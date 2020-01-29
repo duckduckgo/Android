@@ -325,7 +325,9 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
         appBarLayout.setExpanded(true)
         viewModel.onViewResumed()
         logoHidingListener.onResume()
-        if (isVisible) {
+
+        // onResume can be called for a hidden/backgrounded fragment, ensure this tab is visible.
+        if (fragmentIsVisible()) {
             viewModel.onViewVisible()
         }
     }
@@ -403,6 +405,12 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
         viewModel.tabs.observe(this, Observer<List<TabEntity>> {
             it?.let { renderer.renderTabIcon(it) }
         })
+    }
+
+    private fun fragmentIsVisible(): Boolean {
+        // using isHidden rather than isVisible, as isVisible will incorrectly return false when windowToken is not yet initialized.
+        // changes on isHidden will be received in onHiddenChanged
+        return !isHidden
     }
 
     private fun showHome() {
@@ -957,6 +965,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
             webView?.onPause()
         } else {
             webView?.onResume()
+            viewModel.onViewVisible()
         }
     }
 
@@ -1341,7 +1350,9 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
         }
 
         fun renderCtaViewState(viewState: CtaViewState) {
-            if (!isVisible) return
+            if (isHidden) {
+                return
+            }
 
             renderIfChanged(viewState, lastSeenCtaViewState) {
                 ddgLogo.show()
