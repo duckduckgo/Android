@@ -149,9 +149,17 @@ class CtaViewModelTest {
     }
 
     @Test
-    fun whenCtaShownPixelIsFired() {
+    fun whenCtaShownAndCanSendPixelPixelIsFired() {
+        whenever(ctaHelper.canSendPixel(any())).thenReturn(true)
         testee.onCtaShown(HomePanelCta.Survey(Survey("abc", "http://example.com", 1, SCHEDULED)))
         verify(mockPixel).fire(eq(SURVEY_CTA_SHOWN), any())
+    }
+
+    @Test
+    fun whenCtaShownAndCanNotSendPixelPixelIsNotFired() {
+        whenever(ctaHelper.canSendPixel(any())).thenReturn(false)
+        testee.onCtaShown(HomePanelCta.Survey(Survey("abc", "http://example.com", 1, SCHEDULED)))
+        verify(mockPixel, never()).fire(eq(SURVEY_CTA_SHOWN), any())
     }
 
     @Test
@@ -198,21 +206,9 @@ class CtaViewModelTest {
     }
 
     @Test
-    fun whenRegisterDaxBubbleIntroCtaThenPixelIsFired() {
-        testee.registerDaxBubbleCtaDismissed(DaxBubbleCta.DaxIntroCta(ctaHelper))
-        verify(mockPixel).fire(eq(ONBOARDING_DAX_CTA_SHOWN), any())
-    }
-
-    @Test
     fun whenRegisterDaxBubbleEndCtaThenDatabaseNotified() {
         testee.registerDaxBubbleCtaDismissed(DaxBubbleCta.DaxEndCta(ctaHelper))
         verify(mockDismissedCtaDao).insert(DismissedCta(CtaId.DAX_END))
-    }
-
-    @Test
-    fun whenRegisterDaxBubbleEndCtaThenPixelIsFired() {
-        testee.registerDaxBubbleCtaDismissed(DaxBubbleCta.DaxIntroCta(ctaHelper))
-        verify(mockPixel).fire(eq(ONBOARDING_DAX_CTA_SHOWN), any())
     }
 
     @Test

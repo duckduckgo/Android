@@ -1428,33 +1428,6 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenCtaShownThenFirePixel() {
-        val cta = HomePanelCta.Survey(Survey("abc", "http://example.com", daysInstalled = 1, status = Survey.Status.SCHEDULED))
-        testee.ctaViewState.value = BrowserTabViewModel.CtaViewState(cta = cta)
-
-        testee.onCtaShown()
-        verify(mockPixel).fire(cta.shownPixel!!, cta.pixelShownParameters())
-    }
-
-    @Test
-    fun whenManualCtaShownThenFirePixel() {
-        val cta = HomePanelCta.Survey(Survey("abc", "http://example.com", daysInstalled = 1, status = Survey.Status.SCHEDULED))
-
-        testee.onManualCtaShown(cta)
-        verify(mockPixel).fire(cta.shownPixel!!, cta.pixelShownParameters())
-    }
-
-    @Test
-    fun whenRegisterDaxBubbleCtaShownThenFirePixel() {
-        whenever(mockCtaHelper.addCtaToHistory(anyString())).thenReturn("")
-        val cta = DaxBubbleCta.DaxIntroCta(mockCtaHelper)
-        testee.ctaViewState.value = BrowserTabViewModel.CtaViewState(cta = cta)
-
-        testee.registerDaxBubbleCtaDismissed()
-        verify(mockPixel).fire(cta.shownPixel!!, cta.pixelShownParameters())
-    }
-
-    @Test
     fun whenRegisterDaxBubbleCtaShownThenRegisterInDatabase() {
         whenever(mockCtaHelper.addCtaToHistory(anyString())).thenReturn("")
         val cta = DaxBubbleCta.DaxIntroCta(mockCtaHelper)
