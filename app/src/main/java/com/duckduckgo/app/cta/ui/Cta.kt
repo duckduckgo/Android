@@ -39,12 +39,12 @@ import kotlinx.android.synthetic.main.include_dax_dialog_cta.view.dialogTextCta
 import kotlinx.android.synthetic.main.include_dax_dialog_cta.view.hiddenTextCta
 import kotlinx.android.synthetic.main.include_dax_dialog_cta.view.primaryCta
 
-interface BrowserCta {
+interface DialogCta {
     fun showCta(activity: FragmentActivity): DaxDialog
 }
 
 
-interface HomeCta {
+interface ViewCta {
     fun showCta(view: View)
 }
 
@@ -68,7 +68,7 @@ sealed class DaxDialogCta(
     override val cancelPixel: Pixel.PixelName?,
     var ctaPixelParam: String,
     val ctaHelper: CtaHelper
-) : Cta, BrowserCta {
+) : Cta, DialogCta {
 
     override fun showCta(activity: FragmentActivity) = DaxDialog(getDaxText(activity), activity.resources.getString(okButton))
 
@@ -195,7 +195,7 @@ sealed class DaxBubbleCta(
     override val cancelPixel: Pixel.PixelName?,
     val ctaPixelParam: String,
     private val ctaHelper: CtaHelper
-) : Cta, HomeCta {
+) : Cta, ViewCta {
 
     override fun showCta(view: View) {
         val daxText = view.context.getString(description)
@@ -243,7 +243,7 @@ sealed class HomePanelCta(
     override val shownPixel: Pixel.PixelName?,
     override val okPixel: Pixel.PixelName?,
     override val cancelPixel: Pixel.PixelName?
-) : Cta, HomeCta {
+) : Cta, ViewCta {
 
     override fun showCta(view: View) {
         view.ctaIcon.setImageResource(image)
@@ -251,6 +251,7 @@ sealed class HomePanelCta(
         view.ctaSubtitle.text = view.context.getString(description)
         view.ctaOkButton.text = view.context.getString(okButton)
         view.ctaDismissButton.text = view.context.getString(dismissButton)
+        view.show()
     }
 
     override fun pixelCancelParameters(): Map<String, String?> = emptyMap()
