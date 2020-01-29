@@ -16,17 +16,12 @@
 
 package com.duckduckgo.app.cta.ui
 
-import android.content.res.Resources
-import androidx.fragment.app.FragmentActivity
 import com.duckduckgo.app.cta.CtaDaxHelper
 import com.duckduckgo.app.cta.CtaHelper
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.onboarding.store.OnboardingStore
-import com.duckduckgo.app.privacy.model.TestEntity
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.CTA_SHOWN
 import com.duckduckgo.app.survey.model.Survey
-import com.duckduckgo.app.trackerdetection.model.TrackingEvent
-import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.whenever
 import org.junit.Assert.*
 import org.junit.Before
@@ -43,12 +38,6 @@ class CtaTest {
     @Mock
     private lateinit var mockAppInstallStore: AppInstallStore
 
-    @Mock
-    private lateinit var mockActivity: FragmentActivity
-
-    @Mock
-    private lateinit var mockResources: Resources
-
     private lateinit var daxCtaHelper: CtaHelper
 
     @Before
@@ -56,10 +45,6 @@ class CtaTest {
         MockitoAnnotations.initMocks(this)
 
         daxCtaHelper = CtaDaxHelper(mockOnboardingStore, mockAppInstallStore)
-
-        whenever(mockActivity.resources).thenReturn(mockResources)
-        whenever(mockResources.getString(any())).thenReturn("withZero")
-        whenever(mockResources.getQuantityString(any(), any(), any())).thenReturn("withMultiple")
     }
 
     @Test
@@ -205,59 +190,5 @@ class CtaTest {
 
         val value = testee.pixelShownParameters()
         assertEquals(expectedValue, value[CTA_SHOWN])
-    }
-
-    @Test
-    fun whenMoreThanTwoMajorTrackersBlockedReturnFirstTwoWithMultipleString() {
-        val trackers = listOf(
-            TrackingEvent("facebook.com", "facebook.com", blocked = true, entity = TestEntity("Facebook", "Facebook", 9.0), categories = null),
-            TrackingEvent("other.com", "other.com", blocked = true, entity = TestEntity("Other", "Other", 9.0), categories = null),
-            TrackingEvent("amazon.com", "amazon.com", blocked = true, entity = TestEntity("Amazon", "Amazon", 9.0), categories = null)
-        )
-
-        val testee = DaxDialogCta.DaxTrackersBlockedCta(daxCtaHelper, trackers, "http://www.trackers.com")
-        val value = testee.getDaxText(mockActivity)
-
-        assertEquals("<b>Facebook, Other</b>withMultiple", value)
-    }
-
-    @Test
-    fun whenTwoMajorTrackersBlockedReturnThemWithMultipleString() {
-        val trackers = listOf(
-            TrackingEvent("facebook.com", "facebook.com", blocked = true, entity = TestEntity("Facebook", "Facebook", 9.0), categories = null),
-            TrackingEvent("other.com", "other.com", blocked = true, entity = TestEntity("Other", "Other", 9.0), categories = null)
-        )
-
-        val testee = DaxDialogCta.DaxTrackersBlockedCta(daxCtaHelper, trackers, "http://www.trackers.com")
-        val value = testee.getDaxText(mockActivity)
-
-        assertEquals("<b>Facebook, Other</b>withZero", value)
-    }
-
-    @Test
-    fun whenOneMajorTrackersBlockedReturnItWithMultipleString() {
-        val trackers = listOf(
-            TrackingEvent("facebook.com", "facebook.com", blocked = true, entity = TestEntity("Facebook", "Facebook", 9.0), categories = null),
-            TrackingEvent("other.com", "other.com", blocked = true, entity = TestEntity("Other", "Other", 3.0), categories = null)
-        )
-
-        val testee = DaxDialogCta.DaxTrackersBlockedCta(daxCtaHelper, trackers, "http://www.trackers.com")
-        val value = testee.getDaxText(mockActivity)
-
-        assertEquals("<b>Facebook</b>withMultiple", value)
-    }
-
-    @Test
-    fun whenMultipleTrackersFromSameNetworkBlockedReturnOnlyOneWithMultipleString() {
-        val trackers = listOf(
-            TrackingEvent("facebook.com", "facebook.com", blocked = true, entity = TestEntity("Facebook", "Facebook", 9.0), categories = null),
-            TrackingEvent("facebook.com", "facebook.com", blocked = true, entity = TestEntity("Facebook", "Facebook", 9.0), categories = null),
-            TrackingEvent("facebook.com", "facebook.com", blocked = true, entity = TestEntity("Facebook", "Facebook", 9.0), categories = null)
-        )
-
-        val testee = DaxDialogCta.DaxTrackersBlockedCta(daxCtaHelper, trackers, "http://www.trackers.com")
-        val value = testee.getDaxText(mockActivity)
-
-        assertEquals("<b>Facebook</b>withMultiple", value)
     }
 }

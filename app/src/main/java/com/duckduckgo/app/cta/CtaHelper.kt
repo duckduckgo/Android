@@ -48,7 +48,7 @@ class CtaDaxHelper @Inject constructor(val onboardingStore: OnboardingStore, val
             is HomePanelCta -> true
             is DaxDialogCta -> !(param.isNotEmpty() && param.last().contains(cta.ctaPixelParam))
             is DaxBubbleCta -> !(param.isNotEmpty() && param.last().contains(cta.ctaPixelParam))
-            else -> true
+            else -> false
         }
     }
 
