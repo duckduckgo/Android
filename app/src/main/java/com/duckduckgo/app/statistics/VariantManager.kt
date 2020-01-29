@@ -32,6 +32,7 @@ interface VariantManager {
         object ConceptTest : VariantFeature()
         object SuppressWidgetCta : VariantFeature()
         object SuppressDefaultBrowserCta : VariantFeature()
+        object SuppressDefaultBrowserContinueScreen : VariantFeature()
     }
 
     companion object {
@@ -68,7 +69,7 @@ interface VariantManager {
             Variant(
                 key = "mz",
                 weight = 1.0,
-                features = listOf(ConceptTest),
+                features = listOf(ConceptTest, SuppressDefaultBrowserContinueScreen),
                 filterBy = { isEnglishLocale() })
 
             // All groups in an experiment (control and variants) MUST use the same filters
