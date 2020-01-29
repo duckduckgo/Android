@@ -1431,7 +1431,6 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
                 renderHomeCta()
             } else {
                 configuration.showCta(ctaContainer)
-                ctaContainer.show()
             }
         }
 

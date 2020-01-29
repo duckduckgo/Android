@@ -305,6 +305,7 @@ sealed class HomePanelCta(
         view.ctaSubtitle.text = view.context.getString(description)
         view.ctaOkButton.text = view.context.getString(okButton)
         view.ctaDismissButton.text = view.context.getString(dismissButton)
+        view.show()
     }
 
     override fun pixelCancelParameters(): Map<String, String?> = emptyMap()
