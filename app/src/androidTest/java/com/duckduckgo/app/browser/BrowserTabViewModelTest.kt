@@ -56,7 +56,6 @@ import com.duckduckgo.app.cta.ui.HomePanelCta
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.model.SiteFactory
-import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao
 import com.duckduckgo.app.privacy.model.PrivacyPractices
 import com.duckduckgo.app.privacy.model.TestEntity
@@ -1451,7 +1450,7 @@ class BrowserTabViewModelTest {
         val cta = DaxBubbleCta.DaxIntroCta(mockCtaHelper)
         testee.ctaViewState.value = BrowserTabViewModel.CtaViewState(cta = cta)
 
-        testee.registerDaxBubbleCtaShown()
+        testee.registerDaxBubbleCtaDismissed()
         verify(mockPixel).fire(cta.shownPixel!!, cta.pixelShownParameters())
     }
 
@@ -1461,7 +1460,7 @@ class BrowserTabViewModelTest {
         val cta = DaxBubbleCta.DaxIntroCta(mockCtaHelper)
         testee.ctaViewState.value = BrowserTabViewModel.CtaViewState(cta = cta)
 
-        testee.registerDaxBubbleCtaShown()
+        testee.registerDaxBubbleCtaDismissed()
         verify(mockDismissedCtaDao).insert(DismissedCta(cta.ctaId))
     }
 

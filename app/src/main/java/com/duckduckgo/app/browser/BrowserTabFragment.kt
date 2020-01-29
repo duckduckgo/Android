@@ -430,7 +430,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
     private fun navigate(url: String) {
         hideKeyboard()
         renderer.hideFindInPage()
-        viewModel.registerDaxBubbleCtaShown()
+        viewModel.registerDaxBubbleCtaDismissed()
         webView?.loadUrl(url)
     }
 
@@ -1137,6 +1137,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
         private var lastSeenGlobalViewState: GlobalLayoutViewState? = null
         private var lastSeenAutoCompleteViewState: AutoCompleteViewState? = null
         private var lastSeenCtaViewState: CtaViewState? = null
+        private var daxDialog: DaxDialog? = null
 
         fun renderAutocomplete(viewState: AutoCompleteViewState) {
             renderIfChanged(viewState, lastSeenAutoCompleteViewState) {
@@ -1370,7 +1371,8 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
             hideDaxCta()
             val container = networksContainer
             activity?.let { activity ->
-                val daxDialog = configuration.showCta(activity).apply {
+                daxDialog?.dismiss()
+                daxDialog = configuration.showCta(activity).apply {
                     setHideClickListener {
                         dismiss()
                         launchHideTipsDialog(activity, configuration)
@@ -1395,7 +1397,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
                         }
                     }
                 }
-                daxDialog.show(activity.supportFragmentManager, DAX_DIALOG_DIALOG_TAG)
+                daxDialog?.show(activity.supportFragmentManager, DAX_DIALOG_DIALOG_TAG)
             }
         }
 
