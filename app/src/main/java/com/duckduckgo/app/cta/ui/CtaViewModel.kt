@@ -72,14 +72,15 @@ class CtaViewModel @Inject constructor(
 
     fun onCtaShown(cta: Cta) {
         cta.shownPixel?.let {
-            pixel.fire(it, cta.pixelShownParameters())
+            if (ctaHelper.canSendPixel(cta)) {
+                pixel.fire(it, cta.pixelShownParameters())
+            }
         }
     }
 
-    fun registerDaxBubbleCtaShown(cta: Cta) {
+    fun registerDaxBubbleCtaDismissed(cta: Cta) {
         if (cta is DaxBubbleCta) {
             Schedulers.io().scheduleDirect {
-                onCtaShown(cta)
                 dismissedCtaDao.insert(DismissedCta(cta.ctaId))
             }
         }

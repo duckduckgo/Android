@@ -1137,7 +1137,6 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
         private var lastSeenGlobalViewState: GlobalLayoutViewState? = null
         private var lastSeenAutoCompleteViewState: AutoCompleteViewState? = null
         private var lastSeenCtaViewState: CtaViewState? = null
-        private var daxDialog: DaxDialog? = null
 
         fun renderAutocomplete(viewState: AutoCompleteViewState) {
             renderIfChanged(viewState, lastSeenAutoCompleteViewState) {
@@ -1363,9 +1362,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
                 is DaxDialogCta -> showDaxDialogCta(configuration)
             }
 
-            if (configuration !is DaxBubbleCta) {
-                viewModel.onCtaShown()
-            }
+            viewModel.onCtaShown()
         }
 
         private fun showDaxDialogCta(configuration: DaxDialogCta) {
@@ -1373,8 +1370,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
             hideDaxCta()
             val container = networksContainer
             activity?.let { activity ->
-                daxDialog?.dismiss()
-                daxDialog = configuration.showCta(activity).apply {
+                val daxDialog = configuration.showCta(activity).apply {
                     setHideClickListener {
                         dismiss()
                         launchHideTipsDialog(activity, configuration)
@@ -1399,7 +1395,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
                         }
                     }
                 }
-                daxDialog?.show(activity.supportFragmentManager, DAX_DIALOG_DIALOG_TAG)
+                daxDialog.show(activity.supportFragmentManager, DAX_DIALOG_DIALOG_TAG)
             }
         }
 

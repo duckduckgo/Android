@@ -29,7 +29,6 @@ import com.duckduckgo.app.cta.model.DismissedCta
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.model.Site
-import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.privacy.model.HttpsStatus
 import com.duckduckgo.app.privacy.model.PrivacyGrade
 import com.duckduckgo.app.privacy.model.PrivacyPractices
@@ -194,25 +193,25 @@ class CtaViewModelTest {
 
     @Test
     fun whenRegisterDaxBubbleIntroCtaThenDatabaseNotified() {
-        testee.registerDaxBubbleCtaShown(DaxBubbleCta.DaxIntroCta(ctaHelper))
+        testee.registerDaxBubbleCtaDismissed(DaxBubbleCta.DaxIntroCta(ctaHelper))
         verify(mockDismissedCtaDao).insert(DismissedCta(CtaId.DAX_INTRO))
     }
 
     @Test
     fun whenRegisterDaxBubbleIntroCtaThenPixelIsFired() {
-        testee.registerDaxBubbleCtaShown(DaxBubbleCta.DaxIntroCta(ctaHelper))
+        testee.registerDaxBubbleCtaDismissed(DaxBubbleCta.DaxIntroCta(ctaHelper))
         verify(mockPixel).fire(eq(ONBOARDING_DAX_CTA_SHOWN), any())
     }
 
     @Test
     fun whenRegisterDaxBubbleEndCtaThenDatabaseNotified() {
-        testee.registerDaxBubbleCtaShown(DaxBubbleCta.DaxEndCta(ctaHelper))
+        testee.registerDaxBubbleCtaDismissed(DaxBubbleCta.DaxEndCta(ctaHelper))
         verify(mockDismissedCtaDao).insert(DismissedCta(CtaId.DAX_END))
     }
 
     @Test
     fun whenRegisterDaxBubbleEndCtaThenPixelIsFired() {
-        testee.registerDaxBubbleCtaShown(DaxBubbleCta.DaxIntroCta(ctaHelper))
+        testee.registerDaxBubbleCtaDismissed(DaxBubbleCta.DaxIntroCta(ctaHelper))
         verify(mockPixel).fire(eq(ONBOARDING_DAX_CTA_SHOWN), any())
     }
 

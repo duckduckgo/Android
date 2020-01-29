@@ -18,6 +18,10 @@ package com.duckduckgo.app.cta
 
 import android.content.Context
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.cta.ui.Cta
+import com.duckduckgo.app.cta.ui.DaxBubbleCta
+import com.duckduckgo.app.cta.ui.DaxDialogCta
+import com.duckduckgo.app.cta.ui.HomePanelCta
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.install.daysInstalled
 import com.duckduckgo.app.onboarding.store.OnboardingStore
@@ -32,15 +36,24 @@ interface CtaHelper {
     fun getNetworkPercentage(network: String): String?
 
     fun isFromSameNetworkDomain(host: String): Boolean
+
+    fun canSendPixel(cta: Cta): Boolean
 }
 
 class CtaDaxHelper @Inject constructor(val onboardingStore: OnboardingStore, val appInstallStore: AppInstallStore) : CtaHelper {
 
+    override fun canSendPixel(cta: Cta): Boolean {
+        val param = onboardingStore.onboardingDialogJourney?.split("-").orEmpty().toMutableList()
+        return when (cta) {
+            is HomePanelCta -> true
+            is DaxDialogCta -> !(param.isNotEmpty() && param.last().contains(cta.ctaPixelParam))
+            is DaxBubbleCta -> !(param.isNotEmpty() && param.last().contains(cta.ctaPixelParam))
+            else -> true
+        }
+    }
+
     override fun addCtaToHistory(newCta: String): String {
         val param = onboardingStore.onboardingDialogJourney?.split("-").orEmpty().toMutableList()
-        if (param.isNotEmpty() && param.last().contains(newCta)) {
-            return param.joinToString("-")
-        }
         val daysInstalled = minOf(appInstallStore.daysInstalled().toInt(), MAX_DAYS_ALLOWED)
         param.add("$newCta:${daysInstalled}")
         val finalParam = param.joinToString("-")
