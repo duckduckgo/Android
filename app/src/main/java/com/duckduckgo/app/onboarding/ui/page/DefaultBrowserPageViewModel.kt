@@ -21,18 +21,20 @@ import androidx.lifecycle.ViewModel
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.global.SingleLiveEvent
 import com.duckduckgo.app.global.install.AppInstallStore
+import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.pixels.Pixel
 
 class DefaultBrowserPageViewModel(
     private val defaultBrowserDetector: DefaultBrowserDetector,
     private val pixel: Pixel,
-    private val installStore: AppInstallStore
+    private val installStore: AppInstallStore,
+    private val variantManager: VariantManager
 ) : ViewModel() {
 
     data class ViewState(
-        val showSettingsUi: Boolean = false,
-        val showInstructionsCard: Boolean = false,
-        val showOnlyContinue: Boolean = false
+        val showSettingsUi: Boolean = false, //settings or always
+        val showInstructionsCard: Boolean = false, //toast on the top
+        val showOnlyContinue: Boolean = false //confirmation screen
     )
 
     sealed class Command {
@@ -116,11 +118,20 @@ class DefaultBrowserPageViewModel(
                 fireDefaultBrowserPixelAndResetTimesPressedJustOnce(originValue = Pixel.PixelValues.DEFAULT_BROWSER_SETTINGS)
             }
         }
-        viewState.value = viewState.value?.copy(
-            showOnlyContinue = isDefault,
-            showSettingsUi = showSettingsUI,
-            showInstructionsCard = showInstructionsCard
-        )
+        if (isDefault && variantManager.getVariant().hasFeature(VariantManager.VariantFeature.SuppressDefaultBrowserContinueScreen)) {
+            viewState.value = viewState.value?.copy(
+                showOnlyContinue = !variantManager.getVariant().hasFeature(VariantManager.VariantFeature.SuppressDefaultBrowserContinueScreen),
+                showSettingsUi = showSettingsUI,
+                showInstructionsCard = showInstructionsCard
+            )
+            command.value = Command.ContinueToBrowser
+        } else {
+            viewState.value = viewState.value?.copy(
+                showOnlyContinue = !variantManager.getVariant().hasFeature(VariantManager.VariantFeature.SuppressDefaultBrowserContinueScreen),
+                showSettingsUi = showSettingsUI,
+                showInstructionsCard = showInstructionsCard
+            )
+        }
     }
 
     private fun handleOriginInternalBrowser(ddgIsDefaultBrowser: Boolean): Boolean {
