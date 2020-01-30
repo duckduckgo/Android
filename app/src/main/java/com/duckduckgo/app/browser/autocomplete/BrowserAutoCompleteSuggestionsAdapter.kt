@@ -20,6 +20,7 @@ import android.view.ViewGroup
 import androidx.annotation.UiThread
 import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.app.autocomplete.api.AutoCompleteApi.AutoCompleteSuggestion
+import com.duckduckgo.app.autocomplete.api.AutoCompleteApi.AutoCompleteSuggestion.AutoCompleteBookmarkSuggestion
 import com.duckduckgo.app.browser.autocomplete.AutoCompleteViewHolder.EmptySuggestionViewHolder
 
 class BrowserAutoCompleteSuggestionsAdapter(
@@ -38,10 +39,10 @@ class BrowserAutoCompleteSuggestionsAdapter(
         viewHolderFactoryMap.getValue(viewType).onCreateViewHolder(parent)
 
     override fun getItemViewType(position: Int): Int {
-        return if (suggestions.isEmpty()) {
-            EMPTY_TYPE
-        } else {
-            suggestions[position].suggestionType
+        return when {
+            suggestions.isEmpty() -> EMPTY_TYPE
+            suggestions[position] is AutoCompleteBookmarkSuggestion -> BOOKMARK_TYPE
+            else -> SUGGESTION_TYPE
         }
     }
 

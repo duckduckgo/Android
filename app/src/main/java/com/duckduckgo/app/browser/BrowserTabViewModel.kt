@@ -155,7 +155,7 @@ class BrowserTabViewModel(
 
     data class AutoCompleteViewState(
         val showSuggestions: Boolean = false,
-        val searchResults: AutoCompleteResult = AutoCompleteResult("", emptyList(), false)
+        val searchResults: AutoCompleteResult = AutoCompleteResult("", emptyList())
     )
 
     sealed class Command {
@@ -278,7 +278,7 @@ class BrowserTabViewModel(
     private fun onAutoCompleteResultReceived(result: AutoCompleteResult) {
         val results = result.suggestions.take(6)
         val currentViewState = currentAutoCompleteViewState()
-        autoCompleteViewState.value = currentViewState.copy(searchResults = AutoCompleteResult(result.query, results, result.hasBookmarks))
+        autoCompleteViewState.value = currentViewState.copy(searchResults = AutoCompleteResult(result.query, results))
     }
 
     @VisibleForTesting
@@ -315,8 +315,9 @@ class BrowserTabViewModel(
         val hasBookmarks = withContext(dispatchers.io()) {
             bookmarksDao.hasBookmarks()
         }
+        val hasBookmarkResults = currentViewState.searchResults.suggestions.any { it is AutoCompleteBookmarkSuggestion }
         val params = mapOf(
-            PixelParameter.SHOWED_BOOKMARKS to currentViewState.searchResults.hasBookmarks.toString(),
+            PixelParameter.SHOWED_BOOKMARKS to hasBookmarkResults.toString(),
             PixelParameter.BOOKMARK_CAPABLE to hasBookmarks.toString()
         )
         val pixelName = when (suggestion) {
@@ -619,7 +620,7 @@ class BrowserTabViewModel(
 
         // determine if empty list to be shown, or existing search results
         val autoCompleteSearchResults = if (query.isBlank()) {
-            AutoCompleteResult(query, emptyList(), false)
+            AutoCompleteResult(query, emptyList())
         } else {
             currentAutoCompleteViewState().searchResults
         }

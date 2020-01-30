@@ -34,7 +34,7 @@ open class AutoCompleteApi @Inject constructor(
     fun autoComplete(query: String): Observable<AutoCompleteResult> {
 
         if (query.isBlank()) {
-            return Observable.just(AutoCompleteResult(query = query, suggestions = emptyList(), hasBookmarks = false))
+            return Observable.just(AutoCompleteResult(query = query, suggestions = emptyList()))
         }
 
         return getAutoCompleteBookmarkResults(query).zipWith(
@@ -42,8 +42,7 @@ open class AutoCompleteApi @Inject constructor(
             BiFunction { bookmarksResults, searchResults ->
                 AutoCompleteResult(
                     query = query,
-                    suggestions = (bookmarksResults + searchResults).distinct(),
-                    hasBookmarks = bookmarksResults.isNotEmpty()
+                    suggestions = (bookmarksResults + searchResults).distinct()
                 )
             }
         )
@@ -71,15 +70,14 @@ open class AutoCompleteApi @Inject constructor(
 
     data class AutoCompleteResult(
         val query: String,
-        val suggestions: List<AutoCompleteSuggestion>,
-        val hasBookmarks: Boolean
+        val suggestions: List<AutoCompleteSuggestion>
     )
 
-    sealed class AutoCompleteSuggestion(val phrase: String, val suggestionType: Int) {
+    sealed class AutoCompleteSuggestion(val phrase: String) {
         class AutoCompleteSearchSuggestion(phrase: String, val isUrl: Boolean) :
-            AutoCompleteSuggestion(phrase, SUGGESTION_TYPE)
+            AutoCompleteSuggestion(phrase)
 
         class AutoCompleteBookmarkSuggestion(phrase: String, val title: String, val url: String) :
-            AutoCompleteSuggestion(phrase, BOOKMARK_TYPE)
+            AutoCompleteSuggestion(phrase)
     }
 }
