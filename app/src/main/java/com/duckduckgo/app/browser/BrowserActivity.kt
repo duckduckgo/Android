@@ -188,13 +188,6 @@ class BrowserActivity : DuckDuckGoActivity(), CoroutineScope {
             Toast.makeText(applicationContext, R.string.fireDataCleared, Toast.LENGTH_LONG).show()
         }
 
-        if (launchedFromWidget(intent)) {
-            Timber.w("new tab requested from widget")
-            pixel.fire(Pixel.PixelName.WIDGET_LAUNCHED)
-            launch { viewModel.onNewTabRequested() }
-            return
-        }
-
         if (launchNewSearch(intent)) {
             Timber.w("new tab requested")
             launch { viewModel.onNewTabRequested() }
@@ -254,10 +247,6 @@ class BrowserActivity : DuckDuckGoActivity(), CoroutineScope {
             is Command.ShowAppFeedbackPrompt -> showAppEnjoymentPrompt(GiveFeedbackDialogFragment.create(command.promptCount, viewModel))
             is Command.LaunchFeedbackView -> startActivity(FeedbackActivity.intent(this))
         }
-    }
-
-    private fun launchedFromWidget(intent: Intent): Boolean {
-        return intent.getBooleanExtra(WIDGET_SEARCH_EXTRA, false)
     }
 
     private fun launchNewSearch(intent: Intent): Boolean {
@@ -330,20 +319,17 @@ class BrowserActivity : DuckDuckGoActivity(), CoroutineScope {
             context: Context,
             queryExtra: String? = null,
             newSearch: Boolean = false,
-            widgetSearch: Boolean = false,
             launchedFromFireAction: Boolean = false
         ): Intent {
             val intent = Intent(context, BrowserActivity::class.java)
             intent.putExtra(EXTRA_TEXT, queryExtra)
             intent.putExtra(NEW_SEARCH_EXTRA, newSearch)
-            intent.putExtra(WIDGET_SEARCH_EXTRA, widgetSearch)
             intent.putExtra(LAUNCHED_FROM_FIRE_EXTRA, launchedFromFireAction)
             return intent
         }
 
         const val NEW_SEARCH_ACTION = "com.duckduckgo.mobile.android.NEW_SEARCH"
         const val NEW_SEARCH_EXTRA = "NEW_SEARCH_EXTRA"
-        const val WIDGET_SEARCH_EXTRA = "WIDGET_SEARCH_EXTRA"
         const val PERFORM_FIRE_ON_ENTRY_EXTRA = "PERFORM_FIRE_ON_ENTRY_EXTRA"
         const val LAUNCHED_FROM_FIRE_EXTRA = "LAUNCHED_FROM_FIRE_EXTRA"
         const val LAUNCH_FROM_DEFAULT_BROWSER_DIALOG = "LAUNCH_FROM_DEFAULT_BROWSER_DIALOG"
