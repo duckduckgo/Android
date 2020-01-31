@@ -332,6 +332,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
     }
 
     override fun onPause() {
+        daxDialog = null
         logoHidingListener.onPause()
         super.onPause()
     }
@@ -983,7 +984,6 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
     }
 
     override fun onDestroy() {
-        daxDialog = null
         supervisorJob.cancel()
         popupMenu.dismiss()
         destroyWebView()
