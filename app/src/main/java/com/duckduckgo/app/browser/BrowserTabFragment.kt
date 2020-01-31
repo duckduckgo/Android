@@ -235,6 +235,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
     private val logoHidingListener by lazy { LogoHidingLayoutChangeLifecycleListener(ddgLogo) }
 
     private var alertDialog: AlertDialog? = null
+    private var daxDialog: DaxDialog? = null
 
     override fun onAttach(context: Context) {
         AndroidSupportInjection.inject(this)
@@ -982,6 +983,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
     }
 
     override fun onDestroy() {
+        daxDialog = null
         supervisorJob.cancel()
         popupMenu.dismiss()
         destroyWebView()
@@ -1137,7 +1139,6 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
         private var lastSeenGlobalViewState: GlobalLayoutViewState? = null
         private var lastSeenAutoCompleteViewState: AutoCompleteViewState? = null
         private var lastSeenCtaViewState: CtaViewState? = null
-        private var daxDialog: DaxDialog? = null
 
         fun renderAutocomplete(viewState: AutoCompleteViewState) {
             renderIfChanged(viewState, lastSeenAutoCompleteViewState) {
@@ -1374,7 +1375,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
             val container = networksContainer
             activity?.let { activity ->
                 daxDialog?.dismiss()
-                daxDialog = configuration.showCta(activity).apply {
+                daxDialog = configuration.createCta(activity).apply {
                     setHideClickListener {
                         dismiss()
                         launchHideTipsDialog(activity, configuration)
@@ -1398,8 +1399,8 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
                             dismiss()
                         }
                     }
+                    show(activity.supportFragmentManager, DAX_DIALOG_DIALOG_TAG)
                 }
-                daxDialog?.show(activity.supportFragmentManager, DAX_DIALOG_DIALOG_TAG)
             }
         }
 
