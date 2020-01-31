@@ -101,9 +101,22 @@ class DefaultBrowserPage : OnboardingPageFragment() {
     private fun observeViewModel() {
         viewModel.viewState.observe(this, Observer<DefaultBrowserPageViewModel.ViewState> { viewState ->
             viewState?.let {
-                if (it.showSettingsUi) setUiForSettings() else setUiForDialog()
-                if (it.showInstructionsCard) showCard() else hideCard()
-                setOnlyContinue(it.showOnlyContinue)
+                when (it) {
+                    is DefaultBrowserPageViewModel.ViewState.DefaultBrowserSettingsUI -> {
+                        setUiForSettings()
+                        hideInstructionsCard()
+                        setOnlyContinue(false)
+                    }
+                    is DefaultBrowserPageViewModel.ViewState.DefaultBrowserDialogUI -> {
+                        setUiForDialog()
+                        if (it.showInstructionsCard) showInstructionsCard() else hideInstructionsCard()
+                        setOnlyContinue(false)
+                    }
+                    is DefaultBrowserPageViewModel.ViewState.ConfirmationScreen -> {
+                        setOnlyContinue(true)
+                        hideInstructionsCard()
+                    }
+                }
             }
         })
 
@@ -157,7 +170,7 @@ class DefaultBrowserPage : OnboardingPageFragment() {
     }
 
     @SuppressLint("InflateParams")
-    private fun showCard() {
+    private fun showInstructionsCard() {
         toast?.cancel()
         defaultCard?.show()
         defaultCard?.alpha = 1f
@@ -173,7 +186,7 @@ class DefaultBrowserPage : OnboardingPageFragment() {
         toast?.show()
     }
 
-    private fun hideCard() {
+    private fun hideInstructionsCard() {
         toast?.cancel()
         defaultCard?.animate()?.alpha(0f)?.setDuration(100)?.start()
     }
