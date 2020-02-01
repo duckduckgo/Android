@@ -218,9 +218,6 @@ class DefaultBrowserPageViewModelTest {
     @Test
     fun whenDefaultButtonClickedWithoutDefaultBrowserThenExecuteOpenDialogCommandAndShowInstructionsCard() {
         whenever(mockDefaultBrowserDetector.hasDefaultBrowser()).thenReturn(false)
-        val params = mapOf(
-            Pixel.PixelParameter.DEFAULT_BROWSER_BEHAVIOUR_TRIGGERED to DEFAULT_BROWSER_DIALOG
-        )
         testee.loadUI()
 
         testee.onDefaultBrowserClicked()
