@@ -76,12 +76,6 @@ class CtaTest {
     }
 
     @Test
-    fun whenCtaIsSurveyReturnNullDialogCta() {
-        val testee = HomePanelCta.Survey(Survey("abc", "http://example.com", 1, Survey.Status.SCHEDULED))
-        assertNull(testee.createDialogCta(mock(FragmentActivity::class.java)))
-    }
-
-    @Test
     fun whenCtaIsAddWidgetAutoReturnEmptyOkParameters() {
         val testee = HomePanelCta.AddWidgetAuto
         assertTrue(testee.pixelOkParameters().isEmpty())
@@ -99,11 +93,6 @@ class CtaTest {
         assertTrue(testee.pixelShownParameters().isEmpty())
     }
 
-    @Test
-    fun whenCtaIsAddWidgetAutoReturnNullDialogCta() {
-        val testee = HomePanelCta.AddWidgetAuto
-        assertNull(testee.createDialogCta(mock(FragmentActivity::class.java)))
-    }
 
     @Test
     fun whenCtaIsAddWidgetInstructionsReturnEmptyOkParameters() {
@@ -121,12 +110,6 @@ class CtaTest {
     fun whenCtaIsAddWidgetInstructionsReturnEmptyShownParameters() {
         val testee = HomePanelCta.AddWidgetInstructions
         assertTrue(testee.pixelShownParameters().isEmpty())
-    }
-
-    @Test
-    fun whenCtaIsAddWidgetInstructionsReturnNullDialogCta() {
-        val testee = HomePanelCta.AddWidgetInstructions
-        assertNull(testee.createDialogCta(mock(FragmentActivity::class.java)))
     }
 
     @Test

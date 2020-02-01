@@ -235,6 +235,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
     private val logoHidingListener by lazy { LogoHidingLayoutChangeLifecycleListener(ddgLogo) }
 
     private var alertDialog: AlertDialog? = null
+    private var daxDialog: DaxDialog? = null
 
     override fun onAttach(context: Context) {
         AndroidSupportInjection.inject(this)
@@ -333,6 +334,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
     }
 
     override fun onPause() {
+        daxDialog = null
         logoHidingListener.onPause()
         super.onPause()
     }
@@ -1383,7 +1385,8 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
             hideDaxCta()
             val container = networksContainer
             activity?.let { activity ->
-                val daxDialog = configuration.createDialogCta(activity).apply {
+                daxDialog?.dismiss()
+                daxDialog = configuration.createCta(activity).apply {
                     setHideClickListener {
                         dismiss()
                         launchHideTipsDialog(activity, configuration)
@@ -1407,8 +1410,8 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
                             dismiss()
                         }
                     }
+                    show(activity.supportFragmentManager, DAX_DIALOG_DIALOG_TAG)
                 }
-                daxDialog.show(activity.supportFragmentManager, DAX_DIALOG_DIALOG_TAG)
             }
         }
 
@@ -1429,20 +1432,18 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
         }
 
         private fun showDaxCta(configuration: DaxBubbleCta) {
-            daxCtaContainer.alpha = 1f
-            daxCtaContainer.show()
             ddgLogo.hide()
             hideHomeCta()
-            configuration.apply(daxCtaContainer)
+            configuration.showCta(daxCtaContainer)
         }
 
         private fun showHomeCta(configuration: HomePanelCta) {
             hideDaxCta()
             if (ctaContainer.isEmpty()) {
                 renderHomeCta()
+            } else {
+                configuration.showCta(ctaContainer)
             }
-            configuration.apply(ctaContainer)
-            ctaContainer.show()
         }
 
         private fun hideDaxCta() {
@@ -1464,7 +1465,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
             inflate(context, R.layout.include_cta, ctaContainer)
             logoHidingListener.callToActionView = ctaContainer
 
-            configuration.apply(ctaContainer)
+            configuration.showCta(ctaContainer)
             ctaContainer.ctaOkButton.setOnClickListener {
                 viewModel.onUserClickCtaOkButton()
             }
