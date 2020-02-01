@@ -146,7 +146,7 @@ class DefaultBrowserPageViewModelTest {
     }
 
     @Test
-    fun whenLoadUIAfterDefaultButtonClickedThenStateIsSame() {
+    fun whenLoadUIAfterDefaultButtonClickedThenSameState() {
         whenever(mockDefaultBrowserDetector.hasDefaultBrowser()).thenReturn(false)
         testee.loadUI()
         testee.onDefaultBrowserClicked()
