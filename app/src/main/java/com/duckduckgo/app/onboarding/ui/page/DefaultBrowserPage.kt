@@ -112,7 +112,7 @@ class DefaultBrowserPage : OnboardingPageFragment() {
                         if (it.showInstructionsCard) showInstructionsCard() else hideInstructionsCard()
                         setOnlyContinue(false)
                     }
-                    is DefaultBrowserPageViewModel.ViewState.ConfirmationScreen -> {
+                    is DefaultBrowserPageViewModel.ViewState.ContinueUI -> {
                         setOnlyContinue(true)
                         hideInstructionsCard()
                     }

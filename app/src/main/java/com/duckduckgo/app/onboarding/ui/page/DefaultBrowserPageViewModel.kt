@@ -34,7 +34,7 @@ class DefaultBrowserPageViewModel(
     sealed class ViewState {
         object DefaultBrowserSettingsUI : ViewState()
         data class DefaultBrowserDialogUI(val showInstructionsCard: Boolean = false) : ViewState()
-        object ConfirmationScreen : ViewState()
+        object ContinueUI : ViewState()
     }
 
     sealed class Command {
@@ -123,7 +123,7 @@ class DefaultBrowserPageViewModel(
                 if (forceNavigateToBrowser) {
                     viewState.value = ViewState.DefaultBrowserDialogUI(showInstructionsCard = false)
                     command.value = Command.ContinueToBrowser
-                } else if (newViewState is ViewState.ConfirmationScreen) {
+                } else if (newViewState is ViewState.ContinueUI) {
                     showStateOrContinueToBrowser(newViewState)
                 }
             }
@@ -133,14 +133,14 @@ class DefaultBrowserPageViewModel(
                 }
             }
             is Origin.ExternalBrowser -> {
-                if (newViewState is ViewState.ConfirmationScreen) {
+                if (newViewState is ViewState.ContinueUI) {
                     showStateOrContinueToBrowser(newViewState)
                 } else {
                     viewState.value = newViewState
                 }
             }
             is Origin.Settings -> {
-                if (newViewState is ViewState.ConfirmationScreen) {
+                if (newViewState is ViewState.ContinueUI) {
                     showStateOrContinueToBrowser(newViewState)
                 }
             }
@@ -195,7 +195,7 @@ class DefaultBrowserPageViewModel(
 
     private fun newViewState(): ViewState = when {
         defaultBrowserDetector.isDefaultBrowser() -> {
-            ViewState.ConfirmationScreen
+            ViewState.ContinueUI
         }
         defaultBrowserDetector.hasDefaultBrowser() -> {
             ViewState.DefaultBrowserSettingsUI
