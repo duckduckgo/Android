@@ -127,7 +127,7 @@ class VariantManagerTest {
     fun insertCtaConceptTestWithAllCtaExperimentalVariantIsActiveAndHasConceptTestAndSuppressCtaFeatures() {
         val variant = variants.firstOrNull { it.key == "mz" }
         assertEqualsDouble(1.0, variant!!.weight)
-        assertEquals(1, variant!!.features.size)
+        assertEquals(2, variant!!.features.size)
         assertTrue(variant.hasFeature(ConceptTest))
     }
 
