@@ -40,7 +40,7 @@ import kotlinx.android.synthetic.main.include_dax_dialog_cta.view.hiddenTextCta
 import kotlinx.android.synthetic.main.include_dax_dialog_cta.view.primaryCta
 
 interface DialogCta {
-    fun showCta(activity: FragmentActivity): DaxDialog
+    fun createCta(activity: FragmentActivity): DaxDialog
 }
 
 
@@ -70,7 +70,7 @@ sealed class DaxDialogCta(
     val ctaHelper: CtaHelper
 ) : Cta, DialogCta {
 
-    override fun showCta(activity: FragmentActivity) = DaxDialog(getDaxText(activity), activity.resources.getString(okButton))
+    override fun createCta(activity: FragmentActivity) = DaxDialog(getDaxText(activity), activity.resources.getString(okButton))
 
     override fun pixelCancelParameters(): Map<String, String?> = mapOf(Pixel.PixelParameter.CTA_SHOWN to ctaPixelParam)
 
@@ -107,7 +107,7 @@ sealed class DaxDialogCta(
             ctaHelper
         ) {
 
-        override fun showCta(activity: FragmentActivity): DaxDialog =
+        override fun createCta(activity: FragmentActivity): DaxDialog =
             DaxDialog(getDaxText(activity), activity.resources.getString(okButton), false)
 
         override fun getDaxText(context: Context): String {
@@ -134,7 +134,7 @@ sealed class DaxDialogCta(
             }
         }
 
-        override fun showCta(activity: FragmentActivity): DaxDialog {
+        override fun createCta(activity: FragmentActivity): DaxDialog {
             return DaxDialog(getDaxText(activity), activity.resources.getString(okButton)).apply {
                 val privacyGradeButton = activity.findViewById<View>(R.id.privacyGradeButton)
                 onAnimationFinishedListener {
@@ -171,7 +171,7 @@ sealed class DaxDialogCta(
         ctaHelper
     ) {
 
-        override fun showCta(activity: FragmentActivity): DaxDialog {
+        override fun createCta(activity: FragmentActivity): DaxDialog {
             return DaxDialog(getDaxText(activity), activity.resources.getString(okButton)).apply {
                 val fireButton = activity.findViewById<View>(R.id.fire)
                 onAnimationFinishedListener {
