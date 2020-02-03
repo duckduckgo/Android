@@ -19,8 +19,6 @@ package com.duckduckgo.app.autocomplete.api
 import com.duckduckgo.app.autocomplete.api.AutoCompleteApi.AutoCompleteSuggestion.AutoCompleteBookmarkSuggestion
 import com.duckduckgo.app.autocomplete.api.AutoCompleteApi.AutoCompleteSuggestion.AutoCompleteSearchSuggestion
 import com.duckduckgo.app.bookmarks.db.BookmarksDao
-import com.duckduckgo.app.browser.autocomplete.BrowserAutoCompleteSuggestionsAdapter.Companion.BOOKMARK_TYPE
-import com.duckduckgo.app.browser.autocomplete.BrowserAutoCompleteSuggestionsAdapter.Companion.SUGGESTION_TYPE
 import com.duckduckgo.app.global.UriString
 import io.reactivex.Observable
 import io.reactivex.functions.BiFunction

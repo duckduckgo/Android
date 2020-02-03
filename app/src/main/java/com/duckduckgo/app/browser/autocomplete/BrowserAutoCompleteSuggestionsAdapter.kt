@@ -22,11 +22,15 @@ import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.app.autocomplete.api.AutoCompleteApi.AutoCompleteSuggestion
 import com.duckduckgo.app.autocomplete.api.AutoCompleteApi.AutoCompleteSuggestion.AutoCompleteBookmarkSuggestion
 import com.duckduckgo.app.browser.autocomplete.AutoCompleteViewHolder.EmptySuggestionViewHolder
+import com.duckduckgo.app.browser.autocomplete.BrowserAutoCompleteSuggestionsAdapter.Type.BOOKMARK_TYPE
+import com.duckduckgo.app.browser.autocomplete.BrowserAutoCompleteSuggestionsAdapter.Type.EMPTY_TYPE
+import com.duckduckgo.app.browser.autocomplete.BrowserAutoCompleteSuggestionsAdapter.Type.SUGGESTION_TYPE
 
 class BrowserAutoCompleteSuggestionsAdapter(
     private val immediateSearchClickListener: (AutoCompleteSuggestion) -> Unit,
-    private val editableSearchClickListener: (AutoCompleteSuggestion) -> Unit
-) : RecyclerView.Adapter<AutoCompleteViewHolder>() {
+    private val editableSearchClickListener: (AutoCompleteSuggestion) -> Unit,
+    private val showsMessageOnNoSuggestions: Boolean = true
+    ) : RecyclerView.Adapter<AutoCompleteViewHolder>() {
 
     private val viewHolderFactoryMap: Map<Int, SuggestionViewHolderFactory> = mapOf(
         EMPTY_TYPE to EmptySuggestionViewHolderFactory(),
@@ -63,19 +67,19 @@ class BrowserAutoCompleteSuggestionsAdapter(
         if (suggestions.isNotEmpty()) {
             return suggestions.size
         }
-
-        // if there are no suggestions, we'll use a recycler row to display "no suggestions"
-        return 1
+        return if (showsMessageOnNoSuggestions) 1 else 0
     }
 
     @UiThread
     fun updateData(newSuggestions: List<AutoCompleteSuggestion>) {
+        if (suggestions == newSuggestions) return
+
         suggestions.clear()
         suggestions.addAll(newSuggestions)
         notifyDataSetChanged()
     }
 
-    companion object {
+    object Type {
         const val EMPTY_TYPE = 1
         const val SUGGESTION_TYPE = 2
         const val BOOKMARK_TYPE = 3

@@ -48,7 +48,24 @@
 
         <activity
             android:name="com.duckduckgo.app.systemsearch.SystemSearchActivity"
-            android:label="@string/appName">
+            android:label="@string/appName"
+            android:launchMode="singleTask"
+            android:documentLaunchMode="intoExisting"
+            android:stateNotNeeded="true"
+            android:autoRemoveFromRecents="true">
+
+            <!-- Allow app to be default assistant -->
+            <intent-filter>
+                <action android:name="android.intent.action.ASSIST" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+
+            <!-- Required to allow the browser to be launched externally, ensuring it is ready to allow users to search immediately -->
+            <intent-filter>
+                <action android:name="com.duckduckgo.mobile.android.NEW_SEARCH"/>
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+
         </activity>
 
         <activity
@@ -99,18 +116,6 @@
                 <action android:name="android.intent.action.SEND" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <data android:mimeType="text/plain" />
-            </intent-filter>
-
-            <!-- Allow app to be default assistant -->
-            <intent-filter>
-                <action android:name="android.intent.action.ASSIST" />
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
-
-            <!-- Required to allow the browser to be launched externally, ensuring it is ready to allow users to search immediately -->
-            <intent-filter>
-                <action android:name="com.duckduckgo.mobile.android.NEW_SEARCH"/>
-                <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
 

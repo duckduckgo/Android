@@ -14,28 +14,28 @@
   ~ limitations under the License.
   -->
 
-<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/rootView"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    app:layout_scrollFlags="scroll|enterAlways">
+    android:layout_height="match_parent">
 
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/appBarLayout"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="?attr/actionBarSize"
         android:fitsSystemWindows="true"
         android:theme="@style/AppTheme.Dark.AppBarOverlay"
-        app:layout_scrollFlags="scroll|enterAlways">
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/toolbarContainer"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:theme="@style/OmnibarToolbarTheme"
-            app:layout_scrollFlags="scroll|enterAlways">
+            android:theme="@style/OmnibarToolbarTheme">
 
             <androidx.appcompat.widget.Toolbar
                 android:id="@+id/toolbar"
@@ -48,27 +48,24 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                app:layout_scrollFlags="scroll|enterAlways"
                 app:popupTheme="@style/AppTheme.Dark.PopupOverlay">
 
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:id="@+id/omniBarContainer"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:layout_marginStart="5dp"
+                    android:layout_marginStart="16dp"
                     android:layout_marginTop="8dp"
-                    android:layout_marginEnd="5dp"
-                    android:layout_marginBottom="8dp"
-                    android:paddingStart="6dp"
-                    android:paddingEnd="6dp">
+                    android:layout_marginEnd="16dp"
+                    android:layout_marginBottom="8dp">
 
-                    <androidx.constraintlayout.widget.Guideline
-                        android:id="@+id/guideline"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical"
+                    <ImageView
+                        android:id="@+id/logo"
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"
+                        android:importantForAccessibility="no"
+                        android:src="@drawable/logo_medium"
                         app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintGuide_percent="0.4"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent" />
 
@@ -77,8 +74,8 @@
                         style="@style/Base.V7.Widget.AppCompat.EditText"
                         android:layout_width="0dp"
                         android:layout_height="0dp"
-                        android:layout_marginStart="8dp"
-                        android:layout_marginEnd="8dp"
+                        android:layout_marginStart="16dp"
+                        android:layout_marginEnd="16dp"
                         android:background="@android:color/transparent"
                         android:fontFamily="sans-serif-medium"
                         android:hint="@string/omnibarInputHint"
@@ -89,11 +86,11 @@
                         android:textColor="?attr/omnibarTextColor"
                         android:textColorHint="?attr/omnibarHintColor"
                         android:textCursorDrawable="@drawable/text_cursor"
-                        android:textSize="13sp"
+                        android:textSize="16sp"
                         android:textStyle="normal"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toStartOf="@id/clearTextButton"
-                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintStart_toEndOf="@id/logo"
                         app:layout_constraintTop_toTopOf="parent"
                         tools:text="https://duckduckgo.com/?q=areallylongexampleexample">
 
@@ -123,20 +120,46 @@
     </com.google.android.material.appbar.AppBarLayout>
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/autoCompleteSuggestionsList"
-        android:layout_width="match_parent"
+        android:id="@+id/autocompleteSuggestions"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:background="?attr/colorPrimary"
         android:backgroundTint="?attr/colorPrimary"
-        android:clipToPadding="false"
         android:elevation="4dp"
-        android:paddingBottom="14dp"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:itemCount="3"
-        tools:listitem="@layout/item_autocomplete_search_suggestion"
-        tools:visibility="visible" />
+        app:layout_constraintTop_toBottomOf="@id/appBarLayout"
+        tools:itemCount="4"
+        tools:listitem="@layout/item_autocomplete_search_suggestion" />
 
-</androidx.coordinatorlayout.widget.CoordinatorLayout>
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/deviceLabel"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:background="?attr/colorPrimary"
+        android:backgroundTint="?attr/colorPrimary"
+        android:elevation="4dp"
+        android:paddingStart="8dp"
+        android:paddingTop="8dp"
+        android:paddingEnd="8dp"
+        android:text="@string/system_search_app_label"
+        android:textColor="@color/warGreyTwo"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/autocompleteSuggestions"
+        app:textAllCaps="true" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/deviceAppSuggestions"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:background="?attr/colorPrimary"
+        android:backgroundTint="?attr/colorPrimary"
+        android:elevation="4dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/deviceLabel"
+        tools:itemCount="4"
+        tools:listitem="@layout/item_device_app_suggestion" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -95,7 +95,10 @@ interface Pixel {
         WIDGET_LEGACY_CTA_DISMISSED("m_wlc_d"),
         WIDGETS_ADDED(pixelName = "m_w_a"),
         WIDGETS_DELETED(pixelName = "m_w_d"),
-        WIDGET_LAUNCHED(pixelName = "m_w_l"),
+
+        WIDGET_LAUNCH(pixelName = "m_w_l"),
+        ASSIST_LAUNCH(pixelName = "m_a_l"),
+        GOOGLE_BAR_LAUNCH(pixelName = "m_gb_l"),
 
         LONG_PRESS("mlp"),
         LONG_PRESS_DOWNLOAD_IMAGE("mlp_i"),

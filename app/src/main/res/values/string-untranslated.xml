@@ -18,6 +18,9 @@
     <string name="crashedWebViewErrorMessage">"The webpage could not be displayed."</string>
     <string name="crashedWebViewErrorAction">"Reload"</string>
 
+    <!-- System Search-->
+    <string name="system_search_app_label">From this device:</string>
+
     <!-- Omnibar Animation -->
     <string name="trackersAnimationText">Scanning</string>
     <string name="trackersAnimationDotText">%s.</string>
@@ -52,4 +55,5 @@
     <string name="hideTipsTitle">Hide remaining tips?</string>
     <string name="hideTipsText">There are only a few, and we tried to make them informative.</string>
     <string name="hideTipsButton">Hide tips forever</string>
+
 </resources>
