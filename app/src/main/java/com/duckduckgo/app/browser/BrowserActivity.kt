@@ -56,7 +56,7 @@ import kotlin.coroutines.CoroutineContext
 class BrowserActivity : DuckDuckGoActivity(), CoroutineScope {
 
     override val coroutineContext: CoroutineContext
-        get() = SupervisorJob() + Dispatchers.Main
+        get() = job + Dispatchers.Main
 
     @Inject
     lateinit var clearPersonalDataAction: ClearPersonalDataAction
@@ -69,6 +69,8 @@ class BrowserActivity : DuckDuckGoActivity(), CoroutineScope {
 
     @Inject
     lateinit var playStoreUtils: PlayStoreUtils
+
+    private val job = SupervisorJob()
 
     private var currentTab: BrowserTabFragment? = null
 
@@ -99,6 +101,11 @@ class BrowserActivity : DuckDuckGoActivity(), CoroutineScope {
             renderer.renderBrowserViewState(it)
         })
         viewModel.awaitClearDataFinishedNotification()
+    }
+
+    override fun onDestroy() {
+        job.cancel()
+        super.onDestroy()
     }
 
     override fun onNewIntent(intent: Intent?) {
