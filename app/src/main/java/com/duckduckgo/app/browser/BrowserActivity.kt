@@ -105,6 +105,7 @@ class BrowserActivity : DuckDuckGoActivity(), CoroutineScope {
 
     override fun onDestroy() {
         job.cancel()
+        currentTab = null
         super.onDestroy()
     }
 
