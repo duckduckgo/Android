@@ -28,26 +28,26 @@ import android.view.LayoutInflater
 import android.view.View
 import android.widget.Toast
 import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
+import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserSystemSettings
 import com.duckduckgo.app.global.ViewModelFactory
-import dagger.android.support.AndroidSupportInjection
-import kotlinx.android.synthetic.main.content_onboarding_default_browser.continueButton
-import kotlinx.android.synthetic.main.content_onboarding_default_browser.launchSettingsButton
-import kotlinx.android.synthetic.main.content_onboarding_default_browser.*
-import kotlinx.android.synthetic.main.content_onboarding_default_browser.defaultBrowserImage
-import timber.log.Timber
-import javax.inject.Inject
-import androidx.lifecycle.ViewModelProvider
-import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.global.view.hide
 import com.duckduckgo.app.global.view.show
+import com.duckduckgo.app.statistics.VariantManager
+import dagger.android.support.AndroidSupportInjection
+import kotlinx.android.synthetic.main.content_onboarding_default_browser.*
+import timber.log.Timber
+import javax.inject.Inject
 
 class DefaultBrowserPage : OnboardingPageFragment() {
-    override fun layoutResource(): Int = R.layout.content_onboarding_default_browser
 
     @Inject
     lateinit var viewModelFactory: ViewModelFactory
+
+    @Inject
+    lateinit var variantManager: VariantManager
 
     private var userTriedToSetDDGAsDefault = false
     private var userSelectedExternalBrowser = false
@@ -56,6 +56,14 @@ class DefaultBrowserPage : OnboardingPageFragment() {
 
     private val viewModel: DefaultBrowserPageViewModel by lazy {
         ViewModelProvider(this, viewModelFactory).get(DefaultBrowserPageViewModel::class.java)
+    }
+
+    override fun layoutResource(): Int {
+        return if (variantManager.getVariant().hasFeature(VariantManager.VariantFeature.ConceptTest)) {
+            R.layout.content_onboarding_default_browser_daxstyle
+        } else {
+            R.layout.content_onboarding_default_browser
+        }
     }
 
     override fun onAttach(context: Context) {
