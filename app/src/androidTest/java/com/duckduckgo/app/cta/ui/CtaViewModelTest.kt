@@ -22,13 +22,13 @@ import androidx.room.Room
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.InstantSchedulersRule
-import com.duckduckgo.app.cta.CtaHelper
 import com.duckduckgo.app.cta.db.DismissedCtaDao
 import com.duckduckgo.app.cta.model.CtaId
 import com.duckduckgo.app.cta.model.DismissedCta
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.model.Site
+import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.privacy.model.HttpsStatus
 import com.duckduckgo.app.privacy.model.PrivacyGrade
 import com.duckduckgo.app.privacy.model.PrivacyPractices
@@ -98,10 +98,10 @@ class CtaViewModelTest {
     private lateinit var mockSettingsDataStore: SettingsDataStore
 
     @Mock
-    private lateinit var mockPrivacySettingsStore: PrivacySettingsStore
+    private lateinit var mockOnboardingStore: OnboardingStore
 
     @Mock
-    private lateinit var ctaHelper: CtaHelper
+    private lateinit var mockPrivacySettingsStore: PrivacySettingsStore
 
     private lateinit var testee: CtaViewModel
 
@@ -125,7 +125,7 @@ class CtaViewModelTest {
             mockDismissedCtaDao,
             mockVariantManager,
             mockSettingsDataStore,
-            ctaHelper,
+            mockOnboardingStore,
             mockPrivacySettingsStore
         )
     }
@@ -149,17 +149,22 @@ class CtaViewModelTest {
     }
 
     @Test
-    fun whenCtaShownAndCanSendPixelPixelIsFired() {
-        whenever(ctaHelper.canSendPixel(any())).thenReturn(true)
-        testee.onCtaShown(HomePanelCta.Survey(Survey("abc", "http://example.com", 1, SCHEDULED)))
-        verify(mockPixel).fire(eq(SURVEY_CTA_SHOWN), any())
+    fun whenCtaShownAndCtaIsDaxAndCanNotSendPixelThenPixelIsNotFired() {
+        testee.onCtaShown(DaxBubbleCta.DaxIntroCta(mockOnboardingStore, mockAppInstallStore))
+        verify(mockPixel, never()).fire(eq(SURVEY_CTA_SHOWN), any())
     }
 
     @Test
-    fun whenCtaShownAndCanNotSendPixelPixelIsNotFired() {
-        whenever(ctaHelper.canSendPixel(any())).thenReturn(false)
-        testee.onCtaShown(HomePanelCta.Survey(Survey("abc", "http://example.com", 1, SCHEDULED)))
+    fun whenCtaShownAndCtaIsDaxAndCanSendPixelThenPixelIsFired() {
+        whenever(mockOnboardingStore.onboardingDialogJourney).thenReturn("s:0")
+        testee.onCtaShown(DaxBubbleCta.DaxEndCta(mockOnboardingStore, mockAppInstallStore))
         verify(mockPixel, never()).fire(eq(SURVEY_CTA_SHOWN), any())
+    }
+
+    @Test
+    fun whenCtaShownAndCtaIsNotDaxThenPixelIsFired() {
+        testee.onCtaShown(HomePanelCta.Survey(Survey("abc", "http://example.com", 1, SCHEDULED)))
+        verify(mockPixel).fire(eq(SURVEY_CTA_SHOWN), any())
     }
 
     @Test
@@ -201,13 +206,13 @@ class CtaViewModelTest {
 
     @Test
     fun whenRegisterDaxBubbleIntroCtaThenDatabaseNotified() {
-        testee.registerDaxBubbleCtaDismissed(DaxBubbleCta.DaxIntroCta(ctaHelper))
+        testee.registerDaxBubbleCtaDismissed(DaxBubbleCta.DaxIntroCta(mockOnboardingStore, mockAppInstallStore))
         verify(mockDismissedCtaDao).insert(DismissedCta(CtaId.DAX_INTRO))
     }
 
     @Test
     fun whenRegisterDaxBubbleEndCtaThenDatabaseNotified() {
-        testee.registerDaxBubbleCtaDismissed(DaxBubbleCta.DaxEndCta(ctaHelper))
+        testee.registerDaxBubbleCtaDismissed(DaxBubbleCta.DaxEndCta(mockOnboardingStore, mockAppInstallStore))
         verify(mockDismissedCtaDao).insert(DismissedCta(CtaId.DAX_END))
     }
 

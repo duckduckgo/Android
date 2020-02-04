@@ -18,7 +18,6 @@ package com.duckduckgo.app.cta.ui
 
 import androidx.annotation.WorkerThread
 import androidx.lifecycle.LiveData
-import com.duckduckgo.app.cta.CtaHelper
 import com.duckduckgo.app.cta.db.DismissedCtaDao
 import com.duckduckgo.app.cta.model.CtaId
 import com.duckduckgo.app.cta.model.DismissedCta
@@ -26,6 +25,7 @@ import com.duckduckgo.app.cta.ui.HomePanelCta.*
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.install.daysInstalled
 import com.duckduckgo.app.global.model.Site
+import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.privacy.store.PrivacySettingsStore
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.Variant
@@ -52,7 +52,7 @@ class CtaViewModel @Inject constructor(
     private val dismissedCtaDao: DismissedCtaDao,
     private val variantManager: VariantManager,
     private val settingsDataStore: SettingsDataStore,
-    private val ctaHelper: CtaHelper,
+    private val onboardingStore: OnboardingStore,
     private val settingsPrivacySettingsStore: PrivacySettingsStore
 ) {
 
@@ -72,7 +72,11 @@ class CtaViewModel @Inject constructor(
 
     fun onCtaShown(cta: Cta) {
         cta.shownPixel?.let {
-            if (ctaHelper.canSendPixel(cta)) {
+            val canSendPixel = when (cta) {
+                is DaxCta -> cta.canSendShownPixel()
+                else -> true
+            }
+            if (canSendPixel) {
                 pixel.fire(it, cta.pixelShownParameters())
             }
         }
@@ -124,10 +128,10 @@ class CtaViewModel @Inject constructor(
     private fun getHomeCta(): Cta? {
         return when {
             canShowDaxIntroCta() -> {
-                DaxBubbleCta.DaxIntroCta(ctaHelper)
+                DaxBubbleCta.DaxIntroCta(onboardingStore, appInstallStore)
             }
             canShowDaxCtaEndOfJourney() -> {
-                DaxBubbleCta.DaxEndCta(ctaHelper)
+                DaxBubbleCta.DaxEndCta(onboardingStore, appInstallStore)
             }
             canShowWidgetCta() -> {
                 if (widgetCapabilities.supportsAutomaticWidgetAdd) AddWidgetAuto else AddWidgetInstructions
@@ -192,20 +196,20 @@ class CtaViewModel @Inject constructor(
             val host = it.uri?.host
             if (it.entity != null && host != null) {
                 it.entity?.let { entity ->
-                    if (!daxDialogNetworkShown() && DaxDialogCta.MAIN_TRACKER_NETWORKS.contains(entity.displayName)) {
-                        return DaxDialogCta.DaxMainNetworkCta(ctaHelper, entity.displayName, host)
+                    if (!daxDialogNetworkShown() && DaxDialogCta.mainTrackerNetworks.contains(entity.displayName)) {
+                        return DaxDialogCta.DaxMainNetworkCta(onboardingStore, appInstallStore, entity.displayName, host)
                     }
                 }
             }
             // Is Serp
             if (!daxDialogSerpShown() && isSerpUrl(it.url)) {
-                return DaxDialogCta.DaxSerpCta(ctaHelper)
+                return DaxDialogCta.DaxSerpCta(onboardingStore, appInstallStore)
             }
             // Trackers blocked
             return if (!daxDialogTrackersFoundShown() && !isSerpUrl(it.url) && hasTrackersInformation(it.trackingEvents) && host != null) {
-                DaxDialogCta.DaxTrackersBlockedCta(ctaHelper, it.trackingEvents, host)
+                DaxDialogCta.DaxTrackersBlockedCta(onboardingStore, appInstallStore, it.trackingEvents, host)
             } else if (!isSerpUrl(it.url) && !daxDialogOtherShown() && !daxDialogTrackersFoundShown() && !daxDialogNetworkShown()) {
-                DaxDialogCta.DaxNoSerpCta(ctaHelper)
+                DaxDialogCta.DaxNoSerpCta(onboardingStore, appInstallStore)
             } else {
                 null
             }

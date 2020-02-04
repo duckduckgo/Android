@@ -47,7 +47,6 @@ import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.browser.model.LongPressTarget
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
-import com.duckduckgo.app.cta.CtaHelper
 import com.duckduckgo.app.cta.db.DismissedCtaDao
 import com.duckduckgo.app.cta.model.DismissedCta
 import com.duckduckgo.app.cta.ui.CtaViewModel
@@ -56,6 +55,7 @@ import com.duckduckgo.app.cta.ui.HomePanelCta
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.model.SiteFactory
+import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao
 import com.duckduckgo.app.privacy.model.PrivacyPractices
 import com.duckduckgo.app.privacy.model.TestEntity
@@ -164,6 +164,9 @@ class BrowserTabViewModelTest {
     private lateinit var mockPixel: Pixel
 
     @Mock
+    private lateinit var mockOnboardingStore: OnboardingStore
+
+    @Mock
     private lateinit var mockAutoCompleteService: AutoCompleteService
 
     @Mock
@@ -171,9 +174,6 @@ class BrowserTabViewModelTest {
 
     @Mock
     private lateinit var mockPrivacySettingsStore: PrivacySettingsStore
-
-    @Mock
-    private lateinit var mockCtaHelper: CtaHelper
 
     private lateinit var mockAutoCompleteApi: AutoCompleteApi
 
@@ -206,7 +206,7 @@ class BrowserTabViewModelTest {
             mockDismissedCtaDao,
             mockVariantManager,
             mockSettingsStore,
-            mockCtaHelper,
+            mockOnboardingStore,
             mockPrivacySettingsStore
         )
 
@@ -1428,9 +1428,25 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenCtaShownThenFirePixel() {
+        val cta = HomePanelCta.Survey(Survey("abc", "http://example.com", daysInstalled = 1, status = Survey.Status.SCHEDULED))
+        testee.ctaViewState.value = BrowserTabViewModel.CtaViewState(cta = cta)
+
+        testee.onCtaShown()
+        verify(mockPixel).fire(cta.shownPixel!!, cta.pixelShownParameters())
+    }
+
+    @Test
+    fun whenManualCtaShownThenFirePixel() {
+        val cta = HomePanelCta.Survey(Survey("abc", "http://example.com", daysInstalled = 1, status = Survey.Status.SCHEDULED))
+
+        testee.onManualCtaShown(cta)
+        verify(mockPixel).fire(cta.shownPixel!!, cta.pixelShownParameters())
+    }
+
+    @Test
     fun whenRegisterDaxBubbleCtaShownThenRegisterInDatabase() {
-        whenever(mockCtaHelper.addCtaToHistory(anyString())).thenReturn("")
-        val cta = DaxBubbleCta.DaxIntroCta(mockCtaHelper)
+        val cta = DaxBubbleCta.DaxIntroCta(mockOnboardingStore, mockAppInstallStore)
         testee.ctaViewState.value = BrowserTabViewModel.CtaViewState(cta = cta)
 
         testee.registerDaxBubbleCtaDismissed()
@@ -1439,7 +1455,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenUserClickedCtaButtonThenFirePixel() {
-        val cta = DaxBubbleCta.DaxIntroCta(mockCtaHelper)
+        val cta = DaxBubbleCta.DaxIntroCta(mockOnboardingStore, mockAppInstallStore)
         testee.ctaViewState.value = BrowserTabViewModel.CtaViewState(cta = cta)
 
         testee.onUserClickCtaOkButton()
