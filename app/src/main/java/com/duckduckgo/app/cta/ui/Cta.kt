@@ -164,7 +164,7 @@ sealed class DaxDialogCta(
     ) {
 
         override fun getDaxText(context: Context): String {
-            return if (isFromSameNetworkDomain(siteHost)) {
+            return if (isFromSameNetworkDomain()) {
                 context.resources.getString(R.string.daxMainNetworkStep1CtaText, network)
             } else {
                 context.resources.getString(R.string.daxMainNetworkStep1OwnedCtaText, Uri.parse(siteHost).baseHost?.removePrefix("m."), network)
@@ -175,7 +175,7 @@ sealed class DaxDialogCta(
             return DaxDialog(getDaxText(activity), activity.resources.getString(okButton)).apply {
                 val privacyGradeButton = activity.findViewById<View>(R.id.privacyGradeButton)
                 onAnimationFinishedListener {
-                    if (isFromSameNetworkDomain(siteHost)) {
+                    if (isFromSameNetworkDomain()) {
                         startHighlightViewAnimation(privacyGradeButton, timesBigger = 0.7f)
                     }
                 }
@@ -196,7 +196,7 @@ sealed class DaxDialogCta(
             else activity.resources.getString(R.string.daxMainNetworkStep211CtaText, network)
         }
 
-        private fun isFromSameNetworkDomain(host: String): Boolean = mainTrackerDomains.any { host.contains(it) }
+        private fun isFromSameNetworkDomain(): Boolean = mainTrackerDomains.any { siteHost.contains(it) }
     }
 
     class DaxNoSerpCta(override val onboardingStore: OnboardingStore, override val appInstallStore: AppInstallStore) : DaxDialogCta(
