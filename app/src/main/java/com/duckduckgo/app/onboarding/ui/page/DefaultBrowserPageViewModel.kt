@@ -98,8 +98,8 @@ class DefaultBrowserPageViewModel(
     fun handleResult(origin: Origin) {
         when (origin) {
             is Origin.InternalBrowser -> {
-                val forceNavigateToBrowser = handleOriginInternalBrowser()
-                reduceToNewState(origin, forceNavigateToBrowser)
+                val navigateToBrowser = handleOriginInternalBrowser()
+                reduceToNewState(origin, navigateToBrowser)
             }
             is Origin.DialogDismissed -> {
                 fireDefaultBrowserPixelAndResetTimesPressedJustOnce(originValue = Pixel.PixelValues.DEFAULT_BROWSER_DIALOG_DISMISSED)
@@ -116,11 +116,11 @@ class DefaultBrowserPageViewModel(
         }
     }
 
-    private fun reduceToNewState(origin: Origin, forceNavigateToBrowser: Boolean = false) {
+    private fun reduceToNewState(origin: Origin, navigateToBrowser: Boolean = false) {
         val newViewState = newViewState()
         when (origin) {
             is Origin.InternalBrowser -> {
-                if (forceNavigateToBrowser) {
+                if (navigateToBrowser) {
                     viewState.value = ViewState.DefaultBrowserDialogUI(showInstructionsCard = false)
                     command.value = Command.ContinueToBrowser
                 } else if (newViewState is ViewState.ContinueUI) {
@@ -157,7 +157,7 @@ class DefaultBrowserPageViewModel(
     }
 
     private fun handleOriginInternalBrowser(): Boolean {
-        var forceNavigateToBrowser = false
+        var navigateToBrowser = false
         if (defaultBrowserDetector.isDefaultBrowser()) {
             fireDefaultBrowserPixelAndResetTimesPressedJustOnce(originValue = Pixel.PixelValues.DEFAULT_BROWSER_DIALOG)
         } else {
@@ -167,10 +167,10 @@ class DefaultBrowserPageViewModel(
                 pixel.fire(Pixel.PixelName.ONBOARDING_DEFAULT_BROWSER_SELECTED_JUST_ONCE)
             } else {
                 fireDefaultBrowserPixelAndResetTimesPressedJustOnce(originValue = Pixel.PixelValues.DEFAULT_BROWSER_JUST_ONCE_MAX)
-                forceNavigateToBrowser = true
+                navigateToBrowser = true
             }
         }
-        return forceNavigateToBrowser
+        return navigateToBrowser
     }
 
     private fun fireDefaultBrowserPixelAndResetTimesPressedJustOnce(originValue: String) {
