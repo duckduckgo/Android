@@ -53,8 +53,7 @@ interface ViewCta {
 interface DaxCta {
     val onboardingStore: OnboardingStore
     val appInstallStore: AppInstallStore
-
-    fun canSendShownPixel(): Boolean
+    var ctaPixelParam: String
 
     companion object {
         const val MAX_DAYS_ALLOWED = 3
@@ -79,7 +78,7 @@ sealed class DaxDialogCta(
     override val shownPixel: Pixel.PixelName?,
     override val okPixel: Pixel.PixelName?,
     override val cancelPixel: Pixel.PixelName?,
-    var ctaPixelParam: String,
+    override var ctaPixelParam: String,
     override val onboardingStore: OnboardingStore,
     override val appInstallStore: AppInstallStore
 ) : Cta, DialogCta, DaxCta {
@@ -91,11 +90,6 @@ sealed class DaxDialogCta(
     override fun pixelOkParameters(): Map<String, String?> = mapOf(Pixel.PixelParameter.CTA_SHOWN to ctaPixelParam)
 
     override fun pixelShownParameters(): Map<String, String?> = mapOf(Pixel.PixelParameter.CTA_SHOWN to addCtaToHistory(ctaPixelParam))
-
-    override fun canSendShownPixel(): Boolean {
-        val param = onboardingStore.onboardingDialogJourney?.split("-").orEmpty().toMutableList()
-        return !(param.isNotEmpty() && param.last().contains(ctaPixelParam))
-    }
 
     open fun getDaxText(context: Context): String = context.getString(description)
 
@@ -242,7 +236,7 @@ sealed class DaxBubbleCta(
     override val shownPixel: Pixel.PixelName?,
     override val okPixel: Pixel.PixelName?,
     override val cancelPixel: Pixel.PixelName?,
-    val ctaPixelParam: String,
+    override var ctaPixelParam: String,
     override val onboardingStore: OnboardingStore,
     override val appInstallStore: AppInstallStore
 ) : Cta, ViewCta, DaxCta {
@@ -261,11 +255,6 @@ sealed class DaxBubbleCta(
     override fun pixelOkParameters(): Map<String, String?> = mapOf(Pixel.PixelParameter.CTA_SHOWN to ctaPixelParam)
 
     override fun pixelShownParameters(): Map<String, String?> = mapOf(Pixel.PixelParameter.CTA_SHOWN to addCtaToHistory(ctaPixelParam))
-
-    override fun canSendShownPixel(): Boolean {
-        val param = onboardingStore.onboardingDialogJourney?.split("-").orEmpty().toMutableList()
-        return !(param.isNotEmpty() && param.last().contains(ctaPixelParam))
-    }
 
     class DaxIntroCta(override val onboardingStore: OnboardingStore, override val appInstallStore: AppInstallStore) : DaxBubbleCta(
         CtaId.DAX_INTRO,
@@ -361,4 +350,9 @@ fun DaxCta.addCtaToHistory(newCta: String): String {
     val finalParam = param.joinToString("-")
     onboardingStore.onboardingDialogJourney = finalParam
     return finalParam
+}
+
+fun DaxCta.canSendShownPixel(): Boolean {
+    val param = onboardingStore.onboardingDialogJourney?.split("-").orEmpty().toMutableList()
+    return !(param.isNotEmpty() && param.last().contains(ctaPixelParam))
 }
