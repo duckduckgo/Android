@@ -103,8 +103,12 @@ class BrowserActivity : DuckDuckGoActivity(), CoroutineScope {
         viewModel.awaitClearDataFinishedNotification()
     }
 
-    override fun onDestroy() {
+    override fun onStop() {
         job.cancel()
+        super.onStop()
+    }
+
+    override fun onDestroy() {
         currentTab = null
         super.onDestroy()
     }
