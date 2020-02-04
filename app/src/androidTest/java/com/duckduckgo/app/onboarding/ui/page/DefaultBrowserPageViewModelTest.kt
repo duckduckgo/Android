@@ -299,7 +299,6 @@ class DefaultBrowserPageViewModelTest {
 
         testee.handleResult(Origin.InternalBrowser)
 
-        assertEquals(viewState(), DefaultBrowserDialogUI(showInstructionsCard = false))
         assertTrue(captureCommands().lastValue is Command.ContinueToBrowser)
         verify(mockPixel).fire(Pixel.PixelName.DEFAULT_BROWSER_NOT_SET, params)
     }
@@ -368,7 +367,6 @@ class DefaultBrowserPageViewModelTest {
 
         testee.handleResult(Origin.ExternalBrowser)
 
-        assertEquals(DefaultBrowserDialogUI(showInstructionsCard = false), viewState())
         assertTrue(captureCommands().lastValue is Command.ContinueToBrowser)
         verify(mockPixel).fire(Pixel.PixelName.DEFAULT_BROWSER_SET, params)
     }
@@ -398,7 +396,6 @@ class DefaultBrowserPageViewModelTest {
 
         testee.handleResult(Origin.Settings)
 
-        assertEquals(viewState(), DefaultBrowserDialogUI(showInstructionsCard = false))
         assertTrue(captureCommands().lastValue is Command.ContinueToBrowser)
     }
 
