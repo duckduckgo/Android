@@ -30,7 +30,6 @@ import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
 import org.mockito.Mock
-import org.mockito.Mockito.mock
 import org.mockito.MockitoAnnotations
 import java.util.concurrent.TimeUnit
 
@@ -147,6 +146,49 @@ class CtaTest {
     }
 
     @Test
+    fun whenAddCtaToHistoryThenReturnCorrectValue() {
+        whenever(mockOnboardingStore.onboardingDialogJourney).thenReturn(null)
+        whenever(mockAppInstallStore.installTimestamp).thenReturn(System.currentTimeMillis())
+
+        val testee = DaxBubbleCta.DaxEndCta(mockOnboardingStore, mockAppInstallStore)
+        val value = testee.addCtaToHistory("test")
+        assertEquals("test:0", value)
+    }
+
+    @Test
+    fun whenAddCtaToHistoryOnDay3ThenReturnCorrectValue() {
+        whenever(mockOnboardingStore.onboardingDialogJourney).thenReturn(null)
+        whenever(mockAppInstallStore.installTimestamp).thenReturn(System.currentTimeMillis() - TimeUnit.DAYS.toMillis(3))
+
+        val testee = DaxBubbleCta.DaxEndCta(mockOnboardingStore, mockAppInstallStore)
+        val value = testee.addCtaToHistory("test")
+        assertEquals("test:3", value)
+    }
+
+    @Test
+    fun whenAddCtaToHistoryOnDay4ThenReturn3AsDayValue() {
+        whenever(mockOnboardingStore.onboardingDialogJourney).thenReturn(null)
+        whenever(mockAppInstallStore.installTimestamp).thenReturn(System.currentTimeMillis() - TimeUnit.DAYS.toMillis(4))
+
+        val testee = DaxBubbleCta.DaxEndCta(mockOnboardingStore, mockAppInstallStore)
+        val value = testee.addCtaToHistory("test")
+        assertEquals("test:3", value)
+    }
+
+    @Test
+    fun whenAddCtaToHistoryContainsHistoryThenConcatenateNewValue() {
+        val ctaHistory = "s:0-t:1"
+        whenever(mockOnboardingStore.onboardingDialogJourney).thenReturn(ctaHistory)
+        whenever(mockAppInstallStore.installTimestamp).thenReturn(System.currentTimeMillis() - TimeUnit.DAYS.toMillis(1))
+
+        val testee = DaxBubbleCta.DaxEndCta(mockOnboardingStore, mockAppInstallStore)
+        val value = testee.addCtaToHistory("test")
+        val expectedValue = "$ctaHistory-test:1"
+
+        assertEquals(expectedValue, value)
+    }
+
+    @Test
     fun whenCtaIsBubbleTypeThenConcatenateJourneyStoredValueInPixel() {
         val existingJourney = "s:0-t:1"
         whenever(mockOnboardingStore.onboardingDialogJourney).thenReturn(existingJourney)
@@ -156,6 +198,21 @@ class CtaTest {
 
         val value = testee.pixelShownParameters()
         assertEquals(expectedValue, value[CTA_SHOWN])
+    }
+
+    @Test
+    fun whenCanSendPixelAndCtaNotPartOfHistoryThenReturnTrue() {
+        whenever(mockOnboardingStore.onboardingDialogJourney).thenReturn("s:0")
+        val testee = DaxBubbleCta.DaxEndCta(mockOnboardingStore, mockAppInstallStore)
+        assertTrue(testee.canSendShownPixel())
+    }
+
+    @Test
+    fun whenCanSendPixelAndCtaIsPartOfHistoryThenReturnFalse() {
+        whenever(mockOnboardingStore.onboardingDialogJourney).thenReturn("e:0")
+
+        val testee = DaxBubbleCta.DaxEndCta(mockOnboardingStore, mockAppInstallStore)
+        assertFalse(testee.canSendShownPixel())
     }
 
     @Test
@@ -218,7 +275,7 @@ class CtaTest {
     }
 
     @Test
-    fun whenTwoMajorTrackersBlockedReturnThemWithMultipleString() {
+    fun whenTwoMajorTrackersBlockedReturnThemWithZeroString() {
         val trackers = listOf(
             TrackingEvent("facebook.com", "facebook.com", blocked = true, entity = TestEntity("Facebook", "Facebook", 9.0), categories = null),
             TrackingEvent("other.com", "other.com", blocked = true, entity = TestEntity("Other", "Other", 9.0), categories = null)
