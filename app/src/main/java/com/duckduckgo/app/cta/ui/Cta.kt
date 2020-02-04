@@ -186,6 +186,7 @@ sealed class DaxDialogCta(
             ctaPixelParam = Pixel.PixelValues.DAX_NETWORK_CTA_2
             dialog.daxText = activity.resources.getString(R.string.daxMainNetworkStep2CtaText, firstParagraph(activity), network)
             dialog.buttonText = activity.resources.getString(R.string.daxDialogGotIt)
+            dialog.onAnimationFinishedListener { }
             dialog.setDialogAndStartAnimation()
         }
 
