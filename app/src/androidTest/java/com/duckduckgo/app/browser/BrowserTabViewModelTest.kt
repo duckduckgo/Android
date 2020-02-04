@@ -1445,7 +1445,7 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenRegisterDaxBubbleCtaShownThenRegisterInDatabase() {
+    fun whenRegisterDaxBubbleCtaDismissedThenRegisterInDatabase() {
         val cta = DaxBubbleCta.DaxIntroCta(mockOnboardingStore, mockAppInstallStore)
         testee.ctaViewState.value = BrowserTabViewModel.CtaViewState(cta = cta)
 

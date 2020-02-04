@@ -45,6 +45,7 @@ import kotlinx.android.synthetic.main.include_dax_dialog_cta.view.primaryCta
 interface DialogCta {
     fun createCta(activity: FragmentActivity): DaxDialog
 }
+
 interface ViewCta {
     fun showCta(view: View)
 }
@@ -98,7 +99,7 @@ sealed class DaxDialogCta(
 
     open fun getDaxText(context: Context): String = context.getString(description)
 
-    class DaxSerpCta(onboardingStore: OnboardingStore, appInstallStore: AppInstallStore) : DaxDialogCta(
+    class DaxSerpCta(override val onboardingStore: OnboardingStore, override val appInstallStore: AppInstallStore) : DaxDialogCta(
         CtaId.DAX_DIALOG_SERP,
         R.string.daxSerpCtaText,
         R.string.daxDialogPhew,
@@ -115,18 +116,17 @@ sealed class DaxDialogCta(
         override val appInstallStore: AppInstallStore,
         val trackers: List<TrackingEvent>,
         val host: String
-    ) :
-        DaxDialogCta(
-            CtaId.DAX_DIALOG_TRACKERS_FOUND,
-            R.plurals.daxTrackersBlockedCtaText,
-            R.string.daxDialogHighFive,
-            Pixel.PixelName.ONBOARDING_DAX_CTA_SHOWN,
-            Pixel.PixelName.ONBOARDING_DAX_CTA_OK_BUTTON,
-            null,
-            Pixel.PixelValues.DAX_TRACKERS_BLOCKED_CTA,
-            onboardingStore,
-            appInstallStore
-        ) {
+    ) : DaxDialogCta(
+        CtaId.DAX_DIALOG_TRACKERS_FOUND,
+        R.plurals.daxTrackersBlockedCtaText,
+        R.string.daxDialogHighFive,
+        Pixel.PixelName.ONBOARDING_DAX_CTA_SHOWN,
+        Pixel.PixelName.ONBOARDING_DAX_CTA_OK_BUTTON,
+        null,
+        Pixel.PixelValues.DAX_TRACKERS_BLOCKED_CTA,
+        onboardingStore,
+        appInstallStore
+    ) {
 
         override fun createCta(activity: FragmentActivity): DaxDialog =
             DaxDialog(getDaxText(activity), activity.resources.getString(okButton), false)
@@ -146,24 +146,28 @@ sealed class DaxDialogCta(
                 if (size == 0) {
                     context.resources.getString(R.string.daxTrackersBlockedCtaZeroText)
                 } else {
-                    context.resources.getQuantityString(R.plurals.daxTrackersBlockedCtaText, size, size)
+                    context.resources.getQuantityString(description, size, size)
                 }
             return "<b>$trackersText</b>$quantityString"
         }
     }
 
-    class DaxMainNetworkCta(onboardingStore: OnboardingStore, appInstallStore: AppInstallStore, val network: String, val siteHost: String) :
-        DaxDialogCta(
-            CtaId.DAX_DIALOG_NETWORK,
-            R.string.daxMainNetworkStep1CtaText,
-            R.string.daxDialogNext,
-            Pixel.PixelName.ONBOARDING_DAX_CTA_SHOWN,
-            Pixel.PixelName.ONBOARDING_DAX_CTA_OK_BUTTON,
-            null,
-            Pixel.PixelValues.DAX_NETWORK_CTA_1,
-            onboardingStore,
-            appInstallStore
-        ) {
+    class DaxMainNetworkCta(
+        override val onboardingStore: OnboardingStore,
+        override val appInstallStore: AppInstallStore,
+        val network: String,
+        private val siteHost: String
+    ) : DaxDialogCta(
+        CtaId.DAX_DIALOG_NETWORK,
+        R.string.daxMainNetworkStep1CtaText,
+        R.string.daxDialogNext,
+        Pixel.PixelName.ONBOARDING_DAX_CTA_SHOWN,
+        Pixel.PixelName.ONBOARDING_DAX_CTA_OK_BUTTON,
+        null,
+        Pixel.PixelValues.DAX_NETWORK_CTA_1,
+        onboardingStore,
+        appInstallStore
+    ) {
 
         override fun getDaxText(context: Context): String {
             return if (isFromSameNetworkDomain(siteHost)) {
@@ -201,7 +205,7 @@ sealed class DaxDialogCta(
         private fun isFromSameNetworkDomain(host: String): Boolean = mainTrackerDomains.any { host.contains(it) }
     }
 
-    class DaxNoSerpCta(onboardingStore: OnboardingStore, appInstallStore: AppInstallStore) : DaxDialogCta(
+    class DaxNoSerpCta(override val onboardingStore: OnboardingStore, override val appInstallStore: AppInstallStore) : DaxDialogCta(
         CtaId.DAX_DIALOG_OTHER,
         R.string.daxNonSerpCtaText,
         R.string.daxDialogGotIt,
@@ -227,8 +231,8 @@ sealed class DaxDialogCta(
         private const val MAX_TRACKERS_SHOWS = 2
         const val SERP = "duckduckgo"
         private val mainTrackerDomains = listOf("facebook", "google")
-        val mainTrackerNetworks = listOf("Facebook", "Google")
         private val networkPropertyPercentages = mapOf(Pair("Google", "90%"), Pair("Facebook", "40%"))
+        val mainTrackerNetworks = listOf("Facebook", "Google")
     }
 }
 
