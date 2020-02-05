@@ -132,7 +132,10 @@ class DefaultBrowserPage : OnboardingPageFragment() {
             when (it) {
                 is DefaultBrowserPageViewModel.Command.OpenDialog -> onLaunchDefaultBrowserWithDialogClicked(it.url)
                 is DefaultBrowserPageViewModel.Command.OpenSettings -> onLaunchDefaultBrowserSettingsClicked()
-                is DefaultBrowserPageViewModel.Command.ContinueToBrowser -> onContinuePressed()
+                is DefaultBrowserPageViewModel.Command.ContinueToBrowser -> {
+                    hideInstructionsCard()
+                    onContinuePressed()
+                }
             }
         })
     }

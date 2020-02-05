@@ -440,7 +440,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
     private fun navigate(url: String) {
         hideKeyboard()
         renderer.hideFindInPage()
-        viewModel.registerDaxBubbleCtaShown()
+        viewModel.registerDaxBubbleCtaDismissed()
         webView?.loadUrl(url)
     }
 
@@ -1375,9 +1375,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
                 is DaxDialogCta -> showDaxDialogCta(configuration)
             }
 
-            if (configuration !is DaxBubbleCta) {
-                viewModel.onCtaShown()
-            }
+            viewModel.onCtaShown()
         }
 
         private fun showDaxDialogCta(configuration: DaxDialogCta) {
