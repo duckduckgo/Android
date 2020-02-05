@@ -86,10 +86,15 @@ class OnboardingPageManagerWithTrackerBlocking(
     private fun shouldShowDefaultBrowserPage(): Boolean {
         return defaultWebBrowserCapability.deviceSupportsDefaultBrowserConfiguration()
                 && !variantManager.getVariant().hasFeature(SuppressDefaultBrowserCta)
+                && !isDefaultBrowserAndSuppressedContinuationScreen()
+    }
+
+    private fun isDefaultBrowserAndSuppressedContinuationScreen(): Boolean {
+        return defaultWebBrowserCapability.isDefaultBrowser()
+                && variantManager.getVariant().hasFeature(VariantManager.VariantFeature.SuppressDefaultBrowserContinueScreen)
     }
 
     private fun isFinalPage(position: Int) = position == pageCount() - 1
-
 
     private fun buildSummaryPage(blueprint: SummaryPageBlueprint): UnifiedSummaryPage {
         return onboardingPageBuilder.buildSummaryPage(blueprint.continueButtonTextResourceId)

@@ -32,6 +32,7 @@ interface VariantManager {
         object ConceptTest : VariantFeature()
         object SuppressWidgetCta : VariantFeature()
         object SuppressDefaultBrowserCta : VariantFeature()
+        object SuppressDefaultBrowserContinueScreen : VariantFeature()
     }
 
     companion object {
@@ -47,14 +48,29 @@ interface VariantManager {
 
             // Concept test experiment
             Variant(key = "mc", weight = 0.0, features = emptyList(), filterBy = { isEnglishLocale() }),
-            Variant(key = "me", weight = 0.0, features = listOf(ConceptTest, SuppressWidgetCta, SuppressDefaultBrowserCta), filterBy = { isEnglishLocale() }),
+            Variant(
+                key = "me",
+                weight = 0.0,
+                features = listOf(ConceptTest, SuppressWidgetCta, SuppressDefaultBrowserCta),
+                filterBy = { isEnglishLocale() }),
             Variant(key = "md", weight = 0.0, features = listOf(SuppressWidgetCta, SuppressDefaultBrowserCta), filterBy = { isEnglishLocale() }),
 
             // Validate CTAs experiment
-            Variant(key = "mq", weight = 1.0, features = emptyList(), filterBy = { noFilter() }),
-            Variant(key = "mr", weight = 1.0, features = listOf(SuppressDefaultBrowserCta), filterBy = { noFilter() }),
-            Variant(key = "ms", weight = 1.0, features = listOf(SuppressWidgetCta), filterBy = { noFilter() }),
-            Variant(key = "mt", weight = 1.0, features = listOf(SuppressWidgetCta, SuppressDefaultBrowserCta), filterBy = { noFilter() })
+            Variant(key = "mq", weight = 0.0, features = emptyList(), filterBy = { noFilter() }),
+            Variant(key = "mr", weight = 0.0, features = listOf(SuppressDefaultBrowserCta), filterBy = { noFilter() }),
+            Variant(key = "ms", weight = 0.0, features = listOf(SuppressWidgetCta), filterBy = { noFilter() }),
+            Variant(key = "mt", weight = 0.0, features = listOf(SuppressWidgetCta, SuppressDefaultBrowserCta), filterBy = { noFilter() }),
+
+            // Insert CTAs on Concept test experiment
+            Variant(key = "mu", weight = 1.0, features = emptyList(), filterBy = { isEnglishLocale() }),
+            Variant(key = "mv", weight = 1.0,
+                features = listOf(ConceptTest, SuppressWidgetCta, SuppressDefaultBrowserCta),
+                filterBy = { isEnglishLocale() }),
+            Variant(
+                key = "mz",
+                weight = 1.0,
+                features = listOf(ConceptTest, SuppressDefaultBrowserContinueScreen),
+                filterBy = { isEnglishLocale() })
 
             // All groups in an experiment (control and variants) MUST use the same filters
         )
