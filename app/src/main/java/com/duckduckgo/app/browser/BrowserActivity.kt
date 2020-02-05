@@ -51,12 +51,8 @@ import kotlinx.coroutines.*
 import org.jetbrains.anko.longToast
 import timber.log.Timber
 import javax.inject.Inject
-import kotlin.coroutines.CoroutineContext
 
-class BrowserActivity : DuckDuckGoActivity(), CoroutineScope {
-
-    override val coroutineContext: CoroutineContext
-        get() = job + Dispatchers.Main
+class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope() {
 
     @Inject
     lateinit var clearPersonalDataAction: ClearPersonalDataAction
@@ -70,8 +66,6 @@ class BrowserActivity : DuckDuckGoActivity(), CoroutineScope {
     @Inject
     lateinit var playStoreUtils: PlayStoreUtils
 
-    private val job = SupervisorJob()
-
     private var currentTab: BrowserTabFragment? = null
 
     private val viewModel: BrowserViewModel by bindViewModel()
@@ -83,6 +77,8 @@ class BrowserActivity : DuckDuckGoActivity(), CoroutineScope {
     private var currentAppEnjoymentFragment: DialogFragment? = null
 
     private lateinit var renderer: BrowserStateRenderer
+
+    private var openMessageInNewTabJob: Job? = null
 
     @SuppressLint("MissingSuperCall")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -104,7 +100,7 @@ class BrowserActivity : DuckDuckGoActivity(), CoroutineScope {
     }
 
     override fun onStop() {
-        job.cancel()
+        openMessageInNewTabJob?.cancel()
         super.onStop()
     }
 
@@ -302,7 +298,7 @@ class BrowserActivity : DuckDuckGoActivity(), CoroutineScope {
     }
 
     fun openMessageInNewTab(message: Message) {
-        launch {
+        openMessageInNewTabJob = launch {
             val tabId = viewModel.onNewTabRequested()
             val fragment = openNewTab(tabId, null, false)
             fragment.messageFromPreviousTab = message
