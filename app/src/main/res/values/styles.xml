@@ -180,6 +180,11 @@
         <item name="backgroundTint">@color/cornflowerBlue</item>
     </style>
 
+    <style name="OnboardingButtonPrimaryRoundedCta" parent="OnboardingButtonPrimaryCta">
+        <item name="android:background">@drawable/onboarding_primary_cta_button_rounded_bg</item>
+        <item name="android:textAllCaps">false</item>
+    </style>
+
     <style name="OnboardingButtonSecondaryCta">
         <item name="android:background">@drawable/onboarding_secondary_cta_button_outlined_bg</item>
         <item name="android:foreground">?attr/selectableItemBackground</item>
@@ -190,6 +195,11 @@
         <item name="layout_constraintBottom_toBottomOf">parent</item>
         <item name="layout_constraintWidth_max">400dp</item>
         <item name="layout_constraintWidth_percent">0.8</item>
+    </style>
+
+    <style name="OnboardingButtonSecondaryRoundedCta" parent="OnboardingButtonSecondaryCta">
+        <item name="android:background">@drawable/onboarding_secondary_cta_button_rounded_bg</item>
+        <item name="android:textAllCaps">false</item>
     </style>
 
     <style name="OnboardingTextTitle">
