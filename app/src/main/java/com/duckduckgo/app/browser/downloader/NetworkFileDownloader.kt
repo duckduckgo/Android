@@ -31,7 +31,7 @@ class NetworkFileDownloader @Inject constructor(private val context: Context) {
 
         val request = DownloadManager.Request(pendingDownload.url.toUri()).apply {
             allowScanningByMediaScanner()
-            addRequestHeader("User-Agent", CookieManager.getInstance().getCookie(pendingDownload.url))
+            addRequestHeader("User-Agent", pendingDownload.userAgent)
             addRequestHeader("Cookie", CookieManager.getInstance().getCookie(pendingDownload.url))
             setMimeType(pendingDownload.mimeType)
             setDestinationInExternalPublicDir(pendingDownload.subfolder, guessedFileName)

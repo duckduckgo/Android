@@ -204,15 +204,6 @@
                 android:resource="@xml/search_widget_info_light" />
         </receiver>
 
-        <receiver
-            android:name="com.duckduckgo.app.browser.downloader.NetworkFileDownloadReceiver"
-            android:enabled="true"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="android.intent.action.DOWNLOAD_COMPLETE" />
-            </intent-filter>
-        </receiver>
-
     </application>
 
 </manifest>
