@@ -41,7 +41,8 @@ class UserAgentProvider constructor(private val defaultUserAgent: String, privat
         val platform = if (desktopSiteRequested) desktopUaPrefix() else mobileUaPrefix()
         val userAgentStringSuffix = "${getWebKitVersionOnwards(desktopSiteRequested)} ${getApplicationSuffix()}"
 
-        return "$MOZILLA_PREFIX ($platform)$userAgentStringSuffix"
+        // return "$MOZILLA_PREFIX ($platform)$userAgentStringSuffix"
+        return "Mozilla/5.0 (iPhone; CPU iPhone OS 13_3_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148 DuckDuckGo/7"
     }
 
     private fun mobileUaPrefix() = "Linux; Android ${Build.VERSION.RELEASE}"
