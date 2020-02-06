@@ -1010,6 +1010,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
             url = url,
             contentDisposition = contentDisposition,
             mimeType = mimeType,
+            userAgent = userAgentProvider.getUserAgent(),
             subfolder = Environment.DIRECTORY_DOWNLOADS
         )
 
@@ -1019,6 +1020,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
     private fun requestImageDownload(url: String) {
         pendingFileDownload = PendingFileDownload(
             url = url,
+            userAgent = userAgentProvider.getUserAgent(),
             subfolder = Environment.DIRECTORY_PICTURES
         )
 
