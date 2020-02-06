@@ -58,8 +58,8 @@
 
         <activity
             android:name=".BrowserActivity"
-            android:configChanges="keyboardHidden|orientation|screenSize"
             android:label="@string/appDescription"
+            android:configChanges="keyboardHidden|orientation|screenSize"
             android:launchMode="singleTask"
             android:windowSoftInputMode="adjustResize|stateHidden">
 
@@ -104,15 +104,14 @@
 
             <!-- Required to allow the browser to be launched externally, ensuring it is ready to allow users to search immediately -->
             <intent-filter>
-                <action android:name="com.duckduckgo.mobile.android.NEW_SEARCH" />
+                <action android:name="com.duckduckgo.mobile.android.NEW_SEARCH"/>
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
 
-        <activity
-            android:name="com.duckduckgo.app.SelectedTextSearchActivity"
-            android:exported="true"
-            android:label="@string/systemTextSearchMessage">
+        <activity android:name="com.duckduckgo.app.SelectedTextSearchActivity"
+            android:label="@string/systemTextSearchMessage"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.PROCESS_TEXT" />
                 <category android:name="android.intent.category.DEFAULT" />
@@ -152,12 +151,12 @@
             android:parentActivityName=".BrowserActivity" />
         <activity
             android:name="com.duckduckgo.app.feedback.ui.common.FeedbackActivity"
-            android:label="@string/feedbackActivityTitle"
-            android:windowSoftInputMode="adjustResize" />
+            android:windowSoftInputMode="adjustResize"
+            android:label="@string/feedbackActivityTitle" />
         <activity
             android:name="com.duckduckgo.app.brokensite.BrokenSiteActivity"
-            android:label="@string/brokenSiteHeading"
-            android:theme="@style/ModalCardTheme" />
+            android:theme="@style/ModalCardTheme"
+            android:label="@string/brokenSiteHeading" />
         <activity
             android:name="com.duckduckgo.app.survey.ui.SurveyActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
@@ -173,9 +172,9 @@
             android:label="@string/aboutActivityTitle"
             android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity" />
         <activity
+            android:parentActivityName=".BrowserActivity"
             android:name="com.duckduckgo.app.bookmarks.ui.BookmarksActivity"
-            android:label="@string/bookmarksActivityTitle"
-            android:parentActivityName=".BrowserActivity" />
+            android:label="@string/bookmarksActivityTitle" />
         <activity
             android:name="com.duckduckgo.app.fire.FireActivity"
             android:process="@string/fireProcessName" />
