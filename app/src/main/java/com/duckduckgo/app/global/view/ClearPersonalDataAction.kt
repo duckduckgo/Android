@@ -56,18 +56,11 @@ class ClearPersonalDataAction @Inject constructor(
     private val settingsDataStore: SettingsDataStore,
     private val cookieManager: DuckDuckGoCookieManager,
     private val appCacheClearer: AppCacheClearer
-) : ClearDataAction, CoroutineScope {
-
-    private val clearJob: Job = Job()
-
-    override val coroutineContext: CoroutineContext
-        get() = Dispatchers.Main + clearJob
+) : ClearDataAction {
 
     override fun killAndRestartProcess() {
         Timber.i("Restarting process")
         FireActivity.triggerRestart(context)
-
-        clearJob.cancel()
     }
 
     override fun killProcess() {
