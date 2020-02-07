@@ -31,36 +31,24 @@ import com.duckduckgo.app.cta.ui.Cta
 import com.duckduckgo.app.cta.ui.DaxDialogCta
 import com.duckduckgo.app.privacy.renderer.TrackersRenderer
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import javax.inject.Inject
-import kotlin.coroutines.CoroutineContext
 
-class BrowserTrackersAnimatorHelper @Inject constructor() : CoroutineScope {
-
-    override val coroutineContext: CoroutineContext
-        get() = SupervisorJob() + Dispatchers.Main
+class BrowserTrackersAnimatorHelper @Inject constructor() {
 
     private var logosStayOnScreenDuration: Long = TRACKER_LOGOS_DELAY_ON_SCREEN
 
     private var loadingAnimation: AnimatorSet = AnimatorSet()
     private var trackersAnimation: AnimatorSet = AnimatorSet()
-    private var typingAnimationJob: Job? = null
 
-    private fun createScanningAnimation(resources: Resources, loadingText: TextView): Job {
-        return launch {
-            while (true) {
-                if (loadingText.text.contains("...")) {
-                    loadingText.text = resources.getString(R.string.trackersAnimationText)
-                } else {
-                    loadingText.text = resources.getString(R.string.trackersAnimationDotText, loadingText.text)
-                }
-                delay(SCANNING_DELAY)
+    private suspend fun createScanningAnimation(resources: Resources, loadingText: TextView) {
+        while (true) {
+            if (loadingText.text.contains("...")) {
+                loadingText.text = resources.getString(R.string.trackersAnimationText)
+            } else {
+                loadingText.text = resources.getString(R.string.trackersAnimationDotText, loadingText.text)
             }
+            delay(SCANNING_DELAY)
         }
     }
 
@@ -80,8 +68,6 @@ class BrowserTrackersAnimatorHelper @Inject constructor() : CoroutineScope {
             views.map {
                 it.alpha = 0f
             }
-            typingAnimationJob?.cancel()
-            typingAnimationJob = null
             trackersAnimation = if (cta is DaxDialogCta.DaxTrackersBlockedCta) {
                 createTrackersAnimation(activity, container, loadingText, events).apply {
                     start()
@@ -95,8 +81,6 @@ class BrowserTrackersAnimatorHelper @Inject constructor() : CoroutineScope {
     }
 
     fun cancelAnimations() {
-        typingAnimationJob?.cancel()
-        typingAnimationJob = null
         if (loadingAnimation.isRunning) {
             loadingAnimation.end()
         }
@@ -105,7 +89,7 @@ class BrowserTrackersAnimatorHelper @Inject constructor() : CoroutineScope {
         }
     }
 
-    fun createLoadingAnimation(resources: Resources, fadeOutViews: List<View>, fadeInView: View) {
+    suspend fun createLoadingAnimation(resources: Resources, fadeOutViews: List<View>, fadeInView: View) {
         if (!loadingAnimation.isRunning && !trackersAnimation.isRunning) {
 
             val animators = fadeOutViews.map {
@@ -122,10 +106,8 @@ class BrowserTrackersAnimatorHelper @Inject constructor() : CoroutineScope {
                 start()
             }
 
-            if (typingAnimationJob == null) {
-                if (fadeInView is TextView) {
-                    typingAnimationJob = createScanningAnimation(resources, fadeInView)
-                }
+            if (fadeInView is TextView) {
+                createScanningAnimation(resources, fadeInView)
             }
         }
     }

@@ -71,11 +71,7 @@ import com.duckduckgo.app.browser.tabpreview.WebViewPreviewGenerator
 import com.duckduckgo.app.browser.tabpreview.WebViewPreviewPersister
 import com.duckduckgo.app.browser.ui.HttpAuthenticationDialogFragment
 import com.duckduckgo.app.browser.useragent.UserAgentProvider
-import com.duckduckgo.app.cta.ui.Cta
-import com.duckduckgo.app.cta.ui.HomePanelCta
-import com.duckduckgo.app.cta.ui.CtaViewModel
-import com.duckduckgo.app.cta.ui.DaxBubbleCta
-import com.duckduckgo.app.cta.ui.DaxDialogCta
+import com.duckduckgo.app.cta.ui.*
 import com.duckduckgo.app.global.ViewModelFactory
 import com.duckduckgo.app.global.device.DeviceInfo
 import com.duckduckgo.app.global.view.*
@@ -92,9 +88,9 @@ import com.duckduckgo.app.widget.ui.AddWidgetInstructionsActivity
 import com.duckduckgo.widget.SearchWidgetLight
 import com.google.android.material.snackbar.Snackbar
 import dagger.android.support.AndroidSupportInjection
-import kotlinx.android.synthetic.main.include_dax_dialog_cta.*
 import kotlinx.android.synthetic.main.fragment_browser_tab.*
 import kotlinx.android.synthetic.main.include_cta_buttons.view.*
+import kotlinx.android.synthetic.main.include_dax_dialog_cta.*
 import kotlinx.android.synthetic.main.include_find_in_page.*
 import kotlinx.android.synthetic.main.include_new_browser_tab.*
 import kotlinx.android.synthetic.main.include_omnibar_toolbar.*
@@ -191,6 +187,8 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
     private var pendingUploadTask: ValueCallback<Array<Uri>>? = null
 
     private lateinit var renderer: BrowserTabFragmentRenderer
+
+    private var loadingAnimationJob: Job? = null
 
     private val viewModel: BrowserTabViewModel by lazy {
         val viewModel = ViewModelProviders.of(this, viewModelFactory).get(BrowserTabViewModel::class.java)
@@ -1201,10 +1199,16 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
                     }
 
                     if (viewState.progress <= MIN_PROGRESS && viewState.isLoading && lastSeenOmnibarViewState?.isEditing != true) {
-                        animatorHelper.createLoadingAnimation(resources, omnibarViews(), loadingText)
+                        if (loadingAnimationJob?.isActive != true) {
+                            loadingAnimationJob = launch {
+                                animatorHelper.createLoadingAnimation(resources, omnibarViews(), loadingText)
+                            }
+                        }
                     }
 
                     if (viewState.progress == MAX_PROGRESS) {
+                        loadingAnimationJob?.cancel()
+                        animatorHelper.cancelAnimations()
                         createLoadedAnimation()
                     }
                 }
