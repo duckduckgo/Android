@@ -512,7 +512,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
             }
             is Command.DownloadImage -> requestImageDownload(it.url)
             is Command.FindInPageCommand -> webView?.findAllAsync(it.searchTerm)
-            is Command.DismissFindInPage -> webView?.findAllAsync(null)
+            is Command.DismissFindInPage -> webView?.findAllAsync("")
             is Command.ShareLink -> launchSharePageChooser(it.url)
             is Command.CopyLink -> {
                 clipboardManager.primaryClip = ClipData.newPlainText(null, it.url)
