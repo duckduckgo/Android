@@ -19,11 +19,15 @@ package com.duckduckgo.app.systemsearch
 import android.content.Intent
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.duckduckgo.app.autocomplete.api.AutoCompleteApi
 import com.duckduckgo.app.global.SingleLiveEvent
 import com.jakewharton.rxrelay2.PublishRelay
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
 
@@ -76,8 +80,12 @@ class SystemSearchViewModel(
         val trimmedQuery = query.trim()
         if (trimmedQuery != currentViewState().queryText) {
             viewState.value = currentViewState().copy(queryText = trimmedQuery)
-            updateAppResults(deviceAppsLookup.query(query))
             autoCompletePublishSubject.accept(trimmedQuery)
+            viewModelScope.launch {
+                withContext(Dispatchers.IO) {
+                    updateAppResults(deviceAppsLookup.query(query))
+                }
+            }
         }
     }
 
@@ -95,10 +103,7 @@ class SystemSearchViewModel(
         val hasAllResults = autocompleteResults.isNotEmpty() && appResults.isNotEmpty()
         val newSuggestions = if (hasAllResults) autocompleteResults.take(4) else autocompleteResults
         val newApps = if (hasAllResults) appResults.take(4) else appResults
-        viewState.value = currentViewState().copy(
-            autocompleteResults = newSuggestions,
-            appResults = newApps
-        )
+        viewState.postValue(currentViewState().copy(autocompleteResults = newSuggestions, appResults = newApps))
     }
 
     fun userClearedQuery() {

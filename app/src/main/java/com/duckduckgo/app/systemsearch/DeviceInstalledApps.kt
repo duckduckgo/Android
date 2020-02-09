@@ -17,14 +17,13 @@
 package com.duckduckgo.app.systemsearch
 
 import android.content.Intent
-import android.content.pm.ApplicationInfo
+import android.content.pm.ApplicationInfo.DisplayNameComparator
 import android.content.pm.PackageManager
-import timber.log.Timber
-import java.util.*
+import androidx.annotation.WorkerThread
 
 data class DeviceApp(
-    val shortActivityName: String,
-    val fullActivityName: String,
+    val shortName: String,
+    val longName: String,
     val packageName: String,
     val launchIntent: Intent
 )
@@ -33,49 +32,34 @@ class DeviceAppsLookup(private val packageManager: PackageManager) {
 
     private val allApps by lazy { all() }
 
+    @WorkerThread
     fun query(query: String): List<DeviceApp> {
 
         if (query.isBlank()) return emptyList()
 
         return allApps.filter {
-            it.shortActivityName.contains(query, ignoreCase = true)
+            it.shortName.contains(query, ignoreCase = true)
         }
     }
 
+    @WorkerThread
     private fun all(): List<DeviceApp> {
-        val intent = Intent(Intent.ACTION_MAIN)
-        val resInfos = packageManager.queryIntentActivities(intent, 0)
-        val mainPackages = mutableSetOf<String>()
-        val appInfos = mutableListOf<ApplicationInfo>()
 
-        for (resInfo in resInfos) {
-            val packageName = resInfo.activityInfo.packageName
-            mainPackages.add(packageName)
-        }
+        val mainIntent = Intent(Intent.ACTION_MAIN)
+        val mainActivities = packageManager.queryIntentActivities(mainIntent, 0)
 
-        for (packageName in mainPackages) {
-            appInfos.add(packageManager.getApplicationInfo(packageName, PackageManager.GET_META_DATA))
-        }
+        val appsInfo = mainActivities.map {
+            it.activityInfo.packageName
+        }.toSet().map {
+            packageManager.getApplicationInfo(it, PackageManager.GET_META_DATA)
+        }.sortedWith(DisplayNameComparator(packageManager))
 
-        Collections.sort(appInfos, ApplicationInfo.DisplayNameComparator(packageManager))
-
-        Timber.i("Found ${appInfos.size} matching apps")
-
-        val appsList: List<DeviceApp> = appInfos.map {
+        return appsInfo.map {
             val shortName = packageManager.getApplicationLabel(it).toString()
             val packageName = it.packageName
-            val fullActivityName = packageManager.getApplicationInfo(packageName, 0).className
-            val icon = it.icon
-            Timber.i("Short name: $shortName, package: $packageName, full activity name: $fullActivityName")
-
-            val launchIntent = packageManager.getLaunchIntentForPackage(packageName)
-            if (fullActivityName == null) return@map null
-            if (launchIntent == null) return@map null
-            return@map DeviceApp(shortName, fullActivityName, packageName, launchIntent)
-
+            val fullName = packageManager.getApplicationInfo(packageName, 0).className ?: return@map null
+            val launchIntent = packageManager.getLaunchIntentForPackage(packageName) ?: return@map null
+            return@map DeviceApp(shortName, fullName, packageName, launchIntent)
         }.filterNotNull()
-
-        Timber.i("Found ${appsList.size} matching Activities")
-        return appsList
     }
 }

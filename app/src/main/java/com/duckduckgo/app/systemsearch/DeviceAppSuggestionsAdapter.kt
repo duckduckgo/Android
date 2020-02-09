@@ -39,7 +39,7 @@ class DeviceAppSuggestionsAdapter(
 
     override fun onBindViewHolder(holder: DeviceAppViewHolder, position: Int) {
         val app = deviceApps[position]
-        holder.title.text = app.shortActivityName
+        holder.title.text = app.shortName
         holder.root.setOnClickListener {
             clickListener(app)
         }
