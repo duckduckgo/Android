@@ -55,19 +55,21 @@ class SystemSearchViewModel(
     private var autocompleteResults: List<AutoCompleteApi.AutoCompleteSuggestion> = emptyList()
 
     init {
-        resetViewState()
+        resetState()
         configureAutoComplete()
     }
 
     private fun currentViewState(): SystemSearchViewState = viewState.value!!
 
-    fun resetViewState() {
+    fun resetState() {
+        autocompleteResults = emptyList()
+        appResults = emptyList()
         viewState.value = SystemSearchViewState()
     }
 
     private fun configureAutoComplete() {
         autoCompletePublishSubject
-            .debounce(300, TimeUnit.MILLISECONDS)
+            .debounce(DEBOUNCE_TIME_MS, TimeUnit.MILLISECONDS)
             .switchMap { autoCompleteApi.autoComplete(it) }
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
@@ -78,13 +80,21 @@ class SystemSearchViewModel(
 
     fun userUpdatedQuery(query: String) {
         val trimmedQuery = query.trim()
-        if (trimmedQuery != currentViewState().queryText) {
-            viewState.value = currentViewState().copy(queryText = trimmedQuery)
-            autoCompletePublishSubject.accept(trimmedQuery)
-            viewModelScope.launch {
-                withContext(Dispatchers.IO) {
-                    updateAppResults(deviceAppsLookup.query(query))
-                }
+
+        if (trimmedQuery == currentViewState().queryText) {
+            return
+        }
+
+        if (trimmedQuery.isBlank()) {
+            userClearedQuery()
+            return
+        }
+
+        viewState.value = currentViewState().copy(queryText = trimmedQuery)
+        autoCompletePublishSubject.accept(trimmedQuery)
+        viewModelScope.launch {
+            withContext(Dispatchers.IO) {
+                updateAppResults(deviceAppsLookup.query(query))
             }
         }
     }
@@ -100,15 +110,15 @@ class SystemSearchViewModel(
     }
 
     private fun refreshViewStateResults() {
-        val hasAllResults = autocompleteResults.isNotEmpty() && appResults.isNotEmpty()
-        val newSuggestions = if (hasAllResults) autocompleteResults.take(4) else autocompleteResults
-        val newApps = if (hasAllResults) appResults.take(4) else appResults
+        val hasMultiResults = autocompleteResults.isNotEmpty() && appResults.isNotEmpty()
+        val newSuggestions = if (hasMultiResults) autocompleteResults.take(MULTI_RESULTS_MAX_PER_GROUP) else autocompleteResults
+        val newApps = if (hasMultiResults) appResults.take(MULTI_RESULTS_MAX_PER_GROUP) else appResults
         viewState.postValue(currentViewState().copy(autocompleteResults = newSuggestions, appResults = newApps))
     }
 
     fun userClearedQuery() {
-        viewState.value = currentViewState().copy(queryText = "", appResults = emptyList())
         autoCompletePublishSubject.accept("")
+        resetState()
     }
 
     fun userSubmittedQuery(query: String) {
@@ -117,5 +127,10 @@ class SystemSearchViewModel(
 
     fun userSelectedApp(app: DeviceApp) {
         command.value = Command.LaunchApplication(app.launchIntent)
+    }
+
+    companion object {
+        private const val DEBOUNCE_TIME_MS = 300L
+        private const val MULTI_RESULTS_MAX_PER_GROUP = 4
     }
 }

@@ -68,7 +68,7 @@ class SystemSearchActivity : DuckDuckGoActivity() {
         super.onNewIntent(newIntent)
         Timber.i("onNewIntent: $newIntent")
 
-        viewModel.resetViewState()
+        viewModel.resetState()
         val intent = newIntent ?: return
         when {
             launchedFromAssist(intent) -> pixel.fire(Pixel.PixelName.ASSIST_LAUNCH)
