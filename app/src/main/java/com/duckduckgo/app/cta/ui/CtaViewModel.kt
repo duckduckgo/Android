@@ -72,14 +72,19 @@ class CtaViewModel @Inject constructor(
 
     fun onCtaShown(cta: Cta) {
         cta.shownPixel?.let {
-            pixel.fire(it, cta.pixelShownParameters())
+            val canSendPixel = when (cta) {
+                is DaxCta -> cta.canSendShownPixel()
+                else -> true
+            }
+            if (canSendPixel) {
+                pixel.fire(it, cta.pixelShownParameters())
+            }
         }
     }
 
-    fun registerDaxBubbleCtaShown(cta: Cta) {
+    fun registerDaxBubbleCtaDismissed(cta: Cta) {
         if (cta is DaxBubbleCta) {
             Schedulers.io().scheduleDirect {
-                onCtaShown(cta)
                 dismissedCtaDao.insert(DismissedCta(cta.ctaId))
             }
         }
@@ -191,7 +196,7 @@ class CtaViewModel @Inject constructor(
             val host = it.uri?.host
             if (it.entity != null && host != null) {
                 it.entity?.let { entity ->
-                    if (!daxDialogNetworkShown() && DaxDialogCta.MAIN_TRACKER_NETWORKS.contains(entity.displayName)) {
+                    if (!daxDialogNetworkShown() && DaxDialogCta.mainTrackerNetworks.contains(entity.displayName)) {
                         return DaxDialogCta.DaxMainNetworkCta(onboardingStore, appInstallStore, entity.displayName, host)
                     }
                 }

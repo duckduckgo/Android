@@ -149,7 +149,20 @@ class CtaViewModelTest {
     }
 
     @Test
-    fun whenCtaShownPixelIsFired() {
+    fun whenCtaShownAndCtaIsDaxAndCanNotSendPixelThenPixelIsNotFired() {
+        testee.onCtaShown(DaxBubbleCta.DaxIntroCta(mockOnboardingStore, mockAppInstallStore))
+        verify(mockPixel, never()).fire(eq(SURVEY_CTA_SHOWN), any())
+    }
+
+    @Test
+    fun whenCtaShownAndCtaIsDaxAndCanSendPixelThenPixelIsFired() {
+        whenever(mockOnboardingStore.onboardingDialogJourney).thenReturn("s:0")
+        testee.onCtaShown(DaxBubbleCta.DaxEndCta(mockOnboardingStore, mockAppInstallStore))
+        verify(mockPixel, never()).fire(eq(SURVEY_CTA_SHOWN), any())
+    }
+
+    @Test
+    fun whenCtaShownAndCtaIsNotDaxThenPixelIsFired() {
         testee.onCtaShown(HomePanelCta.Survey(Survey("abc", "http://example.com", 1, SCHEDULED)))
         verify(mockPixel).fire(eq(SURVEY_CTA_SHOWN), any())
     }
@@ -193,26 +206,14 @@ class CtaViewModelTest {
 
     @Test
     fun whenRegisterDaxBubbleIntroCtaThenDatabaseNotified() {
-        testee.registerDaxBubbleCtaShown(DaxBubbleCta.DaxIntroCta(mockOnboardingStore, mockAppInstallStore))
+        testee.registerDaxBubbleCtaDismissed(DaxBubbleCta.DaxIntroCta(mockOnboardingStore, mockAppInstallStore))
         verify(mockDismissedCtaDao).insert(DismissedCta(CtaId.DAX_INTRO))
     }
 
     @Test
-    fun whenRegisterDaxBubbleIntroCtaThenPixelIsFired() {
-        testee.registerDaxBubbleCtaShown(DaxBubbleCta.DaxIntroCta(mockOnboardingStore, mockAppInstallStore))
-        verify(mockPixel).fire(eq(ONBOARDING_DAX_CTA_SHOWN), any())
-    }
-
-    @Test
     fun whenRegisterDaxBubbleEndCtaThenDatabaseNotified() {
-        testee.registerDaxBubbleCtaShown(DaxBubbleCta.DaxEndCta(mockOnboardingStore, mockAppInstallStore))
+        testee.registerDaxBubbleCtaDismissed(DaxBubbleCta.DaxEndCta(mockOnboardingStore, mockAppInstallStore))
         verify(mockDismissedCtaDao).insert(DismissedCta(CtaId.DAX_END))
-    }
-
-    @Test
-    fun whenRegisterDaxBubbleEndCtaThenPixelIsFired() {
-        testee.registerDaxBubbleCtaShown(DaxBubbleCta.DaxIntroCta(mockOnboardingStore, mockAppInstallStore))
-        verify(mockPixel).fire(eq(ONBOARDING_DAX_CTA_SHOWN), any())
     }
 
     @Test

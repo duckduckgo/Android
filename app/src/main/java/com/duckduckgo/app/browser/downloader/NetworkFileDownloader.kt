@@ -31,7 +31,9 @@ class NetworkFileDownloader @Inject constructor(private val context: Context) {
 
         val request = DownloadManager.Request(pendingDownload.url.toUri()).apply {
             allowScanningByMediaScanner()
+            addRequestHeader("User-Agent", pendingDownload.userAgent)
             addRequestHeader("Cookie", CookieManager.getInstance().getCookie(pendingDownload.url))
+            setMimeType(pendingDownload.mimeType)
             setDestinationInExternalPublicDir(pendingDownload.subfolder, guessedFileName)
             setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
         }
@@ -44,5 +46,4 @@ class NetworkFileDownloader @Inject constructor(private val context: Context) {
         Timber.i("Guessed filename of $guessedFileName for url ${pending.url}")
         return guessedFileName
     }
-
 }

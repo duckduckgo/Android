@@ -888,9 +888,9 @@ class BrowserTabViewModel(
         }
     }
 
-    fun registerDaxBubbleCtaShown() {
+    fun registerDaxBubbleCtaDismissed() {
         val cta = ctaViewState.value?.cta ?: return
-        ctaViewModel.registerDaxBubbleCtaShown(cta)
+        ctaViewModel.registerDaxBubbleCtaDismissed(cta)
     }
 
     fun onUserClickCtaOkButton() {

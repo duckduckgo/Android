@@ -21,19 +21,21 @@ import androidx.lifecycle.ViewModel
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.global.SingleLiveEvent
 import com.duckduckgo.app.global.install.AppInstallStore
+import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.pixels.Pixel
 
 class DefaultBrowserPageViewModel(
     private val defaultBrowserDetector: DefaultBrowserDetector,
     private val pixel: Pixel,
-    private val installStore: AppInstallStore
+    private val installStore: AppInstallStore,
+    private val variantManager: VariantManager
 ) : ViewModel() {
 
-    data class ViewState(
-        val showSettingsUi: Boolean = false,
-        val showInstructionsCard: Boolean = false,
-        val showOnlyContinue: Boolean = false
-    )
+    sealed class ViewState {
+        object DefaultBrowserSettingsUI : ViewState()
+        data class DefaultBrowserDialogUI(val showInstructionsCard: Boolean = false) : ViewState()
+        object ContinueUI : ViewState()
+    }
 
     sealed class Command {
         class OpenDialog(val url: String = DEFAULT_URL) : Command()
@@ -55,10 +57,7 @@ class DefaultBrowserPageViewModel(
     private var viewHasShown: Boolean = false
 
     init {
-        viewState.value = ViewState(
-            showOnlyContinue = defaultBrowserDetector.isDefaultBrowser(),
-            showSettingsUi = defaultBrowserDetector.hasDefaultBrowser()
-        )
+        viewState.value = newViewState()
     }
 
     fun pageBecameVisible() {
@@ -69,10 +68,7 @@ class DefaultBrowserPageViewModel(
     }
 
     fun loadUI() {
-        viewState.value = viewState.value?.copy(
-            showOnlyContinue = defaultBrowserDetector.isDefaultBrowser(),
-            showSettingsUi = defaultBrowserDetector.hasDefaultBrowser()
-        )
+        refreshViewStateIfTypeChanged(newViewState())
     }
 
     fun onContinueToBrowser(userTriedToSetDDGAsDefault: Boolean) {
@@ -84,13 +80,14 @@ class DefaultBrowserPageViewModel(
 
     fun onDefaultBrowserClicked() {
         var behaviourTriggered = Pixel.PixelValues.DEFAULT_BROWSER_SETTINGS
-        if (defaultBrowserDetector.hasDefaultBrowser()) {
+        val currentState = viewState.value
+        if (currentState is ViewState.DefaultBrowserSettingsUI) {
             command.value = Command.OpenSettings
-        } else {
+        } else if (currentState is ViewState.DefaultBrowserDialogUI) {
             timesPressedJustOnce++
             behaviourTriggered = Pixel.PixelValues.DEFAULT_BROWSER_DIALOG
             command.value = Command.OpenDialog()
-            viewState.value = viewState.value?.copy(showInstructionsCard = true)
+            viewState.value = currentState.copy(showInstructionsCard = true)
         }
         val params = mapOf(
             Pixel.PixelParameter.DEFAULT_BROWSER_BEHAVIOUR_TRIGGERED to behaviourTriggered
@@ -99,45 +96,74 @@ class DefaultBrowserPageViewModel(
     }
 
     fun handleResult(origin: Origin) {
-        val isDefault = defaultBrowserDetector.isDefaultBrowser()
-        val showSettingsUI = defaultBrowserDetector.hasDefaultBrowser()
-        var showInstructionsCard = false
         when (origin) {
             is Origin.InternalBrowser -> {
-                showInstructionsCard = handleOriginInternalBrowser(isDefault)
+                val navigateToBrowser = handleOriginInternalBrowser()
+                reduceToNewState(origin, navigateToBrowser)
             }
             is Origin.DialogDismissed -> {
                 fireDefaultBrowserPixelAndResetTimesPressedJustOnce(originValue = Pixel.PixelValues.DEFAULT_BROWSER_DIALOG_DISMISSED)
+                reduceToNewState(origin)
             }
             is Origin.ExternalBrowser -> {
                 fireDefaultBrowserPixelAndResetTimesPressedJustOnce(originValue = Pixel.PixelValues.DEFAULT_BROWSER_EXTERNAL)
+                reduceToNewState(origin)
             }
             is Origin.Settings -> {
                 fireDefaultBrowserPixelAndResetTimesPressedJustOnce(originValue = Pixel.PixelValues.DEFAULT_BROWSER_SETTINGS)
+                reduceToNewState(origin)
             }
         }
-        viewState.value = viewState.value?.copy(
-            showOnlyContinue = isDefault,
-            showSettingsUi = showSettingsUI,
-            showInstructionsCard = showInstructionsCard
-        )
     }
 
-    private fun handleOriginInternalBrowser(ddgIsDefaultBrowser: Boolean): Boolean {
-        if (ddgIsDefaultBrowser) {
+    private fun reduceToNewState(origin: Origin, navigateToBrowser: Boolean = false) {
+        val newViewState = nextViewState(origin)
+
+        if (newViewState == null || navigateToBrowser) {
+            command.value = Command.ContinueToBrowser
+            return
+        }
+
+        viewState.value = newViewState
+    }
+
+    private fun nextViewState(origin: Origin): ViewState? {
+        return when {
+            defaultBrowserDetector.isDefaultBrowser() -> {
+                if (shouldShowContinueScreen()) {
+                    ViewState.ContinueUI
+                } else {
+                    null
+                }
+            }
+            defaultBrowserDetector.hasDefaultBrowser() -> {
+                ViewState.DefaultBrowserSettingsUI
+            }
+            else -> {
+                ViewState.DefaultBrowserDialogUI(showInstructionsCard = origin is Origin.InternalBrowser)
+            }
+        }
+    }
+
+    private fun shouldShowContinueScreen(): Boolean {
+        return !variantManager.getVariant().hasFeature(VariantManager.VariantFeature.SuppressDefaultBrowserContinueScreen)
+    }
+
+    private fun handleOriginInternalBrowser(): Boolean {
+        var navigateToBrowser = false
+        if (defaultBrowserDetector.isDefaultBrowser()) {
             fireDefaultBrowserPixelAndResetTimesPressedJustOnce(originValue = Pixel.PixelValues.DEFAULT_BROWSER_DIALOG)
         } else {
             if (timesPressedJustOnce < MAX_DIALOG_ATTEMPTS) {
                 timesPressedJustOnce++
                 command.value = Command.OpenDialog()
                 pixel.fire(Pixel.PixelName.ONBOARDING_DEFAULT_BROWSER_SELECTED_JUST_ONCE)
-                return true
             } else {
-                command.value = Command.ContinueToBrowser
                 fireDefaultBrowserPixelAndResetTimesPressedJustOnce(originValue = Pixel.PixelValues.DEFAULT_BROWSER_JUST_ONCE_MAX)
+                navigateToBrowser = true
             }
         }
-        return false
+        return navigateToBrowser
     }
 
     private fun fireDefaultBrowserPixelAndResetTimesPressedJustOnce(originValue: String) {
@@ -155,6 +181,26 @@ class DefaultBrowserPageViewModel(
                 Pixel.PixelParameter.DEFAULT_BROWSER_SET_ORIGIN to originValue
             )
             pixel.fire(Pixel.PixelName.DEFAULT_BROWSER_NOT_SET, params)
+        }
+    }
+
+    private fun currentViewState(): ViewState = viewState.value!!
+
+    private fun newViewState(): ViewState = when {
+        defaultBrowserDetector.isDefaultBrowser() -> {
+            ViewState.ContinueUI
+        }
+        defaultBrowserDetector.hasDefaultBrowser() -> {
+            ViewState.DefaultBrowserSettingsUI
+        }
+        else -> {
+            ViewState.DefaultBrowserDialogUI()
+        }
+    }
+
+    private fun refreshViewStateIfTypeChanged(createViewState: ViewState) {
+        if (createViewState.javaClass != currentViewState().javaClass) {
+            viewState.value = createViewState
         }
     }
 

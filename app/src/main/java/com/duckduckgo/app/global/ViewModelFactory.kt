@@ -139,7 +139,7 @@ class ViewModelFactory @Inject constructor(
             }
         } as T
 
-    private fun defaultBrowserPage() = DefaultBrowserPageViewModel(defaultBrowserDetector, pixel, appInstallStore)
+    private fun defaultBrowserPage() = DefaultBrowserPageViewModel(defaultBrowserDetector, pixel, appInstallStore, variantManager)
 
     private fun onboardingViewModel() = OnboardingViewModel(onboardingStore, onboardingPageManager)
 
