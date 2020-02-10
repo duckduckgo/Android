@@ -23,6 +23,7 @@ import androidx.core.content.edit
 interface AppReferrerDataStore {
     var referrerCheckedPreviously: Boolean
     var campaignSuffix: String?
+    var installedFromEuAuction: Boolean
 }
 
 class AppReferenceSharePreferences(private val context: Context) : AppReferrerDataStore {
@@ -34,6 +35,10 @@ class AppReferenceSharePreferences(private val context: Context) : AppReferrerDa
         get() = preferences.getBoolean(KEY_CHECKED_PREVIOUSLY, false)
         set(value) = preferences.edit(true) { putBoolean(KEY_CHECKED_PREVIOUSLY, value) }
 
+    override var installedFromEuAuction: Boolean
+        get() = preferences.getBoolean(KEY_INSTALLED_FROM_EU_AUCTION, false)
+        set(value) = preferences.edit(true) { putBoolean(KEY_INSTALLED_FROM_EU_AUCTION, value) }
+
     private val preferences: SharedPreferences
         get() = context.getSharedPreferences(FILENAME, Context.MODE_PRIVATE)
 
@@ -41,5 +46,6 @@ class AppReferenceSharePreferences(private val context: Context) : AppReferrerDa
         const val FILENAME = "com.duckduckgo.app.referral"
         private const val KEY_CAMPAIGN_SUFFIX = "KEY_CAMPAIGN_SUFFIX"
         private const val KEY_CHECKED_PREVIOUSLY = "KEY_CHECKED_PREVIOUSLY"
+        private const val KEY_INSTALLED_FROM_EU_AUCTION = "KEY_INSTALLED_FROM_EU_AUCTION"
     }
 }
