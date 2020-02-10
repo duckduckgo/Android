@@ -48,6 +48,7 @@ class NotificationRegistrar @Inject constructor(
     object NotificationId {
         const val ClearData = 100
         const val PrivacyProtection = 101
+        const val StickySearch = 102
     }
 
     object ChannelType {
@@ -66,12 +67,18 @@ class NotificationRegistrar @Inject constructor(
             R.string.notificationChannelTutorials,
             NotificationManagerCompat.IMPORTANCE_DEFAULT
         )
+        val SEARCH = Channel(
+            "com.duckduckgo.search",
+            R.string.notificationChannelTutorials,
+            NotificationManagerCompat.IMPORTANCE_LOW
+        )
     }
 
     private val channels = (listOf(
         ChannelType.FILE_DOWNLOADING,
         ChannelType.FILE_DOWNLOADED,
-        ChannelType.TUTORIALS
+        ChannelType.TUTORIALS,
+        ChannelType.SEARCH
     ))
 
     fun registerApp() {

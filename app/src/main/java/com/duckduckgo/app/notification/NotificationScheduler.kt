@@ -20,14 +20,24 @@ import android.app.PendingIntent
 import android.app.PendingIntent.getService
 import android.content.Context
 import android.content.Intent
+import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
-import androidx.work.*
+import androidx.core.app.RemoteInput
+import androidx.work.CoroutineWorker
+import androidx.work.OneTimeWorkRequest
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.WorkManager
+import androidx.work.WorkerParameters
+import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.notification.NotificationHandlerService.Companion.NOTIFICATION_SYSTEM_ID_EXTRA
 import com.duckduckgo.app.notification.NotificationHandlerService.Companion.PIXEL_SUFFIX_EXTRA
+import com.duckduckgo.app.notification.NotificationHandlerService.Companion.STICKY_SEARCH_REPLY
+import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEvent.STICKY_SEARCH
 import com.duckduckgo.app.notification.db.NotificationDao
 import com.duckduckgo.app.notification.model.Notification
 import com.duckduckgo.app.notification.model.NotificationSpec
 import com.duckduckgo.app.notification.model.SchedulableNotification
+import com.duckduckgo.app.notification.model.StickyNotification
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.NOTIFICATION_SHOWN
 import timber.log.Timber
@@ -53,6 +63,15 @@ class NotificationScheduler @Inject constructor(
             }
             else -> Timber.v("Notifications not enabled for this variant")
         }
+    }
+
+    fun launchStickySearchNotification() {
+        Timber.v("Posting sticky notification")
+        val request = OneTimeWorkRequestBuilder<StickyNotificationWorker>()
+            .addTag(STICKY_REQUEST_TAG)
+            .build()
+
+        workManager.enqueue(request)
     }
 
     private fun scheduleNotification(builder: OneTimeWorkRequest.Builder, duration: Long, unit: TimeUnit) {
@@ -107,7 +126,49 @@ class NotificationScheduler @Inject constructor(
         }
     }
 
+    class StickyNotificationWorker(val context: Context, params: WorkerParameters) : CoroutineWorker(context, params) {
+
+        lateinit var manager: NotificationManagerCompat
+        lateinit var factory: NotificationFactory
+        lateinit var notification: StickyNotification
+        lateinit var pixel: Pixel
+
+        override suspend fun doWork(): Result {
+
+            val specification = notification.buildSpecification()
+
+            val remoteInput: RemoteInput = RemoteInput.Builder(STICKY_SEARCH_REPLY).run {
+                setLabel(specification.launchButton)
+                build()
+            }
+
+            val intent = Intent(context, NotificationHandlerService::class.java)
+            intent.type = STICKY_SEARCH
+            intent.putExtra(PIXEL_SUFFIX_EXTRA, specification.pixelSuffix)
+            intent.putExtra(NOTIFICATION_SYSTEM_ID_EXTRA, specification.systemId)
+            intent.setAction(STICKY_SEARCH)
+            val launchIntent = getService(context, 0, intent, 0)!!
+
+            val action: NotificationCompat.Action =
+                NotificationCompat.Action.Builder(
+                    R.drawable.ic_search_black_24dp,
+                    specification.launchButton,
+                    launchIntent
+                )
+                    .addRemoteInput(remoteInput)
+                    .build()
+
+            val systemNotification = factory.createStickyNotification(specification, action)
+
+            manager.notify(specification.systemId, systemNotification)
+
+            pixel.fire("${NOTIFICATION_SHOWN.pixelName}_${specification.pixelSuffix}")
+            return Result.success()
+        }
+    }
+
     companion object {
         const val WORK_REQUEST_TAG = "com.duckduckgo.notification.schedule"
+        const val STICKY_REQUEST_TAG = "com.duckduckgo.notification.sticky"
     }
 }

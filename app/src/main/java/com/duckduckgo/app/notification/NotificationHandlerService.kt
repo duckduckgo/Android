@@ -17,6 +17,7 @@
 package com.duckduckgo.app.notification
 
 import android.app.IntentService
+import android.app.RemoteInput
 import android.app.TaskStackBuilder
 import android.content.Context
 import android.content.Intent
@@ -26,6 +27,7 @@ import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEvent.APP_LAUNCH
 import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEvent.CANCEL
 import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEvent.CLEAR_DATA_LAUNCH
+import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEvent.STICKY_SEARCH
 import com.duckduckgo.app.settings.SettingsActivity
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.NOTIFICATION_CANCELLED
@@ -57,10 +59,14 @@ class NotificationHandlerService : IntentService("NotificationHandlerService") {
             APP_LAUNCH -> onAppLaunched(pixelSuffix)
             CLEAR_DATA_LAUNCH -> onClearDataLaunched(pixelSuffix)
             CANCEL -> onCancelled(pixelSuffix)
+            STICKY_SEARCH -> onSearchRequest(intent)
         }
-        val notificationId = intent.getIntExtra(NOTIFICATION_SYSTEM_ID_EXTRA, 0)
-        clearNotification(notificationId)
-        closeNotificationPanel()
+
+        if (intent.type != STICKY_SEARCH_REPLY){
+            val notificationId = intent.getIntExtra(NOTIFICATION_SYSTEM_ID_EXTRA, 0)
+            clearNotification(notificationId)
+            closeNotificationPanel()
+        }
     }
 
     private fun onAppLaunched(pixelSuffix: String) {
@@ -84,6 +90,17 @@ class NotificationHandlerService : IntentService("NotificationHandlerService") {
         pixel.fire("${NOTIFICATION_CANCELLED.pixelName}_$pixelSuffix")
     }
 
+    private fun onSearchRequest(intent: Intent) {
+        val searchQuery = RemoteInput.getResultsFromIntent(intent)?.getCharSequence(STICKY_SEARCH_REPLY)!!
+        val pixelSuffix = intent.getStringExtra(PIXEL_SUFFIX_EXTRA)
+        val searchIntent = BrowserActivity.intent(context, queryExtra = searchQuery.toString(), newSearch = false)
+        TaskStackBuilder.create(context)
+            .addNextIntentWithParentStack(searchIntent)
+            .startActivities()
+        pixel.fire("${NOTIFICATION_LAUNCHED.pixelName}_$pixelSuffix")
+    }
+
+
     private fun clearNotification(notificationId: Int) {
         notificationManager.cancel(notificationId)
     }
@@ -97,10 +114,12 @@ class NotificationHandlerService : IntentService("NotificationHandlerService") {
         const val APP_LAUNCH = "com.duckduckgo.notification.launch.app"
         const val CLEAR_DATA_LAUNCH = "com.duckduckgo.notification.launch.clearData"
         const val CANCEL = "com.duckduckgo.notification.cancel"
+        const val STICKY_SEARCH = "com.duckduckgo.notification.search"
     }
 
     companion object {
         const val PIXEL_SUFFIX_EXTRA = "PIXEL_SUFFIX_EXTRA"
         const val NOTIFICATION_SYSTEM_ID_EXTRA = "NOTIFICATION_SYSTEM_ID"
+        const val STICKY_SEARCH_REPLY = "STICKY_SEARCH_REPLY"
     }
 }

@@ -19,6 +19,7 @@ package com.duckduckgo.app.notification
 import android.app.Notification
 import android.app.PendingIntent
 import android.content.Context
+import android.widget.RemoteViews
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
@@ -47,6 +48,22 @@ class NotificationFactory @Inject constructor(val context: Context, val manager:
             builder.addAction(specification.icon, it, launchIntent)
         }
 
+        return builder.build()
+    }
+
+    fun createStickyNotification(
+        specification: NotificationSpec,
+        action: NotificationCompat.Action
+    ): Notification {
+
+        val builder = NotificationCompat.Builder(context, specification.channel.id)
+            .setPriority(specification.channel.priority)
+            .setSmallIcon(specification.icon)
+            .setContentTitle(specification.title)
+            .setContentText(specification.description)
+            .setColor(ContextCompat.getColor(context, R.color.cornflowerDark))
+            .addAction(action)
+            .setOngoing(true)
         return builder.build()
     }
 }

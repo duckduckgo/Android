@@ -26,6 +26,12 @@ interface SchedulableNotification {
     suspend fun buildSpecification(): NotificationSpec
 }
 
+interface StickyNotification {
+    val id: String
+    suspend fun canShow(): Boolean
+    suspend fun buildSpecification(): NotificationSpec
+}
+
 interface NotificationSpec {
     val channel: NotificationRegistrar.Channel
     val systemId: Int
