@@ -65,7 +65,7 @@ class PlayStoreAppReferrerStateListener @Inject constructor(
 
             if (appReferrerDataStore.referrerCheckedPreviously) {
 
-                referralResult = if (appReferrerDataStore.installedFromEuAcution) {
+                referralResult = if (appReferrerDataStore.installedFromEuAuction) {
                     EuAuctionReferrerFound(fromCache = true)
                 } else {
                     loadPreviousReferrerData()
@@ -168,7 +168,7 @@ class PlayStoreAppReferrerStateListener @Inject constructor(
             }
             is EuAuctionReferrerFound -> {
                 variantManager.updateAppReferrerVariant(VariantManager.RESERVED_EU_AUCTION_VARIANT)
-                appReferrerDataStore.installedFromEuAcution = true
+                appReferrerDataStore.installedFromEuAuction = true
             }
         }
 

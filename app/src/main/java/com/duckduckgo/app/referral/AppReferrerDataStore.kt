@@ -23,7 +23,7 @@ import androidx.core.content.edit
 interface AppReferrerDataStore {
     var referrerCheckedPreviously: Boolean
     var campaignSuffix: String?
-    var installedFromEuAcution: Boolean
+    var installedFromEuAuction: Boolean
 }
 
 class AppReferenceSharePreferences(private val context: Context) : AppReferrerDataStore {
@@ -35,7 +35,7 @@ class AppReferenceSharePreferences(private val context: Context) : AppReferrerDa
         get() = preferences.getBoolean(KEY_CHECKED_PREVIOUSLY, false)
         set(value) = preferences.edit(true) { putBoolean(KEY_CHECKED_PREVIOUSLY, value) }
 
-    override var installedFromEuAcution: Boolean
+    override var installedFromEuAuction: Boolean
         get() = preferences.getBoolean(KEY_INSTALLED_FROM_EU_AUCTION, false)
         set(value) = preferences.edit(true) { putBoolean(KEY_INSTALLED_FROM_EU_AUCTION, value) }
 
