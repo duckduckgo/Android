@@ -45,7 +45,7 @@ class QueryParamReferrerParser : AppInstallationReferrerParser {
         for (part in referrerParts) {
 
             Timber.v("Analysing query param part: $part")
-            if (part.startsWith(EU_AUCTION_KEY) && part.endsWith(EU_AUCTION_VALUE)) {
+            if (part.startsWith(INSTALLATION_SOURCE_KEY) && part.endsWith(INSTALLATION_SOURCE_EU_AUCTION_VALUE)) {
                 Timber.i("App installed as a result of the EU auction")
                 return EuAuctionReferrerFound()
             }
@@ -94,8 +94,8 @@ class QueryParamReferrerParser : AppInstallationReferrerParser {
     companion object {
         private const val CAMPAIGN_NAME_PREFIX = "DDGRA"
 
-        const val EU_AUCTION_KEY = "utm_source"
-        const val EU_AUCTION_VALUE = "eea-search-choice"
+        private const val INSTALLATION_SOURCE_KEY = "utm_source"
+        private const val INSTALLATION_SOURCE_EU_AUCTION_VALUE = "eea-search-choice"
     }
 }
 

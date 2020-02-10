@@ -18,8 +18,6 @@ package com.duckduckgo.app.referral
 
 import com.duckduckgo.app.referral.ParsedReferrerResult.CampaignReferrerFound
 import com.duckduckgo.app.referral.ParsedReferrerResult.EuAuctionReferrerFound
-import com.duckduckgo.app.referral.QueryParamReferrerParser.Companion.EU_AUCTION_KEY
-import com.duckduckgo.app.referral.QueryParamReferrerParser.Companion.EU_AUCTION_VALUE
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -81,25 +79,25 @@ class QueryParamReferrerParserTest {
 
     @Test
     fun whenReferrerContainsEuAuctionDataThenEuActionReferrerFound() {
-        val result = testee.parse("$EU_AUCTION_KEY=$EU_AUCTION_VALUE")
+        val result = testee.parse("$INSTALLATION_SOURCE_KEY=$INSTALLATION_SOURCE_EU_AUCTION_VALUE")
         assertTrue(result is EuAuctionReferrerFound)
     }
 
     @Test
     fun whenReferrerContainsBothEuAuctionAndCampaignReferrerDataThenEuActionReferrerFound() {
-        val result = testee.parse("key1=DDGRAAB&key2=foo&key3=bar&$EU_AUCTION_KEY=$EU_AUCTION_VALUE")
+        val result = testee.parse("key1=DDGRAAB&key2=foo&key3=bar&$INSTALLATION_SOURCE_KEY=$INSTALLATION_SOURCE_EU_AUCTION_VALUE")
         assertTrue(result is EuAuctionReferrerFound)
     }
 
     @Test
     fun whenReferrerContainsEuAuctionKeyButNotMatchingValueThenNoReferrerFound() {
-        val result = testee.parse("$EU_AUCTION_KEY=bar")
+        val result = testee.parse("$INSTALLATION_SOURCE_KEY=bar")
         verifyReferrerNotFound(result)
     }
 
     @Test
     fun whenReferrerContainsEuAuctionKeyButNotMatchingValueAndCampaignReferrerDataThenCampaignReferrerFound() {
-        val result = testee.parse("key1=DDGRAAB&key2=foo&key3=bar&$EU_AUCTION_KEY=bar")
+        val result = testee.parse("key1=DDGRAAB&key2=foo&key3=bar&$INSTALLATION_SOURCE_KEY=bar")
         verifyCampaignReferrerFound("AB", result)
     }
 
@@ -112,4 +110,10 @@ class QueryParamReferrerParserTest {
     private fun verifyReferrerNotFound(result: ParsedReferrerResult) {
         assertTrue(result is ParsedReferrerResult.ReferrerNotFound)
     }
+
+    companion object {
+        private const val INSTALLATION_SOURCE_KEY = "utm_source"
+        private const val INSTALLATION_SOURCE_EU_AUCTION_VALUE = "eea-search-choice"
+    }
+
 }
