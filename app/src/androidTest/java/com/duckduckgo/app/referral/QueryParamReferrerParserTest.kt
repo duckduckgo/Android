@@ -16,7 +16,10 @@
 
 package com.duckduckgo.app.referral
 
-import com.duckduckgo.app.referral.ParsedReferrerResult.ReferrerFound
+import com.duckduckgo.app.referral.ParsedReferrerResult.CampaignReferrerFound
+import com.duckduckgo.app.referral.ParsedReferrerResult.EuAuctionReferrerFound
+import com.duckduckgo.app.referral.QueryParamReferrerParser.Companion.EU_AUCTION_KEY
+import com.duckduckgo.app.referral.QueryParamReferrerParser.Companion.EU_AUCTION_VALUE
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -33,13 +36,13 @@ class QueryParamReferrerParserTest {
     @Test
     fun whenReferrerContainsTargetAndLongSuffixThenShortenedReferrerFound() {
         val result = testee.parse("DDGRAABC")
-        verifyReferrerFound("AB", result)
+        verifyCampaignReferrerFound("AB", result)
     }
 
     @Test
     fun whenReferrerContainsTargetAndTwoCharSuffixThenReferrerFound() {
         val result = testee.parse("DDGRAXY")
-        verifyReferrerFound("XY", result)
+        verifyCampaignReferrerFound("XY", result)
     }
 
     @Test
@@ -62,13 +65,13 @@ class QueryParamReferrerParserTest {
     @Test
     fun whenReferrerContainsTargetAsFirstParamThenReferrerFound() {
         val result = testee.parse("key1=DDGRAAB&key2=foo&key3=bar")
-        verifyReferrerFound("AB", result)
+        verifyCampaignReferrerFound("AB", result)
     }
 
     @Test
     fun whenReferrerContainsTargetAsLastParamThenReferrerFound() {
         val result = testee.parse("key1=foo&key2=bar&key3=DDGRAAB")
-        verifyReferrerFound("AB", result)
+        verifyCampaignReferrerFound("AB", result)
     }
 
     @Test
@@ -76,9 +79,33 @@ class QueryParamReferrerParserTest {
         verifyReferrerNotFound(testee.parse("ddgraAB"))
     }
 
-    private fun verifyReferrerFound(expectedReferrer: String, result: ParsedReferrerResult) {
-        assertTrue(result is ReferrerFound)
-        val value = (result as ReferrerFound).campaignSuffix
+    @Test
+    fun whenReferrerContainsEuAuctionDataThenEuActionReferrerFound() {
+        val result = testee.parse("$EU_AUCTION_KEY=$EU_AUCTION_VALUE")
+        assertTrue(result is EuAuctionReferrerFound)
+    }
+
+    @Test
+    fun whenReferrerContainsBothEuAuctionAndCampaignReferrerDataThenEuActionReferrerFound() {
+        val result = testee.parse("key1=DDGRAAB&key2=foo&key3=bar&$EU_AUCTION_KEY=$EU_AUCTION_VALUE")
+        assertTrue(result is EuAuctionReferrerFound)
+    }
+
+    @Test
+    fun whenReferrerContainsEuAuctionKeyButNotMatchingValueThenNoReferrerFound() {
+        val result = testee.parse("$EU_AUCTION_KEY=bar")
+        verifyReferrerNotFound(result)
+    }
+
+    @Test
+    fun whenReferrerContainsEuAuctionKeyButNotMatchingValueAndCampaignReferrerDataThenCampaignReferrerFound() {
+        val result = testee.parse("key1=DDGRAAB&key2=foo&key3=bar&$EU_AUCTION_KEY=bar")
+        verifyCampaignReferrerFound("AB", result)
+    }
+
+    private fun verifyCampaignReferrerFound(expectedReferrer: String, result: ParsedReferrerResult) {
+        assertTrue(result is CampaignReferrerFound)
+        val value = (result as CampaignReferrerFound).campaignSuffix
         assertEquals(expectedReferrer, value)
     }
 

@@ -16,8 +16,7 @@
 
 package com.duckduckgo.app.referral
 
-import com.duckduckgo.app.referral.ParsedReferrerResult.ReferrerFound
-import com.duckduckgo.app.referral.ParsedReferrerResult.ReferrerNotFound
+import com.duckduckgo.app.referral.ParsedReferrerResult.*
 import timber.log.Timber
 
 
@@ -33,16 +32,41 @@ class QueryParamReferrerParser : AppInstallationReferrerParser {
         val referrerParts = splitIntoConstituentParts(referrer)
         if (referrerParts.isNullOrEmpty()) return ReferrerNotFound(fromCache = false)
 
-        for (part in referrerParts) {
-            Timber.d("Analysing query param part: $part")
+        val auctionReferrer = extractEuAuctionReferrer(referrerParts)
+        if (auctionReferrer is EuAuctionReferrerFound) {
+            return auctionReferrer
+        }
 
+        return extractCampaignReferrer(referrerParts)
+    }
+
+    private fun extractEuAuctionReferrer(referrerParts: List<String>): ParsedReferrerResult {
+        Timber.d("Looking for Google EU Auction referrer data")
+        for (part in referrerParts) {
+
+            Timber.d("Analysing query param part: $part")
+            if (part.startsWith(EU_AUCTION_KEY) && part.endsWith(EU_AUCTION_VALUE)) {
+                Timber.i("App installed as a result of the EU auction")
+                return EuAuctionReferrerFound()
+            }
+        }
+
+        Timber.d("App not installed as a result of EU auction")
+        return ReferrerNotFound()
+    }
+
+    private fun extractCampaignReferrer(referrerParts: List<String>): ParsedReferrerResult {
+        Timber.d("Looking for regular referrer data")
+        for (part in referrerParts) {
+
+            Timber.d("Analysing query param part: $part")
             if (part.contains(CAMPAIGN_NAME_PREFIX)) {
                 return extractCampaignNameSuffix(part, CAMPAIGN_NAME_PREFIX)
             }
         }
 
-        Timber.i("Referrer information does not contain inspected campaign names")
-        return ReferrerNotFound(fromCache = false)
+        Timber.d("Referrer information does not contain inspected campaign names")
+        return ReferrerNotFound()
     }
 
     private fun extractCampaignNameSuffix(part: String, prefix: String): ParsedReferrerResult {
@@ -56,7 +80,7 @@ class QueryParamReferrerParser : AppInstallationReferrerParser {
 
         val condensedSuffix = suffix.take(2)
         Timber.i("Found suffix $condensedSuffix (looking for ${prefix}, found in $part)")
-        return ReferrerFound(condensedSuffix)
+        return CampaignReferrerFound(condensedSuffix)
     }
 
     private fun stripCampaignName(fullCampaignName: String, prefix: String): String {
@@ -69,11 +93,15 @@ class QueryParamReferrerParser : AppInstallationReferrerParser {
 
     companion object {
         private const val CAMPAIGN_NAME_PREFIX = "DDGRA"
+
+        const val EU_AUCTION_KEY = "utm_source"
+        const val EU_AUCTION_VALUE = "eea-search-choice"
     }
 }
 
 sealed class ParsedReferrerResult(open val fromCache: Boolean = false) {
-    data class ReferrerFound(val campaignSuffix: String, override val fromCache: Boolean = false) : ParsedReferrerResult(fromCache)
+    data class EuAuctionReferrerFound(override val fromCache: Boolean = false) : ParsedReferrerResult(fromCache)
+    data class CampaignReferrerFound(val campaignSuffix: String, override val fromCache: Boolean = false) : ParsedReferrerResult(fromCache)
     data class ReferrerNotFound(override val fromCache: Boolean = false) : ParsedReferrerResult(fromCache)
     data class ParseFailure(val reason: ParseFailureReason) : ParsedReferrerResult()
     object ReferrerInitialising : ParsedReferrerResult()
