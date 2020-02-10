@@ -90,13 +90,13 @@ class QueryParamReferrerParserTest {
     }
 
     @Test
-    fun whenReferrerContainsEuAuctionKeyButNotMatchingValueThenNoReferrerFound() {
+    fun whenReferrerContainsInstallationSourceKeyButNotMatchingValueThenNoReferrerFound() {
         val result = testee.parse("$INSTALLATION_SOURCE_KEY=bar")
         verifyReferrerNotFound(result)
     }
 
     @Test
-    fun whenReferrerContainsEuAuctionKeyButNotMatchingValueAndCampaignReferrerDataThenCampaignReferrerFound() {
+    fun whenReferrerContainsInstallationSourceKeyAndNoEuAuctionValueButHasCampaignReferrerDataThenCampaignReferrerFound() {
         val result = testee.parse("key1=DDGRAAB&key2=foo&key3=bar&$INSTALLATION_SOURCE_KEY=bar")
         verifyCampaignReferrerFound("AB", result)
     }
