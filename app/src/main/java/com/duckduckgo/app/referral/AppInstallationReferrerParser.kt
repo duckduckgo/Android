@@ -18,9 +18,6 @@ package com.duckduckgo.app.referral
 
 import com.duckduckgo.app.referral.ParsedReferrerResult.ReferrerFound
 import com.duckduckgo.app.referral.ParsedReferrerResult.ReferrerNotFound
-import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.APP_REFERRER_FOUND_TYPE_A
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.APP_REFERRER_FOUND_TYPE_B
 import timber.log.Timber
 
 
@@ -29,7 +26,8 @@ interface AppInstallationReferrerParser {
     fun parse(referrer: String): ParsedReferrerResult
 }
 
-class QueryParamReferrerParser(private val pixel: Pixel) : AppInstallationReferrerParser {
+@Suppress("SameParameterValue")
+class QueryParamReferrerParser : AppInstallationReferrerParser {
 
     override fun parse(referrer: String): ParsedReferrerResult {
         val referrerParts = splitIntoConstituentParts(referrer)
@@ -38,28 +36,13 @@ class QueryParamReferrerParser(private val pixel: Pixel) : AppInstallationReferr
         for (part in referrerParts) {
             Timber.d("Analysing query param part: $part")
 
-            if (part.contains(CAMPAIGN_NAME_PREFIX_TYPE_A)) {
-                val result = extractCampaignNameSuffix(part, CAMPAIGN_NAME_PREFIX_TYPE_A)
-                sendPixelForResult(result, APP_REFERRER_FOUND_TYPE_A)
-                return result
-            }
-
-            if (part.contains(CAMPAIGN_NAME_PREFIX_TYPE_B)) {
-                val result = extractCampaignNameSuffix(part, CAMPAIGN_NAME_PREFIX_TYPE_B)
-                sendPixelForResult(result, APP_REFERRER_FOUND_TYPE_B)
-                return result
+            if (part.contains(CAMPAIGN_NAME_PREFIX)) {
+                return extractCampaignNameSuffix(part, CAMPAIGN_NAME_PREFIX)
             }
         }
 
         Timber.i("Referrer information does not contain inspected campaign names")
         return ReferrerNotFound(fromCache = false)
-    }
-
-    private fun sendPixelForResult(result: ParsedReferrerResult, pixelName: Pixel.PixelName) {
-        if (result is ReferrerFound) {
-            val map = mapOf(PIXEL_KEY_CAMPAIGN_SUFFIX to result.campaignSuffix)
-            pixel.fire(pixelName, map)
-        }
     }
 
     private fun extractCampaignNameSuffix(part: String, prefix: String): ParsedReferrerResult {
@@ -85,10 +68,7 @@ class QueryParamReferrerParser(private val pixel: Pixel) : AppInstallationReferr
     }
 
     companion object {
-        private const val CAMPAIGN_NAME_PREFIX_TYPE_A = "DDGRA"
-        private const val CAMPAIGN_NAME_PREFIX_TYPE_B = "DDGRB"
-
-        private const val PIXEL_KEY_CAMPAIGN_SUFFIX = "c"
+        private const val CAMPAIGN_NAME_PREFIX = "DDGRA"
     }
 }
 

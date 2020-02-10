@@ -17,17 +17,13 @@
 package com.duckduckgo.app.referral
 
 import com.duckduckgo.app.referral.ParsedReferrerResult.ReferrerFound
-import com.duckduckgo.app.statistics.pixels.Pixel
-import com.nhaarman.mockitokotlin2.mock
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class QueryParamReferrerParserTest {
 
-    private val pixel: Pixel = mock()
-
-    private val testee: QueryParamReferrerParser = QueryParamReferrerParser(pixel)
+    private val testee: QueryParamReferrerParser = QueryParamReferrerParser()
 
     @Test
     fun whenReferrerDoesNotContainTargetThenNoReferrerFound() {
@@ -78,11 +74,6 @@ class QueryParamReferrerParserTest {
     @Test
     fun whenReferrerContainsTargetWithDifferentCaseThenNoReferrerFound() {
         verifyReferrerNotFound(testee.parse("ddgraAB"))
-    }
-
-    @Test
-    fun whenTypeAReferrerNotFoundButTypeBFoundThenReferrerFound() {
-        verifyReferrerFound("AB", testee.parse("key1=foo&key2=bar&key3=DDGRBAB"))
     }
 
     private fun verifyReferrerFound(expectedReferrer: String, result: ParsedReferrerResult) {
