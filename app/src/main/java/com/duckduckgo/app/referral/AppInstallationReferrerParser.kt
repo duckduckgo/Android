@@ -44,7 +44,7 @@ class QueryParamReferrerParser : AppInstallationReferrerParser {
         Timber.d("Looking for Google EU Auction referrer data")
         for (part in referrerParts) {
 
-            Timber.d("Analysing query param part: $part")
+            Timber.v("Analysing query param part: $part")
             if (part.startsWith(EU_AUCTION_KEY) && part.endsWith(EU_AUCTION_VALUE)) {
                 Timber.i("App installed as a result of the EU auction")
                 return EuAuctionReferrerFound()
@@ -59,7 +59,7 @@ class QueryParamReferrerParser : AppInstallationReferrerParser {
         Timber.d("Looking for regular referrer data")
         for (part in referrerParts) {
 
-            Timber.d("Analysing query param part: $part")
+            Timber.v("Analysing query param part: $part")
             if (part.contains(CAMPAIGN_NAME_PREFIX)) {
                 return extractCampaignNameSuffix(part, CAMPAIGN_NAME_PREFIX)
             }
