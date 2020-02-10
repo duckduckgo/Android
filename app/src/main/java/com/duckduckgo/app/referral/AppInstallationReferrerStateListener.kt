@@ -167,7 +167,7 @@ class PlayStoreAppReferrerStateListener @Inject constructor(
                 appReferrerDataStore.campaignSuffix = result.campaignSuffix
             }
             is EuAuctionReferrerFound -> {
-                variantManager.updateAppReferrerVariant(VariantManager.EU_AUCTION_VARIANT)
+                variantManager.updateAppReferrerVariant(VariantManager.RESERVED_EU_AUCTION_VARIANT)
                 appReferrerDataStore.installedFromEuAcution = true
             }
         }
