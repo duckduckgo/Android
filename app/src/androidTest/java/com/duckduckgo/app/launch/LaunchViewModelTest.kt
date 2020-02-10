@@ -120,7 +120,7 @@ class LaunchViewModelTest {
         override suspend fun waitForReferrerCode(): ParsedReferrerResult {
             if (mockDelayMs > 0) delay(mockDelayMs)
 
-            return ParsedReferrerResult.ReferrerFound(referrer)
+            return ParsedReferrerResult.CampaignReferrerFound(referrer)
         }
 
         override fun initialiseReferralRetrieval() {
