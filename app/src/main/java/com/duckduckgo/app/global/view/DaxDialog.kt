@@ -22,27 +22,39 @@ import android.graphics.Color
 import android.graphics.Rect
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.fragment.app.DialogFragment
-import com.duckduckgo.app.browser.R
-import android.view.Gravity
-import kotlinx.android.synthetic.main.content_dax_dialog.*
 import android.view.animation.Animation
 import android.view.animation.OvershootInterpolator
 import android.view.animation.ScaleAnimation
 import android.widget.ImageView
 import android.widget.RelativeLayout
 import androidx.core.content.ContextCompat.getColor
+import androidx.fragment.app.DialogFragment
+import com.duckduckgo.app.browser.R
+import kotlinx.android.synthetic.main.content_dax_dialog.*
 
-class DaxDialog(
-    var daxText: String,
-    var buttonText: String,
+
+interface DaxDialog {
+    fun setDaxText(daxText: String)
+    fun setButtonText(buttonText: String)
+    fun setDialogAndStartAnimation()
+    fun onAnimationFinishedListener(onAnimationFinished: () -> Unit)
+    fun setPrimaryCtaClickListener(clickListener: () -> Unit)
+    fun setHideClickListener(clickListener: () -> Unit)
+    fun setDismissListener(clickListener: () -> Unit)
+    fun getDaxDialog(): DialogFragment
+}
+
+class DaxDialogSimple(
+    private var daxText: String,
+    private var buttonText: String,
     private val toolbarDimmed: Boolean = true,
     private val dismissible: Boolean = true,
     private val typingDelayInMs: Long = 20
-) : DialogFragment() {
+) : DialogFragment(), DaxDialog {
 
     private var onAnimationFinished: () -> Unit = {}
     private var primaryCtaClickListener: () -> Unit = { dismiss() }
@@ -82,40 +94,36 @@ class DaxDialog(
         super.onDismiss(dialog)
     }
 
-    fun setDialogAndStartAnimation() {
+    override fun getDaxDialog(): DialogFragment = this
+
+    override fun setDaxText(daxText: String) {
+        this.daxText = daxText
+    }
+
+    override fun setButtonText(buttonText: String) {
+        this.buttonText = buttonText
+    }
+
+    override fun setDialogAndStartAnimation() {
         setDialog()
         setListeners()
         dialogText.startTypingAnimation(daxText, true, onAnimationFinished)
     }
 
-    fun onAnimationFinishedListener(onAnimationFinished: () -> Unit) {
+    override fun onAnimationFinishedListener(onAnimationFinished: () -> Unit) {
         this.onAnimationFinished = onAnimationFinished
     }
 
-    fun setPrimaryCtaClickListener(clickListener: () -> Unit) {
+    override fun setPrimaryCtaClickListener(clickListener: () -> Unit) {
         primaryCtaClickListener = clickListener
     }
 
-    fun setHideClickListener(clickListener: () -> Unit) {
+    override fun setHideClickListener(clickListener: () -> Unit) {
         hideClickListener = clickListener
     }
 
-    fun setDismissListener(clickListener: () -> Unit) {
+    override fun setDismissListener(clickListener: () -> Unit) {
         dismissListener = clickListener
-    }
-
-    fun startHighlightViewAnimation(targetView: View, duration: Long = 400, timesBigger: Float = 0f) {
-        val highlightImageView = addHighlightView(targetView, timesBigger)
-        val scaleAnimation = buildScaleAnimation(duration)
-        highlightImageView?.startAnimation(scaleAnimation)
-    }
-
-    private fun buildScaleAnimation(duration: Long = 400): Animation {
-        val scaleAnimation = ScaleAnimation(0f, 1f, 0f, 1f, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f)
-        scaleAnimation.duration = duration
-        scaleAnimation.fillAfter = true
-        scaleAnimation.interpolator = OvershootInterpolator(OVERSHOOT_TENSION)
-        return scaleAnimation
     }
 
     private fun setListeners() {
@@ -150,6 +158,25 @@ class DaxDialog(
             primaryCta.text = buttonText
             dialogText.typingDelayInMs = typingDelayInMs
         }
+    }
+}
+
+class DaxDialogHighlightView(
+    daxDialog: DaxDialogSimple
+) : DialogFragment(), DaxDialog by daxDialog {
+
+    fun startHighlightViewAnimation(targetView: View, duration: Long = 400, timesBigger: Float = 0f) {
+        val highlightImageView = addHighlightView(targetView, timesBigger)
+        val scaleAnimation = buildScaleAnimation(duration)
+        highlightImageView?.startAnimation(scaleAnimation)
+    }
+
+    private fun buildScaleAnimation(duration: Long = 400): Animation {
+        val scaleAnimation = ScaleAnimation(0f, 1f, 0f, 1f, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f)
+        scaleAnimation.duration = duration
+        scaleAnimation.fillAfter = true
+        scaleAnimation.interpolator = OvershootInterpolator(OVERSHOOT_TENSION)
+        return scaleAnimation
     }
 
     private fun addHighlightView(targetView: View, timesBigger: Float): View? {

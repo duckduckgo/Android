@@ -30,10 +30,7 @@ import com.duckduckgo.app.cta.ui.DaxCta.Companion.MAX_DAYS_ALLOWED
 import com.duckduckgo.app.global.baseHost
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.install.daysInstalled
-import com.duckduckgo.app.global.view.DaxDialog
-import com.duckduckgo.app.global.view.hide
-import com.duckduckgo.app.global.view.html
-import com.duckduckgo.app.global.view.show
+import com.duckduckgo.app.global.view.*
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
@@ -82,7 +79,7 @@ sealed class DaxDialogCta(
     override val appInstallStore: AppInstallStore
 ) : Cta, DialogCta, DaxCta {
 
-    override fun createCta(activity: FragmentActivity) = DaxDialog(getDaxText(activity), activity.resources.getString(okButton))
+    override fun createCta(activity: FragmentActivity): DaxDialog = DaxDialogSimple(getDaxText(activity), activity.resources.getString(okButton))
 
     override fun pixelCancelParameters(): Map<String, String?> = mapOf(Pixel.PixelParameter.CTA_SHOWN to ctaPixelParam)
 
@@ -145,7 +142,7 @@ sealed class DaxDialogCta(
     ) {
 
         override fun createCta(activity: FragmentActivity): DaxDialog =
-            DaxDialog(getDaxText(activity), activity.resources.getString(okButton), false)
+            DaxDialogSimple(getDaxText(activity), activity.resources.getString(okButton), false)
 
         override fun getDaxText(context: Context): String {
             val trackersFiltered = trackers.asSequence()
@@ -194,7 +191,7 @@ sealed class DaxDialogCta(
         }
 
         override fun createCta(activity: FragmentActivity): DaxDialog {
-            return DaxDialog(getDaxText(activity), activity.resources.getString(okButton)).apply {
+            return DaxDialogHighlightView(DaxDialogSimple(getDaxText(activity), activity.resources.getString(okButton))).apply {
                 val privacyGradeButton = activity.findViewById<View>(R.id.privacyGradeButton)
                 onAnimationFinishedListener {
                     if (isFromSameNetworkDomain()) {
@@ -206,8 +203,8 @@ sealed class DaxDialogCta(
 
         fun setSecondDialog(dialog: DaxDialog, activity: FragmentActivity) {
             ctaPixelParam = Pixel.PixelValues.DAX_NETWORK_CTA_2
-            dialog.daxText = activity.resources.getString(R.string.daxMainNetworkStep2CtaText, firstParagraph(activity), network)
-            dialog.buttonText = activity.resources.getString(R.string.daxDialogGotIt)
+            dialog.setButtonText(activity.resources.getString(R.string.daxMainNetworkStep2CtaText, firstParagraph(activity), network))
+            dialog.setButtonText(activity.resources.getString(R.string.daxDialogGotIt))
             dialog.onAnimationFinishedListener { }
             dialog.setDialogAndStartAnimation()
         }
@@ -235,7 +232,7 @@ sealed class DaxDialogCta(
     ) {
 
         override fun createCta(activity: FragmentActivity): DaxDialog {
-            return DaxDialog(getDaxText(activity), activity.resources.getString(okButton)).apply {
+            return DaxDialogHighlightView(DaxDialogSimple(getDaxText(activity), activity.resources.getString(okButton))).apply {
                 val fireButton = activity.findViewById<View>(R.id.fire)
                 onAnimationFinishedListener {
                     startHighlightViewAnimation(fireButton)
