@@ -29,7 +29,10 @@ import android.webkit.WebView
 import androidx.annotation.AnyThread
 import androidx.annotation.VisibleForTesting
 import androidx.core.net.toUri
-import androidx.lifecycle.*
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.duckduckgo.app.autocomplete.api.AutoCompleteApi
 import com.duckduckgo.app.autocomplete.api.AutoCompleteApi.AutoCompleteResult
 import com.duckduckgo.app.autocomplete.api.AutoCompleteApi.AutoCompleteSuggestion
@@ -53,8 +56,8 @@ import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.browser.ui.HttpAuthenticationDialogFragment.HttpAuthenticationListener
 import com.duckduckgo.app.cta.ui.Cta
-import com.duckduckgo.app.cta.ui.HomePanelCta
 import com.duckduckgo.app.cta.ui.CtaViewModel
+import com.duckduckgo.app.cta.ui.HomePanelCta
 import com.duckduckgo.app.global.*
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.global.model.SiteFactory
@@ -894,7 +897,12 @@ class BrowserTabViewModel(
 
     fun onUserClickCtaOkButton() {
         val cta = ctaViewState.value?.cta ?: return
-        ctaViewModel.onUserClickCtaOkButton(cta)
+        ctaViewModel.produceNewCta(cta)?.let {
+            ctaViewState.value = currentCtaViewState().copy(cta = it)
+        } ?: produceNewCommand(cta)
+    }
+
+    private fun produceNewCommand(cta: Cta) {
         command.value = when (cta) {
             is HomePanelCta.Survey -> LaunchSurvey(cta.survey)
             is HomePanelCta.AddWidgetAuto -> LaunchAddWidget

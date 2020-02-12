@@ -18,6 +18,7 @@ package com.duckduckgo.app.cta.ui
 
 import androidx.annotation.WorkerThread
 import androidx.lifecycle.LiveData
+import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.cta.db.DismissedCtaDao
 import com.duckduckgo.app.cta.model.CtaId
 import com.duckduckgo.app.cta.model.DismissedCta
@@ -53,7 +54,8 @@ class CtaViewModel @Inject constructor(
     private val variantManager: VariantManager,
     private val settingsDataStore: SettingsDataStore,
     private val onboardingStore: OnboardingStore,
-    private val settingsPrivacySettingsStore: PrivacySettingsStore
+    private val settingsPrivacySettingsStore: PrivacySettingsStore,
+    private val defaultBrowserDetector: DefaultBrowserDetector
 ) {
 
     val surveyLiveData: LiveData<Survey> = surveyDao.getLiveScheduled()
@@ -213,6 +215,14 @@ class CtaViewModel @Inject constructor(
             } else {
                 null
             }
+        }
+    }
+
+    fun produceNewCta(cta: Cta): Cta? {
+        if (cta is DaxDialogCta.DaxTrackersBlockedCta) {
+            return DaxDialogCta.DefaultBrowserCta(defaultBrowserDetector, onboardingStore, appInstallStore)
+        } else {
+            return null
         }
     }
 
