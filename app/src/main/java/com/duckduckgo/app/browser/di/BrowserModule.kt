@@ -39,6 +39,7 @@ import com.duckduckgo.app.global.file.FileDeleter
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.httpsupgrade.HttpsUpgrader
 import com.duckduckgo.app.privacy.db.PrivacyProtectionCountDao
+import com.duckduckgo.app.referral.AppReferrerDataStore
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.store.OfflinePixelCountDataStore
@@ -57,9 +58,10 @@ class BrowserModule {
     fun duckDuckGoRequestRewriter(
         urlDetector: DuckDuckGoUrlDetector,
         statisticsStore: StatisticsDataStore,
-        variantManager: VariantManager
+        variantManager: VariantManager,
+        appReferrerDataStore: AppReferrerDataStore
     ): RequestRewriter {
-        return DuckDuckGoRequestRewriter(urlDetector, statisticsStore, variantManager)
+        return DuckDuckGoRequestRewriter(urlDetector, statisticsStore, variantManager, appReferrerDataStore)
     }
 
     @Provides

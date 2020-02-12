@@ -64,8 +64,14 @@ class PlayStoreAppReferrerStateListener @Inject constructor(
             initialisationStartTime = System.currentTimeMillis()
 
             if (appReferrerDataStore.referrerCheckedPreviously) {
-                referralResult = loadPreviousReferrerData()
-                Timber.i("Already inspected this referrer data. Took ${System.currentTimeMillis() - initialisationStartTime}ms to load from disk")
+
+                referralResult = if (appReferrerDataStore.installedFromEuAuction) {
+                    EuAuctionReferrerFound(fromCache = true)
+                } else {
+                    loadPreviousReferrerData()
+                }
+
+                Timber.i("Already inspected this referrer data")
                 return
             }
 
@@ -87,7 +93,7 @@ class PlayStoreAppReferrerStateListener @Inject constructor(
             ReferrerNotFound(fromCache = true)
         } else {
             Timber.i("Already have referrer data from previous run - $suffix")
-            ReferrerFound(suffix, fromCache = true)
+            CampaignReferrerFound(suffix, fromCache = true)
         }
     }
 
@@ -155,11 +161,17 @@ class PlayStoreAppReferrerStateListener @Inject constructor(
     private fun referralResultReceived(result: ParsedReferrerResult) {
         referralResult = result
 
-        if (result is ReferrerFound) {
-            variantManager.updateAppReferrerVariant(result.campaignSuffix)
-            appReferrerDataStore.campaignSuffix = result.campaignSuffix
-
+        when (result) {
+            is CampaignReferrerFound -> {
+                variantManager.updateAppReferrerVariant(result.campaignSuffix)
+                appReferrerDataStore.campaignSuffix = result.campaignSuffix
+            }
+            is EuAuctionReferrerFound -> {
+                variantManager.updateAppReferrerVariant(VariantManager.RESERVED_EU_AUCTION_VARIANT)
+                appReferrerDataStore.installedFromEuAuction = true
+            }
         }
+
         appReferrerDataStore.referrerCheckedPreviously = true
     }
 

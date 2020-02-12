@@ -40,5 +40,6 @@ class AppUrl {
 
     object ParamValue {
         const val SOURCE = "ddg_android"
+        const val SOURCE_EU_AUCTION = "ddg_androideu"
     }
 }

@@ -88,6 +88,6 @@ class AtbInitializerTest {
 
     private suspend fun referrerAnswer(delayMs: Long): Answer<ParsedReferrerResult> {
         delay(delayMs)
-        return Answer { ParsedReferrerResult.ReferrerFound("") }
+        return Answer { ParsedReferrerResult.CampaignReferrerFound("") }
     }
 }
