@@ -911,11 +911,9 @@ class BrowserTabViewModel(
         }
     }
 
-    fun onUserDismissedCta() {
-        val cta = ctaViewState.value?.cta ?: return
-
-        ctaViewModel.onUserDismissedCta(cta)
-        if (cta is HomePanelCta) {
+    fun onUserDismissedCta(dismissedCta: Cta) {
+        ctaViewModel.onUserDismissedCta(dismissedCta)
+        if (dismissedCta is HomePanelCta) {
             refreshCta()
         } else {
             ctaViewState.value = currentCtaViewState().copy(cta = null)

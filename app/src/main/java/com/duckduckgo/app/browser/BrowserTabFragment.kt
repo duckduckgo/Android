@@ -1395,7 +1395,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
                         if (configuration is DaxDialogCta.DaxTrackersBlockedCta) {
                             animatorHelper.finishTrackerAnimation(omnibarViews(), container)
                         }
-                        viewModel.onUserDismissedCta()
+                        viewModel.onUserDismissedCta(configuration)
                     }
                     setPrimaryCtaClickListener {
                         viewModel.onUserClickCtaOkButton()
@@ -1471,7 +1471,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
             }
 
             ctaContainer.ctaDismissButton.setOnClickListener {
-                viewModel.onUserDismissedCta()
+                viewModel.onUserDismissedCta(cta)
             }
 
             ConstraintSet().also {
