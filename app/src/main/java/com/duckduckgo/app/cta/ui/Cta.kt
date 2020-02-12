@@ -24,6 +24,7 @@ import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.fragment.app.FragmentActivity
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.cta.model.CtaId
 import com.duckduckgo.app.cta.ui.DaxCta.Companion.MAX_DAYS_ALLOWED
 import com.duckduckgo.app.global.baseHost
@@ -38,9 +39,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import kotlinx.android.synthetic.main.include_cta_buttons.view.*
 import kotlinx.android.synthetic.main.include_cta_content.view.*
-import kotlinx.android.synthetic.main.include_dax_dialog_cta.view.dialogTextCta
-import kotlinx.android.synthetic.main.include_dax_dialog_cta.view.hiddenTextCta
-import kotlinx.android.synthetic.main.include_dax_dialog_cta.view.primaryCta
+import kotlinx.android.synthetic.main.include_dax_dialog_cta.view.*
 
 interface DialogCta {
     fun createCta(activity: FragmentActivity): DaxDialog
@@ -104,6 +103,29 @@ sealed class DaxDialogCta(
         onboardingStore,
         appInstallStore
     )
+
+    class DefaultBrowserCta(
+        val defaultBrowserDetector: DefaultBrowserDetector,
+        override val onboardingStore: OnboardingStore,
+        override val appInstallStore: AppInstallStore
+    ) : DaxDialogCta(
+        ctaId = CtaId.DAX_DIALOG_DEFAULT_BROWSER,
+        description = R.string.daxDefaultBrowserCtaText,
+        okButton = R.string.daxDialogYes,
+        shownPixel = Pixel.PixelName.ONBOARDING_DAX_CTA_SHOWN,
+        okPixel = Pixel.PixelName.ONBOARDING_DAX_CTA_OK_BUTTON,
+        cancelPixel = null,
+        ctaPixelParam = Pixel.PixelValues.DAX_DEFAULT_BROWSER_CTA,
+        onboardingStore = onboardingStore,
+        appInstallStore = appInstallStore
+    ) {
+        override val okButton: Int
+            get() = if (defaultBrowserDetector.hasDefaultBrowser()) {
+                R.string.daxDialogYes
+            } else {
+                R.string.daxDialogSettings
+            }
+    }
 
     class DaxTrackersBlockedCta(
         override val onboardingStore: OnboardingStore,
