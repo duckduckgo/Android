@@ -18,8 +18,10 @@ package com.duckduckgo.app.settings
 
 import android.app.Activity
 import android.app.ActivityOptions
+import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import android.view.View
@@ -40,10 +42,16 @@ import com.duckduckgo.app.settings.clear.ClearWhatOption
 import com.duckduckgo.app.settings.clear.ClearWhenOption
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelName
-import kotlinx.android.synthetic.main.content_settings_general.*
-import kotlinx.android.synthetic.main.content_settings_other.*
-import kotlinx.android.synthetic.main.content_settings_privacy.*
-import kotlinx.android.synthetic.main.include_toolbar.*
+import kotlinx.android.synthetic.main.content_settings_general.autocompleteToggle
+import kotlinx.android.synthetic.main.content_settings_general.changeAppIcon
+import kotlinx.android.synthetic.main.content_settings_general.lightThemeToggle
+import kotlinx.android.synthetic.main.content_settings_general.setAsDefaultBrowserSetting
+import kotlinx.android.synthetic.main.content_settings_other.about
+import kotlinx.android.synthetic.main.content_settings_other.provideFeedback
+import kotlinx.android.synthetic.main.content_settings_other.version
+import kotlinx.android.synthetic.main.content_settings_privacy.automaticallyClearWhatSetting
+import kotlinx.android.synthetic.main.content_settings_privacy.automaticallyClearWhenSetting
+import kotlinx.android.synthetic.main.include_toolbar.toolbar
 import javax.inject.Inject
 
 class SettingsActivity : DuckDuckGoActivity(), SettingsAutomaticallyClearWhatFragment.Listener, SettingsAutomaticallyClearWhenFragment.Listener {
@@ -79,6 +87,16 @@ class SettingsActivity : DuckDuckGoActivity(), SettingsAutomaticallyClearWhatFra
 
     private fun configureUiEventHandlers() {
         changeAppIcon.setOnClickListener {
+
+            packageManager.setComponentEnabledSetting(
+                ComponentName(applicationContext, "com.duckduckgo.app.launch.LauncherBlue"),
+                PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP
+            )
+
+            packageManager.setComponentEnabledSetting(
+                ComponentName(applicationContext, "com.duckduckgo.app.launch.LauncherRed"),
+                PackageManager.COMPONENT_ENABLED_STATE_ENABLED, PackageManager.DONT_KILL_APP
+            )
 
         }
         about.setOnClickListener { startActivity(AboutDuckDuckGoActivity.intent(this)) }

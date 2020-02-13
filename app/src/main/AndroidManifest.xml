@@ -12,9 +12,10 @@
         android:name="com.duckduckgo.app.global.DuckDuckGoApplication"
         android:allowBackup="false"
         android:icon="${appIcon}"
-        android:roundIcon="${appIconRound}"
         android:label="@string/appName"
+        android:logo="${appIcon}"
         android:networkSecurityConfig="@xml/network_security_config"
+        android:roundIcon="${appIconRound}"
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
@@ -42,32 +43,36 @@
             android:name="com.duckduckgo.app.launch.LaunchActivity"
             android:label="@string/appName">
             <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
+                <!--                <action android:name="android.intent.action.MAIN" />-->
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
 
-<!--        <activity-alias android:label="@string/appName"-->
-<!--            android:icon="@drawable/ic_launcher_background_blue"-->
-<!--            android:name="com.duckduckgo.app.launch.LaunchActivity-Blue"-->
-<!--            android:enabled="false"-->
-<!--            android:targetActivity="com.duckduckgo.app.launch.LaunchActivity">-->
-<!--            <intent-filter>-->
-<!--                <action android:name="android.intent.action.MAIN" />-->
-<!--                <category android:name="android.intent.category.LAUNCHER" />-->
-<!--            </intent-filter>-->
-<!--        </activity-alias>-->
+        <activity-alias
+            android:name="com.duckduckgo.app.launch.LauncherBlue"
+            android:enabled="true"
+            android:icon="@mipmap/ic_launcher_blue"
+            android:label="@string/appName"
+            android:roundIcon="@mipmap/ic_launcher_blue_round"
+            android:targetActivity="com.duckduckgo.app.launch.LaunchActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity-alias>
 
-<!--        <activity-alias android:label="@string/appName"-->
-<!--            android:icon="@drawable/ic_launcher_background_red"-->
-<!--            android:name="com.duckduckgo.app.launch.LaunchActivity-Red"-->
-<!--            android:enabled="false"-->
-<!--            android:targetActivity="com.duckduckgo.app.launch.LaunchActivity">-->
-<!--            <intent-filter>-->
-<!--                <action android:name="android.intent.action.MAIN" />-->
-<!--                <category android:name="android.intent.category.LAUNCHER" />-->
-<!--            </intent-filter>-->
-<!--        </activity-alias>-->
+        <activity-alias
+            android:name="com.duckduckgo.app.launch.LauncherRed"
+            android:enabled="false"
+            android:icon="@mipmap/ic_launcher_red"
+            android:label="@string/appName"
+            android:roundIcon="@mipmap/ic_launcher_red_round"
+            android:targetActivity="com.duckduckgo.app.launch.LaunchActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity-alias>
 
         <activity
             android:name="com.duckduckgo.app.onboarding.ui.OnboardingActivity"
@@ -81,8 +86,8 @@
 
         <activity
             android:name=".BrowserActivity"
-            android:label="@string/appDescription"
             android:configChanges="keyboardHidden|orientation|screenSize"
+            android:label="@string/appDescription"
             android:launchMode="singleTask"
             android:windowSoftInputMode="adjustResize|stateHidden">
 
@@ -127,14 +132,15 @@
 
             <!-- Required to allow the browser to be launched externally, ensuring it is ready to allow users to search immediately -->
             <intent-filter>
-                <action android:name="com.duckduckgo.mobile.android.NEW_SEARCH"/>
+                <action android:name="com.duckduckgo.mobile.android.NEW_SEARCH" />
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
 
-        <activity android:name="com.duckduckgo.app.SelectedTextSearchActivity"
-            android:label="@string/systemTextSearchMessage"
-            android:exported="true">
+        <activity
+            android:name="com.duckduckgo.app.SelectedTextSearchActivity"
+            android:exported="true"
+            android:label="@string/systemTextSearchMessage">
             <intent-filter>
                 <action android:name="android.intent.action.PROCESS_TEXT" />
                 <category android:name="android.intent.category.DEFAULT" />
@@ -174,12 +180,12 @@
             android:parentActivityName=".BrowserActivity" />
         <activity
             android:name="com.duckduckgo.app.feedback.ui.common.FeedbackActivity"
-            android:windowSoftInputMode="adjustResize"
-            android:label="@string/feedbackActivityTitle" />
+            android:label="@string/feedbackActivityTitle"
+            android:windowSoftInputMode="adjustResize" />
         <activity
             android:name="com.duckduckgo.app.brokensite.BrokenSiteActivity"
-            android:theme="@style/ModalCardTheme"
-            android:label="@string/brokenSiteHeading" />
+            android:label="@string/brokenSiteHeading"
+            android:theme="@style/ModalCardTheme" />
         <activity
             android:name="com.duckduckgo.app.survey.ui.SurveyActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
@@ -195,9 +201,9 @@
             android:label="@string/aboutActivityTitle"
             android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity" />
         <activity
-            android:parentActivityName=".BrowserActivity"
             android:name="com.duckduckgo.app.bookmarks.ui.BookmarksActivity"
-            android:label="@string/bookmarksActivityTitle" />
+            android:label="@string/bookmarksActivityTitle"
+            android:parentActivityName=".BrowserActivity" />
         <activity
             android:name="com.duckduckgo.app.fire.FireActivity"
             android:process="@string/fireProcessName" />
