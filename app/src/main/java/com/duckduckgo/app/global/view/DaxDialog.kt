@@ -48,6 +48,128 @@ interface DaxDialog {
     fun getDaxDialog(): DialogFragment
 }
 
+class DaxDialog2Buttons(
+    private var daxText: String,
+    private var buttonText: String,
+    private val toolbarDimmed: Boolean = true,
+    private val dismissible: Boolean = true,
+    private val typingDelayInMs: Long = 20
+) : DialogFragment(), DaxDialog {
+
+    private var onAnimationFinished: () -> Unit = {}
+    private var primaryCtaClickListener: () -> Unit = { dismiss() }
+    private var hideClickListener: () -> Unit = { dismiss() }
+    private var dismissListener: () -> Unit = { }
+
+    private var secondaryCtaClickListener: () -> Unit = { dismiss() }
+
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? =
+        inflater.inflate(R.layout.content_dax_dialog, container, false)
+
+    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+        val dialog = super.onCreateDialog(savedInstanceState)
+        val window = dialog.window
+        val attributes = window?.attributes
+
+        attributes?.gravity = Gravity.BOTTOM
+        window?.attributes = attributes
+        window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        setStyle(STYLE_NO_TITLE, android.R.style.Theme_DeviceDefault_Light_NoActionBar)
+
+        return dialog
+    }
+
+    override fun onStart() {
+        super.onStart()
+        dialog?.window?.attributes?.dimAmount = 0f
+        dialog?.window?.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        setDialogAndStartAnimation()
+    }
+
+    override fun onDismiss(dialog: DialogInterface) {
+        dialogText?.cancelAnimation()
+        dismissListener()
+        super.onDismiss(dialog)
+    }
+
+    override fun getDaxDialog(): DialogFragment = this
+
+    override fun setDaxText(daxText: String) {
+        this.daxText = daxText
+    }
+
+    override fun setButtonText(buttonText: String) {
+        this.buttonText = buttonText
+    }
+
+    override fun setDialogAndStartAnimation() {
+        setDialog()
+        setListeners()
+        dialogText.startTypingAnimation(daxText, true, onAnimationFinished)
+    }
+
+    override fun onAnimationFinishedListener(onAnimationFinished: () -> Unit) {
+        this.onAnimationFinished = onAnimationFinished
+    }
+
+    override fun setPrimaryCtaClickListener(clickListener: () -> Unit) {
+        primaryCtaClickListener = clickListener
+    }
+
+    override fun setHideClickListener(clickListener: () -> Unit) {
+        hideClickListener = clickListener
+    }
+
+    override fun setDismissListener(clickListener: () -> Unit) {
+        dismissListener = clickListener
+    }
+
+    private fun setListeners() {
+        hideText.setOnClickListener {
+            dialogText.cancelAnimation()
+            hideClickListener()
+        }
+
+        primaryCta.setOnClickListener {
+            dialogText.cancelAnimation()
+            primaryCtaClickListener()
+        }
+
+        secondaryCta.setOnClickListener {
+            dialogText.cancelAnimation()
+            secondaryCtaClickListener()
+        }
+
+        if (dismissible) {
+            dialogContainer.setOnClickListener {
+                dialogText.cancelAnimation()
+                dismiss()
+            }
+        }
+    }
+
+    private fun setDialog() {
+        if (context == null) {
+            dismiss()
+            return
+        }
+
+        context?.let {
+            val toolbarColor = if (toolbarDimmed) getColor(it, R.color.dimmed) else getColor(it, android.R.color.transparent)
+            toolbarDialogLayout.setBackgroundColor(toolbarColor)
+            hiddenText.text = daxText.html(it)
+            primaryCta.text = buttonText
+            secondaryCta.text = buttonText
+            secondaryCta.visibility = View.VISIBLE
+            dialogText.typingDelayInMs = typingDelayInMs
+        }
+    }
+}
+
 class DaxDialogSimple(
     private var daxText: String,
     private var buttonText: String,

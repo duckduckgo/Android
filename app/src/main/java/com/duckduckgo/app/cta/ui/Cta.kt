@@ -122,6 +122,10 @@ sealed class DaxDialogCta(
             } else {
                 R.string.daxDialogSettings
             }
+
+        override fun createCta(activity: FragmentActivity): DaxDialog {
+            return DaxDialog2Buttons(getDaxText(activity), activity.resources.getString(okButton), false)
+        }
     }
 
     class DaxTrackersBlockedCta(
