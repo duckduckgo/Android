@@ -18,10 +18,8 @@ package com.duckduckgo.app.settings
 
 import android.app.Activity
 import android.app.ActivityOptions
-import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import android.view.View
@@ -86,19 +84,7 @@ class SettingsActivity : DuckDuckGoActivity(), SettingsAutomaticallyClearWhatFra
     }
 
     private fun configureUiEventHandlers() {
-        changeAppIcon.setOnClickListener {
-
-            packageManager.setComponentEnabledSetting(
-                ComponentName(applicationContext, "com.duckduckgo.app.launch.LauncherBlue"),
-                PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP
-            )
-
-            packageManager.setComponentEnabledSetting(
-                ComponentName(applicationContext, "com.duckduckgo.app.launch.LauncherRed"),
-                PackageManager.COMPONENT_ENABLED_STATE_ENABLED, PackageManager.DONT_KILL_APP
-            )
-
-        }
+        changeAppIcon.setOnClickListener { viewModel.userRequestedToChangeIcon() }
         about.setOnClickListener { startActivity(AboutDuckDuckGoActivity.intent(this)) }
         provideFeedback.setOnClickListener { viewModel.userRequestedToSendFeedback() }
 
@@ -117,6 +103,7 @@ class SettingsActivity : DuckDuckGoActivity(), SettingsAutomaticallyClearWhatFra
                 autocompleteToggle.quietlySetIsChecked(it.autoCompleteSuggestionsEnabled, autocompleteToggleListener)
                 updateDefaultBrowserViewVisibility(it)
                 updateAutomaticClearDataOptions(it.automaticallyClearData)
+                changeAppIcon.setCompoundDrawablesRelativeWithIntrinsicBounds(0, 0, it.appIcon.icon, 0)
             }
         })
 

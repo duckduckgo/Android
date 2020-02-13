@@ -43,6 +43,9 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         android:text="Change App Icon"
+        android:gravity="center_vertical"
+        android:layout_height="60dp"
+        android:drawableEnd="@mipmap/ic_launcher"
         app:layout_constraintTop_toBottomOf="@id/lightThemeToggle" />
 
     <androidx.appcompat.widget.SwitchCompat

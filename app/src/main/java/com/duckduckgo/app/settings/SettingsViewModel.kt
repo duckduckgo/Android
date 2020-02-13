@@ -19,6 +19,7 @@ package com.duckduckgo.app.settings
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.duckduckgo.app.browser.BuildConfig
+import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.global.DuckDuckGoTheme
 import com.duckduckgo.app.global.SingleLiveEvent
@@ -46,7 +47,8 @@ class SettingsViewModel @Inject constructor(
         val autoCompleteSuggestionsEnabled: Boolean = true,
         val showDefaultBrowserSetting: Boolean = false,
         val isAppDefaultBrowser: Boolean = false,
-        val automaticallyClearData: AutomaticallyClearData = AutomaticallyClearData(ClearWhatOption.CLEAR_NONE, ClearWhenOption.APP_EXIT_ONLY)
+        val automaticallyClearData: AutomaticallyClearData = AutomaticallyClearData(ClearWhatOption.CLEAR_NONE, ClearWhenOption.APP_EXIT_ONLY),
+        val appIcon: AppIcon = AppIcon.DEFAULT
     )
 
     data class AutomaticallyClearData(
@@ -58,6 +60,7 @@ class SettingsViewModel @Inject constructor(
 
     sealed class Command {
         object LaunchFeedback : Command()
+        object LaunchAppIcon : Command()
         object UpdateTheme : Command()
     }
 
@@ -72,7 +75,6 @@ class SettingsViewModel @Inject constructor(
     }
 
     fun start() {
-
         val defaultBrowserAlready = defaultWebBrowserCapability.isDefaultBrowser()
         val variant = variantManager.getVariant()
         val isLightTheme = settingsDataStore.theme == DuckDuckGoTheme.LIGHT
@@ -87,12 +89,17 @@ class SettingsViewModel @Inject constructor(
             isAppDefaultBrowser = defaultBrowserAlready,
             showDefaultBrowserSetting = defaultWebBrowserCapability.deviceSupportsDefaultBrowserConfiguration(),
             version = obtainVersion(variant.key),
-            automaticallyClearData = AutomaticallyClearData(automaticallyClearWhat, automaticallyClearWhen, automaticallyClearWhenEnabled)
+            automaticallyClearData = AutomaticallyClearData(automaticallyClearWhat, automaticallyClearWhen, automaticallyClearWhenEnabled),
+            appIcon = settingsDataStore.appIcon
         )
     }
 
     fun userRequestedToSendFeedback() {
         command.value = Command.LaunchFeedback
+    }
+
+    fun userRequestedToChangeIcon() {
+        command.value = Command.LaunchAppIcon
     }
 
     fun onLightThemeToggled(enabled: Boolean) {

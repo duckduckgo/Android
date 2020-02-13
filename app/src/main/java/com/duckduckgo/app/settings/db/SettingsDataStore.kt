@@ -20,6 +20,7 @@ import android.content.Context
 import android.content.SharedPreferences
 import androidx.core.content.edit
 import com.duckduckgo.app.global.DuckDuckGoTheme
+import com.duckduckgo.app.settings.AppIcon
 import com.duckduckgo.app.settings.clear.ClearWhatOption
 import com.duckduckgo.app.settings.clear.ClearWhenOption
 import javax.inject.Inject
@@ -30,6 +31,7 @@ interface SettingsDataStore {
     var theme: DuckDuckGoTheme?
     var hideTips: Boolean
     var autoCompleteSuggestionsEnabled: Boolean
+    var appIcon: AppIcon
 
     /**
      * This will be checked upon app startup and used to decide whether it should perform a clear or not.
@@ -74,6 +76,13 @@ class SettingsSharedPreferences @Inject constructor(private val context: Context
     override var autoCompleteSuggestionsEnabled: Boolean
         get() = preferences.getBoolean(KEY_AUTOCOMPLETE_ENABLED, true)
         set(enabled) = preferences.edit { putBoolean(KEY_AUTOCOMPLETE_ENABLED, enabled) }
+
+    override var appIcon: AppIcon
+        get() {
+            val componentName = preferences.getString(KEY_APP_ICON, null) ?: return AppIcon.DEFAULT
+            return AppIcon.valueOf(componentName)
+        }
+        set(appIcon) = preferences.edit { putString(KEY_APP_ICON, appIcon!!.componentName) }
 
     override var appUsedSinceLastClear: Boolean
         get() = preferences.getBoolean(KEY_APP_USED_SINCE_LAST_CLEAR, true)
@@ -132,5 +141,6 @@ class SettingsSharedPreferences @Inject constructor(private val context: Context
         const val KEY_APP_NOTIFICATIONS_ENABLED = "APP_NOTIFCATIONS_ENABLED"
         const val KEY_APP_USED_SINCE_LAST_CLEAR = "APP_USED_SINCE_LAST_CLEAR"
         const val KEY_HIDE_TIPS = "HIDE_TIPS"
+        const val KEY_APP_ICON = "APP_ICON"
     }
 }

@@ -62,6 +62,9 @@ class SettingsViewModelTest {
     private lateinit var mockVariantManager: VariantManager
 
     @Mock
+    private lateinit var mockAppIconModifier: IconModifier
+
+    @Mock
     private lateinit var mockPixel: Pixel
 
     private lateinit var commandCaptor: KArgumentCaptor<Command>
@@ -73,7 +76,7 @@ class SettingsViewModelTest {
         context = InstrumentationRegistry.getInstrumentation().targetContext
         commandCaptor = argumentCaptor()
 
-        testee = SettingsViewModel(mockAppSettingsDataStore, mockDefaultBrowserDetector, mockVariantManager, mockPixel)
+        testee = SettingsViewModel(mockAppSettingsDataStore, mockDefaultBrowserDetector, mockVariantManager, mockAppIconModifier, mockPixel)
         testee.command.observeForever(commandObserver)
 
         whenever(mockAppSettingsDataStore.automaticallyClearWhenOption).thenReturn(APP_EXIT_ONLY)
@@ -210,6 +213,14 @@ class SettingsViewModelTest {
         testee.start()
         val expectedStartString = "${BuildConfig.VERSION_NAME} ab (${BuildConfig.VERSION_CODE})"
         assertEquals(expectedStartString, latestViewState().version)
+    }
+
+    @Test
+    fun whenChangeIconRequestedThenCommandIsChangeIcon() {
+        testee.userRequestedToChangeIcon()
+        testee.command.blockingObserve()
+        verify(commandObserver).onChanged(commandCaptor.capture())
+        assertEquals(Command.LaunchAppIcon, commandCaptor.firstValue)
     }
 
     private fun latestViewState() = testee.viewState.value!!

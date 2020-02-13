@@ -43,15 +43,24 @@
             android:name="com.duckduckgo.app.launch.LaunchActivity"
             android:label="@string/appName">
             <intent-filter>
-                <!--                <action android:name="android.intent.action.MAIN" />-->
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
 
         <activity-alias
-            android:name="com.duckduckgo.app.launch.LauncherBlue"
+            android:name="com.duckduckgo.app.launch.Launcher"
             android:enabled="true"
-            android:label="@string/appName"
+            android:icon="@mipmap/ic_launcher_blue"
+            android:targetActivity="com.duckduckgo.app.launch.LaunchActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity-alias>
+
+        <activity-alias
+            android:name="com.duckduckgo.app.launch.LauncherBlue"
+            android:enabled="false"
             android:icon="@mipmap/ic_launcher_blue"
             android:logo="@mipmap/ic_launcher_blue"
             android:roundIcon="@mipmap/ic_launcher_blue_round"
@@ -65,10 +74,7 @@
         <activity-alias
             android:name="com.duckduckgo.app.launch.LauncherRed"
             android:enabled="false"
-            android:label="@string/appName"
             android:icon="@mipmap/ic_launcher_red"
-            android:logo="@mipmap/ic_launcher_red"
-            android:roundIcon="@mipmap/ic_launcher_red_round"
             android:targetActivity="com.duckduckgo.app.launch.LaunchActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
