@@ -37,10 +37,10 @@ class BookmarksEntityQueryListener(
     }
 
     private fun filter(query: String, bookmarks: List<BookmarkEntity>): List<BookmarkEntity> {
-        val toLowerCaseQuery = query.toLowerCase()
+        val lowercaseQuery = query.toLowerCase()
         return bookmarks.filter {
-            it.title?.toLowerCase()?.contains(toLowerCaseQuery) == true ||
-                    it.url.contains(toLowerCaseQuery)
+            val lowercaseTitle = it.title?.toLowerCase()
+            lowercaseTitle?.contains(lowercaseQuery) == true || it.url.contains(lowercaseQuery)
         }
     }
 }

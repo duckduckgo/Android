@@ -19,7 +19,6 @@ package com.duckduckgo.app.bookmarks.ui
 import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
-import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
 import android.text.Html
@@ -43,7 +42,6 @@ import com.duckduckgo.app.global.baseHost
 import com.duckduckgo.app.global.faviconLocation
 import com.duckduckgo.app.global.image.GlideApp
 import com.duckduckgo.app.global.view.gone
-import com.duckduckgo.app.global.view.setHintTextColor
 import com.duckduckgo.app.global.view.show
 import kotlinx.android.synthetic.main.content_bookmarks.*
 import kotlinx.android.synthetic.main.include_toolbar.*
@@ -101,7 +99,6 @@ class BookmarksActivity : DuckDuckGoActivity() {
         menuInflater.inflate(bookmark_activity_menu, menu)
         val searchItem = menu?.findItem(action_search)
         val searchView = searchItem?.actionView as SearchView
-        searchView.setHintTextColor(Color.GRAY)
         searchView.setOnQueryTextListener(BookmarksEntityQueryListener(viewModel.viewState.value?.bookmarks, adapter))
         return super.onCreateOptionsMenu(menu)
     }

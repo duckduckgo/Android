@@ -43,6 +43,10 @@ class BookmarksViewModel(val dao: BookmarksDao) : EditBookmarkListener, ViewMode
 
     }
 
+    companion object {
+        private const val MIN_BOOKMARKS_FOR_SEARCH = 3
+    }
+
     val viewState: MutableLiveData<ViewState> = MutableLiveData()
     val command: SingleLiveEvent<Command> = SingleLiveEvent()
 
@@ -69,7 +73,7 @@ class BookmarksViewModel(val dao: BookmarksDao) : EditBookmarkListener, ViewMode
         viewState.value = viewState.value?.copy(
                 showBookmarks = bookmarks.isNotEmpty(),
                 bookmarks = bookmarks,
-                enableSearch = bookmarks.size > 3
+                enableSearch = bookmarks.size > MIN_BOOKMARKS_FOR_SEARCH
         )
     }
 

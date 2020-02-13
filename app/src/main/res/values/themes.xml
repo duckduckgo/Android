@@ -28,6 +28,7 @@
         <item name="windowNoTitle">true</item>
         <item name="bottomSheetDialogTheme">@style/BottomSheetDialog</item>
         <item name="android:windowActivityTransitions">true</item>
+        <item name="autoCompleteTextViewStyle">@style/AutoCompleteTextViewStyle</item>
     </style>
 
     <style name="AppTheme.BaseDark">
@@ -165,4 +166,9 @@
         <item name="android:colorForeground">?attr/settingsSwitchBackgroundColor</item>
     </style>
 
+    <style name="AutoCompleteTextViewStyle" parent="Widget.AppCompat.AutoCompleteTextView">
+        <item name="android:textCursorDrawable">@drawable/text_cursor</item>
+        <item name="android:textColorHint">?attr/omnibarHintColor</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+    </style>
 </resources>
