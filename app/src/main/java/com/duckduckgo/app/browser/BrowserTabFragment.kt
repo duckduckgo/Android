@@ -17,8 +17,10 @@
 package com.duckduckgo.app.browser
 
 import android.Manifest
+import android.animation.Animator
 import android.animation.LayoutTransition.CHANGING
 import android.animation.LayoutTransition.DISAPPEARING
+import android.animation.ObjectAnimator
 import android.annotation.SuppressLint
 import android.app.Activity.RESULT_OK
 import android.app.ActivityOptions
@@ -32,6 +34,7 @@ import android.os.*
 import android.text.Editable
 import android.view.*
 import android.view.View.*
+import android.view.animation.AccelerateDecelerateInterpolator
 import android.view.inputmethod.EditorInfo
 import android.webkit.*
 import android.webkit.WebView.FindListener
@@ -1123,10 +1126,13 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
         private const val AUTHENTICATION_DIALOG_TAG = "AUTH_DIALOG_TAG"
         private const val DAX_DIALOG_DIALOG_TAG = "DAX_DIALOG_TAG"
 
-        private const val MIN_PROGRESS = 10
+        private const val MIN_PROGRESS = 50
         private const val MAX_PROGRESS = 100
         private const val TRACKERS_INI_DELAY = 700L
         private const val TRACKERS_SECONDARY_DELAY = 300L
+        private const val MIN_PROGRESS_BAR = 75
+        private const val ANIM_DURATION_PROGRESS_LONG = 1500L
+        private const val ANIM_DURATION_PROGRESS_SHORT = 200L
 
         fun newInstance(tabId: String, query: String? = null, skipHome: Boolean): BrowserTabFragment {
             val fragment = BrowserTabFragment()
@@ -1150,6 +1156,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
         private var lastSeenGlobalViewState: GlobalLayoutViewState? = null
         private var lastSeenAutoCompleteViewState: AutoCompleteViewState? = null
         private var lastSeenCtaViewState: CtaViewState? = null
+        private var progressBarAnimation: ObjectAnimator? = null
 
         fun renderAutocomplete(viewState: AutoCompleteViewState) {
             renderIfChanged(viewState, lastSeenAutoCompleteViewState) {
@@ -1186,14 +1193,39 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
             }
         }
 
+        private fun animateProgressBar(newProgress: Int, isLoading: Boolean) {
+            progressBarAnimation?.cancel()
+
+            if (pageLoadingIndicator.progress > newProgress) {
+                pageLoadingIndicator.progress = 0
+            }
+
+            progressBarAnimation = ObjectAnimator.ofInt(pageLoadingIndicator, "progress", newProgress).apply {
+                duration = if (newProgress < MIN_PROGRESS_BAR) ANIM_DURATION_PROGRESS_LONG else ANIM_DURATION_PROGRESS_SHORT
+                interpolator = AccelerateDecelerateInterpolator()
+                addListener(object : Animator.AnimatorListener {
+                    override fun onAnimationEnd(animation: Animator?) {
+                        if (!isLoading) pageLoadingIndicator.hide()
+                    }
+
+                    override fun onAnimationRepeat(animation: Animator?) {}
+                    override fun onAnimationCancel(animation: Animator?) {}
+                    override fun onAnimationStart(animation: Animator?) {}
+                })
+                start()
+            }
+        }
+
         @SuppressLint("SetTextI18n")
         fun renderLoadingIndicator(viewState: LoadingViewState) {
             renderIfChanged(viewState, lastSeenLoadingViewState) {
                 lastSeenLoadingViewState = viewState
 
                 pageLoadingIndicator.apply {
-                    if (viewState.isLoading) show() else hide()
-                    progress = viewState.progress
+                    if (viewState.isLoading) {
+                        show()
+                    }
+                    animateProgressBar(viewState.progress, viewState.isLoading)
                 }
 
                 if (variantManager.getVariant().hasFeature(VariantManager.VariantFeature.ConceptTest) && privacySettingsStore.privacyOn) {
