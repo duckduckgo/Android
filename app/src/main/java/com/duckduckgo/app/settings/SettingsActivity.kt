@@ -78,6 +78,9 @@ class SettingsActivity : DuckDuckGoActivity(), SettingsAutomaticallyClearWhatFra
     }
 
     private fun configureUiEventHandlers() {
+        changeAppIcon.setOnClickListener {
+
+        }
         about.setOnClickListener { startActivity(AboutDuckDuckGoActivity.intent(this)) }
         provideFeedback.setOnClickListener { viewModel.userRequestedToSendFeedback() }
 

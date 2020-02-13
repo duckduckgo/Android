@@ -11,7 +11,8 @@
     <application
         android:name="com.duckduckgo.app.global.DuckDuckGoApplication"
         android:allowBackup="false"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="${appIcon}"
+        android:roundIcon="${appIconRound}"
         android:label="@string/appName"
         android:networkSecurityConfig="@xml/network_security_config"
         android:supportsRtl="true"
@@ -45,6 +46,28 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+<!--        <activity-alias android:label="@string/appName"-->
+<!--            android:icon="@drawable/ic_launcher_background_blue"-->
+<!--            android:name="com.duckduckgo.app.launch.LaunchActivity-Blue"-->
+<!--            android:enabled="false"-->
+<!--            android:targetActivity="com.duckduckgo.app.launch.LaunchActivity">-->
+<!--            <intent-filter>-->
+<!--                <action android:name="android.intent.action.MAIN" />-->
+<!--                <category android:name="android.intent.category.LAUNCHER" />-->
+<!--            </intent-filter>-->
+<!--        </activity-alias>-->
+
+<!--        <activity-alias android:label="@string/appName"-->
+<!--            android:icon="@drawable/ic_launcher_background_red"-->
+<!--            android:name="com.duckduckgo.app.launch.LaunchActivity-Red"-->
+<!--            android:enabled="false"-->
+<!--            android:targetActivity="com.duckduckgo.app.launch.LaunchActivity">-->
+<!--            <intent-filter>-->
+<!--                <action android:name="android.intent.action.MAIN" />-->
+<!--                <category android:name="android.intent.category.LAUNCHER" />-->
+<!--            </intent-filter>-->
+<!--        </activity-alias>-->
 
         <activity
             android:name="com.duckduckgo.app.onboarding.ui.OnboardingActivity"
