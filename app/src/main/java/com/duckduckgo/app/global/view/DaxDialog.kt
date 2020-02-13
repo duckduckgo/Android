@@ -51,6 +51,7 @@ interface DaxDialog {
 class DaxDialog2Buttons(
     private var daxText: String,
     private var buttonText: String,
+    private var secondaryText: String,
     private val toolbarDimmed: Boolean = true,
     private val dismissible: Boolean = true,
     private val typingDelayInMs: Long = 20
@@ -163,7 +164,7 @@ class DaxDialog2Buttons(
             toolbarDialogLayout.setBackgroundColor(toolbarColor)
             hiddenText.text = daxText.html(it)
             primaryCta.text = buttonText
-            secondaryCta.text = buttonText
+            secondaryCta.text = secondaryText
             secondaryCta.visibility = View.VISIBLE
             dialogText.typingDelayInMs = typingDelayInMs
         }

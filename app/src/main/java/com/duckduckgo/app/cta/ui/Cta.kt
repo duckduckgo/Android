@@ -34,6 +34,7 @@ import com.duckduckgo.app.global.view.*
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
+import com.duckduckgo.app.widget.ui.WidgetCapabilities
 import kotlinx.android.synthetic.main.include_cta_buttons.view.*
 import kotlinx.android.synthetic.main.include_cta_content.view.*
 import kotlinx.android.synthetic.main.include_dax_dialog_cta.view.*
@@ -118,13 +119,70 @@ sealed class DaxDialogCta(
     ) {
         override val okButton: Int
             get() = if (defaultBrowserDetector.hasDefaultBrowser()) {
-                R.string.daxDialogYes
-            } else {
                 R.string.daxDialogSettings
+            } else {
+                R.string.daxDialogYes
             }
 
         override fun createCta(activity: FragmentActivity): DaxDialog {
-            return DaxDialog2Buttons(getDaxText(activity), activity.resources.getString(okButton), false)
+            return DaxDialog2Buttons(
+                getDaxText(activity),
+                activity.resources.getString(okButton),
+                activity.resources.getString(R.string.daxDialogMaybeLater),
+                false
+            )
+        }
+
+        fun onPrimaryButtonClicked(): DefaultBrowserEvent {
+            return if (defaultBrowserDetector.hasDefaultBrowser()) {
+                DefaultBrowserEvent.Settings
+            } else {
+                DefaultBrowserEvent.SystemDialog
+            }
+        }
+
+        sealed class DefaultBrowserEvent {
+            object Settings : DefaultBrowserEvent()
+            object SystemDialog : DefaultBrowserEvent()
+        }
+    }
+
+    class SearchWidgetCta(
+        private val widgetCapabilities: WidgetCapabilities,
+        override val onboardingStore: OnboardingStore,
+        override val appInstallStore: AppInstallStore
+    ) : DaxDialogCta(
+        ctaId = CtaId.DAX_DIALOG_SEACH_DIALOG,
+        description = R.string.daxSearchWidgetCtaText,
+        okButton = R.string.daxDialogAddWidget,
+        shownPixel = Pixel.PixelName.ONBOARDING_DAX_CTA_SHOWN,
+        okPixel = Pixel.PixelName.ONBOARDING_DAX_CTA_OK_BUTTON,
+        cancelPixel = null,
+        ctaPixelParam = Pixel.PixelValues.DAX_DEFAULT_BROWSER_CTA,
+        onboardingStore = onboardingStore,
+        appInstallStore = appInstallStore
+    ) {
+
+        override fun createCta(activity: FragmentActivity): DaxDialog {
+            return DaxDialog2Buttons(
+                getDaxText(activity),
+                activity.resources.getString(okButton),
+                activity.resources.getString(R.string.daxDialogMaybeLater),
+                false
+            )
+        }
+
+        fun onPrimaryButtonClicked(): SearchWidgetAction {
+            return if (widgetCapabilities.supportsAutomaticWidgetAdd) {
+                SearchWidgetAction.Automatic
+            } else {
+                SearchWidgetAction.Manual
+            }
+        }
+
+        sealed class SearchWidgetAction {
+            object Automatic : SearchWidgetAction()
+            object Manual : SearchWidgetAction()
         }
     }
 

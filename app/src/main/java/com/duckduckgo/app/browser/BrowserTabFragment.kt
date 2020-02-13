@@ -57,6 +57,7 @@ import com.duckduckgo.app.autocomplete.api.AutoCompleteApi.AutoCompleteSuggestio
 import com.duckduckgo.app.bookmarks.ui.EditBookmarkDialogFragment
 import com.duckduckgo.app.browser.BrowserTabViewModel.*
 import com.duckduckgo.app.browser.autocomplete.BrowserAutoCompleteSuggestionsAdapter
+import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserSystemSettings
 import com.duckduckgo.app.browser.downloader.FileDownloadNotificationManager
 import com.duckduckgo.app.browser.downloader.FileDownloader
 import com.duckduckgo.app.browser.downloader.FileDownloader.PendingFileDownload
@@ -72,14 +73,11 @@ import com.duckduckgo.app.browser.tabpreview.WebViewPreviewGenerator
 import com.duckduckgo.app.browser.tabpreview.WebViewPreviewPersister
 import com.duckduckgo.app.browser.ui.HttpAuthenticationDialogFragment
 import com.duckduckgo.app.browser.useragent.UserAgentProvider
-import com.duckduckgo.app.cta.ui.Cta
-import com.duckduckgo.app.cta.ui.HomePanelCta
-import com.duckduckgo.app.cta.ui.CtaViewModel
-import com.duckduckgo.app.cta.ui.DaxBubbleCta
-import com.duckduckgo.app.cta.ui.DaxDialogCta
+import com.duckduckgo.app.cta.ui.*
 import com.duckduckgo.app.global.ViewModelFactory
 import com.duckduckgo.app.global.device.DeviceInfo
 import com.duckduckgo.app.global.view.*
+import com.duckduckgo.app.onboarding.ui.page.DefaultBrowserPage
 import com.duckduckgo.app.privacy.model.PrivacyGrade
 import com.duckduckgo.app.privacy.renderer.icon
 import com.duckduckgo.app.privacy.store.PrivacySettingsStore
@@ -93,9 +91,9 @@ import com.duckduckgo.app.widget.ui.AddWidgetInstructionsActivity
 import com.duckduckgo.widget.SearchWidgetLight
 import com.google.android.material.snackbar.Snackbar
 import dagger.android.support.AndroidSupportInjection
-import kotlinx.android.synthetic.main.include_dax_dialog_cta.*
 import kotlinx.android.synthetic.main.fragment_browser_tab.*
 import kotlinx.android.synthetic.main.include_cta_buttons.view.*
+import kotlinx.android.synthetic.main.include_dax_dialog_cta.*
 import kotlinx.android.synthetic.main.include_find_in_page.*
 import kotlinx.android.synthetic.main.include_new_browser_tab.*
 import kotlinx.android.synthetic.main.include_omnibar_toolbar.*
@@ -537,6 +535,25 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
             is Command.GenerateWebViewPreviewImage -> generateWebViewPreviewImage()
             is Command.LaunchTabSwitcher -> launchTabSwitcher()
             is Command.ShowErrorWithAction -> showErrorSnackbar(it)
+            is Command.OpenSettings -> openDefaultBrowserSettings()
+            is Command.OpenDialog -> openDefaultBrowserDialog(it.url)
+        }
+    }
+
+    private fun openDefaultBrowserDialog(url: String) {
+        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
+        intent.putExtra(BrowserActivity.LAUNCH_FROM_DEFAULT_BROWSER_DIALOG, true)
+        startActivityForResult(intent, DefaultBrowserPage.DEFAULT_BROWSER_REQUEST_CODE_DIALOG)
+    }
+
+    private fun openDefaultBrowserSettings() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            val intent = DefaultBrowserSystemSettings.intent()
+            try {
+                startActivityForResult(intent, DEFAULT_BROWSER_REQUEST_CODE_SETTINGS)
+            } catch (e: ActivityNotFoundException) {
+                Timber.w(e, getString(R.string.cannotLaunchDefaultAppSettings))
+            }
         }
     }
 
@@ -1108,6 +1125,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
 
     companion object {
 
+        private const val DEFAULT_BROWSER_REQUEST_CODE_SETTINGS = 100
         private const val TAB_ID_ARG = "TAB_ID_ARG"
         private const val URL_EXTRA_ARG = "URL_EXTRA_ARG"
         private const val SKIP_HOME_ARG = "SKIP_HOME_ARG"
@@ -1399,10 +1417,10 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
                         viewModel.onUserDismissedCta(configuration)
                     }
                     setPrimaryCtaClickListener {
-                        viewModel.onUserClickCtaOkButton()
+                        viewModel.onUserClickCtaOkButton(configuration)
                         if (configuration is DaxDialogCta.DaxMainNetworkCta) {
                             setPrimaryCtaClickListener {
-                                viewModel.onUserClickCtaOkButton()
+                                viewModel.onUserClickCtaOkButton(configuration)
                                 getDaxDialog().dismiss()
                             }
                             configuration.setSecondDialog(this, activity)
@@ -1468,7 +1486,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
 
             configuration.showCta(ctaContainer)
             ctaContainer.ctaOkButton.setOnClickListener {
-                viewModel.onUserClickCtaOkButton()
+                viewModel.onUserClickCtaOkButton(configuration)
             }
 
             ctaContainer.ctaDismissButton.setOnClickListener {

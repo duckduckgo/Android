@@ -57,6 +57,7 @@ import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.browser.ui.HttpAuthenticationDialogFragment.HttpAuthenticationListener
 import com.duckduckgo.app.cta.ui.Cta
 import com.duckduckgo.app.cta.ui.CtaViewModel
+import com.duckduckgo.app.cta.ui.DaxDialogCta
 import com.duckduckgo.app.cta.ui.HomePanelCta
 import com.duckduckgo.app.global.*
 import com.duckduckgo.app.global.model.Site
@@ -195,6 +196,8 @@ class BrowserTabViewModel(
         object GenerateWebViewPreviewImage : Command()
         object LaunchTabSwitcher : Command()
         class ShowErrorWithAction(val action: () -> Unit) : Command()
+        class OpenDialog(val url: String = DEFAULT_URL) : Command()
+        object OpenSettings : Command()
     }
 
     val autoCompleteViewState: MutableLiveData<AutoCompleteViewState> = MutableLiveData()
@@ -895,8 +898,7 @@ class BrowserTabViewModel(
         ctaViewModel.registerDaxBubbleCtaDismissed(cta)
     }
 
-    fun onUserClickCtaOkButton() {
-        val cta = ctaViewState.value?.cta ?: return
+    fun onUserClickCtaOkButton(cta: Cta) {
         ctaViewModel.produceNewCta(cta)?.let {
             ctaViewState.value = currentCtaViewState().copy(cta = it)
         } ?: produceNewCommand(cta)
@@ -907,6 +909,8 @@ class BrowserTabViewModel(
             is HomePanelCta.Survey -> LaunchSurvey(cta.survey)
             is HomePanelCta.AddWidgetAuto -> LaunchAddWidget
             is HomePanelCta.AddWidgetInstructions -> LaunchLegacyAddWidget
+            is DaxDialogCta.DefaultBrowserCta -> cta.onPrimaryButtonClicked().mapToCommand()
+            is DaxDialogCta.SearchWidgetCta -> cta.onPrimaryButtonClicked().mapToCommand()
             else -> return
         }
     }
@@ -987,5 +991,24 @@ class BrowserTabViewModel(
     private fun recoverTabWithQuery(query: String) {
         viewModelScope.launch { closeCurrentTab() }
         command.value = OpenInNewTab(query)
+    }
+
+    private fun DaxDialogCta.DefaultBrowserCta.DefaultBrowserEvent.mapToCommand(): Command {
+        return when (this) {
+            is DaxDialogCta.DefaultBrowserCta.DefaultBrowserEvent.Settings -> OpenSettings
+            is DaxDialogCta.DefaultBrowserCta.DefaultBrowserEvent.SystemDialog -> OpenDialog()
+        }
+    }
+
+    private fun DaxDialogCta.SearchWidgetCta.SearchWidgetAction.mapToCommand(): Command {
+        return when (this) {
+            is DaxDialogCta.SearchWidgetCta.SearchWidgetAction.Automatic -> LaunchAddWidget
+            is DaxDialogCta.SearchWidgetCta.SearchWidgetAction.Manual -> LaunchLegacyAddWidget
+        }
+    }
+
+    companion object {
+        const val MAX_DIALOG_ATTEMPTS = 2
+        const val DEFAULT_URL = "https://duckduckgo.com"
     }
 }
