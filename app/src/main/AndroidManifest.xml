@@ -51,8 +51,9 @@
         <activity-alias
             android:name="com.duckduckgo.app.launch.LauncherBlue"
             android:enabled="true"
-            android:icon="@mipmap/ic_launcher_blue"
             android:label="@string/appName"
+            android:icon="@mipmap/ic_launcher_blue"
+            android:logo="@mipmap/ic_launcher_blue"
             android:roundIcon="@mipmap/ic_launcher_blue_round"
             android:targetActivity="com.duckduckgo.app.launch.LaunchActivity">
             <intent-filter>
@@ -64,8 +65,9 @@
         <activity-alias
             android:name="com.duckduckgo.app.launch.LauncherRed"
             android:enabled="false"
-            android:icon="@mipmap/ic_launcher_red"
             android:label="@string/appName"
+            android:icon="@mipmap/ic_launcher_red"
+            android:logo="@mipmap/ic_launcher_red"
             android:roundIcon="@mipmap/ic_launcher_red_round"
             android:targetActivity="com.duckduckgo.app.launch.LaunchActivity">
             <intent-filter>
