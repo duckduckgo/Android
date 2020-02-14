@@ -58,7 +58,7 @@
         app:layout_constraintBottom_toBottomOf="@+id/changeAppIconLabel"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@+id/changeAppIconLabel"
-        tools:srcCompat="@tools:sample/avatars" />
+        tools:srcCompat="@mipmap/ic_launcher_red" />
 
     <androidx.appcompat.widget.SwitchCompat
         android:id="@+id/autocompleteToggle"
