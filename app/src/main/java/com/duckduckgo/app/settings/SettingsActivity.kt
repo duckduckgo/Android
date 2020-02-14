@@ -43,6 +43,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelName
 import kotlinx.android.synthetic.main.content_settings_general.autocompleteToggle
 import kotlinx.android.synthetic.main.content_settings_general.changeAppIcon
+import kotlinx.android.synthetic.main.content_settings_general.changeAppIconLabel
 import kotlinx.android.synthetic.main.content_settings_general.lightThemeToggle
 import kotlinx.android.synthetic.main.content_settings_general.setAsDefaultBrowserSetting
 import kotlinx.android.synthetic.main.content_settings_other.about
@@ -85,7 +86,7 @@ class SettingsActivity : DuckDuckGoActivity(), SettingsAutomaticallyClearWhatFra
     }
 
     private fun configureUiEventHandlers() {
-        changeAppIcon.setOnClickListener { viewModel.userRequestedToChangeIcon() }
+        changeAppIconLabel.setOnClickListener { viewModel.userRequestedToChangeIcon() }
         about.setOnClickListener { startActivity(AboutDuckDuckGoActivity.intent(this)) }
         provideFeedback.setOnClickListener { viewModel.userRequestedToSendFeedback() }
 
@@ -104,7 +105,7 @@ class SettingsActivity : DuckDuckGoActivity(), SettingsAutomaticallyClearWhatFra
                 autocompleteToggle.quietlySetIsChecked(it.autoCompleteSuggestionsEnabled, autocompleteToggleListener)
                 updateDefaultBrowserViewVisibility(it)
                 updateAutomaticClearDataOptions(it.automaticallyClearData)
-                changeAppIcon.setCompoundDrawablesRelativeWithIntrinsicBounds(0, 0, it.appIcon.icon, 0)
+                changeAppIcon.setImageResource(it.appIcon.icon)
             }
         })
 

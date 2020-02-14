@@ -79,4 +79,5 @@ class ChangeIconActivity : DuckDuckGoActivity() {
     private fun render(viewState: ChangeIconViewModel.ViewState) {
         iconsAdapter.notifyChanges(viewState.appIcons)
     }
+
 }

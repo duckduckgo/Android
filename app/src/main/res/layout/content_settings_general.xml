@@ -16,6 +16,7 @@
 
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/settingsSectionGeneral"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
@@ -38,16 +39,26 @@
         app:layout_constraintTop_toBottomOf="@id/settingsGeneralTitle" />
 
     <TextView
-        android:id="@+id/changeAppIcon"
+        android:id="@+id/changeAppIconLabel"
         style="@style/SettingsItemClickable"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:text="Change App Icon"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
         android:gravity="center_vertical"
-        android:layout_height="60dp"
-        android:drawableEnd="@mipmap/ic_launcher"
-        android:drawablePadding="16dp"
+        android:text="Change App Icon"
+        app:layout_constraintEnd_toStartOf="@+id/changeAppIcon"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/lightThemeToggle" />
+
+    <ImageView
+        android:id="@+id/changeAppIcon"
+        android:layout_width="0dp"
+        android:layout_height="40dp"
+        android:padding="4dp"
+        app:layout_constraintBottom_toBottomOf="@+id/changeAppIconLabel"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/changeAppIconLabel"
+        tools:srcCompat="@tools:sample/avatars" />
 
     <androidx.appcompat.widget.SwitchCompat
         android:id="@+id/autocompleteToggle"
@@ -66,6 +77,5 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/autocompleteToggle" />
-
 
 </androidx.constraintlayout.widget.ConstraintLayout>
