@@ -39,6 +39,7 @@ import android.webkit.WebView.HitTestResult
 import android.webkit.WebView.HitTestResult.*
 import android.widget.EditText
 import android.widget.TextView
+import android.widget.Toast
 import androidx.annotation.AnyThread
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
@@ -213,6 +214,8 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
         get() = appBarLayout.browserMenu
 
     private var webView: WebView? = null
+
+    private var toast: Toast? = null
 
     private val errorSnackbar: Snackbar by lazy {
         Snackbar.make(browserLayout, R.string.crashedWebViewErrorMessage, Snackbar.LENGTH_INDEFINITE)
@@ -540,10 +543,30 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
         }
     }
 
+    private fun showInstructionsCard() {
+        toast?.cancel()
+
+        val inflater = LayoutInflater.from(requireContext())
+        val inflatedView = inflater.inflate(R.layout.content_onboarding_default_browser_card, null)
+
+        toast = Toast(requireContext()).apply {
+            view = inflatedView
+            setGravity(Gravity.TOP or Gravity.FILL_HORIZONTAL, 0, 0)
+            duration = Toast.LENGTH_LONG
+        }
+        toast?.show()
+    }
+
+    private fun hideInstructionsCard() {
+        toast?.cancel()
+    }
+
+
     private fun openDefaultBrowserDialog(url: String) {
         val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
         intent.putExtra(BrowserActivity.LAUNCH_FROM_DEFAULT_BROWSER_DIALOG, true)
         startActivityForResult(intent, DefaultBrowserPage.DEFAULT_BROWSER_REQUEST_CODE_DIALOG)
+        showInstructionsCard()
     }
 
     private fun openDefaultBrowserSettings() {

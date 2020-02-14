@@ -62,7 +62,7 @@
         <item name="callToActionSubtitleColor">@color/grayishThree</item>
         <item name="daxDialogBackgroundColor">@color/charcoalGrey</item>
         <item name="daxDialogSecondaryTextColor">@color/white</item>
-        <item name="daxDialogSecondaryButtonRippleColor">?attr/colorControlHighlight</item>
+        <item name="daxDialogSecondaryButtonRippleColor">@color/white</item>
 
         <item name="feedbackAnonymousFeedbackLabelColor">@color/grayish</item>
         <item name="feedbackListItemBackgroundColor">@color/almostBlack</item>
