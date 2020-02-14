@@ -17,10 +17,8 @@
 package com.duckduckgo.app.browser
 
 import android.Manifest
-import android.animation.Animator
 import android.animation.LayoutTransition.CHANGING
 import android.animation.LayoutTransition.DISAPPEARING
-import android.animation.ObjectAnimator
 import android.annotation.SuppressLint
 import android.app.Activity.RESULT_OK
 import android.app.ActivityOptions
@@ -34,7 +32,6 @@ import android.os.*
 import android.text.Editable
 import android.view.*
 import android.view.View.*
-import android.view.animation.AccelerateDecelerateInterpolator
 import android.view.inputmethod.EditorInfo
 import android.webkit.*
 import android.webkit.WebView.FindListener
@@ -46,7 +43,6 @@ import androidx.annotation.AnyThread
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
 import androidx.constraintlayout.widget.ConstraintSet
-import androidx.core.animation.addListener
 import androidx.core.content.ContextCompat
 import androidx.core.content.pm.ShortcutManagerCompat
 import androidx.core.view.isEmpty
@@ -201,6 +197,8 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
         viewModel.loadData(tabId, initialUrl, skipHome)
         viewModel
     }
+
+    private val smoothProgressAnimator by lazy { SmoothProgressAnimator(pageLoadingIndicator) }
 
     // Optimization to prevent against excessive work generating WebView previews; an existing job will be cancelled if a new one is launched
     private var bitmapGeneratorJob: Job? = null
@@ -1131,9 +1129,6 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
         private const val MAX_PROGRESS = 100
         private const val TRACKERS_INI_DELAY = 700L
         private const val TRACKERS_SECONDARY_DELAY = 300L
-        private const val MIN_PROGRESS_BAR = 75
-        private const val ANIM_DURATION_PROGRESS_LONG = 1500L
-        private const val ANIM_DURATION_PROGRESS_SHORT = 200L
 
         fun newInstance(tabId: String, query: String? = null, skipHome: Boolean): BrowserTabFragment {
             val fragment = BrowserTabFragment()
@@ -1157,7 +1152,6 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
         private var lastSeenGlobalViewState: GlobalLayoutViewState? = null
         private var lastSeenAutoCompleteViewState: AutoCompleteViewState? = null
         private var lastSeenCtaViewState: CtaViewState? = null
-        private var progressBarAnimation: ObjectAnimator? = null
 
         fun renderAutocomplete(viewState: AutoCompleteViewState) {
             renderIfChanged(viewState, lastSeenAutoCompleteViewState) {
@@ -1194,21 +1188,6 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
             }
         }
 
-        private fun animateProgressBar(newProgress: Int, isLoading: Boolean) {
-            progressBarAnimation?.cancel()
-            pageLoadingIndicator.apply {
-                if (progress > newProgress) {
-                    progress = 0
-                }
-                progressBarAnimation = ObjectAnimator.ofInt(this, "progress", newProgress).apply {
-                    duration = if (newProgress < MIN_PROGRESS_BAR) ANIM_DURATION_PROGRESS_LONG else ANIM_DURATION_PROGRESS_SHORT
-                    interpolator = AccelerateDecelerateInterpolator()
-                    addListener(onEnd = { if (!isLoading) hide() })
-                    start()
-                }
-            }
-        }
-
         @SuppressLint("SetTextI18n")
         fun renderLoadingIndicator(viewState: LoadingViewState) {
             renderIfChanged(viewState, lastSeenLoadingViewState) {
@@ -1216,7 +1195,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
 
                 pageLoadingIndicator.apply {
                     if (viewState.isLoading) show()
-                    animateProgressBar(viewState.progress, viewState.isLoading)
+                    smoothProgressAnimator.onNewProgress(viewState.progress) { if (!viewState.isLoading) hide() }
                 }
 
                 if (variantManager.getVariant().hasFeature(VariantManager.VariantFeature.ConceptTest) && privacySettingsStore.privacyOn) {
