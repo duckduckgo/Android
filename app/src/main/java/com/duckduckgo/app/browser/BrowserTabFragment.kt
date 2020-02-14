@@ -46,6 +46,7 @@ import androidx.annotation.AnyThread
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
 import androidx.constraintlayout.widget.ConstraintSet
+import androidx.core.animation.addListener
 import androidx.core.content.ContextCompat
 import androidx.core.content.pm.ShortcutManagerCompat
 import androidx.core.view.isEmpty
@@ -1195,24 +1196,16 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
 
         private fun animateProgressBar(newProgress: Int, isLoading: Boolean) {
             progressBarAnimation?.cancel()
-
-            if (pageLoadingIndicator.progress > newProgress) {
-                pageLoadingIndicator.progress = 0
-            }
-
-            progressBarAnimation = ObjectAnimator.ofInt(pageLoadingIndicator, "progress", newProgress).apply {
-                duration = if (newProgress < MIN_PROGRESS_BAR) ANIM_DURATION_PROGRESS_LONG else ANIM_DURATION_PROGRESS_SHORT
-                interpolator = AccelerateDecelerateInterpolator()
-                addListener(object : Animator.AnimatorListener {
-                    override fun onAnimationEnd(animation: Animator?) {
-                        if (!isLoading) pageLoadingIndicator.hide()
-                    }
-
-                    override fun onAnimationRepeat(animation: Animator?) {}
-                    override fun onAnimationCancel(animation: Animator?) {}
-                    override fun onAnimationStart(animation: Animator?) {}
-                })
-                start()
+            pageLoadingIndicator.apply {
+                if (progress > newProgress) {
+                    progress = 0
+                }
+                progressBarAnimation = ObjectAnimator.ofInt(this, "progress", newProgress).apply {
+                    duration = if (newProgress < MIN_PROGRESS_BAR) ANIM_DURATION_PROGRESS_LONG else ANIM_DURATION_PROGRESS_SHORT
+                    interpolator = AccelerateDecelerateInterpolator()
+                    addListener(onEnd = { if (!isLoading) hide() })
+                    start()
+                }
             }
         }
 
