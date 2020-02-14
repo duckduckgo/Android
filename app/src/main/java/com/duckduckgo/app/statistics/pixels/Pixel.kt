@@ -150,8 +150,7 @@ interface Pixel {
         AUTOCOMPLETE_BOOKMARK_SELECTION("m_aut_s_b"),
         AUTOCOMPLETE_SEARCH_SELECTION("m_aut_s_s"),
 
-        APP_ICON_OPENED("mai"),
-        APP_ICON_CHOSEN("mai_r_%d")
+        CHANGE_APP_ICON_OPENED("mic"),
     }
 
     object PixelParameter {

@@ -49,7 +49,7 @@ class ChangeIconViewModel @Inject constructor(
     val viewState: MutableLiveData<ViewState> = MutableLiveData()
 
     init {
-        pixel.fire(Pixel.PixelName.APP_ICON_OPENED)
+        pixel.fire(Pixel.PixelName.CHANGE_APP_ICON_OPENED)
     }
 
     fun start() {
@@ -57,7 +57,10 @@ class ChangeIconViewModel @Inject constructor(
         viewState.value = ViewState(AppIcon.values().map { IconViewData.from(it, selectedIcon) })
     }
 
-    private fun currentViewState(): ViewState {
-        return viewState.value!!
+    fun onIconSelected(viewData: IconViewData) {
+        val newIcon = viewData.appIcon
+        // appIconModifier.changeIcon(newIcon)
+        viewState.value = ViewState(AppIcon.values().map { IconViewData.from(it, newIcon) })
+        settingsDataStore.appIcon = newIcon
     }
 }

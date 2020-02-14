@@ -49,7 +49,15 @@ enum class AppIcon(
     RED(
         componentName = "$QUALIFIER.LauncherRed",
         icon = R.mipmap.ic_launcher_red
-    ),
+    ),;
+
+    companion object {
+
+        fun from(componentName: String): AppIcon {
+            return values().first { it.componentName == componentName }
+        }
+
+    }
 }
 
 class AppIconModifier @Inject constructor(private val context: Context) : IconModifier {

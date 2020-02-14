@@ -26,7 +26,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.app.browser.R
 import kotlinx.android.synthetic.main.item_tracker_network_header.view.icon
 
-class AppIconsAdapter : RecyclerView.Adapter<AppIconsAdapter.IconViewHolder>() {
+class AppIconsAdapter(private val onClick: (ChangeIconViewModel.IconViewData) -> Unit) : RecyclerView.Adapter<AppIconsAdapter.IconViewHolder>() {
 
     private var iconViewData: MutableList<ChangeIconViewModel.IconViewData> = mutableListOf()
 
@@ -44,17 +44,14 @@ class AppIconsAdapter : RecyclerView.Adapter<AppIconsAdapter.IconViewHolder>() {
 
     override fun onBindViewHolder(holder: IconViewHolder, position: Int) {
         val viewElement = iconViewData[position]
+        holder.itemView.setOnClickListener { onClick.invoke(viewElement) }
         holder.icon.setImageResource(viewElement.appIcon.icon)
+        holder.itemView.isSelected = viewElement.selected
     }
 
     fun notifyChanges(newList: List<ChangeIconViewModel.IconViewData>) {
-        if (newList.isNotEmpty()) {
-            val diffCallback = IconDiffCallback(iconViewData, newList)
-            val diffResult = DiffUtil.calculateDiff(diffCallback)
-            iconViewData.clear()
-            iconViewData.addAll(newList)
-            diffResult.dispatchUpdatesTo(this)
-        }
+        iconViewData = newList.toMutableList()
+        notifyDataSetChanged()
     }
 }
 

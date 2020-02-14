@@ -32,7 +32,9 @@ import kotlinx.android.synthetic.main.include_toolbar.toolbar
 class ChangeIconActivity : DuckDuckGoActivity() {
 
     private val viewModel: ChangeIconViewModel by bindViewModel()
-    private val iconsAdapter: AppIconsAdapter = AppIconsAdapter()
+    private val iconsAdapter: AppIconsAdapter = AppIconsAdapter{ icon ->
+        viewModel.onIconSelected(icon)
+    }
 
     companion object {
         fun intent(context: Context): Intent {
