@@ -14,15 +14,14 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.settings
+package com.duckduckgo.app.icon.api
 
 import android.content.ComponentName
 import android.content.Context
 import android.content.pm.PackageManager
 import androidx.annotation.DrawableRes
 import com.duckduckgo.app.browser.R
-import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
-import com.duckduckgo.app.settings.IconModifier.Companion.QUALIFIER
+import com.duckduckgo.app.icon.api.IconModifier.Companion.QUALIFIER
 import javax.inject.Inject
 
 interface IconModifier {

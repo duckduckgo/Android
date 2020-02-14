@@ -32,6 +32,7 @@ import com.duckduckgo.app.feedback.ui.negative.openended.ShareOpenEndedFeedbackF
 import com.duckduckgo.app.feedback.ui.negative.subreason.SubReasonNegativeFeedbackFragment
 import com.duckduckgo.app.feedback.ui.positive.initial.PositiveFeedbackLandingFragment
 import com.duckduckgo.app.fire.FireActivity
+import com.duckduckgo.app.icon.ui.ChangeIconActivity
 import com.duckduckgo.app.job.AppConfigurationJobService
 import com.duckduckgo.app.launch.LaunchActivity
 import com.duckduckgo.app.notification.NotificationHandlerService
@@ -123,6 +124,10 @@ abstract class AndroidBindingModule {
     @ActivityScoped
     @ContributesAndroidInjector
     abstract fun aboutDuckDuckGoActivity(): AboutDuckDuckGoActivity
+
+    @ActivityScoped
+    @ContributesAndroidInjector
+    abstract fun changeAppIconActivity(): ChangeIconActivity
 
     /* Fragments */
 

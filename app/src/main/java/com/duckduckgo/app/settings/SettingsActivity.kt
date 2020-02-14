@@ -34,6 +34,7 @@ import com.duckduckgo.app.feedback.ui.common.FeedbackActivity
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.sendThemeChangedBroadcast
 import com.duckduckgo.app.global.view.launchDefaultAppActivity
+import com.duckduckgo.app.icon.ui.ChangeIconActivity
 import com.duckduckgo.app.settings.SettingsViewModel.AutomaticallyClearData
 import com.duckduckgo.app.settings.SettingsViewModel.Command
 import com.duckduckgo.app.settings.clear.ClearWhatOption
@@ -138,6 +139,7 @@ class SettingsActivity : DuckDuckGoActivity(), SettingsAutomaticallyClearWhatFra
     private fun processCommand(it: Command?) {
         when (it) {
             is Command.LaunchFeedback -> launchFeedback()
+            is Command.LaunchAppIcon -> launchAppIconChange()
             is Command.UpdateTheme -> sendThemeChangedBroadcast()
         }
     }
@@ -167,6 +169,11 @@ class SettingsActivity : DuckDuckGoActivity(), SettingsAutomaticallyClearWhatFra
     private fun launchFeedback() {
         val options = ActivityOptions.makeSceneTransitionAnimation(this).toBundle()
         startActivityForResult(Intent(FeedbackActivity.intent(this)), FEEDBACK_REQUEST_CODE, options)
+    }
+
+    private fun launchAppIconChange() {
+        val options = ActivityOptions.makeSceneTransitionAnimation(this).toBundle()
+        startActivityForResult(Intent(ChangeIconActivity.intent(this)), CHANGE_APP_ICON_REQUEST_CODE, options)
     }
 
     override fun onAutomaticallyClearWhatOptionSelected(clearWhatSetting: ClearWhatOption) {
@@ -215,6 +222,7 @@ class SettingsActivity : DuckDuckGoActivity(), SettingsAutomaticallyClearWhatFra
         private const val CLEAR_WHAT_DIALOG_TAG = "CLEAR_WHAT_DIALOG_FRAGMENT"
         private const val CLEAR_WHEN_DIALOG_TAG = "CLEAR_WHEN_DIALOG_FRAGMENT"
         private const val FEEDBACK_REQUEST_CODE = 100
+        private const val CHANGE_APP_ICON_REQUEST_CODE = 101
 
         fun intent(context: Context): Intent {
             return Intent(context, SettingsActivity::class.java)

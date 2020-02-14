@@ -215,6 +215,10 @@
         <activity
             android:name="com.duckduckgo.app.fire.FireActivity"
             android:process="@string/fireProcessName" />
+        <activity
+            android:name="com.duckduckgo.app.icon.ui.ChangeIconActivity"
+            android:label="@string/changeIconActivityTitle"
+            android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity" />
 
         <service
             android:name="com.duckduckgo.app.job.AppConfigurationJobService"

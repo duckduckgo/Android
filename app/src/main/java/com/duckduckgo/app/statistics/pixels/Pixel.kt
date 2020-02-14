@@ -148,7 +148,10 @@ interface Pixel {
         FEEDBACK_NEGATIVE_SUBMISSION("mfbs_%s_%s_%s"),
 
         AUTOCOMPLETE_BOOKMARK_SELECTION("m_aut_s_b"),
-        AUTOCOMPLETE_SEARCH_SELECTION("m_aut_s_s")
+        AUTOCOMPLETE_SEARCH_SELECTION("m_aut_s_s"),
+
+        APP_ICON_OPENED("mai"),
+        APP_ICON_CHOSEN("mai_r_%d")
     }
 
     object PixelParameter {

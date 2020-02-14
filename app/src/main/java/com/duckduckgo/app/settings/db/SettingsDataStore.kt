@@ -20,7 +20,7 @@ import android.content.Context
 import android.content.SharedPreferences
 import androidx.core.content.edit
 import com.duckduckgo.app.global.DuckDuckGoTheme
-import com.duckduckgo.app.settings.AppIcon
+import com.duckduckgo.app.icon.api.AppIcon
 import com.duckduckgo.app.settings.clear.ClearWhatOption
 import com.duckduckgo.app.settings.clear.ClearWhenOption
 import javax.inject.Inject
