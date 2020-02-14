@@ -1215,9 +1215,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
                 lastSeenLoadingViewState = viewState
 
                 pageLoadingIndicator.apply {
-                    if (viewState.isLoading) {
-                        show()
-                    }
+                    if (viewState.isLoading) show()
                     animateProgressBar(viewState.progress, viewState.isLoading)
                 }
 
