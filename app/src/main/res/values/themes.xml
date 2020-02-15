@@ -61,6 +61,8 @@
         <item name="callToActionTitleColor">@color/white</item>
         <item name="callToActionSubtitleColor">@color/grayishThree</item>
         <item name="daxDialogBackgroundColor">@color/charcoalGrey</item>
+        <item name="daxDialogSecondaryButtonTextColor">@color/white</item>
+        <item name="daxDialogSecondaryButtonRippleColor">@color/white</item>
 
         <item name="feedbackAnonymousFeedbackLabelColor">@color/grayish</item>
         <item name="feedbackListItemBackgroundColor">@color/almostBlack</item>
@@ -119,6 +121,8 @@
         <item name="callToActionTitleColor">@color/almostBlack</item>
         <item name="callToActionSubtitleColor">@color/brownishGrayTwo</item>
         <item name="daxDialogBackgroundColor">@color/white</item>
+        <item name="daxDialogSecondaryButtonTextColor">@color/grayishBrown</item>
+        <item name="daxDialogSecondaryButtonRippleColor">@color/subtleGrayTwo</item>
 
         <item name="feedbackAnonymousFeedbackLabelColor">@color/warmerGray</item>
         <item name="feedbackListItemBackgroundColor">@color/whiteFive</item>
