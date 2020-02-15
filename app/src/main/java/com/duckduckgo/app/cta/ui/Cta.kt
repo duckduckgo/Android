@@ -142,18 +142,19 @@ sealed class DaxDialogCta(
             )
         }
 
-        fun onPrimaryButtonClicked(): DefaultBrowserEvent {
+        fun produceAction(): DefaultBrowserAction {
             return if (defaultBrowserDetector.hasDefaultBrowser()) {
-                DefaultBrowserEvent.Settings
+                DefaultBrowserAction.ShowSettings
             } else {
-                DefaultBrowserEvent.SystemDialog
+                DefaultBrowserAction.ShowSystemDialog
             }
         }
 
-        sealed class DefaultBrowserEvent {
-            object Settings : DefaultBrowserEvent()
-            object SystemDialog : DefaultBrowserEvent()
         override fun pixelSecondaryButtonParameters(): Map<String, String?> = mapOf(Pixel.PixelParameter.CTA_SHOWN to ctaPixelParam)
+
+        sealed class DefaultBrowserAction {
+            object ShowSettings : DefaultBrowserAction()
+            object ShowSystemDialog : DefaultBrowserAction()
         }
     }
 
@@ -184,19 +185,19 @@ sealed class DaxDialogCta(
             )
         }
 
-        fun onPrimaryButtonClicked(): SearchWidgetAction {
+        fun produceAction(): SearchWidgetAction {
             return if (widgetCapabilities.supportsAutomaticWidgetAdd) {
-                SearchWidgetAction.Automatic
+                SearchWidgetAction.AddAutomatic
             } else {
-                SearchWidgetAction.Manual
+                SearchWidgetAction.AddManually
             }
         }
 
         override fun pixelSecondaryButtonParameters(): Map<String, String?> = mapOf(Pixel.PixelParameter.CTA_SHOWN to ctaPixelParam)
 
         sealed class SearchWidgetAction {
-            object Automatic : SearchWidgetAction()
-            object Manual : SearchWidgetAction()
+            object AddAutomatic : SearchWidgetAction()
+            object AddManually : SearchWidgetAction()
         }
     }
 

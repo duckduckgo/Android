@@ -911,8 +911,8 @@ class BrowserTabViewModel(
             is HomePanelCta.Survey -> LaunchSurvey(cta.survey)
             is HomePanelCta.AddWidgetAuto -> LaunchAddWidget
             is HomePanelCta.AddWidgetInstructions -> LaunchLegacyAddWidget
-            is DaxDialogCta.DefaultBrowserCta -> cta.onPrimaryButtonClicked().mapToCommand()
-            is DaxDialogCta.SearchWidgetCta -> cta.onPrimaryButtonClicked().mapToCommand()
+            is DaxDialogCta.DefaultBrowserCta -> cta.produceAction().mapToCommand()
+            is DaxDialogCta.SearchWidgetCta -> cta.produceAction().mapToCommand()
             else -> return
         }
     }
@@ -995,17 +995,17 @@ class BrowserTabViewModel(
         command.value = OpenInNewTab(query)
     }
 
-    private fun DaxDialogCta.DefaultBrowserCta.DefaultBrowserEvent.mapToCommand(): Command {
+    private fun DaxDialogCta.DefaultBrowserCta.DefaultBrowserAction.mapToCommand(): Command {
         return when (this) {
-            is DaxDialogCta.DefaultBrowserCta.DefaultBrowserEvent.Settings -> OpenSettings
-            is DaxDialogCta.DefaultBrowserCta.DefaultBrowserEvent.SystemDialog -> OpenDialog()
+            is DaxDialogCta.DefaultBrowserCta.DefaultBrowserAction.ShowSettings -> OpenSettings
+            is DaxDialogCta.DefaultBrowserCta.DefaultBrowserAction.ShowSystemDialog -> OpenDialog()
         }
     }
 
     private fun DaxDialogCta.SearchWidgetCta.SearchWidgetAction.mapToCommand(): Command {
         return when (this) {
-            is DaxDialogCta.SearchWidgetCta.SearchWidgetAction.Automatic -> LaunchAddWidget
-            is DaxDialogCta.SearchWidgetCta.SearchWidgetAction.Manual -> LaunchLegacyAddWidget
+            is DaxDialogCta.SearchWidgetCta.SearchWidgetAction.AddAutomatic -> LaunchAddWidget
+            is DaxDialogCta.SearchWidgetCta.SearchWidgetAction.AddManually -> LaunchLegacyAddWidget
         }
     }
 
