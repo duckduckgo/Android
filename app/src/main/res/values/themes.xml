@@ -169,4 +169,8 @@
         <item name="android:colorForeground">?attr/settingsSwitchBackgroundColor</item>
     </style>
 
+    <style name="DaxDialogFragment" parent="android:Theme.DeviceDefault.Light.NoActionBar">
+        <item name="android:windowIsTranslucent">true</item>
+    </style>
+
 </resources>
