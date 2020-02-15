@@ -225,12 +225,14 @@ class CtaViewModel @Inject constructor(
     }
 
     fun produceNewCta(cta: Cta): Cta? {
-        if (cta is DaxDialogCta.DaxTrackersBlockedCta) {
-            return DaxDialogCta.DefaultBrowserCta(defaultBrowserDetector, onboardingStore, appInstallStore)
-        } else if (cta is DaxDialogCta.DaxSerpCta) {
-            return DaxDialogCta.SearchWidgetCta(widgetCapabilities, onboardingStore, appInstallStore)
-        } else {
-            return null
+        return when (cta) {
+            is DaxDialogCta.DaxTrackersBlockedCta -> {
+                DaxDialogCta.DefaultBrowserCta(defaultBrowserDetector, onboardingStore, appInstallStore)
+            }
+            is DaxDialogCta.DaxSerpCta -> {
+                DaxDialogCta.SearchWidgetCta(widgetCapabilities, onboardingStore, appInstallStore)
+            }
+            else -> null
         }
     }
 
