@@ -113,6 +113,12 @@ class CtaViewModel @Inject constructor(
         }
     }
 
+    fun onUserClickCtaSecondaryButton(cta: SecondaryButtonCta) {
+        cta.secondaryButtonPixel?.let {
+            pixel.fire(it, cta.pixelSecondaryButtonParameters())
+        }
+    }
+
     suspend fun refreshCta(dispatcher: CoroutineContext, isBrowserShowing: Boolean, site: Site? = null): Cta? {
         surveyCta()?.let {
             return it

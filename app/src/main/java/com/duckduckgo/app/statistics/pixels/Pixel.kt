@@ -62,6 +62,7 @@ interface Pixel {
         ONBOARDING_DAX_CTA_SHOWN("m_odc_s"),
         ONBOARDING_DAX_ALL_CTA_HIDDEN("m_odc_h"),
         ONBOARDING_DAX_CTA_OK_BUTTON("m_odc_ok"),
+        ONBOARDING_DAX_CTA_CANCEL_BUTTON("m_odc_c"),
 
         PRIVACY_DASHBOARD_OPENED("mp"),
         PRIVACY_DASHBOARD_SCORECARD("mp_c"),

@@ -36,22 +36,22 @@ import androidx.fragment.app.DialogFragment
 import com.duckduckgo.app.browser.R
 import kotlinx.android.synthetic.main.content_dax_dialog.*
 
-
 interface DaxDialog {
     fun setDaxText(daxText: String)
     fun setButtonText(buttonText: String)
     fun setDialogAndStartAnimation()
     fun onAnimationFinishedListener(onAnimationFinished: () -> Unit)
     fun setPrimaryCtaClickListener(clickListener: () -> Unit)
+    fun setSecondaryCtaClickListener(clickListener: () -> Unit)
     fun setHideClickListener(clickListener: () -> Unit)
     fun setDismissListener(clickListener: () -> Unit)
     fun getDaxDialog(): DialogFragment
 }
 
-class DaxDialog2Buttons(
+class TypewriterDaxDialog(
     private var daxText: String,
-    private var buttonText: String,
-    private var secondaryText: String,
+    private var primaryButtonText: String,
+    private var secondaryButtonText: String? = "",
     private val toolbarDimmed: Boolean = true,
     private val dismissible: Boolean = true,
     private val typingDelayInMs: Long = 20
@@ -59,128 +59,7 @@ class DaxDialog2Buttons(
 
     private var onAnimationFinished: () -> Unit = {}
     private var primaryCtaClickListener: () -> Unit = { dismiss() }
-    private var hideClickListener: () -> Unit = { dismiss() }
-    private var dismissListener: () -> Unit = { }
-
-    private var secondaryCtaClickListener: () -> Unit = { dismiss() }
-
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? =
-        inflater.inflate(R.layout.content_dax_dialog, container, false)
-
-    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        val dialog = super.onCreateDialog(savedInstanceState)
-        val window = dialog.window
-        val attributes = window?.attributes
-
-        attributes?.gravity = Gravity.BOTTOM
-        window?.attributes = attributes
-        window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-        setStyle(STYLE_NO_TITLE, android.R.style.Theme_DeviceDefault_Light_NoActionBar)
-
-        return dialog
-    }
-
-    override fun onStart() {
-        super.onStart()
-        dialog?.window?.attributes?.dimAmount = 0f
-        dialog?.window?.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        setDialogAndStartAnimation()
-    }
-
-    override fun onDismiss(dialog: DialogInterface) {
-        dialogText?.cancelAnimation()
-        dismissListener()
-        super.onDismiss(dialog)
-    }
-
-    override fun getDaxDialog(): DialogFragment = this
-
-    override fun setDaxText(daxText: String) {
-        this.daxText = daxText
-    }
-
-    override fun setButtonText(buttonText: String) {
-        this.buttonText = buttonText
-    }
-
-    override fun setDialogAndStartAnimation() {
-        setDialog()
-        setListeners()
-        dialogText.startTypingAnimation(daxText, true, onAnimationFinished)
-    }
-
-    override fun onAnimationFinishedListener(onAnimationFinished: () -> Unit) {
-        this.onAnimationFinished = onAnimationFinished
-    }
-
-    override fun setPrimaryCtaClickListener(clickListener: () -> Unit) {
-        primaryCtaClickListener = clickListener
-    }
-
-    override fun setHideClickListener(clickListener: () -> Unit) {
-        hideClickListener = clickListener
-    }
-
-    override fun setDismissListener(clickListener: () -> Unit) {
-        dismissListener = clickListener
-    }
-
-    private fun setListeners() {
-        hideText.setOnClickListener {
-            dialogText.cancelAnimation()
-            hideClickListener()
-        }
-
-        primaryCta.setOnClickListener {
-            dialogText.cancelAnimation()
-            primaryCtaClickListener()
-        }
-
-        secondaryCta.setOnClickListener {
-            dialogText.cancelAnimation()
-            secondaryCtaClickListener()
-        }
-
-        if (dismissible) {
-            dialogContainer.setOnClickListener {
-                dialogText.cancelAnimation()
-                dismiss()
-            }
-        }
-    }
-
-    private fun setDialog() {
-        if (context == null) {
-            dismiss()
-            return
-        }
-
-        context?.let {
-            val toolbarColor = if (toolbarDimmed) getColor(it, R.color.dimmed) else getColor(it, android.R.color.transparent)
-            toolbarDialogLayout.setBackgroundColor(toolbarColor)
-            hiddenText.text = daxText.html(it)
-            primaryCta.text = buttonText
-            secondaryCta.text = secondaryText
-            secondaryCta.visibility = View.VISIBLE
-            dialogText.typingDelayInMs = typingDelayInMs
-        }
-    }
-}
-
-class DaxDialogSimple(
-    private var daxText: String,
-    private var buttonText: String,
-    private val toolbarDimmed: Boolean = true,
-    private val dismissible: Boolean = true,
-    private val typingDelayInMs: Long = 20
-) : DialogFragment(), DaxDialog {
-
-    private var onAnimationFinished: () -> Unit = {}
-    private var primaryCtaClickListener: () -> Unit = { dismiss() }
+    private var secondaryCtaClickListener: (() -> Unit)? = null
     private var hideClickListener: () -> Unit = { dismiss() }
     private var dismissListener: () -> Unit = { }
 
@@ -224,7 +103,7 @@ class DaxDialogSimple(
     }
 
     override fun setButtonText(buttonText: String) {
-        this.buttonText = buttonText
+        this.primaryButtonText = buttonText
     }
 
     override fun setDialogAndStartAnimation() {
@@ -239,6 +118,10 @@ class DaxDialogSimple(
 
     override fun setPrimaryCtaClickListener(clickListener: () -> Unit) {
         primaryCtaClickListener = clickListener
+    }
+
+    override fun setSecondaryCtaClickListener(clickListener: () -> Unit) {
+        secondaryCtaClickListener = clickListener
     }
 
     override fun setHideClickListener(clickListener: () -> Unit) {
@@ -260,6 +143,13 @@ class DaxDialogSimple(
             primaryCtaClickListener()
         }
 
+        secondaryCtaClickListener?.let {
+            secondaryCta.setOnClickListener {
+                dialogText.cancelAnimation()
+                it()
+            }
+        }
+
         if (dismissible) {
             dialogContainer.setOnClickListener {
                 dialogText.cancelAnimation()
@@ -278,15 +168,17 @@ class DaxDialogSimple(
             val toolbarColor = if (toolbarDimmed) getColor(it, R.color.dimmed) else getColor(it, android.R.color.transparent)
             toolbarDialogLayout.setBackgroundColor(toolbarColor)
             hiddenText.text = daxText.html(it)
-            primaryCta.text = buttonText
+            primaryCta.text = primaryButtonText
+            secondaryCta.text = secondaryButtonText
+            secondaryCta.visibility = if (secondaryButtonText.isNullOrEmpty()) View.GONE else View.VISIBLE
             dialogText.typingDelayInMs = typingDelayInMs
         }
     }
 }
 
 class DaxDialogHighlightView(
-    daxDialog: DaxDialogSimple
-) : DialogFragment(), DaxDialog by daxDialog {
+    daxDialog: TypewriterDaxDialog
+) : DaxDialog by daxDialog {
 
     fun startHighlightViewAnimation(targetView: View, duration: Long = 400, timesBigger: Float = 0f) {
         val highlightImageView = addHighlightView(targetView, timesBigger)
@@ -303,8 +195,8 @@ class DaxDialogHighlightView(
     }
 
     private fun addHighlightView(targetView: View, timesBigger: Float): View? {
-        return activity?.let {
-            val highlightImageView = ImageView(context)
+        return getDaxDialog().activity?.let {
+            val highlightImageView = ImageView(getDaxDialog().context)
             highlightImageView.id = View.generateViewId()
             highlightImageView.setImageResource(R.drawable.ic_circle)
 
@@ -324,7 +216,7 @@ class DaxDialogHighlightView(
             val params = RelativeLayout.LayoutParams((width + timesBiggerX).toInt(), (height + timesBiggerY).toInt())
             params.leftMargin = locationOnScreen[0] - (timesBiggerX / 2).toInt()
             params.topMargin = (locationOnScreen[1] - statusBarHeight) - (timesBiggerY / 2).toInt()
-            dialogContainer.addView(highlightImageView, params)
+            getDaxDialog().dialogContainer.addView(highlightImageView, params)
             highlightImageView
         }
     }

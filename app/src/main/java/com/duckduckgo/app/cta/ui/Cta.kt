@@ -68,6 +68,12 @@ interface Cta {
     fun pixelOkParameters(): Map<String, String?>
 }
 
+interface SecondaryButtonCta {
+    val secondaryButtonPixel: Pixel.PixelName?
+
+    fun pixelSecondaryButtonParameters(): Map<String, String?>
+}
+
 sealed class DaxDialogCta(
     override val ctaId: CtaId,
     @AnyRes open val description: Int,
@@ -80,7 +86,7 @@ sealed class DaxDialogCta(
     override val appInstallStore: AppInstallStore
 ) : Cta, DialogCta, DaxCta {
 
-    override fun createCta(activity: FragmentActivity): DaxDialog = DaxDialogSimple(getDaxText(activity), activity.resources.getString(okButton))
+    override fun createCta(activity: FragmentActivity): DaxDialog = TypewriterDaxDialog(getDaxText(activity), activity.resources.getString(okButton))
 
     override fun pixelCancelParameters(): Map<String, String?> = mapOf(Pixel.PixelParameter.CTA_SHOWN to ctaPixelParam)
 
@@ -116,7 +122,10 @@ sealed class DaxDialogCta(
         ctaPixelParam = Pixel.PixelValues.DAX_DEFAULT_BROWSER_CTA,
         onboardingStore = onboardingStore,
         appInstallStore = appInstallStore
-    ) {
+    ), SecondaryButtonCta {
+
+        override val secondaryButtonPixel: Pixel.PixelName = Pixel.PixelName.ONBOARDING_DAX_CTA_CANCEL_BUTTON
+
         override val okButton: Int
             get() = if (defaultBrowserDetector.hasDefaultBrowser()) {
                 R.string.daxDialogSettings
@@ -125,7 +134,7 @@ sealed class DaxDialogCta(
             }
 
         override fun createCta(activity: FragmentActivity): DaxDialog {
-            return DaxDialog2Buttons(
+            return TypewriterDaxDialog(
                 getDaxText(activity),
                 activity.resources.getString(okButton),
                 activity.resources.getString(R.string.daxDialogMaybeLater),
@@ -144,6 +153,7 @@ sealed class DaxDialogCta(
         sealed class DefaultBrowserEvent {
             object Settings : DefaultBrowserEvent()
             object SystemDialog : DefaultBrowserEvent()
+        override fun pixelSecondaryButtonParameters(): Map<String, String?> = mapOf(Pixel.PixelParameter.CTA_SHOWN to ctaPixelParam)
         }
     }
 
@@ -161,14 +171,16 @@ sealed class DaxDialogCta(
         ctaPixelParam = Pixel.PixelValues.DAX_DEFAULT_BROWSER_CTA,
         onboardingStore = onboardingStore,
         appInstallStore = appInstallStore
-    ) {
+    ), SecondaryButtonCta {
+
+        override val secondaryButtonPixel: Pixel.PixelName = Pixel.PixelName.ONBOARDING_DAX_CTA_CANCEL_BUTTON
 
         override fun createCta(activity: FragmentActivity): DaxDialog {
-            return DaxDialog2Buttons(
-                getDaxText(activity),
-                activity.resources.getString(okButton),
-                activity.resources.getString(R.string.daxDialogMaybeLater),
-                false
+            return TypewriterDaxDialog(
+                daxText = getDaxText(activity),
+                primaryButtonText = activity.resources.getString(okButton),
+                secondaryButtonText = activity.resources.getString(R.string.daxDialogMaybeLater),
+                toolbarDimmed = false
             )
         }
 
@@ -179,6 +191,8 @@ sealed class DaxDialogCta(
                 SearchWidgetAction.Manual
             }
         }
+
+        override fun pixelSecondaryButtonParameters(): Map<String, String?> = mapOf(Pixel.PixelParameter.CTA_SHOWN to ctaPixelParam)
 
         sealed class SearchWidgetAction {
             object Automatic : SearchWidgetAction()
@@ -204,7 +218,7 @@ sealed class DaxDialogCta(
     ) {
 
         override fun createCta(activity: FragmentActivity): DaxDialog =
-            DaxDialogSimple(getDaxText(activity), activity.resources.getString(okButton), false)
+            TypewriterDaxDialog(daxText = getDaxText(activity), primaryButtonText = activity.resources.getString(okButton), toolbarDimmed = false)
 
         override fun getDaxText(context: Context): String {
             val trackersFiltered = trackers.asSequence()
@@ -253,7 +267,9 @@ sealed class DaxDialogCta(
         }
 
         override fun createCta(activity: FragmentActivity): DaxDialog {
-            return DaxDialogHighlightView(DaxDialogSimple(getDaxText(activity), activity.resources.getString(okButton))).apply {
+            return DaxDialogHighlightView(
+                TypewriterDaxDialog(daxText = getDaxText(activity), primaryButtonText = activity.resources.getString(okButton))
+            ).apply {
                 val privacyGradeButton = activity.findViewById<View>(R.id.privacyGradeButton)
                 onAnimationFinishedListener {
                     if (isFromSameNetworkDomain()) {
@@ -292,9 +308,13 @@ sealed class DaxDialogCta(
         onboardingStore,
         appInstallStore
     ) {
-
         override fun createCta(activity: FragmentActivity): DaxDialog {
-            return DaxDialogHighlightView(DaxDialogSimple(getDaxText(activity), activity.resources.getString(okButton))).apply {
+            return DaxDialogHighlightView(
+                TypewriterDaxDialog(
+                    daxText = getDaxText(activity),
+                    primaryButtonText = activity.resources.getString(okButton)
+                )
+            ).apply {
                 val fireButton = activity.findViewById<View>(R.id.fire)
                 onAnimationFinishedListener {
                     startHighlightViewAnimation(fireButton)

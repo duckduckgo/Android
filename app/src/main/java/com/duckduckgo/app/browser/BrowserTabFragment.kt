@@ -1452,6 +1452,12 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
                             getDaxDialog().dismiss()
                         }
                     }
+                    if (configuration is SecondaryButtonCta) {
+                        setSecondaryCtaClickListener {
+                            viewModel.onUserClickCtaSecondaryButton(configuration)
+                            getDaxDialog().dismiss()
+                        }
+                    }
                     getDaxDialog().show(activity.supportFragmentManager, DAX_DIALOG_DIALOG_TAG)
                 }.getDaxDialog()
             }
