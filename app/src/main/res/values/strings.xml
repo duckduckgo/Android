@@ -149,11 +149,11 @@
     <string name="fireClearAll">Clear All Tabs and Data</string>
     <string name="fireCancel">Cancel</string>
     <string name="fireContinue">Continue</string>
-    <string name="download_filename">Save %1$s ?</string>
+    <string name="download_filename">Save %1$s</string>
     <string name="keep_both">Keep both</string>
     <string name="replace">Replace</string>
-    <string name="open_with">Open with…</string>
-    <string name="file_already_downloaded">File already downloaded</string>
+    <string name="open_with">Open</string>
+    <string name="file_already_downloaded">File %1$s already downloaded</string>
     <string name="fireDataCleared">Data cleared</string>
     <string name="fireProcessName" translatable="false">:fire</string>
 

@@ -18,7 +18,6 @@ package com.duckduckgo.app.browser
 
 import android.annotation.SuppressLint
 import android.app.Dialog
-import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.view.LayoutInflater
 import android.view.View
@@ -27,6 +26,7 @@ import androidx.core.content.FileProvider.getUriForFile
 import com.duckduckgo.app.browser.downloader.NetworkFileDownloadManager.DownloadFileData
 import com.duckduckgo.app.browser.downloader.NetworkFileDownloadManager.UserDownloadAction
 import com.duckduckgo.app.global.view.gone
+import com.duckduckgo.app.global.view.leftDrawable
 import com.duckduckgo.app.global.view.show
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import kotlinx.android.synthetic.main.download_confirmation.view.*
@@ -47,17 +47,13 @@ class DownloadConfirmationFragment(
 
     private fun setupViews(view: View) {
         view.download_message.text =
-            getString(R.string.download_filename, downloadFileData.file.name)
+            getString(getMessageResource(), downloadFileData.file.name)
         view.open_with.setOnClickListener {
             openFile()
             dismiss()
         }
         view.replace.setOnClickListener {
             userDownloadAction.acceptAndReplace()
-            dismiss()
-        }
-        view.keep_both.setOnClickListener {
-            userDownloadAction.accept()
             dismiss()
         }
         view.continue_download.setOnClickListener {
@@ -70,13 +66,23 @@ class DownloadConfirmationFragment(
         }
 
         if (downloadFileData.alreadyDownloaded) {
-            view.already_downloaded_options.show()
-            view.continue_download.gone()
+            view.open_with.show()
+            view.replace.show()
+            view.continue_download.text = getString(R.string.keep_both)
+            view.continue_download.leftDrawable(R.drawable.ic_keepboth_24dp)
         } else {
-            view.already_downloaded_options.gone()
-            view.continue_download.show()
+            view.open_with.gone()
+            view.replace.gone()
+            view.continue_download.text = getString(R.string.fireContinue)
+            view.continue_download.leftDrawable(R.drawable.ic_file_24dp)
+
         }
     }
+
+    private fun getMessageResource() =
+        if (downloadFileData.alreadyDownloaded) R.string.file_already_downloaded
+        else R.string.download_filename
+
 
     private fun openFile() {
         val uri = getUriForFile(
@@ -86,14 +92,15 @@ class DownloadConfirmationFragment(
         )
         val mime = activity?.contentResolver?.getType(uri)
 
-        try {
-            val intent = Intent(Intent.ACTION_VIEW)
-            intent.setDataAndType(uri, mime)
-            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+        val intent = Intent(Intent.ACTION_VIEW)
+        intent.setDataAndType(uri, mime)
+        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+        if (intent.resolveActivity(activity?.packageManager!!) != null) {
             startActivity(intent)
-        } catch (e: ActivityNotFoundException) {
-            Timber.e(e,"No suitable activity found")
+        } else {
+            Timber.e("No suitable activity found")
             Toast.makeText(activity, "Can't open file", Toast.LENGTH_SHORT).show()
+
         }
     }
 }

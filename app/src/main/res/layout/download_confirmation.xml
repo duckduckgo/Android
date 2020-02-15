@@ -1,6 +1,5 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
-  ~ Copyright (c) 2019 DuckDuckGo
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright (c) 2020 DuckDuckGo
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -15,197 +14,108 @@
   ~ limitations under the License.
   -->
 
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:custom="http://schemas.android.com/tools"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@color/white"
-    android:orientation="vertical"
-    android:padding="16dp">
+    app:layout_behavior="@string/bottom_sheet_behavior">
 
 
     <TextView
         android:id="@+id/download_message"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textColor="@android:color/black"
+        android:fontFamily="sans-serif"
+        android:paddingStart="24dp"
+        android:paddingTop="17dp"
+        android:paddingEnd="24dp"
+        android:textColor="@color/grayishTwo"
         android:textSize="16sp"
-        android:layout_marginBottom="16dp"
-        custom:text="Save sample-file.pdf ?" />
+        android:textStyle="normal"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="Save sample-file.pdf ?" />
+
 
     <LinearLayout
-        android:id="@+id/already_downloaded_options"
-        android:orientation="vertical"
+        android:id="@+id/download_actions"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintTop_toBottomOf="@id/download_message">
 
-        <RelativeLayout
+        <TextView
             android:id="@+id/open_with"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:clickable="true"
-            android:focusable="true"
             android:background="?attr/selectableItemBackground"
-            android:orientation="horizontal"
-            android:paddingLeft="10dp"
-            android:paddingTop="8dp"
-            android:paddingRight="10dp"
-            android:paddingBottom="8dp">
+            android:drawableStart="@drawable/ic_open_24dp"
+            android:drawablePadding="24dp"
+            android:fontFamily="sans-serif"
+            android:paddingStart="24dp"
+            android:paddingTop="24dp"
+            android:paddingEnd="24dp"
+            android:paddingBottom="17dp"
+            android:text="@string/open_with"
+            android:textColor="@color/brownishGray"
+            android:textSize="16sp"
+            android:textStyle="normal"
+            android:visibility="gone" />
 
-            <ImageView
-                android:id="@+id/open_with_icon"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:layout_marginEnd="32dp"
-                android:layout_alignParentStart="true"
-                android:layout_centerInParent="true"
-                android:src="@drawable/ic_menu_archive"
-                android:tint="#737373" />
-
-            <TextView
-                android:layout_toEndOf="@id/open_with_icon"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
-                android:text="@string/open_with"
-                android:textColor="@android:color/black"
-                android:id="@+id/open_with_text"
-                android:textSize="16sp" />
-            <TextView
-                android:layout_below="@+id/open_with_text"
-                android:layout_toEndOf="@id/open_with_icon"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
-                android:text="@string/file_already_downloaded"
-                android:textColor="@color/brownishGray"
-                android:textSize="12sp" />
-
-        </RelativeLayout>
-
-
-        <LinearLayout
+        <TextView
             android:id="@+id/replace"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:clickable="true"
-            android:focusable="true"
             android:background="?attr/selectableItemBackground"
-            android:orientation="horizontal"
-            android:paddingLeft="10dp"
-            android:paddingTop="8dp"
-            android:paddingRight="10dp"
-            android:paddingBottom="8dp">
+            android:drawableStart="@drawable/ic_replace_24dp"
+            android:drawablePadding="24dp"
+            android:fontFamily="sans-serif"
+            android:paddingStart="24dp"
+            android:paddingTop="24dp"
+            android:paddingEnd="24dp"
+            android:paddingBottom="17dp"
+            android:text="@string/replace"
+            android:textColor="@color/brownishGray"
+            android:textSize="16sp"
+            android:textStyle="normal"
+            android:visibility="gone" />
 
-            <ImageView
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:layout_marginEnd="32dp"
-                android:src="@drawable/ic_refresh_24dp"
-                android:tint="#737373" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
-                android:text="@string/replace"
-                android:textColor="@android:color/black"
-                android:textSize="16sp" />
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/keep_both"
+        <TextView
+            android:id="@+id/continue_download"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:clickable="true"
-            android:focusable="true"
             android:background="?attr/selectableItemBackground"
-            android:orientation="horizontal"
-            android:paddingLeft="10dp"
-            android:paddingTop="8dp"
-            android:paddingRight="10dp"
-            android:paddingBottom="8dp">
-
-            <ImageView
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:layout_marginEnd="32dp"
-                android:src="@android:drawable/ic_menu_save"
-                android:tint="#737373" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
-                android:text="@string/keep_both"
-                android:textColor="@android:color/black"
-                android:textSize="16sp" />
-
-        </LinearLayout>
-
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/continue_download"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:clickable="true"
-        android:focusable="true"
-        android:background="?attr/selectableItemBackground"
-        android:orientation="horizontal"
-        android:paddingLeft="10dp"
-        android:paddingTop="8dp"
-        android:paddingRight="10dp"
-        android:paddingBottom="8dp">
-
-        <ImageView
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:layout_marginEnd="32dp"
-            android:src="@android:drawable/ic_menu_save"
-            android:tint="#737373" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
+            android:drawableStart="@drawable/ic_file_24dp"
+            android:drawablePadding="24dp"
+            android:fontFamily="sans-serif"
+            android:paddingStart="24dp"
+            android:paddingTop="24dp"
+            android:paddingEnd="24dp"
+            android:paddingBottom="17dp"
             android:text="@string/fireContinue"
-            android:textColor="@android:color/black"
-            android:textSize="16sp" />
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/cancel"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:clickable="true"
-        android:focusable="true"
-        android:background="?attr/selectableItemBackground"
-        android:orientation="horizontal"
-        android:paddingLeft="10dp"
-        android:paddingTop="8dp"
-        android:paddingRight="10dp"
-        android:paddingBottom="8dp">
-
-        <ImageView
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:layout_marginEnd="32dp"
-            android:src="@android:drawable/ic_menu_close_clear_cancel"
-            android:tint="#737373" />
+            android:textColor="@color/brownishGray"
+            android:textSize="16sp"
+            android:textStyle="normal" />
 
         <TextView
-            android:layout_width="wrap_content"
+            android:id="@+id/cancel"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
+            android:background="?attr/selectableItemBackground"
+            android:drawableStart="@drawable/ic_cancel_24dp"
+            android:drawablePadding="24dp"
+            android:fontFamily="sans-serif"
+            android:paddingStart="24dp"
+            android:paddingTop="17dp"
+            android:paddingEnd="24dp"
+            android:paddingBottom="24dp"
             android:text="@string/fireCancel"
-            android:textColor="@android:color/black"
-            android:textSize="16sp" />
-
+            android:textColor="@color/brownishGray"
+            android:textSize="16sp"
+            android:textStyle="normal"
+            tools:ignore="UnusedAttribute" />
     </LinearLayout>
 
-
-</LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

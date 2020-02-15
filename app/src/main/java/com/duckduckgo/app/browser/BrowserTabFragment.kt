@@ -1064,7 +1064,9 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
                 ) {
                     val downloadConfirmationFragment =
                         DownloadConfirmationFragment(downloadFileData, userDownloadAction)
-                    downloadConfirmationFragment.show(fragmentManager!!, DOWNLAOD_CONFIRM_TAG)
+                    fragmentManager?.let {
+                        downloadConfirmationFragment.show(it, DOWNLAOD_CONFIRM_TAG)
+                    }
                 }
 
                 override fun downloadStarted() {
