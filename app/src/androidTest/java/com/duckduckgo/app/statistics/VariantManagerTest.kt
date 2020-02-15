@@ -16,67 +16,129 @@
 
 package com.duckduckgo.app.statistics
 
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertTrue
-import org.junit.Assert.fail
+import com.duckduckgo.app.statistics.VariantManager.VariantFeature.*
+import org.junit.Assert.*
 import org.junit.Test
 
 class VariantManagerTest {
 
     private val variants = VariantManager.ACTIVE_VARIANTS
 
+    // SERP Experiment(s)
+
     @Test
-    fun serpAndSharedControlVariantActive() {
+    fun serpControlVariantIsInactiveAndHasNoFeatures() {
         val variant = variants.firstOrNull { it.key == "sc" }
         assertEqualsDouble(0.0, variant!!.weight)
         assertEquals(0, variant.features.size)
     }
 
     @Test
-    fun serpExperimentalVariantActive() {
+    fun serpExperimentalVariantIsInactiveAndHasNoFeatures() {
         val variant = variants.firstOrNull { it.key == "se" }
         assertEqualsDouble(0.0, variant!!.weight)
         assertEquals(0, variant.features.size)
     }
 
+    // Concept test experiment
+
     @Test
-    fun conceptTestControlGroupVariantActive() {
+    fun conceptTestControlVariantIsInactiveAndHasNoFeatures() {
         val variant = variants.firstOrNull { it.key == "mc" }
+        assertEqualsDouble(0.0, variant!!.weight)
+        assertEquals(0, variant.features.size)
+    }
+
+    @Test
+    fun conceptTestNoCtaVariantIsInactiveAndHasSuppressCtaFeatures() {
+        val variant = variants.firstOrNull { it.key == "md" }
+        assertEqualsDouble(0.0, variant!!.weight)
+        assertEquals(2, variant!!.features.size)
+        assertTrue(variant.hasFeature(SuppressWidgetCta))
+        assertTrue(variant.hasFeature(SuppressDefaultBrowserCta))
+    }
+
+    @Test
+    fun conceptTestExperimentalVariantIsInactiveAndHasConceptTestAndSuppressCtaFeatures() {
+        val variant = variants.firstOrNull { it.key == "me" }
+        assertEqualsDouble(0.0, variant!!.weight)
+        assertEquals(3, variant!!.features.size)
+        assertTrue(variant.hasFeature(ConceptTest))
+        assertTrue(variant.hasFeature(SuppressWidgetCta))
+        assertTrue(variant.hasFeature(SuppressDefaultBrowserCta))
+    }
+
+    // CTA Validation experiments
+
+    @Test
+    fun ctaControlVariantIsInactiveAndHasNoFeatures() {
+        val variant = variants.firstOrNull { it.key == "mq" }
+        assertEqualsDouble(0.0, variant!!.weight)
+        assertEquals(0, variant!!.features.size)
+    }
+
+    @Test
+    fun ctaSuppressDefaultBrowserVariantIsInactiveAndHasSuppressDefaultBrowserFeature() {
+        val variant = variants.firstOrNull { it.key == "mr" }
+        assertEqualsDouble(0.0, variant!!.weight)
+        assertEquals(1, variant!!.features.size)
+        assertTrue(variant.hasFeature(SuppressDefaultBrowserCta))
+    }
+
+    @Test
+    fun ctaSuppressWidgetVariantIsInactiveAndHasSuppressWidgetCtaFeature() {
+        val variant = variants.firstOrNull { it.key == "ms" }
+        assertEqualsDouble(0.0, variant!!.weight)
+        assertEquals(1, variant!!.features.size)
+        assertTrue(variant.hasFeature(SuppressWidgetCta))
+    }
+
+    @Test
+    fun ctaSuppressAllVariantIsInactiveAndHasSuppressCtaFeatures() {
+        val variant = variants.firstOrNull { it.key == "mt" }
+        assertEqualsDouble(0.0, variant!!.weight)
+        assertEquals(2, variant!!.features.size)
+        assertTrue(variant.hasFeature(SuppressDefaultBrowserCta))
+        assertTrue(variant.hasFeature(SuppressWidgetCta))
+    }
+
+    // CTA on Concept Test experiments
+
+    @Test
+    fun insertCtaControlVariantIsActiveAndHasNoFeatures() {
+        val variant = variants.firstOrNull { it.key == "mu" }
         assertEqualsDouble(1.0, variant!!.weight)
         assertEquals(0, variant.features.size)
     }
 
     @Test
-    fun conceptTestControlGroupVariantHasNoExperimentFeatures() {
-        val variant = variants.firstOrNull { it.key == "mc" }
-        assertEquals(0, variant!!.features.size)
-    }
-
-    @Test
-    fun conceptTestExistingNoCtaExperimentVariantActive() {
-        val variant = variants.firstOrNull { it.key == "md" }
+    fun insertCtaConceptTestVariantIsActiveAndHasConceptTestAndSuppressCtaFeatures() {
+        val variant = variants.firstOrNull { it.key == "mv" }
         assertEqualsDouble(1.0, variant!!.weight)
+        assertEquals(3, variant!!.features.size)
+        assertTrue(variant.hasFeature(ConceptTest))
+        assertTrue(variant.hasFeature(SuppressWidgetCta))
+        assertTrue(variant.hasFeature(SuppressDefaultBrowserCta))
     }
 
     @Test
-    fun conceptTestExistingNoCtaExperimentVariantHasExperimentalExistingNoCta() {
-        val variant = variants.firstOrNull { it.key == "md" }
-        assertEquals(1, variant!!.features.size)
-        assertTrue(variant.hasFeature(VariantManager.VariantFeature.ExistingNoCta))
-    }
-
-    @Test
-    fun conceptTestExperimentVariantActive() {
-        val variant = variants.firstOrNull { it.key == "me" }
+    fun insertCtaConceptTestWithAllCtaExperimentalVariantIsActiveAndHasConceptTestAndSuppressCtaFeatures() {
+        val variant = variants.firstOrNull { it.key == "mz" }
         assertEqualsDouble(1.0, variant!!.weight)
+        assertEquals(2, variant!!.features.size)
+        assertTrue(variant.hasFeature(ConceptTest))
     }
 
     @Test
-    fun conceptTestExperimentVariantHasExperimentalExistingNoCta() {
-        val variant = variants.firstOrNull { it.key == "me" }
-        assertEquals(1, variant!!.features.size)
-        assertTrue(variant.hasFeature(VariantManager.VariantFeature.ConceptTest))
+    fun verifyNoDuplicateVariantNames() {
+        val existingNames = mutableSetOf<String>()
+        variants.forEach {
+            if (!existingNames.add(it.key)) {
+                fail("Duplicate variant name found: ${it.key}")
+            }
+        }
     }
+
 
     @Suppress("SameParameterValue")
     private fun assertEqualsDouble(expected: Double, actual: Double) {

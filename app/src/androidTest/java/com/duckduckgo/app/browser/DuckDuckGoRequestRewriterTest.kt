@@ -18,6 +18,7 @@ package com.duckduckgo.app.browser
 
 import android.net.Uri
 import com.duckduckgo.app.global.AppUrl.ParamKey
+import com.duckduckgo.app.referral.AppReferrerDataStore
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.model.Atb
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
@@ -30,14 +31,16 @@ import org.junit.Test
 class DuckDuckGoRequestRewriterTest {
 
     private lateinit var testee: DuckDuckGoRequestRewriter
-    private var mockStatisticsStore: StatisticsDataStore = mock()
-    private var mockVariantManager: VariantManager = mock()
+    private val mockStatisticsStore: StatisticsDataStore = mock()
+    private val mockVariantManager: VariantManager = mock()
+    private val mockAppReferrerDataStore: AppReferrerDataStore = mock()
     private lateinit var builder: Uri.Builder
 
     @Before
     fun before() {
         whenever(mockVariantManager.getVariant()).thenReturn(VariantManager.DEFAULT_VARIANT)
-        testee = DuckDuckGoRequestRewriter(DuckDuckGoUrlDetector(), mockStatisticsStore, mockVariantManager)
+        whenever(mockAppReferrerDataStore.installedFromEuAuction).thenReturn(false)
+        testee = DuckDuckGoRequestRewriter(DuckDuckGoUrlDetector(), mockStatisticsStore, mockVariantManager, mockAppReferrerDataStore)
         builder = Uri.Builder()
     }
 
@@ -47,6 +50,15 @@ class DuckDuckGoRequestRewriterTest {
         val uri = builder.build()
         assertTrue(uri.queryParameterNames.contains(ParamKey.SOURCE))
         assertEquals("ddg_android", uri.getQueryParameter(ParamKey.SOURCE))
+    }
+
+    @Test
+    fun whenAddingCustomParamsAndUserSourcedFromEuAuctionThenEuSourceParameterIsAdded() {
+        whenever(mockAppReferrerDataStore.installedFromEuAuction).thenReturn(true)
+        testee.addCustomQueryParams(builder)
+        val uri = builder.build()
+        assertTrue(uri.queryParameterNames.contains(ParamKey.SOURCE))
+        assertEquals("ddg_androideu", uri.getQueryParameter(ParamKey.SOURCE))
     }
 
     @Test

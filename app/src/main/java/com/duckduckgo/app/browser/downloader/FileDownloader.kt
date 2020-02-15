@@ -48,6 +48,7 @@ class FileDownloader @Inject constructor(
         val contentDisposition: String? = null,
         val mimeType: String? = null,
         val subfolder: String,
+        val userAgent: String,
         val directory: File = Environment.getExternalStoragePublicDirectory(subfolder)
     )
 

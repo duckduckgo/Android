@@ -19,6 +19,7 @@ package com.duckduckgo.app.browser
 import android.annotation.SuppressLint
 import android.graphics.Bitmap
 import android.net.Uri
+import android.os.Message
 import android.view.ContextMenu
 import android.view.MenuItem
 import android.view.View
@@ -163,6 +164,7 @@ class BrowserTabViewModel(
         class NavigateBack(val steps: Int) : Command()
         object NavigateForward : Command()
         class OpenInNewTab(val query: String) : Command()
+        class OpenMessageInNewTab(val message: Message) : Command()
         class OpenInNewBackgroundTab(val query: String) : Command()
         object LaunchNewTab : Command()
         object ResetHistory : Command()
@@ -238,6 +240,10 @@ class BrowserTabViewModel(
         }
     }
 
+    fun onMessageProcessed() {
+        showBrowser()
+    }
+
     private fun buildSiteFactory(url: String, title: String? = null) {
 
         if (buildingSiteFactoryJob?.isCompleted == false) {
@@ -286,11 +292,17 @@ class BrowserTabViewModel(
         browserChromeClient.webViewClientListener = this
     }
 
-    fun onViewVisible() {
+    fun onViewResumed() {
         command.value = if (!currentBrowserViewState().browserShowing) ShowKeyboard else HideKeyboard
-        refreshCta(true)
         if (currentGlobalLayoutState() is Invalidated && currentBrowserViewState().browserShowing) {
             showErrorWithAction()
+        }
+    }
+
+    fun onViewVisible() {
+        //we expect refreshCta to be called when a site is fully loaded if browsingShowing -trackers data available-.
+        if (!currentBrowserViewState().browserShowing) {
+            refreshCta()
         }
     }
 
@@ -777,10 +789,17 @@ class BrowserTabViewModel(
     }
 
     fun determineShowBrowser() {
-        browserViewState.value = currentBrowserViewState().copy(browserShowing = !url.isNullOrBlank())
+        val showBrowser = currentBrowserViewState().browserShowing || !url.isNullOrBlank()
+        browserViewState.value = currentBrowserViewState().copy(browserShowing = showBrowser)
+    }
+
+    private fun showBrowser() {
+        browserViewState.value = currentBrowserViewState().copy(browserShowing = true)
+        globalLayoutState.value = Browser(isNewTabState = false)
     }
 
     private fun removeAtbAndSourceParamsFromSearch(url: String): String {
+
         if (!duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(url)) {
             return url
         }
@@ -844,7 +863,7 @@ class BrowserTabViewModel(
     fun onSurveyChanged(survey: Survey?) {
         val activeSurvey = ctaViewModel.onSurveyChanged(survey)
         if (activeSurvey != null) {
-            refreshCta(true)
+            refreshCta()
         }
     }
 
@@ -857,18 +876,20 @@ class BrowserTabViewModel(
         ctaViewModel.onCtaShown(cta)
     }
 
-    fun refreshCta(isNewTab: Boolean) {
-        viewModelScope.launch {
-            val cta = withContext(dispatchers.io()) {
-                ctaViewModel.refreshCta(dispatchers.io(), isNewTab, siteLiveData.value)
+    fun refreshCta() {
+        if (currentGlobalLayoutState() is Browser) {
+            viewModelScope.launch {
+                val cta = withContext(dispatchers.io()) {
+                    ctaViewModel.refreshCta(dispatchers.io(), currentBrowserViewState().browserShowing, siteLiveData.value)
+                }
+                ctaViewState.value = currentCtaViewState().copy(cta = cta)
             }
-            ctaViewState.value = currentCtaViewState().copy(cta = cta)
         }
     }
 
-    fun registerDaxBubbleCtaShown() {
+    fun registerDaxBubbleCtaDismissed() {
         val cta = ctaViewState.value?.cta ?: return
-        ctaViewModel.registerDaxBubbleCtaShown(cta)
+        ctaViewModel.registerDaxBubbleCtaDismissed(cta)
     }
 
     fun onUserClickCtaOkButton() {
@@ -887,7 +908,7 @@ class BrowserTabViewModel(
 
         ctaViewModel.onUserDismissedCta(cta)
         if (cta is HomePanelCta) {
-            refreshCta(true)
+            refreshCta()
         } else {
             ctaViewState.value = currentCtaViewState().copy(cta = null)
         }
@@ -903,6 +924,14 @@ class BrowserTabViewModel(
 
     override fun externalAppLinkClicked(appLink: IntentType) {
         command.value = HandleExternalAppLink(appLink)
+    }
+
+    override fun openInNewTab(url: String?) {
+        command.value = OpenInNewTab(url.orEmpty())
+    }
+
+    override fun openMessageInNewTab(message: Message) {
+        command.value = OpenMessageInNewTab(message)
     }
 
     override fun recoverFromRenderProcessGone() {

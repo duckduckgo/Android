@@ -28,10 +28,14 @@ import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.privacy.store.PrivacySettingsStore
 import com.duckduckgo.app.settings.db.SettingsDataStore
+import com.duckduckgo.app.statistics.Variant
 import com.duckduckgo.app.statistics.VariantManager
+import com.duckduckgo.app.statistics.VariantManager.VariantFeature.ConceptTest
+import com.duckduckgo.app.statistics.VariantManager.VariantFeature.SuppressWidgetCta
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.survey.db.SurveyDao
 import com.duckduckgo.app.survey.model.Survey
+import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import com.duckduckgo.app.widget.ui.WidgetCapabilities
 import io.reactivex.schedulers.Schedulers
 import kotlinx.coroutines.withContext
@@ -68,14 +72,19 @@ class CtaViewModel @Inject constructor(
 
     fun onCtaShown(cta: Cta) {
         cta.shownPixel?.let {
-            pixel.fire(it, cta.pixelShownParameters())
+            val canSendPixel = when (cta) {
+                is DaxCta -> cta.canSendShownPixel()
+                else -> true
+            }
+            if (canSendPixel) {
+                pixel.fire(it, cta.pixelShownParameters())
+            }
         }
     }
 
-    fun registerDaxBubbleCtaShown(cta: Cta) {
+    fun registerDaxBubbleCtaDismissed(cta: Cta) {
         if (cta is DaxBubbleCta) {
             Schedulers.io().scheduleDirect {
-                onCtaShown(cta)
                 dismissedCtaDao.insert(DismissedCta(cta.ctaId))
             }
         }
@@ -102,27 +111,41 @@ class CtaViewModel @Inject constructor(
         }
     }
 
-    suspend fun refreshCta(dispatcher: CoroutineContext, isNewTab: Boolean, site: Site? = null): Cta? {
+    suspend fun refreshCta(dispatcher: CoroutineContext, isBrowserShowing: Boolean, site: Site? = null): Cta? {
         surveyCta()?.let {
             return it
         }
 
         return withContext(dispatcher) {
-            when {
-                canShowDaxIntroCta() && isNewTab -> {
-                    DaxBubbleCta.DaxIntroCta(onboardingStore, appInstallStore)
-                }
-                canShowDaxCtaEndOfJourney(site) && isNewTab -> {
-                    DaxBubbleCta.DaxEndCta(onboardingStore, appInstallStore)
-                }
-                shouldShowDaxCta(site) != null && !isNewTab -> {
-                    shouldShowDaxCta(site)
-                }
-                canShowWidgetCta() && isNewTab -> {
-                    if (widgetCapabilities.supportsAutomaticWidgetAdd) AddWidgetAuto else AddWidgetInstructions
-                }
-                else -> null
+            if (isBrowserShowing) {
+                getBrowserCta(site)
+            } else {
+                getHomeCta()
             }
+        }
+    }
+
+    private fun getHomeCta(): Cta? {
+        return when {
+            canShowDaxIntroCta() -> {
+                DaxBubbleCta.DaxIntroCta(onboardingStore, appInstallStore)
+            }
+            canShowDaxCtaEndOfJourney() -> {
+                DaxBubbleCta.DaxEndCta(onboardingStore, appInstallStore)
+            }
+            canShowWidgetCta() -> {
+                if (widgetCapabilities.supportsAutomaticWidgetAdd) AddWidgetAuto else AddWidgetInstructions
+            }
+            else -> null
+        }
+    }
+
+    private fun getBrowserCta(site: Site?): Cta? {
+        return when {
+            canShowDaxDialogCta() -> {
+                getDaxDialogCta(site)
+            }
+            else -> null
         }
     }
 
@@ -143,28 +166,29 @@ class CtaViewModel @Inject constructor(
         return widgetCapabilities.supportsStandardWidgetAdd &&
                 !widgetCapabilities.hasInstalledWidgets &&
                 !dismissedCtaDao.exists(CtaId.ADD_WIDGET) &&
-                !isFromConceptTestVariant() &&
-                !isFromNoCtaVariant()
+                !variant().hasFeature(SuppressWidgetCta)
     }
 
     @WorkerThread
     private fun canShowDaxIntroCta(): Boolean = isFromConceptTestVariant() && !daxDialogIntroShown() && !settingsDataStore.hideTips
 
     @WorkerThread
-    private fun canShowDaxCtaEndOfJourney(site: Site?): Boolean = isFromConceptTestVariant() &&
+    private fun canShowDaxCtaEndOfJourney(): Boolean = isFromConceptTestVariant() &&
             hasPrivacySettingsOn() &&
             !daxDialogEndShown() &&
             daxDialogIntroShown() &&
             !settingsDataStore.hideTips &&
-            site == null &&
             (daxDialogNetworkShown() || daxDialogOtherShown() || daxDialogSerpShown() || daxDialogTrackersFoundShown())
 
-    @WorkerThread
-    private fun shouldShowDaxCta(site: Site?): Cta? {
+    private fun canShowDaxDialogCta(): Boolean {
         if (settingsDataStore.hideTips || !isFromConceptTestVariant() || !hasPrivacySettingsOn()) {
-            return null
+            return false
         }
+        return true
+    }
 
+    @WorkerThread
+    private fun getDaxDialogCta(site: Site?): Cta? {
         val nonNullSite = site ?: return null
 
         nonNullSite.let {
@@ -172,7 +196,7 @@ class CtaViewModel @Inject constructor(
             val host = it.uri?.host
             if (it.entity != null && host != null) {
                 it.entity?.let { entity ->
-                    if (!daxDialogNetworkShown() && DaxDialogCta.MAIN_TRACKER_NETWORKS.contains(entity.displayName)) {
+                    if (!daxDialogNetworkShown() && DaxDialogCta.mainTrackerNetworks.contains(entity.displayName)) {
                         return DaxDialogCta.DaxMainNetworkCta(onboardingStore, appInstallStore, entity.displayName, host)
                     }
                 }
@@ -182,7 +206,7 @@ class CtaViewModel @Inject constructor(
                 return DaxDialogCta.DaxSerpCta(onboardingStore, appInstallStore)
             }
             // Trackers blocked
-            return if (!daxDialogTrackersFoundShown() && !isSerpUrl(it.url) && it.trackerCount > 0 && host != null) {
+            return if (!daxDialogTrackersFoundShown() && !isSerpUrl(it.url) && hasTrackersInformation(it.trackingEvents) && host != null) {
                 DaxDialogCta.DaxTrackersBlockedCta(onboardingStore, appInstallStore, it.trackingEvents, host)
             } else if (!isSerpUrl(it.url) && !daxDialogOtherShown() && !daxDialogTrackersFoundShown() && !daxDialogNetworkShown()) {
                 DaxDialogCta.DaxNoSerpCta(onboardingStore, appInstallStore)
@@ -192,11 +216,18 @@ class CtaViewModel @Inject constructor(
         }
     }
 
+    private fun hasTrackersInformation(events: List<TrackingEvent>): Boolean =
+        events.asSequence()
+            .filter { it.entity?.isMajor == true }
+            .map { it.entity?.displayName }
+            .filterNotNull()
+            .any()
+
     private fun hasPrivacySettingsOn(): Boolean = settingsPrivacySettingsStore.privacyOn
 
-    private fun isFromConceptTestVariant(): Boolean = variantManager.getVariant().hasFeature(VariantManager.VariantFeature.ConceptTest)
+    private fun variant(): Variant = variantManager.getVariant()
 
-    private fun isFromNoCtaVariant(): Boolean = variantManager.getVariant().hasFeature(VariantManager.VariantFeature.ExistingNoCta)
+    private fun isFromConceptTestVariant(): Boolean = variantManager.getVariant().hasFeature(ConceptTest)
 
     private fun daxDialogIntroShown(): Boolean = dismissedCtaDao.exists(CtaId.DAX_INTRO)
 

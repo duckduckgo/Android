@@ -19,6 +19,7 @@ package com.duckduckgo.app.statistics
 import androidx.annotation.WorkerThread
 import com.duckduckgo.app.statistics.VariantManager.Companion.DEFAULT_VARIANT
 import com.duckduckgo.app.statistics.VariantManager.Companion.referrerVariant
+import com.duckduckgo.app.statistics.VariantManager.VariantFeature.*
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import timber.log.Timber
 import java.util.*
@@ -26,27 +27,52 @@ import java.util.*
 @WorkerThread
 interface VariantManager {
 
+    // variant-dependant features listed here
     sealed class VariantFeature {
-        // variant-dependant features listed here
         object ConceptTest : VariantFeature()
-
-        object ExistingNoCta : VariantFeature()
+        object SuppressWidgetCta : VariantFeature()
+        object SuppressDefaultBrowserCta : VariantFeature()
+        object SuppressDefaultBrowserContinueScreen : VariantFeature()
     }
 
     companion object {
+
+        const val RESERVED_EU_AUCTION_VARIANT = "ml"
 
         // this will be returned when there are no other active experiments
         val DEFAULT_VARIANT = Variant(key = "", features = emptyList(), filterBy = { noFilter() })
 
         val ACTIVE_VARIANTS = listOf(
-
             // SERP variants. "sc" may also be used as a shared control for mobile experiments in
             // the future if we can filter by app version
             Variant(key = "sc", weight = 0.0, features = emptyList(), filterBy = { noFilter() }),
             Variant(key = "se", weight = 0.0, features = emptyList(), filterBy = { noFilter() }),
-            Variant(key = "mc", weight = 1.0, features = emptyList(), filterBy = { isEnglishLocale() }),
-            Variant(key = "me", weight = 1.0, features = listOf(VariantFeature.ConceptTest), filterBy = { isEnglishLocale() }),
-            Variant(key = "md", weight = 1.0, features = listOf(VariantFeature.ExistingNoCta), filterBy = { isEnglishLocale() })
+
+            // Concept test experiment
+            Variant(key = "mc", weight = 0.0, features = emptyList(), filterBy = { isEnglishLocale() }),
+            Variant(
+                key = "me",
+                weight = 0.0,
+                features = listOf(ConceptTest, SuppressWidgetCta, SuppressDefaultBrowserCta),
+                filterBy = { isEnglishLocale() }),
+            Variant(key = "md", weight = 0.0, features = listOf(SuppressWidgetCta, SuppressDefaultBrowserCta), filterBy = { isEnglishLocale() }),
+
+            // Validate CTAs experiment
+            Variant(key = "mq", weight = 0.0, features = emptyList(), filterBy = { noFilter() }),
+            Variant(key = "mr", weight = 0.0, features = listOf(SuppressDefaultBrowserCta), filterBy = { noFilter() }),
+            Variant(key = "ms", weight = 0.0, features = listOf(SuppressWidgetCta), filterBy = { noFilter() }),
+            Variant(key = "mt", weight = 0.0, features = listOf(SuppressWidgetCta, SuppressDefaultBrowserCta), filterBy = { noFilter() }),
+
+            // Insert CTAs on Concept test experiment
+            Variant(key = "mu", weight = 1.0, features = emptyList(), filterBy = { isEnglishLocale() }),
+            Variant(key = "mv", weight = 1.0,
+                features = listOf(ConceptTest, SuppressWidgetCta, SuppressDefaultBrowserCta),
+                filterBy = { isEnglishLocale() }),
+            Variant(
+                key = "mz",
+                weight = 1.0,
+                features = listOf(ConceptTest, SuppressDefaultBrowserContinueScreen),
+                filterBy = { isEnglishLocale() })
 
             // All groups in an experiment (control and variants) MUST use the same filters
         )

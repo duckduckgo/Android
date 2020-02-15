@@ -22,6 +22,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.Intent.EXTRA_TEXT
 import android.os.Bundle
+import android.os.Message
 import android.widget.Toast
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.Observer
@@ -50,12 +51,8 @@ import kotlinx.coroutines.*
 import org.jetbrains.anko.longToast
 import timber.log.Timber
 import javax.inject.Inject
-import kotlin.coroutines.CoroutineContext
 
-class BrowserActivity : DuckDuckGoActivity(), CoroutineScope {
-
-    override val coroutineContext: CoroutineContext
-        get() = SupervisorJob() + Dispatchers.Main
+class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope() {
 
     @Inject
     lateinit var clearPersonalDataAction: ClearPersonalDataAction
@@ -81,6 +78,8 @@ class BrowserActivity : DuckDuckGoActivity(), CoroutineScope {
 
     private lateinit var renderer: BrowserStateRenderer
 
+    private var openMessageInNewTabJob: Job? = null
+
     @SuppressLint("MissingSuperCall")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.daggerInject()
@@ -100,6 +99,16 @@ class BrowserActivity : DuckDuckGoActivity(), CoroutineScope {
         viewModel.awaitClearDataFinishedNotification()
     }
 
+    override fun onStop() {
+        openMessageInNewTabJob?.cancel()
+        super.onStop()
+    }
+
+    override fun onDestroy() {
+        currentTab = null
+        super.onDestroy()
+    }
+
     override fun onNewIntent(intent: Intent?) {
         super.onNewIntent(intent)
         Timber.i("onNewIntent: $intent")
@@ -113,7 +122,7 @@ class BrowserActivity : DuckDuckGoActivity(), CoroutineScope {
         }
     }
 
-    private fun openNewTab(tabId: String, url: String? = null, skipHome: Boolean) {
+    private fun openNewTab(tabId: String, url: String? = null, skipHome: Boolean): BrowserTabFragment {
         Timber.i("Opening new tab, url: $url, tabId: $tabId")
         val fragment = BrowserTabFragment.newInstance(tabId, url, skipHome)
         val transaction = supportFragmentManager.beginTransaction()
@@ -126,6 +135,7 @@ class BrowserActivity : DuckDuckGoActivity(), CoroutineScope {
         }
         transaction.commit()
         currentTab = fragment
+        return fragment
     }
 
     private fun selectTab(tab: TabEntity?) {
@@ -285,6 +295,14 @@ class BrowserActivity : DuckDuckGoActivity(), CoroutineScope {
 
     fun openInNewTab(query: String) {
         launch { viewModel.onOpenInNewTabRequested(query) }
+    }
+
+    fun openMessageInNewTab(message: Message) {
+        openMessageInNewTabJob = launch {
+            val tabId = viewModel.onNewTabRequested()
+            val fragment = openNewTab(tabId, null, false)
+            fragment.messageFromPreviousTab = message
+        }
     }
 
     fun launchBrokenSiteFeedback(url: String?) {

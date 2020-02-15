@@ -18,6 +18,7 @@ package com.duckduckgo.app.browser
 
 import android.net.Uri
 import com.duckduckgo.app.browser.omnibar.QueryUrlConverter
+import com.duckduckgo.app.referral.AppReferrerDataStore
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.nhaarman.mockitokotlin2.mock
@@ -28,7 +29,8 @@ class QueryUrlConverterTest {
 
     private var mockStatisticsStore: StatisticsDataStore = mock()
     private val variantManager: VariantManager = mock()
-    private val requestRewriter = DuckDuckGoRequestRewriter(DuckDuckGoUrlDetector(), mockStatisticsStore, variantManager)
+    private val mockAppReferrerDataStore: AppReferrerDataStore = mock()
+    private val requestRewriter = DuckDuckGoRequestRewriter(DuckDuckGoUrlDetector(), mockStatisticsStore, variantManager, mockAppReferrerDataStore)
     private val testee: QueryUrlConverter = QueryUrlConverter(requestRewriter)
 
     @Test

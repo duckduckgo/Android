@@ -84,6 +84,21 @@
                 <data android:scheme="http" />
             </intent-filter>
 
+            <!-- Allows app to handle the specified MIME types that use the specified schemes, and to become the default handler for them -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.BROWSABLE" />
+                <category android:name="android.intent.category.DEFAULT" />
+
+                <data android:scheme="https" />
+                <data android:scheme="http" />
+
+                <data android:mimeType="text/html" />
+                <data android:mimeType="text/plain" />
+                <data android:mimeType="application/xhtml+xml" />
+            </intent-filter>
+
             <!-- Allows apps to consume links and text shared from other apps e.g chrome -->
             <intent-filter>
                 <action android:name="android.intent.action.SEND" />

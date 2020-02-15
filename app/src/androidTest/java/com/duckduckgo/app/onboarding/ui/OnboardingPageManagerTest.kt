@@ -29,14 +29,14 @@ import org.junit.Test
 class OnboardingPageManagerTest {
 
     private lateinit var testee: OnboardingPageManager
-    private val variantManager: VariantManager = mock()
+    private val mockVariantManager: VariantManager = mock()
     private val onboardingPageBuilder: OnboardingPageBuilder = mock()
     private val mockDefaultBrowserDetector: DefaultBrowserDetector = mock()
 
     @Before
     fun setup() {
-        whenever(variantManager.getVariant()).thenReturn(Variant("test", features = emptyList(), filterBy = { true }))
-        testee = OnboardingPageManagerWithTrackerBlocking(onboardingPageBuilder, mockDefaultBrowserDetector, variantManager)
+        whenever(mockVariantManager.getVariant()).thenReturn(Variant("test", features = emptyList(), filterBy = { true }))
+        testee = OnboardingPageManagerWithTrackerBlocking(onboardingPageBuilder, mockDefaultBrowserDetector, mockVariantManager)
     }
 
     @Test
@@ -55,6 +55,17 @@ class OnboardingPageManagerTest {
         assertEquals(R.string.onboardingContinueFinalPage, resourceId)
     }
 
+    @Test
+    fun whenDDGAsDefaultBrowserAndSuppressContinueScreenVariantEnabledThenSinglePageOnBoarding() {
+        configureDeviceSupportsDefaultBrowser()
+        givenSuppressDefaultBrowserContinueScreen()
+        whenever(mockDefaultBrowserDetector.isDefaultBrowser()).thenReturn(true)
+
+        testee.buildPageBlueprints()
+
+        assertEquals(1, testee.pageCount())
+    }
+
     private fun configureDeviceSupportsDefaultBrowser() {
         whenever(mockDefaultBrowserDetector.deviceSupportsDefaultBrowserConfiguration()).thenReturn(true)
     }
@@ -63,4 +74,12 @@ class OnboardingPageManagerTest {
         whenever(mockDefaultBrowserDetector.deviceSupportsDefaultBrowserConfiguration()).thenReturn(false)
     }
 
+    private fun givenSuppressDefaultBrowserContinueScreen() {
+        whenever(mockVariantManager.getVariant()).thenReturn(
+            Variant("test", features = listOf(
+                VariantManager.VariantFeature.ConceptTest,
+                VariantManager.VariantFeature.SuppressDefaultBrowserContinueScreen
+            ), filterBy = { true })
+        )
+    }
 }
