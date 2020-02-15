@@ -109,6 +109,7 @@ import com.duckduckgo.app.cta.ui.DaxDialogCta
 import com.duckduckgo.app.cta.ui.HomePanelCta
 import com.duckduckgo.app.global.ViewModelFactory
 import com.duckduckgo.app.global.device.DeviceInfo
+import com.duckduckgo.app.global.view.DaxDialog
 import com.duckduckgo.app.global.view.NonDismissibleBehavior
 import com.duckduckgo.app.global.view.TextChangedWatcher
 import com.duckduckgo.app.global.view.gone
