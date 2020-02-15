@@ -136,7 +136,7 @@
                     android:layout_marginTop="-6dp"
                     android:backgroundTint="?attr/daxDialogBackgroundColor"
                     android:textAllCaps="false"
-                    android:textColor="?attr/daxDialogSecondaryTextColor"
+                    android:textColor="?attr/daxDialogSecondaryButtonTextColor"
                     android:visibility="gone"
                     app:cornerRadius="20dp"
                     app:rippleColor="?attr/daxDialogSecondaryButtonRippleColor" />

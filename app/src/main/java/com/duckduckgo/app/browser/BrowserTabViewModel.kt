@@ -55,7 +55,11 @@ import com.duckduckgo.app.browser.model.LongPressTarget
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.browser.ui.HttpAuthenticationDialogFragment.HttpAuthenticationListener
-import com.duckduckgo.app.cta.ui.*
+import com.duckduckgo.app.cta.ui.Cta
+import com.duckduckgo.app.cta.ui.HomePanelCta
+import com.duckduckgo.app.cta.ui.CtaViewModel
+import com.duckduckgo.app.cta.ui.DaxDialogCta
+import com.duckduckgo.app.cta.ui.SecondaryButtonCta
 import com.duckduckgo.app.global.*
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.global.model.SiteFactory
@@ -906,6 +910,15 @@ class BrowserTabViewModel(
         ctaViewModel.onUserClickCtaSecondaryButton(cta)
     }
 
+    fun onUserDismissedCta(dismissedCta: Cta) {
+        ctaViewModel.onUserDismissedCta(dismissedCta)
+        if (dismissedCta is HomePanelCta) {
+            refreshCta()
+        } else {
+            ctaViewState.value = currentCtaViewState().copy(cta = null)
+        }
+    }
+
     private fun produceNewCommand(cta: Cta) {
         command.value = when (cta) {
             is HomePanelCta.Survey -> LaunchSurvey(cta.survey)
@@ -914,15 +927,6 @@ class BrowserTabViewModel(
             is DaxDialogCta.DefaultBrowserCta -> cta.produceAction().mapToCommand()
             is DaxDialogCta.SearchWidgetCta -> cta.produceAction().mapToCommand()
             else -> return
-        }
-    }
-
-    fun onUserDismissedCta(dismissedCta: Cta) {
-        ctaViewModel.onUserDismissedCta(dismissedCta)
-        if (dismissedCta is HomePanelCta) {
-            refreshCta()
-        } else {
-            ctaViewState.value = currentCtaViewState().copy(cta = null)
         }
     }
 

@@ -30,7 +30,12 @@ import com.duckduckgo.app.cta.ui.DaxCta.Companion.MAX_DAYS_ALLOWED
 import com.duckduckgo.app.global.baseHost
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.install.daysInstalled
-import com.duckduckgo.app.global.view.*
+import com.duckduckgo.app.global.view.DaxDialog
+import com.duckduckgo.app.global.view.DaxDialogHighlightView
+import com.duckduckgo.app.global.view.TypewriterDaxDialog
+import com.duckduckgo.app.global.view.hide
+import com.duckduckgo.app.global.view.html
+import com.duckduckgo.app.global.view.show
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
@@ -282,7 +287,7 @@ sealed class DaxDialogCta(
 
         fun setSecondDialog(dialog: DaxDialog, activity: FragmentActivity) {
             ctaPixelParam = Pixel.PixelValues.DAX_NETWORK_CTA_2
-            dialog.setButtonText(activity.resources.getString(R.string.daxMainNetworkStep2CtaText, firstParagraph(activity), network))
+            dialog.setDaxText(activity.resources.getString(R.string.daxMainNetworkStep2CtaText, firstParagraph(activity), network))
             dialog.setButtonText(activity.resources.getString(R.string.daxDialogGotIt))
             dialog.onAnimationFinishedListener { }
             dialog.setDialogAndStartAnimation()

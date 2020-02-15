@@ -49,7 +49,7 @@
     <attr name="feedbackEditTextBackgroundColor" format="color" />
     <attr name="feedbackEditTextHintColor" format="color" />
     <attr name="daxDialogBackgroundColor" format="color" />
-    <attr name="daxDialogSecondaryTextColor" format="color" />
+    <attr name="daxDialogSecondaryButtonTextColor" format="color" />
     <attr name="daxDialogSecondaryButtonRippleColor" format="color" />
 
 </resources>

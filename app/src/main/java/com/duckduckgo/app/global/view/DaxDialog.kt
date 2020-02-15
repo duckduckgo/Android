@@ -74,9 +74,11 @@ class TypewriterDaxDialog(
         attributes?.gravity = Gravity.BOTTOM
         window?.attributes = attributes
         window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-        setStyle(STYLE_NO_TITLE, android.R.style.Theme_DeviceDefault_Light_NoActionBar)
-
         return dialog
+    }
+
+    override fun getTheme(): Int {
+        return R.style.DaxDialogFragment
     }
 
     override fun onStart() {
