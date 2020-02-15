@@ -174,6 +174,14 @@ class CtaViewModelTest {
     }
 
     @Test
+    fun whenCtaSecondaryButonClickedPixelIsFired() {
+        val secondaryButtonCta = mock<SecondaryButtonCta>()
+        whenever(secondaryButtonCta.secondaryButtonPixel).thenReturn(ONBOARDING_DAX_ALL_CTA_HIDDEN)
+        testee.onUserClickCtaSecondaryButton(secondaryButtonCta)
+        verify(mockPixel).fire(eq(ONBOARDING_DAX_ALL_CTA_HIDDEN), any())
+    }
+
+    @Test
     fun whenCtaDismissedPixelIsFired() {
         testee.onUserDismissedCta(HomePanelCta.Survey(Survey("abc", "http://example.com", 1, SCHEDULED)))
         verify(mockPixel).fire(eq(SURVEY_CTA_DISMISSED), any())

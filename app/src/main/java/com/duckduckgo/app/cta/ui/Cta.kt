@@ -71,6 +71,12 @@ interface Cta {
     fun pixelOkParameters(): Map<String, String?>
 }
 
+interface SecondaryButtonCta {
+    val secondaryButtonPixel: Pixel.PixelName?
+
+    fun pixelSecondaryButtonParameters(): Map<String, String?>
+}
+
 sealed class DaxDialogCta(
     override val ctaId: CtaId,
     @AnyRes open val description: Int,
