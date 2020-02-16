@@ -104,6 +104,8 @@ class BrowserTabViewModel(
     private val ctaViewModel: CtaViewModel,
     private val searchCountDao: SearchCountDao,
     private val pixel: Pixel,
+    private val installStore: AppInstallStore,
+    private val defaultBrowserDetector: DefaultBrowserDetector,
     private val variantManager: VariantManager,
     private val dispatchers: DispatcherProvider = DefaultDispatcherProvider()
 ) : WebViewClientListener, EditBookmarkListener, HttpAuthenticationListener, ViewModel() {
@@ -226,6 +228,7 @@ class BrowserTabViewModel(
     private var site: Site? = null
     private lateinit var tabId: String
     private var webNavigationState: WebNavigationState? = null
+    private var defaultBrowserAttempt: Int = 0
 
     init {
         initializeViewStates()
@@ -901,7 +904,7 @@ class BrowserTabViewModel(
 
     fun onUserClickCtaOkButton(cta: Cta) {
         ctaViewModel.onUserClickCtaOkButton(cta)
-        ctaViewModel.produceNewCta(cta)?.let {
+        ctaViewModel.obtainNextCta(previousCta = cta)?.let {
             ctaViewState.value = currentCtaViewState().copy(cta = it)
         } ?: produceNewCommand(cta)
     }
@@ -927,6 +930,23 @@ class BrowserTabViewModel(
             is DaxDialogCta.DefaultBrowserCta -> cta.produceAction().mapToCommand()
             is DaxDialogCta.SearchWidgetCta -> cta.produceAction().mapToCommand()
             else -> return
+        }
+    }
+
+    fun onUserTriedToSetAsDefaultBrowserSettings() {
+    }
+
+    fun onUserTriedToSetAsDefaultBrowserDialog() {
+        //TODO: pixels-pending to be implemented
+        if (defaultBrowserDetector.isDefaultBrowser()) {
+            defaultBrowserAttempt = 0
+            installStore.defaultBrowser = true
+        } else {
+            installStore.defaultBrowser = false
+            if (defaultBrowserAttempt < MAX_DIALOG_ATTEMPTS) {
+                defaultBrowserAttempt++
+                command.value = OpenDialog()
+            }
         }
     }
 
@@ -1002,7 +1022,10 @@ class BrowserTabViewModel(
     private fun DaxDialogCta.DefaultBrowserCta.DefaultBrowserAction.mapToCommand(): Command {
         return when (this) {
             is DaxDialogCta.DefaultBrowserCta.DefaultBrowserAction.ShowSettings -> OpenSettings
-            is DaxDialogCta.DefaultBrowserCta.DefaultBrowserAction.ShowSystemDialog -> OpenDialog()
+            is DaxDialogCta.DefaultBrowserCta.DefaultBrowserAction.ShowSystemDialog -> {
+                defaultBrowserAttempt = 1
+                OpenDialog()
+            }
         }
     }
 

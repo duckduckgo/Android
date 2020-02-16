@@ -23,7 +23,11 @@ import com.duckduckgo.app.bookmarks.db.BookmarksDao
 import com.duckduckgo.app.bookmarks.ui.BookmarksViewModel
 import com.duckduckgo.app.brokensite.BrokenSiteViewModel
 import com.duckduckgo.app.brokensite.api.BrokenSiteSender
-import com.duckduckgo.app.browser.*
+import com.duckduckgo.app.browser.BrowserTabViewModel
+import com.duckduckgo.app.browser.BrowserViewModel
+import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
+import com.duckduckgo.app.browser.LongPressHandler
+import com.duckduckgo.app.browser.SpecialUrlDetector
 import com.duckduckgo.app.browser.addtohome.AddToHomeCapabilityDetector
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.browser.favicon.FaviconDownloader
@@ -183,6 +187,8 @@ class ViewModelFactory @Inject constructor(
         addToHomeCapabilityDetector = addToHomeCapabilityDetector,
         ctaViewModel = ctaViewModel,
         searchCountDao = searchCountDao,
+        installStore = appInstallStore,
+        defaultBrowserDetector = defaultBrowserDetector,
         pixel = pixel,
         variantManager = variantManager
     )

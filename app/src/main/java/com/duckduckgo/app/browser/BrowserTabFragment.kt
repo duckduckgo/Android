@@ -58,7 +58,9 @@ import com.duckduckgo.app.autocomplete.api.AutoCompleteApi.AutoCompleteSuggestio
 import com.duckduckgo.app.bookmarks.ui.EditBookmarkDialogFragment
 import com.duckduckgo.app.browser.BrowserTabViewModel.*
 import com.duckduckgo.app.browser.autocomplete.BrowserAutoCompleteSuggestionsAdapter
+import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserNavigator
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserSystemSettings
+import com.duckduckgo.app.browser.defaultbrowsing.TopInstructionsCard
 import com.duckduckgo.app.browser.downloader.FileDownloadNotificationManager
 import com.duckduckgo.app.browser.downloader.FileDownloader
 import com.duckduckgo.app.browser.downloader.FileDownloader.PendingFileDownload
@@ -83,7 +85,6 @@ import com.duckduckgo.app.cta.ui.SecondaryButtonCta
 import com.duckduckgo.app.global.ViewModelFactory
 import com.duckduckgo.app.global.device.DeviceInfo
 import com.duckduckgo.app.global.view.*
-import com.duckduckgo.app.onboarding.ui.page.DefaultBrowserPage
 import com.duckduckgo.app.privacy.model.PrivacyGrade
 import com.duckduckgo.app.privacy.renderer.icon
 import com.duckduckgo.app.privacy.store.PrivacySettingsStore
@@ -176,6 +177,9 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
     @Inject
     lateinit var animatorHelper: BrowserTrackersAnimatorHelper
 
+    @Inject
+    lateinit var defaultBrowserNavigation: DefaultBrowserNavigator
+
     val tabId get() = arguments!![TAB_ID_ARG] as String
 
     lateinit var userAgentProvider: UserAgentProvider
@@ -220,7 +224,12 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
 
     private var webView: WebView? = null
 
-    private var toast: Toast? = null
+    private var instructionsCard: Toast? = null
+        get() {
+            field?.cancel()
+            field = TopInstructionsCard(requireContext(), Toast.LENGTH_SHORT)
+            return field
+        }
 
     private val errorSnackbar: Snackbar by lazy {
         Snackbar.make(browserLayout, R.string.crashedWebViewErrorMessage, Snackbar.LENGTH_INDEFINITE)
@@ -548,41 +557,19 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
         }
     }
 
-    private fun showInstructionsCard() {
-        toast?.cancel()
-
-        val inflater = LayoutInflater.from(requireContext())
-        val inflatedView = inflater.inflate(R.layout.content_onboarding_default_browser_card, null)
-
-        toast = Toast(requireContext()).apply {
-            view = inflatedView
-            setGravity(Gravity.TOP or Gravity.FILL_HORIZONTAL, 0, 0)
-            duration = Toast.LENGTH_LONG
-        }
-        toast?.show()
-    }
-
-    private fun hideInstructionsCard() {
-        toast?.cancel()
-    }
-
-
     private fun openDefaultBrowserDialog(url: String) {
-        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
-        intent.putExtra(BrowserActivity.LAUNCH_FROM_DEFAULT_BROWSER_DIALOG, true)
-        startActivityForResult(intent, DefaultBrowserPage.DEFAULT_BROWSER_REQUEST_CODE_DIALOG)
-        showInstructionsCard()
+        instructionsCard?.show()
+        defaultCard?.show()
+        defaultCard?.animate()?.alpha(1f)?.setDuration(100)?.start()
+        defaultBrowserNavigation.openDefaultBrowserDialog(this, url, DEFAULT_BROWSER_REQUEST_CODE_DIALOG)
+    }
+
+    private fun hidInstructionsCard() {
+        defaultCard?.animate()?.alpha(0f)?.setDuration(100)?.start()
     }
 
     private fun openDefaultBrowserSettings() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            val intent = DefaultBrowserSystemSettings.intent()
-            try {
-                startActivityForResult(intent, DEFAULT_BROWSER_REQUEST_CODE_SETTINGS)
-            } catch (e: ActivityNotFoundException) {
-                Timber.w(e, getString(R.string.cannotLaunchDefaultAppSettings))
-            }
-        }
+        defaultBrowserNavigation.navigateToSettings(this, DEFAULT_BROWSER_REQUEST_CODE_SETTINGS)
     }
 
     private fun showErrorSnackbar(command: Command.ShowErrorWithAction) {
@@ -674,6 +661,11 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (requestCode == REQUEST_CODE_CHOOSE_FILE) {
             handleFileUploadResult(resultCode, data)
+        } else if (requestCode == DEFAULT_BROWSER_REQUEST_CODE_SETTINGS) {
+            viewModel.onUserTriedToSetAsDefaultBrowserSettings()
+        } else if (requestCode == DEFAULT_BROWSER_REQUEST_CODE_DIALOG) {
+            hidInstructionsCard()
+            viewModel.onUserTriedToSetAsDefaultBrowserDialog()
         }
     }
 
@@ -1152,7 +1144,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
     }
 
     companion object {
-
+        private const val DEFAULT_BROWSER_REQUEST_CODE_DIALOG = 191
         private const val DEFAULT_BROWSER_REQUEST_CODE_SETTINGS = 100
         private const val TAB_ID_ARG = "TAB_ID_ARG"
         private const val URL_EXTRA_ARG = "URL_EXTRA_ARG"
