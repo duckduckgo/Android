@@ -19,20 +19,18 @@ package com.duckduckgo.app.icon.ui
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import androidx.appcompat.app.AlertDialog
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.LinearLayoutManager
 import com.duckduckgo.app.browser.R
-import com.duckduckgo.app.feedback.ui.common.FeedbackActivity
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import kotlinx.android.synthetic.main.content_app_icons.appIconsList
-import kotlinx.android.synthetic.main.content_tracker_networks.networksList
 import kotlinx.android.synthetic.main.include_toolbar.toolbar
 
 class ChangeIconActivity : DuckDuckGoActivity() {
 
     private val viewModel: ChangeIconViewModel by bindViewModel()
-    private val iconsAdapter: AppIconsAdapter = AppIconsAdapter{ icon ->
+    private val iconsAdapter: AppIconsAdapter = AppIconsAdapter { icon ->
         viewModel.onIconSelected(icon)
     }
 
@@ -74,10 +72,31 @@ class ChangeIconActivity : DuckDuckGoActivity() {
             }
         })
 
+        viewModel.command.observe(this, Observer {
+            processCommand(it)
+        })
     }
 
     private fun render(viewState: ChangeIconViewModel.ViewState) {
         iconsAdapter.notifyChanges(viewState.appIcons)
     }
 
+    private fun processCommand(it: ChangeIconViewModel.Command?) {
+        when (it) {
+            is ChangeIconViewModel.Command.ShowChangeIconCta -> {
+                AlertDialog.Builder(this, R.style.AlertDialogTheme)
+                    .setTitle("Do you want to change the app icon?")
+                    .setMessage("We'll close the app first")
+                    .setPositiveButton(R.string.yes) { _, _ ->
+                        viewModel.onChangeIcon(it.appIcon)
+                    }
+                    .setNegativeButton(R.string.no) { dialog, _ ->
+                        dialog.dismiss()
+                    }
+                    .show()
+            }
+        }
+    }
 }
+
+

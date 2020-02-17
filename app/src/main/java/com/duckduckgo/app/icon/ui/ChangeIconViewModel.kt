@@ -18,6 +18,7 @@ package com.duckduckgo.app.icon.ui
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.duckduckgo.app.global.SingleLiveEvent
 import com.duckduckgo.app.icon.api.AppIcon
 import com.duckduckgo.app.icon.api.IconModifier
 import com.duckduckgo.app.settings.db.SettingsDataStore
@@ -46,7 +47,12 @@ class ChangeIconViewModel @Inject constructor(
         val appIcons: List<IconViewData>
     )
 
+    sealed class Command {
+        data class ShowChangeIconCta(val appIcon: AppIcon) : Command()
+    }
+
     val viewState: MutableLiveData<ViewState> = MutableLiveData()
+    val command: SingleLiveEvent<Command> = SingleLiveEvent()
 
     init {
         pixel.fire(Pixel.PixelName.CHANGE_APP_ICON_OPENED)
@@ -58,9 +64,12 @@ class ChangeIconViewModel @Inject constructor(
     }
 
     fun onIconSelected(viewData: IconViewData) {
-        val newIcon = viewData.appIcon
-        // appIconModifier.changeIcon(newIcon)
-        viewState.value = ViewState(AppIcon.values().map { IconViewData.from(it, newIcon) })
-        settingsDataStore.appIcon = newIcon
+        command.value = Command.ShowChangeIconCta(viewData.appIcon)
+    }
+
+    fun onChangeIcon(appIcon: AppIcon) {
+        viewState.value = ViewState(AppIcon.values().map { IconViewData.from(it, appIcon) })
+        settingsDataStore.appIcon = appIcon
+        appIconModifier.changeIcon(appIcon)
     }
 }
