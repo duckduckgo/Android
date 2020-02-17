@@ -19,7 +19,7 @@
     <string name="crashedWebViewErrorAction">"Reload"</string>
 
     <!-- System Search-->
-    <string name="system_search_app_label">From this device:</string>
+    <string name="system_search_app_label">From this device</string>
 
     <!-- Omnibar Animation -->
     <string name="trackersAnimationText">Scanning</string>
