@@ -48,6 +48,7 @@ import com.duckduckgo.app.browser.LongPressHandler.RequiredAction
 import com.duckduckgo.app.browser.SpecialUrlDetector.UrlType.IntentType
 import com.duckduckgo.app.browser.WebNavigationStateChange.*
 import com.duckduckgo.app.browser.addtohome.AddToHomeCapabilityDetector
+import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.browser.favicon.FaviconDownloader
 import com.duckduckgo.app.browser.model.BasicAuthenticationCredentials
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
@@ -56,14 +57,15 @@ import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.browser.ui.HttpAuthenticationDialogFragment.HttpAuthenticationListener
 import com.duckduckgo.app.cta.ui.Cta
-import com.duckduckgo.app.cta.ui.HomePanelCta
 import com.duckduckgo.app.cta.ui.CtaViewModel
 import com.duckduckgo.app.cta.ui.DaxDialogCta
+import com.duckduckgo.app.cta.ui.HomePanelCta
 import com.duckduckgo.app.cta.ui.SecondaryButtonCta
 import com.duckduckgo.app.global.*
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.global.model.SiteFactory
 import com.duckduckgo.app.global.model.domainMatchesUrl
+import com.duckduckgo.app.global.toDesktopUri
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao
 import com.duckduckgo.app.privacy.model.PrivacyGrade
 import com.duckduckgo.app.settings.db.SettingsDataStore
@@ -72,6 +74,7 @@ import com.duckduckgo.app.statistics.api.StatisticsUpdater
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelName
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelValues.DAX_DEFAULT_BROWSER_CTA
 import com.duckduckgo.app.survey.model.Survey
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
@@ -938,6 +941,22 @@ class BrowserTabViewModel(
     }
 
     fun onUserTriedToSetAsDefaultBrowserSettings() {
+        //TODO: pixels-pending to be implemented
+        if (defaultBrowserDetector.isDefaultBrowser()) {
+            installStore.defaultBrowser = true
+            val params = mapOf(
+                PixelParameter.DEFAULT_BROWSER_SET_FROM_ONBOARDING to DAX_DEFAULT_BROWSER_CTA,
+                PixelParameter.DEFAULT_BROWSER_SET_ORIGIN to Pixel.PixelValues.DEFAULT_BROWSER_SETTINGS
+            )
+            pixel.fire(PixelName.DEFAULT_BROWSER_SET, params)
+        } else {
+            installStore.defaultBrowser = false
+            val params = mapOf(
+                PixelParameter.DEFAULT_BROWSER_SET_FROM_ONBOARDING to DAX_DEFAULT_BROWSER_CTA,
+                PixelParameter.DEFAULT_BROWSER_SET_ORIGIN to Pixel.PixelValues.DEFAULT_BROWSER_SETTINGS
+            )
+            pixel.fire(PixelName.DEFAULT_BROWSER_NOT_SET, params)
+        }
     }
 
     fun onUserTriedToSetAsDefaultBrowserDialog() {
