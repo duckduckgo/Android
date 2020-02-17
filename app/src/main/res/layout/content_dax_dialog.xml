@@ -119,27 +119,18 @@
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/primaryCta"
-                    style="@style/Widget.AppCompat.Button.Borderless.Colored"
+                    style="@style/DaxDialogButton.Primary"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
-                    android:backgroundTint="@color/cornflowerBlue"
-                    android:textAllCaps="false"
-                    android:textColor="@color/white"
-                    app:cornerRadius="20dp" />
+                    android:layout_marginTop="10dp"/>
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/secondaryCta"
-                    style="@style/Widget.AppCompat.Button.Borderless.Colored"
+                    style="@style/DaxDialogButton.Secondary"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="-6dp"
-                    android:backgroundTint="?attr/daxDialogBackgroundColor"
-                    android:textAllCaps="false"
-                    android:textColor="?attr/daxDialogSecondaryButtonTextColor"
-                    android:visibility="gone"
-                    app:cornerRadius="20dp"
-                    app:rippleColor="?attr/daxDialogSecondaryButtonRippleColor" />
+                    android:visibility="visible"/>
             </LinearLayout>
         </androidx.cardview.widget.CardView>
     </androidx.constraintlayout.widget.ConstraintLayout>
