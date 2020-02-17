@@ -105,12 +105,6 @@ class VariantManagerTest {
     // CTA on Concept Test experiments
 
     @Test
-    fun insertCtaControlVariantIsActiveAndHasNoFeatures() {
-        val variant = variants.firstOrNull { it.key == "mu" }
-        assertEqualsDouble(1.0, variant!!.weight)
-        assertEquals(0, variant.features.size)
-    }
-
     @Test
     fun insertCtaConceptTestVariantIsActiveAndHasConceptTestAndSuppressCtaFeatures() {
         val variant = variants.firstOrNull { it.key == "mv" }
