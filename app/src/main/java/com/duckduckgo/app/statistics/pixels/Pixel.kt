@@ -174,7 +174,7 @@ interface Pixel {
         const val DAX_INITIAL_CTA = "i"
         const val DAX_END_CTA = "e"
         const val DAX_SERP_CTA = "s"
-        const val DAX_DEFAULT_BROWSER_CTA = "df"
+        const val DAX_DEFAULT_BROWSER_CTA = "dxdf"
         const val DAX_NETWORK_CTA_1 = "n"
         const val DAX_NETWORK_CTA_2 = "n2"
         const val DAX_TRACKERS_BLOCKED_CTA = "t"
