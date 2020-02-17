@@ -114,7 +114,7 @@ sealed class DaxDialogCta(
     )
 
     class DefaultBrowserCta(
-        val defaultBrowserDetector: DefaultBrowserDetector,
+        private val defaultBrowserDetector: DefaultBrowserDetector,
         override val onboardingStore: OnboardingStore,
         override val appInstallStore: AppInstallStore
     ) : DaxDialogCta(
@@ -138,16 +138,19 @@ sealed class DaxDialogCta(
                 R.string.daxDialogYes
             }
 
+        val primaryAction: DefaultBrowserAction
+            get() = getAction()
+
         override fun createCta(activity: FragmentActivity): DaxDialog {
             return TypewriterDaxDialog(
-                getDaxText(activity),
-                activity.resources.getString(okButton),
-                activity.resources.getString(R.string.daxDialogMaybeLater),
-                false
+                daxText = getDaxText(activity),
+                primaryButtonText = activity.resources.getString(okButton),
+                secondaryButtonText = activity.resources.getString(R.string.daxDialogMaybeLater),
+                toolbarDimmed = true
             )
         }
 
-        fun produceAction(): DefaultBrowserAction {
+        private fun getAction(): DefaultBrowserAction {
             return if (defaultBrowserDetector.hasDefaultBrowser()) {
                 DefaultBrowserAction.ShowSettings
             } else {
@@ -181,16 +184,19 @@ sealed class DaxDialogCta(
 
         override val secondaryButtonPixel: Pixel.PixelName = Pixel.PixelName.ONBOARDING_DAX_CTA_CANCEL_BUTTON
 
+        val primaryAction: SearchWidgetAction
+            get() = getAction()
+
         override fun createCta(activity: FragmentActivity): DaxDialog {
             return TypewriterDaxDialog(
                 daxText = getDaxText(activity),
                 primaryButtonText = activity.resources.getString(okButton),
                 secondaryButtonText = activity.resources.getString(R.string.daxDialogMaybeLater),
-                toolbarDimmed = false
+                toolbarDimmed = true
             )
         }
 
-        fun produceAction(): SearchWidgetAction {
+        private fun getAction(): SearchWidgetAction {
             return if (widgetCapabilities.supportsAutomaticWidgetAdd) {
                 SearchWidgetAction.AddAutomatic
             } else {

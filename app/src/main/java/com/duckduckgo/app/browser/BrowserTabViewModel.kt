@@ -931,8 +931,8 @@ class BrowserTabViewModel(
             is HomePanelCta.Survey -> LaunchSurvey(cta.survey)
             is HomePanelCta.AddWidgetAuto -> LaunchAddWidget
             is HomePanelCta.AddWidgetInstructions -> LaunchLegacyAddWidget
-            is DaxDialogCta.DefaultBrowserCta -> cta.produceAction().mapToCommand()
-            is DaxDialogCta.SearchWidgetCta -> cta.produceAction().mapToCommand()
+            is DaxDialogCta.DefaultBrowserCta -> cta.primaryAction.mapToCommand()
+            is DaxDialogCta.SearchWidgetCta -> cta.primaryAction.mapToCommand()
             else -> return
         }
     }
