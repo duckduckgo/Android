@@ -198,6 +198,8 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
         viewModel
     }
 
+    private val smoothProgressAnimator by lazy { SmoothProgressAnimator(pageLoadingIndicator) }
+
     // Optimization to prevent against excessive work generating WebView previews; an existing job will be cancelled if a new one is launched
     private var bitmapGeneratorJob: Job? = null
 
@@ -1123,7 +1125,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
         private const val AUTHENTICATION_DIALOG_TAG = "AUTH_DIALOG_TAG"
         private const val DAX_DIALOG_DIALOG_TAG = "DAX_DIALOG_TAG"
 
-        private const val MIN_PROGRESS = 10
+        private const val MIN_PROGRESS = 50
         private const val MAX_PROGRESS = 100
         private const val TRACKERS_INI_DELAY = 700L
         private const val TRACKERS_SECONDARY_DELAY = 300L
@@ -1192,8 +1194,8 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
                 lastSeenLoadingViewState = viewState
 
                 pageLoadingIndicator.apply {
-                    if (viewState.isLoading) show() else hide()
-                    progress = viewState.progress
+                    if (viewState.isLoading) show()
+                    smoothProgressAnimator.onNewProgress(viewState.progress) { if (!viewState.isLoading) hide() }
                 }
 
                 if (variantManager.getVariant().hasFeature(VariantManager.VariantFeature.ConceptTest) && privacySettingsStore.privacyOn) {
