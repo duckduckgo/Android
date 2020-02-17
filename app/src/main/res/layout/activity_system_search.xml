@@ -123,19 +123,20 @@
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:elevation="4dp"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="wrap_content"
+            android:background="?attr/colorPrimary"
+            android:backgroundTint="?attr/colorPrimary"
+            android:elevation="4dp">
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/autocompleteSuggestions"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:background="?attr/colorPrimary"
-                android:backgroundTint="?attr/colorPrimary"
-                android:elevation="4dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
@@ -146,16 +147,13 @@
                 android:id="@+id/deviceLabel"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:background="?attr/colorPrimary"
-                android:backgroundTint="?attr/colorPrimary"
-                android:textSize="13dp"
-                android:elevation="4dp"
                 android:paddingStart="16dp"
                 android:paddingTop="6dp"
-                android:paddingBottom="2dp"
                 android:paddingEnd="16dp"
+                android:paddingBottom="2dp"
                 android:text="@string/system_search_app_label"
                 android:textColor="@color/grayish"
+                android:textSize="13dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/autocompleteSuggestions"
@@ -165,9 +163,6 @@
                 android:id="@+id/deviceAppSuggestions"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:background="?attr/colorPrimary"
-                android:backgroundTint="?attr/colorPrimary"
-                android:elevation="4dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/deviceLabel"
