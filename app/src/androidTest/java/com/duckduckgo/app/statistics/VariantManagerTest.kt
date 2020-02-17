@@ -105,9 +105,8 @@ class VariantManagerTest {
     // CTA on Concept Test experiments
 
     @Test
-    @Test
-    fun insertCtaConceptTestVariantIsActiveAndHasConceptTestAndSuppressCtaFeatures() {
-        val variant = variants.firstOrNull { it.key == "mv" }
+    fun insertCtaConceptControlVariantIsActiveAndHasConceptTestAndSuppressCtaFeatures() {
+        val variant = variants.firstOrNull { it.key == "mj" }
         assertEqualsDouble(1.0, variant!!.weight)
         assertEquals(3, variant!!.features.size)
         assertTrue(variant.hasFeature(ConceptTest))
@@ -117,10 +116,11 @@ class VariantManagerTest {
 
     @Test
     fun insertCtaConceptTestWithAllCtaExperimentalVariantIsActiveAndHasConceptTestAndSuppressCtaFeatures() {
-        val variant = variants.firstOrNull { it.key == "mz" }
+        val variant = variants.firstOrNull { it.key == "ml" }
         assertEqualsDouble(1.0, variant!!.weight)
         assertEquals(2, variant!!.features.size)
         assertTrue(variant.hasFeature(ConceptTest))
+        assertTrue(variant.hasFeature(SuppressOnboardingDefaultBrowserContinueScreen))
     }
 
     @Test
