@@ -85,8 +85,8 @@ class ChangeIconActivity : DuckDuckGoActivity() {
         when (it) {
             is ChangeIconViewModel.Command.ShowChangeIconCta -> {
                 AlertDialog.Builder(this, R.style.AlertDialogTheme)
-                    .setTitle("Do you want to change the app icon?")
-                    .setMessage("We'll close the app first")
+                    .setTitle("Change app icon")
+                    .setMessage("Do you want to continue?")
                     .setPositiveButton(R.string.yes) { _, _ ->
                         viewModel.onChangeIcon(it.appIcon)
                     }

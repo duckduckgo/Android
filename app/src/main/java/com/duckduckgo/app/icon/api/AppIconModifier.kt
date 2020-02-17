@@ -16,12 +16,16 @@
 
 package com.duckduckgo.app.icon.api
 
+import android.app.AlarmManager
+import android.app.PendingIntent
 import android.content.ComponentName
 import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
 import androidx.annotation.DrawableRes
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.icon.api.IconModifier.Companion.QUALIFIER
+import com.duckduckgo.app.launch.LaunchActivity
 import javax.inject.Inject
 
 interface IconModifier {
@@ -31,7 +35,6 @@ interface IconModifier {
     }
 
     fun changeIcon(newIcon: AppIcon)
-
 }
 
 enum class AppIcon(
@@ -49,14 +52,13 @@ enum class AppIcon(
     RED(
         componentName = "$QUALIFIER.LauncherRed",
         icon = R.mipmap.ic_launcher_red
-    ),;
+    ), ;
 
     companion object {
 
         fun from(componentName: String): AppIcon {
             return values().first { it.componentName == componentName }
         }
-
     }
 }
 
@@ -67,11 +69,11 @@ class AppIconModifier @Inject constructor(private val context: Context) : IconMo
         AppIcon.values().filter { it.componentName == newIcon.componentName }.map { enable(it) }
     }
 
-    private fun disable(appIcon: AppIcon){
+    private fun disable(appIcon: AppIcon) {
         setComponentState(appIcon.componentName, PackageManager.COMPONENT_ENABLED_STATE_DISABLED)
     }
 
-    private fun enable(appIcon: AppIcon){
+    private fun enable(appIcon: AppIcon) {
         setComponentState(appIcon.componentName, PackageManager.COMPONENT_ENABLED_STATE_ENABLED)
     }
 
@@ -81,5 +83,4 @@ class AppIconModifier @Inject constructor(private val context: Context) : IconMo
             componentState, PackageManager.DONT_KILL_APP
         )
     }
-
 }
