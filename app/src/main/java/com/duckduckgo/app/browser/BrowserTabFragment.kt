@@ -1157,8 +1157,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
 
                 if (viewState.showSuggestions) {
                     autoCompleteSuggestionsList.show()
-                    val results = viewState.searchResults.suggestions
-                    autoCompleteSuggestionsAdapter.updateData(results)
+                    autoCompleteSuggestionsAdapter.updateData(viewState.searchResults.query, viewState.searchResults.suggestions)
                 } else {
                     autoCompleteSuggestionsList.gone()
                 }

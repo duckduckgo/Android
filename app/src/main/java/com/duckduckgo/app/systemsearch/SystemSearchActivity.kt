@@ -94,8 +94,7 @@ class SystemSearchActivity : DuckDuckGoActivity() {
             },
             editableSearchClickListener = {
                 viewModel.userUpdatedQuery(it.phrase)
-            },
-            showsMessageOnNoSuggestions = false
+            }
         )
         autocompleteSuggestions.adapter = autocompleteSuggestionsAdapter
     }
@@ -127,8 +126,8 @@ class SystemSearchActivity : DuckDuckGoActivity() {
             omnibarTextInput.setText(viewState.queryText)
             omnibarTextInput.setSelection(viewState.queryText.length)
         }
-        autocompleteSuggestionsAdapter.updateData(viewState.autocompleteResults)
         deviceLabel.isVisible = viewState.appResults.isNotEmpty()
+        autocompleteSuggestionsAdapter.updateData(viewState.autocompleteResults.query, viewState.autocompleteResults.suggestions)
         deviceAppSuggestionsAdapter.updateData(viewState.appResults)
     }
 

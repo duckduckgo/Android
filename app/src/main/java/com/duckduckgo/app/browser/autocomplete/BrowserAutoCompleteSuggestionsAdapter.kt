@@ -28,16 +28,17 @@ import com.duckduckgo.app.browser.autocomplete.BrowserAutoCompleteSuggestionsAda
 
 class BrowserAutoCompleteSuggestionsAdapter(
     private val immediateSearchClickListener: (AutoCompleteSuggestion) -> Unit,
-    private val editableSearchClickListener: (AutoCompleteSuggestion) -> Unit,
-    private val showsMessageOnNoSuggestions: Boolean = true
-    ) : RecyclerView.Adapter<AutoCompleteViewHolder>() {
+    private val editableSearchClickListener: (AutoCompleteSuggestion) -> Unit
+) : RecyclerView.Adapter<AutoCompleteViewHolder>() {
 
     private val viewHolderFactoryMap: Map<Int, SuggestionViewHolderFactory> = mapOf(
         EMPTY_TYPE to EmptySuggestionViewHolderFactory(),
         SUGGESTION_TYPE to SearchSuggestionViewHolderFactory(),
         BOOKMARK_TYPE to BookmarkSuggestionViewHolderFactory()
     )
-    private val suggestions: MutableList<AutoCompleteSuggestion> = ArrayList()
+
+    private var phrase = ""
+    private var suggestions: List<AutoCompleteSuggestion> = emptyList()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AutoCompleteViewHolder =
         viewHolderFactoryMap.getValue(viewType).onCreateViewHolder(parent)
@@ -64,18 +65,17 @@ class BrowserAutoCompleteSuggestionsAdapter(
     }
 
     override fun getItemCount(): Int {
-        if (suggestions.isNotEmpty()) {
-            return suggestions.size
+        if (suggestions.isEmpty() && phrase.isNotBlank()) {
+            return 1 // No suggestions message
         }
-        return if (showsMessageOnNoSuggestions) 1 else 0
+        return suggestions.size
     }
 
     @UiThread
-    fun updateData(newSuggestions: List<AutoCompleteSuggestion>) {
-        if (suggestions == newSuggestions) return
-
-        suggestions.clear()
-        suggestions.addAll(newSuggestions)
+    fun updateData(newPhrase: String, newSuggestions: List<AutoCompleteSuggestion>) {
+        if (phrase == newPhrase && suggestions == newSuggestions) return
+        phrase = newPhrase
+        suggestions = newSuggestions
         notifyDataSetChanged()
     }
 

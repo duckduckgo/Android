@@ -38,7 +38,7 @@ class SystemSearchViewModel(
 
     data class SystemSearchViewState(
         val queryText: String = "",
-        val autocompleteResults: List<AutoCompleteApi.AutoCompleteSuggestion> = emptyList(),
+        val autocompleteResults: AutoCompleteApi.AutoCompleteResult = AutoCompleteApi.AutoCompleteResult("", emptyList()),
         val appResults: List<DeviceApp> = emptyList()
     )
 
@@ -52,7 +52,7 @@ class SystemSearchViewModel(
 
     private val autoCompletePublishSubject = PublishRelay.create<String>()
     private var appResults: List<DeviceApp> = emptyList()
-    private var autocompleteResults: List<AutoCompleteApi.AutoCompleteSuggestion> = emptyList()
+    private var autocompleteResults: AutoCompleteApi.AutoCompleteResult = AutoCompleteApi.AutoCompleteResult("", emptyList())
 
     init {
         resetState()
@@ -62,9 +62,9 @@ class SystemSearchViewModel(
     private fun currentViewState(): SystemSearchViewState = viewState.value!!
 
     fun resetState() {
-        autocompleteResults = emptyList()
-        appResults = emptyList()
         viewState.value = SystemSearchViewState()
+        autocompleteResults = AutoCompleteApi.AutoCompleteResult("", emptyList())
+        appResults = emptyList()
     }
 
     private fun configureAutoComplete() {
@@ -105,15 +105,15 @@ class SystemSearchViewModel(
     }
 
     private fun updateAutocompleteResult(results: AutoCompleteApi.AutoCompleteResult) {
-        autocompleteResults = results.suggestions
+        autocompleteResults = results
         refreshViewStateResults()
     }
 
     private fun refreshViewStateResults() {
-        val hasMultiResults = autocompleteResults.isNotEmpty() && appResults.isNotEmpty()
-        val newSuggestions = if (hasMultiResults) autocompleteResults.take(MULTI_RESULTS_MAX_PER_GROUP) else autocompleteResults
+        val hasMultiResults = autocompleteResults.suggestions.isNotEmpty() && appResults.isNotEmpty()
+        val newSuggestions = if (hasMultiResults) autocompleteResults.suggestions.take(MULTI_RESULTS_MAX_PER_GROUP) else autocompleteResults.suggestions
         val newApps = if (hasMultiResults) appResults.take(MULTI_RESULTS_MAX_PER_GROUP) else appResults
-        viewState.postValue(currentViewState().copy(autocompleteResults = newSuggestions, appResults = newApps))
+        viewState.postValue(currentViewState().copy(autocompleteResults = AutoCompleteApi.AutoCompleteResult(autocompleteResults.query, newSuggestions), appResults = newApps))
     }
 
     fun userClearedQuery() {
