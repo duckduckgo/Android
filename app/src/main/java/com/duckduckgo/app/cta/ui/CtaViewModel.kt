@@ -224,21 +224,29 @@ class CtaViewModel @Inject constructor(
         }
     }
 
+    @WorkerThread
     fun obtainNextCta(previousCta: Cta): Cta? {
         return when {
-            previousCta is DaxDialogCta.DaxTrackersBlockedCta && canShowDefaultBrowserCta() -> {
+            previousCta is DaxDialogCta.DaxTrackersBlockedCta && canShowDefaultBrowserDaxCta() -> {
                 DaxDialogCta.DefaultBrowserCta(defaultBrowserDetector, onboardingStore, appInstallStore)
             }
-            previousCta is DaxDialogCta.DaxSerpCta -> {
+            previousCta is DaxDialogCta.DaxSerpCta && canShowWidgetDaxCta() -> {
                 DaxDialogCta.SearchWidgetCta(widgetCapabilities, onboardingStore, appInstallStore)
             }
             else -> null
         }
     }
 
-    private fun canShowDefaultBrowserCta(): Boolean {
+    @WorkerThread
+    private fun canShowDefaultBrowserDaxCta(): Boolean {
         return defaultBrowserDetector.deviceSupportsDefaultBrowserConfiguration() &&
                 !defaultBrowserDetector.isDefaultBrowser()
+    }
+
+    @WorkerThread
+    private fun canShowWidgetDaxCta(): Boolean {
+        return widgetCapabilities.supportsStandardWidgetAdd &&
+                !widgetCapabilities.hasInstalledWidgets
     }
 
     private fun hasTrackersInformation(events: List<TrackingEvent>): Boolean =

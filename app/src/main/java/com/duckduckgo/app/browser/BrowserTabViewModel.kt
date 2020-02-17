@@ -904,9 +904,13 @@ class BrowserTabViewModel(
 
     fun onUserClickCtaOkButton(cta: Cta) {
         ctaViewModel.onUserClickCtaOkButton(cta)
-        ctaViewModel.obtainNextCta(previousCta = cta)?.let {
-            ctaViewState.value = currentCtaViewState().copy(cta = it)
-        } ?: produceNewCommand(cta)
+        viewModelScope.launch {
+            withContext(dispatchers.io()) {
+                ctaViewModel.obtainNextCta(previousCta = cta)
+            }?.let {
+                ctaViewState.value = currentCtaViewState().copy(cta = it)
+            } ?: produceNewCommand(cta)
+        }
     }
 
     fun onUserClickCtaSecondaryButton(cta: SecondaryButtonCta) {
