@@ -146,7 +146,7 @@ class DefaultBrowserPageViewModel(
     }
 
     private fun shouldShowContinueScreen(): Boolean {
-        return !variantManager.getVariant().hasFeature(VariantManager.VariantFeature.SuppressDefaultBrowserContinueScreen)
+        return !variantManager.getVariant().hasFeature(VariantManager.VariantFeature.SuppressOnboardingDefaultBrowserContinueScreen)
     }
 
     private fun handleOriginInternalBrowser(): Boolean {

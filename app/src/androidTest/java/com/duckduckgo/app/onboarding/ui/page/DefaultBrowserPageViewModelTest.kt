@@ -258,7 +258,7 @@ class DefaultBrowserPageViewModelTest {
 
     @Test
     fun whenUserSetDDGAsDefaultFromDialogAndSuppressContinueScreenVariantEnabledThenContinueToBrowserAndFirePixel() {
-        givenSuppressDefaultBrowserContinueScreen()
+        givenSuppressOnboardingDefaultBrowserContinueScreen()
         val params = mapOf(
             Pixel.PixelParameter.DEFAULT_BROWSER_SET_FROM_ONBOARDING to true.toString(),
             Pixel.PixelParameter.DEFAULT_BROWSER_SET_ORIGIN to DEFAULT_BROWSER_DIALOG
@@ -359,7 +359,7 @@ class DefaultBrowserPageViewModelTest {
             Pixel.PixelParameter.DEFAULT_BROWSER_SET_FROM_ONBOARDING to true.toString(),
             Pixel.PixelParameter.DEFAULT_BROWSER_SET_ORIGIN to Pixel.PixelValues.DEFAULT_BROWSER_EXTERNAL
         )
-        givenSuppressDefaultBrowserContinueScreen()
+        givenSuppressOnboardingDefaultBrowserContinueScreen()
         testee.loadUI()
         testee.onDefaultBrowserClicked()
         whenever(mockDefaultBrowserDetector.isDefaultBrowser()).thenReturn(true)
@@ -387,7 +387,7 @@ class DefaultBrowserPageViewModelTest {
 
     @Test
     fun whenUserWasTakenToSettingsAndSelectedDDGAsDefaultAndSuppressContinueScreenVariantEnabledThenContinueToBrowser() {
-        givenSuppressDefaultBrowserContinueScreen()
+        givenSuppressOnboardingDefaultBrowserContinueScreen()
         whenever(mockDefaultBrowserDetector.isDefaultBrowser()).thenReturn(false)
         whenever(mockDefaultBrowserDetector.hasDefaultBrowser()).thenReturn(true)
         testee.loadUI()
@@ -513,9 +513,9 @@ class DefaultBrowserPageViewModelTest {
         )
     }
 
-    private fun givenSuppressDefaultBrowserContinueScreen() {
+    private fun givenSuppressOnboardingDefaultBrowserContinueScreen() {
         whenever(mockVariantManager.getVariant()).thenReturn(
-            Variant("test", features = listOf(VariantManager.VariantFeature.SuppressDefaultBrowserContinueScreen), filterBy = { true })
+            Variant("test", features = listOf(VariantManager.VariantFeature.SuppressOnboardingDefaultBrowserContinueScreen), filterBy = { true })
         )
     }
 

@@ -32,7 +32,7 @@ import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.Variant
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.VariantManager.VariantFeature.ConceptTest
-import com.duckduckgo.app.statistics.VariantManager.VariantFeature.SuppressWidgetCta
+import com.duckduckgo.app.statistics.VariantManager.VariantFeature.SuppressHomeTabWidgetCta
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.survey.db.SurveyDao
 import com.duckduckgo.app.survey.model.Survey
@@ -174,7 +174,7 @@ class CtaViewModel @Inject constructor(
         return widgetCapabilities.supportsStandardWidgetAdd &&
                 !widgetCapabilities.hasInstalledWidgets &&
                 !dismissedCtaDao.exists(CtaId.ADD_WIDGET) &&
-                !variant().hasFeature(SuppressWidgetCta)
+                !variant().hasFeature(SuppressHomeTabWidgetCta)
     }
 
     @WorkerThread
