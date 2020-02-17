@@ -18,6 +18,7 @@
 
 package com.duckduckgo.app.statistics
 
+import com.duckduckgo.app.statistics.VariantManager.Companion.DEFAULT_VARIANT
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.nhaarman.mockitokotlin2.*
 import org.junit.Assert.*
@@ -63,23 +64,22 @@ class ExperimentationVariantManagerTest {
 
         val defaultVariant = testee.getVariant(activeVariants)
         assertEquals("", defaultVariant.key)
-        assertTrue(defaultVariant.features.isEmpty())
     }
 
-    @Test
+    /*@Test
     fun whenNoVariantsAvailableThenDefaultVariantHasNoExperimentalFeaturesEnabled() {
         whenever(mockStore.variant).thenReturn("foo")
 
         val defaultVariant = testee.getVariant(activeVariants)
         assertTrue(defaultVariant.features.isEmpty())
-    }
+    }*/
 
     @Test
     fun whenVariantPersistedIsNotFoundInActiveVariantListThenRestoredToDefaultVariant() {
         activeVariants.add(Variant("foo", 100.0, filterBy = { true }))
         whenever(mockStore.variant).thenReturn("bar")
 
-        assertEquals(VariantManager.DEFAULT_VARIANT, testee.getVariant(activeVariants))
+        assertEquals(DEFAULT_VARIANT, testee.getVariant(activeVariants))
     }
 
     @Test
@@ -89,7 +89,7 @@ class ExperimentationVariantManagerTest {
         whenever(mockStore.variant).thenReturn("bar")
         testee.getVariant(activeVariants)
 
-        verify(mockStore).variant = VariantManager.DEFAULT_VARIANT.key
+        verify(mockStore).variant = DEFAULT_VARIANT.key
     }
 
     @Test
@@ -116,7 +116,7 @@ class ExperimentationVariantManagerTest {
 
         testee.getVariant(activeVariants)
 
-        verify(mockStore).variant = VariantManager.DEFAULT_VARIANT.key
+        verify(mockStore).variant = DEFAULT_VARIANT.key
     }
 
     @Test
@@ -166,10 +166,10 @@ class ExperimentationVariantManagerTest {
     }
 
     @Test
-    fun whenReferrerVariantReturnedThenNoFeaturesEnabled() {
+    fun whenReferrerVariantReturnedThenVariantIsDefaultWithReferrerVariantKey() {
         mockUpdateScenario("xx")
         val variant = testee.getVariant(activeVariants)
-        assertTrue(variant.features.isEmpty())
+        assertEquals(DEFAULT_VARIANT.copy(key = "xx"), variant)
     }
 
     private fun mockUpdateScenario(key: String) {
