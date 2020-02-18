@@ -665,7 +665,11 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
             viewModel.onUserTriedToSetAsDefaultBrowserSettings()
         } else if (requestCode == DEFAULT_BROWSER_REQUEST_CODE_DIALOG) {
             hidInstructionsCard()
-            viewModel.onUserTriedToSetAsDefaultBrowserDialog()
+            if (resultCode == DefaultBrowserPage.DEFAULT_BROWSER_RESULT_CODE_DIALOG_INTERNAL) {
+                viewModel.onUserTriedToSetAsDefaultBrowserDialog()
+            } else {
+                viewModel.onUserDismissedDefaultBrowserDialog()
+            }
         }
     }
 
@@ -1145,7 +1149,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
 
     companion object {
         private const val DEFAULT_BROWSER_REQUEST_CODE_DIALOG = 191
-        private const val DEFAULT_BROWSER_REQUEST_CODE_SETTINGS = 100
+        private const val DEFAULT_BROWSER_REQUEST_CODE_SETTINGS = 190
         private const val TAB_ID_ARG = "TAB_ID_ARG"
         private const val URL_EXTRA_ARG = "URL_EXTRA_ARG"
         private const val SKIP_HOME_ARG = "SKIP_HOME_ARG"

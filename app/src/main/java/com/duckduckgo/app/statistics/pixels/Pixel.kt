@@ -177,6 +177,12 @@ interface Pixel {
         const val DAX_DEFAULT_BROWSER_CTA_DIALOG = "dxdfd"
         const val DAX_DEFAULT_BROWSER_CTA_SETTINGS = "dxdfs"
         const val DAX_SEARCH_WIDGET_CTA = "dxsw"
+
+        const val DAX_DEFAULT_BROWSER_SETTINGS = "dxs"
+        const val DAX_DEFAULT_BROWSER_DIALOG = "dxd"
+        const val DAX_DEFAULT_BROWSER_DIALOG_DISMISSED = "dxdd"
+        const val DAX_DEFAULT_BROWSER_JUST_ONCE_MAX = "dxjom"
+
         const val DAX_NETWORK_CTA_1 = "n"
         const val DAX_NETWORK_CTA_2 = "n2"
         const val DAX_TRACKERS_BLOCKED_CTA = "t"

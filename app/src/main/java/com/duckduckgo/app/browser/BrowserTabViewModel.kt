@@ -941,36 +941,55 @@ class BrowserTabViewModel(
     }
 
     fun onUserTriedToSetAsDefaultBrowserSettings() {
-        //TODO: pixels-pending to be implemented
+        //TODO: tidy up this part
         if (defaultBrowserDetector.isDefaultBrowser()) {
             installStore.defaultBrowser = true
             val params = mapOf(
-                PixelParameter.DEFAULT_BROWSER_SET_FROM_ONBOARDING to DAX_DEFAULT_BROWSER_CTA,
-                PixelParameter.DEFAULT_BROWSER_SET_ORIGIN to Pixel.PixelValues.DEFAULT_BROWSER_SETTINGS
+                PixelParameter.DEFAULT_BROWSER_SET_FROM_ONBOARDING to false.toString(),
+                PixelParameter.DEFAULT_BROWSER_SET_ORIGIN to Pixel.PixelValues.DAX_DEFAULT_BROWSER_SETTINGS
             )
             pixel.fire(PixelName.DEFAULT_BROWSER_SET, params)
         } else {
             installStore.defaultBrowser = false
             val params = mapOf(
-                PixelParameter.DEFAULT_BROWSER_SET_FROM_ONBOARDING to DAX_DEFAULT_BROWSER_CTA,
-                PixelParameter.DEFAULT_BROWSER_SET_ORIGIN to Pixel.PixelValues.DEFAULT_BROWSER_SETTINGS
+                PixelParameter.DEFAULT_BROWSER_SET_FROM_ONBOARDING to false.toString(),
+                PixelParameter.DEFAULT_BROWSER_SET_ORIGIN to Pixel.PixelValues.DAX_DEFAULT_BROWSER_SETTINGS
             )
-            pixel.fire(PixelName.DEFAULT_BROWSER_NOT_SET, params)
+            pixel.fire(PixelName.DEFAULT_BROWSER_SET, params)
         }
     }
 
     fun onUserTriedToSetAsDefaultBrowserDialog() {
-        //TODO: pixels-pending to be implemented
+        //TODO: tidy up this part
         if (defaultBrowserDetector.isDefaultBrowser()) {
             defaultBrowserAttempt = 0
             installStore.defaultBrowser = true
+            val params = mapOf(
+                PixelParameter.DEFAULT_BROWSER_SET_FROM_ONBOARDING to false.toString(),
+                PixelParameter.DEFAULT_BROWSER_SET_ORIGIN to Pixel.PixelValues.DAX_DEFAULT_BROWSER_DIALOG
+            )
+            pixel.fire(PixelName.DEFAULT_BROWSER_SET, params)
         } else {
             installStore.defaultBrowser = false
             if (defaultBrowserAttempt < MAX_DIALOG_ATTEMPTS) {
                 defaultBrowserAttempt++
                 command.value = OpenDialog()
+            } else {
+                val params = mapOf(
+                    PixelParameter.DEFAULT_BROWSER_SET_FROM_ONBOARDING to false.toString(),
+                    PixelParameter.DEFAULT_BROWSER_SET_ORIGIN to Pixel.PixelValues.DAX_DEFAULT_BROWSER_JUST_ONCE_MAX
+                )
+                pixel.fire(PixelName.DEFAULT_BROWSER_NOT_SET, params)
             }
         }
+    }
+
+    fun onUserDismissedDefaultBrowserDialog() {
+        val params = mapOf(
+            PixelParameter.DEFAULT_BROWSER_SET_FROM_ONBOARDING to false.toString(),
+            PixelParameter.DEFAULT_BROWSER_SET_ORIGIN to Pixel.PixelValues.DAX_DEFAULT_BROWSER_DIALOG_DISMISSED
+        )
+        pixel.fire(PixelName.DEFAULT_BROWSER_NOT_SET, params)
     }
 
     fun updateTabPreview(tabId: String, fileName: String) {
