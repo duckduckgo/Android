@@ -23,6 +23,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import androidx.annotation.DrawableRes
+import com.duckduckgo.app.browser.BuildConfig
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.icon.api.IconModifier.Companion.QUALIFIER
 import com.duckduckgo.app.launch.LaunchActivity
@@ -78,7 +79,7 @@ class AppIconModifier @Inject constructor(private val context: Context) : IconMo
 
     private fun setComponentState(componentName: String, componentState: Int) {
         context.packageManager.setComponentEnabledSetting(
-            ComponentName(context, componentName),
+            ComponentName(BuildConfig.APPLICATION_ID, componentName),
             componentState, PackageManager.DONT_KILL_APP
         )
     }

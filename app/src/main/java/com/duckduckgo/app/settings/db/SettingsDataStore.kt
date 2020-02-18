@@ -79,10 +79,10 @@ class SettingsSharedPreferences @Inject constructor(private val context: Context
 
     override var appIcon: AppIcon
         get() {
-            val componentName = preferences.getString(KEY_APP_ICON, null) ?: return AppIcon.DEFAULT
+            val componentName = preferences.getString(KEY_APP_ICON, AppIcon.DEFAULT.componentName) ?: return AppIcon.DEFAULT
             return AppIcon.from(componentName)
         }
-        set(appIcon) = preferences.edit { putString(KEY_APP_ICON, appIcon!!.componentName) }
+        set(appIcon) = preferences.edit { putString(KEY_APP_ICON, appIcon.componentName) }
 
     override var appUsedSinceLastClear: Boolean
         get() = preferences.getBoolean(KEY_APP_USED_SINCE_LAST_CLEAR, true)
