@@ -176,7 +176,8 @@ interface Pixel {
         const val DAX_SERP_CTA = "s"
         const val DAX_DEFAULT_BROWSER_CTA_DIALOG = "dxdfd"
         const val DAX_DEFAULT_BROWSER_CTA_SETTINGS = "dxdfs"
-        const val DAX_SEARCH_WIDGET_CTA = "dxsw"
+        const val DAX_SEARCH_WIDGET_CTA_AUTO = "dxswa"
+        const val DAX_SEARCH_WIDGET_CTA_MANUAL = "dxswm"
 
         const val DAX_DEFAULT_BROWSER_SETTINGS = "dxs"
         const val DAX_DEFAULT_BROWSER_DIALOG = "dxd"

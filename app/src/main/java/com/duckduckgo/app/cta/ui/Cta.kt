@@ -178,9 +178,10 @@ sealed class DaxDialogCta(
     }
 
     class SearchWidgetCta(
-        private val widgetCapabilities: WidgetCapabilities,
+        widgetCapabilities: WidgetCapabilities,
         override val onboardingStore: OnboardingStore,
-        override val appInstallStore: AppInstallStore
+        override val appInstallStore: AppInstallStore,
+        private val searchWidgetBehavior: SearchWidgetBehavior = getSearchWidgetBehavior(widgetCapabilities)
     ) : DaxDialogCta(
         ctaId = CtaId.DAX_DIALOG_SEARCH_WIDGET,
         description = R.string.daxSearchWidgetCtaText,
@@ -188,7 +189,7 @@ sealed class DaxDialogCta(
         shownPixel = Pixel.PixelName.ONBOARDING_DAX_CTA_SHOWN,
         okPixel = Pixel.PixelName.ONBOARDING_DAX_CTA_OK_BUTTON,
         cancelPixel = null,
-        ctaPixelParam = Pixel.PixelValues.DAX_SEARCH_WIDGET_CTA,
+        ctaPixelParam = searchWidgetBehavior.ctaPixelParam,
         onboardingStore = onboardingStore,
         appInstallStore = appInstallStore
     ), SecondaryButtonCta {
@@ -196,7 +197,7 @@ sealed class DaxDialogCta(
         override val secondaryButtonPixel: Pixel.PixelName = Pixel.PixelName.ONBOARDING_DAX_CTA_CANCEL_BUTTON
 
         val primaryAction: SearchWidgetAction
-            get() = getAction()
+            get() = searchWidgetBehavior.action
 
         override fun createCta(activity: FragmentActivity): DaxDialog {
             return TypewriterDaxDialog(
@@ -207,19 +208,26 @@ sealed class DaxDialogCta(
             )
         }
 
-        private fun getAction(): SearchWidgetAction {
-            return if (widgetCapabilities.supportsAutomaticWidgetAdd) {
-                SearchWidgetAction.AddAutomatic
-            } else {
-                SearchWidgetAction.AddManually
-            }
-        }
-
         override fun pixelSecondaryButtonParameters(): Map<String, String?> = mapOf(Pixel.PixelParameter.CTA_SHOWN to ctaPixelParam)
 
         sealed class SearchWidgetAction {
             object AddAutomatic : SearchWidgetAction()
             object AddManually : SearchWidgetAction()
+        }
+
+        sealed class SearchWidgetBehavior(val ctaPixelParam: String, val action: SearchWidgetAction) {
+            object Automatic : SearchWidgetBehavior(Pixel.PixelValues.DAX_SEARCH_WIDGET_CTA_AUTO, SearchWidgetAction.AddAutomatic)
+            object Manual : SearchWidgetBehavior(Pixel.PixelValues.DAX_SEARCH_WIDGET_CTA_MANUAL, SearchWidgetAction.AddManually)
+        }
+
+        companion object {
+            private fun getSearchWidgetBehavior(widgetCapabilities: WidgetCapabilities): SearchWidgetBehavior {
+                return if (widgetCapabilities.supportsAutomaticWidgetAdd) {
+                    SearchWidgetBehavior.Automatic
+                } else {
+                    SearchWidgetBehavior.Manual
+                }
+            }
         }
     }
 
