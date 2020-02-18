@@ -240,13 +240,15 @@ class CtaViewModel @Inject constructor(
     @WorkerThread
     private fun canShowDefaultBrowserDaxCta(): Boolean {
         return defaultBrowserDetector.deviceSupportsDefaultBrowserConfiguration() &&
-                !defaultBrowserDetector.isDefaultBrowser()
+                !defaultBrowserDetector.isDefaultBrowser() &&
+                variantManager.getVariant().hasFeature(VariantManager.VariantFeature.DefaultBrowserDaxCta)
     }
 
     @WorkerThread
     private fun canShowWidgetDaxCta(): Boolean {
         return widgetCapabilities.supportsStandardWidgetAdd &&
-                !widgetCapabilities.hasInstalledWidgets
+                !widgetCapabilities.hasInstalledWidgets &&
+                variantManager.getVariant().hasFeature(VariantManager.VariantFeature.SearchWidgetDaxCta)
     }
 
     private fun hasTrackersInformation(events: List<TrackingEvent>): Boolean =
