@@ -241,14 +241,16 @@ class CtaViewModel @Inject constructor(
     private fun canShowDefaultBrowserDaxCta(): Boolean {
         return defaultBrowserDetector.deviceSupportsDefaultBrowserConfiguration() &&
                 !defaultBrowserDetector.isDefaultBrowser() &&
-                variantManager.getVariant().hasFeature(VariantManager.VariantFeature.DefaultBrowserDaxCta)
+                variantManager.getVariant().hasFeature(VariantManager.VariantFeature.DefaultBrowserDaxCta) &&
+                !daxDefaultBrowserShown()
     }
 
     @WorkerThread
     private fun canShowWidgetDaxCta(): Boolean {
         return widgetCapabilities.supportsStandardWidgetAdd &&
                 !widgetCapabilities.hasInstalledWidgets &&
-                variantManager.getVariant().hasFeature(VariantManager.VariantFeature.SearchWidgetDaxCta)
+                variantManager.getVariant().hasFeature(VariantManager.VariantFeature.SearchWidgetDaxCta) &&
+                !daxSearchWidgetShown()
     }
 
     private fun hasTrackersInformation(events: List<TrackingEvent>): Boolean =
@@ -275,6 +277,10 @@ class CtaViewModel @Inject constructor(
     private fun daxDialogTrackersFoundShown(): Boolean = dismissedCtaDao.exists(CtaId.DAX_DIALOG_TRACKERS_FOUND)
 
     private fun daxDialogNetworkShown(): Boolean = dismissedCtaDao.exists(CtaId.DAX_DIALOG_NETWORK)
+
+    private fun daxDefaultBrowserShown(): Boolean = dismissedCtaDao.exists(CtaId.DAX_DIALOG_DEFAULT_BROWSER)
+
+    private fun daxSearchWidgetShown(): Boolean = dismissedCtaDao.exists(CtaId.DAX_DIALOG_SEARCH_WIDGET)
 
     private fun isSerpUrl(url: String): Boolean = url.contains(DaxDialogCta.SERP)
 }
