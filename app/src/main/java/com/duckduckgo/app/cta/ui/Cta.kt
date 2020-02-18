@@ -120,23 +120,16 @@ sealed class DaxDialogCta(
     ) : DaxDialogCta(
         ctaId = CtaId.DAX_DIALOG_DEFAULT_BROWSER,
         description = R.string.daxDefaultBrowserCtaText,
-        okButton = R.string.daxDialogYes,
+        okButton = getOkButtonStringRes(defaultBrowserDetector),
         shownPixel = Pixel.PixelName.ONBOARDING_DAX_CTA_SHOWN,
         okPixel = Pixel.PixelName.ONBOARDING_DAX_CTA_OK_BUTTON,
         cancelPixel = null,
-        ctaPixelParam = Pixel.PixelValues.DAX_DEFAULT_BROWSER_CTA,
+        ctaPixelParam = getCtaPixelParam(defaultBrowserDetector),
         onboardingStore = onboardingStore,
         appInstallStore = appInstallStore
     ), SecondaryButtonCta {
 
         override val secondaryButtonPixel: Pixel.PixelName = Pixel.PixelName.ONBOARDING_DAX_CTA_CANCEL_BUTTON
-
-        override val okButton: Int
-            get() = if (defaultBrowserDetector.hasDefaultBrowser()) {
-                R.string.daxDialogSettings
-            } else {
-                R.string.daxDialogYes
-            }
 
         val primaryAction: DefaultBrowserAction
             get() = getAction()
@@ -164,6 +157,24 @@ sealed class DaxDialogCta(
             object ShowSettings : DefaultBrowserAction()
             object ShowSystemDialog : DefaultBrowserAction()
         }
+
+        companion object {
+            fun getCtaPixelParam(defaultBrowserDetector: DefaultBrowserDetector): String {
+                return if (defaultBrowserDetector.hasDefaultBrowser()) {
+                    Pixel.PixelValues.DAX_DEFAULT_BROWSER_CTA_DIALOG
+                } else {
+                    Pixel.PixelValues.DAX_DEFAULT_BROWSER_CTA_SETTINGS
+                }
+            }
+
+            fun getOkButtonStringRes(defaultBrowserDetector: DefaultBrowserDetector): Int {
+                return if (defaultBrowserDetector.hasDefaultBrowser()) {
+                    R.string.daxDialogSettings
+                } else {
+                    R.string.daxDialogYes
+                }
+            }
+        }
     }
 
     class SearchWidgetCta(
@@ -171,13 +182,13 @@ sealed class DaxDialogCta(
         override val onboardingStore: OnboardingStore,
         override val appInstallStore: AppInstallStore
     ) : DaxDialogCta(
-        ctaId = CtaId.DAX_DIALOG_SEACH_DIALOG,
+        ctaId = CtaId.DAX_DIALOG_SEARCH_WIDGET,
         description = R.string.daxSearchWidgetCtaText,
         okButton = R.string.daxDialogAddWidget,
         shownPixel = Pixel.PixelName.ONBOARDING_DAX_CTA_SHOWN,
         okPixel = Pixel.PixelName.ONBOARDING_DAX_CTA_OK_BUTTON,
         cancelPixel = null,
-        ctaPixelParam = Pixel.PixelValues.DAX_DEFAULT_BROWSER_CTA,
+        ctaPixelParam = Pixel.PixelValues.DAX_SEARCH_WIDGET_CTA,
         onboardingStore = onboardingStore,
         appInstallStore = appInstallStore
     ), SecondaryButtonCta {
