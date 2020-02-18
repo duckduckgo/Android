@@ -56,16 +56,12 @@ import com.duckduckgo.app.browser.model.LongPressTarget
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.browser.ui.HttpAuthenticationDialogFragment.HttpAuthenticationListener
-import com.duckduckgo.app.cta.ui.Cta
-import com.duckduckgo.app.cta.ui.CtaViewModel
-import com.duckduckgo.app.cta.ui.DaxDialogCta
-import com.duckduckgo.app.cta.ui.HomePanelCta
-import com.duckduckgo.app.cta.ui.SecondaryButtonCta
+import com.duckduckgo.app.cta.ui.*
 import com.duckduckgo.app.global.*
+import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.global.model.SiteFactory
 import com.duckduckgo.app.global.model.domainMatchesUrl
-import com.duckduckgo.app.global.toDesktopUri
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao
 import com.duckduckgo.app.privacy.model.PrivacyGrade
 import com.duckduckgo.app.settings.db.SettingsDataStore
@@ -74,7 +70,6 @@ import com.duckduckgo.app.statistics.api.StatisticsUpdater
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelName
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelValues.DAX_DEFAULT_BROWSER_CTA
 import com.duckduckgo.app.survey.model.Survey
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
@@ -910,9 +905,8 @@ class BrowserTabViewModel(
         viewModelScope.launch {
             withContext(dispatchers.io()) {
                 ctaViewModel.obtainNextCta(previousCta = cta)
-            }?.let {
-                ctaViewState.value = currentCtaViewState().copy(cta = it)
-            } ?: produceNewCommand(cta)
+            }?.let { ctaViewState.value = currentCtaViewState().copy(cta = it) }
+            produceNewCommand(cta)
         }
     }
 
