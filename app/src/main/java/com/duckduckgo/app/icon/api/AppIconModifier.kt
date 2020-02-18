@@ -34,7 +34,7 @@ interface IconModifier {
         const val QUALIFIER = "com.duckduckgo.app.launch"
     }
 
-    fun changeIcon(newIcon: AppIcon)
+    fun changeIcon(previousIcon: AppIcon, newIcon: AppIcon)
 }
 
 enum class AppIcon(
@@ -55,7 +55,6 @@ enum class AppIcon(
     ), ;
 
     companion object {
-
         fun from(componentName: String): AppIcon {
             return values().first { it.componentName == componentName }
         }
@@ -64,9 +63,9 @@ enum class AppIcon(
 
 class AppIconModifier @Inject constructor(private val context: Context) : IconModifier {
 
-    override fun changeIcon(newIcon: AppIcon) {
-        AppIcon.values().filter { it.componentName != newIcon.componentName }.map { disable(it) }
-        AppIcon.values().filter { it.componentName == newIcon.componentName }.map { enable(it) }
+    override fun changeIcon(previousIcon: AppIcon, newIcon: AppIcon) {
+        enable(newIcon)
+        disable(previousIcon)
     }
 
     private fun disable(appIcon: AppIcon) {

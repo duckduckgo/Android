@@ -49,6 +49,7 @@ class ChangeIconViewModel @Inject constructor(
 
     sealed class Command {
         data class ShowChangeIconCta(val appIcon: AppIcon) : Command()
+        object IconChanged : Command()
     }
 
     val viewState: MutableLiveData<ViewState> = MutableLiveData()
@@ -68,8 +69,9 @@ class ChangeIconViewModel @Inject constructor(
     }
 
     fun onChangeIcon(appIcon: AppIcon) {
-        viewState.value = ViewState(AppIcon.values().map { IconViewData.from(it, appIcon) })
+        val previousIcon = settingsDataStore.appIcon
+        appIconModifier.changeIcon(previousIcon, appIcon)
         settingsDataStore.appIcon = appIcon
-        appIconModifier.changeIcon(appIcon)
+        command.value = Command.IconChanged
     }
 }

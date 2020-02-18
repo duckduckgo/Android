@@ -84,16 +84,10 @@ class ChangeIconActivity : DuckDuckGoActivity() {
     private fun processCommand(it: ChangeIconViewModel.Command?) {
         when (it) {
             is ChangeIconViewModel.Command.ShowChangeIconCta -> {
-                AlertDialog.Builder(this, R.style.AlertDialogTheme)
-                    .setTitle("Change app icon")
-                    .setMessage("Do you want to continue?")
-                    .setPositiveButton(R.string.yes) { _, _ ->
-                        viewModel.onChangeIcon(it.appIcon)
-                    }
-                    .setNegativeButton(R.string.no) { dialog, _ ->
-                        dialog.dismiss()
-                    }
-                    .show()
+                viewModel.onChangeIcon(it.appIcon)
+            }
+            is ChangeIconViewModel.Command.IconChanged -> {
+                finish()
             }
         }
     }
