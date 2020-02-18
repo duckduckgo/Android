@@ -48,7 +48,6 @@ class ChangeIconViewModel @Inject constructor(
     )
 
     sealed class Command {
-        data class ShowChangeIconCta(val appIcon: AppIcon) : Command()
         object IconChanged : Command()
     }
 
@@ -60,18 +59,16 @@ class ChangeIconViewModel @Inject constructor(
     }
 
     fun start() {
+        pixel.fire(Pixel.PixelName.CHANGE_APP_ICON_OPENED)
         val selectedIcon = settingsDataStore.appIcon
         viewState.value = ViewState(AppIcon.values().map { IconViewData.from(it, selectedIcon) })
     }
 
     fun onIconSelected(viewData: IconViewData) {
-        command.value = Command.ShowChangeIconCta(viewData.appIcon)
-    }
-
-    fun onChangeIcon(appIcon: AppIcon) {
         val previousIcon = settingsDataStore.appIcon
-        appIconModifier.changeIcon(previousIcon, appIcon)
-        settingsDataStore.appIcon = appIcon
+        appIconModifier.changeIcon(previousIcon, viewData.appIcon)
+        settingsDataStore.appIcon = viewData.appIcon
         command.value = Command.IconChanged
     }
+
 }

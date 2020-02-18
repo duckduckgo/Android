@@ -83,9 +83,6 @@ class ChangeIconActivity : DuckDuckGoActivity() {
 
     private fun processCommand(it: ChangeIconViewModel.Command?) {
         when (it) {
-            is ChangeIconViewModel.Command.ShowChangeIconCta -> {
-                viewModel.onChangeIcon(it.appIcon)
-            }
             is ChangeIconViewModel.Command.IconChanged -> {
                 finish()
             }
