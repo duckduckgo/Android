@@ -657,11 +657,11 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
         if (requestCode == REQUEST_CODE_CHOOSE_FILE) {
             handleFileUploadResult(resultCode, data)
         } else if (requestCode == DEFAULT_BROWSER_REQUEST_CODE_SETTINGS) {
-            viewModel.onUserTriedToSetAsDefaultBrowserSettings()
+            viewModel.onUserTriedToSetAsDefaultBrowserFromSettings()
         } else if (requestCode == DEFAULT_BROWSER_REQUEST_CODE_DIALOG) {
             hidInstructionsCard()
             if (resultCode == DefaultBrowserPage.DEFAULT_BROWSER_RESULT_CODE_DIALOG_INTERNAL) {
-                viewModel.onUserTriedToSetAsDefaultBrowserDialog()
+                viewModel.onUserTriedToSetAsDefaultBrowserFromDialog()
             } else {
                 viewModel.onUserDismissedDefaultBrowserDialog()
             }

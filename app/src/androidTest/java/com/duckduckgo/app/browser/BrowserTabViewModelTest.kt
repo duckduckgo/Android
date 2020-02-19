@@ -41,6 +41,7 @@ import com.duckduckgo.app.browser.BrowserTabViewModel.Command.Navigate
 import com.duckduckgo.app.browser.LongPressHandler.RequiredAction.DownloadFile
 import com.duckduckgo.app.browser.LongPressHandler.RequiredAction.OpenInNewTab
 import com.duckduckgo.app.browser.addtohome.AddToHomeCapabilityDetector
+import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.browser.favicon.FaviconDownloader
 import com.duckduckgo.app.browser.model.BasicAuthenticationCredentials
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
@@ -175,6 +176,9 @@ class BrowserTabViewModelTest {
     @Mock
     private lateinit var mockPrivacySettingsStore: PrivacySettingsStore
 
+    @Mock
+    private lateinit var mockDefaultBrowserDetector: DefaultBrowserDetector
+
     private lateinit var mockAutoCompleteApi: AutoCompleteApi
 
     private lateinit var ctaViewModel: CtaViewModel
@@ -207,7 +211,8 @@ class BrowserTabViewModelTest {
             mockVariantManager,
             mockSettingsStore,
             mockOnboardingStore,
-            mockPrivacySettingsStore
+            mockPrivacySettingsStore,
+            mockDefaultBrowserDetector
         )
 
         val siteFactory = SiteFactory(mockPrivacyPractices, mockEntityLookup)
@@ -239,7 +244,9 @@ class BrowserTabViewModelTest {
             searchCountDao = mockSearchCountDao,
             pixel = mockPixel,
             variantManager = mockVariantManager,
-            dispatchers = coroutineRule.testDispatcherProvider
+            dispatchers = coroutineRule.testDispatcherProvider,
+            defaultBrowserDetector = mockDefaultBrowserDetector,
+            installStore = mockAppInstallStore
         )
 
         testee.loadData("abc", null, false)
@@ -1350,7 +1357,7 @@ class BrowserTabViewModelTest {
     @Test
     fun whenSurveyCtaDismissedAndNoOtherCtaPossibleCtaIsNull() {
         testee.onSurveyChanged(Survey("abc", "http://example.com", daysInstalled = 1, status = Survey.Status.SCHEDULED))
-        testee.onUserDismissedCta()
+        testee.onUserDismissedCta(testee.ctaViewState.value!!.cta!!)
         assertNull(testee.ctaViewState.value!!.cta)
     }
 
@@ -1361,7 +1368,7 @@ class BrowserTabViewModelTest {
         whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(false)
 
         testee.onSurveyChanged(Survey("abc", "http://example.com", daysInstalled = 1, status = Survey.Status.SCHEDULED))
-        testee.onUserDismissedCta()
+        testee.onUserDismissedCta(testee.ctaViewState.value!!.cta!!)
         assertEquals(HomePanelCta.AddWidgetAuto, testee.ctaViewState.value!!.cta)
     }
 
@@ -1456,73 +1463,120 @@ class BrowserTabViewModelTest {
     @Test
     fun whenUserClickedCtaButtonThenFirePixel() {
         val cta = DaxBubbleCta.DaxIntroCta(mockOnboardingStore, mockAppInstallStore)
-        testee.ctaViewState.value = BrowserTabViewModel.CtaViewState(cta = cta)
-
-        testee.onUserClickCtaOkButton()
+        testee.onUserClickCtaOkButton(cta)
         verify(mockPixel).fire(cta.okPixel!!, cta.pixelOkParameters())
     }
 
     @Test
     fun whenUserClickedCtaButtonThenLaunchSurveyCommand() {
         val cta = HomePanelCta.Survey(Survey("abc", "http://example.com", daysInstalled = 1, status = Survey.Status.SCHEDULED))
-        testee.ctaViewState.value = BrowserTabViewModel.CtaViewState(cta = cta)
-
-        testee.onUserClickCtaOkButton()
+        testee.onUserClickCtaOkButton(cta)
         assertCommandIssued<Command.LaunchSurvey>()
     }
 
     @Test
     fun whenUserClickedCtaButtonThenLaunchAddWidgetCommand() {
         val cta = HomePanelCta.AddWidgetAuto
-        testee.ctaViewState.value = BrowserTabViewModel.CtaViewState(cta = cta)
-
-        testee.onUserClickCtaOkButton()
+        testee.onUserClickCtaOkButton(cta)
         assertCommandIssued<Command.LaunchAddWidget>()
     }
 
     @Test
     fun whenUserClickedCtaButtonThenLaunchLegacyAddWidgetCommand() {
         val cta = HomePanelCta.AddWidgetInstructions
-        testee.ctaViewState.value = BrowserTabViewModel.CtaViewState(cta = cta)
-
-        testee.onUserClickCtaOkButton()
+        testee.onUserClickCtaOkButton(cta)
         assertCommandIssued<Command.LaunchLegacyAddWidget>()
     }
 
     @Test
     fun whenUserDismissedCtaThenFirePixel() {
         val cta = HomePanelCta.Survey(Survey("abc", "http://example.com", daysInstalled = 1, status = Survey.Status.SCHEDULED))
-        testee.ctaViewState.value = BrowserTabViewModel.CtaViewState(cta = cta)
-
-        testee.onUserDismissedCta()
+        testee.onUserDismissedCta(cta)
         verify(mockPixel).fire(cta.cancelPixel!!, cta.pixelCancelParameters())
     }
 
     @Test
     fun whenUserDismissedCtaThenRegisterInDatabase() {
         val cta = HomePanelCta.AddWidgetAuto
-        testee.ctaViewState.value = BrowserTabViewModel.CtaViewState(cta = cta)
-
-        testee.onUserDismissedCta()
+        testee.onUserDismissedCta(cta)
         verify(mockDismissedCtaDao).insert(DismissedCta(cta.ctaId))
     }
 
     @Test
     fun whenUserDismissedSurveyCtaThenDoNotRegisterInDatabase() {
         val cta = HomePanelCta.Survey(Survey("abc", "http://example.com", daysInstalled = 1, status = Survey.Status.SCHEDULED))
-        testee.ctaViewState.value = BrowserTabViewModel.CtaViewState(cta = cta)
-
-        testee.onUserDismissedCta()
+        testee.onUserDismissedCta(cta)
         verify(mockDismissedCtaDao, never()).insert(DismissedCta(cta.ctaId))
     }
 
     @Test
     fun whenUserDismissedSurveyCtaThenCancelScheduledSurveys() {
         val cta = HomePanelCta.Survey(Survey("abc", "http://example.com", daysInstalled = 1, status = Survey.Status.SCHEDULED))
-        testee.ctaViewState.value = BrowserTabViewModel.CtaViewState(cta = cta)
-
-        testee.onUserDismissedCta()
+        testee.onUserDismissedCta(cta)
         verify(mockSurveyDao).cancelScheduledSurveys()
+    }
+
+    @Test
+    fun whenUserFailedSettingDdgAsDefaultBrowserFromSettingsThenFirePixelAndUpdateInstallStore() {
+        whenever(mockDefaultBrowserDetector.isDefaultBrowser()).thenReturn(false)
+
+        testee.onUserTriedToSetAsDefaultBrowserFromSettings()
+
+        verify(mockAppInstallStore).defaultBrowser = false
+        verify(mockPixel).fire(Pixel.PixelName.DEFAULT_BROWSER_NOT_SET, defaultBrowserPixelParams(Pixel.PixelValues.DAX_DEFAULT_BROWSER_SETTINGS))
+    }
+
+    @Test
+    fun whenUserHasSetDdgAsDefaultBrowserFromSettingsThenFirePixelAndUpdateInstallStore() {
+        whenever(mockDefaultBrowserDetector.isDefaultBrowser()).thenReturn(true)
+
+        testee.onUserTriedToSetAsDefaultBrowserFromSettings()
+
+        verify(mockAppInstallStore).defaultBrowser = true
+        verify(mockPixel).fire(Pixel.PixelName.DEFAULT_BROWSER_SET, defaultBrowserPixelParams(Pixel.PixelValues.DAX_DEFAULT_BROWSER_SETTINGS))
+    }
+
+    @Test
+    fun whenUserFailedSettingDdgAsDefaultBrowserFromDialogOnceThenFirePixelAndUpdateInstallStore() {
+        whenever(mockDefaultBrowserDetector.isDefaultBrowser()).thenReturn(false)
+
+        testee.onUserTriedToSetAsDefaultBrowserFromDialog()
+
+        assertCommandIssued<Command.OpenDialog>()
+    }
+
+    @Test
+    fun whenUserFailedSettingDdgAsDefaultBrowserFromDialogTwiceThenFirePixelAndUpdateInstallStore() {
+        whenever(mockDefaultBrowserDetector.isDefaultBrowser()).thenReturn(false)
+
+        testee.onUserTriedToSetAsDefaultBrowserFromDialog()
+        testee.onUserTriedToSetAsDefaultBrowserFromDialog()
+
+        verify(mockAppInstallStore).defaultBrowser = false
+        verify(mockPixel).fire(Pixel.PixelName.DEFAULT_BROWSER_NOT_SET, defaultBrowserPixelParams(Pixel.PixelValues.DAX_DEFAULT_BROWSER_DIALOG))
+    }
+
+    @Test
+    fun whenUserHasSetDdgAsDefaultBrowserFromDialogThenFirePixelAndUpdateInstallStore() {
+        whenever(mockDefaultBrowserDetector.isDefaultBrowser()).thenReturn(true)
+
+        testee.onUserTriedToSetAsDefaultBrowserFromDialog()
+
+        verify(mockAppInstallStore).defaultBrowser = true
+        verify(mockPixel).fire(Pixel.PixelName.DEFAULT_BROWSER_SET, defaultBrowserPixelParams(Pixel.PixelValues.DAX_DEFAULT_BROWSER_DIALOG))
+    }
+
+    @Test
+    fun whenUserDismissesDefaultBrowserDialogThenFirePixelAndUpdateInstallStore() {
+        whenever(mockDefaultBrowserDetector.isDefaultBrowser()).thenReturn(false)
+
+        testee.onUserDismissedDefaultBrowserDialog()
+
+        verify(mockAppInstallStore).defaultBrowser = false
+        verify(mockPixel).fire(
+            Pixel.PixelName.DEFAULT_BROWSER_NOT_SET,
+            defaultBrowserPixelParams(Pixel.PixelValues.DAX_DEFAULT_BROWSER_DIALOG_DISMISSED)
+        )
     }
 
     private inline fun <reified T : Command> assertCommandIssued(instanceAssertions: T.() -> Unit = {}) {
@@ -1536,6 +1590,12 @@ class BrowserTabViewModelTest {
         Pixel.PixelParameter.SHOWED_BOOKMARKS to showedBookmarks.toString(),
         Pixel.PixelParameter.BOOKMARK_CAPABLE to bookmarkCapable.toString()
     )
+
+    private fun defaultBrowserPixelParams(origin: String) = mapOf(
+        Pixel.PixelParameter.DEFAULT_BROWSER_SET_FROM_ONBOARDING to false.toString(),
+        Pixel.PixelParameter.DEFAULT_BROWSER_SET_ORIGIN to origin
+    )
+
 
     private fun givenExpectedCtaAddWidgetInstructions() {
         setBrowserShowing(false)

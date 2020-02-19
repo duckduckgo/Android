@@ -226,7 +226,7 @@ class BrowserTabViewModel(
     private var site: Site? = null
     private lateinit var tabId: String
     private var webNavigationState: WebNavigationState? = null
-    private var defaultBrowserAttempt: Int = 0
+    private var defaultBrowserAttempt: Int = 1
 
     init {
         initializeViewStates()
@@ -934,56 +934,45 @@ class BrowserTabViewModel(
         }
     }
 
-    fun onUserTriedToSetAsDefaultBrowserSettings() {
-        //TODO: tidy up this part
-        if (defaultBrowserDetector.isDefaultBrowser()) {
-            installStore.defaultBrowser = true
-            val params = mapOf(
-                PixelParameter.DEFAULT_BROWSER_SET_FROM_ONBOARDING to false.toString(),
-                PixelParameter.DEFAULT_BROWSER_SET_ORIGIN to Pixel.PixelValues.DAX_DEFAULT_BROWSER_SETTINGS
-            )
-            pixel.fire(PixelName.DEFAULT_BROWSER_SET, params)
-        } else {
-            installStore.defaultBrowser = false
-            val params = mapOf(
-                PixelParameter.DEFAULT_BROWSER_SET_FROM_ONBOARDING to false.toString(),
-                PixelParameter.DEFAULT_BROWSER_SET_ORIGIN to Pixel.PixelValues.DAX_DEFAULT_BROWSER_SETTINGS
-            )
-            pixel.fire(PixelName.DEFAULT_BROWSER_SET, params)
-        }
+    fun onUserTriedToSetAsDefaultBrowserFromSettings() {
+        val isDefaultBrowser = defaultBrowserDetector.isDefaultBrowser()
+        installStore.defaultBrowser = isDefaultBrowser
+        firePixelDefaultBrowserCtaUserAction(isDefaultBrowser, origin = Pixel.PixelValues.DAX_DEFAULT_BROWSER_SETTINGS)
     }
 
-    fun onUserTriedToSetAsDefaultBrowserDialog() {
-        //TODO: tidy up this part
+    fun onUserTriedToSetAsDefaultBrowserFromDialog() {
+        val isDefaultBrowser = defaultBrowserDetector.isDefaultBrowser()
+        installStore.defaultBrowser = isDefaultBrowser
         if (defaultBrowserDetector.isDefaultBrowser()) {
-            defaultBrowserAttempt = 0
-            installStore.defaultBrowser = true
-            val params = mapOf(
-                PixelParameter.DEFAULT_BROWSER_SET_FROM_ONBOARDING to false.toString(),
-                PixelParameter.DEFAULT_BROWSER_SET_ORIGIN to Pixel.PixelValues.DAX_DEFAULT_BROWSER_DIALOG
-            )
-            pixel.fire(PixelName.DEFAULT_BROWSER_SET, params)
+            defaultBrowserAttempt = 1
+            firePixelDefaultBrowserCtaUserAction(true, origin = Pixel.PixelValues.DAX_DEFAULT_BROWSER_DIALOG)
         } else {
-            installStore.defaultBrowser = false
             if (defaultBrowserAttempt < MAX_DIALOG_ATTEMPTS) {
                 defaultBrowserAttempt++
                 command.value = OpenDialog()
             } else {
-                val params = mapOf(
-                    PixelParameter.DEFAULT_BROWSER_SET_FROM_ONBOARDING to false.toString(),
-                    PixelParameter.DEFAULT_BROWSER_SET_ORIGIN to Pixel.PixelValues.DAX_DEFAULT_BROWSER_JUST_ONCE_MAX
-                )
-                pixel.fire(PixelName.DEFAULT_BROWSER_NOT_SET, params)
+                firePixelDefaultBrowserCtaUserAction(false, origin = Pixel.PixelValues.DAX_DEFAULT_BROWSER_JUST_ONCE_MAX)
             }
         }
     }
 
     fun onUserDismissedDefaultBrowserDialog() {
+        val isDefaultBrowser = defaultBrowserDetector.isDefaultBrowser()
+        installStore.defaultBrowser = isDefaultBrowser
+        firePixelDefaultBrowserCtaUserAction(isDefaultBrowser, origin = Pixel.PixelValues.DAX_DEFAULT_BROWSER_DIALOG_DISMISSED)
+    }
+
+    private fun firePixelDefaultBrowserCtaUserAction(isDefaultBrowser: Boolean, origin: String) {
         val params = mapOf(
             PixelParameter.DEFAULT_BROWSER_SET_FROM_ONBOARDING to false.toString(),
-            PixelParameter.DEFAULT_BROWSER_SET_ORIGIN to Pixel.PixelValues.DAX_DEFAULT_BROWSER_DIALOG_DISMISSED
+            PixelParameter.DEFAULT_BROWSER_SET_ORIGIN to origin
         )
-        pixel.fire(PixelName.DEFAULT_BROWSER_NOT_SET, params)
+
+        if (isDefaultBrowser) {
+            pixel.fire(PixelName.DEFAULT_BROWSER_SET, params)
+        } else {
+            pixel.fire(PixelName.DEFAULT_BROWSER_NOT_SET, params)
+        }
     }
 
     fun updateTabPreview(tabId: String, fileName: String) {
@@ -1058,10 +1047,7 @@ class BrowserTabViewModel(
     private fun DaxDialogCta.DefaultBrowserCta.DefaultBrowserAction.mapToCommand(): Command {
         return when (this) {
             is DaxDialogCta.DefaultBrowserCta.DefaultBrowserAction.ShowSettings -> OpenSettings
-            is DaxDialogCta.DefaultBrowserCta.DefaultBrowserAction.ShowSystemDialog -> {
-                defaultBrowserAttempt = 1
-                OpenDialog()
-            }
+            is DaxDialogCta.DefaultBrowserCta.DefaultBrowserAction.ShowSystemDialog -> OpenDialog()
         }
     }
 
