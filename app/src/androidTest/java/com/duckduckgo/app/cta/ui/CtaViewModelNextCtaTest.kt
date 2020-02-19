@@ -113,7 +113,6 @@ class CtaViewModelNextCtaTest {
         assertTrue(nextCta is DaxDialogCta.DefaultBrowserCta)
     }
 
-
     @Theory
     fun whenPreviousCtaIsDaxTrackersBlockedCtaCtaButConditionsAreInvalidThenExpectedNextCtaIsNull(
         deviceSupportsDefaultBrowserConfiguration: Boolean,
@@ -173,7 +172,7 @@ class CtaViewModelNextCtaTest {
         }
         return featureList
     }
-    
+
     companion object {
         @JvmStatic
         @DataPoint

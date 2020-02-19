@@ -22,6 +22,7 @@ import androidx.room.Room
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.InstantSchedulersRule
+import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.cta.db.DismissedCtaDao
 import com.duckduckgo.app.cta.model.CtaId
 import com.duckduckgo.app.cta.model.DismissedCta
@@ -55,6 +56,8 @@ import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.junit.runner.RunWith
+import org.junit.runners.Parameterized
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations
 import java.util.concurrent.TimeUnit
@@ -103,6 +106,9 @@ class CtaViewModelTest {
     @Mock
     private lateinit var mockPrivacySettingsStore: PrivacySettingsStore
 
+    @Mock
+    private lateinit var mockDefaultBrowserDetector: DefaultBrowserDetector
+
     private lateinit var testee: CtaViewModel
 
     @Before
@@ -126,7 +132,8 @@ class CtaViewModelTest {
             mockVariantManager,
             mockSettingsDataStore,
             mockOnboardingStore,
-            mockPrivacySettingsStore
+            mockPrivacySettingsStore,
+            mockDefaultBrowserDetector
         )
     }
 
