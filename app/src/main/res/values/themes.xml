@@ -170,7 +170,7 @@
     </style>
 
     <style name="DaxDialogFragment" parent="android:Theme.DeviceDefault.Light.NoActionBar">
-        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowTranslucentStatus">true</item>
     </style>
 
 </resources>
