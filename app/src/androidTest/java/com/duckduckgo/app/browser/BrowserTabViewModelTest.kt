@@ -1586,7 +1586,10 @@ class BrowserTabViewModelTest {
         testee.onUserTriedToSetAsDefaultBrowserFromDialog()
 
         verify(mockAppInstallStore, times(2)).defaultBrowser = false
-        verify(mockPixel).fire(Pixel.PixelName.DEFAULT_BROWSER_NOT_SET, defaultBrowserPixelParams(Pixel.PixelValues.DAX_DEFAULT_BROWSER_DIALOG))
+        verify(mockPixel).fire(
+            Pixel.PixelName.DEFAULT_BROWSER_NOT_SET,
+            defaultBrowserPixelParams(Pixel.PixelValues.DAX_DEFAULT_BROWSER_JUST_ONCE_MAX)
+        )
     }
 
     @Test
