@@ -30,6 +30,8 @@ import com.duckduckgo.app.global.baseHost
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.install.daysInstalled
 import com.duckduckgo.app.global.view.DaxDialog
+import com.duckduckgo.app.global.view.DaxDialogHighlightView
+import com.duckduckgo.app.global.view.TypewriterDaxDialog
 import com.duckduckgo.app.global.view.hide
 import com.duckduckgo.app.global.view.html
 import com.duckduckgo.app.global.view.show
@@ -38,9 +40,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import kotlinx.android.synthetic.main.include_cta_buttons.view.*
 import kotlinx.android.synthetic.main.include_cta_content.view.*
-import kotlinx.android.synthetic.main.include_dax_dialog_cta.view.dialogTextCta
-import kotlinx.android.synthetic.main.include_dax_dialog_cta.view.hiddenTextCta
-import kotlinx.android.synthetic.main.include_dax_dialog_cta.view.primaryCta
+import kotlinx.android.synthetic.main.include_dax_dialog_cta.view.*
 
 interface DialogCta {
     fun createCta(activity: FragmentActivity): DaxDialog
@@ -71,6 +71,12 @@ interface Cta {
     fun pixelOkParameters(): Map<String, String?>
 }
 
+interface SecondaryButtonCta {
+    val secondaryButtonPixel: Pixel.PixelName?
+
+    fun pixelSecondaryButtonParameters(): Map<String, String?>
+}
+
 sealed class DaxDialogCta(
     override val ctaId: CtaId,
     @AnyRes open val description: Int,
@@ -83,7 +89,7 @@ sealed class DaxDialogCta(
     override val appInstallStore: AppInstallStore
 ) : Cta, DialogCta, DaxCta {
 
-    override fun createCta(activity: FragmentActivity) = DaxDialog(getDaxText(activity), activity.resources.getString(okButton))
+    override fun createCta(activity: FragmentActivity): DaxDialog = TypewriterDaxDialog(getDaxText(activity), activity.resources.getString(okButton))
 
     override fun pixelCancelParameters(): Map<String, String?> = mapOf(Pixel.PixelParameter.CTA_SHOWN to ctaPixelParam)
 
@@ -123,7 +129,7 @@ sealed class DaxDialogCta(
     ) {
 
         override fun createCta(activity: FragmentActivity): DaxDialog =
-            DaxDialog(getDaxText(activity), activity.resources.getString(okButton), false)
+            TypewriterDaxDialog(daxText = getDaxText(activity), primaryButtonText = activity.resources.getString(okButton), toolbarDimmed = false)
 
         override fun getDaxText(context: Context): String {
             val trackersFiltered = trackers.asSequence()
@@ -172,7 +178,9 @@ sealed class DaxDialogCta(
         }
 
         override fun createCta(activity: FragmentActivity): DaxDialog {
-            return DaxDialog(getDaxText(activity), activity.resources.getString(okButton)).apply {
+            return DaxDialogHighlightView(
+                TypewriterDaxDialog(daxText = getDaxText(activity), primaryButtonText = activity.resources.getString(okButton))
+            ).apply {
                 val privacyGradeButton = activity.findViewById<View>(R.id.privacyGradeButton)
                 onAnimationFinishedListener {
                     if (isFromSameNetworkDomain()) {
@@ -184,8 +192,8 @@ sealed class DaxDialogCta(
 
         fun setSecondDialog(dialog: DaxDialog, activity: FragmentActivity) {
             ctaPixelParam = Pixel.PixelValues.DAX_NETWORK_CTA_2
-            dialog.daxText = activity.resources.getString(R.string.daxMainNetworkStep2CtaText, firstParagraph(activity), network)
-            dialog.buttonText = activity.resources.getString(R.string.daxDialogGotIt)
+            dialog.setDaxText(activity.resources.getString(R.string.daxMainNetworkStep2CtaText, firstParagraph(activity), network))
+            dialog.setButtonText(activity.resources.getString(R.string.daxDialogGotIt))
             dialog.onAnimationFinishedListener { }
             dialog.setDialogAndStartAnimation()
         }
@@ -211,9 +219,13 @@ sealed class DaxDialogCta(
         onboardingStore,
         appInstallStore
     ) {
-
         override fun createCta(activity: FragmentActivity): DaxDialog {
-            return DaxDialog(getDaxText(activity), activity.resources.getString(okButton)).apply {
+            return DaxDialogHighlightView(
+                TypewriterDaxDialog(
+                    daxText = getDaxText(activity),
+                    primaryButtonText = activity.resources.getString(okButton)
+                )
+            ).apply {
                 val fireButton = activity.findViewById<View>(R.id.fire)
                 onAnimationFinishedListener {
                     startHighlightViewAnimation(fireButton)

@@ -49,6 +49,7 @@ import androidx.core.view.isEmpty
 import androidx.core.view.isNotEmpty
 import androidx.core.view.isVisible
 import androidx.core.view.postDelayed
+import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.*
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -76,6 +77,7 @@ import com.duckduckgo.app.cta.ui.HomePanelCta
 import com.duckduckgo.app.cta.ui.CtaViewModel
 import com.duckduckgo.app.cta.ui.DaxBubbleCta
 import com.duckduckgo.app.cta.ui.DaxDialogCta
+import com.duckduckgo.app.cta.ui.SecondaryButtonCta
 import com.duckduckgo.app.global.ViewModelFactory
 import com.duckduckgo.app.global.device.DeviceInfo
 import com.duckduckgo.app.global.view.*
@@ -235,7 +237,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
     private val logoHidingListener by lazy { LogoHidingLayoutChangeLifecycleListener(ddgLogo) }
 
     private var alertDialog: AlertDialog? = null
-    private var daxDialog: DaxDialog? = null
+    private var daxDialog: DialogFragment? = null
 
     override fun onAttach(context: Context) {
         AndroidSupportInjection.inject(this)
@@ -1388,7 +1390,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
                 daxDialog?.dismiss()
                 daxDialog = configuration.createCta(activity).apply {
                     setHideClickListener {
-                        dismiss()
+                        getDaxDialog().dismiss()
                         launchHideTipsDialog(activity, configuration)
                     }
                     setDismissListener {
@@ -1402,16 +1404,22 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
                         if (configuration is DaxDialogCta.DaxMainNetworkCta) {
                             setPrimaryCtaClickListener {
                                 viewModel.onUserClickCtaOkButton()
-                                dismiss()
+                                getDaxDialog().dismiss()
                             }
                             configuration.setSecondDialog(this, activity)
                             viewModel.onManualCtaShown(configuration)
                         } else {
-                            dismiss()
+                            getDaxDialog().dismiss()
                         }
                     }
-                    show(activity.supportFragmentManager, DAX_DIALOG_DIALOG_TAG)
-                }
+                    if (configuration is SecondaryButtonCta) {
+                        setSecondaryCtaClickListener {
+                            viewModel.onUserClickCtaSecondaryButton(configuration)
+                            getDaxDialog().dismiss()
+                        }
+                    }
+                    getDaxDialog().show(activity.supportFragmentManager, DAX_DIALOG_DIALOG_TAG)
+                }.getDaxDialog()
             }
         }
 

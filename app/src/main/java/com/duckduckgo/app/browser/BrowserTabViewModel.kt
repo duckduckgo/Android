@@ -55,6 +55,7 @@ import com.duckduckgo.app.browser.ui.HttpAuthenticationDialogFragment.HttpAuthen
 import com.duckduckgo.app.cta.ui.Cta
 import com.duckduckgo.app.cta.ui.HomePanelCta
 import com.duckduckgo.app.cta.ui.CtaViewModel
+import com.duckduckgo.app.cta.ui.SecondaryButtonCta
 import com.duckduckgo.app.global.*
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.global.model.SiteFactory
@@ -901,6 +902,10 @@ class BrowserTabViewModel(
             is HomePanelCta.AddWidgetInstructions -> LaunchLegacyAddWidget
             else -> return
         }
+    }
+
+    fun onUserClickCtaSecondaryButton(cta: SecondaryButtonCta) {
+        ctaViewModel.onUserClickCtaSecondaryButton(cta)
     }
 
     fun onUserDismissedCta() {
