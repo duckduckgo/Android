@@ -38,7 +38,7 @@ import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.Variant
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.VariantManager.VariantFeature.ConceptTest
-import com.duckduckgo.app.statistics.VariantManager.VariantFeature.SuppressWidgetCta
+import com.duckduckgo.app.statistics.VariantManager.VariantFeature.SuppressHomeTabWidgetCta
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.*
 import com.duckduckgo.app.survey.db.SurveyDao
@@ -294,7 +294,7 @@ class CtaViewModelTest {
 
     @Test
     fun whenRefreshCtaOnHomeTabAndSuppressWidgetCtaFeatureThenDoNotShowWidgetAutoCta() = runBlockingTest {
-        setSuppressWidgetCtaFeature()
+        setSuppressHomeTabWidgetCtaFeature()
         whenever(mockSettingsDataStore.hideTips).thenReturn(true)
         whenever(mockWidgetCapabilities.supportsStandardWidgetAdd).thenReturn(true)
         whenever(mockWidgetCapabilities.supportsAutomaticWidgetAdd).thenReturn(true)
@@ -306,7 +306,7 @@ class CtaViewModelTest {
 
     @Test
     fun whenRefreshCtaOnHomeTabAndSuppressWidgetCtaFeatureActiveThenDoNotShowWidgetInstructionsCta() = runBlockingTest {
-        setSuppressWidgetCtaFeature()
+        setSuppressHomeTabWidgetCtaFeature()
         whenever(mockSettingsDataStore.hideTips).thenReturn(true)
         whenever(mockWidgetCapabilities.supportsStandardWidgetAdd).thenReturn(true)
         whenever(mockWidgetCapabilities.supportsAutomaticWidgetAdd).thenReturn(false)
@@ -342,7 +342,7 @@ class CtaViewModelTest {
 
     @Test
     fun whenRefreshCtaOnHomeTabAndSuppressWidgetCtaFeatureActiveThenReturnNullWhenTryngToShowWidgetCta() = runBlockingTest {
-        setSuppressWidgetCtaFeature()
+        setSuppressHomeTabWidgetCtaFeature()
         whenever(mockSettingsDataStore.hideTips).thenReturn(true)
         whenever(mockWidgetCapabilities.supportsStandardWidgetAdd).thenReturn(true)
         whenever(mockWidgetCapabilities.supportsAutomaticWidgetAdd).thenReturn(true)
@@ -354,7 +354,7 @@ class CtaViewModelTest {
 
     @Test
     fun whenRefreshCtaOnHomeTabAndSuppressWidgetCtaFeatureActiveThenReturnNullWhenTryngToShowWidgetInstructionsCta() = runBlockingTest {
-        setSuppressWidgetCtaFeature()
+        setSuppressHomeTabWidgetCtaFeature()
         whenever(mockSettingsDataStore.hideTips).thenReturn(true)
         whenever(mockWidgetCapabilities.supportsStandardWidgetAdd).thenReturn(true)
         whenever(mockWidgetCapabilities.supportsAutomaticWidgetAdd).thenReturn(false)
@@ -439,9 +439,9 @@ class CtaViewModelTest {
         )
     }
 
-    private fun setSuppressWidgetCtaFeature() {
+    private fun setSuppressHomeTabWidgetCtaFeature() {
         whenever(mockVariantManager.getVariant()).thenReturn(
-            Variant("test", features = listOf(SuppressWidgetCta), filterBy = { true })
+            Variant("test", features = listOf(SuppressHomeTabWidgetCta), filterBy = { true })
         )
     }
 
