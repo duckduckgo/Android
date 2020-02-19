@@ -52,6 +52,7 @@ import com.duckduckgo.app.cta.db.DismissedCtaDao
 import com.duckduckgo.app.cta.model.DismissedCta
 import com.duckduckgo.app.cta.ui.CtaViewModel
 import com.duckduckgo.app.cta.ui.DaxBubbleCta
+import com.duckduckgo.app.cta.ui.DaxDialogCta
 import com.duckduckgo.app.cta.ui.HomePanelCta
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.global.install.AppInstallStore
@@ -1468,22 +1469,54 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenUserClickedCtaButtonThenLaunchSurveyCommand() {
+    fun whenUserClickedSurveyCtaButtonThenLaunchSurveyCommand() {
         val cta = HomePanelCta.Survey(Survey("abc", "http://example.com", daysInstalled = 1, status = Survey.Status.SCHEDULED))
         testee.onUserClickCtaOkButton(cta)
         assertCommandIssued<Command.LaunchSurvey>()
     }
 
     @Test
-    fun whenUserClickedCtaButtonThenLaunchAddWidgetCommand() {
+    fun whenUserClickedAddWidgetCtaButtonThenLaunchAddWidgetCommand() {
         val cta = HomePanelCta.AddWidgetAuto
         testee.onUserClickCtaOkButton(cta)
         assertCommandIssued<Command.LaunchAddWidget>()
     }
 
     @Test
-    fun whenUserClickedCtaButtonThenLaunchLegacyAddWidgetCommand() {
+    fun whenUserClickedLegacyAddWidgetCtaButtonThenLaunchLegacyAddWidgetCommand() {
         val cta = HomePanelCta.AddWidgetInstructions
+        testee.onUserClickCtaOkButton(cta)
+        assertCommandIssued<Command.LaunchLegacyAddWidget>()
+    }
+
+    @Test
+    fun whenUserClickedDefaultBrowserCtaButtonWithoutDefaultBrowserThenLaunchDialogCommand() {
+        whenever(mockDefaultBrowserDetector.hasDefaultBrowser()).thenReturn(false)
+        val cta = DaxDialogCta.DefaultBrowserCta(mockDefaultBrowserDetector, mock(), mock())
+        testee.onUserClickCtaOkButton(cta)
+        assertCommandIssued<Command.OpenDialog>()
+    }
+
+    @Test
+    fun whenUserClickedDefaultBrowserCtaButtonWithDefaultBrowserThenLaunchDialogCommand() {
+        whenever(mockDefaultBrowserDetector.hasDefaultBrowser()).thenReturn(true)
+        val cta = DaxDialogCta.DefaultBrowserCta(mockDefaultBrowserDetector, mock(), mock())
+        testee.onUserClickCtaOkButton(cta)
+        assertCommandIssued<Command.OpenSettings>()
+    }
+
+    @Test
+    fun whenUserClickedDaxSearchWidgetCtaButtonWithWidgetCapabilitiesThenLaunchAddWidget() {
+        whenever(mockWidgetCapabilities.supportsAutomaticWidgetAdd).thenReturn(true)
+        val cta = DaxDialogCta.SearchWidgetCta(mockWidgetCapabilities, mock(), mock())
+        testee.onUserClickCtaOkButton(cta)
+        assertCommandIssued<Command.LaunchAddWidget>()
+    }
+
+    @Test
+    fun whenUserClickedDaxSearchWidgetCtaButtonWithoutWidgetCapabilitiesThenLaunchLegacyAddWidget() {
+        whenever(mockWidgetCapabilities.supportsAutomaticWidgetAdd).thenReturn(false)
+        val cta = DaxDialogCta.SearchWidgetCta(mockWidgetCapabilities, mock(), mock())
         testee.onUserClickCtaOkButton(cta)
         assertCommandIssued<Command.LaunchLegacyAddWidget>()
     }
@@ -1552,7 +1585,7 @@ class BrowserTabViewModelTest {
         testee.onUserTriedToSetAsDefaultBrowserFromDialog()
         testee.onUserTriedToSetAsDefaultBrowserFromDialog()
 
-        verify(mockAppInstallStore).defaultBrowser = false
+        verify(mockAppInstallStore, times(2)).defaultBrowser = false
         verify(mockPixel).fire(Pixel.PixelName.DEFAULT_BROWSER_NOT_SET, defaultBrowserPixelParams(Pixel.PixelValues.DAX_DEFAULT_BROWSER_DIALOG))
     }
 
