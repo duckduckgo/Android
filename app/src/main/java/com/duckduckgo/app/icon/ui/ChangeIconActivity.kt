@@ -49,11 +49,6 @@ class ChangeIconActivity : DuckDuckGoActivity() {
         observeViewModel()
     }
 
-    override fun onStart() {
-        super.onStart()
-        viewModel.start()
-    }
-
     private fun setupActionBar() {
         setSupportActionBar(toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
@@ -75,6 +70,8 @@ class ChangeIconActivity : DuckDuckGoActivity() {
         viewModel.command.observe(this, Observer {
             processCommand(it)
         })
+
+        viewModel.start()
     }
 
     private fun render(viewState: ChangeIconViewModel.ViewState) {

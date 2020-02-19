@@ -54,10 +54,6 @@ class ChangeIconViewModel @Inject constructor(
     val viewState: MutableLiveData<ViewState> = MutableLiveData()
     val command: SingleLiveEvent<Command> = SingleLiveEvent()
 
-    init {
-        pixel.fire(Pixel.PixelName.CHANGE_APP_ICON_OPENED)
-    }
-
     fun start() {
         pixel.fire(Pixel.PixelName.CHANGE_APP_ICON_OPENED)
         val selectedIcon = settingsDataStore.appIcon
