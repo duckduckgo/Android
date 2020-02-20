@@ -32,19 +32,21 @@ import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 
 class BrowserTrackersAnimatorHelper {
 
-    private var logosStayOnScreenDuration: Long = TRACKER_LOGOS_DELAY_ON_SCREEN
     private var trackersAnimation: AnimatorSet = AnimatorSet()
 
-    fun startTrackersAnimation(cta: Cta?, activity: Activity, container: ConstraintLayout, views: List<View>, events: List<TrackingEvent>?) {
+    fun startTrackersAnimation(cta: Cta?, activity: Activity, container: ConstraintLayout, omnibarViews: List<View>, events: List<TrackingEvent>?) {
         if (events.isNullOrEmpty()) return
+
+        val logoViews: List<View> = getLogosViewListInContainer(activity, container, events)
+        if (logoViews.isEmpty()) return
 
         if (!trackersAnimation.isRunning) {
             trackersAnimation = if (cta is DaxDialogCta.DaxTrackersBlockedCta) {
-                createPartialTrackersAnimation(activity, container, views, events).apply {
+                createPartialTrackersAnimation(container, omnibarViews, logoViews).apply {
                     start()
                 }
             } else {
-                createFullTrackersAnimation(activity, container, views, events).apply {
+                createFullTrackersAnimation(container, omnibarViews, logoViews).apply {
                     start()
                 }
             }
@@ -66,6 +68,13 @@ class BrowserTrackersAnimatorHelper {
         }
     }
 
+    private fun getLogosViewListInContainer(activity: Activity, container: ConstraintLayout, events: List<TrackingEvent>): List<View> {
+        container.removeAllViews()
+        container.alpha = 0f
+        val logos = createResourcesIdList(activity, events)
+        return createLogosViewList(activity, container, logos)
+    }
+
     private fun createLogosViewList(activity: Activity, container: ConstraintLayout, resourcesId: List<Int>?): List<View> {
         return resourcesId?.map {
             val imageView = ImageView(activity)
@@ -78,9 +87,8 @@ class BrowserTrackersAnimatorHelper {
         }.orEmpty()
     }
 
-    private fun createResourcesIdList(activity: Activity, events: List<TrackingEvent>?): List<Int>? {
-        val packageName = activity.packageName
-        if (events.isNullOrEmpty() || packageName == null) return emptyList()
+    private fun createResourcesIdList(activity: Activity, events: List<TrackingEvent>): List<Int>? {
+        if (activity.packageName == null) return emptyList()
 
         return events.asSequence().mapNotNull {
             it.entity
@@ -99,38 +107,25 @@ class BrowserTrackersAnimatorHelper {
     }
 
     private fun createFullTrackersAnimation(
-        activity: Activity,
         container: ConstraintLayout,
-        views: List<View>,
-        events: List<TrackingEvent>?
+        omnibarViews: List<View>,
+        logoViews: List<View>
     ): AnimatorSet {
         return AnimatorSet().apply {
-            play(createPartialTrackersAnimation(activity, container, views, events))
+            play(createPartialTrackersAnimation(container, omnibarViews, logoViews))
             play(animateFadeOut(container))
-                .after(logosStayOnScreenDuration)
-                .before(animateOmnibarIn(views))
+                .after(TRACKER_LOGOS_DELAY_ON_SCREEN)
+                .before(animateOmnibarIn(omnibarViews))
         }
     }
 
     private fun createPartialTrackersAnimation(
-        activity: Activity,
         container: ConstraintLayout,
-        views: List<View>,
-        events: List<TrackingEvent>?
+        omnibarViews: List<View>,
+        logoViews: List<View>
     ): AnimatorSet {
-        container.removeAllViews()
-        container.alpha = 0f
-
-        val logos = createResourcesIdList(activity, events)
-        val logoViews: List<View> = createLogosViewList(activity, container, logos)
-        val fadeOmnibarOut = animateOmnibarOut(views)
+        val fadeOmnibarOut = animateOmnibarOut(omnibarViews)
         val fadeLogosIn = animateFadeIn(container)
-
-        logosStayOnScreenDuration = if (logoViews.isEmpty()) {
-            TRACKER_LOGOS_REMOVE_DELAY
-        } else {
-            TRACKER_LOGOS_DELAY_ON_SCREEN
-        }
 
         applyConstraintSet(container, logoViews)
         animateBlockedLogos(logoViews)
@@ -207,7 +202,6 @@ class BrowserTrackersAnimatorHelper {
     }
 
     companion object {
-        private const val TRACKER_LOGOS_REMOVE_DELAY = 0L
         private const val TRACKER_LOGOS_DELAY_ON_SCREEN = 2400L
         private const val DEFAULT_ANIMATION_DURATION = 150L
         private const val MAX_LOGOS_SHOWN = 4
