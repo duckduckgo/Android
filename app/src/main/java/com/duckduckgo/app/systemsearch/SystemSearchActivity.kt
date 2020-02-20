@@ -29,6 +29,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.autocomplete.BrowserAutoCompleteSuggestionsAdapter
+import com.duckduckgo.app.browser.omnibar.OmnibarScrolling
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.view.TextChangedWatcher
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -44,13 +45,16 @@ class SystemSearchActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var pixel: Pixel
 
-    private val viewModel: SystemSearchViewModel by bindViewModel()
+    @Inject
+    lateinit var omnibardScrolling: OmnibarScrolling
 
+    private val viewModel: SystemSearchViewModel by bindViewModel()
     private lateinit var autocompleteSuggestionsAdapter: BrowserAutoCompleteSuggestionsAdapter
     private lateinit var deviceAppSuggestionsAdapter: DeviceAppSuggestionsAdapter
 
     private val textChangeWatcher = object : TextChangedWatcher() {
         override fun afterTextChanged(editable: Editable) {
+            showOmnibar()
             viewModel.userUpdatedQuery(omnibarTextInput.text.toString())
         }
     }
@@ -61,6 +65,7 @@ class SystemSearchActivity : DuckDuckGoActivity() {
         configureObservers()
         configureAutoComplete()
         configureDeviceAppSuggestions()
+        configureOmnibar()
         configureTextInput()
     }
 
@@ -107,6 +112,18 @@ class SystemSearchActivity : DuckDuckGoActivity() {
         deviceAppSuggestions.adapter = deviceAppSuggestionsAdapter
     }
 
+    private fun configureOmnibar() {
+        results.addOnLayoutChangeListener { _, _, _, _, _, _, _, _, _ ->
+            val scrollable = results.maxScrollAmount > 0
+            if (scrollable) {
+                omnibardScrolling.enableOmnibarScrolling(toolbar)
+            } else {
+                appBarLayout.setExpanded(true, true)
+                omnibardScrolling.disableOmnibarScrolling(toolbar)
+            }
+        }
+    }
+
     private fun configureTextInput() {
         omnibarTextInput.setOnEditorActionListener(TextView.OnEditorActionListener { _, actionId, keyEvent ->
             if (actionId == EditorInfo.IME_ACTION_GO || keyEvent?.keyCode == KeyEvent.KEYCODE_ENTER) {
@@ -126,6 +143,7 @@ class SystemSearchActivity : DuckDuckGoActivity() {
             omnibarTextInput.setText(viewState.queryText)
             omnibarTextInput.setSelection(viewState.queryText.length)
         }
+
         deviceLabel.isVisible = viewState.appResults.isNotEmpty()
         autocompleteSuggestionsAdapter.updateData(viewState.autocompleteResults.query, viewState.autocompleteResults.suggestions)
         deviceAppSuggestionsAdapter.updateData(viewState.appResults)
@@ -143,6 +161,11 @@ class SystemSearchActivity : DuckDuckGoActivity() {
                 finish()
             }
         }
+    }
+
+    private fun showOmnibar() {
+        results.scrollTo(0, 0)
+        appBarLayout.setExpanded(true)
     }
 
     private fun launchedFromAppBar(intent: Intent): Boolean {

@@ -21,6 +21,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.app.autocomplete.api.AutoCompleteApi
+import com.duckduckgo.app.autocomplete.api.AutoCompleteApi.AutoCompleteResult
 import com.duckduckgo.app.global.SingleLiveEvent
 import com.jakewharton.rxrelay2.PublishRelay
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -38,7 +39,7 @@ class SystemSearchViewModel(
 
     data class SystemSearchViewState(
         val queryText: String = "",
-        val autocompleteResults: AutoCompleteApi.AutoCompleteResult = AutoCompleteApi.AutoCompleteResult("", emptyList()),
+        val autocompleteResults: AutoCompleteResult = AutoCompleteResult("", emptyList()),
         val appResults: List<DeviceApp> = emptyList()
     )
 
@@ -52,7 +53,7 @@ class SystemSearchViewModel(
 
     private val autoCompletePublishSubject = PublishRelay.create<String>()
     private var appResults: List<DeviceApp> = emptyList()
-    private var autocompleteResults: AutoCompleteApi.AutoCompleteResult = AutoCompleteApi.AutoCompleteResult("", emptyList())
+    private var autocompleteResults: AutoCompleteResult = AutoCompleteResult("", emptyList())
 
     init {
         resetState()
@@ -63,7 +64,7 @@ class SystemSearchViewModel(
 
     fun resetState() {
         viewState.value = SystemSearchViewState()
-        autocompleteResults = AutoCompleteApi.AutoCompleteResult("", emptyList())
+        autocompleteResults = AutoCompleteResult("", emptyList())
         appResults = emptyList()
     }
 
@@ -104,16 +105,23 @@ class SystemSearchViewModel(
         refreshViewStateResults()
     }
 
-    private fun updateAutocompleteResult(results: AutoCompleteApi.AutoCompleteResult) {
+    private fun updateAutocompleteResult(results: AutoCompleteResult) {
         autocompleteResults = results
         refreshViewStateResults()
     }
 
     private fun refreshViewStateResults() {
         val hasMultiResults = autocompleteResults.suggestions.isNotEmpty() && appResults.isNotEmpty()
-        val newSuggestions = if (hasMultiResults) autocompleteResults.suggestions.take(MULTI_RESULTS_MAX_PER_GROUP) else autocompleteResults.suggestions
-        val newApps = if (hasMultiResults) appResults.take(MULTI_RESULTS_MAX_PER_GROUP) else appResults
-        viewState.postValue(currentViewState().copy(autocompleteResults = AutoCompleteApi.AutoCompleteResult(autocompleteResults.query, newSuggestions), appResults = newApps))
+        val fullSuggestions = autocompleteResults.suggestions
+        val updatedSuggestions = if (hasMultiResults) fullSuggestions.take(RESULTS_MAX_RESULTS_PER_GROUP) else fullSuggestions
+        val updatedApps = if (hasMultiResults) appResults.take(RESULTS_MAX_RESULTS_PER_GROUP) else appResults
+
+        viewState.postValue(
+            currentViewState().copy(
+                autocompleteResults = AutoCompleteResult(autocompleteResults.query, updatedSuggestions),
+                appResults = updatedApps
+            )
+        )
     }
 
     fun userClearedQuery() {
@@ -130,7 +138,7 @@ class SystemSearchViewModel(
     }
 
     companion object {
-        private const val DEBOUNCE_TIME_MS = 300L
-        private const val MULTI_RESULTS_MAX_PER_GROUP = 4
+        private const val DEBOUNCE_TIME_MS = 200L
+        private const val RESULTS_MAX_RESULTS_PER_GROUP = 4
     }
 }
