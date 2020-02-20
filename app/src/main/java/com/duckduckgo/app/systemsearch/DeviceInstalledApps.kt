@@ -17,9 +17,11 @@
 package com.duckduckgo.app.systemsearch
 
 import android.content.Intent
-import android.content.pm.ApplicationInfo.DisplayNameComparator
 import android.content.pm.PackageManager
+import android.content.pm.PackageManager.GET_META_DATA
 import androidx.annotation.WorkerThread
+import com.duckduckgo.app.global.performance.PerformanceConstants
+import timber.log.Timber
 
 data class DeviceApp(
     val shortName: String,
@@ -45,21 +47,22 @@ class DeviceAppsLookup(private val packageManager: PackageManager) {
     @WorkerThread
     private fun all(): List<DeviceApp> {
 
-        val mainIntent = Intent(Intent.ACTION_MAIN)
-        val mainActivities = packageManager.queryIntentActivities(mainIntent, 0)
+        val startTime = System.nanoTime()
+        val appsInfo = packageManager.getInstalledApplications(GET_META_DATA)
+        var sortTime = System.nanoTime() - startTime
+        Timber.d("Get took ${(sortTime / PerformanceConstants.NANO_TO_MILLIS_DIVISOR)}ms")
 
-        val appsInfo = mainActivities.map {
-            it.activityInfo.packageName
-        }.toSet().map {
-            packageManager.getApplicationInfo(it, PackageManager.GET_META_DATA)
-        }.sortedWith(DisplayNameComparator(packageManager))
-
-        return appsInfo.map {
-            val shortName = packageManager.getApplicationLabel(it).toString()
+        val results = appsInfo.map {
             val packageName = it.packageName
-            val fullName = packageManager.getApplicationInfo(packageName, 0).className ?: return@map null
+            val fullName = it.className ?: return@map null
             val launchIntent = packageManager.getLaunchIntentForPackage(packageName) ?: return@map null
+            val shortName = it.loadLabel(packageManager).toString()
             return@map DeviceApp(shortName, fullName, packageName, launchIntent)
         }.filterNotNull()
+
+        var listTime = System.nanoTime() - startTime - sortTime
+        Timber.d("final list took ${(listTime / PerformanceConstants.NANO_TO_MILLIS_DIVISOR)}ms")
+        Timber.d("total  ${((System.nanoTime() - startTime) / PerformanceConstants.NANO_TO_MILLIS_DIVISOR)}ms")
+        return results
     }
 }
