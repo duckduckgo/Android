@@ -34,5 +34,6 @@
     <dimen name="onboardingTitleMarginTop">20dp</dimen>
 
     <dimen name="changeAppIconPadding">16dp</dimen>
+    <dimen name="changeAppIconListPadding">8dp</dimen>
 
 </resources>

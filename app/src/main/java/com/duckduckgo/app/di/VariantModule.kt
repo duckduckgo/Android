@@ -17,6 +17,7 @@
 package com.duckduckgo.app.di
 
 import android.content.Context
+import com.duckduckgo.app.global.shortcut.AppShortcutCreator
 import com.duckduckgo.app.icon.api.AppIconModifier
 import com.duckduckgo.app.icon.api.IconModifier
 import com.duckduckgo.app.statistics.ExperimentationVariantManager
@@ -40,6 +41,6 @@ class VariantModule {
     fun weightedRandomizer() = WeightedRandomizer()
 
     @Provides
-    fun appIconModifier(context: Context): IconModifier =
-        AppIconModifier(context)
+    fun appIconModifier(context: Context, appShortcutCreator: AppShortcutCreator): IconModifier =
+        AppIconModifier(context, appShortcutCreator)
 }

@@ -16,17 +16,15 @@
 
 package com.duckduckgo.app.icon.api
 
-import android.app.AlarmManager
-import android.app.PendingIntent
 import android.content.ComponentName
 import android.content.Context
-import android.content.Intent
 import android.content.pm.PackageManager
+import android.os.Build
 import androidx.annotation.DrawableRes
 import com.duckduckgo.app.browser.BuildConfig
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.global.shortcut.AppShortcutCreator
 import com.duckduckgo.app.icon.api.IconModifier.Companion.QUALIFIER
-import com.duckduckgo.app.launch.LaunchActivity
 import javax.inject.Inject
 
 interface IconModifier {
@@ -44,15 +42,35 @@ enum class AppIcon(
 ) {
     DEFAULT(
         componentName = "$QUALIFIER.Launcher",
-        icon = R.mipmap.ic_launcher_blue
+        icon = R.mipmap.ic_launcher_red
     ),
     BLUE(
         componentName = "$QUALIFIER.LauncherBlue",
         icon = R.mipmap.ic_launcher_blue
     ),
-    RED(
-        componentName = "$QUALIFIER.LauncherRed",
-        icon = R.mipmap.ic_launcher_red
+    BLACK(
+        componentName = "$QUALIFIER.LauncherBlack",
+        icon = R.mipmap.ic_launcher_black
+    ),
+    GOLD(
+        componentName = "$QUALIFIER.LauncherGold",
+        icon = R.mipmap.ic_launcher_gold
+    ),
+    GREEN(
+        componentName = "$QUALIFIER.LauncherGreen",
+        icon = R.mipmap.ic_launcher_green
+    ),
+    PURPLE(
+        componentName = "$QUALIFIER.LauncherPurple",
+        icon = R.mipmap.ic_launcher_purple
+    ),
+    WHITE(
+        componentName = "$QUALIFIER.LauncherWhite",
+        icon = R.mipmap.ic_launcher_white
+    ),
+    SILHOUETTE(
+        componentName = "$QUALIFIER.LauncherSilhoutte",
+        icon = R.mipmap.ic_launcher_silhouette
     ), ;
 
     companion object {
@@ -62,11 +80,18 @@ enum class AppIcon(
     }
 }
 
-class AppIconModifier @Inject constructor(private val context: Context) : IconModifier {
+class AppIconModifier @Inject constructor(
+    private val context: Context,
+    private val appShortcutCreator: AppShortcutCreator
+) : IconModifier {
 
     override fun changeIcon(previousIcon: AppIcon, newIcon: AppIcon) {
         enable(newIcon)
         disable(previousIcon)
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1) {
+            appShortcutCreator.configureAppShortcuts(context)
+        }
     }
 
     private fun disable(appIcon: AppIcon) {
