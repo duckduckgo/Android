@@ -47,12 +47,9 @@ class DeviceAppsLookup(private val packageManager: PackageManager) {
     @WorkerThread
     private fun all(): List<DeviceApp> {
 
-        val startTime = System.nanoTime()
         val appsInfo = packageManager.getInstalledApplications(GET_META_DATA)
-        var sortTime = System.nanoTime() - startTime
-        Timber.d("Get took ${(sortTime / PerformanceConstants.NANO_TO_MILLIS_DIVISOR)}ms")
 
-        val results = appsInfo.map {
+        return appsInfo.map {
             val packageName = it.packageName
             val fullName = it.className ?: return@map null
             val launchIntent = packageManager.getLaunchIntentForPackage(packageName) ?: return@map null
@@ -60,9 +57,5 @@ class DeviceAppsLookup(private val packageManager: PackageManager) {
             return@map DeviceApp(shortName, fullName, packageName, launchIntent)
         }.filterNotNull()
 
-        var listTime = System.nanoTime() - startTime - sortTime
-        Timber.d("final list took ${(listTime / PerformanceConstants.NANO_TO_MILLIS_DIVISOR)}ms")
-        Timber.d("total  ${((System.nanoTime() - startTime) / PerformanceConstants.NANO_TO_MILLIS_DIVISOR)}ms")
-        return results
     }
 }
