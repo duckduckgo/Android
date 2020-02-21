@@ -543,7 +543,12 @@ class BrowserTabViewModel(
         if (!currentBrowserViewState().browserShowing) return
         val isLoading = newProgress < 100
         val progress = currentLoadingViewState()
-        loadingViewState.value = progress.copy(isLoading = isLoading, progress = newProgress)
+        val visualProgress = if (newProgress < FIXED_PROGRESS) {
+            FIXED_PROGRESS
+        } else {
+            newProgress
+        }
+        loadingViewState.value = progress.copy(isLoading = isLoading, progress = visualProgress)
     }
 
     private fun registerSiteVisit() {
@@ -1059,7 +1064,8 @@ class BrowserTabViewModel(
     }
 
     companion object {
-        const val MAX_DIALOG_ATTEMPTS = 2
-        const val DEFAULT_URL = "https://duckduckgo.com"
+        private const val FIXED_PROGRESS = 50
+        private const val MAX_DIALOG_ATTEMPTS = 2
+        private const val DEFAULT_URL = "https://duckduckgo.com"
     }
 }
