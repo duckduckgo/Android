@@ -33,8 +33,7 @@ import com.duckduckgo.app.browser.omnibar.OmnibarScrolling
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.view.TextChangedWatcher
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.app.systemsearch.SystemSearchViewModel.Command.LaunchApplication
-import com.duckduckgo.app.systemsearch.SystemSearchViewModel.Command.LaunchBrowser
+import com.duckduckgo.app.systemsearch.SystemSearchViewModel.Command.*
 import com.duckduckgo.app.systemsearch.SystemSearchViewModel.SystemSearchViewState
 import kotlinx.android.synthetic.main.activity_system_search.*
 import javax.inject.Inject
@@ -64,6 +63,7 @@ class SystemSearchActivity : DuckDuckGoActivity() {
         configureObservers()
         configureAutoComplete()
         configureDeviceAppSuggestions()
+        configureDaxButton()
         configureOmnibar()
         configureTextInput()
     }
@@ -110,6 +110,12 @@ class SystemSearchActivity : DuckDuckGoActivity() {
         deviceAppSuggestions.adapter = deviceAppSuggestionsAdapter
     }
 
+    private fun configureDaxButton() {
+        logo.setOnClickListener {
+            viewModel.userTappedDax()
+        }
+    }
+
     private fun configureOmnibar() {
         results.addOnLayoutChangeListener { _, _, _, _, _, _, _, _, _ ->
             val scrollable = results.maxScrollAmount > MINIMUM_SCROLL_HEIGHT
@@ -149,12 +155,15 @@ class SystemSearchActivity : DuckDuckGoActivity() {
 
     private fun processCommand(command: SystemSearchViewModel.Command) {
         when (command) {
+            is LaunchDuckDuckGo -> {
+                startActivity(BrowserActivity.intent(this))
+                finish()
+            }
             is LaunchBrowser -> {
                 startActivity(BrowserActivity.intent(this, command.query))
                 finish()
-
             }
-            is LaunchApplication -> {
+            is LaunchDeviceApplication -> {
                 startActivity(command.intent)
                 finish()
             }

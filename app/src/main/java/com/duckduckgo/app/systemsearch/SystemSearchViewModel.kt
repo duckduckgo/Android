@@ -45,8 +45,9 @@ class SystemSearchViewModel(
     )
 
     sealed class Command {
+        class LaunchDuckDuckGo : Command()
         data class LaunchBrowser(val query: String) : Command()
-        data class LaunchApplication(val intent: Intent) : Command()
+        data class LaunchDeviceApplication(val intent: Intent) : Command()
     }
 
     val viewState: MutableLiveData<SystemSearchViewState> = MutableLiveData()
@@ -132,6 +133,10 @@ class SystemSearchViewModel(
         )
     }
 
+    fun userTappedDax() {
+        command.value = Command.LaunchDuckDuckGo()
+    }
+
     fun userClearedQuery() {
         autoCompletePublishSubject.accept("")
         resetState()
@@ -142,7 +147,7 @@ class SystemSearchViewModel(
     }
 
     fun userSelectedApp(app: DeviceApp) {
-        command.value = Command.LaunchApplication(app.launchIntent)
+        command.value = Command.LaunchDeviceApplication(app.launchIntent)
     }
 
     companion object {
