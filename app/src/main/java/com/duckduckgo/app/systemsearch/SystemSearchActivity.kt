@@ -33,6 +33,7 @@ import com.duckduckgo.app.browser.omnibar.OmnibarScrolling
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.view.TextChangedWatcher
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelName
 import com.duckduckgo.app.systemsearch.SystemSearchViewModel.Command.*
 import com.duckduckgo.app.systemsearch.SystemSearchViewModel.SystemSearchViewState
 import kotlinx.android.synthetic.main.activity_system_search.*
@@ -66,17 +67,20 @@ class SystemSearchActivity : DuckDuckGoActivity() {
         configureDaxButton()
         configureOmnibar()
         configureTextInput()
+        intent?.let { sendLaunchPixels(it) }
     }
 
     override fun onNewIntent(newIntent: Intent?) {
         super.onNewIntent(newIntent)
-
         viewModel.resetState()
-        val intent = newIntent ?: return
+        newIntent?.let { sendLaunchPixels(it) }
+    }
+
+    private fun sendLaunchPixels(intent: Intent) {
         when {
-            launchedFromAssist(intent) -> pixel.fire(Pixel.PixelName.ASSIST_LAUNCH)
-            launchedFromWidget(intent) -> pixel.fire(Pixel.PixelName.WIDGET_LAUNCH)
-            launchedFromAppBar(intent) -> pixel.fire(Pixel.PixelName.GOOGLE_BAR_LAUNCH)
+            launchedFromAssist(intent) -> pixel.fire(PixelName.APP_ASSIST_LAUNCH)
+            launchedFromWidget(intent) -> pixel.fire(PixelName.APP_WIDGET_LAUNCH)
+            launchedFromAppBar(intent) -> pixel.fire(PixelName.APP_GOOGLE_BAR_LAUNCH)
         }
     }
 
@@ -93,7 +97,7 @@ class SystemSearchActivity : DuckDuckGoActivity() {
         autocompleteSuggestions.layoutManager = LinearLayoutManager(this)
         autocompleteSuggestionsAdapter = BrowserAutoCompleteSuggestionsAdapter(
             immediateSearchClickListener = {
-                viewModel.userSubmittedQuery(it.phrase)
+                viewModel.userSubmittedAutocompleteResult(it.phrase)
             },
             editableSearchClickListener = {
                 viewModel.userUpdatedQuery(it.phrase)
@@ -156,14 +160,17 @@ class SystemSearchActivity : DuckDuckGoActivity() {
     private fun processCommand(command: SystemSearchViewModel.Command) {
         when (command) {
             is LaunchDuckDuckGo -> {
+                pixel.fire(PixelName.INTERSTITIAL_LAUNCH_DAX)
                 startActivity(BrowserActivity.intent(this))
                 finish()
             }
             is LaunchBrowser -> {
+                pixel.fire(PixelName.INTERSTITIAL_LAUNCH_BROWSER_QUERY)
                 startActivity(BrowserActivity.intent(this, command.query))
                 finish()
             }
             is LaunchDeviceApplication -> {
+                pixel.fire(PixelName.INTERSTITIAL_LAUNCH_DEVICE_APP)
                 startActivity(command.intent)
                 finish()
             }

@@ -146,6 +146,10 @@ class SystemSearchViewModel(
         command.value = Command.LaunchBrowser(query)
     }
 
+    fun userSubmittedAutocompleteResult(query: String) {
+        command.value = Command.LaunchBrowser(query)
+    }
+
     fun userSelectedApp(app: DeviceApp) {
         command.value = Command.LaunchDeviceApplication(app.launchIntent)
     }

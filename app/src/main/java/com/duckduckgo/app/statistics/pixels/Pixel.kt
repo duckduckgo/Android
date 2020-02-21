@@ -93,9 +93,12 @@ interface Pixel {
         WIDGETS_ADDED(pixelName = "m_w_a"),
         WIDGETS_DELETED(pixelName = "m_w_d"),
 
-        WIDGET_LAUNCH(pixelName = "m_w_l"),
-        ASSIST_LAUNCH(pixelName = "m_a_l"),
-        GOOGLE_BAR_LAUNCH(pixelName = "m_gb_l"),
+        APP_WIDGET_LAUNCH(pixelName = "m_w_l"),
+        APP_ASSIST_LAUNCH(pixelName = "m_a_l"),
+        APP_GOOGLE_BAR_LAUNCH(pixelName = "m_g_l"),
+        INTERSTITIAL_LAUNCH_BROWSER_QUERY(pixelName = "m_i_lbq"),
+        INTERSTITIAL_LAUNCH_DEVICE_APP(pixelName = "m_i_sda"),
+        INTERSTITIAL_LAUNCH_DAX(pixelName = "m_i_ld"),
 
         LONG_PRESS("mlp"),
         LONG_PRESS_DOWNLOAD_IMAGE("mlp_i"),

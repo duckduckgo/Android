@@ -20,7 +20,7 @@
 
     <!-- System Search-->
     <string name="system_search_app_label">From this device</string>
-    
+
     <!-- New Onboarding Experience -->
     <string name="onboardingWelcomeTitle">"Welcome to DuckDuckGo!"</string>
     <string name="onboardingDaxText"><![CDATA[The Internet can be kinda creepy.<br/><br/>Not to worry! Searching and browsing privately is easier than you think.]]></string>
