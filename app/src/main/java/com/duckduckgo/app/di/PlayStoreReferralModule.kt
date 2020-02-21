@@ -20,7 +20,6 @@ import android.content.Context
 import android.content.pm.PackageManager
 import com.duckduckgo.app.referral.*
 import com.duckduckgo.app.statistics.VariantManager
-import com.duckduckgo.app.statistics.pixels.Pixel
 import dagger.Module
 import dagger.Provides
 import javax.inject.Singleton
@@ -29,8 +28,8 @@ import javax.inject.Singleton
 class PlayStoreReferralModule {
 
     @Provides
-    fun appInstallationReferrerParser(pixel: Pixel): AppInstallationReferrerParser {
-        return QueryParamReferrerParser(pixel)
+    fun appInstallationReferrerParser(): AppInstallationReferrerParser {
+        return QueryParamReferrerParser()
     }
 
     @Provides

@@ -37,6 +37,8 @@ interface VariantManager {
 
     companion object {
 
+        const val RESERVED_EU_AUCTION_VARIANT = "ml"
+
         // this will be returned when there are no other active experiments
         val DEFAULT_VARIANT = Variant(key = "", features = emptyList(), filterBy = { noFilter() })
 

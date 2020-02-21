@@ -17,9 +17,7 @@
 package com.duckduckgo.app.statistics
 
 import com.duckduckgo.app.statistics.VariantManager.VariantFeature.*
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertTrue
-import org.junit.Assert.fail
+import org.junit.Assert.*
 import org.junit.Test
 
 class VariantManagerTest {
@@ -130,6 +128,17 @@ class VariantManagerTest {
         assertEquals(2, variant.features.size)
         assertTrue(variant.hasFeature(ConceptTest))
     }
+
+    @Test
+    fun verifyNoDuplicateVariantNames() {
+        val existingNames = mutableSetOf<String>()
+        variants.forEach {
+            if (!existingNames.add(it.key)) {
+                fail("Duplicate variant name found: ${it.key}")
+            }
+        }
+    }
+
 
     @Suppress("SameParameterValue")
     private fun assertEqualsDouble(expected: Double, actual: Double) {
