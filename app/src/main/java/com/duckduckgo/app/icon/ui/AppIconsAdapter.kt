@@ -45,39 +45,12 @@ class AppIconsAdapter(private val onClick: (ChangeIconViewModel.IconViewData) ->
     override fun onBindViewHolder(holder: IconViewHolder, position: Int) {
         val viewElement = iconViewData[position]
         holder.itemView.setOnClickListener { onClick.invoke(viewElement) }
-        holder.icon.setImageResource(viewElement.appIcon.icon)
+        holder.icon.setBackgroundResource(viewElement.appIcon.icon)
         holder.itemView.isSelected = viewElement.selected
     }
 
     fun notifyChanges(newList: List<ChangeIconViewModel.IconViewData>) {
         iconViewData = newList.toMutableList()
         notifyDataSetChanged()
-    }
-}
-
-class IconDiffCallback(private val oldList: List<ChangeIconViewModel.IconViewData>, private val newList: List<ChangeIconViewModel.IconViewData>) :
-    DiffUtil.Callback() {
-
-    override fun getOldListSize(): Int = oldList.size
-
-    override fun getNewListSize(): Int = newList.size
-
-    override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
-        val oldItemId = oldList[oldItemPosition]
-        val newItemId = newList[newItemPosition]
-
-        return oldItemId.selected == newItemId.selected
-    }
-
-    override fun areContentsTheSame(oldPosition: Int, newPosition: Int): Boolean {
-        val oldItem = oldList[oldPosition]
-        val newItem = newList[newPosition]
-
-        return oldItem == newItem
-    }
-
-    @Nullable
-    override fun getChangePayload(oldPosition: Int, newPosition: Int): Any? {
-        return super.getChangePayload(oldPosition, newPosition)
     }
 }

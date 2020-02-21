@@ -58,7 +58,7 @@
         app:layout_constraintBottom_toBottomOf="@+id/changeAppIconLabel"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@+id/changeAppIconLabel"
-        tools:srcCompat="@mipmap/ic_launcher_silhouette" />
+        tools:srcCompat="@mipmap/ic_launcher_silhouette_round" />
 
     <androidx.appcompat.widget.SwitchCompat
         android:id="@+id/autocompleteToggle"
