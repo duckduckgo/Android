@@ -114,11 +114,12 @@ class SystemSearchActivity : DuckDuckGoActivity() {
 
     private fun configureOmnibar() {
         results.addOnLayoutChangeListener { _, _, _, _, _, _, _, _, _ ->
-            val scrollable = results.maxScrollAmount > 0
+            val scrollable = results.maxScrollAmount > MINIMUM_SCROLL_HEIGHT
             if (scrollable) {
                 omnibardScrolling.enableOmnibarScrolling(toolbar)
             } else {
-                appBarLayout.setExpanded(true, true)
+                Timber.d("SCROLLABLE: false")
+                showOmnibar()
                 omnibardScrolling.disableOmnibarScrolling(toolbar)
             }
         }
@@ -184,6 +185,7 @@ class SystemSearchActivity : DuckDuckGoActivity() {
 
         const val WIDGET_SEARCH_EXTRA = "WIDGET_SEARCH_EXTRA"
         const val NEW_SEARCH_ACTION = "com.duckduckgo.mobile.android.NEW_SEARCH"
+        const val MINIMUM_SCROLL_HEIGHT = 86
 
         fun intent(context: Context, widgetSearch: Boolean = false): Intent {
             val intent = Intent(context, SystemSearchActivity::class.java)

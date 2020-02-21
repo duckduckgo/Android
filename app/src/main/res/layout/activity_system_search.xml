@@ -111,6 +111,7 @@
         android:layout_height="wrap_content"
         android:clipToPadding="false"
         android:elevation="4dp"
+        android:paddingBottom="4dp"
         android:id="@+id/results"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
