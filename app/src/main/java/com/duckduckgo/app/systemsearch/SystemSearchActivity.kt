@@ -37,7 +37,6 @@ import com.duckduckgo.app.systemsearch.SystemSearchViewModel.Command.LaunchAppli
 import com.duckduckgo.app.systemsearch.SystemSearchViewModel.Command.LaunchBrowser
 import com.duckduckgo.app.systemsearch.SystemSearchViewModel.SystemSearchViewState
 import kotlinx.android.synthetic.main.activity_system_search.*
-import timber.log.Timber
 import javax.inject.Inject
 
 class SystemSearchActivity : DuckDuckGoActivity() {
@@ -71,7 +70,6 @@ class SystemSearchActivity : DuckDuckGoActivity() {
 
     override fun onNewIntent(newIntent: Intent?) {
         super.onNewIntent(newIntent)
-        Timber.i("onNewIntent: $newIntent")
 
         viewModel.resetState()
         val intent = newIntent ?: return
@@ -118,7 +116,6 @@ class SystemSearchActivity : DuckDuckGoActivity() {
             if (scrollable) {
                 omnibardScrolling.enableOmnibarScrolling(toolbar)
             } else {
-                Timber.d("SCROLLABLE: false")
                 showOmnibar()
                 omnibardScrolling.disableOmnibarScrolling(toolbar)
             }
@@ -185,7 +182,7 @@ class SystemSearchActivity : DuckDuckGoActivity() {
 
         const val WIDGET_SEARCH_EXTRA = "WIDGET_SEARCH_EXTRA"
         const val NEW_SEARCH_ACTION = "com.duckduckgo.mobile.android.NEW_SEARCH"
-        const val MINIMUM_SCROLL_HEIGHT = 86
+        const val MINIMUM_SCROLL_HEIGHT = 86 // enough space for blank "no suggestion" and padding
 
         fun intent(context: Context, widgetSearch: Boolean = false): Intent {
             val intent = Intent(context, SystemSearchActivity::class.java)

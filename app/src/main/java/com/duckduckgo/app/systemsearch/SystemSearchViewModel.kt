@@ -27,6 +27,7 @@ import com.jakewharton.rxrelay2.PublishRelay
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
@@ -52,8 +53,10 @@ class SystemSearchViewModel(
     val command: SingleLiveEvent<Command> = SingleLiveEvent()
 
     private val autoCompletePublishSubject = PublishRelay.create<String>()
-    private var appResults: List<DeviceApp> = emptyList()
     private var autocompleteResults: AutoCompleteResult = AutoCompleteResult("", emptyList())
+
+    private var appsJob: Job? = null
+    private var appResults: List<DeviceApp> = emptyList()
 
     init {
         resetState()
@@ -63,9 +66,10 @@ class SystemSearchViewModel(
     private fun currentViewState(): SystemSearchViewState = viewState.value!!
 
     fun resetState() {
-        viewState.value = SystemSearchViewState()
         autocompleteResults = AutoCompleteResult("", emptyList())
+        appsJob?.cancel()
         appResults = emptyList()
+        viewState.value = SystemSearchViewState()
     }
 
     private fun configureAutoComplete() {
@@ -80,6 +84,9 @@ class SystemSearchViewModel(
     }
 
     fun userUpdatedQuery(query: String) {
+
+        appsJob?.cancel()
+
         val trimmedQuery = query.trim()
 
         if (trimmedQuery == currentViewState().queryText) {
@@ -93,7 +100,8 @@ class SystemSearchViewModel(
 
         viewState.value = currentViewState().copy(queryText = trimmedQuery)
         autoCompletePublishSubject.accept(trimmedQuery)
-        viewModelScope.launch {
+
+        appsJob = viewModelScope.launch {
             withContext(Dispatchers.IO) {
                 updateAppResults(deviceAppsLookup.query(query))
             }
