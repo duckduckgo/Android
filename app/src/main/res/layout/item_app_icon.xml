@@ -22,13 +22,13 @@
 
     <ImageView
         android:id="@+id/icon"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:importantForAccessibility="no"
-        android:scaleType="fitCenter"
+        android:scaleType="centerCrop"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        android:background="@mipmap/ic_launcher_blue" />
+        android:background="@drawable/ic_app_icon_red_round" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

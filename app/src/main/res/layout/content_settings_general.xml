@@ -54,11 +54,12 @@
         android:id="@+id/changeAppIcon"
         android:layout_width="0dp"
         android:layout_height="40dp"
+        android:layout_marginEnd="16dp"
         android:padding="4dp"
         app:layout_constraintBottom_toBottomOf="@+id/changeAppIconLabel"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@+id/changeAppIconLabel"
-        tools:srcCompat="@mipmap/ic_launcher_silhouette_round" />
+        tools:srcCompat="@drawable/ic_app_icon_red_round" />
 
     <androidx.appcompat.widget.SwitchCompat
         android:id="@+id/autocompleteToggle"

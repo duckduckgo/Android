@@ -16,14 +16,14 @@
   -->
 
 <ripple xmlns:android="http://schemas.android.com/apk/res/android"
-        android:color="@color/white">
+        android:color="?colorAccent">
     <item>
         <shape android:shape="oval">
             <padding
-                    android:left="4dip"
-                    android:top="4dip"
-                    android:right="4dip"
-                    android:bottom="4dip"/>
+                    android:left="0dp"
+                    android:top="0dp"
+                    android:right="0dp"
+                    android:bottom="0dp"/>
         </shape>
 
     </item>
