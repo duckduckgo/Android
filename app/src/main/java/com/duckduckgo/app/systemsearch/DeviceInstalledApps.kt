@@ -20,8 +20,7 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.pm.PackageManager.GET_META_DATA
 import androidx.annotation.WorkerThread
-import com.duckduckgo.app.global.performance.PerformanceConstants
-import timber.log.Timber
+import kotlin.text.RegexOption.IGNORE_CASE
 
 data class DeviceApp(
     val shortName: String,
@@ -36,11 +35,11 @@ class DeviceAppsLookup(private val packageManager: PackageManager) {
 
     @WorkerThread
     fun query(query: String): List<DeviceApp> {
-
         if (query.isBlank()) return emptyList()
+        val regex = ".*\\b${query}.*".toRegex(IGNORE_CASE)
 
         return allApps.filter {
-            it.shortName.contains(query, ignoreCase = true)
+            it.shortName.matches(regex)
         }
     }
 
