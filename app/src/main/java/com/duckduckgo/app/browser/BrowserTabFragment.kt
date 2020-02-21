@@ -170,9 +170,6 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
     @Inject
     lateinit var privacySettingsStore: PrivacySettingsStore
 
-    @Inject
-    lateinit var animatorHelper: BrowserTrackersAnimatorHelper
-
     val tabId get() = arguments!![TAB_ID_ARG] as String
 
     lateinit var userAgentProvider: UserAgentProvider
@@ -199,6 +196,10 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
         viewModel.loadData(tabId, initialUrl, skipHome)
         viewModel
     }
+
+    private val animatorHelper by lazy { BrowserTrackersAnimatorHelper() }
+
+    private val smoothProgressAnimator by lazy { SmoothProgressAnimator(pageLoadingIndicator) }
 
     // Optimization to prevent against excessive work generating WebView previews; an existing job will be cancelled if a new one is launched
     private var bitmapGeneratorJob: Job? = null
@@ -1125,10 +1126,9 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
         private const val AUTHENTICATION_DIALOG_TAG = "AUTH_DIALOG_TAG"
         private const val DAX_DIALOG_DIALOG_TAG = "DAX_DIALOG_TAG"
 
-        private const val MIN_PROGRESS = 10
         private const val MAX_PROGRESS = 100
-        private const val TRACKERS_INI_DELAY = 700L
-        private const val TRACKERS_SECONDARY_DELAY = 300L
+        private const val TRACKERS_INI_DELAY = 500L
+        private const val TRACKERS_SECONDARY_DELAY = 200L
 
         fun newInstance(tabId: String, query: String? = null, skipHome: Boolean): BrowserTabFragment {
             val fragment = BrowserTabFragment()
@@ -1194,8 +1194,8 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
                 lastSeenLoadingViewState = viewState
 
                 pageLoadingIndicator.apply {
-                    if (viewState.isLoading) show() else hide()
-                    progress = viewState.progress
+                    if (viewState.isLoading) show()
+                    smoothProgressAnimator.onNewProgress(viewState.progress) { if (!viewState.isLoading) hide() }
                 }
 
                 if (variantManager.getVariant().hasFeature(VariantManager.VariantFeature.ConceptTest) && privacySettingsStore.privacyOn) {
@@ -1204,18 +1204,14 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
                         cancelAllAnimations()
                     }
 
-                    if (viewState.progress <= MIN_PROGRESS && viewState.isLoading && lastSeenOmnibarViewState?.isEditing != true) {
-                        animatorHelper.createLoadingAnimation(resources, omnibarViews(), loadingText)
-                    }
-
                     if (viewState.progress == MAX_PROGRESS) {
-                        createLoadedAnimation()
+                        createTrackersAnimation()
                     }
                 }
             }
         }
 
-        private fun createLoadedAnimation() {
+        private fun createTrackersAnimation() {
             launch {
                 delay(TRACKERS_INI_DELAY)
                 viewModel.refreshCta()
@@ -1225,11 +1221,10 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
                     val events = site?.trackingEvents
 
                     activity?.let { activity ->
-                        animatorHelper.createLoadedAnimation(
+                        animatorHelper.startTrackersAnimation(
                             lastSeenCtaViewState?.cta,
                             activity,
                             networksContainer,
-                            loadingText,
                             omnibarViews(),
                             events
                         )
@@ -1242,7 +1237,6 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
             if (variantManager.getVariant().hasFeature(VariantManager.VariantFeature.ConceptTest)) {
                 animatorHelper.cancelAnimations()
                 networksContainer.alpha = 0f
-                loadingText.alpha = 0f
                 clearTextButton.alpha = 1f
                 omnibarTextInput.alpha = 1f
                 privacyGradeButton.alpha = 1f

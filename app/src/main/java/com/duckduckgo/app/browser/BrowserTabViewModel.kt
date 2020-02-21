@@ -536,7 +536,12 @@ class BrowserTabViewModel(
         if (!currentBrowserViewState().browserShowing) return
         val isLoading = newProgress < 100
         val progress = currentLoadingViewState()
-        loadingViewState.value = progress.copy(isLoading = isLoading, progress = newProgress)
+        val visualProgress = if (newProgress < FIXED_PROGRESS) {
+            FIXED_PROGRESS
+        } else {
+            newProgress
+        }
+        loadingViewState.value = progress.copy(isLoading = isLoading, progress = visualProgress)
     }
 
     private fun registerSiteVisit() {
@@ -986,5 +991,9 @@ class BrowserTabViewModel(
     private fun recoverTabWithQuery(query: String) {
         viewModelScope.launch { closeCurrentTab() }
         command.value = OpenInNewTab(query)
+    }
+
+    companion object {
+        private const val FIXED_PROGRESS = 50
     }
 }
