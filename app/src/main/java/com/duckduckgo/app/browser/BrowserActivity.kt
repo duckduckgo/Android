@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.browser
+package com.duckduckgo.app.browser 
 
 import android.annotation.SuppressLint
 import android.app.ActivityOptions
