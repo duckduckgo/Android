@@ -29,7 +29,12 @@ import com.duckduckgo.app.global.model.SiteFactory
 import com.duckduckgo.app.privacy.model.PrivacyPractices
 import com.duckduckgo.app.tabs.db.TabsDao
 import com.duckduckgo.app.trackerdetection.EntityLookup
-import com.nhaarman.mockitokotlin2.*
+import com.nhaarman.mockitokotlin2.any
+import com.nhaarman.mockitokotlin2.anyOrNull
+import com.nhaarman.mockitokotlin2.argumentCaptor
+import com.nhaarman.mockitokotlin2.eq
+import com.nhaarman.mockitokotlin2.verify
+import com.nhaarman.mockitokotlin2.whenever
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.*
@@ -197,8 +202,34 @@ class TabDataRepositoryTest {
         verify(mockDao).insertTabSelection(eq(TabSelectionEntity(tabId = TAB_ID)))
     }
 
+    @Test
+    fun whenAddingFirstTabPositionIsAlwaysZero() = runBlocking<Unit> {
+        whenever(mockDao.tabs()).thenReturn(emptyList())
+
+        testee.add("http://www.example.com")
+
+        val captor = argumentCaptor<TabEntity>()
+        verify(mockDao).addAndSelectTab(captor.capture())
+
+        assertTrue(captor.firstValue.position == 0)
+    }
+
+    @Test
+    fun whenAddingTabToExistingTabsPositionIsAlwaysIncreased() = runBlocking<Unit> {
+        val tab0 = TabEntity("tabid", position = 0)
+        val existingTabs = listOf(tab0)
+
+        whenever(mockDao.tabs()).thenReturn(existingTabs)
+
+        testee.add("http://www.example.com")
+
+        val captor = argumentCaptor<TabEntity>()
+        verify(mockDao).addAndSelectTab(captor.capture())
+
+        assertTrue(captor.firstValue.position == 1)
+    }
+
     companion object {
         const val TAB_ID = "abcd"
     }
-
 }
