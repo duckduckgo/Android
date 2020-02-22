@@ -25,12 +25,19 @@ import javax.inject.Inject
 
 class OmnibarScrolling @Inject constructor() {
 
+
+    private var isScrollingEnabled = true
+
+    val isOmnibarScrollingEnabled:Boolean get() = isScrollingEnabled
+
     fun enableOmnibarScrolling(toolbarContainer: View) {
         updateScrollFlag(SCROLL_FLAG_SCROLL or SCROLL_FLAG_ENTER_ALWAYS, toolbarContainer)
+        isScrollingEnabled = true
     }
 
     fun disableOmnibarScrolling(toolbarContainer: View) {
         updateScrollFlag(0, toolbarContainer)
+        isScrollingEnabled = false
     }
 
     private fun updateScrollFlag(flags: Int, toolbarContainer: View) {
