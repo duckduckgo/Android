@@ -30,6 +30,9 @@ import android.media.MediaScannerConnection
 import android.net.Uri
 import android.os.*
 import android.text.Editable
+import android.util.DisplayMetrics
+import android.util.TypedValue
+import android.util.TypedValue.*
 import android.view.*
 import android.view.View.*
 import android.view.inputmethod.EditorInfo
@@ -90,6 +93,7 @@ import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.ui.TabSwitcherActivity
 import com.duckduckgo.app.widget.ui.AddWidgetInstructionsActivity
 import com.duckduckgo.widget.SearchWidgetLight
+import com.google.android.material.internal.ViewUtils.dpToPx
 import com.google.android.material.snackbar.Snackbar
 import dagger.android.support.AndroidSupportInjection
 import kotlinx.android.synthetic.main.include_dax_dialog_cta.*
@@ -168,6 +172,9 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
     @Inject
     lateinit var privacySettingsStore: PrivacySettingsStore
 
+    @Inject
+    lateinit var animatorHelper: BrowserTrackersAnimatorHelper
+
     val tabId get() = arguments!![TAB_ID_ARG] as String
 
     lateinit var userAgentProvider: UserAgentProvider
@@ -194,10 +201,6 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
         viewModel.loadData(tabId, initialUrl, skipHome)
         viewModel
     }
-
-    private val animatorHelper by lazy { BrowserTrackersAnimatorHelper() }
-
-    private val smoothProgressAnimator by lazy { SmoothProgressAnimator(pageLoadingIndicator) }
 
     // Optimization to prevent against excessive work generating WebView previews; an existing job will be cancelled if a new one is launched
     private var bitmapGeneratorJob: Job? = null
@@ -265,14 +268,12 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
         configureKeyboardAwareLogoAnimation()
         configureShowTabSwitcherListener()
         configureLongClickOpensNewTabListener()
-
         if (savedInstanceState == null) {
             viewModel.onViewReady()
             messageFromPreviousTab?.let {
                 processMessage(it)
             }
         }
-
         lifecycle.addObserver(object : LifecycleObserver {
             @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
             fun onStop() {
@@ -282,7 +283,6 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
             }
         })
     }
-
     private fun processMessage(message: Message) {
         val transport = message.obj as WebView.WebViewTransport
         transport.webView = webView
@@ -291,7 +291,6 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
         tabsButton.animateCount()
         viewModel.onMessageProcessed()
     }
-
     private fun updateOrDeleteWebViewPreview() {
         val url = viewModel.url
         Timber.d("Updating or deleting WebView preview for $url")
@@ -1106,6 +1105,19 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
         startActivity(AddWidgetInstructionsActivity.intent(context), options)
     }
 
+    fun keyboardStateChanged(open: Boolean) {
+        if(::omnibarScrolling.isInitialized) {
+            omnibarScrolling.apply {
+                if(open && isOmnibarScrollingEnabled ) {
+                    disableOmnibarScrolling(toolbarContainer)
+                }else if(!open && !isOmnibarScrollingEnabled) {
+                    enableOmnibarScrolling(toolbarContainer)
+                }
+            }
+        }
+    }
+
+
     companion object {
 
         private const val TAB_ID_ARG = "TAB_ID_ARG"
@@ -1124,9 +1136,10 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
         private const val AUTHENTICATION_DIALOG_TAG = "AUTH_DIALOG_TAG"
         private const val DAX_DIALOG_DIALOG_TAG = "DAX_DIALOG_TAG"
 
+        private const val MIN_PROGRESS = 10
         private const val MAX_PROGRESS = 100
-        private const val TRACKERS_INI_DELAY = 500L
-        private const val TRACKERS_SECONDARY_DELAY = 200L
+        private const val TRACKERS_INI_DELAY = 700L
+        private const val TRACKERS_SECONDARY_DELAY = 300L
 
         fun newInstance(tabId: String, query: String? = null, skipHome: Boolean): BrowserTabFragment {
             val fragment = BrowserTabFragment()
@@ -1192,8 +1205,8 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
                 lastSeenLoadingViewState = viewState
 
                 pageLoadingIndicator.apply {
-                    if (viewState.isLoading) show()
-                    smoothProgressAnimator.onNewProgress(viewState.progress) { if (!viewState.isLoading) hide() }
+                    if (viewState.isLoading) show() else hide()
+                    progress = viewState.progress
                 }
 
                 if (variantManager.getVariant().hasFeature(VariantManager.VariantFeature.ConceptTest) && privacySettingsStore.privacyOn) {
@@ -1202,14 +1215,18 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
                         cancelAllAnimations()
                     }
 
+                    if (viewState.progress <= MIN_PROGRESS && viewState.isLoading && lastSeenOmnibarViewState?.isEditing != true) {
+                        animatorHelper.createLoadingAnimation(resources, omnibarViews(), loadingText)
+                    }
+
                     if (viewState.progress == MAX_PROGRESS) {
-                        createTrackersAnimation()
+                        createLoadedAnimation()
                     }
                 }
             }
         }
 
-        private fun createTrackersAnimation() {
+        private fun createLoadedAnimation() {
             launch {
                 delay(TRACKERS_INI_DELAY)
                 viewModel.refreshCta()
@@ -1219,10 +1236,11 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
                     val events = site?.trackingEvents
 
                     activity?.let { activity ->
-                        animatorHelper.startTrackersAnimation(
+                        animatorHelper.createLoadedAnimation(
                             lastSeenCtaViewState?.cta,
                             activity,
                             networksContainer,
+                            loadingText,
                             omnibarViews(),
                             events
                         )
@@ -1235,6 +1253,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
             if (variantManager.getVariant().hasFeature(VariantManager.VariantFeature.ConceptTest)) {
                 animatorHelper.cancelAnimations()
                 networksContainer.alpha = 0f
+                loadingText.alpha = 0f
                 clearTextButton.alpha = 1f
                 omnibarTextInput.alpha = 1f
                 privacyGradeButton.alpha = 1f
