@@ -38,6 +38,7 @@ import com.duckduckgo.app.feedback.ui.common.FeedbackActivity
 import com.duckduckgo.app.fire.DataClearer
 import com.duckduckgo.app.global.ApplicationClearDataState
 import com.duckduckgo.app.global.DuckDuckGoActivity
+import com.duckduckgo.app.global.KeyBoardVisibilityNotifier
 import com.duckduckgo.app.global.intentText
 import com.duckduckgo.app.global.view.*
 import com.duckduckgo.app.onboarding.ui.page.DefaultBrowserPage
@@ -54,6 +55,7 @@ import javax.inject.Inject
 
 class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope() {
 
+    private lateinit var keyboardVisibilityNotifier: KeyBoardVisibilityNotifier
     @Inject
     lateinit var clearPersonalDataAction: ClearPersonalDataAction
 
@@ -97,17 +99,37 @@ class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope() {
             renderer.renderBrowserViewState(it)
         })
         viewModel.awaitClearDataFinishedNotification()
+
+        keyboardVisibilityNotifier = KeyBoardVisibilityNotifier(this)
+
     }
 
+
+    override fun onResume() {
+        keyboardVisibilityNotifier.register(rootViewGroup,::onKeyboardStateChanged)
+        super.onResume()
+    }
+
+    private fun onKeyboardStateChanged(isOpen: Boolean) {
+        currentTab?.keyboardStateChanged(isOpen)
+    }
+
+    override fun onPause() {
+        keyboardVisibilityNotifier.unRegister(rootViewGroup)
+        super.onPause()
+    }
     override fun onStop() {
+        keyboardVisibilityNotifier.unRegister(rootViewGroup)
         openMessageInNewTabJob?.cancel()
         super.onStop()
     }
 
     override fun onDestroy() {
+        keyboardVisibilityNotifier.unRegister(rootViewGroup)
         currentTab = null
         super.onDestroy()
     }
+
 
     override fun onNewIntent(intent: Intent?) {
         super.onNewIntent(intent)
@@ -150,6 +172,7 @@ class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope() {
             openNewTab(tab.tabId, tab.url, tab.skipHome)
             return
         }
+
         val transaction = supportFragmentManager.beginTransaction()
         currentTab?.let {
             transaction.hide(it)
