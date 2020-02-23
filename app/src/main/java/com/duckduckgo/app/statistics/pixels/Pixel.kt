@@ -182,6 +182,7 @@ interface Pixel {
         const val DAX_DEFAULT_BROWSER_SETTINGS = "dxs"
         const val DAX_DEFAULT_BROWSER_DIALOG = "dxd"
         const val DAX_DEFAULT_BROWSER_DIALOG_DISMISSED = "dxdd"
+        const val DAX_DEFAULT_BROWSER_DIALOG_EXTERNAL = "dxe"
         const val DAX_DEFAULT_BROWSER_JUST_ONCE_MAX = "dxjom"
 
         const val DAX_NETWORK_CTA_1 = "n"

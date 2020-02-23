@@ -248,6 +248,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
 
     private var alertDialog: AlertDialog? = null
     private var daxDialog: DialogFragment? = null
+    private var userSelectedExternalBrowser = false
 
     override fun onAttach(context: Context) {
         AndroidSupportInjection.inject(this)
@@ -349,6 +350,11 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
         daxDialog = null
         logoHidingListener.onPause()
         super.onPause()
+    }
+
+    override fun onStop() {
+        super.onStop()
+        userSelectedExternalBrowser = true
     }
 
     private fun createPopupMenu() {
@@ -556,12 +562,12 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
     private fun openDefaultBrowserDialog(url: String) {
         instructionsCard?.show()
         defaultCard?.show()
-        defaultCard?.animate()?.alpha(1f)?.setDuration(100)?.start()
+        defaultCard?.animate()?.alpha(1f)?.setDuration(INSTRUCTIONS_CARD_ANIMATION_DURATION)?.start()
         defaultBrowserNavigation.openDefaultBrowserDialog(this, url, DEFAULT_BROWSER_REQUEST_CODE_DIALOG)
     }
 
     private fun hideInstructionsCard() {
-        defaultCard?.animate()?.alpha(0f)?.setDuration(100)?.start()
+        defaultCard?.animate()?.alpha(0f)?.setDuration(INSTRUCTIONS_CARD_ANIMATION_DURATION)?.start()
     }
 
     private fun openDefaultBrowserSettings() {
@@ -664,9 +670,10 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
             if (resultCode == DefaultBrowserPage.DEFAULT_BROWSER_RESULT_CODE_DIALOG_INTERNAL) {
                 viewModel.onUserTriedToSetAsDefaultBrowserFromDialog()
             } else {
-                viewModel.onUserDismissedDefaultBrowserDialog()
+                viewModel.onUserDismissedDefaultBrowserDialog(userSelectedExternalBrowser)
             }
         }
+        userSelectedExternalBrowser = false
     }
 
     private fun handleFileUploadResult(resultCode: Int, intent: Intent?) {
@@ -1165,6 +1172,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
         private const val MAX_PROGRESS = 100
         private const val TRACKERS_INI_DELAY = 500L
         private const val TRACKERS_SECONDARY_DELAY = 200L
+        private const val INSTRUCTIONS_CARD_ANIMATION_DURATION: Long = 100
 
         fun newInstance(tabId: String, query: String? = null, skipHome: Boolean): BrowserTabFragment {
             val fragment = BrowserTabFragment()
