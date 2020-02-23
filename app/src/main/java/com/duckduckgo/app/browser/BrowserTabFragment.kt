@@ -560,7 +560,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
         defaultBrowserNavigation.openDefaultBrowserDialog(this, url, DEFAULT_BROWSER_REQUEST_CODE_DIALOG)
     }
 
-    private fun hidInstructionsCard() {
+    private fun hideInstructionsCard() {
         defaultCard?.animate()?.alpha(0f)?.setDuration(100)?.start()
     }
 
@@ -660,7 +660,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
         } else if (requestCode == DEFAULT_BROWSER_REQUEST_CODE_SETTINGS) {
             viewModel.onUserTriedToSetAsDefaultBrowserFromSettings()
         } else if (requestCode == DEFAULT_BROWSER_REQUEST_CODE_DIALOG) {
-            hidInstructionsCard()
+            hideInstructionsCard()
             if (resultCode == DefaultBrowserPage.DEFAULT_BROWSER_RESULT_CODE_DIALOG_INTERNAL) {
                 viewModel.onUserTriedToSetAsDefaultBrowserFromDialog()
             } else {
