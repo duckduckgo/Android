@@ -1507,7 +1507,7 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenUserClickedDefaultBrowserCtaButtonWithDefaultBrowserThenLaunchDialogCommand() {
+    fun whenUserClickedDefaultBrowserCtaButtonWithDefaultBrowserThenOpenDefaultBrowserSettings() {
         whenever(mockDefaultBrowserDetector.hasDefaultBrowser()).thenReturn(true)
         val cta = DaxDialogCta.DefaultBrowserCta(mockDefaultBrowserDetector, mock(), mock())
         testee.onUserClickCtaOkButton(cta)
@@ -1579,7 +1579,7 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenUserFailedSettingDdgAsDefaultBrowserFromDialogOnceThenFirePixelAndUpdateInstallStore() {
+    fun whenUserFailedSettingDdgAsDefaultBrowserFromDialogOnceThenOpenDefaultBrowserDialogAgain() {
         whenever(mockDefaultBrowserDetector.isDefaultBrowser()).thenReturn(false)
 
         testee.onUserTriedToSetAsDefaultBrowserFromDialog()
