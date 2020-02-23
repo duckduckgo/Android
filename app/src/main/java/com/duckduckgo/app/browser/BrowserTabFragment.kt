@@ -548,8 +548,8 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
             is Command.GenerateWebViewPreviewImage -> generateWebViewPreviewImage()
             is Command.LaunchTabSwitcher -> launchTabSwitcher()
             is Command.ShowErrorWithAction -> showErrorSnackbar(it)
-            is Command.OpenSettings -> openDefaultBrowserSettings()
-            is Command.OpenDialog -> openDefaultBrowserDialog(it.url)
+            is Command.OpenDefaultBrowserSettings -> openDefaultBrowserSettings()
+            is Command.OpenDefaultBrowserDialog -> openDefaultBrowserDialog(it.url)
         }
     }
 

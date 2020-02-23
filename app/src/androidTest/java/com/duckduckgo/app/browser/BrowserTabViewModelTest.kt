@@ -1503,7 +1503,7 @@ class BrowserTabViewModelTest {
         whenever(mockDefaultBrowserDetector.hasDefaultBrowser()).thenReturn(false)
         val cta = DaxDialogCta.DefaultBrowserCta(mockDefaultBrowserDetector, mock(), mock())
         testee.onUserClickCtaOkButton(cta)
-        assertCommandIssued<Command.OpenDialog>()
+        assertCommandIssued<Command.OpenDefaultBrowserDialog>()
     }
 
     @Test
@@ -1511,7 +1511,7 @@ class BrowserTabViewModelTest {
         whenever(mockDefaultBrowserDetector.hasDefaultBrowser()).thenReturn(true)
         val cta = DaxDialogCta.DefaultBrowserCta(mockDefaultBrowserDetector, mock(), mock())
         testee.onUserClickCtaOkButton(cta)
-        assertCommandIssued<Command.OpenSettings>()
+        assertCommandIssued<Command.OpenDefaultBrowserSettings>()
     }
 
     @Test
@@ -1584,7 +1584,7 @@ class BrowserTabViewModelTest {
 
         testee.onUserTriedToSetAsDefaultBrowserFromDialog()
 
-        assertCommandIssued<Command.OpenDialog>()
+        assertCommandIssued<Command.OpenDefaultBrowserDialog>()
     }
 
     @Test

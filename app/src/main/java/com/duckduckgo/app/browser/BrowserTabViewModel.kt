@@ -197,8 +197,8 @@ class BrowserTabViewModel(
         object GenerateWebViewPreviewImage : Command()
         object LaunchTabSwitcher : Command()
         class ShowErrorWithAction(val action: () -> Unit) : Command()
-        class OpenDialog(val url: String = DEFAULT_URL) : Command()
-        object OpenSettings : Command()
+        class OpenDefaultBrowserDialog(val url: String = DEFAULT_URL) : Command()
+        object OpenDefaultBrowserSettings : Command()
     }
 
     val autoCompleteViewState: MutableLiveData<AutoCompleteViewState> = MutableLiveData()
@@ -954,7 +954,7 @@ class BrowserTabViewModel(
         } else {
             if (defaultBrowserAttempt < MAX_DIALOG_ATTEMPTS) {
                 defaultBrowserAttempt++
-                command.value = OpenDialog()
+                command.value = OpenDefaultBrowserDialog()
             } else {
                 firePixelDefaultBrowserCtaUserAction(false, origin = Pixel.PixelValues.DAX_DEFAULT_BROWSER_JUST_ONCE_MAX)
             }
@@ -1051,8 +1051,8 @@ class BrowserTabViewModel(
 
     private fun DaxDialogCta.DefaultBrowserCta.DefaultBrowserAction.mapToCommand(): Command {
         return when (this) {
-            is DaxDialogCta.DefaultBrowserCta.DefaultBrowserAction.ShowSettings -> OpenSettings
-            is DaxDialogCta.DefaultBrowserCta.DefaultBrowserAction.ShowSystemDialog -> OpenDialog()
+            is DaxDialogCta.DefaultBrowserCta.DefaultBrowserAction.ShowSettings -> OpenDefaultBrowserSettings
+            is DaxDialogCta.DefaultBrowserCta.DefaultBrowserAction.ShowSystemDialog -> OpenDefaultBrowserDialog()
         }
     }
 
