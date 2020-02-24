@@ -942,7 +942,7 @@ class BrowserTabViewModel(
     fun onUserTriedToSetAsDefaultBrowserFromSettings() {
         val isDefaultBrowser = defaultBrowserDetector.isDefaultBrowser()
         installStore.defaultBrowser = isDefaultBrowser
-        firePixelDefaultBrowserCtaUserAction(isDefaultBrowser, origin = Pixel.PixelValues.DAX_DEFAULT_BROWSER_SETTINGS)
+        firePixelDefaultBrowserCtaUserAction(isDefaultBrowser, origin = Pixel.PixelValues.DEFAULT_BROWSER_SETTINGS)
     }
 
     fun onUserTriedToSetAsDefaultBrowserFromDialog() {
@@ -950,13 +950,13 @@ class BrowserTabViewModel(
         installStore.defaultBrowser = isDefaultBrowser
         if (defaultBrowserDetector.isDefaultBrowser()) {
             defaultBrowserAttempt = 1
-            firePixelDefaultBrowserCtaUserAction(true, origin = Pixel.PixelValues.DAX_DEFAULT_BROWSER_DIALOG)
+            firePixelDefaultBrowserCtaUserAction(true, origin = Pixel.PixelValues.DEFAULT_BROWSER_DIALOG)
         } else {
             if (defaultBrowserAttempt < MAX_DIALOG_ATTEMPTS) {
                 defaultBrowserAttempt++
                 command.value = OpenDefaultBrowserDialog()
             } else {
-                firePixelDefaultBrowserCtaUserAction(false, origin = Pixel.PixelValues.DAX_DEFAULT_BROWSER_JUST_ONCE_MAX)
+                firePixelDefaultBrowserCtaUserAction(false, origin = Pixel.PixelValues.DEFAULT_BROWSER_JUST_ONCE_MAX)
             }
         }
     }
@@ -966,9 +966,9 @@ class BrowserTabViewModel(
         installStore.defaultBrowser = isDefaultBrowser
 
         val origin = if (userSelectedExternalBrowser) {
-            Pixel.PixelValues.DAX_DEFAULT_BROWSER_DIALOG_EXTERNAL
+            Pixel.PixelValues.DEFAULT_BROWSER_EXTERNAL
         } else {
-            Pixel.PixelValues.DAX_DEFAULT_BROWSER_DIALOG_DISMISSED
+            Pixel.PixelValues.DEFAULT_BROWSER_DIALOG_DISMISSED
         }
         firePixelDefaultBrowserCtaUserAction(isDefaultBrowser, origin = origin)
     }

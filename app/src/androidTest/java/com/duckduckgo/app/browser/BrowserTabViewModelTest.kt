@@ -1565,7 +1565,7 @@ class BrowserTabViewModelTest {
         testee.onUserTriedToSetAsDefaultBrowserFromSettings()
 
         verify(mockAppInstallStore).defaultBrowser = false
-        verify(mockPixel).fire(Pixel.PixelName.DEFAULT_BROWSER_NOT_SET, defaultBrowserPixelParams(Pixel.PixelValues.DAX_DEFAULT_BROWSER_SETTINGS))
+        verify(mockPixel).fire(Pixel.PixelName.DEFAULT_BROWSER_NOT_SET, defaultBrowserPixelParams(Pixel.PixelValues.DEFAULT_BROWSER_SETTINGS))
     }
 
     @Test
@@ -1575,7 +1575,7 @@ class BrowserTabViewModelTest {
         testee.onUserTriedToSetAsDefaultBrowserFromSettings()
 
         verify(mockAppInstallStore).defaultBrowser = true
-        verify(mockPixel).fire(Pixel.PixelName.DEFAULT_BROWSER_SET, defaultBrowserPixelParams(Pixel.PixelValues.DAX_DEFAULT_BROWSER_SETTINGS))
+        verify(mockPixel).fire(Pixel.PixelName.DEFAULT_BROWSER_SET, defaultBrowserPixelParams(Pixel.PixelValues.DEFAULT_BROWSER_SETTINGS))
     }
 
     @Test
@@ -1597,7 +1597,7 @@ class BrowserTabViewModelTest {
         verify(mockAppInstallStore, times(2)).defaultBrowser = false
         verify(mockPixel).fire(
             Pixel.PixelName.DEFAULT_BROWSER_NOT_SET,
-            defaultBrowserPixelParams(Pixel.PixelValues.DAX_DEFAULT_BROWSER_JUST_ONCE_MAX)
+            defaultBrowserPixelParams(Pixel.PixelValues.DEFAULT_BROWSER_JUST_ONCE_MAX)
         )
     }
 
@@ -1608,19 +1608,32 @@ class BrowserTabViewModelTest {
         testee.onUserTriedToSetAsDefaultBrowserFromDialog()
 
         verify(mockAppInstallStore).defaultBrowser = true
-        verify(mockPixel).fire(Pixel.PixelName.DEFAULT_BROWSER_SET, defaultBrowserPixelParams(Pixel.PixelValues.DAX_DEFAULT_BROWSER_DIALOG))
+        verify(mockPixel).fire(Pixel.PixelName.DEFAULT_BROWSER_SET, defaultBrowserPixelParams(Pixel.PixelValues.DEFAULT_BROWSER_DIALOG))
     }
 
     @Test
     fun whenUserDismissesDefaultBrowserDialogThenFirePixelAndUpdateInstallStore() {
         whenever(mockDefaultBrowserDetector.isDefaultBrowser()).thenReturn(false)
 
-        testee.onUserDismissedDefaultBrowserDialog()
+        testee.onUserDismissedDefaultBrowserDialog(userSelectedExternalBrowser = false)
 
         verify(mockAppInstallStore).defaultBrowser = false
         verify(mockPixel).fire(
             Pixel.PixelName.DEFAULT_BROWSER_NOT_SET,
-            defaultBrowserPixelParams(Pixel.PixelValues.DAX_DEFAULT_BROWSER_DIALOG_DISMISSED)
+            defaultBrowserPixelParams(Pixel.PixelValues.DEFAULT_BROWSER_DIALOG_DISMISSED)
+        )
+    }
+
+    @Test
+    fun whenDefaultBrowserDialogDismissedAfterSelectingExternalBrowserThenFirePixelAndUpdateInstallStore() {
+        whenever(mockDefaultBrowserDetector.isDefaultBrowser()).thenReturn(false)
+
+        testee.onUserDismissedDefaultBrowserDialog(userSelectedExternalBrowser = true)
+
+        verify(mockAppInstallStore).defaultBrowser = false
+        verify(mockPixel).fire(
+            Pixel.PixelName.DEFAULT_BROWSER_NOT_SET,
+            defaultBrowserPixelParams(Pixel.PixelValues.DEFAULT_BROWSER_EXTERNAL)
         )
     }
 
