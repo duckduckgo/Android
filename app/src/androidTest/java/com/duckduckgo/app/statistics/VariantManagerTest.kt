@@ -68,40 +68,6 @@ class VariantManagerTest {
         assertTrue(variant.hasFeature(SuppressOnboardingDefaultBrowserCta))
     }
 
-    // CTA Validation experiments
-
-    @Test
-    fun ctaControlVariantIsInactiveAndHasNoFeatures() {
-        val variant = variants.firstOrNull { it.key == "mq" }
-        assertEqualsDouble(0.0, variant!!.weight)
-        assertEquals(0, variant!!.features.size)
-    }
-
-    @Test
-    fun ctaSuppressOnboardingDefaultBrowserVariantIsInactiveAndHasSuppressDefaultBrowserFeature() {
-        val variant = variants.firstOrNull { it.key == "mr" }
-        assertEqualsDouble(0.0, variant!!.weight)
-        assertEquals(1, variant!!.features.size)
-        assertTrue(variant.hasFeature(SuppressOnboardingDefaultBrowserCta))
-    }
-
-    @Test
-    fun ctaSuppressHomeWidgetVariantIsInactiveAndHasSuppressWidgetCtaFeature() {
-        val variant = variants.firstOrNull { it.key == "ms" }
-        assertEqualsDouble(0.0, variant!!.weight)
-        assertEquals(1, variant!!.features.size)
-        assertTrue(variant.hasFeature(SuppressHomeTabWidgetCta))
-    }
-
-    @Test
-    fun ctaSuppressAllVariantIsInactiveAndHasSuppressCtaFeatures() {
-        val variant = variants.firstOrNull { it.key == "mt" }
-        assertEqualsDouble(0.0, variant!!.weight)
-        assertEquals(2, variant!!.features.size)
-        assertTrue(variant.hasFeature(SuppressOnboardingDefaultBrowserCta))
-        assertTrue(variant.hasFeature(SuppressHomeTabWidgetCta))
-    }
-
     // CTA on Concept Test experiments
 
     @Test

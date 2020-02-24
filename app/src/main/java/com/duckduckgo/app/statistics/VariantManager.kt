@@ -63,16 +63,6 @@ interface VariantManager {
                 features = listOf(SuppressHomeTabWidgetCta, SuppressOnboardingDefaultBrowserCta),
                 filterBy = { isEnglishLocale() }),
 
-            // Validate CTAs experiment
-            Variant(key = "mq", weight = 0.0, features = emptyList(), filterBy = { noFilter() }),
-            Variant(key = "mr", weight = 0.0, features = listOf(SuppressOnboardingDefaultBrowserCta), filterBy = { noFilter() }),
-            Variant(key = "ms", weight = 0.0, features = listOf(SuppressHomeTabWidgetCta), filterBy = { noFilter() }),
-            Variant(
-                key = "mt",
-                weight = 0.0,
-                features = listOf(SuppressHomeTabWidgetCta, SuppressOnboardingDefaultBrowserCta),
-                filterBy = { noFilter() }),
-
             // Insert CTAs on Concept test experiment
             Variant(key = "mj", weight = 1.0,
                 features = listOf(ConceptTest, SuppressHomeTabWidgetCta, SuppressOnboardingDefaultBrowserCta),
