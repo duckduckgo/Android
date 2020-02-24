@@ -110,7 +110,7 @@
                     <com.duckduckgo.app.global.view.TypeAnimationTextView
                         android:id="@+id/dialogText"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
+                        android:layout_height="match_parent"
                         android:clickable="true"
                         android:focusable="true"
                         android:textColor="?attr/normalTextColor"
