@@ -110,7 +110,6 @@ import javax.inject.Inject
 import kotlin.concurrent.thread
 import kotlin.coroutines.CoroutineContext
 
-
 class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
 
     private val supervisorJob = SupervisorJob()
