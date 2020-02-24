@@ -20,22 +20,23 @@ import android.content.Intent
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.duckduckgo.app.autocomplete.api.AutoCompleteApi
-import com.duckduckgo.app.autocomplete.api.AutoCompleteApi.AutoCompleteResult
+import com.duckduckgo.app.autocomplete.api.AutoComplete
+import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteResult
+import com.duckduckgo.app.global.DefaultDispatcherProvider
+import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.SingleLiveEvent
 import com.jakewharton.rxrelay2.PublishRelay
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
 
 class SystemSearchViewModel(
-    private val autoCompleteApi: AutoCompleteApi,
-    private val deviceAppsLookup: DeviceAppsLookup
+    private val autoComplete: AutoComplete,
+    private val deviceAppLookup: DeviceAppLookup,
+    private val dispatchers: DispatcherProvider = DefaultDispatcherProvider()
 ) : ViewModel() {
 
     data class SystemSearchViewState(
@@ -45,7 +46,7 @@ class SystemSearchViewModel(
     )
 
     sealed class Command {
-        class LaunchDuckDuckGo : Command()
+        object LaunchDuckDuckGo : Command()
         data class LaunchBrowser(val query: String) : Command()
         data class LaunchDeviceApplication(val intent: Intent) : Command()
     }
@@ -76,7 +77,7 @@ class SystemSearchViewModel(
     private fun configureAutoComplete() {
         autoCompletePublishSubject
             .debounce(DEBOUNCE_TIME_MS, TimeUnit.MILLISECONDS)
-            .switchMap { autoCompleteApi.autoComplete(it) }
+            .switchMap { autoComplete.autoComplete(it) }
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe({ result ->
@@ -102,10 +103,8 @@ class SystemSearchViewModel(
         viewState.value = currentViewState().copy(queryText = trimmedQuery)
         autoCompletePublishSubject.accept(trimmedQuery)
 
-        appsJob = viewModelScope.launch {
-            withContext(Dispatchers.IO) {
-                updateAppResults(deviceAppsLookup.query(query))
-            }
+        appsJob = viewModelScope.launch(dispatchers.io()) {
+            updateAppResults(deviceAppLookup.query(query))
         }
     }
 
@@ -134,7 +133,7 @@ class SystemSearchViewModel(
     }
 
     fun userTappedDax() {
-        command.value = Command.LaunchDuckDuckGo()
+        command.value = Command.LaunchDuckDuckGo
     }
 
     fun userClearedQuery() {

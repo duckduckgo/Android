@@ -16,20 +16,38 @@
 
 package com.duckduckgo.app.autocomplete.api
 
-import com.duckduckgo.app.autocomplete.api.AutoCompleteApi.AutoCompleteSuggestion.AutoCompleteBookmarkSuggestion
-import com.duckduckgo.app.autocomplete.api.AutoCompleteApi.AutoCompleteSuggestion.AutoCompleteSearchSuggestion
+import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteResult
+import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteBookmarkSuggestion
+import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteSearchSuggestion
 import com.duckduckgo.app.bookmarks.db.BookmarksDao
 import com.duckduckgo.app.global.UriString
 import io.reactivex.Observable
 import io.reactivex.functions.BiFunction
 import javax.inject.Inject
 
-open class AutoCompleteApi @Inject constructor(
+interface AutoComplete {
+    fun autoComplete(query: String): Observable<AutoCompleteResult>
+
+    data class AutoCompleteResult(
+        val query: String,
+        val suggestions: List<AutoCompleteSuggestion>
+    )
+
+    sealed class AutoCompleteSuggestion(val phrase: String) {
+        class AutoCompleteSearchSuggestion(phrase: String, val isUrl: Boolean) :
+            AutoCompleteSuggestion(phrase)
+
+        class AutoCompleteBookmarkSuggestion(phrase: String, val title: String, val url: String) :
+            AutoCompleteSuggestion(phrase)
+    }
+}
+
+class AutoCompleteApi @Inject constructor(
     private val autoCompleteService: AutoCompleteService,
     private val bookmarksDao: BookmarksDao
-) {
+) : AutoComplete {
 
-    fun autoComplete(query: String): Observable<AutoCompleteResult> {
+    override fun autoComplete(query: String): Observable<AutoCompleteResult> {
 
         if (query.isBlank()) {
             return Observable.just(AutoCompleteResult(query = query, suggestions = emptyList()))
@@ -65,17 +83,4 @@ open class AutoCompleteApi @Inject constructor(
             .toList()
             .onErrorReturn { emptyList() }
             .toObservable()
-
-    data class AutoCompleteResult(
-        val query: String,
-        val suggestions: List<AutoCompleteSuggestion>
-    )
-
-    sealed class AutoCompleteSuggestion(val phrase: String) {
-        class AutoCompleteSearchSuggestion(phrase: String, val isUrl: Boolean) :
-            AutoCompleteSuggestion(phrase)
-
-        class AutoCompleteBookmarkSuggestion(phrase: String, val title: String, val url: String) :
-            AutoCompleteSuggestion(phrase)
-    }
 }

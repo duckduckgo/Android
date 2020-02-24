@@ -63,7 +63,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.app.survey.db.SurveyDao
 import com.duckduckgo.app.survey.ui.SurveyViewModel
-import com.duckduckgo.app.systemsearch.DeviceAppsLookup
+import com.duckduckgo.app.systemsearch.DeviceAppLookup
 import com.duckduckgo.app.systemsearch.SystemSearchViewModel
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel
@@ -87,7 +87,7 @@ class ViewModelFactory @Inject constructor(
     private val bookmarksDao: BookmarksDao,
     private val surveyDao: SurveyDao,
     private val autoCompleteApi: AutoCompleteApi,
-    private val deviceAppsLookup: DeviceAppsLookup,
+    private val deviceAppLookup: DeviceAppLookup,
     private val appSettingsPreferencesStore: SettingsDataStore,
     private val webViewLongPressHandler: LongPressHandler,
     private val defaultBrowserDetector: DefaultBrowserDetector,
@@ -113,7 +113,7 @@ class ViewModelFactory @Inject constructor(
         with(modelClass) {
             when {
                 isAssignableFrom(LaunchViewModel::class.java) -> LaunchViewModel(onboardingStore, appInstallationReferrerStateListener)
-                isAssignableFrom(SystemSearchViewModel::class.java) -> SystemSearchViewModel(autoCompleteApi, deviceAppsLookup)
+                isAssignableFrom(SystemSearchViewModel::class.java) -> SystemSearchViewModel(autoCompleteApi, deviceAppLookup)
                 isAssignableFrom(OnboardingViewModel::class.java) -> onboardingViewModel()
                 isAssignableFrom(BrowserViewModel::class.java) -> browserViewModel()
                 isAssignableFrom(BrowserTabViewModel::class.java) -> browserTabViewModel()
@@ -178,7 +178,7 @@ class ViewModelFactory @Inject constructor(
         tabRepository = tabRepository,
         networkLeaderboardDao = networkLeaderboardDao,
         bookmarksDao = bookmarksDao,
-        autoCompleteApi = autoCompleteApi,
+        autoComplete = autoCompleteApi,
         appSettingsPreferencesStore = appSettingsPreferencesStore,
         longPressHandler = webViewLongPressHandler,
         webViewSessionStorage = webViewSessionStorage,

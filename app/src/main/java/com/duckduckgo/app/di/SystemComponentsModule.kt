@@ -18,7 +18,10 @@ package com.duckduckgo.app.di
 
 import android.content.Context
 import android.content.pm.PackageManager
-import com.duckduckgo.app.systemsearch.DeviceAppsLookup
+import com.duckduckgo.app.systemsearch.DeviceAppListProvider
+import com.duckduckgo.app.systemsearch.DeviceAppLookup
+import com.duckduckgo.app.systemsearch.InstalledDeviceAppListProvider
+import com.duckduckgo.app.systemsearch.InstalledDeviceAppLookup
 import dagger.Module
 import dagger.Provides
 import javax.inject.Singleton
@@ -30,7 +33,11 @@ open class SystemComponentsModule {
     @Provides
     fun packageManager(context: Context) = context.packageManager
 
+    @Singleton
+    @Provides
+    fun deviceAppsListProvider(packageManager: PackageManager): DeviceAppListProvider = InstalledDeviceAppListProvider(packageManager)
+
     @Provides
     @Singleton
-    fun deviceAppsLookup(packageManager: PackageManager): DeviceAppsLookup = DeviceAppsLookup(packageManager)
+    fun deviceAppLookup(deviceAppListProvider: DeviceAppListProvider): DeviceAppLookup = InstalledDeviceAppLookup(deviceAppListProvider)
 }

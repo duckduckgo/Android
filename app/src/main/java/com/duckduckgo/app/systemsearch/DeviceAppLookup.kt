@@ -24,37 +24,47 @@ import kotlin.text.RegexOption.IGNORE_CASE
 
 data class DeviceApp(
     val shortName: String,
-    val longName: String,
     val packageName: String,
     val launchIntent: Intent
 )
 
-class DeviceAppsLookup(private val packageManager: PackageManager) {
+interface DeviceAppLookup {
+    @WorkerThread
+    fun query(query: String): List<DeviceApp>
+}
 
-    private val allApps by lazy { all() }
+class InstalledDeviceAppLookup(private val appListProvider: DeviceAppListProvider) : DeviceAppLookup {
+
+    private val apps by lazy { appListProvider.get() }
 
     @WorkerThread
-    fun query(query: String): List<DeviceApp> {
+    override fun query(query: String): List<DeviceApp> {
         if (query.isBlank()) return emptyList()
         val regex = ".*\\b${query}.*".toRegex(IGNORE_CASE)
 
-        return allApps.filter {
+        return apps.filter {
             it.shortName.matches(regex)
         }
     }
+}
+
+interface DeviceAppListProvider {
+    @WorkerThread
+    fun get(): List<DeviceApp>
+}
+
+class InstalledDeviceAppListProvider(private val packageManager: PackageManager) : DeviceAppListProvider {
 
     @WorkerThread
-    private fun all(): List<DeviceApp> {
+    override fun get(): List<DeviceApp> {
 
         val appsInfo = packageManager.getInstalledApplications(GET_META_DATA)
 
         return appsInfo.map {
             val packageName = it.packageName
-            val fullName = it.className ?: return@map null
             val launchIntent = packageManager.getLaunchIntentForPackage(packageName) ?: return@map null
             val shortName = it.loadLabel(packageManager).toString()
-            return@map DeviceApp(shortName, fullName, packageName, launchIntent)
+            return@map DeviceApp(shortName, packageName, launchIntent)
         }.filterNotNull()
-
     }
 }

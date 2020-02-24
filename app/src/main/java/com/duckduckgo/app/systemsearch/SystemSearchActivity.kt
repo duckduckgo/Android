@@ -45,7 +45,7 @@ class SystemSearchActivity : DuckDuckGoActivity() {
     lateinit var pixel: Pixel
 
     @Inject
-    lateinit var omnibardScrolling: OmnibarScrolling
+    lateinit var omnibarScrolling: OmnibarScrolling
 
     private val viewModel: SystemSearchViewModel by bindViewModel()
     private lateinit var autocompleteSuggestionsAdapter: BrowserAutoCompleteSuggestionsAdapter
@@ -124,10 +124,10 @@ class SystemSearchActivity : DuckDuckGoActivity() {
         results.addOnLayoutChangeListener { _, _, _, _, _, _, _, _, _ ->
             val scrollable = results.maxScrollAmount > MINIMUM_SCROLL_HEIGHT
             if (scrollable) {
-                omnibardScrolling.enableOmnibarScrolling(toolbar)
+                omnibarScrolling.enableOmnibarScrolling(toolbar)
             } else {
                 showOmnibar()
-                omnibardScrolling.disableOmnibarScrolling(toolbar)
+                omnibarScrolling.disableOmnibarScrolling(toolbar)
             }
         }
     }
