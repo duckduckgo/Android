@@ -82,7 +82,7 @@ class ChangeIconViewModelTest {
     @Test
     fun storesIconWhenUserSelectsIt() {
         val previousIcon = AppIcon.BLUE
-        val selectedIcon = AppIcon.RED
+        val selectedIcon = AppIcon.BLACK
         val selectedIconViewData = ChangeIconViewModel.IconViewData(selectedIcon, true)
 
         whenever(mockSettingsDataStore.appIcon).thenReturn(previousIcon)
