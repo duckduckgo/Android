@@ -1615,7 +1615,7 @@ class BrowserTabViewModelTest {
     fun whenUserDismissesDefaultBrowserDialogThenFirePixelAndUpdateInstallStore() {
         whenever(mockDefaultBrowserDetector.isDefaultBrowser()).thenReturn(false)
 
-        testee.onUserDismissedDefaultBrowserDialog(userSelectedExternalBrowser = false)
+        testee.onUserDismissedDefaultBrowserDialog()
 
         verify(mockAppInstallStore).defaultBrowser = false
         verify(mockPixel).fire(
@@ -1625,10 +1625,11 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenDefaultBrowserDialogDismissedAfterSelectingExternalBrowserThenFirePixelAndUpdateInstallStore() {
+    fun whenDefaultBrowserDialogDismissedAfterSelectingDefaultExternalBrowserAlwThenFirePixelAndUpdateInstallStore() {
         whenever(mockDefaultBrowserDetector.isDefaultBrowser()).thenReturn(false)
+        whenever(mockDefaultBrowserDetector.hasDefaultBrowser()).thenReturn(true)
 
-        testee.onUserDismissedDefaultBrowserDialog(userSelectedExternalBrowser = true)
+        testee.onUserDismissedDefaultBrowserDialog()
 
         verify(mockAppInstallStore).defaultBrowser = false
         verify(mockPixel).fire(

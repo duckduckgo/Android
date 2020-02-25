@@ -247,7 +247,6 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
 
     private var alertDialog: AlertDialog? = null
     private var daxDialog: DialogFragment? = null
-    private var userSelectedExternalBrowser = false
 
     override fun onAttach(context: Context) {
         AndroidSupportInjection.inject(this)
@@ -349,11 +348,6 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
         daxDialog = null
         logoHidingListener.onPause()
         super.onPause()
-    }
-
-    override fun onStop() {
-        super.onStop()
-        userSelectedExternalBrowser = true
     }
 
     private fun createPopupMenu() {
@@ -669,10 +663,9 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
             if (resultCode == DefaultBrowserPage.DEFAULT_BROWSER_RESULT_CODE_DIALOG_INTERNAL) {
                 viewModel.onUserTriedToSetAsDefaultBrowserFromDialog()
             } else {
-                viewModel.onUserDismissedDefaultBrowserDialog(userSelectedExternalBrowser)
+                viewModel.onUserDismissedDefaultBrowserDialog()
             }
         }
-        userSelectedExternalBrowser = false
     }
 
     private fun handleFileUploadResult(resultCode: Int, intent: Intent?) {

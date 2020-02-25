@@ -961,11 +961,13 @@ class BrowserTabViewModel(
         }
     }
 
-    fun onUserDismissedDefaultBrowserDialog(userSelectedExternalBrowser: Boolean) {
+    fun onUserDismissedDefaultBrowserDialog() {
         val isDefaultBrowser = defaultBrowserDetector.isDefaultBrowser()
+        val hasDefaultBrowser = defaultBrowserDetector.hasDefaultBrowser()
+
         installStore.defaultBrowser = isDefaultBrowser
 
-        val origin = if (userSelectedExternalBrowser) {
+        val origin = if (!isDefaultBrowser && hasDefaultBrowser) {
             Pixel.PixelValues.DEFAULT_BROWSER_EXTERNAL
         } else {
             Pixel.PixelValues.DEFAULT_BROWSER_DIALOG_DISMISSED
