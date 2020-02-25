@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ripple xmlns:android="http://schemas.android.com/apk/res/android"
-        android:color="?colorAccent">
+    android:color="?colorAccent">
     <item>
         <shape android:shape="oval">
             <stroke
-                    android:width="2dip"
-                    android:color="?colorAccent"/>
+                android:width="2dip"
+                android:color="?colorAccent" />
             <padding
-                    android:left="0dp"
-                    android:top="0dp"
-                    android:right="0dp"
-                    android:bottom="0dp"/>
+                android:bottom="2dp"
+                android:left="2dp"
+                android:right="2dp"
+                android:top="2dp" />
         </shape>
 
     </item>
