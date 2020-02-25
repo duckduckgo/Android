@@ -42,6 +42,7 @@
             android:name="com.duckduckgo.app.launch.LaunchActivity"
             android:icon="${appIcon}"
             android:logo="${appIcon}"
+            android:roundIcon="${appIconRound}"
             android:label="@string/appName">
             <intent-filter>
                 <category android:name="android.intent.action.MAIN" />
