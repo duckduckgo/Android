@@ -64,9 +64,6 @@ interface VariantManager {
                 filterBy = { isEnglishLocale() }),
 
             // Insert CTAs on Concept test experiment
-            Variant(key = "mj", weight = 1.0,
-                features = listOf(ConceptTest, SuppressHomeTabWidgetCta, SuppressOnboardingDefaultBrowserCta),
-                filterBy = { isEnglishLocale() }),
             Variant(
                 key = "ml",
                 weight = 1.0,

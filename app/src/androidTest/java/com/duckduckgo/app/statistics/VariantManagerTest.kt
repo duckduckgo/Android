@@ -71,17 +71,7 @@ class VariantManagerTest {
     // CTA on Concept Test experiments
 
     @Test
-    fun insertCtaConceptControlVariantIsActiveAndHasConceptTestAndSuppressCtaFeatures() {
-        val variant = variants.firstOrNull { it.key == "mj" }
-        assertEqualsDouble(1.0, variant!!.weight)
-        assertEquals(3, variant!!.features.size)
-        assertTrue(variant.hasFeature(ConceptTest))
-        assertTrue(variant.hasFeature(SuppressHomeTabWidgetCta))
-        assertTrue(variant.hasFeature(SuppressOnboardingDefaultBrowserCta))
-    }
-
-    @Test
-    fun insertCtaConceptTestWithAllCtaExperimentalVariantIsActiveAndHasConceptTestAndSuppressCtaFeatures() {
+    fun insertCtaConceptTestControlVariantIsActiveAndHasConceptTestAndHasExpectedFeatures() {
         val variant = variants.firstOrNull { it.key == "ml" }
         assertEqualsDouble(1.0, variant!!.weight)
         assertEquals(2, variant!!.features.size)
@@ -90,7 +80,7 @@ class VariantManagerTest {
     }
 
     @Test
-    fun insertCtaConceptTestWithCtasAsDaxDialogsExperimentalVariantIsActiveAndHasConceptTestAndSuppressCtaFeatures() {
+    fun insertCtaConceptTestWithCtasAsDaxDialogsExperimentalVariantIsActiveAndHasExpectedFeatures() {
         val variant = variants.firstOrNull { it.key == "mh" }
         assertEqualsDouble(1.0, variant!!.weight)
         assertEquals(5, variant!!.features.size)
@@ -110,7 +100,6 @@ class VariantManagerTest {
             }
         }
     }
-
 
     @Suppress("SameParameterValue")
     private fun assertEqualsDouble(expected: Double, actual: Double) {
