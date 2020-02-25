@@ -24,20 +24,17 @@ import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.fragment.app.FragmentActivity
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.cta.model.CtaId
 import com.duckduckgo.app.cta.ui.DaxCta.Companion.MAX_DAYS_ALLOWED
 import com.duckduckgo.app.global.baseHost
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.install.daysInstalled
-import com.duckduckgo.app.global.view.DaxDialog
-import com.duckduckgo.app.global.view.DaxDialogHighlightView
-import com.duckduckgo.app.global.view.TypewriterDaxDialog
-import com.duckduckgo.app.global.view.hide
-import com.duckduckgo.app.global.view.html
-import com.duckduckgo.app.global.view.show
+import com.duckduckgo.app.global.view.*
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
+import com.duckduckgo.app.widget.ui.WidgetCapabilities
 import kotlinx.android.synthetic.main.include_cta_buttons.view.*
 import kotlinx.android.synthetic.main.include_cta_content.view.*
 import kotlinx.android.synthetic.main.include_dax_dialog_cta.view.*
@@ -110,6 +107,123 @@ sealed class DaxDialogCta(
         onboardingStore,
         appInstallStore
     )
+
+    class DefaultBrowserCta(
+        defaultBrowserDetector: DefaultBrowserDetector,
+        override val onboardingStore: OnboardingStore,
+        override val appInstallStore: AppInstallStore,
+        private val defaultBrowserCtaBehavior: DefaultBrowserCtaBehavior = getDefaultBrowserCtaBehavior(defaultBrowserDetector)
+    ) : DaxDialogCta(
+        ctaId = CtaId.DAX_DIALOG_DEFAULT_BROWSER,
+        description = R.string.daxDefaultBrowserCtaText,
+        okButton = defaultBrowserCtaBehavior.primaryButtonStringRes,
+        shownPixel = Pixel.PixelName.ONBOARDING_DAX_CTA_SHOWN,
+        okPixel = Pixel.PixelName.ONBOARDING_DAX_CTA_OK_BUTTON,
+        cancelPixel = null,
+        ctaPixelParam = defaultBrowserCtaBehavior.ctaPixelParam,
+        onboardingStore = onboardingStore,
+        appInstallStore = appInstallStore
+    ), SecondaryButtonCta {
+
+        override val secondaryButtonPixel: Pixel.PixelName = Pixel.PixelName.ONBOARDING_DAX_CTA_CANCEL_BUTTON
+
+        val primaryAction: DefaultBrowserAction
+            get() = defaultBrowserCtaBehavior.action
+
+        override fun createCta(activity: FragmentActivity): DaxDialog {
+            return TypewriterDaxDialog(
+                daxText = getDaxText(activity),
+                primaryButtonText = activity.resources.getString(okButton),
+                secondaryButtonText = activity.resources.getString(R.string.daxDialogMaybeLater),
+                toolbarDimmed = true
+            )
+        }
+
+        override fun pixelSecondaryButtonParameters(): Map<String, String?> = mapOf(Pixel.PixelParameter.CTA_SHOWN to ctaPixelParam)
+
+        sealed class DefaultBrowserAction {
+            object ShowSettings : DefaultBrowserAction()
+            object ShowSystemDialog : DefaultBrowserAction()
+        }
+
+        sealed class DefaultBrowserCtaBehavior(val primaryButtonStringRes: Int, val ctaPixelParam: String, val action: DefaultBrowserAction) {
+            object Settings : DefaultBrowserCtaBehavior(
+                primaryButtonStringRes = R.string.daxDialogSettings,
+                ctaPixelParam = Pixel.PixelValues.DAX_DEFAULT_BROWSER_CTA_SETTINGS,
+                action = DefaultBrowserAction.ShowSettings
+            )
+
+            object Dialog : DefaultBrowserCtaBehavior(
+                primaryButtonStringRes = R.string.daxDialogYes,
+                ctaPixelParam = Pixel.PixelValues.DAX_DEFAULT_BROWSER_CTA_DIALOG,
+                action = DefaultBrowserAction.ShowSystemDialog
+            )
+        }
+
+        companion object {
+            private fun getDefaultBrowserCtaBehavior(defaultBrowserDetector: DefaultBrowserDetector): DefaultBrowserCtaBehavior {
+                return if (defaultBrowserDetector.hasDefaultBrowser()) {
+                    DefaultBrowserCtaBehavior.Settings
+                } else {
+                    DefaultBrowserCtaBehavior.Dialog
+                }
+            }
+        }
+    }
+
+    class SearchWidgetCta(
+        widgetCapabilities: WidgetCapabilities,
+        override val onboardingStore: OnboardingStore,
+        override val appInstallStore: AppInstallStore,
+        private val searchWidgetCtaBehavior: SearchWidgetCtaBehavior = getSearchWidgetBehavior(widgetCapabilities)
+    ) : DaxDialogCta(
+        ctaId = CtaId.DAX_DIALOG_SEARCH_WIDGET,
+        description = R.string.daxSearchWidgetCtaText,
+        okButton = R.string.daxDialogAddWidget,
+        shownPixel = Pixel.PixelName.ONBOARDING_DAX_CTA_SHOWN,
+        okPixel = Pixel.PixelName.ONBOARDING_DAX_CTA_OK_BUTTON,
+        cancelPixel = null,
+        ctaPixelParam = searchWidgetCtaBehavior.ctaPixelParam,
+        onboardingStore = onboardingStore,
+        appInstallStore = appInstallStore
+    ), SecondaryButtonCta {
+
+        override val secondaryButtonPixel: Pixel.PixelName = Pixel.PixelName.ONBOARDING_DAX_CTA_CANCEL_BUTTON
+
+        val primaryAction: SearchWidgetAction
+            get() = searchWidgetCtaBehavior.action
+
+        override fun createCta(activity: FragmentActivity): DaxDialog {
+            return TypewriterDaxDialog(
+                daxText = getDaxText(activity),
+                primaryButtonText = activity.resources.getString(okButton),
+                secondaryButtonText = activity.resources.getString(R.string.daxDialogMaybeLater),
+                toolbarDimmed = true
+            )
+        }
+
+        override fun pixelSecondaryButtonParameters(): Map<String, String?> = mapOf(Pixel.PixelParameter.CTA_SHOWN to ctaPixelParam)
+
+        sealed class SearchWidgetAction {
+            object AddAutomatic : SearchWidgetAction()
+            object AddManually : SearchWidgetAction()
+        }
+
+        sealed class SearchWidgetCtaBehavior(val ctaPixelParam: String, val action: SearchWidgetAction) {
+            object Automatic : SearchWidgetCtaBehavior(Pixel.PixelValues.DAX_SEARCH_WIDGET_CTA_AUTO, SearchWidgetAction.AddAutomatic)
+            object Manual : SearchWidgetCtaBehavior(Pixel.PixelValues.DAX_SEARCH_WIDGET_CTA_MANUAL, SearchWidgetAction.AddManually)
+        }
+
+        companion object {
+            private fun getSearchWidgetBehavior(widgetCapabilities: WidgetCapabilities): SearchWidgetCtaBehavior {
+                return if (widgetCapabilities.supportsAutomaticWidgetAdd) {
+                    SearchWidgetCtaBehavior.Automatic
+                } else {
+                    SearchWidgetCtaBehavior.Manual
+                }
+            }
+        }
+    }
 
     class DaxTrackersBlockedCta(
         override val onboardingStore: OnboardingStore,

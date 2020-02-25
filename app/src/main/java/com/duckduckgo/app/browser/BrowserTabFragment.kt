@@ -39,6 +39,7 @@ import android.webkit.WebView.HitTestResult
 import android.webkit.WebView.HitTestResult.*
 import android.widget.EditText
 import android.widget.TextView
+import android.widget.Toast
 import androidx.annotation.AnyThread
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
@@ -57,6 +58,8 @@ import com.duckduckgo.app.autocomplete.api.AutoCompleteApi.AutoCompleteSuggestio
 import com.duckduckgo.app.bookmarks.ui.EditBookmarkDialogFragment
 import com.duckduckgo.app.browser.BrowserTabViewModel.*
 import com.duckduckgo.app.browser.autocomplete.BrowserAutoCompleteSuggestionsAdapter
+import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserNavigator
+import com.duckduckgo.app.browser.defaultbrowsing.TopInstructionsCard
 import com.duckduckgo.app.browser.downloader.FileDownloadNotificationManager
 import com.duckduckgo.app.browser.downloader.FileDownloader
 import com.duckduckgo.app.browser.downloader.FileDownloader.PendingFileDownload
@@ -72,15 +75,11 @@ import com.duckduckgo.app.browser.tabpreview.WebViewPreviewGenerator
 import com.duckduckgo.app.browser.tabpreview.WebViewPreviewPersister
 import com.duckduckgo.app.browser.ui.HttpAuthenticationDialogFragment
 import com.duckduckgo.app.browser.useragent.UserAgentProvider
-import com.duckduckgo.app.cta.ui.Cta
-import com.duckduckgo.app.cta.ui.HomePanelCta
-import com.duckduckgo.app.cta.ui.CtaViewModel
-import com.duckduckgo.app.cta.ui.DaxBubbleCta
-import com.duckduckgo.app.cta.ui.DaxDialogCta
-import com.duckduckgo.app.cta.ui.SecondaryButtonCta
+import com.duckduckgo.app.cta.ui.*
 import com.duckduckgo.app.global.ViewModelFactory
 import com.duckduckgo.app.global.device.DeviceInfo
 import com.duckduckgo.app.global.view.*
+import com.duckduckgo.app.onboarding.ui.page.DefaultBrowserPage
 import com.duckduckgo.app.privacy.model.PrivacyGrade
 import com.duckduckgo.app.privacy.renderer.icon
 import com.duckduckgo.app.privacy.store.PrivacySettingsStore
@@ -94,9 +93,9 @@ import com.duckduckgo.app.widget.ui.AddWidgetInstructionsActivity
 import com.duckduckgo.widget.SearchWidgetLight
 import com.google.android.material.snackbar.Snackbar
 import dagger.android.support.AndroidSupportInjection
-import kotlinx.android.synthetic.main.include_dax_dialog_cta.*
 import kotlinx.android.synthetic.main.fragment_browser_tab.*
 import kotlinx.android.synthetic.main.include_cta_buttons.view.*
+import kotlinx.android.synthetic.main.include_dax_dialog_cta.*
 import kotlinx.android.synthetic.main.include_find_in_page.*
 import kotlinx.android.synthetic.main.include_new_browser_tab.*
 import kotlinx.android.synthetic.main.include_omnibar_toolbar.*
@@ -110,7 +109,6 @@ import java.io.File
 import javax.inject.Inject
 import kotlin.concurrent.thread
 import kotlin.coroutines.CoroutineContext
-
 
 class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
 
@@ -170,6 +168,9 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
     @Inject
     lateinit var privacySettingsStore: PrivacySettingsStore
 
+    @Inject
+    lateinit var defaultBrowserNavigation: DefaultBrowserNavigator
+
     val tabId get() = arguments!![TAB_ID_ARG] as String
 
     lateinit var userAgentProvider: UserAgentProvider
@@ -217,6 +218,13 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
         get() = appBarLayout.browserMenu
 
     private var webView: WebView? = null
+
+    private var instructionsCard: Toast? = null
+        get() {
+            field?.cancel()
+            field = TopInstructionsCard(requireContext(), Toast.LENGTH_SHORT)
+            return field
+        }
 
     private val errorSnackbar: Snackbar by lazy {
         Snackbar.make(browserLayout, R.string.crashedWebViewErrorMessage, Snackbar.LENGTH_INDEFINITE)
@@ -539,7 +547,24 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
             is Command.GenerateWebViewPreviewImage -> generateWebViewPreviewImage()
             is Command.LaunchTabSwitcher -> launchTabSwitcher()
             is Command.ShowErrorWithAction -> showErrorSnackbar(it)
+            is Command.OpenDefaultBrowserSettings -> openDefaultBrowserSettings()
+            is Command.OpenDefaultBrowserDialog -> openDefaultBrowserDialog(it.url)
         }
+    }
+
+    private fun openDefaultBrowserDialog(url: String) {
+        instructionsCard?.show()
+        defaultCard?.show()
+        defaultCard?.animate()?.alpha(1f)?.setDuration(INSTRUCTIONS_CARD_ANIMATION_DURATION)?.start()
+        defaultBrowserNavigation.openDefaultBrowserDialog(this, url, DEFAULT_BROWSER_REQUEST_CODE_DIALOG)
+    }
+
+    private fun hideInstructionsCard() {
+        defaultCard?.animate()?.alpha(0f)?.setDuration(INSTRUCTIONS_CARD_ANIMATION_DURATION)?.start()
+    }
+
+    private fun openDefaultBrowserSettings() {
+        defaultBrowserNavigation.navigateToSettings(this, DEFAULT_BROWSER_REQUEST_CODE_SETTINGS)
     }
 
     private fun showErrorSnackbar(command: Command.ShowErrorWithAction) {
@@ -631,6 +656,15 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (requestCode == REQUEST_CODE_CHOOSE_FILE) {
             handleFileUploadResult(resultCode, data)
+        } else if (requestCode == DEFAULT_BROWSER_REQUEST_CODE_SETTINGS) {
+            viewModel.onUserTriedToSetAsDefaultBrowserFromSettings()
+        } else if (requestCode == DEFAULT_BROWSER_REQUEST_CODE_DIALOG) {
+            hideInstructionsCard()
+            if (resultCode == DefaultBrowserPage.DEFAULT_BROWSER_RESULT_CODE_DIALOG_INTERNAL) {
+                viewModel.onUserTriedToSetAsDefaultBrowserFromDialog()
+            } else {
+                viewModel.onUserDismissedDefaultBrowserDialog()
+            }
         }
     }
 
@@ -1109,7 +1143,8 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
     }
 
     companion object {
-
+        private const val DEFAULT_BROWSER_REQUEST_CODE_DIALOG = 191
+        private const val DEFAULT_BROWSER_REQUEST_CODE_SETTINGS = 190
         private const val TAB_ID_ARG = "TAB_ID_ARG"
         private const val URL_EXTRA_ARG = "URL_EXTRA_ARG"
         private const val SKIP_HOME_ARG = "SKIP_HOME_ARG"
@@ -1129,6 +1164,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
         private const val MAX_PROGRESS = 100
         private const val TRACKERS_INI_DELAY = 500L
         private const val TRACKERS_SECONDARY_DELAY = 200L
+        private const val INSTRUCTIONS_CARD_ANIMATION_DURATION: Long = 100
 
         fun newInstance(tabId: String, query: String? = null, skipHome: Boolean): BrowserTabFragment {
             val fragment = BrowserTabFragment()
@@ -1391,13 +1427,13 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
                         if (configuration is DaxDialogCta.DaxTrackersBlockedCta) {
                             animatorHelper.finishTrackerAnimation(omnibarViews(), container)
                         }
-                        viewModel.onUserDismissedCta()
+                        viewModel.onUserDismissedCta(configuration)
                     }
                     setPrimaryCtaClickListener {
-                        viewModel.onUserClickCtaOkButton()
+                        viewModel.onUserClickCtaOkButton(configuration)
                         if (configuration is DaxDialogCta.DaxMainNetworkCta) {
                             setPrimaryCtaClickListener {
-                                viewModel.onUserClickCtaOkButton()
+                                viewModel.onUserClickCtaOkButton(configuration)
                                 getDaxDialog().dismiss()
                             }
                             configuration.setSecondDialog(this, activity)
@@ -1469,11 +1505,11 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
 
             configuration.showCta(ctaContainer)
             ctaContainer.ctaOkButton.setOnClickListener {
-                viewModel.onUserClickCtaOkButton()
+                viewModel.onUserClickCtaOkButton(configuration)
             }
 
             ctaContainer.ctaDismissButton.setOnClickListener {
-                viewModel.onUserDismissedCta()
+                viewModel.onUserDismissedCta(cta)
             }
 
             ConstraintSet().also {

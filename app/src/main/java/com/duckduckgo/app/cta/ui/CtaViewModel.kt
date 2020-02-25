@@ -18,6 +18,7 @@ package com.duckduckgo.app.cta.ui
 
 import androidx.annotation.WorkerThread
 import androidx.lifecycle.LiveData
+import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.cta.db.DismissedCtaDao
 import com.duckduckgo.app.cta.model.CtaId
 import com.duckduckgo.app.cta.model.DismissedCta
@@ -53,7 +54,8 @@ class CtaViewModel @Inject constructor(
     private val variantManager: VariantManager,
     private val settingsDataStore: SettingsDataStore,
     private val onboardingStore: OnboardingStore,
-    private val settingsPrivacySettingsStore: PrivacySettingsStore
+    private val settingsPrivacySettingsStore: PrivacySettingsStore,
+    private val defaultBrowserDetector: DefaultBrowserDetector
 ) {
 
     val surveyLiveData: LiveData<Survey> = surveyDao.getLiveScheduled()
@@ -222,6 +224,35 @@ class CtaViewModel @Inject constructor(
         }
     }
 
+    @WorkerThread
+    fun obtainNextCta(previousCta: Cta): Cta? {
+        return when {
+            previousCta is DaxDialogCta.DaxTrackersBlockedCta && canShowDefaultBrowserDaxCta() -> {
+                DaxDialogCta.DefaultBrowserCta(defaultBrowserDetector, onboardingStore, appInstallStore)
+            }
+            previousCta is DaxDialogCta.DaxSerpCta && canShowWidgetDaxCta() -> {
+                DaxDialogCta.SearchWidgetCta(widgetCapabilities, onboardingStore, appInstallStore)
+            }
+            else -> null
+        }
+    }
+
+    @WorkerThread
+    private fun canShowDefaultBrowserDaxCta(): Boolean {
+        return defaultBrowserDetector.deviceSupportsDefaultBrowserConfiguration() &&
+                !defaultBrowserDetector.isDefaultBrowser() &&
+                variantManager.getVariant().hasFeature(VariantManager.VariantFeature.DefaultBrowserDaxCta) &&
+                !daxDefaultBrowserShown()
+    }
+
+    @WorkerThread
+    private fun canShowWidgetDaxCta(): Boolean {
+        return widgetCapabilities.supportsStandardWidgetAdd &&
+                !widgetCapabilities.hasInstalledWidgets &&
+                variantManager.getVariant().hasFeature(VariantManager.VariantFeature.SearchWidgetDaxCta) &&
+                !daxSearchWidgetShown()
+    }
+
     private fun hasTrackersInformation(events: List<TrackingEvent>): Boolean =
         events.asSequence()
             .filter { it.entity?.isMajor == true }
@@ -246,6 +277,10 @@ class CtaViewModel @Inject constructor(
     private fun daxDialogTrackersFoundShown(): Boolean = dismissedCtaDao.exists(CtaId.DAX_DIALOG_TRACKERS_FOUND)
 
     private fun daxDialogNetworkShown(): Boolean = dismissedCtaDao.exists(CtaId.DAX_DIALOG_NETWORK)
+
+    private fun daxDefaultBrowserShown(): Boolean = dismissedCtaDao.exists(CtaId.DAX_DIALOG_DEFAULT_BROWSER)
+
+    private fun daxSearchWidgetShown(): Boolean = dismissedCtaDao.exists(CtaId.DAX_DIALOG_SEARCH_WIDGET)
 
     private fun isSerpUrl(url: String): Boolean = url.contains(DaxDialogCta.SERP)
 }
