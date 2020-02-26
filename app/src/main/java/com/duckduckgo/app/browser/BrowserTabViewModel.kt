@@ -77,6 +77,7 @@ import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import com.duckduckgo.app.usage.search.SearchCountDao
 import com.jakewharton.rxrelay2.PublishRelay
 import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
@@ -219,6 +220,7 @@ class BrowserTabViewModel(
         get() = site?.title
 
     private val autoCompletePublishSubject = PublishRelay.create<String>()
+    private var autoCompleteDisposable: Disposable? = null
     private var site: Site? = null
     private lateinit var tabId: String
     private var webNavigationState: WebNavigationState? = null
@@ -268,7 +270,7 @@ class BrowserTabViewModel(
 
     @SuppressLint("CheckResult")
     private fun configureAutoComplete() {
-        autoCompletePublishSubject
+        autoCompleteDisposable = autoCompletePublishSubject
             .debounce(300, TimeUnit.MILLISECONDS)
             .switchMap { autoComplete.autoComplete(it) }
             .subscribeOn(Schedulers.io())
@@ -286,8 +288,10 @@ class BrowserTabViewModel(
 
     @VisibleForTesting
     public override fun onCleared() {
-        super.onCleared()
         buildingSiteFactoryJob?.cancel()
+        autoCompleteDisposable?.dispose()
+        autoCompleteDisposable = null
+        super.onCleared()
     }
 
     fun registerWebViewListener(browserWebViewClient: BrowserWebViewClient, browserChromeClient: BrowserChromeClient) {

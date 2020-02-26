@@ -26,6 +26,7 @@ import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.SingleLiveEvent
 import com.jakewharton.rxrelay2.PublishRelay
 import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
@@ -56,6 +57,7 @@ class SystemSearchViewModel(
 
     private val autoCompletePublishSubject = PublishRelay.create<String>()
     private var autocompleteResults: AutoCompleteResult = AutoCompleteResult("", emptyList())
+    private var autoCompleteDisposable: Disposable? = null
 
     private var appsJob: Job? = null
     private var appResults: List<DeviceApp> = emptyList()
@@ -75,7 +77,7 @@ class SystemSearchViewModel(
     }
 
     private fun configureAutoComplete() {
-        autoCompletePublishSubject
+        autoCompleteDisposable = autoCompletePublishSubject
             .debounce(DEBOUNCE_TIME_MS, TimeUnit.MILLISECONDS)
             .switchMap { autoComplete.autoComplete(it) }
             .subscribeOn(Schedulers.io())
@@ -156,6 +158,12 @@ class SystemSearchViewModel(
     fun appNotFound(app: DeviceApp) {
         command.value = Command.ShowAppNotFoundMessage(app.shortName)
         deviceAppLookup.refreshAppList()
+    }
+
+    override fun onCleared() {
+        autoCompleteDisposable?.dispose()
+        autoCompleteDisposable = null
+        super.onCleared()
     }
 
     companion object {

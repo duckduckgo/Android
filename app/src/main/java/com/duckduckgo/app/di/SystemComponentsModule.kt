@@ -31,7 +31,7 @@ open class SystemComponentsModule {
 
     @Singleton
     @Provides
-    fun packageManager(context: Context) = context.packageManager
+    fun packageManager(context: Context): PackageManager = context.packageManager
 
     @Singleton
     @Provides
