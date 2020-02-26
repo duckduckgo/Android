@@ -40,10 +40,10 @@ class InstalledDeviceAppLookup(private val appListProvider: DeviceAppListProvide
     @WorkerThread
     override fun query(query: String): List<DeviceApp> {
         if (query.isBlank()) return emptyList()
-        val regex = ".*\\b${query}.*".toRegex(IGNORE_CASE)
+        val wordPrefixMatchingRegex = ".*\\b${query}.*".toRegex(IGNORE_CASE)
 
         return apps.filter {
-            it.shortName.matches(regex)
+            it.shortName.matches(wordPrefixMatchingRegex)
         }
     }
 }

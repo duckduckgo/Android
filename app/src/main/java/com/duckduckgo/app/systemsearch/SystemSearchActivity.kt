@@ -80,7 +80,7 @@ class SystemSearchActivity : DuckDuckGoActivity() {
         when {
             launchedFromAssist(intent) -> pixel.fire(PixelName.APP_ASSIST_LAUNCH)
             launchedFromWidget(intent) -> pixel.fire(PixelName.APP_WIDGET_LAUNCH)
-            launchedFromAppBar(intent) -> pixel.fire(PixelName.APP_GOOGLE_BAR_LAUNCH)
+            launchedFromSystemSearchBox(intent) -> pixel.fire(PixelName.APP_SYSTEM_SEARCH_BOX_LAUNCH)
         }
     }
 
@@ -182,7 +182,7 @@ class SystemSearchActivity : DuckDuckGoActivity() {
         appBarLayout.setExpanded(true)
     }
 
-    private fun launchedFromAppBar(intent: Intent): Boolean {
+    private fun launchedFromSystemSearchBox(intent: Intent): Boolean {
         return intent.action == NEW_SEARCH_ACTION
     }
 

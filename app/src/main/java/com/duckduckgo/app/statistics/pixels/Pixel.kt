@@ -95,7 +95,7 @@ interface Pixel {
 
         APP_WIDGET_LAUNCH(pixelName = "m_w_l"),
         APP_ASSIST_LAUNCH(pixelName = "m_a_l"),
-        APP_GOOGLE_BAR_LAUNCH(pixelName = "m_g_l"),
+        APP_SYSTEM_SEARCH_BOX_LAUNCH(pixelName = "m_ssb_l"),
         INTERSTITIAL_LAUNCH_BROWSER_QUERY(pixelName = "m_i_lbq"),
         INTERSTITIAL_LAUNCH_DEVICE_APP(pixelName = "m_i_sda"),
         INTERSTITIAL_LAUNCH_DAX(pixelName = "m_i_ld"),
