@@ -31,6 +31,7 @@ import com.duckduckgo.app.notification.db.NotificationDao
 import com.duckduckgo.app.notification.model.ClearDataNotification
 import com.duckduckgo.app.notification.model.PrivacyProtectionNotification
 import com.duckduckgo.app.notification.model.StickySearchNotification
+import com.duckduckgo.app.notification.model.StickySearchPromptNotification
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.api.OfflinePixelScheduler
 import com.duckduckgo.app.statistics.api.OfflinePixelSender
@@ -46,6 +47,7 @@ class DaggerWorkerFactory(
     private val notificationFactory: NotificationFactory,
     private val clearDataNotification: ClearDataNotification,
     private val privacyProtectionNotification: PrivacyProtectionNotification,
+    private val stickySearchPromptNotification: StickySearchPromptNotification,
     private val stickySearchNotification: StickySearchNotification,
     private val pixel: Pixel
 ) : WorkerFactory() {
@@ -61,6 +63,7 @@ class DaggerWorkerFactory(
             is DataClearingWorker -> injectDataClearWorker(instance)
             is ClearDataNotificationWorker -> injectClearDataNotificationWorker(instance)
             is PrivacyNotificationWorker -> injectPrivacyNotificationWorker(instance)
+            is NotificationScheduler.StickySeachPromptNotificationWorker -> injectStickySearchPromptNotificationWorker(instance)
             is NotificationScheduler.StickyNotificationWorker -> injectStickySearchNotificationWorker(instance)
             else -> Timber.i("No injection required for worker $workerClassName")
         }
@@ -91,6 +94,14 @@ class DaggerWorkerFactory(
         worker.factory = notificationFactory
         worker.pixel = pixel
         worker.notification = privacyProtectionNotification
+    }
+
+    private fun injectStickySearchPromptNotificationWorker(worker: NotificationScheduler.StickySeachPromptNotificationWorker) {
+        worker.manager = notificationManager
+        worker.notificationDao = notificationDao
+        worker.factory = notificationFactory
+        worker.pixel = pixel
+        worker.notification = stickySearchPromptNotification
     }
 
     private fun injectStickySearchNotificationWorker(worker: NotificationScheduler.StickyNotificationWorker) {

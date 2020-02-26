@@ -48,4 +48,9 @@
     <string name="hideTipsTitle">Hide remaining tips?</string>
     <string name="hideTipsText">There are only a few, and we tried to make them informative.</string>
     <string name="hideTipsButton">Hide tips forever</string>
+
+    <!-- Sticky Search Prompt Notification -->
+    <string name="stickySearchPromptNotificationTitle">Search from anywhere!</string>
+    <string name="stickySearchPromptNotificationDescription">You can know search from anywhere with our Sticky Notification, interested?</string>
+
 </resources>

@@ -26,7 +26,7 @@ class StickySearchNotification(
     private val notificationDao: NotificationDao
 ) : StickyNotification {
 
-    override val id = "com.duckduckgo.privacy.search"
+    override val id = "com.duckduckgo.privacy.search.sticky"
 
     override suspend fun canShow(): Boolean {
         return !notificationDao.exists(id)
@@ -43,7 +43,7 @@ open class StickySearchNotificationSpecification(context: Context) : Notificatio
     override val systemId = NotificationRegistrar.NotificationId.StickySearch
     override val name = "Sticky Search"
     override val icon = R.drawable.notification_fire
-    override val launchButton = "Search"
+    override val launchButton: String? = null
 
     override val title: String = "Start a Search"
 

@@ -38,6 +38,7 @@ import com.duckduckgo.app.notification.model.Notification
 import com.duckduckgo.app.notification.model.NotificationSpec
 import com.duckduckgo.app.notification.model.SchedulableNotification
 import com.duckduckgo.app.notification.model.StickyNotification
+import com.duckduckgo.app.notification.model.StickySearchNotification
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.NOTIFICATION_SHOWN
 import timber.log.Timber
@@ -47,16 +48,21 @@ import javax.inject.Inject
 class NotificationScheduler @Inject constructor(
     private val workManager: WorkManager,
     private val clearDataNotification: SchedulableNotification,
-    private val privacyNotification: SchedulableNotification
+    private val privacyNotification: SchedulableNotification,
+    private val stickySearchPromptNotification: SchedulableNotification
 ) {
 
     suspend fun scheduleNextNotification() {
 
+        // we should not cancel the sticky prompt, we want to show it after 2 days of activity
         workManager.cancelAllWorkByTag(WORK_REQUEST_TAG)
 
         when {
             privacyNotification.canShow() -> {
                 scheduleNotification(OneTimeWorkRequestBuilder<PrivacyNotificationWorker>(), 1, TimeUnit.DAYS)
+            }
+            stickySearchPromptNotification.canShow() -> {
+                scheduleNotification(OneTimeWorkRequestBuilder<ClearDataNotificationWorker>(), 2, TimeUnit.DAYS)
             }
             clearDataNotification.canShow() -> {
                 scheduleNotification(OneTimeWorkRequestBuilder<ClearDataNotificationWorker>(), 3, TimeUnit.DAYS)
@@ -90,6 +96,7 @@ class NotificationScheduler @Inject constructor(
 
     open class ClearDataNotificationWorker(context: Context, params: WorkerParameters) : SchedulableNotificationWorker(context, params)
     class PrivacyNotificationWorker(context: Context, params: WorkerParameters) : SchedulableNotificationWorker(context, params)
+    class StickySeachPromptNotificationWorker(context: Context, params: WorkerParameters) : SchedulableNotificationWorker(context, params)
 
     open class SchedulableNotificationWorker(val context: Context, params: WorkerParameters) : CoroutineWorker(context, params) {
 
@@ -137,16 +144,10 @@ class NotificationScheduler @Inject constructor(
 
             val specification = notification.buildSpecification()
 
-            val remoteInput: RemoteInput = RemoteInput.Builder(STICKY_SEARCH_REPLY).run {
-                setLabel(specification.launchButton)
-                build()
-            }
-
             val intent = Intent(context, NotificationHandlerService::class.java)
             intent.type = STICKY_SEARCH
             intent.putExtra(PIXEL_SUFFIX_EXTRA, specification.pixelSuffix)
             intent.putExtra(NOTIFICATION_SYSTEM_ID_EXTRA, specification.systemId)
-            intent.setAction(STICKY_SEARCH)
             val launchIntent = getService(context, 0, intent, 0)!!
 
             val action: NotificationCompat.Action =
@@ -155,7 +156,6 @@ class NotificationScheduler @Inject constructor(
                     specification.launchButton,
                     launchIntent
                 )
-                    .addRemoteInput(remoteInput)
                     .build()
 
             val systemNotification = factory.createStickyNotification(specification, action)

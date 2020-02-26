@@ -58,12 +58,17 @@ class NotificationFactory @Inject constructor(val context: Context, val manager:
 
         val builder = NotificationCompat.Builder(context, specification.channel.id)
             .setPriority(specification.channel.priority)
+            .setCustomContentView()
             .setSmallIcon(specification.icon)
             .setContentTitle(specification.title)
             .setContentText(specification.description)
             .setColor(ContextCompat.getColor(context, R.color.cornflowerDark))
-            .addAction(action)
             .setOngoing(true)
+
+        specification.launchButton?.let {
+            builder.addAction(specification.icon, it, launchIntent)
+        }
+
         return builder.build()
     }
 }
