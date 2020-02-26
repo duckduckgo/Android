@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.systemsearch
 
+import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -23,6 +24,8 @@ import android.text.Editable
 import android.view.KeyEvent
 import android.view.inputmethod.EditorInfo
 import android.widget.TextView
+import android.widget.Toast
+import android.widget.Toast.LENGTH_SHORT
 import androidx.core.view.isVisible
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -160,20 +163,39 @@ class SystemSearchActivity : DuckDuckGoActivity() {
     private fun processCommand(command: SystemSearchViewModel.Command) {
         when (command) {
             is LaunchDuckDuckGo -> {
-                pixel.fire(PixelName.INTERSTITIAL_LAUNCH_DAX)
-                startActivity(BrowserActivity.intent(this))
-                finish()
+                launchDuckDuckGo()
             }
             is LaunchBrowser -> {
-                pixel.fire(PixelName.INTERSTITIAL_LAUNCH_BROWSER_QUERY)
-                startActivity(BrowserActivity.intent(this, command.query))
-                finish()
+                launchBrowser(command)
             }
             is LaunchDeviceApplication -> {
-                pixel.fire(PixelName.INTERSTITIAL_LAUNCH_DEVICE_APP)
-                startActivity(command.intent)
-                finish()
+                launchDeviceApp(command)
             }
+            is ShowAppNotFoundMessage -> {
+                Toast.makeText(this, R.string.systemSearchAppNotFound, LENGTH_SHORT).show()
+            }
+        }
+    }
+
+    private fun launchDuckDuckGo() {
+        pixel.fire(PixelName.INTERSTITIAL_LAUNCH_DAX)
+        startActivity(BrowserActivity.intent(this))
+        finish()
+    }
+
+    private fun launchBrowser(command: LaunchBrowser) {
+        pixel.fire(PixelName.INTERSTITIAL_LAUNCH_BROWSER_QUERY)
+        startActivity(BrowserActivity.intent(this, command.query))
+        finish()
+    }
+
+    private fun launchDeviceApp(command: LaunchDeviceApplication) {
+        pixel.fire(PixelName.INTERSTITIAL_LAUNCH_DEVICE_APP)
+        try {
+            startActivity(command.deviceApp.launchIntent)
+            finish()
+        } catch (error: ActivityNotFoundException) {
+            viewModel.appNotFound(command.deviceApp)
         }
     }
 

@@ -16,7 +16,6 @@
 
 package com.duckduckgo.app.systemsearch
 
-import android.content.Intent
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -48,7 +47,8 @@ class SystemSearchViewModel(
     sealed class Command {
         object LaunchDuckDuckGo : Command()
         data class LaunchBrowser(val query: String) : Command()
-        data class LaunchDeviceApplication(val intent: Intent) : Command()
+        data class LaunchDeviceApplication(val deviceApp: DeviceApp) : Command()
+        data class ShowAppNotFoundMessage(val appName: String) : Command()
     }
 
     val viewState: MutableLiveData<SystemSearchViewState> = MutableLiveData()
@@ -150,7 +150,12 @@ class SystemSearchViewModel(
     }
 
     fun userSelectedApp(app: DeviceApp) {
-        command.value = Command.LaunchDeviceApplication(app.launchIntent)
+        command.value = Command.LaunchDeviceApplication(app)
+    }
+
+    fun appNotFound(app: DeviceApp) {
+        command.value = Command.ShowAppNotFoundMessage(app.shortName)
+        deviceAppLookup.refreshAppList()
     }
 
     companion object {

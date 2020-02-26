@@ -140,7 +140,7 @@
                 android:paddingTop="6dp"
                 android:paddingEnd="16dp"
                 android:paddingBottom="2dp"
-                android:text="@string/system_search_app_label"
+                android:text="@string/systemSearchDeviceAppLabel"
                 android:textColor="@color/grayish"
                 android:textSize="13dp"
                 app:layout_constraintEnd_toEndOf="parent"

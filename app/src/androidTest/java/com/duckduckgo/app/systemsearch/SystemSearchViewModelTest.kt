@@ -127,7 +127,7 @@ class SystemSearchViewModelTest {
     fun whenUserSelectsAppResultThenAppLaunched() {
         testee.userSelectedApp(deviceApp)
         verify(commandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
-        assertEquals(Command.LaunchDeviceApplication(deviceApp.launchIntent), commandCaptor.lastValue)
+        assertEquals(Command.LaunchDeviceApplication(deviceApp), commandCaptor.lastValue)
     }
 
     @Test
@@ -135,6 +135,14 @@ class SystemSearchViewModelTest {
         testee.userTappedDax()
         verify(commandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
         assertTrue(commandCaptor.lastValue is LaunchDuckDuckGo)
+    }
+
+    @Test
+    fun whenUserSelectsAppThatCannotBeFoundThenAppsRefreshedAndUserMessageShown() {
+        testee.appNotFound(deviceApp)
+        verify(mockDeviceAppLookup).refreshAppList()
+        verify(commandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+        assertEquals(Command.ShowAppNotFoundMessage(deviceApp.shortName), commandCaptor.lastValue)
     }
 
     private fun ruleRunBlockingTest(block: suspend TestCoroutineScope.() -> Unit) =

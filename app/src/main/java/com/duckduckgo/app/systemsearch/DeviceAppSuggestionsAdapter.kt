@@ -43,7 +43,7 @@ class DeviceAppSuggestionsAdapter(
         holder.root.setOnClickListener {
             clickListener(app)
         }
-        val drawable = holder.icon.context.packageManager.getApplicationIcon(app.packageName)
+        val drawable = app.retrieveIcon(holder.icon.context.packageManager)
         holder.icon.setImageDrawable(drawable)
     }
 
