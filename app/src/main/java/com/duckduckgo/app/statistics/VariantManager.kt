@@ -57,12 +57,6 @@ interface VariantManager {
                 filterBy = { isEnglishLocale() }),
             Variant(key = "md", weight = 0.0, features = listOf(SuppressWidgetCta, SuppressDefaultBrowserCta), filterBy = { isEnglishLocale() }),
 
-            // Validate CTAs experiment
-            Variant(key = "mq", weight = 0.0, features = emptyList(), filterBy = { noFilter() }),
-            Variant(key = "mr", weight = 0.0, features = listOf(SuppressDefaultBrowserCta), filterBy = { noFilter() }),
-            Variant(key = "ms", weight = 0.0, features = listOf(SuppressWidgetCta), filterBy = { noFilter() }),
-            Variant(key = "mt", weight = 0.0, features = listOf(SuppressWidgetCta, SuppressDefaultBrowserCta), filterBy = { noFilter() }),
-
             // Insert CTAs on Concept test experiment
             Variant(key = "mu", weight = 1.0, features = emptyList(), filterBy = { isEnglishLocale() }),
             Variant(key = "mv", weight = 1.0,

@@ -25,18 +25,12 @@ import android.webkit.WebView
 import com.duckduckgo.app.browser.navigation.safeCopyBackForwardList
 import com.duckduckgo.app.global.exception.UncaughtExceptionRepository
 import com.duckduckgo.app.global.exception.UncaughtExceptionSource.*
-import kotlinx.coroutines.*
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
-import kotlin.coroutines.CoroutineContext
 
-
-class BrowserChromeClient @Inject constructor(private val uncaughtExceptionRepository: UncaughtExceptionRepository) : WebChromeClient(),
-    CoroutineScope {
-
-    override val coroutineContext: CoroutineContext
-        get() = SupervisorJob() + Dispatchers.Main
-
+class BrowserChromeClient @Inject constructor(private val uncaughtExceptionRepository: UncaughtExceptionRepository) : WebChromeClient() {
 
     var webViewClientListener: WebViewClientListener? = null
 
