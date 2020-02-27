@@ -77,7 +77,6 @@ class OnboardingPageManagerTest {
     private fun givenSuppressDefaultBrowserContinueScreen() {
         whenever(mockVariantManager.getVariant()).thenReturn(
             Variant("test", features = listOf(
-                VariantManager.VariantFeature.ConceptTest,
                 VariantManager.VariantFeature.SuppressOnboardingDefaultBrowserContinueScreen
             ), filterBy = { true })
         )
