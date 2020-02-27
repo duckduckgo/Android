@@ -26,6 +26,7 @@ import com.duckduckgo.app.onboarding.ui.page.DefaultBrowserPageViewModel.Origin
 import com.duckduckgo.app.onboarding.ui.page.DefaultBrowserPageViewModel.ViewState.*
 import com.duckduckgo.app.statistics.Variant
 import com.duckduckgo.app.statistics.VariantManager
+import com.duckduckgo.app.statistics.VariantManager.VariantFeature.SuppressOnboardingDefaultBrowserContinueScreen
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelValues.DEFAULT_BROWSER_DIALOG
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelValues.DEFAULT_BROWSER_SETTINGS
@@ -241,7 +242,7 @@ class DefaultBrowserPageViewModelTest {
 
     @Test
     fun whenUserSetDDGAsDefaultFromDialogThenShowContinueButtonAndFirePixel() {
-        givenConceptTestVariant()
+        givenVariantWithFeatures()
         val params = mapOf(
             Pixel.PixelParameter.DEFAULT_BROWSER_SET_FROM_ONBOARDING to true.toString(),
             Pixel.PixelParameter.DEFAULT_BROWSER_SET_ORIGIN to DEFAULT_BROWSER_DIALOG
@@ -258,7 +259,7 @@ class DefaultBrowserPageViewModelTest {
 
     @Test
     fun whenUserSetDDGAsDefaultFromDialogAndSuppressContinueScreenVariantEnabledThenContinueToBrowserAndFirePixel() {
-        givenSuppressOnboardingDefaultBrowserContinueScreen()
+        givenVariantWithFeatures(SuppressOnboardingDefaultBrowserContinueScreen)
         val params = mapOf(
             Pixel.PixelParameter.DEFAULT_BROWSER_SET_FROM_ONBOARDING to true.toString(),
             Pixel.PixelParameter.DEFAULT_BROWSER_SET_ORIGIN to DEFAULT_BROWSER_DIALOG
@@ -341,7 +342,7 @@ class DefaultBrowserPageViewModelTest {
             Pixel.PixelParameter.DEFAULT_BROWSER_SET_FROM_ONBOARDING to true.toString(),
             Pixel.PixelParameter.DEFAULT_BROWSER_SET_ORIGIN to Pixel.PixelValues.DEFAULT_BROWSER_EXTERNAL
         )
-        givenConceptTestVariant()
+        givenVariantWithFeatures()
         testee.loadUI()
         testee.onDefaultBrowserClicked()
         whenever(mockDefaultBrowserDetector.isDefaultBrowser()).thenReturn(true)
@@ -359,7 +360,7 @@ class DefaultBrowserPageViewModelTest {
             Pixel.PixelParameter.DEFAULT_BROWSER_SET_FROM_ONBOARDING to true.toString(),
             Pixel.PixelParameter.DEFAULT_BROWSER_SET_ORIGIN to Pixel.PixelValues.DEFAULT_BROWSER_EXTERNAL
         )
-        givenSuppressOnboardingDefaultBrowserContinueScreen()
+        givenVariantWithFeatures(SuppressOnboardingDefaultBrowserContinueScreen)
         testee.loadUI()
         testee.onDefaultBrowserClicked()
         whenever(mockDefaultBrowserDetector.isDefaultBrowser()).thenReturn(true)
@@ -373,7 +374,7 @@ class DefaultBrowserPageViewModelTest {
 
     @Test
     fun whenUserWasTakenToSettingsAndSelectedDDGAsDefaultThenShowContinueToBrowserUI() {
-        givenConceptTestVariant()
+        givenVariantWithFeatures()
         whenever(mockDefaultBrowserDetector.isDefaultBrowser()).thenReturn(false)
         whenever(mockDefaultBrowserDetector.hasDefaultBrowser()).thenReturn(true)
         testee.loadUI()
@@ -387,7 +388,7 @@ class DefaultBrowserPageViewModelTest {
 
     @Test
     fun whenUserWasTakenToSettingsAndSelectedDDGAsDefaultAndSuppressContinueScreenVariantEnabledThenContinueToBrowser() {
-        givenSuppressOnboardingDefaultBrowserContinueScreen()
+        givenVariantWithFeatures(SuppressOnboardingDefaultBrowserContinueScreen)
         whenever(mockDefaultBrowserDetector.isDefaultBrowser()).thenReturn(false)
         whenever(mockDefaultBrowserDetector.hasDefaultBrowser()).thenReturn(true)
         testee.loadUI()
@@ -413,7 +414,7 @@ class DefaultBrowserPageViewModelTest {
 
     @Test
     fun whenUserSelectedDDGAsDefaultInSettingsScreenThenFirePixel() {
-        givenConceptTestVariant()
+        givenVariantWithFeatures()
         whenever(mockDefaultBrowserDetector.hasDefaultBrowser()).thenReturn(true)
         val params = mapOf(
             Pixel.PixelParameter.DEFAULT_BROWSER_SET_FROM_ONBOARDING to true.toString(),
@@ -475,7 +476,7 @@ class DefaultBrowserPageViewModelTest {
 
     @Test
     fun whenOriginReceivedIsInternalBrowserAndDDGIsTheDefaultBrowserThenResetTimesPressedJustOnce() {
-        givenConceptTestVariant()
+        givenVariantWithFeatures()
         whenever(mockDefaultBrowserDetector.isDefaultBrowser()).thenReturn(true)
         testee.loadUI()
         testee.timesPressedJustOnce = 1
@@ -507,15 +508,9 @@ class DefaultBrowserPageViewModelTest {
         assertEquals(0, testee.timesPressedJustOnce)
     }
 
-    private fun givenConceptTestVariant() {
+    private fun givenVariantWithFeatures(vararg feature: VariantManager.VariantFeature = emptyArray()) {
         whenever(mockVariantManager.getVariant()).thenReturn(
-            Variant("test", features = listOf(VariantManager.VariantFeature.ConceptTest), filterBy = { true })
-        )
-    }
-
-    private fun givenSuppressOnboardingDefaultBrowserContinueScreen() {
-        whenever(mockVariantManager.getVariant()).thenReturn(
-            Variant("test", features = listOf(VariantManager.VariantFeature.SuppressOnboardingDefaultBrowserContinueScreen), filterBy = { true })
+            Variant("test", features = feature.asList(), filterBy = { true })
         )
     }
 
