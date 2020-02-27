@@ -32,15 +32,15 @@ class VariantManagerTest {
 
     @Test
     fun serpControlVariantIsInactiveAndHasNoFeatures() {
-        val variant = variants.firstOrNull { it.key == "sc" }
-        assertEqualsDouble(0.0, variant!!.weight)
+        val variant = variants.first { it.key == "sc" }
+        assertEqualsDouble(0.0, variant.weight)
         assertEquals(0, variant.features.size)
     }
 
     @Test
     fun serpExperimentalVariantIsInactiveAndHasNoFeatures() {
-        val variant = variants.firstOrNull { it.key == "se" }
-        assertEqualsDouble(0.0, variant!!.weight)
+        val variant = variants.first { it.key == "se" }
+        assertEqualsDouble(0.0, variant.weight)
         assertEquals(0, variant.features.size)
     }
 
@@ -48,25 +48,25 @@ class VariantManagerTest {
 
     @Test
     fun conceptTestControlVariantIsInactiveAndHasNoFeatures() {
-        val variant = variants.firstOrNull { it.key == "mc" }
-        assertEqualsDouble(0.0, variant!!.weight)
+        val variant = variants.first { it.key == "mc" }
+        assertEqualsDouble(0.0, variant.weight)
         assertEquals(0, variant.features.size)
     }
 
     @Test
     fun conceptTestNoCtaVariantIsInactiveAndHasSuppressCtaFeatures() {
-        val variant = variants.firstOrNull { it.key == "md" }
-        assertEqualsDouble(0.0, variant!!.weight)
-        assertEquals(2, variant!!.features.size)
+        val variant = variants.first { it.key == "md" }
+        assertEqualsDouble(0.0, variant.weight)
+        assertEquals(2, variant.features.size)
         assertTrue(variant.hasFeature(SuppressHomeTabWidgetCta))
         assertTrue(variant.hasFeature(SuppressOnboardingDefaultBrowserCta))
     }
 
     @Test
     fun conceptTestExperimentalVariantIsInactiveAndHasConceptTestAndSuppressCtaFeatures() {
-        val variant = variants.firstOrNull { it.key == "me" }
-        assertEqualsDouble(0.0, variant!!.weight)
-        assertEquals(3, variant!!.features.size)
+        val variant = variants.first { it.key == "me" }
+        assertEqualsDouble(0.0, variant.weight)
+        assertEquals(3, variant.features.size)
         assertTrue(variant.hasFeature(ConceptTest))
         assertTrue(variant.hasFeature(SuppressHomeTabWidgetCta))
         assertTrue(variant.hasFeature(SuppressOnboardingDefaultBrowserCta))
@@ -85,9 +85,9 @@ class VariantManagerTest {
 
     @Test
     fun insertCtaConceptTestWithCtasAsDaxDialogsExperimentalVariantIsActiveAndHasExpectedFeatures() {
-        val variant = variants.firstOrNull { it.key == "mh" }
-        assertEqualsDouble(1.0, variant!!.weight)
-        assertEquals(5, variant!!.features.size)
+        val variant = variants.first { it.key == "mh" }
+        assertEqualsDouble(1.0, variant.weight)
+        assertEquals(5, variant.features.size)
         assertTrue(variant.hasFeature(ConceptTest))
         assertTrue(variant.hasFeature(SuppressHomeTabWidgetCta))
         assertTrue(variant.hasFeature(SuppressOnboardingDefaultBrowserCta))
