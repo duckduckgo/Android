@@ -425,6 +425,8 @@ class CtaViewModelTest {
         setConceptTestFeature(SearchWidgetDaxCta)
         givenSerpCtaShown()
         givenAtLeastOneNonSerpCtaShown()
+        whenever(mockWidgetCapabilities.supportsStandardWidgetAdd).thenReturn(true)
+        whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(false)
         whenever(mockDismissedCtaDao.exists(CtaId.DAX_DIALOG_SEARCH_WIDGET)).thenReturn(true)
         val site = site(url = "http://www.duckduckgo.com")
 
