@@ -65,7 +65,7 @@ interface VariantManager {
 
             // Insert CTAs on Concept test experiment
             Variant(
-                key = "ml",
+                key = "mj",
                 weight = 1.0,
                 features = listOf(ConceptTest, SuppressOnboardingDefaultBrowserContinueScreen),
                 filterBy = { isEnglishLocale() }),

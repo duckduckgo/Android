@@ -16,13 +16,17 @@
 
 package com.duckduckgo.app.statistics
 
+import com.duckduckgo.app.statistics.VariantManager.Companion.DEFAULT_VARIANT
+import com.duckduckgo.app.statistics.VariantManager.Companion.RESERVED_EU_AUCTION_VARIANT
 import com.duckduckgo.app.statistics.VariantManager.VariantFeature.*
 import org.junit.Assert.*
 import org.junit.Test
 
 class VariantManagerTest {
 
-    private val variants = VariantManager.ACTIVE_VARIANTS
+    private val variants = VariantManager.ACTIVE_VARIANTS +
+            variantWithKey(RESERVED_EU_AUCTION_VARIANT) +
+            DEFAULT_VARIANT
 
     // SERP Experiment(s)
 
@@ -72,9 +76,9 @@ class VariantManagerTest {
 
     @Test
     fun insertCtaConceptTestControlVariantIsActiveAndHasConceptTestAndHasExpectedFeatures() {
-        val variant = variants.firstOrNull { it.key == "ml" }
-        assertEqualsDouble(1.0, variant!!.weight)
-        assertEquals(2, variant!!.features.size)
+        val variant = variants.first { it.key == "mj" }
+        assertEqualsDouble(1.0, variant.weight)
+        assertEquals(2, variant.features.size)
         assertTrue(variant.hasFeature(ConceptTest))
         assertTrue(variant.hasFeature(SuppressOnboardingDefaultBrowserContinueScreen))
     }
@@ -107,5 +111,10 @@ class VariantManagerTest {
         if (comparison != 0) {
             fail("Doubles are not equal. Expected $expected but was $actual")
         }
+    }
+
+    @Suppress("SameParameterValue")
+    private fun variantWithKey(key: String): Variant {
+        return DEFAULT_VARIANT.copy(key = key)
     }
 }
