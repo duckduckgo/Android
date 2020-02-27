@@ -209,10 +209,14 @@ class CtaViewModel @Inject constructor(
                     }
                 }
             }
-            // Is Serp
-            if (!daxDialogSerpShown() && isSerpUrl(it.url)) {
-                return DaxDialogCta.DaxSerpCta(onboardingStore, appInstallStore)
+
+            if (isSerpUrl(it.url)) {
+                val ctaOnSerp = getCtaOnSerp()
+                if (ctaOnSerp != null) {
+                    return ctaOnSerp
+                }
             }
+
             // Trackers blocked
             return if (!daxDialogTrackersFoundShown() && !isSerpUrl(it.url) && hasTrackersInformation(it.trackingEvents) && host != null) {
                 DaxDialogCta.DaxTrackersBlockedCta(onboardingStore, appInstallStore, it.trackingEvents, host)
@@ -238,6 +242,15 @@ class CtaViewModel @Inject constructor(
     }
 
     @WorkerThread
+    private fun getCtaOnSerp(): DaxDialogCta? {
+        return when {
+            !daxDialogSerpShown() -> DaxDialogCta.DaxSerpCta(onboardingStore, appInstallStore)
+            canShowWidgetDaxCta() -> DaxDialogCta.SearchWidgetCta(widgetCapabilities, onboardingStore, appInstallStore)
+            else -> null
+        }
+    }
+
+    @WorkerThread
     private fun canShowDefaultBrowserDaxCta(): Boolean {
         return defaultBrowserDetector.deviceSupportsDefaultBrowserConfiguration() &&
                 !defaultBrowserDetector.isDefaultBrowser() &&
@@ -250,7 +263,8 @@ class CtaViewModel @Inject constructor(
         return widgetCapabilities.supportsStandardWidgetAdd &&
                 !widgetCapabilities.hasInstalledWidgets &&
                 variantManager.getVariant().hasFeature(VariantManager.VariantFeature.SearchWidgetDaxCta) &&
-                !daxSearchWidgetShown()
+                !daxSearchWidgetShown() &&
+                daxNonSerpDialogShown()
     }
 
     private fun hasTrackersInformation(events: List<TrackingEvent>): Boolean =
@@ -277,6 +291,8 @@ class CtaViewModel @Inject constructor(
     private fun daxDialogTrackersFoundShown(): Boolean = dismissedCtaDao.exists(CtaId.DAX_DIALOG_TRACKERS_FOUND)
 
     private fun daxDialogNetworkShown(): Boolean = dismissedCtaDao.exists(CtaId.DAX_DIALOG_NETWORK)
+
+    private fun daxNonSerpDialogShown(): Boolean = daxDialogNetworkShown() || daxDialogTrackersFoundShown() || daxDialogOtherShown()
 
     private fun daxDefaultBrowserShown(): Boolean = dismissedCtaDao.exists(CtaId.DAX_DIALOG_DEFAULT_BROWSER)
 
