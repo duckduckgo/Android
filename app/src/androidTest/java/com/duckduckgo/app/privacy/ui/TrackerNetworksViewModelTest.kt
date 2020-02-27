@@ -108,7 +108,7 @@ class TrackerNetworksViewModelTest {
         assertEquals(1, result[Entity.MINOR_ENTITY_B]?.count())
     }
 
-    private fun site(url: String = "", networkCount: Int = 0, trackingEvents: List<TrackingEvent> = emptyList()): Site {
+    private fun site(url: String = "", trackingEvents: List<TrackingEvent> = emptyList()): Site {
         val site: Site = mock()
         whenever(site.url).thenReturn(url)
         whenever(site.uri).thenReturn(Uri.parse(url))

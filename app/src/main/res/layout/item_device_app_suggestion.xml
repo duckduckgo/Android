@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?><!--
-  ~ Copyright (c) 2019 DuckDuckGo
+  ~ Copyright (c) 2020 DuckDuckGo
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -19,57 +19,37 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginBottom="8dp"
-    android:layout_marginTop="6dp">
+    android:layout_marginBottom="14dp"
+    android:layout_marginTop="14dp">
 
     <ImageView
-        android:id="@+id/phraseOrUrlIndicator"
-        android:layout_width="24dp"
-        android:layout_height="24dp"
+        android:id="@+id/icon"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
         android:layout_marginStart="16dp"
         android:importantForAccessibility="no"
-        android:src="@drawable/ic_loupe_24dp"
+        android:src="@drawable/logo_medium"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
-        android:id="@+id/phrase"
+        android:id="@+id/title"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginStart="16dp"
         android:ellipsize="end"
-        android:includeFontPadding="false"
         android:fontFamily="sans-serif"
         android:gravity="center_vertical|start"
+        android:includeFontPadding="false"
         android:maxLines="1"
         android:textAlignment="textStart"
         android:textColor="?attr/autoCompleteTextColor"
         android:textSize="16sp"
-        app:layout_constraintBottom_toBottomOf="@id/phraseOrUrlIndicator"
-        app:layout_constraintEnd_toStartOf="@id/editQueryImage"
-        app:layout_constraintStart_toEndOf="@id/phraseOrUrlIndicator"
-        app:layout_constraintTop_toTopOf="@id/phraseOrUrlIndicator"
-        tools:text="phrase or URL suggestion" />
-
-    <FrameLayout
-        android:id="@+id/editQueryImage"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:padding="6dp"
-        android:paddingStart="16dp"
-        android:paddingEnd="14dp"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toBottomOf="@id/icon"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
-        <ImageView
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:contentDescription="@string/editQueryBeforeSubmitting"
-            android:src="@drawable/ic_autocomplete_24dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-    </FrameLayout>
+        app:layout_constraintStart_toEndOf="@id/icon"
+        app:layout_constraintTop_toTopOf="@id/icon"
+        tools:text="DuckDuckGo" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

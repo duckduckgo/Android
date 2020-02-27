@@ -53,7 +53,7 @@ class VariantManagerTest {
     fun conceptTestNoCtaVariantIsInactiveAndHasSuppressCtaFeatures() {
         val variant = variants.firstOrNull { it.key == "md" }
         assertEqualsDouble(0.0, variant!!.weight)
-        assertEquals(2, variant!!.features.size)
+        assertEquals(2, variant.features.size)
         assertTrue(variant.hasFeature(SuppressHomeTabWidgetCta))
         assertTrue(variant.hasFeature(SuppressOnboardingDefaultBrowserCta))
     }
@@ -62,7 +62,7 @@ class VariantManagerTest {
     fun conceptTestExperimentalVariantIsInactiveAndHasConceptTestAndSuppressCtaFeatures() {
         val variant = variants.firstOrNull { it.key == "me" }
         assertEqualsDouble(0.0, variant!!.weight)
-        assertEquals(3, variant!!.features.size)
+        assertEquals(3, variant.features.size)
         assertTrue(variant.hasFeature(ConceptTest))
         assertTrue(variant.hasFeature(SuppressHomeTabWidgetCta))
         assertTrue(variant.hasFeature(SuppressOnboardingDefaultBrowserCta))
@@ -74,7 +74,7 @@ class VariantManagerTest {
     fun insertCtaConceptControlVariantIsActiveAndHasConceptTestAndSuppressCtaFeatures() {
         val variant = variants.firstOrNull { it.key == "mj" }
         assertEqualsDouble(1.0, variant!!.weight)
-        assertEquals(3, variant!!.features.size)
+        assertEquals(3, variant.features.size)
         assertTrue(variant.hasFeature(ConceptTest))
         assertTrue(variant.hasFeature(SuppressHomeTabWidgetCta))
         assertTrue(variant.hasFeature(SuppressOnboardingDefaultBrowserCta))
@@ -84,7 +84,7 @@ class VariantManagerTest {
     fun insertCtaConceptTestWithAllCtaExperimentalVariantIsActiveAndHasConceptTestAndSuppressCtaFeatures() {
         val variant = variants.firstOrNull { it.key == "ml" }
         assertEqualsDouble(1.0, variant!!.weight)
-        assertEquals(2, variant!!.features.size)
+        assertEquals(2, variant.features.size)
         assertTrue(variant.hasFeature(ConceptTest))
         assertTrue(variant.hasFeature(SuppressOnboardingDefaultBrowserContinueScreen))
     }
