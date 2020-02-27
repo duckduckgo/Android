@@ -210,7 +210,6 @@ class CtaViewModel @Inject constructor(
                 }
             }
 
-            // Is Serp
             if (isSerpUrl(it.url)) {
                 val ctaOnSerp = getCtaOnSerp()
                 if (ctaOnSerp != null) {
