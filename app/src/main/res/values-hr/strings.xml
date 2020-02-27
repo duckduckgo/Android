@@ -11,18 +11,6 @@
     <string name="onboardingDefaultBrowserTitle">Učinite DuckDuckGo vašom zadanom tražilicom</string>
     <string name="onboardingDefaultBrowserTitleDefaultSet">Recite bok spokoju</string>
 
-    <!-- Unified Welcome Page -->
-    <string name="unifiedOnboardingTitleFirstVisit">Dobrodošli u\naDuckDuckGo!</string>
-    <string name="unifiedOnboardingSubtitleTrackerBlockingEnabled">Ostanite anonimni dok pretražujete i pregledavate internet.</string>
-    <string name="unifiedOnboardingPrivateSearchTitle">Privatno pretraživanje</string>
-    <string name="unifiedOnboardingPrivateSearchSubtitle">Uz DuckDuckGo, vaša pretraživanja su uvijek privatna.</string>
-    <string name="unifiedOnboardingBrowsingProtectionTitle">Zaštita kod pregledavanja</string>
-    <string name="unifiedOnboardingBrowsingProtectionSubtitleTrackerBlockingEnabled">Blokirajte alate za praćenje i pregledavajte sigurno kao zadani način.</string>
-    <string name="unifiedOnboardingDataClearingTitle">Brisanje podataka</string>
-    <string name="unifiedOnboardingDataClearingSubtitle">Izbrišite podatke o pregledavanju dodirom gumba.</string>
-    <string name="unifiedOnboardingCustomizationTitle">Prilagodba</string>
-    <string name="unifiedOnboardingCustomizationSubtitle">Izaberite temu i prilagodite značajke zaštite privatnosti.</string>
-
     <!-- Default Browser -->
     <string name="cannotLaunchDefaultAppSettings">Ne mogu pokrenuti zaslon zadanih postavki u aplikaciji</string>
     <string name="settingsDefaultBrowserEnabled">Postavi kao zadani preglednik</string>

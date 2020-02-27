@@ -11,18 +11,6 @@
     <string name="onboardingDefaultBrowserTitle">Tedd a DuckDuckGót az alapértelmezett keresőoldaladdá</string>
     <string name="onboardingDefaultBrowserTitleDefaultSet">Köszönj a Peace of Mindnak</string>
 
-    <!-- Unified Welcome Page -->
-    <string name="unifiedOnboardingTitleFirstVisit">Üdvözöl a\nDuckDuckGo!</string>
-    <string name="unifiedOnboardingSubtitleTrackerBlockingEnabled">Teljes adatvédelem internetböngészés közben.</string>
-    <string name="unifiedOnboardingPrivateSearchTitle">Privát keresés</string>
-    <string name="unifiedOnboardingPrivateSearchSubtitle">A DuckDuckGo használatával minden keresésed privát lesz.</string>
-    <string name="unifiedOnboardingBrowsingProtectionTitle">Böngészési védelem</string>
-    <string name="unifiedOnboardingBrowsingProtectionSubtitleTrackerBlockingEnabled">Tiltsd le a nyomkövetőket és böngéssz biztonságosan alapértelmezés szerint.</string>
-    <string name="unifiedOnboardingDataClearingTitle">Adatok törlése</string>
-    <string name="unifiedOnboardingDataClearingSubtitle">Egyetlen gombnyomással törölheted böngészési adataidat.</string>
-    <string name="unifiedOnboardingCustomizationTitle">Testreszabás</string>
-    <string name="unifiedOnboardingCustomizationSubtitle">Válassz egy felületet, és személyre szabhatod az adatvédelmi funkciókat.</string>
-
     <!-- Default Browser -->
     <string name="cannotLaunchDefaultAppSettings">Az alkalmazás alapértelmezett beállítású képernyője nem indítható el</string>
     <string name="settingsDefaultBrowserEnabled">Beállítás alapértelmezett böngészőként</string>

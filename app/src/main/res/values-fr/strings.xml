@@ -11,18 +11,6 @@
     <string name="onboardingDefaultBrowserTitle">Faites de DuckDuckGo votre appli par défaut</string>
     <string name="onboardingDefaultBrowserTitleDefaultSet">Dites bonjour à la tranquillité d\'esprit</string>
 
-    <!-- Unified Welcome Page -->
-    <string name="unifiedOnboardingTitleFirstVisit">Bienvenue sur\ nDuckDuckGo !</string>
-    <string name="unifiedOnboardingSubtitleTrackerBlockingEnabled">Protégez votre vie privée lorsque vous effectuez vos recherches et que vous naviguez sur le Web.</string>
-    <string name="unifiedOnboardingPrivateSearchTitle">Recherche privée</string>
-    <string name="unifiedOnboardingPrivateSearchSubtitle">Avec DuckDuckGo, vos recherches sont toujours privées.</string>
-    <string name="unifiedOnboardingBrowsingProtectionTitle">Protection de navigation</string>
-    <string name="unifiedOnboardingBrowsingProtectionSubtitleTrackerBlockingEnabled">Bloquez les pisteurs et naviguez en toute sécurité par défaut.</string>
-    <string name="unifiedOnboardingDataClearingTitle">Effacement des données</string>
-    <string name="unifiedOnboardingDataClearingSubtitle">Effacez vos données de navigation en appuyant sur un bouton.</string>
-    <string name="unifiedOnboardingCustomizationTitle">Personnalisation</string>
-    <string name="unifiedOnboardingCustomizationSubtitle">Choisissez un thème et personnalisez les fonctionnalités de confidentialité.</string>
-
     <!-- Default Browser -->
     <string name="cannotLaunchDefaultAppSettings">Impossible de lancer l\'écran des paramètres par défaut de l\'application</string>
     <string name="settingsDefaultBrowserEnabled">Définir comme navigateur par défaut</string>

@@ -27,18 +27,6 @@
     <string name="onboardingDefaultBrowserTitle">Ställ in DuckDuckGo som standard</string>
     <string name="onboardingDefaultBrowserTitleDefaultSet">Du kommer aldrig att behöva oroa dig igen</string>
 
-    <!-- Unified Welcome Page -->
-    <string name="unifiedOnboardingTitleFirstVisit">Välkommen till\nDuckDuckGo!</string>
-    <string name="unifiedOnboardingSubtitleTrackerBlockingEnabled">Skydda ditt privatliv medan du söker och surfar på webben.</string>
-    <string name="unifiedOnboardingPrivateSearchTitle">Privat sökning</string>
-    <string name="unifiedOnboardingPrivateSearchSubtitle">Med DuckDuckGo är dina sökningar alltid privata.</string>
-    <string name="unifiedOnboardingBrowsingProtectionTitle">Bläddringsskydd</string>
-    <string name="unifiedOnboardingBrowsingProtectionSubtitleTrackerBlockingEnabled">Ställ in blockering av spårare och säker bläddring som standard.</string>
-    <string name="unifiedOnboardingDataClearingTitle">Rensning av data</string>
-    <string name="unifiedOnboardingDataClearingSubtitle">Radera dina webbläsardata med en enkel knapptryckning.</string>
-    <string name="unifiedOnboardingCustomizationTitle">Personanpassning</string>
-    <string name="unifiedOnboardingCustomizationSubtitle">Välj ett tema och anpassa sekretessfunktionerna.</string>
-
     <!-- Default Browser -->
     <string name="cannotLaunchDefaultAppSettings">Kan inte starta standardinställningssidan för appar</string>
     <string name="settingsDefaultBrowserEnabled">Ställ in som standardwebbläsare</string>

@@ -11,18 +11,6 @@
     <string name="onboardingDefaultBrowserTitle">Κάντε το DuckDuckGo το δικό σας προεπιλεγμένο πρόγραμμα περιήγησης</string>
     <string name="onboardingDefaultBrowserTitleDefaultSet">Πείτε γεια, καλωσορίστε και εναγκαλιστείτε με την ασφάλεια και την ηρεμία</string>
 
-    <!-- Unified Welcome Page -->
-    <string name="unifiedOnboardingTitleFirstVisit">Καλώς ορίσατε στο\nDuckDuckGo!</string>
-    <string name="unifiedOnboardingSubtitleTrackerBlockingEnabled">Διατηρήστε την ιδιωτικότητά σας κατά την αναζήτηση και την περιήγησή σας στο διαδίκτυο.</string>
-    <string name="unifiedOnboardingPrivateSearchTitle">Ιδιωτική αναζήτηση</string>
-    <string name="unifiedOnboardingPrivateSearchSubtitle">Με το DuckDuckGo οι αναζητήσεις σας είναι πάντα ιδιωτικές.</string>
-    <string name="unifiedOnboardingBrowsingProtectionTitle">Προστασία περιήγησης</string>
-    <string name="unifiedOnboardingBrowsingProtectionSubtitleTrackerBlockingEnabled">Αποκλείστε παρακολουθήσεις και περιηγηθείτε με ασφάλεια από προεπιλογή.</string>
-    <string name="unifiedOnboardingDataClearingTitle">Εκκαθάριση δεδομένων</string>
-    <string name="unifiedOnboardingDataClearingSubtitle">Διαγράψτε τα δεδομένα της περιήγησής σας με το πάτημα ενός κουμπιού.</string>
-    <string name="unifiedOnboardingCustomizationTitle">Προσαρμογή</string>
-    <string name="unifiedOnboardingCustomizationSubtitle">Διαλέξτε ένα θέμα και προσαρμόστε τα χαρακτηριστικά ιδιωτικότητας.</string>
-
     <!-- Default Browser -->
     <string name="cannotLaunchDefaultAppSettings">Αδυναμία εκκίνησης προεπιλεγμένης οθόνης ρυθμίσεων εφαρμογής</string>
     <string name="settingsDefaultBrowserEnabled">Ορισμός ως προεπιλεγμένο πρόγραμμα περιήγησης</string>

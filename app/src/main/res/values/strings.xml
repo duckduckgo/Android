@@ -8,22 +8,10 @@
 
     <!-- Onboarding Activity -->
     <string name="onboardingDefaultBrowserDescription">Visit Settings to search and browse with DuckDuckGo every time.</string>
-    <string name="onboardingContinue">Continue</string>
+    <string name="onboardingContinue">Continue</string> <!--todo: remove-->
     <string name="onboardingContinueFinalPage">Start Browsing</string>
     <string name="onboardingDefaultBrowserTitle">Make DuckDuckGo Your Default</string>
     <string name="onboardingDefaultBrowserTitleDefaultSet">Say Hello to Peace of Mind</string>
-
-    <!-- Unified Welcome Page -->
-    <string name="unifiedOnboardingTitleFirstVisit">Welcome to\nDuckDuckGo!</string>
-    <string name="unifiedOnboardingSubtitleTrackerBlockingEnabled">Stay private as you search and browse the web.</string>
-    <string name="unifiedOnboardingPrivateSearchTitle">Private Search</string>
-    <string name="unifiedOnboardingPrivateSearchSubtitle">With DuckDuckGo, your searches are always private.</string>
-    <string name="unifiedOnboardingBrowsingProtectionTitle">Browsing Protection</string>
-    <string name="unifiedOnboardingBrowsingProtectionSubtitleTrackerBlockingEnabled">Block trackers and browse securely by default.</string>
-    <string name="unifiedOnboardingDataClearingTitle">Data Clearing</string>
-    <string name="unifiedOnboardingDataClearingSubtitle">Erase your browsing data with the tap of a button.</string>
-    <string name="unifiedOnboardingCustomizationTitle">Customization</string>
-    <string name="unifiedOnboardingCustomizationSubtitle">Pick a theme and customize privacy features.</string>
 
     <!-- Default Browser -->
     <string name="cannotLaunchDefaultAppSettings">Can\'t launch default app settings screen</string>

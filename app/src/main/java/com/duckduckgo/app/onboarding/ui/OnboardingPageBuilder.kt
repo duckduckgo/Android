@@ -20,18 +20,13 @@ import android.os.Bundle
 import androidx.annotation.StringRes
 import com.duckduckgo.app.onboarding.ui.page.DefaultBrowserPage
 import com.duckduckgo.app.onboarding.ui.page.OnboardingPageFragment
-import com.duckduckgo.app.onboarding.ui.page.UnifiedSummaryPage
 import com.duckduckgo.app.onboarding.ui.page.WelcomePage
 
 interface OnboardingPageBuilder {
     fun buildWelcomePage(@StringRes continueButtonTextResourceId: Int?): WelcomePage
-    fun buildSummaryPage(@StringRes continueButtonTextResourceId: Int?): UnifiedSummaryPage
     fun buildDefaultBrowserPage(@StringRes continueButtonTextResourceId: Int?): DefaultBrowserPage
 
     sealed class OnboardingPageBlueprint(@StringRes open var continueButtonTextResourceId: Int) {
-
-        data class SummaryPageBlueprint(override var continueButtonTextResourceId: Int = 0) :
-            OnboardingPageBlueprint(continueButtonTextResourceId)
 
         data class DefaultBrowserBlueprint(override var continueButtonTextResourceId: Int = 0) :
             OnboardingPageBlueprint(continueButtonTextResourceId)
@@ -51,18 +46,6 @@ class OnboardingFragmentPageBuilder : OnboardingPageBuilder {
         }
 
         val fragment = WelcomePage()
-        fragment.arguments = bundle
-        return fragment
-    }
-
-    override fun buildSummaryPage(@StringRes continueButtonTextResourceId: Int?): UnifiedSummaryPage {
-        val bundle = Bundle()
-
-        if (continueButtonTextResourceId != null) {
-            bundle.putInt(OnboardingPageFragment.CONTINUE_BUTTON_TEXT_RESOURCE_ID_EXTRA, continueButtonTextResourceId)
-        }
-
-        val fragment = UnifiedSummaryPage()
         fragment.arguments = bundle
         return fragment
     }

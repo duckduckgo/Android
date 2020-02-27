@@ -11,18 +11,6 @@
     <string name="onboardingDefaultBrowserTitle">Stel DuckDuckGo in als uw standaardinstelling</string>
     <string name="onboardingDefaultBrowserTitleDefaultSet">Zeg hallo tegen gemoedsrust.</string>
 
-    <!-- Unified Welcome Page -->
-    <string name="unifiedOnboardingTitleFirstVisit">Welkom bij\nDuckDuckGo!</string>
-    <string name="unifiedOnboardingSubtitleTrackerBlockingEnabled">Blijf privé tijdens het zoeken en browsen op het internet.</string>
-    <string name="unifiedOnboardingPrivateSearchTitle">Privé zoeken</string>
-    <string name="unifiedOnboardingPrivateSearchSubtitle">Met DuckDuckGo zijn je zoekopdrachten altijd privé.</string>
-    <string name="unifiedOnboardingBrowsingProtectionTitle">Browsebescherming</string>
-    <string name="unifiedOnboardingBrowsingProtectionSubtitleTrackerBlockingEnabled">Blokkeer trackers en browse standaard veilig.</string>
-    <string name="unifiedOnboardingDataClearingTitle">Gegevensverwijdering</string>
-    <string name="unifiedOnboardingDataClearingSubtitle">Wis je browsegegevens met één druk op een knop.</string>
-    <string name="unifiedOnboardingCustomizationTitle">Maatwerk</string>
-    <string name="unifiedOnboardingCustomizationSubtitle">Kies een thema en pas privacyfuncties aan.</string>
-
     <!-- Default Browser -->
     <string name="cannotLaunchDefaultAppSettings">Kan het scherm voor standaard app-instellingen niet openen</string>
     <string name="settingsDefaultBrowserEnabled">Instellen als standaard browser</string>

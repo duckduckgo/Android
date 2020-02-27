@@ -11,18 +11,6 @@
     <string name="onboardingDefaultBrowserTitle">Fă DuckDuckGo Aplicația Ta Implicită</string>
     <string name="onboardingDefaultBrowserTitleDefaultSet">Salută Liniștea Sufletească</string>
 
-    <!-- Unified Welcome Page -->
-    <string name="unifiedOnboardingTitleFirstVisit">Bine ați venit la\nDuckDuckGo!</string>
-    <string name="unifiedOnboardingSubtitleTrackerBlockingEnabled">Păstrați-vă confidențialitatea în timp ce căutați și navigați pe web.</string>
-    <string name="unifiedOnboardingPrivateSearchTitle">Căutare privată</string>
-    <string name="unifiedOnboardingPrivateSearchSubtitle">Cu ajutorul DuckDuckGo, căutările dvs. sunt întotdeauna private.</string>
-    <string name="unifiedOnboardingBrowsingProtectionTitle">Protecție la navigare</string>
-    <string name="unifiedOnboardingBrowsingProtectionSubtitleTrackerBlockingEnabled">Blocați cookie-urile de urmărire și navigați în siguranță în mod implicit.</string>
-    <string name="unifiedOnboardingDataClearingTitle">Eliminarea datelor</string>
-    <string name="unifiedOnboardingDataClearingSubtitle">Ștergeți datele de navigare prin apăsarea unui buton.</string>
-    <string name="unifiedOnboardingCustomizationTitle">Personalizare</string>
-    <string name="unifiedOnboardingCustomizationSubtitle">Alegeți o temă și personalizați funcțiile privind confidențialitatea.</string>
-
     <!-- Default Browser -->
     <string name="cannotLaunchDefaultAppSettings">Nu se poate lansa ecranul de setări implicite ale aplicației</string>
     <string name="settingsDefaultBrowserEnabled">Setare ca browser implicit</string>

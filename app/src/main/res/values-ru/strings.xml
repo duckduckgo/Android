@@ -27,18 +27,6 @@
     <string name="onboardingDefaultBrowserTitle">Сделайте DuckDuckGo вашим поисковиком по умолчанию</string>
     <string name="onboardingDefaultBrowserTitleDefaultSet">Да пребудет с вами душевное спокойствие</string>
 
-    <!-- Unified Welcome Page -->
-    <string name="unifiedOnboardingTitleFirstVisit">Добро пожаловать в\nDuckDuckGo!</string>
-    <string name="unifiedOnboardingSubtitleTrackerBlockingEnabled">Сохраняйте анонимность во время поиска и навигации в Интернете.</string>
-    <string name="unifiedOnboardingPrivateSearchTitle">Конфиденциальный поиск</string>
-    <string name="unifiedOnboardingPrivateSearchSubtitle">С DuckDuckGo ваш поиск всегда будет конфиденциальным.</string>
-    <string name="unifiedOnboardingBrowsingProtectionTitle">Защита во время навигации в Интернете</string>
-    <string name="unifiedOnboardingBrowsingProtectionSubtitleTrackerBlockingEnabled">Блокируйте трекеры и просматривайте информацию в Интернете в безопасном режиме по умолчанию.</string>
-    <string name="unifiedOnboardingDataClearingTitle">Сброс данных</string>
-    <string name="unifiedOnboardingDataClearingSubtitle">Удаляйте историю просмотров одним нажатием кнопки.</string>
-    <string name="unifiedOnboardingCustomizationTitle">Пользовательская настройка</string>
-    <string name="unifiedOnboardingCustomizationSubtitle">Выберите тему и настройте режим конфиденциальности в соответствии со своими предпочтениями.</string>
-
     <!-- Default Browser -->
     <string name="cannotLaunchDefaultAppSettings">Не удаётся открыть экран настроек приложения по умолчанию</string>
     <string name="settingsDefaultBrowserEnabled">Сделать браузером по умолчанию</string>

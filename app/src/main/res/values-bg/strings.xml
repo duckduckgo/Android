@@ -11,18 +11,6 @@
     <string name="onboardingDefaultBrowserTitle">Направете DuckDuckGo Вашият браузър по подразбиране</string>
     <string name="onboardingDefaultBrowserTitleDefaultSet">Кажете \"Здравей\" на спокойствието</string>
 
-    <!-- Unified Welcome Page -->
-    <string name="unifiedOnboardingTitleFirstVisit">Добре дошли в\nDuckDuckGo!</string>
-    <string name="unifiedOnboardingSubtitleTrackerBlockingEnabled">Запазете поверителността си, докато търсите и сърфирате в мрежата.</string>
-    <string name="unifiedOnboardingPrivateSearchTitle">Частно търсене</string>
-    <string name="unifiedOnboardingPrivateSearchSubtitle">С DuckDuckGo търсенията Ви винаги са лични.</string>
-    <string name="unifiedOnboardingBrowsingProtectionTitle">Защита при сърфиране</string>
-    <string name="unifiedOnboardingBrowsingProtectionSubtitleTrackerBlockingEnabled">Блокирайте проследяващите устройства и сърфирайте сигурно по подразбиране.</string>
-    <string name="unifiedOnboardingDataClearingTitle">Изчистване на данни</string>
-    <string name="unifiedOnboardingDataClearingSubtitle">Изтрийте данните за сърфирането си с едно натискане на бутон.</string>
-    <string name="unifiedOnboardingCustomizationTitle">Персонализиране</string>
-    <string name="unifiedOnboardingCustomizationSubtitle">Изберете тема и персонализирайте функциите за поверителност.</string>
-
     <!-- Default Browser -->
     <string name="cannotLaunchDefaultAppSettings">Екранът за настройки на приложения по подразбиране не може да бъде стартиран</string>
     <string name="settingsDefaultBrowserEnabled">Задаване като браузър по подразбиране</string>

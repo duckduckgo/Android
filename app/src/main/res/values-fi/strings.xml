@@ -11,18 +11,6 @@
     <string name="onboardingDefaultBrowserTitle">Tee DuckDuckGo:sta oletusarvo</string>
     <string name="onboardingDefaultBrowserTitleDefaultSet">Sano Hei Mielenrauhalle</string>
 
-    <!-- Unified Welcome Page -->
-    <string name="unifiedOnboardingTitleFirstVisit">\nDuckDuckGo toivottaa sinut tervetulleeksi!</string>
-    <string name="unifiedOnboardingSubtitleTrackerBlockingEnabled">Varmista yksityisyytesi verkkohakujen ja -selailun yhteydessä.</string>
-    <string name="unifiedOnboardingPrivateSearchTitle">Yksityinen haku</string>
-    <string name="unifiedOnboardingPrivateSearchSubtitle">DuckDuckGo-hakusi ovat aina yksityisiä.</string>
-    <string name="unifiedOnboardingBrowsingProtectionTitle">Selaussuoja</string>
-    <string name="unifiedOnboardingBrowsingProtectionSubtitleTrackerBlockingEnabled">Estä seuranta ja selaa turvallisesti oletusarvoisesti.</string>
-    <string name="unifiedOnboardingDataClearingTitle">Tietojen poisto</string>
-    <string name="unifiedOnboardingDataClearingSubtitle">Poista selaustietosi napinpainalluksella.</string>
-    <string name="unifiedOnboardingCustomizationTitle">Yksilöinti</string>
-    <string name="unifiedOnboardingCustomizationSubtitle">Valitse teema ja muokkaa tietosuojaominaisuuksia.</string>
-
     <!-- Default Browser -->
     <string name="cannotLaunchDefaultAppSettings">Sovelluksen oletusasetusnäyttöä ei voida käynnistää</string>
     <string name="settingsDefaultBrowserEnabled">Aseta oletusselaimeksi</string>

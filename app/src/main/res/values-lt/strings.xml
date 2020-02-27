@@ -11,18 +11,6 @@
     <string name="onboardingDefaultBrowserTitle">Nustatykite „DuckDuckGo“ savo numatytuoju puslapiu</string>
     <string name="onboardingDefaultBrowserTitleDefaultSet">Ištarkite „Sveiki“ ir nebesijaudinkite</string>
 
-    <!-- Unified Welcome Page -->
-    <string name="unifiedOnboardingTitleFirstVisit">Sveiki prisijungę prie\n„DuckDuckGo“!</string>
-    <string name="unifiedOnboardingSubtitleTrackerBlockingEnabled">Ieškant ir naršant internete išlaikykite privatumą.</string>
-    <string name="unifiedOnboardingPrivateSearchTitle">Privati paieška</string>
-    <string name="unifiedOnboardingPrivateSearchSubtitle">Naudojant „DuckDuckGo“ jūsų paieškos visada bus privačios.</string>
-    <string name="unifiedOnboardingBrowsingProtectionTitle">Apsauga naršant</string>
-    <string name="unifiedOnboardingBrowsingProtectionSubtitleTrackerBlockingEnabled">Blokuokite sekiklius ir saugiai naršykite pagal numatytąjį nustatymą.</string>
-    <string name="unifiedOnboardingDataClearingTitle">Duomenų valymas</string>
-    <string name="unifiedOnboardingDataClearingSubtitle">Ištrinkite savo naršymo duomenis vienu mygtuko spustelėjimu.</string>
-    <string name="unifiedOnboardingCustomizationTitle">Tinkinimas</string>
-    <string name="unifiedOnboardingCustomizationSubtitle">Pasirinkite temą ir tinkikite privatumo charakteristikas.</string>
-
     <!-- Default Browser -->
     <string name="cannotLaunchDefaultAppSettings">Nepavyko paleisti numatytųjų programos nustatymų ekrano</string>
     <string name="settingsDefaultBrowserEnabled">Nustatyti kaip numatytąją naršyklę</string>

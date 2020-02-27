@@ -11,18 +11,6 @@
     <string name="onboardingDefaultBrowserTitle">Nastavte si DuckDuckGo jako výchozí</string>
     <string name="onboardingDefaultBrowserTitleDefaultSet">Uvítejte klid mysli</string>
 
-    <!-- Unified Welcome Page -->
-    <string name="unifiedOnboardingTitleFirstVisit">Vítejte u\nDuckDuckGo!</string>
-    <string name="unifiedOnboardingSubtitleTrackerBlockingEnabled">Uchovejte si soukromí při vyhledávání a prohlížení internetových stránek.</string>
-    <string name="unifiedOnboardingPrivateSearchTitle">Soukromé vyhledávání</string>
-    <string name="unifiedOnboardingPrivateSearchSubtitle">S DuckDuckGo jsou vaše vyhledávání vždy soukromá.</string>
-    <string name="unifiedOnboardingBrowsingProtectionTitle">Ochrana prohlížení</string>
-    <string name="unifiedOnboardingBrowsingProtectionSubtitleTrackerBlockingEnabled">Blokování sledovacích zařízení a ve výchozím nastavení bezpečně procházení.</string>
-    <string name="unifiedOnboardingDataClearingTitle">Vymazání dat</string>
-    <string name="unifiedOnboardingDataClearingSubtitle">Údaje o prohlížení vymažte klepnutím na tlačítko.</string>
-    <string name="unifiedOnboardingCustomizationTitle">Personalizace</string>
-    <string name="unifiedOnboardingCustomizationSubtitle">Vyberte si motiv a upravte funkce ochrany soukromí.</string>
-
     <!-- Default Browser -->
     <string name="cannotLaunchDefaultAppSettings">Nelze spustit výchozí obrazovku nastavení aplikace.</string>
     <string name="settingsDefaultBrowserEnabled">Nastavit jako výchozí prohlížeč</string>

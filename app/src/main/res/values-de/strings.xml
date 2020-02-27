@@ -11,18 +11,6 @@
     <string name="onboardingDefaultBrowserTitle">DuckDuckGo als Standard-Browser einstellen</string>
     <string name="onboardingDefaultBrowserTitleDefaultSet">Sag Hallo zum sichern Surfen</string>
 
-    <!-- Unified Welcome Page -->
-    <string name="unifiedOnboardingTitleFirstVisit">Willkommen bei\nDuckDuckGo!</string>
-    <string name="unifiedOnboardingSubtitleTrackerBlockingEnabled">Im privaten Modus im Internet suchen und browsen.</string>
-    <string name="unifiedOnboardingPrivateSearchTitle">Suche im privaten Modus</string>
-    <string name="unifiedOnboardingPrivateSearchSubtitle">Bei DuckDuckGo sind deine Suchanfragen immer privat.</string>
-    <string name="unifiedOnboardingBrowsingProtectionTitle">Schutz beim Browsen</string>
-    <string name="unifiedOnboardingBrowsingProtectionSubtitleTrackerBlockingEnabled">Blockiere Tracker und browse standardmäßig sicher.</string>
-    <string name="unifiedOnboardingDataClearingTitle">Datenlöschung</string>
-    <string name="unifiedOnboardingDataClearingSubtitle">Lösche deine Browserdaten auf Knopfdruck.</string>
-    <string name="unifiedOnboardingCustomizationTitle">Individuelle Anpassung</string>
-    <string name="unifiedOnboardingCustomizationSubtitle">Wähle ein Thema aus und passe die Privatsphärenfunktionen an.</string>
-
     <!-- Default Browser -->
     <string name="cannotLaunchDefaultAppSettings">Standardmäßiger App-Einstellungsbildschirm kann nicht gestartet werden</string>
     <string name="settingsDefaultBrowserEnabled">Als Standard-Browser festlegen</string>
