@@ -42,7 +42,6 @@
             android:name="com.duckduckgo.app.launch.LaunchActivity"
             android:icon="${appIcon}"
             android:logo="${appIcon}"
-            android:roundIcon="${appIconRound}"
             android:label="@string/appName">
             <intent-filter>
                 <category android:name="android.intent.action.MAIN" />
@@ -55,6 +54,7 @@
             android:enabled="true"
             android:icon="@mipmap/ic_launcher_red"
             android:logo="@mipmap/ic_launcher_red"
+            android:label="@string/appName"
             android:targetActivity="com.duckduckgo.app.launch.LaunchActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -67,6 +67,7 @@
             android:enabled="false"
             android:icon="@mipmap/ic_launcher_blue"
             android:logo="@mipmap/ic_launcher_blue"
+            android:label="@string/appName"
             android:targetActivity="com.duckduckgo.app.launch.LaunchActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -79,6 +80,7 @@
             android:enabled="false"
             android:icon="@mipmap/ic_launcher_black"
             android:logo="@mipmap/ic_launcher_black"
+            android:label="@string/appName"
             android:targetActivity="com.duckduckgo.app.launch.LaunchActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -91,6 +93,7 @@
             android:enabled="false"
             android:icon="@mipmap/ic_launcher_gold"
             android:logo="@mipmap/ic_launcher_gold"
+            android:label="@string/appName"
             android:targetActivity="com.duckduckgo.app.launch.LaunchActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -103,6 +106,7 @@
             android:enabled="false"
             android:icon="@mipmap/ic_launcher_green"
             android:logo="@mipmap/ic_launcher_green"
+            android:label="@string/appName"
             android:targetActivity="com.duckduckgo.app.launch.LaunchActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -115,6 +119,7 @@
             android:enabled="false"
             android:icon="@mipmap/ic_launcher_purple"
             android:logo="@mipmap/ic_launcher_purple"
+            android:label="@string/appName"
             android:targetActivity="com.duckduckgo.app.launch.LaunchActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -127,6 +132,7 @@
             android:enabled="false"
             android:icon="@mipmap/ic_launcher_white"
             android:logo="@mipmap/ic_launcher_white"
+            android:label="@string/appName"
             android:targetActivity="com.duckduckgo.app.launch.LaunchActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -139,6 +145,7 @@
             android:enabled="false"
             android:icon="@mipmap/ic_launcher_silhouette"
             android:logo="@mipmap/ic_launcher_silhouette"
+            android:label="@string/appName"
             android:targetActivity="com.duckduckgo.app.launch.LaunchActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
