@@ -50,33 +50,19 @@ interface VariantManager {
             Variant(key = "sc", weight = 0.0, features = emptyList(), filterBy = { noFilter() }),
             Variant(key = "se", weight = 0.0, features = emptyList(), filterBy = { noFilter() }),
 
-            // Concept test experiment
-            Variant(key = "mc", weight = 0.0, features = emptyList(), filterBy = { isEnglishLocale() }),
-            Variant(
-                key = "me",
-                weight = 0.0,
-                features = listOf(ConceptTest, SuppressHomeTabWidgetCta, SuppressOnboardingDefaultBrowserCta),
-                filterBy = { isEnglishLocale() }),
-            Variant(
-                key = "md",
-                weight = 0.0,
-                features = listOf(SuppressHomeTabWidgetCta, SuppressOnboardingDefaultBrowserCta),
-                filterBy = { isEnglishLocale() }),
-
             // Insert CTAs on Concept test experiment
             Variant(key = "mj", weight = 1.0,
-                features = listOf(ConceptTest, SuppressHomeTabWidgetCta, SuppressOnboardingDefaultBrowserCta),
+                features = listOf(SuppressHomeTabWidgetCta, SuppressOnboardingDefaultBrowserCta),
                 filterBy = { isEnglishLocale() }),
             Variant(
                 key = "ml",
                 weight = 1.0,
-                features = listOf(ConceptTest, SuppressOnboardingDefaultBrowserContinueScreen),
+                features = listOf(SuppressOnboardingDefaultBrowserContinueScreen),
                 filterBy = { isEnglishLocale() }),
             Variant(
                 key = "mh",
                 weight = 1.0,
                 features = listOf(
-                    ConceptTest,
                     SuppressHomeTabWidgetCta,
                     SuppressOnboardingDefaultBrowserCta,
                     DefaultBrowserDaxCta,
