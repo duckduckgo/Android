@@ -94,12 +94,12 @@ class AppIconModifier @Inject constructor(
         }
     }
 
-    private fun disable(appIcon: AppIcon) {
-        setComponentState(appIcon.componentName, PackageManager.COMPONENT_ENABLED_STATE_DISABLED)
-    }
-
     private fun enable(appIcon: AppIcon) {
         setComponentState(appIcon.componentName, PackageManager.COMPONENT_ENABLED_STATE_ENABLED)
+    }
+
+    private fun disable(appIcon: AppIcon) {
+        setComponentState(appIcon.componentName, PackageManager.COMPONENT_ENABLED_STATE_DISABLED)
     }
 
     private fun setComponentState(componentName: String, componentState: Int) {

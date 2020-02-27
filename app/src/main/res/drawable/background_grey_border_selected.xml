@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ripple xmlns:android="http://schemas.android.com/apk/res/android"
-    android:color="?colorAccent">
+    android:color="@color/grayishBrown">
     <item>
         <shape android:shape="oval">
             <stroke
                 android:width="2dip"
-                android:color="?colorAccent" />
+                android:color="@color/grayishBrown" />
             <padding
                 android:bottom="2dp"
                 android:left="2dp"
