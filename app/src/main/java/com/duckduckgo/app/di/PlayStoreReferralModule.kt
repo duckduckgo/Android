@@ -27,10 +27,6 @@ import javax.inject.Singleton
 @Module
 class PlayStoreReferralModule {
 
-    @Singleton
-    @Provides
-    fun packageManager(context: Context) = context.packageManager
-
     @Provides
     fun appInstallationReferrerParser(): AppInstallationReferrerParser {
         return QueryParamReferrerParser()

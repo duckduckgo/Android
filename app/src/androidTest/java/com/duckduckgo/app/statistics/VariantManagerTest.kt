@@ -53,7 +53,7 @@ class VariantManagerTest {
     fun conceptTestNoCtaVariantIsInactiveAndHasSuppressCtaFeatures() {
         val variant = variants.firstOrNull { it.key == "md" }
         assertEqualsDouble(0.0, variant!!.weight)
-        assertEquals(2, variant!!.features.size)
+        assertEquals(2, variant.features.size)
         assertTrue(variant.hasFeature(SuppressWidgetCta))
         assertTrue(variant.hasFeature(SuppressDefaultBrowserCta))
     }
@@ -62,11 +62,12 @@ class VariantManagerTest {
     fun conceptTestExperimentalVariantIsInactiveAndHasConceptTestAndSuppressCtaFeatures() {
         val variant = variants.firstOrNull { it.key == "me" }
         assertEqualsDouble(0.0, variant!!.weight)
-        assertEquals(3, variant!!.features.size)
+        assertEquals(3, variant.features.size)
         assertTrue(variant.hasFeature(ConceptTest))
         assertTrue(variant.hasFeature(SuppressWidgetCta))
         assertTrue(variant.hasFeature(SuppressDefaultBrowserCta))
     }
+
 
     // CTA on Concept Test experiments
 
@@ -81,7 +82,7 @@ class VariantManagerTest {
     fun insertCtaConceptTestVariantIsActiveAndHasConceptTestAndSuppressCtaFeatures() {
         val variant = variants.firstOrNull { it.key == "mv" }
         assertEqualsDouble(1.0, variant!!.weight)
-        assertEquals(3, variant!!.features.size)
+        assertEquals(3, variant.features.size)
         assertTrue(variant.hasFeature(ConceptTest))
         assertTrue(variant.hasFeature(SuppressWidgetCta))
         assertTrue(variant.hasFeature(SuppressDefaultBrowserCta))
@@ -91,7 +92,7 @@ class VariantManagerTest {
     fun insertCtaConceptTestWithAllCtaExperimentalVariantIsActiveAndHasConceptTestAndSuppressCtaFeatures() {
         val variant = variants.firstOrNull { it.key == "mz" }
         assertEqualsDouble(1.0, variant!!.weight)
-        assertEquals(2, variant!!.features.size)
+        assertEquals(2, variant.features.size)
         assertTrue(variant.hasFeature(ConceptTest))
     }
 
