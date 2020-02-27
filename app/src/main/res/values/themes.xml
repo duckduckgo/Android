@@ -78,7 +78,7 @@
 
     <style name="AppTheme.Dark.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 
-    <style name="AppTheme.Dark.Transparent">
+    <style name="AppTheme.Dark.Transparent"> <!-- todo: check if this should be changed to Light -->
         <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:windowDrawsSystemBarBackgrounds">true</item>
     </style>

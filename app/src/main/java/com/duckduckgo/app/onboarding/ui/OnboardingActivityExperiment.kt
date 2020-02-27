@@ -22,7 +22,7 @@ import android.os.Bundle
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.DuckDuckGoActivity
-import kotlinx.android.synthetic.main.activity_onboarding.*
+import kotlinx.android.synthetic.main.activity_onboarding_experiment.*
 
 class OnboardingActivityExperiment : DuckDuckGoActivity() {
 

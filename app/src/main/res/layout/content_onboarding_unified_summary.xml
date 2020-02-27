@@ -22,7 +22,7 @@
     android:layout_height="match_parent"
     android:tag="onboardingProtect"
     tools:background="@color/white"
-    tools:context="com.duckduckgo.app.onboarding.ui.OnboardingActivity">
+    tools:context="com.duckduckgo.app.onboarding.ui.OnboardingActivityExperiment">
 
     <ScrollView
         android:id="@+id/scrollView"

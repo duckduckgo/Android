@@ -22,7 +22,7 @@
     android:layout_height="match_parent"
     android:tag="onboardingDefaultBrowser"
     tools:background="@color/white"
-    tools:context="com.duckduckgo.app.onboarding.ui.OnboardingActivity">
+    tools:context="com.duckduckgo.app.onboarding.ui.OnboardingActivityExperiment">
 
     <Button
         android:id="@+id/continueButton"

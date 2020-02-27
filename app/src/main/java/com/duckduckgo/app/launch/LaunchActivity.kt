@@ -21,7 +21,6 @@ import androidx.lifecycle.Observer
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.DuckDuckGoActivity
-import com.duckduckgo.app.onboarding.ui.OnboardingActivity
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import com.duckduckgo.app.onboarding.ui.OnboardingActivityExperiment
@@ -63,11 +62,7 @@ class LaunchActivity : DuckDuckGoActivity() {
     }
 
     private fun showOnboarding() {
-        if (variantManager.getVariant().hasFeature(VariantManager.VariantFeature.ConceptTest)) {
-            startActivity(OnboardingActivityExperiment.intent(this))
-        } else {
-            startActivity(OnboardingActivity.intent(this))
-        }
+        startActivity(OnboardingActivityExperiment.intent(this))
         finish()
     }
 
