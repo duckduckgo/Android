@@ -29,12 +29,15 @@ import android.webkit.WebView
 import androidx.annotation.AnyThread
 import androidx.annotation.VisibleForTesting
 import androidx.core.net.toUri
-import androidx.lifecycle.*
-import com.duckduckgo.app.autocomplete.api.AutoCompleteApi
-import com.duckduckgo.app.autocomplete.api.AutoCompleteApi.AutoCompleteResult
-import com.duckduckgo.app.autocomplete.api.AutoCompleteApi.AutoCompleteSuggestion
-import com.duckduckgo.app.autocomplete.api.AutoCompleteApi.AutoCompleteSuggestion.AutoCompleteBookmarkSuggestion
-import com.duckduckgo.app.autocomplete.api.AutoCompleteApi.AutoCompleteSuggestion.AutoCompleteSearchSuggestion
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.duckduckgo.app.autocomplete.api.AutoComplete
+import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteResult
+import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion
+import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteBookmarkSuggestion
+import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteSearchSuggestion
 import com.duckduckgo.app.bookmarks.db.BookmarkEntity
 import com.duckduckgo.app.bookmarks.db.BookmarksDao
 import com.duckduckgo.app.bookmarks.ui.EditBookmarkDialogFragment.EditBookmarkListener
@@ -45,6 +48,7 @@ import com.duckduckgo.app.browser.LongPressHandler.RequiredAction
 import com.duckduckgo.app.browser.SpecialUrlDetector.UrlType.IntentType
 import com.duckduckgo.app.browser.WebNavigationStateChange.*
 import com.duckduckgo.app.browser.addtohome.AddToHomeCapabilityDetector
+import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.browser.favicon.FaviconDownloader
 import com.duckduckgo.app.browser.model.BasicAuthenticationCredentials
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
@@ -52,10 +56,9 @@ import com.duckduckgo.app.browser.model.LongPressTarget
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.browser.ui.HttpAuthenticationDialogFragment.HttpAuthenticationListener
-import com.duckduckgo.app.cta.ui.Cta
-import com.duckduckgo.app.cta.ui.HomePanelCta
-import com.duckduckgo.app.cta.ui.CtaViewModel
+import com.duckduckgo.app.cta.ui.*
 import com.duckduckgo.app.global.*
+import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.global.model.SiteFactory
 import com.duckduckgo.app.global.model.domainMatchesUrl
@@ -74,6 +77,7 @@ import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import com.duckduckgo.app.usage.search.SearchCountDao
 import com.jakewharton.rxrelay2.PublishRelay
 import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
@@ -89,7 +93,7 @@ class BrowserTabViewModel(
     private val tabRepository: TabRepository,
     private val networkLeaderboardDao: NetworkLeaderboardDao,
     private val bookmarksDao: BookmarksDao,
-    private val autoCompleteApi: AutoCompleteApi,
+    private val autoComplete: AutoComplete,
     private val appSettingsPreferencesStore: SettingsDataStore,
     private val longPressHandler: LongPressHandler,
     private val webViewSessionStorage: WebViewSessionStorage,
@@ -99,6 +103,8 @@ class BrowserTabViewModel(
     private val ctaViewModel: CtaViewModel,
     private val searchCountDao: SearchCountDao,
     private val pixel: Pixel,
+    private val installStore: AppInstallStore,
+    private val defaultBrowserDetector: DefaultBrowserDetector,
     private val variantManager: VariantManager,
     private val dispatchers: DispatcherProvider = DefaultDispatcherProvider()
 ) : WebViewClientListener, EditBookmarkListener, HttpAuthenticationListener, ViewModel() {
@@ -155,7 +161,7 @@ class BrowserTabViewModel(
 
     data class AutoCompleteViewState(
         val showSuggestions: Boolean = false,
-        val searchResults: AutoCompleteResult = AutoCompleteResult("", emptyList(), false)
+        val searchResults: AutoCompleteResult = AutoCompleteResult("", emptyList())
     )
 
     sealed class Command {
@@ -192,6 +198,8 @@ class BrowserTabViewModel(
         object GenerateWebViewPreviewImage : Command()
         object LaunchTabSwitcher : Command()
         class ShowErrorWithAction(val action: () -> Unit) : Command()
+        class OpenDefaultBrowserDialog(val url: String = DEFAULT_URL) : Command()
+        object OpenDefaultBrowserSettings : Command()
     }
 
     val autoCompleteViewState: MutableLiveData<AutoCompleteViewState> = MutableLiveData()
@@ -216,9 +224,11 @@ class BrowserTabViewModel(
         get() = site?.title
 
     private val autoCompletePublishSubject = PublishRelay.create<String>()
+    private var autoCompleteDisposable: Disposable? = null
     private var site: Site? = null
     private lateinit var tabId: String
     private var webNavigationState: WebNavigationState? = null
+    private var defaultBrowserAttempt: Int = 1
 
     init {
         initializeViewStates()
@@ -265,9 +275,9 @@ class BrowserTabViewModel(
 
     @SuppressLint("CheckResult")
     private fun configureAutoComplete() {
-        autoCompletePublishSubject
+        autoCompleteDisposable = autoCompletePublishSubject
             .debounce(300, TimeUnit.MILLISECONDS)
-            .switchMap { autoCompleteApi.autoComplete(it) }
+            .switchMap { autoComplete.autoComplete(it) }
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe({ result ->
@@ -278,13 +288,15 @@ class BrowserTabViewModel(
     private fun onAutoCompleteResultReceived(result: AutoCompleteResult) {
         val results = result.suggestions.take(6)
         val currentViewState = currentAutoCompleteViewState()
-        autoCompleteViewState.value = currentViewState.copy(searchResults = AutoCompleteResult(result.query, results, result.hasBookmarks))
+        autoCompleteViewState.value = currentViewState.copy(searchResults = AutoCompleteResult(result.query, results))
     }
 
     @VisibleForTesting
     public override fun onCleared() {
-        super.onCleared()
         buildingSiteFactoryJob?.cancel()
+        autoCompleteDisposable?.dispose()
+        autoCompleteDisposable = null
+        super.onCleared()
     }
 
     fun registerWebViewListener(browserWebViewClient: BrowserWebViewClient, browserChromeClient: BrowserChromeClient) {
@@ -315,8 +327,9 @@ class BrowserTabViewModel(
         val hasBookmarks = withContext(dispatchers.io()) {
             bookmarksDao.hasBookmarks()
         }
+        val hasBookmarkResults = currentViewState.searchResults.suggestions.any { it is AutoCompleteBookmarkSuggestion }
         val params = mapOf(
-            PixelParameter.SHOWED_BOOKMARKS to currentViewState.searchResults.hasBookmarks.toString(),
+            PixelParameter.SHOWED_BOOKMARKS to hasBookmarkResults.toString(),
             PixelParameter.BOOKMARK_CAPABLE to hasBookmarks.toString()
         )
         val pixelName = when (suggestion) {
@@ -535,7 +548,12 @@ class BrowserTabViewModel(
         if (!currentBrowserViewState().browserShowing) return
         val isLoading = newProgress < 100
         val progress = currentLoadingViewState()
-        loadingViewState.value = progress.copy(isLoading = isLoading, progress = newProgress)
+        val visualProgress = if (newProgress < FIXED_PROGRESS) {
+            FIXED_PROGRESS
+        } else {
+            newProgress
+        }
+        loadingViewState.value = progress.copy(isLoading = isLoading, progress = visualProgress)
     }
 
     private fun registerSiteVisit() {
@@ -619,7 +637,7 @@ class BrowserTabViewModel(
 
         // determine if empty list to be shown, or existing search results
         val autoCompleteSearchResults = if (query.isBlank()) {
-            AutoCompleteResult(query, emptyList(), false)
+            AutoCompleteResult(query, emptyList())
         } else {
             currentAutoCompleteViewState().searchResults
         }
@@ -892,25 +910,86 @@ class BrowserTabViewModel(
         ctaViewModel.registerDaxBubbleCtaDismissed(cta)
     }
 
-    fun onUserClickCtaOkButton() {
-        val cta = ctaViewState.value?.cta ?: return
+    fun onUserClickCtaOkButton(cta: Cta) {
         ctaViewModel.onUserClickCtaOkButton(cta)
+        viewModelScope.launch {
+            withContext(dispatchers.io()) {
+                ctaViewModel.obtainNextCta(previousCta = cta)
+            }?.let { ctaViewState.value = currentCtaViewState().copy(cta = it) }
+            produceNewCommand(cta)
+        }
+    }
+
+    fun onUserClickCtaSecondaryButton(cta: SecondaryButtonCta) {
+        ctaViewModel.onUserClickCtaSecondaryButton(cta)
+    }
+
+    fun onUserDismissedCta(dismissedCta: Cta) {
+        ctaViewModel.onUserDismissedCta(dismissedCta)
+        if (dismissedCta is HomePanelCta) {
+            refreshCta()
+        } else {
+            ctaViewState.value = currentCtaViewState().copy(cta = null)
+        }
+    }
+
+    private fun produceNewCommand(cta: Cta) {
         command.value = when (cta) {
             is HomePanelCta.Survey -> LaunchSurvey(cta.survey)
             is HomePanelCta.AddWidgetAuto -> LaunchAddWidget
             is HomePanelCta.AddWidgetInstructions -> LaunchLegacyAddWidget
+            is DaxDialogCta.DefaultBrowserCta -> cta.primaryAction.mapToCommand()
+            is DaxDialogCta.SearchWidgetCta -> cta.primaryAction.mapToCommand()
             else -> return
         }
     }
 
-    fun onUserDismissedCta() {
-        val cta = ctaViewState.value?.cta ?: return
+    fun onUserTriedToSetAsDefaultBrowserFromSettings() {
+        val isDefaultBrowser = defaultBrowserDetector.isDefaultBrowser()
+        installStore.defaultBrowser = isDefaultBrowser
+        firePixelDefaultBrowserCtaUserAction(isDefaultBrowser, origin = Pixel.PixelValues.DEFAULT_BROWSER_SETTINGS)
+    }
 
-        ctaViewModel.onUserDismissedCta(cta)
-        if (cta is HomePanelCta) {
-            refreshCta()
+    fun onUserTriedToSetAsDefaultBrowserFromDialog() {
+        val isDefaultBrowser = defaultBrowserDetector.isDefaultBrowser()
+        installStore.defaultBrowser = isDefaultBrowser
+        if (defaultBrowserDetector.isDefaultBrowser()) {
+            defaultBrowserAttempt = 1
+            firePixelDefaultBrowserCtaUserAction(true, origin = Pixel.PixelValues.DEFAULT_BROWSER_DIALOG)
         } else {
-            ctaViewState.value = currentCtaViewState().copy(cta = null)
+            if (defaultBrowserAttempt < MAX_DIALOG_ATTEMPTS) {
+                defaultBrowserAttempt++
+                command.value = OpenDefaultBrowserDialog()
+            } else {
+                firePixelDefaultBrowserCtaUserAction(false, origin = Pixel.PixelValues.DEFAULT_BROWSER_JUST_ONCE_MAX)
+            }
+        }
+    }
+
+    fun onUserDismissedDefaultBrowserDialog() {
+        val isDefaultBrowser = defaultBrowserDetector.isDefaultBrowser()
+        val hasDefaultBrowser = defaultBrowserDetector.hasDefaultBrowser()
+
+        installStore.defaultBrowser = isDefaultBrowser
+
+        val origin = if (!isDefaultBrowser && hasDefaultBrowser) {
+            Pixel.PixelValues.DEFAULT_BROWSER_EXTERNAL
+        } else {
+            Pixel.PixelValues.DEFAULT_BROWSER_DIALOG_DISMISSED
+        }
+        firePixelDefaultBrowserCtaUserAction(isDefaultBrowser, origin = origin)
+    }
+
+    private fun firePixelDefaultBrowserCtaUserAction(isDefaultBrowser: Boolean, origin: String) {
+        val params = mapOf(
+            PixelParameter.DEFAULT_BROWSER_SET_FROM_ONBOARDING to false.toString(),
+            PixelParameter.DEFAULT_BROWSER_SET_ORIGIN to origin
+        )
+
+        if (isDefaultBrowser) {
+            pixel.fire(PixelName.DEFAULT_BROWSER_SET, params)
+        } else {
+            pixel.fire(PixelName.DEFAULT_BROWSER_NOT_SET, params)
         }
     }
 
@@ -981,5 +1060,25 @@ class BrowserTabViewModel(
     private fun recoverTabWithQuery(query: String) {
         viewModelScope.launch { closeCurrentTab() }
         command.value = OpenInNewTab(query)
+    }
+
+    private fun DaxDialogCta.DefaultBrowserCta.DefaultBrowserAction.mapToCommand(): Command {
+        return when (this) {
+            is DaxDialogCta.DefaultBrowserCta.DefaultBrowserAction.ShowSettings -> OpenDefaultBrowserSettings
+            is DaxDialogCta.DefaultBrowserCta.DefaultBrowserAction.ShowSystemDialog -> OpenDefaultBrowserDialog()
+        }
+    }
+
+    private fun DaxDialogCta.SearchWidgetCta.SearchWidgetAction.mapToCommand(): Command {
+        return when (this) {
+            is DaxDialogCta.SearchWidgetCta.SearchWidgetAction.AddAutomatic -> LaunchAddWidget
+            is DaxDialogCta.SearchWidgetCta.SearchWidgetAction.AddManually -> LaunchLegacyAddWidget
+        }
+    }
+
+    companion object {
+        private const val FIXED_PROGRESS = 50
+        private const val MAX_DIALOG_ATTEMPTS = 2
+        private const val DEFAULT_URL = "https://duckduckgo.com"
     }
 }

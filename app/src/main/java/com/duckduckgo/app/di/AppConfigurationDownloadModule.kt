@@ -16,7 +16,6 @@
 
 package com.duckduckgo.app.di
 
-import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.httpsupgrade.api.HttpsUpgradeDataDownloader
 import com.duckduckgo.app.job.AppConfigurationDownloader
 import com.duckduckgo.app.job.ConfigurationDownloader

@@ -16,7 +16,6 @@
 
 package com.duckduckgo.app.tabs.model
 
-
 import android.net.Uri
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -29,7 +28,8 @@ import io.reactivex.schedulers.Schedulers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import java.util.*
+import java.util.LinkedHashMap
+import java.util.UUID
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -74,8 +74,14 @@ class TabDataRepository @Inject constructor(
                 return@scheduleDirect
             }
 
-            Timber.i("About to add a new tab, isDefaultTab: $isDefaultTab. $tabId")
-            val position = tabsDao.lastTab()?.position ?: 0
+            val lastTab = tabsDao.lastTab()
+            val position = if (lastTab == null) {
+                0
+            } else {
+                lastTab.position + 1
+            }
+            Timber.i("About to add a new tab, isDefaultTab: $isDefaultTab. $tabId, position: $position")
+
             tabsDao.addAndSelectTab(TabEntity(tabId, data.value?.url, data.value?.title, skipHome, true, position))
         }
     }

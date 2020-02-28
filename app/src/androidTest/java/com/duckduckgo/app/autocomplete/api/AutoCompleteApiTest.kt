@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.autocomplete.api
 
+import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteResult
 import com.duckduckgo.app.bookmarks.db.BookmarkEntity
 import com.duckduckgo.app.bookmarks.db.BookmarksDao
 import com.nhaarman.mockitokotlin2.verify
@@ -59,7 +60,7 @@ class AutoCompleteApiTest {
     @Test
     fun whenQueryIsBlankThenReturnAnEmptyList() {
         val result = testee.autoComplete("").test()
-        val value = result.values()[0] as AutoCompleteApi.AutoCompleteResult
+        val value = result.values()[0] as AutoCompleteResult
 
         assertTrue(value.suggestions.isEmpty())
     }
@@ -70,7 +71,7 @@ class AutoCompleteApiTest {
         whenever(mockBookmarksDao.bookmarksByQuery(anyString())).thenReturn(Single.just(listOf(BookmarkEntity(0, "title", "https://example.com"))))
 
         val result = testee.autoComplete("foo").test()
-        val value = result.values()[0] as AutoCompleteApi.AutoCompleteResult
+        val value = result.values()[0] as AutoCompleteResult
 
         assertSame("https://example.com", value.suggestions[0].phrase)
     }

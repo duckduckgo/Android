@@ -20,13 +20,11 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.duckduckgo.app.autocomplete.api.AutoCompleteApi.AutoCompleteSuggestion
-import com.duckduckgo.app.autocomplete.api.AutoCompleteApi.AutoCompleteSuggestion.AutoCompleteBookmarkSuggestion
-import com.duckduckgo.app.autocomplete.api.AutoCompleteApi.AutoCompleteSuggestion.AutoCompleteSearchSuggestion
+import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion
+import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteBookmarkSuggestion
+import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteSearchSuggestion
 import com.duckduckgo.app.browser.R
-import com.duckduckgo.app.browser.autocomplete.AutoCompleteViewHolder.BookmarkSuggestionViewHolder
-import com.duckduckgo.app.browser.autocomplete.AutoCompleteViewHolder.EmptySuggestionViewHolder
-import com.duckduckgo.app.browser.autocomplete.AutoCompleteViewHolder.SearchSuggestionViewHolder
+import com.duckduckgo.app.browser.autocomplete.AutoCompleteViewHolder.*
 import kotlinx.android.synthetic.main.item_autocomplete_bookmark_suggestion.view.*
 import kotlinx.android.synthetic.main.item_autocomplete_search_suggestion.view.*
 
