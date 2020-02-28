@@ -41,6 +41,7 @@
     <color name="midnight">#161616</color>
     <color name="almostBlackDark">#222222</color>
     <color name="almostBlack">#333333</color>
+    <color name="black">#000000</color>
 
     <color name="charcoalGrey">#383838</color>
     <color name="charcoalGreyTwoSemiTransparent">#d6333339</color>
