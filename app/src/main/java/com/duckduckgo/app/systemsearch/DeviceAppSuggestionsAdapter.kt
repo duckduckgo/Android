@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.systemsearch
 
+import android.content.pm.PackageManager.NameNotFoundException
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -43,8 +44,12 @@ class DeviceAppSuggestionsAdapter(
         holder.root.setOnClickListener {
             clickListener(app)
         }
-        val drawable = app.retrieveIcon(holder.icon.context.packageManager)
-        holder.icon.setImageDrawable(drawable)
+        try {
+            val drawable = app.retrieveIcon(holder.icon.context.packageManager)
+            holder.icon.setImageDrawable(drawable)
+        } catch (e: NameNotFoundException) {
+            holder.icon.setImageDrawable(null)
+        }
     }
 
     override fun getItemCount(): Int {
