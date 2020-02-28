@@ -25,6 +25,7 @@ import com.duckduckgo.app.browser.BuildConfig
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.shortcut.AppShortcutCreator
 import com.duckduckgo.app.icon.api.IconModifier.Companion.QUALIFIER
+import com.duckduckgo.app.icon.ui.ChangeIconActivity
 import javax.inject.Inject
 
 interface IconModifier {
@@ -33,7 +34,7 @@ interface IconModifier {
         const val QUALIFIER = "com.duckduckgo.app.launch"
     }
 
-    fun changeIcon(previousIcon: AppIcon, newIcon: AppIcon)
+    fun changeIcon(context:Context, previousIcon: AppIcon, newIcon: AppIcon)
 }
 
 enum class AppIcon(
@@ -85,26 +86,26 @@ class AppIconModifier @Inject constructor(
     private val appShortcutCreator: AppShortcutCreator
 ) : IconModifier {
 
-    override fun changeIcon(previousIcon: AppIcon, newIcon: AppIcon) {
-        enable(newIcon)
-        disable(previousIcon)
+    override fun changeIcon(context: Context, previousIcon: AppIcon, newIcon: AppIcon) {
+        enable(context, newIcon)
+        disable(context, previousIcon)
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1) {
             appShortcutCreator.configureAppShortcuts(context)
         }
     }
 
-    private fun enable(appIcon: AppIcon) {
-        setComponentState(appIcon.componentName, PackageManager.COMPONENT_ENABLED_STATE_ENABLED)
+    private fun enable(context: Context, appIcon: AppIcon) {
+        setComponentState(context, appIcon.componentName, PackageManager.COMPONENT_ENABLED_STATE_ENABLED)
     }
 
-    private fun disable(appIcon: AppIcon) {
-        setComponentState(appIcon.componentName, PackageManager.COMPONENT_ENABLED_STATE_DISABLED)
+    private fun disable(context: Context, appIcon: AppIcon) {
+        setComponentState(context, appIcon.componentName, PackageManager.COMPONENT_ENABLED_STATE_DISABLED)
     }
 
-    private fun setComponentState(componentName: String, componentState: Int) {
+    private fun setComponentState(context: Context, componentName: String, componentState: Int) {
         context.packageManager.setComponentEnabledSetting(
-            ComponentName(BuildConfig.APPLICATION_ID, componentName),
+            ComponentName(context, componentName),
             componentState, PackageManager.DONT_KILL_APP
         )
     }

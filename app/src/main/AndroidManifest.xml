@@ -14,7 +14,6 @@
         android:icon="${appIcon}"
         android:label="@string/appName"
         android:networkSecurityConfig="@xml/network_security_config"
-        android:roundIcon="${appIconRound}"
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
@@ -41,11 +40,10 @@
         <activity
             android:name="com.duckduckgo.app.launch.LaunchActivity"
             android:icon="${appIcon}"
-            android:logo="${appIcon}"
             android:label="@string/appName">
             <intent-filter>
                 <category android:name="android.intent.action.MAIN" />
-<!--                <category android:name="android.intent.category.LAUNCHER" />-->
+                <!--                <category android:name="android.intent.category.LAUNCHER" />-->
             </intent-filter>
         </activity>
 
@@ -53,8 +51,6 @@
             android:name="com.duckduckgo.app.launch.Launcher"
             android:enabled="true"
             android:icon="@mipmap/ic_launcher_red"
-            android:logo="@mipmap/ic_launcher_red"
-            android:label="@string/appName"
             android:targetActivity="com.duckduckgo.app.launch.LaunchActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -66,8 +62,6 @@
             android:name="com.duckduckgo.app.launch.LauncherBlue"
             android:enabled="false"
             android:icon="@mipmap/ic_launcher_blue"
-            android:logo="@mipmap/ic_launcher_blue"
-            android:label="@string/appName"
             android:targetActivity="com.duckduckgo.app.launch.LaunchActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -79,8 +73,6 @@
             android:name="com.duckduckgo.app.launch.LauncherBlack"
             android:enabled="false"
             android:icon="@mipmap/ic_launcher_black"
-            android:logo="@mipmap/ic_launcher_black"
-            android:label="@string/appName"
             android:targetActivity="com.duckduckgo.app.launch.LaunchActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -92,8 +84,6 @@
             android:name="com.duckduckgo.app.launch.LauncherGold"
             android:enabled="false"
             android:icon="@mipmap/ic_launcher_gold"
-            android:logo="@mipmap/ic_launcher_gold"
-            android:label="@string/appName"
             android:targetActivity="com.duckduckgo.app.launch.LaunchActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -105,8 +95,6 @@
             android:name="com.duckduckgo.app.launch.LauncherGreen"
             android:enabled="false"
             android:icon="@mipmap/ic_launcher_green"
-            android:logo="@mipmap/ic_launcher_green"
-            android:label="@string/appName"
             android:targetActivity="com.duckduckgo.app.launch.LaunchActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -118,8 +106,6 @@
             android:name="com.duckduckgo.app.launch.LauncherPurple"
             android:enabled="false"
             android:icon="@mipmap/ic_launcher_purple"
-            android:logo="@mipmap/ic_launcher_purple"
-            android:label="@string/appName"
             android:targetActivity="com.duckduckgo.app.launch.LaunchActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -131,8 +117,6 @@
             android:name="com.duckduckgo.app.launch.LauncherWhite"
             android:enabled="false"
             android:icon="@mipmap/ic_launcher_white"
-            android:logo="@mipmap/ic_launcher_white"
-            android:label="@string/appName"
             android:targetActivity="com.duckduckgo.app.launch.LaunchActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -144,7 +128,6 @@
             android:name="com.duckduckgo.app.launch.LauncherSilhoutte"
             android:enabled="false"
             android:icon="@mipmap/ic_launcher_silhouette"
-            android:logo="@mipmap/ic_launcher_silhouette"
             android:label="@string/appName"
             android:targetActivity="com.duckduckgo.app.launch.LaunchActivity">
             <intent-filter>
@@ -152,6 +135,28 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity-alias>
+
+        <activity
+            android:name="com.duckduckgo.app.systemsearch.SystemSearchActivity"
+            android:autoRemoveFromRecents="true"
+            android:documentLaunchMode="intoExisting"
+            android:label="@string/appName"
+            android:launchMode="singleTask"
+            android:stateNotNeeded="true">
+
+            <!-- Allow app to be default assistant -->
+            <intent-filter>
+                <action android:name="android.intent.action.ASSIST" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+
+            <!-- Required to allow the browser to be launched externally, ensuring it is ready to allow users to search immediately -->
+            <intent-filter>
+                <action android:name="com.duckduckgo.mobile.android.NEW_SEARCH" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+
+        </activity>
 
         <activity
             android:name="com.duckduckgo.app.onboarding.ui.OnboardingActivity"
@@ -201,18 +206,6 @@
                 <action android:name="android.intent.action.SEND" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <data android:mimeType="text/plain" />
-            </intent-filter>
-
-            <!-- Allow app to be default assistant -->
-            <intent-filter>
-                <action android:name="android.intent.action.ASSIST" />
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
-
-            <!-- Required to allow the browser to be launched externally, ensuring it is ready to allow users to search immediately -->
-            <intent-filter>
-                <action android:name="com.duckduckgo.mobile.android.NEW_SEARCH" />
-                <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
 

@@ -32,7 +32,7 @@ class ChangeIconActivity : DuckDuckGoActivity() {
 
     private val viewModel: ChangeIconViewModel by bindViewModel()
     private val iconsAdapter: AppIconsAdapter = AppIconsAdapter { icon ->
-        viewModel.onIconSelected(icon)
+        viewModel.onIconSelected(this, icon)
     }
 
     companion object {

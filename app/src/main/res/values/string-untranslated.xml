@@ -18,6 +18,10 @@
     <string name="crashedWebViewErrorMessage">"The webpage could not be displayed."</string>
     <string name="crashedWebViewErrorAction">"Reload"</string>
 
+    <!-- System Search-->
+    <string name="systemSearchDeviceAppLabel">From this device</string>
+    <string name="systemSearchAppNotFound">Application could not be found</string>
+
     <!-- New Onboarding Experience -->
     <string name="onboardingWelcomeTitle">"Welcome to DuckDuckGo!"</string>
     <string name="onboardingDaxText"><![CDATA[The Internet can be kinda creepy.<br/><br/>Not to worry! Searching and browsing privately is easier than you think.]]></string>
