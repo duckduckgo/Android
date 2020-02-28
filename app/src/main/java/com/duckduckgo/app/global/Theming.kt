@@ -34,13 +34,9 @@ enum class DuckDuckGoTheme {
 
 object Theming {
 
-    fun initializeTheme(settingsDataStore: SettingsDataStore, variantManager: VariantManager) {
+    fun initializeTheme(settingsDataStore: SettingsDataStore) {
         if (settingsDataStore.theme == null) {
-            if (variantManager.getVariant().hasFeature(VariantManager.VariantFeature.ConceptTest)) {
-                settingsDataStore.theme = DuckDuckGoTheme.LIGHT
-            } else {
-                settingsDataStore.theme = DuckDuckGoTheme.DARK
-            }
+            settingsDataStore.theme = DuckDuckGoTheme.LIGHT
         }
     }
 
@@ -59,10 +55,6 @@ fun DuckDuckGoActivity.applyTheme(): BroadcastReceiver? {
     val themeId = THEME_MAP[Pair(manifestThemeId(), settingsDataStore.theme)] ?: return null
     setTheme(themeId)
     return registerForThemeChangeBroadcast()
-}
-
-fun DuckDuckGoActivity.appTheme(): DuckDuckGoTheme? {
-    return settingsDataStore.theme
 }
 
 private fun DuckDuckGoActivity.registerForThemeChangeBroadcast(): BroadcastReceiver {

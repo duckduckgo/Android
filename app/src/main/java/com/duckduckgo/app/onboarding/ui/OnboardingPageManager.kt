@@ -28,7 +28,7 @@ import com.duckduckgo.app.onboarding.ui.page.OnboardingPageFragment
 import com.duckduckgo.app.onboarding.ui.page.UnifiedSummaryPage
 import com.duckduckgo.app.onboarding.ui.page.WelcomePage
 import com.duckduckgo.app.statistics.VariantManager
-import com.duckduckgo.app.statistics.VariantManager.VariantFeature.SuppressDefaultBrowserCta
+import com.duckduckgo.app.statistics.VariantManager.VariantFeature.SuppressOnboardingDefaultBrowserCta
 
 interface OnboardingPageManager {
     fun pageCount(): Int
@@ -85,13 +85,13 @@ class OnboardingPageManagerWithTrackerBlocking(
 
     private fun shouldShowDefaultBrowserPage(): Boolean {
         return defaultWebBrowserCapability.deviceSupportsDefaultBrowserConfiguration()
-                && !variantManager.getVariant().hasFeature(SuppressDefaultBrowserCta)
+                && !variantManager.getVariant().hasFeature(SuppressOnboardingDefaultBrowserCta)
                 && !isDefaultBrowserAndSuppressedContinuationScreen()
     }
 
     private fun isDefaultBrowserAndSuppressedContinuationScreen(): Boolean {
         return defaultWebBrowserCapability.isDefaultBrowser()
-                && variantManager.getVariant().hasFeature(VariantManager.VariantFeature.SuppressDefaultBrowserContinueScreen)
+                && variantManager.getVariant().hasFeature(VariantManager.VariantFeature.SuppressOnboardingDefaultBrowserContinueScreen)
     }
 
     private fun isFinalPage(position: Int) = position == pageCount() - 1

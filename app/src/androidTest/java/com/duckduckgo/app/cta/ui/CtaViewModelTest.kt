@@ -22,6 +22,7 @@ import androidx.room.Room
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.InstantSchedulersRule
+import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.cta.db.DismissedCtaDao
 import com.duckduckgo.app.cta.model.CtaId
 import com.duckduckgo.app.cta.model.DismissedCta
@@ -37,8 +38,7 @@ import com.duckduckgo.app.privacy.store.PrivacySettingsStore
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.Variant
 import com.duckduckgo.app.statistics.VariantManager
-import com.duckduckgo.app.statistics.VariantManager.VariantFeature.ConceptTest
-import com.duckduckgo.app.statistics.VariantManager.VariantFeature.SuppressWidgetCta
+import com.duckduckgo.app.statistics.VariantManager.VariantFeature.*
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.*
 import com.duckduckgo.app.survey.db.SurveyDao
@@ -103,6 +103,9 @@ class CtaViewModelTest {
     @Mock
     private lateinit var mockPrivacySettingsStore: PrivacySettingsStore
 
+    @Mock
+    private lateinit var mockDefaultBrowserDetector: DefaultBrowserDetector
+
     private lateinit var testee: CtaViewModel
 
     @Before
@@ -126,7 +129,8 @@ class CtaViewModelTest {
             mockVariantManager,
             mockSettingsDataStore,
             mockOnboardingStore,
-            mockPrivacySettingsStore
+            mockPrivacySettingsStore,
+            mockDefaultBrowserDetector
         )
     }
 
@@ -171,6 +175,14 @@ class CtaViewModelTest {
     fun whenCtaLaunchedPixelIsFired() {
         testee.onUserClickCtaOkButton(HomePanelCta.Survey(Survey("abc", "http://example.com", 1, SCHEDULED)))
         verify(mockPixel).fire(eq(SURVEY_CTA_LAUNCHED), any())
+    }
+
+    @Test
+    fun whenCtaSecondaryButonClickedPixelIsFired() {
+        val secondaryButtonCta = mock<SecondaryButtonCta>()
+        whenever(secondaryButtonCta.secondaryButtonPixel).thenReturn(ONBOARDING_DAX_ALL_CTA_HIDDEN)
+        testee.onUserClickCtaSecondaryButton(secondaryButtonCta)
+        verify(mockPixel).fire(eq(ONBOARDING_DAX_ALL_CTA_HIDDEN), any())
     }
 
     @Test
@@ -286,7 +298,7 @@ class CtaViewModelTest {
 
     @Test
     fun whenRefreshCtaOnHomeTabAndSuppressWidgetCtaFeatureThenDoNotShowWidgetAutoCta() = runBlockingTest {
-        setSuppressWidgetCtaFeature()
+        setSuppressHomeTabWidgetCtaFeature()
         whenever(mockSettingsDataStore.hideTips).thenReturn(true)
         whenever(mockWidgetCapabilities.supportsStandardWidgetAdd).thenReturn(true)
         whenever(mockWidgetCapabilities.supportsAutomaticWidgetAdd).thenReturn(true)
@@ -298,7 +310,7 @@ class CtaViewModelTest {
 
     @Test
     fun whenRefreshCtaOnHomeTabAndSuppressWidgetCtaFeatureActiveThenDoNotShowWidgetInstructionsCta() = runBlockingTest {
-        setSuppressWidgetCtaFeature()
+        setSuppressHomeTabWidgetCtaFeature()
         whenever(mockSettingsDataStore.hideTips).thenReturn(true)
         whenever(mockWidgetCapabilities.supportsStandardWidgetAdd).thenReturn(true)
         whenever(mockWidgetCapabilities.supportsAutomaticWidgetAdd).thenReturn(false)
@@ -334,7 +346,7 @@ class CtaViewModelTest {
 
     @Test
     fun whenRefreshCtaOnHomeTabAndSuppressWidgetCtaFeatureActiveThenReturnNullWhenTryngToShowWidgetCta() = runBlockingTest {
-        setSuppressWidgetCtaFeature()
+        setSuppressHomeTabWidgetCtaFeature()
         whenever(mockSettingsDataStore.hideTips).thenReturn(true)
         whenever(mockWidgetCapabilities.supportsStandardWidgetAdd).thenReturn(true)
         whenever(mockWidgetCapabilities.supportsAutomaticWidgetAdd).thenReturn(true)
@@ -346,7 +358,7 @@ class CtaViewModelTest {
 
     @Test
     fun whenRefreshCtaOnHomeTabAndSuppressWidgetCtaFeatureActiveThenReturnNullWhenTryngToShowWidgetInstructionsCta() = runBlockingTest {
-        setSuppressWidgetCtaFeature()
+        setSuppressHomeTabWidgetCtaFeature()
         whenever(mockSettingsDataStore.hideTips).thenReturn(true)
         whenever(mockWidgetCapabilities.supportsStandardWidgetAdd).thenReturn(true)
         whenever(mockWidgetCapabilities.supportsAutomaticWidgetAdd).thenReturn(false)
@@ -385,12 +397,42 @@ class CtaViewModelTest {
     }
 
     @Test
-    fun whenRefreshCtaOnWhileBrowsingAndConceptTestFeatureActiveThenReturnSerpCta() = runBlockingTest {
+    fun whenRefreshCtaOnSerpWhileBrowsingAndConceptTestFeatureActiveThenReturnSerpCta() = runBlockingTest {
         setConceptTestFeature()
         val site = site(url = "http://www.duckduckgo.com")
         val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = true, site = site)
 
         assertTrue(value is DaxDialogCta.DaxSerpCta)
+    }
+
+    @Test
+    fun whenRefreshCtaOnSerpWhereSerpAndAnyNonSerpCtaShownAndWidgetCtaActiveThenReturnWidgetCta() = runBlockingTest {
+        setConceptTestFeature(SearchWidgetDaxCta)
+        givenSerpCtaShown()
+        givenAtLeastOneNonSerpCtaShown()
+        whenever(mockWidgetCapabilities.supportsStandardWidgetAdd).thenReturn(true)
+        whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(false)
+        whenever(mockDismissedCtaDao.exists(CtaId.DAX_DIALOG_SEARCH_WIDGET)).thenReturn(false)
+        val site = site(url = "http://www.duckduckgo.com")
+
+        val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = true, site = site)
+
+        assertTrue(value is DaxDialogCta.SearchWidgetCta)
+    }
+
+    @Test
+    fun whenRefreshCtaOnSerpSiteWhereSerpCtaShownAndWidgetCtaShownAndConceptTestActiveThenReturnNull() = runBlockingTest {
+        setConceptTestFeature(SearchWidgetDaxCta)
+        givenSerpCtaShown()
+        givenAtLeastOneNonSerpCtaShown()
+        whenever(mockWidgetCapabilities.supportsStandardWidgetAdd).thenReturn(true)
+        whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(false)
+        whenever(mockDismissedCtaDao.exists(CtaId.DAX_DIALOG_SEARCH_WIDGET)).thenReturn(true)
+        val site = site(url = "http://www.duckduckgo.com")
+
+        val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = true, site = site)
+
+        assertNull(value)
     }
 
     @Test
@@ -425,16 +467,24 @@ class CtaViewModelTest {
         whenever(mockVariantManager.getVariant()).thenReturn(Variant("test", features = emptyList(), filterBy = { true }))
     }
 
-    private fun setConceptTestFeature() {
+    private fun setConceptTestFeature(vararg features: VariantManager.VariantFeature) {
         whenever(mockVariantManager.getVariant()).thenReturn(
-            Variant("test", features = listOf(ConceptTest), filterBy = { true })
+            Variant("test", features = listOf(ConceptTest) + features, filterBy = { true })
         )
     }
 
-    private fun setSuppressWidgetCtaFeature() {
+    private fun setSuppressHomeTabWidgetCtaFeature() {
         whenever(mockVariantManager.getVariant()).thenReturn(
-            Variant("test", features = listOf(SuppressWidgetCta), filterBy = { true })
+            Variant("test", features = listOf(SuppressHomeTabWidgetCta), filterBy = { true })
         )
+    }
+
+    private fun givenSerpCtaShown() {
+        whenever(mockDismissedCtaDao.exists(CtaId.DAX_DIALOG_SERP)).thenReturn(true)
+    }
+
+    private fun givenAtLeastOneNonSerpCtaShown() {
+        whenever(mockDismissedCtaDao.exists(CtaId.DAX_DIALOG_TRACKERS_FOUND)).thenReturn(true)
     }
 
     private fun site(

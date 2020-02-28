@@ -192,6 +192,8 @@ class ViewModelFactory @Inject constructor(
         addToHomeCapabilityDetector = addToHomeCapabilityDetector,
         ctaViewModel = ctaViewModel,
         searchCountDao = searchCountDao,
+        installStore = appInstallStore,
+        defaultBrowserDetector = defaultBrowserDetector,
         pixel = pixel,
         variantManager = variantManager
     )
