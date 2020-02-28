@@ -16,15 +16,15 @@
 
 package com.duckduckgo.app.icon.ui
 
+import android.app.TaskStackBuilder
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import androidx.appcompat.app.AlertDialog
 import androidx.lifecycle.Observer
-import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.GridLayoutManager
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.DuckDuckGoActivity
+import com.duckduckgo.app.settings.SettingsActivity
 import kotlinx.android.synthetic.main.content_app_icons.appIconsList
 import kotlinx.android.synthetic.main.include_toolbar.toolbar
 
@@ -32,7 +32,7 @@ class ChangeIconActivity : DuckDuckGoActivity() {
 
     private val viewModel: ChangeIconViewModel by bindViewModel()
     private val iconsAdapter: AppIconsAdapter = AppIconsAdapter { icon ->
-        viewModel.onIconSelected(this, icon)
+        viewModel.onIconSelected(icon)
     }
 
     companion object {
@@ -83,6 +83,12 @@ class ChangeIconActivity : DuckDuckGoActivity() {
     private fun processCommand(it: ChangeIconViewModel.Command?) {
         when (it) {
             is ChangeIconViewModel.Command.IconChanged -> {
+
+                val intent = SettingsActivity.intent(applicationContext)
+                TaskStackBuilder.create(applicationContext)
+                    .addNextIntentWithParentStack(intent)
+                    .startActivities()
+
                 finish()
             }
         }

@@ -29,7 +29,7 @@ import com.duckduckgo.app.statistics.VariantManager
 import javax.inject.Inject
 
 
-class LaunchActivity : DuckDuckGoActivity() {
+class LaunchBridgeActivity : DuckDuckGoActivity() {
 
     @Inject
     lateinit var variantManager: VariantManager

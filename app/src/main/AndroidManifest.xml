@@ -37,13 +37,14 @@
             android:name="android.webkit.WebView.EnableSafeBrowsing"
             android:value="false" />
 
+        <!-- Renamed to allow for the introduction of custom icons without breaking existing shortcuts -->
         <activity
-            android:name="com.duckduckgo.app.launch.LaunchActivity"
+            android:name="com.duckduckgo.app.launch.LaunchBridgeActivity"
+            android:noHistory="true"
             android:icon="${appIcon}"
             android:label="@string/appName">
             <intent-filter>
                 <category android:name="android.intent.action.MAIN" />
-                <!--                <category android:name="android.intent.category.LAUNCHER" />-->
             </intent-filter>
         </activity>
 
@@ -51,7 +52,7 @@
             android:name="com.duckduckgo.app.launch.Launcher"
             android:enabled="true"
             android:icon="@mipmap/ic_launcher_red"
-            android:targetActivity="com.duckduckgo.app.launch.LaunchActivity">
+            android:targetActivity="com.duckduckgo.app.launch.LaunchBridgeActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -62,7 +63,7 @@
             android:name="com.duckduckgo.app.launch.LauncherBlue"
             android:enabled="false"
             android:icon="@mipmap/ic_launcher_blue"
-            android:targetActivity="com.duckduckgo.app.launch.LaunchActivity">
+            android:targetActivity="com.duckduckgo.app.launch.LaunchBridgeActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -73,7 +74,7 @@
             android:name="com.duckduckgo.app.launch.LauncherBlack"
             android:enabled="false"
             android:icon="@mipmap/ic_launcher_black"
-            android:targetActivity="com.duckduckgo.app.launch.LaunchActivity">
+            android:targetActivity="com.duckduckgo.app.launch.LaunchBridgeActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -84,7 +85,7 @@
             android:name="com.duckduckgo.app.launch.LauncherGold"
             android:enabled="false"
             android:icon="@mipmap/ic_launcher_gold"
-            android:targetActivity="com.duckduckgo.app.launch.LaunchActivity">
+            android:targetActivity="com.duckduckgo.app.launch.LaunchBridgeActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -95,7 +96,7 @@
             android:name="com.duckduckgo.app.launch.LauncherGreen"
             android:enabled="false"
             android:icon="@mipmap/ic_launcher_green"
-            android:targetActivity="com.duckduckgo.app.launch.LaunchActivity">
+            android:targetActivity="com.duckduckgo.app.launch.LaunchBridgeActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -106,7 +107,7 @@
             android:name="com.duckduckgo.app.launch.LauncherPurple"
             android:enabled="false"
             android:icon="@mipmap/ic_launcher_purple"
-            android:targetActivity="com.duckduckgo.app.launch.LaunchActivity">
+            android:targetActivity="com.duckduckgo.app.launch.LaunchBridgeActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -117,7 +118,7 @@
             android:name="com.duckduckgo.app.launch.LauncherWhite"
             android:enabled="false"
             android:icon="@mipmap/ic_launcher_white"
-            android:targetActivity="com.duckduckgo.app.launch.LaunchActivity">
+            android:targetActivity="com.duckduckgo.app.launch.LaunchBridgeActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -129,7 +130,7 @@
             android:enabled="false"
             android:icon="@mipmap/ic_launcher_silhouette"
             android:label="@string/appName"
-            android:targetActivity="com.duckduckgo.app.launch.LaunchActivity">
+            android:targetActivity="com.duckduckgo.app.launch.LaunchBridgeActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />

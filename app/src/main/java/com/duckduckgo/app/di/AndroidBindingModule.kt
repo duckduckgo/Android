@@ -34,7 +34,7 @@ import com.duckduckgo.app.feedback.ui.positive.initial.PositiveFeedbackLandingFr
 import com.duckduckgo.app.fire.FireActivity
 import com.duckduckgo.app.icon.ui.ChangeIconActivity
 import com.duckduckgo.app.job.AppConfigurationJobService
-import com.duckduckgo.app.launch.LaunchActivity
+import com.duckduckgo.app.launch.LaunchBridgeActivity
 import com.duckduckgo.app.notification.NotificationHandlerService
 import com.duckduckgo.app.onboarding.ui.OnboardingActivity
 import com.duckduckgo.app.onboarding.ui.OnboardingActivityExperiment
@@ -60,7 +60,7 @@ abstract class AndroidBindingModule {
 
     @ActivityScoped
     @ContributesAndroidInjector
-    abstract fun launchActivity(): LaunchActivity
+    abstract fun launchActivity(): LaunchBridgeActivity
 
     @ActivityScoped
     @ContributesAndroidInjector
