@@ -16,6 +16,8 @@
 
 package com.duckduckgo.app.icon.ui
 
+import android.app.AlarmManager
+import android.app.PendingIntent
 import android.app.TaskStackBuilder
 import android.content.Context
 import android.content.Intent
@@ -27,6 +29,7 @@ import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.settings.SettingsActivity
 import kotlinx.android.synthetic.main.content_app_icons.appIconsList
 import kotlinx.android.synthetic.main.include_toolbar.toolbar
+import java.util.Calendar
 
 class ChangeIconActivity : DuckDuckGoActivity() {
 
@@ -83,12 +86,6 @@ class ChangeIconActivity : DuckDuckGoActivity() {
     private fun processCommand(it: ChangeIconViewModel.Command?) {
         when (it) {
             is ChangeIconViewModel.Command.IconChanged -> {
-
-                val intent = SettingsActivity.intent(applicationContext)
-                TaskStackBuilder.create(applicationContext)
-                    .addNextIntentWithParentStack(intent)
-                    .startActivities()
-
                 finish()
             }
         }

@@ -90,9 +90,9 @@ class AppIconModifier @Inject constructor(
         enable(context, newIcon)
         disable(context, previousIcon)
 
-        // if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1) {
-        //     appShortcutCreator.configureAppShortcuts(context)
-        // }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1) {
+            appShortcutCreator.configureAppShortcuts(context)
+        }
     }
 
     private fun enable(context: Context, appIcon: AppIcon) {
@@ -105,7 +105,7 @@ class AppIconModifier @Inject constructor(
 
     private fun setComponentState(context: Context, componentName: String, componentState: Int) {
         context.packageManager.setComponentEnabledSetting(
-            ComponentName(context, componentName),
+            ComponentName(BuildConfig.APPLICATION_ID, componentName),
             componentState, PackageManager.DONT_KILL_APP
         )
     }
