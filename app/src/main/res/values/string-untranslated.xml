@@ -21,6 +21,10 @@
     <!-- System Search-->
     <string name="systemSearchDeviceAppLabel">From this device</string>
     <string name="systemSearchAppNotFound">Application could not be found</string>
+    <string name="systemSearchOnboardingText">Thanks for choosing DuckDuckGo!\nNow, when using our search or app, your searches are protected.</string>
+    <string name="systemSearchOnboardingTitle">Privacy, simplified</string>
+    <string name="systemSearchOnboardingButtonMore">Show more</string>
+    <string name="systemSearchOnboardingButtonOk">Got it</string>
 
     <!-- New Onboarding Experience -->
     <string name="onboardingWelcomeTitle">"Welcome to DuckDuckGo!"</string>
