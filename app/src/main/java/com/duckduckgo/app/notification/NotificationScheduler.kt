@@ -66,7 +66,7 @@ class NotificationScheduler @Inject constructor(
         }
     }
 
-    fun launchStickySearchNotification() {
+    fun launchStickySearchNotification(notificationId: Int) {
         Timber.v("Posting sticky notification")
         val request = OneTimeWorkRequestBuilder<StickyNotificationWorker>()
             .addTag(STICKY_REQUEST_TAG)
@@ -156,7 +156,7 @@ class NotificationScheduler @Inject constructor(
 
             val systemNotification = factory.createStickyNotification(specification, launchIntent)
 
-            manager.notify(specification.systemId, systemNotification)
+            manager.notify(NotificationRegistrar.NotificationId.StickySearch, systemNotification)
 
             pixel.fire("${NOTIFICATION_SHOWN.pixelName}_${specification.pixelSuffix}")
             return Result.success()

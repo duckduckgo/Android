@@ -63,7 +63,7 @@ class NotificationHandlerService : IntentService("NotificationHandlerService") {
             APP_LAUNCH -> onAppLaunched(pixelSuffix)
             CLEAR_DATA_LAUNCH -> onClearDataLaunched(pixelSuffix)
             CANCEL -> onCancelled(pixelSuffix)
-            STICKY_SEARCH_PROMPT -> onStickySearchNotificationRequest(pixelSuffix)
+            STICKY_SEARCH_PROMPT -> onStickySearchNotificationRequest(intent)
             STICKY_SEARCH -> onSearchRequest(intent)
         }
 
@@ -93,9 +93,11 @@ class NotificationHandlerService : IntentService("NotificationHandlerService") {
         pixel.fire("${NOTIFICATION_CANCELLED.pixelName}_$pixelSuffix")
     }
 
-    private fun onStickySearchNotificationRequest(pixelSuffix: String) {
+    private fun onStickySearchNotificationRequest(intent: Intent) {
         Timber.i("Sticky Search Notification Launched!")
-        notificationScheduler.launchStickySearchNotification()
+        val notificationId = intent.getIntExtra(NOTIFICATION_SYSTEM_ID_EXTRA, 0)
+        val pixelSuffix = intent.getStringExtra(PIXEL_SUFFIX_EXTRA)
+        notificationScheduler.launchStickySearchNotification(notificationId)
         pixel.fire("${NOTIFICATION_LAUNCHED.pixelName}_$pixelSuffix")
     }
 

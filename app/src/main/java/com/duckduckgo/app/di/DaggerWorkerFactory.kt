@@ -98,7 +98,7 @@ class DaggerWorkerFactory(
         worker.notification = privacyProtectionNotification
     }
 
-    private fun injectStickySearchPromptNotificationWorker(worker: NotificationScheduler.StickySearchPromptNotificationWorker) {
+    private fun injectStickySearchPromptNotificationWorker(worker: StickySearchPromptNotificationWorker) {
         worker.manager = notificationManager
         worker.notificationDao = notificationDao
         worker.factory = notificationFactory
@@ -106,7 +106,7 @@ class DaggerWorkerFactory(
         worker.notification = stickySearchPromptNotification
     }
 
-    private fun injectStickySearchNotificationWorker(worker: NotificationScheduler.StickyNotificationWorker) {
+    private fun injectStickySearchNotificationWorker(worker: StickyNotificationWorker) {
         worker.manager = notificationManager
         worker.factory = notificationFactory
         worker.pixel = pixel

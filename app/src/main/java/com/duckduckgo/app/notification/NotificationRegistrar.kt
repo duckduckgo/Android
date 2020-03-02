@@ -48,8 +48,7 @@ class NotificationRegistrar @Inject constructor(
     object NotificationId {
         const val ClearData = 100
         const val PrivacyProtection = 101
-        const val StickySearchPrompt = 102
-        const val StickySearch = 103
+        const val StickySearch = 102
     }
 
     object ChannelType {

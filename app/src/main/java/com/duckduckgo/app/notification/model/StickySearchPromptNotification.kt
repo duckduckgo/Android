@@ -18,16 +18,10 @@ package com.duckduckgo.app.notification.model
 
 import android.content.Context
 import com.duckduckgo.app.browser.R
-import com.duckduckgo.app.notification.NotificationHandlerService
 import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEvent.CANCEL
-import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEvent.CLEAR_DATA_LAUNCH
-import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEvent.STICKY_SEARCH
 import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEvent.STICKY_SEARCH_PROMPT
 import com.duckduckgo.app.notification.NotificationRegistrar
 import com.duckduckgo.app.notification.db.NotificationDao
-import com.duckduckgo.app.settings.clear.ClearWhatOption
-import com.duckduckgo.app.settings.db.SettingsDataStore
-import timber.log.Timber
 
 class StickySearchPromptNotification(
     private val context: Context,
@@ -55,7 +49,7 @@ class StickySearchPromptNotification(
 
 class StickySearchPromptSpecification(context: Context) : NotificationSpec {
     override val channel = NotificationRegistrar.ChannelType.TUTORIALS
-    override val systemId = NotificationRegistrar.NotificationId.StickySearchPrompt
+    override val systemId = NotificationRegistrar.NotificationId.StickySearch
     override val name = "Add sticky search notification"
     override val icon = R.drawable.notification_fire
     override val title: String = context.getString(R.string.stickySearchPromptNotificationTitle)
