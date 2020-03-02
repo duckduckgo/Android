@@ -28,14 +28,14 @@ import androidx.room.PrimaryKey
     ]
 )
 data class TabEntity(
-        @PrimaryKey var tabId: String,
-        var url: String? = null,
-        var title: String? = null,
-        var skipHome: Boolean = false,
-        var viewed: Boolean = true,
-        var position: Int,
-        var tabPreviewFile: String? = null,
-        val openedByPage: Boolean = false
+    @PrimaryKey var tabId: String,
+    var url: String? = null,
+    var title: String? = null,
+    var skipHome: Boolean = false,
+    var viewed: Boolean = true,
+    var position: Int,
+    var tabPreviewFile: String? = null,
+    val openedByPage: Boolean = false
 )
 
 val TabEntity.isBlank: Boolean

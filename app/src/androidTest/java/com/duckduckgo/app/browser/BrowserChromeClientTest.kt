@@ -108,7 +108,7 @@ class BrowserChromeClientTest {
 
     @UiThreadTest
     @Test
-    fun whenWhenCloseWindowRequestedThenCloseCurrentTabIfOpenedByPage() {
+    fun whenCloseWindowRequestedThenCloseCurrentTabIfOpenedByPage() {
         testee.onCloseWindow(webView)
         verify(mockWebViewClientListener).closeCurrentTabIfOpenedByPage()
     }

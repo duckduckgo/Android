@@ -92,12 +92,12 @@ class TabDataRepository @Inject constructor(
             val uri = Uri.parse(url)
             val title = uri.host?.removePrefix("www.") ?: url
             val tab = TabEntity(
-                    tabId = generateTabId(),
-                    url = url,
-                    title = title,
-                    skipHome = false,
-                    viewed = false,
-                    position = position + 1
+                tabId = generateTabId(),
+                url = url,
+                title = title,
+                skipHome = false,
+                viewed = false,
+                position = position + 1
             )
             tabsDao.insertTabAtPosition(tab)
         }
