@@ -56,7 +56,8 @@ class InstalledDeviceAppLookup(private val appListProvider: DeviceAppListProvide
             refreshAppList()
         }
 
-        val wordPrefixMatchingRegex = ".*\\b${query}.*".toRegex(IGNORE_CASE)
+        val escapedQuery = Regex.escape(query)
+        val wordPrefixMatchingRegex = ".*\\b${escapedQuery}.*".toRegex(IGNORE_CASE)
         return apps!!.filter {
             it.shortName.matches(wordPrefixMatchingRegex)
         }
