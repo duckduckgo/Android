@@ -45,14 +45,6 @@ enum class AppIcon(
         componentName = "$QUALIFIER.Launcher",
         icon = R.drawable.ic_app_icon_red_round
     ),
-    BLUE(
-        componentName = "$QUALIFIER.LauncherBlue",
-        icon = R.drawable.ic_app_icon_blue_round
-    ),
-    BLACK(
-        componentName = "$QUALIFIER.LauncherBlack",
-        icon = R.drawable.ic_app_icon_black_round
-    ),
     GOLD(
         componentName = "$QUALIFIER.LauncherGold",
         icon = R.drawable.ic_app_icon_gold_round
@@ -61,18 +53,26 @@ enum class AppIcon(
         componentName = "$QUALIFIER.LauncherGreen",
         icon = R.drawable.ic_app_icon_green_round
     ),
+    BLUE(
+        componentName = "$QUALIFIER.LauncherBlue",
+        icon = R.drawable.ic_app_icon_blue_round
+    ),
     PURPLE(
         componentName = "$QUALIFIER.LauncherPurple",
         icon = R.drawable.ic_app_icon_purple_round
     ),
-    WHITE(
-        componentName = "$QUALIFIER.LauncherWhite",
-        icon = R.drawable.ic_app_icon_white_round
+    BLACK(
+        componentName = "$QUALIFIER.LauncherBlack",
+        icon = R.drawable.ic_app_icon_black_round
     ),
     SILHOUETTE(
         componentName = "$QUALIFIER.LauncherSilhoutte",
         icon = R.drawable.ic_app_icon_silhouette_round
-    ), ;
+    ),
+    WHITE(
+        componentName = "$QUALIFIER.LauncherWhite",
+        icon = R.drawable.ic_app_icon_white_round
+    );
 
     companion object {
         fun from(componentName: String): AppIcon {
