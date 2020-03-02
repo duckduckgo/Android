@@ -17,6 +17,7 @@
 package com.duckduckgo.app.systemsearch
 
 import android.content.Intent
+import com.duckduckgo.app.systemsearch.DeviceAppLookupTest.AppName.APP_WITH_RESERVED_CHARS
 import com.duckduckgo.app.systemsearch.DeviceAppLookupTest.AppName.DDG_MOVIES
 import com.duckduckgo.app.systemsearch.DeviceAppLookupTest.AppName.DDG_MUSIC
 import com.duckduckgo.app.systemsearch.DeviceAppLookupTest.AppName.FILES
@@ -100,11 +101,20 @@ class DeviceAppLookupTest {
         assertTrue(result.isEmpty())
     }
 
+    @Test
+    fun whenQueryMatchesAppNameWithSpecialRegexCharactersThenAppReturnedWithoutCrashing() {
+        whenever(mockAppProvider.get()).thenReturn(apps)
+        val result = testee.query(APP_WITH_RESERVED_CHARS)
+        assertEquals(1, result.size)
+        assertEquals(APP_WITH_RESERVED_CHARS, result[0].shortName)
+    }
+
     object AppName {
         const val DDG_MOVIES = "DDG Movies"
         const val DDG_MUSIC = "DDG Music"
         const val LIVE_DDG = "Live DDG"
         const val FILES = "Files"
+        const val APP_WITH_RESERVED_CHARS = "APP.^\$*+-?()[]{}\\|"
     }
 
     companion object {
@@ -114,7 +124,8 @@ class DeviceAppLookupTest {
             DeviceApp(DDG_MOVIES, "", Intent()),
             DeviceApp(DDG_MUSIC, "", Intent()),
             DeviceApp(FILES, "", Intent()),
-            DeviceApp(LIVE_DDG, "", Intent())
+            DeviceApp(LIVE_DDG, "", Intent()),
+            DeviceApp(APP_WITH_RESERVED_CHARS, "", Intent())
         )
     }
 }
