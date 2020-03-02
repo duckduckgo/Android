@@ -61,7 +61,7 @@ class NotificationScheduler @Inject constructor(
                 scheduleNotification(OneTimeWorkRequestBuilder<PrivacyNotificationWorker>(), 1, TimeUnit.DAYS)
             }
             stickySearchPromptNotification.canShow() -> {
-                scheduleNotification(OneTimeWorkRequestBuilder<ClearDataNotificationWorker>(), 2, TimeUnit.DAYS)
+                scheduleNotification(OneTimeWorkRequestBuilder<StickySeachPromptNotificationWorker>(), 2, TimeUnit.DAYS)
             }
             clearDataNotification.canShow() -> {
                 scheduleNotification(OneTimeWorkRequestBuilder<ClearDataNotificationWorker>(), 3, TimeUnit.DAYS)
@@ -72,7 +72,7 @@ class NotificationScheduler @Inject constructor(
 
     fun launchStickySearchNotification() {
         Timber.v("Posting sticky notification")
-        val request = OneTimeWorkRequestBuilder<StickyNotificationWorker>()
+        val request = OneTimeWorkRequestBuilder<StickySeachPromptNotificationWorker>()
             .addTag(STICKY_REQUEST_TAG)
             .build()
 

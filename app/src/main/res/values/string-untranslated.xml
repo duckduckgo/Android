@@ -62,5 +62,6 @@
     <!-- Sticky Search Prompt Notification -->
     <string name="stickySearchPromptNotificationTitle">Search from anywhere!</string>
     <string name="stickySearchPromptNotificationDescription">You can know search from anywhere with our Sticky Notification, interested?</string>
+    <string name="stickySearchNotification">Sticky Search</string>
 
 </resources>

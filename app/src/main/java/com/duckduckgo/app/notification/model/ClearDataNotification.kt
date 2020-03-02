@@ -64,5 +64,6 @@ class ClearDataSpecification(context: Context) : NotificationSpec {
     override val title: String = context.getString(R.string.clearNotificationTitle)
     override val description: String = context.getString(R.string.clearNotificationDescription)
     override val launchButton: String? = null
+    override val closeButton: String? = null
     override val pixelSuffix = "cd"
 }

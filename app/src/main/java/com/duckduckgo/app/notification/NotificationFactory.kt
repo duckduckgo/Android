@@ -44,6 +44,10 @@ class NotificationFactory @Inject constructor(val context: Context, val manager:
             .setContentIntent(launchIntent)
             .setDeleteIntent(cancelIntent)
 
+        specification.closeButton?.let {
+            builder.addAction(specification.icon, it, cancelIntent)
+        }
+        
         specification.launchButton?.let {
             builder.addAction(specification.icon, it, launchIntent)
         }

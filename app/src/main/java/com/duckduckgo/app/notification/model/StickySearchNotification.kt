@@ -41,9 +41,10 @@ open class StickySearchNotificationSpecification(context: Context) : Notificatio
 
     override val channel = NotificationRegistrar.ChannelType.SEARCH
     override val systemId = NotificationRegistrar.NotificationId.StickySearch
-    override val name = "Sticky Search"
+    override val name = context.getString(R.string.stickySearchNotification)
     override val icon = R.drawable.notification_fire
     override val launchButton: String? = null
+    override val closeButton: String? = null
 
     override val title: String = "Start a Search"
 

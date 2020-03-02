@@ -55,6 +55,7 @@ class PrivacyProtectionNotificationSpecification(context: Context, trackers: Int
     override val name = "Privacy protection"
     override val icon = R.drawable.notification_sheild_lock
     override val launchButton: String = context.getString(R.string.privacyProtectionNotificationLaunchButton)
+    override val closeButton: String? = null
 
     override val title: String = when {
         trackers < TRACKER_THRESHOLD && upgrades < UPGRADE_THRESHOLD -> context.getString(R.string.privacyProtectionNotificationDefaultTitle)

@@ -28,8 +28,7 @@ import timber.log.Timber
 
 class StickySearchPromptNotification(
     private val context: Context,
-    private val notificationDao: NotificationDao,
-    private val settingsDataStore: SettingsDataStore
+    private val notificationDao: NotificationDao
 ) : SchedulableNotification {
 
     override val id = "com.duckduckgo.privacy.search.stickyPrompt"
@@ -38,15 +37,10 @@ class StickySearchPromptNotification(
 
     override suspend fun canShow(): Boolean {
 
-        if (notificationDao.exists(id)) {
-            Timber.v("Notification already seen")
-            return false
-        }
-
-        if (settingsDataStore.automaticallyClearWhatOption != ClearWhatOption.CLEAR_NONE) {
-            Timber.v("No need for notification, user already has clear option set")
-            return false
-        }
+        // if (notificationDao.exists(id)) {
+        //     Timber.v("Notification already seen")
+        //     return false
+        // }
 
         return true
     }
@@ -64,5 +58,6 @@ class StickySearchPromptSpecification(context: Context) : NotificationSpec {
     override val title: String = context.getString(R.string.stickySearchPromptNotificationTitle)
     override val description: String = context.getString(R.string.stickySearchPromptNotificationDescription)
     override val launchButton: String = context.getString(R.string.yes)
+    override val closeButton: String? =  context.getString(R.string.no)
     override val pixelSuffix = "ssp"
 }

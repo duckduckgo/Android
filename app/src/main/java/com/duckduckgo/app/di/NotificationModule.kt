@@ -82,6 +82,14 @@ class NotificationModule {
     }
 
     @Provides
+    fun provideStickySearchPromptNotification(
+        context: Context,
+        notificationDao: NotificationDao
+    ): StickySearchPromptNotification {
+        return StickySearchPromptNotification(context, notificationDao)
+    }
+
+    @Provides
     @Singleton
     fun providesNotificationScheduler(
         workManager: WorkManager,
