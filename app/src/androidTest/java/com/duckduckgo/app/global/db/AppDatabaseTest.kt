@@ -148,19 +148,6 @@ class AppDatabaseTest {
         createDatabaseAndMigrate(15, 16, AppDatabase.MIGRATION_15_TO_16)
     }
 
-    @Test
-    fun whenMigratingFromVersion16To17ThenValidationSucceeds() {
-        createDatabaseAndMigrate(16, 17, AppDatabase.MIGRATION_16_TO_17)
-    }
-
-    @Test
-    fun whenMigratingFromVersion16To17ThenTabsAreNotConsideredOpenedByPage() {
-        testHelper.createDatabase(TEST_DB_NAME, 16).use {
-            it.execSQL("INSERT INTO `tabs` values ('tabid1', 'url', 'title', 1, 0, 0, null) ")
-        }
-        assertFalse(database().tabsDao().tabs()[0].openedByPage)
-    }
-
     private fun createDatabase(version: Int) {
         testHelper.createDatabase(TEST_DB_NAME, version).close()
     }

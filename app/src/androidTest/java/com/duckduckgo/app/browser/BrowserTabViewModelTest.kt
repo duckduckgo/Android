@@ -264,20 +264,6 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenCurrentTabClosedByBrowserAndHasNotBeenOpenedByPageThenItIsRemovedFromRepository() = runBlocking {
-        givenOneActiveTabSelected(openedByPage = false)
-        testee.closeCurrentTabIfOpenedByPage()
-        verify(mockTabsRepository, never()).delete(selectedTabLiveData.value!!)
-    }
-
-    @Test
-    fun whenCurrentTabClosedByBrowserAndIsOpenedByPageThenItIsRemovedFromRepository() = runBlocking {
-        givenOneActiveTabSelected(openedByPage = true)
-        testee.closeCurrentTabIfOpenedByPage()
-        verify(mockTabsRepository).delete(selectedTabLiveData.value!!)
-    }
-
-    @Test
     fun whenSearchUrlSharedThenAtbAndSourceParametersAreRemoved() {
         loadUrl("https://duckduckgo.com/?q=test&atb=v117-1&t=ddg_test")
         testee.onShareSelected()
@@ -1683,8 +1669,8 @@ class BrowserTabViewModelTest {
         testee.globalLayoutState.value = BrowserTabViewModel.GlobalLayoutViewState.Invalidated
     }
 
-    private fun givenOneActiveTabSelected(openedByPage: Boolean = false) {
-        selectedTabLiveData.value = TabEntity("TAB_ID", "https://example.com", "", skipHome = false, viewed = true, position = 0, openedByPage = openedByPage)
+    private fun givenOneActiveTabSelected() {
+        selectedTabLiveData.value = TabEntity("TAB_ID", "https://example.com", "", skipHome = false, viewed = true, position = 0)
         testee.loadData("TAB_ID", "https://example.com", false)
     }
 

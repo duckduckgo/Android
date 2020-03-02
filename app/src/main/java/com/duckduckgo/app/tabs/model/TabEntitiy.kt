@@ -34,8 +34,7 @@ data class TabEntity(
     var skipHome: Boolean = false,
     var viewed: Boolean = true,
     var position: Int,
-    var tabPreviewFile: String? = null,
-    val openedByPage: Boolean = false
+    var tabPreviewFile: String? = null
 )
 
 val TabEntity.isBlank: Boolean

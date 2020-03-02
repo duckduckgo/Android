@@ -1009,13 +1009,6 @@ class BrowserTabViewModel(
         command.value = OpenInNewTab(url.orEmpty())
     }
 
-    override fun closeCurrentTabIfOpenedByPage() {
-        val currentTab = tabRepository.liveSelectedTab.value ?: return
-        if (currentTab.openedByPage) {
-            viewModelScope.launch { closeCurrentTab() }
-        }
-    }
-
     override fun openMessageInNewTab(message: Message) {
         command.value = OpenMessageInNewTab(message)
     }

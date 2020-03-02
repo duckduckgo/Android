@@ -45,5 +45,4 @@ interface WebViewClientListener {
     fun openMessageInNewTab(message: Message)
     fun recoverFromRenderProcessGone()
     fun requiresAuthentication(request: BasicAuthenticationRequest)
-    fun closeCurrentTabIfOpenedByPage()
 }

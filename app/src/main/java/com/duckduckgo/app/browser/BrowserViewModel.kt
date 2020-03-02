@@ -119,8 +119,8 @@ class BrowserViewModel(
         appEnjoymentPromptEmitter.promptType.observeForever(appEnjoymentObserver)
     }
 
-    suspend fun onNewTabRequested(isDefaultTab: Boolean = false, openedByPage: Boolean = false): String {
-        return tabRepository.add(isDefaultTab = isDefaultTab, openedByPage = openedByPage)
+    suspend fun onNewTabRequested(isDefaultTab: Boolean = false): String {
+        return tabRepository.add(isDefaultTab = isDefaultTab)
     }
 
     suspend fun onOpenInNewTabRequested(query: String, skipHome: Boolean = false): String {

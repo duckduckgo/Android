@@ -106,13 +106,6 @@ class BrowserChromeClientTest {
         verifyZeroInteractions(mockWebViewClientListener)
     }
 
-    @UiThreadTest
-    @Test
-    fun whenCloseWindowRequestedThenCloseCurrentTabIfOpenedByPage() {
-        testee.onCloseWindow(webView)
-        verify(mockWebViewClientListener).closeCurrentTabIfOpenedByPage()
-    }
-
     private val mockMsg = Message().apply {
         target = mock()
         obj = mock<WebView.WebViewTransport>()
