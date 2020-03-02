@@ -53,15 +53,16 @@ class NotificationFactory @Inject constructor(val context: Context, val manager:
 
     fun createStickyNotification(
         specification: NotificationSpec,
-        action: NotificationCompat.Action
+        launchIntent: PendingIntent
     ): Notification {
+
+        val notificationLayout = RemoteViews(context.packageName, R.layout.search_widget_light)
 
         val builder = NotificationCompat.Builder(context, specification.channel.id)
             .setPriority(specification.channel.priority)
-            .setCustomContentView()
+            .setStyle(NotificationCompat.DecoratedCustomViewStyle())
+            .setCustomContentView(notificationLayout)
             .setSmallIcon(specification.icon)
-            .setContentTitle(specification.title)
-            .setContentText(specification.description)
             .setColor(ContextCompat.getColor(context, R.color.cornflowerDark))
             .setOngoing(true)
 

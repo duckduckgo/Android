@@ -18,6 +18,10 @@
     <string name="crashedWebViewErrorMessage">"The webpage could not be displayed."</string>
     <string name="crashedWebViewErrorAction">"Reload"</string>
 
+    <!-- System Search-->
+    <string name="systemSearchDeviceAppLabel">From this device</string>
+    <string name="systemSearchAppNotFound">Application could not be found</string>
+
     <!-- New Onboarding Experience -->
     <string name="onboardingWelcomeTitle">"Welcome to DuckDuckGo!"</string>
     <string name="onboardingDaxText"><![CDATA[The Internet can be kinda creepy.<br/><br/>Not to worry! Searching and browsing privately is easier than you think.]]></string>
@@ -25,6 +29,8 @@
     <string name="daxIntroCtaText"><![CDATA[Next, try visiting one of your favorite sites!<br/><br/>I\'ll block trackers so they can\'t spy on you. I\'ll also upgrade the security of your connection if possible. 🔒]]></string>
     <string name="daxEndCtaText"><![CDATA[You\'ve got this!<br/><br/>Remember: every time you browse with me a creepy ad loses its wings. 👍]]></string>
     <string name="daxSerpCtaText">Your DuckDuckGo searches are anonymous and I never store your search history. Ever. 🙌</string>
+    <string name="daxDefaultBrowserCtaText"><![CDATA[Before I duck out!<br/><br/>Want tracker protection when you open links from other apps?<br/><br/>Make DuckDuckGo Your Default Browser!]]></string>
+    <string name="daxSearchWidgetCtaText"><![CDATA[You\'re on a roll!<br/><br/>Search privately even faster! Add the DuckDuckGo search widget to your home screen.]]></string>
     <string name="daxNonSerpCtaText"><![CDATA[Every site has a privacy grade. Tap it to see how I protected your privacy.<br/><br/>Want to get fancy? Try clearing your data by hitting the fire button.]]></string>
     <string name="daxMainNetworkStep1CtaText"><![CDATA[Heads up!<br/><br/> %s runs a major tracking network.<br/><br/>A low privacy grade will tip you off to sites like this.]]></string>
     <string name="daxMainNetworkStep1OwnedCtaText"><![CDATA[Heads up!<br/><br/> %s is owned by %s, which runs a major tracking network.]]></string>
@@ -41,6 +47,10 @@
     <!-- Dax Dialog -->
     <string name="daxDialogHideButton">HIDE</string>
     <string name="daxDialogPhew">Phew!</string>
+    <string name="daxDialogYes">OK!</string>
+    <string name="daxDialogAddWidget">Add Widget</string>
+    <string name="daxDialogMaybeLater">Maybe Later</string>
+    <string name="daxDialogSettings">Go to settings</string>
     <string name="daxDialogNext">Next</string>
     <string name="daxDialogHighFive">High Five!</string>
     <string name="daxDialogGotIt">Got It</string>

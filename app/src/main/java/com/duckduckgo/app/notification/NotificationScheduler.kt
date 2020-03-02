@@ -31,7 +31,6 @@ import androidx.work.WorkerParameters
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.notification.NotificationHandlerService.Companion.NOTIFICATION_SYSTEM_ID_EXTRA
 import com.duckduckgo.app.notification.NotificationHandlerService.Companion.PIXEL_SUFFIX_EXTRA
-import com.duckduckgo.app.notification.NotificationHandlerService.Companion.STICKY_SEARCH_REPLY
 import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEvent.STICKY_SEARCH
 import com.duckduckgo.app.notification.db.NotificationDao
 import com.duckduckgo.app.notification.model.Notification
@@ -150,15 +149,7 @@ class NotificationScheduler @Inject constructor(
             intent.putExtra(NOTIFICATION_SYSTEM_ID_EXTRA, specification.systemId)
             val launchIntent = getService(context, 0, intent, 0)!!
 
-            val action: NotificationCompat.Action =
-                NotificationCompat.Action.Builder(
-                    R.drawable.ic_search_black_24dp,
-                    specification.launchButton,
-                    launchIntent
-                )
-                    .build()
-
-            val systemNotification = factory.createStickyNotification(specification, action)
+            val systemNotification = factory.createStickyNotification(specification, launchIntent)
 
             manager.notify(specification.systemId, systemNotification)
 

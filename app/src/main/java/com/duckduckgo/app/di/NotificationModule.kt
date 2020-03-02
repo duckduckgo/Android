@@ -27,6 +27,7 @@ import com.duckduckgo.app.notification.db.NotificationDao
 import com.duckduckgo.app.notification.model.ClearDataNotification
 import com.duckduckgo.app.notification.model.PrivacyProtectionNotification
 import com.duckduckgo.app.notification.model.StickySearchNotification
+import com.duckduckgo.app.notification.model.StickySearchPromptNotification
 import com.duckduckgo.app.privacy.db.PrivacyProtectionCountDao
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import dagger.Module
@@ -85,12 +86,14 @@ class NotificationModule {
     fun providesNotificationScheduler(
         workManager: WorkManager,
         clearDataNotification: ClearDataNotification,
-        privacyProtectionNotification: PrivacyProtectionNotification
+        privacyProtectionNotification: PrivacyProtectionNotification,
+        stickySearchPromptNotification: StickySearchPromptNotification
     ): NotificationScheduler {
         return NotificationScheduler(
             workManager,
             clearDataNotification,
-            privacyProtectionNotification
+            privacyProtectionNotification,
+            stickySearchPromptNotification
         )
     }
 
