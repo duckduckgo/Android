@@ -288,7 +288,7 @@ class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope() {
 
     fun openMessageInNewTab(message: Message) {
         openMessageInNewTabJob = launch {
-            val tabId = viewModel.onNewTabRequested()
+            val tabId = viewModel.onNewTabRequested(openedByPage = true)
             val fragment = openNewTab(tabId, null, false)
             fragment.messageFromPreviousTab = message
         }

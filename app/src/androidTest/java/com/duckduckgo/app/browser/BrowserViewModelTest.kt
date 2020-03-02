@@ -100,9 +100,16 @@ class BrowserViewModelTest {
     }
 
     @Test
+    fun whenNewTabRequestedByPageThenTabAddedToRepositoryWithOpenedByPageFlagSet() = runBlocking<Unit> {
+        testee.onNewTabRequested(openedByPage = true)
+        verify(mockTabRepository).add(openedByPage = true)
+    }
+
+    @Test
     fun whenNewTabRequestedThenTabAddedToRepository() = runBlocking<Unit> {
         testee.onNewTabRequested()
         verify(mockTabRepository).add()
+        verify(mockTabRepository).add(openedByPage = false)
     }
 
     @Test

@@ -46,9 +46,9 @@ class TabDataRepository @Inject constructor(
 
     private val siteData: LinkedHashMap<String, MutableLiveData<Site>> = LinkedHashMap()
 
-    override suspend fun add(url: String?, skipHome: Boolean, isDefaultTab: Boolean): String {
+    override suspend fun add(url: String?, skipHome: Boolean, isDefaultTab: Boolean, openedByPage: Boolean): String {
         val tabId = generateTabId()
-        add(tabId, buildSiteData(url), skipHome = skipHome, isDefaultTab = isDefaultTab)
+        add(tabId, buildSiteData(url), skipHome = skipHome, isDefaultTab = isDefaultTab, openedByPage = openedByPage)
         return tabId
     }
 
@@ -63,7 +63,7 @@ class TabDataRepository @Inject constructor(
         return data
     }
 
-    override suspend fun add(tabId: String, data: MutableLiveData<Site>, skipHome: Boolean, isDefaultTab: Boolean) {
+    override suspend fun add(tabId: String, data: MutableLiveData<Site>, skipHome: Boolean, isDefaultTab: Boolean, openedByPage: Boolean) {
         siteData[tabId] = data
         databaseExecutor().scheduleDirect {
 
@@ -82,7 +82,7 @@ class TabDataRepository @Inject constructor(
             }
             Timber.i("About to add a new tab, isDefaultTab: $isDefaultTab. $tabId, position: $position")
 
-            tabsDao.addAndSelectTab(TabEntity(tabId, data.value?.url, data.value?.title, skipHome, true, position))
+            tabsDao.addAndSelectTab(TabEntity(tabId, data.value?.url, data.value?.title, skipHome, true, position, openedByPage = openedByPage))
         }
     }
 
@@ -92,12 +92,12 @@ class TabDataRepository @Inject constructor(
             val uri = Uri.parse(url)
             val title = uri.host?.removePrefix("www.") ?: url
             val tab = TabEntity(
-                tabId = generateTabId(),
-                url = url,
-                title = title,
-                skipHome = false,
-                viewed = false,
-                position = position + 1
+                    tabId = generateTabId(),
+                    url = url,
+                    title = title,
+                    skipHome = false,
+                    viewed = false,
+                    position = position + 1
             )
             tabsDao.insertTabAtPosition(tab)
         }
