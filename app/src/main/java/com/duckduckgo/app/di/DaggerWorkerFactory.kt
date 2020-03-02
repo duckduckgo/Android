@@ -28,7 +28,7 @@ import com.duckduckgo.app.notification.NotificationScheduler
 import com.duckduckgo.app.notification.NotificationScheduler.ClearDataNotificationWorker
 import com.duckduckgo.app.notification.NotificationScheduler.PrivacyNotificationWorker
 import com.duckduckgo.app.notification.NotificationScheduler.StickyNotificationWorker
-import com.duckduckgo.app.notification.NotificationScheduler.StickySeachPromptNotificationWorker
+import com.duckduckgo.app.notification.NotificationScheduler.StickySearchPromptNotificationWorker
 import com.duckduckgo.app.notification.db.NotificationDao
 import com.duckduckgo.app.notification.model.ClearDataNotification
 import com.duckduckgo.app.notification.model.PrivacyProtectionNotification
@@ -65,7 +65,7 @@ class DaggerWorkerFactory(
             is DataClearingWorker -> injectDataClearWorker(instance)
             is ClearDataNotificationWorker -> injectClearDataNotificationWorker(instance)
             is PrivacyNotificationWorker -> injectPrivacyNotificationWorker(instance)
-            is StickySeachPromptNotificationWorker -> injectStickySearchPromptNotificationWorker(instance)
+            is StickySearchPromptNotificationWorker -> injectStickySearchPromptNotificationWorker(instance)
             is StickyNotificationWorker -> injectStickySearchNotificationWorker(instance)
             else -> Timber.i("No injection required for worker $workerClassName")
         }
@@ -98,7 +98,7 @@ class DaggerWorkerFactory(
         worker.notification = privacyProtectionNotification
     }
 
-    private fun injectStickySearchPromptNotificationWorker(worker: NotificationScheduler.StickySeachPromptNotificationWorker) {
+    private fun injectStickySearchPromptNotificationWorker(worker: NotificationScheduler.StickySearchPromptNotificationWorker) {
         worker.manager = notificationManager
         worker.notificationDao = notificationDao
         worker.factory = notificationFactory

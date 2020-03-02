@@ -60,8 +60,8 @@
     <string name="hideTipsButton">Hide tips forever</string>
 
     <!-- Sticky Search Prompt Notification -->
-    <string name="stickySearchPromptNotificationTitle">Search from anywhere!</string>
-    <string name="stickySearchPromptNotificationDescription">You can know search from anywhere with our Sticky Notification, interested?</string>
+    <string name="stickySearchPromptNotificationTitle">Enable Quick Search</string>
+    <string name="stickySearchPromptNotificationDescription">Easy access to Search</string>
     <string name="stickySearchNotification">Sticky Search</string>
 
 </resources>

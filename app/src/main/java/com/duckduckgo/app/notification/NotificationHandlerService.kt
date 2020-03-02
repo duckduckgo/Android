@@ -48,6 +48,9 @@ class NotificationHandlerService : IntentService("NotificationHandlerService") {
     @Inject
     lateinit var notificationManager: NotificationManagerCompat
 
+    @Inject
+    lateinit var notificationScheduler: NotificationScheduler
+
     override fun onCreate() {
         super.onCreate()
         AndroidInjection.inject(this)
@@ -92,6 +95,7 @@ class NotificationHandlerService : IntentService("NotificationHandlerService") {
 
     private fun onStickySearchNotificationRequest(pixelSuffix: String) {
         Timber.i("Sticky Search Notification Launched!")
+        notificationScheduler.launchStickySearchNotification()
         pixel.fire("${NOTIFICATION_LAUNCHED.pixelName}_$pixelSuffix")
     }
 

@@ -20,15 +20,12 @@ import android.app.PendingIntent
 import android.app.PendingIntent.getService
 import android.content.Context
 import android.content.Intent
-import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
-import androidx.core.app.RemoteInput
 import androidx.work.CoroutineWorker
 import androidx.work.OneTimeWorkRequest
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
-import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.notification.NotificationHandlerService.Companion.NOTIFICATION_SYSTEM_ID_EXTRA
 import com.duckduckgo.app.notification.NotificationHandlerService.Companion.PIXEL_SUFFIX_EXTRA
 import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEvent.STICKY_SEARCH
@@ -37,7 +34,6 @@ import com.duckduckgo.app.notification.model.Notification
 import com.duckduckgo.app.notification.model.NotificationSpec
 import com.duckduckgo.app.notification.model.SchedulableNotification
 import com.duckduckgo.app.notification.model.StickyNotification
-import com.duckduckgo.app.notification.model.StickySearchNotification
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.NOTIFICATION_SHOWN
 import timber.log.Timber
@@ -61,7 +57,7 @@ class NotificationScheduler @Inject constructor(
                 scheduleNotification(OneTimeWorkRequestBuilder<PrivacyNotificationWorker>(), 1, TimeUnit.DAYS)
             }
             stickySearchPromptNotification.canShow() -> {
-                scheduleNotification(OneTimeWorkRequestBuilder<StickySeachPromptNotificationWorker>(), 2, TimeUnit.DAYS)
+                scheduleNotification(OneTimeWorkRequestBuilder<StickySearchPromptNotificationWorker>(), 2, TimeUnit.DAYS)
             }
             clearDataNotification.canShow() -> {
                 scheduleNotification(OneTimeWorkRequestBuilder<ClearDataNotificationWorker>(), 3, TimeUnit.DAYS)
@@ -72,7 +68,16 @@ class NotificationScheduler @Inject constructor(
 
     fun launchStickySearchNotification() {
         Timber.v("Posting sticky notification")
-        val request = OneTimeWorkRequestBuilder<StickySeachPromptNotificationWorker>()
+        val request = OneTimeWorkRequestBuilder<StickyNotificationWorker>()
+            .addTag(STICKY_REQUEST_TAG)
+            .build()
+
+        workManager.enqueue(request)
+    }
+
+    fun launchStickySearchPromptNotification() {
+        Timber.v("Posting sticky notification")
+        val request = OneTimeWorkRequestBuilder<StickySearchPromptNotificationWorker>()
             .addTag(STICKY_REQUEST_TAG)
             .build()
 
@@ -95,7 +100,7 @@ class NotificationScheduler @Inject constructor(
 
     open class ClearDataNotificationWorker(context: Context, params: WorkerParameters) : SchedulableNotificationWorker(context, params)
     class PrivacyNotificationWorker(context: Context, params: WorkerParameters) : SchedulableNotificationWorker(context, params)
-    class StickySeachPromptNotificationWorker(context: Context, params: WorkerParameters) : SchedulableNotificationWorker(context, params)
+    class StickySearchPromptNotificationWorker(context: Context, params: WorkerParameters) : SchedulableNotificationWorker(context, params)
 
     open class SchedulableNotificationWorker(val context: Context, params: WorkerParameters) : CoroutineWorker(context, params) {
 

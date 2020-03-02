@@ -44,12 +44,12 @@ class NotificationFactory @Inject constructor(val context: Context, val manager:
             .setContentIntent(launchIntent)
             .setDeleteIntent(cancelIntent)
 
-        specification.closeButton?.let {
-            builder.addAction(specification.icon, it, cancelIntent)
-        }
-        
         specification.launchButton?.let {
             builder.addAction(specification.icon, it, launchIntent)
+        }
+
+        specification.closeButton?.let {
+            builder.addAction(specification.icon, it, cancelIntent)
         }
 
         return builder.build()
@@ -60,19 +60,16 @@ class NotificationFactory @Inject constructor(val context: Context, val manager:
         launchIntent: PendingIntent
     ): Notification {
 
-        val notificationLayout = RemoteViews(context.packageName, R.layout.search_widget_light)
+        val notificationLayout = RemoteViews(context.packageName, R.layout.search_notification_light)
 
         val builder = NotificationCompat.Builder(context, specification.channel.id)
             .setPriority(specification.channel.priority)
             .setStyle(NotificationCompat.DecoratedCustomViewStyle())
             .setCustomContentView(notificationLayout)
             .setSmallIcon(specification.icon)
-            .setColor(ContextCompat.getColor(context, R.color.cornflowerDark))
+            .setContentIntent(launchIntent)
+            .setAutoCancel(false)
             .setOngoing(true)
-
-        specification.launchButton?.let {
-            builder.addAction(specification.icon, it, launchIntent)
-        }
 
         return builder.build()
     }
