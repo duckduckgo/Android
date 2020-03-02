@@ -26,8 +26,12 @@ interface SchedulableNotification {
     suspend fun buildSpecification(): NotificationSpec
 }
 
-interface StickyNotification {
+interface SearchNotification {
     val id: String
+    val layoutId: Int
+    val priority: Int
+    val launchIntent: String
+    val cancelIntent: String
     suspend fun canShow(): Boolean
     suspend fun buildSpecification(): NotificationSpec
 }

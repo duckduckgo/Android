@@ -55,21 +55,32 @@ class NotificationFactory @Inject constructor(val context: Context, val manager:
         return builder.build()
     }
 
-    fun createStickyNotification(
+    fun createSearchNotification(
         specification: NotificationSpec,
-        launchIntent: PendingIntent
+        launchIntent: PendingIntent,
+        cancelIntent: PendingIntent,
+        layoutId: Int,
+        priority: Int
     ): Notification {
 
-        val notificationLayout = RemoteViews(context.packageName, R.layout.search_notification_light)
+        val notificationLayout = RemoteViews(context.packageName, layoutId)
 
         val builder = NotificationCompat.Builder(context, specification.channel.id)
-            .setPriority(specification.channel.priority)
+            .setPriority(priority)
             .setStyle(NotificationCompat.DecoratedCustomViewStyle())
             .setCustomContentView(notificationLayout)
             .setSmallIcon(specification.icon)
             .setContentIntent(launchIntent)
             .setAutoCancel(false)
             .setOngoing(true)
+
+        specification.launchButton?.let {
+            builder.addAction(specification.icon, it, launchIntent)
+        }
+
+        specification.closeButton?.let {
+            builder.addAction(specification.icon, it, cancelIntent)
+        }
 
         return builder.build()
     }

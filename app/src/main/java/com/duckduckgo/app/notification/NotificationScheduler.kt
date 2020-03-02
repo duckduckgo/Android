@@ -28,12 +28,11 @@ import androidx.work.WorkManager
 import androidx.work.WorkerParameters
 import com.duckduckgo.app.notification.NotificationHandlerService.Companion.NOTIFICATION_SYSTEM_ID_EXTRA
 import com.duckduckgo.app.notification.NotificationHandlerService.Companion.PIXEL_SUFFIX_EXTRA
-import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEvent.STICKY_SEARCH
 import com.duckduckgo.app.notification.db.NotificationDao
 import com.duckduckgo.app.notification.model.Notification
 import com.duckduckgo.app.notification.model.NotificationSpec
 import com.duckduckgo.app.notification.model.SchedulableNotification
-import com.duckduckgo.app.notification.model.StickyNotification
+import com.duckduckgo.app.notification.model.SearchNotification
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.NOTIFICATION_SHOWN
 import timber.log.Timber
@@ -44,7 +43,7 @@ class NotificationScheduler @Inject constructor(
     private val workManager: WorkManager,
     private val clearDataNotification: SchedulableNotification,
     private val privacyNotification: SchedulableNotification,
-    private val stickySearchPromptNotification: SchedulableNotification
+    private val searchPromptNotification: SearchNotification
 ) {
 
     suspend fun scheduleNextNotification() {
@@ -56,8 +55,8 @@ class NotificationScheduler @Inject constructor(
             privacyNotification.canShow() -> {
                 scheduleNotification(OneTimeWorkRequestBuilder<PrivacyNotificationWorker>(), 1, TimeUnit.DAYS)
             }
-            stickySearchPromptNotification.canShow() -> {
-                scheduleNotification(OneTimeWorkRequestBuilder<StickySearchPromptNotificationWorker>(), 2, TimeUnit.DAYS)
+            searchPromptNotification.canShow() -> {
+                scheduleNotification(OneTimeWorkRequestBuilder<SearchPromptNotificationWorker>(), 2, TimeUnit.DAYS)
             }
             clearDataNotification.canShow() -> {
                 scheduleNotification(OneTimeWorkRequestBuilder<ClearDataNotificationWorker>(), 3, TimeUnit.DAYS)
@@ -68,16 +67,16 @@ class NotificationScheduler @Inject constructor(
 
     fun launchStickySearchNotification(notificationId: Int) {
         Timber.v("Posting sticky notification")
-        val request = OneTimeWorkRequestBuilder<StickyNotificationWorker>()
+        val request = OneTimeWorkRequestBuilder<SearchNotificationWorker>()
             .addTag(STICKY_REQUEST_TAG)
             .build()
 
         workManager.enqueue(request)
     }
 
-    fun launchStickySearchPromptNotification() {
+    fun launchSearchPromptNotification() {
         Timber.v("Posting sticky notification")
-        val request = OneTimeWorkRequestBuilder<StickySearchPromptNotificationWorker>()
+        val request = OneTimeWorkRequestBuilder<SearchPromptNotificationWorker>()
             .addTag(STICKY_REQUEST_TAG)
             .build()
 
@@ -100,7 +99,6 @@ class NotificationScheduler @Inject constructor(
 
     open class ClearDataNotificationWorker(context: Context, params: WorkerParameters) : SchedulableNotificationWorker(context, params)
     class PrivacyNotificationWorker(context: Context, params: WorkerParameters) : SchedulableNotificationWorker(context, params)
-    class StickySearchPromptNotificationWorker(context: Context, params: WorkerParameters) : SchedulableNotificationWorker(context, params)
 
     open class SchedulableNotificationWorker(val context: Context, params: WorkerParameters) : CoroutineWorker(context, params) {
 
@@ -137,29 +135,39 @@ class NotificationScheduler @Inject constructor(
         }
     }
 
-    class StickyNotificationWorker(val context: Context, params: WorkerParameters) : CoroutineWorker(context, params) {
+    class SearchPromptNotificationWorker(context: Context, params: WorkerParameters) : SearchNotificationWorker(context, params)
+    class StickySearchNotificationWorker(context: Context, params: WorkerParameters) : SearchNotificationWorker(context, params)
+
+    open class SearchNotificationWorker(val context: Context, params: WorkerParameters) : CoroutineWorker(context, params) {
 
         lateinit var manager: NotificationManagerCompat
         lateinit var factory: NotificationFactory
-        lateinit var notification: StickyNotification
+        lateinit var notificationDao: NotificationDao
+        lateinit var notification: SearchNotification
         lateinit var pixel: Pixel
 
         override suspend fun doWork(): Result {
 
             val specification = notification.buildSpecification()
 
-            val intent = Intent(context, NotificationHandlerService::class.java)
-            intent.type = STICKY_SEARCH
-            intent.putExtra(PIXEL_SUFFIX_EXTRA, specification.pixelSuffix)
-            intent.putExtra(NOTIFICATION_SYSTEM_ID_EXTRA, specification.systemId)
-            val launchIntent = getService(context, 0, intent, 0)!!
+            val cancelIntent = pendingNotificationHandlerIntent(context, notification.cancelIntent, specification)
+            val launchIntent = pendingNotificationHandlerIntent(context, notification.launchIntent, specification)
 
-            val systemNotification = factory.createStickyNotification(specification, launchIntent)
+            val systemNotification =
+                factory.createSearchNotification(specification, launchIntent, cancelIntent, notification.layoutId, notification.priority)
 
             manager.notify(NotificationRegistrar.NotificationId.StickySearch, systemNotification)
 
             pixel.fire("${NOTIFICATION_SHOWN.pixelName}_${specification.pixelSuffix}")
             return Result.success()
+        }
+
+        private fun pendingNotificationHandlerIntent(context: Context, eventType: String, specification: NotificationSpec): PendingIntent {
+            val intent = Intent(context, NotificationHandlerService::class.java)
+            intent.type = eventType
+            intent.putExtra(PIXEL_SUFFIX_EXTRA, specification.pixelSuffix)
+            intent.putExtra(NOTIFICATION_SYSTEM_ID_EXTRA, specification.systemId)
+            return getService(context, 0, intent, 0)!!
         }
     }
 

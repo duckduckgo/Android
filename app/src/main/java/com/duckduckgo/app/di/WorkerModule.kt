@@ -26,8 +26,8 @@ import com.duckduckgo.app.notification.NotificationFactory
 import com.duckduckgo.app.notification.db.NotificationDao
 import com.duckduckgo.app.notification.model.ClearDataNotification
 import com.duckduckgo.app.notification.model.PrivacyProtectionNotification
+import com.duckduckgo.app.notification.model.SearchPromptNotification
 import com.duckduckgo.app.notification.model.StickySearchNotification
-import com.duckduckgo.app.notification.model.StickySearchPromptNotification
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.api.OfflinePixelSender
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -60,7 +60,7 @@ class WorkerModule {
         clearDataNotification: ClearDataNotification,
         privacyProtectionNotification: PrivacyProtectionNotification,
         stickySearchNotification: StickySearchNotification,
-        stickySearchPromptNotification: StickySearchPromptNotification,
+        stickySearchPromptNotification: SearchPromptNotification,
         pixel: Pixel
     ): WorkerFactory {
         return DaggerWorkerFactory(

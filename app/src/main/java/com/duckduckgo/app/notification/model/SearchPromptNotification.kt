@@ -17,23 +17,28 @@
 package com.duckduckgo.app.notification.model
 
 import android.content.Context
+import androidx.core.app.NotificationManagerCompat
 import com.duckduckgo.app.browser.R
-import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEvent.CANCEL
-import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEvent.STICKY_SEARCH_PROMPT
+import com.duckduckgo.app.notification.NotificationHandlerService
 import com.duckduckgo.app.notification.NotificationRegistrar
 import com.duckduckgo.app.notification.db.NotificationDao
 
-class StickySearchPromptNotification(
+class SearchPromptNotification(
     private val context: Context,
     private val notificationDao: NotificationDao
-) : SchedulableNotification {
+) : SearchNotification {
 
     override val id = "com.duckduckgo.privacy.search.stickyPrompt"
-    override val launchIntent = STICKY_SEARCH_PROMPT
-    override val cancelIntent = CANCEL
+
+    override val launchIntent = NotificationHandlerService.NotificationEvent.STICKY_SEARCH_ACCEPT
+
+    override val cancelIntent = NotificationHandlerService.NotificationEvent.STICKY_SEARCH_DISMISS
+
+    override val layoutId = R.layout.search_notification_prompt
+
+    override val priority = NotificationManagerCompat.IMPORTANCE_DEFAULT
 
     override suspend fun canShow(): Boolean {
-
         // if (notificationDao.exists(id)) {
         //     Timber.v("Notification already seen")
         //     return false
@@ -48,13 +53,14 @@ class StickySearchPromptNotification(
 }
 
 class StickySearchPromptSpecification(context: Context) : NotificationSpec {
-    override val channel = NotificationRegistrar.ChannelType.TUTORIALS
+    override val channel = NotificationRegistrar.ChannelType.SEARCH
     override val systemId = NotificationRegistrar.NotificationId.StickySearch
     override val name = "Add sticky search notification"
-    override val icon = R.drawable.notification_fire
+    override val icon = R.drawable.notification_logo
     override val title: String = context.getString(R.string.stickySearchPromptNotificationTitle)
-    override val description: String = context.getString(R.string.stickySearchPromptNotificationDescription)
+    override val description: String = context.getString(R.string.stickySearchPromptNotificationTitle)
     override val launchButton: String = context.getString(R.string.yes)
-    override val closeButton: String? =  context.getString(R.string.noThanks)
+    override val closeButton: String? = context.getString(R.string.noThanks)
     override val pixelSuffix = "ssp"
 }
+
