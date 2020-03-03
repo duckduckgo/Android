@@ -62,5 +62,6 @@
     <!-- Sticky Search Prompt Notification -->
     <string name="stickySearchPromptNotificationTitle">Enable DuckDuckGo Search notification?</string>
     <string name="stickySearchNotification">Sticky Search</string>
+    <string name="stickySearchNotificationText">Show Silent Search Notification</string>
 
 </resources>

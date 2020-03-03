@@ -32,6 +32,7 @@ import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEv
 import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEvent.STICKY_SEARCH_ACCEPT
 import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEvent.STICKY_SEARCH_DISMISS
 import com.duckduckgo.app.settings.SettingsActivity
+import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.NOTIFICATION_CANCELLED
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.NOTIFICATION_LAUNCHED
@@ -52,6 +53,9 @@ class NotificationHandlerService : IntentService("NotificationHandlerService") {
 
     @Inject
     lateinit var notificationScheduler: NotificationScheduler
+
+    @Inject
+    lateinit var settingsDataStore: SettingsDataStore
 
     override fun onCreate() {
         super.onCreate()
@@ -104,7 +108,8 @@ class NotificationHandlerService : IntentService("NotificationHandlerService") {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             notificationManager.getNotificationChannel(NotificationRegistrar.ChannelType.SEARCH.id)?.importance = NotificationManager.IMPORTANCE_MIN
         }
-        notificationScheduler.launchStickySearchNotification()
+        settingsDataStore.searchNotificationEnabled = true
+        notificationScheduler.launchStickySearchNotification(enabled)
         pixel.fire("${NOTIFICATION_LAUNCHED.pixelName}_$pixelSuffix")
     }
 
@@ -113,6 +118,7 @@ class NotificationHandlerService : IntentService("NotificationHandlerService") {
         val notificationId = intent.getIntExtra(NOTIFICATION_SYSTEM_ID_EXTRA, 0)
         val pixelSuffix = intent.getStringExtra(PIXEL_SUFFIX_EXTRA)
         pixel.fire("${NOTIFICATION_CANCELLED.pixelName}_$pixelSuffix")
+        settingsDataStore.searchNotificationEnabled = false
         clearNotification(notificationId)
         closeNotificationPanel()
     }

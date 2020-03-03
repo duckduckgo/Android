@@ -30,6 +30,7 @@ interface SettingsDataStore {
     var theme: DuckDuckGoTheme?
     var hideTips: Boolean
     var autoCompleteSuggestionsEnabled: Boolean
+    var searchNotificationEnabled: Boolean
 
     /**
      * This will be checked upon app startup and used to decide whether it should perform a clear or not.
@@ -74,6 +75,10 @@ class SettingsSharedPreferences @Inject constructor(private val context: Context
     override var autoCompleteSuggestionsEnabled: Boolean
         get() = preferences.getBoolean(KEY_AUTOCOMPLETE_ENABLED, true)
         set(enabled) = preferences.edit { putBoolean(KEY_AUTOCOMPLETE_ENABLED, enabled) }
+
+    override var searchNotificationEnabled: Boolean
+        get() = preferences.getBoolean(KEY_SEARCH_NOTIFICATION, true)
+        set(enabled) = preferences.edit { putBoolean(KEY_SEARCH_NOTIFICATION, enabled) }
 
     override var appUsedSinceLastClear: Boolean
         get() = preferences.getBoolean(KEY_APP_USED_SINCE_LAST_CLEAR, true)
@@ -132,5 +137,6 @@ class SettingsSharedPreferences @Inject constructor(private val context: Context
         const val KEY_APP_NOTIFICATIONS_ENABLED = "APP_NOTIFCATIONS_ENABLED"
         const val KEY_APP_USED_SINCE_LAST_CLEAR = "APP_USED_SINCE_LAST_CLEAR"
         const val KEY_HIDE_TIPS = "HIDE_TIPS"
+        const val KEY_SEARCH_NOTIFICATION = "SEARCH_NOTIFICATION"
     }
 }

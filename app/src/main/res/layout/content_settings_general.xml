@@ -55,5 +55,13 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/autocompleteToggle" />
 
+    <androidx.appcompat.widget.SwitchCompat
+        android:id="@+id/searchNotificationToggle"
+        style="@style/SettingsSwitch"
+        android:text="@string/stickySearchNotificationText"
+        android:theme="@style/SettingsSwitchTheme"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/setAsDefaultBrowserSetting" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

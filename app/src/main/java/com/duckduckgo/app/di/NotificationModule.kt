@@ -85,9 +85,10 @@ class NotificationModule {
     @Provides
     fun provideSearchPromptNotification(
         context: Context,
-        notificationDao: NotificationDao
+        notificationDao: NotificationDao,
+        settingsDataStore: SettingsDataStore
     ): SearchPromptNotification {
-        return SearchPromptNotification(context, notificationDao)
+        return SearchPromptNotification(context, notificationDao, settingsDataStore)
     }
 
     @Provides

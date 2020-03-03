@@ -22,6 +22,7 @@ import com.duckduckgo.app.browser.BuildConfig
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.global.DuckDuckGoTheme
 import com.duckduckgo.app.global.SingleLiveEvent
+import com.duckduckgo.app.notification.NotificationScheduler
 import com.duckduckgo.app.settings.clear.ClearWhatOption
 import com.duckduckgo.app.settings.clear.ClearWhenOption
 import com.duckduckgo.app.settings.db.SettingsDataStore
@@ -44,6 +45,7 @@ class SettingsViewModel @Inject constructor(
         val version: String = "",
         val lightThemeEnabled: Boolean = false,
         val autoCompleteSuggestionsEnabled: Boolean = true,
+        val searchNotificationEnabled: Boolean = false,
         val showDefaultBrowserSetting: Boolean = false,
         val isAppDefaultBrowser: Boolean = false,
         val automaticallyClearData: AutomaticallyClearData = AutomaticallyClearData(ClearWhatOption.CLEAR_NONE, ClearWhenOption.APP_EXIT_ONLY)
@@ -84,6 +86,7 @@ class SettingsViewModel @Inject constructor(
             loading = false,
             lightThemeEnabled = isLightTheme,
             autoCompleteSuggestionsEnabled = settingsDataStore.autoCompleteSuggestionsEnabled,
+            searchNotificationEnabled = settingsDataStore.searchNotificationEnabled,
             isAppDefaultBrowser = defaultBrowserAlready,
             showDefaultBrowserSetting = defaultWebBrowserCapability.deviceSupportsDefaultBrowserConfiguration(),
             version = obtainVersion(variant.key),
@@ -110,6 +113,12 @@ class SettingsViewModel @Inject constructor(
         settingsDataStore.autoCompleteSuggestionsEnabled = enabled
 
         viewState.value = currentViewState().copy(autoCompleteSuggestionsEnabled = enabled)
+    }
+
+    fun onSearchNotificationSettingChanged(enabled: Boolean) {
+        Timber.i("User changed search notification setting, is now enabled: $enabled")
+        settingsDataStore.searchNotificationEnabled = enabled
+        viewState.value = currentViewState().copy(searchNotificationEnabled = enabled)
     }
 
     private fun obtainVersion(variantKey: String): String {

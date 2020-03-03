@@ -22,11 +22,13 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.notification.NotificationHandlerService
 import com.duckduckgo.app.notification.NotificationRegistrar
 import com.duckduckgo.app.notification.db.NotificationDao
+import com.duckduckgo.app.settings.db.SettingsDataStore
 import timber.log.Timber
 
 class SearchPromptNotification(
     private val context: Context,
-    private val notificationDao: NotificationDao
+    private val notificationDao: NotificationDao,
+    private val settingsDataStore: SettingsDataStore
 ) : SearchNotification {
 
     override val id = "com.duckduckgo.privacy.search.stickyPrompt"
@@ -42,6 +44,11 @@ class SearchPromptNotification(
     override suspend fun canShow(): Boolean {
         if (notificationDao.exists(id)) {
             Timber.v("Notification already seen")
+            return false
+        }
+
+        if (settingsDataStore.searchNotificationEnabled) {
+            Timber.v("Notification is already enabled")
             return false
         }
 
