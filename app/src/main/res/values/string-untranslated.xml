@@ -22,8 +22,12 @@
     <string name="systemSearchDeviceAppLabel">From this device</string>
     <string name="systemSearchAppNotFound">Application could not be found</string>
     <string name="systemSearchOnboardingText">Thanks for choosing DuckDuckGo!\nNow, when using our search or app, your searches are protected.</string>
-    <string name="systemSearchOnboardingTitle">Privacy, simplified</string>
+    <string name="systemSearchOnboaringFeaturesIntroText">The DuckDuckGo app also:</string>
+    <string name="systemSearchOnboaringFeatureOneText">Blocks unsafe trackers</string>
+    <string name="systemSearchOnboaringFeatureTwoText">Forces encryption on websites</string>
+    <string name="systemSearchOnboaringFeatureThreeText">Clears data with one tap</string>
     <string name="systemSearchOnboardingButtonMore">Show more</string>
+    <string name="systemSearchOnboardingButtonLess">Hide</string>
     <string name="systemSearchOnboardingButtonOk">Got it</string>
 
     <!-- New Onboarding Experience -->

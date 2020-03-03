@@ -1,6 +1,7 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
 
     <string name="duckDuckGoLogoDescription">Logo DuckDuckGo</string>
+    <string name="duckDuckGoPrivacySimplified">Prywatność uproszczona.</string>
     <string name="yes">Tak</string>
     <string name="no">Nie</string>
 
@@ -183,7 +184,6 @@
 
     <!-- About Activity -->
     <string name="aboutActivityTitle">O nas</string>
-    <string name="aboutHeading">Prywatność uproszczona.</string>
     <string name="aboutDescription">
         DuckDuckGo ustanawia nowy standard zaufania w sieci. Przeglądarka DuckDuckGo Privacy Browser zapewnia wszelkie rozwiązania w zakresie prywatności, które pozwalają użytkownikowi zapewnić sobie ochronę podczas wyszukiwania stron i przeglądania sieci, w tym blokowanie skryptów śledzących, inteligentniejsze szyfrowanie, a także prywatne wyszukiwanie DuckDuckGo. Przecież w Internecie nie wszystko powinno być widoczne, a uzyskanie niezbędnej prywatności powinno być tak proste jak zasunięcie rolety.</string>
     <string name="aboutMoreLink">Więcej informacji: duckduckgo.com/about</string>

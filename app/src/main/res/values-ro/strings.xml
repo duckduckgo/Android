@@ -1,6 +1,7 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
 
     <string name="duckDuckGoLogoDescription">Logoul DuckDuckGo</string>
+    <string name="duckDuckGoPrivacySimplified">Despre confidențialitate, pe scurt.</string>
     <string name="yes">Da</string>
     <string name="no">Nu</string>
 
@@ -179,7 +180,6 @@
 
     <!-- About Activity -->
     <string name="aboutActivityTitle">Despre noi</string>
-    <string name="aboutHeading">Despre confidențialitate, pe scurt.</string>
     <string name="aboutDescription">
         Aici, la DuckDuckGo, stabilim noul standard de încredere online.\n\ DuckDuckGo Privacy Browser oferă toate elementele esențiale de confidențialitate de care aveți nevoie pentru a vă proteja în timp ce căutați și navigați pe web, inclusiv blocarea cookie-urilor de urmărire, criptare mai inteligentă și căutare privată DuckDuckGo.\n\ La urma urmei, internetul nu ar trebui să fie perceput atât de ciudat, iar obținerea confidențialității pe care o meritați online ar trebui să fie la fel de simplă ca a trage perdeaua.</string>
     <string name="aboutMoreLink">Aflați mai multe la duckduckgo.com/about</string>

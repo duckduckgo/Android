@@ -39,7 +39,12 @@ class SystemSearchViewModel(
     private val dispatchers: DispatcherProvider = DefaultDispatcherProvider()
 ) : ViewModel() {
 
-    data class SystemSearchViewState(
+    data class OnboardingViewState(
+        val visibile: Boolean = true,
+        val expanded: Boolean = false
+    )
+
+    data class SystemSearchResultsViewState(
         val queryText: String = "",
         val autocompleteResults: AutoCompleteResult = AutoCompleteResult("", emptyList()),
         val appResults: List<DeviceApp> = emptyList()
@@ -50,9 +55,11 @@ class SystemSearchViewModel(
         data class LaunchBrowser(val query: String) : Command()
         data class LaunchDeviceApplication(val deviceApp: DeviceApp) : Command()
         data class ShowAppNotFoundMessage(val appName: String) : Command()
+        object DismissKeyboard : Command()
     }
 
-    val viewState: MutableLiveData<SystemSearchViewState> = MutableLiveData()
+    val onboardingViewState: MutableLiveData<OnboardingViewState> = MutableLiveData()
+    val resutlsViewState: MutableLiveData<SystemSearchResultsViewState> = MutableLiveData()
     val command: SingleLiveEvent<Command> = SingleLiveEvent()
 
     private val autoCompletePublishSubject = PublishRelay.create<String>()
@@ -63,17 +70,27 @@ class SystemSearchViewModel(
     private var appResults: List<DeviceApp> = emptyList()
 
     init {
-        resetState()
+        resetViewState()
         configureAutoComplete()
     }
 
-    private fun currentViewState(): SystemSearchViewState = viewState.value!!
+    private fun currentOnboardingState(): OnboardingViewState = onboardingViewState.value!!
+    private fun currentResultsState(): SystemSearchResultsViewState = resutlsViewState.value!!
 
-    fun resetState() {
+    fun resetViewState() {
+        resetOnboardingState()
+        resetResultsState()
+    }
+
+    private fun resetOnboardingState() {
+        onboardingViewState.value = OnboardingViewState()
+    }
+
+    private fun resetResultsState() {
         autocompleteResults = AutoCompleteResult("", emptyList())
         appsJob?.cancel()
         appResults = emptyList()
-        viewState.value = SystemSearchViewState()
+        resutlsViewState.value = SystemSearchResultsViewState()
     }
 
     private fun configureAutoComplete() {
@@ -87,13 +104,24 @@ class SystemSearchViewModel(
             }, { t: Throwable? -> Timber.w(t, "Failed to get search results") })
     }
 
+    fun userTappedOnboardingToggle() {
+        onboardingViewState.value = currentOnboardingState().copy(expanded = !currentOnboardingState().expanded)
+        if (currentOnboardingState().expanded) {
+            command.value = Command.DismissKeyboard
+        }
+    }
+
+    fun userDismissedOnboarding() {
+        onboardingViewState.value = currentOnboardingState().copy(visibile = false)
+    }
+
     fun userUpdatedQuery(query: String) {
 
         appsJob?.cancel()
 
         val trimmedQuery = query.trim()
 
-        if (trimmedQuery == currentViewState().queryText) {
+        if (trimmedQuery == currentResultsState().queryText) {
             return
         }
 
@@ -102,7 +130,7 @@ class SystemSearchViewModel(
             return
         }
 
-        viewState.value = currentViewState().copy(queryText = trimmedQuery)
+        resutlsViewState.value = currentResultsState().copy(queryText = trimmedQuery)
         autoCompletePublishSubject.accept(trimmedQuery)
 
         appsJob = viewModelScope.launch(dispatchers.io()) {
@@ -112,22 +140,22 @@ class SystemSearchViewModel(
 
     private fun updateAppResults(results: List<DeviceApp>) {
         appResults = results
-        refreshViewStateResults()
+        refreshResultsViewState()
     }
 
     private fun updateAutocompleteResult(results: AutoCompleteResult) {
         autocompleteResults = results
-        refreshViewStateResults()
+        refreshResultsViewState()
     }
 
-    private fun refreshViewStateResults() {
+    private fun refreshResultsViewState() {
         val hasMultiResults = autocompleteResults.suggestions.isNotEmpty() && appResults.isNotEmpty()
         val fullSuggestions = autocompleteResults.suggestions
         val updatedSuggestions = if (hasMultiResults) fullSuggestions.take(RESULTS_MAX_RESULTS_PER_GROUP) else fullSuggestions
         val updatedApps = if (hasMultiResults) appResults.take(RESULTS_MAX_RESULTS_PER_GROUP) else appResults
 
-        viewState.postValue(
-            currentViewState().copy(
+        resutlsViewState.postValue(
+            currentResultsState().copy(
                 autocompleteResults = AutoCompleteResult(autocompleteResults.query, updatedSuggestions),
                 appResults = updatedApps
             )
@@ -140,7 +168,7 @@ class SystemSearchViewModel(
 
     fun userClearedQuery() {
         autoCompletePublishSubject.accept("")
-        resetState()
+        resetResultsState()
     }
 
     fun userSubmittedQuery(query: String) {

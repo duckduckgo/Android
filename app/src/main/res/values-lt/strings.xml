@@ -1,6 +1,7 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
 
     <string name="duckDuckGoLogoDescription">„DuckDuckGo“ logotipas</string>
+    <string name="duckDuckGoPrivacySimplified">Supaprastintas privatumas.</string>
     <string name="yes">Taip</string>
     <string name="no">Ne</string>
 
@@ -179,7 +180,6 @@
 
     <!-- About Activity -->
     <string name="aboutActivityTitle">Apie mus</string>
-    <string name="aboutHeading">Supaprastintas privatumas.</string>
     <string name="aboutDescription">
         „DuckDuckGo“ nustatome naują patikimumo tinkle standartą.\n\„DuckDuckGo“ privatumo naršyklė užtikrina visus svarbiausius įrankius, kurie padės apsaugoti savo privatumą ieškant ir naršant tinkle, įskaitant sekiklių blokavimą, išmanųjį šifravimą ir „DuckDuckGo“ privačias paieškas.\n\ Mūsų komanda tiki, kad internetas neturėtų būti toks baisus, o privatumas, kurio nusipelnėte internete, turėtų būti ranka pasiekiamas.</string>
     <string name="aboutMoreLink">Daugiau informacijos rasite duckdukgo.com/about</string>

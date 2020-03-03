@@ -148,7 +148,7 @@
                 android:paddingBottom="2dp"
                 android:text="@string/systemSearchDeviceAppLabel"
                 android:textColor="@color/grayish"
-                android:textSize="13dp"
+                android:textSize="13sp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/autocompleteSuggestions"

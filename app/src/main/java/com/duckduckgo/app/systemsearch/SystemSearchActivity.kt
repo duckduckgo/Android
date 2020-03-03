@@ -22,6 +22,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
 import android.view.KeyEvent
+import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.widget.TextView
 import android.widget.Toast
@@ -35,11 +36,13 @@ import com.duckduckgo.app.browser.autocomplete.BrowserAutoCompleteSuggestionsAda
 import com.duckduckgo.app.browser.omnibar.OmnibarScrolling
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.view.TextChangedWatcher
+import com.duckduckgo.app.global.view.hideKeyboard
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelName
 import com.duckduckgo.app.systemsearch.SystemSearchViewModel.Command.*
-import com.duckduckgo.app.systemsearch.SystemSearchViewModel.SystemSearchViewState
+import com.duckduckgo.app.systemsearch.SystemSearchViewModel.SystemSearchResultsViewState
 import kotlinx.android.synthetic.main.activity_system_search.*
+import kotlinx.android.synthetic.main.include_system_search_onboarding.*
 import javax.inject.Inject
 
 class SystemSearchActivity : DuckDuckGoActivity() {
@@ -65,6 +68,7 @@ class SystemSearchActivity : DuckDuckGoActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_system_search)
         configureObservers()
+        configureOnboarding()
         configureAutoComplete()
         configureDeviceAppSuggestions()
         configureDaxButton()
@@ -75,7 +79,7 @@ class SystemSearchActivity : DuckDuckGoActivity() {
 
     override fun onNewIntent(newIntent: Intent?) {
         super.onNewIntent(newIntent)
-        viewModel.resetState()
+        viewModel.resetViewState()
         newIntent?.let { sendLaunchPixels(it) }
     }
 
@@ -88,12 +92,24 @@ class SystemSearchActivity : DuckDuckGoActivity() {
     }
 
     private fun configureObservers() {
-        viewModel.viewState.observe(this, Observer<SystemSearchViewState> {
-            it?.let { renderViewState(it) }
+        viewModel.onboardingViewState.observe(this, Observer<SystemSearchViewModel.OnboardingViewState> {
+            it?.let { renderOnboardingViewState(it) }
+        })
+        viewModel.resutlsViewState.observe(this, Observer<SystemSearchResultsViewState> {
+            it?.let { renderResultsViewState(it) }
         })
         viewModel.command.observe(this, Observer {
             processCommand(it)
         })
+    }
+
+    private fun configureOnboarding() {
+        okButton.setOnClickListener {
+            viewModel.userDismissedOnboarding()
+        }
+        toggleButton.setOnClickListener {
+            viewModel.userTappedOnboardingToggle()
+        }
     }
 
     private fun configureAutoComplete() {
@@ -149,7 +165,15 @@ class SystemSearchActivity : DuckDuckGoActivity() {
         clearTextButton.setOnClickListener { viewModel.userClearedQuery() }
     }
 
-    private fun renderViewState(viewState: SystemSearchViewState) {
+    private fun renderOnboardingViewState(viewState: SystemSearchViewModel.OnboardingViewState) {
+        onboarding.visibility = if (viewState.visibile) View.VISIBLE else View.GONE
+        checkmarks.visibility = if (viewState.expanded) View.VISIBLE else View.GONE
+
+        val toggleText = if (viewState.expanded) R.string.systemSearchOnboardingButtonLess else R.string.systemSearchOnboardingButtonMore
+        toggleButton.text = getString(toggleText)
+    }
+
+    private fun renderResultsViewState(viewState: SystemSearchResultsViewState) {
         if (omnibarTextInput.text.toString() != viewState.queryText) {
             omnibarTextInput.setText(viewState.queryText)
             omnibarTextInput.setSelection(viewState.queryText.length)
@@ -173,6 +197,9 @@ class SystemSearchActivity : DuckDuckGoActivity() {
             }
             is ShowAppNotFoundMessage -> {
                 Toast.makeText(this, R.string.systemSearchAppNotFound, LENGTH_SHORT).show()
+            }
+            is DismissKeyboard -> {
+                omnibarTextInput.hideKeyboard()
             }
         }
     }

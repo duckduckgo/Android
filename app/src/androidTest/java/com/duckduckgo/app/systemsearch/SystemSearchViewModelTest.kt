@@ -78,7 +78,7 @@ class SystemSearchViewModelTest {
     fun whenUserUpdatesQueryThenViewStateUpdated() = ruleRunBlockingTest {
         testee.userUpdatedQuery(QUERY)
 
-        val newViewState = testee.viewState.value
+        val newViewState = testee.resutlsViewState.value
         assertNotNull(newViewState)
         assertEquals(QUERY, newViewState?.queryText)
         assertEquals(appQueryResult, newViewState?.appResults)
@@ -90,7 +90,7 @@ class SystemSearchViewModelTest {
         testee.userUpdatedQuery(QUERY)
         testee.userClearedQuery()
 
-        val newViewState = testee.viewState.value
+        val newViewState = testee.resutlsViewState.value
         assertNotNull(newViewState)
         assertTrue(newViewState!!.queryText.isEmpty())
         assertTrue(newViewState.appResults.isEmpty())
@@ -102,7 +102,7 @@ class SystemSearchViewModelTest {
         testee.userUpdatedQuery(QUERY)
         testee.userUpdatedQuery(BLANK_QUERY)
 
-        val newViewState = testee.viewState.value
+        val newViewState = testee.resutlsViewState.value
         assertNotNull(newViewState)
         assertTrue(newViewState!!.queryText.isEmpty())
         assertTrue(newViewState.appResults.isEmpty())
