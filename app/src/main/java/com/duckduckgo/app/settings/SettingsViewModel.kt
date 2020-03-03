@@ -37,7 +37,8 @@ class SettingsViewModel @Inject constructor(
     private val settingsDataStore: SettingsDataStore,
     private val defaultWebBrowserCapability: DefaultBrowserDetector,
     private val variantManager: VariantManager,
-    private val pixel: Pixel
+    private val pixel: Pixel,
+    private val notificationScheduler: NotificationScheduler
 ) : ViewModel() {
 
     data class ViewState(
@@ -111,13 +112,17 @@ class SettingsViewModel @Inject constructor(
     fun onAutocompleteSettingChanged(enabled: Boolean) {
         Timber.i("User changed autocomplete setting, is now enabled: $enabled")
         settingsDataStore.autoCompleteSuggestionsEnabled = enabled
-
         viewState.value = currentViewState().copy(autoCompleteSuggestionsEnabled = enabled)
     }
 
     fun onSearchNotificationSettingChanged(enabled: Boolean) {
         Timber.i("User changed search notification setting, is now enabled: $enabled")
         settingsDataStore.searchNotificationEnabled = enabled
+        if (enabled){
+            notificationScheduler.launchStickySearchNotification()
+        } else {
+            notificationScheduler.dismissStickySearchNotification()
+        }
         viewState.value = currentViewState().copy(searchNotificationEnabled = enabled)
     }
 

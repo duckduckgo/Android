@@ -49,18 +49,17 @@ class NotificationScheduler @Inject constructor(
 
     suspend fun scheduleNextNotification() {
 
-        // we should not cancel the sticky prompt, we want to show it after 2 days of activity
-        workManager.cancelAllWorkByTag(WORK_REQUEST_TAG)
+        workManager.cancelAllWorkByTag(UNUSED_APP_WORK_REQUEST_TAG)
 
         when {
             privacyNotification.canShow() -> {
-                scheduleNotification(OneTimeWorkRequestBuilder<PrivacyNotificationWorker>(), 1, TimeUnit.DAYS)
+                scheduleNotification(OneTimeWorkRequestBuilder<PrivacyNotificationWorker>(), 1, TimeUnit.DAYS, UNUSED_APP_WORK_REQUEST_TAG)
             }
             searchPromptNotification.canShow() -> {
-                scheduleNotification(OneTimeWorkRequestBuilder<SearchPromptNotificationWorker>(), 2, TimeUnit.DAYS)
+                scheduleNotification(OneTimeWorkRequestBuilder<SearchPromptNotificationWorker>(), 2, TimeUnit.DAYS, CONTINUOUS_APP_USE_REQUEST_TAG)
             }
             clearDataNotification.canShow() -> {
-                scheduleNotification(OneTimeWorkRequestBuilder<ClearDataNotificationWorker>(), 3, TimeUnit.DAYS)
+                scheduleNotification(OneTimeWorkRequestBuilder<ClearDataNotificationWorker>(), 3, TimeUnit.DAYS, UNUSED_APP_WORK_REQUEST_TAG)
             }
             else -> Timber.v("Notifications not enabled for this variant")
         }
@@ -69,6 +68,15 @@ class NotificationScheduler @Inject constructor(
     fun launchStickySearchNotification() {
         Timber.v("Posting sticky notification")
         val request = OneTimeWorkRequestBuilder<StickySearchNotificationWorker>()
+            .addTag(STICKY_REQUEST_TAG)
+            .build()
+
+        workManager.enqueue(request)
+    }
+
+    fun dismissStickySearchNotification() {
+        Timber.v("Dismissing sticky notification")
+        val request = OneTimeWorkRequestBuilder<DismissSearchNotificationWorker>()
             .addTag(STICKY_REQUEST_TAG)
             .build()
 
@@ -84,10 +92,10 @@ class NotificationScheduler @Inject constructor(
         workManager.enqueue(request)
     }
 
-    private fun scheduleNotification(builder: OneTimeWorkRequest.Builder, duration: Long, unit: TimeUnit) {
+    private fun scheduleNotification(builder: OneTimeWorkRequest.Builder, duration: Long, unit: TimeUnit, tag: String) {
         Timber.v("Scheduling notification")
         val request = builder
-            .addTag(WORK_REQUEST_TAG)
+            .addTag(tag)
             .setInitialDelay(duration, unit)
             .build()
 
@@ -175,8 +183,32 @@ class NotificationScheduler @Inject constructor(
         }
     }
 
+    class DismissSearchNotificationWorker(val context: Context, params: WorkerParameters) : CoroutineWorker(context, params) {
+
+        lateinit var manager: NotificationManagerCompat
+        lateinit var notificationDao: NotificationDao
+        lateinit var notification: SearchNotification
+        lateinit var pixel: Pixel
+
+        override suspend fun doWork(): Result {
+
+            val specification = notification.buildSpecification()
+
+            val intent = Intent(context, NotificationHandlerService::class.java)
+            intent.type = NotificationHandlerService.NotificationEvent.STICKY_SEARCH_DISMISS
+            intent.putExtra(PIXEL_SUFFIX_EXTRA, specification.pixelSuffix)
+            intent.putExtra(NOTIFICATION_SYSTEM_ID_EXTRA, specification.systemId)
+            intent.putExtra(NOTIFICATION_AUTO_CANCEL, specification.autoCancel)
+            context.startService(intent)
+
+            return Result.success()
+        }
+
+    }
+
     companion object {
-        const val WORK_REQUEST_TAG = "com.duckduckgo.notification.schedule"
+        const val UNUSED_APP_WORK_REQUEST_TAG = "com.duckduckgo.notification.schedule"
+        const val CONTINUOUS_APP_USE_REQUEST_TAG = "com.duckduckgo.notification.schedule.continuous"
         const val STICKY_REQUEST_TAG = "com.duckduckgo.notification.sticky"
         const val STICKY_PROMPT_REQUEST_TAG = "com.duckduckgo.notification.sticky.prompt"
     }

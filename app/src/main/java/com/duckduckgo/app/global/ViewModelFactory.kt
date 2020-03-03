@@ -42,6 +42,7 @@ import com.duckduckgo.app.global.model.SiteFactory
 import com.duckduckgo.app.global.rating.AppEnjoymentPromptEmitter
 import com.duckduckgo.app.global.rating.AppEnjoymentUserEventRecorder
 import com.duckduckgo.app.launch.LaunchViewModel
+import com.duckduckgo.app.notification.NotificationScheduler
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.ui.OnboardingPageManager
 import com.duckduckgo.app.onboarding.ui.OnboardingViewModel
@@ -106,7 +107,8 @@ class ViewModelFactory @Inject constructor(
     private val playStoreUtils: PlayStoreUtils,
     private val feedbackSubmitter: FeedbackSubmitter,
     private val onboardingPageManager: OnboardingPageManager,
-    private val appInstallationReferrerStateListener: AppInstallationReferrerStateListener
+    private val appInstallationReferrerStateListener: AppInstallationReferrerStateListener,
+    private val notificationScheduler: NotificationScheduler
 ) : ViewModelProvider.NewInstanceFactory() {
 
     override fun <T : ViewModel> create(modelClass: Class<T>) =
@@ -148,7 +150,8 @@ class ViewModelFactory @Inject constructor(
             appSettingsPreferencesStore,
             defaultBrowserDetector,
             variantManager,
-            pixel
+            pixel,
+            notificationScheduler
         )
     }
 

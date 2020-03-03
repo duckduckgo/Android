@@ -109,7 +109,7 @@ class NotificationHandlerService : IntentService("NotificationHandlerService") {
             notificationManager.getNotificationChannel(NotificationRegistrar.ChannelType.SEARCH.id)?.importance = NotificationManager.IMPORTANCE_MIN
         }
         settingsDataStore.searchNotificationEnabled = true
-        notificationScheduler.launchStickySearchNotification(enabled)
+        notificationScheduler.launchStickySearchNotification()
         pixel.fire("${NOTIFICATION_LAUNCHED.pixelName}_$pixelSuffix")
     }
 

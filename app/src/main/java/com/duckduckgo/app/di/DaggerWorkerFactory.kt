@@ -24,7 +24,7 @@ import androidx.work.WorkerParameters
 import com.duckduckgo.app.fire.DataClearingWorker
 import com.duckduckgo.app.global.view.ClearDataAction
 import com.duckduckgo.app.notification.NotificationFactory
-import com.duckduckgo.app.notification.NotificationScheduler
+import com.duckduckgo.app.notification.NotificationScheduler.DismissSearchNotificationWorker
 import com.duckduckgo.app.notification.NotificationScheduler.ClearDataNotificationWorker
 import com.duckduckgo.app.notification.NotificationScheduler.PrivacyNotificationWorker
 import com.duckduckgo.app.notification.NotificationScheduler.StickySearchNotificationWorker
@@ -67,6 +67,7 @@ class DaggerWorkerFactory(
             is PrivacyNotificationWorker -> injectPrivacyNotificationWorker(instance)
             is SearchPromptNotificationWorker -> injectSearchPromptNotificationWorker(instance)
             is StickySearchNotificationWorker -> injectStickySearchNotificationWorker(instance)
+            is DismissSearchNotificationWorker -> injecDismissSearchNotificationWorker(instance)
             else -> Timber.i("No injection required for worker $workerClassName")
         }
 
@@ -110,6 +111,13 @@ class DaggerWorkerFactory(
         worker.manager = notificationManager
         worker.notificationDao = notificationDao
         worker.factory = notificationFactory
+        worker.pixel = pixel
+        worker.notification = stickySearchNotification
+    }
+
+    private fun injecDismissSearchNotificationWorker(worker: DismissSearchNotificationWorker) {
+        worker.manager = notificationManager
+        worker.notificationDao = notificationDao
         worker.pixel = pixel
         worker.notification = stickySearchNotification
     }
