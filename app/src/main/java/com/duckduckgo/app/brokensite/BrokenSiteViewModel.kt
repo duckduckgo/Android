@@ -16,10 +16,13 @@
 
 package com.duckduckgo.app.brokensite
 
+import android.net.Uri
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.duckduckgo.app.brokensite.api.BrokenSiteSender
+import com.duckduckgo.app.brokensite.model.BrokenSite
 import com.duckduckgo.app.global.SingleLiveEvent
+import com.duckduckgo.app.global.isMobileSite
 import com.duckduckgo.app.statistics.pixels.Pixel
 
 
@@ -39,6 +42,7 @@ class BrokenSiteViewModel(private val pixel: Pixel, private val brokenSiteSender
 
     val viewState: MutableLiveData<ViewState> = MutableLiveData()
     val command: SingleLiveEvent<Command> = SingleLiveEvent()
+    var blockedTrackers: String? = null
 
     private val viewValue: ViewState get() = viewState.value!!
 
@@ -46,9 +50,9 @@ class BrokenSiteViewModel(private val pixel: Pixel, private val brokenSiteSender
         viewState.value = ViewState()
     }
 
-    fun setInitialBrokenSite(url: String?) {
+    fun setInitialBrokenSite(url: String?, blockedTrackers: String?) {
         onBrokenSiteUrlChanged(url)
-
+        this.blockedTrackers = blockedTrackers
         if (viewValue.url.isNullOrBlank()) {
             command.value = Command.FocusUrl
         } else {
@@ -85,8 +89,18 @@ class BrokenSiteViewModel(private val pixel: Pixel, private val brokenSiteSender
 
     fun onSubmitPressed(webViewVersion: String) {
         val url = viewValue.url ?: return
+        val trackers = blockedTrackers.orEmpty()
 
-        brokenSiteSender.submitBrokenSiteFeedback(webViewVersion, url)
+        val brokenSite = BrokenSite(
+            category = "",
+            siteUrl = url,
+            upgradeHttps = true,
+            blockedTrackers = trackers,
+            webViewVersion = webViewVersion,
+            siteType = if (Uri.parse(url).isMobileSite) "mobile" else "desktop"
+        )
+
+        brokenSiteSender.submitBrokenSiteFeedback(brokenSite)
         pixel.fire(Pixel.PixelName.BROKEN_SITE_REPORTED, mapOf(Pixel.PixelParameter.URL to url))
         command.value = Command.ConfirmAndFinish
     }

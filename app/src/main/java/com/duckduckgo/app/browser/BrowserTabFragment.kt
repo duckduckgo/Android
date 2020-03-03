@@ -56,6 +56,7 @@ import androidx.lifecycle.*
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion
 import com.duckduckgo.app.bookmarks.ui.EditBookmarkDialogFragment
+import com.duckduckgo.app.brokensite.BrokenSiteActivity
 import com.duckduckgo.app.browser.BrowserTabViewModel.*
 import com.duckduckgo.app.browser.autocomplete.BrowserAutoCompleteSuggestionsAdapter
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserNavigator
@@ -511,7 +512,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
                 hideKeyboard()
             }
             is Command.BrokenSiteFeedback -> {
-                browserActivity?.launchBrokenSiteFeedback(it.url)
+                launchBrokenSiteFeedback(it.url)
             }
             is Command.ShowFullScreen -> {
                 webViewFullScreenContainer.addView(
@@ -549,6 +550,17 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
             is Command.ShowErrorWithAction -> showErrorSnackbar(it)
             is Command.OpenDefaultBrowserSettings -> openDefaultBrowserSettings()
             is Command.OpenDefaultBrowserDialog -> openDefaultBrowserDialog(it.url)
+        }
+    }
+
+    private fun launchBrokenSiteFeedback(url: String?) {
+        val site = viewModel.siteLiveData.value
+        val events = site?.trackingEvents
+        val blockedTrackers = events?.distinct()?.map { Uri.parse(it.trackerUrl).host }.orEmpty().joinToString(",")
+
+        context?.let {
+            val options = ActivityOptions.makeSceneTransitionAnimation(browserActivity).toBundle()
+            startActivity(BrokenSiteActivity.intent(it, url, blockedTrackers), options)
         }
     }
 

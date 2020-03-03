@@ -16,10 +16,9 @@
 
 package com.duckduckgo.app.brokensite.api
 
-import android.net.Uri
 import android.os.Build
+import com.duckduckgo.app.brokensite.model.BrokenSite
 import com.duckduckgo.app.browser.BuildConfig
-import com.duckduckgo.app.global.isMobileSite
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.app.trackerdetection.db.TdsDao
@@ -29,7 +28,7 @@ import kotlinx.coroutines.launch
 import timber.log.Timber
 
 interface BrokenSiteSender {
-    fun submitBrokenSiteFeedback(webViewVersion: String, url: String)
+    fun submitBrokenSiteFeedback(brokenSite: BrokenSite)
 }
 
 class BrokenSiteSubmitter(
@@ -38,17 +37,15 @@ class BrokenSiteSubmitter(
     private val tdsDao: TdsDao
 ) : BrokenSiteSender {
 
-    override fun submitBrokenSiteFeedback(webViewVersion: String, url: String) {
-
-        val siteType = if (Uri.parse(url).isMobileSite) "mobile" else "desktop"
+    override fun submitBrokenSiteFeedback(brokenSite: BrokenSite) {
 
         GlobalScope.launch(Dispatchers.IO) {
             val params = mapOf(
-                "category" to "",
-                "siteUrl" to url,
-                "upgradedHttps" to false,
+                "category" to brokenSite.category,
+                "siteUrl" to brokenSite.siteUrl,
+                "upgradedHttps" to brokenSite.upgradeHttps,
                 "tds" to tdsDao.eTag(),
-                "blockedTrackers" to "",
+                "blockedTrackers" to brokenSite.blockedTrackers,
                 "surrogates" to "",
                 "extensionVersion" to "",
                 "appVersion" to BuildConfig.VERSION_NAME,
@@ -56,8 +53,8 @@ class BrokenSiteSubmitter(
                 "os" to Build.VERSION.SDK_INT,
                 "manufacturer" to Build.MANUFACTURER,
                 "model" to Build.MODEL,
-                "wvVersion" to webViewVersion,
-                "siteType" to siteType
+                "wvVersion" to brokenSite.webViewVersion,
+                "siteType" to brokenSite.siteType
             )
 
 //            runCatching {

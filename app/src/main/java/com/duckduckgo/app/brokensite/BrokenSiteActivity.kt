@@ -49,7 +49,8 @@ class BrokenSiteActivity : DuckDuckGoActivity() {
 
     private fun consumeIntentExtra() {
         val url = intent.getStringExtra(URL_EXTRA)
-        viewModel.setInitialBrokenSite(url)
+        val blockedTrackers = intent.getStringExtra(BLOCKED_TRACKERS_EXTRA)
+        viewModel.setInitialBrokenSite(url, blockedTrackers)
     }
 
     private fun configureListeners() {
@@ -105,11 +106,15 @@ class BrokenSiteActivity : DuckDuckGoActivity() {
     companion object {
 
         private const val URL_EXTRA = "URL_EXTRA"
+        private const val BLOCKED_TRACKERS_EXTRA = "BLOCKED_TRACKERS_EXTRA"
 
-        fun intent(context: Context, url: String? = null): Intent {
+        fun intent(context: Context, url: String? = null, blockedTrackers: String?): Intent {
             val intent = Intent(context, BrokenSiteActivity::class.java)
             if (url != null) {
                 intent.putExtra(URL_EXTRA, url)
+            }
+            if (blockedTrackers != null) {
+                intent.putExtra(BLOCKED_TRACKERS_EXTRA, blockedTrackers)
             }
             return intent
         }
