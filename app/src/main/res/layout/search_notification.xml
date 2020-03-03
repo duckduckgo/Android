@@ -22,7 +22,7 @@
     android:layout_gravity="center"
     android:layout_margin="5dp"
     android:elevation="2dp"
-    android:background="@drawable/search_widget_background_light"
+    android:background="@drawable/search_notification_background_light"
     android:orientation="horizontal">
 
     <ImageView

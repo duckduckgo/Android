@@ -158,9 +158,7 @@ class NotificationScheduler @Inject constructor(
             val systemNotification =
                 factory.createSearchNotification(specification, launchIntent, cancelIntent, notification.layoutId, notification.priority)
 
-            // here we can change the importance of the channel
-            // manager.getNotificationChannel(ChannelType.SEARCH.id).importance =
-
+            notificationDao.insert(Notification(notification.id))
             manager.notify(NotificationRegistrar.NotificationId.StickySearch, systemNotification)
 
             pixel.fire("${NOTIFICATION_SHOWN.pixelName}_${specification.pixelSuffix}")

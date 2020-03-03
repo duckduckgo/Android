@@ -22,6 +22,7 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.notification.NotificationHandlerService
 import com.duckduckgo.app.notification.NotificationRegistrar
 import com.duckduckgo.app.notification.db.NotificationDao
+import timber.log.Timber
 
 class SearchPromptNotification(
     private val context: Context,
@@ -39,10 +40,10 @@ class SearchPromptNotification(
     override val priority = NotificationManagerCompat.IMPORTANCE_DEFAULT
 
     override suspend fun canShow(): Boolean {
-        // if (notificationDao.exists(id)) {
-        //     Timber.v("Notification already seen")
-        //     return false
-        // }
+        if (notificationDao.exists(id)) {
+            Timber.v("Notification already seen")
+            return false
+        }
 
         return true
     }
