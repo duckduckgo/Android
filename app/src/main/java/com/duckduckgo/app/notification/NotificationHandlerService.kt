@@ -17,10 +17,11 @@
 package com.duckduckgo.app.notification
 
 import android.app.IntentService
-import android.app.RemoteInput
+import android.app.NotificationManager
 import android.app.TaskStackBuilder
 import android.content.Context
 import android.content.Intent
+import android.os.Build
 import androidx.annotation.VisibleForTesting
 import androidx.core.app.NotificationManagerCompat
 import com.duckduckgo.app.browser.BrowserActivity
@@ -69,9 +70,11 @@ class NotificationHandlerService : IntentService("NotificationHandlerService") {
             STICKY_SEARCH -> onSearchRequest(intent)
         }
 
-        val notificationId = intent.getIntExtra(NOTIFICATION_SYSTEM_ID_EXTRA, 0)
-        clearNotification(notificationId)
-        closeNotificationPanel()
+        if (intent.getBooleanExtra(NOTIFICATION_AUTO_CANCEL, true)) {
+            val notificationId = intent.getIntExtra(NOTIFICATION_SYSTEM_ID_EXTRA, 0)
+            clearNotification(notificationId)
+            closeNotificationPanel()
+        }
     }
 
     private fun onAppLaunched(pixelSuffix: String) {
@@ -97,9 +100,11 @@ class NotificationHandlerService : IntentService("NotificationHandlerService") {
 
     private fun onStickySearchNotificationRequest(intent: Intent) {
         Timber.i("Sticky Search Notification Requested!")
-        val notificationId = intent.getIntExtra(NOTIFICATION_SYSTEM_ID_EXTRA, 0)
         val pixelSuffix = intent.getStringExtra(PIXEL_SUFFIX_EXTRA)
-        notificationScheduler.launchStickySearchNotification(notificationId)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            notificationManager.getNotificationChannel(NotificationRegistrar.ChannelType.SEARCH.id)?.importance = NotificationManager.IMPORTANCE_MIN
+        }
+        notificationScheduler.launchStickySearchNotification()
         pixel.fire("${NOTIFICATION_LAUNCHED.pixelName}_$pixelSuffix")
     }
 
@@ -107,12 +112,13 @@ class NotificationHandlerService : IntentService("NotificationHandlerService") {
         Timber.i("Sticky Search Notification Dismissed!")
         val notificationId = intent.getIntExtra(NOTIFICATION_SYSTEM_ID_EXTRA, 0)
         val pixelSuffix = intent.getStringExtra(PIXEL_SUFFIX_EXTRA)
-        notificationScheduler.launchStickySearchNotification(notificationId)
         pixel.fire("${NOTIFICATION_CANCELLED.pixelName}_$pixelSuffix")
+        clearNotification(notificationId)
+        closeNotificationPanel()
     }
 
     private fun onSearchRequest(intent: Intent) {
-        Timber.i("Search from Notification Launched!")
+        Timber.i("Search from Notification Requested!")
         val pixelSuffix = intent.getStringExtra(PIXEL_SUFFIX_EXTRA)
         val searchIntent = BrowserActivity.intent(context)
         TaskStackBuilder.create(context)
@@ -142,5 +148,6 @@ class NotificationHandlerService : IntentService("NotificationHandlerService") {
     companion object {
         const val PIXEL_SUFFIX_EXTRA = "PIXEL_SUFFIX_EXTRA"
         const val NOTIFICATION_SYSTEM_ID_EXTRA = "NOTIFICATION_SYSTEM_ID"
+        const val NOTIFICATION_AUTO_CANCEL = "NOTIFICATION_AUTO_CANCEL"
     }
 }

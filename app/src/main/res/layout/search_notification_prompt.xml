@@ -35,7 +35,7 @@
         android:layout_height="44dp"
         android:layout_gravity="center"
         android:gravity="center"
-        android:layout_marginTop="6dp"
+        android:layout_marginTop="10dp"
         android:layout_marginBottom="6dp"
         android:elevation="2dp"
         android:background="@drawable/search_widget_background_light"

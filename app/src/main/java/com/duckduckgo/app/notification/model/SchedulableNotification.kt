@@ -46,5 +46,6 @@ interface NotificationSpec {
     val launchButton: String?
     val closeButton: String?
     val pixelSuffix: String
+    val autoCancel: Boolean
 }
 

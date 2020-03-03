@@ -72,6 +72,7 @@ class NotificationFactory @Inject constructor(val context: Context, val manager:
             .setSmallIcon(specification.icon)
             .setContentIntent(launchIntent)
             .setAutoCancel(false)
+            .setOnlyAlertOnce(true)
             .setOngoing(true)
 
         specification.launchButton?.let {

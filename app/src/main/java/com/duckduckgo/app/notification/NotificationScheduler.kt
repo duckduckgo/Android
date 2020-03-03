@@ -26,6 +26,7 @@ import androidx.work.OneTimeWorkRequest
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
+import com.duckduckgo.app.notification.NotificationHandlerService.Companion.NOTIFICATION_AUTO_CANCEL
 import com.duckduckgo.app.notification.NotificationHandlerService.Companion.NOTIFICATION_SYSTEM_ID_EXTRA
 import com.duckduckgo.app.notification.NotificationHandlerService.Companion.PIXEL_SUFFIX_EXTRA
 import com.duckduckgo.app.notification.db.NotificationDao
@@ -65,9 +66,9 @@ class NotificationScheduler @Inject constructor(
         }
     }
 
-    fun launchStickySearchNotification(notificationId: Int) {
+    fun launchStickySearchNotification() {
         Timber.v("Posting sticky notification")
-        val request = OneTimeWorkRequestBuilder<SearchNotificationWorker>()
+        val request = OneTimeWorkRequestBuilder<StickySearchNotificationWorker>()
             .addTag(STICKY_REQUEST_TAG)
             .build()
 
@@ -75,9 +76,9 @@ class NotificationScheduler @Inject constructor(
     }
 
     fun launchSearchPromptNotification() {
-        Timber.v("Posting sticky notification")
+        Timber.v("Posting sticky search prompt notification")
         val request = OneTimeWorkRequestBuilder<SearchPromptNotificationWorker>()
-            .addTag(STICKY_REQUEST_TAG)
+            .addTag(STICKY_PROMPT_REQUEST_TAG)
             .build()
 
         workManager.enqueue(request)
@@ -131,6 +132,7 @@ class NotificationScheduler @Inject constructor(
             intent.type = eventType
             intent.putExtra(PIXEL_SUFFIX_EXTRA, specification.pixelSuffix)
             intent.putExtra(NOTIFICATION_SYSTEM_ID_EXTRA, specification.systemId)
+            intent.putExtra(NOTIFICATION_AUTO_CANCEL, specification.autoCancel)
             return getService(context, 0, intent, 0)!!
         }
     }
@@ -150,11 +152,14 @@ class NotificationScheduler @Inject constructor(
 
             val specification = notification.buildSpecification()
 
-            val cancelIntent = pendingNotificationHandlerIntent(context, notification.cancelIntent, specification)
             val launchIntent = pendingNotificationHandlerIntent(context, notification.launchIntent, specification)
+            val cancelIntent = pendingNotificationHandlerIntent(context, notification.cancelIntent, specification)
 
             val systemNotification =
                 factory.createSearchNotification(specification, launchIntent, cancelIntent, notification.layoutId, notification.priority)
+
+            // here we can change the importance of the channel
+            // manager.getNotificationChannel(ChannelType.SEARCH.id).importance =
 
             manager.notify(NotificationRegistrar.NotificationId.StickySearch, systemNotification)
 
@@ -167,6 +172,7 @@ class NotificationScheduler @Inject constructor(
             intent.type = eventType
             intent.putExtra(PIXEL_SUFFIX_EXTRA, specification.pixelSuffix)
             intent.putExtra(NOTIFICATION_SYSTEM_ID_EXTRA, specification.systemId)
+            intent.putExtra(NOTIFICATION_AUTO_CANCEL, specification.autoCancel)
             return getService(context, 0, intent, 0)!!
         }
     }
@@ -174,5 +180,6 @@ class NotificationScheduler @Inject constructor(
     companion object {
         const val WORK_REQUEST_TAG = "com.duckduckgo.notification.schedule"
         const val STICKY_REQUEST_TAG = "com.duckduckgo.notification.sticky"
+        const val STICKY_PROMPT_REQUEST_TAG = "com.duckduckgo.notification.sticky.prompt"
     }
 }

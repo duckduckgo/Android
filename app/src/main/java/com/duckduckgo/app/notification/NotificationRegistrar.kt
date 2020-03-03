@@ -103,6 +103,7 @@ class NotificationRegistrar @Inject constructor(
             SDK_INT >= O -> manager.notificationChannels.all { it.importance != IMPORTANCE_NONE }
             else -> true
         }
+
         updateStatus(systemEnabled && allChannelsEnabled)
     }
 

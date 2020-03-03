@@ -65,4 +65,5 @@ class StickySearchNotificationSpecification(context: Context) : NotificationSpec
     override val title: String = "Start a Search"
     override val description: String = "You can now search from anywhere!"
     override val pixelSuffix: String = "pp_sticky_search"
+    override val autoCancel = false
 }

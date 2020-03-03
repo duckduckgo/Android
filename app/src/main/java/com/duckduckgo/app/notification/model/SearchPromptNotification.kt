@@ -53,7 +53,7 @@ class SearchPromptNotification(
 }
 
 class StickySearchPromptSpecification(context: Context) : NotificationSpec {
-    override val channel = NotificationRegistrar.ChannelType.SEARCH
+    override val channel = NotificationRegistrar.ChannelType.TUTORIALS
     override val systemId = NotificationRegistrar.NotificationId.StickySearch
     override val name = "Add sticky search notification"
     override val icon = R.drawable.notification_logo
@@ -62,5 +62,6 @@ class StickySearchPromptSpecification(context: Context) : NotificationSpec {
     override val launchButton: String = context.getString(R.string.yes)
     override val closeButton: String? = context.getString(R.string.noThanks)
     override val pixelSuffix = "ssp"
+    override val autoCancel = false
 }
 
