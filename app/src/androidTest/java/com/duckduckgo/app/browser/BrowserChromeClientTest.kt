@@ -49,6 +49,12 @@ class BrowserChromeClientTest {
     }
 
     @Test
+    fun whenWindowClosedThenCloseCurrentTab() {
+        testee.onCloseWindow(window = null)
+        verify(mockWebViewClientListener).closeCurrentTab()
+    }
+
+    @Test
     fun whenCustomViewShownForFirstTimeListenerInstructedToGoFullScreen() {
         testee.onShowCustomView(fakeView, null)
         verify(mockWebViewClientListener).goFullScreen(fakeView)
