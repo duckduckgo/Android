@@ -27,7 +27,7 @@ import kotlinx.coroutines.launch
 import timber.log.Timber
 
 interface BrokenSiteSender {
-    fun submitBrokenSiteFeedback(comment: String, url: String)
+    fun submitBrokenSiteFeedback(webViewVersion: String, url: String)
 }
 
 class BrokenSiteSubmitter(
@@ -36,7 +36,7 @@ class BrokenSiteSubmitter(
     private val tdsDao: TdsDao
 ) : BrokenSiteSender {
 
-    override fun submitBrokenSiteFeedback(comment: String, url: String) {
+    override fun submitBrokenSiteFeedback(webViewVersion: String, url: String) {
         GlobalScope.launch(Dispatchers.IO) {
             val params = mapOf(
                 "category" to "",
@@ -51,7 +51,7 @@ class BrokenSiteSubmitter(
                 "os" to Build.VERSION.SDK_INT,
                 "manufacturer" to Build.MANUFACTURER,
                 "model" to Build.MODEL,
-                "wvVersion" to "",
+                "wvVersion" to webViewVersion,
                 "siteType" to ""
             )
 

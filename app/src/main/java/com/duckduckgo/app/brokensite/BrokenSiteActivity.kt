@@ -22,6 +22,7 @@ import android.os.Bundle
 import android.text.Editable
 import android.widget.EditText
 import androidx.lifecycle.Observer
+import androidx.webkit.WebViewCompat
 import com.duckduckgo.app.brokensite.BrokenSiteViewModel.Command
 import com.duckduckgo.app.brokensite.BrokenSiteViewModel.ViewState
 import com.duckduckgo.app.browser.R
@@ -63,7 +64,8 @@ class BrokenSiteActivity : DuckDuckGoActivity() {
             }
         })
         submitButton.setOnClickListener {
-            viewModel.onSubmitPressed()
+            val webViewVersion = WebViewCompat.getCurrentWebViewPackage(applicationContext)?.versionName ?: BrokenSiteViewModel.UNKNOWN_VERSION
+            viewModel.onSubmitPressed(webViewVersion)
         }
     }
 
@@ -71,12 +73,12 @@ class BrokenSiteActivity : DuckDuckGoActivity() {
         viewModel.command.observe(this, Observer {
             it?.let { processCommand(it) }
         })
-        viewModel.viewState.observe(this, Observer<BrokenSiteViewModel.ViewState> {
+        viewModel.viewState.observe(this, Observer<ViewState> {
             it?.let { render(it) }
         })
     }
 
-    private fun processCommand(command: BrokenSiteViewModel.Command) {
+    private fun processCommand(command: Command) {
         when (command) {
             Command.FocusUrl -> brokenSiteUrl.requestFocus()
             Command.FocusMessage -> feedbackMessage.requestFocus()

@@ -83,12 +83,15 @@ class BrokenSiteViewModel(private val pixel: Pixel, private val brokenSiteSender
         return true
     }
 
-    fun onSubmitPressed() {
-        val message = viewValue.message ?: return
+    fun onSubmitPressed(webViewVersion: String) {
         val url = viewValue.url ?: return
 
-        brokenSiteSender.submitBrokenSiteFeedback(message, url)
+        brokenSiteSender.submitBrokenSiteFeedback(webViewVersion, url)
         pixel.fire(Pixel.PixelName.BROKEN_SITE_REPORTED, mapOf(Pixel.PixelParameter.URL to url))
         command.value = Command.ConfirmAndFinish
+    }
+
+    companion object {
+        const val UNKNOWN_VERSION = "unknown"
     }
 }
