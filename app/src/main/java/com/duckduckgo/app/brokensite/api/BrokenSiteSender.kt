@@ -16,8 +16,10 @@
 
 package com.duckduckgo.app.brokensite.api
 
+import android.net.Uri
 import android.os.Build
 import com.duckduckgo.app.browser.BuildConfig
+import com.duckduckgo.app.global.isMobileSite
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.app.trackerdetection.db.TdsDao
@@ -37,6 +39,9 @@ class BrokenSiteSubmitter(
 ) : BrokenSiteSender {
 
     override fun submitBrokenSiteFeedback(webViewVersion: String, url: String) {
+
+        val siteType = if (Uri.parse(url).isMobileSite) "mobile" else "desktop"
+
         GlobalScope.launch(Dispatchers.IO) {
             val params = mapOf(
                 "category" to "",
@@ -52,7 +57,7 @@ class BrokenSiteSubmitter(
                 "manufacturer" to Build.MANUFACTURER,
                 "model" to Build.MODEL,
                 "wvVersion" to webViewVersion,
-                "siteType" to ""
+                "siteType" to siteType
             )
 
 //            runCatching {
