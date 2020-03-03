@@ -18,9 +18,9 @@ package com.duckduckgo.app.brokensite.api
 
 import android.os.Build
 import com.duckduckgo.app.browser.BuildConfig
-import com.duckduckgo.app.feedback.api.FeedbackService
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
+import com.duckduckgo.app.trackerdetection.db.TdsDao
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -33,25 +33,41 @@ interface BrokenSiteSender {
 class BrokenSiteSubmitter(
     private val statisticsStore: StatisticsDataStore,
     private val variantManager: VariantManager,
-    private val service: FeedbackService
+    private val tdsDao: TdsDao
 ) : BrokenSiteSender {
 
     override fun submitBrokenSiteFeedback(comment: String, url: String) {
         GlobalScope.launch(Dispatchers.IO) {
+            val params = mapOf(
+                "category" to "",
+                "siteUrl" to url,
+                "upgradedHttps" to false,
+                "tds" to tdsDao.eTag(),
+                "blockedTrackers" to "",
+                "surrogates" to "",
+                "extensionVersion" to "",
+                "appVersion" to BuildConfig.VERSION_NAME,
+                "atb" to atbWithVariant(),
+                "os" to Build.VERSION.SDK_INT,
+                "manufacturer" to Build.MANUFACTURER,
+                "model" to Build.MODEL,
+                "wvVersion" to "",
+                "siteType" to ""
+            )
 
-            runCatching {
-                service.submitBrokenSite(
-                    url = url,
-                    comment = comment,
-                    api = Build.VERSION.SDK_INT,
-                    manufacturer = Build.MANUFACTURER,
-                    model = Build.MODEL,
-                    version = BuildConfig.VERSION_NAME,
-                    atb = atbWithVariant()
-                ).execute()
-            }
-                .onSuccess { Timber.v("Feedback submission succeeded") }
-                .onFailure { Timber.w(it, "Feedback submission failed") }
+//            runCatching {
+//                service.submitBrokenSite(
+//                    url = url,
+//                    comment = comment,
+//                    api = Build.VERSION.SDK_INT,
+//                    manufacturer = Build.MANUFACTURER,
+//                    model = Build.MODEL,
+//                    version = BuildConfig.VERSION_NAME,
+//                    atb = atbWithVariant()
+//                ).execute()
+//            }
+//                .onSuccess { Timber.v("Feedback submission succeeded") }
+//                .onFailure { Timber.w(it, "Feedback submission failed") }
         }
     }
 

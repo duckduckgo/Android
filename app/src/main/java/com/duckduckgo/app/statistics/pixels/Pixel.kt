@@ -53,6 +53,7 @@ interface Pixel {
         WEB_RENDERER_GONE_CRASH("m_d_wrg_c"),
         WEB_RENDERER_GONE_KILLED("m_d_wrg_k"),
         BROKEN_SITE_REPORTED("m_bsr"),
+        BROKEN_SITE_REPORT("epbf_android"),
 
         ONBOARDING_DEFAULT_BROWSER_VISUALIZED("m_odb_v"),
         ONBOARDING_DEFAULT_BROWSER_LAUNCHED("m_odb_l"),

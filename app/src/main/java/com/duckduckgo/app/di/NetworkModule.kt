@@ -38,6 +38,7 @@ import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.app.surrogates.api.ResourceSurrogateListService
 import com.duckduckgo.app.survey.api.SurveyService
 import com.duckduckgo.app.trackerdetection.api.TrackerListService
+import com.duckduckgo.app.trackerdetection.db.TdsDao
 import com.jakewharton.retrofit2.adapter.kotlin.coroutines.CoroutineCallAdapterFactory
 import com.squareup.moshi.Moshi
 import dagger.Module
@@ -125,8 +126,8 @@ class NetworkModule {
         retrofit.create(ResourceSurrogateListService::class.java)
 
     @Provides
-    fun brokenSiteSender(statisticsStore: StatisticsDataStore, variantManager: VariantManager, feedbackService: FeedbackService): BrokenSiteSender =
-        BrokenSiteSubmitter(statisticsStore, variantManager, feedbackService)
+    fun brokenSiteSender(statisticsStore: StatisticsDataStore, variantManager: VariantManager, tdsDao: TdsDao): BrokenSiteSender =
+        BrokenSiteSubmitter(statisticsStore, variantManager, tdsDao)
 
     @Provides
     fun surveyService(@Named("api") retrofit: Retrofit): SurveyService =

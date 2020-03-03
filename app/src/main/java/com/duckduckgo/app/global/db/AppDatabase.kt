@@ -49,6 +49,7 @@ import com.duckduckgo.app.survey.model.Survey
 import com.duckduckgo.app.tabs.db.TabsDao
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabSelectionEntity
+import com.duckduckgo.app.trackerdetection.db.TdsDao
 import com.duckduckgo.app.trackerdetection.db.TdsDomainEntityDao
 import com.duckduckgo.app.trackerdetection.db.TdsTrackerDao
 import com.duckduckgo.app.trackerdetection.db.TemporaryTrackingWhitelistDao
@@ -59,7 +60,7 @@ import com.duckduckgo.app.usage.search.SearchCountDao
 import com.duckduckgo.app.usage.search.SearchCountEntity
 
 @Database(
-    exportSchema = true, version = 16, entities = [
+    exportSchema = true, version = 17, entities = [
         TdsTracker::class,
         TdsEntity::class,
         TdsDomainEntity::class,
@@ -78,7 +79,8 @@ import com.duckduckgo.app.usage.search.SearchCountEntity
         AppEnjoymentEntity::class,
         Notification::class,
         PrivacyProtectionCountsEntity::class,
-        UncaughtExceptionEntity::class
+        UncaughtExceptionEntity::class,
+        Tds::class
     ]
 )
 
@@ -111,6 +113,7 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun notificationDao(): NotificationDao
     abstract fun privacyProtectionCountsDao(): PrivacyProtectionCountDao
     abstract fun uncaughtExceptionDao(): UncaughtExceptionDao
+    abstract fun tdsDao(): TdsDao
 
     companion object {
         val MIGRATION_1_TO_2: Migration = object : Migration(1, 2) {
@@ -234,6 +237,12 @@ abstract class AppDatabase : RoomDatabase() {
             }
         }
 
+        val MIGRATION_16_TO_17: Migration = object : Migration(16, 17) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                database.execSQL("CREATE TABLE IF NOT EXISTS `tds` (`eTag` TEXT NOT NULL, PRIMARY KEY(`eTag`))")
+            }
+        }
+
         val ALL_MIGRATIONS: List<Migration>
             get() = listOf(
                 MIGRATION_1_TO_2,
@@ -250,7 +259,8 @@ abstract class AppDatabase : RoomDatabase() {
                 MIGRATION_12_TO_13,
                 MIGRATION_13_TO_14,
                 MIGRATION_14_TO_15,
-                MIGRATION_15_TO_16
+                MIGRATION_15_TO_16,
+                MIGRATION_16_TO_17
             )
     }
 }
