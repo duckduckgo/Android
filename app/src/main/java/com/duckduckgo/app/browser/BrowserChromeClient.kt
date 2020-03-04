@@ -116,4 +116,8 @@ class BrowserChromeClient @Inject constructor(private val uncaughtExceptionRepos
         }
         return false
     }
+
+    override fun onCloseWindow(window: WebView?) {
+        webViewClientListener?.closeCurrentTab()
+    }
 }
