@@ -43,7 +43,6 @@ import com.duckduckgo.app.systemsearch.SystemSearchViewModel.Command.*
 import com.duckduckgo.app.systemsearch.SystemSearchViewModel.SystemSearchResultsViewState
 import kotlinx.android.synthetic.main.activity_system_search.*
 import kotlinx.android.synthetic.main.include_system_search_onboarding.*
-import kotlinx.android.synthetic.main.include_system_search_onboarding_content.*
 import javax.inject.Inject
 
 class SystemSearchActivity : DuckDuckGoActivity() {
