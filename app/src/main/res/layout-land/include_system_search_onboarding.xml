@@ -21,8 +21,6 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginTop="6dp"
-    android:layout_marginBottom="2dp"
     android:background="?attr/colorPrimary"
     android:elevation="2dp"
     android:paddingStart="16dp"
@@ -36,17 +34,17 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:src="@drawable/interstitial_high_five"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="@+id/onboardingText"
+        app:layout_constraintEnd_toStartOf="@+id/onboardingText"
+        app:layout_constraintHorizontal_bias="0.75"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="@+id/onboardingText" />
 
     <TextView
         android:id="@+id/onboardingTitle"
-        android:layout_width="0dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="42dp"
-        android:layout_marginTop="2dp"
-        android:layout_marginEnd="42dp"
+        android:layout_marginTop="12dp"
         android:layout_marginBottom="12dp"
         android:fontFamily="sans-serif"
         android:gravity="center"
@@ -56,16 +54,13 @@
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/onboardingIcon"
-        app:layout_constraintWidth_max="300dp" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/onboardingText"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="42dp"
         android:layout_marginTop="6dp"
-        android:layout_marginEnd="42dp"
         android:layout_marginBottom="12dp"
         android:fontFamily="sans-serif"
         android:gravity="center"
@@ -74,10 +69,11 @@
         android:textSize="16sp"
         android:textStyle="normal"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/onboardingIcon"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/onboardingTitle"
         app:layout_constraintWidth_max="300dp" />
 
-    <include layout="@layout/include_system_search_onboarding_content"/>
+    <include layout="@layout/include_system_search_onboarding_content" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
