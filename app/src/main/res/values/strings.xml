@@ -366,4 +366,7 @@
     <string name="feedbackInitialDisambiguationSadButtonContentDescription">Negative feedback button</string>
     <string name="feedbackIsImportantToUs">Your anonymous feedback is important to us.</string>
 
+    <!-- System Search -->
+    <string name="systemSearchOmnibarInputHint"><font size="13">Search or type URL</font></string>
+
 </resources>

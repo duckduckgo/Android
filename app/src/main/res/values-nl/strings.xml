@@ -356,5 +356,6 @@
     <string name="feedbackInitialDisambiguationHappyButtonContentDescription">Knop positieve feedback</string>
     <string name="feedbackInitialDisambiguationSadButtonContentDescription">Knop negatieve feedback</string>
     <string name="feedbackIsImportantToUs">Jouw anonieme feedback is belangrijk voor ons.</string>
+    <string name="systemSearchOmnibarInputHint"><font size="13">URL zoeken of typen</font></string>
 
 </resources>

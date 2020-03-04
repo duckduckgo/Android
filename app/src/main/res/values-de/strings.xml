@@ -356,5 +356,6 @@
     <string name="feedbackInitialDisambiguationHappyButtonContentDescription">Schaltfläche für positives Feedback</string>
     <string name="feedbackInitialDisambiguationSadButtonContentDescription">Schaltfläche für negatives Feedback</string>
     <string name="feedbackIsImportantToUs">Dein anonymes Feedback ist uns wichtig.</string>
+    <string name="systemSearchOmnibarInputHint"><font size="13">URL eingeben oder suchen</font></string>
 
 </resources>

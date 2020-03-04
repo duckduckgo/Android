@@ -357,5 +357,6 @@
     <string name="feedbackInitialDisambiguationHappyButtonContentDescription">Tlačidlo pozitívnej spätnej väzby</string>
     <string name="feedbackInitialDisambiguationSadButtonContentDescription">Tlačidlo negatívnej spätnej väzby</string>
     <string name="feedbackIsImportantToUs">Anonymná spätná väzba je pre nás dôležitá.</string>
+    <string name="systemSearchOmnibarInputHint"><font size="13">Vyhľadať alebo zadať webovú adresu</font></string>
 
 </resources>

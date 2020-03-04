@@ -356,5 +356,6 @@
     <string name="feedbackInitialDisambiguationHappyButtonContentDescription">Бутон за положителни отзиви</string>
     <string name="feedbackInitialDisambiguationSadButtonContentDescription">Бутон за отрицателни отзиви</string>
     <string name="feedbackIsImportantToUs">Вашите анонимни отзиви са важни за нас.</string>
+    <string name="systemSearchOmnibarInputHint"><font size="13">Търсене или въвеждане на URL адрес</font></string>
 
 </resources>

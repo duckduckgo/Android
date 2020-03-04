@@ -372,5 +372,6 @@
     <string name="feedbackInitialDisambiguationHappyButtonContentDescription">Pulsante feedback positivo</string>
     <string name="feedbackInitialDisambiguationSadButtonContentDescription">Pulsante feedback negativo</string>
     <string name="feedbackIsImportantToUs">Il tuo feedback anonimo è importante per noi.</string>
+    <string name="systemSearchOmnibarInputHint"><font size="13">Cerca o inserisci URL</font></string>
 
 </resources>

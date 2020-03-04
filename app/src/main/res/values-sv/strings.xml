@@ -372,5 +372,6 @@
     <string name="feedbackInitialDisambiguationHappyButtonContentDescription">Knappen för positiv återkoppling</string>
     <string name="feedbackInitialDisambiguationSadButtonContentDescription">Knappen för negativ återkoppling</string>
     <string name="feedbackIsImportantToUs">Din anonyma återkoppling är viktig för oss.</string>
+    <string name="systemSearchOmnibarInputHint"><font size="13">Sök eller skriv in URL</font></string>
 
 </resources>

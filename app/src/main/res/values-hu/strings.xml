@@ -356,5 +356,6 @@
     <string name="feedbackInitialDisambiguationHappyButtonContentDescription">Pozitív visszajelzés gomb</string>
     <string name="feedbackInitialDisambiguationSadButtonContentDescription">Negatív visszajelzés gomb</string>
     <string name="feedbackIsImportantToUs">Anonim visszajelzésed fontos számunkra.</string>
+    <string name="systemSearchOmnibarInputHint"><font size="13">Keresés vagy URL beírása</font></string>
 
 </resources>

@@ -379,5 +379,6 @@
     <string name="feedbackInitialDisambiguationHappyButtonContentDescription">Кнопка отправки положительного отзыва</string>
     <string name="feedbackInitialDisambiguationSadButtonContentDescription">Кнопка отправки отрицательного отзыва</string>
     <string name="feedbackIsImportantToUs">Ваш отзыв важен для нас. Отзыв анонимный.</string>
+    <string name="systemSearchOmnibarInputHint"><font size="13">Выполнить поиск или ввести URL-адрес</font></string>
 
 </resources>

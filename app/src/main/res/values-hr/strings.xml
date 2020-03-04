@@ -356,5 +356,6 @@
     <string name="feedbackInitialDisambiguationHappyButtonContentDescription">Gumb za pozitivne povratne informacije</string>
     <string name="feedbackInitialDisambiguationSadButtonContentDescription">Gumb za negativne povratne informacije</string>
     <string name="feedbackIsImportantToUs">Vaše anonimne povratne informacije su važne za nas.</string>
+    <string name="systemSearchOmnibarInputHint"><font size="13">Traži ili upiši URL adresu</font></string>
 
 </resources>

@@ -356,5 +356,6 @@
     <string name="feedbackInitialDisambiguationHappyButtonContentDescription">Knap til positiv feedback</string>
     <string name="feedbackInitialDisambiguationSadButtonContentDescription">Knap til negativ feedback</string>
     <string name="feedbackIsImportantToUs">Din anonyme feedback er vigtig for os.</string>
+    <string name="systemSearchOmnibarInputHint"><font size="13">Søg eller indtast URL</font></string>
 
 </resources>

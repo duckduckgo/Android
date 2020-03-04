@@ -360,5 +360,6 @@
     <string name="feedbackInitialDisambiguationHappyButtonContentDescription">Buton feedback pozitiv</string>
     <string name="feedbackInitialDisambiguationSadButtonContentDescription">Buton feedback negativ</string>
     <string name="feedbackIsImportantToUs">Feedbackul dvs. anonim este important pentru noi.</string>
+    <string name="systemSearchOmnibarInputHint"><font size="13">Căutare sau tastare URL</font></string>
 
 </resources>
