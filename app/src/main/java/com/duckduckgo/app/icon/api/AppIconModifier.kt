@@ -45,10 +45,6 @@ enum class AppIcon(
         componentName = "$QUALIFIER.Launcher",
         icon = R.drawable.ic_app_icon_red_round
     ),
-    WHITE(
-        componentName = "$QUALIFIER.LauncherWhite",
-        icon = R.drawable.ic_app_icon_white_round
-    ),
     GOLD(
         componentName = "$QUALIFIER.LauncherGold",
         icon = R.drawable.ic_app_icon_gold_round
