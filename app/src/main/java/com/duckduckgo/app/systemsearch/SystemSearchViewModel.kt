@@ -24,6 +24,7 @@ import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteResult
 import com.duckduckgo.app.global.DefaultDispatcherProvider
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.SingleLiveEvent
+import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.jakewharton.rxrelay2.PublishRelay
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
@@ -32,15 +33,17 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
+import javax.inject.Inject
 
 class SystemSearchViewModel(
+    private var onboardingStore: OnboardingStore,
     private val autoComplete: AutoComplete,
     private val deviceAppLookup: DeviceAppLookup,
     private val dispatchers: DispatcherProvider = DefaultDispatcherProvider()
 ) : ViewModel() {
 
     data class OnboardingViewState(
-        val visibile: Boolean = true,
+        val visibile: Boolean,
         val expanded: Boolean = false
     )
 
@@ -83,7 +86,7 @@ class SystemSearchViewModel(
     }
 
     private fun resetOnboardingState() {
-        onboardingViewState.value = OnboardingViewState()
+        onboardingViewState.value = OnboardingViewState(visibile = onboardingStore.shouldShow)
     }
 
     private fun resetResultsState() {
@@ -113,6 +116,7 @@ class SystemSearchViewModel(
 
     fun userDismissedOnboarding() {
         onboardingViewState.value = currentOnboardingState().copy(visibile = false)
+        onboardingStore.onboardingShown()
     }
 
     fun userUpdatedQuery(query: String) {

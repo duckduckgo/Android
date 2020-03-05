@@ -113,7 +113,7 @@ class ViewModelFactory @Inject constructor(
         with(modelClass) {
             when {
                 isAssignableFrom(LaunchViewModel::class.java) -> LaunchViewModel(onboardingStore, appInstallationReferrerStateListener)
-                isAssignableFrom(SystemSearchViewModel::class.java) -> SystemSearchViewModel(autoCompleteApi, deviceAppLookup)
+                isAssignableFrom(SystemSearchViewModel::class.java) -> SystemSearchViewModel(onboardingStore, autoCompleteApi, deviceAppLookup)
                 isAssignableFrom(OnboardingViewModel::class.java) -> onboardingViewModel()
                 isAssignableFrom(BrowserViewModel::class.java) -> browserViewModel()
                 isAssignableFrom(BrowserTabViewModel::class.java) -> browserTabViewModel()
