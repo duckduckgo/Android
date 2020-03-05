@@ -36,6 +36,7 @@ import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.NOTIFICATION_CANCELLED
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.NOTIFICATION_LAUNCHED
+import com.duckduckgo.app.systemsearch.SystemSearchActivity
 import dagger.android.AndroidInjection
 import timber.log.Timber
 import javax.inject.Inject
@@ -105,9 +106,6 @@ class NotificationHandlerService : IntentService("NotificationHandlerService") {
     private fun onStickySearchNotificationRequest(intent: Intent) {
         Timber.i("Sticky Search Notification Requested!")
         val pixelSuffix = intent.getStringExtra(PIXEL_SUFFIX_EXTRA)
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            notificationManager.getNotificationChannel(NotificationRegistrar.ChannelType.SEARCH.id)?.importance = NotificationManager.IMPORTANCE_MIN
-        }
         settingsDataStore.searchNotificationEnabled = true
         notificationScheduler.launchStickySearchNotification()
         pixel.fire("${NOTIFICATION_LAUNCHED.pixelName}_$pixelSuffix")
@@ -126,7 +124,7 @@ class NotificationHandlerService : IntentService("NotificationHandlerService") {
     private fun onSearchRequest(intent: Intent) {
         Timber.i("Search from Notification Requested!")
         val pixelSuffix = intent.getStringExtra(PIXEL_SUFFIX_EXTRA)
-        val searchIntent = BrowserActivity.intent(context)
+        val searchIntent = SystemSearchActivity.intent(context)
         TaskStackBuilder.create(context)
             .addNextIntentWithParentStack(searchIntent)
             .startActivities()

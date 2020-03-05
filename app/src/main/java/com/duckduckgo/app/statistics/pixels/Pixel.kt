@@ -94,6 +94,7 @@ interface Pixel {
         WIDGETS_ADDED(pixelName = "m_w_a"),
         WIDGETS_DELETED(pixelName = "m_w_d"),
 
+        APP_NOTIFICATION_LAUNCH(pixelName = "m_n_l"),
         APP_WIDGET_LAUNCH(pixelName = "m_w_l"),
         APP_ASSIST_LAUNCH(pixelName = "m_a_l"),
         APP_SYSTEM_SEARCH_BOX_LAUNCH(pixelName = "m_ssb_l"),

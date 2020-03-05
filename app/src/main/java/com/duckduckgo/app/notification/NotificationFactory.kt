@@ -67,8 +67,8 @@ class NotificationFactory @Inject constructor(val context: Context, val manager:
 
         val builder = NotificationCompat.Builder(context, specification.channel.id)
             .setPriority(priority)
-            .setStyle(NotificationCompat.DecoratedCustomViewStyle())
             .setCustomContentView(notificationLayout)
+            .setCustomBigContentView(notificationLayout)
             .setSmallIcon(specification.icon)
             .setContentIntent(launchIntent)
             .setAutoCancel(false)

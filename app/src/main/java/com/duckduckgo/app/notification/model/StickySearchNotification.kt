@@ -37,7 +37,7 @@ class StickySearchNotification(
 
     override val layoutId = R.layout.search_notification
 
-    override val priority = NotificationManagerCompat.IMPORTANCE_MIN
+    override val priority = NotificationManagerCompat.IMPORTANCE_DEFAULT
 
     override suspend fun canShow(): Boolean {
 

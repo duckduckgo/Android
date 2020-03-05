@@ -77,7 +77,7 @@ class SettingsSharedPreferences @Inject constructor(private val context: Context
         set(enabled) = preferences.edit { putBoolean(KEY_AUTOCOMPLETE_ENABLED, enabled) }
 
     override var searchNotificationEnabled: Boolean
-        get() = preferences.getBoolean(KEY_SEARCH_NOTIFICATION, true)
+        get() = preferences.getBoolean(KEY_SEARCH_NOTIFICATION, false)
         set(enabled) = preferences.edit { putBoolean(KEY_SEARCH_NOTIFICATION, enabled) }
 
     override var appUsedSinceLastClear: Boolean

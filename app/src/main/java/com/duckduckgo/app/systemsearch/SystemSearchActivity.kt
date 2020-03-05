@@ -39,7 +39,15 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelName
 import com.duckduckgo.app.systemsearch.SystemSearchViewModel.Command.*
 import com.duckduckgo.app.systemsearch.SystemSearchViewModel.SystemSearchViewState
-import kotlinx.android.synthetic.main.activity_system_search.*
+import kotlinx.android.synthetic.main.activity_system_search.appBarLayout
+import kotlinx.android.synthetic.main.activity_system_search.autocompleteSuggestions
+import kotlinx.android.synthetic.main.activity_system_search.clearTextButton
+import kotlinx.android.synthetic.main.activity_system_search.deviceAppSuggestions
+import kotlinx.android.synthetic.main.activity_system_search.deviceLabel
+import kotlinx.android.synthetic.main.activity_system_search.logo
+import kotlinx.android.synthetic.main.activity_system_search.omnibarTextInput
+import kotlinx.android.synthetic.main.activity_system_search.results
+import kotlinx.android.synthetic.main.activity_system_search.toolbar
 import javax.inject.Inject
 
 class SystemSearchActivity : DuckDuckGoActivity() {
@@ -83,6 +91,7 @@ class SystemSearchActivity : DuckDuckGoActivity() {
         when {
             launchedFromAssist(intent) -> pixel.fire(PixelName.APP_ASSIST_LAUNCH)
             launchedFromWidget(intent) -> pixel.fire(PixelName.APP_WIDGET_LAUNCH)
+            launchedFromNotification(intent) -> pixel.fire(PixelName.APP_NOTIFICATION_LAUNCH)
             launchedFromSystemSearchBox(intent) -> pixel.fire(PixelName.APP_SYSTEM_SEARCH_BOX_LAUNCH)
         }
     }
@@ -216,15 +225,21 @@ class SystemSearchActivity : DuckDuckGoActivity() {
         return intent.getBooleanExtra(WIDGET_SEARCH_EXTRA, false)
     }
 
+    private fun launchedFromNotification(intent: Intent): Boolean {
+        return intent.getBooleanExtra(NOTIFICATION_SEARCH_EXTRA, false)
+    }
+
     companion object {
 
+        const val NOTIFICATION_SEARCH_EXTRA = "NOTIFICATION_SEARCH_EXTRA"
         const val WIDGET_SEARCH_EXTRA = "WIDGET_SEARCH_EXTRA"
         const val NEW_SEARCH_ACTION = "com.duckduckgo.mobile.android.NEW_SEARCH"
         const val MINIMUM_SCROLL_HEIGHT = 86 // enough space for blank "no suggestion" and padding
 
-        fun intent(context: Context, widgetSearch: Boolean = false): Intent {
+        fun intent(context: Context, widgetSearch: Boolean = false, notificationSearch: Boolean = false): Intent {
             val intent = Intent(context, SystemSearchActivity::class.java)
             intent.putExtra(WIDGET_SEARCH_EXTRA, widgetSearch)
+            intent.putExtra(NOTIFICATION_SEARCH_EXTRA, notificationSearch)
             return intent
         }
     }
