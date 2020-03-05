@@ -80,7 +80,7 @@ class ChangeIconViewModelTest {
     }
 
     @Test
-    fun storesIconWhenUserSelectsIt() {
+    fun whenIconIsSelectedSettingsAreUpdated() {
         val previousIcon = AppIcon.BLUE
         val selectedIcon = AppIcon.BLACK
         val selectedIconViewData = ChangeIconViewModel.IconViewData(selectedIcon, true)

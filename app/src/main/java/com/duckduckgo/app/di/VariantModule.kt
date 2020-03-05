@@ -39,8 +39,4 @@ class VariantModule {
 
     @Provides
     fun weightedRandomizer() = WeightedRandomizer()
-
-    @Provides
-    fun appIconModifier(context: Context, appShortcutCreator: AppShortcutCreator): IconModifier =
-        AppIconModifier(context, appShortcutCreator)
 }
