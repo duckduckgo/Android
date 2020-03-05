@@ -19,6 +19,7 @@ package com.duckduckgo.app.settings.db
 import android.content.Context
 import android.content.SharedPreferences
 import androidx.core.content.edit
+import com.duckduckgo.app.browser.BuildConfig
 import com.duckduckgo.app.global.DuckDuckGoTheme
 import com.duckduckgo.app.icon.api.AppIcon
 import com.duckduckgo.app.settings.clear.ClearWhatOption
@@ -79,7 +80,7 @@ class SettingsSharedPreferences @Inject constructor(private val context: Context
 
     override var appIcon: AppIcon
         get() {
-            val componentName = preferences.getString(KEY_APP_ICON, AppIcon.DEFAULT.componentName) ?: return AppIcon.DEFAULT
+            val componentName = preferences.getString(KEY_APP_ICON, DEFAULT_ICON.componentName) ?: return DEFAULT_ICON
             return AppIcon.from(componentName)
         }
         set(appIcon) = preferences.edit(commit = true) { putString(KEY_APP_ICON, appIcon.componentName) }
@@ -142,5 +143,11 @@ class SettingsSharedPreferences @Inject constructor(private val context: Context
         const val KEY_APP_USED_SINCE_LAST_CLEAR = "APP_USED_SINCE_LAST_CLEAR"
         const val KEY_HIDE_TIPS = "HIDE_TIPS"
         const val KEY_APP_ICON = "APP_ICON"
+
+        private val DEFAULT_ICON = if (BuildConfig.DEBUG){
+            AppIcon.BLUE
+        } else {
+            AppIcon.DEFAULT
+        }
     }
 }
