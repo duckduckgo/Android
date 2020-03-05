@@ -17,167 +17,173 @@
   ~ limitations under the License.
   -->
 
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:layout_marginBottom="2dp"
-    android:background="?attr/colorPrimary"
-    android:clipToPadding="false"
-    android:elevation="4dp"
-    android:paddingStart="16dp"
-    android:paddingEnd="16dp"
-    app:layout_constraintEnd_toEndOf="parent"
-    app:layout_constraintStart_toStartOf="parent"
-    app:layout_constraintTop_toTopOf="parent"
-    tools:context="com.duckduckgo.app.systemsearch.SystemSearchActivity"
-    tools:showIn="@layout/include_system_search_onboarding">
+    xmlns:tools="http://schemas.android.com/tools">
 
-    <androidx.appcompat.widget.AppCompatImageView
-        android:id="@+id/onboardingIcon"
-        android:layout_width="wrap_content"
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/onboarding"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:src="@drawable/interstitial_high_five"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <TextView
-        android:id="@+id/onboardingTitle"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="42dp"
         android:layout_marginTop="2dp"
-        android:layout_marginEnd="42dp"
-        android:layout_marginBottom="12dp"
-        android:fontFamily="sans-serif"
-        android:gravity="center"
-        android:text="@string/duckDuckGoPrivacySimplified"
-        android:textColor="?attr/normalTextColor"
-        android:textSize="16sp"
-        android:textStyle="bold"
+        android:layout_marginBottom="2dp"
+        android:background="?attr/colorPrimary"
+        android:clipToPadding="false"
+        android:elevation="4dp"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/onboardingIcon"
-        app:layout_constraintWidth_max="300dp" />
+        app:layout_constraintTop_toTopOf="parent"
+        tools:context="com.duckduckgo.app.systemsearch.SystemSearchActivity"
+        tools:showIn="@layout/include_system_search_onboarding">
 
-    <TextView
-        android:id="@+id/onboardingText"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="42dp"
-        android:layout_marginTop="6dp"
-        android:layout_marginEnd="42dp"
-        android:layout_marginBottom="12dp"
-        android:fontFamily="sans-serif"
-        android:gravity="center"
-        android:text="@string/systemSearchOnboardingText"
-        android:textColor="?attr/normalTextColor"
-        android:textSize="16sp"
-        android:textStyle="normal"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/onboardingTitle"
-        app:layout_constraintWidth_max="300dp" />
-
-    <LinearLayout
-        android:id="@+id/checkmarks"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="12dp"
-        android:layout_marginTop="10dp"
-        android:layout_marginEnd="12dp"
-        android:layout_marginBottom="12dp"
-        android:orientation="vertical"
-        android:visibility="gone"
-        app:layout_constraintEnd_toEndOf="@id/onboardingText"
-        app:layout_constraintStart_toStartOf="@id/onboardingText"
-        app:layout_constraintTop_toBottomOf="@id/onboardingText"
-        tools:visibility="visible">
-
-        <TextView
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/onboardingIcon"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:src="@drawable/interstitial_high_five"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/onboardingTitle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="42dp"
+            android:layout_marginTop="2dp"
+            android:layout_marginEnd="42dp"
+            android:layout_marginBottom="12dp"
+            android:fontFamily="sans-serif"
+            android:gravity="center"
+            android:text="@string/duckDuckGoPrivacySimplified"
+            android:textColor="?attr/normalTextColor"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/onboardingIcon"
+            app:layout_constraintWidth_max="300dp" />
+
+        <TextView
+            android:id="@+id/onboardingText"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="42dp"
+            android:layout_marginTop="6dp"
+            android:layout_marginEnd="42dp"
+            android:layout_marginBottom="12dp"
+            android:fontFamily="sans-serif"
+            android:gravity="center"
+            android:text="@string/systemSearchOnboardingText"
+            android:textColor="?attr/normalTextColor"
+            android:textSize="16sp"
+            android:textStyle="normal"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/onboardingTitle"
+            app:layout_constraintWidth_max="300dp" />
+
+        <LinearLayout
+            android:id="@+id/checkmarks"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginEnd="12dp"
+            android:layout_marginBottom="12dp"
+            android:orientation="vertical"
+            android:visibility="gone"
+            app:layout_constraintEnd_toEndOf="@id/onboardingText"
+            app:layout_constraintStart_toStartOf="@id/onboardingText"
+            app:layout_constraintTop_toBottomOf="@id/onboardingText"
+            tools:visibility="visible">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:layout_marginBottom="6dp"
+                android:fontFamily="sans-serif"
+                android:text="@string/systemSearchOnboaringFeaturesIntroText"
+                android:textColor="?attr/normalTextColor"
+                android:textSize="14sp"
+                android:textStyle="normal" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:layout_marginBottom="6dp"
+                android:drawableStart="@drawable/ic_success"
+                android:drawablePadding="12dp"
+                android:fontFamily="sans-serif"
+                android:text="@string/systemSearchOnboaringFeatureOneText"
+                android:textColor="?attr/normalTextColor"
+                android:textSize="14sp"
+                android:textStyle="normal" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:layout_marginBottom="6dp"
+                android:drawableStart="@drawable/ic_success"
+                android:drawablePadding="12dp"
+                android:fontFamily="sans-serif"
+                android:text="@string/systemSearchOnboaringFeatureTwoText"
+                android:textColor="?attr/normalTextColor"
+                android:textSize="14sp"
+                android:textStyle="normal" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:layout_marginBottom="6dp"
+                android:drawableStart="@drawable/ic_success"
+                android:drawablePadding="12dp"
+                android:fontFamily="sans-serif"
+                android:text="@string/systemSearchOnboaringFeatureThreeText"
+                android:textColor="?attr/normalTextColor"
+                android:textSize="14sp"
+                android:textStyle="normal" />
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/okButton"
+            style="?android:attr/borderlessButtonStyle"
+            android:layout_width="0dp"
+            android:layout_height="36dp"
+            android:layout_marginStart="8dp"
             android:layout_marginTop="12dp"
-            android:layout_marginBottom="6dp"
-            android:fontFamily="sans-serif"
-            android:text="@string/systemSearchOnboaringFeaturesIntroText"
-            android:textColor="?attr/normalTextColor"
-            android:textSize="14sp"
-            android:textStyle="normal" />
+            android:layout_marginEnd="12dp"
+            android:layout_marginBottom="16dp"
+            android:text="@string/systemSearchOnboardingButtonOk"
+            android:textColor="@color/cornflowerBlue"
+            android:textSize="13sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/checkmarks" />
 
-        <TextView
+        <Button
+            android:id="@+id/toggleButton"
+            style="?android:attr/borderlessButtonStyle"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="6dp"
-            android:layout_marginBottom="6dp"
-            android:drawableStart="@drawable/ic_success"
-            android:drawablePadding="12dp"
-            android:fontFamily="sans-serif"
-            android:text="@string/systemSearchOnboaringFeatureOneText"
-            android:textColor="?attr/normalTextColor"
-            android:textSize="14sp"
-            android:textStyle="normal" />
+            android:layout_height="36dp"
+            android:layout_marginStart="12dp"
+            android:layout_marginTop="12dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginBottom="16dp"
+            android:text="@string/systemSearchOnboardingButtonMore"
+            android:textColor="@color/cornflowerBlue"
+            android:textSize="13sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/okButton"
+            app:layout_constraintTop_toBottomOf="@id/checkmarks" />
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="6dp"
-            android:layout_marginBottom="6dp"
-            android:drawableStart="@drawable/ic_success"
-            android:drawablePadding="12dp"
-            android:fontFamily="sans-serif"
-            android:text="@string/systemSearchOnboaringFeatureTwoText"
-            android:textColor="?attr/normalTextColor"
-            android:textSize="14sp"
-            android:textStyle="normal" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="6dp"
-            android:layout_marginBottom="6dp"
-            android:drawableStart="@drawable/ic_success"
-            android:drawablePadding="12dp"
-            android:fontFamily="sans-serif"
-            android:text="@string/systemSearchOnboaringFeatureThreeText"
-            android:textColor="?attr/normalTextColor"
-            android:textSize="14sp"
-            android:textStyle="normal" />
-    </LinearLayout>
-
-    <Button
-        android:id="@+id/okButton"
-        style="?android:attr/borderlessButtonStyle"
-        android:layout_width="0dp"
-        android:layout_height="36dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="12dp"
-        android:layout_marginEnd="12dp"
-        android:layout_marginBottom="16dp"
-        android:text="@string/systemSearchOnboardingButtonOk"
-        android:textColor="@color/cornflowerBlue"
-        android:textSize="13sp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/checkmarks" />
-
-    <Button
-        android:id="@+id/toggleButton"
-        style="?android:attr/borderlessButtonStyle"
-        android:layout_width="wrap_content"
-        android:layout_height="36dp"
-        android:layout_marginStart="12dp"
-        android:layout_marginTop="12dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginBottom="16dp"
-        android:text="@string/systemSearchOnboardingButtonMore"
-        android:textColor="@color/cornflowerBlue"
-        android:textSize="13sp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@id/okButton"
-        app:layout_constraintTop_toBottomOf="@id/checkmarks" />
-
-</androidx.constraintlayout.widget.ConstraintLayout>
+</merge>

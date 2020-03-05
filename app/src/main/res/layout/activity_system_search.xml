@@ -123,7 +123,6 @@
             android:elevation="4dp">
 
             <include
-                android:id="@+id/onboarding"
                 layout="@layout/include_system_search_onboarding"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
