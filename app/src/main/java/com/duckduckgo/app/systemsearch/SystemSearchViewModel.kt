@@ -91,22 +91,21 @@ class SystemSearchViewModel(
 
         appsJob?.cancel()
 
-        val trimmedQuery = query.trim()
-
-        if (trimmedQuery == currentViewState().queryText) {
+        if (query == currentViewState().queryText) {
             return
         }
 
-        if (trimmedQuery.isBlank()) {
+        if (query.isBlank()) {
             userClearedQuery()
             return
         }
 
-        viewState.value = currentViewState().copy(queryText = trimmedQuery)
-        autoCompletePublishSubject.accept(trimmedQuery)
+        viewState.value = currentViewState().copy(queryText = query)
 
+        val trimmedQuery = query.trim()
+        autoCompletePublishSubject.accept(trimmedQuery)
         appsJob = viewModelScope.launch(dispatchers.io()) {
-            updateAppResults(deviceAppLookup.query(query))
+            updateAppResults(deviceAppLookup.query(trimmedQuery))
         }
     }
 

@@ -86,6 +86,18 @@ class SystemSearchViewModelTest {
     }
 
     @Test
+    fun whenUserAddsSpaceToQueryThenViewStateMatchesAndSpaceTrimmedFromAutocomplete() = ruleRunBlockingTest {
+        testee.userUpdatedQuery(QUERY)
+        testee.userUpdatedQuery("$QUERY ")
+
+        val newViewState = testee.viewState.value
+        assertNotNull(newViewState)
+        assertEquals("$QUERY ", newViewState?.queryText)
+        assertEquals(appQueryResult, newViewState?.appResults)
+        assertEquals(autocompleteQueryResult, newViewState?.autocompleteResults)
+    }
+
+    @Test
     fun whenUserClearsQueryThenViewStateReset() = ruleRunBlockingTest {
         testee.userUpdatedQuery(QUERY)
         testee.userClearedQuery()
