@@ -71,6 +71,7 @@ class NotificationFactory @Inject constructor(val context: Context, val manager:
             .setCustomBigContentView(notificationLayout)
             .setSmallIcon(specification.icon)
             .setContentIntent(launchIntent)
+            .setVisibility(NotificationCompat.VISIBILITY_SECRET)
             .setAutoCancel(false)
             .setOnlyAlertOnce(true)
             .setOngoing(true)
