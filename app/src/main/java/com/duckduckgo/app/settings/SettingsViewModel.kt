@@ -26,6 +26,7 @@ import com.duckduckgo.app.notification.NotificationScheduler
 import com.duckduckgo.app.settings.clear.ClearWhatOption
 import com.duckduckgo.app.settings.clear.ClearWhenOption
 import com.duckduckgo.app.settings.db.SettingsDataStore
+import com.duckduckgo.app.statistics.Variant
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelName
@@ -46,6 +47,7 @@ class SettingsViewModel @Inject constructor(
         val version: String = "",
         val lightThemeEnabled: Boolean = false,
         val autoCompleteSuggestionsEnabled: Boolean = true,
+        val searchNotificationExperimentEnabled: Boolean = false,
         val searchNotificationEnabled: Boolean = false,
         val showDefaultBrowserSetting: Boolean = false,
         val isAppDefaultBrowser: Boolean = false,
@@ -87,6 +89,7 @@ class SettingsViewModel @Inject constructor(
             loading = false,
             lightThemeEnabled = isLightTheme,
             autoCompleteSuggestionsEnabled = settingsDataStore.autoCompleteSuggestionsEnabled,
+            searchNotificationExperimentEnabled = isSearchNotificationExperimentEnabled(variant),
             searchNotificationEnabled = settingsDataStore.searchNotificationEnabled,
             isAppDefaultBrowser = defaultBrowserAlready,
             showDefaultBrowserSetting = defaultWebBrowserCapability.deviceSupportsDefaultBrowserConfiguration(),
@@ -194,6 +197,10 @@ class SettingsViewModel @Inject constructor(
             ClearWhenOption.APP_EXIT_OR_60_MINS -> AUTOMATIC_CLEAR_DATA_WHEN_OPTION_APP_EXIT_OR_60_MINS
             else -> null
         }
+    }
+
+    private fun isSearchNotificationExperimentEnabled(variant: Variant): Boolean {
+        return variant.hasFeature(VariantManager.VariantFeature.SearchNotification)
     }
 
 }
