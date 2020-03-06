@@ -32,7 +32,11 @@ import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.Variant
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.nhaarman.mockitokotlin2.*
+import com.nhaarman.mockitokotlin2.KArgumentCaptor
+import com.nhaarman.mockitokotlin2.argumentCaptor
+import com.nhaarman.mockitokotlin2.atLeastOnce
+import com.nhaarman.mockitokotlin2.verify
+import com.nhaarman.mockitokotlin2.whenever
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Rule
@@ -214,6 +218,31 @@ class SettingsViewModelTest {
         testee.start()
         val expectedStartString = "${BuildConfig.VERSION_NAME} ab (${BuildConfig.VERSION_CODE})"
         assertEquals(expectedStartString, latestViewState().version)
+    }
+
+    @Test
+    fun whenSearchNotificationWasPreviouslyEnabledViewStateIndicatesIt() {
+        whenever(mockAppSettingsDataStore.searchNotificationEnabled).thenReturn(true)
+        testee.start()
+        assertTrue(latestViewState().searchNotificationEnabled)
+    }
+
+    @Test
+    fun whenSearchNotificationToggledOnThenDataStoreIsUpdatedAndNotificationShown() {
+        testee.onSearchNotificationSettingChanged(true)
+        verify(mockAppSettingsDataStore).searchNotificationEnabled = true
+        verify(notificationScheduler).launchStickySearchNotification()
+
+        assertTrue(latestViewState().searchNotificationEnabled)
+    }
+
+    @Test
+    fun whenSearchNotificationToggledOffThenDataStoreIsUpdatedAndNotificationRemoved() {
+        testee.onSearchNotificationSettingChanged(false)
+        verify(mockAppSettingsDataStore).searchNotificationEnabled = false
+        verify(notificationScheduler).dismissStickySearchNotification()
+
+        assertFalse(latestViewState().searchNotificationEnabled)
     }
 
     private fun latestViewState() = testee.viewState.value!!
