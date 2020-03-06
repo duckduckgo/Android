@@ -33,7 +33,6 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
-import javax.inject.Inject
 
 class SystemSearchViewModel(
     private var onboardingStore: OnboardingStore,
@@ -123,22 +122,21 @@ class SystemSearchViewModel(
 
         appsJob?.cancel()
 
-        val trimmedQuery = query.trim()
-
-        if (trimmedQuery == currentResultsState().queryText) {
+        if (query == currentResultsState().queryText) {
             return
         }
 
-        if (trimmedQuery.isBlank()) {
+        if (query.isBlank()) {
             userClearedQuery()
             return
         }
 
-        resutlsViewState.value = currentResultsState().copy(queryText = trimmedQuery)
-        autoCompletePublishSubject.accept(trimmedQuery)
+        resutlsViewState.value = currentResultsState().copy(queryText = query)
 
+        val trimmedQuery = query.trim()
+        autoCompletePublishSubject.accept(trimmedQuery)
         appsJob = viewModelScope.launch(dispatchers.io()) {
-            updateAppResults(deviceAppLookup.query(query))
+            updateAppResults(deviceAppLookup.query(trimmedQuery))
         }
     }
 

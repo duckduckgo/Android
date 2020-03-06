@@ -33,14 +33,14 @@ class VariantManagerTest {
     @Test
     fun serpControlVariantIsInactiveAndHasNoFeatures() {
         val variant = variants.first { it.key == "sc" }
-        assertEqualsDouble(0.0, variant.weight)
+        assertEqualsDouble(1.0, variant.weight)
         assertEquals(0, variant.features.size)
     }
 
     @Test
     fun serpExperimentalVariantIsInactiveAndHasNoFeatures() {
         val variant = variants.first { it.key == "se" }
-        assertEqualsDouble(0.0, variant.weight)
+        assertEqualsDouble(1.0, variant.weight)
         assertEquals(0, variant.features.size)
     }
 
