@@ -23,9 +23,10 @@ import androidx.test.platform.app.InstrumentationRegistry
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import com.duckduckgo.app.CoroutineTestRule
-import com.duckduckgo.app.notification.NotificationScheduler.ClearDataNotificationWorker
-import com.duckduckgo.app.notification.NotificationScheduler.PrivacyNotificationWorker
+import com.duckduckgo.app.notification.AndroidNotificationScheduler.ClearDataNotificationWorker
+import com.duckduckgo.app.notification.AndroidNotificationScheduler.PrivacyNotificationWorker
 import com.duckduckgo.app.notification.model.SchedulableNotification
+import com.duckduckgo.app.notification.model.SearchNotification
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.VariantManager.Companion.DEFAULT_VARIANT
 import com.nhaarman.mockitokotlin2.any
@@ -48,6 +49,7 @@ class NotificationSchedulerTest {
     private val variantManager: VariantManager = mock()
     private val clearNotification: SchedulableNotification = mock()
     private val privacyNotification: SchedulableNotification = mock()
+    private val searchPromptNotification: SearchNotification = mock()
 
     private val context = InstrumentationRegistry.getInstrumentation().targetContext
     private var workManager = WorkManager.getInstance(context)
@@ -56,10 +58,11 @@ class NotificationSchedulerTest {
     @Before
     fun before() {
         whenever(variantManager.getVariant(any())).thenReturn(DEFAULT_VARIANT)
-        testee = NotificationScheduler(
+        testee = AndroidNotificationScheduler(
             workManager,
             clearNotification,
-            privacyNotification
+            privacyNotification,
+            searchPromptNotification
         )
     }
 
@@ -105,7 +108,7 @@ class NotificationSchedulerTest {
 
     private fun getScheduledWorkers(): List<WorkInfo> {
         return workManager
-            .getWorkInfosByTag(NotificationScheduler.WORK_REQUEST_TAG)
+            .getWorkInfosByTag(AndroidNotificationScheduler.UNUSED_APP_WORK_REQUEST_TAG)
             .get()
             .filter { it.state == WorkInfo.State.ENQUEUED }
     }

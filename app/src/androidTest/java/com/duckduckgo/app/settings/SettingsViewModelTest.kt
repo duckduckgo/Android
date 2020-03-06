@@ -24,6 +24,7 @@ import com.duckduckgo.app.blockingObserve
 import com.duckduckgo.app.browser.BuildConfig
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.global.DuckDuckGoTheme
+import com.duckduckgo.app.notification.NotificationScheduler
 import com.duckduckgo.app.settings.SettingsViewModel.Command
 import com.duckduckgo.app.settings.clear.ClearWhatOption.CLEAR_NONE
 import com.duckduckgo.app.settings.clear.ClearWhenOption.APP_EXIT_ONLY
@@ -62,6 +63,9 @@ class SettingsViewModelTest {
     private lateinit var mockVariantManager: VariantManager
 
     @Mock
+    private lateinit var notificationScheduler: NotificationScheduler
+
+    @Mock
     private lateinit var mockPixel: Pixel
 
     private lateinit var commandCaptor: KArgumentCaptor<Command>
@@ -73,7 +77,7 @@ class SettingsViewModelTest {
         context = InstrumentationRegistry.getInstrumentation().targetContext
         commandCaptor = argumentCaptor()
 
-        testee = SettingsViewModel(mockAppSettingsDataStore, mockDefaultBrowserDetector, mockVariantManager, mockPixel)
+        testee = SettingsViewModel(mockAppSettingsDataStore, mockDefaultBrowserDetector, mockVariantManager, mockPixel, notificationScheduler)
         testee.command.observeForever(commandObserver)
 
         whenever(mockAppSettingsDataStore.automaticallyClearWhenOption).thenReturn(APP_EXIT_ONLY)

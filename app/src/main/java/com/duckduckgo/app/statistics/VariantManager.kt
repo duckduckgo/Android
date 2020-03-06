@@ -22,7 +22,7 @@ import com.duckduckgo.app.statistics.VariantManager.Companion.referrerVariant
 import com.duckduckgo.app.statistics.VariantManager.VariantFeature.*
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import timber.log.Timber
-import java.util.*
+import java.util.Locale
 
 @WorkerThread
 interface VariantManager {
@@ -35,6 +35,7 @@ interface VariantManager {
         object SuppressOnboardingDefaultBrowserContinueScreen : VariantFeature()
         object DefaultBrowserDaxCta : VariantFeature()
         object SearchWidgetDaxCta : VariantFeature()
+        object SearchNotification : VariantFeature()
     }
 
     companion object {
@@ -79,6 +80,16 @@ interface VariantManager {
                     DefaultBrowserDaxCta,
                     SearchWidgetDaxCta
                 ),
+                filterBy = { isEnglishLocale() }),
+            Variant(
+                key = "mf",
+                weight = 1.0,
+                features = listOf(SearchNotification),
+                filterBy = { isEnglishLocale() }),
+            Variant(
+                key = "mg",
+                weight = 1.0,
+                features = emptyList(),
                 filterBy = { isEnglishLocale() })
 
             // All groups in an experiment (control and variants) MUST use the same filters

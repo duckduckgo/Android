@@ -24,7 +24,6 @@ import com.duckduckgo.app.notification.NotificationRegistrar
 import com.duckduckgo.app.notification.db.NotificationDao
 import com.duckduckgo.app.privacy.db.PrivacyProtectionCountDao
 
-
 class PrivacyProtectionNotification(
     private val context: Context,
     private val notificationDao: NotificationDao,

@@ -21,6 +21,7 @@ import android.content.Context
 import androidx.core.app.NotificationManagerCompat
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.work.WorkManager
+import com.duckduckgo.app.notification.AndroidNotificationScheduler
 import com.duckduckgo.app.notification.NotificationFactory
 import com.duckduckgo.app.notification.NotificationScheduler
 import com.duckduckgo.app.notification.db.NotificationDao
@@ -99,7 +100,7 @@ class NotificationModule {
         privacyProtectionNotification: PrivacyProtectionNotification,
         stickySearchNotification: StickySearchNotification
     ): NotificationScheduler {
-        return NotificationScheduler(
+        return AndroidNotificationScheduler(
             workManager,
             clearDataNotification,
             privacyProtectionNotification,

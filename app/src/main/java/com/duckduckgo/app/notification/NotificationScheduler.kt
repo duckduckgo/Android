@@ -20,6 +20,7 @@ import android.app.PendingIntent
 import android.app.PendingIntent.getService
 import android.content.Context
 import android.content.Intent
+import androidx.annotation.WorkerThread
 import androidx.core.app.NotificationManagerCompat
 import androidx.work.CoroutineWorker
 import androidx.work.OneTimeWorkRequest
@@ -38,16 +39,22 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.NOTIFICATION_SHOWN
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
-import javax.inject.Inject
 
-class NotificationScheduler @Inject constructor(
+@WorkerThread
+interface NotificationScheduler {
+    suspend fun scheduleNextNotification()
+    fun launchStickySearchNotification()
+    fun dismissStickySearchNotification()
+}
+
+class AndroidNotificationScheduler(
     private val workManager: WorkManager,
     private val clearDataNotification: SchedulableNotification,
     private val privacyNotification: SchedulableNotification,
     private val searchPromptNotification: SearchNotification
-) {
+) : NotificationScheduler {
 
-    suspend fun scheduleNextNotification() {
+    override suspend fun scheduleNextNotification() {
 
         workManager.cancelAllWorkByTag(UNUSED_APP_WORK_REQUEST_TAG)
 
@@ -65,7 +72,7 @@ class NotificationScheduler @Inject constructor(
         }
     }
 
-    fun launchStickySearchNotification() {
+    override fun launchStickySearchNotification() {
         Timber.v("Posting sticky notification")
         val request = OneTimeWorkRequestBuilder<StickySearchNotificationWorker>()
             .addTag(STICKY_REQUEST_TAG)
@@ -74,7 +81,7 @@ class NotificationScheduler @Inject constructor(
         workManager.enqueue(request)
     }
 
-    fun dismissStickySearchNotification() {
+    override fun dismissStickySearchNotification() {
         Timber.v("Dismissing sticky notification")
         val request = OneTimeWorkRequestBuilder<DismissSearchNotificationWorker>()
             .addTag(STICKY_REQUEST_TAG)
@@ -203,7 +210,6 @@ class NotificationScheduler @Inject constructor(
 
             return Result.success()
         }
-
     }
 
     companion object {
