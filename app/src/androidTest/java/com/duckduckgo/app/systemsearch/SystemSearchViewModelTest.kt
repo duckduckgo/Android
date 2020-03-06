@@ -24,6 +24,7 @@ import com.duckduckgo.app.InstantSchedulersRule
 import com.duckduckgo.app.autocomplete.api.AutoComplete
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteResult
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteSearchSuggestion
+import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.systemsearch.SystemSearchViewModel.Command
 import com.duckduckgo.app.systemsearch.SystemSearchViewModel.Command.LaunchDuckDuckGo
 import com.nhaarman.mockitokotlin2.argumentCaptor
@@ -51,6 +52,7 @@ class SystemSearchViewModelTest {
     @get:Rule
     var coroutineRule = CoroutineTestRule()
 
+    private val mockOnboardingStore: OnboardingStore = mock()
     private val mockDeviceAppLookup: DeviceAppLookup = mock()
     private val mockAutoComplete: AutoComplete = mock()
 
@@ -65,7 +67,7 @@ class SystemSearchViewModelTest {
         whenever(mockAutoComplete.autoComplete(BLANK_QUERY)).thenReturn(Observable.just(autocompleteBlankResult))
         whenever(mockDeviceAppLookup.query(QUERY)).thenReturn(appQueryResult)
         whenever(mockDeviceAppLookup.query(BLANK_QUERY)).thenReturn(appBlankResult)
-        testee = SystemSearchViewModel(mockAutoComplete, mockDeviceAppLookup, coroutineRule.testDispatcherProvider)
+        testee = SystemSearchViewModel(mockOnboardingStore, mockAutoComplete, mockDeviceAppLookup, coroutineRule.testDispatcherProvider)
         testee.command.observeForever(commandObserver)
     }
 
