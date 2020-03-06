@@ -37,7 +37,6 @@ import com.duckduckgo.app.browser.omnibar.OmnibarScrolling
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.view.TextChangedWatcher
 import com.duckduckgo.app.global.view.hideKeyboard
-import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelName
 import com.duckduckgo.app.systemsearch.SystemSearchViewModel.Command.*
@@ -141,14 +140,16 @@ class SystemSearchActivity : DuckDuckGoActivity() {
     }
 
     private fun configureOmnibar() {
-        results.addOnLayoutChangeListener { _, _, _, _, _, _, _, _, _ ->
-            val scrollable = resultsContent.height > results.height
-            if (scrollable) {
-                omnibarScrolling.enableOmnibarScrolling(toolbar)
-            } else {
-                showOmnibar()
-                omnibarScrolling.disableOmnibarScrolling(toolbar)
-            }
+        resultsContent.addOnLayoutChangeListener { _, _, _, _, _, _, _, _, _ -> updateScroll() }
+    }
+
+    private fun updateScroll() {
+        val scrollable = resultsContent.height > (results.height - results.paddingTop - results.paddingBottom)
+        if (scrollable) {
+            omnibarScrolling.enableOmnibarScrolling(toolbar)
+        } else {
+            showOmnibar()
+            omnibarScrolling.disableOmnibarScrolling(toolbar)
         }
     }
 
@@ -167,10 +168,19 @@ class SystemSearchActivity : DuckDuckGoActivity() {
     }
 
     private fun renderOnboardingViewState(viewState: SystemSearchViewModel.OnboardingViewState) {
-        onboarding.visibility = if (viewState.visibile) View.VISIBLE else View.GONE
-        checkmarks.visibility = if (viewState.expanded) View.VISIBLE else View.GONE
+        if (viewState.visibile) {
+            onboarding.visibility = View.VISIBLE
+            results.elevation = 0.0f
+            checkmarks.visibility = if (viewState.expanded) View.VISIBLE else View.GONE
+            refreshOnboardingToggleText(viewState.expanded)
+        } else {
+            onboarding.visibility = View.GONE
+            results.elevation = if (viewState.visibile) 0.0f else resources.getDimension(R.dimen.systemSearchResultsElevation)
+        }
+    }
 
-        val toggleText = if (viewState.expanded) R.string.systemSearchOnboardingButtonLess else R.string.systemSearchOnboardingButtonMore
+    private fun refreshOnboardingToggleText(expanded: Boolean) {
+        val toggleText = if (expanded) R.string.systemSearchOnboardingButtonLess else R.string.systemSearchOnboardingButtonMore
         toggleButton.text = getString(toggleText)
     }
 
