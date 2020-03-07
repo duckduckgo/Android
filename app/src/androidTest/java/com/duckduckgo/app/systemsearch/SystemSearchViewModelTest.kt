@@ -77,6 +77,56 @@ class SystemSearchViewModelTest {
     }
 
     @Test
+    fun whenOnboardingShouldNotShowThenViewIsNotVisibleAndUnexpanded() = runBlockingTest {
+        whenever(mockOnboardingStore.shouldShow).thenReturn(false)
+        testee.resetViewState()
+
+        val viewState = testee.onboardingViewState.value
+        assertFalse(viewState!!.visibile)
+        assertFalse(viewState!!.expanded)
+    }
+
+    @Test
+    fun whenOnboardingShouldShowThenViewIsVisibleAndUnexpanded() = runBlockingTest {
+        whenever(mockOnboardingStore.shouldShow).thenReturn(true)
+        testee.resetViewState()
+
+        val viewState = testee.onboardingViewState.value
+        assertTrue(viewState!!.visibile)
+        assertFalse(viewState!!.expanded)
+    }
+
+
+    @Test
+    fun whenOnboardingIsUnexpandedAndUserPressesToggleThenItIsExpanded() = runBlockingTest {
+        whenOnboardingShowing()
+        testee.userTappedOnboardingToggle()
+
+        val viewState = testee.onboardingViewState.value
+        assertTrue(viewState!!.expanded)
+    }
+
+    @Test
+    fun whenOnboardingIsExpandedAndUserPressesToggleThenItIsUnexpanded() = runBlockingTest {
+        whenOnboardingShowing()
+        testee.userTappedOnboardingToggle() // first press to expand
+        testee.userTappedOnboardingToggle() // second press to minimize
+
+        val viewState = testee.onboardingViewState.value
+        assertFalse(viewState!!.expanded)
+    }
+
+    @Test
+    fun whenOnboardingIsDismissedThenViewHiddenAndOnboaringStoreNotified() = runBlockingTest {
+        whenOnboardingShowing()
+        testee.userDismissedOnboarding()
+
+        val viewState = testee.onboardingViewState.value
+        assertFalse(viewState!!.visibile)
+        verify(mockOnboardingStore).onboardingShown()
+    }
+
+    @Test
     fun whenUserUpdatesQueryThenViewStateUpdated() = ruleRunBlockingTest {
         testee.userUpdatedQuery(QUERY)
 
@@ -92,7 +142,7 @@ class SystemSearchViewModelTest {
         testee.userUpdatedQuery(QUERY)
         testee.userUpdatedQuery("$QUERY ")
 
-        val newViewState = testee.viewState.value
+        val newViewState = testee.resutlsViewState.value
         assertNotNull(newViewState)
         assertEquals("$QUERY ", newViewState?.queryText)
         assertEquals(appQueryResult, newViewState?.appResults)
@@ -157,6 +207,11 @@ class SystemSearchViewModelTest {
         verify(mockDeviceAppLookup).refreshAppList()
         verify(commandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
         assertEquals(Command.ShowAppNotFoundMessage(deviceApp.shortName), commandCaptor.lastValue)
+    }
+
+    private fun whenOnboardingShowing() {
+        whenever(mockOnboardingStore.shouldShow).thenReturn(true)
+        testee.resetViewState()
     }
 
     private fun ruleRunBlockingTest(block: suspend TestCoroutineScope.() -> Unit) =
