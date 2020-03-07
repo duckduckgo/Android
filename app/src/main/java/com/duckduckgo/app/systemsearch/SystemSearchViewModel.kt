@@ -42,7 +42,7 @@ class SystemSearchViewModel(
 ) : ViewModel() {
 
     data class OnboardingViewState(
-        val visibile: Boolean,
+        val visible: Boolean,
         val expanded: Boolean = false
     )
 
@@ -61,7 +61,7 @@ class SystemSearchViewModel(
     }
 
     val onboardingViewState: MutableLiveData<OnboardingViewState> = MutableLiveData()
-    val resutlsViewState: MutableLiveData<SystemSearchResultsViewState> = MutableLiveData()
+    val resultsViewState: MutableLiveData<SystemSearchResultsViewState> = MutableLiveData()
     val command: SingleLiveEvent<Command> = SingleLiveEvent()
 
     private val autoCompletePublishSubject = PublishRelay.create<String>()
@@ -77,7 +77,7 @@ class SystemSearchViewModel(
     }
 
     private fun currentOnboardingState(): OnboardingViewState = onboardingViewState.value!!
-    private fun currentResultsState(): SystemSearchResultsViewState = resutlsViewState.value!!
+    private fun currentResultsState(): SystemSearchResultsViewState = resultsViewState.value!!
 
     fun resetViewState() {
         resetOnboardingState()
@@ -85,14 +85,14 @@ class SystemSearchViewModel(
     }
 
     private fun resetOnboardingState() {
-        onboardingViewState.value = OnboardingViewState(visibile = onboardingStore.shouldShow)
+        onboardingViewState.value = OnboardingViewState(visible = onboardingStore.shouldShow)
     }
 
     private fun resetResultsState() {
         autocompleteResults = AutoCompleteResult("", emptyList())
         appsJob?.cancel()
         appResults = emptyList()
-        resutlsViewState.value = SystemSearchResultsViewState()
+        resultsViewState.value = SystemSearchResultsViewState()
     }
 
     private fun configureAutoComplete() {
@@ -114,7 +114,7 @@ class SystemSearchViewModel(
     }
 
     fun userDismissedOnboarding() {
-        onboardingViewState.value = currentOnboardingState().copy(visibile = false)
+        onboardingViewState.value = currentOnboardingState().copy(visible = false)
         onboardingStore.onboardingShown()
     }
 
@@ -131,7 +131,7 @@ class SystemSearchViewModel(
             return
         }
 
-        resutlsViewState.value = currentResultsState().copy(queryText = query)
+        resultsViewState.value = currentResultsState().copy(queryText = query)
 
         val trimmedQuery = query.trim()
         autoCompletePublishSubject.accept(trimmedQuery)
@@ -156,7 +156,7 @@ class SystemSearchViewModel(
         val updatedSuggestions = if (hasMultiResults) fullSuggestions.take(RESULTS_MAX_RESULTS_PER_GROUP) else fullSuggestions
         val updatedApps = if (hasMultiResults) appResults.take(RESULTS_MAX_RESULTS_PER_GROUP) else appResults
 
-        resutlsViewState.postValue(
+        resultsViewState.postValue(
             currentResultsState().copy(
                 autocompleteResults = AutoCompleteResult(autocompleteResults.query, updatedSuggestions),
                 appResults = updatedApps

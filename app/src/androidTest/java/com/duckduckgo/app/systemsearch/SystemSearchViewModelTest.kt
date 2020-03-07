@@ -82,7 +82,7 @@ class SystemSearchViewModelTest {
         testee.resetViewState()
 
         val viewState = testee.onboardingViewState.value
-        assertFalse(viewState!!.visibile)
+        assertFalse(viewState!!.visible)
         assertFalse(viewState!!.expanded)
     }
 
@@ -92,7 +92,7 @@ class SystemSearchViewModelTest {
         testee.resetViewState()
 
         val viewState = testee.onboardingViewState.value
-        assertTrue(viewState!!.visibile)
+        assertTrue(viewState!!.visible)
         assertFalse(viewState!!.expanded)
     }
 
@@ -117,12 +117,12 @@ class SystemSearchViewModelTest {
     }
 
     @Test
-    fun whenOnboardingIsDismissedThenViewHiddenAndOnboaringStoreNotified() = runBlockingTest {
+    fun whenOnboardingIsDismissedThenViewHiddenAndOnboardingStoreNotified() = runBlockingTest {
         whenOnboardingShowing()
         testee.userDismissedOnboarding()
 
         val viewState = testee.onboardingViewState.value
-        assertFalse(viewState!!.visibile)
+        assertFalse(viewState!!.visible)
         verify(mockOnboardingStore).onboardingShown()
     }
 
@@ -130,7 +130,7 @@ class SystemSearchViewModelTest {
     fun whenUserUpdatesQueryThenViewStateUpdated() = ruleRunBlockingTest {
         testee.userUpdatedQuery(QUERY)
 
-        val newViewState = testee.resutlsViewState.value
+        val newViewState = testee.resultsViewState.value
         assertNotNull(newViewState)
         assertEquals(QUERY, newViewState?.queryText)
         assertEquals(appQueryResult, newViewState?.appResults)
@@ -142,7 +142,7 @@ class SystemSearchViewModelTest {
         testee.userUpdatedQuery(QUERY)
         testee.userUpdatedQuery("$QUERY ")
 
-        val newViewState = testee.resutlsViewState.value
+        val newViewState = testee.resultsViewState.value
         assertNotNull(newViewState)
         assertEquals("$QUERY ", newViewState?.queryText)
         assertEquals(appQueryResult, newViewState?.appResults)
@@ -154,7 +154,7 @@ class SystemSearchViewModelTest {
         testee.userUpdatedQuery(QUERY)
         testee.userClearedQuery()
 
-        val newViewState = testee.resutlsViewState.value
+        val newViewState = testee.resultsViewState.value
         assertNotNull(newViewState)
         assertTrue(newViewState!!.queryText.isEmpty())
         assertTrue(newViewState.appResults.isEmpty())
@@ -166,7 +166,7 @@ class SystemSearchViewModelTest {
         testee.userUpdatedQuery(QUERY)
         testee.userUpdatedQuery(BLANK_QUERY)
 
-        val newViewState = testee.resutlsViewState.value
+        val newViewState = testee.resultsViewState.value
         assertNotNull(newViewState)
         assertTrue(newViewState!!.queryText.isEmpty())
         assertTrue(newViewState.appResults.isEmpty())

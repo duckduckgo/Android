@@ -105,7 +105,7 @@
             android:layout_marginTop="12dp"
             android:layout_marginBottom="6dp"
             android:fontFamily="sans-serif"
-            android:text="@string/systemSearchOnboaringFeaturesIntroText"
+            android:text="@string/systemSearchOnboardingFeaturesIntroText"
             android:textColor="?attr/normalTextColor"
             android:textSize="14sp"
             android:textStyle="normal" />
@@ -118,7 +118,7 @@
             android:drawableStart="@drawable/ic_success"
             android:drawablePadding="12dp"
             android:fontFamily="sans-serif"
-            android:text="@string/systemSearchOnboaringFeatureOneText"
+            android:text="@string/systemSearchOnboardingFeatureOneText"
             android:textColor="?attr/normalTextColor"
             android:textSize="14sp"
             android:textStyle="normal" />
@@ -131,7 +131,7 @@
             android:drawableStart="@drawable/ic_success"
             android:drawablePadding="12dp"
             android:fontFamily="sans-serif"
-            android:text="@string/systemSearchOnboaringFeatureTwoText"
+            android:text="@string/systemSearchOnboardingFeatureTwoText"
             android:textColor="?attr/normalTextColor"
             android:textSize="14sp"
             android:textStyle="normal" />
@@ -144,7 +144,7 @@
             android:drawableStart="@drawable/ic_success"
             android:drawablePadding="12dp"
             android:fontFamily="sans-serif"
-            android:text="@string/systemSearchOnboaringFeatureThreeText"
+            android:text="@string/systemSearchOnboardingFeatureThreeText"
             android:textColor="?attr/normalTextColor"
             android:textSize="14sp"
             android:textStyle="normal" />

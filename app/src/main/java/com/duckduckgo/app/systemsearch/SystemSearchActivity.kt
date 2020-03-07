@@ -95,7 +95,7 @@ class SystemSearchActivity : DuckDuckGoActivity() {
         viewModel.onboardingViewState.observe(this, Observer<SystemSearchViewModel.OnboardingViewState> {
             it?.let { renderOnboardingViewState(it) }
         })
-        viewModel.resutlsViewState.observe(this, Observer<SystemSearchResultsViewState> {
+        viewModel.resultsViewState.observe(this, Observer<SystemSearchResultsViewState> {
             it?.let { renderResultsViewState(it) }
         })
         viewModel.command.observe(this, Observer {
@@ -168,14 +168,14 @@ class SystemSearchActivity : DuckDuckGoActivity() {
     }
 
     private fun renderOnboardingViewState(viewState: SystemSearchViewModel.OnboardingViewState) {
-        if (viewState.visibile) {
+        if (viewState.visible) {
             onboarding.visibility = View.VISIBLE
             results.elevation = 0.0f
             checkmarks.visibility = if (viewState.expanded) View.VISIBLE else View.GONE
             refreshOnboardingToggleText(viewState.expanded)
         } else {
             onboarding.visibility = View.GONE
-            results.elevation = if (viewState.visibile) 0.0f else resources.getDimension(R.dimen.systemSearchResultsElevation)
+            results.elevation = if (viewState.visible) 0.0f else resources.getDimension(R.dimen.systemSearchResultsElevation)
         }
     }
 
