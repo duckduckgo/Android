@@ -32,7 +32,11 @@ import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.media.MediaScannerConnection
 import android.net.Uri
-import android.os.*
+import android.os.Build
+import android.os.Bundle
+import android.os.Environment
+import android.os.Handler
+import android.os.Message
 import android.text.Editable
 import android.view.ContextMenu
 import android.view.KeyEvent
@@ -57,6 +61,7 @@ import android.webkit.WebView.HitTestResult.UNKNOWN_TYPE
 import android.webkit.WebViewDatabase
 import android.widget.EditText
 import android.widget.TextView
+import android.widget.Toast
 import androidx.annotation.AnyThread
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
@@ -67,6 +72,7 @@ import androidx.core.view.isEmpty
 import androidx.core.view.isNotEmpty
 import androidx.core.view.isVisible
 import androidx.core.view.postDelayed
+import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleObserver
@@ -74,7 +80,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.OnLifecycleEvent
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.duckduckgo.app.autocomplete.api.AutoCompleteApi.AutoCompleteSuggestion
+import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion
 import com.duckduckgo.app.bookmarks.ui.EditBookmarkDialogFragment
 import com.duckduckgo.app.browser.BrowserTabViewModel.AutoCompleteViewState
 import com.duckduckgo.app.browser.BrowserTabViewModel.BrowserViewState
@@ -85,6 +91,8 @@ import com.duckduckgo.app.browser.BrowserTabViewModel.GlobalLayoutViewState
 import com.duckduckgo.app.browser.BrowserTabViewModel.LoadingViewState
 import com.duckduckgo.app.browser.BrowserTabViewModel.OmnibarViewState
 import com.duckduckgo.app.browser.autocomplete.BrowserAutoCompleteSuggestionsAdapter
+import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserNavigator
+import com.duckduckgo.app.browser.defaultbrowsing.TopInstructionsCard
 import com.duckduckgo.app.browser.downloader.FileDownloadNotificationManager
 import com.duckduckgo.app.browser.downloader.FileDownloader
 import com.duckduckgo.app.browser.downloader.FileDownloader.PendingFileDownload
@@ -107,9 +115,9 @@ import com.duckduckgo.app.cta.ui.CtaViewModel
 import com.duckduckgo.app.cta.ui.DaxBubbleCta
 import com.duckduckgo.app.cta.ui.DaxDialogCta
 import com.duckduckgo.app.cta.ui.HomePanelCta
+import com.duckduckgo.app.cta.ui.SecondaryButtonCta
 import com.duckduckgo.app.global.ViewModelFactory
 import com.duckduckgo.app.global.device.DeviceInfo
-import com.duckduckgo.app.global.view.DaxDialog
 import com.duckduckgo.app.global.view.NonDismissibleBehavior
 import com.duckduckgo.app.global.view.TextChangedWatcher
 import com.duckduckgo.app.global.view.gone
@@ -121,6 +129,7 @@ import com.duckduckgo.app.global.view.renderIfChanged
 import com.duckduckgo.app.global.view.show
 import com.duckduckgo.app.global.view.showKeyboard
 import com.duckduckgo.app.global.view.toggleFullScreen
+import com.duckduckgo.app.onboarding.ui.page.DefaultBrowserPage
 import com.duckduckgo.app.privacy.model.PrivacyGrade
 import com.duckduckgo.app.privacy.renderer.icon
 import com.duckduckgo.app.privacy.store.PrivacySettingsStore
@@ -157,7 +166,6 @@ import java.io.File
 import javax.inject.Inject
 import kotlin.concurrent.thread
 import kotlin.coroutines.CoroutineContext
-
 
 class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
 
@@ -218,7 +226,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
     lateinit var privacySettingsStore: PrivacySettingsStore
 
     @Inject
-    lateinit var animatorHelper: BrowserTrackersAnimatorHelper
+    lateinit var defaultBrowserNavigation: DefaultBrowserNavigator
 
     val tabId get() = arguments!![TAB_ID_ARG] as String
 
@@ -247,6 +255,10 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
         viewModel
     }
 
+    private val animatorHelper by lazy { BrowserTrackersAnimatorHelper() }
+
+    private val smoothProgressAnimator by lazy { SmoothProgressAnimator(pageLoadingIndicator) }
+
     // Optimization to prevent against excessive work generating WebView previews; an existing job will be cancelled if a new one is launched
     private var bitmapGeneratorJob: Job? = null
 
@@ -263,6 +275,13 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
         get() = appBarLayout.browserMenu
 
     private var webView: WebView? = null
+
+    private var instructionsCard: Toast? = null
+        get() {
+            field?.cancel()
+            field = TopInstructionsCard(requireContext(), Toast.LENGTH_SHORT)
+            return field
+        }
 
     private val errorSnackbar: Snackbar by lazy {
         Snackbar.make(browserLayout, R.string.crashedWebViewErrorMessage, Snackbar.LENGTH_INDEFINITE)
@@ -284,7 +303,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
     private val logoHidingListener by lazy { LogoHidingLayoutChangeLifecycleListener(ddgLogo) }
 
     private var alertDialog: AlertDialog? = null
-    private var daxDialog: DaxDialog? = null
+    private var daxDialog: DialogFragment? = null
 
     override fun onAttach(context: Context) {
         AndroidSupportInjection.inject(this)
@@ -585,7 +604,24 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
             is Command.GenerateWebViewPreviewImage -> generateWebViewPreviewImage()
             is Command.LaunchTabSwitcher -> launchTabSwitcher()
             is Command.ShowErrorWithAction -> showErrorSnackbar(it)
+            is Command.OpenDefaultBrowserSettings -> openDefaultBrowserSettings()
+            is Command.OpenDefaultBrowserDialog -> openDefaultBrowserDialog(it.url)
         }
+    }
+
+    private fun openDefaultBrowserDialog(url: String) {
+        instructionsCard?.show()
+        defaultCard?.show()
+        defaultCard?.animate()?.alpha(1f)?.setDuration(INSTRUCTIONS_CARD_ANIMATION_DURATION)?.start()
+        defaultBrowserNavigation.openDefaultBrowserDialog(this, url, DEFAULT_BROWSER_REQUEST_CODE_DIALOG)
+    }
+
+    private fun hideInstructionsCard() {
+        defaultCard?.animate()?.alpha(0f)?.setDuration(INSTRUCTIONS_CARD_ANIMATION_DURATION)?.start()
+    }
+
+    private fun openDefaultBrowserSettings() {
+        defaultBrowserNavigation.navigateToSettings(this, DEFAULT_BROWSER_REQUEST_CODE_SETTINGS)
     }
 
     private fun showErrorSnackbar(command: Command.ShowErrorWithAction) {
@@ -677,6 +713,15 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (requestCode == REQUEST_CODE_CHOOSE_FILE) {
             handleFileUploadResult(resultCode, data)
+        } else if (requestCode == DEFAULT_BROWSER_REQUEST_CODE_SETTINGS) {
+            viewModel.onUserTriedToSetAsDefaultBrowserFromSettings()
+        } else if (requestCode == DEFAULT_BROWSER_REQUEST_CODE_DIALOG) {
+            hideInstructionsCard()
+            if (resultCode == DefaultBrowserPage.DEFAULT_BROWSER_RESULT_CODE_DIALOG_INTERNAL) {
+                viewModel.onUserTriedToSetAsDefaultBrowserFromDialog()
+            } else {
+                viewModel.onUserDismissedDefaultBrowserDialog()
+            }
         }
     }
 
@@ -1166,7 +1211,8 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
     }
 
     companion object {
-
+        private const val DEFAULT_BROWSER_REQUEST_CODE_DIALOG = 191
+        private const val DEFAULT_BROWSER_REQUEST_CODE_SETTINGS = 190
         private const val TAB_ID_ARG = "TAB_ID_ARG"
         private const val URL_EXTRA_ARG = "URL_EXTRA_ARG"
         private const val SKIP_HOME_ARG = "SKIP_HOME_ARG"
@@ -1184,10 +1230,10 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
         private const val DOWNLAOD_CONFIRM_TAG = "DOWNLAOD_CONFIRM_TAG"
         private const val DAX_DIALOG_DIALOG_TAG = "DAX_DIALOG_TAG"
 
-        private const val MIN_PROGRESS = 10
         private const val MAX_PROGRESS = 100
-        private const val TRACKERS_INI_DELAY = 700L
-        private const val TRACKERS_SECONDARY_DELAY = 300L
+        private const val TRACKERS_INI_DELAY = 500L
+        private const val TRACKERS_SECONDARY_DELAY = 200L
+        private const val INSTRUCTIONS_CARD_ANIMATION_DURATION: Long = 100
 
         fun newInstance(tabId: String, query: String? = null, skipHome: Boolean): BrowserTabFragment {
             val fragment = BrowserTabFragment()
@@ -1218,8 +1264,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
 
                 if (viewState.showSuggestions) {
                     autoCompleteSuggestionsList.show()
-                    val results = viewState.searchResults.suggestions
-                    autoCompleteSuggestionsAdapter.updateData(results)
+                    autoCompleteSuggestionsAdapter.updateData(viewState.searchResults.query, viewState.searchResults.suggestions)
                 } else {
                     autoCompleteSuggestionsList.gone()
                 }
@@ -1253,8 +1298,8 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
                 lastSeenLoadingViewState = viewState
 
                 pageLoadingIndicator.apply {
-                    if (viewState.isLoading) show() else hide()
-                    progress = viewState.progress
+                    if (viewState.isLoading) show()
+                    smoothProgressAnimator.onNewProgress(viewState.progress) { if (!viewState.isLoading) hide() }
                 }
 
                 if (variantManager.getVariant().hasFeature(VariantManager.VariantFeature.ConceptTest) && privacySettingsStore.privacyOn) {
@@ -1263,18 +1308,14 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
                         cancelAllAnimations()
                     }
 
-                    if (viewState.progress <= MIN_PROGRESS && viewState.isLoading && lastSeenOmnibarViewState?.isEditing != true) {
-                        animatorHelper.createLoadingAnimation(resources, omnibarViews(), loadingText)
-                    }
-
                     if (viewState.progress == MAX_PROGRESS) {
-                        createLoadedAnimation()
+                        createTrackersAnimation()
                     }
                 }
             }
         }
 
-        private fun createLoadedAnimation() {
+        private fun createTrackersAnimation() {
             launch {
                 delay(TRACKERS_INI_DELAY)
                 viewModel.refreshCta()
@@ -1284,11 +1325,10 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
                     val events = site?.trackingEvents
 
                     activity?.let { activity ->
-                        animatorHelper.createLoadedAnimation(
+                        animatorHelper.startTrackersAnimation(
                             lastSeenCtaViewState?.cta,
                             activity,
                             networksContainer,
-                            loadingText,
                             omnibarViews(),
                             events
                         )
@@ -1301,7 +1341,6 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
             if (variantManager.getVariant().hasFeature(VariantManager.VariantFeature.ConceptTest)) {
                 animatorHelper.cancelAnimations()
                 networksContainer.alpha = 0f
-                loadingText.alpha = 0f
                 clearTextButton.alpha = 1f
                 omnibarTextInput.alpha = 1f
                 privacyGradeButton.alpha = 1f
@@ -1449,30 +1488,36 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
                 daxDialog?.dismiss()
                 daxDialog = configuration.createCta(activity).apply {
                     setHideClickListener {
-                        dismiss()
+                        getDaxDialog().dismiss()
                         launchHideTipsDialog(activity, configuration)
                     }
                     setDismissListener {
                         if (configuration is DaxDialogCta.DaxTrackersBlockedCta) {
                             animatorHelper.finishTrackerAnimation(omnibarViews(), container)
                         }
-                        viewModel.onUserDismissedCta()
+                        viewModel.onUserDismissedCta(configuration)
                     }
                     setPrimaryCtaClickListener {
-                        viewModel.onUserClickCtaOkButton()
+                        viewModel.onUserClickCtaOkButton(configuration)
                         if (configuration is DaxDialogCta.DaxMainNetworkCta) {
                             setPrimaryCtaClickListener {
-                                viewModel.onUserClickCtaOkButton()
-                                dismiss()
+                                viewModel.onUserClickCtaOkButton(configuration)
+                                getDaxDialog().dismiss()
                             }
                             configuration.setSecondDialog(this, activity)
                             viewModel.onManualCtaShown(configuration)
                         } else {
-                            dismiss()
+                            getDaxDialog().dismiss()
                         }
                     }
-                    show(activity.supportFragmentManager, DAX_DIALOG_DIALOG_TAG)
-                }
+                    if (configuration is SecondaryButtonCta) {
+                        setSecondaryCtaClickListener {
+                            viewModel.onUserClickCtaSecondaryButton(configuration)
+                            getDaxDialog().dismiss()
+                        }
+                    }
+                    getDaxDialog().show(activity.supportFragmentManager, DAX_DIALOG_DIALOG_TAG)
+                }.getDaxDialog()
             }
         }
 
@@ -1528,11 +1573,11 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
 
             configuration.showCta(ctaContainer)
             ctaContainer.ctaOkButton.setOnClickListener {
-                viewModel.onUserClickCtaOkButton()
+                viewModel.onUserClickCtaOkButton(configuration)
             }
 
             ctaContainer.ctaDismissButton.setOnClickListener {
-                viewModel.onUserDismissedCta()
+                viewModel.onUserDismissedCta(cta)
             }
 
             ConstraintSet().also {

@@ -186,7 +186,7 @@ open class DuckDuckGoApplication : HasActivityInjector, HasServiceInjector, HasS
         }
 
         recordInstallationTimestamp()
-        initializeTheme(settingsDataStore, variantManager)
+        initializeTheme(settingsDataStore)
         loadTrackerData()
         configureDataDownloader()
         scheduleOfflinePixels()

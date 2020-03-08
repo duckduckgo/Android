@@ -18,7 +18,6 @@ package com.duckduckgo.app.global.view
 
 import android.content.Context
 import android.util.AttributeSet
-import android.widget.TextView
 import androidx.appcompat.widget.AppCompatTextView
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers

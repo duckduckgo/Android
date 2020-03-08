@@ -78,7 +78,7 @@ class OnboardingPageManagerTest {
         whenever(mockVariantManager.getVariant()).thenReturn(
             Variant("test", features = listOf(
                 VariantManager.VariantFeature.ConceptTest,
-                VariantManager.VariantFeature.SuppressDefaultBrowserContinueScreen
+                VariantManager.VariantFeature.SuppressOnboardingDefaultBrowserContinueScreen
             ), filterBy = { true })
         )
     }

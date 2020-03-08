@@ -18,6 +18,7 @@ package com.duckduckgo.app.cta.ui
 
 import androidx.annotation.WorkerThread
 import androidx.lifecycle.LiveData
+import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.cta.db.DismissedCtaDao
 import com.duckduckgo.app.cta.model.CtaId
 import com.duckduckgo.app.cta.model.DismissedCta
@@ -31,7 +32,7 @@ import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.Variant
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.VariantManager.VariantFeature.ConceptTest
-import com.duckduckgo.app.statistics.VariantManager.VariantFeature.SuppressWidgetCta
+import com.duckduckgo.app.statistics.VariantManager.VariantFeature.SuppressHomeTabWidgetCta
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.survey.db.SurveyDao
 import com.duckduckgo.app.survey.model.Survey
@@ -53,7 +54,8 @@ class CtaViewModel @Inject constructor(
     private val variantManager: VariantManager,
     private val settingsDataStore: SettingsDataStore,
     private val onboardingStore: OnboardingStore,
-    private val settingsPrivacySettingsStore: PrivacySettingsStore
+    private val settingsPrivacySettingsStore: PrivacySettingsStore,
+    private val defaultBrowserDetector: DefaultBrowserDetector
 ) {
 
     val surveyLiveData: LiveData<Survey> = surveyDao.getLiveScheduled()
@@ -108,6 +110,12 @@ class CtaViewModel @Inject constructor(
     fun onUserClickCtaOkButton(cta: Cta) {
         cta.okPixel?.let {
             pixel.fire(it, cta.pixelOkParameters())
+        }
+    }
+
+    fun onUserClickCtaSecondaryButton(cta: SecondaryButtonCta) {
+        cta.secondaryButtonPixel?.let {
+            pixel.fire(it, cta.pixelSecondaryButtonParameters())
         }
     }
 
@@ -166,7 +174,7 @@ class CtaViewModel @Inject constructor(
         return widgetCapabilities.supportsStandardWidgetAdd &&
                 !widgetCapabilities.hasInstalledWidgets &&
                 !dismissedCtaDao.exists(CtaId.ADD_WIDGET) &&
-                !variant().hasFeature(SuppressWidgetCta)
+                !variant().hasFeature(SuppressHomeTabWidgetCta)
     }
 
     @WorkerThread
@@ -201,10 +209,14 @@ class CtaViewModel @Inject constructor(
                     }
                 }
             }
-            // Is Serp
-            if (!daxDialogSerpShown() && isSerpUrl(it.url)) {
-                return DaxDialogCta.DaxSerpCta(onboardingStore, appInstallStore)
+
+            if (isSerpUrl(it.url)) {
+                val ctaOnSerp = getCtaOnSerp()
+                if (ctaOnSerp != null) {
+                    return ctaOnSerp
+                }
             }
+
             // Trackers blocked
             return if (!daxDialogTrackersFoundShown() && !isSerpUrl(it.url) && hasTrackersInformation(it.trackingEvents) && host != null) {
                 DaxDialogCta.DaxTrackersBlockedCta(onboardingStore, appInstallStore, it.trackingEvents, host)
@@ -214,6 +226,45 @@ class CtaViewModel @Inject constructor(
                 null
             }
         }
+    }
+
+    @WorkerThread
+    fun obtainNextCta(previousCta: Cta): Cta? {
+        return when {
+            previousCta is DaxDialogCta.DaxTrackersBlockedCta && canShowDefaultBrowserDaxCta() -> {
+                DaxDialogCta.DefaultBrowserCta(defaultBrowserDetector, onboardingStore, appInstallStore)
+            }
+            previousCta is DaxDialogCta.DaxSerpCta && canShowWidgetDaxCta() -> {
+                DaxDialogCta.SearchWidgetCta(widgetCapabilities, onboardingStore, appInstallStore)
+            }
+            else -> null
+        }
+    }
+
+    @WorkerThread
+    private fun getCtaOnSerp(): DaxDialogCta? {
+        return when {
+            !daxDialogSerpShown() -> DaxDialogCta.DaxSerpCta(onboardingStore, appInstallStore)
+            canShowWidgetDaxCta() -> DaxDialogCta.SearchWidgetCta(widgetCapabilities, onboardingStore, appInstallStore)
+            else -> null
+        }
+    }
+
+    @WorkerThread
+    private fun canShowDefaultBrowserDaxCta(): Boolean {
+        return defaultBrowserDetector.deviceSupportsDefaultBrowserConfiguration() &&
+                !defaultBrowserDetector.isDefaultBrowser() &&
+                variantManager.getVariant().hasFeature(VariantManager.VariantFeature.DefaultBrowserDaxCta) &&
+                !daxDefaultBrowserShown()
+    }
+
+    @WorkerThread
+    private fun canShowWidgetDaxCta(): Boolean {
+        return widgetCapabilities.supportsStandardWidgetAdd &&
+                !widgetCapabilities.hasInstalledWidgets &&
+                variantManager.getVariant().hasFeature(VariantManager.VariantFeature.SearchWidgetDaxCta) &&
+                !daxSearchWidgetShown() &&
+                daxNonSerpDialogShown()
     }
 
     private fun hasTrackersInformation(events: List<TrackingEvent>): Boolean =
@@ -240,6 +291,12 @@ class CtaViewModel @Inject constructor(
     private fun daxDialogTrackersFoundShown(): Boolean = dismissedCtaDao.exists(CtaId.DAX_DIALOG_TRACKERS_FOUND)
 
     private fun daxDialogNetworkShown(): Boolean = dismissedCtaDao.exists(CtaId.DAX_DIALOG_NETWORK)
+
+    private fun daxNonSerpDialogShown(): Boolean = daxDialogNetworkShown() || daxDialogTrackersFoundShown() || daxDialogOtherShown()
+
+    private fun daxDefaultBrowserShown(): Boolean = dismissedCtaDao.exists(CtaId.DAX_DIALOG_DEFAULT_BROWSER)
+
+    private fun daxSearchWidgetShown(): Boolean = dismissedCtaDao.exists(CtaId.DAX_DIALOG_SEARCH_WIDGET)
 
     private fun isSerpUrl(url: String): Boolean = url.contains(DaxDialogCta.SERP)
 }

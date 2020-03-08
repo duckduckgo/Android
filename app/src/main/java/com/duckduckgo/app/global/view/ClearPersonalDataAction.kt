@@ -29,13 +29,10 @@ import com.duckduckgo.app.fire.FireActivity
 import com.duckduckgo.app.fire.UnsentForgetAllPixelStore
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.tabs.model.TabRepository
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 import javax.inject.Inject
-import kotlin.coroutines.CoroutineContext
 
 interface ClearDataAction {
 
@@ -56,18 +53,11 @@ class ClearPersonalDataAction @Inject constructor(
     private val settingsDataStore: SettingsDataStore,
     private val cookieManager: DuckDuckGoCookieManager,
     private val appCacheClearer: AppCacheClearer
-) : ClearDataAction, CoroutineScope {
-
-    private val clearJob: Job = Job()
-
-    override val coroutineContext: CoroutineContext
-        get() = Dispatchers.Main + clearJob
+) : ClearDataAction {
 
     override fun killAndRestartProcess() {
         Timber.i("Restarting process")
         FireActivity.triggerRestart(context)
-
-        clearJob.cancel()
     }
 
     override fun killProcess() {
