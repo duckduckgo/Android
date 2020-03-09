@@ -162,6 +162,11 @@ class AndroidNotificationScheduler(
 
         override suspend fun doWork(): Result {
 
+            if (!notification.canShow()) {
+                Timber.v("Notification no longer showable")
+                return Result.success()
+            }
+
             val specification = notification.buildSpecification()
 
             val launchIntent = pendingNotificationHandlerIntent(context, notification.launchIntent, specification)
