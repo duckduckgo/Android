@@ -19,11 +19,14 @@ package com.duckduckgo.app.icon.ui
 import android.content.Context
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.duckduckgo.app.global.SingleLiveEvent
 import com.duckduckgo.app.icon.api.AppIcon
 import com.duckduckgo.app.icon.api.IconModifier
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 class ChangeIconViewModel @Inject constructor(
@@ -62,10 +65,13 @@ class ChangeIconViewModel @Inject constructor(
     }
 
     fun onIconSelected(viewData: IconViewData) {
-        val previousIcon = settingsDataStore.appIcon
-        appIconModifier.changeIcon(previousIcon, viewData.appIcon)
-        settingsDataStore.appIcon = viewData.appIcon
-        command.value = Command.IconChanged
+        viewModelScope.launch {
+            val previousIcon = settingsDataStore.appIcon
+            settingsDataStore.appIcon = viewData.appIcon
+            appIconModifier.changeIcon(previousIcon, viewData.appIcon)
+            command.value = Command.IconChanged
+            delay(1000)
+        }
     }
 
 }

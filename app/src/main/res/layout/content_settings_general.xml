@@ -38,28 +38,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/settingsGeneralTitle" />
 
-    <TextView
-        android:id="@+id/changeAppIconLabel"
-        style="@style/SettingsItemClickable"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:gravity="center_vertical"
-        android:text="@string/changeIconCtaLabel"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/lightThemeToggle" />
-
-    <ImageView
-        android:id="@+id/changeAppIcon"
-        android:layout_width="0dp"
-        android:layout_height="40dp"
-        android:layout_marginEnd="16dp"
-        app:layout_constraintBottom_toBottomOf="@+id/changeAppIconLabel"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/changeAppIconLabel"
-        tools:srcCompat="@drawable/ic_app_icon_red_round" />
-
     <androidx.appcompat.widget.SwitchCompat
         android:id="@+id/autocompleteToggle"
         style="@style/SettingsSwitch"
@@ -67,7 +45,7 @@
         android:theme="@style/SettingsSwitchTheme"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/changeAppIcon" />
+        app:layout_constraintTop_toBottomOf="@id/lightThemeToggle" />
 
     <androidx.appcompat.widget.SwitchCompat
         android:id="@+id/setAsDefaultBrowserSetting"
@@ -78,5 +56,27 @@
         app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/autocompleteToggle" />
+
+    <TextView
+        android:id="@+id/changeAppIconLabel"
+        style="@style/SettingsItemClickable"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:text="@string/changeIconCtaLabel"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/setAsDefaultBrowserSetting" />
+
+    <ImageView
+        android:id="@+id/changeAppIcon"
+        android:layout_width="0dp"
+        android:layout_height="40dp"
+        android:layout_marginEnd="16dp"
+        app:layout_constraintBottom_toBottomOf="@+id/changeAppIconLabel"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/changeAppIconLabel"
+        tools:srcCompat="@drawable/ic_app_icon_red_round" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

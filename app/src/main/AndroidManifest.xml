@@ -45,7 +45,8 @@
             android:roundIcon="${appIconRound}"
             android:label="@string/appName">
             <intent-filter>
-                <category android:name="android.intent.action.MAIN" />
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.INFO"/>
             </intent-filter>
         </activity>
 

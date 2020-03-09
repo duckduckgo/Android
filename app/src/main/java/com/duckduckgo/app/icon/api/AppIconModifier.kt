@@ -84,7 +84,7 @@ class AppIconModifier @Inject constructor(
 
     override fun changeIcon(previousIcon: AppIcon, newIcon: AppIcon) {
         enable(context, newIcon)
-        disable(context, previousIcon)
+        disable(context, newIcon)
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1) {
             appShortcutCreator.configureAppShortcuts(context)
@@ -96,7 +96,9 @@ class AppIconModifier @Inject constructor(
     }
 
     private fun disable(context: Context, appIcon: AppIcon) {
-        setComponentState(context, appIcon.componentName, PackageManager.COMPONENT_ENABLED_STATE_DISABLED)
+        AppIcon.values().filterNot { it.componentName == appIcon.componentName }.forEach {
+            setComponentState(context, it.componentName, PackageManager.COMPONENT_ENABLED_STATE_DISABLED)
+        }
     }
 
     private fun setComponentState(context: Context, componentName: String, componentState: Int) {
