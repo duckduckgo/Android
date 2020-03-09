@@ -25,6 +25,8 @@ import com.duckduckgo.app.autocomplete.api.AutoComplete
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteResult
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteSearchSuggestion
 import com.duckduckgo.app.onboarding.store.OnboardingStore
+import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.*
 import com.duckduckgo.app.systemsearch.SystemSearchViewModel.Command
 import com.duckduckgo.app.systemsearch.SystemSearchViewModel.Command.LaunchDuckDuckGo
 import com.nhaarman.mockitokotlin2.argumentCaptor
@@ -55,6 +57,7 @@ class SystemSearchViewModelTest {
     private val mockOnboardingStore: OnboardingStore = mock()
     private val mockDeviceAppLookup: DeviceAppLookup = mock()
     private val mockAutoComplete: AutoComplete = mock()
+    private val mockPixel: Pixel = mock()
 
     private val commandObserver: Observer<Command> = mock()
     private val commandCaptor = argumentCaptor<Command>()
@@ -67,7 +70,7 @@ class SystemSearchViewModelTest {
         whenever(mockAutoComplete.autoComplete(BLANK_QUERY)).thenReturn(Observable.just(autocompleteBlankResult))
         whenever(mockDeviceAppLookup.query(QUERY)).thenReturn(appQueryResult)
         whenever(mockDeviceAppLookup.query(BLANK_QUERY)).thenReturn(appBlankResult)
-        testee = SystemSearchViewModel(mockOnboardingStore, mockAutoComplete, mockDeviceAppLookup, coroutineRule.testDispatcherProvider)
+        testee = SystemSearchViewModel(mockOnboardingStore, mockAutoComplete, mockDeviceAppLookup, mockPixel, coroutineRule.testDispatcherProvider)
         testee.command.observeForever(commandObserver)
     }
 
@@ -96,33 +99,42 @@ class SystemSearchViewModelTest {
         assertFalse(viewState!!.expanded)
     }
 
+    @Test
+    fun whenOnboardingShownThenPixelSent() = runBlockingTest {
+        whenever(mockOnboardingStore.shouldShow).thenReturn(true)
+        testee.resetViewState()
+        verify(mockPixel).fire(INTERSTITIAL_ONBOARDING_SHOWN)
+    }
 
     @Test
-    fun whenOnboardingIsUnexpandedAndUserPressesToggleThenItIsExpanded() = runBlockingTest {
+    fun whenOnboardingIsUnexpandedAndUserPressesToggleThenItIsExpandedAndPixelSent() = runBlockingTest {
         whenOnboardingShowing()
         testee.userTappedOnboardingToggle()
 
         val viewState = testee.onboardingViewState.value
         assertTrue(viewState!!.expanded)
+        verify(mockPixel).fire(INTERSTITIAL_ONBOARDING_MORE_PRESSED)
     }
 
     @Test
-    fun whenOnboardingIsExpandedAndUserPressesToggleThenItIsUnexpanded() = runBlockingTest {
+    fun whenOnboardingIsExpandedAndUserPressesToggleThenItIsUnexpandedAndPixelSent() = runBlockingTest {
         whenOnboardingShowing()
         testee.userTappedOnboardingToggle() // first press to expand
         testee.userTappedOnboardingToggle() // second press to minimize
 
         val viewState = testee.onboardingViewState.value
         assertFalse(viewState!!.expanded)
+        verify(mockPixel).fire(INTERSTITIAL_ONBOARDING_LESS_PRESSED)
     }
 
     @Test
-    fun whenOnboardingIsDismissedThenViewHiddenAndOnboardingStoreNotified() = runBlockingTest {
+    fun whenOnboardingIsDismissedThenViewHiddenPixelSentAndOnboardingStoreNotified() = runBlockingTest {
         whenOnboardingShowing()
         testee.userDismissedOnboarding()
 
         val viewState = testee.onboardingViewState.value
         assertFalse(viewState!!.visible)
+        verify(mockPixel).fire(INTERSTITIAL_ONBOARDING_DISMISSED)
         verify(mockOnboardingStore).onboardingShown()
     }
 
@@ -174,31 +186,35 @@ class SystemSearchViewModelTest {
     }
 
     @Test
-    fun whenUserSubmitsQueryThenBrowserLaunched() {
+    fun whenUserSubmitsQueryThenBrowserLaunchedAndPixelSent() {
         testee.userSubmittedQuery(QUERY)
         verify(commandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
         assertEquals(Command.LaunchBrowser(QUERY), commandCaptor.lastValue)
+        verify(mockPixel).fire(INTERSTITIAL_LAUNCH_BROWSER_QUERY)
     }
 
     @Test
-    fun whenUserSubmitsAutocompleteResultThenBrowserLaunched() {
+    fun whenUserSubmitsAutocompleteResultThenBrowserLaunchedAndPixelSent() {
         testee.userSubmittedAutocompleteResult(AUTOCOMPLETE_RESULT)
         verify(commandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
         assertEquals(Command.LaunchBrowser(AUTOCOMPLETE_RESULT), commandCaptor.lastValue)
+        verify(mockPixel).fire(INTERSTITIAL_LAUNCH_BROWSER_QUERY)
     }
 
     @Test
-    fun whenUserSelectsAppResultThenAppLaunched() {
+    fun whenUserSelectsAppResultThenAppLaunchedAndPixelSent() {
         testee.userSelectedApp(deviceApp)
         verify(commandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
         assertEquals(Command.LaunchDeviceApplication(deviceApp), commandCaptor.lastValue)
+        verify(mockPixel).fire(INTERSTITIAL_LAUNCH_DEVICE_APP)
     }
 
     @Test
-    fun whenUserTapsDaxThenAppLaunched() {
+    fun whenUserTapsDaxThenAppLaunchedAndPixelSent() {
         testee.userTappedDax()
         verify(commandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
         assertTrue(commandCaptor.lastValue is LaunchDuckDuckGo)
+        verify(mockPixel).fire(INTERSTITIAL_LAUNCH_DAX)
     }
 
     @Test

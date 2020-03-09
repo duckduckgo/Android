@@ -25,6 +25,8 @@ import com.duckduckgo.app.global.DefaultDispatcherProvider
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.SingleLiveEvent
 import com.duckduckgo.app.onboarding.store.OnboardingStore
+import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.*
 import com.jakewharton.rxrelay2.PublishRelay
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
@@ -38,6 +40,7 @@ class SystemSearchViewModel(
     private var onboardingStore: OnboardingStore,
     private val autoComplete: AutoComplete,
     private val deviceAppLookup: DeviceAppLookup,
+    private val pixel: Pixel,
     private val dispatchers: DispatcherProvider = DefaultDispatcherProvider()
 ) : ViewModel() {
 
@@ -85,7 +88,11 @@ class SystemSearchViewModel(
     }
 
     private fun resetOnboardingState() {
-        onboardingViewState.value = OnboardingViewState(visible = onboardingStore.shouldShow)
+        val showOnboarding = onboardingStore.shouldShow
+        onboardingViewState.value = OnboardingViewState(visible = showOnboarding)
+        if (showOnboarding) {
+            pixel.fire(INTERSTITIAL_ONBOARDING_SHOWN)
+        }
     }
 
     private fun resetResultsState() {
@@ -109,13 +116,17 @@ class SystemSearchViewModel(
     fun userTappedOnboardingToggle() {
         onboardingViewState.value = currentOnboardingState().copy(expanded = !currentOnboardingState().expanded)
         if (currentOnboardingState().expanded) {
+            pixel.fire(INTERSTITIAL_ONBOARDING_MORE_PRESSED)
             command.value = Command.DismissKeyboard
+        } else {
+            pixel.fire(INTERSTITIAL_ONBOARDING_LESS_PRESSED)
         }
     }
 
     fun userDismissedOnboarding() {
         onboardingViewState.value = currentOnboardingState().copy(visible = false)
         onboardingStore.onboardingShown()
+        pixel.fire(INTERSTITIAL_ONBOARDING_DISMISSED)
     }
 
     fun userUpdatedQuery(query: String) {
@@ -165,6 +176,7 @@ class SystemSearchViewModel(
     }
 
     fun userTappedDax() {
+        pixel.fire(INTERSTITIAL_LAUNCH_DAX)
         command.value = Command.LaunchDuckDuckGo
     }
 
@@ -175,14 +187,17 @@ class SystemSearchViewModel(
 
     fun userSubmittedQuery(query: String) {
         command.value = Command.LaunchBrowser(query)
+        pixel.fire(INTERSTITIAL_LAUNCH_BROWSER_QUERY)
     }
 
     fun userSubmittedAutocompleteResult(query: String) {
         command.value = Command.LaunchBrowser(query)
+        pixel.fire(INTERSTITIAL_LAUNCH_BROWSER_QUERY)
     }
 
     fun userSelectedApp(app: DeviceApp) {
         command.value = Command.LaunchDeviceApplication(app)
+        pixel.fire(INTERSTITIAL_LAUNCH_DEVICE_APP)
     }
 
     fun appNotFound(app: DeviceApp) {

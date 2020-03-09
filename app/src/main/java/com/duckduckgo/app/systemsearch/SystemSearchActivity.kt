@@ -74,7 +74,10 @@ class SystemSearchActivity : DuckDuckGoActivity() {
         configureDaxButton()
         configureOmnibar()
         configureTextInput()
-        intent?.let { sendLaunchPixels(it) }
+
+        if (savedInstanceState == null) {
+            intent?.let { sendLaunchPixels(it) }
+        }
     }
 
     override fun onNewIntent(newIntent: Intent?) {
@@ -105,12 +108,9 @@ class SystemSearchActivity : DuckDuckGoActivity() {
 
     private fun configureOnboarding() {
         okButton.setOnClickListener {
-            pixel.fire(PixelName.INTERSTITIAL_ONBOARDING_DISMISSED)
             viewModel.userDismissedOnboarding()
         }
         toggleButton.setOnClickListener {
-            val more = toggleButton.text == getString(R.string.systemSearchOnboardingButtonMore)
-            pixel.fire(if (more) PixelName.INTERSTITIAL_ONBOARDING_MORE_PRESSED else PixelName.INTERSTITIAL_ONBOARDING_LESS_PRESSED)
             viewModel.userTappedOnboardingToggle()
         }
     }
@@ -172,14 +172,13 @@ class SystemSearchActivity : DuckDuckGoActivity() {
 
     private fun renderOnboardingViewState(viewState: SystemSearchViewModel.OnboardingViewState) {
         if (viewState.visible) {
-            pixel.fire(PixelName.INTERSTITIAL_ONBOARDING_SHOWN)
             onboarding.visibility = View.VISIBLE
             results.elevation = 0.0f
             checkmarks.visibility = if (viewState.expanded) View.VISIBLE else View.GONE
             refreshOnboardingToggleText(viewState.expanded)
         } else {
             onboarding.visibility = View.GONE
-            results.elevation = if (viewState.visible) 0.0f else resources.getDimension(R.dimen.systemSearchResultsElevation)
+            results.elevation = resources.getDimension(R.dimen.systemSearchResultsElevation)
         }
     }
 
@@ -220,19 +219,16 @@ class SystemSearchActivity : DuckDuckGoActivity() {
     }
 
     private fun launchDuckDuckGo() {
-        pixel.fire(PixelName.INTERSTITIAL_LAUNCH_DAX)
         startActivity(BrowserActivity.intent(this))
         finish()
     }
 
     private fun launchBrowser(command: LaunchBrowser) {
-        pixel.fire(PixelName.INTERSTITIAL_LAUNCH_BROWSER_QUERY)
         startActivity(BrowserActivity.intent(this, command.query))
         finish()
     }
 
     private fun launchDeviceApp(command: LaunchDeviceApplication) {
-        pixel.fire(PixelName.INTERSTITIAL_LAUNCH_DEVICE_APP)
         try {
             startActivity(command.deviceApp.launchIntent)
             finish()
