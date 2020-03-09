@@ -355,7 +355,7 @@
     <string name="feedbackInitialDisambiguationSubtitle">Como classificaria os seus comentários?</string>
     <string name="feedbackInitialDisambiguationHappyButtonContentDescription">Botão de comentário positivo</string>
     <string name="feedbackInitialDisambiguationSadButtonContentDescription">Botão de comentário negativo</string>
-    <string name="feedbackIsImportantToUs">Os seus comentários anónimos são importantes para nós.</string>
+    <string name="feedbackIsImportantToUs">Os seus comentários anônimos são importantes para nós.</string>
     <string name="systemSearchOmnibarInputHint"><font size="13">Pesquisar ou escrever URL</font></string>
 
 </resources>
