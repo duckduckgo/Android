@@ -25,7 +25,7 @@ import org.junit.Test
 class VariantManagerTest {
 
     private val variants = VariantManager.ACTIVE_VARIANTS +
-            variantWithKey(RESERVED_EU_AUCTION_VARIANT) +
+            VariantManager.REFERRER_VARIANTS +
             DEFAULT_VARIANT
 
     // SERP Experiment(s)

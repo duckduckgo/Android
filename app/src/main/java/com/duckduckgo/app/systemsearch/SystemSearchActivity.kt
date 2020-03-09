@@ -105,9 +105,12 @@ class SystemSearchActivity : DuckDuckGoActivity() {
 
     private fun configureOnboarding() {
         okButton.setOnClickListener {
+            pixel.fire(PixelName.INTERSTITIAL_ONBOARDING_DISMISSED)
             viewModel.userDismissedOnboarding()
         }
         toggleButton.setOnClickListener {
+            val more = toggleButton.text == getString(R.string.systemSearchOnboardingButtonMore)
+            pixel.fire(if (more) PixelName.INTERSTITIAL_ONBOARDING_MORE_PRESSED else PixelName.INTERSTITIAL_ONBOARDING_LESS_PRESSED)
             viewModel.userTappedOnboardingToggle()
         }
     }
@@ -169,6 +172,7 @@ class SystemSearchActivity : DuckDuckGoActivity() {
 
     private fun renderOnboardingViewState(viewState: SystemSearchViewModel.OnboardingViewState) {
         if (viewState.visible) {
+            pixel.fire(PixelName.INTERSTITIAL_ONBOARDING_SHOWN)
             onboarding.visibility = View.VISIBLE
             results.elevation = 0.0f
             checkmarks.visibility = if (viewState.expanded) View.VISIBLE else View.GONE
