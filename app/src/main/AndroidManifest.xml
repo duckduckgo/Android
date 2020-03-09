@@ -41,12 +41,12 @@
         <!-- Renamed to allow for the introduction of custom icons without breaking existing shortcuts -->
         <activity
             android:name="com.duckduckgo.app.launch.LaunchBridgeActivity"
+            android:noHistory="true"
             android:icon="${appIcon}"
             android:roundIcon="${appIconRound}"
             android:label="@string/appName">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.INFO"/>
             </intent-filter>
         </activity>
 
