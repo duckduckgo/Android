@@ -55,6 +55,30 @@ class NotificationFactory @Inject constructor(val context: Context, val manager:
         return builder.build()
     }
 
+    fun createSearchNotificationPrompt(
+        specification: NotificationSpec,
+        launchIntent: PendingIntent,
+        cancelIntent: PendingIntent,
+        layoutId: Int,
+        priority: Int
+    ): Notification {
+
+        val notificationLayout = RemoteViews(context.packageName, layoutId)
+
+        val builder = NotificationCompat.Builder(context, specification.channel.id)
+            .setPriority(priority)
+            .setCustomContentView(notificationLayout)
+            .setCustomBigContentView(notificationLayout)
+            .setStyle(NotificationCompat.DecoratedCustomViewStyle())
+            .setSmallIcon(specification.icon)
+            .setVisibility(NotificationCompat.VISIBILITY_SECRET)
+            .setAutoCancel(false)
+            .setOnlyAlertOnce(true)
+            .addAction(specification.icon, specification.launchButton, launchIntent)
+            .addAction(specification.icon, specification.closeButton, cancelIntent)
+        return builder.build()
+    }
+
     fun createSearchNotification(
         specification: NotificationSpec,
         launchIntent: PendingIntent,

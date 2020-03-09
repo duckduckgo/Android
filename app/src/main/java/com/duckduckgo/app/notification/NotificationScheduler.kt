@@ -45,6 +45,7 @@ interface NotificationScheduler {
     suspend fun scheduleNextNotification()
     fun launchStickySearchNotification()
     fun dismissStickySearchNotification()
+    fun launchSearchPromptNotification()
 }
 
 class AndroidNotificationScheduler(
@@ -90,7 +91,7 @@ class AndroidNotificationScheduler(
         workManager.enqueue(request)
     }
 
-    fun launchSearchPromptNotification() {
+    override fun launchSearchPromptNotification() {
         Timber.v("Posting sticky search prompt notification")
         val request = OneTimeWorkRequestBuilder<SearchPromptNotificationWorker>()
             .addTag(STICKY_PROMPT_REQUEST_TAG)
@@ -152,7 +153,41 @@ class AndroidNotificationScheduler(
         }
     }
 
-    class SearchPromptNotificationWorker(context: Context, params: WorkerParameters) : SearchNotificationWorker(context, params)
+    class SearchPromptNotificationWorker(val context: Context, val params: WorkerParameters) : CoroutineWorker(context, params) {
+        lateinit var manager: NotificationManagerCompat
+        lateinit var factory: NotificationFactory
+        lateinit var notificationDao: NotificationDao
+        lateinit var notification: SearchNotification
+        lateinit var pixel: Pixel
+
+        override suspend fun doWork(): Result {
+
+            val specification = notification.buildSpecification()
+
+            val launchIntent = pendingNotificationHandlerIntent(context, notification.launchIntent, specification)
+            val cancelIntent = pendingNotificationHandlerIntent(context, notification.cancelIntent, specification)
+
+            val systemNotification =
+                factory.createSearchNotificationPrompt(specification, launchIntent, cancelIntent, notification.layoutId, notification.priority)
+
+            notificationDao.insert(Notification(notification.id))
+            manager.notify(NotificationRegistrar.NotificationId.StickySearch, systemNotification)
+
+            pixel.fire("${NOTIFICATION_SHOWN.pixelName}_${specification.pixelSuffix}")
+            return Result.success()
+        }
+
+        private fun pendingNotificationHandlerIntent(context: Context, eventType: String, specification: NotificationSpec): PendingIntent {
+            val intent = Intent(context, NotificationHandlerService::class.java)
+            intent.type = eventType
+            intent.putExtra(PIXEL_SUFFIX_EXTRA, specification.pixelSuffix)
+            intent.putExtra(NOTIFICATION_SYSTEM_ID_EXTRA, specification.systemId)
+            intent.putExtra(NOTIFICATION_AUTO_CANCEL, specification.autoCancel)
+            return getService(context, 0, intent, 0)!!
+        }
+    }
+
+
     class StickySearchNotificationWorker(context: Context, params: WorkerParameters) : SearchNotificationWorker(context, params)
 
     open class SearchNotificationWorker(val context: Context, params: WorkerParameters) : CoroutineWorker(context, params) {

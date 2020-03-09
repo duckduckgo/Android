@@ -200,7 +200,8 @@ class SettingsViewModel @Inject constructor(
     }
 
     private fun isSearchNotificationExperimentEnabled(variant: Variant): Boolean {
-        return variant.hasFeature(VariantManager.VariantFeature.SearchNotification)
+        return true
+        // return variant.hasFeature(VariantManager.VariantFeature.SearchNotification)
     }
 
 }
