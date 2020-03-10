@@ -365,8 +365,8 @@
     <string name="systemSearchOmnibarInputHint"><font size="13">Faire des recherches ou saisir l\'URL</font></string>
     <string name="systemSearchDeviceAppLabel">Depuis cet appareil</string>
     <string name="systemSearchAppNotFound">Impossible de trouver l\'application</string>
-    <string name="systemSearchOnboardingText">Merci d\'avoir choisi DuckDuckGo !\nDésormais, lorsque vous utilisez notre recherche ou notre application, vos recherches sont protégées.</string>
-    <string name="systemSearchOnboardingFeaturesIntroText">L\'appli DuckDuckGo offre également les fonctionnalités suivantes :</string>
+    <string name="systemSearchOnboardingText">Merci d\'avoir choisi DuckDuckGo!\nDésormais, lorsque vous utilisez notre recherche ou notre application, vos recherches sont protégées.</string>
+    <string name="systemSearchOnboardingFeaturesIntroText">L\'appli DuckDuckGo offre également les fonctionnalités suivantes:</string>
     <string name="systemSearchOnboardingFeatureOneText">Bloque les traqueurs dangereux</string>
     <string name="systemSearchOnboardingFeatureTwoText">Force le cryptage sur les sites Web</string>
     <string name="systemSearchOnboardingFeatureThreeText">Efface les données en un seul clic</string>
