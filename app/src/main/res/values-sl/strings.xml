@@ -1,6 +1,7 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
 
     <string name="duckDuckGoLogoDescription">Logotip DuckDuckGo</string>
+    <string name="duckDuckGoPrivacySimplified">Poenostavljena zasebnost.</string>
     <string name="yes">Da</string>
     <string name="no">Ne</string>
 
@@ -183,7 +184,6 @@
 
     <!-- About Activity -->
     <string name="aboutActivityTitle">O nas</string>
-    <string name="aboutHeading">Poenostavljena zasebnost.</string>
     <string name="aboutDescription">
         Pri DuckDuckGo vzpostavljamo nov standard zaupanja na spletu.\n\ Zasebni brskalnik DuckDuckGo zagotavlja vse bistvene sestavine zasebnosti, ki jih potrebujete za svojo zaščito, kadar iščete in brskate po spletu, vključno z blokiranjem sledilnikov, pametnejšim šifriranjem in zasebnim iskanjem DuckDuckGo.\n\ Navsezadnje nam internet ne bi smel vzbujati strahu. Doseganje zasebnosti na spletu, ki si jo zaslužimo, bi moralo biti tako preprosto kot zagrinjanje zaves.</string>
     <string name="aboutMoreLink">Več na duckduckgo.com/about</string>
@@ -364,5 +364,6 @@
     <string name="feedbackInitialDisambiguationHappyButtonContentDescription">Gumb Pozitivne povratne informacije</string>
     <string name="feedbackInitialDisambiguationSadButtonContentDescription">Gumb Negativne povratne informacije</string>
     <string name="feedbackIsImportantToUs">Vaše anonimne povratne informacije so nam pomembne.</string>
+    <string name="systemSearchOmnibarInputHint"><font size="13">Iščite z iskalnikom ali vnesite URL</font></string>
 
 </resources>

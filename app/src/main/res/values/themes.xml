@@ -29,6 +29,7 @@
         <item name="bottomSheetDialogTheme">@style/BottomSheetDialog</item>
         <item name="android:windowActivityTransitions">true</item>
         <item name="autoCompleteTextViewStyle">@style/AutoCompleteTextViewStyle</item>
+        <item name="android:statusBarColor">?colorPrimary</item>
     </style>
 
     <style name="AppTheme.BaseDark">
