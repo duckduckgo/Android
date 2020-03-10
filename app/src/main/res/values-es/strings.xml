@@ -369,7 +369,7 @@
     <string name="systemSearchOnboardingFeaturesIntroText">La aplicación DuckDuckGo también:</string>
     <string name="systemSearchOnboardingFeatureOneText">Bloquea rastreadores inseguros</string>
     <string name="systemSearchOnboardingFeatureTwoText">Fuerza el cifrado en sitios web</string>
-    <string name="systemSearchOnboardingFeatureThreeText">Borra datos con un toque</string>
+    <string name="systemSearchOnboardingFeatureThreeText">Borra datos con un solo toque</string>
     <string name="systemSearchOnboardingButtonMore">Mostrar más</string>
     <string name="systemSearchOnboardingButtonLess">Ocultar</string>
     <string name="systemSearchOnboardingButtonOk">Entendido</string>
