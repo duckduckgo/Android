@@ -89,10 +89,10 @@ class ChangeIconActivity : DuckDuckGoActivity() {
                 AlertDialog.Builder(this)
                     .setTitle(R.string.changeIconDialogTitle)
                     .setMessage(getString(R.string.changeIconDialogMessage))
-                    .setPositiveButton(R.string.yes) { _, _ ->
+                    .setPositiveButton(R.string.changeIconCtaAccept) { _, _ ->
                         viewModel.onIconConfirmed(it.viewData)
                     }
-                    .setNegativeButton(R.string.no) { dialog, _ ->
+                    .setNegativeButton(R.string.changeIconCtaCancel) { dialog, _ ->
                         dialog.dismiss()
                     }
                     .show()
