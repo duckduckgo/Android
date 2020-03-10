@@ -33,6 +33,7 @@ interface SettingsDataStore {
     var hideTips: Boolean
     var autoCompleteSuggestionsEnabled: Boolean
     var appIcon: AppIcon
+    var appIconChanged: Boolean
 
     /**
      * This will be checked upon app startup and used to decide whether it should perform a clear or not.
@@ -84,6 +85,10 @@ class SettingsSharedPreferences @Inject constructor(private val context: Context
             return AppIcon.from(componentName)
         }
         set(appIcon) = preferences.edit(commit = true) { putString(KEY_APP_ICON, appIcon.componentName) }
+
+    override var appIconChanged: Boolean
+        get() = preferences.getBoolean(KEY_APP_ICON_CHANGED, false)
+        set(enabled) = preferences.edit(commit = true) { putBoolean(KEY_APP_ICON_CHANGED, enabled) }
 
     override var appUsedSinceLastClear: Boolean
         get() = preferences.getBoolean(KEY_APP_USED_SINCE_LAST_CLEAR, true)
@@ -143,6 +148,7 @@ class SettingsSharedPreferences @Inject constructor(private val context: Context
         const val KEY_APP_USED_SINCE_LAST_CLEAR = "APP_USED_SINCE_LAST_CLEAR"
         const val KEY_HIDE_TIPS = "HIDE_TIPS"
         const val KEY_APP_ICON = "APP_ICON"
+        const val KEY_APP_ICON_CHANGED = "APP_ICON_CHANGED"
 
         private val DEFAULT_ICON = if (BuildConfig.DEBUG){
             AppIcon.BLUE

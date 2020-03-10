@@ -487,6 +487,37 @@ class AutomaticDataClearerTest {
         }
     }
 
+    @Test
+    fun whenNotFreshAppLaunchAndIconJustChangedThenShouldNotClear() = runBlocking<Unit> {
+        val isFreshAppLaunch = false
+
+
+        configureUserOptions(ClearWhatOption.CLEAR_TABS_AND_DATA, ClearWhenOption.APP_EXIT_OR_5_MINS)
+        configureAppIconJustChanged()
+
+        withContext(Dispatchers.Main) {
+            simulateLifecycle(isFreshAppLaunch)
+            verifyAppIconFlagReset()
+            verifyTabsNotCleared()
+        }
+    }
+
+    @Test
+    fun whenNotFreshAppLaunchAndIconNotChangedThenShouldClear() = runBlocking<Unit> {
+        val isFreshAppLaunch = false
+        
+        configureAppIconNotChanged()
+
+        configureUserOptions(ClearWhatOption.CLEAR_TABS_AND_DATA, ClearWhenOption.APP_EXIT_OR_5_MINS)
+        configureEnoughTimePassed()
+        configureAppUsedSinceLastClear()
+
+        withContext(Dispatchers.Main) {
+            simulateLifecycle(isFreshAppLaunch)
+            verifyEverythingCleared()
+        }
+    }
+
     private fun configureUserOptions(whatOption: ClearWhatOption, whenOption: ClearWhenOption) {
         whenever(mockSettingsDataStore.automaticallyClearWhenOption).thenReturn(whenOption)
         whenever(mockSettingsDataStore.automaticallyClearWhatOption).thenReturn(whatOption)
@@ -508,6 +539,14 @@ class AutomaticDataClearerTest {
         whenever(mockTimeKeeper.hasEnoughTimeElapsed(any(), any(), any())).thenReturn(false)
     }
 
+    private fun configureAppIconJustChanged() {
+        whenever(mockSettingsDataStore.appIconChanged).thenReturn(true)
+    }
+
+    private fun configureAppIconNotChanged() {
+        whenever(mockSettingsDataStore.appIconChanged).thenReturn(false)
+    }
+
     private suspend fun verifyTabsCleared() {
         verify(mockClearAction).clearTabsAsync(any())
     }
@@ -522,5 +561,9 @@ class AutomaticDataClearerTest {
 
     private suspend fun verifyEverythingNotCleared() {
         verify(mockClearAction, never()).clearTabsAndAllDataAsync(any(), any())
+    }
+
+    private fun verifyAppIconFlagReset() {
+        verify(mockSettingsDataStore).appIconChanged = false
     }
 }

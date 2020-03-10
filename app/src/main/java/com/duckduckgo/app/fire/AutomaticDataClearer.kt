@@ -20,7 +20,11 @@ import android.os.Handler
 import android.os.SystemClock
 import androidx.annotation.UiThread
 import androidx.core.os.postDelayed
-import androidx.lifecycle.*
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleObserver
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.OnLifecycleEvent
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import com.duckduckgo.app.global.ApplicationClearDataState
@@ -30,7 +34,11 @@ import com.duckduckgo.app.global.view.ClearDataAction
 import com.duckduckgo.app.settings.clear.ClearWhatOption
 import com.duckduckgo.app.settings.clear.ClearWhenOption
 import com.duckduckgo.app.settings.db.SettingsDataStore
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
 import kotlin.coroutines.CoroutineContext
@@ -78,6 +86,9 @@ class AutomaticDataClearer(
         val appUsedSinceLastClear = settingsDataStore.appUsedSinceLastClear
         settingsDataStore.appUsedSinceLastClear = true
 
+        val appIconChanged = settingsDataStore.appIconChanged
+        settingsDataStore.appIconChanged = false
+
         val clearWhat = settingsDataStore.automaticallyClearWhatOption
         val clearWhen = settingsDataStore.automaticallyClearWhenOption
         Timber.i("Currently configured to automatically clear $clearWhat / $clearWhen")
@@ -86,7 +97,7 @@ class AutomaticDataClearer(
             Timber.i("No data will be cleared as it's configured to clear nothing automatically")
             dataClearerState.value = FINISHED
         } else {
-            if (shouldClearData(clearWhen, appUsedSinceLastClear)) {
+            if (shouldClearData(clearWhen, appUsedSinceLastClear, appIconChanged)) {
                 Timber.i("Decided data should be cleared")
                 clearDataWhenAppInForeground(clearWhat)
             } else {
@@ -171,13 +182,19 @@ class AutomaticDataClearer(
         }
     }
 
-    private fun shouldClearData(cleanWhenOption: ClearWhenOption, appUsedSinceLastClear: Boolean): Boolean {
+    private fun shouldClearData(cleanWhenOption: ClearWhenOption, appUsedSinceLastClear: Boolean, appIconChanged: Boolean): Boolean {
         Timber.d("Determining if data should be cleared for option $cleanWhenOption")
+
+        if (appIconChanged) {
+            Timber.i("No data will be cleared as the app icon was just changed")
+            return false
+        }
 
         if (!appUsedSinceLastClear) {
             Timber.d("App hasn't been used since last clear; no need to clear again")
             return false
         }
+
         Timber.d("App has been used since last clear")
 
         if (isFreshAppLaunch) {
@@ -198,6 +215,7 @@ class AutomaticDataClearer(
             clearWhenOption = cleanWhenOption
         )
         Timber.d("Has enough time passed to trigger the data clear? $enoughTimePassed")
+
         return enoughTimePassed
     }
 }

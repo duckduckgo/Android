@@ -68,6 +68,7 @@ class ChangeIconViewModel @Inject constructor(
     fun onIconConfirmed(viewData: IconViewData) {
         val previousIcon = settingsDataStore.appIcon
         settingsDataStore.appIcon = viewData.appIcon
+        settingsDataStore.appIconChanged = true
         appIconModifier.changeIcon(previousIcon, viewData.appIcon)
         command.value = Command.IconChanged
     }
