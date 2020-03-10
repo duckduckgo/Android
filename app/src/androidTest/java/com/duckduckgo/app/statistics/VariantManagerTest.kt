@@ -112,9 +112,4 @@ class VariantManagerTest {
             fail("Doubles are not equal. Expected $expected but was $actual")
         }
     }
-
-    @Suppress("SameParameterValue")
-    private fun variantWithKey(key: String): Variant {
-        return DEFAULT_VARIANT.copy(key = key)
-    }
 }

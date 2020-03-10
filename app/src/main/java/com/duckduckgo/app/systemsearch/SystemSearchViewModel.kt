@@ -167,11 +167,9 @@ class SystemSearchViewModel(
         val updatedSuggestions = if (hasMultiResults) fullSuggestions.take(RESULTS_MAX_RESULTS_PER_GROUP) else fullSuggestions
         val updatedApps = if (hasMultiResults) appResults.take(RESULTS_MAX_RESULTS_PER_GROUP) else appResults
 
-        resultsViewState.postValue(
-            currentResultsState().copy(
-                autocompleteResults = AutoCompleteResult(autocompleteResults.query, updatedSuggestions),
-                appResults = updatedApps
-            )
+        resultsViewState.value = currentResultsState().copy(
+            autocompleteResults = AutoCompleteResult(autocompleteResults.query, updatedSuggestions),
+            appResults = updatedApps
         )
     }
 
