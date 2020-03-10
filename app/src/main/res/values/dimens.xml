@@ -33,6 +33,8 @@
     <dimen name="settingsItemHorizontalPadding">20dp</dimen>
     <dimen name="onboardingTitleMarginTop">20dp</dimen>
 
+    <dimen name="systemSearchResultsElevation">4dp</dimen>
+
     <dimen name="changeAppIconPadding">16dp</dimen>
     <dimen name="changeAppIconListPadding">4dp</dimen>
     <dimen name="changeAppIconSize">75dp</dimen>

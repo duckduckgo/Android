@@ -22,6 +22,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
 import android.view.KeyEvent
+import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.widget.TextView
 import android.widget.Toast
@@ -35,11 +36,13 @@ import com.duckduckgo.app.browser.autocomplete.BrowserAutoCompleteSuggestionsAda
 import com.duckduckgo.app.browser.omnibar.OmnibarScrolling
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.view.TextChangedWatcher
+import com.duckduckgo.app.global.view.hideKeyboard
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelName
 import com.duckduckgo.app.systemsearch.SystemSearchViewModel.Command.*
-import com.duckduckgo.app.systemsearch.SystemSearchViewModel.SystemSearchViewState
+import com.duckduckgo.app.systemsearch.SystemSearchViewModel.SystemSearchResultsViewState
 import kotlinx.android.synthetic.main.activity_system_search.*
+import kotlinx.android.synthetic.main.include_system_search_onboarding.*
 import javax.inject.Inject
 
 class SystemSearchActivity : DuckDuckGoActivity() {
@@ -65,17 +68,21 @@ class SystemSearchActivity : DuckDuckGoActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_system_search)
         configureObservers()
+        configureOnboarding()
         configureAutoComplete()
         configureDeviceAppSuggestions()
         configureDaxButton()
         configureOmnibar()
         configureTextInput()
-        intent?.let { sendLaunchPixels(it) }
+
+        if (savedInstanceState == null) {
+            intent?.let { sendLaunchPixels(it) }
+        }
     }
 
     override fun onNewIntent(newIntent: Intent?) {
         super.onNewIntent(newIntent)
-        viewModel.resetState()
+        viewModel.resetViewState()
         newIntent?.let { sendLaunchPixels(it) }
     }
 
@@ -88,12 +95,24 @@ class SystemSearchActivity : DuckDuckGoActivity() {
     }
 
     private fun configureObservers() {
-        viewModel.viewState.observe(this, Observer<SystemSearchViewState> {
-            it?.let { renderViewState(it) }
+        viewModel.onboardingViewState.observe(this, Observer<SystemSearchViewModel.OnboardingViewState> {
+            it?.let { renderOnboardingViewState(it) }
+        })
+        viewModel.resultsViewState.observe(this, Observer<SystemSearchResultsViewState> {
+            it?.let { renderResultsViewState(it) }
         })
         viewModel.command.observe(this, Observer {
             processCommand(it)
         })
+    }
+
+    private fun configureOnboarding() {
+        okButton.setOnClickListener {
+            viewModel.userDismissedOnboarding()
+        }
+        toggleButton.setOnClickListener {
+            viewModel.userTappedOnboardingToggle()
+        }
     }
 
     private fun configureAutoComplete() {
@@ -124,14 +143,16 @@ class SystemSearchActivity : DuckDuckGoActivity() {
     }
 
     private fun configureOmnibar() {
-        results.addOnLayoutChangeListener { _, _, _, _, _, _, _, _, _ ->
-            val scrollable = results.maxScrollAmount > MINIMUM_SCROLL_HEIGHT
-            if (scrollable) {
-                omnibarScrolling.enableOmnibarScrolling(toolbar)
-            } else {
-                showOmnibar()
-                omnibarScrolling.disableOmnibarScrolling(toolbar)
-            }
+        resultsContent.addOnLayoutChangeListener { _, _, _, _, _, _, _, _, _ -> updateScroll() }
+    }
+
+    private fun updateScroll() {
+        val scrollable = resultsContent.height > (results.height - results.paddingTop - results.paddingBottom)
+        if (scrollable) {
+            omnibarScrolling.enableOmnibarScrolling(toolbar)
+        } else {
+            showOmnibar()
+            omnibarScrolling.disableOmnibarScrolling(toolbar)
         }
     }
 
@@ -149,7 +170,24 @@ class SystemSearchActivity : DuckDuckGoActivity() {
         clearTextButton.setOnClickListener { viewModel.userClearedQuery() }
     }
 
-    private fun renderViewState(viewState: SystemSearchViewState) {
+    private fun renderOnboardingViewState(viewState: SystemSearchViewModel.OnboardingViewState) {
+        if (viewState.visible) {
+            onboarding.visibility = View.VISIBLE
+            results.elevation = 0.0f
+            checkmarks.visibility = if (viewState.expanded) View.VISIBLE else View.GONE
+            refreshOnboardingToggleText(viewState.expanded)
+        } else {
+            onboarding.visibility = View.GONE
+            results.elevation = resources.getDimension(R.dimen.systemSearchResultsElevation)
+        }
+    }
+
+    private fun refreshOnboardingToggleText(expanded: Boolean) {
+        val toggleText = if (expanded) R.string.systemSearchOnboardingButtonLess else R.string.systemSearchOnboardingButtonMore
+        toggleButton.text = getString(toggleText)
+    }
+
+    private fun renderResultsViewState(viewState: SystemSearchResultsViewState) {
         if (omnibarTextInput.text.toString() != viewState.queryText) {
             omnibarTextInput.setText(viewState.queryText)
             omnibarTextInput.setSelection(viewState.queryText.length)
@@ -174,23 +212,23 @@ class SystemSearchActivity : DuckDuckGoActivity() {
             is ShowAppNotFoundMessage -> {
                 Toast.makeText(this, R.string.systemSearchAppNotFound, LENGTH_SHORT).show()
             }
+            is DismissKeyboard -> {
+                omnibarTextInput.hideKeyboard()
+            }
         }
     }
 
     private fun launchDuckDuckGo() {
-        pixel.fire(PixelName.INTERSTITIAL_LAUNCH_DAX)
         startActivity(BrowserActivity.intent(this))
         finish()
     }
 
     private fun launchBrowser(command: LaunchBrowser) {
-        pixel.fire(PixelName.INTERSTITIAL_LAUNCH_BROWSER_QUERY)
         startActivity(BrowserActivity.intent(this, command.query))
         finish()
     }
 
     private fun launchDeviceApp(command: LaunchDeviceApplication) {
-        pixel.fire(PixelName.INTERSTITIAL_LAUNCH_DEVICE_APP)
         try {
             startActivity(command.deviceApp.launchIntent)
             finish()
@@ -220,7 +258,6 @@ class SystemSearchActivity : DuckDuckGoActivity() {
 
         const val WIDGET_SEARCH_EXTRA = "WIDGET_SEARCH_EXTRA"
         const val NEW_SEARCH_ACTION = "com.duckduckgo.mobile.android.NEW_SEARCH"
-        const val MINIMUM_SCROLL_HEIGHT = 86 // enough space for blank "no suggestion" and padding
 
         fun intent(context: Context, widgetSearch: Boolean = false): Intent {
             val intent = Intent(context, SystemSearchActivity::class.java)

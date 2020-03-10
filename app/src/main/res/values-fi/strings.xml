@@ -1,6 +1,7 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
 
     <string name="duckDuckGoLogoDescription">DuckDuckGo-logo</string>
+    <string name="duckDuckGoPrivacySimplified">Tietosuojaa, yksinkertaisesti.</string>
     <string name="yes">Joo</string>
     <string name="no">Ei</string>
 
@@ -175,7 +176,6 @@
 
     <!-- About Activity -->
     <string name="aboutActivityTitle">Tietoa meistä</string>
-    <string name="aboutHeading">Tietosuojaa, yksinkertaisesti.</string>
     <string name="aboutDescription">
         DuckDuckGo asettaa uudet standardit luottamukselle verkossa.\n\ DuckDuckGo-tietosuojaselain tarjoaa kaikki keskeiset tietosuojaominaisuudet nettihakujesi ja -selailusi turvaksi, kuten seurantapalvelinten eston, älykkäämmän salauksen ja yksityisen DuckDuckGo-haun.\n\ Internetin ei pitäisi tuntua karmivalta paikalta ja haluamasi nettiyksityisyyden pitäisi järjestyä sulkemalla verhot.</string>
     <string name="aboutMoreLink">Lisätietoa: duckduckgo.com/about</string>
@@ -356,5 +356,6 @@
     <string name="feedbackInitialDisambiguationHappyButtonContentDescription">Positiivinen palaute -painike</string>
     <string name="feedbackInitialDisambiguationSadButtonContentDescription">Negatiivinen palaute -painike</string>
     <string name="feedbackIsImportantToUs">Anonyymi palautteesi on meille tärkeää.</string>
+    <string name="systemSearchOmnibarInputHint"><font size="13">Hae tai kirjoita URL</font></string>
 
 </resources>

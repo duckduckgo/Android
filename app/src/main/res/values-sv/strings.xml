@@ -17,6 +17,7 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
 
     <string name="duckDuckGoLogoDescription">DuckDuckGos logotyp</string>
+    <string name="duckDuckGoPrivacySimplified">Förenklad sekretessförklaring.</string>
     <string name="yes">Ja</string>
     <string name="no">Nej</string>
 
@@ -191,7 +192,6 @@
 
     <!-- About Activity -->
     <string name="aboutActivityTitle">Om oss</string>
-    <string name="aboutHeading">Förenklad sekretessförklaring.</string>
     <string name="aboutDescription">
         På DuckDuckGo höjer vi kraven för förtroende online.\n\ DuckDuckGo Privacy Browser tillhandahåller alla nödvändiga sekretessvillkor som du behöver för att skydda dig själv när du söker och surfar på nätet, inklusive blockering av spårare, smartare kryptering och DuckDuckGo privat sökning.\ n\ Internet borde ju trots allt inte kännas obehagligt och att få den sekretess du förtjänar online bör vara lika enkelt som att stänga persiennerna.</string>
     <string name="aboutMoreLink">Mer på duckduckgo.com/about</string>
@@ -372,5 +372,6 @@
     <string name="feedbackInitialDisambiguationHappyButtonContentDescription">Knappen för positiv återkoppling</string>
     <string name="feedbackInitialDisambiguationSadButtonContentDescription">Knappen för negativ återkoppling</string>
     <string name="feedbackIsImportantToUs">Din anonyma återkoppling är viktig för oss.</string>
+    <string name="systemSearchOmnibarInputHint"><font size="13">Sök eller skriv in URL</font></string>
 
 </resources>

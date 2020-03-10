@@ -100,6 +100,10 @@ interface Pixel {
         INTERSTITIAL_LAUNCH_BROWSER_QUERY(pixelName = "m_i_lbq"),
         INTERSTITIAL_LAUNCH_DEVICE_APP(pixelName = "m_i_sda"),
         INTERSTITIAL_LAUNCH_DAX(pixelName = "m_i_ld"),
+        INTERSTITIAL_ONBOARDING_SHOWN(pixelName = "m_io_s"),
+        INTERSTITIAL_ONBOARDING_DISMISSED(pixelName = "m_io_d"),
+        INTERSTITIAL_ONBOARDING_LESS_PRESSED(pixelName = "m_io_l"),
+        INTERSTITIAL_ONBOARDING_MORE_PRESSED(pixelName = "m_io_m"),
 
         LONG_PRESS("mlp"),
         LONG_PRESS_DOWNLOAD_IMAGE("mlp_i"),
