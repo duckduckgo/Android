@@ -68,11 +68,11 @@ class LaunchBridgeActivity : DuckDuckGoActivity() {
         } else {
             startActivity(OnboardingActivity.intent(this))
         }
-        finish()
+        // finish()
     }
 
     private fun showHome() {
         startActivity(BrowserActivity.intent(this))
-        finish()
+        // finish()
     }
 }

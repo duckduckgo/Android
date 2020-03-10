@@ -24,7 +24,9 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.GridLayoutManager
+import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.fire.FireActivity
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.settings.SettingsActivity
 import kotlinx.android.synthetic.main.content_app_icons.appIconsList
@@ -35,13 +37,20 @@ class ChangeIconActivity : DuckDuckGoActivity() {
 
     private val viewModel: ChangeIconViewModel by bindViewModel()
     private val iconsAdapter: AppIconsAdapter = AppIconsAdapter { icon ->
-        viewModel.onIconSelected(icon)
+        viewModel.onIconSelected(this, icon )
     }
 
     companion object {
         fun intent(context: Context): Intent {
             return Intent(context, ChangeIconActivity::class.java)
         }
+
+        private fun getRestartIntent(context: Context): Intent {
+            val intent = BrowserActivity.intent(context, launchedFromFireAction = true)
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+            return intent
+        }
+
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -86,7 +95,7 @@ class ChangeIconActivity : DuckDuckGoActivity() {
     private fun processCommand(it: ChangeIconViewModel.Command?) {
         when (it) {
             is ChangeIconViewModel.Command.IconChanged -> {
-                finish()
+                FireActivity.triggerRestart(this)
             }
         }
     }
