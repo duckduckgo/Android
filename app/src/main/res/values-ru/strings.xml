@@ -381,7 +381,7 @@
     <string name="feedbackIsImportantToUs">Ваш отзыв важен для нас. Отзыв анонимный.</string>
 
     <!-- Webview Recovery -->
-    <string name="crashedWebViewErrorMessage">Веб-страницу невозможно показать.</string>
+    <string name="crashedWebViewErrorMessage">Невозможно отобразить веб-страницу.</string>
     <string name="crashedWebViewErrorAction">Перезагрузить</string>
 
     <!-- System Search -->
@@ -393,7 +393,7 @@
     <string name="systemSearchOnboardingFeatureOneText">Блокирует небезопасное отслеживание</string>
     <string name="systemSearchOnboardingFeatureTwoText">Принудительно использует шифрование на веб-сайтах</string>
     <string name="systemSearchOnboardingFeatureThreeText">Удаляет данные одним касанием</string>
-    <string name="systemSearchOnboardingButtonMore">Показать больше</string>
+    <string name="systemSearchOnboardingButtonMore">ПОДРОБНЕЕ</string>
     <string name="systemSearchOnboardingButtonLess">Скрыть</string>
     <string name="systemSearchOnboardingButtonOk">Понятно</string>
 
