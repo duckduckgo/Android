@@ -15,14 +15,26 @@
   -->
 <resources>
     <string-array name="brokenSitesCategories">
+        <item>Images didn\'t load</item>
+        <item>The site asked me to disable</item>
+        <item>Comments didn\'t load</item>
+        <item>Video didn\'t play</item>
         <item>Links or buttons don\'t work</item>
         <item>Content is missing</item>
-        <item>Comments didn\'t load</item>
-        <item>Images didn\'t load</item>
         <item>I can\'t login</item>
-        <item>The site asked me to disable</item>
         <item>The browser is incompatible</item>
-        <item>Video didn\'t play</item>
         <item>Something else</item>
+    </string-array>
+
+    <string-array name="brokenSitesValues">
+        <item>images</item>
+        <item>paywall</item>
+        <item>comments</item>
+        <item>videos</item>
+        <item>links</item>
+        <item>content</item>
+        <item>login</item>
+        <item>unsupported</item>
+        <item>other</item>
     </string-array>
 </resources>

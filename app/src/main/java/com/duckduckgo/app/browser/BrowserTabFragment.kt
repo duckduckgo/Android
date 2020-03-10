@@ -512,7 +512,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
                 hideKeyboard()
             }
             is Command.BrokenSiteFeedback -> {
-                launchBrokenSiteFeedback(it.url)
+                launchBrokenSiteFeedback(it.url, it.blockedTrackers, it.httpsUpgraded)
             }
             is Command.ShowFullScreen -> {
                 webViewFullScreenContainer.addView(
@@ -553,14 +553,10 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
         }
     }
 
-    private fun launchBrokenSiteFeedback(url: String?) {
-        val site = viewModel.siteLiveData.value
-        val events = site?.trackingEvents
-        val blockedTrackers = events?.distinct()?.map { Uri.parse(it.trackerUrl).host }.orEmpty().joinToString(",")
-
+    private fun launchBrokenSiteFeedback(url: String?, blockedTrackers: String, upgradedHttps: Boolean) {
         context?.let {
             val options = ActivityOptions.makeSceneTransitionAnimation(browserActivity).toBundle()
-            startActivity(BrokenSiteActivity.intent(it, url, blockedTrackers), options)
+            startActivity(BrokenSiteActivity.intent(it, url, blockedTrackers, upgradedHttps), options)
         }
     }
 

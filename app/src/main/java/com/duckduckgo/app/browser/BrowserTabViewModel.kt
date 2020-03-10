@@ -185,7 +185,7 @@ class BrowserTabViewModel(
         class ShareLink(val url: String) : Command()
         class CopyLink(val url: String) : Command()
         class FindInPageCommand(val searchTerm: String) : Command()
-        class BrokenSiteFeedback(val url: String?) : Command()
+        class BrokenSiteFeedback(val url: String?, val blockedTrackers: String, val httpsUpgraded: Boolean) : Command()
         object DismissFindInPage : Command()
         class ShowFileChooser(val filePathCallback: ValueCallback<Array<Uri>>, val fileChooserParams: WebChromeClient.FileChooserParams) : Command()
         class HandleExternalAppLink(val appLink: IntentType) : Command()
@@ -582,6 +582,10 @@ class BrowserTabViewModel(
         command.postValue(SendSms(telephoneNumber))
     }
 
+    override fun upgradedToHttps() {
+        site?.upgradedToHttps()
+    }
+
     override fun trackerDetected(event: TrackingEvent) {
         Timber.d("Tracker detected while on $url and the document was ${event.documentUrl}")
         if (site?.domainMatchesUrl(event.documentUrl) == true) {
@@ -690,7 +694,11 @@ class BrowserTabViewModel(
     }
 
     fun onBrokenSiteSelected() {
-        command.value = BrokenSiteFeedback(url)
+        val events = site?.trackingEvents
+        val blockedTrackers = events?.distinct()?.map { Uri.parse(it.trackerUrl).host }.orEmpty().joinToString(",")
+        val upgradedHttps = site?.upgradedHttps ?: false
+
+        command.value = BrokenSiteFeedback(url, blockedTrackers, upgradedHttps)
     }
 
     fun onUserSelectedToEditQuery(query: String) {

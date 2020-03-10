@@ -53,6 +53,11 @@ val Uri.hasIpHost: Boolean
         return baseHost?.matches(IP_REGEX) ?: false
     }
 
+val Uri.absoluteString: String
+    get() {
+        return "$scheme$host$path"
+    }
+
 fun Uri.isHttpsVersionOfUri(other: Uri): Boolean {
     return isHttps && other.isHttp && other.toHttps == this
 }

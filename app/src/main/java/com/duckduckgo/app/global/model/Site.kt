@@ -43,6 +43,7 @@ interface Site {
     var title: String?
     val https: HttpsStatus
     var hasHttpResources: Boolean
+    var upgradedHttps: Boolean
 
     val privacyPractices: PrivacyPractices.Practices
     val entity: Entity?
@@ -52,6 +53,7 @@ interface Site {
     val allTrackersBlocked: Boolean
     fun trackerDetected(event: TrackingEvent)
     fun updatePrivacyData(sitePrivacyData: SitePrivacyData)
+    fun upgradedToHttps()
 
     fun calculateGrades(): SiteGrades
 

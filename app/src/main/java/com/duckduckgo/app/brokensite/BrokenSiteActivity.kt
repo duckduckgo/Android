@@ -19,8 +19,8 @@ package com.duckduckgo.app.brokensite
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.widget.EditText
 import androidx.lifecycle.Observer
+import androidx.webkit.WebViewCompat
 import com.duckduckgo.app.brokensite.BrokenSiteViewModel.Command
 import com.duckduckgo.app.brokensite.BrokenSiteViewModel.ViewState
 import com.duckduckgo.app.browser.R
@@ -32,9 +32,8 @@ import org.jetbrains.anko.longToast
 
 
 class BrokenSiteActivity : DuckDuckGoActivity() {
-    // TODO Change code here
     private val viewModel: BrokenSiteViewModel by bindViewModel()
-    private var lol: Int = -1
+    val categories: Array<String> by lazy { resources.getStringArray(R.array.brokenSitesCategories) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -42,36 +41,10 @@ class BrokenSiteActivity : DuckDuckGoActivity() {
         configureListeners()
         configureObservers()
         setupActionBar()
-        submitButton.isEnabled = false
         if (savedInstanceState == null) {
             consumeIntentExtra()
         }
-
-        val categories = resources.getStringArray(R.array.brokenSitesCategories)
-
-        categoriesSelection.setOnClickListener {
-            MaterialAlertDialogBuilder(this)
-                .setTitle(getString(R.string.brokenSitesCategoriesTitle))
-                .setSingleChoiceItems(categories, -1) { _, itemSelected ->
-                    lol = itemSelected
-                }
-                .setPositiveButton(getString(android.R.string.yes)) { _, _ ->
-                    when (lol) {
-                        -1 -> {
-                            categoriesSelection.setText("")
-                            submitButton.isEnabled = false
-                        }
-                        else -> {
-                            categoriesSelection.setText(categories[lol])
-                            submitButton.isEnabled = true
-                        }
-                    }
-                }
-                .setNegativeButton(getString(android.R.string.no)) { dialog, _ -> dialog.dismiss() }
-                .show()
-        }
     }
-
 
     private fun setupActionBar() {
         setSupportActionBar(toolbar)
@@ -81,39 +54,40 @@ class BrokenSiteActivity : DuckDuckGoActivity() {
     private fun consumeIntentExtra() {
         val url = intent.getStringExtra(URL_EXTRA)
         val blockedTrackers = intent.getStringExtra(BLOCKED_TRACKERS_EXTRA)
-        viewModel.setInitialBrokenSite(url, blockedTrackers)
+        val upgradedHttps = intent.getBooleanExtra(UPGRADED_TO_HTTPS_EXTRA, false)
+        viewModel.setInitialBrokenSite(url, blockedTrackers, upgradedHttps)
     }
 
     private fun configureListeners() {
-//        feedbackMessage.addTextChangedListener(object : TextChangedWatcher() {
-//            override fun afterTextChanged(editable: Editable) {
-//                viewModel.onFeedbackMessageChanged(editable.toString())
-//            }
-//        })
-//        brokenSiteUrl.addTextChangedListener(object : TextChangedWatcher() {
-//            override fun afterTextChanged(editable: Editable) {
-//                viewModel.onBrokenSiteUrlChanged(editable.toString())
-//            }
-//        })
-//        submitButton.setOnClickListener {
-//            val webViewVersion = WebViewCompat.getCurrentWebViewPackage(applicationContext)?.versionName ?: BrokenSiteViewModel.UNKNOWN_VERSION
-//            viewModel.onSubmitPressed(webViewVersion)
-//        }
+        categoriesSelection.setOnClickListener {
+            MaterialAlertDialogBuilder(this)
+                .setTitle(getString(R.string.brokenSitesCategoriesTitle))
+                .setSingleChoiceItems(categories, -1) { _, newIndex ->
+                    viewModel.onCategoryIndexChanged(newIndex)
+                }
+                .setPositiveButton(getString(android.R.string.yes)) { dialog, _ -> dialog.dismiss() }
+                .setNegativeButton(getString(android.R.string.no)) { dialog, _ -> dialog.dismiss() }
+                .show()
+        }
+
+        submitButton.setOnClickListener {
+            val webViewVersion = WebViewCompat.getCurrentWebViewPackage(applicationContext)?.versionName ?: BrokenSiteViewModel.UNKNOWN_VERSION
+            val categoryValues = resources.getStringArray(R.array.brokenSitesValues)
+            viewModel.onSubmitPressed(webViewVersion, categoryValues[viewModel.indexSelected()])
+        }
     }
 
     private fun configureObservers() {
         viewModel.command.observe(this, Observer {
             it?.let { processCommand(it) }
         })
-        viewModel.viewState.observe(this, Observer<ViewState> {
+        viewModel.viewState.observe(this, Observer {
             it?.let { render(it) }
         })
     }
 
     private fun processCommand(command: Command) {
         when (command) {
-//            Command.FocusUrl -> brokenSiteUrl.requestFocus()
-//            Command.FocusMessage -> feedbackMessage.requestFocus()
             Command.ConfirmAndFinish -> confirmAndFinish()
         }
     }
@@ -124,22 +98,18 @@ class BrokenSiteActivity : DuckDuckGoActivity() {
     }
 
     private fun render(viewState: ViewState) {
-//        brokenSiteUrl.updateText(viewState.url ?: "")
-//        submitButton.isEnabled = viewState.submitAllowed
-    }
-
-    private fun EditText.updateText(newText: String) {
-        if (text.toString() != newText) {
-            setText(newText)
-        }
+        val category = if (viewState.indexSelected > -1) categories[viewState.indexSelected] else ""
+        categoriesSelection.setText(category)
+        submitButton.isEnabled = viewState.submitAllowed
     }
 
     companion object {
 
         private const val URL_EXTRA = "URL_EXTRA"
         private const val BLOCKED_TRACKERS_EXTRA = "BLOCKED_TRACKERS_EXTRA"
+        private const val UPGRADED_TO_HTTPS_EXTRA = "UPGRADED_TO_HTTPS_EXTRA"
 
-        fun intent(context: Context, url: String? = null, blockedTrackers: String?): Intent {
+        fun intent(context: Context, url: String? = null, blockedTrackers: String?, upgradedToHttps: Boolean): Intent {
             val intent = Intent(context, BrokenSiteActivity::class.java)
             if (url != null) {
                 intent.putExtra(URL_EXTRA, url)
@@ -147,8 +117,8 @@ class BrokenSiteActivity : DuckDuckGoActivity() {
             if (blockedTrackers != null) {
                 intent.putExtra(BLOCKED_TRACKERS_EXTRA, blockedTrackers)
             }
+            intent.putExtra(UPGRADED_TO_HTTPS_EXTRA, upgradedToHttps)
             return intent
         }
-
     }
 }

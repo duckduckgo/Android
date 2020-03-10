@@ -54,6 +54,8 @@ class SiteMonitor(
     override val https: HttpsStatus
         get() = httpsStatus()
 
+    override var upgradedHttps = false
+
     override var hasHttpResources = false
 
     override var privacyPractices: PrivacyPractices.Practices = PrivacyPractices.UNKNOWN
@@ -95,6 +97,10 @@ class SiteMonitor(
         }
 
         return HttpsStatus.NONE
+    }
+
+    override fun upgradedToHttps() {
+        upgradedHttps = true
     }
 
     override fun trackerDetected(event: TrackingEvent) {

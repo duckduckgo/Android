@@ -22,15 +22,14 @@ import androidx.lifecycle.ViewModel
 import com.duckduckgo.app.brokensite.api.BrokenSiteSender
 import com.duckduckgo.app.brokensite.model.BrokenSite
 import com.duckduckgo.app.global.SingleLiveEvent
+import com.duckduckgo.app.global.absoluteString
 import com.duckduckgo.app.global.isMobileSite
 import com.duckduckgo.app.statistics.pixels.Pixel
-
 
 class BrokenSiteViewModel(private val pixel: Pixel, private val brokenSiteSender: BrokenSiteSender) : ViewModel() {
 
     data class ViewState(
-        val url: String? = null,
-        val message: String? = null,
+        val indexSelected: Int = -1,
         val submitAllowed: Boolean = false
     )
 
@@ -43,6 +42,8 @@ class BrokenSiteViewModel(private val pixel: Pixel, private val brokenSiteSender
     val viewState: MutableLiveData<ViewState> = MutableLiveData()
     val command: SingleLiveEvent<Command> = SingleLiveEvent()
     var blockedTrackers: String? = null
+    var url: String? = null
+    var upgradedHttps: Boolean = false
 
     private val viewValue: ViewState get() = viewState.value!!
 
@@ -50,62 +51,46 @@ class BrokenSiteViewModel(private val pixel: Pixel, private val brokenSiteSender
         viewState.value = ViewState()
     }
 
-    fun setInitialBrokenSite(url: String?, blockedTrackers: String?) {
-        onBrokenSiteUrlChanged(url)
+    fun setInitialBrokenSite(url: String?, blockedTrackers: String?, upgradedHttps: Boolean) {
+        this.url = url
         this.blockedTrackers = blockedTrackers
-        if (viewValue.url.isNullOrBlank()) {
-            command.value = Command.FocusUrl
-        } else {
-            command.value = Command.FocusMessage
-        }
+        this.upgradedHttps = upgradedHttps
     }
 
-    fun onBrokenSiteUrlChanged(newUrl: String?) {
+    fun onCategoryIndexChanged(newIndex: Int) {
         viewState.value = viewState.value?.copy(
-            url = newUrl,
-            submitAllowed = canSubmit(newUrl, viewValue.message)
+            indexSelected = newIndex,
+            submitAllowed = canSubmit(newIndex)
         )
     }
 
-    fun onFeedbackMessageChanged(newMessage: String?) {
-        viewState.value = viewState.value?.copy(
-            message = newMessage,
-            submitAllowed = canSubmit(viewValue.url, newMessage)
-        )
-    }
+    fun indexSelected(): Int = viewValue.indexSelected
 
-    private fun canSubmit(url: String?, feedbackMessage: String?): Boolean {
+    private fun canSubmit(indexSelected: Int): Boolean = indexSelected > -1
 
-        if (feedbackMessage.isNullOrBlank()) {
-            return false
+    fun onSubmitPressed(webViewVersion: String, category: String) {
+
+        url?.let {
+            val trackers = blockedTrackers.orEmpty()
+
+            val brokenSite = BrokenSite(
+                category = category,
+                siteUrl = Uri.parse(it).absoluteString,
+                upgradeHttps = upgradedHttps,
+                blockedTrackers = trackers,
+                webViewVersion = webViewVersion,
+                siteType = if (Uri.parse(it).isMobileSite) MOBILE else DESKTOP
+            )
+
+            brokenSiteSender.submitBrokenSiteFeedback(brokenSite)
+            //pixel.fire(Pixel.PixelName.BROKEN_SITE_REPORTED, mapOf(Pixel.PixelParameter.URL to it))
         }
-
-        if (url.isNullOrBlank()) {
-            return false
-        }
-
-        return true
-    }
-
-    fun onSubmitPressed(webViewVersion: String) {
-        val url = viewValue.url ?: return
-        val trackers = blockedTrackers.orEmpty()
-
-        val brokenSite = BrokenSite(
-            category = "",
-            siteUrl = url,
-            upgradeHttps = true,
-            blockedTrackers = trackers,
-            webViewVersion = webViewVersion,
-            siteType = if (Uri.parse(url).isMobileSite) "mobile" else "desktop"
-        )
-
-        brokenSiteSender.submitBrokenSiteFeedback(brokenSite)
-        pixel.fire(Pixel.PixelName.BROKEN_SITE_REPORTED, mapOf(Pixel.PixelParameter.URL to url))
         command.value = Command.ConfirmAndFinish
     }
 
     companion object {
         const val UNKNOWN_VERSION = "unknown"
+        const val MOBILE = "mobile"
+        const val DESKTOP = "desktop"
     }
 }

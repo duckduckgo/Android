@@ -59,20 +59,9 @@ class BrokenSiteSubmitter(
                 "siteType" to brokenSite.siteType
             )
 
-            pixel.fireCompletable(Pixel.PixelName.BROKEN_SITE_REPORT.pixelName, params)
-                .doOnComplete { Timber.v("Feedback submission succeeded") }
-                .doOnError { Timber.w(it, "Feedback submission failed") }
-
+            val test = ""
 //            runCatching {
-//                service.submitBrokenSite(
-//                    url = url,
-//                    comment = comment,
-//                    api = Build.VERSION.SDK_INT,
-//                    manufacturer = Build.MANUFACTURER,
-//                    model = Build.MODEL,
-//                    version = BuildConfig.VERSION_NAME,
-//                    atb = atbWithVariant()
-//                ).execute()
+//                pixel.fire(Pixel.PixelName.BROKEN_SITE_REPORT.pixelName, params)
 //            }
 //                .onSuccess { Timber.v("Feedback submission succeeded") }
 //                .onFailure { Timber.w(it, "Feedback submission failed") }
