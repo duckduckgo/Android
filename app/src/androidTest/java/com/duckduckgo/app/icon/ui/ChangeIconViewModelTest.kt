@@ -19,11 +19,8 @@ package com.duckduckgo.app.icon.ui
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.Observer
 import com.duckduckgo.app.ValueCaptorObserver
-import com.duckduckgo.app.browser.BrowserTabViewModel
 import com.duckduckgo.app.icon.api.AppIcon
 import com.duckduckgo.app.icon.api.IconModifier
-import com.duckduckgo.app.launch.LaunchViewModel
-import com.duckduckgo.app.privacy.ui.TrackerNetworksViewModel
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.nhaarman.mockitokotlin2.mock
@@ -31,13 +28,9 @@ import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.whenever
 import junit.framework.Assert.assertTrue
 import org.junit.After
-import org.junit.Assert
-import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import org.mockito.Mock
 import org.mockito.Mockito
-import org.mockito.MockitoAnnotations
 
 class ChangeIconViewModelTest {
 
@@ -80,14 +73,23 @@ class ChangeIconViewModelTest {
     }
 
     @Test
-    fun whenIconIsSelectedSettingsAreUpdated() {
+    fun whenIconIsSelectedDialogIsShown() {
+        val selectedIcon = AppIcon.BLACK
+        val selectedIconViewData = ChangeIconViewModel.IconViewData(selectedIcon, true)
+        testee.onIconSelected(selectedIconViewData)
+
+        verify(mockCommandObserver).onChanged(Mockito.any(ChangeIconViewModel.Command.ShowConfirmationDialog::class.java))
+    }
+
+    @Test
+    fun whenIconIsConfirmedSettingsAreUpdated() {
         val previousIcon = AppIcon.BLUE
         val selectedIcon = AppIcon.BLACK
         val selectedIconViewData = ChangeIconViewModel.IconViewData(selectedIcon, true)
 
         whenever(mockSettingsDataStore.appIcon).thenReturn(previousIcon)
 
-        testee.onIconSelected(selectedIconViewData)
+        testee.onIconConfirmed(selectedIconViewData)
 
         verify(mockAppIconModifier).changeIcon(previousIcon, selectedIcon)
         verify(mockSettingsDataStore).appIcon = selectedIcon

@@ -34,7 +34,7 @@ interface IconModifier {
         const val QUALIFIER = "com.duckduckgo.app.launch"
     }
 
-    fun changeIcon(context: Context, previousIcon: AppIcon, newIcon: AppIcon)
+    fun changeIcon(previousIcon: AppIcon, newIcon: AppIcon)
 }
 
 enum class AppIcon(
@@ -82,7 +82,7 @@ class AppIconModifier @Inject constructor(
     private val appShortcutCreator: AppShortcutCreator
 ) : IconModifier {
 
-    override fun changeIcon(context: Context, previousIcon: AppIcon, newIcon: AppIcon) {
+    override fun changeIcon(previousIcon: AppIcon, newIcon: AppIcon) {
         disable(context, newIcon)
         enable(context, newIcon)
 
@@ -103,7 +103,7 @@ class AppIconModifier @Inject constructor(
 
     private fun setComponentState(context: Context, componentName: String, componentState: Int) {
         context.packageManager.setComponentEnabledSetting(
-            ComponentName(context, componentName),
+            ComponentName(BuildConfig.APPLICATION_ID, componentName),
             componentState, PackageManager.DONT_KILL_APP
         )
     }

@@ -16,41 +16,29 @@
 
 package com.duckduckgo.app.icon.ui
 
-import android.app.AlarmManager
-import android.app.PendingIntent
-import android.app.TaskStackBuilder
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import androidx.appcompat.app.AlertDialog
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.GridLayoutManager
-import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.fire.FireActivity
 import com.duckduckgo.app.global.DuckDuckGoActivity
-import com.duckduckgo.app.settings.SettingsActivity
 import kotlinx.android.synthetic.main.content_app_icons.appIconsList
 import kotlinx.android.synthetic.main.include_toolbar.toolbar
-import java.util.Calendar
 
 class ChangeIconActivity : DuckDuckGoActivity() {
 
     private val viewModel: ChangeIconViewModel by bindViewModel()
     private val iconsAdapter: AppIconsAdapter = AppIconsAdapter { icon ->
-        viewModel.onIconSelected(this, icon )
+        viewModel.onIconSelected(icon)
     }
 
     companion object {
         fun intent(context: Context): Intent {
             return Intent(context, ChangeIconActivity::class.java)
         }
-
-        private fun getRestartIntent(context: Context): Intent {
-            val intent = BrowserActivity.intent(context, launchedFromFireAction = true)
-            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
-            return intent
-        }
-
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -96,6 +84,18 @@ class ChangeIconActivity : DuckDuckGoActivity() {
         when (it) {
             is ChangeIconViewModel.Command.IconChanged -> {
                 FireActivity.triggerRestart(this)
+            }
+            is ChangeIconViewModel.Command.ShowConfirmationDialog -> {
+                AlertDialog.Builder(this)
+                    .setTitle(R.string.changeIconDialogTitle)
+                    .setMessage(getString(R.string.changeIconDialogMessage))
+                    .setPositiveButton(R.string.yes) { _, _ ->
+                        viewModel.onIconConfirmed(it.viewData)
+                    }
+                    .setNegativeButton(R.string.no) { dialog, _ ->
+                        dialog.dismiss()
+                    }
+                    .show()
             }
         }
     }

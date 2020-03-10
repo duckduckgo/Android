@@ -16,7 +16,6 @@
 
 package com.duckduckgo.app.icon.ui
 
-import android.content.Context
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.duckduckgo.app.global.SingleLiveEvent
@@ -50,6 +49,7 @@ class ChangeIconViewModel @Inject constructor(
 
     sealed class Command {
         object IconChanged : Command()
+        data class ShowConfirmationDialog(val viewData: IconViewData) : Command()
     }
 
     val viewState: MutableLiveData<ViewState> = MutableLiveData()
@@ -61,10 +61,15 @@ class ChangeIconViewModel @Inject constructor(
         viewState.value = ViewState(AppIcon.values().map { IconViewData.from(it, selectedIcon) })
     }
 
-    fun onIconSelected(context: Context, viewData: IconViewData) {
+    fun onIconSelected(viewData: IconViewData) {
+        command.value = Command.ShowConfirmationDialog(viewData)
+    }
+
+    fun onIconConfirmed(viewData: IconViewData) {
         val previousIcon = settingsDataStore.appIcon
         settingsDataStore.appIcon = viewData.appIcon
-        appIconModifier.changeIcon(context, previousIcon, viewData.appIcon)
+        appIconModifier.changeIcon(previousIcon, viewData.appIcon)
         command.value = Command.IconChanged
     }
+
 }
