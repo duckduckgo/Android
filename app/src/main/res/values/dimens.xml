@@ -33,4 +33,6 @@
     <dimen name="settingsItemHorizontalPadding">20dp</dimen>
     <dimen name="onboardingTitleMarginTop">20dp</dimen>
 
+    <dimen name="systemSearchResultsElevation">4dp</dimen>
+
 </resources>
