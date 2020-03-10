@@ -20,6 +20,7 @@ import android.os.Build
 import com.duckduckgo.app.brokensite.model.BrokenSite
 import com.duckduckgo.app.browser.BuildConfig
 import com.duckduckgo.app.statistics.VariantManager
+import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.app.trackerdetection.db.TdsDao
 import kotlinx.coroutines.Dispatchers
@@ -34,28 +35,33 @@ interface BrokenSiteSender {
 class BrokenSiteSubmitter(
     private val statisticsStore: StatisticsDataStore,
     private val variantManager: VariantManager,
-    private val tdsDao: TdsDao
+    private val tdsDao: TdsDao,
+    private val pixel: Pixel
 ) : BrokenSiteSender {
 
     override fun submitBrokenSiteFeedback(brokenSite: BrokenSite) {
-
+        // TODO Change code here
         GlobalScope.launch(Dispatchers.IO) {
             val params = mapOf(
                 "category" to brokenSite.category,
                 "siteUrl" to brokenSite.siteUrl,
-                "upgradedHttps" to brokenSite.upgradeHttps,
+                "upgradedHttps" to brokenSite.upgradeHttps.toString(),
                 "tds" to tdsDao.eTag(),
                 "blockedTrackers" to brokenSite.blockedTrackers,
                 "surrogates" to "",
                 "extensionVersion" to "",
                 "appVersion" to BuildConfig.VERSION_NAME,
                 "atb" to atbWithVariant(),
-                "os" to Build.VERSION.SDK_INT,
+                "os" to Build.VERSION.SDK_INT.toString(),
                 "manufacturer" to Build.MANUFACTURER,
                 "model" to Build.MODEL,
                 "wvVersion" to brokenSite.webViewVersion,
                 "siteType" to brokenSite.siteType
             )
+
+            pixel.fireCompletable(Pixel.PixelName.BROKEN_SITE_REPORT.pixelName, params)
+                .doOnComplete { Timber.v("Feedback submission succeeded") }
+                .doOnError { Timber.w(it, "Feedback submission failed") }
 
 //            runCatching {
 //                service.submitBrokenSite(

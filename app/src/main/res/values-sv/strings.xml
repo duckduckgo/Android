@@ -200,11 +200,6 @@
     <!-- Broken Site Activity -->
     <string name="brokenSiteReportBrokenSiteMenuItem">Rapportera skadad webbplats</string>
     <string name="brokenSiteHeading">Rapportera skadad webbplats</string>
-    <string name="brokenSiteModalDescription">Rapportering av skadad webbplats kan göras helt anonymt och hjälper oss att förbättra appen!</string>
-    <string name="brokenSiteUrlHint">Ange URL</string>
-    <string name="brokenSiteDomainLabel">Skadad webbplatsdomän:</string>
-    <string name="brokenSiteMessageHint">Vilket innehåll eller vilken funktionalitet är skadad?</string>
-    <string name="brokenSiteSubmitButton">Skicka återkoppling</string>
     <string name="brokenSiteSubmitted">Tack! Återkopplingen har skickats</string>
 
     <!-- Bookmarks Activity -->

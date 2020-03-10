@@ -184,11 +184,6 @@
     <!-- Broken Site Activity -->
     <string name="brokenSiteReportBrokenSiteMenuItem">Prijavi neispravno web-mjesto</string>
     <string name="brokenSiteHeading">Prijavi neispravno web-mjesto</string>
-    <string name="brokenSiteModalDescription">Izvješćivanje o neispravnom web-mjestu potpuno je anonimno i pomaže nam poboljšati aplikaciju!</string>
-    <string name="brokenSiteUrlHint">Unesi URL</string>
-    <string name="brokenSiteDomainLabel">Domena neispravnog web-mjesta:</string>
-    <string name="brokenSiteMessageHint">Koji sadržaj ili funkcionalnost je neispravan?</string>
-    <string name="brokenSiteSubmitButton">Pošalji povratne informacije</string>
     <string name="brokenSiteSubmitted">Hvala! Povratne informacije su poslane</string>
 
     <!-- Bookmarks Activity -->

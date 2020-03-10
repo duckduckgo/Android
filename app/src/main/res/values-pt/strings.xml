@@ -184,11 +184,6 @@
     <!-- Broken Site Activity -->
     <string name="brokenSiteReportBrokenSiteMenuItem">Denunciar falha no site</string>
     <string name="brokenSiteHeading">Denunciar uma falha no site</string>
-    <string name="brokenSiteModalDescription">A comunicação de falhas em sites é totalmente anónima e ajuda-nos a melhorar a aplicação!</string>
-    <string name="brokenSiteUrlHint">Introduzir URL</string>
-    <string name="brokenSiteDomainLabel">Domínio de site com falha:</string>
-    <string name="brokenSiteMessageHint">Que conteúdo ou funcionalidade está com falhas?</string>
-    <string name="brokenSiteSubmitButton">Submeter comentários</string>
     <string name="brokenSiteSubmitted">Obrigado! Comentário enviado</string>
 
     <!-- Bookmarks Activity -->

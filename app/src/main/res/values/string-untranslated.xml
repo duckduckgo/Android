@@ -59,4 +59,10 @@
     <string name="hideTipsText">There are only a few, and we tried to make them informative.</string>
     <string name="hideTipsButton">Hide tips forever</string>
 
+    <!-- Broken Sites-->
+    <string name="brokenSitesCategoriesTitle">Describe what happened:</string>
+    <string name="brokenSitesCategoriesHint">Describe what happened</string>
+    <string name="brokenSiteSubmitButton">Send Report</string>
+    <string name="brokenSiteDescription">Submitting an anonymous broken site report helps us debug these issues and improve the extension.</string>
+
 </resources>

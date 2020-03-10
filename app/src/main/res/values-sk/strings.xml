@@ -185,11 +185,6 @@
     <!-- Broken Site Activity -->
     <string name="brokenSiteReportBrokenSiteMenuItem">Nahlásiť nefunkčný web</string>
     <string name="brokenSiteHeading">Nahláste nefunkčný web</string>
-    <string name="brokenSiteModalDescription">Nahlasovanie nefunkčného webu je úplne anonymné a pomáha nám pri zdokonaľovaní aplikácie.</string>
-    <string name="brokenSiteUrlHint">Zadajte webovú adresu</string>
-    <string name="brokenSiteDomainLabel">Doména nefunkčného webu:</string>
-    <string name="brokenSiteMessageHint">Ktorý obsah alebo funkcie sú nefunkčné?</string>
-    <string name="brokenSiteSubmitButton">Odoslať spätnú väzbu</string>
     <string name="brokenSiteSubmitted">Ďakujeme! Spätná väzba bola odoslaná</string>
 
     <!-- Bookmarks Activity -->

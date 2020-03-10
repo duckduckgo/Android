@@ -184,11 +184,6 @@
     <!-- Broken Site Activity -->
     <string name="brokenSiteReportBrokenSiteMenuItem">Defecte website melden</string>
     <string name="brokenSiteHeading">Een defecte website melden</string>
-    <string name="brokenSiteModalDescription">Het melden van een defecte site is volledig anoniem en helpt ons om de app te verbeteren!</string>
-    <string name="brokenSiteUrlHint">URL invoeren</string>
-    <string name="brokenSiteDomainLabel">Domein van defecte site:</string>
-    <string name="brokenSiteMessageHint">Welke inhoud of functionaliteit is defect?</string>
-    <string name="brokenSiteSubmitButton">Feedback versturen</string>
     <string name="brokenSiteSubmitted">Dank je wel! Feedback verzonden</string>
 
     <!-- Bookmarks Activity -->

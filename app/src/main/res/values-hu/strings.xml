@@ -184,11 +184,6 @@
     <!-- Broken Site Activity -->
     <string name="brokenSiteReportBrokenSiteMenuItem">Hibás weboldal bejelentése</string>
     <string name="brokenSiteHeading">Hibás weboldal bejelentése</string>
-    <string name="brokenSiteModalDescription">A hibás weboldal bejelentése teljes mértékben anonim, és segít nekünk az alkalmazás javításában!</string>
-    <string name="brokenSiteUrlHint">URL megadása</string>
-    <string name="brokenSiteDomainLabel">Hibás weboldal címe:</string>
-    <string name="brokenSiteMessageHint">Melyik tartalom vagy funkció hibás?</string>
-    <string name="brokenSiteSubmitButton">Visszajelzés elküldése</string>
     <string name="brokenSiteSubmitted">Köszönjük! Visszajelzés elküldve</string>
 
     <!-- Bookmarks Activity -->

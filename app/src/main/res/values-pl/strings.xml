@@ -192,11 +192,6 @@
     <!-- Broken Site Activity -->
     <string name="brokenSiteReportBrokenSiteMenuItem">Zgłoś wadliwą stronę</string>
     <string name="brokenSiteHeading">Zgłoś wadliwą stronę</string>
-    <string name="brokenSiteModalDescription">Zgłoszenie wadliwej strony przekazywane jest całkowicie anonimowo i pomaga nam usprawnić aplikację!</string>
-    <string name="brokenSiteUrlHint">Wpisz adres URL</string>
-    <string name="brokenSiteDomainLabel">Domena wadliwej strony:</string>
-    <string name="brokenSiteMessageHint">Jaka treść lub funkcja nie działa poprawnie?</string>
-    <string name="brokenSiteSubmitButton">Przekaż opinię</string>
     <string name="brokenSiteSubmitted">Dziękujemy! Informacje zostały przekazane</string>
 
     <!-- Bookmarks Activity -->

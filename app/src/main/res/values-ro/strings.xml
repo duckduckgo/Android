@@ -188,11 +188,6 @@
     <!-- Broken Site Activity -->
     <string name="brokenSiteReportBrokenSiteMenuItem">Raportare site defect</string>
     <string name="brokenSiteHeading">Raportare site defect</string>
-    <string name="brokenSiteModalDescription">Raportarea site-ului defect este complet anonimă și ne ajută să îmbunătățim aplicația!</string>
-    <string name="brokenSiteUrlHint">Introduceți URL-ul</string>
-    <string name="brokenSiteDomainLabel">Domeniul site-ului defect:</string>
-    <string name="brokenSiteMessageHint">Ce conținut sau funcție se întrerupe?</string>
-    <string name="brokenSiteSubmitButton">Trimitere feedback</string>
     <string name="brokenSiteSubmitted">Vă mulțumim! Feedback trimis</string>
 
     <!-- Bookmarks Activity -->

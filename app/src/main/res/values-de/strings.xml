@@ -184,11 +184,6 @@
     <!-- Broken Site Activity -->
     <string name="brokenSiteReportBrokenSiteMenuItem">Fehlerhafte Seite melden</string>
     <string name="brokenSiteHeading">Eine fehlerhafte Seite melden</string>
-    <string name="brokenSiteModalDescription">Das Melden fehlerhafter Seiten ist völlig anonym und hilft uns dabei, die App zu verbessern!</string>
-    <string name="brokenSiteUrlHint">URL eingeben</string>
-    <string name="brokenSiteDomainLabel">Domain der fehlerhaften Seite:</string>
-    <string name="brokenSiteMessageHint">Welche Inhalte oder Funktionen sind fehlerhaft?</string>
-    <string name="brokenSiteSubmitButton">Feedback absenden</string>
     <string name="brokenSiteSubmitted">Vielen Dank! Feedback gesendet</string>
 
     <!-- Bookmarks Activity -->

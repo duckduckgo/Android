@@ -184,11 +184,6 @@
     <!-- Broken Site Activity -->
     <string name="brokenSiteReportBrokenSiteMenuItem">Rapporter ødelagt nettsted</string>
     <string name="brokenSiteHeading">Rapporter et ødelagt nettsted</string>
-    <string name="brokenSiteModalDescription">Det er helt anonymt å rapportere ødelagte nettsteder og det hjelper oss til å forbedre appen!</string>
-    <string name="brokenSiteUrlHint">Oppgi URL</string>
-    <string name="brokenSiteDomainLabel">Den ødelagte sidens domene:</string>
-    <string name="brokenSiteMessageHint">Hva slags innhold eller funksjonalitet er det som ikke virker?</string>
-    <string name="brokenSiteSubmitButton">Send inn tilbakemelding</string>
     <string name="brokenSiteSubmitted">Takk! Tilbakemeldingen er sendt</string>
 
     <!-- Bookmarks Activity -->

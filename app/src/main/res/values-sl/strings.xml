@@ -192,11 +192,6 @@
     <!-- Broken Site Activity -->
     <string name="brokenSiteReportBrokenSiteMenuItem">Prijavite poškodovano spletno mesto</string>
     <string name="brokenSiteHeading">Prijavite poškodovano spletno mesto</string>
-    <string name="brokenSiteModalDescription">Prijavljanje poškodovanega spletnega mesta je popolnoma anonimno in nam pomaga izboljšati aplikacijo!</string>
-    <string name="brokenSiteUrlHint">Vnesite URL</string>
-    <string name="brokenSiteDomainLabel">Domena poškodovanega spletnega mesta:</string>
-    <string name="brokenSiteMessageHint">Katera vsebina ali funkcionalnost ne deluje pravilno?</string>
-    <string name="brokenSiteSubmitButton">Pošljite povratne informacije</string>
     <string name="brokenSiteSubmitted">Hvala! Povratne informacije so poslane</string>
 
     <!-- Bookmarks Activity -->

@@ -184,11 +184,6 @@
     <!-- Broken Site Activity -->
     <string name="brokenSiteReportBrokenSiteMenuItem">Подаване на сигнал за повреден сайт</string>
     <string name="brokenSiteHeading">Подаване на сигнал за повреден сайт</string>
-    <string name="brokenSiteModalDescription">Подаването на сигнали за повредени сайтове е напълно анонимно и ни помага да подобрим приложението!</string>
-    <string name="brokenSiteUrlHint">Въведете URL адрес</string>
-    <string name="brokenSiteDomainLabel">Домейн на повредения сайт:</string>
-    <string name="brokenSiteMessageHint">Кое съдържание или функционалност се нарушава?</string>
-    <string name="brokenSiteSubmitButton">Изпращане на отзиви</string>
     <string name="brokenSiteSubmitted">Благодарим Ви! Изпратена обратна връзка</string>
 
     <!-- Bookmarks Activity -->

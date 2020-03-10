@@ -188,11 +188,6 @@
     <!-- Broken Site Activity -->
     <string name="brokenSiteReportBrokenSiteMenuItem">Nahlásit poškozené stránky</string>
     <string name="brokenSiteHeading">Nahlásit poškozenou stránku</string>
-    <string name="brokenSiteModalDescription">Přehledy poškozených stránek jsou zcela anonymní a pomáhají nám vylepšovat aplikaci!</string>
-    <string name="brokenSiteUrlHint">Zadejte URL</string>
-    <string name="brokenSiteDomainLabel">Doména poškozených stránek:</string>
-    <string name="brokenSiteMessageHint">Který obsah nebo funkce jsou poškozeny?</string>
-    <string name="brokenSiteSubmitButton">Odeslat zpětnou vazbu</string>
     <string name="brokenSiteSubmitted">Děkujeme! Zpětná vazba odeslána</string>
 
     <!-- Bookmarks Activity -->

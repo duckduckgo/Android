@@ -207,11 +207,6 @@
     <!-- Broken Site Activity -->
     <string name="brokenSiteReportBrokenSiteMenuItem">Сообщить о нерабочем сайте</string>
     <string name="brokenSiteHeading">Сообщить о нерабочем сайте</string>
-    <string name="brokenSiteModalDescription">Сообщение о нерабочих сайтах полностью анонимно и помогает нам улучшить приложение!</string>
-    <string name="brokenSiteUrlHint">Введите URL</string>
-    <string name="brokenSiteDomainLabel">Домен нерабочего сайта:</string>
-    <string name="brokenSiteMessageHint">Какой контент или функциональные возможности не доступны?</string>
-    <string name="brokenSiteSubmitButton">Отправить отзыв</string>
     <string name="brokenSiteSubmitted">Спасибо! Отзыв отправлен</string>
 
     <!-- Bookmarks Activity -->

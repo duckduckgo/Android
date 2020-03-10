@@ -63,6 +63,8 @@
         <item name="daxDialogBackgroundColor">@color/charcoalGrey</item>
         <item name="daxDialogSecondaryButtonTextColor">@color/white</item>
         <item name="daxDialogSecondaryButtonRippleColor">@color/white</item>
+        <item name="brokenSiteSelectionTextColor">@color/white</item>
+        <item name="brokenSiteOutlinedColor">@color/grayish</item>
 
         <item name="feedbackAnonymousFeedbackLabelColor">@color/grayish</item>
         <item name="feedbackListItemBackgroundColor">@color/almostBlack</item>
@@ -123,6 +125,8 @@
         <item name="daxDialogBackgroundColor">@color/white</item>
         <item name="daxDialogSecondaryButtonTextColor">@color/grayishBrown</item>
         <item name="daxDialogSecondaryButtonRippleColor">@color/subtleGrayTwo</item>
+        <item name="brokenSiteSelectionTextColor">@color/almostBlack</item>
+        <item name="brokenSiteOutlinedColor">@color/grayishTwo</item>
 
         <item name="feedbackAnonymousFeedbackLabelColor">@color/warmerGray</item>
         <item name="feedbackListItemBackgroundColor">@color/whiteFive</item>

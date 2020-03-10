@@ -184,11 +184,6 @@
     <!-- Broken Site Activity -->
     <string name="brokenSiteReportBrokenSiteMenuItem">Notificar sitio web no operativo</string>
     <string name="brokenSiteHeading">Notificar un sitio web no operativo</string>
-    <string name="brokenSiteModalDescription">La notificación de sitios web no operativos es totalmente anónima y nos ayuda a mejorar la aplicación.</string>
-    <string name="brokenSiteUrlHint">Introducir URL</string>
-    <string name="brokenSiteDomainLabel">Dominio del sitio web no operativo:</string>
-    <string name="brokenSiteMessageHint">¿Qué contenido o funcionalidad no está disponible?</string>
-    <string name="brokenSiteSubmitButton">Enviar opinión</string>
     <string name="brokenSiteSubmitted">¡Gracias! Opinión enviada</string>
 
     <!-- Bookmarks Activity -->

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?><!--
-  ~ Copyright (c) 2019 DuckDuckGo
+  ~ Copyright (c) 2020 DuckDuckGo
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -13,16 +13,16 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-
-<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context="com.duckduckgo.app.brokensite.BrokenSiteActivity">
-
-    <include layout="@layout/include_toolbar" />
-
-    <include layout="@layout/content_broken_sites" />
-
-</androidx.coordinatorlayout.widget.CoordinatorLayout>
-
+<resources>
+    <string-array name="brokenSitesCategories">
+        <item>Links or buttons don\'t work</item>
+        <item>Content is missing</item>
+        <item>Comments didn\'t load</item>
+        <item>Images didn\'t load</item>
+        <item>I can\'t login</item>
+        <item>The site asked me to disable</item>
+        <item>The browser is incompatible</item>
+        <item>Video didn\'t play</item>
+        <item>Something else</item>
+    </string-array>
+</resources>

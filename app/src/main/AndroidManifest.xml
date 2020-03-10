@@ -165,7 +165,7 @@
             android:label="@string/feedbackActivityTitle" />
         <activity
             android:name="com.duckduckgo.app.brokensite.BrokenSiteActivity"
-            android:theme="@style/ModalCardTheme"
+            android:parentActivityName=".BrowserActivity"
             android:label="@string/brokenSiteHeading" />
         <activity
             android:name="com.duckduckgo.app.survey.ui.SurveyActivity"

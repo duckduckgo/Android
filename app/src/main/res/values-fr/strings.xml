@@ -184,11 +184,6 @@
     <!-- Broken Site Activity -->
     <string name="brokenSiteReportBrokenSiteMenuItem">Signaler un problème de site</string>
     <string name="brokenSiteHeading">Signaler un problème de site</string>
-    <string name="brokenSiteModalDescription">Les signalements de problème de site sont totalement anonymes et nous aident à améliorer l\'application !</string>
-    <string name="brokenSiteUrlHint">Saisir l\'URL</string>
-    <string name="brokenSiteDomainLabel">Domaine du site posant problème :</string>
-    <string name="brokenSiteMessageHint">Quel contenu ou fonctionnalité pose problème ?</string>
-    <string name="brokenSiteSubmitButton">Envoyer un commentaire</string>
     <string name="brokenSiteSubmitted">Merci ! Commentaire envoyé</string>
 
     <!-- Bookmarks Activity -->

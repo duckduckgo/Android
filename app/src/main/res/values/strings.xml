@@ -191,11 +191,6 @@
     <!-- Broken Site Activity -->
     <string name="brokenSiteReportBrokenSiteMenuItem">Report Broken Site</string>
     <string name="brokenSiteHeading">Report a Broken Site</string>
-    <string name="brokenSiteModalDescription">Broken site reporting is completely anonymous and helps us improve the app!</string>
-    <string name="brokenSiteUrlHint">Enter URL</string>
-    <string name="brokenSiteDomainLabel">Domain of broken site:</string>
-    <string name="brokenSiteMessageHint">Which content or functionality is breaking?</string>
-    <string name="brokenSiteSubmitButton">Submit Feedback</string>
     <string name="brokenSiteSubmitted">Thank you! Feedback submitted</string>
 
     <!-- Bookmarks Activity -->

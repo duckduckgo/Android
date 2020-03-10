@@ -51,5 +51,7 @@
     <attr name="daxDialogBackgroundColor" format="color" />
     <attr name="daxDialogSecondaryButtonTextColor" format="color" />
     <attr name="daxDialogSecondaryButtonRippleColor" format="color" />
+    <attr name="brokenSiteSelectionTextColor" format="color" />
+    <attr name="brokenSiteOutlinedColor" format="color" />
 
 </resources>

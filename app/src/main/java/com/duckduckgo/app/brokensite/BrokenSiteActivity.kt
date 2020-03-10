@@ -19,32 +19,63 @@ package com.duckduckgo.app.brokensite
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.text.Editable
 import android.widget.EditText
 import androidx.lifecycle.Observer
-import androidx.webkit.WebViewCompat
 import com.duckduckgo.app.brokensite.BrokenSiteViewModel.Command
 import com.duckduckgo.app.brokensite.BrokenSiteViewModel.ViewState
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.DuckDuckGoActivity
-import com.duckduckgo.app.global.view.TextChangedWatcher
-import kotlinx.android.synthetic.main.activity_broken_site.*
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import kotlinx.android.synthetic.main.content_broken_sites.*
+import kotlinx.android.synthetic.main.include_toolbar.*
 import org.jetbrains.anko.longToast
 
 
 class BrokenSiteActivity : DuckDuckGoActivity() {
-
+    // TODO Change code here
     private val viewModel: BrokenSiteViewModel by bindViewModel()
+    private var lol: Int = -1
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_broken_site)
         configureListeners()
         configureObservers()
-
+        setupActionBar()
+        submitButton.isEnabled = false
         if (savedInstanceState == null) {
             consumeIntentExtra()
         }
+
+        val categories = resources.getStringArray(R.array.brokenSitesCategories)
+
+        categoriesSelection.setOnClickListener {
+            MaterialAlertDialogBuilder(this)
+                .setTitle(getString(R.string.brokenSitesCategoriesTitle))
+                .setSingleChoiceItems(categories, -1) { _, itemSelected ->
+                    lol = itemSelected
+                }
+                .setPositiveButton(getString(android.R.string.yes)) { _, _ ->
+                    when (lol) {
+                        -1 -> {
+                            categoriesSelection.setText("")
+                            submitButton.isEnabled = false
+                        }
+                        else -> {
+                            categoriesSelection.setText(categories[lol])
+                            submitButton.isEnabled = true
+                        }
+                    }
+                }
+                .setNegativeButton(getString(android.R.string.no)) { dialog, _ -> dialog.dismiss() }
+                .show()
+        }
+    }
+
+
+    private fun setupActionBar() {
+        setSupportActionBar(toolbar)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
     }
 
     private fun consumeIntentExtra() {
@@ -54,20 +85,20 @@ class BrokenSiteActivity : DuckDuckGoActivity() {
     }
 
     private fun configureListeners() {
-        feedbackMessage.addTextChangedListener(object : TextChangedWatcher() {
-            override fun afterTextChanged(editable: Editable) {
-                viewModel.onFeedbackMessageChanged(editable.toString())
-            }
-        })
-        brokenSiteUrl.addTextChangedListener(object : TextChangedWatcher() {
-            override fun afterTextChanged(editable: Editable) {
-                viewModel.onBrokenSiteUrlChanged(editable.toString())
-            }
-        })
-        submitButton.setOnClickListener {
-            val webViewVersion = WebViewCompat.getCurrentWebViewPackage(applicationContext)?.versionName ?: BrokenSiteViewModel.UNKNOWN_VERSION
-            viewModel.onSubmitPressed(webViewVersion)
-        }
+//        feedbackMessage.addTextChangedListener(object : TextChangedWatcher() {
+//            override fun afterTextChanged(editable: Editable) {
+//                viewModel.onFeedbackMessageChanged(editable.toString())
+//            }
+//        })
+//        brokenSiteUrl.addTextChangedListener(object : TextChangedWatcher() {
+//            override fun afterTextChanged(editable: Editable) {
+//                viewModel.onBrokenSiteUrlChanged(editable.toString())
+//            }
+//        })
+//        submitButton.setOnClickListener {
+//            val webViewVersion = WebViewCompat.getCurrentWebViewPackage(applicationContext)?.versionName ?: BrokenSiteViewModel.UNKNOWN_VERSION
+//            viewModel.onSubmitPressed(webViewVersion)
+//        }
     }
 
     private fun configureObservers() {
@@ -81,8 +112,8 @@ class BrokenSiteActivity : DuckDuckGoActivity() {
 
     private fun processCommand(command: Command) {
         when (command) {
-            Command.FocusUrl -> brokenSiteUrl.requestFocus()
-            Command.FocusMessage -> feedbackMessage.requestFocus()
+//            Command.FocusUrl -> brokenSiteUrl.requestFocus()
+//            Command.FocusMessage -> feedbackMessage.requestFocus()
             Command.ConfirmAndFinish -> confirmAndFinish()
         }
     }
@@ -93,8 +124,8 @@ class BrokenSiteActivity : DuckDuckGoActivity() {
     }
 
     private fun render(viewState: ViewState) {
-        brokenSiteUrl.updateText(viewState.url ?: "")
-        submitButton.isEnabled = viewState.submitAllowed
+//        brokenSiteUrl.updateText(viewState.url ?: "")
+//        submitButton.isEnabled = viewState.submitAllowed
     }
 
     private fun EditText.updateText(newText: String) {

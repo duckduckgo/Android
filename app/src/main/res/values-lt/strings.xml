@@ -188,11 +188,6 @@
     <!-- Broken Site Activity -->
     <string name="brokenSiteReportBrokenSiteMenuItem">Pranešti apie neveikiančią svetainę</string>
     <string name="brokenSiteHeading">Pranešti apie neveikiančią svetainę</string>
-    <string name="brokenSiteModalDescription">Pranešimas apie neveikiančias svetaines yra visiškai anonimiškas ir padeda mums tobulinti programą!</string>
-    <string name="brokenSiteUrlHint">Įveskite URL</string>
-    <string name="brokenSiteDomainLabel">Neveikiančios svetainės domenas:</string>
-    <string name="brokenSiteMessageHint">Koks turinys ar funkcija neveikia?</string>
-    <string name="brokenSiteSubmitButton">Pateikti atsiliepimą</string>
     <string name="brokenSiteSubmitted">Dėkojame! Atsiliepimas pateiktas</string>
 
     <!-- Bookmarks Activity -->

@@ -126,8 +126,8 @@ class NetworkModule {
         retrofit.create(ResourceSurrogateListService::class.java)
 
     @Provides
-    fun brokenSiteSender(statisticsStore: StatisticsDataStore, variantManager: VariantManager, tdsDao: TdsDao): BrokenSiteSender =
-        BrokenSiteSubmitter(statisticsStore, variantManager, tdsDao)
+    fun brokenSiteSender(statisticsStore: StatisticsDataStore, variantManager: VariantManager, tdsDao: TdsDao, pixel: Pixel): BrokenSiteSender =
+        BrokenSiteSubmitter(statisticsStore, variantManager, tdsDao, pixel)
 
     @Provides
     fun surveyService(@Named("api") retrofit: Retrofit): SurveyService =

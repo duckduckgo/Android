@@ -184,11 +184,6 @@
     <!-- Broken Site Activity -->
     <string name="brokenSiteReportBrokenSiteMenuItem">Ilmoita viallisesta sivustosta</string>
     <string name="brokenSiteHeading">Ilmoita viallisesta sivustosta</string>
-    <string name="brokenSiteModalDescription">Viallisesta sivustosta ilmoittaminen tapahtuu täysin anonyymisti ja auttaa meitä kehittämään sovellusta!</string>
-    <string name="brokenSiteUrlHint">Anna URL-osoite</string>
-    <string name="brokenSiteDomainLabel">Viallisen sivuston verkkotunnus:</string>
-    <string name="brokenSiteMessageHint">Missä sisällössä tai toiminnallisuudessa on vikaa?</string>
-    <string name="brokenSiteSubmitButton">Lähetä palaute</string>
     <string name="brokenSiteSubmitted">Kiitos! Palaute lähetetty</string>
 
     <!-- Bookmarks Activity -->

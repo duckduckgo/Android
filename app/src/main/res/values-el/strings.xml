@@ -184,11 +184,6 @@
     <!-- Broken Site Activity -->
     <string name="brokenSiteReportBrokenSiteMenuItem">Αναφορά κατεστραμμένου ιστότοπου</string>
     <string name="brokenSiteHeading">Αναφορά ενός κατεστραμμένου ιστότοπου</string>
-    <string name="brokenSiteModalDescription">Η αναφορά κατεστραμμένου ιστότοπου είναι απολύτως ανώνυμη και μας βοηθά να βελτιώσουμε την εφαρμογή!</string>
-    <string name="brokenSiteUrlHint">Εισαγωγή διεύθυνσης URL</string>
-    <string name="brokenSiteDomainLabel">Τομέας κατεστραμμένου ιστότοπου:</string>
-    <string name="brokenSiteMessageHint">Ποιο περιεχόμενο ή λειτουργία είναι κατεστραμμένο;</string>
-    <string name="brokenSiteSubmitButton">Υποβολή σχολίων</string>
     <string name="brokenSiteSubmitted">Ευχαριστούμε! Τα σχόλια υποβλήθηκαν</string>
 
     <!-- Bookmarks Activity -->
