@@ -40,7 +40,6 @@ class BrokenSiteSubmitter(
 ) : BrokenSiteSender {
 
     override fun submitBrokenSiteFeedback(brokenSite: BrokenSite) {
-        // TODO Change code here
         GlobalScope.launch(Dispatchers.IO) {
             val params = mapOf(
                 "category" to brokenSite.category,
@@ -59,12 +58,11 @@ class BrokenSiteSubmitter(
                 "siteType" to brokenSite.siteType
             )
 
-            val test = ""
-//            runCatching {
-//                pixel.fire(Pixel.PixelName.BROKEN_SITE_REPORT.pixelName, params)
-//            }
-//                .onSuccess { Timber.v("Feedback submission succeeded") }
-//                .onFailure { Timber.w(it, "Feedback submission failed") }
+            runCatching {
+                pixel.fire(Pixel.PixelName.BROKEN_SITE_REPORT.pixelName, params)
+            }
+                .onSuccess { Timber.v("Feedback submission succeeded") }
+                .onFailure { Timber.w(it, "Feedback submission failed") }
         }
     }
 

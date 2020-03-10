@@ -33,7 +33,7 @@ import org.jetbrains.anko.longToast
 
 class BrokenSiteActivity : DuckDuckGoActivity() {
     private val viewModel: BrokenSiteViewModel by bindViewModel()
-    val categories: Array<String> by lazy { resources.getStringArray(R.array.brokenSitesCategories) }
+    var checkedItem: Int = -1
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -59,10 +59,12 @@ class BrokenSiteActivity : DuckDuckGoActivity() {
     }
 
     private fun configureListeners() {
+        val categories = viewModel.categories.map { getString(it.category) }.toTypedArray()
+
         categoriesSelection.setOnClickListener {
             MaterialAlertDialogBuilder(this)
                 .setTitle(getString(R.string.brokenSitesCategoriesTitle))
-                .setSingleChoiceItems(categories, -1) { _, newIndex ->
+                .setSingleChoiceItems(categories, checkedItem) { _, newIndex ->
                     viewModel.onCategoryIndexChanged(newIndex)
                 }
                 .setPositiveButton(getString(android.R.string.yes)) { dialog, _ -> dialog.dismiss() }
@@ -72,8 +74,7 @@ class BrokenSiteActivity : DuckDuckGoActivity() {
 
         submitButton.setOnClickListener {
             val webViewVersion = WebViewCompat.getCurrentWebViewPackage(applicationContext)?.versionName ?: BrokenSiteViewModel.UNKNOWN_VERSION
-            val categoryValues = resources.getStringArray(R.array.brokenSitesValues)
-            viewModel.onSubmitPressed(webViewVersion, categoryValues[viewModel.indexSelected()])
+            viewModel.onSubmitPressed(webViewVersion)
         }
     }
 
@@ -98,7 +99,10 @@ class BrokenSiteActivity : DuckDuckGoActivity() {
     }
 
     private fun render(viewState: ViewState) {
-        val category = if (viewState.indexSelected > -1) categories[viewState.indexSelected] else ""
+        checkedItem = viewState.indexSelected
+        val category = viewState.categorySelected?.let {
+            getString(viewState.categorySelected.category)
+        }.orEmpty()
         categoriesSelection.setText(category)
         submitButton.isEnabled = viewState.submitAllowed
     }

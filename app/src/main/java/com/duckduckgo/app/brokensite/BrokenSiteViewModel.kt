@@ -21,6 +21,8 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.duckduckgo.app.brokensite.api.BrokenSiteSender
 import com.duckduckgo.app.brokensite.model.BrokenSite
+import com.duckduckgo.app.brokensite.model.BrokenSiteCategory
+import com.duckduckgo.app.brokensite.model.BrokenSiteCategory.*
 import com.duckduckgo.app.global.SingleLiveEvent
 import com.duckduckgo.app.global.absoluteString
 import com.duckduckgo.app.global.isMobileSite
@@ -30,6 +32,7 @@ class BrokenSiteViewModel(private val pixel: Pixel, private val brokenSiteSender
 
     data class ViewState(
         val indexSelected: Int = -1,
+        val categorySelected: BrokenSiteCategory? = null,
         val submitAllowed: Boolean = false
     )
 
@@ -44,6 +47,17 @@ class BrokenSiteViewModel(private val pixel: Pixel, private val brokenSiteSender
     var blockedTrackers: String? = null
     var url: String? = null
     var upgradedHttps: Boolean = false
+    val categories: List<BrokenSiteCategory> = listOf(
+        ImagesCategory,
+        PaywallCategory,
+        CommentsCategory,
+        VideosCategory,
+        LinksCategory,
+        ContentCategory,
+        LoginCategory,
+        UnsupportedCategory,
+        OtherCategory
+    )
 
     private val viewValue: ViewState get() = viewState.value!!
 
@@ -60,21 +74,20 @@ class BrokenSiteViewModel(private val pixel: Pixel, private val brokenSiteSender
     fun onCategoryIndexChanged(newIndex: Int) {
         viewState.value = viewState.value?.copy(
             indexSelected = newIndex,
+            categorySelected = categories[newIndex],
             submitAllowed = canSubmit(newIndex)
         )
     }
 
-    fun indexSelected(): Int = viewValue.indexSelected
-
     private fun canSubmit(indexSelected: Int): Boolean = indexSelected > -1
 
-    fun onSubmitPressed(webViewVersion: String, category: String) {
+    fun onSubmitPressed(webViewVersion: String) {
 
         url?.let {
             val trackers = blockedTrackers.orEmpty()
-
+            val category = categories[viewValue.indexSelected]
             val brokenSite = BrokenSite(
-                category = category,
+                category = category.key,
                 siteUrl = Uri.parse(it).absoluteString,
                 upgradeHttps = upgradedHttps,
                 blockedTrackers = trackers,
@@ -83,7 +96,7 @@ class BrokenSiteViewModel(private val pixel: Pixel, private val brokenSiteSender
             )
 
             brokenSiteSender.submitBrokenSiteFeedback(brokenSite)
-            //pixel.fire(Pixel.PixelName.BROKEN_SITE_REPORTED, mapOf(Pixel.PixelParameter.URL to it))
+            pixel.fire(Pixel.PixelName.BROKEN_SITE_REPORTED, mapOf(Pixel.PixelParameter.URL to it))
         }
         command.value = Command.ConfirmAndFinish
     }
