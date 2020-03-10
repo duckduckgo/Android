@@ -62,6 +62,6 @@
     <!-- Sticky Search Prompt Notification -->
     <string name="stickySearchPromptNotificationTitle">Enable DuckDuckGo Quick Search?</string>
     <string name="stickySearchNotification">Sticky Search</string>
-    <string name="stickySearchNotificationText">Show Quick Search in notifications</string>
+    <string name="stickySearchNotificationText">Quick Search in Notifications</string>
 
 </resources>
