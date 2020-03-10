@@ -356,6 +356,36 @@
     <string name="feedbackInitialDisambiguationHappyButtonContentDescription">Knap til positiv feedback</string>
     <string name="feedbackInitialDisambiguationSadButtonContentDescription">Knap til negativ feedback</string>
     <string name="feedbackIsImportantToUs">Din anonyme feedback er vigtig for os.</string>
+
+    <!-- Webview Recovery -->
+    <string name="crashedWebViewErrorMessage">Websiden kunne ikke vises.</string>
+    <string name="crashedWebViewErrorAction">Genindlæs</string>
+
+    <!-- System Search-->
     <string name="systemSearchOmnibarInputHint"><font size="13">Søg eller indtast URL</font></string>
+    <string name="systemSearchDeviceAppLabel">Fra denne enhed</string>
+    <string name="systemSearchAppNotFound">Appen kunne ikke findes</string>
+    <string name="systemSearchOnboardingText">Tak, fordi du valgte DuckDuckGo!\nNår du bruger vores søgning eller app, er dine søgninger beskyttet.</string>
+    <string name="systemSearchOnboardingFeaturesIntroText">DuckDuckGo-appen kan også:</string>
+    <string name="systemSearchOnboardingFeatureOneText">Blokere farlige trackere</string>
+    <string name="systemSearchOnboardingFeatureTwoText">Tvinge kryptering af websteder</string>
+    <string name="systemSearchOnboardingFeatureThreeText">Rydde data med et enkelt klik</string>
+    <string name="systemSearchOnboardingButtonMore">Vis mere</string>
+    <string name="systemSearchOnboardingButtonLess">Skjul</string>
+    <string name="systemSearchOnboardingButtonOk">Forstået</string>
+
+    <!-- Dax Dialog -->
+    <string name="daxDialogHideButton">SKJUL</string>
+    <string name="daxDialogPhew">Pyha!</string>
+    <string name="daxDialogYes">OKAY!</string>
+    <string name="daxDialogAddWidget">Tilføj widget</string>
+    <string name="daxDialogMaybeLater">Måske senere</string>
+    <string name="daxDialogSettings">Gå til indstillinger</string>
+    <string name="daxDialogNext">Næste</string>
+    <string name="daxDialogHighFive">Giv mig fem!</string>
+    <string name="daxDialogGotIt">Forstået</string>
+    <string name="hideTipsTitle">Skjul de resterende tip?</string>
+    <string name="hideTipsText">Der er kun få, og vi forsøgte at gøre dem oplysende.</string>
+    <string name="hideTipsButton">Skjul tip for evigt</string>
 
 </resources>

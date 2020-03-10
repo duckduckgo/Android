@@ -357,6 +357,36 @@
     <string name="feedbackInitialDisambiguationHappyButtonContentDescription">Tlačidlo pozitívnej spätnej väzby</string>
     <string name="feedbackInitialDisambiguationSadButtonContentDescription">Tlačidlo negatívnej spätnej väzby</string>
     <string name="feedbackIsImportantToUs">Anonymná spätná väzba je pre nás dôležitá.</string>
+
+    <!-- Webview Recovery -->
+    <string name="crashedWebViewErrorMessage">Webovú stránku nebolo možné zobraziť.</string>
+    <string name="crashedWebViewErrorAction">Znovu načítať</string>
+
+    <!-- System Search -->
     <string name="systemSearchOmnibarInputHint"><font size="13">Vyhľadať alebo zadať webovú adresu</font></string>
+    <string name="systemSearchDeviceAppLabel">Z tohto zariadenia</string>
+    <string name="systemSearchAppNotFound">Aplikáciu sa nepodarilo nájsť</string>
+    <string name="systemSearchOnboardingText">Ďakujeme, že ste si vybrali aplikáciu DuckDuckGo!\nPri použití nášho vyhľadávača alebo aplikácie je vaše vyhľadávanie chránené.</string>
+    <string name="systemSearchOnboardingFeaturesIntroText">Aplikácia DuckDuckGo tiež:</string>
+    <string name="systemSearchOnboardingFeatureOneText">Blokuje nebezpečné sledovanie</string>
+    <string name="systemSearchOnboardingFeatureTwoText">Vynucuje šifrovanie na webových stránkach</string>
+    <string name="systemSearchOnboardingFeatureThreeText">Odstraňuje údaje jediným kliknutím</string>
+    <string name="systemSearchOnboardingButtonMore">Zobraziť viac</string>
+    <string name="systemSearchOnboardingButtonLess">Skryť</string>
+    <string name="systemSearchOnboardingButtonOk">Mám to</string>
+
+    <!-- Dax Dialog -->
+    <string name="daxDialogHideButton">SKRYŤ</string>
+    <string name="daxDialogPhew">Uf!</string>
+    <string name="daxDialogYes">OK!</string>
+    <string name="daxDialogAddWidget">Pridať miniaplikáciu</string>
+    <string name="daxDialogMaybeLater">Možno neskôr</string>
+    <string name="daxDialogSettings">Prejdite do nastavení</string>
+    <string name="daxDialogNext">Ďalšie</string>
+    <string name="daxDialogHighFive">High Five!</string>
+    <string name="daxDialogGotIt">Mám to</string>
+    <string name="hideTipsTitle">Skryť zostávajúce tipy?</string>
+    <string name="hideTipsText">Je ich len niekoľko, snažili sme sa, aby mali informatívny charakter.</string>
+    <string name="hideTipsButton">Navždy skryť tipy</string>
 
 </resources>
