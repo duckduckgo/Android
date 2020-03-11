@@ -54,7 +54,8 @@ class BrokenSiteActivity : DuckDuckGoActivity() {
         val url = intent.getStringExtra(URL_EXTRA)
         val blockedTrackers = intent.getStringExtra(BLOCKED_TRACKERS_EXTRA)
         val upgradedHttps = intent.getBooleanExtra(UPGRADED_TO_HTTPS_EXTRA, false)
-        viewModel.setInitialBrokenSite(url, blockedTrackers, upgradedHttps)
+        val surrogates = intent.getStringExtra(SURROGATES_EXTRA)
+        viewModel.setInitialBrokenSite(url, blockedTrackers, upgradedHttps, surrogates)
     }
 
     private fun configureListeners() {
@@ -113,15 +114,15 @@ class BrokenSiteActivity : DuckDuckGoActivity() {
         private const val URL_EXTRA = "URL_EXTRA"
         private const val BLOCKED_TRACKERS_EXTRA = "BLOCKED_TRACKERS_EXTRA"
         private const val UPGRADED_TO_HTTPS_EXTRA = "UPGRADED_TO_HTTPS_EXTRA"
+        private const val SURROGATES_EXTRA = "SURROGATES_EXTRA"
 
-        fun intent(context: Context, url: String? = null, blockedTrackers: String?, upgradedToHttps: Boolean): Intent {
+        fun intent(context: Context, url: String? = null, blockedTrackers: String, upgradedToHttps: Boolean, surrogates: String): Intent {
             val intent = Intent(context, BrokenSiteActivity::class.java)
             if (url != null) {
                 intent.putExtra(URL_EXTRA, url)
             }
-            if (blockedTrackers != null) {
-                intent.putExtra(BLOCKED_TRACKERS_EXTRA, blockedTrackers)
-            }
+            intent.putExtra(BLOCKED_TRACKERS_EXTRA, blockedTrackers)
+            intent.putExtra(SURROGATES_EXTRA, surrogates)
             intent.putExtra(UPGRADED_TO_HTTPS_EXTRA, upgradedToHttps)
             return intent
         }

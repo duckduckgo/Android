@@ -26,6 +26,7 @@ import com.duckduckgo.app.privacy.model.Grade
 import com.duckduckgo.app.privacy.model.HttpsStatus
 import com.duckduckgo.app.privacy.model.PrivacyGrade
 import com.duckduckgo.app.privacy.model.PrivacyPractices
+import com.duckduckgo.app.surrogates.SurrogateResponse
 import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import java.util.concurrent.CopyOnWriteArrayList
@@ -64,6 +65,8 @@ class SiteMonitor(
 
     override val trackingEvents = CopyOnWriteArrayList<TrackingEvent>()
 
+    override val surrogates = CopyOnWriteArrayList<SurrogateResponse>()
+
     override val trackerCount: Int
         get() = trackingEvents.size
 
@@ -101,6 +104,10 @@ class SiteMonitor(
 
     override fun upgradedToHttps() {
         upgradedHttps = true
+    }
+
+    override fun surrogateDetected(surrogate: SurrogateResponse) {
+        surrogates.add(surrogate)
     }
 
     override fun trackerDetected(event: TrackingEvent) {

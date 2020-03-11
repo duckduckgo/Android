@@ -93,6 +93,7 @@ class WebViewRequestInterceptor(
             val surrogate = resourceSurrogates.get(url)
             if (surrogate.responseAvailable) {
                 Timber.d("Surrogate found for $url")
+                webViewClientListener?.surrogateDetected(surrogate)
                 return WebResourceResponse(surrogate.mimeType, "UTF-8", surrogate.jsFunction.byteInputStream())
             }
 

@@ -70,6 +70,7 @@ import com.duckduckgo.app.statistics.api.StatisticsUpdater
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelName
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter
+import com.duckduckgo.app.surrogates.SurrogateResponse
 import com.duckduckgo.app.survey.model.Survey
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
@@ -185,7 +186,7 @@ class BrowserTabViewModel(
         class ShareLink(val url: String) : Command()
         class CopyLink(val url: String) : Command()
         class FindInPageCommand(val searchTerm: String) : Command()
-        class BrokenSiteFeedback(val url: String?, val blockedTrackers: String, val httpsUpgraded: Boolean) : Command()
+        class BrokenSiteFeedback(val url: String?, val blockedTrackers: String, val httpsUpgraded: Boolean, val surrogates: String) : Command()
         object DismissFindInPage : Command()
         class ShowFileChooser(val filePathCallback: ValueCallback<Array<Uri>>, val fileChooserParams: WebChromeClient.FileChooserParams) : Command()
         class HandleExternalAppLink(val appLink: IntentType) : Command()
@@ -586,6 +587,10 @@ class BrowserTabViewModel(
         command.postValue(SendSms(telephoneNumber))
     }
 
+    override fun surrogateDetected(surrogate: SurrogateResponse) {
+        site?.surrogateDetected(surrogate)
+    }
+
     override fun upgradedToHttps() {
         site?.upgradedToHttps()
     }
@@ -701,8 +706,9 @@ class BrowserTabViewModel(
         val events = site?.trackingEvents
         val blockedTrackers = events?.distinct()?.map { Uri.parse(it.trackerUrl).host }.orEmpty().joinToString(",")
         val upgradedHttps = site?.upgradedHttps ?: false
+        val surrogates = site?.surrogates?.map { it.name }.orEmpty().joinToString(",")
 
-        command.value = BrokenSiteFeedback(url, blockedTrackers, upgradedHttps)
+        command.value = BrokenSiteFeedback(url, blockedTrackers, upgradedHttps, surrogates)
     }
 
     fun onUserSelectedToEditQuery(query: String) {

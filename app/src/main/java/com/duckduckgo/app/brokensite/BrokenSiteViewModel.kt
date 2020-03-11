@@ -55,7 +55,8 @@ class BrokenSiteViewModel(private val pixel: Pixel, private val brokenSiteSender
         UnsupportedCategory,
         OtherCategory
     )
-    private var blockedTrackers: String? = null
+    private var blockedTrackers: String = ""
+    private var surrogates: String = "null"
     private var url: String? = null
     private var upgradedHttps: Boolean = false
     private val viewValue: ViewState get() = viewState.value!!
@@ -64,10 +65,11 @@ class BrokenSiteViewModel(private val pixel: Pixel, private val brokenSiteSender
         viewState.value = ViewState()
     }
 
-    fun setInitialBrokenSite(url: String?, blockedTrackers: String?, upgradedHttps: Boolean) {
+    fun setInitialBrokenSite(url: String?, blockedTrackers: String, upgradedHttps: Boolean, surrogates: String) {
         this.url = url
         this.blockedTrackers = blockedTrackers
         this.upgradedHttps = upgradedHttps
+        this.surrogates = surrogates
     }
 
     fun onCategoryIndexChanged(newIndex: Int) {
@@ -99,7 +101,8 @@ class BrokenSiteViewModel(private val pixel: Pixel, private val brokenSiteSender
             category = category.key,
             siteUrl = absoluteUrl,
             upgradeHttps = upgradedHttps,
-            blockedTrackers = blockedTrackers.orEmpty(),
+            blockedTrackers = blockedTrackers,
+            surrogates = surrogates,
             webViewVersion = webViewVersion,
             siteType = if (Uri.parse(url).isMobileSite) MOBILE else DESKTOP
         )
