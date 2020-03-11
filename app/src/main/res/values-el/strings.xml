@@ -1,6 +1,7 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
 
     <string name="duckDuckGoLogoDescription">Λογότυπο DuckDuckGo</string>
+    <string name="duckDuckGoPrivacySimplified">Ιδιωτικότητα, απλοποιημένη.</string>
     <string name="yes">Ναι</string>
     <string name="no">Οχι</string>
 
@@ -175,7 +176,6 @@
 
     <!-- About Activity -->
     <string name="aboutActivityTitle">Πληροφορίες για εμάς</string>
-    <string name="aboutHeading">Ιδιωτικότητα, απλοποιημένη.</string>
     <string name="aboutDescription">
         Στην DuckDuckGo θέτουμε το νέο πρότυπο εμπιστοσύνης στο διαδίκτυο.\n\Το πρόγραμμα περιήγησης ιδιωτικότητας DuckDuckGo παρέχει όλα τα απαραίτητα στοιχεία ιδιωτικότητας που χρειάζεστε για να προστατεύσετε τον εαυτό σας κατά την αναζήτηση και περιήγηση στο διαδίκτυο, συμπεριλαμβανομένου του αποκλεισμού παρακολούθησης, πιο έξυπνης κρυπτογράφησης και ιδιωτικής αναζήτησης DuckDuckGo.\n\ Άλλωστε, στο διαδίκτυο δεν θα πρέπει να αισθάνεστε άβολα και το να απολαμβάνετε την ιδιωτικότητα που σας αξίζει στο διαδίκτυο θα πρέπει να είναι τόσο απλό όσο το κλείσιμο μιας πόρτας.</string>
     <string name="aboutMoreLink">Περισσότερα στη διεύθυνση duckduckgo.com/about</string>
@@ -351,5 +351,6 @@
     <string name="feedbackInitialDisambiguationHappyButtonContentDescription">Κουμπί θετικών σχολίων</string>
     <string name="feedbackInitialDisambiguationSadButtonContentDescription">Κουμπί αρνητικών σχολίων</string>
     <string name="feedbackIsImportantToUs">Τα ανώνυμα σχόλιά σας είναι σημαντικά για εμάς.</string>
+    <string name="systemSearchOmnibarInputHint"><font size="13">Αναζήτηση ή πληκτρολόγηση διεύθυνσης URL</font></string>
 
 </resources>

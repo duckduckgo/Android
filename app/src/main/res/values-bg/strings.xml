@@ -1,6 +1,7 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
 
     <string name="duckDuckGoLogoDescription">Лого на DuckDuckGo</string>
+    <string name="duckDuckGoPrivacySimplified">Поверителност, опростена.</string>
     <string name="yes">да</string>
     <string name="no">Не</string>
 
@@ -175,7 +176,6 @@
 
     <!-- About Activity -->
     <string name="aboutActivityTitle">За нас</string>
-    <string name="aboutHeading">Поверителност, опростена.</string>
     <string name="aboutDescription">
         В DuckDuckGo задаваме новия стандарт на доверие онлайн.\n\ Браузърът за поверителност DuckDuckGo осигурява всички необходими елементи за защита на поверителността, докато търсите и сърфирате в мрежата, включително блокиране на проследяващи елементи, по-интелигентно криптиране и частно търсене с DuckDuckGo.\ n\ В крайна сметка интернет не трябва да създава чувство на страх, а получаването на поверителността, която заслужавате онлайн, трябва да е толкова просто, колкото пускането на щорите.</string>
     <string name="aboutMoreLink">Още на duckduckgo.com/about</string>
@@ -351,5 +351,6 @@
     <string name="feedbackInitialDisambiguationHappyButtonContentDescription">Бутон за положителни отзиви</string>
     <string name="feedbackInitialDisambiguationSadButtonContentDescription">Бутон за отрицателни отзиви</string>
     <string name="feedbackIsImportantToUs">Вашите анонимни отзиви са важни за нас.</string>
+    <string name="systemSearchOmnibarInputHint"><font size="13">Търсене или въвеждане на URL адрес</font></string>
 
 </resources>

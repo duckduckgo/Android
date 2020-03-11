@@ -1,8 +1,9 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
 
     <string name="appName" translatable="false">DuckDuckGo</string>
-    <string name="duckDuckGoLogoDescription">DuckDuckGo logo</string>
     <string name="appDescription" translatable="false">DuckDuckGo&#160;</string>
+    <string name="duckDuckGoLogoDescription">DuckDuckGo logo</string>
+    <string name="duckDuckGoPrivacySimplified">Privacy, simplified.</string>
     <string name="yes">Yes</string>
     <string name="no">No</string>
 
@@ -180,7 +181,6 @@
 
     <!-- About Activity -->
     <string name="aboutActivityTitle">About us</string>
-    <string name="aboutHeading">Privacy, simplified.</string>
     <string name="aboutDescription">
         At DuckDuckGo, we\'re setting the new standard of trust online.\n\
         DuckDuckGo Privacy Browser provides all the privacy essentials you need to protect yourself as you search and browse the web, including tracker blocking, smarter encryption, and DuckDuckGo private search.\n\
@@ -360,5 +360,8 @@
     <string name="feedbackInitialDisambiguationHappyButtonContentDescription">Positive feedback button</string>
     <string name="feedbackInitialDisambiguationSadButtonContentDescription">Negative feedback button</string>
     <string name="feedbackIsImportantToUs">Your anonymous feedback is important to us.</string>
+
+    <!-- System Search -->
+    <string name="systemSearchOmnibarInputHint"><font size="13">Search or type URL</font></string>
 
 </resources>

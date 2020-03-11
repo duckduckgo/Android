@@ -47,8 +47,8 @@ interface VariantManager {
         val ACTIVE_VARIANTS = listOf(
             // SERP variants. "sc" may also be used as a shared control for mobile experiments in
             // the future if we can filter by app version
-            Variant(key = "sc", weight = 0.0, features = emptyList(), filterBy = { noFilter() }),
-            Variant(key = "se", weight = 0.0, features = emptyList(), filterBy = { noFilter() }),
+            Variant(key = "sc", weight = 1.0, features = emptyList(), filterBy = { noFilter() }),
+            Variant(key = "se", weight = 1.0, features = emptyList(), filterBy = { noFilter() }),
 
             // Concept test experiment
             Variant(key = "mc", weight = 0.0, features = emptyList(), filterBy = { isEnglishLocale() }),
@@ -84,8 +84,13 @@ interface VariantManager {
             // All groups in an experiment (control and variants) MUST use the same filters
         )
 
+        val REFERRER_VARIANTS = listOf(
+            Variant(RESERVED_EU_AUCTION_VARIANT, features = listOf(SuppressHomeTabWidgetCta), filterBy = { noFilter() })
+        )
+
         fun referrerVariant(key: String): Variant {
-            return Variant(key, features = emptyList(), filterBy = { noFilter() })
+            val knownReferrer = REFERRER_VARIANTS.firstOrNull { it.key == key }
+            return knownReferrer ?: Variant(key, features = emptyList(), filterBy = { noFilter() })
         }
 
         private fun noFilter(): Boolean = true

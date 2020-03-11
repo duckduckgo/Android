@@ -1,6 +1,7 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
 
     <string name="duckDuckGoLogoDescription">DuckDuckGo-logo</string>
+    <string name="duckDuckGoPrivacySimplified">Privatlivets fred, forenklet.</string>
     <string name="yes">Ja</string>
     <string name="no">Nej</string>
 
@@ -175,7 +176,6 @@
 
     <!-- About Activity -->
     <string name="aboutActivityTitle">Om os</string>
-    <string name="aboutHeading">Privatlivets fred, forenklet.</string>
     <string name="aboutDescription">
         Hos DuckDuckGo sætter vi den nye standard for tiltro online .\n\ DuckDuckGo Privacy Browser giver dig alle de nødvendige værktøjer til at værne over privatlivets fred, så du kan beskytte dig selv, når du søger og surfer på nettet, herunder tracker-blokering, smartere kryptering og DuckDuckGo-privat søgning.\n\ Internettet bør trods alt ikke føles så skummelt, og det bør være lige så enkelt at få det privatliv, du fortjener online, som at lukke dine persienner ned.</string>
     <string name="aboutMoreLink">Mere på duckduckgo.com/about</string>
@@ -351,5 +351,6 @@
     <string name="feedbackInitialDisambiguationHappyButtonContentDescription">Knap til positiv feedback</string>
     <string name="feedbackInitialDisambiguationSadButtonContentDescription">Knap til negativ feedback</string>
     <string name="feedbackIsImportantToUs">Din anonyme feedback er vigtig for os.</string>
+    <string name="systemSearchOmnibarInputHint"><font size="13">Søg eller indtast URL</font></string>
 
 </resources>

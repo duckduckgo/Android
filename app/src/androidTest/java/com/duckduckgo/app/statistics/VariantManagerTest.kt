@@ -25,7 +25,7 @@ import org.junit.Test
 class VariantManagerTest {
 
     private val variants = VariantManager.ACTIVE_VARIANTS +
-            variantWithKey(RESERVED_EU_AUCTION_VARIANT) +
+            VariantManager.REFERRER_VARIANTS +
             DEFAULT_VARIANT
 
     // SERP Experiment(s)
@@ -33,14 +33,14 @@ class VariantManagerTest {
     @Test
     fun serpControlVariantIsInactiveAndHasNoFeatures() {
         val variant = variants.first { it.key == "sc" }
-        assertEqualsDouble(0.0, variant.weight)
+        assertEqualsDouble(1.0, variant.weight)
         assertEquals(0, variant.features.size)
     }
 
     @Test
     fun serpExperimentalVariantIsInactiveAndHasNoFeatures() {
         val variant = variants.first { it.key == "se" }
-        assertEqualsDouble(0.0, variant.weight)
+        assertEqualsDouble(1.0, variant.weight)
         assertEquals(0, variant.features.size)
     }
 
@@ -111,10 +111,5 @@ class VariantManagerTest {
         if (comparison != 0) {
             fail("Doubles are not equal. Expected $expected but was $actual")
         }
-    }
-
-    @Suppress("SameParameterValue")
-    private fun variantWithKey(key: String): Variant {
-        return DEFAULT_VARIANT.copy(key = key)
     }
 }

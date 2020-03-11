@@ -379,11 +379,15 @@ class BrowserTabViewModel(
         return !currentBrowserViewState().browserShowing && navigation.hasNavigationHistory
     }
 
-    suspend fun closeCurrentTab() {
+    private suspend fun removeCurrentTabFromRepository() {
         val currentTab = tabRepository.liveSelectedTab.value
         currentTab?.let {
             tabRepository.delete(currentTab)
         }
+    }
+
+    override fun closeCurrentTab() {
+        viewModelScope.launch { removeCurrentTabFromRepository() }
     }
 
     fun onUserPressedForward() {
@@ -1066,7 +1070,7 @@ class BrowserTabViewModel(
     }
 
     private fun recoverTabWithQuery(query: String) {
-        viewModelScope.launch { closeCurrentTab() }
+        closeCurrentTab()
         command.value = OpenInNewTab(query)
     }
 

@@ -17,6 +17,7 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
 
     <string name="duckDuckGoLogoDescription">Logo DuckDuckGo</string>
+    <string name="duckDuckGoPrivacySimplified">La privacy, semplificata.</string>
     <string name="yes">Sì</string>
     <string name="no">No</string>
 
@@ -191,7 +192,6 @@
 
     <!-- About Activity -->
     <string name="aboutActivityTitle">Chi siamo</string>
-    <string name="aboutHeading">La privacy, semplificata.</string>
     <string name="aboutDescription">
         DuckDuckGo è il nuovo standard di sicurezza online.\n\Il browser per la navigazione anonima DuckDuckGo ti fornisce tutti gli strumenti di privacy di cui hai bisogno per proteggerti mentre navighi ed effettui ricerche online. Inoltre, blocca i sistemi di tracciamento, offre una crittografia intelligente e ti permette di effettuare ricerche private.\n\ Dopotutto, Internet non deve essere un luogo da temere e avere online la privacy che meriti dovrebbe essere davvero facile.</string>
     <string name="aboutMoreLink">Scopri di più su duckduckgo.com/about</string>
@@ -367,5 +367,6 @@
     <string name="feedbackInitialDisambiguationHappyButtonContentDescription">Pulsante feedback positivo</string>
     <string name="feedbackInitialDisambiguationSadButtonContentDescription">Pulsante feedback negativo</string>
     <string name="feedbackIsImportantToUs">Il tuo feedback anonimo è importante per noi.</string>
+    <string name="systemSearchOmnibarInputHint"><font size="13">Cerca o inserisci URL</font></string>
 
 </resources>

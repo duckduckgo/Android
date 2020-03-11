@@ -43,7 +43,7 @@ interface DeviceInfo {
 
 class ContextDeviceInfo @Inject constructor(private val context: Context) : DeviceInfo {
 
-    override val appVersion = "${BuildConfig.VERSION_NAME}"
+    override val appVersion = BuildConfig.VERSION_NAME
 
     override val majorAppVersion = appVersion.split(".").first()
 

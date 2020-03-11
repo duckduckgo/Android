@@ -1,6 +1,7 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
 
     <string name="duckDuckGoLogoDescription">DuckDuckGo logo</string>
+    <string name="duckDuckGoPrivacySimplified">Personvern gjort enkelt.</string>
     <string name="yes">Ja</string>
     <string name="no">Nei</string>
 
@@ -175,7 +176,6 @@
 
     <!-- About Activity -->
     <string name="aboutActivityTitle">Om oss</string>
-    <string name="aboutHeading">Personvern gjort enkelt.</string>
     <string name="aboutDescription">
         Hos DucDuckGo setter vi den nye standarden for pålitelighet på nettet.\n\ DuckDuckGos private nettleser gir deg alle de grunnleggende personvernfunksjonene du trenger for å beskytte deg selv mens du søker og surfer på nettet, inkludert sporingsblokkering, smartere kryptering og DuckDuckGos private søk.\n\ Når det kommer til stykket, burde det ikke være så guffent å bruke Internett. Det skal ikke være vanskeligere å få det personvernet du fortjener på nett enn å velge gardiner.</string>
     <string name="aboutMoreLink">Mer på duckduckgo.com/about</string>
@@ -351,5 +351,6 @@
     <string name="feedbackInitialDisambiguationHappyButtonContentDescription">Knapp for positiv tilbakemelding</string>
     <string name="feedbackInitialDisambiguationSadButtonContentDescription">Knapp for negativ tilbakemelding</string>
     <string name="feedbackIsImportantToUs">Den anonyme tilbakemeldingen din er viktig for oss.</string>
+    <string name="systemSearchOmnibarInputHint"><font size="13">Søk eller skriv URL</font></string>
 
 </resources>

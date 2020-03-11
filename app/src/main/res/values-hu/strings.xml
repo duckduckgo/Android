@@ -1,6 +1,7 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
 
     <string name="duckDuckGoLogoDescription">DuckDuckGo logó</string>
+    <string name="duckDuckGoPrivacySimplified">Adatvédelem, egyszerűsítve.</string>
     <string name="yes">Igen</string>
     <string name="no">Nem</string>
 
@@ -175,7 +176,6 @@
 
     <!-- About Activity -->
     <string name="aboutActivityTitle">Rólunk</string>
-    <string name="aboutHeading">Adatvédelem, egyszerűsítve.</string>
     <string name="aboutDescription">
         A DuckDuckGo célja egy új online bizalmi szint megteremtése. \n\ A DuckDuckGo Adatvédelmi Böngésző minden olyan alapvető adatvédelmi elemet tartalmaz, amelyre szükséged lehet ahhoz, hogy megvédd magad az internetes keresés és böngészés során, beleértve a nyomkövető letiltását, az intelligensebb titkosítást és a DuckDuckGo privát keresést.\n\ Az internet végső soron nem feltétlenül kell, hogy ellenséges közeg legyen, és hisszük, hogy az általad megérdemelt adatvédelem olyan egyszerű is lehet, mint a redőny lehúzása.</string>
     <string name="aboutMoreLink">További információk a duckduckgo.com/about oldalon</string>
@@ -351,5 +351,6 @@
     <string name="feedbackInitialDisambiguationHappyButtonContentDescription">Pozitív visszajelzés gomb</string>
     <string name="feedbackInitialDisambiguationSadButtonContentDescription">Negatív visszajelzés gomb</string>
     <string name="feedbackIsImportantToUs">Anonim visszajelzésed fontos számunkra.</string>
+    <string name="systemSearchOmnibarInputHint"><font size="13">Keresés vagy URL beírása</font></string>
 
 </resources>
