@@ -25,7 +25,7 @@ import org.junit.Test
 class VariantManagerTest {
 
     private val variants = VariantManager.ACTIVE_VARIANTS +
-            variantWithKey(RESERVED_EU_AUCTION_VARIANT) +
+            VariantManager.REFERRER_VARIANTS +
             DEFAULT_VARIANT
 
     // SERP Experiment(s)
@@ -127,10 +127,5 @@ class VariantManagerTest {
         if (comparison != 0) {
             fail("Doubles are not equal. Expected $expected but was $actual")
         }
-    }
-
-    @Suppress("SameParameterValue")
-    private fun variantWithKey(key: String): Variant {
-        return DEFAULT_VARIANT.copy(key = key)
     }
 }

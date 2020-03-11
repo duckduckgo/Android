@@ -18,6 +18,7 @@
 
 package com.duckduckgo.app.statistics
 
+import com.duckduckgo.app.statistics.VariantManager.Companion.RESERVED_EU_AUCTION_VARIANT
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.nhaarman.mockitokotlin2.*
 import org.junit.Assert.*
@@ -166,10 +167,17 @@ class ExperimentationVariantManagerTest {
     }
 
     @Test
-    fun whenReferrerVariantReturnedThenNoFeaturesEnabled() {
+    fun whenUnknownReferrerVariantReturnedThenNoFeaturesEnabled() {
         mockUpdateScenario("xx")
         val variant = testee.getVariant(activeVariants)
         assertTrue(variant.features.isEmpty())
+    }
+
+    @Test
+    fun whenEuAuctionReferrerVariantReturnedThenSuppressWidgetFeaturesEnabled() {
+        mockUpdateScenario(RESERVED_EU_AUCTION_VARIANT)
+        val variant = testee.getVariant(activeVariants)
+        assertTrue(variant.hasFeature(VariantManager.VariantFeature.SuppressHomeTabWidgetCta))
     }
 
     private fun mockUpdateScenario(key: String) {
