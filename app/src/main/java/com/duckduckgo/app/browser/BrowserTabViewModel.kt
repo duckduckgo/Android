@@ -186,7 +186,7 @@ class BrowserTabViewModel(
         class ShareLink(val url: String) : Command()
         class CopyLink(val url: String) : Command()
         class FindInPageCommand(val searchTerm: String) : Command()
-        class BrokenSiteFeedback(val url: String?, val blockedTrackers: String, val httpsUpgraded: Boolean, val surrogates: String) : Command()
+        class BrokenSiteFeedback(val url: String?, val blockedTrackers: String, val surrogates: String, val httpsUpgraded: Boolean) : Command()
         object DismissFindInPage : Command()
         class ShowFileChooser(val filePathCallback: ValueCallback<Array<Uri>>, val fileChooserParams: WebChromeClient.FileChooserParams) : Command()
         class HandleExternalAppLink(val appLink: IntentType) : Command()
@@ -708,7 +708,7 @@ class BrowserTabViewModel(
         val upgradedHttps = site?.upgradedHttps ?: false
         val surrogates = site?.surrogates?.map { it.name }.orEmpty().joinToString(",")
 
-        command.value = BrokenSiteFeedback(url, blockedTrackers, upgradedHttps, surrogates)
+        command.value = BrokenSiteFeedback(url, blockedTrackers, surrogates, upgradedHttps)
     }
 
     fun onUserSelectedToEditQuery(query: String) {

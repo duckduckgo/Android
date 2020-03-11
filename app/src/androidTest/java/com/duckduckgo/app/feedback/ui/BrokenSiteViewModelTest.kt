@@ -103,7 +103,7 @@ class BrokenSiteViewModelTest {
 
     @Test
     fun whenCanSubmitBrokenSiteAndUrlNotNullAndSubmitPressedThenReportAndPixelSubmitted() {
-        testee.setInitialBrokenSite(url, null, false)
+        testee.setInitialBrokenSite(url, "", "", false)
         selectAndAcceptCategory()
         testee.onSubmitPressed("webViewVersion")
 
@@ -112,6 +112,7 @@ class BrokenSiteViewModelTest {
             siteUrl = url,
             upgradeHttps = false,
             blockedTrackers = "",
+            surrogates = "",
             webViewVersion = "webViewVersion",
             siteType = BrokenSiteViewModel.DESKTOP
         )
@@ -123,7 +124,7 @@ class BrokenSiteViewModelTest {
 
     @Test
     fun whenUrlIsDesktopThenSendDesktopParameter() {
-        testee.setInitialBrokenSite(url, null, false)
+        testee.setInitialBrokenSite(url, "", "", false)
         selectAndAcceptCategory()
 
         val brokenSiteExpected = testee.getBrokenSite(url, "")
@@ -133,7 +134,7 @@ class BrokenSiteViewModelTest {
     @Test
     fun whenUrlIsMobileThenSendMobileParameter() {
         val url = "http://m.example.com"
-        testee.setInitialBrokenSite(url, null, false)
+        testee.setInitialBrokenSite(url, "", "", false)
         selectAndAcceptCategory()
 
         val brokenSiteExpected = testee.getBrokenSite(url, "")
@@ -141,20 +142,10 @@ class BrokenSiteViewModelTest {
     }
 
     @Test
-    fun whenBlockedTrackersIsEmptyThenReturnEmptyString() {
-        val url = "http://m.example.com"
-        testee.setInitialBrokenSite(url, null, false)
-        selectAndAcceptCategory()
-
-        val brokenSiteExpected = testee.getBrokenSite(url, "")
-        assertEquals("", brokenSiteExpected.blockedTrackers)
-    }
-
-    @Test
     fun whenGetBrokenSiteThenReturnCorrectCategory() {
         val url = "http://m.example.com"
         val categoryIndex = 0
-        testee.setInitialBrokenSite(url, null, false)
+        testee.setInitialBrokenSite(url, "", "", false)
         selectAndAcceptCategory(categoryIndex)
 
         val categoryExpected = testee.categories[categoryIndex].key
@@ -164,7 +155,7 @@ class BrokenSiteViewModelTest {
 
     @Test
     fun whenCanSubmitBrokenSiteAndUrlNullAndSubmitPressedThenReportAndPixelNotSubmitted() {
-        testee.setInitialBrokenSite(null, null, false)
+        testee.setInitialBrokenSite(null, "", "", false)
         selectAndAcceptCategory()
         testee.onSubmitPressed("webViewVersion")
 
