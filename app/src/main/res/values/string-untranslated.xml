@@ -60,7 +60,7 @@
     <string name="hideTipsButton">Hide tips forever</string>
 
     <!-- Sticky Search Prompt Notification -->
-    <string name="stickySearchPromptNotificationTitle">Enable DuckDuckGo Quick Search?</string>
+    <string name="stickySearchPromptNotificationTitle">Quick Search</string>
     <string name="stickySearchNotification">Sticky Search</string>
     <string name="stickySearchNotificationText">Quick Search in Notifications</string>
     <string name="stickySearchPromptKeep">Keep</string>

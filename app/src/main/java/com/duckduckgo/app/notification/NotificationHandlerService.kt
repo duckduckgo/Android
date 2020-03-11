@@ -26,9 +26,10 @@ import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEvent.APP_LAUNCH
 import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEvent.CANCEL
 import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEvent.CLEAR_DATA_LAUNCH
-import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEvent.STICKY_SEARCH_QUERY
-import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEvent.STICKY_SEARCH_KEEP
-import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEvent.STICKY_SEARCH_REMOVE
+import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEvent.QUICK_SEARCH_LAUNCH
+import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEvent.QUICK_SEARCH_KEEP
+import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEvent.QUICK_SEARCH_PROMPT_LAUNCH
+import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEvent.QUICK_SEARCH_REMOVE
 import com.duckduckgo.app.settings.SettingsActivity
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -68,9 +69,10 @@ class NotificationHandlerService : IntentService("NotificationHandlerService") {
             APP_LAUNCH -> onAppLaunched(pixelSuffix)
             CLEAR_DATA_LAUNCH -> onClearDataLaunched(pixelSuffix)
             CANCEL -> onCancelled(pixelSuffix)
-            STICKY_SEARCH_REMOVE -> onStickySearchNotificationRemove(intent)
-            STICKY_SEARCH_KEEP -> onStickySearchNotificationKeep(intent)
-            STICKY_SEARCH_QUERY -> onSearchQueryRequest(intent)
+            QUICK_SEARCH_PROMPT_LAUNCH -> onQuickSearchPromptRequest()
+            QUICK_SEARCH_REMOVE -> onQuickSearchNotificationRemove(intent)
+            QUICK_SEARCH_KEEP -> onQuickSearchNotificationKeep(intent)
+            QUICK_SEARCH_LAUNCH -> onQuickSearchRequest()
         }
 
         if (intent.getBooleanExtra(NOTIFICATION_AUTO_CANCEL, true)) {
@@ -101,15 +103,14 @@ class NotificationHandlerService : IntentService("NotificationHandlerService") {
         pixel.fire("${NOTIFICATION_CANCELLED.pixelName}_$pixelSuffix")
     }
 
-    private fun onStickySearchNotificationKeep(intent: Intent) {
+    private fun onQuickSearchNotificationKeep(intent: Intent) {
         Timber.i("Sticky Search Notification Requested!")
-        val pixelSuffix = intent.getStringExtra(PIXEL_SUFFIX_EXTRA)
         settingsDataStore.searchNotificationEnabled = true
         notificationScheduler.launchStickySearchNotification()
         pixel.fire(Pixel.PixelName.QUICK_SEARCH_PROMPT_NOTIFICATION_KEEP)
     }
 
-    private fun onStickySearchNotificationRemove(intent: Intent) {
+    private fun onQuickSearchNotificationRemove(intent: Intent) {
         Timber.i("Sticky Search Notification Dismissed!")
         val notificationId = intent.getIntExtra(NOTIFICATION_SYSTEM_ID_EXTRA, 0)
         pixel.fire(Pixel.PixelName.QUICK_SEARCH_PROMPT_NOTIFICATION_REMOVE)
@@ -118,7 +119,16 @@ class NotificationHandlerService : IntentService("NotificationHandlerService") {
         closeNotificationPanel()
     }
 
-    private fun onSearchQueryRequest(intent: Intent) {
+    private fun onQuickSearchPromptRequest() {
+        Timber.i("Search from Prompt Notification Requested!")
+        val searchIntent = SystemSearchActivity.intent(context)
+        TaskStackBuilder.create(context)
+            .addNextIntentWithParentStack(searchIntent)
+            .startActivities()
+        pixel.fire(Pixel.PixelName.QUICK_SEARCH_PROMPT_NOTIFICATION_PRESSED)
+    }
+
+    private fun onQuickSearchRequest() {
         Timber.i("Search from Notification Requested!")
         val searchIntent = SystemSearchActivity.intent(context)
         TaskStackBuilder.create(context)
@@ -140,9 +150,10 @@ class NotificationHandlerService : IntentService("NotificationHandlerService") {
         const val APP_LAUNCH = "com.duckduckgo.notification.launch.app"
         const val CLEAR_DATA_LAUNCH = "com.duckduckgo.notification.launch.clearData"
         const val CANCEL = "com.duckduckgo.notification.cancel"
-        const val STICKY_SEARCH_KEEP = "com.duckduckgo.notification.search.accept"
-        const val STICKY_SEARCH_REMOVE = "com.duckduckgo.notification.search.dismiss"
-        const val STICKY_SEARCH_QUERY = "com.duckduckgo.notification.search"
+        const val QUICK_SEARCH_PROMPT_LAUNCH = "com.duckduckgo.notification.search.launch"
+        const val QUICK_SEARCH_KEEP = "com.duckduckgo.notification.search.keep"
+        const val QUICK_SEARCH_REMOVE = "com.duckduckgo.notification.search.remove"
+        const val QUICK_SEARCH_LAUNCH = "com.duckduckgo.notification.search"
     }
 
     companion object {

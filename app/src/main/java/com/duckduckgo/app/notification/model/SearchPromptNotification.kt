@@ -33,9 +33,11 @@ class SearchPromptNotification(
 
     override val id = "com.duckduckgo.privacy.search.stickyPrompt"
 
-    override val launchIntent = NotificationHandlerService.NotificationEvent.STICKY_SEARCH_KEEP
+    override val pressIntent = NotificationHandlerService.NotificationEvent.QUICK_SEARCH_PROMPT_LAUNCH
 
-    override val cancelIntent = NotificationHandlerService.NotificationEvent.STICKY_SEARCH_REMOVE
+    override val launchIntent = NotificationHandlerService.NotificationEvent.QUICK_SEARCH_KEEP
+
+    override val cancelIntent = NotificationHandlerService.NotificationEvent.QUICK_SEARCH_REMOVE
 
     override val layoutId = R.layout.search_notification_prompt
 

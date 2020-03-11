@@ -59,6 +59,7 @@ class NotificationFactory @Inject constructor(val context: Context, val manager:
         specification: NotificationSpec,
         launchIntent: PendingIntent,
         cancelIntent: PendingIntent,
+        pressIntent: PendingIntent,
         layoutId: Int,
         priority: Int
     ): Notification {
@@ -71,6 +72,7 @@ class NotificationFactory @Inject constructor(val context: Context, val manager:
             .setCustomBigContentView(notificationLayout)
             .setStyle(NotificationCompat.DecoratedCustomViewStyle())
             .setSmallIcon(specification.icon)
+            .setContentIntent(pressIntent)
             .setVisibility(NotificationCompat.VISIBILITY_SECRET)
             .setAutoCancel(false)
             .setOnlyAlertOnce(true)

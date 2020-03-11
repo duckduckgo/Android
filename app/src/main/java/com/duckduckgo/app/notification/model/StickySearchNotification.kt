@@ -19,7 +19,7 @@ package com.duckduckgo.app.notification.model
 import android.content.Context
 import androidx.core.app.NotificationManagerCompat
 import com.duckduckgo.app.browser.R
-import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEvent.STICKY_SEARCH_QUERY
+import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEvent.QUICK_SEARCH_LAUNCH
 import com.duckduckgo.app.notification.NotificationRegistrar
 import com.duckduckgo.app.notification.db.NotificationDao
 import timber.log.Timber
@@ -31,9 +31,11 @@ class StickySearchNotification(
 
     override val id = "com.duckduckgo.privacy.search.sticky"
 
-    override val launchIntent = STICKY_SEARCH_QUERY
+    override val pressIntent = QUICK_SEARCH_LAUNCH
 
-    override val cancelIntent = STICKY_SEARCH_QUERY
+    override val launchIntent = QUICK_SEARCH_LAUNCH
+
+    override val cancelIntent = QUICK_SEARCH_LAUNCH
 
     override val layoutId = R.layout.search_notification
 

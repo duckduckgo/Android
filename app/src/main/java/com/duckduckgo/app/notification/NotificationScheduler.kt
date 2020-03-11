@@ -171,9 +171,10 @@ class AndroidNotificationScheduler(
 
             val launchIntent = pendingNotificationHandlerIntent(context, notification.launchIntent, specification)
             val cancelIntent = pendingNotificationHandlerIntent(context, notification.cancelIntent, specification)
+            val pressIntent = pendingNotificationHandlerIntent(context, notification.pressIntent, specification)
 
             val systemNotification =
-                factory.createSearchNotificationPrompt(specification, launchIntent, cancelIntent, notification.layoutId, notification.priority)
+                factory.createSearchNotificationPrompt(specification, launchIntent, cancelIntent, pressIntent, notification.layoutId, notification.priority)
 
             notificationDao.insert(Notification(notification.id))
             manager.notify(NotificationRegistrar.NotificationId.StickySearch, systemNotification)
@@ -242,7 +243,7 @@ class AndroidNotificationScheduler(
             val specification = notification.buildSpecification()
 
             val intent = Intent(context, NotificationHandlerService::class.java)
-            intent.type = NotificationHandlerService.NotificationEvent.STICKY_SEARCH_REMOVE
+            intent.type = NotificationHandlerService.NotificationEvent.QUICK_SEARCH_REMOVE
             intent.putExtra(PIXEL_SUFFIX_EXTRA, specification.pixelSuffix)
             intent.putExtra(NOTIFICATION_SYSTEM_ID_EXTRA, specification.systemId)
             intent.putExtra(NOTIFICATION_AUTO_CANCEL, specification.autoCancel)
