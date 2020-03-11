@@ -67,8 +67,8 @@ class StickySearchPromptSpecification(context: Context) : NotificationSpec {
     override val icon = R.drawable.notification_logo
     override val title: String = context.getString(R.string.stickySearchPromptNotificationTitle)
     override val description: String = context.getString(R.string.stickySearchPromptNotificationTitle)
-    override val launchButton: String = context.getString(R.string.yes)
-    override val closeButton: String? = context.getString(R.string.noThanks)
+    override val launchButton: String = context.getString(R.string.stickySearchPromptKeep)
+    override val closeButton: String? = context.getString(R.string.stickySearchPromptRemove)
     override val pixelSuffix = "ssp"
     override val autoCancel = false
 }
