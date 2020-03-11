@@ -356,6 +356,36 @@
     <string name="feedbackInitialDisambiguationHappyButtonContentDescription">Schaltfläche für positives Feedback</string>
     <string name="feedbackInitialDisambiguationSadButtonContentDescription">Schaltfläche für negatives Feedback</string>
     <string name="feedbackIsImportantToUs">Dein anonymes Feedback ist uns wichtig.</string>
+
+    <!-- Webview Recovery -->
+    <string name="crashedWebViewErrorMessage">Die Webseite konnte nicht angezeigt werden.</string>
+    <string name="crashedWebViewErrorAction">Neu laden</string>
+
+    <!-- System Search -->
     <string name="systemSearchOmnibarInputHint"><font size="13">URL eingeben oder suchen</font></string>
+    <string name="systemSearchDeviceAppLabel">Von diesem Gerät</string>
+    <string name="systemSearchAppNotFound">Die Anwendung konnte nicht gefunden werden.</string>
+    <string name="systemSearchOnboardingText">Vielen Dank, dass Sie sich für DuckDuckGo entschieden haben!\nWenn Sie jetzt unsere Suche oder App verwenden, sind Ihre Suchanfragen geschützt.</string>
+    <string name="systemSearchOnboardingFeaturesIntroText">Das kann die DuckDuckGo App auch:</string>
+    <string name="systemSearchOnboardingFeatureOneText">Sie blockiert unsichere Tracker.</string>
+    <string name="systemSearchOnboardingFeatureTwoText">Sie erzwingt die Verschlüsselung auf Websites.</string>
+    <string name="systemSearchOnboardingFeatureThreeText">Sie löscht Daten mit einem Fingertipp.</string>
+    <string name="systemSearchOnboardingButtonMore">Mehr anzeigen</string>
+    <string name="systemSearchOnboardingButtonLess">Ausblenden</string>
+    <string name="systemSearchOnboardingButtonOk">Verstanden</string>
+
+    <!-- Dax Dialog -->
+    <string name="daxDialogHideButton">AUSBLENDEN</string>
+    <string name="daxDialogPhew">Puh!</string>
+    <string name="daxDialogYes">OK!</string>
+    <string name="daxDialogAddWidget">Widget hinzufügen</string>
+    <string name="daxDialogMaybeLater">Vielleicht später</string>
+    <string name="daxDialogSettings">Zu den Einstellungen</string>
+    <string name="daxDialogNext">Weiter</string>
+    <string name="daxDialogHighFive">Gib mir fünf!</string>
+    <string name="daxDialogGotIt">Verstanden</string>
+    <string name="hideTipsTitle">Verbleibende Tipps ausblenden?</string>
+    <string name="hideTipsText">Es gibt nur wenige, und wir haben versucht, sie informativ zu gestalten.</string>
+    <string name="hideTipsButton">Tipps für immer ausblenden</string>
 
 </resources>
