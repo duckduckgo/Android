@@ -28,33 +28,37 @@
         tools:context="com.duckduckgo.app.brokensite.BrokenSiteActivity"
         tools:showIn="@layout/activity_broken_site">
 
-        <ImageView
-            android:id="@+id/bicycleImage"
-            android:layout_width="150dp"
-            android:layout_height="150dp"
-            android:layout_marginStart="95dp"
-            android:layout_marginTop="8dp"
-            android:importantForAccessibility="no"
-            android:src="@drawable/broken_bicycle"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <TextView
-            android:id="@+id/noteText"
-            android:layout_width="0dp"
+        <LinearLayout
+            android:id="@+id/headerLayout"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="10dp"
-            android:layout_marginTop="12dp"
-            android:layout_marginEnd="170dp"
-            android:gravity="start"
-            android:lineSpacingExtra="4sp"
-            android:text="@string/brokenSiteDescription"
-            android:textColor="?attr/normalTextColor"
-            android:textSize="15sp"
-            app:layout_constraintBottom_toBottomOf="@id/bicycleImage"
+            android:gravity="center"
+            android:orientation="horizontal"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@id/bicycleImage"
-            app:layout_constraintTop_toTopOf="@id/bicycleImage" />
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:ignore="UseCompoundDrawables">
+
+            <ImageView
+                android:id="@+id/bicycleImage"
+                android:layout_width="150dp"
+                android:layout_height="150dp"
+                android:layout_marginTop="8dp"
+                android:importantForAccessibility="no"
+                android:src="@drawable/broken_bicycle" />
+
+            <TextView
+                android:id="@+id/noteText"
+                android:layout_width="300dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="12dp"
+                android:lineSpacingExtra="4sp"
+                android:text="@string/brokenSiteDescription"
+                android:textColor="?attr/normalTextColor"
+                android:textSize="15sp" />
+        </LinearLayout>
+
 
         <androidx.appcompat.widget.AppCompatImageView
             android:layout_width="12dp"
@@ -79,7 +83,7 @@
             app:hintTextColor="@color/broken_sites_dropdown_selector"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/bicycleImage">
+            app:layout_constraintTop_toBottomOf="@id/headerLayout">
 
             <EditText
                 android:id="@+id/categoriesSelection"
@@ -104,7 +108,7 @@
             android:layout_width="0dp"
             android:layout_height="70dp"
             android:layout_marginStart="25dp"
-            android:layout_marginTop="30dp"
+            android:layout_marginTop="8dp"
             android:layout_marginEnd="25dp"
             android:layout_marginBottom="30dp"
             android:text="@string/brokenSiteSubmitButton"

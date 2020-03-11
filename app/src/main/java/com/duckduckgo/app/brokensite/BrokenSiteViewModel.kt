@@ -17,6 +17,7 @@
 package com.duckduckgo.app.brokensite
 
 import android.net.Uri
+import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.duckduckgo.app.brokensite.api.BrokenSiteSender
@@ -83,21 +84,25 @@ class BrokenSiteViewModel(private val pixel: Pixel, private val brokenSiteSender
 
     fun onSubmitPressed(webViewVersion: String) {
         url?.let {
-            val category = categories[viewValue.indexSelected]
-            val absoluteUrl = Uri.parse(it).absoluteString
-            val brokenSite = BrokenSite(
-                category = category.key,
-                siteUrl = absoluteUrl,
-                upgradeHttps = upgradedHttps,
-                blockedTrackers = blockedTrackers.orEmpty(),
-                webViewVersion = webViewVersion,
-                siteType = if (Uri.parse(it).isMobileSite) MOBILE else DESKTOP
-            )
-
+            val brokenSite = getBrokenSite(it, webViewVersion)
             brokenSiteSender.submitBrokenSiteFeedback(brokenSite)
-            pixel.fire(Pixel.PixelName.BROKEN_SITE_REPORTED, mapOf(Pixel.PixelParameter.URL to absoluteUrl))
+            pixel.fire(Pixel.PixelName.BROKEN_SITE_REPORTED, mapOf(Pixel.PixelParameter.URL to brokenSite.siteUrl))
         }
         command.value = Command.ConfirmAndFinish
+    }
+
+    @VisibleForTesting
+    fun getBrokenSite(url: String, webViewVersion: String): BrokenSite {
+        val category = categories[viewValue.indexSelected]
+        val absoluteUrl = Uri.parse(url).absoluteString
+        return BrokenSite(
+            category = category.key,
+            siteUrl = absoluteUrl,
+            upgradeHttps = upgradedHttps,
+            blockedTrackers = blockedTrackers.orEmpty(),
+            webViewVersion = webViewVersion,
+            siteType = if (Uri.parse(url).isMobileSite) MOBILE else DESKTOP
+        )
     }
 
     private fun canSubmit(): Boolean = categories.elementAtOrNull(indexSelected) != null
