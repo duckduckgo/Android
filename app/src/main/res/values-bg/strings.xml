@@ -356,6 +356,36 @@
     <string name="feedbackInitialDisambiguationHappyButtonContentDescription">Бутон за положителни отзиви</string>
     <string name="feedbackInitialDisambiguationSadButtonContentDescription">Бутон за отрицателни отзиви</string>
     <string name="feedbackIsImportantToUs">Вашите анонимни отзиви са важни за нас.</string>
+
+    <!-- Webview Recovery -->
+    <string name="crashedWebViewErrorMessage">Уеб страницата не може да бъде показана.</string>
+    <string name="crashedWebViewErrorAction">Презареждане</string>
+
+    <!-- System Search -->
     <string name="systemSearchOmnibarInputHint"><font size="13">Търсене или въвеждане на URL адрес</font></string>
+    <string name="systemSearchDeviceAppLabel">От това устройство</string>
+    <string name="systemSearchAppNotFound">Приложението не може да бъде намерено</string>
+    <string name="systemSearchOnboardingText">Благодарим ви, че избрахте DuckDuckGo!\nС използването на нашата търсачка или приложение, вашите търсения са защитени.</string>
+    <string name="systemSearchOnboardingFeaturesIntroText">Приложението също:</string>
+    <string name="systemSearchOnboardingFeatureOneText">Блокира опасни тракери</string>
+    <string name="systemSearchOnboardingFeatureTwoText">Криптира уебсайтове принудително</string>
+    <string name="systemSearchOnboardingFeatureThreeText">Изчиства данните с едно докосване</string>
+    <string name="systemSearchOnboardingButtonMore">Покажи повече</string>
+    <string name="systemSearchOnboardingButtonLess">Скрий</string>
+    <string name="systemSearchOnboardingButtonOk">Разбрах</string>
+
+    <!-- Dax Dialog -->
+    <string name="daxDialogHideButton">СКРИЙ</string>
+    <string name="daxDialogPhew">Слава Богу!</string>
+    <string name="daxDialogYes">ДОБРЕ!</string>
+    <string name="daxDialogAddWidget">Добави уиджет</string>
+    <string name="daxDialogMaybeLater">Може би по-късно</string>
+    <string name="daxDialogSettings">Отиди в настройки</string>
+    <string name="daxDialogNext">Следващ</string>
+    <string name="daxDialogHighFive">Дай пет!</string>
+    <string name="daxDialogGotIt">Разбрах</string>
+    <string name="hideTipsTitle">Скрий оставащите съвети?</string>
+    <string name="hideTipsText">Само няколко са и се постарахме да са информативни.</string>
+    <string name="hideTipsButton">Скрий съветите за постоянно</string>
 
 </resources>

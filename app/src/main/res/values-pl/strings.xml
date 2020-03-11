@@ -364,6 +364,39 @@
     <string name="feedbackInitialDisambiguationHappyButtonContentDescription">Przycisk pozytywnej opinii</string>
     <string name="feedbackInitialDisambiguationSadButtonContentDescription">Przycisk negatywnej opinii</string>
     <string name="feedbackIsImportantToUs">Twoja anonimowa opinia ma dla nas ogromne znaczenie.</string>
+
+    <!-- Webview Recovery -->
+    <string name="crashedWebViewErrorMessage">Nie można wyświetlić strony internetowej.</string>
+    <string name="crashedWebViewErrorAction">Przeładuj</string>
+
+    <!-- System Search -->
     <string name="systemSearchOmnibarInputHint"><font size="13">Wyszukaj lub wpisz adres URL</font></string>
+    <string name="systemSearchDeviceAppLabel">Z tego urządzenia</string>
+    <string name="systemSearchAppNotFound">Nie można znaleźć aplikacji</string>
+    <string name="systemSearchOnboardingText">Dziękujemy za wybranie DuckDuckGo!\nTeraz, gdy korzystasz z naszej wyszukiwarki lub aplikacji, Twoje wyszukiwania są chronione.</string>
+    <string name="systemSearchOnboardingFeaturesIntroText">Aplikacja DuckDuckGo także:</string>
+    <string name="systemSearchOnboardingFeatureOneText">Blokuje niebezpieczne lokalizatory</string>
+    <string name="systemSearchOnboardingFeatureTwoText">Wymusza szyfrowanie na stronach internetowych</string>
+    <string name="systemSearchOnboardingFeatureThreeText">Usuwa dane za jednym dotknięciem</string>
+    <string name="systemSearchOnboardingButtonMore">Pokaż więcej</string>
+    <string name="systemSearchOnboardingButtonLess">Ukryć</string>
+    <string name="systemSearchOnboardingButtonOk">Rozumiem</string>
+    <string name="onboardingWelcomeTitle">WITAMY W DUCKDUCKGO</string>
+    <string name="onboardingDaxText">Internet może być trochę przerażający.&lt;br/&gt;&lt;br/&gt;Nie martw się! Prywatne wyszukiwanie i przeglądanie jest łatwiejsze niż myślisz.</string>
+    <string name="onboardingLetsDoItButton">Zróbmy to!</string>
+
+    <!-- Dax Dialog -->
+    <string name="daxDialogHideButton">UKRYĆ</string>
+    <string name="daxDialogPhew">Uff!</string>
+    <string name="daxDialogYes">OK!</string>
+    <string name="daxDialogAddWidget">Dodaj widżet</string>
+    <string name="daxDialogMaybeLater">Może później</string>
+    <string name="daxDialogSettings">Przejdź do ustawień</string>
+    <string name="daxDialogNext">Kolejny</string>
+    <string name="daxDialogHighFive">Piątka!</string>
+    <string name="daxDialogGotIt">Rozumiem</string>
+    <string name="hideTipsTitle">Ukryć pozostałe wskazówki?</string>
+    <string name="hideTipsText">Jest tylko kilka i staraliśmy się, aby były one pouczające.</string>
+    <string name="hideTipsButton">Ukryj wskazówki na zawsze</string>
 
 </resources>

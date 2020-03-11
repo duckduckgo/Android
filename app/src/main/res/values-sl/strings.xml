@@ -364,6 +364,36 @@
     <string name="feedbackInitialDisambiguationHappyButtonContentDescription">Gumb Pozitivne povratne informacije</string>
     <string name="feedbackInitialDisambiguationSadButtonContentDescription">Gumb Negativne povratne informacije</string>
     <string name="feedbackIsImportantToUs">Vaše anonimne povratne informacije so nam pomembne.</string>
+
+    <!-- Webview Recovery -->
+    <string name="crashedWebViewErrorMessage">Spletne strani ni bilo mogoče prikazati.</string>
+    <string name="crashedWebViewErrorAction">Ponovno naloži</string>
+
+    <!-- System Search -->
     <string name="systemSearchOmnibarInputHint"><font size="13">Iščite z iskalnikom ali vnesite URL</font></string>
+    <string name="systemSearchDeviceAppLabel">Iz te naprave</string>
+    <string name="systemSearchAppNotFound">Prošnje ni bilo mogoče najti</string>
+    <string name="systemSearchOnboardingText">Hvala, ker ste izbrali DuckDuckGo!\nZdaj, ko uporabljate naše iskalnike ali aplikacijo, so vaša iskanja zaščitena. </string>
+    <string name="systemSearchOnboardingFeaturesIntroText">Tudi aplikacija DuckDuckGo:</string>
+    <string name="systemSearchOnboardingFeatureOneText">Blokira nevarne sledilce</string>
+    <string name="systemSearchOnboardingFeatureTwoText">Prisilno šifriranje na spletiščih</string>
+    <string name="systemSearchOnboardingFeatureThreeText">Izbriše podatke z enim dotikom</string>
+    <string name="systemSearchOnboardingButtonMore">Pokaži več</string>
+    <string name="systemSearchOnboardingButtonLess">Skrij se</string>
+    <string name="systemSearchOnboardingButtonOk">Razumem</string>
+
+    <!-- Dax Dialog -->
+    <string name="daxDialogHideButton">Skrij</string>
+    <string name="daxDialogPhew">Fuj!</string>
+    <string name="daxDialogYes">V REDU!</string>
+    <string name="daxDialogAddWidget">Dodaj gradnik</string>
+    <string name="daxDialogMaybeLater">Mogoče kasneje</string>
+    <string name="daxDialogSettings">Pojdite na nastavitve</string>
+    <string name="daxDialogNext">Naslednji</string>
+    <string name="daxDialogHighFive">Petka!</string>
+    <string name="daxDialogGotIt">Razumem</string>
+    <string name="hideTipsTitle">Skrij preostale nasvete?</string>
+    <string name="hideTipsText">Le nekaj jih je in poskušali smo jih narediti informativne.</string>
+    <string name="hideTipsButton">Skrivaj nasvete za vedno</string>
 
 </resources>
