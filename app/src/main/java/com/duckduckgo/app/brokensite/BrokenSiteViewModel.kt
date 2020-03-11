@@ -37,8 +37,6 @@ class BrokenSiteViewModel(private val pixel: Pixel, private val brokenSiteSender
     )
 
     sealed class Command {
-        object FocusUrl : Command()
-        object FocusMessage : Command()
         object ConfirmAndFinish : Command()
     }
 
@@ -74,7 +72,7 @@ class BrokenSiteViewModel(private val pixel: Pixel, private val brokenSiteSender
     fun onCategoryIndexChanged(newIndex: Int) {
         viewState.value = viewState.value?.copy(
             indexSelected = newIndex,
-            categorySelected = categories[newIndex],
+            categorySelected = categories.elementAtOrNull(newIndex),
             submitAllowed = canSubmit(newIndex)
         )
     }
@@ -86,9 +84,10 @@ class BrokenSiteViewModel(private val pixel: Pixel, private val brokenSiteSender
         url?.let {
             val trackers = blockedTrackers.orEmpty()
             val category = categories[viewValue.indexSelected]
+            val absoluteUrl = Uri.parse(it).absoluteString
             val brokenSite = BrokenSite(
                 category = category.key,
-                siteUrl = Uri.parse(it).absoluteString,
+                siteUrl = absoluteUrl,
                 upgradeHttps = upgradedHttps,
                 blockedTrackers = trackers,
                 webViewVersion = webViewVersion,
@@ -96,7 +95,7 @@ class BrokenSiteViewModel(private val pixel: Pixel, private val brokenSiteSender
             )
 
             brokenSiteSender.submitBrokenSiteFeedback(brokenSite)
-            pixel.fire(Pixel.PixelName.BROKEN_SITE_REPORTED, mapOf(Pixel.PixelParameter.URL to it))
+            pixel.fire(Pixel.PixelName.BROKEN_SITE_REPORTED, mapOf(Pixel.PixelParameter.URL to absoluteUrl))
         }
         command.value = Command.ConfirmAndFinish
     }

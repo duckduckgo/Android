@@ -6,6 +6,7 @@ import com.duckduckgo.app.InstantSchedulersRule
 import com.duckduckgo.app.brokensite.BrokenSiteViewModel
 import com.duckduckgo.app.brokensite.BrokenSiteViewModel.Command
 import com.duckduckgo.app.brokensite.api.BrokenSiteSender
+import com.duckduckgo.app.brokensite.model.BrokenSite
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.mock
@@ -33,7 +34,7 @@ class BrokenSiteViewModelTest {
 
     private val mockBrokenSiteSender: BrokenSiteSender = mock()
 
-    private val mockCommandObserver: Observer<BrokenSiteViewModel.Command> = mock()
+    private val mockCommandObserver: Observer<Command> = mock()
 
     private lateinit var testee: BrokenSiteViewModel
 
@@ -58,68 +59,46 @@ class BrokenSiteViewModelTest {
     }
 
     @Test
-    fun whenNoUrlProvidedThenUrlFocused() {
-        testee.setInitialBrokenSite(null)
-        verify(mockCommandObserver).onChanged(Command.FocusUrl)
-    }
-
-    @Test
-    fun whenUrlProvidedThenMessageFocused() {
-        testee.setInitialBrokenSite(url)
-        verify(mockCommandObserver).onChanged(Command.FocusMessage)
-    }
-
-    @Test
-    fun whenUrlAndMessageNotEmptyThenCanSubmit() {
-        testee.onBrokenSiteUrlChanged(url)
-        testee.onFeedbackMessageChanged(message)
+    fun whenCategorySelectedThenCanSubmit() {
+        testee.onCategoryIndexChanged(0)
         assertTrue(viewState.submitAllowed)
     }
 
     @Test
-    fun whenNullUrlThenCannotSubmit() {
-        testee.onBrokenSiteUrlChanged(null)
-        testee.onFeedbackMessageChanged(message)
+    fun whenCategoryNotSelectedThenCannotSubmit() {
+        testee.onCategoryIndexChanged(-1)
         assertFalse(viewState.submitAllowed)
     }
 
     @Test
-    fun whenEmptyUrlThenCannotSubmit() {
-        testee.onBrokenSiteUrlChanged(" ")
-        testee.onFeedbackMessageChanged(message)
-        assertFalse(viewState.submitAllowed)
-    }
+    fun whenCanSubmitBrokenSiteAndUrlNotNullAndSubmitPressedThenReportAndPixelSubmitted() {
+        testee.setInitialBrokenSite(url, null, false)
+        testee.onCategoryIndexChanged(0)
+        testee.onSubmitPressed("webViewVersion")
 
-    @Test
-    fun whenNullMessageThenCannotSubmit() {
-        testee.onBrokenSiteUrlChanged(url)
-        testee.onFeedbackMessageChanged(null)
-        assertFalse(viewState.submitAllowed)
-    }
-
-    @Test
-    fun whenEmptyMessageThenCannotSubmit() {
-        testee.onBrokenSiteUrlChanged(url)
-        testee.onFeedbackMessageChanged(" ")
-        assertFalse(viewState.submitAllowed)
-    }
-
-    @Test
-    fun whenCanSubmitBrokenSiteAndSubmitPressedThenFeedbackAndPixelSubmitted() {
-        testee.onBrokenSiteUrlChanged(url)
-        testee.onFeedbackMessageChanged(message)
-        testee.onSubmitPressed()
+        val brokenSiteExpected = BrokenSite(
+            category = testee.categories[0].key,
+            siteUrl = url,
+            upgradeHttps = false,
+            blockedTrackers = "",
+            webViewVersion = "webViewVersion",
+            siteType = BrokenSiteViewModel.DESKTOP
+        )
 
         verify(mockPixel).fire(Pixel.PixelName.BROKEN_SITE_REPORTED, mapOf("url" to url))
-        verify(mockBrokenSiteSender).submitBrokenSiteFeedback(message, url)
+        verify(mockBrokenSiteSender).submitBrokenSiteFeedback(brokenSiteExpected)
         verify(mockCommandObserver).onChanged(Command.ConfirmAndFinish)
     }
 
     @Test
-    fun whenCannotSubmitBrokenSiteAndSubmitPressedThenFeedbackNotSubmitted() {
-        testee.onSubmitPressed()
-        verify(mockBrokenSiteSender, never()).submitBrokenSiteFeedback(any(), any())
-        verify(mockCommandObserver, never()).onChanged(Command.ConfirmAndFinish)
+    fun whenCanSubmitBrokenSiteAndUrlNullAndSubmitPressedThenReportAndPixelNotSubmitted() {
+        testee.setInitialBrokenSite(null, null, false)
+        testee.onCategoryIndexChanged(0)
+        testee.onSubmitPressed("webViewVersion")
+
+        verify(mockBrokenSiteSender, never()).submitBrokenSiteFeedback(any())
+        verify(mockPixel, never()).fire(Pixel.PixelName.BROKEN_SITE_REPORTED, mapOf("url" to null))
+        verify(mockCommandObserver).onChanged(Command.ConfirmAndFinish)
     }
 
     companion object Constants {

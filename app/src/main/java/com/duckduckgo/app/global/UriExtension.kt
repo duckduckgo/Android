@@ -55,7 +55,7 @@ val Uri.hasIpHost: Boolean
 
 val Uri.absoluteString: String
     get() {
-        return "$scheme$host$path"
+        return "$scheme://$host$path"
     }
 
 fun Uri.isHttpsVersionOfUri(other: Uri): Boolean {
