@@ -83,7 +83,7 @@ class ChangeIconActivity : DuckDuckGoActivity() {
     private fun processCommand(it: ChangeIconViewModel.Command?) {
         when (it) {
             is ChangeIconViewModel.Command.IconChanged -> {
-                FireActivity.triggerRestart(this)
+                finish()
             }
             is ChangeIconViewModel.Command.ShowConfirmationDialog -> {
                 AlertDialog.Builder(this)

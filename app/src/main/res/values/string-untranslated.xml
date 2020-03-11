@@ -70,9 +70,9 @@
     <!-- Change Icon Activity -->
     <string name="changeIconActivityTitle">App Icon</string>
     <string name="changeIconCtaLabel">Change App Icon</string>
-    <string name="changeIconCtaAccept">Ok</string>
+    <string name="changeIconCtaAccept">Apply</string>
     <string name="changeIconCtaCancel">Cancel</string>
-    <string name="changeIconDialogTitle">Change App Icon?</string>
-    <string name="changeIconDialogMessage">The app will close. Take a moment to admire your handsome new icon and then come on back!</string>
+    <string name="changeIconDialogTitle">Apply New Icon?</string>
+    <string name="changeIconDialogMessage">The app may close to apply changes. Come on back after you\'ve admired your handsome new icon.</string>
 
 </resources>
