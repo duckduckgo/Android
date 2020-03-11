@@ -43,8 +43,8 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:fontFamily="sans-serif"
+            style="@style/TextAppearance.Compat.Notification.Title"
             android:text="@string/searchWidgetTextHint"
-            android:textColor="@color/charcoalGrey"
             android:textSize="14sp" />
 
         <ImageView
