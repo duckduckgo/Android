@@ -20,14 +20,12 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_gravity="center"
-    android:background="@color/almostBlackDark"
-    android:orientation="horizontal"
-    android:padding="16dp">
+    android:orientation="horizontal">
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="44dp"
-        android:background="@drawable/search_notification_background_light"
+        android:layout_height="72dp"
+        android:background="@drawable/search_notification_background"
         android:gravity="center_vertical"
         android:orientation="horizontal">
 
@@ -35,13 +33,13 @@
             android:id="@+id/logo"
             android:layout_width="26dp"
             android:layout_height="26dp"
-            android:layout_marginStart="8dp"
-            android:layout_marginEnd="4dp"
+            android:layout_marginStart="24dp"
+            android:layout_marginEnd="8dp"
             android:src="@drawable/logo_mini" />
 
         <TextView
             android:id="@+id/searchInputBox"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:fontFamily="sans-serif"
@@ -54,7 +52,7 @@
             android:layout_width="32dp"
             android:layout_height="32dp"
             android:layout_marginStart="12dp"
-            android:layout_marginEnd="12dp"
+            android:layout_marginEnd="24dp"
             android:src="@drawable/ic_widget_loupe_gunmetal_24dp" />
 
     </LinearLayout>

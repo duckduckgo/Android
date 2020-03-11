@@ -13,24 +13,8 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <item>
-        <shape>
-            <solid android:color="@color/almostBlack" />
-            <corners android:radius="8dp" />
-        </shape>
-    </item>
-    <item
-        android:bottom="8dip"
-        android:left="8dip"
-        android:right="8dip"
-        android:top="8dip">
-        <shape>
-            <solid android:color="@color/white" />
-            <corners android:radius="40dp" />
-        </shape>
-    </item>
-
-</layer-list>
-
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <solid android:color="@color/white" />
+    <corners android:radius="40dp" />
+</shape>
