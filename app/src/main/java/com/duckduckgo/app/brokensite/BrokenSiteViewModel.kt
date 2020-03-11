@@ -42,9 +42,7 @@ class BrokenSiteViewModel(private val pixel: Pixel, private val brokenSiteSender
 
     val viewState: MutableLiveData<ViewState> = MutableLiveData()
     val command: SingleLiveEvent<Command> = SingleLiveEvent()
-    var blockedTrackers: String? = null
-    var url: String? = null
-    var upgradedHttps: Boolean = false
+    var indexSelected = -1
     val categories: List<BrokenSiteCategory> = listOf(
         ImagesCategory,
         PaywallCategory,
@@ -56,7 +54,9 @@ class BrokenSiteViewModel(private val pixel: Pixel, private val brokenSiteSender
         UnsupportedCategory,
         OtherCategory
     )
-
+    private var blockedTrackers: String? = null
+    private var url: String? = null
+    private var upgradedHttps: Boolean = false
     private val viewValue: ViewState get() = viewState.value!!
 
     init {
@@ -70,26 +70,26 @@ class BrokenSiteViewModel(private val pixel: Pixel, private val brokenSiteSender
     }
 
     fun onCategoryIndexChanged(newIndex: Int) {
+        indexSelected = newIndex
+    }
+
+    fun onCategoryAccepted() {
         viewState.value = viewState.value?.copy(
-            indexSelected = newIndex,
-            categorySelected = categories.elementAtOrNull(newIndex),
-            submitAllowed = canSubmit(newIndex)
+            indexSelected = indexSelected,
+            categorySelected = categories.elementAtOrNull(indexSelected),
+            submitAllowed = canSubmit()
         )
     }
 
-    private fun canSubmit(indexSelected: Int): Boolean = indexSelected > -1
-
     fun onSubmitPressed(webViewVersion: String) {
-
         url?.let {
-            val trackers = blockedTrackers.orEmpty()
             val category = categories[viewValue.indexSelected]
             val absoluteUrl = Uri.parse(it).absoluteString
             val brokenSite = BrokenSite(
                 category = category.key,
                 siteUrl = absoluteUrl,
                 upgradeHttps = upgradedHttps,
-                blockedTrackers = trackers,
+                blockedTrackers = blockedTrackers.orEmpty(),
                 webViewVersion = webViewVersion,
                 siteType = if (Uri.parse(it).isMobileSite) MOBILE else DESKTOP
             )
@@ -99,6 +99,8 @@ class BrokenSiteViewModel(private val pixel: Pixel, private val brokenSiteSender
         }
         command.value = Command.ConfirmAndFinish
     }
+
+    private fun canSubmit(): Boolean = categories.elementAtOrNull(indexSelected) != null
 
     companion object {
         const val UNKNOWN_VERSION = "unknown"

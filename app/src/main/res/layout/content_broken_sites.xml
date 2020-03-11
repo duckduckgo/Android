@@ -29,8 +29,8 @@
 
         <ImageView
             android:id="@+id/bicycleImage"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="180dp"
+            android:layout_height="180dp"
             android:layout_marginTop="20dp"
             android:importantForAccessibility="no"
             android:src="@drawable/broken_bicycle"
@@ -59,12 +59,12 @@
             android:layout_height="12dp"
             android:layout_marginTop="26dp"
             android:layout_marginEnd="18dp"
-            app:layout_constraintEnd_toEndOf="@+id/tetInputLayout"
-            app:layout_constraintTop_toTopOf="@id/tetInputLayout"
+            app:layout_constraintEnd_toEndOf="@+id/textInputLayout"
+            app:layout_constraintTop_toTopOf="@id/textInputLayout"
             app:srcCompat="@drawable/ic_down_arrow" />
 
         <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/tetInputLayout"
+            android:id="@+id/textInputLayout"
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:layout_width="match_parent"
             android:layout_height="60dp"
@@ -96,22 +96,20 @@
 
         </com.google.android.material.textfield.TextInputLayout>
 
-        <Button
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/submitButton"
+            style="@style/DDGButton"
             android:layout_width="0dp"
-            android:layout_height="56dp"
+            android:layout_height="70dp"
             android:layout_marginStart="25dp"
             android:layout_marginTop="30dp"
             android:layout_marginEnd="25dp"
             android:layout_marginBottom="30dp"
-            android:background="@drawable/button_contained_bg"
-            android:foreground="?attr/selectableItemBackground"
             android:text="@string/brokenSiteSubmitButton"
-            android:textColor="@color/white"
-            android:textSize="@dimen/modalCardMajorButtonTextSize"
+            android:textSize="15sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tetInputLayout" />
+            app:layout_constraintTop_toBottomOf="@id/textInputLayout" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

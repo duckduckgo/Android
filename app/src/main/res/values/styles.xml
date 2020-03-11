@@ -325,6 +325,13 @@
         <item name="android:layout_marginTop">9dp</item>
     </style>
 
+    <style name="DDGButton" parent="@style/Widget.AppCompat.Button.Borderless.Colored">
+        <item name="android:backgroundTint">@color/material_button_background</item>
+        <item name="android:textColor">@color/material_button_text</item>
+        <item name="rippleColor">?attr/daxDialogSecondaryButtonRippleColor</item>
+        <item name="android:textAllCaps">false</item>
+    </style>
+
     <style name="DaxDialogButton" parent="@style/Widget.AppCompat.Button.Borderless.Colored">
         <item name="android:textAllCaps">false</item>
         <item name="cornerRadius">20dp</item>

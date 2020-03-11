@@ -42,22 +42,21 @@ class BrokenSiteSubmitter(
     override fun submitBrokenSiteFeedback(brokenSite: BrokenSite) {
         GlobalScope.launch(Dispatchers.IO) {
             val params = mapOf(
-                "category" to brokenSite.category,
-                "siteUrl" to brokenSite.siteUrl,
-                "upgradedHttps" to brokenSite.upgradeHttps.toString(),
-                "tds" to tdsDao.eTag(),
-                "blockedTrackers" to brokenSite.blockedTrackers,
-                "surrogates" to "",
-                "extensionVersion" to "",
-                "appVersion" to BuildConfig.VERSION_NAME,
-                "atb" to atbWithVariant(),
-                "os" to Build.VERSION.SDK_INT.toString(),
-                "manufacturer" to Build.MANUFACTURER,
-                "model" to Build.MODEL,
-                "wvVersion" to brokenSite.webViewVersion,
-                "siteType" to brokenSite.siteType
+                CATEGORY_KEY to brokenSite.category,
+                SITE_URL_KEY to brokenSite.siteUrl,
+                UPDGRADED_HTTPS_KEY to brokenSite.upgradeHttps.toString(),
+                TDS_ETAG_KEY to tdsDao.eTag(),
+                BLOCKED_TRACKERS_KEY to brokenSite.blockedTrackers,
+                SURROGATES_KEY to "",
+                EXTENSION_VERSION_KEY to "",
+                APP_VERSION_KEY to BuildConfig.VERSION_NAME,
+                ATB_KEY to atbWithVariant(),
+                OS_KEY to Build.VERSION.SDK_INT.toString(),
+                MANUFACTURER_KEY to Build.MANUFACTURER,
+                MODEL_KEY to Build.MODEL,
+                WEBVIEW_VERSION_KEY to brokenSite.webViewVersion,
+                SITE_TYPE_KEY to brokenSite.siteType
             )
-
             runCatching {
                 pixel.fire(Pixel.PixelName.BROKEN_SITE_REPORT.pixelName, params)
             }
@@ -68,5 +67,22 @@ class BrokenSiteSubmitter(
 
     private fun atbWithVariant(): String {
         return statisticsStore.atb?.formatWithVariant(variantManager.getVariant()) ?: ""
+    }
+
+    companion object {
+        private const val CATEGORY_KEY = "category"
+        private const val SITE_URL_KEY = "siteUrl"
+        private const val UPDGRADED_HTTPS_KEY = "upgradedHttps"
+        private const val TDS_ETAG_KEY = "tds"
+        private const val BLOCKED_TRACKERS_KEY = "blockedTrackers"
+        private const val SURROGATES_KEY = "surrogates"
+        private const val EXTENSION_VERSION_KEY = "extensionVersion"
+        private const val APP_VERSION_KEY = "appVersion"
+        private const val ATB_KEY = "atb"
+        private const val OS_KEY = "os"
+        private const val MANUFACTURER_KEY = "manufacturer"
+        private const val MODEL_KEY = "model"
+        private const val WEBVIEW_VERSION_KEY = "wvVersion"
+        private const val SITE_TYPE_KEY = "siteType"
     }
 }

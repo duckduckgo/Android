@@ -53,5 +53,7 @@
     <attr name="daxDialogSecondaryButtonRippleColor" format="color" />
     <attr name="brokenSiteSelectionTextColor" format="color" />
     <attr name="brokenSiteOutlinedColor" format="color" />
+    <attr name="ddgButtonDisabledBackgroundColor" format="color" />
+    <attr name="ddgButtonDisabledTextColor" format="color" />
 
 </resources>

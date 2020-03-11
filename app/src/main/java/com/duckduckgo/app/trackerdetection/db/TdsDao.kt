@@ -32,7 +32,7 @@ abstract class TdsDao {
     @Query("delete from tds")
     abstract fun deleteAll()
 
-    @Query("SELECT eTag FROM tds LIMIT 1")
+    @Query("SELECT eTag FROM tds")
     abstract fun eTag(): String
 
     @Transaction

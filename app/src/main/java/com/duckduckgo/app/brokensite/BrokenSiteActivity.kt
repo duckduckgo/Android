@@ -33,7 +33,6 @@ import org.jetbrains.anko.longToast
 
 class BrokenSiteActivity : DuckDuckGoActivity() {
     private val viewModel: BrokenSiteViewModel by bindViewModel()
-    var checkedItem: Int = -1
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -64,10 +63,13 @@ class BrokenSiteActivity : DuckDuckGoActivity() {
         categoriesSelection.setOnClickListener {
             MaterialAlertDialogBuilder(this)
                 .setTitle(getString(R.string.brokenSitesCategoriesTitle))
-                .setSingleChoiceItems(categories, checkedItem) { _, newIndex ->
+                .setSingleChoiceItems(categories, viewModel.indexSelected) { _, newIndex ->
                     viewModel.onCategoryIndexChanged(newIndex)
                 }
-                .setPositiveButton(getString(android.R.string.yes)) { dialog, _ -> dialog.dismiss() }
+                .setPositiveButton(getString(android.R.string.yes)) { dialog, _ ->
+                    viewModel.onCategoryAccepted()
+                    dialog.dismiss()
+                }
                 .setNegativeButton(getString(android.R.string.no)) { dialog, _ -> dialog.dismiss() }
                 .show()
         }
@@ -99,7 +101,6 @@ class BrokenSiteActivity : DuckDuckGoActivity() {
     }
 
     private fun render(viewState: ViewState) {
-        checkedItem = viewState.indexSelected
         val category = viewState.categorySelected?.let {
             getString(viewState.categorySelected.category)
         }.orEmpty()

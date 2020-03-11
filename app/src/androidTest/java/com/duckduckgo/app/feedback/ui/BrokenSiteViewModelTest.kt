@@ -13,6 +13,7 @@ import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.never
 import com.nhaarman.mockitokotlin2.verify
 import org.junit.After
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -61,13 +62,29 @@ class BrokenSiteViewModelTest {
     @Test
     fun whenCategorySelectedThenCanSubmit() {
         testee.onCategoryIndexChanged(0)
+        testee.onCategoryAccepted()
         assertTrue(viewState.submitAllowed)
     }
 
     @Test
-    fun whenCategoryNotSelectedThenCannotSubmit() {
-        testee.onCategoryIndexChanged(-1)
+    fun whenCategoryChangedButNotSelectedThenCannotSubmit() {
+        testee.onCategoryIndexChanged(0)
         assertFalse(viewState.submitAllowed)
+    }
+
+    @Test
+    fun whenNoCategorySelectedThenCannotSubmit() {
+        testee.onCategoryIndexChanged(-1)
+        testee.onCategoryAccepted()
+        assertFalse(viewState.submitAllowed)
+    }
+
+    @Test
+    fun whenCategorySelectedButNotChangedThenReturnOldCategory() {
+        testee.onCategoryIndexChanged(0)
+        testee.onCategoryAccepted()
+        testee.onCategoryIndexChanged(1)
+        assertEquals(0, viewState.indexSelected)
     }
 
     @Test
