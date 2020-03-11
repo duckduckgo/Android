@@ -19,7 +19,7 @@ package com.duckduckgo.app.notification.model
 import android.content.Context
 import androidx.core.app.NotificationManagerCompat
 import com.duckduckgo.app.browser.R
-import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEvent.STICKY_SEARCH
+import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEvent.STICKY_SEARCH_QUERY
 import com.duckduckgo.app.notification.NotificationRegistrar
 import com.duckduckgo.app.notification.db.NotificationDao
 import timber.log.Timber
@@ -31,9 +31,9 @@ class StickySearchNotification(
 
     override val id = "com.duckduckgo.privacy.search.sticky"
 
-    override val launchIntent = STICKY_SEARCH
+    override val launchIntent = STICKY_SEARCH_QUERY
 
-    override val cancelIntent = STICKY_SEARCH
+    override val cancelIntent = STICKY_SEARCH_QUERY
 
     override val layoutId = R.layout.search_notification
 
@@ -64,6 +64,6 @@ class StickySearchNotificationSpecification(context: Context) : NotificationSpec
     override val closeButton: String? = null
     override val title: String = "Start a Search"
     override val description: String = "You can now search from anywhere!"
-    override val pixelSuffix: String = "pp_sticky_search"
+    override val pixelSuffix: String = ""
     override val autoCancel = false
 }

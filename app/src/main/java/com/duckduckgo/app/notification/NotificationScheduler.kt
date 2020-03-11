@@ -178,7 +178,7 @@ class AndroidNotificationScheduler(
             notificationDao.insert(Notification(notification.id))
             manager.notify(NotificationRegistrar.NotificationId.StickySearch, systemNotification)
 
-            pixel.fire("${NOTIFICATION_SHOWN.pixelName}_${specification.pixelSuffix}")
+            pixel.fire(Pixel.PixelName.QUICK_SEARCH_PROMPT_NOTIFICATION_SHOWN)
             return Result.success()
         }
 
@@ -216,7 +216,7 @@ class AndroidNotificationScheduler(
             notificationDao.insert(Notification(notification.id))
             manager.notify(NotificationRegistrar.NotificationId.StickySearch, systemNotification)
 
-            pixel.fire("${NOTIFICATION_SHOWN.pixelName}_${specification.pixelSuffix}")
+            pixel.fire(Pixel.PixelName.QUICK_SEARCH_NOTIFICATION_SHOWN)
             return Result.success()
         }
 
@@ -242,7 +242,7 @@ class AndroidNotificationScheduler(
             val specification = notification.buildSpecification()
 
             val intent = Intent(context, NotificationHandlerService::class.java)
-            intent.type = NotificationHandlerService.NotificationEvent.STICKY_SEARCH_DISMISS
+            intent.type = NotificationHandlerService.NotificationEvent.STICKY_SEARCH_REMOVE
             intent.putExtra(PIXEL_SUFFIX_EXTRA, specification.pixelSuffix)
             intent.putExtra(NOTIFICATION_SYSTEM_ID_EXTRA, specification.systemId)
             intent.putExtra(NOTIFICATION_AUTO_CANCEL, specification.autoCancel)

@@ -156,7 +156,13 @@ interface Pixel {
         FEEDBACK_NEGATIVE_SUBMISSION("mfbs_%s_%s_%s"),
 
         AUTOCOMPLETE_BOOKMARK_SELECTION("m_aut_s_b"),
-        AUTOCOMPLETE_SEARCH_SELECTION("m_aut_s_s")
+        AUTOCOMPLETE_SEARCH_SELECTION("m_aut_s_s"),
+
+        QUICK_SEARCH_PROMPT_NOTIFICATION_SHOWN("m_qs_pn_s"),
+        QUICK_SEARCH_PROMPT_NOTIFICATION_KEEP("m_qs_n_k"),
+        QUICK_SEARCH_PROMPT_NOTIFICATION_REMOVE("m_qs_n_r"),
+        QUICK_SEARCH_NOTIFICATION_SHOWN("m_qs_sn_s"),
+        QUICK_SEARCH_NOTIFICATION_PRESSED("m_qs_sn_p")
     }
 
     object PixelParameter {

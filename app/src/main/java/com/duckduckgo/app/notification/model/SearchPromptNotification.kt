@@ -33,9 +33,9 @@ class SearchPromptNotification(
 
     override val id = "com.duckduckgo.privacy.search.stickyPrompt"
 
-    override val launchIntent = NotificationHandlerService.NotificationEvent.STICKY_SEARCH_ACCEPT
+    override val launchIntent = NotificationHandlerService.NotificationEvent.STICKY_SEARCH_KEEP
 
-    override val cancelIntent = NotificationHandlerService.NotificationEvent.STICKY_SEARCH_DISMISS
+    override val cancelIntent = NotificationHandlerService.NotificationEvent.STICKY_SEARCH_REMOVE
 
     override val layoutId = R.layout.search_notification_prompt
 
@@ -68,8 +68,8 @@ class StickySearchPromptSpecification(context: Context) : NotificationSpec {
     override val title: String = context.getString(R.string.stickySearchPromptNotificationTitle)
     override val description: String = context.getString(R.string.stickySearchPromptNotificationTitle)
     override val launchButton: String = context.getString(R.string.stickySearchPromptKeep)
-    override val closeButton: String? = context.getString(R.string.stickySearchPromptRemove)
-    override val pixelSuffix = "ssp"
+    override val closeButton: String = context.getString(R.string.stickySearchPromptRemove)
+    override val pixelSuffix = ""
     override val autoCancel = false
 }
 
