@@ -63,7 +63,7 @@
     <string name="brokenSitesCategoriesTitle">Describe what happened:</string>
     <string name="brokenSitesCategoriesHint">Describe what happened</string>
     <string name="brokenSiteSubmitButton">Send Report</string>
-    <string name="brokenSiteDescription">Submitting an anonymous broken site report helps us debug these issues and improve the extension.</string>
+    <string name="brokenSiteDescription">Submitting an anonymous broken site report helps us debug these issues and improve the app.</string>
 
     <string name="brokenSiteCategoryImages">Images didn\'t load</string>
     <string name="brokenSiteCategoryPaywall">The site asked me to disable</string>
