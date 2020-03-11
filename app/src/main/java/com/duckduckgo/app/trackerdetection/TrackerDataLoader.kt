@@ -90,6 +90,6 @@ class TrackerDataLoader @Inject constructor(
     }
 
     companion object {
-        const val DEFAULT_ETAG = "ads23qwdasd" // TODO use correct etag
+        const val DEFAULT_ETAG = "c6dbe27844bea5bb6b2b812dd097fcf6"
     }
 }
