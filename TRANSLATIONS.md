@@ -9,12 +9,14 @@ If you know any of the following languages and would like to help us improve the
 1. Czech (cs)
 1. Danish (da)
 1. Dutch (nl)
+1. Estonian (et)
 1. Finnish (fi)
 1. French (fr)
 1. German (de)
 1. Greek (el)
 1. Hungarian (hu)
 1. Italian (it)
+1. Latvian (lv)
 1. Lithuanian (lt)
 1. Norwegian bokmål (nb)
 1. Polish (pl)
@@ -25,6 +27,7 @@ If you know any of the following languages and would like to help us improve the
 1. Slovenian (sl)
 1. Spanish (es)
 1. Swedish (sv)
+1. Turkish (tr)
 
 ## How to help
 

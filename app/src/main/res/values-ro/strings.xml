@@ -355,6 +355,36 @@
     <string name="feedbackInitialDisambiguationHappyButtonContentDescription">Buton feedback pozitiv</string>
     <string name="feedbackInitialDisambiguationSadButtonContentDescription">Buton feedback negativ</string>
     <string name="feedbackIsImportantToUs">Feedbackul dvs. anonim este important pentru noi.</string>
+
+    <!-- Webview Recovery -->
+    <string name="crashedWebViewErrorMessage">Pagina web nu a putut fi afișată.</string>
+    <string name="crashedWebViewErrorAction">Reîncarcă</string>
+
+    <!-- System Search -->
     <string name="systemSearchOmnibarInputHint"><font size="13">Căutare sau tastare URL</font></string>
+    <string name="systemSearchDeviceAppLabel">De pe acest dispozitiv</string>
+    <string name="systemSearchAppNotFound">Aplicația nu a fost găsită</string>
+    <string name="systemSearchOnboardingText">Mulțumim pentru că ai ales DuckDuckGo!\nAcum, atunci când utilizezi căutarea sau aplicația noastră, căutările tale sunt protejate.</string>
+    <string name="systemSearchOnboardingFeaturesIntroText">De asemenea aplicația DuckDuckGo:</string>
+    <string name="systemSearchOnboardingFeatureOneText">Blochează urmăritoriinesiguri</string>
+    <string name="systemSearchOnboardingFeatureTwoText">Forțează criptarea pe site-uri web</string>
+    <string name="systemSearchOnboardingFeatureThreeText">Șterge datele cu o singură atingere</string>
+    <string name="systemSearchOnboardingButtonMore">Arată mai multe</string>
+    <string name="systemSearchOnboardingButtonLess">Ascunde</string>
+    <string name="systemSearchOnboardingButtonOk">Am înțeles</string>
+
+    <!-- Dax Dialog -->
+    <string name="daxDialogHideButton">ASCUNDE</string>
+    <string name="daxDialogPhew">Pfiu!</string>
+    <string name="daxDialogYes">OK!</string>
+    <string name="daxDialogAddWidget">Adaugă Widget</string>
+    <string name="daxDialogMaybeLater">Poate Mai Târziu</string>
+    <string name="daxDialogSettings">Mergi la setări</string>
+    <string name="daxDialogNext">Următorul</string>
+    <string name="daxDialogHighFive">Bate Palma!</string>
+    <string name="daxDialogGotIt">Am înțeles</string>
+    <string name="hideTipsTitle">Ascunzi sfaturile rămase?</string>
+    <string name="hideTipsText">Sunt doar câteva, iar noi am încercat să le facem informative.</string>
+    <string name="hideTipsButton">Ascunde sfaturile definitiv</string>
 
 </resources>

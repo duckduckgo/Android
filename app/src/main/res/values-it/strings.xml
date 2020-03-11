@@ -284,7 +284,7 @@
     <string name="privacyProtectionNotificationTrackerDescription">Con DuckDuckGo hai protetto i tuoi dati bloccando %d sistemi di tracciamento.</string>
     <string name="privacyProtectionNotificationBothDescription">Con DuckDuckGo hai protetto i tuoi dati bloccando %d sistemi di tracciamento e rendendo sicure %d connessioni non crittografate.</string>
     <string name="privacyProtectionNotificationLaunchButton">Riprendi la navigazione</string>
-    
+
     <!-- Authentication -->
     <string name="authenticationDialogTitle">Accedi</string>
     <string name="authenticationDialogMessage">%s richiede un nome utente e una password.</string>
@@ -367,6 +367,36 @@
     <string name="feedbackInitialDisambiguationHappyButtonContentDescription">Pulsante feedback positivo</string>
     <string name="feedbackInitialDisambiguationSadButtonContentDescription">Pulsante feedback negativo</string>
     <string name="feedbackIsImportantToUs">Il tuo feedback anonimo è importante per noi.</string>
+
+    <!-- Webview Recovery -->
+    <string name="crashedWebViewErrorMessage">La pagina non può essere visualizzata.</string>
+    <string name="crashedWebViewErrorAction">Ricarica</string>
+
+    <!-- System Search -->
     <string name="systemSearchOmnibarInputHint"><font size="13">Cerca o inserisci URL</font></string>
+    <string name="systemSearchDeviceAppLabel">Da questo dispositivo</string>
+    <string name="systemSearchAppNotFound">Impossibile trovare l\'applicazione</string>
+    <string name="systemSearchOnboardingText">Grazie per aver scelto DuckDuckGo!\nOra, quando usi la nostra ricerca o app, le tue ricerche sono protette.</string>
+    <string name="systemSearchOnboardingFeaturesIntroText">L\'app DuckDuckGo inoltre:</string>
+    <string name="systemSearchOnboardingFeatureOneText">Blocca i tracker non sicuri</string>
+    <string name="systemSearchOnboardingFeatureTwoText">Forza la crittografia sui siti web</string>
+    <string name="systemSearchOnboardingFeatureThreeText">Cancella i dati in un tap</string>
+    <string name="systemSearchOnboardingButtonMore">Mostra di più</string>
+    <string name="systemSearchOnboardingButtonLess">Nascondi</string>
+    <string name="systemSearchOnboardingButtonOk">Fatto</string>
+
+    <!-- Dax Dialog -->
+    <string name="daxDialogHideButton">NASCONDI</string>
+    <string name="daxDialogPhew">Accidenti!</string>
+    <string name="daxDialogYes">OK!</string>
+    <string name="daxDialogAddWidget">Aggiungi widget</string>
+    <string name="daxDialogMaybeLater">Forse più tardi</string>
+    <string name="daxDialogSettings">Vai alle impostazioni</string>
+    <string name="daxDialogNext">Successivo</string>
+    <string name="daxDialogHighFive">Batti cinque!</string>
+    <string name="daxDialogGotIt">Fatto</string>
+    <string name="hideTipsTitle">Nascondere i suggerimenti rimanenti?</string>
+    <string name="hideTipsText">Ce ne sono solo alcuni e abbiamo cercato di renderli informativi.</string>
+    <string name="hideTipsButton">Nascondi suggerimenti per sempre</string>
 
 </resources>

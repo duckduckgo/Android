@@ -351,6 +351,35 @@
     <string name="feedbackInitialDisambiguationHappyButtonContentDescription">Positiivinen palaute -painike</string>
     <string name="feedbackInitialDisambiguationSadButtonContentDescription">Negatiivinen palaute -painike</string>
     <string name="feedbackIsImportantToUs">Anonyymi palautteesi on meille tärkeää.</string>
-    <string name="systemSearchOmnibarInputHint"><font size="13">Hae tai kirjoita URL</font></string>
 
+    <!-- Webview Recovery -->
+    <string name="crashedWebViewErrorMessage">Verkkosivua ei voitu näyttää.</string>
+    <string name="crashedWebViewErrorAction">Lataa uudelleen</string>
+
+    <!-- System Search -->
+    <string name="systemSearchOmnibarInputHint"><font size="13">Hae tai kirjoita URL</font></string>
+    <string name="systemSearchDeviceAppLabel">Tästä laitteesta</string>
+    <string name="systemSearchAppNotFound">Sovellusta ei löytynyt</string>
+    <string name="systemSearchOnboardingText">Kiitos, että valitsit DuckDuckGon!\nKun nyt käytät hakua tai sovellusta, hakusi ovat suojattu.</string>
+    <string name="systemSearchOnboardingFeaturesIntroText">DuckDuckGo-sovellus myös:</string>
+    <string name="systemSearchOnboardingFeatureOneText">Estää vaaralliset seurantalaitteet</string>
+    <string name="systemSearchOnboardingFeatureTwoText">Pakottaa verkkosivustosalauksen</string>
+    <string name="systemSearchOnboardingFeatureThreeText">Tyhjentää tiedot yhdellä kosketuksella</string>
+    <string name="systemSearchOnboardingButtonMore">Näytä lisää</string>
+    <string name="systemSearchOnboardingButtonLess">Piilota</string>
+    <string name="systemSearchOnboardingButtonOk">Selvä</string>
+
+    <!-- Dax Dialog -->
+    <string name="daxDialogHideButton">PIILOTA</string>
+    <string name="daxDialogPhew">Huh huh!</string>
+    <string name="daxDialogYes">OK!</string>
+    <string name="daxDialogAddWidget">Lisää widget</string>
+    <string name="daxDialogMaybeLater">Ehkä myöhemmin</string>
+    <string name="daxDialogSettings">Mene asetuksiin</string>
+    <string name="daxDialogNext">Seuraava</string>
+    <string name="daxDialogHighFive">Ylävitonen!</string>
+    <string name="daxDialogGotIt">Selvä</string>
+    <string name="hideTipsTitle">Piilotetaanko jäljellä olevat vinkit?</string>
+    <string name="hideTipsText">Niitä on vain pari, ja yritimme tehdä niistä informatiivisia.</string>
+    <string name="hideTipsButton">Piilota vinkit ikuisesti</string>
 </resources>

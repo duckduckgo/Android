@@ -284,7 +284,7 @@
     <string name="privacyProtectionNotificationTrackerDescription">Du skyddade dina data genom att blockera %d spårare när du använde DuckDuckGo.</string>
     <string name="privacyProtectionNotificationBothDescription">Du skyddade dina data genom att blockera %d spårare och säkra %d okrypterade anslutningar medan du använde DuckDuckGo.</string>
     <string name="privacyProtectionNotificationLaunchButton">Återuppta bläddring</string>
-    
+
     <!-- Authentication -->
     <string name="authenticationDialogTitle">Logga in</string>
     <string name="authenticationDialogMessage">%s kräver ett användarnamn och ett lösenord.</string>
@@ -367,6 +367,36 @@
     <string name="feedbackInitialDisambiguationHappyButtonContentDescription">Knappen för positiv återkoppling</string>
     <string name="feedbackInitialDisambiguationSadButtonContentDescription">Knappen för negativ återkoppling</string>
     <string name="feedbackIsImportantToUs">Din anonyma återkoppling är viktig för oss.</string>
+
+    <!-- Webview Recovery -->
+    <string name="crashedWebViewErrorMessage">Webbsidan kunde inte visas.</string>
+    <string name="crashedWebViewErrorAction">Ladda om</string>
+
+    <!-- System Search -->
     <string name="systemSearchOmnibarInputHint"><font size="13">Sök eller skriv in URL</font></string>
+    <string name="systemSearchDeviceAppLabel">Från den här enheten</string>
+    <string name="systemSearchAppNotFound">Appen kunde inte hittas</string>
+    <string name="systemSearchOnboardingText">Tack för att du valde DuckDuckGo!\nNär du använder vår sökning eller app är dina sökningar skyddade.</string>
+    <string name="systemSearchOnboardingFeaturesIntroText">DuckDuckGo-appen också:</string>
+    <string name="systemSearchOnboardingFeatureOneText">Blockerar farliga trackers</string>
+    <string name="systemSearchOnboardingFeatureTwoText">Tvingar kryptering på webbplatser</string>
+    <string name="systemSearchOnboardingFeatureThreeText">Rensar data med ett tryck</string>
+    <string name="systemSearchOnboardingButtonMore">Visa mer</string>
+    <string name="systemSearchOnboardingButtonLess">Dölj</string>
+    <string name="systemSearchOnboardingButtonOk">Jag fattar</string>
+
+    <!-- Dax Dialog -->
+    <string name="daxDialogHideButton">DÖLJ</string>
+    <string name="daxDialogPhew">Puh!</string>
+    <string name="daxDialogYes">OK!</string>
+    <string name="daxDialogAddWidget">Lägg till widget</string>
+    <string name="daxDialogMaybeLater">Kanske senare</string>
+    <string name="daxDialogSettings">Gå till inställningar</string>
+    <string name="daxDialogNext">Nästa</string>
+    <string name="daxDialogHighFive">High Five!</string>
+    <string name="daxDialogGotIt">Jag fattar</string>
+    <string name="hideTipsTitle">Dölj återstående tips?</string>
+    <string name="hideTipsText">Det finns bara några få, och vi försökte göra dem informativa.</string>
+    <string name="hideTipsButton">Dölj tipsen för alltid</string>
 
 </resources>

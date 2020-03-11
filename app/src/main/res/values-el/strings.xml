@@ -351,6 +351,36 @@
     <string name="feedbackInitialDisambiguationHappyButtonContentDescription">Κουμπί θετικών σχολίων</string>
     <string name="feedbackInitialDisambiguationSadButtonContentDescription">Κουμπί αρνητικών σχολίων</string>
     <string name="feedbackIsImportantToUs">Τα ανώνυμα σχόλιά σας είναι σημαντικά για εμάς.</string>
+
+    <!-- Webview Recovery -->
+    <string name="crashedWebViewErrorMessage">Δεν ήταν δυνατή η εμφάνιση της ιστοσελίδας.</string>
+    <string name="crashedWebViewErrorAction">Γίνεται επαναφόρτωση</string>
+
+    <!-- System Search-->
     <string name="systemSearchOmnibarInputHint"><font size="13">Αναζήτηση ή πληκτρολόγηση διεύθυνσης URL</font></string>
+    <string name="systemSearchDeviceAppLabel">Από αυτή τη συσκευή</string>
+    <string name="systemSearchAppNotFound">Η εφαρμογή δεν βρέθηκε</string>
+    <string name="systemSearchOnboardingText">Ευχαριστώ που επιλέξατε το DuckDuckGo!\nΤώρα, όταν χρησιμοποιείτε την αναζήτηση ή την εφαρμογή μας, οι αναζητήσεις σας προστατεύονται.</string>
+    <string name="systemSearchOnboardingFeaturesIntroText">Η εφαρμογή DuckDuckGo επίσης:</string>
+    <string name="systemSearchOnboardingFeatureOneText">Αποκλείει μη ασφαλείς ιχνηλάτες</string>
+    <string name="systemSearchOnboardingFeatureTwoText">Επιβάλλει την κρυπτογράφηση στους ιστότοπους</string>
+    <string name="systemSearchOnboardingFeatureThreeText">Καθαρίζει τα δεδομένα με ένα άγγιγμα</string>
+    <string name="systemSearchOnboardingButtonMore">Εμφάνιση περισσοτέρων</string>
+    <string name="systemSearchOnboardingButtonLess">Αποκρυψη</string>
+    <string name="systemSearchOnboardingButtonOk">Το έπιασα</string>
+
+    <!-- Dax Dialog -->
+    <string name="daxDialogHideButton">ΑΠΟΚΡΥΨΗ</string>
+    <string name="daxDialogPhew">Φιου!</string>
+    <string name="daxDialogYes">ΕΝΤΑΞΕΙ!</string>
+    <string name="daxDialogAddWidget">Προσθήκη εικονιδίου</string>
+    <string name="daxDialogMaybeLater">Ίσως αργότερα</string>
+    <string name="daxDialogSettings">Μετάβαση στις ρυθμίσεις</string>
+    <string name="daxDialogNext">Επόμενο</string>
+    <string name="daxDialogHighFive">Κόλλα πέντε!</string>
+    <string name="daxDialogGotIt">Το έπιασα</string>
+    <string name="hideTipsTitle">Απόκρυψη συμβουλών που απομένουν;</string>
+    <string name="hideTipsText">Υπάρχουν λίγες μόνο και προσπαθήσαμε να τις καταστήσουμε ενημερωτικές.</string>
+    <string name="hideTipsButton">Απόκρυψη συμβουλών για πάντα</string>
 
 </resources>

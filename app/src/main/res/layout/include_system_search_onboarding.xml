@@ -33,7 +33,6 @@
     app:layout_constraintStart_toStartOf="parent"
     app:layout_constraintTop_toBottomOf="@id/deviceAppSuggestions"
     tools:context="com.duckduckgo.app.systemsearch.SystemSearchActivity"
-    tools:showIn="@layout/include_system_search_onboarding"
     tools:visibility="visible">
 
     <androidx.appcompat.widget.AppCompatImageView
