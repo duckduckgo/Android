@@ -374,7 +374,7 @@
     <string name="feedbackIsImportantToUs">Il tuo feedback anonimo è importante per noi.</string>
 
     <!-- Webview Recovery -->
-    <string name="crashedWebViewErrorMessage">La pagina Web non può essere visualizzata.</string>
+    <string name="crashedWebViewErrorMessage">La pagina non può essere visualizzata.</string>
     <string name="crashedWebViewErrorAction">Ricarica</string>
 
     <!-- System Search -->
@@ -383,9 +383,9 @@
     <string name="systemSearchAppNotFound">Impossibile trovare l\'applicazione</string>
     <string name="systemSearchOnboardingText">Grazie per aver scelto DuckDuckGo!\nOra, quando usi la nostra ricerca o app, le tue ricerche sono protette.</string>
     <string name="systemSearchOnboardingFeaturesIntroText">L\'app DuckDuckGo inoltre:</string>
-    <string name="systemSearchOnboardingFeatureOneText">Blocca i localizzatori non sicuri</string>
-    <string name="systemSearchOnboardingFeatureTwoText">Forza la crittografia sui siti Web</string>
-    <string name="systemSearchOnboardingFeatureThreeText">Cancella i dati con un solo tocco</string>
+    <string name="systemSearchOnboardingFeatureOneText">Blocca i tracker non sicuri</string>
+    <string name="systemSearchOnboardingFeatureTwoText">Forza la crittografia sui siti web</string>
+    <string name="systemSearchOnboardingFeatureThreeText">Cancella i dati in un tap</string>
     <string name="systemSearchOnboardingButtonMore">Mostra di più</string>
     <string name="systemSearchOnboardingButtonLess">Nascondi</string>
     <string name="systemSearchOnboardingButtonOk">Fatto</string>
