@@ -1,8 +1,9 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
 
     <string name="appName" translatable="false">DuckDuckGo</string>
-    <string name="duckDuckGoLogoDescription">DuckDuckGo logo</string>
     <string name="appDescription" translatable="false">DuckDuckGo&#160;</string>
+    <string name="duckDuckGoLogoDescription">DuckDuckGo logo</string>
+    <string name="duckDuckGoPrivacySimplified">Privacy, simplified.</string>
     <string name="yes">Yes</string>
     <string name="no">No</string>
 
@@ -180,7 +181,6 @@
 
     <!-- About Activity -->
     <string name="aboutActivityTitle">About us</string>
-    <string name="aboutHeading">Privacy, simplified.</string>
     <string name="aboutDescription">
         At DuckDuckGo, we\'re setting the new standard of trust online.\n\
         DuckDuckGo Privacy Browser provides all the privacy essentials you need to protect yourself as you search and browse the web, including tracker blocking, smarter encryption, and DuckDuckGo private search.\n\
@@ -365,5 +365,36 @@
     <string name="feedbackInitialDisambiguationHappyButtonContentDescription">Positive feedback button</string>
     <string name="feedbackInitialDisambiguationSadButtonContentDescription">Negative feedback button</string>
     <string name="feedbackIsImportantToUs">Your anonymous feedback is important to us.</string>
+
+    <!-- Webview Recovery -->
+    <string name="crashedWebViewErrorMessage">"The webpage could not be displayed."</string>
+    <string name="crashedWebViewErrorAction">"Reload"</string>
+
+    <!-- System Search-->
+    <string name="systemSearchDeviceAppLabel">From this device</string>
+    <string name="systemSearchOmnibarInputHint"><font size="13">Search or type URL</font></string>
+    <string name="systemSearchAppNotFound">Application could not be found</string>
+    <string name="systemSearchOnboardingText">Thanks for choosing DuckDuckGo!\nNow, when using our search or app, your searches are protected.</string>
+    <string name="systemSearchOnboardingFeaturesIntroText">The DuckDuckGo app also:</string>
+    <string name="systemSearchOnboardingFeatureOneText">Blocks unsafe trackers</string>
+    <string name="systemSearchOnboardingFeatureTwoText">Forces encryption on websites</string>
+    <string name="systemSearchOnboardingFeatureThreeText">Clears data with one tap</string>
+    <string name="systemSearchOnboardingButtonMore">Show more</string>
+    <string name="systemSearchOnboardingButtonLess">Hide</string>
+    <string name="systemSearchOnboardingButtonOk">Got it</string>
+
+    <!-- Dax Dialog -->
+    <string name="daxDialogHideButton">HIDE</string>
+    <string name="daxDialogPhew">Phew!</string>
+    <string name="daxDialogYes">OK!</string>
+    <string name="daxDialogAddWidget">Add Widget</string>
+    <string name="daxDialogMaybeLater">Maybe Later</string>
+    <string name="daxDialogSettings">Go to settings</string>
+    <string name="daxDialogNext">Next</string>
+    <string name="daxDialogHighFive">High Five!</string>
+    <string name="daxDialogGotIt">Got It</string>
+    <string name="hideTipsTitle">Hide remaining tips?</string>
+    <string name="hideTipsText">There are only a few, and we tried to make them informative.</string>
+    <string name="hideTipsButton">Hide tips forever</string>
 
 </resources>

@@ -84,8 +84,13 @@ interface VariantManager {
             // All groups in an experiment (control and variants) MUST use the same filters
         )
 
+        val REFERRER_VARIANTS = listOf(
+            Variant(RESERVED_EU_AUCTION_VARIANT, features = listOf(SuppressHomeTabWidgetCta), filterBy = { noFilter() })
+        )
+
         fun referrerVariant(key: String): Variant {
-            return Variant(key, features = emptyList(), filterBy = { noFilter() })
+            val knownReferrer = REFERRER_VARIANTS.firstOrNull { it.key == key }
+            return knownReferrer ?: Variant(key, features = emptyList(), filterBy = { noFilter() })
         }
 
         private fun noFilter(): Boolean = true
