@@ -20,6 +20,7 @@ import android.app.PendingIntent
 import android.app.PendingIntent.getService
 import android.content.Context
 import android.content.Intent
+import androidx.annotation.VisibleForTesting
 import androidx.annotation.WorkerThread
 import androidx.core.app.NotificationManagerCompat
 import androidx.work.CoroutineWorker
@@ -63,11 +64,11 @@ class AndroidNotificationScheduler(
             privacyNotification.canShow() -> {
                 scheduleNotification(OneTimeWorkRequestBuilder<PrivacyNotificationWorker>(), 1, TimeUnit.DAYS, UNUSED_APP_WORK_REQUEST_TAG)
             }
-            searchPromptNotification.canShow() -> {
-                scheduleNotification(OneTimeWorkRequestBuilder<SearchPromptNotificationWorker>(), 2, TimeUnit.DAYS, CONTINUOUS_APP_USE_REQUEST_TAG)
-            }
             clearDataNotification.canShow() -> {
                 scheduleNotification(OneTimeWorkRequestBuilder<ClearDataNotificationWorker>(), 3, TimeUnit.DAYS, UNUSED_APP_WORK_REQUEST_TAG)
+            }
+            searchPromptNotification.canShow() -> {
+                scheduleNotification(OneTimeWorkRequestBuilder<SearchPromptNotificationWorker>(), 2, TimeUnit.DAYS, CONTINUOUS_APP_USE_REQUEST_TAG)
             }
             else -> Timber.v("Notifications not enabled for this variant")
         }
