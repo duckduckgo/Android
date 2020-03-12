@@ -75,6 +75,7 @@ class WebViewRequestInterceptor(
                 webView.loadUrl(newUri.toString())
             }
 
+            webViewClientListener?.upgradedToHttps()
             privacyProtectionCountDao.incrementUpgradeCount()
             return WebResourceResponse(null, null, null)
         }

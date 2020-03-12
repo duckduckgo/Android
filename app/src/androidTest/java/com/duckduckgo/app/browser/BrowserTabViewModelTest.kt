@@ -1651,8 +1651,10 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenUpgradedToHttpsThenSiteUpgradedHttpsReturnsTrue() {
-        givenOneActiveTabSelected()
+        val url = "http://www.example.com"
+        selectedTabLiveData.value = TabEntity("TAB_ID", url, "", skipHome = false, viewed = true, position = 0)
         testee.upgradedToHttps()
+        loadUrl("https://www.example.com")
         assertTrue(testee.siteLiveData.value?.upgradedHttps!!)
     }
 
@@ -1677,19 +1679,6 @@ class BrowserTabViewModelTest {
 
         val brokenSiteFeedback = command as Command.BrokenSiteFeedback
         assertFalse(brokenSiteFeedback.httpsUpgraded)
-    }
-
-    @Test
-    fun whenOnBrokenSiteSelectedAndHttpsUpgradedThenReturnHttpsUpgradedTrue() {
-        givenOneActiveTabSelected()
-        testee.upgradedToHttps()
-        testee.onBrokenSiteSelected()
-
-        val command = captureCommands().lastValue
-        assertTrue(command is Command.BrokenSiteFeedback)
-
-        val brokenSiteFeedback = command as Command.BrokenSiteFeedback
-        assertTrue(brokenSiteFeedback.httpsUpgraded)
     }
 
     @Test

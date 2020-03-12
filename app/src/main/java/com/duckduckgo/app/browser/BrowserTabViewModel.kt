@@ -230,6 +230,7 @@ class BrowserTabViewModel(
     private lateinit var tabId: String
     private var webNavigationState: WebNavigationState? = null
     private var defaultBrowserAttempt: Int = 1
+    private var httpsUpgraded = false
 
     init {
         initializeViewStates()
@@ -262,7 +263,7 @@ class BrowserTabViewModel(
             buildingSiteFactoryJob?.cancel()
         }
 
-        site = siteFactory.buildSite(url, title)
+        site = siteFactory.buildSite(url, title, httpsUpgraded)
         onSiteChanged()
         buildingSiteFactoryJob = viewModelScope.launch {
             site?.let {
@@ -592,7 +593,7 @@ class BrowserTabViewModel(
     }
 
     override fun upgradedToHttps() {
-        site?.upgradedToHttps()
+        httpsUpgraded = true
     }
 
     override fun trackerDetected(event: TrackingEvent) {
@@ -617,6 +618,7 @@ class BrowserTabViewModel(
     }
 
     private fun onSiteChanged() {
+        httpsUpgraded = false
         viewModelScope.launch {
 
             val improvedGrade = withContext(dispatchers.io()) {

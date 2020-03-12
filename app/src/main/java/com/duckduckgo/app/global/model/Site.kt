@@ -55,7 +55,6 @@ interface Site {
     val surrogates: List<SurrogateResponse>
     fun trackerDetected(event: TrackingEvent)
     fun updatePrivacyData(sitePrivacyData: SitePrivacyData)
-    fun upgradedToHttps()
     fun surrogateDetected(surrogate: SurrogateResponse)
 
     fun calculateGrades(): SiteGrades

@@ -320,6 +320,20 @@ class WebViewRequestInterceptorTest {
         verify(mockWebViewClientListener).surrogateDetected(availableSurrogate)
     }
 
+    @Test
+    fun whenUrlShouldBeUpgradedThenNotifyWebViewClientListener() = runBlocking<Unit> {
+        configureShouldUpgrade()
+        val mockWebViewClientListener: WebViewClientListener = mock()
+        testee.shouldIntercept(
+            request = mockRequest,
+            documentUrl = null,
+            webView = webView,
+            webViewClientListener = mockWebViewClientListener
+        )
+
+        verify(mockWebViewClientListener).upgradedToHttps()
+    }
+
     private fun assertRequestCanContinueToLoad(response: WebResourceResponse?) {
         assertNull(response)
     }

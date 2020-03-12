@@ -33,7 +33,8 @@ import java.util.concurrent.CopyOnWriteArrayList
 
 class SiteMonitor(
     url: String,
-    override var title: String?
+    override var title: String?,
+    override var upgradedHttps: Boolean = false
 ) : Site {
 
     override var url: String = url
@@ -54,8 +55,6 @@ class SiteMonitor(
 
     override val https: HttpsStatus
         get() = httpsStatus()
-
-    override var upgradedHttps = false
 
     override var hasHttpResources = false
 
@@ -100,10 +99,6 @@ class SiteMonitor(
         }
 
         return HttpsStatus.NONE
-    }
-
-    override fun upgradedToHttps() {
-        upgradedHttps = true
     }
 
     override fun surrogateDetected(surrogate: SurrogateResponse) {
