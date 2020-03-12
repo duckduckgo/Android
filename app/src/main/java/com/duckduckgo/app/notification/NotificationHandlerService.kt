@@ -125,7 +125,7 @@ class NotificationHandlerService : IntentService("NotificationHandlerService") {
         TaskStackBuilder.create(context)
             .addNextIntentWithParentStack(searchIntent)
             .startActivities()
-        pixel.fire(Pixel.PixelName.QUICK_SEARCH_PROMPT_NOTIFICATION_PRESSED)
+        pixel.fire(Pixel.PixelName.QUICK_SEARCH_PROMPT_NOTIFICATION_LAUNCHED)
     }
 
     private fun onQuickSearchRequest() {
@@ -134,7 +134,7 @@ class NotificationHandlerService : IntentService("NotificationHandlerService") {
         TaskStackBuilder.create(context)
             .addNextIntentWithParentStack(searchIntent)
             .startActivities()
-        pixel.fire(Pixel.PixelName.QUICK_SEARCH_NOTIFICATION_PRESSED)
+        pixel.fire(Pixel.PixelName.QUICK_SEARCH_NOTIFICATION_LAUNCHED)
     }
 
     private fun clearNotification(notificationId: Int) {

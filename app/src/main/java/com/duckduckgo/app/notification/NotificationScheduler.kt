@@ -218,7 +218,6 @@ class AndroidNotificationScheduler(
             notificationDao.insert(Notification(notification.id))
             manager.notify(NotificationRegistrar.NotificationId.StickySearch, systemNotification)
 
-            pixel.fire(Pixel.PixelName.QUICK_SEARCH_NOTIFICATION_SHOWN)
             return Result.success()
         }
 
