@@ -71,7 +71,10 @@ class BrokenSiteActivity : DuckDuckGoActivity() {
                     viewModel.onCategoryAccepted()
                     dialog.dismiss()
                 }
-                .setNegativeButton(getString(android.R.string.no)) { dialog, _ -> dialog.dismiss() }
+                .setNegativeButton(getString(android.R.string.no)) { dialog, _ ->
+                    viewModel.onCategorySelectionCancelled()
+                    dialog.dismiss()
+                }
                 .show()
         }
 

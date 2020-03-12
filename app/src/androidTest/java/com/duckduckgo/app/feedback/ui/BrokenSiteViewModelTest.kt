@@ -164,6 +164,25 @@ class BrokenSiteViewModelTest {
         verify(mockCommandObserver).onChanged(Command.ConfirmAndFinish)
     }
 
+    @Test
+    fun whenCancelSelectionThenAssignOldIndexValue() {
+        testee.setInitialBrokenSite(null, "", "", false)
+        selectAndAcceptCategory(0)
+        testee.onCategoryIndexChanged(1)
+        testee.onCategorySelectionCancelled()
+
+        assertEquals(0, testee.indexSelected)
+    }
+
+    @Test
+    fun whenCancelSelectionAndNoPreviousValueThenAssignMinusOne() {
+        testee.setInitialBrokenSite(null, "", "", false)
+        testee.onCategoryIndexChanged(1)
+        testee.onCategorySelectionCancelled()
+
+        assertEquals(-1, testee.indexSelected)
+    }
+
     private fun selectAndAcceptCategory(indexSelected: Int = 0) {
         testee.onCategoryIndexChanged(indexSelected)
         testee.onCategoryAccepted()

@@ -76,6 +76,10 @@ class BrokenSiteViewModel(private val pixel: Pixel, private val brokenSiteSender
         indexSelected = newIndex
     }
 
+    fun onCategorySelectionCancelled() {
+        indexSelected = viewState.value?.indexSelected ?: -1
+    }
+
     fun onCategoryAccepted() {
         viewState.value = viewState.value?.copy(
             indexSelected = indexSelected,
