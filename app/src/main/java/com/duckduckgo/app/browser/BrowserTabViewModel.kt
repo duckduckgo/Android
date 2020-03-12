@@ -704,9 +704,9 @@ class BrowserTabViewModel(
 
     fun onBrokenSiteSelected() {
         val events = site?.trackingEvents
-        val blockedTrackers = events?.distinct()?.map { Uri.parse(it.trackerUrl).host }.orEmpty().joinToString(",")
+        val blockedTrackers = events?.map { Uri.parse(it.trackerUrl).host }.orEmpty().distinct().joinToString(",")
         val upgradedHttps = site?.upgradedHttps ?: false
-        val surrogates = site?.surrogates?.map { Uri.parse(it.name).baseHost }.orEmpty().joinToString(",")
+        val surrogates = site?.surrogates?.map { Uri.parse(it.name).baseHost }.orEmpty().distinct().joinToString(",")
 
         command.value = BrokenSiteFeedback(url, blockedTrackers, surrogates, upgradedHttps)
     }

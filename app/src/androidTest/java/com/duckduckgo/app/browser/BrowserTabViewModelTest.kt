@@ -68,6 +68,7 @@ import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.VariantManager.Companion.DEFAULT_VARIANT
 import com.duckduckgo.app.statistics.api.StatisticsUpdater
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.surrogates.SurrogateResponse
 import com.duckduckgo.app.survey.db.SurveyDao
 import com.duckduckgo.app.survey.model.Survey
 import com.duckduckgo.app.tabs.model.TabEntity
@@ -1638,6 +1639,151 @@ class BrowserTabViewModelTest {
             Pixel.PixelName.DEFAULT_BROWSER_NOT_SET,
             defaultBrowserPixelParams(Pixel.PixelValues.DEFAULT_BROWSER_EXTERNAL)
         )
+    }
+
+    @Test
+    fun whenSurrogateDetectedThenSiteUpdated() {
+        givenOneActiveTabSelected()
+        val surrogate = SurrogateResponse()
+        testee.surrogateDetected(surrogate)
+        assertTrue(testee.siteLiveData.value?.surrogates?.size == 1)
+    }
+
+    @Test
+    fun whenUpgradedToHttpsThenSiteUpgradedHttpsReturnsTrue() {
+        givenOneActiveTabSelected()
+        testee.upgradedToHttps()
+        assertTrue(testee.siteLiveData.value?.upgradedHttps!!)
+    }
+
+    @Test
+    fun whenNotUpgradedToHttpsThenSiteUpgradedHttpsReturnsFalse() {
+        givenOneActiveTabSelected()
+        assertFalse(testee.siteLiveData.value?.upgradedHttps!!)
+    }
+
+    @Test
+    fun whenOnBrokenSiteSelectedOpenBokenSiteFeedback() {
+        testee.onBrokenSiteSelected()
+        assertCommandIssued<Command.BrokenSiteFeedback>()
+    }
+
+    @Test
+    fun whenOnBrokenSiteSelectedAndNoHttpsUpgradedThenReturnHttpsUpgradedFalse() {
+        testee.onBrokenSiteSelected()
+
+        val command = captureCommands().lastValue
+        assertTrue(command is Command.BrokenSiteFeedback)
+
+        val brokenSiteFeedback = command as Command.BrokenSiteFeedback
+        assertFalse(brokenSiteFeedback.httpsUpgraded)
+    }
+
+    @Test
+    fun whenOnBrokenSiteSelectedAndHttpsUpgradedThenReturnHttpsUpgradedTrue() {
+        givenOneActiveTabSelected()
+        testee.upgradedToHttps()
+        testee.onBrokenSiteSelected()
+
+        val command = captureCommands().lastValue
+        assertTrue(command is Command.BrokenSiteFeedback)
+
+        val brokenSiteFeedback = command as Command.BrokenSiteFeedback
+        assertTrue(brokenSiteFeedback.httpsUpgraded)
+    }
+
+    @Test
+    fun whenOnBrokenSiteSelectedAndNoTrackersThenReturnBlockedTrackersEmptyString() {
+        givenOneActiveTabSelected()
+
+        testee.onBrokenSiteSelected()
+
+        val command = captureCommands().lastValue
+        assertTrue(command is Command.BrokenSiteFeedback)
+
+        val brokenSiteFeedback = command as Command.BrokenSiteFeedback
+        assertEquals("", brokenSiteFeedback.blockedTrackers)
+    }
+
+    @Test
+    fun whenOnBrokenSiteSelectedAndTrackersBlockedThenReturnBlockedTrackers() {
+        givenOneActiveTabSelected()
+        val event = TrackingEvent("http://www.example.com", "http://www.tracker.com/tracker.js", emptyList(), null, false)
+        val anotherEvent = TrackingEvent("http://www.example.com/test", "http://www.anothertracker.com/tracker.js", emptyList(), null, false)
+
+        testee.trackerDetected(event)
+        testee.trackerDetected(anotherEvent)
+        testee.onBrokenSiteSelected()
+
+        val command = captureCommands().lastValue
+        assertTrue(command is Command.BrokenSiteFeedback)
+
+        val brokenSiteFeedback = command as Command.BrokenSiteFeedback
+        assertEquals("www.tracker.com,www.anothertracker.com", brokenSiteFeedback.blockedTrackers)
+    }
+
+    @Test
+    fun whenOnBrokenSiteSelectedAndSameHostTrackersBlockedThenDoNotReturnDuplicatedBlockedTrackers() {
+        givenOneActiveTabSelected()
+        val event = TrackingEvent("http://www.example.com", "http://www.tracker.com/tracker.js", emptyList(), null, false)
+        val anotherEvent = TrackingEvent("http://www.example.com/test", "http://www.tracker.com/tracker2.js", emptyList(), null, false)
+
+        testee.trackerDetected(event)
+        testee.trackerDetected(anotherEvent)
+        testee.onBrokenSiteSelected()
+
+        val command = captureCommands().lastValue
+        assertTrue(command is Command.BrokenSiteFeedback)
+
+        val brokenSiteFeedback = command as Command.BrokenSiteFeedback
+        assertEquals("www.tracker.com", brokenSiteFeedback.blockedTrackers)
+    }
+
+    @Test
+    fun whenOnBrokenSiteSelectedAndNoSurrogatesThenReturnSurrogatesEmptyString() {
+        givenOneActiveTabSelected()
+
+        testee.onBrokenSiteSelected()
+
+        val command = captureCommands().lastValue
+        assertTrue(command is Command.BrokenSiteFeedback)
+
+        val brokenSiteFeedback = command as Command.BrokenSiteFeedback
+        assertEquals("", brokenSiteFeedback.surrogates)
+    }
+
+    @Test
+    fun whenOnBrokenSiteSelectedAndSurrogatesThenReturnSurrogates() {
+        givenOneActiveTabSelected()
+        val surrogate = SurrogateResponse(true, "surrogate.com/test.js", "", "")
+        val anotherSurrogate = SurrogateResponse(true, "anothersurrogate.com/test.js", "", "")
+
+        testee.surrogateDetected(surrogate)
+        testee.surrogateDetected(anotherSurrogate)
+        testee.onBrokenSiteSelected()
+
+        val command = captureCommands().lastValue
+        assertTrue(command is Command.BrokenSiteFeedback)
+
+        val brokenSiteFeedback = command as Command.BrokenSiteFeedback
+        assertEquals("surrogate.com,anothersurrogate.com", brokenSiteFeedback.surrogates)
+    }
+
+    @Test
+    fun whenOnBrokenSiteSelectedAndSameHostSurrogatesThenDoNotReturnDuplicatedSurrogates() {
+        givenOneActiveTabSelected()
+        val surrogate = SurrogateResponse(true, "surrogate.com/test.js", "", "")
+        val anotherSurrogate = SurrogateResponse(true, "surrogate.com/test2.js", "", "")
+
+        testee.surrogateDetected(surrogate)
+        testee.surrogateDetected(anotherSurrogate)
+        testee.onBrokenSiteSelected()
+
+        val command = captureCommands().lastValue
+        assertTrue(command is Command.BrokenSiteFeedback)
+
+        val brokenSiteFeedback = command as Command.BrokenSiteFeedback
+        assertEquals("surrogate.com", brokenSiteFeedback.surrogates)
     }
 
     private inline fun <reified T : Command> assertCommandIssued(instanceAssertions: T.() -> Unit = {}) {

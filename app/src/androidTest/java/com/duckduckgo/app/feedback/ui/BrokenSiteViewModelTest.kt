@@ -154,7 +154,7 @@ class BrokenSiteViewModelTest {
     }
 
     @Test
-    fun whenCanSubmitBrokenSiteAndUrlNullAndSubmitPressedThenReportAndPixelNotSubmitted() {
+    fun whenCanSubmitBrokenSiteAndUrlNullAndSubmitPressedThenConfirmSentButPixelAndReportNotSubmitted() {
         testee.setInitialBrokenSite(null, "", "", false)
         selectAndAcceptCategory()
         testee.onSubmitPressed("webViewVersion")
