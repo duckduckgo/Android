@@ -75,7 +75,6 @@ class BrokenSiteSubmitter(
         private const val TDS_ETAG_KEY = "tds"
         private const val BLOCKED_TRACKERS_KEY = "blockedTrackers"
         private const val SURROGATES_KEY = "surrogates"
-        private const val EXTENSION_VERSION_KEY = "extensionVersion"
         private const val APP_VERSION_KEY = "appVersion"
         private const val ATB_KEY = "atb"
         private const val OS_KEY = "os"
