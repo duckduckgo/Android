@@ -81,6 +81,7 @@ interface VariantManager {
                     SearchWidgetDaxCta
                 ),
                 filterBy = { isEnglishLocale() }),
+            // Quick Search Notification Experiment
             Variant(
                 key = "mf",
                 weight = 1.0,

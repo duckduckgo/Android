@@ -54,6 +54,7 @@
             android:layout_height="wrap_content"
             android:fontFamily="sans-serif"
             style="@style/TextAppearance.Compat.Notification.Title"
+            android:visibility="invisible"
             android:text="@string/searchWidgetTextHint"
             android:textSize="14sp"
             android:layout_weight="1"/>
