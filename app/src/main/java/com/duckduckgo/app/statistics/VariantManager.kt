@@ -85,12 +85,12 @@ interface VariantManager {
             Variant(
                 key = "mf",
                 weight = 1.0,
-                features = listOf(SearchNotification),
+                features = emptyList(),
                 filterBy = { isEnglishLocale() }),
             Variant(
                 key = "mg",
                 weight = 1.0,
-                features = emptyList(),
+                features = listOf(SearchNotification),
                 filterBy = { isEnglishLocale() })
 
             // All groups in an experiment (control and variants) MUST use the same filters
