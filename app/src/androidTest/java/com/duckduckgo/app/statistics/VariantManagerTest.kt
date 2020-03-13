@@ -98,14 +98,14 @@ class VariantManagerTest {
     // Search Notification Experiment
     @Test
     fun searchNotificationControlVariantIsInactive() {
-        val variant = variants.first { it.key == "mg" }
+        val variant = variants.first { it.key == "mf" }
         assertEqualsDouble(1.0, variant.weight)
         assertEquals(0, variant.features.size)
     }
 
     @Test
     fun searchNotificationEnabledVariantIsActive() {
-        val variant = variants.first { it.key == "mf" }
+        val variant = variants.first { it.key == "mg" }
         assertEqualsDouble(1.0, variant.weight)
         assertEquals(1, variant.features.size)
         assertTrue(variant.hasFeature(SearchNotification))
