@@ -27,11 +27,9 @@
         android:text="@string/stickySearchPromptNotificationTitle"
         style="@style/TextAppearance.Compat.Notification.Title"/>
 
-    <LinearLayout
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="44dp"
-        android:layout_gravity="center"
-        android:gravity="center"
         android:layout_marginTop="12dp"
         android:layout_marginStart="2dp"
         android:layout_marginEnd="2dp"
@@ -46,18 +44,9 @@
             android:layout_height="26dp"
             android:layout_marginStart="10dp"
             android:layout_marginEnd="8dp"
+            android:layout_alignParentStart="true"
+            android:layout_centerInParent="true"
             android:src="@drawable/logo_mini" />
-
-        <TextView
-            android:id="@+id/searchInputBox"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:fontFamily="sans-serif"
-            style="@style/TextAppearance.Compat.Notification.Title"
-            android:visibility="invisible"
-            android:text="@string/searchWidgetTextHint"
-            android:textSize="14sp"
-            android:layout_weight="1"/>
 
         <ImageView
             android:id="@+id/search"
@@ -65,9 +54,11 @@
             android:layout_height="32dp"
             android:layout_marginStart="16dp"
             android:layout_marginEnd="16dp"
+            android:layout_alignParentEnd="true"
+            android:layout_centerInParent="true"
             android:src="@drawable/ic_widget_loupe_gunmetal_24dp" />
 
-    </LinearLayout>
+    </RelativeLayout>
 
 
 

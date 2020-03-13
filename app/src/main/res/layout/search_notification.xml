@@ -15,19 +15,17 @@
   -->
 
 
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/widgetContainer"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_gravity="center"
     android:orientation="horizontal">
 
-    <LinearLayout
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="72dp"
-        android:background="@drawable/search_notification_background"
-        android:gravity="center_vertical"
-        android:orientation="horizontal">
+        android:background="@drawable/search_notification_background">
 
         <ImageView
             android:id="@+id/logo"
@@ -35,18 +33,9 @@
             android:layout_height="26dp"
             android:layout_marginStart="24dp"
             android:layout_marginEnd="8dp"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true"
             android:src="@drawable/logo_mini" />
-
-        <TextView
-            android:id="@+id/searchInputBox"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:fontFamily="sans-serif"
-            style="@style/TextAppearance.Compat.Notification.Title"
-            android:visibility="invisible"
-            android:text="@string/searchWidgetTextHint"
-            android:textSize="14sp" />
 
         <ImageView
             android:id="@+id/search"
@@ -54,9 +43,11 @@
             android:layout_height="32dp"
             android:layout_marginStart="12dp"
             android:layout_marginEnd="24dp"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
             android:src="@drawable/ic_widget_loupe_gunmetal_24dp" />
 
-    </LinearLayout>
+    </RelativeLayout>
 
 
-</LinearLayout>
+</FrameLayout>
