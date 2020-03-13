@@ -488,26 +488,58 @@ class AutomaticDataClearerTest {
     }
 
     @Test
-    fun whenNotFreshAppLaunchAndIconJustChangedThenShouldNotClear() = runBlocking<Unit> {
+    fun whenNotFreshAppLaunchAndIconJustChangedButAppNotUsedThenShouldNotClear() = runBlocking<Unit> {
         val isFreshAppLaunch = false
 
-
         configureUserOptions(ClearWhatOption.CLEAR_TABS_AND_DATA, ClearWhenOption.APP_EXIT_OR_5_MINS)
+        configureAppUsedSinceLastClear()
         configureAppIconJustChanged()
 
         withContext(Dispatchers.Main) {
             simulateLifecycle(isFreshAppLaunch)
             verifyAppIconFlagReset()
-            verifyTabsNotCleared()
+            verifyEverythingNotCleared()
         }
     }
+
+    @Test
+    fun whenFreshAppLaunchAndIconJustChangedButAppUsedThenShouldClear() = runBlocking<Unit> {
+        val isFreshAppLaunch = true
+
+        configureUserOptions(ClearWhatOption.CLEAR_TABS_AND_DATA, ClearWhenOption.APP_EXIT_OR_5_MINS)
+        configureAppUsedSinceLastClear()
+        configureAppIconJustChanged()
+
+        withContext(Dispatchers.Main) {
+            simulateLifecycle(isFreshAppLaunch)
+            verifyAppIconFlagReset()
+            verifyEverythingCleared()
+        }
+    }
+
 
     @Test
     fun whenNotFreshAppLaunchAndIconNotChangedThenShouldClear() = runBlocking<Unit> {
         val isFreshAppLaunch = false
         
         configureAppIconNotChanged()
+        configureAppNotUsedSinceLastClear()
+        configureUserOptions(ClearWhatOption.CLEAR_TABS_AND_DATA, ClearWhenOption.APP_EXIT_OR_5_MINS)
+        configureEnoughTimePassed()
+        configureAppUsedSinceLastClear()
 
+        withContext(Dispatchers.Main) {
+            simulateLifecycle(isFreshAppLaunch)
+            verifyEverythingCleared()
+        }
+    }
+
+    @Test
+    fun whenNotFreshAppLaunchAndIconNotChangedAppUsedThenShouldClear() = runBlocking<Unit> {
+        val isFreshAppLaunch = false
+
+        configureAppIconNotChanged()
+        configureAppUsedSinceLastClear()
         configureUserOptions(ClearWhatOption.CLEAR_TABS_AND_DATA, ClearWhenOption.APP_EXIT_OR_5_MINS)
         configureEnoughTimePassed()
         configureAppUsedSinceLastClear()

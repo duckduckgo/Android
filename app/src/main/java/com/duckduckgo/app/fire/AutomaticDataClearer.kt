@@ -69,7 +69,6 @@ class AutomaticDataClearer(
     @UiThread
     @OnLifecycleEvent(Lifecycle.Event.ON_START)
     fun onAppForegrounded() {
-
         launch {
             onAppForegroundedAsync()
         }
@@ -185,11 +184,6 @@ class AutomaticDataClearer(
     private fun shouldClearData(cleanWhenOption: ClearWhenOption, appUsedSinceLastClear: Boolean, appIconChanged: Boolean): Boolean {
         Timber.d("Determining if data should be cleared for option $cleanWhenOption")
 
-        if (appIconChanged) {
-            Timber.i("No data will be cleared as the app icon was just changed")
-            return false
-        }
-
         if (!appUsedSinceLastClear) {
             Timber.d("App hasn't been used since last clear; no need to clear again")
             return false
@@ -201,6 +195,12 @@ class AutomaticDataClearer(
             Timber.d("This is a fresh app launch, so will clear the data")
             return true
         }
+
+        if (appIconChanged) {
+            Timber.i("No data will be cleared as the app icon was just changed")
+            return false
+        }
+
         if (cleanWhenOption == ClearWhenOption.APP_EXIT_ONLY) {
             Timber.d("This is NOT a fresh app launch, and the configuration is for app exit only. Not clearing the data")
             return false
@@ -218,4 +218,5 @@ class AutomaticDataClearer(
 
         return enoughTimePassed
     }
+
 }

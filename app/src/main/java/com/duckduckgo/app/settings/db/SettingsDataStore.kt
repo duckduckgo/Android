@@ -86,6 +86,9 @@ class SettingsSharedPreferences @Inject constructor(private val context: Context
         }
         set(appIcon) = preferences.edit(commit = true) { putString(KEY_APP_ICON, appIcon.componentName) }
 
+    // Changing the app icon makes the app close in some devices / OS versions. This is a problem if the user has
+    // selected automatic data / tabs clear. We will use this flag to track if the user has changed the icon
+    // and prevent the tabs / data from be cleared {check AutomaticDataClearer}
     override var appIconChanged: Boolean
         get() = preferences.getBoolean(KEY_APP_ICON_CHANGED, false)
         set(enabled) = preferences.edit(commit = true) { putBoolean(KEY_APP_ICON_CHANGED, enabled) }
@@ -150,7 +153,7 @@ class SettingsSharedPreferences @Inject constructor(private val context: Context
         const val KEY_APP_ICON = "APP_ICON"
         const val KEY_APP_ICON_CHANGED = "APP_ICON_CHANGED"
 
-        private val DEFAULT_ICON = if (BuildConfig.DEBUG){
+        private val DEFAULT_ICON = if (BuildConfig.DEBUG) {
             AppIcon.BLUE
         } else {
             AppIcon.DEFAULT
