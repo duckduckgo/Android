@@ -46,8 +46,6 @@ class BrokenSiteSubmitter(
                 SITE_URL_KEY to brokenSite.siteUrl,
                 UPDGRADED_HTTPS_KEY to brokenSite.upgradeHttps.toString(),
                 TDS_ETAG_KEY to tdsDao.eTag(),
-                BLOCKED_TRACKERS_KEY to brokenSite.blockedTrackers,
-                SURROGATES_KEY to brokenSite.surrogates,
                 APP_VERSION_KEY to BuildConfig.VERSION_NAME,
                 ATB_KEY to atbWithVariant(),
                 OS_KEY to Build.VERSION.SDK_INT.toString(),
@@ -56,8 +54,12 @@ class BrokenSiteSubmitter(
                 WEBVIEW_VERSION_KEY to brokenSite.webViewVersion,
                 SITE_TYPE_KEY to brokenSite.siteType
             )
+            val encodedParams = mapOf(
+                BLOCKED_TRACKERS_KEY to brokenSite.blockedTrackers,
+                SURROGATES_KEY to brokenSite.surrogates
+            )
             runCatching {
-                pixel.fire(Pixel.PixelName.BROKEN_SITE_REPORT.pixelName, params)
+                pixel.fire(Pixel.PixelName.BROKEN_SITE_REPORT.pixelName, params, encodedParams)
             }
                 .onSuccess { Timber.v("Feedback submission succeeded") }
                 .onFailure { Timber.w(it, "Feedback submission failed") }

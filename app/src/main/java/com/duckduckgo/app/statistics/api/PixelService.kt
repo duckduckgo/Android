@@ -32,6 +32,7 @@ interface PixelService {
         @Path("formFactor") formFactor: String,
         @Query(AppUrl.ParamKey.ATB) atb: String,
         @QueryMap additionalQueryParams: Map<String, String?> = emptyMap(),
+        @QueryMap(encoded = true) encodedQueryParams: Map<String, String?> = emptyMap(),
         @Query(AppUrl.ParamKey.DEV_MODE) devMode: Int? = if (BuildConfig.DEBUG) 1 else null
     ): Completable
 }
