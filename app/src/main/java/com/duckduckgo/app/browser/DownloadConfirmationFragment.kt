@@ -16,11 +16,12 @@
 
 package com.duckduckgo.app.browser
 
-import android.annotation.SuppressLint
-import android.app.Dialog
+import android.content.Context
 import android.content.Intent
+import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import android.widget.Toast
 import androidx.core.content.FileProvider.getUriForFile
 import com.duckduckgo.app.browser.downloader.NetworkFileDownloadManager.DownloadFileData
@@ -37,17 +38,14 @@ class DownloadConfirmationFragment(
     private val userDownloadAction: UserDownloadAction
 ) : BottomSheetDialogFragment() {
 
-    @SuppressLint("RestrictedApi")
-    override fun setupDialog(dialog: Dialog, style: Int) {
-        super.setupDialog(dialog, style)
-        val view = LayoutInflater.from(context).inflate(R.layout.download_confirmation, null)
-        dialog.setContentView(view)
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        val view = inflater.inflate(R.layout.download_confirmation, container, false)
         setupViews(view)
+        return view
     }
 
     private fun setupViews(view: View) {
-        view.download_message.text =
-            getString(getMessageResource(), downloadFileData.file.name)
+        view.download_message.text = getString(R.string.downloadConfirmationSaveFileTitle, downloadFileData.file.name)
         view.open_with.setOnClickListener {
             openFile()
             dismiss()
@@ -68,39 +66,35 @@ class DownloadConfirmationFragment(
         if (downloadFileData.alreadyDownloaded) {
             view.open_with.show()
             view.replace.show()
-            view.continue_download.text = getString(R.string.keep_both)
-            view.continue_download.leftDrawable(R.drawable.ic_keepboth_24dp)
+            view.continue_download.text = getString(R.string.downloadConfirmationKeepBothFilesText)
+            view.continue_download.leftDrawable(R.drawable.ic_keepboth_brownish_24dp)
         } else {
             view.open_with.gone()
             view.replace.gone()
-            view.continue_download.text = getString(R.string.fireContinue)
-            view.continue_download.leftDrawable(R.drawable.ic_file_24dp)
+            view.continue_download.text = getString(R.string.downloadConfirmationContinue)
+            view.continue_download.leftDrawable(R.drawable.ic_file_brownish_24dp)
 
         }
     }
 
-    private fun getMessageResource() =
-        if (downloadFileData.alreadyDownloaded) R.string.file_already_downloaded
-        else R.string.download_filename
-
-
     private fun openFile() {
-        val uri = getUriForFile(
-            context!!,
-            "${BuildConfig.APPLICATION_ID}.provider",
-            downloadFileData.file
-        )
-        val mime = activity?.contentResolver?.getType(uri)
+        val intent = context?.let { createIntentToOpenFile(it) }
+        activity?.packageManager?.let { packageManager ->
+            if (intent?.resolveActivity(packageManager) != null) {
+                startActivity(intent)
+            } else {
+                Timber.e("No suitable activity found")
+                Toast.makeText(activity, "Can't open file", Toast.LENGTH_SHORT).show()
 
+            }
+        }
+    }
+
+    private fun createIntentToOpenFile(context: Context): Intent {
+        val uri = getUriForFile(context, "${BuildConfig.APPLICATION_ID}.provider", downloadFileData.file)
+        val mime = activity?.contentResolver?.getType(uri)
         val intent = Intent(Intent.ACTION_VIEW)
         intent.setDataAndType(uri, mime)
-        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-        if (intent.resolveActivity(activity?.packageManager!!) != null) {
-            startActivity(intent)
-        } else {
-            Timber.e("No suitable activity found")
-            Toast.makeText(activity, "Can't open file", Toast.LENGTH_SHORT).show()
-
-        }
+        return intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
     }
 }

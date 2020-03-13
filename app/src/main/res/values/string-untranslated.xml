@@ -59,4 +59,10 @@
     <string name="hideTipsText">There are only a few, and we tried to make them informative.</string>
     <string name="hideTipsButton">Hide tips forever</string>
 
+    <string name="downloadConfirmationContinue">Continue</string>
+    <string name="downloadConfirmationSaveFileTitle">Save %1$s</string>
+    <string name="downloadConfirmationKeepBothFilesText">Keep both</string>
+    <string name="downloadConfirmationReplaceOldFileText">Replace</string>
+    <string name="downloadConfirmationOpenFileText">Open</string>
+
 </resources>
