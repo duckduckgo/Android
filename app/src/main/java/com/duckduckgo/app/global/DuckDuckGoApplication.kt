@@ -298,7 +298,6 @@ open class DuckDuckGoApplication : HasActivityInjector, HasServiceInjector, HasS
         notificationRegistrar.updateStatus()
         GlobalScope.launch {
             notificationScheduler.scheduleNextNotification()
-            notificationScheduler.launchSearchPromptNotification()
             atbInitializer.initializeAfterReferrerAvailable()
         }
     }

@@ -22,6 +22,7 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEvent.QUICK_SEARCH_LAUNCH
 import com.duckduckgo.app.notification.NotificationRegistrar
 import com.duckduckgo.app.notification.db.NotificationDao
+import com.duckduckgo.app.statistics.VariantManager
 import timber.log.Timber
 
 class StickySearchNotification(

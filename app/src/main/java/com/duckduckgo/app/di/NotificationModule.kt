@@ -32,6 +32,7 @@ import com.duckduckgo.app.notification.model.StickySearchNotification
 import com.duckduckgo.app.notification.model.StickySearchPromptSpecification
 import com.duckduckgo.app.privacy.db.PrivacyProtectionCountDao
 import com.duckduckgo.app.settings.db.SettingsDataStore
+import com.duckduckgo.app.statistics.VariantManager
 import dagger.Module
 import dagger.Provides
 import javax.inject.Singleton
@@ -87,9 +88,10 @@ class NotificationModule {
     fun provideSearchPromptNotification(
         context: Context,
         notificationDao: NotificationDao,
+        variantManager: VariantManager,
         settingsDataStore: SettingsDataStore
     ): SearchPromptNotification {
-        return SearchPromptNotification(context, notificationDao, settingsDataStore)
+        return SearchPromptNotification(context, notificationDao, variantManager, settingsDataStore)
     }
 
     @Provides

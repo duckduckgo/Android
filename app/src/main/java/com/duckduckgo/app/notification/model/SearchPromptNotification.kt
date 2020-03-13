@@ -23,11 +23,13 @@ import com.duckduckgo.app.notification.NotificationHandlerService
 import com.duckduckgo.app.notification.NotificationRegistrar
 import com.duckduckgo.app.notification.db.NotificationDao
 import com.duckduckgo.app.settings.db.SettingsDataStore
+import com.duckduckgo.app.statistics.VariantManager
 import timber.log.Timber
 
 class SearchPromptNotification(
     private val context: Context,
     private val notificationDao: NotificationDao,
+    private val variantManager: VariantManager,
     private val settingsDataStore: SettingsDataStore
 ) : SearchNotification {
 
@@ -44,6 +46,13 @@ class SearchPromptNotification(
     override val priority = NotificationManagerCompat.IMPORTANCE_DEFAULT
 
     override suspend fun canShow(): Boolean {
+
+        val variant = variantManager.getVariant()
+        if (!variant.hasFeature(VariantManager.VariantFeature.SearchNotification)){
+            Timber.v("Notification Variant is not enabled ")
+            return false
+        }
+
         if (notificationDao.exists(id)) {
             Timber.v("Notification already seen")
             return false
