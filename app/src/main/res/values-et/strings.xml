@@ -203,6 +203,20 @@
     <string name="brokenSiteReportBrokenSiteMenuItem">Teatage katkisest saidist</string>
     <string name="brokenSiteHeading">Teatage katkisest saidist</string>
     <string name="brokenSiteSubmitted">Aitäh! Tagasiside on esitatud</string>
+    <string name="brokenSitesCategoriesTitle">Kirjeldage toimunut:</string>
+    <string name="brokenSitesCategoriesHint">Kirjeldage toimunut</string>
+    <string name="brokenSiteSubmitButton">Saada aruanne</string>
+    <string name="brokenSiteDescription">Anonüümse katkise saidi aruande esitamine aitab meil neid probleeme siluda ja rakendust täiustada.</string>
+
+    <string name="brokenSiteCategoryImages">Pilte ei laaditud</string>
+    <string name="brokenSiteCategoryPaywall">Sait palus mul välja lülitada</string>
+    <string name="brokenSiteCategoryComments">Kommentaare ei laaditud</string>
+    <string name="brokenSiteCategoryVideos">Videot ei esitatud</string>
+    <string name="brokenSiteCategoryLinks">Lingid või nupud ei töötanud</string>
+    <string name="brokenSiteCategoryContent">Sisu puudub</string>
+    <string name="brokenSiteCategoryLogin">Ma ei saa sisse logida</string>
+    <string name="brokenSiteCategoryUnsupported">Brauser ei ühildu</string>
+    <string name="brokenSiteCategoryOther">Midagi muud</string>
 
     <!-- Bookmarks Activity -->
     <string name="bookmarksMenuTitle">Järjehoidjad</string>
