@@ -38,20 +38,4 @@
     </plurals>
     <string name="daxTrackersBlockedCtaZeroText"><![CDATA[&#160;was trying to track you here. <br/><br/>I blocked it!<br/><br/> ☝️You can check the URL bar to see who is trying to track you when you visit a new site.️]]></string>
     <!-- !!! WAITING FOR CORRECTIONS FROM TRANSLATOR - DO NOT RESUBMIT TRANSLATIONS ABOVE !!! -->
-
-    <!-- Broken Sites-->
-    <string name="brokenSitesCategoriesTitle">Describe what happened:</string>
-    <string name="brokenSitesCategoriesHint">Describe what happened</string>
-    <string name="brokenSiteSubmitButton">Send Report</string>
-    <string name="brokenSiteDescription">Submitting an anonymous broken site report helps us debug these issues and improve the app.</string>
-
-    <string name="brokenSiteCategoryImages">Images didn\'t load</string>
-    <string name="brokenSiteCategoryPaywall">The site asked me to disable</string>
-    <string name="brokenSiteCategoryComments">Comments didn\'t load</string>
-    <string name="brokenSiteCategoryVideos">Video didn\'t play</string>
-    <string name="brokenSiteCategoryLinks">Links or buttons don\'t work</string>
-    <string name="brokenSiteCategoryContent">Content is missing</string>
-    <string name="brokenSiteCategoryLogin">I can\'t login</string>
-    <string name="brokenSiteCategoryUnsupported">The browser is incompatible</string>
-    <string name="brokenSiteCategoryOther">Something else</string>
 </resources>

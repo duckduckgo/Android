@@ -185,6 +185,20 @@
     <string name="brokenSiteReportBrokenSiteMenuItem">Fehlerhafte Seite melden</string>
     <string name="brokenSiteHeading">Eine fehlerhafte Seite melden</string>
     <string name="brokenSiteSubmitted">Vielen Dank! Feedback gesendet</string>
+    <string name="brokenSitesCategoriesTitle">Beschreiben Sie, was passiert ist:</string>
+    <string name="brokenSitesCategoriesHint">Beschreiben, was passiert ist</string>
+    <string name="brokenSiteSubmitButton">Bericht senden</string>
+    <string name="brokenSiteDescription">Das Senden eines anonymen Berichts über fehlerhafte Websites hilft uns, diese Probleme zu beheben und die App zu verbessern.</string>
+
+    <string name="brokenSiteCategoryImages">Bilder wurden nicht geladen</string>
+    <string name="brokenSiteCategoryPaywall">Die Seite hat mich aufgefordert, zu deaktivieren</string>
+    <string name="brokenSiteCategoryComments">Kommentare wurden nicht geladen</string>
+    <string name="brokenSiteCategoryVideos">Video wurde nicht abgespielt</string>
+    <string name="brokenSiteCategoryLinks">Links oder Schaltflächen funktionieren nicht</string>
+    <string name="brokenSiteCategoryContent">Inhalt fehlt</string>
+    <string name="brokenSiteCategoryLogin">Ich kann mich nicht anmelden</string>
+    <string name="brokenSiteCategoryUnsupported">Der Browser ist nicht kompatibel</string>
+    <string name="brokenSiteCategoryOther">Etwas anderes</string>
 
     <!-- Bookmarks Activity -->
     <string name="bookmarksMenuTitle">Lesezeichen</string>

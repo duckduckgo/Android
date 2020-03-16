@@ -201,6 +201,20 @@
     <string name="brokenSiteReportBrokenSiteMenuItem">Rapportera skadad webbplats</string>
     <string name="brokenSiteHeading">Rapportera skadad webbplats</string>
     <string name="brokenSiteSubmitted">Tack! Återkopplingen har skickats</string>
+    <string name="brokenSitesCategoriesTitle">Berätta vad som hände:</string>
+    <string name="brokenSitesCategoriesHint">Berätta vad som hände:</string>
+    <string name="brokenSiteSubmitButton">Skicka anmälan</string>
+    <string name="brokenSiteDescription">Om du skickar in en anonym anmälan om att webbplatsen inte fungerar hjälper det oss att åtgärda problemet och förbättra appen.</string>
+
+    <string name="brokenSiteCategoryImages">Bilderna kunde inte laddas</string>
+    <string name="brokenSiteCategoryPaywall">Webbplatsen bad mig att avaktivera</string>
+    <string name="brokenSiteCategoryComments">Inlägg kunde inte laddas</string>
+    <string name="brokenSiteCategoryVideos">Videon kunde inte spelas upp</string>
+    <string name="brokenSiteCategoryLinks">Länkar eller knappar fungerar inte</string>
+    <string name="brokenSiteCategoryContent">Innehåll saknas</string>
+    <string name="brokenSiteCategoryLogin">Jag kan inte logga in</string>
+    <string name="brokenSiteCategoryUnsupported">Webbläsaren är inte kompatibel</string>
+    <string name="brokenSiteCategoryOther">Övrigt</string>
 
     <!-- Bookmarks Activity -->
     <string name="bookmarksMenuTitle">Bokmärken</string>

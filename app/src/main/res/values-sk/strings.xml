@@ -186,6 +186,20 @@
     <string name="brokenSiteReportBrokenSiteMenuItem">Nahlásiť nefunkčný web</string>
     <string name="brokenSiteHeading">Nahláste nefunkčný web</string>
     <string name="brokenSiteSubmitted">Ďakujeme! Spätná väzba bola odoslaná</string>
+    <string name="brokenSitesCategoriesTitle">Popíšte, čo sa stalo:</string>
+    <string name="brokenSitesCategoriesHint">Popíšte, čo sa stalo</string>
+    <string name="brokenSiteSubmitButton">Odoslať správu</string>
+    <string name="brokenSiteDescription">Odoslaním anonymného hlásenia o nefunkčnom webe nám pomôžete tieto problémy odstrániť a vylepšiť aplikáciu.</string>
+
+    <string name="brokenSiteCategoryImages">Obrázky sa nepodarilo načítať</string>
+    <string name="brokenSiteCategoryPaywall">Táto stránka ma požiadala o deaktiváciu</string>
+    <string name="brokenSiteCategoryComments">Komentáre nepodarilo načítať</string>
+    <string name="brokenSiteCategoryVideos">Video sa neprehráva</string>
+    <string name="brokenSiteCategoryLinks">Odkazy alebo tlačidlá nefungujú</string>
+    <string name="brokenSiteCategoryContent">Chýba obsah</string>
+    <string name="brokenSiteCategoryLogin">Nemôžem sa prihlásiť</string>
+    <string name="brokenSiteCategoryUnsupported">Prehliadač je nekompatibilný</string>
+    <string name="brokenSiteCategoryOther">Niečo iné</string>
 
     <!-- Bookmarks Activity -->
     <string name="bookmarksMenuTitle">Záložky</string>

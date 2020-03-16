@@ -189,6 +189,20 @@
     <string name="brokenSiteReportBrokenSiteMenuItem">Pranešti apie neveikiančią svetainę</string>
     <string name="brokenSiteHeading">Pranešti apie neveikiančią svetainę</string>
     <string name="brokenSiteSubmitted">Dėkojame! Atsiliepimas pateiktas</string>
+    <string name="brokenSitesCategoriesTitle">Aprašykite, kas atsitiko:</string>
+    <string name="brokenSitesCategoriesHint">Aprašykite, kas atsitiko</string>
+    <string name="brokenSiteSubmitButton">Siųsti ataskaitą</string>
+    <string name="brokenSiteDescription">Pateikdami anoniminę sugadintos svetainės ataskaitą, galime padėti išspręsti šias problemas ir patobulinti programėlę.</string>
+
+    <string name="brokenSiteCategoryImages">Vaizdai neįkelti</string>
+    <string name="brokenSiteCategoryPaywall">Svetainė paprašė manęs išjungti</string>
+    <string name="brokenSiteCategoryComments">Komentarai nebuvo įkelti</string>
+    <string name="brokenSiteCategoryVideos">Vaizdo įrašas nebuvo paleistas</string>
+    <string name="brokenSiteCategoryLinks">Nuorodos ar mygtukai neveikia</string>
+    <string name="brokenSiteCategoryContent">Trūksta turinio</string>
+    <string name="brokenSiteCategoryLogin">Negaliu prisijungti</string>
+    <string name="brokenSiteCategoryUnsupported">Naršyklė nesuderinama</string>
+    <string name="brokenSiteCategoryOther">Kažkas kito</string>
 
     <!-- Bookmarks Activity -->
     <string name="bookmarksMenuTitle">Žymelės</string>

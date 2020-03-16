@@ -185,6 +185,20 @@
     <string name="brokenSiteReportBrokenSiteMenuItem">Ilmoita viallisesta sivustosta</string>
     <string name="brokenSiteHeading">Ilmoita viallisesta sivustosta</string>
     <string name="brokenSiteSubmitted">Kiitos! Palaute lähetetty</string>
+    <string name="brokenSitesCategoriesTitle">Kuvaile mitä tapahtui:</string>
+    <string name="brokenSitesCategoriesHint">Kuvaile mitä tapahtui</string>
+    <string name="brokenSiteSubmitButton">Lähetä raportti</string>
+    <string name="brokenSiteDescription">Anonyymin raportin lähettäminen toimimattomasta sivustosta auttaa meitä korjaamaan nämä ongelmat ja parantamaan sovellusta.</string>
+
+    <string name="brokenSiteCategoryImages">Kuvat eivät latautuneet</string>
+    <string name="brokenSiteCategoryPaywall">Sivusto pyysi minua poistamaan käytöstä</string>
+    <string name="brokenSiteCategoryComments">Kommentit eivät latautuneet</string>
+    <string name="brokenSiteCategoryVideos">Videoita ei toistettu</string>
+    <string name="brokenSiteCategoryLinks">Linkit tai painikkeet eivät toimineet</string>
+    <string name="brokenSiteCategoryContent">Sisältöä puuttuu</string>
+    <string name="brokenSiteCategoryLogin">En pysty kirjautumaan sisään</string>
+    <string name="brokenSiteCategoryUnsupported">Selain ei ole yhteensopiva</string>
+    <string name="brokenSiteCategoryOther">Jotain muuta</string>
 
     <!-- Bookmarks Activity -->
     <string name="bookmarksMenuTitle">Kirjanmerkit</string>
@@ -382,4 +396,5 @@
     <string name="hideTipsTitle">Piilotetaanko jäljellä olevat vinkit?</string>
     <string name="hideTipsText">Niitä on vain pari, ja yritimme tehdä niistä informatiivisia.</string>
     <string name="hideTipsButton">Piilota vinkit ikuisesti</string>
+
 </resources>

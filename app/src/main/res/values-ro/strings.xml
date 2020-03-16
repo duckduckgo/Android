@@ -189,6 +189,20 @@
     <string name="brokenSiteReportBrokenSiteMenuItem">Raportare site defect</string>
     <string name="brokenSiteHeading">Raportare site defect</string>
     <string name="brokenSiteSubmitted">Vă mulțumim! Feedback trimis</string>
+    <string name="brokenSitesCategoriesTitle">Descrie ce s-a întâmplat:</string>
+    <string name="brokenSitesCategoriesHint">Descrie ce s-a întâmplat</string>
+    <string name="brokenSiteSubmitButton">Trimite Raportul</string>
+    <string name="brokenSiteDescription">Trimiterea unui raport anonim al unui site care nu funcționează ne ajută să corectăm aceste probleme și să îmbunătățim aplicația.</string>
+
+    <string name="brokenSiteCategoryImages">Imaginile nu s-au încărcat</string>
+    <string name="brokenSiteCategoryPaywall">Site-ul mi-a cerut să dezactivez</string>
+    <string name="brokenSiteCategoryComments">Comentariile nu s-au încărcat</string>
+    <string name="brokenSiteCategoryVideos">Videoclipul nu s-a redat</string>
+    <string name="brokenSiteCategoryLinks">Linkurile sau butoanele nu funcționează</string>
+    <string name="brokenSiteCategoryContent">Conținutul lipsește</string>
+    <string name="brokenSiteCategoryLogin">Nu mă pot autentifica</string>
+    <string name="brokenSiteCategoryUnsupported">Browserul este incompatibil</string>
+    <string name="brokenSiteCategoryOther">Altceva</string>
 
     <!-- Bookmarks Activity -->
     <string name="bookmarksMenuTitle">Semne de carte</string>

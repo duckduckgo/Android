@@ -185,6 +185,20 @@
     <string name="brokenSiteReportBrokenSiteMenuItem">Rapporter ødelagt websted</string>
     <string name="brokenSiteHeading">Rapporter et ødelagt websted</string>
     <string name="brokenSiteSubmitted">Mange tak! Feedback sendt</string>
+    <string name="brokenSitesCategoriesTitle">Beskriv hvad der skete:</string>
+    <string name="brokenSitesCategoriesHint">Beskriv hvad der skete</string>
+    <string name="brokenSiteSubmitButton">Send rapport</string>
+    <string name="brokenSiteDescription">Indsendelse af en anonym webstedsrapport om brud hjælper os med at debugge disse problemer og forbedre appen.</string>
+
+    <string name="brokenSiteCategoryImages">Billeder blev ikke indlæst</string>
+    <string name="brokenSiteCategoryPaywall">Webstedet bad mig om at deaktivere</string>
+    <string name="brokenSiteCategoryComments">Kommentarer blev ikke indlæst</string>
+    <string name="brokenSiteCategoryVideos">Videoen blev ikke spillet</string>
+    <string name="brokenSiteCategoryLinks">Links eller knapper fungerer ikke</string>
+    <string name="brokenSiteCategoryContent">Indhold mangler </string>
+    <string name="brokenSiteCategoryLogin">Jeg kan ikke logge ind</string>
+    <string name="brokenSiteCategoryUnsupported">Browseren er inkompatibel</string>
+    <string name="brokenSiteCategoryOther">Noget andet</string>
 
     <!-- Bookmarks Activity -->
     <string name="bookmarksMenuTitle">Bogmærker</string>

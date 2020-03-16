@@ -202,11 +202,6 @@
     <!-- Broken Site Activity -->
     <string name="brokenSiteReportBrokenSiteMenuItem">Teatage katkisest saidist</string>
     <string name="brokenSiteHeading">Teatage katkisest saidist</string>
-    <string name="brokenSiteModalDescription">Katkisest saidist teatamine on täiesti anonüümne ja aitab meil rakendust täiustada!</string>
-    <string name="brokenSiteUrlHint">Sisestage URL</string>
-    <string name="brokenSiteDomainLabel">Katkise saidi domeen:</string>
-    <string name="brokenSiteMessageHint">Milline sisu või funktsioon probleemi põhjustab?</string>
-    <string name="brokenSiteSubmitButton">Esitage tagasiside</string>
     <string name="brokenSiteSubmitted">Aitäh! Tagasiside on esitatud</string>
 
     <!-- Bookmarks Activity -->

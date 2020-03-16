@@ -193,6 +193,20 @@
     <string name="brokenSiteReportBrokenSiteMenuItem">Zgłoś wadliwą stronę</string>
     <string name="brokenSiteHeading">Zgłoś wadliwą stronę</string>
     <string name="brokenSiteSubmitted">Dziękujemy! Informacje zostały przekazane</string>
+    <string name="brokenSitesCategoriesTitle">Opisz, co się stało:</string>
+    <string name="brokenSitesCategoriesHint">Opisz co się stało</string>
+    <string name="brokenSiteSubmitButton">Wyślij raport</string>
+    <string name="brokenSiteDescription">Przesłanie anonimowego raportu o uszkodzonej witrynie pomaga nam debugować te problemy i ulepszać aplikację.</string>
+
+    <string name="brokenSiteCategoryImages">Obrazy nie zostały załadowane</string>
+    <string name="brokenSiteCategoryPaywall">Witryna poprosiła mnie o wyłączenie</string>
+    <string name="brokenSiteCategoryComments">Komentarze nie zostały załadowane</string>
+    <string name="brokenSiteCategoryVideos">Film nie został odtworzony</string>
+    <string name="brokenSiteCategoryLinks">Linki lub przyciski nie działają</string>
+    <string name="brokenSiteCategoryContent">Brakuje treści</string>
+    <string name="brokenSiteCategoryLogin">Nie mogę się zalogować</string>
+    <string name="brokenSiteCategoryUnsupported">Przeglądarka jest niezgodna</string>
+    <string name="brokenSiteCategoryOther">Coś innego</string>
 
     <!-- Bookmarks Activity -->
     <string name="bookmarksMenuTitle">Zakładki</string>
