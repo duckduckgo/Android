@@ -74,7 +74,7 @@ class NotificationSchedulerTest {
     }
 
     @Test
-    fun whenPrivacyNotificationCleatDataAndSearchPromptCanShowThenPrivacyNotificationScheduled() = runBlocking<Unit> {
+    fun whenPrivacyNotificationClearDataAndSearchPromptCanShowThenPrivacyNotificationScheduled() = runBlocking<Unit> {
         whenever(privacyNotification.canShow()).thenReturn(true)
         whenever(clearNotification.canShow()).thenReturn(true)
         whenever(searchPromptNotification.canShow()).thenReturn(true)
@@ -85,7 +85,7 @@ class NotificationSchedulerTest {
     }
 
     @Test
-    fun whenPrivacyNotificationCanShowButCleatDataAndSearchPromptCannotThenPrivacyNotificationScheduled() = runBlocking<Unit> {
+    fun whenPrivacyNotificationCanShowButClearDataAndSearchPromptCannotThenPrivacyNotificationScheduled() = runBlocking<Unit> {
         whenever(privacyNotification.canShow()).thenReturn(true)
         whenever(clearNotification.canShow()).thenReturn(false)
         whenever(searchPromptNotification.canShow()).thenReturn(false)
@@ -96,7 +96,7 @@ class NotificationSchedulerTest {
     }
 
     @Test
-    fun whenPrivacyNotificationAndSearchPromptCanShowButCleatDataCannotThenPrivacyNotificationScheduled() = runBlocking<Unit> {
+    fun whenPrivacyNotificationAndSearchPromptCanShowButClearDataCannotThenPrivacyNotificationScheduled() = runBlocking<Unit> {
         whenever(privacyNotification.canShow()).thenReturn(true)
         whenever(clearNotification.canShow()).thenReturn(false)
         whenever(searchPromptNotification.canShow()).thenReturn(true)
