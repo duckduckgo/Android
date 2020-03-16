@@ -123,8 +123,11 @@ class SettingsViewModel @Inject constructor(
         settingsDataStore.searchNotificationEnabled = enabled
         if (enabled){
             notificationScheduler.launchStickySearchNotification()
+            pixel.fire(QUICK_SEARCH_NOTIFICATION_ENABLED)
+
         } else {
             notificationScheduler.dismissStickySearchNotification()
+            pixel.fire(QUICK_SEARCH_NOTIFICATION_DISABLED)
         }
         viewState.value = currentViewState().copy(searchNotificationEnabled = enabled)
     }

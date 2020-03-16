@@ -232,6 +232,7 @@ class SettingsViewModelTest {
         testee.onSearchNotificationSettingChanged(true)
         verify(mockAppSettingsDataStore).searchNotificationEnabled = true
         verify(notificationScheduler).launchStickySearchNotification()
+        verify(mockPixel).fire(Pixel.PixelName.QUICK_SEARCH_NOTIFICATION_ENABLED)
 
         assertTrue(latestViewState().searchNotificationEnabled)
     }
@@ -241,6 +242,7 @@ class SettingsViewModelTest {
         testee.onSearchNotificationSettingChanged(false)
         verify(mockAppSettingsDataStore).searchNotificationEnabled = false
         verify(notificationScheduler).dismissStickySearchNotification()
+        verify(mockPixel).fire(Pixel.PixelName.QUICK_SEARCH_NOTIFICATION_DISABLED)
 
         assertFalse(latestViewState().searchNotificationEnabled)
     }

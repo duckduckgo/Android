@@ -32,6 +32,8 @@ import com.duckduckgo.app.notification.db.NotificationDao
 import com.duckduckgo.app.notification.model.Notification
 import com.duckduckgo.app.notification.model.SchedulableNotification
 import com.duckduckgo.app.notification.model.SearchNotification
+import com.duckduckgo.app.notification.model.SearchPromptNotification
+import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.NOTIFICATION_SHOWN
 import timber.log.Timber
@@ -216,19 +218,10 @@ class AndroidNotificationScheduler(
         lateinit var manager: NotificationManagerCompat
         lateinit var notificationDao: NotificationDao
         lateinit var notification: SearchNotification
-        lateinit var pixel: Pixel
 
         override suspend fun doWork(): Result {
-
             val specification = notification.buildSpecification()
-
-            val intent = Intent(context, NotificationHandlerService::class.java)
-            intent.type = NotificationHandlerService.NotificationEvent.QUICK_SEARCH_REMOVE
-            intent.putExtra(PIXEL_SUFFIX_EXTRA, specification.pixelSuffix)
-            intent.putExtra(NOTIFICATION_SYSTEM_ID_EXTRA, specification.systemId)
-            intent.putExtra(NOTIFICATION_AUTO_CANCEL, specification.autoCancel)
-            context.startService(intent)
-
+            manager.cancel(specification.systemId)
             return Result.success()
         }
     }

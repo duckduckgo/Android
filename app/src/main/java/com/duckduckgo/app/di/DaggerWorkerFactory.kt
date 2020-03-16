@@ -63,7 +63,7 @@ class DaggerWorkerFactory(
             is PrivacyNotificationWorker -> injectPrivacyNotificationWorker(instance)
             is SearchPromptNotificationWorker -> injectSearchPromptNotificationWorker(instance)
             is StickySearchNotificationWorker -> injectStickySearchNotificationWorker(instance)
-            is DismissSearchNotificationWorker -> injecDismissSearchNotificationWorker(instance)
+            is DismissSearchNotificationWorker -> injectDismissSearchNotificationWorker(instance)
             else -> Timber.i("No injection required for worker $workerClassName")
         }
 
@@ -111,10 +111,9 @@ class DaggerWorkerFactory(
         worker.notification = stickySearchNotification
     }
 
-    private fun injecDismissSearchNotificationWorker(worker: DismissSearchNotificationWorker) {
+    private fun injectDismissSearchNotificationWorker(worker: DismissSearchNotificationWorker) {
         worker.manager = notificationManager
         worker.notificationDao = notificationDao
-        worker.pixel = pixel
         worker.notification = stickySearchNotification
     }
 }
