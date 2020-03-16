@@ -43,8 +43,6 @@ class SearchPromptNotification(
 
     override val layoutId = R.layout.search_notification_prompt
 
-    override val priority = NotificationManagerCompat.IMPORTANCE_HIGH
-
     override suspend fun canShow(): Boolean {
 
         val variant = variantManager.getVariant()
