@@ -76,8 +76,8 @@ class NotificationFactory @Inject constructor(val context: Context, val manager:
             .setVisibility(NotificationCompat.VISIBILITY_SECRET)
             .setAutoCancel(false)
             .setOnlyAlertOnce(true)
-            .addAction(specification.icon, specification.launchButton, launchIntent)
-            .addAction(specification.icon, specification.closeButton, cancelIntent)
+            .addAction(R.drawable.ic_add_24dp, specification.launchButton, launchIntent)
+            .addAction(R.drawable.ic_close_24dp, specification.closeButton, cancelIntent)
         return builder.build()
     }
 
