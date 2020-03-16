@@ -109,7 +109,7 @@ class SettingsActivity : DuckDuckGoActivity(), SettingsAutomaticallyClearWhatFra
                 searchNotificationToggle.quietlySetIsChecked(it.searchNotificationEnabled, searchNotificationToggleListener)
                 updateDefaultBrowserViewVisibility(it)
                 updateAutomaticClearDataOptions(it.automaticallyClearData)
-                maybeEnableExperiment(it.searchNotificationExperimentEnabled)
+                showSearchNotificationToggle(it.showSearchNotificationToggle)
             }
         })
 
@@ -129,7 +129,7 @@ class SettingsActivity : DuckDuckGoActivity(), SettingsAutomaticallyClearWhatFra
         automaticallyClearWhenSetting.isEnabled = whenOptionEnabled
     }
 
-    private fun maybeEnableExperiment(enabled: Boolean) {
+    private fun showSearchNotificationToggle(enabled: Boolean) {
         if (enabled) {
             searchNotificationToggle.show()
             searchNotificationToggle.setOnCheckedChangeListener(searchNotificationToggleListener)

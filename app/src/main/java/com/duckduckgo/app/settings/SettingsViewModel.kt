@@ -47,7 +47,7 @@ class SettingsViewModel @Inject constructor(
         val version: String = "",
         val lightThemeEnabled: Boolean = false,
         val autoCompleteSuggestionsEnabled: Boolean = true,
-        val searchNotificationExperimentEnabled: Boolean = false,
+        val showSearchNotificationToggle: Boolean = false,
         val searchNotificationEnabled: Boolean = false,
         val showDefaultBrowserSetting: Boolean = false,
         val isAppDefaultBrowser: Boolean = false,
@@ -89,7 +89,7 @@ class SettingsViewModel @Inject constructor(
             loading = false,
             lightThemeEnabled = isLightTheme,
             autoCompleteSuggestionsEnabled = settingsDataStore.autoCompleteSuggestionsEnabled,
-            searchNotificationExperimentEnabled = isSearchNotificationExperimentEnabled(variant),
+            showSearchNotificationToggle = isSearchNotificationFeatureEnabled(variant),
             searchNotificationEnabled = settingsDataStore.searchNotificationEnabled,
             isAppDefaultBrowser = defaultBrowserAlready,
             showDefaultBrowserSetting = defaultWebBrowserCapability.deviceSupportsDefaultBrowserConfiguration(),
@@ -199,7 +199,7 @@ class SettingsViewModel @Inject constructor(
         }
     }
 
-    private fun isSearchNotificationExperimentEnabled(variant: Variant): Boolean {
+    private fun isSearchNotificationFeatureEnabled(variant: Variant): Boolean {
         return variant.hasFeature(VariantManager.VariantFeature.StickySearchNotification)
     }
 
