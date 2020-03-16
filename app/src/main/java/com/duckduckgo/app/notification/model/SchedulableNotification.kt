@@ -29,7 +29,6 @@ interface SchedulableNotification {
 interface SearchNotification {
     val id: String
     val layoutId: Int
-    val priority: Int
     val pressIntent: String
     val launchIntent: String
     val cancelIntent: String

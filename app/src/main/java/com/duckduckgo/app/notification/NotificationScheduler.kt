@@ -177,7 +177,7 @@ class AndroidNotificationScheduler(
                     cancelIntent,
                     pressIntent,
                     notification.layoutId,
-                    notification.priority
+                    specification.channel.priority
                 )
 
             notificationDao.insert(Notification(notification.id))
@@ -204,7 +204,7 @@ class AndroidNotificationScheduler(
             val cancelIntent = NotificationHandlerService.pendingNotificationHandlerIntent(context, notification.cancelIntent, specification)
 
             val systemNotification =
-                factory.createSearchNotification(specification, launchIntent, cancelIntent, notification.layoutId, notification.priority)
+                factory.createSearchNotification(specification, launchIntent, cancelIntent, notification.layoutId, specification.channel.priority)
 
             notificationDao.insert(Notification(notification.id))
             manager.notify(NotificationRegistrar.NotificationId.StickySearch, systemNotification)

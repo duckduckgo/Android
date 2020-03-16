@@ -67,7 +67,7 @@ interface VariantManager {
             // Insert CTAs on Concept test experiment
             Variant(
                 key = "mj",
-                weight = 1.0,
+                weight = 0.0,
                 features = listOf(ConceptTest, SuppressOnboardingDefaultBrowserContinueScreen),
                 filterBy = { isEnglishLocale() }),
             Variant(
@@ -85,7 +85,7 @@ interface VariantManager {
             // Quick Search Notification Experiment
             Variant(
                 key = "mf",
-                weight = 0.0,
+                weight = 1.0,
                 features = emptyList(),
                 filterBy = { isEnglishLocale() }),
             Variant(

@@ -30,14 +30,14 @@ class VariantManagerTest {
     // SERP Experiment(s)
 
     @Test
-    fun serpControlVariantIsInactiveAndHasNoFeatures() {
+    fun serpControlVariantIsActiveAndHasNoFeatures() {
         val variant = variants.first { it.key == "sc" }
         assertEqualsDouble(1.0, variant.weight)
         assertEquals(0, variant.features.size)
     }
 
     @Test
-    fun serpExperimentalVariantIsInactiveAndHasNoFeatures() {
+    fun serpExperimentalVariantIsActiveAndHasNoFeatures() {
         val variant = variants.first { it.key == "se" }
         assertEqualsDouble(1.0, variant.weight)
         assertEquals(0, variant.features.size)
@@ -74,16 +74,16 @@ class VariantManagerTest {
     // CTA on Concept Test experiments
 
     @Test
-    fun insertCtaConceptTestControlVariantIsActiveAndHasConceptTestAndHasExpectedFeatures() {
+    fun insertCtaConceptTestControlVariantIsInactiveAndHasConceptTestAndHasExpectedFeatures() {
         val variant = variants.first { it.key == "mj" }
-        assertEqualsDouble(1.0, variant.weight)
+        assertEqualsDouble(0.0, variant.weight)
         assertEquals(2, variant.features.size)
         assertTrue(variant.hasFeature(ConceptTest))
         assertTrue(variant.hasFeature(SuppressOnboardingDefaultBrowserContinueScreen))
     }
 
     @Test
-    fun insertCtaConceptTestWithCtasAsDaxDialogsExperimentalVariantIsActiveAndHasExpectedFeatures() {
+    fun insertCtaConceptTestWithCtasAsDaxDialogsExperimentalVariantIsInactiveAndHasExpectedFeatures() {
         val variant = variants.first { it.key == "mh" }
         assertEqualsDouble(0.0, variant.weight)
         assertEquals(5, variant.features.size)
@@ -97,9 +97,9 @@ class VariantManagerTest {
     // Search Notification Experiment
 
     @Test
-    fun searchNotificationControlVariantIsInactive() {
+    fun searchNotificationControlVariantIsActiveAndHasNoFeatures() {
         val variant = variants.first { it.key == "mf" }
-        assertEqualsDouble(0.0, variant.weight)
+        assertEqualsDouble(1.0, variant.weight)
         assertEquals(0, variant.features.size)
     }
 
