@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-
 @file:Suppress("RemoveExplicitTypeArguments")
 
 package com.duckduckgo.app.notification
@@ -23,9 +22,7 @@ import androidx.test.platform.app.InstrumentationRegistry
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import com.duckduckgo.app.CoroutineTestRule
-import com.duckduckgo.app.notification.AndroidNotificationScheduler.ClearDataNotificationWorker
-import com.duckduckgo.app.notification.AndroidNotificationScheduler.PrivacyNotificationWorker
-import com.duckduckgo.app.notification.AndroidNotificationScheduler.SearchPromptNotificationWorker
+import com.duckduckgo.app.notification.AndroidNotificationScheduler.*
 import com.duckduckgo.app.notification.model.SchedulableNotification
 import com.duckduckgo.app.notification.model.SearchNotification
 import com.duckduckgo.app.statistics.VariantManager
@@ -69,7 +66,7 @@ class NotificationSchedulerTest {
     }
 
     @After
-    fun resetWorkers(){
+    fun resetWorkers() {
         workManager.cancelAllWorkByTag(AndroidNotificationScheduler.CONTINUOUS_APP_USE_REQUEST_TAG)
     }
 
