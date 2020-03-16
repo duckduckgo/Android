@@ -31,23 +31,22 @@
             android:id="@+id/logo"
             android:layout_width="26dp"
             android:layout_height="26dp"
-            android:layout_marginStart="24dp"
-            android:layout_marginEnd="8dp"
             android:layout_alignParentStart="true"
             android:layout_centerVertical="true"
+            android:layout_marginStart="24dp"
+            android:layout_marginEnd="8dp"
             android:src="@drawable/logo_mini" />
 
         <ImageView
             android:id="@+id/search"
             android:layout_width="32dp"
             android:layout_height="32dp"
-            android:layout_marginStart="12dp"
-            android:layout_marginEnd="24dp"
             android:layout_alignParentEnd="true"
             android:layout_centerVertical="true"
+            android:layout_marginStart="12dp"
+            android:layout_marginEnd="24dp"
             android:src="@drawable/ic_widget_loupe_gunmetal_24dp" />
 
     </RelativeLayout>
-
 
 </FrameLayout>
