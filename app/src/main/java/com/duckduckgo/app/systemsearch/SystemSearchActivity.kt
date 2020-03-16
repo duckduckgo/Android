@@ -268,10 +268,17 @@ class SystemSearchActivity : DuckDuckGoActivity() {
         const val WIDGET_SEARCH_EXTRA = "WIDGET_SEARCH_EXTRA"
         const val NEW_SEARCH_ACTION = "com.duckduckgo.mobile.android.NEW_SEARCH"
 
-        fun intent(context: Context, widgetSearch: Boolean = false, notificationSearch: Boolean = false): Intent {
+        fun fromWidget(context: Context): Intent {
             val intent = Intent(context, SystemSearchActivity::class.java)
-            intent.putExtra(WIDGET_SEARCH_EXTRA, widgetSearch)
-            intent.putExtra(NOTIFICATION_SEARCH_EXTRA, notificationSearch)
+            intent.putExtra(WIDGET_SEARCH_EXTRA, true)
+            intent.putExtra(NOTIFICATION_SEARCH_EXTRA, false)
+            return intent
+        }
+
+        fun fromNotification(context: Context): Intent {
+            val intent = Intent(context, SystemSearchActivity::class.java)
+            intent.putExtra(WIDGET_SEARCH_EXTRA, false)
+            intent.putExtra(NOTIFICATION_SEARCH_EXTRA, true)
             return intent
         }
     }

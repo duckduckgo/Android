@@ -121,7 +121,7 @@ class NotificationHandlerService : IntentService("NotificationHandlerService") {
 
     private fun onQuickSearchPromptRequest() {
         Timber.i("Search from Prompt Notification Requested!")
-        val searchIntent = SystemSearchActivity.intent(context)
+        val searchIntent = SystemSearchActivity.fromNotification(context)
         TaskStackBuilder.create(context)
             .addNextIntentWithParentStack(searchIntent)
             .startActivities()
@@ -130,7 +130,7 @@ class NotificationHandlerService : IntentService("NotificationHandlerService") {
 
     private fun onQuickSearchRequest() {
         Timber.i("Search from Notification Requested!")
-        val searchIntent = SystemSearchActivity.intent(context)
+        val searchIntent = SystemSearchActivity.fromNotification(context)
         TaskStackBuilder.create(context)
             .addNextIntentWithParentStack(searchIntent)
             .startActivities()
