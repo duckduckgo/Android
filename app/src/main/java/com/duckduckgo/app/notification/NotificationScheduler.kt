@@ -20,7 +20,6 @@ import android.app.PendingIntent
 import android.app.PendingIntent.getService
 import android.content.Context
 import android.content.Intent
-import androidx.annotation.VisibleForTesting
 import androidx.annotation.WorkerThread
 import androidx.core.app.NotificationManagerCompat
 import androidx.work.CoroutineWorker
@@ -36,7 +35,6 @@ import com.duckduckgo.app.notification.model.Notification
 import com.duckduckgo.app.notification.model.NotificationSpec
 import com.duckduckgo.app.notification.model.SchedulableNotification
 import com.duckduckgo.app.notification.model.SearchNotification
-import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.NOTIFICATION_SHOWN
 import timber.log.Timber
@@ -176,7 +174,14 @@ class AndroidNotificationScheduler(
             val pressIntent = pendingNotificationHandlerIntent(context, notification.pressIntent, specification)
 
             val systemNotification =
-                factory.createSearchNotificationPrompt(specification, launchIntent, cancelIntent, pressIntent, notification.layoutId, notification.priority)
+                factory.createSearchNotificationPrompt(
+                    specification,
+                    launchIntent,
+                    cancelIntent,
+                    pressIntent,
+                    notification.layoutId,
+                    notification.priority
+                )
 
             notificationDao.insert(Notification(notification.id))
             manager.notify(NotificationRegistrar.NotificationId.StickySearch, systemNotification)
@@ -195,10 +200,7 @@ class AndroidNotificationScheduler(
         }
     }
 
-
-    class StickySearchNotificationWorker(context: Context, params: WorkerParameters) : SearchNotificationWorker(context, params)
-
-    open class SearchNotificationWorker(val context: Context, params: WorkerParameters) : CoroutineWorker(context, params) {
+    class StickySearchNotificationWorker(val context: Context, params: WorkerParameters) : CoroutineWorker(context, params) {
 
         lateinit var manager: NotificationManagerCompat
         lateinit var factory: NotificationFactory
