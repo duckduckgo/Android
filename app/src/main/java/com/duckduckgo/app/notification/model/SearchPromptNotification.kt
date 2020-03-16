@@ -72,7 +72,7 @@ class SearchPromptNotification(
 }
 
 class StickySearchPromptSpecification(context: Context) : NotificationSpec {
-    override val channel = NotificationRegistrar.ChannelType.TUTORIALS
+    override val channel = NotificationRegistrar.ChannelType.SEARCH
     override val systemId = NotificationRegistrar.NotificationId.StickySearch
     override val name = "Add sticky search notification"
     override val icon = R.drawable.notification_logo
