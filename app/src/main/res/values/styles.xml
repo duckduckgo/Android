@@ -325,15 +325,15 @@
         <item name="android:layout_marginTop">9dp</item>
     </style>
 
-    <style name="DDGButton" parent="@style/Widget.MaterialComponents.Button">
-        <item name="android:backgroundTint">@color/material_button_background</item>
-        <item name="android:textColor">@color/material_button_text</item>
+    <style name="BrokenSitesButton" parent="@style/Widget.MaterialComponents.Button">
+        <item name="backgroundTint">@color/broken_sites_button_background</item>
+        <item name="android:textColor">@color/broken_sites_button_text</item>
         <item name="rippleColor">?attr/daxDialogSecondaryButtonRippleColor</item>
         <item name="android:textAllCaps">false</item>
-        <item name="android:textAppearance">@style/DDGTextAppearance</item>
+        <item name="android:textAppearance">@style/BrokenSitesButtonTextAppearance</item>
     </style>
 
-    <style name="DDGTextAppearance" parent="@style/TextAppearance.MaterialComponents.Button">
+    <style name="BrokenSitesButtonTextAppearance" parent="@style/TextAppearance.MaterialComponents.Button">
         <item name="android:letterSpacing">0.0</item>
     </style>
 

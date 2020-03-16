@@ -61,7 +61,7 @@
             android:layout_marginEnd="18dp"
             app:layout_constraintEnd_toEndOf="@+id/textInputLayout"
             app:layout_constraintTop_toTopOf="@id/textInputLayout"
-            app:srcCompat="@drawable/ic_down_arrow" />
+            app:srcCompat="@drawable/ic_broken_sites_down_arrow" />
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/textInputLayout"
@@ -89,7 +89,8 @@
                 android:importantForAutofill="no"
                 android:inputType="none"
                 android:labelFor="@id/categoriesSelection"
-                android:maxLength="42"
+                android:maxLines="1"
+                android:paddingEnd="32dp"
                 android:textColor="?attr/normalTextColor"
                 android:textIsSelectable="false"
                 tools:ignore="RtlSymmetry" />
@@ -98,7 +99,7 @@
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/submitButton"
-            style="@style/DDGButton"
+            style="@style/BrokenSitesButton"
             android:layout_width="0dp"
             android:layout_height="70dp"
             android:layout_marginStart="25dp"
