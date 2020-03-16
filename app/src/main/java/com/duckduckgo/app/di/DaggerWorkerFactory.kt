@@ -23,13 +23,8 @@ import androidx.work.WorkerFactory
 import androidx.work.WorkerParameters
 import com.duckduckgo.app.fire.DataClearingWorker
 import com.duckduckgo.app.global.view.ClearDataAction
-import com.duckduckgo.app.notification.AndroidNotificationScheduler
+import com.duckduckgo.app.notification.AndroidNotificationScheduler.*
 import com.duckduckgo.app.notification.NotificationFactory
-import com.duckduckgo.app.notification.AndroidNotificationScheduler.DismissSearchNotificationWorker
-import com.duckduckgo.app.notification.AndroidNotificationScheduler.ClearDataNotificationWorker
-import com.duckduckgo.app.notification.AndroidNotificationScheduler.PrivacyNotificationWorker
-import com.duckduckgo.app.notification.AndroidNotificationScheduler.StickySearchNotificationWorker
-import com.duckduckgo.app.notification.AndroidNotificationScheduler.SearchPromptNotificationWorker
 import com.duckduckgo.app.notification.db.NotificationDao
 import com.duckduckgo.app.notification.model.ClearDataNotification
 import com.duckduckgo.app.notification.model.PrivacyProtectionNotification
@@ -122,5 +117,4 @@ class DaggerWorkerFactory(
         worker.pixel = pixel
         worker.notification = stickySearchNotification
     }
-
 }

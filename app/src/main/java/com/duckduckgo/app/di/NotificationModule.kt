@@ -29,7 +29,6 @@ import com.duckduckgo.app.notification.model.ClearDataNotification
 import com.duckduckgo.app.notification.model.PrivacyProtectionNotification
 import com.duckduckgo.app.notification.model.SearchPromptNotification
 import com.duckduckgo.app.notification.model.StickySearchNotification
-import com.duckduckgo.app.notification.model.StickySearchPromptSpecification
 import com.duckduckgo.app.privacy.db.PrivacyProtectionCountDao
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.VariantManager

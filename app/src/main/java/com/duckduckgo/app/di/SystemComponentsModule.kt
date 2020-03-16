@@ -18,11 +18,6 @@ package com.duckduckgo.app.di
 
 import android.content.Context
 import android.content.pm.PackageManager
-import androidx.work.WorkManager
-import com.duckduckgo.app.notification.AndroidNotificationScheduler
-import com.duckduckgo.app.notification.NotificationScheduler
-import com.duckduckgo.app.notification.model.SchedulableNotification
-import com.duckduckgo.app.notification.model.SearchNotification
 import com.duckduckgo.app.systemsearch.DeviceAppListProvider
 import com.duckduckgo.app.systemsearch.DeviceAppLookup
 import com.duckduckgo.app.systemsearch.InstalledDeviceAppListProvider
@@ -45,5 +40,4 @@ open class SystemComponentsModule {
     @Provides
     @Singleton
     fun deviceAppLookup(deviceAppListProvider: DeviceAppListProvider): DeviceAppLookup = InstalledDeviceAppLookup(deviceAppListProvider)
-
 }
