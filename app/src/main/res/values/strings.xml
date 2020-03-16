@@ -269,7 +269,6 @@
     <string name="notificationChannelFileDownloading">File Downloading</string>
     <string name="notificationChannelFileDownloaded">File Downloaded</string>
     <string name="notificationChannelTutorials">Tutorials</string>
-    <string name="notificationChannelSearch">Search</string>
 
     <!-- Clear Notification -->
     <string name="clearNotificationTitle">Data clearing set to manual</string>

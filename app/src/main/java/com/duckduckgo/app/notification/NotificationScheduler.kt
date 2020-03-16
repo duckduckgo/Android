@@ -16,8 +16,6 @@
 
 package com.duckduckgo.app.notification
 
-import android.app.PendingIntent
-import android.app.PendingIntent.getService
 import android.content.Context
 import android.content.Intent
 import androidx.annotation.WorkerThread
@@ -32,7 +30,6 @@ import com.duckduckgo.app.notification.NotificationHandlerService.Companion.NOTI
 import com.duckduckgo.app.notification.NotificationHandlerService.Companion.PIXEL_SUFFIX_EXTRA
 import com.duckduckgo.app.notification.db.NotificationDao
 import com.duckduckgo.app.notification.model.Notification
-import com.duckduckgo.app.notification.model.NotificationSpec
 import com.duckduckgo.app.notification.model.SchedulableNotification
 import com.duckduckgo.app.notification.model.SearchNotification
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -60,13 +57,13 @@ class AndroidNotificationScheduler(
         scheduleInactiveUserNotifications()
     }
 
-    private suspend fun scheduleActiveUserNotifications(){
-        if (searchPromptNotification.canShow()){
+    private suspend fun scheduleActiveUserNotifications() {
+        if (searchPromptNotification.canShow()) {
             scheduleNotification(OneTimeWorkRequestBuilder<SearchPromptNotificationWorker>(), 2, TimeUnit.DAYS, CONTINUOUS_APP_USE_REQUEST_TAG)
         }
     }
 
-    private suspend fun scheduleInactiveUserNotifications(){
+    private suspend fun scheduleInactiveUserNotifications() {
         workManager.cancelAllWorkByTag(UNUSED_APP_WORK_REQUEST_TAG)
 
         when {
@@ -149,7 +146,6 @@ class AndroidNotificationScheduler(
             pixel.fire("${NOTIFICATION_SHOWN.pixelName}_${specification.pixelSuffix}")
             return Result.success()
         }
-
     }
 
     class SearchPromptNotificationWorker(val context: Context, val params: WorkerParameters) : CoroutineWorker(context, params) {
@@ -213,7 +209,6 @@ class AndroidNotificationScheduler(
 
             return Result.success()
         }
-
     }
 
     class DismissSearchNotificationWorker(val context: Context, params: WorkerParameters) : CoroutineWorker(context, params) {

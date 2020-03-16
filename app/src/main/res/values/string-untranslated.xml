@@ -45,5 +45,6 @@
     <string name="stickySearchNotificationText">Quick Search in Notifications</string>
     <string name="stickySearchPromptKeep">Keep</string>
     <string name="stickySearchPromptRemove">Remove</string>
+    <string name="notificationChannelSearch">Search</string>
 
 </resources>

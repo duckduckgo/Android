@@ -69,8 +69,8 @@ class NotificationRegistrar @Inject constructor(
         )
         val SEARCH = Channel(
             "com.duckduckgo.search",
-            R.string.notificationChannelTutorials,
-            NotificationManagerCompat.IMPORTANCE_DEFAULT
+            R.string.notificationChannelSearch,
+            NotificationManagerCompat.IMPORTANCE_HIGH
         )
     }
 
