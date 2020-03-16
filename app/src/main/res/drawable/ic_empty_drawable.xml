@@ -15,4 +15,10 @@
 
   This represents and empty drawable that we only use for backwards compatibility reasons.
   -->
-<shape xmlns:android="http://schemas.android.com/apk/res/android"/>
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="oval">
+    <size
+        android:width="1dp"
+        android:height="1dp" />
+    <solid android:color="@android:color/transparent" />
+</shape>
