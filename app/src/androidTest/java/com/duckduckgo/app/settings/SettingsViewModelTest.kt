@@ -221,7 +221,7 @@ class SettingsViewModelTest {
     }
 
     @Test
-    fun whenSearchNotificationWasPreviouslyEnabledViewStateIndicatesIt() {
+    fun whenSearchNotificationWasPreviouslyEnabledThenViewStateIndicatesIt() {
         whenever(mockAppSettingsDataStore.searchNotificationEnabled).thenReturn(true)
         testee.start()
         assertTrue(latestViewState().searchNotificationEnabled)

@@ -56,7 +56,17 @@ class AndroidNotificationScheduler(
 ) : NotificationScheduler {
 
     override suspend fun scheduleNextNotification() {
+        scheduleActiveUserNotifications()
+        scheduleInactiveUserNotifications()
+    }
 
+    private suspend fun scheduleActiveUserNotifications(){
+        if (searchPromptNotification.canShow()){
+            scheduleNotification(OneTimeWorkRequestBuilder<SearchPromptNotificationWorker>(), 2, TimeUnit.DAYS, CONTINUOUS_APP_USE_REQUEST_TAG)
+        }
+    }
+
+    private suspend fun scheduleInactiveUserNotifications(){
         workManager.cancelAllWorkByTag(UNUSED_APP_WORK_REQUEST_TAG)
 
         when {
@@ -65,9 +75,6 @@ class AndroidNotificationScheduler(
             }
             clearDataNotification.canShow() -> {
                 scheduleNotification(OneTimeWorkRequestBuilder<ClearDataNotificationWorker>(), 3, TimeUnit.DAYS, UNUSED_APP_WORK_REQUEST_TAG)
-            }
-            searchPromptNotification.canShow() -> {
-                scheduleNotification(OneTimeWorkRequestBuilder<SearchPromptNotificationWorker>(), 2, TimeUnit.DAYS, CONTINUOUS_APP_USE_REQUEST_TAG)
             }
             else -> Timber.v("Notifications not enabled for this variant")
         }
