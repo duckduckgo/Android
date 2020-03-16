@@ -53,8 +53,8 @@ class AndroidNotificationScheduler(
 ) : NotificationScheduler {
 
     override suspend fun scheduleNextNotification() {
-        scheduleActiveUserNotifications()
         scheduleInactiveUserNotifications()
+        scheduleActiveUserNotifications()
     }
 
     private suspend fun scheduleActiveUserNotifications() {

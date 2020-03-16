@@ -85,7 +85,7 @@ class VariantManagerTest {
     @Test
     fun insertCtaConceptTestWithCtasAsDaxDialogsExperimentalVariantIsActiveAndHasExpectedFeatures() {
         val variant = variants.first { it.key == "mh" }
-        assertEqualsDouble(1.0, variant.weight)
+        assertEqualsDouble(0.0, variant.weight)
         assertEquals(5, variant.features.size)
         assertTrue(variant.hasFeature(ConceptTest))
         assertTrue(variant.hasFeature(SuppressHomeTabWidgetCta))
@@ -95,10 +95,11 @@ class VariantManagerTest {
     }
 
     // Search Notification Experiment
+
     @Test
     fun searchNotificationControlVariantIsInactive() {
         val variant = variants.first { it.key == "mf" }
-        assertEqualsDouble(1.0, variant.weight)
+        assertEqualsDouble(0.0, variant.weight)
         assertEquals(0, variant.features.size)
     }
 
