@@ -17,6 +17,7 @@
 package com.duckduckgo.app.notification
 
 import android.app.IntentService
+import android.app.PendingIntent
 import android.app.TaskStackBuilder
 import android.content.Context
 import android.content.Intent
@@ -30,6 +31,7 @@ import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEv
 import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEvent.QUICK_SEARCH_KEEP
 import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEvent.QUICK_SEARCH_PROMPT_LAUNCH
 import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEvent.QUICK_SEARCH_REMOVE
+import com.duckduckgo.app.notification.model.NotificationSpec
 import com.duckduckgo.app.settings.SettingsActivity
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -160,5 +162,14 @@ class NotificationHandlerService : IntentService("NotificationHandlerService") {
         const val PIXEL_SUFFIX_EXTRA = "PIXEL_SUFFIX_EXTRA"
         const val NOTIFICATION_SYSTEM_ID_EXTRA = "NOTIFICATION_SYSTEM_ID"
         const val NOTIFICATION_AUTO_CANCEL = "NOTIFICATION_AUTO_CANCEL"
+
+        fun pendingNotificationHandlerIntent(context: Context, eventType: String, specification: NotificationSpec): PendingIntent {
+            val intent = Intent(context, NotificationHandlerService::class.java)
+            intent.type = eventType
+            intent.putExtra(PIXEL_SUFFIX_EXTRA, specification.pixelSuffix)
+            intent.putExtra(NOTIFICATION_SYSTEM_ID_EXTRA, specification.systemId)
+            intent.putExtra(NOTIFICATION_AUTO_CANCEL, specification.autoCancel)
+            return PendingIntent.getService(context, 0, intent, 0)!!
+        }
     }
 }

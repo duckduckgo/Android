@@ -140,8 +140,8 @@ class AndroidNotificationScheduler(
             }
 
             val specification = notification.buildSpecification()
-            val launchIntent = pendingNotificationHandlerIntent(context, notification.launchIntent, specification)
-            val cancelIntent = pendingNotificationHandlerIntent(context, notification.cancelIntent, specification)
+            val launchIntent = NotificationHandlerService.pendingNotificationHandlerIntent(context, notification.launchIntent, specification)
+            val cancelIntent = NotificationHandlerService.pendingNotificationHandlerIntent(context, notification.cancelIntent, specification)
             val systemNotification = factory.createNotification(specification, launchIntent, cancelIntent)
             notificationDao.insert(Notification(notification.id))
             manager.notify(specification.systemId, systemNotification)
@@ -150,14 +150,6 @@ class AndroidNotificationScheduler(
             return Result.success()
         }
 
-        private fun pendingNotificationHandlerIntent(context: Context, eventType: String, specification: NotificationSpec): PendingIntent {
-            val intent = Intent(context, NotificationHandlerService::class.java)
-            intent.type = eventType
-            intent.putExtra(PIXEL_SUFFIX_EXTRA, specification.pixelSuffix)
-            intent.putExtra(NOTIFICATION_SYSTEM_ID_EXTRA, specification.systemId)
-            intent.putExtra(NOTIFICATION_AUTO_CANCEL, specification.autoCancel)
-            return getService(context, 0, intent, 0)!!
-        }
     }
 
     class SearchPromptNotificationWorker(val context: Context, val params: WorkerParameters) : CoroutineWorker(context, params) {
@@ -176,9 +168,9 @@ class AndroidNotificationScheduler(
 
             val specification = notification.buildSpecification()
 
-            val launchIntent = pendingNotificationHandlerIntent(context, notification.launchIntent, specification)
-            val cancelIntent = pendingNotificationHandlerIntent(context, notification.cancelIntent, specification)
-            val pressIntent = pendingNotificationHandlerIntent(context, notification.pressIntent, specification)
+            val launchIntent = NotificationHandlerService.pendingNotificationHandlerIntent(context, notification.launchIntent, specification)
+            val cancelIntent = NotificationHandlerService.pendingNotificationHandlerIntent(context, notification.cancelIntent, specification)
+            val pressIntent = NotificationHandlerService.pendingNotificationHandlerIntent(context, notification.pressIntent, specification)
 
             val systemNotification =
                 factory.createSearchNotificationPrompt(
@@ -196,15 +188,6 @@ class AndroidNotificationScheduler(
             pixel.fire(Pixel.PixelName.QUICK_SEARCH_PROMPT_NOTIFICATION_SHOWN)
             return Result.success()
         }
-
-        private fun pendingNotificationHandlerIntent(context: Context, eventType: String, specification: NotificationSpec): PendingIntent {
-            val intent = Intent(context, NotificationHandlerService::class.java)
-            intent.type = eventType
-            intent.putExtra(PIXEL_SUFFIX_EXTRA, specification.pixelSuffix)
-            intent.putExtra(NOTIFICATION_SYSTEM_ID_EXTRA, specification.systemId)
-            intent.putExtra(NOTIFICATION_AUTO_CANCEL, specification.autoCancel)
-            return getService(context, 0, intent, 0)!!
-        }
     }
 
     class StickySearchNotificationWorker(val context: Context, params: WorkerParameters) : CoroutineWorker(context, params) {
@@ -219,8 +202,8 @@ class AndroidNotificationScheduler(
 
             val specification = notification.buildSpecification()
 
-            val launchIntent = pendingNotificationHandlerIntent(context, notification.launchIntent, specification)
-            val cancelIntent = pendingNotificationHandlerIntent(context, notification.cancelIntent, specification)
+            val launchIntent = NotificationHandlerService.pendingNotificationHandlerIntent(context, notification.launchIntent, specification)
+            val cancelIntent = NotificationHandlerService.pendingNotificationHandlerIntent(context, notification.cancelIntent, specification)
 
             val systemNotification =
                 factory.createSearchNotification(specification, launchIntent, cancelIntent, notification.layoutId, notification.priority)
@@ -231,14 +214,6 @@ class AndroidNotificationScheduler(
             return Result.success()
         }
 
-        private fun pendingNotificationHandlerIntent(context: Context, eventType: String, specification: NotificationSpec): PendingIntent {
-            val intent = Intent(context, NotificationHandlerService::class.java)
-            intent.type = eventType
-            intent.putExtra(PIXEL_SUFFIX_EXTRA, specification.pixelSuffix)
-            intent.putExtra(NOTIFICATION_SYSTEM_ID_EXTRA, specification.systemId)
-            intent.putExtra(NOTIFICATION_AUTO_CANCEL, specification.autoCancel)
-            return getService(context, 0, intent, 0)!!
-        }
     }
 
     class DismissSearchNotificationWorker(val context: Context, params: WorkerParameters) : CoroutineWorker(context, params) {
