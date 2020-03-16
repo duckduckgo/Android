@@ -220,19 +220,16 @@ class SystemSearchActivity : DuckDuckGoActivity() {
     }
 
     private fun launchDuckDuckGo() {
-        pixel.fire(PixelName.INTERSTITIAL_LAUNCH_DAX)
         startActivity(BrowserActivity.intent(this))
         finish()
     }
 
     private fun launchBrowser(command: LaunchBrowser) {
-        pixel.fire(PixelName.INTERSTITIAL_LAUNCH_BROWSER_QUERY)
         startActivity(BrowserActivity.intent(this, command.query))
         finish()
     }
 
     private fun launchDeviceApp(command: LaunchDeviceApplication) {
-        pixel.fire(PixelName.INTERSTITIAL_LAUNCH_DEVICE_APP)
         try {
             startActivity(command.deviceApp.launchIntent)
             finish()
