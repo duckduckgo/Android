@@ -57,7 +57,7 @@ class TrackerDataDownloader @Inject constructor(
 
             Timber.d("Updating tds data from server")
             val body = response.body()!!
-            val eTag = response.headers()["eTag"]!!.removeSurrounding("W/\"", "\"") // removes weak eTag validator
+            val eTag = response.headers()["eTag"]?.removeSurrounding("W/\"", "\"").orEmpty() // removes weak eTag validator
             appDatabase.runInTransaction {
                 trackerDataLoader.persistTds(eTag, body)
                 trackerDataLoader.loadTrackers()

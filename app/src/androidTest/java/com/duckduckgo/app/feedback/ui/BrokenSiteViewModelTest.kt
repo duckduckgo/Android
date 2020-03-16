@@ -114,7 +114,7 @@ class BrokenSiteViewModelTest {
             blockedTrackers = "",
             surrogates = "",
             webViewVersion = "webViewVersion",
-            siteType = BrokenSiteViewModel.DESKTOP
+            siteType = BrokenSiteViewModel.DESKTOP_SITE
         )
 
         verify(mockPixel).fire(Pixel.PixelName.BROKEN_SITE_REPORTED, mapOf("url" to url))
@@ -128,7 +128,7 @@ class BrokenSiteViewModelTest {
         selectAndAcceptCategory()
 
         val brokenSiteExpected = testee.getBrokenSite(url, "")
-        assertEquals(BrokenSiteViewModel.DESKTOP, brokenSiteExpected.siteType)
+        assertEquals(BrokenSiteViewModel.DESKTOP_SITE, brokenSiteExpected.siteType)
     }
 
     @Test
@@ -138,7 +138,7 @@ class BrokenSiteViewModelTest {
         selectAndAcceptCategory()
 
         val brokenSiteExpected = testee.getBrokenSite(url, "")
-        assertEquals(BrokenSiteViewModel.MOBILE, brokenSiteExpected.siteType)
+        assertEquals(BrokenSiteViewModel.MOBILE_SITE, brokenSiteExpected.siteType)
     }
 
     @Test

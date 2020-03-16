@@ -21,12 +21,12 @@ import androidx.annotation.WorkerThread
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.trackerdetection.api.TdsJson
-import com.duckduckgo.app.trackerdetection.db.TdsDao
+import com.duckduckgo.app.trackerdetection.db.TdsMetadataDao
 import com.duckduckgo.app.trackerdetection.db.TdsDomainEntityDao
 import com.duckduckgo.app.trackerdetection.db.TdsEntityDao
 import com.duckduckgo.app.trackerdetection.db.TdsTrackerDao
 import com.duckduckgo.app.trackerdetection.db.TemporaryTrackingWhitelistDao
-import com.duckduckgo.app.trackerdetection.model.Tds
+import com.duckduckgo.app.trackerdetection.model.TdsMetadata
 import com.squareup.moshi.Moshi
 import timber.log.Timber
 import javax.inject.Inject
@@ -38,7 +38,7 @@ class TrackerDataLoader @Inject constructor(
     private val tdsEntityDao: TdsEntityDao,
     private val tdsDomainEntityDao: TdsDomainEntityDao,
     private val tempWhitelistDao: TemporaryTrackingWhitelistDao,
-    private val tdsDao: TdsDao,
+    private val tdsMetadataDao: TdsMetadataDao,
     private val context: Context,
     private val appDatabase: AppDatabase,
     private val moshi: Moshi
@@ -67,7 +67,7 @@ class TrackerDataLoader @Inject constructor(
 
     fun persistTds(eTag: String, tdsJson: TdsJson) {
         appDatabase.runInTransaction {
-            tdsDao.tdsDownloadSuccessful(Tds(eTag))
+            tdsMetadataDao.tdsDownloadSuccessful(TdsMetadata(eTag = eTag))
             tdsEntityDao.updateAll(tdsJson.jsonToEntities())
             tdsDomainEntityDao.updateAll(tdsJson.jsonToDomainEntities())
             tdsTrackerDao.updateAll(tdsJson.jsonToTrackers().values)

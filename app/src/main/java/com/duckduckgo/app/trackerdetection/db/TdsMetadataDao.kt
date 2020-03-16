@@ -21,23 +21,19 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
-import com.duckduckgo.app.trackerdetection.model.Tds
+import com.duckduckgo.app.trackerdetection.model.TdsMetadata
 
 @Dao
-abstract class TdsDao {
+abstract class TdsMetadataDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    abstract fun insert(tds: Tds)
+    abstract fun insert(tdsMetadata: TdsMetadata)
 
-    @Query("delete from tds")
-    abstract fun deleteAll()
-
-    @Query("SELECT eTag FROM tds")
+    @Query("SELECT eTag FROM tdsMetadata limit 1")
     abstract fun eTag(): String
 
     @Transaction
-    open fun tdsDownloadSuccessful(tds: Tds) {
-        deleteAll()
-        insert(tds)
+    open fun tdsDownloadSuccessful(tdsMetadata: TdsMetadata) {
+        insert(tdsMetadata)
     }
 }

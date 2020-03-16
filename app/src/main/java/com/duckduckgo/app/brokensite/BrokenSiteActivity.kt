@@ -22,6 +22,7 @@ import android.os.Bundle
 import androidx.lifecycle.Observer
 import androidx.webkit.WebViewCompat
 import com.duckduckgo.app.brokensite.BrokenSiteViewModel.Command
+import com.duckduckgo.app.brokensite.BrokenSiteViewModel.Companion.WEBVIEW_UNKNOWN_VERSION
 import com.duckduckgo.app.brokensite.BrokenSiteViewModel.ViewState
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.DuckDuckGoActivity
@@ -79,7 +80,7 @@ class BrokenSiteActivity : DuckDuckGoActivity() {
         }
 
         submitButton.setOnClickListener {
-            val webViewVersion = WebViewCompat.getCurrentWebViewPackage(applicationContext)?.versionName ?: BrokenSiteViewModel.UNKNOWN_VERSION
+            val webViewVersion = WebViewCompat.getCurrentWebViewPackage(applicationContext)?.versionName ?: WEBVIEW_UNKNOWN_VERSION
             viewModel.onSubmitPressed(webViewVersion)
         }
     }

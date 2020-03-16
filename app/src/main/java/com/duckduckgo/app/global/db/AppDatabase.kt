@@ -49,7 +49,7 @@ import com.duckduckgo.app.survey.model.Survey
 import com.duckduckgo.app.tabs.db.TabsDao
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabSelectionEntity
-import com.duckduckgo.app.trackerdetection.db.TdsDao
+import com.duckduckgo.app.trackerdetection.db.TdsMetadataDao
 import com.duckduckgo.app.trackerdetection.db.TdsDomainEntityDao
 import com.duckduckgo.app.trackerdetection.db.TdsTrackerDao
 import com.duckduckgo.app.trackerdetection.db.TemporaryTrackingWhitelistDao
@@ -80,7 +80,7 @@ import com.duckduckgo.app.usage.search.SearchCountEntity
         Notification::class,
         PrivacyProtectionCountsEntity::class,
         UncaughtExceptionEntity::class,
-        Tds::class
+        TdsMetadata::class
     ]
 )
 
@@ -113,7 +113,7 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun notificationDao(): NotificationDao
     abstract fun privacyProtectionCountsDao(): PrivacyProtectionCountDao
     abstract fun uncaughtExceptionDao(): UncaughtExceptionDao
-    abstract fun tdsDao(): TdsDao
+    abstract fun tdsDao(): TdsMetadataDao
 
     companion object {
         val MIGRATION_1_TO_2: Migration = object : Migration(1, 2) {
@@ -239,7 +239,7 @@ abstract class AppDatabase : RoomDatabase() {
 
         val MIGRATION_16_TO_17: Migration = object : Migration(16, 17) {
             override fun migrate(database: SupportSQLiteDatabase) {
-                database.execSQL("CREATE TABLE IF NOT EXISTS `tds` (`eTag` TEXT NOT NULL, PRIMARY KEY(`eTag`))")
+                database.execSQL("CREATE TABLE IF NOT EXISTS `tdsMetadata` (`id` INTEGER NOT NULL, `eTag` TEXT NOT NULL, PRIMARY KEY(`id`))")
             }
         }
 

@@ -20,27 +20,27 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.room.Room
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.global.db.AppDatabase
-import com.duckduckgo.app.trackerdetection.model.Tds
+import com.duckduckgo.app.trackerdetection.model.TdsMetadata
 import org.junit.After
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 
-class TdsDaoTest {
+class TdsMetadataDaoTest {
     @get:Rule
     @Suppress("unused")
     var instantTaskExecutorRule = InstantTaskExecutorRule()
 
     private lateinit var db: AppDatabase
-    private lateinit var tdsDao: TdsDao
+    private lateinit var tdsMetadataDao: TdsMetadataDao
 
     @Before
     fun before() {
         db = Room.inMemoryDatabaseBuilder(InstrumentationRegistry.getInstrumentation().targetContext, AppDatabase::class.java)
             .allowMainThreadQueries()
             .build()
-        tdsDao = db.tdsDao()
+        tdsMetadataDao = db.tdsDao()
     }
 
     @After
@@ -50,22 +50,22 @@ class TdsDaoTest {
 
     @Test
     fun whenTdsIsInsertedThenReturnCorrectEtag() {
-        val tds = Tds("exampleEtag")
-        tdsDao.insert(tds)
+        val tds = TdsMetadata(eTag = "exampleEtag")
+        tdsMetadataDao.insert(tds)
 
-        val etag = tdsDao.eTag()
+        val etag = tdsMetadataDao.eTag()
         assertEquals("exampleEtag", etag)
     }
 
     @Test
     fun whenTdsDownloadSuccessfulThenReplaceOldEtag() {
-        val tds = Tds("exampleEtag")
-        tdsDao.insert(tds)
+        val tds = TdsMetadata(eTag = "exampleEtag")
+        tdsMetadataDao.insert(tds)
 
-        val newTds = Tds("newEtag")
-        tdsDao.tdsDownloadSuccessful(newTds)
+        val newTds = TdsMetadata(eTag = "newEtag")
+        tdsMetadataDao.tdsDownloadSuccessful(newTds)
 
-        val etag = tdsDao.eTag()
+        val etag = tdsMetadataDao.eTag()
         assertEquals("newEtag", etag)
     }
 }

@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 17,
-    "identityHash": "b5de575c99854f995b9be39c5084e2fc",
+    "identityHash": "d25d9ea06a37919b34fcc39ef2919ebb",
     "entities": [
       {
         "tableName": "tds_tracker",
@@ -607,9 +607,15 @@
         "foreignKeys": []
       },
       {
-        "tableName": "tds",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`eTag` TEXT NOT NULL, PRIMARY KEY(`eTag`))",
+        "tableName": "tdsMetadata",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `eTag` TEXT NOT NULL, PRIMARY KEY(`id`))",
         "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
           {
             "fieldPath": "eTag",
             "columnName": "eTag",
@@ -619,7 +625,7 @@
         ],
         "primaryKey": {
           "columnNames": [
-            "eTag"
+            "id"
           ],
           "autoGenerate": false
         },
@@ -630,7 +636,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'b5de575c99854f995b9be39c5084e2fc')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'd25d9ea06a37919b34fcc39ef2919ebb')"
     ]
   }
 }

@@ -22,7 +22,7 @@ import com.duckduckgo.app.browser.BuildConfig
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
-import com.duckduckgo.app.trackerdetection.db.TdsDao
+import com.duckduckgo.app.trackerdetection.db.TdsMetadataDao
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -35,7 +35,7 @@ interface BrokenSiteSender {
 class BrokenSiteSubmitter(
     private val statisticsStore: StatisticsDataStore,
     private val variantManager: VariantManager,
-    private val tdsDao: TdsDao,
+    private val tdsMetadataDao: TdsMetadataDao,
     private val pixel: Pixel
 ) : BrokenSiteSender {
 
@@ -45,7 +45,7 @@ class BrokenSiteSubmitter(
                 CATEGORY_KEY to brokenSite.category,
                 SITE_URL_KEY to brokenSite.siteUrl,
                 UPDGRADED_HTTPS_KEY to brokenSite.upgradeHttps.toString(),
-                TDS_ETAG_KEY to tdsDao.eTag(),
+                TDS_ETAG_KEY to tdsMetadataDao.eTag(),
                 APP_VERSION_KEY to BuildConfig.VERSION_NAME,
                 ATB_KEY to atbWithVariant(),
                 OS_KEY to Build.VERSION.SDK_INT.toString(),

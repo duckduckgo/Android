@@ -56,7 +56,7 @@ class BrokenSiteViewModel(private val pixel: Pixel, private val brokenSiteSender
         OtherCategory
     )
     private var blockedTrackers: String = ""
-    private var surrogates: String = "null"
+    private var surrogates: String = ""
     private var url: String? = null
     private var upgradedHttps: Boolean = false
     private val viewValue: ViewState get() = viewState.value!!
@@ -108,15 +108,15 @@ class BrokenSiteViewModel(private val pixel: Pixel, private val brokenSiteSender
             blockedTrackers = blockedTrackers,
             surrogates = surrogates,
             webViewVersion = webViewVersion,
-            siteType = if (Uri.parse(url).isMobileSite) MOBILE else DESKTOP
+            siteType = if (Uri.parse(url).isMobileSite) MOBILE_SITE else DESKTOP_SITE
         )
     }
 
     private fun canSubmit(): Boolean = categories.elementAtOrNull(indexSelected) != null
 
     companion object {
-        const val UNKNOWN_VERSION = "unknown"
-        const val MOBILE = "mobile"
-        const val DESKTOP = "desktop"
+        const val WEBVIEW_UNKNOWN_VERSION = "unknown"
+        const val MOBILE_SITE = "mobile"
+        const val DESKTOP_SITE = "desktop"
     }
 }
