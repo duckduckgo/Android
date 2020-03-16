@@ -104,7 +104,7 @@ class VariantManagerTest {
     }
 
     @Test
-    fun searchNotificationEnabledVariantIsActive() {
+    fun searchNotificationVariantIsActiveAndHasStickySearchNotificationFeature() {
         val variant = variants.first { it.key == "mg" }
         assertEqualsDouble(1.0, variant.weight)
         assertEquals(1, variant.features.size)
