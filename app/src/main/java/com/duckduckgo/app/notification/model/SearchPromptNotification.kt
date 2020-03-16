@@ -48,7 +48,7 @@ class SearchPromptNotification(
     override suspend fun canShow(): Boolean {
 
         val variant = variantManager.getVariant()
-        if (!variant.hasFeature(VariantManager.VariantFeature.SearchNotification)){
+        if (!variant.hasFeature(VariantManager.VariantFeature.StickySearchNotification)){
             Timber.v("Notification Variant is not enabled ")
             return false
         }

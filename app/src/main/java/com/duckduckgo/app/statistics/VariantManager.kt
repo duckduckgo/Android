@@ -35,7 +35,7 @@ interface VariantManager {
         object SuppressOnboardingDefaultBrowserContinueScreen : VariantFeature()
         object DefaultBrowserDaxCta : VariantFeature()
         object SearchWidgetDaxCta : VariantFeature()
-        object SearchNotification : VariantFeature()
+        object StickySearchNotification : VariantFeature()
     }
 
     companion object {
@@ -72,7 +72,7 @@ interface VariantManager {
                 filterBy = { isEnglishLocale() }),
             Variant(
                 key = "mh",
-                weight = 1.0,
+                weight = 0.0,
                 features = listOf(
                     ConceptTest,
                     SuppressHomeTabWidgetCta,
@@ -81,16 +81,17 @@ interface VariantManager {
                     SearchWidgetDaxCta
                 ),
                 filterBy = { isEnglishLocale() }),
+
             // Quick Search Notification Experiment
             Variant(
                 key = "mf",
-                weight = 1.0,
+                weight = 0.0,
                 features = emptyList(),
                 filterBy = { isEnglishLocale() }),
             Variant(
                 key = "mg",
                 weight = 1.0,
-                features = listOf(SearchNotification),
+                features = listOf(StickySearchNotification),
                 filterBy = { isEnglishLocale() })
 
             // All groups in an experiment (control and variants) MUST use the same filters
