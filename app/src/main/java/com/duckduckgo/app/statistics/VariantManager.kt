@@ -22,7 +22,7 @@ import com.duckduckgo.app.statistics.VariantManager.Companion.referrerVariant
 import com.duckduckgo.app.statistics.VariantManager.VariantFeature.*
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import timber.log.Timber
-import java.util.*
+import java.util.Locale
 
 @WorkerThread
 interface VariantManager {
@@ -35,6 +35,7 @@ interface VariantManager {
         object SuppressOnboardingDefaultBrowserContinueScreen : VariantFeature()
         object DefaultBrowserDaxCta : VariantFeature()
         object SearchWidgetDaxCta : VariantFeature()
+        object StickySearchNotification : VariantFeature()
     }
 
     companion object {
@@ -47,8 +48,8 @@ interface VariantManager {
         val ACTIVE_VARIANTS = listOf(
             // SERP variants. "sc" may also be used as a shared control for mobile experiments in
             // the future if we can filter by app version
-            Variant(key = "sc", weight = 1.0, features = emptyList(), filterBy = { noFilter() }),
-            Variant(key = "se", weight = 1.0, features = emptyList(), filterBy = { noFilter() }),
+            Variant(key = "sc", weight = 0.0, features = emptyList(), filterBy = { noFilter() }),
+            Variant(key = "se", weight = 0.0, features = emptyList(), filterBy = { noFilter() }),
 
             // Concept test experiment
             Variant(key = "mc", weight = 0.0, features = emptyList(), filterBy = { isEnglishLocale() }),
@@ -66,12 +67,12 @@ interface VariantManager {
             // Insert CTAs on Concept test experiment
             Variant(
                 key = "mj",
-                weight = 1.0,
+                weight = 0.0,
                 features = listOf(ConceptTest, SuppressOnboardingDefaultBrowserContinueScreen),
                 filterBy = { isEnglishLocale() }),
             Variant(
                 key = "mh",
-                weight = 1.0,
+                weight = 0.0,
                 features = listOf(
                     ConceptTest,
                     SuppressHomeTabWidgetCta,
@@ -79,6 +80,18 @@ interface VariantManager {
                     DefaultBrowserDaxCta,
                     SearchWidgetDaxCta
                 ),
+                filterBy = { isEnglishLocale() }),
+
+            // Quick Search Notification Experiment
+            Variant(
+                key = "mf",
+                weight = 1.0,
+                features = emptyList(),
+                filterBy = { isEnglishLocale() }),
+            Variant(
+                key = "mg",
+                weight = 1.0,
+                features = listOf(StickySearchNotification),
                 filterBy = { isEnglishLocale() })
 
             // All groups in an experiment (control and variants) MUST use the same filters

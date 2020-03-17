@@ -23,9 +23,11 @@ import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.global.DuckDuckGoTheme
 import com.duckduckgo.app.global.SingleLiveEvent
 import com.duckduckgo.app.icon.api.AppIcon
+import com.duckduckgo.app.notification.NotificationScheduler
 import com.duckduckgo.app.settings.clear.ClearWhatOption
 import com.duckduckgo.app.settings.clear.ClearWhenOption
 import com.duckduckgo.app.settings.db.SettingsDataStore
+import com.duckduckgo.app.statistics.Variant
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelName
@@ -37,7 +39,8 @@ class SettingsViewModel @Inject constructor(
     private val settingsDataStore: SettingsDataStore,
     private val defaultWebBrowserCapability: DefaultBrowserDetector,
     private val variantManager: VariantManager,
-    private val pixel: Pixel
+    private val pixel: Pixel,
+    private val notificationScheduler: NotificationScheduler
 ) : ViewModel() {
 
     data class ViewState(
@@ -45,6 +48,8 @@ class SettingsViewModel @Inject constructor(
         val version: String = "",
         val lightThemeEnabled: Boolean = false,
         val autoCompleteSuggestionsEnabled: Boolean = true,
+        val showSearchNotificationToggle: Boolean = false,
+        val searchNotificationEnabled: Boolean = false,
         val showDefaultBrowserSetting: Boolean = false,
         val isAppDefaultBrowser: Boolean = false,
         val automaticallyClearData: AutomaticallyClearData = AutomaticallyClearData(ClearWhatOption.CLEAR_NONE, ClearWhenOption.APP_EXIT_ONLY),
@@ -86,6 +91,8 @@ class SettingsViewModel @Inject constructor(
             loading = false,
             lightThemeEnabled = isLightTheme,
             autoCompleteSuggestionsEnabled = settingsDataStore.autoCompleteSuggestionsEnabled,
+            showSearchNotificationToggle = isSearchNotificationFeatureEnabled(variant),
+            searchNotificationEnabled = settingsDataStore.searchNotificationEnabled,
             isAppDefaultBrowser = defaultBrowserAlready,
             showDefaultBrowserSetting = defaultWebBrowserCapability.deviceSupportsDefaultBrowserConfiguration(),
             version = obtainVersion(variant.key),
@@ -115,8 +122,21 @@ class SettingsViewModel @Inject constructor(
     fun onAutocompleteSettingChanged(enabled: Boolean) {
         Timber.i("User changed autocomplete setting, is now enabled: $enabled")
         settingsDataStore.autoCompleteSuggestionsEnabled = enabled
-
         viewState.value = currentViewState().copy(autoCompleteSuggestionsEnabled = enabled)
+    }
+
+    fun onSearchNotificationSettingChanged(enabled: Boolean) {
+        Timber.i("User changed search notification setting, is now enabled: $enabled")
+        settingsDataStore.searchNotificationEnabled = enabled
+        if (enabled){
+            notificationScheduler.launchStickySearchNotification()
+            pixel.fire(QUICK_SEARCH_NOTIFICATION_ENABLED)
+
+        } else {
+            notificationScheduler.dismissStickySearchNotification()
+            pixel.fire(QUICK_SEARCH_NOTIFICATION_DISABLED)
+        }
+        viewState.value = currentViewState().copy(searchNotificationEnabled = enabled)
     }
 
     private fun obtainVersion(variantKey: String): String {
@@ -187,6 +207,10 @@ class SettingsViewModel @Inject constructor(
             ClearWhenOption.APP_EXIT_OR_60_MINS -> AUTOMATIC_CLEAR_DATA_WHEN_OPTION_APP_EXIT_OR_60_MINS
             else -> null
         }
+    }
+
+    private fun isSearchNotificationFeatureEnabled(variant: Variant): Boolean {
+        return variant.hasFeature(VariantManager.VariantFeature.StickySearchNotification)
     }
 
 }

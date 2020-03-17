@@ -32,6 +32,7 @@ interface SettingsDataStore {
     var theme: DuckDuckGoTheme?
     var hideTips: Boolean
     var autoCompleteSuggestionsEnabled: Boolean
+    var searchNotificationEnabled: Boolean
     var appIcon: AppIcon
     var appIconChanged: Boolean
 
@@ -92,6 +93,10 @@ class SettingsSharedPreferences @Inject constructor(private val context: Context
     override var appIconChanged: Boolean
         get() = preferences.getBoolean(KEY_APP_ICON_CHANGED, false)
         set(enabled) = preferences.edit(commit = true) { putBoolean(KEY_APP_ICON_CHANGED, enabled) }
+
+    override var searchNotificationEnabled: Boolean
+        get() = preferences.getBoolean(KEY_SEARCH_NOTIFICATION, false)
+        set(enabled) = preferences.edit { putBoolean(KEY_SEARCH_NOTIFICATION, enabled) }
 
     override var appUsedSinceLastClear: Boolean
         get() = preferences.getBoolean(KEY_APP_USED_SINCE_LAST_CLEAR, true)
@@ -158,5 +163,6 @@ class SettingsSharedPreferences @Inject constructor(private val context: Context
         } else {
             AppIcon.DEFAULT
         }
+        const val KEY_SEARCH_NOTIFICATION = "SEARCH_NOTIFICATION"
     }
 }

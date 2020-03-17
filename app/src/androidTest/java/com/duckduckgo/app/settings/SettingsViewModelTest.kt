@@ -25,6 +25,7 @@ import com.duckduckgo.app.browser.BuildConfig
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.global.DuckDuckGoTheme
 import com.duckduckgo.app.icon.api.AppIcon
+import com.duckduckgo.app.notification.NotificationScheduler
 import com.duckduckgo.app.settings.SettingsViewModel.Command
 import com.duckduckgo.app.settings.clear.ClearWhatOption.CLEAR_NONE
 import com.duckduckgo.app.settings.clear.ClearWhenOption.APP_EXIT_ONLY
@@ -32,7 +33,11 @@ import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.Variant
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.nhaarman.mockitokotlin2.*
+import com.nhaarman.mockitokotlin2.KArgumentCaptor
+import com.nhaarman.mockitokotlin2.argumentCaptor
+import com.nhaarman.mockitokotlin2.atLeastOnce
+import com.nhaarman.mockitokotlin2.verify
+import com.nhaarman.mockitokotlin2.whenever
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Rule
@@ -63,6 +68,9 @@ class SettingsViewModelTest {
     private lateinit var mockVariantManager: VariantManager
 
     @Mock
+    private lateinit var notificationScheduler: NotificationScheduler
+
+    @Mock
     private lateinit var mockPixel: Pixel
 
     private lateinit var commandCaptor: KArgumentCaptor<Command>
@@ -74,7 +82,7 @@ class SettingsViewModelTest {
         context = InstrumentationRegistry.getInstrumentation().targetContext
         commandCaptor = argumentCaptor()
 
-        testee = SettingsViewModel(mockAppSettingsDataStore, mockDefaultBrowserDetector, mockVariantManager, mockPixel)
+        testee = SettingsViewModel(mockAppSettingsDataStore, mockDefaultBrowserDetector, mockVariantManager, mockPixel, notificationScheduler)
         testee.command.observeForever(commandObserver)
 
         whenever(mockAppSettingsDataStore.automaticallyClearWhenOption).thenReturn(APP_EXIT_ONLY)
@@ -220,6 +228,33 @@ class SettingsViewModelTest {
         testee.command.blockingObserve()
         verify(commandObserver).onChanged(commandCaptor.capture())
         assertEquals(Command.LaunchAppIcon, commandCaptor.firstValue)
+    }
+
+    @Test
+    fun whenSearchNotificationWasPreviouslyEnabledThenViewStateIndicatesIt() {
+        whenever(mockAppSettingsDataStore.searchNotificationEnabled).thenReturn(true)
+        testee.start()
+        assertTrue(latestViewState().searchNotificationEnabled)
+    }
+
+    @Test
+    fun whenSearchNotificationToggledOnThenDataStoreIsUpdatedAndNotificationShown() {
+        testee.onSearchNotificationSettingChanged(true)
+        verify(mockAppSettingsDataStore).searchNotificationEnabled = true
+        verify(notificationScheduler).launchStickySearchNotification()
+        verify(mockPixel).fire(Pixel.PixelName.QUICK_SEARCH_NOTIFICATION_ENABLED)
+
+        assertTrue(latestViewState().searchNotificationEnabled)
+    }
+
+    @Test
+    fun whenSearchNotificationToggledOffThenDataStoreIsUpdatedAndNotificationRemoved() {
+        testee.onSearchNotificationSettingChanged(false)
+        verify(mockAppSettingsDataStore).searchNotificationEnabled = false
+        verify(notificationScheduler).dismissStickySearchNotification()
+        verify(mockPixel).fire(Pixel.PixelName.QUICK_SEARCH_NOTIFICATION_DISABLED)
+
+        assertFalse(latestViewState().searchNotificationEnabled)
     }
 
     private fun latestViewState() = testee.viewState.value!!
