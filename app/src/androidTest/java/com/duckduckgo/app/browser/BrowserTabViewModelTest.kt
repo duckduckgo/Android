@@ -1089,7 +1089,7 @@ class BrowserTabViewModelTest {
     fun whenNoSiteAndBrokenSiteSelectedThenBrokenSiteFeedbackCommandSentWithoutUrl() {
         testee.onBrokenSiteSelected()
         val command = captureCommands().value as Command.BrokenSiteFeedback
-        assertNull(command.url)
+        assertEquals("", command.url)
     }
 
     @Test

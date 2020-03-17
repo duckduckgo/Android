@@ -154,19 +154,8 @@ class BrokenSiteViewModelTest {
     }
 
     @Test
-    fun whenCanSubmitBrokenSiteAndUrlNullAndSubmitPressedThenConfirmSentButPixelAndReportNotSubmitted() {
-        testee.setInitialBrokenSite(null, "", "", false)
-        selectAndAcceptCategory()
-        testee.onSubmitPressed("webViewVersion")
-
-        verify(mockBrokenSiteSender, never()).submitBrokenSiteFeedback(any())
-        verify(mockPixel, never()).fire(Pixel.PixelName.BROKEN_SITE_REPORTED, mapOf("url" to null))
-        verify(mockCommandObserver).onChanged(Command.ConfirmAndFinish)
-    }
-
-    @Test
     fun whenCancelSelectionThenAssignOldIndexValue() {
-        testee.setInitialBrokenSite(null, "", "", false)
+        testee.setInitialBrokenSite("", "", "", false)
         selectAndAcceptCategory(0)
         testee.onCategoryIndexChanged(1)
         testee.onCategorySelectionCancelled()
@@ -176,7 +165,7 @@ class BrokenSiteViewModelTest {
 
     @Test
     fun whenCancelSelectionAndNoPreviousValueThenAssignMinusOne() {
-        testee.setInitialBrokenSite(null, "", "", false)
+        testee.setInitialBrokenSite("", "", "", false)
         testee.onCategoryIndexChanged(1)
         testee.onCategorySelectionCancelled()
 

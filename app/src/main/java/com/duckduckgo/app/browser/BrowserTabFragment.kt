@@ -553,7 +553,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
         }
     }
 
-    private fun launchBrokenSiteFeedback(url: String?, blockedTrackers: String, surrogates: String, upgradedHttps: Boolean) {
+    private fun launchBrokenSiteFeedback(url: String, blockedTrackers: String, surrogates: String, upgradedHttps: Boolean) {
         context?.let {
             val options = ActivityOptions.makeSceneTransitionAnimation(browserActivity).toBundle()
             startActivity(BrokenSiteActivity.intent(it, url, blockedTrackers, surrogates, upgradedHttps), options)

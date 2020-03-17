@@ -120,11 +120,9 @@ class BrokenSiteActivity : DuckDuckGoActivity() {
         private const val UPGRADED_TO_HTTPS_EXTRA = "UPGRADED_TO_HTTPS_EXTRA"
         private const val SURROGATES_EXTRA = "SURROGATES_EXTRA"
 
-        fun intent(context: Context, url: String? = null, blockedTrackers: String, surrogates: String, upgradedToHttps: Boolean): Intent {
+        fun intent(context: Context, url: String, blockedTrackers: String, surrogates: String, upgradedToHttps: Boolean): Intent {
             val intent = Intent(context, BrokenSiteActivity::class.java)
-            if (url != null) {
-                intent.putExtra(URL_EXTRA, url)
-            }
+            intent.putExtra(URL_EXTRA, url)
             intent.putExtra(BLOCKED_TRACKERS_EXTRA, blockedTrackers)
             intent.putExtra(SURROGATES_EXTRA, surrogates)
             intent.putExtra(UPGRADED_TO_HTTPS_EXTRA, upgradedToHttps)

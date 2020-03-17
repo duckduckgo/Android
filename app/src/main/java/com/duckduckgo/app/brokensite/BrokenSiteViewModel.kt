@@ -57,7 +57,7 @@ class BrokenSiteViewModel(private val pixel: Pixel, private val brokenSiteSender
     )
     private var blockedTrackers: String = ""
     private var surrogates: String = ""
-    private var url: String? = null
+    private var url: String = ""
     private var upgradedHttps: Boolean = false
     private val viewValue: ViewState get() = viewState.value!!
 
@@ -65,7 +65,7 @@ class BrokenSiteViewModel(private val pixel: Pixel, private val brokenSiteSender
         viewState.value = ViewState()
     }
 
-    fun setInitialBrokenSite(url: String?, blockedTrackers: String, surrogates: String, upgradedHttps: Boolean) {
+    fun setInitialBrokenSite(url: String, blockedTrackers: String, surrogates: String, upgradedHttps: Boolean) {
         this.url = url
         this.blockedTrackers = blockedTrackers
         this.upgradedHttps = upgradedHttps
@@ -89,11 +89,9 @@ class BrokenSiteViewModel(private val pixel: Pixel, private val brokenSiteSender
     }
 
     fun onSubmitPressed(webViewVersion: String) {
-        url?.let {
-            val brokenSite = getBrokenSite(it, webViewVersion)
-            brokenSiteSender.submitBrokenSiteFeedback(brokenSite)
-            pixel.fire(Pixel.PixelName.BROKEN_SITE_REPORTED, mapOf(Pixel.PixelParameter.URL to brokenSite.siteUrl))
-        }
+        val brokenSite = getBrokenSite(url, webViewVersion)
+        brokenSiteSender.submitBrokenSiteFeedback(brokenSite)
+        pixel.fire(Pixel.PixelName.BROKEN_SITE_REPORTED, mapOf(Pixel.PixelParameter.URL to brokenSite.siteUrl))
         command.value = Command.ConfirmAndFinish
     }
 

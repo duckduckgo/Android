@@ -135,7 +135,7 @@ class BrowserTabViewModel(
         val canAddBookmarks: Boolean = false,
         val canGoBack: Boolean = false,
         val canGoForward: Boolean = false,
-        val canReportSite: Boolean = true,
+        val canReportSite: Boolean = false,
         val addToHomeEnabled: Boolean = false,
         val addToHomeVisible: Boolean = false
     )
@@ -186,7 +186,7 @@ class BrowserTabViewModel(
         class ShareLink(val url: String) : Command()
         class CopyLink(val url: String) : Command()
         class FindInPageCommand(val searchTerm: String) : Command()
-        class BrokenSiteFeedback(val url: String?, val blockedTrackers: String, val surrogates: String, val httpsUpgraded: Boolean) : Command()
+        class BrokenSiteFeedback(val url: String, val blockedTrackers: String, val surrogates: String, val httpsUpgraded: Boolean) : Command()
         object DismissFindInPage : Command()
         class ShowFileChooser(val filePathCallback: ValueCallback<Array<Uri>>, val fileChooserParams: WebChromeClient.FileChooserParams) : Command()
         class HandleExternalAppLink(val appLink: IntentType) : Command()
@@ -500,7 +500,8 @@ class BrowserTabViewModel(
                 addToHomeEnabled = true,
                 addToHomeVisible = addToHomeCapabilityDetector.isAddToHomeSupported(),
                 canSharePage = true,
-                showPrivacyGrade = true
+                showPrivacyGrade = true,
+                canReportSite = true
             )
         )
 
@@ -538,7 +539,8 @@ class BrowserTabViewModel(
             addToHomeEnabled = false,
             addToHomeVisible = addToHomeCapabilityDetector.isAddToHomeSupported(),
             canSharePage = false,
-            showPrivacyGrade = false
+            showPrivacyGrade = false,
+            canReportSite = false
         )
     }
 
@@ -709,6 +711,7 @@ class BrowserTabViewModel(
         val blockedTrackers = events?.map { Uri.parse(it.trackerUrl).host }.orEmpty().distinct().joinToString(",")
         val upgradedHttps = site?.upgradedHttps ?: false
         val surrogates = site?.surrogates?.map { Uri.parse(it.name).baseHost }.orEmpty().distinct().joinToString(",")
+        val url = url.orEmpty()
 
         command.value = BrokenSiteFeedback(url, blockedTrackers, surrogates, upgradedHttps)
     }

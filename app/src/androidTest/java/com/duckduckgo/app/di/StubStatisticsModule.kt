@@ -58,14 +58,14 @@ class StubStatisticsModule {
     fun stubPixel(): Pixel {
         return object : Pixel {
 
-            override fun fire(pixel: Pixel.PixelName, parameters: Map<String, String?>, encodedParameters: Map<String, String?>) {
+            override fun fire(pixel: Pixel.PixelName, parameters: Map<String, String>, encodedParameters: Map<String, String>) {
             }
 
-            override fun fire(pixelName: String, parameters: Map<String, String?>, encodedParameters: Map<String, String?>) {
+            override fun fire(pixelName: String, parameters: Map<String, String>, encodedParameters: Map<String, String>) {
 
             }
 
-            override fun fireCompletable(pixelName: String, parameters: Map<String, String?>, encodedParameters: Map<String, String?>): Completable {
+            override fun fireCompletable(pixelName: String, parameters: Map<String, String>, encodedParameters: Map<String, String>): Completable {
                 return Completable.fromAction {}
             }
         }
