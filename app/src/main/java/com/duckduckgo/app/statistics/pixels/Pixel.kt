@@ -206,9 +206,9 @@ interface Pixel {
         const val DAX_NO_TRACKERS_CTA = "nt"
     }
 
-    fun fire(pixel: PixelName, parameters: Map<String, String?> = emptyMap(), encodedParameters: Map<String, String?> = emptyMap())
-    fun fire(pixelName: String, parameters: Map<String, String?> = emptyMap(), encodedParameters: Map<String, String?> = emptyMap())
-    fun fireCompletable(pixelName: String, parameters: Map<String, String?>, encodedParameters: Map<String, String?> = emptyMap()): Completable
+    fun fire(pixel: PixelName, parameters: Map<String, String> = emptyMap(), encodedParameters: Map<String, String> = emptyMap())
+    fun fire(pixelName: String, parameters: Map<String, String> = emptyMap(), encodedParameters: Map<String, String> = emptyMap())
+    fun fireCompletable(pixelName: String, parameters: Map<String, String>, encodedParameters: Map<String, String> = emptyMap()): Completable
 }
 
 class ApiBasedPixel @Inject constructor(
@@ -218,21 +218,21 @@ class ApiBasedPixel @Inject constructor(
     private val deviceInfo: DeviceInfo
 ) : Pixel {
 
-    override fun fire(pixel: PixelName, parameters: Map<String, String?>, encodedParameters: Map<String, String?>) {
+    override fun fire(pixel: PixelName, parameters: Map<String, String>, encodedParameters: Map<String, String>) {
         fire(pixel.pixelName, parameters, encodedParameters)
     }
 
-    override fun fire(pixelName: String, parameters: Map<String, String?>, encodedParameters: Map<String, String?>) {
+    override fun fire(pixelName: String, parameters: Map<String, String>, encodedParameters: Map<String, String>) {
         fireCompletable(pixelName, parameters, encodedParameters)
             .subscribeOn(Schedulers.io())
             .subscribe({
                 Timber.v("Pixel sent: $pixelName with params: $parameters $encodedParameters")
             }, {
-                Timber.w("Pixel failed: $pixelName with params: $parameters $encodedParameters")
+                Timber.w(it, "Pixel failed: $pixelName with params: $parameters $encodedParameters")
             })
     }
 
-    override fun fireCompletable(pixelName: String, parameters: Map<String, String?>, encodedParameters: Map<String, String?>): Completable {
+    override fun fireCompletable(pixelName: String, parameters: Map<String, String>, encodedParameters: Map<String, String>): Completable {
         val defaultParameters = mapOf(PixelParameter.APP_VERSION to deviceInfo.appVersion)
         val fullParameters = defaultParameters.plus(parameters)
         val atb = statisticsDataStore.atb?.formatWithVariant(variantManager.getVariant()) ?: ""

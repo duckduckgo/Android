@@ -45,7 +45,7 @@ class BrokenSiteSubmitter(
                 CATEGORY_KEY to brokenSite.category,
                 SITE_URL_KEY to brokenSite.siteUrl,
                 UPDGRADED_HTTPS_KEY to brokenSite.upgradeHttps.toString(),
-                TDS_ETAG_KEY to tdsMetadataDao.eTag(),
+                TDS_ETAG_KEY to tdsMetadataDao.eTag().orEmpty(),
                 APP_VERSION_KEY to BuildConfig.VERSION_NAME,
                 ATB_KEY to atbWithVariant(),
                 OS_KEY to Build.VERSION.SDK_INT.toString(),
@@ -67,7 +67,7 @@ class BrokenSiteSubmitter(
     }
 
     private fun atbWithVariant(): String {
-        return statisticsStore.atb?.formatWithVariant(variantManager.getVariant()) ?: ""
+        return statisticsStore.atb?.formatWithVariant(variantManager.getVariant()).orEmpty()
     }
 
     companion object {

@@ -30,7 +30,7 @@ abstract class TdsMetadataDao {
     abstract fun insert(tdsMetadata: TdsMetadata)
 
     @Query("SELECT eTag FROM tdsMetadata limit 1")
-    abstract fun eTag(): String
+    abstract fun eTag(): String?
 
     @Transaction
     open fun tdsDownloadSuccessful(tdsMetadata: TdsMetadata) {
