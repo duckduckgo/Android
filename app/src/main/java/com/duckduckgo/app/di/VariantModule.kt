@@ -16,6 +16,10 @@
 
 package com.duckduckgo.app.di
 
+import android.content.Context
+import com.duckduckgo.app.global.shortcut.AppShortcutCreator
+import com.duckduckgo.app.icon.api.AppIconModifier
+import com.duckduckgo.app.icon.api.IconModifier
 import com.duckduckgo.app.statistics.ExperimentationVariantManager
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.WeightedRandomizer
@@ -23,7 +27,6 @@ import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import dagger.Module
 import dagger.Provides
 import javax.inject.Singleton
-
 
 @Module
 class VariantModule {

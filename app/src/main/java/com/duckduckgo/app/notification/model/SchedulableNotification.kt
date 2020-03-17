@@ -26,6 +26,16 @@ interface SchedulableNotification {
     suspend fun buildSpecification(): NotificationSpec
 }
 
+interface SearchNotification {
+    val id: String
+    val layoutId: Int
+    val pressIntent: String
+    val launchIntent: String
+    val cancelIntent: String
+    suspend fun canShow(): Boolean
+    suspend fun buildSpecification(): NotificationSpec
+}
+
 interface NotificationSpec {
     val channel: NotificationRegistrar.Channel
     val systemId: Int
@@ -34,6 +44,8 @@ interface NotificationSpec {
     val title: String
     val description: String
     val launchButton: String?
+    val closeButton: String?
     val pixelSuffix: String
+    val autoCancel: Boolean
 }
 

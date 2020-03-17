@@ -95,6 +95,7 @@ interface Pixel {
         WIDGETS_ADDED(pixelName = "m_w_a"),
         WIDGETS_DELETED(pixelName = "m_w_d"),
 
+        APP_NOTIFICATION_LAUNCH(pixelName = "m_n_l"),
         APP_WIDGET_LAUNCH(pixelName = "m_w_l"),
         APP_ASSIST_LAUNCH(pixelName = "m_a_l"),
         APP_SYSTEM_SEARCH_BOX_LAUNCH(pixelName = "m_ssb_l"),
@@ -160,7 +161,17 @@ interface Pixel {
         FEEDBACK_NEGATIVE_SUBMISSION("mfbs_%s_%s_%s"),
 
         AUTOCOMPLETE_BOOKMARK_SELECTION("m_aut_s_b"),
-        AUTOCOMPLETE_SEARCH_SELECTION("m_aut_s_s")
+        AUTOCOMPLETE_SEARCH_SELECTION("m_aut_s_s"),
+
+        CHANGE_APP_ICON_OPENED("m_ic"),
+
+        QUICK_SEARCH_PROMPT_NOTIFICATION_SHOWN("m_qs_pn_s"),
+        QUICK_SEARCH_PROMPT_NOTIFICATION_LAUNCHED("m_qs_pn_l"),
+        QUICK_SEARCH_PROMPT_NOTIFICATION_KEEP("m_qs_pn_k"),
+        QUICK_SEARCH_PROMPT_NOTIFICATION_REMOVE("m_qs_pn_r"),
+        QUICK_SEARCH_NOTIFICATION_ENABLED("m_qs_sn_e"),
+        QUICK_SEARCH_NOTIFICATION_DISABLED("m_qs_sn_d"),
+        QUICK_SEARCH_NOTIFICATION_LAUNCHED("m_qs_sn_l")
     }
 
     object PixelParameter {

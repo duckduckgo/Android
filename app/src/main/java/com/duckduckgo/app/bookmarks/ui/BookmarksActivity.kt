@@ -23,16 +23,20 @@ import android.net.Uri
 import android.os.Bundle
 import android.text.Html
 import android.view.LayoutInflater
+import android.view.Menu
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.PopupMenu
+import androidx.appcompat.widget.SearchView
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.RecyclerView.*
 import com.duckduckgo.app.bookmarks.db.BookmarkEntity
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.browser.R.id.action_search
+import com.duckduckgo.app.browser.R.menu.bookmark_activity_menu
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.baseHost
 import com.duckduckgo.app.global.faviconLocation
@@ -78,6 +82,7 @@ class BookmarksActivity : DuckDuckGoActivity() {
             viewState?.let {
                 if (it.showBookmarks) showBookmarks() else hideBookmarks()
                 adapter.bookmarks = it.bookmarks
+                invalidateOptionsMenu()
             }
         })
 
@@ -88,6 +93,19 @@ class BookmarksActivity : DuckDuckGoActivity() {
                 is BookmarksViewModel.Command.ShowEditBookmark -> showEditBookmarkDialog(it.bookmark)
             }
         })
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(bookmark_activity_menu, menu)
+        val searchItem = menu?.findItem(action_search)
+        val searchView = searchItem?.actionView as SearchView
+        searchView.setOnQueryTextListener(BookmarksEntityQueryListener(viewModel.viewState.value?.bookmarks, adapter))
+        return super.onCreateOptionsMenu(menu)
+    }
+
+    override fun onPrepareOptionsMenu(menu: Menu?): Boolean {
+        menu?.findItem(action_search)?.isVisible = viewModel.viewState.value?.enableSearch == true
+        return super.onPrepareOptionsMenu(menu)
     }
 
     private fun showEditBookmarkDialog(bookmark: BookmarkEntity) {

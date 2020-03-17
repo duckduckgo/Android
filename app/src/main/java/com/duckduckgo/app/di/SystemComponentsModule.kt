@@ -18,6 +18,9 @@ package com.duckduckgo.app.di
 
 import android.content.Context
 import android.content.pm.PackageManager
+import com.duckduckgo.app.global.shortcut.AppShortcutCreator
+import com.duckduckgo.app.icon.api.AppIconModifier
+import com.duckduckgo.app.icon.api.IconModifier
 import com.duckduckgo.app.systemsearch.DeviceAppListProvider
 import com.duckduckgo.app.systemsearch.DeviceAppLookup
 import com.duckduckgo.app.systemsearch.InstalledDeviceAppListProvider
@@ -40,4 +43,8 @@ open class SystemComponentsModule {
     @Provides
     @Singleton
     fun deviceAppLookup(deviceAppListProvider: DeviceAppListProvider): DeviceAppLookup = InstalledDeviceAppLookup(deviceAppListProvider)
+
+    @Provides
+    fun appIconModifier(context: Context, appShortcutCreator: AppShortcutCreator): IconModifier =
+        AppIconModifier(context, appShortcutCreator)
 }
