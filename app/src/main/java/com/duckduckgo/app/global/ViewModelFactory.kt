@@ -111,7 +111,7 @@ class ViewModelFactory @Inject constructor(
     private val feedbackSubmitter: FeedbackSubmitter,
     private val onboardingPageManager: OnboardingPageManager,
     private val appInstallationReferrerStateListener: AppInstallationReferrerStateListener,
-    private val appIconModifier: IconModifier
+    private val appIconModifier: IconModifier,
     private val notificationScheduler: NotificationScheduler
 ) : ViewModelProvider.NewInstanceFactory() {
 
