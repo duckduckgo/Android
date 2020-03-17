@@ -35,6 +35,7 @@ import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.sendThemeChangedBroadcast
 import com.duckduckgo.app.global.view.gone
 import com.duckduckgo.app.global.view.launchDefaultAppActivity
+import com.duckduckgo.app.icon.ui.ChangeIconActivity
 import com.duckduckgo.app.global.view.show
 import com.duckduckgo.app.settings.SettingsViewModel.AutomaticallyClearData
 import com.duckduckgo.app.settings.SettingsViewModel.Command
@@ -42,6 +43,17 @@ import com.duckduckgo.app.settings.clear.ClearWhatOption
 import com.duckduckgo.app.settings.clear.ClearWhenOption
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelName
+import kotlinx.android.synthetic.main.content_settings_general.autocompleteToggle
+import kotlinx.android.synthetic.main.content_settings_general.changeAppIcon
+import kotlinx.android.synthetic.main.content_settings_general.changeAppIconLabel
+import kotlinx.android.synthetic.main.content_settings_general.lightThemeToggle
+import kotlinx.android.synthetic.main.content_settings_general.setAsDefaultBrowserSetting
+import kotlinx.android.synthetic.main.content_settings_other.about
+import kotlinx.android.synthetic.main.content_settings_other.provideFeedback
+import kotlinx.android.synthetic.main.content_settings_other.version
+import kotlinx.android.synthetic.main.content_settings_privacy.automaticallyClearWhatSetting
+import kotlinx.android.synthetic.main.content_settings_privacy.automaticallyClearWhenSetting
+import kotlinx.android.synthetic.main.include_toolbar.toolbar
 import kotlinx.android.synthetic.main.content_settings_general.autocompleteToggle
 import kotlinx.android.synthetic.main.content_settings_general.lightThemeToggle
 import kotlinx.android.synthetic.main.content_settings_general.searchNotificationToggle
@@ -90,6 +102,7 @@ class SettingsActivity : DuckDuckGoActivity(), SettingsAutomaticallyClearWhatFra
     }
 
     private fun configureUiEventHandlers() {
+        changeAppIconLabel.setOnClickListener { viewModel.userRequestedToChangeIcon() }
         about.setOnClickListener { startActivity(AboutDuckDuckGoActivity.intent(this)) }
         provideFeedback.setOnClickListener { viewModel.userRequestedToSendFeedback() }
 
@@ -109,6 +122,7 @@ class SettingsActivity : DuckDuckGoActivity(), SettingsAutomaticallyClearWhatFra
                 searchNotificationToggle.quietlySetIsChecked(it.searchNotificationEnabled, searchNotificationToggleListener)
                 updateDefaultBrowserViewVisibility(it)
                 updateAutomaticClearDataOptions(it.automaticallyClearData)
+                changeAppIcon.setImageResource(it.appIcon.icon)
                 showSearchNotification(it.showSearchNotificationToggle)
             }
         })
@@ -152,6 +166,7 @@ class SettingsActivity : DuckDuckGoActivity(), SettingsAutomaticallyClearWhatFra
     private fun processCommand(it: Command?) {
         when (it) {
             is Command.LaunchFeedback -> launchFeedback()
+            is Command.LaunchAppIcon -> launchAppIconChange()
             is Command.UpdateTheme -> sendThemeChangedBroadcast()
         }
     }
@@ -181,6 +196,11 @@ class SettingsActivity : DuckDuckGoActivity(), SettingsAutomaticallyClearWhatFra
     private fun launchFeedback() {
         val options = ActivityOptions.makeSceneTransitionAnimation(this).toBundle()
         startActivityForResult(Intent(FeedbackActivity.intent(this)), FEEDBACK_REQUEST_CODE, options)
+    }
+
+    private fun launchAppIconChange() {
+        val options = ActivityOptions.makeSceneTransitionAnimation(this).toBundle()
+        startActivityForResult(Intent(ChangeIconActivity.intent(this)), CHANGE_APP_ICON_REQUEST_CODE, options)
     }
 
     override fun onAutomaticallyClearWhatOptionSelected(clearWhatSetting: ClearWhatOption) {
@@ -229,6 +249,7 @@ class SettingsActivity : DuckDuckGoActivity(), SettingsAutomaticallyClearWhatFra
         private const val CLEAR_WHAT_DIALOG_TAG = "CLEAR_WHAT_DIALOG_FRAGMENT"
         private const val CLEAR_WHEN_DIALOG_TAG = "CLEAR_WHEN_DIALOG_FRAGMENT"
         private const val FEEDBACK_REQUEST_CODE = 100
+        private const val CHANGE_APP_ICON_REQUEST_CODE = 101
 
         fun intent(context: Context): Intent {
             return Intent(context, SettingsActivity::class.java)

@@ -162,6 +162,8 @@ interface Pixel {
         AUTOCOMPLETE_BOOKMARK_SELECTION("m_aut_s_b"),
         AUTOCOMPLETE_SEARCH_SELECTION("m_aut_s_s"),
 
+        CHANGE_APP_ICON_OPENED("m_ic"),
+
         QUICK_SEARCH_PROMPT_NOTIFICATION_SHOWN("m_qs_pn_s"),
         QUICK_SEARCH_PROMPT_NOTIFICATION_LAUNCHED("m_qs_pn_l"),
         QUICK_SEARCH_PROMPT_NOTIFICATION_KEEP("m_qs_pn_k"),

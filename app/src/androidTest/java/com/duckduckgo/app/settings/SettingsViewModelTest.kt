@@ -24,6 +24,7 @@ import com.duckduckgo.app.blockingObserve
 import com.duckduckgo.app.browser.BuildConfig
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.global.DuckDuckGoTheme
+import com.duckduckgo.app.icon.api.AppIcon
 import com.duckduckgo.app.notification.NotificationScheduler
 import com.duckduckgo.app.settings.SettingsViewModel.Command
 import com.duckduckgo.app.settings.clear.ClearWhatOption.CLEAR_NONE
@@ -86,6 +87,7 @@ class SettingsViewModelTest {
 
         whenever(mockAppSettingsDataStore.automaticallyClearWhenOption).thenReturn(APP_EXIT_ONLY)
         whenever(mockAppSettingsDataStore.automaticallyClearWhatOption).thenReturn(CLEAR_NONE)
+        whenever(mockAppSettingsDataStore.appIcon).thenReturn(AppIcon.DEFAULT)
 
         whenever(mockVariantManager.getVariant()).thenReturn(VariantManager.DEFAULT_VARIANT)
     }
@@ -218,6 +220,14 @@ class SettingsViewModelTest {
         testee.start()
         val expectedStartString = "${BuildConfig.VERSION_NAME} ab (${BuildConfig.VERSION_CODE})"
         assertEquals(expectedStartString, latestViewState().version)
+    }
+
+    @Test
+    fun whenChangeIconRequestedThenCommandIsChangeIcon() {
+        testee.userRequestedToChangeIcon()
+        testee.command.blockingObserve()
+        verify(commandObserver).onChanged(commandCaptor.capture())
+        assertEquals(Command.LaunchAppIcon, commandCaptor.firstValue)
     }
 
     @Test

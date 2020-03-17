@@ -40,6 +40,15 @@
     <!-- !!! WAITING FOR CORRECTIONS FROM TRANSLATOR - DO NOT RESUBMIT TRANSLATIONS ABOVE !!! -->
 
     <string name="search">Search</string>
+
+    <!-- Change Icon Activity -->
+    <string name="changeIconActivityTitle">App Icon</string>
+    <string name="changeIconCtaLabel">Change App Icon</string>
+    <string name="changeIconCtaAccept">Apply</string>
+    <string name="changeIconCtaCancel">Cancel</string>
+    <string name="changeIconDialogTitle">Apply New Icon?</string>
+    <string name="changeIconDialogMessage">The app may close to apply changes. Come on back after you\'ve admired your handsome new icon.</string>
+
     <!-- Sticky Search Prompt Notification -->
     <string name="stickySearchPromptNotificationTitle">Quick Search</string>
     <string name="stickySearchNotification">Sticky Search</string>
