@@ -1,6 +1,7 @@
 ﻿<resources xmlns:tools="http://schemas.android.com/tools">
 
     <string name="duckDuckGoLogoDescription">Logo DuckDuckGo</string>
+    <string name="duckDuckGoPrivacySimplified">Le respect de votre vie privée, simplifié.</string>
     <string name="yes">Oui</string>
     <string name="no">Non</string>
 
@@ -175,7 +176,6 @@
 
     <!-- About Activity -->
     <string name="aboutActivityTitle">À propos de nous</string>
-    <string name="aboutHeading">Le respect de votre vie privée, simplifié.</string>
     <string name="aboutDescription">
         Chez DuckDuckGo, nous établissons la nouvelle norme de confiance en ligne. \n\ Le navigateur de confidentialité DuckDuckGo fournit tous les éléments de confidentialité essentiels dont vous avez besoin pour vous protéger lorsque vous faites des recherches et naviguez sur le Web, notamment le blocage des trackers, le chiffrement plus intelligent et la recherche privée DuckDuckGo.\n\ Après tout, Internet ne devrait pas être aussi effrayant, et obtenir la confidentialité que vous méritez en ligne devrait être aussi simple que de fermer les stores.</string>
     <string name="aboutMoreLink">Pour en savoir plus, visitez duckduckgo.com/about</string>
@@ -273,7 +273,7 @@
     <string name="privacyProtectionNotificationTrackerDescription">Vous avez protégé vos données en bloquant %d trackers lors de l\'utilisation de DuckDuckGo.</string>
     <string name="privacyProtectionNotificationBothDescription">Vous avez protégé vos données en bloquant %d trackers et en sécurisant %d connexions non chiffrées lors de l\'utilisation de DuckDuckGo.</string>
     <string name="privacyProtectionNotificationLaunchButton">Reprendre la navigation</string>
-    
+
     <!-- Authentication -->
     <string name="authenticationDialogTitle">Se connecter</string>
     <string name="authenticationDialogMessage">%s nécessite un nom d\'utilisateur et un mot de passe.</string>
@@ -356,5 +356,36 @@
     <string name="feedbackInitialDisambiguationHappyButtonContentDescription">Bouton de commentaires positifs</string>
     <string name="feedbackInitialDisambiguationSadButtonContentDescription">Bouton de commentaires négatifs</string>
     <string name="feedbackIsImportantToUs">Vos commentaires anonymes sont importants pour nous.</string>
+
+    <!-- Webview Recovery -->
+    <string name="crashedWebViewErrorMessage">Impossible d\'afficher la page Web.</string>
+    <string name="crashedWebViewErrorAction">Recharger</string>
+
+    <!-- System Search -->
+    <string name="systemSearchOmnibarInputHint"><font size="13">Faire des recherches ou saisir l\'URL</font></string>
+    <string name="systemSearchDeviceAppLabel">Depuis cet appareil</string>
+    <string name="systemSearchAppNotFound">Impossible de trouver l\'application</string>
+    <string name="systemSearchOnboardingText">Merci d\'avoir choisi DuckDuckGo!\nDésormais, lorsque vous utilisez notre recherche ou notre application, vos recherches sont protégées.</string>
+    <string name="systemSearchOnboardingFeaturesIntroText">L\'appli DuckDuckGo offre également les fonctionnalités suivantes:</string>
+    <string name="systemSearchOnboardingFeatureOneText">Bloque les traqueurs dangereux</string>
+    <string name="systemSearchOnboardingFeatureTwoText">Force le cryptage sur les sites Web</string>
+    <string name="systemSearchOnboardingFeatureThreeText">Efface les données en un seul clic</string>
+    <string name="systemSearchOnboardingButtonMore">Afficher plus</string>
+    <string name="systemSearchOnboardingButtonLess">Masquer</string>
+    <string name="systemSearchOnboardingButtonOk">J\'ai compris</string>
+
+    <!-- Dax Dialog -->
+    <string name="daxDialogHideButton">MASQUER</string>
+    <string name="daxDialogPhew">Ouf !</string>
+    <string name="daxDialogYes">OK !</string>
+    <string name="daxDialogAddWidget">Ajouter un widget</string>
+    <string name="daxDialogMaybeLater">Peut-être plus tard</string>
+    <string name="daxDialogSettings">Aller aux paramètres</string>
+    <string name="daxDialogNext">Suivant</string>
+    <string name="daxDialogHighFive">Tape m\'en cinq !</string>
+    <string name="daxDialogGotIt">J\'ai compris</string>
+    <string name="hideTipsTitle">Masquer les conseils restants ?</string>
+    <string name="hideTipsText">Il n\'y en a que quelques-uns, et nous avons essayé de les rendre informatifs.</string>
+    <string name="hideTipsButton">Masquer les conseils pour toujours</string>
 
 </resources>

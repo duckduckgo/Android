@@ -24,6 +24,9 @@ import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteResult
 import com.duckduckgo.app.global.DefaultDispatcherProvider
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.SingleLiveEvent
+import com.duckduckgo.app.onboarding.store.OnboardingStore
+import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.*
 import com.jakewharton.rxrelay2.PublishRelay
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
@@ -34,12 +37,19 @@ import timber.log.Timber
 import java.util.concurrent.TimeUnit
 
 class SystemSearchViewModel(
+    private var onboardingStore: OnboardingStore,
     private val autoComplete: AutoComplete,
     private val deviceAppLookup: DeviceAppLookup,
+    private val pixel: Pixel,
     private val dispatchers: DispatcherProvider = DefaultDispatcherProvider()
 ) : ViewModel() {
 
-    data class SystemSearchViewState(
+    data class OnboardingViewState(
+        val visible: Boolean,
+        val expanded: Boolean = false
+    )
+
+    data class SystemSearchResultsViewState(
         val queryText: String = "",
         val autocompleteResults: AutoCompleteResult = AutoCompleteResult("", emptyList()),
         val appResults: List<DeviceApp> = emptyList()
@@ -50,9 +60,11 @@ class SystemSearchViewModel(
         data class LaunchBrowser(val query: String) : Command()
         data class LaunchDeviceApplication(val deviceApp: DeviceApp) : Command()
         data class ShowAppNotFoundMessage(val appName: String) : Command()
+        object DismissKeyboard : Command()
     }
 
-    val viewState: MutableLiveData<SystemSearchViewState> = MutableLiveData()
+    val onboardingViewState: MutableLiveData<OnboardingViewState> = MutableLiveData()
+    val resultsViewState: MutableLiveData<SystemSearchResultsViewState> = MutableLiveData()
     val command: SingleLiveEvent<Command> = SingleLiveEvent()
 
     private val autoCompletePublishSubject = PublishRelay.create<String>()
@@ -63,17 +75,31 @@ class SystemSearchViewModel(
     private var appResults: List<DeviceApp> = emptyList()
 
     init {
-        resetState()
+        resetViewState()
         configureAutoComplete()
     }
 
-    private fun currentViewState(): SystemSearchViewState = viewState.value!!
+    private fun currentOnboardingState(): OnboardingViewState = onboardingViewState.value!!
+    private fun currentResultsState(): SystemSearchResultsViewState = resultsViewState.value!!
 
-    fun resetState() {
+    fun resetViewState() {
+        resetOnboardingState()
+        resetResultsState()
+    }
+
+    private fun resetOnboardingState() {
+        val showOnboarding = onboardingStore.shouldShow
+        onboardingViewState.value = OnboardingViewState(visible = showOnboarding)
+        if (showOnboarding) {
+            pixel.fire(INTERSTITIAL_ONBOARDING_SHOWN)
+        }
+    }
+
+    private fun resetResultsState() {
         autocompleteResults = AutoCompleteResult("", emptyList())
         appsJob?.cancel()
         appResults = emptyList()
-        viewState.value = SystemSearchViewState()
+        resultsViewState.value = SystemSearchResultsViewState()
     }
 
     private fun configureAutoComplete() {
@@ -87,11 +113,27 @@ class SystemSearchViewModel(
             }, { t: Throwable? -> Timber.w(t, "Failed to get search results") })
     }
 
+    fun userTappedOnboardingToggle() {
+        onboardingViewState.value = currentOnboardingState().copy(expanded = !currentOnboardingState().expanded)
+        if (currentOnboardingState().expanded) {
+            pixel.fire(INTERSTITIAL_ONBOARDING_MORE_PRESSED)
+            command.value = Command.DismissKeyboard
+        } else {
+            pixel.fire(INTERSTITIAL_ONBOARDING_LESS_PRESSED)
+        }
+    }
+
+    fun userDismissedOnboarding() {
+        onboardingViewState.value = currentOnboardingState().copy(visible = false)
+        onboardingStore.onboardingShown()
+        pixel.fire(INTERSTITIAL_ONBOARDING_DISMISSED)
+    }
+
     fun userUpdatedQuery(query: String) {
 
         appsJob?.cancel()
 
-        if (query == currentViewState().queryText) {
+        if (query == currentResultsState().queryText) {
             return
         }
 
@@ -100,7 +142,7 @@ class SystemSearchViewModel(
             return
         }
 
-        viewState.value = currentViewState().copy(queryText = query)
+        resultsViewState.value = currentResultsState().copy(queryText = query)
 
         val trimmedQuery = query.trim()
         autoCompletePublishSubject.accept(trimmedQuery)
@@ -111,22 +153,22 @@ class SystemSearchViewModel(
 
     private fun updateAppResults(results: List<DeviceApp>) {
         appResults = results
-        refreshViewStateResults()
+        refreshResultsViewState()
     }
 
     private fun updateAutocompleteResult(results: AutoCompleteResult) {
         autocompleteResults = results
-        refreshViewStateResults()
+        refreshResultsViewState()
     }
 
-    private fun refreshViewStateResults() {
+    private fun refreshResultsViewState() {
         val hasMultiResults = autocompleteResults.suggestions.isNotEmpty() && appResults.isNotEmpty()
         val fullSuggestions = autocompleteResults.suggestions
         val updatedSuggestions = if (hasMultiResults) fullSuggestions.take(RESULTS_MAX_RESULTS_PER_GROUP) else fullSuggestions
         val updatedApps = if (hasMultiResults) appResults.take(RESULTS_MAX_RESULTS_PER_GROUP) else appResults
 
-        viewState.postValue(
-            currentViewState().copy(
+        resultsViewState.postValue(
+            currentResultsState().copy(
                 autocompleteResults = AutoCompleteResult(autocompleteResults.query, updatedSuggestions),
                 appResults = updatedApps
             )
@@ -134,24 +176,28 @@ class SystemSearchViewModel(
     }
 
     fun userTappedDax() {
+        pixel.fire(INTERSTITIAL_LAUNCH_DAX)
         command.value = Command.LaunchDuckDuckGo
     }
 
     fun userClearedQuery() {
         autoCompletePublishSubject.accept("")
-        resetState()
+        resetResultsState()
     }
 
     fun userSubmittedQuery(query: String) {
         command.value = Command.LaunchBrowser(query)
+        pixel.fire(INTERSTITIAL_LAUNCH_BROWSER_QUERY)
     }
 
     fun userSubmittedAutocompleteResult(query: String) {
         command.value = Command.LaunchBrowser(query)
+        pixel.fire(INTERSTITIAL_LAUNCH_BROWSER_QUERY)
     }
 
     fun userSelectedApp(app: DeviceApp) {
         command.value = Command.LaunchDeviceApplication(app)
+        pixel.fire(INTERSTITIAL_LAUNCH_DEVICE_APP)
     }
 
     fun appNotFound(app: DeviceApp) {

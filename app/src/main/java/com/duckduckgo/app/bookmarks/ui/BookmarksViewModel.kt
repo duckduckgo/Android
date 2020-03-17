@@ -31,6 +31,7 @@ class BookmarksViewModel(val dao: BookmarksDao) : EditBookmarkListener, ViewMode
 
     data class ViewState(
         val showBookmarks: Boolean = false,
+        val enableSearch: Boolean = false,
         val bookmarks: List<BookmarkEntity> = emptyList()
     )
 
@@ -40,6 +41,10 @@ class BookmarksViewModel(val dao: BookmarksDao) : EditBookmarkListener, ViewMode
         class ConfirmDeleteBookmark(val bookmark: BookmarkEntity) : Command()
         class ShowEditBookmark(val bookmark: BookmarkEntity) : Command()
 
+    }
+
+    companion object {
+        private const val MIN_BOOKMARKS_FOR_SEARCH = 3
     }
 
     val viewState: MutableLiveData<ViewState> = MutableLiveData()
@@ -65,7 +70,11 @@ class BookmarksViewModel(val dao: BookmarksDao) : EditBookmarkListener, ViewMode
     }
 
     private fun onBookmarksChanged(bookmarks: List<BookmarkEntity>) {
-        viewState.value = viewState.value?.copy(showBookmarks = bookmarks.isNotEmpty(), bookmarks = bookmarks)
+        viewState.value = viewState.value?.copy(
+                showBookmarks = bookmarks.isNotEmpty(),
+                bookmarks = bookmarks,
+                enableSearch = bookmarks.size > MIN_BOOKMARKS_FOR_SEARCH
+        )
     }
 
     fun onSelected(bookmark: BookmarkEntity) {

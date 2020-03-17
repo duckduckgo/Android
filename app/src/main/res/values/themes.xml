@@ -28,6 +28,8 @@
         <item name="windowNoTitle">true</item>
         <item name="bottomSheetDialogTheme">@style/BottomSheetDialog</item>
         <item name="android:windowActivityTransitions">true</item>
+        <item name="autoCompleteTextViewStyle">@style/AutoCompleteTextViewStyle</item>
+        <item name="android:statusBarColor">?colorPrimary</item>
     </style>
 
     <style name="AppTheme.BaseDark">
@@ -167,6 +169,12 @@
         <item name="colorControlActivated">@color/cornflowerBlue</item>
         <item name="colorSwitchThumbNormal">@color/white</item>
         <item name="android:colorForeground">?attr/settingsSwitchBackgroundColor</item>
+    </style>
+
+    <style name="AutoCompleteTextViewStyle" parent="Widget.AppCompat.AutoCompleteTextView">
+        <item name="android:textCursorDrawable">@drawable/text_cursor</item>
+        <item name="android:textColorHint">?attr/omnibarHintColor</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
     </style>
 
     <style name="DaxDialogFragment" parent="android:Theme.DeviceDefault.Light.NoActionBar">
