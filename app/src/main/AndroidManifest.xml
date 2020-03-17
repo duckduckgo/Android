@@ -255,7 +255,7 @@
         <activity
             android:name="com.duckduckgo.app.brokensite.BrokenSiteActivity"
             android:label="@string/brokenSiteHeading"
-            android:theme="@style/ModalCardTheme" />
+            android:parentActivityName=".BrowserActivity" />
         <activity
             android:name="com.duckduckgo.app.survey.ui.SurveyActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"

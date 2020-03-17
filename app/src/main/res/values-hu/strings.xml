@@ -184,12 +184,21 @@
     <!-- Broken Site Activity -->
     <string name="brokenSiteReportBrokenSiteMenuItem">Hibás weboldal bejelentése</string>
     <string name="brokenSiteHeading">Hibás weboldal bejelentése</string>
-    <string name="brokenSiteModalDescription">A hibás weboldal bejelentése teljes mértékben anonim, és segít nekünk az alkalmazás javításában!</string>
-    <string name="brokenSiteUrlHint">URL megadása</string>
-    <string name="brokenSiteDomainLabel">Hibás weboldal címe:</string>
-    <string name="brokenSiteMessageHint">Melyik tartalom vagy funkció hibás?</string>
-    <string name="brokenSiteSubmitButton">Visszajelzés elküldése</string>
     <string name="brokenSiteSubmitted">Köszönjük! Visszajelzés elküldve</string>
+    <string name="brokenSitesCategoriesTitle">Írja le, mi történt:</string>
+    <string name="brokenSitesCategoriesHint">Az esemény leírása</string>
+    <string name="brokenSiteSubmitButton">Jelentés küldése</string>
+    <string name="brokenSiteDescription">Egy megsérült webhelyről szóló névtelen bejelentés segít a hibakeresésben és az alkalmazás fejlesztésében.</string>
+
+    <string name="brokenSiteCategoryImages">A képek nem töltődtek be</string>
+    <string name="brokenSiteCategoryPaywall">A webhely kérte tőlem a letiltást</string>
+    <string name="brokenSiteCategoryComments">A megjegyzések nem töltődtek be</string>
+    <string name="brokenSiteCategoryVideos">A videót nem játszotta le</string>
+    <string name="brokenSiteCategoryLinks">A hivatkozások vagy a gombok nem működnek</string>
+    <string name="brokenSiteCategoryContent">Hiányzik a tartalom</string>
+    <string name="brokenSiteCategoryLogin">Nem tudok bejelentkezni</string>
+    <string name="brokenSiteCategoryUnsupported">A böngésző nem kompatibilis</string>
+    <string name="brokenSiteCategoryOther">Valami más</string>
 
     <!-- Bookmarks Activity -->
     <string name="bookmarksMenuTitle">Könyvjelzők</string>

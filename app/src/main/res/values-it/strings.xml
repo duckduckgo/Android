@@ -200,12 +200,21 @@
     <!-- Broken Site Activity -->
     <string name="brokenSiteReportBrokenSiteMenuItem">Segnala sito danneggiato</string>
     <string name="brokenSiteHeading">Segnala un sito danneggiato</string>
-    <string name="brokenSiteModalDescription">La segnalazione dei siti danneggiati è totalmente anonima e ci aiuta a migliorare l\'app!</string>
-    <string name="brokenSiteUrlHint">Inserisci l\'URL</string>
-    <string name="brokenSiteDomainLabel">Dominio del sito danneggiato:</string>
-    <string name="brokenSiteMessageHint">Quale funzionalità o contenuto è danneggiato?</string>
-    <string name="brokenSiteSubmitButton">Invia feedback</string>
     <string name="brokenSiteSubmitted">Grazie! Il feedback è stato inviato</string>
+    <string name="brokenSitesCategoriesTitle">Descrivi cosa è successo:</string>
+    <string name="brokenSitesCategoriesHint">Descrivi cosa è successo</string>
+    <string name="brokenSiteSubmitButton">Invia il rapporto</string>
+    <string name="brokenSiteDescription">L\'invio di un rapporto sul sito non funzionante nell\'anonimato ci consente di eseguire il debug di questi problemi e migliorare l\'app.</string>
+
+    <string name="brokenSiteCategoryImages">Le immagini non sono state caricate</string>
+    <string name="brokenSiteCategoryPaywall">Il sito mi ha chiesto di disabilitare</string>
+    <string name="brokenSiteCategoryComments">I commenti non sono stati caricati</string>
+    <string name="brokenSiteCategoryVideos">Il video non è stato riprodotto</string>
+    <string name="brokenSiteCategoryLinks">Collegamenti o pulsanti non funzionano</string>
+    <string name="brokenSiteCategoryContent">Manca il contenuto</string>
+    <string name="brokenSiteCategoryLogin">Non riesco ad accedere</string>
+    <string name="brokenSiteCategoryUnsupported">Il browser non è compatibile</string>
+    <string name="brokenSiteCategoryOther">Qualcos\'altro</string>
 
     <!-- Bookmarks Activity -->
     <string name="bookmarksMenuTitle">Segnalibri</string>

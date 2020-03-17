@@ -53,6 +53,7 @@ interface Pixel {
         WEB_RENDERER_GONE_CRASH("m_d_wrg_c"),
         WEB_RENDERER_GONE_KILLED("m_d_wrg_k"),
         BROKEN_SITE_REPORTED("m_bsr"),
+        BROKEN_SITE_REPORT("epbf"),
 
         ONBOARDING_DEFAULT_BROWSER_VISUALIZED("m_odb_v"),
         ONBOARDING_DEFAULT_BROWSER_LAUNCHED("m_odb_l"),
@@ -205,9 +206,9 @@ interface Pixel {
         const val DAX_NO_TRACKERS_CTA = "nt"
     }
 
-    fun fire(pixel: PixelName, parameters: Map<String, String?> = emptyMap())
-    fun fire(pixelName: String, parameters: Map<String, String?> = emptyMap())
-    fun fireCompletable(pixelName: String, parameters: Map<String, String?>): Completable
+    fun fire(pixel: PixelName, parameters: Map<String, String> = emptyMap(), encodedParameters: Map<String, String> = emptyMap())
+    fun fire(pixelName: String, parameters: Map<String, String> = emptyMap(), encodedParameters: Map<String, String> = emptyMap())
+    fun fireCompletable(pixelName: String, parameters: Map<String, String>, encodedParameters: Map<String, String> = emptyMap()): Completable
 }
 
 class ApiBasedPixel @Inject constructor(
@@ -217,24 +218,24 @@ class ApiBasedPixel @Inject constructor(
     private val deviceInfo: DeviceInfo
 ) : Pixel {
 
-    override fun fire(pixel: PixelName, parameters: Map<String, String?>) {
-        fire(pixel.pixelName, parameters)
+    override fun fire(pixel: PixelName, parameters: Map<String, String>, encodedParameters: Map<String, String>) {
+        fire(pixel.pixelName, parameters, encodedParameters)
     }
 
-    override fun fire(pixelName: String, parameters: Map<String, String?>) {
-        fireCompletable(pixelName, parameters)
+    override fun fire(pixelName: String, parameters: Map<String, String>, encodedParameters: Map<String, String>) {
+        fireCompletable(pixelName, parameters, encodedParameters)
             .subscribeOn(Schedulers.io())
             .subscribe({
-                Timber.v("Pixel sent: $pixelName with params: $parameters")
+                Timber.v("Pixel sent: $pixelName with params: $parameters $encodedParameters")
             }, {
-                Timber.w("Pixel failed: $pixelName with params: $parameters")
+                Timber.w(it, "Pixel failed: $pixelName with params: $parameters $encodedParameters")
             })
     }
 
-    override fun fireCompletable(pixelName: String, parameters: Map<String, String?>): Completable {
+    override fun fireCompletable(pixelName: String, parameters: Map<String, String>, encodedParameters: Map<String, String>): Completable {
         val defaultParameters = mapOf(PixelParameter.APP_VERSION to deviceInfo.appVersion)
         val fullParameters = defaultParameters.plus(parameters)
         val atb = statisticsDataStore.atb?.formatWithVariant(variantManager.getVariant()) ?: ""
-        return api.fire(pixelName, deviceInfo.formFactor().description, atb, fullParameters)
+        return api.fire(pixelName, deviceInfo.formFactor().description, atb, fullParameters, encodedParameters)
     }
 }

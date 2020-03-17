@@ -19,8 +19,10 @@ package com.duckduckgo.app.global.model
 import com.duckduckgo.app.privacy.model.HttpsStatus
 import com.duckduckgo.app.privacy.model.PrivacyPractices
 import com.duckduckgo.app.privacy.model.TestEntity
+import com.duckduckgo.app.surrogates.SurrogateResponse
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Test
 
 class SiteMonitorTest {
@@ -114,5 +116,24 @@ class SiteMonitorTest {
         testee.trackerDetected(TrackingEvent(document, trackerA, null, majorNetwork, true))
         testee.trackerDetected(TrackingEvent(document, trackerB, null, majorNetwork, true))
         assertEquals(1, testee.majorNetworkCount)
+    }
+
+    @Test
+    fun whenSiteCreatedThenUpgradedHttpsIsFalse() {
+        val testee = SiteMonitor(document, null)
+        assertFalse(testee.upgradedHttps)
+    }
+
+    @Test
+    fun whenSiteCreatedThenSurrogatesSizeIsZero() {
+        val testee = SiteMonitor(document, null)
+        assertEquals(0, testee.surrogates.size)
+    }
+
+    @Test
+    fun whenSurrogatesAreDetectedThenSurrogatesListIsIncremented() {
+        val testee = SiteMonitor(document, null)
+        testee.surrogateDetected(SurrogateResponse())
+        assertEquals(1, testee.surrogates.size)
     }
 }

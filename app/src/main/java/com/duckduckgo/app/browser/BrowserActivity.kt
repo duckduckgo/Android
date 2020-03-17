@@ -294,11 +294,6 @@ class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope() {
         }
     }
 
-    fun launchBrokenSiteFeedback(url: String?) {
-        val options = ActivityOptions.makeSceneTransitionAnimation(this).toBundle()
-        startActivity(BrokenSiteActivity.intent(this, url), options)
-    }
-
     fun launchSettings() {
         startActivity(SettingsActivity.intent(this))
     }

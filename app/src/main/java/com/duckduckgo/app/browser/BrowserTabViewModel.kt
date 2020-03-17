@@ -70,6 +70,7 @@ import com.duckduckgo.app.statistics.api.StatisticsUpdater
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelName
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter
+import com.duckduckgo.app.surrogates.SurrogateResponse
 import com.duckduckgo.app.survey.model.Survey
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
@@ -134,7 +135,7 @@ class BrowserTabViewModel(
         val canAddBookmarks: Boolean = false,
         val canGoBack: Boolean = false,
         val canGoForward: Boolean = false,
-        val canReportSite: Boolean = true,
+        val canReportSite: Boolean = false,
         val addToHomeEnabled: Boolean = false,
         val addToHomeVisible: Boolean = false
     )
@@ -185,7 +186,7 @@ class BrowserTabViewModel(
         class ShareLink(val url: String) : Command()
         class CopyLink(val url: String) : Command()
         class FindInPageCommand(val searchTerm: String) : Command()
-        class BrokenSiteFeedback(val url: String?) : Command()
+        class BrokenSiteFeedback(val url: String, val blockedTrackers: String, val surrogates: String, val httpsUpgraded: Boolean) : Command()
         object DismissFindInPage : Command()
         class ShowFileChooser(val filePathCallback: ValueCallback<Array<Uri>>, val fileChooserParams: WebChromeClient.FileChooserParams) : Command()
         class HandleExternalAppLink(val appLink: IntentType) : Command()
@@ -229,6 +230,7 @@ class BrowserTabViewModel(
     private lateinit var tabId: String
     private var webNavigationState: WebNavigationState? = null
     private var defaultBrowserAttempt: Int = 1
+    private var httpsUpgraded = false
 
     init {
         initializeViewStates()
@@ -261,7 +263,7 @@ class BrowserTabViewModel(
             buildingSiteFactoryJob?.cancel()
         }
 
-        site = siteFactory.buildSite(url, title)
+        site = siteFactory.buildSite(url, title, httpsUpgraded)
         onSiteChanged()
         buildingSiteFactoryJob = viewModelScope.launch {
             site?.let {
@@ -498,7 +500,8 @@ class BrowserTabViewModel(
                 addToHomeEnabled = true,
                 addToHomeVisible = addToHomeCapabilityDetector.isAddToHomeSupported(),
                 canSharePage = true,
-                showPrivacyGrade = true
+                showPrivacyGrade = true,
+                canReportSite = true
             )
         )
 
@@ -536,7 +539,8 @@ class BrowserTabViewModel(
             addToHomeEnabled = false,
             addToHomeVisible = addToHomeCapabilityDetector.isAddToHomeSupported(),
             canSharePage = false,
-            showPrivacyGrade = false
+            showPrivacyGrade = false,
+            canReportSite = false
         )
     }
 
@@ -586,6 +590,14 @@ class BrowserTabViewModel(
         command.postValue(SendSms(telephoneNumber))
     }
 
+    override fun surrogateDetected(surrogate: SurrogateResponse) {
+        site?.surrogateDetected(surrogate)
+    }
+
+    override fun upgradedToHttps() {
+        httpsUpgraded = true
+    }
+
     override fun trackerDetected(event: TrackingEvent) {
         Timber.d("Tracker detected while on $url and the document was ${event.documentUrl}")
         if (site?.domainMatchesUrl(event.documentUrl) == true) {
@@ -608,6 +620,7 @@ class BrowserTabViewModel(
     }
 
     private fun onSiteChanged() {
+        httpsUpgraded = false
         viewModelScope.launch {
 
             val improvedGrade = withContext(dispatchers.io()) {
@@ -694,7 +707,13 @@ class BrowserTabViewModel(
     }
 
     fun onBrokenSiteSelected() {
-        command.value = BrokenSiteFeedback(url)
+        val events = site?.trackingEvents
+        val blockedTrackers = events?.map { Uri.parse(it.trackerUrl).host }.orEmpty().distinct().joinToString(",")
+        val upgradedHttps = site?.upgradedHttps ?: false
+        val surrogates = site?.surrogates?.map { Uri.parse(it.name).baseHost }.orEmpty().distinct().joinToString(",")
+        val url = url.orEmpty()
+
+        command.value = BrokenSiteFeedback(url, blockedTrackers, surrogates, upgradedHttps)
     }
 
     fun onUserSelectedToEditQuery(query: String) {
