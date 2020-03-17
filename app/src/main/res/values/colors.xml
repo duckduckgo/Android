@@ -38,6 +38,7 @@
     <color name="whiteThree">#f5f5f5</color>
     <color name="whiteFour">#f1f1f1</color>
     <color name="whiteFive">#fafafa</color>
+    <color name="whiteEight">#D7D7D7</color>
     <color name="midnight">#161616</color>
     <color name="almostBlackDark">#222222</color>
     <color name="almostBlack">#333333</color>
@@ -76,8 +77,15 @@
 
     <color name="midGreen">#3fa140</color>
 
-
     <color name="translucentDark">#b000</color>
     <color name="gunmetal">#494d56</color>
 
+    <color name="ic_launcher_red_background">#DE5833</color>
+    <color name="ic_launcher_white_background">#FFFFFF</color>
+    <color name="ic_launcher_gold_background">#EEA849</color>
+    <color name="ic_launcher_silhouette_background">#262626</color>
+    <color name="ic_launcher_green_background">#5FAD3E</color>
+    <color name="ic_launcher_purple_background">#7A4BDC</color>
+    <color name="ic_launcher_blue_background">#4179ED</color>
+    <color name="ic_launcher_black_background">#262626</color>
 </resources>

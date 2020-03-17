@@ -19,7 +19,9 @@ package com.duckduckgo.app.settings.db
 import android.content.Context
 import android.content.SharedPreferences
 import androidx.core.content.edit
+import com.duckduckgo.app.browser.BuildConfig
 import com.duckduckgo.app.global.DuckDuckGoTheme
+import com.duckduckgo.app.icon.api.AppIcon
 import com.duckduckgo.app.settings.clear.ClearWhatOption
 import com.duckduckgo.app.settings.clear.ClearWhenOption
 import javax.inject.Inject
@@ -30,6 +32,8 @@ interface SettingsDataStore {
     var theme: DuckDuckGoTheme?
     var hideTips: Boolean
     var autoCompleteSuggestionsEnabled: Boolean
+    var appIcon: AppIcon
+    var appIconChanged: Boolean
 
     /**
      * This will be checked upon app startup and used to decide whether it should perform a clear or not.
@@ -74,6 +78,20 @@ class SettingsSharedPreferences @Inject constructor(private val context: Context
     override var autoCompleteSuggestionsEnabled: Boolean
         get() = preferences.getBoolean(KEY_AUTOCOMPLETE_ENABLED, true)
         set(enabled) = preferences.edit { putBoolean(KEY_AUTOCOMPLETE_ENABLED, enabled) }
+
+    override var appIcon: AppIcon
+        get() {
+            val componentName = preferences.getString(KEY_APP_ICON, DEFAULT_ICON.componentName) ?: return DEFAULT_ICON
+            return AppIcon.from(componentName)
+        }
+        set(appIcon) = preferences.edit(commit = true) { putString(KEY_APP_ICON, appIcon.componentName) }
+
+    // Changing the app icon makes the app close in some devices / OS versions. This is a problem if the user has
+    // selected automatic data / tabs clear. We will use this flag to track if the user has changed the icon
+    // and prevent the tabs / data from be cleared {check AutomaticDataClearer}
+    override var appIconChanged: Boolean
+        get() = preferences.getBoolean(KEY_APP_ICON_CHANGED, false)
+        set(enabled) = preferences.edit(commit = true) { putBoolean(KEY_APP_ICON_CHANGED, enabled) }
 
     override var appUsedSinceLastClear: Boolean
         get() = preferences.getBoolean(KEY_APP_USED_SINCE_LAST_CLEAR, true)
@@ -132,5 +150,13 @@ class SettingsSharedPreferences @Inject constructor(private val context: Context
         const val KEY_APP_NOTIFICATIONS_ENABLED = "APP_NOTIFCATIONS_ENABLED"
         const val KEY_APP_USED_SINCE_LAST_CLEAR = "APP_USED_SINCE_LAST_CLEAR"
         const val KEY_HIDE_TIPS = "HIDE_TIPS"
+        const val KEY_APP_ICON = "APP_ICON"
+        const val KEY_APP_ICON_CHANGED = "APP_ICON_CHANGED"
+
+        private val DEFAULT_ICON = if (BuildConfig.DEBUG) {
+            AppIcon.BLUE
+        } else {
+            AppIcon.DEFAULT
+        }
     }
 }
