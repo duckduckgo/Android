@@ -184,12 +184,21 @@
     <!-- Broken Site Activity -->
     <string name="brokenSiteReportBrokenSiteMenuItem">Αναφορά κατεστραμμένου ιστότοπου</string>
     <string name="brokenSiteHeading">Αναφορά ενός κατεστραμμένου ιστότοπου</string>
-    <string name="brokenSiteModalDescription">Η αναφορά κατεστραμμένου ιστότοπου είναι απολύτως ανώνυμη και μας βοηθά να βελτιώσουμε την εφαρμογή!</string>
-    <string name="brokenSiteUrlHint">Εισαγωγή διεύθυνσης URL</string>
-    <string name="brokenSiteDomainLabel">Τομέας κατεστραμμένου ιστότοπου:</string>
-    <string name="brokenSiteMessageHint">Ποιο περιεχόμενο ή λειτουργία είναι κατεστραμμένο;</string>
-    <string name="brokenSiteSubmitButton">Υποβολή σχολίων</string>
     <string name="brokenSiteSubmitted">Ευχαριστούμε! Τα σχόλια υποβλήθηκαν</string>
+    <string name="brokenSitesCategoriesTitle">Περιγράψτε τι συνέβη:</string>
+    <string name="brokenSitesCategoriesHint">Περιγράψτε τι συνέβη</string>
+    <string name="brokenSiteSubmitButton">Αποστολή Αναφοράς</string>
+    <string name="brokenSiteDescription">Η υποβολή μιας ανώνυμης αναφοράς για σπασμένους συνδεσμους μασ βοηθά να πραγματοποιήσουμε επανόρθωση των εντοπισμένων σφαλμάτων και προβλημάτων αυτών των ζητημάτων και να βελτιώσουμε την εφαρμογή. </string>
+
+    <string name="brokenSiteCategoryImages">Οι εικόνες δεν φορτώθηκαν</string>
+    <string name="brokenSiteCategoryPaywall">Ο ιστότοπος μου ζήτησε να απενεργοποιήσω</string>
+    <string name="brokenSiteCategoryComments">Τα σχόλια δεν φορτώθηκαν</string>
+    <string name="brokenSiteCategoryVideos">Το βίντεο δεν έπαιξε</string>
+    <string name="brokenSiteCategoryLinks">Οι σύνδεσμοι  ή τα κουμπιά δεν λειτουργούν</string>
+    <string name="brokenSiteCategoryContent">Το περιεχόμενο λείπει</string>
+    <string name="brokenSiteCategoryLogin">Δεν μπορώ να συνδεθώ</string>
+    <string name="brokenSiteCategoryUnsupported">Το πρόγραμμα περιήγησης είναι ασύμβατο</string>
+    <string name="brokenSiteCategoryOther">Κάτι άλλο</string>
 
     <!-- Bookmarks Activity -->
     <string name="bookmarksMenuTitle">Σελιδοδείκτες</string>

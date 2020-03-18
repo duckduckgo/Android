@@ -6,13 +6,16 @@ import com.duckduckgo.app.InstantSchedulersRule
 import com.duckduckgo.app.brokensite.BrokenSiteViewModel
 import com.duckduckgo.app.brokensite.BrokenSiteViewModel.Command
 import com.duckduckgo.app.brokensite.api.BrokenSiteSender
+import com.duckduckgo.app.brokensite.model.BrokenSite
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.never
 import com.nhaarman.mockitokotlin2.verify
 import org.junit.After
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
@@ -33,7 +36,7 @@ class BrokenSiteViewModelTest {
 
     private val mockBrokenSiteSender: BrokenSiteSender = mock()
 
-    private val mockCommandObserver: Observer<BrokenSiteViewModel.Command> = mock()
+    private val mockCommandObserver: Observer<Command> = mock()
 
     private lateinit var testee: BrokenSiteViewModel
 
@@ -58,68 +61,120 @@ class BrokenSiteViewModelTest {
     }
 
     @Test
-    fun whenNoUrlProvidedThenUrlFocused() {
-        testee.setInitialBrokenSite(null)
-        verify(mockCommandObserver).onChanged(Command.FocusUrl)
-    }
-
-    @Test
-    fun whenUrlProvidedThenMessageFocused() {
-        testee.setInitialBrokenSite(url)
-        verify(mockCommandObserver).onChanged(Command.FocusMessage)
-    }
-
-    @Test
-    fun whenUrlAndMessageNotEmptyThenCanSubmit() {
-        testee.onBrokenSiteUrlChanged(url)
-        testee.onFeedbackMessageChanged(message)
+    fun whenCategorySelectedThenCanSubmit() {
+        selectAndAcceptCategory()
         assertTrue(viewState.submitAllowed)
     }
 
     @Test
-    fun whenNullUrlThenCannotSubmit() {
-        testee.onBrokenSiteUrlChanged(null)
-        testee.onFeedbackMessageChanged(message)
+    fun whenCategoryChangedButNotSelectedThenCannotSubmit() {
+        testee.onCategoryIndexChanged(0)
         assertFalse(viewState.submitAllowed)
     }
 
     @Test
-    fun whenEmptyUrlThenCannotSubmit() {
-        testee.onBrokenSiteUrlChanged(" ")
-        testee.onFeedbackMessageChanged(message)
+    fun whenNoCategorySelectedThenCannotSubmit() {
+        selectAndAcceptCategory(-1)
         assertFalse(viewState.submitAllowed)
     }
 
     @Test
-    fun whenNullMessageThenCannotSubmit() {
-        testee.onBrokenSiteUrlChanged(url)
-        testee.onFeedbackMessageChanged(null)
-        assertFalse(viewState.submitAllowed)
+    fun whenCategorySelectedButNotChangedThenReturnOldCategory() {
+        testee.onCategoryIndexChanged(0)
+        testee.onCategoryAccepted()
+        testee.onCategoryIndexChanged(1)
+        assertEquals(0, viewState.indexSelected)
     }
 
     @Test
-    fun whenEmptyMessageThenCannotSubmit() {
-        testee.onBrokenSiteUrlChanged(url)
-        testee.onFeedbackMessageChanged(" ")
-        assertFalse(viewState.submitAllowed)
+    fun whenCategoryAcceptedAndIncorrectIndexThenReturnNullCategory() {
+        selectAndAcceptCategory(-1)
+        assertNull(viewState.categorySelected)
     }
 
     @Test
-    fun whenCanSubmitBrokenSiteAndSubmitPressedThenFeedbackAndPixelSubmitted() {
-        testee.onBrokenSiteUrlChanged(url)
-        testee.onFeedbackMessageChanged(message)
-        testee.onSubmitPressed()
+    fun whenCategoryAcceptedAndCorrectIndexThenReturnCategory() {
+        val indexSelected = 0
+        selectAndAcceptCategory(indexSelected)
+
+        val categoryExpected = testee.categories[indexSelected]
+        assertEquals(categoryExpected, viewState.categorySelected)
+    }
+
+    @Test
+    fun whenCanSubmitBrokenSiteAndUrlNotNullAndSubmitPressedThenReportAndPixelSubmitted() {
+        testee.setInitialBrokenSite(url, "", "", false)
+        selectAndAcceptCategory()
+        testee.onSubmitPressed("webViewVersion")
+
+        val brokenSiteExpected = BrokenSite(
+            category = testee.categories[0].key,
+            siteUrl = url,
+            upgradeHttps = false,
+            blockedTrackers = "",
+            surrogates = "",
+            webViewVersion = "webViewVersion",
+            siteType = BrokenSiteViewModel.DESKTOP_SITE
+        )
 
         verify(mockPixel).fire(Pixel.PixelName.BROKEN_SITE_REPORTED, mapOf("url" to url))
-        verify(mockBrokenSiteSender).submitBrokenSiteFeedback(message, url)
+        verify(mockBrokenSiteSender).submitBrokenSiteFeedback(brokenSiteExpected)
         verify(mockCommandObserver).onChanged(Command.ConfirmAndFinish)
     }
 
     @Test
-    fun whenCannotSubmitBrokenSiteAndSubmitPressedThenFeedbackNotSubmitted() {
-        testee.onSubmitPressed()
-        verify(mockBrokenSiteSender, never()).submitBrokenSiteFeedback(any(), any())
-        verify(mockCommandObserver, never()).onChanged(Command.ConfirmAndFinish)
+    fun whenUrlIsDesktopThenSendDesktopParameter() {
+        testee.setInitialBrokenSite(url, "", "", false)
+        selectAndAcceptCategory()
+
+        val brokenSiteExpected = testee.getBrokenSite(url, "")
+        assertEquals(BrokenSiteViewModel.DESKTOP_SITE, brokenSiteExpected.siteType)
+    }
+
+    @Test
+    fun whenUrlIsMobileThenSendMobileParameter() {
+        val url = "http://m.example.com"
+        testee.setInitialBrokenSite(url, "", "", false)
+        selectAndAcceptCategory()
+
+        val brokenSiteExpected = testee.getBrokenSite(url, "")
+        assertEquals(BrokenSiteViewModel.MOBILE_SITE, brokenSiteExpected.siteType)
+    }
+
+    @Test
+    fun whenGetBrokenSiteThenReturnCorrectCategory() {
+        val url = "http://m.example.com"
+        val categoryIndex = 0
+        testee.setInitialBrokenSite(url, "", "", false)
+        selectAndAcceptCategory(categoryIndex)
+
+        val categoryExpected = testee.categories[categoryIndex].key
+        val brokenSiteExpected = testee.getBrokenSite(url, "")
+        assertEquals(categoryExpected, brokenSiteExpected.category)
+    }
+
+    @Test
+    fun whenCancelSelectionThenAssignOldIndexValue() {
+        testee.setInitialBrokenSite("", "", "", false)
+        selectAndAcceptCategory(0)
+        testee.onCategoryIndexChanged(1)
+        testee.onCategorySelectionCancelled()
+
+        assertEquals(0, testee.indexSelected)
+    }
+
+    @Test
+    fun whenCancelSelectionAndNoPreviousValueThenAssignMinusOne() {
+        testee.setInitialBrokenSite("", "", "", false)
+        testee.onCategoryIndexChanged(1)
+        testee.onCategorySelectionCancelled()
+
+        assertEquals(-1, testee.indexSelected)
+    }
+
+    private fun selectAndAcceptCategory(indexSelected: Int = 0) {
+        testee.onCategoryIndexChanged(indexSelected)
+        testee.onCategoryAccepted()
     }
 
     companion object Constants {

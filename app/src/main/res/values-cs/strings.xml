@@ -188,12 +188,21 @@
     <!-- Broken Site Activity -->
     <string name="brokenSiteReportBrokenSiteMenuItem">Nahlásit poškozené stránky</string>
     <string name="brokenSiteHeading">Nahlásit poškozenou stránku</string>
-    <string name="brokenSiteModalDescription">Přehledy poškozených stránek jsou zcela anonymní a pomáhají nám vylepšovat aplikaci!</string>
-    <string name="brokenSiteUrlHint">Zadejte URL</string>
-    <string name="brokenSiteDomainLabel">Doména poškozených stránek:</string>
-    <string name="brokenSiteMessageHint">Který obsah nebo funkce jsou poškozeny?</string>
-    <string name="brokenSiteSubmitButton">Odeslat zpětnou vazbu</string>
     <string name="brokenSiteSubmitted">Děkujeme! Zpětná vazba odeslána</string>
+    <string name="brokenSitesCategoriesTitle">Popište, co se stalo:</string>
+    <string name="brokenSitesCategoriesHint">Popište, co se stalo</string>
+    <string name="brokenSiteSubmitButton">Poslat zprávu</string>
+    <string name="brokenSiteDescription">Odeslání anonymní zprávy o nefunkčním webu nám pomůže tyto problémy řešit a vylepšovat aplikaci.</string>
+
+    <string name="brokenSiteCategoryImages">Obrázky nebyly načteny</string>
+    <string name="brokenSiteCategoryPaywall">Tato stránka mě požádala o deaktivaci</string>
+    <string name="brokenSiteCategoryComments">Komentáře nebyly načteny</string>
+    <string name="brokenSiteCategoryVideos">Video nebylo přehráno</string>
+    <string name="brokenSiteCategoryLinks">Odkazy nebo tlačítka nefungují</string>
+    <string name="brokenSiteCategoryContent">Chybí obsah</string>
+    <string name="brokenSiteCategoryLogin">Nemohu se přihlásit</string>
+    <string name="brokenSiteCategoryUnsupported">Prohlížeč je nekompatibilní</string>
+    <string name="brokenSiteCategoryOther">Něco jiného</string>
 
     <!-- Bookmarks Activity -->
     <string name="bookmarksMenuTitle">Záložky</string>

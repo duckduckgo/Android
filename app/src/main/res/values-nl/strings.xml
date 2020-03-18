@@ -184,12 +184,21 @@
     <!-- Broken Site Activity -->
     <string name="brokenSiteReportBrokenSiteMenuItem">Defecte website melden</string>
     <string name="brokenSiteHeading">Een defecte website melden</string>
-    <string name="brokenSiteModalDescription">Het melden van een defecte site is volledig anoniem en helpt ons om de app te verbeteren!</string>
-    <string name="brokenSiteUrlHint">URL invoeren</string>
-    <string name="brokenSiteDomainLabel">Domein van defecte site:</string>
-    <string name="brokenSiteMessageHint">Welke inhoud of functionaliteit is defect?</string>
-    <string name="brokenSiteSubmitButton">Feedback versturen</string>
     <string name="brokenSiteSubmitted">Dank je wel! Feedback verzonden</string>
+    <string name="brokenSitesCategoriesTitle">Beschrijf wat er is gebeurd:</string>
+    <string name="brokenSitesCategoriesHint">Beschrijf wat er is gebeurd</string>
+    <string name="brokenSiteSubmitButton">Verzend Rapport</string>
+    <string name="brokenSiteDescription">Als u een anoniem rapport voor een gebroken site indient, kunnen we deze problemen oplossen en de app verbeteren.</string>
+
+    <string name="brokenSiteCategoryImages">Afbeeldingen zijn niet geladen</string>
+    <string name="brokenSiteCategoryPaywall">De site heeft me gevraagd om uit te schakelen</string>
+    <string name="brokenSiteCategoryComments">Opmerkingen zijn niet geladen</string>
+    <string name="brokenSiteCategoryVideos">Video werd niet afgespeeld</string>
+    <string name="brokenSiteCategoryLinks">Links of knoppen werken niet</string>
+    <string name="brokenSiteCategoryContent">Inhoud ontbreekt</string>
+    <string name="brokenSiteCategoryLogin">Ik kan niet inloggen</string>
+    <string name="brokenSiteCategoryUnsupported">De browser is niet compatibel</string>
+    <string name="brokenSiteCategoryOther">Iets anders</string>
 
     <!-- Bookmarks Activity -->
     <string name="bookmarksMenuTitle">Bladwijzers</string>

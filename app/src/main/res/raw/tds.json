@@ -12,13 +12,12 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.002,
-      "fingerprinting": 0,
-      "cookies": 0.002,
+      "prevalence": 0.003,
+      "fingerprinting": 1,
+      "cookies": 0.003,
       "performance": {
         "time": 1,
         "size": 1,
-        "cpu": 1,
         "cache": 3
       },
       "categories": [
@@ -40,8 +39,8 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.055,
-      "fingerprinting": 0,
+      "prevalence": 0.058,
+      "fingerprinting": 1,
       "cookies": 0,
       "performance": {
         "time": 1,
@@ -53,34 +52,6 @@
         "Advertising",
         "Ad Fraud",
         "Third-Party Analytics Marketing"
-      ]
-    },
-    "254a.com": {
-      "domain": "254a.com",
-      "default": "block",
-      "owner": {
-        "name": "Yieldr",
-        "displayName": "Yieldr",
-        "privacyPolicy": "https://www.yieldr.com/privacy/",
-        "url": "http://yieldr.com"
-      },
-      "source": [
-        "DDG"
-      ],
-      "prevalence": 0.011,
-      "fingerprinting": 0,
-      "cookies": 0.011,
-      "performance": {
-        "time": 1,
-        "size": 1,
-        "cache": 3
-      },
-      "categories": [
-        "Ad Motivated Tracking",
-        "Advertising",
-        "Third-Party Analytics Marketing",
-        "Action Pixels",
-        "Obscure Ownership"
       ]
     },
     "2mdn.net": {
@@ -95,7 +66,7 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.09,
+      "prevalence": 0.107,
       "fingerprinting": 1,
       "cookies": 0.009,
       "performance": {
@@ -138,7 +109,7 @@
         "DDG"
       ],
       "prevalence": 0.006,
-      "fingerprinting": 0,
+      "fingerprinting": 1,
       "cookies": 0,
       "performance": {
         "time": 1,
@@ -180,13 +151,12 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.028,
-      "fingerprinting": 0,
-      "cookies": 0.028,
+      "prevalence": 0.023,
+      "fingerprinting": 1,
+      "cookies": 0.023,
       "performance": {
         "time": 1,
         "size": 1,
-        "cpu": 3,
         "cache": 3
       },
       "categories": [
@@ -208,13 +178,12 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.017,
-      "fingerprinting": 0,
-      "cookies": 0.017,
+      "prevalence": 0.024,
+      "fingerprinting": 1,
+      "cookies": 0.024,
       "performance": {
         "time": 1,
         "size": 1,
-        "cpu": 1,
         "cache": 3
       },
       "categories": [
@@ -235,13 +204,12 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.039,
-      "fingerprinting": 0,
+      "prevalence": 0.046,
+      "fingerprinting": 1,
       "cookies": 0.039,
       "performance": {
         "time": 1,
         "size": 1,
-        "cpu": 1,
         "cache": 3
       },
       "categories": [
@@ -261,13 +229,12 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.005,
+      "prevalence": 0.004,
       "fingerprinting": 2,
-      "cookies": 0.003,
+      "cookies": 0.002,
       "performance": {
         "time": 1,
         "size": 1,
-        "cpu": 2,
         "cache": 3
       },
       "categories": [
@@ -288,13 +255,12 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.008,
-      "fingerprinting": 0,
-      "cookies": 0.008,
+      "prevalence": 0.015,
+      "fingerprinting": 1,
+      "cookies": 0.015,
       "performance": {
         "time": 1,
         "size": 1,
-        "cpu": 1,
         "cache": 3
       },
       "categories": [
@@ -314,9 +280,9 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.113,
+      "prevalence": 0.115,
       "fingerprinting": 1,
-      "cookies": 0.081,
+      "cookies": 0.088,
       "performance": {
         "time": 1,
         "size": 1,
@@ -331,6 +297,16 @@
         "Third-Party Analytics Marketing",
         "Social - Share",
         "Embedded Content"
+      ],
+      "rules": [
+        {
+          "rule": "s7\\.addthis\\.com\\/js\\/250\\/addthis_widget\\.js",
+          "exceptions": {
+            "domains": [
+              "restorationhardware.com"
+            ]
+          }
+        }
       ]
     },
     "addtoany.com": {
@@ -345,9 +321,9 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.011,
+      "prevalence": 0.01,
       "fingerprinting": 1,
-      "cookies": 0.011,
+      "cookies": 0.009,
       "performance": {
         "time": 1,
         "size": 1,
@@ -375,9 +351,9 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.016,
+      "prevalence": 0.018,
       "fingerprinting": 0,
-      "cookies": 0.015,
+      "cookies": 0.016,
       "performance": {
         "time": 1,
         "size": 1,
@@ -401,9 +377,9 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.07,
+      "prevalence": 0.064,
       "fingerprinting": 3,
-      "cookies": 0.062,
+      "cookies": 0.056,
       "performance": {
         "time": 1,
         "size": 1,
@@ -431,11 +407,10 @@
       ],
       "prevalence": 0.003,
       "fingerprinting": 0,
-      "cookies": 0.002,
+      "cookies": 0.003,
       "performance": {
         "time": 1,
         "size": 1,
-        "cpu": 1,
         "cache": 3
       },
       "categories": [
@@ -455,9 +430,9 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.013,
-      "fingerprinting": 0,
-      "cookies": 0.013,
+      "prevalence": 0.014,
+      "fingerprinting": 1,
+      "cookies": 0.014,
       "performance": {
         "time": 1,
         "size": 1,
@@ -468,6 +443,32 @@
         "Advertising",
         "Ad Fraud",
         "Third-Party Analytics Marketing"
+      ]
+    },
+    "adhaven.com": {
+      "domain": "adhaven.com",
+      "default": "block",
+      "owner": {
+        "name": "4INFO, Inc.",
+        "displayName": "4INFO",
+        "url": "",
+        "privacyPolicy": ""
+      },
+      "source": [
+        "DDG"
+      ],
+      "prevalence": 0.003,
+      "fingerprinting": 0,
+      "cookies": 0.003,
+      "performance": {
+        "time": 1,
+        "size": 1,
+        "cache": 3
+      },
+      "categories": [
+        "Ad Motivated Tracking",
+        "Advertising",
+        "Audience Measurement"
       ]
     },
     "adhigh.net": {
@@ -482,13 +483,12 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.015,
-      "fingerprinting": 0,
-      "cookies": 0.014,
+      "prevalence": 0.024,
+      "fingerprinting": 1,
+      "cookies": 0.023,
       "performance": {
         "time": 1,
         "size": 1,
-        "cpu": 1,
         "cache": 3
       },
       "categories": [
@@ -508,9 +508,9 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.015,
-      "fingerprinting": 0,
-      "cookies": 0.015,
+      "prevalence": 0.014,
+      "fingerprinting": 1,
+      "cookies": 0.014,
       "performance": {
         "time": 1,
         "size": 1,
@@ -520,33 +520,6 @@
       "categories": [
         "Ad Motivated Tracking",
         "Advertising"
-      ]
-    },
-    "adkernel.com": {
-      "domain": "adkernel.com",
-      "default": "block",
-      "owner": {
-        "name": "Adkernel, LLC",
-        "displayName": "Adkernel",
-        "privacyPolicy": "https://adkernel.com/privacy-policy/",
-        "url": "http://adkernel.com"
-      },
-      "source": [
-        "DDG"
-      ],
-      "prevalence": 0.002,
-      "fingerprinting": 0,
-      "cookies": 0.001,
-      "performance": {
-        "time": 1,
-        "size": 1,
-        "cpu": 1,
-        "cache": 3
-      },
-      "categories": [
-        "Ad Motivated Tracking",
-        "Advertising",
-        "Third-Party Analytics Marketing"
       ]
     },
     "adlightning.com": {
@@ -562,12 +535,11 @@
         "DDG"
       ],
       "prevalence": 0.004,
-      "fingerprinting": 0,
+      "fingerprinting": 1,
       "cookies": 0,
       "performance": {
         "time": 1,
         "size": 1,
-        "cpu": 2,
         "cache": 1
       },
       "categories": [
@@ -588,7 +560,7 @@
         "DDG"
       ],
       "prevalence": 0.007,
-      "fingerprinting": 0,
+      "fingerprinting": 1,
       "cookies": 0.007,
       "performance": {
         "time": 1,
@@ -613,38 +585,12 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.009,
-      "fingerprinting": 0,
-      "cookies": 0.009,
+      "prevalence": 0.007,
+      "fingerprinting": 1,
+      "cookies": 0.007,
       "performance": {
         "time": 1,
         "size": 1,
-        "cache": 3
-      },
-      "categories": [
-        "Ad Motivated Tracking",
-        "Advertising"
-      ]
-    },
-    "adnium.com": {
-      "domain": "adnium.com",
-      "default": "block",
-      "owner": {
-        "name": "Adnium Inc",
-        "displayName": "Adnium",
-        "privacyPolicy": "https://adnium.com/privacy",
-        "url": "http://adnium.com"
-      },
-      "source": [
-        "DDG"
-      ],
-      "prevalence": 0.003,
-      "fingerprinting": 3,
-      "cookies": 0.002,
-      "performance": {
-        "time": 1,
-        "size": 3,
-        "cpu": 3,
         "cache": 3
       },
       "categories": [
@@ -664,9 +610,9 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.223,
-      "fingerprinting": 0,
-      "cookies": 0.161,
+      "prevalence": 0.242,
+      "fingerprinting": 1,
+      "cookies": 0.148,
       "performance": {
         "time": 1,
         "size": 1,
@@ -707,9 +653,9 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.032,
+      "prevalence": 0.033,
       "fingerprinting": 2,
-      "cookies": 0.014,
+      "cookies": 0.016,
       "performance": {
         "time": 1,
         "size": 1,
@@ -765,13 +711,12 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.004,
-      "fingerprinting": 0,
+      "prevalence": 0.01,
+      "fingerprinting": 1,
       "cookies": 0.001,
       "performance": {
         "time": 1,
         "size": 1,
-        "cpu": 1,
         "cache": 3
       },
       "categories": [
@@ -791,9 +736,9 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.014,
-      "fingerprinting": 0,
-      "cookies": 0.013,
+      "prevalence": 0.013,
+      "fingerprinting": 1,
+      "cookies": 0.012,
       "performance": {
         "time": 1,
         "size": 1,
@@ -817,8 +762,8 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.046,
-      "fingerprinting": 0,
+      "prevalence": 0.049,
+      "fingerprinting": 1,
       "cookies": 0,
       "performance": {
         "time": 1,
@@ -845,13 +790,13 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.044,
+      "prevalence": 0.032,
       "fingerprinting": 3,
       "cookies": 0,
       "performance": {
         "time": 1,
         "size": 1,
-        "cpu": 3,
+        "cpu": 1,
         "cache": 1
       },
       "categories": [
@@ -872,9 +817,9 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.008,
-      "fingerprinting": 0,
-      "cookies": 0.008,
+      "prevalence": 0.007,
+      "fingerprinting": 1,
+      "cookies": 0.007,
       "performance": {
         "time": 1,
         "size": 1,
@@ -898,13 +843,13 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.007,
+      "prevalence": 0.005,
       "fingerprinting": 3,
       "cookies": 0,
       "performance": {
         "time": 1,
         "size": 1,
-        "cpu": 3,
+        "cpu": 2,
         "cache": 3
       },
       "categories": [
@@ -926,9 +871,9 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.191,
+      "prevalence": 0.169,
       "fingerprinting": 1,
-      "cookies": 0.189,
+      "cookies": 0.167,
       "performance": {
         "time": 1,
         "size": 1,
@@ -952,9 +897,9 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.005,
-      "fingerprinting": 0,
-      "cookies": 0.005,
+      "prevalence": 0.003,
+      "fingerprinting": 1,
+      "cookies": 0.003,
       "performance": {
         "time": 1,
         "size": 1,
@@ -977,9 +922,34 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.081,
-      "fingerprinting": 0,
-      "cookies": 0.08,
+      "prevalence": 0.095,
+      "fingerprinting": 1,
+      "cookies": 0.094,
+      "performance": {
+        "time": 1,
+        "size": 1,
+        "cache": 3
+      },
+      "categories": [
+        "Ad Motivated Tracking",
+        "Advertising"
+      ]
+    },
+    "adtdp.com": {
+      "domain": "adtdp.com",
+      "default": "block",
+      "owner": {
+        "name": "CyberAgent, Inc.",
+        "displayName": "CyberAgent",
+        "privacyPolicy": "https://adtech.cyberagent.io/privacy",
+        "url": "http://cyberagent.io"
+      },
+      "source": [
+        "DDG"
+      ],
+      "prevalence": 0.002,
+      "fingerprinting": 1,
+      "cookies": 0.001,
       "performance": {
         "time": 1,
         "size": 1,
@@ -1002,8 +972,8 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.004,
-      "fingerprinting": 0,
+      "prevalence": 0.003,
+      "fingerprinting": 1,
       "cookies": 0,
       "performance": {
         "time": 1,
@@ -1028,9 +998,9 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.004,
+      "prevalence": 0.005,
       "fingerprinting": 2,
-      "cookies": 0.001,
+      "cookies": 0.004,
       "performance": {
         "time": 1,
         "size": 1,
@@ -1053,13 +1023,12 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.108,
-      "fingerprinting": 0,
-      "cookies": 0.095,
+      "prevalence": 0.105,
+      "fingerprinting": 1,
+      "cookies": 0.091,
       "performance": {
         "time": 1,
         "size": 1,
-        "cpu": 1,
         "cache": 3
       },
       "categories": [
@@ -1079,9 +1048,9 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.083,
-      "fingerprinting": 0,
-      "cookies": 0.079,
+      "prevalence": 0.091,
+      "fingerprinting": 1,
+      "cookies": 0.086,
       "performance": {
         "time": 1,
         "size": 1,
@@ -1105,7 +1074,7 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.003,
+      "prevalence": 0.002,
       "fingerprinting": 0,
       "cookies": 0.002,
       "performance": {
@@ -1132,9 +1101,9 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.003,
-      "fingerprinting": 0,
-      "cookies": 0.001,
+      "prevalence": 0.002,
+      "fingerprinting": 1,
+      "cookies": 0,
       "performance": {
         "time": 1,
         "size": 1,
@@ -1158,7 +1127,7 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.017,
+      "prevalence": 0.016,
       "fingerprinting": 1,
       "cookies": 0.005,
       "performance": {
@@ -1183,9 +1152,9 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.094,
+      "prevalence": 0.097,
       "fingerprinting": 1,
-      "cookies": 0.073,
+      "cookies": 0.075,
       "performance": {
         "time": 1,
         "size": 1,
@@ -1218,35 +1187,48 @@
       ]
     },
     "amazon.com": {
-      "domain": "amazon.com",
-      "default": "block",
-      "owner": {
-        "name": "Amazon Technologies, Inc.",
-        "displayName": "Amazon",
-        "privacyPolicy": "https://www.amazon.com/gp/help/customer/display.html?nodeId=468496",
-        "url": "http://amazon.com"
-      },
-      "source": [
-        "DDG"
-      ],
-      "prevalence": 0.002,
-      "fingerprinting": 0,
-      "cookies": 0.002,
-      "performance": {
-        "time": 1,
-        "size": 1,
-        "cpu": 1,
-        "cache": 3
-      },
-      "categories": [
-        "Ad Motivated Tracking",
-        "Analytics",
-        "SSO",
-        "Third-Party Analytics Marketing",
-        "Online Payment",
-        "Embedded Content"
-      ],
       "rules": [
+        {
+          "rule": "amazon\\.com\\/1\\/events\\/com\\.amazon\\.csm\\.nexusclient\\.prod"
+        },
+        {
+          "rule": "amazon\\.com\\/ap\\/signin\\/178-4417027-1316064"
+        },
+        {
+          "rule": "amazon\\.com\\/gp\\/widgets\\/sessionstabilizer"
+        },
+        {
+          "rule": "amazon\\.com\\/cs\\/uedata"
+        },
+        {
+          "rule": "amazon\\.com\\/abTestV2"
+        },
+        {
+          "rule": "amazon\\.com\\/1\\/batch\\/1\\/OE\\/"
+        },
+        {
+          "rule": "amazon\\.com\\/kp\\/card"
+        },
+        {
+          "rule": "amazon\\.com\\/service\\/web\\/content\\/uploadMetrics"
+        },
+        {
+          "rule": "amazon\\.com\\/kp\\/uedata\\/uedata"
+        },
+        {
+          "rule": "amazon\\.com\\/widgets\\/q"
+        },
+        {
+          "rule": "amazon\\.com\\/sdk\\/login1\\.js",
+          "exceptions": {
+            "types": [
+              "script"
+            ]
+          }
+        },
+        {
+          "rule": "amazon\\.com\\/1\\/4167132\\/1\\/OP\\/"
+        },
         {
           "rule": "payments\\.amazon\\.com",
           "action": "ignore"
@@ -1267,8 +1249,7 @@
           "rule": "api-cdn\\.amazon\\.com\\/sdk",
           "exceptions": {
             "types": [
-              "subdocument",
-              "script"
+              "subdocument"
             ]
           }
         },
@@ -1289,6 +1270,33 @@
             ]
           }
         }
+      ],
+      "domain": "amazon.com",
+      "default": "ignore",
+      "owner": {
+        "name": "Amazon Technologies, Inc.",
+        "displayName": "Amazon",
+        "privacyPolicy": "https://www.amazon.com/gp/help/customer/display.html?nodeId=468496",
+        "url": "http://amazon.com"
+      },
+      "source": [
+        "DDG"
+      ],
+      "prevalence": 0.002,
+      "fingerprinting": 1,
+      "cookies": 0.002,
+      "performance": {
+        "time": 1,
+        "size": 1,
+        "cache": 3
+      },
+      "categories": [
+        "Ad Motivated Tracking",
+        "Analytics",
+        "SSO",
+        "Third-Party Analytics Marketing",
+        "Online Payment",
+        "Embedded Content"
       ]
     },
     "amplitude.com": {
@@ -1303,14 +1311,14 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.005,
+      "prevalence": 0.006,
       "fingerprinting": 1,
-      "cookies": 0.003,
+      "cookies": 0.004,
       "performance": {
         "time": 1,
         "size": 1,
-        "cpu": 1,
-        "cache": 3
+        "cpu": 2,
+        "cache": 1
       },
       "categories": [
         "Analytics"
@@ -1329,7 +1337,7 @@
         "DDG"
       ],
       "prevalence": 0.007,
-      "fingerprinting": 0,
+      "fingerprinting": 1,
       "cookies": 0,
       "performance": {
         "time": 1,
@@ -1390,7 +1398,7 @@
       "performance": {
         "time": 1,
         "size": 1,
-        "cpu": 2,
+        "cpu": 1,
         "cache": 1
       },
       "categories": [
@@ -1409,9 +1417,9 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.019,
+      "prevalence": 0.015,
       "fingerprinting": 0,
-      "cookies": 0.019,
+      "cookies": 0.015,
       "performance": {
         "time": 1,
         "size": 1,
@@ -1460,8 +1468,8 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.003,
-      "fingerprinting": 0,
+      "prevalence": 0.002,
+      "fingerprinting": 1,
       "cookies": 0,
       "performance": {
         "time": 1,
@@ -1475,30 +1483,32 @@
         "Action Pixels"
       ]
     },
-    "atdmt.com": {
-      "domain": "atdmt.com",
+    "attn.tv": {
+      "domain": "attn.tv",
       "default": "block",
       "owner": {
-        "name": "Facebook, Inc.",
-        "displayName": "Facebook",
-        "privacyPolicy": "https://www.facebook.com/privacy/explanation",
-        "url": "http://facebook.com"
+        "name": "Attentive Mobile",
+        "displayName": "Attentive Mobile",
+        "url": "",
+        "privacyPolicy": ""
       },
       "source": [
         "DDG"
       ],
-      "prevalence": 0.05,
-      "fingerprinting": 0,
-      "cookies": 0,
+      "prevalence": 0.003,
+      "fingerprinting": 1,
+      "cookies": 0.003,
       "performance": {
         "time": 1,
         "size": 1,
         "cpu": 1,
-        "cache": 3
+        "cache": 1
       },
       "categories": [
         "Ad Motivated Tracking",
-        "Advertising"
+        "Advertising",
+        "Analytics",
+        "Third-Party Analytics Marketing"
       ]
     },
     "avocet.io": {
@@ -1513,9 +1523,9 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.017,
+      "prevalence": 0.012,
       "fingerprinting": 0,
-      "cookies": 0.017,
+      "cookies": 0.012,
       "performance": {
         "time": 1,
         "size": 1,
@@ -1542,7 +1552,7 @@
         "DDG"
       ],
       "prevalence": 0.004,
-      "fingerprinting": 0,
+      "fingerprinting": 1,
       "cookies": 0,
       "performance": {
         "time": 1,
@@ -1677,8 +1687,8 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.008,
-      "fingerprinting": 0,
+      "prevalence": 0.012,
+      "fingerprinting": 1,
       "cookies": 0,
       "performance": {
         "time": 1,
@@ -1690,6 +1700,31 @@
         "Ad Motivated Tracking",
         "Analytics",
         "Third-Party Analytics Marketing"
+      ]
+    },
+    "betweendigital.com": {
+      "domain": "betweendigital.com",
+      "default": "block",
+      "owner": {
+        "name": "SSP Network Ltd",
+        "displayName": "SSP Network Ltd",
+        "url": "",
+        "privacyPolicy": ""
+      },
+      "source": [
+        "DDG"
+      ],
+      "prevalence": 0.004,
+      "fingerprinting": 1,
+      "cookies": 0.004,
+      "performance": {
+        "time": 1,
+        "size": 1,
+        "cache": 3
+      },
+      "categories": [
+        "Ad Motivated Tracking",
+        "Advertising"
       ]
     },
     "bfmio.com": {
@@ -1704,13 +1739,12 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.008,
-      "fingerprinting": 0,
+      "prevalence": 0.009,
+      "fingerprinting": 1,
       "cookies": 0.008,
       "performance": {
         "time": 1,
         "size": 1,
-        "cpu": 1,
         "cache": 3
       },
       "categories": [
@@ -1732,9 +1766,9 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.058,
-      "fingerprinting": 0,
-      "cookies": 0.058,
+      "prevalence": 0.055,
+      "fingerprinting": 1,
+      "cookies": 0.054,
       "performance": {
         "time": 1,
         "size": 1,
@@ -1757,9 +1791,9 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.107,
-      "fingerprinting": 0,
-      "cookies": 0.105,
+      "prevalence": 0.098,
+      "fingerprinting": 1,
+      "cookies": 0.096,
       "performance": {
         "time": 1,
         "size": 1,
@@ -1783,8 +1817,8 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.019,
-      "fingerprinting": 0,
+      "prevalence": 0.023,
+      "fingerprinting": 1,
       "cookies": 0,
       "performance": {
         "time": 1,
@@ -1812,7 +1846,7 @@
         "DDG"
       ],
       "prevalence": 0.003,
-      "fingerprinting": 0,
+      "fingerprinting": 1,
       "cookies": 0.002,
       "performance": {
         "time": 1,
@@ -1842,8 +1876,8 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.011,
-      "fingerprinting": 0,
+      "prevalence": 0.009,
+      "fingerprinting": 1,
       "cookies": 0,
       "performance": {
         "time": 1,
@@ -1871,9 +1905,9 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.003,
+      "prevalence": 0.009,
       "fingerprinting": 0,
-      "cookies": 0.003,
+      "cookies": 0.009,
       "performance": {
         "time": 1,
         "size": 1,
@@ -1900,13 +1934,12 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.005,
+      "prevalence": 0.004,
       "fingerprinting": 2,
-      "cookies": 0.005,
+      "cookies": 0.003,
       "performance": {
         "time": 1,
         "size": 1,
-        "cpu": 1,
         "cache": 1
       },
       "categories": [
@@ -1928,13 +1961,13 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.003,
-      "fingerprinting": 3,
+      "prevalence": 0.002,
+      "fingerprinting": 1,
       "cookies": 0.002,
       "performance": {
         "time": 1,
         "size": 1,
-        "cpu": 2,
+        "cpu": 3,
         "cache": 1
       },
       "categories": [
@@ -1970,9 +2003,9 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.092,
-      "fingerprinting": 0,
-      "cookies": 0.088,
+      "prevalence": 0.086,
+      "fingerprinting": 1,
+      "cookies": 0.083,
       "performance": {
         "time": 1,
         "size": 1,
@@ -1998,12 +2031,12 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.003,
-      "fingerprinting": 0,
-      "cookies": 0.003,
+      "prevalence": 0.009,
+      "fingerprinting": 1,
+      "cookies": 0.009,
       "performance": {
         "time": 1,
-        "size": 2,
+        "size": 1,
         "cpu": 1,
         "cache": 1
       },
@@ -2026,7 +2059,7 @@
       ],
       "prevalence": 0.006,
       "fingerprinting": 3,
-      "cookies": 0.005,
+      "cookies": 0.006,
       "performance": {
         "time": 1,
         "size": 1,
@@ -2053,7 +2086,7 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.004,
+      "prevalence": 0.005,
       "fingerprinting": 2,
       "cookies": 0,
       "performance": {
@@ -2081,13 +2114,12 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.024,
-      "fingerprinting": 0,
-      "cookies": 0.011,
+      "prevalence": 0.017,
+      "fingerprinting": 1,
+      "cookies": 0.006,
       "performance": {
         "time": 1,
         "size": 1,
-        "cpu": 1,
         "cache": 3
       },
       "categories": [
@@ -2141,8 +2173,8 @@
         "DDG"
       ],
       "prevalence": 0.004,
-      "fingerprinting": 1,
-      "cookies": 0.004,
+      "fingerprinting": 2,
+      "cookies": 0.003,
       "performance": {
         "time": 1,
         "size": 1,
@@ -2166,9 +2198,9 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.015,
+      "prevalence": 0.003,
       "fingerprinting": 3,
-      "cookies": 0.003,
+      "cookies": 0.002,
       "performance": {
         "time": 1,
         "size": 1,
@@ -2195,9 +2227,9 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.013,
-      "fingerprinting": 0,
-      "cookies": 0.009,
+      "prevalence": 0.012,
+      "fingerprinting": 1,
+      "cookies": 0.012,
       "performance": {
         "time": 1,
         "size": 1,
@@ -2224,8 +2256,8 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.003,
-      "fingerprinting": 0,
+      "prevalence": 0.002,
+      "fingerprinting": 1,
       "cookies": 0,
       "performance": {
         "time": 1,
@@ -2259,13 +2291,12 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.132,
-      "fingerprinting": 0,
-      "cookies": 0.129,
+      "prevalence": 0.176,
+      "fingerprinting": 1,
+      "cookies": 0.174,
       "performance": {
         "time": 1,
         "size": 1,
-        "cpu": 1,
         "cache": 3
       },
       "categories": [
@@ -2288,7 +2319,7 @@
       ],
       "prevalence": 0.021,
       "fingerprinting": 2,
-      "cookies": 0.019,
+      "cookies": 0.02,
       "performance": {
         "time": 1,
         "size": 1,
@@ -2347,13 +2378,13 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.003,
-      "fingerprinting": 0,
-      "cookies": 0.003,
+      "prevalence": 0.004,
+      "fingerprinting": 1,
+      "cookies": 0.004,
       "performance": {
         "time": 1,
         "size": 1,
-        "cpu": 2,
+        "cpu": 3,
         "cache": 1
       },
       "categories": [
@@ -2374,9 +2405,9 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.004,
-      "fingerprinting": 0,
-      "cookies": 0.004,
+      "prevalence": 0.013,
+      "fingerprinting": 1,
+      "cookies": 0.013,
       "performance": {
         "time": 1,
         "size": 1,
@@ -2388,32 +2419,6 @@
         "Analytics",
         "Audience Measurement",
         "Third-Party Analytics Marketing"
-      ]
-    },
-    "clickcertain.com": {
-      "domain": "clickcertain.com",
-      "default": "block",
-      "owner": {
-        "name": "ClickCertain",
-        "displayName": "ClickCertain",
-        "url": "",
-        "privacyPolicy": ""
-      },
-      "source": [
-        "DDG"
-      ],
-      "prevalence": 0.003,
-      "fingerprinting": 0,
-      "cookies": 0.003,
-      "performance": {
-        "time": 1,
-        "size": 1,
-        "cache": 3
-      },
-      "categories": [
-        "Ad Motivated Tracking",
-        "Advertising",
-        "Audience Measurement"
       ]
     },
     "clicktale.net": {
@@ -2434,7 +2439,7 @@
       "performance": {
         "time": 1,
         "size": 1,
-        "cpu": 2,
+        "cpu": 1,
         "cache": 3
       },
       "categories": [
@@ -2455,9 +2460,9 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.011,
-      "fingerprinting": 0,
-      "cookies": 0.01,
+      "prevalence": 0.012,
+      "fingerprinting": 1,
+      "cookies": 0.011,
       "performance": {
         "time": 1,
         "size": 1,
@@ -2484,9 +2489,9 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.019,
+      "prevalence": 0.015,
       "fingerprinting": 0,
-      "cookies": 0.019,
+      "cookies": 0.014,
       "performance": {
         "time": 1,
         "size": 1,
@@ -2497,30 +2502,6 @@
         "Ad Motivated Tracking",
         "Advertising",
         "Audience Measurement"
-      ]
-    },
-    "colossusssp.com": {
-      "domain": "colossusssp.com",
-      "default": "block",
-      "owner": {
-        "name": "Colossus Media, LLC",
-        "displayName": "Colossus Media",
-        "privacyPolicy": "https://colossus.media/privacy.php",
-        "url": "http://colossus.media"
-      },
-      "source": [
-        "DDG"
-      ],
-      "prevalence": 0.003,
-      "fingerprinting": 0,
-      "cookies": 0.001,
-      "performance": {
-        "time": 1,
-        "size": 1,
-        "cache": 3
-      },
-      "categories": [
-        "Ad Motivated Tracking"
       ]
     },
     "commander1.com": {
@@ -2535,9 +2516,9 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.004,
-      "fingerprinting": 0,
-      "cookies": 0.004,
+      "prevalence": 0.003,
+      "fingerprinting": 1,
+      "cookies": 0.003,
       "performance": {
         "time": 1,
         "size": 1,
@@ -2563,9 +2544,9 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.008,
-      "fingerprinting": 0,
-      "cookies": 0.008,
+      "prevalence": 0.007,
+      "fingerprinting": 1,
+      "cookies": 0.006,
       "performance": {
         "time": 1,
         "size": 1,
@@ -2582,57 +2563,6 @@
         "Obscure Ownership"
       ]
     },
-    "connexity.net": {
-      "domain": "connexity.net",
-      "default": "block",
-      "owner": {
-        "name": "Connexity, Inc.",
-        "displayName": "Connexity",
-        "privacyPolicy": "https://connexity.com/privacy-policy/",
-        "url": "http://connexity.com"
-      },
-      "source": [
-        "DDG"
-      ],
-      "prevalence": 0.002,
-      "fingerprinting": 0,
-      "cookies": 0.002,
-      "performance": {
-        "time": 1,
-        "size": 1,
-        "cache": 1
-      },
-      "categories": [
-        "Ad Motivated Tracking",
-        "Advertising",
-        "Analytics",
-        "Audience Measurement",
-        "Third-Party Analytics Marketing"
-      ]
-    },
-    "consensu.org": {
-      "domain": "consensu.org",
-      "default": "block",
-      "owner": {
-        "name": "IAB Europe",
-        "displayName": "IAB Europe",
-        "url": "",
-        "privacyPolicy": ""
-      },
-      "source": [
-        "DDG"
-      ],
-      "prevalence": 0.043,
-      "fingerprinting": 0,
-      "cookies": 0.015,
-      "performance": {
-        "time": 1,
-        "size": 1,
-        "cpu": 1,
-        "cache": 3
-      },
-      "categories": []
-    },
     "contentabc.com": {
       "domain": "contentabc.com",
       "default": "block",
@@ -2645,12 +2575,12 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.002,
-      "fingerprinting": 0,
+      "prevalence": 0.003,
+      "fingerprinting": 1,
       "cookies": 0.001,
       "performance": {
         "time": 1,
-        "size": 1,
+        "size": 2,
         "cpu": 1,
         "cache": 1
       },
@@ -2672,9 +2602,9 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.004,
+      "prevalence": 0.005,
       "fingerprinting": 2,
-      "cookies": 0,
+      "cookies": 0.001,
       "performance": {
         "time": 1,
         "size": 1,
@@ -2701,9 +2631,9 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.054,
-      "fingerprinting": 0,
-      "cookies": 0.054,
+      "prevalence": 0.045,
+      "fingerprinting": 1,
+      "cookies": 0.045,
       "performance": {
         "time": 1,
         "size": 1,
@@ -2729,9 +2659,9 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.009,
-      "fingerprinting": 0,
-      "cookies": 0.008,
+      "prevalence": 0.007,
+      "fingerprinting": 1,
+      "cookies": 0.006,
       "performance": {
         "time": 1,
         "size": 1,
@@ -2760,12 +2690,12 @@
         "DDG"
       ],
       "prevalence": 0.006,
-      "fingerprinting": 0,
-      "cookies": 0.005,
+      "fingerprinting": 1,
+      "cookies": 0.006,
       "performance": {
         "time": 1,
         "size": 1,
-        "cpu": 1,
+        "cpu": 3,
         "cache": 3
       },
       "categories": [
@@ -2784,9 +2714,9 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.011,
-      "fingerprinting": 0,
-      "cookies": 0.01,
+      "prevalence": 0.014,
+      "fingerprinting": 1,
+      "cookies": 0.012,
       "performance": {
         "time": 1,
         "size": 1,
@@ -2810,8 +2740,8 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.098,
-      "fingerprinting": 0,
+      "prevalence": 0.096,
+      "fingerprinting": 1,
       "cookies": 0.038,
       "performance": {
         "time": 1,
@@ -2838,9 +2768,9 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.073,
-      "fingerprinting": 0,
-      "cookies": 0.061,
+      "prevalence": 0.071,
+      "fingerprinting": 1,
+      "cookies": 0.06,
       "performance": {
         "time": 1,
         "size": 1,
@@ -2865,13 +2795,12 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.005,
-      "fingerprinting": 0,
-      "cookies": 0.005,
+      "prevalence": 0.004,
+      "fingerprinting": 1,
+      "cookies": 0.004,
       "performance": {
         "time": 1,
         "size": 1,
-        "cpu": 1,
         "cache": 3
       },
       "categories": [
@@ -2894,9 +2823,9 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.079,
-      "fingerprinting": 0,
-      "cookies": 0.031,
+      "prevalence": 0.082,
+      "fingerprinting": 1,
+      "cookies": 0.029,
       "performance": {
         "time": 1,
         "size": 1,
@@ -2920,6 +2849,31 @@
             ]
           }
         }
+      ]
+    },
+    "ctnsnet.com": {
+      "domain": "ctnsnet.com",
+      "default": "block",
+      "owner": {
+        "name": "Crimtan Holdings Ltd",
+        "displayName": "Crimtan Holdings",
+        "privacyPolicy": "https://crimtan.com/privacy/",
+        "url": "http://crimtan.com"
+      },
+      "source": [
+        "DDG"
+      ],
+      "prevalence": 0.002,
+      "fingerprinting": 1,
+      "cookies": 0.002,
+      "performance": {
+        "time": 1,
+        "size": 1,
+        "cache": 3
+      },
+      "categories": [
+        "Ad Motivated Tracking",
+        "Advertising"
       ]
     },
     "cxense.com": {
@@ -2990,8 +2944,8 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.005,
-      "fingerprinting": 0,
+      "prevalence": 0.004,
+      "fingerprinting": 1,
       "cookies": 0,
       "performance": {
         "time": 1,
@@ -3019,9 +2973,9 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.109,
-      "fingerprinting": 0,
-      "cookies": 0.108,
+      "prevalence": 0.114,
+      "fingerprinting": 1,
+      "cookies": 0.112,
       "performance": {
         "time": 1,
         "size": 1,
@@ -3048,11 +3002,11 @@
       ],
       "prevalence": 0.004,
       "fingerprinting": 2,
-      "cookies": 0.004,
+      "cookies": 0.003,
       "performance": {
         "time": 1,
         "size": 1,
-        "cpu": 2,
+        "cpu": 1,
         "cache": 3
       },
       "categories": [
@@ -3073,9 +3027,9 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.003,
+      "prevalence": 0.002,
       "fingerprinting": 0,
-      "cookies": 0.002,
+      "cookies": 0.001,
       "performance": {
         "time": 1,
         "size": 1,
@@ -3099,13 +3053,13 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.021,
-      "fingerprinting": 0,
-      "cookies": 0.021,
+      "prevalence": 0.014,
+      "fingerprinting": 1,
+      "cookies": 0.013,
       "performance": {
         "time": 1,
         "size": 1,
-        "cpu": 2,
+        "cpu": 1,
         "cache": 1
       },
       "categories": [
@@ -3124,8 +3078,8 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.02,
-      "fingerprinting": 0,
+      "prevalence": 0.018,
+      "fingerprinting": 1,
       "cookies": 0,
       "performance": {
         "time": 1,
@@ -3179,7 +3133,7 @@
         "DDG"
       ],
       "prevalence": 0.002,
-      "fingerprinting": 0,
+      "fingerprinting": 1,
       "cookies": 0.001,
       "performance": {
         "time": 1,
@@ -3204,9 +3158,9 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.035,
-      "fingerprinting": 0,
-      "cookies": 0.034,
+      "prevalence": 0.034,
+      "fingerprinting": 1,
+      "cookies": 0.032,
       "performance": {
         "time": 1,
         "size": 1,
@@ -3230,13 +3184,12 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.003,
+      "prevalence": 0.004,
       "fingerprinting": 0,
-      "cookies": 0.003,
+      "cookies": 0.004,
       "performance": {
         "time": 1,
         "size": 1,
-        "cpu": 1,
         "cache": 3
       },
       "categories": [
@@ -3260,7 +3213,7 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.002,
+      "prevalence": 0.009,
       "fingerprinting": 0,
       "cookies": 0,
       "performance": {
@@ -3289,9 +3242,9 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.046,
-      "fingerprinting": 0,
-      "cookies": 0.042,
+      "prevalence": 0.049,
+      "fingerprinting": 1,
+      "cookies": 0.045,
       "performance": {
         "time": 1,
         "size": 1,
@@ -3315,9 +3268,9 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.688,
+      "prevalence": 0.686,
       "fingerprinting": 2,
-      "cookies": 0.5,
+      "cookies": 0.491,
       "performance": {
         "time": 1,
         "size": 1,
@@ -3398,7 +3351,7 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.024,
+      "prevalence": 0.03,
       "fingerprinting": 2,
       "cookies": 0,
       "performance": {
@@ -3426,12 +3379,11 @@
         "DDG"
       ],
       "prevalence": 0.003,
-      "fingerprinting": 1,
+      "fingerprinting": 2,
       "cookies": 0,
       "performance": {
         "time": 1,
         "size": 2,
-        "cpu": 3,
         "cache": 1
       },
       "categories": [
@@ -3452,9 +3404,9 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.02,
-      "fingerprinting": 0,
-      "cookies": 0.02,
+      "prevalence": 0.021,
+      "fingerprinting": 1,
+      "cookies": 0.021,
       "performance": {
         "time": 1,
         "size": 1,
@@ -3479,8 +3431,8 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.009,
-      "fingerprinting": 0,
+      "prevalence": 0.008,
+      "fingerprinting": 1,
       "cookies": 0,
       "performance": {
         "time": 1,
@@ -3522,31 +3474,29 @@
         "Embedded Content"
       ]
     },
-    "dyntrk.com": {
-      "domain": "dyntrk.com",
+    "e-planning.net": {
+      "domain": "e-planning.net",
       "default": "block",
       "owner": {
-        "name": "DynAdmic",
-        "displayName": "DynAdmic",
+        "name": "Teroa S.A.",
+        "displayName": "Teroa",
         "url": "",
         "privacyPolicy": ""
       },
       "source": [
         "DDG"
       ],
-      "prevalence": 0.007,
-      "fingerprinting": 0,
-      "cookies": 0.007,
+      "prevalence": 0.003,
+      "fingerprinting": 1,
+      "cookies": 0,
       "performance": {
         "time": 1,
         "size": 1,
-        "cache": 3
+        "cache": 1
       },
       "categories": [
         "Ad Motivated Tracking",
-        "Advertising",
-        "Ad Fraud",
-        "Audience Measurement"
+        "Advertising"
       ]
     },
     "eloqua.com": {
@@ -3561,8 +3511,8 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.006,
-      "fingerprinting": 0,
+      "prevalence": 0.007,
+      "fingerprinting": 1,
       "cookies": 0.005,
       "performance": {
         "time": 1,
@@ -3588,7 +3538,7 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.006,
+      "prevalence": 0.005,
       "fingerprinting": 2,
       "cookies": 0,
       "performance": {
@@ -3616,13 +3566,12 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.024,
-      "fingerprinting": 0,
-      "cookies": 0.022,
+      "prevalence": 0.026,
+      "fingerprinting": 1,
+      "cookies": 0.023,
       "performance": {
         "time": 1,
         "size": 1,
-        "cpu": 1,
         "cache": 3
       },
       "categories": [
@@ -3643,8 +3592,8 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.006,
-      "fingerprinting": 0,
+      "prevalence": 0.007,
+      "fingerprinting": 1,
       "cookies": 0,
       "performance": {
         "time": 1,
@@ -3718,17 +3667,41 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.004,
-      "fingerprinting": 3,
+      "prevalence": 0.002,
+      "fingerprinting": 1,
       "cookies": 0,
       "performance": {
         "time": 1,
         "size": 1,
-        "cpu": 1,
+        "cpu": 2,
         "cache": 1
       },
       "categories": [
         "Advertising"
+      ]
+    },
+    "eum-appdynamics.com": {
+      "domain": "eum-appdynamics.com",
+      "default": "block",
+      "owner": {
+        "name": "AppDynamics LLC",
+        "displayName": "AppDynamics",
+        "privacyPolicy": "https://www.appdynamics.com/privacy-policy/",
+        "url": "http://appdynamics.com"
+      },
+      "source": [
+        "DDG"
+      ],
+      "prevalence": 0.004,
+      "fingerprinting": 1,
+      "cookies": 0.002,
+      "performance": {
+        "time": 1,
+        "size": 1,
+        "cache": 3
+      },
+      "categories": [
+        "Analytics"
       ]
     },
     "everestjs.net": {
@@ -3743,9 +3716,9 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.003,
-      "fingerprinting": 0,
-      "cookies": 0.001,
+      "prevalence": 0.004,
+      "fingerprinting": 1,
+      "cookies": 0.002,
       "performance": {
         "time": 1,
         "size": 1,
@@ -3768,13 +3741,12 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.133,
-      "fingerprinting": 0,
-      "cookies": 0.132,
+      "prevalence": 0.148,
+      "fingerprinting": 1,
+      "cookies": 0.123,
       "performance": {
         "time": 1,
         "size": 1,
-        "cpu": 1,
         "cache": 3
       },
       "categories": [
@@ -3794,8 +3766,8 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.007,
-      "fingerprinting": 0,
+      "prevalence": 0.012,
+      "fingerprinting": 1,
       "cookies": 0,
       "performance": {
         "time": 1,
@@ -3834,9 +3806,9 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.09,
-      "fingerprinting": 0,
-      "cookies": 0.089,
+      "prevalence": 0.084,
+      "fingerprinting": 1,
+      "cookies": 0.083,
       "performance": {
         "time": 1,
         "size": 1,
@@ -3863,9 +3835,9 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.016,
-      "fingerprinting": 0,
-      "cookies": 0.011,
+      "prevalence": 0.015,
+      "fingerprinting": 1,
+      "cookies": 0.01,
       "performance": {
         "time": 1,
         "size": 1,
@@ -3889,9 +3861,9 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.029,
+      "prevalence": 0.033,
       "fingerprinting": 1,
-      "cookies": 0.029,
+      "cookies": 0.032,
       "performance": {
         "time": 1,
         "size": 1,
@@ -3915,13 +3887,12 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.004,
+      "prevalence": 0.003,
       "fingerprinting": 3,
       "cookies": 0,
       "performance": {
         "time": 1,
         "size": 1,
-        "cpu": 1,
         "cache": 3
       },
       "categories": [
@@ -3946,9 +3917,9 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.044,
-      "fingerprinting": 0,
-      "cookies": 0.042,
+      "prevalence": 0.048,
+      "fingerprinting": 1,
+      "cookies": 0.048,
       "performance": {
         "time": 1,
         "size": 1,
@@ -3975,9 +3946,9 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.01,
-      "fingerprinting": 0,
-      "cookies": 0.01,
+      "prevalence": 0.009,
+      "fingerprinting": 1,
+      "cookies": 0.009,
       "performance": {
         "time": 1,
         "size": 1,
@@ -3992,37 +3963,6 @@
         "Session Replay"
       ]
     },
-    "eyeviewads.com": {
-      "domain": "eyeviewads.com",
-      "default": "block",
-      "owner": {
-        "name": "EyeView, Inc.",
-        "displayName": "EyeView",
-        "privacyPolicy": "https://www.eyeviewdigital.com/privacy-policy/",
-        "url": "http://eyeviewdigital.com"
-      },
-      "source": [
-        "DDG"
-      ],
-      "prevalence": 0.005,
-      "fingerprinting": 0,
-      "cookies": 0.005,
-      "performance": {
-        "time": 1,
-        "size": 1,
-        "cpu": 1,
-        "cache": 3
-      },
-      "categories": [
-        "Ad Motivated Tracking",
-        "Advertising",
-        "Ad Fraud",
-        "Analytics",
-        "Audience Measurement",
-        "Action Pixels",
-        "Embedded Content"
-      ]
-    },
     "ezoic.net": {
       "domain": "ezoic.net",
       "default": "block",
@@ -4035,9 +3975,9 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.005,
+      "prevalence": 0.008,
       "fingerprinting": 1,
-      "cookies": 0.005,
+      "cookies": 0.006,
       "performance": {
         "time": 1,
         "size": 1,
@@ -4057,31 +3997,19 @@
     "facebook.com": {
       "rules": [
         {
-          "rule": "facebook\\.com\\/connect\\/xd_arbiter\\.php"
-        },
-        {
           "rule": "facebook\\.com\\/tr\\/"
         },
         {
           "rule": "facebook\\.com\\/audiencenetwork\\/idsync"
         },
         {
-          "rule": "facebook\\.com\\/fr\\/b\\.php"
+          "rule": "facebook\\.com\\/brandlift\\.php"
         },
         {
           "rule": "facebook\\.com\\/common\\/cavalry_endpoint\\.php"
         },
         {
-          "rule": "facebook\\.com\\/method\\/links\\.getStats"
-        },
-        {
-          "rule": "facebook\\.com\\/ajax\\/bz"
-        },
-        {
-          "rule": "facebook\\.com\\/brandlift\\.php"
-        },
-        {
-          "rule": "facebook\\.com\\/pages\\/call_to_action\\/fetch_dialog_data\\/"
+          "rule": "facebook\\.com\\/fr\\/b\\.php"
         },
         {
           "rule": "facebook\\.com\\/platform\\/plugin\\/tab\\/renderer\\/"
@@ -4090,34 +4018,40 @@
           "rule": "facebook\\.com\\/platform\\/plugin\\/page\\/logging\\/"
         },
         {
-          "rule": "facebook\\.com\\/images\\/emoji\\.php"
+          "rule": "facebook\\.com\\/ajax\\/bz"
         },
         {
           "rule": "facebook\\.com\\/ajax\\/bootloader-endpoint\\/"
         },
         {
-          "rule": "facebook\\.com\\/connect\\/ping"
+          "rule": "facebook\\.com\\/pages\\/call_to_action\\/fetch_dialog_data\\/"
+        },
+        {
+          "rule": "facebook\\.com\\/tr"
+        },
+        {
+          "rule": "facebook\\.com\\/images\\/emoji\\.php"
+        },
+        {
+          "rule": "facebook\\.com\\/method\\/links\\.getStats"
         },
         {
           "rule": "facebook\\.com\\/favicon\\.ico"
         },
         {
-          "rule": "facebook\\.com\\/audiencenetwork\\/iframe\\/"
-        },
-        {
-          "rule": "facebook\\.com\\/audiencenetwork\\/xhr\\/"
-        },
-        {
-          "rule": "facebook\\.com\\/chat"
+          "rule": "facebook\\.com\\/connect\\/xd_arbiter\\.php"
         },
         {
           "rule": "facebook\\.com\\/en_US\\/AudienceNetworkPrebid\\.js"
         },
         {
-          "rule": "facebook\\.com\\/en_US\\/fbevents\\.js"
+          "rule": "facebook\\.com\\/pick24com"
         },
         {
-          "rule": "facebook\\.com\\/connect\\/xd_arbiter\\/r\\/lY4eZXm_YWu\\.js"
+          "rule": "facebook\\.com\\/spolivetv\\/posts\\/471634950220884"
+        },
+        {
+          "rule": "facebook\\.com\\/en_US\\/fbevents\\.js"
         }
       ],
       "domain": "facebook.com",
@@ -4131,9 +4065,9 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.396,
+      "prevalence": 0.365,
       "fingerprinting": 1,
-      "cookies": 0.279,
+      "cookies": 0.281,
       "performance": {
         "time": 1,
         "size": 1,
@@ -4170,16 +4104,7 @@
           "rule": "facebook\\.net\\/.*\\/sdk\\/xfbml\\.customerchat\\.js"
         },
         {
-          "rule": "facebook\\.net\\/en_US\\/fbadnw60-tag\\.js"
-        },
-        {
-          "rule": "facebook\\.net\\/en_US\\/fbadnw60\\.js"
-        },
-        {
           "rule": "facebook\\.net\\/en_US\\/AudienceNetworkPrebid\\.js"
-        },
-        {
-          "rule": "facebook\\.net\\/en_US\\/platform\\.Extensions\\.js"
         }
       ],
       "domain": "facebook.net",
@@ -4193,8 +4118,8 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.345,
-      "fingerprinting": 1,
+      "prevalence": 0.338,
+      "fingerprinting": 2,
       "cookies": 0.049,
       "performance": {
         "time": 1,
@@ -4229,9 +4154,9 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.004,
-      "fingerprinting": 0,
-      "cookies": 0.004,
+      "prevalence": 0.003,
+      "fingerprinting": 1,
+      "cookies": 0.003,
       "performance": {
         "time": 1,
         "size": 1,
@@ -4259,13 +4184,13 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.013,
+      "prevalence": 0.01,
       "fingerprinting": 2,
-      "cookies": 0.01,
+      "cookies": 0.007,
       "performance": {
         "time": 1,
         "size": 1,
-        "cpu": 2,
+        "cpu": 1,
         "cache": 3
       },
       "categories": [
@@ -4293,11 +4218,11 @@
       ],
       "prevalence": 0.005,
       "fingerprinting": 2,
-      "cookies": 0.003,
+      "cookies": 0.004,
       "performance": {
         "time": 1,
         "size": 1,
-        "cpu": 1,
+        "cpu": 2,
         "cache": 1
       },
       "categories": [
@@ -4319,13 +4244,13 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.004,
-      "fingerprinting": 2,
+      "prevalence": 0.005,
+      "fingerprinting": 1,
       "cookies": 0.002,
       "performance": {
         "time": 1,
         "size": 1,
-        "cpu": 2,
+        "cpu": 1,
         "cache": 3
       },
       "categories": [
@@ -4345,13 +4270,12 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.004,
-      "fingerprinting": 0,
-      "cookies": 0.004,
+      "prevalence": 0.005,
+      "fingerprinting": 1,
+      "cookies": 0.005,
       "performance": {
         "time": 1,
         "size": 1,
-        "cpu": 1,
         "cache": 3
       },
       "categories": [
@@ -4373,14 +4297,14 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.012,
-      "fingerprinting": 2,
-      "cookies": 0.008,
+      "prevalence": 0.035,
+      "fingerprinting": 1,
+      "cookies": 0.007,
       "performance": {
         "time": 1,
         "size": 1,
-        "cpu": 1,
-        "cache": 1
+        "cpu": 2,
+        "cache": 3
       },
       "categories": [
         "Ad Motivated Tracking",
@@ -4400,9 +4324,9 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.008,
+      "prevalence": 0.006,
       "fingerprinting": 1,
-      "cookies": 0.008,
+      "cookies": 0.006,
       "performance": {
         "time": 1,
         "size": 1,
@@ -4428,7 +4352,7 @@
       ],
       "prevalence": 0.003,
       "fingerprinting": 2,
-      "cookies": 0.002,
+      "cookies": 0.001,
       "performance": {
         "time": 1,
         "size": 1,
@@ -4455,7 +4379,7 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.015,
+      "prevalence": 0.018,
       "fingerprinting": 2,
       "cookies": 0.004,
       "performance": {
@@ -4480,9 +4404,9 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.79,
+      "prevalence": 0.789,
       "fingerprinting": 2,
-      "cookies": 0.551,
+      "cookies": 0.558,
       "performance": {
         "time": 1,
         "size": 1,
@@ -4532,7 +4456,7 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.182,
+      "prevalence": 0.295,
       "fingerprinting": 2,
       "cookies": 0,
       "performance": {
@@ -4558,13 +4482,13 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.282,
+      "prevalence": 0.269,
       "fingerprinting": 3,
-      "cookies": 0.008,
+      "cookies": 0.102,
       "performance": {
         "time": 1,
         "size": 1,
-        "cpu": 2,
+        "cpu": 1,
         "cache": 1
       },
       "categories": [
@@ -4590,9 +4514,9 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.455,
-      "fingerprinting": 1,
-      "cookies": 0.098,
+      "prevalence": 0.487,
+      "fingerprinting": 2,
+      "cookies": 0.109,
       "performance": {
         "time": 1,
         "size": 1,
@@ -4633,13 +4557,13 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.285,
+      "prevalence": 0.268,
       "fingerprinting": 1,
       "cookies": 0,
       "performance": {
         "time": 1,
         "size": 1,
-        "cpu": 2,
+        "cpu": 1,
         "cache": 1
       },
       "categories": [
@@ -4691,14 +4615,14 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.028,
+      "prevalence": 0.031,
       "fingerprinting": 3,
-      "cookies": 0.026,
+      "cookies": 0.028,
       "performance": {
         "time": 1,
         "size": 1,
-        "cpu": 2,
-        "cache": 1
+        "cpu": 1,
+        "cache": 3
       },
       "categories": [
         "Ad Motivated Tracking",
@@ -4717,9 +4641,9 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.009,
+      "prevalence": 0.008,
       "fingerprinting": 0,
-      "cookies": 0.008,
+      "cookies": 0.006,
       "performance": {
         "time": 1,
         "size": 1,
@@ -4770,8 +4694,8 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.003,
-      "fingerprinting": 0,
+      "prevalence": 0.002,
+      "fingerprinting": 1,
       "cookies": 0,
       "performance": {
         "time": 1,
@@ -4799,9 +4723,9 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.018,
+      "prevalence": 0.019,
       "fingerprinting": 2,
-      "cookies": 0.017,
+      "cookies": 0.018,
       "performance": {
         "time": 1,
         "size": 1,
@@ -4825,9 +4749,9 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.082,
+      "prevalence": 0.085,
       "fingerprinting": 2,
-      "cookies": 0.075,
+      "cookies": 0.078,
       "performance": {
         "time": 1,
         "size": 1,
@@ -4852,7 +4776,7 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.011,
+      "prevalence": 0.012,
       "fingerprinting": 2,
       "cookies": 0,
       "performance": {
@@ -4880,9 +4804,9 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.003,
+      "prevalence": 0.004,
       "fingerprinting": 0,
-      "cookies": 0.003,
+      "cookies": 0.004,
       "performance": {
         "time": 1,
         "size": 1,
@@ -4912,7 +4836,7 @@
       ],
       "prevalence": 0.003,
       "fingerprinting": 0,
-      "cookies": 0.003,
+      "cookies": 0.001,
       "performance": {
         "time": 1,
         "size": 1,
@@ -4948,13 +4872,13 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.004,
-      "fingerprinting": 0,
-      "cookies": 0.004,
+      "prevalence": 0.005,
+      "fingerprinting": 1,
+      "cookies": 0.005,
       "performance": {
         "time": 1,
         "size": 1,
-        "cpu": 1,
+        "cpu": 2,
         "cache": 3
       },
       "categories": [
@@ -4976,7 +4900,7 @@
         "DDG"
       ],
       "prevalence": 0.004,
-      "fingerprinting": 0,
+      "fingerprinting": 1,
       "cookies": 0.003,
       "performance": {
         "time": 1,
@@ -5003,9 +4927,9 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.011,
-      "fingerprinting": 0,
-      "cookies": 0.01,
+      "prevalence": 0.012,
+      "fingerprinting": 1,
+      "cookies": 0.011,
       "performance": {
         "time": 1,
         "size": 1,
@@ -5050,9 +4974,9 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.003,
-      "fingerprinting": 0,
-      "cookies": 0.003,
+      "prevalence": 0.004,
+      "fingerprinting": 1,
+      "cookies": 0.004,
       "performance": {
         "time": 1,
         "size": 1,
@@ -5077,9 +5001,9 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.032,
+      "prevalence": 0.017,
       "fingerprinting": 0,
-      "cookies": 0.032,
+      "cookies": 0.017,
       "performance": {
         "time": 1,
         "size": 1,
@@ -5104,9 +5028,9 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.016,
-      "fingerprinting": 0,
-      "cookies": 0.016,
+      "prevalence": 0.013,
+      "fingerprinting": 1,
+      "cookies": 0.013,
       "performance": {
         "time": 1,
         "size": 1,
@@ -5130,13 +5054,12 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.004,
+      "prevalence": 0.003,
       "fingerprinting": 1,
       "cookies": 0.003,
       "performance": {
         "time": 1,
         "size": 1,
-        "cpu": 1,
         "cache": 1
       },
       "categories": [
@@ -5156,9 +5079,9 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.005,
-      "fingerprinting": 0,
-      "cookies": 0.005,
+      "prevalence": 0.012,
+      "fingerprinting": 1,
+      "cookies": 0.012,
       "performance": {
         "time": 1,
         "size": 1,
@@ -5182,8 +5105,8 @@
         "DDG"
       ],
       "prevalence": 0.007,
-      "fingerprinting": 0,
-      "cookies": 0.005,
+      "fingerprinting": 1,
+      "cookies": 0.006,
       "performance": {
         "time": 1,
         "size": 1,
@@ -5210,9 +5133,9 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.006,
-      "fingerprinting": 0,
-      "cookies": 0.001,
+      "prevalence": 0.007,
+      "fingerprinting": 1,
+      "cookies": 0.002,
       "performance": {
         "time": 1,
         "size": 1,
@@ -5239,9 +5162,9 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.016,
+      "prevalence": 0.022,
       "fingerprinting": 1,
-      "cookies": 0.016,
+      "cookies": 0.022,
       "performance": {
         "time": 1,
         "size": 1,
@@ -5290,7 +5213,7 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.018,
+      "prevalence": 0.019,
       "fingerprinting": 1,
       "cookies": 0,
       "performance": {
@@ -5316,13 +5239,12 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.005,
-      "fingerprinting": 0,
-      "cookies": 0.005,
+      "prevalence": 0.028,
+      "fingerprinting": 1,
+      "cookies": 0.028,
       "performance": {
         "time": 1,
         "size": 1,
-        "cpu": 1,
         "cache": 3
       },
       "categories": [
@@ -5342,9 +5264,9 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.002,
+      "prevalence": 0.004,
       "fingerprinting": 0,
-      "cookies": 0.002,
+      "cookies": 0.004,
       "performance": {
         "time": 1,
         "size": 1,
@@ -5370,12 +5292,12 @@
         "DDG"
       ],
       "prevalence": 0.003,
-      "fingerprinting": 0,
+      "fingerprinting": 1,
       "cookies": 0.003,
       "performance": {
         "time": 1,
         "size": 1,
-        "cpu": 1,
+        "cpu": 2,
         "cache": 3
       },
       "categories": [
@@ -5393,22 +5315,142 @@
           "rule": "instagram\\.com\\/embed\\.js"
         },
         {
-          "rule": "instagram\\.com\\/static\\/bundles\\/es6\\/EmbedSDK\\.js\\/2fe3a16f6aeb\\.js"
+          "rule": "instagram\\.com\\/static\\/bundles\\/es6\\/EmbedSDK\\.js\\/bf4a12bd69f3\\.js"
         },
         {
           "rule": "instagram\\.com\\/ar15com"
         },
         {
-          "rule": "instagram\\.com\\/de_de\\/embeds\\.js"
-        },
-        {
           "rule": "instagram\\.com\\/v1\\/users\\/self\\/media\\/recent\\/"
         },
         {
-          "rule": "instagram\\.com\\/static\\/bundles\\/es6\\/en_US\\.js\\/83520ac22c7c\\.js"
+          "rule": "instagram\\.com\\/p\\/B8bkthsDhFI\\/media"
         },
         {
-          "rule": "instagram\\.com\\/static\\/bundles\\/es6\\/EmbedSimple\\.js\\/384bb7913821\\.js"
+          "rule": "instagram\\.com\\/p\\/B8V4yv0I_gD\\/media"
+        },
+        {
+          "rule": "instagram\\.com\\/p\\/B8TfChhCiUP\\/media"
+        },
+        {
+          "rule": "instagram\\.com\\/p\\/B8L19DdAA3B\\/media"
+        },
+        {
+          "rule": "instagram\\.com\\/p\\/B8L19DEA4k5\\/media"
+        },
+        {
+          "rule": "instagram\\.com\\/p\\/B8Osu78IcZG\\/media"
+        },
+        {
+          "rule": "instagram\\.com\\/p\\/B8OJsEUgCYr\\/media"
+        },
+        {
+          "rule": "instagram\\.com\\/p\\/B8L19D6g1J2\\/media"
+        },
+        {
+          "rule": "instagram\\.com\\/p\\/B8brtE8C-tf\\/media"
+        },
+        {
+          "rule": "instagram\\.com\\/p\\/B8JUDNigbeA\\/media"
+        },
+        {
+          "rule": "instagram\\.com\\/p\\/B8D92n9IQGo\\/media"
+        },
+        {
+          "rule": "instagram\\.com\\/p\\/B78Tvicg3rB\\/media"
+        },
+        {
+          "rule": "instagram\\.com\\/p\\/B76DoApgzQf\\/media"
+        },
+        {
+          "rule": "instagram\\.com\\/p\\/B7lX9OGISsE\\/media"
+        },
+        {
+          "rule": "instagram\\.com\\/p\\/B76DoAwgJQz\\/media"
+        },
+        {
+          "rule": "instagram\\.com\\/p\\/B75yQjIoQQZ\\/media"
+        },
+        {
+          "rule": "instagram\\.com\\/p\\/B7-smI5IIPs\\/media"
+        },
+        {
+          "rule": "instagram\\.com\\/p\\/B78QStLgEb3\\/media"
+        },
+        {
+          "rule": "instagram\\.com\\/p\\/B7tCO0RIK3M\\/media"
+        },
+        {
+          "rule": "instagram\\.com\\/p\\/B78TvaSAnfw\\/media"
+        },
+        {
+          "rule": "instagram\\.com\\/p\\/B7jxV1QCqdT\\/media"
+        },
+        {
+          "rule": "instagram\\.com\\/p\\/B7eWR75CwMN\\/media"
+        },
+        {
+          "rule": "instagram\\.com\\/p\\/B7cFdWbiuxu\\/media"
+        },
+        {
+          "rule": "instagram\\.com\\/p\\/B7bj8yzCn2u\\/media"
+        },
+        {
+          "rule": "instagram\\.com\\/p\\/B7jxV1PCthr\\/media"
+        },
+        {
+          "rule": "instagram\\.com\\/p\\/B7bpBRFiKVQ\\/media"
+        },
+        {
+          "rule": "instagram\\.com\\/p\\/B7ZGZehCiSK\\/media"
+        },
+        {
+          "rule": "instagram\\.com\\/p\\/B7YteDCiljv\\/media"
+        },
+        {
+          "rule": "instagram\\.com\\/p\\/B7JYXDuCZoM\\/media"
+        },
+        {
+          "rule": "instagram\\.com\\/p\\/B7ZW15QiDFE\\/media"
+        },
+        {
+          "rule": "instagram\\.com\\/p\\/B7bHDnNodgc\\/media"
+        },
+        {
+          "rule": "instagram\\.com\\/p\\/B7BEnMlghrD\\/media"
+        },
+        {
+          "rule": "instagram\\.com\\/p\\/B7DnipggDiM\\/media"
+        },
+        {
+          "rule": "instagram\\.com\\/p\\/B7BDJyDAeQG\\/media"
+        },
+        {
+          "rule": "instagram\\.com\\/p\\/B600BsyAZh1\\/media"
+        },
+        {
+          "rule": "instagram\\.com\\/p\\/B62saSBKaFP\\/media"
+        },
+        {
+          "rule": "instagram\\.com\\/p\\/B62xCXdAlAS\\/media"
+        },
+        {
+          "rule": "instagram\\.com\\/p\\/B6_RqpAi-R-\\/media"
+        },
+        {
+          "rule": "instagram\\.com\\/p\\/B7HC8HeiKE1\\/media"
+        },
+        {
+          "rule": "instagram\\.com\\/p\\/B68XkChCu7K\\/media"
+        },
+        {
+          "rule": "instagram\\.com\\/v1\\/users\\/self\\/media\\/recent"
+        },
+        {
+          "rule": "instagram\\.com\\/static\\/bundles\\/es6\\/en_US\\.js\\/795c57577ded\\.js"
+        },
+        {
+          "rule": "instagram\\.com\\/static\\/bundles\\/es6\\/EmbedSimple\\.js\\/b4da102fe1d6\\.js"
         },
         {
           "rule": "instagram\\.com\\/static\\/bundles\\/es6\\/EmbedSimpleBase\\.css\\/20a68d4f85ad\\.css"
@@ -5417,70 +5459,64 @@
           "rule": "instagram\\.com\\/static\\/bundles\\/es6\\/sprite_embed_d7bcbaf5d4c9\\.png\\/d7bcbaf5d4c9\\.png"
         },
         {
-          "rule": "instagram\\.com\\/static\\/bundles\\/es6\\/EmbedAsyncLogger\\.js\\/b8467e949e08\\.js"
+          "rule": "instagram\\.com\\/static\\/bundles\\/es6\\/EmbedAsyncLogger\\.js\\/f90d9793b12a\\.js"
         },
         {
           "rule": "instagram\\.com\\/logging_client_events"
         },
         {
-          "rule": "instagram\\.com\\/v1\\/users\\/self\\/media\\/recent"
-        },
-        {
           "rule": "instagram\\.com\\/static\\/images\\/ig-badge-view-24\\.png"
-        },
-        {
-          "rule": "instagram\\.com\\/static\\/thirdparty\\/images\\/badges\\/ig-badge-view-24\\.png\\/41dd6fb5d8eb\\.png"
         },
         {
           "rule": "instagram\\.com\\/static\\/images\\/ig-badge-view-sprite-24\\.png"
         },
         {
+          "rule": "instagram\\.com\\/static\\/thirdparty\\/images\\/badges\\/ig-badge-view-24\\.png\\/41dd6fb5d8eb\\.png"
+        },
+        {
           "rule": "instagram\\.com\\/static\\/thirdparty\\/images\\/badges\\/ig-badge-view-sprite-24\\.png\\/284161441bde\\.png"
         },
         {
-          "rule": "instagram\\.com\\/static\\/images\\/ig-badge-16\\.png"
+          "rule": "instagram\\.com\\/static\\/bundles\\/es6\\/EmbedRichBase\\.css\\/a8b7d71287ac\\.css"
         },
         {
-          "rule": "instagram\\.com\\/static\\/images\\/ig-badge-sprite-16\\.png"
+          "rule": "instagram\\.com\\/static\\/bundles\\/es6\\/EmbedRich\\.js\\/822740cf73ca\\.js"
         },
         {
-          "rule": "instagram\\.com\\/static\\/thirdparty\\/images\\/badges\\/ig-badge-16\\.png\\/1f6a7ba1a929\\.png"
+          "rule": "instagram\\.com\\/static\\/bundles\\/es6\\/EmbedRich\\.css\\/a8b7d71287ac\\.css"
         },
         {
-          "rule": "instagram\\.com\\/static\\/thirdparty\\/images\\/badges\\/ig-badge-sprite-16\\.png\\/fa7f5dc1affd\\.png"
+          "rule": "instagram\\.com\\/static\\/bundles\\/es6\\/EmbedSidecarBase\\.css\\/1397dcbde82b\\.css"
         },
         {
-          "rule": "instagram\\.com\\/static\\/bundles\\/es6\\/EmbedRichBase\\.css\\/9c6ecd8855b6\\.css"
+          "rule": "instagram\\.com\\/static\\/bundles\\/es6\\/EmbedSidecarEntrypoint\\.js\\/7edd54ef8f6e\\.js"
         },
         {
-          "rule": "instagram\\.com\\/static\\/bundles\\/es6\\/EmbedRich\\.js\\/39e7b75d4180\\.js"
-        },
-        {
-          "rule": "instagram\\.com\\/static\\/bundles\\/es6\\/EmbedRich\\.css\\/9c6ecd8855b6\\.css"
+          "rule": "instagram\\.com\\/static\\/bundles\\/es6\\/EmbedSidecarEntrypoint\\.css\\/1397dcbde82b\\.css"
         },
         {
           "rule": "instagram\\.com\\/fr_fr\\/embeds\\.js"
         },
         {
-          "rule": "instagram\\.com\\/static\\/images\\/ig-badge-24\\.png"
-        },
-        {
-          "rule": "instagram\\.com\\/static\\/images\\/ig-badge-sprite-24\\.png"
-        },
-        {
-          "rule": "instagram\\.com\\/static\\/thirdparty\\/images\\/badges\\/ig-badge-24\\.png\\/e4bfeb5b807c\\.png"
-        },
-        {
-          "rule": "instagram\\.com\\/static\\/thirdparty\\/images\\/badges\\/ig-badge-sprite-24\\.png\\/9b01fe0f0cc2\\.png"
+          "rule": "instagram\\.com\\/de_de\\/embeds\\.js"
         },
         {
           "rule": "instagram\\.com\\/v1\\/users\\/1562748433\\/media\\/recent"
         },
         {
-          "rule": "instagram\\.com\\/static\\/images\\/ig-badge-32\\.png"
+          "rule": "instagram\\.com\\/ajax\\/bz"
         },
         {
-          "rule": "instagram\\.com\\/static\\/thirdparty\\/images\\/badges\\/ig-badge-32\\.png\\/71906700c669\\.png"
+          "rule": "instagram\\.com\\/logging\\/falco"
+        },
+        {
+          "rule": "instagram\\.com\\/logging\\/arwing"
+        },
+        {
+          "rule": "instagram\\.com\\/accounts\\/login\\/"
+        },
+        {
+          "rule": "instagram\\.com\\/static\\/bundles\\/es6\\/sprite_core_b20f2a3cd7e4\\.png\\/b20f2a3cd7e4\\.png"
         },
         {
           "rule": "instagram\\.com\\/graphql\\/query\\/"
@@ -5497,7 +5533,7 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.008,
+      "prevalence": 0.007,
       "fingerprinting": 2,
       "cookies": 0.002,
       "performance": {
@@ -5526,9 +5562,9 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.004,
-      "fingerprinting": 0,
-      "cookies": 0.004,
+      "prevalence": 0.005,
+      "fingerprinting": 1,
+      "cookies": 0.005,
       "performance": {
         "time": 1,
         "size": 1,
@@ -5554,9 +5590,9 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.013,
+      "prevalence": 0.011,
       "fingerprinting": 2,
-      "cookies": 0.013,
+      "cookies": 0.011,
       "performance": {
         "time": 1,
         "size": 1,
@@ -5589,8 +5625,8 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.003,
-      "fingerprinting": 0,
+      "prevalence": 0.002,
+      "fingerprinting": 1,
       "cookies": 0.002,
       "performance": {
         "time": 1,
@@ -5615,9 +5651,9 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.021,
-      "fingerprinting": 0,
-      "cookies": 0.021,
+      "prevalence": 0.025,
+      "fingerprinting": 1,
+      "cookies": 0.025,
       "performance": {
         "time": 1,
         "size": 1,
@@ -5641,7 +5677,7 @@
         "DDG"
       ],
       "prevalence": 0.003,
-      "fingerprinting": 0,
+      "fingerprinting": 1,
       "cookies": 0.002,
       "performance": {
         "time": 1,
@@ -5666,9 +5702,9 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.012,
+      "prevalence": 0.006,
       "fingerprinting": 0,
-      "cookies": 0.012,
+      "cookies": 0.006,
       "performance": {
         "time": 1,
         "size": 1,
@@ -5694,7 +5730,7 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.003,
+      "prevalence": 0.002,
       "fingerprinting": 0,
       "cookies": 0,
       "performance": {
@@ -5720,9 +5756,9 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.004,
+      "prevalence": 0.005,
       "fingerprinting": 0,
-      "cookies": 0.004,
+      "cookies": 0.005,
       "performance": {
         "time": 1,
         "size": 1,
@@ -5745,9 +5781,9 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.009,
-      "fingerprinting": 0,
-      "cookies": 0.008,
+      "prevalence": 0.007,
+      "fingerprinting": 1,
+      "cookies": 0.006,
       "performance": {
         "time": 1,
         "size": 1,
@@ -5778,7 +5814,6 @@
       "performance": {
         "time": 1,
         "size": 1,
-        "cpu": 1,
         "cache": 3
       },
       "categories": [
@@ -5798,9 +5833,9 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.003,
+      "prevalence": 0.004,
       "fingerprinting": 2,
-      "cookies": 0.003,
+      "cookies": 0.004,
       "performance": {
         "time": 1,
         "size": 1,
@@ -5825,12 +5860,11 @@
         "DDG"
       ],
       "prevalence": 0.003,
-      "fingerprinting": 0,
+      "fingerprinting": 1,
       "cookies": 0.003,
       "performance": {
         "time": 1,
         "size": 1,
-        "cpu": 1,
         "cache": 3
       },
       "categories": [
@@ -5851,7 +5885,7 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.003,
+      "prevalence": 0.002,
       "fingerprinting": 2,
       "cookies": 0.002,
       "performance": {
@@ -5879,13 +5913,12 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.005,
+      "prevalence": 0.006,
       "fingerprinting": 2,
-      "cookies": 0.004,
+      "cookies": 0.006,
       "performance": {
         "time": 1,
         "size": 1,
-        "cpu": 2,
         "cache": 3
       },
       "categories": [
@@ -5895,31 +5928,6 @@
         "Audience Measurement",
         "Third-Party Analytics Marketing",
         "Embedded Content"
-      ]
-    },
-    "korrelate.net": {
-      "domain": "korrelate.net",
-      "default": "block",
-      "owner": {
-        "name": "J.D. Power",
-        "displayName": "J.D. Power",
-        "url": "",
-        "privacyPolicy": ""
-      },
-      "source": [
-        "DDG"
-      ],
-      "prevalence": 0.003,
-      "fingerprinting": 0,
-      "cookies": 0.003,
-      "performance": {
-        "time": 1,
-        "size": 1,
-        "cpu": 1,
-        "cache": 3
-      },
-      "categories": [
-        "Ad Motivated Tracking"
       ]
     },
     "krxd.net": {
@@ -5934,9 +5942,9 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.06,
+      "prevalence": 0.069,
       "fingerprinting": 1,
-      "cookies": 0.059,
+      "cookies": 0.067,
       "performance": {
         "time": 1,
         "size": 1,
@@ -5961,9 +5969,9 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.02,
+      "prevalence": 0.023,
       "fingerprinting": 1,
-      "cookies": 0.02,
+      "cookies": 0.022,
       "performance": {
         "time": 1,
         "size": 1,
@@ -5989,9 +5997,9 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.05,
-      "fingerprinting": 2,
-      "cookies": 0.048,
+      "prevalence": 0.046,
+      "fingerprinting": 1,
+      "cookies": 0.046,
       "performance": {
         "time": 1,
         "size": 1,
@@ -6013,13 +6021,13 @@
           "rule": "linkedin\\.com\\/in\\.js"
         },
         {
-          "rule": "linkedin\\.com\\/countserv\\/count\\/share"
-        },
-        {
           "rule": "linkedin\\.com\\/collect"
         },
         {
           "rule": "linkedin\\.com\\/px\\/li_sync"
+        },
+        {
+          "rule": "linkedin\\.com\\/countserv\\/count\\/share"
         },
         {
           "rule": "linkedin\\.com\\/autofill\\/js\\/autofill\\.js"
@@ -6045,9 +6053,9 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.044,
-      "fingerprinting": 0,
-      "cookies": 0.042,
+      "prevalence": 0.048,
+      "fingerprinting": 1,
+      "cookies": 0.047,
       "performance": {
         "time": 1,
         "size": 1,
@@ -6076,9 +6084,9 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.034,
-      "fingerprinting": 0,
-      "cookies": 0.034,
+      "prevalence": 0.007,
+      "fingerprinting": 1,
+      "cookies": 0.007,
       "performance": {
         "time": 1,
         "size": 1,
@@ -6103,8 +6111,8 @@
         "DDG"
       ],
       "prevalence": 0.003,
-      "fingerprinting": 0,
-      "cookies": 0.002,
+      "fingerprinting": 3,
+      "cookies": 0.003,
       "performance": {
         "time": 1,
         "size": 1,
@@ -6143,8 +6151,8 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.003,
-      "fingerprinting": 0,
+      "prevalence": 0.002,
+      "fingerprinting": 1,
       "cookies": 0,
       "performance": {
         "time": 1,
@@ -6173,12 +6181,12 @@
         "DDG"
       ],
       "prevalence": 0.005,
-      "fingerprinting": 0,
+      "fingerprinting": 1,
       "cookies": 0.005,
       "performance": {
         "time": 1,
         "size": 1,
-        "cpu": 1,
+        "cpu": 2,
         "cache": 3
       },
       "categories": [
@@ -6207,8 +6215,8 @@
       "cookies": 0.005,
       "performance": {
         "time": 1,
-        "size": 2,
-        "cpu": 2,
+        "size": 1,
+        "cpu": 3,
         "cache": 1
       },
       "categories": [
@@ -6254,13 +6262,12 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.002,
-      "fingerprinting": 2,
+      "prevalence": 0.004,
+      "fingerprinting": 1,
       "cookies": 0.001,
       "performance": {
         "time": 1,
         "size": 1,
-        "cpu": 3,
         "cache": 3
       },
       "categories": [
@@ -6283,8 +6290,8 @@
         "DDG"
       ],
       "prevalence": 0.003,
-      "fingerprinting": 0,
-      "cookies": 0.003,
+      "fingerprinting": 1,
+      "cookies": 0.002,
       "performance": {
         "time": 1,
         "size": 1,
@@ -6294,35 +6301,6 @@
       "categories": [
         "Ad Motivated Tracking",
         "Advertising"
-      ]
-    },
-    "loopme.me": {
-      "domain": "loopme.me",
-      "default": "block",
-      "owner": {
-        "name": "LoopMe Ltd",
-        "displayName": "LoopMe",
-        "privacyPolicy": "https://loopme.com/privacy-policy/",
-        "url": "http://loopme.com"
-      },
-      "source": [
-        "DDG"
-      ],
-      "prevalence": 0.005,
-      "fingerprinting": 0,
-      "cookies": 0,
-      "performance": {
-        "time": 1,
-        "size": 1,
-        "cache": 3
-      },
-      "categories": [
-        "Ad Motivated Tracking",
-        "Advertising",
-        "Analytics",
-        "Audience Measurement",
-        "Third-Party Analytics Marketing",
-        "Action Pixels"
       ]
     },
     "lpsnmedia.net": {
@@ -6365,7 +6343,7 @@
         "DDG"
       ],
       "prevalence": 0.004,
-      "fingerprinting": 0,
+      "fingerprinting": 1,
       "cookies": 0.004,
       "performance": {
         "time": 1,
@@ -6397,7 +6375,7 @@
       "performance": {
         "time": 1,
         "size": 1,
-        "cpu": 1,
+        "cpu": 2,
         "cache": 3
       },
       "categories": [
@@ -6467,8 +6445,8 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.004,
-      "fingerprinting": 0,
+      "prevalence": 0.003,
+      "fingerprinting": 1,
       "cookies": 0.002,
       "performance": {
         "time": 1,
@@ -6558,9 +6536,9 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.009,
+      "prevalence": 0.011,
       "fingerprinting": 1,
-      "cookies": 0.008,
+      "cookies": 0.009,
       "performance": {
         "time": 1,
         "size": 1,
@@ -6586,9 +6564,9 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.108,
-      "fingerprinting": 0,
-      "cookies": 0.108,
+      "prevalence": 0.107,
+      "fingerprinting": 1,
+      "cookies": 0.107,
       "performance": {
         "time": 1,
         "size": 1,
@@ -6641,13 +6619,13 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.004,
+      "prevalence": 0.003,
       "fingerprinting": 1,
       "cookies": 0.001,
       "performance": {
         "time": 1,
         "size": 1,
-        "cpu": 2,
+        "cpu": 1,
         "cache": 1
       },
       "categories": [
@@ -6668,9 +6646,9 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.022,
-      "fingerprinting": 0,
-      "cookies": 0.02,
+      "prevalence": 0.03,
+      "fingerprinting": 1,
+      "cookies": 0.028,
       "performance": {
         "time": 1,
         "size": 1,
@@ -6704,9 +6682,9 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.008,
+      "prevalence": 0.007,
       "fingerprinting": 0,
-      "cookies": 0.008,
+      "cookies": 0.007,
       "performance": {
         "time": 1,
         "size": 1,
@@ -6718,33 +6696,6 @@
         "Advertising",
         "Analytics",
         "Audience Measurement"
-      ]
-    },
-    "mediaplex.com": {
-      "domain": "mediaplex.com",
-      "default": "block",
-      "owner": {
-        "name": "Conversant LLC",
-        "displayName": "Conversant",
-        "privacyPolicy": "https://www.conversantmedia.com/legal/privacy",
-        "url": "http://conversantmedia.com"
-      },
-      "source": [
-        "DDG"
-      ],
-      "prevalence": 0.002,
-      "fingerprinting": 0,
-      "cookies": 0.001,
-      "performance": {
-        "time": 1,
-        "size": 1,
-        "cache": 3
-      },
-      "categories": [
-        "Ad Motivated Tracking",
-        "Advertising",
-        "Third-Party Analytics Marketing",
-        "Action Pixels"
       ]
     },
     "mediavine.com": {
@@ -6759,9 +6710,9 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.008,
-      "fingerprinting": 2,
-      "cookies": 0.008,
+      "prevalence": 0.006,
+      "fingerprinting": 1,
+      "cookies": 0.004,
       "performance": {
         "time": 1,
         "size": 1,
@@ -6787,7 +6738,7 @@
         "DDG"
       ],
       "prevalence": 0.002,
-      "fingerprinting": 0,
+      "fingerprinting": 1,
       "cookies": 0,
       "performance": {
         "time": 1,
@@ -6812,13 +6763,12 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.004,
-      "fingerprinting": 0,
+      "prevalence": 0.003,
+      "fingerprinting": 1,
       "cookies": 0,
       "performance": {
         "time": 1,
         "size": 1,
-        "cpu": 1,
         "cache": 3
       },
       "categories": [
@@ -6841,9 +6791,9 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.017,
-      "fingerprinting": 0,
-      "cookies": 0.017,
+      "prevalence": 0.026,
+      "fingerprinting": 1,
+      "cookies": 0.026,
       "performance": {
         "time": 1,
         "size": 1,
@@ -6912,6 +6862,32 @@
         "Audience Measurement"
       ]
     },
+    "microad.jp": {
+      "domain": "microad.jp",
+      "default": "block",
+      "owner": {
+        "name": "MicroAd, Inc.",
+        "displayName": "MicroAd",
+        "url": "",
+        "privacyPolicy": ""
+      },
+      "source": [
+        "DDG"
+      ],
+      "prevalence": 0.002,
+      "fingerprinting": 1,
+      "cookies": 0.002,
+      "performance": {
+        "time": 1,
+        "size": 1,
+        "cpu": 1,
+        "cache": 3
+      },
+      "categories": [
+        "Ad Motivated Tracking",
+        "Advertising"
+      ]
+    },
     "mixpanel.com": {
       "domain": "mixpanel.com",
       "default": "block",
@@ -6924,8 +6900,8 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.008,
-      "fingerprinting": 0,
+      "prevalence": 0.007,
+      "fingerprinting": 1,
       "cookies": 0,
       "performance": {
         "time": 1,
@@ -6952,7 +6928,7 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.009,
+      "prevalence": 0.01,
       "fingerprinting": 0,
       "cookies": 0.001,
       "performance": {
@@ -6979,9 +6955,9 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.035,
-      "fingerprinting": 0,
-      "cookies": 0.035,
+      "prevalence": 0.032,
+      "fingerprinting": 1,
+      "cookies": 0.031,
       "performance": {
         "time": 1,
         "size": 1,
@@ -7009,13 +6985,13 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.03,
+      "prevalence": 0.075,
       "fingerprinting": 3,
       "cookies": 0,
       "performance": {
         "time": 1,
         "size": 1,
-        "cpu": 3,
+        "cpu": 1,
         "cache": 3
       },
       "categories": [
@@ -7046,32 +7022,6 @@
             ]
           }
         }
-      ]
-    },
-    "mobileadtrading.com": {
-      "domain": "mobileadtrading.com",
-      "default": "block",
-      "owner": {
-        "name": "Somo Audience Corp",
-        "displayName": "Somo Audience",
-        "privacyPolicy": "https://somoaudience.com/legal/",
-        "url": "http://somoaudience.com"
-      },
-      "source": [
-        "DDG"
-      ],
-      "prevalence": 0.011,
-      "fingerprinting": 0,
-      "cookies": 0.011,
-      "performance": {
-        "time": 1,
-        "size": 1,
-        "cache": 3
-      },
-      "categories": [
-        "Ad Motivated Tracking",
-        "Advertising",
-        "Ad Fraud"
       ]
     },
     "monetate.net": {
@@ -7117,9 +7067,9 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.048,
-      "fingerprinting": 0,
-      "cookies": 0.047,
+      "prevalence": 0.068,
+      "fingerprinting": 1,
+      "cookies": 0.068,
       "performance": {
         "time": 1,
         "size": 1,
@@ -7148,7 +7098,7 @@
         "DDG"
       ],
       "prevalence": 0.006,
-      "fingerprinting": 2,
+      "fingerprinting": 1,
       "cookies": 0.001,
       "performance": {
         "time": 1,
@@ -7215,9 +7165,9 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.024,
-      "fingerprinting": 0,
-      "cookies": 0.023,
+      "prevalence": 0.026,
+      "fingerprinting": 1,
+      "cookies": 0.026,
       "performance": {
         "time": 1,
         "size": 1,
@@ -7228,33 +7178,6 @@
         "Advertising",
         "Analytics",
         "Audience Measurement"
-      ]
-    },
-    "mynativeplatform.com": {
-      "domain": "mynativeplatform.com",
-      "default": "block",
-      "owner": {
-        "name": "My6sense Inc.",
-        "displayName": "My6sense",
-        "privacyPolicy": "https://my6sense.com/privacy-policy/",
-        "url": "http://my6sense.com"
-      },
-      "source": [
-        "DDG"
-      ],
-      "prevalence": 0.002,
-      "fingerprinting": 0,
-      "cookies": 0.002,
-      "performance": {
-        "time": 1,
-        "size": 1,
-        "cpu": 1,
-        "cache": 1
-      },
-      "categories": [
-        "Ad Motivated Tracking",
-        "Advertising",
-        "Analytics"
       ]
     },
     "myvisualiq.net": {
@@ -7269,9 +7192,9 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.017,
-      "fingerprinting": 0,
-      "cookies": 0.017,
+      "prevalence": 0.028,
+      "fingerprinting": 1,
+      "cookies": 0.028,
       "performance": {
         "time": 1,
         "size": 1,
@@ -7297,12 +7220,11 @@
         "DDG"
       ],
       "prevalence": 0.006,
-      "fingerprinting": 0,
+      "fingerprinting": 1,
       "cookies": 0.006,
       "performance": {
         "time": 1,
         "size": 1,
-        "cpu": 1,
         "cache": 3
       },
       "categories": [
@@ -7324,8 +7246,8 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.035,
-      "fingerprinting": 0,
+      "prevalence": 0.036,
+      "fingerprinting": 1,
       "cookies": 0.034,
       "performance": {
         "time": 1,
@@ -7353,8 +7275,8 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.084,
-      "fingerprinting": 0,
+      "prevalence": 0.079,
+      "fingerprinting": 1,
       "cookies": 0,
       "performance": {
         "time": 1,
@@ -7378,9 +7300,9 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.005,
+      "prevalence": 0.006,
       "fingerprinting": 0,
-      "cookies": 0.005,
+      "cookies": 0.006,
       "performance": {
         "time": 1,
         "size": 1,
@@ -7389,6 +7311,36 @@
       "categories": [
         "Analytics",
         "Audience Measurement"
+      ]
+    },
+    "npttech.com": {
+      "domain": "npttech.com",
+      "default": "block",
+      "owner": {
+        "name": "Piano Software",
+        "displayName": "Piano Software",
+        "privacyPolicy": "https://piano.io/privacy-policy/",
+        "url": "http://piano.io"
+      },
+      "source": [
+        "DDG"
+      ],
+      "prevalence": 0.002,
+      "fingerprinting": 1,
+      "cookies": 0.002,
+      "performance": {
+        "time": 1,
+        "size": 1,
+        "cache": 3
+      },
+      "categories": [
+        "Ad Motivated Tracking",
+        "Advertising",
+        "Analytics",
+        "Audience Measurement",
+        "SSO",
+        "Third-Party Analytics Marketing",
+        "Embedded Content"
       ]
     },
     "nr-data.net": {
@@ -7403,9 +7355,9 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.084,
-      "fingerprinting": 0,
-      "cookies": 0.037,
+      "prevalence": 0.08,
+      "fingerprinting": 1,
+      "cookies": 0.03,
       "performance": {
         "time": 1,
         "size": 1,
@@ -7430,7 +7382,7 @@
       ],
       "prevalence": 0.007,
       "fingerprinting": 1,
-      "cookies": 0.007,
+      "cookies": 0.006,
       "performance": {
         "time": 1,
         "size": 1,
@@ -7455,9 +7407,9 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.006,
+      "prevalence": 0.004,
       "fingerprinting": 0,
-      "cookies": 0.006,
+      "cookies": 0.004,
       "performance": {
         "time": 1,
         "size": 1,
@@ -7485,7 +7437,7 @@
       ],
       "prevalence": 0.002,
       "fingerprinting": 1,
-      "cookies": 0.002,
+      "cookies": 0.001,
       "performance": {
         "time": 1,
         "size": 1,
@@ -7511,7 +7463,7 @@
       ],
       "prevalence": 0.003,
       "fingerprinting": 2,
-      "cookies": 0.003,
+      "cookies": 0.002,
       "performance": {
         "time": 1,
         "size": 2,
@@ -7535,13 +7487,12 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.009,
-      "fingerprinting": 0,
-      "cookies": 0.008,
+      "prevalence": 0.005,
+      "fingerprinting": 1,
+      "cookies": 0.005,
       "performance": {
         "time": 1,
         "size": 1,
-        "cpu": 1,
         "cache": 3
       },
       "categories": [
@@ -7561,9 +7512,9 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.035,
-      "fingerprinting": 0,
-      "cookies": 0.005,
+      "prevalence": 0.037,
+      "fingerprinting": 1,
+      "cookies": 0.006,
       "performance": {
         "time": 1,
         "size": 1,
@@ -7635,13 +7586,13 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.003,
+      "prevalence": 0.002,
       "fingerprinting": 1,
       "cookies": 0.002,
       "performance": {
         "time": 1,
         "size": 1,
-        "cpu": 2,
+        "cpu": 3,
         "cache": 3
       },
       "categories": [
@@ -7662,9 +7613,9 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.141,
-      "fingerprinting": 0,
-      "cookies": 0.14,
+      "prevalence": 0.161,
+      "fingerprinting": 1,
+      "cookies": 0.161,
       "performance": {
         "time": 1,
         "size": 1,
@@ -7690,7 +7641,7 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.013,
+      "prevalence": 0.014,
       "fingerprinting": 1,
       "cookies": 0.005,
       "performance": {
@@ -7750,9 +7701,9 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.045,
+      "prevalence": 0.047,
       "fingerprinting": 1,
-      "cookies": 0.036,
+      "cookies": 0.037,
       "performance": {
         "time": 1,
         "size": 1,
@@ -7783,9 +7734,9 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.025,
-      "fingerprinting": 0,
-      "cookies": 0.025,
+      "prevalence": 0.031,
+      "fingerprinting": 1,
+      "cookies": 0.031,
       "performance": {
         "time": 1,
         "size": 1,
@@ -7797,32 +7748,6 @@
         "Advertising",
         "Ad Fraud",
         "Audience Measurement"
-      ]
-    },
-    "pagefair.com": {
-      "domain": "pagefair.com",
-      "default": "block",
-      "owner": {
-        "name": "PageFair Limited",
-        "displayName": "PageFair",
-        "privacyPolicy": "https://pagefair.com/privacy/",
-        "url": "http://pagefair.com"
-      },
-      "source": [
-        "DDG"
-      ],
-      "prevalence": 0.003,
-      "fingerprinting": 0,
-      "cookies": 0.002,
-      "performance": {
-        "time": 1,
-        "size": 1,
-        "cpu": 1,
-        "cache": 3
-      },
-      "categories": [
-        "Ad Motivated Tracking",
-        "Advertising"
       ]
     },
     "pardot.com": {
@@ -7838,7 +7763,7 @@
         "DDG"
       ],
       "prevalence": 0.005,
-      "fingerprinting": 0,
+      "fingerprinting": 1,
       "cookies": 0.005,
       "performance": {
         "time": 1,
@@ -7865,7 +7790,7 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.008,
+      "prevalence": 0.009,
       "fingerprinting": 1,
       "cookies": 0.003,
       "performance": {
@@ -7882,36 +7807,6 @@
         "Action Pixels"
       ]
     },
-    "payments-amazon.com": {
-      "domain": "payments-amazon.com",
-      "default": "ignore",
-      "owner": {
-        "name": "Amazon Technologies, Inc.",
-        "displayName": "Amazon",
-        "privacyPolicy": "https://www.amazon.com/gp/help/customer/display.html?nodeId=468496",
-        "url": "http://amazon.com"
-      },
-      "source": [
-        "DDG"
-      ],
-      "prevalence": 0.002,
-      "fingerprinting": 0,
-      "cookies": 0.001,
-      "performance": {
-        "time": 1,
-        "size": 1,
-        "cpu": 1,
-        "cache": 3
-      },
-      "categories": [
-        "Analytics",
-        "Audience Measurement",
-        "Federated Login",
-        "Online Payment",
-        "Badge",
-        "Embedded Content"
-      ]
-    },
     "paypal.com": {
       "domain": "paypal.com",
       "default": "ignore",
@@ -7926,11 +7821,10 @@
       ],
       "prevalence": 0.006,
       "fingerprinting": 3,
-      "cookies": 0.006,
+      "cookies": 0.005,
       "performance": {
         "time": 1,
         "size": 1,
-        "cpu": 1,
         "cache": 3
       },
       "categories": [
@@ -7954,13 +7848,12 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.003,
+      "prevalence": 0.004,
       "fingerprinting": 1,
       "cookies": 0.002,
       "performance": {
         "time": 1,
         "size": 1,
-        "cpu": 1,
         "cache": 1
       },
       "categories": [
@@ -7970,6 +7863,34 @@
         "Audience Measurement",
         "Third-Party Analytics Marketing",
         "Session Replay"
+      ]
+    },
+    "perimeterx.net": {
+      "domain": "perimeterx.net",
+      "default": "block",
+      "owner": {
+        "name": "PerimeterX, Inc.",
+        "displayName": "PerimeterX, Inc.",
+        "url": "",
+        "privacyPolicy": ""
+      },
+      "source": [
+        "DDG"
+      ],
+      "prevalence": 0.003,
+      "fingerprinting": 3,
+      "cookies": 0.001,
+      "performance": {
+        "time": 1,
+        "size": 1,
+        "cpu": 1,
+        "cache": 3
+      },
+      "categories": [
+        "Ad Motivated Tracking",
+        "Ad Fraud",
+        "Analytics",
+        "Audience Measurement"
       ]
     },
     "permutive.com": {
@@ -7984,9 +7905,9 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.004,
+      "prevalence": 0.006,
       "fingerprinting": 1,
-      "cookies": 0.004,
+      "cookies": 0.005,
       "performance": {
         "time": 1,
         "size": 1,
@@ -8014,7 +7935,7 @@
       ],
       "prevalence": 0.012,
       "fingerprinting": 2,
-      "cookies": 0.012,
+      "cookies": 0.006,
       "performance": {
         "time": 1,
         "size": 1,
@@ -8039,76 +7960,17 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.06,
-      "fingerprinting": 0,
-      "cookies": 0.06,
+      "prevalence": 0.045,
+      "fingerprinting": 1,
+      "cookies": 0.045,
       "performance": {
         "time": 1,
         "size": 1,
-        "cpu": 1,
         "cache": 3
       },
       "categories": [
         "Ad Motivated Tracking",
         "Advertising"
-      ]
-    },
-    "playground.xyz": {
-      "domain": "playground.xyz",
-      "default": "block",
-      "owner": {
-        "name": "PLAYGROUND XYZ",
-        "displayName": "PLAYGROUND XYZ",
-        "privacyPolicy": "https://playground.xyz/privacy/",
-        "url": "http://playground.xyz"
-      },
-      "source": [
-        "DDG"
-      ],
-      "prevalence": 0.008,
-      "fingerprinting": 0,
-      "cookies": 0.008,
-      "performance": {
-        "time": 1,
-        "size": 1,
-        "cache": 3
-      },
-      "categories": [
-        "Ad Motivated Tracking",
-        "Advertising",
-        "Analytics",
-        "Third-Party Analytics Marketing"
-      ]
-    },
-    "po.st": {
-      "domain": "po.st",
-      "default": "block",
-      "owner": {
-        "name": "RhythmOne",
-        "displayName": "RhythmOne",
-        "privacyPolicy": "https://www.rhythmone.com/privacy-policy",
-        "url": "http://rhythmone.com"
-      },
-      "source": [
-        "DDG"
-      ],
-      "prevalence": 0.002,
-      "fingerprinting": 1,
-      "cookies": 0.002,
-      "performance": {
-        "time": 1,
-        "size": 1,
-        "cpu": 1,
-        "cache": 1
-      },
-      "categories": [
-        "Analytics",
-        "Audience Measurement",
-        "Third-Party Analytics Marketing",
-        "Social - Comment",
-        "Social - Share",
-        "Badge",
-        "Embedded Content"
       ]
     },
     "popads.net": {
@@ -8123,7 +7985,7 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.007,
+      "prevalence": 0.005,
       "fingerprinting": 1,
       "cookies": 0,
       "performance": {
@@ -8152,9 +8014,9 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.01,
-      "fingerprinting": 0,
-      "cookies": 0.01,
+      "prevalence": 0.011,
+      "fingerprinting": 1,
+      "cookies": 0.011,
       "performance": {
         "time": 1,
         "size": 1,
@@ -8179,9 +8041,9 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.017,
+      "prevalence": 0.008,
       "fingerprinting": 0,
-      "cookies": 0.016,
+      "cookies": 0.008,
       "performance": {
         "time": 1,
         "size": 1,
@@ -8209,12 +8071,11 @@
         "DDG"
       ],
       "prevalence": 0.012,
-      "fingerprinting": 0,
-      "cookies": 0.011,
+      "fingerprinting": 1,
+      "cookies": 0.01,
       "performance": {
         "time": 1,
         "size": 1,
-        "cpu": 1,
         "cache": 1
       },
       "categories": [
@@ -8235,9 +8096,9 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.003,
-      "fingerprinting": 0,
-      "cookies": 0,
+      "prevalence": 0.009,
+      "fingerprinting": 1,
+      "cookies": 0.005,
       "performance": {
         "time": 1,
         "size": 1,
@@ -8262,8 +8123,8 @@
         "DDG"
       ],
       "prevalence": 0.006,
-      "fingerprinting": 0,
-      "cookies": 0.006,
+      "fingerprinting": 1,
+      "cookies": 0.005,
       "performance": {
         "time": 1,
         "size": 1,
@@ -8288,9 +8149,9 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.121,
-      "fingerprinting": 0,
-      "cookies": 0.116,
+      "prevalence": 0.15,
+      "fingerprinting": 1,
+      "cookies": 0.14,
       "performance": {
         "time": 1,
         "size": 1,
@@ -8320,11 +8181,11 @@
       ],
       "prevalence": 0.002,
       "fingerprinting": 1,
-      "cookies": 0.002,
+      "cookies": 0,
       "performance": {
         "time": 1,
         "size": 1,
-        "cpu": 1,
+        "cpu": 2,
         "cache": 3
       },
       "categories": [
@@ -8375,9 +8236,9 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.009,
+      "prevalence": 0.01,
       "fingerprinting": 1,
-      "cookies": 0.008,
+      "cookies": 0.009,
       "performance": {
         "time": 1,
         "size": 1,
@@ -8404,9 +8265,9 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.11,
+      "prevalence": 0.14,
       "fingerprinting": 1,
-      "cookies": 0.107,
+      "cookies": 0.136,
       "performance": {
         "time": 1,
         "size": 1,
@@ -8433,9 +8294,9 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.006,
-      "fingerprinting": 0,
-      "cookies": 0.005,
+      "prevalence": 0.007,
+      "fingerprinting": 1,
+      "cookies": 0,
       "performance": {
         "time": 1,
         "size": 1,
@@ -8469,7 +8330,6 @@
       "performance": {
         "time": 1,
         "size": 1,
-        "cpu": 2,
         "cache": 3
       },
       "categories": [
@@ -8519,7 +8379,7 @@
         "DDG"
       ],
       "prevalence": 0.005,
-      "fingerprinting": 0,
+      "fingerprinting": 1,
       "cookies": 0,
       "performance": {
         "time": 1,
@@ -8541,6 +8401,33 @@
         }
       ]
     },
+    "realvu.net": {
+      "domain": "realvu.net",
+      "default": "block",
+      "owner": {
+        "name": "RealVu Inc",
+        "displayName": "RealVu Inc",
+        "url": "",
+        "privacyPolicy": ""
+      },
+      "source": [
+        "DDG"
+      ],
+      "prevalence": 0.002,
+      "fingerprinting": 1,
+      "cookies": 0,
+      "performance": {
+        "time": 1,
+        "size": 1,
+        "cache": 3
+      },
+      "categories": [
+        "Ad Motivated Tracking",
+        "Advertising",
+        "Ad Fraud",
+        "Analytics"
+      ]
+    },
     "reddit.com": {
       "domain": "reddit.com",
       "default": "block",
@@ -8554,7 +8441,7 @@
         "DDG"
       ],
       "prevalence": 0.007,
-      "fingerprinting": 0,
+      "fingerprinting": 1,
       "cookies": 0.007,
       "performance": {
         "time": 1,
@@ -8620,9 +8507,9 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.003,
-      "fingerprinting": 2,
-      "cookies": 0,
+      "prevalence": 0.004,
+      "fingerprinting": 1,
+      "cookies": 0.004,
       "performance": {
         "time": 1,
         "size": 1,
@@ -8647,9 +8534,9 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.011,
-      "fingerprinting": 0,
-      "cookies": 0.011,
+      "prevalence": 0.003,
+      "fingerprinting": 1,
+      "cookies": 0.003,
       "performance": {
         "time": 1,
         "size": 1,
@@ -8676,8 +8563,8 @@
         "DDG"
       ],
       "prevalence": 0.002,
-      "fingerprinting": 0,
-      "cookies": 0.001,
+      "fingerprinting": 1,
+      "cookies": 0.002,
       "performance": {
         "time": 1,
         "size": 1,
@@ -8704,13 +8591,12 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.002,
+      "prevalence": 0.004,
       "fingerprinting": 1,
-      "cookies": 0.002,
+      "cookies": 0.004,
       "performance": {
         "time": 1,
         "size": 1,
-        "cpu": 2,
         "cache": 3
       },
       "categories": [
@@ -8734,13 +8620,12 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.017,
+      "prevalence": 0.011,
       "fingerprinting": 0,
-      "cookies": 0.017,
+      "cookies": 0.01,
       "performance": {
         "time": 1,
         "size": 1,
-        "cpu": 1,
         "cache": 3
       },
       "categories": [
@@ -8760,8 +8645,8 @@
         "DDG"
       ],
       "prevalence": 0.043,
-      "fingerprinting": 0,
-      "cookies": 0.042,
+      "fingerprinting": 1,
+      "cookies": 0.043,
       "performance": {
         "time": 1,
         "size": 1,
@@ -8787,7 +8672,7 @@
         "DDG"
       ],
       "prevalence": 0.004,
-      "fingerprinting": 0,
+      "fingerprinting": 1,
       "cookies": 0,
       "performance": {
         "time": 1,
@@ -8814,9 +8699,9 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.009,
-      "fingerprinting": 0,
-      "cookies": 0.009,
+      "prevalence": 0.012,
+      "fingerprinting": 1,
+      "cookies": 0.012,
       "performance": {
         "time": 1,
         "size": 1,
@@ -8843,7 +8728,7 @@
       ],
       "prevalence": 0.005,
       "fingerprinting": 2,
-      "cookies": 0,
+      "cookies": 0.001,
       "performance": {
         "time": 1,
         "size": 1,
@@ -8869,8 +8754,8 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.006,
-      "fingerprinting": 0,
+      "prevalence": 0.007,
+      "fingerprinting": 1,
       "cookies": 0.006,
       "performance": {
         "time": 1,
@@ -8895,9 +8780,9 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.161,
-      "fingerprinting": 1,
-      "cookies": 0.124,
+      "prevalence": 0.19,
+      "fingerprinting": 2,
+      "cookies": 0.134,
       "performance": {
         "time": 1,
         "size": 1,
@@ -8921,9 +8806,9 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.02,
+      "prevalence": 0.017,
       "fingerprinting": 0,
-      "cookies": 0.02,
+      "cookies": 0.017,
       "performance": {
         "time": 1,
         "size": 1,
@@ -8933,33 +8818,6 @@
         "Ad Motivated Tracking",
         "Advertising",
         "Analytics"
-      ]
-    },
-    "rutarget.ru": {
-      "domain": "rutarget.ru",
-      "default": "block",
-      "owner": {
-        "name": "RuTarget LLC",
-        "displayName": "RuTarget",
-        "privacyPolicy": "https://segmento.ru/privacy",
-        "url": "http://segmento.ru"
-      },
-      "source": [
-        "DDG"
-      ],
-      "prevalence": 0.002,
-      "fingerprinting": 0,
-      "cookies": 0.002,
-      "performance": {
-        "time": 1,
-        "size": 1,
-        "cpu": 1,
-        "cache": 3
-      },
-      "categories": [
-        "Ad Motivated Tracking",
-        "Audience Measurement",
-        "Third-Party Analytics Marketing"
       ]
     },
     "s-onetag.com": {
@@ -9001,12 +8859,11 @@
         "DDG"
       ],
       "prevalence": 0.005,
-      "fingerprinting": 0,
-      "cookies": 0.004,
+      "fingerprinting": 1,
+      "cookies": 0.005,
       "performance": {
         "time": 1,
         "size": 1,
-        "cpu": 1,
         "cache": 3
       },
       "categories": [
@@ -9030,7 +8887,7 @@
         "DDG"
       ],
       "prevalence": 0.005,
-      "fingerprinting": 0,
+      "fingerprinting": 1,
       "cookies": 0.005,
       "performance": {
         "time": 1,
@@ -9055,6 +8912,33 @@
         }
       ]
     },
+    "samplicio.us": {
+      "domain": "samplicio.us",
+      "default": "block",
+      "owner": {
+        "name": "Lucid Holdings, LLC",
+        "displayName": "Lucid Holdings, LLC",
+        "url": "",
+        "privacyPolicy": ""
+      },
+      "source": [
+        "DDG"
+      ],
+      "prevalence": 0.005,
+      "fingerprinting": 0,
+      "cookies": 0,
+      "performance": {
+        "time": 1,
+        "size": 1,
+        "cache": 3
+      },
+      "categories": [
+        "Ad Motivated Tracking",
+        "Audience Measurement",
+        "Third-Party Analytics Marketing",
+        "Action Pixels"
+      ]
+    },
     "scarabresearch.com": {
       "domain": "scarabresearch.com",
       "default": "block",
@@ -9069,7 +8953,7 @@
       ],
       "prevalence": 0.004,
       "fingerprinting": 2,
-      "cookies": 0,
+      "cookies": 0.001,
       "performance": {
         "time": 1,
         "size": 1,
@@ -9093,9 +8977,9 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.108,
+      "prevalence": 0.105,
       "fingerprinting": 1,
-      "cookies": 0.107,
+      "cookies": 0.103,
       "performance": {
         "time": 1,
         "size": 1,
@@ -9125,9 +9009,9 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.006,
+      "prevalence": 0.004,
       "fingerprinting": 2,
-      "cookies": 0.006,
+      "cookies": 0.002,
       "performance": {
         "time": 1,
         "size": 1,
@@ -9151,13 +9035,13 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.008,
-      "fingerprinting": 0,
-      "cookies": 0.001,
+      "prevalence": 0.009,
+      "fingerprinting": 1,
+      "cookies": 0.002,
       "performance": {
         "time": 1,
         "size": 1,
-        "cpu": 1,
+        "cpu": 2,
         "cache": 3
       },
       "categories": [
@@ -9180,8 +9064,8 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.008,
-      "fingerprinting": 0,
+      "prevalence": 0.009,
+      "fingerprinting": 1,
       "cookies": 0,
       "performance": {
         "time": 1,
@@ -9208,9 +9092,9 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.009,
+      "prevalence": 0.004,
       "fingerprinting": 0,
-      "cookies": 0.008,
+      "cookies": 0.004,
       "performance": {
         "time": 1,
         "size": 1,
@@ -9233,13 +9117,13 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.003,
+      "prevalence": 0.004,
       "fingerprinting": 0,
-      "cookies": 0.002,
+      "cookies": 0.003,
       "performance": {
         "time": 1,
         "size": 1,
-        "cpu": 3,
+        "cpu": 1,
         "cache": 3
       },
       "categories": [
@@ -9261,7 +9145,7 @@
         "DDG"
       ],
       "prevalence": 0.003,
-      "fingerprinting": 0,
+      "fingerprinting": 1,
       "cookies": 0.003,
       "performance": {
         "time": 1,
@@ -9290,13 +9174,13 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.046,
-      "fingerprinting": 0,
-      "cookies": 0.046,
+      "prevalence": 0.044,
+      "fingerprinting": 1,
+      "cookies": 0.043,
       "performance": {
         "time": 1,
         "size": 1,
-        "cpu": 1,
+        "cpu": 2,
         "cache": 1
       },
       "categories": [
@@ -9319,13 +9203,12 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.014,
-      "fingerprinting": 0,
-      "cookies": 0.006,
+      "prevalence": 0.021,
+      "fingerprinting": 1,
+      "cookies": 0.013,
       "performance": {
         "time": 1,
         "size": 1,
-        "cpu": 1,
         "cache": 3
       },
       "categories": [
@@ -9345,9 +9228,9 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.043,
-      "fingerprinting": 0,
-      "cookies": 0.043,
+      "prevalence": 0.049,
+      "fingerprinting": 1,
+      "cookies": 0.048,
       "performance": {
         "time": 1,
         "size": 1,
@@ -9372,7 +9255,7 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.009,
+      "prevalence": 0.012,
       "fingerprinting": 1,
       "cookies": 0.002,
       "performance": {
@@ -9397,9 +9280,9 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.009,
+      "prevalence": 0.011,
       "fingerprinting": 0,
-      "cookies": 0.009,
+      "cookies": 0.011,
       "performance": {
         "time": 1,
         "size": 1,
@@ -9421,9 +9304,9 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.065,
-      "fingerprinting": 0,
-      "cookies": 0.064,
+      "prevalence": 0.062,
+      "fingerprinting": 1,
+      "cookies": 0.061,
       "performance": {
         "time": 1,
         "size": 1,
@@ -9450,7 +9333,7 @@
         "DDG"
       ],
       "prevalence": 0.004,
-      "fingerprinting": 0,
+      "fingerprinting": 1,
       "cookies": 0,
       "performance": {
         "time": 1,
@@ -9475,9 +9358,9 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.11,
-      "fingerprinting": 0,
-      "cookies": 0.109,
+      "prevalence": 0.042,
+      "fingerprinting": 1,
+      "cookies": 0.041,
       "performance": {
         "time": 1,
         "size": 1,
@@ -9501,9 +9384,9 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.012,
-      "fingerprinting": 0,
-      "cookies": 0.012,
+      "prevalence": 0.014,
+      "fingerprinting": 1,
+      "cookies": 0.014,
       "performance": {
         "time": 1,
         "size": 1,
@@ -9528,13 +9411,12 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.003,
-      "fingerprinting": 0,
-      "cookies": 0.003,
+      "prevalence": 0.024,
+      "fingerprinting": 1,
+      "cookies": 0.023,
       "performance": {
         "time": 1,
         "size": 1,
-        "cpu": 1,
         "cache": 3
       },
       "categories": [
@@ -9555,7 +9437,7 @@
         "DDG"
       ],
       "prevalence": 0.004,
-      "fingerprinting": 0,
+      "fingerprinting": 1,
       "cookies": 0.004,
       "performance": {
         "time": 1,
@@ -9580,9 +9462,9 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.02,
-      "fingerprinting": 0,
-      "cookies": 0.019,
+      "prevalence": 0.018,
+      "fingerprinting": 1,
+      "cookies": 0.018,
       "performance": {
         "time": 1,
         "size": 1,
@@ -9605,9 +9487,9 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.121,
-      "fingerprinting": 0,
-      "cookies": 0.118,
+      "prevalence": 0.041,
+      "fingerprinting": 1,
+      "cookies": 0.04,
       "performance": {
         "time": 1,
         "size": 1,
@@ -9631,13 +9513,12 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.003,
-      "fingerprinting": 1,
-      "cookies": 0.002,
+      "prevalence": 0.002,
+      "fingerprinting": 2,
+      "cookies": 0.001,
       "performance": {
         "time": 1,
         "size": 1,
-        "cpu": 2,
         "cache": 3
       },
       "categories": [
@@ -9657,9 +9538,9 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.03,
-      "fingerprinting": 0,
-      "cookies": 0.03,
+      "prevalence": 0.033,
+      "fingerprinting": 1,
+      "cookies": 0.032,
       "performance": {
         "time": 1,
         "size": 1,
@@ -9686,9 +9567,9 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.013,
+      "prevalence": 0.011,
       "fingerprinting": 2,
-      "cookies": 0.012,
+      "cookies": 0.011,
       "performance": {
         "time": 1,
         "size": 1,
@@ -9711,9 +9592,9 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.004,
-      "fingerprinting": 0,
-      "cookies": 0.004,
+      "prevalence": 0.003,
+      "fingerprinting": 1,
+      "cookies": 0.003,
       "performance": {
         "time": 1,
         "size": 1,
@@ -9739,13 +9620,12 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.054,
-      "fingerprinting": 0,
-      "cookies": 0.054,
+      "prevalence": 0.018,
+      "fingerprinting": 1,
+      "cookies": 0.018,
       "performance": {
         "time": 1,
         "size": 1,
-        "cpu": 2,
         "cache": 3
       },
       "categories": [
@@ -9767,7 +9647,7 @@
         "DDG"
       ],
       "prevalence": 0.005,
-      "fingerprinting": 0,
+      "fingerprinting": 1,
       "cookies": 0.005,
       "performance": {
         "time": 1,
@@ -9793,9 +9673,9 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.008,
+      "prevalence": 0.007,
       "fingerprinting": 2,
-      "cookies": 0.008,
+      "cookies": 0.007,
       "performance": {
         "time": 1,
         "size": 2,
@@ -9822,7 +9702,7 @@
         "DDG"
       ],
       "prevalence": 0.003,
-      "fingerprinting": 0,
+      "fingerprinting": 1,
       "cookies": 0.003,
       "performance": {
         "time": 1,
@@ -9848,9 +9728,9 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.01,
+      "prevalence": 0.011,
       "fingerprinting": 0,
-      "cookies": 0.009,
+      "cookies": 0.01,
       "performance": {
         "time": 1,
         "size": 1,
@@ -9875,13 +9755,13 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.057,
+      "prevalence": 0.059,
       "fingerprinting": 1,
-      "cookies": 0.042,
+      "cookies": 0.045,
       "performance": {
         "time": 1,
         "size": 1,
-        "cpu": 2,
+        "cpu": 1,
         "cache": 1
       },
       "categories": [
@@ -9909,7 +9789,7 @@
       "performance": {
         "time": 1,
         "size": 1,
-        "cpu": 1,
+        "cpu": 2,
         "cache": 3
       },
       "categories": [
@@ -9932,9 +9812,9 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.09,
-      "fingerprinting": 0,
-      "cookies": 0.09,
+      "prevalence": 0.092,
+      "fingerprinting": 1,
+      "cookies": 0.092,
       "performance": {
         "time": 1,
         "size": 1,
@@ -9959,9 +9839,9 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.021,
+      "prevalence": 0.042,
       "fingerprinting": 1,
-      "cookies": 0.019,
+      "cookies": 0.039,
       "performance": {
         "time": 1,
         "size": 1,
@@ -9989,7 +9869,7 @@
         "DDG"
       ],
       "prevalence": 0.005,
-      "fingerprinting": 0,
+      "fingerprinting": 1,
       "cookies": 0.003,
       "performance": {
         "time": 1,
@@ -10019,13 +9899,12 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.031,
-      "fingerprinting": 0,
+      "prevalence": 0.03,
+      "fingerprinting": 1,
       "cookies": 0.03,
       "performance": {
         "time": 1,
         "size": 1,
-        "cpu": 2,
         "cache": 3
       },
       "categories": [
@@ -10048,7 +9927,7 @@
       ],
       "prevalence": 0.007,
       "fingerprinting": 2,
-      "cookies": 0.007,
+      "cookies": 0.006,
       "performance": {
         "time": 1,
         "size": 1,
@@ -10072,9 +9951,9 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.019,
-      "fingerprinting": 0,
-      "cookies": 0.016,
+      "prevalence": 0.005,
+      "fingerprinting": 1,
+      "cookies": 0.002,
       "performance": {
         "time": 1,
         "size": 1,
@@ -10085,6 +9964,33 @@
         "Ad Motivated Tracking",
         "Advertising",
         "Third-Party Analytics Marketing"
+      ]
+    },
+    "threadloom.com": {
+      "domain": "threadloom.com",
+      "default": "block",
+      "owner": {
+        "name": "Threadloom, Inc.",
+        "displayName": "Threadloom, Inc.",
+        "url": "",
+        "privacyPolicy": ""
+      },
+      "source": [
+        "DDG"
+      ],
+      "prevalence": 0.002,
+      "fingerprinting": 1,
+      "cookies": 0,
+      "performance": {
+        "time": 1,
+        "size": 1,
+        "cache": 3
+      },
+      "categories": [
+        "Advertising",
+        "Analytics",
+        "Third-Party Analytics Marketing",
+        "Embedded Content"
       ]
     },
     "thrtle.com": {
@@ -10099,9 +10005,9 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.015,
+      "prevalence": 0.017,
       "fingerprinting": 0,
-      "cookies": 0.014,
+      "cookies": 0.017,
       "performance": {
         "time": 1,
         "size": 1,
@@ -10126,9 +10032,9 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.011,
-      "fingerprinting": 0,
-      "cookies": 0.011,
+      "prevalence": 0.015,
+      "fingerprinting": 1,
+      "cookies": 0.015,
       "performance": {
         "time": 1,
         "size": 1,
@@ -10157,7 +10063,6 @@
       "performance": {
         "time": 1,
         "size": 1,
-        "cpu": 2,
         "cache": 3
       },
       "categories": [
@@ -10182,13 +10087,13 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.023,
+      "prevalence": 0.024,
       "fingerprinting": 3,
-      "cookies": 0.006,
+      "cookies": 0.007,
       "performance": {
         "time": 1,
         "size": 1,
-        "cpu": 2,
+        "cpu": 1,
         "cache": 1
       },
       "categories": [
@@ -10221,13 +10126,12 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.003,
-      "fingerprinting": 0,
+      "prevalence": 0.002,
+      "fingerprinting": 1,
       "cookies": 0.001,
       "performance": {
         "time": 1,
         "size": 1,
-        "cpu": 1,
         "cache": 1
       },
       "categories": [
@@ -10261,6 +10165,33 @@
         "Action Pixels"
       ]
     },
+    "treasuredata.com": {
+      "domain": "treasuredata.com",
+      "default": "block",
+      "owner": {
+        "name": "Treasure Data, Inc",
+        "displayName": "Treasure Data, Inc",
+        "url": "",
+        "privacyPolicy": ""
+      },
+      "source": [
+        "DDG"
+      ],
+      "prevalence": 0.003,
+      "fingerprinting": 2,
+      "cookies": 0.002,
+      "performance": {
+        "time": 1,
+        "size": 1,
+        "cpu": 1,
+        "cache": 1
+      },
+      "categories": [
+        "Ad Motivated Tracking",
+        "Analytics",
+        "Audience Measurement"
+      ]
+    },
     "tremorhub.com": {
       "domain": "tremorhub.com",
       "default": "block",
@@ -10274,8 +10205,8 @@
         "DDG"
       ],
       "prevalence": 0.017,
-      "fingerprinting": 0,
-      "cookies": 0.004,
+      "fingerprinting": 1,
+      "cookies": 0.003,
       "performance": {
         "time": 1,
         "size": 1,
@@ -10298,14 +10229,14 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.02,
+      "prevalence": 0.024,
       "fingerprinting": 3,
-      "cookies": 0.02,
+      "cookies": 0.024,
       "performance": {
         "time": 1,
         "size": 1,
         "cpu": 1,
-        "cache": 3
+        "cache": 1
       },
       "categories": [
         "Ad Motivated Tracking",
@@ -10325,13 +10256,12 @@
         "DDG"
       ],
       "prevalence": 0.002,
-      "fingerprinting": 0,
+      "fingerprinting": 1,
       "cookies": 0.002,
       "performance": {
         "time": 1,
         "size": 1,
-        "cpu": 1,
-        "cache": 1
+        "cache": 3
       },
       "categories": [
         "Third-Party Analytics Marketing"
@@ -10349,8 +10279,8 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.003,
-      "fingerprinting": 0,
+      "prevalence": 0.002,
+      "fingerprinting": 1,
       "cookies": 0,
       "performance": {
         "time": 1,
@@ -10375,9 +10305,9 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.008,
+      "prevalence": 0.005,
       "fingerprinting": 0,
-      "cookies": 0.008,
+      "cookies": 0.005,
       "performance": {
         "time": 1,
         "size": 1,
@@ -10403,9 +10333,9 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.019,
-      "fingerprinting": 0,
-      "cookies": 0.002,
+      "prevalence": 0.011,
+      "fingerprinting": 1,
+      "cookies": 0.003,
       "performance": {
         "time": 1,
         "size": 1,
@@ -10428,8 +10358,8 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.019,
-      "fingerprinting": 0,
+      "prevalence": 0.01,
+      "fingerprinting": 1,
       "cookies": 0,
       "performance": {
         "time": 1,
@@ -10454,7 +10384,7 @@
         "DDG"
       ],
       "prevalence": 0.004,
-      "fingerprinting": 0,
+      "fingerprinting": 1,
       "cookies": 0,
       "performance": {
         "time": 1,
@@ -10478,7 +10408,7 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.008,
+      "prevalence": 0.009,
       "fingerprinting": 1,
       "cookies": 0,
       "performance": {
@@ -10505,8 +10435,8 @@
         "DDG"
       ],
       "prevalence": 0.004,
-      "fingerprinting": 0,
-      "cookies": 0.003,
+      "fingerprinting": 1,
+      "cookies": 0.004,
       "performance": {
         "time": 1,
         "size": 1,
@@ -10529,9 +10459,9 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.006,
+      "prevalence": 0.007,
       "fingerprinting": 1,
-      "cookies": 0.006,
+      "cookies": 0.007,
       "performance": {
         "time": 1,
         "size": 2,
@@ -10556,9 +10486,9 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.1,
-      "fingerprinting": 0,
-      "cookies": 0.091,
+      "prevalence": 0.078,
+      "fingerprinting": 1,
+      "cookies": 0.068,
       "performance": {
         "time": 1,
         "size": 1,
@@ -10568,6 +10498,32 @@
       "categories": [
         "Ad Motivated Tracking",
         "Advertising"
+      ]
+    },
+    "tvpixel.com": {
+      "domain": "tvpixel.com",
+      "default": "block",
+      "owner": {
+        "name": "Data Plus Math",
+        "displayName": "Data Plus Math",
+        "privacyPolicy": "https://www.dataplusmath.com/privacy-policy",
+        "url": "http://dataplusmath.com"
+      },
+      "source": [
+        "DDG"
+      ],
+      "prevalence": 0.019,
+      "fingerprinting": 1,
+      "cookies": 0.019,
+      "performance": {
+        "time": 1,
+        "size": 1,
+        "cache": 3
+      },
+      "categories": [
+        "Ad Motivated Tracking",
+        "Advertising",
+        "Analytics"
       ]
     },
     "tvsquared.com": {
@@ -10598,90 +10554,61 @@
         "Audience Measurement"
       ]
     },
-    "twiago.com": {
-      "domain": "twiago.com",
-      "default": "block",
-      "owner": {
-        "name": "twiago GmbH",
-        "displayName": "twiago",
-        "privacyPolicy": "https://www.twiago.com/datenschutz/",
-        "url": "http://twiago.com"
-      },
-      "source": [
-        "DDG"
-      ],
-      "prevalence": 0.003,
-      "fingerprinting": 0,
-      "cookies": 0.003,
-      "performance": {
-        "time": 1,
-        "size": 1,
-        "cpu": 1,
-        "cache": 3
-      },
-      "categories": [
-        "Ad Motivated Tracking",
-        "Advertising"
-      ]
-    },
     "twitter.com": {
       "rules": [
         {
           "rule": "twitter\\.com\\/settings"
         },
         {
-          "rule": "twitter\\.com\\/js\\/button\\.d941c9a422e2e3faf474b82a1f39e936\\.js"
+          "rule": "twitter\\.com\\/i\\/adsct"
+        },
+        {
+          "rule": "twitter\\.com\\/js\\/button\\.a657e8de41cd5e7b38cde1f36c9ab9c2\\.js"
         },
         {
           "rule": "twitter\\.com\\/i\\/jot"
         },
         {
-          "rule": "twitter\\.com\\/i\\/adsct"
+          "rule": "twitter\\.com\\/js\\/moment~timeline~tweet\\.67dc174b757b0258b54544be2c7b1fe0\\.js"
+        },
+        {
+          "rule": "twitter\\.com\\/js\\/tweet\\.eb0dd69dea3bc571217e6648d8c433ce\\.js"
+        },
+        {
+          "rule": "twitter\\.com\\/css\\/tweet\\.b19b28e5dd6afdadd09507e64bad84c7\\.light\\.ltr\\.css"
         },
         {
           "rule": "twitter\\.com\\/jot\\.html"
         },
         {
-          "rule": "twitter\\.com\\/timeline\\/profile"
+          "rule": "twitter\\.com\\/js\\/timeline\\.f2565d449b4dd797677034caa0d66bf8\\.js"
         },
         {
-          "rule": "twitter\\.com\\/js\\/moment~timeline~tweet\\.ec04a6cb5ba879d0e0db41f211639fdf\\.js"
+          "rule": "twitter\\.com\\/css\\/timeline\\.b19b28e5dd6afdadd09507e64bad84c7\\.light\\.ltr\\.css"
         },
         {
-          "rule": "twitter\\.com\\/js\\/tweet\\.faba1cdc1d0b60d30bd0cf4ea438c3e8\\.js"
-        },
-        {
-          "rule": "twitter\\.com\\/css\\/tweet\\.9bf5093a19cec463852b31b784bf047a\\.light\\.ltr\\.css"
-        },
-        {
-          "rule": "twitter\\.com\\/js\\/timeline\\.0a7b4db67eacd23e35c5ce02e6ea3470\\.js"
-        },
-        {
-          "rule": "twitter\\.com\\/css\\/timeline\\.9bf5093a19cec463852b31b784bf047a\\.dark\\.ltr\\.css"
-        },
-        {
-          "rule": "twitter\\.com\\/css\\/timeline\\.9bf5093a19cec463852b31b784bf047a\\.light\\.ltr\\.css"
+          "rule": "twitter\\.com\\/css\\/timeline\\.b19b28e5dd6afdadd09507e64bad84c7\\.dark\\.ltr\\.css"
         },
         {
           "rule": "twitter\\.com\\/oct\\.js"
         },
         {
-          "rule": "twitter\\.com\\/impressions\\.js"
-        },
-        {
           "rule": "twitter\\.com\\/1\\/statuses\\/user_timeline\\.json"
         },
         {
-          "rule": "twitter\\.com\\/1\\/urls\\/count\\.json"
+          "rule": "twitter\\.com\\/css\\/timeline\\.b19b28e5dd6afdadd09507e64bad84c7\\.light\\.rtl\\.css"
+        },
+        {
+          "rule": "twitter\\.com\\/impressions\\.js"
+        },
+        {
+          "rule": "twitter\\.com\\/timeline\\/profile"
         },
         {
           "rule": "twitter\\.com\\/favicon\\.ico"
         },
         {
           "rule": "twitter\\.com\\/login"
-        },
-        {
-          "rule": "twitter\\.com\\/1\\/users\\/show\\.json"
         },
         {
           "rule": "twitter\\.com\\/f\\.gif"
@@ -10701,8 +10628,8 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.128,
-      "fingerprinting": 0,
+      "prevalence": 0.124,
+      "fingerprinting": 1,
       "cookies": 0.065,
       "performance": {
         "time": 1,
@@ -10733,9 +10660,9 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.025,
-      "fingerprinting": 0,
-      "cookies": 0.025,
+      "prevalence": 0.019,
+      "fingerprinting": 1,
+      "cookies": 0.019,
       "performance": {
         "time": 1,
         "size": 1,
@@ -10768,7 +10695,7 @@
       "performance": {
         "time": 1,
         "size": 1,
-        "cpu": 1,
+        "cpu": 2,
         "cache": 1
       },
       "categories": [
@@ -10789,13 +10716,12 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.004,
+      "prevalence": 0.005,
       "fingerprinting": 1,
-      "cookies": 0.004,
+      "cookies": 0.005,
       "performance": {
         "time": 1,
         "size": 1,
-        "cpu": 1,
         "cache": 3
       },
       "categories": [
@@ -10816,12 +10742,11 @@
         "DDG"
       ],
       "prevalence": 0.002,
-      "fingerprinting": 0,
-      "cookies": 0,
+      "fingerprinting": 1,
+      "cookies": 0.001,
       "performance": {
         "time": 1,
         "size": 1,
-        "cpu": 1,
         "cache": 1
       },
       "categories": [
@@ -10844,8 +10769,8 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.006,
-      "fingerprinting": 0,
+      "prevalence": 0.005,
+      "fingerprinting": 1,
       "cookies": 0,
       "performance": {
         "time": 1,
@@ -10871,9 +10796,9 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.004,
-      "fingerprinting": 0,
-      "cookies": 0.004,
+      "prevalence": 0.005,
+      "fingerprinting": 1,
+      "cookies": 0.005,
       "performance": {
         "time": 1,
         "size": 1,
@@ -10925,9 +10850,9 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.003,
+      "prevalence": 0.002,
       "fingerprinting": 0,
-      "cookies": 0.003,
+      "cookies": 0.002,
       "performance": {
         "time": 1,
         "size": 1,
@@ -10956,8 +10881,7 @@
       "performance": {
         "time": 1,
         "size": 1,
-        "cpu": 2,
-        "cache": 1
+        "cache": 3
       },
       "categories": [
         "Ad Motivated Tracking",
@@ -10978,13 +10902,13 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.005,
-      "fingerprinting": 0,
-      "cookies": 0.005,
+      "prevalence": 0.004,
+      "fingerprinting": 1,
+      "cookies": 0.004,
       "performance": {
         "time": 1,
         "size": 1,
-        "cpu": 3,
+        "cpu": 1,
         "cache": 3
       },
       "categories": [
@@ -11004,12 +10928,11 @@
         "DDG"
       ],
       "prevalence": 0.003,
-      "fingerprinting": 0,
+      "fingerprinting": 1,
       "cookies": 0.002,
       "performance": {
         "time": 1,
         "size": 1,
-        "cpu": 1,
         "cache": 3
       },
       "categories": [
@@ -11030,9 +10953,9 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.015,
+      "prevalence": 0.014,
       "fingerprinting": 1,
-      "cookies": 0.011,
+      "cookies": 0.01,
       "performance": {
         "time": 1,
         "size": 1,
@@ -11102,13 +11025,12 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.05,
-      "fingerprinting": 0,
-      "cookies": 0.05,
+      "prevalence": 0.043,
+      "fingerprinting": 1,
+      "cookies": 0.043,
       "performance": {
         "time": 1,
         "size": 1,
-        "cpu": 1,
         "cache": 3
       },
       "categories": [
@@ -11128,9 +11050,9 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.006,
+      "prevalence": 0.029,
       "fingerprinting": 0,
-      "cookies": 0.006,
+      "cookies": 0.029,
       "performance": {
         "time": 1,
         "size": 1,
@@ -11154,8 +11076,8 @@
         "DDG"
       ],
       "prevalence": 0.002,
-      "fingerprinting": 0,
-      "cookies": 0.002,
+      "fingerprinting": 1,
+      "cookies": 0.001,
       "performance": {
         "time": 1,
         "size": 1,
@@ -11182,9 +11104,9 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.003,
+      "prevalence": 0.002,
       "fingerprinting": 0,
-      "cookies": 0.003,
+      "cookies": 0.002,
       "performance": {
         "time": 1,
         "size": 1,
@@ -11208,9 +11130,9 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.008,
+      "prevalence": 0.006,
       "fingerprinting": 0,
-      "cookies": 0.008,
+      "cookies": 0.006,
       "performance": {
         "time": 1,
         "size": 1,
@@ -11235,13 +11157,12 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.012,
-      "fingerprinting": 0,
-      "cookies": 0.011,
+      "prevalence": 0.01,
+      "fingerprinting": 1,
+      "cookies": 0.009,
       "performance": {
         "time": 1,
         "size": 1,
-        "cpu": 1,
         "cache": 3
       },
       "categories": [
@@ -11263,8 +11184,8 @@
         "DDG"
       ],
       "prevalence": 0.004,
-      "fingerprinting": 0,
-      "cookies": 0.005,
+      "fingerprinting": 1,
+      "cookies": 0.004,
       "performance": {
         "time": 1,
         "size": 1,
@@ -11286,7 +11207,7 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.003,
+      "prevalence": 0.002,
       "fingerprinting": 0,
       "cookies": 0.002,
       "performance": {
@@ -11320,7 +11241,7 @@
       "performance": {
         "time": 1,
         "size": 1,
-        "cpu": 1,
+        "cpu": 2,
         "cache": 3
       },
       "categories": [
@@ -11341,8 +11262,8 @@
         "DDG"
       ],
       "prevalence": 0.007,
-      "fingerprinting": 0,
-      "cookies": 0.001,
+      "fingerprinting": 1,
+      "cookies": 0,
       "performance": {
         "time": 1,
         "size": 1,
@@ -11390,7 +11311,7 @@
         "DDG"
       ],
       "prevalence": 0.006,
-      "fingerprinting": 0,
+      "fingerprinting": 1,
       "cookies": 0.006,
       "performance": {
         "time": 1,
@@ -11415,9 +11336,9 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.022,
-      "fingerprinting": 0,
-      "cookies": 0.02,
+      "prevalence": 0.02,
+      "fingerprinting": 1,
+      "cookies": 0.019,
       "performance": {
         "time": 1,
         "size": 1,
@@ -11441,9 +11362,9 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.003,
+      "prevalence": 0.004,
       "fingerprinting": 1,
-      "cookies": 0.002,
+      "cookies": 0.003,
       "performance": {
         "time": 1,
         "size": 1,
@@ -11467,8 +11388,8 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.155,
-      "fingerprinting": 0,
+      "prevalence": 0.154,
+      "fingerprinting": 1,
       "cookies": 0.148,
       "performance": {
         "time": 1,
@@ -11498,7 +11419,7 @@
       ],
       "prevalence": 0.035,
       "fingerprinting": 2,
-      "cookies": 0.034,
+      "cookies": 0.035,
       "performance": {
         "time": 1,
         "size": 1,
@@ -11560,9 +11481,9 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.014,
-      "fingerprinting": 0,
-      "cookies": 0.011,
+      "prevalence": 0.012,
+      "fingerprinting": 1,
+      "cookies": 0.009,
       "performance": {
         "time": 1,
         "size": 1,
@@ -11587,7 +11508,7 @@
         "DDG"
       ],
       "prevalence": 0.003,
-      "fingerprinting": 0,
+      "fingerprinting": 1,
       "cookies": 0,
       "performance": {
         "time": 1,
@@ -11617,7 +11538,6 @@
       "performance": {
         "time": 1,
         "size": 1,
-        "cpu": 2,
         "cache": 3
       },
       "categories": [
@@ -11636,13 +11556,12 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.015,
+      "prevalence": 0.018,
       "fingerprinting": 3,
-      "cookies": 0.015,
+      "cookies": 0.018,
       "performance": {
         "time": 1,
         "size": 1,
-        "cpu": 3,
         "cache": 3
       },
       "categories": [
@@ -11663,8 +11582,8 @@
         "DDG"
       ],
       "prevalence": 0.005,
-      "fingerprinting": 0,
-      "cookies": 0.004,
+      "fingerprinting": 1,
+      "cookies": 0.005,
       "performance": {
         "time": 1,
         "size": 1,
@@ -11675,6 +11594,32 @@
         "Ad Motivated Tracking",
         "Advertising",
         "Analytics"
+      ]
+    },
+    "yimg.jp": {
+      "domain": "yimg.jp",
+      "default": "block",
+      "owner": {
+        "name": "Yahoo Japan Corporation",
+        "displayName": "Yahoo Japan",
+        "url": "",
+        "privacyPolicy": ""
+      },
+      "source": [
+        "DDG"
+      ],
+      "prevalence": 0.003,
+      "fingerprinting": 1,
+      "cookies": 0,
+      "performance": {
+        "time": 2,
+        "size": 1,
+        "cpu": 1,
+        "cache": 3
+      },
+      "categories": [
+        "Ad Motivated Tracking",
+        "Advertising"
       ]
     },
     "yotpo.com": {
@@ -11689,13 +11634,13 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.004,
+      "prevalence": 0.005,
       "fingerprinting": 2,
-      "cookies": 0.004,
+      "cookies": 0.005,
       "performance": {
         "time": 1,
         "size": 1,
-        "cpu": 1,
+        "cpu": 2,
         "cache": 1
       },
       "categories": [
@@ -11717,7 +11662,7 @@
         "DDG"
       ],
       "prevalence": 0.003,
-      "fingerprinting": 0,
+      "fingerprinting": 1,
       "cookies": 0.002,
       "performance": {
         "time": 1,
@@ -11741,9 +11686,9 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.025,
-      "fingerprinting": 0,
-      "cookies": 0.024,
+      "prevalence": 0.026,
+      "fingerprinting": 1,
+      "cookies": 0.025,
       "performance": {
         "time": 1,
         "size": 1,
@@ -11767,7 +11712,7 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.011,
+      "prevalence": 0.012,
       "fingerprinting": 2,
       "cookies": 0.004,
       "performance": {
@@ -11792,13 +11737,12 @@
       "source": [
         "DDG"
       ],
-      "prevalence": 0.011,
+      "prevalence": 0.015,
       "fingerprinting": 0,
-      "cookies": 0.011,
+      "cookies": 0.015,
       "performance": {
         "time": 1,
         "size": 1,
-        "cpu": 1,
         "cache": 3
       },
       "categories": [
@@ -11830,6 +11774,13 @@
       ],
       "displayName": "4Cite Marketing",
       "prevalence": 0.341
+    },
+    "4INFO, Inc.": {
+      "domains": [
+        "adhaven.com"
+      ],
+      "displayName": "4INFO",
+      "prevalence": 0.03
     },
     "A.Mob SAS": {
       "domains": [
@@ -11947,13 +11898,6 @@
       "displayName": "Adform",
       "prevalence": 8.897
     },
-    "Adkernel, LLC": {
-      "domains": [
-        "adkernel.com"
-      ],
-      "displayName": "Adkernel",
-      "prevalence": 1.007
-    },
     "Admedo": {
       "domains": [
         "admedo.com",
@@ -11969,13 +11913,6 @@
       ],
       "displayName": "Admixer",
       "prevalence": 0.812
-    },
-    "Adnium Inc": {
-      "domains": [
-        "adnium.com"
-      ],
-      "displayName": "Adnium",
-      "prevalence": 0.371
     },
     "Adobe Inc.": {
       "domains": [
@@ -12157,6 +12094,13 @@
       "displayName": "AppNexus",
       "prevalence": 25.977
     },
+    "Attentive Mobile": {
+      "domains": [
+        "attn.tv",
+        "attentivemobile.com"
+      ],
+      "prevalence": 0.161
+    },
     "AudienceProject": {
       "domains": [
         "userreport.com",
@@ -12331,12 +12275,6 @@
       "displayName": "CleverDATA",
       "prevalence": 0.207
     },
-    "ClickCertain": {
-      "domains": [
-        "clickcertain.com"
-      ],
-      "prevalence": 0.22
-    },
     "ClickTale Ltd": {
       "domains": [
         "clicktale.net"
@@ -12366,26 +12304,6 @@
       ],
       "displayName": "Collective Roll",
       "prevalence": 4.324
-    },
-    "Colossus Media, LLC": {
-      "domains": [
-        "colossusssp.com"
-      ],
-      "displayName": "Colossus Media",
-      "prevalence": 0.271
-    },
-    "Connexity, Inc.": {
-      "domains": [
-        "cnnx.io",
-        "connexity.net",
-        "bizrate-images.com",
-        "beso-images.com",
-        "mammothshopper.com",
-        "beso.com",
-        "prixmoinscher.com"
-      ],
-      "displayName": "Connexity",
-      "prevalence": 0.341
     },
     "Contact Impact GmbH": {
       "domains": [
@@ -12440,6 +12358,13 @@
       "displayName": "Crazy Egg",
       "prevalence": 3.251
     },
+    "Crimtan Holdings Ltd": {
+      "domains": [
+        "ctnsnet.com"
+      ],
+      "displayName": "Crimtan Holdings",
+      "prevalence": 0.668
+    },
     "Criteo SA": {
       "domains": [
         "criteo.net",
@@ -12476,6 +12401,18 @@
       "displayName": "Cxense",
       "prevalence": 0.441
     },
+    "CyberAgent, Inc.": {
+      "domains": [
+        "adtdp.com",
+        "amebame.com",
+        "ameba.jp",
+        "ameblo.jp",
+        "ca-mpr.jp",
+        "hayabusa.io"
+      ],
+      "displayName": "CyberAgent",
+      "prevalence": 0.584
+    },
     "DCN": {
       "domains": [
         "trustx.org"
@@ -12500,6 +12437,14 @@
       ],
       "displayName": "Dailymotion",
       "prevalence": 0.482
+    },
+    "Data Plus Math": {
+      "domains": [
+        "dataplusmath.com",
+        "tvpixel.com"
+      ],
+      "displayName": "Data Plus Math",
+      "prevalence": 1.862
     },
     "DataXu": {
       "domains": [
@@ -12568,13 +12513,6 @@
       ],
       "displayName": "Dstillery",
       "prevalence": 1
-    },
-    "DynAdmic": {
-      "domains": [
-        "dyntrk.com"
-      ],
-      "displayName": "DynAdmic",
-      "prevalence": 1.962
     },
     "Dynamic Yield": {
       "domains": [
@@ -12648,13 +12586,6 @@
       ],
       "displayName": "Exponential Interactive",
       "prevalence": 2.844
-    },
-    "EyeView, Inc.": {
-      "domains": [
-        "eyeviewads.com"
-      ],
-      "displayName": "EyeView",
-      "prevalence": 1.257
     },
     "Ezoic Inc.": {
       "domains": [
@@ -13307,13 +13238,6 @@
       ],
       "displayName": "Hybrid Adtech"
     },
-    "IAB Europe": {
-      "domains": [
-        "consensu.org"
-      ],
-      "displayName": "IAB Europe",
-      "prevalence": 4.192
-    },
     "ID5 Technology Ltd": {
       "domains": [
         "id5-sync.com"
@@ -13446,15 +13370,6 @@
       ],
       "displayName": "Ividence",
       "prevalence": 0.257
-    },
-    "J.D. Power": {
-      "domains": [
-        "korrelate.net",
-        "jdpower.com",
-        "nadaguides.com",
-        "nada.com"
-      ],
-      "prevalence": 0.098
     },
     "JSC ADFACT": {
       "domains": [
@@ -13619,14 +13534,6 @@
       "displayName": "LockerDome",
       "prevalence": 0.35
     },
-    "LoopMe Ltd": {
-      "domains": [
-        "loopme.com",
-        "loopme.me"
-      ],
-      "displayName": "LoopMe",
-      "prevalence": 0.55
-    },
     "Lotame Solutions, Inc.": {
       "domains": [
         "crwdcntrl.net",
@@ -13634,6 +13541,14 @@
       ],
       "displayName": "Lotame Solutions",
       "prevalence": 9.006
+    },
+    "Lucid Holdings, LLC": {
+      "domains": [
+        "samplicio.us",
+        "luc.id",
+        "federatedsample.com"
+      ],
+      "prevalence": 0.048
     },
     "MGID Inc": {
       "domains": [
@@ -13734,6 +13649,14 @@
       "displayName": "Merkle",
       "prevalence": 1.096
     },
+    "MicroAd, Inc.": {
+      "domains": [
+        "microad.jp",
+        "microad.net"
+      ],
+      "displayName": "MicroAd",
+      "prevalence": 0.118
+    },
     "MindGeek": {
       "domains": [
         "seancodycontent.com",
@@ -13813,14 +13736,6 @@
       ],
       "displayName": "Movable Ink",
       "prevalence": 0.448
-    },
-    "My6sense Inc.": {
-      "domains": [
-        "my6sense.com",
-        "mynativeplatform.com"
-      ],
-      "displayName": "My6sense",
-      "prevalence": 0.709
     },
     "Nativo, Inc": {
       "domains": [
@@ -13992,21 +13907,6 @@
       "displayName": "OwnerIQ",
       "prevalence": 4.578
     },
-    "PLAYGROUND XYZ": {
-      "domains": [
-        "playground.xyz"
-      ],
-      "displayName": "PLAYGROUND XYZ",
-      "prevalence": 1.625
-    },
-    "PageFair Limited": {
-      "domains": [
-        "pagefair.com",
-        "pagefair.net"
-      ],
-      "displayName": "PageFair",
-      "prevalence": 0.402
-    },
     "Parsely, Inc.": {
       "domains": [
         "parsely.com",
@@ -14107,6 +14007,13 @@
       ],
       "displayName": "Perfect Market",
       "prevalence": 0.284
+    },
+    "PerimeterX, Inc.": {
+      "domains": [
+        "perimeterx.net",
+        "pxi.pub"
+      ],
+      "prevalence": 0.189
     },
     "Permutive, Inc.": {
       "domains": [
@@ -14264,6 +14171,12 @@
       "displayName": "Rambler Internet Holding",
       "prevalence": 0.323
     },
+    "RealVu Inc": {
+      "domains": [
+        "realvu.net"
+      ],
+      "prevalence": 0.045
+    },
     "Reddit Inc.": {
       "domains": [
         "reddit.com",
@@ -14340,18 +14253,17 @@
       "displayName": "Roxr Software",
       "prevalence": 0.755
     },
-    "RuTarget LLC": {
-      "domains": [
-        "rutarget.ru"
-      ],
-      "displayName": "RuTarget",
-      "prevalence": 0.298
-    },
     "SCTR Services LLC": {
       "domains": [
         "itsup.com"
       ],
       "prevalence": 0.034
+    },
+    "SSP Network Ltd": {
+      "domains": [
+        "betweendigital.com"
+      ],
+      "prevalence": 0.232
     },
     "Sailthru, Inc": {
       "domains": [
@@ -14538,13 +14450,6 @@
       "displayName": "Sojern",
       "prevalence": 0.521
     },
-    "Somo Audience Corp": {
-      "domains": [
-        "mobileadtrading.com"
-      ],
-      "displayName": "Somo Audience",
-      "prevalence": 1.093
-    },
     "Sonobi, Inc": {
       "domains": [
         "sonobi.com"
@@ -14714,6 +14619,14 @@
       "displayName": "Telaria",
       "prevalence": 2.066
     },
+    "Teroa S.A.": {
+      "domains": [
+        "e-planning.net",
+        "e-planning.video"
+      ],
+      "displayName": "Teroa",
+      "prevalence": 0.089
+    },
     "The Nielsen Company": {
       "domains": [
         "imrworldwide.com",
@@ -14757,6 +14670,12 @@
       "displayName": "The Trade Desk",
       "prevalence": 19.938
     },
+    "Threadloom, Inc.": {
+      "domains": [
+        "threadloom.com"
+      ],
+      "prevalence": 0.23
+    },
     "Throtle": {
       "domains": [
         "thrtle.com"
@@ -14778,6 +14697,12 @@
       ],
       "displayName": "Traffic Stars",
       "prevalence": 0.586
+    },
+    "Treasure Data, Inc": {
+      "domains": [
+        "treasuredata.com"
+      ],
+      "prevalence": 0.193
     },
     "Tremor Video DSP": {
       "domains": [
@@ -15139,7 +15064,8 @@
         "yimg.jp",
         "storage-yahoo.jp",
         "yahooapis.jp",
-        "geocities.jp"
+        "geocities.jp",
+        "yjtag.jp"
       ],
       "displayName": "Yahoo Japan",
       "prevalence": 0.286
@@ -15182,14 +15108,6 @@
       ],
       "displayName": "Yieldlove",
       "prevalence": 0.443
-    },
-    "Yieldr": {
-      "domains": [
-        "yieldr.com",
-        "254a.com"
-      ],
-      "displayName": "Yieldr",
-      "prevalence": 1.541
     },
     "Yotpo Ltd": {
       "domains": [
@@ -15283,13 +15201,6 @@
       "displayName": "trueAnthem",
       "prevalence": 0.189
     },
-    "twiago GmbH": {
-      "domains": [
-        "twiago.com"
-      ],
-      "displayName": "twiago",
-      "prevalence": 0.277
-    },
     "whos.amung.us Inc": {
       "domains": [
         "amung.us",
@@ -15311,6 +15222,7 @@
     "33across.com": "33Across, Inc.",
     "tynt.com": "33Across, Inc.",
     "securedvisit.com": "4Cite Marketing",
+    "adhaven.com": "4INFO, Inc.",
     "adotmob.com": "A.Mob SAS",
     "alcmpn.com": "ALC",
     "idify.com": "ALC",
@@ -15338,12 +15250,10 @@
     "ipredictive.com": "Adelphic, Inc.",
     "adform.net": "Adform A/S",
     "adformdsp.net": "Adform A/S",
-    "adkernel.com": "Adkernel, LLC",
     "admedo.com": "Admedo",
     "adizio.com": "Admedo",
     "a8723.com": "Admedo",
     "admixer.net": "Admixer Technologies",
-    "adnium.com": "Adnium Inc",
     "everesttech.net": "Adobe Inc.",
     "everestjs.net": "Adobe Inc.",
     "everestads.net": "Adobe Inc.",
@@ -15464,6 +15374,8 @@
     "yieldoptimizer.com": "AppNexus, Inc.",
     "ml-attr.com": "AppNexus, Inc.",
     "realmedia.com": "AppNexus, Inc.",
+    "attn.tv": "Attentive Mobile",
+    "attentivemobile.com": "Attentive Mobile",
     "userreport.com": "AudienceProject",
     "audienceproject.com": "AudienceProject",
     "avocet.io": "Avocet Systems Ltd.",
@@ -15519,21 +15431,12 @@
     "highwebmedia.com": "Chaturbate, LLC",
     "oncam.xxx": "Chaturbate, LLC",
     "1dmp.io": "CleverDATA LLC",
-    "clickcertain.com": "ClickCertain",
     "clicktale.net": "ClickTale Ltd",
     "clickagy.com": "Clickagy",
     "cogocast.net": "Cogo Labs",
     "cogocast.com": "Cogo Labs",
     "apxlv.com": "Cogo Labs",
     "stackadapt.com": "Collective Roll",
-    "colossusssp.com": "Colossus Media, LLC",
-    "cnnx.io": "Connexity, Inc.",
-    "connexity.net": "Connexity, Inc.",
-    "bizrate-images.com": "Connexity, Inc.",
-    "beso-images.com": "Connexity, Inc.",
-    "mammothshopper.com": "Connexity, Inc.",
-    "beso.com": "Connexity, Inc.",
-    "prixmoinscher.com": "Connexity, Inc.",
     "df-srv.de": "Contact Impact GmbH",
     "contentsquare.com": "ContentSquare",
     "contentsquare.net": "ContentSquare",
@@ -15557,6 +15460,7 @@
     "digitru.st": "Cookie Trust Working Group, Inc. DBA Cookie Trust",
     "crazyegg.com": "Crazy Egg, Inc.",
     "hellobar.com": "Crazy Egg, Inc.",
+    "ctnsnet.com": "Crimtan Holdings Ltd",
     "criteo.net": "Criteo SA",
     "criteo.com": "Criteo SA",
     "hlserve.com": "Criteo SA",
@@ -15569,6 +15473,12 @@
     "cxense.com": "Cxense ASA",
     "emediate.dk": "Cxense ASA",
     "emediate.eu": "Cxense ASA",
+    "adtdp.com": "CyberAgent, Inc.",
+    "amebame.com": "CyberAgent, Inc.",
+    "ameba.jp": "CyberAgent, Inc.",
+    "ameblo.jp": "CyberAgent, Inc.",
+    "ca-mpr.jp": "CyberAgent, Inc.",
+    "hayabusa.io": "CyberAgent, Inc.",
     "trustx.org": "DCN",
     "dtscout.com": "DTS Technology",
     "dmcdn.net": "Dailymotion SA",
@@ -15576,6 +15486,8 @@
     "dm-event.net": "Dailymotion SA",
     "dmxleo.com": "Dailymotion SA",
     "pxlad.io": "Dailymotion SA",
+    "dataplusmath.com": "Data Plus Math",
+    "tvpixel.com": "Data Plus Math",
     "w55c.net": "DataXu",
     "pro-market.net": "Datonics LLC",
     "demandbase.com": "Demandbase, Inc.",
@@ -15591,7 +15503,6 @@
     "driftt.com": "Drift.com, Inc.",
     "dstillery.com": "Dstillery Inc.",
     "media6degrees.com": "Dstillery Inc.",
-    "dyntrk.com": "DynAdmic",
     "dynamicyield.com": "Dynamic Yield",
     "emarsys.com": "Emarsys eMarketing Systems AG",
     "scarabresearch.com": "Emarsys eMarketing Systems AG",
@@ -15617,7 +15528,6 @@
     "wpncdn.com": "ExoClick, S.L.",
     "exponential.com": "Exponential Interactive Inc.",
     "tribalfusion.com": "Exponential Interactive Inc.",
-    "eyeviewads.com": "EyeView, Inc.",
     "ezoic.net": "Ezoic Inc.",
     "usconstitution.net": "Ezoic Inc.",
     "facebook.net": "Facebook, Inc.",
@@ -16168,7 +16078,6 @@
     "minitab.com": "HubSpot, Inc.",
     "li.me": "HubSpot, Inc.",
     "hybrid.ai": "Hybrid Adtech, Inc.",
-    "consensu.org": "IAB Europe",
     "id5-sync.com": "ID5 Technology Ltd",
     "ioam.de": "INFOnline GmbH",
     "iocnt.net": "INFOnline GmbH",
@@ -16206,10 +16115,6 @@
     "bbelements.com": "Internet Billboard a.s.",
     "ero-advertising.com": "Interwebvertising B.V.",
     "ivitrack.com": "Ividence",
-    "korrelate.net": "J.D. Power",
-    "jdpower.com": "J.D. Power",
-    "nadaguides.com": "J.D. Power",
-    "nada.com": "J.D. Power",
     "tns-counter.ru": "JSC ADFACT",
     "juicyads.com": "JuicyAds",
     "justpremium.com": "JustPremium",
@@ -16259,10 +16164,11 @@
     "abtasty.com": "Liwio",
     "lockerdome.com": "LockerDome, LLC",
     "lockerdomecdn.com": "LockerDome, LLC",
-    "loopme.com": "LoopMe Ltd",
-    "loopme.me": "LoopMe Ltd",
     "crwdcntrl.net": "Lotame Solutions, Inc.",
     "lotame.com": "Lotame Solutions, Inc.",
+    "samplicio.us": "Lucid Holdings, LLC",
+    "luc.id": "Lucid Holdings, LLC",
+    "federatedsample.com": "Lucid Holdings, LLC",
     "mgid.com": "MGID Inc",
     "domdex.com": "Magnetic Media Online, Inc.",
     "marinsm.com": "Marin Software Inc.",
@@ -16290,6 +16196,8 @@
     "research.de.com": "Meetrics GmbH",
     "rkdms.com": "Merkle Inc",
     "merklesearch.com": "Merkle Inc",
+    "microad.jp": "MicroAd, Inc.",
+    "microad.net": "MicroAd, Inc.",
     "seancodycontent.com": "MindGeek",
     "seancody.com": "MindGeek",
     "dplaygroundcontent.com": "MindGeek",
@@ -16340,8 +16248,6 @@
     "mouseflow.com": "Mouseflow",
     "movableink.com": "Movable Ink",
     "micpn.com": "Movable Ink",
-    "my6sense.com": "My6sense Inc.",
-    "mynativeplatform.com": "My6sense Inc.",
     "postrelease.com": "Nativo, Inc",
     "ntv.io": "Nativo, Inc",
     "nativo.net": "Nativo, Inc",
@@ -16428,9 +16334,6 @@
     "zemanta.com": "Outbrain",
     "owneriq.net": "OwnerIQ Inc",
     "manualsonline.com": "OwnerIQ Inc",
-    "playground.xyz": "PLAYGROUND XYZ",
-    "pagefair.com": "PageFair Limited",
-    "pagefair.net": "PageFair Limited",
     "parsely.com": "Parsely, Inc.",
     "parse.ly": "Parsely, Inc.",
     "ywxi.net": "PathDefender",
@@ -16508,6 +16411,8 @@
     "paypal-knowledge.com": "PayPal, Inc.",
     "paypal-knowledge-test.com": "PayPal, Inc.",
     "perfectmarket.com": "Perfect Market, Inc.",
+    "perimeterx.net": "PerimeterX, Inc.",
+    "pxi.pub": "PerimeterX, Inc.",
     "permutive.com": "Permutive, Inc.",
     "npttech.com": "Piano Software",
     "piano.io": "Piano Software",
@@ -16562,6 +16467,7 @@
     "rambler.su": "Rambler Internet Holding, LLC",
     "dsp-rambler.ru": "Rambler Internet Holding, LLC",
     "rambler-co.ru": "Rambler Internet Holding, LLC",
+    "realvu.net": "RealVu Inc",
     "reddit.com": "Reddit Inc.",
     "redditstatic.com": "Reddit Inc.",
     "redditmedia.com": "Reddit Inc.",
@@ -16590,8 +16496,8 @@
     "rfihub.net": "Rocket Fuel Inc.",
     "ru4.com": "Rocket Fuel Inc.",
     "getclicky.com": "Roxr Software Ltd",
-    "rutarget.ru": "RuTarget LLC",
     "itsup.com": "SCTR Services LLC",
+    "betweendigital.com": "SSP Network Ltd",
     "sail-horizon.com": "Sailthru, Inc",
     "sail-personalize.com": "Sailthru, Inc",
     "sailthru.com": "Sailthru, Inc",
@@ -16655,7 +16561,7 @@
     "sharethrough.com": "Sharethrough, Inc.",
     "shareth.ru": "Sharethrough, Inc.",
     "btstatic.com": "Signal Digital, Inc.",
-    "yjtag.jp": "Signal Digital, Inc.",
+    "yjtag.jp": "Yahoo Japan Corporation",
     "thebrighttag.com": "Signal Digital, Inc.",
     "flashtalking.com": "Simplicity Marketing",
     "simpli.fi": "Simplifi Holdings Inc.",
@@ -16675,7 +16581,6 @@
     "snapsort.com": "Snapsort Inc.",
     "carsort.com": "Snapsort Inc.",
     "sojern.com": "Sojern, Inc.",
-    "mobileadtrading.com": "Somo Audience Corp",
     "sonobi.com": "Sonobi, Inc",
     "sovrnlabs.net": "Sovrn Holdings",
     "sovrn.com": "Sovrn Holdings",
@@ -16726,6 +16631,8 @@
     "tealium.com": "Tealium Inc.",
     "tealiumiq.com": "Tealium Inc.",
     "tremorhub.com": "Telaria",
+    "e-planning.net": "Teroa S.A.",
+    "e-planning.video": "Teroa S.A.",
     "imrworldwide.com": "The Nielsen Company",
     "nielsen.com": "The Nielsen Company",
     "exelator.com": "The Nielsen Company",
@@ -16745,10 +16652,12 @@
     "rubiconproject.com": "The Rubicon Project, Inc.",
     "chango.com": "The Rubicon Project, Inc.",
     "adsrvr.org": "The Trade Desk Inc",
+    "threadloom.com": "Threadloom, Inc.",
     "thrtle.com": "Throtle",
     "popads.net": "Tomksoft S.A.",
     "trafficstars.com": "Traffic Stars",
     "tsyndicate.com": "Traffic Stars",
+    "treasuredata.com": "Treasure Data, Inc",
     "videohub.tv": "Tremor Video DSP",
     "scanscout.com": "Tremor Video DSP",
     "tremormedia.com": "Tremor Video DSP",
@@ -16998,8 +16907,6 @@
     "yieldmo.com": "YieldMo, Inc.",
     "yieldlove.com": "Yieldlove GmbH",
     "yieldlove-ad-serving.net": "Yieldlove GmbH",
-    "yieldr.com": "Yieldr",
-    "254a.com": "Yieldr",
     "yotpo.com": "Yotpo Ltd",
     "zopim.com": "Zendesk, Inc.",
     "zendesk.com": "Zendesk, Inc.",
@@ -17026,7 +16933,6 @@
     "ispot.tv": "iSpot.tv",
     "nuggad.net": "nugg.ad GmbH",
     "tru.am": "trueAnthem Corp",
-    "twiago.com": "twiago GmbH",
     "amung.us": "whos.amung.us Inc",
     "waust.at": "whos.amung.us Inc",
     "histats.com": "wisecode s.r.l."

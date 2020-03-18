@@ -184,12 +184,21 @@
     <!-- Broken Site Activity -->
     <string name="brokenSiteReportBrokenSiteMenuItem">Notificar sitio web no operativo</string>
     <string name="brokenSiteHeading">Notificar un sitio web no operativo</string>
-    <string name="brokenSiteModalDescription">La notificación de sitios web no operativos es totalmente anónima y nos ayuda a mejorar la aplicación.</string>
-    <string name="brokenSiteUrlHint">Introducir URL</string>
-    <string name="brokenSiteDomainLabel">Dominio del sitio web no operativo:</string>
-    <string name="brokenSiteMessageHint">¿Qué contenido o funcionalidad no está disponible?</string>
-    <string name="brokenSiteSubmitButton">Enviar opinión</string>
-    <string name="brokenSiteSubmitted">¡Gracias! Opinión enviada</string>
+    <string name="brokenSiteSubmitted">¡Gracias! Informe enviado</string>
+    <string name="brokenSitesCategoriesTitle">Describe qué pasó:</string>
+    <string name="brokenSitesCategoriesHint">Describe qué pasó</string>
+    <string name="brokenSiteSubmitButton">Enviar reporte</string>
+    <string name="brokenSiteDescription">Enviar un reporte anónimo del sitio dañado nos ayuda a depurar estos problemas y mejorar la aplicación.</string>
+
+    <string name="brokenSiteCategoryImages">Las imágenes no se cargaron</string>
+    <string name="brokenSiteCategoryPaywall">El sitio me pidió que desactivara</string>
+    <string name="brokenSiteCategoryComments">Los comentarios no se cargaron</string>
+    <string name="brokenSiteCategoryVideos">El vídeo no se reprodujo</string>
+    <string name="brokenSiteCategoryLinks">Los enlaces o botones no funcionan</string>
+    <string name="brokenSiteCategoryContent">Falta contenido</string>
+    <string name="brokenSiteCategoryLogin">No puedo iniciar sesión</string>
+    <string name="brokenSiteCategoryUnsupported">El navegador es incompatible.</string>
+    <string name="brokenSiteCategoryOther">Otro problema</string>
 
     <!-- Bookmarks Activity -->
     <string name="bookmarksMenuTitle">Marcadores</string>
@@ -387,4 +396,5 @@
     <string name="hideTipsTitle">¿Ocultar los consejos restantes?</string>
     <string name="hideTipsText">Sólo hay unos cuantos, y tratamos de hacerlos informativos.</string>
     <string name="hideTipsButton">Ocultar consejos para siempre</string>
+
 </resources>

@@ -75,6 +75,7 @@ class WebViewRequestInterceptor(
                 webView.loadUrl(newUri.toString())
             }
 
+            webViewClientListener?.upgradedToHttps()
             privacyProtectionCountDao.incrementUpgradeCount()
             return WebResourceResponse(null, null, null)
         }
@@ -93,6 +94,7 @@ class WebViewRequestInterceptor(
             val surrogate = resourceSurrogates.get(url)
             if (surrogate.responseAvailable) {
                 Timber.d("Surrogate found for $url")
+                webViewClientListener?.surrogateDetected(surrogate)
                 return WebResourceResponse(surrogate.mimeType, "UTF-8", surrogate.jsFunction.byteInputStream())
             }
 

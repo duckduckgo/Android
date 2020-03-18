@@ -184,12 +184,21 @@
     <!-- Broken Site Activity -->
     <string name="brokenSiteReportBrokenSiteMenuItem">Rapporter ødelagt nettsted</string>
     <string name="brokenSiteHeading">Rapporter et ødelagt nettsted</string>
-    <string name="brokenSiteModalDescription">Det er helt anonymt å rapportere ødelagte nettsteder og det hjelper oss til å forbedre appen!</string>
-    <string name="brokenSiteUrlHint">Oppgi URL</string>
-    <string name="brokenSiteDomainLabel">Den ødelagte sidens domene:</string>
-    <string name="brokenSiteMessageHint">Hva slags innhold eller funksjonalitet er det som ikke virker?</string>
-    <string name="brokenSiteSubmitButton">Send inn tilbakemelding</string>
     <string name="brokenSiteSubmitted">Takk! Tilbakemeldingen er sendt</string>
+    <string name="brokenSitesCategoriesTitle">Beskriv hva som skjedde:</string>
+    <string name="brokenSitesCategoriesHint">Beskriv hva som skjedde</string>
+    <string name="brokenSiteSubmitButton">Send rapport</string>
+    <string name="brokenSiteDescription">Innsending av anonym rapport om ødelagt nettsted, hjelper oss med å feilsøke disse problemene og forbedre appen.</string>
+
+    <string name="brokenSiteCategoryImages">Bildene ble ikke lastet inn</string>
+    <string name="brokenSiteCategoryPaywall">Nettstedet ba meg om å deaktivere</string>
+    <string name="brokenSiteCategoryComments">Kommentarene ble ikke lastet inn</string>
+    <string name="brokenSiteCategoryVideos">Videoen ble ikke spilt</string>
+    <string name="brokenSiteCategoryLinks">Linker eller knapper fungerer ikke</string>
+    <string name="brokenSiteCategoryContent">Innhold manglet</string>
+    <string name="brokenSiteCategoryLogin">Jeg kan ikke logge inn</string>
+    <string name="brokenSiteCategoryUnsupported">Nettleseren er inkompatibel</string>
+    <string name="brokenSiteCategoryOther">Noe annet</string>
 
     <!-- Bookmarks Activity -->
     <string name="bookmarksMenuTitle">Bokmerker</string>
