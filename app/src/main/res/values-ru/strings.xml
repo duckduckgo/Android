@@ -207,12 +207,21 @@
     <!-- Broken Site Activity -->
     <string name="brokenSiteReportBrokenSiteMenuItem">Сообщить о нерабочем сайте</string>
     <string name="brokenSiteHeading">Сообщить о нерабочем сайте</string>
-    <string name="brokenSiteModalDescription">Сообщение о нерабочих сайтах полностью анонимно и помогает нам улучшить приложение!</string>
-    <string name="brokenSiteUrlHint">Введите URL</string>
-    <string name="brokenSiteDomainLabel">Домен нерабочего сайта:</string>
-    <string name="brokenSiteMessageHint">Какой контент или функциональные возможности не доступны?</string>
-    <string name="brokenSiteSubmitButton">Отправить отзыв</string>
     <string name="brokenSiteSubmitted">Спасибо! Отзыв отправлен</string>
+    <string name="brokenSitesCategoriesTitle">Опишите, что случилось:</string>
+    <string name="brokenSitesCategoriesHint">Опишите, что случилось</string>
+    <string name="brokenSiteSubmitButton">Отправить жалобу</string>
+    <string name="brokenSiteDescription">Отправка анонимной жалобы на неработающий сайт помогает нам решить эти проблемы и улучшить приложение.</string>
+
+    <string name="brokenSiteCategoryImages">Не загрузились изображения</string>
+    <string name="brokenSiteCategoryPaywall">Сайт попросил меня отключить</string>
+    <string name="brokenSiteCategoryComments">Не загрузились комментарии</string>
+    <string name="brokenSiteCategoryVideos">Не воспроизвелось видео</string>
+    <string name="brokenSiteCategoryLinks">Не работают ссылки или кнопки</string>
+    <string name="brokenSiteCategoryContent">Отсутствует содержимое</string>
+    <string name="brokenSiteCategoryLogin">Не могу войти</string>
+    <string name="brokenSiteCategoryUnsupported">Несовместимость браузера</string>
+    <string name="brokenSiteCategoryOther">Что-то другое</string>
 
     <!-- Bookmarks Activity -->
     <string name="bookmarksMenuTitle">Закладки</string>

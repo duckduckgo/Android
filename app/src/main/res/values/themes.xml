@@ -28,6 +28,7 @@
         <item name="windowNoTitle">true</item>
         <item name="bottomSheetDialogTheme">@style/BottomSheetDialog</item>
         <item name="android:windowActivityTransitions">true</item>
+        <item name="autoCompleteTextViewStyle">@style/AutoCompleteTextViewStyle</item>
         <item name="android:statusBarColor">?colorPrimary</item>
     </style>
 
@@ -64,6 +65,11 @@
         <item name="daxDialogBackgroundColor">@color/charcoalGrey</item>
         <item name="daxDialogSecondaryButtonTextColor">@color/white</item>
         <item name="daxDialogSecondaryButtonRippleColor">@color/white</item>
+        <item name="brokenSiteSelectionTextColor">@color/white</item>
+        <item name="brokenSiteOutlinedColor">@color/grayish</item>
+        <item name="brokenSitesButtonDisabledBackgroundColor">@color/greyishBrownTwo</item>
+        <item name="brokenSitesButtonDisabledTextColor">@color/warGreyTwo</item>
+        <item name="brokenSitesButtonRippleColor">@color/white</item>
 
         <item name="feedbackAnonymousFeedbackLabelColor">@color/grayish</item>
         <item name="feedbackListItemBackgroundColor">@color/almostBlack</item>
@@ -124,6 +130,11 @@
         <item name="daxDialogBackgroundColor">@color/white</item>
         <item name="daxDialogSecondaryButtonTextColor">@color/grayishBrown</item>
         <item name="daxDialogSecondaryButtonRippleColor">@color/subtleGrayTwo</item>
+        <item name="brokenSiteSelectionTextColor">@color/almostBlack</item>
+        <item name="brokenSiteOutlinedColor">@color/grayishTwo</item>
+        <item name="brokenSitesButtonDisabledBackgroundColor">@color/subtleGrayTwo</item>
+        <item name="brokenSitesButtonDisabledTextColor">@color/white</item>
+        <item name="brokenSitesButtonRippleColor">@color/subtleGrayTwo</item>
 
         <item name="feedbackAnonymousFeedbackLabelColor">@color/warmerGray</item>
         <item name="feedbackListItemBackgroundColor">@color/whiteFive</item>
@@ -168,6 +179,12 @@
         <item name="colorControlActivated">@color/cornflowerBlue</item>
         <item name="colorSwitchThumbNormal">@color/white</item>
         <item name="android:colorForeground">?attr/settingsSwitchBackgroundColor</item>
+    </style>
+
+    <style name="AutoCompleteTextViewStyle" parent="Widget.AppCompat.AutoCompleteTextView">
+        <item name="android:textCursorDrawable">@drawable/text_cursor</item>
+        <item name="android:textColorHint">?attr/omnibarHintColor</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
     </style>
 
     <style name="DaxDialogFragment" parent="android:Theme.DeviceDefault.Light.NoActionBar">

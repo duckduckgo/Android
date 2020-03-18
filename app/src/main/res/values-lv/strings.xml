@@ -206,12 +206,21 @@
     <!-- Broken Site Activity -->
     <string name="brokenSiteReportBrokenSiteMenuItem">Ziņot par bojātu vietni</string>
     <string name="brokenSiteHeading">Ziņot par bojātu vietni</string>
-    <string name="brokenSiteModalDescription">Pārskats par bojātu vietni ir pilnīgi anonīms un palīdz mums uzlabot lietotni!</string>
-    <string name="brokenSiteUrlHint">Ievadīt URL</string>
-    <string name="brokenSiteDomainLabel">Bojātas vietnes domēns:</string>
-    <string name="brokenSiteMessageHint">Kurš saturs vai funkcija ir bojāta?</string>
-    <string name="brokenSiteSubmitButton">Iesniegt atsauksmes</string>
     <string name="brokenSiteSubmitted">Paldies! Atsauksme iesniegta</string>
+    <string name="brokenSitesCategoriesTitle">Aprakstiet notikušo:</string>
+    <string name="brokenSitesCategoriesHint">Aprakstiet notikušo</string>
+    <string name="brokenSiteSubmitButton">Nosūtīt ziņojumu</string>
+    <string name="brokenSiteDescription">Ja iesniegsiet anonīmu ziņojumu par bojātu vietni, mēs varēsim atkļūdot šīs problēmas un uzlabot lietotni.</string>
+
+    <string name="brokenSiteCategoryImages">Attēli netika ielādēti</string>
+    <string name="brokenSiteCategoryPaywall">Vietne pieprasīja atspējošanu</string>
+    <string name="brokenSiteCategoryComments">Komentāri netika ielādēti</string>
+    <string name="brokenSiteCategoryVideos">Video netika atskaņots</string>
+    <string name="brokenSiteCategoryLinks">Saites vai pogas nedarbojas</string>
+    <string name="brokenSiteCategoryContent">Trūkst satura</string>
+    <string name="brokenSiteCategoryLogin">Es nevaru pieteikties</string>
+    <string name="brokenSiteCategoryUnsupported">Pārlūks nav saderīgs</string>
+    <string name="brokenSiteCategoryOther">Kaut kas cits</string>
 
     <!-- Bookmarks Activity -->
     <string name="bookmarksMenuTitle">Grāmatzīmes</string>

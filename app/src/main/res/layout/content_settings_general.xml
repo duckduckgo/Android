@@ -16,6 +16,7 @@
 
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/settingsSectionGeneral"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
@@ -52,8 +53,39 @@
         android:text="@string/settingsDefaultBrowserEnabled"
         android:theme="@style/SettingsSwitchTheme"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/autocompleteToggle" />
 
+    <androidx.appcompat.widget.SwitchCompat
+        android:id="@+id/searchNotificationToggle"
+        style="@style/SettingsSwitch"
+        android:text="@string/stickySearchNotificationText"
+        android:theme="@style/SettingsSwitchTheme"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/setAsDefaultBrowserSetting" />
+
+    <TextView
+        android:id="@+id/changeAppIconLabel"
+        style="@style/SettingsItemClickable"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:text="@string/changeIconCtaLabel"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/setAsDefaultBrowserSetting" />
+
+    <ImageView
+        android:id="@+id/changeAppIcon"
+        android:layout_width="0dp"
+        android:layout_height="32dp"
+        android:layout_marginEnd="16dp"
+        app:layout_constraintBottom_toBottomOf="@+id/changeAppIconLabel"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/changeAppIconLabel"
+        tools:srcCompat="@drawable/ic_app_icon_red_round" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

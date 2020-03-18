@@ -23,6 +23,7 @@ import com.duckduckgo.app.global.model.SiteFactory.SitePrivacyData
 import com.duckduckgo.app.privacy.model.HttpsStatus
 import com.duckduckgo.app.privacy.model.PrivacyGrade
 import com.duckduckgo.app.privacy.model.PrivacyPractices
+import com.duckduckgo.app.surrogates.SurrogateResponse
 import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 
@@ -43,6 +44,7 @@ interface Site {
     var title: String?
     val https: HttpsStatus
     var hasHttpResources: Boolean
+    var upgradedHttps: Boolean
 
     val privacyPractices: PrivacyPractices.Practices
     val entity: Entity?
@@ -50,8 +52,10 @@ interface Site {
     val trackerCount: Int
     val majorNetworkCount: Int
     val allTrackersBlocked: Boolean
+    val surrogates: List<SurrogateResponse>
     fun trackerDetected(event: TrackingEvent)
     fun updatePrivacyData(sitePrivacyData: SitePrivacyData)
+    fun surrogateDetected(surrogate: SurrogateResponse)
 
     fun calculateGrades(): SiteGrades
 

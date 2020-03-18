@@ -184,12 +184,21 @@
     <!-- Broken Site Activity -->
     <string name="brokenSiteReportBrokenSiteMenuItem">Подаване на сигнал за повреден сайт</string>
     <string name="brokenSiteHeading">Подаване на сигнал за повреден сайт</string>
-    <string name="brokenSiteModalDescription">Подаването на сигнали за повредени сайтове е напълно анонимно и ни помага да подобрим приложението!</string>
-    <string name="brokenSiteUrlHint">Въведете URL адрес</string>
-    <string name="brokenSiteDomainLabel">Домейн на повредения сайт:</string>
-    <string name="brokenSiteMessageHint">Кое съдържание или функционалност се нарушава?</string>
-    <string name="brokenSiteSubmitButton">Изпращане на отзиви</string>
     <string name="brokenSiteSubmitted">Благодарим Ви! Изпратена обратна връзка</string>
+    <string name="brokenSitesCategoriesTitle">Опишете проблема:</string>
+    <string name="brokenSitesCategoriesHint">Опишете проблема</string>
+    <string name="brokenSiteSubmitButton">Изпращане на доклад</string>
+    <string name="brokenSiteDescription">Изпращането на анонимен доклад за неработещ сайт ни помага да отстраним грешките и да подобрим приложението.</string>
+
+    <string name="brokenSiteCategoryImages">Изображенията не се зареждат</string>
+    <string name="brokenSiteCategoryPaywall">Сайтът ме помоли да деактивирам</string>
+    <string name="brokenSiteCategoryComments">Коментарите не се зареждат</string>
+    <string name="brokenSiteCategoryVideos">Видеото не се възпроизвежда</string>
+    <string name="brokenSiteCategoryLinks">Връзките или бутоните не работят</string>
+    <string name="brokenSiteCategoryContent">Липсва съдържание</string>
+    <string name="brokenSiteCategoryLogin">Не мога да вляза</string>
+    <string name="brokenSiteCategoryUnsupported">Браузърът е несъвместим</string>
+    <string name="brokenSiteCategoryOther">Нещо друго</string>
 
     <!-- Bookmarks Activity -->
     <string name="bookmarksMenuTitle">Отметки</string>

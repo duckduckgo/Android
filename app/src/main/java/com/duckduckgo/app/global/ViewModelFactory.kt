@@ -41,7 +41,11 @@ import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.model.SiteFactory
 import com.duckduckgo.app.global.rating.AppEnjoymentPromptEmitter
 import com.duckduckgo.app.global.rating.AppEnjoymentUserEventRecorder
+import com.duckduckgo.app.icon.api.AppIconModifier
+import com.duckduckgo.app.icon.api.IconModifier
+import com.duckduckgo.app.icon.ui.ChangeIconViewModel
 import com.duckduckgo.app.launch.LaunchViewModel
+import com.duckduckgo.app.notification.NotificationScheduler
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.ui.OnboardingPageManager
 import com.duckduckgo.app.onboarding.ui.OnboardingViewModel
@@ -106,7 +110,9 @@ class ViewModelFactory @Inject constructor(
     private val playStoreUtils: PlayStoreUtils,
     private val feedbackSubmitter: FeedbackSubmitter,
     private val onboardingPageManager: OnboardingPageManager,
-    private val appInstallationReferrerStateListener: AppInstallationReferrerStateListener
+    private val appInstallationReferrerStateListener: AppInstallationReferrerStateListener,
+    private val appIconModifier: IconModifier,
+    private val notificationScheduler: NotificationScheduler
 ) : ViewModelProvider.NewInstanceFactory() {
 
     override fun <T : ViewModel> create(modelClass: Class<T>) =
@@ -134,6 +140,7 @@ class ViewModelFactory @Inject constructor(
                 isAssignableFrom(BrokenSiteNegativeFeedbackViewModel::class.java) -> BrokenSiteNegativeFeedbackViewModel()
                 isAssignableFrom(TrackerBlockingSelectionViewModel::class.java) -> TrackerBlockingSelectionViewModel(privacySettingsStore)
                 isAssignableFrom(DefaultBrowserPageViewModel::class.java) -> defaultBrowserPage()
+                isAssignableFrom(ChangeIconViewModel::class.java) -> changeAppIconViewModel()
 
                 else -> throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")
             }
@@ -148,7 +155,8 @@ class ViewModelFactory @Inject constructor(
             appSettingsPreferencesStore,
             defaultBrowserDetector,
             variantManager,
-            pixel
+            pixel,
+            notificationScheduler
         )
     }
 
@@ -192,4 +200,6 @@ class ViewModelFactory @Inject constructor(
         pixel = pixel,
         variantManager = variantManager
     )
+
+    private fun changeAppIconViewModel() = ChangeIconViewModel(settingsDataStore = appSettingsPreferencesStore, appIconModifier = appIconModifier, pixel = pixel)
 }

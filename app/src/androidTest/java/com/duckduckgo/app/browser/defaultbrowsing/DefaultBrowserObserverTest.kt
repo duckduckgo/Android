@@ -63,7 +63,7 @@ class DefaultBrowserObserverTest {
 
         testee.onApplicationResumed()
 
-        verify(mockPixel, never()).fire(eq(Pixel.PixelName.DEFAULT_BROWSER_SET), any())
+        verify(mockPixel, never()).fire(eq(Pixel.PixelName.DEFAULT_BROWSER_SET), any(), any())
     }
 
     @Test
@@ -73,7 +73,7 @@ class DefaultBrowserObserverTest {
 
         testee.onApplicationResumed()
 
-        verify(mockPixel, never()).fire(eq(Pixel.PixelName.DEFAULT_BROWSER_SET), any())
+        verify(mockPixel, never()).fire(eq(Pixel.PixelName.DEFAULT_BROWSER_SET), any(), any())
     }
 
     @Test

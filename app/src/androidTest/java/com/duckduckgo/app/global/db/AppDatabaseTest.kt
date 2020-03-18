@@ -21,7 +21,6 @@ import androidx.room.Room
 import androidx.room.migration.Migration
 import androidx.room.testing.MigrationTestHelper
 import androidx.sqlite.db.framework.FrameworkSQLiteOpenHelperFactory
-import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
 import com.duckduckgo.app.blockingObserve
 import org.junit.Assert.*
@@ -148,6 +147,11 @@ class AppDatabaseTest {
         createDatabaseAndMigrate(15, 16, AppDatabase.MIGRATION_15_TO_16)
     }
 
+    @Test
+    fun whenMigratingFromVersion16To17ThenValidationSucceeds() {
+        createDatabaseAndMigrate(16, 17, AppDatabase.MIGRATION_16_TO_17)
+    }
+
     private fun createDatabase(version: Int) {
         testHelper.createDatabase(TEST_DB_NAME, version).close()
     }
@@ -163,7 +167,7 @@ class AppDatabaseTest {
 
     private fun database(): AppDatabase {
         val database = Room
-            .databaseBuilder(InstrumentationRegistry.getInstrumentation().targetContext, AppDatabase::class.java, TEST_DB_NAME)
+            .databaseBuilder(getInstrumentation().targetContext, AppDatabase::class.java, TEST_DB_NAME)
             .addMigrations(*AppDatabase.ALL_MIGRATIONS.toTypedArray())
             .allowMainThreadQueries()
             .build()

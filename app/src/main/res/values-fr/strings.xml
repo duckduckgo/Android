@@ -184,12 +184,21 @@
     <!-- Broken Site Activity -->
     <string name="brokenSiteReportBrokenSiteMenuItem">Signaler un problème de site</string>
     <string name="brokenSiteHeading">Signaler un problème de site</string>
-    <string name="brokenSiteModalDescription">Les signalements de problème de site sont totalement anonymes et nous aident à améliorer l\'application !</string>
-    <string name="brokenSiteUrlHint">Saisir l\'URL</string>
-    <string name="brokenSiteDomainLabel">Domaine du site posant problème :</string>
-    <string name="brokenSiteMessageHint">Quel contenu ou fonctionnalité pose problème ?</string>
-    <string name="brokenSiteSubmitButton">Envoyer un commentaire</string>
     <string name="brokenSiteSubmitted">Merci ! Commentaire envoyé</string>
+    <string name="brokenSitesCategoriesTitle">Décrivez ce qui s\'est passé :</string>
+    <string name="brokenSitesCategoriesHint">Décrivez ce qui s\'est passé</string>
+    <string name="brokenSiteSubmitButton">Envoyer un rapport</string>
+    <string name="brokenSiteDescription">La soumission d\'un rapport anonyme pour signaler le mauvais fonctionnement du site nous aide à déboguer ces problèmes et à améliorer l\'application.</string>
+
+    <string name="brokenSiteCategoryImages">Les images ne se sont pas chargées</string>
+    <string name="brokenSiteCategoryPaywall">Le site m\'a demandé de désactiver</string>
+    <string name="brokenSiteCategoryComments">Les commentaires n\'ont pas été chargés</string>
+    <string name="brokenSiteCategoryVideos">La vidéo n\'a pas été lue</string>
+    <string name="brokenSiteCategoryLinks">Les liens ou les boutons ne fonctionnent pas</string>
+    <string name="brokenSiteCategoryContent">Le contenu est manquant</string>
+    <string name="brokenSiteCategoryLogin">Je ne peux pas me connecter</string>
+    <string name="brokenSiteCategoryUnsupported">Le navigateur est incompatible</string>
+    <string name="brokenSiteCategoryOther">Autre chose</string>
 
     <!-- Bookmarks Activity -->
     <string name="bookmarksMenuTitle">Signets</string>
