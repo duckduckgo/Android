@@ -30,9 +30,10 @@ import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.InstantSchedulersRule
 import com.duckduckgo.app.ValueCaptorObserver
+import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteResult
+import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteBookmarkSuggestion
+import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteSearchSuggestion
 import com.duckduckgo.app.autocomplete.api.AutoCompleteApi
-import com.duckduckgo.app.autocomplete.api.AutoCompleteApi.AutoCompleteSuggestion.AutoCompleteBookmarkSuggestion
-import com.duckduckgo.app.autocomplete.api.AutoCompleteApi.AutoCompleteSuggestion.AutoCompleteSearchSuggestion
 import com.duckduckgo.app.autocomplete.api.AutoCompleteService
 import com.duckduckgo.app.bookmarks.db.BookmarkEntity
 import com.duckduckgo.app.bookmarks.db.BookmarksDao
@@ -67,6 +68,7 @@ import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.VariantManager.Companion.DEFAULT_VARIANT
 import com.duckduckgo.app.statistics.api.StatisticsUpdater
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.surrogates.SurrogateResponse
 import com.duckduckgo.app.survey.db.SurveyDao
 import com.duckduckgo.app.survey.model.Survey
 import com.duckduckgo.app.tabs.model.TabEntity
@@ -233,7 +235,7 @@ class BrowserTabViewModelTest {
             siteFactory = siteFactory,
             tabRepository = mockTabsRepository,
             networkLeaderboardDao = mockNetworkLeaderboardDao,
-            autoCompleteApi = mockAutoCompleteApi,
+            autoComplete = mockAutoCompleteApi,
             appSettingsPreferencesStore = mockSettingsStore,
             bookmarksDao = mockBookmarksDao,
             longPressHandler = mockLongPressHandler,
@@ -1087,7 +1089,7 @@ class BrowserTabViewModelTest {
     fun whenNoSiteAndBrokenSiteSelectedThenBrokenSiteFeedbackCommandSentWithoutUrl() {
         testee.onBrokenSiteSelected()
         val command = captureCommands().value as Command.BrokenSiteFeedback
-        assertNull(command.url)
+        assertEquals("", command.url)
     }
 
     @Test
@@ -1271,16 +1273,17 @@ class BrowserTabViewModelTest {
     @Test
     fun whenBookmarkSuggestionSubmittedThenAutoCompleteBookmarkSelectionPixelSent() = runBlocking {
         whenever(mockBookmarksDao.hasBookmarks()).thenReturn(true)
-        testee.autoCompleteViewState.value = autoCompleteViewState().copy(searchResults = AutoCompleteApi.AutoCompleteResult("", emptyList(), true))
-        testee.fireAutocompletePixel(AutoCompleteBookmarkSuggestion("example", "Example", "https://example.com"))
-
+        val suggestion = AutoCompleteBookmarkSuggestion("example", "Example", "https://example.com")
+        testee.autoCompleteViewState.value = autoCompleteViewState().copy(searchResults = AutoCompleteResult("", listOf(suggestion)))
+        testee.fireAutocompletePixel(suggestion)
         verify(mockPixel).fire(Pixel.PixelName.AUTOCOMPLETE_BOOKMARK_SELECTION, pixelParams(showedBookmarks = true, bookmarkCapable = true))
     }
 
     @Test
     fun whenSearchSuggestionSubmittedWithBookmarksThenAutoCompleteSearchSelectionPixelSent() = runBlocking {
         whenever(mockBookmarksDao.hasBookmarks()).thenReturn(true)
-        testee.autoCompleteViewState.value = autoCompleteViewState().copy(searchResults = AutoCompleteApi.AutoCompleteResult("", emptyList(), true))
+        val suggestions = listOf(AutoCompleteSearchSuggestion("", false), AutoCompleteBookmarkSuggestion("", "", ""))
+        testee.autoCompleteViewState.value = autoCompleteViewState().copy(searchResults = AutoCompleteResult("", suggestions))
         testee.fireAutocompletePixel(AutoCompleteSearchSuggestion("example", false))
 
         verify(mockPixel).fire(Pixel.PixelName.AUTOCOMPLETE_SEARCH_SELECTION, pixelParams(showedBookmarks = true, bookmarkCapable = true))
@@ -1289,7 +1292,7 @@ class BrowserTabViewModelTest {
     @Test
     fun whenSearchSuggestionSubmittedWithoutBookmarksThenAutoCompleteSearchSelectionPixelSent() = runBlocking {
         whenever(mockBookmarksDao.hasBookmarks()).thenReturn(false)
-        testee.autoCompleteViewState.value = autoCompleteViewState().copy(searchResults = AutoCompleteApi.AutoCompleteResult("", emptyList(), false))
+        testee.autoCompleteViewState.value = autoCompleteViewState().copy(searchResults = AutoCompleteResult("", emptyList()))
         testee.fireAutocompletePixel(AutoCompleteSearchSuggestion("example", false))
 
         verify(mockPixel).fire(Pixel.PixelName.AUTOCOMPLETE_SEARCH_SELECTION, pixelParams(showedBookmarks = false, bookmarkCapable = false))
@@ -1638,6 +1641,140 @@ class BrowserTabViewModelTest {
         )
     }
 
+    @Test
+    fun whenSurrogateDetectedThenSiteUpdated() {
+        givenOneActiveTabSelected()
+        val surrogate = SurrogateResponse()
+        testee.surrogateDetected(surrogate)
+        assertTrue(testee.siteLiveData.value?.surrogates?.size == 1)
+    }
+
+    @Test
+    fun whenUpgradedToHttpsThenSiteUpgradedHttpsReturnsTrue() {
+        val url = "http://www.example.com"
+        selectedTabLiveData.value = TabEntity("TAB_ID", url, "", skipHome = false, viewed = true, position = 0)
+        testee.upgradedToHttps()
+        loadUrl("https://www.example.com")
+        assertTrue(testee.siteLiveData.value?.upgradedHttps!!)
+    }
+
+    @Test
+    fun whenNotUpgradedToHttpsThenSiteUpgradedHttpsReturnsFalse() {
+        givenOneActiveTabSelected()
+        assertFalse(testee.siteLiveData.value?.upgradedHttps!!)
+    }
+
+    @Test
+    fun whenOnBrokenSiteSelectedOpenBokenSiteFeedback() {
+        testee.onBrokenSiteSelected()
+        assertCommandIssued<Command.BrokenSiteFeedback>()
+    }
+
+    @Test
+    fun whenOnBrokenSiteSelectedAndNoHttpsUpgradedThenReturnHttpsUpgradedFalse() {
+        testee.onBrokenSiteSelected()
+
+        val command = captureCommands().lastValue
+        assertTrue(command is Command.BrokenSiteFeedback)
+
+        val brokenSiteFeedback = command as Command.BrokenSiteFeedback
+        assertFalse(brokenSiteFeedback.httpsUpgraded)
+    }
+
+    @Test
+    fun whenOnBrokenSiteSelectedAndNoTrackersThenReturnBlockedTrackersEmptyString() {
+        givenOneActiveTabSelected()
+
+        testee.onBrokenSiteSelected()
+
+        val command = captureCommands().lastValue
+        assertTrue(command is Command.BrokenSiteFeedback)
+
+        val brokenSiteFeedback = command as Command.BrokenSiteFeedback
+        assertEquals("", brokenSiteFeedback.blockedTrackers)
+    }
+
+    @Test
+    fun whenOnBrokenSiteSelectedAndTrackersBlockedThenReturnBlockedTrackers() {
+        givenOneActiveTabSelected()
+        val event = TrackingEvent("http://www.example.com", "http://www.tracker.com/tracker.js", emptyList(), null, false)
+        val anotherEvent = TrackingEvent("http://www.example.com/test", "http://www.anothertracker.com/tracker.js", emptyList(), null, false)
+
+        testee.trackerDetected(event)
+        testee.trackerDetected(anotherEvent)
+        testee.onBrokenSiteSelected()
+
+        val command = captureCommands().lastValue
+        assertTrue(command is Command.BrokenSiteFeedback)
+
+        val brokenSiteFeedback = command as Command.BrokenSiteFeedback
+        assertEquals("www.tracker.com,www.anothertracker.com", brokenSiteFeedback.blockedTrackers)
+    }
+
+    @Test
+    fun whenOnBrokenSiteSelectedAndSameHostTrackersBlockedThenDoNotReturnDuplicatedBlockedTrackers() {
+        givenOneActiveTabSelected()
+        val event = TrackingEvent("http://www.example.com", "http://www.tracker.com/tracker.js", emptyList(), null, false)
+        val anotherEvent = TrackingEvent("http://www.example.com/test", "http://www.tracker.com/tracker2.js", emptyList(), null, false)
+
+        testee.trackerDetected(event)
+        testee.trackerDetected(anotherEvent)
+        testee.onBrokenSiteSelected()
+
+        val command = captureCommands().lastValue
+        assertTrue(command is Command.BrokenSiteFeedback)
+
+        val brokenSiteFeedback = command as Command.BrokenSiteFeedback
+        assertEquals("www.tracker.com", brokenSiteFeedback.blockedTrackers)
+    }
+
+    @Test
+    fun whenOnBrokenSiteSelectedAndNoSurrogatesThenReturnSurrogatesEmptyString() {
+        givenOneActiveTabSelected()
+
+        testee.onBrokenSiteSelected()
+
+        val command = captureCommands().lastValue
+        assertTrue(command is Command.BrokenSiteFeedback)
+
+        val brokenSiteFeedback = command as Command.BrokenSiteFeedback
+        assertEquals("", brokenSiteFeedback.surrogates)
+    }
+
+    @Test
+    fun whenOnBrokenSiteSelectedAndSurrogatesThenReturnSurrogates() {
+        givenOneActiveTabSelected()
+        val surrogate = SurrogateResponse(true, "surrogate.com/test.js", "", "")
+        val anotherSurrogate = SurrogateResponse(true, "anothersurrogate.com/test.js", "", "")
+
+        testee.surrogateDetected(surrogate)
+        testee.surrogateDetected(anotherSurrogate)
+        testee.onBrokenSiteSelected()
+
+        val command = captureCommands().lastValue
+        assertTrue(command is Command.BrokenSiteFeedback)
+
+        val brokenSiteFeedback = command as Command.BrokenSiteFeedback
+        assertEquals("surrogate.com,anothersurrogate.com", brokenSiteFeedback.surrogates)
+    }
+
+    @Test
+    fun whenOnBrokenSiteSelectedAndSameHostSurrogatesThenDoNotReturnDuplicatedSurrogates() {
+        givenOneActiveTabSelected()
+        val surrogate = SurrogateResponse(true, "surrogate.com/test.js", "", "")
+        val anotherSurrogate = SurrogateResponse(true, "surrogate.com/test2.js", "", "")
+
+        testee.surrogateDetected(surrogate)
+        testee.surrogateDetected(anotherSurrogate)
+        testee.onBrokenSiteSelected()
+
+        val command = captureCommands().lastValue
+        assertTrue(command is Command.BrokenSiteFeedback)
+
+        val brokenSiteFeedback = command as Command.BrokenSiteFeedback
+        assertEquals("surrogate.com", brokenSiteFeedback.surrogates)
+    }
+
     private inline fun <reified T : Command> assertCommandIssued(instanceAssertions: T.() -> Unit = {}) {
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
         val issuedCommand = commandCaptor.allValues.find { it is T }
@@ -1654,7 +1791,6 @@ class BrowserTabViewModelTest {
         Pixel.PixelParameter.DEFAULT_BROWSER_SET_FROM_ONBOARDING to false.toString(),
         Pixel.PixelParameter.DEFAULT_BROWSER_SET_ORIGIN to origin
     )
-
 
     private fun givenExpectedCtaAddWidgetInstructions() {
         setBrowserShowing(false)

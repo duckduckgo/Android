@@ -1,6 +1,7 @@
 ﻿<resources xmlns:tools="http://schemas.android.com/tools">
 
     <string name="duckDuckGoLogoDescription">DuckDuckGo-Logo</string>
+    <string name="duckDuckGoPrivacySimplified">Datenschutz – leicht gemacht.</string>
     <string name="yes">Ja</string>
     <string name="no">Nein</string>
 
@@ -163,7 +164,6 @@
 
     <!-- About Activity -->
     <string name="aboutActivityTitle">Über uns</string>
-    <string name="aboutHeading">Datenschutz – leicht gemacht.</string>
     <string name="aboutDescription">
         Wir bei DuckDuckGo setzen den neuen Standard für Vertrauen im Internet.\n\ Der DuckDuckGo Privacy Browser bietet alle Datenschutzgrundlagen, die du benötigst, um dich beim Suchen und Browsen im Internet zu schützen, einschließlich Tracker-Blockierung, intelligentere Verschlüsselung und DuckDuckGo-Privatmodussuche.\n\ Schließlich muss das Internet kein unheimlicher Ort sein und die Online-Privatsphäre zu bekommen, die du verdienst, sollte so einfach sein wie das Zuziehen deiner Vorhänge.</string>
     <string name="aboutMoreLink">Mehr auf duckduckgo.com/about</string>
@@ -172,12 +172,21 @@
     <!-- Broken Site Activity -->
     <string name="brokenSiteReportBrokenSiteMenuItem">Fehlerhafte Seite melden</string>
     <string name="brokenSiteHeading">Eine fehlerhafte Seite melden</string>
-    <string name="brokenSiteModalDescription">Das Melden fehlerhafter Seiten ist völlig anonym und hilft uns dabei, die App zu verbessern!</string>
-    <string name="brokenSiteUrlHint">URL eingeben</string>
-    <string name="brokenSiteDomainLabel">Domain der fehlerhaften Seite:</string>
-    <string name="brokenSiteMessageHint">Welche Inhalte oder Funktionen sind fehlerhaft?</string>
-    <string name="brokenSiteSubmitButton">Feedback absenden</string>
     <string name="brokenSiteSubmitted">Vielen Dank! Feedback gesendet</string>
+    <string name="brokenSitesCategoriesTitle">Beschreiben Sie, was passiert ist:</string>
+    <string name="brokenSitesCategoriesHint">Beschreiben, was passiert ist</string>
+    <string name="brokenSiteSubmitButton">Bericht senden</string>
+    <string name="brokenSiteDescription">Das Senden eines anonymen Berichts über fehlerhafte Websites hilft uns, diese Probleme zu beheben und die App zu verbessern.</string>
+
+    <string name="brokenSiteCategoryImages">Bilder wurden nicht geladen</string>
+    <string name="brokenSiteCategoryPaywall">Die Seite hat mich aufgefordert, zu deaktivieren</string>
+    <string name="brokenSiteCategoryComments">Kommentare wurden nicht geladen</string>
+    <string name="brokenSiteCategoryVideos">Video wurde nicht abgespielt</string>
+    <string name="brokenSiteCategoryLinks">Links oder Schaltflächen funktionieren nicht</string>
+    <string name="brokenSiteCategoryContent">Inhalt fehlt</string>
+    <string name="brokenSiteCategoryLogin">Ich kann mich nicht anmelden</string>
+    <string name="brokenSiteCategoryUnsupported">Der Browser ist nicht kompatibel</string>
+    <string name="brokenSiteCategoryOther">Etwas anderes</string>
 
     <!-- Bookmarks Activity -->
     <string name="bookmarksMenuTitle">Lesezeichen</string>
@@ -344,5 +353,36 @@
     <string name="feedbackInitialDisambiguationHappyButtonContentDescription">Schaltfläche für positives Feedback</string>
     <string name="feedbackInitialDisambiguationSadButtonContentDescription">Schaltfläche für negatives Feedback</string>
     <string name="feedbackIsImportantToUs">Dein anonymes Feedback ist uns wichtig.</string>
+
+    <!-- Webview Recovery -->
+    <string name="crashedWebViewErrorMessage">Die Webseite konnte nicht angezeigt werden.</string>
+    <string name="crashedWebViewErrorAction">Neu laden</string>
+
+    <!-- System Search -->
+    <string name="systemSearchOmnibarInputHint"><font size="13">URL eingeben oder suchen</font></string>
+    <string name="systemSearchDeviceAppLabel">Von diesem Gerät</string>
+    <string name="systemSearchAppNotFound">Die Anwendung konnte nicht gefunden werden.</string>
+    <string name="systemSearchOnboardingText">Vielen Dank, dass Sie sich für DuckDuckGo entschieden haben!\nWenn Sie jetzt unsere Suche oder App verwenden, sind Ihre Suchanfragen geschützt.</string>
+    <string name="systemSearchOnboardingFeaturesIntroText">Das kann die DuckDuckGo App auch:</string>
+    <string name="systemSearchOnboardingFeatureOneText">Sie blockiert unsichere Tracker.</string>
+    <string name="systemSearchOnboardingFeatureTwoText">Sie erzwingt die Verschlüsselung auf Websites.</string>
+    <string name="systemSearchOnboardingFeatureThreeText">Sie löscht Daten mit einem Fingertipp.</string>
+    <string name="systemSearchOnboardingButtonMore">Mehr anzeigen</string>
+    <string name="systemSearchOnboardingButtonLess">Ausblenden</string>
+    <string name="systemSearchOnboardingButtonOk">Verstanden</string>
+
+    <!-- Dax Dialog -->
+    <string name="daxDialogHideButton">AUSBLENDEN</string>
+    <string name="daxDialogPhew">Puh!</string>
+    <string name="daxDialogYes">OK!</string>
+    <string name="daxDialogAddWidget">Widget hinzufügen</string>
+    <string name="daxDialogMaybeLater">Vielleicht später</string>
+    <string name="daxDialogSettings">Zu den Einstellungen</string>
+    <string name="daxDialogNext">Weiter</string>
+    <string name="daxDialogHighFive">Gib mir fünf!</string>
+    <string name="daxDialogGotIt">Verstanden</string>
+    <string name="hideTipsTitle">Verbleibende Tipps ausblenden?</string>
+    <string name="hideTipsText">Es gibt nur wenige, und wir haben versucht, sie informativ zu gestalten.</string>
+    <string name="hideTipsButton">Tipps für immer ausblenden</string>
 
 </resources>

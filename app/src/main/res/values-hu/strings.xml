@@ -1,6 +1,7 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
 
     <string name="duckDuckGoLogoDescription">DuckDuckGo logó</string>
+    <string name="duckDuckGoPrivacySimplified">Adatvédelem, egyszerűsítve.</string>
     <string name="yes">Igen</string>
     <string name="no">Nem</string>
 
@@ -163,7 +164,6 @@
 
     <!-- About Activity -->
     <string name="aboutActivityTitle">Rólunk</string>
-    <string name="aboutHeading">Adatvédelem, egyszerűsítve.</string>
     <string name="aboutDescription">
         A DuckDuckGo célja egy új online bizalmi szint megteremtése. \n\ A DuckDuckGo Adatvédelmi Böngésző minden olyan alapvető adatvédelmi elemet tartalmaz, amelyre szükséged lehet ahhoz, hogy megvédd magad az internetes keresés és böngészés során, beleértve a nyomkövető letiltását, az intelligensebb titkosítást és a DuckDuckGo privát keresést.\n\ Az internet végső soron nem feltétlenül kell, hogy ellenséges közeg legyen, és hisszük, hogy az általad megérdemelt adatvédelem olyan egyszerű is lehet, mint a redőny lehúzása.</string>
     <string name="aboutMoreLink">További információk a duckduckgo.com/about oldalon</string>
@@ -172,12 +172,21 @@
     <!-- Broken Site Activity -->
     <string name="brokenSiteReportBrokenSiteMenuItem">Hibás weboldal bejelentése</string>
     <string name="brokenSiteHeading">Hibás weboldal bejelentése</string>
-    <string name="brokenSiteModalDescription">A hibás weboldal bejelentése teljes mértékben anonim, és segít nekünk az alkalmazás javításában!</string>
-    <string name="brokenSiteUrlHint">URL megadása</string>
-    <string name="brokenSiteDomainLabel">Hibás weboldal címe:</string>
-    <string name="brokenSiteMessageHint">Melyik tartalom vagy funkció hibás?</string>
-    <string name="brokenSiteSubmitButton">Visszajelzés elküldése</string>
     <string name="brokenSiteSubmitted">Köszönjük! Visszajelzés elküldve</string>
+    <string name="brokenSitesCategoriesTitle">Írja le, mi történt:</string>
+    <string name="brokenSitesCategoriesHint">Az esemény leírása</string>
+    <string name="brokenSiteSubmitButton">Jelentés küldése</string>
+    <string name="brokenSiteDescription">Egy megsérült webhelyről szóló névtelen bejelentés segít a hibakeresésben és az alkalmazás fejlesztésében.</string>
+
+    <string name="brokenSiteCategoryImages">A képek nem töltődtek be</string>
+    <string name="brokenSiteCategoryPaywall">A webhely kérte tőlem a letiltást</string>
+    <string name="brokenSiteCategoryComments">A megjegyzések nem töltődtek be</string>
+    <string name="brokenSiteCategoryVideos">A videót nem játszotta le</string>
+    <string name="brokenSiteCategoryLinks">A hivatkozások vagy a gombok nem működnek</string>
+    <string name="brokenSiteCategoryContent">Hiányzik a tartalom</string>
+    <string name="brokenSiteCategoryLogin">Nem tudok bejelentkezni</string>
+    <string name="brokenSiteCategoryUnsupported">A böngésző nem kompatibilis</string>
+    <string name="brokenSiteCategoryOther">Valami más</string>
 
     <!-- Bookmarks Activity -->
     <string name="bookmarksMenuTitle">Könyvjelzők</string>
@@ -344,5 +353,36 @@
     <string name="feedbackInitialDisambiguationHappyButtonContentDescription">Pozitív visszajelzés gomb</string>
     <string name="feedbackInitialDisambiguationSadButtonContentDescription">Negatív visszajelzés gomb</string>
     <string name="feedbackIsImportantToUs">Anonim visszajelzésed fontos számunkra.</string>
+
+    <!-- Webview Recovery -->
+    <string name="crashedWebViewErrorMessage">A weblap nem jeleníthető meg.</string>
+    <string name="crashedWebViewErrorAction">Újratöltés</string>
+
+    <!-- System Search -->
+    <string name="systemSearchOmnibarInputHint"><font size="13">Keresés vagy URL beírása</font></string>
+    <string name="systemSearchDeviceAppLabel">Ebből az eszközből</string>
+    <string name="systemSearchAppNotFound">Az alkalmazás nem található</string>
+    <string name="systemSearchOnboardingText">Köszönjük, hogy a DuckDuckGo-t választotta!\nMost, amikor a mi keresésünket vagy az alkalmazásunkat használja, a keresései védettek.</string>
+    <string name="systemSearchOnboardingFeaturesIntroText">A DuckDuckGo alkalmazás is:</string>
+    <string name="systemSearchOnboardingFeatureOneText">Blokkolja a nem biztonságos nyomkövetőket</string>
+    <string name="systemSearchOnboardingFeatureTwoText">Kikényszeríti a webhelyek titkosítását</string>
+    <string name="systemSearchOnboardingFeatureThreeText">Egyetlen érintéssel törli az adatokat</string>
+    <string name="systemSearchOnboardingButtonMore">Többet mutat</string>
+    <string name="systemSearchOnboardingButtonLess">Elrejtés</string>
+    <string name="systemSearchOnboardingButtonOk">Megvan</string>
+
+    <!-- Dax Dialog -->
+    <string name="daxDialogHideButton">ELREJTÉS</string>
+    <string name="daxDialogPhew">Pfuj!</string>
+    <string name="daxDialogYes">RENDBEN!</string>
+    <string name="daxDialogAddWidget">Widget hozzáadása</string>
+    <string name="daxDialogMaybeLater">Talán később</string>
+    <string name="daxDialogSettings">Ugrás a beállításokhoz</string>
+    <string name="daxDialogNext">Következő</string>
+    <string name="daxDialogHighFive">Pacsi!</string>
+    <string name="daxDialogGotIt">Megvan</string>
+    <string name="hideTipsTitle">Elrejti a többi tippet?</string>
+    <string name="hideTipsText">Csak néhány van, és megpróbáltuk őket informatívvá tenni.</string>
+    <string name="hideTipsButton">Ötletek elrejtése örökre</string>
 
 </resources>

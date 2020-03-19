@@ -15,9 +15,8 @@
   -->
 
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
-    <string name="crashedWebViewErrorMessage">"The webpage could not be displayed."</string>
-    <string name="crashedWebViewErrorAction">"Reload"</string>
 
+    <!-- !!! WAITING FOR CORRECTIONS FROM TRANSLATOR - DO NOT RESUBMIT TRANSLATIONS BELOW !!! -->
     <!-- New Onboarding Experience -->
     <string name="onboardingWelcomeTitle">"Welcome to DuckDuckGo!"</string>
     <string name="onboardingDaxText"><![CDATA[The Internet can be kinda creepy.<br/><br/>Not to worry! Searching and browsing privately is easier than you think.]]></string>
@@ -33,12 +32,14 @@
     <string name="daxMainNetworkStep21CtaText"><![CDATA[In fact, %s trackers lurk on about %s of top sites. 😱<br/><br/>]]></string>
     <string name="daxMainNetworkStep211CtaText"><![CDATA[In fact, %s trackers lurk all over the internet. 😱<br/><br/>]]></string>
     <string name="daxMainNetworkStep2CtaText">%sI\'ll block these trackers when you\'re browsing non-%s sites.</string>
-
     <plurals name="daxTrackersBlockedCtaText">
         <item quantity="one"><![CDATA[&#160;and <b>%d other</b> were trying to track you here. <br/><br/>I blocked them!<br/><br/> ☝️You can check the URL bar to see who is trying to track you when you visit a new site.️]]></item>
         <item quantity="other"><![CDATA[&#160;and <b>%d others</b> were trying to track you here. <br/><br/>I blocked them!<br/><br/> ☝️You can check the URL bar to see who is trying to track you when you visit a new site.️]]></item>
     </plurals>
     <string name="daxTrackersBlockedCtaZeroText"><![CDATA[&#160;was trying to track you here. <br/><br/>I blocked it!<br/><br/> ☝️You can check the URL bar to see who is trying to track you when you visit a new site.️]]></string>
+    <!-- !!! WAITING FOR CORRECTIONS FROM TRANSLATOR - DO NOT RESUBMIT TRANSLATIONS ABOVE !!! -->
+
+    <string name="search">Search</string>
 
     <!-- Dax Dialog -->
     <string name="daxDialogHideButton">HIDE</string>
@@ -51,7 +52,20 @@
     <string name="daxDialogHighFive">High Five!</string>
     <string name="daxDialogGotIt">Got It</string>
 
-    <string name="hideTipsTitle">Hide remaining tips?</string>
-    <string name="hideTipsText">There are only a few, and we tried to make them informative.</string>
-    <string name="hideTipsButton">Hide tips forever</string>
+    <!-- Change Icon Activity -->
+    <string name="changeIconActivityTitle">App Icon</string>
+    <string name="changeIconCtaLabel">Change App Icon</string>
+    <string name="changeIconCtaAccept">Apply</string>
+    <string name="changeIconCtaCancel">Cancel</string>
+    <string name="changeIconDialogTitle">Apply New Icon?</string>
+    <string name="changeIconDialogMessage">The app may close to apply changes. Come on back after you\'ve admired your handsome new icon.</string>
+
+    <!-- Sticky Search Prompt Notification -->
+    <string name="stickySearchPromptNotificationTitle">Quick Search</string>
+    <string name="stickySearchNotification">Sticky Search</string>
+    <string name="stickySearchNotificationText">Quick Search in Notifications</string>
+    <string name="stickySearchPromptKeep">Keep</string>
+    <string name="stickySearchPromptRemove">Remove</string>
+    <string name="notificationChannelSearch">Search</string>
+
 </resources>

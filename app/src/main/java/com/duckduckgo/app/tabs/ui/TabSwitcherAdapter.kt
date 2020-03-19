@@ -119,10 +119,15 @@ class TabSwitcherAdapter(private val itemClickListener: TabSwitcherListener, pri
     }
 
     private fun loadTabPreviewImage(tab: TabEntity, glide: GlideRequests, holder: TabViewHolder) {
-        val previewFile = tab.tabPreviewFile ?: return
+        val previewFile = tab.tabPreviewFile
+        if (previewFile == null) {
+            glide.clear(holder.tabPreview)
+            return
+        }
 
         val cachedWebViewPreview = File(webViewPreviewPersister.fullPathForFile(tab.tabId, previewFile))
         if (!cachedWebViewPreview.exists()) {
+            glide.clear(holder.tabPreview)
             return
         }
 

@@ -1,6 +1,7 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
 
     <string name="duckDuckGoLogoDescription">Лого на DuckDuckGo</string>
+    <string name="duckDuckGoPrivacySimplified">Поверителност, опростена.</string>
     <string name="yes">да</string>
     <string name="no">Не</string>
 
@@ -163,7 +164,6 @@
 
     <!-- About Activity -->
     <string name="aboutActivityTitle">За нас</string>
-    <string name="aboutHeading">Поверителност, опростена.</string>
     <string name="aboutDescription">
         В DuckDuckGo задаваме новия стандарт на доверие онлайн.\n\ Браузърът за поверителност DuckDuckGo осигурява всички необходими елементи за защита на поверителността, докато търсите и сърфирате в мрежата, включително блокиране на проследяващи елементи, по-интелигентно криптиране и частно търсене с DuckDuckGo.\ n\ В крайна сметка интернет не трябва да създава чувство на страх, а получаването на поверителността, която заслужавате онлайн, трябва да е толкова просто, колкото пускането на щорите.</string>
     <string name="aboutMoreLink">Още на duckduckgo.com/about</string>
@@ -172,12 +172,21 @@
     <!-- Broken Site Activity -->
     <string name="brokenSiteReportBrokenSiteMenuItem">Подаване на сигнал за повреден сайт</string>
     <string name="brokenSiteHeading">Подаване на сигнал за повреден сайт</string>
-    <string name="brokenSiteModalDescription">Подаването на сигнали за повредени сайтове е напълно анонимно и ни помага да подобрим приложението!</string>
-    <string name="brokenSiteUrlHint">Въведете URL адрес</string>
-    <string name="brokenSiteDomainLabel">Домейн на повредения сайт:</string>
-    <string name="brokenSiteMessageHint">Кое съдържание или функционалност се нарушава?</string>
-    <string name="brokenSiteSubmitButton">Изпращане на отзиви</string>
     <string name="brokenSiteSubmitted">Благодарим Ви! Изпратена обратна връзка</string>
+    <string name="brokenSitesCategoriesTitle">Опишете проблема:</string>
+    <string name="brokenSitesCategoriesHint">Опишете проблема</string>
+    <string name="brokenSiteSubmitButton">Изпращане на доклад</string>
+    <string name="brokenSiteDescription">Изпращането на анонимен доклад за неработещ сайт ни помага да отстраним грешките и да подобрим приложението.</string>
+
+    <string name="brokenSiteCategoryImages">Изображенията не се зареждат</string>
+    <string name="brokenSiteCategoryPaywall">Сайтът ме помоли да деактивирам</string>
+    <string name="brokenSiteCategoryComments">Коментарите не се зареждат</string>
+    <string name="brokenSiteCategoryVideos">Видеото не се възпроизвежда</string>
+    <string name="brokenSiteCategoryLinks">Връзките или бутоните не работят</string>
+    <string name="brokenSiteCategoryContent">Липсва съдържание</string>
+    <string name="brokenSiteCategoryLogin">Не мога да вляза</string>
+    <string name="brokenSiteCategoryUnsupported">Браузърът е несъвместим</string>
+    <string name="brokenSiteCategoryOther">Нещо друго</string>
 
     <!-- Bookmarks Activity -->
     <string name="bookmarksMenuTitle">Отметки</string>
@@ -344,5 +353,36 @@
     <string name="feedbackInitialDisambiguationHappyButtonContentDescription">Бутон за положителни отзиви</string>
     <string name="feedbackInitialDisambiguationSadButtonContentDescription">Бутон за отрицателни отзиви</string>
     <string name="feedbackIsImportantToUs">Вашите анонимни отзиви са важни за нас.</string>
+
+    <!-- Webview Recovery -->
+    <string name="crashedWebViewErrorMessage">Уеб страницата не може да бъде показана.</string>
+    <string name="crashedWebViewErrorAction">Презареждане</string>
+
+    <!-- System Search -->
+    <string name="systemSearchOmnibarInputHint"><font size="13">Търсене или въвеждане на URL адрес</font></string>
+    <string name="systemSearchDeviceAppLabel">От това устройство</string>
+    <string name="systemSearchAppNotFound">Приложението не може да бъде намерено</string>
+    <string name="systemSearchOnboardingText">Благодарим ви, че избрахте DuckDuckGo!\nС използването на нашата търсачка или приложение, вашите търсения са защитени.</string>
+    <string name="systemSearchOnboardingFeaturesIntroText">Приложението също:</string>
+    <string name="systemSearchOnboardingFeatureOneText">Блокира опасни тракери</string>
+    <string name="systemSearchOnboardingFeatureTwoText">Криптира уебсайтове принудително</string>
+    <string name="systemSearchOnboardingFeatureThreeText">Изчиства данните с едно докосване</string>
+    <string name="systemSearchOnboardingButtonMore">Покажи повече</string>
+    <string name="systemSearchOnboardingButtonLess">Скрий</string>
+    <string name="systemSearchOnboardingButtonOk">Разбрах</string>
+
+    <!-- Dax Dialog -->
+    <string name="daxDialogHideButton">СКРИЙ</string>
+    <string name="daxDialogPhew">Слава Богу!</string>
+    <string name="daxDialogYes">ДОБРЕ!</string>
+    <string name="daxDialogAddWidget">Добави уиджет</string>
+    <string name="daxDialogMaybeLater">Може би по-късно</string>
+    <string name="daxDialogSettings">Отиди в настройки</string>
+    <string name="daxDialogNext">Следващ</string>
+    <string name="daxDialogHighFive">Дай пет!</string>
+    <string name="daxDialogGotIt">Разбрах</string>
+    <string name="hideTipsTitle">Скрий оставащите съвети?</string>
+    <string name="hideTipsText">Само няколко са и се постарахме да са информативни.</string>
+    <string name="hideTipsButton">Скрий съветите за постоянно</string>
 
 </resources>

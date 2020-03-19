@@ -189,4 +189,10 @@ class UriExtensionTest {
         val converted = Uri.parse("https://example.com").toDesktopUri()
         assertEquals("https://example.com", converted.toString())
     }
+
+    @Test
+    fun whenGettingAbsoluteStringThenDoNotReturnQueryParameters() {
+        val absoluteString = Uri.parse("https://example.com/test?q=example/#1/anotherrandomcode").absoluteString
+        assertEquals("https://example.com/test", absoluteString)
+    }
 }

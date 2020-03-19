@@ -59,14 +59,26 @@ class CtaViewModelNextCtaTest {
         supportsStandardWidgetAdd: Boolean,
         hasInstalledWidget: Boolean,
         hasSearchWidgetDaxCtaFeature: Boolean,
-        daxSearchWidgetShown: Boolean
+        daxSearchWidgetShown: Boolean,
+        daxNetworkDialogShown: Boolean,
+        daxTrackersDialogShown: Boolean,
+        daxOtherDialogShown: Boolean
     ) {
         val previousCta = DaxDialogCta.DaxSerpCta(mock(), mock())
         assumeTrue(supportsStandardWidgetAdd)
         assumeFalse(hasInstalledWidget)
         assumeTrue(hasSearchWidgetDaxCtaFeature)
         assumeFalse(daxSearchWidgetShown)
-        givenSearchWidgetScenario(supportsStandardWidgetAdd, hasInstalledWidget, hasSearchWidgetDaxCtaFeature, daxSearchWidgetShown)
+        assumeTrue(daxNetworkDialogShown || daxTrackersDialogShown || daxOtherDialogShown)
+        givenSearchWidgetScenario(
+            supportsStandardWidgetAdd,
+            hasInstalledWidget,
+            hasSearchWidgetDaxCtaFeature,
+            daxSearchWidgetShown,
+            daxNetworkDialogShown,
+            daxTrackersDialogShown,
+            daxOtherDialogShown
+        )
 
         val nextCta = testee.obtainNextCta(previousCta)
 
@@ -78,11 +90,28 @@ class CtaViewModelNextCtaTest {
         supportsStandardWidgetAdd: Boolean,
         hasInstalledWidget: Boolean,
         hasSearchWidgetDaxCtaFeature: Boolean,
-        daxSearchWidgetShown: Boolean
+        daxSearchWidgetShown: Boolean,
+        daxNetworkDialogShown: Boolean,
+        daxTrackersDialogShown: Boolean,
+        daxOtherDialogShown: Boolean
     ) {
         val previousCta = DaxDialogCta.DaxSerpCta(mock(), mock())
-        assumeFalse(supportsStandardWidgetAdd && !hasInstalledWidget && hasSearchWidgetDaxCtaFeature && !daxSearchWidgetShown)
-        givenSearchWidgetScenario(supportsStandardWidgetAdd, hasInstalledWidget, hasSearchWidgetDaxCtaFeature, daxSearchWidgetShown)
+        assumeFalse(
+            supportsStandardWidgetAdd &&
+                    !hasInstalledWidget &&
+                    hasSearchWidgetDaxCtaFeature &&
+                    !daxSearchWidgetShown &&
+                    (daxNetworkDialogShown || daxTrackersDialogShown || daxOtherDialogShown)
+        )
+        givenSearchWidgetScenario(
+            supportsStandardWidgetAdd,
+            hasInstalledWidget,
+            hasSearchWidgetDaxCtaFeature,
+            daxSearchWidgetShown,
+            daxNetworkDialogShown,
+            daxTrackersDialogShown,
+            daxOtherDialogShown
+        )
 
         val nextCta = testee.obtainNextCta(previousCta)
 
@@ -152,7 +181,10 @@ class CtaViewModelNextCtaTest {
         supportsStandardWidgetAdd: Boolean,
         hasInstalledWidget: Boolean,
         hasSearchWidgetDaxCtaFeature: Boolean,
-        daxSearchWidgetShown: Boolean
+        daxSearchWidgetShown: Boolean,
+        daxNetworkDialogShown: Boolean,
+        daxTrackersDialogShown: Boolean,
+        daxOtherDialogShown: Boolean
     ) {
         whenever(mockWidgetCapabilities.supportsStandardWidgetAdd).thenReturn(supportsStandardWidgetAdd)
         whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(hasInstalledWidget)
@@ -160,6 +192,9 @@ class CtaViewModelNextCtaTest {
             Variant("test", features = getFeatures(hasSearchWidgetDaxCtaFeature, false), filterBy = { true })
         )
         whenever(mockDismissedCtaDao.exists(CtaId.DAX_DIALOG_SEARCH_WIDGET)).thenReturn(daxSearchWidgetShown)
+        whenever(mockDismissedCtaDao.exists(CtaId.DAX_DIALOG_NETWORK)).thenReturn(daxNetworkDialogShown)
+        whenever(mockDismissedCtaDao.exists(CtaId.DAX_DIALOG_TRACKERS_FOUND)).thenReturn(daxTrackersDialogShown)
+        whenever(mockDismissedCtaDao.exists(CtaId.DAX_DIALOG_OTHER)).thenReturn(daxOtherDialogShown)
     }
 
     private fun getFeatures(searchWidgetFeature: Boolean, defaultBrowserFeature: Boolean): List<VariantManager.VariantFeature> {
@@ -205,5 +240,17 @@ class CtaViewModelNextCtaTest {
         @JvmStatic
         @DataPoint
         fun daxDefaultBrowserShown() = listOf(true, false)
+
+        @JvmStatic
+        @DataPoint
+        fun daxNetworkDialogShown() = listOf(true, false)
+
+        @JvmStatic
+        @DataPoint
+        fun daxTrackersDialogShown() = listOf(true, false)
+
+        @JvmStatic
+        @DataPoint
+        fun daxOtherDialogShown() = listOf(true, false)
     }
 }

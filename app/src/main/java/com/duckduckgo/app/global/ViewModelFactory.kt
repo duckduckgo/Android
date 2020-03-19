@@ -41,7 +41,11 @@ import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.model.SiteFactory
 import com.duckduckgo.app.global.rating.AppEnjoymentPromptEmitter
 import com.duckduckgo.app.global.rating.AppEnjoymentUserEventRecorder
+import com.duckduckgo.app.icon.api.AppIconModifier
+import com.duckduckgo.app.icon.api.IconModifier
+import com.duckduckgo.app.icon.ui.ChangeIconViewModel
 import com.duckduckgo.app.launch.LaunchViewModel
+import com.duckduckgo.app.notification.NotificationScheduler
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.ui.OnboardingPageManager
 import com.duckduckgo.app.onboarding.ui.OnboardingViewModel
@@ -63,6 +67,8 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.app.survey.db.SurveyDao
 import com.duckduckgo.app.survey.ui.SurveyViewModel
+import com.duckduckgo.app.systemsearch.DeviceAppLookup
+import com.duckduckgo.app.systemsearch.SystemSearchViewModel
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel
 import com.duckduckgo.app.usage.search.SearchCountDao
@@ -85,6 +91,7 @@ class ViewModelFactory @Inject constructor(
     private val bookmarksDao: BookmarksDao,
     private val surveyDao: SurveyDao,
     private val autoCompleteApi: AutoCompleteApi,
+    private val deviceAppLookup: DeviceAppLookup,
     private val appSettingsPreferencesStore: SettingsDataStore,
     private val webViewLongPressHandler: LongPressHandler,
     private val defaultBrowserDetector: DefaultBrowserDetector,
@@ -103,13 +110,16 @@ class ViewModelFactory @Inject constructor(
     private val playStoreUtils: PlayStoreUtils,
     private val feedbackSubmitter: FeedbackSubmitter,
     private val onboardingPageManager: OnboardingPageManager,
-    private val appInstallationReferrerStateListener: AppInstallationReferrerStateListener
+    private val appInstallationReferrerStateListener: AppInstallationReferrerStateListener,
+    private val appIconModifier: IconModifier,
+    private val notificationScheduler: NotificationScheduler
 ) : ViewModelProvider.NewInstanceFactory() {
 
     override fun <T : ViewModel> create(modelClass: Class<T>) =
         with(modelClass) {
             when {
                 isAssignableFrom(LaunchViewModel::class.java) -> LaunchViewModel(onboardingStore, appInstallationReferrerStateListener)
+                isAssignableFrom(SystemSearchViewModel::class.java) -> SystemSearchViewModel(onboardingStore, autoCompleteApi, deviceAppLookup, pixel)
                 isAssignableFrom(OnboardingViewModel::class.java) -> onboardingViewModel()
                 isAssignableFrom(BrowserViewModel::class.java) -> browserViewModel()
                 isAssignableFrom(BrowserTabViewModel::class.java) -> browserTabViewModel()
@@ -130,6 +140,7 @@ class ViewModelFactory @Inject constructor(
                 isAssignableFrom(BrokenSiteNegativeFeedbackViewModel::class.java) -> BrokenSiteNegativeFeedbackViewModel()
                 isAssignableFrom(TrackerBlockingSelectionViewModel::class.java) -> TrackerBlockingSelectionViewModel(privacySettingsStore)
                 isAssignableFrom(DefaultBrowserPageViewModel::class.java) -> defaultBrowserPage()
+                isAssignableFrom(ChangeIconViewModel::class.java) -> changeAppIconViewModel()
 
                 else -> throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")
             }
@@ -144,7 +155,8 @@ class ViewModelFactory @Inject constructor(
             appSettingsPreferencesStore,
             defaultBrowserDetector,
             variantManager,
-            pixel
+            pixel,
+            notificationScheduler
         )
     }
 
@@ -174,7 +186,7 @@ class ViewModelFactory @Inject constructor(
         tabRepository = tabRepository,
         networkLeaderboardDao = networkLeaderboardDao,
         bookmarksDao = bookmarksDao,
-        autoCompleteApi = autoCompleteApi,
+        autoComplete = autoCompleteApi,
         appSettingsPreferencesStore = appSettingsPreferencesStore,
         longPressHandler = webViewLongPressHandler,
         webViewSessionStorage = webViewSessionStorage,
@@ -188,4 +200,6 @@ class ViewModelFactory @Inject constructor(
         pixel = pixel,
         variantManager = variantManager
     )
+
+    private fun changeAppIconViewModel() = ChangeIconViewModel(settingsDataStore = appSettingsPreferencesStore, appIconModifier = appIconModifier, pixel = pixel)
 }

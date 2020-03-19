@@ -1,6 +1,7 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
 
     <string name="duckDuckGoLogoDescription">Logoul DuckDuckGo</string>
+    <string name="duckDuckGoPrivacySimplified">Despre confidențialitate, pe scurt.</string>
     <string name="yes">Da</string>
     <string name="no">Nu</string>
 
@@ -167,7 +168,6 @@
 
     <!-- About Activity -->
     <string name="aboutActivityTitle">Despre noi</string>
-    <string name="aboutHeading">Despre confidențialitate, pe scurt.</string>
     <string name="aboutDescription">
         Aici, la DuckDuckGo, stabilim noul standard de încredere online.\n\ DuckDuckGo Privacy Browser oferă toate elementele esențiale de confidențialitate de care aveți nevoie pentru a vă proteja în timp ce căutați și navigați pe web, inclusiv blocarea cookie-urilor de urmărire, criptare mai inteligentă și căutare privată DuckDuckGo.\n\ La urma urmei, internetul nu ar trebui să fie perceput atât de ciudat, iar obținerea confidențialității pe care o meritați online ar trebui să fie la fel de simplă ca a trage perdeaua.</string>
     <string name="aboutMoreLink">Aflați mai multe la duckduckgo.com/about</string>
@@ -176,12 +176,21 @@
     <!-- Broken Site Activity -->
     <string name="brokenSiteReportBrokenSiteMenuItem">Raportare site defect</string>
     <string name="brokenSiteHeading">Raportare site defect</string>
-    <string name="brokenSiteModalDescription">Raportarea site-ului defect este complet anonimă și ne ajută să îmbunătățim aplicația!</string>
-    <string name="brokenSiteUrlHint">Introduceți URL-ul</string>
-    <string name="brokenSiteDomainLabel">Domeniul site-ului defect:</string>
-    <string name="brokenSiteMessageHint">Ce conținut sau funcție se întrerupe?</string>
-    <string name="brokenSiteSubmitButton">Trimitere feedback</string>
     <string name="brokenSiteSubmitted">Vă mulțumim! Feedback trimis</string>
+    <string name="brokenSitesCategoriesTitle">Descrie ce s-a întâmplat:</string>
+    <string name="brokenSitesCategoriesHint">Descrie ce s-a întâmplat</string>
+    <string name="brokenSiteSubmitButton">Trimite Raportul</string>
+    <string name="brokenSiteDescription">Trimiterea unui raport anonim al unui site care nu funcționează ne ajută să corectăm aceste probleme și să îmbunătățim aplicația.</string>
+
+    <string name="brokenSiteCategoryImages">Imaginile nu s-au încărcat</string>
+    <string name="brokenSiteCategoryPaywall">Site-ul mi-a cerut să dezactivez</string>
+    <string name="brokenSiteCategoryComments">Comentariile nu s-au încărcat</string>
+    <string name="brokenSiteCategoryVideos">Videoclipul nu s-a redat</string>
+    <string name="brokenSiteCategoryLinks">Linkurile sau butoanele nu funcționează</string>
+    <string name="brokenSiteCategoryContent">Conținutul lipsește</string>
+    <string name="brokenSiteCategoryLogin">Nu mă pot autentifica</string>
+    <string name="brokenSiteCategoryUnsupported">Browserul este incompatibil</string>
+    <string name="brokenSiteCategoryOther">Altceva</string>
 
     <!-- Bookmarks Activity -->
     <string name="bookmarksMenuTitle">Semne de carte</string>
@@ -348,5 +357,36 @@
     <string name="feedbackInitialDisambiguationHappyButtonContentDescription">Buton feedback pozitiv</string>
     <string name="feedbackInitialDisambiguationSadButtonContentDescription">Buton feedback negativ</string>
     <string name="feedbackIsImportantToUs">Feedbackul dvs. anonim este important pentru noi.</string>
+
+    <!-- Webview Recovery -->
+    <string name="crashedWebViewErrorMessage">Pagina web nu a putut fi afișată.</string>
+    <string name="crashedWebViewErrorAction">Reîncarcă</string>
+
+    <!-- System Search -->
+    <string name="systemSearchOmnibarInputHint"><font size="13">Căutare sau tastare URL</font></string>
+    <string name="systemSearchDeviceAppLabel">De pe acest dispozitiv</string>
+    <string name="systemSearchAppNotFound">Aplicația nu a fost găsită</string>
+    <string name="systemSearchOnboardingText">Mulțumim pentru că ai ales DuckDuckGo!\nAcum, atunci când utilizezi căutarea sau aplicația noastră, căutările tale sunt protejate.</string>
+    <string name="systemSearchOnboardingFeaturesIntroText">De asemenea aplicația DuckDuckGo:</string>
+    <string name="systemSearchOnboardingFeatureOneText">Blochează urmăritoriinesiguri</string>
+    <string name="systemSearchOnboardingFeatureTwoText">Forțează criptarea pe site-uri web</string>
+    <string name="systemSearchOnboardingFeatureThreeText">Șterge datele cu o singură atingere</string>
+    <string name="systemSearchOnboardingButtonMore">Arată mai multe</string>
+    <string name="systemSearchOnboardingButtonLess">Ascunde</string>
+    <string name="systemSearchOnboardingButtonOk">Am înțeles</string>
+
+    <!-- Dax Dialog -->
+    <string name="daxDialogHideButton">ASCUNDE</string>
+    <string name="daxDialogPhew">Pfiu!</string>
+    <string name="daxDialogYes">OK!</string>
+    <string name="daxDialogAddWidget">Adaugă Widget</string>
+    <string name="daxDialogMaybeLater">Poate Mai Târziu</string>
+    <string name="daxDialogSettings">Mergi la setări</string>
+    <string name="daxDialogNext">Următorul</string>
+    <string name="daxDialogHighFive">Bate Palma!</string>
+    <string name="daxDialogGotIt">Am înțeles</string>
+    <string name="hideTipsTitle">Ascunzi sfaturile rămase?</string>
+    <string name="hideTipsText">Sunt doar câteva, iar noi am încercat să le facem informative.</string>
+    <string name="hideTipsButton">Ascunde sfaturile definitiv</string>
 
 </resources>

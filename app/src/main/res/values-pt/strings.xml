@@ -1,6 +1,7 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
 
     <string name="duckDuckGoLogoDescription">Logótipo do DuckDuckGo</string>
+    <string name="duckDuckGoPrivacySimplified">Privacidade, simplificada.</string>
     <string name="yes">Sim</string>
     <string name="no">Não</string>
 
@@ -163,7 +164,6 @@
 
     <!-- About Activity -->
     <string name="aboutActivityTitle">Sobre nós</string>
-    <string name="aboutHeading">Privacidade, simplificada.</string>
     <string name="aboutDescription">
         No DuckDuckGo, estamos a definir o novo padrão de confiança online.\n\ O Navegador de Privacidade DuckDuckGo fornece todos os elementos essenciais de privacidade de que necessita para se proteger enquanto pesquisa e navega na Web, incluindo bloqueio de rastreadores, encriptação mais inteligente e pesquisa privada DuckDuckGo.\n\ Afinal de contas, a Internet não deve ser tão assustadora, e obter a privacidade que merece online deve ser tão simples como fechar as persianas.</string>
     <string name="aboutMoreLink">Mais em duckduckgo.com/about</string>
@@ -172,12 +172,21 @@
     <!-- Broken Site Activity -->
     <string name="brokenSiteReportBrokenSiteMenuItem">Denunciar falha no site</string>
     <string name="brokenSiteHeading">Denunciar uma falha no site</string>
-    <string name="brokenSiteModalDescription">A comunicação de falhas em sites é totalmente anónima e ajuda-nos a melhorar a aplicação!</string>
-    <string name="brokenSiteUrlHint">Introduzir URL</string>
-    <string name="brokenSiteDomainLabel">Domínio de site com falha:</string>
-    <string name="brokenSiteMessageHint">Que conteúdo ou funcionalidade está com falhas?</string>
-    <string name="brokenSiteSubmitButton">Submeter comentários</string>
     <string name="brokenSiteSubmitted">Obrigado! Comentário enviado</string>
+    <string name="brokenSitesCategoriesTitle">Descreva o que aconteceu:</string>
+    <string name="brokenSitesCategoriesHint">Descrever o que aconteceu</string>
+    <string name="brokenSiteSubmitButton">Enviar relatório</string>
+    <string name="brokenSiteDescription">O envio de um relatório anónimo de site com problemas ajuda-nos a depurar e a melhorar a aplicação.</string>
+
+    <string name="brokenSiteCategoryImages">As imagens não foram carregadas</string>
+    <string name="brokenSiteCategoryPaywall">O site pediu-me para desativar</string>
+    <string name="brokenSiteCategoryComments">Os comentários não foram carregados</string>
+    <string name="brokenSiteCategoryVideos">O vídeo não foi reproduzido</string>
+    <string name="brokenSiteCategoryLinks">Os links ou botões não funcionam</string>
+    <string name="brokenSiteCategoryContent">Falta conteúdo</string>
+    <string name="brokenSiteCategoryLogin">Não consigo iniciar sessão</string>
+    <string name="brokenSiteCategoryUnsupported">O navegador é incompatível</string>
+    <string name="brokenSiteCategoryOther">Outra coisa</string>
 
     <!-- Bookmarks Activity -->
     <string name="bookmarksMenuTitle">Marcadores</string>
@@ -343,6 +352,37 @@
     <string name="feedbackInitialDisambiguationSubtitle">Como classificaria os seus comentários?</string>
     <string name="feedbackInitialDisambiguationHappyButtonContentDescription">Botão de comentário positivo</string>
     <string name="feedbackInitialDisambiguationSadButtonContentDescription">Botão de comentário negativo</string>
-    <string name="feedbackIsImportantToUs">Os seus comentários anónimos são importantes para nós.</string>
+    <string name="feedbackIsImportantToUs">Os seus comentários anônimos são importantes para nós.</string>
+
+    <!-- Webview Recovery -->
+    <string name="crashedWebViewErrorMessage">Não foi possível exibir a página web.</string>
+    <string name="crashedWebViewErrorAction">Recarregar</string>
+
+    <!-- System Search -->
+    <string name="systemSearchOmnibarInputHint"><font size="13">Pesquisar ou escrever URL</font></string>
+    <string name="systemSearchDeviceAppLabel">Deste dispositivo</string>
+    <string name="systemSearchAppNotFound">Não foi possível encontrar a aplicação</string>
+    <string name="systemSearchOnboardingText">Obrigado por escolher o DuckDuckGo!\nAgora as suas pesquisas estão protegidas ao usar a nossa pesquisa ou aplicação.</string>
+    <string name="systemSearchOnboardingFeaturesIntroText">A aplicação DuckDuckGo também:</string>
+    <string name="systemSearchOnboardingFeatureOneText">Bloqueia rastreadores inseguros</string>
+    <string name="systemSearchOnboardingFeatureTwoText">Força a encriptação em sites</string>
+    <string name="systemSearchOnboardingFeatureThreeText">Limpa dados com um toque</string>
+    <string name="systemSearchOnboardingButtonMore">Mostrar mais</string>
+    <string name="systemSearchOnboardingButtonLess">Ocultar</string>
+    <string name="systemSearchOnboardingButtonOk">Entendi</string>
+
+    <!-- Dax Dialog -->
+    <string name="daxDialogHideButton">OCULTAR</string>
+    <string name="daxDialogPhew">Ufa!</string>
+    <string name="daxDialogYes">OK!</string>
+    <string name="daxDialogAddWidget">Adicionar Widget</string>
+    <string name="daxDialogMaybeLater">Talvez mais tarde</string>
+    <string name="daxDialogSettings">Vá às definições</string>
+    <string name="daxDialogNext">Seguinte</string>
+    <string name="daxDialogHighFive">High Five!</string>
+    <string name="daxDialogGotIt">Entendi</string>
+    <string name="hideTipsTitle">Ocultar as dicas restantes?</string>
+    <string name="hideTipsText">Há apenas algumas, e tentamos torná-las informativas.</string>
+    <string name="hideTipsButton">Ocultar dicas para sempre</string>
 
 </resources>

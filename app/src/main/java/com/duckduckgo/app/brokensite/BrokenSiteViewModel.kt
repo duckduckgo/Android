@@ -16,79 +16,105 @@
 
 package com.duckduckgo.app.brokensite
 
+import android.net.Uri
+import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.duckduckgo.app.brokensite.api.BrokenSiteSender
+import com.duckduckgo.app.brokensite.model.BrokenSite
+import com.duckduckgo.app.brokensite.model.BrokenSiteCategory
+import com.duckduckgo.app.brokensite.model.BrokenSiteCategory.*
 import com.duckduckgo.app.global.SingleLiveEvent
+import com.duckduckgo.app.global.absoluteString
+import com.duckduckgo.app.global.isMobileSite
 import com.duckduckgo.app.statistics.pixels.Pixel
-
 
 class BrokenSiteViewModel(private val pixel: Pixel, private val brokenSiteSender: BrokenSiteSender) : ViewModel() {
 
     data class ViewState(
-        val url: String? = null,
-        val message: String? = null,
+        val indexSelected: Int = -1,
+        val categorySelected: BrokenSiteCategory? = null,
         val submitAllowed: Boolean = false
     )
 
     sealed class Command {
-        object FocusUrl : Command()
-        object FocusMessage : Command()
         object ConfirmAndFinish : Command()
     }
 
     val viewState: MutableLiveData<ViewState> = MutableLiveData()
     val command: SingleLiveEvent<Command> = SingleLiveEvent()
-
+    var indexSelected = -1
+    val categories: List<BrokenSiteCategory> = listOf(
+        ImagesCategory,
+        PaywallCategory,
+        CommentsCategory,
+        VideosCategory,
+        LinksCategory,
+        ContentCategory,
+        LoginCategory,
+        UnsupportedCategory,
+        OtherCategory
+    )
+    private var blockedTrackers: String = ""
+    private var surrogates: String = ""
+    private var url: String = ""
+    private var upgradedHttps: Boolean = false
     private val viewValue: ViewState get() = viewState.value!!
 
     init {
         viewState.value = ViewState()
     }
 
-    fun setInitialBrokenSite(url: String?) {
-        onBrokenSiteUrlChanged(url)
-
-        if (viewValue.url.isNullOrBlank()) {
-            command.value = Command.FocusUrl
-        } else {
-            command.value = Command.FocusMessage
-        }
+    fun setInitialBrokenSite(url: String, blockedTrackers: String, surrogates: String, upgradedHttps: Boolean) {
+        this.url = url
+        this.blockedTrackers = blockedTrackers
+        this.upgradedHttps = upgradedHttps
+        this.surrogates = surrogates
     }
 
-    fun onBrokenSiteUrlChanged(newUrl: String?) {
+    fun onCategoryIndexChanged(newIndex: Int) {
+        indexSelected = newIndex
+    }
+
+    fun onCategorySelectionCancelled() {
+        indexSelected = viewState.value?.indexSelected ?: -1
+    }
+
+    fun onCategoryAccepted() {
         viewState.value = viewState.value?.copy(
-            url = newUrl,
-            submitAllowed = canSubmit(newUrl, viewValue.message)
+            indexSelected = indexSelected,
+            categorySelected = categories.elementAtOrNull(indexSelected),
+            submitAllowed = canSubmit()
         )
     }
 
-    fun onFeedbackMessageChanged(newMessage: String?) {
-        viewState.value = viewState.value?.copy(
-            message = newMessage,
-            submitAllowed = canSubmit(viewValue.url, newMessage)
-        )
-    }
-
-    private fun canSubmit(url: String?, feedbackMessage: String?): Boolean {
-
-        if (feedbackMessage.isNullOrBlank()) {
-            return false
-        }
-
-        if (url.isNullOrBlank()) {
-            return false
-        }
-
-        return true
-    }
-
-    fun onSubmitPressed() {
-        val message = viewValue.message ?: return
-        val url = viewValue.url ?: return
-
-        brokenSiteSender.submitBrokenSiteFeedback(message, url)
-        pixel.fire(Pixel.PixelName.BROKEN_SITE_REPORTED, mapOf(Pixel.PixelParameter.URL to url))
+    fun onSubmitPressed(webViewVersion: String) {
+        val brokenSite = getBrokenSite(url, webViewVersion)
+        brokenSiteSender.submitBrokenSiteFeedback(brokenSite)
+        pixel.fire(Pixel.PixelName.BROKEN_SITE_REPORTED, mapOf(Pixel.PixelParameter.URL to brokenSite.siteUrl))
         command.value = Command.ConfirmAndFinish
+    }
+
+    @VisibleForTesting
+    fun getBrokenSite(url: String, webViewVersion: String): BrokenSite {
+        val category = categories[viewValue.indexSelected]
+        val absoluteUrl = Uri.parse(url).absoluteString
+        return BrokenSite(
+            category = category.key,
+            siteUrl = absoluteUrl,
+            upgradeHttps = upgradedHttps,
+            blockedTrackers = blockedTrackers,
+            surrogates = surrogates,
+            webViewVersion = webViewVersion,
+            siteType = if (Uri.parse(url).isMobileSite) MOBILE_SITE else DESKTOP_SITE
+        )
+    }
+
+    private fun canSubmit(): Boolean = categories.elementAtOrNull(indexSelected) != null
+
+    companion object {
+        const val WEBVIEW_UNKNOWN_VERSION = "unknown"
+        const val MOBILE_SITE = "mobile"
+        const val DESKTOP_SITE = "desktop"
     }
 }

@@ -32,8 +32,9 @@ import com.duckduckgo.app.feedback.ui.negative.openended.ShareOpenEndedFeedbackF
 import com.duckduckgo.app.feedback.ui.negative.subreason.SubReasonNegativeFeedbackFragment
 import com.duckduckgo.app.feedback.ui.positive.initial.PositiveFeedbackLandingFragment
 import com.duckduckgo.app.fire.FireActivity
+import com.duckduckgo.app.icon.ui.ChangeIconActivity
 import com.duckduckgo.app.job.AppConfigurationJobService
-import com.duckduckgo.app.launch.LaunchActivity
+import com.duckduckgo.app.launch.LaunchBridgeActivity
 import com.duckduckgo.app.notification.NotificationHandlerService
 import com.duckduckgo.app.onboarding.ui.OnboardingActivityExperiment
 import com.duckduckgo.app.onboarding.ui.page.DefaultBrowserPage
@@ -43,6 +44,7 @@ import com.duckduckgo.app.privacy.ui.ScorecardActivity
 import com.duckduckgo.app.privacy.ui.TrackerNetworksActivity
 import com.duckduckgo.app.settings.SettingsActivity
 import com.duckduckgo.app.survey.ui.SurveyActivity
+import com.duckduckgo.app.systemsearch.SystemSearchActivity
 import com.duckduckgo.app.tabs.ui.TabSwitcherActivity
 import com.duckduckgo.app.widget.ui.AddWidgetInstructionsActivity
 import dagger.Module
@@ -56,11 +58,15 @@ abstract class AndroidBindingModule {
 
     @ActivityScoped
     @ContributesAndroidInjector
-    abstract fun launchActivity(): LaunchActivity
+    abstract fun launchActivity(): LaunchBridgeActivity
 
     @ActivityScoped
     @ContributesAndroidInjector
     abstract fun onboardingActivityExperiment(): OnboardingActivityExperiment
+
+    @ActivityScoped
+    @ContributesAndroidInjector
+    abstract fun systemSearchActivity(): SystemSearchActivity
 
     @ActivityScoped
     @ContributesAndroidInjector
@@ -117,6 +123,10 @@ abstract class AndroidBindingModule {
     @ActivityScoped
     @ContributesAndroidInjector
     abstract fun aboutDuckDuckGoActivity(): AboutDuckDuckGoActivity
+
+    @ActivityScoped
+    @ContributesAndroidInjector
+    abstract fun changeAppIconActivity(): ChangeIconActivity
 
     /* Fragments */
 

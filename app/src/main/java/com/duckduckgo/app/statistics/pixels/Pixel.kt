@@ -53,6 +53,7 @@ interface Pixel {
         WEB_RENDERER_GONE_CRASH("m_d_wrg_c"),
         WEB_RENDERER_GONE_KILLED("m_d_wrg_k"),
         BROKEN_SITE_REPORTED("m_bsr"),
+        BROKEN_SITE_REPORT("epbf"),
 
         ONBOARDING_DEFAULT_BROWSER_VISUALIZED("m_odb_v"),
         ONBOARDING_DEFAULT_BROWSER_LAUNCHED("m_odb_l"),
@@ -93,7 +94,18 @@ interface Pixel {
         WIDGET_LEGACY_CTA_DISMISSED("m_wlc_d"),
         WIDGETS_ADDED(pixelName = "m_w_a"),
         WIDGETS_DELETED(pixelName = "m_w_d"),
-        WIDGET_LAUNCHED(pixelName = "m_w_l"),
+
+        APP_NOTIFICATION_LAUNCH(pixelName = "m_n_l"),
+        APP_WIDGET_LAUNCH(pixelName = "m_w_l"),
+        APP_ASSIST_LAUNCH(pixelName = "m_a_l"),
+        APP_SYSTEM_SEARCH_BOX_LAUNCH(pixelName = "m_ssb_l"),
+        INTERSTITIAL_LAUNCH_BROWSER_QUERY(pixelName = "m_i_lbq"),
+        INTERSTITIAL_LAUNCH_DEVICE_APP(pixelName = "m_i_sda"),
+        INTERSTITIAL_LAUNCH_DAX(pixelName = "m_i_ld"),
+        INTERSTITIAL_ONBOARDING_SHOWN(pixelName = "m_io_s"),
+        INTERSTITIAL_ONBOARDING_DISMISSED(pixelName = "m_io_d"),
+        INTERSTITIAL_ONBOARDING_LESS_PRESSED(pixelName = "m_io_l"),
+        INTERSTITIAL_ONBOARDING_MORE_PRESSED(pixelName = "m_io_m"),
 
         LONG_PRESS("mlp"),
         LONG_PRESS_DOWNLOAD_IMAGE("mlp_i"),
@@ -149,7 +161,17 @@ interface Pixel {
         FEEDBACK_NEGATIVE_SUBMISSION("mfbs_%s_%s_%s"),
 
         AUTOCOMPLETE_BOOKMARK_SELECTION("m_aut_s_b"),
-        AUTOCOMPLETE_SEARCH_SELECTION("m_aut_s_s")
+        AUTOCOMPLETE_SEARCH_SELECTION("m_aut_s_s"),
+
+        CHANGE_APP_ICON_OPENED("m_ic"),
+
+        QUICK_SEARCH_PROMPT_NOTIFICATION_SHOWN("m_qs_pn_s"),
+        QUICK_SEARCH_PROMPT_NOTIFICATION_LAUNCHED("m_qs_pn_l"),
+        QUICK_SEARCH_PROMPT_NOTIFICATION_KEEP("m_qs_pn_k"),
+        QUICK_SEARCH_PROMPT_NOTIFICATION_REMOVE("m_qs_pn_r"),
+        QUICK_SEARCH_NOTIFICATION_ENABLED("m_qs_sn_e"),
+        QUICK_SEARCH_NOTIFICATION_DISABLED("m_qs_sn_d"),
+        QUICK_SEARCH_NOTIFICATION_LAUNCHED("m_qs_sn_l")
     }
 
     object PixelParameter {
@@ -184,9 +206,9 @@ interface Pixel {
         const val DAX_NO_TRACKERS_CTA = "nt"
     }
 
-    fun fire(pixel: PixelName, parameters: Map<String, String?> = emptyMap())
-    fun fire(pixelName: String, parameters: Map<String, String?> = emptyMap())
-    fun fireCompletable(pixelName: String, parameters: Map<String, String?>): Completable
+    fun fire(pixel: PixelName, parameters: Map<String, String> = emptyMap(), encodedParameters: Map<String, String> = emptyMap())
+    fun fire(pixelName: String, parameters: Map<String, String> = emptyMap(), encodedParameters: Map<String, String> = emptyMap())
+    fun fireCompletable(pixelName: String, parameters: Map<String, String>, encodedParameters: Map<String, String> = emptyMap()): Completable
 }
 
 class ApiBasedPixel @Inject constructor(
@@ -196,24 +218,24 @@ class ApiBasedPixel @Inject constructor(
     private val deviceInfo: DeviceInfo
 ) : Pixel {
 
-    override fun fire(pixel: PixelName, parameters: Map<String, String?>) {
-        fire(pixel.pixelName, parameters)
+    override fun fire(pixel: PixelName, parameters: Map<String, String>, encodedParameters: Map<String, String>) {
+        fire(pixel.pixelName, parameters, encodedParameters)
     }
 
-    override fun fire(pixelName: String, parameters: Map<String, String?>) {
-        fireCompletable(pixelName, parameters)
+    override fun fire(pixelName: String, parameters: Map<String, String>, encodedParameters: Map<String, String>) {
+        fireCompletable(pixelName, parameters, encodedParameters)
             .subscribeOn(Schedulers.io())
             .subscribe({
-                Timber.v("Pixel sent: $pixelName with params: $parameters")
+                Timber.v("Pixel sent: $pixelName with params: $parameters $encodedParameters")
             }, {
-                Timber.w("Pixel failed: $pixelName with params: $parameters")
+                Timber.w(it, "Pixel failed: $pixelName with params: $parameters $encodedParameters")
             })
     }
 
-    override fun fireCompletable(pixelName: String, parameters: Map<String, String?>): Completable {
+    override fun fireCompletable(pixelName: String, parameters: Map<String, String>, encodedParameters: Map<String, String>): Completable {
         val defaultParameters = mapOf(PixelParameter.APP_VERSION to deviceInfo.appVersion)
         val fullParameters = defaultParameters.plus(parameters)
         val atb = statisticsDataStore.atb?.formatWithVariant(variantManager.getVariant()) ?: ""
-        return api.fire(pixelName, deviceInfo.formFactor().description, atb, fullParameters)
+        return api.fire(pixelName, deviceInfo.formFactor().description, atb, fullParameters, encodedParameters)
     }
 }

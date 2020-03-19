@@ -196,13 +196,6 @@ class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope() {
             Toast.makeText(applicationContext, R.string.fireDataCleared, Toast.LENGTH_LONG).show()
         }
 
-        if (launchedFromWidget(intent)) {
-            Timber.w("new tab requested from widget")
-            pixel.fire(Pixel.PixelName.WIDGET_LAUNCHED)
-            launch { viewModel.onNewTabRequested() }
-            return
-        }
-
         if (launchNewSearch(intent)) {
             Timber.w("new tab requested")
             launch { viewModel.onNewTabRequested() }
@@ -264,12 +257,8 @@ class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope() {
         }
     }
 
-    private fun launchedFromWidget(intent: Intent): Boolean {
-        return intent.getBooleanExtra(WIDGET_SEARCH_EXTRA, false)
-    }
-
     private fun launchNewSearch(intent: Intent): Boolean {
-        return intent.getBooleanExtra(NEW_SEARCH_EXTRA, false) || intent.action == Intent.ACTION_ASSIST || intent.action == NEW_SEARCH_ACTION
+        return intent.getBooleanExtra(NEW_SEARCH_EXTRA, false)
     }
 
     fun launchPrivacyDashboard() {
@@ -305,11 +294,6 @@ class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope() {
         }
     }
 
-    fun launchBrokenSiteFeedback(url: String?) {
-        val options = ActivityOptions.makeSceneTransitionAnimation(this).toBundle()
-        startActivity(BrokenSiteActivity.intent(this, url), options)
-    }
-
     fun launchSettings() {
         startActivity(SettingsActivity.intent(this))
     }
@@ -338,20 +322,16 @@ class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope() {
             context: Context,
             queryExtra: String? = null,
             newSearch: Boolean = false,
-            widgetSearch: Boolean = false,
             launchedFromFireAction: Boolean = false
         ): Intent {
             val intent = Intent(context, BrowserActivity::class.java)
             intent.putExtra(EXTRA_TEXT, queryExtra)
             intent.putExtra(NEW_SEARCH_EXTRA, newSearch)
-            intent.putExtra(WIDGET_SEARCH_EXTRA, widgetSearch)
             intent.putExtra(LAUNCHED_FROM_FIRE_EXTRA, launchedFromFireAction)
             return intent
         }
 
-        const val NEW_SEARCH_ACTION = "com.duckduckgo.mobile.android.NEW_SEARCH"
         const val NEW_SEARCH_EXTRA = "NEW_SEARCH_EXTRA"
-        const val WIDGET_SEARCH_EXTRA = "WIDGET_SEARCH_EXTRA"
         const val PERFORM_FIRE_ON_ENTRY_EXTRA = "PERFORM_FIRE_ON_ENTRY_EXTRA"
         const val LAUNCHED_FROM_FIRE_EXTRA = "LAUNCHED_FROM_FIRE_EXTRA"
         const val LAUNCH_FROM_DEFAULT_BROWSER_DIALOG = "LAUNCH_FROM_DEFAULT_BROWSER_DIALOG"

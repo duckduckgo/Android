@@ -1,6 +1,7 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
 
     <string name="duckDuckGoLogoDescription">Logo DuckDuckGo</string>
+    <string name="duckDuckGoPrivacySimplified">Ochrana soukromí, zjednodušená.</string>
     <string name="yes">Ano</string>
     <string name="no">Ne</string>
 
@@ -167,7 +168,6 @@
 
     <!-- About Activity -->
     <string name="aboutActivityTitle">O nás</string>
-    <string name="aboutHeading">Ochrana soukromí, zjednodušená.</string>
     <string name="aboutDescription">
         V DuckDuckGo přinášíme nový standard důvěry online.\n\ DuckDuckGo Privacy Browser poskytuje všechny základní prvky soukromí, které potřebujete k ochraně při vyhledávání a prohlížení webu, včetně blokování sledovacích zařízení, chytřejšího šifrování a soukromého vyhledávání DuckDuckGo.\n\ Internet by v konečném důsledku neměl být tak nebezpečný a získat soukromí, které si zasloužíte online, by mělo být stejně jednoduché jako zatáhnout žaluzie.</string>
     <string name="aboutMoreLink">Více na duckduckgo.com/about</string>
@@ -176,12 +176,21 @@
     <!-- Broken Site Activity -->
     <string name="brokenSiteReportBrokenSiteMenuItem">Nahlásit poškozené stránky</string>
     <string name="brokenSiteHeading">Nahlásit poškozenou stránku</string>
-    <string name="brokenSiteModalDescription">Přehledy poškozených stránek jsou zcela anonymní a pomáhají nám vylepšovat aplikaci!</string>
-    <string name="brokenSiteUrlHint">Zadejte URL</string>
-    <string name="brokenSiteDomainLabel">Doména poškozených stránek:</string>
-    <string name="brokenSiteMessageHint">Který obsah nebo funkce jsou poškozeny?</string>
-    <string name="brokenSiteSubmitButton">Odeslat zpětnou vazbu</string>
     <string name="brokenSiteSubmitted">Děkujeme! Zpětná vazba odeslána</string>
+    <string name="brokenSitesCategoriesTitle">Popište, co se stalo:</string>
+    <string name="brokenSitesCategoriesHint">Popište, co se stalo</string>
+    <string name="brokenSiteSubmitButton">Poslat zprávu</string>
+    <string name="brokenSiteDescription">Odeslání anonymní zprávy o nefunkčním webu nám pomůže tyto problémy řešit a vylepšovat aplikaci.</string>
+
+    <string name="brokenSiteCategoryImages">Obrázky nebyly načteny</string>
+    <string name="brokenSiteCategoryPaywall">Tato stránka mě požádala o deaktivaci</string>
+    <string name="brokenSiteCategoryComments">Komentáře nebyly načteny</string>
+    <string name="brokenSiteCategoryVideos">Video nebylo přehráno</string>
+    <string name="brokenSiteCategoryLinks">Odkazy nebo tlačítka nefungují</string>
+    <string name="brokenSiteCategoryContent">Chybí obsah</string>
+    <string name="brokenSiteCategoryLogin">Nemohu se přihlásit</string>
+    <string name="brokenSiteCategoryUnsupported">Prohlížeč je nekompatibilní</string>
+    <string name="brokenSiteCategoryOther">Něco jiného</string>
 
     <!-- Bookmarks Activity -->
     <string name="bookmarksMenuTitle">Záložky</string>
@@ -348,5 +357,36 @@
     <string name="feedbackInitialDisambiguationHappyButtonContentDescription">Tlačítko pozitivní zpětné vazby</string>
     <string name="feedbackInitialDisambiguationSadButtonContentDescription">Tlačítko negativní zpětné vazby</string>
     <string name="feedbackIsImportantToUs">Vaše anonymní zpětná vazba je pro nás důležitá.</string>
+
+    <!-- Webview Recovery -->
+    <string name="crashedWebViewErrorMessage">Tuto webovou stránku nelze zobrazit.</string>
+    <string name="crashedWebViewErrorAction">Načíst znovu</string>
+
+    <!-- System Search-->
+    <string name="systemSearchOmnibarInputHint"><font size="13">Vyhledat nebo zadat URL</font></string>
+    <string name="systemSearchDeviceAppLabel">Z tohoto zařízení</string>
+    <string name="systemSearchAppNotFound">Aplikace nebyla nalezena</string>
+    <string name="systemSearchOnboardingText">Děkujeme, že jste si vybrali DuckDuckGo!\nPři použití našeho vyhledávání nebo aplikace jsou od teď Vaše vyhledávání chráněna.</string>
+    <string name="systemSearchOnboardingFeaturesIntroText">Aplikace DuckDuckGo také:</string>
+    <string name="systemSearchOnboardingFeatureOneText">Blokuje nebezpečné sledovače</string>
+    <string name="systemSearchOnboardingFeatureTwoText">Vynutí šifrování na webových stránkách</string>
+    <string name="systemSearchOnboardingFeatureThreeText">Vymaže data jedním klepnutím</string>
+    <string name="systemSearchOnboardingButtonMore">Zobrazit více</string>
+    <string name="systemSearchOnboardingButtonLess">Skrýt</string>
+    <string name="systemSearchOnboardingButtonOk">Mám to</string>
+
+    <!-- Dax Dialog -->
+    <string name="daxDialogHideButton">SKRÝT</string>
+    <string name="daxDialogPhew">Pche!</string>
+    <string name="daxDialogYes">OK!</string>
+    <string name="daxDialogAddWidget">Přidat widget</string>
+    <string name="daxDialogMaybeLater">Možná později</string>
+    <string name="daxDialogSettings">Přejít na nastavení</string>
+    <string name="daxDialogNext">Další</string>
+    <string name="daxDialogHighFive">Plácnutí!</string>
+    <string name="daxDialogGotIt">Mám to</string>
+    <string name="hideTipsTitle">Skrýt zbývající tipy?</string>
+    <string name="hideTipsText">Je jich jen pár a snažili jsme se udělat je informativní.</string>
+    <string name="hideTipsButton">Navždy skrýt tipy</string>
 
 </resources>

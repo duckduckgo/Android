@@ -22,6 +22,7 @@ import android.view.View
 import android.webkit.ValueCallback
 import android.webkit.WebChromeClient
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
+import com.duckduckgo.app.surrogates.SurrogateResponse
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 
 interface WebViewClientListener {
@@ -45,4 +46,7 @@ interface WebViewClientListener {
     fun openMessageInNewTab(message: Message)
     fun recoverFromRenderProcessGone()
     fun requiresAuthentication(request: BasicAuthenticationRequest)
+    fun closeCurrentTab()
+    fun upgradedToHttps()
+    fun surrogateDetected(surrogate: SurrogateResponse)
 }

@@ -22,13 +22,13 @@ import android.appwidget.AppWidgetProvider
 import android.content.Context
 import android.content.Intent
 import android.widget.RemoteViews
-import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.DuckDuckGoApplication
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.WIDGETS_ADDED
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.WIDGETS_DELETED
+import com.duckduckgo.app.systemsearch.SystemSearchActivity
 import com.duckduckgo.app.widget.ui.AppWidgetCapabilities
 import javax.inject.Inject
 
@@ -77,7 +77,7 @@ open class SearchWidget(val layoutId: Int = R.layout.search_widget) : AppWidgetP
     }
 
     private fun buildPendingIntent(context: Context): PendingIntent {
-        val intent = BrowserActivity.intent(context, widgetSearch = true)
+        val intent = SystemSearchActivity.fromWidget(context)
         return PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT)
     }
 

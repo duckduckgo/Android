@@ -1,6 +1,7 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
 
     <string name="duckDuckGoLogoDescription">Logo DuckDuckGo</string>
+    <string name="duckDuckGoPrivacySimplified">Súkromie jednoducho.</string>
     <string name="yes">Áno</string>
     <string name="no">žiadny</string>
 
@@ -164,7 +165,6 @@
 
     <!-- About Activity -->
     <string name="aboutActivityTitle">O nás</string>
-    <string name="aboutHeading">Súkromie jednoducho.</string>
     <string name="aboutDescription">
         V DuckDuckGo nastavujeme nový štandard dôvery online.\n\ DuckDuckGo, prehliadač s dôrazom na súkromie, ponúka všetky dôležité základné prvky ochrany súkromia na ochranu pri vyhľadávaní a prehliadaní webu, vrátane blokovania sledovacích zariadení, inteligentnejšieho šifrovania a súkromného vyhľadávania DuckDuckGo.\n\ Pri používaní internetu by sme predsa nemali mať zlý pocit a dopriať si zaslúžené online súkromie by nemalo byť o nič ťažšie ako jednoduché zatiahnutie rolety.</string>
     <string name="aboutMoreLink">Viac informácií na stránke duckduckgo.com/about</string>
@@ -173,12 +173,21 @@
     <!-- Broken Site Activity -->
     <string name="brokenSiteReportBrokenSiteMenuItem">Nahlásiť nefunkčný web</string>
     <string name="brokenSiteHeading">Nahláste nefunkčný web</string>
-    <string name="brokenSiteModalDescription">Nahlasovanie nefunkčného webu je úplne anonymné a pomáha nám pri zdokonaľovaní aplikácie.</string>
-    <string name="brokenSiteUrlHint">Zadajte webovú adresu</string>
-    <string name="brokenSiteDomainLabel">Doména nefunkčného webu:</string>
-    <string name="brokenSiteMessageHint">Ktorý obsah alebo funkcie sú nefunkčné?</string>
-    <string name="brokenSiteSubmitButton">Odoslať spätnú väzbu</string>
     <string name="brokenSiteSubmitted">Ďakujeme! Spätná väzba bola odoslaná</string>
+    <string name="brokenSitesCategoriesTitle">Popíšte, čo sa stalo:</string>
+    <string name="brokenSitesCategoriesHint">Popíšte, čo sa stalo</string>
+    <string name="brokenSiteSubmitButton">Odoslať správu</string>
+    <string name="brokenSiteDescription">Odoslaním anonymného hlásenia o nefunkčnom webe nám pomôžete tieto problémy odstrániť a vylepšiť aplikáciu.</string>
+
+    <string name="brokenSiteCategoryImages">Obrázky sa nepodarilo načítať</string>
+    <string name="brokenSiteCategoryPaywall">Táto stránka ma požiadala o deaktiváciu</string>
+    <string name="brokenSiteCategoryComments">Komentáre nepodarilo načítať</string>
+    <string name="brokenSiteCategoryVideos">Video sa neprehráva</string>
+    <string name="brokenSiteCategoryLinks">Odkazy alebo tlačidlá nefungujú</string>
+    <string name="brokenSiteCategoryContent">Chýba obsah</string>
+    <string name="brokenSiteCategoryLogin">Nemôžem sa prihlásiť</string>
+    <string name="brokenSiteCategoryUnsupported">Prehliadač je nekompatibilný</string>
+    <string name="brokenSiteCategoryOther">Niečo iné</string>
 
     <!-- Bookmarks Activity -->
     <string name="bookmarksMenuTitle">Záložky</string>
@@ -345,5 +354,36 @@
     <string name="feedbackInitialDisambiguationHappyButtonContentDescription">Tlačidlo pozitívnej spätnej väzby</string>
     <string name="feedbackInitialDisambiguationSadButtonContentDescription">Tlačidlo negatívnej spätnej väzby</string>
     <string name="feedbackIsImportantToUs">Anonymná spätná väzba je pre nás dôležitá.</string>
+
+    <!-- Webview Recovery -->
+    <string name="crashedWebViewErrorMessage">Webovú stránku nebolo možné zobraziť.</string>
+    <string name="crashedWebViewErrorAction">Znovu načítať</string>
+
+    <!-- System Search -->
+    <string name="systemSearchOmnibarInputHint"><font size="13">Vyhľadať alebo zadať webovú adresu</font></string>
+    <string name="systemSearchDeviceAppLabel">Z tohto zariadenia</string>
+    <string name="systemSearchAppNotFound">Aplikáciu sa nepodarilo nájsť</string>
+    <string name="systemSearchOnboardingText">Ďakujeme, že ste si vybrali aplikáciu DuckDuckGo!\nPri použití nášho vyhľadávača alebo aplikácie je vaše vyhľadávanie chránené.</string>
+    <string name="systemSearchOnboardingFeaturesIntroText">Aplikácia DuckDuckGo tiež:</string>
+    <string name="systemSearchOnboardingFeatureOneText">Blokuje nebezpečné sledovanie</string>
+    <string name="systemSearchOnboardingFeatureTwoText">Vynucuje šifrovanie na webových stránkach</string>
+    <string name="systemSearchOnboardingFeatureThreeText">Odstraňuje údaje jediným kliknutím</string>
+    <string name="systemSearchOnboardingButtonMore">Zobraziť viac</string>
+    <string name="systemSearchOnboardingButtonLess">Skryť</string>
+    <string name="systemSearchOnboardingButtonOk">Mám to</string>
+
+    <!-- Dax Dialog -->
+    <string name="daxDialogHideButton">SKRYŤ</string>
+    <string name="daxDialogPhew">Uf!</string>
+    <string name="daxDialogYes">OK!</string>
+    <string name="daxDialogAddWidget">Pridať miniaplikáciu</string>
+    <string name="daxDialogMaybeLater">Možno neskôr</string>
+    <string name="daxDialogSettings">Prejdite do nastavení</string>
+    <string name="daxDialogNext">Ďalšie</string>
+    <string name="daxDialogHighFive">High Five!</string>
+    <string name="daxDialogGotIt">Mám to</string>
+    <string name="hideTipsTitle">Skryť zostávajúce tipy?</string>
+    <string name="hideTipsText">Je ich len niekoľko, snažili sme sa, aby mali informatívny charakter.</string>
+    <string name="hideTipsButton">Navždy skryť tipy</string>
 
 </resources>

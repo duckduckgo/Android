@@ -70,4 +70,7 @@ class DaoModule {
 
     @Provides
     fun uncaughtExceptionDao(database: AppDatabase) = database.uncaughtExceptionDao()
+
+    @Provides
+    fun tdsDao(database: AppDatabase) = database.tdsDao()
 }

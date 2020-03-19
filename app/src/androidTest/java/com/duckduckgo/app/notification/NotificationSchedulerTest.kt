@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-
 @file:Suppress("RemoveExplicitTypeArguments")
 
 package com.duckduckgo.app.notification
@@ -23,9 +22,9 @@ import androidx.test.platform.app.InstrumentationRegistry
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import com.duckduckgo.app.CoroutineTestRule
-import com.duckduckgo.app.notification.NotificationScheduler.ClearDataNotificationWorker
-import com.duckduckgo.app.notification.NotificationScheduler.PrivacyNotificationWorker
+import com.duckduckgo.app.notification.AndroidNotificationScheduler.*
 import com.duckduckgo.app.notification.model.SchedulableNotification
+import com.duckduckgo.app.notification.model.SearchNotification
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.VariantManager.Companion.DEFAULT_VARIANT
 import com.nhaarman.mockitokotlin2.any
@@ -33,6 +32,7 @@ import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.whenever
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
+import org.junit.After
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
@@ -48,6 +48,7 @@ class NotificationSchedulerTest {
     private val variantManager: VariantManager = mock()
     private val clearNotification: SchedulableNotification = mock()
     private val privacyNotification: SchedulableNotification = mock()
+    private val searchPromptNotification: SearchNotification = mock()
 
     private val context = InstrumentationRegistry.getInstrumentation().targetContext
     private var workManager = WorkManager.getInstance(context)
@@ -56,56 +57,137 @@ class NotificationSchedulerTest {
     @Before
     fun before() {
         whenever(variantManager.getVariant(any())).thenReturn(DEFAULT_VARIANT)
-        testee = NotificationScheduler(
+        testee = AndroidNotificationScheduler(
             workManager,
             clearNotification,
-            privacyNotification
+            privacyNotification,
+            searchPromptNotification
         )
     }
 
-    @Test
-    fun whenBothPrivacyNotificationAndCleatDataCanShowThenPrivacyNotificationScheduled() = runBlocking<Unit> {
-        whenever(privacyNotification.canShow()).thenReturn(true)
-        whenever(clearNotification.canShow()).thenReturn(true)
-        testee.scheduleNextNotification()
-        assertNotificationScheduled(PrivacyNotificationWorker::class.jvmName)
+    @After
+    fun resetWorkers() {
+        workManager.cancelAllWorkByTag(AndroidNotificationScheduler.CONTINUOUS_APP_USE_REQUEST_TAG)
     }
 
     @Test
-    fun whenPrivacyNotificationCanShowAndCleatDataCannotThenPrivacyNotificationScheduled() = runBlocking<Unit> {
+    fun whenPrivacyNotificationClearDataAndSearchPromptCanShowThenBothAreScheduled() = runBlocking<Unit> {
+        whenever(privacyNotification.canShow()).thenReturn(true)
+        whenever(clearNotification.canShow()).thenReturn(true)
+        whenever(searchPromptNotification.canShow()).thenReturn(true)
+        testee.scheduleNextNotification()
+
+        assertUnusedAppNotificationScheduled(PrivacyNotificationWorker::class.jvmName)
+        assertContinuousAppUseNotificationScheduled(SearchPromptNotificationWorker::class.jvmName)
+    }
+
+    @Test
+    fun whenPrivacyNotificationClearDataAndSearchPromptCanShowThenPrivacyNotificationScheduled() = runBlocking<Unit> {
+        whenever(privacyNotification.canShow()).thenReturn(true)
+        whenever(clearNotification.canShow()).thenReturn(true)
+        whenever(searchPromptNotification.canShow()).thenReturn(false)
+        testee.scheduleNextNotification()
+
+        assertUnusedAppNotificationScheduled(PrivacyNotificationWorker::class.jvmName)
+        assertNoContinuousAppNotificationScheduled()
+    }
+
+    @Test
+    fun whenPrivacyNotificationAndSearchPromptCanShowButClearDataCannotThenThenBothAreScheduled() = runBlocking<Unit> {
         whenever(privacyNotification.canShow()).thenReturn(true)
         whenever(clearNotification.canShow()).thenReturn(false)
+        whenever(searchPromptNotification.canShow()).thenReturn(true)
         testee.scheduleNextNotification()
-        assertNotificationScheduled(PrivacyNotificationWorker::class.jvmName)
+
+        assertUnusedAppNotificationScheduled(PrivacyNotificationWorker::class.jvmName)
+        assertContinuousAppUseNotificationScheduled(SearchPromptNotificationWorker::class.jvmName)
     }
 
     @Test
-    fun whenPrivacyNotificationCannotShowAndClearNotificationCanShowThenNotificationScheduled() = runBlocking<Unit> {
+    fun whenPrivacyNotificationCanShowButClearDataAndSearchPromptCannotThenPrivacyNotificationScheduled() = runBlocking<Unit> {
+        whenever(privacyNotification.canShow()).thenReturn(true)
+        whenever(clearNotification.canShow()).thenReturn(false)
+        whenever(searchPromptNotification.canShow()).thenReturn(false)
+        testee.scheduleNextNotification()
+
+        assertUnusedAppNotificationScheduled(PrivacyNotificationWorker::class.jvmName)
+        assertNoContinuousAppNotificationScheduled()
+    }
+
+    @Test
+    fun whenPrivacyNotificationAndSearchPromptCannotShowAndClearNotificationCanShowThenBothAreScheduled() = runBlocking<Unit> {
         whenever(privacyNotification.canShow()).thenReturn(false)
         whenever(clearNotification.canShow()).thenReturn(true)
+        whenever(searchPromptNotification.canShow()).thenReturn(true)
         testee.scheduleNextNotification()
-        assertNotificationScheduled(ClearDataNotificationWorker::class.jvmName)
+
+        assertUnusedAppNotificationScheduled(ClearDataNotificationWorker::class.jvmName)
+        assertContinuousAppUseNotificationScheduled(SearchPromptNotificationWorker::class.jvmName)
+    }
+
+    @Test
+    fun whenPrivacyNotificationAndClearNotificationCannotShowButSearchPromptCanShowThenNotificationScheduled() = runBlocking<Unit> {
+        whenever(privacyNotification.canShow()).thenReturn(false)
+        whenever(clearNotification.canShow()).thenReturn(false)
+        whenever(searchPromptNotification.canShow()).thenReturn(true)
+        testee.scheduleNextNotification()
+
+        assertContinuousAppUseNotificationScheduled(SearchPromptNotificationWorker::class.jvmName)
+        assertNoUnusedAppNotificationScheduled()
+    }
+
+    @Test
+    fun whenPrivacyNotificationAndClearNotificationCannotShowButSearchPromptCanThenSearchPromptNotificationScheduled() = runBlocking<Unit> {
+        whenever(privacyNotification.canShow()).thenReturn(false)
+        whenever(clearNotification.canShow()).thenReturn(false)
+        whenever(searchPromptNotification.canShow()).thenReturn(true)
+        testee.scheduleNextNotification()
+
+        assertContinuousAppUseNotificationScheduled(SearchPromptNotificationWorker::class.jvmName)
+        assertNoUnusedAppNotificationScheduled()
     }
 
     @Test
     fun whenNoNotificationCanShowThenNoNotificationScheduled() = runBlocking<Unit> {
         whenever(privacyNotification.canShow()).thenReturn(false)
         whenever(clearNotification.canShow()).thenReturn(false)
+        whenever(searchPromptNotification.canShow()).thenReturn(false)
         testee.scheduleNextNotification()
+
         assertNoNotificationScheduled()
     }
 
-    private fun assertNotificationScheduled(workerName: String) {
-        assertTrue(getScheduledWorkers().any { it.tags.contains(workerName) })
+    private fun assertUnusedAppNotificationScheduled(workerName: String) {
+        assertTrue(getUnusedAppScheduledWorkers().any { it.tags.contains(workerName) })
+    }
+
+    private fun assertContinuousAppUseNotificationScheduled(workerName: String) {
+        assertTrue(getContinuousAppUseScheduledWorkers().any { it.tags.contains(workerName) })
+    }
+
+    private fun assertNoUnusedAppNotificationScheduled() {
+        assertTrue(getUnusedAppScheduledWorkers().isEmpty())
+    }
+
+    private fun assertNoContinuousAppNotificationScheduled() {
+        assertTrue(getContinuousAppUseScheduledWorkers().isEmpty())
     }
 
     private fun assertNoNotificationScheduled() {
-        assertTrue(getScheduledWorkers().isEmpty())
+        assertTrue(getUnusedAppScheduledWorkers().isEmpty())
+        assertTrue(getContinuousAppUseScheduledWorkers().isEmpty())
     }
 
-    private fun getScheduledWorkers(): List<WorkInfo> {
+    private fun getUnusedAppScheduledWorkers(): List<WorkInfo> {
         return workManager
-            .getWorkInfosByTag(NotificationScheduler.WORK_REQUEST_TAG)
+            .getWorkInfosByTag(AndroidNotificationScheduler.UNUSED_APP_WORK_REQUEST_TAG)
+            .get()
+            .filter { it.state == WorkInfo.State.ENQUEUED }
+    }
+
+    private fun getContinuousAppUseScheduledWorkers(): List<WorkInfo> {
+        return workManager
+            .getWorkInfosByTag(AndroidNotificationScheduler.CONTINUOUS_APP_USE_REQUEST_TAG)
             .get()
             .filter { it.state == WorkInfo.State.ENQUEUED }
     }

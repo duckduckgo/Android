@@ -17,38 +17,49 @@
 package com.duckduckgo.app.brokensite.api
 
 import android.os.Build
+import com.duckduckgo.app.brokensite.model.BrokenSite
 import com.duckduckgo.app.browser.BuildConfig
-import com.duckduckgo.app.feedback.api.FeedbackService
 import com.duckduckgo.app.statistics.VariantManager
+import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
+import com.duckduckgo.app.trackerdetection.db.TdsMetadataDao
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
 interface BrokenSiteSender {
-    fun submitBrokenSiteFeedback(comment: String, url: String)
+    fun submitBrokenSiteFeedback(brokenSite: BrokenSite)
 }
 
 class BrokenSiteSubmitter(
     private val statisticsStore: StatisticsDataStore,
     private val variantManager: VariantManager,
-    private val service: FeedbackService
+    private val tdsMetadataDao: TdsMetadataDao,
+    private val pixel: Pixel
 ) : BrokenSiteSender {
 
-    override fun submitBrokenSiteFeedback(comment: String, url: String) {
+    override fun submitBrokenSiteFeedback(brokenSite: BrokenSite) {
         GlobalScope.launch(Dispatchers.IO) {
-
+            val params = mapOf(
+                CATEGORY_KEY to brokenSite.category,
+                SITE_URL_KEY to brokenSite.siteUrl,
+                UPDGRADED_HTTPS_KEY to brokenSite.upgradeHttps.toString(),
+                TDS_ETAG_KEY to tdsMetadataDao.eTag().orEmpty(),
+                APP_VERSION_KEY to BuildConfig.VERSION_NAME,
+                ATB_KEY to atbWithVariant(),
+                OS_KEY to Build.VERSION.SDK_INT.toString(),
+                MANUFACTURER_KEY to Build.MANUFACTURER,
+                MODEL_KEY to Build.MODEL,
+                WEBVIEW_VERSION_KEY to brokenSite.webViewVersion,
+                SITE_TYPE_KEY to brokenSite.siteType
+            )
+            val encodedParams = mapOf(
+                BLOCKED_TRACKERS_KEY to brokenSite.blockedTrackers,
+                SURROGATES_KEY to brokenSite.surrogates
+            )
             runCatching {
-                service.submitBrokenSite(
-                    url = url,
-                    comment = comment,
-                    api = Build.VERSION.SDK_INT,
-                    manufacturer = Build.MANUFACTURER,
-                    model = Build.MODEL,
-                    version = BuildConfig.VERSION_NAME,
-                    atb = atbWithVariant()
-                ).execute()
+                pixel.fire(Pixel.PixelName.BROKEN_SITE_REPORT.pixelName, params, encodedParams)
             }
                 .onSuccess { Timber.v("Feedback submission succeeded") }
                 .onFailure { Timber.w(it, "Feedback submission failed") }
@@ -56,6 +67,22 @@ class BrokenSiteSubmitter(
     }
 
     private fun atbWithVariant(): String {
-        return statisticsStore.atb?.formatWithVariant(variantManager.getVariant()) ?: ""
+        return statisticsStore.atb?.formatWithVariant(variantManager.getVariant()).orEmpty()
+    }
+
+    companion object {
+        private const val CATEGORY_KEY = "category"
+        private const val SITE_URL_KEY = "siteUrl"
+        private const val UPDGRADED_HTTPS_KEY = "upgradedHttps"
+        private const val TDS_ETAG_KEY = "tds"
+        private const val BLOCKED_TRACKERS_KEY = "blockedTrackers"
+        private const val SURROGATES_KEY = "surrogates"
+        private const val APP_VERSION_KEY = "appVersion"
+        private const val ATB_KEY = "atb"
+        private const val OS_KEY = "os"
+        private const val MANUFACTURER_KEY = "manufacturer"
+        private const val MODEL_KEY = "model"
+        private const val WEBVIEW_VERSION_KEY = "wvVersion"
+        private const val SITE_TYPE_KEY = "siteType"
     }
 }

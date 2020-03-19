@@ -1,6 +1,7 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
 
     <string name="duckDuckGoLogoDescription">Logo DuckDuckGo</string>
+    <string name="duckDuckGoPrivacySimplified">Privacy, vereenvoudigd.</string>
     <string name="yes">Ja</string>
     <string name="no">Nee</string>
 
@@ -163,7 +164,6 @@
 
     <!-- About Activity -->
     <string name="aboutActivityTitle">Over ons</string>
-    <string name="aboutHeading">Privacy, vereenvoudigd.</string>
     <string name="aboutDescription">
         Bij DuckDuckGo zetten we de nieuwe standaard voor vertrouwen online.\ n\ DuckDuckGo Privacy Browser biedt alle privacy-essentials die je nodig hebt om jezelf te beschermen tijdens het zoeken en browsen op het internet, inclusief trackerblokkering, slimmere codering en DuckDuckGo privé-zoekopdrachten.\ n\ Het internet zou namelijk helemaal niet zo griezelig moeten zijn en de privacy die je online verdient, moet net zo eenvoudig zijn als het sluiten van de gordijnen.</string>
     <string name="aboutMoreLink">Meer informatie op duckduckgo.com/about</string>
@@ -172,12 +172,21 @@
     <!-- Broken Site Activity -->
     <string name="brokenSiteReportBrokenSiteMenuItem">Defecte website melden</string>
     <string name="brokenSiteHeading">Een defecte website melden</string>
-    <string name="brokenSiteModalDescription">Het melden van een defecte site is volledig anoniem en helpt ons om de app te verbeteren!</string>
-    <string name="brokenSiteUrlHint">URL invoeren</string>
-    <string name="brokenSiteDomainLabel">Domein van defecte site:</string>
-    <string name="brokenSiteMessageHint">Welke inhoud of functionaliteit is defect?</string>
-    <string name="brokenSiteSubmitButton">Feedback versturen</string>
     <string name="brokenSiteSubmitted">Dank je wel! Feedback verzonden</string>
+    <string name="brokenSitesCategoriesTitle">Beschrijf wat er is gebeurd:</string>
+    <string name="brokenSitesCategoriesHint">Beschrijf wat er is gebeurd</string>
+    <string name="brokenSiteSubmitButton">Verzend Rapport</string>
+    <string name="brokenSiteDescription">Als u een anoniem rapport voor een gebroken site indient, kunnen we deze problemen oplossen en de app verbeteren.</string>
+
+    <string name="brokenSiteCategoryImages">Afbeeldingen zijn niet geladen</string>
+    <string name="brokenSiteCategoryPaywall">De site heeft me gevraagd om uit te schakelen</string>
+    <string name="brokenSiteCategoryComments">Opmerkingen zijn niet geladen</string>
+    <string name="brokenSiteCategoryVideos">Video werd niet afgespeeld</string>
+    <string name="brokenSiteCategoryLinks">Links of knoppen werken niet</string>
+    <string name="brokenSiteCategoryContent">Inhoud ontbreekt</string>
+    <string name="brokenSiteCategoryLogin">Ik kan niet inloggen</string>
+    <string name="brokenSiteCategoryUnsupported">De browser is niet compatibel</string>
+    <string name="brokenSiteCategoryOther">Iets anders</string>
 
     <!-- Bookmarks Activity -->
     <string name="bookmarksMenuTitle">Bladwijzers</string>
@@ -344,5 +353,36 @@
     <string name="feedbackInitialDisambiguationHappyButtonContentDescription">Knop positieve feedback</string>
     <string name="feedbackInitialDisambiguationSadButtonContentDescription">Knop negatieve feedback</string>
     <string name="feedbackIsImportantToUs">Jouw anonieme feedback is belangrijk voor ons.</string>
+
+    <!-- Webview Recovery -->
+    <string name="crashedWebViewErrorMessage">De webpagina kon niet worden weergegeven.</string>
+    <string name="crashedWebViewErrorAction">Opnieuw laden</string>
+
+    <!-- System Search -->
+    <string name="systemSearchOmnibarInputHint"><font size="13">URL zoeken of typen</font></string>
+    <string name="systemSearchDeviceAppLabel">Van dit apparaat</string>
+    <string name="systemSearchAppNotFound">Toepassing kon niet worden gevonden</string>
+    <string name="systemSearchOnboardingText">Bedankt dat u voor DuckDuckGo heeft gekozen!\nWanneer u nu onze zoekopdracht of app gebruikt, zijn uw zoekopdrachten beveiligd.</string>
+    <string name="systemSearchOnboardingFeaturesIntroText">De DuckDuckGo-app:</string>
+    <string name="systemSearchOnboardingFeatureOneText">Blokkeert ook onveilige trackers</string>
+    <string name="systemSearchOnboardingFeatureTwoText">Dwingt codering af op websites</string>
+    <string name="systemSearchOnboardingFeatureThreeText">Wist gegevens met één tik</string>
+    <string name="systemSearchOnboardingButtonMore">Laat meer zien</string>
+    <string name="systemSearchOnboardingButtonLess">Verbergen</string>
+    <string name="systemSearchOnboardingButtonOk">Ik snap het</string>
+
+    <!-- Dax Dialog -->
+    <string name="daxDialogHideButton">VERBERGEN</string>
+    <string name="daxDialogPhew">Opluchting!</string>
+    <string name="daxDialogYes">OK!</string>
+    <string name="daxDialogAddWidget">Widget Toevoegen</string>
+    <string name="daxDialogMaybeLater">Later Misschien</string>
+    <string name="daxDialogSettings">Ga naar instellingen</string>
+    <string name="daxDialogNext">Volgende</string>
+    <string name="daxDialogHighFive">High Five!</string>
+    <string name="daxDialogGotIt">Ik snap het</string>
+    <string name="hideTipsTitle">Resterende tips verbergen?</string>
+    <string name="hideTipsText">Het zijn er maar een paar en we hebben geprobeerd ze informatief te maken.</string>
+    <string name="hideTipsButton">Tips voor altijd verbergen</string>
 
 </resources>

@@ -51,6 +51,7 @@ import javax.inject.Singleton
         DatabaseModule::class,
         DaoModule::class,
         JsonModule::class,
+        SystemComponentsModule::class,
         BrowserModule::class,
         BrowserAutoCompleteModule::class,
         HttpsUpgraderModule::class,

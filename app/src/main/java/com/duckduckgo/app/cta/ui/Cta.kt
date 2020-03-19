@@ -63,15 +63,15 @@ interface Cta {
     val okPixel: Pixel.PixelName?
     val cancelPixel: Pixel.PixelName?
 
-    fun pixelShownParameters(): Map<String, String?>
-    fun pixelCancelParameters(): Map<String, String?>
-    fun pixelOkParameters(): Map<String, String?>
+    fun pixelShownParameters(): Map<String, String>
+    fun pixelCancelParameters(): Map<String, String>
+    fun pixelOkParameters(): Map<String, String>
 }
 
 interface SecondaryButtonCta {
     val secondaryButtonPixel: Pixel.PixelName?
 
-    fun pixelSecondaryButtonParameters(): Map<String, String?>
+    fun pixelSecondaryButtonParameters(): Map<String, String>
 }
 
 sealed class DaxDialogCta(
@@ -88,11 +88,11 @@ sealed class DaxDialogCta(
 
     override fun createCta(activity: FragmentActivity): DaxDialog = TypewriterDaxDialog(getDaxText(activity), activity.resources.getString(okButton))
 
-    override fun pixelCancelParameters(): Map<String, String?> = mapOf(Pixel.PixelParameter.CTA_SHOWN to ctaPixelParam)
+    override fun pixelCancelParameters(): Map<String, String> = mapOf(Pixel.PixelParameter.CTA_SHOWN to ctaPixelParam)
 
-    override fun pixelOkParameters(): Map<String, String?> = mapOf(Pixel.PixelParameter.CTA_SHOWN to ctaPixelParam)
+    override fun pixelOkParameters(): Map<String, String> = mapOf(Pixel.PixelParameter.CTA_SHOWN to ctaPixelParam)
 
-    override fun pixelShownParameters(): Map<String, String?> = mapOf(Pixel.PixelParameter.CTA_SHOWN to addCtaToHistory(ctaPixelParam))
+    override fun pixelShownParameters(): Map<String, String> = mapOf(Pixel.PixelParameter.CTA_SHOWN to addCtaToHistory(ctaPixelParam))
 
     open fun getDaxText(context: Context): String = context.getString(description)
 
@@ -139,7 +139,7 @@ sealed class DaxDialogCta(
             )
         }
 
-        override fun pixelSecondaryButtonParameters(): Map<String, String?> = mapOf(Pixel.PixelParameter.CTA_SHOWN to ctaPixelParam)
+        override fun pixelSecondaryButtonParameters(): Map<String, String> = mapOf(Pixel.PixelParameter.CTA_SHOWN to ctaPixelParam)
 
         sealed class DefaultBrowserAction {
             object ShowSettings : DefaultBrowserAction()
@@ -202,7 +202,7 @@ sealed class DaxDialogCta(
             )
         }
 
-        override fun pixelSecondaryButtonParameters(): Map<String, String?> = mapOf(Pixel.PixelParameter.CTA_SHOWN to ctaPixelParam)
+        override fun pixelSecondaryButtonParameters(): Map<String, String> = mapOf(Pixel.PixelParameter.CTA_SHOWN to ctaPixelParam)
 
         sealed class SearchWidgetAction {
             object AddAutomatic : SearchWidgetAction()
@@ -377,11 +377,11 @@ sealed class DaxBubbleCta(
         view.dialogTextCta.startTypingAnimation(daxText, true)
     }
 
-    override fun pixelCancelParameters(): Map<String, String?> = mapOf(Pixel.PixelParameter.CTA_SHOWN to ctaPixelParam)
+    override fun pixelCancelParameters(): Map<String, String> = mapOf(Pixel.PixelParameter.CTA_SHOWN to ctaPixelParam)
 
-    override fun pixelOkParameters(): Map<String, String?> = mapOf(Pixel.PixelParameter.CTA_SHOWN to ctaPixelParam)
+    override fun pixelOkParameters(): Map<String, String> = mapOf(Pixel.PixelParameter.CTA_SHOWN to ctaPixelParam)
 
-    override fun pixelShownParameters(): Map<String, String?> = mapOf(Pixel.PixelParameter.CTA_SHOWN to addCtaToHistory(ctaPixelParam))
+    override fun pixelShownParameters(): Map<String, String> = mapOf(Pixel.PixelParameter.CTA_SHOWN to addCtaToHistory(ctaPixelParam))
 
     class DaxIntroCta(override val onboardingStore: OnboardingStore, override val appInstallStore: AppInstallStore) : DaxBubbleCta(
         CtaId.DAX_INTRO,
@@ -427,11 +427,11 @@ sealed class HomePanelCta(
         view.show()
     }
 
-    override fun pixelCancelParameters(): Map<String, String?> = emptyMap()
+    override fun pixelCancelParameters(): Map<String, String> = emptyMap()
 
-    override fun pixelOkParameters(): Map<String, String?> = emptyMap()
+    override fun pixelOkParameters(): Map<String, String> = emptyMap()
 
-    override fun pixelShownParameters(): Map<String, String?> = emptyMap()
+    override fun pixelShownParameters(): Map<String, String> = emptyMap()
 
     data class Survey(val survey: com.duckduckgo.app.survey.model.Survey) : HomePanelCta(
         CtaId.SURVEY,

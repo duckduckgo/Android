@@ -1,6 +1,7 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
 
     <string name="duckDuckGoLogoDescription">„DuckDuckGo“ logotipas</string>
+    <string name="duckDuckGoPrivacySimplified">Supaprastintas privatumas.</string>
     <string name="yes">Taip</string>
     <string name="no">Ne</string>
 
@@ -167,7 +168,6 @@
 
     <!-- About Activity -->
     <string name="aboutActivityTitle">Apie mus</string>
-    <string name="aboutHeading">Supaprastintas privatumas.</string>
     <string name="aboutDescription">
         „DuckDuckGo“ nustatome naują patikimumo tinkle standartą.\n\„DuckDuckGo“ privatumo naršyklė užtikrina visus svarbiausius įrankius, kurie padės apsaugoti savo privatumą ieškant ir naršant tinkle, įskaitant sekiklių blokavimą, išmanųjį šifravimą ir „DuckDuckGo“ privačias paieškas.\n\ Mūsų komanda tiki, kad internetas neturėtų būti toks baisus, o privatumas, kurio nusipelnėte internete, turėtų būti ranka pasiekiamas.</string>
     <string name="aboutMoreLink">Daugiau informacijos rasite duckdukgo.com/about</string>
@@ -176,12 +176,21 @@
     <!-- Broken Site Activity -->
     <string name="brokenSiteReportBrokenSiteMenuItem">Pranešti apie neveikiančią svetainę</string>
     <string name="brokenSiteHeading">Pranešti apie neveikiančią svetainę</string>
-    <string name="brokenSiteModalDescription">Pranešimas apie neveikiančias svetaines yra visiškai anonimiškas ir padeda mums tobulinti programą!</string>
-    <string name="brokenSiteUrlHint">Įveskite URL</string>
-    <string name="brokenSiteDomainLabel">Neveikiančios svetainės domenas:</string>
-    <string name="brokenSiteMessageHint">Koks turinys ar funkcija neveikia?</string>
-    <string name="brokenSiteSubmitButton">Pateikti atsiliepimą</string>
     <string name="brokenSiteSubmitted">Dėkojame! Atsiliepimas pateiktas</string>
+    <string name="brokenSitesCategoriesTitle">Aprašykite, kas atsitiko:</string>
+    <string name="brokenSitesCategoriesHint">Aprašykite, kas atsitiko</string>
+    <string name="brokenSiteSubmitButton">Siųsti ataskaitą</string>
+    <string name="brokenSiteDescription">Pateikdami anoniminę sugadintos svetainės ataskaitą, galime padėti išspręsti šias problemas ir patobulinti programėlę.</string>
+
+    <string name="brokenSiteCategoryImages">Vaizdai neįkelti</string>
+    <string name="brokenSiteCategoryPaywall">Svetainė paprašė manęs išjungti</string>
+    <string name="brokenSiteCategoryComments">Komentarai nebuvo įkelti</string>
+    <string name="brokenSiteCategoryVideos">Vaizdo įrašas nebuvo paleistas</string>
+    <string name="brokenSiteCategoryLinks">Nuorodos ar mygtukai neveikia</string>
+    <string name="brokenSiteCategoryContent">Trūksta turinio</string>
+    <string name="brokenSiteCategoryLogin">Negaliu prisijungti</string>
+    <string name="brokenSiteCategoryUnsupported">Naršyklė nesuderinama</string>
+    <string name="brokenSiteCategoryOther">Kažkas kito</string>
 
     <!-- Bookmarks Activity -->
     <string name="bookmarksMenuTitle">Žymelės</string>
@@ -348,5 +357,36 @@
     <string name="feedbackInitialDisambiguationHappyButtonContentDescription">Teigiamų atsiliepimų mygtukas</string>
     <string name="feedbackInitialDisambiguationSadButtonContentDescription">Neigiamų atsiliepimų mygtukas</string>
     <string name="feedbackIsImportantToUs">Jūsų anoniminiai atsiliepimai mums labai svarbūs.</string>
+
+    <!-- Webview Recovery -->
+    <string name="crashedWebViewErrorMessage">Nepavyko parodyti tinklalapio.</string>
+    <string name="crashedWebViewErrorAction">Įkelti iš naujo</string>
+
+    <!-- System Search -->
+    <string name="systemSearchOmnibarInputHint"><font size="13">Ieškoti arba įvesti URL</font></string>
+    <string name="systemSearchDeviceAppLabel">Iš šio įrenginio</string>
+    <string name="systemSearchAppNotFound">Nepavyko rasti programos</string>
+    <string name="systemSearchOnboardingText">Dėkojame, kad pasirinkote „DuckDuckGo“!\nDabar, kai naudojate mūsų paieškos funkciją ar programėlę, jūsų paieškos yra apsaugotos.</string>
+    <string name="systemSearchOnboardingFeaturesIntroText">„DuckDuckGo“ programėlė taip pat:</string>
+    <string name="systemSearchOnboardingFeatureOneText">Blokuoja nesaugius sekimo įrenginius</string>
+    <string name="systemSearchOnboardingFeatureTwoText">Priverstinis tinklalapių šifravimas</string>
+    <string name="systemSearchOnboardingFeatureThreeText">Išvalo duomenis vienu bakstelėjimu</string>
+    <string name="systemSearchOnboardingButtonMore">Rodyti daugiau</string>
+    <string name="systemSearchOnboardingButtonLess">Slėpti</string>
+    <string name="systemSearchOnboardingButtonOk">Supratau</string>
+
+    <!-- Dax Dialog -->
+    <string name="daxDialogHideButton">SLĖPTI</string>
+    <string name="daxDialogPhew">Oi!</string>
+    <string name="daxDialogYes">GERAI!</string>
+    <string name="daxDialogAddWidget">Pridėti valdiklį</string>
+    <string name="daxDialogMaybeLater">Galbūt vėliau</string>
+    <string name="daxDialogSettings">Eiti į nustatymus</string>
+    <string name="daxDialogNext">Kitas</string>
+    <string name="daxDialogHighFive">Duok penkis!</string>
+    <string name="daxDialogGotIt">Supratau</string>
+    <string name="hideTipsTitle">Slėpti likusius patarimus?</string>
+    <string name="hideTipsText">Jų tik keletas, stengėmės, kad jie būtų informatyvūs.</string>
+    <string name="hideTipsButton">Slėpti patarimus visam laikui</string>
 
 </resources>
