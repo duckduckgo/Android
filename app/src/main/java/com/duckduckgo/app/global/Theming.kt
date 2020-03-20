@@ -25,7 +25,6 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.Theming.Constants.BROADCAST_THEME_CHANGED
 import com.duckduckgo.app.global.Theming.Constants.THEME_MAP
 import com.duckduckgo.app.settings.db.SettingsDataStore
-import com.duckduckgo.app.statistics.VariantManager
 
 enum class DuckDuckGoTheme {
     DARK,
@@ -74,5 +73,9 @@ fun DuckDuckGoActivity.sendThemeChangedBroadcast() {
 }
 
 private fun DuckDuckGoActivity.manifestThemeId(): Int {
-    return packageManager.getActivityInfo(componentName, 0).themeResource
+    return try {
+        packageManager.getActivityInfo(componentName, 0).themeResource
+    } catch (exception: Exception) {
+        R.style.AppTheme
+    }
 }
