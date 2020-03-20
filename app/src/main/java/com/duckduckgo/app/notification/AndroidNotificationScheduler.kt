@@ -17,7 +17,6 @@
 package com.duckduckgo.app.notification
 
 import android.content.Context
-import android.content.Intent
 import androidx.annotation.WorkerThread
 import androidx.core.app.NotificationManagerCompat
 import androidx.work.CoroutineWorker
@@ -25,34 +24,32 @@ import androidx.work.OneTimeWorkRequest
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
-import com.duckduckgo.app.notification.NotificationHandlerService.Companion.NOTIFICATION_AUTO_CANCEL
-import com.duckduckgo.app.notification.NotificationHandlerService.Companion.NOTIFICATION_SYSTEM_ID_EXTRA
-import com.duckduckgo.app.notification.NotificationHandlerService.Companion.PIXEL_SUFFIX_EXTRA
 import com.duckduckgo.app.notification.db.NotificationDao
 import com.duckduckgo.app.notification.model.Notification
 import com.duckduckgo.app.notification.model.SchedulableNotification
 import com.duckduckgo.app.notification.model.SearchNotification
-import com.duckduckgo.app.notification.model.SearchPromptNotification
-import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.NOTIFICATION_SHOWN
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
 
+
+// Please don't rename any Worker class name or class path.
+// More information: https://craigrussell.io/2019/04/a-workmanager-pitfall-modifying-a-scheduled-worker/
 @WorkerThread
-interface NotificationScheduler {
+interface AndroidNotificationScheduler {
     suspend fun scheduleNextNotification()
     fun launchStickySearchNotification()
     fun dismissStickySearchNotification()
     fun launchSearchPromptNotification()
 }
 
-class AndroidNotificationScheduler(
+class NotificationScheduler(
     private val workManager: WorkManager,
     private val clearDataNotification: SchedulableNotification,
     private val privacyNotification: SchedulableNotification,
     private val searchPromptNotification: SearchNotification
-) : NotificationScheduler {
+) : AndroidNotificationScheduler {
 
     override suspend fun scheduleNextNotification() {
         scheduleInactiveUserNotifications()
@@ -66,7 +63,7 @@ class AndroidNotificationScheduler(
     }
 
     private suspend fun scheduleInactiveUserNotifications() {
-        workManager.cancelAllWorkByTag(UNUSED_APP_WORK_REQUEST_TAG)
+        workManager.cancelUniqueWork(UNUSED_APP_WORK_REQUEST_TAG)
 
         when {
             privacyNotification.canShow() -> {
