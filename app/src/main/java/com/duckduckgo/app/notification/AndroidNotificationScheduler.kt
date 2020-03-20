@@ -34,7 +34,7 @@ import timber.log.Timber
 import java.util.concurrent.TimeUnit
 
 
-// Please don't rename any Worker class name or class path.
+// Please don't rename any Worker class name or class path
 // More information: https://craigrussell.io/2019/04/a-workmanager-pitfall-modifying-a-scheduled-worker/
 @WorkerThread
 interface AndroidNotificationScheduler {
@@ -63,7 +63,7 @@ class NotificationScheduler(
     }
 
     private suspend fun scheduleInactiveUserNotifications() {
-        workManager.cancelUniqueWork(UNUSED_APP_WORK_REQUEST_TAG)
+        workManager.cancelAllWorkByTag(UNUSED_APP_WORK_REQUEST_TAG)
 
         when {
             privacyNotification.canShow() -> {

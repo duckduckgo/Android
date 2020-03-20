@@ -74,7 +74,7 @@ class DaggerWorkerFactory(
 
             return instance
         } catch (exception: Exception){
-            Timber.i("Worker $workerClassName could not be created")
+            Timber.e(exception, "Worker $workerClassName could not be created")
             return null
         }
 
