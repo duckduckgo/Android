@@ -24,6 +24,8 @@
 
     <include layout="@layout/include_omnibar_toolbar" />
 
+    <include layout="@layout/layout_bottom_navigation_bar" />
+
     <include
         android:id="@+id/defaultCard"
         layout="@layout/content_onboarding_default_browser_card"
