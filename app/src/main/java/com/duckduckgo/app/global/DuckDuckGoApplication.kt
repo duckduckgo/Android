@@ -41,7 +41,7 @@ import com.duckduckgo.app.global.shortcut.AppShortcutCreator
 import com.duckduckgo.app.httpsupgrade.HttpsUpgrader
 import com.duckduckgo.app.job.AppConfigurationSyncer
 import com.duckduckgo.app.notification.NotificationRegistrar
-import com.duckduckgo.app.notification.NotificationScheduler
+import com.duckduckgo.app.notification.AndroidNotificationScheduler
 import com.duckduckgo.app.referral.AppInstallationReferrerStateListener
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.AtbInitializer
@@ -129,7 +129,7 @@ open class DuckDuckGoApplication : HasActivityInjector, HasServiceInjector, HasS
     lateinit var dataClearer: DataClearer
 
     @Inject
-    lateinit var notificationScheduler: NotificationScheduler
+    lateinit var notificationScheduler: AndroidNotificationScheduler
 
     @Inject
     lateinit var workerFactory: WorkerFactory

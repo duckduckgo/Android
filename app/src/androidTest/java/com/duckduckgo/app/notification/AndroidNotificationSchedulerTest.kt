@@ -22,7 +22,7 @@ import androidx.test.platform.app.InstrumentationRegistry
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import com.duckduckgo.app.CoroutineTestRule
-import com.duckduckgo.app.notification.AndroidNotificationScheduler.*
+import com.duckduckgo.app.notification.NotificationScheduler.*
 import com.duckduckgo.app.notification.model.SchedulableNotification
 import com.duckduckgo.app.notification.model.SearchNotification
 import com.duckduckgo.app.statistics.VariantManager
@@ -39,7 +39,7 @@ import org.junit.Rule
 import org.junit.Test
 import kotlin.reflect.jvm.jvmName
 
-class NotificationSchedulerTest {
+class AndroidNotificationSchedulerTest {
 
     @ExperimentalCoroutinesApi
     @get:Rule
@@ -57,7 +57,7 @@ class NotificationSchedulerTest {
     @Before
     fun before() {
         whenever(variantManager.getVariant(any())).thenReturn(DEFAULT_VARIANT)
-        testee = AndroidNotificationScheduler(
+        testee = NotificationScheduler(
             workManager,
             clearNotification,
             privacyNotification,
@@ -67,7 +67,7 @@ class NotificationSchedulerTest {
 
     @After
     fun resetWorkers() {
-        workManager.cancelAllWorkByTag(AndroidNotificationScheduler.CONTINUOUS_APP_USE_REQUEST_TAG)
+        workManager.cancelAllWorkByTag(NotificationScheduler.CONTINUOUS_APP_USE_REQUEST_TAG)
     }
 
     @Test
@@ -141,6 +141,7 @@ class NotificationSchedulerTest {
         whenever(privacyNotification.canShow()).thenReturn(false)
         whenever(clearNotification.canShow()).thenReturn(false)
         whenever(searchPromptNotification.canShow()).thenReturn(true)
+
         testee.scheduleNextNotification()
 
         assertContinuousAppUseNotificationScheduled(SearchPromptNotificationWorker::class.jvmName)
@@ -180,14 +181,14 @@ class NotificationSchedulerTest {
 
     private fun getUnusedAppScheduledWorkers(): List<WorkInfo> {
         return workManager
-            .getWorkInfosByTag(AndroidNotificationScheduler.UNUSED_APP_WORK_REQUEST_TAG)
+            .getWorkInfosByTag(NotificationScheduler.UNUSED_APP_WORK_REQUEST_TAG)
             .get()
             .filter { it.state == WorkInfo.State.ENQUEUED }
     }
 
     private fun getContinuousAppUseScheduledWorkers(): List<WorkInfo> {
         return workManager
-            .getWorkInfosByTag(AndroidNotificationScheduler.CONTINUOUS_APP_USE_REQUEST_TAG)
+            .getWorkInfosByTag(NotificationScheduler.CONTINUOUS_APP_USE_REQUEST_TAG)
             .get()
             .filter { it.state == WorkInfo.State.ENQUEUED }
     }
