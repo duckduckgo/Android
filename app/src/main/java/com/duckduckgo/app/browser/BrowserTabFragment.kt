@@ -748,7 +748,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
             onItemClicked(bottomBarBackItem) { activity?.onBackPressed() }
             onItemClicked(bottomBarForwardItem) { viewModel.onUserPressedForward() }
             onItemClicked(bottomBarFireItem) {  browserActivity?.launchFire() }
-            onItemClicked(bottomBarBookmarksItem) {  viewModel.onBookmarkAddRequested() }
+            onItemClicked(bottomBarBookmarksItem) {  launch { viewModel.onBookmarkAddRequested() } }
         }
     }
 
@@ -1323,6 +1323,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
 
                 toggleDesktopSiteMode(viewState.isDesktopBrowsingMode)
                 renderToolbarMenus(viewState)
+                renderBottomBar(viewState)
                 renderPopupMenus(browserShowing, viewState)
                 renderFullscreenMode(viewState)
             }
@@ -1336,6 +1337,11 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
                     if (it) exitFullScreen()
                 }
             }
+        }
+
+        private fun renderBottomBar(viewState: BrowserViewState){
+            bottomBarForwardItem.isEnabled = viewState.canGoForward
+            bottomBarBackItem.isEnabled = viewState.canGoBack
         }
 
         private fun renderPopupMenus(browserShowing: Boolean, viewState: BrowserViewState) {
