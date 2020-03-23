@@ -14,17 +14,9 @@
   ~ limitations under the License.
   -->
 
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="48dp"
-    android:layout_gravity="bottom"
-    android:gravity="center"
-    android:orientation="horizontal"
-    android:elevation="8dp"
-    android:background="@color/white"
-    app:layout_behavior="com.duckduckgo.app.browser.ui.HideBottomViewOnScrollBehavior">
+    tools:parentTag="android.widget.LinearLayout">
 
     <ImageButton
         android:id="@+id/bottomBarBackItem"
@@ -32,9 +24,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_weight="1"
+        android:background="?selectableItemBackground"
         android:contentDescription="@string/back"
-        android:src="@drawable/ic_arrow_back_24dp"
-        android:background="?selectableItemBackground"/>
+        android:src="@drawable/ic_arrow_back_24dp" />
 
     <ImageButton
         android:id="@+id/bottomBarForwardItem"
@@ -42,9 +34,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_weight="1"
+        android:background="?selectableItemBackground"
         android:contentDescription="@string/back"
-        android:src="@drawable/ic_arrow_forward_24dp"
-        android:background="?selectableItemBackground"/>
+        android:src="@drawable/ic_arrow_forward_24dp" />
 
     <ImageButton
         android:id="@+id/bottomBarFireItem"
@@ -52,9 +44,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_weight="1"
+        android:background="?selectableItemBackground"
         android:contentDescription="@string/back"
-        android:src="@drawable/ic_fire_black_24dp"
-        android:background="?selectableItemBackground"/>
+        android:src="@drawable/ic_fire_black_24dp" />
 
     <ImageButton
         android:id="@+id/bottomBarBookmarksItem"
@@ -62,8 +54,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_weight="1"
+        android:background="?selectableItemBackground"
         android:contentDescription="@string/back"
-        android:src="@drawable/ic_bookmarks_black_24dp"
-        android:background="?selectableItemBackground"/>
+        android:src="@drawable/ic_bookmarks_black_24dp" />
 
-</LinearLayout>
+</merge>

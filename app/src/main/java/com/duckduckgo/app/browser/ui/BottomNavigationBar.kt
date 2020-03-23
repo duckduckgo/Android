@@ -17,15 +17,28 @@
 package com.duckduckgo.app.browser.ui
 
 import android.content.Context
+import android.util.AttributeSet
 import android.view.LayoutInflater
+import android.view.View
 import android.widget.LinearLayout
 import com.duckduckgo.app.browser.R
 import com.google.android.material.bottomnavigation.BottomNavigationView
 
-class BottomNavigationBar(context: Context) : LinearLayout(context) {
+class BottomNavigationBar @JvmOverloads constructor(
+    context: Context,
+    attrs: AttributeSet? = null,
+    defStyleAttr: Int = 0
+) : LinearLayout(context, attrs, defStyleAttr) {
 
-    init {
-        LayoutInflater.from(context).inflate(R.layout.layout_bottom_navigation_bar, this, true)
+    override fun onFinishInflate() {
+        super.onFinishInflate()
+        View.inflate(context, R.layout.layout_bottom_navigation_bar, this)
+    }
+
+    fun onItemClicked(view: View, onClick: () -> Unit) {
+        view.setOnClickListener {
+            onClick()
+        }
     }
 
 }

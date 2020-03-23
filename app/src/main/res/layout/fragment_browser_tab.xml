@@ -24,7 +24,16 @@
 
     <include layout="@layout/include_omnibar_toolbar" />
 
-    <include layout="@layout/layout_bottom_navigation_bar" />
+    <com.duckduckgo.app.browser.ui.BottomNavigationBar
+        android:id="@+id/bottomNavigationBar"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_gravity="bottom"
+        android:background="@color/white"
+        android:elevation="8dp"
+        android:gravity="center"
+        android:orientation="horizontal"
+        app:layout_behavior="com.duckduckgo.app.browser.ui.HideBottomViewOnScrollBehavior" />
 
     <include
         android:id="@+id/defaultCard"
