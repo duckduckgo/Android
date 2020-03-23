@@ -22,8 +22,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     app:layout_scrollFlags="scroll|enterAlways"
-    tools:context="com.duckduckgo.app.browser.BrowserActivity"
-    tools:menu="@menu/menu_browser_activity">
+    tools:context="com.duckduckgo.app.browser.BrowserActivity">
 
 
     <androidx.constraintlayout.widget.ConstraintLayout

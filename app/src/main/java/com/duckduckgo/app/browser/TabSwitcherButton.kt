@@ -19,11 +19,19 @@ package com.duckduckgo.app.browser
 import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
 import android.content.Context
+import android.util.AttributeSet
 import android.view.LayoutInflater
+import android.view.View
 import android.widget.FrameLayout
+import android.widget.LinearLayout
+import android.widget.RelativeLayout
 import kotlinx.android.synthetic.main.view_tab_switcher_button.view.*
 
-class TabSwitcherButton(context: Context) : FrameLayout(context) {
+class TabSwitcherButton @JvmOverloads constructor(
+    context: Context,
+    attrs: AttributeSet? = null,
+    defStyleAttr: Int = 0
+) : RelativeLayout(context, attrs, defStyleAttr) {
 
     var count = 0
         set(value) {
@@ -38,9 +46,9 @@ class TabSwitcherButton(context: Context) : FrameLayout(context) {
             anim.progress = if (hasUnread) 1.0f else 0.0f
         }
 
-    init {
-        LayoutInflater.from(context).inflate(R.layout.view_tab_switcher_button, this, true)
-
+    override fun onFinishInflate() {
+        super.onFinishInflate()
+        View.inflate(context, R.layout.view_tab_switcher_button, this)
         clickZone.setOnClickListener {
             super.callOnClick()
         }

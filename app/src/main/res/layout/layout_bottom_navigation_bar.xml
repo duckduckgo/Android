@@ -58,4 +58,10 @@
         android:contentDescription="@string/back"
         android:src="@drawable/ic_bookmarks_black_24dp" />
 
+    <com.duckduckgo.app.browser.TabSwitcherButton
+        android:id="@+id/bottomBarTabsItem"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"/>
+
 </merge>

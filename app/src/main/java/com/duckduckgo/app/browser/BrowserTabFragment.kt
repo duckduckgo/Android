@@ -101,6 +101,11 @@ import kotlinx.android.synthetic.main.include_find_in_page.*
 import kotlinx.android.synthetic.main.include_new_browser_tab.*
 import kotlinx.android.synthetic.main.include_omnibar_toolbar.*
 import kotlinx.android.synthetic.main.include_omnibar_toolbar.view.*
+import kotlinx.android.synthetic.main.layout_bottom_navigation_bar.bottomBarBackItem
+import kotlinx.android.synthetic.main.layout_bottom_navigation_bar.bottomBarBookmarksItem
+import kotlinx.android.synthetic.main.layout_bottom_navigation_bar.bottomBarFireItem
+import kotlinx.android.synthetic.main.layout_bottom_navigation_bar.bottomBarForwardItem
+import kotlinx.android.synthetic.main.layout_bottom_navigation_bar.bottomBarTabsItem
 import kotlinx.android.synthetic.main.popup_window_browser_menu.view.*
 import kotlinx.coroutines.*
 import org.jetbrains.anko.longToast
@@ -209,12 +214,6 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
     private val browserActivity
         get() = activity as? BrowserActivity
 
-    private val tabsButton: MenuItem?
-        get() = toolbar.menu.findItem(R.id.tabs)
-
-    private val fireMenuButton: MenuItem?
-        get() = toolbar.menu.findItem(R.id.fire)
-
     private val menuButton: ViewGroup?
         get() = appBarLayout.browserMenu
 
@@ -268,6 +267,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
         createPopupMenu()
         configureObservers()
         configureAppBar()
+        configureBottomBar()
         configureWebView()
         viewModel.registerWebViewListener(webViewClient, webChromeClient)
         configureOmnibarTextInput()
@@ -298,8 +298,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
         val transport = message.obj as WebView.WebViewTransport
         transport.webView = webView
         message.sendToTarget()
-        val tabsButton = tabsButton?.actionView as TabSwitcherButton
-        tabsButton.animateCount()
+        bottomBarTabsItem.animateCount()
         viewModel.onMessageProcessed()
     }
 
@@ -314,13 +313,13 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
     }
 
     private fun configureShowTabSwitcherListener() {
-        tabsButton?.actionView?.setOnClickListener {
+        bottomBarTabsItem.setOnClickListener {
             launch { viewModel.userLaunchingTabSwitcher() }
         }
     }
 
     private fun configureLongClickOpensNewTabListener() {
-        tabsButton?.actionView?.setOnLongClickListener {
+        bottomBarTabsItem.setOnLongClickListener {
             launch { viewModel.userRequestedOpeningNewTab() }
             return@setOnLongClickListener true
         }
@@ -605,8 +604,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
     private fun openInNewBackgroundTab() {
         appBarLayout.setExpanded(true, true)
         viewModel.tabs.removeObservers(this)
-        val view = tabsButton?.actionView as TabSwitcherButton
-        view.increment {
+        bottomBarTabsItem.increment {
             addTabsObserver()
         }
     }
@@ -725,17 +723,6 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
     }
 
     private fun configureAppBar() {
-        toolbar.inflateMenu(R.menu.menu_browser_activity)
-
-        toolbar.setOnMenuItemClickListener { menuItem ->
-            when (menuItem.itemId) {
-                R.id.fire -> {
-                    browserActivity?.launchFire()
-                    return@setOnMenuItemClickListener true
-                }
-                else -> return@setOnMenuItemClickListener false
-            }
-        }
 
         toolbar.privacyGradeButton.setOnClickListener {
             browserActivity?.launchPrivacyDashboard()
@@ -754,6 +741,15 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
                 privacyGradeButton?.isEnabled = privacyGrade != PrivacyGrade.UNKNOWN
             }
         })
+    }
+
+    private fun configureBottomBar(){
+        bottomNavigationBar.apply {
+            onItemClicked(bottomBarBackItem) { activity?.onBackPressed() }
+            onItemClicked(bottomBarForwardItem) { viewModel.onUserPressedForward() }
+            onItemClicked(bottomBarFireItem) {  browserActivity?.launchFire() }
+            onItemClicked(bottomBarBookmarksItem) {  viewModel.onBookmarkAddRequested() }
+        }
     }
 
     private fun configureFindInPage() {
@@ -1363,8 +1359,8 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
         private fun renderToolbarMenus(viewState: BrowserViewState) {
             privacyGradeButton?.isVisible = viewState.showPrivacyGrade
             clearTextButton?.isVisible = viewState.showClearButton
-            tabsButton?.isVisible = viewState.showTabsButton
-            fireMenuButton?.isVisible = viewState.showFireButton
+            bottomBarTabsItem?.isVisible = viewState.showTabsButton
+            bottomBarFireItem?.isVisible = viewState.showFireButton
             menuButton?.isVisible = viewState.showMenuButton
         }
 
@@ -1386,9 +1382,8 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
 
         fun renderTabIcon(tabs: List<TabEntity>) {
             context?.let {
-                val button = tabsButton?.actionView as TabSwitcherButton
-                button.count = tabs.count()
-                button.hasUnread = tabs.firstOrNull { !it.viewed } != null
+                bottomBarTabsItem.count = tabs.count()
+                bottomBarTabsItem.hasUnread = tabs.firstOrNull { !it.viewed } != null
             }
         }
 
