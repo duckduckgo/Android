@@ -14,7 +14,7 @@
   ~ limitations under the License.
   -->
 
-<Bottom xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -24,7 +24,7 @@
     android:orientation="horizontal"
     android:elevation="8dp"
     android:background="@color/white"
-    app:layout_behavior="@string/hide_bottom_view_on_scroll_behavior">
+    app:layout_behavior="com.duckduckgo.app.browser.ui.HideBottomViewOnScrollBehavior">
 
     <ImageButton
         android:id="@+id/bottomBarBackItem"
@@ -66,4 +66,4 @@
         android:src="@drawable/ic_bookmarks_black_24dp"
         android:background="?selectableItemBackground"/>
 
-</Bottom>
+</LinearLayout>

@@ -14,18 +14,15 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.browser
+package com.duckduckgo.app.browser.ui
 
-import android.animation.Animator
-import android.animation.AnimatorListenerAdapter
 import android.content.Context
 import android.view.LayoutInflater
-import android.widget.FrameLayout
 import android.widget.LinearLayout
+import com.duckduckgo.app.browser.R
 import com.google.android.material.bottomnavigation.BottomNavigationView
-import kotlinx.android.synthetic.main.view_tab_switcher_button.view.*
 
-class BottomNavigationBar(context: Context) : BottomNavigationView(context) {
+class BottomNavigationBar(context: Context) : LinearLayout(context) {
 
     init {
         LayoutInflater.from(context).inflate(R.layout.layout_bottom_navigation_bar, this, true)
