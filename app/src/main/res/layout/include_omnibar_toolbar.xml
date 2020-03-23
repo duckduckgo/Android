@@ -27,16 +27,13 @@
         android:id="@+id/appBarLayout"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
-        android:fitsSystemWindows="true"
-        android:theme="@style/AppTheme.Dark.AppBarOverlay"
-        app:layout_scrollFlags="scroll|enterAlways">
+        android:theme="@style/AppTheme.Dark.AppBarOverlay">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/toolbarContainer"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:theme="@style/OmnibarToolbarTheme"
-            app:layout_scrollFlags="scroll|enterAlways">
+            android:theme="@style/OmnibarToolbarTheme">
 
             <androidx.appcompat.widget.Toolbar
                 android:id="@+id/toolbar"
@@ -49,7 +46,6 @@
                 app:layout_constraintEnd_toStartOf="@id/browserMenu"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                app:layout_scrollFlags="scroll|enterAlways"
                 app:popupTheme="@style/AppTheme.Dark.PopupOverlay">
 
                 <androidx.constraintlayout.widget.ConstraintLayout
@@ -64,12 +60,12 @@
                     android:paddingStart="6dp"
                     android:paddingEnd="6dp">
 
-                <androidx.constraintlayout.widget.ConstraintLayout
-                    android:id="@+id/networksContainer"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent" />
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:id="@+id/networksContainer"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent" />
 
                     <ImageButton
                         android:id="@+id/privacyGradeButton"
@@ -168,7 +164,6 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
-
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 

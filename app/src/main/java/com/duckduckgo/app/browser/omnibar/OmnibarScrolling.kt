@@ -18,8 +18,7 @@ package com.duckduckgo.app.browser.omnibar
 
 import android.view.View
 import com.google.android.material.appbar.AppBarLayout
-import com.google.android.material.appbar.AppBarLayout.LayoutParams.SCROLL_FLAG_ENTER_ALWAYS
-import com.google.android.material.appbar.AppBarLayout.LayoutParams.SCROLL_FLAG_SCROLL
+import com.google.android.material.appbar.AppBarLayout.LayoutParams.*
 import javax.inject.Inject
 
 

@@ -21,9 +21,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    app:layout_scrollFlags="scroll|enterAlways"
     tools:context="com.duckduckgo.app.browser.BrowserActivity">
-
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/fragmentContainer"
