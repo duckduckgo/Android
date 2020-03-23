@@ -54,7 +54,7 @@ class NotificationHandlerService : IntentService("NotificationHandlerService") {
     lateinit var notificationManager: NotificationManagerCompat
 
     @Inject
-    lateinit var notificationScheduler: NotificationScheduler
+    lateinit var notificationScheduler: AndroidNotificationScheduler
 
     @Inject
     lateinit var settingsDataStore: SettingsDataStore
