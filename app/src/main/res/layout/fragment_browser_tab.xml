@@ -32,7 +32,7 @@
         android:elevation="8dp"
         android:gravity="center"
         android:orientation="horizontal"
-        app:layout_behavior="com.duckduckgo.app.browser.ui.HideBottomViewOnScrollBehavior" />
+        app:layout_behavior="com.duckduckgo.app.browser.ui.BottomNavigationBehavior" />
 
     <include
         android:id="@+id/defaultCard"
