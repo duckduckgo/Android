@@ -397,4 +397,6 @@
     <string name="hideTipsText">Υπάρχουν λίγες μόνο και προσπαθήσαμε να τις καταστήσουμε ενημερωτικές.</string>
     <string name="hideTipsButton">Απόκρυψη συμβουλών για πάντα</string>
 
+    <!-- Covid Cta-->
+    <string name="covidCtaText">Αποκτήστε τις επίσημες πληροφορίες και συμβουλές για το COVID-19.</string>
 </resources>

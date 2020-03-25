@@ -36,19 +36,20 @@
 
         <TextView
             android:id="@+id/upperCtaTitle"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
             android:layout_marginTop="11dp"
-            android:layout_marginEnd="30dp"
+            android:layout_marginEnd="7dp"
             android:layout_marginBottom="11dp"
             android:letterSpacing="0.02"
             android:textColor="?attr/topCallToActionDescriptionColor"
             android:textSize="16sp"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="@id/closeButton"
+            app:layout_constraintEnd_toStartOf="@+id/closeButton"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            tools:text="Get official COVID-19 info and tips." />
+            tools:text="@string/covidCtaText" />
 
         <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/closeButton"
