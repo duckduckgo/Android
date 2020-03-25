@@ -23,20 +23,37 @@ import android.annotation.SuppressLint
 import android.app.Activity.RESULT_OK
 import android.app.ActivityOptions
 import android.appwidget.AppWidgetManager
-import android.content.*
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.content.ComponentName
+import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.media.MediaScannerConnection
 import android.net.Uri
-import android.os.*
+import android.os.Build
+import android.os.Bundle
+import android.os.Environment
+import android.os.Handler
+import android.os.Message
 import android.text.Editable
-import android.view.*
+import android.view.ContextMenu
+import android.view.KeyEvent
+import android.view.LayoutInflater
+import android.view.MenuItem
+import android.view.View
 import android.view.View.*
+import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
-import android.webkit.*
+import android.webkit.ValueCallback
+import android.webkit.WebChromeClient
+import android.webkit.WebSettings
+import android.webkit.WebView
 import android.webkit.WebView.FindListener
 import android.webkit.WebView.HitTestResult
 import android.webkit.WebView.HitTestResult.*
+import android.webkit.WebViewDatabase
 import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
@@ -52,7 +69,11 @@ import androidx.core.view.isVisible
 import androidx.core.view.postDelayed
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.*
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleObserver
+import androidx.lifecycle.Observer
+import androidx.lifecycle.OnLifecycleEvent
+import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion
 import com.duckduckgo.app.bookmarks.ui.EditBookmarkDialogFragment
@@ -76,10 +97,25 @@ import com.duckduckgo.app.browser.tabpreview.WebViewPreviewGenerator
 import com.duckduckgo.app.browser.tabpreview.WebViewPreviewPersister
 import com.duckduckgo.app.browser.ui.HttpAuthenticationDialogFragment
 import com.duckduckgo.app.browser.useragent.UserAgentProvider
-import com.duckduckgo.app.cta.ui.*
+import com.duckduckgo.app.cta.ui.Cta
+import com.duckduckgo.app.cta.ui.CtaViewModel
+import com.duckduckgo.app.cta.ui.DaxBubbleCta
+import com.duckduckgo.app.cta.ui.DaxDialogCta
+import com.duckduckgo.app.cta.ui.HomePanelCta
+import com.duckduckgo.app.cta.ui.SecondaryButtonCta
 import com.duckduckgo.app.global.ViewModelFactory
 import com.duckduckgo.app.global.device.DeviceInfo
-import com.duckduckgo.app.global.view.*
+import com.duckduckgo.app.global.view.NonDismissibleBehavior
+import com.duckduckgo.app.global.view.TextChangedWatcher
+import com.duckduckgo.app.global.view.gone
+import com.duckduckgo.app.global.view.hide
+import com.duckduckgo.app.global.view.hideKeyboard
+import com.duckduckgo.app.global.view.isDifferent
+import com.duckduckgo.app.global.view.isImmersiveModeEnabled
+import com.duckduckgo.app.global.view.renderIfChanged
+import com.duckduckgo.app.global.view.show
+import com.duckduckgo.app.global.view.showKeyboard
+import com.duckduckgo.app.global.view.toggleFullScreen
 import com.duckduckgo.app.onboarding.ui.page.DefaultBrowserPage
 import com.duckduckgo.app.privacy.model.PrivacyGrade
 import com.duckduckgo.app.privacy.renderer.icon
@@ -94,20 +130,64 @@ import com.duckduckgo.app.widget.ui.AddWidgetInstructionsActivity
 import com.duckduckgo.widget.SearchWidgetLight
 import com.google.android.material.snackbar.Snackbar
 import dagger.android.support.AndroidSupportInjection
-import kotlinx.android.synthetic.main.fragment_browser_tab.*
-import kotlinx.android.synthetic.main.include_cta_buttons.view.*
-import kotlinx.android.synthetic.main.include_dax_dialog_cta.*
-import kotlinx.android.synthetic.main.include_find_in_page.*
-import kotlinx.android.synthetic.main.include_new_browser_tab.*
-import kotlinx.android.synthetic.main.include_omnibar_toolbar.*
-import kotlinx.android.synthetic.main.include_omnibar_toolbar.view.*
+import kotlinx.android.synthetic.main.fragment_browser_tab.autoCompleteSuggestionsList
+import kotlinx.android.synthetic.main.fragment_browser_tab.bottomNavigationBar
+import kotlinx.android.synthetic.main.fragment_browser_tab.browserLayout
+import kotlinx.android.synthetic.main.fragment_browser_tab.defaultCard
+import kotlinx.android.synthetic.main.fragment_browser_tab.focusDummy
+import kotlinx.android.synthetic.main.fragment_browser_tab.rootView
+import kotlinx.android.synthetic.main.fragment_browser_tab.webViewContainer
+import kotlinx.android.synthetic.main.fragment_browser_tab.webViewFullScreenContainer
+import kotlinx.android.synthetic.main.include_cta_buttons.view.ctaDismissButton
+import kotlinx.android.synthetic.main.include_cta_buttons.view.ctaOkButton
+import kotlinx.android.synthetic.main.include_dax_dialog_cta.daxCtaContainer
+import kotlinx.android.synthetic.main.include_dax_dialog_cta.dialogTextCta
+import kotlinx.android.synthetic.main.include_find_in_page.closeFindInPagePanel
+import kotlinx.android.synthetic.main.include_find_in_page.findInPageContainer
+import kotlinx.android.synthetic.main.include_find_in_page.findInPageInput
+import kotlinx.android.synthetic.main.include_find_in_page.findInPageMatches
+import kotlinx.android.synthetic.main.include_find_in_page.nextSearchTermButton
+import kotlinx.android.synthetic.main.include_find_in_page.previousSearchTermButton
+import kotlinx.android.synthetic.main.include_new_browser_tab.ctaContainer
+import kotlinx.android.synthetic.main.include_new_browser_tab.ddgLogo
+import kotlinx.android.synthetic.main.include_new_browser_tab.newTabLayout
+import kotlinx.android.synthetic.main.include_omnibar_toolbar.appBarLayout
+import kotlinx.android.synthetic.main.include_omnibar_toolbar.browserMenu
+import kotlinx.android.synthetic.main.include_omnibar_toolbar.clearTextButton
+import kotlinx.android.synthetic.main.include_omnibar_toolbar.networksContainer
+import kotlinx.android.synthetic.main.include_omnibar_toolbar.omniBarContainer
+import kotlinx.android.synthetic.main.include_omnibar_toolbar.omnibarTextInput
+import kotlinx.android.synthetic.main.include_omnibar_toolbar.pageLoadingIndicator
+import kotlinx.android.synthetic.main.include_omnibar_toolbar.privacyGradeButton
+import kotlinx.android.synthetic.main.include_omnibar_toolbar.toolbar
+import kotlinx.android.synthetic.main.include_omnibar_toolbar.toolbarContainer
+import kotlinx.android.synthetic.main.include_omnibar_toolbar.view.browserMenu
+import kotlinx.android.synthetic.main.include_omnibar_toolbar.view.privacyGradeButton
 import kotlinx.android.synthetic.main.layout_bottom_navigation_bar.bottomBarBackItem
 import kotlinx.android.synthetic.main.layout_bottom_navigation_bar.bottomBarBookmarksItem
 import kotlinx.android.synthetic.main.layout_bottom_navigation_bar.bottomBarFireItem
 import kotlinx.android.synthetic.main.layout_bottom_navigation_bar.bottomBarForwardItem
 import kotlinx.android.synthetic.main.layout_bottom_navigation_bar.bottomBarTabsItem
-import kotlinx.android.synthetic.main.popup_window_browser_menu.view.*
-import kotlinx.coroutines.*
+import kotlinx.android.synthetic.main.popup_window_browser_menu.view.addBookmarksPopupMenuItem
+import kotlinx.android.synthetic.main.popup_window_browser_menu.view.addToHome
+import kotlinx.android.synthetic.main.popup_window_browser_menu.view.backPopupMenuItem
+import kotlinx.android.synthetic.main.popup_window_browser_menu.view.bookmarksPopupMenuItem
+import kotlinx.android.synthetic.main.popup_window_browser_menu.view.brokenSitePopupMenuItem
+import kotlinx.android.synthetic.main.popup_window_browser_menu.view.findInPageMenuItem
+import kotlinx.android.synthetic.main.popup_window_browser_menu.view.forwardPopupMenuItem
+import kotlinx.android.synthetic.main.popup_window_browser_menu.view.newTabPopupMenuItem
+import kotlinx.android.synthetic.main.popup_window_browser_menu.view.refreshPopupMenuItem
+import kotlinx.android.synthetic.main.popup_window_browser_menu.view.requestDesktopSiteCheckMenuItem
+import kotlinx.android.synthetic.main.popup_window_browser_menu.view.settingsPopupMenuItem
+import kotlinx.android.synthetic.main.popup_window_browser_menu.view.sharePageMenuItem
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.jetbrains.anko.longToast
 import org.jetbrains.anko.share
 import timber.log.Timber
@@ -198,6 +278,8 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
 
     private lateinit var renderer: BrowserTabFragmentRenderer
 
+    private lateinit var decorator: BrowserTabFragmentExperimentDecorator
+
     private val viewModel: BrowserTabViewModel by lazy {
         val viewModel = ViewModelProviders.of(this, viewModelFactory).get(BrowserTabViewModel::class.java)
         viewModel.loadData(tabId, initialUrl, skipHome)
@@ -256,6 +338,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         renderer = BrowserTabFragmentRenderer()
+        decorator = BrowserTabFragmentExperimentDecorator()
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -264,18 +347,20 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        createPopupMenu()
+
         configureObservers()
-        configureAppBar()
-        configureBottomBar()
         configureWebView()
         viewModel.registerWebViewListener(webViewClient, webChromeClient)
         configureOmnibarTextInput()
         configureFindInPage()
         configureAutoComplete()
         configureKeyboardAwareLogoAnimation()
+
+        createPopupMenu()
+        configureAppBar()
         configureShowTabSwitcherListener()
         configureLongClickOpensNewTabListener()
+        decorateWithExperiments()
 
         if (savedInstanceState == null) {
             viewModel.onViewReady()
@@ -722,6 +807,22 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
         autoCompleteSuggestionsList.adapter = autoCompleteSuggestionsAdapter
     }
 
+
+    private fun decorateWithExperiments(){
+        when{
+            variantManager.getVariant().hasFeature(VariantManager.VariantFeature.ConceptTest) -> {
+                decorator.decorateWithToolbarOnlyExperiment()
+            }
+            variantManager.getVariant().hasFeature(VariantManager.VariantFeature.ConceptTest) -> {
+                decorator.decorateWithBottomBarNavigationOnlyExperiment()
+            }
+            else -> {
+                decorator.decorateWithBottomBarAndToolbarExperiment()
+            }
+        }
+    }
+
+
     private fun configureAppBar() {
 
         toolbar.privacyGradeButton.setOnClickListener {
@@ -741,15 +842,6 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
                 privacyGradeButton?.isEnabled = privacyGrade != PrivacyGrade.UNKNOWN
             }
         })
-    }
-
-    private fun configureBottomBar(){
-        bottomNavigationBar.apply {
-            onItemClicked(bottomBarBackItem) { activity?.onBackPressed() }
-            onItemClicked(bottomBarForwardItem) { viewModel.onUserPressedForward() }
-            onItemClicked(bottomBarFireItem) {  browserActivity?.launchFire() }
-            onItemClicked(bottomBarBookmarksItem) {  launch { viewModel.onBookmarkAddRequested() } }
-        }
     }
 
     private fun configureFindInPage() {
@@ -1180,6 +1272,49 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
             }
             fragment.arguments = args
             return fragment
+        }
+    }
+
+    inner class BrowserTabFragmentExperimentDecorator {
+
+        fun decorateWithToolbarOnlyExperiment(){
+            hideBottomBar()
+        }
+
+        fun decorateWithBottomBarNavigationOnlyExperiment(){
+            decorateAppBarWithToolbarOnlyExperiment()
+            decorateBottomBar()
+        }
+
+        fun decorateWithBottomBarAndToolbarExperiment(){
+            decorateAppBarWithToolbarOnlyExperiment()
+            decorateBottomBar()
+        }
+
+        private fun decorateAppBarWithToolbarOnlyExperiment(){
+            toolbar.inflateMenu(R.menu.menu_browser_activity)
+            toolbar.setOnMenuItemClickListener { menuItem ->
+                when (menuItem.itemId) {
+                    R.id.fire -> {
+                        browserActivity?.launchFire()
+                        return@setOnMenuItemClickListener true
+                    }
+                    else -> return@setOnMenuItemClickListener false
+                }
+            }
+        }
+
+        private fun decorateBottomBar(){
+            bottomNavigationBar.apply {
+                onItemClicked(bottomBarBackItem) { activity?.onBackPressed() }
+                onItemClicked(bottomBarForwardItem) { viewModel.onUserPressedForward() }
+                onItemClicked(bottomBarFireItem) {  browserActivity?.launchFire() }
+                onItemClicked(bottomBarBookmarksItem) {  launch { viewModel.onBookmarkAddRequested() } }
+            }
+        }
+
+        private fun hideBottomBar(){
+            bottomNavigationBar.gone()
         }
     }
 
