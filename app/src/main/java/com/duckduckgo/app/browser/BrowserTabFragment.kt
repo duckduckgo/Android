@@ -296,6 +296,12 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
     private val browserActivity
         get() = activity as? BrowserActivity
 
+    private val tabsButton: MenuItem?
+        get() = toolbar.menu.findItem(R.id.tabs)
+
+    private val fireMenuButton: MenuItem?
+        get() = toolbar.menu.findItem(R.id.fire)
+
     private val menuButton: ViewGroup?
         get() = appBarLayout.browserMenu
 
@@ -355,11 +361,8 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
         configureFindInPage()
         configureAutoComplete()
         configureKeyboardAwareLogoAnimation()
-
-        createPopupMenu()
         configureAppBar()
-        configureShowTabSwitcherListener()
-        configureLongClickOpensNewTabListener()
+
         decorateWithExperiments()
 
         if (savedInstanceState == null) {
@@ -397,19 +400,6 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
         }
     }
 
-    private fun configureShowTabSwitcherListener() {
-        bottomBarTabsItem.setOnClickListener {
-            launch { viewModel.userLaunchingTabSwitcher() }
-        }
-    }
-
-    private fun configureLongClickOpensNewTabListener() {
-        bottomBarTabsItem.setOnLongClickListener {
-            launch { viewModel.userRequestedOpeningNewTab() }
-            return@setOnLongClickListener true
-        }
-    }
-
     private fun launchTabSwitcher() {
         val activity = activity ?: return
         startActivity(TabSwitcherActivity.intent(activity, tabId))
@@ -433,25 +423,6 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
         daxDialog = null
         logoHidingListener.onPause()
         super.onPause()
-    }
-
-    private fun createPopupMenu() {
-        popupMenu = BrowserPopupMenu(layoutInflater)
-        val view = popupMenu.contentView
-        popupMenu.apply {
-            onMenuItemClicked(view.forwardPopupMenuItem) { viewModel.onUserPressedForward() }
-            onMenuItemClicked(view.backPopupMenuItem) { activity?.onBackPressed() }
-            onMenuItemClicked(view.refreshPopupMenuItem) { viewModel.onRefreshRequested() }
-            onMenuItemClicked(view.newTabPopupMenuItem) { viewModel.userRequestedOpeningNewTab() }
-            onMenuItemClicked(view.bookmarksPopupMenuItem) { browserActivity?.launchBookmarks() }
-            onMenuItemClicked(view.addBookmarksPopupMenuItem) { launch { viewModel.onBookmarkAddRequested() } }
-            onMenuItemClicked(view.findInPageMenuItem) { viewModel.onFindInPageSelected() }
-            onMenuItemClicked(view.brokenSitePopupMenuItem) { viewModel.onBrokenSiteSelected() }
-            onMenuItemClicked(view.settingsPopupMenuItem) { browserActivity?.launchSettings() }
-            onMenuItemClicked(view.requestDesktopSiteCheckMenuItem) { viewModel.onDesktopSiteModeToggled(view.requestDesktopSiteCheckMenuItem.isChecked) }
-            onMenuItemClicked(view.sharePageMenuItem) { viewModel.onShareSelected() }
-            onMenuItemClicked(view.addToHome) { viewModel.onPinPageToHomeSelected() }
-        }
     }
 
     private fun addHomeShortcut(homeShortcut: Command.AddHomeShortcut, context: Context) {
@@ -809,6 +780,8 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
 
 
     private fun decorateWithExperiments(){
+        decorator.decorateWithToolbarOnlyExperiment()
+        return
         when{
             variantManager.getVariant().hasFeature(VariantManager.VariantFeature.ConceptTest) -> {
                 decorator.decorateWithToolbarOnlyExperiment()
@@ -1279,16 +1252,26 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
 
         fun decorateWithToolbarOnlyExperiment(){
             hideBottomBar()
+            decorateAppBarWithToolbarOnlyExperiment()
+            createPopupMenuWithToolbarOnlyExperiment()
+            configureShowTabSwitcherListenerWithToolbarOnlyExperiment()
+            configureLongClickOpensNewTabListenerWithToolbarOnlyExperiment()
         }
 
         fun decorateWithBottomBarNavigationOnlyExperiment(){
-            decorateAppBarWithToolbarOnlyExperiment()
             decorateBottomBar()
+            decorateAppBarWithToolbarOnlyExperiment()
+            createPopupMenuWithToolbarOnlyExperiment()
+            configureShowTabSwitcherListenerWithBottomBarNavigationOnlyExperiment()
+            configureLongClickOpensNewTabListenerWithBottomBarNavigationOnlyExperiment()
         }
 
         fun decorateWithBottomBarAndToolbarExperiment(){
-            decorateAppBarWithToolbarOnlyExperiment()
             decorateBottomBar()
+            decorateAppBarWithToolbarOnlyExperiment()
+            createPopupMenuWithToolbarOnlyExperiment()
+            configureShowTabSwitcherListenerWithBottomBarNavigationOnlyExperiment()
+            configureLongClickOpensNewTabListenerWithBottomBarNavigationOnlyExperiment()
         }
 
         private fun decorateAppBarWithToolbarOnlyExperiment(){
@@ -1304,6 +1287,25 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
             }
         }
 
+        private fun createPopupMenuWithToolbarOnlyExperiment() {
+            popupMenu = BrowserPopupMenu(layoutInflater)
+            val view = popupMenu.contentView
+            popupMenu.apply {
+                onMenuItemClicked(view.forwardPopupMenuItem) { viewModel.onUserPressedForward() }
+                onMenuItemClicked(view.backPopupMenuItem) { activity?.onBackPressed() }
+                onMenuItemClicked(view.refreshPopupMenuItem) { viewModel.onRefreshRequested() }
+                onMenuItemClicked(view.newTabPopupMenuItem) { viewModel.userRequestedOpeningNewTab() }
+                onMenuItemClicked(view.bookmarksPopupMenuItem) { browserActivity?.launchBookmarks() }
+                onMenuItemClicked(view.addBookmarksPopupMenuItem) { launch { viewModel.onBookmarkAddRequested() } }
+                onMenuItemClicked(view.findInPageMenuItem) { viewModel.onFindInPageSelected() }
+                onMenuItemClicked(view.brokenSitePopupMenuItem) { viewModel.onBrokenSiteSelected() }
+                onMenuItemClicked(view.settingsPopupMenuItem) { browserActivity?.launchSettings() }
+                onMenuItemClicked(view.requestDesktopSiteCheckMenuItem) { viewModel.onDesktopSiteModeToggled(view.requestDesktopSiteCheckMenuItem.isChecked) }
+                onMenuItemClicked(view.sharePageMenuItem) { viewModel.onShareSelected() }
+                onMenuItemClicked(view.addToHome) { viewModel.onPinPageToHomeSelected() }
+            }
+        }
+
         private fun decorateBottomBar(){
             bottomNavigationBar.apply {
                 onItemClicked(bottomBarBackItem) { activity?.onBackPressed() }
@@ -1316,7 +1318,35 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
         private fun hideBottomBar(){
             bottomNavigationBar.gone()
         }
+
+        private fun configureShowTabSwitcherListenerWithToolbarOnlyExperiment() {
+            tabsButton?.actionView?.setOnClickListener {
+                launch { viewModel.userLaunchingTabSwitcher() }
+            }
+        }
+
+        private fun configureShowTabSwitcherListenerWithBottomBarNavigationOnlyExperiment() {
+            bottomBarTabsItem.setOnClickListener {
+                launch { viewModel.userLaunchingTabSwitcher() }
+            }
+        }
+
+        private fun configureLongClickOpensNewTabListenerWithToolbarOnlyExperiment() {
+            tabsButton?.actionView?.setOnLongClickListener {
+                launch { viewModel.userRequestedOpeningNewTab() }
+                return@setOnLongClickListener true
+            }
+        }
+
+        private fun configureLongClickOpensNewTabListenerWithBottomBarNavigationOnlyExperiment() {
+            bottomBarTabsItem.setOnLongClickListener {
+                launch { viewModel.userRequestedOpeningNewTab() }
+                return@setOnLongClickListener true
+            }
+        }
     }
+
+
 
     inner class BrowserTabFragmentRenderer {
 
