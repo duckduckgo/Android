@@ -421,4 +421,26 @@
     <string name="hideTipsText">Tie ir tikai daži, un mēs centāmies padarīt tos informatīvus.</string>
     <string name="hideTipsButton">Paslēpt padomus uz visiem laikiem</string>
 
+    <!-- New Onboarding Experience -->
+    <string name="onboardingWelcomeTitle">Laipni lūdzam DuckDuckGo!</string>
+    <string name="onboardingDaxText">Internets var būt diezgan biedējošs.&lt;br/&gt;&lt;br/&gt;Bet neuztraucieties! Meklēt un pārlūkot privātā režīmā ir vieglāk, nekā jūs domājat.</string>
+    <string name="onboardingLetsDoItButton">Darīsim to!</string>
+    <string name="daxIntroCtaText">Tagad pamēģiniet ieiet kādā no jūsu mīļākajām vietnēm! &lt;br/&gt;&lt;br/&gt;Es nobloķēšu izsekotājus, lai viņi nevarētu jūs izspiegot. Ja iespējams, uzlabošu arī jūsu savienojuma drošību. &#128274;</string>
+    <string name="daxEndCtaText">Tas izdevās! &lt;br/&gt;&lt;br/&gt;Atcerieties – katru reizi, kad jūs pārlūkojat ar mani, jocīgas reklāmas atkāpjas. &#128077;</string>
+    <string name="daxSerpCtaText">Jūsu DuckDuckGo meklējumi ir anonīmi, un es nekad neuzglabāju jūsu meklēšanas vēsturi. Nekad. &#128588;</string>
+    <string name="daxDefaultBrowserCtaText">Pirms es aizpēkšķu projām! &lt;br/&gt;&lt;br/&gt;Vai vēlaties aizsardzību pret izsekotājiem, atverot saites no citām lietotnēm? &lt;br/&gt;&lt;br/&gt;Izvēlieties DuckDuckGo par jūsu noklusējuma pārlūku!</string>
+    <string name="daxSearchWidgetCtaText">Jums tas izdevās! &lt;br/&gt;&lt;br/&gt;Meklējiet privāti vēl ātrāk! Sākuma ekrānā pievienojiet meklēšanas logrīku DuckDuckGo.</string>
+    <string name="daxNonSerpCtaText">Katrai vietnei ir savs konfidencialitātes līmenis. Pieskarieties tam, lai redzētu, kā es aizsargāju jūsu privātumu.&lt;br/&gt;&lt;br/&gt;Kaut ko vēl labāku? Pamēģiniet nodzēst datus, noklikšķinot uz uguns pogas.</string>
+    <string name="daxMainNetworkStep1CtaText">Galvas augšā!&lt;br/&gt;&lt;br/&gt; %s pārvalda lielu izsekošanas tīklu.&lt;br/&gt;&lt;br/&gt;Zems konfidencialitātes līmenis jūs aizvedīs uz šādām vietnēm.</string>
+    <string name="daxMainNetworkStep1OwnedCtaText">Galvas augšā!&lt;br/&gt;&lt;br/&gt; %s pieder uzņēmumam %s, kas pārvalda galveno izsekošanas tīklu.</string>
+    <string name="daxMainNetworkStep21CtaText">Faktiski %s izsekotāji slēpjas apmēram %s populārākajās vietnēs. &#128561;&lt;br/&gt;&lt;br/&gt;</string>
+    <string name="daxMainNetworkStep211CtaText">Faktiski %s izsekotāju slēpjas visā internetā. &#128561;&lt;br/&gt;&lt;br/&gt;</string>
+    <string name="daxMainNetworkStep2CtaText">%s Es bloķēšu šos izsekotājus, kad pārlūkosiet vietnes, kas nav %s vietnes.</string>
+    <plurals name="daxTrackersBlockedCtaText">
+        <item quantity="zero">un &lt;b&gt;%d citas&lt;/b&gt; mēģināja jūs izsekot. &lt;br/&gt;&lt;br/&gt;Es tās nobloķēju!&lt;br/&gt;&lt;br/&gt; ☝️Jūs varat pārbaudīt URL joslu, lai redzētu, kas mēģina jūs izsekot, kad apmeklējat jaunu vietni.️</item>
+        <item quantity="one">un &lt;b&gt;%d citas&lt;/b&gt; mēģināja jūs izsekot. &lt;br/&gt;&lt;br/&gt;Es tās nobloķēju!&lt;br/&gt;&lt;br/&gt; ☝️Jūs varat pārbaudīt URL joslu, lai redzētu, kurš mēģina jūs izsekot, kad apmeklējat jaunu vietni.️</item>
+        <item quantity="other">un &lt;b&gt;%d citas&lt;/b&gt; mēģināja jūs izsekot. &lt;br/&gt;&lt;br/&gt;Es tās nobloķēju!&lt;br/&gt;&lt;br/&gt; ☝️Jūs varat pārbaudīt URL joslu, lai redzētu, kurš mēģina jūs izsekot, kad apmeklējat jaunu vietni.️</item>
+    </plurals>
+    <string name="daxTrackersBlockedCtaZeroText">mēģināja jūs izsekot. &lt;br/&gt;&lt;br/&gt;Es to nobloķēju!&lt;br/&gt;&lt;br/&gt; ☝️Jūs varat pārbaudīt URL joslu, lai redzētu, kurš mēģina jūs izsekot, kad apmeklējat jaunu vietni.️</string>
+
 </resources>

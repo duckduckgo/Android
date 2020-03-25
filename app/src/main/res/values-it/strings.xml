@@ -401,4 +401,25 @@
     <string name="hideTipsText">Ce ne sono solo alcuni e abbiamo cercato di renderli informativi.</string>
     <string name="hideTipsButton">Nascondi suggerimenti per sempre</string>
 
+    <!-- New Onboarding Experience -->
+    <string name="onboardingWelcomeTitle">Benvenuto su DuckDuckGo</string>
+    <string name="onboardingDaxText">Internet può essere un po\' inquietante.&lt;br/&gt;&lt;br/&gt;Non preoccuparti! Cercare e navigare in privato è più facile di quanto pensi.</string>
+    <string name="onboardingLetsDoItButton">Facciamolo!</string>
+    <string name="daxIntroCtaText">Poi, prova a visitare uno dei tuoi siti preferiti! &lt;br/&gt;&lt;br/&gt;Bloccherò i localizzatori in modo che non possano spiarti. Aggiornerò anche la sicurezza della tua connessione, se possibile. &#128274;</string>
+    <string name="daxEndCtaText">Hai questo! &lt;br/&gt;&lt;br/&gt;Ricorda: ogni volta che navighi con me un annuncio inquietante perde le sue ali. &#128077;</string>
+    <string name="daxSerpCtaText">Le tue ricerche DuckDuckGo sono anonime e non memorizzo mai la cronologia delle ricerche. Mai. &#128588;</string>
+    <string name="daxDefaultBrowserCtaText">Prima di uscire! &lt;br/&gt;&lt;br/&gt;Desideri la protezione contro i localizzatori quando apri collegamenti da altre app? &lt;br/&gt;&lt;br/&gt;Rendi DuckDuckGo il tuo browser predefinito!</string>
+    <string name="daxSearchWidgetCtaText">Sei inarrestabile! &lt;br/&gt;&lt;br/&gt;Cerca in privato ancora più velocemente! Aggiungi il widget di ricerca di DuckDuckGo alla schermata principale.</string>
+    <string name="daxNonSerpCtaText">Ogni sito ha un grado di privacy. Toccalo per vedere come ho protetto la tua privacy.&lt;br/&gt;&lt;br/&gt;Vuoi essere sofisticato? Prova a cancellare i tuoi dati premendo il pulsante di fuoco.</string>
+    <string name="daxMainNetworkStep1CtaText">Dritta!&lt;br/&gt;&lt;br/&gt; %s gestisce un\'importante rete di tracciamento.&lt;br/&gt;&lt;br/&gt;Un basso livello di privacy ti avviserà di siti come questo.</string>
+    <string name="daxMainNetworkStep1OwnedCtaText">Dritta!&lt;br/&gt;&lt;br/&gt; %s è di proprietà di %s, che gestisce un\'importante rete di tracciamento.</string>
+    <string name="daxMainNetworkStep21CtaText">In effetti, %s localizzatori si nascondono in circa %s dei migliori siti. &#128561;&lt;br/&gt;&lt;br/&gt;</string>
+    <string name="daxMainNetworkStep211CtaText">In effetti, %s localizzatori si nascondono su Internet. &#128561;&lt;br/&gt;&lt;br/&gt;</string>
+    <string name="daxMainNetworkStep2CtaText">%s Bloccherò questi localizzatori quando navighi su siti non %s.</string>
+    <plurals name="daxTrackersBlockedCtaText">
+        <item quantity="one"> e &lt;b&gt;%d altro&lt;/b&gt; stavano cercando di rintracciarti qui. &lt;br/&gt;&lt;br/&gt;Li ho bloccati!&lt;br/&gt;&lt;br/&gt; ☝️Puoi controllare la barra degli URL per vedere chi sta cercando di rintracciarti quando visiti un nuovo sito.️</item>
+        <item quantity="other"> e &lt;b&gt;%d altri&lt;/b&gt; stavano cercando di rintracciarti qui. &lt;br/&gt;&lt;br/&gt;Li ho bloccati!&lt;br/&gt;&lt;br/&gt; ☝️Puoi controllare la barra degli URL per vedere chi sta cercando di rintracciarti quando visiti un nuovo sito.️</item>
+    </plurals>
+    <string name="daxTrackersBlockedCtaZeroText"> stava cercando di rintracciarti qui. &lt;br/&gt;&lt;br/&gt;L\'ho bloccato!&lt;br/&gt;&lt;br/&gt; ☝️Puoi controllare la barra degli URL per vedere chi sta cercando di rintracciarti quando visiti un nuovo sito.️</string>
+
 </resources>

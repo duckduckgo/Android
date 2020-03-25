@@ -386,4 +386,27 @@
     <string name="hideTipsText">Je ich len niekoľko, snažili sme sa, aby mali informatívny charakter.</string>
     <string name="hideTipsButton">Navždy skryť tipy</string>
 
+    <!-- New Onboarding Experience -->
+    <string name="onboardingWelcomeTitle">Vitajte v aplikácii DuckDuckGo!</string>
+    <string name="onboardingDaxText">Internet môže byť dosť nevyspytateľný.&lt;br/&gt;&lt;br/&gt;Nemajte žiadne obavy! Súkromné vyhľadávanie a prehliadanie je jednoduchšie, ako si myslíte.</string>
+    <string name="onboardingLetsDoItButton">Poďme na to!</string>
+    <string name="daxIntroCtaText">Nabudúce skúste navštíviť jeden z vašich obľúbených serverov! &lt;br/&gt;&lt;br/&gt;Zablokujeme sledovacie zariadenia, ktoré by vás mohli špehovať. V prípade potreby dokážeme tiež inovovať zabezpečenie vášho pripojenia. &#128274;</string>
+    <string name="daxEndCtaText">Hotovo! &lt;br/&gt;&lt;br/&gt;Pamätajte: zakaždým, keď prehľadávate v našej aplikácii, divnej reklame pristrihávate krídla. &#128077;</string>
+    <string name="daxSerpCtaText">Vaše vyhľadávanie v aplikácii DuckDuckGo je anonymné. Nikdy nebudeme uchovávať vašu históriu vyhľadávania. Nikdy. &#128588;</string>
+    <string name="daxDefaultBrowserCtaText">Skôr ako sa vyparím! &lt;br/&gt;&lt;br/&gt;Chcete ochranu pred sledovaním pri otvorení odkazov z iných aplikácií? &lt;br/&gt;&lt;br/&gt;Nastavte si aplikáciu DuckDuckGo ako predvolený prehliadač!</string>
+    <string name="daxSearchWidgetCtaText">Ste na šťastnej vlne! &lt;br/&gt;&lt;br/&gt;Vyhľadávajte v súkromí ešte rýchlejšie! Pridajte DuckDuckGo, miniaplikáciu vyhľadávania na svoju domovskú obrazovku.</string>
+    <string name="daxNonSerpCtaText">Každá stránka má vlastný stupeň ochrany osobných údajov. Ťuknutím na túto ikonu zobrazíte informácie o tom, ako sme chránili vaše súkromie.&lt;br/&gt;&lt;br/&gt;Chcete sa zabávať? Skúste vymazať svoje údaje stlačením spúšťacieho tlačidla.</string>
+    <string name="daxMainNetworkStep1CtaText">Hlavu hore!&lt;br/&gt;&lt;br/&gt; %s prevádzkuje hlavnú sledovaciu sieť.&lt;br/&gt;&lt;br/&gt;Nízka úroveň ochrany osobných údajov vás na takéto stránky upozorní.</string>
+    <string name="daxMainNetworkStep1OwnedCtaText">Hlavu hore!Vlastníkom &lt;br/&gt;&lt;br/&gt; %s je %s, ktorá prevádzkuje hlavnú sledovaciu sieť.</string>
+    <string name="daxMainNetworkStep21CtaText">V skutočnosti %s sledovatelia číhajú na asi %s najvýznamnejších stránkach. &#128561;&lt;br/&gt;&lt;br/&gt;</string>
+    <string name="daxMainNetworkStep211CtaText">V skutočnosti %s sledovatelia číhajú na celom internete. &#128561;&lt;br/&gt;&lt;br/&gt;</string>
+    <string name="daxMainNetworkStep2CtaText">%s Keď prehliadate ne %s stránky, blokujeme týchto sledovačov.</string>
+    <plurals name="daxTrackersBlockedCtaText">
+        <item quantity="one">a &lt;b&gt;%d ďalší&lt;/b&gt; sa vás tu pokúsil sledovať. &lt;br/&gt;&lt;br/&gt;Zablokovali sme ich!&lt;br/&gt;&lt;br/&gt; ☝️Skontrolujte si panel s URL adresou a zistite, kto sa vás snaží sledovať pri vašej návšteve novej stránky.️</item>
+        <item quantity="few">a &lt;b&gt;%d ďalších&lt;/b&gt; sa vás tu pokúsilo sledovať. &lt;br/&gt;&lt;br/&gt;Zablokovali sme ich!&lt;br/&gt;&lt;br/&gt; ☝️Skontrolujte si panel s URL adresou a zistite, kto sa vás snaží sledovať pri vašej návšteve novej stránky.️</item>
+        <item quantity="many">a &lt;b&gt;%d ďalších&lt;/b&gt; sa vás tu pokúsilo sledovať. &lt;br/&gt;&lt;br/&gt;Zablokovali sme ich!&lt;br/&gt;&lt;br/&gt; ☝️Skontrolujte si panel s URL adresou a zistite, kto sa vás snaží sledovať pri vašej návšteve novej stránky.️</item>
+        <item quantity="other">a &lt;b&gt;%d ďalší&lt;/b&gt; sa vás tu pokúsil sledovať. &lt;br/&gt;&lt;br/&gt;Zablokovali sme ich!&lt;br/&gt;&lt;br/&gt; ☝️Skontrolujte si panel s URL adresou a zistite, kto sa vás snaží sledovať pri vašej návšteve novej stránky.️</item>
+    </plurals>
+    <string name="daxTrackersBlockedCtaZeroText">sa vás tu snažil sledovať. &lt;br/&gt;&lt;br/&gt;Zablokovali sme ho!&lt;br/&gt;&lt;br/&gt; ☝️Skontrolujte si panel s URL adresou a zistite, kto sa vás snaží sledovať pri vašej návšteve novej stránky.️</string>
+
 </resources>

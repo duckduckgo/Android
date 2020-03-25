@@ -385,4 +385,25 @@
     <string name="hideTipsText">Niitä on vain pari, ja yritimme tehdä niistä informatiivisia.</string>
     <string name="hideTipsButton">Piilota vinkit ikuisesti</string>
 
+    <!-- New Onboarding Experience -->
+    <string name="onboardingWelcomeTitle">Tervetuloa DuckDuckGo-sovellukseen!</string>
+    <string name="onboardingDaxText">Internet voi olla pelottava.&lt;br/&gt;&lt;br/&gt;Ei hätää! Yksityinen haku ja selaaminen on helpompaa kuin luulet.</string>
+    <string name="onboardingLetsDoItButton">Aloitetaan!</string>
+    <string name="daxIntroCtaText">Seuraavaksi vieraile suosikkisivustoissasi! &lt;br/&gt;&lt;br/&gt;Estän jäljittäjät, jotta he eivät voi vakoilla sinua. Päivitän myös yhteytesi suojauksen, jos mahdollista. &#128274;</string>
+    <string name="daxEndCtaText">Onnistut varmasti! &lt;br/&gt;&lt;br/&gt;Muista: Joka kerta kun selaat kanssani, rasittavat mainokset katoavat. &#128077;</string>
+    <string name="daxSerpCtaText">DuckDuckGo-haut ovat nimettömiä, enkä koskaan tallenna hakuhistoriaasi. Koskaan. &#128588;</string>
+    <string name="daxDefaultBrowserCtaText">Ennen kuin ankkailen pois! &lt;br/&gt;&lt;br/&gt;Haluatko seurantasuojauksen, kun avaat sovellusten linkkejä? &lt;br/&gt;&lt;br/&gt;Aseta DuckDuckGo oletusselaimeksesi!</string>
+    <string name="daxSearchWidgetCtaText">Oletvauhdissa! &lt;br/&gt;&lt;br/&gt;Etsi yksityisesti vieläkin nopeammin! Lisää DuckDuckGo-hakuwidgetti aloitusnäyttöösi.</string>
+    <string name="daxNonSerpCtaText">Jokaisella sivustolla on tietosuojaluokka. Napauta sitä nähdäksesi kuinka suojasin yksityisyyttäsi.&lt;br/&gt;&lt;br/&gt;Haluatko enemmän? Yritä tyhjentää tietosi napsauttamalla tulipainiketta.</string>
+    <string name="daxMainNetworkStep1CtaText">Huomaa!&lt;br/&gt;&lt;br/&gt; %s ylläpitää suurta seurantaverkkoa.&lt;br/&gt;&lt;br/&gt;Matala tietosuojaluokka johtaa sinut tällaisille sivustoille.</string>
+    <string name="daxMainNetworkStep1OwnedCtaText">Huomaa!&lt;br/&gt;&lt;br/&gt; %s omistaa %s, joka ylläpitää suurta seurantaverkkoa.</string>
+    <string name="daxMainNetworkStep21CtaText">Itse asiassa %s jäljittäjistä vakoilee noin %s suosituimmista sivustoista. &#128561;&lt;br/&gt;&lt;br/&gt;</string>
+    <string name="daxMainNetworkStep211CtaText">Itse asiassa %s jäljittäjää vakoilee Internetiä kaikkialla. &#128561;&lt;br/&gt;&lt;br/&gt;</string>
+    <string name="daxMainNetworkStep2CtaText">%s Estän nämä seurantalaitteet selatessasi muita kuin %s sivustoja.</string>
+    <plurals name="daxTrackersBlockedCtaText">
+        <item quantity="one">ja &lt;b&gt;%d muu&lt;/b&gt; yritti jäljittää sinua täällä. &lt;br/&gt;&lt;br/&gt;Estin heidät!&lt;br/&gt;&lt;br/&gt; ☝️Voit tarkistaa URL-palkin nähdäksesi kuka yrittää seurata sinua vieraillessasi uudella sivustolla.️</item>
+        <item quantity="other">ja &lt;b&gt;%d muut&lt;/b&gt; yrittivät jäljittää sinua täällä. &lt;br/&gt;&lt;br/&gt;Estin heidät!&lt;br/&gt;&lt;br/&gt; ☝️Voit tarkistaa URL-palkin nähdäksesi kuka yrittää seurata sinua vieraillessasi uudella sivustolla.️</item>
+    </plurals>
+    <string name="daxTrackersBlockedCtaZeroText">yritti seurata sinua. &lt;br/&gt;&lt;br/&gt;Estin sen!&lt;br/&gt;&lt;br/&gt; ☝️Voit tarkistaa URL-palkin nähdäksesi kuka yrittää seurata sinua vieraillessasi uudella sivustolla.️</string>
+
 </resources>

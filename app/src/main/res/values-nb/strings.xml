@@ -385,4 +385,25 @@
     <string name="hideTipsText">Det er bare noen få, og vi prøvde å gjøre dem informative.</string>
     <string name="hideTipsButton">Skjul tips for alltid</string>
 
+    <!-- New Onboarding Experience -->
+    <string name="onboardingWelcomeTitle">Velkommen til DuckDuckGo!</string>
+    <string name="onboardingDaxText">Internett kan være ganske skummelt.&lt;br/&gt;&lt;br/&gt;Men ikke bekymre deg! Søk og surfing privat er enklere enn du tror.</string>
+    <string name="onboardingLetsDoItButton">La oss gjøre det!</string>
+    <string name="daxIntroCtaText">Deretter kan du besøke et av favorittnettstedene dine! &lt;br/&gt;&lt;br/&gt;Jeg blokkerer sporere slik at de ikke kan spionere på deg. Jeg vil også oppgradere sikkerheten til tilkoblingen din hvis mulig. &#128274;</string>
+    <string name="daxEndCtaText">Dette har du skjønt! &lt;br/&gt;&lt;br/&gt;Husk: hver gang du surfer med meg, mister en skummel annonse vingene. &#128077;</string>
+    <string name="daxSerpCtaText">DuckDuckGo-søkene dine er anonyme, jeg lagrer aldri søkehistorikken din. Noensinne. &#128588;</string>
+    <string name="daxDefaultBrowserCtaText">Før jeg dukker ut! &lt;br/&gt;&lt;br/&gt;Vil du ha sporingsbeskyttelse når du åpner koblinger fra andre apper? &lt;br/&gt;&lt;br/&gt;Gjør DuckDuckGo til din standard nettleser!</string>
+    <string name="daxSearchWidgetCtaText">Du er i gang! &lt;br/&gt;&lt;br/&gt;Søk privat enda raskere! Legg til DuckDuckGo søkewidget til startskjermen din.</string>
+    <string name="daxNonSerpCtaText">Hvert nettsted har en personvernsgrad. Trykk på den for å se hvordan jeg beskyttet personvernet ditt.&lt;br/&gt;&lt;br/&gt;Vil du se noe fancy? Prøv å tømme dataene dine ved å trykke på brann-knappen.</string>
+    <string name="daxMainNetworkStep1CtaText">Følg med!&lt;br/&gt;&lt;br/&gt; %s driver et stort sporingsnettverk.&lt;br/&gt;&lt;br/&gt;En lav personvernsgrad vil tipse deg om slike nettsteder.</string>
+    <string name="daxMainNetworkStep1OwnedCtaText">Følg med!&lt;br/&gt;&lt;br/&gt; %s eies av %s, som driver et stort sporingsnettverk.</string>
+    <string name="daxMainNetworkStep21CtaText">Faktisk lurer %s sporere på omtrent %s av topp-nettstedene. &#128561;&lt;br/&gt;&lt;br/&gt;</string>
+    <string name="daxMainNetworkStep211CtaText">Faktisk lurer %s sporere over hele internett. &#128561;&lt;br/&gt;&lt;br/&gt;</string>
+    <string name="daxMainNetworkStep2CtaText">%s Jeg blokkerer disse sporerne når du surfer på ikke-%s nettsteder.</string>
+    <plurals name="daxTrackersBlockedCtaText">
+        <item quantity="one">og &lt;b&gt;%d andre&lt;/b&gt; prøvde å spore deg her. &lt;br/&gt;&lt;br/&gt;Jeg blokkerte dem!&lt;br/&gt;&lt;br/&gt; ☝️Du kan sjekke URL-linjen for å se hvem som prøver å spore deg når du besøker et nytt nettsted.️</item>
+        <item quantity="other">og &lt;b&gt;%d andre&lt;/b&gt; prøvde å spore deg her. &lt;br/&gt;&lt;br/&gt;Jeg blokkerte dem!&lt;br/&gt;&lt;br/&gt; ☝️Du kan sjekke URL-linjen for å se hvem som prøver å spore deg når du besøker et nytt nettsted.️</item>
+    </plurals>
+    <string name="daxTrackersBlockedCtaZeroText">prøvde å spore deg her. &lt;br/&gt;&lt;br/&gt;Jeg har blokkert det!&lt;br/&gt;&lt;br/&gt; ☝️Du kan sjekke URL-linjen for å se hvem som prøver å spore deg når du besøker et nytt nettsted.️</string>
+
 </resources>
