@@ -50,6 +50,7 @@ import com.duckduckgo.app.browser.model.LongPressTarget
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.cta.db.DismissedCtaDao
+import com.duckduckgo.app.cta.model.CtaId
 import com.duckduckgo.app.cta.model.DismissedCta
 import com.duckduckgo.app.cta.ui.CtaViewModel
 import com.duckduckgo.app.cta.ui.DaxBubbleCta
@@ -1359,6 +1360,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenScheduledSurveyChangesAndInstalledDaysDontMatchThenCtaIsNull() {
+        setCovidCtaShown()
         testee.onSurveyChanged(Survey("abc", "http://example.com", daysInstalled = 2, status = Survey.Status.SCHEDULED))
         assertNull(testee.ctaViewState.value!!.cta)
     }
@@ -1371,6 +1373,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenSurveyCtaDismissedAndNoOtherCtaPossibleCtaIsNull() {
+        setCovidCtaShown()
         testee.onSurveyChanged(Survey("abc", "http://example.com", daysInstalled = 1, status = Survey.Status.SCHEDULED))
         testee.onUserDismissedCta(testee.ctaViewState.value!!.cta!!)
         assertNull(testee.ctaViewState.value!!.cta)
@@ -1378,6 +1381,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenSurveyCtaDismissedAndWidgetCtaIsPossibleThenNextCtaIsWidget() {
+        setCovidCtaShown()
         whenever(mockWidgetCapabilities.supportsStandardWidgetAdd).thenReturn(true)
         whenever(mockWidgetCapabilities.supportsAutomaticWidgetAdd).thenReturn(true)
         whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(false)
@@ -1389,6 +1393,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenCtaRefreshedAndAutoAddSupportedAndWidgetNotInstalledThenCtaIsAutoWidget() = ruleRunBlockingTest {
+        setCovidCtaShown()
         whenever(mockWidgetCapabilities.supportsStandardWidgetAdd).thenReturn(true)
         whenever(mockWidgetCapabilities.supportsAutomaticWidgetAdd).thenReturn(true)
         whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(false)
@@ -1398,6 +1403,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenCtaRefreshedAndAutoAddSupportedAndWidgetAlreadyInstalledThenCtaIsNull() = ruleRunBlockingTest {
+        setCovidCtaShown()
         whenever(mockWidgetCapabilities.supportsStandardWidgetAdd).thenReturn(true)
         whenever(mockWidgetCapabilities.supportsAutomaticWidgetAdd).thenReturn(true)
         whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(true)
@@ -1407,6 +1413,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenCtaRefreshedAndOnlyStandardAddSupportedAndWidgetNotInstalledThenCtaIsInstructionsWidget() = ruleRunBlockingTest {
+        setCovidCtaShown()
         givenExpectedCtaAddWidgetInstructions()
         testee.refreshCta()
         assertEquals(HomePanelCta.AddWidgetInstructions, testee.ctaViewState.value!!.cta)
@@ -1414,6 +1421,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenCtaRefreshedAndOnlyStandardAddSupportedAndWidgetAlreadyInstalledThenCtaIsNull() = ruleRunBlockingTest {
+        setCovidCtaShown()
         whenever(mockWidgetCapabilities.supportsStandardWidgetAdd).thenReturn(true)
         whenever(mockWidgetCapabilities.supportsAutomaticWidgetAdd).thenReturn(false)
         whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(true)
@@ -1423,6 +1431,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenCtaRefreshedAndStandardAddNotSupportedAndWidgetNotInstalledThenCtaIsNull() = ruleRunBlockingTest {
+        setCovidCtaShown()
         whenever(mockWidgetCapabilities.supportsStandardWidgetAdd).thenReturn(false)
         whenever(mockWidgetCapabilities.supportsAutomaticWidgetAdd).thenReturn(false)
         whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(false)
@@ -1432,6 +1441,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenCtaRefreshedAndStandardAddNotSupportedAndWidgetAlreadyInstalledThenCtaIsNull() = ruleRunBlockingTest {
+        setCovidCtaShown()
         whenever(mockWidgetCapabilities.supportsStandardWidgetAdd).thenReturn(false)
         whenever(mockWidgetCapabilities.supportsAutomaticWidgetAdd).thenReturn(false)
         whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(true)
@@ -1850,6 +1860,10 @@ class BrowserTabViewModelTest {
     private fun updateUrl(originalUrl: String?, currentUrl: String?, isBrowserShowing: Boolean) {
         setBrowserShowing(isBrowserShowing)
         testee.navigationStateChanged(buildWebNavigation(originalUrl = originalUrl, currentUrl = currentUrl))
+    }
+
+    private fun setCovidCtaShown() {
+        whenever(mockDismissedCtaDao.exists(CtaId.COVID)).thenReturn(true)
     }
 
     private fun setupNavigation(
