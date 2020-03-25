@@ -44,7 +44,12 @@ class BottomNavigationBehavior<V : View>(context: Context, attrs: AttributeSet) 
     }
 
     override fun onStartNestedScroll(
-        coordinatorLayout: CoordinatorLayout, child: V, directTargetChild: View, target: View, axes: Int, type: Int
+        coordinatorLayout: CoordinatorLayout,
+        child: V,
+        directTargetChild: View,
+        target: View,
+        axes: Int,
+        type: Int
     ): Boolean {
         if (axes != ViewCompat.SCROLL_AXIS_VERTICAL)
             return false
@@ -56,9 +61,7 @@ class BottomNavigationBehavior<V : View>(context: Context, attrs: AttributeSet) 
         return true
     }
 
-    override fun onNestedPreScroll(
-        coordinatorLayout: CoordinatorLayout, child: V, target: View, dx: Int, dy: Int, consumed: IntArray, type: Int
-    ) {
+    override fun onNestedPreScroll(coordinatorLayout: CoordinatorLayout, child: V, target: View, dx: Int, dy: Int, consumed: IntArray, type: Int) {
         super.onNestedPreScroll(coordinatorLayout, child, target, dx, dy, consumed, type)
         child.translationY = kotlin.math.max(0f, kotlin.math.min(child.height.toFloat(), child.translationY + dy))
     }
@@ -67,8 +70,6 @@ class BottomNavigationBehavior<V : View>(context: Context, attrs: AttributeSet) 
         if (!isSnappingEnabled)
             return
 
-        // add snap behaviour
-        // Logic here borrowed from AppBarLayout onStopNestedScroll code
         if (lastStartedType == ViewCompat.TYPE_TOUCH || type == ViewCompat.TYPE_NON_TOUCH) {
             // find nearest seam
             val currTranslation = child.translationY
