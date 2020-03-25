@@ -24,11 +24,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup.LayoutParams.WRAP_CONTENT
 import android.widget.PopupWindow
+import com.duckduckgo.app.statistics.Variant
+import com.duckduckgo.app.statistics.VariantManager
 
 class BrowserPopupMenu : PopupWindow {
 
-    constructor(layoutInflater: LayoutInflater, view: View = BrowserPopupMenu.inflate(layoutInflater))
-            : super(view, WRAP_CONTENT, WRAP_CONTENT, true) {
+    constructor(layoutInflater: LayoutInflater, variant: Variant, view: View = inflate(layoutInflater, variant))
+        : super(view, WRAP_CONTENT, WRAP_CONTENT, true) {
 
         if (SDK_INT <= 22) {
             // popupwindow gets stuck on the screen on API 22 (tested on 23) without a background
@@ -59,10 +61,25 @@ class BrowserPopupMenu : PopupWindow {
 
         private const val margin = 30
 
-        fun inflate(layoutInflater: LayoutInflater): View {
-            return layoutInflater.inflate(R.layout.popup_window_browser_menu, null)
+        fun inflate(layoutInflater: LayoutInflater, variant: Variant): View {
+            return inflateToolbarOnlyExperiment(layoutInflater)
+
+            when {
+                variant.hasFeature(VariantManager.VariantFeature.ConceptTest) -> {
+                    inflateToolbarOnlyExperiment(layoutInflater)
+                }
+                variant.hasFeature(VariantManager.VariantFeature.ConceptTest) -> {
+                    inflateToolbarOnlyExperiment(layoutInflater)
+                }
+                else -> {
+                    inflateToolbarOnlyExperiment(layoutInflater)
+                }
+            }
         }
 
+        private fun inflateToolbarOnlyExperiment(layoutInflater: LayoutInflater): View {
+            return layoutInflater.inflate(R.layout.popup_window_browser_menu, null)
+        }
     }
 }
 

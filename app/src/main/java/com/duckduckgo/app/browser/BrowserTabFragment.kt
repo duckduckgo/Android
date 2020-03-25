@@ -1288,7 +1288,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
         }
 
         private fun createPopupMenuWithToolbarOnlyExperiment() {
-            popupMenu = BrowserPopupMenu(layoutInflater)
+            popupMenu = BrowserPopupMenu(layoutInflater, variantManager.getVariant())
             val view = popupMenu.contentView
             popupMenu.apply {
                 onMenuItemClicked(view.forwardPopupMenuItem) { viewModel.onUserPressedForward() }
