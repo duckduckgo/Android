@@ -57,4 +57,6 @@
     <string name="stickySearchPromptRemove">Remove</string>
     <string name="notificationChannelSearch">Search</string>
 
+    <string name="covidCtaText">Get official COVID-19 info and tips.</string>
+
 </resources>

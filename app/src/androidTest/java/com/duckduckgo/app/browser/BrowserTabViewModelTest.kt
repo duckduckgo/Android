@@ -55,6 +55,7 @@ import com.duckduckgo.app.cta.ui.CtaViewModel
 import com.duckduckgo.app.cta.ui.DaxBubbleCta
 import com.duckduckgo.app.cta.ui.DaxDialogCta
 import com.duckduckgo.app.cta.ui.HomePanelCta
+import com.duckduckgo.app.cta.ui.HomeTopPanelCta
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.model.SiteFactory
@@ -64,6 +65,7 @@ import com.duckduckgo.app.privacy.model.PrivacyPractices
 import com.duckduckgo.app.privacy.model.TestEntity
 import com.duckduckgo.app.privacy.store.PrivacySettingsStore
 import com.duckduckgo.app.settings.db.SettingsDataStore
+import com.duckduckgo.app.statistics.Variant
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.VariantManager.Companion.DEFAULT_VARIANT
 import com.duckduckgo.app.statistics.api.StatisticsUpdater
@@ -1562,6 +1564,25 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenUserDismissedHOmeTopPanelCtaAndVariantIsNotConceptTestThenRefreshCta() {
+        val cta = HomeTopPanelCta.CovidCta()
+        whenever(mockDismissedCtaDao.exists(cta.ctaId)).thenReturn(true)
+        testee.onUserDismissedCta(cta)
+        verify(mockDismissedCtaDao).insert(DismissedCta(cta.ctaId))
+        assertNotEquals(HomeTopPanelCta.CovidCta, testee.ctaViewState.value!!.cta)
+    }
+
+    @Test
+    fun whenUserDismissedHOmeTopPanelCtaAndVariantIsConceptTestThenReturnEmtpyCta() {
+        whenever(mockVariantManager.getVariant()).thenReturn(
+            Variant("test", features = listOf(VariantManager.VariantFeature.ConceptTest), filterBy = { true })
+        )
+        val cta = HomeTopPanelCta.CovidCta()
+        testee.onUserDismissedCta(cta)
+        assertNull(testee.ctaViewState.value!!.cta)
+    }
+
+    @Test
     fun whenUserFailedSettingDdgAsDefaultBrowserFromSettingsThenFirePixelAndUpdateInstallStore() {
         whenever(mockDefaultBrowserDetector.isDefaultBrowser()).thenReturn(false)
 
@@ -1773,6 +1794,13 @@ class BrowserTabViewModelTest {
 
         val brokenSiteFeedback = command as Command.BrokenSiteFeedback
         assertEquals("surrogate.com", brokenSiteFeedback.surrogates)
+    }
+
+    @Test
+    fun whenUserClickedTopCtaButtonAndCtaIsCovidCtaThenSubmitQuery() {
+        val cta = HomeTopPanelCta.CovidCta()
+        testee.onUserClickTopCta(cta)
+        assertEquals(cta.searchTerm, omnibarViewState().omnibarText)
     }
 
     private inline fun <reified T : Command> assertCommandIssued(instanceAssertions: T.() -> Unit = {}) {

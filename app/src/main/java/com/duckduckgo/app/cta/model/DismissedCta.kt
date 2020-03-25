@@ -31,7 +31,8 @@ enum class CtaId {
     DAX_DIALOG_TRACKERS_FOUND,
     DAX_DIALOG_NETWORK,
     DAX_DIALOG_OTHER,
-    DAX_END
+    DAX_END,
+    COVID
 }
 
 @Entity(

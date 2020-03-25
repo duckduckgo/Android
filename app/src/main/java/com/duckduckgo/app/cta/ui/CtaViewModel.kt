@@ -135,6 +135,9 @@ class CtaViewModel @Inject constructor(
 
     private fun getHomeCta(): Cta? {
         return when {
+            canShowCovidCta() -> {
+                HomeTopPanelCta.CovidCta()
+            }
             canShowDaxIntroCta() -> {
                 DaxBubbleCta.DaxIntroCta(onboardingStore, appInstallStore)
             }
@@ -184,6 +187,7 @@ class CtaViewModel @Inject constructor(
     private fun canShowDaxCtaEndOfJourney(): Boolean = isFromConceptTestVariant() &&
             hasPrivacySettingsOn() &&
             !daxDialogEndShown() &&
+            covidCtaShown() &&
             daxDialogIntroShown() &&
             !settingsDataStore.hideTips &&
             (daxDialogNetworkShown() || daxDialogOtherShown() || daxDialogSerpShown() || daxDialogTrackersFoundShown())
@@ -267,6 +271,15 @@ class CtaViewModel @Inject constructor(
                 daxNonSerpDialogShown()
     }
 
+    @WorkerThread
+    private fun canShowCovidCta(): Boolean {
+        return if (variantManager.getVariant().hasFeature(ConceptTest)) {
+            daxDialogIntroShown() && !covidCtaShown()
+        } else {
+            !covidCtaShown()
+        }
+    }
+
     private fun hasTrackersInformation(events: List<TrackingEvent>): Boolean =
         events.asSequence()
             .filter { it.entity?.isMajor == true }
@@ -297,6 +310,8 @@ class CtaViewModel @Inject constructor(
     private fun daxDefaultBrowserShown(): Boolean = dismissedCtaDao.exists(CtaId.DAX_DIALOG_DEFAULT_BROWSER)
 
     private fun daxSearchWidgetShown(): Boolean = dismissedCtaDao.exists(CtaId.DAX_DIALOG_SEARCH_WIDGET)
+
+    private fun covidCtaShown(): Boolean = dismissedCtaDao.exists(CtaId.COVID)
 
     private fun isSerpUrl(url: String): Boolean = url.contains(DaxDialogCta.SERP)
 }
