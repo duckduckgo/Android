@@ -1406,7 +1406,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
                 } else {
                     hideHomeCta()
                     hideDaxCta()
-                    hideTopHomeCta()
+                    hideHomeTopCta()
                 }
             }
         }
@@ -1416,7 +1416,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
                 is HomePanelCta -> showHomeCta(configuration)
                 is DaxBubbleCta -> showDaxCta(configuration)
                 is DaxDialogCta -> showDaxDialogCta(configuration)
-                is HomeTopPanelCta -> showTopHomeCta(configuration)
+                is HomeTopPanelCta -> showHomeTopCta(configuration)
             }
 
             viewModel.onCtaShown()
@@ -1482,11 +1482,11 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
         private fun showDaxCta(configuration: DaxBubbleCta) {
             ddgLogo.hide()
             hideHomeCta()
-            hideTopHomeCta()
+            hideHomeTopCta()
             configuration.showCta(daxCtaContainer)
         }
 
-        private fun showTopHomeCta(configuration: HomeTopPanelCta) {
+        private fun showHomeTopCta(configuration: HomeTopPanelCta) {
             hideDaxCta()
             hideHomeCta()
 
@@ -1503,7 +1503,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
 
         private fun showHomeCta(configuration: HomePanelCta) {
             hideDaxCta()
-            hideTopHomeCta()
+            hideHomeTopCta()
             if (ctaContainer.isEmpty()) {
                 renderHomeCta()
             } else {
@@ -1520,7 +1520,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
             ctaContainer.gone()
         }
 
-        private fun hideTopHomeCta() {
+        private fun hideHomeTopCta() {
             ctaTopContainer.gone()
         }
 

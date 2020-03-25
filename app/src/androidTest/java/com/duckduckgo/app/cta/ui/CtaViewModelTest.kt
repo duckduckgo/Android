@@ -470,7 +470,7 @@ class CtaViewModelTest {
     }
 
     @Test
-    fun whenRefreshCtaOnHomeTabAndConceptTestFeatureActiveAndIntroCtaWasNotPreviouslyShownThenEndCovidCtaNotShown() = runBlockingTest {
+    fun whenRefreshCtaOnHomeTabAndConceptTestFeatureActiveAndIntroCtaWasNotPreviouslyShownThenCovidCtaNotShown() = runBlockingTest {
         setConceptTestFeature()
         whenever(mockDismissedCtaDao.exists(CtaId.DAX_INTRO)).thenReturn(false)
         whenever(mockDismissedCtaDao.exists(CtaId.COVID)).thenReturn(false)
@@ -491,7 +491,7 @@ class CtaViewModelTest {
     }
 
     @Test
-    fun whenRefreshCtaOnHomeTabAndCovidCtaNotShownThenShowCovidCtaTakesPrecedenceOverWidgetCta() = runBlockingTest {
+    fun whenRefreshCtaOnHomeTabAndCovidCtaNotShownThenCovidCtaTakesPrecedenceOverWidgetCta() = runBlockingTest {
         setNoFeatures()
         whenever(mockDismissedCtaDao.exists(CtaId.ADD_WIDGET)).thenReturn(false)
         whenever(mockDismissedCtaDao.exists(CtaId.COVID)).thenReturn(false)

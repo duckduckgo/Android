@@ -1574,7 +1574,7 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenUserDismissedHOmeTopPanelCtaAndVariantIsNotConceptTestThenRefreshCta() {
+    fun whenUserDismissedHomeTopPanelCtaAndVariantIsNotConceptTestThenRefreshCta() {
         val cta = HomeTopPanelCta.CovidCta()
         whenever(mockDismissedCtaDao.exists(cta.ctaId)).thenReturn(true)
         testee.onUserDismissedCta(cta)
@@ -1583,7 +1583,7 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenUserDismissedHOmeTopPanelCtaAndVariantIsConceptTestThenReturnEmtpyCta() {
+    fun whenUserDismissedHomeTopPanelCtaAndVariantIsConceptTestThenReturnEmptyCta() {
         whenever(mockVariantManager.getVariant()).thenReturn(
             Variant("test", features = listOf(VariantManager.VariantFeature.ConceptTest), filterBy = { true })
         )
