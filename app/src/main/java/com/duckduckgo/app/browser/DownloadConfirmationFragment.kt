@@ -45,8 +45,8 @@ class DownloadConfirmationFragment(
     }
 
     private fun setupViews(view: View) {
-        view.download_message.text = getString(R.string.downloadConfirmationSaveFileTitle, downloadFileData.file.name)
-        view.open_with.setOnClickListener {
+        view.downloadMessage.text = getString(R.string.downloadConfirmationSaveFileTitle, downloadFileData.file.name)
+        view.openWith.setOnClickListener {
             openFile()
             dismiss()
         }
@@ -54,7 +54,7 @@ class DownloadConfirmationFragment(
             userDownloadAction.acceptAndReplace()
             dismiss()
         }
-        view.continue_download.setOnClickListener {
+        view.continueDownload.setOnClickListener {
             userDownloadAction.accept()
             dismiss()
         }
@@ -64,16 +64,15 @@ class DownloadConfirmationFragment(
         }
 
         if (downloadFileData.alreadyDownloaded) {
-            view.open_with.show()
+            view.openWith.show()
             view.replace.show()
-            view.continue_download.text = getString(R.string.downloadConfirmationKeepBothFilesText)
-            view.continue_download.leftDrawable(R.drawable.ic_keepboth_brownish_24dp)
+            view.continueDownload.text = getString(R.string.downloadConfirmationKeepBothFilesText)
+            view.continueDownload.leftDrawable(R.drawable.ic_keepboth_brownish_24dp)
         } else {
-            view.open_with.gone()
+            view.openWith.gone()
             view.replace.gone()
-            view.continue_download.text = getString(R.string.downloadConfirmationContinue)
-            view.continue_download.leftDrawable(R.drawable.ic_file_brownish_24dp)
-
+            view.continueDownload.text = getString(R.string.downloadConfirmationContinue)
+            view.continueDownload.leftDrawable(R.drawable.ic_file_brownish_24dp)
         }
     }
 
@@ -84,8 +83,7 @@ class DownloadConfirmationFragment(
                 startActivity(intent)
             } else {
                 Timber.e("No suitable activity found")
-                Toast.makeText(activity, "Can't open file", Toast.LENGTH_SHORT).show()
-
+                Toast.makeText(activity, R.string.downloadConfirmationUnableToOpenFileText, Toast.LENGTH_SHORT).show()
             }
         }
     }

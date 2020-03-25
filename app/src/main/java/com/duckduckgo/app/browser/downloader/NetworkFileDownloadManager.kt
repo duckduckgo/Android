@@ -16,7 +16,6 @@
 
 package com.duckduckgo.app.browser.downloader
 
-import android.webkit.URLUtil
 import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
@@ -28,7 +27,7 @@ class NetworkFileDownloadManager @Inject constructor(private val networkDownload
         pendingDownload: FileDownloader.PendingFileDownload,
         callback: FileDownloader.FileDownloadListener
     ) {
-        val guessedFileName = guessFileName(pendingDownload)
+        val guessedFileName = networkDownloader.guessFileName(pendingDownload)
         val fileToDownload = File(pendingDownload.directory, guessedFileName)
         val alreadyDownloaded = fileToDownload.exists()
         callback.confirmDownload(
@@ -47,13 +46,6 @@ class NetworkFileDownloadManager @Inject constructor(private val networkDownload
                     Timber.i("Cancelled download for url ${pendingDownload.url}")
                 }
             })
-    }
-
-    private fun guessFileName(pending: FileDownloader.PendingFileDownload): String {
-        val guessedFileName =
-            URLUtil.guessFileName(pending.url, pending.contentDisposition, pending.mimeType)
-        Timber.i("Guessed filename of $guessedFileName for url ${pending.url}")
-        return guessedFileName
     }
 
     interface UserDownloadAction {

@@ -24,7 +24,7 @@
 
 
     <TextView
-        android:id="@+id/download_message"
+        android:id="@+id/downloadMessage"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:fontFamily="sans-serif"
@@ -40,14 +40,14 @@
 
 
     <LinearLayout
-        android:id="@+id/download_actions"
+        android:id="@+id/downloadActions"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        app:layout_constraintTop_toBottomOf="@id/download_message">
+        app:layout_constraintTop_toBottomOf="@id/downloadMessage">
 
         <TextView
-            android:id="@+id/open_with"
+            android:id="@+id/openWith"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="?attr/selectableItemBackground"
@@ -83,7 +83,7 @@
             android:visibility="gone" />
 
         <TextView
-            android:id="@+id/continue_download"
+            android:id="@+id/continueDownload"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="?attr/selectableItemBackground"
