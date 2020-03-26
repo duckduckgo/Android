@@ -29,14 +29,12 @@ import org.junit.Test
 class OnboardingPageManagerTest {
 
     private lateinit var testee: OnboardingPageManager
-    private val mockVariantManager: VariantManager = mock()
     private val onboardingPageBuilder: OnboardingPageBuilder = mock()
     private val mockDefaultBrowserDetector: DefaultBrowserDetector = mock()
 
     @Before
     fun setup() {
-        whenever(mockVariantManager.getVariant()).thenReturn(Variant("test", features = emptyList(), filterBy = { true }))
-        testee = OnboardingPageManagerWithTrackerBlocking(onboardingPageBuilder, mockDefaultBrowserDetector, mockVariantManager)
+        testee = OnboardingPageManagerWithTrackerBlocking(onboardingPageBuilder, mockDefaultBrowserDetector)
     }
 
     @Test
@@ -58,7 +56,6 @@ class OnboardingPageManagerTest {
     @Test
     fun whenDDGAsDefaultBrowserAndSuppressContinueScreenVariantEnabledThenSinglePageOnBoarding() {
         configureDeviceSupportsDefaultBrowser()
-        givenSuppressDefaultBrowserContinueScreen()
         whenever(mockDefaultBrowserDetector.isDefaultBrowser()).thenReturn(true)
 
         testee.buildPageBlueprints()
@@ -72,13 +69,5 @@ class OnboardingPageManagerTest {
 
     private fun configureDeviceDoesNotSupportDefaultBrowser() {
         whenever(mockDefaultBrowserDetector.deviceSupportsDefaultBrowserConfiguration()).thenReturn(false)
-    }
-
-    private fun givenSuppressDefaultBrowserContinueScreen() {
-        whenever(mockVariantManager.getVariant()).thenReturn(
-            Variant("test", features = listOf(
-                VariantManager.VariantFeature.SuppressOnboardingDefaultBrowserContinueScreen
-            ), filterBy = { true })
-        )
     }
 }

@@ -32,11 +32,10 @@ class OnboardingModule {
 
     @Provides
     fun onboardingPageManger(
-        variantManager: VariantManager,
         onboardingPageBuilder: OnboardingPageBuilder,
         defaultBrowserDetector: DefaultBrowserDetector
     ): OnboardingPageManager {
-        return OnboardingPageManagerWithTrackerBlocking(onboardingPageBuilder, defaultBrowserDetector, variantManager)
+        return OnboardingPageManagerWithTrackerBlocking(onboardingPageBuilder, defaultBrowserDetector)
     }
 
     @Provides

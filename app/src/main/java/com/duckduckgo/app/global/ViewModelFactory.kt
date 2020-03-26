@@ -41,7 +41,6 @@ import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.model.SiteFactory
 import com.duckduckgo.app.global.rating.AppEnjoymentPromptEmitter
 import com.duckduckgo.app.global.rating.AppEnjoymentUserEventRecorder
-import com.duckduckgo.app.icon.api.AppIconModifier
 import com.duckduckgo.app.icon.api.IconModifier
 import com.duckduckgo.app.icon.ui.ChangeIconViewModel
 import com.duckduckgo.app.launch.LaunchViewModel
@@ -146,7 +145,7 @@ class ViewModelFactory @Inject constructor(
             }
         } as T
 
-    private fun defaultBrowserPage() = DefaultBrowserPageViewModel(defaultBrowserDetector, pixel, appInstallStore, variantManager)
+    private fun defaultBrowserPage() = DefaultBrowserPageViewModel(defaultBrowserDetector, pixel, appInstallStore)
 
     private fun onboardingViewModel() = OnboardingViewModel(onboardingStore, onboardingPageManager)
 
@@ -201,5 +200,6 @@ class ViewModelFactory @Inject constructor(
         variantManager = variantManager
     )
 
-    private fun changeAppIconViewModel() = ChangeIconViewModel(settingsDataStore = appSettingsPreferencesStore, appIconModifier = appIconModifier, pixel = pixel)
+    private fun changeAppIconViewModel() =
+        ChangeIconViewModel(settingsDataStore = appSettingsPreferencesStore, appIconModifier = appIconModifier, pixel = pixel)
 }

@@ -30,7 +30,6 @@ interface VariantManager {
     // variant-dependant features listed here
     sealed class VariantFeature {
         object ConceptTest : VariantFeature()
-        object SuppressOnboardingDefaultBrowserContinueScreen : VariantFeature()
         object DefaultBrowserDaxCta : VariantFeature()
         object SearchWidgetDaxCta : VariantFeature()
         object StickySearchNotification : VariantFeature()
