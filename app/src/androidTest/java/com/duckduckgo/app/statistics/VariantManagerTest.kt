@@ -60,8 +60,6 @@ class VariantManagerTest {
         assertEqualsDouble(0.0, variant.weight)
         assertEquals(5, variant.features.size)
         assertTrue(variant.hasFeature(ConceptTest))
-        assertTrue(variant.hasFeature(SuppressHomeTabWidgetCta))
-        assertTrue(variant.hasFeature(SuppressOnboardingDefaultBrowserCta))
         assertTrue(variant.hasFeature(DefaultBrowserDaxCta))
         assertTrue(variant.hasFeature(SearchWidgetDaxCta))
     }
