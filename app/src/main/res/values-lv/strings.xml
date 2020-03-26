@@ -421,4 +421,6 @@
     <string name="hideTipsText">Tie ir tikai daži, un mēs centāmies padarīt tos informatīvus.</string>
     <string name="hideTipsButton">Paslēpt padomus uz visiem laikiem</string>
 
+    <!-- Covid Cta-->
+    <string name="covidCtaText">Iegūstiet oficiālo informāciju un padomus par COVID-19.</string>
 </resources>

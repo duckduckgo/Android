@@ -101,6 +101,7 @@ import kotlinx.android.synthetic.main.include_find_in_page.*
 import kotlinx.android.synthetic.main.include_new_browser_tab.*
 import kotlinx.android.synthetic.main.include_omnibar_toolbar.*
 import kotlinx.android.synthetic.main.include_omnibar_toolbar.view.*
+import kotlinx.android.synthetic.main.include_top_cta.view.*
 import kotlinx.android.synthetic.main.popup_window_browser_menu.view.*
 import kotlinx.coroutines.*
 import org.jetbrains.anko.longToast
@@ -1405,6 +1406,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
                 } else {
                     hideHomeCta()
                     hideDaxCta()
+                    hideHomeTopCta()
                 }
             }
         }
@@ -1414,6 +1416,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
                 is HomePanelCta -> showHomeCta(configuration)
                 is DaxBubbleCta -> showDaxCta(configuration)
                 is DaxDialogCta -> showDaxDialogCta(configuration)
+                is HomeTopPanelCta -> showHomeTopCta(configuration)
             }
 
             viewModel.onCtaShown()
@@ -1479,11 +1482,28 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
         private fun showDaxCta(configuration: DaxBubbleCta) {
             ddgLogo.hide()
             hideHomeCta()
+            hideHomeTopCta()
             configuration.showCta(daxCtaContainer)
+        }
+
+        private fun showHomeTopCta(configuration: HomeTopPanelCta) {
+            hideDaxCta()
+            hideHomeCta()
+
+            logoHidingListener.callToActionView = ctaTopContainer
+
+            configuration.showCta(ctaTopContainer)
+            ctaTopContainer.setOnClickListener {
+                viewModel.onUserClickTopCta(configuration)
+            }
+            ctaTopContainer.closeButton.setOnClickListener {
+                viewModel.onUserDismissedCta(configuration)
+            }
         }
 
         private fun showHomeCta(configuration: HomePanelCta) {
             hideDaxCta()
+            hideHomeTopCta()
             if (ctaContainer.isEmpty()) {
                 renderHomeCta()
             } else {
@@ -1498,6 +1518,10 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
 
         private fun hideHomeCta() {
             ctaContainer.gone()
+        }
+
+        private fun hideHomeTopCta() {
+            ctaTopContainer.gone()
         }
 
         fun renderHomeCta() {

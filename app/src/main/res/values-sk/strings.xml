@@ -398,4 +398,6 @@
     <string name="hideTipsText">Je ich len niekoľko, snažili sme sa, aby mali informatívny charakter.</string>
     <string name="hideTipsButton">Navždy skryť tipy</string>
 
+    <!-- Covid Cta-->
+    <string name="covidCtaText">Získajte oficiálne informácie a tipy ohľadom COVID-19.</string>
 </resources>

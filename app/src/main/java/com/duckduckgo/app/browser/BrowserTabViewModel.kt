@@ -933,6 +933,12 @@ class BrowserTabViewModel(
         ctaViewModel.registerDaxBubbleCtaDismissed(cta)
     }
 
+    fun onUserClickTopCta(cta: HomeTopPanelCta) {
+        if (cta is HomeTopPanelCta.CovidCta) {
+            onUserSubmittedQuery(cta.searchTerm)
+        }
+    }
+
     fun onUserClickCtaOkButton(cta: Cta) {
         ctaViewModel.onUserClickCtaOkButton(cta)
         viewModelScope.launch {
@@ -949,10 +955,16 @@ class BrowserTabViewModel(
 
     fun onUserDismissedCta(dismissedCta: Cta) {
         ctaViewModel.onUserDismissedCta(dismissedCta)
-        if (dismissedCta is HomePanelCta) {
-            refreshCta()
-        } else {
-            ctaViewState.value = currentCtaViewState().copy(cta = null)
+        when (dismissedCta) {
+            is HomeTopPanelCta -> {
+                if (!variantManager.getVariant().hasFeature(VariantManager.VariantFeature.ConceptTest)) {
+                    refreshCta()
+                } else {
+                    ctaViewState.value = currentCtaViewState().copy(cta = null)
+                }
+            }
+            is HomePanelCta -> refreshCta()
+            else -> ctaViewState.value = currentCtaViewState().copy(cta = null)
         }
     }
 

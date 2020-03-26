@@ -406,4 +406,6 @@
     <string name="hideTipsText">There are only a few, and we tried to make them informative.</string>
     <string name="hideTipsButton">Hide tips forever</string>
 
+    <!-- Covid Cta-->
+    <string name="covidCtaText">Get official COVID-19 info and tips.</string>
 </resources>

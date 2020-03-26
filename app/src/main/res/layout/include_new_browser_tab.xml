@@ -26,6 +26,17 @@
     tools:menu="@menu/menu_browser_activity"
     tools:showIn="@layout/fragment_browser_tab">
 
+    <include
+        layout="@layout/include_top_cta"
+        android:id="@+id/ctaTopContainer"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:visibility="gone"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
     <ImageView
         android:id="@+id/ddgLogo"
         android:layout_width="0dp"
@@ -38,7 +49,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHeight_max="180dp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/ctaTopContainer"
         app:layout_constraintWidth_max="180dp" />
 
     <include
