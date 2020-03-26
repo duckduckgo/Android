@@ -16,49 +16,22 @@
 
 package com.duckduckgo.app.onboarding.ui
 
-import android.os.Bundle
-import androidx.annotation.StringRes
 import com.duckduckgo.app.onboarding.ui.page.DefaultBrowserPage
-import com.duckduckgo.app.onboarding.ui.page.OnboardingPageFragment
 import com.duckduckgo.app.onboarding.ui.page.WelcomePage
 
 interface OnboardingPageBuilder {
-    fun buildWelcomePage(@StringRes continueButtonTextResourceId: Int?): WelcomePage
-    fun buildDefaultBrowserPage(@StringRes continueButtonTextResourceId: Int?): DefaultBrowserPage
+    fun buildWelcomePage(): WelcomePage
+    fun buildDefaultBrowserPage(): DefaultBrowserPage
 
-    sealed class OnboardingPageBlueprint(@StringRes open var continueButtonTextResourceId: Int) {
-
-        data class DefaultBrowserBlueprint(override var continueButtonTextResourceId: Int = 0) :
-            OnboardingPageBlueprint(continueButtonTextResourceId)
-
-        data class WelcomeBlueprint(override var continueButtonTextResourceId: Int = 0) :
-            OnboardingPageBlueprint(continueButtonTextResourceId)
+    sealed class OnboardingPageBlueprint {
+        object DefaultBrowserBlueprint : OnboardingPageBlueprint()
+        object WelcomeBlueprint : OnboardingPageBlueprint()
     }
 }
 
 class OnboardingFragmentPageBuilder : OnboardingPageBuilder {
 
-    override fun buildWelcomePage(@StringRes continueButtonTextResourceId: Int?): WelcomePage {
-        val bundle = Bundle()
+    override fun buildWelcomePage() = WelcomePage()
 
-        if (continueButtonTextResourceId != null) {
-            bundle.putInt(OnboardingPageFragment.CONTINUE_BUTTON_TEXT_RESOURCE_ID_EXTRA, continueButtonTextResourceId)
-        }
-
-        val fragment = WelcomePage()
-        fragment.arguments = bundle
-        return fragment
-    }
-
-    override fun buildDefaultBrowserPage(@StringRes continueButtonTextResourceId: Int?): DefaultBrowserPage {
-        val bundle = Bundle()
-
-        if (continueButtonTextResourceId != null) {
-            bundle.putInt(OnboardingPageFragment.CONTINUE_BUTTON_TEXT_RESOURCE_ID_EXTRA, continueButtonTextResourceId)
-        }
-
-        val fragment = DefaultBrowserPage()
-        fragment.arguments = bundle
-        return fragment
-    }
+    override fun buildDefaultBrowserPage() = DefaultBrowserPage()
 }

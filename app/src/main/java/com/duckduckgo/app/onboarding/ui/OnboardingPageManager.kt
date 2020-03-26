@@ -30,7 +30,6 @@ interface OnboardingPageManager {
     fun pageCount(): Int
     fun buildPageBlueprints()
     fun buildPage(position: Int): OnboardingPageFragment?
-    fun getContinueButtonTextResourceId(position: Int): Int
 }
 
 class OnboardingPageManagerWithTrackerBlocking(
@@ -45,31 +44,18 @@ class OnboardingPageManagerWithTrackerBlocking(
     override fun buildPageBlueprints() {
         pages.clear()
 
-        pages.add(WelcomeBlueprint())
+        pages.add(WelcomeBlueprint)
 
         if (shouldShowDefaultBrowserPage()) {
-            pages.add((DefaultBrowserBlueprint()))
-        }
-
-        pages.forEachIndexed { index, pageBlueprint ->
-            pageBlueprint.continueButtonTextResourceId = getContinueButtonTextResourceId(index)
+            pages.add((DefaultBrowserBlueprint))
         }
     }
 
     override fun buildPage(position: Int): OnboardingPageFragment? {
         return when (val blueprint = pages.getOrNull(position)) {
-            is WelcomeBlueprint -> buildWelcomePage(blueprint)
-            is DefaultBrowserBlueprint -> buildDefaultBrowserPage(blueprint)
+            is WelcomeBlueprint -> buildWelcomePage()
+            is DefaultBrowserBlueprint -> buildDefaultBrowserPage()
             else -> null
-        }
-    }
-
-    @StringRes
-    override fun getContinueButtonTextResourceId(position: Int): Int {
-        return if (isFinalPage(position)) {
-            R.string.onboardingContinueFinalPage
-        } else {
-            R.string.onboardingContinue
         }
     }
 
@@ -78,14 +64,11 @@ class OnboardingPageManagerWithTrackerBlocking(
                 && !defaultWebBrowserCapability.isDefaultBrowser()
     }
 
-
-    private fun isFinalPage(position: Int) = position == pageCount() - 1
-
-    private fun buildDefaultBrowserPage(blueprint: DefaultBrowserBlueprint): DefaultBrowserPage {
-        return onboardingPageBuilder.buildDefaultBrowserPage(blueprint.continueButtonTextResourceId)
+    private fun buildDefaultBrowserPage(): DefaultBrowserPage {
+        return onboardingPageBuilder.buildDefaultBrowserPage()
     }
 
-    private fun buildWelcomePage(blueprint: WelcomeBlueprint): WelcomePage {
-        return onboardingPageBuilder.buildWelcomePage(blueprint.continueButtonTextResourceId)
+    private fun buildWelcomePage(): WelcomePage {
+        return onboardingPageBuilder.buildWelcomePage()
     }
 }
