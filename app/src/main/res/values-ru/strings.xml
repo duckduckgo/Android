@@ -420,4 +420,6 @@
     <string name="hideTipsText">Их немного, и мы постарались сделать их информативными.</string>
     <string name="hideTipsButton">Скрыть подсказки навсегда</string>
 
+    <!-- Covid Cta-->
+    <string name="covidCtaText">Получить официальную информацию и советы в связи с COVID-19.</string>
 </resources>

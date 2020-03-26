@@ -477,7 +477,6 @@ class CtaViewModelTest {
 
         val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = false)
         assertFalse(value is HomeTopPanelCta.CovidCta)
-        assertTrue(value is DaxBubbleCta.DaxIntroCta)
     }
 
     @Test
