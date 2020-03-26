@@ -1380,7 +1380,7 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenSurveyCtaDismissedAndCovidCtaNotShownthenCtaIsCovid() {
+    fun whenSurveyCtaDismissedAndWidgetNotCompatibleAndCovidCtaNotShownThenCtaIsCovid() {
         testee.onSurveyChanged(Survey("abc", "http://example.com", daysInstalled = 1, status = Survey.Status.SCHEDULED))
         testee.onUserDismissedCta(testee.ctaViewState.value!!.cta!!)
         assertEquals(HomeTopPanelCta.CovidCta(), testee.ctaViewState.value!!.cta)

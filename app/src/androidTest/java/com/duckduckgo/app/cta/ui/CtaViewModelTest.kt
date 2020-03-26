@@ -499,16 +499,6 @@ class CtaViewModelTest {
     }
 
     @Test
-    fun whenRefreshCtaOnHomeTabAndConceptTestFeatureActiveAndIntroCtaWasPreviouslyShownThenCovidCtaNotShown() = runBlockingTest {
-        setConceptTestFeature()
-        whenever(mockDismissedCtaDao.exists(CtaId.DAX_INTRO)).thenReturn(true)
-        whenever(mockDismissedCtaDao.exists(CtaId.COVID)).thenReturn(false)
-
-        val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = false)
-        assertFalse(value is HomeTopPanelCta.CovidCta)
-    }
-
-    @Test
     fun whenRefreshCtaOnHomeTabAndConceptTestFeatureActiveAndDaxEndCtaWasPreviouslyShownThenCovidCtaShown() = runBlockingTest {
         setConceptTestFeature()
         whenever(mockDismissedCtaDao.exists(CtaId.DAX_INTRO)).thenReturn(true)
