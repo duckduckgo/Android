@@ -39,6 +39,13 @@
     <string name="daxTrackersBlockedCtaZeroText"><![CDATA[&#160;was trying to track you here. <br/><br/>I blocked it!<br/><br/> ☝️You can check the URL bar to see who is trying to track you when you visit a new site.️]]></string>
     <!-- !!! WAITING FOR CORRECTIONS FROM TRANSLATOR - DO NOT RESUBMIT TRANSLATIONS ABOVE !!! -->
 
+    <string name="downloadConfirmationContinue">Continue</string>
+    <string name="downloadConfirmationSaveFileTitle">Save %1$s</string>
+    <string name="downloadConfirmationKeepBothFilesText">Keep both</string>
+    <string name="downloadConfirmationReplaceOldFileText">Replace</string>
+    <string name="downloadConfirmationOpenFileText">Open</string>
+    <string name="downloadConfirmationUnableToOpenFileText">Can\'t open file</string>
+
     <string name="search">Search</string>
 
     <!-- Change Icon Activity -->

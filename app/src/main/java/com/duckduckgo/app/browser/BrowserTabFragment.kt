@@ -23,20 +23,42 @@ import android.annotation.SuppressLint
 import android.app.Activity.RESULT_OK
 import android.app.ActivityOptions
 import android.appwidget.AppWidgetManager
-import android.content.*
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.content.ComponentName
+import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.media.MediaScannerConnection
 import android.net.Uri
-import android.os.*
+import android.os.Build
+import android.os.Bundle
+import android.os.Environment
+import android.os.Handler
+import android.os.Message
 import android.text.Editable
-import android.view.*
-import android.view.View.*
+import android.view.ContextMenu
+import android.view.KeyEvent
+import android.view.LayoutInflater
+import android.view.MenuItem
+import android.view.View
+import android.view.View.GONE
+import android.view.View.OnFocusChangeListener
+import android.view.View.VISIBLE
+import android.view.View.inflate
+import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
-import android.webkit.*
+import android.webkit.ValueCallback
+import android.webkit.WebChromeClient
+import android.webkit.WebSettings
+import android.webkit.WebView
 import android.webkit.WebView.FindListener
 import android.webkit.WebView.HitTestResult
-import android.webkit.WebView.HitTestResult.*
+import android.webkit.WebView.HitTestResult.IMAGE_TYPE
+import android.webkit.WebView.HitTestResult.SRC_IMAGE_ANCHOR_TYPE
+import android.webkit.WebView.HitTestResult.UNKNOWN_TYPE
+import android.webkit.WebViewDatabase
 import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
@@ -52,18 +74,31 @@ import androidx.core.view.isVisible
 import androidx.core.view.postDelayed
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.*
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleObserver
+import androidx.lifecycle.Observer
+import androidx.lifecycle.OnLifecycleEvent
+import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion
 import com.duckduckgo.app.bookmarks.ui.EditBookmarkDialogFragment
 import com.duckduckgo.app.brokensite.BrokenSiteActivity
-import com.duckduckgo.app.browser.BrowserTabViewModel.*
+import com.duckduckgo.app.browser.BrowserTabViewModel.AutoCompleteViewState
+import com.duckduckgo.app.browser.BrowserTabViewModel.BrowserViewState
+import com.duckduckgo.app.browser.BrowserTabViewModel.Command
+import com.duckduckgo.app.browser.BrowserTabViewModel.CtaViewState
+import com.duckduckgo.app.browser.BrowserTabViewModel.FindInPageViewState
+import com.duckduckgo.app.browser.BrowserTabViewModel.GlobalLayoutViewState
+import com.duckduckgo.app.browser.BrowserTabViewModel.LoadingViewState
+import com.duckduckgo.app.browser.BrowserTabViewModel.OmnibarViewState
 import com.duckduckgo.app.browser.autocomplete.BrowserAutoCompleteSuggestionsAdapter
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserNavigator
 import com.duckduckgo.app.browser.defaultbrowsing.TopInstructionsCard
 import com.duckduckgo.app.browser.downloader.FileDownloadNotificationManager
 import com.duckduckgo.app.browser.downloader.FileDownloader
 import com.duckduckgo.app.browser.downloader.FileDownloader.PendingFileDownload
+import com.duckduckgo.app.browser.downloader.NetworkFileDownloadManager.DownloadFileData
+import com.duckduckgo.app.browser.downloader.NetworkFileDownloadManager.UserDownloadAction
 import com.duckduckgo.app.browser.filechooser.FileChooserIntentBuilder
 import com.duckduckgo.app.browser.model.BasicAuthenticationCredentials
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
@@ -76,10 +111,25 @@ import com.duckduckgo.app.browser.tabpreview.WebViewPreviewGenerator
 import com.duckduckgo.app.browser.tabpreview.WebViewPreviewPersister
 import com.duckduckgo.app.browser.ui.HttpAuthenticationDialogFragment
 import com.duckduckgo.app.browser.useragent.UserAgentProvider
-import com.duckduckgo.app.cta.ui.*
+import com.duckduckgo.app.cta.ui.Cta
+import com.duckduckgo.app.cta.ui.CtaViewModel
+import com.duckduckgo.app.cta.ui.DaxBubbleCta
+import com.duckduckgo.app.cta.ui.DaxDialogCta
+import com.duckduckgo.app.cta.ui.HomePanelCta
+import com.duckduckgo.app.cta.ui.SecondaryButtonCta
 import com.duckduckgo.app.global.ViewModelFactory
 import com.duckduckgo.app.global.device.DeviceInfo
-import com.duckduckgo.app.global.view.*
+import com.duckduckgo.app.global.view.NonDismissibleBehavior
+import com.duckduckgo.app.global.view.TextChangedWatcher
+import com.duckduckgo.app.global.view.gone
+import com.duckduckgo.app.global.view.hide
+import com.duckduckgo.app.global.view.hideKeyboard
+import com.duckduckgo.app.global.view.isDifferent
+import com.duckduckgo.app.global.view.isImmersiveModeEnabled
+import com.duckduckgo.app.global.view.renderIfChanged
+import com.duckduckgo.app.global.view.show
+import com.duckduckgo.app.global.view.showKeyboard
+import com.duckduckgo.app.global.view.toggleFullScreen
 import com.duckduckgo.app.onboarding.ui.page.DefaultBrowserPage
 import com.duckduckgo.app.privacy.model.PrivacyGrade
 import com.duckduckgo.app.privacy.renderer.icon
@@ -102,7 +152,14 @@ import kotlinx.android.synthetic.main.include_new_browser_tab.*
 import kotlinx.android.synthetic.main.include_omnibar_toolbar.*
 import kotlinx.android.synthetic.main.include_omnibar_toolbar.view.*
 import kotlinx.android.synthetic.main.popup_window_browser_menu.view.*
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.jetbrains.anko.longToast
 import org.jetbrains.anko.share
 import timber.log.Timber
@@ -1086,6 +1143,13 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
         pendingFileDownload = null
         thread {
             fileDownloader.download(pendingDownload, object : FileDownloader.FileDownloadListener {
+                override fun confirmDownload(downloadFileData: DownloadFileData, userDownloadAction: UserDownloadAction) {
+                    val downloadConfirmationFragment = DownloadConfirmationFragment(downloadFileData, userDownloadAction)
+                    fragmentManager?.let {
+                        downloadConfirmationFragment.show(it, DOWNLAOD_CONFIRM_TAG)
+                    }
+                }
+
                 override fun downloadStarted() {
                     fileDownloadNotificationManager.showDownloadInProgressNotification()
                 }
@@ -1167,6 +1231,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
         private const val URL_BUNDLE_KEY = "url"
 
         private const val AUTHENTICATION_DIALOG_TAG = "AUTH_DIALOG_TAG"
+        private const val DOWNLAOD_CONFIRM_TAG = "DOWNLAOD_CONFIRM_TAG"
         private const val DAX_DIALOG_DIALOG_TAG = "DAX_DIALOG_TAG"
 
         private const val MAX_PROGRESS = 100
