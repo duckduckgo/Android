@@ -26,7 +26,6 @@
     <string name="onboardingContinue">Fortsätt</string>
     <string name="onboardingContinueFinalPage">Starta bläddring</string>
     <string name="onboardingDefaultBrowserTitle">Ställ in DuckDuckGo som standard</string>
-    <string name="onboardingDefaultBrowserTitleDefaultSet">Du kommer aldrig att behöva oroa dig igen</string>
 
     <!-- Default Browser -->
     <string name="cannotLaunchDefaultAppSettings">Kan inte starta standardinställningssidan för appar</string>
@@ -34,7 +33,6 @@
     <string name="defaultBrowserMaybeLater">Kanske senare</string>
     <string name="defaultBrowserLetsDoIt">Vi gör det!</string>
     <string name="defaultBrowserDescriptionNoDefault">Öppna länkar utan att behöva oroa dig, varje gång.</string>
-    <string name="defaultBrowserDescriptionDefaultSet">Med DuckDuckGo är dina onlinedata som standard mer privata, var än på internet du beger dig.</string>
     <string name="defaultBrowserInstructions">Välj DuckDuckGo och tryck på <font color="#678fff">Alltid</font>.</string>
 
     <!-- Browser Activity -->

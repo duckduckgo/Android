@@ -26,7 +26,6 @@
     <string name="onboardingContinue">Continua</string>
     <string name="onboardingContinueFinalPage">Inizia la navigazione</string>
     <string name="onboardingDefaultBrowserTitle">Imposta DuckDuckGo come predefinito</string>
-    <string name="onboardingDefaultBrowserTitleDefaultSet">Saluta la pace della mente</string>
 
     <!-- Default Browser -->
     <string name="cannotLaunchDefaultAppSettings">Impossibile aprire la schermata delle impostazioni predefinite dell\'app</string>
@@ -34,7 +33,6 @@
     <string name="defaultBrowserMaybeLater">Forse più tardi</string>
     <string name="defaultBrowserLetsDoIt">Facciamolo!</string>
     <string name="defaultBrowserDescriptionNoDefault">Apri i collegamenti con la massima tranquillità, ogni volta.</string>
-    <string name="defaultBrowserDescriptionDefaultSet">Con DuckDuckGo, i tuoi dati online sono più privati ​​per impostazione predefinita, ovunque ti porti Internet.</string>
     <string name="defaultBrowserInstructions">Seleziona DuckDuckGo e clicca su <font color="#678fff">Sempre</font>.</string>
 
     <!-- Browser Activity -->

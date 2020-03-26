@@ -26,7 +26,6 @@
     <string name="onboardingContinue">Turpināt</string>
     <string name="onboardingContinueFinalPage">Sākt pārlūkošanu</string>
     <string name="onboardingDefaultBrowserTitle">Izvēlieties DuckDuckGo par jūsu Noklusējumu</string>
-    <string name="onboardingDefaultBrowserTitleDefaultSet">Nododieties mieram</string>
 
     <!-- Default Browser -->
     <string name="cannotLaunchDefaultAppSettings">Nevar palaist lietotnes noklusējuma iestatījumu ekrānu</string>
@@ -34,7 +33,6 @@
     <string name="defaultBrowserMaybeLater">Varbūt vēlāk</string>
     <string name="defaultBrowserLetsDoIt">Aiziet!</string>
     <string name="defaultBrowserDescriptionNoDefault">Katru reizi atveriet saites bez raizēm.</string>
-    <string name="defaultBrowserDescriptionDefaultSet">Izmantojot DuckDuckGo, jūsu tiešsaistes dati pēc noklusējuma būs privāti, lai arī kurp internets jūs aizvestu.</string>
     <string name="defaultBrowserInstructions">Atlasiet DuckDuckGo un pieskarieties <font color="#678fff">Vienmēr</font>.</string>
 
     <!-- Browser Activity -->

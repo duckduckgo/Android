@@ -10,7 +10,6 @@
     <string name="onboardingContinue">Fortsæt</string>
     <string name="onboardingContinueFinalPage">Gå i gang med at surfe</string>
     <string name="onboardingDefaultBrowserTitle">Gør DuckDuckGo til din standard</string>
-    <string name="onboardingDefaultBrowserTitleDefaultSet">Sig hej til Fred i Sindet</string>
 
     <!-- Default Browser -->
     <string name="cannotLaunchDefaultAppSettings">Det var ikke muligt at starte standard app-indstillingsskærmen</string>
@@ -18,7 +17,6 @@
     <string name="defaultBrowserMaybeLater">Måske senere</string>
     <string name="defaultBrowserLetsDoIt">Lad os gøre det!</string>
     <string name="defaultBrowserDescriptionNoDefault">Åbne link med ro i sindet, hver gang.</string>
-    <string name="defaultBrowserDescriptionDefaultSet">Med DuckDuckGo er dine online data mere private som standard, uanset hvor internettet fører dig hen.</string>
     <string name="defaultBrowserInstructions">Vælg DuckDuckGo, og tryk på <font color="#678fff"> Altid </font>.</string>
 
     <!-- Browser Activity -->

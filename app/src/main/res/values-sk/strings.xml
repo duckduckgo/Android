@@ -10,7 +10,6 @@
     <string name="onboardingContinue">Pokračovať</string>
     <string name="onboardingContinueFinalPage">Spustiť prehľadávanie</string>
     <string name="onboardingDefaultBrowserTitle">Nastav DuckDuckGo ako svoju predvolenú aplikáciu</string>
-    <string name="onboardingDefaultBrowserTitleDefaultSet">Zoznám sa s pokojom mysle</string>
 
     <!-- Default Browser -->
     <string name="cannotLaunchDefaultAppSettings">Nedá sa spustiť obrazovka predvolených nastavení aplikácie</string>
@@ -18,7 +17,6 @@
     <string name="defaultBrowserMaybeLater">Možno neskôr</string>
     <string name="defaultBrowserLetsDoIt">Poďme na to!</string>
     <string name="defaultBrowserDescriptionNoDefault">Vždy otvor odkazy s pokojom mysle.</string>
-    <string name="defaultBrowserDescriptionDefaultSet">Pomocou DuckDuckGo sú tvoje online údaje v predvolenom nastavení viac chránené bez ohľadu na to, kam ťa internet zavedie.</string>
     <string name="defaultBrowserInstructions">Zvoľ DuckDuckGo a ťukni <font color="#678fff">vždy</font>.</string>
 
     <!-- Browser Activity -->

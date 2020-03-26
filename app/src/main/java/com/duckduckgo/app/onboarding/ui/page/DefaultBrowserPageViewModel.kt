@@ -21,20 +21,17 @@ import androidx.lifecycle.ViewModel
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.global.SingleLiveEvent
 import com.duckduckgo.app.global.install.AppInstallStore
-import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.pixels.Pixel
 
 class DefaultBrowserPageViewModel(
     private val defaultBrowserDetector: DefaultBrowserDetector,
     private val pixel: Pixel,
-    private val installStore: AppInstallStore,
-    private val variantManager: VariantManager
+    private val installStore: AppInstallStore
 ) : ViewModel() {
 
     sealed class ViewState {
         object DefaultBrowserSettingsUI : ViewState()
         data class DefaultBrowserDialogUI(val showInstructionsCard: Boolean = false) : ViewState()
-        object ContinueUI : ViewState()
     }
 
     sealed class Command {
@@ -68,6 +65,9 @@ class DefaultBrowserPageViewModel(
     }
 
     fun loadUI() {
+        if (defaultBrowserDetector.isDefaultBrowser()) {
+            command.value = Command.ContinueToBrowser
+        }
         refreshViewStateIfTypeChanged(newViewState())
     }
 
@@ -129,13 +129,7 @@ class DefaultBrowserPageViewModel(
 
     private fun nextViewState(origin: Origin): ViewState? {
         return when {
-            defaultBrowserDetector.isDefaultBrowser() -> {
-                if (shouldShowContinueScreen()) {
-                    ViewState.ContinueUI
-                } else {
-                    null
-                }
-            }
+            defaultBrowserDetector.isDefaultBrowser() -> null
             defaultBrowserDetector.hasDefaultBrowser() -> {
                 ViewState.DefaultBrowserSettingsUI
             }
@@ -143,10 +137,6 @@ class DefaultBrowserPageViewModel(
                 ViewState.DefaultBrowserDialogUI(showInstructionsCard = origin is Origin.InternalBrowser)
             }
         }
-    }
-
-    private fun shouldShowContinueScreen(): Boolean {
-        return !variantManager.getVariant().hasFeature(VariantManager.VariantFeature.SuppressOnboardingDefaultBrowserContinueScreen)
     }
 
     private fun handleOriginInternalBrowser(): Boolean {
@@ -187,9 +177,6 @@ class DefaultBrowserPageViewModel(
     private fun currentViewState(): ViewState = viewState.value!!
 
     private fun newViewState(): ViewState = when {
-        defaultBrowserDetector.isDefaultBrowser() -> {
-            ViewState.ContinueUI
-        }
         defaultBrowserDetector.hasDefaultBrowser() -> {
             ViewState.DefaultBrowserSettingsUI
         }

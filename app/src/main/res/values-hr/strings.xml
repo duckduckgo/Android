@@ -10,7 +10,6 @@
     <string name="onboardingContinue">Nastavi</string>
     <string name="onboardingContinueFinalPage">Započni pregledavanje</string>
     <string name="onboardingDefaultBrowserTitle">Učinite DuckDuckGo vašom zadanom tražilicom</string>
-    <string name="onboardingDefaultBrowserTitleDefaultSet">Recite bok spokoju</string>
 
     <!-- Default Browser -->
     <string name="cannotLaunchDefaultAppSettings">Ne mogu pokrenuti zaslon zadanih postavki u aplikaciji</string>
@@ -18,7 +17,6 @@
     <string name="defaultBrowserMaybeLater">Možda kasnije</string>
     <string name="defaultBrowserLetsDoIt">Učinimo to!</string>
     <string name="defaultBrowserDescriptionNoDefault">Otvarajte veze spokojno, svaki put.</string>
-    <string name="defaultBrowserDescriptionDefaultSet">Uz DuckDuckGo, vaši su internetski podaci prema zadanim postavkama privatniji, bez obzira gdje vas Internet vodio.</string>
     <string name="defaultBrowserInstructions">Odaberite DuckDuckGo i dodirnite <font color="#678fff"> Uvijek </font>.</string>
 
     <!-- Browser Activity -->

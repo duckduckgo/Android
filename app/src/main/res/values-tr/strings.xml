@@ -26,7 +26,6 @@
     <string name="onboardingContinue">Devam et</string>
     <string name="onboardingContinueFinalPage">Gezinmeye Başla</string>
     <string name="onboardingDefaultBrowserTitle">DuckDuckGo\'yu Varsayılan Yap</string>
-    <string name="onboardingDefaultBrowserTitleDefaultSet">Huzura Merhaba Deyin</string>
 
     <!-- Default Browser -->
     <string name="cannotLaunchDefaultAppSettings">Varsayılan uygulama ayarları ekranı başlatılamıyor</string>
@@ -34,7 +33,6 @@
     <string name="defaultBrowserMaybeLater">Belki sonra</string>
     <string name="defaultBrowserLetsDoIt">Hadi başlayalım!</string>
     <string name="defaultBrowserDescriptionNoDefault">Her zaman gönül rahatlığıyla açık bağlantılar.</string>
-    <string name="defaultBrowserDescriptionDefaultSet">DuckDuckGo ile çevrimiçi verileriniz, internet sizi nereye götürürse götürsün varsayılan olarak gizlidir.</string>
     <string name="defaultBrowserInstructions">DuckDuckGo\'yu seçin ve <font color="#678fff">Her zaman</font> öğesine dokunun.</string>
 
     <!-- Browser Activity -->

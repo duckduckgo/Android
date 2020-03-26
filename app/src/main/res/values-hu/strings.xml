@@ -10,7 +10,6 @@
     <string name="onboardingContinue">Folytatás</string>
     <string name="onboardingContinueFinalPage">Böngészés indítása</string>
     <string name="onboardingDefaultBrowserTitle">Tedd a DuckDuckGót az alapértelmezett keresőoldaladdá</string>
-    <string name="onboardingDefaultBrowserTitleDefaultSet">Köszönj a Peace of Mindnak</string>
 
     <!-- Default Browser -->
     <string name="cannotLaunchDefaultAppSettings">Az alkalmazás alapértelmezett beállítású képernyője nem indítható el</string>
@@ -18,7 +17,6 @@
     <string name="defaultBrowserMaybeLater">Talán később</string>
     <string name="defaultBrowserLetsDoIt">Csináljuk!</string>
     <string name="defaultBrowserDescriptionNoDefault">Nyugodtan kattints a linkekre, mindig.</string>
-    <string name="defaultBrowserDescriptionDefaultSet">A DuckDuckGo használatával az online adatok alapértelmezés szerint sokkal jobban védettek, bárhová is visz az internet.</string>
     <string name="defaultBrowserInstructions">Válaszd ki a DuckDuckGót, majd koppints a <font color="#678fff"> Mindig </font> elemre.</string>
 
     <!-- Browser Activity -->

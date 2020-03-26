@@ -10,7 +10,6 @@
     <string name="onboardingContinue">Weiter</string>
     <string name="onboardingContinueFinalPage">Mit dem Browsen beginnen</string>
     <string name="onboardingDefaultBrowserTitle">DuckDuckGo als Standard-Browser einstellen</string>
-    <string name="onboardingDefaultBrowserTitleDefaultSet">Sag Hallo zum sichern Surfen</string>
 
     <!-- Default Browser -->
     <string name="cannotLaunchDefaultAppSettings">Standardmäßiger App-Einstellungsbildschirm kann nicht gestartet werden</string>
@@ -18,7 +17,6 @@
     <string name="defaultBrowserMaybeLater">Vielleicht später</string>
     <string name="defaultBrowserLetsDoIt">Machen wir das!</string>
     <string name="defaultBrowserDescriptionNoDefault">Öffnen Sie Links jederzeit sicher und ohne Sorge.</string>
-    <string name="defaultBrowserDescriptionDefaultSet">Mit DuckDuckGo sind Ihre Online-Daten standardmäßig vertraulich, egal wohin das Internet Sie führt.</string>
     <string name="defaultBrowserInstructions">Wählen Sie DuckDuckGo aus und tippen Sie auf <font color="#678fff"> Immer </font>.</string>
 
     <!-- Browser Activity -->

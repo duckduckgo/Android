@@ -10,7 +10,6 @@
     <string name="onboardingContinue">Dalej</string>
     <string name="onboardingContinueFinalPage">Zacznij przeglądać sieć</string>
     <string name="onboardingDefaultBrowserTitle">Ustaw DuckDuckGo jako domyślny</string>
-    <string name="onboardingDefaultBrowserTitleDefaultSet">Wybierz spokój</string>
 
     <!-- Default Browser -->
     <string name="cannotLaunchDefaultAppSettings">Nie mogę otworzyć domyślnego ekranu ustawień aplikacji</string>
@@ -18,7 +17,6 @@
     <string name="defaultBrowserMaybeLater">Może później</string>
     <string name="defaultBrowserLetsDoIt">Zróbmy to!</string>
     <string name="defaultBrowserDescriptionNoDefault">Zawsze otwieraj linki ze spokojem.</string>
-    <string name="defaultBrowserDescriptionDefaultSet">Dzięki DuckDuckGo Twoje dane online są domyślnie bardziej prywatne, niezależnie od tego, gdzie prowadzi Cię Internet.</string>
     <string name="defaultBrowserInstructions">Wybierz DuckDuckGo i dotknij <font color="#678fff"> Zawsze </font>.</string>
 
     <!-- Browser Activity -->

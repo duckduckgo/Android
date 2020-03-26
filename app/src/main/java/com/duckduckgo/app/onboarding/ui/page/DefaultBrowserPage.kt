@@ -33,7 +33,6 @@ import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserSystemSettings
 import com.duckduckgo.app.global.ViewModelFactory
-import com.duckduckgo.app.global.view.hide
 import com.duckduckgo.app.global.view.show
 import com.duckduckgo.app.statistics.VariantManager
 import dagger.android.support.AndroidSupportInjection
@@ -107,16 +106,10 @@ class DefaultBrowserPage : OnboardingPageFragment() {
                     is DefaultBrowserPageViewModel.ViewState.DefaultBrowserSettingsUI -> {
                         setUiForSettings()
                         hideInstructionsCard()
-                        setOnlyContinue(false)
                     }
                     is DefaultBrowserPageViewModel.ViewState.DefaultBrowserDialogUI -> {
                         setUiForDialog()
                         if (it.showInstructionsCard) showInstructionsCard() else hideInstructionsCard()
-                        setOnlyContinue(false)
-                    }
-                    is DefaultBrowserPageViewModel.ViewState.ContinueUI -> {
-                        setOnlyContinue(true)
-                        hideInstructionsCard()
                     }
                 }
             }
@@ -134,6 +127,22 @@ class DefaultBrowserPage : OnboardingPageFragment() {
         })
     }
 
+    private fun setUiForDialog() {
+        defaultBrowserImage.setImageResource(R.drawable.set_as_default_browser_illustration_dialog)
+        browserProtectionSubtitle.setText(R.string.defaultBrowserDescriptionNoDefault)
+        browserProtectionTitle.setText(R.string.onboardingDefaultBrowserTitle)
+        launchSettingsButton.setText(R.string.defaultBrowserLetsDoIt)
+        setButtonsBehaviour()
+    }
+
+    private fun setUiForSettings() {
+        defaultBrowserImage.setImageResource(R.drawable.set_as_default_browser_illustration_settings)
+        browserProtectionSubtitle.setText(R.string.onboardingDefaultBrowserDescription)
+        browserProtectionTitle.setText(R.string.onboardingDefaultBrowserTitle)
+        launchSettingsButton.setText(R.string.defaultBrowserLetsDoIt)
+        setButtonsBehaviour()
+    }
+
     private fun setButtonsBehaviour() {
         launchSettingsButton.setOnClickListener {
             viewModel.onDefaultBrowserClicked()
@@ -141,37 +150,6 @@ class DefaultBrowserPage : OnboardingPageFragment() {
         continueButton.setOnClickListener {
             viewModel.onContinueToBrowser(userTriedToSetDDGAsDefault)
         }
-    }
-
-    private fun setOnlyContinue(visible: Boolean) {
-        if (visible) {
-            continueButton.hide()
-            browserProtectionSubtitle.setText(R.string.defaultBrowserDescriptionDefaultSet)
-            browserProtectionTitle.setText(R.string.onboardingDefaultBrowserTitleDefaultSet)
-
-            defaultBrowserImage.setImageResource(R.drawable.hiker)
-
-            extractContinueButtonTextResourceId()?.let { launchSettingsButton.setText(it) }
-            launchSettingsButton.setOnClickListener {
-                viewModel.onContinueToBrowser(userTriedToSetDDGAsDefault)
-            }
-        } else {
-            launchSettingsButton.setText(R.string.defaultBrowserLetsDoIt)
-            continueButton.show()
-            setButtonsBehaviour()
-        }
-    }
-
-    private fun setUiForDialog() {
-        defaultBrowserImage.setImageResource(R.drawable.set_as_default_browser_illustration_dialog)
-        browserProtectionSubtitle.setText(R.string.defaultBrowserDescriptionNoDefault)
-        browserProtectionTitle.setText(R.string.onboardingDefaultBrowserTitle)
-    }
-
-    private fun setUiForSettings() {
-        defaultBrowserImage.setImageResource(R.drawable.set_as_default_browser_illustration_settings)
-        browserProtectionSubtitle.setText(R.string.onboardingDefaultBrowserDescription)
-        browserProtectionTitle.setText(R.string.onboardingDefaultBrowserTitle)
     }
 
     @SuppressLint("InflateParams")

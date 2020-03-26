@@ -10,7 +10,6 @@
     <string name="onboardingContinue">Jatka</string>
     <string name="onboardingContinueFinalPage">Aloita selaaminen</string>
     <string name="onboardingDefaultBrowserTitle">Tee DuckDuckGo:sta oletusarvo</string>
-    <string name="onboardingDefaultBrowserTitleDefaultSet">Sano Hei Mielenrauhalle</string>
 
     <!-- Default Browser -->
     <string name="cannotLaunchDefaultAppSettings">Sovelluksen oletusasetusnäyttöä ei voida käynnistää</string>
@@ -18,7 +17,6 @@
     <string name="defaultBrowserMaybeLater">Ehkä myöhemmin</string>
     <string name="defaultBrowserLetsDoIt">Aloitetaan!</string>
     <string name="defaultBrowserDescriptionNoDefault">Avaa linkit ilman stressiä, joka kerta.</string>
-    <string name="defaultBrowserDescriptionDefaultSet">DuckDuckGon avulla online-tietosi ovat oletuksena yksityisempiä, missä tahansa surffailetkin.</string>
     <string name="defaultBrowserInstructions">Valitse DuckDuckGo ja napauta <font color="#678fff"> Aina </font>.</string>
 
     <!-- Browser Activity -->

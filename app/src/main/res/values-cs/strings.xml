@@ -10,7 +10,6 @@
     <string name="onboardingContinue">Pokračovat</string>
     <string name="onboardingContinueFinalPage">Začít prohlížet</string>
     <string name="onboardingDefaultBrowserTitle">Nastavte si DuckDuckGo jako výchozí</string>
-    <string name="onboardingDefaultBrowserTitleDefaultSet">Uvítejte klid mysli</string>
 
     <!-- Default Browser -->
     <string name="cannotLaunchDefaultAppSettings">Nelze spustit výchozí obrazovku nastavení aplikace.</string>
@@ -18,7 +17,6 @@
     <string name="defaultBrowserMaybeLater">Možná později</string>
     <string name="defaultBrowserLetsDoIt">Pojďme na to!</string>
     <string name="defaultBrowserDescriptionNoDefault">Otevírejte odkazy s klidem mysli, pokaždé.</string>
-    <string name="defaultBrowserDescriptionDefaultSet">S DuckDuckGo jsou Vaše online data dle výchozího nastavení soukromější, ať už Vás internet zavede kamkoli.</string>
     <string name="defaultBrowserInstructions">Vyberte DuckDuckGo a klepněte na <font color="#678fff">Vždy</font>.</string>
 
     <!-- Browser Activity -->

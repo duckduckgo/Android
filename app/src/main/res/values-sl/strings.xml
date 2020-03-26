@@ -10,7 +10,6 @@
     <string name="onboardingContinue">Nadaljujte</string>
     <string name="onboardingContinueFinalPage">Začnite brskati</string>
     <string name="onboardingDefaultBrowserTitle">Nastavi aplikacijo DuckDuckGo kot privzeto</string>
-    <string name="onboardingDefaultBrowserTitleDefaultSet">Najdite vaš notranji mir</string>
 
     <!-- Default Browser -->
     <string name="cannotLaunchDefaultAppSettings">Zaslona privzetih nastavitev aplikacije ni mogoče zagnati</string>
@@ -18,7 +17,6 @@
     <string name="defaultBrowserMaybeLater">Mogoče kasneje</string>
     <string name="defaultBrowserLetsDoIt">Zanima me!</string>
     <string name="defaultBrowserDescriptionNoDefault">Bodite pomirjeni, ko odpirate povezave.</string>
-    <string name="defaultBrowserDescriptionDefaultSet">Z aplikacijo DuckDuckGo so vaši spletni podatki privzeto bolj zasebni, ne glede na to, kam vas vodi internet.</string>
     <string name="defaultBrowserInstructions">Izberite aplikacijo DuckDuckGo in tapnite <font color="#678fff">Vedno</font>.</string>
 
     <!-- Browser Activity -->

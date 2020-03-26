@@ -26,7 +26,6 @@
     <string name="onboardingContinue">Jätkake</string>
     <string name="onboardingContinueFinalPage">Alustage sirvimist</string>
     <string name="onboardingDefaultBrowserTitle">Muutke DuckDuckGo teie vaikimisi</string>
-    <string name="onboardingDefaultBrowserTitleDefaultSet">Öelge meelerahule tere</string>
 
     <!-- Default Browser -->
     <string name="cannotLaunchDefaultAppSettings">Rakenduse vaikeseadete ekraani ei saa käivitada</string>
@@ -34,7 +33,6 @@
     <string name="defaultBrowserMaybeLater">Võib-olla hiljem</string>
     <string name="defaultBrowserLetsDoIt">Teeme ära!</string>
     <string name="defaultBrowserDescriptionNoDefault">Avage linke igal ajal, rahuliku meelega.</string>
-    <string name="defaultBrowserDescriptionDefaultSet">DuckDuckGo abil on teie veebiandmed vaikimisi privaatsemad, kuhu iganes Internet teid ka ei viiks.</string>
     <string name="defaultBrowserInstructions">Valige DuckDuckGo ja koputage valikut <font color="#678fff">Alati</font>.</string>
 
     <!-- Browser Activity -->

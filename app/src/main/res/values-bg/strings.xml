@@ -10,7 +10,6 @@
     <string name="onboardingContinue">Напред</string>
     <string name="onboardingContinueFinalPage">Начало на сърфирането</string>
     <string name="onboardingDefaultBrowserTitle">Направете DuckDuckGo Вашият браузър по подразбиране</string>
-    <string name="onboardingDefaultBrowserTitleDefaultSet">Кажете \"Здравей\" на спокойствието</string>
 
     <!-- Default Browser -->
     <string name="cannotLaunchDefaultAppSettings">Екранът за настройки на приложения по подразбиране не може да бъде стартиран</string>
@@ -18,7 +17,6 @@
     <string name="defaultBrowserMaybeLater">Може би по-късно</string>
     <string name="defaultBrowserLetsDoIt">Да го направим!</string>
     <string name="defaultBrowserDescriptionNoDefault">Отваряйте връзки без притеснения</string>
-    <string name="defaultBrowserDescriptionDefaultSet">С DuckDuckGo Вашите онлайн данни са защитени по подразбиране, където и да търсите в интернет.</string>
     <string name="defaultBrowserInstructions">Изберете DuckDuckGo и докоснете <font color="#678fff">Винаги</font>.</string>
 
     <!-- Browser Activity -->

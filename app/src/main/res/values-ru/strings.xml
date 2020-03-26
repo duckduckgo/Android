@@ -26,7 +26,6 @@
     <string name="onboardingContinue">Продолжить</string>
     <string name="onboardingContinueFinalPage">Запустить браузер</string>
     <string name="onboardingDefaultBrowserTitle">Сделайте DuckDuckGo вашим поисковиком по умолчанию</string>
-    <string name="onboardingDefaultBrowserTitleDefaultSet">Да пребудет с вами душевное спокойствие</string>
 
     <!-- Default Browser -->
     <string name="cannotLaunchDefaultAppSettings">Не удаётся открыть экран настроек приложения по умолчанию</string>
@@ -34,7 +33,6 @@
     <string name="defaultBrowserMaybeLater">Может быть позже</string>
     <string name="defaultBrowserLetsDoIt">Давайте это сделаем!</string>
     <string name="defaultBrowserDescriptionNoDefault">Каждый раз открывайте ссылки, ни о чем не беспокоясь</string>
-    <string name="defaultBrowserDescriptionDefaultSet">Благодаря DuckDuckGo ваши онлайн-данные в любом месте станут более конфиденциальными.</string>
     <string name="defaultBrowserInstructions">Выберите DuckDuckGo и нажмите <font color="#678fff">Всегда</font>.</string>
 
     <!-- Browser Activity -->

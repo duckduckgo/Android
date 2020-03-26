@@ -12,7 +12,6 @@
     <string name="onboardingContinue">Continue</string> <!--todo: remove-->
     <string name="onboardingContinueFinalPage">Start Browsing</string>
     <string name="onboardingDefaultBrowserTitle">Make DuckDuckGo Your Default</string>
-    <string name="onboardingDefaultBrowserTitleDefaultSet">Say Hello to Peace of Mind</string>
 
     <!-- Default Browser -->
     <string name="cannotLaunchDefaultAppSettings">Can\'t launch default app settings screen</string>
@@ -20,7 +19,6 @@
     <string name="defaultBrowserMaybeLater">Maybe Later</string>
     <string name="defaultBrowserLetsDoIt">Let\'s do it!</string>
     <string name="defaultBrowserDescriptionNoDefault">Open links with peace of mind, every time.</string>
-    <string name="defaultBrowserDescriptionDefaultSet">With DuckDuckGo, your online data is more private by default, wherever the internet takes you.</string>
     <string name="defaultBrowserInstructions">Select DuckDuckGo and tap <font color='#678fff'>Always</font>.</string>
 
     <!-- Browser Activity -->

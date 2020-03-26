@@ -10,7 +10,6 @@
     <string name="onboardingContinue">Ga verder</string>
     <string name="onboardingContinueFinalPage">Start met browsen</string>
     <string name="onboardingDefaultBrowserTitle">Stel DuckDuckGo in als uw standaardinstelling</string>
-    <string name="onboardingDefaultBrowserTitleDefaultSet">Zeg hallo tegen gemoedsrust.</string>
 
     <!-- Default Browser -->
     <string name="cannotLaunchDefaultAppSettings">Kan het scherm voor standaard app-instellingen niet openen</string>
@@ -18,7 +17,6 @@
     <string name="defaultBrowserMaybeLater">Later misschien</string>
     <string name="defaultBrowserLetsDoIt">Laten we het doen!</string>
     <string name="defaultBrowserDescriptionNoDefault">Elke keer links in een rustige toestand openen.</string>
-    <string name="defaultBrowserDescriptionDefaultSet">Dankzij DuckDuckGo zijn uw online gegevens standaard beter beschermt, waar het Internet u ook brengt.</string>
     <string name="defaultBrowserInstructions">Selecteer DuckDuckGo en tik op <font color="#678fff"> Altijd </font>.</string>
 
     <!-- Browser Activity -->

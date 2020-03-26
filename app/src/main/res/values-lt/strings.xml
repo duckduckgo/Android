@@ -10,7 +10,6 @@
     <string name="onboardingContinue">Tęsti</string>
     <string name="onboardingContinueFinalPage">Pradėti naršyti</string>
     <string name="onboardingDefaultBrowserTitle">Nustatykite „DuckDuckGo“ savo numatytuoju puslapiu</string>
-    <string name="onboardingDefaultBrowserTitleDefaultSet">Ištarkite „Sveiki“ ir nebesijaudinkite</string>
 
     <!-- Default Browser -->
     <string name="cannotLaunchDefaultAppSettings">Nepavyko paleisti numatytųjų programos nustatymų ekrano</string>
@@ -18,7 +17,6 @@
     <string name="defaultBrowserMaybeLater">Galbūt vėliau</string>
     <string name="defaultBrowserLetsDoIt">Padarykime tai!</string>
     <string name="defaultBrowserDescriptionNoDefault">Kiekvieną kartą be jaudulio atverkite nuorodas.</string>
-    <string name="defaultBrowserDescriptionDefaultSet">Naudodamiesi „DuckDuckGo“, jūsų internetiniai duomenys pagal numatytus parametrus yra labiau apsaugoti, nesvarbu kur benaršytumėte.</string>
     <string name="defaultBrowserInstructions">Pasirinkite „DuckDuckGo“ ir bakstelėkite <font color="#678fff"> „Always“ (visada) </font>.</string>
 
     <!-- Browser Activity -->
