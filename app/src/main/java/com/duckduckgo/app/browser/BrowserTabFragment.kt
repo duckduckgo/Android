@@ -1241,7 +1241,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
                     smoothProgressAnimator.onNewProgress(viewState.progress) { if (!viewState.isLoading) hide() }
                 }
 
-                if (variantManager.getVariant().hasFeature(VariantManager.VariantFeature.ConceptTest) && privacySettingsStore.privacyOn) {
+                if (privacySettingsStore.privacyOn) {
 
                     if (lastSeenOmnibarViewState?.isEditing == true) {
                         cancelAllAnimations()
@@ -1277,13 +1277,11 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
         }
 
         fun cancelAllAnimations() {
-            if (variantManager.getVariant().hasFeature(VariantManager.VariantFeature.ConceptTest)) {
-                animatorHelper.cancelAnimations()
-                networksContainer.alpha = 0f
-                clearTextButton.alpha = 1f
-                omnibarTextInput.alpha = 1f
-                privacyGradeButton.alpha = 1f
-            }
+            animatorHelper.cancelAnimations()
+            networksContainer.alpha = 0f
+            clearTextButton.alpha = 1f
+            omnibarTextInput.alpha = 1f
+            privacyGradeButton.alpha = 1f
         }
 
         private fun omnibarViews(): List<View> = listOf(clearTextButton, omnibarTextInput, privacyGradeButton)
