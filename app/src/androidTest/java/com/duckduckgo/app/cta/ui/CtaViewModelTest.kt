@@ -273,7 +273,6 @@ class CtaViewModelTest {
     @Test
     fun whenRefreshCtaOnHomeTabAndConceptTestFeatureActiveThenReturnDaxEndCta() = runBlockingTest {
         setConceptTestFeature()
-        setCovidCtaShown()
         whenever(mockDismissedCtaDao.exists(CtaId.DAX_INTRO)).thenReturn(true)
         whenever(mockDismissedCtaDao.exists(CtaId.DAX_DIALOG_SERP)).thenReturn(true)
 
@@ -325,7 +324,6 @@ class CtaViewModelTest {
     @Test
     fun whenRefreshCtaOnHomeTabAndHideTipsIsTrueThenReturnWidgetAutoCta() = runBlockingTest {
         setNoFeatures()
-        setCovidCtaShown()
         whenever(mockSettingsDataStore.hideTips).thenReturn(true)
         whenever(mockWidgetCapabilities.supportsStandardWidgetAdd).thenReturn(true)
         whenever(mockWidgetCapabilities.supportsAutomaticWidgetAdd).thenReturn(true)
@@ -338,7 +336,6 @@ class CtaViewModelTest {
     @Test
     fun whenRefreshCtaOnHomeTabAndHideTipsIsTrueThenReturnWidgetInstructionsCta() = runBlockingTest {
         setNoFeatures()
-        setCovidCtaShown()
         whenever(mockSettingsDataStore.hideTips).thenReturn(true)
         whenever(mockWidgetCapabilities.supportsStandardWidgetAdd).thenReturn(true)
         whenever(mockWidgetCapabilities.supportsAutomaticWidgetAdd).thenReturn(false)
@@ -362,7 +359,7 @@ class CtaViewModelTest {
     }
 
     @Test
-    fun whenRefreshCtaOnHomeTabAndSuppressWidgetCtaFeatureActiveThenReturnNullWhenTryngToShowWidgetInstructionsCta() = runBlockingTest {
+    fun whenRefreshCtaOnHomeTabAndSuppressWidgetCtaFeatureActiveThenReturnNullWhenTryingToShowWidgetInstructionsCta() = runBlockingTest {
         setSuppressHomeTabWidgetCtaFeature()
         setCovidCtaShown()
         whenever(mockSettingsDataStore.hideTips).thenReturn(true)
@@ -490,34 +487,35 @@ class CtaViewModelTest {
     }
 
     @Test
-    fun whenRefreshCtaOnHomeTabAndCovidCtaNotShownThenCovidCtaTakesPrecedenceOverWidgetCta() = runBlockingTest {
+    fun whenRefreshCtaOnHomeTabAndCovidCtaNotShownThenWidgetCtaTakesPrecedenceOverCovidCta() = runBlockingTest {
         setNoFeatures()
+        whenever(mockWidgetCapabilities.supportsStandardWidgetAdd).thenReturn(true)
+        whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(false)
         whenever(mockDismissedCtaDao.exists(CtaId.ADD_WIDGET)).thenReturn(false)
         whenever(mockDismissedCtaDao.exists(CtaId.COVID)).thenReturn(false)
 
         val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = false)
-        assertTrue(value is HomeTopPanelCta.CovidCta)
+        assertTrue(value is HomePanelCta.AddWidgetInstructions)
     }
 
     @Test
-    fun whenRefreshCtaOnHomeTabAndConceptTestFeatureActiveAndIntroCtaWasPreviouslyShownThenCovidCtaShown() = runBlockingTest {
+    fun whenRefreshCtaOnHomeTabAndConceptTestFeatureActiveAndIntroCtaWasPreviouslyShownThenCovidCtaNotShown() = runBlockingTest {
         setConceptTestFeature()
         whenever(mockDismissedCtaDao.exists(CtaId.DAX_INTRO)).thenReturn(true)
         whenever(mockDismissedCtaDao.exists(CtaId.COVID)).thenReturn(false)
 
         val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = false)
-        assertTrue(value is HomeTopPanelCta.CovidCta)
+        assertFalse(value is HomeTopPanelCta.CovidCta)
     }
 
     @Test
-    fun whenRefreshCtaOnHomeTabAndConceptTestFeatureActiveAndDaxCtasAndCovidCtaWasPreviouslyShownThenDaxEndCtaShown() = runBlockingTest {
+    fun whenRefreshCtaOnHomeTabAndConceptTestFeatureActiveAndDaxEndCtaWasPreviouslyShownThenCovidCtaShown() = runBlockingTest {
         setConceptTestFeature()
         whenever(mockDismissedCtaDao.exists(CtaId.DAX_INTRO)).thenReturn(true)
-        whenever(mockDismissedCtaDao.exists(CtaId.DAX_DIALOG_SERP)).thenReturn(true)
-        whenever(mockDismissedCtaDao.exists(CtaId.COVID)).thenReturn(true)
+        whenever(mockDismissedCtaDao.exists(CtaId.DAX_END)).thenReturn(true)
 
         val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = false)
-        assertTrue(value is DaxBubbleCta.DaxEndCta)
+        assertTrue(value is HomeTopPanelCta.CovidCta)
     }
 
     private fun setCovidCtaShown() {

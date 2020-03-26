@@ -1380,8 +1380,14 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenSurveyCtaDismissedAndCovidCtaNotShownthenCtaIsCovid() {
+        testee.onSurveyChanged(Survey("abc", "http://example.com", daysInstalled = 1, status = Survey.Status.SCHEDULED))
+        testee.onUserDismissedCta(testee.ctaViewState.value!!.cta!!)
+        assertEquals(HomeTopPanelCta.CovidCta(), testee.ctaViewState.value!!.cta)
+    }
+
+    @Test
     fun whenSurveyCtaDismissedAndWidgetCtaIsPossibleThenNextCtaIsWidget() {
-        setCovidCtaShown()
         whenever(mockWidgetCapabilities.supportsStandardWidgetAdd).thenReturn(true)
         whenever(mockWidgetCapabilities.supportsAutomaticWidgetAdd).thenReturn(true)
         whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(false)
@@ -1393,7 +1399,6 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenCtaRefreshedAndAutoAddSupportedAndWidgetNotInstalledThenCtaIsAutoWidget() = ruleRunBlockingTest {
-        setCovidCtaShown()
         whenever(mockWidgetCapabilities.supportsStandardWidgetAdd).thenReturn(true)
         whenever(mockWidgetCapabilities.supportsAutomaticWidgetAdd).thenReturn(true)
         whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(false)
@@ -1413,7 +1418,6 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenCtaRefreshedAndOnlyStandardAddSupportedAndWidgetNotInstalledThenCtaIsInstructionsWidget() = ruleRunBlockingTest {
-        setCovidCtaShown()
         givenExpectedCtaAddWidgetInstructions()
         testee.refreshCta()
         assertEquals(HomePanelCta.AddWidgetInstructions, testee.ctaViewState.value!!.cta)

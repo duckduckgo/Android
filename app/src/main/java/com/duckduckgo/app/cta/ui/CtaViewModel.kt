@@ -135,9 +135,6 @@ class CtaViewModel @Inject constructor(
 
     private fun getHomeCta(): Cta? {
         return when {
-            canShowCovidCta() -> {
-                HomeTopPanelCta.CovidCta()
-            }
             canShowDaxIntroCta() -> {
                 DaxBubbleCta.DaxIntroCta(onboardingStore, appInstallStore)
             }
@@ -146,6 +143,9 @@ class CtaViewModel @Inject constructor(
             }
             canShowWidgetCta() -> {
                 if (widgetCapabilities.supportsAutomaticWidgetAdd) AddWidgetAuto else AddWidgetInstructions
+            }
+            canShowCovidCta() -> {
+                HomeTopPanelCta.CovidCta()
             }
             else -> null
         }
@@ -187,7 +187,6 @@ class CtaViewModel @Inject constructor(
     private fun canShowDaxCtaEndOfJourney(): Boolean = isFromConceptTestVariant() &&
             hasPrivacySettingsOn() &&
             !daxDialogEndShown() &&
-            covidCtaShown() &&
             daxDialogIntroShown() &&
             !settingsDataStore.hideTips &&
             (daxDialogNetworkShown() || daxDialogOtherShown() || daxDialogSerpShown() || daxDialogTrackersFoundShown())
@@ -274,7 +273,7 @@ class CtaViewModel @Inject constructor(
     @WorkerThread
     private fun canShowCovidCta(): Boolean {
         return if (variantManager.getVariant().hasFeature(ConceptTest)) {
-            daxDialogIntroShown() && !covidCtaShown()
+            daxDialogEndShown() && !covidCtaShown()
         } else {
             !covidCtaShown()
         }
