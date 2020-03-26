@@ -28,18 +28,6 @@
     <string name="onboardingDefaultBrowserTitle">DuckDuckGo\'yu Varsayılan Yap</string>
     <string name="onboardingDefaultBrowserTitleDefaultSet">Huzura Merhaba Deyin</string>
 
-    <!-- Unified Welcome Page -->
-    <string name="unifiedOnboardingTitleFirstVisit">DuckDuckGo\'ya\nhoş geldiniz!</string>
-    <string name="unifiedOnboardingSubtitleTrackerBlockingEnabled">Web\'de arama yaparken ve web\'de gezinirken gizli kalın.</string>
-    <string name="unifiedOnboardingPrivateSearchTitle">Özel Arama</string>
-    <string name="unifiedOnboardingPrivateSearchSubtitle">DuckDuckGo ile aramalarınız her zaman gizlidir.</string>
-    <string name="unifiedOnboardingBrowsingProtectionTitle">Gezinme Koruması</string>
-    <string name="unifiedOnboardingBrowsingProtectionSubtitleTrackerBlockingEnabled">İzleyicileri engelleyin ve varsayılan olarak güvenli bir şekilde göz atın.</string>
-    <string name="unifiedOnboardingDataClearingTitle">Veri Silme</string>
-    <string name="unifiedOnboardingDataClearingSubtitle">Bir düğmeye dokunarak tarama verilerinizi silin.</string>
-    <string name="unifiedOnboardingCustomizationTitle">Özelleştirme</string>
-    <string name="unifiedOnboardingCustomizationSubtitle">Bir tema seçin ve gizlilik özelliklerini kişiselleştirin.</string>
-
     <!-- Default Browser -->
     <string name="cannotLaunchDefaultAppSettings">Varsayılan uygulama ayarları ekranı başlatılamıyor</string>
     <string name="settingsDefaultBrowserEnabled">Varsayılan tarayıcı olarak ayarla</string>

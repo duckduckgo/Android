@@ -28,18 +28,6 @@
     <string name="onboardingDefaultBrowserTitle">Muutke DuckDuckGo teie vaikimisi</string>
     <string name="onboardingDefaultBrowserTitleDefaultSet">Öelge meelerahule tere</string>
 
-    <!-- Unified Welcome Page -->
-    <string name="unifiedOnboardingTitleFirstVisit">Tere tulemast DuckDuckGo kasutajaks!</string>
-    <string name="unifiedOnboardingSubtitleTrackerBlockingEnabled">Jääge veebis otsides ja sirvides privaatseks.</string>
-    <string name="unifiedOnboardingPrivateSearchTitle">Privaatne otsing</string>
-    <string name="unifiedOnboardingPrivateSearchSubtitle">DuckDuckGo abil on teie otsingud alati privaatsed.</string>
-    <string name="unifiedOnboardingBrowsingProtectionTitle">Sirvimiskaitse</string>
-    <string name="unifiedOnboardingBrowsingProtectionSubtitleTrackerBlockingEnabled">Blokeerige jälgijaid ja sirvige vaikimisi turvaliselt.</string>
-    <string name="unifiedOnboardingDataClearingTitle">Andmete kustutamine</string>
-    <string name="unifiedOnboardingDataClearingSubtitle">Kustutage sirvimisandmeid ühe nupuvajutusega.</string>
-    <string name="unifiedOnboardingCustomizationTitle">Kohandamine</string>
-    <string name="unifiedOnboardingCustomizationSubtitle">Valige teema ja kohandage privaatsusfunktsioone.</string>
-
     <!-- Default Browser -->
     <string name="cannotLaunchDefaultAppSettings">Rakenduse vaikeseadete ekraani ei saa käivitada</string>
     <string name="settingsDefaultBrowserEnabled">Määrake vaikebrauseriks</string>

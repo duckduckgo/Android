@@ -28,18 +28,6 @@
     <string name="onboardingDefaultBrowserTitle">Izvēlieties DuckDuckGo par jūsu Noklusējumu</string>
     <string name="onboardingDefaultBrowserTitleDefaultSet">Nododieties mieram</string>
 
-    <!-- Unified Welcome Page -->
-    <string name="unifiedOnboardingTitleFirstVisit">Laipni lūdzam\nDuckDuckGo!</string>
-    <string name="unifiedOnboardingSubtitleTrackerBlockingEnabled">Veicot meklēšanu un pārlūkošanu tīmeklī, saglabājiet privātumu.</string>
-    <string name="unifiedOnboardingPrivateSearchTitle">Privātā meklēšana</string>
-    <string name="unifiedOnboardingPrivateSearchSubtitle">Ar DuckDuckGo jūsu meklējumi vienmēr ir privāti.</string>
-    <string name="unifiedOnboardingBrowsingProtectionTitle">Pārlūkošanas aizsardzība</string>
-    <string name="unifiedOnboardingBrowsingProtectionSubtitleTrackerBlockingEnabled">Bloķējiet izsekotājus un pārlūkojiet droši pēc noklusējuma.</string>
-    <string name="unifiedOnboardingDataClearingTitle">Datu dzēšana</string>
-    <string name="unifiedOnboardingDataClearingSubtitle">Izdzēsiet pārlūkošanas datus, pieskaroties pogai.</string>
-    <string name="unifiedOnboardingCustomizationTitle">Pielāgošana</string>
-    <string name="unifiedOnboardingCustomizationSubtitle">Izvēlieties motīvu un pielāgojiet privātuma funkcijas.</string>
-
     <!-- Default Browser -->
     <string name="cannotLaunchDefaultAppSettings">Nevar palaist lietotnes noklusējuma iestatījumu ekrānu</string>
     <string name="settingsDefaultBrowserEnabled">Iestatīt kā noklusējuma pārlūku</string>
