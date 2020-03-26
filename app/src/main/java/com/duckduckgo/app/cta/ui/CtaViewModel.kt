@@ -31,7 +31,6 @@ import com.duckduckgo.app.privacy.store.PrivacySettingsStore
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.Variant
 import com.duckduckgo.app.statistics.VariantManager
-import com.duckduckgo.app.statistics.VariantManager.VariantFeature.ConceptTest
 import com.duckduckgo.app.statistics.VariantManager.VariantFeature.SuppressHomeTabWidgetCta
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.survey.db.SurveyDao
@@ -178,18 +177,17 @@ class CtaViewModel @Inject constructor(
     }
 
     @WorkerThread
-    private fun canShowDaxIntroCta(): Boolean = isFromConceptTestVariant() && !daxDialogIntroShown() && !settingsDataStore.hideTips
+    private fun canShowDaxIntroCta(): Boolean = !daxDialogIntroShown() && !settingsDataStore.hideTips
 
     @WorkerThread
-    private fun canShowDaxCtaEndOfJourney(): Boolean = isFromConceptTestVariant() &&
-            hasPrivacySettingsOn() &&
+    private fun canShowDaxCtaEndOfJourney(): Boolean = hasPrivacySettingsOn() &&
             !daxDialogEndShown() &&
             daxDialogIntroShown() &&
             !settingsDataStore.hideTips &&
             (daxDialogNetworkShown() || daxDialogOtherShown() || daxDialogSerpShown() || daxDialogTrackersFoundShown())
 
     private fun canShowDaxDialogCta(): Boolean {
-        if (settingsDataStore.hideTips || !isFromConceptTestVariant() || !hasPrivacySettingsOn()) {
+        if (settingsDataStore.hideTips || !hasPrivacySettingsOn()) {
             return false
         }
         return true
@@ -277,8 +275,6 @@ class CtaViewModel @Inject constructor(
     private fun hasPrivacySettingsOn(): Boolean = settingsPrivacySettingsStore.privacyOn
 
     private fun variant(): Variant = variantManager.getVariant()
-
-    private fun isFromConceptTestVariant(): Boolean = variantManager.getVariant().hasFeature(ConceptTest)
 
     private fun daxDialogIntroShown(): Boolean = dismissedCtaDao.exists(CtaId.DAX_INTRO)
 
