@@ -24,7 +24,6 @@ import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.fragment.app.FragmentActivity
 import com.duckduckgo.app.browser.R
-import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.cta.model.CtaId
 import com.duckduckgo.app.cta.ui.DaxCta.Companion.MAX_DAYS_ALLOWED
 import com.duckduckgo.app.global.baseHost
@@ -107,69 +106,6 @@ sealed class DaxDialogCta(
         onboardingStore,
         appInstallStore
     )
-
-    class DefaultBrowserCta(
-        defaultBrowserDetector: DefaultBrowserDetector,
-        override val onboardingStore: OnboardingStore,
-        override val appInstallStore: AppInstallStore,
-        private val defaultBrowserCtaBehavior: DefaultBrowserCtaBehavior = getDefaultBrowserCtaBehavior(defaultBrowserDetector)
-    ) : DaxDialogCta(
-        ctaId = CtaId.DAX_DIALOG_DEFAULT_BROWSER,
-        description = R.string.daxDefaultBrowserCtaText,
-        okButton = defaultBrowserCtaBehavior.primaryButtonStringRes,
-        shownPixel = Pixel.PixelName.ONBOARDING_DAX_CTA_SHOWN,
-        okPixel = Pixel.PixelName.ONBOARDING_DAX_CTA_OK_BUTTON,
-        cancelPixel = null,
-        ctaPixelParam = defaultBrowserCtaBehavior.ctaPixelParam,
-        onboardingStore = onboardingStore,
-        appInstallStore = appInstallStore
-    ), SecondaryButtonCta {
-
-        override val secondaryButtonPixel: Pixel.PixelName = Pixel.PixelName.ONBOARDING_DAX_CTA_CANCEL_BUTTON
-
-        val primaryAction: DefaultBrowserAction
-            get() = defaultBrowserCtaBehavior.action
-
-        override fun createCta(activity: FragmentActivity): DaxDialog {
-            return TypewriterDaxDialog(
-                daxText = getDaxText(activity),
-                primaryButtonText = activity.resources.getString(okButton),
-                secondaryButtonText = activity.resources.getString(R.string.daxDialogMaybeLater),
-                toolbarDimmed = true
-            )
-        }
-
-        override fun pixelSecondaryButtonParameters(): Map<String, String> = mapOf(Pixel.PixelParameter.CTA_SHOWN to ctaPixelParam)
-
-        sealed class DefaultBrowserAction {
-            object ShowSettings : DefaultBrowserAction()
-            object ShowSystemDialog : DefaultBrowserAction()
-        }
-
-        sealed class DefaultBrowserCtaBehavior(val primaryButtonStringRes: Int, val ctaPixelParam: String, val action: DefaultBrowserAction) {
-            object Settings : DefaultBrowserCtaBehavior(
-                primaryButtonStringRes = R.string.daxDialogSettings,
-                ctaPixelParam = Pixel.PixelValues.DAX_DEFAULT_BROWSER_CTA_SETTINGS,
-                action = DefaultBrowserAction.ShowSettings
-            )
-
-            object Dialog : DefaultBrowserCtaBehavior(
-                primaryButtonStringRes = R.string.daxDialogYes,
-                ctaPixelParam = Pixel.PixelValues.DAX_DEFAULT_BROWSER_CTA_DIALOG,
-                action = DefaultBrowserAction.ShowSystemDialog
-            )
-        }
-
-        companion object {
-            private fun getDefaultBrowserCtaBehavior(defaultBrowserDetector: DefaultBrowserDetector): DefaultBrowserCtaBehavior {
-                return if (defaultBrowserDetector.hasDefaultBrowser()) {
-                    DefaultBrowserCtaBehavior.Settings
-                } else {
-                    DefaultBrowserCtaBehavior.Dialog
-                }
-            }
-        }
-    }
 
     class SearchWidgetCta(
         widgetCapabilities: WidgetCapabilities,

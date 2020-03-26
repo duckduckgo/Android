@@ -30,7 +30,6 @@ interface VariantManager {
     // variant-dependant features listed here
     sealed class VariantFeature {
         object ConceptTest : VariantFeature()
-        object DefaultBrowserDaxCta : VariantFeature()
         object SearchWidgetDaxCta : VariantFeature()
         object StickySearchNotification : VariantFeature()
     }
@@ -59,7 +58,6 @@ interface VariantManager {
                 weight = 0.0,
                 features = listOf(
                     ConceptTest,
-                    DefaultBrowserDaxCta,
                     SearchWidgetDaxCta
                 ),
                 filterBy = { isEnglishLocale() }),

@@ -196,8 +196,6 @@ interface Pixel {
         const val DAX_INITIAL_CTA = "i"
         const val DAX_END_CTA = "e"
         const val DAX_SERP_CTA = "s"
-        const val DAX_DEFAULT_BROWSER_CTA_DIALOG = "dbd"
-        const val DAX_DEFAULT_BROWSER_CTA_SETTINGS = "dbs"
         const val DAX_SEARCH_WIDGET_CTA_AUTO = "wa"
         const val DAX_SEARCH_WIDGET_CTA_MANUAL = "wm"
         const val DAX_NETWORK_CTA_1 = "n"

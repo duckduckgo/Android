@@ -227,9 +227,6 @@ class CtaViewModel @Inject constructor(
     @WorkerThread
     fun obtainNextCta(previousCta: Cta): Cta? {
         return when {
-            previousCta is DaxDialogCta.DaxTrackersBlockedCta && canShowDefaultBrowserDaxCta() -> {
-                DaxDialogCta.DefaultBrowserCta(defaultBrowserDetector, onboardingStore, appInstallStore)
-            }
             previousCta is DaxDialogCta.DaxSerpCta && canShowWidgetDaxCta() -> {
                 DaxDialogCta.SearchWidgetCta(widgetCapabilities, onboardingStore, appInstallStore)
             }
@@ -244,14 +241,6 @@ class CtaViewModel @Inject constructor(
             canShowWidgetDaxCta() -> DaxDialogCta.SearchWidgetCta(widgetCapabilities, onboardingStore, appInstallStore)
             else -> null
         }
-    }
-
-    @WorkerThread
-    private fun canShowDefaultBrowserDaxCta(): Boolean {
-        return defaultBrowserDetector.deviceSupportsDefaultBrowserConfiguration() &&
-                !defaultBrowserDetector.isDefaultBrowser() &&
-                variantManager.getVariant().hasFeature(VariantManager.VariantFeature.DefaultBrowserDaxCta) &&
-                !daxDefaultBrowserShown()
     }
 
     @WorkerThread
@@ -287,8 +276,6 @@ class CtaViewModel @Inject constructor(
     private fun daxDialogNetworkShown(): Boolean = dismissedCtaDao.exists(CtaId.DAX_DIALOG_NETWORK)
 
     private fun daxNonSerpDialogShown(): Boolean = daxDialogNetworkShown() || daxDialogTrackersFoundShown() || daxDialogOtherShown()
-
-    private fun daxDefaultBrowserShown(): Boolean = dismissedCtaDao.exists(CtaId.DAX_DIALOG_DEFAULT_BROWSER)
 
     private fun daxSearchWidgetShown(): Boolean = dismissedCtaDao.exists(CtaId.DAX_DIALOG_SEARCH_WIDGET)
 
