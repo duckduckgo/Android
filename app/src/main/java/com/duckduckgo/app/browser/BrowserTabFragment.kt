@@ -96,6 +96,7 @@ import com.duckduckgo.app.browser.shortcut.ShortcutBuilder
 import com.duckduckgo.app.browser.tabpreview.WebViewPreviewGenerator
 import com.duckduckgo.app.browser.tabpreview.WebViewPreviewPersister
 import com.duckduckgo.app.browser.ui.HttpAuthenticationDialogFragment
+import com.duckduckgo.app.browser.ui.ScrollAwareSwipeRefreshLayout
 import com.duckduckgo.app.browser.useragent.UserAgentProvider
 import com.duckduckgo.app.cta.ui.Cta
 import com.duckduckgo.app.cta.ui.CtaViewModel
@@ -136,6 +137,7 @@ import kotlinx.android.synthetic.main.fragment_browser_tab.browserLayout
 import kotlinx.android.synthetic.main.fragment_browser_tab.defaultCard
 import kotlinx.android.synthetic.main.fragment_browser_tab.focusDummy
 import kotlinx.android.synthetic.main.fragment_browser_tab.rootView
+import kotlinx.android.synthetic.main.fragment_browser_tab.swipeContainer
 import kotlinx.android.synthetic.main.fragment_browser_tab.webViewContainer
 import kotlinx.android.synthetic.main.fragment_browser_tab.webViewFullScreenContainer
 import kotlinx.android.synthetic.main.include_cta_buttons.view.ctaDismissButton
@@ -362,6 +364,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
         configureAutoComplete()
         configureKeyboardAwareLogoAnimation()
         configureAppBar()
+        configureSwipeToRefresh()
 
         decorateWithExperiments()
 
@@ -512,6 +515,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
     }
 
     fun onRefreshRequested() {
+        swipeContainer.isRefreshing = true
         viewModel.onRefreshRequested()
     }
 
@@ -778,11 +782,10 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
         autoCompleteSuggestionsList.adapter = autoCompleteSuggestionsAdapter
     }
 
-
-    private fun decorateWithExperiments(){
+    private fun decorateWithExperiments() {
         decorator.decorateWithToolbarOnlyExperiment()
         return
-        when{
+        when {
             variantManager.getVariant().hasFeature(VariantManager.VariantFeature.ConceptTest) -> {
                 decorator.decorateWithToolbarOnlyExperiment()
             }
@@ -794,7 +797,6 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
             }
         }
     }
-
 
     private fun configureAppBar() {
 
@@ -815,6 +817,19 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
                 privacyGradeButton?.isEnabled = privacyGrade != PrivacyGrade.UNKNOWN
             }
         })
+    }
+
+    private fun configureSwipeToRefresh() {
+        swipeContainer.setCanWebViewScrollUpCallback(object : ScrollAwareSwipeRefreshLayout.CanWebViewScrollUpCallback {
+            override fun canSwipeRefreshChildScrollUp(): Boolean {
+                return webView?.canScrollVertically(-1) ?: false
+            }
+        })
+
+        swipeContainer.setColorSchemeColors(ContextCompat.getColor(context!!, R.color.cornflowerBlue))
+        swipeContainer.setOnRefreshListener {
+            viewModel.onRefreshRequested()
+        }
     }
 
     private fun configureFindInPage() {
@@ -1250,7 +1265,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
 
     inner class BrowserTabFragmentExperimentDecorator {
 
-        fun decorateWithToolbarOnlyExperiment(){
+        fun decorateWithToolbarOnlyExperiment() {
             hideBottomBar()
             decorateAppBarWithToolbarOnlyExperiment()
             createPopupMenuWithToolbarOnlyExperiment()
@@ -1258,7 +1273,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
             configureLongClickOpensNewTabListenerWithToolbarOnlyExperiment()
         }
 
-        fun decorateWithBottomBarNavigationOnlyExperiment(){
+        fun decorateWithBottomBarNavigationOnlyExperiment() {
             decorateBottomBar()
             decorateAppBarWithToolbarOnlyExperiment()
             createPopupMenuWithToolbarOnlyExperiment()
@@ -1266,7 +1281,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
             configureLongClickOpensNewTabListenerWithBottomBarNavigationOnlyExperiment()
         }
 
-        fun decorateWithBottomBarAndToolbarExperiment(){
+        fun decorateWithBottomBarAndToolbarExperiment() {
             decorateBottomBar()
             decorateAppBarWithToolbarOnlyExperiment()
             createPopupMenuWithToolbarOnlyExperiment()
@@ -1274,7 +1289,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
             configureLongClickOpensNewTabListenerWithBottomBarNavigationOnlyExperiment()
         }
 
-        private fun decorateAppBarWithToolbarOnlyExperiment(){
+        private fun decorateAppBarWithToolbarOnlyExperiment() {
             toolbar.inflateMenu(R.menu.menu_browser_activity)
             toolbar.setOnMenuItemClickListener { menuItem ->
                 when (menuItem.itemId) {
@@ -1306,16 +1321,16 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
             }
         }
 
-        private fun decorateBottomBar(){
+        private fun decorateBottomBar() {
             bottomNavigationBar.apply {
                 onItemClicked(bottomBarBackItem) { activity?.onBackPressed() }
                 onItemClicked(bottomBarForwardItem) { viewModel.onUserPressedForward() }
-                onItemClicked(bottomBarFireItem) {  browserActivity?.launchFire() }
-                onItemClicked(bottomBarBookmarksItem) {  launch { viewModel.onBookmarkAddRequested() } }
+                onItemClicked(bottomBarFireItem) { browserActivity?.launchFire() }
+                onItemClicked(bottomBarBookmarksItem) { launch { viewModel.onBookmarkAddRequested() } }
             }
         }
 
-        private fun hideBottomBar(){
+        private fun hideBottomBar() {
             bottomNavigationBar.gone()
         }
 
@@ -1345,8 +1360,6 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
             }
         }
     }
-
-
 
     inner class BrowserTabFragmentRenderer {
 
@@ -1411,6 +1424,10 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
                     if (viewState.progress == MAX_PROGRESS) {
                         createTrackersAnimation()
                     }
+                }
+
+                if (!viewState.isLoading) {
+                    swipeContainer.isRefreshing = false
                 }
             }
         }
@@ -1504,7 +1521,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
             }
         }
 
-        private fun renderBottomBar(viewState: BrowserViewState){
+        private fun renderBottomBar(viewState: BrowserViewState) {
             bottomBarForwardItem.isEnabled = viewState.canGoForward
             bottomBarBackItem.isEnabled = viewState.canGoBack
         }
