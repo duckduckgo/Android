@@ -397,4 +397,6 @@
     <string name="hideTipsText">Il n\'y en a que quelques-uns, et nous avons essayé de les rendre informatifs.</string>
     <string name="hideTipsButton">Masquer les conseils pour toujours</string>
 
+    <!-- Covid Cta-->
+    <string name="covidCtaText">Accédez aux informations officielles et aux recommandations sur le COVID-19.</string>
 </resources>

@@ -397,4 +397,6 @@
     <string name="hideTipsText">Ima ih samo nekoliko, a pokušali smo ih učiniti što informativnijima.</string>
     <string name="hideTipsButton">Sakrij savjete zauvijek</string>
 
+    <!-- Covid Cta-->
+    <string name="covidCtaText">Dobijte službene informacije i savjete o COVID-19.</string>
 </resources>

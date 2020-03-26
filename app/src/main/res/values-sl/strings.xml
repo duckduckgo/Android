@@ -405,4 +405,6 @@
     <string name="hideTipsText">Le nekaj jih je in poskušali smo jih narediti informativne.</string>
     <string name="hideTipsButton">Skrivaj nasvete za vedno</string>
 
+    <!-- Covid Cta-->
+    <string name="covidCtaText">Pridobite uradne informacije in nasvete za COVID-19.</string>
 </resources>
