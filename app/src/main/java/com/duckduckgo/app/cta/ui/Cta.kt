@@ -490,7 +490,7 @@ sealed class HomeTopPanelCta(
         view.show()
     }
 
-    class CovidCta(val searchTerm: String = COVID_SEARCH_TERM) : HomeTopPanelCta(CtaId.COVID, null, null, null, R.string.covidCtaText) {
+    data class CovidCta(val searchTerm: String = COVID_SEARCH_TERM) : HomeTopPanelCta(CtaId.COVID, null, null, null, R.string.covidCtaText) {
         companion object {
             private const val COVID_SEARCH_TERM = "covid 19"
         }
