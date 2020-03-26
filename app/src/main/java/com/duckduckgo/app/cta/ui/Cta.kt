@@ -33,7 +33,6 @@ import com.duckduckgo.app.global.view.*
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
-import com.duckduckgo.app.widget.ui.WidgetCapabilities
 import kotlinx.android.synthetic.main.include_cta_buttons.view.*
 import kotlinx.android.synthetic.main.include_cta_content.view.*
 import kotlinx.android.synthetic.main.include_dax_dialog_cta.view.*
@@ -106,60 +105,6 @@ sealed class DaxDialogCta(
         onboardingStore,
         appInstallStore
     )
-
-    class SearchWidgetCta(
-        widgetCapabilities: WidgetCapabilities,
-        override val onboardingStore: OnboardingStore,
-        override val appInstallStore: AppInstallStore,
-        private val searchWidgetCtaBehavior: SearchWidgetCtaBehavior = getSearchWidgetBehavior(widgetCapabilities)
-    ) : DaxDialogCta(
-        ctaId = CtaId.DAX_DIALOG_SEARCH_WIDGET,
-        description = R.string.daxSearchWidgetCtaText,
-        okButton = R.string.daxDialogAddWidget,
-        shownPixel = Pixel.PixelName.ONBOARDING_DAX_CTA_SHOWN,
-        okPixel = Pixel.PixelName.ONBOARDING_DAX_CTA_OK_BUTTON,
-        cancelPixel = null,
-        ctaPixelParam = searchWidgetCtaBehavior.ctaPixelParam,
-        onboardingStore = onboardingStore,
-        appInstallStore = appInstallStore
-    ), SecondaryButtonCta {
-
-        override val secondaryButtonPixel: Pixel.PixelName = Pixel.PixelName.ONBOARDING_DAX_CTA_CANCEL_BUTTON
-
-        val primaryAction: SearchWidgetAction
-            get() = searchWidgetCtaBehavior.action
-
-        override fun createCta(activity: FragmentActivity): DaxDialog {
-            return TypewriterDaxDialog(
-                daxText = getDaxText(activity),
-                primaryButtonText = activity.resources.getString(okButton),
-                secondaryButtonText = activity.resources.getString(R.string.daxDialogMaybeLater),
-                toolbarDimmed = true
-            )
-        }
-
-        override fun pixelSecondaryButtonParameters(): Map<String, String> = mapOf(Pixel.PixelParameter.CTA_SHOWN to ctaPixelParam)
-
-        sealed class SearchWidgetAction {
-            object AddAutomatic : SearchWidgetAction()
-            object AddManually : SearchWidgetAction()
-        }
-
-        sealed class SearchWidgetCtaBehavior(val ctaPixelParam: String, val action: SearchWidgetAction) {
-            object Automatic : SearchWidgetCtaBehavior(Pixel.PixelValues.DAX_SEARCH_WIDGET_CTA_AUTO, SearchWidgetAction.AddAutomatic)
-            object Manual : SearchWidgetCtaBehavior(Pixel.PixelValues.DAX_SEARCH_WIDGET_CTA_MANUAL, SearchWidgetAction.AddManually)
-        }
-
-        companion object {
-            private fun getSearchWidgetBehavior(widgetCapabilities: WidgetCapabilities): SearchWidgetCtaBehavior {
-                return if (widgetCapabilities.supportsAutomaticWidgetAdd) {
-                    SearchWidgetCtaBehavior.Automatic
-                } else {
-                    SearchWidgetCtaBehavior.Manual
-                }
-            }
-        }
-    }
 
     class DaxTrackersBlockedCta(
         override val onboardingStore: OnboardingStore,

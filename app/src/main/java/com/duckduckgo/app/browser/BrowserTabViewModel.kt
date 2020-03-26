@@ -929,11 +929,11 @@ class BrowserTabViewModel(
 
     fun onUserClickCtaOkButton(cta: Cta) {
         ctaViewModel.onUserClickCtaOkButton(cta)
-        viewModelScope.launch {
-            withContext(dispatchers.io()) {
-                ctaViewModel.obtainNextCta(previousCta = cta)
-            }?.let { ctaViewState.value = currentCtaViewState().copy(cta = it) }
-            produceNewCommand(cta)
+        command.value = when (cta) {
+            is HomePanelCta.Survey -> LaunchSurvey(cta.survey)
+            is HomePanelCta.AddWidgetAuto -> LaunchAddWidget
+            is HomePanelCta.AddWidgetInstructions -> LaunchLegacyAddWidget
+            else -> return
         }
     }
 
@@ -947,16 +947,6 @@ class BrowserTabViewModel(
             refreshCta()
         } else {
             ctaViewState.value = currentCtaViewState().copy(cta = null)
-        }
-    }
-
-    private fun produceNewCommand(cta: Cta) {
-        command.value = when (cta) {
-            is HomePanelCta.Survey -> LaunchSurvey(cta.survey)
-            is HomePanelCta.AddWidgetAuto -> LaunchAddWidget
-            is HomePanelCta.AddWidgetInstructions -> LaunchLegacyAddWidget
-            is DaxDialogCta.SearchWidgetCta -> cta.primaryAction.mapToCommand()
-            else -> return
         }
     }
 
@@ -1027,13 +1017,6 @@ class BrowserTabViewModel(
     private fun recoverTabWithQuery(query: String) {
         closeCurrentTab()
         command.value = OpenInNewTab(query)
-    }
-
-    private fun DaxDialogCta.SearchWidgetCta.SearchWidgetAction.mapToCommand(): Command {
-        return when (this) {
-            is DaxDialogCta.SearchWidgetCta.SearchWidgetAction.AddAutomatic -> LaunchAddWidget
-            is DaxDialogCta.SearchWidgetCta.SearchWidgetAction.AddManually -> LaunchLegacyAddWidget
-        }
     }
 
     companion object {

@@ -30,7 +30,6 @@ interface VariantManager {
     // variant-dependant features listed here
     sealed class VariantFeature {
         object ConceptTest : VariantFeature()
-        object SearchWidgetDaxCta : VariantFeature()
         object StickySearchNotification : VariantFeature()
     }
 
@@ -50,15 +49,14 @@ interface VariantManager {
             // Insert CTAs on Concept test experiment
             Variant(
                 key = "mj",
-                weight = 0.0,
-                features = listOf(ConceptTest, SuppressOnboardingDefaultBrowserContinueScreen),
+                weight = 1.0,
+                features = emptyList(),
                 filterBy = { isEnglishLocale() }),
             Variant(
                 key = "mh",
                 weight = 0.0,
                 features = listOf(
-                    ConceptTest,
-                    SearchWidgetDaxCta
+                    ConceptTest
                 ),
                 filterBy = { isEnglishLocale() }),
 
