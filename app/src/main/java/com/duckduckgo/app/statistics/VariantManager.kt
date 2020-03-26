@@ -30,7 +30,6 @@ interface VariantManager {
     // variant-dependant features listed here
     sealed class VariantFeature {
         object ConceptTest : VariantFeature()
-        object SuppressHomeTabWidgetCta : VariantFeature()
         object SuppressOnboardingDefaultBrowserCta : VariantFeature()
         object SuppressOnboardingDefaultBrowserContinueScreen : VariantFeature()
         object DefaultBrowserDaxCta : VariantFeature()
@@ -62,7 +61,6 @@ interface VariantManager {
                 weight = 0.0,
                 features = listOf(
                     ConceptTest,
-                    SuppressHomeTabWidgetCta,
                     SuppressOnboardingDefaultBrowserCta,
                     DefaultBrowserDaxCta,
                     SearchWidgetDaxCta
@@ -85,7 +83,7 @@ interface VariantManager {
         )
 
         val REFERRER_VARIANTS = listOf(
-            Variant(RESERVED_EU_AUCTION_VARIANT, features = listOf(SuppressHomeTabWidgetCta), filterBy = { noFilter() })
+            Variant(RESERVED_EU_AUCTION_VARIANT, features = emptyList(), filterBy = { noFilter() })
         )
 
         fun referrerVariant(key: String): Variant {

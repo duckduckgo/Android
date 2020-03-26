@@ -31,7 +31,6 @@ import com.duckduckgo.app.privacy.store.PrivacySettingsStore
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.Variant
 import com.duckduckgo.app.statistics.VariantManager
-import com.duckduckgo.app.statistics.VariantManager.VariantFeature.SuppressHomeTabWidgetCta
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.survey.db.SurveyDao
 import com.duckduckgo.app.survey.model.Survey
@@ -172,8 +171,7 @@ class CtaViewModel @Inject constructor(
     private fun canShowWidgetCta(): Boolean {
         return widgetCapabilities.supportsStandardWidgetAdd &&
                 !widgetCapabilities.hasInstalledWidgets &&
-                !dismissedCtaDao.exists(CtaId.ADD_WIDGET) &&
-                !variant().hasFeature(SuppressHomeTabWidgetCta)
+                !dismissedCtaDao.exists(CtaId.ADD_WIDGET)
     }
 
     @WorkerThread
