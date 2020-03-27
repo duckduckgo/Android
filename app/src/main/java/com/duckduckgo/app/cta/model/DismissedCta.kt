@@ -20,7 +20,6 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import androidx.room.TypeConverter
 
-
 enum class CtaId {
     SURVEY,
     ADD_WIDGET,

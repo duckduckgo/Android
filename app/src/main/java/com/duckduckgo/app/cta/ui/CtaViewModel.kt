@@ -25,7 +25,9 @@ import com.duckduckgo.app.cta.ui.HomePanelCta.*
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.install.daysInstalled
 import com.duckduckgo.app.global.model.Site
+import com.duckduckgo.app.onboarding.store.AppStage
 import com.duckduckgo.app.onboarding.store.OnboardingStore
+import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.privacy.store.PrivacySettingsStore
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.Variant
@@ -36,7 +38,9 @@ import com.duckduckgo.app.survey.model.Survey
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import com.duckduckgo.app.widget.ui.WidgetCapabilities
 import io.reactivex.schedulers.Schedulers
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import timber.log.Timber
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlin.coroutines.CoroutineContext
@@ -51,12 +55,20 @@ class CtaViewModel @Inject constructor(
     private val variantManager: VariantManager,
     private val settingsDataStore: SettingsDataStore,
     private val onboardingStore: OnboardingStore,
-    private val settingsPrivacySettingsStore: PrivacySettingsStore
+    private val settingsPrivacySettingsStore: PrivacySettingsStore,
+    private val userStageStore: UserStageStore
 ) {
-
     val surveyLiveData: LiveData<Survey> = surveyDao.getLiveScheduled()
 
     private var activeSurvey: Survey? = null
+
+    private val requiredDaxOnboardingCtas: Array<CtaId> = arrayOf(
+        CtaId.DAX_INTRO,
+        CtaId.DAX_DIALOG_SERP,
+        CtaId.DAX_DIALOG_TRACKERS_FOUND,
+        CtaId.DAX_DIALOG_NETWORK,
+        CtaId.DAX_END
+    )
 
     fun onSurveyChanged(survey: Survey?): Survey? {
         activeSurvey = survey
@@ -80,15 +92,23 @@ class CtaViewModel @Inject constructor(
         }
     }
 
-    fun registerDaxBubbleCtaDismissed(cta: Cta) {
+    suspend fun registerDaxBubbleCtaDismissed(cta: Cta) {
         if (cta is DaxBubbleCta) {
             Schedulers.io().scheduleDirect {
                 dismissedCtaDao.insert(DismissedCta(cta.ctaId))
             }
         }
+        completeStageIfDaxOnboardingCompleted()
     }
 
-    fun onUserDismissedCta(cta: Cta) {
+    private suspend fun completeStageIfDaxOnboardingCompleted() {
+        if (daxOnboardingActive() && allOnboardingCtasShown()) {
+            Timber.d("Completing DAX ONBOARDING")
+            userStageStore.stageCompleted(AppStage.DAX_ONBOARDING)
+        }
+    }
+
+    suspend fun onUserDismissedCta(cta: Cta) {
         cta.cancelPixel?.let {
             pixel.fire(it, cta.pixelCancelParameters())
         }
@@ -101,6 +121,8 @@ class CtaViewModel @Inject constructor(
                 dismissedCtaDao.insert(DismissedCta(cta.ctaId))
             }
         }
+
+        completeStageIfDaxOnboardingCompleted()
     }
 
     fun onUserClickCtaOkButton(cta: Cta) {
@@ -129,7 +151,7 @@ class CtaViewModel @Inject constructor(
         }
     }
 
-    private fun getHomeCta(): Cta? {
+    private suspend fun getHomeCta(): Cta? {
         return when {
             canShowDaxIntroCta() -> {
                 DaxBubbleCta.DaxIntroCta(onboardingStore, appInstallStore)
@@ -144,7 +166,7 @@ class CtaViewModel @Inject constructor(
         }
     }
 
-    private fun getBrowserCta(site: Site?): Cta? {
+    private suspend fun getBrowserCta(site: Site?): Cta? {
         return when {
             canShowDaxDialogCta() -> {
                 getDaxDialogCta(site)
@@ -173,17 +195,18 @@ class CtaViewModel @Inject constructor(
     }
 
     @WorkerThread
-    private fun canShowDaxIntroCta(): Boolean = !daxDialogIntroShown() && !settingsDataStore.hideTips
+    private suspend fun canShowDaxIntroCta(): Boolean = daxOnboardingActive() && !daxDialogIntroShown() && !settingsDataStore.hideTips
 
     @WorkerThread
-    private fun canShowDaxCtaEndOfJourney(): Boolean = hasPrivacySettingsOn() &&
+    private suspend fun canShowDaxCtaEndOfJourney(): Boolean = daxOnboardingActive() &&
+            hasPrivacySettingsOn() &&
             !daxDialogEndShown() &&
             daxDialogIntroShown() &&
             !settingsDataStore.hideTips &&
             (daxDialogNetworkShown() || daxDialogOtherShown() || daxDialogSerpShown() || daxDialogTrackersFoundShown())
 
-    private fun canShowDaxDialogCta(): Boolean {
-        if (settingsDataStore.hideTips || !hasPrivacySettingsOn()) {
+    private suspend fun canShowDaxDialogCta(): Boolean {
+        if (!daxOnboardingActive() || settingsDataStore.hideTips || !hasPrivacySettingsOn()) {
             return false
         }
         return true
@@ -243,4 +266,17 @@ class CtaViewModel @Inject constructor(
     private fun daxDialogNetworkShown(): Boolean = dismissedCtaDao.exists(CtaId.DAX_DIALOG_NETWORK)
 
     private fun isSerpUrl(url: String): Boolean = url.contains(DaxDialogCta.SERP)
+
+    private suspend fun daxOnboardingActive(): Boolean = userStageStore.getUserAppStage() == AppStage.DAX_ONBOARDING
+
+    private suspend fun allOnboardingCtasShown(): Boolean {
+        return withContext(Dispatchers.IO) {
+            requiredDaxOnboardingCtas.forEach { ctaId ->
+                if (!dismissedCtaDao.exists(ctaId)) {
+                    return@withContext false
+                }
+            }
+            return@withContext true
+        }
+    }
 }

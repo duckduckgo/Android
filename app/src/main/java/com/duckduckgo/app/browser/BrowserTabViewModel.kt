@@ -48,7 +48,6 @@ import com.duckduckgo.app.browser.LongPressHandler.RequiredAction
 import com.duckduckgo.app.browser.SpecialUrlDetector.UrlType.IntentType
 import com.duckduckgo.app.browser.WebNavigationStateChange.*
 import com.duckduckgo.app.browser.addtohome.AddToHomeCapabilityDetector
-import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.browser.favicon.FaviconDownloader
 import com.duckduckgo.app.browser.model.BasicAuthenticationCredentials
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
@@ -56,16 +55,17 @@ import com.duckduckgo.app.browser.model.LongPressTarget
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.browser.ui.HttpAuthenticationDialogFragment.HttpAuthenticationListener
-import com.duckduckgo.app.cta.ui.*
+import com.duckduckgo.app.cta.ui.Cta
+import com.duckduckgo.app.cta.ui.CtaViewModel
+import com.duckduckgo.app.cta.ui.HomePanelCta
+import com.duckduckgo.app.cta.ui.SecondaryButtonCta
 import com.duckduckgo.app.global.*
-import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.global.model.SiteFactory
 import com.duckduckgo.app.global.model.domainMatchesUrl
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao
 import com.duckduckgo.app.privacy.model.PrivacyGrade
 import com.duckduckgo.app.settings.db.SettingsDataStore
-import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.api.StatisticsUpdater
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelName
@@ -923,8 +923,10 @@ class BrowserTabViewModel(
     }
 
     fun registerDaxBubbleCtaDismissed() {
-        val cta = ctaViewState.value?.cta ?: return
-        ctaViewModel.registerDaxBubbleCtaDismissed(cta)
+        viewModelScope.launch {
+            val cta = ctaViewState.value?.cta ?: return@launch
+            ctaViewModel.registerDaxBubbleCtaDismissed(cta)
+        }
     }
 
     fun onUserClickCtaOkButton(cta: Cta) {
@@ -942,11 +944,13 @@ class BrowserTabViewModel(
     }
 
     fun onUserDismissedCta(dismissedCta: Cta) {
-        ctaViewModel.onUserDismissedCta(dismissedCta)
-        if (dismissedCta is HomePanelCta) {
-            refreshCta()
-        } else {
-            ctaViewState.value = currentCtaViewState().copy(cta = null)
+        viewModelScope.launch {
+            ctaViewModel.onUserDismissedCta(dismissedCta)
+            if (dismissedCta is HomePanelCta) {
+                refreshCta()
+            } else {
+                ctaViewState.value = currentCtaViewState().copy(cta = null)
+            }
         }
     }
 
