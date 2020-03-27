@@ -558,6 +558,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
     }
 
     fun refresh() {
+        swipeContainer.isRefreshing = true
         webView?.reload()
     }
 
