@@ -13,21 +13,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.duckduckgo.app.browser.ui
 
-public class ScrollAwareSwipeToRefreshLayout: SwipeRefreshLayout {
+import android.content.Context
+import android.util.AttributeSet
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 
-interface CanWebViewScrollUpCallback {
-    fun canSwipeRefreshChildScrollUp(): Boolean
-}
+class ScrollAwareSwipeRefreshLayout @JvmOverloads constructor(
+    context: Context,
+    attrs: AttributeSet? = null
+) : SwipeRefreshLayout(context, attrs) {
+    private var canWebViewScrollUpCallback: CanWebViewScrollUpCallback? = null
 
-fun setCanWebViewScrollUpCallback(canWebViewScrollUpCallback: CanWebViewScrollUpCallback) {
-    this.canWebViewScrollUpCallback = canWebViewScrollUpCallback
-}
+    interface CanWebViewScrollUpCallback {
+        fun canSwipeRefreshChildScrollUp(): Boolean
+    }
 
-override fun canChildScrollUp(): Boolean {
-    return if (canWebViewScrollUpCallback != null) {
-        canWebViewScrollUpCallback!!.canSwipeRefreshChildScrollUp()
-    } else super.canChildScrollUp()
+    fun setCanWebViewScrollUpCallback(canWebViewScrollUpCallback: CanWebViewScrollUpCallback) {
+        this.canWebViewScrollUpCallback = canWebViewScrollUpCallback
+    }
+
+    override fun canChildScrollUp(): Boolean {
+        return if (canWebViewScrollUpCallback != null) {
+            canWebViewScrollUpCallback!!.canSwipeRefreshChildScrollUp()
+        } else super.canChildScrollUp()
+    }
 }
