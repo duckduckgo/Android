@@ -79,7 +79,7 @@ class SystemSearchViewModel(
         resetViewState()
         configureAutoComplete()
 
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch(dispatchers.io()) {
             deviceAppLookup.refreshAppList()
         }
     }
