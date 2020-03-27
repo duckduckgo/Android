@@ -783,7 +783,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
     }
 
     private fun decorateWithExperiments() {
-        decorator.decorateWithToolbarOnlyExperiment()
+        decorator.decorateWithBottomBarAndToolbarExperiment()
         return
         when {
             variantManager.getVariant().hasFeature(VariantManager.VariantFeature.ConceptTest) -> {
