@@ -31,7 +31,6 @@ import com.jakewharton.rxrelay2.PublishRelay
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -207,7 +206,10 @@ class SystemSearchViewModel(
 
     fun appNotFound(app: DeviceApp) {
         command.value = Command.ShowAppNotFoundMessage(app.shortName)
-        deviceAppLookup.refreshAppList()
+
+        viewModelScope.launch(dispatchers.io()) {
+            deviceAppLookup.refreshAppList()
+        }
     }
 
     override fun onCleared() {
