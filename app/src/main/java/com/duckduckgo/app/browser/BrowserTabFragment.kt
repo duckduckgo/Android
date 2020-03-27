@@ -75,6 +75,7 @@ import com.duckduckgo.app.browser.shortcut.ShortcutBuilder
 import com.duckduckgo.app.browser.tabpreview.WebViewPreviewGenerator
 import com.duckduckgo.app.browser.tabpreview.WebViewPreviewPersister
 import com.duckduckgo.app.browser.ui.HttpAuthenticationDialogFragment
+import com.duckduckgo.app.browser.ui.ScrollAwareSwipeRefreshLayout
 import com.duckduckgo.app.browser.useragent.UserAgentProvider
 import com.duckduckgo.app.cta.ui.*
 import com.duckduckgo.app.global.ViewModelFactory
@@ -277,6 +278,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
         configureKeyboardAwareLogoAnimation()
         configureShowTabSwitcherListener()
         configureLongClickOpensNewTabListener()
+        configureSwipeRefreshLayout()
 
         if (savedInstanceState == null) {
             viewModel.onViewReady()
@@ -325,6 +327,15 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
             launch { viewModel.userRequestedOpeningNewTab() }
             return@setOnLongClickListener true
         }
+    }
+
+    private fun configureSwipeRefreshLayout(){
+        swipeContainer.setColorSchemeColors(ContextCompat.getColor(context!!, R.color.cornflowerBlue))
+        swipeContainer.setCanWebViewScrollUpCallback(object : ScrollAwareSwipeRefreshLayout.CanWebViewScrollUpCallback {
+            override fun canSwipeRefreshChildScrollUp(): Boolean {
+                return webView?.canScrollVertically(-1) ?: false
+            }
+        })
     }
 
     private fun launchTabSwitcher() {
