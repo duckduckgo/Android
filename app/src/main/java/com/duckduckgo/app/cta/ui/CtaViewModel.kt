@@ -37,7 +37,6 @@ import com.duckduckgo.app.survey.db.SurveyDao
 import com.duckduckgo.app.survey.model.Survey
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import com.duckduckgo.app.widget.ui.WidgetCapabilities
-import io.reactivex.schedulers.Schedulers
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import timber.log.Timber
@@ -93,12 +92,12 @@ class CtaViewModel @Inject constructor(
     }
 
     suspend fun registerDaxBubbleCtaDismissed(cta: Cta) {
-        if (cta is DaxBubbleCta) {
-            Schedulers.io().scheduleDirect {
+        withContext(Dispatchers.IO) {
+            if (cta is DaxBubbleCta) {
                 dismissedCtaDao.insert(DismissedCta(cta.ctaId))
             }
+            completeStageIfDaxOnboardingCompleted()
         }
-        completeStageIfDaxOnboardingCompleted()
     }
 
     private suspend fun completeStageIfDaxOnboardingCompleted() {
@@ -109,20 +108,20 @@ class CtaViewModel @Inject constructor(
     }
 
     suspend fun onUserDismissedCta(cta: Cta) {
-        cta.cancelPixel?.let {
-            pixel.fire(it, cta.pixelCancelParameters())
-        }
+        withContext(Dispatchers.IO) {
+            cta.cancelPixel?.let {
+                pixel.fire(it, cta.pixelCancelParameters())
+            }
 
-        Schedulers.io().scheduleDirect {
             if (cta is HomePanelCta.Survey) {
                 activeSurvey = null
                 surveyDao.cancelScheduledSurveys()
             } else {
                 dismissedCtaDao.insert(DismissedCta(cta.ctaId))
             }
-        }
 
-        completeStageIfDaxOnboardingCompleted()
+            completeStageIfDaxOnboardingCompleted()
+        }
     }
 
     fun onUserClickCtaOkButton(cta: Cta) {
@@ -273,6 +272,7 @@ class CtaViewModel @Inject constructor(
         return withContext(Dispatchers.IO) {
             requiredDaxOnboardingCtas.forEach { ctaId ->
                 if (!dismissedCtaDao.exists(ctaId)) {
+                    Timber.d("Missing CTA $ctaId")
                     return@withContext false
                 }
             }
