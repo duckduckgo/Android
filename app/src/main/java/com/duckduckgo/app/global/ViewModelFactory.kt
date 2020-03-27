@@ -46,6 +46,7 @@ import com.duckduckgo.app.icon.ui.ChangeIconViewModel
 import com.duckduckgo.app.launch.LaunchViewModel
 import com.duckduckgo.app.notification.NotificationScheduler
 import com.duckduckgo.app.onboarding.store.OnboardingStore
+import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.onboarding.ui.OnboardingPageManager
 import com.duckduckgo.app.onboarding.ui.OnboardingViewModel
 import com.duckduckgo.app.onboarding.ui.page.DefaultBrowserPageViewModel
@@ -80,6 +81,7 @@ class ViewModelFactory @Inject constructor(
     private val statisticsUpdater: StatisticsUpdater,
     private val statisticsStore: StatisticsDataStore,
     private val onboardingStore: OnboardingStore,
+    private val userStageStore: UserStageStore,
     private val appInstallStore: AppInstallStore,
     private val queryUrlConverter: QueryUrlConverter,
     private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector,
@@ -117,8 +119,8 @@ class ViewModelFactory @Inject constructor(
     override fun <T : ViewModel> create(modelClass: Class<T>) =
         with(modelClass) {
             when {
-                isAssignableFrom(LaunchViewModel::class.java) -> LaunchViewModel(onboardingStore, appInstallationReferrerStateListener)
-                isAssignableFrom(SystemSearchViewModel::class.java) -> SystemSearchViewModel(onboardingStore, autoCompleteApi, deviceAppLookup, pixel)
+                isAssignableFrom(LaunchViewModel::class.java) -> LaunchViewModel(userStageStore, appInstallationReferrerStateListener)
+                isAssignableFrom(SystemSearchViewModel::class.java) -> SystemSearchViewModel(userStageStore, autoCompleteApi, deviceAppLookup, pixel)
                 isAssignableFrom(OnboardingViewModel::class.java) -> onboardingViewModel()
                 isAssignableFrom(BrowserViewModel::class.java) -> browserViewModel()
                 isAssignableFrom(BrowserTabViewModel::class.java) -> browserTabViewModel()
@@ -147,7 +149,7 @@ class ViewModelFactory @Inject constructor(
 
     private fun defaultBrowserPage() = DefaultBrowserPageViewModel(defaultBrowserDetector, pixel, appInstallStore)
 
-    private fun onboardingViewModel() = OnboardingViewModel(onboardingStore, onboardingPageManager)
+    private fun onboardingViewModel() = OnboardingViewModel(userStageStore, onboardingPageManager)
 
     private fun settingsViewModel(): SettingsViewModel {
         return SettingsViewModel(

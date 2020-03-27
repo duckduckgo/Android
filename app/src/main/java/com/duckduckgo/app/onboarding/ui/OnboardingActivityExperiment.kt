@@ -23,6 +23,8 @@ import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import kotlinx.android.synthetic.main.activity_onboarding_experiment.*
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.launch
 
 class OnboardingActivityExperiment : DuckDuckGoActivity() {
 
@@ -41,9 +43,11 @@ class OnboardingActivityExperiment : DuckDuckGoActivity() {
         if (next < viewPager.adapter!!.count) {
             viewPager.setCurrentItem(next, true)
         } else {
-            viewModel.onOnboardingDone()
-            startActivity(BrowserActivity.intent(this))
-            finish()
+            MainScope().launch {
+                viewModel.onOnboardingDone()
+                startActivity(BrowserActivity.intent(this@OnboardingActivityExperiment))
+                finish()
+            }
         }
     }
 

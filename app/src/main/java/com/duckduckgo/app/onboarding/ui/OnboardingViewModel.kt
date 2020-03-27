@@ -17,11 +17,15 @@
 package com.duckduckgo.app.onboarding.ui
 
 import androidx.lifecycle.ViewModel
+import com.duckduckgo.app.onboarding.store.AppStage
+import com.duckduckgo.app.onboarding.store.AppUserStageStore
 import com.duckduckgo.app.onboarding.store.OnboardingStore
+import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.onboarding.ui.page.OnboardingPageFragment
+import kotlinx.coroutines.GlobalScope
 
 class OnboardingViewModel(
-    private val onboardingStore: OnboardingStore,
+    private val userStageStore: UserStageStore,
     private val pageLayoutManager: OnboardingPageManager
 ) : ViewModel() {
 
@@ -37,7 +41,7 @@ class OnboardingViewModel(
         return pageLayoutManager.buildPage(position)
     }
 
-    fun onOnboardingDone() {
-        onboardingStore.onboardingShown()
+    suspend fun onOnboardingDone() {
+        userStageStore.stageCompleted(AppStage.NEW)
     }
 }

@@ -18,14 +18,15 @@ package com.duckduckgo.app.launch
 
 import androidx.lifecycle.ViewModel
 import com.duckduckgo.app.global.SingleLiveEvent
-import com.duckduckgo.app.onboarding.store.OnboardingStore
+import com.duckduckgo.app.onboarding.store.AppStage
+import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.referral.AppInstallationReferrerStateListener
 import com.duckduckgo.app.referral.AppInstallationReferrerStateListener.Companion.MAX_REFERRER_WAIT_TIME_MS
 import kotlinx.coroutines.withTimeoutOrNull
 import timber.log.Timber
 
 class LaunchViewModel(
-    private val onboardingStore: OnboardingStore,
+    private val userStageStore: UserStageStore,
     private val appReferrerStateListener: AppInstallationReferrerStateListener
 ) :
     ViewModel() {
@@ -40,7 +41,7 @@ class LaunchViewModel(
     suspend fun determineViewToShow() {
         waitForReferrerData()
 
-        if (onboardingStore.shouldShow) {
+        if (userStageStore.getUserAppStage() == AppStage.NEW) {
             command.value = Command.Onboarding
         } else {
             command.value = Command.Home()

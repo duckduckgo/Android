@@ -19,6 +19,7 @@ package com.duckduckgo.app.di
 import android.content.Context
 import androidx.room.Room
 import com.duckduckgo.app.global.db.AppDatabase
+import com.duckduckgo.app.global.db.MigrationsProvider
 import dagger.Module
 import dagger.Provides
 import javax.inject.Singleton
@@ -28,10 +29,14 @@ class DatabaseModule {
 
     @Provides
     @Singleton
-    fun provideDatabase(context: Context): AppDatabase {
+    fun provideDatabase(context: Context, migrationsProvider: MigrationsProvider): AppDatabase {
         return Room.databaseBuilder(context, AppDatabase::class.java, "app.db")
-            .addMigrations(*AppDatabase.ALL_MIGRATIONS.toTypedArray())
+            .addMigrations(*migrationsProvider.ALL_MIGRATIONS.toTypedArray())
             .build()
     }
 
+    @Provides
+    fun provideDatabaseMigrations(context: Context): MigrationsProvider {
+        return MigrationsProvider(context)
+    }
 }
