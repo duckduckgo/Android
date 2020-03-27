@@ -29,7 +29,6 @@ interface VariantManager {
 
     // variant-dependant features listed here
     sealed class VariantFeature {
-        object ConceptTest : VariantFeature()
         object StickySearchNotification : VariantFeature()
     }
 
@@ -46,29 +45,15 @@ interface VariantManager {
             Variant(key = "sc", weight = 0.0, features = emptyList(), filterBy = { noFilter() }),
             Variant(key = "se", weight = 0.0, features = emptyList(), filterBy = { noFilter() }),
 
-            // Insert CTAs on Concept test experiment
-            Variant(
-                key = "mj",
-                weight = 1.0,
-                features = emptyList(),
-                filterBy = { isEnglishLocale() }),
-            Variant(
-                key = "mh",
-                weight = 0.0,
-                features = listOf(
-                    ConceptTest
-                ),
-                filterBy = { isEnglishLocale() }),
-
             // Quick Search Notification Experiment
             Variant(
                 key = "mf",
-                weight = 1.0,
+                weight = 0.0,
                 features = emptyList(),
                 filterBy = { isEnglishLocale() }),
             Variant(
                 key = "mg",
-                weight = 1.0,
+                weight = 0.0,
                 features = listOf(StickySearchNotification),
                 filterBy = { isEnglishLocale() })
 
