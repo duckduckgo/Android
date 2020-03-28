@@ -16,10 +16,7 @@
 
 package com.duckduckgo.app.onboarding.ui
 
-import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
-import com.duckduckgo.app.statistics.Variant
-import com.duckduckgo.app.statistics.VariantManager
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.whenever
 import org.junit.Assert.assertEquals
@@ -38,25 +35,28 @@ class OnboardingPageManagerTest {
     }
 
     @Test
-    fun whenDefaultBrowserSupportedThenFirstPageShowsContinueTextOnButton() {
+    fun whenDDGIsNotDefaultBrowserThenExpectedOnboardingPagesAreTwo() {
         configureDeviceSupportsDefaultBrowser()
+        whenever(mockDefaultBrowserDetector.isDefaultBrowser()).thenReturn(false)
+
         testee.buildPageBlueprints()
-        val resourceId = testee.getContinueButtonTextResourceId(0)
-        assertEquals(R.string.onboardingContinue, resourceId)
+
+        assertEquals(2, testee.pageCount())
     }
 
     @Test
-    fun whenDefaultBrowserNotSupportedThenFirstPageShowsFinalTextOnButton() {
-        configureDeviceDoesNotSupportDefaultBrowser()
-        testee.buildPageBlueprints()
-        val resourceId = testee.getContinueButtonTextResourceId(0)
-        assertEquals(R.string.onboardingContinueFinalPage, resourceId)
-    }
-
-    @Test
-    fun whenDDGAsDefaultBrowserAndSuppressContinueScreenVariantEnabledThenSinglePageOnBoarding() {
+    fun whenDDGAsDefaultBrowserThenSinglePageOnBoarding() {
         configureDeviceSupportsDefaultBrowser()
         whenever(mockDefaultBrowserDetector.isDefaultBrowser()).thenReturn(true)
+
+        testee.buildPageBlueprints()
+
+        assertEquals(1, testee.pageCount())
+    }
+
+    @Test
+    fun whenDeviceDoesNotSupportDefaultBrowserThenSinglePageOnBoarding() {
+        configureDeviceDoesNotSupportDefaultBrowser()
 
         testee.buildPageBlueprints()
 
