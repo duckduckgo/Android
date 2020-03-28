@@ -16,8 +16,6 @@
 
 package com.duckduckgo.app.onboarding.ui
 
-import androidx.annotation.StringRes
-import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.onboarding.ui.OnboardingPageBuilder.OnboardingPageBlueprint
 import com.duckduckgo.app.onboarding.ui.OnboardingPageBuilder.OnboardingPageBlueprint.DefaultBrowserBlueprint
@@ -52,7 +50,7 @@ class OnboardingPageManagerWithTrackerBlocking(
     }
 
     override fun buildPage(position: Int): OnboardingPageFragment? {
-        return when (val blueprint = pages.getOrNull(position)) {
+        return when (pages.getOrNull(position)) {
             is WelcomeBlueprint -> buildWelcomePage()
             is DefaultBrowserBlueprint -> buildDefaultBrowserPage()
             else -> null
