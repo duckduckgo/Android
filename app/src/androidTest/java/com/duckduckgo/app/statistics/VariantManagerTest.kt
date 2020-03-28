@@ -43,27 +43,6 @@ class VariantManagerTest {
         assertEquals(0, variant.features.size)
     }
 
-    // CTA on Concept Test experiments
-
-    @Test
-    fun insertCtaConceptTestControlVariantIsInactiveAndHasConceptTestAndHasExpectedFeatures() {
-        val variant = variants.first { it.key == "mj" }
-        assertEqualsDouble(0.0, variant.weight)
-        assertEquals(2, variant.features.size)
-        assertTrue(variant.hasFeature(ConceptTest))
-        assertTrue(variant.hasFeature(SuppressOnboardingDefaultBrowserContinueScreen))
-    }
-
-    @Test
-    fun insertCtaConceptTestWithCtasAsDaxDialogsExperimentalVariantIsInactiveAndHasExpectedFeatures() {
-        val variant = variants.first { it.key == "mh" }
-        assertEqualsDouble(0.0, variant.weight)
-        assertEquals(5, variant.features.size)
-        assertTrue(variant.hasFeature(ConceptTest))
-        assertTrue(variant.hasFeature(DefaultBrowserDaxCta))
-        assertTrue(variant.hasFeature(SearchWidgetDaxCta))
-    }
-
     // Search Notification Experiment
 
     @Test
