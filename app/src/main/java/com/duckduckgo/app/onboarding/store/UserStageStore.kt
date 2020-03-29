@@ -16,7 +16,7 @@
 
 package com.duckduckgo.app.onboarding.store
 
-import kotlinx.coroutines.Dispatchers
+import com.duckduckgo.app.global.DispatcherProvider
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
@@ -25,16 +25,19 @@ interface UserStageStore {
     suspend fun stageCompleted(appStage: AppStage): AppStage
 }
 
-class AppUserStageStore @Inject constructor(private val userStageDao: UserStageDao) : UserStageStore {
+class AppUserStageStore @Inject constructor(
+    private val userStageDao: UserStageDao,
+    private val dispatcher: DispatcherProvider
+) : UserStageStore {
     override suspend fun getUserAppStage(): AppStage {
-        return withContext(Dispatchers.IO) {
+        return withContext(dispatcher.io()) {
             val userStage = userStageDao.currentUserAppStage()
             return@withContext userStage?.appStage ?: AppStage.NEW
         }
     }
 
     override suspend fun stageCompleted(appStage: AppStage): AppStage {
-        return withContext(Dispatchers.IO) {
+        return withContext(dispatcher.io()) {
             val newAppStage = when (appStage) {
                 AppStage.NEW -> AppStage.DAX_ONBOARDING
                 AppStage.DAX_ONBOARDING -> AppStage.ESTABLISHED
