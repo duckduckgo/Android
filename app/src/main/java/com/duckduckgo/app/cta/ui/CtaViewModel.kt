@@ -22,6 +22,8 @@ import com.duckduckgo.app.cta.db.DismissedCtaDao
 import com.duckduckgo.app.cta.model.CtaId
 import com.duckduckgo.app.cta.model.DismissedCta
 import com.duckduckgo.app.cta.ui.HomePanelCta.*
+import com.duckduckgo.app.global.DefaultDispatcherProvider
+import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.install.daysInstalled
 import com.duckduckgo.app.global.model.Site
@@ -55,7 +57,8 @@ class CtaViewModel @Inject constructor(
     private val settingsDataStore: SettingsDataStore,
     private val onboardingStore: OnboardingStore,
     private val settingsPrivacySettingsStore: PrivacySettingsStore,
-    private val userStageStore: UserStageStore
+    private val userStageStore: UserStageStore,
+    private val dispatchers: DispatcherProvider
 ) {
     val surveyLiveData: LiveData<Survey> = surveyDao.getLiveScheduled()
 
@@ -92,7 +95,7 @@ class CtaViewModel @Inject constructor(
     }
 
     suspend fun registerDaxBubbleCtaDismissed(cta: Cta) {
-        withContext(Dispatchers.IO) {
+        withContext(dispatchers.io()) {
             if (cta is DaxBubbleCta) {
                 dismissedCtaDao.insert(DismissedCta(cta.ctaId))
             }
@@ -108,7 +111,7 @@ class CtaViewModel @Inject constructor(
     }
 
     suspend fun onUserDismissedCta(cta: Cta) {
-        withContext(Dispatchers.IO) {
+        withContext(dispatchers.io()) {
             cta.cancelPixel?.let {
                 pixel.fire(it, cta.pixelCancelParameters())
             }
@@ -269,7 +272,7 @@ class CtaViewModel @Inject constructor(
     private suspend fun daxOnboardingActive(): Boolean = userStageStore.getUserAppStage() == AppStage.DAX_ONBOARDING
 
     private suspend fun allOnboardingCtasShown(): Boolean {
-        return withContext(Dispatchers.IO) {
+        return withContext(dispatchers.io()) {
             requiredDaxOnboardingCtas.forEach { ctaId ->
                 if (!dismissedCtaDao.exists(ctaId)) {
                     Timber.d("Missing CTA $ctaId")
