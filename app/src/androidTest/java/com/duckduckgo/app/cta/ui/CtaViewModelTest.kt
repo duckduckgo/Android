@@ -36,6 +36,7 @@ import com.duckduckgo.app.privacy.model.PrivacyGrade
 import com.duckduckgo.app.privacy.model.PrivacyPractices
 import com.duckduckgo.app.privacy.model.TestEntity
 import com.duckduckgo.app.privacy.store.PrivacySettingsStore
+import com.duckduckgo.app.runBlocking
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -48,7 +49,6 @@ import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import com.duckduckgo.app.widget.ui.WidgetCapabilities
 import com.nhaarman.mockitokotlin2.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.runBlockingTest
 import org.junit.After
 import org.junit.Assert.*
 import org.junit.Before
@@ -137,7 +137,8 @@ class CtaViewModelTest {
             mockSettingsDataStore,
             mockOnboardingStore,
             mockPrivacySettingsStore,
-            mockUserStageStore
+            mockUserStageStore,
+            coroutineRule.testDispatcherProvider
         )
     }
 
@@ -193,26 +194,26 @@ class CtaViewModelTest {
     }
 
     @Test
-    fun whenCtaDismissedPixelIsFired() = runBlockingTest {
+    fun whenCtaDismissedPixelIsFired() = coroutineRule.runBlocking {
         testee.onUserDismissedCta(HomePanelCta.Survey(Survey("abc", "http://example.com", 1, SCHEDULED)))
         verify(mockPixel).fire(eq(SURVEY_CTA_DISMISSED), any(), any())
     }
 
     @Test
-    fun whenSurveyCtaDismissedThenScheduledSurveysAreCancelled() = runBlockingTest {
+    fun whenSurveyCtaDismissedThenScheduledSurveysAreCancelled() = coroutineRule.runBlocking {
         testee.onUserDismissedCta(HomePanelCta.Survey(Survey("abc", "http://example.com", 1, SCHEDULED)))
         verify(mockSurveyDao).cancelScheduledSurveys()
         verify(mockDismissedCtaDao, never()).insert(any())
     }
 
     @Test
-    fun whenNonSurveyCtaDismissedCtaThenDatabaseNotified() = runBlockingTest {
+    fun whenNonSurveyCtaDismissedCtaThenDatabaseNotified() = coroutineRule.runBlocking {
         testee.onUserDismissedCta(HomePanelCta.AddWidgetAuto)
         verify(mockDismissedCtaDao).insert(DismissedCta(CtaId.ADD_WIDGET))
     }
 
     @Test
-    fun whenCtaDismissedAndUserHasPendingOnboardingCtasThenStageNotCompleted() = runBlockingTest {
+    fun whenCtaDismissedAndUserHasPendingOnboardingCtasThenStageNotCompleted() = coroutineRule.runBlocking {
         givenOnboardingActive()
         givenShownDaxOnboardingCtas(emptyList())
         testee.onUserDismissedCta(DaxBubbleCta.DaxEndCta(mockOnboardingStore, mockAppInstallStore))
@@ -220,9 +221,9 @@ class CtaViewModelTest {
     }
 
     @Test
-    fun whenDismissedLastPendingOnboardingCtaThenStageCompleted() = runBlockingTest {
+    fun whenCtaDismissedAndAllDaxOnboardingCtasShownThenStageCompleted() = coroutineRule.runBlocking {
         givenOnboardingActive()
-        givenShownDaxOnboardingCtas(requiredDaxOnboardingCtas - CtaId.DAX_DIALOG_SERP)
+        givenShownDaxOnboardingCtas(requiredDaxOnboardingCtas)
         testee.onUserDismissedCta(DaxDialogCta.DaxSerpCta(mockOnboardingStore, mockAppInstallStore))
         verify(mockUserStageStore).stageCompleted(AppStage.DAX_ONBOARDING)
     }
@@ -240,19 +241,19 @@ class CtaViewModelTest {
     }
 
     @Test
-    fun whenRegisterDaxBubbleIntroCtaThenDatabaseNotified() = runBlockingTest {
+    fun whenRegisterDaxBubbleIntroCtaThenDatabaseNotified() = coroutineRule.runBlocking {
         testee.registerDaxBubbleCtaDismissed(DaxBubbleCta.DaxIntroCta(mockOnboardingStore, mockAppInstallStore))
         verify(mockDismissedCtaDao).insert(DismissedCta(CtaId.DAX_INTRO))
     }
 
     @Test
-    fun whenRegisterDaxBubbleEndCtaThenDatabaseNotified() = runBlockingTest {
+    fun whenRegisterDaxBubbleEndCtaThenDatabaseNotified() = coroutineRule.runBlocking {
         testee.registerDaxBubbleCtaDismissed(DaxBubbleCta.DaxEndCta(mockOnboardingStore, mockAppInstallStore))
         verify(mockDismissedCtaDao).insert(DismissedCta(CtaId.DAX_END))
     }
 
     @Test
-    fun whenRegisterCtaAndUserHasPendingOnboardingCtasThenStageNotCompleted() = runBlockingTest {
+    fun whenRegisterCtaAndUserHasPendingOnboardingCtasThenStageNotCompleted() = coroutineRule.runBlocking {
         givenOnboardingActive()
         givenShownDaxOnboardingCtas(emptyList())
         testee.registerDaxBubbleCtaDismissed(DaxBubbleCta.DaxEndCta(mockOnboardingStore, mockAppInstallStore))
@@ -260,21 +261,21 @@ class CtaViewModelTest {
     }
 
     @Test
-    fun whenRegisterLastPendingOnboardingCtaThenStageCompleted() = runBlockingTest {
+    fun whenRegisterCtaAndAllDaxOnboardingCtasShownThenStageCompleted() = coroutineRule.runBlocking {
         givenOnboardingActive()
-        givenShownDaxOnboardingCtas(requiredDaxOnboardingCtas - CtaId.DAX_END)
+        givenShownDaxOnboardingCtas(requiredDaxOnboardingCtas)
         testee.registerDaxBubbleCtaDismissed(DaxBubbleCta.DaxEndCta(mockOnboardingStore, mockAppInstallStore))
         verify(mockUserStageStore).stageCompleted(AppStage.DAX_ONBOARDING)
     }
 
     @Test
-    fun whenRefreshCtaWhileBrowsingAndSiteIsNullThenReturnNull() = runBlockingTest {
+    fun whenRefreshCtaWhileBrowsingAndSiteIsNullThenReturnNull() = coroutineRule.runBlocking {
         val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = true, site = null)
         assertNull(value)
     }
 
     @Test
-    fun whenRefreshCtaWhileBrowsingAndHideTipsIsTrueThenReturnNull() = runBlockingTest {
+    fun whenRefreshCtaWhileBrowsingAndHideTipsIsTrueThenReturnNull() = coroutineRule.runBlocking {
         whenever(mockSettingsDataStore.hideTips).thenReturn(true)
         val site = site(url = "http://www.facebook.com", entity = TestEntity("Facebook", "Facebook", 9.0))
 
@@ -283,7 +284,7 @@ class CtaViewModelTest {
     }
 
     @Test
-    fun whenRefreshCtaOnHomeTabAndHideTipsIsTrueThenReturnNull() = runBlockingTest {
+    fun whenRefreshCtaOnHomeTabAndHideTipsIsTrueThenReturnNull() = coroutineRule.runBlocking {
         whenever(mockSettingsDataStore.hideTips).thenReturn(true)
 
         val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = false)
@@ -291,7 +292,8 @@ class CtaViewModelTest {
     }
 
     @Test
-    fun whenRefreshCtaWhileBrowsingAndPrivacyOffThenReturnNull() = runBlockingTest {
+    fun whenRefreshCtaWhileBrowsingAndPrivacyOffThenReturnNull() = coroutineRule.runBlocking {
+        givenDaxOnboardingActive()
         whenever(mockPrivacySettingsStore.privacyOn).thenReturn(false)
         val site = site(url = "http://www.facebook.com", entity = TestEntity("Facebook", "Facebook", 9.0))
 
@@ -300,7 +302,7 @@ class CtaViewModelTest {
     }
 
     @Test
-    fun whenRefreshCtaOnHomeTabAndHideTipsIsTrueThenReturnWidgetAutoCta() = runBlockingTest {
+    fun whenRefreshCtaOnHomeTabAndHideTipsIsTrueThenReturnWidgetAutoCta() = coroutineRule.runBlocking {
         whenever(mockSettingsDataStore.hideTips).thenReturn(true)
         whenever(mockWidgetCapabilities.supportsStandardWidgetAdd).thenReturn(true)
         whenever(mockWidgetCapabilities.supportsAutomaticWidgetAdd).thenReturn(true)
@@ -311,7 +313,7 @@ class CtaViewModelTest {
     }
 
     @Test
-    fun whenRefreshCtaOnHomeTabAndHideTipsIsTrueThenReturnWidgetInstructionsCta() = runBlockingTest {
+    fun whenRefreshCtaOnHomeTabAndHideTipsIsTrueThenReturnWidgetInstructionsCta() = coroutineRule.runBlocking {
         whenever(mockSettingsDataStore.hideTips).thenReturn(true)
         whenever(mockWidgetCapabilities.supportsStandardWidgetAdd).thenReturn(true)
         whenever(mockWidgetCapabilities.supportsAutomaticWidgetAdd).thenReturn(false)
@@ -322,7 +324,8 @@ class CtaViewModelTest {
     }
 
     @Test
-    fun whenRefreshCtaWhileBrowsingThenReturnNetworkCta() = runBlockingTest {
+    fun whenRefreshCtaWhileBrowsingThenReturnNetworkCta() = coroutineRule.runBlocking {
+        givenDaxOnboardingActive()
         val site = site(url = "http://www.facebook.com", entity = TestEntity("Facebook", "Facebook", 9.0))
         val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = true, site = site)
 
@@ -330,7 +333,8 @@ class CtaViewModelTest {
     }
 
     @Test
-    fun whenRefreshCtaWhileBrowsingThenReturnTrackersBlockedCta() = runBlockingTest {
+    fun whenRefreshCtaWhileBrowsingThenReturnTrackersBlockedCta() = coroutineRule.runBlocking {
+        givenDaxOnboardingActive()
         val trackingEvent = TrackingEvent("test.com", "test.com", null, TestEntity("test", "test", 9.0), true)
         val site = site(url = "http://www.cnn.com", trackerCount = 1, events = listOf(trackingEvent))
         val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = true, site = site)
@@ -339,7 +343,8 @@ class CtaViewModelTest {
     }
 
     @Test
-    fun whenRefreshCtaWhileBrowsingAndNoTrackersInformationThenReturnNoSerpCta() = runBlockingTest {
+    fun whenRefreshCtaWhileBrowsingAndNoTrackersInformationThenReturnNoSerpCta() = coroutineRule.runBlocking {
+        givenDaxOnboardingActive()
         val site = site(url = "http://www.cnn.com", trackerCount = 1)
         val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = true, site = site)
 
@@ -347,7 +352,8 @@ class CtaViewModelTest {
     }
 
     @Test
-    fun whenRefreshCtaOnSerpWhileBrowsingThenReturnSerpCta() = runBlockingTest {
+    fun whenRefreshCtaOnSerpWhileBrowsingThenReturnSerpCta() = coroutineRule.runBlocking {
+        givenDaxOnboardingActive()
         val site = site(url = "http://www.duckduckgo.com")
         val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = true, site = site)
 
@@ -356,7 +362,8 @@ class CtaViewModelTest {
 
 
     @Test
-    fun whenRefreshCtaWhileBrowsingThenReturnNoSerpCta() = runBlockingTest {
+    fun whenRefreshCtaWhileBrowsingThenReturnNoSerpCta() = coroutineRule.runBlocking {
+        givenDaxOnboardingActive()
         val site = site(url = "http://www.wikipedia.com")
         val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = true, site = site)
 
@@ -364,7 +371,8 @@ class CtaViewModelTest {
     }
 
     @Test
-    fun whenRefreshCtaOnHomeTabThenValueReturnedIsNotDaxDialogCtaType() = runBlockingTest {
+    fun whenRefreshCtaOnHomeTabThenValueReturnedIsNotDaxDialogCtaType() = coroutineRule.runBlocking {
+        givenDaxOnboardingActive()
         val site = site(url = "http://www.wikipedia.com")
         val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = false, site = site)
 
@@ -372,7 +380,8 @@ class CtaViewModelTest {
     }
 
     @Test
-    fun whenRefreshCtaOnHomeTabAndIntroCtaWasNotPreviouslyShownThenIntroCtaShown() = runBlockingTest {
+    fun whenRefreshCtaOnHomeTabAndIntroCtaWasNotPreviouslyShownThenIntroCtaShown() = coroutineRule.runBlocking {
+        givenDaxOnboardingActive()
         whenever(mockDismissedCtaDao.exists(CtaId.DAX_INTRO)).thenReturn(false)
         whenever(mockDismissedCtaDao.exists(CtaId.DAX_DIALOG_SERP)).thenReturn(true)
 
@@ -381,12 +390,17 @@ class CtaViewModelTest {
     }
 
     @Test
-    fun whenRefreshCtaOnHomeTabAndIntroCtaWasShownThenEndCtaShown() = runBlockingTest {
+    fun whenRefreshCtaOnHomeTabAndIntroCtaWasShownThenEndCtaShown() = coroutineRule.runBlocking {
+        givenDaxOnboardingActive()
         whenever(mockDismissedCtaDao.exists(CtaId.DAX_INTRO)).thenReturn(true)
         givenAtLeastOneDaxDialogCtaShown()
 
         val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = false)
         assertTrue(value is DaxBubbleCta.DaxEndCta)
+    }
+
+    private suspend fun givenDaxOnboardingActive() {
+        whenever(mockUserStageStore.getUserAppStage()).thenReturn(AppStage.DAX_ONBOARDING)
     }
 
     private fun givenAtLeastOneDaxDialogCtaShown() {
