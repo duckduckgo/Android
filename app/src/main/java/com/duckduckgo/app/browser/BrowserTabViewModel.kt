@@ -55,10 +55,7 @@ import com.duckduckgo.app.browser.model.LongPressTarget
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.browser.ui.HttpAuthenticationDialogFragment.HttpAuthenticationListener
-import com.duckduckgo.app.cta.ui.Cta
-import com.duckduckgo.app.cta.ui.CtaViewModel
-import com.duckduckgo.app.cta.ui.HomePanelCta
-import com.duckduckgo.app.cta.ui.SecondaryButtonCta
+import com.duckduckgo.app.cta.ui.*
 import com.duckduckgo.app.global.*
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.global.model.SiteFactory
@@ -929,6 +926,12 @@ class BrowserTabViewModel(
         }
     }
 
+    fun onUserClickTopCta(cta: HomeTopPanelCta) {
+        if (cta is HomeTopPanelCta.CovidCta) {
+            onUserSubmittedQuery(cta.searchTerm)
+        }
+    }
+
     fun onUserClickCtaOkButton(cta: Cta) {
         ctaViewModel.onUserClickCtaOkButton(cta)
         command.value = when (cta) {
@@ -946,10 +949,12 @@ class BrowserTabViewModel(
     fun onUserDismissedCta(dismissedCta: Cta) {
         viewModelScope.launch {
             ctaViewModel.onUserDismissedCta(dismissedCta)
-            if (dismissedCta is HomePanelCta) {
-                refreshCta()
-            } else {
-                ctaViewState.value = currentCtaViewState().copy(cta = null)
+            when (dismissedCta) {
+                is HomeTopPanelCta -> {
+                    ctaViewState.value = currentCtaViewState().copy(cta = null)
+                }
+                is HomePanelCta -> refreshCta()
+                else -> ctaViewState.value = currentCtaViewState().copy(cta = null)
             }
         }
     }

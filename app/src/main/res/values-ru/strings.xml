@@ -429,4 +429,6 @@
     </plurals>
     <string name="daxTrackersBlockedCtaZeroText">  пытался отследить вас здесь. &lt;br/&gt;&lt;br/&gt;Я заблокировал это!&lt;br/&gt;&lt;br/&gt; ☝️Вы можете видеть в адресной строке, отслеживает ли вас кто-то во время посещения нового сайта.️</string>
 
+    <!-- Covid Cta-->
+    <string name="covidCtaText">Получить официальную информацию и советы в связи с COVID-19.</string>
 </resources>

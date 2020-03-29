@@ -414,4 +414,6 @@
     </plurals>
     <string name="daxTrackersBlockedCtaZeroText">vas je poskušal izslediti tukaj. &lt;br/&gt;&lt;br/&gt;Blokiral sem ga!&lt;br/&gt;&lt;br/&gt; ☝️Preverite lahko URL vrstico, da vidite, kdo vas poskuša zaslediti, ko obiščete novo spletišče.</string>
 
+    <!-- Covid Cta-->
+    <string name="covidCtaText">Pridobite uradne informacije in nasvete za COVID-19.</string>
 </resources>

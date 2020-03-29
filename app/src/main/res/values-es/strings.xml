@@ -404,4 +404,6 @@
     </plurals>
     <string name="daxTrackersBlockedCtaZeroText">intentaba rastrearte aquí. &lt;br/&gt;&lt;br/&gt;¡Lo bloqueé!&lt;br/&gt;&lt;br/&gt; ☝️Puedes consultar la barra de URL para ver quién está tratando de rastrearte cuando visitas un nuevo sitio.️</string>
 
+    <!-- Covid Cta-->
+    <string name="covidCtaText">Obtén información y consejos oficiales sobre COVID-19.</string>
 </resources>

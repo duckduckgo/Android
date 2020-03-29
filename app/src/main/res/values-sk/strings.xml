@@ -407,4 +407,6 @@
     </plurals>
     <string name="daxTrackersBlockedCtaZeroText">sa vás tu snažil sledovať. &lt;br/&gt;&lt;br/&gt;Zablokovali sme ho!&lt;br/&gt;&lt;br/&gt; ☝️Skontrolujte si panel s URL adresou a zistite, kto sa vás snaží sledovať pri vašej návšteve novej stránky.️</string>
 
+    <!-- Covid Cta-->
+    <string name="covidCtaText">Získajte oficiálne informácie a tipy ohľadom COVID-19.</string>
 </resources>

@@ -410,4 +410,6 @@
     </plurals>
     <string name="daxTrackersBlockedCtaZeroText"> se Vás tady snažil sledovat. &lt;br/&gt;&lt;br/&gt;Zablokovali jsme to!&lt;br/&gt;&lt;br/&gt; ☝️Když navštívíte nový web, můžete se do adresního řádku prohlížeče podívat, kdo se Vás snaží sledovat.</string>
 
+    <!-- Covid Cta-->
+    <string name="covidCtaText">Odebírejte oficiální informace a tipy o COVID-19.</string>
 </resources>

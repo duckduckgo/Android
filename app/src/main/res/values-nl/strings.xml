@@ -404,4 +404,6 @@
     </plurals>
     <string name="daxTrackersBlockedCtaZeroText"> probeerde u hier te volgen. &lt;br/&gt;&lt;br/&gt;Ik heb het geblokkeerd!&lt;br/&gt;&lt;br/&gt; ☝️U kunt de URL-balk bekijken om te zien wie u probeert te volgen wanneer u een nieuwe site bezoekt.️</string>
 
+    <!-- Covid Cta-->
+    <string name="covidCtaText">Ontvang officiële COVID-19 info en tips.</string>
 </resources>

@@ -44,7 +44,7 @@ import com.duckduckgo.app.global.rating.AppEnjoymentUserEventRecorder
 import com.duckduckgo.app.icon.api.IconModifier
 import com.duckduckgo.app.icon.ui.ChangeIconViewModel
 import com.duckduckgo.app.launch.LaunchViewModel
-import com.duckduckgo.app.notification.NotificationScheduler
+import com.duckduckgo.app.notification.AndroidNotificationScheduler
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.onboarding.ui.OnboardingPageManager
@@ -113,7 +113,7 @@ class ViewModelFactory @Inject constructor(
     private val onboardingPageManager: OnboardingPageManager,
     private val appInstallationReferrerStateListener: AppInstallationReferrerStateListener,
     private val appIconModifier: IconModifier,
-    private val notificationScheduler: NotificationScheduler
+    private val notificationScheduler: AndroidNotificationScheduler
 ) : ViewModelProvider.NewInstanceFactory() {
 
     override fun <T : ViewModel> create(modelClass: Class<T>) =

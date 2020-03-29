@@ -47,11 +47,11 @@ import com.duckduckgo.app.browser.model.LongPressTarget
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.cta.db.DismissedCtaDao
+import com.duckduckgo.app.cta.model.CtaId
 import com.duckduckgo.app.cta.model.DismissedCta
-import com.duckduckgo.app.cta.ui.CtaViewModel
-import com.duckduckgo.app.cta.ui.DaxBubbleCta
-import com.duckduckgo.app.cta.ui.HomePanelCta
+import com.duckduckgo.app.cta.ui.*
 import com.duckduckgo.app.global.db.AppDatabase
+import com.duckduckgo.app.cta.ui.HomeTopPanelCta
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.model.SiteFactory
 import com.duckduckgo.app.onboarding.store.OnboardingStore
@@ -1336,6 +1336,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenScheduledSurveyChangesAndInstalledDaysDontMatchThenCtaIsNull() {
+        setCovidCtaShown()
         testee.onSurveyChanged(Survey("abc", "http://example.com", daysInstalled = 2, status = Survey.Status.SCHEDULED))
         assertNull(testee.ctaViewState.value!!.cta)
     }
@@ -1357,6 +1358,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenCtaRefreshedAndAutoAddSupportedAndWidgetAlreadyInstalledThenCtaIsNull() = coroutineRule.runBlocking {
+        setCovidCtaShown()
         whenever(mockWidgetCapabilities.supportsStandardWidgetAdd).thenReturn(true)
         whenever(mockWidgetCapabilities.supportsAutomaticWidgetAdd).thenReturn(true)
         whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(true)
@@ -1373,6 +1375,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenCtaRefreshedAndOnlyStandardAddSupportedAndWidgetAlreadyInstalledThenCtaIsNull() = coroutineRule.runBlocking {
+        setCovidCtaShown()
         whenever(mockWidgetCapabilities.supportsStandardWidgetAdd).thenReturn(true)
         whenever(mockWidgetCapabilities.supportsAutomaticWidgetAdd).thenReturn(false)
         whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(true)
@@ -1382,6 +1385,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenCtaRefreshedAndStandardAddNotSupportedAndWidgetNotInstalledThenCtaIsNull() = coroutineRule.runBlocking {
+        setCovidCtaShown()
         whenever(mockWidgetCapabilities.supportsStandardWidgetAdd).thenReturn(false)
         whenever(mockWidgetCapabilities.supportsAutomaticWidgetAdd).thenReturn(false)
         whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(false)
@@ -1391,6 +1395,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenCtaRefreshedAndStandardAddNotSupportedAndWidgetAlreadyInstalledThenCtaIsNull() = coroutineRule.runBlocking {
+        setCovidCtaShown()
         whenever(mockWidgetCapabilities.supportsStandardWidgetAdd).thenReturn(false)
         whenever(mockWidgetCapabilities.supportsAutomaticWidgetAdd).thenReturn(false)
         whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(true)
@@ -1464,9 +1469,18 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenSurveyCtaDismissedAndNoOtherCtaPossibleCtaIsNull() = coroutineRule.runBlocking {
+        givenShownCtas(CtaId.DAX_INTRO, CtaId.DAX_END, CtaId.COVID)
         testee.onSurveyChanged(Survey("abc", "http://example.com", daysInstalled = 1, status = Survey.Status.SCHEDULED))
         testee.onUserDismissedCta(testee.ctaViewState.value!!.cta!!)
         assertNull(testee.ctaViewState.value!!.cta)
+    }
+
+    @Test
+    fun whenSurveyCtaDismissedAndWidgetNotCompatibleAndCovidCtaNotShownThenCtaIsCovid() = coroutineRule.runBlocking {
+        givenShownCtas(CtaId.DAX_INTRO, CtaId.DAX_END)
+        testee.onSurveyChanged(Survey("abc", "http://example.com", daysInstalled = 1, status = Survey.Status.SCHEDULED))
+        testee.onUserDismissedCta(testee.ctaViewState.value!!.cta!!)
+        assertEquals(HomeTopPanelCta.CovidCta(), testee.ctaViewState.value!!.cta)
     }
 
     @Test
@@ -1506,6 +1520,14 @@ class BrowserTabViewModelTest {
         val cta = HomePanelCta.Survey(Survey("abc", "http://example.com", daysInstalled = 1, status = Survey.Status.SCHEDULED))
         testee.onUserDismissedCta(cta)
         verify(mockSurveyDao).cancelScheduledSurveys()
+    }
+
+
+    @Test
+    fun whenUserDismissedHomeTopPanelCtaThenReturnEmptyCta() {
+        val cta = HomeTopPanelCta.CovidCta()
+        testee.onUserDismissedCta(cta)
+        assertNull(testee.ctaViewState.value!!.cta)
     }
 
     @Test
@@ -1642,6 +1664,13 @@ class BrowserTabViewModelTest {
         assertEquals("surrogate.com", brokenSiteFeedback.surrogates)
     }
 
+    @Test
+    fun whenUserClickedTopCtaButtonAndCtaIsCovidCtaThenSubmitQuery() {
+        val cta = HomeTopPanelCta.CovidCta()
+        testee.onUserClickTopCta(cta)
+        assertEquals(cta.searchTerm, omnibarViewState().omnibarText)
+    }
+
     private inline fun <reified T : Command> assertCommandIssued(instanceAssertions: T.() -> Unit = {}) {
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
         val issuedCommand = commandCaptor.allValues.find { it is T }
@@ -1659,6 +1688,12 @@ class BrowserTabViewModelTest {
         whenever(mockWidgetCapabilities.supportsStandardWidgetAdd).thenReturn(true)
         whenever(mockWidgetCapabilities.supportsAutomaticWidgetAdd).thenReturn(false)
         whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(false)
+    }
+
+    private fun givenShownCtas(vararg shownCtas: CtaId) {
+        shownCtas.forEach {
+            whenever(mockDismissedCtaDao.exists(it)).thenReturn(true)
+        }
     }
 
     private fun givenInvalidatedGlobalLayout() {
@@ -1683,6 +1718,10 @@ class BrowserTabViewModelTest {
     private fun updateUrl(originalUrl: String?, currentUrl: String?, isBrowserShowing: Boolean) {
         setBrowserShowing(isBrowserShowing)
         testee.navigationStateChanged(buildWebNavigation(originalUrl = originalUrl, currentUrl = currentUrl))
+    }
+
+    private fun setCovidCtaShown() {
+        whenever(mockDismissedCtaDao.exists(CtaId.COVID)).thenReturn(true)
     }
 
     private fun setupNavigation(

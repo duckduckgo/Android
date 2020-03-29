@@ -413,4 +413,6 @@
     </plurals>
     <string name="daxTrackersBlockedCtaZeroText"><![CDATA[&#160;was trying to track you here. <br/><br/>I blocked it!<br/><br/> ☝️You can check the URL bar to see who is trying to track you when you visit a new site.️]]></string>
 
+    <!-- Covid Cta-->
+    <string name="covidCtaText">Get official COVID-19 info and tips.</string>
 </resources>

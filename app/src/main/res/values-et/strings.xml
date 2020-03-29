@@ -425,4 +425,6 @@
     </plurals>
     <string name="daxTrackersBlockedCtaZeroText"> üritas teid siin jälitada. &lt;br/&gt;&lt;br/&gt;Blokeerisin selle!&lt;br/&gt;&lt;br/&gt; ☝️Võite vaadata URL-i riba, et näha, kes üritab teid jälgida, kui külastate uut saiti.️</string>
 
+    <!-- Covid Cta-->
+    <string name="covidCtaText">Hankige ametlikku teavet COVID-19 kohta ja näpunäiteid.</string>
 </resources>

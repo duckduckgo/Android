@@ -420,4 +420,6 @@
     </plurals>
     <string name="daxTrackersBlockedCtaZeroText"> stava cercando di rintracciarti qui. &lt;br/&gt;&lt;br/&gt;L\'ho bloccato!&lt;br/&gt;&lt;br/&gt; ☝️Puoi controllare la barra degli URL per vedere chi sta cercando di rintracciarti quando visiti un nuovo sito.️</string>
 
+    <!-- Covid Cta-->
+    <string name="covidCtaText">Leggi informazioni e consigli ufficiali sul COVID-19.</string>
 </resources>

@@ -49,6 +49,7 @@ import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import com.duckduckgo.app.widget.ui.WidgetCapabilities
 import com.nhaarman.mockitokotlin2.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.runBlockingTest
 import org.junit.After
 import org.junit.Assert.*
 import org.junit.Before
@@ -399,6 +400,14 @@ class CtaViewModelTest {
         assertTrue(value is DaxBubbleCta.DaxEndCta)
     }
 
+    @Test
+    fun whenRefreshCtaOnHomeTabAndDaxEndCtaWasPreviouslyShownThenCovidCtaShown() = runBlockingTest {
+        givenShownDaxOnboardingCtas(listOf(CtaId.DAX_INTRO, CtaId.DAX_END))
+
+        val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = false)
+        assertTrue(value is HomeTopPanelCta.CovidCta)
+    }
+
     private suspend fun givenDaxOnboardingActive() {
         whenever(mockUserStageStore.getUserAppStage()).thenReturn(AppStage.DAX_ONBOARDING)
     }
@@ -415,6 +424,10 @@ class CtaViewModelTest {
 
     private suspend fun givenOnboardingActive() {
         whenever(mockUserStageStore.getUserAppStage()).thenReturn(AppStage.DAX_ONBOARDING)
+    }
+
+    private fun setCovidCtaShown() {
+        whenever(mockDismissedCtaDao.exists(CtaId.COVID)).thenReturn(true)
     }
 
     private fun site(

@@ -427,4 +427,6 @@
     </plurals>
     <string name="daxTrackersBlockedCtaZeroText"> sizi burada izlemeye çalışıyordu. &lt;br/&gt;&lt;br/&gt;Onu engelledim!&lt;br/&gt;&lt;br/&gt; ☝️Yeni bir siteyi ziyaret ettiğinizde sizi kimin izlemeye çalıştığını görmek için URL çubuğunu kontrol edebilirsiniz.</string>
 
+    <!-- Covid Cta-->
+    <string name="covidCtaText">Resmi COVID-19 hakkında bilgi ve ipuçları alın.</string>
 </resources>

@@ -404,4 +404,6 @@
     </plurals>
     <string name="daxTrackersBlockedCtaZeroText">itt próbálta meg követni. &lt;br/&gt;&lt;br/&gt;blokkoltam!&lt;br/&gt;&lt;br/&gt; ☝️Ellenőrizheti az URL-sávot, hogy megtudja, ki próbálja meg követni, amikor új webhelyre látogat.</string>
 
+    <!-- Covid Cta-->
+    <string name="covidCtaText">Kapjon hivatalos információt és tippeket a COVID-19-ről.</string>
 </resources>

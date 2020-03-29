@@ -404,4 +404,6 @@
     </plurals>
     <string name="daxTrackersBlockedCtaZeroText">prøvde å spore deg her. &lt;br/&gt;&lt;br/&gt;Jeg har blokkert det!&lt;br/&gt;&lt;br/&gt; ☝️Du kan sjekke URL-linjen for å se hvem som prøver å spore deg når du besøker et nytt nettsted.️</string>
 
+    <!-- Covid Cta-->
+    <string name="covidCtaText">Få offisiell info og tips om COVID-19.</string>
 </resources>
