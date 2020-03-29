@@ -28,6 +28,7 @@ import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.blockingObserve
 import com.duckduckgo.app.onboarding.store.AppStage
+import com.duckduckgo.app.runBlocking
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runBlockingTest
 import org.junit.Assert.*
@@ -168,20 +169,20 @@ class AppDatabaseTest {
 
     @Test
     fun whenMigratingFromVersion17To18ThenValidationSucceeds() {
-        createDatabaseAndMigrate(17, 18, migrationsProvider.MIGRATION_16_TO_17)
+        createDatabaseAndMigrate(17, 18, migrationsProvider.MIGRATION_17_TO_18)
     }
 
     @Test
-    fun whenMigratingFromVersion17To18IfUserDidNotSawOnboardingThenMigrateToNew() = coroutineRule.testDispatcher.runBlockingTest {
+    fun whenMigratingFromVersion17To18IfUserDidNotSawOnboardingThenMigrateToNew() = coroutineRule.runBlocking {
         givenUserNeverSawOnboarding()
-        createDatabaseAndMigrate(17, 18, migrationsProvider.MIGRATION_16_TO_17)
+        createDatabaseAndMigrate(17, 18, migrationsProvider.MIGRATION_17_TO_18)
         assertEquals(AppStage.NEW, database().userStageDao().currentUserAppStage()?.appStage)
     }
 
     @Test
-    fun whenMigratingFromVersion17To18IfUserSawOnboardingThenMigrateToEstablished() = coroutineRule.testDispatcher.runBlockingTest {
+    fun whenMigratingFromVersion17To18IfUserSawOnboardingThenMigrateToEstablished() = coroutineRule.runBlocking {
         givenUserSawOnboarding()
-        createDatabaseAndMigrate(17, 18, migrationsProvider.MIGRATION_16_TO_17)
+        createDatabaseAndMigrate(17, 18, migrationsProvider.MIGRATION_17_TO_18)
         assertEquals(AppStage.ESTABLISHED, database().userStageDao().currentUserAppStage()?.appStage)
     }
 
@@ -212,12 +213,12 @@ class AppDatabaseTest {
 
     private fun givenUserNeverSawOnboarding() {
         val sharedPreferences = getInstrumentation().getOnboardingSharedPrefs()
-        sharedPreferences.edit().putInt("com.duckduckgo.app.onboarding.currentVersion", 0).commit()
+        sharedPreferences.edit().putInt("com.duckduckgo.app.onboarding.currentVersion", 0).apply()
     }
 
     private fun givenUserSawOnboarding() {
         val sharedPreferences = getInstrumentation().getOnboardingSharedPrefs()
-        sharedPreferences.edit().putInt("com.duckduckgo.app.onboarding.currentVersion", 1).commit()
+        sharedPreferences.edit().putInt("com.duckduckgo.app.onboarding.currentVersion", 1).apply()
     }
 
     private fun Instrumentation.getOnboardingSharedPrefs(): SharedPreferences {
