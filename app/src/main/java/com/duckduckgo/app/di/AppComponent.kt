@@ -67,7 +67,8 @@ import javax.inject.Singleton
         AppUsageModule::class,
         FileModule::class,
         UncaughtExceptionModule::class,
-        PlayStoreReferralModule::class
+        PlayStoreReferralModule::class,
+        CoroutinesModule::class
     ]
 )
 interface AppComponent : AndroidInjector<DuckDuckGoApplication> {
