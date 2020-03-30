@@ -132,8 +132,6 @@ import com.duckduckgo.app.widget.ui.AddWidgetInstructionsActivity
 import com.duckduckgo.widget.SearchWidgetLight
 import com.google.android.material.snackbar.Snackbar
 import dagger.android.support.AndroidSupportInjection
-import kotlinx.android.synthetic.main.include_new_browser_tab.*
-import kotlinx.android.synthetic.main.include_top_cta.view.*
 import kotlinx.android.synthetic.main.fragment_browser_tab.autoCompleteSuggestionsList
 import kotlinx.android.synthetic.main.fragment_browser_tab.bottomNavigationBar
 import kotlinx.android.synthetic.main.fragment_browser_tab.browserLayout
@@ -154,6 +152,7 @@ import kotlinx.android.synthetic.main.include_find_in_page.findInPageMatches
 import kotlinx.android.synthetic.main.include_find_in_page.nextSearchTermButton
 import kotlinx.android.synthetic.main.include_find_in_page.previousSearchTermButton
 import kotlinx.android.synthetic.main.include_new_browser_tab.ctaContainer
+import kotlinx.android.synthetic.main.include_new_browser_tab.ctaTopContainer
 import kotlinx.android.synthetic.main.include_new_browser_tab.ddgLogo
 import kotlinx.android.synthetic.main.include_new_browser_tab.newTabLayout
 import kotlinx.android.synthetic.main.include_omnibar_toolbar.appBarLayout
@@ -168,6 +167,7 @@ import kotlinx.android.synthetic.main.include_omnibar_toolbar.toolbar
 import kotlinx.android.synthetic.main.include_omnibar_toolbar.toolbarContainer
 import kotlinx.android.synthetic.main.include_omnibar_toolbar.view.browserMenu
 import kotlinx.android.synthetic.main.include_omnibar_toolbar.view.privacyGradeButton
+import kotlinx.android.synthetic.main.include_top_cta.view.closeButton
 import kotlinx.android.synthetic.main.layout_bottom_navigation_bar.bottomBarBackItem
 import kotlinx.android.synthetic.main.layout_bottom_navigation_bar.bottomBarBookmarksItemOne
 import kotlinx.android.synthetic.main.layout_bottom_navigation_bar.bottomBarBookmarksItemTwo
@@ -787,17 +787,15 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
     }
 
     private fun decorateWithExperiments() {
-        decorator.decorateWithBottomBarNavigationExperiment()
-        return
         when {
-            variantManager.getVariant().hasFeature(VariantManager.VariantFeature.ConceptTest) -> {
-                decorator.decorateWithToolbarOnlyExperiment()
+            variantManager.getVariant().hasFeature(VariantManager.VariantFeature.BottomBarWithNavigationExperiment) -> {
+                decorator.decorateWithBottomBarNavigationExperiment()
             }
-            variantManager.getVariant().hasFeature(VariantManager.VariantFeature.ConceptTest) -> {
+            variantManager.getVariant().hasFeature(VariantManager.VariantFeature.BottomBarWithSearchExperiment) -> {
                 decorator.decorateWithBottomBarSearchExperiment()
             }
             else -> {
-                decorator.decorateWithBottomBarNavigationExperiment()
+                decorator.decorateWithToolbarOnlyExperiment()
             }
         }
     }
@@ -1260,29 +1258,27 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
 
     inner class BrowserTabFragmentExperimentDecorator {
 
-        fun decorateToolbarMenus(viewState: BrowserViewState){
-            decorator.hideToolbarMenu()
-            return
+        fun decorateToolbarMenus(viewState: BrowserViewState) {
             when {
-                variantManager.getVariant().hasFeature(VariantManager.VariantFeature.ConceptTest) -> {
-                    decorator.decorateToolbarMenu(viewState)
+                variantManager.getVariant().hasFeature(VariantManager.VariantFeature.BottomBarWithNavigationExperiment) -> {
+                    decorator.hideToolbarMenu()
                 }
-                variantManager.getVariant().hasFeature(VariantManager.VariantFeature.ConceptTest) -> {
+                variantManager.getVariant().hasFeature(VariantManager.VariantFeature.BottomBarWithSearchExperiment) -> {
                     decorator.hideToolbarMenu()
                 }
                 else -> {
-                    decorator.hideToolbarMenu()
+                    decorator.decorateToolbarMenu(viewState)
                 }
             }
         }
 
-        private fun decorateToolbarMenu(viewState: BrowserViewState){
+        private fun decorateToolbarMenu(viewState: BrowserViewState) {
             tabsButton?.isVisible = viewState.showTabsButton
             fireMenuButton?.isVisible = viewState.showFireButton
             menuButton?.isVisible = viewState.showMenuButton
         }
 
-        private fun hideToolbarMenu(){
+        private fun hideToolbarMenu() {
             menuButton?.gone()
         }
 
@@ -1360,12 +1356,10 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
 
         private fun decorateBottomBarWithNavigationOnlyExperiment() {
             bindBottomBarButtons()
-            
-        }   
+        }
 
         private fun decorateBottomBarWithBottomBarAndToolbarExperiment() {
             bindBottomBarButtons()
-
         }
 
         private fun bindBottomBarButtons() {

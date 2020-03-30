@@ -36,6 +36,8 @@ interface VariantManager {
         object DefaultBrowserDaxCta : VariantFeature()
         object SearchWidgetDaxCta : VariantFeature()
         object StickySearchNotification : VariantFeature()
+        object BottomBarWithSearchExperiment : VariantFeature()
+        object BottomBarWithNavigationExperiment : VariantFeature()
     }
 
     companion object {
@@ -48,8 +50,8 @@ interface VariantManager {
         val ACTIVE_VARIANTS = listOf(
             // SERP variants. "sc" may also be used as a shared control for mobile experiments in
             // the future if we can filter by app version
-            Variant(key = "sc", weight = 1.0, features = emptyList(), filterBy = { noFilter() }),
-            Variant(key = "se", weight = 1.0, features = emptyList(), filterBy = { noFilter() }),
+            Variant(key = "sc", weight = 0.0, features = emptyList(), filterBy = { noFilter() }),
+            Variant(key = "se", weight = 0.0, features = emptyList(), filterBy = { noFilter() }),
 
             // Concept test experiment
             Variant(key = "mc", weight = 0.0, features = emptyList(), filterBy = { isEnglishLocale() }),
@@ -90,8 +92,20 @@ interface VariantManager {
                 filterBy = { isEnglishLocale() }),
             Variant(
                 key = "mg",
-                weight = 1.0,
+                weight = 0.0,
                 features = listOf(StickySearchNotification),
+                filterBy = { isEnglishLocale() }),
+
+            // Bottom Bar Navigation Experiment
+            Variant(
+                key = "mm",
+                weight = 0.0,
+                features = listOf(BottomBarWithSearchExperiment),
+                filterBy = { isEnglishLocale() }),
+            Variant(
+                key = "mn",
+                weight = 0.0,
+                features = listOf(BottomBarWithNavigationExperiment),
                 filterBy = { isEnglishLocale() })
 
             // All groups in an experiment (control and variants) MUST use the same filters
