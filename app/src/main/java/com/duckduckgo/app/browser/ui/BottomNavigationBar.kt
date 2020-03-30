@@ -31,13 +31,21 @@ class BottomNavigationBar @JvmOverloads constructor(
     override fun onFinishInflate() {
         super.onFinishInflate()
 
-        View.inflate(context, R.layout.layout_bottom_navigation_bar_experiment_one, this)
+        View.inflate(context, R.layout.layout_bottom_navigation_bar, this)
     }
 
     fun onItemClicked(view: View, onClick: () -> Unit) {
         view.setOnClickListener {
             onClick()
         }
+    }
+
+    fun decorateExperimentOne(){
+
+    }
+
+    fun decorateExperimentTwo(){
+
     }
 
 }

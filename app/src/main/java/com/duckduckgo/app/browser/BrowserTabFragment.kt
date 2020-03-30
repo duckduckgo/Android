@@ -132,16 +132,8 @@ import com.duckduckgo.app.widget.ui.AddWidgetInstructionsActivity
 import com.duckduckgo.widget.SearchWidgetLight
 import com.google.android.material.snackbar.Snackbar
 import dagger.android.support.AndroidSupportInjection
-import kotlinx.android.synthetic.main.fragment_browser_tab.*
-import kotlinx.android.synthetic.main.include_cta_buttons.view.*
-import kotlinx.android.synthetic.main.include_dax_dialog_cta.*
-import kotlinx.android.synthetic.main.include_find_in_page.*
 import kotlinx.android.synthetic.main.include_new_browser_tab.*
-import kotlinx.android.synthetic.main.include_omnibar_toolbar.*
-import kotlinx.android.synthetic.main.include_omnibar_toolbar.view.*
 import kotlinx.android.synthetic.main.include_top_cta.view.*
-import kotlinx.android.synthetic.main.popup_window_browser_menu.view.*
-import kotlinx.coroutines.*
 import kotlinx.android.synthetic.main.fragment_browser_tab.autoCompleteSuggestionsList
 import kotlinx.android.synthetic.main.fragment_browser_tab.bottomNavigationBar
 import kotlinx.android.synthetic.main.fragment_browser_tab.browserLayout
@@ -176,11 +168,13 @@ import kotlinx.android.synthetic.main.include_omnibar_toolbar.toolbar
 import kotlinx.android.synthetic.main.include_omnibar_toolbar.toolbarContainer
 import kotlinx.android.synthetic.main.include_omnibar_toolbar.view.browserMenu
 import kotlinx.android.synthetic.main.include_omnibar_toolbar.view.privacyGradeButton
-import kotlinx.android.synthetic.main.layout_bottom_navigation_bar_experiment_one.bottomBarBackItem
-import kotlinx.android.synthetic.main.layout_bottom_navigation_bar_experiment_one.bottomBarBookmarksItem
-import kotlinx.android.synthetic.main.layout_bottom_navigation_bar_experiment_one.bottomBarFireItem
-import kotlinx.android.synthetic.main.layout_bottom_navigation_bar_experiment_one.bottomBarForwardItem
-import kotlinx.android.synthetic.main.layout_bottom_navigation_bar_experiment_one.bottomBarTabsItem
+import kotlinx.android.synthetic.main.layout_bottom_navigation_bar.bottomBarBackItem
+import kotlinx.android.synthetic.main.layout_bottom_navigation_bar.bottomBarBookmarksItem
+import kotlinx.android.synthetic.main.layout_bottom_navigation_bar.bottomBarBookmarksItemOne
+import kotlinx.android.synthetic.main.layout_bottom_navigation_bar.bottomBarBookmarksItemTwo
+import kotlinx.android.synthetic.main.layout_bottom_navigation_bar.bottomBarFireItem
+import kotlinx.android.synthetic.main.layout_bottom_navigation_bar.bottomBarForwardItem
+import kotlinx.android.synthetic.main.layout_bottom_navigation_bar.bottomBarTabsItem
 import kotlinx.android.synthetic.main.popup_window_browser_menu.view.addBookmarksPopupMenuItem
 import kotlinx.android.synthetic.main.popup_window_browser_menu.view.addToHome
 import kotlinx.android.synthetic.main.popup_window_browser_menu.view.backPopupMenuItem
@@ -1285,7 +1279,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
         }
 
         fun decorateWithBottomBarNavigationOnlyExperiment() {
-            decorateBottomBar()
+            decorateBottomBarWithNavigationOnlyExperiment()
             decorateAppBarWithToolbarOnlyExperiment()
             createPopupMenuWithToolbarOnlyExperiment()
             configureShowTabSwitcherListenerWithBottomBarNavigationOnlyExperiment()
@@ -1293,7 +1287,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
         }
 
         fun decorateWithBottomBarAndToolbarExperiment() {
-            decorateBottomBar()
+            decorateBottomBarWithBottomBarAndToolbarExperiment()
             decorateAppBarWithToolbarOnlyExperiment()
             createPopupMenuWithToolbarOnlyExperiment()
             configureShowTabSwitcherListenerWithBottomBarNavigationOnlyExperiment()
@@ -1332,12 +1326,23 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
             }
         }
 
-        private fun decorateBottomBar() {
+        private fun decorateBottomBarWithNavigationOnlyExperiment() {
+            bindBottomBarButtons()
+
+        }
+
+        private fun decorateBottomBarWithBottomBarAndToolbarExperiment() {
+            bindBottomBarButtons()
+
+        }
+
+        private fun bindBottomBarButtons() {
             bottomNavigationBar.apply {
                 onItemClicked(bottomBarBackItem) { activity?.onBackPressed() }
                 onItemClicked(bottomBarForwardItem) { viewModel.onUserPressedForward() }
                 onItemClicked(bottomBarFireItem) { browserActivity?.launchFire() }
-                onItemClicked(bottomBarBookmarksItem) { launch { viewModel.onBookmarkAddRequested() } }
+                onItemClicked(bottomBarBookmarksItemOne) { launch { viewModel.onBookmarkAddRequested() } }
+                onItemClicked(bottomBarBookmarksItemTwo) { launch { viewModel.onBookmarkAddRequested() } }
             }
         }
 
