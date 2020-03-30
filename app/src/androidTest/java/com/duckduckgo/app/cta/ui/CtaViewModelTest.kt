@@ -292,6 +292,7 @@ class CtaViewModelTest {
     @Test
     fun whenRefreshCtaOnHomeTabAndNoFeaturesActiveThenReturnNull() = runBlockingTest {
         setNoFeatures()
+        setCovidCtaShown()
         val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = false)
         assertNull(value)
     }
@@ -347,6 +348,7 @@ class CtaViewModelTest {
     @Test
     fun whenRefreshCtaOnHomeTabAndSuppressWidgetCtaFeatureActiveThenReturnNullWhenTryngToShowWidgetCta() = runBlockingTest {
         setSuppressHomeTabWidgetCtaFeature()
+        setCovidCtaShown()
         whenever(mockSettingsDataStore.hideTips).thenReturn(true)
         whenever(mockWidgetCapabilities.supportsStandardWidgetAdd).thenReturn(true)
         whenever(mockWidgetCapabilities.supportsAutomaticWidgetAdd).thenReturn(true)
@@ -357,8 +359,9 @@ class CtaViewModelTest {
     }
 
     @Test
-    fun whenRefreshCtaOnHomeTabAndSuppressWidgetCtaFeatureActiveThenReturnNullWhenTryngToShowWidgetInstructionsCta() = runBlockingTest {
+    fun whenRefreshCtaOnHomeTabAndSuppressWidgetCtaFeatureActiveThenReturnNullWhenTryingToShowWidgetInstructionsCta() = runBlockingTest {
         setSuppressHomeTabWidgetCtaFeature()
+        setCovidCtaShown()
         whenever(mockSettingsDataStore.hideTips).thenReturn(true)
         whenever(mockWidgetCapabilities.supportsStandardWidgetAdd).thenReturn(true)
         whenever(mockWidgetCapabilities.supportsAutomaticWidgetAdd).thenReturn(false)
@@ -461,6 +464,52 @@ class CtaViewModelTest {
 
         val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = false)
         assertTrue(value !is DaxBubbleCta.DaxEndCta)
+    }
+
+    @Test
+    fun whenRefreshCtaOnHomeTabAndConceptTestFeatureActiveAndIntroCtaWasNotPreviouslyShownThenCovidCtaNotShown() = runBlockingTest {
+        setConceptTestFeature()
+        whenever(mockDismissedCtaDao.exists(CtaId.DAX_INTRO)).thenReturn(false)
+        whenever(mockDismissedCtaDao.exists(CtaId.COVID)).thenReturn(false)
+
+        val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = false)
+        assertFalse(value is HomeTopPanelCta.CovidCta)
+    }
+
+    @Test
+    fun whenRefreshCtaOnHomeTabAndConceptTestFeatureActiveAndIntroCtaWasNotPreviouslyShownThenDaxIntroCtaShown() = runBlockingTest {
+        setConceptTestFeature()
+        whenever(mockDismissedCtaDao.exists(CtaId.DAX_INTRO)).thenReturn(false)
+        whenever(mockDismissedCtaDao.exists(CtaId.COVID)).thenReturn(false)
+
+        val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = false)
+        assertTrue(value is DaxBubbleCta.DaxIntroCta)
+    }
+
+    @Test
+    fun whenRefreshCtaOnHomeTabAndCovidCtaNotShownThenWidgetCtaTakesPrecedenceOverCovidCta() = runBlockingTest {
+        setNoFeatures()
+        whenever(mockWidgetCapabilities.supportsStandardWidgetAdd).thenReturn(true)
+        whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(false)
+        whenever(mockDismissedCtaDao.exists(CtaId.ADD_WIDGET)).thenReturn(false)
+        whenever(mockDismissedCtaDao.exists(CtaId.COVID)).thenReturn(false)
+
+        val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = false)
+        assertTrue(value is HomePanelCta.AddWidgetInstructions)
+    }
+
+    @Test
+    fun whenRefreshCtaOnHomeTabAndConceptTestFeatureActiveAndDaxEndCtaWasPreviouslyShownThenCovidCtaShown() = runBlockingTest {
+        setConceptTestFeature()
+        whenever(mockDismissedCtaDao.exists(CtaId.DAX_INTRO)).thenReturn(true)
+        whenever(mockDismissedCtaDao.exists(CtaId.DAX_END)).thenReturn(true)
+
+        val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = false)
+        assertTrue(value is HomeTopPanelCta.CovidCta)
+    }
+
+    private fun setCovidCtaShown() {
+        whenever(mockDismissedCtaDao.exists(CtaId.COVID)).thenReturn(true)
     }
 
     private fun setNoFeatures() {

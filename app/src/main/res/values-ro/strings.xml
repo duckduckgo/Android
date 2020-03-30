@@ -401,4 +401,6 @@
     <string name="hideTipsText">Sunt doar câteva, iar noi am încercat să le facem informative.</string>
     <string name="hideTipsButton">Ascunde sfaturile definitiv</string>
 
+    <!-- Covid Cta-->
+    <string name="covidCtaText">Obține informații și sfaturi oficiale COVID-19.</string>
 </resources>

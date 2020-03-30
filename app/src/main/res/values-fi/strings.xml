@@ -397,4 +397,6 @@
     <string name="hideTipsText">Niitä on vain pari, ja yritimme tehdä niistä informatiivisia.</string>
     <string name="hideTipsButton">Piilota vinkit ikuisesti</string>
 
+    <!-- Covid Cta-->
+    <string name="covidCtaText">Hanki COVID-19:ää koskevia virallisia tietoja ja neuvoja.</string>
 </resources>

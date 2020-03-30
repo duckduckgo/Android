@@ -397,4 +397,6 @@
     <string name="hideTipsText">Csak néhány van, és megpróbáltuk őket informatívvá tenni.</string>
     <string name="hideTipsButton">Ötletek elrejtése örökre</string>
 
+    <!-- Covid Cta-->
+    <string name="covidCtaText">Kapjon hivatalos információt és tippeket a COVID-19-ről.</string>
 </resources>

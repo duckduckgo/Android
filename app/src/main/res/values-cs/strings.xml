@@ -401,4 +401,6 @@
     <string name="hideTipsText">Je jich jen pár a snažili jsme se udělat je informativní.</string>
     <string name="hideTipsButton">Navždy skrýt tipy</string>
 
+    <!-- Covid Cta-->
+    <string name="covidCtaText">Odebírejte oficiální informace a tipy o COVID-19.</string>
 </resources>

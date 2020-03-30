@@ -420,4 +420,6 @@
     <string name="hideTipsText">Sadece birkaç tane var ve onları da bilgilendirici hale getirmeye çalıştık.</string>
     <string name="hideTipsButton">İpuçlarını sonsuza kadar gizle</string>
 
+    <!-- Covid Cta-->
+    <string name="covidCtaText">Resmi COVID-19 hakkında bilgi ve ipuçları alın.</string>
 </resources>

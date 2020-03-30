@@ -397,4 +397,6 @@
     <string name="hideTipsText">Det er bare noen få, og vi prøvde å gjøre dem informative.</string>
     <string name="hideTipsButton">Skjul tips for alltid</string>
 
+    <!-- Covid Cta-->
+    <string name="covidCtaText">Få offisiell info og tips om COVID-19.</string>
 </resources>

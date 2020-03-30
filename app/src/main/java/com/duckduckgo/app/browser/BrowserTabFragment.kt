@@ -103,6 +103,7 @@ import com.duckduckgo.app.cta.ui.CtaViewModel
 import com.duckduckgo.app.cta.ui.DaxBubbleCta
 import com.duckduckgo.app.cta.ui.DaxDialogCta
 import com.duckduckgo.app.cta.ui.HomePanelCta
+import com.duckduckgo.app.cta.ui.HomeTopPanelCta
 import com.duckduckgo.app.cta.ui.SecondaryButtonCta
 import com.duckduckgo.app.global.ViewModelFactory
 import com.duckduckgo.app.global.device.DeviceInfo
@@ -131,6 +132,16 @@ import com.duckduckgo.app.widget.ui.AddWidgetInstructionsActivity
 import com.duckduckgo.widget.SearchWidgetLight
 import com.google.android.material.snackbar.Snackbar
 import dagger.android.support.AndroidSupportInjection
+import kotlinx.android.synthetic.main.fragment_browser_tab.*
+import kotlinx.android.synthetic.main.include_cta_buttons.view.*
+import kotlinx.android.synthetic.main.include_dax_dialog_cta.*
+import kotlinx.android.synthetic.main.include_find_in_page.*
+import kotlinx.android.synthetic.main.include_new_browser_tab.*
+import kotlinx.android.synthetic.main.include_omnibar_toolbar.*
+import kotlinx.android.synthetic.main.include_omnibar_toolbar.view.*
+import kotlinx.android.synthetic.main.include_top_cta.view.*
+import kotlinx.android.synthetic.main.popup_window_browser_menu.view.*
+import kotlinx.coroutines.*
 import kotlinx.android.synthetic.main.fragment_browser_tab.autoCompleteSuggestionsList
 import kotlinx.android.synthetic.main.fragment_browser_tab.bottomNavigationBar
 import kotlinx.android.synthetic.main.fragment_browser_tab.browserLayout
@@ -1588,6 +1599,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
                 } else {
                     hideHomeCta()
                     hideDaxCta()
+                    hideHomeTopCta()
                 }
             }
         }
@@ -1597,6 +1609,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
                 is HomePanelCta -> showHomeCta(configuration)
                 is DaxBubbleCta -> showDaxCta(configuration)
                 is DaxDialogCta -> showDaxDialogCta(configuration)
+                is HomeTopPanelCta -> showHomeTopCta(configuration)
             }
 
             viewModel.onCtaShown()
@@ -1662,11 +1675,28 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
         private fun showDaxCta(configuration: DaxBubbleCta) {
             ddgLogo.hide()
             hideHomeCta()
+            hideHomeTopCta()
             configuration.showCta(daxCtaContainer)
+        }
+
+        private fun showHomeTopCta(configuration: HomeTopPanelCta) {
+            hideDaxCta()
+            hideHomeCta()
+
+            logoHidingListener.callToActionView = ctaTopContainer
+
+            configuration.showCta(ctaTopContainer)
+            ctaTopContainer.setOnClickListener {
+                viewModel.onUserClickTopCta(configuration)
+            }
+            ctaTopContainer.closeButton.setOnClickListener {
+                viewModel.onUserDismissedCta(configuration)
+            }
         }
 
         private fun showHomeCta(configuration: HomePanelCta) {
             hideDaxCta()
+            hideHomeTopCta()
             if (ctaContainer.isEmpty()) {
                 renderHomeCta()
             } else {
@@ -1681,6 +1711,10 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
 
         private fun hideHomeCta() {
             ctaContainer.gone()
+        }
+
+        private fun hideHomeTopCta() {
+            ctaTopContainer.gone()
         }
 
         fun renderHomeCta() {
