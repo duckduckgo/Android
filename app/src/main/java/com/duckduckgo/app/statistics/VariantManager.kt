@@ -48,12 +48,12 @@ interface VariantManager {
             // Quick Search Notification Experiment
             Variant(
                 key = "mf",
-                weight = 0.0,
+                weight = 1.0,
                 features = emptyList(),
                 filterBy = { isEnglishLocale() }),
             Variant(
                 key = "mg",
-                weight = 0.0,
+                weight = 1.0,
                 features = listOf(StickySearchNotification),
                 filterBy = { isEnglishLocale() })
 
