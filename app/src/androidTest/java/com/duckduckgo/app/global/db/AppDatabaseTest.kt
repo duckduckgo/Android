@@ -16,7 +16,6 @@
 
 package com.duckduckgo.app.global.db
 
-import android.app.Instrumentation
 import android.content.Context
 import android.content.SharedPreferences
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
@@ -29,9 +28,13 @@ import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.blockingObserve
 import com.duckduckgo.app.onboarding.store.AppStage
 import com.duckduckgo.app.runBlocking
+import com.nhaarman.mockitokotlin2.any
+import com.nhaarman.mockitokotlin2.eq
+import com.nhaarman.mockitokotlin2.mock
+import com.nhaarman.mockitokotlin2.whenever
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.runBlockingTest
 import org.junit.Assert.*
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 
@@ -49,7 +52,14 @@ class AppDatabaseTest {
     @get:Rule
     val testHelper = MigrationTestHelper(getInstrumentation(), AppDatabase::class.qualifiedName, FrameworkSQLiteOpenHelperFactory())
 
-    private val migrationsProvider: MigrationsProvider = MigrationsProvider(getInstrumentation().context)
+    private val context = mock<Context>()
+
+    private val migrationsProvider: MigrationsProvider = MigrationsProvider(context)
+
+    @Before
+    fun setup() {
+        givenSharedPreferencesEmpty()
+    }
 
     @Test
     fun whenMigratingFromVersion1To2ThenValidationSucceeds() {
@@ -211,24 +221,26 @@ class AppDatabaseTest {
         return database
     }
 
+    private fun givenSharedPreferencesEmpty() {
+        val sharedPreferences = mock<SharedPreferences>()
+        whenever(context.getSharedPreferences(FILE_NAME, Context.MODE_PRIVATE)).thenReturn(sharedPreferences)
+    }
+
     private fun givenUserNeverSawOnboarding() {
-        val sharedPreferences = getInstrumentation().getOnboardingSharedPrefs()
-        sharedPreferences.edit().putInt("com.duckduckgo.app.onboarding.currentVersion", 0).apply()
+        val sharedPreferences = mock<SharedPreferences>()
+        whenever(context.getSharedPreferences(FILE_NAME, Context.MODE_PRIVATE)).thenReturn(sharedPreferences)
+        whenever(sharedPreferences.getInt(eq(PROPERTY_KEY), any())).thenReturn(0)
     }
 
     private fun givenUserSawOnboarding() {
-        val sharedPreferences = getInstrumentation().getOnboardingSharedPrefs()
-        sharedPreferences.edit().putInt("com.duckduckgo.app.onboarding.currentVersion", 1).apply()
-    }
-
-    private fun Instrumentation.getOnboardingSharedPrefs(): SharedPreferences {
-        return context.getSharedPreferences(
-            "com.duckduckgo.app.onboarding.settings",
-            Context.MODE_PRIVATE
-        )
+        val sharedPreferences = mock<SharedPreferences>()
+        whenever(context.getSharedPreferences(FILE_NAME, Context.MODE_PRIVATE)).thenReturn(sharedPreferences)
+        whenever(sharedPreferences.getInt(eq(PROPERTY_KEY), any())).thenReturn(1)
     }
 
     companion object {
         private const val TEST_DB_NAME = "TEST_DB_NAME"
+        private const val FILE_NAME = "com.duckduckgo.app.onboarding.settings"
+        private const val PROPERTY_KEY = "com.duckduckgo.app.onboarding.currentVersion"
     }
 }
