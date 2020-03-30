@@ -18,11 +18,9 @@ package com.duckduckgo.app.browser.ui
 
 import android.content.Context
 import android.util.AttributeSet
-import android.view.LayoutInflater
 import android.view.View
 import android.widget.LinearLayout
 import com.duckduckgo.app.browser.R
-import com.google.android.material.bottomnavigation.BottomNavigationView
 
 class BottomNavigationBar @JvmOverloads constructor(
     context: Context,
@@ -32,7 +30,8 @@ class BottomNavigationBar @JvmOverloads constructor(
 
     override fun onFinishInflate() {
         super.onFinishInflate()
-        View.inflate(context, R.layout.layout_bottom_navigation_bar, this)
+
+        View.inflate(context, R.layout.layout_bottom_navigation_bar_experiment_one, this)
     }
 
     fun onItemClicked(view: View, onClick: () -> Unit) {
