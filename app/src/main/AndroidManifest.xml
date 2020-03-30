@@ -157,7 +157,7 @@
         </activity>
 
         <activity
-            android:name="com.duckduckgo.app.onboarding.ui.OnboardingActivityExperiment"
+            android:name="com.duckduckgo.app.onboarding.ui.OnboardingActivity"
             android:label="@string/appName"
             android:theme="@style/AppTheme.Dark.Transparent" />
 

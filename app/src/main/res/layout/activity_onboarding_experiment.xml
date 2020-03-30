@@ -20,7 +20,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/white"
-    tools:context="com.duckduckgo.app.onboarding.ui.OnboardingActivityExperiment">
+    tools:context="com.duckduckgo.app.onboarding.ui.OnboardingActivity">
 
     <include
         android:id="@+id/defaultCard"

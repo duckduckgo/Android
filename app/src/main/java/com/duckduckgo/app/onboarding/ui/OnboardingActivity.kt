@@ -26,7 +26,7 @@ import kotlinx.android.synthetic.main.activity_onboarding_experiment.*
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 
-class OnboardingActivityExperiment : DuckDuckGoActivity() {
+class OnboardingActivity : DuckDuckGoActivity() {
 
     private lateinit var viewPageAdapter: PagerAdapter
 
@@ -45,7 +45,7 @@ class OnboardingActivityExperiment : DuckDuckGoActivity() {
         } else {
             MainScope().launch {
                 viewModel.onOnboardingDone()
-                startActivity(BrowserActivity.intent(this@OnboardingActivityExperiment))
+                startActivity(BrowserActivity.intent(this@OnboardingActivity))
                 finish()
             }
         }
@@ -72,7 +72,7 @@ class OnboardingActivityExperiment : DuckDuckGoActivity() {
     companion object {
 
         fun intent(context: Context): Intent {
-            return Intent(context, OnboardingActivityExperiment::class.java)
+            return Intent(context, OnboardingActivity::class.java)
         }
     }
 }

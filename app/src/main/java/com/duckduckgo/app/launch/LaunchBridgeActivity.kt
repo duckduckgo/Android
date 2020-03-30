@@ -23,7 +23,7 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
-import com.duckduckgo.app.onboarding.ui.OnboardingActivityExperiment
+import com.duckduckgo.app.onboarding.ui.OnboardingActivity
 import com.duckduckgo.app.statistics.VariantManager
 import javax.inject.Inject
 
@@ -61,7 +61,7 @@ class LaunchBridgeActivity : DuckDuckGoActivity() {
     }
 
     private fun showOnboarding() {
-        startActivity(OnboardingActivityExperiment.intent(this))
+        startActivity(OnboardingActivity.intent(this))
         finish()
     }
 
