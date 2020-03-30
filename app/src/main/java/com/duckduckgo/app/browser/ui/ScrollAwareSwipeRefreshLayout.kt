@@ -34,8 +34,6 @@ class ScrollAwareSwipeRefreshLayout @JvmOverloads constructor(
     }
 
     override fun canChildScrollUp(): Boolean {
-        return if (canWebViewScrollUpCallback != null) {
-            canWebViewScrollUpCallback!!.canSwipeRefreshChildScrollUp()
-        } else super.canChildScrollUp()
+        return canWebViewScrollUpCallback?.canSwipeRefreshChildScrollUp() ?: super.canChildScrollUp()
     }
 }
