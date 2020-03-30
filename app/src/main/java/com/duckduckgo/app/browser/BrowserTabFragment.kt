@@ -1260,6 +1260,32 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
 
     inner class BrowserTabFragmentExperimentDecorator {
 
+        fun decorateToolbarMenus(viewState: BrowserViewState){
+            decorator.hideToolbarMenu()
+            return
+            when {
+                variantManager.getVariant().hasFeature(VariantManager.VariantFeature.ConceptTest) -> {
+                    decorator.decorateToolbarMenu(viewState)
+                }
+                variantManager.getVariant().hasFeature(VariantManager.VariantFeature.ConceptTest) -> {
+                    decorator.hideToolbarMenu()
+                }
+                else -> {
+                    decorator.hideToolbarMenu()
+                }
+            }
+        }
+
+        private fun decorateToolbarMenu(viewState: BrowserViewState){
+            tabsButton?.isVisible = viewState.showTabsButton
+            fireMenuButton?.isVisible = viewState.showFireButton
+            menuButton?.isVisible = viewState.showMenuButton
+        }
+
+        private fun hideToolbarMenu(){
+            menuButton?.gone()
+        }
+
         fun decorateWithToolbarOnlyExperiment() {
             hideBottomBar()
             decorateAppBarWithToolbarOnlyExperiment()
@@ -1270,7 +1296,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
 
         fun decorateWithBottomBarSearchExperiment() {
             decorateBottomBarWithNavigationOnlyExperiment()
-            decorateAppBarWithToolbarOnlyExperiment()
+            decorateAppBarWithBottomBarExperiment()
             createPopupMenuWithToolbarOnlyExperiment()
             configureShowTabSwitcherListenerWithBottomBarNavigationOnlyExperiment()
             configureLongClickOpensNewTabListenerWithBottomBarNavigationOnlyExperiment()
@@ -1278,7 +1304,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
 
         fun decorateWithBottomBarNavigationExperiment() {
             decorateBottomBarWithBottomBarAndToolbarExperiment()
-            decorateAppBarWithToolbarOnlyExperiment()
+            decorateAppBarWithBottomBarExperiment()
             createPopupMenuWithToolbarOnlyExperiment()
             configureShowTabSwitcherListenerWithBottomBarNavigationOnlyExperiment()
             configureLongClickOpensNewTabListenerWithBottomBarNavigationOnlyExperiment()
@@ -1295,6 +1321,10 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
                     else -> return@setOnMenuItemClickListener false
                 }
             }
+        }
+
+        private fun decorateAppBarWithBottomBarExperiment() {
+            menuButton?.gone()
         }
 
         private fun createPopupMenuWithToolbarOnlyExperiment() {
@@ -1565,9 +1595,8 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
         private fun renderToolbarMenus(viewState: BrowserViewState) {
             privacyGradeButton?.isVisible = viewState.showPrivacyGrade
             clearTextButton?.isVisible = viewState.showClearButton
-            bottomBarTabsItem?.isVisible = viewState.showTabsButton
-            bottomBarFireItem?.isVisible = viewState.showFireButton
-            menuButton?.isVisible = viewState.showMenuButton
+
+            decorator.decorateToolbarMenus(viewState)
         }
 
         fun renderFindInPageState(viewState: FindInPageViewState) {
