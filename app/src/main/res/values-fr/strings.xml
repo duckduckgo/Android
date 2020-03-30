@@ -377,7 +377,7 @@
     <string name="daxDialogMaybeLater">Peut-être plus tard</string>
     <string name="daxDialogSettings">Aller aux paramètres</string>
     <string name="daxDialogNext">Suivant</string>
-    <string name="daxDialogHighFive">Tape m\'en cinq !</string>
+    <string name="daxDialogHighFive">Bien joué !</string>
     <string name="daxDialogGotIt">J\'ai compris</string>
     <string name="hideTipsTitle">Masquer les conseils restants ?</string>
     <string name="hideTipsText">Il n\'y en a que quelques-uns, et nous avons essayé de les rendre informatifs.</string>
@@ -385,24 +385,24 @@
 
     <!-- New Onboarding Experience -->
     <string name="onboardingWelcomeTitle">Bienvenue sur DuckDuckGo !</string>
-    <string name="onboardingDaxText">Internet peut être un peu effrayant.&lt;br/&gt;&lt;br/&gt;Ne vous inquiétez pas ! La recherche et la navigation privées sont plus faciles que vous ne le pensez.</string>
-    <string name="onboardingLetsDoItButton">Allons-y !</string>
-    <string name="daxIntroCtaText">Ensuite, essayez de visiter l\'un de vos sites préférés !&lt;br/&gt;&lt;br/&gt;Je bloquerai les traqueurs afin qu\'ils ne puissent pas vous espionner. J\'améliorerai également la sécurité de votre connexion si possible. &#128274;</string>
-    <string name="daxEndCtaText">Vous maîtrisez la situation !&lt;br/&gt;&lt;br/&gt;N\'oubliez pas : chaque fois que vous naviguez avec moi, une annonce effrayante perd ses ailes. &#128077;</string>
-    <string name="daxSerpCtaText">Vos recherches DuckDuckGo sont anonymes et je ne stocke jamais votre historique de recherche. Jamais. &#128588;</string>
+    <string name="onboardingDaxText">Internet peut être intrusif.&lt;br/&gt;&lt;br/&gt;Cependant ne vous inquiétez pas ! Rechercher et naviguer de manière confidentielle est plus facile que vous ne le pensez.</string>
+    <string name="onboardingLetsDoItButton">Allons-y !</string>
+    <string name="daxIntroCtaText">Maintenant, essayez de visiter un de vos sites préférés !&lt;br/&gt;&lt;br/&gt;Je bloquerai les traqueurs afin qu\'ils ne puissent pas vous espionner. J\'améliorerai également la sécurité de votre connexion dans la mesure du possible. &#128274;</string>
+    <string name="daxEndCtaText">Bien joué !&lt;br/&gt;&lt;br/&gt;Rappelez vous : chaque fois que vous naviguez avec moi, des publicités intrusives disparaissent. &#128077;</string>
+    <string name="daxSerpCtaText">Vos recherches effectuées sur DuckDuckGo sont confidentielles et je ne conserve jamais votre historique de recherche. Jamais. &#128588;</string>
     <string name="daxDefaultBrowserCtaText">Avant de partir !&lt;br/&gt;&lt;br/&gt;Vous voulez une protection contre les traqueurs lorsque vous ouvrez des liens à partir d\'autres applications ?&lt;br/&gt;&lt;br/&gt;Faites de DuckDuckGo votre navigateur par défaut !</string>
     <string name="daxSearchWidgetCtaText">Vous êtes sur la bonne voie !&lt;br/&gt;&lt;br/&gt;Effectuez des recherches privées encore plus rapidement ! Ajoutez le widget de recherche DuckDuckGo à votre écran d\'accueil.</string>
     <string name="daxNonSerpCtaText">Chaque site a un niveau de confidentialité. Touchez pour voir comment j\'ai protégé votre vie privée.&lt;br/&gt;&lt;br/&gt;Vous voulez aller plus loin ? Essayez d\'effacer vos données en appuyant sur le bouton avec la flamme.</string>
-    <string name="daxMainNetworkStep1CtaText">Attention !&lt;br/&gt;&lt;br/&gt; %s gère un important réseau de suivi.&lt;br/&gt;&lt;br/&gt;Un faible niveau de confidentialité vous dirigera vers des sites comme celui-ci.</string>
-    <string name="daxMainNetworkStep1OwnedCtaText">Attention !&lt;br/&gt;&lt;br/&gt; %s appartient à %s, qui gère un important réseau de suivi.</string>
-    <string name="daxMainNetworkStep21CtaText">En fait, %s traqueurs se cachent sur environ %s des meilleurs sites. &#128561;&lt;br/&gt;&lt;br/&gt;</string>
-    <string name="daxMainNetworkStep211CtaText">En fait, %s traqueurs se cachent partout sur Internet. &#128561;&lt;br/&gt;&lt;br/&gt;</string>
-    <string name="daxMainNetworkStep2CtaText">%sJe bloquerai ces traqueurs lorsque vous naviguerez sur des sites non %s.</string>
+    <string name="daxMainNetworkStep1CtaText">Attention !&lt;br/&gt;&lt;br/&gt; %s gère un important réseau de traqueurs.&lt;br/&gt;&lt;br/&gt;Une mauvaise note de confidentialité vous avertira lorsque vous visitez des sites à risques.</string>
+    <string name="daxMainNetworkStep1OwnedCtaText">Attention !&lt;br/&gt;&lt;br/&gt; %s appartient à %s, qui gère un important réseau de traqueurs.</string>
+    <string name="daxMainNetworkStep21CtaText">En fait, les traqueurs issus de %s se cachent sur environ %s des sites les plus visités. &#128561;&lt;br/&gt;&lt;br/&gt;</string>
+    <string name="daxMainNetworkStep211CtaText"> En fait, les traqueurs issus de %s se cachent partout sur Internet. &#128561;&lt;br/&gt;&lt;br/&gt;</string>
+    <string name="daxMainNetworkStep2CtaText">%sJe bloquerai ces traqueurs lorsque vous naviguez sur des sites non associés à %s.</string>
     <plurals name="daxTrackersBlockedCtaText">
-        <item quantity="one">&#160;et &lt;b&gt;%d autres&lt;/b&gt; essayaient de vous suivre ici. &lt;br/&gt;&lt;br/&gt;Je les ai bloqués !&lt;br/&gt;&lt;br/&gt; ☝️Vous pouvez vérifier la barre d\'URL pour voir qui essaie de vous suivre lorsque vous visitez un nouveau site.️</item>
-        <item quantity="other">&#160;et &lt;b&gt;%d autres&lt;/b&gt; essayaient de vous suivre ici. &lt;br/&gt;&lt;br/&gt;Je les ai bloqués !&lt;br/&gt;&lt;br/&gt; ☝️Vous pouvez vérifier la barre d\'URL pour voir qui essaie de vous suivre lorsque vous visitez un nouveau site.️</item>
+        <item quantity="one">&#160;et &lt;b&gt;%d autre&lt;/b&gt; essayaient de vous traquer ici.  &lt;br/&gt;&lt;br/&gt;Je les ai bloqués !&lt;br/&gt;&lt;br/&gt; ☝️Vous pouvez voir dans la barre d\'adresse URL qui essaie de vous traquer lorsque vous visitez un nouveau site.️</item>
+        <item quantity="other">&#160;et &lt;b&gt;%d autres&lt;/b&gt; essayaient de vous traquer ici. &lt;br/&gt;&lt;br/&gt;Je les ai bloqués !&lt;br/&gt;&lt;br/&gt; ☝️Vous pouvez voir dans la barre d\'adresse URL qui essaie de vous traquer lorsque vous visitez un nouveau site.️</item>
     </plurals>
-    <string name="daxTrackersBlockedCtaZeroText">&#160;essayait de vous suivre ici. &lt;br/&gt;&lt;br/&gt;Je l\'ai bloqué !&lt;br/&gt;&lt;br/&gt; ☝️Vous pouvez vérifier la barre d\'URL pour voir qui essaie de vous suivre lorsque vous visitez un nouveau site.️</string>
+    <string name="daxTrackersBlockedCtaZeroText">&#160;essayait de vous traquer ici. &lt;br/&gt;&lt;br/&gt;Je l\'ai bloqué !&lt;br/&gt;&lt;br/&gt; ☝️Vous pouvez voir dans la barre d\'adresse URL qui essaie de vous traquer lorsque vous visitez un nouveau site.️️</string>
 
     <!-- Covid Cta-->
     <string name="covidCtaText">Accédez aux informations officielles et aux recommandations sur le COVID-19.</string>
