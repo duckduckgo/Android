@@ -77,9 +77,10 @@ class CtaViewModel @Inject constructor(
         return activeSurvey
     }
 
-    fun hideTipsForever(cta: Cta) {
+    suspend fun hideTipsForever(cta: Cta) {
         settingsDataStore.hideTips = true
         pixel.fire(Pixel.PixelName.ONBOARDING_DAX_ALL_CTA_HIDDEN, cta.pixelCancelParameters())
+        userStageStore.stageCompleted(AppStage.DAX_ONBOARDING)
     }
 
     fun onCtaShown(cta: Cta) {
@@ -248,8 +249,8 @@ class CtaViewModel @Inject constructor(
     }
 
     @WorkerThread
-    private fun canShowCovidCta(): Boolean {
-        return daxDialogEndShown() && !covidCtaShown()
+    private suspend fun canShowCovidCta(): Boolean {
+        return (daxDialogEndShown() || !daxOnboardingActive()) && !covidCtaShown()
     }
 
     private fun hasTrackersInformation(events: List<TrackingEvent>): Boolean =

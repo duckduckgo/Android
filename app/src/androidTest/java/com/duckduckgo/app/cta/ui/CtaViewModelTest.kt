@@ -230,15 +230,21 @@ class CtaViewModelTest {
     }
 
     @Test
-    fun whenHideTipsForeverThenPixelIsFired() {
+    fun whenHideTipsForeverThenPixelIsFired() = coroutineRule.runBlocking {
         testee.hideTipsForever(HomePanelCta.AddWidgetAuto)
         verify(mockPixel).fire(eq(ONBOARDING_DAX_ALL_CTA_HIDDEN), any(), any())
     }
 
     @Test
-    fun whenHideTipsForeverThenHideTipsSetToTrueOnSettings() {
+    fun whenHideTipsForeverThenHideTipsSetToTrueOnSettings() = coroutineRule.runBlocking {
         testee.hideTipsForever(HomePanelCta.AddWidgetAuto)
         verify(mockSettingsDataStore).hideTips = true
+    }
+
+    @Test
+    fun whenHideTipsForeverThenDaxOnboardingStageCompleted() = coroutineRule.runBlocking {
+        testee.hideTipsForever(HomePanelCta.AddWidgetAuto)
+        verify(mockUserStageStore).stageCompleted(AppStage.DAX_ONBOARDING)
     }
 
     @Test
@@ -285,11 +291,22 @@ class CtaViewModelTest {
     }
 
     @Test
-    fun whenRefreshCtaOnHomeTabAndHideTipsIsTrueThenReturnNull() = coroutineRule.runBlocking {
+    fun whenRefreshCtaOnHomeTabAndHideTipsIsTrueThenReturnCovidCta() = coroutineRule.runBlocking {
         whenever(mockSettingsDataStore.hideTips).thenReturn(true)
+        givenSearchWidgetNoCompatible()
 
         val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = false)
-        assertNull(value)
+        assertTrue(value is HomeTopPanelCta.CovidCta)
+    }
+
+    @Test
+    fun whenRefreshCtaOnHomeTabAndHideTipsIsTrueAndWidgetCompatibleThenReturnWidgetCta() = coroutineRule.runBlocking {
+        whenever(mockSettingsDataStore.hideTips).thenReturn(true)
+        whenever(mockWidgetCapabilities.supportsStandardWidgetAdd).thenReturn(true)
+        whenever(mockWidgetCapabilities.supportsAutomaticWidgetAdd).thenReturn(true)
+
+        val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = false)
+        assertTrue(value is HomePanelCta.AddWidgetAuto)
     }
 
     @Test
@@ -408,8 +425,37 @@ class CtaViewModelTest {
         assertTrue(value is HomeTopPanelCta.CovidCta)
     }
 
+    @Test
+    fun whenRefreshCtaWhileBrowsingWithDaxOnboardingCompletedButNotAllCtasWereShownThenReturnNull() = runBlockingTest {
+        givenShownDaxOnboardingCtas(listOf(CtaId.DAX_INTRO))
+        givenDaxOnboardingCompleted()
+
+        val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = true)
+        assertNull(value)
+    }
+
+    @Test
+    fun whenRefreshCtaOnHomeTabWithDaxOnboardingCompletedButNotAllCtasWereShownThenReturnCovidCta() = runBlockingTest {
+        givenShownDaxOnboardingCtas(listOf(CtaId.DAX_INTRO))
+        givenDaxOnboardingCompleted()
+        givenSearchWidgetNoCompatible()
+
+        val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = false)
+        assertTrue(value is HomeTopPanelCta.CovidCta)
+    }
+
     private suspend fun givenDaxOnboardingActive() {
         whenever(mockUserStageStore.getUserAppStage()).thenReturn(AppStage.DAX_ONBOARDING)
+    }
+
+    private suspend fun givenDaxOnboardingCompleted() {
+        whenever(mockUserStageStore.getUserAppStage()).thenReturn(AppStage.ESTABLISHED)
+    }
+
+    private fun givenSearchWidgetNoCompatible() {
+        whenever(mockWidgetCapabilities.supportsStandardWidgetAdd).thenReturn(false)
+        whenever(mockWidgetCapabilities.supportsAutomaticWidgetAdd).thenReturn(false)
+        whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(false)
     }
 
     private fun givenAtLeastOneDaxDialogCtaShown() {
