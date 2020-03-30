@@ -80,6 +80,14 @@ class BrowserPopupMenu : PopupWindow {
         private fun inflateToolbarOnlyExperiment(layoutInflater: LayoutInflater): View {
             return layoutInflater.inflate(R.layout.popup_window_browser_menu, null)
         }
+
+        private fun inflateBottomBarWithNavigationExperiment(layoutInflater: LayoutInflater): View {
+            return layoutInflater.inflate(R.layout.popup_window_browser_bottom_navigation_menu, null)
+        }
+
+        private fun inflateBottomBarWithSearchExperiment(layoutInflater: LayoutInflater): View {
+            return layoutInflater.inflate(R.layout.popup_window_browser_bottom_tab_menu, null)
+        }
     }
 }
 

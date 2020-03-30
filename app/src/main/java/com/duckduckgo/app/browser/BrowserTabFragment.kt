@@ -169,7 +169,6 @@ import kotlinx.android.synthetic.main.include_omnibar_toolbar.toolbarContainer
 import kotlinx.android.synthetic.main.include_omnibar_toolbar.view.browserMenu
 import kotlinx.android.synthetic.main.include_omnibar_toolbar.view.privacyGradeButton
 import kotlinx.android.synthetic.main.layout_bottom_navigation_bar.bottomBarBackItem
-import kotlinx.android.synthetic.main.layout_bottom_navigation_bar.bottomBarBookmarksItem
 import kotlinx.android.synthetic.main.layout_bottom_navigation_bar.bottomBarBookmarksItemOne
 import kotlinx.android.synthetic.main.layout_bottom_navigation_bar.bottomBarBookmarksItemTwo
 import kotlinx.android.synthetic.main.layout_bottom_navigation_bar.bottomBarFireItem
@@ -788,17 +787,17 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
     }
 
     private fun decorateWithExperiments() {
-        decorator.decorateWithBottomBarAndToolbarExperiment()
+        decorator.decorateWithBottomBarNavigationExperiment()
         return
         when {
             variantManager.getVariant().hasFeature(VariantManager.VariantFeature.ConceptTest) -> {
                 decorator.decorateWithToolbarOnlyExperiment()
             }
             variantManager.getVariant().hasFeature(VariantManager.VariantFeature.ConceptTest) -> {
-                decorator.decorateWithBottomBarNavigationOnlyExperiment()
+                decorator.decorateWithBottomBarSearchExperiment()
             }
             else -> {
-                decorator.decorateWithBottomBarAndToolbarExperiment()
+                decorator.decorateWithBottomBarNavigationExperiment()
             }
         }
     }
@@ -807,11 +806,6 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
 
         toolbar.privacyGradeButton.setOnClickListener {
             browserActivity?.launchPrivacyDashboard()
-        }
-
-        browserMenu.setOnClickListener {
-            hideKeyboardImmediately()
-            launchPopupMenu()
         }
 
         viewModel.privacyGrade.observe(this, Observer<PrivacyGrade> {
@@ -1010,10 +1004,6 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
         }
 
         return super.onContextItemSelected(item)
-    }
-
-    private fun launchPopupMenu() {
-        popupMenu.show(rootView, toolbar)
     }
 
     private fun bookmarkAdded(bookmarkId: Long, title: String?, url: String?) {
@@ -1278,7 +1268,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
             configureLongClickOpensNewTabListenerWithToolbarOnlyExperiment()
         }
 
-        fun decorateWithBottomBarNavigationOnlyExperiment() {
+        fun decorateWithBottomBarSearchExperiment() {
             decorateBottomBarWithNavigationOnlyExperiment()
             decorateAppBarWithToolbarOnlyExperiment()
             createPopupMenuWithToolbarOnlyExperiment()
@@ -1286,7 +1276,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
             configureLongClickOpensNewTabListenerWithBottomBarNavigationOnlyExperiment()
         }
 
-        fun decorateWithBottomBarAndToolbarExperiment() {
+        fun decorateWithBottomBarNavigationExperiment() {
             decorateBottomBarWithBottomBarAndToolbarExperiment()
             decorateAppBarWithToolbarOnlyExperiment()
             createPopupMenuWithToolbarOnlyExperiment()
@@ -1324,12 +1314,24 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
                 onMenuItemClicked(view.sharePageMenuItem) { viewModel.onShareSelected() }
                 onMenuItemClicked(view.addToHome) { viewModel.onPinPageToHomeSelected() }
             }
+            browserMenu.setOnClickListener {
+                hideKeyboardImmediately()
+                launchBottomAnchoredPopupMenu()
+            }
+        }
+
+        private fun launchTopAnchoredPopupMenu() {
+            popupMenu.show(rootView, toolbar)
+        }
+
+        private fun launchBottomAnchoredPopupMenu() {
+            popupMenu.show(rootView, bottomNavigationBar)
         }
 
         private fun decorateBottomBarWithNavigationOnlyExperiment() {
             bindBottomBarButtons()
-
-        }
+            
+        }   
 
         private fun decorateBottomBarWithBottomBarAndToolbarExperiment() {
             bindBottomBarButtons()
