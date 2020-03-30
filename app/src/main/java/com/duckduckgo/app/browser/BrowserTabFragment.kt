@@ -163,6 +163,7 @@ import kotlinx.android.synthetic.main.include_omnibar_toolbar.omniBarContainer
 import kotlinx.android.synthetic.main.include_omnibar_toolbar.omnibarTextInput
 import kotlinx.android.synthetic.main.include_omnibar_toolbar.pageLoadingIndicator
 import kotlinx.android.synthetic.main.include_omnibar_toolbar.privacyGradeButton
+import kotlinx.android.synthetic.main.include_omnibar_toolbar.searchIcon
 import kotlinx.android.synthetic.main.include_omnibar_toolbar.toolbar
 import kotlinx.android.synthetic.main.include_omnibar_toolbar.toolbarContainer
 import kotlinx.android.synthetic.main.include_omnibar_toolbar.view.browserMenu
@@ -1589,7 +1590,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
         private fun renderToolbarMenus(viewState: BrowserViewState) {
             privacyGradeButton?.isVisible = viewState.showPrivacyGrade
             clearTextButton?.isVisible = viewState.showClearButton
-
+            searchIcon?.isVisible = !viewState.showPrivacyGrade
             decorator.decorateToolbarMenus(viewState)
         }
 
