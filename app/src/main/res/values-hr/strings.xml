@@ -399,11 +399,11 @@
     <string name="daxMainNetworkStep211CtaText">Zapravo, %s tragači vrebaju po cijelom internetu. &#128561;&lt;br/&gt;&lt;br/&gt;</string>
     <string name="daxMainNetworkStep2CtaText">%s Blokirat ću te tragače dok pregledavate ne-%s web-mjesta.</string>
     <plurals name="daxTrackersBlockedCtaText">
-        <item quantity="one">i &lt;b&gt;%d ostali&lt;/b&gt; su vas pokušavali pratiti ovdje. &lt;br/&gt;&lt;br/&gt;Blokirao sam ih!&lt;br/&gt;&lt;br/&gt; ☝️Možete provjeriti URL traku kako biste vidjeli tko vas pokušava pratiti kad posjetite novo web-mjesto.️</item>
-        <item quantity="few">i &lt;b&gt;%d ostali&lt;/b&gt; su vas pokušavali pratiti ovdje. &lt;br/&gt;&lt;br/&gt;Blokirao sam ih!&lt;br/&gt;&lt;br/&gt; ☝️Možete provjeriti URL traku kako biste vidjeli tko vas pokušava pratiti kad posjetite novo web-mjesto.️ </item>
-        <item quantity="other">i &lt;b&gt;%d ostali&lt;/b&gt; su vas pokušavali pratiti ovdje. &lt;br/&gt;&lt;br/&gt;Blokirao sam ih!&lt;br/&gt;&lt;br/&gt; ☝️Možete provjeriti URL traku kako biste vidjeli tko vas pokušava pratiti kad posjetite novo web-mjesto.️</item>
+        <item quantity="one">&#160;i &lt;b&gt;%d ostali&lt;/b&gt; su vas pokušavali pratiti ovdje. &lt;br/&gt;&lt;br/&gt;Blokirao sam ih!&lt;br/&gt;&lt;br/&gt; ☝️Možete provjeriti URL traku kako biste vidjeli tko vas pokušava pratiti kad posjetite novo web-mjesto.️</item>
+        <item quantity="few">&#160;i &lt;b&gt;%d ostali&lt;/b&gt; su vas pokušavali pratiti ovdje. &lt;br/&gt;&lt;br/&gt;Blokirao sam ih!&lt;br/&gt;&lt;br/&gt; ☝️Možete provjeriti URL traku kako biste vidjeli tko vas pokušava pratiti kad posjetite novo web-mjesto.️ </item>
+        <item quantity="other">&#160;i &lt;b&gt;%d ostali&lt;/b&gt; su vas pokušavali pratiti ovdje. &lt;br/&gt;&lt;br/&gt;Blokirao sam ih!&lt;br/&gt;&lt;br/&gt; ☝️Možete provjeriti URL traku kako biste vidjeli tko vas pokušava pratiti kad posjetite novo web-mjesto.️</item>
     </plurals>
-    <string name="daxTrackersBlockedCtaZeroText">vas je pokušavao pratiti ovdje. &lt;br/&gt;&lt;br/&gt;Blokirao sam ga!&lt;br/&gt;&lt;br/&gt; ☝️Možete provjeriti URL traku kako biste vidjeli tko vas pokušava pratiti kad posjetite novo web-mjesto.️</string>
+    <string name="daxTrackersBlockedCtaZeroText">&#160;vas je pokušavao pratiti ovdje. &lt;br/&gt;&lt;br/&gt;Blokirao sam ga!&lt;br/&gt;&lt;br/&gt; ☝️Možete provjeriti URL traku kako biste vidjeli tko vas pokušava pratiti kad posjetite novo web-mjesto.️</string>
 
     <!-- Covid Cta-->
     <string name="covidCtaText">Dobijte službene informacije i savjete o COVID-19.</string>

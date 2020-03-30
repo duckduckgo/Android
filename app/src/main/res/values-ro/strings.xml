@@ -403,11 +403,11 @@
     <string name="daxMainNetworkStep211CtaText">De fapt, %s urmăritorii stau la pândă oriunde în internet. &#128561;&lt;br/&gt;&lt;br/&gt;</string>
     <string name="daxMainNetworkStep2CtaText">%s Voi bloca acești urmăritori când navighezi pe site-uri non-%s.</string>
     <plurals name="daxTrackersBlockedCtaText">
-        <item quantity="one"> și &lt;b&gt;%d altul&lt;/b&gt; încercau să te urmărească aici. &lt;br/&gt;&lt;br/&gt;I-am blocat!&lt;br/&gt;&lt;br/&gt; ☝️ Poți verifica bara URL pentru a vedea cine încearcă să te urmărească atunci când vizitezi un nou site.️</item>
-        <item quantity="few"> și &lt;b&gt;%d alții&lt;/b&gt; încercau să te urmărească aici. &lt;br/&gt;&lt;br/&gt;I-am blocat!&lt;br/&gt;&lt;br/&gt; ☝️ Poți verifica bara URL pentru a vedea cine încearcă să te urmărească atunci când vizitezi un nou site.️</item>
-        <item quantity="other">  și &lt;b&gt;%d alții&lt;/b&gt; încercau să te urmărească aici. &lt;br/&gt;&lt;br/&gt;I-am blocat!&lt;br/&gt;&lt;br/&gt; ☝️ Puteți verifica bara URL pentru a vedea cine încearcă să vă urmărească atunci când vizitați un nou site.️</item>
+        <item quantity="one">&#160;și &lt;b&gt;%d altul&lt;/b&gt; încercau să te urmărească aici. &lt;br/&gt;&lt;br/&gt;I-am blocat!&lt;br/&gt;&lt;br/&gt; ☝️ Poți verifica bara URL pentru a vedea cine încearcă să te urmărească atunci când vizitezi un nou site.️</item>
+        <item quantity="few">&#160;și &lt;b&gt;%d alții&lt;/b&gt; încercau să te urmărească aici. &lt;br/&gt;&lt;br/&gt;I-am blocat!&lt;br/&gt;&lt;br/&gt; ☝️ Poți verifica bara URL pentru a vedea cine încearcă să te urmărească atunci când vizitezi un nou site.️</item>
+        <item quantity="other">&#160;și &lt;b&gt;%d alții&lt;/b&gt; încercau să te urmărească aici. &lt;br/&gt;&lt;br/&gt;I-am blocat!&lt;br/&gt;&lt;br/&gt; ☝️ Puteți verifica bara URL pentru a vedea cine încearcă să vă urmărească atunci când vizitați un nou site.️</item>
     </plurals>
-    <string name="daxTrackersBlockedCtaZeroText">încerca să te urmărească aici. &lt;br/&gt;&lt;br/&gt;Am blocat-o!&lt;br/&gt;&lt;br/&gt; ☝️ Poți verifica bara URL pentru a vedea cine încearcă să te urmărească atunci când vizitezi un nou site.️</string>
+    <string name="daxTrackersBlockedCtaZeroText">&#160;încerca să te urmărească aici. &lt;br/&gt;&lt;br/&gt;Am blocat-o!&lt;br/&gt;&lt;br/&gt; ☝️ Poți verifica bara URL pentru a vedea cine încearcă să te urmărească atunci când vizitezi un nou site.️</string>
 
     <!-- Covid Cta-->
     <string name="covidCtaText">Obține informații și sfaturi oficiale COVID-19.</string>

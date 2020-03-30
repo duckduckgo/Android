@@ -423,11 +423,11 @@
     <string name="daxMainNetworkStep211CtaText">Faktiski %s izsekotāju slēpjas visā internetā. &#128561;&lt;br/&gt;&lt;br/&gt;</string>
     <string name="daxMainNetworkStep2CtaText">%s Es bloķēšu šos izsekotājus, kad pārlūkosiet vietnes, kas nav %s vietnes.</string>
     <plurals name="daxTrackersBlockedCtaText">
-        <item quantity="zero">un &lt;b&gt;%d citas&lt;/b&gt; mēģināja jūs izsekot. &lt;br/&gt;&lt;br/&gt;Es tās nobloķēju!&lt;br/&gt;&lt;br/&gt; ☝️Jūs varat pārbaudīt URL joslu, lai redzētu, kas mēģina jūs izsekot, kad apmeklējat jaunu vietni.️</item>
-        <item quantity="one">un &lt;b&gt;%d citas&lt;/b&gt; mēģināja jūs izsekot. &lt;br/&gt;&lt;br/&gt;Es tās nobloķēju!&lt;br/&gt;&lt;br/&gt; ☝️Jūs varat pārbaudīt URL joslu, lai redzētu, kurš mēģina jūs izsekot, kad apmeklējat jaunu vietni.️</item>
-        <item quantity="other">un &lt;b&gt;%d citas&lt;/b&gt; mēģināja jūs izsekot. &lt;br/&gt;&lt;br/&gt;Es tās nobloķēju!&lt;br/&gt;&lt;br/&gt; ☝️Jūs varat pārbaudīt URL joslu, lai redzētu, kurš mēģina jūs izsekot, kad apmeklējat jaunu vietni.️</item>
+        <item quantity="zero">&#160;un &lt;b&gt;%d citas&lt;/b&gt; mēģināja jūs izsekot. &lt;br/&gt;&lt;br/&gt;Es tās nobloķēju!&lt;br/&gt;&lt;br/&gt; ☝️Jūs varat pārbaudīt URL joslu, lai redzētu, kas mēģina jūs izsekot, kad apmeklējat jaunu vietni.️</item>
+        <item quantity="one">&#160;un &lt;b&gt;%d citas&lt;/b&gt; mēģināja jūs izsekot. &lt;br/&gt;&lt;br/&gt;Es tās nobloķēju!&lt;br/&gt;&lt;br/&gt; ☝️Jūs varat pārbaudīt URL joslu, lai redzētu, kurš mēģina jūs izsekot, kad apmeklējat jaunu vietni.️</item>
+        <item quantity="other">&#160;un &lt;b&gt;%d citas&lt;/b&gt; mēģināja jūs izsekot. &lt;br/&gt;&lt;br/&gt;Es tās nobloķēju!&lt;br/&gt;&lt;br/&gt; ☝️Jūs varat pārbaudīt URL joslu, lai redzētu, kurš mēģina jūs izsekot, kad apmeklējat jaunu vietni.️</item>
     </plurals>
-    <string name="daxTrackersBlockedCtaZeroText">mēģināja jūs izsekot. &lt;br/&gt;&lt;br/&gt;Es to nobloķēju!&lt;br/&gt;&lt;br/&gt; ☝️Jūs varat pārbaudīt URL joslu, lai redzētu, kurš mēģina jūs izsekot, kad apmeklējat jaunu vietni.️</string>
+    <string name="daxTrackersBlockedCtaZeroText">&#160;mēģināja jūs izsekot. &lt;br/&gt;&lt;br/&gt;Es to nobloķēju!&lt;br/&gt;&lt;br/&gt; ☝️Jūs varat pārbaudīt URL joslu, lai redzētu, kurš mēģina jūs izsekot, kad apmeklējat jaunu vietni.️</string>
 
     <!-- Covid Cta-->
     <string name="covidCtaText">Iegūstiet oficiālo informāciju un padomus par COVID-19.</string>

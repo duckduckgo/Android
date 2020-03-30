@@ -399,10 +399,10 @@
     <string name="daxMainNetworkStep211CtaText">Tatsächlich lauern %s Tracker im ganzen Internet. &#128561;&lt;br/&gt;&lt;br/&gt;</string>
     <string name="daxMainNetworkStep2CtaText">%s Ich blockiere diese Tracker, wenn Sie Websites durchsuchen, die nicht zu %s gehören.</string>
     <plurals name="daxTrackersBlockedCtaText">
-        <item quantity="one">und &lt;b&gt;%d andere&lt;/b&gt; haben versucht, Sie hier zu verfolgen. &lt;br/&gt;&lt;br/&gt;Ich habe sie blockiert!&lt;br/&gt;&lt;br/&gt; ☝️Sie können in der URL-Leiste überprüfen, wer versucht, Sie zu verfolgen, wenn Sie eine neue Website besuchen.</item>
-        <item quantity="other">und &lt;b&gt;%d andere&lt;/b&gt; haben versucht, Sie hier zu verfolgen. &lt;br/&gt;&lt;br/&gt;Ich habe sie blockiert!&lt;br/&gt;&lt;br/&gt; ☝️Sie können in der URL-Leiste überprüfen, wer versucht, Sie zu verfolgen, wenn Sie eine neue Website besuchen.</item>
+        <item quantity="one">&#160;und &lt;b&gt;%d andere&lt;/b&gt; haben versucht, Sie hier zu verfolgen. &lt;br/&gt;&lt;br/&gt;Ich habe sie blockiert!&lt;br/&gt;&lt;br/&gt; ☝️Sie können in der URL-Leiste überprüfen, wer versucht, Sie zu verfolgen, wenn Sie eine neue Website besuchen.</item>
+        <item quantity="other">&#160;und &lt;b&gt;%d andere&lt;/b&gt; haben versucht, Sie hier zu verfolgen. &lt;br/&gt;&lt;br/&gt;Ich habe sie blockiert!&lt;br/&gt;&lt;br/&gt; ☝️Sie können in der URL-Leiste überprüfen, wer versucht, Sie zu verfolgen, wenn Sie eine neue Website besuchen.</item>
     </plurals>
-    <string name="daxTrackersBlockedCtaZeroText">  hat versucht, Sie hier zu verfolgen. &lt;br/&gt;&lt;br/&gt;Ich habe es blockiert!&lt;br/&gt;&lt;br/&gt; ☝️Sie können in der URL-Leiste überprüfen, wer versucht, Sie zu verfolgen, wenn Sie eine neue Website besuchen.</string>
+    <string name="daxTrackersBlockedCtaZeroText">&#160;hat versucht, Sie hier zu verfolgen. &lt;br/&gt;&lt;br/&gt;Ich habe es blockiert!&lt;br/&gt;&lt;br/&gt; ☝️Sie können in der URL-Leiste überprüfen, wer versucht, Sie zu verfolgen, wenn Sie eine neue Website besuchen.</string>
 
     <!-- Covid Cta-->
     <string name="covidCtaText">Offizielle COVID-19 Infos &amp; Tipps.</string>

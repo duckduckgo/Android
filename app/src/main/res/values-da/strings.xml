@@ -399,10 +399,10 @@
     <string name="daxMainNetworkStep211CtaText">Faktisk lurer %s trackere over hele internettet. &#128561;&lt;br/&gt;&lt;br/&gt;</string>
     <string name="daxMainNetworkStep2CtaText">%s Jeg blokerer disse trackere, når du gennemser ikke-%s websteder.</string>
     <plurals name="daxTrackersBlockedCtaText">
-        <item quantity="one">og &lt;b&gt;%d anden&lt;/b&gt; forsøgte at spore dig her. &lt;br/&gt;&lt;br/&gt;Jeg blokerede dem!&lt;br/&gt;&lt;br/&gt; ☝️Du kan kontrollere URL-linjen for at se, hvem der prøver at spore dig, når du besøger et nyt sted.️</item>
-        <item quantity="other">og &lt;b&gt;%d andre&lt;/b&gt; forsøgte at spore dig her. &lt;br/&gt;&lt;br/&gt;Jeg blokerede dem!&lt;br/&gt;&lt;br/&gt; ☝️Du kan kontrollere URL-linjen for at se, hvem der prøver at spore dig, når du besøger et nyt sted.️</item>
+        <item quantity="one">&#160;og &lt;b&gt;%d anden&lt;/b&gt; forsøgte at spore dig her. &lt;br/&gt;&lt;br/&gt;Jeg blokerede dem!&lt;br/&gt;&lt;br/&gt; ☝️Du kan kontrollere URL-linjen for at se, hvem der prøver at spore dig, når du besøger et nyt sted.️</item>
+        <item quantity="other">&#160;og &lt;b&gt;%d andre&lt;/b&gt; forsøgte at spore dig her. &lt;br/&gt;&lt;br/&gt;Jeg blokerede dem!&lt;br/&gt;&lt;br/&gt; ☝️Du kan kontrollere URL-linjen for at se, hvem der prøver at spore dig, når du besøger et nyt sted.️</item>
     </plurals>
-    <string name="daxTrackersBlockedCtaZeroText">prøvede at spore dig her. &lt;br/&gt;&lt;br/&gt;Jeg blokerede det!&lt;br/&gt;&lt;br/&gt; ☝️Du kan kontrollere URL-linjen for at se, hvem der prøver at spore dig, når du besøger et nyt sted.️</string>
+    <string name="daxTrackersBlockedCtaZeroText">&#160;prøvede at spore dig her. &lt;br/&gt;&lt;br/&gt;Jeg blokerede det!&lt;br/&gt;&lt;br/&gt; ☝️Du kan kontrollere URL-linjen for at se, hvem der prøver at spore dig, når du besøger et nyt sted.️</string>
 
     <!-- Covid Cta-->
     <string name="covidCtaText">Få officielle COVID-19 info og tip.</string>

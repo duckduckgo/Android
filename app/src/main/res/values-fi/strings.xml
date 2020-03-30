@@ -399,10 +399,10 @@
     <string name="daxMainNetworkStep211CtaText">Itse asiassa %s jäljittäjää vakoilee Internetiä kaikkialla. &#128561;&lt;br/&gt;&lt;br/&gt;</string>
     <string name="daxMainNetworkStep2CtaText">%s Estän nämä seurantalaitteet selatessasi muita kuin %s sivustoja.</string>
     <plurals name="daxTrackersBlockedCtaText">
-        <item quantity="one">ja &lt;b&gt;%d muu&lt;/b&gt; yritti jäljittää sinua täällä. &lt;br/&gt;&lt;br/&gt;Estin heidät!&lt;br/&gt;&lt;br/&gt; ☝️Voit tarkistaa URL-palkin nähdäksesi kuka yrittää seurata sinua vieraillessasi uudella sivustolla.️</item>
-        <item quantity="other">ja &lt;b&gt;%d muut&lt;/b&gt; yrittivät jäljittää sinua täällä. &lt;br/&gt;&lt;br/&gt;Estin heidät!&lt;br/&gt;&lt;br/&gt; ☝️Voit tarkistaa URL-palkin nähdäksesi kuka yrittää seurata sinua vieraillessasi uudella sivustolla.️</item>
+        <item quantity="one">&#160;ja &lt;b&gt;%d muu&lt;/b&gt; yritti jäljittää sinua täällä. &lt;br/&gt;&lt;br/&gt;Estin heidät!&lt;br/&gt;&lt;br/&gt; ☝️Voit tarkistaa URL-palkin nähdäksesi kuka yrittää seurata sinua vieraillessasi uudella sivustolla.️</item>
+        <item quantity="other">&#160;ja &lt;b&gt;%d muut&lt;/b&gt; yrittivät jäljittää sinua täällä. &lt;br/&gt;&lt;br/&gt;Estin heidät!&lt;br/&gt;&lt;br/&gt; ☝️Voit tarkistaa URL-palkin nähdäksesi kuka yrittää seurata sinua vieraillessasi uudella sivustolla.️</item>
     </plurals>
-    <string name="daxTrackersBlockedCtaZeroText">yritti seurata sinua. &lt;br/&gt;&lt;br/&gt;Estin sen!&lt;br/&gt;&lt;br/&gt; ☝️Voit tarkistaa URL-palkin nähdäksesi kuka yrittää seurata sinua vieraillessasi uudella sivustolla.️</string>
+    <string name="daxTrackersBlockedCtaZeroText">&#160;yritti seurata sinua. &lt;br/&gt;&lt;br/&gt;Estin sen!&lt;br/&gt;&lt;br/&gt; ☝️Voit tarkistaa URL-palkin nähdäksesi kuka yrittää seurata sinua vieraillessasi uudella sivustolla.️</string>
 
     <!-- Covid Cta-->
     <string name="covidCtaText">Hanki COVID-19:ää koskevia virallisia tietoja ja neuvoja.</string>

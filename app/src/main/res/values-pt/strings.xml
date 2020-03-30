@@ -399,10 +399,10 @@
     <string name="daxMainNetworkStep211CtaText">De facto, %s rastreadores estão à espreita em toda a Internet. &#128561; &lt;br/&gt;&lt;br/&gt;</string>
     <string name="daxMainNetworkStep2CtaText">%s Irei bloquear estes rastreadores quando estiver a navegar em sites que não sejam %s.</string>
     <plurals name="daxTrackersBlockedCtaText">
-        <item quantity="one">e mais &lt;b&gt;%d outro&lt;/b&gt; estava tentar rastrear aqui. &lt;br/&gt;&lt;br/&gt;Eu bloqueei-os!&lt;br/&gt;&lt;br/&gt; ☝️Pode verificar a barra de URL para ver quem está a tentar rastrear quando visita um novo site.️</item>
-        <item quantity="other">e mais &lt;b&gt;%d outros&lt;/b&gt; estavam a tentar rastrear aqui. &lt;br/&gt;&lt;br/&gt;Eu bloqueei-os!&lt;br/&gt;&lt;br/&gt; ☝️Pode verificar a barra de URL para ver quem está a tentar rastrear quando visita um novo site.️</item>
+        <item quantity="one">&#160;e mais &lt;b&gt;%d outro&lt;/b&gt; estava tentar rastrear aqui. &lt;br/&gt;&lt;br/&gt;Eu bloqueei-os!&lt;br/&gt;&lt;br/&gt; ☝️Pode verificar a barra de URL para ver quem está a tentar rastrear quando visita um novo site.️</item>
+        <item quantity="other">&#160;e mais &lt;b&gt;%d outros&lt;/b&gt; estavam a tentar rastrear aqui. &lt;br/&gt;&lt;br/&gt;Eu bloqueei-os!&lt;br/&gt;&lt;br/&gt; ☝️Pode verificar a barra de URL para ver quem está a tentar rastrear quando visita um novo site.️</item>
     </plurals>
-    <string name="daxTrackersBlockedCtaZeroText">estava a tentar rastrear aqui. &lt;br/&gt;&lt;br/&gt;Eu bloqueei-o!&lt;br/&gt;&lt;br/&gt; ☝️Pode verificar a barra de URL para ver quem está a tentar rastrear quando visita um novo site.️</string>
+    <string name="daxTrackersBlockedCtaZeroText">&#160;estava a tentar rastrear aqui. &lt;br/&gt;&lt;br/&gt;Eu bloqueei-o!&lt;br/&gt;&lt;br/&gt; ☝️Pode verificar a barra de URL para ver quem está a tentar rastrear quando visita um novo site.️</string>
 
     <!-- Covid Cta-->
     <string name="covidCtaText">Obtenha informações oficiais e sugestões sobre a COVID-19.</string>

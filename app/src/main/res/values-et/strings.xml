@@ -420,10 +420,10 @@
     <string name="daxMainNetworkStep211CtaText">Tegelikult varitsevad %s jälitajad kogu Internetis, &#128561;&lt;br/&gt;&lt;br/&gt;</string>
     <string name="daxMainNetworkStep2CtaText">%s blokeerin need jälitajad, kui sirvite saite, mis pole %s.</string>
     <plurals name="daxTrackersBlockedCtaText">
-        <item quantity="one">ja &lt;b&gt;%d teine&lt;/b&gt; üritasid teid siin jälitada. &lt;br/&gt;&lt;br/&gt;Blokeerisin nad!&lt;br/&gt;&lt;br/&gt; ☝️Võite vaadata URL-i riba, et näha, kes üritab teid jälgida, kui külastate uut saiti.️</item>
-        <item quantity="other">ja &lt;b&gt;%d teised&lt;/b&gt; üritasid teid siin jälitada. &lt;br/&gt;&lt;br/&gt;Blokeerisin nad!&lt;br/&gt;&lt;br/&gt; ☝️Võite vaadata URL-i riba, et näha, kes üritab teid jälgida, kui külastate uut saiti.️</item>
+        <item quantity="one">&#160;ja &lt;b&gt;%d teine&lt;/b&gt; üritasid teid siin jälitada. &lt;br/&gt;&lt;br/&gt;Blokeerisin nad!&lt;br/&gt;&lt;br/&gt; ☝️Võite vaadata URL-i riba, et näha, kes üritab teid jälgida, kui külastate uut saiti.️</item>
+        <item quantity="other">&#160;ja &lt;b&gt;%d teised&lt;/b&gt; üritasid teid siin jälitada. &lt;br/&gt;&lt;br/&gt;Blokeerisin nad!&lt;br/&gt;&lt;br/&gt; ☝️Võite vaadata URL-i riba, et näha, kes üritab teid jälgida, kui külastate uut saiti.️</item>
     </plurals>
-    <string name="daxTrackersBlockedCtaZeroText"> üritas teid siin jälitada. &lt;br/&gt;&lt;br/&gt;Blokeerisin selle!&lt;br/&gt;&lt;br/&gt; ☝️Võite vaadata URL-i riba, et näha, kes üritab teid jälgida, kui külastate uut saiti.️</string>
+    <string name="daxTrackersBlockedCtaZeroText">&#160;üritas teid siin jälitada. &lt;br/&gt;&lt;br/&gt;Blokeerisin selle!&lt;br/&gt;&lt;br/&gt; ☝️Võite vaadata URL-i riba, et näha, kes üritab teid jälgida, kui külastate uut saiti.️</string>
 
     <!-- Covid Cta-->
     <string name="covidCtaText">Hankige ametlikku teavet COVID-19 kohta ja näpunäiteid.</string>

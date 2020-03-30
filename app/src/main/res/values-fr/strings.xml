@@ -399,10 +399,10 @@
     <string name="daxMainNetworkStep211CtaText">En fait, %s traqueurs se cachent partout sur Internet. &#128561;&lt;br/&gt;&lt;br/&gt;</string>
     <string name="daxMainNetworkStep2CtaText">%sJe bloquerai ces traqueurs lorsque vous naviguerez sur des sites non %s.</string>
     <plurals name="daxTrackersBlockedCtaText">
-        <item quantity="one">et &lt;b&gt;%d autres&lt;/b&gt; essayaient de vous suivre ici. &lt;br/&gt;&lt;br/&gt;Je les ai bloqués !&lt;br/&gt;&lt;br/&gt; ☝️Vous pouvez vérifier la barre d\'URL pour voir qui essaie de vous suivre lorsque vous visitez un nouveau site.️</item>
-        <item quantity="other">et &lt;b&gt;%d autres&lt;/b&gt; essayaient de vous suivre ici. &lt;br/&gt;&lt;br/&gt;Je les ai bloqués !&lt;br/&gt;&lt;br/&gt; ☝️Vous pouvez vérifier la barre d\'URL pour voir qui essaie de vous suivre lorsque vous visitez un nouveau site.️</item>
+        <item quantity="one">&#160;et &lt;b&gt;%d autres&lt;/b&gt; essayaient de vous suivre ici. &lt;br/&gt;&lt;br/&gt;Je les ai bloqués !&lt;br/&gt;&lt;br/&gt; ☝️Vous pouvez vérifier la barre d\'URL pour voir qui essaie de vous suivre lorsque vous visitez un nouveau site.️</item>
+        <item quantity="other">&#160;et &lt;b&gt;%d autres&lt;/b&gt; essayaient de vous suivre ici. &lt;br/&gt;&lt;br/&gt;Je les ai bloqués !&lt;br/&gt;&lt;br/&gt; ☝️Vous pouvez vérifier la barre d\'URL pour voir qui essaie de vous suivre lorsque vous visitez un nouveau site.️</item>
     </plurals>
-    <string name="daxTrackersBlockedCtaZeroText"> essayait de vous suivre ici. &lt;br/&gt;&lt;br/&gt;Je l\'ai bloqué !&lt;br/&gt;&lt;br/&gt; ☝️Vous pouvez vérifier la barre d\'URL pour voir qui essaie de vous suivre lorsque vous visitez un nouveau site.️</string>
+    <string name="daxTrackersBlockedCtaZeroText">&#160;essayait de vous suivre ici. &lt;br/&gt;&lt;br/&gt;Je l\'ai bloqué !&lt;br/&gt;&lt;br/&gt; ☝️Vous pouvez vérifier la barre d\'URL pour voir qui essaie de vous suivre lorsque vous visitez un nouveau site.️</string>
 
     <!-- Covid Cta-->
     <string name="covidCtaText">Accédez aux informations officielles et aux recommandations sur le COVID-19.</string>

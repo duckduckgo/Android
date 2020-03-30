@@ -399,10 +399,10 @@
     <string name="daxMainNetworkStep211CtaText">Всъщност, %s тракери дебнат из целия интернет. &#128561;&lt;br/&gt;&lt;br/&gt;</string>
     <string name="daxMainNetworkStep2CtaText">%s Ще блокирам тези тракери, когато разглеждате не-%s сайтове.</string>
     <plurals name="daxTrackersBlockedCtaText">
-        <item quantity="one">и &lt;b&gt;%d други&lt;/b&gt; се опитваха да ви проследят тук. &lt;br/&gt;&lt;br/&gt;Блокирах ги!&lt;br/&gt;&lt;br/&gt; ☝️Вижте URL лентата, за да разберете кой се опитва да ви проследи, когато посещавате нов сайт.️</item>
-        <item quantity="other">и &lt;b&gt;%d други&lt;/b&gt; се опитваха да ви проследят тук. &lt;br/&gt;&lt;br/&gt;Блокирах ги!&lt;br/&gt;&lt;br/&gt; ☝️Вижте URL лентата, за да разберете кой се опитва да ви проследи, когато посещавате нов сайт.️</item>
+        <item quantity="one">&#160;и &lt;b&gt;%d други&lt;/b&gt; се опитваха да ви проследят тук. &lt;br/&gt;&lt;br/&gt;Блокирах ги!&lt;br/&gt;&lt;br/&gt; ☝️Вижте URL лентата, за да разберете кой се опитва да ви проследи, когато посещавате нов сайт.️</item>
+        <item quantity="other">&#160;и &lt;b&gt;%d други&lt;/b&gt; се опитваха да ви проследят тук. &lt;br/&gt;&lt;br/&gt;Блокирах ги!&lt;br/&gt;&lt;br/&gt; ☝️Вижте URL лентата, за да разберете кой се опитва да ви проследи, когато посещавате нов сайт.️</item>
     </plurals>
-    <string name="daxTrackersBlockedCtaZeroText">се опитваше да ви проследи тук. &lt;br/&gt;&lt;br/&gt;Блокирах го!&lt;br/&gt;&lt;br/&gt; ☝️Вижте URL лентата, за да разберете кой се опитва да ви проследи, когато посещавате нов сайт.️</string>
+    <string name="daxTrackersBlockedCtaZeroText">&#160;се опитваше да ви проследи тук. &lt;br/&gt;&lt;br/&gt;Блокирах го!&lt;br/&gt;&lt;br/&gt; ☝️Вижте URL лентата, за да разберете кой се опитва да ви проследи, когато посещавате нов сайт.️</string>
 
     <!-- Covid Cta-->
     <string name="covidCtaText">Официална информация и съвети относно COVID-19.</string>

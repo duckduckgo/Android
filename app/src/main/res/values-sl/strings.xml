@@ -407,12 +407,12 @@
     <string name="daxMainNetworkStep211CtaText">Pravzaprav %s se sledilci skrivajo po vsem internetu. &#128561;&lt;br/&gt;&lt;br/&gt;</string>
     <string name="daxMainNetworkStep2CtaText">%s Blokiral bom te sledilce med brskanjem po spletiščih mestih, ki niso %s.</string>
     <plurals name="daxTrackersBlockedCtaText">
-        <item quantity="one">in &lt;b&gt;%d drugi&lt;/b&gt; so vas skušali zaslediti tukaj. &lt;br/&gt;&lt;br/&gt;Blokiral sem jih!&lt;br/&gt;&lt;br/&gt; ☝️Preverite lahko URL vrstico, da vidite, kdo vas poskuša zaslediti, ko obiščete novo spletišče.️</item>
-        <item quantity="two">in &lt;b&gt;%d drugi&lt;/b&gt; so vas poskušali zaslediti tukaj. &lt;br/&gt;&lt;br/&gt;Blokiral sem jih!&lt;br/&gt;&lt;br/&gt; ☝️Preverite lahko URL vrstico, da vidite, kdo vas poskuša zaslediti, ko obiščete novo spletno mesto.️</item>
-        <item quantity="few">in &lt;b&gt;%d drugi&lt;/b&gt; so vas poskušali zaslediti tukaj. &lt;br/&gt;&lt;br/&gt;Blokiral sem jih!&lt;br/&gt;&lt;br/&gt; ☝️Preverite lahko URL vrstico, da vidite, kdo vas poskuša zaslediti, ko obiščete novo spletišče.</item>
-        <item quantity="other">in &lt;b&gt;%d drugi&lt;/b&gt; so vas poskušali zaslediti tukaj. &lt;br/&gt;&lt;br/&gt;Blokiral sem jih!&lt;br/&gt;&lt;br/&gt; ☝️Preverite lahko URL vrstico, da vidite, kdo vas poskuša zaslediti, ko obiščete novo spletno mesto.️</item>
+        <item quantity="one">&#160;in &lt;b&gt;%d drugi&lt;/b&gt; so vas skušali zaslediti tukaj. &lt;br/&gt;&lt;br/&gt;Blokiral sem jih!&lt;br/&gt;&lt;br/&gt; ☝️Preverite lahko URL vrstico, da vidite, kdo vas poskuša zaslediti, ko obiščete novo spletišče.️</item>
+        <item quantity="two">&#160;in &lt;b&gt;%d drugi&lt;/b&gt; so vas poskušali zaslediti tukaj. &lt;br/&gt;&lt;br/&gt;Blokiral sem jih!&lt;br/&gt;&lt;br/&gt; ☝️Preverite lahko URL vrstico, da vidite, kdo vas poskuša zaslediti, ko obiščete novo spletno mesto.️</item>
+        <item quantity="few">&#160;in &lt;b&gt;%d drugi&lt;/b&gt; so vas poskušali zaslediti tukaj. &lt;br/&gt;&lt;br/&gt;Blokiral sem jih!&lt;br/&gt;&lt;br/&gt; ☝️Preverite lahko URL vrstico, da vidite, kdo vas poskuša zaslediti, ko obiščete novo spletišče.</item>
+        <item quantity="other">&#160;in &lt;b&gt;%d drugi&lt;/b&gt; so vas poskušali zaslediti tukaj. &lt;br/&gt;&lt;br/&gt;Blokiral sem jih!&lt;br/&gt;&lt;br/&gt; ☝️Preverite lahko URL vrstico, da vidite, kdo vas poskuša zaslediti, ko obiščete novo spletno mesto.️</item>
     </plurals>
-    <string name="daxTrackersBlockedCtaZeroText">vas je poskušal izslediti tukaj. &lt;br/&gt;&lt;br/&gt;Blokiral sem ga!&lt;br/&gt;&lt;br/&gt; ☝️Preverite lahko URL vrstico, da vidite, kdo vas poskuša zaslediti, ko obiščete novo spletišče.</string>
+    <string name="daxTrackersBlockedCtaZeroText">&#160;vas je poskušal izslediti tukaj. &lt;br/&gt;&lt;br/&gt;Blokiral sem ga!&lt;br/&gt;&lt;br/&gt; ☝️Preverite lahko URL vrstico, da vidite, kdo vas poskuša zaslediti, ko obiščete novo spletišče.</string>
 
     <!-- Covid Cta-->
     <string name="covidCtaText">Pridobite uradne informacije in nasvete za COVID-19.</string>

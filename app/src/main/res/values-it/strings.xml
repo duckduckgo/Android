@@ -415,10 +415,10 @@
     <string name="daxMainNetworkStep211CtaText">In effetti, %s localizzatori si nascondono su Internet. &#128561;&lt;br/&gt;&lt;br/&gt;</string>
     <string name="daxMainNetworkStep2CtaText">%s Bloccherò questi localizzatori quando navighi su siti non %s.</string>
     <plurals name="daxTrackersBlockedCtaText">
-        <item quantity="one"> e &lt;b&gt;%d altro&lt;/b&gt; stavano cercando di rintracciarti qui. &lt;br/&gt;&lt;br/&gt;Li ho bloccati!&lt;br/&gt;&lt;br/&gt; ☝️Puoi controllare la barra degli URL per vedere chi sta cercando di rintracciarti quando visiti un nuovo sito.️</item>
-        <item quantity="other"> e &lt;b&gt;%d altri&lt;/b&gt; stavano cercando di rintracciarti qui. &lt;br/&gt;&lt;br/&gt;Li ho bloccati!&lt;br/&gt;&lt;br/&gt; ☝️Puoi controllare la barra degli URL per vedere chi sta cercando di rintracciarti quando visiti un nuovo sito.️</item>
+        <item quantity="one">&#160;e &lt;b&gt;%d altro&lt;/b&gt; stavano cercando di rintracciarti qui. &lt;br/&gt;&lt;br/&gt;Li ho bloccati!&lt;br/&gt;&lt;br/&gt; ☝️Puoi controllare la barra degli URL per vedere chi sta cercando di rintracciarti quando visiti un nuovo sito.️</item>
+        <item quantity="other">&#160;e &lt;b&gt;%d altri&lt;/b&gt; stavano cercando di rintracciarti qui. &lt;br/&gt;&lt;br/&gt;Li ho bloccati!&lt;br/&gt;&lt;br/&gt; ☝️Puoi controllare la barra degli URL per vedere chi sta cercando di rintracciarti quando visiti un nuovo sito.️</item>
     </plurals>
-    <string name="daxTrackersBlockedCtaZeroText"> stava cercando di rintracciarti qui. &lt;br/&gt;&lt;br/&gt;L\'ho bloccato!&lt;br/&gt;&lt;br/&gt; ☝️Puoi controllare la barra degli URL per vedere chi sta cercando di rintracciarti quando visiti un nuovo sito.️</string>
+    <string name="daxTrackersBlockedCtaZeroText">&#160;stava cercando di rintracciarti qui. &lt;br/&gt;&lt;br/&gt;L\'ho bloccato!&lt;br/&gt;&lt;br/&gt; ☝️Puoi controllare la barra degli URL per vedere chi sta cercando di rintracciarti quando visiti un nuovo sito.️</string>
 
     <!-- Covid Cta-->
     <string name="covidCtaText">Leggi informazioni e consigli ufficiali sul COVID-19.</string>
