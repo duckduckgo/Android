@@ -22,7 +22,7 @@ import android.os.Bundle
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.DuckDuckGoActivity
-import kotlinx.android.synthetic.main.activity_onboarding_experiment.*
+import kotlinx.android.synthetic.main.activity_onboarding.*
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 
@@ -34,7 +34,7 @@ class OnboardingActivity : DuckDuckGoActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_onboarding_experiment)
+        setContentView(R.layout.activity_onboarding)
         configurePager()
     }
 
