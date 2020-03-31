@@ -32,6 +32,7 @@ class DefaultBrowserPageViewModel(
     sealed class ViewState {
         object DefaultBrowserSettingsUI : ViewState()
         data class DefaultBrowserDialogUI(val showInstructionsCard: Boolean = false) : ViewState()
+        object ContinueToBrowser : ViewState()
     }
 
     sealed class Command {
@@ -65,10 +66,9 @@ class DefaultBrowserPageViewModel(
     }
 
     fun loadUI() {
-        if (defaultBrowserDetector.isDefaultBrowser()) {
-            command.value = Command.ContinueToBrowser
+        nextViewState()?.let {
+            refreshViewStateIfTypeChanged(it)
         }
-        refreshViewStateIfTypeChanged(newViewState())
     }
 
     fun onContinueToBrowser(userTriedToSetDDGAsDefault: Boolean) {
@@ -127,7 +127,7 @@ class DefaultBrowserPageViewModel(
         viewState.value = newViewState
     }
 
-    private fun nextViewState(origin: Origin): ViewState? {
+    private fun nextViewState(origin: Origin? = null): ViewState? {
         return when {
             defaultBrowserDetector.isDefaultBrowser() -> null
             defaultBrowserDetector.hasDefaultBrowser() -> {
@@ -177,12 +177,9 @@ class DefaultBrowserPageViewModel(
     private fun currentViewState(): ViewState = viewState.value!!
 
     private fun newViewState(): ViewState = when {
-        defaultBrowserDetector.hasDefaultBrowser() -> {
-            ViewState.DefaultBrowserSettingsUI
-        }
-        else -> {
-            ViewState.DefaultBrowserDialogUI()
-        }
+        defaultBrowserDetector.isDefaultBrowser() -> ViewState.ContinueToBrowser
+        defaultBrowserDetector.hasDefaultBrowser() -> ViewState.DefaultBrowserSettingsUI
+        else -> ViewState.DefaultBrowserDialogUI()
     }
 
     private fun refreshViewStateIfTypeChanged(createViewState: ViewState) {

@@ -100,7 +100,7 @@ class DefaultBrowserPage : OnboardingPageFragment() {
     }
 
     private fun observeViewModel() {
-        viewModel.viewState.observe(this, Observer<DefaultBrowserPageViewModel.ViewState> { viewState ->
+        viewModel.viewState.observe(this, Observer { viewState ->
             viewState?.let {
                 when (it) {
                     is DefaultBrowserPageViewModel.ViewState.DefaultBrowserSettingsUI -> {
@@ -110,6 +110,10 @@ class DefaultBrowserPage : OnboardingPageFragment() {
                     is DefaultBrowserPageViewModel.ViewState.DefaultBrowserDialogUI -> {
                         setUiForDialog()
                         if (it.showInstructionsCard) showInstructionsCard() else hideInstructionsCard()
+                    }
+                    is DefaultBrowserPageViewModel.ViewState.ContinueToBrowser -> {
+                        hideInstructionsCard()
+                        onContinuePressed()
                     }
                 }
             }

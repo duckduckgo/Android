@@ -123,15 +123,6 @@ class DefaultBrowserPageViewModelTest {
     }
 
     @Test
-    fun whenLoadUiThenContinueToBrowserIfDDGIsTheDefaultBrowser() {
-        whenever(mockDefaultBrowserDetector.isDefaultBrowser()).thenReturn(true)
-
-        testee.loadUI()
-
-        assertTrue(captureCommands().lastValue is Command.ContinueToBrowser)
-    }
-
-    @Test
     fun whenLoadUIAfterDefaultButtonClickedThenSameState() {
         whenever(mockDefaultBrowserDetector.hasDefaultBrowser()).thenReturn(false)
         testee.loadUI()
