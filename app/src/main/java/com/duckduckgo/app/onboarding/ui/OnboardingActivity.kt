@@ -23,12 +23,8 @@ import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import kotlinx.android.synthetic.main.activity_onboarding.*
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.MainScope
-import kotlinx.coroutines.launch
 
-class OnboardingActivity : DuckDuckGoActivity(), CoroutineScope by MainScope() {
+class OnboardingActivity : DuckDuckGoActivity() {
 
     private lateinit var viewPageAdapter: PagerAdapter
 
@@ -45,11 +41,7 @@ class OnboardingActivity : DuckDuckGoActivity(), CoroutineScope by MainScope() {
         if (next < viewPager.adapter!!.count) {
             viewPager.setCurrentItem(next, true)
         } else {
-            //Executing this on IO to avoid any delay changing threads between Main-IO.
-            //Important to avoid expensive work inside onOnboardingDone to ensure next screen starts with expected state.
-            launch(Dispatchers.IO) {
-                viewModel.onOnboardingDone()
-            }
+            viewModel.onOnboardingDone()
             startActivity(BrowserActivity.intent(this@OnboardingActivity))
             finish()
         }
