@@ -110,7 +110,7 @@ class DefaultBrowserPage : OnboardingPageFragment() {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
             }
-            statusBarColor = Color.TRANSPARENT
+            statusBarColor = Color.WHITE
         }
         requestApplyInsets(longDescriptionContainer)
     }
