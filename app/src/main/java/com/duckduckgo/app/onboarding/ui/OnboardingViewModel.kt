@@ -18,11 +18,8 @@ package com.duckduckgo.app.onboarding.ui
 
 import androidx.lifecycle.ViewModel
 import com.duckduckgo.app.onboarding.store.AppStage
-import com.duckduckgo.app.onboarding.store.AppUserStageStore
-import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.onboarding.ui.page.OnboardingPageFragment
-import kotlinx.coroutines.GlobalScope
 
 class OnboardingViewModel(
     private val userStageStore: UserStageStore,
