@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 18,
-    "identityHash": "45c441e22d1beccca1a3dc2fb983f79b",
+    "identityHash": "b762bd97949a77fd6240c97f1bc868fc",
     "entities": [
       {
         "tableName": "tds_tracker",
@@ -634,12 +634,12 @@
       },
       {
         "tableName": "userStage",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`key` TEXT NOT NULL, `appStage` TEXT NOT NULL, PRIMARY KEY(`key`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`key` INTEGER NOT NULL, `appStage` TEXT NOT NULL, PRIMARY KEY(`key`))",
         "fields": [
           {
             "fieldPath": "key",
             "columnName": "key",
-            "affinity": "TEXT",
+            "affinity": "INTEGER",
             "notNull": true
           },
           {
@@ -662,7 +662,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '45c441e22d1beccca1a3dc2fb983f79b')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'b762bd97949a77fd6240c97f1bc868fc')"
     ]
   }
 }

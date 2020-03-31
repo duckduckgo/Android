@@ -24,13 +24,9 @@ const val USER_STAGE_TABLE_NAME = "userStage"
 
 @Entity(tableName = USER_STAGE_TABLE_NAME)
 data class UserStage(
-    @PrimaryKey val key: String = SINGLETON_KEY,
+    @PrimaryKey val key: Int = 1,
     val appStage: AppStage
-) {
-    companion object {
-        const val SINGLETON_KEY = "SINGLETON_KEY"
-    }
-}
+)
 
 enum class AppStage {
     NEW,

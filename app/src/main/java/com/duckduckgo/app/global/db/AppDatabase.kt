@@ -260,10 +260,10 @@ class MigrationsProvider(val context: Context) {
             val userStage = UserStage(appStage = appStage)
             database.execSQL(
                 "CREATE TABLE IF NOT EXISTS `$USER_STAGE_TABLE_NAME` " +
-                        "(`key` TEXT NOT NULL, `appStage` TEXT NOT NULL, PRIMARY KEY(`key`))"
+                        "(`key` INTEGER NOT NULL, `appStage` TEXT NOT NULL, PRIMARY KEY(`key`))"
             )
             database.execSQL(
-                "INSERT INTO $USER_STAGE_TABLE_NAME VALUES (\"${userStage.key}\", \"${userStage.appStage}\") "
+                "INSERT INTO $USER_STAGE_TABLE_NAME VALUES (${userStage.key}, \"${userStage.appStage}\") "
             )
         }
     }
