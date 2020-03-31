@@ -82,7 +82,6 @@
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
         tools:context="com.duckduckgo.app.browser.BrowserActivity">
 
-
         <com.duckduckgo.app.browser.ui.ScrollAwareSwipeRefreshLayout
             android:id="@+id/swipeContainer"
             android:layout_width="0dp"
