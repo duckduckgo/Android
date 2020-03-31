@@ -42,7 +42,7 @@ class OnboardingViewModelTest {
     private val pageLayout: OnboardingPageManager = mock()
 
     private val testee: OnboardingViewModel by lazy {
-        OnboardingViewModel(userStageStore, pageLayout)
+        OnboardingViewModel(userStageStore, pageLayout, coroutineRule.testDispatcherProvider)
     }
 
     @Test

@@ -113,7 +113,8 @@ class ViewModelFactory @Inject constructor(
     private val onboardingPageManager: OnboardingPageManager,
     private val appInstallationReferrerStateListener: AppInstallationReferrerStateListener,
     private val appIconModifier: IconModifier,
-    private val notificationScheduler: AndroidNotificationScheduler
+    private val notificationScheduler: AndroidNotificationScheduler,
+    private val dispatcherProvider: DispatcherProvider
 ) : ViewModelProvider.NewInstanceFactory() {
 
     override fun <T : ViewModel> create(modelClass: Class<T>) =
@@ -149,7 +150,7 @@ class ViewModelFactory @Inject constructor(
 
     private fun defaultBrowserPage() = DefaultBrowserPageViewModel(defaultBrowserDetector, pixel, appInstallStore)
 
-    private fun onboardingViewModel() = OnboardingViewModel(userStageStore, onboardingPageManager)
+    private fun onboardingViewModel() = OnboardingViewModel(userStageStore, onboardingPageManager, dispatcherProvider)
 
     private fun settingsViewModel(): SettingsViewModel {
         return SettingsViewModel(
