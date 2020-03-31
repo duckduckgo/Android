@@ -99,8 +99,8 @@ class CtaViewModel @Inject constructor(
         withContext(dispatchers.io()) {
             if (cta is DaxBubbleCta) {
                 dismissedCtaDao.insert(DismissedCta(cta.ctaId))
+                completeStageIfDaxOnboardingCompleted()
             }
-            completeStageIfDaxOnboardingCompleted()
         }
     }
 
