@@ -26,6 +26,7 @@ import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.SingleLiveEvent
 import com.duckduckgo.app.onboarding.store.AppStage
 import com.duckduckgo.app.onboarding.store.UserStageStore
+import com.duckduckgo.app.onboarding.store.isNewUser
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.*
 import com.jakewharton.rxrelay2.PublishRelay
@@ -91,7 +92,7 @@ class SystemSearchViewModel(
     }
 
     private suspend fun resetOnboardingState() {
-        val showOnboarding = userStageStore.getUserAppStage() == AppStage.NEW
+        val showOnboarding = userStageStore.isNewUser()
         onboardingViewState.value = OnboardingViewState(visible = showOnboarding)
         if (showOnboarding) {
             pixel.fire(INTERSTITIAL_ONBOARDING_SHOWN)

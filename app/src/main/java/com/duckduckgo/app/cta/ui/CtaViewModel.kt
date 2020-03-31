@@ -29,6 +29,7 @@ import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.onboarding.store.AppStage
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.store.UserStageStore
+import com.duckduckgo.app.onboarding.store.daxOnboardingActive
 import com.duckduckgo.app.privacy.store.PrivacySettingsStore
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.Variant
@@ -278,7 +279,7 @@ class CtaViewModel @Inject constructor(
 
     private fun isSerpUrl(url: String): Boolean = url.contains(DaxDialogCta.SERP)
 
-    private suspend fun daxOnboardingActive(): Boolean = userStageStore.getUserAppStage() == AppStage.DAX_ONBOARDING
+    private suspend fun daxOnboardingActive(): Boolean = userStageStore.daxOnboardingActive()
 
     private suspend fun allOnboardingCtasShown(): Boolean {
         return withContext(dispatchers.io()) {

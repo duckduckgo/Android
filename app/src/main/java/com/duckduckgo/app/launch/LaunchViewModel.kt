@@ -20,6 +20,7 @@ import androidx.lifecycle.ViewModel
 import com.duckduckgo.app.global.SingleLiveEvent
 import com.duckduckgo.app.onboarding.store.AppStage
 import com.duckduckgo.app.onboarding.store.UserStageStore
+import com.duckduckgo.app.onboarding.store.isNewUser
 import com.duckduckgo.app.referral.AppInstallationReferrerStateListener
 import com.duckduckgo.app.referral.AppInstallationReferrerStateListener.Companion.MAX_REFERRER_WAIT_TIME_MS
 import kotlinx.coroutines.withTimeoutOrNull
@@ -41,7 +42,7 @@ class LaunchViewModel(
     suspend fun determineViewToShow() {
         waitForReferrerData()
 
-        if (userStageStore.getUserAppStage() == AppStage.NEW) {
+        if (userStageStore.isNewUser()) {
             command.value = Command.Onboarding
         } else {
             command.value = Command.Home()

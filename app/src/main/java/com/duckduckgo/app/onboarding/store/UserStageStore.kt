@@ -52,3 +52,11 @@ class AppUserStageStore @Inject constructor(
         }
     }
 }
+
+suspend fun UserStageStore.isNewUser(): Boolean {
+    return this.getUserAppStage() == AppStage.NEW
+}
+
+suspend fun UserStageStore.daxOnboardingActive(): Boolean {
+    return this.getUserAppStage() == AppStage.DAX_ONBOARDING
+}
