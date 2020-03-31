@@ -7,8 +7,6 @@
 
     <!-- Onboarding Activity -->
     <string name="onboardingDefaultBrowserDescription">Navigiere zu Einstellungen, damit du in Zukunft immer mit DuckDuckGo suchen und browsen kannst.</string>
-    <string name="onboardingContinue">Weiter</string>
-    <string name="onboardingContinueFinalPage">Mit dem Browsen beginnen</string>
     <string name="onboardingDefaultBrowserTitle">DuckDuckGo als Standard-Browser einstellen</string>
 
     <!-- Default Browser -->
@@ -372,10 +370,6 @@
     <!-- Dax Dialog -->
     <string name="daxDialogHideButton">AUSBLENDEN</string>
     <string name="daxDialogPhew">Puh!</string>
-    <string name="daxDialogYes">OK!</string>
-    <string name="daxDialogAddWidget">Widget hinzufügen</string>
-    <string name="daxDialogMaybeLater">Vielleicht später</string>
-    <string name="daxDialogSettings">Zu den Einstellungen</string>
     <string name="daxDialogNext">Weiter</string>
     <string name="daxDialogHighFive">Gib mir fünf!</string>
     <string name="daxDialogGotIt">Verstanden</string>
@@ -390,8 +384,6 @@
     <string name="daxIntroCtaText">Versuchen Sie als nächstes, eine Ihrer Lieblingsseiten zu besuchen! &lt;br/&gt;&lt;br/&gt;Ich blockiere Tracker, damit sie Sie nicht ausspionieren können. Ich werde auch die Sicherheit Ihrer Verbindung verbessern, wenn das möglich ist. &#128274;</string>
     <string name="daxEndCtaText">Gut gemacht! &lt;br/&gt;&lt;br/&gt;Hinweis Jedes Mal, wenn Sie mit mir surfen, verliert eine gruselige Anzeige ihre Flügel. &#128077;</string>
     <string name="daxSerpCtaText">Ihre DuckDuckGo-Suchanfragen sind anonym und ich speichere niemals Ihren Suchverlauf. Nie. &#128588;</string>
-    <string name="daxDefaultBrowserCtaText">Bevor ich mich zurückziehe! &lt;br/&gt;&lt;br/&gt;Möchten Sie sich vor Trackern schützen, wenn Sie Links von anderen Apps öffnest? &lt;br/&gt;&lt;br/&gt;Machen Sie DuckDuckGo zu Ihrem Standardbrowser!</string>
-    <string name="daxSearchWidgetCtaText">Sie sind auf dem Laufenden! &lt;br/&gt;&lt;br/&gt;Suchen Sie privat noch schneller! Fügen Sie das DuckDuckGo-Such-Widget zu Ihrem Startbildschirm hinzu.</string>
     <string name="daxNonSerpCtaText">Jede Website hat eine Datenschutzstufe. Tippen Sie darauf, um zu sehen, wie ich Ihre Privatsphäre geschützt habe.&lt;br/&gt;&lt;br/&gt;Sie haben Lust darauf? Versuchen Sie, Ihre Daten zu löschen, indem Sie den Feuerknopf drücken.</string>
     <string name="daxMainNetworkStep1CtaText">Augen auf!&lt;br/&gt;&lt;br/&gt; %s betreibt ein großes Tracking-Netzwerk.&lt;br/&gt;&lt;br/&gt;Eine niedriger Datenschutzstufe weist Sie darauf hin.</string>
     <string name="daxMainNetworkStep1OwnedCtaText">Augen auf!&lt;br/&gt;&lt;br/&gt; %s gehört %s, das ein großes Tracking-Netzwerk betreibt.</string>

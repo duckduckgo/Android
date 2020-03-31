@@ -7,8 +7,6 @@
 
     <!-- Onboarding Activity -->
     <string name="onboardingDefaultBrowserDescription">Jei visada norite ieškoti ir naršyti naudojant „DuckDuckGo“, apsilankykite nustatymuose.</string>
-    <string name="onboardingContinue">Tęsti</string>
-    <string name="onboardingContinueFinalPage">Pradėti naršyti</string>
     <string name="onboardingDefaultBrowserTitle">Nustatykite „DuckDuckGo“ savo numatytuoju puslapiu</string>
 
     <!-- Default Browser -->
@@ -376,10 +374,6 @@
     <!-- Dax Dialog -->
     <string name="daxDialogHideButton">SLĖPTI</string>
     <string name="daxDialogPhew">Oi!</string>
-    <string name="daxDialogYes">GERAI!</string>
-    <string name="daxDialogAddWidget">Pridėti valdiklį</string>
-    <string name="daxDialogMaybeLater">Galbūt vėliau</string>
-    <string name="daxDialogSettings">Eiti į nustatymus</string>
     <string name="daxDialogNext">Kitas</string>
     <string name="daxDialogHighFive">Duok penkis!</string>
     <string name="daxDialogGotIt">Supratau</string>
@@ -394,8 +388,6 @@
     <string name="daxIntroCtaText">Toliau pabandykite apsilankyti viename mėgstamiausių tinklapių! &lt;br/&gt;&lt;br/&gt;Užblokuosiu sekimo įrenginius, kad jie negalėtų jūsų šnipinėti. Jei įmanoma, atnaujinsiu jūsų ryšio saugumą. &#128274;</string>
     <string name="daxEndCtaText">Atliktai! &lt;br/&gt;&lt;br/&gt;Įsidėmėkite: kiekvieną kartą, kai naršote su manimi, bauginantis skelbimas praranda galią. &#128077;</string>
     <string name="daxSerpCtaText">„DuckDuckGo“ paieškos yra anoniminės ir niekada nekaupiu jūsų paieškos istorijos. Niekada. &#128588;</string>
-    <string name="daxDefaultBrowserCtaText">Prieš man kimbant į darbą! &lt;br/&gt;&lt;br/&gt;Norite apsaugos nuo sekimo įrenginių, kai atveriate kitose programėlese esančias nuorodas?&lt;br/&gt;&lt;br/&gt;Tegul „DuckDuckGo“ tampa jūsų numatytąja naršykle!</string>
-    <string name="daxSearchWidgetCtaText">Esate sąraše! &lt;br/&gt;&lt;br/&gt;Dar greičiau ieškokite privačiai! Pridėkite „DuckDuckGo“ prie paieškos valdiklio savo pagrindiniame ekrane.</string>
     <string name="daxNonSerpCtaText">Kiekvienas tinklapis turi privatumo kategoriją. Bakstelėkite jį, kad pamatytumėte, kaip apsaugojau jūsų privatumą.&lt;br/&gt;&lt;br/&gt;Norite neatsilikti? Pabandykite išvalyti duomenis paspausdami suaktyvinimo mygtuką.</string>
     <string name="daxMainNetworkStep1CtaText">Būkite atidus!&lt;br/&gt;&lt;br/&gt; %s valdo pagrindinį sekimo tinklą.&lt;br/&gt;&lt;br/&gt;Žema privatumo kategorija nukreipia jus į tokius tinklapius.</string>
     <string name="daxMainNetworkStep1OwnedCtaText">Būkite atidus!&lt;br/&gt;&lt;br/&gt; %s priklauso %s, valdančiai pagrindinį sekimo tinklą.</string>

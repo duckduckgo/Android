@@ -7,8 +7,6 @@
 
     <!-- Onboarding Activity -->
     <string name="onboardingDefaultBrowserDescription">Ga naar Instellingen om elke keer te zoeken en te browsen met DuckDuckGo.</string>
-    <string name="onboardingContinue">Ga verder</string>
-    <string name="onboardingContinueFinalPage">Start met browsen</string>
     <string name="onboardingDefaultBrowserTitle">Stel DuckDuckGo in als uw standaardinstelling</string>
 
     <!-- Default Browser -->
@@ -372,10 +370,6 @@
     <!-- Dax Dialog -->
     <string name="daxDialogHideButton">VERBERGEN</string>
     <string name="daxDialogPhew">Opluchting!</string>
-    <string name="daxDialogYes">OK!</string>
-    <string name="daxDialogAddWidget">Widget Toevoegen</string>
-    <string name="daxDialogMaybeLater">Later Misschien</string>
-    <string name="daxDialogSettings">Ga naar instellingen</string>
     <string name="daxDialogNext">Volgende</string>
     <string name="daxDialogHighFive">High Five!</string>
     <string name="daxDialogGotIt">Ik snap het</string>
@@ -390,8 +384,6 @@
     <string name="daxIntroCtaText">Probeer vervolgens een van uw favoriete sites te bezoeken! &lt;br/&gt;&lt;br/&gt;Ik blokkeer trackers zodat ze u niet kunnen bespioneren. Ik zal ook indien mogelijk de beveiliging van uw verbinding upgraden. &#128274;</string>
     <string name="daxEndCtaText">U kunt het! &lt;br/&gt;&lt;br/&gt;Denk eraan: elke keer als u met mij surft, verliest een enge advertentie zijn vleugels. &#128077;</string>
     <string name="daxSerpCtaText">Uw DuckDuckGo-zoekopdrachten zijn anoniem en ik sla uw zoekgeschiedenis nooit op. Nooit. &#128588;</string>
-    <string name="daxDefaultBrowserCtaText">Voordat ik onderduik! &lt;br/&gt;&lt;br/&gt;Wilt u trackerbeveiliging wanneer u koppelingen vanuit andere apps opent? &lt;br/&gt;&lt;br/&gt;Maak DuckDuckGo Uw Standaardbrowser!</string>
-    <string name="daxSearchWidgetCtaText">U bent goed bezig! &lt;br/&gt;&lt;br/&gt;Zoek privé nog sneller! Voeg de DuckDuckGo-zoekwidget toe aan uw startscherm.</string>
     <string name="daxNonSerpCtaText">Elke site heeft een privacy-cijfer. Tik erop om te zien hoe ik uw privacy heb beschermd.&lt;br/&gt;&lt;br/&gt;Zullen we eens gek doen? Probeer uw gegevens te wissen door op de vuurknop te drukken.</string>
     <string name="daxMainNetworkStep1CtaText">Let op!&lt;br/&gt;&lt;br/&gt; %s beheert een groot trackingnetwerk.&lt;br/&gt;&lt;br/&gt;Een laag privacycijfer zal u waarschuwen voor dergelijke sites.</string>
     <string name="daxMainNetworkStep1OwnedCtaText">Let op!&lt;br/&gt;&lt;br/&gt; %s is eigendom van %s, dat een groot trackingnetwerk beheert.</string>

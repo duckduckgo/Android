@@ -7,8 +7,6 @@
 
     <!-- Onboarding Activity -->
     <string name="onboardingDefaultBrowserDescription">Vsakič obiščite Nastavitve za iskanje in brskanje z DuckDuckGo.</string>
-    <string name="onboardingContinue">Nadaljujte</string>
-    <string name="onboardingContinueFinalPage">Začnite brskati</string>
     <string name="onboardingDefaultBrowserTitle">Nastavi aplikacijo DuckDuckGo kot privzeto</string>
 
     <!-- Default Browser -->
@@ -380,11 +378,6 @@
     <!-- Dax Dialog -->
     <string name="daxDialogHideButton">Skrij</string>
     <string name="daxDialogPhew">Fuj!</string>
-    <string name="daxDialogYes">V REDU!</string>
-    <string name="daxDialogAddWidget">Dodaj gradnik</string>
-    <string name="daxDialogMaybeLater">Mogoče kasneje</string>
-    <string name="daxDialogSettings">Pojdite na nastavitve</string>
-    <string name="daxDialogNext">Naslednji</string>
     <string name="daxDialogHighFive">Petka!</string>
     <string name="daxDialogGotIt">Razumem</string>
     <string name="hideTipsTitle">Skrij preostale nasvete?</string>
@@ -398,8 +391,6 @@
     <string name="daxIntroCtaText">Nato obiščite eno od svojih najljubših spletišč! &lt;br/&gt;&lt;br/&gt;Blokiral bom sledilce, da vas ne bi vohunili. Prav tako bom nadgradil varnost vaše povezave. &#128274;</string>
     <string name="daxEndCtaText">&lt;br/&gt;&lt;br/&gt;Ne pozabite: vsakič, ko brskate z mano, grozljiv oglas izgubi krila. &#128077;</string>
     <string name="daxSerpCtaText">Vaša iskanja v DuckDuckGo so anonimna in nikoli ne shranim vaše zgodovine iskanja. Vedno. &#128588;</string>
-    <string name="daxDefaultBrowserCtaText">&lt;br/&gt;&lt;br/&gt;Želite zaščito sledilca, ko odpirate povezave iz drugih aplikacij? &lt;br/&gt;&lt;br/&gt;Naredite DuckDuckGo svoj privzeti brskalnik!</string>
-    <string name="daxSearchWidgetCtaText">&lt;br/&gt;&lt;br/&gt;Iščite na zaseben način še hitreje! Dodajte pripomoček za iskanje DuckDuckGo na domači zaslon.</string>
     <string name="daxNonSerpCtaText">Vsako spletno mesto ima oceno zasebnosti. Tapnite nanj da vidite kako barni vašo zasebnost.&lt;br/&gt;&lt;br/&gt;Se želite navdušiti? Poskusite izbrisati svoje podatke s pritiskom na gumb za požar.</string>
     <string name="daxMainNetworkStep1CtaText">Glavo pokonci!&lt;br/&gt;&lt;br/&gt; %s vodi glavno mrežo za sledenje.&lt;br/&gt;&lt;br/&gt;Nizka ocena zasebnosti vas bo usmerila na taka spletna mesta.</string>
     <string name="daxMainNetworkStep1OwnedCtaText">Glavo pokonci!&lt;br/&gt;&lt;br/&gt; %s je last podjetja %s, ki vodi glavno sledilno mrežo.</string>

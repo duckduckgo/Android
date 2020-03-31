@@ -7,8 +7,6 @@
 
     <!-- Onboarding Activity -->
     <string name="onboardingDefaultBrowserDescription">Επισκεφθείτε τις Ρυθμίσεις για να εκτελείτε κάθε φορά αναζήτηση και περιήγηση με το DuckDuckGo.</string>
-    <string name="onboardingContinue">Συνέχεια</string>
-    <string name="onboardingContinueFinalPage">Έναρξη περιήγησης</string>
     <string name="onboardingDefaultBrowserTitle">Κάντε το DuckDuckGo το δικό σας προεπιλεγμένο πρόγραμμα περιήγησης</string>
 
     <!-- Default Browser -->
@@ -372,10 +370,6 @@
     <!-- Dax Dialog -->
     <string name="daxDialogHideButton">ΑΠΟΚΡΥΨΗ</string>
     <string name="daxDialogPhew">Φιου!</string>
-    <string name="daxDialogYes">ΕΝΤΑΞΕΙ!</string>
-    <string name="daxDialogAddWidget">Προσθήκη εικονιδίου</string>
-    <string name="daxDialogMaybeLater">Ίσως αργότερα</string>
-    <string name="daxDialogSettings">Μετάβαση στις ρυθμίσεις</string>
     <string name="daxDialogNext">Επόμενο</string>
     <string name="daxDialogHighFive">Κόλλα πέντε!</string>
     <string name="daxDialogGotIt">Το έπιασα</string>
@@ -390,8 +384,6 @@
     <string name="daxIntroCtaText">Στη συνέχεια, δοκιμάστε να επισκεφτείτε έναν από τους αγαπημένους σας ιστότοπους! &lt;br/&gt;&lt;br/&gt;Θα εμποδίσω τους ιχνηλάτες ώστε να μην μπορούν να σας κατασκοπεύουν. Επίσης, θα αναβαθμίσω την ασφάλεια της σύνδεσής σας αν είναι δυνατόν. &#128274;</string>
     <string name="daxEndCtaText">Έχετε αυτό! &lt;br/&gt;&lt;br/&gt;Να θυμάστε: κάθε φορά που περιηγείστε μαζί μου μια ανατριχιαστική διαφήμιση χάνει τα φτερά της. &#128077;</string>
     <string name="daxSerpCtaText">Οι αναζητήσεις σας στο DuckDuckGo είναι ανώνυμες και ποτέ δεν αποθηκεύω το ιστορικό αναζήτησης. Ποτέ. &#128588;</string>
-    <string name="daxDefaultBrowserCtaText">Πριν ξεγλυστρίσω!&lt;br/&gt;&lt;br/&gt;Θέλετε προστασία από τον εντοπισμό και την ιχνηλασία όταν ανοίγετε συνδέσμους από άλλες εφαρμογές; &lt;br/&gt;&lt;br/&gt;Κάνετε το DuckDuckGo τον προεπιλεγμένο σας φυλλομετρητή!</string>
-    <string name="daxSearchWidgetCtaText">Έχετε πάρει φόρα! &lt;br/&gt;&lt;br/&gt;Αναζήτηση ιδιωτικά ακόμα πιο γρήγορα! Προσθέστε το εικονίδιο αναζήτησης DuckDuckGo στην αρχική σας οθόνη.</string>
     <string name="daxNonSerpCtaText">Κάθε τοποθεσία έχει κάποιο βαθμό προστασίας προσωπικών δεδομένων και απορρήτου. Πατήστε πάνω του για να δείτε πώς προστάτευσα το απόρρητό σας. &lt;br/&gt;&lt;br/&gt; Δοκιμάστε να καθαρίσετε τα δεδομένα σας πατώντας το κουμπί φωτιάς.</string>
     <string name="daxMainNetworkStep1CtaText">Ενημέρωση εκ των προτέρων!&lt;br/&gt;&lt;br/&gt; %s τρέχει ένα σημαντικό δίκτυο παρακολούθησης.&lt;br/&gt;&lt;br/&gt;Ένας χαμηλός βαθμός απορρήτου θα σας μαρτυρήσει σε τοποθεσίες σαν και αυτή.</string>
     <string name="daxMainNetworkStep1OwnedCtaText">Ενημέρωση εκ των προτέρων!&lt;br/&gt;&lt;br/&gt; %s ανήκει στην %s, η οποία διαχειρίζεται ένα σημαντικό δίκτυο παρακολούθησης.</string>

@@ -23,8 +23,6 @@
 
     <!-- Onboarding Activity -->
     <string name="onboardingDefaultBrowserDescription">Gå till "Inställningar" för att söka och bläddra med DuckDuckGo varje gång.</string>
-    <string name="onboardingContinue">Fortsätt</string>
-    <string name="onboardingContinueFinalPage">Starta bläddring</string>
     <string name="onboardingDefaultBrowserTitle">Ställ in DuckDuckGo som standard</string>
 
     <!-- Default Browser -->
@@ -388,10 +386,6 @@
     <!-- Dax Dialog -->
     <string name="daxDialogHideButton">DÖLJ</string>
     <string name="daxDialogPhew">Puh!</string>
-    <string name="daxDialogYes">OK!</string>
-    <string name="daxDialogAddWidget">Lägg till widget</string>
-    <string name="daxDialogMaybeLater">Kanske senare</string>
-    <string name="daxDialogSettings">Gå till inställningar</string>
     <string name="daxDialogNext">Nästa</string>
     <string name="daxDialogHighFive">High Five!</string>
     <string name="daxDialogGotIt">Jag fattar</string>
@@ -406,8 +400,6 @@
     <string name="daxIntroCtaText">Prova sedan att besöka en av dina favoritwebbplatser! &lt;br/&gt;&lt;br/&gt;Jag blockerar trackers så att de inte kan spionera på dig. Jag ska också uppgradera säkerheten för din uppkoppling om det är möjligt. &#128274;</string>
     <string name="daxEndCtaText">Du klarar det här! &lt;br/&gt;&lt;br/&gt;Kom ihåg: varje gång du surfar med mig förlorar en läskig annons sina vingar. &#128077;</string>
     <string name="daxSerpCtaText">Dina DuckDuckGo-sökningar är anonyma och jag lagrar aldrig din sökhistorik. Någonsin. &#128588;</string>
-    <string name="daxDefaultBrowserCtaText">Innan jag går!&lt;br/&gt;&lt;br/&gt;Vill du ha tracker-skydd när du öppnar länkar från andra appar?&lt;br/&gt;&lt;br/&gt;Gör DuckDuckGo till din standardwebbläsare!</string>
-    <string name="daxSearchWidgetCtaText">Du är på väg!&lt;br/&gt;&lt;br/&gt;Sök privat ännu snabbare! Lägg till DuckDuckGo-sökwidgeten på din startsida.</string>
     <string name="daxNonSerpCtaText">Varje webbplats har ett sekretessbetyg. Klicka på den för att se hur jag skyddade din integritet.&lt;br/&gt;&lt;br/&gt;Vill du ha det ännu bättre? Försök att rensa dina data genom att använda brandknappen.</string>
     <string name="daxMainNetworkStep1CtaText">Se upp!&lt;br/&gt;&lt;br/&gt; %s driver ett stort tracking-nätverk.&lt;br/&gt;&lt;br/&gt;Ett lågt sekretessbetyg tipsar dig om webbplatser som denna.</string>
     <string name="daxMainNetworkStep1OwnedCtaText">Se upp!&lt;br/&gt;&lt;br/&gt; %s ägs av %s, som driver ett större tracking-nätverk.</string>

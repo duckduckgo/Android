@@ -7,8 +7,6 @@
 
     <!-- Onboarding Activity -->
     <string name="onboardingDefaultBrowserDescription">Zmień ustawienia, aby zawsze wyszukiwać i przeglądać strony za pośrednictwem DuckDuckGo.</string>
-    <string name="onboardingContinue">Dalej</string>
-    <string name="onboardingContinueFinalPage">Zacznij przeglądać sieć</string>
     <string name="onboardingDefaultBrowserTitle">Ustaw DuckDuckGo jako domyślny</string>
 
     <!-- Default Browser -->
@@ -380,10 +378,6 @@
     <!-- Dax Dialog -->
     <string name="daxDialogHideButton">UKRYĆ</string>
     <string name="daxDialogPhew">Uff!</string>
-    <string name="daxDialogYes">OK!</string>
-    <string name="daxDialogAddWidget">Dodaj widżet</string>
-    <string name="daxDialogMaybeLater">Może później</string>
-    <string name="daxDialogSettings">Przejdź do ustawień</string>
     <string name="daxDialogNext">Kolejny</string>
     <string name="daxDialogHighFive">Piątka!</string>
     <string name="daxDialogGotIt">Rozumiem</string>
@@ -398,8 +392,6 @@
     <string name="daxIntroCtaText">Spróbuj teraz odwiedzić jedną z twoich ulubionych stron! &lt;br/&gt;&lt;br/&gt;Zablokuję cię, aby nie mogły cię szpiegować. Jeśli to możliwe, poprawię również bezpieczeństwo twojego połączenia. &#128274;</string>
     <string name="daxEndCtaText">Masz to! &lt;br/&gt;&lt;br/&gt;Pamiętaj: za każdym razem, gdy przeglądasz ze mną Internet, jakaś wścibska reklama przestaje działać. &#128077;</string>
     <string name="daxSerpCtaText">Twoje wyszukiwania w DuckDuckGo są anonimowe, a ja nigdy nie przechowuję Twojej historii wyszukiwania. Przenigdy. &#128588;</string>
-    <string name="daxDefaultBrowserCtaText">Zanim wyskoczę! &lt;br/&gt;&lt;br/&gt;Chcesz ochrony trackera, gdy otwierasz linki z innych aplikacji? &lt;br/&gt;&lt;br/&gt;Ustaw DuckDuckGo jako domyślną przeglądarkę!</string>
-    <string name="daxSearchWidgetCtaText">Jesteś na fali! &lt;br/&gt;&lt;br/&gt;Szukaj prywatnie jeszcze szybciej! Dodaj widżet wyszukiwania DuckDuckGo do ekranu głównego.</string>
     <string name="daxNonSerpCtaText">Każda strona ma stopień prywatności. Stuknij, aby zobaczyć, jak chroniłem twoją prywatność.&lt;br/&gt;&lt;br/&gt;Chcesz się zachwycić? Spróbuj wyczyścić swoje dane, naciskając przycisk strzału.</string>
     <string name="daxMainNetworkStep1CtaText">Uwaga!&lt;br/&gt;&lt;br/&gt; %s prowadzi dużą sieć śledzenia.&lt;br/&gt;&lt;br/&gt;Niska ocena prywatności ostrzega przed stronami takimi jak ta.</string>
     <string name="daxMainNetworkStep1OwnedCtaText">Uwaga!&lt;br/&gt;&lt;br/&gt; %s jest własnością %s, która prowadzi dużą sieć śledzenia.</string>

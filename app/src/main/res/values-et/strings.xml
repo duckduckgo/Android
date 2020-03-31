@@ -23,8 +23,6 @@
 
     <!-- Onboarding Activity -->
     <string name="onboardingDefaultBrowserDescription">Avage sätted, et DuckDuckGo abil iga kord otsida ja sirvida.</string>
-    <string name="onboardingContinue">Jätkake</string>
-    <string name="onboardingContinueFinalPage">Alustage sirvimist</string>
     <string name="onboardingDefaultBrowserTitle">Muutke DuckDuckGo teie vaikimisi</string>
 
     <!-- Default Browser -->
@@ -392,10 +390,6 @@
     <!-- Dax Dialog -->
     <string name="daxDialogHideButton">PEIDA</string>
     <string name="daxDialogPhew">Huh!</string>
-    <string name="daxDialogYes">OK!</string>
-    <string name="daxDialogAddWidget">Lisage vidin</string>
-    <string name="daxDialogMaybeLater">Võib-olla hiljem</string>
-    <string name="daxDialogSettings">Avage sätted</string>
     <string name="daxDialogNext">Järgmine</string>
     <string name="daxDialogHighFive">Viska viis!</string>
     <string name="daxDialogGotIt">Sain aru</string>
@@ -411,8 +405,6 @@
     <string name="daxIntroCtaText">Järgmisena proovige külastada ühte oma lemmiksaitidest! &lt;br/&gt;&lt;br/&gt;Mina aga blokeerin jälgijaid, et nad ei saaks teid luurata. Täiustan võimalusel ka teie ühenduse turvalisust. &#128274;</string>
     <string name="daxEndCtaText">Käpas! &lt;br/&gt;&lt;br/&gt;Pidage meeles: iga kord, kui minuga sirvite, kaotab jube reklaam tiivad. &#128077;</string>
     <string name="daxSerpCtaText">Teie DuckDuckGo otsingud on anonüümsed ja ma ei salvesta kunagi teie otsinguajalugu. Mitte kunagi. &#128588;</string>
-    <string name="daxDefaultBrowserCtaText">Enne kui lähen! &lt;br/&gt;&lt;br/&gt;Kas soovite jälgijate kaitset muude rakenduste linkide avamisel? &lt;br/&gt;&lt;br/&gt;Tehke DuckDuckGo enda vaikebrauseriks!</string>
-    <string name="daxSearchWidgetCtaText">Olete kursis!&lt;br/&gt;&lt;br/&gt;Otsige privaatselt veel kiiremini! Lisage avaekraanile DuckDuckGo otsinguvidin.</string>
     <string name="daxNonSerpCtaText">Igal saidil on privaatsusklass. Puudutage seda, et näha, kuidas ma teie privaatsust kaitsesin.&lt;br/&gt;&lt;br/&gt;Tahate aga proovida midagi eriti peent? Proovige kustutada oma andmed, puudutades tule nuppu.</string>
     <string name="daxMainNetworkStep1CtaText">Ettevaatust!&lt;br/&gt;&lt;br/&gt; %s haldab suurt jälgimisvõrku.&lt;br/&gt;&lt;br/&gt;Sellistest saitidest annab märku madal privaatsusklass.</string>
     <string name="daxMainNetworkStep1OwnedCtaText">Ettevaatust!&lt;br/&gt;&lt;br/&gt; %s kuulub ettevõttele %s, mis haldab suurt jälgimisvõrku.</string>

@@ -7,8 +7,6 @@
 
     <!-- Onboarding Activity -->
     <string name="onboardingDefaultBrowserDescription">Accédez systématiquement aux paramètres pour faire des recherches et naviguer avec DuckDuckGo.</string>
-    <string name="onboardingContinue">Continuer</string>
-    <string name="onboardingContinueFinalPage">Commencer la navigation</string>
     <string name="onboardingDefaultBrowserTitle">Faites de DuckDuckGo votre appli par défaut</string>
 
     <!-- Default Browser -->
@@ -372,10 +370,6 @@
     <!-- Dax Dialog -->
     <string name="daxDialogHideButton">MASQUER</string>
     <string name="daxDialogPhew">Ouf !</string>
-    <string name="daxDialogYes">OK !</string>
-    <string name="daxDialogAddWidget">Ajouter un widget</string>
-    <string name="daxDialogMaybeLater">Peut-être plus tard</string>
-    <string name="daxDialogSettings">Aller aux paramètres</string>
     <string name="daxDialogNext">Suivant</string>
     <string name="daxDialogHighFive">Bien joué !</string>
     <string name="daxDialogGotIt">J\'ai compris</string>
@@ -390,8 +384,6 @@
     <string name="daxIntroCtaText">Maintenant, essayez de visiter un de vos sites préférés !&lt;br/&gt;&lt;br/&gt;Je bloquerai les traqueurs afin qu\'ils ne puissent pas vous espionner. J\'améliorerai également la sécurité de votre connexion dans la mesure du possible. &#128274;</string>
     <string name="daxEndCtaText">Bien joué !&lt;br/&gt;&lt;br/&gt;Rappelez vous : chaque fois que vous naviguez avec moi, des publicités intrusives disparaissent. &#128077;</string>
     <string name="daxSerpCtaText">Vos recherches effectuées sur DuckDuckGo sont confidentielles et je ne conserve jamais votre historique de recherche. Jamais. &#128588;</string>
-    <string name="daxDefaultBrowserCtaText">Avant de partir !&lt;br/&gt;&lt;br/&gt;Vous voulez une protection contre les traqueurs lorsque vous ouvrez des liens à partir d\'autres applications ?&lt;br/&gt;&lt;br/&gt;Faites de DuckDuckGo votre navigateur par défaut !</string>
-    <string name="daxSearchWidgetCtaText">Vous êtes sur la bonne voie !&lt;br/&gt;&lt;br/&gt;Effectuez des recherches privées encore plus rapidement ! Ajoutez le widget de recherche DuckDuckGo à votre écran d\'accueil.</string>
     <string name="daxNonSerpCtaText">Chaque site a un niveau de confidentialité. Touchez pour voir comment j\'ai protégé votre vie privée.&lt;br/&gt;&lt;br/&gt;Vous voulez aller plus loin ? Essayez d\'effacer vos données en appuyant sur le bouton avec la flamme.</string>
     <string name="daxMainNetworkStep1CtaText">Attention !&lt;br/&gt;&lt;br/&gt; %s gère un important réseau de traqueurs.&lt;br/&gt;&lt;br/&gt;Une mauvaise note de confidentialité vous avertira lorsque vous visitez des sites à risques.</string>
     <string name="daxMainNetworkStep1OwnedCtaText">Attention !&lt;br/&gt;&lt;br/&gt; %s appartient à %s, qui gère un important réseau de traqueurs.</string>

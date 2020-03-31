@@ -7,8 +7,6 @@
 
     <!-- Onboarding Activity -->
     <string name="onboardingDefaultBrowserDescription">Åpne innstillinger for å søke og bruke nettleseren med DuckDuckGo hver gang.</string>
-    <string name="onboardingContinue">Fortsett</string>
-    <string name="onboardingContinueFinalPage">Begynn å surfe</string>
     <string name="onboardingDefaultBrowserTitle">Gjør DuckDuckGo til din standard</string>
 
     <!-- Default Browser -->
@@ -372,10 +370,6 @@
     <!-- Dax Dialog -->
     <string name="daxDialogHideButton">SKJUL</string>
     <string name="daxDialogPhew">Puh!</string>
-    <string name="daxDialogYes">OK!</string>
-    <string name="daxDialogAddWidget">Legg til widget</string>
-    <string name="daxDialogMaybeLater">Kanskje senere</string>
-    <string name="daxDialogSettings">Gå til innstillinger</string>
     <string name="daxDialogNext">Neste</string>
     <string name="daxDialogHighFive">High Five!</string>
     <string name="daxDialogGotIt">Den er grei</string>
@@ -390,8 +384,6 @@
     <string name="daxIntroCtaText">Deretter kan du besøke et av favorittnettstedene dine! &lt;br/&gt;&lt;br/&gt;Jeg blokkerer sporere slik at de ikke kan spionere på deg. Jeg vil også oppgradere sikkerheten til tilkoblingen din hvis mulig. &#128274;</string>
     <string name="daxEndCtaText">Dette har du skjønt! &lt;br/&gt;&lt;br/&gt;Husk: hver gang du surfer med meg, mister en skummel annonse vingene. &#128077;</string>
     <string name="daxSerpCtaText">DuckDuckGo-søkene dine er anonyme, jeg lagrer aldri søkehistorikken din. Noensinne. &#128588;</string>
-    <string name="daxDefaultBrowserCtaText">Før jeg dukker ut! &lt;br/&gt;&lt;br/&gt;Vil du ha sporingsbeskyttelse når du åpner koblinger fra andre apper? &lt;br/&gt;&lt;br/&gt;Gjør DuckDuckGo til din standard nettleser!</string>
-    <string name="daxSearchWidgetCtaText">Du er i gang! &lt;br/&gt;&lt;br/&gt;Søk privat enda raskere! Legg til DuckDuckGo søkewidget til startskjermen din.</string>
     <string name="daxNonSerpCtaText">Hvert nettsted har en personvernsgrad. Trykk på den for å se hvordan jeg beskyttet personvernet ditt.&lt;br/&gt;&lt;br/&gt;Vil du se noe fancy? Prøv å tømme dataene dine ved å trykke på brann-knappen.</string>
     <string name="daxMainNetworkStep1CtaText">Følg med!&lt;br/&gt;&lt;br/&gt; %s driver et stort sporingsnettverk.&lt;br/&gt;&lt;br/&gt;En lav personvernsgrad vil tipse deg om slike nettsteder.</string>
     <string name="daxMainNetworkStep1OwnedCtaText">Følg med!&lt;br/&gt;&lt;br/&gt; %s eies av %s, som driver et stort sporingsnettverk.</string>

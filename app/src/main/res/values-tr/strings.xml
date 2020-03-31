@@ -23,8 +23,6 @@
 
     <!-- Onboarding Activity -->
     <string name="onboardingDefaultBrowserDescription">Her seferinde DuckDuckGo ile arama yapmak ve göz atmak için Ayarlar\'ı ziyaret edin.</string>
-    <string name="onboardingContinue">Devam et</string>
-    <string name="onboardingContinueFinalPage">Gezinmeye Başla</string>
     <string name="onboardingDefaultBrowserTitle">DuckDuckGo\'yu Varsayılan Yap</string>
 
     <!-- Default Browser -->
@@ -395,10 +393,6 @@
     <!-- Dax Dialog -->
     <string name="daxDialogHideButton">GİZLE</string>
     <string name="daxDialogPhew">Uf!</string>
-    <string name="daxDialogYes">TAMAM!</string>
-    <string name="daxDialogAddWidget">Widget Ekle</string>
-    <string name="daxDialogMaybeLater">Belki sonra</string>
-    <string name="daxDialogSettings">Ayarlara git</string>
     <string name="daxDialogNext">Sonraki</string>
     <string name="daxDialogHighFive">Çak bir beşlik!</string>
     <string name="daxDialogGotIt">Anladım</string>
@@ -413,8 +407,6 @@
     <string name="daxIntroCtaText">Şimdi favori sitelerinizden birini ziyaret etmeyi deneyin! &lt;br/&gt;&lt;br/&gt;İzleyicileri engelleyeceğim, böylece sizi gözetlemeyecekler. Mümkünse bağlantınızın güvenliğini de yükselteceğim. &#128274;</string>
     <string name="daxEndCtaText">İşte böyle!&lt;br/&gt;&lt;br/&gt;Unutmayın: benimle İnterneti her gezişinizde tüyler ürpertici bir reklam daha kaybolur . &#128077;</string>
     <string name="daxSerpCtaText">DuckDuckGo aramalarınız anonimdir ve arama geçmişiniz asla saklanmaz. Asla. &#128588;</string>
-    <string name="daxDefaultBrowserCtaText">Evet, gitmeden son bir şey daha! &lt;br/&gt;&lt;br/&gt;Diğer uygulamalardan bağlantıları açtığınızda izleyici koruması ister misiniz? &lt;br/&gt;&lt;br/&gt;DuckDuckGo\'yu Varsayılan Tarayıcınız yapın!</string>
-    <string name="daxSearchWidgetCtaText">Harikasınız! &lt;br/&gt;&lt;br/&gt;Gizli olarak daha hızlı arama yapın! DuckDuckGo arama widget\'ını giriş ekranınıza ekleyin.</string>
     <string name="daxNonSerpCtaText">Her sitenin bir gizlilik derecesi vardır. Gizliliğinizi nasıl koruduğumu görmek için dokunun.&lt;br/&gt;&lt;br/&gt;Biraz daha çılgınlaşmaya ne dersiniz? Yangın düğmesine basarak verilerinizi silmeyi deneyin.</string>
     <string name="daxMainNetworkStep1CtaText">Dikkat!&lt;br/&gt;&lt;br/&gt; %s büyük bir izleme ağı işletiyor.&lt;br/&gt;&lt;br/&gt;Düşük gizlilik derecesi sizi bu gibi sitelere yönlendirecektir.</string>
     <string name="daxMainNetworkStep1OwnedCtaText">Dikkat!&lt;br/&gt;&lt;br/&gt; %s, büyük bir izleme ağı işleten %s şirketine aittir.</string>

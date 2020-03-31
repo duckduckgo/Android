@@ -7,8 +7,6 @@
 
     <!-- Onboarding Activity -->
     <string name="onboardingDefaultBrowserDescription">Accesați „Setări” pentru a căuta și naviga cu DuckDuckGo de fiecare dată.</string>
-    <string name="onboardingContinue">Continuare</string>
-    <string name="onboardingContinueFinalPage">Începere navigare</string>
     <string name="onboardingDefaultBrowserTitle">Fă DuckDuckGo Aplicația Ta Implicită</string>
 
     <!-- Default Browser -->
@@ -376,10 +374,6 @@
     <!-- Dax Dialog -->
     <string name="daxDialogHideButton">ASCUNDE</string>
     <string name="daxDialogPhew">Pfiu!</string>
-    <string name="daxDialogYes">OK!</string>
-    <string name="daxDialogAddWidget">Adaugă Widget</string>
-    <string name="daxDialogMaybeLater">Poate Mai Târziu</string>
-    <string name="daxDialogSettings">Mergi la setări</string>
     <string name="daxDialogNext">Următorul</string>
     <string name="daxDialogHighFive">Bate Palma!</string>
     <string name="daxDialogGotIt">Am înțeles</string>
@@ -394,8 +388,6 @@
     <string name="daxIntroCtaText">Apoi, încearcă să vizitezi unul din site-urile tale preferate! &lt;br/&gt;&lt;br/&gt;Voi bloca urmăritorii ca să nu te mai spioneze. Voi îmbunătăți, de asemenea, securitatea conexiunii tale, dacă este posibil. &#128274;</string>
     <string name="daxEndCtaText">Ai ghicit! &lt;br/&gt;&lt;br/&gt;Reține: de fiecare dată când navighezi cu mine, o reclamă terifiantă își pierde aripile. &#128077;</string>
     <string name="daxSerpCtaText">Căutările tale DuckDuckGo sunt anonime și nu îți voi stoca niciodată istoricul căutării. Niciodată. &#128588;</string>
-    <string name="daxDefaultBrowserCtaText">Înainte să dezertez! &lt;br/&gt;&lt;br/&gt;Vrei protecție împotriva urmăritorilor când deschizi link-uri din alte aplicații? &lt;br/&gt;&lt;br/&gt;Fă DuckDuckGo Browserul Tău Implicit!</string>
-    <string name="daxSearchWidgetCtaText">Ești pe val! &lt;br/&gt;&lt;br/&gt;Caută în mod confidențial chiar mai repede! Adaugă widgetul de căutare DuckDuckGo pe ecranul de pornire.</string>
     <string name="daxNonSerpCtaText">Fiecare site are un grad de confidențialitate. Atingeți-l ca să vezi cum ți-am protejat confidențialitatea.&lt;br/&gt;&lt;br/&gt;Vrei să te dai mare? Încearcă să-ți ștergi datele, apăsând butonul de tragere.</string>
     <string name="daxMainNetworkStep1CtaText">Atenție!&lt;br/&gt;&lt;br/&gt; %s rulează o rețea de urmărire majoră.&lt;br/&gt;&lt;br/&gt;Un grad de confidențialitate scăzut te va avertiza despre site-uri de acest fel.</string>
     <string name="daxMainNetworkStep1OwnedCtaText">Atenție!&lt;br/&gt;&lt;br/&gt; %s este deținută de %s, care administrează o rețea de urmărire semnificativă.</string>

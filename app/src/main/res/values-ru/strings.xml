@@ -23,8 +23,6 @@
 
     <!-- Onboarding Activity -->
     <string name="onboardingDefaultBrowserDescription">Чтобы сделать DuckDuckGo поисковой системой по умолчанию, перейдите в «Настройки».</string>
-    <string name="onboardingContinue">Продолжить</string>
-    <string name="onboardingContinueFinalPage">Запустить браузер</string>
     <string name="onboardingDefaultBrowserTitle">Сделайте DuckDuckGo вашим поисковиком по умолчанию</string>
 
     <!-- Default Browser -->
@@ -395,10 +393,6 @@
     <!-- Dax Dialog -->
     <string name="daxDialogHideButton">СКРЫТЬ</string>
     <string name="daxDialogPhew">Уф!</string>
-    <string name="daxDialogYes">OK!</string>
-    <string name="daxDialogAddWidget">Добавить виджет</string>
-    <string name="daxDialogMaybeLater">Может быть позже</string>
-    <string name="daxDialogSettings">Перейти в настройки</string>
     <string name="daxDialogNext">Далее</string>
     <string name="daxDialogHighFive">Дай пять!</string>
     <string name="daxDialogGotIt">Понятно</string>
@@ -413,8 +407,6 @@
     <string name="daxIntroCtaText">Теперь попробуйте зайти на один из ваших любимых сайтов! &lt;br/&gt;&lt;br/&gt;Я заблокирую трекеры, чтобы они не могли шпионить за вами. Кроме того, если возможно, я сделаю соединение безопасным. &#128274;</string>
     <string name="daxEndCtaText">У вас получилось!&lt;br/&gt;&lt;br/&gt;Помните: когда вы заходите в сеть вместе со мной, вредная реклама не может вам досаждать. &#128077;</string>
     <string name="daxSerpCtaText">Все, что вы ищете в DuckDuckGo остается анонимным — я никогда не сохраняю вашу историю поиска. Никогда. &#128588;</string>
-    <string name="daxDefaultBrowserCtaText">И еще!&lt;br/&gt;&lt;br/&gt;Хотите быть защищены от отслеживания при открытии ссылок из других приложений?&lt;br/&gt;&lt;br/&gt;Сделайте DuckDuckGo браузером по умолчанию!</string>
-    <string name="daxSearchWidgetCtaText">Все отлично!&lt;br/&gt;&lt;br/&gt;Вы можете искать быстро и безопасности! Добавьте виджет поиска DuckDuckGo на домашний экран.</string>
     <string name="daxNonSerpCtaText">Каждый сайт имеет уровень конфиденциальности. Нажмите, чтобы узнать, как я защитил вашу конфиденциальность.&lt;br/&gt;&lt;br/&gt;Хотите стать еще круче? Попробуйте очистить данные, нажав кнопку c пламенем.</string>
     <string name="daxMainNetworkStep1CtaText">Внимание!&lt;br/&gt;&lt;br/&gt; %s входит в крупную сеть отслеживания.&lt;br/&gt;&lt;br/&gt;Низкий уровень конфиденциальности позволит вам получать информацию о подобных сайтах.</string>
     <string name="daxMainNetworkStep1OwnedCtaText">Внимание!&lt;br/&gt;&lt;br/&gt; %s принадлежит %s, который управляет крупной сетью отслеживания.</string>

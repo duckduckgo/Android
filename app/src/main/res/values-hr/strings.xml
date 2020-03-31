@@ -7,8 +7,6 @@
 
     <!-- Onboarding Activity -->
     <string name="onboardingDefaultBrowserDescription">Posjetite Postavke kako biste svaki put pretraživali i pregledavali uz DuckDuckGo.</string>
-    <string name="onboardingContinue">Nastavi</string>
-    <string name="onboardingContinueFinalPage">Započni pregledavanje</string>
     <string name="onboardingDefaultBrowserTitle">Učinite DuckDuckGo vašom zadanom tražilicom</string>
 
     <!-- Default Browser -->
@@ -372,10 +370,6 @@
     <!-- Dax Dialog -->
     <string name="daxDialogHideButton">SAKRIJ</string>
     <string name="daxDialogPhew">Uf!</string>
-    <string name="daxDialogYes">U REDU!</string>
-    <string name="daxDialogAddWidget">Dodaj widget</string>
-    <string name="daxDialogMaybeLater">Možda kasnije</string>
-    <string name="daxDialogSettings">Idite na postavke</string>
     <string name="daxDialogNext">Dalje</string>
     <string name="daxDialogHighFive">Visoko pet!</string>
     <string name="daxDialogGotIt">Shvatio/la sam</string>
@@ -390,8 +384,6 @@
     <string name="daxIntroCtaText">Zatim pokušajte posjetiti jedno od svojih omiljenih web-mjesta! &lt;br/&gt;&lt;br/&gt;Blokirat ću tragače kako vas ne bi mogli špijunirati. Nadogradit ću i sigurnost vaše veze ako je moguće. &#128274;</string>
     <string name="daxEndCtaText">&lt;br/&gt;&lt;br/&gt;Shvatili ste ovo! Zapamtite: svaki put kada pregledavate sa mnom jeziva reklama gubi krila. &#128077;</string>
     <string name="daxSerpCtaText">Vaše pretrage u DuckDuckGo anonimne su i nikad ne pohranjujem vašu povijest pretraga. Nikad. &#128588;</string>
-    <string name="daxDefaultBrowserCtaText">Prije nego što se ugasim! &lt;br/&gt;&lt;br/&gt;Želite li zaštitu od tragača kada otvarate veze sa drugih aplikacija? &lt;br/&gt;&lt;br/&gt;Učinite DuckDuckGo svojim zadanim preglednikom!</string>
-    <string name="daxSearchWidgetCtaText">&lt;br/&gt;&lt;br/&gt;Dobro vam ide! Pretražujte privatno još brže! Dodajte widget za pretragu DuckDuckGo na početni zaslon.</string>
     <string name="daxNonSerpCtaText">Svako web-mjesto ima ocjenu privatnosti. Dodirnite je da biste vidjeli kako sam zaštitio vašu privatnost.&lt;br/&gt;&lt;br/&gt;Želite li uživati? Pokušajte izbrisati svoje podatke pritiskom na gumb \"Pali\".</string>
     <string name="daxMainNetworkStep1CtaText">Obratite pozornost!&lt;br/&gt;&lt;br/&gt; %s pokreće veliku mrežu praćenja.&lt;br/&gt;&lt;br/&gt;Niska ocjena privatnosti upozorit će vas na ovakva mjesta.</string>
     <string name="daxMainNetworkStep1OwnedCtaText">Obratite pozornost!&lt;br/&gt;&lt;br/&gt; %s je u vlasništvu kompanije %s, koja vodi glavnu mrežu za praćenje.</string>

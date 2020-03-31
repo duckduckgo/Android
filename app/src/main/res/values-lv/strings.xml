@@ -23,8 +23,6 @@
 
     <!-- Onboarding Activity -->
     <string name="onboardingDefaultBrowserDescription">Dodieties uz Iestatījumiem, lai meklētu un pārlūkotu ar DuckDuckGo katru reizi.</string>
-    <string name="onboardingContinue">Turpināt</string>
-    <string name="onboardingContinueFinalPage">Sākt pārlūkošanu</string>
     <string name="onboardingDefaultBrowserTitle">Izvēlieties DuckDuckGo par jūsu Noklusējumu</string>
 
     <!-- Default Browser -->
@@ -396,10 +394,6 @@
     <!-- Dax Dialog -->
     <string name="daxDialogHideButton">PASLĒPT</string>
     <string name="daxDialogPhew">Phū!</string>
-    <string name="daxDialogYes">LABI!</string>
-    <string name="daxDialogAddWidget">Pievienot logrīku</string>
-    <string name="daxDialogMaybeLater">Varbūt vēlāk</string>
-    <string name="daxDialogSettings">Atvērt iestatījumus</string>
     <string name="daxDialogNext">Nākamais</string>
     <string name="daxDialogHighFive">Dod pieci!</string>
     <string name="daxDialogGotIt">Sapratu</string>
@@ -414,8 +408,6 @@
     <string name="daxIntroCtaText">Tagad pamēģiniet ieiet kādā no jūsu mīļākajām vietnēm! &lt;br/&gt;&lt;br/&gt;Es nobloķēšu izsekotājus, lai viņi nevarētu jūs izspiegot. Ja iespējams, uzlabošu arī jūsu savienojuma drošību. &#128274;</string>
     <string name="daxEndCtaText">Tas izdevās! &lt;br/&gt;&lt;br/&gt;Atcerieties – katru reizi, kad jūs pārlūkojat ar mani, jocīgas reklāmas atkāpjas. &#128077;</string>
     <string name="daxSerpCtaText">Jūsu DuckDuckGo meklējumi ir anonīmi, un es nekad neuzglabāju jūsu meklēšanas vēsturi. Nekad. &#128588;</string>
-    <string name="daxDefaultBrowserCtaText">Pirms es aizpēkšķu projām! &lt;br/&gt;&lt;br/&gt;Vai vēlaties aizsardzību pret izsekotājiem, atverot saites no citām lietotnēm? &lt;br/&gt;&lt;br/&gt;Izvēlieties DuckDuckGo par jūsu noklusējuma pārlūku!</string>
-    <string name="daxSearchWidgetCtaText">Jums tas izdevās! &lt;br/&gt;&lt;br/&gt;Meklējiet privāti vēl ātrāk! Sākuma ekrānā pievienojiet meklēšanas logrīku DuckDuckGo.</string>
     <string name="daxNonSerpCtaText">Katrai vietnei ir savs konfidencialitātes līmenis. Pieskarieties tam, lai redzētu, kā es aizsargāju jūsu privātumu.&lt;br/&gt;&lt;br/&gt;Kaut ko vēl labāku? Pamēģiniet nodzēst datus, noklikšķinot uz uguns pogas.</string>
     <string name="daxMainNetworkStep1CtaText">Galvas augšā!&lt;br/&gt;&lt;br/&gt; %s pārvalda lielu izsekošanas tīklu.&lt;br/&gt;&lt;br/&gt;Zems konfidencialitātes līmenis jūs aizvedīs uz šādām vietnēm.</string>
     <string name="daxMainNetworkStep1OwnedCtaText">Galvas augšā!&lt;br/&gt;&lt;br/&gt; %s pieder uzņēmumam %s, kas pārvalda galveno izsekošanas tīklu.</string>

@@ -7,8 +7,6 @@
 
     <!-- Onboarding Activity -->
     <string name="onboardingDefaultBrowserDescription">Na automatické vyhľadávanie a prehliadanie s DuckDuckGo navštívte Nastavenia.</string>
-    <string name="onboardingContinue">Pokračovať</string>
-    <string name="onboardingContinueFinalPage">Spustiť prehľadávanie</string>
     <string name="onboardingDefaultBrowserTitle">Nastav DuckDuckGo ako svoju predvolenú aplikáciu</string>
 
     <!-- Default Browser -->
@@ -373,10 +371,6 @@
     <!-- Dax Dialog -->
     <string name="daxDialogHideButton">SKRYŤ</string>
     <string name="daxDialogPhew">Uf!</string>
-    <string name="daxDialogYes">OK!</string>
-    <string name="daxDialogAddWidget">Pridať miniaplikáciu</string>
-    <string name="daxDialogMaybeLater">Možno neskôr</string>
-    <string name="daxDialogSettings">Prejdite do nastavení</string>
     <string name="daxDialogNext">Ďalšie</string>
     <string name="daxDialogHighFive">High Five!</string>
     <string name="daxDialogGotIt">Mám to</string>
@@ -391,8 +385,6 @@
     <string name="daxIntroCtaText">Nabudúce skúste navštíviť jeden z vašich obľúbených serverov! &lt;br/&gt;&lt;br/&gt;Zablokujeme sledovacie zariadenia, ktoré by vás mohli špehovať. V prípade potreby dokážeme tiež inovovať zabezpečenie vášho pripojenia. &#128274;</string>
     <string name="daxEndCtaText">Hotovo! &lt;br/&gt;&lt;br/&gt;Pamätajte: zakaždým, keď prehľadávate v našej aplikácii, divnej reklame pristrihávate krídla. &#128077;</string>
     <string name="daxSerpCtaText">Vaše vyhľadávanie v aplikácii DuckDuckGo je anonymné. Nikdy nebudeme uchovávať vašu históriu vyhľadávania. Nikdy. &#128588;</string>
-    <string name="daxDefaultBrowserCtaText">Skôr ako sa vyparím! &lt;br/&gt;&lt;br/&gt;Chcete ochranu pred sledovaním pri otvorení odkazov z iných aplikácií? &lt;br/&gt;&lt;br/&gt;Nastavte si aplikáciu DuckDuckGo ako predvolený prehliadač!</string>
-    <string name="daxSearchWidgetCtaText">Ste na šťastnej vlne! &lt;br/&gt;&lt;br/&gt;Vyhľadávajte v súkromí ešte rýchlejšie! Pridajte DuckDuckGo, miniaplikáciu vyhľadávania na svoju domovskú obrazovku.</string>
     <string name="daxNonSerpCtaText">Každá stránka má vlastný stupeň ochrany osobných údajov. Ťuknutím na túto ikonu zobrazíte informácie o tom, ako sme chránili vaše súkromie.&lt;br/&gt;&lt;br/&gt;Chcete sa zabávať? Skúste vymazať svoje údaje stlačením spúšťacieho tlačidla.</string>
     <string name="daxMainNetworkStep1CtaText">Hlavu hore!&lt;br/&gt;&lt;br/&gt; %s prevádzkuje hlavnú sledovaciu sieť.&lt;br/&gt;&lt;br/&gt;Nízka úroveň ochrany osobných údajov vás na takéto stránky upozorní.</string>
     <string name="daxMainNetworkStep1OwnedCtaText">Hlavu hore!Vlastníkom &lt;br/&gt;&lt;br/&gt; %s je %s, ktorá prevádzkuje hlavnú sledovaciu sieť.</string>

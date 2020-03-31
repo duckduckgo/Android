@@ -7,8 +7,6 @@
 
     <!-- Onboarding Activity -->
     <string name="onboardingDefaultBrowserDescription">Посетете Настройки, за да търсите и сърфирате с DuckDuckGo всеки път.</string>
-    <string name="onboardingContinue">Напред</string>
-    <string name="onboardingContinueFinalPage">Начало на сърфирането</string>
     <string name="onboardingDefaultBrowserTitle">Направете DuckDuckGo Вашият браузър по подразбиране</string>
 
     <!-- Default Browser -->
@@ -372,10 +370,6 @@
     <!-- Dax Dialog -->
     <string name="daxDialogHideButton">СКРИЙ</string>
     <string name="daxDialogPhew">Слава Богу!</string>
-    <string name="daxDialogYes">ДОБРЕ!</string>
-    <string name="daxDialogAddWidget">Добави уиджет</string>
-    <string name="daxDialogMaybeLater">Може би по-късно</string>
-    <string name="daxDialogSettings">Отиди в настройки</string>
     <string name="daxDialogNext">Следващ</string>
     <string name="daxDialogHighFive">Дай пет!</string>
     <string name="daxDialogGotIt">Разбрах</string>
@@ -390,8 +384,6 @@
     <string name="daxIntroCtaText">Сега, отворете един от любимите си сайтове! &lt;br/&gt;&lt;br/&gt;Ще блокирам тракерите, за да не ви шпионират. Също така ще надстроя сигурността на вашата връзка, ако е възможно. &#128274;</string>
     <string name="daxEndCtaText">&lt;br/&gt;&lt;br/&gt;Запомнете: всеки път, когато браузвате с мен,подрязвам крилцата на някоя неприятна реклама. &#128077;</string>
     <string name="daxSerpCtaText">Търсенията ви в DuckDuckGo са анонимни и никога не съхранявам историята на вашите търсения. Никога. &#128588;</string>
-    <string name="daxDefaultBrowserCtaText">Последен въпрос!&lt;br/&gt;&lt;br/&gt;Искате ли защита от проследяване, когато отваряте връзки от други приложения? &lt;br/&gt;&lt;br/&gt;Направете DuckDuckGo вашия браузър по подразбиране!</string>
-    <string name="daxSearchWidgetCtaText">Днес ви върви!&lt;br/&gt;&lt;br/&gt;Търсете частно още по-бързо! Добавете уиджет търсачката DuckDuckGo към началния си екран.</string>
     <string name="daxNonSerpCtaText">Всеки сайт има степен на поверителност. Докоснете, за да видите как защитих поверителността ви.&lt;br/&gt;&lt;br/&gt;Искате ли да пробвате нещо различно? Опитайте да изчистите данните си, като натиснете бутона за пожар.</string>
     <string name="daxMainNetworkStep1CtaText">Внимание!&lt;br/&gt;&lt;br/&gt; %s управлява основна мрежа за проследяване.&lt;br/&gt;&lt;br/&gt;Ниската степен на поверителност ви предупреждава за подобни сайтове.</string>
     <string name="daxMainNetworkStep1OwnedCtaText">Внимание!&lt;br/&gt;&lt;br/&gt; %s е собственост на %s, който управлява основна мрежа за проследяване.</string>

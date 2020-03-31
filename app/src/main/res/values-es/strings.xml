@@ -7,8 +7,6 @@
 
     <!-- Onboarding Activity -->
     <string name="onboardingDefaultBrowserDescription">Accede a «Ajustes» para realizar búsquedas y navegar con DuckDuckGo en cualquier momento.</string>
-    <string name="onboardingContinue">Continuar</string>
-    <string name="onboardingContinueFinalPage">Comenzar a navegar</string>
     <string name="onboardingDefaultBrowserTitle">Haz DuckDuckGo tu navegador predeterminado</string>
 
     <!-- Default Browser -->
@@ -372,10 +370,6 @@
     <!-- Dax Dialog -->
     <string name="daxDialogHideButton">OCULTAR</string>
     <string name="daxDialogPhew">¡Genial!</string>
-    <string name="daxDialogYes">¡OK!</string>
-    <string name="daxDialogAddWidget">Añadir widget</string>
-    <string name="daxDialogMaybeLater">Quizás más tarde</string>
-    <string name="daxDialogSettings">Ir a los ajustes</string>
     <string name="daxDialogNext">Siguiente</string>
     <string name="daxDialogHighFive">¡Choca esos cinco!</string>
     <string name="daxDialogGotIt">Entendido</string>
@@ -390,8 +384,6 @@
     <string name="daxIntroCtaText">¡A continuación, intenta visitar uno de tus sitios favoritos!&lt;br/&gt;&lt;br/&gt;Bloquearé los rastreadores para que no puedan espiarte. También haré tu conexión segura si es posible. &#128274;</string>
     <string name="daxEndCtaText">¡Lo estás haciendo muy bien!&lt;br/&gt;&lt;br/&gt;Recuerda: cada vez que navegas conmigo, anuncios y rastreadores son bloqueados. &#128077;</string>
     <string name="daxSerpCtaText">Tus búsquedas con DuckDuckGo son anónimas y nunca almaceno tu historial de búsqueda. Nunca. &#128588;</string>
-    <string name="daxDefaultBrowserCtaText">¡Antes de irme! &lt;br/&gt;&lt;br/&gt;¿Quieres protección contra rastreadores cuando abres enlaces desde otras aplicaciones? &lt;br/&gt;&lt;br/&gt;¡Haz que DuckDuckGo sea tu navegador predeterminado!</string>
-    <string name="daxSearchWidgetCtaText">¡Qué forma de dominarlo! &lt;br/&gt;&lt;br/&gt;¡Busca en privado incluso más rápido! Añade el widget de búsqueda DuckDuckGo a tu pantalla de inicio.</string>
     <string name="daxNonSerpCtaText">Cada sitio tiene un grado de privacidad. Toca para ver cómo protegí tu privacidad.&lt;br/&gt;&lt;br/&gt;¿Quieres algo más interesante? Prueba borrando tus datos presionando el botón fuego.</string>
     <string name="daxMainNetworkStep1CtaText">¡Aviso!&lt;br/&gt;&lt;br/&gt; %s posee una red de rastreo importante.&lt;br/&gt;&lt;br/&gt;Un grado de privacidad bajo te alertará de sitios como este.</string>
     <string name="daxMainNetworkStep1OwnedCtaText">¡Aviso!&lt;br/&gt;&lt;br/&gt; %s es propiedad de %s, que posee una importante red de rastreo.</string>

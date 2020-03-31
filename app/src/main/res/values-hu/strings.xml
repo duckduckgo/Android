@@ -7,8 +7,6 @@
 
     <!-- Onboarding Activity -->
     <string name="onboardingDefaultBrowserDescription">A Beállítások oldalon bármikor kereshetsz és böngészhetsz a DuckDuckGo segítségével.</string>
-    <string name="onboardingContinue">Folytatás</string>
-    <string name="onboardingContinueFinalPage">Böngészés indítása</string>
     <string name="onboardingDefaultBrowserTitle">Tedd a DuckDuckGót az alapértelmezett keresőoldaladdá</string>
 
     <!-- Default Browser -->
@@ -372,10 +370,6 @@
     <!-- Dax Dialog -->
     <string name="daxDialogHideButton">ELREJTÉS</string>
     <string name="daxDialogPhew">Pfuj!</string>
-    <string name="daxDialogYes">RENDBEN!</string>
-    <string name="daxDialogAddWidget">Widget hozzáadása</string>
-    <string name="daxDialogMaybeLater">Talán később</string>
-    <string name="daxDialogSettings">Ugrás a beállításokhoz</string>
     <string name="daxDialogNext">Következő</string>
     <string name="daxDialogHighFive">Pacsi!</string>
     <string name="daxDialogGotIt">Megvan</string>
@@ -390,8 +384,6 @@
     <string name="daxIntroCtaText">A következő lépésben látogassa meg az egyik kedvenc webhelyét! &lt;br/&gt;&lt;br/&gt;Én blokkolom a nyomkövetőket, hogy ne tudjanak kémkedni. Ha lehet, a kapcsolat biztonságát is javítom. &#128274;</string>
     <string name="daxEndCtaText">Megvan, ez az! &lt;br/&gt;&lt;br/&gt;Ne feledje: minden alkalommal, amikor velem végzi a böngészést, a hátborzongató hirdetés elveszíti az erejét. &#128077;</string>
     <string name="daxSerpCtaText">A DuckDuckGo keresések névtelenek, és én soha nem tárolom el a keresési előzményeket. Soha. &#128588;</string>
-    <string name="daxDefaultBrowserCtaText">Mielőtt eltűnök! &lt;br/&gt;&lt;br/&gt;Szeretne nyomkövető védelmet, ha más alkalmazásokból nyitja meg a linkeket? &lt;br/&gt;&lt;br/&gt;Legyen DuckDuckGo az alapértelmezett böngészője!</string>
-    <string name="daxSearchWidgetCtaText">Jó passzban van! &lt;br/&gt;&lt;br/&gt;Magánjellegű keresés még gyorsabban! DuckDuckGo keresési widget hozzáadása a kezdőképernyőhöz.</string>
     <string name="daxNonSerpCtaText">Minden webhely rendelkezik adatvédelmi besorolással. Koppintson rá, hogy megvédje a magánszféráját.&lt;br/&gt;&lt;br/&gt;Van kedve hozzá? Próbálja meg törölni az adatokat a Kidob gomb megnyomásával.</string>
     <string name="daxMainNetworkStep1CtaText">Fel a fejjel!&lt;br/&gt;&lt;br/&gt; %s egy nagy nyomkövető hálózatot működtet.&lt;br/&gt;&lt;br/&gt;Az alacsony szintű adatvédelem ilyen webhelyekhez vezet.</string>
     <string name="daxMainNetworkStep1OwnedCtaText">Fel a fejjel!A(z) &lt;br/&gt;&lt;br/&gt; %s tulajdonosa a %s, aki egy nagy nyomkövető hálózatot üzemeltet.</string>
