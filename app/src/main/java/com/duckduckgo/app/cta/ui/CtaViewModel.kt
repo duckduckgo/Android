@@ -22,7 +22,6 @@ import com.duckduckgo.app.cta.db.DismissedCtaDao
 import com.duckduckgo.app.cta.model.CtaId
 import com.duckduckgo.app.cta.model.DismissedCta
 import com.duckduckgo.app.cta.ui.HomePanelCta.*
-import com.duckduckgo.app.global.DefaultDispatcherProvider
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.install.daysInstalled
@@ -39,7 +38,6 @@ import com.duckduckgo.app.survey.db.SurveyDao
 import com.duckduckgo.app.survey.model.Survey
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import com.duckduckgo.app.widget.ui.WidgetCapabilities
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 import javax.inject.Inject
@@ -284,13 +282,9 @@ class CtaViewModel @Inject constructor(
 
     private suspend fun allOnboardingCtasShown(): Boolean {
         return withContext(dispatchers.io()) {
-            requiredDaxOnboardingCtas.forEach { ctaId ->
-                if (!dismissedCtaDao.exists(ctaId)) {
-                    Timber.d("Missing CTA $ctaId")
-                    return@withContext false
-                }
+            requiredDaxOnboardingCtas.all {
+                dismissedCtaDao.exists(it)
             }
-            return@withContext true
         }
     }
 }
