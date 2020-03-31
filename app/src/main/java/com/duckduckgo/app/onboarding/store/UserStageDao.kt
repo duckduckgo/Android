@@ -21,7 +21,7 @@ import androidx.room.*
 @Dao
 interface UserStageDao {
 
-    @Query("select * from $USER_STAGE_TABLE_NAME")
+    @Query("select * from $USER_STAGE_TABLE_NAME limit 1")
     suspend fun currentUserAppStage(): UserStage?
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
