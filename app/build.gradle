@@ -117,7 +117,7 @@ ext {
     dagger = "2.18"
     retrofit = "2.8.1"
     ankoVersion = "0.10.4"
-    glide = "4.8.0"
+    glide = "4.11.0"
     lottieVersion = "2.6.0-beta19"
     okHttp = "3.10.0"
     rxJava = "2.1.10"
