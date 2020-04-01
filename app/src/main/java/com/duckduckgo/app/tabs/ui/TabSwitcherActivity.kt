@@ -118,7 +118,7 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
         swipeListener.attachToRecyclerView(tabsRecycler)
 
 
-        tabGridItemDecorator = TabGridItemDecorator(themedContext, selectedTabId)
+        tabGridItemDecorator = TabGridItemDecorator(this, selectedTabId)
         tabsRecycler.addItemDecoration(tabGridItemDecorator)
     }
 
