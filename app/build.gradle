@@ -116,7 +116,7 @@ ext {
 
     junit = "4.12"
     dagger = "2.18"
-    retrofit = "2.3.0"
+    retrofit = "2.8.1"
     ankoVersion = "0.10.4"
     glide = "4.8.0"
     lottieVersion = "2.6.0-beta19"
