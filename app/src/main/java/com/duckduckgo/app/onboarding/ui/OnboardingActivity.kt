@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 DuckDuckGo
+ * Copyright (c) 2019 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,6 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import kotlinx.android.synthetic.main.activity_onboarding.*
 
-
 class OnboardingActivity : DuckDuckGoActivity() {
 
     private lateinit var viewPageAdapter: PagerAdapter
@@ -43,7 +42,7 @@ class OnboardingActivity : DuckDuckGoActivity() {
             viewPager.setCurrentItem(next, true)
         } else {
             viewModel.onOnboardingDone()
-            startActivity(BrowserActivity.intent(this))
+            startActivity(BrowserActivity.intent(this@OnboardingActivity))
             finish()
         }
     }

@@ -30,7 +30,6 @@ import kotlinx.android.synthetic.main.include_dax_dialog_cta.*
 import kotlinx.android.synthetic.main.content_onboarding_welcome.*
 import kotlinx.android.synthetic.main.content_onboarding_welcome.longDescriptionContainer
 
-
 class WelcomePage : OnboardingPageFragment() {
 
     private var ctaText: String = ""

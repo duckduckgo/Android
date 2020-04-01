@@ -24,7 +24,9 @@ import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteResult
 import com.duckduckgo.app.global.DefaultDispatcherProvider
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.SingleLiveEvent
-import com.duckduckgo.app.onboarding.store.OnboardingStore
+import com.duckduckgo.app.onboarding.store.AppStage
+import com.duckduckgo.app.onboarding.store.UserStageStore
+import com.duckduckgo.app.onboarding.store.isNewUser
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.*
 import com.jakewharton.rxrelay2.PublishRelay
@@ -37,7 +39,7 @@ import timber.log.Timber
 import java.util.concurrent.TimeUnit
 
 class SystemSearchViewModel(
-    private var onboardingStore: OnboardingStore,
+    private var userStageStore: UserStageStore,
     private val autoComplete: AutoComplete,
     private val deviceAppLookup: DeviceAppLookup,
     private val pixel: Pixel,
@@ -77,18 +79,21 @@ class SystemSearchViewModel(
     init {
         resetViewState()
         configureAutoComplete()
+        refreshAppList()
     }
 
     private fun currentOnboardingState(): OnboardingViewState = onboardingViewState.value!!
     private fun currentResultsState(): SystemSearchResultsViewState = resultsViewState.value!!
 
     fun resetViewState() {
-        resetOnboardingState()
-        resetResultsState()
+        viewModelScope.launch {
+            resetOnboardingState()
+            resetResultsState()
+        }
     }
 
-    private fun resetOnboardingState() {
-        val showOnboarding = onboardingStore.shouldShow
+    private suspend fun resetOnboardingState() {
+        val showOnboarding = userStageStore.isNewUser()
         onboardingViewState.value = OnboardingViewState(visible = showOnboarding)
         if (showOnboarding) {
             pixel.fire(INTERSTITIAL_ONBOARDING_SHOWN)
@@ -124,13 +129,14 @@ class SystemSearchViewModel(
     }
 
     fun userDismissedOnboarding() {
-        onboardingViewState.value = currentOnboardingState().copy(visible = false)
-        onboardingStore.onboardingShown()
-        pixel.fire(INTERSTITIAL_ONBOARDING_DISMISSED)
+        viewModelScope.launch {
+            onboardingViewState.value = currentOnboardingState().copy(visible = false)
+            userStageStore.stageCompleted(AppStage.NEW)
+            pixel.fire(INTERSTITIAL_ONBOARDING_DISMISSED)
+        }
     }
 
     fun userUpdatedQuery(query: String) {
-
         appsJob?.cancel()
 
         if (query == currentResultsState().queryText) {
@@ -176,8 +182,11 @@ class SystemSearchViewModel(
     }
 
     fun userTappedDax() {
-        pixel.fire(INTERSTITIAL_LAUNCH_DAX)
-        command.value = Command.LaunchDuckDuckGo
+        viewModelScope.launch {
+            userStageStore.stageCompleted(AppStage.NEW)
+            pixel.fire(INTERSTITIAL_LAUNCH_DAX)
+            command.value = Command.LaunchDuckDuckGo
+        }
     }
 
     fun userClearedQuery() {
@@ -186,8 +195,11 @@ class SystemSearchViewModel(
     }
 
     fun userSubmittedQuery(query: String) {
-        command.value = Command.LaunchBrowser(query)
-        pixel.fire(INTERSTITIAL_LAUNCH_BROWSER_QUERY)
+        viewModelScope.launch {
+            userStageStore.stageCompleted(AppStage.NEW)
+            command.value = Command.LaunchBrowser(query)
+            pixel.fire(INTERSTITIAL_LAUNCH_BROWSER_QUERY)
+        }
     }
 
     fun userSubmittedAutocompleteResult(query: String) {
@@ -202,7 +214,14 @@ class SystemSearchViewModel(
 
     fun appNotFound(app: DeviceApp) {
         command.value = Command.ShowAppNotFoundMessage(app.shortName)
-        deviceAppLookup.refreshAppList()
+
+        refreshAppList()
+    }
+
+    private fun refreshAppList() {
+        viewModelScope.launch(dispatchers.io()) {
+            deviceAppLookup.refreshAppList()
+        }
     }
 
     override fun onCleared() {

@@ -65,11 +65,11 @@ class BrowserPopupMenu : PopupWindow {
             return inflateToolbarOnlyExperiment(layoutInflater)
 
             when {
-                variant.hasFeature(VariantManager.VariantFeature.ConceptTest) -> {
-                    inflateToolbarOnlyExperiment(layoutInflater)
+                variant.hasFeature(VariantManager.VariantFeature.BottomBarWithSearchExperiment) -> {
+                    inflateBottomBarWithSearchExperiment(layoutInflater)
                 }
-                variant.hasFeature(VariantManager.VariantFeature.ConceptTest) -> {
-                    inflateToolbarOnlyExperiment(layoutInflater)
+                variant.hasFeature(VariantManager.VariantFeature.BottomBarWithNavigationExperiment) -> {
+                    inflateBottomBarWithNavigationExperiment(layoutInflater)
                 }
                 else -> {
                     inflateToolbarOnlyExperiment(layoutInflater)

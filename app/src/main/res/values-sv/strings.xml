@@ -23,22 +23,7 @@
 
     <!-- Onboarding Activity -->
     <string name="onboardingDefaultBrowserDescription">Gå till "Inställningar" för att söka och bläddra med DuckDuckGo varje gång.</string>
-    <string name="onboardingContinue">Fortsätt</string>
-    <string name="onboardingContinueFinalPage">Starta bläddring</string>
     <string name="onboardingDefaultBrowserTitle">Ställ in DuckDuckGo som standard</string>
-    <string name="onboardingDefaultBrowserTitleDefaultSet">Du kommer aldrig att behöva oroa dig igen</string>
-
-    <!-- Unified Welcome Page -->
-    <string name="unifiedOnboardingTitleFirstVisit">Välkommen till\nDuckDuckGo!</string>
-    <string name="unifiedOnboardingSubtitleTrackerBlockingEnabled">Skydda ditt privatliv medan du söker och surfar på webben.</string>
-    <string name="unifiedOnboardingPrivateSearchTitle">Privat sökning</string>
-    <string name="unifiedOnboardingPrivateSearchSubtitle">Med DuckDuckGo är dina sökningar alltid privata.</string>
-    <string name="unifiedOnboardingBrowsingProtectionTitle">Bläddringsskydd</string>
-    <string name="unifiedOnboardingBrowsingProtectionSubtitleTrackerBlockingEnabled">Ställ in blockering av spårare och säker bläddring som standard.</string>
-    <string name="unifiedOnboardingDataClearingTitle">Rensning av data</string>
-    <string name="unifiedOnboardingDataClearingSubtitle">Radera dina webbläsardata med en enkel knapptryckning.</string>
-    <string name="unifiedOnboardingCustomizationTitle">Personanpassning</string>
-    <string name="unifiedOnboardingCustomizationSubtitle">Välj ett tema och anpassa sekretessfunktionerna.</string>
 
     <!-- Default Browser -->
     <string name="cannotLaunchDefaultAppSettings">Kan inte starta standardinställningssidan för appar</string>
@@ -46,7 +31,6 @@
     <string name="defaultBrowserMaybeLater">Kanske senare</string>
     <string name="defaultBrowserLetsDoIt">Vi gör det!</string>
     <string name="defaultBrowserDescriptionNoDefault">Öppna länkar utan att behöva oroa dig, varje gång.</string>
-    <string name="defaultBrowserDescriptionDefaultSet">Med DuckDuckGo är dina onlinedata som standard mer privata, var än på internet du beger dig.</string>
     <string name="defaultBrowserInstructions">Välj DuckDuckGo och tryck på <font color="#678fff">Alltid</font>.</string>
 
     <!-- Browser Activity -->
@@ -402,16 +386,31 @@
     <!-- Dax Dialog -->
     <string name="daxDialogHideButton">DÖLJ</string>
     <string name="daxDialogPhew">Puh!</string>
-    <string name="daxDialogYes">OK!</string>
-    <string name="daxDialogAddWidget">Lägg till widget</string>
-    <string name="daxDialogMaybeLater">Kanske senare</string>
-    <string name="daxDialogSettings">Gå till inställningar</string>
     <string name="daxDialogNext">Nästa</string>
     <string name="daxDialogHighFive">High Five!</string>
     <string name="daxDialogGotIt">Jag fattar</string>
     <string name="hideTipsTitle">Dölj återstående tips?</string>
     <string name="hideTipsText">Det finns bara några få, och vi försökte göra dem informativa.</string>
     <string name="hideTipsButton">Dölj tipsen för alltid</string>
+
+    <!-- New Onboarding Experience -->
+    <string name="onboardingWelcomeTitle">VÄLKOMMEN TILL DUCKDUCKGO</string>
+    <string name="onboardingDaxText">Internet kan vara lite läskigt.&lt;br/&gt;&lt;br/&gt;Oroa dig inte! Att söka och surfa privat är lättare än du tror.</string>
+    <string name="onboardingLetsDoItButton">Vi kör!</string>
+    <string name="daxIntroCtaText">Prova sedan att besöka en av dina favoritwebbplatser! &lt;br/&gt;&lt;br/&gt;Jag blockerar trackers så att de inte kan spionera på dig. Jag ska också uppgradera säkerheten för din uppkoppling om det är möjligt. &#128274;</string>
+    <string name="daxEndCtaText">Du klarar det här! &lt;br/&gt;&lt;br/&gt;Kom ihåg: varje gång du surfar med mig förlorar en läskig annons sina vingar. &#128077;</string>
+    <string name="daxSerpCtaText">Dina DuckDuckGo-sökningar är anonyma och jag lagrar aldrig din sökhistorik. Någonsin. &#128588;</string>
+    <string name="daxNonSerpCtaText">Varje webbplats har ett sekretessbetyg. Klicka på den för att se hur jag skyddade din integritet.&lt;br/&gt;&lt;br/&gt;Vill du ha det ännu bättre? Försök att rensa dina data genom att använda brandknappen.</string>
+    <string name="daxMainNetworkStep1CtaText">Se upp!&lt;br/&gt;&lt;br/&gt; %s driver ett stort tracking-nätverk.&lt;br/&gt;&lt;br/&gt;Ett lågt sekretessbetyg tipsar dig om webbplatser som denna.</string>
+    <string name="daxMainNetworkStep1OwnedCtaText">Se upp!&lt;br/&gt;&lt;br/&gt; %s ägs av %s, som driver ett större tracking-nätverk.</string>
+    <string name="daxMainNetworkStep21CtaText">I själva verket lurar %s trackers på %s av de bästa webbplatserna. &#128561;&lt;br/&gt;&lt;br/&gt;</string>
+    <string name="daxMainNetworkStep211CtaText">I själva verket lurar %s trackers över hela internet. &#128561;&lt;br/&gt;&lt;br/&gt;</string>
+    <string name="daxMainNetworkStep2CtaText">%s Jag blockerar dessa trackers när du surfar på webbplatser som inte är %s.</string>
+    <plurals name="daxTrackersBlockedCtaText">
+        <item quantity="one">&#160;och &lt;b&gt;%d andra&lt;/b&gt; försökte spåra dig här. &lt;br/&gt;&lt;br/&gt;Jag blockerade dem!&lt;br/&gt;&lt;br/&gt; ☝️Du kan kontrollera webbadressfältet för att se vem som försöker spåra dig när du besöker en ny webbplats.️</item>
+        <item quantity="other">&#160;och &lt;b&gt;%d andra&lt;/b&gt; försökte spåra dig här. &lt;br/&gt;&lt;br/&gt;Jag blockerade dem!&lt;br/&gt;&lt;br/&gt; ☝️Du kan kontrollera webbadressfältet för att se vem som försöker spåra dig när du besöker en ny webbplats.️</item>
+    </plurals>
+    <string name="daxTrackersBlockedCtaZeroText">&#160;försökte spåra dig här. &lt;br/&gt;&lt;br/&gt;Jag blockerade det!&lt;br/&gt;&lt;br/&gt; ☝️Du kan kontrollera webbadressfältet för att se vem som försöker spåra dig när du besöker en ny webbplats.️</string>
 
     <!-- Covid Cta-->
     <string name="covidCtaText">Ta emot officiell COVID-19 information och tips.</string>

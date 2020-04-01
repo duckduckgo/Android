@@ -22,7 +22,7 @@
     android:layout_height="match_parent"
     android:background="@drawable/onboarding_background_large"
     android:tag="onboardingDefaultBrowser"
-    tools:context="com.duckduckgo.app.onboarding.ui.OnboardingActivityExperiment">
+    tools:context="com.duckduckgo.app.onboarding.ui.OnboardingActivity">
 
     <LinearLayout
         android:id="@+id/welcomeContent"

@@ -7,22 +7,7 @@
 
     <!-- Onboarding Activity -->
     <string name="onboardingDefaultBrowserDescription">Accede a «Ajustes» para realizar búsquedas y navegar con DuckDuckGo en cualquier momento.</string>
-    <string name="onboardingContinue">Continuar</string>
-    <string name="onboardingContinueFinalPage">Comenzar a navegar</string>
     <string name="onboardingDefaultBrowserTitle">Haz DuckDuckGo tu navegador predeterminado</string>
-    <string name="onboardingDefaultBrowserTitleDefaultSet">Dile hola a la navegación privada</string>
-
-    <!-- Unified Welcome Page -->
-    <string name="unifiedOnboardingTitleFirstVisit">¡Bienvenido a\nDuckDuckGo!</string>
-    <string name="unifiedOnboardingSubtitleTrackerBlockingEnabled">Preserva tu privacidad cuando realices búsquedas y navegues por Internet.</string>
-    <string name="unifiedOnboardingPrivateSearchTitle">Búsqueda privada</string>
-    <string name="unifiedOnboardingPrivateSearchSubtitle">Con DuckDuckGo, tus búsquedas son siempre privadas.</string>
-    <string name="unifiedOnboardingBrowsingProtectionTitle">Protección de la navegación</string>
-    <string name="unifiedOnboardingBrowsingProtectionSubtitleTrackerBlockingEnabled">Bloquea los rastreadores y disfruta de una navegación inherentemente segura.</string>
-    <string name="unifiedOnboardingDataClearingTitle">Eliminación de datos</string>
-    <string name="unifiedOnboardingDataClearingSubtitle">Borra tus datos de navegación con solo tocar un botón.</string>
-    <string name="unifiedOnboardingCustomizationTitle">Personalización</string>
-    <string name="unifiedOnboardingCustomizationSubtitle">Elige un tema y configura tus opciones de privacidad.</string>
 
     <!-- Default Browser -->
     <string name="cannotLaunchDefaultAppSettings">La pantalla de configuración predeterminada de la aplicación no se puede abrir</string>
@@ -30,7 +15,6 @@
     <string name="defaultBrowserMaybeLater">Quizás más tarde</string>
     <string name="defaultBrowserLetsDoIt">¡Hagámoslo!</string>
     <string name="defaultBrowserDescriptionNoDefault">Abre los enlaces con tranquilidad, siempre.</string>
-    <string name="defaultBrowserDescriptionDefaultSet">Con DuckDuckGo, tus datos en línea son más privados de forma predeterminada, donde sea que Internet te lleve.</string>
     <string name="defaultBrowserInstructions">Selecciona DuckDuckGo y elige <font color="#678fff">Siempre</font>.</string>
 
     <!-- Browser Activity -->
@@ -385,17 +369,32 @@
 
     <!-- Dax Dialog -->
     <string name="daxDialogHideButton">OCULTAR</string>
-    <string name="daxDialogPhew">¡Uf!</string>
-    <string name="daxDialogYes">¡OK!</string>
-    <string name="daxDialogAddWidget">Añadir widget</string>
-    <string name="daxDialogMaybeLater">Quizás más tarde</string>
-    <string name="daxDialogSettings">Ir a los ajustes</string>
+    <string name="daxDialogPhew">¡Genial!</string>
     <string name="daxDialogNext">Siguiente</string>
     <string name="daxDialogHighFive">¡Choca esos cinco!</string>
     <string name="daxDialogGotIt">Entendido</string>
     <string name="hideTipsTitle">¿Ocultar los consejos restantes?</string>
     <string name="hideTipsText">Sólo hay unos cuantos, y tratamos de hacerlos informativos.</string>
     <string name="hideTipsButton">Ocultar consejos para siempre</string>
+
+    <!-- New Onboarding Experience -->
+    <string name="onboardingWelcomeTitle">¡Bienvenido a DuckDuckGo!</string>
+    <string name="onboardingDaxText">Internet puede ser un poco espeluznante.&lt;br/&gt;&lt;br/&gt;¡No te preocupes! Buscar y navegar con privacidad es más fácil de lo que piensas.</string>
+    <string name="onboardingLetsDoItButton">¡De acuerdo!</string>
+    <string name="daxIntroCtaText">¡A continuación, intenta visitar uno de tus sitios favoritos!&lt;br/&gt;&lt;br/&gt;Bloquearé los rastreadores para que no puedan espiarte. También haré tu conexión segura si es posible. &#128274;</string>
+    <string name="daxEndCtaText">¡Lo estás haciendo muy bien!&lt;br/&gt;&lt;br/&gt;Recuerda: cada vez que navegas conmigo, anuncios y rastreadores son bloqueados. &#128077;</string>
+    <string name="daxSerpCtaText">Tus búsquedas con DuckDuckGo son anónimas y nunca almaceno tu historial de búsqueda. Nunca. &#128588;</string>
+    <string name="daxNonSerpCtaText">Cada sitio tiene un grado de privacidad. Toca para ver cómo protegí tu privacidad.&lt;br/&gt;&lt;br/&gt;¿Quieres algo más interesante? Prueba borrando tus datos presionando el botón fuego.</string>
+    <string name="daxMainNetworkStep1CtaText">¡Aviso!&lt;br/&gt;&lt;br/&gt; %s posee una red de rastreo importante.&lt;br/&gt;&lt;br/&gt;Un grado de privacidad bajo te alertará de sitios como este.</string>
+    <string name="daxMainNetworkStep1OwnedCtaText">¡Aviso!&lt;br/&gt;&lt;br/&gt; %s es propiedad de %s, que posee una importante red de rastreo.</string>
+    <string name="daxMainNetworkStep21CtaText">De hecho, los rastreadores de %s acechan en aproximadamente %s de los sitios más visitados. &#128561;&lt;br/&gt;&lt;br/&gt;</string>
+    <string name="daxMainNetworkStep211CtaText">De hecho, los rastreadores de %s están al acecho en Internet. &#128561;&lt;br/&gt;&lt;br/&gt;</string>
+    <string name="daxMainNetworkStep2CtaText">%sBloquearé estos rastreadores cuando navegues en sitios que no pertenezca a %s.</string>
+    <plurals name="daxTrackersBlockedCtaText">
+        <item quantity="one">&#160;y &lt;b&gt;%d más&lt;/b&gt; intentaban rastrearte aquí. &lt;br/&gt;&lt;br/&gt;¡Los he bloqueado!&lt;br/&gt;&lt;br/&gt; ☝️Puedes consultar la barra de navegación para ver quién está tratando de rastrearte cuando visitas un nuevo sitio.️</item>
+        <item quantity="other">&#160;y &lt;b&gt;%d más&lt;/b&gt; intentaban rastrearte aquí. &lt;br/&gt;&lt;br/&gt;¡Los he bloqueado!&lt;br/&gt;&lt;br/&gt; ☝️Puedes consultar la barra de navegación para ver quién está tratando de rastrearte cuando visitas un nuevo sitio.️</item>
+    </plurals>
+    <string name="daxTrackersBlockedCtaZeroText">&#160;intentaba rastrearte aquí. &lt;br/&gt;&lt;br/&gt;¡Lo he bloqueado!&lt;br/&gt;&lt;br/&gt; ☝️Puedes consultar la barra de navegación para ver quién está tratando de rastrearte cuando visitas un nuevo sitio.️</string>
 
     <!-- Covid Cta-->
     <string name="covidCtaText">Obtén información y consejos oficiales sobre COVID-19.</string>

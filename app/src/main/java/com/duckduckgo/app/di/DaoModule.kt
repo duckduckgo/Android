@@ -73,4 +73,7 @@ class DaoModule {
 
     @Provides
     fun tdsDao(database: AppDatabase) = database.tdsDao()
+
+    @Provides
+    fun userStageDao(database: AppDatabase) = database.userStageDao()
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 DuckDuckGo
+ * Copyright (c) 2020 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,27 +16,18 @@
 
 package com.duckduckgo.app.di
 
-import android.content.Context
-import androidx.room.Room
-import com.duckduckgo.app.global.db.AppDatabase
-import com.duckduckgo.app.global.db.MigrationsProvider
+import com.duckduckgo.app.global.DefaultDispatcherProvider
+import com.duckduckgo.app.global.DispatcherProvider
 import dagger.Module
 import dagger.Provides
 import javax.inject.Singleton
 
-@Module(includes = [DaoModule::class])
-class DatabaseModule {
+@Module
+class CoroutinesModule {
 
     @Provides
     @Singleton
-    fun provideDatabase(context: Context, migrationsProvider: MigrationsProvider): AppDatabase {
-        return Room.databaseBuilder(context, AppDatabase::class.java, "app.db")
-            .addMigrations(*migrationsProvider.ALL_MIGRATIONS.toTypedArray())
-            .build()
-    }
-
-    @Provides
-    fun provideDatabaseMigrations(context: Context): MigrationsProvider {
-        return MigrationsProvider(context)
+    fun providesDispatcherProvider(): DispatcherProvider {
+        return DefaultDispatcherProvider()
     }
 }
