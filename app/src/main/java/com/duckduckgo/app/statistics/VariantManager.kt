@@ -50,7 +50,7 @@ interface VariantManager {
             // Quick Search Notification Experiment
             Variant(
                 key = "mf",
-                weight = 1.0,
+                weight = 0.0,
                 features = emptyList(),
                 filterBy = { isEnglishLocale() }),
             Variant(
@@ -62,7 +62,7 @@ interface VariantManager {
             // Bottom Bar Navigation Experiment
             Variant(
                 key = "mm",
-                weight = 0.0,
+                weight = 1.0,
                 features = listOf(BottomBarWithSearchExperiment),
                 filterBy = { isEnglishLocale() }),
             Variant(
