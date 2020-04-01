@@ -7,22 +7,7 @@
 
     <!-- Onboarding Activity -->
     <string name="onboardingDefaultBrowserDescription">Accesați „Setări” pentru a căuta și naviga cu DuckDuckGo de fiecare dată.</string>
-    <string name="onboardingContinue">Continuare</string>
-    <string name="onboardingContinueFinalPage">Începere navigare</string>
     <string name="onboardingDefaultBrowserTitle">Fă DuckDuckGo Aplicația Ta Implicită</string>
-    <string name="onboardingDefaultBrowserTitleDefaultSet">Salută Liniștea Sufletească</string>
-
-    <!-- Unified Welcome Page -->
-    <string name="unifiedOnboardingTitleFirstVisit">Bine ați venit la\nDuckDuckGo!</string>
-    <string name="unifiedOnboardingSubtitleTrackerBlockingEnabled">Păstrați-vă confidențialitatea în timp ce căutați și navigați pe web.</string>
-    <string name="unifiedOnboardingPrivateSearchTitle">Căutare privată</string>
-    <string name="unifiedOnboardingPrivateSearchSubtitle">Cu ajutorul DuckDuckGo, căutările dvs. sunt întotdeauna private.</string>
-    <string name="unifiedOnboardingBrowsingProtectionTitle">Protecție la navigare</string>
-    <string name="unifiedOnboardingBrowsingProtectionSubtitleTrackerBlockingEnabled">Blocați cookie-urile de urmărire și navigați în siguranță în mod implicit.</string>
-    <string name="unifiedOnboardingDataClearingTitle">Eliminarea datelor</string>
-    <string name="unifiedOnboardingDataClearingSubtitle">Ștergeți datele de navigare prin apăsarea unui buton.</string>
-    <string name="unifiedOnboardingCustomizationTitle">Personalizare</string>
-    <string name="unifiedOnboardingCustomizationSubtitle">Alegeți o temă și personalizați funcțiile privind confidențialitatea.</string>
 
     <!-- Default Browser -->
     <string name="cannotLaunchDefaultAppSettings">Nu se poate lansa ecranul de setări implicite ale aplicației</string>
@@ -30,7 +15,6 @@
     <string name="defaultBrowserMaybeLater">Poate Mai Târziu</string>
     <string name="defaultBrowserLetsDoIt">Hai să o facem!</string>
     <string name="defaultBrowserDescriptionNoDefault">Deschide link-urile cu liniște sufletească, de fiecare dată.</string>
-    <string name="defaultBrowserDescriptionDefaultSet">Cu DuckDuckGo, datele tale online sunt mai confidențiale în mod implicit, oriunde te poartă internetul.</string>
     <string name="defaultBrowserInstructions">Selectează DuckDuckGo și atinge <font color="#678fff"> Întotdeauna </font>.</string>
 
     <!-- Browser Activity -->
@@ -390,16 +374,32 @@
     <!-- Dax Dialog -->
     <string name="daxDialogHideButton">ASCUNDE</string>
     <string name="daxDialogPhew">Pfiu!</string>
-    <string name="daxDialogYes">OK!</string>
-    <string name="daxDialogAddWidget">Adaugă Widget</string>
-    <string name="daxDialogMaybeLater">Poate Mai Târziu</string>
-    <string name="daxDialogSettings">Mergi la setări</string>
     <string name="daxDialogNext">Următorul</string>
     <string name="daxDialogHighFive">Bate Palma!</string>
     <string name="daxDialogGotIt">Am înțeles</string>
     <string name="hideTipsTitle">Ascunzi sfaturile rămase?</string>
     <string name="hideTipsText">Sunt doar câteva, iar noi am încercat să le facem informative.</string>
     <string name="hideTipsButton">Ascunde sfaturile definitiv</string>
+
+    <!-- New Onboarding Experience -->
+    <string name="onboardingWelcomeTitle">Bine ai venit la DuckDuckGo!</string>
+    <string name="onboardingDaxText">Internetul poate fi cam terifiant.&lt;br/&gt;&lt;br/&gt;Nu te îngrijora! Căutarea și navigarea în mod confidențial sunt mai ușoare decât crezi.</string>
+    <string name="onboardingLetsDoItButton">Hai Să O Facem!</string>
+    <string name="daxIntroCtaText">Apoi, încearcă să vizitezi unul din site-urile tale preferate! &lt;br/&gt;&lt;br/&gt;Voi bloca urmăritorii ca să nu te mai spioneze. Voi îmbunătăți, de asemenea, securitatea conexiunii tale, dacă este posibil. &#128274;</string>
+    <string name="daxEndCtaText">Ai ghicit! &lt;br/&gt;&lt;br/&gt;Reține: de fiecare dată când navighezi cu mine, o reclamă terifiantă își pierde aripile. &#128077;</string>
+    <string name="daxSerpCtaText">Căutările tale DuckDuckGo sunt anonime și nu îți voi stoca niciodată istoricul căutării. Niciodată. &#128588;</string>
+    <string name="daxNonSerpCtaText">Fiecare site are un grad de confidențialitate. Atingeți-l ca să vezi cum ți-am protejat confidențialitatea.&lt;br/&gt;&lt;br/&gt;Vrei să te dai mare? Încearcă să-ți ștergi datele, apăsând butonul de tragere.</string>
+    <string name="daxMainNetworkStep1CtaText">Atenție!&lt;br/&gt;&lt;br/&gt; %s rulează o rețea de urmărire majoră.&lt;br/&gt;&lt;br/&gt;Un grad de confidențialitate scăzut te va avertiza despre site-uri de acest fel.</string>
+    <string name="daxMainNetworkStep1OwnedCtaText">Atenție!&lt;br/&gt;&lt;br/&gt; %s este deținută de %s, care administrează o rețea de urmărire semnificativă.</string>
+    <string name="daxMainNetworkStep21CtaText">De fapt, %s urmăritorii dau târcoale %s site-urilor de top. &#128561;&lt;br/&gt;&lt;br/&gt;</string>
+    <string name="daxMainNetworkStep211CtaText">De fapt, %s urmăritorii stau la pândă oriunde în internet. &#128561;&lt;br/&gt;&lt;br/&gt;</string>
+    <string name="daxMainNetworkStep2CtaText">%s Voi bloca acești urmăritori când navighezi pe site-uri non-%s.</string>
+    <plurals name="daxTrackersBlockedCtaText">
+        <item quantity="one">&#160;și &lt;b&gt;%d altul&lt;/b&gt; încercau să te urmărească aici. &lt;br/&gt;&lt;br/&gt;I-am blocat!&lt;br/&gt;&lt;br/&gt; ☝️ Poți verifica bara URL pentru a vedea cine încearcă să te urmărească atunci când vizitezi un nou site.️</item>
+        <item quantity="few">&#160;și &lt;b&gt;%d alții&lt;/b&gt; încercau să te urmărească aici. &lt;br/&gt;&lt;br/&gt;I-am blocat!&lt;br/&gt;&lt;br/&gt; ☝️ Poți verifica bara URL pentru a vedea cine încearcă să te urmărească atunci când vizitezi un nou site.️</item>
+        <item quantity="other">&#160;și &lt;b&gt;%d alții&lt;/b&gt; încercau să te urmărească aici. &lt;br/&gt;&lt;br/&gt;I-am blocat!&lt;br/&gt;&lt;br/&gt; ☝️ Puteți verifica bara URL pentru a vedea cine încearcă să vă urmărească atunci când vizitați un nou site.️</item>
+    </plurals>
+    <string name="daxTrackersBlockedCtaZeroText">&#160;încerca să te urmărească aici. &lt;br/&gt;&lt;br/&gt;Am blocat-o!&lt;br/&gt;&lt;br/&gt; ☝️ Poți verifica bara URL pentru a vedea cine încearcă să te urmărească atunci când vizitezi un nou site.️</string>
 
     <!-- Covid Cta-->
     <string name="covidCtaText">Obține informații și sfaturi oficiale COVID-19.</string>

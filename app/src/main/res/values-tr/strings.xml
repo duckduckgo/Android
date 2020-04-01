@@ -23,22 +23,7 @@
 
     <!-- Onboarding Activity -->
     <string name="onboardingDefaultBrowserDescription">Her seferinde DuckDuckGo ile arama yapmak ve göz atmak için Ayarlar\'ı ziyaret edin.</string>
-    <string name="onboardingContinue">Devam et</string>
-    <string name="onboardingContinueFinalPage">Gezinmeye Başla</string>
     <string name="onboardingDefaultBrowserTitle">DuckDuckGo\'yu Varsayılan Yap</string>
-    <string name="onboardingDefaultBrowserTitleDefaultSet">Huzura Merhaba Deyin</string>
-
-    <!-- Unified Welcome Page -->
-    <string name="unifiedOnboardingTitleFirstVisit">DuckDuckGo\'ya\nhoş geldiniz!</string>
-    <string name="unifiedOnboardingSubtitleTrackerBlockingEnabled">Web\'de arama yaparken ve web\'de gezinirken gizli kalın.</string>
-    <string name="unifiedOnboardingPrivateSearchTitle">Özel Arama</string>
-    <string name="unifiedOnboardingPrivateSearchSubtitle">DuckDuckGo ile aramalarınız her zaman gizlidir.</string>
-    <string name="unifiedOnboardingBrowsingProtectionTitle">Gezinme Koruması</string>
-    <string name="unifiedOnboardingBrowsingProtectionSubtitleTrackerBlockingEnabled">İzleyicileri engelleyin ve varsayılan olarak güvenli bir şekilde göz atın.</string>
-    <string name="unifiedOnboardingDataClearingTitle">Veri Silme</string>
-    <string name="unifiedOnboardingDataClearingSubtitle">Bir düğmeye dokunarak tarama verilerinizi silin.</string>
-    <string name="unifiedOnboardingCustomizationTitle">Özelleştirme</string>
-    <string name="unifiedOnboardingCustomizationSubtitle">Bir tema seçin ve gizlilik özelliklerini kişiselleştirin.</string>
 
     <!-- Default Browser -->
     <string name="cannotLaunchDefaultAppSettings">Varsayılan uygulama ayarları ekranı başlatılamıyor</string>
@@ -46,7 +31,6 @@
     <string name="defaultBrowserMaybeLater">Belki sonra</string>
     <string name="defaultBrowserLetsDoIt">Hadi başlayalım!</string>
     <string name="defaultBrowserDescriptionNoDefault">Her zaman gönül rahatlığıyla açık bağlantılar.</string>
-    <string name="defaultBrowserDescriptionDefaultSet">DuckDuckGo ile çevrimiçi verileriniz, internet sizi nereye götürürse götürsün varsayılan olarak gizlidir.</string>
     <string name="defaultBrowserInstructions">DuckDuckGo\'yu seçin ve <font color="#678fff">Her zaman</font> öğesine dokunun.</string>
 
     <!-- Browser Activity -->
@@ -409,16 +393,31 @@
     <!-- Dax Dialog -->
     <string name="daxDialogHideButton">GİZLE</string>
     <string name="daxDialogPhew">Uf!</string>
-    <string name="daxDialogYes">TAMAM!</string>
-    <string name="daxDialogAddWidget">Widget Ekle</string>
-    <string name="daxDialogMaybeLater">Belki sonra</string>
-    <string name="daxDialogSettings">Ayarlara git</string>
     <string name="daxDialogNext">Sonraki</string>
     <string name="daxDialogHighFive">Çak bir beşlik!</string>
     <string name="daxDialogGotIt">Anladım</string>
     <string name="hideTipsTitle">Kalan ipuçları gizlensin mi?</string>
     <string name="hideTipsText">Sadece birkaç tane var ve onları da bilgilendirici hale getirmeye çalıştık.</string>
     <string name="hideTipsButton">İpuçlarını sonsuza kadar gizle</string>
+
+    <!-- New Onboarding Experience -->
+    <string name="onboardingWelcomeTitle">DuckDuckGo\'ya hoş geldiniz!</string>
+    <string name="onboardingDaxText">İnternet biraz ürkütücü olabilir.&lt;br/&gt;&lt;br/&gt;Endişelenmeyin! Özel olarak arama yapmak ve sitelere göz atmak düşündüğünüzden daha kolaydır.</string>
+    <string name="onboardingLetsDoItButton">Hadi başlayalım!</string>
+    <string name="daxIntroCtaText">Şimdi favori sitelerinizden birini ziyaret etmeyi deneyin! &lt;br/&gt;&lt;br/&gt;İzleyicileri engelleyeceğim, böylece sizi gözetlemeyecekler. Mümkünse bağlantınızın güvenliğini de yükselteceğim. &#128274;</string>
+    <string name="daxEndCtaText">İşte böyle!&lt;br/&gt;&lt;br/&gt;Unutmayın: benimle İnterneti her gezişinizde tüyler ürpertici bir reklam daha kaybolur . &#128077;</string>
+    <string name="daxSerpCtaText">DuckDuckGo aramalarınız anonimdir ve arama geçmişiniz asla saklanmaz. Asla. &#128588;</string>
+    <string name="daxNonSerpCtaText">Her sitenin bir gizlilik derecesi vardır. Gizliliğinizi nasıl koruduğumu görmek için dokunun.&lt;br/&gt;&lt;br/&gt;Biraz daha çılgınlaşmaya ne dersiniz? Yangın düğmesine basarak verilerinizi silmeyi deneyin.</string>
+    <string name="daxMainNetworkStep1CtaText">Dikkat!&lt;br/&gt;&lt;br/&gt; %s büyük bir izleme ağı işletiyor.&lt;br/&gt;&lt;br/&gt;Düşük gizlilik derecesi sizi bu gibi sitelere yönlendirecektir.</string>
+    <string name="daxMainNetworkStep1OwnedCtaText">Dikkat!&lt;br/&gt;&lt;br/&gt; %s, büyük bir izleme ağı işleten %s şirketine aittir.</string>
+    <string name="daxMainNetworkStep21CtaText">Aslında, %s izleyicileri en iyi sitelerin yaklaşık %s kadarına hakim. &#128561; &lt;br/&gt;&lt;br/&gt;</string>
+    <string name="daxMainNetworkStep211CtaText">Aslında, %s izleyicileri İnternetin her yerinde pusuda. &#128561; &lt;br/&gt;&lt;br/&gt;</string>
+    <string name="daxMainNetworkStep2CtaText">%s %s dışındaki sitelere göz atarken bu izleyicileri engelleyeceğim.</string>
+    <plurals name="daxTrackersBlockedCtaText">
+        <item quantity="one">&#160;ve &lt;b&gt;%d diğer&lt;/b&gt; sizi burada izlemeye çalışıyordu. &lt;br/&gt;&lt;br/&gt;Onları engelledim!&lt;br/&gt;&lt;br/&gt; ☝️Yeni bir siteyi ziyaret ettiğinizde sizi kimin izlemeye çalıştığını görmek için URL çubuğunu kontrol edebilirsiniz.</item>
+        <item quantity="other">&#160;ve &lt;b&gt;%d diğerleri&lt;/b&gt; sizi burada izlemeye çalışıyordu. &lt;br/&gt;&lt;br/&gt;Onları engelledim!&lt;br/&gt;&lt;br/&gt; ☝️Yeni bir siteyi ziyaret ettiğinizde sizi kimin izlemeye çalıştığını görmek için URL çubuğunu kontrol edebilirsiniz.</item>
+    </plurals>
+    <string name="daxTrackersBlockedCtaZeroText">&#160;sizi burada izlemeye çalışıyordu. &lt;br/&gt;&lt;br/&gt;Onu engelledim!&lt;br/&gt;&lt;br/&gt; ☝️Yeni bir siteyi ziyaret ettiğinizde sizi kimin izlemeye çalıştığını görmek için URL çubuğunu kontrol edebilirsiniz.</string>
 
     <!-- Covid Cta-->
     <string name="covidCtaText">Resmi COVID-19 hakkında bilgi ve ipuçları alın.</string>

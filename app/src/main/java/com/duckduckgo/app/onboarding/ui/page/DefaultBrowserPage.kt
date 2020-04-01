@@ -20,20 +20,22 @@ import android.annotation.SuppressLint
 import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
+import android.graphics.Color
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
+import android.view.WindowManager
 import android.widget.Toast
+import androidx.core.view.ViewCompat.requestApplyInsets
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserSystemSettings
 import com.duckduckgo.app.global.ViewModelFactory
-import com.duckduckgo.app.global.view.hide
 import com.duckduckgo.app.global.view.show
 import com.duckduckgo.app.statistics.VariantManager
 import dagger.android.support.AndroidSupportInjection
@@ -58,13 +60,7 @@ class DefaultBrowserPage : OnboardingPageFragment() {
         ViewModelProvider(this, viewModelFactory).get(DefaultBrowserPageViewModel::class.java)
     }
 
-    override fun layoutResource(): Int {
-        return if (variantManager.getVariant().hasFeature(VariantManager.VariantFeature.ConceptTest)) {
-            R.layout.content_onboarding_default_browser_daxstyle
-        } else {
-            R.layout.content_onboarding_default_browser
-        }
-    }
+    override fun layoutResource(): Int = R.layout.content_onboarding_default_browser
 
     override fun onAttach(context: Context) {
         AndroidSupportInjection.inject(this)
@@ -74,6 +70,7 @@ class DefaultBrowserPage : OnboardingPageFragment() {
     override fun setUserVisibleHint(isVisibleToUser: Boolean) {
         super.setUserVisibleHint(isVisibleToUser)
         if (isVisibleToUser) {
+            applyStyle()
             viewModel.pageBecameVisible()
         }
     }
@@ -106,23 +103,33 @@ class DefaultBrowserPage : OnboardingPageFragment() {
         outState.putBoolean(SAVED_STATE_LAUNCHED_DEFAULT, userTriedToSetDDGAsDefault)
     }
 
+    private fun applyStyle() {
+        activity?.window?.apply {
+            clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS)
+            addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
+            }
+            statusBarColor = Color.WHITE
+        }
+        requestApplyInsets(longDescriptionContainer)
+    }
+
     private fun observeViewModel() {
-        viewModel.viewState.observe(this, Observer<DefaultBrowserPageViewModel.ViewState> { viewState ->
+        viewModel.viewState.observe(this, Observer { viewState ->
             viewState?.let {
                 when (it) {
                     is DefaultBrowserPageViewModel.ViewState.DefaultBrowserSettingsUI -> {
                         setUiForSettings()
                         hideInstructionsCard()
-                        setOnlyContinue(false)
                     }
                     is DefaultBrowserPageViewModel.ViewState.DefaultBrowserDialogUI -> {
                         setUiForDialog()
                         if (it.showInstructionsCard) showInstructionsCard() else hideInstructionsCard()
-                        setOnlyContinue(false)
                     }
-                    is DefaultBrowserPageViewModel.ViewState.ContinueUI -> {
-                        setOnlyContinue(true)
+                    is DefaultBrowserPageViewModel.ViewState.ContinueToBrowser -> {
                         hideInstructionsCard()
+                        onContinuePressed()
                     }
                 }
             }
@@ -140,6 +147,22 @@ class DefaultBrowserPage : OnboardingPageFragment() {
         })
     }
 
+    private fun setUiForDialog() {
+        defaultBrowserImage.setImageResource(R.drawable.set_as_default_browser_illustration_dialog)
+        browserProtectionSubtitle.setText(R.string.defaultBrowserDescriptionNoDefault)
+        browserProtectionTitle.setText(R.string.onboardingDefaultBrowserTitle)
+        launchSettingsButton.setText(R.string.defaultBrowserLetsDoIt)
+        setButtonsBehaviour()
+    }
+
+    private fun setUiForSettings() {
+        defaultBrowserImage.setImageResource(R.drawable.set_as_default_browser_illustration_settings)
+        browserProtectionSubtitle.setText(R.string.onboardingDefaultBrowserDescription)
+        browserProtectionTitle.setText(R.string.onboardingDefaultBrowserTitle)
+        launchSettingsButton.setText(R.string.defaultBrowserLetsDoIt)
+        setButtonsBehaviour()
+    }
+
     private fun setButtonsBehaviour() {
         launchSettingsButton.setOnClickListener {
             viewModel.onDefaultBrowserClicked()
@@ -147,37 +170,6 @@ class DefaultBrowserPage : OnboardingPageFragment() {
         continueButton.setOnClickListener {
             viewModel.onContinueToBrowser(userTriedToSetDDGAsDefault)
         }
-    }
-
-    private fun setOnlyContinue(visible: Boolean) {
-        if (visible) {
-            continueButton.hide()
-            browserProtectionSubtitle.setText(R.string.defaultBrowserDescriptionDefaultSet)
-            browserProtectionTitle.setText(R.string.onboardingDefaultBrowserTitleDefaultSet)
-
-            defaultBrowserImage.setImageResource(R.drawable.hiker)
-
-            extractContinueButtonTextResourceId()?.let { launchSettingsButton.setText(it) }
-            launchSettingsButton.setOnClickListener {
-                viewModel.onContinueToBrowser(userTriedToSetDDGAsDefault)
-            }
-        } else {
-            launchSettingsButton.setText(R.string.defaultBrowserLetsDoIt)
-            continueButton.show()
-            setButtonsBehaviour()
-        }
-    }
-
-    private fun setUiForDialog() {
-        defaultBrowserImage.setImageResource(R.drawable.set_as_default_browser_illustration_dialog)
-        browserProtectionSubtitle.setText(R.string.defaultBrowserDescriptionNoDefault)
-        browserProtectionTitle.setText(R.string.onboardingDefaultBrowserTitle)
-    }
-
-    private fun setUiForSettings() {
-        defaultBrowserImage.setImageResource(R.drawable.set_as_default_browser_illustration_settings)
-        browserProtectionSubtitle.setText(R.string.onboardingDefaultBrowserDescription)
-        browserProtectionTitle.setText(R.string.onboardingDefaultBrowserTitle)
     }
 
     @SuppressLint("InflateParams")
