@@ -63,7 +63,6 @@ interface Pixel {
         ONBOARDING_DAX_CTA_SHOWN("m_odc_s"),
         ONBOARDING_DAX_ALL_CTA_HIDDEN("m_odc_h"),
         ONBOARDING_DAX_CTA_OK_BUTTON("m_odc_ok"),
-        ONBOARDING_DAX_CTA_CANCEL_BUTTON("m_odc_c"),
 
         PRIVACY_DASHBOARD_OPENED("mp"),
         PRIVACY_DASHBOARD_SCORECARD("mp_c"),
@@ -196,10 +195,6 @@ interface Pixel {
         const val DAX_INITIAL_CTA = "i"
         const val DAX_END_CTA = "e"
         const val DAX_SERP_CTA = "s"
-        const val DAX_DEFAULT_BROWSER_CTA_DIALOG = "dbd"
-        const val DAX_DEFAULT_BROWSER_CTA_SETTINGS = "dbs"
-        const val DAX_SEARCH_WIDGET_CTA_AUTO = "wa"
-        const val DAX_SEARCH_WIDGET_CTA_MANUAL = "wm"
         const val DAX_NETWORK_CTA_1 = "n"
         const val DAX_NETWORK_CTA_2 = "n2"
         const val DAX_TRACKERS_BLOCKED_CTA = "t"

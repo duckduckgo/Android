@@ -7,22 +7,7 @@
 
     <!-- Onboarding Activity -->
     <string name="onboardingDefaultBrowserDescription">Přejděte do Nastavení a vždy vyhledávejte a prohlížejte s DuckDuckGo.</string>
-    <string name="onboardingContinue">Pokračovat</string>
-    <string name="onboardingContinueFinalPage">Začít prohlížet</string>
     <string name="onboardingDefaultBrowserTitle">Nastavte si DuckDuckGo jako výchozí</string>
-    <string name="onboardingDefaultBrowserTitleDefaultSet">Uvítejte klid mysli</string>
-
-    <!-- Unified Welcome Page -->
-    <string name="unifiedOnboardingTitleFirstVisit">Vítejte u\nDuckDuckGo!</string>
-    <string name="unifiedOnboardingSubtitleTrackerBlockingEnabled">Uchovejte si soukromí při vyhledávání a prohlížení internetových stránek.</string>
-    <string name="unifiedOnboardingPrivateSearchTitle">Soukromé vyhledávání</string>
-    <string name="unifiedOnboardingPrivateSearchSubtitle">S DuckDuckGo jsou vaše vyhledávání vždy soukromá.</string>
-    <string name="unifiedOnboardingBrowsingProtectionTitle">Ochrana prohlížení</string>
-    <string name="unifiedOnboardingBrowsingProtectionSubtitleTrackerBlockingEnabled">Blokování sledovacích zařízení a ve výchozím nastavení bezpečně procházení.</string>
-    <string name="unifiedOnboardingDataClearingTitle">Vymazání dat</string>
-    <string name="unifiedOnboardingDataClearingSubtitle">Údaje o prohlížení vymažte klepnutím na tlačítko.</string>
-    <string name="unifiedOnboardingCustomizationTitle">Personalizace</string>
-    <string name="unifiedOnboardingCustomizationSubtitle">Vyberte si motiv a upravte funkce ochrany soukromí.</string>
 
     <!-- Default Browser -->
     <string name="cannotLaunchDefaultAppSettings">Nelze spustit výchozí obrazovku nastavení aplikace.</string>
@@ -30,7 +15,6 @@
     <string name="defaultBrowserMaybeLater">Možná později</string>
     <string name="defaultBrowserLetsDoIt">Pojďme na to!</string>
     <string name="defaultBrowserDescriptionNoDefault">Otevírejte odkazy s klidem mysli, pokaždé.</string>
-    <string name="defaultBrowserDescriptionDefaultSet">S DuckDuckGo jsou Vaše online data dle výchozího nastavení soukromější, ať už Vás internet zavede kamkoli.</string>
     <string name="defaultBrowserInstructions">Vyberte DuckDuckGo a klepněte na <font color="#678fff">Vždy</font>.</string>
 
     <!-- Browser Activity -->
@@ -390,16 +374,33 @@
     <!-- Dax Dialog -->
     <string name="daxDialogHideButton">SKRÝT</string>
     <string name="daxDialogPhew">Pche!</string>
-    <string name="daxDialogYes">OK!</string>
-    <string name="daxDialogAddWidget">Přidat widget</string>
-    <string name="daxDialogMaybeLater">Možná později</string>
-    <string name="daxDialogSettings">Přejít na nastavení</string>
     <string name="daxDialogNext">Další</string>
     <string name="daxDialogHighFive">Plácnutí!</string>
     <string name="daxDialogGotIt">Mám to</string>
     <string name="hideTipsTitle">Skrýt zbývající tipy?</string>
     <string name="hideTipsText">Je jich jen pár a snažili jsme se udělat je informativní.</string>
     <string name="hideTipsButton">Navždy skrýt tipy</string>
+
+    <!-- New Onboarding Experience -->
+    <string name="onboardingWelcomeTitle">Vítejte v DuckDuckGo!</string>
+    <string name="onboardingDaxText">Internet může být někdy trochu strašidelný.&lt;br/&gt;&lt;br/&gt;Nebojte se! Anonymní vyhledávání a procházení je jednodušší, než si myslíte.</string>
+    <string name="onboardingLetsDoItButton">Pojďme na to!</string>
+    <string name="daxIntroCtaText">Dále zkuste navštívit některý z Vašich oblíbených webů! &lt;br/&gt;&lt;br/&gt;Zablokujeme sledovače, aby Vás nemohli špehovat. Pokud to bude možné, upgraduji také zabezpečení Vašeho připojení. &#128274;</string>
+    <string name="daxEndCtaText">Máte to! &lt;br/&gt;&lt;br/&gt;Pamatujte: pokaždé, když internet procházíte se mnou, hrozným reklamám jsou přistřižena křídla. &#128077;</string>
+    <string name="daxSerpCtaText">Vaše vyhledávání DuckDuckGo jsou anonymní a historii Vašeho vyhledávání nikdy nikam neukládáme. Vůbec nikdy. &#128588;</string>
+    <string name="daxNonSerpCtaText">Každý web má svůj stupeň ochrany osobních údajů. Klepnutím na něj si zobrazíte, jak jsem chránil Vaše soukromí.&lt;br/&gt;&lt;br/&gt;Chcete zkusit něco zajímavého? Zkuste stiskem tlačítka palby vymazat svá data.</string>
+    <string name="daxMainNetworkStep1CtaText">Hlavy vzhůru!&lt;br/&gt;&lt;br/&gt; %s provozuje jednu významnou sledovací síť.&lt;br/&gt;&lt;br/&gt;Nízká úroveň ochrany osobních údajů Vás na takovéto stránky upozorní.</string>
+    <string name="daxMainNetworkStep1OwnedCtaText">Hlavy vzhůru!&lt;br/&gt;&lt;br/&gt; %s vlastní společnost %s, která provozuje jednu významnou sledovací síť.</string>
+    <string name="daxMainNetworkStep21CtaText">Ve skutečnosti %s sledovačů číhá na přibližně %s nejnavštěvovanějších webů. &#128561;&lt;br/&gt;&lt;br/&gt;</string>
+    <string name="daxMainNetworkStep211CtaText">Ve skutečnosti %s sledovači číhají na internetu všude. &#128561;&lt;br/&gt;&lt;br/&gt;</string>
+    <string name="daxMainNetworkStep2CtaText">%sKdyž budete navštěvovat weby mimo %s, budeme tyto sledovače blokovat.</string>
+    <plurals name="daxTrackersBlockedCtaText">
+        <item quantity="one">&#160;a &lt;b&gt;%d další&lt;/b&gt; se Vás tu snažili sledovat. &lt;br/&gt;&lt;br/&gt;Zablokovali jsme je!&lt;br/&gt;&lt;br/&gt; ☝️Když navštívíte nový web, můžete se do adresního řádku prohlížeče podívat, kdo se Vás snaží sledovat.</item>
+        <item quantity="few">&#160;a &lt;b&gt;%d další&lt;/b&gt; se Vás tu snažili sledovat. &lt;br/&gt;&lt;br/&gt;Zablokovali jsme je!&lt;br/&gt;&lt;br/&gt; ☝️Když navštívíte nový web, můžete se do adresního řádku prohlížeče podívat, kdo se Vás snaží sledovat.</item>
+        <item quantity="many">&#160;a &lt;b&gt;%d dalších&lt;/b&gt; se Vás tu snažilo sledovat. &lt;br/&gt;&lt;br/&gt;Zablokovali jsme je!&lt;br/&gt;&lt;br/&gt; ☝️Když navštívíte nový web, můžete se do adresního řádku prohlížeče podívat, kdo se Vás snaží sledovat.</item>
+        <item quantity="other">&#160;a &lt;b&gt;%d další&lt;/b&gt; se Vás tu snažili sledovat. &lt;br/&gt;&lt;br/&gt;Zablokovali jsme je!&lt;br/&gt;&lt;br/&gt; ☝️Když navštívíte nový web, můžete se do adresního řádku prohlížeče podívat, kdo se Vás snaží sledovat.</item>
+    </plurals>
+    <string name="daxTrackersBlockedCtaZeroText">&#160;se Vás tady snažil sledovat. &lt;br/&gt;&lt;br/&gt;Zablokovali jsme to!&lt;br/&gt;&lt;br/&gt; ☝️Když navštívíte nový web, můžete se do adresního řádku prohlížeče podívat, kdo se Vás snaží sledovat.</string>
 
     <!-- Covid Cta-->
     <string name="covidCtaText">Odebírejte oficiální informace a tipy o COVID-19.</string>

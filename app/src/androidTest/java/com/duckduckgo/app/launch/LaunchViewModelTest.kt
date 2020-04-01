@@ -21,7 +21,9 @@ import androidx.lifecycle.Observer
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.launch.LaunchViewModel.Command.Home
 import com.duckduckgo.app.launch.LaunchViewModel.Command.Onboarding
+import com.duckduckgo.app.onboarding.store.AppStage
 import com.duckduckgo.app.onboarding.store.OnboardingStore
+import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.referral.AppInstallationReferrerStateListener
 import com.duckduckgo.app.referral.ParsedReferrerResult
 import com.nhaarman.mockitokotlin2.mock
@@ -46,8 +48,8 @@ class LaunchViewModelTest {
     @get:Rule
     var coroutineRule = CoroutineTestRule()
 
-    private var onboardingStore: OnboardingStore = mock()
-    private var mockCommandObserver: Observer<LaunchViewModel.Command> = mock()
+    private val userStageStore = mock<UserStageStore>()
+    private val mockCommandObserver: Observer<LaunchViewModel.Command> = mock()
 
     private lateinit var testee: LaunchViewModel
 
@@ -58,8 +60,8 @@ class LaunchViewModelTest {
 
     @Test
     fun whenOnboardingShouldShowAndReferrerDataReturnsQuicklyThenCommandIsOnboarding() = runBlockingTest {
-        testee = LaunchViewModel(onboardingStore, StubAppReferrerFoundStateListener("xx"))
-        whenever(onboardingStore.shouldShow).thenReturn(true)
+        testee = LaunchViewModel(userStageStore, StubAppReferrerFoundStateListener("xx"))
+        whenever(userStageStore.getUserAppStage()).thenReturn(AppStage.NEW)
         testee.command.observeForever(mockCommandObserver)
 
         testee.determineViewToShow()
@@ -69,8 +71,8 @@ class LaunchViewModelTest {
 
     @Test
     fun whenOnboardingShouldShowAndReferrerDataReturnsButNotInstantlyThenCommandIsOnboarding() = runBlockingTest {
-        testee = LaunchViewModel(onboardingStore, StubAppReferrerFoundStateListener("xx", mockDelayMs = 1_000))
-        whenever(onboardingStore.shouldShow).thenReturn(true)
+        testee = LaunchViewModel(userStageStore, StubAppReferrerFoundStateListener("xx", mockDelayMs = 1_000))
+        whenever(userStageStore.getUserAppStage()).thenReturn(AppStage.NEW)
         testee.command.observeForever(mockCommandObserver)
 
         testee.determineViewToShow()
@@ -80,8 +82,8 @@ class LaunchViewModelTest {
 
     @Test
     fun whenOnboardingShouldShowAndReferrerDataTimesOutThenCommandIsOnboarding() = runBlockingTest {
-        testee = LaunchViewModel(onboardingStore, StubAppReferrerFoundStateListener("xx", mockDelayMs = Long.MAX_VALUE))
-        whenever(onboardingStore.shouldShow).thenReturn(true)
+        testee = LaunchViewModel(userStageStore, StubAppReferrerFoundStateListener("xx", mockDelayMs = Long.MAX_VALUE))
+        whenever(userStageStore.getUserAppStage()).thenReturn(AppStage.NEW)
         testee.command.observeForever(mockCommandObserver)
 
         testee.determineViewToShow()
@@ -91,8 +93,8 @@ class LaunchViewModelTest {
 
     @Test
     fun whenOnboardingShouldNotShowAndReferrerDataReturnsQuicklyThenCommandIsHome() = runBlockingTest {
-        testee = LaunchViewModel(onboardingStore, StubAppReferrerFoundStateListener("xx"))
-        whenever(onboardingStore.shouldShow).thenReturn(false)
+        testee = LaunchViewModel(userStageStore, StubAppReferrerFoundStateListener("xx"))
+        whenever(userStageStore.getUserAppStage()).thenReturn(AppStage.DAX_ONBOARDING)
         testee.command.observeForever(mockCommandObserver)
         testee.determineViewToShow()
         verify(mockCommandObserver).onChanged(any(Home::class.java))
@@ -100,8 +102,8 @@ class LaunchViewModelTest {
 
     @Test
     fun whenOnboardingShouldNotShowAndReferrerDataReturnsButNotInstantlyThenCommandIsHome() = runBlockingTest {
-        testee = LaunchViewModel(onboardingStore, StubAppReferrerFoundStateListener("xx", mockDelayMs = 1_000))
-        whenever(onboardingStore.shouldShow).thenReturn(false)
+        testee = LaunchViewModel(userStageStore, StubAppReferrerFoundStateListener("xx", mockDelayMs = 1_000))
+        whenever(userStageStore.getUserAppStage()).thenReturn(AppStage.DAX_ONBOARDING)
         testee.command.observeForever(mockCommandObserver)
         testee.determineViewToShow()
         verify(mockCommandObserver).onChanged(any(Home::class.java))
@@ -109,8 +111,8 @@ class LaunchViewModelTest {
 
     @Test
     fun whenOnboardingShouldNotShowAndReferrerDataTimesOutThenCommandIsHome() = runBlockingTest {
-        testee = LaunchViewModel(onboardingStore, StubAppReferrerFoundStateListener("xx", mockDelayMs = Long.MAX_VALUE))
-        whenever(onboardingStore.shouldShow).thenReturn(false)
+        testee = LaunchViewModel(userStageStore, StubAppReferrerFoundStateListener("xx", mockDelayMs = Long.MAX_VALUE))
+        whenever(userStageStore.getUserAppStage()).thenReturn(AppStage.DAX_ONBOARDING)
         testee.command.observeForever(mockCommandObserver)
         testee.determineViewToShow()
         verify(mockCommandObserver).onChanged(any(Home::class.java))

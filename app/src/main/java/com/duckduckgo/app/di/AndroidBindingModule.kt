@@ -37,9 +37,7 @@ import com.duckduckgo.app.job.AppConfigurationJobService
 import com.duckduckgo.app.launch.LaunchBridgeActivity
 import com.duckduckgo.app.notification.NotificationHandlerService
 import com.duckduckgo.app.onboarding.ui.OnboardingActivity
-import com.duckduckgo.app.onboarding.ui.OnboardingActivityExperiment
 import com.duckduckgo.app.onboarding.ui.page.DefaultBrowserPage
-import com.duckduckgo.app.onboarding.ui.page.UnifiedSummaryPage
 import com.duckduckgo.app.privacy.ui.PrivacyDashboardActivity
 import com.duckduckgo.app.privacy.ui.PrivacyPracticesActivity
 import com.duckduckgo.app.privacy.ui.ScorecardActivity
@@ -64,11 +62,7 @@ abstract class AndroidBindingModule {
 
     @ActivityScoped
     @ContributesAndroidInjector
-    abstract fun onboardingActivity(): OnboardingActivity
-
-    @ActivityScoped
-    @ContributesAndroidInjector
-    abstract fun onboardingActivityExperiment(): OnboardingActivityExperiment
+    abstract fun onboardingActivityExperiment(): OnboardingActivity
 
     @ActivityScoped
     @ContributesAndroidInjector
@@ -168,9 +162,6 @@ abstract class AndroidBindingModule {
 
     @ContributesAndroidInjector
     abstract fun brokenSiteNegativeFeedbackFragment(): BrokenSiteNegativeFeedbackFragment
-
-    @ContributesAndroidInjector
-    abstract fun unifiedSummaryPage(): UnifiedSummaryPage
 
     /* Services */
 

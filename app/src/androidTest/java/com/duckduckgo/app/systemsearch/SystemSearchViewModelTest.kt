@@ -24,14 +24,14 @@ import com.duckduckgo.app.InstantSchedulersRule
 import com.duckduckgo.app.autocomplete.api.AutoComplete
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteResult
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteSearchSuggestion
-import com.duckduckgo.app.onboarding.store.OnboardingStore
+import com.duckduckgo.app.onboarding.store.AppStage
+import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.*
 import com.duckduckgo.app.systemsearch.SystemSearchViewModel.Command
 import com.duckduckgo.app.systemsearch.SystemSearchViewModel.Command.LaunchDuckDuckGo
 import com.nhaarman.mockitokotlin2.*
 import io.reactivex.Observable
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.TestCoroutineScope
 import kotlinx.coroutines.test.runBlockingTest
 import org.junit.After
@@ -41,6 +41,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.mockito.Mockito.verify
 
+@Suppress("EXPERIMENTAL_API_USAGE")
 class SystemSearchViewModelTest {
 
     @get:Rule
@@ -52,7 +53,7 @@ class SystemSearchViewModelTest {
     @get:Rule
     var coroutineRule = CoroutineTestRule()
 
-    private val mockOnboardingStore: OnboardingStore = mock()
+    private val mockUserStageStore: UserStageStore = mock()
     private val mockDeviceAppLookup: DeviceAppLookup = mock()
     private val mockAutoComplete: AutoComplete = mock()
     private val mockPixel: Pixel = mock()
@@ -68,7 +69,7 @@ class SystemSearchViewModelTest {
         whenever(mockAutoComplete.autoComplete(BLANK_QUERY)).thenReturn(Observable.just(autocompleteBlankResult))
         whenever(mockDeviceAppLookup.query(QUERY)).thenReturn(appQueryResult)
         whenever(mockDeviceAppLookup.query(BLANK_QUERY)).thenReturn(appBlankResult)
-        testee = SystemSearchViewModel(mockOnboardingStore, mockAutoComplete, mockDeviceAppLookup, mockPixel, coroutineRule.testDispatcherProvider)
+        testee = SystemSearchViewModel(mockUserStageStore, mockAutoComplete, mockDeviceAppLookup, mockPixel, coroutineRule.testDispatcherProvider)
         testee.command.observeForever(commandObserver)
     }
 
@@ -79,7 +80,7 @@ class SystemSearchViewModelTest {
 
     @Test
     fun whenOnboardingShouldNotShowThenViewIsNotVisibleAndUnexpanded() = runBlockingTest {
-        whenever(mockOnboardingStore.shouldShow).thenReturn(false)
+        whenever(mockUserStageStore.getUserAppStage()).thenReturn(AppStage.DAX_ONBOARDING)
         testee.resetViewState()
 
         val viewState = testee.onboardingViewState.value
@@ -89,7 +90,7 @@ class SystemSearchViewModelTest {
 
     @Test
     fun whenOnboardingShouldShowThenViewIsVisibleAndUnexpanded() = runBlockingTest {
-        whenever(mockOnboardingStore.shouldShow).thenReturn(true)
+        whenever(mockUserStageStore.getUserAppStage()).thenReturn(AppStage.NEW)
         testee.resetViewState()
 
         val viewState = testee.onboardingViewState.value
@@ -99,7 +100,7 @@ class SystemSearchViewModelTest {
 
     @Test
     fun whenOnboardingShownThenPixelSent() = runBlockingTest {
-        whenever(mockOnboardingStore.shouldShow).thenReturn(true)
+        whenever(mockUserStageStore.getUserAppStage()).thenReturn(AppStage.NEW)
         testee.resetViewState()
         verify(mockPixel).fire(INTERSTITIAL_ONBOARDING_SHOWN)
     }
@@ -133,7 +134,7 @@ class SystemSearchViewModelTest {
         val viewState = testee.onboardingViewState.value
         assertFalse(viewState!!.visible)
         verify(mockPixel).fire(INTERSTITIAL_ONBOARDING_DISMISSED)
-        verify(mockOnboardingStore).onboardingShown()
+        verify(mockUserStageStore).stageCompleted(AppStage.NEW)
     }
 
     @Test
@@ -192,6 +193,13 @@ class SystemSearchViewModelTest {
     }
 
     @Test
+    fun whenUserSubmitsQueryThenOnboardingCompleted() = ruleRunBlockingTest {
+        testee.userSubmittedQuery(QUERY)
+        verify(mockUserStageStore).stageCompleted(AppStage.NEW)
+    }
+
+
+    @Test
     fun whenUserSubmitsAutocompleteResultThenBrowserLaunchedAndPixelSent() {
         testee.userSubmittedAutocompleteResult(AUTOCOMPLETE_RESULT)
         verify(commandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
@@ -216,6 +224,12 @@ class SystemSearchViewModelTest {
     }
 
     @Test
+    fun whenUserTapsDaxThenOnboardingCompleted() = ruleRunBlockingTest {
+        testee.userTappedDax()
+        verify(mockUserStageStore).stageCompleted(AppStage.NEW)
+    }
+
+    @Test
     fun whenViewModelCreatedThenAppsRefreshed() = ruleRunBlockingTest {
         verify(mockDeviceAppLookup).refreshAppList()
     }
@@ -228,8 +242,8 @@ class SystemSearchViewModelTest {
         assertEquals(Command.ShowAppNotFoundMessage(deviceApp.shortName), commandCaptor.lastValue)
     }
 
-    private fun whenOnboardingShowing() {
-        whenever(mockOnboardingStore.shouldShow).thenReturn(true)
+    private suspend fun whenOnboardingShowing() {
+        whenever(mockUserStageStore.getUserAppStage()).thenReturn(AppStage.NEW)
         testee.resetViewState()
     }
 

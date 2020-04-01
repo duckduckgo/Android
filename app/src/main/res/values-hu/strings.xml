@@ -7,22 +7,7 @@
 
     <!-- Onboarding Activity -->
     <string name="onboardingDefaultBrowserDescription">A Beállítások oldalon bármikor kereshetsz és böngészhetsz a DuckDuckGo segítségével.</string>
-    <string name="onboardingContinue">Folytatás</string>
-    <string name="onboardingContinueFinalPage">Böngészés indítása</string>
     <string name="onboardingDefaultBrowserTitle">Tedd a DuckDuckGót az alapértelmezett keresőoldaladdá</string>
-    <string name="onboardingDefaultBrowserTitleDefaultSet">Köszönj a Peace of Mindnak</string>
-
-    <!-- Unified Welcome Page -->
-    <string name="unifiedOnboardingTitleFirstVisit">Üdvözöl a\nDuckDuckGo!</string>
-    <string name="unifiedOnboardingSubtitleTrackerBlockingEnabled">Teljes adatvédelem internetböngészés közben.</string>
-    <string name="unifiedOnboardingPrivateSearchTitle">Privát keresés</string>
-    <string name="unifiedOnboardingPrivateSearchSubtitle">A DuckDuckGo használatával minden keresésed privát lesz.</string>
-    <string name="unifiedOnboardingBrowsingProtectionTitle">Böngészési védelem</string>
-    <string name="unifiedOnboardingBrowsingProtectionSubtitleTrackerBlockingEnabled">Tiltsd le a nyomkövetőket és böngéssz biztonságosan alapértelmezés szerint.</string>
-    <string name="unifiedOnboardingDataClearingTitle">Adatok törlése</string>
-    <string name="unifiedOnboardingDataClearingSubtitle">Egyetlen gombnyomással törölheted böngészési adataidat.</string>
-    <string name="unifiedOnboardingCustomizationTitle">Testreszabás</string>
-    <string name="unifiedOnboardingCustomizationSubtitle">Válassz egy felületet, és személyre szabhatod az adatvédelmi funkciókat.</string>
 
     <!-- Default Browser -->
     <string name="cannotLaunchDefaultAppSettings">Az alkalmazás alapértelmezett beállítású képernyője nem indítható el</string>
@@ -30,7 +15,6 @@
     <string name="defaultBrowserMaybeLater">Talán később</string>
     <string name="defaultBrowserLetsDoIt">Csináljuk!</string>
     <string name="defaultBrowserDescriptionNoDefault">Nyugodtan kattints a linkekre, mindig.</string>
-    <string name="defaultBrowserDescriptionDefaultSet">A DuckDuckGo használatával az online adatok alapértelmezés szerint sokkal jobban védettek, bárhová is visz az internet.</string>
     <string name="defaultBrowserInstructions">Válaszd ki a DuckDuckGót, majd koppints a <font color="#678fff"> Mindig </font> elemre.</string>
 
     <!-- Browser Activity -->
@@ -386,16 +370,31 @@
     <!-- Dax Dialog -->
     <string name="daxDialogHideButton">ELREJTÉS</string>
     <string name="daxDialogPhew">Pfuj!</string>
-    <string name="daxDialogYes">RENDBEN!</string>
-    <string name="daxDialogAddWidget">Widget hozzáadása</string>
-    <string name="daxDialogMaybeLater">Talán később</string>
-    <string name="daxDialogSettings">Ugrás a beállításokhoz</string>
     <string name="daxDialogNext">Következő</string>
     <string name="daxDialogHighFive">Pacsi!</string>
     <string name="daxDialogGotIt">Megvan</string>
     <string name="hideTipsTitle">Elrejti a többi tippet?</string>
     <string name="hideTipsText">Csak néhány van, és megpróbáltuk őket informatívvá tenni.</string>
     <string name="hideTipsButton">Ötletek elrejtése örökre</string>
+
+    <!-- New Onboarding Experience -->
+    <string name="onboardingWelcomeTitle">Üdvözlünk a DuckDuckGo-ban!</string>
+    <string name="onboardingDaxText">Az internet lehet hátborzongató.&lt;br/&gt;&lt;br/&gt;Ne aggódjon! A magánjellegű keresés és böngészés könnyebb, mint gondolná.</string>
+    <string name="onboardingLetsDoItButton">Rajta, csináljuk!</string>
+    <string name="daxIntroCtaText">A következő lépésben látogassa meg az egyik kedvenc webhelyét! &lt;br/&gt;&lt;br/&gt;Én blokkolom a nyomkövetőket, hogy ne tudjanak kémkedni. Ha lehet, a kapcsolat biztonságát is javítom. &#128274;</string>
+    <string name="daxEndCtaText">Megvan, ez az! &lt;br/&gt;&lt;br/&gt;Ne feledje: minden alkalommal, amikor velem végzi a böngészést, a hátborzongató hirdetés elveszíti az erejét. &#128077;</string>
+    <string name="daxSerpCtaText">A DuckDuckGo keresések névtelenek, és én soha nem tárolom el a keresési előzményeket. Soha. &#128588;</string>
+    <string name="daxNonSerpCtaText">Minden webhely rendelkezik adatvédelmi besorolással. Koppintson rá, hogy megvédje a magánszféráját.&lt;br/&gt;&lt;br/&gt;Van kedve hozzá? Próbálja meg törölni az adatokat a Kidob gomb megnyomásával.</string>
+    <string name="daxMainNetworkStep1CtaText">Fel a fejjel!&lt;br/&gt;&lt;br/&gt; %s egy nagy nyomkövető hálózatot működtet.&lt;br/&gt;&lt;br/&gt;Az alacsony szintű adatvédelem ilyen webhelyekhez vezet.</string>
+    <string name="daxMainNetworkStep1OwnedCtaText">Fel a fejjel!A(z) &lt;br/&gt;&lt;br/&gt; %s tulajdonosa a %s, aki egy nagy nyomkövető hálózatot üzemeltet.</string>
+    <string name="daxMainNetworkStep21CtaText">A(z) %s nyomkövetők valójában a legfontosabb %s oldalakon ólálkodnak. &#128561;&lt;br/&gt;&lt;br/&gt;</string>
+    <string name="daxMainNetworkStep211CtaText">A(z) %s nyomkövetők valójában az egész interneten leselkednek. &#128561;&lt;br/&gt;&lt;br/&gt;</string>
+    <string name="daxMainNetworkStep2CtaText">%s Letiltom ezeket a nyomkövetőket, ha nem-%s helyeken böngész.</string>
+    <plurals name="daxTrackersBlockedCtaText">
+        <item quantity="one">&#160;és &lt;b&gt;%d másik&lt;/b&gt; itt próbálta meg követni. &lt;br/&gt;&lt;br/&gt;blokkoltam őket!&lt;br/&gt;&lt;br/&gt; ☝️Ellenőrizheti az URL-sávot, hogy megtudja, ki próbálja meg követni, amikor új webhelyre látogat.</item>
+        <item quantity="other">&#160;és &lt;b&gt;%d másik&lt;/b&gt; itt próbálta meg követni. &lt;br/&gt;&lt;br/&gt;blokkoltam őket!&lt;br/&gt;&lt;br/&gt; ☝️Ellenőrizheti az URL-sávot, hogy megtudja, ki próbálja meg követni, amikor új webhelyre látogat.</item>
+    </plurals>
+    <string name="daxTrackersBlockedCtaZeroText">&#160;itt próbálta meg követni. &lt;br/&gt;&lt;br/&gt;blokkoltam!&lt;br/&gt;&lt;br/&gt; ☝️Ellenőrizheti az URL-sávot, hogy megtudja, ki próbálja meg követni, amikor új webhelyre látogat.</string>
 
     <!-- Covid Cta-->
     <string name="covidCtaText">Kapjon hivatalos információt és tippeket a COVID-19-ről.</string>

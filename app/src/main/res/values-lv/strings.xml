@@ -23,22 +23,7 @@
 
     <!-- Onboarding Activity -->
     <string name="onboardingDefaultBrowserDescription">Dodieties uz Iestatījumiem, lai meklētu un pārlūkotu ar DuckDuckGo katru reizi.</string>
-    <string name="onboardingContinue">Turpināt</string>
-    <string name="onboardingContinueFinalPage">Sākt pārlūkošanu</string>
     <string name="onboardingDefaultBrowserTitle">Izvēlieties DuckDuckGo par jūsu Noklusējumu</string>
-    <string name="onboardingDefaultBrowserTitleDefaultSet">Nododieties mieram</string>
-
-    <!-- Unified Welcome Page -->
-    <string name="unifiedOnboardingTitleFirstVisit">Laipni lūdzam\nDuckDuckGo!</string>
-    <string name="unifiedOnboardingSubtitleTrackerBlockingEnabled">Veicot meklēšanu un pārlūkošanu tīmeklī, saglabājiet privātumu.</string>
-    <string name="unifiedOnboardingPrivateSearchTitle">Privātā meklēšana</string>
-    <string name="unifiedOnboardingPrivateSearchSubtitle">Ar DuckDuckGo jūsu meklējumi vienmēr ir privāti.</string>
-    <string name="unifiedOnboardingBrowsingProtectionTitle">Pārlūkošanas aizsardzība</string>
-    <string name="unifiedOnboardingBrowsingProtectionSubtitleTrackerBlockingEnabled">Bloķējiet izsekotājus un pārlūkojiet droši pēc noklusējuma.</string>
-    <string name="unifiedOnboardingDataClearingTitle">Datu dzēšana</string>
-    <string name="unifiedOnboardingDataClearingSubtitle">Izdzēsiet pārlūkošanas datus, pieskaroties pogai.</string>
-    <string name="unifiedOnboardingCustomizationTitle">Pielāgošana</string>
-    <string name="unifiedOnboardingCustomizationSubtitle">Izvēlieties motīvu un pielāgojiet privātuma funkcijas.</string>
 
     <!-- Default Browser -->
     <string name="cannotLaunchDefaultAppSettings">Nevar palaist lietotnes noklusējuma iestatījumu ekrānu</string>
@@ -46,7 +31,6 @@
     <string name="defaultBrowserMaybeLater">Varbūt vēlāk</string>
     <string name="defaultBrowserLetsDoIt">Aiziet!</string>
     <string name="defaultBrowserDescriptionNoDefault">Katru reizi atveriet saites bez raizēm.</string>
-    <string name="defaultBrowserDescriptionDefaultSet">Izmantojot DuckDuckGo, jūsu tiešsaistes dati pēc noklusējuma būs privāti, lai arī kurp internets jūs aizvestu.</string>
     <string name="defaultBrowserInstructions">Atlasiet DuckDuckGo un pieskarieties <font color="#678fff">Vienmēr</font>.</string>
 
     <!-- Browser Activity -->
@@ -410,16 +394,32 @@
     <!-- Dax Dialog -->
     <string name="daxDialogHideButton">PASLĒPT</string>
     <string name="daxDialogPhew">Phū!</string>
-    <string name="daxDialogYes">LABI!</string>
-    <string name="daxDialogAddWidget">Pievienot logrīku</string>
-    <string name="daxDialogMaybeLater">Varbūt vēlāk</string>
-    <string name="daxDialogSettings">Atvērt iestatījumus</string>
     <string name="daxDialogNext">Nākamais</string>
     <string name="daxDialogHighFive">Dod pieci!</string>
     <string name="daxDialogGotIt">Sapratu</string>
     <string name="hideTipsTitle">Vai paslēpt pārējos padomus?</string>
     <string name="hideTipsText">Tie ir tikai daži, un mēs centāmies padarīt tos informatīvus.</string>
     <string name="hideTipsButton">Paslēpt padomus uz visiem laikiem</string>
+
+    <!-- New Onboarding Experience -->
+    <string name="onboardingWelcomeTitle">Laipni lūdzam DuckDuckGo!</string>
+    <string name="onboardingDaxText">Internets var būt diezgan biedējošs.&lt;br/&gt;&lt;br/&gt;Bet neuztraucieties! Meklēt un pārlūkot privātā režīmā ir vieglāk, nekā jūs domājat.</string>
+    <string name="onboardingLetsDoItButton">Darīsim to!</string>
+    <string name="daxIntroCtaText">Tagad pamēģiniet ieiet kādā no jūsu mīļākajām vietnēm! &lt;br/&gt;&lt;br/&gt;Es nobloķēšu izsekotājus, lai viņi nevarētu jūs izspiegot. Ja iespējams, uzlabošu arī jūsu savienojuma drošību. &#128274;</string>
+    <string name="daxEndCtaText">Tas izdevās! &lt;br/&gt;&lt;br/&gt;Atcerieties – katru reizi, kad jūs pārlūkojat ar mani, jocīgas reklāmas atkāpjas. &#128077;</string>
+    <string name="daxSerpCtaText">Jūsu DuckDuckGo meklējumi ir anonīmi, un es nekad neuzglabāju jūsu meklēšanas vēsturi. Nekad. &#128588;</string>
+    <string name="daxNonSerpCtaText">Katrai vietnei ir savs konfidencialitātes līmenis. Pieskarieties tam, lai redzētu, kā es aizsargāju jūsu privātumu.&lt;br/&gt;&lt;br/&gt;Kaut ko vēl labāku? Pamēģiniet nodzēst datus, noklikšķinot uz uguns pogas.</string>
+    <string name="daxMainNetworkStep1CtaText">Galvas augšā!&lt;br/&gt;&lt;br/&gt; %s pārvalda lielu izsekošanas tīklu.&lt;br/&gt;&lt;br/&gt;Zems konfidencialitātes līmenis jūs aizvedīs uz šādām vietnēm.</string>
+    <string name="daxMainNetworkStep1OwnedCtaText">Galvas augšā!&lt;br/&gt;&lt;br/&gt; %s pieder uzņēmumam %s, kas pārvalda galveno izsekošanas tīklu.</string>
+    <string name="daxMainNetworkStep21CtaText">Faktiski %s izsekotāji slēpjas apmēram %s populārākajās vietnēs. &#128561;&lt;br/&gt;&lt;br/&gt;</string>
+    <string name="daxMainNetworkStep211CtaText">Faktiski %s izsekotāju slēpjas visā internetā. &#128561;&lt;br/&gt;&lt;br/&gt;</string>
+    <string name="daxMainNetworkStep2CtaText">%s Es bloķēšu šos izsekotājus, kad pārlūkosiet vietnes, kas nav %s vietnes.</string>
+    <plurals name="daxTrackersBlockedCtaText">
+        <item quantity="zero">&#160;un &lt;b&gt;%d citas&lt;/b&gt; mēģināja jūs izsekot. &lt;br/&gt;&lt;br/&gt;Es tās nobloķēju!&lt;br/&gt;&lt;br/&gt; ☝️Jūs varat pārbaudīt URL joslu, lai redzētu, kas mēģina jūs izsekot, kad apmeklējat jaunu vietni.️</item>
+        <item quantity="one">&#160;un &lt;b&gt;%d citas&lt;/b&gt; mēģināja jūs izsekot. &lt;br/&gt;&lt;br/&gt;Es tās nobloķēju!&lt;br/&gt;&lt;br/&gt; ☝️Jūs varat pārbaudīt URL joslu, lai redzētu, kurš mēģina jūs izsekot, kad apmeklējat jaunu vietni.️</item>
+        <item quantity="other">&#160;un &lt;b&gt;%d citas&lt;/b&gt; mēģināja jūs izsekot. &lt;br/&gt;&lt;br/&gt;Es tās nobloķēju!&lt;br/&gt;&lt;br/&gt; ☝️Jūs varat pārbaudīt URL joslu, lai redzētu, kurš mēģina jūs izsekot, kad apmeklējat jaunu vietni.️</item>
+    </plurals>
+    <string name="daxTrackersBlockedCtaZeroText">&#160;mēģināja jūs izsekot. &lt;br/&gt;&lt;br/&gt;Es to nobloķēju!&lt;br/&gt;&lt;br/&gt; ☝️Jūs varat pārbaudīt URL joslu, lai redzētu, kurš mēģina jūs izsekot, kad apmeklējat jaunu vietni.️</string>
 
     <!-- Covid Cta-->
     <string name="covidCtaText">Iegūstiet oficiālo informāciju un padomus par COVID-19.</string>

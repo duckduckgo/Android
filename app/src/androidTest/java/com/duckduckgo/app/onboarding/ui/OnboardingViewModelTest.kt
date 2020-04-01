@@ -17,43 +17,37 @@
 package com.duckduckgo.app.onboarding.ui
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
-import com.duckduckgo.app.onboarding.store.OnboardingStore
-import com.duckduckgo.app.privacy.store.PrivacySettingsStore
-import com.duckduckgo.app.statistics.VariantManager
-import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.CoroutineTestRule
+import com.duckduckgo.app.onboarding.store.AppStage
+import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.nhaarman.mockitokotlin2.mock
-import com.nhaarman.mockitokotlin2.never
 import com.nhaarman.mockitokotlin2.verify
-import com.nhaarman.mockitokotlin2.whenever
+import kotlinx.coroutines.test.runBlockingTest
 import org.junit.Rule
 import org.junit.Test
 
 
+@Suppress("EXPERIMENTAL_API_USAGE")
 class OnboardingViewModelTest {
 
     @get:Rule
     @Suppress("unused")
     var instantTaskExecutorRule = InstantTaskExecutorRule()
 
-    private var onboardingStore: OnboardingStore = mock()
-    private var privacySettingsStore: PrivacySettingsStore = mock()
+    @get:Rule
+    var coroutineRule = CoroutineTestRule()
 
-    private val variantManager: VariantManager = mock()
-    private val mockDefaultBrowserCapabilityDetector: DefaultBrowserDetector = mock()
-    private val pixelSender: Pixel = mock()
-    private val mockPageLayout: OnboardingPageManager =
-        OnboardingPageManagerWithTrackerBlocking(OnboardingFragmentPageBuilder(), mockDefaultBrowserCapabilityDetector, variantManager)
+    private var userStageStore: UserStageStore = mock()
+
+    private val pageLayout: OnboardingPageManager = mock()
 
     private val testee: OnboardingViewModel by lazy {
-        OnboardingViewModel(onboardingStore, mockPageLayout)
+        OnboardingViewModel(userStageStore, pageLayout, coroutineRule.testDispatcherProvider)
     }
 
     @Test
-    fun whenOnboardingDoneThenStoreNotifiedThatOnboardingShown() {
-        whenever(variantManager.getVariant()).thenReturn(VariantManager.DEFAULT_VARIANT)
-        verify(onboardingStore, never()).onboardingShown()
+    fun whenOnboardingDoneThenCompleteStage() = runBlockingTest {
         testee.onOnboardingDone()
-        verify(onboardingStore).onboardingShown()
+        verify(userStageStore).stageCompleted(AppStage.NEW)
     }
 }

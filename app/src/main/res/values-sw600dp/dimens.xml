@@ -17,8 +17,6 @@
   -->
 
 <resources>
-    <dimen name="onboardingSubtitleTextSize">20sp</dimen>
-
     <dimen name="modalCardTitleTextSize">30sp</dimen>
     <dimen name="modalCardDescriptionTextSize">20sp</dimen>
     <dimen name="modalCardEditTextSize">20sp</dimen>
@@ -27,5 +25,4 @@
     <dimen name="feedbackCardVerticalMargin">32dp</dimen>
     <dimen name="feedbackFormFieldsMargin">32dp</dimen>
     <dimen name="feedbackCardHorizontalMargin">48dp</dimen>
-
 </resources>

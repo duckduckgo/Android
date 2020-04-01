@@ -173,13 +173,6 @@ class ExperimentationVariantManagerTest {
         assertTrue(variant.features.isEmpty())
     }
 
-    @Test
-    fun whenEuAuctionReferrerVariantReturnedThenSuppressWidgetFeaturesEnabled() {
-        mockUpdateScenario(RESERVED_EU_AUCTION_VARIANT)
-        val variant = testee.getVariant(activeVariants)
-        assertTrue(variant.hasFeature(VariantManager.VariantFeature.SuppressHomeTabWidgetCta))
-    }
-
     private fun mockUpdateScenario(key: String) {
         testee.updateAppReferrerVariant(key)
         whenever(mockStore.referrerVariant).thenReturn(key)
