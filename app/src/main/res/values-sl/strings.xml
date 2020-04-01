@@ -7,22 +7,7 @@
 
     <!-- Onboarding Activity -->
     <string name="onboardingDefaultBrowserDescription">Vsakič obiščite Nastavitve za iskanje in brskanje z DuckDuckGo.</string>
-    <string name="onboardingContinue">Nadaljujte</string>
-    <string name="onboardingContinueFinalPage">Začnite brskati</string>
     <string name="onboardingDefaultBrowserTitle">Nastavi aplikacijo DuckDuckGo kot privzeto</string>
-    <string name="onboardingDefaultBrowserTitleDefaultSet">Najdite vaš notranji mir</string>
-
-    <!-- Unified Welcome Page -->
-    <string name="unifiedOnboardingTitleFirstVisit">Dobrodošli v\nDuckDuckGo!</string>
-    <string name="unifiedOnboardingSubtitleTrackerBlockingEnabled">Med iskanjem in brskanjem po spletu ohranite zasebnost.</string>
-    <string name="unifiedOnboardingPrivateSearchTitle">Zasebno iskanje</string>
-    <string name="unifiedOnboardingPrivateSearchSubtitle">Z DuckDuckGo so vaša iskanja vedno zasebna.</string>
-    <string name="unifiedOnboardingBrowsingProtectionTitle">Zaščita brskanja</string>
-    <string name="unifiedOnboardingBrowsingProtectionSubtitleTrackerBlockingEnabled">Privzeto blokirajte sledilnike in brskajte varno.</string>
-    <string name="unifiedOnboardingDataClearingTitle">Brisanje podatkov</string>
-    <string name="unifiedOnboardingDataClearingSubtitle">Izbrišite podatke brskanja z enim samim pritiskom na gumb.</string>
-    <string name="unifiedOnboardingCustomizationTitle">Prilagoditev</string>
-    <string name="unifiedOnboardingCustomizationSubtitle">Izberite temo in prilagodite funkcije zasebnosti.</string>
 
     <!-- Default Browser -->
     <string name="cannotLaunchDefaultAppSettings">Zaslona privzetih nastavitev aplikacije ni mogoče zagnati</string>
@@ -30,7 +15,6 @@
     <string name="defaultBrowserMaybeLater">Mogoče kasneje</string>
     <string name="defaultBrowserLetsDoIt">Zanima me!</string>
     <string name="defaultBrowserDescriptionNoDefault">Bodite pomirjeni, ko odpirate povezave.</string>
-    <string name="defaultBrowserDescriptionDefaultSet">Z aplikacijo DuckDuckGo so vaši spletni podatki privzeto bolj zasebni, ne glede na to, kam vas vodi internet.</string>
     <string name="defaultBrowserInstructions">Izberite aplikacijo DuckDuckGo in tapnite <font color="#678fff">Vedno</font>.</string>
 
     <!-- Browser Activity -->
@@ -394,16 +378,33 @@
     <!-- Dax Dialog -->
     <string name="daxDialogHideButton">Skrij</string>
     <string name="daxDialogPhew">Fuj!</string>
-    <string name="daxDialogYes">V REDU!</string>
-    <string name="daxDialogAddWidget">Dodaj gradnik</string>
-    <string name="daxDialogMaybeLater">Mogoče kasneje</string>
-    <string name="daxDialogSettings">Pojdite na nastavitve</string>
     <string name="daxDialogNext">Naslednji</string>
     <string name="daxDialogHighFive">Petka!</string>
     <string name="daxDialogGotIt">Razumem</string>
     <string name="hideTipsTitle">Skrij preostale nasvete?</string>
     <string name="hideTipsText">Le nekaj jih je in poskušali smo jih narediti informativne.</string>
     <string name="hideTipsButton">Skrivaj nasvete za vedno</string>
+
+    <!-- New Onboarding Experience -->
+    <string name="onboardingWelcomeTitle">Dobrodošli v aplikaciji DUCKDUCKGO</string>
+    <string name="onboardingDaxText">&lt;br/&gt;&lt;br/&gt;Brez skrbi! Internet je lahko grozljiv. Iskanje in brskanje na zaseben način je lažje, kot si mislite.</string>
+    <string name="onboardingLetsDoItButton">Dajmo se ga lotiti!</string>
+    <string name="daxIntroCtaText">Nato obiščite eno od svojih najljubših spletišč! &lt;br/&gt;&lt;br/&gt;Blokiral bom sledilce, da vas ne bi vohunili. Prav tako bom nadgradil varnost vaše povezave. &#128274;</string>
+    <string name="daxEndCtaText">&lt;br/&gt;&lt;br/&gt;Ne pozabite: vsakič, ko brskate z mano, grozljiv oglas izgubi krila. &#128077;</string>
+    <string name="daxSerpCtaText">Vaša iskanja v DuckDuckGo so anonimna in nikoli ne shranim vaše zgodovine iskanja. Vedno. &#128588;</string>
+    <string name="daxNonSerpCtaText">Vsako spletno mesto ima oceno zasebnosti. Tapnite nanj da vidite kako barni vašo zasebnost.&lt;br/&gt;&lt;br/&gt;Se želite navdušiti? Poskusite izbrisati svoje podatke s pritiskom na gumb za požar.</string>
+    <string name="daxMainNetworkStep1CtaText">Glavo pokonci!&lt;br/&gt;&lt;br/&gt; %s vodi glavno mrežo za sledenje.&lt;br/&gt;&lt;br/&gt;Nizka ocena zasebnosti vas bo usmerila na taka spletna mesta.</string>
+    <string name="daxMainNetworkStep1OwnedCtaText">Glavo pokonci!&lt;br/&gt;&lt;br/&gt; %s je last podjetja %s, ki vodi glavno sledilno mrežo.</string>
+    <string name="daxMainNetworkStep21CtaText">Pravzaprav %s sledilci skrivajo od%s najboljših spletišč. &#128561;&lt;br/&gt;&lt;br/&gt;</string>
+    <string name="daxMainNetworkStep211CtaText">Pravzaprav %s se sledilci skrivajo po vsem internetu. &#128561;&lt;br/&gt;&lt;br/&gt;</string>
+    <string name="daxMainNetworkStep2CtaText">%s Blokiral bom te sledilce med brskanjem po spletiščih mestih, ki niso %s.</string>
+    <plurals name="daxTrackersBlockedCtaText">
+        <item quantity="one">&#160;in &lt;b&gt;%d drugi&lt;/b&gt; so vas skušali zaslediti tukaj. &lt;br/&gt;&lt;br/&gt;Blokiral sem jih!&lt;br/&gt;&lt;br/&gt; ☝️Preverite lahko URL vrstico, da vidite, kdo vas poskuša zaslediti, ko obiščete novo spletišče.️</item>
+        <item quantity="two">&#160;in &lt;b&gt;%d drugi&lt;/b&gt; so vas poskušali zaslediti tukaj. &lt;br/&gt;&lt;br/&gt;Blokiral sem jih!&lt;br/&gt;&lt;br/&gt; ☝️Preverite lahko URL vrstico, da vidite, kdo vas poskuša zaslediti, ko obiščete novo spletno mesto.️</item>
+        <item quantity="few">&#160;in &lt;b&gt;%d drugi&lt;/b&gt; so vas poskušali zaslediti tukaj. &lt;br/&gt;&lt;br/&gt;Blokiral sem jih!&lt;br/&gt;&lt;br/&gt; ☝️Preverite lahko URL vrstico, da vidite, kdo vas poskuša zaslediti, ko obiščete novo spletišče.</item>
+        <item quantity="other">&#160;in &lt;b&gt;%d drugi&lt;/b&gt; so vas poskušali zaslediti tukaj. &lt;br/&gt;&lt;br/&gt;Blokiral sem jih!&lt;br/&gt;&lt;br/&gt; ☝️Preverite lahko URL vrstico, da vidite, kdo vas poskuša zaslediti, ko obiščete novo spletno mesto.️</item>
+    </plurals>
+    <string name="daxTrackersBlockedCtaZeroText">&#160;vas je poskušal izslediti tukaj. &lt;br/&gt;&lt;br/&gt;Blokiral sem ga!&lt;br/&gt;&lt;br/&gt; ☝️Preverite lahko URL vrstico, da vidite, kdo vas poskuša zaslediti, ko obiščete novo spletišče.</string>
 
     <!-- Covid Cta-->
     <string name="covidCtaText">Pridobite uradne informacije in nasvete za COVID-19.</string>

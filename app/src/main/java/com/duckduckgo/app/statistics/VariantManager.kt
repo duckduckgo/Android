@@ -29,12 +29,6 @@ interface VariantManager {
 
     // variant-dependant features listed here
     sealed class VariantFeature {
-        object ConceptTest : VariantFeature()
-        object SuppressHomeTabWidgetCta : VariantFeature()
-        object SuppressOnboardingDefaultBrowserCta : VariantFeature()
-        object SuppressOnboardingDefaultBrowserContinueScreen : VariantFeature()
-        object DefaultBrowserDaxCta : VariantFeature()
-        object SearchWidgetDaxCta : VariantFeature()
         object StickySearchNotification : VariantFeature()
     }
 
@@ -50,37 +44,6 @@ interface VariantManager {
             // the future if we can filter by app version
             Variant(key = "sc", weight = 1.0, features = emptyList(), filterBy = { noFilter() }),
             Variant(key = "se", weight = 1.0, features = emptyList(), filterBy = { noFilter() }),
-
-            // Concept test experiment
-            Variant(key = "mc", weight = 0.0, features = emptyList(), filterBy = { isEnglishLocale() }),
-            Variant(
-                key = "me",
-                weight = 0.0,
-                features = listOf(ConceptTest, SuppressHomeTabWidgetCta, SuppressOnboardingDefaultBrowserCta),
-                filterBy = { isEnglishLocale() }),
-            Variant(
-                key = "md",
-                weight = 0.0,
-                features = listOf(SuppressHomeTabWidgetCta, SuppressOnboardingDefaultBrowserCta),
-                filterBy = { isEnglishLocale() }),
-
-            // Insert CTAs on Concept test experiment
-            Variant(
-                key = "mj",
-                weight = 0.0,
-                features = listOf(ConceptTest, SuppressOnboardingDefaultBrowserContinueScreen),
-                filterBy = { isEnglishLocale() }),
-            Variant(
-                key = "mh",
-                weight = 0.0,
-                features = listOf(
-                    ConceptTest,
-                    SuppressHomeTabWidgetCta,
-                    SuppressOnboardingDefaultBrowserCta,
-                    DefaultBrowserDaxCta,
-                    SearchWidgetDaxCta
-                ),
-                filterBy = { isEnglishLocale() }),
 
             // Quick Search Notification Experiment
             Variant(
@@ -98,7 +61,7 @@ interface VariantManager {
         )
 
         val REFERRER_VARIANTS = listOf(
-            Variant(RESERVED_EU_AUCTION_VARIANT, features = listOf(SuppressHomeTabWidgetCta), filterBy = { noFilter() })
+            Variant(RESERVED_EU_AUCTION_VARIANT, features = emptyList(), filterBy = { noFilter() })
         )
 
         fun referrerVariant(key: String): Variant {
