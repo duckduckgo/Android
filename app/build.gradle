@@ -176,7 +176,7 @@ dependencies {
     implementation "androidx.lifecycle:lifecycle-extensions:$lifecycle"
     implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycle"
 
-    kapt "androidx.lifecycle:lifecycle-compiler:$lifecycle"
+    implementation "androidx.lifecycle:lifecycle-common-java8:$lifecycle"
     testImplementation "androidx.arch.core:core-testing:$coreTesting"
     androidTestImplementation "androidx.arch.core:core-testing:$coreTesting"
 
