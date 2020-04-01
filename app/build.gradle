@@ -95,7 +95,7 @@ android {
 }
 
 ext {
-    androidX = "1.0.2"
+    androidX = "1.1.0"
     materialDesign = "1.1.0-alpha05"
     architectureComponents = "1.1.1"
     architectureComponentsExtensions = "1.1.1"
