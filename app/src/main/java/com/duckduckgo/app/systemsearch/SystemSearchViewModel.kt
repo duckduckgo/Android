@@ -79,6 +79,7 @@ class SystemSearchViewModel(
     init {
         resetViewState()
         configureAutoComplete()
+        refreshAppList()
     }
 
     private fun currentOnboardingState(): OnboardingViewState = onboardingViewState.value!!
@@ -213,7 +214,14 @@ class SystemSearchViewModel(
 
     fun appNotFound(app: DeviceApp) {
         command.value = Command.ShowAppNotFoundMessage(app.shortName)
-        deviceAppLookup.refreshAppList()
+
+        refreshAppList()
+    }
+
+    private fun refreshAppList() {
+        viewModelScope.launch(dispatchers.io()) {
+            deviceAppLookup.refreshAppList()
+        }
     }
 
     override fun onCleared() {
