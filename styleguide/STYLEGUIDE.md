@@ -9,12 +9,16 @@ It is possible to get Android Studio to adhere to these style guidelines, via a 
 The file can be found [here](ddg-settings.zip).
 
 * Open Android Studio File -> Settings
+
 ![Setting kotlin style screenshot](import_settings_one.png)
 
 * Select the file you just downloaded
+
+
 ![Setting kotlin style screenshot](import_settings_two.png)
 
 * Import all components required
+
 ![Setting kotlin style screenshot](import_settings_three.png)
 
 From now on, projects you create should follow the correct style guidelines.
