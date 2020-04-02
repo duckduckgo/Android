@@ -100,13 +100,14 @@ class SystemSearchViewModelTest {
     }
 
     @Test
-    fun whenDatabaseIsSlowThenIntroducingTextDoesNotCrash() = coroutineRule.runBlocking {
-        whenever(mockUserStageStore.getUserAppStage()).thenReturn(AppStage.NEW)
+    fun whenDatabaseIsSlowThenIntroducingTextDoesNotCrashTheApp() = coroutineRule.runBlocking {
         (coroutineRule.testDispatcherProvider.io() as TestCoroutineDispatcher).pauseDispatcher()
         testee =
             SystemSearchViewModel(givenEmptyUserStageStore(), mockAutoComplete, mockDeviceAppLookup, mockPixel, coroutineRule.testDispatcherProvider)
         testee.resetViewState()
         testee.userUpdatedQuery("test")
+
+        //no crash
     }
 
     @Test
