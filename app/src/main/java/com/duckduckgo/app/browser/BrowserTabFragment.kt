@@ -188,7 +188,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
     private lateinit var renderer: BrowserTabFragmentRenderer
 
     private val viewModel: BrowserTabViewModel by lazy {
-        val viewModel = ViewModelProviders.of(this, viewModelFactory).get(BrowserTabViewModel::class.java)
+        val viewModel = ViewModelProvider(this, viewModelFactory).get(BrowserTabViewModel::class.java)
         viewModel.loadData(tabId, initialUrl, skipHome)
         viewModel
     }
