@@ -22,7 +22,7 @@ import android.os.Bundle
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProviders
+import androidx.lifecycle.ViewModelProvider
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import dagger.android.AndroidInjection
@@ -75,6 +75,6 @@ abstract class DuckDuckGoActivity : AppCompatActivity() {
         super.onDestroy()
     }
 
-    protected inline fun <reified V : ViewModel> bindViewModel() = lazy { ViewModelProviders.of(this, viewModelFactory).get(V::class.java) }
+    protected inline fun <reified V : ViewModel> bindViewModel() = lazy { ViewModelProvider(this, viewModelFactory).get(V::class.java) }
 
 }
