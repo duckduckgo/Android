@@ -19,17 +19,7 @@
     tools:parentTag="android.widget.LinearLayout">
 
     <ImageButton
-        android:id="@+id/bottomBarBackItem"
-        style="@style/BrowserIconMenuItem"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:background="?selectableItemBackgroundBorderless"
-        android:contentDescription="@string/back"
-        android:src="@drawable/ic_arrow_back_24dp" />
-
-    <ImageButton
-        android:id="@+id/bottomBarSearchkItem"
+        android:id="@+id/bottomBarSearchItem"
         style="@style/BrowserIconMenuItem"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -37,16 +27,6 @@
         android:background="?selectableItemBackgroundBorderless"
         android:contentDescription="@string/back"
         android:src="@drawable/ic_search_black_24dp" />
-
-    <ImageButton
-        android:id="@+id/bottomBarForwardItem"
-        style="@style/BrowserIconMenuItem"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:background="?selectableItemBackgroundBorderless"
-        android:contentDescription="@string/back"
-        android:src="@drawable/ic_arrow_forward_24dp" />
 
     <ImageButton
         android:id="@+id/bottomBarBookmarksItemOne"
@@ -67,16 +47,6 @@
         android:background="?selectableItemBackgroundBorderless"
         android:contentDescription="@string/back"
         android:src="@drawable/ic_fire_black_24dp" />
-
-    <ImageButton
-        android:id="@+id/bottomBarBookmarksItemTwo"
-        style="@style/BrowserIconMenuItem"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:background="?selectableItemBackgroundBorderless"
-        android:contentDescription="@string/back"
-        android:src="@drawable/ic_bookmarks_black_24dp" />
 
     <com.duckduckgo.app.browser.TabSwitcherButton
         android:id="@+id/bottomBarTabsItem"

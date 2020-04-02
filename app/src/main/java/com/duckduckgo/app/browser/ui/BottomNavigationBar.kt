@@ -40,12 +40,4 @@ class BottomNavigationBar @JvmOverloads constructor(
         }
     }
 
-    fun decorateExperimentOne(){
-
-    }
-
-    fun decorateExperimentTwo(){
-
-    }
-
 }

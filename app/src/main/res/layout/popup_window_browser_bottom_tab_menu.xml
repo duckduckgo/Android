@@ -48,19 +48,9 @@
                 android:text="@string/newTabMenuItem" />
 
             <TextView
-                android:id="@+id/bookmarksPopupMenuItem"
-                style="@style/BrowserTextMenuItem"
-                android:text="@string/bookmarksMenuTitle" />
-
-            <TextView
                 android:id="@+id/addBookmarksPopupMenuItem"
                 style="@style/BrowserTextMenuItem"
                 android:text="@string/addBookmarkMenuTitle" />
-
-            <TextView
-                android:id="@+id/sharePageMenuItem"
-                style="@style/BrowserTextMenuItem"
-                android:text="@string/shareMenuTitle" />
 
             <TextView
                 android:id="@+id/findInPageMenuItem"
@@ -118,16 +108,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:contentDescription="@string/back"
-            android:src="@drawable/ic_add_24dp" />
-
-        <ImageButton
-            android:id="@+id/refreshPopupMenuItem"
-            style="@style/BrowserIconMenuItem"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:contentDescription="@string/refresh"
-            android:src="@drawable/ic_refresh_24dp" />
+            android:src="@drawable/ic_arrow_back_24dp" />
 
         <ImageButton
             android:id="@+id/forwardPopupMenuItem"
@@ -138,9 +119,25 @@
             android:contentDescription="@string/forward"
             android:src="@drawable/ic_arrow_forward_24dp" />
 
+        <ImageButton
+            android:id="@+id/refreshPopupMenuItem"
+            style="@style/BrowserIconMenuItem"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:contentDescription="@string/refresh"
+            android:src="@drawable/ic_refresh_24dp" />
 
+
+        <ImageButton
+            android:id="@+id/sharePopupMenuItem"
+            style="@style/BrowserIconMenuItem"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:contentDescription="@string/forward"
+            android:src="@drawable/ic_share_black_24dp" />
 
     </LinearLayout>
-
 
 </androidx.constraintlayout.widget.ConstraintLayout>
