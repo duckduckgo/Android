@@ -24,14 +24,15 @@ import com.duckduckgo.app.InstantSchedulersRule
 import com.duckduckgo.app.autocomplete.api.AutoComplete
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteResult
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteSearchSuggestion
-import com.duckduckgo.app.onboarding.store.AppStage
-import com.duckduckgo.app.onboarding.store.UserStageStore
+import com.duckduckgo.app.onboarding.store.*
+import com.duckduckgo.app.runBlocking
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.*
 import com.duckduckgo.app.systemsearch.SystemSearchViewModel.Command
 import com.duckduckgo.app.systemsearch.SystemSearchViewModel.Command.LaunchDuckDuckGo
 import com.nhaarman.mockitokotlin2.*
 import io.reactivex.Observable
+import kotlinx.coroutines.test.TestCoroutineDispatcher
 import kotlinx.coroutines.test.TestCoroutineScope
 import kotlinx.coroutines.test.runBlockingTest
 import org.junit.After
@@ -99,6 +100,16 @@ class SystemSearchViewModelTest {
     }
 
     @Test
+    fun whenDatabaseIsSlowThenIntroducingTextDoesNotCrash() = coroutineRule.runBlocking {
+        whenever(mockUserStageStore.getUserAppStage()).thenReturn(AppStage.NEW)
+        (coroutineRule.testDispatcherProvider.io() as TestCoroutineDispatcher).pauseDispatcher()
+        testee =
+            SystemSearchViewModel(givenEmptyUserStageStore(), mockAutoComplete, mockDeviceAppLookup, mockPixel, coroutineRule.testDispatcherProvider)
+        testee.resetViewState()
+        testee.userUpdatedQuery("test")
+    }
+
+    @Test
     fun whenOnboardingShownThenPixelSent() = runBlockingTest {
         whenever(mockUserStageStore.getUserAppStage()).thenReturn(AppStage.NEW)
         testee.resetViewState()
@@ -138,7 +149,7 @@ class SystemSearchViewModelTest {
     }
 
     @Test
-    fun whenUserUpdatesQueryThenViewStateUpdated() = ruleRunBlockingTest {
+    fun whenUserUpdatesQueryThenViewStateUpdated() = coroutineRule.runBlocking {
         testee.userUpdatedQuery(QUERY)
 
         val newViewState = testee.resultsViewState.value
@@ -149,7 +160,7 @@ class SystemSearchViewModelTest {
     }
 
     @Test
-    fun whenUserAddsSpaceToQueryThenViewStateMatchesAndSpaceTrimmedFromAutocomplete() = ruleRunBlockingTest {
+    fun whenUserAddsSpaceToQueryThenViewStateMatchesAndSpaceTrimmedFromAutocomplete() = coroutineRule.runBlocking {
         testee.userUpdatedQuery(QUERY)
         testee.userUpdatedQuery("$QUERY ")
 
@@ -161,7 +172,7 @@ class SystemSearchViewModelTest {
     }
 
     @Test
-    fun whenUserClearsQueryThenViewStateReset() = ruleRunBlockingTest {
+    fun whenUserClearsQueryThenViewStateReset() = coroutineRule.runBlocking {
         testee.userUpdatedQuery(QUERY)
         testee.userClearedQuery()
 
@@ -173,7 +184,7 @@ class SystemSearchViewModelTest {
     }
 
     @Test
-    fun whenUsersUpdatesWithBlankQueryThenViewStateReset() = ruleRunBlockingTest {
+    fun whenUsersUpdatesWithBlankQueryThenViewStateReset() = coroutineRule.runBlocking {
         testee.userUpdatedQuery(QUERY)
         testee.userUpdatedQuery(BLANK_QUERY)
 
@@ -193,7 +204,7 @@ class SystemSearchViewModelTest {
     }
 
     @Test
-    fun whenUserSubmitsQueryThenOnboardingCompleted() = ruleRunBlockingTest {
+    fun whenUserSubmitsQueryThenOnboardingCompleted() = coroutineRule.runBlocking {
         testee.userSubmittedQuery(QUERY)
         verify(mockUserStageStore).stageCompleted(AppStage.NEW)
     }
@@ -224,18 +235,18 @@ class SystemSearchViewModelTest {
     }
 
     @Test
-    fun whenUserTapsDaxThenOnboardingCompleted() = ruleRunBlockingTest {
+    fun whenUserTapsDaxThenOnboardingCompleted() = coroutineRule.runBlocking {
         testee.userTappedDax()
         verify(mockUserStageStore).stageCompleted(AppStage.NEW)
     }
 
     @Test
-    fun whenViewModelCreatedThenAppsRefreshed() = ruleRunBlockingTest {
+    fun whenViewModelCreatedThenAppsRefreshed() = coroutineRule.runBlocking {
         verify(mockDeviceAppLookup).refreshAppList()
     }
 
     @Test
-    fun whenUserSelectsAppThatCannotBeFoundThenAppsRefreshedAndUserMessageShown() = ruleRunBlockingTest {
+    fun whenUserSelectsAppThatCannotBeFoundThenAppsRefreshedAndUserMessageShown() = coroutineRule.runBlocking {
         testee.appNotFound(deviceApp)
         verify(mockDeviceAppLookup, times(2)).refreshAppList()
         verify(commandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
@@ -247,8 +258,13 @@ class SystemSearchViewModelTest {
         testee.resetViewState()
     }
 
-    private fun ruleRunBlockingTest(block: suspend TestCoroutineScope.() -> Unit) =
-        coroutineRule.testDispatcher.runBlockingTest(block)
+    private fun givenEmptyUserStageStore(): UserStageStore {
+        val emptyUserStageDao = object : UserStageDao {
+            override suspend fun currentUserAppStage() = UserStage(appStage = AppStage.NEW)
+            override fun insert(userStage: UserStage) {}
+        }
+        return AppUserStageStore(emptyUserStageDao, coroutineRule.testDispatcherProvider)
+    }
 
     companion object {
         const val QUERY = "abc"
