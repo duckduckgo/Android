@@ -166,15 +166,15 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
     @Inject
     lateinit var privacySettingsStore: PrivacySettingsStore
 
-    val tabId get() = arguments!![TAB_ID_ARG] as String
+    val tabId get() = requireArguments()[TAB_ID_ARG] as String
 
     lateinit var userAgentProvider: UserAgentProvider
 
     var messageFromPreviousTab: Message? = null
 
-    private val initialUrl get() = arguments!!.getString(URL_EXTRA_ARG)
+    private val initialUrl get() = requireArguments().getString(URL_EXTRA_ARG)
 
-    private val skipHome get() = arguments!!.getBoolean(SKIP_HOME_ARG)
+    private val skipHome get() = requireArguments().getBoolean(SKIP_HOME_ARG)
 
     private lateinit var popupMenu: BrowserPopupMenu
 
@@ -363,39 +363,39 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
     }
 
     private fun configureObservers() {
-        viewModel.autoCompleteViewState.observe(this, Observer<AutoCompleteViewState> {
+        viewModel.autoCompleteViewState.observe(viewLifecycleOwner, Observer<AutoCompleteViewState> {
             it?.let { renderer.renderAutocomplete(it) }
         })
 
-        viewModel.globalLayoutState.observe(this, Observer<GlobalLayoutViewState> {
+        viewModel.globalLayoutState.observe(viewLifecycleOwner, Observer<GlobalLayoutViewState> {
             it?.let { renderer.renderGlobalViewState(it) }
         })
 
-        viewModel.browserViewState.observe(this, Observer<BrowserViewState> {
+        viewModel.browserViewState.observe(viewLifecycleOwner, Observer<BrowserViewState> {
             it?.let { renderer.renderBrowserViewState(it) }
         })
 
-        viewModel.loadingViewState.observe(this, Observer<LoadingViewState> {
+        viewModel.loadingViewState.observe(viewLifecycleOwner, Observer<LoadingViewState> {
             it?.let { renderer.renderLoadingIndicator(it) }
         })
 
-        viewModel.omnibarViewState.observe(this, Observer<OmnibarViewState> {
+        viewModel.omnibarViewState.observe(viewLifecycleOwner, Observer<OmnibarViewState> {
             it?.let { renderer.renderOmnibar(it) }
         })
 
-        viewModel.findInPageViewState.observe(this, Observer<FindInPageViewState> {
+        viewModel.findInPageViewState.observe(viewLifecycleOwner, Observer<FindInPageViewState> {
             it?.let { renderer.renderFindInPageState(it) }
         })
 
-        viewModel.ctaViewState.observe(this, Observer {
+        viewModel.ctaViewState.observe(viewLifecycleOwner, Observer {
             it?.let { renderer.renderCtaViewState(it) }
         })
 
-        viewModel.command.observe(this, Observer {
+        viewModel.command.observe(viewLifecycleOwner, Observer {
             processCommand(it)
         })
 
-        viewModel.survey.observe(this, Observer<Survey> {
+        viewModel.survey.observe(viewLifecycleOwner, Observer<Survey> {
             it.let { viewModel.onSurveyChanged(it) }
         })
 
@@ -403,7 +403,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
     }
 
     private fun addTabsObserver() {
-        viewModel.tabs.observe(this, Observer<List<TabEntity>> {
+        viewModel.tabs.observe(viewLifecycleOwner, Observer<List<TabEntity>> {
             it?.let { renderer.renderTabIcon(it) }
         })
     }
@@ -707,7 +707,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
             launchPopupMenu()
         }
 
-        viewModel.privacyGrade.observe(this, Observer<PrivacyGrade> {
+        viewModel.privacyGrade.observe(viewLifecycleOwner, Observer<PrivacyGrade> {
             Timber.d("Observed grade: $it")
             it?.let { privacyGrade ->
                 val drawable = context?.getDrawable(privacyGrade.icon()) ?: return@let
@@ -1073,7 +1073,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
     }
 
     private fun hasWriteStoragePermission(): Boolean {
-        return ContextCompat.checkSelfPermission(context!!, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED
+        return ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED
     }
 
     private fun requestWriteStoragePermission() {

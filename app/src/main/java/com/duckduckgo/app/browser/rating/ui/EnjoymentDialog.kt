@@ -31,7 +31,7 @@ abstract class EnjoymentDialog : DialogFragment() {
     lateinit var pixel: Pixel
 
     val promptCount: PromptCount
-        get() = PromptCount(arguments!![PROMPT_COUNT_BUNDLE_KEY] as Int)
+        get() = PromptCount(requireArguments()[PROMPT_COUNT_BUNDLE_KEY] as Int)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
