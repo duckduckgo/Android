@@ -17,7 +17,7 @@ The file can be found [here](ddg-settings.zip).
 
 ![Setting kotlin style screenshot](import_settings_two.png)
 
-* Import all components required
+* Import all components required (AndroidEditors and Code Style)
 
 ![Setting kotlin style screenshot](import_settings_three.png)
 
