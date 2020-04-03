@@ -91,14 +91,12 @@ import com.duckduckgo.app.browser.BrowserTabViewModel.FindInPageViewState
 import com.duckduckgo.app.browser.BrowserTabViewModel.GlobalLayoutViewState
 import com.duckduckgo.app.browser.BrowserTabViewModel.LoadingViewState
 import com.duckduckgo.app.browser.BrowserTabViewModel.OmnibarViewState
-import com.duckduckgo.app.browser.DownloadConfirmationFragment.*
 import com.duckduckgo.app.browser.autocomplete.BrowserAutoCompleteSuggestionsAdapter
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserNavigator
 import com.duckduckgo.app.browser.defaultbrowsing.TopInstructionsCard
 import com.duckduckgo.app.browser.downloader.FileDownloadNotificationManager
 import com.duckduckgo.app.browser.downloader.FileDownloader
 import com.duckduckgo.app.browser.downloader.FileDownloader.PendingFileDownload
-import com.duckduckgo.app.browser.downloader.guessFileName
 import com.duckduckgo.app.browser.filechooser.FileChooserIntentBuilder
 import com.duckduckgo.app.browser.model.BasicAuthenticationCredentials
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
@@ -1171,38 +1169,13 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
     }
 
     private fun requestDownloadConfirmation(pendingDownload: PendingFileDownload, downloadListener: FileDownloader.FileDownloadListener) {
-        val guessedFileName = pendingDownload.guessFileName()
-
-        val data = if (guessedFileName != null) {
-            val fileToDownload = File(pendingDownload.directory, guessedFileName)
-            DownloadFileData(fileToDownload, fileToDownload.exists())
-        } else {
-            DownloadFileData(null, false)
-        }
-
-        val downloadConfirmationFragment = DownloadConfirmationFragment(data, object : UserDownloadAction {
-            override fun acceptAndReplace() {
-                if (guessedFileName != null) {
-                    File(pendingDownload.directory, guessedFileName).delete()
-                }
-                completeDownload(pendingDownload, downloadListener)
-            }
-
-            override fun accept() {
-                completeDownload(pendingDownload, downloadListener)
-            }
-
-            override fun cancel() {
-                Timber.i("Cancelled download for url ${pendingDownload.url}")
-            }
-        })
-
         fragmentManager?.let {
+            val downloadConfirmationFragment = DownloadConfirmationFragment(pendingDownload, fileDownloader, downloadListener)
             downloadConfirmationFragment.show(it, DOWNLAOD_CONFIRM_TAG)
         }
     }
 
-    fun completeDownload(pendingDownload: PendingFileDownload?, callback: FileDownloader.FileDownloadListener) {
+    fun completeDownload(pendingDownload: FileDownloader.PendingFileDownload?, callback: FileDownloader.FileDownloadListener) {
         thread {
             fileDownloader.download(pendingDownload, callback)
         }

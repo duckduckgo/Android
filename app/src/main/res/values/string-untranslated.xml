@@ -44,8 +44,8 @@
     <string name="downloadConfirmationKeepBothFilesText">Keep both</string>
     <string name="downloadConfirmationReplaceOldFileText">Replace</string>
     <string name="downloadConfirmationOpenFileText">Open</string>
-    <string name="downloadConfirmationUnableToOpenFileText">Can\'t open file</string>
-
+    <string name="downloadConfirmationUnableToOpenFileText">Could not open file</string>
+    <string name="downloadConfirmationUnableToDeleteFileText">Could not delete old file</string>
     <string name="search">Search</string>
 
     <!-- Change Icon Activity -->
