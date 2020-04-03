@@ -108,7 +108,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:contentDescription="@string/back"
-            android:src="@drawable/ic_arrow_back_24dp" />
+            android:src="@drawable/ic_back" />
 
         <ImageButton
             android:id="@+id/forwardPopupMenuItem"
@@ -117,7 +117,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:contentDescription="@string/forward"
-            android:src="@drawable/ic_arrow_forward_24dp" />
+            android:src="@drawable/ic_forward" />
 
         <ImageButton
             android:id="@+id/refreshPopupMenuItem"
@@ -126,8 +126,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:contentDescription="@string/refresh"
-            android:src="@drawable/ic_refresh_24dp" />
-
+            android:src="@drawable/ic_bottom_bar_refresh" />
 
         <ImageButton
             android:id="@+id/sharePopupMenuItem"
@@ -136,7 +135,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:contentDescription="@string/forward"
-            android:src="@drawable/ic_share_black_24dp" />
+            android:src="@drawable/ic_share" />
 
     </LinearLayout>
 

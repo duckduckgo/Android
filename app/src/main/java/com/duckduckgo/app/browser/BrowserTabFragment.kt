@@ -1279,7 +1279,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
             bottomNavigationBar.apply {
                 onItemClicked(bottomBarFireItem) { browserActivity?.launchFire() }
                 onItemClicked(bottomBarBookmarksItemOne) { browserActivity?.launchBookmarks() }
-                onItemClicked(bottomBarSearchItem) { browserActivity?.launchBookmarks() }
+                onItemClicked(bottomBarSearchItem) { omnibarTextInput.requestFocus() }
                 onItemClicked(bottomBarTabsItem) { viewModel.userLaunchingTabSwitcher() }
                 onItemClicked(bottomBarOverflowItem) {
                     hideKeyboardImmediately()
