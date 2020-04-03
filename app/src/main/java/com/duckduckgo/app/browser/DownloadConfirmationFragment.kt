@@ -24,19 +24,26 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.core.content.FileProvider.getUriForFile
-import com.duckduckgo.app.browser.downloader.NetworkFileDownloadManager.DownloadFileData
-import com.duckduckgo.app.browser.downloader.NetworkFileDownloadManager.UserDownloadAction
 import com.duckduckgo.app.global.view.gone
 import com.duckduckgo.app.global.view.leftDrawable
 import com.duckduckgo.app.global.view.show
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import kotlinx.android.synthetic.main.download_confirmation.view.*
 import timber.log.Timber
+import java.io.File
 
 class DownloadConfirmationFragment(
     private val downloadFileData: DownloadFileData,
     private val userDownloadAction: UserDownloadAction
 ) : BottomSheetDialogFragment() {
+
+    interface UserDownloadAction {
+        fun accept()
+        fun acceptAndReplace()
+        fun cancel()
+    }
+
+    class DownloadFileData(val file: File?, val alreadyDownloaded: Boolean)
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.download_confirmation, container, false)
@@ -45,7 +52,7 @@ class DownloadConfirmationFragment(
     }
 
     private fun setupViews(view: View) {
-        view.downloadMessage.text = getString(R.string.downloadConfirmationSaveFileTitle, downloadFileData.file.name)
+        view.downloadMessage.text = getString(R.string.downloadConfirmationSaveFileTitle, downloadFileData.file?.name ?: "")
         view.openWith.setOnClickListener {
             openFile()
             dismiss()
@@ -88,9 +95,10 @@ class DownloadConfirmationFragment(
         }
     }
 
-    private fun createIntentToOpenFile(context: Context): Intent {
-        val uri = getUriForFile(context, "${BuildConfig.APPLICATION_ID}.provider", downloadFileData.file)
-        val mime = activity?.contentResolver?.getType(uri)
+    private fun createIntentToOpenFile(context: Context): Intent? {
+        val file = downloadFileData.file ?: return null
+        val uri = getUriForFile(context, "${BuildConfig.APPLICATION_ID}.provider", file)
+        val mime = activity?.contentResolver?.getType(uri) ?: return null
         val intent = Intent(Intent.ACTION_VIEW)
         intent.setDataAndType(uri, mime)
         return intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)

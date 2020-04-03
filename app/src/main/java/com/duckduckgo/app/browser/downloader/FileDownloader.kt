@@ -19,14 +19,13 @@ package com.duckduckgo.app.browser.downloader
 import android.os.Environment
 import android.webkit.URLUtil
 import androidx.annotation.WorkerThread
-import com.duckduckgo.app.browser.downloader.NetworkFileDownloadManager.DownloadFileData
-import com.duckduckgo.app.browser.downloader.NetworkFileDownloadManager.UserDownloadAction
+import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
 
 class FileDownloader @Inject constructor(
     private val dataUriDownloader: DataUriDownloader,
-    private val networkFileDownloadManager: NetworkFileDownloadManager
+    private val networkFileDownloader: NetworkFileDownloader
 ) {
 
     @WorkerThread
@@ -37,7 +36,7 @@ class FileDownloader @Inject constructor(
         }
 
         when {
-            URLUtil.isNetworkUrl(pending.url) -> networkFileDownloadManager.download(pending, callback)
+            URLUtil.isNetworkUrl(pending.url) -> networkFileDownloader.download(pending)
             URLUtil.isDataUrl(pending.url) -> dataUriDownloader.download(pending, callback)
             else -> callback.downloadFailed("Not supported")
         }
@@ -53,12 +52,15 @@ class FileDownloader @Inject constructor(
     )
 
     interface FileDownloadListener {
-        fun confirmDownload(
-            downloadFileData: DownloadFileData,
-            userDownloadAction: UserDownloadAction
-        )
         fun downloadStarted()
         fun downloadFinished(file: File, mimeType: String?)
         fun downloadFailed(message: String)
     }
+}
+
+fun FileDownloader.PendingFileDownload.guessFileName(): String? {
+    if (URLUtil.isDataUrl(url)) return null
+    val guessedFileName = URLUtil.guessFileName(url, contentDisposition, mimeType)
+    Timber.i("Guessed filename of $guessedFileName for url ${url}")
+    return guessedFileName
 }

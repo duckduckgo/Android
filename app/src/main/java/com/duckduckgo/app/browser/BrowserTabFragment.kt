@@ -91,14 +91,14 @@ import com.duckduckgo.app.browser.BrowserTabViewModel.FindInPageViewState
 import com.duckduckgo.app.browser.BrowserTabViewModel.GlobalLayoutViewState
 import com.duckduckgo.app.browser.BrowserTabViewModel.LoadingViewState
 import com.duckduckgo.app.browser.BrowserTabViewModel.OmnibarViewState
+import com.duckduckgo.app.browser.DownloadConfirmationFragment.*
 import com.duckduckgo.app.browser.autocomplete.BrowserAutoCompleteSuggestionsAdapter
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserNavigator
 import com.duckduckgo.app.browser.defaultbrowsing.TopInstructionsCard
 import com.duckduckgo.app.browser.downloader.FileDownloadNotificationManager
 import com.duckduckgo.app.browser.downloader.FileDownloader
 import com.duckduckgo.app.browser.downloader.FileDownloader.PendingFileDownload
-import com.duckduckgo.app.browser.downloader.NetworkFileDownloadManager.DownloadFileData
-import com.duckduckgo.app.browser.downloader.NetworkFileDownloadManager.UserDownloadAction
+import com.duckduckgo.app.browser.downloader.guessFileName
 import com.duckduckgo.app.browser.filechooser.FileChooserIntentBuilder
 import com.duckduckgo.app.browser.model.BasicAuthenticationCredentials
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
@@ -579,7 +579,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
                     )
                 )
             }
-            is Command.DownloadImage -> requestImageDownload(it.url)
+            is Command.DownloadImage -> requestImageDownload(it.url, requestUserConfirmation = false)
             is Command.FindInPageCommand -> webView?.findAllAsync(it.searchTerm)
             is Command.DismissFindInPage -> webView?.findAllAsync("")
             is Command.ShareLink -> launchSharePageChooser(it.url)
@@ -905,7 +905,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
             }
 
             it.setDownloadListener { url, _, contentDisposition, mimeType, _ ->
-                requestFileDownload(url, contentDisposition, mimeType)
+                requestFileDownload(url, contentDisposition, mimeType, true)
             }
 
             it.setOnTouchListener { _, _ ->
@@ -1107,7 +1107,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
         webView = null
     }
 
-    private fun requestFileDownload(url: String, contentDisposition: String, mimeType: String) {
+    private fun requestFileDownload(url: String, contentDisposition: String, mimeType: String, requestUserConfirmation: Boolean) {
         pendingFileDownload = PendingFileDownload(
             url = url,
             contentDisposition = contentDisposition,
@@ -1116,55 +1116,95 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
             subfolder = Environment.DIRECTORY_DOWNLOADS
         )
 
-        downloadFileWithPermissionCheck()
+        if (hasWriteStoragePermission()) {
+            downloadFile(requestUserConfirmation)
+        } else {
+            requestWriteStoragePermission()
+        }
     }
 
-    private fun requestImageDownload(url: String) {
+    private fun requestImageDownload(url: String, requestUserConfirmation: Boolean) {
         pendingFileDownload = PendingFileDownload(
             url = url,
             userAgent = userAgentProvider.getUserAgent(),
             subfolder = Environment.DIRECTORY_PICTURES
         )
 
-        downloadFileWithPermissionCheck()
-    }
-
-    private fun downloadFileWithPermissionCheck() {
         if (hasWriteStoragePermission()) {
-            downloadFile()
+            downloadFile(requestUserConfirmation)
         } else {
             requestWriteStoragePermission()
         }
     }
 
     @AnyThread
-    private fun downloadFile() {
+    private fun downloadFile(requestUserConfirmation: Boolean) {
         val pendingDownload = pendingFileDownload
         pendingFileDownload = null
+
+        if (pendingDownload == null) {
+            return
+        }
+
+        val downloadListener = object : FileDownloader.FileDownloadListener {
+            override fun downloadStarted() {
+                fileDownloadNotificationManager.showDownloadInProgressNotification()
+            }
+
+            override fun downloadFinished(file: File, mimeType: String?) {
+                MediaScannerConnection.scanFile(context, arrayOf(file.absolutePath), null) { _, uri ->
+                    fileDownloadNotificationManager.showDownloadFinishedNotification(file.name, uri, mimeType)
+                }
+            }
+
+            override fun downloadFailed(message: String) {
+                Timber.w("Failed to download file [$message]")
+                fileDownloadNotificationManager.showDownloadFailedNotification()
+            }
+        }
+
+        if (requestUserConfirmation) {
+            requestDownloadConfirmation(pendingDownload, downloadListener)
+        } else {
+            completeDownload(pendingDownload, downloadListener)
+        }
+    }
+
+    private fun requestDownloadConfirmation(pendingDownload: PendingFileDownload, downloadListener: FileDownloader.FileDownloadListener) {
+        val guessedFileName = pendingDownload.guessFileName()
+
+        val data = if (guessedFileName != null) {
+            val fileToDownload = File(pendingDownload.directory, guessedFileName)
+            DownloadFileData(fileToDownload, fileToDownload.exists())
+        } else {
+            DownloadFileData(null, false)
+        }
+
+        val downloadConfirmationFragment = DownloadConfirmationFragment(data, object : UserDownloadAction {
+            override fun acceptAndReplace() {
+                if (guessedFileName != null) {
+                    File(pendingDownload.directory, guessedFileName).delete()
+                }
+                completeDownload(pendingDownload, downloadListener)
+            }
+
+            override fun accept() {
+                completeDownload(pendingDownload, downloadListener)
+            }
+
+            override fun cancel() {
+                Timber.i("Cancelled download for url ${pendingDownload.url}")
+            }
+        })
+
+        fragmentManager?.let {
+            downloadConfirmationFragment.show(it, DOWNLAOD_CONFIRM_TAG)
+        }
+    }
+
+    fun completeDownload(pendingDownload: PendingFileDownload?, callback: FileDownloader.FileDownloadListener) {
         thread {
-            fileDownloader.download(pendingDownload, object : FileDownloader.FileDownloadListener {
-                override fun confirmDownload(downloadFileData: DownloadFileData, userDownloadAction: UserDownloadAction) {
-                    val downloadConfirmationFragment = DownloadConfirmationFragment(downloadFileData, userDownloadAction)
-                    fragmentManager?.let {
-                        downloadConfirmationFragment.show(it, DOWNLAOD_CONFIRM_TAG)
-                    }
-                }
-
-                override fun downloadStarted() {
-                    fileDownloadNotificationManager.showDownloadInProgressNotification()
-                }
-
-                override fun downloadFinished(file: File, mimeType: String?) {
-                    MediaScannerConnection.scanFile(context, arrayOf(file.absolutePath), null) { _, uri ->
-                        fileDownloadNotificationManager.showDownloadFinishedNotification(file.name, uri, mimeType)
-                    }
-                }
-
-                override fun downloadFailed(message: String) {
-                    Timber.w("Failed to download file [$message]")
-                    fileDownloadNotificationManager.showDownloadFailedNotification()
-                }
-            })
+            fileDownloader.download(pendingDownload, callback)
         }
     }
 
@@ -1187,7 +1227,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
         if (requestCode == PERMISSION_REQUEST_WRITE_EXTERNAL_STORAGE) {
             if ((grantResults.isNotEmpty()) && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 Timber.i("Write external storage permission granted")
-                downloadFile()
+                downloadFile(requestUserConfirmation = false)
             } else {
                 Timber.i("Write external storage permission refused")
                 Snackbar.make(toolbar, R.string.permissionRequiredToDownload, Snackbar.LENGTH_LONG).show()
