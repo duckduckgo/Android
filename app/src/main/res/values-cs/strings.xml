@@ -389,11 +389,6 @@
     <string name="daxEndCtaText">Máte to! &lt;br/&gt;&lt;br/&gt;Pamatujte: pokaždé, když internet procházíte se mnou, hrozným reklamám jsou přistřižena křídla. &#128077;</string>
     <string name="daxSerpCtaText">Vaše vyhledávání DuckDuckGo jsou anonymní a historii Vašeho vyhledávání nikdy nikam neukládáme. Vůbec nikdy. &#128588;</string>
     <string name="daxNonSerpCtaText">Každý web má svůj stupeň ochrany osobních údajů. Klepnutím na něj si zobrazíte, jak jsem chránil Vaše soukromí.&lt;br/&gt;&lt;br/&gt;Chcete zkusit něco zajímavého? Zkuste stiskem tlačítka palby vymazat svá data.</string>
-    <string name="daxMainNetworkStep1CtaText">Hlavy vzhůru!&lt;br/&gt;&lt;br/&gt; %s provozuje jednu významnou sledovací síť.&lt;br/&gt;&lt;br/&gt;Nízká úroveň ochrany osobních údajů Vás na takovéto stránky upozorní.</string>
-    <string name="daxMainNetworkStep1OwnedCtaText">Hlavy vzhůru!&lt;br/&gt;&lt;br/&gt; %s vlastní společnost %s, která provozuje jednu významnou sledovací síť.</string>
-    <string name="daxMainNetworkStep21CtaText">Ve skutečnosti %s sledovačů číhá na přibližně %s nejnavštěvovanějších webů. &#128561;&lt;br/&gt;&lt;br/&gt;</string>
-    <string name="daxMainNetworkStep211CtaText">Ve skutečnosti %s sledovači číhají na internetu všude. &#128561;&lt;br/&gt;&lt;br/&gt;</string>
-    <string name="daxMainNetworkStep2CtaText">%sKdyž budete navštěvovat weby mimo %s, budeme tyto sledovače blokovat.</string>
     <plurals name="daxTrackersBlockedCtaText">
         <item quantity="one">&#160;a &lt;b&gt;%d další&lt;/b&gt; se Vás tu snažili sledovat. &lt;br/&gt;&lt;br/&gt;Zablokovali jsme je!&lt;br/&gt;&lt;br/&gt; ☝️Když navštívíte nový web, můžete se do adresního řádku prohlížeče podívat, kdo se Vás snaží sledovat.</item>
         <item quantity="few">&#160;a &lt;b&gt;%d další&lt;/b&gt; se Vás tu snažili sledovat. &lt;br/&gt;&lt;br/&gt;Zablokovali jsme je!&lt;br/&gt;&lt;br/&gt; ☝️Když navštívíte nový web, můžete se do adresního řádku prohlížeče podívat, kdo se Vás snaží sledovat.</item>

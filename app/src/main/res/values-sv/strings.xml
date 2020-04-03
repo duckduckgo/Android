@@ -401,11 +401,6 @@
     <string name="daxEndCtaText">Du klarar det här! &lt;br/&gt;&lt;br/&gt;Kom ihåg: varje gång du surfar med mig förlorar en läskig annons sina vingar. &#128077;</string>
     <string name="daxSerpCtaText">Dina DuckDuckGo-sökningar är anonyma och jag lagrar aldrig din sökhistorik. Någonsin. &#128588;</string>
     <string name="daxNonSerpCtaText">Varje webbplats har ett sekretessbetyg. Klicka på den för att se hur jag skyddade din integritet.&lt;br/&gt;&lt;br/&gt;Vill du ha det ännu bättre? Försök att rensa dina data genom att använda brandknappen.</string>
-    <string name="daxMainNetworkStep1CtaText">Se upp!&lt;br/&gt;&lt;br/&gt; %s driver ett stort tracking-nätverk.&lt;br/&gt;&lt;br/&gt;Ett lågt sekretessbetyg tipsar dig om webbplatser som denna.</string>
-    <string name="daxMainNetworkStep1OwnedCtaText">Se upp!&lt;br/&gt;&lt;br/&gt; %s ägs av %s, som driver ett större tracking-nätverk.</string>
-    <string name="daxMainNetworkStep21CtaText">I själva verket lurar %s trackers på %s av de bästa webbplatserna. &#128561;&lt;br/&gt;&lt;br/&gt;</string>
-    <string name="daxMainNetworkStep211CtaText">I själva verket lurar %s trackers över hela internet. &#128561;&lt;br/&gt;&lt;br/&gt;</string>
-    <string name="daxMainNetworkStep2CtaText">%s Jag blockerar dessa trackers när du surfar på webbplatser som inte är %s.</string>
     <plurals name="daxTrackersBlockedCtaText">
         <item quantity="one">&#160;och &lt;b&gt;%d andra&lt;/b&gt; försökte spåra dig här. &lt;br/&gt;&lt;br/&gt;Jag blockerade dem!&lt;br/&gt;&lt;br/&gt; ☝️Du kan kontrollera webbadressfältet för att se vem som försöker spåra dig när du besöker en ny webbplats.️</item>
         <item quantity="other">&#160;och &lt;b&gt;%d andra&lt;/b&gt; försökte spåra dig här. &lt;br/&gt;&lt;br/&gt;Jag blockerade dem!&lt;br/&gt;&lt;br/&gt; ☝️Du kan kontrollera webbadressfältet för att se vem som försöker spåra dig när du besöker en ny webbplats.️</item>

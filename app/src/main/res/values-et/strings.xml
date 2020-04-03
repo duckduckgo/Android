@@ -406,11 +406,6 @@
     <string name="daxEndCtaText">Käpas! &lt;br/&gt;&lt;br/&gt;Pidage meeles: iga kord, kui minuga sirvite, kaotab jube reklaam tiivad. &#128077;</string>
     <string name="daxSerpCtaText">Teie DuckDuckGo otsingud on anonüümsed ja ma ei salvesta kunagi teie otsinguajalugu. Mitte kunagi. &#128588;</string>
     <string name="daxNonSerpCtaText">Igal saidil on privaatsusklass. Puudutage seda, et näha, kuidas ma teie privaatsust kaitsesin.&lt;br/&gt;&lt;br/&gt;Tahate aga proovida midagi eriti peent? Proovige kustutada oma andmed, puudutades tule nuppu.</string>
-    <string name="daxMainNetworkStep1CtaText">Ettevaatust!&lt;br/&gt;&lt;br/&gt; %s haldab suurt jälgimisvõrku.&lt;br/&gt;&lt;br/&gt;Sellistest saitidest annab märku madal privaatsusklass.</string>
-    <string name="daxMainNetworkStep1OwnedCtaText">Ettevaatust!&lt;br/&gt;&lt;br/&gt; %s kuulub ettevõttele %s, mis haldab suurt jälgimisvõrku.</string>
-    <string name="daxMainNetworkStep21CtaText">Tegelikult varitsevad %s jälgijad umbes %s populaarseimal saidil. &#128561;&lt;br/&gt;&lt;br/&gt;</string>
-    <string name="daxMainNetworkStep211CtaText">Tegelikult varitsevad %s jälitajad kogu Internetis, &#128561;&lt;br/&gt;&lt;br/&gt;</string>
-    <string name="daxMainNetworkStep2CtaText">%s blokeerin need jälitajad, kui sirvite saite, mis pole %s.</string>
     <plurals name="daxTrackersBlockedCtaText">
         <item quantity="one">&#160;ja &lt;b&gt;%d teine&lt;/b&gt; üritasid teid siin jälitada. &lt;br/&gt;&lt;br/&gt;Blokeerisin nad!&lt;br/&gt;&lt;br/&gt; ☝️Võite vaadata URL-i riba, et näha, kes üritab teid jälgida, kui külastate uut saiti.️</item>
         <item quantity="other">&#160;ja &lt;b&gt;%d teised&lt;/b&gt; üritasid teid siin jälitada. &lt;br/&gt;&lt;br/&gt;Blokeerisin nad!&lt;br/&gt;&lt;br/&gt; ☝️Võite vaadata URL-i riba, et näha, kes üritab teid jälgida, kui külastate uut saiti.️</item>

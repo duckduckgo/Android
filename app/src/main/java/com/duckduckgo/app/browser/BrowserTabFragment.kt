@@ -1396,16 +1396,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
                     }
                     setPrimaryCtaClickListener {
                         viewModel.onUserClickCtaOkButton(configuration)
-                        if (configuration is DaxDialogCta.DaxMainNetworkCta) {
-                            setPrimaryCtaClickListener {
-                                viewModel.onUserClickCtaOkButton(configuration)
-                                getDaxDialog().dismiss()
-                            }
-                            configuration.setSecondDialog(this, activity)
-                            viewModel.onManualCtaShown(configuration)
-                        } else {
-                            getDaxDialog().dismiss()
-                        }
+                        getDaxDialog().dismiss()
                     }
                     if (configuration is SecondaryButtonCta) {
                         setSecondaryCtaClickListener {

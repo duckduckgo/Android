@@ -389,11 +389,6 @@
     <string name="daxEndCtaText">Atliktai! &lt;br/&gt;&lt;br/&gt;Įsidėmėkite: kiekvieną kartą, kai naršote su manimi, bauginantis skelbimas praranda galią. &#128077;</string>
     <string name="daxSerpCtaText">„DuckDuckGo“ paieškos yra anoniminės ir niekada nekaupiu jūsų paieškos istorijos. Niekada. &#128588;</string>
     <string name="daxNonSerpCtaText">Kiekvienas tinklapis turi privatumo kategoriją. Bakstelėkite jį, kad pamatytumėte, kaip apsaugojau jūsų privatumą.&lt;br/&gt;&lt;br/&gt;Norite neatsilikti? Pabandykite išvalyti duomenis paspausdami suaktyvinimo mygtuką.</string>
-    <string name="daxMainNetworkStep1CtaText">Būkite atidus!&lt;br/&gt;&lt;br/&gt; %s valdo pagrindinį sekimo tinklą.&lt;br/&gt;&lt;br/&gt;Žema privatumo kategorija nukreipia jus į tokius tinklapius.</string>
-    <string name="daxMainNetworkStep1OwnedCtaText">Būkite atidus!&lt;br/&gt;&lt;br/&gt; %s priklauso %s, valdančiai pagrindinį sekimo tinklą.</string>
-    <string name="daxMainNetworkStep21CtaText">Iš tiesų, %s sekimo įranga lukuriuoja %s populiariausiuose tinklapiuose. &#128561;&lt;br/&gt;&lt;br/&gt;</string>
-    <string name="daxMainNetworkStep211CtaText">Iš tiesų, %s sekimo įranga slypi visame internete. &#128561;&lt;br/&gt;&lt;br/&gt;</string>
-    <string name="daxMainNetworkStep2CtaText">%sUžblokuosiu šią sekimo įrangą, kai naršysite ne %s tinklapiuose.</string>
     <plurals name="daxTrackersBlockedCtaText">
         <item quantity="one">&#160;ir &lt;b&gt;%d kiti&lt;/b&gt; bandė jus sekti čia. &lt;br/&gt;&lt;br/&gt;užblokavau juos!&lt;br/&gt;&lt;br/&gt; ☝️Galite patikrinti URL juostą ir sužinoti, kas bando jus sekti, kai lankotės naujame tinklapyje.️</item>
         <item quantity="few">&#160;ir &lt;b&gt;%d kiti&lt;/b&gt; bandė jus čia sekti. &lt;br/&gt;&lt;br/&gt;užblokavau juos!&lt;br/&gt;&lt;br/&gt; ☝️Galite patikrinti URL juostą ir sužinoti, kas bando jus sekti, kai lankotės naujame tinklapyje.️</item>
