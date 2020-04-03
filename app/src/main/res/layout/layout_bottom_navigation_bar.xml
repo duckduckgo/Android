@@ -26,7 +26,7 @@
         android:layout_weight="1"
         android:background="?selectableItemBackgroundBorderless"
         android:contentDescription="@string/back"
-        android:src="@drawable/ic_search_black_24dp" />
+        android:src="@drawable/ic_search" />
 
     <ImageButton
         android:id="@+id/bottomBarBookmarksItemOne"

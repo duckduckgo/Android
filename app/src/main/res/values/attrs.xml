@@ -58,5 +58,7 @@
     <attr name="brokenSitesButtonRippleColor" format="color" />
     <attr name="topCallToActionDescriptionColor" format="color" />
     <attr name="topCallToActionBackgroundColor" format="color" />
+    <attr name="bottomBarIconColor" format="color" />
+    <attr name="bottomBarIconColorDisabled" format="color" />
 
 </resources>

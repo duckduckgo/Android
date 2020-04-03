@@ -80,6 +80,9 @@
         <item name="feedbackEditTextBackgroundColor">@color/almostBlack</item>
         <item name="feedbackEditTextHintColor">@color/grayish</item>
 
+        <item name="bottomBarIconColor">@color/white</item>
+        <item name="bottomBarIconColorDisabled">@color/midGray</item>
+
     </style>
 
     <style name="AppTheme.Dark" parent="AppTheme.BaseDark" />
@@ -147,6 +150,9 @@
         <item name="feedbackListItemSeparatorColor">@color/whiteSix</item>
         <item name="feedbackEditTextBackgroundColor">@color/whiteFive</item>
         <item name="feedbackEditTextHintColor">@color/warmerGray</item>
+
+        <item name="bottomBarIconColor">@color/grayishBrown</item>
+        <item name="bottomBarIconColorDisabled">@color/pinkish_grey_two</item>
 
     </style>
 
