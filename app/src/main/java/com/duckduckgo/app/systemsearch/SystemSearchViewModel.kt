@@ -88,8 +88,8 @@ class SystemSearchViewModel(
     fun resetViewState() {
         viewModelScope.launch {
             resetOnboardingState()
-            resetResultsState()
         }
+        resetResultsState()
     }
 
     private suspend fun resetOnboardingState() {
