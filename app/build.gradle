@@ -119,7 +119,7 @@ ext {
     ankoVersion = "0.10.4"
     glide = "4.11.0"
     lottieVersion = "2.6.0-beta19"
-    okHttp = "3.10.0"
+    okHttp = "3.14.7"
     rxJava = "2.1.10"
     rxAndroid = "2.0.2"
     timber = "4.7.1"
