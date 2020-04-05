@@ -813,6 +813,12 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
             }
 
             it.setDownloadListener { url, _, contentDisposition, mimeType, _ ->
+                if (viewModel.url == null) {   //if in an empty tab
+                    launch {
+                        viewModel.closeCurrentTab()
+                        destroyWebView()
+                    }
+                }
                 requestFileDownload(url, contentDisposition, mimeType)
             }
 
