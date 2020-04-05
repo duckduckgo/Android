@@ -735,7 +735,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
         omnibarTextInput.onFocusChangeListener =
             OnFocusChangeListener { _, hasFocus: Boolean ->
                 viewModel.onOmnibarInputStateChanged(omnibarTextInput.text.toString(), hasFocus, false)
-                if(!hasFocus){
+                if (!hasFocus) {
                     omnibarTextInput.hideKeyboard()
                     focusDummy.requestFocus()
                 }
