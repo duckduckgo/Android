@@ -17,6 +17,7 @@
 package com.duckduckgo.app.global.view
 
 import android.content.Context
+import android.os.Build
 import android.os.Bundle
 import android.view.View
 import com.duckduckgo.app.browser.R
@@ -33,6 +34,10 @@ class FireDialog(context: Context, private val clearPersonalDataAction: ClearPer
     init {
         val contentView = View.inflate(context, R.layout.sheet_fire_clear_data, null)
         setContentView(contentView)
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            window?.decorView?.systemUiVisibility = View.NOT_FOCUSABLE
+        }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
