@@ -723,8 +723,10 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
         autoCompleteSuggestionsList.adapter = autoCompleteSuggestionsAdapter
     }
 
+    private fun isExperimentEnabled() = variantManager.getVariant().hasFeature(VariantManager.VariantFeature.BottomBarWithSearchExperiment)
+
     private fun decorateWithExperiments() {
-        if (variantManager.getVariant().hasFeature(VariantManager.VariantFeature.BottomBarWithSearchExperiment)) {
+        if (isExperimentEnabled()) {
             decorator.decorateWithBottomBarSearchExperiment()
         } else {
             decorator.decorateWithToolbarOnlyExperiment()
@@ -1288,8 +1290,22 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
             }
         }
 
+        fun updateBottomBarVisibility(shouldShow: Boolean){
+            if (isExperimentEnabled()){
+                if (shouldShow){
+                    showBottomBar()
+                } else {
+                    hideBottomBar()
+                }
+            }
+        }
+
         private fun hideBottomBar() {
             bottomNavigationBar.gone()
+        }
+
+        private fun showBottomBar() {
+            bottomNavigationBar.show()
         }
 
         private fun configureShowTabSwitcherListenerWithToolbarOnlyExperiment() {
@@ -1360,6 +1376,8 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
                         omnibarTextInput.setSelection(viewState.omnibarText.length)
                     }
                 }
+
+                decorator.updateBottomBarVisibility(!viewState.isEditing)
             }
         }
 
@@ -1459,6 +1477,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
                 renderToolbarMenus(viewState)
                 renderPopupMenus(browserShowing, viewState)
                 renderFullscreenMode(viewState)
+
             }
         }
 
