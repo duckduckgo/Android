@@ -186,23 +186,15 @@ class BrowserTrackersAnimatorHelper {
         }
     }
 
-    private fun animateFadeOut(view: View?): ObjectAnimator? {
-        return if (view != null) {
-            ObjectAnimator.ofFloat(view, "alpha", 1f, 0f).apply {
-                duration = DEFAULT_ANIMATION_DURATION
-            }
-        } else {
-            null
+    private fun animateFadeOut(view: View): ObjectAnimator {
+        return ObjectAnimator.ofFloat(view, "alpha", 1f, 0f).apply {
+            duration = DEFAULT_ANIMATION_DURATION
         }
     }
 
-    private fun animateFadeIn(view: View?): ObjectAnimator? {
-        return if (view != null) {
-            ObjectAnimator.ofFloat(view, "alpha", 0f, 1f).apply {
-                duration = DEFAULT_ANIMATION_DURATION
-            }
-        } else {
-            null
+    private fun animateFadeIn(view: View): ObjectAnimator {
+        return ObjectAnimator.ofFloat(view, "alpha", 0f, 1f).apply {
+            duration = DEFAULT_ANIMATION_DURATION
         }
     }
 

@@ -93,8 +93,10 @@ class TypewriterDaxDialog(
     }
 
     override fun onDismiss(dialog: DialogInterface) {
-        dialogText?.cancelAnimation()
-        dismissListener()
+        if (activity != null) {
+            dialogText?.cancelAnimation()
+            dismissListener()
+        }
         super.onDismiss(dialog)
     }
 
