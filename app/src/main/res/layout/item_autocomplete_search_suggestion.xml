@@ -26,7 +26,7 @@
         android:id="@+id/phraseOrUrlIndicator"
         android:layout_width="24dp"
         android:layout_height="24dp"
-        android:layout_marginStart="16dp"
+        android:layout_marginStart="24dp"
         android:importantForAccessibility="no"
         android:src="@drawable/ic_loupe_24dp"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -58,7 +58,7 @@
         android:layout_height="wrap_content"
         android:padding="6dp"
         android:paddingStart="16dp"
-        android:paddingEnd="14dp"
+        android:paddingEnd="22dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent">

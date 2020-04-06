@@ -68,6 +68,7 @@ import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.content.ContextCompat
 import androidx.core.content.pm.ShortcutManagerCompat
 import androidx.core.view.isEmpty
+import androidx.core.view.isInvisible
 import androidx.core.view.isNotEmpty
 import androidx.core.view.isVisible
 import androidx.core.view.postDelayed
@@ -1363,10 +1364,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
                 lastSeenOmnibarViewState = viewState
 
                 if (viewState.isEditing) {
-                    omniBarContainer.background = null
                     cancelAllAnimations()
-                } else {
-                    omniBarContainer.setBackgroundResource(R.drawable.omnibar_field_background)
                 }
 
                 if (shouldUpdateOmnibarTextInput(viewState, viewState.omnibarText)) {
@@ -1510,9 +1508,10 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
         }
 
         private fun renderToolbarMenus(viewState: BrowserViewState) {
-            privacyGradeButton?.isVisible = viewState.showPrivacyGrade
+            privacyGradeButton?.isInvisible = !viewState.showPrivacyGrade
             clearTextButton?.isVisible = viewState.showClearButton
-            searchIcon?.isVisible = !viewState.showPrivacyGrade
+            searchIcon?.isVisible = viewState.showSearchIcon
+
             decorator.decorateToolbarMenus(viewState)
         }
 

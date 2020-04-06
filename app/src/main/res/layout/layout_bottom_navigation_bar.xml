@@ -36,7 +36,7 @@
         android:layout_weight="1"
         android:background="?selectableItemBackgroundBorderless"
         android:contentDescription="@string/back"
-        android:src="@drawable/ic_bottom_bar_bookmarks" />
+        android:src="@drawable/ic_bookmarks" />
 
     <ImageButton
         android:id="@+id/bottomBarFireItem"

@@ -121,6 +121,7 @@ class BrowserTabViewModel(
         val isDesktopBrowsingMode: Boolean = false,
         val canChangeBrowsingMode: Boolean = true,
         val showPrivacyGrade: Boolean = false,
+        val showSearchIcon: Boolean = false,
         val showClearButton: Boolean = false,
         val showTabsButton: Boolean = true,
         val showFireButton: Boolean = true,
@@ -660,7 +661,8 @@ class BrowserTabViewModel(
 
         val currentBrowserViewState = currentBrowserViewState()
         browserViewState.value = currentBrowserViewState.copy(
-            showPrivacyGrade = currentBrowserViewState.browserShowing,
+            showPrivacyGrade = !hasFocus,
+            showSearchIcon = hasFocus,
             showTabsButton = showControls,
             showFireButton = showControls,
             showMenuButton = showControls,
