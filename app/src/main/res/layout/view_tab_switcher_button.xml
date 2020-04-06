@@ -34,7 +34,7 @@
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
         android:textAlignment="center"
-        android:textColor="?attr/toolbarIconColor"
+        android:textColor="@color/brownishGray"
         android:textSize="12sp"
         android:textStyle="bold"
         android:typeface="normal"

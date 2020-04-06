@@ -50,6 +50,8 @@
 
     <com.duckduckgo.app.browser.TabSwitcherButton
         android:id="@+id/bottomBarTabsItem"
+        android:paddingTop="6dp"
+        android:paddingBottom="6dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:background="?selectableItemBackgroundBorderless"
