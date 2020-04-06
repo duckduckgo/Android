@@ -9,22 +9,7 @@
 
     <!-- Onboarding Activity -->
     <string name="onboardingDefaultBrowserDescription">Visit Settings to search and browse with DuckDuckGo every time.</string>
-    <string name="onboardingContinue">Continue</string>
-    <string name="onboardingContinueFinalPage">Start Browsing</string>
     <string name="onboardingDefaultBrowserTitle">Make DuckDuckGo Your Default</string>
-    <string name="onboardingDefaultBrowserTitleDefaultSet">Say Hello to Peace of Mind</string>
-
-    <!-- Unified Welcome Page -->
-    <string name="unifiedOnboardingTitleFirstVisit">Welcome to\nDuckDuckGo!</string>
-    <string name="unifiedOnboardingSubtitleTrackerBlockingEnabled">Stay private as you search and browse the web.</string>
-    <string name="unifiedOnboardingPrivateSearchTitle">Private Search</string>
-    <string name="unifiedOnboardingPrivateSearchSubtitle">With DuckDuckGo, your searches are always private.</string>
-    <string name="unifiedOnboardingBrowsingProtectionTitle">Browsing Protection</string>
-    <string name="unifiedOnboardingBrowsingProtectionSubtitleTrackerBlockingEnabled">Block trackers and browse securely by default.</string>
-    <string name="unifiedOnboardingDataClearingTitle">Data Clearing</string>
-    <string name="unifiedOnboardingDataClearingSubtitle">Erase your browsing data with the tap of a button.</string>
-    <string name="unifiedOnboardingCustomizationTitle">Customization</string>
-    <string name="unifiedOnboardingCustomizationSubtitle">Pick a theme and customize privacy features.</string>
 
     <!-- Default Browser -->
     <string name="cannotLaunchDefaultAppSettings">Can\'t launch default app settings screen</string>
@@ -32,7 +17,6 @@
     <string name="defaultBrowserMaybeLater">Maybe Later</string>
     <string name="defaultBrowserLetsDoIt">Let\'s do it!</string>
     <string name="defaultBrowserDescriptionNoDefault">Open links with peace of mind, every time.</string>
-    <string name="defaultBrowserDescriptionDefaultSet">With DuckDuckGo, your online data is more private by default, wherever the internet takes you.</string>
     <string name="defaultBrowserInstructions">Select DuckDuckGo and tap <font color='#678fff'>Always</font>.</string>
 
     <!-- Browser Activity -->
@@ -395,10 +379,6 @@
     <!-- Dax Dialog -->
     <string name="daxDialogHideButton">HIDE</string>
     <string name="daxDialogPhew">Phew!</string>
-    <string name="daxDialogYes">OK!</string>
-    <string name="daxDialogAddWidget">Add Widget</string>
-    <string name="daxDialogMaybeLater">Maybe Later</string>
-    <string name="daxDialogSettings">Go to settings</string>
     <string name="daxDialogNext">Next</string>
     <string name="daxDialogHighFive">High Five!</string>
     <string name="daxDialogGotIt">Got It</string>
@@ -406,4 +386,25 @@
     <string name="hideTipsText">There are only a few, and we tried to make them informative.</string>
     <string name="hideTipsButton">Hide tips forever</string>
 
+    <!-- New Onboarding Experience -->
+    <string name="onboardingWelcomeTitle">"Welcome to DuckDuckGo!"</string>
+    <string name="onboardingDaxText"><![CDATA[The Internet can be kinda creepy.<br/><br/>Not to worry! Searching and browsing privately is easier than you think.]]></string>
+    <string name="onboardingLetsDoItButton">Let\'s Do It!</string>
+    <string name="daxIntroCtaText"><![CDATA[Next, try visiting one of your favorite sites!<br/><br/>I\'ll block trackers so they can\'t spy on you. I\'ll also upgrade the security of your connection if possible. 🔒]]></string>
+    <string name="daxEndCtaText"><![CDATA[You\'ve got this!<br/><br/>Remember: every time you browse with me a creepy ad loses its wings. 👍]]></string>
+    <string name="daxSerpCtaText">Your DuckDuckGo searches are anonymous and I never store your search history. Ever. 🙌</string>
+    <string name="daxNonSerpCtaText"><![CDATA[Every site has a privacy grade. Tap it to see how I protected your privacy.<br/><br/>Want to get fancy? Try clearing your data by hitting the fire button.]]></string>
+    <string name="daxMainNetworkStep1CtaText"><![CDATA[Heads up!<br/><br/> %s runs a major tracking network.<br/><br/>A low privacy grade will tip you off to sites like this.]]></string>
+    <string name="daxMainNetworkStep1OwnedCtaText"><![CDATA[Heads up!<br/><br/> %s is owned by %s, which runs a major tracking network.]]></string>
+    <string name="daxMainNetworkStep21CtaText"><![CDATA[In fact, %s trackers lurk on about %s of top sites. 😱<br/><br/>]]></string>
+    <string name="daxMainNetworkStep211CtaText"><![CDATA[In fact, %s trackers lurk all over the internet. 😱<br/><br/>]]></string>
+    <string name="daxMainNetworkStep2CtaText">%sI\'ll block these trackers when you\'re browsing non-%s sites.</string>
+    <plurals name="daxTrackersBlockedCtaText">
+        <item quantity="one"><![CDATA[&#160;and <b>%d other</b> were trying to track you here. <br/><br/>I blocked them!<br/><br/> ☝️You can check the URL bar to see who is trying to track you when you visit a new site.️]]></item>
+        <item quantity="other"><![CDATA[&#160;and <b>%d others</b> were trying to track you here. <br/><br/>I blocked them!<br/><br/> ☝️You can check the URL bar to see who is trying to track you when you visit a new site.️]]></item>
+    </plurals>
+    <string name="daxTrackersBlockedCtaZeroText"><![CDATA[&#160;was trying to track you here. <br/><br/>I blocked it!<br/><br/> ☝️You can check the URL bar to see who is trying to track you when you visit a new site.️]]></string>
+
+    <!-- Covid Cta-->
+    <string name="covidCtaText">Get official COVID-19 info and tips.</string>
 </resources>

@@ -16,17 +16,29 @@
 
 package com.duckduckgo.app.global.db
 
+import android.content.Context
+import android.content.SharedPreferences
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.room.Room
 import androidx.room.migration.Migration
 import androidx.room.testing.MigrationTestHelper
 import androidx.sqlite.db.framework.FrameworkSQLiteOpenHelperFactory
 import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
+import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.blockingObserve
+import com.duckduckgo.app.onboarding.store.AppStage
+import com.duckduckgo.app.runBlocking
+import com.nhaarman.mockitokotlin2.any
+import com.nhaarman.mockitokotlin2.eq
+import com.nhaarman.mockitokotlin2.mock
+import com.nhaarman.mockitokotlin2.whenever
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.junit.Assert.*
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 
+@ExperimentalCoroutinesApi
 class AppDatabaseTest {
 
     @get:Rule
@@ -34,16 +46,29 @@ class AppDatabaseTest {
     var instantTaskExecutorRule = InstantTaskExecutorRule()
 
     @get:Rule
+    @Suppress("unused")
+    val coroutineRule = CoroutineTestRule()
+
+    @get:Rule
     val testHelper = MigrationTestHelper(getInstrumentation(), AppDatabase::class.qualifiedName, FrameworkSQLiteOpenHelperFactory())
+
+    private val context = mock<Context>()
+
+    private val migrationsProvider: MigrationsProvider = MigrationsProvider(context)
+
+    @Before
+    fun setup() {
+        givenSharedPreferencesEmpty()
+    }
 
     @Test
     fun whenMigratingFromVersion1To2ThenValidationSucceeds() {
-        createDatabaseAndMigrate(1, 2, AppDatabase.MIGRATION_1_TO_2)
+        createDatabaseAndMigrate(1, 2, migrationsProvider.MIGRATION_1_TO_2)
     }
 
     @Test
     fun whenMigratingFromVersion2To3ThenValidationSucceeds() {
-        createDatabaseAndMigrate(2, 3, AppDatabase.MIGRATION_2_TO_3)
+        createDatabaseAndMigrate(2, 3, migrationsProvider.MIGRATION_2_TO_3)
     }
 
     @Test
@@ -56,12 +81,12 @@ class AppDatabaseTest {
 
     @Test
     fun whenMigratingFromVersion3To4ThenValidationSucceeds() {
-        createDatabaseAndMigrate(3, 4, AppDatabase.MIGRATION_3_TO_4)
+        createDatabaseAndMigrate(3, 4, migrationsProvider.MIGRATION_3_TO_4)
     }
 
     @Test
     fun whenMigratingFromVersion4To5ThenValidationSucceeds() {
-        createDatabaseAndMigrate(4, 5, AppDatabase.MIGRATION_4_TO_5)
+        createDatabaseAndMigrate(4, 5, migrationsProvider.MIGRATION_4_TO_5)
     }
 
     @Test
@@ -86,37 +111,37 @@ class AppDatabaseTest {
 
     @Test
     fun whenMigratingFromVersion5To6ThenValidationSucceeds() {
-        createDatabaseAndMigrate(5, 6, AppDatabase.MIGRATION_5_TO_6)
+        createDatabaseAndMigrate(5, 6, migrationsProvider.MIGRATION_5_TO_6)
     }
 
     @Test
     fun whenMigratingFromVersion6To7ThenValidationSucceeds() {
-        createDatabaseAndMigrate(6, 7, AppDatabase.MIGRATION_6_TO_7)
+        createDatabaseAndMigrate(6, 7, migrationsProvider.MIGRATION_6_TO_7)
     }
 
     @Test
     fun whenMigratingFromVersion7To8ThenValidationSucceeds() {
-        createDatabaseAndMigrate(7, 8, AppDatabase.MIGRATION_7_TO_8)
+        createDatabaseAndMigrate(7, 8, migrationsProvider.MIGRATION_7_TO_8)
     }
 
     @Test
     fun whenMigratingFromVersion8To9ThenValidationSucceeds() {
-        createDatabaseAndMigrate(8, 9, AppDatabase.MIGRATION_8_TO_9)
+        createDatabaseAndMigrate(8, 9, migrationsProvider.MIGRATION_8_TO_9)
     }
 
     @Test
     fun whenMigratingFromVersion9To10ThenValidationSucceeds() {
-        createDatabaseAndMigrate(9, 10, AppDatabase.MIGRATION_9_TO_10)
+        createDatabaseAndMigrate(9, 10, migrationsProvider.MIGRATION_9_TO_10)
     }
 
     @Test
     fun whenMigratingFromVersion10To11ThenValidationSucceeds() {
-        createDatabaseAndMigrate(10, 11, AppDatabase.MIGRATION_10_TO_11)
+        createDatabaseAndMigrate(10, 11, migrationsProvider.MIGRATION_10_TO_11)
     }
 
     @Test
     fun whenMigratingFromVersion11To12ThenValidationSucceeds() {
-        createDatabaseAndMigrate(11, 12, AppDatabase.MIGRATION_11_TO_12)
+        createDatabaseAndMigrate(11, 12, migrationsProvider.MIGRATION_11_TO_12)
     }
 
     @Test
@@ -129,27 +154,46 @@ class AppDatabaseTest {
 
     @Test
     fun whenMigratingFromVersion12To13ThenValidationSucceeds() {
-        createDatabaseAndMigrate(12, 13, AppDatabase.MIGRATION_12_TO_13)
+        createDatabaseAndMigrate(12, 13, migrationsProvider.MIGRATION_12_TO_13)
     }
 
     @Test
     fun whenMigratingFromVersion13To14ThenValidationSucceeds() {
-        createDatabaseAndMigrate(13, 14, AppDatabase.MIGRATION_13_TO_14)
+        createDatabaseAndMigrate(13, 14, migrationsProvider.MIGRATION_13_TO_14)
     }
 
     @Test
     fun whenMigratingFromVersion14To15ThenValidationSucceeds() {
-        createDatabaseAndMigrate(14, 15, AppDatabase.MIGRATION_14_TO_15)
+        createDatabaseAndMigrate(14, 15, migrationsProvider.MIGRATION_14_TO_15)
     }
 
     @Test
     fun whenMigratingFromVersion15To16ThenValidationSucceeds() {
-        createDatabaseAndMigrate(15, 16, AppDatabase.MIGRATION_15_TO_16)
+        createDatabaseAndMigrate(15, 16, migrationsProvider.MIGRATION_15_TO_16)
     }
 
     @Test
     fun whenMigratingFromVersion16To17ThenValidationSucceeds() {
-        createDatabaseAndMigrate(16, 17, AppDatabase.MIGRATION_16_TO_17)
+        createDatabaseAndMigrate(16, 17, migrationsProvider.MIGRATION_16_TO_17)
+    }
+
+    @Test
+    fun whenMigratingFromVersion17To18ThenValidationSucceeds() {
+        createDatabaseAndMigrate(17, 18, migrationsProvider.MIGRATION_17_TO_18)
+    }
+
+    @Test
+    fun whenMigratingFromVersion17To18IfUserDidNotSawOnboardingThenMigrateToNew() = coroutineRule.runBlocking {
+        givenUserNeverSawOnboarding()
+        createDatabaseAndMigrate(17, 18, migrationsProvider.MIGRATION_17_TO_18)
+        assertEquals(AppStage.NEW, database().userStageDao().currentUserAppStage()?.appStage)
+    }
+
+    @Test
+    fun whenMigratingFromVersion17To18IfUserSawOnboardingThenMigrateToEstablished() = coroutineRule.runBlocking {
+        givenUserSawOnboarding()
+        createDatabaseAndMigrate(17, 18, migrationsProvider.MIGRATION_17_TO_18)
+        assertEquals(AppStage.ESTABLISHED, database().userStageDao().currentUserAppStage()?.appStage)
     }
 
     private fun createDatabase(version: Int) {
@@ -168,7 +212,7 @@ class AppDatabaseTest {
     private fun database(): AppDatabase {
         val database = Room
             .databaseBuilder(getInstrumentation().targetContext, AppDatabase::class.java, TEST_DB_NAME)
-            .addMigrations(*AppDatabase.ALL_MIGRATIONS.toTypedArray())
+            .addMigrations(*migrationsProvider.ALL_MIGRATIONS.toTypedArray())
             .allowMainThreadQueries()
             .build()
 
@@ -177,7 +221,26 @@ class AppDatabaseTest {
         return database
     }
 
+    private fun givenSharedPreferencesEmpty() {
+        val sharedPreferences = mock<SharedPreferences>()
+        whenever(context.getSharedPreferences(FILE_NAME, Context.MODE_PRIVATE)).thenReturn(sharedPreferences)
+    }
+
+    private fun givenUserNeverSawOnboarding() {
+        val sharedPreferences = mock<SharedPreferences>()
+        whenever(context.getSharedPreferences(FILE_NAME, Context.MODE_PRIVATE)).thenReturn(sharedPreferences)
+        whenever(sharedPreferences.getInt(eq(PROPERTY_KEY), any())).thenReturn(0)
+    }
+
+    private fun givenUserSawOnboarding() {
+        val sharedPreferences = mock<SharedPreferences>()
+        whenever(context.getSharedPreferences(FILE_NAME, Context.MODE_PRIVATE)).thenReturn(sharedPreferences)
+        whenever(sharedPreferences.getInt(eq(PROPERTY_KEY), any())).thenReturn(1)
+    }
+
     companion object {
         private const val TEST_DB_NAME = "TEST_DB_NAME"
+        private const val FILE_NAME = "com.duckduckgo.app.onboarding.settings"
+        private const val PROPERTY_KEY = "com.duckduckgo.app.onboarding.currentVersion"
     }
 }

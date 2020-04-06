@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 DuckDuckGo
+ * Copyright (c) 2020 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,33 @@
 
 package com.duckduckgo.app.onboarding.store
 
+import androidx.room.Entity
+import androidx.room.PrimaryKey
+import androidx.room.TypeConverter
 
-interface OnboardingStore {
-    var onboardingDialogJourney: String?
+const val USER_STAGE_TABLE_NAME = "userStage"
+
+@Entity(tableName = USER_STAGE_TABLE_NAME)
+data class UserStage(
+    @PrimaryKey val key: Int = 1,
+    val appStage: AppStage
+)
+
+enum class AppStage {
+    NEW,
+    DAX_ONBOARDING,
+    ESTABLISHED;
+}
+
+class StageTypeConverter {
+
+    @TypeConverter
+    fun toStage(stage: String): AppStage {
+        return AppStage.valueOf(stage)
+    }
+
+    @TypeConverter
+    fun fromStage(stage: AppStage): String {
+        return stage.name
+    }
 }

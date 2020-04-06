@@ -7,22 +7,7 @@
 
     <!-- Onboarding Activity -->
     <string name="onboardingDefaultBrowserDescription">Posjetite Postavke kako biste svaki put pretraživali i pregledavali uz DuckDuckGo.</string>
-    <string name="onboardingContinue">Nastavi</string>
-    <string name="onboardingContinueFinalPage">Započni pregledavanje</string>
     <string name="onboardingDefaultBrowserTitle">Učinite DuckDuckGo vašom zadanom tražilicom</string>
-    <string name="onboardingDefaultBrowserTitleDefaultSet">Recite bok spokoju</string>
-
-    <!-- Unified Welcome Page -->
-    <string name="unifiedOnboardingTitleFirstVisit">Dobrodošli u\naDuckDuckGo!</string>
-    <string name="unifiedOnboardingSubtitleTrackerBlockingEnabled">Ostanite anonimni dok pretražujete i pregledavate internet.</string>
-    <string name="unifiedOnboardingPrivateSearchTitle">Privatno pretraživanje</string>
-    <string name="unifiedOnboardingPrivateSearchSubtitle">Uz DuckDuckGo, vaša pretraživanja su uvijek privatna.</string>
-    <string name="unifiedOnboardingBrowsingProtectionTitle">Zaštita kod pregledavanja</string>
-    <string name="unifiedOnboardingBrowsingProtectionSubtitleTrackerBlockingEnabled">Blokirajte alate za praćenje i pregledavajte sigurno kao zadani način.</string>
-    <string name="unifiedOnboardingDataClearingTitle">Brisanje podataka</string>
-    <string name="unifiedOnboardingDataClearingSubtitle">Izbrišite podatke o pregledavanju dodirom gumba.</string>
-    <string name="unifiedOnboardingCustomizationTitle">Prilagodba</string>
-    <string name="unifiedOnboardingCustomizationSubtitle">Izaberite temu i prilagodite značajke zaštite privatnosti.</string>
 
     <!-- Default Browser -->
     <string name="cannotLaunchDefaultAppSettings">Ne mogu pokrenuti zaslon zadanih postavki u aplikaciji</string>
@@ -30,7 +15,6 @@
     <string name="defaultBrowserMaybeLater">Možda kasnije</string>
     <string name="defaultBrowserLetsDoIt">Učinimo to!</string>
     <string name="defaultBrowserDescriptionNoDefault">Otvarajte veze spokojno, svaki put.</string>
-    <string name="defaultBrowserDescriptionDefaultSet">Uz DuckDuckGo, vaši su internetski podaci prema zadanim postavkama privatniji, bez obzira gdje vas Internet vodio.</string>
     <string name="defaultBrowserInstructions">Odaberite DuckDuckGo i dodirnite <font color="#678fff"> Uvijek </font>.</string>
 
     <!-- Browser Activity -->
@@ -386,10 +370,6 @@
     <!-- Dax Dialog -->
     <string name="daxDialogHideButton">SAKRIJ</string>
     <string name="daxDialogPhew">Uf!</string>
-    <string name="daxDialogYes">U REDU!</string>
-    <string name="daxDialogAddWidget">Dodaj widget</string>
-    <string name="daxDialogMaybeLater">Možda kasnije</string>
-    <string name="daxDialogSettings">Idite na postavke</string>
     <string name="daxDialogNext">Dalje</string>
     <string name="daxDialogHighFive">Visoko pet!</string>
     <string name="daxDialogGotIt">Shvatio/la sam</string>
@@ -397,4 +377,26 @@
     <string name="hideTipsText">Ima ih samo nekoliko, a pokušali smo ih učiniti što informativnijima.</string>
     <string name="hideTipsButton">Sakrij savjete zauvijek</string>
 
+    <!-- New Onboarding Experience -->
+    <string name="onboardingWelcomeTitle">Dobro došli u DuckDuckGo!</string>
+    <string name="onboardingDaxText">Internet može biti pomalo jeziv.&lt;br/&gt;&lt;br/&gt;          Ne brinite! Privatno pretraživanje i pregledavanje lakše je nego što mislite.</string>
+    <string name="onboardingLetsDoItButton">Učinimo to!</string>
+    <string name="daxIntroCtaText">Zatim pokušajte posjetiti jedno od svojih omiljenih web-mjesta! &lt;br/&gt;&lt;br/&gt;Blokirat ću tragače kako vas ne bi mogli špijunirati. Nadogradit ću i sigurnost vaše veze ako je moguće. &#128274;</string>
+    <string name="daxEndCtaText">&lt;br/&gt;&lt;br/&gt;Shvatili ste ovo! Zapamtite: svaki put kada pregledavate sa mnom jeziva reklama gubi krila. &#128077;</string>
+    <string name="daxSerpCtaText">Vaše pretrage u DuckDuckGo anonimne su i nikad ne pohranjujem vašu povijest pretraga. Nikad. &#128588;</string>
+    <string name="daxNonSerpCtaText">Svako web-mjesto ima ocjenu privatnosti. Dodirnite je da biste vidjeli kako sam zaštitio vašu privatnost.&lt;br/&gt;&lt;br/&gt;Želite li uživati? Pokušajte izbrisati svoje podatke pritiskom na gumb \"Pali\".</string>
+    <string name="daxMainNetworkStep1CtaText">Obratite pozornost!&lt;br/&gt;&lt;br/&gt; %s pokreće veliku mrežu praćenja.&lt;br/&gt;&lt;br/&gt;Niska ocjena privatnosti upozorit će vas na ovakva mjesta.</string>
+    <string name="daxMainNetworkStep1OwnedCtaText">Obratite pozornost!&lt;br/&gt;&lt;br/&gt; %s je u vlasništvu kompanije %s, koja vodi glavnu mrežu za praćenje.</string>
+    <string name="daxMainNetworkStep21CtaText">Zapravo, %s tragači vrebaju oko %s najboljih web-mjesta. &#128561;&lt;br/&gt;&lt;br/&gt;</string>
+    <string name="daxMainNetworkStep211CtaText">Zapravo, %s tragači vrebaju po cijelom internetu. &#128561;&lt;br/&gt;&lt;br/&gt;</string>
+    <string name="daxMainNetworkStep2CtaText">%s Blokirat ću te tragače dok pregledavate ne-%s web-mjesta.</string>
+    <plurals name="daxTrackersBlockedCtaText">
+        <item quantity="one">&#160;i &lt;b&gt;%d ostali&lt;/b&gt; su vas pokušavali pratiti ovdje. &lt;br/&gt;&lt;br/&gt;Blokirao sam ih!&lt;br/&gt;&lt;br/&gt; ☝️Možete provjeriti URL traku kako biste vidjeli tko vas pokušava pratiti kad posjetite novo web-mjesto.️</item>
+        <item quantity="few">&#160;i &lt;b&gt;%d ostali&lt;/b&gt; su vas pokušavali pratiti ovdje. &lt;br/&gt;&lt;br/&gt;Blokirao sam ih!&lt;br/&gt;&lt;br/&gt; ☝️Možete provjeriti URL traku kako biste vidjeli tko vas pokušava pratiti kad posjetite novo web-mjesto.️ </item>
+        <item quantity="other">&#160;i &lt;b&gt;%d ostali&lt;/b&gt; su vas pokušavali pratiti ovdje. &lt;br/&gt;&lt;br/&gt;Blokirao sam ih!&lt;br/&gt;&lt;br/&gt; ☝️Možete provjeriti URL traku kako biste vidjeli tko vas pokušava pratiti kad posjetite novo web-mjesto.️</item>
+    </plurals>
+    <string name="daxTrackersBlockedCtaZeroText">&#160;vas je pokušavao pratiti ovdje. &lt;br/&gt;&lt;br/&gt;Blokirao sam ga!&lt;br/&gt;&lt;br/&gt; ☝️Možete provjeriti URL traku kako biste vidjeli tko vas pokušava pratiti kad posjetite novo web-mjesto.️</string>
+
+    <!-- Covid Cta-->
+    <string name="covidCtaText">Dobijte službene informacije i savjete o COVID-19.</string>
 </resources>

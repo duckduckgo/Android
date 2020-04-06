@@ -48,7 +48,6 @@ import com.duckduckgo.app.browser.LongPressHandler.RequiredAction
 import com.duckduckgo.app.browser.SpecialUrlDetector.UrlType.IntentType
 import com.duckduckgo.app.browser.WebNavigationStateChange.*
 import com.duckduckgo.app.browser.addtohome.AddToHomeCapabilityDetector
-import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.browser.favicon.FaviconDownloader
 import com.duckduckgo.app.browser.model.BasicAuthenticationCredentials
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
@@ -58,14 +57,12 @@ import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.browser.ui.HttpAuthenticationDialogFragment.HttpAuthenticationListener
 import com.duckduckgo.app.cta.ui.*
 import com.duckduckgo.app.global.*
-import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.global.model.SiteFactory
 import com.duckduckgo.app.global.model.domainMatchesUrl
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao
 import com.duckduckgo.app.privacy.model.PrivacyGrade
 import com.duckduckgo.app.settings.db.SettingsDataStore
-import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.api.StatisticsUpdater
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelName
@@ -104,9 +101,6 @@ class BrowserTabViewModel(
     private val ctaViewModel: CtaViewModel,
     private val searchCountDao: SearchCountDao,
     private val pixel: Pixel,
-    private val installStore: AppInstallStore,
-    private val defaultBrowserDetector: DefaultBrowserDetector,
-    private val variantManager: VariantManager,
     private val dispatchers: DispatcherProvider = DefaultDispatcherProvider()
 ) : WebViewClientListener, EditBookmarkListener, HttpAuthenticationListener, ViewModel() {
 
@@ -199,8 +193,6 @@ class BrowserTabViewModel(
         object GenerateWebViewPreviewImage : Command()
         object LaunchTabSwitcher : Command()
         class ShowErrorWithAction(val action: () -> Unit) : Command()
-        class OpenDefaultBrowserDialog(val url: String = DEFAULT_URL) : Command()
-        object OpenDefaultBrowserSettings : Command()
     }
 
     val autoCompleteViewState: MutableLiveData<AutoCompleteViewState> = MutableLiveData()
@@ -229,7 +221,6 @@ class BrowserTabViewModel(
     private var site: Site? = null
     private lateinit var tabId: String
     private var webNavigationState: WebNavigationState? = null
-    private var defaultBrowserAttempt: Int = 1
     private var httpsUpgraded = false
 
     init {
@@ -929,17 +920,25 @@ class BrowserTabViewModel(
     }
 
     fun registerDaxBubbleCtaDismissed() {
-        val cta = ctaViewState.value?.cta ?: return
-        ctaViewModel.registerDaxBubbleCtaDismissed(cta)
+        viewModelScope.launch {
+            val cta = ctaViewState.value?.cta ?: return@launch
+            ctaViewModel.registerDaxBubbleCtaDismissed(cta)
+        }
+    }
+
+    fun onUserClickTopCta(cta: HomeTopPanelCta) {
+        if (cta is HomeTopPanelCta.CovidCta) {
+            onUserSubmittedQuery(cta.searchTerm)
+        }
     }
 
     fun onUserClickCtaOkButton(cta: Cta) {
         ctaViewModel.onUserClickCtaOkButton(cta)
-        viewModelScope.launch {
-            withContext(dispatchers.io()) {
-                ctaViewModel.obtainNextCta(previousCta = cta)
-            }?.let { ctaViewState.value = currentCtaViewState().copy(cta = it) }
-            produceNewCommand(cta)
+        command.value = when (cta) {
+            is HomePanelCta.Survey -> LaunchSurvey(cta.survey)
+            is HomePanelCta.AddWidgetAuto -> LaunchAddWidget
+            is HomePanelCta.AddWidgetInstructions -> LaunchLegacyAddWidget
+            else -> return
         }
     }
 
@@ -948,71 +947,15 @@ class BrowserTabViewModel(
     }
 
     fun onUserDismissedCta(dismissedCta: Cta) {
-        ctaViewModel.onUserDismissedCta(dismissedCta)
-        if (dismissedCta is HomePanelCta) {
-            refreshCta()
-        } else {
-            ctaViewState.value = currentCtaViewState().copy(cta = null)
-        }
-    }
-
-    private fun produceNewCommand(cta: Cta) {
-        command.value = when (cta) {
-            is HomePanelCta.Survey -> LaunchSurvey(cta.survey)
-            is HomePanelCta.AddWidgetAuto -> LaunchAddWidget
-            is HomePanelCta.AddWidgetInstructions -> LaunchLegacyAddWidget
-            is DaxDialogCta.DefaultBrowserCta -> cta.primaryAction.mapToCommand()
-            is DaxDialogCta.SearchWidgetCta -> cta.primaryAction.mapToCommand()
-            else -> return
-        }
-    }
-
-    fun onUserTriedToSetAsDefaultBrowserFromSettings() {
-        val isDefaultBrowser = defaultBrowserDetector.isDefaultBrowser()
-        installStore.defaultBrowser = isDefaultBrowser
-        firePixelDefaultBrowserCtaUserAction(isDefaultBrowser, origin = Pixel.PixelValues.DEFAULT_BROWSER_SETTINGS)
-    }
-
-    fun onUserTriedToSetAsDefaultBrowserFromDialog() {
-        val isDefaultBrowser = defaultBrowserDetector.isDefaultBrowser()
-        installStore.defaultBrowser = isDefaultBrowser
-        if (defaultBrowserDetector.isDefaultBrowser()) {
-            defaultBrowserAttempt = 1
-            firePixelDefaultBrowserCtaUserAction(true, origin = Pixel.PixelValues.DEFAULT_BROWSER_DIALOG)
-        } else {
-            if (defaultBrowserAttempt < MAX_DIALOG_ATTEMPTS) {
-                defaultBrowserAttempt++
-                command.value = OpenDefaultBrowserDialog()
-            } else {
-                firePixelDefaultBrowserCtaUserAction(false, origin = Pixel.PixelValues.DEFAULT_BROWSER_JUST_ONCE_MAX)
+        viewModelScope.launch {
+            ctaViewModel.onUserDismissedCta(dismissedCta)
+            when (dismissedCta) {
+                is HomeTopPanelCta -> {
+                    ctaViewState.value = currentCtaViewState().copy(cta = null)
+                }
+                is HomePanelCta -> refreshCta()
+                else -> ctaViewState.value = currentCtaViewState().copy(cta = null)
             }
-        }
-    }
-
-    fun onUserDismissedDefaultBrowserDialog() {
-        val isDefaultBrowser = defaultBrowserDetector.isDefaultBrowser()
-        val hasDefaultBrowser = defaultBrowserDetector.hasDefaultBrowser()
-
-        installStore.defaultBrowser = isDefaultBrowser
-
-        val origin = if (!isDefaultBrowser && hasDefaultBrowser) {
-            Pixel.PixelValues.DEFAULT_BROWSER_EXTERNAL
-        } else {
-            Pixel.PixelValues.DEFAULT_BROWSER_DIALOG_DISMISSED
-        }
-        firePixelDefaultBrowserCtaUserAction(isDefaultBrowser, origin = origin)
-    }
-
-    private fun firePixelDefaultBrowserCtaUserAction(isDefaultBrowser: Boolean, origin: String) {
-        val params = mapOf(
-            PixelParameter.DEFAULT_BROWSER_SET_FROM_ONBOARDING to false.toString(),
-            PixelParameter.DEFAULT_BROWSER_SET_ORIGIN to origin
-        )
-
-        if (isDefaultBrowser) {
-            pixel.fire(PixelName.DEFAULT_BROWSER_SET, params)
-        } else {
-            pixel.fire(PixelName.DEFAULT_BROWSER_NOT_SET, params)
         }
     }
 
@@ -1085,23 +1028,7 @@ class BrowserTabViewModel(
         command.value = OpenInNewTab(query)
     }
 
-    private fun DaxDialogCta.DefaultBrowserCta.DefaultBrowserAction.mapToCommand(): Command {
-        return when (this) {
-            is DaxDialogCta.DefaultBrowserCta.DefaultBrowserAction.ShowSettings -> OpenDefaultBrowserSettings
-            is DaxDialogCta.DefaultBrowserCta.DefaultBrowserAction.ShowSystemDialog -> OpenDefaultBrowserDialog()
-        }
-    }
-
-    private fun DaxDialogCta.SearchWidgetCta.SearchWidgetAction.mapToCommand(): Command {
-        return when (this) {
-            is DaxDialogCta.SearchWidgetCta.SearchWidgetAction.AddAutomatic -> LaunchAddWidget
-            is DaxDialogCta.SearchWidgetCta.SearchWidgetAction.AddManually -> LaunchLegacyAddWidget
-        }
-    }
-
     companion object {
         private const val FIXED_PROGRESS = 50
-        private const val MAX_DIALOG_ATTEMPTS = 2
-        private const val DEFAULT_URL = "https://duckduckgo.com"
     }
 }

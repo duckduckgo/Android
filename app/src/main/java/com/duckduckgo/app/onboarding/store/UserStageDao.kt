@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 DuckDuckGo
+ * Copyright (c) 2020 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,19 @@
 
 package com.duckduckgo.app.onboarding.store
 
+import androidx.room.*
 
-interface OnboardingStore {
-    var onboardingDialogJourney: String?
+@Dao
+interface UserStageDao {
+
+    @Query("select * from $USER_STAGE_TABLE_NAME limit 1")
+    suspend fun currentUserAppStage(): UserStage?
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun insert(userStage: UserStage)
+
+    @Transaction
+    fun updateUserStage(appStage: AppStage) {
+        insert(UserStage(appStage = appStage))
+    }
 }

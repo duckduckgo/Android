@@ -24,28 +24,15 @@ import javax.inject.Inject
 
 class OnboardingSharedPreferences @Inject constructor(private val context: Context) : OnboardingStore {
 
-    override val shouldShow: Boolean
-        get() = preferences.getInt(KEY_VERSION, 0) < CURRENT_VERSION
-
     override var onboardingDialogJourney: String?
         get() = preferences.getString(ONBOARDING_JOURNEY, null)
         set(dialogJourney) = preferences.edit { putString(ONBOARDING_JOURNEY, dialogJourney) }
 
-    override fun onboardingShown() {
-        val editor = preferences.edit()
-        editor.putInt(KEY_VERSION, CURRENT_VERSION)
-        editor.apply()
-    }
-
     private val preferences: SharedPreferences
         get() = context.getSharedPreferences(FILENAME, Context.MODE_PRIVATE)
 
-
     companion object {
         const val FILENAME = "com.duckduckgo.app.onboarding.settings"
-        const val KEY_VERSION = "com.duckduckgo.app.onboarding.currentVersion"
-        const val CURRENT_VERSION = 1
         const val ONBOARDING_JOURNEY = "onboardingJourney"
     }
-
 }
