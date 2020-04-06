@@ -52,6 +52,7 @@
         android:id="@+id/bottomBarTabsItem"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:background="?selectableItemBackgroundBorderless"
         android:layout_weight="1"/>
 
     <ImageButton

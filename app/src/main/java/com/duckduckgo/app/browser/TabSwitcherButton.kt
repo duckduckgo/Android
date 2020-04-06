@@ -43,46 +43,33 @@ class TabSwitcherButton @JvmOverloads constructor(
     var hasUnread = false
         set(value) {
             field = value
-            anim.progress = if (hasUnread) 1.0f else 0.0f
         }
 
     override fun onFinishInflate() {
         super.onFinishInflate()
         View.inflate(context, R.layout.view_tab_switcher_button, this)
-        clickZone.setOnClickListener {
+
+        setOnClickListener {
             super.callOnClick()
         }
 
-        clickZone.setOnLongClickListener {
+        setOnLongClickListener {
             super.performLongClick()
         }
     }
 
     fun increment(callback: () -> Unit) {
-        anim.progress = 0.0f
-
-        anim.addAnimatorListener(object : AnimatorListenerAdapter() {
-            override fun onAnimationEnd(animation: Animator?) {
-                callback()
-            }
-        })
-
         fadeOutCount {
             count += 1
             fadeInCount()
+            callback()
         }
-
-        anim.playAnimation()
     }
 
     fun animateCount() {
-        anim.progress = 0.0f
-
         fadeOutCount {
             fadeInCount()
         }
-
-        anim.playAnimation()
     }
 
     private fun fadeOutCount(callback: () -> Unit) {
