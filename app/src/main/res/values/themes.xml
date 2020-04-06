@@ -65,11 +65,14 @@
         <item name="daxDialogBackgroundColor">@color/charcoalGrey</item>
         <item name="daxDialogSecondaryButtonTextColor">@color/white</item>
         <item name="daxDialogSecondaryButtonRippleColor">@color/white</item>
+
         <item name="brokenSiteSelectionTextColor">@color/white</item>
         <item name="brokenSiteOutlinedColor">@color/grayish</item>
         <item name="brokenSitesButtonDisabledBackgroundColor">@color/greyishBrownTwo</item>
         <item name="brokenSitesButtonDisabledTextColor">@color/warGreyTwo</item>
         <item name="brokenSitesButtonRippleColor">@color/white</item>
+        <item name="topCallToActionDescriptionColor">@color/grayish</item>
+        <item name="topCallToActionBackgroundColor">@color/greyishBrownTwo</item>
 
         <item name="feedbackAnonymousFeedbackLabelColor">@color/grayish</item>
         <item name="feedbackListItemBackgroundColor">@color/almostBlack</item>
@@ -130,11 +133,14 @@
         <item name="daxDialogBackgroundColor">@color/white</item>
         <item name="daxDialogSecondaryButtonTextColor">@color/grayishBrown</item>
         <item name="daxDialogSecondaryButtonRippleColor">@color/subtleGrayTwo</item>
+
         <item name="brokenSiteSelectionTextColor">@color/almostBlack</item>
         <item name="brokenSiteOutlinedColor">@color/grayishTwo</item>
         <item name="brokenSitesButtonDisabledBackgroundColor">@color/subtleGrayTwo</item>
         <item name="brokenSitesButtonDisabledTextColor">@color/white</item>
         <item name="brokenSitesButtonRippleColor">@color/subtleGrayTwo</item>
+        <item name="topCallToActionDescriptionColor">@color/almostBlack</item>
+        <item name="topCallToActionBackgroundColor">@color/white</item>
 
         <item name="feedbackAnonymousFeedbackLabelColor">@color/warmerGray</item>
         <item name="feedbackListItemBackgroundColor">@color/whiteFive</item>

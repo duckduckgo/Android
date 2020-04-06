@@ -23,22 +23,7 @@
 
     <!-- Onboarding Activity -->
     <string name="onboardingDefaultBrowserDescription">Avage sätted, et DuckDuckGo abil iga kord otsida ja sirvida.</string>
-    <string name="onboardingContinue">Jätkake</string>
-    <string name="onboardingContinueFinalPage">Alustage sirvimist</string>
     <string name="onboardingDefaultBrowserTitle">Muutke DuckDuckGo teie vaikimisi</string>
-    <string name="onboardingDefaultBrowserTitleDefaultSet">Öelge meelerahule tere</string>
-
-    <!-- Unified Welcome Page -->
-    <string name="unifiedOnboardingTitleFirstVisit">Tere tulemast DuckDuckGo kasutajaks!</string>
-    <string name="unifiedOnboardingSubtitleTrackerBlockingEnabled">Jääge veebis otsides ja sirvides privaatseks.</string>
-    <string name="unifiedOnboardingPrivateSearchTitle">Privaatne otsing</string>
-    <string name="unifiedOnboardingPrivateSearchSubtitle">DuckDuckGo abil on teie otsingud alati privaatsed.</string>
-    <string name="unifiedOnboardingBrowsingProtectionTitle">Sirvimiskaitse</string>
-    <string name="unifiedOnboardingBrowsingProtectionSubtitleTrackerBlockingEnabled">Blokeerige jälgijaid ja sirvige vaikimisi turvaliselt.</string>
-    <string name="unifiedOnboardingDataClearingTitle">Andmete kustutamine</string>
-    <string name="unifiedOnboardingDataClearingSubtitle">Kustutage sirvimisandmeid ühe nupuvajutusega.</string>
-    <string name="unifiedOnboardingCustomizationTitle">Kohandamine</string>
-    <string name="unifiedOnboardingCustomizationSubtitle">Valige teema ja kohandage privaatsusfunktsioone.</string>
 
     <!-- Default Browser -->
     <string name="cannotLaunchDefaultAppSettings">Rakenduse vaikeseadete ekraani ei saa käivitada</string>
@@ -46,7 +31,6 @@
     <string name="defaultBrowserMaybeLater">Võib-olla hiljem</string>
     <string name="defaultBrowserLetsDoIt">Teeme ära!</string>
     <string name="defaultBrowserDescriptionNoDefault">Avage linke igal ajal, rahuliku meelega.</string>
-    <string name="defaultBrowserDescriptionDefaultSet">DuckDuckGo abil on teie veebiandmed vaikimisi privaatsemad, kuhu iganes Internet teid ka ei viiks.</string>
     <string name="defaultBrowserInstructions">Valige DuckDuckGo ja koputage valikut <font color="#678fff">Alati</font>.</string>
 
     <!-- Browser Activity -->
@@ -406,10 +390,6 @@
     <!-- Dax Dialog -->
     <string name="daxDialogHideButton">PEIDA</string>
     <string name="daxDialogPhew">Huh!</string>
-    <string name="daxDialogYes">OK!</string>
-    <string name="daxDialogAddWidget">Lisage vidin</string>
-    <string name="daxDialogMaybeLater">Võib-olla hiljem</string>
-    <string name="daxDialogSettings">Avage sätted</string>
     <string name="daxDialogNext">Järgmine</string>
     <string name="daxDialogHighFive">Viska viis!</string>
     <string name="daxDialogGotIt">Sain aru</string>
@@ -418,4 +398,25 @@
     <string name="hideTipsText">Neid on üsna vähe ja püüdsime muuta need informatiivseks.</string>
     <string name="hideTipsButton">Peida näpunäited igaveseks</string>
 
+    <!-- New Onboarding Experience -->
+    <string name="onboardingWelcomeTitle">Tere tulemast DuckDuckGo kasutajaks!</string>
+    <string name="onboardingDaxText">Internet võib olla üsna jube.&lt;br/&gt;&lt;br/&gt;Ärge muretsege! Privaatselt otsimine ja sirvimine on lihtsam kui arvate.</string>
+    <string name="onboardingLetsDoItButton">Teeme ära!</string>
+    <string name="daxIntroCtaText">Järgmisena proovige külastada ühte oma lemmiksaitidest! &lt;br/&gt;&lt;br/&gt;Mina aga blokeerin jälgijaid, et nad ei saaks teid luurata. Täiustan võimalusel ka teie ühenduse turvalisust. &#128274;</string>
+    <string name="daxEndCtaText">Käpas! &lt;br/&gt;&lt;br/&gt;Pidage meeles: iga kord, kui minuga sirvite, kaotab jube reklaam tiivad. &#128077;</string>
+    <string name="daxSerpCtaText">Teie DuckDuckGo otsingud on anonüümsed ja ma ei salvesta kunagi teie otsinguajalugu. Mitte kunagi. &#128588;</string>
+    <string name="daxNonSerpCtaText">Igal saidil on privaatsusklass. Puudutage seda, et näha, kuidas ma teie privaatsust kaitsesin.&lt;br/&gt;&lt;br/&gt;Tahate aga proovida midagi eriti peent? Proovige kustutada oma andmed, puudutades tule nuppu.</string>
+    <string name="daxMainNetworkStep1CtaText">Ettevaatust!&lt;br/&gt;&lt;br/&gt; %s haldab suurt jälgimisvõrku.&lt;br/&gt;&lt;br/&gt;Sellistest saitidest annab märku madal privaatsusklass.</string>
+    <string name="daxMainNetworkStep1OwnedCtaText">Ettevaatust!&lt;br/&gt;&lt;br/&gt; %s kuulub ettevõttele %s, mis haldab suurt jälgimisvõrku.</string>
+    <string name="daxMainNetworkStep21CtaText">Tegelikult varitsevad %s jälgijad umbes %s populaarseimal saidil. &#128561;&lt;br/&gt;&lt;br/&gt;</string>
+    <string name="daxMainNetworkStep211CtaText">Tegelikult varitsevad %s jälitajad kogu Internetis, &#128561;&lt;br/&gt;&lt;br/&gt;</string>
+    <string name="daxMainNetworkStep2CtaText">%s blokeerin need jälitajad, kui sirvite saite, mis pole %s.</string>
+    <plurals name="daxTrackersBlockedCtaText">
+        <item quantity="one">&#160;ja &lt;b&gt;%d teine&lt;/b&gt; üritasid teid siin jälitada. &lt;br/&gt;&lt;br/&gt;Blokeerisin nad!&lt;br/&gt;&lt;br/&gt; ☝️Võite vaadata URL-i riba, et näha, kes üritab teid jälgida, kui külastate uut saiti.️</item>
+        <item quantity="other">&#160;ja &lt;b&gt;%d teised&lt;/b&gt; üritasid teid siin jälitada. &lt;br/&gt;&lt;br/&gt;Blokeerisin nad!&lt;br/&gt;&lt;br/&gt; ☝️Võite vaadata URL-i riba, et näha, kes üritab teid jälgida, kui külastate uut saiti.️</item>
+    </plurals>
+    <string name="daxTrackersBlockedCtaZeroText">&#160;üritas teid siin jälitada. &lt;br/&gt;&lt;br/&gt;Blokeerisin selle!&lt;br/&gt;&lt;br/&gt; ☝️Võite vaadata URL-i riba, et näha, kes üritab teid jälgida, kui külastate uut saiti.️</string>
+
+    <!-- Covid Cta-->
+    <string name="covidCtaText">Hankige ametlikku teavet COVID-19 kohta ja näpunäiteid.</string>
 </resources>

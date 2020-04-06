@@ -23,7 +23,6 @@ import android.view.ViewGroup
 import androidx.annotation.LayoutRes
 import androidx.fragment.app.Fragment
 import com.duckduckgo.app.onboarding.ui.OnboardingActivity
-import com.duckduckgo.app.onboarding.ui.OnboardingActivityExperiment
 
 abstract class OnboardingPageFragment : Fragment() {
 
@@ -33,19 +32,9 @@ abstract class OnboardingPageFragment : Fragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? =
         inflater.inflate(layoutResource(), container, false)
 
-    fun extractContinueButtonTextResourceId(): Int? {
-        val customContinueButton = arguments?.getInt(CONTINUE_BUTTON_TEXT_RESOURCE_ID_EXTRA, 0)
-        return if (customContinueButton != 0) customContinueButton else null
-    }
-
     fun onContinuePressed() {
         when (activity) {
-            is OnboardingActivityExperiment -> (activity as OnboardingActivityExperiment).onContinueClicked()
             is OnboardingActivity -> (activity as OnboardingActivity).onContinueClicked()
         }
-    }
-
-    companion object {
-        const val CONTINUE_BUTTON_TEXT_RESOURCE_ID_EXTRA = "CONTINUE_BUTTON_TEXT_RESOURCE_ID_EXTRA"
     }
 }

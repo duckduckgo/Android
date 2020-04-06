@@ -20,18 +20,16 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import androidx.room.TypeConverter
 
-
 enum class CtaId {
     SURVEY,
     ADD_WIDGET,
     DAX_INTRO,
     DAX_DIALOG_SERP,
-    DAX_DIALOG_DEFAULT_BROWSER,
-    DAX_DIALOG_SEARCH_WIDGET,
     DAX_DIALOG_TRACKERS_FOUND,
     DAX_DIALOG_NETWORK,
     DAX_DIALOG_OTHER,
-    DAX_END
+    DAX_END,
+    COVID
 }
 
 @Entity(

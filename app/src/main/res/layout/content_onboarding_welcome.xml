@@ -22,7 +22,7 @@
     android:layout_height="match_parent"
     android:background="@drawable/onboarding_background_small"
     android:tag="onboardingDefaultBrowser"
-    tools:context="com.duckduckgo.app.onboarding.ui.OnboardingActivityExperiment">
+    tools:context="com.duckduckgo.app.onboarding.ui.OnboardingActivity">
 
     <LinearLayout
         android:id="@+id/welcomeContent"
@@ -59,11 +59,12 @@
 
     <include
         layout="@layout/include_dax_dialog_cta"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
         android:layout_marginTop="93dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintWidth_max="600dp"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

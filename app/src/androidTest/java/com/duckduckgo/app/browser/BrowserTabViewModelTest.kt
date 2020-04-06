@@ -14,8 +14,6 @@
  * limitations under the License.
  */
 
-@file:Suppress("RemoveExplicitTypeArguments")
-
 package com.duckduckgo.app.browser
 
 import android.view.MenuItem
@@ -42,7 +40,6 @@ import com.duckduckgo.app.browser.BrowserTabViewModel.Command.Navigate
 import com.duckduckgo.app.browser.LongPressHandler.RequiredAction.DownloadFile
 import com.duckduckgo.app.browser.LongPressHandler.RequiredAction.OpenInNewTab
 import com.duckduckgo.app.browser.addtohome.AddToHomeCapabilityDetector
-import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.browser.favicon.FaviconDownloader
 import com.duckduckgo.app.browser.model.BasicAuthenticationCredentials
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
@@ -50,19 +47,20 @@ import com.duckduckgo.app.browser.model.LongPressTarget
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.cta.db.DismissedCtaDao
+import com.duckduckgo.app.cta.model.CtaId
 import com.duckduckgo.app.cta.model.DismissedCta
-import com.duckduckgo.app.cta.ui.CtaViewModel
-import com.duckduckgo.app.cta.ui.DaxBubbleCta
-import com.duckduckgo.app.cta.ui.DaxDialogCta
-import com.duckduckgo.app.cta.ui.HomePanelCta
+import com.duckduckgo.app.cta.ui.*
 import com.duckduckgo.app.global.db.AppDatabase
+import com.duckduckgo.app.cta.ui.HomeTopPanelCta
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.model.SiteFactory
 import com.duckduckgo.app.onboarding.store.OnboardingStore
+import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao
 import com.duckduckgo.app.privacy.model.PrivacyPractices
 import com.duckduckgo.app.privacy.model.TestEntity
 import com.duckduckgo.app.privacy.store.PrivacySettingsStore
+import com.duckduckgo.app.runBlocking
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.VariantManager.Companion.DEFAULT_VARIANT
@@ -80,12 +78,9 @@ import com.duckduckgo.app.widget.ui.WidgetCapabilities
 import com.nhaarman.mockitokotlin2.*
 import io.reactivex.Observable
 import io.reactivex.Single
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.test.TestCoroutineScope
 import kotlinx.coroutines.test.runBlockingTest
-import kotlinx.coroutines.withContext
 import org.junit.After
 import org.junit.Assert.*
 import org.junit.Before
@@ -180,7 +175,7 @@ class BrowserTabViewModelTest {
     private lateinit var mockPrivacySettingsStore: PrivacySettingsStore
 
     @Mock
-    private lateinit var mockDefaultBrowserDetector: DefaultBrowserDetector
+    private lateinit var mockUserStageStore: UserStageStore
 
     private lateinit var mockAutoCompleteApi: AutoCompleteApi
 
@@ -215,7 +210,8 @@ class BrowserTabViewModelTest {
             mockSettingsStore,
             mockOnboardingStore,
             mockPrivacySettingsStore,
-            mockDefaultBrowserDetector
+            mockUserStageStore,
+            coroutineRule.testDispatcherProvider
         )
 
         val siteFactory = SiteFactory(mockPrivacyPractices, mockEntityLookup)
@@ -246,10 +242,7 @@ class BrowserTabViewModelTest {
             ctaViewModel = ctaViewModel,
             searchCountDao = mockSearchCountDao,
             pixel = mockPixel,
-            variantManager = mockVariantManager,
-            dispatchers = coroutineRule.testDispatcherProvider,
-            defaultBrowserDetector = mockDefaultBrowserDetector,
-            installStore = mockAppInstallStore
+            dispatchers = coroutineRule.testDispatcherProvider
         )
 
         testee.loadData("abc", null, false)
@@ -288,7 +281,7 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenOpenInNewBackgroundRequestedThenTabRepositoryUpdatedAndCommandIssued() = ruleRunBlockingTest {
+    fun whenOpenInNewBackgroundRequestedThenTabRepositoryUpdatedAndCommandIssued() = coroutineRule.runBlocking {
         val url = "http://www.example.com"
         testee.openInNewBackgroundTab(url)
 
@@ -316,7 +309,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenViewBecomesVisibleAndHomeShowingThenRefreshCtaIsCalled() {
-        ruleRunBlockingTest {
+        coroutineRule.runBlocking {
             setBrowserShowing(false)
             val observer = ValueCaptorObserver<BrowserTabViewModel.CtaViewState>()
             testee.ctaViewState.observeForever(observer)
@@ -330,7 +323,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenViewBecomesVisibleAndBrowserShowingThenRefreshCtaIsNotCalled() {
-        ruleRunBlockingTest {
+        coroutineRule.runBlocking {
             setBrowserShowing(true)
             val observer = ValueCaptorObserver<BrowserTabViewModel.CtaViewState>()
             testee.ctaViewState.observeForever(observer)
@@ -375,13 +368,13 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenBookmarkEditedThenDaoIsUpdated() = ruleRunBlockingTest {
+    fun whenBookmarkEditedThenDaoIsUpdated() = coroutineRule.runBlocking {
         testee.editBookmark(0, "A title", "www.example.com")
         verify(mockBookmarksDao).update(BookmarkEntity(title = "A title", url = "www.example.com"))
     }
 
     @Test
-    fun whenBookmarkAddedThenDaoIsUpdatedAndUserNotified() = ruleRunBlockingTest {
+    fun whenBookmarkAddedThenDaoIsUpdatedAndUserNotified() = coroutineRule.runBlocking {
         loadUrl("www.example.com", "A title")
 
         testee.onBookmarkAddRequested()
@@ -432,13 +425,13 @@ class BrowserTabViewModelTest {
 
         testee.onUserSubmittedQuery("foo")
 
-        ruleRunBlockingTest {
+        coroutineRule.runBlocking {
             verify(mockTabsRepository).delete(selectedTabLiveData.value!!)
         }
     }
 
     @Test
-    fun whenBrowsingAndUrlLoadedThenSiteVisitedEntryAddedToLeaderboardDao() = ruleRunBlockingTest {
+    fun whenBrowsingAndUrlLoadedThenSiteVisitedEntryAddedToLeaderboardDao() = coroutineRule.runBlocking {
         loadUrl("http://example.com/abc", isBrowserShowing = true)
         verify(mockNetworkLeaderboardDao).incrementSitesVisited()
     }
@@ -507,11 +500,9 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenViewModelNotifiedThatUrlGotFocusThenViewStateIsUpdated() = ruleRunBlockingTest {
-        withContext(Dispatchers.Main) {
-            testee.onOmnibarInputStateChanged("", true, hasQueryChanged = false)
-            assertTrue(omnibarViewState().isEditing)
-        }
+    fun whenViewModelNotifiedThatUrlGotFocusThenViewStateIsUpdated() = coroutineRule.runBlocking {
+        testee.onOmnibarInputStateChanged("", true, hasQueryChanged = false)
+        assertTrue(omnibarViewState().isEditing)
     }
 
     @Test
@@ -584,21 +575,17 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenUrlClearedThenPrivacyGradeIsCleared() = ruleRunBlockingTest {
-        withContext(Dispatchers.Main) {
-            loadUrl("https://duckduckgo.com")
-            assertNotNull(testee.privacyGrade.value)
-            loadUrl(null)
-            assertNull(testee.privacyGrade.value)
-        }
+    fun whenUrlClearedThenPrivacyGradeIsCleared() = coroutineRule.runBlocking {
+        loadUrl("https://duckduckgo.com")
+        assertNotNull(testee.privacyGrade.value)
+        loadUrl(null)
+        assertNull(testee.privacyGrade.value)
     }
 
     @Test
-    fun whenUrlLoadedThenPrivacyGradeIsReset() = ruleRunBlockingTest {
-        withContext(Dispatchers.Main) {
-            loadUrl("https://duckduckgo.com")
-            assertNotNull(testee.privacyGrade.value)
-        }
+    fun whenUrlLoadedThenPrivacyGradeIsReset() = coroutineRule.runBlocking {
+        loadUrl("https://duckduckgo.com")
+        assertNotNull(testee.privacyGrade.value)
     }
 
     @Test
@@ -961,7 +948,7 @@ class BrowserTabViewModelTest {
 
         testee.onRefreshRequested()
 
-        ruleRunBlockingTest {
+        coroutineRule.runBlocking {
             verify(mockTabsRepository).delete(selectedTabLiveData.value!!)
         }
     }
@@ -1049,7 +1036,7 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenSiteLoadedAndUserSelectsToAddBookmarkThenAddBookmarkCommandSentWithUrlAndTitle() = ruleRunBlockingTest {
+    fun whenSiteLoadedAndUserSelectsToAddBookmarkThenAddBookmarkCommandSentWithUrlAndTitle() = coroutineRule.runBlocking {
         loadUrl("foo.com")
         testee.titleReceived("Foo Title")
         testee.onBookmarkAddRequested()
@@ -1059,7 +1046,7 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenNoSiteAndUserSelectsToAddBookmarkThenBookmarkAddedWithBlankTitleAndUrl() = ruleRunBlockingTest {
+    fun whenNoSiteAndUserSelectsToAddBookmarkThenBookmarkAddedWithBlankTitleAndUrl() = coroutineRule.runBlocking {
         whenever(mockBookmarksDao.insert(any())).thenReturn(1)
         testee.onBookmarkAddRequested()
         verify(mockBookmarksDao).insert(BookmarkEntity(title = "", url = ""))
@@ -1078,7 +1065,7 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenOnSiteAndBrokenSiteSelectedThenBrokenSiteFeedbackCommandSentWithUrl() = ruleRunBlockingTest {
+    fun whenOnSiteAndBrokenSiteSelectedThenBrokenSiteFeedbackCommandSentWithUrl() = coroutineRule.runBlocking {
         loadUrl("foo.com", isBrowserShowing = true)
         testee.onBrokenSiteSelected()
         val command = captureCommands().value as Command.BrokenSiteFeedback
@@ -1137,30 +1124,24 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenUrlNullThenSetBrowserNotShowing() = ruleRunBlockingTest {
-        withContext(Dispatchers.Main) {
-            testee.loadData("id", null, false)
-            testee.determineShowBrowser()
-            assertEquals(false, testee.browserViewState.value?.browserShowing)
-        }
+    fun whenUrlNullThenSetBrowserNotShowing() = coroutineRule.runBlocking {
+        testee.loadData("id", null, false)
+        testee.determineShowBrowser()
+        assertEquals(false, testee.browserViewState.value?.browserShowing)
     }
 
     @Test
-    fun whenUrlBlankThenSetBrowserNotShowing() = ruleRunBlockingTest {
-        withContext(Dispatchers.Main) {
-            testee.loadData("id", "  ", false)
-            testee.determineShowBrowser()
-            assertEquals(false, testee.browserViewState.value?.browserShowing)
-        }
+    fun whenUrlBlankThenSetBrowserNotShowing() = coroutineRule.runBlocking {
+        testee.loadData("id", "  ", false)
+        testee.determineShowBrowser()
+        assertEquals(false, testee.browserViewState.value?.browserShowing)
     }
 
     @Test
-    fun whenUrlPresentThenSetBrowserShowing() = ruleRunBlockingTest {
-        withContext(Dispatchers.Main) {
-            testee.loadData("id", "https://example.com", false)
-            testee.determineShowBrowser()
-            assertEquals(true, testee.browserViewState.value?.browserShowing)
-        }
+    fun whenUrlPresentThenSetBrowserShowing() = coroutineRule.runBlocking {
+        testee.loadData("id", "https://example.com", false)
+        testee.determineShowBrowser()
+        assertEquals(true, testee.browserViewState.value?.browserShowing)
     }
 
     @Test
@@ -1204,7 +1185,7 @@ class BrowserTabViewModelTest {
 
         showErrorWithAction.action()
 
-        ruleRunBlockingTest {
+        coroutineRule.runBlocking {
             verify(mockTabsRepository).delete(selectedTabLiveData.value!!)
         }
     }
@@ -1299,11 +1280,9 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenUserSelectToEditQueryThenMoveCaretToTheEnd() = ruleRunBlockingTest {
-        withContext(Dispatchers.Main) {
-            testee.onUserSelectedToEditQuery("foo")
-            assertTrue(omnibarViewState().shouldMoveCaretToEnd)
-        }
+    fun whenUserSelectToEditQueryThenMoveCaretToTheEnd() = coroutineRule.runBlocking {
+        testee.onUserSelectedToEditQuery("foo")
+        assertTrue(omnibarViewState().shouldMoveCaretToEnd)
     }
 
     @Test
@@ -1357,6 +1336,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenScheduledSurveyChangesAndInstalledDaysDontMatchThenCtaIsNull() {
+        setCovidCtaShown()
         testee.onSurveyChanged(Survey("abc", "http://example.com", daysInstalled = 2, status = Survey.Status.SCHEDULED))
         assertNull(testee.ctaViewState.value!!.cta)
     }
@@ -1368,25 +1348,7 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenSurveyCtaDismissedAndNoOtherCtaPossibleCtaIsNull() {
-        testee.onSurveyChanged(Survey("abc", "http://example.com", daysInstalled = 1, status = Survey.Status.SCHEDULED))
-        testee.onUserDismissedCta(testee.ctaViewState.value!!.cta!!)
-        assertNull(testee.ctaViewState.value!!.cta)
-    }
-
-    @Test
-    fun whenSurveyCtaDismissedAndWidgetCtaIsPossibleThenNextCtaIsWidget() {
-        whenever(mockWidgetCapabilities.supportsStandardWidgetAdd).thenReturn(true)
-        whenever(mockWidgetCapabilities.supportsAutomaticWidgetAdd).thenReturn(true)
-        whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(false)
-
-        testee.onSurveyChanged(Survey("abc", "http://example.com", daysInstalled = 1, status = Survey.Status.SCHEDULED))
-        testee.onUserDismissedCta(testee.ctaViewState.value!!.cta!!)
-        assertEquals(HomePanelCta.AddWidgetAuto, testee.ctaViewState.value!!.cta)
-    }
-
-    @Test
-    fun whenCtaRefreshedAndAutoAddSupportedAndWidgetNotInstalledThenCtaIsAutoWidget() = ruleRunBlockingTest {
+    fun whenCtaRefreshedAndAutoAddSupportedAndWidgetNotInstalledThenCtaIsAutoWidget() = coroutineRule.runBlocking {
         whenever(mockWidgetCapabilities.supportsStandardWidgetAdd).thenReturn(true)
         whenever(mockWidgetCapabilities.supportsAutomaticWidgetAdd).thenReturn(true)
         whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(false)
@@ -1395,7 +1357,8 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenCtaRefreshedAndAutoAddSupportedAndWidgetAlreadyInstalledThenCtaIsNull() = ruleRunBlockingTest {
+    fun whenCtaRefreshedAndAutoAddSupportedAndWidgetAlreadyInstalledThenCtaIsNull() = coroutineRule.runBlocking {
+        setCovidCtaShown()
         whenever(mockWidgetCapabilities.supportsStandardWidgetAdd).thenReturn(true)
         whenever(mockWidgetCapabilities.supportsAutomaticWidgetAdd).thenReturn(true)
         whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(true)
@@ -1404,14 +1367,15 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenCtaRefreshedAndOnlyStandardAddSupportedAndWidgetNotInstalledThenCtaIsInstructionsWidget() = ruleRunBlockingTest {
+    fun whenCtaRefreshedAndOnlyStandardAddSupportedAndWidgetNotInstalledThenCtaIsInstructionsWidget() = coroutineRule.runBlocking {
         givenExpectedCtaAddWidgetInstructions()
         testee.refreshCta()
         assertEquals(HomePanelCta.AddWidgetInstructions, testee.ctaViewState.value!!.cta)
     }
 
     @Test
-    fun whenCtaRefreshedAndOnlyStandardAddSupportedAndWidgetAlreadyInstalledThenCtaIsNull() = ruleRunBlockingTest {
+    fun whenCtaRefreshedAndOnlyStandardAddSupportedAndWidgetAlreadyInstalledThenCtaIsNull() = coroutineRule.runBlocking {
+        setCovidCtaShown()
         whenever(mockWidgetCapabilities.supportsStandardWidgetAdd).thenReturn(true)
         whenever(mockWidgetCapabilities.supportsAutomaticWidgetAdd).thenReturn(false)
         whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(true)
@@ -1420,7 +1384,8 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenCtaRefreshedAndStandardAddNotSupportedAndWidgetNotInstalledThenCtaIsNull() = ruleRunBlockingTest {
+    fun whenCtaRefreshedAndStandardAddNotSupportedAndWidgetNotInstalledThenCtaIsNull() = coroutineRule.runBlocking {
+        setCovidCtaShown()
         whenever(mockWidgetCapabilities.supportsStandardWidgetAdd).thenReturn(false)
         whenever(mockWidgetCapabilities.supportsAutomaticWidgetAdd).thenReturn(false)
         whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(false)
@@ -1429,7 +1394,8 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenCtaRefreshedAndStandardAddNotSupportedAndWidgetAlreadyInstalledThenCtaIsNull() = ruleRunBlockingTest {
+    fun whenCtaRefreshedAndStandardAddNotSupportedAndWidgetAlreadyInstalledThenCtaIsNull() = coroutineRule.runBlocking {
+        setCovidCtaShown()
         whenever(mockWidgetCapabilities.supportsStandardWidgetAdd).thenReturn(false)
         whenever(mockWidgetCapabilities.supportsAutomaticWidgetAdd).thenReturn(false)
         whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(true)
@@ -1438,7 +1404,7 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenCtaRefreshedAndIsNewTabIsFalseThenReturnNull() = ruleRunBlockingTest {
+    fun whenCtaRefreshedAndIsNewTabIsFalseThenReturnNull() = coroutineRule.runBlocking {
         setBrowserShowing(true)
         whenever(mockWidgetCapabilities.supportsStandardWidgetAdd).thenReturn(true)
         whenever(mockWidgetCapabilities.supportsAutomaticWidgetAdd).thenReturn(true)
@@ -1465,7 +1431,7 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenRegisterDaxBubbleCtaDismissedThenRegisterInDatabase() {
+    fun whenRegisterDaxBubbleCtaDismissedThenRegisterInDatabase() = coroutineRule.runBlocking {
         val cta = DaxBubbleCta.DaxIntroCta(mockOnboardingStore, mockAppInstallStore)
         testee.ctaViewState.value = BrowserTabViewModel.CtaViewState(cta = cta)
 
@@ -1502,143 +1468,66 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenUserClickedDefaultBrowserCtaButtonWithoutDefaultBrowserThenLaunchDialogCommand() {
-        whenever(mockDefaultBrowserDetector.hasDefaultBrowser()).thenReturn(false)
-        val cta = DaxDialogCta.DefaultBrowserCta(mockDefaultBrowserDetector, mock(), mock())
-        testee.onUserClickCtaOkButton(cta)
-        assertCommandIssued<Command.OpenDefaultBrowserDialog>()
+    fun whenSurveyCtaDismissedAndNoOtherCtaPossibleCtaIsNull() = coroutineRule.runBlocking {
+        givenShownCtas(CtaId.DAX_INTRO, CtaId.DAX_END, CtaId.COVID)
+        testee.onSurveyChanged(Survey("abc", "http://example.com", daysInstalled = 1, status = Survey.Status.SCHEDULED))
+        testee.onUserDismissedCta(testee.ctaViewState.value!!.cta!!)
+        assertNull(testee.ctaViewState.value!!.cta)
     }
 
     @Test
-    fun whenUserClickedDefaultBrowserCtaButtonWithDefaultBrowserThenOpenDefaultBrowserSettings() {
-        whenever(mockDefaultBrowserDetector.hasDefaultBrowser()).thenReturn(true)
-        val cta = DaxDialogCta.DefaultBrowserCta(mockDefaultBrowserDetector, mock(), mock())
-        testee.onUserClickCtaOkButton(cta)
-        assertCommandIssued<Command.OpenDefaultBrowserSettings>()
+    fun whenSurveyCtaDismissedAndWidgetNotCompatibleAndCovidCtaNotShownThenCtaIsCovid() = coroutineRule.runBlocking {
+        givenShownCtas(CtaId.DAX_INTRO, CtaId.DAX_END)
+        testee.onSurveyChanged(Survey("abc", "http://example.com", daysInstalled = 1, status = Survey.Status.SCHEDULED))
+        testee.onUserDismissedCta(testee.ctaViewState.value!!.cta!!)
+        assertEquals(HomeTopPanelCta.CovidCta(), testee.ctaViewState.value!!.cta)
     }
 
     @Test
-    fun whenUserClickedDaxSearchWidgetCtaButtonWithWidgetCapabilitiesThenLaunchAddWidget() {
+    fun whenSurveyCtaDismissedAndWidgetCtaIsPossibleThenNextCtaIsWidget() = coroutineRule.runBlocking {
+        whenever(mockWidgetCapabilities.supportsStandardWidgetAdd).thenReturn(true)
         whenever(mockWidgetCapabilities.supportsAutomaticWidgetAdd).thenReturn(true)
-        val cta = DaxDialogCta.SearchWidgetCta(mockWidgetCapabilities, mock(), mock())
-        testee.onUserClickCtaOkButton(cta)
-        assertCommandIssued<Command.LaunchAddWidget>()
+        whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(false)
+
+        testee.onSurveyChanged(Survey("abc", "http://example.com", daysInstalled = 1, status = Survey.Status.SCHEDULED))
+        testee.onUserDismissedCta(testee.ctaViewState.value!!.cta!!)
+        assertEquals(HomePanelCta.AddWidgetAuto, testee.ctaViewState.value!!.cta)
     }
 
     @Test
-    fun whenUserClickedDaxSearchWidgetCtaButtonWithoutWidgetCapabilitiesThenLaunchLegacyAddWidget() {
-        whenever(mockWidgetCapabilities.supportsAutomaticWidgetAdd).thenReturn(false)
-        val cta = DaxDialogCta.SearchWidgetCta(mockWidgetCapabilities, mock(), mock())
-        testee.onUserClickCtaOkButton(cta)
-        assertCommandIssued<Command.LaunchLegacyAddWidget>()
-    }
-
-    @Test
-    fun whenUserDismissedCtaThenFirePixel() {
+    fun whenUserDismissedCtaThenFirePixel() = coroutineRule.runBlocking {
         val cta = HomePanelCta.Survey(Survey("abc", "http://example.com", daysInstalled = 1, status = Survey.Status.SCHEDULED))
         testee.onUserDismissedCta(cta)
         verify(mockPixel).fire(cta.cancelPixel!!, cta.pixelCancelParameters())
     }
 
     @Test
-    fun whenUserDismissedCtaThenRegisterInDatabase() {
+    fun whenUserDismissedCtaThenRegisterInDatabase() = coroutineRule.runBlocking {
         val cta = HomePanelCta.AddWidgetAuto
         testee.onUserDismissedCta(cta)
         verify(mockDismissedCtaDao).insert(DismissedCta(cta.ctaId))
     }
 
     @Test
-    fun whenUserDismissedSurveyCtaThenDoNotRegisterInDatabase() {
+    fun whenUserDismissedSurveyCtaThenDoNotRegisterInDatabase() = coroutineRule.runBlocking {
         val cta = HomePanelCta.Survey(Survey("abc", "http://example.com", daysInstalled = 1, status = Survey.Status.SCHEDULED))
         testee.onUserDismissedCta(cta)
         verify(mockDismissedCtaDao, never()).insert(DismissedCta(cta.ctaId))
     }
 
     @Test
-    fun whenUserDismissedSurveyCtaThenCancelScheduledSurveys() {
+    fun whenUserDismissedSurveyCtaThenCancelScheduledSurveys() = coroutineRule.runBlocking {
         val cta = HomePanelCta.Survey(Survey("abc", "http://example.com", daysInstalled = 1, status = Survey.Status.SCHEDULED))
         testee.onUserDismissedCta(cta)
         verify(mockSurveyDao).cancelScheduledSurveys()
     }
 
-    @Test
-    fun whenUserFailedSettingDdgAsDefaultBrowserFromSettingsThenFirePixelAndUpdateInstallStore() {
-        whenever(mockDefaultBrowserDetector.isDefaultBrowser()).thenReturn(false)
-
-        testee.onUserTriedToSetAsDefaultBrowserFromSettings()
-
-        verify(mockAppInstallStore).defaultBrowser = false
-        verify(mockPixel).fire(Pixel.PixelName.DEFAULT_BROWSER_NOT_SET, defaultBrowserPixelParams(Pixel.PixelValues.DEFAULT_BROWSER_SETTINGS))
-    }
 
     @Test
-    fun whenUserHasSetDdgAsDefaultBrowserFromSettingsThenFirePixelAndUpdateInstallStore() {
-        whenever(mockDefaultBrowserDetector.isDefaultBrowser()).thenReturn(true)
-
-        testee.onUserTriedToSetAsDefaultBrowserFromSettings()
-
-        verify(mockAppInstallStore).defaultBrowser = true
-        verify(mockPixel).fire(Pixel.PixelName.DEFAULT_BROWSER_SET, defaultBrowserPixelParams(Pixel.PixelValues.DEFAULT_BROWSER_SETTINGS))
-    }
-
-    @Test
-    fun whenUserFailedSettingDdgAsDefaultBrowserFromDialogOnceThenOpenDefaultBrowserDialogAgain() {
-        whenever(mockDefaultBrowserDetector.isDefaultBrowser()).thenReturn(false)
-
-        testee.onUserTriedToSetAsDefaultBrowserFromDialog()
-
-        assertCommandIssued<Command.OpenDefaultBrowserDialog>()
-    }
-
-    @Test
-    fun whenUserFailedSettingDdgAsDefaultBrowserFromDialogTwiceThenFirePixelAndUpdateInstallStore() {
-        whenever(mockDefaultBrowserDetector.isDefaultBrowser()).thenReturn(false)
-
-        testee.onUserTriedToSetAsDefaultBrowserFromDialog()
-        testee.onUserTriedToSetAsDefaultBrowserFromDialog()
-
-        verify(mockAppInstallStore, times(2)).defaultBrowser = false
-        verify(mockPixel).fire(
-            Pixel.PixelName.DEFAULT_BROWSER_NOT_SET,
-            defaultBrowserPixelParams(Pixel.PixelValues.DEFAULT_BROWSER_JUST_ONCE_MAX)
-        )
-    }
-
-    @Test
-    fun whenUserHasSetDdgAsDefaultBrowserFromDialogThenFirePixelAndUpdateInstallStore() {
-        whenever(mockDefaultBrowserDetector.isDefaultBrowser()).thenReturn(true)
-
-        testee.onUserTriedToSetAsDefaultBrowserFromDialog()
-
-        verify(mockAppInstallStore).defaultBrowser = true
-        verify(mockPixel).fire(Pixel.PixelName.DEFAULT_BROWSER_SET, defaultBrowserPixelParams(Pixel.PixelValues.DEFAULT_BROWSER_DIALOG))
-    }
-
-    @Test
-    fun whenUserDismissesDefaultBrowserDialogThenFirePixelAndUpdateInstallStore() {
-        whenever(mockDefaultBrowserDetector.isDefaultBrowser()).thenReturn(false)
-
-        testee.onUserDismissedDefaultBrowserDialog()
-
-        verify(mockAppInstallStore).defaultBrowser = false
-        verify(mockPixel).fire(
-            Pixel.PixelName.DEFAULT_BROWSER_NOT_SET,
-            defaultBrowserPixelParams(Pixel.PixelValues.DEFAULT_BROWSER_DIALOG_DISMISSED)
-        )
-    }
-
-    @Test
-    fun whenDefaultBrowserDialogDismissedAfterSelectingDefaultExternalBrowserAlwThenFirePixelAndUpdateInstallStore() {
-        whenever(mockDefaultBrowserDetector.isDefaultBrowser()).thenReturn(false)
-        whenever(mockDefaultBrowserDetector.hasDefaultBrowser()).thenReturn(true)
-
-        testee.onUserDismissedDefaultBrowserDialog()
-
-        verify(mockAppInstallStore).defaultBrowser = false
-        verify(mockPixel).fire(
-            Pixel.PixelName.DEFAULT_BROWSER_NOT_SET,
-            defaultBrowserPixelParams(Pixel.PixelValues.DEFAULT_BROWSER_EXTERNAL)
-        )
+    fun whenUserDismissedHomeTopPanelCtaThenReturnEmptyCta() {
+        val cta = HomeTopPanelCta.CovidCta()
+        testee.onUserDismissedCta(cta)
+        assertNull(testee.ctaViewState.value!!.cta)
     }
 
     @Test
@@ -1665,7 +1554,7 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenOnBrokenSiteSelectedOpenBokenSiteFeedback() {
+    fun whenOnBrokenSiteSelectedOpenBokenSiteFeedback() = runBlockingTest {
         testee.onBrokenSiteSelected()
         assertCommandIssued<Command.BrokenSiteFeedback>()
     }
@@ -1775,6 +1664,13 @@ class BrowserTabViewModelTest {
         assertEquals("surrogate.com", brokenSiteFeedback.surrogates)
     }
 
+    @Test
+    fun whenUserClickedTopCtaButtonAndCtaIsCovidCtaThenSubmitQuery() {
+        val cta = HomeTopPanelCta.CovidCta()
+        testee.onUserClickTopCta(cta)
+        assertEquals(cta.searchTerm, omnibarViewState().omnibarText)
+    }
+
     private inline fun <reified T : Command> assertCommandIssued(instanceAssertions: T.() -> Unit = {}) {
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
         val issuedCommand = commandCaptor.allValues.find { it is T }
@@ -1787,17 +1683,17 @@ class BrowserTabViewModelTest {
         Pixel.PixelParameter.BOOKMARK_CAPABLE to bookmarkCapable.toString()
     )
 
-    private fun defaultBrowserPixelParams(origin: String) = mapOf(
-        Pixel.PixelParameter.DEFAULT_BROWSER_SET_FROM_ONBOARDING to false.toString(),
-        Pixel.PixelParameter.DEFAULT_BROWSER_SET_ORIGIN to origin
-    )
-
-
     private fun givenExpectedCtaAddWidgetInstructions() {
         setBrowserShowing(false)
         whenever(mockWidgetCapabilities.supportsStandardWidgetAdd).thenReturn(true)
         whenever(mockWidgetCapabilities.supportsAutomaticWidgetAdd).thenReturn(false)
         whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(false)
+    }
+
+    private fun givenShownCtas(vararg shownCtas: CtaId) {
+        shownCtas.forEach {
+            whenever(mockDismissedCtaDao.exists(it)).thenReturn(true)
+        }
     }
 
     private fun givenInvalidatedGlobalLayout() {
@@ -1822,6 +1718,10 @@ class BrowserTabViewModelTest {
     private fun updateUrl(originalUrl: String?, currentUrl: String?, isBrowserShowing: Boolean) {
         setBrowserShowing(isBrowserShowing)
         testee.navigationStateChanged(buildWebNavigation(originalUrl = originalUrl, currentUrl = currentUrl))
+    }
+
+    private fun setCovidCtaShown() {
+        whenever(mockDismissedCtaDao.exists(CtaId.COVID)).thenReturn(true)
     }
 
     private fun setupNavigation(
@@ -1867,7 +1767,4 @@ class BrowserTabViewModelTest {
     private fun findInPageViewState() = testee.findInPageViewState.value!!
     private fun globalLayoutViewState() = testee.globalLayoutState.value!!
     private fun browserGlobalLayoutViewState() = testee.globalLayoutState.value!! as BrowserTabViewModel.GlobalLayoutViewState.Browser
-
-    private fun ruleRunBlockingTest(block: suspend TestCoroutineScope.() -> Unit) =
-        coroutineRule.testDispatcher.runBlockingTest(block)
 }
