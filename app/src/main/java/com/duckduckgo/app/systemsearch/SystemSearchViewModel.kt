@@ -30,13 +30,17 @@ import com.duckduckgo.app.onboarding.store.isNewUser
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.*
 import com.jakewharton.rxrelay2.PublishRelay
+import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
+import io.reactivex.functions.BiFunction
 import io.reactivex.schedulers.Schedulers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
+
+typealias SystemSearchResult = Pair<AutoCompleteResult, List<DeviceApp>>
 
 class SystemSearchViewModel(
     private var userStageStore: UserStageStore,
@@ -69,16 +73,15 @@ class SystemSearchViewModel(
     val resultsViewState: MutableLiveData<SystemSearchResultsViewState> = MutableLiveData()
     val command: SingleLiveEvent<Command> = SingleLiveEvent()
 
-    private val autoCompletePublishSubject = PublishRelay.create<String>()
-    private var autocompleteResults: AutoCompleteResult = AutoCompleteResult("", emptyList())
-    private var autoCompleteDisposable: Disposable? = null
+    private val resultsPublishSubject = PublishRelay.create<String>()
+    private var results = SystemSearchResult(AutoCompleteResult("", emptyList()), emptyList())
+    private var resultsDisposable: Disposable? = null
 
     private var appsJob: Job? = null
-    private var appResults: List<DeviceApp> = emptyList()
 
     init {
         resetViewState()
-        configureAutoComplete()
+        configureResults()
         refreshAppList()
     }
 
@@ -101,21 +104,30 @@ class SystemSearchViewModel(
     }
 
     private fun resetResultsState() {
-        autocompleteResults = AutoCompleteResult("", emptyList())
+        results = SystemSearchResult(AutoCompleteResult("", emptyList()), emptyList())
         appsJob?.cancel()
-        appResults = emptyList()
         resultsViewState.value = SystemSearchResultsViewState()
     }
 
-    private fun configureAutoComplete() {
-        autoCompleteDisposable = autoCompletePublishSubject
+    private fun configureResults() {
+        resultsDisposable = resultsPublishSubject
             .debounce(DEBOUNCE_TIME_MS, TimeUnit.MILLISECONDS)
-            .switchMap { autoComplete.autoComplete(it) }
+            .switchMap { buildResultsObservable(query = it) }
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe({ result ->
-                updateAutocompleteResult(result)
+                updateResults(result)
             }, { t: Throwable? -> Timber.w(t, "Failed to get search results") })
+    }
+
+    private fun buildResultsObservable(query: String): Observable<SystemSearchResult>? {
+        return Observable.zip(
+            autoComplete.autoComplete(query),
+            Observable.just(deviceAppLookup.query(query)),
+            BiFunction<AutoCompleteResult, List<DeviceApp>, SystemSearchResult> { autocompleteResult: AutoCompleteResult, appsResult: List<DeviceApp> ->
+                SystemSearchResult(autocompleteResult, appsResult)
+            }
+        )
     }
 
     fun userTappedOnboardingToggle() {
@@ -151,31 +163,22 @@ class SystemSearchViewModel(
         resultsViewState.value = currentResultsState().copy(queryText = query)
 
         val trimmedQuery = query.trim()
-        autoCompletePublishSubject.accept(trimmedQuery)
-        appsJob = viewModelScope.launch(dispatchers.io()) {
-            updateAppResults(deviceAppLookup.query(trimmedQuery))
-        }
+        resultsPublishSubject.accept(trimmedQuery)
     }
 
-    private fun updateAppResults(results: List<DeviceApp>) {
-        appResults = results
-        refreshResultsViewState()
-    }
+    private fun updateResults(results: SystemSearchResult) {
+        this.results = results
 
-    private fun updateAutocompleteResult(results: AutoCompleteResult) {
-        autocompleteResults = results
-        refreshResultsViewState()
-    }
+        val suggestions = results.first.suggestions
+        val appResults = results.second
+        val hasMultiResults = suggestions.isNotEmpty() && appResults.isNotEmpty()
 
-    private fun refreshResultsViewState() {
-        val hasMultiResults = autocompleteResults.suggestions.isNotEmpty() && appResults.isNotEmpty()
-        val fullSuggestions = autocompleteResults.suggestions
-        val updatedSuggestions = if (hasMultiResults) fullSuggestions.take(RESULTS_MAX_RESULTS_PER_GROUP) else fullSuggestions
+        val updatedSuggestions = if (hasMultiResults) suggestions.take(RESULTS_MAX_RESULTS_PER_GROUP) else suggestions
         val updatedApps = if (hasMultiResults) appResults.take(RESULTS_MAX_RESULTS_PER_GROUP) else appResults
 
         resultsViewState.postValue(
             currentResultsState().copy(
-                autocompleteResults = AutoCompleteResult(autocompleteResults.query, updatedSuggestions),
+                autocompleteResults = AutoCompleteResult(results.first.query, updatedSuggestions),
                 appResults = updatedApps
             )
         )
@@ -190,7 +193,7 @@ class SystemSearchViewModel(
     }
 
     fun userClearedQuery() {
-        autoCompletePublishSubject.accept("")
+        resultsPublishSubject.accept("")
         resetResultsState()
     }
 
@@ -225,8 +228,8 @@ class SystemSearchViewModel(
     }
 
     override fun onCleared() {
-        autoCompleteDisposable?.dispose()
-        autoCompleteDisposable = null
+        resultsDisposable?.dispose()
+        resultsDisposable = null
         super.onCleared()
     }
 
