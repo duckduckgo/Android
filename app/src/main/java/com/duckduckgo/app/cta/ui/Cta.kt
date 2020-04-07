@@ -86,7 +86,8 @@ sealed class DaxDialogCta(
     override val appInstallStore: AppInstallStore
 ) : Cta, DialogCta, DaxCta {
 
-    override fun createCta(activity: FragmentActivity): DaxDialog = TypewriterDaxDialog(getDaxText(activity), activity.resources.getString(okButton))
+    override fun createCta(activity: FragmentActivity): DaxDialog =
+        TypewriterDaxDialog.newInstance(getDaxText(activity), activity.resources.getString(okButton))
 
     override fun pixelCancelParameters(): Map<String, String> = mapOf(Pixel.PixelParameter.CTA_SHOWN to ctaPixelParam)
 
@@ -126,7 +127,11 @@ sealed class DaxDialogCta(
     ) {
 
         override fun createCta(activity: FragmentActivity): DaxDialog =
-            TypewriterDaxDialog(daxText = getDaxText(activity), primaryButtonText = activity.resources.getString(okButton), toolbarDimmed = false)
+            TypewriterDaxDialog.newInstance(
+                daxText = getDaxText(activity),
+                primaryButtonText = activity.resources.getString(okButton),
+                toolbarDimmed = false
+            )
 
         override fun getDaxText(context: Context): String {
             val trackersFiltered = trackers.asSequence()
@@ -186,7 +191,7 @@ sealed class DaxDialogCta(
 
         @ExperimentalStdlibApi
         override fun createCta(activity: FragmentActivity): DaxDialog =
-            TypewriterDaxDialog(daxText = getDaxText(activity), primaryButtonText = activity.resources.getString(okButton))
+            TypewriterDaxDialog.newInstance(daxText = getDaxText(activity), primaryButtonText = activity.resources.getString(okButton))
 
         private fun isFromSameNetworkDomain(): Boolean = mainTrackerDomains.any { siteHost.contains(it) }
     }
@@ -203,7 +208,7 @@ sealed class DaxDialogCta(
         appInstallStore
     ) {
         override fun createCta(activity: FragmentActivity): DaxDialog =
-            TypewriterDaxDialog(daxText = getDaxText(activity), primaryButtonText = activity.resources.getString(okButton))
+            TypewriterDaxDialog.newInstance(daxText = getDaxText(activity), primaryButtonText = activity.resources.getString(okButton))
     }
 
     companion object {

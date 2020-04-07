@@ -49,7 +49,6 @@ import androidx.core.view.isEmpty
 import androidx.core.view.isNotEmpty
 import androidx.core.view.isVisible
 import androidx.core.view.postDelayed
-import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.*
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -108,7 +107,7 @@ import javax.inject.Inject
 import kotlin.concurrent.thread
 import kotlin.coroutines.CoroutineContext
 
-class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
+class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogListeners {
 
     private val supervisorJob = SupervisorJob()
 
@@ -234,7 +233,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
     private val logoHidingListener by lazy { LogoHidingLayoutChangeLifecycleListener(ddgLogo) }
 
     private var alertDialog: AlertDialog? = null
-    private var daxDialog: DialogFragment? = null
+    private var daxDialog: DaxDialog? = null
 
     override fun onAttach(context: Context) {
         AndroidSupportInjection.inject(this)
@@ -1111,6 +1110,32 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
         startActivity(AddWidgetInstructionsActivity.intent(context), options)
     }
 
+    override fun onDismissDialog() {
+        val configuration = viewModel.ctaViewState.value?.cta ?: return
+        if (configuration is DaxDialogCta.DaxTrackersBlockedCta) {
+            animatorHelper.finishTrackerAnimation(omnibarViews(), networksContainer)
+        }
+        viewModel.onUserDismissedCta(configuration)
+    }
+
+    override fun onHideClick() {
+        context?.let {
+            val configuration = viewModel.ctaViewState.value?.cta ?: return
+            daxDialog?.getDaxDialog()?.dismiss()
+            renderer.launchHideTipsDialog(it, configuration)
+        }
+    }
+
+    override fun onPrimaryCtaClick() {
+        daxDialog?.let {
+            val configuration = viewModel.ctaViewState.value?.cta ?: return
+            viewModel.onUserClickCtaOkButton(configuration)
+            it.getDaxDialog().dismiss()
+        }
+    }
+
+    fun omnibarViews(): List<View> = listOf(clearTextButton, omnibarTextInput, privacyGradeButton)
+
     companion object {
         private const val TAB_ID_ARG = "TAB_ID_ARG"
         private const val URL_EXTRA_ARG = "URL_EXTRA_ARG"
@@ -1241,8 +1266,6 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
             omnibarTextInput.alpha = 1f
             privacyGradeButton.alpha = 1f
         }
-
-        private fun omnibarViews(): List<View> = listOf(clearTextButton, omnibarTextInput, privacyGradeButton)
 
         fun renderGlobalViewState(viewState: GlobalLayoutViewState) {
             if (lastSeenGlobalViewState is GlobalLayoutViewState.Invalidated &&
@@ -1380,36 +1403,19 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
         private fun showDaxDialogCta(configuration: DaxDialogCta) {
             hideHomeCta()
             hideDaxCta()
-            val container = networksContainer
             activity?.let { activity ->
-                daxDialog?.dismiss()
+                val savedDaxDialog: Fragment? = childFragmentManager.findFragmentByTag(DAX_DIALOG_DIALOG_TAG)
+                if (savedDaxDialog != null) {
+                    daxDialog = savedDaxDialog as DaxDialog
+                    return
+                }
                 daxDialog = configuration.createCta(activity).apply {
-                    setHideClickListener {
-                        getDaxDialog().dismiss()
-                        launchHideTipsDialog(activity, configuration)
-                    }
-                    setDismissListener {
-                        if (configuration is DaxDialogCta.DaxTrackersBlockedCta) {
-                            animatorHelper.finishTrackerAnimation(omnibarViews(), container)
-                        }
-                        viewModel.onUserDismissedCta(configuration)
-                    }
-                    setPrimaryCtaClickListener {
-                        viewModel.onUserClickCtaOkButton(configuration)
-                        getDaxDialog().dismiss()
-                    }
-                    if (configuration is SecondaryButtonCta) {
-                        setSecondaryCtaClickListener {
-                            viewModel.onUserClickCtaSecondaryButton(configuration)
-                            getDaxDialog().dismiss()
-                        }
-                    }
-                    getDaxDialog().show(activity.supportFragmentManager, DAX_DIALOG_DIALOG_TAG)
-                }.getDaxDialog()
+                    getDaxDialog().show(childFragmentManager, DAX_DIALOG_DIALOG_TAG)
+                }
             }
         }
 
-        private fun launchHideTipsDialog(context: Context, cta: Cta) {
+        fun launchHideTipsDialog(context: Context, cta: Cta) {
             AlertDialog.Builder(context)
                 .setTitle(R.string.hideTipsTitle)
                 .setMessage(getString(R.string.hideTipsText))
