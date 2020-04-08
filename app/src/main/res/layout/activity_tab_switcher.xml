@@ -18,11 +18,40 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="?attr/colorPrimaryDark"
     tools:context="com.duckduckgo.app.tabs.ui.TabSwitcherActivity">
 
-    <include layout="@layout/include_toolbar" />
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/tabsRecycler"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginStart="7dp"
+        android:layout_marginEnd="7dp"
+        android:clipToPadding="false"
+        android:paddingTop="40dp"
+        android:paddingBottom="@dimen/bottomBarHeight"
+        app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:itemCount="3"
+        tools:listitem="@layout/item_tab"
+        tools:showIn="@layout/activity_tab_switcher"
+        tools:spanCount="2" />
 
-    <include layout="@layout/content_tab_switcher" />
+    <com.duckduckgo.app.browser.ui.BottomNavigationBar
+        android:id="@+id/bottomNavigationBar"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/bottomBarHeight"
+        android:layout_gravity="bottom"
+        android:background="?attr/colorPrimary"
+        android:elevation="8dp"
+        android:gravity="center"
+        android:orientation="horizontal"
+        app:layoutResource="@layout/layout_tabs_bottom_navigation_bar"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

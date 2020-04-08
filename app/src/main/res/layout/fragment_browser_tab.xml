@@ -26,12 +26,13 @@
     <com.duckduckgo.app.browser.ui.BottomNavigationBar
         android:id="@+id/bottomNavigationBar"
         android:layout_width="match_parent"
-        android:layout_height="48dp"
+        android:layout_height="@dimen/bottomBarHeight"
         android:layout_gravity="bottom"
         android:background="?attr/colorPrimary"
         android:elevation="8dp"
         android:gravity="center"
         android:orientation="horizontal"
+        app:layoutResource="@layout/layout_browser_bottom_navigation_bar"
         app:layout_behavior="com.duckduckgo.app.browser.ui.BottomNavigationBehavior" />
 
     <include

@@ -17,21 +17,38 @@
 package com.duckduckgo.app.browser.ui
 
 import android.content.Context
+import android.content.res.TypedArray
 import android.util.AttributeSet
 import android.view.View
 import android.widget.LinearLayout
 import com.duckduckgo.app.browser.R
 
-class BottomNavigationBar @JvmOverloads constructor(
-    context: Context,
-    attrs: AttributeSet? = null,
-    defStyleAttr: Int = 0
-) : LinearLayout(context, attrs, defStyleAttr) {
+class BottomNavigationBar : LinearLayout {
 
-    override fun onFinishInflate() {
-        super.onFinishInflate()
+    constructor(context: Context) : super(context) {
+        init(context, null)
+    }
 
-        View.inflate(context, R.layout.layout_bottom_navigation_bar, this)
+    constructor(context: Context, attrs: AttributeSet) : super(context, attrs) {
+        init(context, attrs)
+    }
+
+    constructor(context: Context, attrs: AttributeSet, defStyleAttr: Int) : super(
+        context,
+        attrs,
+        defStyleAttr
+    ) {
+        init(context, attrs)
+    }
+
+    private fun init(context: Context, attrs: AttributeSet?) {
+
+        val ta: TypedArray = context.obtainStyledAttributes(attrs, R.styleable.BottomNavigationBar)
+        val resourceId = ta.getResourceId(R.styleable.BottomNavigationBar_layoutResource, R.layout.layout_browser_bottom_navigation_bar)
+
+        ta.recycle()
+
+        View.inflate(context, resourceId, this)
     }
 
     fun onItemClicked(view: View, onClick: () -> Unit) {
@@ -39,5 +56,4 @@ class BottomNavigationBar @JvmOverloads constructor(
             onClick()
         }
     }
-
 }
