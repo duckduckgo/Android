@@ -80,7 +80,7 @@
         <item name="feedbackEditTextBackgroundColor">@color/almostBlack</item>
         <item name="feedbackEditTextHintColor">@color/grayish</item>
 
-        <item name="bottomBarIconColor">@color/white</item>
+        <item name="bottomBarIconColor">?toolbarIconColor</item>
         <item name="bottomBarIconColorDisabled">@color/midGray</item>
 
     </style>
