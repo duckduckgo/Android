@@ -192,7 +192,7 @@ class SystemSearchViewModelTest {
     }
 
     @Test
-    fun whenUserSubmitsQueryThenBrowserLaunchedAndPixelSent() {
+    fun whenUserSubmitsQueryThenBrowserLaunchedWithQueryAndPixelSent() {
         testee.userSubmittedQuery(QUERY)
         verify(commandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
         assertEquals(Command.LaunchBrowser(QUERY), commandCaptor.lastValue)
@@ -200,11 +200,25 @@ class SystemSearchViewModelTest {
     }
 
     @Test
+    fun whenUserSubmitsQueryWithSpaceThenBrowserLaunchedWithTrimmedQueryAndPixelSent() {
+        testee.userSubmittedQuery("$QUERY ")
+        verify(commandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+        assertEquals(Command.LaunchBrowser(QUERY), commandCaptor.lastValue)
+        verify(mockPixel).fire(INTERSTITIAL_LAUNCH_BROWSER_QUERY)
+    }
+
+    @Test
+    fun whenUserSubmitsBlankQueryThenIgnored() {
+        testee.userSubmittedQuery(BLANK_QUERY)
+        verify(commandObserver, never()).onChanged(commandCaptor.capture())
+        verify(mockPixel, never()).fire(INTERSTITIAL_LAUNCH_BROWSER_QUERY)
+    }
+
+    @Test
     fun whenUserSubmitsQueryThenOnboardingCompleted() = coroutineRule.runBlocking {
         testee.userSubmittedQuery(QUERY)
         verify(mockUserStageStore).stageCompleted(AppStage.NEW)
     }
-
 
     @Test
     fun whenUserSubmitsAutocompleteResultThenBrowserLaunchedAndPixelSent() {

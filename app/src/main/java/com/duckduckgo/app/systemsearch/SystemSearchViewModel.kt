@@ -197,9 +197,13 @@ class SystemSearchViewModel(
     }
 
     fun userSubmittedQuery(query: String) {
+        if (query.isBlank()) {
+            return
+        }
+
         viewModelScope.launch {
             userStageStore.stageCompleted(AppStage.NEW)
-            command.value = Command.LaunchBrowser(query)
+            command.value = Command.LaunchBrowser(query.trim())
             pixel.fire(INTERSTITIAL_LAUNCH_BROWSER_QUERY)
         }
     }
