@@ -1,0 +1,28 @@
+<!--
+  ~ Copyright (c) 2020 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+  <path
+      android:pathData="M12,0C5.3726,0 0,5.3726 0,12C0,18.6274 5.3726,24 12,24C18.6274,24 24,18.6274 24,12C24,8.8174 22.7357,5.7652 20.4853,3.5147C18.2348,1.2643 15.1826,0 12,0ZM18.1619,15.4757C17.7051,15.5461 17.2397,15.5383 16.7855,15.4525C16.7433,15.4387 16.6976,15.4603 16.6814,15.5017C15.8886,16.8557 14.2013,17.3923 12.772,16.7451C12.7055,16.7161 12.6853,16.7248 12.6535,16.7913C12.1848,17.8704 11.1962,18.6343 10.0337,18.8154C8.4025,19.0912 6.8021,18.1828 6.2024,16.641C6.1764,16.5745 6.1475,16.5629 6.0839,16.5745C5.156,16.7557 4.1958,16.5093 3.4699,15.9036C2.8286,15.4065 2.4031,14.6818 2.2814,13.8795C2.1191,12.9568 2.3613,12.0088 2.9465,11.2771C3.1784,10.9751 3.4648,10.7191 3.7908,10.5224C3.8458,10.4877 3.8545,10.4588 3.8284,10.3981C3.2899,9.0691 3.5436,7.5503 4.4848,6.4684C5.0123,5.8467 5.7332,5.4201 6.532,5.2569C7.6511,5.001 8.8255,5.2775 9.7128,6.0058C9.9284,6.1742 10.1226,6.3684 10.2911,6.5841C10.3373,6.6448 10.3605,6.6304 10.4039,6.5841C11.5433,5.4346 13.3359,5.2494 14.6863,6.1417C15.1363,6.4362 15.5107,6.8324 15.7793,7.2983C15.8198,7.3677 15.8516,7.3677 15.9152,7.3417C16.9611,6.8953 18.1453,6.9026 19.1855,7.3619C20.4566,7.9074 21.3771,9.0443 21.6463,10.401C21.7075,10.686 21.7376,10.9769 21.736,11.2684C21.7447,12.363 21.3303,13.4186 20.5793,14.2149C19.94,14.8975 19.0875,15.3421 18.1619,15.4757Z"
+      android:strokeWidth="1"
+      android:fillColor="?attr/toolbarIconColor"
+      android:fillType="nonZero"
+      android:strokeColor="#00000000"/>
+</vector>

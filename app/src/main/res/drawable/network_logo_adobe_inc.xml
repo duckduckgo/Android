@@ -1,0 +1,28 @@
+<!--
+  ~ Copyright (c) 2020 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+  <path
+      android:pathData="M12,0C5.3726,0 0,5.3726 0,12C0,18.6274 5.3726,24 12,24C18.6274,24 24,18.6274 24,12C24,8.8174 22.7357,5.7652 20.4853,3.5147C18.2348,1.2643 15.1826,0 12,0ZM4.3373,5.2048L10.0019,5.2048L4.3373,18.7952L4.3373,5.2048ZM13.2492,18.7952L12.1677,16.0627L9.519,16.0627L12.0029,10.213L15.6145,18.7952L13.2492,18.7952ZM19.6771,18.7952L14.001,5.2048L19.6771,5.2048L19.6771,18.7952Z"
+      android:strokeWidth="1"
+      android:fillColor="?attr/toolbarIconColor"
+      android:fillType="nonZero"
+      android:strokeColor="#00000000"/>
+</vector>

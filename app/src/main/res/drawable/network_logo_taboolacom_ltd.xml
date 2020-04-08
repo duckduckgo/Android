@@ -1,0 +1,40 @@
+<!--
+  ~ Copyright (c) 2020 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+  <path
+      android:pathData="M16.2564,7.599C15.4439,7.5701 14.9783,7.9084 14.7875,8.7065C14.6041,9.432 14.6151,10.1929 14.8193,10.9128C14.9485,11.5132 15.4925,11.9325 16.106,11.9046C16.7108,11.9422 17.252,11.5314 17.3783,10.9388C17.4655,10.577 17.5293,10.21 17.5692,9.84C17.5316,9.4236 17.5229,9.1142 17.4708,8.8135C17.3494,8.0733 16.8752,7.6222 16.2564,7.599Z"
+      android:strokeWidth="1"
+      android:fillColor="?attr/toolbarIconColor"
+      android:fillType="nonZero"
+      android:strokeColor="#00000000"/>
+  <path
+      android:pathData="M12,0C5.3726,0 0,5.3726 0,12C0,18.6274 5.3726,24 12,24C18.6274,24 24,18.6274 24,12C24,8.8174 22.7357,5.7652 20.4853,3.5147C18.2348,1.2643 15.1826,0 12,0ZM19.1913,17.2482C17.4811,18.0607 15.6426,18.5695 13.7581,18.7518C10.5773,19.041 7.5152,18.6043 4.6352,17.1586C4.5427,17.1123 4.4154,17.0024 4.4154,16.9186C4.3981,16.0337 4.4154,15.1489 4.4154,14.2323C9.4381,16.239 14.4029,16.2072 19.4227,14.3017L19.4227,14.6747C19.4227,15.412 19.4227,16.1494 19.4227,16.8839C19.4443,17.0454 19.3467,17.1991 19.1913,17.2482ZM17.6964,14.0675C16.5999,14.3617 15.4429,14.3427 14.3566,14.0125C13.3703,13.7318 12.5302,13.0813 12.0116,12.1966C11.9706,12.2243 11.9328,12.2563 11.8988,12.292C11.2468,13.292 10.1907,13.9574 9.0072,14.1137C7.9211,14.3243 6.7975,14.2241 5.7658,13.8246C4.4165,13.3082 3.4571,12.096 3.2646,10.6641C3.0431,9.5891 3.1823,8.4712 3.6607,7.4834C4.3489,6.1041 5.5258,5.4246 7.012,5.2251C7.9102,5.0965 8.8256,5.1686 9.6925,5.4361C10.6616,5.7265 11.4869,6.3692 12.0058,7.2376C12.1995,6.9976 12.3586,6.7807 12.5407,6.5812C13.2192,5.8628 14.1296,5.407 15.1113,5.2945C16.1279,5.1201 17.1724,5.2138 18.1417,5.5663C19.654,6.1446 20.4954,7.2781 20.7441,8.854C20.8984,9.7113 20.8328,10.5938 20.5533,11.4188C20.1365,12.7466 19.0508,13.7564 17.6964,14.0761L17.6964,14.0675Z"
+      android:strokeWidth="1"
+      android:fillColor="?attr/toolbarIconColor"
+      android:fillType="nonZero"
+      android:strokeColor="#00000000"/>
+  <path
+      android:pathData="M7.9663,7.5412C7.2723,7.5412 6.8386,7.8014 6.6333,8.4549C6.3687,9.2667 6.3687,10.1415 6.6333,10.9533C6.7793,11.5096 7.2965,11.8866 7.8708,11.8554C8.4424,11.9045 8.968,11.5403 9.1229,10.988C9.2343,10.5686 9.3193,10.1427 9.3773,9.7128C9.3308,9.3116 9.2643,8.913 9.1778,8.5186C9.0644,7.9421 8.5537,7.5301 7.9663,7.5412L7.9663,7.5412Z"
+      android:strokeWidth="1"
+      android:fillColor="?attr/toolbarIconColor"
+      android:fillType="nonZero"
+      android:strokeColor="#00000000"/>
+</vector>

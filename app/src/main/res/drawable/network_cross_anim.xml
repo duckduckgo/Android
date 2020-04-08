@@ -20,13 +20,13 @@
     <aapt:attr name="android:drawable">
         <vector
             android:name="vector"
-            android:width="28dp"
-            android:height="28dp"
-            android:viewportWidth="28"
-            android:viewportHeight="28">
+            android:width="22dp"
+            android:height="22dp"
+            android:viewportWidth="22"
+            android:viewportHeight="22">
             <path
                 android:name="path"
-                android:pathData="M 2 2 L 26 26"
+                android:pathData="M 2 2 L 20 20"
                 android:fillColor="#00000000"
                 android:strokeColor="?attr/omnibarRoundedFieldBackgroundColor"
                 android:strokeWidth="6"
@@ -35,7 +35,7 @@
                 android:fillType="evenOdd"/>
             <path
                 android:name="path_1"
-                android:pathData="M 2 2 L 26 26"
+                android:pathData="M 2 2 L 20 20"
                 android:fillColor="#00000000"
                 android:strokeColor="?attr/toolbarIconColor"
                 android:strokeWidth="3"
@@ -51,8 +51,8 @@
                 android:propertyName="pathData"
                 android:startOffset="800"
                 android:duration="200"
-                android:valueFrom="M 12 10 L 12 10"
-                android:valueTo="M 2 2 L 26 26"
+                android:valueFrom="M 10 8 L 10 8"
+                android:valueTo="M 2 2 L 20 20"
                 android:valueType="pathType"
                 android:interpolator="@android:interpolator/linear"/>
             <objectAnimator
@@ -73,8 +73,8 @@
                 android:propertyName="pathData"
                 android:startOffset="800"
                 android:duration="200"
-                android:valueFrom="M 12 10 L 12 10"
-                android:valueTo="M 2 2 L 26 26"
+                android:valueFrom="M 10 8 L 10 8"
+                android:valueTo="M 2 2 L 20 20"
                 android:valueType="pathType"
                 android:interpolator="@android:interpolator/linear"/>
             <objectAnimator

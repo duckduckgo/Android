@@ -1,0 +1,28 @@
+<!--
+  ~ Copyright (c) 2020 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+  <path
+      android:pathData="M12,0C5.3726,0 0,5.3726 0,12C0,18.6274 5.3726,24 12,24C18.6274,24 24,18.6274 24,12C24,8.8174 22.7357,5.7652 20.4853,3.5147C18.2348,1.2643 15.1826,0 12,0ZM4.6988,6.6969L19.4978,6.6969L16.8723,9.0101L4.6988,9.0101L4.6988,6.6969ZM1.9229,12.3643L1.9229,10.0511L15.7446,10.0511L13.119,12.3643L1.9229,12.3643ZM5.1267,13.4227L11.8092,13.4227L9.1865,15.7359L5.1383,15.7359L5.1267,13.4227ZM10.6207,19.3793L10.6005,19.3793C10.5857,19.3998 10.5692,19.4192 10.5513,19.4371C10.2622,19.7263 9.6839,19.6222 9.253,19.2C8.8222,18.7778 8.7036,18.2169 8.9899,17.9277C9.0068,17.9098 9.0252,17.8934 9.0448,17.8786C9.0443,17.8709 9.0443,17.8631 9.0448,17.8554L20.8713,6.8096C21.0079,6.6643 21.2364,6.6572 21.3817,6.7937C21.527,6.9303 21.5341,7.1588 21.3976,7.3041L10.6207,19.3793Z"
+      android:strokeWidth="1"
+      android:fillColor="?attr/toolbarIconColor"
+      android:fillType="nonZero"
+      android:strokeColor="#00000000"/>
+</vector>
