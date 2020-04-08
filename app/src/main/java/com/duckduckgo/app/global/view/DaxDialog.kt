@@ -108,8 +108,8 @@ class TypewriterDaxDialog : DialogFragment(), DaxDialog {
         if (activity != null) {
             dialogText?.cancelAnimation()
             dialogListeners?.onDismissDialog()
-            super.onDismiss(dialog)
         }
+        super.onDismiss(dialog)
     }
 
     override fun getDaxDialog(): DialogFragment = this
