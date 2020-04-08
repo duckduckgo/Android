@@ -33,7 +33,6 @@ import com.duckduckgo.app.systemsearch.SystemSearchViewModel.Command.LaunchDuckD
 import com.nhaarman.mockitokotlin2.*
 import io.reactivex.Observable
 import kotlinx.coroutines.test.TestCoroutineDispatcher
-import kotlinx.coroutines.test.TestCoroutineScope
 import kotlinx.coroutines.test.runBlockingTest
 import org.junit.After
 import org.junit.Assert.*
@@ -155,7 +154,6 @@ class SystemSearchViewModelTest {
 
         val newViewState = testee.resultsViewState.value
         assertNotNull(newViewState)
-        assertEquals(QUERY, newViewState?.queryText)
         assertEquals(appQueryResult, newViewState?.appResults)
         assertEquals(autocompleteQueryResult, newViewState?.autocompleteResults)
     }
@@ -167,7 +165,6 @@ class SystemSearchViewModelTest {
 
         val newViewState = testee.resultsViewState.value
         assertNotNull(newViewState)
-        assertEquals("$QUERY ", newViewState?.queryText)
         assertEquals(appQueryResult, newViewState?.appResults)
         assertEquals(autocompleteQueryResult, newViewState?.autocompleteResults)
     }
@@ -175,12 +172,11 @@ class SystemSearchViewModelTest {
     @Test
     fun whenUserClearsQueryThenViewStateReset() = coroutineRule.runBlocking {
         testee.userUpdatedQuery(QUERY)
-        testee.userClearedQuery()
+        testee.userRequestedClear()
 
         val newViewState = testee.resultsViewState.value
         assertNotNull(newViewState)
-        assertTrue(newViewState!!.queryText.isEmpty())
-        assertTrue(newViewState.appResults.isEmpty())
+        assertTrue(newViewState!!.appResults.isEmpty())
         assertEquals(AutoCompleteResult("", emptyList()), newViewState.autocompleteResults)
     }
 
@@ -191,8 +187,7 @@ class SystemSearchViewModelTest {
 
         val newViewState = testee.resultsViewState.value
         assertNotNull(newViewState)
-        assertTrue(newViewState!!.queryText.isEmpty())
-        assertTrue(newViewState.appResults.isEmpty())
+        assertTrue(newViewState!!.appResults.isEmpty())
         assertEquals(AutoCompleteResult("", emptyList()), newViewState.autocompleteResults)
     }
 

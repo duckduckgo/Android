@@ -56,12 +56,12 @@ class SystemSearchViewModel(
     )
 
     data class SystemSearchResultsViewState(
-        val queryText: String = "",
         val autocompleteResults: AutoCompleteResult = AutoCompleteResult("", emptyList()),
         val appResults: List<DeviceApp> = emptyList()
     )
 
     sealed class Command {
+        object ClearInputText : Command()
         object LaunchDuckDuckGo : Command()
         data class LaunchBrowser(val query: String) : Command()
         data class LaunchDeviceApplication(val deviceApp: DeviceApp) : Command()
@@ -151,16 +151,10 @@ class SystemSearchViewModel(
     fun userUpdatedQuery(query: String) {
         appsJob?.cancel()
 
-        if (query == currentResultsState().queryText) {
-            return
-        }
-
         if (query.isBlank()) {
-            userClearedQuery()
+            inputCleared()
             return
         }
-
-        resultsViewState.value = currentResultsState().copy(queryText = query)
 
         val trimmedQuery = query.trim()
         resultsPublishSubject.accept(trimmedQuery)
@@ -184,6 +178,11 @@ class SystemSearchViewModel(
         )
     }
 
+    private fun inputCleared() {
+        resultsPublishSubject.accept("")
+        resetResultsState()
+    }
+
     fun userTappedDax() {
         viewModelScope.launch {
             userStageStore.stageCompleted(AppStage.NEW)
@@ -192,9 +191,9 @@ class SystemSearchViewModel(
         }
     }
 
-    fun userClearedQuery() {
-        resultsPublishSubject.accept("")
-        resetResultsState()
+    fun userRequestedClear() {
+        command.value = Command.ClearInputText
+        inputCleared()
     }
 
     fun userSubmittedQuery(query: String) {
