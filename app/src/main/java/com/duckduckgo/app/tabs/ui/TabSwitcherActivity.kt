@@ -18,11 +18,9 @@ package com.duckduckgo.app.tabs.ui
 
 import android.content.Context
 import android.content.Intent
-import android.graphics.Color
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
-import android.view.WindowManager
 import androidx.appcompat.widget.Toolbar
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.GridLayoutManager
@@ -40,15 +38,6 @@ import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.Close
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.DisplayMessage
-import kotlinx.android.synthetic.main.activity_tab_switcher.tabsRecycler
-import kotlinx.android.synthetic.main.fragment_browser_tab.bottomNavigationBar
-import kotlinx.android.synthetic.main.fragment_browser_tab.rootView
-import kotlinx.android.synthetic.main.include_omnibar_toolbar.browserMenu
-import kotlinx.android.synthetic.main.layout_tabs_bottom_navigation_bar.bottomBarFireItem
-import kotlinx.android.synthetic.main.layout_tabs_bottom_navigation_bar.bottomBarNewTabItem
-import kotlinx.android.synthetic.main.layout_tabs_bottom_navigation_bar.bottomBarOverflowItem
-import kotlinx.android.synthetic.main.popup_window_browser_menu.view.settingsPopupMenuItem
-import kotlinx.android.synthetic.main.popup_window_tabs_menu.view.closeAllTabs
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -56,6 +45,7 @@ import kotlinx.coroutines.launch
 import org.jetbrains.anko.longToast
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
+
 
 class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, CoroutineScope {
 
@@ -86,26 +76,32 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
 
     private var selectedTabId: String? = null
 
-    private lateinit var popupMenu: TapsPopupMenu
-
+    private lateinit var tabsRecycler: RecyclerView
     private lateinit var tabGridItemDecorator: TabGridItemDecorator
+    private lateinit var toolbar: Toolbar
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        window.statusBarColor = Color.TRANSPARENT
-
         setContentView(R.layout.activity_tab_switcher)
         extractIntentExtras()
+        configureViewReferences()
+        configureToolbar()
         configureRecycler()
         configureObservers()
-        configureBottomBar()
-        createPopUpMenu()
-
     }
 
     private fun extractIntentExtras() {
         selectedTabId = intent.getStringExtra(EXTRA_KEY_SELECTED_TAB)
+    }
+
+    private fun configureViewReferences() {
+        tabsRecycler = findViewById(R.id.tabsRecycler)
+        toolbar = findViewById(R.id.toolbar)
+    }
+
+    private fun configureToolbar() {
+        setSupportActionBar(toolbar)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
     }
 
     private fun configureRecycler() {
@@ -120,6 +116,7 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
             }
         }))
         swipeListener.attachToRecyclerView(tabsRecycler)
+
 
         tabGridItemDecorator = TabGridItemDecorator(themedContext, selectedTabId)
         tabsRecycler.addItemDecoration(tabGridItemDecorator)
@@ -153,23 +150,6 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
         when (command) {
             is DisplayMessage -> applicationContext?.longToast(command.messageId)
             is Close -> finishAfterTransition()
-        }
-    }
-
-    private fun configureBottomBar() {
-        bottomNavigationBar.apply {
-            onItemClicked(bottomBarNewTabItem) { onNewTabRequested() }
-            onItemClicked(bottomBarFireItem) { onFire() }
-            onItemClicked(bottomBarOverflowItem) { popupMenu.show(rootView, bottomNavigationBar) }
-        }
-    }
-
-    private fun createPopUpMenu() {
-        popupMenu = TapsPopupMenu(layoutInflater)
-        val view = popupMenu.contentView
-        popupMenu.apply {
-            onMenuItemClicked(view.closeAllTabs) { closeAllTabs() }
-            onMenuItemClicked(view.settingsPopupMenuItem) { showSettings() }
         }
     }
 
@@ -230,6 +210,7 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
     override fun finish() {
         clearObserversEarlyToStopViewUpdates()
         super.finish()
+        overridePendingTransition(R.anim.slide_from_bottom, R.anim.tab_anim_fade_out)
     }
 
     private fun clearObserversEarlyToStopViewUpdates() {

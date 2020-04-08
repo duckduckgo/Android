@@ -40,7 +40,7 @@ import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.Close
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.DisplayMessage
-import kotlinx.android.synthetic.main.activity_tab_switcher.tabsRecycler
+import kotlinx.android.synthetic.main.activity_tab_switcher_bottom_bar_experiment.tabsRecycler
 import kotlinx.android.synthetic.main.fragment_browser_tab.bottomNavigationBar
 import kotlinx.android.synthetic.main.fragment_browser_tab.rootView
 import kotlinx.android.synthetic.main.include_omnibar_toolbar.browserMenu
@@ -95,7 +95,7 @@ class TabSwitcherBottomBarExperimentActivity : DuckDuckGoActivity(), TabSwitcher
 
         window.statusBarColor = Color.TRANSPARENT
 
-        setContentView(R.layout.activity_tab_switcher)
+        setContentView(R.layout.activity_tab_switcher_bottom_bar_experiment)
         extractIntentExtras()
         configureRecycler()
         configureObservers()
