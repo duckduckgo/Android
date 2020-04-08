@@ -75,6 +75,7 @@ class BookmarksActivity : DuckDuckGoActivity() {
     private fun setupActionBar() {
         setSupportActionBar(toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        toolbar.setNavigationIcon(R.drawable.ic_back)
     }
 
     private fun observeViewModel() {

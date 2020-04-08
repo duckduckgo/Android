@@ -61,4 +61,8 @@
     <attr name="bottomBarIconColor" format="color" />
     <attr name="bottomBarIconColorDisabled" format="color" />
 
+    <declare-styleable name="BottomNavigationBar">
+        <attr name="layoutResource" format="reference" />
+    </declare-styleable>
+
 </resources>

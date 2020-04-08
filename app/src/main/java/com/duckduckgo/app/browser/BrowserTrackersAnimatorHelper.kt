@@ -18,7 +18,6 @@ package com.duckduckgo.app.browser
 
 import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
-import android.annotation.SuppressLint
 import android.app.Activity
 import android.graphics.drawable.AnimatedVectorDrawable
 import android.view.View
@@ -187,15 +186,13 @@ class BrowserTrackersAnimatorHelper {
         }
     }
 
-    @SuppressLint("ObjectAnimatorBinding")
-    fun animateFadeOut(view: Any): ObjectAnimator {
+    private fun animateFadeOut(view: View): ObjectAnimator {
         return ObjectAnimator.ofFloat(view, "alpha", 1f, 0f).apply {
             duration = DEFAULT_ANIMATION_DURATION
         }
     }
 
-    @SuppressLint("ObjectAnimatorBinding")
-    fun animateFadeIn(view: Any): ObjectAnimator {
+    private fun animateFadeIn(view: View): ObjectAnimator {
         return ObjectAnimator.ofFloat(view, "alpha", 0f, 1f).apply {
             duration = DEFAULT_ANIMATION_DURATION
         }

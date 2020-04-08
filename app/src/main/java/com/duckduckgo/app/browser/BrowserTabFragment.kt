@@ -126,6 +126,7 @@ import com.duckduckgo.app.survey.model.Survey
 import com.duckduckgo.app.survey.ui.SurveyActivity
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.ui.TabSwitcherActivity
+import com.duckduckgo.app.tabs.ui.TabSwitcherBottomBarExperimentActivity
 import com.duckduckgo.app.widget.ui.AddWidgetInstructionsActivity
 import com.duckduckgo.widget.SearchWidgetLight
 import com.google.android.material.snackbar.Snackbar
@@ -155,11 +156,13 @@ import kotlinx.android.synthetic.main.include_omnibar_toolbar.*
 import kotlinx.android.synthetic.main.include_omnibar_toolbar.view.browserMenu
 import kotlinx.android.synthetic.main.include_omnibar_toolbar.view.privacyGradeButton
 import kotlinx.android.synthetic.main.include_top_cta.view.closeButton
-import kotlinx.android.synthetic.main.layout_bottom_navigation_bar.bottomBarBookmarksItemOne
-import kotlinx.android.synthetic.main.layout_bottom_navigation_bar.bottomBarFireItem
-import kotlinx.android.synthetic.main.layout_bottom_navigation_bar.bottomBarOverflowItem
-import kotlinx.android.synthetic.main.layout_bottom_navigation_bar.bottomBarSearchItem
-import kotlinx.android.synthetic.main.layout_bottom_navigation_bar.bottomBarTabsItem
+import kotlinx.android.synthetic.main.layout_browser_bottom_navigation_bar.bottomBarBookmarksItemOne
+import kotlinx.android.synthetic.main.layout_browser_bottom_navigation_bar.bottomBarFireItem
+import kotlinx.android.synthetic.main.layout_browser_bottom_navigation_bar.bottomBarOverflowItem
+import kotlinx.android.synthetic.main.layout_browser_bottom_navigation_bar.bottomBarSearchItem
+import kotlinx.android.synthetic.main.layout_browser_bottom_navigation_bar.bottomBarTabsItem
+import kotlinx.android.synthetic.main.layout_browser_bottom_navigation_bar.bottomBarFireItem
+import kotlinx.android.synthetic.main.layout_browser_bottom_navigation_bar.bottomBarTabsItem
 import kotlinx.android.synthetic.main.popup_window_browser_bottom_tab_menu.view.sharePopupMenuItem
 import kotlinx.android.synthetic.main.popup_window_browser_menu.view.*
 import kotlinx.coroutines.CoroutineScope
@@ -374,7 +377,12 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
 
     private fun launchTabSwitcher() {
         val activity = activity ?: return
-        startActivity(TabSwitcherActivity.intent(activity, tabId))
+        if (variantManager.getVariant().hasFeature(VariantManager.VariantFeature.BottomBarWithSearchExperiment)) {
+            startActivity(TabSwitcherBottomBarExperimentActivity.intent(activity, tabId))
+        } else {
+            startActivity(TabSwitcherActivity.intent(activity, tabId))
+        }
+
         activity.overridePendingTransition(R.anim.tab_anim_fade_in, R.anim.slide_to_bottom)
     }
 
@@ -767,6 +775,10 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
         omnibarTextInput.onFocusChangeListener =
             OnFocusChangeListener { _, hasFocus: Boolean ->
                 viewModel.onOmnibarInputStateChanged(omnibarTextInput.text.toString(), hasFocus, false)
+                if (!hasFocus) {
+                    omnibarTextInput.hideKeyboard()
+                    focusDummy.requestFocus()
+                }
             }
 
         omnibarTextInput.onBackKeyListener = object : KeyboardAwareEditText.OnBackKeyListener {
