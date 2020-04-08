@@ -132,11 +132,13 @@ class TypewriterDaxDialog : DialogFragment(), DaxDialog {
         hideText.setOnClickListener {
             dialogText.cancelAnimation()
             dialogListeners?.onHideClick()
+            dismiss()
         }
 
         primaryCta.setOnClickListener {
             dialogText.cancelAnimation()
             dialogListeners?.onPrimaryCtaClick()
+            dismiss()
         }
 
         if (dismissible) {

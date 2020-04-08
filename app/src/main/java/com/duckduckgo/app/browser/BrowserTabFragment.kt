@@ -233,7 +233,6 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
     private val logoHidingListener by lazy { LogoHidingLayoutChangeLifecycleListener(ddgLogo) }
 
     private var alertDialog: AlertDialog? = null
-    private var daxDialog: DaxDialog? = null
 
     override fun onAttach(context: Context) {
         AndroidSupportInjection.inject(this)
@@ -242,6 +241,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        removeDaxDialogFromManager()
         renderer = BrowserTabFragmentRenderer()
     }
 
@@ -278,6 +278,13 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
                 }
             }
         })
+    }
+
+    private fun removeDaxDialogFromManager() {
+        val fragment: Fragment? = childFragmentManager.findFragmentByTag(DAX_DIALOG_DIALOG_TAG)
+        fragment?.let {
+            childFragmentManager.beginTransaction().remove(it).commit()
+        }
     }
 
     private fun processMessage(message: Message) {
@@ -332,7 +339,6 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
     }
 
     override fun onPause() {
-        daxDialog = null
         logoHidingListener.onPause()
         super.onPause()
     }
@@ -1121,17 +1127,29 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
     override fun onHideClick() {
         context?.let {
             val configuration = viewModel.ctaViewState.value?.cta ?: return
-            daxDialog?.getDaxDialog()?.dismiss()
-            renderer.launchHideTipsDialog(it, configuration)
+            launchHideTipsDialog(it, configuration)
         }
     }
 
     override fun onPrimaryCtaClick() {
-        daxDialog?.let {
-            val configuration = viewModel.ctaViewState.value?.cta ?: return
-            viewModel.onUserClickCtaOkButton(configuration)
-            it.getDaxDialog().dismiss()
-        }
+        val configuration = viewModel.ctaViewState.value?.cta ?: return
+        viewModel.onUserClickCtaOkButton(configuration)
+    }
+
+    private fun launchHideTipsDialog(context: Context, cta: Cta) {
+        AlertDialog.Builder(context)
+            .setTitle(R.string.hideTipsTitle)
+            .setMessage(getString(R.string.hideTipsText))
+            .setPositiveButton(R.string.hideTipsButton) { dialog, _ ->
+                dialog.dismiss()
+                launch {
+                    ctaViewModel.hideTipsForever(cta)
+                }
+            }
+            .setNegativeButton(android.R.string.no) { dialog, _ ->
+                dialog.dismiss()
+            }
+            .show()
     }
 
     fun omnibarViews(): List<View> = listOf(clearTextButton, omnibarTextInput, privacyGradeButton)
@@ -1406,29 +1424,12 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
             activity?.let { activity ->
                 val savedDaxDialog: Fragment? = childFragmentManager.findFragmentByTag(DAX_DIALOG_DIALOG_TAG)
                 if (savedDaxDialog != null) {
-                    daxDialog = savedDaxDialog as DaxDialog
                     return
                 }
-                daxDialog = configuration.createCta(activity).apply {
+                configuration.createCta(activity).apply {
                     getDaxDialog().show(childFragmentManager, DAX_DIALOG_DIALOG_TAG)
                 }
             }
-        }
-
-        fun launchHideTipsDialog(context: Context, cta: Cta) {
-            AlertDialog.Builder(context)
-                .setTitle(R.string.hideTipsTitle)
-                .setMessage(getString(R.string.hideTipsText))
-                .setPositiveButton(R.string.hideTipsButton) { dialog, _ ->
-                    dialog.dismiss()
-                    launch {
-                        ctaViewModel.hideTipsForever(cta)
-                    }
-                }
-                .setNegativeButton(android.R.string.no) { dialog, _ ->
-                    dialog.dismiss()
-                }
-                .show()
         }
 
         private fun showDaxCta(configuration: DaxBubbleCta) {
