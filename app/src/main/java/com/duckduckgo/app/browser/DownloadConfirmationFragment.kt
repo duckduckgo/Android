@@ -25,12 +25,15 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.core.content.FileProvider.getUriForFile
 import com.duckduckgo.app.browser.downloader.FileDownloader
+import com.duckduckgo.app.browser.downloader.FileDownloader.FileDownloadListener
+import com.duckduckgo.app.browser.downloader.FileDownloader.PendingFileDownload
 import com.duckduckgo.app.browser.downloader.guessFileName
 import com.duckduckgo.app.browser.downloader.isDataUrl
 import com.duckduckgo.app.global.view.gone
 import com.duckduckgo.app.global.view.leftDrawable
 import com.duckduckgo.app.global.view.show
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import dagger.android.support.AndroidSupportInjection
 import kotlinx.android.synthetic.main.download_confirmation.view.*
 import timber.log.Timber
 import java.io.File
@@ -38,24 +41,31 @@ import java.io.IOException
 import javax.inject.Inject
 import kotlin.concurrent.thread
 
-class DownloadConfirmationFragment(
-    private val pendingDownload: FileDownloader.PendingFileDownload,
-    private val downloadListener: FileDownloader.FileDownloadListener
-) : BottomSheetDialogFragment() {
+class DownloadConfirmationFragment : BottomSheetDialogFragment() {
 
     @Inject
     lateinit var downloader: FileDownloader
 
+    lateinit var downloadListener: FileDownloadListener
+
+    private lateinit var pendingDownload: PendingFileDownload
+
     private var file: File? = null
+
+    override fun onAttach(context: Context) {
+        AndroidSupportInjection.inject(this)
+        super.onAttach(context)
+    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.download_confirmation, container, false)
-        setupFile()
+        setupDownload()
         setupViews(view)
         return view
     }
 
-    private fun setupFile() {
+    private fun setupDownload() {
+        pendingDownload = arguments!![PENDING_DOWNLOAD_BUNDLE_KEY] as PendingFileDownload
         file = if (!pendingDownload.isDataUrl) File(pendingDownload.directory, pendingDownload.guessFileName()) else null
     }
 
@@ -100,7 +110,7 @@ class DownloadConfirmationFragment(
         }
     }
 
-    private fun completeDownload(pendingDownload: FileDownloader.PendingFileDownload?, callback: FileDownloader.FileDownloadListener) {
+    private fun completeDownload(pendingDownload: PendingFileDownload?, callback: FileDownloadListener) {
         thread {
             downloader.download(pendingDownload, callback)
         }
@@ -125,5 +135,19 @@ class DownloadConfirmationFragment(
         val intent = Intent(Intent.ACTION_VIEW)
         intent.setDataAndType(uri, mime)
         return intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+    }
+
+    companion object {
+
+        private const val PENDING_DOWNLOAD_BUNDLE_KEY = "PENDING_DOWNLOAD_BUNDLE_KEY"
+
+        fun instance(pendingDownload: PendingFileDownload, downloadListener: FileDownloadListener): DownloadConfirmationFragment {
+            val fragment = DownloadConfirmationFragment()
+            val bundle = Bundle()
+            bundle.putSerializable(PENDING_DOWNLOAD_BUNDLE_KEY, pendingDownload)
+            fragment.arguments = bundle
+            fragment.downloadListener = downloadListener
+            return fragment
+        }
     }
 }

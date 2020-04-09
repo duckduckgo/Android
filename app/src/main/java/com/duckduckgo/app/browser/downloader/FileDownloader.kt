@@ -21,6 +21,7 @@ import android.webkit.URLUtil
 import androidx.annotation.WorkerThread
 import timber.log.Timber
 import java.io.File
+import java.io.Serializable
 import javax.inject.Inject
 
 class FileDownloader @Inject constructor(
@@ -49,7 +50,7 @@ class FileDownloader @Inject constructor(
         val subfolder: String,
         val userAgent: String,
         val directory: File = Environment.getExternalStoragePublicDirectory(subfolder)
-    )
+    ): Serializable
 
     interface FileDownloadListener {
         fun downloadStarted()

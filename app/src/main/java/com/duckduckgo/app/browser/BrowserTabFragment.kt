@@ -93,6 +93,7 @@ import com.duckduckgo.app.browser.BrowserTabViewModel.OmnibarViewState
 import com.duckduckgo.app.browser.autocomplete.BrowserAutoCompleteSuggestionsAdapter
 import com.duckduckgo.app.browser.downloader.FileDownloadNotificationManager
 import com.duckduckgo.app.browser.downloader.FileDownloader
+import com.duckduckgo.app.browser.downloader.FileDownloader.FileDownloadListener
 import com.duckduckgo.app.browser.downloader.FileDownloader.PendingFileDownload
 import com.duckduckgo.app.browser.filechooser.FileChooserIntentBuilder
 import com.duckduckgo.app.browser.model.BasicAuthenticationCredentials
@@ -294,6 +295,14 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         renderer = BrowserTabFragmentRenderer()
+        if(savedInstanceState != null) {
+            updateFragmentListener()
+        }
+    }
+
+    private fun updateFragmentListener() {
+        val fragment = fragmentManager?.findFragmentByTag(DOWNLOAD_CONFIRMATION_TAG) as? DownloadConfirmationFragment
+        fragment?.downloadListener = createDownloadListener()
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -390,7 +399,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
     }
 
     private fun dismissDownloadFragment() {
-        val fragment = fragmentManager?.findFragmentByTag(DOWNLAOD_CONFIRM_TAG) as? DownloadConfirmationFragment
+        val fragment = fragmentManager?.findFragmentByTag(DOWNLOAD_CONFIRMATION_TAG) as? DownloadConfirmationFragment
         fragment?.dismiss()
     }
 
@@ -1110,7 +1119,16 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
             return
         }
 
-        val downloadListener = object : FileDownloader.FileDownloadListener {
+        val downloadListener = createDownloadListener()
+        if (requestUserConfirmation) {
+            requestDownloadConfirmation(pendingDownload, downloadListener)
+        } else {
+            completeDownload(pendingDownload, downloadListener)
+        }
+    }
+
+    private fun createDownloadListener(): FileDownloadListener {
+        return object : FileDownloadListener {
             override fun downloadStarted() {
                 fileDownloadNotificationManager.showDownloadInProgressNotification()
             }
@@ -1126,22 +1144,15 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
                 fileDownloadNotificationManager.showDownloadFailedNotification()
             }
         }
-
-        if (requestUserConfirmation) {
-            requestDownloadConfirmation(pendingDownload, downloadListener)
-        } else {
-            completeDownload(pendingDownload, downloadListener)
-        }
     }
 
-    private fun requestDownloadConfirmation(pendingDownload: PendingFileDownload, downloadListener: FileDownloader.FileDownloadListener) {
+    private fun requestDownloadConfirmation(pendingDownload: PendingFileDownload, downloadListener: FileDownloadListener) {
         fragmentManager?.let {
-            val downloadConfirmationFragment = DownloadConfirmationFragment(pendingDownload, downloadListener)
-            downloadConfirmationFragment.show(it, DOWNLAOD_CONFIRM_TAG)
+            DownloadConfirmationFragment.instance(pendingDownload, downloadListener).show(it, DOWNLOAD_CONFIRMATION_TAG)
         }
     }
 
-    private fun completeDownload(pendingDownload: FileDownloader.PendingFileDownload?, callback: FileDownloader.FileDownloadListener) {
+    private fun completeDownload(pendingDownload: PendingFileDownload?, callback: FileDownloadListener) {
         thread {
             fileDownloader.download(pendingDownload, callback)
         }
@@ -1208,7 +1219,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
         private const val URL_BUNDLE_KEY = "url"
 
         private const val AUTHENTICATION_DIALOG_TAG = "AUTH_DIALOG_TAG"
-        private const val DOWNLAOD_CONFIRM_TAG = "DOWNLAOD_CONFIRM_TAG"
+        private const val DOWNLOAD_CONFIRMATION_TAG = "DOWNLOAD_CONFIRMATION_TAG"
         private const val DAX_DIALOG_DIALOG_TAG = "DAX_DIALOG_TAG"
 
         private const val MAX_PROGRESS = 100
