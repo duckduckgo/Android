@@ -50,6 +50,7 @@ import androidx.core.view.isNotEmpty
 import androidx.core.view.isVisible
 import androidx.core.view.postDelayed
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.transaction
 import androidx.lifecycle.*
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion
@@ -107,7 +108,7 @@ import javax.inject.Inject
 import kotlin.concurrent.thread
 import kotlin.coroutines.CoroutineContext
 
-class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogListeners {
+class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogListener {
 
     private val supervisorJob = SupervisorJob()
 
@@ -280,10 +281,12 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
         })
     }
 
+    private fun getDaxDialogFromManager(): Fragment? = childFragmentManager.findFragmentByTag(DAX_DIALOG_DIALOG_TAG)
+
     private fun removeDaxDialogFromManager() {
-        val fragment: Fragment? = childFragmentManager.findFragmentByTag(DAX_DIALOG_DIALOG_TAG)
+        val fragment = getDaxDialogFromManager()
         fragment?.let {
-            childFragmentManager.beginTransaction().remove(it).commit()
+            childFragmentManager.transaction { remove(it) }
         }
     }
 
@@ -1120,7 +1123,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
         startActivity(AddWidgetInstructionsActivity.intent(context), options)
     }
 
-    override fun onDismissDialog() {
+    override fun onDaxDialogDismiss() {
         val configuration = viewModel.ctaViewState.value?.cta ?: return
         if (configuration is DaxDialogCta.DaxTrackersBlockedCta) {
             animatorHelper.finishTrackerAnimation(omnibarViews(), networksContainer)
@@ -1128,14 +1131,14 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
         viewModel.onUserDismissedCta(configuration)
     }
 
-    override fun onHideClick() {
+    override fun onDaxDialogHideClick() {
         context?.let {
             val configuration = viewModel.ctaViewState.value?.cta ?: return
             launchHideTipsDialog(it, configuration)
         }
     }
 
-    override fun onPrimaryCtaClick() {
+    override fun onDaxDialogPrimaryCtaClick() {
         val configuration = viewModel.ctaViewState.value?.cta ?: return
         viewModel.onUserClickCtaOkButton(configuration)
     }
@@ -1426,8 +1429,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
             hideHomeCta()
             hideDaxCta()
             activity?.let { activity ->
-                val savedDaxDialog: Fragment? = childFragmentManager.findFragmentByTag(DAX_DIALOG_DIALOG_TAG)
-                if (savedDaxDialog != null) {
+                if (getDaxDialogFromManager() != null) {
                     return
                 }
                 configuration.createCta(activity).apply {
