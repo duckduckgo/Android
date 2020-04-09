@@ -73,6 +73,7 @@
                 android:drawablePadding="30dp"
                 android:paddingStart="30dp"
                 android:paddingEnd="0dp"
+                android:drawableTint="@color/browser_menu_icon"
                 android:text="@string/requestDesktopSiteMenuTitle" />
 
             <TextView
