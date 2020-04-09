@@ -194,8 +194,10 @@ class BrowserTabViewModel(
         object GenerateWebViewPreviewImage : Command()
         object LaunchTabSwitcher : Command()
         class ShowErrorWithAction(val action: () -> Unit) : Command()
-        object FinishTrackerAnimation : Command()
-        class HideDaxDialog(val cta: Cta) : Command()
+        sealed class DaxCommand: Command() {
+            object FinishTrackerAnimation : DaxCommand()
+            class HideDaxDialog(val cta: Cta) : DaxCommand()
+        }
     }
 
     val autoCompleteViewState: MutableLiveData<AutoCompleteViewState> = MutableLiveData()
@@ -952,13 +954,13 @@ class BrowserTabViewModel(
 
     fun onUserHideDaxDialog() {
         val cta = currentCtaViewState().cta ?: return
-        command.value = HideDaxDialog(cta)
+        command.value = DaxCommand.HideDaxDialog(cta)
     }
 
     fun onDaxDialogDismissed() {
         val cta = currentCtaViewState().cta ?: return
         if (cta is DaxDialogCta.DaxTrackersBlockedCta) {
-            command.value = FinishTrackerAnimation
+            command.value = DaxCommand.FinishTrackerAnimation
         }
         onUserDismissedCta()
     }

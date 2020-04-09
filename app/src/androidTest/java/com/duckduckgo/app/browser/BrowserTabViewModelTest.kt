@@ -1512,7 +1512,7 @@ class BrowserTabViewModelTest {
         setCta(cta)
         testee.onUserHideDaxDialog()
         val command = captureCommands().lastValue
-        assertTrue(command is Command.HideDaxDialog)
+        assertTrue(command is Command.DaxCommand.HideDaxDialog)
     }
 
     @Test
@@ -1521,7 +1521,7 @@ class BrowserTabViewModelTest {
         setCta(cta)
         testee.onDaxDialogDismissed()
         val command = captureCommands().lastValue
-        assertTrue(command is Command.FinishTrackerAnimation)
+        assertTrue(command is Command.DaxCommand.FinishTrackerAnimation)
     }
 
     @Test

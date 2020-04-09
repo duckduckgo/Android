@@ -460,7 +460,9 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
     }
 
     private fun processCommand(it: Command?) {
-        renderer.cancelAllAnimations()
+        if (it !is Command.DaxCommand) {
+            renderer.cancelAllAnimations()
+        }
         when (it) {
             is Command.Refresh -> refresh()
             is Command.OpenInNewTab -> {
@@ -543,8 +545,8 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
             is Command.GenerateWebViewPreviewImage -> generateWebViewPreviewImage()
             is Command.LaunchTabSwitcher -> launchTabSwitcher()
             is Command.ShowErrorWithAction -> showErrorSnackbar(it)
-            is Command.FinishTrackerAnimation -> finishTrackerAnimation()
-            is Command.HideDaxDialog -> showHideTipsDialog(it.cta)
+            is Command.DaxCommand.FinishTrackerAnimation -> finishTrackerAnimation()
+            is Command.DaxCommand.HideDaxDialog -> showHideTipsDialog(it.cta)
         }
     }
 
