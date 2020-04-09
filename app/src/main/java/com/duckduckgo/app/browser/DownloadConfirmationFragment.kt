@@ -26,6 +26,7 @@ import android.widget.Toast
 import androidx.core.content.FileProvider.getUriForFile
 import com.duckduckgo.app.browser.downloader.FileDownloader
 import com.duckduckgo.app.browser.downloader.guessFileName
+import com.duckduckgo.app.browser.downloader.isDataUrl
 import com.duckduckgo.app.global.view.gone
 import com.duckduckgo.app.global.view.leftDrawable
 import com.duckduckgo.app.global.view.show
@@ -51,8 +52,7 @@ class DownloadConfirmationFragment(
     }
 
     private fun setupFile() {
-        val guessedFileName = pendingDownload.guessFileName()
-        file = if (guessedFileName != null) File(pendingDownload.directory, guessedFileName) else null
+        file = if (!pendingDownload.isDataUrl) File(pendingDownload.directory, pendingDownload.guessFileName()) else null
     }
 
     private fun setupViews(view: View) {

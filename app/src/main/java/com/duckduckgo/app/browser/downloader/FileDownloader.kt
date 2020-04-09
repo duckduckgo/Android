@@ -36,8 +36,8 @@ class FileDownloader @Inject constructor(
         }
 
         when {
-            URLUtil.isNetworkUrl(pending.url) -> networkFileDownloader.download(pending)
-            URLUtil.isDataUrl(pending.url) -> dataUriDownloader.download(pending, callback)
+            pending.isNetworkUrl -> networkFileDownloader.download(pending)
+            pending.isDataUrl -> dataUriDownloader.download(pending, callback)
             else -> callback.downloadFailed("Not supported")
         }
     }
@@ -58,9 +58,12 @@ class FileDownloader @Inject constructor(
     }
 }
 
-fun FileDownloader.PendingFileDownload.guessFileName(): String? {
-    if (URLUtil.isDataUrl(url)) return null
+fun FileDownloader.PendingFileDownload.guessFileName(): String {
     val guessedFileName = URLUtil.guessFileName(url, contentDisposition, mimeType)
     Timber.i("Guessed filename of $guessedFileName for url ${url}")
     return guessedFileName
 }
+
+val FileDownloader.PendingFileDownload.isDataUrl get() = URLUtil.isDataUrl(url)
+
+val FileDownloader.PendingFileDownload.isNetworkUrl get() = URLUtil.isNetworkUrl(url)
