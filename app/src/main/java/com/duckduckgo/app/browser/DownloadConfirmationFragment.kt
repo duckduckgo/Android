@@ -35,13 +35,16 @@ import kotlinx.android.synthetic.main.download_confirmation.view.*
 import timber.log.Timber
 import java.io.File
 import java.io.IOException
+import javax.inject.Inject
 import kotlin.concurrent.thread
 
 class DownloadConfirmationFragment(
     private val pendingDownload: FileDownloader.PendingFileDownload,
-    private val downloader: FileDownloader,
     private val downloadListener: FileDownloader.FileDownloadListener
 ) : BottomSheetDialogFragment() {
+
+    @Inject
+    lateinit var downloader: FileDownloader
 
     private var file: File? = null
 

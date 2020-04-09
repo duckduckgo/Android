@@ -385,7 +385,13 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
     override fun onPause() {
         daxDialog = null
         logoHidingListener.onPause()
+        dismissDownloadFragment()
         super.onPause()
+    }
+
+    private fun dismissDownloadFragment() {
+        val fragment = fragmentManager?.findFragmentByTag(DOWNLAOD_CONFIRM_TAG) as? DownloadConfirmationFragment
+        fragment?.dismiss()
     }
 
     private fun createPopupMenu() {
@@ -1130,7 +1136,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
 
     private fun requestDownloadConfirmation(pendingDownload: PendingFileDownload, downloadListener: FileDownloader.FileDownloadListener) {
         fragmentManager?.let {
-            val downloadConfirmationFragment = DownloadConfirmationFragment(pendingDownload, fileDownloader, downloadListener)
+            val downloadConfirmationFragment = DownloadConfirmationFragment(pendingDownload, downloadListener)
             downloadConfirmationFragment.show(it, DOWNLAOD_CONFIRM_TAG)
         }
     }
