@@ -230,6 +230,7 @@ class TabSwitcherBottomBarExperimentActivity : DuckDuckGoActivity(), TabSwitcher
     override fun finish() {
         clearObserversEarlyToStopViewUpdates()
         super.finish()
+        overridePendingTransition(R.anim.slide_from_bottom, R.anim.tab_anim_fade_out)
     }
 
     private fun clearObserversEarlyToStopViewUpdates() {

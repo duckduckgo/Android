@@ -52,10 +52,7 @@
                     android:id="@+id/omniBarContainer"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:layout_marginStart="5dp"
-                    android:layout_marginTop="8dp"
-                    android:layout_marginEnd="5dp"
-                    android:layout_marginBottom="8dp"
+                    android:layout_margin="8dp"
                     android:background="@drawable/omnibar_field_background"
                     android:paddingStart="6dp"
                     android:paddingEnd="6dp">

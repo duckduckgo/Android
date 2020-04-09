@@ -27,8 +27,7 @@
         android:textAlignment="center"
         android:textColor="?toolbarIconColor"
         android:textSize="12sp"
-        android:textStyle="bold"
-        android:typeface="normal"
+        android:fontFamily="sans-serif-condensed-medium"
         android:gravity="center"
         android:background="@drawable/ic_tabs"
         tools:text="66" />

@@ -154,8 +154,8 @@
     </style>
 
     <style name="BrowserTextMenuItem">
-        <item name="android:paddingEnd">30dp</item>
-        <item name="android:paddingStart">30dp</item>
+        <item name="android:paddingEnd">24dp</item>
+        <item name="android:paddingStart">24dp</item>
         <item name="android:paddingTop">14dp</item>
         <item name="android:paddingBottom">14dp</item>
         <item name="android:textSize">16sp</item>
