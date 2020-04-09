@@ -59,8 +59,10 @@ import com.duckduckgo.app.cta.ui.*
 import com.duckduckgo.app.global.*
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.global.model.SiteFactory
+import com.duckduckgo.app.global.model.domain
 import com.duckduckgo.app.global.model.domainMatchesUrl
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao
+import com.duckduckgo.app.privacy.db.UserWhitelistDao
 import com.duckduckgo.app.privacy.model.PrivacyGrade
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.api.StatisticsUpdater
@@ -89,6 +91,7 @@ class BrowserTabViewModel(
     private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector,
     private val siteFactory: SiteFactory,
     private val tabRepository: TabRepository,
+    private val userWhitelistDao: UserWhitelistDao,
     private val networkLeaderboardDao: NetworkLeaderboardDao,
     private val bookmarksDao: BookmarksDao,
     private val autoComplete: AutoComplete,
@@ -142,6 +145,7 @@ class BrowserTabViewModel(
 
     data class LoadingViewState(
         val isLoading: Boolean = false,
+        val privacyOn: Boolean = true,
         val progress: Int = 0
     )
 
@@ -500,7 +504,17 @@ class BrowserTabViewModel(
             statisticsUpdater.refreshSearchRetentionAtb()
         }
 
+        updateLoadingStatePrivacy()
+
         registerSiteVisit()
+    }
+
+    private fun updateLoadingStatePrivacy() {
+        viewModelScope.launch(dispatchers.io()) {
+            site?.domain?.let {
+                loadingViewState.postValue(currentLoadingViewState().copy(privacyOn = !userWhitelistDao.contains(it)))
+            }
+        }
     }
 
     private fun urlUpdated(url: String) {

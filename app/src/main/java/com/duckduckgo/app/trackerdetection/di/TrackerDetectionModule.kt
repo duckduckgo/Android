@@ -16,7 +16,7 @@
 
 package com.duckduckgo.app.trackerdetection.di
 
-import com.duckduckgo.app.privacy.store.PrivacySettingsStore
+import com.duckduckgo.app.privacy.db.UserWhitelistDao
 import com.duckduckgo.app.trackerdetection.EntityLookup
 import com.duckduckgo.app.trackerdetection.TrackerDetector
 import com.duckduckgo.app.trackerdetection.TrackerDetectorImpl
@@ -30,7 +30,7 @@ class TrackerDetectionModule {
 
     @Provides
     @Singleton
-    fun trackerDetector(entityLookup: EntityLookup, settings: PrivacySettingsStore): TrackerDetector {
-        return TrackerDetectorImpl(entityLookup, settings)
+    fun trackerDetector(entityLookup: EntityLookup, userWhitelistDao: UserWhitelistDao): TrackerDetector {
+        return TrackerDetectorImpl(entityLookup, userWhitelistDao)
     }
 }

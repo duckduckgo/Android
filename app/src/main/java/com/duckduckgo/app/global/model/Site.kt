@@ -66,3 +66,5 @@ interface Site {
 fun Site.domainMatchesUrl(matchingUrl: String): Boolean {
     return uri?.baseHost == matchingUrl.toUri().baseHost
 }
+
+val Site.domain get() = uri?.host

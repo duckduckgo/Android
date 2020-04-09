@@ -57,7 +57,7 @@ class PrivacyDashboardActivity : DuckDuckGoActivity() {
         setContentView(R.layout.activity_privacy_dashboard)
         configureToolbar()
 
-        viewModel.viewState.observe(this, Observer<ViewState> {
+        viewModel.viewState.observe(this, Observer {
             it?.let { render(it) }
         })
 

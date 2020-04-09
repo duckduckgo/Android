@@ -79,7 +79,6 @@ import com.duckduckgo.app.global.device.DeviceInfo
 import com.duckduckgo.app.global.view.*
 import com.duckduckgo.app.privacy.model.PrivacyGrade
 import com.duckduckgo.app.privacy.renderer.icon
-import com.duckduckgo.app.privacy.store.PrivacySettingsStore
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.survey.model.Survey
@@ -162,9 +161,6 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
 
     @Inject
     lateinit var variantManager: VariantManager
-
-    @Inject
-    lateinit var privacySettingsStore: PrivacySettingsStore
 
     val tabId get() = arguments!![TAB_ID_ARG] as String
 
@@ -1203,8 +1199,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
                     smoothProgressAnimator.onNewProgress(viewState.progress) { if (!viewState.isLoading) hide() }
                 }
 
-                if (privacySettingsStore.privacyOn) {
-
+                if (viewState.privacyOn) {
                     if (lastSeenOmnibarViewState?.isEditing == true) {
                         cancelAllAnimations()
                     }

@@ -21,21 +21,27 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
+import com.duckduckgo.app.global.DefaultDispatcherProvider
+import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.model.Site
+import com.duckduckgo.app.global.model.domain
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardEntry
+import com.duckduckgo.app.privacy.db.UserWhitelistDao
 import com.duckduckgo.app.privacy.model.HttpsStatus
 import com.duckduckgo.app.privacy.model.PrivacyGrade
 import com.duckduckgo.app.privacy.model.PrivacyPractices
 import com.duckduckgo.app.privacy.model.PrivacyPractices.Summary.UNKNOWN
-import com.duckduckgo.app.privacy.store.PrivacySettingsStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.*
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 
 class PrivacyDashboardViewModel(
-    private val settingsStore: PrivacySettingsStore,
+    private val userWhitelistDao: UserWhitelistDao,
     networkLeaderboardDao: NetworkLeaderboardDao,
-    private val pixel: Pixel
+    private val pixel: Pixel,
+    private val dispatchers: DispatcherProvider = DefaultDispatcherProvider()
 ) : ViewModel() {
 
     data class ViewState(
@@ -60,11 +66,6 @@ class PrivacyDashboardViewModel(
     private val sitesVisitedObserver = Observer<Int> { onSitesVisitedChanged(it) }
     private val trackerNetworkLeaderboard: LiveData<List<NetworkLeaderboardEntry>> = networkLeaderboardDao.trackerNetworkLeaderboard()
     private val trackerNetworkActivityObserver = Observer<List<NetworkLeaderboardEntry>> { onTrackerNetworkEntriesChanged(it) }
-
-    private val privacyInitiallyOn = settingsStore.privacyOn
-
-    private val shouldReloadPage: Boolean
-        get() = privacyInitiallyOn != settingsStore.privacyOn
 
     init {
         pixel.fire(PRIVACY_DASHBOARD_OPENED)
@@ -119,40 +120,51 @@ class PrivacyDashboardViewModel(
             httpsStatus = HttpsStatus.SECURE,
             trackerCount = 0,
             allTrackersBlocked = true,
-            toggleEnabled = settingsStore.privacyOn,
+            toggleEnabled = true,
             practices = UNKNOWN,
             shouldShowTrackerNetworkLeaderboard = false,
             sitesVisited = 0,
             trackerNetworkEntries = emptyList(),
-            shouldReloadPage = shouldReloadPage
+            shouldReloadPage = false
         )
     }
 
     private fun updateSite(site: Site) {
         val grades = site.calculateGrades()
 
-        viewState.value = viewState.value?.copy(
-            domain = site.uri?.host ?: "",
-            beforeGrade = grades.grade,
-            afterGrade = grades.improvedGrade,
-            httpsStatus = site.https,
-            trackerCount = site.trackerCount,
-            allTrackersBlocked = site.allTrackersBlocked,
-            practices = site.privacyPractices.summary
-        )
+        GlobalScope.launch(dispatchers.io()) {
+            viewState.postValue(viewState.value?.copy(
+                domain = site.domain ?: "",
+                beforeGrade = grades.grade,
+                afterGrade = grades.improvedGrade,
+                httpsStatus = site.https,
+                trackerCount = site.trackerCount,
+                allTrackersBlocked = site.allTrackersBlocked,
+                toggleEnabled = site.domain?.let { !userWhitelistDao.contains(it) } ?: true,
+                practices = site.privacyPractices.summary
+            ))
+        }
     }
 
     fun onPrivacyToggled(enabled: Boolean) {
-        if (enabled != viewState.value?.toggleEnabled) {
+        if (enabled == viewState.value?.toggleEnabled) {
+            return
+        }
 
-            settingsStore.privacyOn = enabled
-            val pixelName = if (enabled) TRACKER_BLOCKER_DASHBOARD_TURNED_ON else TRACKER_BLOCKER_DASHBOARD_TURNED_OFF
-            pixel.fire(pixelName)
+        viewState.value = viewState.value?.copy(
+            toggleEnabled = enabled,
+            shouldReloadPage = true
+        )
 
-            viewState.value = viewState.value?.copy(
-                toggleEnabled = enabled,
-                shouldReloadPage = shouldReloadPage
-            )
+        val domain = site?.domain ?: return
+        GlobalScope.launch(dispatchers.io()) {
+            if (enabled) {
+                userWhitelistDao.delete(domain)
+                pixel.fire(TRACKER_BLOCKER_DASHBOARD_TURNED_ON)
+            } else {
+                userWhitelistDao.insert(domain)
+                pixel.fire(TRACKER_BLOCKER_DASHBOARD_TURNED_OFF)
+            }
         }
     }
 

@@ -16,16 +16,25 @@
 
 package com.duckduckgo.app.privacy.ui
 
+import androidx.annotation.WorkerThread
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.duckduckgo.app.global.DefaultDispatcherProvider
+import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.model.Site
+import com.duckduckgo.app.global.model.domain
+import com.duckduckgo.app.privacy.db.UserWhitelistDao
 import com.duckduckgo.app.privacy.model.HttpsStatus
 import com.duckduckgo.app.privacy.model.PrivacyGrade
 import com.duckduckgo.app.privacy.model.PrivacyPractices
 import com.duckduckgo.app.privacy.model.PrivacyPractices.Summary.UNKNOWN
-import com.duckduckgo.app.privacy.store.PrivacySettingsStore
+import kotlinx.coroutines.launch
 
-class ScorecardViewModel(private val settingsStore: PrivacySettingsStore) : ViewModel() {
+class ScorecardViewModel(
+    private val userWhitelistDao: UserWhitelistDao,
+    private val dispatchers: DispatcherProvider = DefaultDispatcherProvider()
+) : ViewModel() {
 
     data class ViewState(
         val domain: String,
@@ -67,28 +76,35 @@ class ScorecardViewModel(private val settingsStore: PrivacySettingsStore) : View
             majorNetworkCount = 0,
             allTrackersBlocked = true,
             practices = UNKNOWN,
-            privacyOn = settingsStore.privacyOn,
+            privacyOn = true,
             showIsMemberOfMajorNetwork = false,
             showEnhancedGrade = false
         )
     }
 
+    @WorkerThread
     private fun updateSite(site: Site) {
+        val domain = site.domain ?: ""
         val grades = site.calculateGrades()
         val grade = grades.grade
         val improvedGrade = grades.improvedGrade
 
-        viewState.value = viewState.value?.copy(
-            domain = site.uri?.host ?: "",
-            beforeGrade = grade,
-            afterGrade = improvedGrade,
-            trackerCount = site.trackerCount,
-            majorNetworkCount = site.majorNetworkCount,
-            httpsStatus = site.https,
-            allTrackersBlocked = site.allTrackersBlocked,
-            practices = site.privacyPractices.summary,
-            showIsMemberOfMajorNetwork = site.entity?.isMajor ?: false,
-            showEnhancedGrade = grade != improvedGrade
-        )
+        viewModelScope.launch(dispatchers.io()) {
+            viewState.postValue(
+                viewState.value?.copy(
+                    domain = domain,
+                    beforeGrade = grade,
+                    afterGrade = improvedGrade,
+                    trackerCount = site.trackerCount,
+                    majorNetworkCount = site.majorNetworkCount,
+                    httpsStatus = site.https,
+                    allTrackersBlocked = site.allTrackersBlocked,
+                    practices = site.privacyPractices.summary,
+                    privacyOn = !userWhitelistDao.contains(domain),
+                    showIsMemberOfMajorNetwork = site.entity?.isMajor ?: false,
+                    showEnhancedGrade = grade != improvedGrade
+                )
+            )
+        }
     }
 }
