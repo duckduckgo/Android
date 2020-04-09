@@ -40,9 +40,10 @@ import kotlin.concurrent.thread
 class DownloadConfirmationFragment(
     private val pendingDownload: FileDownloader.PendingFileDownload,
     private val downloader: FileDownloader,
-    private val downloadListener: FileDownloader.FileDownloadListener,
-    private var file: File? = null
+    private val downloadListener: FileDownloader.FileDownloadListener
 ) : BottomSheetDialogFragment() {
+
+    private var file: File? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.download_confirmation, container, false)
