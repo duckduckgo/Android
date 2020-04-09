@@ -57,9 +57,9 @@ class TypewriterDaxDialog : DialogFragment(), DaxDialog {
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
-        daxDialogListener = parentFragment as? DaxDialogListener
+        daxDialogListener = context as? DaxDialogListener
         if (daxDialogListener == null) {
-            throw ClassCastException("$parentFragment must implement DaxDialogListeners")
+            throw ClassCastException("$context must implement DaxDialogListeners")
         }
     }
 

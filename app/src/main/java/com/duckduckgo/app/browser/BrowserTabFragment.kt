@@ -50,7 +50,6 @@ import androidx.core.view.isNotEmpty
 import androidx.core.view.isVisible
 import androidx.core.view.postDelayed
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.transaction
 import androidx.lifecycle.*
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -109,7 +108,7 @@ import javax.inject.Inject
 import kotlin.concurrent.thread
 import kotlin.coroutines.CoroutineContext
 
-class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogListener {
+class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
 
     private val supervisorJob = SupervisorJob()
 
@@ -243,7 +242,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        removeDaxDialogFromManager()
+        removeDaxDialogFromActivity()
         renderer = BrowserTabFragmentRenderer()
     }
 
@@ -282,21 +281,18 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
         })
     }
 
-    private fun getDaxDialogFromAnyFragment(): Fragment? {
-        try {
-            val parentFragment = activity?.supportFragmentManager?.fragments?.firstOrNull {
-                it.childFragmentManager.findFragmentByTag(DAX_DIALOG_DIALOG_TAG) != null
-            } ?: return null
-            return parentFragment.childFragmentManager.findFragmentByTag(DAX_DIALOG_DIALOG_TAG) ?: return null
+    private fun recoverDaxDialogFromActivity(): Fragment? {
+        return try {
+            activity?.supportFragmentManager?.findFragmentByTag(DAX_DIALOG_DIALOG_TAG)
         } catch (e: java.lang.IllegalStateException) {
-            return null
+            null
         }
     }
 
-    private fun removeDaxDialogFromManager() {
-        val fragment = getDaxDialogFromAnyFragment()
+    private fun removeDaxDialogFromActivity() {
+        val fragment = recoverDaxDialogFromActivity()
         fragment?.let {
-            childFragmentManager.transaction { remove(it) }
+            activity?.supportFragmentManager?.transaction { remove(it) }
         }
     }
 
@@ -1145,15 +1141,15 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
         }
     }
 
-    override fun onDaxDialogDismiss() {
+    fun onDaxDialogDismiss() {
         viewModel.onDaxDialogDismissed()
     }
 
-    override fun onDaxDialogHideClick() {
+    fun onDaxDialogHideClick() {
         viewModel.onUserHideDaxDialog()
     }
 
-    override fun onDaxDialogPrimaryCtaClick() {
+    fun onDaxDialogPrimaryCtaClick() {
         viewModel.onUserClickCtaOkButton()
     }
 
@@ -1443,11 +1439,11 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
             hideHomeCta()
             hideDaxCta()
             activity?.let { activity ->
-                if (getDaxDialogFromAnyFragment() != null) {
+                if (recoverDaxDialogFromActivity() != null) {
                     return
                 }
                 configuration.createCta(activity).apply {
-                    getDaxDialog().show(childFragmentManager, DAX_DIALOG_DIALOG_TAG)
+                    getDaxDialog().show(activity.supportFragmentManager, DAX_DIALOG_DIALOG_TAG)
                 }
             }
         }

@@ -52,7 +52,7 @@ import org.jetbrains.anko.longToast
 import timber.log.Timber
 import javax.inject.Inject
 
-class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope() {
+class BrowserActivity : DuckDuckGoActivity(), DaxDialogListener, CoroutineScope by MainScope() {
 
     @Inject
     lateinit var clearPersonalDataAction: ClearPersonalDataAction
@@ -255,6 +255,18 @@ class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope() {
             is Command.ShowAppFeedbackPrompt -> showAppEnjoymentPrompt(GiveFeedbackDialogFragment.create(command.promptCount, viewModel))
             is Command.LaunchFeedbackView -> startActivity(FeedbackActivity.intent(this))
         }
+    }
+
+    override fun onDaxDialogDismiss() {
+        currentTab?.onDaxDialogDismiss()
+    }
+
+    override fun onDaxDialogHideClick() {
+        currentTab?.onDaxDialogHideClick()
+    }
+
+    override fun onDaxDialogPrimaryCtaClick() {
+        currentTab?.onDaxDialogPrimaryCtaClick()
     }
 
     private fun launchNewSearch(intent: Intent): Boolean {
