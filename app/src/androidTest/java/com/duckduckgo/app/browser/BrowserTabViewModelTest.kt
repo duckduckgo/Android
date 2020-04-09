@@ -1507,6 +1507,32 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenUserClickedHideDaxDialogThenHideDaxDialogCommandSent() {
+        val cta = DaxDialogCta.DaxSerpCta(mockOnboardingStore, mockAppInstallStore)
+        setCta(cta)
+        testee.onUserHideDaxDialog()
+        val command = captureCommands().lastValue
+        assertTrue(command is Command.HideDaxDialog)
+    }
+
+    @Test
+    fun whenUserDismissDaxTrackersBlockedDialogThenFinishTrackerAnimationCommandSent() {
+        val cta = DaxDialogCta.DaxTrackersBlockedCta(mockOnboardingStore, mockAppInstallStore, emptyList(), "")
+        setCta(cta)
+        testee.onDaxDialogDismissed()
+        val command = captureCommands().lastValue
+        assertTrue(command is Command.FinishTrackerAnimation)
+    }
+
+    @Test
+    fun whenUserDismissDifferentThanDaxTrackersBlockedDialogThenFinishTrackerAnimationCommandNotSent() {
+        val cta = DaxDialogCta.DaxSerpCta(mockOnboardingStore, mockAppInstallStore)
+        setCta(cta)
+        testee.onDaxDialogDismissed()
+        verify(mockCommandObserver, never()).onChanged(commandCaptor.capture())
+    }
+
+    @Test
     fun whenUserDismissedCtaThenRegisterInDatabase() = coroutineRule.runBlocking {
         val cta = HomePanelCta.AddWidgetAuto
         setCta(cta)
@@ -1529,7 +1555,6 @@ class BrowserTabViewModelTest {
         testee.onUserDismissedCta()
         verify(mockSurveyDao).cancelScheduledSurveys()
     }
-
 
     @Test
     fun whenUserDismissedHomeTopPanelCtaThenReturnEmptyCta() {
