@@ -54,16 +54,7 @@ import kotlinx.android.synthetic.main.content_settings_other.version
 import kotlinx.android.synthetic.main.content_settings_privacy.automaticallyClearWhatSetting
 import kotlinx.android.synthetic.main.content_settings_privacy.automaticallyClearWhenSetting
 import kotlinx.android.synthetic.main.include_toolbar.toolbar
-import kotlinx.android.synthetic.main.content_settings_general.autocompleteToggle
-import kotlinx.android.synthetic.main.content_settings_general.lightThemeToggle
 import kotlinx.android.synthetic.main.content_settings_general.searchNotificationToggle
-import kotlinx.android.synthetic.main.content_settings_general.setAsDefaultBrowserSetting
-import kotlinx.android.synthetic.main.content_settings_other.about
-import kotlinx.android.synthetic.main.content_settings_other.provideFeedback
-import kotlinx.android.synthetic.main.content_settings_other.version
-import kotlinx.android.synthetic.main.content_settings_privacy.automaticallyClearWhatSetting
-import kotlinx.android.synthetic.main.content_settings_privacy.automaticallyClearWhenSetting
-import kotlinx.android.synthetic.main.include_toolbar.toolbar
 import javax.inject.Inject
 
 class SettingsActivity : DuckDuckGoActivity(), SettingsAutomaticallyClearWhatFragment.Listener, SettingsAutomaticallyClearWhenFragment.Listener {
@@ -90,7 +81,7 @@ class SettingsActivity : DuckDuckGoActivity(), SettingsAutomaticallyClearWhatFra
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_settings)
-        setupActionBar()
+        setupToolbar(toolbar)
 
         configureUiEventHandlers()
         observeViewModel()
@@ -186,12 +177,6 @@ class SettingsActivity : DuckDuckGoActivity(), SettingsAutomaticallyClearWhatFra
         } else {
             throw IllegalStateException("Unable to launch default app activity on this OS")
         }
-    }
-
-    private fun setupActionBar() {
-        setSupportActionBar(toolbar)
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        toolbar.setNavigationIcon(R.drawable.ic_back)
     }
 
     private fun launchFeedback() {

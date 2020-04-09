@@ -23,7 +23,6 @@ import androidx.appcompat.app.AlertDialog
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.GridLayoutManager
 import com.duckduckgo.app.browser.R
-import com.duckduckgo.app.fire.FireActivity
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import kotlinx.android.synthetic.main.content_app_icons.appIconsList
 import kotlinx.android.synthetic.main.include_toolbar.toolbar
@@ -44,15 +43,10 @@ class ChangeIconActivity : DuckDuckGoActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_app_icons)
-        setupActionBar()
+        setupToolbar(toolbar)
         configureRecycler()
 
         observeViewModel()
-    }
-
-    private fun setupActionBar() {
-        setSupportActionBar(toolbar)
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
     }
 
     private fun configureRecycler() {
