@@ -47,9 +47,9 @@
         android:layout_height="@dimen/bottomBarHeight"
         android:layout_gravity="bottom"
         android:background="?attr/colorPrimary"
-        android:elevation="8dp"
         android:gravity="center"
         android:orientation="horizontal"
+        android:elevation="4dp"
         app:layoutResource="@layout/layout_tabs_bottom_navigation_bar"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
