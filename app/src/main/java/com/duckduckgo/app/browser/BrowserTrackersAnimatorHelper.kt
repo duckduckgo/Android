@@ -89,11 +89,15 @@ class BrowserTrackersAnimatorHelper {
     private fun createResourcesIdList(activity: Activity, events: List<TrackingEvent>): List<Int>? {
         if (activity.packageName == null) return emptyList()
 
-        return events.asSequence().mapNotNull {
-            it.entity
-        }.map {
-            TrackersRenderer().networkLogoIcon(activity, it.name)
-        }.filterNotNull().distinct().take(MAX_LOGOS_SHOWN).toList()
+        return events.asSequence()
+            .mapNotNull { it.entity }
+            .sortedByDescending { it.prevalence }
+            .map { TrackersRenderer().networkLogoIcon(activity, it.name) }
+            .filterNotNull()
+            .distinct()
+            .take(MAX_LOGOS_SHOWN)
+            .toMutableList()
+            .apply { add(R.drawable.ic_more_trackers) }
     }
 
     private fun animateBlockedLogos(views: List<View>) {
@@ -201,6 +205,6 @@ class BrowserTrackersAnimatorHelper {
     companion object {
         private const val TRACKER_LOGOS_DELAY_ON_SCREEN = 2400L
         private const val DEFAULT_ANIMATION_DURATION = 150L
-        private const val MAX_LOGOS_SHOWN = 4
+        private const val MAX_LOGOS_SHOWN = 3
     }
 }

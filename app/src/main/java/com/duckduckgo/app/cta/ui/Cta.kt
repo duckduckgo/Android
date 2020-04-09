@@ -135,8 +135,9 @@ sealed class DaxDialogCta(
 
         override fun getDaxText(context: Context): String {
             val trackersFiltered = trackers.asSequence()
-                .filter { it.entity?.isMajor == true }
-                .map { it.entity?.displayName }
+                .mapNotNull { it.entity }
+                .sortedByDescending { it.prevalence }
+                .map { it.displayName }
                 .filterNotNull()
                 .distinct()
                 .take(MAX_TRACKERS_SHOWS)
