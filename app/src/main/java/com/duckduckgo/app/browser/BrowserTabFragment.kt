@@ -281,13 +281,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
         })
     }
 
-    private fun recoverDaxDialogFromActivity(): Fragment? {
-        return try {
-            activity?.supportFragmentManager?.findFragmentByTag(DAX_DIALOG_DIALOG_TAG)
-        } catch (e: java.lang.IllegalStateException) {
-            null
-        }
-    }
+    private fun recoverDaxDialogFromActivity(): Fragment? = activity?.supportFragmentManager?.findFragmentByTag(DAX_DIALOG_DIALOG_TAG)
 
     private fun removeDaxDialogFromActivity() {
         val fragment = recoverDaxDialogFromActivity()
