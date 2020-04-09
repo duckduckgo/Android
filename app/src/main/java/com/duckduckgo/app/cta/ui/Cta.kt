@@ -370,5 +370,5 @@ fun DaxCta.addCtaToHistory(newCta: String): String {
 
 fun DaxCta.canSendShownPixel(): Boolean {
     val param = onboardingStore.onboardingDialogJourney?.split("-").orEmpty().toMutableList()
-    return !(param.isNotEmpty() && param.last().contains(ctaPixelParam))
+    return !(param.isNotEmpty() && param.any { it.contains(ctaPixelParam) })
 }
