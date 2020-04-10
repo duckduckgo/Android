@@ -778,7 +778,6 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
                 if (!hasFocus) {
                     omnibarTextInput.hideKeyboard()
                     focusDummy.requestFocus()
-                    decorator.updateBottomBarVisibility(hasFocus)
                 }
             }
 
@@ -1521,9 +1520,15 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
         }
 
         private fun renderToolbarMenus(viewState: BrowserViewState) {
-            privacyGradeButton?.isInvisible = !viewState.showPrivacyGrade
-            clearTextButton?.isVisible = viewState.showClearButton
-            searchIcon?.isVisible = viewState.showSearchIcon
+            if (viewState.browserShowing){
+                privacyGradeButton?.isInvisible = !viewState.showPrivacyGrade
+                clearTextButton?.isVisible = viewState.showClearButton
+                searchIcon?.isVisible = viewState.showSearchIcon
+            } else {
+                privacyGradeButton?.isInvisible = true
+                clearTextButton?.isVisible = viewState.showClearButton
+                searchIcon?.isVisible = true
+            }
 
             decorator.decorateToolbarMenus(viewState)
         }
