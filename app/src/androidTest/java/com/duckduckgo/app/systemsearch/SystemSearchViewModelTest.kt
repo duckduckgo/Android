@@ -210,7 +210,7 @@ class SystemSearchViewModelTest {
     @Test
     fun whenUserSubmitsBlankQueryThenIgnored() {
         testee.userSubmittedQuery(BLANK_QUERY)
-        verify(commandObserver, never()).onChanged(commandCaptor.capture())
+        assertFalse(commandCaptor.allValues.any { it is Command.LaunchBrowser })
         verify(mockPixel, never()).fire(INTERSTITIAL_LAUNCH_BROWSER_QUERY)
     }
 
