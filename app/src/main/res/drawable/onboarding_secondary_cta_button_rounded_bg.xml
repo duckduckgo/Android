@@ -13,10 +13,13 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-
-<shape xmlns:android="http://schemas.android.com/apk/res/android">
-    <stroke
-        android:width="1.5dp"
-        android:color="@color/cornflowerBlue" />
-    <corners android:radius="22dp" />
-</shape>
+<ripple xmlns:android="http://schemas.android.com/apk/res/android"
+    android:color="?attr/colorControlHighlight">
+    <item android:id="@android:id/background">
+        <shape android:shape="rectangle">
+            <solid android:color="@color/white" />
+            <stroke android:width="1.5dp" android:color="@color/cornflowerBlue"/>
+            <corners android:radius="22dp" />
+        </shape>
+    </item>
+</ripple>

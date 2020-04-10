@@ -60,6 +60,14 @@ class InstalledDeviceAppLookup(private val appListProvider: DeviceAppListProvide
         val wordPrefixMatchingRegex = ".*\\b${escapedQuery}.*".toRegex(IGNORE_CASE)
         return apps!!.filter {
             it.shortName.matches(wordPrefixMatchingRegex)
+        }.sortedWith(comparator(query))
+    }
+
+    private fun comparator(query: String): Comparator<DeviceApp> {
+        return compareByDescending<DeviceApp> {
+            it.shortName.startsWith(query, ignoreCase = true)
+        }.thenBy {
+            it.shortName
         }
     }
 
