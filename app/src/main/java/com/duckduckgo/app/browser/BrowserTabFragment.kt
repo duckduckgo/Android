@@ -281,10 +281,10 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
         })
     }
 
-    private fun recoverDaxDialogFromActivity(): Fragment? = activity?.supportFragmentManager?.findFragmentByTag(DAX_DIALOG_DIALOG_TAG)
+    private fun getDaxDialogFromActivity(): Fragment? = activity?.supportFragmentManager?.findFragmentByTag(DAX_DIALOG_DIALOG_TAG)
 
     private fun removeDaxDialogFromActivity() {
-        val fragment = recoverDaxDialogFromActivity()
+        val fragment = getDaxDialogFromActivity()
         fragment?.let {
             activity?.supportFragmentManager?.transaction { remove(it) }
         }
@@ -1435,7 +1435,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
             hideHomeCta()
             hideDaxCta()
             activity?.let { activity ->
-                if (recoverDaxDialogFromActivity() != null) {
+                if (getDaxDialogFromActivity() != null) {
                     return
                 }
                 configuration.createCta(activity).apply {
