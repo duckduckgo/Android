@@ -371,7 +371,7 @@
     <string name="daxDialogHideButton">AUSBLENDEN</string>
     <string name="daxDialogPhew">Puh!</string>
     <string name="daxDialogNext">Weiter</string>
-    <string name="daxDialogHighFive">Gib mir fünf!</string>
+    <string name="daxDialogHighFive">Schlag ein!</string>
     <string name="daxDialogGotIt">Verstanden</string>
     <string name="hideTipsTitle">Verbleibende Tipps ausblenden?</string>
     <string name="hideTipsText">Es gibt nur wenige, und wir haben versucht, sie informativ zu gestalten.</string>
@@ -385,16 +385,16 @@
     <string name="daxEndCtaText">Gut gemacht! &lt;br/&gt;&lt;br/&gt;Hinweis Jedes Mal, wenn Sie mit mir surfen, verliert eine gruselige Anzeige ihre Flügel. &#128077;</string>
     <string name="daxSerpCtaText">Ihre DuckDuckGo-Suchanfragen sind anonym und ich speichere niemals Ihren Suchverlauf. Nie. &#128588;</string>
     <string name="daxNonSerpCtaText">Jede Website hat eine Datenschutzstufe. Tippen Sie darauf, um zu sehen, wie ich Ihre Privatsphäre geschützt habe.&lt;br/&gt;&lt;br/&gt;Sie haben Lust darauf? Versuchen Sie, Ihre Daten zu löschen, indem Sie den Feuerknopf drücken.</string>
-    <string name="daxMainNetworkStep1CtaText">Augen auf!&lt;br/&gt;&lt;br/&gt; %s betreibt ein großes Tracking-Netzwerk.&lt;br/&gt;&lt;br/&gt;Eine niedriger Datenschutzstufe weist Sie darauf hin.</string>
-    <string name="daxMainNetworkStep1OwnedCtaText">Augen auf!&lt;br/&gt;&lt;br/&gt; %s gehört %s, das ein großes Tracking-Netzwerk betreibt.</string>
+    <string name="daxMainNetworkStep1CtaText">Aufgepasst!&lt;br/&gt;&lt;br/&gt; %s betreibt ein großes Tracking-Netzwerk.&lt;br/&gt;&lt;br/&gt;Eine niedriger Datenschutzstufe weist Sie darauf hin.</string>
+    <string name="daxMainNetworkStep1OwnedCtaText">Aufgepasst!&lt;br/&gt;&lt;br/&gt; %s gehört zu %s, das ein großes Tracking-Netzwerk betreibt.</string>
     <string name="daxMainNetworkStep21CtaText">Tatsächlich lauern %s Tracker auf ungefähr %s der Top-Sites. &#128561;&lt;br/&gt;&lt;br/&gt;</string>
     <string name="daxMainNetworkStep211CtaText">Tatsächlich lauern %s Tracker im ganzen Internet. &#128561;&lt;br/&gt;&lt;br/&gt;</string>
     <string name="daxMainNetworkStep2CtaText">%s Ich blockiere diese Tracker, wenn Sie Websites durchsuchen, die nicht zu %s gehören.</string>
     <plurals name="daxTrackersBlockedCtaText">
-        <item quantity="one">&#160;und &lt;b&gt;%d andere&lt;/b&gt; haben versucht, Sie hier zu verfolgen. &lt;br/&gt;&lt;br/&gt;Ich habe sie blockiert!&lt;br/&gt;&lt;br/&gt; ☝️Sie können in der URL-Leiste überprüfen, wer versucht, Sie zu verfolgen, wenn Sie eine neue Website besuchen.</item>
-        <item quantity="other">&#160;und &lt;b&gt;%d andere&lt;/b&gt; haben versucht, Sie hier zu verfolgen. &lt;br/&gt;&lt;br/&gt;Ich habe sie blockiert!&lt;br/&gt;&lt;br/&gt; ☝️Sie können in der URL-Leiste überprüfen, wer versucht, Sie zu verfolgen, wenn Sie eine neue Website besuchen.</item>
+        <item quantity="one">&#160;und &lt;b&gt;%d andere&lt;/b&gt; haben versucht, Sie hier zu tracken. &lt;br/&gt;&lt;br/&gt;Ich habe sie blockiert!&lt;br/&gt;&lt;br/&gt; ☝️Sie können in der URL-Leiste überprüfen, wer versucht, Sie zu tracken, wenn Sie eine neue Website besuchen.</item>
+        <item quantity="other">&#160;und &lt;b&gt;%d andere&lt;/b&gt; haben versucht, Sie hier zu tracken. &lt;br/&gt;&lt;br/&gt;Ich habe sie blockiert!&lt;br/&gt;&lt;br/&gt; ☝️Sie können in der URL-Leiste überprüfen, wer versucht, Sie zu tracken, wenn Sie eine neue Website besuchen.</item>
     </plurals>
-    <string name="daxTrackersBlockedCtaZeroText">&#160;hat versucht, Sie hier zu verfolgen. &lt;br/&gt;&lt;br/&gt;Ich habe es blockiert!&lt;br/&gt;&lt;br/&gt; ☝️Sie können in der URL-Leiste überprüfen, wer versucht, Sie zu verfolgen, wenn Sie eine neue Website besuchen.</string>
+    <string name="daxTrackersBlockedCtaZeroText">&#160;hat versucht, Sie hier zu tracken. &lt;br/&gt;&lt;br/&gt;Ich habe das blockiert!&lt;br/&gt;&lt;br/&gt; ☝️Sie können in der URL-Leiste überprüfen, wer versucht, Sie zu tracken, wenn Sie eine neue Website besuchen.</string>
 
     <!-- Covid Cta-->
     <string name="covidCtaText">Offizielle COVID-19 Infos &amp; Tipps.</string>
