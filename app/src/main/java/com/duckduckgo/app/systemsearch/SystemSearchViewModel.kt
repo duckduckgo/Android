@@ -89,6 +89,7 @@ class SystemSearchViewModel(
     private fun currentResultsState(): SystemSearchResultsViewState = resultsViewState.value!!
 
     fun resetViewState() {
+        command.value = Command.ClearInputText
         viewModelScope.launch {
             resetOnboardingState()
         }
