@@ -40,7 +40,7 @@ import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
 
-typealias SystemSearchResult = Pair<AutoCompleteResult, List<DeviceApp>>
+data class SystemSearchResult(val autocomplete: AutoCompleteResult, val deviceApps: List<DeviceApp>)
 
 class SystemSearchViewModel(
     private var userStageStore: UserStageStore,
@@ -163,8 +163,8 @@ class SystemSearchViewModel(
     private fun updateResults(results: SystemSearchResult) {
         this.results = results
 
-        val suggestions = results.first.suggestions
-        val appResults = results.second
+        val suggestions = results.autocomplete.suggestions
+        val appResults = results.deviceApps
         val hasMultiResults = suggestions.isNotEmpty() && appResults.isNotEmpty()
 
         val updatedSuggestions = if (hasMultiResults) suggestions.take(RESULTS_MAX_RESULTS_PER_GROUP) else suggestions
@@ -172,7 +172,7 @@ class SystemSearchViewModel(
 
         resultsViewState.postValue(
             currentResultsState().copy(
-                autocompleteResults = AutoCompleteResult(results.first.query, updatedSuggestions),
+                autocompleteResults = AutoCompleteResult(results.autocomplete.query, updatedSuggestions),
                 appResults = updatedApps
             )
         )
