@@ -23,42 +23,20 @@ import android.annotation.SuppressLint
 import android.app.Activity.RESULT_OK
 import android.app.ActivityOptions
 import android.appwidget.AppWidgetManager
-import android.content.ClipData
-import android.content.ClipboardManager
-import android.content.ComponentName
-import android.content.Context
-import android.content.Intent
+import android.content.*
 import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.media.MediaScannerConnection
 import android.net.Uri
-import android.os.Build
-import android.os.Bundle
-import android.os.Environment
-import android.os.Handler
-import android.os.Message
+import android.os.*
 import android.text.Editable
-import android.view.ContextMenu
-import android.view.KeyEvent
-import android.view.LayoutInflater
-import android.view.MenuItem
-import android.view.View
-import android.view.View.GONE
-import android.view.View.OnFocusChangeListener
-import android.view.View.VISIBLE
-import android.view.View.inflate
-import android.view.ViewGroup
+import android.view.*
+import android.view.View.*
 import android.view.inputmethod.EditorInfo
-import android.webkit.ValueCallback
-import android.webkit.WebChromeClient
-import android.webkit.WebSettings
-import android.webkit.WebView
+import android.webkit.*
 import android.webkit.WebView.FindListener
 import android.webkit.WebView.HitTestResult
-import android.webkit.WebView.HitTestResult.IMAGE_TYPE
-import android.webkit.WebView.HitTestResult.SRC_IMAGE_ANCHOR_TYPE
-import android.webkit.WebView.HitTestResult.UNKNOWN_TYPE
-import android.webkit.WebViewDatabase
+import android.webkit.WebView.HitTestResult.*
 import android.widget.EditText
 import android.widget.TextView
 import androidx.annotation.AnyThread
@@ -73,29 +51,17 @@ import androidx.core.view.isVisible
 import androidx.core.view.postDelayed
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleObserver
-import androidx.lifecycle.Observer
-import androidx.lifecycle.OnLifecycleEvent
-import androidx.lifecycle.ViewModelProviders
+import androidx.lifecycle.*
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion
 import com.duckduckgo.app.bookmarks.ui.EditBookmarkDialogFragment
 import com.duckduckgo.app.brokensite.BrokenSiteActivity
-import com.duckduckgo.app.browser.BrowserTabViewModel.AutoCompleteViewState
-import com.duckduckgo.app.browser.BrowserTabViewModel.BrowserViewState
-import com.duckduckgo.app.browser.BrowserTabViewModel.Command
-import com.duckduckgo.app.browser.BrowserTabViewModel.CtaViewState
-import com.duckduckgo.app.browser.BrowserTabViewModel.FindInPageViewState
-import com.duckduckgo.app.browser.BrowserTabViewModel.GlobalLayoutViewState
-import com.duckduckgo.app.browser.BrowserTabViewModel.LoadingViewState
-import com.duckduckgo.app.browser.BrowserTabViewModel.OmnibarViewState
+import com.duckduckgo.app.browser.BrowserTabViewModel.*
 import com.duckduckgo.app.browser.autocomplete.BrowserAutoCompleteSuggestionsAdapter
 import com.duckduckgo.app.browser.downloader.FileDownloadNotificationManager
 import com.duckduckgo.app.browser.downloader.FileDownloader
+import com.duckduckgo.app.browser.downloader.FileDownloader.FileDownloadListener
 import com.duckduckgo.app.browser.downloader.FileDownloader.PendingFileDownload
-import com.duckduckgo.app.browser.downloader.NetworkFileDownloadManager.DownloadFileData
-import com.duckduckgo.app.browser.downloader.NetworkFileDownloadManager.UserDownloadAction
 import com.duckduckgo.app.browser.filechooser.FileChooserIntentBuilder
 import com.duckduckgo.app.browser.model.BasicAuthenticationCredentials
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
@@ -111,17 +77,7 @@ import com.duckduckgo.app.browser.useragent.UserAgentProvider
 import com.duckduckgo.app.cta.ui.*
 import com.duckduckgo.app.global.ViewModelFactory
 import com.duckduckgo.app.global.device.DeviceInfo
-import com.duckduckgo.app.global.view.NonDismissibleBehavior
-import com.duckduckgo.app.global.view.TextChangedWatcher
-import com.duckduckgo.app.global.view.gone
-import com.duckduckgo.app.global.view.hide
-import com.duckduckgo.app.global.view.hideKeyboard
-import com.duckduckgo.app.global.view.isDifferent
-import com.duckduckgo.app.global.view.isImmersiveModeEnabled
-import com.duckduckgo.app.global.view.renderIfChanged
-import com.duckduckgo.app.global.view.show
-import com.duckduckgo.app.global.view.showKeyboard
-import com.duckduckgo.app.global.view.toggleFullScreen
+import com.duckduckgo.app.global.view.*
 import com.duckduckgo.app.privacy.model.PrivacyGrade
 import com.duckduckgo.app.privacy.renderer.icon
 import com.duckduckgo.app.privacy.store.PrivacySettingsStore
@@ -144,14 +100,7 @@ import kotlinx.android.synthetic.main.include_omnibar_toolbar.*
 import kotlinx.android.synthetic.main.include_omnibar_toolbar.view.*
 import kotlinx.android.synthetic.main.include_top_cta.view.*
 import kotlinx.android.synthetic.main.popup_window_browser_menu.view.*
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
 import org.jetbrains.anko.longToast
 import org.jetbrains.anko.share
 import timber.log.Timber
@@ -296,6 +245,14 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         renderer = BrowserTabFragmentRenderer()
+        if (savedInstanceState != null) {
+            updateFragmentListener()
+        }
+    }
+
+    private fun updateFragmentListener() {
+        val fragment = fragmentManager?.findFragmentByTag(DOWNLOAD_CONFIRMATION_TAG) as? DownloadConfirmationFragment
+        fragment?.downloadListener = createDownloadListener()
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -387,7 +344,13 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
     override fun onPause() {
         daxDialog = null
         logoHidingListener.onPause()
+        dismissDownloadFragment()
         super.onPause()
+    }
+
+    private fun dismissDownloadFragment() {
+        val fragment = fragmentManager?.findFragmentByTag(DOWNLOAD_CONFIRMATION_TAG) as? DownloadConfirmationFragment
+        fragment?.dismiss()
     }
 
     private fun createPopupMenu() {
@@ -561,7 +524,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
                     )
                 )
             }
-            is Command.DownloadImage -> requestImageDownload(it.url)
+            is Command.DownloadImage -> requestImageDownload(it.url, it.requestUserConfirmation)
             is Command.FindInPageCommand -> webView?.findAllAsync(it.searchTerm)
             is Command.DismissFindInPage -> webView?.findAllAsync("")
             is Command.ShareLink -> launchSharePageChooser(it.url)
@@ -865,7 +828,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
             }
 
             it.setDownloadListener { url, _, contentDisposition, mimeType, _ ->
-                requestFileDownload(url, contentDisposition, mimeType)
+                requestFileDownload(url, contentDisposition, mimeType, true)
             }
 
             it.setOnTouchListener { _, _ ->
@@ -1067,7 +1030,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
         webView = null
     }
 
-    private fun requestFileDownload(url: String, contentDisposition: String, mimeType: String) {
+    private fun requestFileDownload(url: String, contentDisposition: String, mimeType: String, requestUserConfirmation: Boolean) {
         pendingFileDownload = PendingFileDownload(
             url = url,
             contentDisposition = contentDisposition,
@@ -1076,55 +1039,72 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
             subfolder = Environment.DIRECTORY_DOWNLOADS
         )
 
-        downloadFileWithPermissionCheck()
+        if (hasWriteStoragePermission()) {
+            downloadFile(requestUserConfirmation)
+        } else {
+            requestWriteStoragePermission()
+        }
     }
 
-    private fun requestImageDownload(url: String) {
+    private fun requestImageDownload(url: String, requestUserConfirmation: Boolean) {
         pendingFileDownload = PendingFileDownload(
             url = url,
             userAgent = userAgentProvider.getUserAgent(),
             subfolder = Environment.DIRECTORY_PICTURES
         )
 
-        downloadFileWithPermissionCheck()
-    }
-
-    private fun downloadFileWithPermissionCheck() {
         if (hasWriteStoragePermission()) {
-            downloadFile()
+            downloadFile(requestUserConfirmation)
         } else {
             requestWriteStoragePermission()
         }
     }
 
     @AnyThread
-    private fun downloadFile() {
+    private fun downloadFile(requestUserConfirmation: Boolean) {
         val pendingDownload = pendingFileDownload
         pendingFileDownload = null
+
+        if (pendingDownload == null) {
+            return
+        }
+
+        val downloadListener = createDownloadListener()
+        if (requestUserConfirmation) {
+            requestDownloadConfirmation(pendingDownload, downloadListener)
+        } else {
+            completeDownload(pendingDownload, downloadListener)
+        }
+    }
+
+    private fun createDownloadListener(): FileDownloadListener {
+        return object : FileDownloadListener {
+            override fun downloadStarted() {
+                fileDownloadNotificationManager.showDownloadInProgressNotification()
+            }
+
+            override fun downloadFinished(file: File, mimeType: String?) {
+                MediaScannerConnection.scanFile(context, arrayOf(file.absolutePath), null) { _, uri ->
+                    fileDownloadNotificationManager.showDownloadFinishedNotification(file.name, uri, mimeType)
+                }
+            }
+
+            override fun downloadFailed(message: String) {
+                Timber.w("Failed to download file [$message]")
+                fileDownloadNotificationManager.showDownloadFailedNotification()
+            }
+        }
+    }
+
+    private fun requestDownloadConfirmation(pendingDownload: PendingFileDownload, downloadListener: FileDownloadListener) {
+        fragmentManager?.let {
+            DownloadConfirmationFragment.instance(pendingDownload, downloadListener).show(it, DOWNLOAD_CONFIRMATION_TAG)
+        }
+    }
+
+    private fun completeDownload(pendingDownload: PendingFileDownload, callback: FileDownloadListener) {
         thread {
-            fileDownloader.download(pendingDownload, object : FileDownloader.FileDownloadListener {
-                override fun confirmDownload(downloadFileData: DownloadFileData, userDownloadAction: UserDownloadAction) {
-                    val downloadConfirmationFragment = DownloadConfirmationFragment(downloadFileData, userDownloadAction)
-                    fragmentManager?.let {
-                        downloadConfirmationFragment.show(it, DOWNLAOD_CONFIRM_TAG)
-                    }
-                }
-
-                override fun downloadStarted() {
-                    fileDownloadNotificationManager.showDownloadInProgressNotification()
-                }
-
-                override fun downloadFinished(file: File, mimeType: String?) {
-                    MediaScannerConnection.scanFile(context, arrayOf(file.absolutePath), null) { _, uri ->
-                        fileDownloadNotificationManager.showDownloadFinishedNotification(file.name, uri, mimeType)
-                    }
-                }
-
-                override fun downloadFailed(message: String) {
-                    Timber.w("Failed to download file [$message]")
-                    fileDownloadNotificationManager.showDownloadFailedNotification()
-                }
-            })
+            fileDownloader.download(pendingDownload, callback)
         }
     }
 
@@ -1147,7 +1127,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
         if (requestCode == PERMISSION_REQUEST_WRITE_EXTERNAL_STORAGE) {
             if ((grantResults.isNotEmpty()) && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 Timber.i("Write external storage permission granted")
-                downloadFile()
+                downloadFile(requestUserConfirmation = false)
             } else {
                 Timber.i("Write external storage permission refused")
                 Snackbar.make(toolbar, R.string.permissionRequiredToDownload, Snackbar.LENGTH_LONG).show()
@@ -1189,7 +1169,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
         private const val URL_BUNDLE_KEY = "url"
 
         private const val AUTHENTICATION_DIALOG_TAG = "AUTH_DIALOG_TAG"
-        private const val DOWNLAOD_CONFIRM_TAG = "DOWNLAOD_CONFIRM_TAG"
+        private const val DOWNLOAD_CONFIRMATION_TAG = "DOWNLOAD_CONFIRMATION_TAG"
         private const val DAX_DIALOG_DIALOG_TAG = "DAX_DIALOG_TAG"
 
         private const val MAX_PROGRESS = 100
