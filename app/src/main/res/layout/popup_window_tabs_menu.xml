@@ -17,10 +17,10 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="?attr/colorPrimary"
     android:orientation="vertical"
     android:paddingTop="13dp"
-    android:paddingBottom="20dp">
+    android:paddingBottom="20dp"
+    android:background="@drawable/popup_menu_bg">
 
     <TextView
         android:id="@+id/closeAllTabs"

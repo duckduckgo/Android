@@ -778,6 +778,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
                 if (!hasFocus) {
                     omnibarTextInput.hideKeyboard()
                     focusDummy.requestFocus()
+                    decorator.updateBottomBarVisibility(hasFocus)
                 }
             }
 
