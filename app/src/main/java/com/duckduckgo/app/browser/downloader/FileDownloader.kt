@@ -30,12 +30,7 @@ class FileDownloader @Inject constructor(
 ) {
 
     @WorkerThread
-    fun download(pending: PendingFileDownload?, callback: FileDownloadListener) {
-
-        if (pending == null) {
-            return
-        }
-
+    fun download(pending: PendingFileDownload, callback: FileDownloadListener) {
         when {
             pending.isNetworkUrl -> networkFileDownloader.download(pending)
             pending.isDataUrl -> dataUriDownloader.download(pending, callback)
@@ -61,7 +56,7 @@ class FileDownloader @Inject constructor(
 
 fun FileDownloader.PendingFileDownload.guessFileName(): String {
     val guessedFileName = URLUtil.guessFileName(url, contentDisposition, mimeType)
-    Timber.i("Guessed filename of $guessedFileName for url ${url}")
+    Timber.i("Guessed filename of $guessedFileName for url $url")
     return guessedFileName
 }
 

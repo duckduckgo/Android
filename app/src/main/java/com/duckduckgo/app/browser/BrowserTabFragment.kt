@@ -1152,7 +1152,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
         }
     }
 
-    private fun completeDownload(pendingDownload: PendingFileDownload?, callback: FileDownloadListener) {
+    private fun completeDownload(pendingDownload: PendingFileDownload, callback: FileDownloadListener) {
         thread {
             fileDownloader.download(pendingDownload, callback)
         }

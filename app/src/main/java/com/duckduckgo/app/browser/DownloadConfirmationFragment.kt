@@ -48,7 +48,9 @@ class DownloadConfirmationFragment : BottomSheetDialogFragment() {
 
     lateinit var downloadListener: FileDownloadListener
 
-    private lateinit var pendingDownload: PendingFileDownload
+    private val pendingDownload: PendingFileDownload by lazy {
+        arguments!![PENDING_DOWNLOAD_BUNDLE_KEY] as PendingFileDownload
+    }
 
     private var file: File? = null
 
@@ -65,7 +67,6 @@ class DownloadConfirmationFragment : BottomSheetDialogFragment() {
     }
 
     private fun setupDownload() {
-        pendingDownload = arguments!![PENDING_DOWNLOAD_BUNDLE_KEY] as PendingFileDownload
         file = if (!pendingDownload.isDataUrl) File(pendingDownload.directory, pendingDownload.guessFileName()) else null
     }
 
@@ -110,7 +111,7 @@ class DownloadConfirmationFragment : BottomSheetDialogFragment() {
         }
     }
 
-    private fun completeDownload(pendingDownload: PendingFileDownload?, callback: FileDownloadListener) {
+    private fun completeDownload(pendingDownload: PendingFileDownload, callback: FileDownloadListener) {
         thread {
             downloader.download(pendingDownload, callback)
         }
