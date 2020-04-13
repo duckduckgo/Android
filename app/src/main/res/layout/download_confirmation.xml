@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright (c) 2020 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/white"
+    app:layout_behavior="@string/bottom_sheet_behavior">
+
+
+    <TextView
+        android:id="@+id/downloadMessage"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="sans-serif"
+        android:paddingStart="24dp"
+        android:paddingTop="17dp"
+        android:paddingEnd="24dp"
+        android:textColor="@color/grayishTwo"
+        android:textSize="16sp"
+        android:textStyle="normal"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="Save sample-file.pdf ?" />
+
+
+    <LinearLayout
+        android:id="@+id/downloadActions"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintTop_toBottomOf="@id/downloadMessage">
+
+        <TextView
+            android:id="@+id/openWith"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="?attr/selectableItemBackground"
+            android:drawableStart="@drawable/ic_open_brownish_24dp"
+            android:drawablePadding="24dp"
+            android:fontFamily="sans-serif"
+            android:paddingStart="24dp"
+            android:paddingTop="24dp"
+            android:paddingEnd="24dp"
+            android:paddingBottom="17dp"
+            android:text="@string/downloadConfirmationOpenFileText"
+            android:textColor="@color/brownishGray"
+            android:textSize="16sp"
+            android:textStyle="normal"
+            android:visibility="gone" />
+
+        <TextView
+            android:id="@+id/replace"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="?attr/selectableItemBackground"
+            android:drawableStart="@drawable/ic_replace_brownish_24dp"
+            android:drawablePadding="24dp"
+            android:fontFamily="sans-serif"
+            android:paddingStart="24dp"
+            android:paddingTop="24dp"
+            android:paddingEnd="24dp"
+            android:paddingBottom="17dp"
+            android:text="@string/downloadConfirmationReplaceOldFileText"
+            android:textColor="@color/brownishGray"
+            android:textSize="16sp"
+            android:textStyle="normal"
+            android:visibility="gone" />
+
+        <TextView
+            android:id="@+id/continueDownload"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="?attr/selectableItemBackground"
+            android:drawableStart="@drawable/ic_file_brownish_24dp"
+            android:drawablePadding="24dp"
+            android:fontFamily="sans-serif"
+            android:paddingStart="24dp"
+            android:paddingTop="24dp"
+            android:paddingEnd="24dp"
+            android:paddingBottom="17dp"
+            android:text="@string/downloadConfirmationContinue"
+            android:textColor="@color/brownishGray"
+            android:textSize="16sp"
+            android:textStyle="normal" />
+
+        <TextView
+            android:id="@+id/cancel"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="?attr/selectableItemBackground"
+            android:drawableStart="@drawable/ic_cancel_brownish_24dp"
+            android:drawablePadding="24dp"
+            android:fontFamily="sans-serif"
+            android:paddingStart="24dp"
+            android:paddingTop="17dp"
+            android:paddingEnd="24dp"
+            android:paddingBottom="24dp"
+            android:text="@string/fireCancel"
+            android:textColor="@color/brownishGray"
+            android:textSize="16sp"
+            android:textStyle="normal"
+            tools:ignore="UnusedAttribute" />
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
