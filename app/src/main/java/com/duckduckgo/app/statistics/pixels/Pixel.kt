@@ -170,7 +170,15 @@ interface Pixel {
         QUICK_SEARCH_PROMPT_NOTIFICATION_REMOVE("m_qs_pn_r"),
         QUICK_SEARCH_NOTIFICATION_ENABLED("m_qs_sn_e"),
         QUICK_SEARCH_NOTIFICATION_DISABLED("m_qs_sn_d"),
-        QUICK_SEARCH_NOTIFICATION_LAUNCHED("m_qs_sn_l")
+        QUICK_SEARCH_NOTIFICATION_LAUNCHED("m_qs_sn_l"),
+
+        MENU_ACTION_POPUP_OPENED("m_a_p_o_%s"),
+        MENU_ACTION_FIRE_PRESSED("m_a_f_p_%s"),
+        MENU_ACTION_REFRESH_PRESSED("m_a_r_p_%s"),
+        MENU_ACTION_NEW_TAB_PRESSED("m_a_nt_p_%s"),
+        MENU_ACTION_BOOKMARKS_PRESSED("m_a_b_p_%s"),
+        MENU_ACTION_SEARCH_PRESSED("m_a_s_p_%s")
+
     }
 
     object PixelParameter {

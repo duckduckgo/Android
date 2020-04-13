@@ -114,6 +114,7 @@ import com.duckduckgo.app.cta.ui.DaxDialogCta
 import com.duckduckgo.app.cta.ui.HomePanelCta
 import com.duckduckgo.app.cta.ui.HomeTopPanelCta
 import com.duckduckgo.app.cta.ui.SecondaryButtonCta
+import com.duckduckgo.app.feedback.api.FireAndForgetFeedbackSubmitter
 import com.duckduckgo.app.global.ViewModelFactory
 import com.duckduckgo.app.global.device.DeviceInfo
 import com.duckduckgo.app.global.view.*
@@ -175,6 +176,7 @@ import org.jetbrains.anko.longToast
 import org.jetbrains.anko.share
 import timber.log.Timber
 import java.io.File
+import java.util.Locale
 import javax.inject.Inject
 import kotlin.concurrent.thread
 import kotlin.coroutines.CoroutineContext
@@ -1241,9 +1243,18 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
             popupMenu.apply {
                 onMenuItemClicked(view.forwardPopupMenuItem) { viewModel.onUserPressedForward() }
                 onMenuItemClicked(view.backPopupMenuItem) { activity?.onBackPressed() }
-                onMenuItemClicked(view.refreshPopupMenuItem) { viewModel.onRefreshRequested() }
-                onMenuItemClicked(view.newTabPopupMenuItem) { viewModel.userRequestedOpeningNewTab() }
-                onMenuItemClicked(view.bookmarksPopupMenuItem) { browserActivity?.launchBookmarks() }
+                onMenuItemClicked(view.refreshPopupMenuItem) {
+                    viewModel.onRefreshRequested()
+                    pixel.fire(String.format(Locale.US, Pixel.PixelName.MENU_ACTION_REFRESH_PRESSED.pixelName, variantManager.getVariant()))
+                }
+                onMenuItemClicked(view.newTabPopupMenuItem) {
+                    viewModel.userRequestedOpeningNewTab()
+                    pixel.fire(String.format(Locale.US, Pixel.PixelName.MENU_ACTION_NEW_TAB_PRESSED.pixelName, variantManager.getVariant()))
+                }
+                onMenuItemClicked(view.bookmarksPopupMenuItem) {
+                    browserActivity?.launchBookmarks(),
+                    pixel.fire(String.format(Locale.US, Pixel.PixelName.MENU_ACTION_BOOKMARKS_PRESSED.pixelName, variantManager.getVariant()))
+                }
                 onMenuItemClicked(view.addBookmarksPopupMenuItem) { launch { viewModel.onBookmarkAddRequested() } }
                 onMenuItemClicked(view.findInPageMenuItem) { viewModel.onFindInPageSelected() }
                 onMenuItemClicked(view.brokenSitePopupMenuItem) { viewModel.onBrokenSiteSelected() }
@@ -1260,6 +1271,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
 
         private fun launchTopAnchoredPopupMenu() {
             popupMenu.show(rootView, toolbar)
+            pixel.fire(String.format(Locale.US, Pixel.PixelName.MENU_ACTION_POPUP_OPENED.pixelName, variantManager.getVariant()))
         }
 
         private fun createPopupMenuWithBottomBarExperiment() {
@@ -1282,6 +1294,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
 
         private fun launchBottomAnchoredPopupMenu() {
             popupMenu.show(rootView, bottomNavigationBar)
+            pixel.fire(String.format(Locale.US, Pixel.PixelName.MENU_ACTION_POPUP_OPENED.pixelName, variantManager.getVariant()))
         }
 
         private fun decorateBottomBarWithNavigationOnlyExperiment() {
@@ -1290,10 +1303,21 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
 
         private fun bindBottomBarButtons() {
             bottomNavigationBar.apply {
-                onItemClicked(bottomBarFireItem) { browserActivity?.launchFire() }
-                onItemClicked(bottomBarBookmarksItemOne) { browserActivity?.launchBookmarks() }
-                onItemClicked(bottomBarSearchItem) { omnibarTextInput.requestFocus() }
-                onItemClicked(bottomBarTabsItem) { viewModel.userLaunchingTabSwitcher() }
+                onItemClicked(bottomBarFireItem) {
+                    browserActivity?.launchFire()
+                    pixel.fire(String.format(Locale.US, Pixel.PixelName.MENU_ACTION_FIRE_PRESSED.pixelName, variantManager.getVariant()))
+                }
+                onItemClicked(bottomBarBookmarksItemOne) {
+                    browserActivity?.launchBookmarks()
+                    pixel.fire(String.format(Locale.US, Pixel.PixelName.MENU_ACTION_BOOKMARKS_PRESSED.pixelName, variantManager.getVariant()))
+                }
+                onItemClicked(bottomBarSearchItem) {
+                    omnibarTextInput.requestFocus()
+                    pixel.fire(String.format(Locale.US, Pixel.PixelName.MENU_ACTION_SEARCH_PRESSED.pixelName, variantManager.getVariant()))
+                }
+                onItemClicked(bottomBarTabsItem) {
+                    viewModel.userLaunchingTabSwitcher()
+                }
                 onItemClicked(bottomBarOverflowItem) {
                     hideKeyboardImmediately()
                     launchBottomAnchoredPopupMenu()
@@ -1301,9 +1325,9 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
             }
         }
 
-        fun updateBottomBarVisibility(shouldShow: Boolean){
-            if (isExperimentEnabled()){
-                if (shouldShow){
+        fun updateBottomBarVisibility(shouldShow: Boolean) {
+            if (isExperimentEnabled()) {
+                if (shouldShow) {
                     showBottomBar()
                 } else {
                     hideBottomBar()
@@ -1516,7 +1540,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
         }
 
         private fun renderToolbarMenus(viewState: BrowserViewState) {
-            if (viewState.browserShowing){
+            if (viewState.browserShowing) {
                 privacyGradeButton?.isInvisible = !viewState.showPrivacyGrade
                 clearTextButton?.isVisible = viewState.showClearButton
                 searchIcon?.isVisible = viewState.showSearchIcon
