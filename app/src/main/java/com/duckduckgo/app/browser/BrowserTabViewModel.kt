@@ -493,7 +493,8 @@ class BrowserTabViewModel(
                 addToHomeVisible = addToHomeCapabilityDetector.isAddToHomeSupported(),
                 canSharePage = true,
                 showPrivacyGrade = true,
-                canReportSite = true
+                canReportSite = true,
+                showSearchIcon = false
             )
         )
 
