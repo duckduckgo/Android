@@ -1226,6 +1226,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
                 when (menuItem.itemId) {
                     R.id.fire -> {
                         browserActivity?.launchFire()
+                        pixel.fire(String.format(Locale.US, Pixel.PixelName.MENU_ACTION_FIRE_PRESSED.pixelName, variantManager.getVariant()))
                         return@setOnMenuItemClickListener true
                     }
                     else -> return@setOnMenuItemClickListener false
@@ -1252,7 +1253,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
                     pixel.fire(String.format(Locale.US, Pixel.PixelName.MENU_ACTION_NEW_TAB_PRESSED.pixelName, variantManager.getVariant()))
                 }
                 onMenuItemClicked(view.bookmarksPopupMenuItem) {
-                    browserActivity?.launchBookmarks(),
+                    browserActivity?.launchBookmarks()
                     pixel.fire(String.format(Locale.US, Pixel.PixelName.MENU_ACTION_BOOKMARKS_PRESSED.pixelName, variantManager.getVariant()))
                 }
                 onMenuItemClicked(view.addBookmarksPopupMenuItem) { launch { viewModel.onBookmarkAddRequested() } }
@@ -1280,7 +1281,8 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
             popupMenu.apply {
                 onMenuItemClicked(view.forwardPopupMenuItem) { viewModel.onUserPressedForward() }
                 onMenuItemClicked(view.backPopupMenuItem) { activity?.onBackPressed() }
-                onMenuItemClicked(view.refreshPopupMenuItem) { viewModel.onRefreshRequested() }
+                onMenuItemClicked(view.refreshPopupMenuItem) { viewModel.onRefreshRequested()
+                    pixel.fire(String.format(Locale.US, Pixel.PixelName.MENU_ACTION_REFRESH_PRESSED.pixelName, variantManager.getVariant()))}
                 onMenuItemClicked(view.sharePopupMenuItem) { viewModel.onShareSelected() }
                 onMenuItemClicked(view.newTabPopupMenuItem) { viewModel.userRequestedOpeningNewTab() }
                 onMenuItemClicked(view.addBookmarksPopupMenuItem) { launch { viewModel.onBookmarkAddRequested() } }
@@ -1358,6 +1360,8 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
         private fun configureLongClickOpensNewTabListenerWithToolbarOnlyExperiment() {
             tabsButton?.actionView?.setOnLongClickListener {
                 launch { viewModel.userRequestedOpeningNewTab() }
+
+
                 return@setOnLongClickListener true
             }
         }
