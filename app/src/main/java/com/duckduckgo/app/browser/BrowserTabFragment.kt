@@ -1281,8 +1281,10 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
             popupMenu.apply {
                 onMenuItemClicked(view.forwardPopupMenuItem) { viewModel.onUserPressedForward() }
                 onMenuItemClicked(view.backPopupMenuItem) { activity?.onBackPressed() }
-                onMenuItemClicked(view.refreshPopupMenuItem) { viewModel.onRefreshRequested()
-                    pixel.fire(String.format(Locale.US, Pixel.PixelName.MENU_ACTION_REFRESH_PRESSED.pixelName, variantManager.getVariant()))}
+                onMenuItemClicked(view.refreshPopupMenuItem) {
+                    viewModel.onRefreshRequested()
+                    pixel.fire(String.format(Locale.US, Pixel.PixelName.MENU_ACTION_REFRESH_PRESSED.pixelName, variantManager.getVariant()))
+                }
                 onMenuItemClicked(view.sharePopupMenuItem) { viewModel.onShareSelected() }
                 onMenuItemClicked(view.newTabPopupMenuItem) { viewModel.userRequestedOpeningNewTab() }
                 onMenuItemClicked(view.addBookmarksPopupMenuItem) { launch { viewModel.onBookmarkAddRequested() } }
@@ -1327,22 +1329,29 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
             }
         }
 
-        fun updateBottomBarVisibility(shouldShow: Boolean) {
+        fun updateBottomBarVisibility(shouldShow: Boolean, shouldAnimate: Boolean = false) {
             if (isExperimentEnabled()) {
                 if (shouldShow) {
-                    showBottomBar()
+                    showBottomBar(shouldAnimate)
                 } else {
-                    hideBottomBar()
+                    hideBottomBar(shouldAnimate)
                 }
             }
         }
 
-        private fun hideBottomBar() {
+        private fun hideBottomBar(shouldAnimate: Boolean = false) {
+            if (shouldAnimate){
+                bottomNavigationBar.animateBarVisibility(false)
+            }
+
             bottomNavigationBar.gone()
         }
 
-        private fun showBottomBar() {
+        private fun showBottomBar(shouldAnimate: Boolean) {
             bottomNavigationBar.show()
+            if (shouldAnimate){
+                bottomNavigationBar.animateBarVisibility(true)
+            }
         }
 
         private fun configureShowTabSwitcherListenerWithToolbarOnlyExperiment() {
@@ -1408,12 +1417,11 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
                 if (shouldUpdateOmnibarTextInput(viewState, viewState.omnibarText)) {
                     omnibarTextInput.setText(viewState.omnibarText)
                     appBarLayout.setExpanded(true, true)
+                    decorator.updateBottomBarVisibility(true, true)
                     if (viewState.shouldMoveCaretToEnd) {
                         omnibarTextInput.setSelection(viewState.omnibarText.length)
                     }
                 }
-
-                decorator.updateBottomBarVisibility(!viewState.isEditing)
             }
         }
 

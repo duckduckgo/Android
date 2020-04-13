@@ -40,6 +40,7 @@ class BottomNavigationBehavior<V : View>(context: Context, attrs: AttributeSet) 
         if (dependency is Snackbar.SnackbarLayout) {
             updateSnackbar(child, dependency)
         }
+
         return super.layoutDependsOn(parent, child, dependency)
     }
 

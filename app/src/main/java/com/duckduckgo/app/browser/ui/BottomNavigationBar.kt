@@ -16,10 +16,12 @@
 
 package com.duckduckgo.app.browser.ui
 
+import android.animation.ValueAnimator
 import android.content.Context
 import android.content.res.TypedArray
 import android.util.AttributeSet
 import android.view.View
+import android.view.animation.DecelerateInterpolator
 import android.widget.LinearLayout
 import com.duckduckgo.app.browser.R
 
@@ -55,5 +57,20 @@ class BottomNavigationBar : LinearLayout {
         view.setOnClickListener {
             onClick()
         }
+    }
+
+    fun animateBarVisibility(isVisible: Boolean) {
+        val offsetAnimator = ValueAnimator().apply {
+            interpolator = DecelerateInterpolator()
+            duration = 150L
+        }
+
+        offsetAnimator?.addUpdateListener {
+            translationY = it.animatedValue as Float
+        }
+
+        val targetTranslation = if (isVisible) 0f else height.toFloat()
+        offsetAnimator?.setFloatValues(translationY, targetTranslation)
+        offsetAnimator?.start()
     }
 }
