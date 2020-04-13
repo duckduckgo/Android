@@ -1,12 +1,11 @@
 ## DuckDuckGo Android Style Guide
 * We care about clean code and aim to make this codebase as self-documenting and readable as possible.
-* We've provided a coding style that can be imported into Android Studio.
 * We primarily use Kotlin and follow coding conventions based on the [Android Kotlin Style Guide](https://developer.android.com/kotlin/style-guide)
 * There may be instances of code that pre-dates our use of this style guide, these can be refactored as we encounter them.
 
 ###  Android Studio Setup
 
-It is possible to get Android Studio to adhere to these style guidelines, via a rather complex sequence of menus. To make it easier, we've provided a coding style that can be imported into Android Studio.
+We've provided a coding style that can be imported into Android Studio.
 The file can be found [here](ddg-settings.zip).
 
 * From Android Studio click on File -> Import Settings
