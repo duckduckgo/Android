@@ -161,8 +161,6 @@ import kotlinx.android.synthetic.main.layout_browser_bottom_navigation_bar.botto
 import kotlinx.android.synthetic.main.layout_browser_bottom_navigation_bar.bottomBarOverflowItem
 import kotlinx.android.synthetic.main.layout_browser_bottom_navigation_bar.bottomBarSearchItem
 import kotlinx.android.synthetic.main.layout_browser_bottom_navigation_bar.bottomBarTabsItem
-import kotlinx.android.synthetic.main.layout_browser_bottom_navigation_bar.bottomBarFireItem
-import kotlinx.android.synthetic.main.layout_browser_bottom_navigation_bar.bottomBarTabsItem
 import kotlinx.android.synthetic.main.popup_window_browser_bottom_tab_menu.view.sharePopupMenuItem
 import kotlinx.android.synthetic.main.popup_window_browser_menu.view.*
 import kotlinx.coroutines.CoroutineScope
@@ -1441,7 +1439,6 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
             networksContainer.alpha = 0f
             clearTextButton.alpha = 1f
             omnibarTextInput.alpha = 1f
-            privacyGradeButton.alpha = 1f
         }
 
         private fun omnibarViews(): List<View> = listOf(clearTextButton, omnibarTextInput, privacyGradeButton)
@@ -1487,7 +1484,6 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
                 renderToolbarMenus(viewState)
                 renderPopupMenus(browserShowing, viewState)
                 renderFullscreenMode(viewState)
-
             }
         }
 
