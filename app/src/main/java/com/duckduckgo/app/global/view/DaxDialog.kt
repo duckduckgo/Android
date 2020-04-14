@@ -17,7 +17,6 @@
 package com.duckduckgo.app.global.view
 
 import android.app.Dialog
-import android.content.Context
 import android.content.DialogInterface
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
@@ -36,6 +35,7 @@ interface DaxDialog {
     fun setButtonText(buttonText: String)
     fun setDialogAndStartAnimation()
     fun getDaxDialog(): DialogFragment
+    fun setDaxDialogListener(listener: DaxDialogListener)
 }
 
 interface DaxDialogListener {
@@ -55,12 +55,8 @@ class TypewriterDaxDialog : DialogFragment(), DaxDialog {
 
     private var daxDialogListener: DaxDialogListener? = null
 
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-        daxDialogListener = context as? DaxDialogListener
-        if (daxDialogListener == null) {
-            throw ClassCastException("$context must implement DaxDialogListeners")
-        }
+    override fun setDaxDialogListener(listener: DaxDialogListener) {
+        daxDialogListener = listener
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? =
@@ -121,6 +117,7 @@ class TypewriterDaxDialog : DialogFragment(), DaxDialog {
             dialogText?.cancelAnimation()
             daxDialogListener?.onDaxDialogDismiss()
         }
+        daxDialogListener = null
         super.onDismiss(dialog)
     }
 

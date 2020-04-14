@@ -109,7 +109,7 @@ import javax.inject.Inject
 import kotlin.concurrent.thread
 import kotlin.coroutines.CoroutineContext
 
-class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
+class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogListener {
 
     private val supervisorJob = SupervisorJob()
 
@@ -1176,15 +1176,15 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
         }
     }
 
-    fun onDaxDialogDismiss() {
+    override fun onDaxDialogDismiss() {
         viewModel.onDaxDialogDismissed()
     }
 
-    fun onDaxDialogHideClick() {
+    override fun onDaxDialogHideClick() {
         viewModel.onUserHideDaxDialog()
     }
 
-    fun onDaxDialogPrimaryCtaClick() {
+    override fun onDaxDialogPrimaryCtaClick() {
         viewModel.onUserClickCtaOkButton()
     }
 
@@ -1475,10 +1475,13 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
             hideHomeCta()
             hideDaxCta()
             activity?.let { activity ->
-                if (getDaxDialogFromActivity() != null) {
+                val daxDialog = getDaxDialogFromActivity()
+                if (daxDialog != null) {
+                    (daxDialog as DaxDialog).setDaxDialogListener(this@BrowserTabFragment)
                     return
                 }
                 configuration.createCta(activity).apply {
+                    setDaxDialogListener(this@BrowserTabFragment)
                     getDaxDialog().show(activity.supportFragmentManager, DAX_DIALOG_DIALOG_TAG)
                 }
             }

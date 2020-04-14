@@ -17,7 +17,6 @@
 package com.duckduckgo.app.browser
 
 import android.annotation.SuppressLint
-import android.app.ActivityOptions
 import android.content.Context
 import android.content.Intent
 import android.content.Intent.EXTRA_TEXT
@@ -27,7 +26,6 @@ import android.widget.Toast
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.Observer
 import com.duckduckgo.app.bookmarks.ui.BookmarksActivity
-import com.duckduckgo.app.brokensite.BrokenSiteActivity
 import com.duckduckgo.app.browser.BrowserViewModel.Command
 import com.duckduckgo.app.browser.BrowserViewModel.Command.Query
 import com.duckduckgo.app.browser.BrowserViewModel.Command.Refresh
@@ -52,7 +50,7 @@ import org.jetbrains.anko.longToast
 import timber.log.Timber
 import javax.inject.Inject
 
-class BrowserActivity : DuckDuckGoActivity(), DaxDialogListener, CoroutineScope by MainScope() {
+class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope() {
 
     @Inject
     lateinit var clearPersonalDataAction: ClearPersonalDataAction
@@ -255,18 +253,6 @@ class BrowserActivity : DuckDuckGoActivity(), DaxDialogListener, CoroutineScope 
             is Command.ShowAppFeedbackPrompt -> showAppEnjoymentPrompt(GiveFeedbackDialogFragment.create(command.promptCount, viewModel))
             is Command.LaunchFeedbackView -> startActivity(FeedbackActivity.intent(this))
         }
-    }
-
-    override fun onDaxDialogDismiss() {
-        currentTab?.onDaxDialogDismiss()
-    }
-
-    override fun onDaxDialogHideClick() {
-        currentTab?.onDaxDialogHideClick()
-    }
-
-    override fun onDaxDialogPrimaryCtaClick() {
-        currentTab?.onDaxDialogPrimaryCtaClick()
     }
 
     private fun launchNewSearch(intent: Intent): Boolean {
