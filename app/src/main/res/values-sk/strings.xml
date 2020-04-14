@@ -4,6 +4,7 @@
     <string name="duckDuckGoPrivacySimplified">Súkromie jednoducho.</string>
     <string name="yes">Áno</string>
     <string name="no">žiadny</string>
+    <string name="search">Vyhľadávať</string>
 
     <!-- Onboarding Activity -->
     <string name="onboardingDefaultBrowserDescription">Na automatické vyhľadávanie a prehliadanie s DuckDuckGo navštívte Nastavenia.</string>
@@ -385,7 +386,6 @@
     <string name="daxIntroCtaText">Nabudúce skúste navštíviť jeden z vašich obľúbených serverov! &lt;br/&gt;&lt;br/&gt;Zablokujeme sledovacie zariadenia, ktoré by vás mohli špehovať. V prípade potreby dokážeme tiež inovovať zabezpečenie vášho pripojenia. &#128274;</string>
     <string name="daxEndCtaText">Hotovo! &lt;br/&gt;&lt;br/&gt;Pamätajte: zakaždým, keď prehľadávate v našej aplikácii, divnej reklame pristrihávate krídla. &#128077;</string>
     <string name="daxSerpCtaText">Vaše vyhľadávanie v aplikácii DuckDuckGo je anonymné. Nikdy nebudeme uchovávať vašu históriu vyhľadávania. Nikdy. &#128588;</string>
-    <string name="daxNonSerpCtaText">Každá stránka má vlastný stupeň ochrany osobných údajov. Ťuknutím na túto ikonu zobrazíte informácie o tom, ako sme chránili vaše súkromie.&lt;br/&gt;&lt;br/&gt;Chcete sa zabávať? Skúste vymazať svoje údaje stlačením spúšťacieho tlačidla.</string>
     <plurals name="daxTrackersBlockedCtaText">
         <item quantity="one">&#160;a &lt;b&gt;%d ďalší&lt;/b&gt; sa vás tu pokúsil sledovať. &lt;br/&gt;&lt;br/&gt;Zablokovali sme ich!&lt;br/&gt;&lt;br/&gt; ☝️Skontrolujte si panel s URL adresou a zistite, kto sa vás snaží sledovať pri vašej návšteve novej stránky.️</item>
         <item quantity="few">&#160;a &lt;b&gt;%d ďalších&lt;/b&gt; sa vás tu pokúsilo sledovať. &lt;br/&gt;&lt;br/&gt;Zablokovali sme ich!&lt;br/&gt;&lt;br/&gt; ☝️Skontrolujte si panel s URL adresou a zistite, kto sa vás snaží sledovať pri vašej návšteve novej stránky.️</item>
@@ -393,6 +393,9 @@
         <item quantity="other">&#160;a &lt;b&gt;%d ďalší&lt;/b&gt; sa vás tu pokúsil sledovať. &lt;br/&gt;&lt;br/&gt;Zablokovali sme ich!&lt;br/&gt;&lt;br/&gt; ☝️Skontrolujte si panel s URL adresou a zistite, kto sa vás snaží sledovať pri vašej návšteve novej stránky.️</item>
     </plurals>
     <string name="daxTrackersBlockedCtaZeroText">&#160;sa vás tu snažil sledovať. &lt;br/&gt;&lt;br/&gt;Zablokovali sme ho!&lt;br/&gt;&lt;br/&gt; ☝️Skontrolujte si panel s URL adresou a zistite, kto sa vás snaží sledovať pri vašej návšteve novej stránky.️</string>
+    <string name="daxNonSerpCtaText">Počas toho, ako budeš ťukať a posúvať, zablokujem nepríjemné sledovacie zariadenia. &lt;br/&gt;&lt;br/&gt;Neprestávaj - pokračuj v prehľadávaní!</string>
+    <string name="daxMainNetworkOwnedCtaText">Hlavu hore! Vlastníkom %s je %s.Sledovatelia &lt;br/&gt;&lt;br/&gt; %s číhajú na %s najobľúbenejších weboch &#128561;, ale nemaj strach! &lt;br/&gt;&lt;br/&gt;Zablokujem %s, aby niekto pozoroval tvoje aktivity na týchto stránkach.</string>
+    <string name="daxMainNetworkCtaText">Hlavu hore! %s je hlavná sledovacia sieť.&lt;br/&gt;&lt;br/&gt; Ich sledovatelia číhajú na %s najobľúbenejších weboch &#128561;, ale nemaj strach! &lt;br/&gt;&lt;br/&gt;Zablokujem %s, aby niekto pozoroval tvoje aktivity na týchto stránkach.</string>
 
     <!-- Covid Cta-->
     <string name="covidCtaText">Získajte oficiálne informácie a tipy ohľadom COVID-19.</string>

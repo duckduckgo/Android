@@ -20,6 +20,7 @@
     <string name="duckDuckGoPrivacySimplified">Privaatsus lihtsustatud kujul.</string>
     <string name="yes">Jah</string>
     <string name="no">Ei</string>
+    <string name="search">Otsing</string>
 
     <!-- Onboarding Activity -->
     <string name="onboardingDefaultBrowserDescription">Avage sätted, et DuckDuckGo abil iga kord otsida ja sirvida.</string>
@@ -405,12 +406,14 @@
     <string name="daxIntroCtaText">Järgmisena proovige külastada ühte oma lemmiksaitidest! &lt;br/&gt;&lt;br/&gt;Mina aga blokeerin jälgijaid, et nad ei saaks teid luurata. Täiustan võimalusel ka teie ühenduse turvalisust. &#128274;</string>
     <string name="daxEndCtaText">Käpas! &lt;br/&gt;&lt;br/&gt;Pidage meeles: iga kord, kui minuga sirvite, kaotab jube reklaam tiivad. &#128077;</string>
     <string name="daxSerpCtaText">Teie DuckDuckGo otsingud on anonüümsed ja ma ei salvesta kunagi teie otsinguajalugu. Mitte kunagi. &#128588;</string>
-    <string name="daxNonSerpCtaText">Igal saidil on privaatsusklass. Puudutage seda, et näha, kuidas ma teie privaatsust kaitsesin.&lt;br/&gt;&lt;br/&gt;Tahate aga proovida midagi eriti peent? Proovige kustutada oma andmed, puudutades tule nuppu.</string>
     <plurals name="daxTrackersBlockedCtaText">
         <item quantity="one">&#160;ja &lt;b&gt;%d teine&lt;/b&gt; üritasid teid siin jälitada. &lt;br/&gt;&lt;br/&gt;Blokeerisin nad!&lt;br/&gt;&lt;br/&gt; ☝️Võite vaadata URL-i riba, et näha, kes üritab teid jälgida, kui külastate uut saiti.️</item>
         <item quantity="other">&#160;ja &lt;b&gt;%d teised&lt;/b&gt; üritasid teid siin jälitada. &lt;br/&gt;&lt;br/&gt;Blokeerisin nad!&lt;br/&gt;&lt;br/&gt; ☝️Võite vaadata URL-i riba, et näha, kes üritab teid jälgida, kui külastate uut saiti.️</item>
     </plurals>
     <string name="daxTrackersBlockedCtaZeroText">&#160;üritas teid siin jälitada. &lt;br/&gt;&lt;br/&gt;Blokeerisin selle!&lt;br/&gt;&lt;br/&gt; ☝️Võite vaadata URL-i riba, et näha, kes üritab teid jälgida, kui külastate uut saiti.️</string>
+    <string name="daxNonSerpCtaText">Kui puudutate ja kerite, siis mina blokeerin tüütud jälgijad. &lt;br/&gt;&lt;br/&gt;Edasi — jätkake sirvimist!</string>
+    <string name="daxMainNetworkOwnedCtaText">Ettevaatust! Ettevõtte %s omanik on %s.&lt;br/&gt;&lt;br/&gt; %s jälitajad varitsevad %s populaarseimatest veebisaitidest, &#128561; aga ärge muretsege!&lt;br/&gt;&lt;br/&gt;Hoolitsen selle eest, et %s teid nendel saitidel ei jälgiks.</string>
+    <string name="daxMainNetworkCtaText">Ettevaatust! %s on suur jälgimisvõrgustik.&lt;br/&gt;&lt;br/&gt; Nend jälitajad jälgivad teid %s populaarseimatest saitidest, &#128561; aga ärge muretsege!&lt;br/&gt;&lt;br/&gt;Hoolitsen selle eest, et %s teid nendel saitidel ei jälgiks.</string>
 
     <!-- Covid Cta-->
     <string name="covidCtaText">Hankige ametlikku teavet COVID-19 kohta ja näpunäiteid.</string>

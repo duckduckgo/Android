@@ -4,6 +4,7 @@
     <string name="duckDuckGoPrivacySimplified">Supaprastintas privatumas.</string>
     <string name="yes">Taip</string>
     <string name="no">Ne</string>
+    <string name="search">Paieška</string>
 
     <!-- Onboarding Activity -->
     <string name="onboardingDefaultBrowserDescription">Jei visada norite ieškoti ir naršyti naudojant „DuckDuckGo“, apsilankykite nustatymuose.</string>
@@ -388,7 +389,6 @@
     <string name="daxIntroCtaText">Toliau pabandykite apsilankyti viename mėgstamiausių tinklapių! &lt;br/&gt;&lt;br/&gt;Užblokuosiu sekimo įrenginius, kad jie negalėtų jūsų šnipinėti. Jei įmanoma, atnaujinsiu jūsų ryšio saugumą. &#128274;</string>
     <string name="daxEndCtaText">Atliktai! &lt;br/&gt;&lt;br/&gt;Įsidėmėkite: kiekvieną kartą, kai naršote su manimi, bauginantis skelbimas praranda galią. &#128077;</string>
     <string name="daxSerpCtaText">„DuckDuckGo“ paieškos yra anoniminės ir niekada nekaupiu jūsų paieškos istorijos. Niekada. &#128588;</string>
-    <string name="daxNonSerpCtaText">Kiekvienas tinklapis turi privatumo kategoriją. Bakstelėkite jį, kad pamatytumėte, kaip apsaugojau jūsų privatumą.&lt;br/&gt;&lt;br/&gt;Norite neatsilikti? Pabandykite išvalyti duomenis paspausdami suaktyvinimo mygtuką.</string>
     <plurals name="daxTrackersBlockedCtaText">
         <item quantity="one">&#160;ir &lt;b&gt;%d kiti&lt;/b&gt; bandė jus sekti čia. &lt;br/&gt;&lt;br/&gt;užblokavau juos!&lt;br/&gt;&lt;br/&gt; ☝️Galite patikrinti URL juostą ir sužinoti, kas bando jus sekti, kai lankotės naujame tinklapyje.️</item>
         <item quantity="few">&#160;ir &lt;b&gt;%d kiti&lt;/b&gt; bandė jus čia sekti. &lt;br/&gt;&lt;br/&gt;užblokavau juos!&lt;br/&gt;&lt;br/&gt; ☝️Galite patikrinti URL juostą ir sužinoti, kas bando jus sekti, kai lankotės naujame tinklapyje.️</item>
@@ -396,6 +396,9 @@
         <item quantity="other">&#160;ir &lt;b&gt;%d kiti&lt;/b&gt; bandė jus čia sekti. &lt;br/&gt;&lt;br/&gt;užblokavau juos!&lt;br/&gt;&lt;br/&gt; ☝️Galite patikrinti URL juostą ir sužinoti, kas bando jus sekti, kai lankotės naujame tinklapyje.️</item>
     </plurals>
     <string name="daxTrackersBlockedCtaZeroText">&#160;bandė jus susekti čia. &lt;br/&gt;&lt;br/&gt;užblokavau!&lt;br/&gt;&lt;br/&gt; ☝️Galite patikrinti URL juostą ir sužinoti, kas bando jus sekti, kai lankotės naujame tinklapyje.️</string>
+    <string name="daxNonSerpCtaText">Bakstelėjus ir slenkant, bus blokuojami įkyrūs sekimo įrenginiai. &lt;br/&gt;&lt;br/&gt;Pirmyn - naršykite toliau!</string>
+    <string name="daxMainNetworkOwnedCtaText">Būkite atidus! %s priklauso %s.&lt;br/&gt;&lt;br/&gt; %s stebėtojai tyko %s populiariausiuose tinklapiuose &#128561;, bet nesijaudinkite! &lt;br/&gt;&lt;br/&gt;Blokuosiu %s sekimą tuose tinklapiuose.</string>
+    <string name="daxMainNetworkCtaText">Būkite atidus! %s yra pagrindinis sekimo tinklas.&lt;br/&gt;&lt;br/&gt; stebėtojai tyko %s populiariausiuose tinklapiuose &#128561;, bet nesijaudinkite! &lt;br/&gt;&lt;br/&gt;Blokuosiu %s sekimą tuose tinklapiuose.</string>
 
     <!-- Covid Cta-->
     <string name="covidCtaText">Gaukite oficialiosios informacijos apie COVID-19 ir patarimų.</string>
