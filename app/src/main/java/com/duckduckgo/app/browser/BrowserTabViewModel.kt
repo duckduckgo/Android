@@ -176,7 +176,7 @@ class BrowserTabViewModel(
         object ShowKeyboard : Command()
         object HideKeyboard : Command()
         class ShowFullScreen(val view: View) : Command()
-        class DownloadImage(val url: String) : Command()
+        class DownloadImage(val url: String, val requestUserConfirmation: Boolean) : Command()
         class ShowBookmarkAddedConfirmation(val bookmarkId: Long, val title: String?, val url: String?) : Command()
         class ShareLink(val url: String) : Command()
         class CopyLink(val url: String) : Command()
@@ -737,7 +737,7 @@ class BrowserTabViewModel(
                 true
             }
             is RequiredAction.DownloadFile -> {
-                command.value = DownloadImage(requiredAction.url)
+                command.value = DownloadImage(requiredAction.url, false)
                 true
             }
             is RequiredAction.ShareLink -> {
