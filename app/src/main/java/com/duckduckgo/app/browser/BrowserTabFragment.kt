@@ -1475,9 +1475,9 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
             hideHomeCta()
             hideDaxCta()
             activity?.let { activity ->
-                val daxDialog = getDaxDialogFromActivity()
+                val daxDialog = getDaxDialogFromActivity() as? DaxDialog
                 if (daxDialog != null) {
-                    (daxDialog as DaxDialog).setDaxDialogListener(this@BrowserTabFragment)
+                    daxDialog.setDaxDialogListener(this@BrowserTabFragment)
                     return
                 }
                 configuration.createCta(activity).apply {
