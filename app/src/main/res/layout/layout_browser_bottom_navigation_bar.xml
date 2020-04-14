@@ -19,16 +19,6 @@
     tools:parentTag="android.widget.LinearLayout">
 
     <ImageButton
-        android:id="@+id/bottomBarBookmarksItemOne"
-        style="@style/BrowserIconMenuItem"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:background="?selectableItemBackgroundBorderless"
-        android:contentDescription="@string/back"
-        android:src="@drawable/ic_bookmarks" />
-
-    <ImageButton
         android:id="@+id/bottomBarSearchItem"
         style="@style/BrowserIconMenuItem"
         android:layout_width="wrap_content"
@@ -37,6 +27,16 @@
         android:background="?selectableItemBackgroundBorderless"
         android:contentDescription="@string/back"
         android:src="@drawable/ic_search" />
+
+    <ImageButton
+        android:id="@+id/bottomBarBookmarksItemOne"
+        style="@style/BrowserIconMenuItem"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:background="?selectableItemBackgroundBorderless"
+        android:contentDescription="@string/back"
+        android:src="@drawable/ic_bookmarks" />
 
     <ImageButton
         android:id="@+id/bottomBarFireItem"
