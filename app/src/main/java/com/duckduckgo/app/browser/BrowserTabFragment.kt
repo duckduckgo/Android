@@ -60,6 +60,7 @@ import android.webkit.WebView.HitTestResult.SRC_IMAGE_ANCHOR_TYPE
 import android.webkit.WebView.HitTestResult.UNKNOWN_TYPE
 import android.webkit.WebViewDatabase
 import android.widget.EditText
+import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.annotation.AnyThread
 import androidx.annotation.StringRes
@@ -1784,6 +1785,10 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
 
             ctaContainer.ctaDismissButton.setOnClickListener {
                 viewModel.onUserDismissedCta(cta)
+            }
+
+            if (isExperimentEnabled()){
+                ctaContainer.setPadding(0,0, 0, 48.toPx())
             }
 
             ConstraintSet().also {
