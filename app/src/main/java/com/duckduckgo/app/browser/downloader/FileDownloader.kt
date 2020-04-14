@@ -19,25 +19,22 @@ package com.duckduckgo.app.browser.downloader
 import android.os.Environment
 import android.webkit.URLUtil
 import androidx.annotation.WorkerThread
+import timber.log.Timber
 import java.io.File
+import java.io.Serializable
 import javax.inject.Inject
 
 class FileDownloader @Inject constructor(
     private val dataUriDownloader: DataUriDownloader,
-    private val networkDownloader: NetworkFileDownloader
+    private val networkFileDownloader: NetworkFileDownloader
 ) {
 
     @WorkerThread
-    fun download(pending: PendingFileDownload?, callback: FileDownloadListener?) {
-
-        if (pending == null) {
-            return
-        }
-
+    fun download(pending: PendingFileDownload, callback: FileDownloadListener) {
         when {
-            URLUtil.isNetworkUrl(pending.url) -> networkDownloader.download(pending)
-            URLUtil.isDataUrl(pending.url) -> dataUriDownloader.download(pending, callback)
-            else -> callback?.downloadFailed("Not supported")
+            pending.isNetworkUrl -> networkFileDownloader.download(pending)
+            pending.isDataUrl -> dataUriDownloader.download(pending, callback)
+            else -> callback.downloadFailed("Not supported")
         }
     }
 
@@ -48,7 +45,7 @@ class FileDownloader @Inject constructor(
         val subfolder: String,
         val userAgent: String,
         val directory: File = Environment.getExternalStoragePublicDirectory(subfolder)
-    )
+    ): Serializable
 
     interface FileDownloadListener {
         fun downloadStarted()
@@ -56,3 +53,13 @@ class FileDownloader @Inject constructor(
         fun downloadFailed(message: String)
     }
 }
+
+fun FileDownloader.PendingFileDownload.guessFileName(): String {
+    val guessedFileName = URLUtil.guessFileName(url, contentDisposition, mimeType)
+    Timber.i("Guessed filename of $guessedFileName for url $url")
+    return guessedFileName
+}
+
+val FileDownloader.PendingFileDownload.isDataUrl get() = URLUtil.isDataUrl(url)
+
+val FileDownloader.PendingFileDownload.isNetworkUrl get() = URLUtil.isNetworkUrl(url)
