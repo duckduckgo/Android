@@ -1393,9 +1393,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
                 bottomNavigationBar.animateBarVisibility(false)
                 bottomNavigationBar.gone()
             } else {
-                bottomNavigationBar.postDelayed(KEYBOARD_DELAY) {
-                    bottomNavigationBar.gone()
-                }
+                bottomNavigationBar.gone()
             }
         }
 
