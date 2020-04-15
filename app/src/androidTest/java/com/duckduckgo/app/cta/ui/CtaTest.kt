@@ -261,7 +261,7 @@ class CtaTest {
     }
 
     @Test
-    fun whenMoreThanTwoMajorTrackersBlockedReturnFirstTwoWithMultipleString() {
+    fun whenMoreThanTwoTrackersBlockedReturnFirstTwoWithMultipleString() {
         val trackers = listOf(
             TrackingEvent("facebook.com", "facebook.com", blocked = true, entity = TestEntity("Facebook", "Facebook", 9.0), categories = null),
             TrackingEvent("other.com", "other.com", blocked = true, entity = TestEntity("Other", "Other", 9.0), categories = null),
@@ -275,7 +275,7 @@ class CtaTest {
     }
 
     @Test
-    fun whenTwoMajorTrackersBlockedReturnThemWithZeroString() {
+    fun whenTwoTrackersBlockedReturnThemWithZeroString() {
         val trackers = listOf(
             TrackingEvent("facebook.com", "facebook.com", blocked = true, entity = TestEntity("Facebook", "Facebook", 9.0), categories = null),
             TrackingEvent("other.com", "other.com", blocked = true, entity = TestEntity("Other", "Other", 9.0), categories = null)
@@ -288,16 +288,16 @@ class CtaTest {
     }
 
     @Test
-    fun whenOneMajorTrackersBlockedReturnItWithMultipleString() {
+    fun whenTrackersBlockedReturnThemSortingByPrevalence() {
         val trackers = listOf(
-            TrackingEvent("facebook.com", "facebook.com", blocked = true, entity = TestEntity("Facebook", "Facebook", 9.0), categories = null),
-            TrackingEvent("other.com", "other.com", blocked = true, entity = TestEntity("Other", "Other", 3.0), categories = null)
+            TrackingEvent("facebook.com", "facebook.com", blocked = true, entity = TestEntity("Facebook", "Facebook", 3.0), categories = null),
+            TrackingEvent("other.com", "other.com", blocked = true, entity = TestEntity("Other", "Other", 9.0), categories = null)
         )
 
         val testee = DaxDialogCta.DaxTrackersBlockedCta(mockOnboardingStore, mockAppInstallStore, trackers, "http://www.trackers.com")
         val value = testee.getDaxText(mockActivity)
 
-        assertEquals("<b>Facebook</b>withMultiple", value)
+        assertEquals("<b>Other, Facebook</b>withZero", value)
     }
 
     @Test
