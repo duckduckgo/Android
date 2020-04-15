@@ -1480,6 +1480,14 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
                 } else {
                     decorator.updateBottomBarVisibility(!viewState.isEditing)
                 }
+
+                if (ctaContainer.isVisible){
+                    if (viewState.isEditing){
+                        ctaContainer.setPadding(0,0, 0, 0)
+                    } else {
+                        ctaContainer.setPadding(0,0, 0, 46.toPx())
+                    }
+                }
             }
         }
 
@@ -1786,6 +1794,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
 
             inflate(context, R.layout.include_cta, ctaContainer)
             logoHidingListener.callToActionView = ctaContainer
+            logoHidingListener.callToActionView = ctaContainer
 
             configuration.showCta(ctaContainer)
             ctaContainer.ctaOkButton.setOnClickListener {
@@ -1797,7 +1806,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
             }
 
             if (isExperimentEnabled()){
-                ctaContainer.setPadding(0,0, 0, 48.toPx())
+                ctaContainer.setPadding(0,0, 0, 46.toPx())
             }
 
             ConstraintSet().also {
