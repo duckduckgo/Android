@@ -60,7 +60,6 @@ import android.webkit.WebView.HitTestResult.SRC_IMAGE_ANCHOR_TYPE
 import android.webkit.WebView.HitTestResult.UNKNOWN_TYPE
 import android.webkit.WebViewDatabase
 import android.widget.EditText
-import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.annotation.AnyThread
 import androidx.annotation.StringRes
@@ -116,7 +115,6 @@ import com.duckduckgo.app.cta.ui.DaxDialogCta
 import com.duckduckgo.app.cta.ui.HomePanelCta
 import com.duckduckgo.app.cta.ui.HomeTopPanelCta
 import com.duckduckgo.app.cta.ui.SecondaryButtonCta
-import com.duckduckgo.app.feedback.api.FireAndForgetFeedbackSubmitter
 import com.duckduckgo.app.global.ViewModelFactory
 import com.duckduckgo.app.global.device.DeviceInfo
 import com.duckduckgo.app.global.view.*
@@ -1804,7 +1802,15 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
             }
 
             if (isExperimentEnabled()){
-                ctaContainer.setPadding(0,0, 0, 46.toPx())
+                if (lastSeenOmnibarViewState != null){
+                    if (lastSeenOmnibarViewState!!.isEditing){
+                        ctaContainer.setPadding(0,0, 0, 0)
+                    } else {
+                        ctaContainer.setPadding(0,0, 0, 46.toPx())
+                    }
+                } else {
+                    ctaContainer.setPadding(0,0, 0, 46.toPx())
+                }
             }
 
             ConstraintSet().also {
