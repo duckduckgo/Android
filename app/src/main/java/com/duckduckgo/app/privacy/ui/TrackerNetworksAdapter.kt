@@ -26,6 +26,8 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.baseHost
+import com.duckduckgo.app.global.view.gone
+import com.duckduckgo.app.global.view.show
 import com.duckduckgo.app.privacy.renderer.TrackersRenderer
 import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
@@ -50,7 +52,8 @@ class TrackerNetworksAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     class HeaderViewHolder(
         val root: View,
         val network: TextView,
-        val icon: ImageView
+        val icon: ImageView,
+        val unknownIcon: TextView
     ) : RecyclerView.ViewHolder(root)
 
     class RowViewHolder(
@@ -66,7 +69,7 @@ class TrackerNetworksAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
         return when (viewType) {
             HEADER -> {
                 val root = LayoutInflater.from(parent.context).inflate(R.layout.item_tracker_network_header, parent, false)
-                HeaderViewHolder(root, root.network, root.icon)
+                HeaderViewHolder(root, root.network, root.icon, root.unknownIcon)
             }
             else -> {
                 val root = LayoutInflater.from(parent.context).inflate(R.layout.item_tracker_network_element, parent, false)
@@ -95,6 +98,12 @@ class TrackerNetworksAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
         val iconResource = networkRenderer.networkLogoIcon(holder.icon.context, viewElement.networkName)
         if (iconResource != null) {
             holder.icon.setImageResource(iconResource)
+            holder.icon.show()
+            holder.unknownIcon.gone()
+        } else {
+            holder.unknownIcon.text = viewElement.networkDisplayName.take(1)
+            holder.unknownIcon.show()
+            holder.icon.gone()
         }
         holder.network.text = viewElement.networkDisplayName
     }

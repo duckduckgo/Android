@@ -20,10 +20,15 @@ import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
 import android.app.Activity
 import android.graphics.drawable.AnimatedVectorDrawable
+import android.view.Gravity
 import android.view.View
+import android.widget.FrameLayout
 import android.widget.ImageView
+import androidx.appcompat.widget.AppCompatTextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
+import androidx.core.view.children
+import androidx.core.widget.TextViewCompat
 import com.duckduckgo.app.cta.ui.Cta
 import com.duckduckgo.app.cta.ui.DaxDialogCta
 import com.duckduckgo.app.privacy.renderer.TrackersRenderer
@@ -74,42 +79,92 @@ class BrowserTrackersAnimatorHelper {
         return createLogosViewList(activity, container, logos)
     }
 
-    private fun createLogosViewList(activity: Activity, container: ConstraintLayout, resourcesId: List<Int>?): List<View> {
+    private fun createLogosViewList(
+        activity: Activity,
+        container: ConstraintLayout,
+        resourcesId: List<TrackerLogo>?
+    ): List<View> {
         return resourcesId?.map {
-            val imageView = ImageView(activity)
-            imageView.scaleType = ImageView.ScaleType.CENTER_CROP
-            imageView.setImageResource(R.drawable.network_cross_anim)
-            imageView.setBackgroundResource(it)
-            imageView.id = View.generateViewId()
-            container.addView(imageView)
-            return@map imageView
+            return@map if (it.resId == R.drawable.other_tracker_bg) {
+                val frameLayout = createTrackerTextLogo(activity, it)
+                container.addView(frameLayout)
+                frameLayout
+            } else {
+                val imageView = createTrackerImageLogo(activity, it)
+                container.addView(imageView)
+                imageView
+            }
         }.orEmpty()
     }
 
-    private fun createResourcesIdList(activity: Activity, events: List<TrackingEvent>): List<Int>? {
+    private fun createTrackerTextLogo(activity: Activity, trackerLogo: TrackerLogo): FrameLayout {
+        val params = FrameLayout.LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT, FrameLayout.LayoutParams.WRAP_CONTENT)
+        val frameLayout = FrameLayout(activity)
+        frameLayout.id = View.generateViewId()
+
+        val animationView = ImageView(activity)
+        animationView.setImageResource(R.drawable.network_cross_anim)
+        animationView.layoutParams = params
+
+        val textView = AppCompatTextView(activity)
+        textView.gravity = Gravity.CENTER
+        textView.setBackgroundResource(trackerLogo.resId)
+        TextViewCompat.setTextAppearance(textView, R.style.UnknownTrackerText)
+        textView.text = trackerLogo.trackerLetter
+        textView.layoutParams = params
+
+        frameLayout.addView(textView)
+        frameLayout.addView(animationView)
+
+        return frameLayout
+    }
+
+    private fun createTrackerImageLogo(activity: Activity, trackerLogo: TrackerLogo): ImageView {
+        val imageView = ImageView(activity)
+        imageView.scaleType = ImageView.ScaleType.CENTER_CROP
+        imageView.setImageResource(R.drawable.network_cross_anim)
+        imageView.setBackgroundResource(trackerLogo.resId)
+        imageView.id = View.generateViewId()
+        return imageView
+    }
+
+    private fun createResourcesIdList(activity: Activity, events: List<TrackingEvent>): List<TrackerLogo>? {
         if (activity.packageName == null) return emptyList()
         val resourcesList = events.asSequence()
             .mapNotNull { it.entity }
             .sortedByDescending { it.prevalence }
-            .map { TrackersRenderer().networkLogoIcon(activity, it.name) }
-            .filterNotNull()
+            .map {
+                val res = TrackersRenderer().networkLogoIcon(activity, it.name)
+                if (res == null) {
+                    TrackerLogo(R.drawable.other_tracker_bg, it.displayName.take(1))
+                } else {
+                    TrackerLogo(res)
+                }
+            }
             .distinct()
             .toMutableList()
 
         return if (resourcesList.size <= MAX_LOGOS_SHOWN) {
-            resourcesList.take(MAX_LOGOS_SHOWN)
+            resourcesList
         } else {
             resourcesList.take(MAX_LOGOS_SHOWN - 1)
                 .toMutableList()
-                .apply { add(R.drawable.ic_more_trackers) }
+                .apply { add(TrackerLogo(R.drawable.ic_more_trackers)) }
         }
     }
 
     private fun animateBlockedLogos(views: List<View>) {
         views.map {
             if (it is ImageView) {
-                val frameAnimation = it.drawable as AnimatedVectorDrawable
-                frameAnimation.start()
+                val frameAnimation = it.drawable as? AnimatedVectorDrawable
+                frameAnimation?.start()
+            }
+            if (it is FrameLayout) {
+                val view: ImageView? = it.children.filter { child -> child is ImageView }.firstOrNull() as ImageView?
+                view?.let {
+                    val frameAnimation = view.drawable as? AnimatedVectorDrawable
+                    frameAnimation?.start()
+                }
             }
         }
     }
@@ -210,6 +265,8 @@ class BrowserTrackersAnimatorHelper {
     companion object {
         private const val TRACKER_LOGOS_DELAY_ON_SCREEN = 2400L
         private const val DEFAULT_ANIMATION_DURATION = 150L
-        private const val MAX_LOGOS_SHOWN = 4
+        private const val MAX_LOGOS_SHOWN = 3
     }
 }
+
+data class TrackerLogo(val resId: Int, val trackerLetter: String = "")
