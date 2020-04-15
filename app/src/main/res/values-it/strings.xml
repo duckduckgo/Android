@@ -406,9 +406,9 @@
         <item quantity="other">&#160;e &lt;b&gt;%d altri&lt;/b&gt; stavano cercando di spiarti qui. &lt;br/&gt;&lt;br/&gt;Li ho bloccati!&lt;br/&gt;&lt;br/&gt; ☝️Puoi controllare la barra degli indirizzi per vedere chi sta cercando di rintracciarti quando visiti un nuovo sito.️</item>
     </plurals>
     <string name="daxTrackersBlockedCtaZeroText">&#160;stava cercando di spiarti qui. &lt;br/&gt;&lt;br/&gt;L\'ho bloccato!&lt;br/&gt;&lt;br/&gt; ☝️Puoi controllare la barra degli indirizzi per vedere chi sta cercando di rintracciarti quando visiti un nuovo sito.️</string>
-    <string name="daxNonSerpCtaText">Mentre clicchi e scorri, bloccherò fastidiosi localizzatori. &lt;br/&gt;&lt;br/&gt;Vai avanti - continua a navigare!</string>
-    <string name="daxMainNetworkOwnedCtaText">A tutta dritta! %s è di proprietà di %s.I localizzatori di &lt;br/&gt;&lt;br/&gt; %s si nascondono in circa %s dei migliori siti Web &#128561; ma non preoccuparti!&lt;br/&gt;&lt;br/&gt;Impedirò a %s di vedere la tua attività su questi siti.</string>
-    <string name="daxMainNetworkCtaText">A tutta dritta! %s è un\'importante rete di tracciamento.&lt;br/&gt;&lt;br/&gt; I loro localizzatori si nascondono in circa %s dei migliori siti &#128561; ma non preoccuparti! &lt;br/&gt;&lt;br/&gt;Impedirò a %s di vedere la tua attività su quei siti.</string>
+    <string name="daxNonSerpCtaText">Mentre clicchi e scrolli, io bloccherò i fastidiosi tracker. &lt;br/&gt;&lt;br/&gt;Continua pure a navigare in tranquillità!</string>
+    <string name="daxMainNetworkOwnedCtaText">Attenzione! %s è di proprietà di %s. I tracker di &lt;br/&gt;&lt;br/&gt; %s si nascondono nel %s dei siti più popolari &#128561; ma non preoccuparti!&lt;br/&gt;&lt;br/&gt;Impedirò a %s di spiare la tua attività su questi siti.</string>
+    <string name="daxMainNetworkCtaText">Attenzione! %s è un\'importante rete di tracciamento.&lt;br/&gt;&lt;br/&gt; I loro tracker si nascondono nel %s dei siti più popolari &#128561; ma non preoccuparti! &lt;br/&gt;&lt;br/&gt;Impedirò a %s di spiare la tua attività su quei siti.</string>
 
     <!-- Covid Cta-->
     <string name="covidCtaText">Leggi informazioni e consigli ufficiali sul COVID-19.</string>
