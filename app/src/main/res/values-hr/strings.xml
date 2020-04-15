@@ -4,6 +4,7 @@
     <string name="duckDuckGoPrivacySimplified">Zaštita privatnosti, pojednostavljeno.</string>
     <string name="yes">Da</string>
     <string name="no">Ne</string>
+    <string name="search">Pretraga</string>
 
     <!-- Onboarding Activity -->
     <string name="onboardingDefaultBrowserDescription">Posjetite Postavke kako biste svaki put pretraživali i pregledavali uz DuckDuckGo.</string>
@@ -384,13 +385,15 @@
     <string name="daxIntroCtaText">Zatim pokušajte posjetiti jedno od svojih omiljenih web-mjesta! &lt;br/&gt;&lt;br/&gt;Blokirat ću tragače kako vas ne bi mogli špijunirati. Nadogradit ću i sigurnost vaše veze ako je moguće. &#128274;</string>
     <string name="daxEndCtaText">&lt;br/&gt;&lt;br/&gt;Shvatili ste ovo! Zapamtite: svaki put kada pregledavate sa mnom jeziva reklama gubi krila. &#128077;</string>
     <string name="daxSerpCtaText">Vaše pretrage u DuckDuckGo anonimne su i nikad ne pohranjujem vašu povijest pretraga. Nikad. &#128588;</string>
-    <string name="daxNonSerpCtaText">Svako web-mjesto ima ocjenu privatnosti. Dodirnite je da biste vidjeli kako sam zaštitio vašu privatnost.&lt;br/&gt;&lt;br/&gt;Želite li uživati? Pokušajte izbrisati svoje podatke pritiskom na gumb \"Pali\".</string>
     <plurals name="daxTrackersBlockedCtaText">
         <item quantity="one">&#160;i &lt;b&gt;%d ostali&lt;/b&gt; su vas pokušavali pratiti ovdje. &lt;br/&gt;&lt;br/&gt;Blokirao sam ih!&lt;br/&gt;&lt;br/&gt; ☝️Možete provjeriti URL traku kako biste vidjeli tko vas pokušava pratiti kad posjetite novo web-mjesto.️</item>
         <item quantity="few">&#160;i &lt;b&gt;%d ostali&lt;/b&gt; su vas pokušavali pratiti ovdje. &lt;br/&gt;&lt;br/&gt;Blokirao sam ih!&lt;br/&gt;&lt;br/&gt; ☝️Možete provjeriti URL traku kako biste vidjeli tko vas pokušava pratiti kad posjetite novo web-mjesto.️ </item>
         <item quantity="other">&#160;i &lt;b&gt;%d ostali&lt;/b&gt; su vas pokušavali pratiti ovdje. &lt;br/&gt;&lt;br/&gt;Blokirao sam ih!&lt;br/&gt;&lt;br/&gt; ☝️Možete provjeriti URL traku kako biste vidjeli tko vas pokušava pratiti kad posjetite novo web-mjesto.️</item>
     </plurals>
     <string name="daxTrackersBlockedCtaZeroText">&#160;vas je pokušavao pratiti ovdje. &lt;br/&gt;&lt;br/&gt;Blokirao sam ga!&lt;br/&gt;&lt;br/&gt; ☝️Možete provjeriti URL traku kako biste vidjeli tko vas pokušava pratiti kad posjetite novo web-mjesto.️</string>
+    <string name="daxNonSerpCtaText">Čim dodirnete i pomičete, blokirat ću neugodne tragače. &lt;br/&gt;&lt;br/&gt;Naprijed - nastavite pretraživati!</string>
+    <string name="daxMainNetworkOwnedCtaText">Obratite pozornost! %s je u vlasništvu %s.&lt;br/&gt;&lt;br/&gt; %s tragači vrebaju na oko %s top web-mjesta &#128561;, ali ne brinite! &lt;br/&gt;&lt;br/&gt;Blokirat ću %s da  ne vide vašu aktivnost na tim stranicama.</string>
+    <string name="daxMainNetworkCtaText">Obratite pozornost! %s je glavna mreža za praćenje.&lt;br/&gt;&lt;br/&gt; Njihovi tragači vrebaju na oko %s top web-mjesta &#128561;, ali ne brinite! &lt;br/&gt;&lt;br/&gt;Blokirat ću %s  da ne vide vašu aktivnost na tim stranicama.</string>
 
     <!-- Covid Cta-->
     <string name="covidCtaText">Dobijte službene informacije i savjete o COVID-19.</string>

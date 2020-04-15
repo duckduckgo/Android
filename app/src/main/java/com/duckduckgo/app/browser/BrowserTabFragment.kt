@@ -50,6 +50,7 @@ import androidx.core.view.isNotEmpty
 import androidx.core.view.isVisible
 import androidx.core.view.postDelayed
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.transaction
 import androidx.lifecycle.*
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion
@@ -108,7 +109,7 @@ import javax.inject.Inject
 import kotlin.concurrent.thread
 import kotlin.coroutines.CoroutineContext
 
-class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogListeners {
+class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogListener {
 
     private val supervisorJob = SupervisorJob()
 
@@ -242,7 +243,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        removeDaxDialogFromManager()
+        removeDaxDialogFromActivity()
         renderer = BrowserTabFragmentRenderer()
         if (savedInstanceState != null) {
             updateFragmentListener()
@@ -289,10 +290,12 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
         })
     }
 
-    private fun removeDaxDialogFromManager() {
-        val fragment: Fragment? = childFragmentManager.findFragmentByTag(DAX_DIALOG_DIALOG_TAG)
+    private fun getDaxDialogFromActivity(): Fragment? = activity?.supportFragmentManager?.findFragmentByTag(DAX_DIALOG_DIALOG_TAG)
+
+    private fun removeDaxDialogFromActivity() {
+        val fragment = getDaxDialogFromActivity()
         fragment?.let {
-            childFragmentManager.beginTransaction().remove(it).commit()
+            activity?.supportFragmentManager?.transaction { remove(it) }
         }
     }
 
@@ -472,7 +475,9 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
     }
 
     private fun processCommand(it: Command?) {
-        renderer.cancelAllAnimations()
+        if (it !is Command.DaxCommand) {
+            renderer.cancelAllAnimations()
+        }
         when (it) {
             is Command.Refresh -> refresh()
             is Command.OpenInNewTab -> {
@@ -555,6 +560,8 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
             is Command.GenerateWebViewPreviewImage -> generateWebViewPreviewImage()
             is Command.LaunchTabSwitcher -> launchTabSwitcher()
             is Command.ShowErrorWithAction -> showErrorSnackbar(it)
+            is Command.DaxCommand.FinishTrackerAnimation -> finishTrackerAnimation()
+            is Command.DaxCommand.HideDaxDialog -> showHideTipsDialog(it.cta)
         }
     }
 
@@ -1159,24 +1166,26 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
         startActivity(AddWidgetInstructionsActivity.intent(context), options)
     }
 
-    override fun onDismissDialog() {
-        val configuration = viewModel.ctaViewState.value?.cta ?: return
-        if (configuration is DaxDialogCta.DaxTrackersBlockedCta) {
-            animatorHelper.finishTrackerAnimation(omnibarViews(), networksContainer)
-        }
-        viewModel.onUserDismissedCta(configuration)
+    private fun finishTrackerAnimation() {
+        animatorHelper.finishTrackerAnimation(omnibarViews(), networksContainer)
     }
 
-    override fun onHideClick() {
+    private fun showHideTipsDialog(cta: Cta) {
         context?.let {
-            val configuration = viewModel.ctaViewState.value?.cta ?: return
-            launchHideTipsDialog(it, configuration)
+            launchHideTipsDialog(it, cta)
         }
     }
 
-    override fun onPrimaryCtaClick() {
-        val configuration = viewModel.ctaViewState.value?.cta ?: return
-        viewModel.onUserClickCtaOkButton(configuration)
+    override fun onDaxDialogDismiss() {
+        viewModel.onDaxDialogDismissed()
+    }
+
+    override fun onDaxDialogHideClick() {
+        viewModel.onUserHideDaxDialog()
+    }
+
+    override fun onDaxDialogPrimaryCtaClick() {
+        viewModel.onUserClickCtaOkButton()
     }
 
     private fun launchHideTipsDialog(context: Context, cta: Cta) {
@@ -1466,12 +1475,14 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
             hideHomeCta()
             hideDaxCta()
             activity?.let { activity ->
-                val savedDaxDialog: Fragment? = childFragmentManager.findFragmentByTag(DAX_DIALOG_DIALOG_TAG)
-                if (savedDaxDialog != null) {
+                val daxDialog = getDaxDialogFromActivity() as? DaxDialog
+                if (daxDialog != null) {
+                    daxDialog.setDaxDialogListener(this@BrowserTabFragment)
                     return
                 }
                 configuration.createCta(activity).apply {
-                    getDaxDialog().show(childFragmentManager, DAX_DIALOG_DIALOG_TAG)
+                    setDaxDialogListener(this@BrowserTabFragment)
+                    getDaxDialog().show(activity.supportFragmentManager, DAX_DIALOG_DIALOG_TAG)
                 }
             }
         }
@@ -1494,7 +1505,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
                 viewModel.onUserClickTopCta(configuration)
             }
             ctaTopContainer.closeButton.setOnClickListener {
-                viewModel.onUserDismissedCta(configuration)
+                viewModel.onUserDismissedCta()
             }
         }
 
@@ -1533,11 +1544,11 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
 
             configuration.showCta(ctaContainer)
             ctaContainer.ctaOkButton.setOnClickListener {
-                viewModel.onUserClickCtaOkButton(configuration)
+                viewModel.onUserClickCtaOkButton()
             }
 
             ctaContainer.ctaDismissButton.setOnClickListener {
-                viewModel.onUserDismissedCta(cta)
+                viewModel.onUserDismissedCta()
             }
 
             ConstraintSet().also {

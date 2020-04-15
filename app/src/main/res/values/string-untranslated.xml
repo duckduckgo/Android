@@ -15,9 +15,6 @@
   -->
 
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
-
-    <string name="search">Search</string>
-
     <!-- Download Confirmation -->
     <string name="downloadConfirmationContinue">Continue</string>
     <string name="downloadConfirmationSaveFileTitle">Save %1$s</string>
@@ -42,10 +39,5 @@
     <string name="stickySearchPromptKeep">Keep</string>
     <string name="stickySearchPromptRemove">Remove</string>
     <string name="notificationChannelSearch">Search</string>
-
-    <!-- Dax Dialog -->
-    <string name="daxNonSerpCtaText"><![CDATA[As you tap and scroll, I\'ll block pesky trackers. <br/><br/>Go ahead — keep browsing!]]></string>
-    <string name="daxMainNetworkOwnedCtaText"><![CDATA[Heads up! %s is owned by %s.<br/><br/> %s\'s trackers lurk on about %s of top websites 😱 but don\'t worry!<br/><br/>I\'ll block %s from seeing your activity on those sites.]]></string>
-    <string name="daxMainNetworkCtaText"><![CDATA[Heads up! %s is a major tracking network.<br/><br/> Their trackers lurk on about %s of top sites 😱 but don\'t worry!<br/><br/>I\'ll block %s from seeing your activity on those sites.]]></string>
 
 </resources>

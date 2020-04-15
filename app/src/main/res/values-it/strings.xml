@@ -20,6 +20,7 @@
     <string name="duckDuckGoPrivacySimplified">La privacy, semplificata.</string>
     <string name="yes">Sì</string>
     <string name="no">No</string>
+    <string name="search">Ricerca</string>
 
     <!-- Onboarding Activity -->
     <string name="onboardingDefaultBrowserDescription">Visita la sezione Impostazioni per effettuare ricerche e navigare sempre con DuckDuckGo.</string>
@@ -400,12 +401,14 @@
     <string name="daxIntroCtaText">Poi, prova a visitare uno dei tuoi siti preferiti! &lt;br/&gt;&lt;br/&gt;Bloccherò i localizzatori in modo che non possano spiarti. Aggiornerò anche la sicurezza della tua connessione, se possibile. &#128274;</string>
     <string name="daxEndCtaText">Ben fatto! &lt;br/&gt;&lt;br/&gt;Ricorda: quando navighi con me gli annunci inquietanti non possono seguirti. &#128077;</string>
     <string name="daxSerpCtaText">Le tue ricerche su DuckDuckGo sono anonime e non salvo mai la cronologia delle ricerche. Mai. &#128588;</string>
-    <string name="daxNonSerpCtaText">Ogni sito ha un grado di privacy. Toccalo per vedere come ho protetto la tua privacy.&lt;br/&gt;&lt;br/&gt;Vuoi essere sofisticato? Prova a cancellare i tuoi dati premendo il pulsante di fuoco.</string>
     <plurals name="daxTrackersBlockedCtaText">
         <item quantity="one">&#160;e &lt;b&gt;%d altro&lt;/b&gt; stavano cercando di spiarti qui. &lt;br/&gt;&lt;br/&gt;Li ho bloccati!&lt;br/&gt;&lt;br/&gt; ☝️Puoi controllare la barra degli indirizzi per vedere chi sta cercando di rintracciarti quando visiti un nuovo sito.️</item>
         <item quantity="other">&#160;e &lt;b&gt;%d altri&lt;/b&gt; stavano cercando di spiarti qui. &lt;br/&gt;&lt;br/&gt;Li ho bloccati!&lt;br/&gt;&lt;br/&gt; ☝️Puoi controllare la barra degli indirizzi per vedere chi sta cercando di rintracciarti quando visiti un nuovo sito.️</item>
     </plurals>
     <string name="daxTrackersBlockedCtaZeroText">&#160;stava cercando di spiarti qui. &lt;br/&gt;&lt;br/&gt;L\'ho bloccato!&lt;br/&gt;&lt;br/&gt; ☝️Puoi controllare la barra degli indirizzi per vedere chi sta cercando di rintracciarti quando visiti un nuovo sito.️</string>
+    <string name="daxNonSerpCtaText">Mentre clicchi e scrolli, io bloccherò i fastidiosi tracker. &lt;br/&gt;&lt;br/&gt;Continua pure a navigare in tranquillità!</string>
+    <string name="daxMainNetworkOwnedCtaText">Attenzione! %s è di proprietà di %s. I tracker di &lt;br/&gt;&lt;br/&gt; %s si nascondono nel %s dei siti più popolari &#128561; ma non preoccuparti!&lt;br/&gt;&lt;br/&gt;Impedirò a %s di spiare la tua attività su questi siti.</string>
+    <string name="daxMainNetworkCtaText">Attenzione! %s è un\'importante rete di tracciamento.&lt;br/&gt;&lt;br/&gt; I loro tracker si nascondono nel %s dei siti più popolari &#128561; ma non preoccuparti! &lt;br/&gt;&lt;br/&gt;Impedirò a %s di spiare la tua attività su quei siti.</string>
 
     <!-- Covid Cta-->
     <string name="covidCtaText">Leggi informazioni e consigli ufficiali sul COVID-19.</string>
