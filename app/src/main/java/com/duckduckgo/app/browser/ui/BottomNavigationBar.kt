@@ -65,12 +65,12 @@ class BottomNavigationBar : LinearLayout {
             duration = 150L
         }
 
-        offsetAnimator?.addUpdateListener {
+        offsetAnimator.addUpdateListener {
             translationY = it.animatedValue as Float
         }
 
         val targetTranslation = if (isVisible) 0f else height.toFloat()
-        offsetAnimator?.setFloatValues(translationY, targetTranslation)
-        offsetAnimator?.start()
+        offsetAnimator.setFloatValues(translationY, targetTranslation)
+        offsetAnimator.start()
     }
 }

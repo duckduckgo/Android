@@ -1391,15 +1391,22 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
         private fun hideBottomBar(shouldAnimate: Boolean = false) {
             if (shouldAnimate){
                 bottomNavigationBar.animateBarVisibility(false)
+                bottomNavigationBar.gone()
+            } else {
+                bottomNavigationBar.postDelayed(KEYBOARD_DELAY) {
+                    bottomNavigationBar.gone()
+                }
             }
-
-            bottomNavigationBar.gone()
         }
 
         private fun showBottomBar(shouldAnimate: Boolean) {
-            bottomNavigationBar.show()
             if (shouldAnimate){
+                bottomNavigationBar.show()
                 bottomNavigationBar.animateBarVisibility(true)
+            } else {
+                bottomNavigationBar.postDelayed(KEYBOARD_DELAY) {
+                    bottomNavigationBar.show()
+                }
             }
         }
 
@@ -1470,6 +1477,8 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
                     if (viewState.shouldMoveCaretToEnd) {
                         omnibarTextInput.setSelection(viewState.omnibarText.length)
                     }
+                } else {
+                    decorator.updateBottomBarVisibility(!viewState.isEditing)
                 }
             }
         }
