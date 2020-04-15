@@ -1098,7 +1098,9 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
 
     private fun requestDownloadConfirmation(pendingDownload: PendingFileDownload, downloadListener: FileDownloadListener) {
         fragmentManager?.let {
-            DownloadConfirmationFragment.instance(pendingDownload, downloadListener).show(it, DOWNLOAD_CONFIRMATION_TAG)
+            if (!it.isStateSaved) {
+                DownloadConfirmationFragment.instance(pendingDownload, downloadListener).show(it, DOWNLOAD_CONFIRMATION_TAG)
+            }
         }
     }
 
