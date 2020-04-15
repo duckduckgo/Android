@@ -25,6 +25,8 @@ import android.widget.TextView
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.global.DuckDuckGoTheme
+import com.duckduckgo.app.global.Theming
 import com.duckduckgo.app.global.baseHost
 import com.duckduckgo.app.global.view.gone
 import com.duckduckgo.app.global.view.show
@@ -97,11 +99,14 @@ class TrackerNetworksAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     private fun onBindHeader(holder: HeaderViewHolder, viewElement: Header) {
         val iconResource = networkRenderer.networkLogoIcon(holder.icon.context, viewElement.networkName)
         if (iconResource != null) {
-            holder.icon.setImageResource(iconResource)
+            val drawable = Theming.getThemedDrawable(holder.icon.context, iconResource, DuckDuckGoTheme.LIGHT)
+            holder.icon.setImageDrawable(drawable)
             holder.icon.show()
             holder.unknownIcon.gone()
         } else {
+            val drawable = Theming.getThemedDrawable(holder.icon.context, R.drawable.other_tracker_bg, DuckDuckGoTheme.LIGHT)
             holder.unknownIcon.text = viewElement.networkDisplayName.take(1)
+            holder.unknownIcon.background = drawable
             holder.unknownIcon.show()
             holder.icon.gone()
         }
