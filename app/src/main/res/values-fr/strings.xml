@@ -393,10 +393,9 @@
         <item quantity="one" tools:ignore="ImpliedQuantity">&#160;essayait de vous traquer ici. &lt;br/&gt;&lt;br/&gt;Je l\'ai bloqué !&lt;br/&gt;&lt;br/&gt; ☝️Vous pouvez voir dans la barre d\'adresse URL qui essaie de vous traquer lorsque vous visitez un nouveau site.️️</item>
         <item quantity="other">&#160;essayaient de vous traquer ici. &lt;br/&gt;&lt;br/&gt;Je l\'ai bloqué !&lt;br/&gt;&lt;br/&gt; ☝️Vous pouvez voir dans la barre d\'adresse URL qui essaie de vous traquer lorsque vous visitez un nouveau site.️️</item>
     </plurals>
-    <string name="daxNonSerpCtaText">Pendant que vous appuyez et faites défiler, je bloque les trackers ennuyeux. &lt;br/&gt;&lt;br/&gt;Allez-y, continuez à naviguer !</string>
-    <string name="daxMainNetworkOwnedCtaText">Attention ! %s appartient à %s.Les trackers de &lt;br/&gt;&lt;br/&gt; %s se cachent sur environ %s des meilleurs sites Web &#128561;, mais ne vous inquiétez pas ! &lt;br/&gt;&lt;br/&gt;Je vais empêcher %s de voir votre activité sur ces sites.</string>
-    <string name="daxMainNetworkCtaText">Attention ! %s est un important réseau de localisation.&lt;br/&gt;&lt;br/&gt; Leurs trackers se cachent sur environ %s des meilleurs sites &#128561;, mais ne vous inquiétez pas ! &lt;br/&gt;&lt;br/&gt;Je vais empêcher %s de voir votre activité sur ces sites.</string>
-
+    <string name="daxNonSerpCtaText">Lors de votre navigation, je bloque les traqueurs indésirables. &lt;br/&gt;&lt;br/&gt;Continuez à naviguer librement en toute tranquillité !</string>
+    <string name="daxMainNetworkOwnedCtaText">Attention ! %s appartient à %s. &lt;br/&gt;&lt;br/&gt;Les traqueurs de %s se cachent sur environ %s des sites Web les plus visités &#128561;, mais ne vous inquiétez pas ! &lt;br/&gt;&lt;br/&gt;J’empêche %s de voir votre activité sur ces sites.</string>
+    <string name="daxMainNetworkCtaText">Attention ! %s est un important réseau de traqueurs.&lt;br/&gt;&lt;br/&gt;Leurs traqueurs se cachent sur environ %s des sites les plus visités &#128561;, mais ne vous inquiétez pas ! &lt;br/&gt;&lt;br/&gt;J’empêche %s de voir votre activité sur ces sites.</string>
     <!-- Covid Cta-->
     <string name="covidCtaText">Accédez aux informations officielles et aux recommandations sur le COVID-19.</string>
 </resources>
