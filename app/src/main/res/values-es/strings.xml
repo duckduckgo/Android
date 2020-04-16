@@ -395,7 +395,4 @@
         <item quantity="other">&#160;y &lt;b&gt;%d más&lt;/b&gt; intentaban rastrearte aquí. &lt;br/&gt;&lt;br/&gt;¡Los he bloqueado!&lt;br/&gt;&lt;br/&gt; ☝️Puedes consultar la barra de navegación para ver quién está tratando de rastrearte cuando visitas un nuevo sitio.️</item>
     </plurals>
     <string name="daxTrackersBlockedCtaZeroText">&#160;intentaba rastrearte aquí. &lt;br/&gt;&lt;br/&gt;¡Lo he bloqueado!&lt;br/&gt;&lt;br/&gt; ☝️Puedes consultar la barra de navegación para ver quién está tratando de rastrearte cuando visitas un nuevo sitio.️</string>
-
-    <!-- Covid Cta-->
-    <string name="covidCtaText">Obtén información y consejos oficiales sobre COVID-19.</string>
 </resources>

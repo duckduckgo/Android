@@ -418,7 +418,4 @@
         <item quantity="other">&#160;ve &lt;b&gt;%d diğerleri&lt;/b&gt; sizi burada izlemeye çalışıyordu. &lt;br/&gt;&lt;br/&gt;Onları engelledim!&lt;br/&gt;&lt;br/&gt; ☝️Yeni bir siteyi ziyaret ettiğinizde sizi kimin izlemeye çalıştığını görmek için URL çubuğunu kontrol edebilirsiniz.</item>
     </plurals>
     <string name="daxTrackersBlockedCtaZeroText">&#160;sizi burada izlemeye çalışıyordu. &lt;br/&gt;&lt;br/&gt;Onu engelledim!&lt;br/&gt;&lt;br/&gt; ☝️Yeni bir siteyi ziyaret ettiğinizde sizi kimin izlemeye çalıştığını görmek için URL çubuğunu kontrol edebilirsiniz.</string>
-
-    <!-- Covid Cta-->
-    <string name="covidCtaText">Resmi COVID-19 hakkında bilgi ve ipuçları alın.</string>
 </resources>
