@@ -420,7 +420,4 @@
         <item quantity="other">&#160;и еще &lt;b&gt;%d&lt;/b&gt; пытались отследить вас здесь. &lt;br/&gt;&lt;br/&gt;Я заблокировал их!&lt;br/&gt;&lt;br/&gt; ☝️Вы можете видеть в адресной строке, отслеживает ли вас кто-то во время посещения нового сайта.️</item>
     </plurals>
     <string name="daxTrackersBlockedCtaZeroText">&#160;пытался отследить вас здесь. &lt;br/&gt;&lt;br/&gt;Я заблокировал его!&lt;br/&gt;&lt;br/&gt; ☝️Вы можете видеть в адресной строке, отслеживает ли вас кто-то во время посещения нового сайта.️</string>
-
-    <!-- Covid Cta-->
-    <string name="covidCtaText">Получить официальную информацию и советы в связи с COVID-19.</string>
 </resources>

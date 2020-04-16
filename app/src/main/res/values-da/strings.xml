@@ -395,7 +395,4 @@
         <item quantity="other">&#160;og &lt;b&gt;%d andre&lt;/b&gt; forsøgte at spore dig her. &lt;br/&gt;&lt;br/&gt;Jeg blokerede dem!&lt;br/&gt;&lt;br/&gt; ☝️Du kan kontrollere URL-linjen for at se, hvem der prøver at spore dig, når du besøger et nyt sted.️</item>
     </plurals>
     <string name="daxTrackersBlockedCtaZeroText">&#160;prøvede at spore dig her. &lt;br/&gt;&lt;br/&gt;Jeg blokerede det!&lt;br/&gt;&lt;br/&gt; ☝️Du kan kontrollere URL-linjen for at se, hvem der prøver at spore dig, når du besøger et nyt sted.️</string>
-
-    <!-- Covid Cta-->
-    <string name="covidCtaText">Få officielle COVID-19 info og tip.</string>
 </resources>

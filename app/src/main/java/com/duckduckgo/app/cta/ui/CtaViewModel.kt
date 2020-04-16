@@ -164,9 +164,6 @@ class CtaViewModel @Inject constructor(
             canShowWidgetCta() -> {
                 if (widgetCapabilities.supportsAutomaticWidgetAdd) AddWidgetAuto else AddWidgetInstructions
             }
-            canShowCovidCta() -> {
-                HomeTopPanelCta.CovidCta()
-            }
             else -> null
         }
     }
@@ -247,11 +244,6 @@ class CtaViewModel @Inject constructor(
         }
     }
 
-    @WorkerThread
-    private suspend fun canShowCovidCta(): Boolean {
-        return (daxDialogEndShown() || !daxOnboardingActive()) && !covidCtaShown()
-    }
-
     private fun hasTrackersInformation(events: List<TrackingEvent>): Boolean =
         events.asSequence()
             .filter { it.entity?.isMajor == true }
@@ -274,8 +266,6 @@ class CtaViewModel @Inject constructor(
     private fun daxDialogTrackersFoundShown(): Boolean = dismissedCtaDao.exists(CtaId.DAX_DIALOG_TRACKERS_FOUND)
 
     private fun daxDialogNetworkShown(): Boolean = dismissedCtaDao.exists(CtaId.DAX_DIALOG_NETWORK)
-
-    private fun covidCtaShown(): Boolean = dismissedCtaDao.exists(CtaId.COVID)
 
     private fun isSerpUrl(url: String): Boolean = url.contains(DaxDialogCta.SERP)
 

@@ -395,7 +395,4 @@
         <item quantity="other">&#160;und &lt;b&gt;%d andere&lt;/b&gt; haben versucht, Sie hier zu tracken. &lt;br/&gt;&lt;br/&gt;Ich habe sie blockiert!&lt;br/&gt;&lt;br/&gt; ☝️Sie können in der URL-Leiste überprüfen, wer versucht, Sie zu tracken, wenn Sie eine neue Website besuchen.</item>
     </plurals>
     <string name="daxTrackersBlockedCtaZeroText">&#160;hat versucht, Sie hier zu tracken. &lt;br/&gt;&lt;br/&gt;Ich habe das blockiert!&lt;br/&gt;&lt;br/&gt; ☝️Sie können in der URL-Leiste überprüfen, wer versucht, Sie zu tracken, wenn Sie eine neue Website besuchen.</string>
-
-    <!-- Covid Cta-->
-    <string name="covidCtaText">Offizielle COVID-19 Infos &amp; Tipps.</string>
 </resources>
