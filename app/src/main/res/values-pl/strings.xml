@@ -405,7 +405,8 @@
         <item quantity="many">&#160;próbowali cię tu wyśledzić. &lt;br/&gt;&lt;br/&gt;Zablokowałem to!&lt;br/&gt;&lt;br/&gt; can Możesz sprawdzić pasek adresu URL, aby zobaczyć, kto próbuje Cię śledzić, gdy odwiedzasz nową witrynę.️</item>
         <item quantity="other">&#160;próbowali cię tu wyśledzić. &lt;br/&gt;&lt;br/&gt;Zablokowałem to!&lt;br/&gt;&lt;br/&gt; can Możesz sprawdzić pasek adresu URL, aby zobaczyć, kto próbuje Cię śledzić, gdy odwiedzasz nową witrynę.️</item>
     </plurals>
-    <string name="daxNonSerpCtaText">Kiedy będziesz stukać i przewijać, będę blokować nieznośne moduły śledzące. &lt;br/&gt;&lt;br/&gt;Śmiało - kontynuuj przeglądanie!</string>
-    <string name="daxMainNetworkOwnedCtaText">Heads-up! %s jest własnością %s.Moduły śledzące &lt;br/&gt;&lt;br/&gt; %s czają się na około %s najlepszych witrynach &#128561;, ale nie martw się! &lt;br/&gt;&lt;br/&gt;Zablokuję %s Twoją aktywność na tych strony.</string>
-    <string name="daxMainNetworkCtaText">Heads-up! %s to duża sieć śledzenia.&lt;br/&gt;&lt;br/&gt; Ich moduły śledzące czają się na około %s najpopularniejszych witryn &#128561;, ale nie martw się! &lt;br/&gt;&lt;br/&gt;Zablokuję %s Twoją aktywność na tych stronach.</string>
+    <string name="daxNonSerpCtaText">Gdy korzystasz z przeglądarki, ja blokuję nieznośne moduły śledzące.&lt;br/&gt;&lt;br/&gt;Śmiało – kontynuuj przeglądanie.</string>
+    <string name="daxMainNetworkOwnedCtaText">Uwaga! %s jest własnością firmy %s.&lt;br/&gt;&lt;br/&gt;Moduły śledzące firmy %s czają się na około %s najpopularniejszych witryn &#128561;, ale nie martw się!&lt;br/&gt;&lt;br/&gt;Zablokuję śledzenie twojej aktywności przez firmę %s na tych stronach.</string>
+    <string name="daxMainNetworkCtaText">Uwaga! %s to duża sieć śledząca.&lt;br/&gt;&lt;br/&gt;Ich moduły śledzące czają się na około %s najpopularniejszych witryn &#128561;, ale nie martw się!&lt;br/&gt;&lt;br/&gt;Zablokuję śledzenie twojej aktywności przez firmę %s na tych stronach.</string>
+
 </resources>
