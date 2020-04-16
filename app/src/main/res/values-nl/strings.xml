@@ -396,7 +396,4 @@
     <string name="daxNonSerpCtaText">Terwijl je tikt en scrolt, blokkeer ik vervelende trackers. &lt;br/&gt;&lt;br/&gt;Ga je gang - blijf browsen!</string>
     <string name="daxMainNetworkOwnedCtaText">Let op! %s is eigendom van %s.&lt;br/&gt;De trackers van &lt;br/&gt; %s liggen op de loer op ongeveer %s van de beste websites &#128561; maar maak je geen zorgen! &lt;br/&gt;&lt;br/&gt;Ik blokkeer %s voor het zien van jouw activiteit op die websites.</string>
     <string name="daxMainNetworkCtaText">Let op! %s is een belangrijk volgnetwerk.&lt;br/&gt;&lt;br/&gt; Hun trackers liggen op de loer op ongeveer %s van de beste sites &#128561; maar maak je geen zorgen! &lt;br/&gt;&lt;br/&gt;Ik blokkeer %s voor het zien van jouw activiteit op die websites.</string>
-
-    <!-- Covid Cta-->
-    <string name="covidCtaText">Ontvang officiële COVID-19 info en tips.</string>
 </resources>

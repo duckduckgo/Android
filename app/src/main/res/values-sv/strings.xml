@@ -412,7 +412,4 @@
     <string name="daxNonSerpCtaText">Medan du pekar och bläddrar kommer jag att blockera irriterande spårare. &lt;br/&gt;&lt;br/&gt;Fortsätt - surfa vidare!</string>
     <string name="daxMainNetworkOwnedCtaText">Se upp! %s ägs av %s.&lt;br/&gt;&lt;br/&gt; %ss spårare ligger och lurar på cirka %s av de populäraste webbplatserna &#128561; men oroa dig inte! &lt;br/&gt;&lt;br/&gt;Jag kommer att hindra %s från att se din aktivitet på dessa webbplatser.</string>
     <string name="daxMainNetworkCtaText">Se upp! %s är ett stort spårningsnätverk.&lt;br/&gt;&lt;br/&gt; Deras spårare ligger och lurar på cirka %s av de populäraste webbplatserna &#128561; men oroa dig inte! &lt;br/&gt;&lt;br/&gt;Jag kommer att hindra %s från att se din aktivitet på dessa webbplatser.</string>
-
-    <!-- Covid Cta-->
-    <string name="covidCtaText">Ta emot officiell COVID-19 information och tips.</string>
 </resources>

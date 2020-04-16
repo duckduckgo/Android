@@ -402,7 +402,4 @@
     <string name="daxNonSerpCtaText">Čim dodirnete i pomičete, blokirat ću neugodne tragače. &lt;br/&gt;&lt;br/&gt;Naprijed - nastavite pretraživati!</string>
     <string name="daxMainNetworkOwnedCtaText">Obratite pozornost! %s je u vlasništvu %s.&lt;br/&gt;&lt;br/&gt; %s tragači vrebaju na oko %s top web-mjesta &#128561;, ali ne brinite! &lt;br/&gt;&lt;br/&gt;Blokirat ću %s da  ne vide vašu aktivnost na tim stranicama.</string>
     <string name="daxMainNetworkCtaText">Obratite pozornost! %s je glavna mreža za praćenje.&lt;br/&gt;&lt;br/&gt; Njihovi tragači vrebaju na oko %s top web-mjesta &#128561;, ali ne brinite! &lt;br/&gt;&lt;br/&gt;Blokirat ću %s  da ne vide vašu aktivnost na tim stranicama.</string>
-
-    <!-- Covid Cta-->
-    <string name="covidCtaText">Dobijte službene informacije i savjete o COVID-19.</string>
 </resources>

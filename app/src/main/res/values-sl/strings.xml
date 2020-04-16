@@ -408,7 +408,4 @@
     <string name="daxNonSerpCtaText">Ko tapkate in se pomikate, bom blokiral nadležne sledilce. &lt;br/&gt;&lt;br/&gt;Brskaj naprej!</string>
     <string name="daxMainNetworkOwnedCtaText">Glavo pokonci! %s je last %s.&lt;br/&gt;&lt;br/&gt; %s sledilci se skrivajo na približno %s najboljših spletnih mest &#128561;, vendar ne skrbite!&lt;br/&gt;&lt;br/&gt; %s bom preprečil ogled vaše dejavnosti na teh spletnih mestih.</string>
     <string name="daxMainNetworkCtaText">Glavo pokonci! %s je glavno omrežje za sledenje.&lt;br/&gt;&lt;br/&gt; Njihovi sledilci se skrivajo na približno %s najboljših spletnih mest, vendar ne skrbite!&lt;br/&gt;&lt;br/&gt; %s bom preprečil ogled vaše dejavnosti na teh spletnih mestih.</string>
-
-    <!-- Covid Cta-->
-    <string name="covidCtaText">Pridobite uradne informacije in nasvete za COVID-19.</string>
 </resources>

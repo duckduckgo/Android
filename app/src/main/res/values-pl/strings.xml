@@ -408,7 +408,4 @@
     <string name="daxNonSerpCtaText">Kiedy będziesz stukać i przewijać, będę blokować nieznośne moduły śledzące. &lt;br/&gt;&lt;br/&gt;Śmiało - kontynuuj przeglądanie!</string>
     <string name="daxMainNetworkOwnedCtaText">Heads-up! %s jest własnością %s.Moduły śledzące &lt;br/&gt;&lt;br/&gt; %s czają się na około %s najlepszych witrynach &#128561;, ale nie martw się! &lt;br/&gt;&lt;br/&gt;Zablokuję %s Twoją aktywność na tych strony.</string>
     <string name="daxMainNetworkCtaText">Heads-up! %s to duża sieć śledzenia.&lt;br/&gt;&lt;br/&gt; Ich moduły śledzące czają się na około %s najpopularniejszych witryn &#128561;, ale nie martw się! &lt;br/&gt;&lt;br/&gt;Zablokuję %s Twoją aktywność na tych stronach.</string>
-
-    <!-- Covid Cta-->
-    <string name="covidCtaText">Zobacz oficjalne informacje i wskazówki dotyczące COVID-19.</string>
 </resources>

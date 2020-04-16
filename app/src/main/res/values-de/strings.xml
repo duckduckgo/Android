@@ -396,7 +396,4 @@
     <string name="daxNonSerpCtaText">Während Sie tippen und scrollen, blockiere ich lästige Tracker. &lt;br/&gt;&lt;br/&gt;Vorwärts — surfen Sie weiter!</string>
     <string name="daxMainNetworkOwnedCtaText">Augen auf! %s gehört %s.&lt;br/&gt;&lt;br/&gt; Die Tracker von %s lauern auf ungefähr %s der Top-Websites &#128561;, aber keine Sorge! &lt;br/&gt;&lt;br/&gt;Ich werde %s daran hindern, Ihre Aktivitäten auf diesen Websites zu verfolgen.</string>
     <string name="daxMainNetworkCtaText">Augen auf! %s ist ein wichtiges Tracking-Netzwerk.&lt;br/&gt;&lt;br/&gt; Ihre Tracker lauern auf ungefähr %s der Top-Websites &#128561;, aber keine Sorge! &lt;br/&gt;&lt;br/&gt;Ich werde %s daran hindern, Ihre Aktivitäten auf diesen Websites zu sehen.</string>
-
-    <!-- Covid Cta-->
-    <string name="covidCtaText">Offizielle COVID-19 Infos &amp; Tipps.</string>
 </resources>

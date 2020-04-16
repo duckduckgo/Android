@@ -402,7 +402,4 @@
     <string name="daxNonSerpCtaText">Bakstelėjus ir slenkant, bus blokuojami įkyrūs sekimo įrenginiai. &lt;br/&gt;&lt;br/&gt;Pirmyn - naršykite toliau!</string>
     <string name="daxMainNetworkOwnedCtaText">Būkite atidus! %s priklauso %s.&lt;br/&gt;&lt;br/&gt; %s stebėtojai tyko %s populiariausiuose tinklapiuose &#128561;, bet nesijaudinkite! &lt;br/&gt;&lt;br/&gt;Blokuosiu %s sekimą tuose tinklapiuose.</string>
     <string name="daxMainNetworkCtaText">Būkite atidus! %s yra pagrindinis sekimo tinklas.&lt;br/&gt;&lt;br/&gt; stebėtojai tyko %s populiariausiuose tinklapiuose &#128561;, bet nesijaudinkite! &lt;br/&gt;&lt;br/&gt;Blokuosiu %s sekimą tuose tinklapiuose.</string>
-
-    <!-- Covid Cta-->
-    <string name="covidCtaText">Gaukite oficialiosios informacijos apie COVID-19 ir patarimų.</string>
 </resources>

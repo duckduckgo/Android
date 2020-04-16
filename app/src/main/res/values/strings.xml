@@ -405,7 +405,4 @@
     <string name="daxNonSerpCtaText"><![CDATA[As you tap and scroll, I\'ll block pesky trackers. <br/><br/>Go ahead — keep browsing!]]></string>
     <string name="daxMainNetworkOwnedCtaText"><![CDATA[Heads up! %s is owned by %s.<br/><br/> %s\'s trackers lurk on about %s of top websites 😱 but don\'t worry!<br/><br/>I\'ll block %s from seeing your activity on those sites.]]></string>
     <string name="daxMainNetworkCtaText"><![CDATA[Heads up! %s is a major tracking network.<br/><br/> Their trackers lurk on about %s of top sites 😱 but don\'t worry!<br/><br/>I\'ll block %s from seeing your activity on those sites.]]></string>
-
-    <!-- Covid Cta-->
-    <string name="covidCtaText">Get official COVID-19 info and tips.</string>
 </resources>
