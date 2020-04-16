@@ -89,21 +89,25 @@
 
     <plurals name="trackersFound">
         <item quantity="one">%s pronađen alat za praćenje</item>
+        <item quantity="few">%s pronađenih alata za praćenje</item>
         <item quantity="other">%s pronađenih alata za praćenje</item>
     </plurals>
 
     <plurals name="trackerBlocked">
         <item quantity="one">%s blokiranih alata za praćenje</item>
+        <item quantity="few">%s blokiranih alata za praćenje</item>
         <item quantity="other">%s blokiranih alata za praćenje</item>
     </plurals>
 
     <plurals name="majorNetworksFound">
         <item quantity="one">%s pronađenih glavnih mreža za praćenje</item>
+        <item quantity="few">%s pronađenih glavnih mreža za praćenje</item>
         <item quantity="other">%s pronađenih glavnih mreža za praćenje</item>
     </plurals>
 
     <plurals name="majorNetworksBlocked">
         <item quantity="one">%s blokiranih glavnih mreža za praćenje</item>
+        <item quantity="few">%s blokiranih glavnih mreža za praćenje</item>
         <item quantity="other">%s blokiranih glavnih mreža za praćenje</item>
     </plurals>
 
@@ -390,7 +394,11 @@
         <item quantity="few">&#160;i &lt;b&gt;%d ostali&lt;/b&gt; su vas pokušavali pratiti ovdje. &lt;br/&gt;&lt;br/&gt;Blokirao sam ih!&lt;br/&gt;&lt;br/&gt; ☝️Možete provjeriti URL traku kako biste vidjeli tko vas pokušava pratiti kad posjetite novo web-mjesto.️ </item>
         <item quantity="other">&#160;i &lt;b&gt;%d ostali&lt;/b&gt; su vas pokušavali pratiti ovdje. &lt;br/&gt;&lt;br/&gt;Blokirao sam ih!&lt;br/&gt;&lt;br/&gt; ☝️Možete provjeriti URL traku kako biste vidjeli tko vas pokušava pratiti kad posjetite novo web-mjesto.️</item>
     </plurals>
-    <string name="daxTrackersBlockedCtaZeroText">&#160;vas je pokušavao pratiti ovdje. &lt;br/&gt;&lt;br/&gt;Blokirao sam ga!&lt;br/&gt;&lt;br/&gt; ☝️Možete provjeriti URL traku kako biste vidjeli tko vas pokušava pratiti kad posjetite novo web-mjesto.️</string>
+    <plurals name="daxTrackersBlockedCtaZeroText">
+        <item quantity="one" tools:ignore="ImpliedQuantity">&#160;vas je pokušavao pratiti ovdje. &lt;br/&gt;&lt;br/&gt;Blokirao sam ga!&lt;br/&gt;&lt;br/&gt; ☝️Možete provjeriti URL traku kako biste vidjeli tko vas pokušava pratiti kad posjetite novo web-mjesto.️</item>
+        <item quantity="few">&#160;su vas pokušavali pratiti ovdje. &lt;br/&gt;&lt;br/&gt;Blokirao sam ga!&lt;br/&gt;&lt;br/&gt; ☝️Možete provjeriti URL traku kako biste vidjeli tko vas pokušava pratiti kad posjetite novo web-mjesto.️</item>
+        <item quantity="other">&#160;su vas pokušavali pratiti ovdje. &lt;br/&gt;&lt;br/&gt;Blokirao sam ga!&lt;br/&gt;&lt;br/&gt; ☝️Možete provjeriti URL traku kako biste vidjeli tko vas pokušava pratiti kad posjetite novo web-mjesto.️</item>
+    </plurals>
     <string name="daxNonSerpCtaText">Čim dodirnete i pomičete, blokirat ću neugodne tragače. &lt;br/&gt;&lt;br/&gt;Naprijed - nastavite pretraživati!</string>
     <string name="daxMainNetworkOwnedCtaText">Obratite pozornost! %s je u vlasništvu %s.&lt;br/&gt;&lt;br/&gt; %s tragači vrebaju na oko %s top web-mjesta &#128561;, ali ne brinite! &lt;br/&gt;&lt;br/&gt;Blokirat ću %s da  ne vide vašu aktivnost na tim stranicama.</string>
     <string name="daxMainNetworkCtaText">Obratite pozornost! %s je glavna mreža za praćenje.&lt;br/&gt;&lt;br/&gt; Njihovi tragači vrebaju na oko %s top web-mjesta &#128561;, ali ne brinite! &lt;br/&gt;&lt;br/&gt;Blokirat ću %s  da ne vide vašu aktivnost na tim stranicama.</string>

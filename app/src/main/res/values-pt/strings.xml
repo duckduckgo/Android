@@ -389,7 +389,10 @@
         <item quantity="one">&#160;e mais &lt;b&gt;%d outro&lt;/b&gt; estava tentar rastrear aqui. &lt;br/&gt;&lt;br/&gt;Eu bloqueei-os!&lt;br/&gt;&lt;br/&gt; ☝️Pode verificar a barra de URL para ver quem está a tentar rastrear quando visita um novo site.️</item>
         <item quantity="other">&#160;e mais &lt;b&gt;%d outros&lt;/b&gt; estavam a tentar rastrear aqui. &lt;br/&gt;&lt;br/&gt;Eu bloqueei-os!&lt;br/&gt;&lt;br/&gt; ☝️Pode verificar a barra de URL para ver quem está a tentar rastrear quando visita um novo site.️</item>
     </plurals>
-    <string name="daxTrackersBlockedCtaZeroText">&#160;estava a tentar rastrear aqui. &lt;br/&gt;&lt;br/&gt;Eu bloqueei-o!&lt;br/&gt;&lt;br/&gt; ☝️Pode verificar a barra de URL para ver quem está a tentar rastrear quando visita um novo site.️</string>
+    <plurals name="daxTrackersBlockedCtaZeroText">
+        <item quantity="one" tools:ignore="ImpliedQuantity">&#160;estava a tentar rastrear aqui. &lt;br/&gt;&lt;br/&gt;Eu bloqueei-o!&lt;br/&gt;&lt;br/&gt; ☝️Pode verificar a barra de URL para ver quem está a tentar rastrear quando visita um novo site.️</item>
+        <item quantity="other">&#160;estavam a tentar rastrear aqui. &lt;br/&gt;&lt;br/&gt;Eu bloqueei-o!&lt;br/&gt;&lt;br/&gt; ☝️Pode verificar a barra de URL para ver quem está a tentar rastrear quando visita um novo site.️</item>
+    </plurals>
     <string name="daxNonSerpCtaText">Enquanto toca e desliza, eu bloqueio rastreadores irritantes. &lt;br/&gt;&lt;br/&gt;Prossiga - continue a navegar!</string>
     <string name="daxMainNetworkOwnedCtaText">Atenção! %s é propriedade de %s.Os rastreadores de &lt;br/&gt;&lt;br/&gt; %s estão ocultos em cerca de %s dos principais sites &#128561;, mas não se preocupe! &lt;br/&gt;&lt;br/&gt;Eu impeço %s de ver a sua atividade nesses sites.</string>
     <string name="daxMainNetworkCtaText">Atenção! %s é uma grande rede de rastreamento.&lt;br/&gt;&lt;br/&gt; Os seus rastreadores estão à espreita em cerca de %s dos principais sites &#128561;, mas não se preocupe! &lt;br/&gt;&lt;br/&gt;Eu impeço %s de ver a sua atividade nesses sites.</string>

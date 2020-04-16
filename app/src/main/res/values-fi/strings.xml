@@ -389,7 +389,10 @@
         <item quantity="one">&#160;ja &lt;b&gt;%d muu&lt;/b&gt; yritti jäljittää sinua täällä. &lt;br/&gt;&lt;br/&gt;Estin heidät!&lt;br/&gt;&lt;br/&gt; ☝️Voit tarkistaa URL-palkin nähdäksesi kuka yrittää seurata sinua vieraillessasi uudella sivustolla.️</item>
         <item quantity="other">&#160;ja &lt;b&gt;%d muut&lt;/b&gt; yrittivät jäljittää sinua täällä. &lt;br/&gt;&lt;br/&gt;Estin heidät!&lt;br/&gt;&lt;br/&gt; ☝️Voit tarkistaa URL-palkin nähdäksesi kuka yrittää seurata sinua vieraillessasi uudella sivustolla.️</item>
     </plurals>
-    <string name="daxTrackersBlockedCtaZeroText">&#160;yritti seurata sinua. &lt;br/&gt;&lt;br/&gt;Estin sen!&lt;br/&gt;&lt;br/&gt; ☝️Voit tarkistaa URL-palkin nähdäksesi kuka yrittää seurata sinua vieraillessasi uudella sivustolla.️</string>
+    <plurals name="daxTrackersBlockedCtaZeroText">
+        <item quantity="one">&#160;yritti seurata sinua. &lt;br/&gt;&lt;br/&gt;Estin sen!&lt;br/&gt;&lt;br/&gt; ☝️Voit tarkistaa URL-palkin nähdäksesi kuka yrittää seurata sinua vieraillessasi uudella sivustolla.️</item>
+        <item quantity="other">&#160;yrittivät seurata sinua. &lt;br/&gt;&lt;br/&gt;Estin sen!&lt;br/&gt;&lt;br/&gt; ☝️Voit tarkistaa URL-palkin nähdäksesi kuka yrittää seurata sinua vieraillessasi uudella sivustolla.️</item>
+    </plurals>
     <string name="daxNonSerpCtaText">Kun napautat ja selaat, estän ikävät seurantaohjelmat. &lt;br/&gt;&lt;br/&gt;Siirry eteenpäin - jatka selaamista!</string>
     <string name="daxMainNetworkOwnedCtaText">Pysy valppaana! %s:n omistaa %s.&lt;br/&gt;&lt;br/&gt; %s:n seurantaohjelmat väijyvät noin %s:lla suosituimmista verkkosivustoista &#128561;, mutta älä huoli! &lt;br/&gt;&lt;br/&gt;Estän %s-väijyjää näkemästä toimintaasi näillä sivustoilla.</string>
     <string name="daxMainNetworkCtaText">Pysy valppaana! %s on merkittävä seurantaverkko.&lt;br/&gt;&lt;br/&gt; Heidän seurantaohjelmansa väijyvät noin %s:lla suosituimmista sivustoista &#128561;, mutta älä huoli! &lt;br/&gt;&lt;br/&gt;Estän %s-väijyjää näkemästä toimintaasi näillä sivustoilla.</string>

@@ -95,16 +95,19 @@
 
     <plurals name="trackerBlocked">
         <item quantity="one">%s zablokované sledovacie zariadenie</item>
+        <item quantity="few">%s zablokovaných sledovacích zariadení</item>
         <item quantity="other">%s zablokovaných sledovacích zariadení</item>
     </plurals>
 
     <plurals name="majorNetworksFound">
         <item quantity="one">%s nájdená veľká sieť sledovacích zariadení</item>
+        <item quantity="few">%s nájdených veľkých sietí sledovacích zariadení</item>
         <item quantity="other">%s nájdených veľkých sietí sledovacích zariadení</item>
     </plurals>
 
     <plurals name="majorNetworksBlocked">
         <item quantity="one">%s zablokovaná veľká sieť sledovacích zariadení</item>
+        <item quantity="few">%s zablokovaných veľkých sietí sledovacích zariadení</item>
         <item quantity="other">%s zablokovaných veľkých sietí sledovacích zariadení</item>
     </plurals>
 
@@ -389,10 +392,13 @@
     <plurals name="daxTrackersBlockedCtaText">
         <item quantity="one">&#160;a &lt;b&gt;%d ďalší&lt;/b&gt; sa vás tu pokúsil sledovať. &lt;br/&gt;&lt;br/&gt;Zablokovali sme ich!&lt;br/&gt;&lt;br/&gt; ☝️Skontrolujte si panel s URL adresou a zistite, kto sa vás snaží sledovať pri vašej návšteve novej stránky.️</item>
         <item quantity="few">&#160;a &lt;b&gt;%d ďalších&lt;/b&gt; sa vás tu pokúsilo sledovať. &lt;br/&gt;&lt;br/&gt;Zablokovali sme ich!&lt;br/&gt;&lt;br/&gt; ☝️Skontrolujte si panel s URL adresou a zistite, kto sa vás snaží sledovať pri vašej návšteve novej stránky.️</item>
-        <item quantity="many">&#160;a &lt;b&gt;%d ďalších&lt;/b&gt; sa vás tu pokúsilo sledovať. &lt;br/&gt;&lt;br/&gt;Zablokovali sme ich!&lt;br/&gt;&lt;br/&gt; ☝️Skontrolujte si panel s URL adresou a zistite, kto sa vás snaží sledovať pri vašej návšteve novej stránky.️</item>
         <item quantity="other">&#160;a &lt;b&gt;%d ďalší&lt;/b&gt; sa vás tu pokúsil sledovať. &lt;br/&gt;&lt;br/&gt;Zablokovali sme ich!&lt;br/&gt;&lt;br/&gt; ☝️Skontrolujte si panel s URL adresou a zistite, kto sa vás snaží sledovať pri vašej návšteve novej stránky.️</item>
     </plurals>
-    <string name="daxTrackersBlockedCtaZeroText">&#160;sa vás tu snažil sledovať. &lt;br/&gt;&lt;br/&gt;Zablokovali sme ho!&lt;br/&gt;&lt;br/&gt; ☝️Skontrolujte si panel s URL adresou a zistite, kto sa vás snaží sledovať pri vašej návšteve novej stránky.️</string>
+    <plurals name="daxTrackersBlockedCtaZeroText">
+        <item quantity="one">&#160;sa vás tu pokúsil sledovať. &lt;br/&gt;&lt;br/&gt;Zablokovali sme ho!&lt;br/&gt;&lt;br/&gt; ☝️Skontrolujte si panel s URL adresou a zistite, kto sa vás snaží sledovať pri vašej návšteve novej stránky.️</item>
+        <item quantity="few">&#160;sa vás tu pokúsilo sledovať. &lt;br/&gt;&lt;br/&gt;Zablokovali sme ho!&lt;br/&gt;&lt;br/&gt; ☝️Skontrolujte si panel s URL adresou a zistite, kto sa vás snaží sledovať pri vašej návšteve novej stránky.️</item>
+        <item quantity="other">&#160;sa vás tu pokúsil sledovať. &lt;br/&gt;&lt;br/&gt;Zablokovali sme ho!&lt;br/&gt;&lt;br/&gt; ☝️Skontrolujte si panel s URL adresou a zistite, kto sa vás snaží sledovať pri vašej návšteve novej stránky.️</item>
+    </plurals>
     <string name="daxNonSerpCtaText">Počas toho, ako budeš ťukať a posúvať, zablokujem nepríjemné sledovacie zariadenia. &lt;br/&gt;&lt;br/&gt;Neprestávaj - pokračuj v prehľadávaní!</string>
     <string name="daxMainNetworkOwnedCtaText">Hlavu hore! Vlastníkom %s je %s.Sledovatelia &lt;br/&gt;&lt;br/&gt; %s číhajú na %s najobľúbenejších weboch &#128561;, ale nemaj strach! &lt;br/&gt;&lt;br/&gt;Zablokujem %s, aby niekto pozoroval tvoje aktivity na týchto stránkach.</string>
     <string name="daxMainNetworkCtaText">Hlavu hore! %s je hlavná sledovacia sieť.&lt;br/&gt;&lt;br/&gt; Ich sledovatelia číhajú na %s najobľúbenejších weboch &#128561;, ale nemaj strach! &lt;br/&gt;&lt;br/&gt;Zablokujem %s, aby niekto pozoroval tvoje aktivity na týchto stránkach.</string>

@@ -168,7 +168,7 @@
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Kaydet</string>
 
-    <string name="settingsAutomaticallyClearWhat">Otomatik olarak siliniyor...</string>
+    <string name="settingsAutomaticallyClearWhat">Otomatik olarak siliniyor…</string>
     <string name="settingsAutomaticallyClearWhatOptionNone">Yok</string>
     <string name="settingsAutomaticallyClearWhatOptionTabs">Sekmeler</string>
     <string name="settingsAutomaticallyClearWhatOptionTabsAndData">Sekmeler ve veriler</string>
@@ -412,7 +412,10 @@
         <item quantity="one">&#160;ve &lt;b&gt;%d diğer&lt;/b&gt; sizi burada izlemeye çalışıyordu. &lt;br/&gt;&lt;br/&gt;Onları engelledim!&lt;br/&gt;&lt;br/&gt; ☝️Yeni bir siteyi ziyaret ettiğinizde sizi kimin izlemeye çalıştığını görmek için URL çubuğunu kontrol edebilirsiniz.</item>
         <item quantity="other">&#160;ve &lt;b&gt;%d diğerleri&lt;/b&gt; sizi burada izlemeye çalışıyordu. &lt;br/&gt;&lt;br/&gt;Onları engelledim!&lt;br/&gt;&lt;br/&gt; ☝️Yeni bir siteyi ziyaret ettiğinizde sizi kimin izlemeye çalıştığını görmek için URL çubuğunu kontrol edebilirsiniz.</item>
     </plurals>
-    <string name="daxTrackersBlockedCtaZeroText">&#160;sizi burada izlemeye çalışıyordu. &lt;br/&gt;&lt;br/&gt;Onu engelledim!&lt;br/&gt;&lt;br/&gt; ☝️Yeni bir siteyi ziyaret ettiğinizde sizi kimin izlemeye çalıştığını görmek için URL çubuğunu kontrol edebilirsiniz.</string>
+    <plurals name="daxTrackersBlockedCtaZeroText">
+        <item quantity="one">&#160;sizi burada izlemeye çalışıyordu. &lt;br/&gt;&lt;br/&gt;Onu engelledim!&lt;br/&gt;&lt;br/&gt; ☝️Yeni bir siteyi ziyaret ettiğinizde sizi kimin izlemeye çalıştığını görmek için URL çubuğunu kontrol edebilirsiniz.</item>
+        <item quantity="other">&#160;sizi burada izlemeye çalışıyordu. &lt;br/&gt;&lt;br/&gt;Onu engelledim!&lt;br/&gt;&lt;br/&gt; ☝️Yeni bir siteyi ziyaret ettiğinizde sizi kimin izlemeye çalıştığını görmek için URL çubuğunu kontrol edebilirsiniz.</item>
+    </plurals>
     <string name="daxNonSerpCtaText">Siz gezintinize devam ederken sinir bozucu izleyicileri engelleyeceğim. &lt;br/&gt;&lt;br/&gt;Hadi, gezinmeye devam edin!</string>
     <string name="daxMainNetworkOwnedCtaText">Dikkat! %s, %s şirketine aittir.&lt;br/&gt;&lt;br/&gt; %s\'ın izleyicileri, en iyi web sitelerinin yaklaşık %s kadarını gizliyor ancak endişelenmeyin! &lt;br/&gt;&lt;br/&gt;%s\'nın bu sitelerdeki etkinliğinizi görmesini engelleyeceğim.</string>
     <string name="daxMainNetworkCtaText">Dikkat! %s büyük bir izleme ağıdır.&lt;br/&gt;&lt;br/&gt; İzleyicileri, en iyi sitelerin yaklaşık %s kadarını gizliyor &#128561; ancak endişelenmeyin! &lt;br/&gt;&lt;br/&gt;%s \'nin bu sitelerdeki etkinliğinizi görmesini engelleyeceğim.</string>
