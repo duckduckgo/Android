@@ -396,7 +396,4 @@
     <string name="daxNonSerpCtaText">Enquanto toca e desliza, eu bloqueio rastreadores irritantes. &lt;br/&gt;&lt;br/&gt;Prossiga - continue a navegar!</string>
     <string name="daxMainNetworkOwnedCtaText">Atenção! %s é propriedade de %s.Os rastreadores de &lt;br/&gt;&lt;br/&gt; %s estão ocultos em cerca de %s dos principais sites &#128561;, mas não se preocupe! &lt;br/&gt;&lt;br/&gt;Eu impeço %s de ver a sua atividade nesses sites.</string>
     <string name="daxMainNetworkCtaText">Atenção! %s é uma grande rede de rastreamento.&lt;br/&gt;&lt;br/&gt; Os seus rastreadores estão à espreita em cerca de %s dos principais sites &#128561;, mas não se preocupe! &lt;br/&gt;&lt;br/&gt;Eu impeço %s de ver a sua atividade nesses sites.</string>
-
-    <!-- Covid Cta-->
-    <string name="covidCtaText">Obtenha informações oficiais e sugestões sobre a COVID-19.</string>
 </resources>

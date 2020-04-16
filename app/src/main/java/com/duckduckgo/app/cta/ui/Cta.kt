@@ -352,12 +352,6 @@ sealed class HomeTopPanelCta(
         view.upperCtaTitle.text = view.context.getString(description)
         view.show()
     }
-
-    data class CovidCta(val searchTerm: String = COVID_SEARCH_TERM) : HomeTopPanelCta(CtaId.COVID, null, null, null, R.string.covidCtaText) {
-        companion object {
-            private const val COVID_SEARCH_TERM = "covid 19"
-        }
-    }
 }
 
 fun DaxCta.addCtaToHistory(newCta: String): String {

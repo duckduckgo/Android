@@ -419,7 +419,4 @@
     <string name="daxNonSerpCtaText">Siz gezintinize devam ederken sinir bozucu izleyicileri engelleyeceğim. &lt;br/&gt;&lt;br/&gt;Hadi, gezinmeye devam edin!</string>
     <string name="daxMainNetworkOwnedCtaText">Dikkat! %s, %s şirketine aittir.&lt;br/&gt;&lt;br/&gt; %s\'ın izleyicileri, en iyi web sitelerinin yaklaşık %s kadarını gizliyor ancak endişelenmeyin! &lt;br/&gt;&lt;br/&gt;%s\'nın bu sitelerdeki etkinliğinizi görmesini engelleyeceğim.</string>
     <string name="daxMainNetworkCtaText">Dikkat! %s büyük bir izleme ağıdır.&lt;br/&gt;&lt;br/&gt; İzleyicileri, en iyi sitelerin yaklaşık %s kadarını gizliyor &#128561; ancak endişelenmeyin! &lt;br/&gt;&lt;br/&gt;%s \'nin bu sitelerdeki etkinliğinizi görmesini engelleyeceğim.</string>
-
-    <!-- Covid Cta-->
-    <string name="covidCtaText">Resmi COVID-19 hakkında bilgi ve ipuçları alın.</string>
 </resources>

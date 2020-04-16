@@ -402,7 +402,4 @@
     <string name="daxNonSerpCtaText">În timp ce atingi și derulezi, voi bloca urmăritorii pisălogi. &lt;br/&gt;&lt;br/&gt;Dă-i bătaie- continuă să navighezi!</string>
     <string name="daxMainNetworkOwnedCtaText">Atenție! %s este deținut de %s.&lt;br/&gt;&lt;br/&gt; Urmăritorii %s spionează %s site-urile web de top, &#128561; dar nu îți face griji! &lt;br/&gt;&lt;br/&gt;Îi voi bloca %s să nu vadă activitatea ta pe acele site-uri.</string>
     <string name="daxMainNetworkCtaText">Atenție! %s este o rețea semnificativă de urmărire.&lt;br/&gt;&lt;br/&gt; Urmăritorii lor spionează %s site-uri de top, &#128561; dar nu îți face griji! &lt;br/&gt;&lt;br/&gt;Îi voi bloca %s să nu vadă activitatea ta pe acele site-uri.</string>
-
-    <!-- Covid Cta-->
-    <string name="covidCtaText">Obține informații și sfaturi oficiale COVID-19.</string>
 </resources>

@@ -49,7 +49,7 @@
             app:layout_constraintEnd_toStartOf="@+id/closeButton"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            tools:text="@string/covidCtaText" />
+            tools:text="@string/addWidgetCtaTitle" />
 
         <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/closeButton"

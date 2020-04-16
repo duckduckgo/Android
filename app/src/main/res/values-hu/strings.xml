@@ -396,7 +396,4 @@
     <string name="daxNonSerpCtaText">Ahogy megérinti és görgeti, én blokkolni fogom a bosszantó nyomkövetőket. &lt;br/&gt;&lt;br/&gt;Menjen tovább - folytassa a böngészést!</string>
     <string name="daxMainNetworkOwnedCtaText">Fel a fejjel! A(z) %s tulajdonosa a(z) %s.&lt;br/&gt;&lt;br/&gt; %s nyomkövetői ott leselkednek a legfontosabb webhelyek %s oldalán &#128561; de ne aggódjon! &lt;br/&gt;&lt;br/&gt;meg fogom akadályozni, hogy a(z) %s láthassa az Ön tevékenységeit azokon az oldalakon.</string>
     <string name="daxMainNetworkCtaText">Fel a fejjel! A(z) %s egy nagy nyomkövető hálózat.&lt;br/&gt;&lt;br/&gt; A nyomkövetői ott leselkednek a legfontosabb webhelyek %s oldalán &#128561;, de ne aggódjon! &lt;br/&gt;&lt;br/&gt;meg fogom akadályozni, hogy a(z) %s láthassa az Ön tevékenységét azokon a webhelyeken.</string>
-
-    <!-- Covid Cta-->
-    <string name="covidCtaText">Kapjon hivatalos információt és tippeket a COVID-19-ről.</string>
 </resources>

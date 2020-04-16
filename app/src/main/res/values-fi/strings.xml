@@ -396,7 +396,4 @@
     <string name="daxNonSerpCtaText">Kun napautat ja selaat, estän ikävät seurantaohjelmat. &lt;br/&gt;&lt;br/&gt;Siirry eteenpäin - jatka selaamista!</string>
     <string name="daxMainNetworkOwnedCtaText">Pysy valppaana! %s:n omistaa %s.&lt;br/&gt;&lt;br/&gt; %s:n seurantaohjelmat väijyvät noin %s:lla suosituimmista verkkosivustoista &#128561;, mutta älä huoli! &lt;br/&gt;&lt;br/&gt;Estän %s-väijyjää näkemästä toimintaasi näillä sivustoilla.</string>
     <string name="daxMainNetworkCtaText">Pysy valppaana! %s on merkittävä seurantaverkko.&lt;br/&gt;&lt;br/&gt; Heidän seurantaohjelmansa väijyvät noin %s:lla suosituimmista sivustoista &#128561;, mutta älä huoli! &lt;br/&gt;&lt;br/&gt;Estän %s-väijyjää näkemästä toimintaasi näillä sivustoilla.</string>
-
-    <!-- Covid Cta-->
-    <string name="covidCtaText">Hanki COVID-19:ää koskevia virallisia tietoja ja neuvoja.</string>
 </resources>

@@ -402,7 +402,4 @@
     <string name="daxNonSerpCtaText">Počas toho, ako budeš ťukať a posúvať, zablokujem nepríjemné sledovacie zariadenia. &lt;br/&gt;&lt;br/&gt;Neprestávaj - pokračuj v prehľadávaní!</string>
     <string name="daxMainNetworkOwnedCtaText">Hlavu hore! Vlastníkom %s je %s.Sledovatelia &lt;br/&gt;&lt;br/&gt; %s číhajú na %s najobľúbenejších weboch &#128561;, ale nemaj strach! &lt;br/&gt;&lt;br/&gt;Zablokujem %s, aby niekto pozoroval tvoje aktivity na týchto stránkach.</string>
     <string name="daxMainNetworkCtaText">Hlavu hore! %s je hlavná sledovacia sieť.&lt;br/&gt;&lt;br/&gt; Ich sledovatelia číhajú na %s najobľúbenejších weboch &#128561;, ale nemaj strach! &lt;br/&gt;&lt;br/&gt;Zablokujem %s, aby niekto pozoroval tvoje aktivity na týchto stránkach.</string>
-
-    <!-- Covid Cta-->
-    <string name="covidCtaText">Získajte oficiálne informácie a tipy ohľadom COVID-19.</string>
 </resources>

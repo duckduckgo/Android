@@ -396,7 +396,4 @@
     <string name="daxNonSerpCtaText">Når du trykker og blar, blokkerer jeg irriterende trackere. &lt;br/&gt;&lt;br/&gt;Gå videre – fortsett å bla!</string>
     <string name="daxMainNetworkOwnedCtaText">Følg med! %s eies av %s.&lt;br/&gt;&lt;br/&gt; %ss trackere lurer på omtrent %s av ledende nettsteder &#128561; men ikke bekymre deg! &lt;br/&gt;&lt;br/&gt;Jeg blokkerer %s fra å se aktiviteten din på disse nettstedene.</string>
     <string name="daxMainNetworkCtaText">Følg med! %s er et stort sporingsnettverk.&lt;br/&gt;&lt;br/&gt; Trackerne deres lurer på omtrent %s av ledende nettsteder &#128561; men ikke bekymre deg! &lt;br/&gt;&lt;br/&gt;Jeg hindrer %s fra å se aktiviteten din på disse nettstedene.</string>
-
-    <!-- Covid Cta-->
-    <string name="covidCtaText">Få offisiell info og tips om COVID-19.</string>
 </resources>

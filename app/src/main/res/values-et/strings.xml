@@ -417,7 +417,4 @@
     <string name="daxNonSerpCtaText">Kui puudutate ja kerite, siis mina blokeerin tüütud jälgijad. &lt;br/&gt;&lt;br/&gt;Edasi — jätkake sirvimist!</string>
     <string name="daxMainNetworkOwnedCtaText">Ettevaatust! Ettevõtte %s omanik on %s.&lt;br/&gt;&lt;br/&gt; %s jälitajad varitsevad %s populaarseimatest veebisaitidest, &#128561; aga ärge muretsege!&lt;br/&gt;&lt;br/&gt;Hoolitsen selle eest, et %s teid nendel saitidel ei jälgiks.</string>
     <string name="daxMainNetworkCtaText">Ettevaatust! %s on suur jälgimisvõrgustik.&lt;br/&gt;&lt;br/&gt; Nend jälitajad jälgivad teid %s populaarseimatest saitidest, &#128561; aga ärge muretsege!&lt;br/&gt;&lt;br/&gt;Hoolitsen selle eest, et %s teid nendel saitidel ei jälgiks.</string>
-
-    <!-- Covid Cta-->
-    <string name="covidCtaText">Hankige ametlikku teavet COVID-19 kohta ja näpunäiteid.</string>
 </resources>
