@@ -131,6 +131,7 @@ class BrowserTrackersAnimatorHelper {
     private fun createResourcesIdList(activity: Activity, entities: List<Entity>): List<TrackerLogo>? {
         if (activity.packageName == null) return emptyList()
         val resourcesList = entities
+            .take(MAX_LOGOS_SHOWN + 1)
             .map {
                 val res = TrackersRenderer().networkLogoIcon(activity, it.name)
                 if (res == null) {
