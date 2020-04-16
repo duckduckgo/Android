@@ -389,7 +389,10 @@
         <item quantity="one">&#160;y &lt;b&gt;%d más&lt;/b&gt; intentaban rastrearte aquí. &lt;br/&gt;&lt;br/&gt;¡Los he bloqueado!&lt;br/&gt;&lt;br/&gt; ☝️Puedes consultar la barra de navegación para ver quién está tratando de rastrearte cuando visitas un nuevo sitio.️</item>
         <item quantity="other">&#160;y &lt;b&gt;%d más&lt;/b&gt; intentaban rastrearte aquí. &lt;br/&gt;&lt;br/&gt;¡Los he bloqueado!&lt;br/&gt;&lt;br/&gt; ☝️Puedes consultar la barra de navegación para ver quién está tratando de rastrearte cuando visitas un nuevo sitio.️</item>
     </plurals>
-    <string name="daxTrackersBlockedCtaZeroText">&#160;intentaba rastrearte aquí. &lt;br/&gt;&lt;br/&gt;¡Lo he bloqueado!&lt;br/&gt;&lt;br/&gt; ☝️Puedes consultar la barra de navegación para ver quién está tratando de rastrearte cuando visitas un nuevo sitio.️</string>
+    <plurals name="daxTrackersBlockedCtaZeroText">
+        <item quantity="one">&#160;intentaba rastrearte aquí. &lt;br/&gt;&lt;br/&gt;¡Lo he bloqueado!&lt;br/&gt;&lt;br/&gt; ☝️Puedes consultar la barra de navegación para ver quién está tratando de rastrearte cuando visitas un nuevo sitio.️</item>
+        <item quantity="other">&#160;intentaban rastrearte aquí. &lt;br/&gt;&lt;br/&gt;¡Lo he bloqueado!&lt;br/&gt;&lt;br/&gt; ☝️Puedes consultar la barra de navegación para ver quién está tratando de rastrearte cuando visitas un nuevo sitio.️</item>
+    </plurals>
     <string name="daxNonSerpCtaText">A medida que navegues y te desplaces, bloquearé rastreadores molestos. &lt;br/&gt;&lt;br/&gt;Adelante, ¡sigue navegando!</string>
     <string name="daxMainNetworkOwnedCtaText">¡Cuidado! %s pertenece %s.&lt;br/&gt;&lt;br/&gt;Los rastreadores de %s acechan en %s de los principales sitios web &#128561; ¡pero no te preocupes! &lt;br/&gt;&lt;br/&gt;Bloquearé a %s para que no vean tu actividad en esos sitios.</string>
     <string name="daxMainNetworkCtaText">¡Cuidado! %s es una importante red de rastreo.&lt;br/&gt;&lt;br/&gt; Sus rastreadores acechan en aproximadamente %s de los sitios principales &#128561; ¡pero no te preocupes! &lt;br/&gt;&lt;br/&gt;Bloquearé a %s para que no vea tu actividad en esos sitios.</string>

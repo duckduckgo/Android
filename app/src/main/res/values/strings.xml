@@ -398,7 +398,10 @@
         <item quantity="one"><![CDATA[&#160;and <b>%d other</b> were trying to track you here. <br/><br/>I blocked them!<br/><br/> ☝️You can check the URL bar to see who is trying to track you when you visit a new site.️]]></item>
         <item quantity="other"><![CDATA[&#160;and <b>%d others</b> were trying to track you here. <br/><br/>I blocked them!<br/><br/> ☝️You can check the URL bar to see who is trying to track you when you visit a new site.️]]></item>
     </plurals>
-    <string name="daxTrackersBlockedCtaZeroText"><![CDATA[&#160;was trying to track you here. <br/><br/>I blocked it!<br/><br/> ☝️You can check the URL bar to see who is trying to track you when you visit a new site.️]]></string>
+    <plurals name="daxTrackersBlockedCtaZeroText">
+        <item quantity="one"><![CDATA[&#160;was trying to track you here. <br/><br/>I blocked it!<br/><br/> ☝️You can check the URL bar to see who is trying to track you when you visit a new site.️]]></item>
+        <item quantity="other"><![CDATA[&#160;were trying to track you here. <br/><br/>I blocked it!<br/><br/> ☝️You can check the URL bar to see who is trying to track you when you visit a new site.️]]></item>
+    </plurals>
     <string name="daxNonSerpCtaText"><![CDATA[As you tap and scroll, I\'ll block pesky trackers. <br/><br/>Go ahead — keep browsing!]]></string>
     <string name="daxMainNetworkOwnedCtaText"><![CDATA[Heads up! %s is owned by %s.<br/><br/> %s\'s trackers lurk on about %s of top websites 😱 but don\'t worry!<br/><br/>I\'ll block %s from seeing your activity on those sites.]]></string>
     <string name="daxMainNetworkCtaText"><![CDATA[Heads up! %s is a major tracking network.<br/><br/> Their trackers lurk on about %s of top sites 😱 but don\'t worry!<br/><br/>I\'ll block %s from seeing your activity on those sites.]]></string>

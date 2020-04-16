@@ -392,10 +392,13 @@
     <plurals name="daxTrackersBlockedCtaText">
         <item quantity="one">&#160;a &lt;b&gt;%d další&lt;/b&gt; se Vás tu snažili sledovat. &lt;br/&gt;&lt;br/&gt;Zablokovali jsme je!&lt;br/&gt;&lt;br/&gt; ☝️Když navštívíte nový web, můžete se do adresního řádku prohlížeče podívat, kdo se Vás snaží sledovat.</item>
         <item quantity="few">&#160;a &lt;b&gt;%d další&lt;/b&gt; se Vás tu snažili sledovat. &lt;br/&gt;&lt;br/&gt;Zablokovali jsme je!&lt;br/&gt;&lt;br/&gt; ☝️Když navštívíte nový web, můžete se do adresního řádku prohlížeče podívat, kdo se Vás snaží sledovat.</item>
-        <item quantity="many">&#160;a &lt;b&gt;%d dalších&lt;/b&gt; se Vás tu snažilo sledovat. &lt;br/&gt;&lt;br/&gt;Zablokovali jsme je!&lt;br/&gt;&lt;br/&gt; ☝️Když navštívíte nový web, můžete se do adresního řádku prohlížeče podívat, kdo se Vás snaží sledovat.</item>
         <item quantity="other">&#160;a &lt;b&gt;%d další&lt;/b&gt; se Vás tu snažili sledovat. &lt;br/&gt;&lt;br/&gt;Zablokovali jsme je!&lt;br/&gt;&lt;br/&gt; ☝️Když navštívíte nový web, můžete se do adresního řádku prohlížeče podívat, kdo se Vás snaží sledovat.</item>
     </plurals>
-    <string name="daxTrackersBlockedCtaZeroText">&#160;se Vás tady snažil sledovat. &lt;br/&gt;&lt;br/&gt;Zablokovali jsme to!&lt;br/&gt;&lt;br/&gt; ☝️Když navštívíte nový web, můžete se do adresního řádku prohlížeče podívat, kdo se Vás snaží sledovat.</string>
+    <plurals name="daxTrackersBlockedCtaZeroText">
+        <item quantity="one">&#160;se Vás tady snažil sledovat. &lt;br/&gt;&lt;br/&gt;Zablokovali jsme to!&lt;br/&gt;&lt;br/&gt; ☝️Když navštívíte nový web, můžete se do adresního řádku prohlížeče podívat, kdo se Vás snaží sledovat</item>
+        <item quantity="other">&#160;se Vás tu snažili sledovat. &lt;br/&gt;&lt;br/&gt;Zablokovali jsme to!&lt;br/&gt;&lt;br/&gt; ☝️Když navštívíte nový web, můžete se do adresního řádku prohlížeče podívat, kdo se Vás snaží sledovat</item>
+        <item quantity="few">&#160;se Vás tu snažili sledovat. &lt;br/&gt;&lt;br/&gt;Zablokovali jsme to!&lt;br/&gt;&lt;br/&gt; ☝️Když navštívíte nový web, můžete se do adresního řádku prohlížeče podívat, kdo se Vás snaží sledovat</item>
+    </plurals>
     <string name="daxNonSerpCtaText">Zatímco Vy budete klepat a přejíždět, já budu blokovat zlovolné sledovače. &lt;br/&gt;&lt;br/&gt;Nenechejte se rušit — pokračujte v prohlížení!</string>
     <string name="daxMainNetworkOwnedCtaText">Hlavy vzhůru! %s vlastní společnost %s.&lt;br/&gt;&lt;br/&gt; Sledovatelé %s číhají na přibližně %s významných webů &#128561;, ale netrapte se!&lt;br/&gt;&lt;br/&gt;Já %s zablokuji, aby Vaši aktivitu na těchto webech neviděl.</string>
     <string name="daxMainNetworkCtaText">Hlavy vzhůru! %s je významná sledovací síť.&lt;br/&gt;&lt;br/&gt; Jejich sledovatelé číhají na přibližně %s významných webů &#128561;, ale netrapte se!&lt;br/&gt;&lt;br/&gt;Já %s zablokuji, aby Vaši aktivitu na těchto webech neviděl.</string>

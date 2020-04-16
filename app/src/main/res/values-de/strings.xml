@@ -389,7 +389,10 @@
         <item quantity="one">&#160;und &lt;b&gt;%d andere&lt;/b&gt; haben versucht, Sie hier zu tracken. &lt;br/&gt;&lt;br/&gt;Ich habe sie blockiert!&lt;br/&gt;&lt;br/&gt; ☝️Sie können in der URL-Leiste überprüfen, wer versucht, Sie zu tracken, wenn Sie eine neue Website besuchen.</item>
         <item quantity="other">&#160;und &lt;b&gt;%d andere&lt;/b&gt; haben versucht, Sie hier zu tracken. &lt;br/&gt;&lt;br/&gt;Ich habe sie blockiert!&lt;br/&gt;&lt;br/&gt; ☝️Sie können in der URL-Leiste überprüfen, wer versucht, Sie zu tracken, wenn Sie eine neue Website besuchen.</item>
     </plurals>
-    <string name="daxTrackersBlockedCtaZeroText">&#160;hat versucht, Sie hier zu tracken. &lt;br/&gt;&lt;br/&gt;Ich habe das blockiert!&lt;br/&gt;&lt;br/&gt; ☝️Sie können in der URL-Leiste überprüfen, wer versucht, Sie zu tracken, wenn Sie eine neue Website besuchen.</string>
+    <plurals name="daxTrackersBlockedCtaZeroText">
+        <item quantity="one">&#160;hat versucht, Sie hier zu tracken. &lt;br/&gt;&lt;br/&gt;Ich habe das blockiert!&lt;br/&gt;&lt;br/&gt; ☝️Sie können in der URL-Leiste überprüfen, wer versucht, Sie zu tracken, wenn Sie eine neue Website besuchen.</item>
+        <item quantity="other">&#160;haben versucht, Sie hier zu tracken. &lt;br/&gt;&lt;br/&gt;Ich habe das blockiert!&lt;br/&gt;&lt;br/&gt; ☝️Sie können in der URL-Leiste überprüfen, wer versucht, Sie zu tracken, wenn Sie eine neue Website besuchen.</item>
+    </plurals>
     <string name="daxNonSerpCtaText">Während Sie tippen und scrollen, blockiere ich lästige Tracker. &lt;br/&gt;&lt;br/&gt;Vorwärts — surfen Sie weiter!</string>
     <string name="daxMainNetworkOwnedCtaText">Augen auf! %s gehört %s.&lt;br/&gt;&lt;br/&gt; Die Tracker von %s lauern auf ungefähr %s der Top-Websites &#128561;, aber keine Sorge! &lt;br/&gt;&lt;br/&gt;Ich werde %s daran hindern, Ihre Aktivitäten auf diesen Websites zu verfolgen.</string>
     <string name="daxMainNetworkCtaText">Augen auf! %s ist ein wichtiges Tracking-Netzwerk.&lt;br/&gt;&lt;br/&gt; Ihre Tracker lauern auf ungefähr %s der Top-Websites &#128561;, aber keine Sorge! &lt;br/&gt;&lt;br/&gt;Ich werde %s daran hindern, Ihre Aktivitäten auf diesen Websites zu sehen.</string>

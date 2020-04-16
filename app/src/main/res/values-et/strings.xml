@@ -56,7 +56,7 @@
     <!-- Sharing options -->
     <string name="options">Valikud</string>
     <string name="shareLink">Jaga linki</string>
-    <string name="shareMenuTitle">Jaga ...</string>
+    <string name="shareMenuTitle">Jaga…</string>
     <string name="copyUrl">Kopeeri lingi aadress</string>
 
     <!-- Find in page -->
@@ -165,12 +165,12 @@
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Salvesta</string>
 
-    <string name="settingsAutomaticallyClearWhat">Kustuta automaatselt ...</string>
+    <string name="settingsAutomaticallyClearWhat">Kustuta automaatselt…</string>
     <string name="settingsAutomaticallyClearWhatOptionNone">Puudub</string>
     <string name="settingsAutomaticallyClearWhatOptionTabs">Vahelehed</string>
     <string name="settingsAutomaticallyClearWhatOptionTabsAndData">Vahelehed ja andmed</string>
 
-    <string name="settingsAutomaticallyClearWhen">Kustuta ...</string>
+    <string name="settingsAutomaticallyClearWhen">Kustuta…</string>
     <string name="settingsAutomaticallyClearWhenAppExitOnly">Ainult rakendusest väljumisel</string>
     <string name="settingsAutomaticallyClearWhenAppExit5Seconds">Rakendusest väljumisel, 5-sekundilise passiivsuse järel</string>
     <string name="settingsAutomaticallyClearWhenAppExit5Minutes">Rakendusest väljumisel, 5-minutilise passiivsuse järel</string>
@@ -410,7 +410,10 @@
         <item quantity="one">&#160;ja &lt;b&gt;%d teine&lt;/b&gt; üritasid teid siin jälitada. &lt;br/&gt;&lt;br/&gt;Blokeerisin nad!&lt;br/&gt;&lt;br/&gt; ☝️Võite vaadata URL-i riba, et näha, kes üritab teid jälgida, kui külastate uut saiti.️</item>
         <item quantity="other">&#160;ja &lt;b&gt;%d teised&lt;/b&gt; üritasid teid siin jälitada. &lt;br/&gt;&lt;br/&gt;Blokeerisin nad!&lt;br/&gt;&lt;br/&gt; ☝️Võite vaadata URL-i riba, et näha, kes üritab teid jälgida, kui külastate uut saiti.️</item>
     </plurals>
-    <string name="daxTrackersBlockedCtaZeroText">&#160;üritas teid siin jälitada. &lt;br/&gt;&lt;br/&gt;Blokeerisin selle!&lt;br/&gt;&lt;br/&gt; ☝️Võite vaadata URL-i riba, et näha, kes üritab teid jälgida, kui külastate uut saiti.️</string>
+    <plurals name="daxTrackersBlockedCtaZeroText">
+        <item quantity="one">&#160;üritas teid siin jälitada. &lt;br/&gt;&lt;br/&gt;Blokeerisin selle!&lt;br/&gt;&lt;br/&gt; ☝️Võite vaadata URL-i riba, et näha, kes üritab teid jälgida, kui külastate uut saiti.️</item>
+        <item quantity="other">&#160;üritas teid siin jälitada. &lt;br/&gt;&lt;br/&gt;Blokeerisin selle!&lt;br/&gt;&lt;br/&gt; ☝️Võite vaadata URL-i riba, et näha, kes üritab teid jälgida, kui külastate uut saiti.️</item>
+    </plurals>
     <string name="daxNonSerpCtaText">Kui puudutate ja kerite, siis mina blokeerin tüütud jälgijad. &lt;br/&gt;&lt;br/&gt;Edasi — jätkake sirvimist!</string>
     <string name="daxMainNetworkOwnedCtaText">Ettevaatust! Ettevõtte %s omanik on %s.&lt;br/&gt;&lt;br/&gt; %s jälitajad varitsevad %s populaarseimatest veebisaitidest, &#128561; aga ärge muretsege!&lt;br/&gt;&lt;br/&gt;Hoolitsen selle eest, et %s teid nendel saitidel ei jälgiks.</string>
     <string name="daxMainNetworkCtaText">Ettevaatust! %s on suur jälgimisvõrgustik.&lt;br/&gt;&lt;br/&gt; Nend jälitajad jälgivad teid %s populaarseimatest saitidest, &#128561; aga ärge muretsege!&lt;br/&gt;&lt;br/&gt;Hoolitsen selle eest, et %s teid nendel saitidel ei jälgiks.</string>

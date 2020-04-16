@@ -146,7 +146,7 @@ sealed class DaxDialogCta(
             val size = trackers.size - trackersFiltered.size
             val quantityString =
                 if (size == 0) {
-                    context.resources.getString(R.string.daxTrackersBlockedCtaZeroText)
+                    context.resources.getQuantityString(R.plurals.daxTrackersBlockedCtaZeroText, trackersFiltered.size)
                 } else {
                     context.resources.getQuantityString(description, size, size)
                 }

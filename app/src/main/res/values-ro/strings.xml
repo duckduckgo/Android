@@ -394,7 +394,11 @@
         <item quantity="few">&#160;și &lt;b&gt;%d alții&lt;/b&gt; încercau să te urmărească aici. &lt;br/&gt;&lt;br/&gt;I-am blocat!&lt;br/&gt;&lt;br/&gt; ☝️ Poți verifica bara URL pentru a vedea cine încearcă să te urmărească atunci când vizitezi un nou site.️</item>
         <item quantity="other">&#160;și &lt;b&gt;%d alții&lt;/b&gt; încercau să te urmărească aici. &lt;br/&gt;&lt;br/&gt;I-am blocat!&lt;br/&gt;&lt;br/&gt; ☝️ Puteți verifica bara URL pentru a vedea cine încearcă să vă urmărească atunci când vizitați un nou site.️</item>
     </plurals>
-    <string name="daxTrackersBlockedCtaZeroText">&#160;încerca să te urmărească aici. &lt;br/&gt;&lt;br/&gt;Am blocat-o!&lt;br/&gt;&lt;br/&gt; ☝️ Poți verifica bara URL pentru a vedea cine încearcă să te urmărească atunci când vizitezi un nou site.️</string>
+    <plurals name="daxTrackersBlockedCtaZeroText">
+        <item quantity="one">&#160;încerca să te urmărească aici. &lt;br/&gt;&lt;br/&gt;Am blocat-o!&lt;br/&gt;&lt;br/&gt; ☝️ Poți verifica bara URL pentru a vedea cine încearcă să te urmărească atunci când vizitezi un nou site.</item>
+        <item quantity="few">&#160;încercau să te urmărească aici. &lt;br/&gt;&lt;br/&gt;Am blocat-o!&lt;br/&gt;&lt;br/&gt; ☝️ Poți verifica bara URL pentru a vedea cine încearcă să te urmărească atunci când vizitezi un nou site.</item>
+        <item quantity="other">&#160;încercau să te urmărească aici. &lt;br/&gt;&lt;br/&gt;Am blocat-o!&lt;br/&gt;&lt;br/&gt; ☝️ Poți verifica bara URL pentru a vedea cine încearcă să te urmărească atunci când vizitezi un nou site.</item>
+    </plurals>
     <string name="daxNonSerpCtaText">În timp ce atingi și derulezi, voi bloca urmăritorii pisălogi. &lt;br/&gt;&lt;br/&gt;Dă-i bătaie- continuă să navighezi!</string>
     <string name="daxMainNetworkOwnedCtaText">Atenție! %s este deținut de %s.&lt;br/&gt;&lt;br/&gt; Urmăritorii %s spionează %s site-urile web de top, &#128561; dar nu îți face griji! &lt;br/&gt;&lt;br/&gt;Îi voi bloca %s să nu vadă activitatea ta pe acele site-uri.</string>
     <string name="daxMainNetworkCtaText">Atenție! %s este o rețea semnificativă de urmărire.&lt;br/&gt;&lt;br/&gt; Urmăritorii lor spionează %s site-uri de top, &#128561; dar nu îți face griji! &lt;br/&gt;&lt;br/&gt;Îi voi bloca %s să nu vadă activitatea ta pe acele site-uri.</string>

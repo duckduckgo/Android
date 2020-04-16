@@ -389,7 +389,10 @@
         <item quantity="one">&#160;og &lt;b&gt;%d andre&lt;/b&gt; prøvde å spore deg her. &lt;br/&gt;&lt;br/&gt;Jeg blokkerte dem!&lt;br/&gt;&lt;br/&gt; ☝️Du kan sjekke URL-linjen for å se hvem som prøver å spore deg når du besøker et nytt nettsted.️</item>
         <item quantity="other">&#160;og &lt;b&gt;%d andre&lt;/b&gt; prøvde å spore deg her. &lt;br/&gt;&lt;br/&gt;Jeg blokkerte dem!&lt;br/&gt;&lt;br/&gt; ☝️Du kan sjekke URL-linjen for å se hvem som prøver å spore deg når du besøker et nytt nettsted.️</item>
     </plurals>
-    <string name="daxTrackersBlockedCtaZeroText">&#160;prøvde å spore deg her. &lt;br/&gt;&lt;br/&gt;Jeg har blokkert det!&lt;br/&gt;&lt;br/&gt; ☝️Du kan sjekke URL-linjen for å se hvem som prøver å spore deg når du besøker et nytt nettsted.️</string>
+    <plurals name="daxTrackersBlockedCtaZeroText">
+        <item quantity="one">&#160;prøvde å spore deg her. &lt;br/&gt;&lt;br/&gt;Jeg har blokkert det!&lt;br/&gt;&lt;br/&gt; ☝️Du kan sjekke URL-linjen for å se hvem som prøver å spore deg når du besøker et nytt nettsted.️</item>
+        <item quantity="other">&#160;prøvde å spore deg her. &lt;br/&gt;&lt;br/&gt;Jeg har blokkert det!&lt;br/&gt;&lt;br/&gt; ☝️Du kan sjekke URL-linjen for å se hvem som prøver å spore deg når du besøker et nytt nettsted.️</item>
+    </plurals>
     <string name="daxNonSerpCtaText">Når du trykker og blar, blokkerer jeg irriterende trackere. &lt;br/&gt;&lt;br/&gt;Gå videre – fortsett å bla!</string>
     <string name="daxMainNetworkOwnedCtaText">Følg med! %s eies av %s.&lt;br/&gt;&lt;br/&gt; %ss trackere lurer på omtrent %s av ledende nettsteder &#128561; men ikke bekymre deg! &lt;br/&gt;&lt;br/&gt;Jeg blokkerer %s fra å se aktiviteten din på disse nettstedene.</string>
     <string name="daxMainNetworkCtaText">Følg med! %s er et stort sporingsnettverk.&lt;br/&gt;&lt;br/&gt; Trackerne deres lurer på omtrent %s av ledende nettsteder &#128561; men ikke bekymre deg! &lt;br/&gt;&lt;br/&gt;Jeg hindrer %s fra å se aktiviteten din på disse nettstedene.</string>

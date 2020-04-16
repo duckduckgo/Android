@@ -56,7 +56,7 @@
     <!-- Sharing options -->
     <string name="options">Iespējas</string>
     <string name="shareLink">Kopīgot saiti</string>
-    <string name="shareMenuTitle">Kopīgot...</string>
+    <string name="shareMenuTitle">Kopīgot…</string>
     <string name="copyUrl">Kopēt saites adresi</string>
 
     <!-- Find in page -->
@@ -169,7 +169,7 @@
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Saglabāt</string>
 
-    <string name="settingsAutomaticallyClearWhat">Automātiski nodzēst...</string>
+    <string name="settingsAutomaticallyClearWhat">Automātiski nodzēst…</string>
     <string name="settingsAutomaticallyClearWhatOptionNone">Neko</string>
     <string name="settingsAutomaticallyClearWhatOptionTabs">Cilnes</string>
     <string name="settingsAutomaticallyClearWhatOptionTabsAndData">Cilnes un datus</string>
@@ -414,7 +414,10 @@
         <item quantity="one">&#160;un &lt;b&gt;%d citas&lt;/b&gt; mēģināja jūs izsekot. &lt;br/&gt;&lt;br/&gt;Es tās nobloķēju!&lt;br/&gt;&lt;br/&gt; ☝️Jūs varat pārbaudīt URL joslu, lai redzētu, kurš mēģina jūs izsekot, kad apmeklējat jaunu vietni.️</item>
         <item quantity="other">&#160;un &lt;b&gt;%d citas&lt;/b&gt; mēģināja jūs izsekot. &lt;br/&gt;&lt;br/&gt;Es tās nobloķēju!&lt;br/&gt;&lt;br/&gt; ☝️Jūs varat pārbaudīt URL joslu, lai redzētu, kurš mēģina jūs izsekot, kad apmeklējat jaunu vietni.️</item>
     </plurals>
-    <string name="daxTrackersBlockedCtaZeroText">&#160;mēģināja jūs izsekot. &lt;br/&gt;&lt;br/&gt;Es to nobloķēju!&lt;br/&gt;&lt;br/&gt; ☝️Jūs varat pārbaudīt URL joslu, lai redzētu, kurš mēģina jūs izsekot, kad apmeklējat jaunu vietni.️</string>
+    <plurals name="daxTrackersBlockedCtaZeroText" tools:ignore="MissingQuantity">
+        <item quantity="one" tools:ignore="ImpliedQuantity">&#160;mēģināja jūs izsekot. &lt;br/&gt;&lt;br/&gt;Es to nobloķēju!&lt;br/&gt;&lt;br/&gt; ☝️Jūs varat pārbaudīt URL joslu, lai redzētu, kurš mēģina jūs izsekot, kad apmeklējat jaunu vietni.️</item>
+        <item quantity="other">&#160;mēģināja jūs izsekot. &lt;br/&gt;&lt;br/&gt;Es to nobloķēju!&lt;br/&gt;&lt;br/&gt; ☝️Jūs varat pārbaudīt URL joslu, lai redzētu, kurš mēģina jūs izsekot, kad apmeklējat jaunu vietni.️</item>
+    </plurals>
     <string name="daxNonSerpCtaText">Kad pieskarsies un ritināsi, es bloķēšu uzmācīgos izsekotājus. &lt;br/&gt;&lt;br/&gt;Aiziet – turpini pārlūkot!</string>
     <string name="daxMainNetworkOwnedCtaText">Galvu augšā! %s pieder %s.&lt;br/&gt;&lt;br/&gt; %s izsekotāji slēpjas apmēram %s populārākajās vietnēs &#128561;, bet nevajag satraukties! &lt;br/&gt;&lt;br/&gt;Es bloķēšu %s iespēju redzēt tavas darbības šajās vietnēs.</string>
     <string name="daxMainNetworkCtaText">Galvu augšā! %s ir galvenais izsekošanas tīkls.&lt;br/&gt;&lt;br/&gt; To izsekotāji slēpjas apmēram %s populārākajās vietnēs &#128561;, bet nevajag satraukties! &lt;br/&gt;&lt;br/&gt;Es bloķēšu %s iespēju redzēt tavas darbības šajās vietnēs.</string>
