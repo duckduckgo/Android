@@ -134,15 +134,15 @@ sealed class DaxDialogCta(
             )
 
         override fun getDaxText(context: Context): String {
-            val trackersFiltered = trackers.asSequence()
+            val trackers = trackers.asSequence()
                 .mapNotNull { it.entity }
                 .sortedByDescending { it.prevalence }
                 .map { it.displayName }
                 .filterNotNull()
                 .distinct()
-                .take(MAX_TRACKERS_SHOWS)
                 .toList()
 
+            val trackersFiltered = trackers.take(MAX_TRACKERS_SHOWS)
             val trackersText = trackersFiltered.joinToString(", ")
             val size = trackers.size - trackersFiltered.size
             val quantityString =
