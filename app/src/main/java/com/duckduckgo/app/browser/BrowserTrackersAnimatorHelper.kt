@@ -32,16 +32,16 @@ import androidx.core.widget.TextViewCompat
 import com.duckduckgo.app.cta.ui.Cta
 import com.duckduckgo.app.cta.ui.DaxDialogCta
 import com.duckduckgo.app.privacy.renderer.TrackersRenderer
-import com.duckduckgo.app.trackerdetection.model.TrackingEvent
+import com.duckduckgo.app.trackerdetection.model.Entity
 
 class BrowserTrackersAnimatorHelper {
 
     private var trackersAnimation: AnimatorSet = AnimatorSet()
 
-    fun startTrackersAnimation(cta: Cta?, activity: Activity, container: ConstraintLayout, omnibarViews: List<View>, events: List<TrackingEvent>?) {
-        if (events.isNullOrEmpty()) return
+    fun startTrackersAnimation(cta: Cta?, activity: Activity, container: ConstraintLayout, omnibarViews: List<View>, entities: List<Entity>?) {
+        if (entities.isNullOrEmpty()) return
 
-        val logoViews: List<View> = getLogosViewListInContainer(activity, container, events)
+        val logoViews: List<View> = getLogosViewListInContainer(activity, container, entities)
         if (logoViews.isEmpty()) return
 
         if (!trackersAnimation.isRunning) {
@@ -72,10 +72,10 @@ class BrowserTrackersAnimatorHelper {
         }
     }
 
-    private fun getLogosViewListInContainer(activity: Activity, container: ConstraintLayout, events: List<TrackingEvent>): List<View> {
+    private fun getLogosViewListInContainer(activity: Activity, container: ConstraintLayout, entities: List<Entity>): List<View> {
         container.removeAllViews()
         container.alpha = 0f
-        val logos = createResourcesIdList(activity, events)
+        val logos = createResourcesIdList(activity, entities)
         return createLogosViewList(activity, container, logos)
     }
 
@@ -128,11 +128,9 @@ class BrowserTrackersAnimatorHelper {
         return imageView
     }
 
-    private fun createResourcesIdList(activity: Activity, events: List<TrackingEvent>): List<TrackerLogo>? {
+    private fun createResourcesIdList(activity: Activity, entities: List<Entity>): List<TrackerLogo>? {
         if (activity.packageName == null) return emptyList()
-        val resourcesList = events.asSequence()
-            .mapNotNull { it.entity }
-            .sortedByDescending { it.prevalence }
+        val resourcesList = entities
             .map {
                 val res = TrackersRenderer().networkLogoIcon(activity, it.name)
                 if (res == null) {
