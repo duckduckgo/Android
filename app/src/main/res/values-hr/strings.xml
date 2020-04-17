@@ -396,7 +396,4 @@
         <item quantity="other">&#160;i &lt;b&gt;%d ostali&lt;/b&gt; su vas pokušavali pratiti ovdje. &lt;br/&gt;&lt;br/&gt;Blokirao sam ih!&lt;br/&gt;&lt;br/&gt; ☝️Možete provjeriti URL traku kako biste vidjeli tko vas pokušava pratiti kad posjetite novo web-mjesto.️</item>
     </plurals>
     <string name="daxTrackersBlockedCtaZeroText">&#160;vas je pokušavao pratiti ovdje. &lt;br/&gt;&lt;br/&gt;Blokirao sam ga!&lt;br/&gt;&lt;br/&gt; ☝️Možete provjeriti URL traku kako biste vidjeli tko vas pokušava pratiti kad posjetite novo web-mjesto.️</string>
-
-    <!-- Covid Cta-->
-    <string name="covidCtaText">Dobijte službene informacije i savjete o COVID-19.</string>
 </resources>

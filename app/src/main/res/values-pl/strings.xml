@@ -405,7 +405,4 @@
         <item quantity="other">&#160;i &lt;b&gt;%d inni&lt;/b&gt; próbowali cię tutaj wyśledzić. &lt;br/&gt;&lt;br/&gt;Zablokowałem je!&lt;br/&gt;&lt;br/&gt; can Możesz sprawdzić pasek adresu, aby zobaczyć, kto próbuje cię śledzić, gdy odwiedzasz nową witrynę.️</item>
     </plurals>
     <string name="daxTrackersBlockedCtaZeroText">&#160;próbował cię tu wyśledzić. &lt;br/&gt;&lt;br/&gt;Zablokowałem to!&lt;br/&gt;&lt;br/&gt; can Możesz sprawdzić pasek adresu URL, aby zobaczyć, kto próbuje Cię śledzić, gdy odwiedzasz nową witrynę.️</string>
-
-    <!-- Covid Cta-->
-    <string name="covidCtaText">Zobacz oficjalne informacje i wskazówki dotyczące COVID-19.</string>
 </resources>

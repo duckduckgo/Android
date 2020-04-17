@@ -930,9 +930,6 @@ class BrowserTabViewModel(
     }
 
     fun onUserClickTopCta(cta: HomeTopPanelCta) {
-        if (cta is HomeTopPanelCta.CovidCta) {
-            onUserSubmittedQuery(cta.searchTerm)
-        }
     }
 
     fun onUserClickCtaOkButton(cta: Cta) {
