@@ -114,7 +114,6 @@ import com.duckduckgo.app.cta.ui.DaxDialogCta
 import com.duckduckgo.app.cta.ui.HomePanelCta
 import com.duckduckgo.app.cta.ui.HomeTopPanelCta
 import com.duckduckgo.app.cta.ui.SecondaryButtonCta
-import com.duckduckgo.app.feedback.api.FireAndForgetFeedbackSubmitter
 import com.duckduckgo.app.global.ViewModelFactory
 import com.duckduckgo.app.global.device.DeviceInfo
 import com.duckduckgo.app.global.view.*
@@ -377,7 +376,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
 
     private fun launchTabSwitcher() {
         val activity = activity ?: return
-        if (variantManager.getVariant().hasFeature(VariantManager.VariantFeature.BottomBarWithSearchExperiment)) {
+        if (variantManager.getVariant().hasFeature(VariantManager.VariantFeature.BottomBarNavigationExperiment)) {
             startActivity(TabSwitcherBottomBarExperimentActivity.intent(activity, tabId))
         } else {
             startActivity(TabSwitcherActivity.intent(activity, tabId))
@@ -732,7 +731,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
         autoCompleteSuggestionsList.adapter = autoCompleteSuggestionsAdapter
     }
 
-    private fun isExperimentEnabled() = variantManager.getVariant().hasFeature(VariantManager.VariantFeature.BottomBarWithSearchExperiment)
+    private fun isExperimentEnabled() = variantManager.getVariant().hasFeature(VariantManager.VariantFeature.BottomBarNavigationExperiment)
 
     private fun decorateWithExperiments() {
         if (isExperimentEnabled()) {
@@ -1187,7 +1186,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
 
     inner class BrowserTabFragmentExperimentDecorator {
         fun decorateToolbarMenus(viewState: BrowserViewState) {
-            if (variantManager.getVariant().hasFeature(VariantManager.VariantFeature.BottomBarWithSearchExperiment)) {
+            if (variantManager.getVariant().hasFeature(VariantManager.VariantFeature.BottomBarNavigationExperiment)) {
                 decorator.hideToolbarMenu()
             } else {
                 decorator.decorateToolbarMenu(viewState)
