@@ -139,8 +139,14 @@ class BrowserModule {
     ): RequestInterceptor = WebViewRequestInterceptor(resourceSurrogates, trackerDetector, httpsUpgrader, privacyProtectionCountDao)
 
     @Provides
-    fun cookieManager(context: Context, bookmarksDao: BookmarksDao, cookieManager: CookieManager): DuckDuckGoCookieManager {
-        return WebViewCookieManager(context, bookmarksDao, cookieManager, AppUrl.Url.HOST)
+    fun cookieManager(
+        context: Context,
+        bookmarksDao: BookmarksDao,
+        cookieManager: CookieManager,
+        pixel: Pixel,
+        uncaughtExceptionRepository: UncaughtExceptionRepository
+    ): DuckDuckGoCookieManager {
+        return WebViewCookieManager(context, bookmarksDao, cookieManager, AppUrl.Url.HOST, pixel, uncaughtExceptionRepository)
     }
 
     @Singleton

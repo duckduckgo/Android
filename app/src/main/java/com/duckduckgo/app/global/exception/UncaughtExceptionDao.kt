@@ -49,7 +49,8 @@ enum class UncaughtExceptionSource {
     HIDE_CUSTOM_VIEW,
     ON_PROGRESS_CHANGED,
     RECEIVED_PAGE_TITLE,
-    SHOW_FILE_CHOOSER
+    SHOW_FILE_CHOOSER,
+    COOKIE_DATABASE
 }
 
 class UncaughtExceptionSourceConverter {

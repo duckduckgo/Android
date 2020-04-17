@@ -25,6 +25,11 @@ import android.net.Uri
 import android.webkit.CookieManager
 import android.widget.Toast
 import com.duckduckgo.app.bookmarks.db.BookmarksDao
+import com.duckduckgo.app.global.exception.UncaughtExceptionRepository
+import com.duckduckgo.app.global.exception.UncaughtExceptionSource
+import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.*
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.COOKIE_DATABASE_PARAM
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import timber.log.Timber
@@ -78,10 +83,13 @@ class WebViewCookieManager(
     private val context: Context,
     private val bookmarks: BookmarksDao,
     private val cookieManager: CookieManager,
-    private val host: String
+    private val host: String,
+    private val pixel: Pixel,
+    private val uncaughtExceptionRepository: UncaughtExceptionRepository
 ) : DuckDuckGoCookieManager {
 
     override suspend fun removeExternalCookies() {
+        val startTime = System.currentTimeMillis()
         if (cookieManager.hasCookies()) {
             val excludedSites = withContext(Dispatchers.IO) {
                 getHostsToPreserve()
@@ -92,6 +100,8 @@ class WebViewCookieManager(
         withContext(Dispatchers.IO) {
             flush()
         }
+        val durationMs = System.currentTimeMillis() - startTime
+        pixel.fire(pixel = COOKIE_DATABASE_TIME, parameters = mapOf(COOKIE_DATABASE_PARAM to durationMs.toString()))
     }
 
     private fun getHostsToPreserve(): List<String> {
@@ -112,6 +122,7 @@ class WebViewCookieManager(
 
     private suspend fun removeCookies(excludedSites: List<String>) {
 
+        var cookiesRemoved = false
         val dataDir = context.applicationInfo.dataDir
         val knownLocations = listOf("app_webview/Default/Cookies", "app_webview/Cookies")
         val filePath: String = knownLocations.find { knownPath ->
@@ -123,25 +134,42 @@ class WebViewCookieManager(
 
         if (filePath.isNotEmpty()) {
             val file = File(dataDir, filePath)
-            val readableDatabase = SQLiteDatabase.openDatabase(
-                file.toString(),
-                null,
-                SQLiteDatabase.OPEN_READWRITE,
-                DatabaseErrorHandler { Timber.d("COOKIE: onCorruption") })
-            val whereArg = excludedSites.foldIndexed("", { pos, acc, _ ->
-                if (pos == 0) {
-                    "host_key NOT LIKE ?"
-                } else {
-                    "$acc AND host_key NOT LIKE ?"
+            val readableDatabase: SQLiteDatabase? = try {
+                SQLiteDatabase.openDatabase(
+                    file.toString(),
+                    null,
+                    SQLiteDatabase.OPEN_READWRITE,
+                    DatabaseErrorHandler { Timber.d("COOKIE: onCorruption") })
+            } catch (exception: Exception) {
+                pixel.fire(COOKIE_DATABASE_OPEN_ERROR)
+                uncaughtExceptionRepository.recordUncaughtException(exception, UncaughtExceptionSource.COOKIE_DATABASE)
+                null
+            }
+            if (readableDatabase != null) {
+                try {
+                    val whereArg = excludedSites.foldIndexed("", { pos, acc, _ ->
+                        if (pos == 0) {
+                            "host_key NOT LIKE ?"
+                        } else {
+                            "$acc AND host_key NOT LIKE ?"
+                        }
+                    })
+                    val number = readableDatabase.delete("cookies", whereArg, excludedSites.toTypedArray())
+                    cookiesRemoved = true
+                    Toast.makeText(context, "$number cookies removed", Toast.LENGTH_LONG).show()
+                } catch (exception: Exception) {
+                    pixel.fire(COOKIE_DATABASE_DELETE_ERROR)
+                    uncaughtExceptionRepository.recordUncaughtException(exception, UncaughtExceptionSource.COOKIE_DATABASE)
+                } finally {
+                    readableDatabase.close()
                 }
-            })
-            val number = readableDatabase.delete("cookies", whereArg, excludedSites.toTypedArray())
-            Toast.makeText(context, "$number cookies removed", Toast.LENGTH_LONG).show()
+            }
 
-            readableDatabase.close()
-            Timber.d("DONE")
-            Toast.makeText(context, "All cookies removed", Toast.LENGTH_LONG).show()
         } else {
+            pixel.fire(COOKIE_DATABASE_NOT_FOUND)
+        }
+
+        if (!cookiesRemoved) {
             legacyCookieRemoval()
         }
 
