@@ -64,7 +64,7 @@ class BrowserPopupMenu(layoutInflater: LayoutInflater, variant: Variant, view: V
         private const val margin = 30
 
         fun inflate(layoutInflater: LayoutInflater, variant: Variant): View {
-            return if (variant.hasFeature(VariantManager.VariantFeature.BottomBarWithSearchExperiment)) {
+            return if (variant.hasFeature(VariantManager.VariantFeature.BottomBarNavigationExperiment)) {
                 inflateBottomBarWithSearchExperiment(layoutInflater)
             } else {
                 inflateToolbarOnlyExperiment(layoutInflater)

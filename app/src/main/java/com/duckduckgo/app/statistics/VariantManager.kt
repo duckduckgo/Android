@@ -30,7 +30,7 @@ interface VariantManager {
     // variant-dependant features listed here
     sealed class VariantFeature {
         object StickySearchNotification : VariantFeature()
-        object BottomBarWithSearchExperiment : VariantFeature()
+        object BottomBarNavigationExperiment : VariantFeature()
     }
 
     companion object {
@@ -49,7 +49,7 @@ interface VariantManager {
             // Quick Search Notification Experiment
             Variant(
                 key = "mf",
-                weight = 0.0,
+                weight = 1.0,
                 features = emptyList(),
                 filterBy = { isEnglishLocale() }),
             Variant(
@@ -62,7 +62,7 @@ interface VariantManager {
             Variant(
                 key = "mm",
                 weight = 1.0,
-                features = listOf(BottomBarWithSearchExperiment),
+                features = listOf(BottomBarNavigationExperiment),
                 filterBy = { isEnglishLocale() })
 
             // All groups in an experiment (control and variants) MUST use the same filters

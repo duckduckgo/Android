@@ -389,7 +389,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
 
     private fun launchTabSwitcher() {
         val activity = activity ?: return
-        if (variantManager.getVariant().hasFeature(VariantManager.VariantFeature.BottomBarWithSearchExperiment)) {
+        if (variantManager.getVariant().hasFeature(VariantManager.VariantFeature.BottomBarNavigationExperiment)) {
             startActivity(TabSwitcherBottomBarExperimentActivity.intent(activity, tabId))
         } else {
             startActivity(TabSwitcherActivity.intent(activity, tabId))
@@ -754,7 +754,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
         autoCompleteSuggestionsList.adapter = autoCompleteSuggestionsAdapter
     }
 
-    private fun isExperimentEnabled() = variantManager.getVariant().hasFeature(VariantManager.VariantFeature.BottomBarWithSearchExperiment)
+    private fun isExperimentEnabled() = variantManager.getVariant().hasFeature(VariantManager.VariantFeature.BottomBarNavigationExperiment)
 
     private fun decorateWithExperiments() {
         if (isExperimentEnabled()) {
@@ -1234,7 +1234,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
 
     inner class BrowserTabFragmentExperimentDecorator {
         fun decorateToolbarMenus(viewState: BrowserViewState) {
-            if (variantManager.getVariant().hasFeature(VariantManager.VariantFeature.BottomBarWithSearchExperiment)) {
+            if (variantManager.getVariant().hasFeature(VariantManager.VariantFeature.BottomBarNavigationExperiment)) {
                 decorator.hideToolbarMenu()
             } else {
                 decorator.decorateToolbarMenu(viewState)

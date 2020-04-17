@@ -62,6 +62,23 @@ class VariantManagerTest {
         assertTrue(variant.hasFeature(StickySearchNotification))
     }
 
+    // Bottom Bar Navigation Experiment
+
+    @Test
+    fun bottomBarNavigationControlVariantIsActiveAndHasNoFeatures() {
+        val variant = variants.first { it.key == "mf" }
+        assertEqualsDouble(0.0, variant.weight)
+        assertEquals(0, variant.features.size)
+    }
+
+    @Test
+    fun bottomBarNavigationVariantIsActiveAndHasBottomBarNavigationFeature() {
+        val variant = variants.first { it.key == "mm" }
+        assertEqualsDouble(1.0, variant.weight)
+        assertEquals(1, variant.features.size)
+        assertTrue(variant.hasFeature(BottomBarNavigationExperiment))
+    }
+
     @Test
     fun verifyNoDuplicateVariantNames() {
         val existingNames = mutableSetOf<String>()
