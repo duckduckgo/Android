@@ -80,43 +80,18 @@ class WebViewCookieManager(
     private val cookieManager: CookieManager,
     private val host: String
 ) : DuckDuckGoCookieManager {
+
     override suspend fun removeExternalCookies() {
-
-        //val allCookies = getAllCookies()
-
         if (cookieManager.hasCookies()) {
-            val ddgCookies = getDuckDuckGoCookies()
             val excludedSites = withContext(Dispatchers.IO) {
                 getHostsToPreserve()
             }
             removeCookies(excludedSites)
-            storeDuckDuckGoCookies(ddgCookies)
         }
 
         withContext(Dispatchers.IO) {
             flush()
         }
-
-        /*
-
-        suspendCoroutine<Unit> { continuation ->
-            cookieManager.removeAllCookies {
-                Timber.v("All cookies removed; restoring ${ddgCookies.size} DDG cookies")
-                continuation.resume(Unit)
-            }
-        }
-
-        storeDuckDuckGoCookies(ddgCookies)
-
-        allCookies.forEach { cookie ->
-             suspendCoroutine<Unit> { continuation ->
-                 cookieManager.setCookie(cookie.domain, cookie.toString()) { success ->
-                     Timber.v("Cookie $cookie stored successfully: $success")
-                     continuation.resume(Unit)
-                 }
-             }
-         }*/
-
     }
 
     private fun getHostsToPreserve(): List<String> {
@@ -135,16 +110,16 @@ class WebViewCookieManager(
         }
     }
 
-    private fun removeCookies(excludedSites: List<String>): List<Cookie> {
-        val allCookies = mutableListOf<Cookie>()
-        val cookiesHelper = CookiesHelper(context)
-        //val readableDatabase = cookiesHelper.readableDatabase
+    private suspend fun removeCookies(excludedSites: List<String>) {
+
         val dataDir = context.applicationInfo.dataDir
         val knownLocations = listOf("app_webview/Default/Cookies", "app_webview/Cookies")
         val filePath: String = knownLocations.find { knownPath ->
             val file = File(dataDir, knownPath)
             file.exists()
         } ?: ""
+
+        val ddgCookies = getDuckDuckGoCookies()
 
         if (filePath.isNotEmpty()) {
             val file = File(dataDir, filePath)
@@ -153,7 +128,6 @@ class WebViewCookieManager(
                 null,
                 SQLiteDatabase.OPEN_READWRITE,
                 DatabaseErrorHandler { Timber.d("COOKIE: onCorruption") })
-            Timber.d("COOKIE: database version: ${readableDatabase.version}")
             val whereArg = excludedSites.foldIndexed("", { pos, acc, _ ->
                 if (pos == 0) {
                     "host_key NOT LIKE ?"
@@ -167,9 +141,20 @@ class WebViewCookieManager(
             readableDatabase.close()
             Timber.d("DONE")
             Toast.makeText(context, "All cookies removed", Toast.LENGTH_LONG).show()
+        } else {
+            legacyCookieRemoval()
         }
 
-        return allCookies
+        storeDuckDuckGoCookies(ddgCookies)
+    }
+
+    private suspend fun legacyCookieRemoval() {
+        suspendCoroutine<Unit> { continuation ->
+            cookieManager.removeAllCookies {
+                Timber.v("All cookies removed; restoring DDG cookies")
+                continuation.resume(Unit)
+            }
+        }
     }
 
     private fun getAllCookies(): List<Cookie> {
