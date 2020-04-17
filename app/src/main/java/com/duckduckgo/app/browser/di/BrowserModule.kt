@@ -19,6 +19,7 @@ package com.duckduckgo.app.browser.di
 import android.content.ClipboardManager
 import android.content.Context
 import android.webkit.CookieManager
+import com.duckduckgo.app.bookmarks.db.BookmarksDao
 import com.duckduckgo.app.browser.*
 import com.duckduckgo.app.browser.addtohome.AddToHomeCapabilityDetector
 import com.duckduckgo.app.browser.addtohome.AddToHomeSystemCapabilityDetector
@@ -138,8 +139,8 @@ class BrowserModule {
     ): RequestInterceptor = WebViewRequestInterceptor(resourceSurrogates, trackerDetector, httpsUpgrader, privacyProtectionCountDao)
 
     @Provides
-    fun cookieManager(cookieManager: CookieManager): DuckDuckGoCookieManager {
-        return WebViewCookieManager(cookieManager, AppUrl.Url.HOST)
+    fun cookieManager(context: Context, bookmarksDao: BookmarksDao, cookieManager: CookieManager): DuckDuckGoCookieManager {
+        return WebViewCookieManager(context, bookmarksDao, cookieManager, AppUrl.Url.HOST)
     }
 
     @Singleton
