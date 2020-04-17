@@ -401,7 +401,4 @@
         <item quantity="other">&#160;a &lt;b&gt;%d další&lt;/b&gt; se Vás tu snažili sledovat. &lt;br/&gt;&lt;br/&gt;Zablokovali jsme je!&lt;br/&gt;&lt;br/&gt; ☝️Když navštívíte nový web, můžete se do adresního řádku prohlížeče podívat, kdo se Vás snaží sledovat.</item>
     </plurals>
     <string name="daxTrackersBlockedCtaZeroText">&#160;se Vás tady snažil sledovat. &lt;br/&gt;&lt;br/&gt;Zablokovali jsme to!&lt;br/&gt;&lt;br/&gt; ☝️Když navštívíte nový web, můžete se do adresního řádku prohlížeče podívat, kdo se Vás snaží sledovat.</string>
-
-    <!-- Covid Cta-->
-    <string name="covidCtaText">Odebírejte oficiální informace a tipy o COVID-19.</string>
 </resources>

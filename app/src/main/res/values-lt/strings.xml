@@ -401,7 +401,4 @@
         <item quantity="other">&#160;ir &lt;b&gt;%d kiti&lt;/b&gt; bandė jus čia sekti. &lt;br/&gt;&lt;br/&gt;užblokavau juos!&lt;br/&gt;&lt;br/&gt; ☝️Galite patikrinti URL juostą ir sužinoti, kas bando jus sekti, kai lankotės naujame tinklapyje.️</item>
     </plurals>
     <string name="daxTrackersBlockedCtaZeroText">&#160;bandė jus susekti čia. &lt;br/&gt;&lt;br/&gt;užblokavau!&lt;br/&gt;&lt;br/&gt; ☝️Galite patikrinti URL juostą ir sužinoti, kas bando jus sekti, kai lankotės naujame tinklapyje.️</string>
-
-    <!-- Covid Cta-->
-    <string name="covidCtaText">Gaukite oficialiosios informacijos apie COVID-19 ir patarimų.</string>
 </resources>

@@ -35,8 +35,7 @@ class DataUriDownloader @Inject constructor(
         try {
             callback?.downloadStarted()
 
-            val parsedDataUri = dataUriParser.generate(pending.url)
-            when (parsedDataUri) {
+            when (val parsedDataUri = dataUriParser.generate(pending.url)) {
                 is ParseResult.Invalid -> {
                     Timber.w("Failed to extract data from data URI")
                     callback?.downloadFailed("Failed to extract data from data URI")
