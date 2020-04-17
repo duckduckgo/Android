@@ -94,6 +94,7 @@ import com.duckduckgo.app.browser.BrowserTabViewModel.OmnibarViewState
 import com.duckduckgo.app.browser.autocomplete.BrowserAutoCompleteSuggestionsAdapter
 import com.duckduckgo.app.browser.downloader.FileDownloadNotificationManager
 import com.duckduckgo.app.browser.downloader.FileDownloader
+import com.duckduckgo.app.browser.downloader.FileDownloader.FileDownloadListener
 import com.duckduckgo.app.browser.downloader.FileDownloader.PendingFileDownload
 import com.duckduckgo.app.browser.filechooser.FileChooserIntentBuilder
 import com.duckduckgo.app.browser.model.BasicAuthenticationCredentials
@@ -319,6 +320,14 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
         super.onCreate(savedInstanceState)
         renderer = BrowserTabFragmentRenderer()
         decorator = BrowserTabFragmentExperimentDecorator()
+        if (savedInstanceState != null) {
+            updateFragmentListener()
+        }
+    }
+
+    private fun updateFragmentListener() {
+        val fragment = fragmentManager?.findFragmentByTag(DOWNLOAD_CONFIRMATION_TAG) as? DownloadConfirmationFragment
+        fragment?.downloadListener = createDownloadListener()
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -360,7 +369,11 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
         val transport = message.obj as WebView.WebViewTransport
         transport.webView = webView
         message.sendToTarget()
+
+        val tabsButton = tabsButton?.actionView as TabSwitcherButton
+        tabsButton?.animateCount()
         bottomBarTabsItem.animateCount()
+
         viewModel.onMessageProcessed()
     }
 
@@ -401,7 +414,13 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
     override fun onPause() {
         daxDialog = null
         logoHidingListener.onPause()
+        dismissDownloadFragment()
         super.onPause()
+    }
+
+    private fun dismissDownloadFragment() {
+        val fragment = fragmentManager?.findFragmentByTag(DOWNLOAD_CONFIRMATION_TAG) as? DownloadConfirmationFragment
+        fragment?.dismiss()
     }
 
     private fun addHomeShortcut(homeShortcut: Command.AddHomeShortcut, context: Context) {
@@ -556,7 +575,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
                     )
                 )
             }
-            is Command.DownloadImage -> requestImageDownload(it.url)
+            is Command.DownloadImage -> requestImageDownload(it.url, it.requestUserConfirmation)
             is Command.FindInPageCommand -> webView?.findAllAsync(it.searchTerm)
             is Command.DismissFindInPage -> webView?.findAllAsync("")
             is Command.ShareLink -> launchSharePageChooser(it.url)
@@ -622,6 +641,10 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
     private fun openInNewBackgroundTab() {
         appBarLayout.setExpanded(true, true)
         viewModel.tabs.removeObservers(this)
+        val view = tabsButton?.actionView as TabSwitcherButton
+        view.increment {
+            addTabsObserver()
+        }
         bottomBarTabsItem.increment {
             addTabsObserver()
         }
@@ -852,7 +875,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
             }
 
             it.setDownloadListener { url, _, contentDisposition, mimeType, _ ->
-                requestFileDownload(url, contentDisposition, mimeType)
+                requestFileDownload(url, contentDisposition, mimeType, true)
             }
 
             it.setOnTouchListener { _, _ ->
@@ -1050,7 +1073,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
         webView = null
     }
 
-    private fun requestFileDownload(url: String, contentDisposition: String, mimeType: String) {
+    private fun requestFileDownload(url: String, contentDisposition: String, mimeType: String, requestUserConfirmation: Boolean) {
         pendingFileDownload = PendingFileDownload(
             url = url,
             contentDisposition = contentDisposition,
@@ -1059,48 +1082,72 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
             subfolder = Environment.DIRECTORY_DOWNLOADS
         )
 
-        downloadFileWithPermissionCheck()
+        if (hasWriteStoragePermission()) {
+            downloadFile(requestUserConfirmation)
+        } else {
+            requestWriteStoragePermission()
+        }
     }
 
-    private fun requestImageDownload(url: String) {
+    private fun requestImageDownload(url: String, requestUserConfirmation: Boolean) {
         pendingFileDownload = PendingFileDownload(
             url = url,
             userAgent = userAgentProvider.getUserAgent(),
             subfolder = Environment.DIRECTORY_PICTURES
         )
 
-        downloadFileWithPermissionCheck()
-    }
-
-    private fun downloadFileWithPermissionCheck() {
         if (hasWriteStoragePermission()) {
-            downloadFile()
+            downloadFile(requestUserConfirmation)
         } else {
             requestWriteStoragePermission()
         }
     }
 
     @AnyThread
-    private fun downloadFile() {
+    private fun downloadFile(requestUserConfirmation: Boolean) {
         val pendingDownload = pendingFileDownload
         pendingFileDownload = null
+
+        if (pendingDownload == null) {
+            return
+        }
+
+        val downloadListener = createDownloadListener()
+        if (requestUserConfirmation) {
+            requestDownloadConfirmation(pendingDownload, downloadListener)
+        } else {
+            completeDownload(pendingDownload, downloadListener)
+        }
+    }
+
+    private fun createDownloadListener(): FileDownloadListener {
+        return object : FileDownloadListener {
+            override fun downloadStarted() {
+                fileDownloadNotificationManager.showDownloadInProgressNotification()
+            }
+
+            override fun downloadFinished(file: File, mimeType: String?) {
+                MediaScannerConnection.scanFile(context, arrayOf(file.absolutePath), null) { _, uri ->
+                    fileDownloadNotificationManager.showDownloadFinishedNotification(file.name, uri, mimeType)
+                }
+            }
+
+            override fun downloadFailed(message: String) {
+                Timber.w("Failed to download file [$message]")
+                fileDownloadNotificationManager.showDownloadFailedNotification()
+            }
+        }
+    }
+
+    private fun requestDownloadConfirmation(pendingDownload: PendingFileDownload, downloadListener: FileDownloadListener) {
+        fragmentManager?.let {
+            DownloadConfirmationFragment.instance(pendingDownload, downloadListener).show(it, DOWNLOAD_CONFIRMATION_TAG)
+        }
+    }
+
+    private fun completeDownload(pendingDownload: PendingFileDownload, callback: FileDownloadListener) {
         thread {
-            fileDownloader.download(pendingDownload, object : FileDownloader.FileDownloadListener {
-                override fun downloadStarted() {
-                    fileDownloadNotificationManager.showDownloadInProgressNotification()
-                }
-
-                override fun downloadFinished(file: File, mimeType: String?) {
-                    MediaScannerConnection.scanFile(context, arrayOf(file.absolutePath), null) { _, uri ->
-                        fileDownloadNotificationManager.showDownloadFinishedNotification(file.name, uri, mimeType)
-                    }
-                }
-
-                override fun downloadFailed(message: String) {
-                    Timber.w("Failed to download file [$message]")
-                    fileDownloadNotificationManager.showDownloadFailedNotification()
-                }
-            })
+            fileDownloader.download(pendingDownload, callback)
         }
     }
 
@@ -1123,7 +1170,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
         if (requestCode == PERMISSION_REQUEST_WRITE_EXTERNAL_STORAGE) {
             if ((grantResults.isNotEmpty()) && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 Timber.i("Write external storage permission granted")
-                downloadFile()
+                downloadFile(requestUserConfirmation = false)
             } else {
                 Timber.i("Write external storage permission refused")
                 Snackbar.make(toolbar, R.string.permissionRequiredToDownload, Snackbar.LENGTH_LONG).show()
@@ -1165,6 +1212,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
         private const val URL_BUNDLE_KEY = "url"
 
         private const val AUTHENTICATION_DIALOG_TAG = "AUTH_DIALOG_TAG"
+        private const val DOWNLOAD_CONFIRMATION_TAG = "DOWNLOAD_CONFIRMATION_TAG"
         private const val DAX_DIALOG_DIALOG_TAG = "DAX_DIALOG_TAG"
 
         private const val MAX_PROGRESS = 100
@@ -1341,15 +1389,20 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
         private fun hideBottomBar(shouldAnimate: Boolean = false) {
             if (shouldAnimate){
                 bottomNavigationBar.animateBarVisibility(false)
+                bottomNavigationBar.gone()
+            } else {
+                bottomNavigationBar.gone()
             }
-
-            bottomNavigationBar.gone()
         }
 
         private fun showBottomBar(shouldAnimate: Boolean) {
-            bottomNavigationBar.show()
             if (shouldAnimate){
+                bottomNavigationBar.show()
                 bottomNavigationBar.animateBarVisibility(true)
+            } else {
+                bottomNavigationBar.postDelayed(KEYBOARD_DELAY) {
+                    bottomNavigationBar.show()
+                }
             }
         }
 
@@ -1419,6 +1472,16 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
                     decorator.updateBottomBarVisibility(true, true)
                     if (viewState.shouldMoveCaretToEnd) {
                         omnibarTextInput.setSelection(viewState.omnibarText.length)
+                    }
+                } else {
+                    decorator.updateBottomBarVisibility(!viewState.isEditing)
+                }
+
+                if (ctaContainer.isVisible){
+                    if (viewState.isEditing){
+                        ctaContainer.setPadding(0,0, 0, 0)
+                    } else {
+                        ctaContainer.setPadding(0,0, 0, 46.toPx())
                     }
                 }
             }
@@ -1727,6 +1790,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
 
             inflate(context, R.layout.include_cta, ctaContainer)
             logoHidingListener.callToActionView = ctaContainer
+            logoHidingListener.callToActionView = ctaContainer
 
             configuration.showCta(ctaContainer)
             ctaContainer.ctaOkButton.setOnClickListener {
@@ -1735,6 +1799,18 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
 
             ctaContainer.ctaDismissButton.setOnClickListener {
                 viewModel.onUserDismissedCta(cta)
+            }
+
+            if (isExperimentEnabled()){
+                if (lastSeenOmnibarViewState != null){
+                    if (lastSeenOmnibarViewState!!.isEditing){
+                        ctaContainer.setPadding(0,0, 0, 0)
+                    } else {
+                        ctaContainer.setPadding(0,0, 0, 46.toPx())
+                    }
+                } else {
+                    ctaContainer.setPadding(0,0, 0, 46.toPx())
+                }
             }
 
             ConstraintSet().also {

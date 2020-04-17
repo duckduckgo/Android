@@ -1,5 +1,5 @@
-<!--
-  ~ Copyright (c) 2020 DuckDuckGo
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright (c) 2019 DuckDuckGo
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -13,13 +13,9 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-<ripple xmlns:android="http://schemas.android.com/apk/res/android"
-    android:color="?attr/colorControlHighlight">
-    <item android:id="@android:id/background">
-        <shape android:shape="rectangle">
-            <solid android:color="@color/white" />
-            <stroke android:width="1.5dp" android:color="@color/cornflowerBlue"/>
-            <corners android:radius="22dp" />
-        </shape>
-    </item>
-</ripple>
+
+<paths xmlns:android="http://schemas.android.com/apk/res/android">
+    <external-path
+        name="external_files"
+        path="." />
+</paths>

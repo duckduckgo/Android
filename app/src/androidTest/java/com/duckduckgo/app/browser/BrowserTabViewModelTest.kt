@@ -803,7 +803,7 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenUserSelectsDownloadImageOptionFromContextMenuThenDownloadFileCommandIssued() {
+    fun whenUserSelectsDownloadImageOptionFromContextMenuThenDownloadCommandIssuedWithoutRequirementForFurtherUserConfirmation() {
         whenever(mockLongPressHandler.userSelectedMenuItem(any(), any()))
             .thenReturn(DownloadFile("example.com"))
 
@@ -815,6 +815,7 @@ class BrowserTabViewModelTest {
 
         val lastCommand = commandCaptor.lastValue as Command.DownloadImage
         assertEquals("example.com", lastCommand.url)
+        assertFalse(lastCommand.requestUserConfirmation)
     }
 
     @Test

@@ -34,7 +34,7 @@ class BottomNavigationBehavior<V : View>(context: Context, attrs: AttributeSet) 
 
     private var offsetAnimator: ValueAnimator? = null
 
-    var isSnappingEnabled = true
+    private var isSnappingEnabled = true
 
     override fun layoutDependsOn(parent: CoordinatorLayout, child: V, dependency: View): Boolean {
         if (dependency is Snackbar.SnackbarLayout) {
