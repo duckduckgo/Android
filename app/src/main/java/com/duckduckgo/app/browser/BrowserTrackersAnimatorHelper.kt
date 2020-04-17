@@ -19,7 +19,6 @@ package com.duckduckgo.app.browser
 import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
 import android.app.Activity
-import android.graphics.drawable.AnimatedVectorDrawable
 import android.view.Gravity
 import android.view.View
 import android.widget.FrameLayout
@@ -29,6 +28,7 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.view.children
 import androidx.core.widget.TextViewCompat
+import androidx.vectordrawable.graphics.drawable.AnimatedVectorDrawableCompat
 import com.duckduckgo.app.cta.ui.Cta
 import com.duckduckgo.app.cta.ui.DaxDialogCta
 import com.duckduckgo.app.privacy.renderer.TrackersRenderer
@@ -82,9 +82,9 @@ class BrowserTrackersAnimatorHelper {
     private fun createLogosViewList(
         activity: Activity,
         container: ConstraintLayout,
-        resourcesId: List<TrackerLogo>?
+        resourcesId: List<TrackerLogo>
     ): List<View> {
-        return resourcesId?.map {
+        return resourcesId.map {
             return@map if (it.resId == R.drawable.other_tracker_bg) {
                 val frameLayout = createTrackerTextLogo(activity, it)
                 container.addView(frameLayout)
@@ -94,7 +94,7 @@ class BrowserTrackersAnimatorHelper {
                 container.addView(imageView)
                 imageView
             }
-        }.orEmpty()
+        }
     }
 
     private fun createTrackerTextLogo(activity: Activity, trackerLogo: TrackerLogo): FrameLayout {
@@ -103,7 +103,8 @@ class BrowserTrackersAnimatorHelper {
         frameLayout.id = View.generateViewId()
 
         val animationView = ImageView(activity)
-        animationView.setImageResource(R.drawable.network_cross_anim)
+        val animatedDrawable = AnimatedVectorDrawableCompat.create(activity, R.drawable.network_cross_anim)
+        animationView.setImageDrawable(animatedDrawable)
         animationView.layoutParams = params
 
         val textView = AppCompatTextView(activity)
@@ -122,13 +123,14 @@ class BrowserTrackersAnimatorHelper {
     private fun createTrackerImageLogo(activity: Activity, trackerLogo: TrackerLogo): ImageView {
         val imageView = ImageView(activity)
         imageView.scaleType = ImageView.ScaleType.CENTER_CROP
-        imageView.setImageResource(R.drawable.network_cross_anim)
+        val animatedDrawable = AnimatedVectorDrawableCompat.create(activity, R.drawable.network_cross_anim)
+        imageView.setImageDrawable(animatedDrawable)
         imageView.setBackgroundResource(trackerLogo.resId)
         imageView.id = View.generateViewId()
         return imageView
     }
 
-    private fun createResourcesIdList(activity: Activity, entities: List<Entity>): List<TrackerLogo>? {
+    private fun createResourcesIdList(activity: Activity, entities: List<Entity>): List<TrackerLogo> {
         if (activity.packageName == null) return emptyList()
         val resourcesList = entities
             .distinct()
@@ -155,14 +157,14 @@ class BrowserTrackersAnimatorHelper {
     private fun animateBlockedLogos(views: List<View>) {
         views.map {
             if (it is ImageView) {
-                val frameAnimation = it.drawable as? AnimatedVectorDrawable
-                frameAnimation?.start()
+                val animatedVectorDrawableCompat = it.drawable as? AnimatedVectorDrawableCompat
+                animatedVectorDrawableCompat?.start()
             }
             if (it is FrameLayout) {
                 val view: ImageView? = it.children.filter { child -> child is ImageView }.firstOrNull() as ImageView?
                 view?.let {
-                    val frameAnimation = view.drawable as? AnimatedVectorDrawable
-                    frameAnimation?.start()
+                    val animatedVectorDrawableCompat = view.drawable as? AnimatedVectorDrawableCompat
+                    animatedVectorDrawableCompat?.start()
                 }
             }
         }
