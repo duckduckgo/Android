@@ -511,13 +511,7 @@ class BrowserTabViewModel(
         omnibarViewState.postValue(currentOmnibarViewState.copy(omnibarText = omnibarTextForUrl(url), shouldMoveCaretToEnd = false))
     }
 
-    private fun omnibarTextForUrl(url: String?): String {
-        if (url == null) return ""
-        if (duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(url)) {
-            return duckDuckGoUrlDetector.extractQuery(url) ?: ""
-        }
-        return url
-    }
+    private fun omnibarTextForUrl(url: String?) = url.orEmpty()
 
     private fun pageCleared() {
         Timber.v("Page cleared: $url")
