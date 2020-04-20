@@ -43,4 +43,8 @@
     <string name="stickySearchPromptRemove">Remove</string>
     <string name="notificationChannelSearch">Search</string>
 
+    <!-- Fireproof websites -->
+    <string name="settingsFireproofWebsites">Fireproof Websites</string>
+
+
 </resources>
