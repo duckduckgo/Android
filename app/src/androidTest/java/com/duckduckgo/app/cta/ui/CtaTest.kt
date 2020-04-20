@@ -52,7 +52,7 @@ class CtaTest {
         MockitoAnnotations.initMocks(this)
 
         whenever(mockActivity.resources).thenReturn(mockResources)
-        whenever(mockResources.getString(any())).thenReturn("withZero")
+        whenever(mockResources.getQuantityString(any(), any())).thenReturn("withZero")
         whenever(mockResources.getQuantityString(any(), any(), any())).thenReturn("withMultiple")
     }
 
@@ -209,7 +209,7 @@ class CtaTest {
 
     @Test
     fun whenCanSendPixelAndCtaIsPartOfHistoryThenReturnFalse() {
-        whenever(mockOnboardingStore.onboardingDialogJourney).thenReturn("e:0")
+        whenever(mockOnboardingStore.onboardingDialogJourney).thenReturn("i:0-e:0-s:0")
 
         val testee = DaxBubbleCta.DaxEndCta(mockOnboardingStore, mockAppInstallStore)
         assertFalse(testee.canSendShownPixel())
