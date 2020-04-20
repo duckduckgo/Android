@@ -382,9 +382,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
         transport.webView = webView
         message.sendToTarget()
 
-        val tabsButton = tabsButton?.actionView as TabSwitcherButton
-        tabsButton?.animateCount()
-        bottomBarTabsItem.animateCount()
+        decorator.animateTabsCount()
 
         viewModel.onMessageProcessed()
     }
@@ -784,7 +782,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
             browserActivity?.launchPrivacyDashboard()
         }
 
-        viewModel.privacyGrade.observe(this, Observer<PrivacyGrade> {
+        viewModel.privacyGrade.observe(viewLifecycleOwner, Observer<PrivacyGrade> {
             Timber.d("Observed grade: $it")
             it?.let { privacyGrade ->
                 val drawable = context?.getDrawable(privacyGrade.icon()) ?: return@let
@@ -1444,7 +1442,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
         }
 
         private fun hideBottomBar(shouldAnimate: Boolean = false) {
-            if (shouldAnimate){
+            if (shouldAnimate) {
                 bottomNavigationBar.animateBarVisibility(false)
                 bottomNavigationBar.gone()
             } else {
@@ -1453,7 +1451,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
         }
 
         private fun showBottomBar(shouldAnimate: Boolean) {
-            if (shouldAnimate){
+            if (shouldAnimate) {
                 bottomNavigationBar.show()
                 bottomNavigationBar.animateBarVisibility(true)
             } else {
@@ -1489,6 +1487,12 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
                 launch { viewModel.userRequestedOpeningNewTab() }
                 return@setOnLongClickListener true
             }
+        }
+
+        fun animateTabsCount() {
+            val tabsButton = tabsButton?.actionView as TabSwitcherButton
+            tabsButton?.animateCount()
+            bottomBarTabsItem.animateCount()
         }
     }
 
@@ -1534,11 +1538,11 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
                     decorator.updateBottomBarVisibility(!viewState.isEditing)
                 }
 
-                if (ctaContainer.isVisible){
-                    if (viewState.isEditing){
-                        ctaContainer.setPadding(0,0, 0, 0)
+                if (ctaContainer.isVisible) {
+                    if (viewState.isEditing) {
+                        ctaContainer.setPadding(0, 0, 0, 0)
                     } else {
-                        ctaContainer.setPadding(0,0, 0, 46.toPx())
+                        ctaContainer.setPadding(0, 0, 0, 46.toPx())
                     }
                 }
             }
@@ -1815,15 +1819,15 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
                 viewModel.onUserDismissedCta()
             }
 
-            if (isExperimentEnabled()){
-                if (lastSeenOmnibarViewState != null){
-                    if (lastSeenOmnibarViewState!!.isEditing){
-                        ctaContainer.setPadding(0,0, 0, 0)
+            if (isExperimentEnabled()) {
+                if (lastSeenOmnibarViewState != null) {
+                    if (lastSeenOmnibarViewState!!.isEditing) {
+                        ctaContainer.setPadding(0, 0, 0, 0)
                     } else {
-                        ctaContainer.setPadding(0,0, 0, 46.toPx())
+                        ctaContainer.setPadding(0, 0, 0, 46.toPx())
                     }
                 } else {
-                    ctaContainer.setPadding(0,0, 0, 46.toPx())
+                    ctaContainer.setPadding(0, 0, 0, 46.toPx())
                 }
             }
 
