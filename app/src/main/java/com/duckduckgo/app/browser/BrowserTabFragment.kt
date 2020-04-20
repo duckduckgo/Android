@@ -363,6 +363,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
             onMenuItemClicked(view.newTabPopupMenuItem) { viewModel.userRequestedOpeningNewTab() }
             onMenuItemClicked(view.bookmarksPopupMenuItem) { browserActivity?.launchBookmarks() }
             onMenuItemClicked(view.addBookmarksPopupMenuItem) { launch { viewModel.onBookmarkAddRequested() } }
+            onMenuItemClicked(view.fireproofWebsitePopupMenuItem) { launch { viewModel.onFireproofWebsiteClicked() } }
             onMenuItemClicked(view.findInPageMenuItem) { viewModel.onFindInPageSelected() }
             onMenuItemClicked(view.brokenSitePopupMenuItem) { viewModel.onBrokenSiteSelected() }
             onMenuItemClicked(view.settingsPopupMenuItem) { browserActivity?.launchSettings() }
@@ -481,6 +482,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
             }
             is Command.LaunchNewTab -> browserActivity?.launchNewTab()
             is Command.ShowBookmarkAddedConfirmation -> bookmarkAdded(it.bookmarkId, it.title, it.url)
+            is Command.ShowFireproofWebSiteConfirmation -> fireproofWebsiteConfirmation(it.preserveSiteId)
             is Command.Navigate -> {
                 navigate(it.url)
             }
@@ -922,6 +924,14 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
                 val addBookmarkDialog = EditBookmarkDialogFragment.instance(bookmarkId, title, url)
                 addBookmarkDialog.show(childFragmentManager, ADD_BOOKMARK_FRAGMENT_TAG)
                 addBookmarkDialog.listener = viewModel
+            }
+            .show()
+    }
+
+    private fun fireproofWebsiteConfirmation(preserveSiteId: Long) {
+        Snackbar.make(rootView, R.string.fireproofWebsiteSnackbarConfirmation, Snackbar.LENGTH_LONG)
+            .setAction(R.string.fireproofWebsiteSnackbarAction) {
+                viewModel.onFireproofWebsiteSnackbarActionClicked(preserveSiteId)
             }
             .show()
     }

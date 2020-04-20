@@ -96,6 +96,11 @@
                 android:text="@string/addBookmarkMenuTitle" />
 
             <TextView
+                android:id="@+id/fireproofWebsitePopupMenuItem"
+                style="@style/BrowserTextMenuItem"
+                android:text="@string/fireproofWebsiteMenuTitle" />
+
+            <TextView
                 android:id="@+id/sharePageMenuItem"
                 style="@style/BrowserTextMenuItem"
                 android:text="@string/shareMenuTitle" />

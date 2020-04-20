@@ -180,6 +180,7 @@ class BrowserTabViewModel(
         class ShowFullScreen(val view: View) : Command()
         class DownloadImage(val url: String, val requestUserConfirmation: Boolean) : Command()
         class ShowBookmarkAddedConfirmation(val bookmarkId: Long, val title: String?, val url: String?) : Command()
+        class ShowFireproofWebSiteConfirmation(val preserveSiteId: Long) : Command()
         class ShareLink(val url: String) : Command()
         class CopyLink(val url: String) : Command()
         class FindInPageCommand(val searchTerm: String) : Command()
@@ -685,6 +686,27 @@ class BrowserTabViewModel(
         }
         withContext(dispatchers.main()) {
             command.value = ShowBookmarkAddedConfirmation(id, title, url)
+        }
+    }
+
+    fun onFireproofWebsiteClicked() {
+        val url = url ?: ""
+        viewModelScope.launch {
+            val id = withContext(dispatchers.io()) {
+                val urlDomain = Uri.parse(url).host
+                preserveCookiesDao.insert(PreserveCookiesEntity(domain = urlDomain))
+            }
+            if (id >= 0) {
+                command.value = ShowFireproofWebSiteConfirmation(preserveSiteId = id)
+            }
+        }
+    }
+
+    fun onFireproofWebsiteSnackbarActionClicked(preserveSiteId: Long) {
+        viewModelScope.launch {
+            withContext(dispatchers.io()) {
+                preserveCookiesDao.deleteById(preserveSiteId)
+            }
         }
     }
 
