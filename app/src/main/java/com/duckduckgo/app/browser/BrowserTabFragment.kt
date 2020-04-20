@@ -49,8 +49,8 @@ import androidx.core.view.isEmpty
 import androidx.core.view.isNotEmpty
 import androidx.core.view.isVisible
 import androidx.core.view.postDelayed
-import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.transaction
 import androidx.lifecycle.*
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion
@@ -77,6 +77,7 @@ import com.duckduckgo.app.browser.useragent.UserAgentProvider
 import com.duckduckgo.app.cta.ui.*
 import com.duckduckgo.app.global.ViewModelFactory
 import com.duckduckgo.app.global.device.DeviceInfo
+import com.duckduckgo.app.global.model.orderedTrackingEntities
 import com.duckduckgo.app.global.view.*
 import com.duckduckgo.app.privacy.model.PrivacyGrade
 import com.duckduckgo.app.privacy.renderer.icon
@@ -109,7 +110,7 @@ import javax.inject.Inject
 import kotlin.concurrent.thread
 import kotlin.coroutines.CoroutineContext
 
-class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
+class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogListener {
 
     private val supervisorJob = SupervisorJob()
 
@@ -235,7 +236,6 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
     private val logoHidingListener by lazy { LogoHidingLayoutChangeLifecycleListener(ddgLogo) }
 
     private var alertDialog: AlertDialog? = null
-    private var daxDialog: DialogFragment? = null
 
     override fun onAttach(context: Context) {
         AndroidSupportInjection.inject(this)
@@ -244,6 +244,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        removeDaxDialogFromActivity()
         renderer = BrowserTabFragmentRenderer()
         if (savedInstanceState != null) {
             updateFragmentListener()
@@ -288,6 +289,15 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
                 }
             }
         })
+    }
+
+    private fun getDaxDialogFromActivity(): Fragment? = activity?.supportFragmentManager?.findFragmentByTag(DAX_DIALOG_DIALOG_TAG)
+
+    private fun removeDaxDialogFromActivity() {
+        val fragment = getDaxDialogFromActivity()
+        fragment?.let {
+            activity?.supportFragmentManager?.transaction { remove(it) }
+        }
     }
 
     private fun processMessage(message: Message) {
@@ -342,7 +352,6 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
     }
 
     override fun onPause() {
-        daxDialog = null
         logoHidingListener.onPause()
         dismissDownloadFragment()
         super.onPause()
@@ -467,7 +476,9 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
     }
 
     private fun processCommand(it: Command?) {
-        renderer.cancelAllAnimations()
+        if (it !is Command.DaxCommand) {
+            renderer.cancelAllAnimations()
+        }
         when (it) {
             is Command.Refresh -> refresh()
             is Command.OpenInNewTab -> {
@@ -550,6 +561,8 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
             is Command.GenerateWebViewPreviewImage -> generateWebViewPreviewImage()
             is Command.LaunchTabSwitcher -> launchTabSwitcher()
             is Command.ShowErrorWithAction -> showErrorSnackbar(it)
+            is Command.DaxCommand.FinishTrackerAnimation -> finishTrackerAnimation()
+            is Command.DaxCommand.HideDaxDialog -> showHideTipsDialog(it.cta)
         }
     }
 
@@ -1156,6 +1169,46 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
         startActivity(AddWidgetInstructionsActivity.intent(context), options)
     }
 
+    private fun finishTrackerAnimation() {
+        animatorHelper.finishTrackerAnimation(omnibarViews(), networksContainer)
+    }
+
+    private fun showHideTipsDialog(cta: Cta) {
+        context?.let {
+            launchHideTipsDialog(it, cta)
+        }
+    }
+
+    override fun onDaxDialogDismiss() {
+        viewModel.onDaxDialogDismissed()
+    }
+
+    override fun onDaxDialogHideClick() {
+        viewModel.onUserHideDaxDialog()
+    }
+
+    override fun onDaxDialogPrimaryCtaClick() {
+        viewModel.onUserClickCtaOkButton()
+    }
+
+    private fun launchHideTipsDialog(context: Context, cta: Cta) {
+        AlertDialog.Builder(context)
+            .setTitle(R.string.hideTipsTitle)
+            .setMessage(getString(R.string.hideTipsText))
+            .setPositiveButton(R.string.hideTipsButton) { dialog, _ ->
+                dialog.dismiss()
+                launch {
+                    ctaViewModel.hideTipsForever(cta)
+                }
+            }
+            .setNegativeButton(android.R.string.no) { dialog, _ ->
+                dialog.dismiss()
+            }
+            .show()
+    }
+
+    fun omnibarViews(): List<View> = listOf(clearTextButton, omnibarTextInput, privacyGradeButton)
+
     companion object {
         private const val TAB_ID_ARG = "TAB_ID_ARG"
         private const val URL_EXTRA_ARG = "URL_EXTRA_ARG"
@@ -1265,7 +1318,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
                 delay(TRACKERS_SECONDARY_DELAY)
                 if (lastSeenOmnibarViewState?.isEditing != true) {
                     val site = viewModel.siteLiveData.value
-                    val events = site?.trackingEvents
+                    val events = site?.orderedTrackingEntities()
 
                     activity?.let { activity ->
                         animatorHelper.startTrackersAnimation(
@@ -1287,8 +1340,6 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
             omnibarTextInput.alpha = 1f
             privacyGradeButton.alpha = 1f
         }
-
-        private fun omnibarViews(): List<View> = listOf(clearTextButton, omnibarTextInput, privacyGradeButton)
 
         fun renderGlobalViewState(viewState: GlobalLayoutViewState) {
             if (lastSeenGlobalViewState is GlobalLayoutViewState.Invalidated &&
@@ -1426,58 +1477,17 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
         private fun showDaxDialogCta(configuration: DaxDialogCta) {
             hideHomeCta()
             hideDaxCta()
-            val container = networksContainer
             activity?.let { activity ->
-                daxDialog?.dismiss()
-                daxDialog = configuration.createCta(activity).apply {
-                    setHideClickListener {
-                        getDaxDialog().dismiss()
-                        launchHideTipsDialog(activity, configuration)
-                    }
-                    setDismissListener {
-                        if (configuration is DaxDialogCta.DaxTrackersBlockedCta) {
-                            animatorHelper.finishTrackerAnimation(omnibarViews(), container)
-                        }
-                        viewModel.onUserDismissedCta(configuration)
-                    }
-                    setPrimaryCtaClickListener {
-                        viewModel.onUserClickCtaOkButton(configuration)
-                        if (configuration is DaxDialogCta.DaxMainNetworkCta) {
-                            setPrimaryCtaClickListener {
-                                viewModel.onUserClickCtaOkButton(configuration)
-                                getDaxDialog().dismiss()
-                            }
-                            configuration.setSecondDialog(this, activity)
-                            viewModel.onManualCtaShown(configuration)
-                        } else {
-                            getDaxDialog().dismiss()
-                        }
-                    }
-                    if (configuration is SecondaryButtonCta) {
-                        setSecondaryCtaClickListener {
-                            viewModel.onUserClickCtaSecondaryButton(configuration)
-                            getDaxDialog().dismiss()
-                        }
-                    }
+                val daxDialog = getDaxDialogFromActivity() as? DaxDialog
+                if (daxDialog != null) {
+                    daxDialog.setDaxDialogListener(this@BrowserTabFragment)
+                    return
+                }
+                configuration.createCta(activity).apply {
+                    setDaxDialogListener(this@BrowserTabFragment)
                     getDaxDialog().show(activity.supportFragmentManager, DAX_DIALOG_DIALOG_TAG)
-                }.getDaxDialog()
+                }
             }
-        }
-
-        private fun launchHideTipsDialog(context: Context, cta: Cta) {
-            AlertDialog.Builder(context)
-                .setTitle(R.string.hideTipsTitle)
-                .setMessage(getString(R.string.hideTipsText))
-                .setPositiveButton(R.string.hideTipsButton) { dialog, _ ->
-                    dialog.dismiss()
-                    launch {
-                        ctaViewModel.hideTipsForever(cta)
-                    }
-                }
-                .setNegativeButton(android.R.string.no) { dialog, _ ->
-                    dialog.dismiss()
-                }
-                .show()
         }
 
         private fun showDaxCta(configuration: DaxBubbleCta) {
@@ -1498,7 +1508,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
                 viewModel.onUserClickTopCta(configuration)
             }
             ctaTopContainer.closeButton.setOnClickListener {
-                viewModel.onUserDismissedCta(configuration)
+                viewModel.onUserDismissedCta()
             }
         }
 
@@ -1537,11 +1547,11 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
 
             configuration.showCta(ctaContainer)
             ctaContainer.ctaOkButton.setOnClickListener {
-                viewModel.onUserClickCtaOkButton(configuration)
+                viewModel.onUserClickCtaOkButton()
             }
 
             ctaContainer.ctaDismissButton.setOnClickListener {
-                viewModel.onUserDismissedCta(cta)
+                viewModel.onUserDismissedCta()
             }
 
             ConstraintSet().also {
