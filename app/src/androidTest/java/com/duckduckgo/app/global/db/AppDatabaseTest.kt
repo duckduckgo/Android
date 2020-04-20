@@ -183,6 +183,12 @@ class AppDatabaseTest {
     }
 
     @Test
+    fun whenMigratingFromVersion18To19ThenValidationSucceeds() {
+        createDatabaseAndMigrate(18, 19, migrationsProvider.MIGRATION_18_TO_19)
+    }
+
+
+    @Test
     fun whenMigratingFromVersion17To18IfUserDidNotSawOnboardingThenMigrateToNew() = coroutineRule.runBlocking {
         givenUserNeverSawOnboarding()
         createDatabaseAndMigrate(17, 18, migrationsProvider.MIGRATION_17_TO_18)
