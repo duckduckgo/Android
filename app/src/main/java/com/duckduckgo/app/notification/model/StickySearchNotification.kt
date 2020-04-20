@@ -17,6 +17,7 @@
 package com.duckduckgo.app.notification.model
 
 import android.content.Context
+import android.os.Bundle
 import androidx.core.app.NotificationManagerCompat
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEvent.QUICK_SEARCH_LAUNCH
@@ -66,4 +67,5 @@ class StickySearchNotificationSpecification(context: Context) : NotificationSpec
     override val description: String = ""
     override val pixelSuffix: String = ""
     override val autoCancel = false
+    override val bundle: Bundle = Bundle()
 }

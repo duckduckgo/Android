@@ -30,6 +30,12 @@ interface VariantManager {
     // variant-dependant features listed here
     sealed class VariantFeature {
         object StickySearchNotification : VariantFeature()
+        object DripNotification : VariantFeature()
+        object Day1PrivacyNotification : VariantFeature()
+        object Day3ClearDataNotification : VariantFeature()
+        object Day1ArticleNotification : VariantFeature()
+        object Day1BlogNotification : VariantFeature()
+        object Day1AppFeatureNotification : VariantFeature()
     }
 
     companion object {
@@ -55,6 +61,33 @@ interface VariantManager {
                 key = "mg",
                 weight = 1.0,
                 features = listOf(StickySearchNotification),
+                filterBy = { isEnglishLocale() }),
+
+            // Notification Drip Experiment
+            Variant(
+                key = "za",
+                weight = 1.0,
+                features = listOf(DripNotification, Day1PrivacyNotification, Day3ClearDataNotification),
+                filterBy = { isEnglishLocale() }),
+            Variant(
+                key = "zb",
+                weight = 1.0,
+                features = listOf(DripNotification),
+                filterBy = { isEnglishLocale() }),
+            Variant(
+                key = "zc",
+                weight = 1.0,
+                features = listOf(DripNotification, Day1ArticleNotification, Day3ClearDataNotification),
+                filterBy = { isEnglishLocale() }),
+            Variant(
+                key = "zd",
+                weight = 1.0,
+                features = listOf(DripNotification, Day1BlogNotification, Day3ClearDataNotification),
+                filterBy = { isEnglishLocale() }),
+            Variant(
+                key = "ze",
+                weight = 1.0,
+                features = listOf(DripNotification, Day1AppFeatureNotification, Day3ClearDataNotification),
                 filterBy = { isEnglishLocale() })
 
             // All groups in an experiment (control and variants) MUST use the same filters

@@ -60,6 +60,81 @@ class VariantManagerTest {
         assertTrue(variant.hasFeature(StickySearchNotification))
     }
 
+    // Notification Drip Experiment
+
+    @Test
+    fun notificationDripTestControlGroupVariantActive() {
+        val variant = variants.firstOrNull { it.key == "za" }
+        assertEqualsDouble(1.0, variant!!.weight)
+    }
+
+    @Test
+    fun notificationDripTestControlGroupVariantHasDay1PrivacyNotificationAndDay3ClearDataNotificationAndDripNotification() {
+        val variant = variants.firstOrNull { it.key == "za" }
+        assertEquals(3, variant!!.features.size)
+        assertTrue(variant.hasFeature(Day1PrivacyNotification))
+        assertTrue(variant.hasFeature(Day3ClearDataNotification))
+        assertTrue(variant.hasFeature(DripNotification))
+    }
+
+    @Test
+    fun notificationDripTestNullVariantActive() {
+        val variant = variants.firstOrNull { it.key == "zb" }
+        assertEqualsDouble(1.0, variant!!.weight)
+    }
+
+    @Test
+    fun notificationDripTestNullVariantHasDripNotification() {
+        val variant = variants.firstOrNull { it.key == "zb" }
+        assertEquals(1, variant!!.features.size)
+        assertTrue(variant.hasFeature(DripNotification))
+    }
+
+    @Test
+    fun notificationDripTestArticleVariantActive() {
+        val variant = variants.firstOrNull { it.key == "zc" }
+        assertEqualsDouble(1.0, variant!!.weight)
+    }
+
+    @Test
+    fun notificationDripTestArticleVariantHasDay1ArticleNotificationAndDay3ClearDataNotificationAndDripNotification() {
+        val variant = variants.firstOrNull { it.key == "zc" }
+        assertEquals(3, variant!!.features.size)
+        assertTrue(variant.hasFeature(Day1ArticleNotification))
+        assertTrue(variant.hasFeature(Day3ClearDataNotification))
+        assertTrue(variant.hasFeature(DripNotification))
+    }
+
+    @Test
+    fun notificationDripTestBlogVariantActive() {
+        val variant = variants.firstOrNull { it.key == "zd" }
+        assertEqualsDouble(1.0, variant!!.weight)
+    }
+
+    @Test
+    fun notificationDripTestBlogVariantHasDay1BlogNotificationAndDay3ClearDataNotificationAndDripNotification() {
+        val variant = variants.firstOrNull { it.key == "zd" }
+        assertEquals(3, variant!!.features.size)
+        assertTrue(variant.hasFeature(Day1BlogNotification))
+        assertTrue(variant.hasFeature(Day3ClearDataNotification))
+        assertTrue(variant.hasFeature(DripNotification))
+    }
+
+    @Test
+    fun notificationDripTestAppFeatureVariantActive() {
+        val variant = variants.firstOrNull { it.key == "ze" }
+        assertEqualsDouble(1.0, variant!!.weight)
+    }
+
+    @Test
+    fun notificationDripTestAppFeatureVariantHasDay1AppFeatureNotificationAndDay3ClearDataNotificationAndDripNotification() {
+        val variant = variants.firstOrNull { it.key == "ze" }
+        assertEquals(3, variant!!.features.size)
+        assertTrue(variant.hasFeature(Day1AppFeatureNotification))
+        assertTrue(variant.hasFeature(Day3ClearDataNotification))
+        assertTrue(variant.hasFeature(DripNotification))
+    }
+
     @Test
     fun verifyNoDuplicateVariantNames() {
         val existingNames = mutableSetOf<String>()

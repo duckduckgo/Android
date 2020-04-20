@@ -49,6 +49,9 @@ class AndroidNotificationSchedulerTest {
     private val clearNotification: SchedulableNotification = mock()
     private val privacyNotification: SchedulableNotification = mock()
     private val searchPromptNotification: SearchNotification = mock()
+    private val articleNotification: SchedulableNotification = mock()
+    private val blogNotification: SchedulableNotification = mock()
+    private val appFeatureNotification: SchedulableNotification = mock()
 
     private val context = InstrumentationRegistry.getInstrumentation().targetContext
     private var workManager = WorkManager.getInstance(context)
@@ -61,7 +64,11 @@ class AndroidNotificationSchedulerTest {
             workManager,
             clearNotification,
             privacyNotification,
-            searchPromptNotification
+            searchPromptNotification,
+            articleNotification,
+            blogNotification,
+            appFeatureNotification,
+            variantManager
         )
     }
 

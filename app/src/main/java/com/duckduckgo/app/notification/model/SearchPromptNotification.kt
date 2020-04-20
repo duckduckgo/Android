@@ -17,6 +17,7 @@
 package com.duckduckgo.app.notification.model
 
 import android.content.Context
+import android.os.Bundle
 import androidx.core.app.NotificationManagerCompat
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.notification.NotificationHandlerService
@@ -80,5 +81,6 @@ class StickySearchPromptSpecification(context: Context) : NotificationSpec {
     override val closeButton: String = context.getString(R.string.stickySearchPromptRemove)
     override val pixelSuffix = ""
     override val autoCancel = false
+    override val bundle: Bundle = Bundle()
 }
 

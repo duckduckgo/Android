@@ -28,8 +28,13 @@ import com.duckduckgo.app.notification.NotificationScheduler.PrivacyNotification
 import com.duckduckgo.app.notification.NotificationScheduler.SearchPromptNotificationWorker
 import com.duckduckgo.app.notification.NotificationScheduler.StickySearchNotificationWorker
 import com.duckduckgo.app.notification.NotificationScheduler.DismissSearchNotificationWorker
+import com.duckduckgo.app.notification.NotificationScheduler.ArticleNotificationWorker
+import com.duckduckgo.app.notification.NotificationScheduler.BlogNotificationWorker
+import com.duckduckgo.app.notification.NotificationScheduler.AppFeatureNotificationWorker
 import com.duckduckgo.app.notification.NotificationFactory
 import com.duckduckgo.app.notification.db.NotificationDao
+import com.duckduckgo.app.notification.model.AppFeatureNotification
+import com.duckduckgo.app.notification.model.WebsiteNotification
 import com.duckduckgo.app.notification.model.ClearDataNotification
 import com.duckduckgo.app.notification.model.PrivacyProtectionNotification
 import com.duckduckgo.app.notification.model.SearchPromptNotification
@@ -51,6 +56,9 @@ class DaggerWorkerFactory(
     private val privacyProtectionNotification: PrivacyProtectionNotification,
     private val stickySearchPromptNotification: SearchPromptNotification,
     private val stickySearchNotification: StickySearchNotification,
+    private val articleNotification: WebsiteNotification,
+    private val blogNotification: WebsiteNotification,
+    private val appFeatureNotification: AppFeatureNotification,
     private val pixel: Pixel
 ) : WorkerFactory() {
 
@@ -69,11 +77,14 @@ class DaggerWorkerFactory(
                 is SearchPromptNotificationWorker -> injectSearchPromptNotificationWorker(instance)
                 is StickySearchNotificationWorker -> injectStickySearchNotificationWorker(instance)
                 is DismissSearchNotificationWorker -> injectDismissSearchNotificationWorker(instance)
+                is ArticleNotificationWorker -> injectArticleNotificationWorker(instance)
+                is BlogNotificationWorker -> injectBlogNotificationWorker(instance)
+                is AppFeatureNotificationWorker -> injectAppFeatureNotificationWorker(instance)
                 else -> Timber.i("No injection required for worker $workerClassName")
             }
 
             return instance
-        } catch (exception: Exception){
+        } catch (exception: Exception) {
             Timber.e(exception, "Worker $workerClassName could not be created")
             return null
         }
@@ -103,6 +114,30 @@ class DaggerWorkerFactory(
         worker.factory = notificationFactory
         worker.pixel = pixel
         worker.notification = privacyProtectionNotification
+    }
+
+    private fun injectArticleNotificationWorker(worker: ArticleNotificationWorker) {
+        worker.manager = notificationManager
+        worker.notificationDao = notificationDao
+        worker.factory = notificationFactory
+        worker.pixel = pixel
+        worker.notification = articleNotification
+    }
+
+    private fun injectBlogNotificationWorker(worker: BlogNotificationWorker) {
+        worker.manager = notificationManager
+        worker.notificationDao = notificationDao
+        worker.factory = notificationFactory
+        worker.pixel = pixel
+        worker.notification = blogNotification
+    }
+
+    private fun injectAppFeatureNotificationWorker(worker: AppFeatureNotificationWorker) {
+        worker.manager = notificationManager
+        worker.notificationDao = notificationDao
+        worker.factory = notificationFactory
+        worker.pixel = pixel
+        worker.notification = appFeatureNotification
     }
 
     private fun injectSearchPromptNotificationWorker(worker: SearchPromptNotificationWorker) {

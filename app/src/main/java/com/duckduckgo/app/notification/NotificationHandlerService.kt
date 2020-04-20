@@ -24,6 +24,7 @@ import android.content.Intent
 import androidx.annotation.VisibleForTesting
 import androidx.core.app.NotificationManagerCompat
 import com.duckduckgo.app.browser.BrowserActivity
+import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEvent.APP_FEATURE
 import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEvent.APP_LAUNCH
 import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEvent.CANCEL
 import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEvent.CLEAR_DATA_LAUNCH
@@ -31,7 +32,9 @@ import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEv
 import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEvent.QUICK_SEARCH_KEEP
 import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEvent.QUICK_SEARCH_PROMPT_LAUNCH
 import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEvent.QUICK_SEARCH_REMOVE
+import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEvent.WEBSITE
 import com.duckduckgo.app.notification.model.NotificationSpec
+import com.duckduckgo.app.notification.model.WebsiteNotificationSpecification
 import com.duckduckgo.app.settings.SettingsActivity
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -75,6 +78,8 @@ class NotificationHandlerService : IntentService("NotificationHandlerService") {
             QUICK_SEARCH_REMOVE -> onQuickSearchNotificationRemove(intent)
             QUICK_SEARCH_KEEP -> onQuickSearchNotificationKeep(intent)
             QUICK_SEARCH_LAUNCH -> onQuickSearchRequest()
+            WEBSITE -> onArticleNotification(intent, pixelSuffix)
+            APP_FEATURE -> onAppLaunched(pixelSuffix)
         }
 
         if (intent.getBooleanExtra(NOTIFICATION_AUTO_CANCEL, true)) {
@@ -82,6 +87,15 @@ class NotificationHandlerService : IntentService("NotificationHandlerService") {
             clearNotification(notificationId)
             closeNotificationPanel()
         }
+    }
+
+    private fun onArticleNotification(intent: Intent, pixelSuffix: String) {
+        val url = intent.getStringExtra(WebsiteNotificationSpecification.WEBSITE_KEY)
+        val newIntent = BrowserActivity.intent(context, queryExtra = url)
+        TaskStackBuilder.create(context)
+            .addNextIntentWithParentStack(newIntent)
+            .startActivities()
+        pixel.fire("${NOTIFICATION_LAUNCHED.pixelName}_$pixelSuffix")
     }
 
     private fun onAppLaunched(pixelSuffix: String) {
@@ -156,6 +170,8 @@ class NotificationHandlerService : IntentService("NotificationHandlerService") {
         const val QUICK_SEARCH_KEEP = "com.duckduckgo.notification.search.keep"
         const val QUICK_SEARCH_REMOVE = "com.duckduckgo.notification.search.remove"
         const val QUICK_SEARCH_LAUNCH = "com.duckduckgo.notification.search"
+        const val WEBSITE = "com.duckduckgo.notification.website"
+        const val APP_FEATURE = "com.duckduckgo.notification.app.feature"
     }
 
     companion object {
@@ -166,6 +182,7 @@ class NotificationHandlerService : IntentService("NotificationHandlerService") {
         fun pendingNotificationHandlerIntent(context: Context, eventType: String, specification: NotificationSpec): PendingIntent {
             val intent = Intent(context, NotificationHandlerService::class.java)
             intent.type = eventType
+            intent.putExtras(specification.bundle)
             intent.putExtra(PIXEL_SUFFIX_EXTRA, specification.pixelSuffix)
             intent.putExtra(NOTIFICATION_SYSTEM_ID_EXTRA, specification.systemId)
             intent.putExtra(NOTIFICATION_AUTO_CANCEL, specification.autoCancel)

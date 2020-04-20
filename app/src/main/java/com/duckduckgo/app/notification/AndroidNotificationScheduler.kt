@@ -28,11 +28,17 @@ import com.duckduckgo.app.notification.db.NotificationDao
 import com.duckduckgo.app.notification.model.Notification
 import com.duckduckgo.app.notification.model.SchedulableNotification
 import com.duckduckgo.app.notification.model.SearchNotification
+import com.duckduckgo.app.statistics.VariantManager
+import com.duckduckgo.app.statistics.VariantManager.VariantFeature.DripNotification
+import com.duckduckgo.app.statistics.VariantManager.VariantFeature.Day1AppFeatureNotification
+import com.duckduckgo.app.statistics.VariantManager.VariantFeature.Day1BlogNotification
+import com.duckduckgo.app.statistics.VariantManager.VariantFeature.Day1ArticleNotification
+import com.duckduckgo.app.statistics.VariantManager.VariantFeature.Day1PrivacyNotification
+import com.duckduckgo.app.statistics.VariantManager.VariantFeature.Day3ClearDataNotification
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.NOTIFICATION_SHOWN
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
-
 
 // Please don't rename any Worker class name or class path
 // More information: https://craigrussell.io/2019/04/a-workmanager-pitfall-modifying-a-scheduled-worker/
@@ -48,8 +54,14 @@ class NotificationScheduler(
     private val workManager: WorkManager,
     private val clearDataNotification: SchedulableNotification,
     private val privacyNotification: SchedulableNotification,
-    private val searchPromptNotification: SearchNotification
+    private val searchPromptNotification: SearchNotification,
+    private val articleNotification: SchedulableNotification,
+    private val blogNotification: SchedulableNotification,
+    private val appFeatureNotification: SchedulableNotification,
+    variantManager: VariantManager
 ) : AndroidNotificationScheduler {
+
+    private val variant = variantManager.getVariant()
 
     override suspend fun scheduleNextNotification() {
         scheduleInactiveUserNotifications()
@@ -66,15 +78,26 @@ class NotificationScheduler(
         workManager.cancelAllWorkByTag(UNUSED_APP_WORK_REQUEST_TAG)
 
         when {
-            privacyNotification.canShow() -> {
+            variant.hasFeature(Day1ArticleNotification) && articleNotification.canShow() -> {
+                scheduleNotification(OneTimeWorkRequestBuilder<ArticleNotificationWorker>(), 1, TimeUnit.DAYS, UNUSED_APP_WORK_REQUEST_TAG)
+            }
+            variant.hasFeature(Day1BlogNotification) && blogNotification.canShow() -> {
+                scheduleNotification(OneTimeWorkRequestBuilder<BlogNotificationWorker>(), 1, TimeUnit.DAYS, UNUSED_APP_WORK_REQUEST_TAG)
+            }
+            variant.hasFeature(Day1AppFeatureNotification) && appFeatureNotification.canShow() -> {
+                scheduleNotification(OneTimeWorkRequestBuilder<AppFeatureNotificationWorker>(), 1, TimeUnit.DAYS, UNUSED_APP_WORK_REQUEST_TAG)
+            }
+            (!isFromDripNotificationVariant() || variant.hasFeature(Day1PrivacyNotification)) && privacyNotification.canShow() -> {
                 scheduleNotification(OneTimeWorkRequestBuilder<PrivacyNotificationWorker>(), 1, TimeUnit.DAYS, UNUSED_APP_WORK_REQUEST_TAG)
             }
-            clearDataNotification.canShow() -> {
+            (!isFromDripNotificationVariant() || variant.hasFeature(Day3ClearDataNotification)) && clearDataNotification.canShow() -> {
                 scheduleNotification(OneTimeWorkRequestBuilder<ClearDataNotificationWorker>(), 3, TimeUnit.DAYS, UNUSED_APP_WORK_REQUEST_TAG)
             }
             else -> Timber.v("Notifications not enabled for this variant")
         }
     }
+
+    private fun isFromDripNotificationVariant(): Boolean = variant.hasFeature(DripNotification)
 
     override fun launchStickySearchNotification() {
         Timber.v("Posting sticky notification")
@@ -119,6 +142,9 @@ class NotificationScheduler(
 
     open class ClearDataNotificationWorker(context: Context, params: WorkerParameters) : SchedulableNotificationWorker(context, params)
     class PrivacyNotificationWorker(context: Context, params: WorkerParameters) : SchedulableNotificationWorker(context, params)
+    class ArticleNotificationWorker(context: Context, params: WorkerParameters) : SchedulableNotificationWorker(context, params)
+    class BlogNotificationWorker(context: Context, params: WorkerParameters) : SchedulableNotificationWorker(context, params)
+    class AppFeatureNotificationWorker(context: Context, params: WorkerParameters) : SchedulableNotificationWorker(context, params)
 
     open class SchedulableNotificationWorker(val context: Context, params: WorkerParameters) : CoroutineWorker(context, params) {
 

@@ -25,15 +25,18 @@ import com.duckduckgo.app.notification.NotificationScheduler
 import com.duckduckgo.app.notification.NotificationFactory
 import com.duckduckgo.app.notification.AndroidNotificationScheduler
 import com.duckduckgo.app.notification.db.NotificationDao
+import com.duckduckgo.app.notification.model.AppFeatureNotification
 import com.duckduckgo.app.notification.model.ClearDataNotification
 import com.duckduckgo.app.notification.model.PrivacyProtectionNotification
 import com.duckduckgo.app.notification.model.SearchPromptNotification
 import com.duckduckgo.app.notification.model.StickySearchNotification
+import com.duckduckgo.app.notification.model.WebsiteNotification
 import com.duckduckgo.app.privacy.db.PrivacyProtectionCountDao
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.VariantManager
 import dagger.Module
 import dagger.Provides
+import javax.inject.Named
 import javax.inject.Singleton
 
 @Module(includes = [DaoModule::class])
@@ -94,18 +97,52 @@ class NotificationModule {
     }
 
     @Provides
+    @Named("articleNotification")
+    fun provideArticleNotification(
+        context: Context,
+        notificationDao: NotificationDao
+    ): WebsiteNotification {
+        return WebsiteNotification(context, notificationDao, WebsiteNotification.ARTICLE_URL, WebsiteNotification.ARTICLE_PIXEL)
+    }
+
+    @Provides
+    @Named("blogNotification")
+    fun provideBlogNotification(
+        context: Context,
+        notificationDao: NotificationDao
+    ): WebsiteNotification {
+        return WebsiteNotification(context, notificationDao, WebsiteNotification.BLOG_URL, WebsiteNotification.BLOG_PIXEL)
+    }
+
+    @Provides
+    fun provideAppFeatureNotification(
+        context: Context,
+        notificationDao: NotificationDao
+    ): AppFeatureNotification {
+        return AppFeatureNotification(context, notificationDao)
+    }
+
+    @Provides
     @Singleton
     fun providesNotificationScheduler(
         workManager: WorkManager,
         clearDataNotification: ClearDataNotification,
         privacyProtectionNotification: PrivacyProtectionNotification,
-        stickySearchNotification: StickySearchNotification
+        stickySearchNotification: StickySearchNotification,
+        @Named("articleNotification") articleNotification: WebsiteNotification,
+        @Named("blogNotification") blogNotification: WebsiteNotification,
+        appFeatureNotification: AppFeatureNotification,
+        variantManager: VariantManager
     ): AndroidNotificationScheduler {
         return NotificationScheduler(
             workManager,
             clearDataNotification,
             privacyProtectionNotification,
-            stickySearchNotification
+            stickySearchNotification,
+            articleNotification,
+            blogNotification,
+            appFeatureNotification,
+            variantManager
         )
     }
 

@@ -49,6 +49,8 @@ class NotificationRegistrar @Inject constructor(
         const val ClearData = 100
         const val PrivacyProtection = 101
         const val StickySearch = 102
+        const val Article = 103
+        const val AppFeature = 104
     }
 
     object ChannelType {
