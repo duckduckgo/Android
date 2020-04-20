@@ -45,6 +45,9 @@
 
     <!-- Fireproof websites -->
     <string name="settingsFireproofWebsites">Fireproof Websites</string>
+    <string name="fireproofWebsiteMenuTitle">Fireproof Website</string>
+    <string name="fireproofWebsiteSnackbarConfirmation">‘website.com’ is now fireproof! Visit Settings to remove.</string>
+    <string name="fireproofWebsiteSnackbarAction">Undo</string>
 
 
 </resources>
