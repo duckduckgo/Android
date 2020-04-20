@@ -32,7 +32,7 @@ import com.duckduckgo.app.global.install.daysInstalled
 import com.duckduckgo.app.global.view.*
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.app.trackerdetection.model.TrackingEvent
+import com.duckduckgo.app.trackerdetection.model.Entity
 import kotlinx.android.synthetic.main.include_cta_buttons.view.*
 import kotlinx.android.synthetic.main.include_cta_content.view.*
 import kotlinx.android.synthetic.main.include_dax_dialog_cta.view.*
@@ -112,7 +112,7 @@ sealed class DaxDialogCta(
     class DaxTrackersBlockedCta(
         override val onboardingStore: OnboardingStore,
         override val appInstallStore: AppInstallStore,
-        val trackers: List<TrackingEvent>,
+        val trackers: List<Entity>,
         val host: String
     ) : DaxDialogCta(
         CtaId.DAX_DIALOG_TRACKERS_FOUND,
@@ -134,14 +134,11 @@ sealed class DaxDialogCta(
             )
 
         override fun getDaxText(context: Context): String {
-            val trackersFiltered = trackers.asSequence()
-                .filter { it.entity?.isMajor == true }
-                .map { it.entity?.displayName }
-                .filterNotNull()
+            val trackers = trackers
+                .map { it.displayName }
                 .distinct()
-                .take(MAX_TRACKERS_SHOWS)
-                .toList()
 
+            val trackersFiltered = trackers.take(MAX_TRACKERS_SHOWS)
             val trackersText = trackersFiltered.joinToString(", ")
             val size = trackers.size - trackersFiltered.size
             val quantityString =
