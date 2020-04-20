@@ -32,6 +32,7 @@
     <attr name="tabsFireTextColor" format="color" />
     <attr name="tabCardBackgroundColor" format="color" />
     <attr name="bookmarkIconColor" format="color" />
+    <attr name="bookmarkFaviconBackground" format="color" />
     <attr name="bookmarkTitleTextColor" format="color" />
     <attr name="bookmarkSubtitleTextColor" format="color" />
     <attr name="settingsItemTextColor" format="color" />
