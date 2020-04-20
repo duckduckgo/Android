@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-
 <!--
-  ~ Copyright (c) 2018 DuckDuckGo
+  ~ Copyright (c) 2020 DuckDuckGo
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -16,7 +15,13 @@
   ~ limitations under the License.
   -->
 
-<selector xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:color="?attr/bottomBarIconColorDisabled" android:state_enabled="false" />
-    <item android:color="?attr/bottomBarIconColor" />
-</selector>
+<resources>
+
+    <style name="BrowserIconMenuItem">
+        <item name="android:paddingTop">6dp</item>
+        <item name="android:paddingBottom">6dp</item>
+        <item name="android:background">?selectableItemBackground</item>
+        <item name="android:tint">@color/bottom_bar_icon_color_selector</item>
+    </style>
+
+</resources>
