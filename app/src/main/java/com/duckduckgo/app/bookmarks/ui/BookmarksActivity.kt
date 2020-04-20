@@ -30,8 +30,8 @@ import android.widget.ImageView
 import android.widget.PopupMenu
 import androidx.appcompat.widget.SearchView
 import androidx.lifecycle.Observer
-import androidx.recyclerview.widget.DividerItemDecoration
-import androidx.recyclerview.widget.RecyclerView.*
+import androidx.recyclerview.widget.RecyclerView.Adapter
+import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.duckduckgo.app.bookmarks.db.BookmarkEntity
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
@@ -67,9 +67,6 @@ class BookmarksActivity : DuckDuckGoActivity() {
     private fun setupBookmarksRecycler() {
         adapter = BookmarksAdapter(applicationContext, viewModel)
         recycler.adapter = adapter
-
-        val separator = DividerItemDecoration(this, VERTICAL)
-        recycler.addItemDecoration(separator)
     }
 
     private fun setupActionBar() {
