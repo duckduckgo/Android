@@ -58,9 +58,7 @@ import com.duckduckgo.app.trackerdetection.TrackerDataLoader
 import com.duckduckgo.app.usage.app.AppDaysUsedRecorder
 import dagger.android.AndroidInjector
 import dagger.android.DispatchingAndroidInjector
-import dagger.android.HasActivityInjector
-import dagger.android.HasServiceInjector
-import dagger.android.support.HasSupportFragmentInjector
+import dagger.android.HasAndroidInjector
 import io.reactivex.schedulers.Schedulers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -69,16 +67,10 @@ import timber.log.Timber
 import javax.inject.Inject
 import kotlin.concurrent.thread
 
-open class DuckDuckGoApplication : HasActivityInjector, HasServiceInjector, HasSupportFragmentInjector, Application(), LifecycleObserver {
+open class DuckDuckGoApplication : HasAndroidInjector, Application(), LifecycleObserver {
 
     @Inject
-    lateinit var activityInjector: DispatchingAndroidInjector<Activity>
-
-    @Inject
-    lateinit var supportFragmentInjector: DispatchingAndroidInjector<Fragment>
-
-    @Inject
-    lateinit var serviceInjector: DispatchingAndroidInjector<Service>
+    lateinit var androidInjector: DispatchingAndroidInjector<Any>
 
     @Inject
     lateinit var trackerDataLoader: TrackerDataLoader
@@ -277,11 +269,9 @@ open class DuckDuckGoApplication : HasActivityInjector, HasServiceInjector, HasS
         offlinePixelScheduler.scheduleOfflinePixels()
     }
 
-    override fun activityInjector(): AndroidInjector<Activity> = activityInjector
-
-    override fun supportFragmentInjector(): AndroidInjector<Fragment> = supportFragmentInjector
-
-    override fun serviceInjector(): AndroidInjector<Service> = serviceInjector
+    override fun androidInjector(): AndroidInjector<Any> {
+        return androidInjector
+    }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_START)
     fun onAppForegrounded() {
@@ -305,4 +295,6 @@ open class DuckDuckGoApplication : HasActivityInjector, HasServiceInjector, HasS
     companion object {
         private const val APP_RESTART_CAUSED_BY_FIRE_GRACE_PERIOD: Long = 10_000L
     }
+
+
 }

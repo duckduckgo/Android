@@ -23,6 +23,7 @@
     <attr name="omnibarRoundedFieldBackgroundColor" format="color" />
     <attr name="omnibarTextColor" format="color" />
     <attr name="omnibarHintColor" format="color" />
+    <attr name="omnibarLogoLetterTextColor" format="color" />
     <attr name="autoCompleteTextColor" format="color" />
     <attr name="autoCompleteSubtitleTextColor" format="color" />
     <attr name="tabTitleTextColor" format="color" />
@@ -58,6 +59,7 @@
     <attr name="brokenSitesButtonRippleColor" format="color" />
     <attr name="topCallToActionDescriptionColor" format="color" />
     <attr name="topCallToActionBackgroundColor" format="color" />
+    <attr name="privacyDashboardLogoLetterTextColor" format="color" />
     <attr name="bottomBarIconColor" format="color" />
     <attr name="bottomBarIconColorDisabled" format="color" />
 

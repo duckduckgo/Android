@@ -72,8 +72,9 @@ import androidx.core.view.isInvisible
 import androidx.core.view.isNotEmpty
 import androidx.core.view.isVisible
 import androidx.core.view.postDelayed
-import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.transaction
+import androidx.lifecycle.*
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.Observer
@@ -117,6 +118,7 @@ import com.duckduckgo.app.cta.ui.HomeTopPanelCta
 import com.duckduckgo.app.cta.ui.SecondaryButtonCta
 import com.duckduckgo.app.global.ViewModelFactory
 import com.duckduckgo.app.global.device.DeviceInfo
+import com.duckduckgo.app.global.model.orderedTrackingEntities
 import com.duckduckgo.app.global.view.*
 import com.duckduckgo.app.privacy.model.PrivacyGrade
 import com.duckduckgo.app.privacy.renderer.icon
@@ -181,7 +183,7 @@ import javax.inject.Inject
 import kotlin.concurrent.thread
 import kotlin.coroutines.CoroutineContext
 
-class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
+class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogListener {
 
     private val supervisorJob = SupervisorJob()
 
@@ -239,15 +241,15 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
     @Inject
     lateinit var privacySettingsStore: PrivacySettingsStore
 
-    val tabId get() = arguments!![TAB_ID_ARG] as String
+    val tabId get() = requireArguments()[TAB_ID_ARG] as String
 
     lateinit var userAgentProvider: UserAgentProvider
 
     var messageFromPreviousTab: Message? = null
 
-    private val initialUrl get() = arguments!!.getString(URL_EXTRA_ARG)
+    private val initialUrl get() = requireArguments().getString(URL_EXTRA_ARG)
 
-    private val skipHome get() = arguments!!.getBoolean(SKIP_HOME_ARG)
+    private val skipHome get() = requireArguments().getBoolean(SKIP_HOME_ARG)
 
     private lateinit var popupMenu: BrowserPopupMenu
 
@@ -263,7 +265,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
     private lateinit var decorator: BrowserTabFragmentExperimentDecorator
 
     private val viewModel: BrowserTabViewModel by lazy {
-        val viewModel = ViewModelProviders.of(this, viewModelFactory).get(BrowserTabViewModel::class.java)
+        val viewModel = ViewModelProvider(this, viewModelFactory).get(BrowserTabViewModel::class.java)
         viewModel.loadData(tabId, initialUrl, skipHome)
         viewModel
     }
@@ -309,7 +311,6 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
     private val logoHidingListener by lazy { LogoHidingLayoutChangeLifecycleListener(ddgLogo) }
 
     private var alertDialog: AlertDialog? = null
-    private var daxDialog: DialogFragment? = null
 
     override fun onAttach(context: Context) {
         AndroidSupportInjection.inject(this)
@@ -318,6 +319,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        removeDaxDialogFromActivity()
         renderer = BrowserTabFragmentRenderer()
         decorator = BrowserTabFragmentExperimentDecorator()
         if (savedInstanceState != null) {
@@ -338,6 +340,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
         super.onActivityCreated(savedInstanceState)
 
         configureObservers()
+        configureAppBar()
         configureWebView()
         viewModel.registerWebViewListener(webViewClient, webChromeClient)
         configureOmnibarTextInput()
@@ -363,6 +366,15 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
                 }
             }
         })
+    }
+
+    private fun getDaxDialogFromActivity(): Fragment? = activity?.supportFragmentManager?.findFragmentByTag(DAX_DIALOG_DIALOG_TAG)
+
+    private fun removeDaxDialogFromActivity() {
+        val fragment = getDaxDialogFromActivity()
+        fragment?.let {
+            activity?.supportFragmentManager?.transaction { remove(it) }
+        }
     }
 
     private fun processMessage(message: Message) {
@@ -412,7 +424,6 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
     }
 
     override fun onPause() {
-        daxDialog = null
         logoHidingListener.onPause()
         dismissDownloadFragment()
         super.onPause()
@@ -429,39 +440,39 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
     }
 
     private fun configureObservers() {
-        viewModel.autoCompleteViewState.observe(this, Observer<AutoCompleteViewState> {
+        viewModel.autoCompleteViewState.observe(viewLifecycleOwner, Observer<AutoCompleteViewState> {
             it?.let { renderer.renderAutocomplete(it) }
         })
 
-        viewModel.globalLayoutState.observe(this, Observer<GlobalLayoutViewState> {
+        viewModel.globalLayoutState.observe(viewLifecycleOwner, Observer<GlobalLayoutViewState> {
             it?.let { renderer.renderGlobalViewState(it) }
         })
 
-        viewModel.browserViewState.observe(this, Observer<BrowserViewState> {
+        viewModel.browserViewState.observe(viewLifecycleOwner, Observer<BrowserViewState> {
             it?.let { renderer.renderBrowserViewState(it) }
         })
 
-        viewModel.loadingViewState.observe(this, Observer<LoadingViewState> {
+        viewModel.loadingViewState.observe(viewLifecycleOwner, Observer<LoadingViewState> {
             it?.let { renderer.renderLoadingIndicator(it) }
         })
 
-        viewModel.omnibarViewState.observe(this, Observer<OmnibarViewState> {
+        viewModel.omnibarViewState.observe(viewLifecycleOwner, Observer<OmnibarViewState> {
             it?.let { renderer.renderOmnibar(it) }
         })
 
-        viewModel.findInPageViewState.observe(this, Observer<FindInPageViewState> {
+        viewModel.findInPageViewState.observe(viewLifecycleOwner, Observer<FindInPageViewState> {
             it?.let { renderer.renderFindInPageState(it) }
         })
 
-        viewModel.ctaViewState.observe(this, Observer {
+        viewModel.ctaViewState.observe(viewLifecycleOwner, Observer {
             it?.let { renderer.renderCtaViewState(it) }
         })
 
-        viewModel.command.observe(this, Observer {
+        viewModel.command.observe(viewLifecycleOwner, Observer {
             processCommand(it)
         })
 
-        viewModel.survey.observe(this, Observer<Survey> {
+        viewModel.survey.observe(viewLifecycleOwner, Observer<Survey> {
             it.let { viewModel.onSurveyChanged(it) }
         })
 
@@ -469,7 +480,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
     }
 
     private fun addTabsObserver() {
-        viewModel.tabs.observe(this, Observer<List<TabEntity>> {
+        viewModel.tabs.observe(viewLifecycleOwner, Observer<List<TabEntity>> {
             it?.let { renderer.renderTabIcon(it) }
         })
     }
@@ -518,7 +529,9 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
     }
 
     private fun processCommand(it: Command?) {
-        renderer.cancelAllAnimations()
+        if (it !is Command.DaxCommand) {
+            renderer.cancelAllAnimations()
+        }
         when (it) {
             is Command.Refresh -> refresh()
             is Command.OpenInNewTab -> {
@@ -601,6 +614,8 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
             is Command.GenerateWebViewPreviewImage -> generateWebViewPreviewImage()
             is Command.LaunchTabSwitcher -> launchTabSwitcher()
             is Command.ShowErrorWithAction -> showErrorSnackbar(it)
+            is Command.DaxCommand.FinishTrackerAnimation -> finishTrackerAnimation()
+            is Command.DaxCommand.HideDaxDialog -> showHideTipsDialog(it.cta)
         }
     }
 
@@ -1161,7 +1176,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
     }
 
     private fun hasWriteStoragePermission(): Boolean {
-        return ContextCompat.checkSelfPermission(context!!, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED
+        return ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED
     }
 
     private fun requestWriteStoragePermission() {
@@ -1198,6 +1213,46 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
         val options = ActivityOptions.makeSceneTransitionAnimation(activity).toBundle()
         startActivity(AddWidgetInstructionsActivity.intent(context), options)
     }
+
+    private fun finishTrackerAnimation() {
+        animatorHelper.finishTrackerAnimation(omnibarViews(), networksContainer)
+    }
+
+    private fun showHideTipsDialog(cta: Cta) {
+        context?.let {
+            launchHideTipsDialog(it, cta)
+        }
+    }
+
+    override fun onDaxDialogDismiss() {
+        viewModel.onDaxDialogDismissed()
+    }
+
+    override fun onDaxDialogHideClick() {
+        viewModel.onUserHideDaxDialog()
+    }
+
+    override fun onDaxDialogPrimaryCtaClick() {
+        viewModel.onUserClickCtaOkButton()
+    }
+
+    private fun launchHideTipsDialog(context: Context, cta: Cta) {
+        AlertDialog.Builder(context)
+            .setTitle(R.string.hideTipsTitle)
+            .setMessage(getString(R.string.hideTipsText))
+            .setPositiveButton(R.string.hideTipsButton) { dialog, _ ->
+                dialog.dismiss()
+                launch {
+                    ctaViewModel.hideTipsForever(cta)
+                }
+            }
+            .setNegativeButton(android.R.string.no) { dialog, _ ->
+                dialog.dismiss()
+            }
+            .show()
+    }
+
+    fun omnibarViews(): List<View> = listOf(clearTextButton, omnibarTextInput, privacyGradeButton)
 
     companion object {
         private const val TAB_ID_ARG = "TAB_ID_ARG"
@@ -1519,7 +1574,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
                 delay(TRACKERS_SECONDARY_DELAY)
                 if (lastSeenOmnibarViewState?.isEditing != true) {
                     val site = viewModel.siteLiveData.value
-                    val events = site?.trackingEvents
+                    val events = site?.orderedTrackingEntities()
 
                     activity?.let { activity ->
                         animatorHelper.startTrackersAnimation(
@@ -1540,8 +1595,6 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
             clearTextButton.alpha = 1f
             omnibarTextInput.alpha = 1f
         }
-
-        private fun omnibarViews(): List<View> = listOf(clearTextButton, omnibarTextInput, privacyGradeButton)
 
         fun renderGlobalViewState(viewState: GlobalLayoutViewState) {
             if (lastSeenGlobalViewState is GlobalLayoutViewState.Invalidated &&
@@ -1684,58 +1737,17 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
         private fun showDaxDialogCta(configuration: DaxDialogCta) {
             hideHomeCta()
             hideDaxCta()
-            val container = networksContainer
             activity?.let { activity ->
-                daxDialog?.dismiss()
-                daxDialog = configuration.createCta(activity).apply {
-                    setHideClickListener {
-                        getDaxDialog().dismiss()
-                        launchHideTipsDialog(activity, configuration)
-                    }
-                    setDismissListener {
-                        if (configuration is DaxDialogCta.DaxTrackersBlockedCta) {
-                            animatorHelper.finishTrackerAnimation(omnibarViews(), container)
-                        }
-                        viewModel.onUserDismissedCta(configuration)
-                    }
-                    setPrimaryCtaClickListener {
-                        viewModel.onUserClickCtaOkButton(configuration)
-                        if (configuration is DaxDialogCta.DaxMainNetworkCta) {
-                            setPrimaryCtaClickListener {
-                                viewModel.onUserClickCtaOkButton(configuration)
-                                getDaxDialog().dismiss()
-                            }
-                            configuration.setSecondDialog(this, activity)
-                            viewModel.onManualCtaShown(configuration)
-                        } else {
-                            getDaxDialog().dismiss()
-                        }
-                    }
-                    if (configuration is SecondaryButtonCta) {
-                        setSecondaryCtaClickListener {
-                            viewModel.onUserClickCtaSecondaryButton(configuration)
-                            getDaxDialog().dismiss()
-                        }
-                    }
+                val daxDialog = getDaxDialogFromActivity() as? DaxDialog
+                if (daxDialog != null) {
+                    daxDialog.setDaxDialogListener(this@BrowserTabFragment)
+                    return
+                }
+                configuration.createCta(activity).apply {
+                    setDaxDialogListener(this@BrowserTabFragment)
                     getDaxDialog().show(activity.supportFragmentManager, DAX_DIALOG_DIALOG_TAG)
-                }.getDaxDialog()
+                }
             }
-        }
-
-        private fun launchHideTipsDialog(context: Context, cta: Cta) {
-            AlertDialog.Builder(context)
-                .setTitle(R.string.hideTipsTitle)
-                .setMessage(getString(R.string.hideTipsText))
-                .setPositiveButton(R.string.hideTipsButton) { dialog, _ ->
-                    dialog.dismiss()
-                    launch {
-                        ctaViewModel.hideTipsForever(cta)
-                    }
-                }
-                .setNegativeButton(android.R.string.no) { dialog, _ ->
-                    dialog.dismiss()
-                }
-                .show()
         }
 
         private fun showDaxCta(configuration: DaxBubbleCta) {
@@ -1756,7 +1768,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
                 viewModel.onUserClickTopCta(configuration)
             }
             ctaTopContainer.closeButton.setOnClickListener {
-                viewModel.onUserDismissedCta(configuration)
+                viewModel.onUserDismissedCta()
             }
         }
 
@@ -1796,11 +1808,11 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
 
             configuration.showCta(ctaContainer)
             ctaContainer.ctaOkButton.setOnClickListener {
-                viewModel.onUserClickCtaOkButton(configuration)
+                viewModel.onUserClickCtaOkButton()
             }
 
             ctaContainer.ctaDismissButton.setOnClickListener {
-                viewModel.onUserDismissedCta(cta)
+                viewModel.onUserDismissedCta()
             }
 
             if (isExperimentEnabled()){

@@ -23,12 +23,11 @@ import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProviders
+import androidx.lifecycle.ViewModelProvider
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import dagger.android.AndroidInjection
-import kotlinx.android.synthetic.main.include_toolbar.toolbar
 import javax.inject.Inject
 
 
@@ -84,6 +83,6 @@ abstract class DuckDuckGoActivity : AppCompatActivity() {
         toolbar.setNavigationIcon(R.drawable.ic_back)
     }
 
-    protected inline fun <reified V : ViewModel> bindViewModel() = lazy { ViewModelProviders.of(this, viewModelFactory).get(V::class.java) }
+    protected inline fun <reified V : ViewModel> bindViewModel() = lazy { ViewModelProvider(this, viewModelFactory).get(V::class.java) }
 
 }
