@@ -1808,7 +1808,6 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
 
             inflate(context, R.layout.include_cta, ctaContainer)
             logoHidingListener.callToActionView = ctaContainer
-            logoHidingListener.callToActionView = ctaContainer
 
             configuration.showCta(ctaContainer)
             ctaContainer.ctaOkButton.setOnClickListener {
