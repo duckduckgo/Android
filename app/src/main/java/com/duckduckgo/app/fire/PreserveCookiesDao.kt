@@ -17,8 +17,15 @@
 package com.duckduckgo.app.fire
 
 import androidx.room.Dao
+import androidx.room.Insert
+import androidx.room.Query
 
 @Dao
 interface PreserveCookiesDao {
 
+    @Insert
+    fun insert(preserveCookiesEntity: PreserveCookiesEntity): Long
+
+    @Query("delete from $PRESERVE_COOKIES_TABLE_NAME WHERE id LIKE :id")
+    fun deleteById(id: Long)
 }
