@@ -49,7 +49,7 @@ interface VariantManager {
             // Quick Search Notification Experiment
             Variant(
                 key = "mf",
-                weight = 1.0,
+                weight = 0.0,
                 features = emptyList(),
                 filterBy = { isEnglishLocale() }),
             Variant(
