@@ -44,7 +44,7 @@ class TermsOfServiceRawStore @Inject constructor(private val moshi: Moshi, priva
             val json = context.resources.openRawResource(R.raw.tosdr).bufferedReader().use { it.readText() }
             val type = Types.newParameterizedType(List::class.java, TermsOfService::class.java)
             val adapter: JsonAdapter<List<TermsOfService>> = moshi.adapter(type)
-            data = adapter.fromJson(json)
+            data = adapter.fromJson(json)!!
             Timber.i("Initialised TermsOfService data")
             initialized = true
         }

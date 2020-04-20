@@ -77,6 +77,7 @@ import com.jakewharton.rxrelay2.PublishRelay
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
+import kotlinx.android.synthetic.main.include_omnibar_toolbar.*
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -193,6 +194,10 @@ class BrowserTabViewModel(
         object GenerateWebViewPreviewImage : Command()
         object LaunchTabSwitcher : Command()
         class ShowErrorWithAction(val action: () -> Unit) : Command()
+        sealed class DaxCommand: Command() {
+            object FinishTrackerAnimation : DaxCommand()
+            class HideDaxDialog(val cta: Cta) : DaxCommand()
+        }
     }
 
     val autoCompleteViewState: MutableLiveData<AutoCompleteViewState> = MutableLiveData()
@@ -927,12 +932,10 @@ class BrowserTabViewModel(
     }
 
     fun onUserClickTopCta(cta: HomeTopPanelCta) {
-        if (cta is HomeTopPanelCta.CovidCta) {
-            onUserSubmittedQuery(cta.searchTerm)
-        }
     }
 
-    fun onUserClickCtaOkButton(cta: Cta) {
+    fun onUserClickCtaOkButton() {
+        val cta = currentCtaViewState().cta ?: return
         ctaViewModel.onUserClickCtaOkButton(cta)
         command.value = when (cta) {
             is HomePanelCta.Survey -> LaunchSurvey(cta.survey)
@@ -946,10 +949,24 @@ class BrowserTabViewModel(
         ctaViewModel.onUserClickCtaSecondaryButton(cta)
     }
 
-    fun onUserDismissedCta(dismissedCta: Cta) {
+    fun onUserHideDaxDialog() {
+        val cta = currentCtaViewState().cta ?: return
+        command.value = DaxCommand.HideDaxDialog(cta)
+    }
+
+    fun onDaxDialogDismissed() {
+        val cta = currentCtaViewState().cta ?: return
+        if (cta is DaxDialogCta.DaxTrackersBlockedCta) {
+            command.value = DaxCommand.FinishTrackerAnimation
+        }
+        onUserDismissedCta()
+    }
+
+    fun onUserDismissedCta() {
+        val cta = currentCtaViewState().cta ?: return
         viewModelScope.launch {
-            ctaViewModel.onUserDismissedCta(dismissedCta)
-            when (dismissedCta) {
+            ctaViewModel.onUserDismissedCta(cta)
+            when (cta) {
                 is HomeTopPanelCta -> {
                     ctaViewState.value = currentCtaViewState().copy(cta = null)
                 }

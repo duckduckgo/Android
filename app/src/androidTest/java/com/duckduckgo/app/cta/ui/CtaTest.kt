@@ -17,14 +17,22 @@
 package com.duckduckgo.app.cta.ui
 
 import android.content.res.Resources
+import android.net.Uri
 import androidx.fragment.app.FragmentActivity
 import com.duckduckgo.app.global.install.AppInstallStore
+import com.duckduckgo.app.global.model.Site
+import com.duckduckgo.app.global.model.orderedTrackingEntities
 import com.duckduckgo.app.onboarding.store.OnboardingStore
+import com.duckduckgo.app.privacy.model.HttpsStatus
+import com.duckduckgo.app.privacy.model.PrivacyGrade
+import com.duckduckgo.app.privacy.model.PrivacyPractices
 import com.duckduckgo.app.privacy.model.TestEntity
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.CTA_SHOWN
 import com.duckduckgo.app.survey.model.Survey
+import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import com.nhaarman.mockitokotlin2.any
+import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.whenever
 import org.junit.Assert.*
 import org.junit.Before
@@ -52,7 +60,7 @@ class CtaTest {
         MockitoAnnotations.initMocks(this)
 
         whenever(mockActivity.resources).thenReturn(mockResources)
-        whenever(mockResources.getString(any())).thenReturn("withZero")
+        whenever(mockResources.getQuantityString(any(), any())).thenReturn("withZero")
         whenever(mockResources.getQuantityString(any(), any(), any())).thenReturn("withMultiple")
     }
 
@@ -209,7 +217,7 @@ class CtaTest {
 
     @Test
     fun whenCanSendPixelAndCtaIsPartOfHistoryThenReturnFalse() {
-        whenever(mockOnboardingStore.onboardingDialogJourney).thenReturn("e:0")
+        whenever(mockOnboardingStore.onboardingDialogJourney).thenReturn("i:0-e:0-s:0")
 
         val testee = DaxBubbleCta.DaxEndCta(mockOnboardingStore, mockAppInstallStore)
         assertFalse(testee.canSendShownPixel())
@@ -261,11 +269,11 @@ class CtaTest {
     }
 
     @Test
-    fun whenMoreThanTwoMajorTrackersBlockedReturnFirstTwoWithMultipleString() {
+    fun whenMoreThanTwoTrackersBlockedReturnFirstTwoWithMultipleString() {
         val trackers = listOf(
-            TrackingEvent("facebook.com", "facebook.com", blocked = true, entity = TestEntity("Facebook", "Facebook", 9.0), categories = null),
-            TrackingEvent("other.com", "other.com", blocked = true, entity = TestEntity("Other", "Other", 9.0), categories = null),
-            TrackingEvent("amazon.com", "amazon.com", blocked = true, entity = TestEntity("Amazon", "Amazon", 9.0), categories = null)
+            TestEntity("Facebook", "Facebook", 9.0),
+            TestEntity("Other", "Other", 9.0),
+            TestEntity("Amazon", "Amazon", 9.0)
         )
 
         val testee = DaxDialogCta.DaxTrackersBlockedCta(mockOnboardingStore, mockAppInstallStore, trackers, "http://www.trackers.com")
@@ -275,10 +283,10 @@ class CtaTest {
     }
 
     @Test
-    fun whenTwoMajorTrackersBlockedReturnThemWithZeroString() {
+    fun whenTwoTrackersBlockedReturnThemWithZeroString() {
         val trackers = listOf(
-            TrackingEvent("facebook.com", "facebook.com", blocked = true, entity = TestEntity("Facebook", "Facebook", 9.0), categories = null),
-            TrackingEvent("other.com", "other.com", blocked = true, entity = TestEntity("Other", "Other", 9.0), categories = null)
+            TestEntity("Facebook", "Facebook", 9.0),
+            TestEntity("Other", "Other", 9.0)
         )
 
         val testee = DaxDialogCta.DaxTrackersBlockedCta(mockOnboardingStore, mockAppInstallStore, trackers, "http://www.trackers.com")
@@ -288,29 +296,58 @@ class CtaTest {
     }
 
     @Test
-    fun whenOneMajorTrackersBlockedReturnItWithMultipleString() {
+    fun whenTrackersBlockedReturnThemSortingByPrevalence() {
         val trackers = listOf(
-            TrackingEvent("facebook.com", "facebook.com", blocked = true, entity = TestEntity("Facebook", "Facebook", 9.0), categories = null),
-            TrackingEvent("other.com", "other.com", blocked = true, entity = TestEntity("Other", "Other", 3.0), categories = null)
+            TrackingEvent("facebook.com", "facebook.com", blocked = true, entity = TestEntity("Facebook", "Facebook", 3.0), categories = null),
+            TrackingEvent("other.com", "other.com", blocked = true, entity = TestEntity("Other", "Other", 9.0), categories = null)
         )
+        val site = site(events = trackers)
 
-        val testee = DaxDialogCta.DaxTrackersBlockedCta(mockOnboardingStore, mockAppInstallStore, trackers, "http://www.trackers.com")
+        val testee =
+            DaxDialogCta.DaxTrackersBlockedCta(mockOnboardingStore, mockAppInstallStore, site.orderedTrackingEntities(), "http://www.trackers.com")
         val value = testee.getDaxText(mockActivity)
 
-        assertEquals("<b>Facebook</b>withMultiple", value)
+        assertEquals("<b>Other, Facebook</b>withZero", value)
     }
 
     @Test
-    fun whenMultipleTrackersFromSameNetworkBlockedReturnOnlyOneWithMultipleString() {
+    fun whenMultipleTrackersFromSameNetworkBlockedReturnOnlyOneWithZeroString() {
         val trackers = listOf(
-            TrackingEvent("facebook.com", "facebook.com", blocked = true, entity = TestEntity("Facebook", "Facebook", 9.0), categories = null),
-            TrackingEvent("facebook.com", "facebook.com", blocked = true, entity = TestEntity("Facebook", "Facebook", 9.0), categories = null),
-            TrackingEvent("facebook.com", "facebook.com", blocked = true, entity = TestEntity("Facebook", "Facebook", 9.0), categories = null)
+            TestEntity("Facebook", "Facebook", 9.0),
+            TestEntity("Facebook", "Facebook", 9.0),
+            TestEntity("Facebook", "Facebook", 9.0)
         )
 
         val testee = DaxDialogCta.DaxTrackersBlockedCta(mockOnboardingStore, mockAppInstallStore, trackers, "http://www.trackers.com")
         val value = testee.getDaxText(mockActivity)
 
-        assertEquals("<b>Facebook</b>withMultiple", value)
+        assertEquals("<b>Facebook</b>withZero", value)
+    }
+
+    private fun site(
+        url: String = "http://www.test.com",
+        uri: Uri? = Uri.parse(url),
+        https: HttpsStatus = HttpsStatus.SECURE,
+        trackerCount: Int = 0,
+        events: List<TrackingEvent> = emptyList(),
+        majorNetworkCount: Int = 0,
+        allTrackersBlocked: Boolean = true,
+        privacyPractices: PrivacyPractices.Practices = PrivacyPractices.UNKNOWN,
+        entity: Entity? = null,
+        grade: PrivacyGrade = PrivacyGrade.UNKNOWN,
+        improvedGrade: PrivacyGrade = PrivacyGrade.UNKNOWN
+    ): Site {
+        val site: Site = mock()
+        whenever(site.url).thenReturn(url)
+        whenever(site.uri).thenReturn(uri)
+        whenever(site.https).thenReturn(https)
+        whenever(site.entity).thenReturn(entity)
+        whenever(site.trackingEvents).thenReturn(events)
+        whenever(site.trackerCount).thenReturn(trackerCount)
+        whenever(site.majorNetworkCount).thenReturn(majorNetworkCount)
+        whenever(site.allTrackersBlocked).thenReturn(allTrackersBlocked)
+        whenever(site.privacyPractices).thenReturn(privacyPractices)
+        whenever(site.calculateGrades()).thenReturn(Site.SiteGrades(grade, improvedGrade))
+        return site
     }
 }

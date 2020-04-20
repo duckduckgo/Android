@@ -32,7 +32,7 @@ class HttpsWhitelistJsonTest {
         val type = Types.newParameterizedType(List::class.java, HttpsWhitelistedDomain::class.java)
         val jsonAdapter: JsonAdapter<List<HttpsWhitelistedDomain>> = moshi.adapter(type)
 
-        val list = jsonAdapter.fromJson(json())
+        val list = jsonAdapter.fromJson(json())!!
         assertEquals(7, list.count())
     }
 

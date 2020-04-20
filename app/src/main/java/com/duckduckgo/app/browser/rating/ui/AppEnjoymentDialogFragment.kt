@@ -38,7 +38,7 @@ class AppEnjoymentDialogFragment : EnjoymentDialog() {
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         firePixelWithPromptCount(APP_ENJOYMENT_DIALOG_SHOWN)
 
-        return AlertDialog.Builder(activity!!, R.style.AlertDialogTheme)
+        return AlertDialog.Builder(requireActivity(), R.style.AlertDialogTheme)
             .setTitle(R.string.appEnjoymentDialogTitle)
             .setMessage(R.string.appEnjoymentDialogMessage)
             .setPositiveButton(R.string.appEnjoymentDialogPositiveButton) { _, _ ->

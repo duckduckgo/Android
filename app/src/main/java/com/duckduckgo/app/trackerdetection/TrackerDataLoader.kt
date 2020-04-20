@@ -62,7 +62,7 @@ class TrackerDataLoader @Inject constructor(
         Timber.d("Updating tds from file")
         val json = context.resources.openRawResource(R.raw.tds).bufferedReader().use { it.readText() }
         val adapter = moshi.adapter(TdsJson::class.java)
-        persistTds(DEFAULT_ETAG, adapter.fromJson(json))
+        persistTds(DEFAULT_ETAG, adapter.fromJson(json)!!)
     }
 
     fun persistTds(eTag: String, tdsJson: TdsJson) {
