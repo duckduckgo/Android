@@ -76,4 +76,7 @@ class DaoModule {
 
     @Provides
     fun userStageDao(database: AppDatabase) = database.userStageDao()
+
+    @Provides
+    fun preserveCookiesDao(database: AppDatabase) = database.preserveCookiesDao()
 }

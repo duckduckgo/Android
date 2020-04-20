@@ -56,6 +56,8 @@ import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.browser.ui.HttpAuthenticationDialogFragment.HttpAuthenticationListener
 import com.duckduckgo.app.cta.ui.*
+import com.duckduckgo.app.fire.PreserveCookiesDao
+import com.duckduckgo.app.fire.PreserveCookiesEntity
 import com.duckduckgo.app.global.*
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.global.model.SiteFactory
@@ -91,6 +93,7 @@ class BrowserTabViewModel(
     private val tabRepository: TabRepository,
     private val networkLeaderboardDao: NetworkLeaderboardDao,
     private val bookmarksDao: BookmarksDao,
+    private val preserveCookiesDao: PreserveCookiesDao,
     private val autoComplete: AutoComplete,
     private val appSettingsPreferencesStore: SettingsDataStore,
     private val longPressHandler: LongPressHandler,

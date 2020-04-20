@@ -37,6 +37,7 @@ import com.duckduckgo.app.feedback.ui.negative.brokensite.BrokenSiteNegativeFeed
 import com.duckduckgo.app.feedback.ui.negative.openended.ShareOpenEndedNegativeFeedbackViewModel
 import com.duckduckgo.app.feedback.ui.positive.initial.PositiveFeedbackLandingViewModel
 import com.duckduckgo.app.fire.DataClearer
+import com.duckduckgo.app.fire.PreserveCookiesDao
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.model.SiteFactory
 import com.duckduckgo.app.global.rating.AppEnjoymentPromptEmitter
@@ -90,6 +91,7 @@ class ViewModelFactory @Inject constructor(
     private val siteFactory: SiteFactory,
     private val networkLeaderboardDao: NetworkLeaderboardDao,
     private val bookmarksDao: BookmarksDao,
+    private val preserveCookiesDao: PreserveCookiesDao,
     private val surveyDao: SurveyDao,
     private val autoCompleteApi: AutoCompleteApi,
     private val deviceAppLookup: DeviceAppLookup,
@@ -188,6 +190,7 @@ class ViewModelFactory @Inject constructor(
         tabRepository = tabRepository,
         networkLeaderboardDao = networkLeaderboardDao,
         bookmarksDao = bookmarksDao,
+        preserveCookiesDao = preserveCookiesDao,
         autoComplete = autoCompleteApi,
         appSettingsPreferencesStore = appSettingsPreferencesStore,
         longPressHandler = webViewLongPressHandler,
