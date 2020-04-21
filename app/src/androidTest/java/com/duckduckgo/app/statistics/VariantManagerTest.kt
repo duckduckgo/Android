@@ -30,16 +30,16 @@ class VariantManagerTest {
     // SERP Experiment(s)
 
     @Test
-    fun serpControlVariantIsInactiveAndHasNoFeatures() {
+    fun serpControlVariantIsActiveAndHasNoFeatures() {
         val variant = variants.first { it.key == "sc" }
-        assertEqualsDouble(0.0, variant.weight)
+        assertEqualsDouble(1.0, variant.weight)
         assertEquals(0, variant.features.size)
     }
 
     @Test
-    fun serpExperimentalVariantIsInactiveAndHasNoFeatures() {
+    fun serpExperimentalVariantIsActiveAndHasNoFeatures() {
         val variant = variants.first { it.key == "se" }
-        assertEqualsDouble(0.0, variant.weight)
+        assertEqualsDouble(1.0, variant.weight)
         assertEquals(0, variant.features.size)
     }
 
@@ -55,7 +55,7 @@ class VariantManagerTest {
     @Test
     fun searchNotificationVariantIsActiveAndHasStickySearchNotificationFeature() {
         val variant = variants.first { it.key == "mg" }
-        assertEqualsDouble(0.0, variant.weight)
+        assertEqualsDouble(1.0, variant.weight)
         assertEquals(1, variant.features.size)
         assertTrue(variant.hasFeature(StickySearchNotification))
     }
