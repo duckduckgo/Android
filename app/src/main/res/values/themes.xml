@@ -42,6 +42,7 @@
         <item name="omnibarRoundedFieldBackgroundColor">@color/midGray</item>
         <item name="omnibarTextColor">@color/white</item>
         <item name="omnibarHintColor">@color/grayishTwo</item>
+        <item name="omnibarLogoLetterTextColor">@color/midGray</item>
         <item name="autoCompleteTextColor">@color/white</item>
         <item name="autoCompleteSubtitleTextColor">@color/grayish</item>
         <item name="tabTitleTextColor">@color/white</item>
@@ -81,6 +82,8 @@
         <item name="feedbackEditTextBackgroundColor">@color/almostBlack</item>
         <item name="feedbackEditTextHintColor">@color/grayish</item>
 
+        <item name="privacyDashboardLogoLetterTextColor">@color/subtleGray</item>
+
     </style>
 
     <style name="AppTheme.Dark" parent="AppTheme.BaseDark" />
@@ -111,6 +114,7 @@
         <item name="omnibarRoundedFieldBackgroundColor">@color/whiteFour</item>
         <item name="omnibarTextColor">@color/brownishGrayTwo</item>
         <item name="omnibarHintColor">@color/warmGray</item>
+        <item name="omnibarLogoLetterTextColor">@color/whiteFour</item>
         <item name="autoCompleteTextColor">@color/grayishBrown</item>
         <item name="autoCompleteSubtitleTextColor">@color/warmerGray</item>
         <item name="tabTitleTextColor">@color/almostBlack</item>
@@ -150,6 +154,7 @@
         <item name="feedbackEditTextBackgroundColor">@color/whiteFive</item>
         <item name="feedbackEditTextHintColor">@color/warmerGray</item>
 
+        <item name="privacyDashboardLogoLetterTextColor">@color/whiteFour</item>
     </style>
 
     <style name="AppTheme.Light" parent="AppTheme.BaseLight">

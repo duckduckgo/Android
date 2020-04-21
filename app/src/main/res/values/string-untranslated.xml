@@ -15,9 +15,6 @@
   -->
 
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
-
-    <string name="search">Search</string>
-
     <!-- Download Confirmation -->
     <string name="downloadConfirmationContinue">Continue</string>
     <string name="downloadConfirmationSaveFileTitle">Save %1$s</string>

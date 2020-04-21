@@ -32,11 +32,12 @@ import com.duckduckgo.app.global.install.daysInstalled
 import com.duckduckgo.app.global.view.*
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.app.trackerdetection.model.TrackingEvent
+import com.duckduckgo.app.trackerdetection.model.Entity
 import kotlinx.android.synthetic.main.include_cta_buttons.view.*
 import kotlinx.android.synthetic.main.include_cta_content.view.*
 import kotlinx.android.synthetic.main.include_dax_dialog_cta.view.*
 import kotlinx.android.synthetic.main.include_top_cta.view.*
+import java.util.Locale
 
 interface DialogCta {
     fun createCta(activity: FragmentActivity): DaxDialog
@@ -85,7 +86,8 @@ sealed class DaxDialogCta(
     override val appInstallStore: AppInstallStore
 ) : Cta, DialogCta, DaxCta {
 
-    override fun createCta(activity: FragmentActivity): DaxDialog = TypewriterDaxDialog(getDaxText(activity), activity.resources.getString(okButton))
+    override fun createCta(activity: FragmentActivity): DaxDialog =
+        TypewriterDaxDialog.newInstance(getDaxText(activity), activity.resources.getString(okButton))
 
     override fun pixelCancelParameters(): Map<String, String> = mapOf(Pixel.PixelParameter.CTA_SHOWN to ctaPixelParam)
 
@@ -110,7 +112,7 @@ sealed class DaxDialogCta(
     class DaxTrackersBlockedCta(
         override val onboardingStore: OnboardingStore,
         override val appInstallStore: AppInstallStore,
-        val trackers: List<TrackingEvent>,
+        val trackers: List<Entity>,
         val host: String
     ) : DaxDialogCta(
         CtaId.DAX_DIALOG_TRACKERS_FOUND,
@@ -125,22 +127,23 @@ sealed class DaxDialogCta(
     ) {
 
         override fun createCta(activity: FragmentActivity): DaxDialog =
-            TypewriterDaxDialog(daxText = getDaxText(activity), primaryButtonText = activity.resources.getString(okButton), toolbarDimmed = false)
+            TypewriterDaxDialog.newInstance(
+                daxText = getDaxText(activity),
+                primaryButtonText = activity.resources.getString(okButton),
+                toolbarDimmed = false
+            )
 
         override fun getDaxText(context: Context): String {
-            val trackersFiltered = trackers.asSequence()
-                .filter { it.entity?.isMajor == true }
-                .map { it.entity?.displayName }
-                .filterNotNull()
+            val trackers = trackers
+                .map { it.displayName }
                 .distinct()
-                .take(MAX_TRACKERS_SHOWS)
-                .toList()
 
+            val trackersFiltered = trackers.take(MAX_TRACKERS_SHOWS)
             val trackersText = trackersFiltered.joinToString(", ")
             val size = trackers.size - trackersFiltered.size
             val quantityString =
                 if (size == 0) {
-                    context.resources.getString(R.string.daxTrackersBlockedCtaZeroText)
+                    context.resources.getQuantityString(R.plurals.daxTrackersBlockedCtaZeroText, trackersFiltered.size)
                 } else {
                     context.resources.getQuantityString(description, size, size)
                 }
@@ -155,8 +158,8 @@ sealed class DaxDialogCta(
         private val siteHost: String
     ) : DaxDialogCta(
         CtaId.DAX_DIALOG_NETWORK,
-        R.string.daxMainNetworkStep1CtaText,
-        R.string.daxDialogNext,
+        R.string.daxMainNetworkCtaText,
+        R.string.daxDialogGotIt,
         Pixel.PixelName.ONBOARDING_DAX_CTA_SHOWN,
         Pixel.PixelName.ONBOARDING_DAX_CTA_OK_BUTTON,
         null,
@@ -165,41 +168,27 @@ sealed class DaxDialogCta(
         appInstallStore
     ) {
 
+        @ExperimentalStdlibApi
         override fun getDaxText(context: Context): String {
-            return if (isFromSameNetworkDomain()) {
-                context.resources.getString(R.string.daxMainNetworkStep1CtaText, network)
-            } else {
-                context.resources.getString(R.string.daxMainNetworkStep1OwnedCtaText, Uri.parse(siteHost).baseHost?.removePrefix("m."), network)
-            }
-        }
-
-        override fun createCta(activity: FragmentActivity): DaxDialog {
-            return DaxDialogHighlightView(
-                TypewriterDaxDialog(daxText = getDaxText(activity), primaryButtonText = activity.resources.getString(okButton))
-            ).apply {
-                val privacyGradeButton = activity.findViewById<View>(R.id.privacyGradeButton)
-                onAnimationFinishedListener {
-                    if (isFromSameNetworkDomain()) {
-                        startHighlightViewAnimation(privacyGradeButton, timesBigger = 0.7f)
-                    }
-                }
-            }
-        }
-
-        fun setSecondDialog(dialog: DaxDialog, activity: FragmentActivity) {
-            ctaPixelParam = Pixel.PixelValues.DAX_NETWORK_CTA_2
-            dialog.setDaxText(activity.resources.getString(R.string.daxMainNetworkStep2CtaText, firstParagraph(activity), network))
-            dialog.setButtonText(activity.resources.getString(R.string.daxDialogGotIt))
-            dialog.onAnimationFinishedListener { }
-            dialog.setDialogAndStartAnimation()
-        }
-
-        private fun firstParagraph(activity: FragmentActivity): String {
             val percentage = networkPropertyPercentages[network]
-            return if (percentage != null)
-                activity.resources.getString(R.string.daxMainNetworkStep21CtaText, network, percentage)
-            else activity.resources.getString(R.string.daxMainNetworkStep211CtaText, network)
+
+            return if (isFromSameNetworkDomain()) {
+                context.resources.getString(R.string.daxMainNetworkCtaText, network, percentage, network)
+            } else {
+                context.resources.getString(
+                    R.string.daxMainNetworkOwnedCtaText,
+                    Uri.parse(siteHost).baseHost?.removePrefix("m.")?.capitalize(Locale.getDefault()),
+                    network,
+                    network,
+                    percentage,
+                    network
+                )
+            }
         }
+
+        @ExperimentalStdlibApi
+        override fun createCta(activity: FragmentActivity): DaxDialog =
+            TypewriterDaxDialog.newInstance(daxText = getDaxText(activity), primaryButtonText = activity.resources.getString(okButton))
 
         private fun isFromSameNetworkDomain(): Boolean = mainTrackerDomains.any { siteHost.contains(it) }
     }
@@ -215,19 +204,8 @@ sealed class DaxDialogCta(
         onboardingStore,
         appInstallStore
     ) {
-        override fun createCta(activity: FragmentActivity): DaxDialog {
-            return DaxDialogHighlightView(
-                TypewriterDaxDialog(
-                    daxText = getDaxText(activity),
-                    primaryButtonText = activity.resources.getString(okButton)
-                )
-            ).apply {
-                val fireButton = activity.findViewById<View>(R.id.fire)
-                onAnimationFinishedListener {
-                    startHighlightViewAnimation(fireButton)
-                }
-            }
-        }
+        override fun createCta(activity: FragmentActivity): DaxDialog =
+            TypewriterDaxDialog.newInstance(daxText = getDaxText(activity), primaryButtonText = activity.resources.getString(okButton))
     }
 
     companion object {
@@ -383,5 +361,5 @@ fun DaxCta.addCtaToHistory(newCta: String): String {
 
 fun DaxCta.canSendShownPixel(): Boolean {
     val param = onboardingStore.onboardingDialogJourney?.split("-").orEmpty().toMutableList()
-    return !(param.isNotEmpty() && param.last().contains(ctaPixelParam))
+    return !(param.isNotEmpty() && param.any { it.contains(ctaPixelParam) })
 }
