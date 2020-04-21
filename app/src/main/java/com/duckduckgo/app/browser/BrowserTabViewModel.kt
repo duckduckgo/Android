@@ -29,10 +29,7 @@ import android.webkit.WebView
 import androidx.annotation.AnyThread
 import androidx.annotation.VisibleForTesting
 import androidx.core.net.toUri
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import com.duckduckgo.app.autocomplete.api.AutoComplete
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteResult
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion
@@ -222,15 +219,22 @@ class BrowserTabViewModel(
         get() = site?.title
 
     private val autoCompletePublishSubject = PublishRelay.create<String>()
+    private val preserveCookiesState: LiveData<List<PreserveCookiesEntity>> = preserveCookiesDao.preserveCookiesEntities()
     private var autoCompleteDisposable: Disposable? = null
     private var site: Site? = null
     private lateinit var tabId: String
     private var webNavigationState: WebNavigationState? = null
     private var httpsUpgraded = false
+    private val fireproofWebsitesObserver = Observer<List<PreserveCookiesEntity>> {
+        viewModelScope.launch {
+            browserViewState.value = currentBrowserViewState().copy(canFireproofSite = canFireproofWebsite())
+        }
+    }
 
     init {
         initializeViewStates()
         configureAutoComplete()
+        preserveCookiesState.observeForever(fireproofWebsitesObserver)
     }
 
     fun loadData(tabId: String, initialUrl: String?, skipHome: Boolean) {
@@ -294,6 +298,7 @@ class BrowserTabViewModel(
         buildingSiteFactoryJob?.cancel()
         autoCompleteDisposable?.dispose()
         autoCompleteDisposable = null
+        preserveCookiesState.removeObserver(fireproofWebsitesObserver)
         super.onCleared()
     }
 
@@ -473,22 +478,18 @@ class BrowserTabViewModel(
 
         Timber.v("navigationStateChanged: $stateChange")
         when (stateChange) {
-            is NewPage -> {
-                viewModelScope.launch {
-                    pageChanged(stateChange.url, stateChange.title)
-                }
-            }
+            is NewPage -> pageChanged(stateChange.url, stateChange.title)
             is PageCleared -> pageCleared()
             is UrlUpdated -> urlUpdated(stateChange.url)
             is PageNavigationCleared -> disableUserNavigation()
         }
+
+        viewModelScope.launch {
+            browserViewState.value = currentBrowserViewState().copy(canFireproofSite = canFireproofWebsite())
+        }
     }
 
-    private suspend fun pageChanged(url: String, title: String?) {
-
-        val preserveCookiesEntity = withContext(dispatchers.io()) {
-            preserveCookiesDao.findByDomain(Uri.parse(url).host)
-        }
+    private fun pageChanged(url: String, title: String?) {
 
         Timber.v("Page changed: $url")
         buildSiteFactory(url, title)
@@ -504,7 +505,6 @@ class BrowserTabViewModel(
                 canAddBookmarks = true,
                 addToHomeEnabled = true,
                 addToHomeVisible = addToHomeCapabilityDetector.isAddToHomeSupported(),
-                canFireproofSite = preserveCookiesEntity == null,
                 canSharePage = true,
                 showPrivacyGrade = true,
                 canReportSite = true
@@ -542,7 +542,6 @@ class BrowserTabViewModel(
         val currentBrowserViewState = currentBrowserViewState()
         browserViewState.value = currentBrowserViewState.copy(
             canAddBookmarks = false,
-            canFireproofSite = false,
             addToHomeEnabled = false,
             addToHomeVisible = addToHomeCapabilityDetector.isAddToHomeSupported(),
             canSharePage = false,
@@ -557,6 +556,7 @@ class BrowserTabViewModel(
                 Timber.v("Page refreshed: $refreshedUrl")
                 pageChanged(refreshedUrl, title)
             }
+            browserViewState.value = currentBrowserViewState().copy(canFireproofSite = canFireproofWebsite())
         }
     }
 
@@ -636,15 +636,9 @@ class BrowserTabViewModel(
                 site?.calculateGrades()?.improvedGrade
             }
 
-            val canFireproofSite = withContext(dispatchers.io()) {
-                val domain = site?.uri?.host ?: return@withContext false
-                preserveCookiesDao.findByDomain(domain) == null
-            }
-
             withContext(dispatchers.main()) {
                 siteLiveData.value = site
                 privacyGrade.value = improvedGrade
-                browserViewState.value = currentBrowserViewState().copy(canFireproofSite = canFireproofSite)
             }
 
             withContext(dispatchers.io()) {
@@ -719,7 +713,6 @@ class BrowserTabViewModel(
                 preserveCookiesDao.insert(preserveCookiesEntity)
             }
             if (id >= 0) {
-                browserViewState.value = currentBrowserViewState().copy(canFireproofSite = false)
                 command.value = ShowFireproofWebSiteConfirmation(preserveCookiesEntity = preserveCookiesEntity)
             }
         }
@@ -727,11 +720,8 @@ class BrowserTabViewModel(
 
     fun onFireproofWebsiteSnackbarActionClicked(preserveCookiesEntity: PreserveCookiesEntity) {
         viewModelScope.launch {
-            val deleteById = withContext(dispatchers.io()) {
+            withContext(dispatchers.io()) {
                 preserveCookiesDao.delete(preserveCookiesEntity)
-            }
-            if (deleteById >= 1) {
-                browserViewState.value = currentBrowserViewState().copy(canFireproofSite = true)
             }
         }
     }
@@ -1052,6 +1042,13 @@ class BrowserTabViewModel(
         command.value = LaunchTabSwitcher
     }
 
+    private suspend fun canFireproofWebsite(): Boolean {
+        return withContext(dispatchers.io()) {
+            val domain = site?.uri?.host ?: return@withContext false
+            preserveCookiesDao.findByDomain(domain) == null
+        }
+    }
+
     private fun invalidateBrowsingActions() {
         globalLayoutState.value = Invalidated
         loadingViewState.value = LoadingViewState()
@@ -1063,7 +1060,8 @@ class BrowserTabViewModel(
             canGoBack = false,
             canGoForward = false,
             canReportSite = false,
-            canChangeBrowsingMode = false
+            canChangeBrowsingMode = false,
+            canFireproofSite = false
         )
     }
 
