@@ -81,7 +81,7 @@ class TabSwitcherBottomBarFeatureActivity : DuckDuckGoActivity(), TabSwitcherLis
 
     private var selectedTabId: String? = null
 
-    private lateinit var popupMenu: TapsPopupMenu
+    private lateinit var popupMenu: TabsPopupMenu
 
     private lateinit var tabGridItemDecorator: TabGridItemDecorator
 
@@ -160,7 +160,7 @@ class TabSwitcherBottomBarFeatureActivity : DuckDuckGoActivity(), TabSwitcherLis
     }
 
     private fun createPopUpMenu() {
-        popupMenu = TapsPopupMenu(layoutInflater)
+        popupMenu = TabsPopupMenu(layoutInflater)
         val view = popupMenu.contentView
         popupMenu.apply {
             onMenuItemClicked(view.closeAllTabs) { closeAllTabs() }

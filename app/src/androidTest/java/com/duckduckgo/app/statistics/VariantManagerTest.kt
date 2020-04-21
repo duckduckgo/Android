@@ -64,14 +64,14 @@ class VariantManagerTest {
 
     @Test
     fun bottomBarNavigationControlVariantIsActiveAndHasNoFeatures() {
-        val variant = variants.first { it.key == "mf" }
+        val variant = variants.first { it.key == "mm" }
         assertEqualsDouble(1.0, variant.weight)
         assertEquals(0, variant.features.size)
     }
 
     @Test
     fun bottomBarNavigationVariantIsActiveAndHasBottomBarNavigationFeature() {
-        val variant = variants.first { it.key == "mm" }
+        val variant = variants.first { it.key == "mn" }
         assertEqualsDouble(1.0, variant.weight)
         assertEquals(1, variant.features.size)
         assertTrue(variant.hasFeature(BottomBarNavigation))

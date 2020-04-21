@@ -28,7 +28,7 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.statistics.Variant
 import com.duckduckgo.app.statistics.VariantManager
 
-class TapsPopupMenu(layoutInflater: LayoutInflater, view: View = inflate(layoutInflater, R.layout.popup_window_tabs_menu)) :
+class TabsPopupMenu(layoutInflater: LayoutInflater, view: View = inflate(layoutInflater, R.layout.popup_window_tabs_menu)) :
     PopupWindow(view, WRAP_CONTENT, WRAP_CONTENT, true) {
 
     // popupwindow gets stuck on the screen on API 22 (tested on 23) without a background

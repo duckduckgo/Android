@@ -62,6 +62,11 @@ interface VariantManager {
             Variant(
                 key = "mm",
                 weight = 1.0,
+                features = emptyList(),
+                filterBy = { isEnglishLocale() }),
+            Variant(
+                key = "mn",
+                weight = 1.0,
                 features = listOf(BottomBarNavigation),
                 filterBy = { isEnglishLocale() })
 
