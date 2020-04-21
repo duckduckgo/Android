@@ -74,12 +74,11 @@ import androidx.core.view.isVisible
 import androidx.core.view.postDelayed
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.transaction
-import androidx.lifecycle.*
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.Observer
 import androidx.lifecycle.OnLifecycleEvent
-import androidx.lifecycle.ViewModelProviders
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion
 import com.duckduckgo.app.bookmarks.ui.EditBookmarkDialogFragment
@@ -115,7 +114,6 @@ import com.duckduckgo.app.cta.ui.DaxBubbleCta
 import com.duckduckgo.app.cta.ui.DaxDialogCta
 import com.duckduckgo.app.cta.ui.HomePanelCta
 import com.duckduckgo.app.cta.ui.HomeTopPanelCta
-import com.duckduckgo.app.cta.ui.SecondaryButtonCta
 import com.duckduckgo.app.global.ViewModelFactory
 import com.duckduckgo.app.global.device.DeviceInfo
 import com.duckduckgo.app.global.model.orderedTrackingEntities
@@ -1444,7 +1442,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
         }
 
         private fun hideBottomBar(shouldAnimate: Boolean = false) {
-            if (shouldAnimate){
+            if (shouldAnimate) {
                 bottomNavigationBar.animateBarVisibility(false)
                 bottomNavigationBar.gone()
             } else {
@@ -1453,7 +1451,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
         }
 
         private fun showBottomBar(shouldAnimate: Boolean) {
-            if (shouldAnimate){
+            if (shouldAnimate) {
                 bottomNavigationBar.show()
                 bottomNavigationBar.animateBarVisibility(true)
             } else {
@@ -1478,8 +1476,6 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
         private fun configureLongClickOpensNewTabListenerWithToolbarOnlyExperiment() {
             tabsButton?.actionView?.setOnLongClickListener {
                 launch { viewModel.userRequestedOpeningNewTab() }
-
-
                 return@setOnLongClickListener true
             }
         }
@@ -1534,11 +1530,11 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
                     decorator.updateBottomBarVisibility(!viewState.isEditing)
                 }
 
-                if (ctaContainer.isVisible){
-                    if (viewState.isEditing){
-                        ctaContainer.setPadding(0,0, 0, 0)
+                if (ctaContainer.isVisible) {
+                    if (viewState.isEditing) {
+                        ctaContainer.setPadding(0, 0, 0, 0)
                     } else {
-                        ctaContainer.setPadding(0,0, 0, 46.toPx())
+                        ctaContainer.setPadding(0, 0, 0, 46.toPx())
                     }
                 }
             }
@@ -1815,68 +1811,65 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
                 viewModel.onUserDismissedCta()
             }
 
-            if (isExperimentEnabled()){
-                if (lastSeenOmnibarViewState != null){
-                    if (lastSeenOmnibarViewState!!.isEditing){
-                        ctaContainer.setPadding(0,0, 0, 0)
+            if (isExperimentEnabled()) {
+                lastSeenOmnibarViewState?.let {
+                    if (it.isEditing) {
+                        ctaContainer.setPadding(0, 0, 0, 0)
                     } else {
-                        ctaContainer.setPadding(0,0, 0, 46.toPx())
+                        ctaContainer.setPadding(0, 0, 0, 46.toPx())
                     }
+                } ?: ctaContainer.setPadding(0, 0, 0, 46.toPx())
+
+                ConstraintSet().also {
+                    it.clone(newTabLayout)
+                    it.connect(ddgLogo.id, ConstraintSet.BOTTOM, ctaContainer.id, ConstraintSet.TOP, 0)
+                    it.applyTo(newTabLayout)
+                }
+            }
+
+            fun hideFindInPage() {
+                if (findInPageContainer.visibility != GONE) {
+                    focusDummy.requestFocus()
+                    findInPageContainer.gone()
+                    findInPageInput.hideKeyboard()
+                }
+            }
+
+            private fun showFindInPageView(viewState: FindInPageViewState) {
+
+                if (findInPageContainer.visibility != VISIBLE) {
+                    findInPageContainer.show()
+                    findInPageInput.postDelayed(KEYBOARD_DELAY) {
+                        findInPageInput?.showKeyboard()
+                    }
+                }
+
+                if (viewState.showNumberMatches) {
+                    findInPageMatches.text = getString(R.string.findInPageMatches, viewState.activeMatchIndex, viewState.numberMatches)
+                    findInPageMatches.show()
                 } else {
-                    ctaContainer.setPadding(0,0, 0, 46.toPx())
+                    findInPageMatches.hide()
                 }
             }
 
-            ConstraintSet().also {
-                it.clone(newTabLayout)
-                it.connect(ddgLogo.id, ConstraintSet.BOTTOM, ctaContainer.id, ConstraintSet.TOP, 0)
-                it.applyTo(newTabLayout)
-            }
-        }
-
-        fun hideFindInPage() {
-            if (findInPageContainer.visibility != GONE) {
-                focusDummy.requestFocus()
-                findInPageContainer.gone()
-                findInPageInput.hideKeyboard()
-            }
-        }
-
-        private fun showFindInPageView(viewState: FindInPageViewState) {
-
-            if (findInPageContainer.visibility != VISIBLE) {
-                findInPageContainer.show()
-                findInPageInput.postDelayed(KEYBOARD_DELAY) {
-                    findInPageInput?.showKeyboard()
-                }
+            private fun toggleDesktopSiteMode(isDesktopSiteMode: Boolean) {
+                webView?.settings?.userAgentString = userAgentProvider.getUserAgent(isDesktopSiteMode)
             }
 
-            if (viewState.showNumberMatches) {
-                findInPageMatches.text = getString(R.string.findInPageMatches, viewState.activeMatchIndex, viewState.numberMatches)
-                findInPageMatches.show()
-            } else {
-                findInPageMatches.hide()
+            private fun goFullScreen() {
+                Timber.i("Entering full screen")
+                webViewFullScreenContainer.show()
+                activity?.toggleFullScreen()
             }
-        }
 
-        private fun toggleDesktopSiteMode(isDesktopSiteMode: Boolean) {
-            webView?.settings?.userAgentString = userAgentProvider.getUserAgent(isDesktopSiteMode)
-        }
+            private fun exitFullScreen() {
+                Timber.i("Exiting full screen")
+                webViewFullScreenContainer.removeAllViews()
+                webViewFullScreenContainer.gone()
+                activity?.toggleFullScreen()
+            }
 
-        private fun goFullScreen() {
-            Timber.i("Entering full screen")
-            webViewFullScreenContainer.show()
-            activity?.toggleFullScreen()
+            private fun shouldUpdateOmnibarTextInput(viewState: OmnibarViewState, omnibarInput: String?) =
+                (!viewState.isEditing || omnibarInput.isNullOrEmpty()) && omnibarTextInput.isDifferent(omnibarInput)
         }
-
-        private fun exitFullScreen() {
-            Timber.i("Exiting full screen")
-            webViewFullScreenContainer.removeAllViews()
-            webViewFullScreenContainer.gone()
-            activity?.toggleFullScreen()
-        }
-
-        private fun shouldUpdateOmnibarTextInput(viewState: OmnibarViewState, omnibarInput: String?) =
-            (!viewState.isEditing || omnibarInput.isNullOrEmpty()) && omnibarTextInput.isDifferent(omnibarInput)
     }
-}

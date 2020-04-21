@@ -611,7 +611,7 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenBrowserNotShownAndOmnibarInputDoesNotHaveFocusThenPrivacyGradeIsShownAndSearchIconIsHidden() {
+    fun whenOmnibarDoesNotHaveFocusThenPrivacyGradeIsShownAndSearchIconIsHidden() {
         testee.onOmnibarInputStateChanged(query = "", hasFocus = false, hasQueryChanged = false)
         assertTrue(browserViewState().showPrivacyGrade)
         assertFalse(browserViewState().showSearchIcon)
