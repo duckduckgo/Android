@@ -276,7 +276,7 @@ class MigrationsProvider(val context: Context) {
 
     val MIGRATION_18_TO_19: Migration = object : Migration(18, 19) {
         override fun migrate(database: SupportSQLiteDatabase) {
-            database.execSQL("CREATE TABLE IF NOT EXISTS $PRESERVE_COOKIES_TABLE_NAME (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `domain` TEXT NOT NULL)")
+            database.execSQL("CREATE TABLE IF NOT EXISTS $PRESERVE_COOKIES_TABLE_NAME (`domain` TEXT NOT NULL, PRIMARY KEY(`domain`))")
         }
     }
 

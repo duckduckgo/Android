@@ -81,6 +81,7 @@ import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
@@ -130,6 +131,7 @@ class BrowserTabViewModel(
         val showMenuButton: Boolean = true,
         val canSharePage: Boolean = false,
         val canAddBookmarks: Boolean = false,
+        val canFireproofSite: Boolean = false,
         val canGoBack: Boolean = false,
         val canGoForward: Boolean = false,
         val canReportSite: Boolean = false,
@@ -180,7 +182,7 @@ class BrowserTabViewModel(
         class ShowFullScreen(val view: View) : Command()
         class DownloadImage(val url: String, val requestUserConfirmation: Boolean) : Command()
         class ShowBookmarkAddedConfirmation(val bookmarkId: Long, val title: String?, val url: String?) : Command()
-        class ShowFireproofWebSiteConfirmation(val preserveSiteId: Long) : Command()
+        class ShowFireproofWebSiteConfirmation(val preserveCookiesEntity: PreserveCookiesEntity) : Command()
         class ShareLink(val url: String) : Command()
         class CopyLink(val url: String) : Command()
         class FindInPageCommand(val searchTerm: String) : Command()
@@ -437,6 +439,7 @@ class BrowserTabViewModel(
         browserViewState.value = currentBrowserViewState().copy(
             browserShowing = false,
             canGoBack = false,
+            canFireproofSite = false,
             canGoForward = currentGlobalLayoutState() !is Invalidated
         )
         omnibarViewState.value = currentOmnibarViewState().copy(omnibarText = "", shouldMoveCaretToEnd = false)
@@ -471,14 +474,22 @@ class BrowserTabViewModel(
 
         Timber.v("navigationStateChanged: $stateChange")
         when (stateChange) {
-            is NewPage -> pageChanged(stateChange.url, stateChange.title)
+            is NewPage -> {
+                viewModelScope.launch {
+                    pageChanged(stateChange.url, stateChange.title)
+                }
+            }
             is PageCleared -> pageCleared()
             is UrlUpdated -> urlUpdated(stateChange.url)
             is PageNavigationCleared -> disableUserNavigation()
         }
     }
 
-    private fun pageChanged(url: String, title: String?) {
+    private suspend fun pageChanged(url: String, title: String?) {
+
+        val preserveCookiesEntity = withContext(dispatchers.io()) {
+            preserveCookiesDao.findByDomain(Uri.parse(url).host)
+        }
 
         Timber.v("Page changed: $url")
         buildSiteFactory(url, title)
@@ -494,6 +505,7 @@ class BrowserTabViewModel(
                 canAddBookmarks = true,
                 addToHomeEnabled = true,
                 addToHomeVisible = addToHomeCapabilityDetector.isAddToHomeSupported(),
+                canFireproofSite = preserveCookiesEntity == null,
                 canSharePage = true,
                 showPrivacyGrade = true,
                 canReportSite = true
@@ -531,6 +543,7 @@ class BrowserTabViewModel(
         val currentBrowserViewState = currentBrowserViewState()
         browserViewState.value = currentBrowserViewState.copy(
             canAddBookmarks = false,
+            canFireproofSite = false,
             addToHomeEnabled = false,
             addToHomeVisible = addToHomeCapabilityDetector.isAddToHomeSupported(),
             canSharePage = false,
@@ -540,9 +553,11 @@ class BrowserTabViewModel(
     }
 
     override fun pageRefreshed(refreshedUrl: String) {
-        if (url == null || refreshedUrl == url) {
-            Timber.v("Page refreshed: $refreshedUrl")
-            pageChanged(refreshedUrl, title)
+        viewModelScope.launch {
+            if (url == null || refreshedUrl == url) {
+                Timber.v("Page refreshed: $refreshedUrl")
+                pageChanged(refreshedUrl, title)
+            }
         }
     }
 
@@ -622,9 +637,15 @@ class BrowserTabViewModel(
                 site?.calculateGrades()?.improvedGrade
             }
 
+            val canFireproofSite = withContext(dispatchers.io()) {
+                val domain = site?.uri?.host ?: return@withContext false
+                preserveCookiesDao.findByDomain(domain) == null
+            }
+
             withContext(dispatchers.main()) {
                 siteLiveData.value = site
                 privacyGrade.value = improvedGrade
+                browserViewState.value = currentBrowserViewState().copy(canFireproofSite = canFireproofSite)
             }
 
             withContext(dispatchers.io()) {
@@ -690,22 +711,27 @@ class BrowserTabViewModel(
     }
 
     fun onFireproofWebsiteClicked() {
-        val url = url ?: ""
+        val url = url ?: return
         viewModelScope.launch {
+            val urlDomain = Uri.parse(url).host ?: return@launch
+            val preserveCookiesEntity = PreserveCookiesEntity(domain = urlDomain)
             val id = withContext(dispatchers.io()) {
-                val urlDomain = Uri.parse(url).host
-                preserveCookiesDao.insert(PreserveCookiesEntity(domain = urlDomain))
+                preserveCookiesDao.insert(preserveCookiesEntity)
             }
             if (id >= 0) {
-                command.value = ShowFireproofWebSiteConfirmation(preserveSiteId = id)
+                browserViewState.value = currentBrowserViewState().copy(canFireproofSite = false)
+                command.value = ShowFireproofWebSiteConfirmation(preserveCookiesEntity = preserveCookiesEntity)
             }
         }
     }
 
-    fun onFireproofWebsiteSnackbarActionClicked(preserveSiteId: Long) {
+    fun onFireproofWebsiteSnackbarActionClicked(preserveCookiesEntity: PreserveCookiesEntity) {
         viewModelScope.launch {
-            withContext(dispatchers.io()) {
-                preserveCookiesDao.deleteById(preserveSiteId)
+            val deleteById = withContext(dispatchers.io()) {
+                preserveCookiesDao.delete(preserveCookiesEntity)
+            }
+            if (deleteById >= 1) {
+                browserViewState.value = currentBrowserViewState().copy(canFireproofSite = true)
             }
         }
     }

@@ -16,16 +16,19 @@
 
 package com.duckduckgo.app.fire
 
-import androidx.room.Dao
-import androidx.room.Insert
-import androidx.room.Query
+import androidx.room.*
+import com.duckduckgo.app.bookmarks.db.BookmarkEntity
+import io.reactivex.Single
 
 @Dao
 interface PreserveCookiesDao {
 
-    @Insert
+    @Query("select * from $PRESERVE_COOKIES_TABLE_NAME WHERE domain LIKE :domain limit 1")
+    fun findByDomain(domain: String): PreserveCookiesEntity?
+
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
     fun insert(preserveCookiesEntity: PreserveCookiesEntity): Long
 
-    @Query("delete from $PRESERVE_COOKIES_TABLE_NAME WHERE id LIKE :id")
-    fun deleteById(id: Long)
+    @Delete
+    fun delete(preserveCookiesEntity: PreserveCookiesEntity): Int
 }

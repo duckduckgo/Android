@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 19,
-    "identityHash": "2515c6cdf319aa38c3eefcf6ff99b46b",
+    "identityHash": "37310531ebf43bda7ea25d33c741440c",
     "entities": [
       {
         "tableName": "tds_tracker",
@@ -660,14 +660,8 @@
       },
       {
         "tableName": "preserveCookies",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `domain` TEXT NOT NULL)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`domain` TEXT NOT NULL, PRIMARY KEY(`domain`))",
         "fields": [
-          {
-            "fieldPath": "id",
-            "columnName": "id",
-            "affinity": "INTEGER",
-            "notNull": true
-          },
           {
             "fieldPath": "domain",
             "columnName": "domain",
@@ -677,9 +671,9 @@
         ],
         "primaryKey": {
           "columnNames": [
-            "id"
+            "domain"
           ],
-          "autoGenerate": true
+          "autoGenerate": false
         },
         "indices": [],
         "foreignKeys": []
@@ -688,7 +682,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '2515c6cdf319aa38c3eefcf6ff99b46b')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '37310531ebf43bda7ea25d33c741440c')"
     ]
   }
 }

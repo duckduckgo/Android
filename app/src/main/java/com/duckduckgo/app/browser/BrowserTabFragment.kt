@@ -75,6 +75,7 @@ import com.duckduckgo.app.browser.tabpreview.WebViewPreviewPersister
 import com.duckduckgo.app.browser.ui.HttpAuthenticationDialogFragment
 import com.duckduckgo.app.browser.useragent.UserAgentProvider
 import com.duckduckgo.app.cta.ui.*
+import com.duckduckgo.app.fire.PreserveCookiesEntity
 import com.duckduckgo.app.global.ViewModelFactory
 import com.duckduckgo.app.global.device.DeviceInfo
 import com.duckduckgo.app.global.view.*
@@ -482,7 +483,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
             }
             is Command.LaunchNewTab -> browserActivity?.launchNewTab()
             is Command.ShowBookmarkAddedConfirmation -> bookmarkAdded(it.bookmarkId, it.title, it.url)
-            is Command.ShowFireproofWebSiteConfirmation -> fireproofWebsiteConfirmation(it.preserveSiteId)
+            is Command.ShowFireproofWebSiteConfirmation -> fireproofWebsiteConfirmation(it.preserveCookiesEntity)
             is Command.Navigate -> {
                 navigate(it.url)
             }
@@ -928,10 +929,10 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
             .show()
     }
 
-    private fun fireproofWebsiteConfirmation(preserveSiteId: Long) {
+    private fun fireproofWebsiteConfirmation(preserveCookiesEntity: PreserveCookiesEntity) {
         Snackbar.make(rootView, R.string.fireproofWebsiteSnackbarConfirmation, Snackbar.LENGTH_LONG)
             .setAction(R.string.fireproofWebsiteSnackbarAction) {
-                viewModel.onFireproofWebsiteSnackbarActionClicked(preserveSiteId)
+                viewModel.onFireproofWebsiteSnackbarActionClicked(preserveCookiesEntity)
             }
             .show()
     }
@@ -1361,6 +1362,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
                 refreshPopupMenuItem.isEnabled = browserShowing
                 newTabPopupMenuItem.isEnabled = browserShowing
                 addBookmarksPopupMenuItem?.isEnabled = viewState.canAddBookmarks
+                fireproofWebsitePopupMenuItem?.isEnabled = viewState.canFireproofSite
                 sharePageMenuItem?.isEnabled = viewState.canSharePage
                 brokenSitePopupMenuItem?.isEnabled = viewState.canReportSite
                 requestDesktopSiteCheckMenuItem?.isEnabled = viewState.canChangeBrowsingMode
