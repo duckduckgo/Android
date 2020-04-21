@@ -35,8 +35,6 @@ class BrowserPopupMenu(layoutInflater: LayoutInflater, variant: Variant, view: V
 
     init {
         if (SDK_INT <= 22) {
-            // popupwindow gets stuck on the screen on API 22 (tested on 23) without a background
-            // color.  Adding it however garbles the elevation so we cannot have elevation here.
             setBackgroundDrawable(ColorDrawable(Color.WHITE))
         } else {
             elevation = 6.toFloat()
@@ -77,10 +75,6 @@ class BrowserPopupMenu(layoutInflater: LayoutInflater, variant: Variant, view: V
 
         private fun inflateBottomBarWithSearchExperiment(layoutInflater: LayoutInflater): View {
             return layoutInflater.inflate(R.layout.popup_window_browser_bottom_tab_menu, null)
-        }
-
-        fun inflate(layoutInflater: LayoutInflater, resourceId: Int): View {
-            return layoutInflater.inflate(resourceId, null)
         }
     }
 }

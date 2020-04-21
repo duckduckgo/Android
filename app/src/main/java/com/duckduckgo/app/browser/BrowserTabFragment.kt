@@ -380,10 +380,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
         transport.webView = webView
         message.sendToTarget()
 
-        val tabsButton = tabsButton?.actionView as TabSwitcherButton
-        tabsButton?.animateCount()
-        bottomBarTabsItem.animateCount()
-
+        decorator.animateTabsCount()
         viewModel.onMessageProcessed()
     }
 
@@ -782,7 +779,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
             browserActivity?.launchPrivacyDashboard()
         }
 
-        viewModel.privacyGrade.observe(this, Observer<PrivacyGrade> {
+        viewModel.privacyGrade.observe(viewLifecycleOwner, Observer<PrivacyGrade> {
             Timber.d("Observed grade: $it")
             it?.let { privacyGrade ->
                 val drawable = context?.getDrawable(privacyGrade.icon()) ?: return@let
@@ -1486,6 +1483,12 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
                 return@setOnLongClickListener true
             }
         }
+
+        fun animateTabsCount() {
+            val tabsButton = tabsButton?.actionView as TabSwitcherButton
+            tabsButton?.animateCount()
+            bottomBarTabsItem.animateCount()
+        }
     }
 
     inner class BrowserTabFragmentRenderer {
@@ -1800,7 +1803,6 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
 
             inflate(context, R.layout.include_cta, ctaContainer)
             logoHidingListener.callToActionView = ctaContainer
-            logoHidingListener.callToActionView = ctaContainer
 
             configuration.showCta(ctaContainer)
             ctaContainer.ctaOkButton.setOnClickListener {
@@ -1826,50 +1828,51 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
                     it.applyTo(newTabLayout)
                 }
             }
-
-            fun hideFindInPage() {
-                if (findInPageContainer.visibility != GONE) {
-                    focusDummy.requestFocus()
-                    findInPageContainer.gone()
-                    findInPageInput.hideKeyboard()
-                }
-            }
-
-            private fun showFindInPageView(viewState: FindInPageViewState) {
-
-                if (findInPageContainer.visibility != VISIBLE) {
-                    findInPageContainer.show()
-                    findInPageInput.postDelayed(KEYBOARD_DELAY) {
-                        findInPageInput?.showKeyboard()
-                    }
-                }
-
-                if (viewState.showNumberMatches) {
-                    findInPageMatches.text = getString(R.string.findInPageMatches, viewState.activeMatchIndex, viewState.numberMatches)
-                    findInPageMatches.show()
-                } else {
-                    findInPageMatches.hide()
-                }
-            }
-
-            private fun toggleDesktopSiteMode(isDesktopSiteMode: Boolean) {
-                webView?.settings?.userAgentString = userAgentProvider.getUserAgent(isDesktopSiteMode)
-            }
-
-            private fun goFullScreen() {
-                Timber.i("Entering full screen")
-                webViewFullScreenContainer.show()
-                activity?.toggleFullScreen()
-            }
-
-            private fun exitFullScreen() {
-                Timber.i("Exiting full screen")
-                webViewFullScreenContainer.removeAllViews()
-                webViewFullScreenContainer.gone()
-                activity?.toggleFullScreen()
-            }
-
-            private fun shouldUpdateOmnibarTextInput(viewState: OmnibarViewState, omnibarInput: String?) =
-                (!viewState.isEditing || omnibarInput.isNullOrEmpty()) && omnibarTextInput.isDifferent(omnibarInput)
         }
+
+        fun hideFindInPage() {
+            if (findInPageContainer.visibility != GONE) {
+                focusDummy.requestFocus()
+                findInPageContainer.gone()
+                findInPageInput.hideKeyboard()
+            }
+        }
+
+        private fun showFindInPageView(viewState: FindInPageViewState) {
+
+            if (findInPageContainer.visibility != VISIBLE) {
+                findInPageContainer.show()
+                findInPageInput.postDelayed(KEYBOARD_DELAY) {
+                    findInPageInput?.showKeyboard()
+                }
+            }
+
+            if (viewState.showNumberMatches) {
+                findInPageMatches.text = getString(R.string.findInPageMatches, viewState.activeMatchIndex, viewState.numberMatches)
+                findInPageMatches.show()
+            } else {
+                findInPageMatches.hide()
+            }
+        }
+
+        private fun toggleDesktopSiteMode(isDesktopSiteMode: Boolean) {
+            webView?.settings?.userAgentString = userAgentProvider.getUserAgent(isDesktopSiteMode)
+        }
+
+        private fun goFullScreen() {
+            Timber.i("Entering full screen")
+            webViewFullScreenContainer.show()
+            activity?.toggleFullScreen()
+        }
+
+        private fun exitFullScreen() {
+            Timber.i("Exiting full screen")
+            webViewFullScreenContainer.removeAllViews()
+            webViewFullScreenContainer.gone()
+            activity?.toggleFullScreen()
+        }
+
+        private fun shouldUpdateOmnibarTextInput(viewState: OmnibarViewState, omnibarInput: String?) =
+            (!viewState.isEditing || omnibarInput.isNullOrEmpty()) && omnibarTextInput.isDifferent(omnibarInput)
     }
+}

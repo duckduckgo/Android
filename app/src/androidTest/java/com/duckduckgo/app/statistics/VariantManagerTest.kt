@@ -22,7 +22,6 @@ import org.junit.Assert.*
 import org.junit.Ignore
 import org.junit.Test
 
-@Ignore
 class VariantManagerTest {
 
     private val variants = VariantManager.ACTIVE_VARIANTS +
@@ -50,14 +49,14 @@ class VariantManagerTest {
     @Test
     fun searchNotificationControlVariantIsActiveAndHasNoFeatures() {
         val variant = variants.first { it.key == "mf" }
-        assertEqualsDouble(0.0, variant.weight)
+        assertEqualsDouble(1.0, variant.weight)
         assertEquals(0, variant.features.size)
     }
 
     @Test
     fun searchNotificationVariantIsActiveAndHasStickySearchNotificationFeature() {
         val variant = variants.first { it.key == "mg" }
-        assertEqualsDouble(1.0, variant.weight)
+        assertEqualsDouble(0.0, variant.weight)
         assertEquals(1, variant.features.size)
         assertTrue(variant.hasFeature(StickySearchNotification))
     }
@@ -67,7 +66,7 @@ class VariantManagerTest {
     @Test
     fun bottomBarNavigationControlVariantIsActiveAndHasNoFeatures() {
         val variant = variants.first { it.key == "mf" }
-        assertEqualsDouble(0.0, variant.weight)
+        assertEqualsDouble(1.0, variant.weight)
         assertEquals(0, variant.features.size)
     }
 
