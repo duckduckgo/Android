@@ -20,7 +20,6 @@ package com.duckduckgo.app.notification.model
 
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.notification.db.NotificationDao
-import com.duckduckgo.app.privacy.db.PrivacyProtectionCountDao
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.whenever
