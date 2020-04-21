@@ -396,7 +396,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
 
     private fun launchTabSwitcher() {
         val activity = activity ?: return
-        if (variantManager.getVariant().hasFeature(VariantManager.VariantFeature.BottomBarNavigationExperiment)) {
+        if (isBottomNavigationExperimentEnabled()) {
             startActivity(TabSwitcherBottomBarExperimentActivity.intent(activity, tabId))
         } else {
             startActivity(TabSwitcherActivity.intent(activity, tabId))
@@ -764,10 +764,11 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
         autoCompleteSuggestionsList.adapter = autoCompleteSuggestionsAdapter
     }
 
-    private fun isExperimentEnabled() = variantManager.getVariant().hasFeature(VariantManager.VariantFeature.BottomBarNavigationExperiment)
+    private fun isBottomNavigationExperimentEnabled() =
+        variantManager.getVariant().hasFeature(VariantManager.VariantFeature.BottomBarNavigationExperiment)
 
     private fun decorateWithExperiments() {
-        if (isExperimentEnabled()) {
+        if (isBottomNavigationExperimentEnabled()) {
             decorator.decorateWithBottomBarSearchExperiment()
         } else {
             decorator.decorateWithToolbarOnlyExperiment()
@@ -1285,15 +1286,15 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
     }
 
     inner class BrowserTabFragmentExperimentDecorator {
-        fun decorateToolbarMenus(viewState: BrowserViewState) {
+        fun decorateToolbar(viewState: BrowserViewState) {
             if (variantManager.getVariant().hasFeature(VariantManager.VariantFeature.BottomBarNavigationExperiment)) {
                 decorator.hideToolbarMenu()
             } else {
-                decorator.decorateToolbarMenu(viewState)
+                decorator.decorateToolbarActions(viewState)
             }
         }
 
-        private fun decorateToolbarMenu(viewState: BrowserViewState) {
+        private fun decorateToolbarActions(viewState: BrowserViewState) {
             tabsButton?.isVisible = viewState.showTabsButton
             fireMenuButton?.isVisible = viewState.showFireButton
             menuButton?.isVisible = viewState.showMenuButton
@@ -1429,7 +1430,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
         }
 
         fun updateBottomBarVisibility(shouldShow: Boolean, shouldAnimate: Boolean = false) {
-            if (isExperimentEnabled()) {
+            if (isBottomNavigationExperimentEnabled()) {
                 if (shouldShow) {
                     showBottomBar(shouldAnimate)
                 } else {
@@ -1440,17 +1441,15 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
 
         private fun hideBottomBar(shouldAnimate: Boolean = false) {
             if (shouldAnimate) {
-                bottomNavigationBar.animateBarVisibility(false)
-                bottomNavigationBar.gone()
-            } else {
-                bottomNavigationBar.gone()
+                bottomNavigationBar.animateBarVisibility(isVisible = false)
             }
+            bottomNavigationBar.gone()
         }
 
         private fun showBottomBar(shouldAnimate: Boolean) {
             if (shouldAnimate) {
                 bottomNavigationBar.show()
-                bottomNavigationBar.animateBarVisibility(true)
+                bottomNavigationBar.animateBarVisibility(isVisible = true)
             } else {
                 bottomNavigationBar.postDelayed(KEYBOARD_DELAY) {
                     bottomNavigationBar.show()
@@ -1678,7 +1677,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
                 searchIcon?.isVisible = true
             }
 
-            decorator.decorateToolbarMenus(viewState)
+            decorator.decorateToolbar(viewState)
         }
 
         fun renderFindInPageState(viewState: FindInPageViewState) {
@@ -1813,7 +1812,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
                 viewModel.onUserDismissedCta()
             }
 
-            if (isExperimentEnabled()) {
+            if (isBottomNavigationExperimentEnabled()) {
                 lastSeenOmnibarViewState?.let {
                     if (it.isEditing) {
                         ctaContainer.setPadding(0, 0, 0, 0)
