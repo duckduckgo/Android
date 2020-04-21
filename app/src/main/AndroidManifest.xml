@@ -12,9 +12,9 @@
         android:name="com.duckduckgo.app.global.DuckDuckGoApplication"
         android:allowBackup="false"
         android:icon="${appIcon}"
-        android:roundIcon="${appIconRound}"
         android:label="@string/appName"
         android:networkSecurityConfig="@xml/network_security_config"
+        android:roundIcon="${appIconRound}"
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
@@ -37,7 +37,7 @@
             android:grantUriPermissions="true">
             <meta-data
                 android:name="android.support.FILE_PROVIDER_PATHS"
-                android:resource="@xml/provider_paths"/>
+                android:resource="@xml/provider_paths" />
         </provider>
 
         <!--
@@ -52,8 +52,8 @@
         <activity
             android:name="com.duckduckgo.app.launch.LaunchBridgeActivity"
             android:icon="${appIcon}"
-            android:roundIcon="${appIconRound}"
-            android:label="@string/appName">
+            android:label="@string/appName"
+            android:roundIcon="${appIconRound}">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
             </intent-filter>
@@ -135,8 +135,8 @@
             android:name="com.duckduckgo.app.launch.LauncherSilhoutte"
             android:enabled="false"
             android:icon="@mipmap/ic_launcher_silhouette"
-            android:roundIcon="@mipmap/ic_launcher_silhouette_round"
             android:label="@string/appName"
+            android:roundIcon="@mipmap/ic_launcher_silhouette_round"
             android:targetActivity="com.duckduckgo.app.launch.LaunchBridgeActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -280,8 +280,8 @@
             android:label="@string/bookmarksActivityTitle"
             android:parentActivityName=".BrowserActivity" />
         <activity
-            android:name="com.duckduckgo.app.fire.preservewebsite.ui.PreserveWebsiteActivity"
-            android:label="@string/preserveWebsiteActivityTitle"
+            android:name="com.duckduckgo.app.fire.fireproofwebsite.ui.FireproofWebsitesActivity"
+            android:label="@string/fireproofWebsitesActivityTitle"
             android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity" />
         <activity
             android:name="com.duckduckgo.app.fire.FireActivity"

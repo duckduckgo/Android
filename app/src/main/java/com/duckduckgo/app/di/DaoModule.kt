@@ -78,5 +78,5 @@ class DaoModule {
     fun userStageDao(database: AppDatabase) = database.userStageDao()
 
     @Provides
-    fun preserveCookiesDao(database: AppDatabase) = database.preserveCookiesDao()
+    fun fireproofWebsiteDao(database: AppDatabase) = database.fireproofWebsiteDao()
 }

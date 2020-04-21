@@ -14,8 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.fire.preservewebsite.ui
-
+package com.duckduckgo.app.fire.fireproofwebsite.ui
 
 import android.app.AlertDialog
 import android.content.Context
@@ -32,36 +31,34 @@ import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.RecyclerView.Adapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.duckduckgo.app.browser.R
-import com.duckduckgo.app.fire.PreserveCookiesEntity
+import com.duckduckgo.app.fire.FireproofWebsiteEntity
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.baseHost
 import com.duckduckgo.app.global.faviconLocation
 import com.duckduckgo.app.global.image.GlideApp
-import com.duckduckgo.app.global.view.gone
-import com.duckduckgo.app.global.view.show
 import kotlinx.android.synthetic.main.content_preserve_website.*
 import kotlinx.android.synthetic.main.include_toolbar.*
 import kotlinx.android.synthetic.main.view_preserved_website_entry.view.*
 import org.jetbrains.anko.alert
 import timber.log.Timber
 
-class PreserveWebsiteActivity : DuckDuckGoActivity() {
+class FireproofWebsitesActivity : DuckDuckGoActivity() {
 
-    lateinit var adapter: PreserveWebsiteAdapter
+    lateinit var adapter: FireproofWebsiteAdapter
     private var deleteDialog: AlertDialog? = null
 
-    private val viewModel: PreserveWebsiteViewModel by bindViewModel()
+    private val viewModel: FireproofWebsitesViewModel by bindViewModel()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_preserve_website)
         setupActionBar()
-        setupPreserveWebsiteRecycler()
+        setupFireproofWebsiteRecycler()
         observeViewModel()
     }
 
-    private fun setupPreserveWebsiteRecycler() {
-        adapter = PreserveWebsiteAdapter(viewModel)
+    private fun setupFireproofWebsiteRecycler() {
+        adapter = FireproofWebsiteAdapter(viewModel)
         recycler.adapter = adapter
     }
 
@@ -71,21 +68,21 @@ class PreserveWebsiteActivity : DuckDuckGoActivity() {
     }
 
     private fun observeViewModel() {
-        viewModel.viewState.observe(this, Observer<PreserveWebsiteViewModel.ViewState> { viewState ->
+        viewModel.viewState.observe(this, Observer<FireproofWebsitesViewModel.ViewState> { viewState ->
             viewState?.let {
-                adapter.preservedWebsites = it.preserveWebsiteEntities
+                adapter.fireproofWebsites = it.fireproofWebsitesEntities
             }
         })
 
         viewModel.command.observe(this, Observer {
             when (it) {
-                is PreserveWebsiteViewModel.Command.ConfirmDeletePreservedWebsite -> confirmDeleteWebsite(it.entity)
+                is FireproofWebsitesViewModel.Command.ConfirmDeletePreservedWebsite -> confirmDeleteWebsite(it.entity)
             }
         })
     }
 
     @Suppress("deprecation")
-    private fun confirmDeleteWebsite(entity: PreserveCookiesEntity) {
+    private fun confirmDeleteWebsite(entity: FireproofWebsiteEntity) {
         val message =
             Html.fromHtml(getString(R.string.bookmarkDeleteConfirmMessage, entity.domain))
         val title = getString(R.string.bookmarkDeleteConfirmTitle)
@@ -103,16 +100,16 @@ class PreserveWebsiteActivity : DuckDuckGoActivity() {
 
     companion object {
         fun intent(context: Context): Intent {
-            return Intent(context, PreserveWebsiteActivity::class.java)
+            return Intent(context, FireproofWebsitesActivity::class.java)
         }
     }
 }
 
-class PreserveWebsiteAdapter(
-    private val viewModel: PreserveWebsiteViewModel
+class FireproofWebsiteAdapter(
+    private val viewModel: FireproofWebsitesViewModel
 ) : Adapter<PreservedWebsiteViewHolder>() {
 
-    var preservedWebsites: List<PreserveCookiesEntity> = emptyList()
+    var fireproofWebsites: List<FireproofWebsiteEntity> = emptyList()
         set(value) {
             field = value
             notifyDataSetChanged()
@@ -125,20 +122,20 @@ class PreserveWebsiteAdapter(
     }
 
     override fun onBindViewHolder(holder: PreservedWebsiteViewHolder, position: Int) {
-        holder.update(preservedWebsites[position])
+        holder.update(fireproofWebsites[position])
     }
 
     override fun getItemCount(): Int {
-        return preservedWebsites.size
+        return fireproofWebsites.size
     }
 }
 
-class PreservedWebsiteViewHolder(itemView: View, private val viewModel: PreserveWebsiteViewModel) :
+class PreservedWebsiteViewHolder(itemView: View, private val viewModel: FireproofWebsitesViewModel) :
     ViewHolder(itemView) {
 
-    lateinit var entity: PreserveCookiesEntity
+    lateinit var entity: FireproofWebsiteEntity
 
-    fun update(entity: PreserveCookiesEntity) {
+    fun update(entity: FireproofWebsiteEntity) {
         this.entity = entity
 
         itemView.overflowMenu.contentDescription = itemView.context.getString(
@@ -170,7 +167,7 @@ class PreservedWebsiteViewHolder(itemView: View, private val viewModel: Preserve
         return uri.baseHost ?: return urlString
     }
 
-    private fun showOverFlowMenu(overflowMenu: ImageView, entity: PreserveCookiesEntity) {
+    private fun showOverFlowMenu(overflowMenu: ImageView, entity: FireproofWebsiteEntity) {
         val popup = PopupMenu(overflowMenu.context, overflowMenu)
         popup.inflate(R.menu.bookmarks_individual_overflow_menu)
         popup.setOnMenuItemClickListener {
@@ -184,7 +181,7 @@ class PreservedWebsiteViewHolder(itemView: View, private val viewModel: Preserve
         popup.show()
     }
 
-    private fun deleteEntity(entity: PreserveCookiesEntity) {
+    private fun deleteEntity(entity: FireproofWebsiteEntity) {
         Timber.i("Deleting website with domain: ${entity.domain}")
         viewModel.onDeleteRequested(entity)
     }

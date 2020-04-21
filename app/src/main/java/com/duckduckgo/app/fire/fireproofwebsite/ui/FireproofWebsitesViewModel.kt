@@ -14,28 +14,28 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.fire.preservewebsite.ui
+package com.duckduckgo.app.fire.fireproofwebsite.ui
 
 import androidx.lifecycle.*
-import com.duckduckgo.app.fire.PreserveCookiesDao
-import com.duckduckgo.app.fire.PreserveCookiesEntity
-import com.duckduckgo.app.fire.preservewebsite.ui.PreserveWebsiteViewModel.Command.ConfirmDeletePreservedWebsite
+import com.duckduckgo.app.fire.FireproofWebsiteDao
+import com.duckduckgo.app.fire.FireproofWebsiteEntity
+import com.duckduckgo.app.fire.fireproofwebsite.ui.FireproofWebsitesViewModel.Command.ConfirmDeletePreservedWebsite
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.SingleLiveEvent
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class PreserveWebsiteViewModel(
-    private val dao: PreserveCookiesDao,
+class FireproofWebsitesViewModel(
+    private val dao: FireproofWebsiteDao,
     private val dispatcherProvider: DispatcherProvider
 ) : ViewModel() {
 
     data class ViewState(
-        val preserveWebsiteEntities: List<PreserveCookiesEntity> = emptyList()
+        val fireproofWebsitesEntities: List<FireproofWebsiteEntity> = emptyList()
     )
 
     sealed class Command {
-        class ConfirmDeletePreservedWebsite(val entity: PreserveCookiesEntity) : Command()
+        class ConfirmDeletePreservedWebsite(val entity: FireproofWebsiteEntity) : Command()
     }
 
     companion object {
@@ -45,8 +45,8 @@ class PreserveWebsiteViewModel(
     val viewState: MutableLiveData<ViewState> = MutableLiveData()
     val command: SingleLiveEvent<Command> = SingleLiveEvent()
 
-    private val bookmarks: LiveData<List<PreserveCookiesEntity>> = dao.preserveCookiesEntities()
-    private val bookmarksObserver = Observer<List<PreserveCookiesEntity>> { onPreservedCookiesEntitiesChanged(it!!) }
+    private val bookmarks: LiveData<List<FireproofWebsiteEntity>> = dao.fireproofWebsitesEntities()
+    private val bookmarksObserver = Observer<List<FireproofWebsiteEntity>> { onPreservedCookiesEntitiesChanged(it!!) }
 
     init {
         viewState.value = ViewState()
@@ -58,17 +58,17 @@ class PreserveWebsiteViewModel(
         bookmarks.removeObserver(bookmarksObserver)
     }
 
-    private fun onPreservedCookiesEntitiesChanged(entities: List<PreserveCookiesEntity>) {
+    private fun onPreservedCookiesEntitiesChanged(entities: List<FireproofWebsiteEntity>) {
         viewState.value = viewState.value?.copy(
-            preserveWebsiteEntities = entities
+            fireproofWebsitesEntities = entities
         )
     }
 
-    fun onDeleteRequested(entity: PreserveCookiesEntity) {
+    fun onDeleteRequested(entity: FireproofWebsiteEntity) {
         command.value = ConfirmDeletePreservedWebsite(entity)
     }
 
-    fun delete(entity: PreserveCookiesEntity) {
+    fun delete(entity: FireproofWebsiteEntity) {
         viewModelScope.launch {
             withContext(dispatcherProvider.io()) {
                 dao.delete(entity)

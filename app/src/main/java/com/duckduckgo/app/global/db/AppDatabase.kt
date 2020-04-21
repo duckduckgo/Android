@@ -30,9 +30,9 @@ import com.duckduckgo.app.browser.rating.db.AppEnjoymentTypeConverter
 import com.duckduckgo.app.browser.rating.db.PromptCountConverter
 import com.duckduckgo.app.cta.db.DismissedCtaDao
 import com.duckduckgo.app.cta.model.DismissedCta
-import com.duckduckgo.app.fire.PRESERVE_COOKIES_TABLE_NAME
-import com.duckduckgo.app.fire.PreserveCookiesDao
-import com.duckduckgo.app.fire.PreserveCookiesEntity
+import com.duckduckgo.app.fire.FIREPROOF_WEBSITES_TABLE_NAME
+import com.duckduckgo.app.fire.FireproofWebsiteDao
+import com.duckduckgo.app.fire.FireproofWebsiteEntity
 import com.duckduckgo.app.global.exception.UncaughtExceptionDao
 import com.duckduckgo.app.global.exception.UncaughtExceptionEntity
 import com.duckduckgo.app.global.exception.UncaughtExceptionSourceConverter
@@ -83,7 +83,7 @@ import com.duckduckgo.app.usage.search.SearchCountEntity
         UncaughtExceptionEntity::class,
         TdsMetadata::class,
         UserStage::class,
-        PreserveCookiesEntity::class
+        FireproofWebsiteEntity::class
     ]
 )
 
@@ -119,7 +119,7 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun uncaughtExceptionDao(): UncaughtExceptionDao
     abstract fun tdsDao(): TdsMetadataDao
     abstract fun userStageDao(): UserStageDao
-    abstract fun preserveCookiesDao(): PreserveCookiesDao
+    abstract fun fireproofWebsiteDao(): FireproofWebsiteDao
 }
 
 @Suppress("PropertyName")
@@ -276,7 +276,7 @@ class MigrationsProvider(val context: Context) {
 
     val MIGRATION_18_TO_19: Migration = object : Migration(18, 19) {
         override fun migrate(database: SupportSQLiteDatabase) {
-            database.execSQL("CREATE TABLE IF NOT EXISTS $PRESERVE_COOKIES_TABLE_NAME (`domain` TEXT NOT NULL, `title` TEXT, `originalUrl` TEXT, PRIMARY KEY(`domain`))")
+            database.execSQL("CREATE TABLE IF NOT EXISTS $FIREPROOF_WEBSITES_TABLE_NAME (`domain` TEXT NOT NULL, `title` TEXT, `originalUrl` TEXT, PRIMARY KEY(`domain`))")
         }
     }
 

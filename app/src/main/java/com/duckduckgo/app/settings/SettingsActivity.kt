@@ -31,7 +31,7 @@ import androidx.lifecycle.Observer
 import com.duckduckgo.app.about.AboutDuckDuckGoActivity
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.feedback.ui.common.FeedbackActivity
-import com.duckduckgo.app.fire.preservewebsite.ui.PreserveWebsiteActivity
+import com.duckduckgo.app.fire.fireproofwebsite.ui.FireproofWebsitesActivity
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.sendThemeChangedBroadcast
 import com.duckduckgo.app.global.view.gone
@@ -53,15 +53,8 @@ import kotlinx.android.synthetic.main.content_settings_other.about
 import kotlinx.android.synthetic.main.content_settings_other.provideFeedback
 import kotlinx.android.synthetic.main.content_settings_other.version
 import kotlinx.android.synthetic.main.include_toolbar.toolbar
-import kotlinx.android.synthetic.main.content_settings_general.autocompleteToggle
-import kotlinx.android.synthetic.main.content_settings_general.lightThemeToggle
 import kotlinx.android.synthetic.main.content_settings_general.searchNotificationToggle
-import kotlinx.android.synthetic.main.content_settings_general.setAsDefaultBrowserSetting
-import kotlinx.android.synthetic.main.content_settings_other.about
-import kotlinx.android.synthetic.main.content_settings_other.provideFeedback
-import kotlinx.android.synthetic.main.content_settings_other.version
 import kotlinx.android.synthetic.main.content_settings_privacy.*
-import kotlinx.android.synthetic.main.include_toolbar.toolbar
 import javax.inject.Inject
 
 class SettingsActivity : DuckDuckGoActivity(), SettingsAutomaticallyClearWhatFragment.Listener, SettingsAutomaticallyClearWhenFragment.Listener {
@@ -200,7 +193,7 @@ class SettingsActivity : DuckDuckGoActivity(), SettingsAutomaticallyClearWhatFra
 
     private fun launchFireproofWebsites() {
         val options = ActivityOptions.makeSceneTransitionAnimation(this).toBundle()
-        startActivity(PreserveWebsiteActivity.intent(this), options)
+        startActivity(FireproofWebsitesActivity.intent(this), options)
     }
 
     private fun launchAppIconChange() {

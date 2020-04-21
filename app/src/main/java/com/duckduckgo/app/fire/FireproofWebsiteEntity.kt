@@ -16,21 +16,14 @@
 
 package com.duckduckgo.app.fire
 
-import androidx.lifecycle.LiveData
-import androidx.room.*
+import androidx.room.Entity
+import androidx.room.PrimaryKey
 
-@Dao
-interface PreserveCookiesDao {
+const val FIREPROOF_WEBSITES_TABLE_NAME = "fireproofWebsites"
 
-    @Query("select * from $PRESERVE_COOKIES_TABLE_NAME WHERE domain LIKE :domain limit 1")
-    fun findByDomain(domain: String): PreserveCookiesEntity?
-
-    @Query("select * from $PRESERVE_COOKIES_TABLE_NAME")
-    fun preserveCookiesEntities(): LiveData<List<PreserveCookiesEntity>>
-
-    @Insert(onConflict = OnConflictStrategy.IGNORE)
-    fun insert(preserveCookiesEntity: PreserveCookiesEntity): Long
-
-    @Delete
-    fun delete(preserveCookiesEntity: PreserveCookiesEntity): Int
-}
+@Entity(tableName = FIREPROOF_WEBSITES_TABLE_NAME)
+data class FireproofWebsiteEntity(
+    @PrimaryKey val domain: String,
+    var title: String?,
+    val originalUrl: String
+)

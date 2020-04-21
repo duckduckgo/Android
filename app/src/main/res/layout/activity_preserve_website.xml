@@ -21,7 +21,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context="com.duckduckgo.app.fire.preservewebsite.ui.PreserveWebsiteActivity">
+    tools:context="com.duckduckgo.app.fire.fireproofwebsite.ui.FireproofWebsitesActivity">
 
     <include layout="@layout/include_toolbar" />
 

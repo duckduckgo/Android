@@ -53,8 +53,8 @@ import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.browser.ui.HttpAuthenticationDialogFragment.HttpAuthenticationListener
 import com.duckduckgo.app.cta.ui.*
-import com.duckduckgo.app.fire.PreserveCookiesDao
-import com.duckduckgo.app.fire.PreserveCookiesEntity
+import com.duckduckgo.app.fire.FireproofWebsiteDao
+import com.duckduckgo.app.fire.FireproofWebsiteEntity
 import com.duckduckgo.app.global.*
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.global.model.SiteFactory
@@ -90,7 +90,7 @@ class BrowserTabViewModel(
     private val tabRepository: TabRepository,
     private val networkLeaderboardDao: NetworkLeaderboardDao,
     private val bookmarksDao: BookmarksDao,
-    private val preserveCookiesDao: PreserveCookiesDao,
+    private val fireproofWebsiteDao: FireproofWebsiteDao,
     private val autoComplete: AutoComplete,
     private val appSettingsPreferencesStore: SettingsDataStore,
     private val longPressHandler: LongPressHandler,
@@ -178,7 +178,7 @@ class BrowserTabViewModel(
         class ShowFullScreen(val view: View) : Command()
         class DownloadImage(val url: String, val requestUserConfirmation: Boolean) : Command()
         class ShowBookmarkAddedConfirmation(val bookmarkId: Long, val title: String?, val url: String?) : Command()
-        class ShowFireproofWebSiteConfirmation(val preserveCookiesEntity: PreserveCookiesEntity) : Command()
+        class ShowFireproofWebSiteConfirmation(val fireproofWebsiteEntity: FireproofWebsiteEntity) : Command()
         class ShareLink(val url: String) : Command()
         class CopyLink(val url: String) : Command()
         class FindInPageCommand(val searchTerm: String) : Command()
@@ -219,13 +219,13 @@ class BrowserTabViewModel(
         get() = site?.title
 
     private val autoCompletePublishSubject = PublishRelay.create<String>()
-    private val preserveCookiesState: LiveData<List<PreserveCookiesEntity>> = preserveCookiesDao.preserveCookiesEntities()
+    private val fireproofWebsiteState: LiveData<List<FireproofWebsiteEntity>> = fireproofWebsiteDao.fireproofWebsitesEntities()
     private var autoCompleteDisposable: Disposable? = null
     private var site: Site? = null
     private lateinit var tabId: String
     private var webNavigationState: WebNavigationState? = null
     private var httpsUpgraded = false
-    private val fireproofWebsitesObserver = Observer<List<PreserveCookiesEntity>> {
+    private val fireproofWebsitesObserver = Observer<List<FireproofWebsiteEntity>> {
         viewModelScope.launch {
             browserViewState.value = currentBrowserViewState().copy(canFireproofSite = canFireproofWebsite())
         }
@@ -234,7 +234,7 @@ class BrowserTabViewModel(
     init {
         initializeViewStates()
         configureAutoComplete()
-        preserveCookiesState.observeForever(fireproofWebsitesObserver)
+        fireproofWebsiteState.observeForever(fireproofWebsitesObserver)
     }
 
     fun loadData(tabId: String, initialUrl: String?, skipHome: Boolean) {
@@ -298,7 +298,7 @@ class BrowserTabViewModel(
         buildingSiteFactoryJob?.cancel()
         autoCompleteDisposable?.dispose()
         autoCompleteDisposable = null
-        preserveCookiesState.removeObserver(fireproofWebsitesObserver)
+        fireproofWebsiteState.removeObserver(fireproofWebsitesObserver)
         super.onCleared()
     }
 
@@ -708,20 +708,20 @@ class BrowserTabViewModel(
             val url = url ?: return@launch
             val title = title ?: ""
             val urlDomain = Uri.parse(url).host ?: return@launch
-            val preserveCookiesEntity = PreserveCookiesEntity(domain = urlDomain, title = title, originalUrl = url)
+            val fireproofWebsiteEntity = FireproofWebsiteEntity(domain = urlDomain, title = title, originalUrl = url)
             val id = withContext(dispatchers.io()) {
-                preserveCookiesDao.insert(preserveCookiesEntity)
+                fireproofWebsiteDao.insert(fireproofWebsiteEntity)
             }
             if (id >= 0) {
-                command.value = ShowFireproofWebSiteConfirmation(preserveCookiesEntity = preserveCookiesEntity)
+                command.value = ShowFireproofWebSiteConfirmation(fireproofWebsiteEntity = fireproofWebsiteEntity)
             }
         }
     }
 
-    fun onFireproofWebsiteSnackbarActionClicked(preserveCookiesEntity: PreserveCookiesEntity) {
+    fun onFireproofWebsiteSnackbarActionClicked(fireproofWebsiteEntity: FireproofWebsiteEntity) {
         viewModelScope.launch {
             withContext(dispatchers.io()) {
-                preserveCookiesDao.delete(preserveCookiesEntity)
+                fireproofWebsiteDao.delete(fireproofWebsiteEntity)
             }
         }
     }
@@ -1045,7 +1045,7 @@ class BrowserTabViewModel(
     private suspend fun canFireproofWebsite(): Boolean {
         return withContext(dispatchers.io()) {
             val domain = site?.uri?.host ?: return@withContext false
-            preserveCookiesDao.findByDomain(domain) == null
+            fireproofWebsiteDao.findByDomain(domain) == null
         }
     }
 

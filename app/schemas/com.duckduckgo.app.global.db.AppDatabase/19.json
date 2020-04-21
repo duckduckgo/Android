@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 19,
-    "identityHash": "d98fd6f08744ef16e945de76eaba9c43",
+    "identityHash": "867c9f01442685872406ae91181e083e",
     "entities": [
       {
         "tableName": "tds_tracker",
@@ -659,7 +659,7 @@
         "foreignKeys": []
       },
       {
-        "tableName": "preserveCookies",
+        "tableName": "fireproofWebsites",
         "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`domain` TEXT NOT NULL, `title` TEXT, `originalUrl` TEXT NOT NULL, PRIMARY KEY(`domain`))",
         "fields": [
           {
@@ -694,7 +694,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'd98fd6f08744ef16e945de76eaba9c43')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '867c9f01442685872406ae91181e083e')"
     ]
   }
 }
