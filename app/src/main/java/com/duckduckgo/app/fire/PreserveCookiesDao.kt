@@ -16,15 +16,17 @@
 
 package com.duckduckgo.app.fire
 
+import androidx.lifecycle.LiveData
 import androidx.room.*
-import com.duckduckgo.app.bookmarks.db.BookmarkEntity
-import io.reactivex.Single
 
 @Dao
 interface PreserveCookiesDao {
 
     @Query("select * from $PRESERVE_COOKIES_TABLE_NAME WHERE domain LIKE :domain limit 1")
     fun findByDomain(domain: String): PreserveCookiesEntity?
+
+    @Query("select * from $PRESERVE_COOKIES_TABLE_NAME")
+    fun preserveCookiesEntities(): LiveData<List<PreserveCookiesEntity>>
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     fun insert(preserveCookiesEntity: PreserveCookiesEntity): Long

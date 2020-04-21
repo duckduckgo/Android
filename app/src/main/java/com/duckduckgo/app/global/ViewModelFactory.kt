@@ -38,6 +38,7 @@ import com.duckduckgo.app.feedback.ui.negative.openended.ShareOpenEndedNegativeF
 import com.duckduckgo.app.feedback.ui.positive.initial.PositiveFeedbackLandingViewModel
 import com.duckduckgo.app.fire.DataClearer
 import com.duckduckgo.app.fire.PreserveCookiesDao
+import com.duckduckgo.app.fire.preservewebsite.ui.PreserveWebsiteViewModel
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.model.SiteFactory
 import com.duckduckgo.app.global.rating.AppEnjoymentPromptEmitter
@@ -145,6 +146,7 @@ class ViewModelFactory @Inject constructor(
                 isAssignableFrom(TrackerBlockingSelectionViewModel::class.java) -> TrackerBlockingSelectionViewModel(privacySettingsStore)
                 isAssignableFrom(DefaultBrowserPageViewModel::class.java) -> defaultBrowserPage()
                 isAssignableFrom(ChangeIconViewModel::class.java) -> changeAppIconViewModel()
+                isAssignableFrom(PreserveWebsiteViewModel::class.java) -> preserveWebsiteViewModel()
 
                 else -> throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")
             }
@@ -205,4 +207,7 @@ class ViewModelFactory @Inject constructor(
 
     private fun changeAppIconViewModel() =
         ChangeIconViewModel(settingsDataStore = appSettingsPreferencesStore, appIconModifier = appIconModifier, pixel = pixel)
+
+    private fun preserveWebsiteViewModel() =
+        PreserveWebsiteViewModel(dao = preserveCookiesDao, dispatcherProvider = dispatcherProvider)
 }

@@ -44,6 +44,7 @@
     <string name="notificationChannelSearch">Search</string>
 
     <!-- Fireproof websites -->
+    <string name="preserveWebsiteActivityTitle">Fireproof Websites</string>
     <string name="settingsFireproofWebsites">Fireproof Websites</string>
     <string name="fireproofWebsiteMenuTitle">Fireproof Website</string>
     <string name="fireproofWebsiteSnackbarConfirmation">‘website.com’ is now fireproof! Visit Settings to remove.</string>
