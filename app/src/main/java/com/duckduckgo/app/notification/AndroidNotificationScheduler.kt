@@ -58,10 +58,8 @@ class NotificationScheduler(
     private val articleNotification: SchedulableNotification,
     private val blogNotification: SchedulableNotification,
     private val appFeatureNotification: SchedulableNotification,
-    variantManager: VariantManager
+    private val variantManager: VariantManager
 ) : AndroidNotificationScheduler {
-
-    private val variant = variantManager.getVariant()
 
     override suspend fun scheduleNextNotification() {
         scheduleInactiveUserNotifications()
@@ -78,26 +76,34 @@ class NotificationScheduler(
         workManager.cancelAllWorkByTag(UNUSED_APP_WORK_REQUEST_TAG)
 
         when {
-            variant.hasFeature(Day1ArticleNotification) && articleNotification.canShow() -> {
+            variant().hasFeature(Day1ArticleNotification) && articleNotification.canShow() -> {
                 scheduleNotification(OneTimeWorkRequestBuilder<ArticleNotificationWorker>(), 1, TimeUnit.DAYS, UNUSED_APP_WORK_REQUEST_TAG)
             }
-            variant.hasFeature(Day1BlogNotification) && blogNotification.canShow() -> {
+            variant().hasFeature(Day1BlogNotification) && blogNotification.canShow() -> {
                 scheduleNotification(OneTimeWorkRequestBuilder<BlogNotificationWorker>(), 1, TimeUnit.DAYS, UNUSED_APP_WORK_REQUEST_TAG)
             }
-            variant.hasFeature(Day1AppFeatureNotification) && appFeatureNotification.canShow() -> {
+            variant().hasFeature(Day1AppFeatureNotification) && appFeatureNotification.canShow() -> {
                 scheduleNotification(OneTimeWorkRequestBuilder<AppFeatureNotificationWorker>(), 1, TimeUnit.DAYS, UNUSED_APP_WORK_REQUEST_TAG)
             }
-            (!isFromDripNotificationVariant() || variant.hasFeature(Day1PrivacyNotification)) && privacyNotification.canShow() -> {
+            (isNotDripVariant() || isDripVariantAndHasPrivacyFeature()) && privacyNotification.canShow() -> {
                 scheduleNotification(OneTimeWorkRequestBuilder<PrivacyNotificationWorker>(), 1, TimeUnit.DAYS, UNUSED_APP_WORK_REQUEST_TAG)
             }
-            (!isFromDripNotificationVariant() || variant.hasFeature(Day3ClearDataNotification)) && clearDataNotification.canShow() -> {
+            (isNotDripVariant() || isDripVariantAndHasClearDataFeature()) && clearDataNotification.canShow() -> {
                 scheduleNotification(OneTimeWorkRequestBuilder<ClearDataNotificationWorker>(), 3, TimeUnit.DAYS, UNUSED_APP_WORK_REQUEST_TAG)
             }
             else -> Timber.v("Notifications not enabled for this variant")
         }
     }
 
-    private fun isFromDripNotificationVariant(): Boolean = variant.hasFeature(DripNotification)
+    private fun variant() = variantManager.getVariant()
+
+    private fun isDripVariantAndHasPrivacyFeature(): Boolean = isFromDripNotificationVariant() && variant().hasFeature(Day1PrivacyNotification)
+
+    private fun isDripVariantAndHasClearDataFeature(): Boolean = isFromDripNotificationVariant() && variant().hasFeature(Day3ClearDataNotification)
+
+    private fun isFromDripNotificationVariant(): Boolean = variant().hasFeature(DripNotification)
+
+    private fun isNotDripVariant(): Boolean = !variant().hasFeature(DripNotification)
 
     override fun launchStickySearchNotification() {
         Timber.v("Posting sticky notification")
