@@ -81,7 +81,6 @@ import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
@@ -711,10 +710,11 @@ class BrowserTabViewModel(
     }
 
     fun onFireproofWebsiteClicked() {
-        val url = url ?: return
         viewModelScope.launch {
+            val url = url ?: return@launch
+            val title = title ?: ""
             val urlDomain = Uri.parse(url).host ?: return@launch
-            val preserveCookiesEntity = PreserveCookiesEntity(domain = urlDomain)
+            val preserveCookiesEntity = PreserveCookiesEntity(domain = urlDomain, title = title, originalUrl = url)
             val id = withContext(dispatchers.io()) {
                 preserveCookiesDao.insert(preserveCookiesEntity)
             }
