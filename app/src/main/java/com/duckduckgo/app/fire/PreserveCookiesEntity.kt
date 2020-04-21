@@ -23,5 +23,7 @@ const val PRESERVE_COOKIES_TABLE_NAME = "preserveCookies"
 
 @Entity(tableName = PRESERVE_COOKIES_TABLE_NAME)
 data class PreserveCookiesEntity(
-    @PrimaryKey val domain: String
+    @PrimaryKey val domain: String,
+    var title: String?,
+    val originalUrl: String
 )
