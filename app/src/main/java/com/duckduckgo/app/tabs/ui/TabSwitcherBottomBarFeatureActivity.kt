@@ -22,12 +22,9 @@ import android.graphics.Color
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
-import android.view.WindowManager
-import androidx.appcompat.widget.Toolbar
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.ItemTouchHelper
-import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.tabpreview.WebViewPreviewPersister
 import com.duckduckgo.app.global.DuckDuckGoActivity
@@ -40,10 +37,8 @@ import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.Close
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.DisplayMessage
-import kotlinx.android.synthetic.main.activity_tab_switcher_bottom_bar_experiment.tabsRecycler
+import kotlinx.android.synthetic.main.activity_tab_switcher_bottom_bar_feature.tabsRecycler
 import kotlinx.android.synthetic.main.fragment_browser_tab.bottomNavigationBar
-import kotlinx.android.synthetic.main.fragment_browser_tab.rootView
-import kotlinx.android.synthetic.main.include_omnibar_toolbar.browserMenu
 import kotlinx.android.synthetic.main.layout_tabs_bottom_navigation_bar.bottomBarFireItem
 import kotlinx.android.synthetic.main.layout_tabs_bottom_navigation_bar.bottomBarNewTabItem
 import kotlinx.android.synthetic.main.layout_tabs_bottom_navigation_bar.bottomBarOverflowItem
@@ -57,7 +52,7 @@ import org.jetbrains.anko.longToast
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 
-class TabSwitcherBottomBarExperimentActivity : DuckDuckGoActivity(), TabSwitcherListener, CoroutineScope {
+class TabSwitcherBottomBarFeatureActivity : DuckDuckGoActivity(), TabSwitcherListener, CoroutineScope {
 
     override val coroutineContext: CoroutineContext
         get() = SupervisorJob() + Dispatchers.Main
@@ -95,7 +90,7 @@ class TabSwitcherBottomBarExperimentActivity : DuckDuckGoActivity(), TabSwitcher
 
         window.statusBarColor = Color.TRANSPARENT
 
-        setContentView(R.layout.activity_tab_switcher_bottom_bar_experiment)
+        setContentView(R.layout.activity_tab_switcher_bottom_bar_feature)
         extractIntentExtras()
         configureRecycler()
         configureObservers()
@@ -239,7 +234,7 @@ class TabSwitcherBottomBarExperimentActivity : DuckDuckGoActivity(), TabSwitcher
 
     companion object {
         fun intent(context: Context, selectedTabId: String? = null): Intent {
-            val intent = Intent(context, TabSwitcherBottomBarExperimentActivity::class.java)
+            val intent = Intent(context, TabSwitcherBottomBarFeatureActivity::class.java)
             intent.putExtra(EXTRA_KEY_SELECTED_TAB, selectedTabId)
             return intent
         }

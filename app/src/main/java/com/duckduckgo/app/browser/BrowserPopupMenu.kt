@@ -62,18 +62,18 @@ class BrowserPopupMenu(layoutInflater: LayoutInflater, variant: Variant, view: V
         private const val margin = 30
 
         fun inflate(layoutInflater: LayoutInflater, variant: Variant): View {
-            return if (variant.hasFeature(VariantManager.VariantFeature.BottomBarNavigationExperiment)) {
-                inflateBottomBarWithSearchExperiment(layoutInflater)
+            return if (variant.hasFeature(VariantManager.VariantFeature.BottomBarNavigation)) {
+                inflateBottomBarWithSearchFeature(layoutInflater)
             } else {
-                inflateToolbarOnlyExperiment(layoutInflater)
+                inflateToolbarOnly(layoutInflater)
             }
         }
 
-        private fun inflateToolbarOnlyExperiment(layoutInflater: LayoutInflater): View {
+        private fun inflateToolbarOnly(layoutInflater: LayoutInflater): View {
             return layoutInflater.inflate(R.layout.popup_window_browser_menu, null)
         }
 
-        private fun inflateBottomBarWithSearchExperiment(layoutInflater: LayoutInflater): View {
+        private fun inflateBottomBarWithSearchFeature(layoutInflater: LayoutInflater): View {
             return layoutInflater.inflate(R.layout.popup_window_browser_bottom_tab_menu, null)
         }
     }

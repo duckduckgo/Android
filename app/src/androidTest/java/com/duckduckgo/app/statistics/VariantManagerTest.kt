@@ -19,7 +19,6 @@ package com.duckduckgo.app.statistics
 import com.duckduckgo.app.statistics.VariantManager.Companion.DEFAULT_VARIANT
 import com.duckduckgo.app.statistics.VariantManager.VariantFeature.*
 import org.junit.Assert.*
-import org.junit.Ignore
 import org.junit.Test
 
 class VariantManagerTest {
@@ -75,7 +74,7 @@ class VariantManagerTest {
         val variant = variants.first { it.key == "mm" }
         assertEqualsDouble(1.0, variant.weight)
         assertEquals(1, variant.features.size)
-        assertTrue(variant.hasFeature(BottomBarNavigationExperiment))
+        assertTrue(variant.hasFeature(BottomBarNavigation))
     }
 
     @Test

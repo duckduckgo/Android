@@ -127,7 +127,7 @@ import com.duckduckgo.app.survey.model.Survey
 import com.duckduckgo.app.survey.ui.SurveyActivity
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.ui.TabSwitcherActivity
-import com.duckduckgo.app.tabs.ui.TabSwitcherBottomBarExperimentActivity
+import com.duckduckgo.app.tabs.ui.TabSwitcherBottomBarFeatureActivity
 import com.duckduckgo.app.widget.ui.AddWidgetInstructionsActivity
 import com.duckduckgo.widget.SearchWidgetLight
 import com.google.android.material.snackbar.Snackbar
@@ -260,7 +260,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
 
     private lateinit var renderer: BrowserTabFragmentRenderer
 
-    private lateinit var decorator: BrowserTabFragmentExperimentDecorator
+    private lateinit var decorator: BrowserTabFragmentDecorator
 
     private val viewModel: BrowserTabViewModel by lazy {
         val viewModel = ViewModelProvider(this, viewModelFactory).get(BrowserTabViewModel::class.java)
@@ -319,7 +319,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
         super.onCreate(savedInstanceState)
         removeDaxDialogFromActivity()
         renderer = BrowserTabFragmentRenderer()
-        decorator = BrowserTabFragmentExperimentDecorator()
+        decorator = BrowserTabFragmentDecorator()
         if (savedInstanceState != null) {
             updateFragmentListener()
         }
@@ -347,7 +347,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
         configureKeyboardAwareLogoAnimation()
         configureAppBar()
 
-        decorateWithExperiments()
+        decorateWithFeatures()
 
         if (savedInstanceState == null) {
             viewModel.onViewReady()
@@ -396,8 +396,8 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
 
     private fun launchTabSwitcher() {
         val activity = activity ?: return
-        if (isBottomNavigationExperimentEnabled()) {
-            startActivity(TabSwitcherBottomBarExperimentActivity.intent(activity, tabId))
+        if (isBottomNavigationFeatureEnabled()) {
+            startActivity(TabSwitcherBottomBarFeatureActivity.intent(activity, tabId))
         } else {
             startActivity(TabSwitcherActivity.intent(activity, tabId))
         }
@@ -764,14 +764,14 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
         autoCompleteSuggestionsList.adapter = autoCompleteSuggestionsAdapter
     }
 
-    private fun isBottomNavigationExperimentEnabled() =
-        variantManager.getVariant().hasFeature(VariantManager.VariantFeature.BottomBarNavigationExperiment)
+    private fun isBottomNavigationFeatureEnabled() =
+        variantManager.getVariant().hasFeature(VariantManager.VariantFeature.BottomBarNavigation)
 
-    private fun decorateWithExperiments() {
-        if (isBottomNavigationExperimentEnabled()) {
-            decorator.decorateWithBottomBarSearchExperiment()
+    private fun decorateWithFeatures() {
+        if (isBottomNavigationFeatureEnabled()) {
+            decorator.decorateWithBottomBarSearch()
         } else {
-            decorator.decorateWithToolbarOnlyExperiment()
+            decorator.decorateWithToolbar()
         }
     }
 
@@ -1285,9 +1285,9 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
         }
     }
 
-    inner class BrowserTabFragmentExperimentDecorator {
+    inner class BrowserTabFragmentDecorator {
         fun decorateToolbar(viewState: BrowserViewState) {
-            if (variantManager.getVariant().hasFeature(VariantManager.VariantFeature.BottomBarNavigationExperiment)) {
+            if (variantManager.getVariant().hasFeature(VariantManager.VariantFeature.BottomBarNavigation)) {
                 decorator.hideToolbarMenu()
             } else {
                 decorator.decorateToolbarActions(viewState)
@@ -1304,23 +1304,23 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
             menuButton?.gone()
         }
 
-        fun decorateWithToolbarOnlyExperiment() {
+        fun decorateWithToolbar() {
             hideBottomBar()
-            decorateAppBarWithToolbarOnlyExperiment()
-            createPopupMenuWithToolbarOnlyExperiment()
-            configureShowTabSwitcherListenerWithToolbarOnlyExperiment()
-            configureLongClickOpensNewTabListenerWithToolbarOnlyExperiment()
+            decorateAppBarWithToolbarOnly()
+            createPopupMenuWithToolbarOnly()
+            configureShowTabSwitcherListenerWithToolbarOnly()
+            configureLongClickOpensNewTabListenerWithToolbarOnly()
         }
 
-        fun decorateWithBottomBarSearchExperiment() {
-            decorateBottomBarWithNavigationOnlyExperiment()
-            decorateAppBarWithBottomBarExperiment()
-            createPopupMenuWithBottomBarExperiment()
-            configureShowTabSwitcherListenerWithBottomBarNavigationOnlyExperiment()
-            configureLongClickOpensNewTabListenerWithBottomBarNavigationOnlyExperiment()
+        fun decorateWithBottomBarSearch() {
+            decorateBottomBarWithNavigationOnly()
+            decorateAppBarWithBottomBar()
+            createPopupMenuWithBottomBar()
+            configureShowTabSwitcherListenerWithBottomBarNavigationOnly()
+            configureLongClickOpensNewTabListenerWithBottomBarNavigationOnly()
         }
 
-        private fun decorateAppBarWithToolbarOnlyExperiment() {
+        private fun decorateAppBarWithToolbarOnly() {
             toolbar.inflateMenu(R.menu.menu_browser_activity)
             toolbar.setOnMenuItemClickListener { menuItem ->
                 when (menuItem.itemId) {
@@ -1334,11 +1334,11 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
             }
         }
 
-        private fun decorateAppBarWithBottomBarExperiment() {
+        private fun decorateAppBarWithBottomBar() {
             menuButton?.gone()
         }
 
-        private fun createPopupMenuWithToolbarOnlyExperiment() {
+        private fun createPopupMenuWithToolbarOnly() {
             popupMenu = BrowserPopupMenu(layoutInflater, variantManager.getVariant())
             val view = popupMenu.contentView
             popupMenu.apply {
@@ -1375,7 +1375,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
             pixel.fire(String.format(Locale.US, Pixel.PixelName.MENU_ACTION_POPUP_OPENED.pixelName, variantManager.getVariant()))
         }
 
-        private fun createPopupMenuWithBottomBarExperiment() {
+        private fun createPopupMenuWithBottomBar() {
             popupMenu = BrowserPopupMenu(layoutInflater, variantManager.getVariant())
             val view = popupMenu.contentView
             popupMenu.apply {
@@ -1401,7 +1401,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
             pixel.fire(String.format(Locale.US, Pixel.PixelName.MENU_ACTION_POPUP_OPENED.pixelName, variantManager.getVariant()))
         }
 
-        private fun decorateBottomBarWithNavigationOnlyExperiment() {
+        private fun decorateBottomBarWithNavigationOnly() {
             bindBottomBarButtons()
         }
 
@@ -1430,7 +1430,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
         }
 
         fun updateBottomBarVisibility(shouldShow: Boolean, shouldAnimate: Boolean = false) {
-            if (isBottomNavigationExperimentEnabled()) {
+            if (isBottomNavigationFeatureEnabled()) {
                 if (shouldShow) {
                     showBottomBar(shouldAnimate)
                 } else {
@@ -1457,26 +1457,26 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
             }
         }
 
-        private fun configureShowTabSwitcherListenerWithToolbarOnlyExperiment() {
+        private fun configureShowTabSwitcherListenerWithToolbarOnly() {
             tabsButton?.actionView?.setOnClickListener {
                 launch { viewModel.userLaunchingTabSwitcher() }
             }
         }
 
-        private fun configureShowTabSwitcherListenerWithBottomBarNavigationOnlyExperiment() {
+        private fun configureShowTabSwitcherListenerWithBottomBarNavigationOnly() {
             bottomBarTabsItem.setOnClickListener {
                 launch { viewModel.userLaunchingTabSwitcher() }
             }
         }
 
-        private fun configureLongClickOpensNewTabListenerWithToolbarOnlyExperiment() {
+        private fun configureLongClickOpensNewTabListenerWithToolbarOnly() {
             tabsButton?.actionView?.setOnLongClickListener {
                 launch { viewModel.userRequestedOpeningNewTab() }
                 return@setOnLongClickListener true
             }
         }
 
-        private fun configureLongClickOpensNewTabListenerWithBottomBarNavigationOnlyExperiment() {
+        private fun configureLongClickOpensNewTabListenerWithBottomBarNavigationOnly() {
             bottomBarTabsItem.setOnLongClickListener {
                 launch { viewModel.userRequestedOpeningNewTab() }
                 return@setOnLongClickListener true
@@ -1812,7 +1812,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
                 viewModel.onUserDismissedCta()
             }
 
-            if (isBottomNavigationExperimentEnabled()) {
+            if (isBottomNavigationFeatureEnabled()) {
                 lastSeenOmnibarViewState?.let {
                     if (it.isEditing) {
                         ctaContainer.setPadding(0, 0, 0, 0)
