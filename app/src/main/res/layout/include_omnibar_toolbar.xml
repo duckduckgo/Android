@@ -43,92 +43,130 @@
                 app:contentInsetEnd="0dp"
                 app:contentInsetStart="0dp"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@id/browserMenu"
+                app:layout_constraintEnd_toStartOf="@id/fireIconMenu"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 app:popupTheme="@style/AppTheme.Dark.PopupOverlay">
 
-                <androidx.constraintlayout.widget.ConstraintLayout
-                    android:id="@+id/omniBarContainer"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_margin="8dp"
-                    android:background="@drawable/omnibar_field_background"
-                    android:paddingStart="6dp"
-                    android:paddingEnd="6dp">
-
                     <androidx.constraintlayout.widget.ConstraintLayout
-                        android:id="@+id/networksContainer"
+                        android:id="@+id/omniBarContainer"
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toStartOf="parent" />
+                        android:layout_margin="8dp"
+                        android:background="@drawable/omnibar_field_background"
+                        android:paddingStart="6dp"
+                        android:paddingEnd="6dp">
 
-                    <ImageButton
-                        android:id="@+id/privacyGradeButton"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:background="?attr/selectableItemBackgroundBorderless"
-                        android:contentDescription="@string/privacyGradeContentDescription"
-                        android:padding="4dp"
-                        android:src="@drawable/privacygrade_icon_a"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent" />
+                        <androidx.constraintlayout.widget.ConstraintLayout
+                            android:id="@+id/networksContainer"
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toStartOf="parent" />
 
-                    <ImageView
-                        android:id="@+id/searchIcon"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:contentDescription="@string/privacyGradeContentDescription"
-                        android:padding="4dp"
-                        android:src="@drawable/ic_loupe_24dp"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent" />
+                        <ImageButton
+                            android:id="@+id/privacyGradeButton"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:background="?attr/selectableItemBackgroundBorderless"
+                            android:contentDescription="@string/privacyGradeContentDescription"
+                            android:padding="4dp"
+                            android:src="@drawable/privacygrade_icon_a"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
 
-                    <com.duckduckgo.app.browser.omnibar.KeyboardAwareEditText
-                        android:id="@+id/omnibarTextInput"
-                        style="@style/Base.V7.Widget.AppCompat.EditText"
-                        android:layout_width="0dp"
-                        android:layout_height="0dp"
-                        android:paddingStart="5dp"
-                        android:paddingEnd="8dp"
-                        android:background="@null"
-                        android:fontFamily="sans-serif"
-                        android:hint="@string/omnibarInputHint"
-                        android:imeOptions="flagNoExtractUi|actionGo|flagNoPersonalizedLearning"
-                        android:inputType="textUri|textNoSuggestions"
-                        android:maxLines="1"
-                        android:selectAllOnFocus="true"
-                        android:textColor="?attr/omnibarTextColor"
-                        android:textColorHint="?attr/omnibarHintColor"
-                        android:textCursorDrawable="@drawable/text_cursor"
-                        android:textSize="16sp"
-                        android:textStyle="normal"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintEnd_toStartOf="@id/clearTextButton"
-                        app:layout_constraintStart_toEndOf="@id/privacyGradeButton"
-                        app:layout_constraintTop_toTopOf="parent"
-                        tools:text="https://duckduckgo.com/?q=areallylongexampleexample" />
+                        <ImageView
+                            android:id="@+id/searchIcon"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:contentDescription="@string/privacyGradeContentDescription"
+                            android:padding="4dp"
+                            android:src="@drawable/ic_loupe_24dp"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
 
-                    <ImageView
-                        android:id="@+id/clearTextButton"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:background="?selectableItemBackground"
-                        android:contentDescription="@string/clearButtonContentDescription"
-                        android:padding="3dp"
-                        android:src="@drawable/ic_close"
-                        android:visibility="gone"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintTop_toTopOf="parent"
-                        tools:visibility="visible" />
+                        <com.duckduckgo.app.browser.omnibar.KeyboardAwareEditText
+                            android:id="@+id/omnibarTextInput"
+                            style="@style/Base.V7.Widget.AppCompat.EditText"
+                            android:layout_width="0dp"
+                            android:layout_height="0dp"
+                            android:background="@null"
+                            android:fontFamily="sans-serif"
+                            android:hint="@string/omnibarInputHint"
+                            android:imeOptions="flagNoExtractUi|actionGo|flagNoPersonalizedLearning"
+                            android:inputType="textUri|textNoSuggestions"
+                            android:maxLines="1"
+                            android:paddingStart="5dp"
+                            android:paddingEnd="8dp"
+                            android:selectAllOnFocus="true"
+                            android:textColor="?attr/omnibarTextColor"
+                            android:textColorHint="?attr/omnibarHintColor"
+                            android:textCursorDrawable="@drawable/text_cursor"
+                            android:textSize="16sp"
+                            android:textStyle="normal"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toStartOf="@id/clearTextButton"
+                            app:layout_constraintStart_toEndOf="@id/privacyGradeButton"
+                            app:layout_constraintTop_toTopOf="parent"
+                            tools:text="https://duckduckgo.com/?q=areallylongexampleexample" />
 
-                </androidx.constraintlayout.widget.ConstraintLayout>
+                        <ImageView
+                            android:id="@+id/clearTextButton"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:background="?selectableItemBackground"
+                            android:contentDescription="@string/clearButtonContentDescription"
+                            android:padding="3dp"
+                            android:src="@drawable/ic_close"
+                            android:visibility="gone"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintTop_toTopOf="parent"
+                            tools:visibility="visible" />
+
+                    </androidx.constraintlayout.widget.ConstraintLayout>
 
             </androidx.appcompat.widget.Toolbar>
+
+            <FrameLayout
+                android:id="@+id/fireIconMenu"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_marginStart="2dp"
+                android:paddingStart="4dp"
+                android:paddingEnd="4dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/tabsMenu"
+                app:layout_constraintStart_toEndOf="@id/toolbar"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:visibility="visible">
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:contentDescription="@string/browserPopupMenu"
+                    android:padding="3dp"
+                    android:src="@drawable/ic_fire_24dp" />
+
+            </FrameLayout>
+
+            <com.duckduckgo.app.browser.TabSwitcherButton
+                android:id="@+id/tabsMenu"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="8dp"
+                android:background="?selectableItemBackgroundBorderless"
+                android:paddingTop="6dp"
+                android:paddingBottom="6dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/browserMenu"
+                app:layout_constraintStart_toEndOf="@id/fireIconMenu"
+                app:layout_constraintTop_toTopOf="parent" />
 
             <FrameLayout
                 android:id="@+id/browserMenu"
@@ -139,7 +177,7 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                tools:visibility="gone">
+                tools:visibility="visible">
 
                 <ImageView
                     android:layout_width="wrap_content"

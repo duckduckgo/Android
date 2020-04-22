@@ -139,6 +139,7 @@ import kotlinx.android.synthetic.main.fragment_browser_tab.focusDummy
 import kotlinx.android.synthetic.main.fragment_browser_tab.rootView
 import kotlinx.android.synthetic.main.fragment_browser_tab.webViewContainer
 import kotlinx.android.synthetic.main.fragment_browser_tab.webViewFullScreenContainer
+import kotlinx.android.synthetic.main.include_add_widget_instruction_buttons.view.closeButton
 import kotlinx.android.synthetic.main.include_cta_buttons.view.ctaDismissButton
 import kotlinx.android.synthetic.main.include_cta_buttons.view.ctaOkButton
 import kotlinx.android.synthetic.main.include_dax_dialog_cta.daxCtaContainer
@@ -155,8 +156,9 @@ import kotlinx.android.synthetic.main.include_new_browser_tab.ddgLogo
 import kotlinx.android.synthetic.main.include_new_browser_tab.newTabLayout
 import kotlinx.android.synthetic.main.include_omnibar_toolbar.*
 import kotlinx.android.synthetic.main.include_omnibar_toolbar.view.browserMenu
+import kotlinx.android.synthetic.main.include_omnibar_toolbar.view.fireIconMenu
 import kotlinx.android.synthetic.main.include_omnibar_toolbar.view.privacyGradeButton
-import kotlinx.android.synthetic.main.include_top_cta.view.closeButton
+import kotlinx.android.synthetic.main.include_omnibar_toolbar.view.tabsMenu
 import kotlinx.android.synthetic.main.layout_browser_bottom_navigation_bar.bottomBarBookmarksItemOne
 import kotlinx.android.synthetic.main.layout_browser_bottom_navigation_bar.bottomBarFireItem
 import kotlinx.android.synthetic.main.layout_browser_bottom_navigation_bar.bottomBarOverflowItem
@@ -278,11 +280,11 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
     private val browserActivity
         get() = activity as? BrowserActivity
 
-    private val tabsButton: MenuItem?
-        get() = toolbar.menu.findItem(R.id.tabs)
+    private val tabsButton: TabSwitcherButton?
+        get() = appBarLayout.tabsMenu
 
-    private val fireMenuButton: MenuItem?
-        get() = toolbar.menu.findItem(R.id.fire)
+    private val fireMenuButton: ViewGroup?
+        get() = appBarLayout.fireIconMenu
 
     private val menuButton: ViewGroup?
         get() = appBarLayout.browserMenu
@@ -476,7 +478,9 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
 
     private fun addTabsObserver() {
         viewModel.tabs.observe(viewLifecycleOwner, Observer<List<TabEntity>> {
-            it?.let { renderer.renderTabIcon(it) }
+            it?.let {
+                decorator.renderTabIcon(it)
+            }
         })
     }
 
@@ -651,8 +655,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
     private fun openInNewBackgroundTab() {
         appBarLayout.setExpanded(true, true)
         viewModel.tabs.removeObservers(this)
-        val view = tabsButton?.actionView as TabSwitcherButton
-        view.increment {
+        tabsButton?.increment {
             addTabsObserver()
         }
         bottomBarTabsItem.increment {
@@ -1321,17 +1324,13 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
         }
 
         private fun decorateAppBarWithToolbarOnly() {
-            toolbar.inflateMenu(R.menu.menu_browser_activity)
-            toolbar.setOnMenuItemClickListener { menuItem ->
-                when (menuItem.itemId) {
-                    R.id.fire -> {
-                        browserActivity?.launchFire()
-                        pixel.fire(String.format(Locale.US, Pixel.PixelName.MENU_ACTION_FIRE_PRESSED.pixelName, variantManager.getVariant().key))
-                        return@setOnMenuItemClickListener true
-                    }
-                    else -> return@setOnMenuItemClickListener false
-                }
+            fireMenuButton?.show()
+            fireMenuButton?.setOnClickListener {
+                browserActivity?.launchFire()
+                pixel.fire(String.format(Locale.US, Pixel.PixelName.MENU_ACTION_FIRE_PRESSED.pixelName, variantManager.getVariant().key))
             }
+
+            tabsButton?.show()
         }
 
         private fun decorateAppBarWithBottomBar() {
@@ -1458,7 +1457,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
         }
 
         private fun configureShowTabSwitcherListenerWithToolbarOnly() {
-            tabsButton?.actionView?.setOnClickListener {
+            tabsButton?.setOnClickListener {
                 launch { viewModel.userLaunchingTabSwitcher() }
             }
         }
@@ -1470,7 +1469,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
         }
 
         private fun configureLongClickOpensNewTabListenerWithToolbarOnly() {
-            tabsButton?.actionView?.setOnLongClickListener {
+            tabsButton?.setOnLongClickListener {
                 launch { viewModel.userRequestedOpeningNewTab() }
                 return@setOnLongClickListener true
             }
@@ -1484,9 +1483,18 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
         }
 
         fun animateTabsCount() {
-            val tabsButton = tabsButton?.actionView as TabSwitcherButton
-            tabsButton.animateCount()
+            tabsButton?.animateCount()
             bottomBarTabsItem.animateCount()
+        }
+
+        fun renderTabIcon(tabs: List<TabEntity>) {
+            context?.let {
+                tabsButton?.count = tabs.count()
+                tabsButton?.hasUnread = tabs.firstOrNull { !it.viewed } != null
+
+                bottomBarTabsItem.count = tabs.count()
+                bottomBarTabsItem.hasUnread = tabs.firstOrNull { !it.viewed } != null
+            }
         }
     }
 
@@ -1694,13 +1702,6 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
             }
 
             popupMenu.contentView.findInPageMenuItem?.isEnabled = viewState.canFindInPage
-        }
-
-        fun renderTabIcon(tabs: List<TabEntity>) {
-            context?.let {
-                bottomBarTabsItem.count = tabs.count()
-                bottomBarTabsItem.hasUnread = tabs.firstOrNull { !it.viewed } != null
-            }
         }
 
         fun renderCtaViewState(viewState: CtaViewState) {
