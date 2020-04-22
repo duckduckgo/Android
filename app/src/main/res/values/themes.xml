@@ -192,6 +192,15 @@
         <item name="android:colorForeground">?attr/settingsSwitchBackgroundColor</item>
     </style>
 
+    <style name="TextInputLayoutTheme" parent="Widget.Design.TextInputLayout">
+        <item name="colorControlActivated">@color/cornflowerBlue</item>
+        <item name="colorControlNormal">@color/cornflowerBlue</item>
+        <item name="colorControlHighlight">@color/cornflowerBlue</item>
+        <item name="android:textColor">@color/grayish</item>
+        <item name="android:textColorSecondary">@color/grayish</item>
+        <item name="android:textColorHint">@color/grayish</item>
+    </style>
+
     <style name="AutoCompleteTextViewStyle" parent="Widget.AppCompat.AutoCompleteTextView">
         <item name="android:textCursorDrawable">@drawable/text_cursor</item>
         <item name="android:textColorHint">?attr/omnibarHintColor</item>
