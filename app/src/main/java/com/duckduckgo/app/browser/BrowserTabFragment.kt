@@ -1485,7 +1485,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
 
         fun animateTabsCount() {
             val tabsButton = tabsButton?.actionView as TabSwitcherButton
-            tabsButton?.animateCount()
+            tabsButton.animateCount()
             bottomBarTabsItem.animateCount()
         }
     }
