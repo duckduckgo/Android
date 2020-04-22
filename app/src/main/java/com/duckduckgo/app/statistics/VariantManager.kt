@@ -44,18 +44,18 @@ interface VariantManager {
         val ACTIVE_VARIANTS = listOf(
             // SERP variants. "sc" may also be used as a shared control for mobile experiments in
             // the future if we can filter by app version
-            Variant(key = "sc", weight = 0.0, features = emptyList(), filterBy = { noFilter() }),
-            Variant(key = "se", weight = 0.0, features = emptyList(), filterBy = { noFilter() }),
+            Variant(key = "sc", weight = 1.0, features = emptyList(), filterBy = { noFilter() }),
+            Variant(key = "se", weight = 1.0, features = emptyList(), filterBy = { noFilter() }),
 
             // Quick Search Notification Experiment
             Variant(
                 key = "mf",
-                weight = 0.0,
+                weight = 1.0,
                 features = emptyList(),
                 filterBy = { isEnglishLocale() }),
             Variant(
                 key = "mg",
-                weight = 0.0,
+                weight = 1.0,
                 features = listOf(StickySearchNotification),
                 filterBy = { isEnglishLocale() }),
 
@@ -67,7 +67,7 @@ interface VariantManager {
                 filterBy = { noFilter() }),
             Variant(
                 key = "mn",
-                weight = 0.0,
+                weight = 1.0,
                 features = listOf(BottomBarNavigation),
                 filterBy = { noFilter() })
 
