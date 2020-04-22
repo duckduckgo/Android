@@ -28,9 +28,7 @@ import java.util.Locale
 interface VariantManager {
 
     // variant-dependant features listed here
-    sealed class VariantFeature {
-        object StickySearchNotification : VariantFeature()
-    }
+    sealed class VariantFeature
 
     companion object {
 
@@ -43,19 +41,7 @@ interface VariantManager {
             // SERP variants. "sc" may also be used as a shared control for mobile experiments in
             // the future if we can filter by app version
             Variant(key = "sc", weight = 1.0, features = emptyList(), filterBy = { noFilter() }),
-            Variant(key = "se", weight = 1.0, features = emptyList(), filterBy = { noFilter() }),
-
-            // Quick Search Notification Experiment
-            Variant(
-                key = "mf",
-                weight = 1.0,
-                features = emptyList(),
-                filterBy = { isEnglishLocale() }),
-            Variant(
-                key = "mg",
-                weight = 1.0,
-                features = listOf(StickySearchNotification),
-                filterBy = { isEnglishLocale() })
+            Variant(key = "se", weight = 1.0, features = emptyList(), filterBy = { noFilter() })
 
             // All groups in an experiment (control and variants) MUST use the same filters
         )

@@ -48,8 +48,6 @@ class SettingsViewModel @Inject constructor(
         val version: String = "",
         val lightThemeEnabled: Boolean = false,
         val autoCompleteSuggestionsEnabled: Boolean = true,
-        val showSearchNotificationToggle: Boolean = false,
-        val searchNotificationEnabled: Boolean = false,
         val showDefaultBrowserSetting: Boolean = false,
         val isAppDefaultBrowser: Boolean = false,
         val automaticallyClearData: AutomaticallyClearData = AutomaticallyClearData(ClearWhatOption.CLEAR_NONE, ClearWhenOption.APP_EXIT_ONLY),
@@ -91,8 +89,6 @@ class SettingsViewModel @Inject constructor(
             loading = false,
             lightThemeEnabled = isLightTheme,
             autoCompleteSuggestionsEnabled = settingsDataStore.autoCompleteSuggestionsEnabled,
-            showSearchNotificationToggle = isSearchNotificationFeatureEnabled(variant),
-            searchNotificationEnabled = settingsDataStore.searchNotificationEnabled,
             isAppDefaultBrowser = defaultBrowserAlready,
             showDefaultBrowserSetting = defaultWebBrowserCapability.deviceSupportsDefaultBrowserConfiguration(),
             version = obtainVersion(variant.key),
@@ -123,20 +119,6 @@ class SettingsViewModel @Inject constructor(
         Timber.i("User changed autocomplete setting, is now enabled: $enabled")
         settingsDataStore.autoCompleteSuggestionsEnabled = enabled
         viewState.value = currentViewState().copy(autoCompleteSuggestionsEnabled = enabled)
-    }
-
-    fun onSearchNotificationSettingChanged(enabled: Boolean) {
-        Timber.i("User changed search notification setting, is now enabled: $enabled")
-        settingsDataStore.searchNotificationEnabled = enabled
-        if (enabled){
-            notificationScheduler.launchStickySearchNotification()
-            pixel.fire(QUICK_SEARCH_NOTIFICATION_ENABLED)
-
-        } else {
-            notificationScheduler.dismissStickySearchNotification()
-            pixel.fire(QUICK_SEARCH_NOTIFICATION_DISABLED)
-        }
-        viewState.value = currentViewState().copy(searchNotificationEnabled = enabled)
     }
 
     private fun obtainVersion(variantKey: String): String {
@@ -207,10 +189,6 @@ class SettingsViewModel @Inject constructor(
             ClearWhenOption.APP_EXIT_OR_60_MINS -> AUTOMATIC_CLEAR_DATA_WHEN_OPTION_APP_EXIT_OR_60_MINS
             else -> null
         }
-    }
-
-    private fun isSearchNotificationFeatureEnabled(variant: Variant): Boolean {
-        return variant.hasFeature(VariantManager.VariantFeature.StickySearchNotification)
     }
 
 }

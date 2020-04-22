@@ -230,32 +230,5 @@ class SettingsViewModelTest {
         assertEquals(Command.LaunchAppIcon, commandCaptor.firstValue)
     }
 
-    @Test
-    fun whenSearchNotificationWasPreviouslyEnabledThenViewStateIndicatesIt() {
-        whenever(mockAppSettingsDataStore.searchNotificationEnabled).thenReturn(true)
-        testee.start()
-        assertTrue(latestViewState().searchNotificationEnabled)
-    }
-
-    @Test
-    fun whenSearchNotificationToggledOnThenDataStoreIsUpdatedAndNotificationShown() {
-        testee.onSearchNotificationSettingChanged(true)
-        verify(mockAppSettingsDataStore).searchNotificationEnabled = true
-        verify(notificationScheduler).launchStickySearchNotification()
-        verify(mockPixel).fire(Pixel.PixelName.QUICK_SEARCH_NOTIFICATION_ENABLED)
-
-        assertTrue(latestViewState().searchNotificationEnabled)
-    }
-
-    @Test
-    fun whenSearchNotificationToggledOffThenDataStoreIsUpdatedAndNotificationRemoved() {
-        testee.onSearchNotificationSettingChanged(false)
-        verify(mockAppSettingsDataStore).searchNotificationEnabled = false
-        verify(notificationScheduler).dismissStickySearchNotification()
-        verify(mockPixel).fire(Pixel.PixelName.QUICK_SEARCH_NOTIFICATION_DISABLED)
-
-        assertFalse(latestViewState().searchNotificationEnabled)
-    }
-
     private fun latestViewState() = testee.viewState.value!!
 }

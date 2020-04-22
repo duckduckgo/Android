@@ -54,16 +54,6 @@ import kotlinx.android.synthetic.main.content_settings_other.version
 import kotlinx.android.synthetic.main.content_settings_privacy.automaticallyClearWhatSetting
 import kotlinx.android.synthetic.main.content_settings_privacy.automaticallyClearWhenSetting
 import kotlinx.android.synthetic.main.include_toolbar.toolbar
-import kotlinx.android.synthetic.main.content_settings_general.autocompleteToggle
-import kotlinx.android.synthetic.main.content_settings_general.lightThemeToggle
-import kotlinx.android.synthetic.main.content_settings_general.searchNotificationToggle
-import kotlinx.android.synthetic.main.content_settings_general.setAsDefaultBrowserSetting
-import kotlinx.android.synthetic.main.content_settings_other.about
-import kotlinx.android.synthetic.main.content_settings_other.provideFeedback
-import kotlinx.android.synthetic.main.content_settings_other.version
-import kotlinx.android.synthetic.main.content_settings_privacy.automaticallyClearWhatSetting
-import kotlinx.android.synthetic.main.content_settings_privacy.automaticallyClearWhenSetting
-import kotlinx.android.synthetic.main.include_toolbar.toolbar
 import javax.inject.Inject
 
 class SettingsActivity : DuckDuckGoActivity(), SettingsAutomaticallyClearWhatFragment.Listener, SettingsAutomaticallyClearWhenFragment.Listener {
@@ -81,10 +71,6 @@ class SettingsActivity : DuckDuckGoActivity(), SettingsAutomaticallyClearWhatFra
 
     private val autocompleteToggleListener = OnCheckedChangeListener { _, isChecked ->
         viewModel.onAutocompleteSettingChanged(isChecked)
-    }
-
-    private val searchNotificationToggleListener = OnCheckedChangeListener { _, isChecked ->
-        viewModel.onSearchNotificationSettingChanged(isChecked)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -119,11 +105,9 @@ class SettingsActivity : DuckDuckGoActivity(), SettingsAutomaticallyClearWhatFra
                 version.setSubtitle(it.version)
                 lightThemeToggle.quietlySetIsChecked(it.lightThemeEnabled, lightThemeToggleListener)
                 autocompleteToggle.quietlySetIsChecked(it.autoCompleteSuggestionsEnabled, autocompleteToggleListener)
-                searchNotificationToggle.quietlySetIsChecked(it.searchNotificationEnabled, searchNotificationToggleListener)
                 updateDefaultBrowserViewVisibility(it)
                 updateAutomaticClearDataOptions(it.automaticallyClearData)
                 changeAppIcon.setImageResource(it.appIcon.icon)
-                showSearchNotification(it.showSearchNotificationToggle)
             }
         })
 
@@ -141,14 +125,6 @@ class SettingsActivity : DuckDuckGoActivity(), SettingsAutomaticallyClearWhatFra
 
         val whenOptionEnabled = automaticallyClearData.clearWhenOptionEnabled
         automaticallyClearWhenSetting.isEnabled = whenOptionEnabled
-    }
-
-    private fun showSearchNotification(enabled: Boolean) {
-        if (enabled) {
-            searchNotificationToggle.show()
-        } else {
-            searchNotificationToggle.gone()
-        }
     }
 
     private fun launchAutomaticallyClearWhatDialog() {
