@@ -62,9 +62,10 @@
                 style="@style/BrowserTextMenuItem"
                 android:text="@string/addToHome" />
 
-            <CheckBox
+            <androidx.appcompat.widget.AppCompatCheckBox
                 android:id="@+id/requestDesktopSiteCheckMenuItem"
                 style="@style/BrowserTextMenuItem"
+                android:theme="@style/PopUpMenuSwitchTheme"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="20dp"
@@ -73,7 +74,6 @@
                 android:drawablePadding="24dp"
                 android:paddingStart="24dp"
                 android:paddingEnd="0dp"
-                android:drawableTint="@color/bottom_bar_icon_color_selector_21"
                 android:text="@string/requestDesktopSiteMenuTitle" />
 
             <TextView
