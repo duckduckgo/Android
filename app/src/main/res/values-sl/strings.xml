@@ -4,6 +4,7 @@
     <string name="duckDuckGoPrivacySimplified">Poenostavljena zasebnost.</string>
     <string name="yes">Da</string>
     <string name="no">Ne</string>
+    <string name="search">Iskanje</string>
 
     <!-- Onboarding Activity -->
     <string name="onboardingDefaultBrowserDescription">Vsakič obiščite Nastavitve za iskanje in brskanje z DuckDuckGo.</string>
@@ -392,20 +393,19 @@
     <string name="daxIntroCtaText">Nato obiščite eno od svojih najljubših spletišč! &lt;br/&gt;&lt;br/&gt;Blokiral bom sledilce, da vas ne bi vohunili. Prav tako bom nadgradil varnost vaše povezave. &#128274;</string>
     <string name="daxEndCtaText">&lt;br/&gt;&lt;br/&gt;Ne pozabite: vsakič, ko brskate z mano, grozljiv oglas izgubi krila. &#128077;</string>
     <string name="daxSerpCtaText">Vaša iskanja v DuckDuckGo so anonimna in nikoli ne shranim vaše zgodovine iskanja. Vedno. &#128588;</string>
-    <string name="daxNonSerpCtaText">Vsako spletno mesto ima oceno zasebnosti. Tapnite nanj da vidite kako barni vašo zasebnost.&lt;br/&gt;&lt;br/&gt;Se želite navdušiti? Poskusite izbrisati svoje podatke s pritiskom na gumb za požar.</string>
-    <string name="daxMainNetworkStep1CtaText">Glavo pokonci!&lt;br/&gt;&lt;br/&gt; %s vodi glavno mrežo za sledenje.&lt;br/&gt;&lt;br/&gt;Nizka ocena zasebnosti vas bo usmerila na taka spletna mesta.</string>
-    <string name="daxMainNetworkStep1OwnedCtaText">Glavo pokonci!&lt;br/&gt;&lt;br/&gt; %s je last podjetja %s, ki vodi glavno sledilno mrežo.</string>
-    <string name="daxMainNetworkStep21CtaText">Pravzaprav %s sledilci skrivajo od%s najboljših spletišč. &#128561;&lt;br/&gt;&lt;br/&gt;</string>
-    <string name="daxMainNetworkStep211CtaText">Pravzaprav %s se sledilci skrivajo po vsem internetu. &#128561;&lt;br/&gt;&lt;br/&gt;</string>
-    <string name="daxMainNetworkStep2CtaText">%s Blokiral bom te sledilce med brskanjem po spletiščih mestih, ki niso %s.</string>
     <plurals name="daxTrackersBlockedCtaText">
         <item quantity="one">&#160;in &lt;b&gt;%d drugi&lt;/b&gt; so vas skušali zaslediti tukaj. &lt;br/&gt;&lt;br/&gt;Blokiral sem jih!&lt;br/&gt;&lt;br/&gt; ☝️Preverite lahko URL vrstico, da vidite, kdo vas poskuša zaslediti, ko obiščete novo spletišče.️</item>
         <item quantity="two">&#160;in &lt;b&gt;%d drugi&lt;/b&gt; so vas poskušali zaslediti tukaj. &lt;br/&gt;&lt;br/&gt;Blokiral sem jih!&lt;br/&gt;&lt;br/&gt; ☝️Preverite lahko URL vrstico, da vidite, kdo vas poskuša zaslediti, ko obiščete novo spletno mesto.️</item>
         <item quantity="few">&#160;in &lt;b&gt;%d drugi&lt;/b&gt; so vas poskušali zaslediti tukaj. &lt;br/&gt;&lt;br/&gt;Blokiral sem jih!&lt;br/&gt;&lt;br/&gt; ☝️Preverite lahko URL vrstico, da vidite, kdo vas poskuša zaslediti, ko obiščete novo spletišče.</item>
         <item quantity="other">&#160;in &lt;b&gt;%d drugi&lt;/b&gt; so vas poskušali zaslediti tukaj. &lt;br/&gt;&lt;br/&gt;Blokiral sem jih!&lt;br/&gt;&lt;br/&gt; ☝️Preverite lahko URL vrstico, da vidite, kdo vas poskuša zaslediti, ko obiščete novo spletno mesto.️</item>
     </plurals>
-    <string name="daxTrackersBlockedCtaZeroText">&#160;vas je poskušal izslediti tukaj. &lt;br/&gt;&lt;br/&gt;Blokiral sem ga!&lt;br/&gt;&lt;br/&gt; ☝️Preverite lahko URL vrstico, da vidite, kdo vas poskuša zaslediti, ko obiščete novo spletišče.</string>
-
-    <!-- Covid Cta-->
-    <string name="covidCtaText">Pridobite uradne informacije in nasvete za COVID-19.</string>
+    <plurals name="daxTrackersBlockedCtaZeroText">
+        <item quantity="one" tools:ignore="ImpliedQuantity">&#160;vas je poskušal izslediti tukaj. &lt;br/&gt;&lt;br/&gt;Blokiral sem ga!&lt;br/&gt;&lt;br/&gt; ☝️Preverite lahko URL vrstico, da vidite, kdo vas poskuša zaslediti, ko obiščete novo spletišče.</item>
+        <item quantity="two" tools:ignore="ImpliedQuantity">&#160;so vas poskušali zaslediti tukaj. &lt;br/&gt;&lt;br/&gt;Blokiral sem ga!&lt;br/&gt;&lt;br/&gt; ☝️Preverite lahko URL vrstico, da vidite, kdo vas poskuša zaslediti, ko obiščete novo spletišče.</item>
+        <item quantity="few">&#160;so vas poskušali zaslediti tukaj. &lt;br/&gt;&lt;br/&gt;Blokiral sem ga!&lt;br/&gt;&lt;br/&gt; ☝️Preverite lahko URL vrstico, da vidite, kdo vas poskuša zaslediti, ko obiščete novo spletišče.</item>
+        <item quantity="other">&#160;so vas poskušali zaslediti tukaj. &lt;br/&gt;&lt;br/&gt;Blokiral sem ga!&lt;br/&gt;&lt;br/&gt; ☝️Preverite lahko URL vrstico, da vidite, kdo vas poskuša zaslediti, ko obiščete novo spletišče.</item>
+    </plurals>
+    <string name="daxNonSerpCtaText">Ko tapkate in se pomikate, bom blokiral nadležne sledilce. &lt;br/&gt;&lt;br/&gt;Brskaj naprej!</string>
+    <string name="daxMainNetworkOwnedCtaText">Glavo pokonci! %s je last %s.&lt;br/&gt;&lt;br/&gt; %s sledilci se skrivajo na približno %s najboljših spletnih mest &#128561;, vendar ne skrbite!&lt;br/&gt;&lt;br/&gt; %s bom preprečil ogled vaše dejavnosti na teh spletnih mestih.</string>
+    <string name="daxMainNetworkCtaText">Glavo pokonci! %s je glavno omrežje za sledenje.&lt;br/&gt;&lt;br/&gt; Njihovi sledilci se skrivajo na približno %s najboljših spletnih mest, vendar ne skrbite!&lt;br/&gt;&lt;br/&gt; %s bom preprečil ogled vaše dejavnosti na teh spletnih mestih.</string>
 </resources>

@@ -21,6 +21,7 @@ import com.duckduckgo.app.bookmarks.ui.BookmarksActivity
 import com.duckduckgo.app.brokensite.BrokenSiteActivity
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.BrowserTabFragment
+import com.duckduckgo.app.browser.DownloadConfirmationFragment
 import com.duckduckgo.app.browser.rating.ui.AppEnjoymentDialogFragment
 import com.duckduckgo.app.browser.rating.ui.GiveFeedbackDialogFragment
 import com.duckduckgo.app.browser.rating.ui.RateAppDialogFragment
@@ -132,6 +133,9 @@ abstract class AndroidBindingModule {
 
     @ContributesAndroidInjector
     abstract fun browserTabFragment(): BrowserTabFragment
+
+    @ContributesAndroidInjector
+    abstract fun downloadConfirmationFragment(): DownloadConfirmationFragment
 
     @ContributesAndroidInjector
     abstract fun onboardingDefaultBrowserFragment(): DefaultBrowserPage

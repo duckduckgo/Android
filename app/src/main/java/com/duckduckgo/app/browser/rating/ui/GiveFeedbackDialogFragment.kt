@@ -38,7 +38,7 @@ class GiveFeedbackDialogFragment : EnjoymentDialog() {
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         firePixelWithPromptCount(APP_FEEDBACK_DIALOG_SHOWN)
 
-        return AlertDialog.Builder(activity!!, R.style.AlertDialogTheme)
+        return AlertDialog.Builder(requireActivity(), R.style.AlertDialogTheme)
             .setTitle(R.string.giveFeedbackDialogTitle)
             .setMessage(R.string.giveFeedbackDialogMessage)
             .setPositiveButton(R.string.giveFeedbackDialogPositiveButton) { _, _ ->

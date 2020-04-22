@@ -41,7 +41,7 @@ class SettingsAutomaticallyClearWhatFragment : DialogFragment() {
         val rootView = View.inflate(activity, R.layout.settings_automatically_clear_what_fragment, null)
         updateCurrentSelect(currentOption, rootView.findViewById(R.id.settingsClearWhatGroup))
 
-        val alertBuilder = AlertDialog.Builder(activity!!)
+        val alertBuilder = AlertDialog.Builder(requireActivity())
             .setView(rootView)
             .setTitle(R.string.settingsAutomaticallyClearWhat)
             .setPositiveButton(R.string.settingsAutomaticallyClearingDialogSave) { _, _ ->

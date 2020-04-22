@@ -18,26 +18,30 @@ package com.duckduckgo.app.browser
 
 import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
-import android.annotation.SuppressLint
 import android.app.Activity
-import android.graphics.drawable.AnimatedVectorDrawable
+import android.view.Gravity
 import android.view.View
+import android.widget.FrameLayout
 import android.widget.ImageView
+import androidx.appcompat.widget.AppCompatTextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
+import androidx.core.view.children
+import androidx.core.widget.TextViewCompat
+import androidx.vectordrawable.graphics.drawable.AnimatedVectorDrawableCompat
 import com.duckduckgo.app.cta.ui.Cta
 import com.duckduckgo.app.cta.ui.DaxDialogCta
 import com.duckduckgo.app.privacy.renderer.TrackersRenderer
-import com.duckduckgo.app.trackerdetection.model.TrackingEvent
+import com.duckduckgo.app.trackerdetection.model.Entity
 
 class BrowserTrackersAnimatorHelper {
 
     private var trackersAnimation: AnimatorSet = AnimatorSet()
 
-    fun startTrackersAnimation(cta: Cta?, activity: Activity, container: ConstraintLayout, omnibarViews: List<View>, events: List<TrackingEvent>?) {
-        if (events.isNullOrEmpty()) return
+    fun startTrackersAnimation(cta: Cta?, activity: Activity, container: ConstraintLayout, omnibarViews: List<View>, entities: List<Entity>?) {
+        if (entities.isNullOrEmpty()) return
 
-        val logoViews: List<View> = getLogosViewListInContainer(activity, container, events)
+        val logoViews: List<View> = getLogosViewListInContainer(activity, container, entities)
         if (logoViews.isEmpty()) return
 
         if (!trackersAnimation.isRunning) {
@@ -68,40 +72,100 @@ class BrowserTrackersAnimatorHelper {
         }
     }
 
-    private fun getLogosViewListInContainer(activity: Activity, container: ConstraintLayout, events: List<TrackingEvent>): List<View> {
+    private fun getLogosViewListInContainer(activity: Activity, container: ConstraintLayout, entities: List<Entity>): List<View> {
         container.removeAllViews()
         container.alpha = 0f
-        val logos = createResourcesIdList(activity, events)
+        val logos = createResourcesIdList(activity, entities)
         return createLogosViewList(activity, container, logos)
     }
 
-    private fun createLogosViewList(activity: Activity, container: ConstraintLayout, resourcesId: List<Int>?): List<View> {
-        return resourcesId?.map {
-            val imageView = ImageView(activity)
-            imageView.scaleType = ImageView.ScaleType.CENTER_CROP
-            imageView.setImageResource(R.drawable.network_cross_anim)
-            imageView.setBackgroundResource(it)
-            imageView.id = View.generateViewId()
-            container.addView(imageView)
-            return@map imageView
-        }.orEmpty()
+    private fun createLogosViewList(
+        activity: Activity,
+        container: ConstraintLayout,
+        resourcesId: List<TrackerLogo>
+    ): List<View> {
+        return resourcesId.map {
+            return@map if (it.resId == R.drawable.other_tracker_bg) {
+                val frameLayout = createTrackerTextLogo(activity, it)
+                container.addView(frameLayout)
+                frameLayout
+            } else {
+                val imageView = createTrackerImageLogo(activity, it)
+                container.addView(imageView)
+                imageView
+            }
+        }
     }
 
-    private fun createResourcesIdList(activity: Activity, events: List<TrackingEvent>): List<Int>? {
-        if (activity.packageName == null) return emptyList()
+    private fun createTrackerTextLogo(activity: Activity, trackerLogo: TrackerLogo): FrameLayout {
+        val params = FrameLayout.LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT, FrameLayout.LayoutParams.WRAP_CONTENT)
+        val frameLayout = FrameLayout(activity)
+        frameLayout.id = View.generateViewId()
 
-        return events.asSequence().mapNotNull {
-            it.entity
-        }.map {
-            TrackersRenderer().networkLogoIcon(activity, it.name)
-        }.filterNotNull().distinct().take(MAX_LOGOS_SHOWN).toList()
+        val animationView = ImageView(activity)
+        val animatedDrawable = AnimatedVectorDrawableCompat.create(activity, R.drawable.network_cross_anim)
+        animationView.setImageDrawable(animatedDrawable)
+        animationView.layoutParams = params
+
+        val textView = AppCompatTextView(activity)
+        textView.gravity = Gravity.CENTER
+        textView.setBackgroundResource(trackerLogo.resId)
+        TextViewCompat.setTextAppearance(textView, R.style.UnknownTrackerText)
+        textView.text = trackerLogo.trackerLetter
+        textView.layoutParams = params
+
+        frameLayout.addView(textView)
+        frameLayout.addView(animationView)
+
+        return frameLayout
+    }
+
+    private fun createTrackerImageLogo(activity: Activity, trackerLogo: TrackerLogo): ImageView {
+        val imageView = ImageView(activity)
+        imageView.scaleType = ImageView.ScaleType.CENTER_CROP
+        val animatedDrawable = AnimatedVectorDrawableCompat.create(activity, R.drawable.network_cross_anim)
+        imageView.setImageDrawable(animatedDrawable)
+        imageView.setBackgroundResource(trackerLogo.resId)
+        imageView.id = View.generateViewId()
+        return imageView
+    }
+
+    private fun createResourcesIdList(activity: Activity, entities: List<Entity>): List<TrackerLogo> {
+        if (activity.packageName == null) return emptyList()
+        val resourcesList = entities
+            .distinct()
+            .take(MAX_LOGOS_SHOWN + 1)
+            .map {
+                val res = TrackersRenderer().networkLogoIcon(activity, it.name)
+                if (res == null) {
+                    TrackerLogo(R.drawable.other_tracker_bg, it.displayName.take(1))
+                } else {
+                    TrackerLogo(res)
+                }
+            }
+            .toMutableList()
+
+        return if (resourcesList.size <= MAX_LOGOS_SHOWN) {
+            resourcesList
+        } else {
+            resourcesList.take(MAX_LOGOS_SHOWN - 1)
+                .toMutableList()
+                .apply { add(TrackerLogo(R.drawable.ic_more_trackers)) }
+        }
     }
 
     private fun animateBlockedLogos(views: List<View>) {
         views.map {
             if (it is ImageView) {
-                val frameAnimation = it.drawable as AnimatedVectorDrawable
-                frameAnimation.start()
+                val animatedVectorDrawableCompat = it.drawable as? AnimatedVectorDrawableCompat
+                animatedVectorDrawableCompat?.start()
+            }
+            if (it is FrameLayout) {
+                val view: ImageView? = it.children.filter { child -> child is ImageView }.firstOrNull() as ImageView?
+                view?.let {
+                    val animatedVectorDrawableCompat = view.drawable as? AnimatedVectorDrawableCompat
+                    animatedVectorDrawableCompat?.start()
+                }
             }
         }
     }
@@ -187,15 +251,13 @@ class BrowserTrackersAnimatorHelper {
         }
     }
 
-    @SuppressLint("ObjectAnimatorBinding")
-    fun animateFadeOut(view: Any): ObjectAnimator {
+    private fun animateFadeOut(view: View): ObjectAnimator {
         return ObjectAnimator.ofFloat(view, "alpha", 1f, 0f).apply {
             duration = DEFAULT_ANIMATION_DURATION
         }
     }
 
-    @SuppressLint("ObjectAnimatorBinding")
-    fun animateFadeIn(view: Any): ObjectAnimator {
+    private fun animateFadeIn(view: View): ObjectAnimator {
         return ObjectAnimator.ofFloat(view, "alpha", 0f, 1f).apply {
             duration = DEFAULT_ANIMATION_DURATION
         }
@@ -204,6 +266,8 @@ class BrowserTrackersAnimatorHelper {
     companion object {
         private const val TRACKER_LOGOS_DELAY_ON_SCREEN = 2400L
         private const val DEFAULT_ANIMATION_DURATION = 150L
-        private const val MAX_LOGOS_SHOWN = 4
+        private const val MAX_LOGOS_SHOWN = 3
     }
 }
+
+data class TrackerLogo(val resId: Int, val trackerLetter: String = "")

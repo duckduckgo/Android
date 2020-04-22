@@ -168,20 +168,17 @@
         <item name="android:color">@color/browser_menu_text</item>
     </style>
 
-    <style name="OnboardingButtonPrimaryRoundedCta">
-        <item name="android:foreground">?attr/selectableItemBackground</item>
+    <style name="OnboardingButtonPrimaryRoundedCta" parent="Widget.AppCompat.Button.Borderless">
         <item name="android:layout_marginBottom">20dp</item>
         <item name="android:textSize">15sp</item>
         <item name="android:textColor">@color/white</item>
         <item name="layout_constraintWidth_max">400dp</item>
         <item name="layout_constraintWidth_percent">0.8</item>
-        <item name="backgroundTint">@color/cornflowerBlue</item>
         <item name="android:background">@drawable/onboarding_primary_cta_button_rounded_bg</item>
         <item name="android:textAllCaps">false</item>
     </style>
 
-    <style name="OnboardingButtonSecondaryRoundedCta">
-        <item name="android:foreground">?attr/selectableItemBackground</item>
+    <style name="OnboardingButtonSecondaryRoundedCta" parent="Widget.AppCompat.Button.Borderless">
         <item name="android:layout_marginBottom">20dp</item>
         <item name="android:textSize">15sp</item>
         <item name="android:textColor">@color/cornflowerDark</item>
@@ -286,6 +283,14 @@
         <item name="android:backgroundTint">?attr/daxDialogBackgroundColor</item>
         <item name="android:textColor">?attr/daxDialogSecondaryButtonTextColor</item>
         <item name="rippleColor">?attr/daxDialogSecondaryButtonRippleColor</item>
+    </style>
+
+    <style name="UnknownTrackerText">
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:textAlignment">center</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">?attr/omnibarLogoLetterTextColor</item>
+        <item name="android:textSize">12sp</item>
     </style>
 
 </resources>

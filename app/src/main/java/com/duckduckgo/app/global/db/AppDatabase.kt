@@ -247,6 +247,7 @@ class MigrationsProvider(val context: Context) {
         }
     }
 
+    @Suppress("DEPRECATION")
     val MIGRATION_17_TO_18: Migration = object : Migration(17, 18) {
 
         val onboardingStore: OldOnboardingStore = OldOnboardingStore()
