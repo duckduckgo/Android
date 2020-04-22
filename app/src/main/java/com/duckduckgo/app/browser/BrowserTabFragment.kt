@@ -1335,6 +1335,8 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
 
         private fun decorateAppBarWithBottomBar() {
             menuButton?.gone()
+            tabsButton?.gone()
+            fireMenuButton?.gone()
         }
 
         private fun createPopupMenuWithToolbarOnly() {
