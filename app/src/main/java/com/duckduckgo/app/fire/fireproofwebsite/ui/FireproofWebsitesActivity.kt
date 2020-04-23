@@ -21,12 +21,13 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.text.Html
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.PopupMenu
+import androidx.core.text.HtmlCompat
+import androidx.core.text.HtmlCompat.FROM_HTML_MODE_LEGACY
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.RecyclerView.Adapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
@@ -83,8 +84,7 @@ class FireproofWebsitesActivity : DuckDuckGoActivity() {
 
     @Suppress("deprecation")
     private fun confirmDeleteWebsite(entity: FireproofWebsiteEntity) {
-        val message =
-            Html.fromHtml(getString(R.string.bookmarkDeleteConfirmMessage, entity.domain))
+        val message = HtmlCompat.fromHtml(getString(R.string.fireproofWebsiteDeleteConfirmMessage, entity.domain), FROM_HTML_MODE_LEGACY)
         val title = getString(R.string.bookmarkDeleteConfirmTitle)
         deleteDialog = alert(message, title) {
             positiveButton(android.R.string.yes) { viewModel.delete(entity) }
