@@ -44,8 +44,9 @@
     <string name="fireproofWebsitesActivityTitle">Fireproof Websites</string>
     <string name="settingsFireproofWebsites">Fireproof Websites</string>
     <string name="fireproofWebsiteMenuTitle">Fireproof Website</string>
-    <string name="fireproofWebsiteSnackbarConfirmation">‘website.com’ is now fireproof! Visit Settings to remove.</string>
+    <string name="fireproofWebsiteSnackbarConfirmation">&lt;b>%s&lt;/b> is now fireproof! Visit Settings to learn more.</string>
     <string name="fireproofWebsiteSnackbarAction">Undo</string>
-
+    <string name="fireproofWebsiteDeleteConfirmMessage">Are you sure you want to delete &lt;b>%s&lt;/b>?</string>
+    <string name="fireproofWebsiteInfo">Websites rely on cookies to keep you signed in. When you Fireproof a site, cookies won\'t be erased and you\'ll stay signed in, even after using the Fire Button.</string>
 
 </resources>
