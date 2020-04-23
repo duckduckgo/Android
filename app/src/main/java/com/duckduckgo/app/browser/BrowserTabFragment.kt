@@ -30,6 +30,7 @@ import android.media.MediaScannerConnection
 import android.net.Uri
 import android.os.*
 import android.text.Editable
+import android.text.Html
 import android.view.*
 import android.view.View.*
 import android.view.inputmethod.EditorInfo
@@ -45,6 +46,8 @@ import androidx.appcompat.app.AlertDialog
 import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.content.ContextCompat
 import androidx.core.content.pm.ShortcutManagerCompat
+import androidx.core.text.HtmlCompat
+import androidx.core.text.HtmlCompat.FROM_HTML_MODE_LEGACY
 import androidx.core.view.isEmpty
 import androidx.core.view.isNotEmpty
 import androidx.core.view.isVisible
@@ -942,10 +945,14 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
             .show()
     }
 
-    private fun fireproofWebsiteConfirmation(fireproofWebsiteEntity: FireproofWebsiteEntity) {
-        Snackbar.make(rootView, R.string.fireproofWebsiteSnackbarConfirmation, Snackbar.LENGTH_LONG)
+    private fun fireproofWebsiteConfirmation(entity: FireproofWebsiteEntity) {
+        Snackbar.make(
+            rootView,
+            HtmlCompat.fromHtml(getString(R.string.fireproofWebsiteSnackbarConfirmation, entity.domain), FROM_HTML_MODE_LEGACY),
+            Snackbar.LENGTH_LONG
+        )
             .setAction(R.string.fireproofWebsiteSnackbarAction) {
-                viewModel.onFireproofWebsiteSnackbarActionClicked(fireproofWebsiteEntity)
+                viewModel.onFireproofWebsiteSnackbarActionClicked(entity)
             }
             .show()
     }
