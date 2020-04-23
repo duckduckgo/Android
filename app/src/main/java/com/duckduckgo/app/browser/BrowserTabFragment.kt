@@ -973,7 +973,6 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
     }
 
     private fun bookmarkAdded(bookmarkId: Long, title: String?, url: String?) {
-
         Snackbar.make(rootView, R.string.bookmarkEdited, Snackbar.LENGTH_LONG)
             .setAction(R.string.edit) {
                 val addBookmarkDialog = EditBookmarkDialogFragment.instance(bookmarkId, title, url)
@@ -1251,7 +1250,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
             .show()
     }
 
-    fun omnibarViews(): List<View> = listOf(clearTextButton, omnibarTextInput, privacyGradeButton)
+    fun omnibarViews(): List<View> = listOf(clearTextButton, omnibarTextInput, privacyGradeButton, searchIcon)
 
     companion object {
         private const val TAB_ID_ARG = "TAB_ID_ARG"
@@ -1543,10 +1542,14 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
                 }
 
                 if (ctaContainer.isVisible) {
-                    if (viewState.isEditing) {
-                        ctaContainer.setPadding(0, 0, 0, 0)
-                    } else {
-                        ctaContainer.setPadding(0, 0, 0, 46.toPx())
+                    if (isBottomNavigationFeatureEnabled()) {
+                        lastSeenOmnibarViewState?.let {
+                            if (it.isEditing) {
+                                ctaContainer.setPadding(0, 0, 0, 0)
+                            } else {
+                                ctaContainer.setPadding(0, 0, 0, 46.toPx())
+                            }
+                        } ?: ctaContainer.setPadding(0, 0, 0, 46.toPx())
                     }
                 }
             }
