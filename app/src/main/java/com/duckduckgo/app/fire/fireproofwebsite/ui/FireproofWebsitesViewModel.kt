@@ -38,10 +38,6 @@ class FireproofWebsitesViewModel(
         class ConfirmDeletePreservedWebsite(val entity: FireproofWebsiteEntity) : Command()
     }
 
-    companion object {
-        private const val MIN_BOOKMARKS_FOR_SEARCH = 3
-    }
-
     val viewState: MutableLiveData<ViewState> = MutableLiveData()
     val command: SingleLiveEvent<Command> = SingleLiveEvent()
 
