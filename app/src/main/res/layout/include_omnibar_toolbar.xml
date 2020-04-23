@@ -50,7 +50,7 @@
 
                     <androidx.constraintlayout.widget.ConstraintLayout
                         android:id="@+id/omniBarContainer"
-                        android:layout_width="wrap_content"
+                        android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:layout_margin="8dp"
                         android:background="@drawable/omnibar_field_background"
@@ -59,7 +59,7 @@
 
                         <androidx.constraintlayout.widget.ConstraintLayout
                             android:id="@+id/networksContainer"
-                            android:layout_width="wrap_content"
+                            android:layout_width="match_parent"
                             android:layout_height="match_parent"
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintStart_toStartOf="parent" />
