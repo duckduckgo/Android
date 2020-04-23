@@ -37,7 +37,7 @@ import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.baseHost
 import com.duckduckgo.app.global.faviconLocation
 import com.duckduckgo.app.global.image.GlideApp
-import kotlinx.android.synthetic.main.content_preserve_website.*
+import kotlinx.android.synthetic.main.content_fireproof_websites.*
 import kotlinx.android.synthetic.main.include_toolbar.*
 import kotlinx.android.synthetic.main.view_preserved_website_entry.view.*
 import org.jetbrains.anko.alert
@@ -52,7 +52,7 @@ class FireproofWebsitesActivity : DuckDuckGoActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_preserve_website)
+        setContentView(R.layout.activity_fireproof_websites)
         setupActionBar()
         setupFireproofWebsiteRecycler()
         observeViewModel()

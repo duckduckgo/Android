@@ -25,6 +25,6 @@
 
     <include layout="@layout/include_toolbar" />
 
-    <include layout="@layout/content_preserve_website" />
+    <include layout="@layout/content_fireproof_websites" />
 
 </LinearLayout>
