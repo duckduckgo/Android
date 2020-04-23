@@ -169,7 +169,7 @@ class PreservedWebsiteViewHolder(itemView: View, private val viewModel: Fireproo
 
     private fun showOverFlowMenu(overflowMenu: ImageView, entity: FireproofWebsiteEntity) {
         val popup = PopupMenu(overflowMenu.context, overflowMenu)
-        popup.inflate(R.menu.bookmarks_individual_overflow_menu)
+        popup.inflate(R.menu.fireproof_website_individual_overflow_menu)
         popup.setOnMenuItemClickListener {
             when (it.itemId) {
                 R.id.delete -> {
