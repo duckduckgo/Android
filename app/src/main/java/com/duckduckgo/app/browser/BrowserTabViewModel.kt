@@ -486,12 +486,10 @@ class BrowserTabViewModel(
         buildSiteFactory(url, title)
 
         val currentOmnibarViewState = currentOmnibarViewState()
-        omnibarViewState.postValue(currentOmnibarViewState.copy(omnibarText = omnibarTextForUrl(url), shouldMoveCaretToEnd = false))
-
+        omnibarViewState.value = currentOmnibarViewState.copy(omnibarText = omnibarTextForUrl(url), shouldMoveCaretToEnd = false)
         val currentBrowserViewState = currentBrowserViewState()
-        findInPageViewState.postValue(FindInPageViewState(visible = false, canFindInPage = true))
-        browserViewState.postValue(
-            currentBrowserViewState.copy(
+        findInPageViewState.value = FindInPageViewState(visible = false, canFindInPage = true)
+        browserViewState.value = currentBrowserViewState.copy(
                 browserShowing = true,
                 canAddBookmarks = true,
                 addToHomeEnabled = true,
@@ -500,7 +498,6 @@ class BrowserTabViewModel(
                 showPrivacyGrade = true,
                 canReportSite = true,
                 showSearchIcon = false
-            )
         )
 
         if (duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(url)) {
@@ -667,8 +664,8 @@ class BrowserTabViewModel(
 
         val currentBrowserViewState = currentBrowserViewState()
         browserViewState.value = currentBrowserViewState.copy(
-            showPrivacyGrade = !hasFocus,
-            showSearchIcon = hasFocus,
+            showPrivacyGrade = !showClearButton,
+            showSearchIcon = showClearButton,
             showTabsButton = showControls,
             showFireButton = showControls,
             showMenuButton = showControls,

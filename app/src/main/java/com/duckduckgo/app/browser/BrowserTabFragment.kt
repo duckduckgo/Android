@@ -65,6 +65,7 @@ import androidx.annotation.AnyThread
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
 import androidx.constraintlayout.widget.ConstraintSet
+import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.content.ContextCompat
 import androidx.core.content.pm.ShortcutManagerCompat
 import androidx.core.view.isEmpty
@@ -409,7 +410,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
 
     override fun onResume() {
         super.onResume()
-        addTextChangedListeners()
+
         appBarLayout.setExpanded(true)
         viewModel.onViewResumed()
         logoHidingListener.onResume()
@@ -418,6 +419,8 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
         if (fragmentIsVisible()) {
             viewModel.onViewVisible()
         }
+
+        addTextChangedListeners()
     }
 
     override fun onPause() {
@@ -973,7 +976,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
     }
 
     private fun bookmarkAdded(bookmarkId: Long, title: String?, url: String?) {
-        Snackbar.make(rootView, R.string.bookmarkEdited, Snackbar.LENGTH_LONG)
+        Snackbar.make(browserLayout, R.string.bookmarkEdited, Snackbar.LENGTH_LONG)
             .setAction(R.string.edit) {
                 val addBookmarkDialog = EditBookmarkDialogFragment.instance(bookmarkId, title, url)
                 addBookmarkDialog.show(childFragmentManager, ADD_BOOKMARK_FRAGMENT_TAG)
@@ -1312,6 +1315,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
             createPopupMenuWithToolbarOnly()
             configureShowTabSwitcherListenerWithToolbarOnly()
             configureLongClickOpensNewTabListenerWithToolbarOnly()
+            removeUnnecessaryLayoutBehaviour()
         }
 
         fun decorateWithBottomBarSearch() {
@@ -1483,6 +1487,11 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
             }
         }
 
+        private fun removeUnnecessaryLayoutBehaviour() {
+            val params: CoordinatorLayout.LayoutParams = bottomNavigationBar.getLayoutParams() as CoordinatorLayout.LayoutParams
+            params.behavior = null
+        }
+
         fun animateTabsCount() {
             tabsButton?.animateCount()
             bottomBarTabsItem.animateCount()
@@ -1539,6 +1548,11 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
                     }
                 } else {
                     decorator.updateBottomBarVisibility(!viewState.isEditing)
+                }
+
+                lastSeenBrowserViewState?.let {
+                    decorator.decorateToolbar(it)
+                    renderToolbarMenus(it)
                 }
 
                 if (ctaContainer.isVisible) {
@@ -1685,7 +1699,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
                 clearTextButton?.isVisible = viewState.showClearButton
                 searchIcon?.isVisible = viewState.showSearchIcon
             } else {
-                privacyGradeButton?.isInvisible = true
+                privacyGradeButton?.isVisible = false
                 clearTextButton?.isVisible = viewState.showClearButton
                 searchIcon?.isVisible = true
             }

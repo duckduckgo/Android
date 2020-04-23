@@ -33,8 +33,13 @@ class KeyboardAwareEditText : AppCompatEditText {
     constructor(context: Context, attrs: AttributeSet?) : this(context, attrs, 0)
     constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr)
 
+    private var lastFocusValue = false
+
     override fun onFocusChanged(focused: Boolean, direction: Int, previouslyFocusedRect: Rect?) {
-        super.onFocusChanged(focused, direction, previouslyFocusedRect)
+        if (focused != lastFocusValue){
+            lastFocusValue = focused
+            super.onFocusChanged(focused, direction, previouslyFocusedRect)
+        }
 
         if (focused) {
             showKeyboard()
