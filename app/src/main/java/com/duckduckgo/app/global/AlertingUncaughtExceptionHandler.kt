@@ -20,7 +20,6 @@ import com.duckduckgo.app.browser.BuildConfig
 import com.duckduckgo.app.global.exception.UncaughtExceptionRepository
 import com.duckduckgo.app.global.exception.UncaughtExceptionSource
 import com.duckduckgo.app.statistics.store.OfflinePixelCountDataStore
-import io.reactivex.exceptions.UndeliverableException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.NonCancellable
@@ -54,7 +53,7 @@ class AlertingUncaughtExceptionHandler(
      */
     private fun shouldRecordExceptionAndCrashApp(exception: Throwable?): Boolean {
         return when (exception) {
-            is UndeliverableException, is InterruptedException, is InterruptedIOException -> false
+            is InterruptedException, is InterruptedIOException -> false
             else -> true
         }
     }
