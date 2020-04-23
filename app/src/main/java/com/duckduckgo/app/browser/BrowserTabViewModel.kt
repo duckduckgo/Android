@@ -664,8 +664,8 @@ class BrowserTabViewModel(
 
         val currentBrowserViewState = currentBrowserViewState()
         browserViewState.value = currentBrowserViewState.copy(
-            showPrivacyGrade = !showClearButton,
-            showSearchIcon = showClearButton,
+            showPrivacyGrade = !hasFocus,
+            showSearchIcon = hasFocus,
             showTabsButton = showControls,
             showFireButton = showControls,
             showMenuButton = showControls,
