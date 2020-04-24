@@ -160,10 +160,10 @@ class PrivacyDashboardViewModel(
         GlobalScope.launch(dispatchers.io()) {
             if (enabled) {
                 userWhitelistDao.delete(domain)
-                pixel.fire(TRACKER_BLOCKER_DASHBOARD_TURNED_ON)
+                pixel.fire(PRIVACY_DASHBOARD_WHITELIST_REMOVE)
             } else {
                 userWhitelistDao.insert(domain)
-                pixel.fire(TRACKER_BLOCKER_DASHBOARD_TURNED_OFF)
+                pixel.fire(PRIVACY_DASHBOARD_WHITELIST_ADD)
             }
         }
     }

@@ -70,6 +70,8 @@ interface Pixel {
         PRIVACY_DASHBOARD_GLOBAL_STATS("mp_s"),
         PRIVACY_DASHBOARD_PRIVACY_PRACTICES("mp_p"),
         PRIVACY_DASHBOARD_NETWORKS("mp_n"),
+        PRIVACY_DASHBOARD_WHITELIST_ADD("mp_wla"),
+        PRIVACY_DASHBOARD_WHITELIST_REMOVE("mp_wlr"),
 
         HTTPS_NO_LOOKUP("m_https_nl"),
         HTTPS_LOCAL_UPGRADE("m_https_lu"),
@@ -77,9 +79,6 @@ interface Pixel {
         HTTPS_SERVICE_CACHE_UPGRADE("m_https_scu"),
         HTTPS_SERVICE_REQUEST_NO_UPGRADE("m_https_srn"),
         HTTPS_SERVICE_CACHE_NO_UPGRADE("m_https_scn"),
-
-        TRACKER_BLOCKER_DASHBOARD_TURNED_ON(pixelName = "m_tb_on_pd"),
-        TRACKER_BLOCKER_DASHBOARD_TURNED_OFF(pixelName = "m_tb_off_pd"),
 
         DEFAULT_BROWSER_SET("m_db_s"),
         DEFAULT_BROWSER_NOT_SET("m_db_ns"),
