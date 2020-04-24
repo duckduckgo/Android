@@ -76,7 +76,6 @@ import com.jakewharton.rxrelay2.PublishRelay
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
-import kotlinx.android.synthetic.main.include_omnibar_toolbar.*
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -196,7 +195,7 @@ class BrowserTabViewModel(
         object GenerateWebViewPreviewImage : Command()
         object LaunchTabSwitcher : Command()
         class ShowErrorWithAction(val action: () -> Unit) : Command()
-        sealed class DaxCommand: Command() {
+        sealed class DaxCommand : Command() {
             object FinishTrackerAnimation : DaxCommand()
             class HideDaxDialog(val cta: Cta) : DaxCommand()
         }
@@ -470,7 +469,6 @@ class BrowserTabViewModel(
     }
 
     override fun navigationStateChanged(newWebNavigationState: WebNavigationState) {
-
         val stateChange = newWebNavigationState.compare(webNavigationState)
         webNavigationState = newWebNavigationState
 
