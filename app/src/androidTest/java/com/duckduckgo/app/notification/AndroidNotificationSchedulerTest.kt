@@ -62,11 +62,6 @@ class AndroidNotificationSchedulerTest {
         )
     }
 
-    @After
-    fun resetWorkers() {
-        workManager.cancelAllWorkByTag(NotificationScheduler.CONTINUOUS_APP_USE_REQUEST_TAG)
-    }
-
     @Test
     fun whenPrivacyNotificationClearDataCanShowThenPrivacyNotificationIsScheduled() = runBlocking<Unit> {
         whenever(privacyNotification.canShow()).thenReturn(true)
