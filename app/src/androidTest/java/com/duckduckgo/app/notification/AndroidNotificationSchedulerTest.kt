@@ -68,7 +68,7 @@ class AndroidNotificationSchedulerTest {
     }
 
     @Test
-    fun whenPrivacyNotificationClearDataCanShowThenBothAreScheduled() = runBlocking<Unit> {
+    fun whenPrivacyNotificationClearDataCanShowThenPrivacyNotificationIsScheduled() = runBlocking<Unit> {
         whenever(privacyNotification.canShow()).thenReturn(true)
         whenever(clearNotification.canShow()).thenReturn(true)
         testee.scheduleNextNotification()
@@ -77,7 +77,7 @@ class AndroidNotificationSchedulerTest {
     }
 
     @Test
-    fun whenPrivacyNotificationCanShowButClearDataCannotThenThenBothAreScheduled() = runBlocking<Unit> {
+    fun whenPrivacyNotificationCanShowButClearDataCannotThenPrivacyNotificationIsScheduled() = runBlocking<Unit> {
         whenever(privacyNotification.canShow()).thenReturn(true)
         whenever(clearNotification.canShow()).thenReturn(false)
         testee.scheduleNextNotification()
@@ -86,7 +86,7 @@ class AndroidNotificationSchedulerTest {
     }
 
     @Test
-    fun whenPrivacyNotificationCannotShowAndClearNotificationCanShowThenBothAreScheduled() = runBlocking<Unit> {
+    fun whenPrivacyNotificationCannotShowAndClearNotificationCanShowThenClearNotificationIsScheduled() = runBlocking<Unit> {
         whenever(privacyNotification.canShow()).thenReturn(false)
         whenever(clearNotification.canShow()).thenReturn(true)
         testee.scheduleNextNotification()
@@ -95,21 +95,12 @@ class AndroidNotificationSchedulerTest {
     }
 
     @Test
-    fun whenPrivacyNotificationAndClearNotificationCannotShowThenNotificationScheduled() = runBlocking<Unit> {
+    fun whenPrivacyNotificationAndClearNotificationCannotShowThenNoNotificationScheduled() = runBlocking<Unit> {
         whenever(privacyNotification.canShow()).thenReturn(false)
         whenever(clearNotification.canShow()).thenReturn(false)
         testee.scheduleNextNotification()
 
         assertNoUnusedAppNotificationScheduled()
-    }
-
-    @Test
-    fun whenNoNotificationCanShowThenNoNotificationScheduled() = runBlocking<Unit> {
-        whenever(privacyNotification.canShow()).thenReturn(false)
-        whenever(clearNotification.canShow()).thenReturn(false)
-        testee.scheduleNextNotification()
-
-        assertNoNotificationScheduled()
     }
 
     private fun assertUnusedAppNotificationScheduled(workerName: String) {
@@ -120,11 +111,6 @@ class AndroidNotificationSchedulerTest {
         assertTrue(getUnusedAppScheduledWorkers().isEmpty())
     }
 
-    private fun assertNoNotificationScheduled() {
-        assertTrue(getUnusedAppScheduledWorkers().isEmpty())
-        assertTrue(getContinuousAppUseScheduledWorkers().isEmpty())
-    }
-
     private fun getUnusedAppScheduledWorkers(): List<WorkInfo> {
         return workManager
             .getWorkInfosByTag(NotificationScheduler.UNUSED_APP_WORK_REQUEST_TAG)
@@ -132,10 +118,4 @@ class AndroidNotificationSchedulerTest {
             .filter { it.state == WorkInfo.State.ENQUEUED }
     }
 
-    private fun getContinuousAppUseScheduledWorkers(): List<WorkInfo> {
-        return workManager
-            .getWorkInfosByTag(NotificationScheduler.CONTINUOUS_APP_USE_REQUEST_TAG)
-            .get()
-            .filter { it.state == WorkInfo.State.ENQUEUED }
-    }
 }

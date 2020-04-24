@@ -23,11 +23,9 @@ import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.global.DuckDuckGoTheme
 import com.duckduckgo.app.global.SingleLiveEvent
 import com.duckduckgo.app.icon.api.AppIcon
-import com.duckduckgo.app.notification.AndroidNotificationScheduler
 import com.duckduckgo.app.settings.clear.ClearWhatOption
 import com.duckduckgo.app.settings.clear.ClearWhenOption
 import com.duckduckgo.app.settings.db.SettingsDataStore
-import com.duckduckgo.app.statistics.Variant
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelName
@@ -39,8 +37,7 @@ class SettingsViewModel @Inject constructor(
     private val settingsDataStore: SettingsDataStore,
     private val defaultWebBrowserCapability: DefaultBrowserDetector,
     private val variantManager: VariantManager,
-    private val pixel: Pixel,
-    private val notificationScheduler: AndroidNotificationScheduler
+    private val pixel: Pixel
 ) : ViewModel() {
 
     data class ViewState(
@@ -59,7 +56,6 @@ class SettingsViewModel @Inject constructor(
         val clearWhenOption: ClearWhenOption,
         val clearWhenOptionEnabled: Boolean = true
     )
-
 
     sealed class Command {
         object LaunchFeedback : Command()
@@ -190,5 +186,4 @@ class SettingsViewModel @Inject constructor(
             else -> null
         }
     }
-
 }
