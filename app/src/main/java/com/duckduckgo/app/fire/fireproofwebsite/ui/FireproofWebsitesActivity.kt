@@ -26,22 +26,25 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.PopupMenu
+import androidx.annotation.StringRes
 import androidx.core.text.HtmlCompat
 import androidx.core.text.HtmlCompat.FROM_HTML_MODE_LEGACY
 import androidx.lifecycle.Observer
-import androidx.recyclerview.widget.RecyclerView.Adapter
+import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.fire.FireproofWebsiteEntity
 import com.duckduckgo.app.global.DuckDuckGoActivity
-import com.duckduckgo.app.global.baseHost
 import com.duckduckgo.app.global.faviconLocation
 import com.duckduckgo.app.global.image.GlideApp
 import kotlinx.android.synthetic.main.content_fireproof_websites.*
 import kotlinx.android.synthetic.main.include_toolbar.*
-import kotlinx.android.synthetic.main.view_preserved_website_entry.view.*
+import kotlinx.android.synthetic.main.item_autocomplete_bookmark_suggestion.view.*
+import kotlinx.android.synthetic.main.view_fireproof_website_description.view.*
+import kotlinx.android.synthetic.main.view_fireproof_website_entry.view.*
 import org.jetbrains.anko.alert
 import timber.log.Timber
+import java.lang.IllegalArgumentException
 
 class FireproofWebsitesActivity : DuckDuckGoActivity() {
 
@@ -59,7 +62,7 @@ class FireproofWebsitesActivity : DuckDuckGoActivity() {
     }
 
     private fun setupFireproofWebsiteRecycler() {
-        adapter = FireproofWebsiteAdapter(viewModel)
+        adapter = FireproofWebsiteAdapter(viewModel, R.string.fireproofWebsiteFeatureDescription)
         recycler.adapter = adapter
     }
 
@@ -106,8 +109,14 @@ class FireproofWebsitesActivity : DuckDuckGoActivity() {
 }
 
 class FireproofWebsiteAdapter(
-    private val viewModel: FireproofWebsitesViewModel
-) : Adapter<PreservedWebsiteViewHolder>() {
+    private val viewModel: FireproofWebsitesViewModel,
+    @StringRes private val listDescriptionStringRes: Int
+) : RecyclerView.Adapter<FireproofWebSiteViewHolder>() {
+
+    companion object Type {
+        const val FIREPROOF_WEBSITE_TYPE = 0
+        const val DESCRIPTION_TYPE = 1
+    }
 
     var fireproofWebsites: List<FireproofWebsiteEntity> = emptyList()
         set(value) {
@@ -115,74 +124,96 @@ class FireproofWebsiteAdapter(
             notifyDataSetChanged()
         }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PreservedWebsiteViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FireproofWebSiteViewHolder {
         val inflater = LayoutInflater.from(parent.context)
-        val view = inflater.inflate(R.layout.view_preserved_website_entry, parent, false)
-        return PreservedWebsiteViewHolder(view, viewModel)
+        return when (viewType) {
+            FIREPROOF_WEBSITE_TYPE -> {
+                val view = inflater.inflate(R.layout.view_fireproof_website_entry, parent, false)
+                FireproofWebSiteViewHolder.PreservedWebsiteViewHolder(view, viewModel)
+            }
+            DESCRIPTION_TYPE -> {
+                val view = inflater.inflate(R.layout.view_fireproof_website_description, parent, false)
+                FireproofWebSiteViewHolder.FireproofWebsiteDescriptionViewHolder(view)
+            }
+            else -> throw IllegalArgumentException("viewType not found")
+        }
     }
 
-    override fun onBindViewHolder(holder: PreservedWebsiteViewHolder, position: Int) {
-        holder.update(fireproofWebsites[position])
+    override fun getItemViewType(position: Int): Int {
+        return if ((fireproofWebsites.size - 1) < position) {
+            DESCRIPTION_TYPE
+        } else {
+            FIREPROOF_WEBSITE_TYPE
+        }
+    }
+
+    override fun onBindViewHolder(holder: FireproofWebSiteViewHolder, position: Int) {
+        when (holder) {
+            is FireproofWebSiteViewHolder.FireproofWebsiteDescriptionViewHolder -> holder.bind(listDescriptionStringRes)
+            is FireproofWebSiteViewHolder.PreservedWebsiteViewHolder -> holder.bind(fireproofWebsites[position])
+        }
     }
 
     override fun getItemCount(): Int {
-        return fireproofWebsites.size
+        return fireproofWebsites.size + 1
     }
 }
 
-class PreservedWebsiteViewHolder(itemView: View, private val viewModel: FireproofWebsitesViewModel) :
-    ViewHolder(itemView) {
+sealed class FireproofWebSiteViewHolder(itemView: View) : ViewHolder(itemView) {
 
-    lateinit var entity: FireproofWebsiteEntity
-
-    fun update(entity: FireproofWebsiteEntity) {
-        this.entity = entity
-
-        itemView.overflowMenu.contentDescription = itemView.context.getString(
-            R.string.bookmarkOverflowContentDescription,
-            entity.title
-        )
-
-        itemView.title.text = entity.title
-        itemView.url.text = parseDisplayUrl(entity.domain)
-        loadFavicon(entity.originalUrl)
-
-        itemView.overflowMenu.setOnClickListener {
-            showOverFlowMenu(itemView.overflowMenu, entity)
+    class FireproofWebsiteDescriptionViewHolder(itemView: View) : FireproofWebSiteViewHolder(itemView) {
+        fun bind(@StringRes text: Int) = with(itemView) {
+            fireproofWebsiteDescription.setText(text)
         }
     }
 
-    private fun loadFavicon(url: String) {
-        val faviconUrl = Uri.parse(url).faviconLocation()
+    class PreservedWebsiteViewHolder(itemView: View, private val viewModel: FireproofWebsitesViewModel) : FireproofWebSiteViewHolder(itemView) {
 
-        GlideApp.with(itemView)
-            .load(faviconUrl)
-            .placeholder(R.drawable.ic_globe_gray_16dp)
-            .error(R.drawable.ic_globe_gray_16dp)
-            .into(itemView.favicon)
-    }
+        lateinit var entity: FireproofWebsiteEntity
 
-    private fun parseDisplayUrl(urlString: String): String {
-        val uri = Uri.parse(urlString)
-        return uri.baseHost ?: return urlString
-    }
+        fun bind(entity: FireproofWebsiteEntity) {
+            this.entity = entity
 
-    private fun showOverFlowMenu(overflowMenu: ImageView, entity: FireproofWebsiteEntity) {
-        val popup = PopupMenu(overflowMenu.context, overflowMenu)
-        popup.inflate(R.menu.fireproof_website_individual_overflow_menu)
-        popup.setOnMenuItemClickListener {
-            when (it.itemId) {
-                R.id.delete -> {
-                    deleteEntity(entity); true
-                }
-                else -> false
+            itemView.overflowMenu.contentDescription = itemView.context.getString(
+                R.string.bookmarkOverflowContentDescription,
+                entity.title
+            )
+
+            itemView.fireproofWebsiteEntryTitle.text = entity.domain
+            loadFavicon(entity.originalUrl)
+
+            itemView.overflowMenu.setOnClickListener {
+                showOverFlowMenu(itemView.overflowMenu, entity)
             }
         }
-        popup.show()
-    }
 
-    private fun deleteEntity(entity: FireproofWebsiteEntity) {
-        Timber.i("Deleting website with domain: ${entity.domain}")
-        viewModel.onDeleteRequested(entity)
+        private fun loadFavicon(url: String) {
+            val faviconUrl = Uri.parse(url).faviconLocation()
+
+            GlideApp.with(itemView)
+                .load(faviconUrl)
+                .placeholder(R.drawable.ic_globe_gray_16dp)
+                .error(R.drawable.ic_globe_gray_16dp)
+                .into(itemView.fireproofWebsiteEntryFavicon)
+        }
+
+        private fun showOverFlowMenu(overflowMenu: ImageView, entity: FireproofWebsiteEntity) {
+            val popup = PopupMenu(overflowMenu.context, overflowMenu)
+            popup.inflate(R.menu.fireproof_website_individual_overflow_menu)
+            popup.setOnMenuItemClickListener {
+                when (it.itemId) {
+                    R.id.delete -> {
+                        deleteEntity(entity); true
+                    }
+                    else -> false
+                }
+            }
+            popup.show()
+        }
+
+        private fun deleteEntity(entity: FireproofWebsiteEntity) {
+            Timber.i("Deleting website with domain: ${entity.domain}")
+            viewModel.onDeleteRequested(entity)
+        }
     }
 }
