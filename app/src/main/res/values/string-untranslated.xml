@@ -33,4 +33,10 @@
     <string name="stickySearchPromptRemove">Remove</string>
     <string name="notificationChannelSearch">Search</string>
 
+    <!-- String changed translate and replace -->
+    <string name="privacyProtectionToggle">Site Privacy Protection</string>
+
+    <!-- New dashboard / menu buttons -->
+    <string name="manageWhitelist">Manage Whitelist</string>
+    <string name="reportBrokenSite">Report Broken Site</string>
 </resources>

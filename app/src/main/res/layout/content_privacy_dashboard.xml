@@ -47,6 +47,7 @@
                 android:id="@+id/httpsContainer"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                app:layout_constraintBottom_toTopOf="@id/networksContainer"
                 android:onClick="onEncryptionClicked">
 
                 <ImageView
@@ -125,6 +126,7 @@
                 android:textColor="@android:color/white"
                 android:textSize="14sp"
                 android:textStyle="normal"
+                app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
@@ -139,6 +141,54 @@
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
+
+        <LinearLayout
+            android:id="@+id/buttonContainer"
+            android:layout_width="match_parent"
+            app:layout_constraintTop_toBottomOf="@id/privacyToggleContainer"
+            android:layout_height="50dp"
+            android:background="@color/white"
+            android:paddingStart="20dp"
+            android:paddingEnd="20dp">
+
+            <TextView
+                android:id="@+id/whitelistButton"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:fontFamily="sans-serif-medium"
+                android:gravity="center"
+                android:text="@string/manageWhitelist"
+                android:textColor="@android:color/black"
+                android:textSize="14sp"
+                android:layout_weight="1"
+                android:textStyle="normal"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <View
+                android:layout_width="1dp"
+                android:background="@color/grayish"
+                android:layout_height="match_parent" />
+
+            <TextView
+                android:id="@+id/brokenSiteButton"
+                android:gravity="center"
+                android:layout_weight="1"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:fontFamily="sans-serif-medium"
+                android:text="@string/reportBrokenSite"
+                android:textColor="@android:color/black"
+                android:textSize="14sp"
+                android:textStyle="normal"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+
+        </LinearLayout>
+
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/trackerNetworkLeaderboard"
             android:layout_width="match_parent"
@@ -146,7 +196,7 @@
             android:onClick="onLeaderboardClick"
             android:paddingStart="20dp"
             android:paddingEnd="20dp"
-            app:layout_constraintTop_toBottomOf="@id/privacyToggleContainer">
+            app:layout_constraintTop_toBottomOf="@id/buttonContainer">
 
             <TextView
                 android:id="@+id/trackerNetworkLeaderboardHeader"
