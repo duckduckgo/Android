@@ -481,28 +481,29 @@ class BrowserTabViewModel(
 
         Timber.v("navigationStateChanged: $stateChange")
         when (stateChange) {
-            is NewPage -> pageChanged(stateChange.url, stateChange.title)
-            is PageCleared -> pageCleared()
-            is UrlUpdated -> urlUpdated(stateChange.url)
+            is NewPage -> {
+                pageChanged(stateChange.url, stateChange.title)
+            }
+            is PageCleared -> {
+                pageCleared()
+            }
+            is UrlUpdated -> {
+                urlUpdated(stateChange.url)
+            }
             is PageNavigationCleared -> disableUserNavigation()
-        }
-
-        viewModelScope.launch {
-            browserViewState.value = currentBrowserViewState().copy(canFireproofSite = canFireproofWebsite())
         }
     }
 
     private fun pageChanged(url: String, title: String?) {
-
         Timber.v("Page changed: $url")
         buildSiteFactory(url, title)
 
         val currentOmnibarViewState = currentOmnibarViewState()
-        omnibarViewState.postValue(currentOmnibarViewState.copy(omnibarText = omnibarTextForUrl(url), shouldMoveCaretToEnd = false))
+        omnibarViewState.value = currentOmnibarViewState.copy(omnibarText = omnibarTextForUrl(url), shouldMoveCaretToEnd = false)
 
         val currentBrowserViewState = currentBrowserViewState()
-        findInPageViewState.postValue(FindInPageViewState(visible = false, canFindInPage = true))
-        browserViewState.postValue(
+        findInPageViewState.value = FindInPageViewState(visible = false, canFindInPage = true)
+        browserViewState.value =
             currentBrowserViewState.copy(
                 browserShowing = true,
                 canAddBookmarks = true,
@@ -510,9 +511,9 @@ class BrowserTabViewModel(
                 addToHomeVisible = addToHomeCapabilityDetector.isAddToHomeSupported(),
                 canSharePage = true,
                 showPrivacyGrade = true,
-                canReportSite = true
+                canReportSite = true,
+                canFireproofSite = canFireproofWebsite()
             )
-        )
 
         if (duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(url)) {
             statisticsUpdater.refreshSearchRetentionAtb()
@@ -527,6 +528,7 @@ class BrowserTabViewModel(
         onSiteChanged()
         val currentOmnibarViewState = currentOmnibarViewState()
         omnibarViewState.postValue(currentOmnibarViewState.copy(omnibarText = omnibarTextForUrl(url), shouldMoveCaretToEnd = false))
+        browserViewState.value = currentBrowserViewState().copy(canFireproofSite = canFireproofWebsite())
     }
 
     private fun omnibarTextForUrl(url: String?): String {
@@ -549,7 +551,8 @@ class BrowserTabViewModel(
             addToHomeVisible = addToHomeCapabilityDetector.isAddToHomeSupported(),
             canSharePage = false,
             showPrivacyGrade = false,
-            canReportSite = false
+            canReportSite = false,
+            canFireproofSite = false
         )
     }
 
@@ -1060,11 +1063,10 @@ class BrowserTabViewModel(
         command.value = LaunchTabSwitcher
     }
 
-    private suspend fun canFireproofWebsite(): Boolean {
-        return withContext(dispatchers.io()) {
-            val domain = site?.uri?.host ?: return@withContext false
-            fireproofWebsiteDao.findByDomain(domain) == null
-        }
+    private fun canFireproofWebsite(): Boolean {
+        val domain = site?.uri?.host ?: return false
+        val fireproofWebsites = fireproofWebsiteState.value
+        return fireproofWebsites?.all { it.domain != domain } ?: true
     }
 
     private fun invalidateBrowsingActions() {
