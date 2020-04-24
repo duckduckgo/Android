@@ -210,7 +210,7 @@
     </style>
 
     <style name="PopUpMenuSwitchTheme">
-        <item name="colorAccent">@color/cornflowerBlue</item>
+        <item name="colorAccent">?colorAccent</item>
         <item name="android:textColorSecondary">?bottomBarIconColor</item>
     </style>
 
