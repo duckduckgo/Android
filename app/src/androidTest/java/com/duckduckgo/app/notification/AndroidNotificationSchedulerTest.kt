@@ -31,7 +31,6 @@ import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.whenever
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
-import org.junit.After
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
@@ -105,7 +104,7 @@ class AndroidNotificationSchedulerTest {
 
         testee.scheduleNextNotification()
 
-        NotificationScheduler.allDeprecatedWorkTags().forEach {
+        NotificationScheduler.allDeprecatedNotificationWorkTags().forEach {
             assertTrue(getScheduledWorkers(it).isEmpty())
         }
     }

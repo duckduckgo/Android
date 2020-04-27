@@ -51,7 +51,7 @@ class NotificationScheduler(
     }
 
     private fun cancelAllUnnecessaryWork(){
-        allDeprecatedWorkTags().forEach { tag  ->
+        allDeprecatedNotificationWorkTags().forEach { tag  ->
             workManager.cancelAllWorkByTag(tag)
         }
 
@@ -122,6 +122,6 @@ class NotificationScheduler(
         // we want to make sure that this TAGs are cancelled to avoid inconsistencies
         private const val CONTINUOUS_APP_USE_REQUEST_TAG = "com.duckduckgo.notification.schedule.continuous" // Sticky Search Experiment
 
-        fun allDeprecatedWorkTags() = listOf(CONTINUOUS_APP_USE_REQUEST_TAG)
+        fun allDeprecatedNotificationWorkTags() = listOf(CONTINUOUS_APP_USE_REQUEST_TAG)
     }
 }
