@@ -29,7 +29,11 @@ import android.webkit.WebView
 import androidx.annotation.AnyThread
 import androidx.annotation.VisibleForTesting
 import androidx.core.net.toUri
-import androidx.lifecycle.*
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.duckduckgo.app.autocomplete.api.AutoComplete
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteResult
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion
@@ -230,9 +234,7 @@ class BrowserTabViewModel(
     private var webNavigationState: WebNavigationState? = null
     private var httpsUpgraded = false
     private val fireproofWebsitesObserver = Observer<List<FireproofWebsiteEntity>> {
-        viewModelScope.launch {
-            browserViewState.value = currentBrowserViewState().copy(canFireproofSite = canFireproofWebsite())
-        }
+        browserViewState.value = currentBrowserViewState().copy(canFireproofSite = canFireproofWebsite())
     }
 
     init {
@@ -481,15 +483,9 @@ class BrowserTabViewModel(
 
         Timber.v("navigationStateChanged: $stateChange")
         when (stateChange) {
-            is NewPage -> {
-                pageChanged(stateChange.url, stateChange.title)
-            }
-            is PageCleared -> {
-                pageCleared()
-            }
-            is UrlUpdated -> {
-                urlUpdated(stateChange.url)
-            }
+            is NewPage -> pageChanged(stateChange.url, stateChange.title)
+            is PageCleared -> pageCleared()
+            is UrlUpdated -> urlUpdated(stateChange.url)
             is PageNavigationCleared -> disableUserNavigation()
         }
     }
@@ -499,11 +495,11 @@ class BrowserTabViewModel(
         buildSiteFactory(url, title)
 
         val currentOmnibarViewState = currentOmnibarViewState()
-        omnibarViewState.value = currentOmnibarViewState.copy(omnibarText = omnibarTextForUrl(url), shouldMoveCaretToEnd = false)
+        omnibarViewState.postValue(currentOmnibarViewState.copy(omnibarText = omnibarTextForUrl(url), shouldMoveCaretToEnd = false))
 
         val currentBrowserViewState = currentBrowserViewState()
-        findInPageViewState.value = FindInPageViewState(visible = false, canFindInPage = true)
-        browserViewState.value =
+        findInPageViewState.postValue(FindInPageViewState(visible = false, canFindInPage = true))
+        browserViewState.postValue(
             currentBrowserViewState.copy(
                 browserShowing = true,
                 canAddBookmarks = true,
@@ -514,6 +510,7 @@ class BrowserTabViewModel(
                 canReportSite = true,
                 canFireproofSite = canFireproofWebsite()
             )
+        )
 
         if (duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(url)) {
             statisticsUpdater.refreshSearchRetentionAtb()
@@ -528,7 +525,7 @@ class BrowserTabViewModel(
         onSiteChanged()
         val currentOmnibarViewState = currentOmnibarViewState()
         omnibarViewState.postValue(currentOmnibarViewState.copy(omnibarText = omnibarTextForUrl(url), shouldMoveCaretToEnd = false))
-        browserViewState.value = currentBrowserViewState().copy(canFireproofSite = canFireproofWebsite())
+        browserViewState.postValue(currentBrowserViewState().copy(canFireproofSite = canFireproofWebsite()))
     }
 
     private fun omnibarTextForUrl(url: String?): String {
@@ -557,13 +554,11 @@ class BrowserTabViewModel(
     }
 
     override fun pageRefreshed(refreshedUrl: String) {
-        viewModelScope.launch {
-            if (url == null || refreshedUrl == url) {
-                Timber.v("Page refreshed: $refreshedUrl")
-                pageChanged(refreshedUrl, title)
-            }
-            browserViewState.value = currentBrowserViewState().copy(canFireproofSite = canFireproofWebsite())
+        if (url == null || refreshedUrl == url) {
+            Timber.v("Page refreshed: $refreshedUrl")
+            pageChanged(refreshedUrl, title)
         }
+        browserViewState.value = currentBrowserViewState().copy(canFireproofSite = canFireproofWebsite())
     }
 
     override fun progressChanged(newProgress: Int) {
