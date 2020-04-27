@@ -72,7 +72,7 @@ class FireproofWebsitesActivity : DuckDuckGoActivity() {
     @Suppress("deprecation")
     private fun confirmDeleteWebsite(entity: FireproofWebsiteEntity) {
         val message = HtmlCompat.fromHtml(getString(R.string.fireproofWebsiteDeleteConfirmMessage, entity.domain), FROM_HTML_MODE_LEGACY)
-        val title = getString(R.string.bookmarkDeleteConfirmTitle)
+        val title = getString(R.string.fireproofWebsiteDeleteConfirmTitle)
         deleteDialog = alert(message, title) {
             positiveButton(android.R.string.yes) { viewModel.delete(entity) }
             negativeButton(android.R.string.no) { }

@@ -33,7 +33,6 @@ import kotlinx.android.synthetic.main.view_fireproof_website_entry.view.*
 import timber.log.Timber
 import java.lang.IllegalArgumentException
 
-
 class FireproofWebsiteAdapter(
     private val viewModel: FireproofWebsitesViewModel,
     @StringRes private val listDescriptionStringRes: Int
@@ -101,7 +100,7 @@ sealed class FireproofWebSiteViewHolder(itemView: View) : RecyclerView.ViewHolde
             this.entity = entity
 
             itemView.overflowMenu.contentDescription = itemView.context.getString(
-                R.string.bookmarkOverflowContentDescription,
+                R.string.fireproofWebsiteOverflowContentDescription,
                 entity.domain
             )
 
