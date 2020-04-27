@@ -30,7 +30,6 @@ interface VariantManager {
 
     // variant-dependant features listed here
     sealed class VariantFeature {
-        object StickySearchNotification : VariantFeature()
         object BottomBarNavigation : VariantFeature()
     }
 
@@ -46,18 +45,6 @@ interface VariantManager {
             // the future if we can filter by app version
             Variant(key = "sc", weight = 1.0, features = emptyList(), filterBy = { noFilter() }),
             Variant(key = "se", weight = 1.0, features = emptyList(), filterBy = { noFilter() }),
-
-            // Quick Search Notification Experiment
-            Variant(
-                key = "mf",
-                weight = 1.0,
-                features = emptyList(),
-                filterBy = { isEnglishLocale() }),
-            Variant(
-                key = "mg",
-                weight = 1.0,
-                features = listOf(StickySearchNotification),
-                filterBy = { isEnglishLocale() }),
 
             // Bottom Bar Navigation Experiment
             Variant(

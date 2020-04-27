@@ -43,23 +43,6 @@ class VariantManagerTest {
         assertEquals(0, variant.features.size)
     }
 
-    // Search Notification Experiment
-
-    @Test
-    fun searchNotificationControlVariantIsActiveAndHasNoFeatures() {
-        val variant = variants.first { it.key == "mf" }
-        assertEqualsDouble(1.0, variant.weight)
-        assertEquals(0, variant.features.size)
-    }
-
-    @Test
-    fun searchNotificationVariantIsActiveAndHasStickySearchNotificationFeature() {
-        val variant = variants.first { it.key == "mg" }
-        assertEqualsDouble(1.0, variant.weight)
-        assertEquals(1, variant.features.size)
-        assertTrue(variant.hasFeature(StickySearchNotification))
-    }
-
     // Bottom Bar Navigation Experiment
 
     @Test
