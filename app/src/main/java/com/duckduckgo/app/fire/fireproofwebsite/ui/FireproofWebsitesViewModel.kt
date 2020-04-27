@@ -41,17 +41,17 @@ class FireproofWebsitesViewModel(
     val viewState: MutableLiveData<ViewState> = MutableLiveData()
     val command: SingleLiveEvent<Command> = SingleLiveEvent()
 
-    private val bookmarks: LiveData<List<FireproofWebsiteEntity>> = dao.fireproofWebsitesEntities()
-    private val bookmarksObserver = Observer<List<FireproofWebsiteEntity>> { onPreservedCookiesEntitiesChanged(it!!) }
+    private val fireproofWebsites: LiveData<List<FireproofWebsiteEntity>> = dao.fireproofWebsitesEntities()
+    private val fireproofWebsitesObserver = Observer<List<FireproofWebsiteEntity>> { onPreservedCookiesEntitiesChanged(it!!) }
 
     init {
         viewState.value = ViewState()
-        bookmarks.observeForever(bookmarksObserver)
+        fireproofWebsites.observeForever(fireproofWebsitesObserver)
     }
 
     override fun onCleared() {
         super.onCleared()
-        bookmarks.removeObserver(bookmarksObserver)
+        fireproofWebsites.removeObserver(fireproofWebsitesObserver)
     }
 
     private fun onPreservedCookiesEntitiesChanged(entities: List<FireproofWebsiteEntity>) {
