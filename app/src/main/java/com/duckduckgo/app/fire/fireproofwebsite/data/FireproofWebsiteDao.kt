@@ -22,9 +22,6 @@ import androidx.room.*
 @Dao
 interface FireproofWebsiteDao {
 
-    @Query("select * from $FIREPROOF_WEBSITES_TABLE_NAME WHERE domain LIKE :domain limit 1")
-    fun findByDomain(domain: String): FireproofWebsiteEntity?
-
     @Query("select * from $FIREPROOF_WEBSITES_TABLE_NAME")
     fun fireproofWebsitesEntities(): LiveData<List<FireproofWebsiteEntity>>
 
