@@ -66,6 +66,11 @@ class DownloadConfirmationFragment : BottomSheetDialogFragment() {
         return view
     }
 
+    override fun onPause() {
+        dismiss()
+        super.onPause()
+    }
+
     private fun setupDownload() {
         file = if (!pendingDownload.isDataUrl) File(pendingDownload.directory, pendingDownload.guessFileName()) else null
     }
