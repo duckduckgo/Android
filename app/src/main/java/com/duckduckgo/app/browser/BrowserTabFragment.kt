@@ -30,7 +30,6 @@ import android.media.MediaScannerConnection
 import android.net.Uri
 import android.os.*
 import android.text.Editable
-import android.text.Html
 import android.view.*
 import android.view.View.*
 import android.view.inputmethod.EditorInfo
@@ -78,7 +77,7 @@ import com.duckduckgo.app.browser.tabpreview.WebViewPreviewPersister
 import com.duckduckgo.app.browser.ui.HttpAuthenticationDialogFragment
 import com.duckduckgo.app.browser.useragent.UserAgentProvider
 import com.duckduckgo.app.cta.ui.*
-import com.duckduckgo.app.fire.FireproofWebsiteEntity
+import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
 import com.duckduckgo.app.global.ViewModelFactory
 import com.duckduckgo.app.global.device.DeviceInfo
 import com.duckduckgo.app.global.model.orderedTrackingEntities

@@ -30,9 +30,9 @@ import com.duckduckgo.app.browser.rating.db.AppEnjoymentTypeConverter
 import com.duckduckgo.app.browser.rating.db.PromptCountConverter
 import com.duckduckgo.app.cta.db.DismissedCtaDao
 import com.duckduckgo.app.cta.model.DismissedCta
-import com.duckduckgo.app.fire.FIREPROOF_WEBSITES_TABLE_NAME
-import com.duckduckgo.app.fire.FireproofWebsiteDao
-import com.duckduckgo.app.fire.FireproofWebsiteEntity
+import com.duckduckgo.app.fire.fireproofwebsite.data.FIREPROOF_WEBSITES_TABLE_NAME
+import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteDao
+import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
 import com.duckduckgo.app.global.exception.UncaughtExceptionDao
 import com.duckduckgo.app.global.exception.UncaughtExceptionEntity
 import com.duckduckgo.app.global.exception.UncaughtExceptionSourceConverter

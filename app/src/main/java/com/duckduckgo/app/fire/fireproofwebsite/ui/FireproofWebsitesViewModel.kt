@@ -17,9 +17,9 @@
 package com.duckduckgo.app.fire.fireproofwebsite.ui
 
 import androidx.lifecycle.*
-import com.duckduckgo.app.fire.FireproofWebsiteDao
-import com.duckduckgo.app.fire.FireproofWebsiteEntity
-import com.duckduckgo.app.fire.fireproofwebsite.ui.FireproofWebsitesViewModel.Command.ConfirmDeletePreservedWebsite
+import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteDao
+import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
+import com.duckduckgo.app.fire.fireproofwebsite.ui.FireproofWebsitesViewModel.Command.ConfirmDeleteFireproofWebsite
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.SingleLiveEvent
 import kotlinx.coroutines.launch

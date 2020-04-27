@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.fire
+package com.duckduckgo.app.fire.fireproofwebsite.data
 
 import androidx.lifecycle.LiveData
 import androidx.room.*

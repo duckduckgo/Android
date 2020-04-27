@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.fire
+package com.duckduckgo.app.fire.fireproofwebsite.data
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
@@ -23,7 +23,5 @@ const val FIREPROOF_WEBSITES_TABLE_NAME = "fireproofWebsites"
 
 @Entity(tableName = FIREPROOF_WEBSITES_TABLE_NAME)
 data class FireproofWebsiteEntity(
-    @PrimaryKey val domain: String,
-    var title: String?,
-    val originalUrl: String
+    @PrimaryKey val domain: String
 )
