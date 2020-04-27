@@ -23,7 +23,7 @@ import com.duckduckgo.app.job.AndroidJobCleaner
 import com.duckduckgo.app.job.AndroidWorkScheduler
 import com.duckduckgo.app.job.JobCleaner
 import com.duckduckgo.app.job.WorkScheduler
-import com.duckduckgo.app.notification.NotificationScheduler
+import com.duckduckgo.app.notification.AndroidNotificationScheduler
 import dagger.Module
 import dagger.Provides
 import javax.inject.Singleton
@@ -45,7 +45,7 @@ class JobsModule {
 
     @Singleton
     @Provides
-    fun providesWorkScheduler(notificationScheduler: NotificationScheduler, jobCleaner: JobCleaner): WorkScheduler {
+    fun providesWorkScheduler(notificationScheduler: AndroidNotificationScheduler, jobCleaner: JobCleaner): WorkScheduler {
         return AndroidWorkScheduler(notificationScheduler, jobCleaner)
     }
 }

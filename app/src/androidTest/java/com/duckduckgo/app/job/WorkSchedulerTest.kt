@@ -16,7 +16,7 @@
 
 package com.duckduckgo.app.job
 
-import com.duckduckgo.app.notification.NotificationScheduler
+import com.duckduckgo.app.notification.AndroidNotificationScheduler
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.verify
 import kotlinx.coroutines.runBlocking
@@ -25,7 +25,7 @@ import org.junit.Test
 
 class WorkSchedulerTest {
 
-    private val notificationScheduler: NotificationScheduler = mock()
+    private val notificationScheduler: AndroidNotificationScheduler = mock()
     private val jobCleaner: JobCleaner = mock()
 
     private lateinit var testee: WorkScheduler
@@ -39,7 +39,7 @@ class WorkSchedulerTest {
     }
 
     @Test
-    fun allDeprecatedWorkIsCancelledUponStart() = runBlocking<Unit> {
+    fun schedulesNextNotificationAndCleansDeprecatedJobs() = runBlocking<Unit> {
         testee.scheduleWork()
 
         verify(notificationScheduler).scheduleNextNotification()

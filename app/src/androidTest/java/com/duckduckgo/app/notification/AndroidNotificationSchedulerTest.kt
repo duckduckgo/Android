@@ -22,7 +22,8 @@ import androidx.test.platform.app.InstrumentationRegistry
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import com.duckduckgo.app.CoroutineTestRule
-import com.duckduckgo.app.notification.NotificationScheduler.*
+import com.duckduckgo.app.notification.NotificationScheduler.ClearDataNotificationWorker
+import com.duckduckgo.app.notification.NotificationScheduler.PrivacyNotificationWorker
 import com.duckduckgo.app.notification.model.SchedulableNotification
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.VariantManager.Companion.DEFAULT_VARIANT
@@ -95,18 +96,6 @@ class AndroidNotificationSchedulerTest {
         testee.scheduleNextNotification()
 
         assertNoUnusedAppNotificationScheduled()
-    }
-
-    @Test
-    fun allDeprecatedWorkIsCancelledUponStart() = runBlocking<Unit> {
-        whenever(privacyNotification.canShow()).thenReturn(false)
-        whenever(clearNotification.canShow()).thenReturn(false)
-
-        testee.scheduleNextNotification()
-
-        NotificationScheduler.allDeprecatedNotificationWorkTags().forEach {
-            assertTrue(getScheduledWorkers(it).isEmpty())
-        }
     }
 
     private fun assertUnusedAppNotificationScheduled(workerName: String) {

@@ -16,14 +16,14 @@
 
 package com.duckduckgo.app.job
 
-import com.duckduckgo.app.notification.NotificationScheduler
+import com.duckduckgo.app.notification.AndroidNotificationScheduler
 
 interface WorkScheduler {
     suspend fun scheduleWork()
 }
 
 class AndroidWorkScheduler(
-    private val notificationScheduler: NotificationScheduler,
+    private val notificationScheduler: AndroidNotificationScheduler,
     private val jobCleaner: JobCleaner
 ) : WorkScheduler {
     override suspend fun scheduleWork() {
