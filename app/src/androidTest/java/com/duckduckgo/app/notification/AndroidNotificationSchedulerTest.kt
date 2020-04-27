@@ -98,17 +98,29 @@ class AndroidNotificationSchedulerTest {
         assertNoUnusedAppNotificationScheduled()
     }
 
+    @Test
+    fun allDeprecatedWorkIsCancelledUponStart() = runBlocking<Unit> {
+        whenever(privacyNotification.canShow()).thenReturn(false)
+        whenever(clearNotification.canShow()).thenReturn(false)
+
+        testee.scheduleNextNotification()
+
+        NotificationScheduler.allDeprecatedWorkTags().forEach {
+            assertTrue(getScheduledWorkers(it).isEmpty())
+        }
+    }
+
     private fun assertUnusedAppNotificationScheduled(workerName: String) {
-        assertTrue(getUnusedAppScheduledWorkers().any { it.tags.contains(workerName) })
+        assertTrue(getScheduledWorkers(NotificationScheduler.UNUSED_APP_WORK_REQUEST_TAG).any { it.tags.contains(workerName) })
     }
 
     private fun assertNoUnusedAppNotificationScheduled() {
-        assertTrue(getUnusedAppScheduledWorkers().isEmpty())
+        assertTrue(getScheduledWorkers(NotificationScheduler.UNUSED_APP_WORK_REQUEST_TAG).isEmpty())
     }
 
-    private fun getUnusedAppScheduledWorkers(): List<WorkInfo> {
+    private fun getScheduledWorkers(tag: String): List<WorkInfo> {
         return workManager
-            .getWorkInfosByTag(NotificationScheduler.UNUSED_APP_WORK_REQUEST_TAG)
+            .getWorkInfosByTag(tag)
             .get()
             .filter { it.state == WorkInfo.State.ENQUEUED }
     }
