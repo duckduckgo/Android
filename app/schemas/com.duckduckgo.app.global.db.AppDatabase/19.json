@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 19,
-    "identityHash": "867c9f01442685872406ae91181e083e",
+    "identityHash": "c2140ed55b1545ccedf0e1ed968beca1",
     "entities": [
       {
         "tableName": "tds_tracker",
@@ -296,7 +296,7 @@
             "columnNames": [
               "tabId"
             ],
-            "createSql": "CREATE  INDEX `index_tabs_tabId` ON `${TABLE_NAME}` (`tabId`)"
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_tabs_tabId` ON `${TABLE_NAME}` (`tabId`)"
           }
         ],
         "foreignKeys": []
@@ -331,7 +331,7 @@
             "columnNames": [
               "tabId"
             ],
-            "createSql": "CREATE  INDEX `index_tab_selection_tabId` ON `${TABLE_NAME}` (`tabId`)"
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_tab_selection_tabId` ON `${TABLE_NAME}` (`tabId`)"
           }
         ],
         "foreignKeys": [
@@ -660,23 +660,11 @@
       },
       {
         "tableName": "fireproofWebsites",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`domain` TEXT NOT NULL, `title` TEXT, `originalUrl` TEXT NOT NULL, PRIMARY KEY(`domain`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`domain` TEXT NOT NULL, PRIMARY KEY(`domain`))",
         "fields": [
           {
             "fieldPath": "domain",
             "columnName": "domain",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "title",
-            "columnName": "title",
-            "affinity": "TEXT",
-            "notNull": false
-          },
-          {
-            "fieldPath": "originalUrl",
-            "columnName": "originalUrl",
             "affinity": "TEXT",
             "notNull": true
           }
@@ -694,7 +682,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '867c9f01442685872406ae91181e083e')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'c2140ed55b1545ccedf0e1ed968beca1')"
     ]
   }
 }

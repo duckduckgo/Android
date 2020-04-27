@@ -712,9 +712,8 @@ class BrowserTabViewModel(
     fun onFireproofWebsiteClicked() {
         viewModelScope.launch {
             val url = url ?: return@launch
-            val title = title ?: ""
             val urlDomain = Uri.parse(url).host ?: return@launch
-            val fireproofWebsiteEntity = FireproofWebsiteEntity(domain = urlDomain, title = title, originalUrl = url)
+            val fireproofWebsiteEntity = FireproofWebsiteEntity(domain = urlDomain)
             val id = withContext(dispatchers.io()) {
                 fireproofWebsiteDao.insert(fireproofWebsiteEntity)
             }
