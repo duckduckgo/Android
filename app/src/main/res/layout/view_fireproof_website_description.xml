@@ -29,5 +29,5 @@
         android:textColor="?attr/settingsMinorTextColor"
         android:textSize="14sp"
         android:textStyle="normal"
-        tools:text="Bookmark" />
+        tools:text="Lorem ipsum dolor sit amet" />
 </LinearLayout>
