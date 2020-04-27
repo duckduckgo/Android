@@ -558,7 +558,6 @@ class BrowserTabViewModel(
             Timber.v("Page refreshed: $refreshedUrl")
             pageChanged(refreshedUrl, title)
         }
-        browserViewState.value = currentBrowserViewState().copy(canFireproofSite = canFireproofWebsite())
     }
 
     override fun progressChanged(newProgress: Int) {

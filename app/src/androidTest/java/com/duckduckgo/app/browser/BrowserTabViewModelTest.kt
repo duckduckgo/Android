@@ -50,8 +50,9 @@ import com.duckduckgo.app.cta.db.DismissedCtaDao
 import com.duckduckgo.app.cta.model.CtaId
 import com.duckduckgo.app.cta.model.DismissedCta
 import com.duckduckgo.app.cta.ui.*
+import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteDao
+import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
 import com.duckduckgo.app.global.db.AppDatabase
-import com.duckduckgo.app.cta.ui.HomeTopPanelCta
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.model.SiteFactory
 import com.duckduckgo.app.onboarding.store.OnboardingStore
@@ -188,6 +189,8 @@ class BrowserTabViewModelTest {
 
     private lateinit var testee: BrowserTabViewModel
 
+    private lateinit var fireproofWebsiteDao: FireproofWebsiteDao
+
     private val selectedTabLiveData = MutableLiveData<TabEntity>()
 
     @Before
@@ -197,6 +200,7 @@ class BrowserTabViewModelTest {
         db = Room.inMemoryDatabaseBuilder(getInstrumentation().targetContext, AppDatabase::class.java)
             .allowMainThreadQueries()
             .build()
+        fireproofWebsiteDao = db.fireproofWebsiteDao()
 
         mockAutoCompleteApi = AutoCompleteApi(mockAutoCompleteService, mockBookmarksDao)
 
@@ -242,7 +246,8 @@ class BrowserTabViewModelTest {
             ctaViewModel = ctaViewModel,
             searchCountDao = mockSearchCountDao,
             pixel = mockPixel,
-            dispatchers = coroutineRule.testDispatcherProvider
+            dispatchers = coroutineRule.testDispatcherProvider,
+            fireproofWebsiteDao = fireproofWebsiteDao
         )
 
         testee.loadData("abc", null, false)
@@ -1222,6 +1227,7 @@ class BrowserTabViewModelTest {
         assertFalse(browserViewState().canGoForward)
         assertFalse(browserViewState().canReportSite)
         assertFalse(browserViewState().canChangeBrowsingMode)
+        assertFalse(browserViewState().canFireproofSite)
         assertFalse(findInPageViewState().canFindInPage)
     }
 
@@ -1678,6 +1684,83 @@ class BrowserTabViewModelTest {
         assertEquals("surrogate.com", brokenSiteFeedback.surrogates)
     }
 
+    @Test
+    fun whenHomeShowingByPressingBackThenFireproofWebsiteOptionMenuDisabled() {
+        setupNavigation(isBrowsing = true)
+        testee.onUserPressedBack()
+        assertFalse(browserViewState().canFireproofSite)
+    }
+
+    @Test
+    fun whenUserLoadsNotFireproofWebsiteThenFireproofWebsiteOptionMenuEnabled() {
+        loadUrl("http://www.example.com/path", isBrowserShowing = true)
+        assertTrue(browserViewState().canFireproofSite)
+    }
+
+    @Test
+    fun whenUserLoadsFireproofWebsiteThenFireproofWebsiteOptionMenuDisabled() {
+        givenFireproofWebsiteDomain("www.example.com")
+        loadUrl("http://www.example.com/path", isBrowserShowing = true)
+        assertFalse(browserViewState().canFireproofSite)
+    }
+
+    @Test
+    fun whenUserLoadsFireproofWebsiteSubDomainThenFireproofWebsiteOptionMenuEnabled() {
+        givenFireproofWebsiteDomain("example.com")
+        loadUrl("http://mobile.example.com/path", isBrowserShowing = true)
+        assertTrue(browserViewState().canFireproofSite)
+    }
+
+    @Test
+    fun whenUrlClearedThenFireproofWebsiteOptionMenuDisabled() {
+        loadUrl("http://www.example.com/path")
+        assertTrue(browserViewState().canFireproofSite)
+        loadUrl(null)
+        assertFalse(browserViewState().canFireproofSite)
+    }
+
+    @Test
+    fun whenUrlIsUpdatedWithNonFireproofWebsiteThenFireproofWebsiteOptionMenuEnabled() {
+        givenFireproofWebsiteDomain("www.example.com")
+        loadUrl("http://www.example.com/", isBrowserShowing = true)
+        updateUrl("http://www.example.com/", "http://twitter.com/explore", true)
+        assertTrue(browserViewState().canFireproofSite)
+    }
+
+    @Test
+    fun whenUrlIsUpdatedWithFireproofWebsiteThenFireproofWebsiteOptionMenuDisabled() {
+        givenFireproofWebsiteDomain("twitter.com")
+        loadUrl("http://example.com/", isBrowserShowing = true)
+        updateUrl("http://example.com/", "http://twitter.com/explore", true)
+        assertFalse(browserViewState().canFireproofSite)
+    }
+
+    @Test
+    fun whenUserClicksFireproofWebsiteOptionMenuThenShowConfirmationIsIssued() {
+        loadUrl("http://mobile.example.com/", isBrowserShowing = true)
+        testee.onFireproofWebsiteClicked()
+        assertCommandIssued<Command.ShowFireproofWebSiteConfirmation> {
+            assertEquals("mobile.example.com", this.fireproofWebsiteEntity.domain)
+        }
+    }
+
+    @Test
+    fun whenUserClicksFireproofWebsiteOptionMenuThenFireproofWebsiteOptionMenuDisabled() {
+        loadUrl("http://example.com/", isBrowserShowing = true)
+        testee.onFireproofWebsiteClicked()
+        assertFalse(browserViewState().canFireproofSite)
+    }
+
+    @Test
+    fun whenUserClicksOnFireproofWebsiteSnackbarUndoActionThenFireproofWebsiteIsRemoved() {
+        loadUrl("http://example.com/", isBrowserShowing = true)
+        testee.onFireproofWebsiteClicked()
+        assertCommandIssued<Command.ShowFireproofWebSiteConfirmation> {
+            testee.onFireproofWebsiteSnackbarActionClicked(this.fireproofWebsiteEntity)
+        }
+        assertTrue(browserViewState().canFireproofSite)
+    }
+
     private inline fun <reified T : Command> assertCommandIssued(instanceAssertions: T.() -> Unit = {}) {
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
         val issuedCommand = commandCaptor.allValues.find { it is T }
@@ -1710,6 +1793,12 @@ class BrowserTabViewModelTest {
     private fun givenOneActiveTabSelected() {
         selectedTabLiveData.value = TabEntity("TAB_ID", "https://example.com", "", skipHome = false, viewed = true, position = 0)
         testee.loadData("TAB_ID", "https://example.com", false)
+    }
+
+    private fun givenFireproofWebsiteDomain(vararg fireproofWebsitesDomain: String) {
+        fireproofWebsitesDomain.forEach {
+            fireproofWebsiteDao.insert(FireproofWebsiteEntity(domain = it))
+        }
     }
 
     private fun setBrowserShowing(isBrowsing: Boolean) {
