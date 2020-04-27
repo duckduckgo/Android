@@ -52,7 +52,6 @@ import kotlinx.android.synthetic.main.content_settings_other.version
 import kotlinx.android.synthetic.main.content_settings_privacy.automaticallyClearWhatSetting
 import kotlinx.android.synthetic.main.content_settings_privacy.automaticallyClearWhenSetting
 import kotlinx.android.synthetic.main.include_toolbar.toolbar
-import kotlinx.android.synthetic.main.content_settings_general.searchNotificationToggle
 import javax.inject.Inject
 
 class SettingsActivity : DuckDuckGoActivity(), SettingsAutomaticallyClearWhatFragment.Listener, SettingsAutomaticallyClearWhenFragment.Listener {

@@ -20,7 +20,6 @@ import androidx.annotation.WorkerThread
 import com.duckduckgo.app.statistics.VariantManager.Companion.DEFAULT_VARIANT
 import com.duckduckgo.app.statistics.VariantManager.Companion.referrerVariant
 import com.duckduckgo.app.statistics.VariantManager.VariantFeature.BottomBarNavigation
-import com.duckduckgo.app.statistics.VariantManager.VariantFeature.StickySearchNotification
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import timber.log.Timber
 import java.util.Locale
