@@ -35,7 +35,7 @@ class FireproofWebsitesViewModel(
     )
 
     sealed class Command {
-        class ConfirmDeletePreservedWebsite(val entity: FireproofWebsiteEntity) : Command()
+        class ConfirmDeleteFireproofWebsite(val entity: FireproofWebsiteEntity) : Command()
     }
 
     val viewState: MutableLiveData<ViewState> = MutableLiveData()
@@ -61,7 +61,7 @@ class FireproofWebsitesViewModel(
     }
 
     fun onDeleteRequested(entity: FireproofWebsiteEntity) {
-        command.value = ConfirmDeletePreservedWebsite(entity)
+        command.value = ConfirmDeleteFireproofWebsite(entity)
     }
 
     fun delete(entity: FireproofWebsiteEntity) {

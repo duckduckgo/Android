@@ -64,7 +64,7 @@ class FireproofWebsitesActivity : DuckDuckGoActivity() {
 
         viewModel.command.observe(this, Observer {
             when (it) {
-                is FireproofWebsitesViewModel.Command.ConfirmDeletePreservedWebsite -> confirmDeleteWebsite(it.entity)
+                is FireproofWebsitesViewModel.Command.ConfirmDeleteFireproofWebsite -> confirmDeleteWebsite(it.entity)
             }
         })
     }
