@@ -841,6 +841,14 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
             }
 
             it.setDownloadListener { url, _, contentDisposition, mimeType, _ ->
+                //handling target=_blank if link points to a file
+                if (viewModel.url == null) {     //in an empty tab
+                    launch {
+                        viewModel.closeCurrentTab()
+                        destroyWebView()
+                    }
+                }
+
                 requestFileDownload(url, contentDisposition, mimeType, true)
             }
 
