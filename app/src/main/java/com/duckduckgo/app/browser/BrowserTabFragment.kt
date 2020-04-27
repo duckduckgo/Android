@@ -353,13 +353,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
 
     override fun onPause() {
         logoHidingListener.onPause()
-        dismissDownloadFragment()
         super.onPause()
-    }
-
-    private fun dismissDownloadFragment() {
-        val fragment = fragmentManager?.findFragmentByTag(DOWNLOAD_CONFIRMATION_TAG) as? DownloadConfirmationFragment
-        fragment?.dismiss()
     }
 
     private fun createPopupMenu() {
