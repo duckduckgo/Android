@@ -16,11 +16,8 @@
 
 package com.duckduckgo.app.global
 
-import android.app.Activity
 import android.app.Application
-import android.app.Service
 import android.os.Build
-import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.OnLifecycleEvent
@@ -40,8 +37,8 @@ import com.duckduckgo.app.global.rating.AppEnjoymentLifecycleObserver
 import com.duckduckgo.app.global.shortcut.AppShortcutCreator
 import com.duckduckgo.app.httpsupgrade.HttpsUpgrader
 import com.duckduckgo.app.job.AppConfigurationSyncer
-import com.duckduckgo.app.notification.NotificationRegistrar
 import com.duckduckgo.app.notification.AndroidNotificationScheduler
+import com.duckduckgo.app.notification.NotificationRegistrar
 import com.duckduckgo.app.referral.AppInstallationReferrerStateListener
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.AtbInitializer
@@ -59,6 +56,8 @@ import com.duckduckgo.app.usage.app.AppDaysUsedRecorder
 import dagger.android.AndroidInjector
 import dagger.android.DispatchingAndroidInjector
 import dagger.android.HasAndroidInjector
+import io.reactivex.exceptions.UndeliverableException
+import io.reactivex.plugins.RxJavaPlugins
 import io.reactivex.schedulers.Schedulers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -196,6 +195,13 @@ open class DuckDuckGoApplication : HasAndroidInjector, Application(), LifecycleO
 
     private fun configureUncaughtExceptionHandler() {
         Thread.setDefaultUncaughtExceptionHandler(alertingUncaughtExceptionHandler)
+        RxJavaPlugins.setErrorHandler { throwable ->
+            if (throwable is UndeliverableException) {
+                Timber.w(throwable, "An exception happened inside RxJava code but no subscriber was still around to handle it")
+            } else {
+                alertingUncaughtExceptionHandler.uncaughtException(Thread.currentThread(), throwable)
+            }
+        }
     }
 
     private fun recordInstallationTimestamp() {
