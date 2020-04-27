@@ -53,7 +53,7 @@
         <item name="tabsFireTextColor">@color/white</item>
         <item name="tabCardBackgroundColor">@color/almostBlack</item>
         <item name="bookmarkIconColor">@color/white</item>
-        <item name="bookmarkFaviconBackground">@color/almostBlack</item>
+        <item name="websiteListFaviconBackground">@color/almostBlack</item>
         <item name="bookmarkTitleTextColor">@color/white</item>
         <item name="fireproofWebsiteTitleTextColor">@color/white</item>
         <item name="bookmarkSubtitleTextColor">@color/grayishTwo</item>
@@ -126,7 +126,7 @@
         <item name="tabsFireTextColor">@color/warmerGray</item>
         <item name="tabCardBackgroundColor">@color/white</item>
         <item name="bookmarkIconColor">@color/grayishBrown</item>
-        <item name="bookmarkFaviconBackground">@color/whiteSix</item>
+        <item name="websiteListFaviconBackground">@color/whiteSix</item>
         <item name="bookmarkTitleTextColor">@color/almostBlack</item>
         <item name="fireproofWebsiteTitleTextColor">@color/almostBlack</item>
         <item name="bookmarkSubtitleTextColor">@color/warmerGray</item>
