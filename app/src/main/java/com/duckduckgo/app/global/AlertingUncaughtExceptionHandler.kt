@@ -24,7 +24,9 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import java.io.InterruptedIOException
+import java.lang.IllegalArgumentException
 
 class AlertingUncaughtExceptionHandler(
     private val originalHandler: Thread.UncaughtExceptionHandler,
@@ -65,11 +67,14 @@ class AlertingUncaughtExceptionHandler(
 
     private fun recordExceptionAndAllowCrash(thread: Thread?, originalException: Throwable?) {
         GlobalScope.launch(Dispatchers.IO + NonCancellable) {
-            uncaughtExceptionRepository.recordUncaughtException(originalException, UncaughtExceptionSource.GLOBAL)
-            offlinePixelCountDataStore.applicationCrashCount += 1
-
-            // wait until the exception has been fully processed before propagating exception
-            originalHandler.uncaughtException(thread, originalException)
+            try {
+                uncaughtExceptionRepository.recordUncaughtException(originalException, UncaughtExceptionSource.GLOBAL)
+                offlinePixelCountDataStore.applicationCrashCount += 1
+            } catch (e: Throwable) {
+                Timber.e(e, "Failed to record exception")
+            } finally {
+                originalHandler.uncaughtException(thread, originalException)
+            }
         }
     }
 }
