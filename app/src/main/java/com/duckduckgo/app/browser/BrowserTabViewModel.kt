@@ -414,6 +414,11 @@ class BrowserTabViewModel(
     fun onUserPressedBack(): Boolean {
         val navigation = webNavigationState ?: return false
 
+        if (currentFindInPageViewState().visible) {
+            dismissFindInView()
+            return true
+        }
+
         if (!currentBrowserViewState().browserShowing) {
             return false
         }
