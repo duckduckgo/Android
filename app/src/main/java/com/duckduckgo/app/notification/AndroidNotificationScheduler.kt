@@ -120,7 +120,7 @@ class NotificationScheduler(
 
         // below there is a list of TAGs that were used at some point but that are no longer active
         // we want to make sure that this TAGs are cancelled to avoid inconsistencies
-        const val CONTINUOUS_APP_USE_REQUEST_TAG = "com.duckduckgo.notification.schedule.continuous" // Sticky Search Experiment
+        private const val CONTINUOUS_APP_USE_REQUEST_TAG = "com.duckduckgo.notification.schedule.continuous" // Sticky Search Experiment
 
         fun allDeprecatedWorkTags() = listOf(CONTINUOUS_APP_USE_REQUEST_TAG)
     }
