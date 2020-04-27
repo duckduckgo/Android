@@ -33,10 +33,8 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.feedback.ui.common.FeedbackActivity
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.sendThemeChangedBroadcast
-import com.duckduckgo.app.global.view.gone
 import com.duckduckgo.app.global.view.launchDefaultAppActivity
 import com.duckduckgo.app.icon.ui.ChangeIconActivity
-import com.duckduckgo.app.global.view.show
 import com.duckduckgo.app.settings.SettingsViewModel.AutomaticallyClearData
 import com.duckduckgo.app.settings.SettingsViewModel.Command
 import com.duckduckgo.app.settings.clear.ClearWhatOption
@@ -47,16 +45,6 @@ import kotlinx.android.synthetic.main.content_settings_general.autocompleteToggl
 import kotlinx.android.synthetic.main.content_settings_general.changeAppIcon
 import kotlinx.android.synthetic.main.content_settings_general.changeAppIconLabel
 import kotlinx.android.synthetic.main.content_settings_general.lightThemeToggle
-import kotlinx.android.synthetic.main.content_settings_general.setAsDefaultBrowserSetting
-import kotlinx.android.synthetic.main.content_settings_other.about
-import kotlinx.android.synthetic.main.content_settings_other.provideFeedback
-import kotlinx.android.synthetic.main.content_settings_other.version
-import kotlinx.android.synthetic.main.content_settings_privacy.automaticallyClearWhatSetting
-import kotlinx.android.synthetic.main.content_settings_privacy.automaticallyClearWhenSetting
-import kotlinx.android.synthetic.main.include_toolbar.toolbar
-import kotlinx.android.synthetic.main.content_settings_general.autocompleteToggle
-import kotlinx.android.synthetic.main.content_settings_general.lightThemeToggle
-import kotlinx.android.synthetic.main.content_settings_general.searchNotificationToggle
 import kotlinx.android.synthetic.main.content_settings_general.setAsDefaultBrowserSetting
 import kotlinx.android.synthetic.main.content_settings_other.about
 import kotlinx.android.synthetic.main.content_settings_other.provideFeedback
@@ -81,10 +69,6 @@ class SettingsActivity : DuckDuckGoActivity(), SettingsAutomaticallyClearWhatFra
 
     private val autocompleteToggleListener = OnCheckedChangeListener { _, isChecked ->
         viewModel.onAutocompleteSettingChanged(isChecked)
-    }
-
-    private val searchNotificationToggleListener = OnCheckedChangeListener { _, isChecked ->
-        viewModel.onSearchNotificationSettingChanged(isChecked)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -119,11 +103,9 @@ class SettingsActivity : DuckDuckGoActivity(), SettingsAutomaticallyClearWhatFra
                 version.setSubtitle(it.version)
                 lightThemeToggle.quietlySetIsChecked(it.lightThemeEnabled, lightThemeToggleListener)
                 autocompleteToggle.quietlySetIsChecked(it.autoCompleteSuggestionsEnabled, autocompleteToggleListener)
-                searchNotificationToggle.quietlySetIsChecked(it.searchNotificationEnabled, searchNotificationToggleListener)
                 updateDefaultBrowserViewVisibility(it)
                 updateAutomaticClearDataOptions(it.automaticallyClearData)
                 changeAppIcon.setImageResource(it.appIcon.icon)
-                showSearchNotification(it.showSearchNotificationToggle)
             }
         })
 
@@ -141,14 +123,6 @@ class SettingsActivity : DuckDuckGoActivity(), SettingsAutomaticallyClearWhatFra
 
         val whenOptionEnabled = automaticallyClearData.clearWhenOptionEnabled
         automaticallyClearWhenSetting.isEnabled = whenOptionEnabled
-    }
-
-    private fun showSearchNotification(enabled: Boolean) {
-        if (enabled) {
-            searchNotificationToggle.show()
-        } else {
-            searchNotificationToggle.gone()
-        }
     }
 
     private fun launchAutomaticallyClearWhatDialog() {

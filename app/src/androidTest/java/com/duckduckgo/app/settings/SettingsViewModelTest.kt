@@ -68,9 +68,6 @@ class SettingsViewModelTest {
     private lateinit var mockVariantManager: VariantManager
 
     @Mock
-    private lateinit var notificationScheduler: AndroidNotificationScheduler
-
-    @Mock
     private lateinit var mockPixel: Pixel
 
     private lateinit var commandCaptor: KArgumentCaptor<Command>
@@ -82,7 +79,7 @@ class SettingsViewModelTest {
         context = InstrumentationRegistry.getInstrumentation().targetContext
         commandCaptor = argumentCaptor()
 
-        testee = SettingsViewModel(mockAppSettingsDataStore, mockDefaultBrowserDetector, mockVariantManager, mockPixel, notificationScheduler)
+        testee = SettingsViewModel(mockAppSettingsDataStore, mockDefaultBrowserDetector, mockVariantManager, mockPixel)
         testee.command.observeForever(commandObserver)
 
         whenever(mockAppSettingsDataStore.automaticallyClearWhenOption).thenReturn(APP_EXIT_ONLY)
@@ -228,33 +225,6 @@ class SettingsViewModelTest {
         testee.command.blockingObserve()
         verify(commandObserver).onChanged(commandCaptor.capture())
         assertEquals(Command.LaunchAppIcon, commandCaptor.firstValue)
-    }
-
-    @Test
-    fun whenSearchNotificationWasPreviouslyEnabledThenViewStateIndicatesIt() {
-        whenever(mockAppSettingsDataStore.searchNotificationEnabled).thenReturn(true)
-        testee.start()
-        assertTrue(latestViewState().searchNotificationEnabled)
-    }
-
-    @Test
-    fun whenSearchNotificationToggledOnThenDataStoreIsUpdatedAndNotificationShown() {
-        testee.onSearchNotificationSettingChanged(true)
-        verify(mockAppSettingsDataStore).searchNotificationEnabled = true
-        verify(notificationScheduler).launchStickySearchNotification()
-        verify(mockPixel).fire(Pixel.PixelName.QUICK_SEARCH_NOTIFICATION_ENABLED)
-
-        assertTrue(latestViewState().searchNotificationEnabled)
-    }
-
-    @Test
-    fun whenSearchNotificationToggledOffThenDataStoreIsUpdatedAndNotificationRemoved() {
-        testee.onSearchNotificationSettingChanged(false)
-        verify(mockAppSettingsDataStore).searchNotificationEnabled = false
-        verify(notificationScheduler).dismissStickySearchNotification()
-        verify(mockPixel).fire(Pixel.PixelName.QUICK_SEARCH_NOTIFICATION_DISABLED)
-
-        assertFalse(latestViewState().searchNotificationEnabled)
     }
 
     private fun latestViewState() = testee.viewState.value!!

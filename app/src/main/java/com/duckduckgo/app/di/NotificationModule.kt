@@ -27,11 +27,8 @@ import com.duckduckgo.app.notification.AndroidNotificationScheduler
 import com.duckduckgo.app.notification.db.NotificationDao
 import com.duckduckgo.app.notification.model.ClearDataNotification
 import com.duckduckgo.app.notification.model.PrivacyProtectionNotification
-import com.duckduckgo.app.notification.model.SearchPromptNotification
-import com.duckduckgo.app.notification.model.StickySearchNotification
 import com.duckduckgo.app.privacy.db.PrivacyProtectionCountDao
 import com.duckduckgo.app.settings.db.SettingsDataStore
-import com.duckduckgo.app.statistics.VariantManager
 import dagger.Module
 import dagger.Provides
 import javax.inject.Singleton
@@ -76,36 +73,16 @@ class NotificationModule {
     }
 
     @Provides
-    fun provideStickySearchNotification(
-        context: Context,
-        notificationDao: NotificationDao
-    ): StickySearchNotification {
-        return StickySearchNotification(context, notificationDao)
-    }
-
-    @Provides
-    fun provideSearchPromptNotification(
-        context: Context,
-        notificationDao: NotificationDao,
-        variantManager: VariantManager,
-        settingsDataStore: SettingsDataStore
-    ): SearchPromptNotification {
-        return SearchPromptNotification(context, notificationDao, variantManager, settingsDataStore)
-    }
-
-    @Provides
     @Singleton
     fun providesNotificationScheduler(
         workManager: WorkManager,
         clearDataNotification: ClearDataNotification,
-        privacyProtectionNotification: PrivacyProtectionNotification,
-        stickySearchNotification: StickySearchNotification
+        privacyProtectionNotification: PrivacyProtectionNotification
     ): AndroidNotificationScheduler {
         return NotificationScheduler(
             workManager,
             clearDataNotification,
-            privacyProtectionNotification,
-            stickySearchNotification
+            privacyProtectionNotification
         )
     }
 
