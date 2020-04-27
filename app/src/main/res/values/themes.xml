@@ -54,6 +54,7 @@
         <item name="bookmarkIconColor">@color/white</item>
         <item name="bookmarkFaviconBackground">@color/almostBlack</item>
         <item name="bookmarkTitleTextColor">@color/white</item>
+        <item name="fireproofWebsiteTitleTextColor">@color/white</item>
         <item name="bookmarkSubtitleTextColor">@color/grayishTwo</item>
         <item name="settingsItemTextColor">@color/white</item>
         <item name="settingsItemTextColorDisabled">@color/midGray</item>
@@ -126,6 +127,7 @@
         <item name="bookmarkIconColor">@color/grayishBrown</item>
         <item name="bookmarkFaviconBackground">@color/whiteSix</item>
         <item name="bookmarkTitleTextColor">@color/almostBlack</item>
+        <item name="fireproofWebsiteTitleTextColor">@color/almostBlack</item>
         <item name="bookmarkSubtitleTextColor">@color/warmerGray</item>
         <item name="settingsItemTextColor">@color/grayishBrown</item>
         <item name="settingsItemTextColorDisabled">@color/pinkish_grey_two</item>

@@ -61,5 +61,6 @@
     <attr name="topCallToActionDescriptionColor" format="color" />
     <attr name="topCallToActionBackgroundColor" format="color" />
     <attr name="privacyDashboardLogoLetterTextColor" format="color" />
+    <attr name="fireproofWebsiteTitleTextColor" format="color" />
 
 </resources>

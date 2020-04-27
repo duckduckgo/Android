@@ -48,7 +48,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:fontFamily="sans-serif"
-        android:textColor="?attr/bookmarkTitleTextColor"
+        android:textColor="?attr/fireproofWebsiteTitleTextColor"
         android:textSize="16sp"
         android:textStyle="normal"
         android:maxLines="1"
