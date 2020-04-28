@@ -25,8 +25,6 @@ import android.view.View
 import android.view.ViewGroup.LayoutParams.WRAP_CONTENT
 import android.widget.PopupWindow
 import com.duckduckgo.app.browser.R
-import com.duckduckgo.app.statistics.Variant
-import com.duckduckgo.app.statistics.VariantManager
 
 class TabsPopupMenu(layoutInflater: LayoutInflater, view: View = inflate(layoutInflater, R.layout.popup_window_tabs_menu)) :
     PopupWindow(view, WRAP_CONTENT, WRAP_CONTENT, true) {
@@ -55,14 +53,14 @@ class TabsPopupMenu(layoutInflater: LayoutInflater, view: View = inflate(layoutI
     fun show(rootView: View, anchorView: View) {
         val anchorLocation = IntArray(2)
         anchorView.getLocationOnScreen(anchorLocation)
-        val x = margin
-        val y = anchorLocation[1] + margin
+        val x = MARGIN
+        val y = anchorLocation[1] + MARGIN
         showAtLocation(rootView, Gravity.TOP or Gravity.END, x, y)
     }
 
     companion object {
 
-        private const val margin = 30
+        private const val MARGIN = 30
 
         fun inflate(layoutInflater: LayoutInflater, resourceId: Int): View {
             return layoutInflater.inflate(resourceId, null)
