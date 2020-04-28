@@ -348,7 +348,6 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
         configureFindInPage()
         configureAutoComplete()
         configureKeyboardAwareLogoAnimation()
-        configureAppBar()
 
         decorateWithFeatures()
 
