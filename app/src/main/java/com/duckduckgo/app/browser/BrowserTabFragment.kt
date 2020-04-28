@@ -656,6 +656,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
 
     private fun openInNewBackgroundTab() {
         appBarLayout.setExpanded(true, true)
+        decorator.updateBottomBarVisibility(true, true)
         viewModel.tabs.removeObservers(this)
         decorator.incrementTabs()
     }
