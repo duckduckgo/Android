@@ -30,34 +30,17 @@ class VariantManagerTest {
     // SERP Experiment(s)
 
     @Test
-    fun serpControlVariantIsActiveAndHasNoFeatures() {
+    fun serpControlVariantHasExpectedWeightAndNoFeatures() {
         val variant = variants.first { it.key == "sc" }
-        assertEqualsDouble(1.0, variant.weight)
+        assertEqualsDouble(0.0, variant.weight)
         assertEquals(0, variant.features.size)
     }
 
     @Test
-    fun serpExperimentalVariantIsActiveAndHasNoFeatures() {
+    fun serpExperimentalVariantHasExpectedWeightAndNoFeatures() {
         val variant = variants.first { it.key == "se" }
-        assertEqualsDouble(1.0, variant.weight)
+        assertEqualsDouble(0.0, variant.weight)
         assertEquals(0, variant.features.size)
-    }
-
-    // Search Notification Experiment
-
-    @Test
-    fun searchNotificationControlVariantIsActiveAndHasNoFeatures() {
-        val variant = variants.first { it.key == "mf" }
-        assertEqualsDouble(1.0, variant.weight)
-        assertEquals(0, variant.features.size)
-    }
-
-    @Test
-    fun searchNotificationVariantIsActiveAndHasStickySearchNotificationFeature() {
-        val variant = variants.first { it.key == "mg" }
-        assertEqualsDouble(1.0, variant.weight)
-        assertEquals(1, variant.features.size)
-        assertTrue(variant.hasFeature(StickySearchNotification))
     }
 
     // Bottom Bar Navigation Experiment

@@ -20,7 +20,6 @@ import androidx.annotation.WorkerThread
 import com.duckduckgo.app.statistics.VariantManager.Companion.DEFAULT_VARIANT
 import com.duckduckgo.app.statistics.VariantManager.Companion.referrerVariant
 import com.duckduckgo.app.statistics.VariantManager.VariantFeature.BottomBarNavigation
-import com.duckduckgo.app.statistics.VariantManager.VariantFeature.StickySearchNotification
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import timber.log.Timber
 import java.util.Locale
@@ -30,7 +29,6 @@ interface VariantManager {
 
     // variant-dependant features listed here
     sealed class VariantFeature {
-        object StickySearchNotification : VariantFeature()
         object BottomBarNavigation : VariantFeature()
     }
 
@@ -44,20 +42,8 @@ interface VariantManager {
         val ACTIVE_VARIANTS = listOf(
             // SERP variants. "sc" may also be used as a shared control for mobile experiments in
             // the future if we can filter by app version
-            Variant(key = "sc", weight = 1.0, features = emptyList(), filterBy = { noFilter() }),
-            Variant(key = "se", weight = 1.0, features = emptyList(), filterBy = { noFilter() }),
-
-            // Quick Search Notification Experiment
-            Variant(
-                key = "mf",
-                weight = 1.0,
-                features = emptyList(),
-                filterBy = { isEnglishLocale() }),
-            Variant(
-                key = "mg",
-                weight = 1.0,
-                features = listOf(StickySearchNotification),
-                filterBy = { isEnglishLocale() }),
+            Variant(key = "sc", weight = 0.0, features = emptyList(), filterBy = { noFilter() }),
+            Variant(key = "se", weight = 0.0, features = emptyList(), filterBy = { noFilter() }),
 
             // Bottom Bar Navigation Experiment
             Variant(
