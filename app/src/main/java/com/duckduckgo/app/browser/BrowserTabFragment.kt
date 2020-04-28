@@ -1390,7 +1390,10 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
                     pixel.fire(String.format(Locale.US, Pixel.PixelName.MENU_ACTION_REFRESH_PRESSED.pixelName, variantManager.getVariant().key))
                 }
                 onMenuItemClicked(view.sharePopupMenuItem) { viewModel.onShareSelected() }
-                onMenuItemClicked(view.newTabPopupMenuItem) { viewModel.userRequestedOpeningNewTab() }
+                onMenuItemClicked(view.newTabPopupMenuItem) {
+                    viewModel.userRequestedOpeningNewTab()
+                    pixel.fire(String.format(Locale.US, Pixel.PixelName.MENU_ACTION_NEW_TAB_PRESSED.pixelName, variantManager.getVariant().key))
+                }
                 onMenuItemClicked(view.addBookmarksPopupMenuItem) { launch { viewModel.onBookmarkAddRequested() } }
                 onMenuItemClicked(view.findInPageMenuItem) { viewModel.onFindInPageSelected() }
                 onMenuItemClicked(view.brokenSitePopupMenuItem) { viewModel.onBrokenSiteSelected() }
