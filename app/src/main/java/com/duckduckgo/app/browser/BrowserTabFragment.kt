@@ -1309,7 +1309,6 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
 
         fun decorateWithBottomBarSearch() {
             bindBottomBarButtons()
-            decorateBottomBarWithNavigationOnly()
             decorateAppBarWithBottomBar()
             createPopupMenuWithBottomBar()
             configureShowTabSwitcherListenerWithBottomBarNavigationOnly()
