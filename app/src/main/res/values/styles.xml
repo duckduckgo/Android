@@ -149,13 +149,13 @@
     <style name="BrowserIconMenuItem">
         <item name="android:paddingTop">6dp</item>
         <item name="android:paddingBottom">6dp</item>
-        <item name="android:background">@android:color/transparent</item>
-        <item name="android:tint">@color/browser_menu_icon</item>
+        <item name="android:background">?selectableItemBackground</item>
+        <item name="android:tint">?toolbarIconColor</item>
     </style>
 
     <style name="BrowserTextMenuItem">
-        <item name="android:paddingEnd">30dp</item>
-        <item name="android:paddingStart">30dp</item>
+        <item name="android:paddingEnd">24dp</item>
+        <item name="android:paddingStart">24dp</item>
         <item name="android:paddingTop">14dp</item>
         <item name="android:paddingBottom">14dp</item>
         <item name="android:textSize">16sp</item>
@@ -165,7 +165,19 @@
         <item name="android:layout_height">wrap_content</item>
         <item name="android:textColor">@color/browser_menu_text</item>
         <item name="android:background">?attr/selectableItemBackground</item>
-        <item name="android:color">@color/browser_menu_text</item>
+    </style>
+
+    <style name="BrowserCheckBoxMenuItem">
+        <item name="android:paddingEnd">24dp</item>
+        <item name="android:paddingStart">24dp</item>
+        <item name="android:paddingTop">14dp</item>
+        <item name="android:paddingBottom">14dp</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:background">?attr/selectableItemBackground</item>
     </style>
 
     <style name="OnboardingButtonPrimaryRoundedCta" parent="Widget.AppCompat.Button.Borderless">
