@@ -1286,9 +1286,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
 
     inner class BrowserTabFragmentDecorator {
         fun decorateToolbar(viewState: BrowserViewState) {
-            if (variantManager.getVariant().hasFeature(VariantManager.VariantFeature.BottomBarNavigation)) {
-                decorator.hideToolbarMenu()
-            } else {
+            if (!variantManager.getVariant().hasFeature(VariantManager.VariantFeature.BottomBarNavigation)) {
                 decorator.decorateToolbarActions(viewState)
             }
         }
@@ -1297,10 +1295,6 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
             tabsButton?.isVisible = viewState.showTabsButton
             fireMenuButton?.isVisible = viewState.showFireButton
             menuButton?.isVisible = viewState.showMenuButton
-        }
-
-        private fun hideToolbarMenu() {
-            menuButton?.gone()
         }
 
         fun decorateWithToolbar() {
