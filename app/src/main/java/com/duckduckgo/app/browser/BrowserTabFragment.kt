@@ -658,12 +658,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
     private fun openInNewBackgroundTab() {
         appBarLayout.setExpanded(true, true)
         viewModel.tabs.removeObservers(this)
-        tabsButton?.increment {
-            addTabsObserver()
-        }
-        bottomBarTabsItem.increment {
-            addTabsObserver()
-        }
+        decorator.incrementTabs()
     }
 
     private fun openExternalDialog(intent: Intent, fallbackUrl: String? = null, useFirstActivityFound: Boolean = true) {
@@ -1507,6 +1502,18 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
 
                 bottomBarTabsItem.count = tabs.count()
                 bottomBarTabsItem.hasUnread = tabs.firstOrNull { !it.viewed } != null
+            }
+        }
+
+        fun incrementTabs() {
+            if (isBottomNavigationFeatureEnabled()){
+                bottomBarTabsItem.increment {
+                    addTabsObserver()
+                }
+            } else {
+                tabsButton?.increment {
+                    addTabsObserver()
+                }
             }
         }
     }
