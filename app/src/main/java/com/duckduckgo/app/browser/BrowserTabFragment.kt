@@ -1308,6 +1308,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
         }
 
         fun decorateWithBottomBarSearch() {
+            bindBottomBarButtons()
             decorateBottomBarWithNavigationOnly()
             decorateAppBarWithBottomBar()
             createPopupMenuWithBottomBar()
@@ -1395,10 +1396,6 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
         private fun launchBottomAnchoredPopupMenu() {
             popupMenu.show(rootView, bottomNavigationBar)
             pixel.fire(String.format(Locale.US, Pixel.PixelName.MENU_ACTION_POPUP_OPENED.pixelName, variantManager.getVariant().key))
-        }
-
-        private fun decorateBottomBarWithNavigationOnly() {
-            bindBottomBarButtons()
         }
 
         private fun bindBottomBarButtons() {
@@ -1555,7 +1552,6 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
                 }
 
                 lastSeenBrowserViewState?.let {
-                    decorator.decorateToolbar(it)
                     renderToolbarMenus(it)
                 }
 
