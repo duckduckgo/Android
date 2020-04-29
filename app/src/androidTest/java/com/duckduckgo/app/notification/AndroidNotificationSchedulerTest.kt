@@ -19,10 +19,12 @@
 package com.duckduckgo.app.notification
 
 import androidx.test.platform.app.InstrumentationRegistry
+import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import com.duckduckgo.app.CoroutineTestRule
-import com.duckduckgo.app.notification.NotificationScheduler.*
+import com.duckduckgo.app.notification.NotificationScheduler.ClearDataNotificationWorker
+import com.duckduckgo.app.notification.NotificationScheduler.PrivacyNotificationWorker
 import com.duckduckgo.app.notification.model.SchedulableNotification
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.VariantManager.Companion.DEFAULT_VARIANT
@@ -31,7 +33,6 @@ import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.whenever
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
-import org.junit.After
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
@@ -98,19 +99,42 @@ class AndroidNotificationSchedulerTest {
         assertNoUnusedAppNotificationScheduled()
     }
 
+    @Test
+    fun whenNotificationIsScheduledOldJobsAreCancelled() = runBlocking<Unit> {
+        whenever(privacyNotification.canShow()).thenReturn(false)
+        whenever(clearNotification.canShow()).thenReturn(false)
+
+        enqueueDeprecatedJobs()
+
+        testee.scheduleNextNotification()
+
+        NotificationScheduler.allDeprecatedNotificationWorkTags().forEach {
+            assertTrue(getScheduledWorkers(it).isEmpty())
+        }
+    }
+
+    private fun enqueueDeprecatedJobs() {
+        NotificationScheduler.allDeprecatedNotificationWorkTags().forEach {
+            val request = OneTimeWorkRequestBuilder<PrivacyNotificationWorker>()
+                .addTag(it)
+                .build()
+
+            workManager.enqueue(request)
+        }
+    }
+
     private fun assertUnusedAppNotificationScheduled(workerName: String) {
-        assertTrue(getUnusedAppScheduledWorkers().any { it.tags.contains(workerName) })
+        assertTrue(getScheduledWorkers(NotificationScheduler.UNUSED_APP_WORK_REQUEST_TAG).any { it.tags.contains(workerName) })
     }
 
     private fun assertNoUnusedAppNotificationScheduled() {
-        assertTrue(getUnusedAppScheduledWorkers().isEmpty())
+        assertTrue(getScheduledWorkers(NotificationScheduler.UNUSED_APP_WORK_REQUEST_TAG).isEmpty())
     }
 
-    private fun getUnusedAppScheduledWorkers(): List<WorkInfo> {
+    private fun getScheduledWorkers(tag: String): List<WorkInfo> {
         return workManager
-            .getWorkInfosByTag(NotificationScheduler.UNUSED_APP_WORK_REQUEST_TAG)
+            .getWorkInfosByTag(tag)
             .get()
             .filter { it.state == WorkInfo.State.ENQUEUED }
     }
-
 }
