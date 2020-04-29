@@ -270,10 +270,10 @@
 
     <!-- Authentication -->
     <string name="authenticationDialogTitle">Iniciar sessão</string>
-    <string name="authenticationDialogMessage">%s requer um nome de utilizador e palavra-passe.</string>
+    <string name="authenticationDialogMessage">%s requer um nome de usuário e palavra-passe.</string>
     <string name="authenticationDialogPositiveButton">Iniciar sessão</string>
     <string name="authenticationDialogNegativeButton">Cancelar</string>
-    <string name="authenticationDialogUsernameHint">Nome de utilizador</string>
+    <string name="authenticationDialogUsernameHint">Nome de usuário</string>
     <string name="authenticationDialogPasswordHint">Palavra-passe</string>
 
     <!-- User-facing label for when a user selects text and might want to search for that text -->
@@ -285,7 +285,7 @@
     <string name="missingBrowserFeaturesTitleShort">Problemas com funcionalidade do navegador</string>
     <string name="missingBrowserFeaturesSubtitle">Que funcionalidade de navegação podemos adicionar ou melhorar?</string>
     <string name="missingBrowserFeatureSubReasonNavigation">Navegar para a frente, para trás, atualizar</string>
-    <string name="missingBrowserFeatureSubReasonTabManagement">Criar e gerir separadores</string>
+    <string name="missingBrowserFeatureSubReasonTabManagement">Criar e gerir abas</string>
     <string name="missingBrowserFeatureSubReasonAdPopups">Bloquear anúncios e pop-ups</string>
     <string name="missingBrowserFeatureSubReasonVideos">Ver vídeos</string>
     <string name="missingBrowserFeatureSubReasonImages">Interagir com imagens</string>
