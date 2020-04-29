@@ -56,7 +56,6 @@ class WebViewCookieManagerTest {
             testee.removeExternalCookies()
         }
 
-        verify(cookieManager, times(1)).setCookie(any(), any(), any())
         verify(cookieManager, times(1)).setCookie(eq(ddgCookie.url), eq(ddgCookie.value), any())
     }
 
@@ -73,7 +72,6 @@ class WebViewCookieManagerTest {
             testee.removeExternalCookies()
         }
 
-        verify(cookieManager, times(1)).setCookie(any(), any(), any())
         verify(cookieManager, times(1)).setCookie(eq(ddgCookie.url), eq(ddgCookie.value), any())
     }
 
@@ -101,6 +99,8 @@ class WebViewCookieManagerTest {
         cookieManager.inOrder {
             verify().flush()
             verify().getCookie(DDG_HOST)
+            verify().hasCookies()
+            verify().setCookie(eq(DDG_HOST), any(), any())
             verify().flush()
         }
     }
