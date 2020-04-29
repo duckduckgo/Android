@@ -23,7 +23,6 @@ import timber.log.Timber
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
-
 interface DuckDuckGoCookieManager {
     suspend fun removeExternalCookies()
     fun flush()
@@ -32,8 +31,8 @@ interface DuckDuckGoCookieManager {
 class WebViewCookieManager(
     private val cookieManager: CookieManager,
     private val host: String,
-    private val cookieManagerRemover: CookieManagerRemover,
-    private val sqlCookieRemover: SQLCookieRemover
+    private val cookieManagerRemover: CookieRemover,
+    private val selectiveCookieRemover: CookieRemover
 ) : DuckDuckGoCookieManager {
 
     override suspend fun removeExternalCookies() {
@@ -43,15 +42,15 @@ class WebViewCookieManager(
         val ddgCookies = getDuckDuckGoCookies()
         if (cookieManager.hasCookies()) {
             removeCookies()
+            storeDuckDuckGoCookies(ddgCookies)
         }
-        storeDuckDuckGoCookies(ddgCookies)
         withContext(Dispatchers.IO) {
             flush()
         }
     }
 
     private suspend fun removeCookies() {
-        val removeSuccess = sqlCookieRemover.removeCookies()
+        val removeSuccess = selectiveCookieRemover.removeCookies()
         if (!removeSuccess) {
             cookieManagerRemover.removeCookies()
         }

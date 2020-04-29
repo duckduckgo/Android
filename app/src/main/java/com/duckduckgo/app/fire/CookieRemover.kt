@@ -19,6 +19,7 @@ package com.duckduckgo.app.fire
 import android.content.Context
 import android.database.DatabaseErrorHandler
 import android.database.sqlite.SQLiteDatabase
+import android.webkit.CookieManager
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteDao
 import com.duckduckgo.app.global.exception.UncaughtExceptionRepository
 import com.duckduckgo.app.global.exception.UncaughtExceptionSource
@@ -27,16 +28,32 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 import java.io.File
+import kotlin.coroutines.resume
+import kotlin.coroutines.suspendCoroutine
 
-private const val COOKIES_TABLE_NAME = "cookies"
+interface CookieRemover {
+    suspend fun removeCookies(): Boolean
+}
+
+class CookieManagerRemover(private val cookieManager: CookieManager) : CookieRemover {
+    override suspend fun removeCookies(): Boolean {
+        suspendCoroutine<Unit> { continuation ->
+            cookieManager.removeAllCookies {
+                Timber.v("All cookies removed; restoring DDG cookies")
+                continuation.resume(Unit)
+            }
+        }
+        return true
+    }
+}
 
 class SQLCookieRemover(
     private val context: Context,
     private val fireproofWebsiteDao: FireproofWebsiteDao,
     private val pixel: Pixel,
     private val uncaughtExceptionRepository: UncaughtExceptionRepository
-) {
-    suspend fun removeCookies(): Boolean {
+) : CookieRemover {
+    override suspend fun removeCookies(): Boolean {
         return withContext(Dispatchers.IO) {
             var deleteExecuted = false
             val excludedSites = getHostsToPreserve()
@@ -50,6 +67,7 @@ class SQLCookieRemover(
                         deleteExecuted = true
                         Timber.v("$number cookies removed")
                     } catch (exception: Exception) {
+                        Timber.e(exception)
                         pixel.fire(Pixel.PixelName.COOKIE_DATABASE_DELETE_ERROR)
                         uncaughtExceptionRepository.recordUncaughtException(exception, UncaughtExceptionSource.COOKIE_DATABASE)
                     } finally {
@@ -112,5 +130,9 @@ class SQLCookieRemover(
             acceptedHosts.add(host)
             acceptedHosts
         }
+    }
+
+    companion object {
+        private const val COOKIES_TABLE_NAME = "cookies"
     }
 }

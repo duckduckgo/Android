@@ -17,66 +17,138 @@
 package com.duckduckgo.app.fire
 
 import android.webkit.CookieManager
+import android.webkit.ValueCallback
+import com.nhaarman.mockitokotlin2.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
-import kotlin.coroutines.resume
-import kotlin.coroutines.suspendCoroutine
 
-@Suppress("RemoveExplicitTypeArguments")
+private data class Cookie(val url: String, val value: String)
+
 class WebViewCookieManagerTest {
 
     private lateinit var testee: WebViewCookieManager
-
-    private val cookieManager: CookieManager = CookieManager.getInstance()
+    private val selectiveCookieRemover = mock<CookieRemover>()
+    private val cookieManagerRemover = mock<CookieRemover>()
+    private val cookieManager = mock<CookieManager>()
+    private val ddgCookie = Cookie(DDG_HOST, "da=abc")
+    private val externalHostCookie = Cookie("example.com", "dz=zyx")
 
     @Before
-    fun setup() = runBlocking {
-        removeExistingCookies()
-        testee = WebViewCookieManager(cookieManager, host)
+    fun setup() {
+        whenever(cookieManager.setCookie(any(), any(), any())).then {
+            (it.getArgument(2) as ValueCallback<Boolean>).onReceiveValue(true)
+        }
+        testee = WebViewCookieManager(cookieManager, DDG_HOST, cookieManagerRemover, selectiveCookieRemover)
     }
 
-    private suspend fun removeExistingCookies() {
+    @Test
+    fun whenSelectiveCookieRemoverSucceedsThenInternalCookiesRecreated() = runBlocking {
+        givenCookieManagerWithCookies(
+            ddgCookie,
+            externalHostCookie
+        )
+        selectiveCookieRemover.succeeds()
+
         withContext(Dispatchers.Main) {
-            suspendCoroutine<Unit> { continuation ->
-                cookieManager.removeAllCookies { continuation.resume(Unit) }
+            testee.removeExternalCookies()
+        }
+
+        verify(cookieManager, times(1)).setCookie(any(), any(), any())
+        verify(cookieManager, times(1)).setCookie(eq(ddgCookie.url), eq(ddgCookie.value), any())
+    }
+
+    @Test
+    fun whenCookieManagerRemoverSucceedsThenInternalCookiesRecreated() = runBlocking {
+        givenCookieManagerWithCookies(
+            ddgCookie,
+            externalHostCookie
+        )
+        selectiveCookieRemover.fails()
+        cookieManagerRemover.succeeds()
+
+        withContext(Dispatchers.Main) {
+            testee.removeExternalCookies()
+        }
+
+        verify(cookieManager, times(1)).setCookie(any(), any(), any())
+        verify(cookieManager, times(1)).setCookie(eq(ddgCookie.url), eq(ddgCookie.value), any())
+    }
+
+    @Test
+    fun whenCookiesStoredThenSelectiveCookieRemoverExecuted() = runBlocking<Unit> {
+        givenCookieManagerWithCookies(ddgCookie, externalHostCookie)
+        selectiveCookieRemover.succeeds()
+
+        withContext(Dispatchers.Main) {
+            testee.removeExternalCookies()
+        }
+
+        verify(selectiveCookieRemover).removeCookies()
+    }
+
+    @Test
+    fun whenCookiesStoredThenFlushBeforeAndAfterInteractingWithCookieManager() = runBlocking<Unit> {
+        givenCookieManagerWithCookies(ddgCookie, externalHostCookie)
+        selectiveCookieRemover.succeeds()
+
+        withContext(Dispatchers.Main) {
+            testee.removeExternalCookies()
+        }
+
+        cookieManager.inOrder {
+            verify().flush()
+            verify().getCookie(DDG_HOST)
+            verify().flush()
+        }
+    }
+
+    @Test
+    fun whenCookiesStoredAndelectiveCookieRemoverFailsThenCookieManagerRemoverExecuted() = runBlocking<Unit> {
+        givenCookieManagerWithCookies(ddgCookie, externalHostCookie)
+        selectiveCookieRemover.fails()
+
+        withContext(Dispatchers.Main) {
+            testee.removeExternalCookies()
+        }
+
+        verify(cookieManagerRemover).removeCookies()
+    }
+
+    @Test
+    fun whenNoCookiesThenRemoveProcessNotExecuted() = runBlocking {
+        givenCookieManagerWithCookies()
+
+        withContext(Dispatchers.Main) {
+            testee.removeExternalCookies()
+        }
+
+        verifyZeroInteractions(selectiveCookieRemover)
+        verifyZeroInteractions(cookieManagerRemover)
+    }
+
+    private fun givenCookieManagerWithCookies(vararg cookies: Cookie) {
+        if (cookies.isEmpty()) {
+            whenever(cookieManager.hasCookies()).thenReturn(false)
+        } else {
+            whenever(cookieManager.hasCookies()).thenReturn(true)
+            cookies.forEach { cookie ->
+                whenever(cookieManager.getCookie(cookie.url)).thenReturn(cookie.value)
             }
         }
     }
 
-    @Test
-    fun whenExternalCookiesClearedThenInternalCookiesRecreated() = runBlocking<Unit> {
-        cookieManager.setCookie(host, "da=abc")
-        cookieManager.setCookie(externalHost, "dz=zyx")
-
-        withContext(Dispatchers.Main) {
-            testee.removeExternalCookies()
-        }
-
-        val actualCookies = cookieManager.getCookie(host)?.split(";").orEmpty()
-        assertEquals(1, actualCookies.size)
-        assertTrue(actualCookies.contains("da=abc"))
+    private suspend fun CookieRemover.succeeds() {
+        whenever(this.removeCookies()).thenReturn(true)
     }
 
-    @Test
-    fun whenExternalCookiesClearedThenExternalCookiesAreNotRecreated() = runBlocking<Unit> {
-        cookieManager.setCookie(host, "da=abc")
-        cookieManager.setCookie(externalHost, "dz=zyx")
-
-        withContext(Dispatchers.Main) {
-            testee.removeExternalCookies()
-        }
-
-        val actualCookies = cookieManager.getCookie(externalHost)?.split(";").orEmpty()
-        assertEquals(0, actualCookies.size)
+    private suspend fun CookieRemover.fails() {
+        whenever(this.removeCookies()).thenReturn(false)
     }
 
     companion object {
-        private const val host = "duckduckgo.com"
-        private const val externalHost = "example.com"
+        private const val DDG_HOST = "duckduckgo.com"
     }
 }
