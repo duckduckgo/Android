@@ -1,6 +1,6 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
 
-    <string name="duckDuckGoLogoDescription">Logótipo do DuckDuckGo</string>
+    <string name="duckDuckGoLogoDescription">Logotipo do DuckDuckGo</string>
     <string name="duckDuckGoPrivacySimplified">Privacidade, simplificada.</string>
     <string name="yes">Sim</string>
     <string name="no">Não</string>
@@ -28,27 +28,27 @@
     <string name="clearButtonContentDescription">Limpar introdução da pesquisa</string>
     <string name="no_compatible_third_party_app_installed">Nenhuma aplicação compatível instalada</string>
     <string name="addBookmarkMenuTitle">Adicionar marcador</string>
-    <string name="requestDesktopSiteMenuTitle">Site para computador de secretária</string>
+    <string name="requestDesktopSiteMenuTitle">Abrir versão do site para computador</string>
 
     <!-- Downloading files -->
     <string name="downloadImage">Transferir imagem</string>
     <string name="permissionRequiredToDownload">A transferência requer permissão de armazenamento</string>
     <string name="downloadComplete">Transferência concluída.</string>
     <string name="downloadFailed">Falha na transferência</string>
-    <string name="downloadInProgress">A transferir</string>
+    <string name="downloadInProgress">Transferência em progresso...</string>
 
     <!-- Sharing options -->
     <string name="options">Opções</string>
-    <string name="shareLink">Partilhar ligação</string>
-    <string name="shareMenuTitle">Partilhar…</string>
+    <string name="shareLink">Compartilhar link</string>
+    <string name="shareMenuTitle">Compartilhar</string>
     <string name="copyUrl">Copiar endereço de ligação</string>
 
     <!-- Find in page -->
-    <string name="findInPageMenuTitle">Encontrar na página</string>
-    <string name="nextSearchTermDescription">Encontrar seguinte</string>
-    <string name="previousSearchTermDescription">Encontrar anterior</string>
+    <string name="findInPageMenuTitle">Buscar na página</string>
+    <string name="nextSearchTermDescription">Próximo resultado</string>
+    <string name="previousSearchTermDescription">Resultado anterior</string>
     <string name="closeFindInPageButtonDescription">Fechar a vista de encontrar na página</string>
-    <string name="findInPageHint">Encontrar na página</string>
+    <string name="findInPageHint">Buscar na página</string>
 
     <!-- AutoComplete Suggestions -->
     <string name="editQueryBeforeSubmitting">Editar consulta antes de pesquisar</string>
@@ -58,34 +58,34 @@
     <string name="openExternalApp">Abrir aplicação externa</string>
     <string name="launchingExternalApp">Abrir noutra aplicação</string>
     <string name="confirmOpenExternalApp">Gostaria de sair do DuckDuckGo para visualizar este conteúdo?</string>
-    <string name="unableToOpenLink">Não é possível abrir este tipo de ligação</string>
+    <string name="unableToOpenLink">Não é possível abrir este tipo de link</string>
 
     <!-- Tabs -->
-    <string name="tabActivityTitle">Separadores</string>
-    <string name="tabsMenuItem">Separadores</string>
-    <string name="newTabMenuItem">Novo separador</string>
-    <string name="openInNewTab">Abrir em novo separador</string>
-    <string name="openInNewBackgroundTab">Abrir em separador em segundo plano</string>
-    <string name="openImageInNewTab">Abrir imagem em separador em segundo plano</string>
+    <string name="tabActivityTitle">Abas</string>
+    <string name="tabsMenuItem">Abas</string>
+    <string name="newTabMenuItem">Nova aba</string>
+    <string name="openInNewTab">Abrir em uma nova aba</string>
+    <string name="openInNewBackgroundTab">Abrir em nova aba em segundo plano</string>
+    <string name="openImageInNewTab">Abrir imagem em uma nova aba em segundo plano</string>
     <string name="faviconContentDescription">Ícone de favorito</string>
     <string name="closeContentDescription">Fechar</string>
-    <string name="closeAllTabsMenuItem">Fechar todos os separadores</string>
-    <string name="closeTab">Fechar separador</string>
+    <string name="closeAllTabsMenuItem">Fechar todas as abas</string>
+    <string name="closeTab">Fechar aba</string>
 
     <!-- Privacy Dashboard Activities -->
-    <string name="privacyDashboardActivityTitle">Painel de privacidade</string>
+    <string name="privacyDashboardActivityTitle">Painel de Privacidade</string>
     <string name="privacyProtectionEnabled">PROTEÇÃO DE PRIVACIDADE ATIVADA</string>
     <string name="privacyProtectionDisabled">PROTEÇÃO DE PRIVACIDADE DESATIVADA</string>
     <string name="privacyProtectionUpgraded" tools:ignore="TypographyQuotes">MELHORADO DE &lt;img src="%d" /&gt; PARA &lt;img src="%d" /&gt;</string>
     <string name="privacyGradeContentDescription">Grau de privacidade</string>
 
-    <string name="httpsGood">Ligação encriptada</string>
-    <string name="httpsMixed">Ligação com encriptação mista</string>
-    <string name="httpsBad">Ligação não encriptada</string>
+    <string name="httpsGood">Conexão criptografada</string>
+    <string name="httpsMixed">Conexão com criptografia mista</string>
+    <string name="httpsBad">Conexão sem criptografia</string>
 
     <string name="networksActivityTitle">Redes de rastreamento</string>
     <string name="networksContentDescription">Redes de rastreamento</string>
-    <string name="networksOverview">As redes de rastreamento agregam o seu histórico da web num perfil de dados sobre si. As principais redes de rastreamento são mais prejudiciais porque podem rastreá-lo e segmentá-lo em mais sites da Internet.</string>
+    <string name="networksOverview">As redes de rastreamento agregam o seu histórico da web num perfil de dados sobre você. As principais redes de rastreamento são mais prejudiciais porque podem rastreá-lo e encontrá-lo em mais sites da Internet.</string>
 
     <plurals name="trackersFound">
         <item quantity="one">%s rastreador encontrado</item>
@@ -114,10 +114,10 @@
 
     <string name="privacyTermsActivityTitle">Práticas de privacidade</string>
     <string name="practicesGood">Boas práticas de privacidade</string>
-    <string name="practicesMixed">Práticas de privacidade mistas"</string>
-    <string name="practicesBad">"Más práticas de privacidade"</string>
+    <string name="practicesMixed">Práticas de privacidade mistas</string>
+    <string name="practicesBad">Práticas ruins de privacidade</string>
     <string name="practicesUnknown">Práticas de privacidade desconhecidas</string>
-    <string name="practicesOverview">As práticas de privacidade indicam o nível de proteção das informações pessoais que partilha com um site.</string>
+    <string name="practicesOverview">As práticas de privacidade indicam o nível de proteção das informações pessoais que você compartilha com um site.</string>
     <string name="practicesTosdrLink">As práticas de privacidade resultam de <b><u>ToS;DR</u></b></string>
     <string name="practicesIconContentGood">Ícone de boas práticas</string>
     <string name="practicesIconContentBad">Ícone de más práticas</string>
@@ -162,18 +162,18 @@
     <!-- About Activity -->
     <string name="aboutActivityTitle">Sobre nós</string>
     <string name="aboutDescription">
-        No DuckDuckGo, estamos a definir o novo padrão de confiança online.\n\ O Navegador de Privacidade DuckDuckGo fornece todos os elementos essenciais de privacidade de que necessita para se proteger enquanto pesquisa e navega na Web, incluindo bloqueio de rastreadores, encriptação mais inteligente e pesquisa privada DuckDuckGo.\n\ Afinal de contas, a Internet não deve ser tão assustadora, e obter a privacidade que merece online deve ser tão simples como fechar as persianas.</string>
+        Na DuckDuckGo, estamos definindo um novo padrão de confiança online.\n\ O Navegador de Privacidade DuckDuckGo fornece todos os elementos essenciais de privacidade de que necessita para se proteger enquanto pesquisa e navega na Web, incluindo bloqueio de rastreadores, criptografia mais inteligente e pesquisa privada DuckDuckGo.\n\ Afinal de contas, a internet não deve ser tão assustadora, e obter a privacidade que você merece online deve ser tão simples como fechar as persianas.</string>
     <string name="aboutMoreLink">Mais em duckduckgo.com/about</string>
     <string name="no_suggestions">Sem sugestões</string>
 
     <!-- Broken Site Activity -->
     <string name="brokenSiteReportBrokenSiteMenuItem">Denunciar falha no site</string>
     <string name="brokenSiteHeading">Denunciar uma falha no site</string>
-    <string name="brokenSiteSubmitted">Obrigado! Comentário enviado</string>
+    <string name="brokenSiteSubmitted">Obrigado! Comentário enviado.</string>
     <string name="brokenSitesCategoriesTitle">Descreva o que aconteceu:</string>
     <string name="brokenSitesCategoriesHint">Descrever o que aconteceu</string>
     <string name="brokenSiteSubmitButton">Enviar relatório</string>
-    <string name="brokenSiteDescription">O envio de um relatório anónimo de site com problemas ajuda-nos a depurar e a melhorar a aplicação.</string>
+    <string name="brokenSiteDescription">O envio de um relatório anônimo de site com problemas ajuda-nos a depurar e a melhorar a aplicação.</string>
 
     <string name="brokenSiteCategoryImages">As imagens não foram carregadas</string>
     <string name="brokenSiteCategoryPaywall">O site pediu-me para desativar</string>
@@ -188,7 +188,7 @@
     <!-- Bookmarks Activity -->
     <string name="bookmarksMenuTitle">Marcadores</string>
     <string name="bookmarksActivityTitle">Marcadores</string>
-    <string name="bookmarkDeleteConfirmMessage">Tem a certeza de que pretende eliminar o marcador &lt;b&gt;%s&lt;/b&gt;?</string>
+    <string name="bookmarkDeleteConfirmMessage">Tem a certeza de que quer eliminar o marcador &lt;b&gt;%s&lt;/b&gt;?</string>
     <string name="bookmarkDeleteConfirmTitle">Confirmar</string>
     <string name="bookmarkAddedFeedback">Marcador adicionado</string>
     <string name="bookmarkTitleHint">Título do marcador</string>
@@ -209,14 +209,14 @@
 
     <!-- User Survey -->
     <string name="surveyCtaTitle">Ajude-nos a melhorar a aplicação!</string>
-    <string name="surveyCtaDescription">Responda ao nosso inquérito breve e anónimo e partilhe os seus comentários.</string>
+    <string name="surveyCtaDescription">Responda ao nosso inquérito breve e anônimo e partilhe os seus comentários.</string>
     <string name="surveyCtaLaunchButton">Responder ao inquérito</string>
     <string name="surveyCtaDismissButton">Não, obrigado</string>
     <string name="surveyActivityTitle">Inquérito aos utilizadores</string>
     <string name="surveyTitle">INQUÉRITO DO DUCKDUCKGO</string>
     <string name="surveyDismissContentDescription">Ignorar inquérito</string>
     <string name="surveyLoadingErrorTitle">Oh, não!</string>
-    <string name="surveyLoadingErrorText">O nosso inquérito não pode ser carregado neste momento.\nVolte a tentar mais tarde.</string>
+    <string name="surveyLoadingErrorText">O nosso inquérito não pode ser carregado neste momento.\nFavor tentar mais tarde.</string>
 
     <!-- Add widget -->
     <string name="addWidgetCtaTitle">Experimente o nosso widget de pesquisa!</string>
@@ -235,7 +235,7 @@
     <string name="addWidgetInstructionsButtonClose">Fechar</string>
 
     <!-- App Enjoyment / Rating / Feedback -->
-    <string name="appEnjoymentDialogTitle">Está a gostar do DuckDuckGo?</string>
+    <string name="appEnjoymentDialogTitle">Está gostando do DuckDuckGo?</string>
     <string name="appEnjoymentDialogMessage">Adorávamos saber a sua opinião</string>
     <string name="appEnjoymentDialogPositiveButton">Gosto</string>
     <string name="appEnjoymentDialogNegativeButton">Precisa de ser trabalhado</string>
@@ -245,13 +245,13 @@
     <string name="rateAppDialogPositiveButton">Classificar a aplicação</string>
 
     <string name="giveFeedbackDialogTitle">Lamentamos saber isso</string>
-    <string name="giveFeedbackDialogMessage">Diga-nos como podemos melhorar a aplicação para si</string>
+    <string name="giveFeedbackDialogMessage">Diga-nos como podemos melhorar a aplicação para você</string>
     <string name="giveFeedbackDialogPositiveButton">Deixar comentário</string>
 
     <string name="noThanks">Não, obrigado</string>
 
     <!-- Notification Channel Names -->
-    <string name="notificationChannelFileDownloading">A transferir ficheiro</string>
+    <string name="notificationChannelFileDownloading">Tranferindo ficheiro</string>
     <string name="notificationChannelFileDownloaded">Ficheiro transferido</string>
     <string name="notificationChannelTutorials">Tutoriais</string>
 
@@ -342,8 +342,8 @@
     <string name="shareTheLoveWithARating">Partilhe o que gosta com a classificação na Play Store.</string>
     <string name="rateTheApp">CLASSIFIQUE A APLICAÇÃO</string>
     <string name="declineFurtherFeedback">NÃO, OBRIGADO. JÁ TERMINEI</string>
-    <string name="whichBrokenSites">Onde está a ver esses problemas?</string>
-    <string name="whichBrokenSitesHint">Que website tem problemas?</string>
+    <string name="whichBrokenSites">Onde está vendo esses problemas?</string>
+    <string name="whichBrokenSitesHint">Qual website tem problemas?</string>
     <string name="feedbackSpecificAsPossible">Seja o mais específico possível</string>
     <string name="feedbackInitialDisambiguationTitle">Vamos começar!</string>
     <string name="feedbackInitialDisambiguationSubtitle">Como classificaria os seus comentários?</string>
@@ -380,20 +380,20 @@
 
     <!-- New Onboarding Experience -->
     <string name="onboardingWelcomeTitle">Bem-vindo(a) ao DuckDuckGo!</string>
-    <string name="onboardingDaxText">A Internet pode ser um pouco assustadora.&lt;br/&gt;&lt;br/&gt;Mas não se preocupe! Pesquisar e navegar em privado é mais fácil do que pensa.</string>
+    <string name="onboardingDaxText">A Internet pode ser um pouco assustadora.&lt;br/&gt;&lt;br/&gt;Mas não se preocupe! Pesquisar e navegar com privacidade é mais fácil do que pensa.</string>
     <string name="onboardingLetsDoItButton">Vamos lá!</string>
-    <string name="daxIntroCtaText">A seguir, experimente visitar um dos seus sites favoritos! &lt;br/&gt;&lt;br/&gt;Irei bloquear os rastreadores para que eles não possam espiar o que faz. Também irei atualizar a segurança da sua ligação, se possível. &#128274;</string>
+    <string name="daxIntroCtaText">A seguir, experimente visitar um dos seus sites favoritos! &lt;br/&gt;&lt;br/&gt;Irei bloquear os rastreadores para que eles não possam espiar o que faz. Também irei atualizar a segurança da sua conexão, se possível. &#128274;</string>
     <string name="daxEndCtaText">Conseguiu! &lt;br/&gt;&lt;br/&gt;Lembre-se: sempre que navega comigo, um anúncio estranho perde as suas asas. &#128077;</string>
     <string name="daxSerpCtaText">A suas pesquisas no DuckDuckGo são anónimas e eu nunca guardo o seu histórico de pesquisas. Nunca. &#128588;</string>
     <plurals name="daxTrackersBlockedCtaText">
-        <item quantity="one">&#160;e mais &lt;b&gt;%d outro&lt;/b&gt; estava tentar rastrear aqui. &lt;br/&gt;&lt;br/&gt;Eu bloqueei-os!&lt;br/&gt;&lt;br/&gt; ☝️Pode verificar a barra de URL para ver quem está a tentar rastrear quando visita um novo site.️</item>
+        <item quantity="one">&#160;e mais &lt;b&gt;%d outro&lt;/b&gt; estava tentar rastrear aqui. &lt;br/&gt;&lt;br/&gt;Eu bloqueei-os!&lt;br/&gt;&lt;br/&gt; ☝️Pode verificar a barra de URL para ver quem está tentando te rastrear quando visita um novo site.️</item>
         <item quantity="other">&#160;e mais &lt;b&gt;%d outros&lt;/b&gt; estavam a tentar rastrear aqui. &lt;br/&gt;&lt;br/&gt;Eu bloqueei-os!&lt;br/&gt;&lt;br/&gt; ☝️Pode verificar a barra de URL para ver quem está a tentar rastrear quando visita um novo site.️</item>
     </plurals>
     <plurals name="daxTrackersBlockedCtaZeroText">
         <item quantity="one" tools:ignore="ImpliedQuantity">&#160;estava a tentar rastrear aqui. &lt;br/&gt;&lt;br/&gt;Eu bloqueei-o!&lt;br/&gt;&lt;br/&gt; ☝️Pode verificar a barra de URL para ver quem está a tentar rastrear quando visita um novo site.️</item>
         <item quantity="other">&#160;estavam a tentar rastrear aqui. &lt;br/&gt;&lt;br/&gt;Eu bloqueei-o!&lt;br/&gt;&lt;br/&gt; ☝️Pode verificar a barra de URL para ver quem está a tentar rastrear quando visita um novo site.️</item>
     </plurals>
-    <string name="daxNonSerpCtaText">Enquanto toca e desliza, eu bloqueio rastreadores irritantes. &lt;br/&gt;&lt;br/&gt;Prossiga - continue a navegar!</string>
+    <string name="daxNonSerpCtaText">Enquanto você toca e desliza, eu bloqueio rastreadores irritantes. &lt;br/&gt;&lt;br/&gt;Prossiga - continue a navegar!</string>
     <string name="daxMainNetworkOwnedCtaText">Atenção! %s é propriedade de %s.Os rastreadores de &lt;br/&gt;&lt;br/&gt; %s estão ocultos em cerca de %s dos principais sites &#128561;, mas não se preocupe! &lt;br/&gt;&lt;br/&gt;Eu impeço %s de ver a sua atividade nesses sites.</string>
     <string name="daxMainNetworkCtaText">Atenção! %s é uma grande rede de rastreamento.&lt;br/&gt;&lt;br/&gt; Os seus rastreadores estão à espreita em cerca de %s dos principais sites &#128561;, mas não se preocupe! &lt;br/&gt;&lt;br/&gt;Eu impeço %s de ver a sua atividade nesses sites.</string>
 </resources>
