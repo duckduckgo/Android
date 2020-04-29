@@ -36,4 +36,6 @@
     <dimen name="changeAppIconListPadding">4dp</dimen>
     <dimen name="changeAppIconSize">75dp</dimen>
 
+    <dimen name="bottomBarHeight">48dp</dimen>
+
 </resources>

@@ -59,7 +59,7 @@ class BookmarksActivity : DuckDuckGoActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_bookmarks)
-        setupActionBar()
+        setupToolbar(toolbar)
         setupBookmarksRecycler()
         observeViewModel()
     }
@@ -67,11 +67,6 @@ class BookmarksActivity : DuckDuckGoActivity() {
     private fun setupBookmarksRecycler() {
         adapter = BookmarksAdapter(applicationContext, viewModel)
         recycler.adapter = adapter
-    }
-
-    private fun setupActionBar() {
-        setSupportActionBar(toolbar)
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
     }
 
     private fun observeViewModel() {

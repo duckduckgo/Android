@@ -47,7 +47,7 @@ class PrivacyPracticesActivity : DuckDuckGoActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_privacy_practices)
-        configureToolbar()
+        setupToolbar(toolbar)
         configureRecycler()
 
         viewModel.viewState.observe(this, Observer<PrivacyPracticesViewModel.ViewState> {
@@ -57,11 +57,6 @@ class PrivacyPracticesActivity : DuckDuckGoActivity() {
         repository.retrieveSiteData(intent.tabId!!).observe(this, Observer<Site> {
             viewModel.onSiteChanged(it)
         })
-    }
-
-    private fun configureToolbar() {
-        setSupportActionBar(toolbar)
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
     }
 
     private fun configureRecycler() {

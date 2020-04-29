@@ -31,7 +31,6 @@ import kotlinx.android.synthetic.main.content_broken_sites.*
 import kotlinx.android.synthetic.main.include_toolbar.*
 import org.jetbrains.anko.longToast
 
-
 class BrokenSiteActivity : DuckDuckGoActivity() {
     private val viewModel: BrokenSiteViewModel by bindViewModel()
 
@@ -40,15 +39,10 @@ class BrokenSiteActivity : DuckDuckGoActivity() {
         setContentView(R.layout.activity_broken_site)
         configureListeners()
         configureObservers()
-        setupActionBar()
+        setupToolbar(toolbar)
         if (savedInstanceState == null) {
             consumeIntentExtra()
         }
-    }
-
-    private fun setupActionBar() {
-        setSupportActionBar(toolbar)
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
     }
 
     private fun consumeIntentExtra() {

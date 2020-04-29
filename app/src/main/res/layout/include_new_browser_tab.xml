@@ -23,7 +23,6 @@
     android:layout_marginTop="?attr/actionBarSize"
     android:animateLayoutChanges="true"
     tools:context="com.duckduckgo.app.browser.BrowserActivity"
-    tools:menu="@menu/menu_browser_activity"
     tools:showIn="@layout/fragment_browser_tab">
 
     <include

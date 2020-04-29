@@ -110,6 +110,8 @@ class UncaughtExceptionDaoTest {
             assertEquals(1, id)
             assertEquals(exception.exceptionSource, exceptionSource)
             assertEquals(exception.message, message)
+            assertEquals(exception.version, version)
+            assertEquals(exception.timestamp, timestamp)
         }
     }
 

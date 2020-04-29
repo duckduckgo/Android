@@ -18,15 +18,14 @@ package com.duckduckgo.app.browser.omnibar
 
 import android.view.View
 import com.google.android.material.appbar.AppBarLayout
-import com.google.android.material.appbar.AppBarLayout.LayoutParams.SCROLL_FLAG_ENTER_ALWAYS
-import com.google.android.material.appbar.AppBarLayout.LayoutParams.SCROLL_FLAG_SCROLL
+import com.google.android.material.appbar.AppBarLayout.LayoutParams.*
 import javax.inject.Inject
 
 
 class OmnibarScrolling @Inject constructor() {
 
     fun enableOmnibarScrolling(toolbarContainer: View) {
-        updateScrollFlag(SCROLL_FLAG_SCROLL or SCROLL_FLAG_ENTER_ALWAYS, toolbarContainer)
+        updateScrollFlag(SCROLL_FLAG_SCROLL or SCROLL_FLAG_SNAP or SCROLL_FLAG_ENTER_ALWAYS, toolbarContainer)
     }
 
     fun disableOmnibarScrolling(toolbarContainer: View) {
