@@ -46,10 +46,7 @@ class WebViewCookieManagerTest {
 
     @Test
     fun whenSelectiveCookieRemoverSucceedsThenInternalCookiesRecreated() = runBlocking {
-        givenCookieManagerWithCookies(
-            ddgCookie,
-            externalHostCookie
-        )
+        givenCookieManagerWithCookies(ddgCookie, externalHostCookie)
         selectiveCookieRemover.succeeds()
 
         withContext(Dispatchers.Main) {
@@ -61,10 +58,7 @@ class WebViewCookieManagerTest {
 
     @Test
     fun whenCookieManagerRemoverSucceedsThenInternalCookiesRecreated() = runBlocking {
-        givenCookieManagerWithCookies(
-            ddgCookie,
-            externalHostCookie
-        )
+        givenCookieManagerWithCookies(ddgCookie, externalHostCookie)
         selectiveCookieRemover.fails()
         cookieManagerRemover.succeeds()
 
