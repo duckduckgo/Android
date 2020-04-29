@@ -32,7 +32,9 @@ import com.duckduckgo.app.browser.tabpreview.FileBasedWebViewPreviewGenerator
 import com.duckduckgo.app.browser.tabpreview.FileBasedWebViewPreviewPersister
 import com.duckduckgo.app.browser.tabpreview.WebViewPreviewGenerator
 import com.duckduckgo.app.browser.tabpreview.WebViewPreviewPersister
+import com.duckduckgo.app.fire.CookieManagerRemover
 import com.duckduckgo.app.fire.DuckDuckGoCookieManager
+import com.duckduckgo.app.fire.SQLCookieRemover
 import com.duckduckgo.app.fire.WebViewCookieManager
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteDao
 import com.duckduckgo.app.global.AppUrl
@@ -141,13 +143,28 @@ class BrowserModule {
 
     @Provides
     fun cookieManager(
+        cookieManager: CookieManager,
+        cookieManagerRemover: CookieManagerRemover,
+        sqlCookieRemover: SQLCookieRemover
+    ): DuckDuckGoCookieManager {
+        return WebViewCookieManager(cookieManager, AppUrl.Url.HOST, cookieManagerRemover, sqlCookieRemover)
+    }
+
+    @Provides
+    fun sqlCookieRemover(
         context: Context,
         fireproofWebsiteDao: FireproofWebsiteDao,
-        cookieManager: CookieManager,
         pixel: Pixel,
         uncaughtExceptionRepository: UncaughtExceptionRepository
-    ): DuckDuckGoCookieManager {
-        return WebViewCookieManager(context, fireproofWebsiteDao, cookieManager, AppUrl.Url.HOST, pixel, uncaughtExceptionRepository)
+    ): SQLCookieRemover {
+        return SQLCookieRemover(context, fireproofWebsiteDao, pixel, uncaughtExceptionRepository)
+    }
+
+    @Provides
+    fun cookieManagerRemover(
+        cookieManager: CookieManager
+    ): CookieManagerRemover {
+        return CookieManagerRemover(cookieManager)
     }
 
     @Singleton

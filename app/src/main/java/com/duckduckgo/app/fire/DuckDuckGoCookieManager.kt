@@ -16,21 +16,10 @@
 
 package com.duckduckgo.app.fire
 
-import android.content.Context
-import android.database.DatabaseErrorHandler
-import android.database.sqlite.SQLiteDatabase
 import android.webkit.CookieManager
-import android.widget.Toast
-import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteDao
-import com.duckduckgo.app.global.exception.UncaughtExceptionRepository
-import com.duckduckgo.app.global.exception.UncaughtExceptionSource
-import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.*
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.COOKIE_DATABASE_PARAM
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import timber.log.Timber
-import java.io.File
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
@@ -41,40 +30,31 @@ interface DuckDuckGoCookieManager {
 }
 
 class WebViewCookieManager(
-    private val context: Context,
-    private val fireproofWebsiteDao: FireproofWebsiteDao,
     private val cookieManager: CookieManager,
     private val host: String,
-    private val pixel: Pixel,
-    private val uncaughtExceptionRepository: UncaughtExceptionRepository
+    private val cookieManagerRemover: CookieManagerRemover,
+    private val sqlCookieRemover: SQLCookieRemover
 ) : DuckDuckGoCookieManager {
 
     override suspend fun removeExternalCookies() {
-        val startTime = System.currentTimeMillis()
-
-        if (cookieManager.hasCookies()) {
-            removeCookies()
-        }
-
         withContext(Dispatchers.IO) {
             flush()
         }
-
-        val durationMs = System.currentTimeMillis() - startTime
-        pixel.fire(pixel = COOKIE_DATABASE_TIME, parameters = mapOf(COOKIE_DATABASE_PARAM to durationMs.toString()))
+        val ddgCookies = getDuckDuckGoCookies()
+        if (cookieManager.hasCookies()) {
+            removeCookies()
+        }
+        storeDuckDuckGoCookies(ddgCookies)
+        withContext(Dispatchers.IO) {
+            flush()
+        }
     }
 
     private suspend fun removeCookies() {
-        val ddgCookies = getDuckDuckGoCookies()
-
-        val sqlCookieRemover = SQLCookieRemover(context, fireproofWebsiteDao, pixel, uncaughtExceptionRepository)
-        val cookieManagerRemover = CookieManagerRemover(cookieManager)
-        val cookiesRemoved = sqlCookieRemover.removeCookies()
-        if (!cookiesRemoved) {
+        val removeSuccess = sqlCookieRemover.removeCookies()
+        if (!removeSuccess) {
             cookieManagerRemover.removeCookies()
         }
-
-        storeDuckDuckGoCookies(ddgCookies)
     }
 
     private suspend fun storeDuckDuckGoCookies(cookies: List<String>) {
@@ -100,101 +80,5 @@ class WebViewCookieManager(
 
     override fun flush() {
         cookieManager.flush()
-    }
-}
-
-class SQLCookieRemover(
-    private val context: Context,
-    private val fireproofWebsiteDao: FireproofWebsiteDao,
-    private val pixel: Pixel,
-    private val uncaughtExceptionRepository: UncaughtExceptionRepository
-) {
-    suspend fun removeCookies(): Boolean {
-        return withContext(Dispatchers.IO) {
-            var cookiesRemoved = false
-            val excludedSites = getHostsToPreserve()
-            val databasePath: String = getDatabasePath()
-            if (databasePath.isNotEmpty()) {
-                val readableDatabase = openReadableDatabase(databasePath)
-                if (readableDatabase != null) {
-                    try {
-                        val whereClause = buildSQLWhereClause(excludedSites)
-                        val number = readableDatabase.delete("cookies", whereClause, excludedSites.toTypedArray())
-                        cookiesRemoved = true
-                        Toast.makeText(context, "$number cookies removed", Toast.LENGTH_LONG).show()
-                    } catch (exception: Exception) {
-                        pixel.fire(COOKIE_DATABASE_DELETE_ERROR)
-                        uncaughtExceptionRepository.recordUncaughtException(exception, UncaughtExceptionSource.COOKIE_DATABASE)
-                    } finally {
-                        readableDatabase.close()
-                    }
-                }
-            } else {
-                pixel.fire(COOKIE_DATABASE_NOT_FOUND)
-            }
-            return@withContext cookiesRemoved
-        }
-    }
-
-    private suspend fun openReadableDatabase(databasePath: String): SQLiteDatabase? {
-        val databaseFile = File(context.applicationInfo.dataDir, databasePath)
-        return try {
-            SQLiteDatabase.openDatabase(
-                databaseFile.toString(),
-                null,
-                SQLiteDatabase.OPEN_READWRITE,
-                DatabaseErrorHandler { Timber.d("COOKIE: onCorruption") })
-        } catch (exception: Exception) {
-            pixel.fire(COOKIE_DATABASE_OPEN_ERROR)
-            uncaughtExceptionRepository.recordUncaughtException(exception, UncaughtExceptionSource.COOKIE_DATABASE)
-            null
-        }
-    }
-
-    private fun getDatabasePath(): String {
-        val knownLocations = listOf("app_webview/Default/Cookies", "app_webview/Cookies")
-        val filePath: String = knownLocations.find { knownPath ->
-            val file = File(context.applicationInfo.dataDir, knownPath)
-            file.exists()
-        } ?: ""
-        return filePath
-    }
-
-    private fun buildSQLWhereClause(excludedSites: List<String>): String {
-        val whereArg = excludedSites.foldIndexed("", { pos, acc, _ ->
-            if (pos == 0) {
-                "host_key NOT LIKE ?"
-            } else {
-                "$acc AND host_key NOT LIKE ?"
-            }
-        })
-        return whereArg
-    }
-
-    private fun getHostsToPreserve(): List<String> {
-        val bookmarksList = fireproofWebsiteDao.fireproofWebsitesSync()
-        return bookmarksList.flatMap { entity ->
-            val acceptedHosts = mutableListOf<String>()
-            val host = entity.domain
-            host.split(".")
-                .foldRight("", { next, acc ->
-                    val next = ".$next$acc"
-                    acceptedHosts.add(next)
-                    next
-                })
-            acceptedHosts.add(host)
-            acceptedHosts
-        }
-    }
-}
-
-class CookieManagerRemover(private val cookieManager: CookieManager) {
-    suspend fun removeCookies() {
-        suspendCoroutine<Unit> { continuation ->
-            cookieManager.removeAllCookies {
-                Timber.v("All cookies removed; restoring DDG cookies")
-                continuation.resume(Unit)
-            }
-        }
     }
 }
