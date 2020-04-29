@@ -22,7 +22,9 @@ import com.duckduckgo.app.global.exception.UncaughtExceptionSource.*
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.*
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.COUNT
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.EXCEPTION_APP_VERSION
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.EXCEPTION_MESSAGE
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.EXCEPTION_TIMESTAMP
 import com.duckduckgo.app.statistics.store.OfflinePixelCountDataStore
 import io.reactivex.Completable
 import io.reactivex.Completable.*
@@ -103,11 +105,15 @@ class OfflinePixelSender @Inject constructor(
             exceptions.forEach { exception ->
                 Timber.d("Analysing exception $exception")
                 val pixelName = determinePixelName(exception)
-                val params = mapOf(EXCEPTION_MESSAGE to exception.message)
+                val params = mapOf(
+                    EXCEPTION_MESSAGE to exception.message,
+                    EXCEPTION_APP_VERSION to exception.version,
+                    EXCEPTION_TIMESTAMP to exception.toFormattedDate()
+                )
 
                 val pixel = pixel.fireCompletable(pixelName, params)
                     .doOnComplete {
-                        Timber.d("Sent pixel containing exception; deleting exception with id=${exception.id}")
+                        Timber.d("Sent pixel with params: $params containing exception; deleting exception with id=${exception.id}")
                         runBlocking { uncaughtExceptionRepository.deleteException(exception.id) }
                     }
 

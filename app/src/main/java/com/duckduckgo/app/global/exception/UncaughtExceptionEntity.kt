@@ -18,10 +18,25 @@ package com.duckduckgo.app.global.exception
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import com.duckduckgo.app.browser.BuildConfig
+import java.text.SimpleDateFormat
+import java.util.Locale
+import java.util.TimeZone
 
 @Entity
 data class UncaughtExceptionEntity(
     @PrimaryKey(autoGenerate = true) val id: Long = 0,
     val exceptionSource: UncaughtExceptionSource,
-    val message: String
-)
+    val message: String,
+    val timestamp: Long = System.currentTimeMillis(),
+    val version: String = BuildConfig.VERSION_NAME
+) {
+
+    fun toFormattedDate(): String = formatter.format(timestamp)
+
+    companion object {
+        val formatter: SimpleDateFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ", Locale.US).apply {
+            timeZone = TimeZone.getTimeZone("UTC")
+        }
+    }
+}

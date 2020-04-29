@@ -58,7 +58,7 @@ import com.duckduckgo.app.usage.search.SearchCountDao
 import com.duckduckgo.app.usage.search.SearchCountEntity
 
 @Database(
-    exportSchema = true, version = 18, entities = [
+    exportSchema = true, version = 19, entities = [
         TdsTracker::class,
         TdsEntity::class,
         TdsDomainEntity::class,
@@ -269,6 +269,13 @@ class MigrationsProvider(val context: Context) {
         }
     }
 
+    val MIGRATION_18_TO_19: Migration = object : Migration(18, 19) {
+        override fun migrate(database: SupportSQLiteDatabase) {
+            database.execSQL("DROP TABLE `UncaughtExceptionEntity`")
+            database.execSQL("CREATE TABLE IF NOT EXISTS `UncaughtExceptionEntity` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `exceptionSource` TEXT NOT NULL, `message` TEXT NOT NULL, `version` TEXT NOT NULL, `timestamp` INTEGER NOT NULL)")
+        }
+    }
+
     val ALL_MIGRATIONS: List<Migration>
         get() = listOf(
             MIGRATION_1_TO_2,
@@ -287,7 +294,8 @@ class MigrationsProvider(val context: Context) {
             MIGRATION_14_TO_15,
             MIGRATION_15_TO_16,
             MIGRATION_16_TO_17,
-            MIGRATION_17_TO_18
+            MIGRATION_17_TO_18,
+            MIGRATION_18_TO_19
         )
 
     @Deprecated(
