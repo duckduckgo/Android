@@ -34,6 +34,7 @@ import com.duckduckgo.app.browser.tabpreview.WebViewPreviewGenerator
 import com.duckduckgo.app.browser.tabpreview.WebViewPreviewPersister
 import com.duckduckgo.app.fire.DuckDuckGoCookieManager
 import com.duckduckgo.app.fire.WebViewCookieManager
+import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteDao
 import com.duckduckgo.app.global.AppUrl
 import com.duckduckgo.app.global.exception.UncaughtExceptionRepository
 import com.duckduckgo.app.global.file.FileDeleter
@@ -141,12 +142,12 @@ class BrowserModule {
     @Provides
     fun cookieManager(
         context: Context,
-        bookmarksDao: BookmarksDao,
+        fireproofWebsiteDao: FireproofWebsiteDao,
         cookieManager: CookieManager,
         pixel: Pixel,
         uncaughtExceptionRepository: UncaughtExceptionRepository
     ): DuckDuckGoCookieManager {
-        return WebViewCookieManager(context, bookmarksDao, cookieManager, AppUrl.Url.HOST, pixel, uncaughtExceptionRepository)
+        return WebViewCookieManager(context, fireproofWebsiteDao, cookieManager, AppUrl.Url.HOST, pixel, uncaughtExceptionRepository)
     }
 
     @Singleton

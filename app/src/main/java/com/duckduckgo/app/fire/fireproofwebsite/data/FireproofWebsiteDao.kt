@@ -18,9 +18,13 @@ package com.duckduckgo.app.fire.fireproofwebsite.data
 
 import androidx.lifecycle.LiveData
 import androidx.room.*
+import com.duckduckgo.app.bookmarks.db.BookmarkEntity
 
 @Dao
 interface FireproofWebsiteDao {
+
+    @Query("select * from $FIREPROOF_WEBSITES_TABLE_NAME")
+    fun fireproofWebsitesSync(): List<FireproofWebsiteEntity>
 
     @Query("select * from $FIREPROOF_WEBSITES_TABLE_NAME")
     fun fireproofWebsitesEntities(): LiveData<List<FireproofWebsiteEntity>>
