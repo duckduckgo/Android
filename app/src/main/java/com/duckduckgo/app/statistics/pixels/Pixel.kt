@@ -203,7 +203,6 @@ interface Pixel {
         const val DAX_END_CTA = "e"
         const val DAX_SERP_CTA = "s"
         const val DAX_NETWORK_CTA_1 = "n"
-        const val DAX_NETWORK_CTA_2 = "n2"
         const val DAX_TRACKERS_BLOCKED_CTA = "t"
         const val DAX_NO_TRACKERS_CTA = "nt"
     }

@@ -23,13 +23,24 @@
     <TextView
         android:id="@+id/settingsPrivacyTitle"
         style="@style/SettingsSectionTitle"
-        android:text="@string/settingsHeadingPrivacy" />
+        android:text="@string/settingsHeadingPrivacy"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"/>
+
+    <TextView
+        android:id="@+id/fireproofWebsites"
+        style="@style/SettingsItemClickable"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:text="@string/settingsFireproofWebsites"
+        app:layout_constraintTop_toBottomOf="@id/settingsPrivacyTitle" />
 
     <com.duckduckgo.app.settings.SettingsOptionWithSubtitle
         android:id="@+id/automaticallyClearWhatSetting"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@id/settingsPrivacyTitle"
+        app:layout_constraintTop_toBottomOf="@id/fireproofWebsites"
         app:subtitle="test test test"
         app:title="@string/settingsAutomaticallyClearWhat" />
 

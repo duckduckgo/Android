@@ -37,6 +37,8 @@ import com.duckduckgo.app.feedback.ui.negative.brokensite.BrokenSiteNegativeFeed
 import com.duckduckgo.app.feedback.ui.negative.openended.ShareOpenEndedNegativeFeedbackViewModel
 import com.duckduckgo.app.feedback.ui.positive.initial.PositiveFeedbackLandingViewModel
 import com.duckduckgo.app.fire.DataClearer
+import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteDao
+import com.duckduckgo.app.fire.fireproofwebsite.ui.FireproofWebsitesViewModel
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.model.SiteFactory
 import com.duckduckgo.app.global.rating.AppEnjoymentPromptEmitter
@@ -90,6 +92,7 @@ class ViewModelFactory @Inject constructor(
     private val siteFactory: SiteFactory,
     private val networkLeaderboardDao: NetworkLeaderboardDao,
     private val bookmarksDao: BookmarksDao,
+    private val fireproofWebsiteDao: FireproofWebsiteDao,
     private val surveyDao: SurveyDao,
     private val autoCompleteApi: AutoCompleteApi,
     private val deviceAppLookup: DeviceAppLookup,
@@ -143,6 +146,7 @@ class ViewModelFactory @Inject constructor(
                 isAssignableFrom(TrackerBlockingSelectionViewModel::class.java) -> TrackerBlockingSelectionViewModel(privacySettingsStore)
                 isAssignableFrom(DefaultBrowserPageViewModel::class.java) -> defaultBrowserPage()
                 isAssignableFrom(ChangeIconViewModel::class.java) -> changeAppIconViewModel()
+                isAssignableFrom(FireproofWebsitesViewModel::class.java) -> fireproofWebsiteViewModel()
 
                 else -> throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")
             }
@@ -188,6 +192,7 @@ class ViewModelFactory @Inject constructor(
         tabRepository = tabRepository,
         networkLeaderboardDao = networkLeaderboardDao,
         bookmarksDao = bookmarksDao,
+        fireproofWebsiteDao = fireproofWebsiteDao,
         autoComplete = autoCompleteApi,
         appSettingsPreferencesStore = appSettingsPreferencesStore,
         longPressHandler = webViewLongPressHandler,
@@ -202,4 +207,10 @@ class ViewModelFactory @Inject constructor(
 
     private fun changeAppIconViewModel() =
         ChangeIconViewModel(settingsDataStore = appSettingsPreferencesStore, appIconModifier = appIconModifier, pixel = pixel)
+
+    private fun fireproofWebsiteViewModel() =
+        FireproofWebsitesViewModel(
+            dao = fireproofWebsiteDao,
+            dispatcherProvider = dispatcherProvider
+        )
 }

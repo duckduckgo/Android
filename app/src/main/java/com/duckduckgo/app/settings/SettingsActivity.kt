@@ -31,6 +31,7 @@ import androidx.lifecycle.Observer
 import com.duckduckgo.app.about.AboutDuckDuckGoActivity
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.feedback.ui.common.FeedbackActivity
+import com.duckduckgo.app.fire.fireproofwebsite.ui.FireproofWebsitesActivity
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.sendThemeChangedBroadcast
 import com.duckduckgo.app.global.view.gone
@@ -51,19 +52,9 @@ import kotlinx.android.synthetic.main.content_settings_general.setAsDefaultBrows
 import kotlinx.android.synthetic.main.content_settings_other.about
 import kotlinx.android.synthetic.main.content_settings_other.provideFeedback
 import kotlinx.android.synthetic.main.content_settings_other.version
-import kotlinx.android.synthetic.main.content_settings_privacy.automaticallyClearWhatSetting
-import kotlinx.android.synthetic.main.content_settings_privacy.automaticallyClearWhenSetting
 import kotlinx.android.synthetic.main.include_toolbar.toolbar
-import kotlinx.android.synthetic.main.content_settings_general.autocompleteToggle
-import kotlinx.android.synthetic.main.content_settings_general.lightThemeToggle
 import kotlinx.android.synthetic.main.content_settings_general.searchNotificationToggle
-import kotlinx.android.synthetic.main.content_settings_general.setAsDefaultBrowserSetting
-import kotlinx.android.synthetic.main.content_settings_other.about
-import kotlinx.android.synthetic.main.content_settings_other.provideFeedback
-import kotlinx.android.synthetic.main.content_settings_other.version
-import kotlinx.android.synthetic.main.content_settings_privacy.automaticallyClearWhatSetting
-import kotlinx.android.synthetic.main.content_settings_privacy.automaticallyClearWhenSetting
-import kotlinx.android.synthetic.main.include_toolbar.toolbar
+import kotlinx.android.synthetic.main.content_settings_privacy.*
 import javax.inject.Inject
 
 class SettingsActivity : DuckDuckGoActivity(), SettingsAutomaticallyClearWhatFragment.Listener, SettingsAutomaticallyClearWhenFragment.Listener {
@@ -105,6 +96,7 @@ class SettingsActivity : DuckDuckGoActivity(), SettingsAutomaticallyClearWhatFra
         changeAppIconLabel.setOnClickListener { viewModel.userRequestedToChangeIcon() }
         about.setOnClickListener { startActivity(AboutDuckDuckGoActivity.intent(this)) }
         provideFeedback.setOnClickListener { viewModel.userRequestedToSendFeedback() }
+        fireproofWebsites.setOnClickListener { viewModel.onFireproofWebsitesClicked() }
 
         lightThemeToggle.setOnCheckedChangeListener(lightThemeToggleListener)
         autocompleteToggle.setOnCheckedChangeListener(autocompleteToggleListener)
@@ -166,6 +158,7 @@ class SettingsActivity : DuckDuckGoActivity(), SettingsAutomaticallyClearWhatFra
     private fun processCommand(it: Command?) {
         when (it) {
             is Command.LaunchFeedback -> launchFeedback()
+            is Command.LaunchFireproofWebsites -> launchFireproofWebsites()
             is Command.LaunchAppIcon -> launchAppIconChange()
             is Command.UpdateTheme -> sendThemeChangedBroadcast()
         }
@@ -196,6 +189,11 @@ class SettingsActivity : DuckDuckGoActivity(), SettingsAutomaticallyClearWhatFra
     private fun launchFeedback() {
         val options = ActivityOptions.makeSceneTransitionAnimation(this).toBundle()
         startActivityForResult(Intent(FeedbackActivity.intent(this)), FEEDBACK_REQUEST_CODE, options)
+    }
+
+    private fun launchFireproofWebsites() {
+        val options = ActivityOptions.makeSceneTransitionAnimation(this).toBundle()
+        startActivity(FireproofWebsitesActivity.intent(this), options)
     }
 
     private fun launchAppIconChange() {

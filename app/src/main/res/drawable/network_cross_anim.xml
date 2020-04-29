@@ -14,77 +14,92 @@
   ~ limitations under the License.
   -->
 
-<animated-vector
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<animated-vector xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:aapt="http://schemas.android.com/aapt">
     <aapt:attr name="android:drawable">
         <vector
             android:name="vector"
-            android:width="28dp"
-            android:height="28dp"
-            android:viewportWidth="28"
-            android:viewportHeight="28">
+            android:width="22dp"
+            android:height="22dp"
+            android:viewportWidth="22"
+            android:viewportHeight="22">
             <path
                 android:name="path"
-                android:pathData="M 2 2 L 26 26"
                 android:fillColor="#00000000"
-                android:strokeColor="?attr/omnibarRoundedFieldBackgroundColor"
+                android:fillType="evenOdd"
+                android:pathData="M 2 2 L 20 20"
                 android:strokeWidth="6"
                 android:strokeAlpha="0"
-                android:strokeLineCap="round"
-                android:fillType="evenOdd"/>
+                android:strokeColor="?attr/omnibarRoundedFieldBackgroundColor"
+                android:strokeLineCap="round" />
             <path
                 android:name="path_1"
-                android:pathData="M 2 2 L 26 26"
                 android:fillColor="#00000000"
-                android:strokeColor="?attr/toolbarIconColor"
-                android:strokeWidth="3"
+                android:fillType="evenOdd"
+                android:pathData="M 2 2 L 20 20"
+                android:strokeWidth="2"
                 android:strokeAlpha="0"
-                android:strokeLineCap="round"
-                android:fillType="evenOdd"/>
+                android:strokeColor="?attr/toolbarIconColor"
+                android:strokeLineCap="round" />
         </vector>
     </aapt:attr>
-    <target android:name="path">
-        <aapt:attr name="android:animation">
-            <set>
-            <objectAnimator
-                android:propertyName="pathData"
-                android:startOffset="800"
-                android:duration="200"
-                android:valueFrom="M 12 10 L 12 10"
-                android:valueTo="M 2 2 L 26 26"
-                android:valueType="pathType"
-                android:interpolator="@android:interpolator/linear"/>
-            <objectAnimator
-                android:propertyName="strokeAlpha"
-                android:startOffset="0"
-                android:duration="1000"
-                android:valueFrom="0"
-                android:valueTo="1"
-                android:valueType="floatType"
-                android:interpolator="@android:interpolator/linear"/>
-        </set>
-        </aapt:attr>
-    </target>
     <target android:name="path_1">
         <aapt:attr name="android:animation">
             <set>
-            <objectAnimator
-                android:propertyName="pathData"
-                android:startOffset="800"
-                android:duration="200"
-                android:valueFrom="M 12 10 L 12 10"
-                android:valueTo="M 2 2 L 26 26"
-                android:valueType="pathType"
-                android:interpolator="@android:interpolator/linear"/>
-            <objectAnimator
-                android:propertyName="strokeAlpha"
-                android:startOffset="800"
-                android:duration="200"
-                android:valueFrom="0"
-                android:valueTo="1"
-                android:valueType="floatType"
-                android:interpolator="@android:interpolator/linear"/>
+                <objectAnimator
+                    android:duration="20"
+                    android:interpolator="@android:interpolator/linear"
+                    android:propertyName="strokeWidth"
+                    android:startOffset="800"
+                    android:valueFrom="0"
+                    android:valueTo="2"
+                    android:valueType="floatType" />
+                <objectAnimator
+                    android:duration="200"
+                    android:interpolator="@android:interpolator/linear"
+                    android:propertyName="pathData"
+                    android:startOffset="800"
+                    android:valueFrom="M 10 10 L 10 10"
+                    android:valueTo="M 2 2 L 20 20"
+                    android:valueType="pathType" />
+                <objectAnimator
+                    android:duration="200"
+                    android:interpolator="@android:interpolator/linear"
+                    android:propertyName="strokeAlpha"
+                    android:startOffset="800"
+                    android:valueFrom="0"
+                    android:valueTo="1"
+                    android:valueType="floatType" />
+            </set>
+        </aapt:attr>
+    </target>
+    <target android:name="path">
+        <aapt:attr name="android:animation">
+            <set>
+                <objectAnimator
+                    android:duration="20"
+                    android:interpolator="@android:interpolator/linear"
+                    android:propertyName="strokeWidth"
+                    android:startOffset="800"
+                    android:valueFrom="0"
+                    android:valueTo="6"
+                    android:valueType="floatType" />
+                <objectAnimator
+                    android:duration="200"
+                    android:interpolator="@android:interpolator/linear"
+                    android:propertyName="pathData"
+                    android:startOffset="800"
+                    android:valueFrom="M 10 10 L 10 10"
+                    android:valueTo="M 2 2 L 20 20"
+                    android:valueType="pathType" />
+                <objectAnimator
+                    android:duration="200"
+                    android:interpolator="@android:interpolator/linear"
+                    android:propertyName="strokeAlpha"
+                    android:startOffset="800"
+                    android:valueFrom="0"
+                    android:valueTo="1"
+                    android:valueType="floatType" />
             </set>
         </aapt:attr>
     </target>

@@ -7,6 +7,7 @@
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="com.android.launcher.permission.INSTALL_SHORTCUT" />
+    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
 
     <application
         android:name="com.duckduckgo.app.global.DuckDuckGoApplication"
@@ -279,6 +280,10 @@
             android:name="com.duckduckgo.app.bookmarks.ui.BookmarksActivity"
             android:label="@string/bookmarksActivityTitle"
             android:parentActivityName=".BrowserActivity" />
+        <activity
+            android:name="com.duckduckgo.app.fire.fireproofwebsite.ui.FireproofWebsitesActivity"
+            android:label="@string/fireproofWebsitesActivityTitle"
+            android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity" />
         <activity
             android:name="com.duckduckgo.app.fire.FireActivity"
             android:process="@string/fireProcessName" />

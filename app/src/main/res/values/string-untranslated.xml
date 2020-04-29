@@ -15,9 +15,6 @@
   -->
 
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
-
-    <string name="search">Search</string>
-
     <!-- Download Confirmation -->
     <string name="downloadConfirmationContinue">Continue</string>
     <string name="downloadConfirmationSaveFileTitle">Save %1$s</string>
@@ -42,5 +39,16 @@
     <string name="stickySearchPromptKeep">Keep</string>
     <string name="stickySearchPromptRemove">Remove</string>
     <string name="notificationChannelSearch">Search</string>
+
+    <!-- Fireproof websites -->
+    <string name="fireproofWebsitesActivityTitle">Fireproof Websites</string>
+    <string name="settingsFireproofWebsites">Fireproof Websites</string>
+    <string name="fireproofWebsiteMenuTitle">Fireproof Website</string>
+    <string name="fireproofWebsiteSnackbarConfirmation">&lt;b>%s&lt;/b> is now fireproof! Visit Settings to learn more.</string>
+    <string name="fireproofWebsiteSnackbarAction">Undo</string>
+    <string name="fireproofWebsiteDeleteConfirmMessage">Are you sure you want to delete &lt;b>%s&lt;/b>?</string>
+    <string name="fireproofWebsiteFeatureDescription">Websites rely on cookies to keep you signed in. When you Fireproof a site, cookies won\'t be erased and you\'ll stay signed in, even after using the Fire Button.</string>
+    <string name="fireproofWebsiteOverflowContentDescription">More options for fireproof website %s</string>
+    <string name="fireproofWebsiteDeleteConfirmTitle">Confirm</string>
 
 </resources>

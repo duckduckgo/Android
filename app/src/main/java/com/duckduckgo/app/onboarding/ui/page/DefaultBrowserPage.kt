@@ -116,7 +116,7 @@ class DefaultBrowserPage : OnboardingPageFragment() {
     }
 
     private fun observeViewModel() {
-        viewModel.viewState.observe(this, Observer { viewState ->
+        viewModel.viewState.observe(viewLifecycleOwner, Observer { viewState ->
             viewState?.let {
                 when (it) {
                     is DefaultBrowserPageViewModel.ViewState.DefaultBrowserSettingsUI -> {

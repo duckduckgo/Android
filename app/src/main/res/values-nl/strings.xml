@@ -4,6 +4,7 @@
     <string name="duckDuckGoPrivacySimplified">Privacy, vereenvoudigd.</string>
     <string name="yes">Ja</string>
     <string name="no">Nee</string>
+    <string name="search">Zoeken</string>
 
     <!-- Onboarding Activity -->
     <string name="onboardingDefaultBrowserDescription">Ga naar Instellingen om elke keer te zoeken en te browsen met DuckDuckGo.</string>
@@ -384,15 +385,15 @@
     <string name="daxIntroCtaText">Probeer vervolgens een van uw favoriete sites te bezoeken! &lt;br/&gt;&lt;br/&gt;Ik blokkeer trackers zodat ze u niet kunnen bespioneren. Ik zal ook indien mogelijk de beveiliging van uw verbinding upgraden. &#128274;</string>
     <string name="daxEndCtaText">U kunt het! &lt;br/&gt;&lt;br/&gt;Denk eraan: elke keer als u met mij surft, verliest een enge advertentie zijn vleugels. &#128077;</string>
     <string name="daxSerpCtaText">Uw DuckDuckGo-zoekopdrachten zijn anoniem en ik sla uw zoekgeschiedenis nooit op. Nooit. &#128588;</string>
-    <string name="daxNonSerpCtaText">Elke site heeft een privacy-cijfer. Tik erop om te zien hoe ik uw privacy heb beschermd.&lt;br/&gt;&lt;br/&gt;Zullen we eens gek doen? Probeer uw gegevens te wissen door op de vuurknop te drukken.</string>
-    <string name="daxMainNetworkStep1CtaText">Let op!&lt;br/&gt;&lt;br/&gt; %s beheert een groot trackingnetwerk.&lt;br/&gt;&lt;br/&gt;Een laag privacycijfer zal u waarschuwen voor dergelijke sites.</string>
-    <string name="daxMainNetworkStep1OwnedCtaText">Let op!&lt;br/&gt;&lt;br/&gt; %s is eigendom van %s, dat een groot trackingnetwerk beheert.</string>
-    <string name="daxMainNetworkStep21CtaText">In feite liggen er %s trackers op de loer op ongeveer %s topwebsites. &#128561;&lt;br/&gt;&lt;br/&gt;</string>
-    <string name="daxMainNetworkStep211CtaText">In feite liggen er overal op internet %s trackers op de loer. &#128561;&lt;br/&gt;&lt;br/&gt;</string>
-    <string name="daxMainNetworkStep2CtaText">%s Ik blokkeer deze trackers wanneer u niet-%s sites bezoekt.</string>
     <plurals name="daxTrackersBlockedCtaText">
         <item quantity="one">&#160;en &lt;b&gt;%d anderen &lt;/b&gt; probeerden u hier te volgen. &lt;br/&gt;&lt;br/&gt;Ik heb ze geblokkeerd!&lt;br/&gt;&lt;br/&gt; ☝️U kunt de URL-balk bekijken om te zien wie u probeert te volgen wanneer u een nieuwe site bezoekt.️</item>
         <item quantity="other">&#160;en &lt;b&gt;%d anderen&lt;/b&gt; probeerden u hier te volgen. &lt;br/&gt;&lt;br/&gt;Ik heb ze geblokkeerd!&lt;br/&gt;&lt;br/&gt; ☝️U kunt de URL-balk bekijken om te zien wie u probeert te volgen wanneer u een nieuwe site bezoekt.️</item>
     </plurals>
-    <string name="daxTrackersBlockedCtaZeroText">&#160;probeerde u hier te volgen. &lt;br/&gt;&lt;br/&gt;Ik heb het geblokkeerd!&lt;br/&gt;&lt;br/&gt; ☝️U kunt de URL-balk bekijken om te zien wie u probeert te volgen wanneer u een nieuwe site bezoekt.️</string>
+    <plurals name="daxTrackersBlockedCtaZeroText">
+        <item quantity="one">&#160;probeerde u hier te volgen. &lt;br/&gt;&lt;br/&gt;Ik heb het geblokkeerd!&lt;br/&gt;&lt;br/&gt; ☝️U kunt de URL-balk bekijken om te zien wie u probeert te volgen wanneer u een nieuwe site bezoekt.️</item>
+        <item quantity="other">&#160;probeerden u hier te volgen. &lt;br/&gt;&lt;br/&gt;Ik heb het geblokkeerd!&lt;br/&gt;&lt;br/&gt; ☝️U kunt de URL-balk bekijken om te zien wie u probeert te volgen wanneer u een nieuwe site bezoekt.️</item>
+    </plurals>
+    <string name="daxNonSerpCtaText">Terwijl je tikt en scrolt, blokkeer ik vervelende trackers. &lt;br/&gt;&lt;br/&gt;Ga je gang - blijf browsen!</string>
+    <string name="daxMainNetworkOwnedCtaText">Let op! %s is eigendom van %s.&lt;br/&gt;De trackers van &lt;br/&gt; %s liggen op de loer op ongeveer %s van de beste websites &#128561; maar maak je geen zorgen! &lt;br/&gt;&lt;br/&gt;Ik blokkeer %s voor het zien van jouw activiteit op die websites.</string>
+    <string name="daxMainNetworkCtaText">Let op! %s is een belangrijk volgnetwerk.&lt;br/&gt;&lt;br/&gt; Hun trackers liggen op de loer op ongeveer %s van de beste sites &#128561; maar maak je geen zorgen! &lt;br/&gt;&lt;br/&gt;Ik blokkeer %s voor het zien van jouw activiteit op die websites.</string>
 </resources>

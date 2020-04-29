@@ -285,4 +285,16 @@
         <item name="rippleColor">?attr/daxDialogSecondaryButtonRippleColor</item>
     </style>
 
+    <style name="UnknownTrackerText">
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:textAlignment">center</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">?attr/omnibarLogoLetterTextColor</item>
+        <item name="android:textSize">12sp</item>
+    </style>
+
+    <style name="snackbarButtonStyle" parent="Widget.MaterialComponents.Button.TextButton.Snackbar">
+        <item name="android:textColor">?attr/colorAccent</item>
+    </style>
+
 </resources>
