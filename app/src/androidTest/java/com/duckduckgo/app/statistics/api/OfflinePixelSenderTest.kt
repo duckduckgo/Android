@@ -16,7 +16,6 @@
 
 package com.duckduckgo.app.statistics.api
 
-import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.InstantSchedulersRule
 import com.duckduckgo.app.global.exception.UncaughtExceptionEntity
@@ -31,7 +30,6 @@ import com.nhaarman.mockitokotlin2.*
 import io.reactivex.Completable
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
-import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
