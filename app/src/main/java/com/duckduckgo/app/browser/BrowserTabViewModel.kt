@@ -122,6 +122,7 @@ class BrowserTabViewModel(
         val isDesktopBrowsingMode: Boolean = false,
         val canChangeBrowsingMode: Boolean = true,
         val showPrivacyGrade: Boolean = false,
+        val showSearchIcon: Boolean = false,
         val showClearButton: Boolean = false,
         val showTabsButton: Boolean = true,
         val showFireButton: Boolean = true,
@@ -194,7 +195,7 @@ class BrowserTabViewModel(
         object GenerateWebViewPreviewImage : Command()
         object LaunchTabSwitcher : Command()
         class ShowErrorWithAction(val action: () -> Unit) : Command()
-        sealed class DaxCommand: Command() {
+        sealed class DaxCommand : Command() {
             object FinishTrackerAnimation : DaxCommand()
             class HideDaxDialog(val cta: Cta) : DaxCommand()
         }
@@ -485,21 +486,22 @@ class BrowserTabViewModel(
         buildSiteFactory(url, title)
 
         val currentOmnibarViewState = currentOmnibarViewState()
-        omnibarViewState.postValue(currentOmnibarViewState.copy(omnibarText = omnibarTextForUrl(url), shouldMoveCaretToEnd = false))
-
+        omnibarViewState.value = currentOmnibarViewState.copy(omnibarText = omnibarTextForUrl(url), shouldMoveCaretToEnd = false)
         val currentBrowserViewState = currentBrowserViewState()
-        findInPageViewState.postValue(FindInPageViewState(visible = false, canFindInPage = true))
-        browserViewState.postValue(
-            currentBrowserViewState.copy(
-                browserShowing = true,
-                canAddBookmarks = true,
-                addToHomeEnabled = true,
-                addToHomeVisible = addToHomeCapabilityDetector.isAddToHomeSupported(),
-                canSharePage = true,
-                showPrivacyGrade = true,
-                canReportSite = true
-            )
+        findInPageViewState.value = FindInPageViewState(visible = false, canFindInPage = true)
+        browserViewState.value = currentBrowserViewState.copy(
+            browserShowing = true,
+            canAddBookmarks = true,
+            addToHomeEnabled = true,
+            addToHomeVisible = addToHomeCapabilityDetector.isAddToHomeSupported(),
+            canSharePage = true,
+            showPrivacyGrade = true,
+            canReportSite = true,
+            showSearchIcon = false,
+            showClearButton = false
         )
+
+        Timber.d("showPrivacyGrade=true, showSearchIcon=false, showClearButton=false")
 
         if (duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(url)) {
             statisticsUpdater.refreshSearchRetentionAtb()
@@ -536,8 +538,11 @@ class BrowserTabViewModel(
             addToHomeVisible = addToHomeCapabilityDetector.isAddToHomeSupported(),
             canSharePage = false,
             showPrivacyGrade = false,
-            canReportSite = false
+            canReportSite = false,
+            showSearchIcon = true,
+            showClearButton = true
         )
+        Timber.d("showPrivacyGrade=false, showSearchIcon=true, showClearButton=true")
     }
 
     override fun pageRefreshed(refreshedUrl: String) {
@@ -660,17 +665,22 @@ class BrowserTabViewModel(
         val showAutoCompleteSuggestions = hasFocus && query.isNotBlank() && hasQueryChanged && autoCompleteSuggestionsEnabled
         val showClearButton = hasFocus && query.isNotBlank()
         val showControls = !hasFocus || query.isBlank()
+        val showPrivacyGrade = !hasFocus
+        val showSearchIcon = hasFocus
 
         omnibarViewState.value = currentOmnibarViewState.copy(isEditing = hasFocus)
 
         val currentBrowserViewState = currentBrowserViewState()
         browserViewState.value = currentBrowserViewState.copy(
-            showPrivacyGrade = currentBrowserViewState.browserShowing,
+            showPrivacyGrade = showPrivacyGrade,
+            showSearchIcon = showSearchIcon,
             showTabsButton = showControls,
             showFireButton = showControls,
             showMenuButton = showControls,
             showClearButton = showClearButton
         )
+
+        Timber.d("showPrivacyGrade=$showPrivacyGrade, showSearchIcon=$showSearchIcon, showClearButton=$showClearButton")
 
         autoCompleteViewState.value = AutoCompleteViewState(showAutoCompleteSuggestions, autoCompleteSearchResults)
 

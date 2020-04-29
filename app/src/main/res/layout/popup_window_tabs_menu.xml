@@ -14,15 +14,22 @@
   ~ limitations under the License.
   -->
 
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="?attr/colorPrimaryDark"
-    tools:context="com.duckduckgo.app.tabs.ui.TabSwitcherActivity">
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:paddingTop="13dp"
+    android:paddingBottom="20dp"
+    android:background="@drawable/popup_menu_bg">
 
-    <include layout="@layout/include_toolbar" />
+    <TextView
+        android:id="@+id/closeAllTabs"
+        style="@style/BrowserTextMenuItem"
+        android:text="@string/closeAllTabsMenuItem" />
 
-    <include layout="@layout/content_tab_switcher" />
+    <TextView
+        android:id="@+id/settingsPopupMenuItem"
+        style="@style/BrowserTextMenuItem"
+        android:text="@string/settingsMenuItemTitle" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+</LinearLayout>

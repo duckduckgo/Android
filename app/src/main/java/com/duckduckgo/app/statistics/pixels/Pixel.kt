@@ -163,6 +163,13 @@ interface Pixel {
         AUTOCOMPLETE_SEARCH_SELECTION("m_aut_s_s"),
 
         CHANGE_APP_ICON_OPENED("m_ic"),
+
+        MENU_ACTION_POPUP_OPENED("m_nav_pm_o_%s"),
+        MENU_ACTION_FIRE_PRESSED("m_nav_f_p_%s"),
+        MENU_ACTION_REFRESH_PRESSED("m_nav_r_p_%s"),
+        MENU_ACTION_NEW_TAB_PRESSED("m_nav_nt_p_%s"),
+        MENU_ACTION_BOOKMARKS_PRESSED("m_nav_b_p_%s"),
+        MENU_ACTION_SEARCH_PRESSED("m_nav_s_p_%s")
     }
 
     object PixelParameter {

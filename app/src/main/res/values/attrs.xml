@@ -60,5 +60,11 @@
     <attr name="topCallToActionDescriptionColor" format="color" />
     <attr name="topCallToActionBackgroundColor" format="color" />
     <attr name="privacyDashboardLogoLetterTextColor" format="color" />
+    <attr name="bottomBarIconColor" format="color" />
+    <attr name="bottomBarIconColorDisabled" format="color" />
+
+    <declare-styleable name="BottomNavigationBar">
+        <attr name="layoutResource" format="reference" />
+    </declare-styleable>
 
 </resources>

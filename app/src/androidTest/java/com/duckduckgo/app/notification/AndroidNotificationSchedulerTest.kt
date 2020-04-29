@@ -19,6 +19,7 @@
 package com.duckduckgo.app.notification
 
 import androidx.test.platform.app.InstrumentationRegistry
+import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import com.duckduckgo.app.CoroutineTestRule
@@ -98,6 +99,30 @@ class AndroidNotificationSchedulerTest {
         assertNoUnusedAppNotificationScheduled()
     }
 
+    @Test
+    fun whenNotificationIsScheduledOldJobsAreCancelled() = runBlocking<Unit> {
+        whenever(privacyNotification.canShow()).thenReturn(false)
+        whenever(clearNotification.canShow()).thenReturn(false)
+
+        enqueueDeprecatedJobs()
+
+        testee.scheduleNextNotification()
+
+        NotificationScheduler.allDeprecatedNotificationWorkTags().forEach {
+            assertTrue(getScheduledWorkers(it).isEmpty())
+        }
+    }
+
+    private fun enqueueDeprecatedJobs() {
+        NotificationScheduler.allDeprecatedNotificationWorkTags().forEach {
+            val request = OneTimeWorkRequestBuilder<PrivacyNotificationWorker>()
+                .addTag(it)
+                .build()
+
+            workManager.enqueue(request)
+        }
+    }
+
     private fun assertUnusedAppNotificationScheduled(workerName: String) {
         assertTrue(getScheduledWorkers(NotificationScheduler.UNUSED_APP_WORK_REQUEST_TAG).any { it.tags.contains(workerName) })
     }
@@ -112,5 +137,4 @@ class AndroidNotificationSchedulerTest {
             .get()
             .filter { it.state == WorkInfo.State.ENQUEUED }
     }
-
 }

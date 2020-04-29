@@ -611,16 +611,18 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenBrowserNotShownAndOmnibarInputDoesNotHaveFocusThenPrivacyGradeIsNotShown() {
+    fun whenOmnibarDoesNotHaveFocusThenPrivacyGradeIsShownAndSearchIconIsHidden() {
         testee.onOmnibarInputStateChanged(query = "", hasFocus = false, hasQueryChanged = false)
-        assertFalse(browserViewState().showPrivacyGrade)
+        assertTrue(browserViewState().showPrivacyGrade)
+        assertFalse(browserViewState().showSearchIcon)
     }
 
     @Test
-    fun whenBrowserShownAndOmnibarInputDoesNotHaveFocusThenPrivacyGradeIsShown() {
+    fun whenBrowserShownAndOmnibarInputDoesNotHaveFocusThenPrivacyGradeIsShownAndSearchIconIsHidden() {
         testee.onUserSubmittedQuery("foo")
         testee.onOmnibarInputStateChanged(query = "", hasFocus = false, hasQueryChanged = false)
         assertTrue(browserViewState().showPrivacyGrade)
+        assertFalse(browserViewState().showSearchIcon)
     }
 
     @Test
@@ -630,10 +632,11 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenBrowserShownAndOmnibarInputHasFocusThenPrivacyGradeIsShown() {
+    fun whenBrowserShownAndOmnibarInputHasFocusThenSearchIconIsShownAndPrivacyGradeIsHidden() {
         testee.onUserSubmittedQuery("foo")
         testee.onOmnibarInputStateChanged("", true, hasQueryChanged = false)
-        assertTrue(browserViewState().showPrivacyGrade)
+        assertFalse(browserViewState().showPrivacyGrade)
+        assertTrue(browserViewState().showSearchIcon)
     }
 
     @Test

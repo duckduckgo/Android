@@ -21,9 +21,11 @@ import android.content.BroadcastReceiver
 import android.os.Bundle
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.Toolbar
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import dagger.android.AndroidInjection
 import javax.inject.Inject
@@ -73,6 +75,12 @@ abstract class DuckDuckGoActivity : AppCompatActivity() {
             LocalBroadcastManager.getInstance(applicationContext).unregisterReceiver(it)
         }
         super.onDestroy()
+    }
+
+    fun setupToolbar(toolbar: Toolbar) {
+        setSupportActionBar(toolbar)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        toolbar.setNavigationIcon(R.drawable.ic_back)
     }
 
     protected inline fun <reified V : ViewModel> bindViewModel() = lazy { ViewModelProvider(this, viewModelFactory).get(V::class.java) }

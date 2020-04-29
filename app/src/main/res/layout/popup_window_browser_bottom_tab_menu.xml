@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?><!--
   ~ Copyright (c) 2020 DuckDuckGo
-  ~  
+  ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
   ~ You may obtain a copy of the License at
@@ -16,19 +16,93 @@
 
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="match_parent"
+    android:layout_width="320dp"
     android:layout_height="wrap_content"
     android:background="@drawable/popup_menu_bg">
 
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/whiteTwo"
+        app:layout_constraintBottom_toBottomOf="@+id/browserMenuHeader" />
+
+    <ScrollView
+        android:id="@+id/browserMenuContent"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constrainedHeight="true">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingTop="13dp"
+            android:paddingBottom="16dp">
+
+            <TextView
+                android:id="@+id/newTabPopupMenuItem"
+                style="@style/BrowserTextMenuItem"
+                android:text="@string/newTabMenuItem" />
+
+            <TextView
+                android:id="@+id/addBookmarksPopupMenuItem"
+                style="@style/BrowserTextMenuItem"
+                android:text="@string/addBookmarkMenuTitle" />
+
+            <TextView
+                android:id="@+id/findInPageMenuItem"
+                style="@style/BrowserTextMenuItem"
+                android:text="@string/findInPageMenuTitle" />
+
+            <TextView
+                android:id="@+id/addToHome"
+                style="@style/BrowserTextMenuItem"
+                android:text="@string/addToHome" />
+
+            <androidx.appcompat.widget.AppCompatCheckBox
+                android:id="@+id/requestDesktopSiteCheckMenuItem"
+                style="@style/BrowserTextMenuItem"
+                android:theme="@style/PopUpMenuSwitchTheme"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="20dp"
+                android:button="@null"
+                android:drawableEnd="?android:attr/listChoiceIndicatorMultiple"
+                android:drawablePadding="24dp"
+                android:paddingStart="24dp"
+                android:paddingEnd="0dp"
+                android:text="@string/requestDesktopSiteMenuTitle" />
+
+            <TextView
+                android:id="@+id/brokenSitePopupMenuItem"
+                style="@style/BrowserTextMenuItem"
+                android:text="@string/brokenSiteReportBrokenSiteMenuItem" />
+
+            <TextView
+                android:id="@+id/settingsPopupMenuItem"
+                style="@style/BrowserTextMenuItem"
+                android:text="@string/settingsMenuItemTitle" />
+
+        </LinearLayout>
+
+    </ScrollView>
+
     <LinearLayout
-        android:id="@+id/header"
+        android:id="@+id/browserMenuHeader"
         android:layout_width="0dp"
         android:layout_height="50dp"
         android:gravity="center"
         android:orientation="horizontal"
-        app:layout_constraintTop_toTopOf="parent"
+        android:paddingStart="12dp"
+        android:paddingEnd="12dp"
+        android:paddingBottom="16dp"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent">
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/browserMenuContent">
 
         <ImageButton
             android:id="@+id/backPopupMenuItem"
@@ -57,85 +131,15 @@
             android:contentDescription="@string/refresh"
             android:src="@drawable/ic_bottom_bar_refresh" />
 
-    </LinearLayout>
-
-    <FrameLayout
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="@color/whiteTwo"
-        app:layout_constraintBottom_toBottomOf="@+id/header" />
-
-    <ScrollView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:layout_constrainedHeight="true"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/header">
-
-        <LinearLayout
+        <ImageButton
+            android:id="@+id/sharePopupMenuItem"
+            style="@style/BrowserIconMenuItem"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:paddingTop="13dp"
-            android:paddingBottom="20dp">
+            android:layout_weight="1"
+            android:contentDescription="@string/forward"
+            android:src="@drawable/ic_share" />
 
-            <TextView
-                android:id="@+id/newTabPopupMenuItem"
-                style="@style/BrowserTextMenuItem"
-                android:text="@string/newTabMenuItem" />
-
-            <TextView
-                android:id="@+id/bookmarksPopupMenuItem"
-                style="@style/BrowserTextMenuItem"
-                android:text="@string/bookmarksMenuTitle" />
-
-            <TextView
-                android:id="@+id/addBookmarksPopupMenuItem"
-                style="@style/BrowserTextMenuItem"
-                android:text="@string/addBookmarkMenuTitle" />
-
-            <TextView
-                android:id="@+id/sharePageMenuItem"
-                style="@style/BrowserTextMenuItem"
-                android:text="@string/shareMenuTitle" />
-
-            <TextView
-                android:id="@+id/findInPageMenuItem"
-                style="@style/BrowserTextMenuItem"
-                android:text="@string/findInPageMenuTitle" />
-
-            <TextView
-                android:id="@+id/addToHome"
-                style="@style/BrowserTextMenuItem"
-                android:text="@string/addToHome" />
-
-            <androidx.appcompat.widget.AppCompatCheckBox
-                android:id="@+id/requestDesktopSiteCheckMenuItem"
-                style="@style/BrowserCheckBoxMenuItem"
-                android:theme="@style/PopUpMenuSwitchTheme"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="20dp"
-                android:button="@null"
-                android:drawableEnd="?android:attr/listChoiceIndicatorMultiple"
-                android:drawablePadding="24dp"
-                android:paddingStart="24dp"
-                android:paddingEnd="0dp"
-                android:text="@string/requestDesktopSiteMenuTitle" />
-
-            <TextView
-                android:id="@+id/brokenSitePopupMenuItem"
-                style="@style/BrowserTextMenuItem"
-                android:text="@string/brokenSiteReportBrokenSiteMenuItem" />
-
-            <TextView
-                android:id="@+id/settingsPopupMenuItem"
-                style="@style/BrowserTextMenuItem"
-                android:text="@string/settingsMenuItemTitle" />
-
-        </LinearLayout>
-
-    </ScrollView>
-
+    </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
