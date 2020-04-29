@@ -22,24 +22,19 @@ import com.duckduckgo.app.InstantSchedulersRule
 import com.duckduckgo.app.global.exception.UncaughtExceptionEntity
 import com.duckduckgo.app.global.exception.UncaughtExceptionRepository
 import com.duckduckgo.app.global.exception.UncaughtExceptionSource
-import com.duckduckgo.app.runBlocking
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.EXCEPTION_APP_VERSION
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.EXCEPTION_MESSAGE
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.EXCEPTION_TIMESTAMP
 import com.duckduckgo.app.statistics.store.OfflinePixelCountDataStore
-import com.nhaarman.mockitokotlin2.mock
-import com.nhaarman.mockitokotlin2.verify
-import com.nhaarman.mockitokotlin2.whenever
+import com.nhaarman.mockitokotlin2.*
+import io.reactivex.Completable
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.test.runBlockingTest
-import org.junit.After
+import org.junit.Assert.assertEquals
 import org.junit.Before
-import org.junit.Test
-
-import org.junit.Assert.*
 import org.junit.Rule
+import org.junit.Test
 
 @ExperimentalCoroutinesApi
 class OfflinePixelSenderTest {
@@ -51,9 +46,6 @@ class OfflinePixelSenderTest {
     private var testee: OfflinePixelSender = OfflinePixelSender(mockOfflinePixelCountDataStore, mockUncaughtExceptionRepository, mockPixel)
 
     @get:Rule
-    var instantTaskExecutorRule = InstantTaskExecutorRule()
-
-    @get:Rule
     val schedulers = InstantSchedulersRule()
 
     @ExperimentalCoroutinesApi
@@ -62,21 +54,24 @@ class OfflinePixelSenderTest {
 
     @Before
     fun before() {
-        val exceptionEntity = UncaughtExceptionEntity(1, UncaughtExceptionSource.GLOBAL, "test", 1588167165, "version")
+        val exceptionEntity = UncaughtExceptionEntity(1, UncaughtExceptionSource.GLOBAL, "test", 1588167165000, "version")
+
         runBlocking<Unit> {
+            whenever(mockPixel.fireCompletable(any(), any(), any())).thenReturn(Completable.complete())
             whenever(mockUncaughtExceptionRepository.getExceptions()).thenReturn(listOf(exceptionEntity))
         }
     }
 
     @Test
-    fun whenSendUncaughtExceptionsPixelThenTimestampFormattedToUtc()  {
+    fun whenSendUncaughtExceptionsPixelThenTimestampFormattedToUtc() {
         val params = mapOf(
             EXCEPTION_MESSAGE to "test",
             EXCEPTION_APP_VERSION to "version",
-            EXCEPTION_TIMESTAMP to "hereGoesTheFormattedDate"
+            EXCEPTION_TIMESTAMP to "2020-04-29T13:32:45+0000"
         )
 
-        testee.sendOfflinePixels()
-        verify(mockPixel).fireCompletable(Pixel.PixelName.APPLICATION_CRASH_GLOBAL.name, params)
+        testee.sendOfflinePixels().blockingAwait()
+
+        verify(mockPixel).fireCompletable(Pixel.PixelName.APPLICATION_CRASH_GLOBAL.pixelName, params)
     }
 }

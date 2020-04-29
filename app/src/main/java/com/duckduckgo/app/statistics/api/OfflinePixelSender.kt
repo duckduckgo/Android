@@ -108,7 +108,7 @@ class OfflinePixelSender @Inject constructor(
                 val params = mapOf(
                     EXCEPTION_MESSAGE to exception.message,
                     EXCEPTION_APP_VERSION to exception.version,
-                    EXCEPTION_TIMESTAMP to exception.toFormattedDate()
+                    EXCEPTION_TIMESTAMP to exception.formattedTimestamp()
                 )
 
                 val pixel = pixel.fireCompletable(pixelName, params)

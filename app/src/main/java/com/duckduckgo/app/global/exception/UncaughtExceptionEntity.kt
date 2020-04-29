@@ -20,8 +20,7 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.duckduckgo.app.browser.BuildConfig
 import java.text.SimpleDateFormat
-import java.util.Locale
-import java.util.TimeZone
+import java.util.*
 
 @Entity
 data class UncaughtExceptionEntity(
@@ -32,7 +31,7 @@ data class UncaughtExceptionEntity(
     val version: String = BuildConfig.VERSION_NAME
 ) {
 
-    fun toFormattedDate(): String = formatter.format(timestamp)
+    fun formattedTimestamp(): String = formatter.format(Date(timestamp))
 
     companion object {
         val formatter: SimpleDateFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ", Locale.US).apply {
