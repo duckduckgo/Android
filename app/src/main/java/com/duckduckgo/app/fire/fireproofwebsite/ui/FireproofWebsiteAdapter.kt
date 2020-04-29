@@ -26,6 +26,7 @@ import androidx.annotation.StringRes
 import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
+import com.duckduckgo.app.fire.fireproofwebsite.data.website
 import com.duckduckgo.app.global.faviconLocation
 import com.duckduckgo.app.global.image.GlideApp
 import kotlinx.android.synthetic.main.view_fireproof_website_description.view.*
@@ -101,10 +102,10 @@ sealed class FireproofWebSiteViewHolder(itemView: View) : RecyclerView.ViewHolde
 
             itemView.overflowMenu.contentDescription = itemView.context.getString(
                 R.string.fireproofWebsiteOverflowContentDescription,
-                entity.domain
+                entity.website()
             )
 
-            itemView.fireproofWebsiteEntryDomain.text = entity.domain
+            itemView.fireproofWebsiteEntryDomain.text = entity.website()
             loadFavicon(entity.domain)
 
             itemView.overflowMenu.setOnClickListener {
