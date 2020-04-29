@@ -61,7 +61,7 @@ import com.duckduckgo.app.usage.search.SearchCountDao
 import com.duckduckgo.app.usage.search.SearchCountEntity
 
 @Database(
-    exportSchema = true, version = 19, entities = [
+    exportSchema = true, version = 20, entities = [
         TdsTracker::class,
         TdsEntity::class,
         TdsDomainEntity::class,
@@ -274,7 +274,7 @@ class MigrationsProvider(val context: Context) {
         }
     }
 
-    val MIGRATION_18_TO_19: Migration = object : Migration(18, 19) {
+    val MIGRATION_19_TO_20: Migration = object : Migration(19, 20) {
         override fun migrate(database: SupportSQLiteDatabase) {
             database.execSQL("CREATE TABLE IF NOT EXISTS $FIREPROOF_WEBSITES_TABLE_NAME (`domain` TEXT NOT NULL, PRIMARY KEY(`domain`))")
         }
@@ -299,7 +299,7 @@ class MigrationsProvider(val context: Context) {
             MIGRATION_15_TO_16,
             MIGRATION_16_TO_17,
             MIGRATION_17_TO_18,
-            MIGRATION_18_TO_19
+            MIGRATION_19_TO_20
         )
 
     @Deprecated(
