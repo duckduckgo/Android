@@ -30,6 +30,7 @@
         <item name="android:windowActivityTransitions">true</item>
         <item name="autoCompleteTextViewStyle">@style/AutoCompleteTextViewStyle</item>
         <item name="android:statusBarColor">?colorPrimary</item>
+        <item name="snackbarButtonStyle">@style/snackbarButtonStyle</item>
     </style>
 
     <style name="AppTheme.BaseDark">
@@ -82,6 +83,9 @@
         <item name="feedbackEditTextHintColor">@color/grayish</item>
 
         <item name="privacyDashboardLogoLetterTextColor">@color/subtleGray</item>
+
+        <item name="bottomBarIconColor">@color/grayish</item>
+        <item name="bottomBarIconColorDisabled">@color/midGray</item>
 
     </style>
 
@@ -153,6 +157,10 @@
         <item name="feedbackEditTextHintColor">@color/warmerGray</item>
 
         <item name="privacyDashboardLogoLetterTextColor">@color/whiteFour</item>
+
+        <item name="bottomBarIconColor">@color/grayishBrown</item>
+        <item name="bottomBarIconColorDisabled">@color/pinkish_grey_two</item>
+
     </style>
 
     <style name="AppTheme.Light" parent="AppTheme.BaseLight">
@@ -192,6 +200,15 @@
         <item name="android:colorForeground">?attr/settingsSwitchBackgroundColor</item>
     </style>
 
+    <style name="TextInputLayoutTheme" parent="Widget.Design.TextInputLayout">
+        <item name="colorControlActivated">@color/cornflowerBlue</item>
+        <item name="colorControlNormal">@color/cornflowerBlue</item>
+        <item name="colorControlHighlight">@color/cornflowerBlue</item>
+        <item name="android:textColor">@color/grayish</item>
+        <item name="android:textColorSecondary">@color/grayish</item>
+        <item name="android:textColorHint">@color/grayish</item>
+    </style>
+
     <style name="AutoCompleteTextViewStyle" parent="Widget.AppCompat.AutoCompleteTextView">
         <item name="android:textCursorDrawable">@drawable/text_cursor</item>
         <item name="android:textColorHint">?attr/omnibarHintColor</item>
@@ -200,6 +217,11 @@
 
     <style name="DaxDialogFragment" parent="android:Theme.DeviceDefault.Light.NoActionBar">
         <item name="android:windowTranslucentStatus">true</item>
+    </style>
+
+    <style name="PopUpMenuSwitchTheme">
+        <item name="colorAccent">@color/cornflowerBlue</item>
+        <item name="android:textColorSecondary">?bottomBarIconColor</item>
     </style>
 
 </resources>

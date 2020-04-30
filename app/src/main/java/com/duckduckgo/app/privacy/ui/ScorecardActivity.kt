@@ -47,7 +47,7 @@ class ScorecardActivity : DuckDuckGoActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_privacy_scorecard)
-        configureToolbar()
+        setupToolbar(toolbar)
 
         viewModel.viewState.observe(this, Observer<ScorecardViewModel.ViewState> {
             it?.let { render(it) }
@@ -56,11 +56,6 @@ class ScorecardActivity : DuckDuckGoActivity() {
         repository.retrieveSiteData(intent.tabId!!).observe(this, Observer<Site> {
             viewModel.onSiteChanged(it)
         })
-    }
-
-    private fun configureToolbar() {
-        setSupportActionBar(toolbar)
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
     }
 
     private fun render(viewState: ScorecardViewModel.ViewState) {
@@ -105,5 +100,4 @@ class ScorecardActivity : DuckDuckGoActivity() {
             return intent
         }
     }
-
 }

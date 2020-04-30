@@ -164,13 +164,12 @@ interface Pixel {
 
         CHANGE_APP_ICON_OPENED("m_ic"),
 
-        QUICK_SEARCH_PROMPT_NOTIFICATION_SHOWN("m_qs_pn_s"),
-        QUICK_SEARCH_PROMPT_NOTIFICATION_LAUNCHED("m_qs_pn_l"),
-        QUICK_SEARCH_PROMPT_NOTIFICATION_KEEP("m_qs_pn_k"),
-        QUICK_SEARCH_PROMPT_NOTIFICATION_REMOVE("m_qs_pn_r"),
-        QUICK_SEARCH_NOTIFICATION_ENABLED("m_qs_sn_e"),
-        QUICK_SEARCH_NOTIFICATION_DISABLED("m_qs_sn_d"),
-        QUICK_SEARCH_NOTIFICATION_LAUNCHED("m_qs_sn_l")
+        MENU_ACTION_POPUP_OPENED("m_nav_pm_o_%s"),
+        MENU_ACTION_FIRE_PRESSED("m_nav_f_p_%s"),
+        MENU_ACTION_REFRESH_PRESSED("m_nav_r_p_%s"),
+        MENU_ACTION_NEW_TAB_PRESSED("m_nav_nt_p_%s"),
+        MENU_ACTION_BOOKMARKS_PRESSED("m_nav_b_p_%s"),
+        MENU_ACTION_SEARCH_PRESSED("m_nav_s_p_%s")
     }
 
     object PixelParameter {

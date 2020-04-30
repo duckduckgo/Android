@@ -1,5 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
 <!--
-  ~ Copyright (c) 2020 DuckDuckGo
+  ~ Copyright (c) 2018 DuckDuckGo
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -14,22 +15,7 @@
   ~ limitations under the License.
   -->
 
-<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
-
-    <item>
-        <shape>
-            <solid android:color="@color/almostBlack" />
-        </shape>
-    </item>
-    <item
-        android:bottom="16dip"
-        android:left="16dip"
-        android:right="16dip"
-        android:top="16dip">
-        <shape>
-            <solid android:color="@color/white" />
-            <corners android:radius="40dp" />
-        </shape>
-    </item>
-
-</layer-list>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:state_enabled="false" android:color="?attr/bottomBarIconColorDisabled" />
+    <item android:state_enabled="true" android:color="?bottomBarIconColor"/>
+</selector>

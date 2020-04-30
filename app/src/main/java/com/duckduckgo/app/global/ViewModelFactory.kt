@@ -157,8 +157,7 @@ class ViewModelFactory @Inject constructor(
             appSettingsPreferencesStore,
             defaultBrowserDetector,
             variantManager,
-            pixel,
-            notificationScheduler
+            pixel
         )
     }
 
