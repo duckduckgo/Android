@@ -72,7 +72,9 @@ interface Pixel {
         PRIVACY_DASHBOARD_NETWORKS("mp_n"),
         PRIVACY_DASHBOARD_WHITELIST_ADD("mp_wla"),
         PRIVACY_DASHBOARD_WHITELIST_REMOVE("mp_wlr"),
-
+        PRIVACY_DASHBOARD_MANAGE_WHITELIST("mp_mw"),
+        PRIVACY_DASHBOARD_REPORT_BROKEN_SITE("mp_rb"),
+        
         HTTPS_NO_LOOKUP("m_https_nl"),
         HTTPS_LOCAL_UPGRADE("m_https_lu"),
         HTTPS_SERVICE_REQUEST_UPGRADE("m_https_sru"),
@@ -116,6 +118,7 @@ interface Pixel {
         SETTINGS_OPENED("ms"),
         SETTINGS_THEME_TOGGLED_LIGHT("ms_tl"),
         SETTINGS_THEME_TOGGLED_DARK("ms_td"),
+        SETTINGS_MANAGE_WHITELIST("ms_mw"),
 
         SURVEY_CTA_SHOWN(pixelName = "mus_cs"),
         SURVEY_CTA_DISMISSED(pixelName = "mus_cd"),

@@ -192,11 +192,11 @@
     <string name="bookmarksMenuTitle">Záložky</string>
     <string name="bookmarksActivityTitle">Záložky</string>
     <string name="bookmarkDeleteConfirmMessage">Opravdu chcete smazat záložku &lt;b&gt;%s&lt;/b&gt;?</string>
-    <string name="bookmarkDeleteConfirmTitle">Potvrdit</string>
+    <string name="dialogConfirmTitle">Potvrdit</string>
     <string name="bookmarkAddedFeedback">Záložka přidána</string>
     <string name="bookmarkTitleHint">Název záložky</string>
     <string name="bookmarkUrlHint">URL záložky</string>
-    <string name="bookmarkSave">Uložit</string>
+    <string name="dialogSave">Uložit</string>
     <string name="bookmarkTitleEdit">Upravit záložku</string>
     <string name="noBookmarks">Zatím nebyly přidány žádné záložky.</string>
     <string name="bookmarkOverflowContentDescription">Další možnosti záložky %s</string>

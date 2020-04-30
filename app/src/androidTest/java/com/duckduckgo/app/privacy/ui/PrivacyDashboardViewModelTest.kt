@@ -30,12 +30,12 @@ import com.duckduckgo.app.privacy.model.PrivacyGrade
 import com.duckduckgo.app.privacy.model.PrivacyPractices
 import com.duckduckgo.app.privacy.model.PrivacyPractices.Summary.GOOD
 import com.duckduckgo.app.privacy.model.PrivacyPractices.Summary.UNKNOWN
+import com.duckduckgo.app.privacy.ui.PrivacyDashboardViewModel.Command
+import com.duckduckgo.app.privacy.ui.PrivacyDashboardViewModel.Command.LaunchManageWhitelist
+import com.duckduckgo.app.privacy.ui.PrivacyDashboardViewModel.Command.LaunchReportBrokenSite
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.PRIVACY_DASHBOARD_OPENED
-import com.nhaarman.mockitokotlin2.any
-import com.nhaarman.mockitokotlin2.mock
-import com.nhaarman.mockitokotlin2.verify
-import com.nhaarman.mockitokotlin2.whenever
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.*
+import com.nhaarman.mockitokotlin2.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.junit.After
 import org.junit.Assert.*
@@ -60,9 +60,13 @@ class PrivacyDashboardViewModelTest {
     private var sitesVisitedLiveData: LiveData<Int> = mock()
     private var mockPixel: Pixel = mock()
 
+    private var commandObserver: Observer<Command> = mock()
+    private var commandCaptor: KArgumentCaptor<Command> = argumentCaptor()
+
     private val testee: PrivacyDashboardViewModel by lazy {
         val model = PrivacyDashboardViewModel(mockUserWhitelistDao, networkLeaderboardDao, mockPixel, coroutineRule.testDispatcherProvider)
         model.viewState.observeForever(viewStateObserver)
+        model.command.observeForever(commandObserver)
         model
     }
 
@@ -77,6 +81,7 @@ class PrivacyDashboardViewModelTest {
     @After
     fun after() {
         testee.viewState.removeObserver(viewStateObserver)
+        testee.command.removeObserver(commandObserver)
         testee.onCleared()
     }
 
@@ -211,6 +216,21 @@ class PrivacyDashboardViewModelTest {
         val viewState = testee.viewState.value!!
         assertEquals(emptyList<NetworkLeaderboardEntry>(), viewState.trackerNetworkEntries)
         assertFalse(viewState.shouldShowTrackerNetworkLeaderboard)
+    }
+
+    @Test
+    fun whenManageWhitelistSelectedThenPixelIsFiredAndCommandIsManageWhitelist() {
+        testee.onManageWhitelistSelected()
+        verify(mockPixel).fire(PRIVACY_DASHBOARD_MANAGE_WHITELIST)
+        verify(commandObserver).onChanged(LaunchManageWhitelist)
+    }
+
+    @Test
+    fun whenBrokenSiteSelectedThenPixelIsFiredAndCommandIsLaunchBrokenSite() {
+        testee.onReportBrokenSiteSelected()
+        verify(mockPixel).fire(PRIVACY_DASHBOARD_REPORT_BROKEN_SITE)
+        verify(commandObserver).onChanged(commandCaptor.capture())
+        assertTrue(commandCaptor.lastValue is LaunchReportBrokenSite)
     }
 
     private fun givenSiteWithPrivacyOn() {

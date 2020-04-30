@@ -210,11 +210,11 @@
     <string name="bookmarksMenuTitle">Grāmatzīmes</string>
     <string name="bookmarksActivityTitle">Grāmatzīmes</string>
     <string name="bookmarkDeleteConfirmMessage">Vai tiešām vēlaties izdzēst grāmatzīmi &lt;b&gt;%s&lt;/b&gt;?</string>
-    <string name="bookmarkDeleteConfirmTitle">Apstiprināt</string>
+    <string name="dialogConfirmTitle">Apstiprināt</string>
     <string name="bookmarkAddedFeedback">Pievienota grāmatzīme</string>
     <string name="bookmarkTitleHint">Grāmatzīmes nosaukums</string>
     <string name="bookmarkUrlHint">Grāmatzīmju URL</string>
-    <string name="bookmarkSave">Saglabāt</string>
+    <string name="dialogSave">Saglabāt</string>
     <string name="bookmarkTitleEdit">Rediģēt grāmatzīmi</string>
     <string name="noBookmarks">Pagaidām nav pievienota neviena grāmatzīme</string>
     <string name="bookmarkOverflowContentDescription">Vairāk iespēju grāmatzīmei %s</string>

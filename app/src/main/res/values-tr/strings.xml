@@ -209,11 +209,11 @@
     <string name="bookmarksMenuTitle">Yer imleri</string>
     <string name="bookmarksActivityTitle">Yer imleri</string>
     <string name="bookmarkDeleteConfirmMessage">&lt;b&gt;%s&lt;/b&gt; yer imini silmek istediğinizden emin misiniz?</string>
-    <string name="bookmarkDeleteConfirmTitle">Onayla</string>
+    <string name="dialogConfirmTitle">Onayla</string>
     <string name="bookmarkAddedFeedback">Yer imi eklendi</string>
     <string name="bookmarkTitleHint">Yer imi başlığı</string>
     <string name="bookmarkUrlHint">Yer imi URL\'si</string>
-    <string name="bookmarkSave">Kaydet</string>
+    <string name="dialogSave">Kaydet</string>
     <string name="bookmarkTitleEdit">Yer İşaretini Düzenle</string>
     <string name="noBookmarks">Henüz yer işareti eklenmedi</string>
     <string name="bookmarkOverflowContentDescription">%s yer imi için diğer seçenekler</string>

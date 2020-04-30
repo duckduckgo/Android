@@ -188,11 +188,11 @@
     <string name="bookmarksMenuTitle">Bogmærker</string>
     <string name="bookmarksActivityTitle">Bogmærker</string>
     <string name="bookmarkDeleteConfirmMessage">Er du sikker på, at du vil slette bogmærket &lt;b&gt;%s&lt;/b&gt;?</string>
-    <string name="bookmarkDeleteConfirmTitle">Bekræft</string>
+    <string name="dialogConfirmTitle">Bekræft</string>
     <string name="bookmarkAddedFeedback">Bogmærke tilføjet</string>
     <string name="bookmarkTitleHint">Titel på bogmærke</string>
     <string name="bookmarkUrlHint">Bogmærkets URL</string>
-    <string name="bookmarkSave">Gem</string>
+    <string name="dialogSave">Gem</string>
     <string name="bookmarkTitleEdit">Rediger bogmærke</string>
     <string name="noBookmarks">Ingen bogmærker tilføjet endnu</string>
     <string name="bookmarkOverflowContentDescription">Flere muligheder for bogmærke %s</string>

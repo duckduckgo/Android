@@ -188,11 +188,11 @@
     <string name="bookmarksMenuTitle">Bladwijzers</string>
     <string name="bookmarksActivityTitle">Bladwijzers</string>
     <string name="bookmarkDeleteConfirmMessage">Weet je zeker dat je bladwijzer &lt;b&gt;%s&lt;/b&gt; wilt verwijderen?</string>
-    <string name="bookmarkDeleteConfirmTitle">Bevestigen</string>
+    <string name="dialogConfirmTitle">Bevestigen</string>
     <string name="bookmarkAddedFeedback">Bladwijzer toegevoegd</string>
     <string name="bookmarkTitleHint">Naam bladwijzer</string>
     <string name="bookmarkUrlHint">URL bladwijzer</string>
-    <string name="bookmarkSave">Opslaan</string>
+    <string name="dialogSave">Opslaan</string>
     <string name="bookmarkTitleEdit">Bladwijzer bewerken</string>
     <string name="noBookmarks">Nog geen bladwijzers toegevoegd</string>
     <string name="bookmarkOverflowContentDescription">Meer opties voor bladwijzer %s</string>

@@ -21,8 +21,10 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
+import com.duckduckgo.app.brokensite.BrokenSiteData
 import com.duckduckgo.app.global.DefaultDispatcherProvider
 import com.duckduckgo.app.global.DispatcherProvider
+import com.duckduckgo.app.global.SingleLiveEvent
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.global.model.domain
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao
@@ -32,6 +34,8 @@ import com.duckduckgo.app.privacy.model.HttpsStatus
 import com.duckduckgo.app.privacy.model.PrivacyGrade
 import com.duckduckgo.app.privacy.model.PrivacyPractices
 import com.duckduckgo.app.privacy.model.PrivacyPractices.Summary.UNKNOWN
+import com.duckduckgo.app.privacy.ui.PrivacyDashboardViewModel.Command.LaunchManageWhitelist
+import com.duckduckgo.app.privacy.ui.PrivacyDashboardViewModel.Command.LaunchReportBrokenSite
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.*
 import kotlinx.coroutines.GlobalScope
@@ -59,7 +63,13 @@ class PrivacyDashboardViewModel(
         val shouldReloadPage: Boolean
     )
 
+    sealed class Command {
+        object LaunchManageWhitelist : Command()
+        class LaunchReportBrokenSite(val data: BrokenSiteData) : Command()
+    }
+
     val viewState: MutableLiveData<ViewState> = MutableLiveData()
+    val command: SingleLiveEvent<Command> = SingleLiveEvent()
     private var site: Site? = null
 
     private val sitesVisited: LiveData<Int> = networkLeaderboardDao.sitesVisited()
@@ -166,6 +176,16 @@ class PrivacyDashboardViewModel(
                 pixel.fire(PRIVACY_DASHBOARD_WHITELIST_ADD)
             }
         }
+    }
+
+    fun onManageWhitelistSelected() {
+        pixel.fire(PRIVACY_DASHBOARD_MANAGE_WHITELIST)
+        command.value = LaunchManageWhitelist
+    }
+
+    fun onReportBrokenSiteSelected() {
+        pixel.fire(PRIVACY_DASHBOARD_REPORT_BROKEN_SITE)
+        command.value = LaunchReportBrokenSite(BrokenSiteData.fromSite(site))
     }
 
     private companion object {

@@ -23,6 +23,8 @@ import android.os.Bundle
 import android.view.View
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
+import com.duckduckgo.app.brokensite.BrokenSiteActivity
+import com.duckduckgo.app.brokensite.BrokenSiteData
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.model.Site
@@ -30,6 +32,9 @@ import com.duckduckgo.app.global.view.hide
 import com.duckduckgo.app.global.view.html
 import com.duckduckgo.app.global.view.show
 import com.duckduckgo.app.privacy.renderer.*
+import com.duckduckgo.app.privacy.ui.PrivacyDashboardViewModel.Command
+import com.duckduckgo.app.privacy.ui.PrivacyDashboardViewModel.Command.LaunchManageWhitelist
+import com.duckduckgo.app.privacy.ui.PrivacyDashboardViewModel.Command.LaunchReportBrokenSite
 import com.duckduckgo.app.privacy.ui.PrivacyDashboardViewModel.ViewState
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.*
@@ -56,27 +61,43 @@ class PrivacyDashboardActivity : DuckDuckGoActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_privacy_dashboard)
         configureToolbar()
-
-        viewModel.viewState.observe(this, Observer {
-            it?.let { render(it) }
-        })
-
-        repository.retrieveSiteData(intent.tabId!!).observe(this, Observer<Site> {
-            viewModel.onSiteChanged(it)
-        })
-
-        privacyGrade.setOnClickListener {
-            onScorecardClicked()
-        }
-
-        privacyToggle.setOnCheckedChangeListener { _, enabled ->
-            viewModel.onPrivacyToggled(enabled)
-        }
+        setupObservers()
+        setupClickListeners()
     }
 
     private fun configureToolbar() {
         setSupportActionBar(toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
+    }
+
+    private fun setupObservers() {
+        viewModel.viewState.observe(this, Observer {
+            it?.let { render(it) }
+        })
+        viewModel.command.observe(this, Observer {
+            it?.let { processCommand(it) }
+        })
+        repository.retrieveSiteData(intent.tabId!!).observe(this, Observer<Site> {
+            viewModel.onSiteChanged(it)
+        })
+    }
+
+    private fun setupClickListeners() {
+        privacyGrade.setOnClickListener {
+            onScorecardClicked()
+        }
+
+        whitelistButton.setOnClickListener {
+            viewModel.onManageWhitelistSelected()
+        }
+
+        brokenSiteButton.setOnClickListener {
+            viewModel.onReportBrokenSiteSelected()
+        }
+
+        privacyToggle.setOnCheckedChangeListener { _, enabled ->
+            viewModel.onPrivacyToggled(enabled)
+        }
     }
 
     private fun render(viewState: ViewState) {
@@ -132,9 +153,24 @@ class PrivacyDashboardActivity : DuckDuckGoActivity() {
         privacyToggle.isChecked = enabled
     }
 
+    private fun processCommand(command: Command) {
+        when (command) {
+            is LaunchManageWhitelist -> launchWhitelistActivity()
+            is LaunchReportBrokenSite -> launchReportBrokenSite(command.data)
+        }
+    }
+
     private fun onScorecardClicked() {
         pixel.fire(PRIVACY_DASHBOARD_SCORECARD)
         startActivity(ScorecardActivity.intent(this, intent.tabId!!))
+    }
+
+    private fun launchReportBrokenSite(data: BrokenSiteData) {
+        startActivity(BrokenSiteActivity.intent(this, data))
+    }
+
+    private fun launchWhitelistActivity() {
+        startActivity(WhitelistActivity.intent(this))
     }
 
     fun onEncryptionClicked(@Suppress("UNUSED_PARAMETER") view: View) {
@@ -174,5 +210,4 @@ class PrivacyDashboardActivity : DuckDuckGoActivity() {
         }
 
     }
-
 }

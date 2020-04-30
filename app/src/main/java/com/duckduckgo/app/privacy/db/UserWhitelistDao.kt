@@ -16,7 +16,7 @@
 
 package com.duckduckgo.app.privacy.db
 
-import androidx.core.net.toUri
+import androidx.lifecycle.LiveData
 import androidx.room.*
 import com.duckduckgo.app.privacy.model.UserWhitelistedDomain
 
@@ -36,6 +36,9 @@ abstract class UserWhitelistDao {
     fun delete(domain: String) {
         delete(UserWhitelistedDomain(domain))
     }
+
+    @Query("select * from user_whitelist")
+    abstract fun all(): LiveData<List<UserWhitelistedDomain>>
 
     @Query("select count(1) > 0 from user_whitelist where domain = :domain")
     abstract fun contains(domain: String): Boolean

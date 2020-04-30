@@ -206,11 +206,11 @@
     <string name="bookmarksMenuTitle">Järjehoidjad</string>
     <string name="bookmarksActivityTitle">Järjehoidjad</string>
     <string name="bookmarkDeleteConfirmMessage">Kas soovite kindlasti kustutada järjehoidja &lt;b&gt;%s&lt;/b&gt;?</string>
-    <string name="bookmarkDeleteConfirmTitle">Kinnitage</string>
+    <string name="dialogConfirmTitle">Kinnitage</string>
     <string name="bookmarkAddedFeedback">Järjehoidja lisatud</string>
     <string name="bookmarkTitleHint">Järjehoidja pealkiri</string>
     <string name="bookmarkUrlHint">Järjehoidja URL</string>
-    <string name="bookmarkSave">Salvesta</string>
+    <string name="dialogSave">Salvesta</string>
     <string name="bookmarkTitleEdit">Redigeeri järjehoidjat</string>
     <string name="noBookmarks">Järjehoidjaid pole veel lisatud</string>
     <string name="bookmarkOverflowContentDescription">Veel järjehoidja %s valikuid</string>

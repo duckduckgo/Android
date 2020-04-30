@@ -56,6 +56,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion
 import com.duckduckgo.app.bookmarks.ui.EditBookmarkDialogFragment
 import com.duckduckgo.app.brokensite.BrokenSiteActivity
+import com.duckduckgo.app.brokensite.BrokenSiteData
 import com.duckduckgo.app.browser.BrowserTabViewModel.*
 import com.duckduckgo.app.browser.autocomplete.BrowserAutoCompleteSuggestionsAdapter
 import com.duckduckgo.app.browser.downloader.FileDownloadNotificationManager
@@ -76,6 +77,7 @@ import com.duckduckgo.app.browser.useragent.UserAgentProvider
 import com.duckduckgo.app.cta.ui.*
 import com.duckduckgo.app.global.ViewModelFactory
 import com.duckduckgo.app.global.device.DeviceInfo
+import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.global.view.*
 import com.duckduckgo.app.privacy.model.PrivacyGrade
 import com.duckduckgo.app.privacy.renderer.icon
@@ -495,7 +497,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
                 hideKeyboard()
             }
             is Command.BrokenSiteFeedback -> {
-                launchBrokenSiteFeedback(it.url, it.blockedTrackers, it.surrogates, it.httpsUpgraded)
+                launchBrokenSiteFeedback(it.data)
             }
             is Command.ShowFullScreen -> {
                 webViewFullScreenContainer.addView(
@@ -534,10 +536,10 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope {
         }
     }
 
-    private fun launchBrokenSiteFeedback(url: String, blockedTrackers: String, surrogates: String, upgradedHttps: Boolean) {
+    private fun launchBrokenSiteFeedback(data: BrokenSiteData) {
         context?.let {
             val options = ActivityOptions.makeSceneTransitionAnimation(browserActivity).toBundle()
-            startActivity(BrokenSiteActivity.intent(it, url, blockedTrackers, surrogates, upgradedHttps), options)
+            startActivity(BrokenSiteActivity.intent(it, data), options)
         }
     }
 

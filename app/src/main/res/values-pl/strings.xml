@@ -196,11 +196,11 @@
     <string name="bookmarksMenuTitle">Zakładki</string>
     <string name="bookmarksActivityTitle">Zakładki</string>
     <string name="bookmarkDeleteConfirmMessage">Czy na pewno chcesz usunąć zakładkę &lt;b&gt;%s&lt;/b&gt;?</string>
-    <string name="bookmarkDeleteConfirmTitle">Potwierdź</string>
+    <string name="dialogConfirmTitle">Potwierdź</string>
     <string name="bookmarkAddedFeedback">Zakładka została dodana</string>
     <string name="bookmarkTitleHint">Tytuł zakładki</string>
     <string name="bookmarkUrlHint">Adres URL zakładki</string>
-    <string name="bookmarkSave">Zapisz</string>
+    <string name="dialogSave">Zapisz</string>
     <string name="bookmarkTitleEdit">Edytuj zakładkę</string>
     <string name="noBookmarks">Nie dodano jeszcze żadnych zakładek</string>
     <string name="bookmarkOverflowContentDescription">Więcej opcji dla zakładki %s</string>

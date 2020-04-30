@@ -189,11 +189,11 @@
     <string name="bookmarksMenuTitle">Záložky</string>
     <string name="bookmarksActivityTitle">Záložky</string>
     <string name="bookmarkDeleteConfirmMessage">Naozaj chcete odstrániť záložku &lt;b&gt;%s&lt;/b&gt;?</string>
-    <string name="bookmarkDeleteConfirmTitle">Potvrdiť</string>
+    <string name="dialogConfirmTitle">Potvrdiť</string>
     <string name="bookmarkAddedFeedback">Záložka je pridaná</string>
     <string name="bookmarkTitleHint">Názov záložky</string>
     <string name="bookmarkUrlHint">Webová adresa záložky</string>
-    <string name="bookmarkSave">Uložiť</string>
+    <string name="dialogSave">Uložiť</string>
     <string name="bookmarkTitleEdit">Upraviť záložku</string>
     <string name="noBookmarks">Zatiaľ neboli pridané žiadne záložky</string>
     <string name="bookmarkOverflowContentDescription">Viac možností pre záložku %s</string>

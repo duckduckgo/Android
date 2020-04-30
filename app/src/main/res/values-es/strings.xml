@@ -188,11 +188,11 @@
     <string name="bookmarksMenuTitle">Marcadores</string>
     <string name="bookmarksActivityTitle">Marcadores</string>
     <string name="bookmarkDeleteConfirmMessage">¿Estás seguro de que quieres eliminar el marcador &lt;b&gt;%s&lt;/b&gt;?</string>
-    <string name="bookmarkDeleteConfirmTitle">Confirmar</string>
+    <string name="dialogConfirmTitle">Confirmar</string>
     <string name="bookmarkAddedFeedback">Marcador añadido</string>
     <string name="bookmarkTitleHint">Título del marcador</string>
     <string name="bookmarkUrlHint">URL del marcador</string>
-    <string name="bookmarkSave">Guardar</string>
+    <string name="dialogSave">Guardar</string>
     <string name="bookmarkTitleEdit">Editar marcador</string>
     <string name="noBookmarks">No se han añadido marcadores todavía</string>
     <string name="bookmarkOverflowContentDescription">Más opciones para el marcador %s</string>

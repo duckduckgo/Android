@@ -1,5 +1,7 @@
-<?xml version="1.0" encoding="utf-8"?><!--
-  ~ Copyright (c) 2018 DuckDuckGo
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+  ~ Copyright (c) 2020 DuckDuckGo
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -19,56 +21,31 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:layout_marginStart="8dp"
+    android:layout_marginEnd="8dp"
     android:layout_marginTop="4dp"
     android:layout_marginBottom="4dp"
     android:background="?android:attr/selectableItemBackground"
     android:clickable="true"
     android:focusable="true">
 
-    <ImageView
-        android:id="@+id/favicon"
-        android:layout_width="24dp"
-        android:layout_height="24dp"
-        android:layout_marginStart="22dp"
-        android:importantForAccessibility="no"
-        android:src="@drawable/ic_globe_gray_16dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
     <TextView
-        android:id="@+id/title"
+        android:id="@+id/domain"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="22dp"
+        android:layout_height="match_parent"
         android:fontFamily="sans-serif"
-        android:paddingTop="4dp"
-        android:textColor="?attr/bookmarkTitleTextColor"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="8dp"
+        android:textColor="?attr/whitelistTextColor"
         android:textSize="16sp"
         android:textStyle="normal"
-        app:layout_constraintBottom_toTopOf="@+id/url"
-        app:layout_constraintEnd_toStartOf="@+id/overflowMenu"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toEndOf="@id/favicon"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:text="Bookmark" />
-
-    <TextView
-        android:id="@+id/url"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="22dp"
-        android:fontFamily="sans-serif"
-        android:paddingTop="2dp"
-        android:paddingBottom="4dp"
-        android:textColor="?attr/bookmarkSubtitleTextColor"
-        android:textSize="12sp"
-        android:textStyle="normal"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/overflowMenu"
-        app:layout_constraintStart_toEndOf="@id/favicon"
-        app:layout_constraintTop_toBottomOf="@id/title"
-        tools:text="Bookmark" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="Domain" />
 
     <ImageView
         android:id="@+id/overflowMenu"

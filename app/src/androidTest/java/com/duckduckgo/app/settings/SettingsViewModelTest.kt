@@ -208,6 +208,13 @@ class SettingsViewModelTest {
     }
 
     @Test
+    fun whenWhitelistSelectedThenPixelIsSentAndWhitelistLaunched() {
+        testee.onManageWhitelistSelected()
+        verify(mockPixel).fire(Pixel.PixelName.SETTINGS_MANAGE_WHITELIST)
+        verify(commandObserver).onChanged(Command.LaunchWhitelist)
+    }
+
+    @Test
     fun whenVariantIsEmptyThenEmptyVariantIncludedInSettings() {
         testee.start()
         val expectedStartString = "${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})"

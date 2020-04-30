@@ -192,11 +192,11 @@
     <string name="bookmarksMenuTitle">Žymelės</string>
     <string name="bookmarksActivityTitle">Žymelės</string>
     <string name="bookmarkDeleteConfirmMessage">Ar tikrai norite ištrinti žymelę &lt;b&gt;%s&lt;/b&gt;?</string>
-    <string name="bookmarkDeleteConfirmTitle">Patvirtinti</string>
+    <string name="dialogConfirmTitle">Patvirtinti</string>
     <string name="bookmarkAddedFeedback">Žymelė pridėta</string>
     <string name="bookmarkTitleHint">Žymelės antraštė</string>
     <string name="bookmarkUrlHint">Žymelės URL</string>
-    <string name="bookmarkSave">Išsaugoti</string>
+    <string name="dialogSave">Išsaugoti</string>
     <string name="bookmarkTitleEdit">Redaguoti žymelę</string>
     <string name="noBookmarks">Žymelių dar nepridėta</string>
     <string name="bookmarkOverflowContentDescription">Daugiau parinkčių žymelei %s</string>

@@ -41,6 +41,7 @@ import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.A
 import com.duckduckgo.app.bookmarks.db.BookmarkEntity
 import com.duckduckgo.app.bookmarks.db.BookmarksDao
 import com.duckduckgo.app.bookmarks.ui.EditBookmarkDialogFragment.EditBookmarkListener
+import com.duckduckgo.app.brokensite.BrokenSiteData
 import com.duckduckgo.app.browser.BrowserTabViewModel.Command.*
 import com.duckduckgo.app.browser.BrowserTabViewModel.GlobalLayoutViewState.Browser
 import com.duckduckgo.app.browser.BrowserTabViewModel.GlobalLayoutViewState.Invalidated
@@ -184,7 +185,7 @@ class BrowserTabViewModel(
         class ShareLink(val url: String) : Command()
         class CopyLink(val url: String) : Command()
         class FindInPageCommand(val searchTerm: String) : Command()
-        class BrokenSiteFeedback(val url: String, val blockedTrackers: String, val surrogates: String, val httpsUpgraded: Boolean) : Command()
+        class BrokenSiteFeedback(val data: BrokenSiteData) : Command()
         object DismissFindInPage : Command()
         class ShowFileChooser(val filePathCallback: ValueCallback<Array<Uri>>, val fileChooserParams: WebChromeClient.FileChooserParams) : Command()
         class HandleExternalAppLink(val appLink: IntentType) : Command()
@@ -712,13 +713,7 @@ class BrowserTabViewModel(
     }
 
     fun onBrokenSiteSelected() {
-        val events = site?.trackingEvents
-        val blockedTrackers = events?.map { Uri.parse(it.trackerUrl).host }.orEmpty().distinct().joinToString(",")
-        val upgradedHttps = site?.upgradedHttps ?: false
-        val surrogates = site?.surrogates?.map { Uri.parse(it.name).baseHost }.orEmpty().distinct().joinToString(",")
-        val url = url.orEmpty()
-
-        command.value = BrokenSiteFeedback(url, blockedTrackers, surrogates, upgradedHttps)
+        command.value = BrokenSiteFeedback(BrokenSiteData.fromSite(site))
     }
 
     fun onUserSelectedToEditQuery(query: String) {
