@@ -31,8 +31,7 @@ interface DuckDuckGoCookieManager {
 class WebViewCookieManager(
     private val cookieManager: CookieManager,
     private val host: String,
-    private val cookieManagerRemover: CookieRemover,
-    private val selectiveCookieRemover: CookieRemover
+    private val removeCookies: RemoveCookiesStrategy
 ) : DuckDuckGoCookieManager {
 
     override suspend fun removeExternalCookies() {
@@ -41,18 +40,11 @@ class WebViewCookieManager(
         }
         val ddgCookies = getDuckDuckGoCookies()
         if (cookieManager.hasCookies()) {
-            removeCookies()
+            removeCookies.removeCookies()
             storeDuckDuckGoCookies(ddgCookies)
         }
         withContext(Dispatchers.IO) {
             flush()
-        }
-    }
-
-    private suspend fun removeCookies() {
-        val removeSuccess = selectiveCookieRemover.removeCookies()
-        if (!removeSuccess) {
-            cookieManagerRemover.removeCookies()
         }
     }
 

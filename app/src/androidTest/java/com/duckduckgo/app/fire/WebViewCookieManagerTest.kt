@@ -29,25 +29,22 @@ private data class Cookie(val url: String, val value: String)
 
 class WebViewCookieManagerTest {
 
-    private lateinit var testee: WebViewCookieManager
-    private val selectiveCookieRemover = mock<CookieRemover>()
-    private val cookieManagerRemover = mock<CookieRemover>()
+    private val removeCookieStrategy = mock<RemoveCookiesStrategy>()
     private val cookieManager = mock<CookieManager>()
     private val ddgCookie = Cookie(DDG_HOST, "da=abc")
     private val externalHostCookie = Cookie("example.com", "dz=zyx")
+    private val testee: WebViewCookieManager = WebViewCookieManager(cookieManager, DDG_HOST, removeCookieStrategy)
 
     @Before
     fun setup() {
         whenever(cookieManager.setCookie(any(), any(), any())).then {
             (it.getArgument(2) as ValueCallback<Boolean>).onReceiveValue(true)
         }
-        testee = WebViewCookieManager(cookieManager, DDG_HOST, cookieManagerRemover, selectiveCookieRemover)
     }
 
     @Test
-    fun whenSelectiveCookieRemoverSucceedsThenInternalCookiesRecreated() = runBlocking {
+    fun whenCookiesRemovedThenInternalCookiesRecreated() = runBlocking {
         givenCookieManagerWithCookies(ddgCookie, externalHostCookie)
-        selectiveCookieRemover.succeeds()
 
         withContext(Dispatchers.Main) {
             testee.removeExternalCookies()
@@ -57,34 +54,19 @@ class WebViewCookieManagerTest {
     }
 
     @Test
-    fun whenCookieManagerRemoverSucceedsThenInternalCookiesRecreated() = runBlocking {
+    fun whenCookiesStoredThenRemoveCookiesExecuted() = runBlocking<Unit> {
         givenCookieManagerWithCookies(ddgCookie, externalHostCookie)
-        selectiveCookieRemover.fails()
-        cookieManagerRemover.succeeds()
 
         withContext(Dispatchers.Main) {
             testee.removeExternalCookies()
         }
 
-        verify(cookieManager, times(1)).setCookie(eq(ddgCookie.url), eq(ddgCookie.value), any())
-    }
-
-    @Test
-    fun whenCookiesStoredThenSelectiveCookieRemoverExecuted() = runBlocking<Unit> {
-        givenCookieManagerWithCookies(ddgCookie, externalHostCookie)
-        selectiveCookieRemover.succeeds()
-
-        withContext(Dispatchers.Main) {
-            testee.removeExternalCookies()
-        }
-
-        verify(selectiveCookieRemover).removeCookies()
+        verify(removeCookieStrategy).removeCookies()
     }
 
     @Test
     fun whenCookiesStoredThenFlushBeforeAndAfterInteractingWithCookieManager() = runBlocking<Unit> {
         givenCookieManagerWithCookies(ddgCookie, externalHostCookie)
-        selectiveCookieRemover.succeeds()
 
         withContext(Dispatchers.Main) {
             testee.removeExternalCookies()
@@ -100,18 +82,6 @@ class WebViewCookieManagerTest {
     }
 
     @Test
-    fun whenCookiesStoredAndelectiveCookieRemoverFailsThenCookieManagerRemoverExecuted() = runBlocking<Unit> {
-        givenCookieManagerWithCookies(ddgCookie, externalHostCookie)
-        selectiveCookieRemover.fails()
-
-        withContext(Dispatchers.Main) {
-            testee.removeExternalCookies()
-        }
-
-        verify(cookieManagerRemover).removeCookies()
-    }
-
-    @Test
     fun whenNoCookiesThenRemoveProcessNotExecuted() = runBlocking {
         givenCookieManagerWithCookies()
 
@@ -119,8 +89,7 @@ class WebViewCookieManagerTest {
             testee.removeExternalCookies()
         }
 
-        verifyZeroInteractions(selectiveCookieRemover)
-        verifyZeroInteractions(cookieManagerRemover)
+        verifyZeroInteractions(removeCookieStrategy)
     }
 
     private fun givenCookieManagerWithCookies(vararg cookies: Cookie) {

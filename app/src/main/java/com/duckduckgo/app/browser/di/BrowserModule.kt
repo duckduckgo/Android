@@ -19,7 +19,6 @@ package com.duckduckgo.app.browser.di
 import android.content.ClipboardManager
 import android.content.Context
 import android.webkit.CookieManager
-import com.duckduckgo.app.bookmarks.db.BookmarksDao
 import com.duckduckgo.app.browser.*
 import com.duckduckgo.app.browser.addtohome.AddToHomeCapabilityDetector
 import com.duckduckgo.app.browser.addtohome.AddToHomeSystemCapabilityDetector
@@ -32,10 +31,7 @@ import com.duckduckgo.app.browser.tabpreview.FileBasedWebViewPreviewGenerator
 import com.duckduckgo.app.browser.tabpreview.FileBasedWebViewPreviewPersister
 import com.duckduckgo.app.browser.tabpreview.WebViewPreviewGenerator
 import com.duckduckgo.app.browser.tabpreview.WebViewPreviewPersister
-import com.duckduckgo.app.fire.CookieManagerRemover
-import com.duckduckgo.app.fire.DuckDuckGoCookieManager
-import com.duckduckgo.app.fire.SQLCookieRemover
-import com.duckduckgo.app.fire.WebViewCookieManager
+import com.duckduckgo.app.fire.*
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteDao
 import com.duckduckgo.app.global.AppUrl
 import com.duckduckgo.app.global.exception.UncaughtExceptionRepository
@@ -144,10 +140,17 @@ class BrowserModule {
     @Provides
     fun cookieManager(
         cookieManager: CookieManager,
+        removeCookies: RemoveCookies
+    ): DuckDuckGoCookieManager {
+        return WebViewCookieManager(cookieManager, AppUrl.Url.HOST, removeCookies)
+    }
+
+    @Provides
+    fun removeCookiesStrategy(
         cookieManagerRemover: CookieManagerRemover,
         sqlCookieRemover: SQLCookieRemover
-    ): DuckDuckGoCookieManager {
-        return WebViewCookieManager(cookieManager, AppUrl.Url.HOST, cookieManagerRemover, sqlCookieRemover)
+    ): RemoveCookies {
+        return RemoveCookies(cookieManagerRemover, sqlCookieRemover)
     }
 
     @Provides
