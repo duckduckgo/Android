@@ -1439,13 +1439,17 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
         }
 
         private fun showBottomBar(shouldAnimate: Boolean) {
-            if (shouldAnimate) {
-                bottomNavigationBar.show()
-                bottomNavigationBar.animateBarVisibility(isVisible = true)
-            } else {
-                bottomNavigationBar.postDelayed(KEYBOARD_DELAY) {
+            try {
+                if (shouldAnimate) {
                     bottomNavigationBar.show()
+                    bottomNavigationBar.animateBarVisibility(isVisible = true)
+                } else {
+                    bottomNavigationBar.postDelayed(KEYBOARD_DELAY) {
+                        bottomNavigationBar.show()
+                    }
                 }
+            } catch (e: Exception){
+                Timber.d("Could not show Bottom Bar, ${e.localizedMessage}")
             }
         }
 
