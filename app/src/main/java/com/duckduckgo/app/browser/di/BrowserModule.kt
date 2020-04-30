@@ -155,13 +155,19 @@ class BrowserModule {
 
     @Provides
     fun sqlCookieRemover(
-        context: Context,
-        fireproofWebsiteDao: FireproofWebsiteDao,
+        webViewDatabaseLocator: WebViewDatabaseLocator,
+        getHostsToPreserve: GetHostsToPreserve,
         pixel: Pixel,
         uncaughtExceptionRepository: UncaughtExceptionRepository
     ): SQLCookieRemover {
-        return SQLCookieRemover(context, fireproofWebsiteDao, pixel, uncaughtExceptionRepository)
+        return SQLCookieRemover(webViewDatabaseLocator, getHostsToPreserve, pixel, uncaughtExceptionRepository)
     }
+
+    @Provides
+    fun webViewDatabaseLocator(context: Context): WebViewDatabaseLocator = WebViewDatabaseLocator(context)
+
+    @Provides
+    fun getHostsToPreserve(fireproofWebsiteDao: FireproofWebsiteDao): GetHostsToPreserve = GetHostsToPreserve(fireproofWebsiteDao)
 
     @Provides
     fun cookieManagerRemover(

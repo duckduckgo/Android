@@ -48,44 +48,29 @@ class CookieManagerRemover(private val cookieManager: CookieManager) : CookieRem
 }
 
 class SQLCookieRemover(
-    private val context: Context,
-    private val fireproofWebsiteDao: FireproofWebsiteDao,
+    private val webViewDatabaseLocator: WebViewDatabaseLocator,
+    private val getHostsToPreserve: GetHostsToPreserve,
     private val pixel: Pixel,
     private val uncaughtExceptionRepository: UncaughtExceptionRepository
 ) : CookieRemover {
+
     override suspend fun removeCookies(): Boolean {
         return withContext(Dispatchers.IO) {
-            var deleteExecuted = false
-            val excludedSites = getHostsToPreserve()
-            val databasePath: String = getDatabasePath()
+            val databasePath: String = webViewDatabaseLocator.getDatabasePath()
             if (databasePath.isNotEmpty()) {
-                val readableDatabase = openReadableDatabase(databasePath)
-                if (readableDatabase != null) {
-                    try {
-                        val whereClause = buildSQLWhereClause(excludedSites)
-                        val number = readableDatabase.delete(COOKIES_TABLE_NAME, whereClause, excludedSites.toTypedArray())
-                        deleteExecuted = true
-                        Timber.v("$number cookies removed")
-                    } catch (exception: Exception) {
-                        Timber.e(exception)
-                        pixel.fire(Pixel.PixelName.COOKIE_DATABASE_DELETE_ERROR)
-                        uncaughtExceptionRepository.recordUncaughtException(exception, UncaughtExceptionSource.COOKIE_DATABASE)
-                    } finally {
-                        readableDatabase.close()
-                    }
-                }
+                val excludedHosts = getHostsToPreserve()
+                return@withContext removeCookies(databasePath, excludedHosts)
             } else {
                 pixel.fire(Pixel.PixelName.COOKIE_DATABASE_NOT_FOUND)
             }
-            return@withContext deleteExecuted
+            return@withContext false
         }
     }
 
     private suspend fun openReadableDatabase(databasePath: String): SQLiteDatabase? {
-        val databaseFile = File(context.applicationInfo.dataDir, databasePath)
         return try {
             SQLiteDatabase.openDatabase(
-                databaseFile.toString(),
+                databasePath,
                 null,
                 SQLiteDatabase.OPEN_READWRITE,
                 DatabaseErrorHandler { Timber.d("COOKIE: onCorruption") })
@@ -96,27 +81,45 @@ class SQLCookieRemover(
         }
     }
 
-    private fun getDatabasePath(): String {
-        val knownLocations = listOf("app_webview/Default/Cookies", "app_webview/Cookies")
-        val filePath: String = knownLocations.find { knownPath ->
-            val file = File(context.applicationInfo.dataDir, knownPath)
-            file.exists()
-        } ?: ""
-        return filePath
+    private suspend fun removeCookies(databasePath: String, excludedSites: List<String>): Boolean {
+        var deleteExecuted = false
+        openReadableDatabase(databasePath)?.apply {
+            try {
+                val whereClause = buildSQLWhereClause(excludedSites)
+                val number = delete(COOKIES_TABLE_NAME, whereClause, excludedSites.toTypedArray())
+                deleteExecuted = true
+                Timber.v("$number cookies removed")
+            } catch (exception: Exception) {
+                Timber.e(exception)
+                pixel.fire(Pixel.PixelName.COOKIE_DATABASE_DELETE_ERROR)
+                uncaughtExceptionRepository.recordUncaughtException(exception, UncaughtExceptionSource.COOKIE_DATABASE)
+            } finally {
+                close()
+            }
+        }
+        return deleteExecuted
     }
 
     private fun buildSQLWhereClause(excludedSites: List<String>): String {
-        val whereArg = excludedSites.foldIndexed("", { pos, acc, _ ->
+        if (excludedSites.isEmpty()) {
+            return ""
+        }
+        return excludedSites.foldIndexed("", { pos, acc, _ ->
             if (pos == 0) {
                 "host_key NOT LIKE ?"
             } else {
                 "$acc AND host_key NOT LIKE ?"
             }
         })
-        return whereArg
     }
 
-    private fun getHostsToPreserve(): List<String> {
+    companion object {
+        private const val COOKIES_TABLE_NAME = "cookies"
+    }
+}
+
+class GetHostsToPreserve(private val fireproofWebsiteDao: FireproofWebsiteDao) {
+    operator fun invoke(): List<String> {
         val bookmarksList = fireproofWebsiteDao.fireproofWebsitesSync()
         return bookmarksList.flatMap { entity ->
             val acceptedHosts = mutableListOf<String>()
@@ -131,8 +134,20 @@ class SQLCookieRemover(
             acceptedHosts
         }
     }
+}
 
-    companion object {
-        private const val COOKIES_TABLE_NAME = "cookies"
+class WebViewDatabaseLocator(private val context: Context) {
+    fun getDatabasePath(): String {
+        val knownLocations = listOf("/app_webview/Default/Cookies", "/app_webview/Cookies")
+        val detectedPath = knownLocations.find { knownPath ->
+            val file = File(context.applicationInfo.dataDir, knownPath)
+            file.exists()
+        }
+
+        return detectedPath
+            .takeUnless { it.isNullOrEmpty() }
+            ?.let { nonEmptyPath ->
+                "${context.applicationInfo.dataDir}$nonEmptyPath"
+            }.orEmpty()
     }
 }
