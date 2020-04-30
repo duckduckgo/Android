@@ -54,7 +54,7 @@ class WebViewCookieManagerTest {
     }
 
     @Test
-    fun whenCookiesStoredThenRemoveCookiesExecuted() = runBlocking<Unit> {
+    fun whenCookiesStoredThenRemoveCookiesExecuted() = runBlocking {
         givenCookieManagerWithCookies(ddgCookie, externalHostCookie)
 
         withContext(Dispatchers.Main) {
@@ -65,7 +65,7 @@ class WebViewCookieManagerTest {
     }
 
     @Test
-    fun whenCookiesStoredThenFlushBeforeAndAfterInteractingWithCookieManager() = runBlocking<Unit> {
+    fun whenCookiesStoredThenFlushBeforeAndAfterInteractingWithCookieManager() = runBlocking {
         givenCookieManagerWithCookies(ddgCookie, externalHostCookie)
 
         withContext(Dispatchers.Main) {
@@ -101,14 +101,6 @@ class WebViewCookieManagerTest {
                 whenever(cookieManager.getCookie(cookie.url)).thenReturn(cookie.value)
             }
         }
-    }
-
-    private suspend fun CookieRemover.succeeds() {
-        whenever(this.removeCookies()).thenReturn(true)
-    }
-
-    private suspend fun CookieRemover.fails() {
-        whenever(this.removeCookies()).thenReturn(false)
     }
 
     companion object {
