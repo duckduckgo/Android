@@ -24,17 +24,20 @@ interface DatabaseLocator {
 }
 
 class WebViewDatabaseLocator(private val context: Context) : DatabaseLocator {
+
+    private val knownLocations = listOf("/app_webview/Default/Cookies", "/app_webview/Cookies")
+
     override fun getDatabasePath(): String {
-        val knownLocations = listOf("/app_webview/Default/Cookies", "/app_webview/Cookies")
+        val dataDir = context.applicationInfo.dataDir
         val detectedPath = knownLocations.find { knownPath ->
-            val file = File(context.applicationInfo.dataDir, knownPath)
+            val file = File(dataDir, knownPath)
             file.exists()
         }
 
         return detectedPath
             .takeUnless { it.isNullOrEmpty() }
             ?.let { nonEmptyPath ->
-                "${context.applicationInfo.dataDir}$nonEmptyPath"
+                "$dataDir$nonEmptyPath"
             }.orEmpty()
     }
 }
