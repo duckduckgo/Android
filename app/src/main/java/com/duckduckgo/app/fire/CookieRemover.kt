@@ -21,10 +21,10 @@ import android.database.DatabaseErrorHandler
 import android.database.sqlite.SQLiteDatabase
 import android.webkit.CookieManager
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteDao
+import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.exception.UncaughtExceptionRepository
 import com.duckduckgo.app.global.exception.UncaughtExceptionSource
 import com.duckduckgo.app.statistics.pixels.Pixel
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 import java.io.File
@@ -48,14 +48,15 @@ class CookieManagerRemover(private val cookieManager: CookieManager) : CookieRem
 }
 
 class SQLCookieRemover(
-    private val webViewDatabaseLocator: WebViewDatabaseLocator,
+    private val webViewDatabaseLocator: DatabaseLocator,
     private val getHostsToPreserve: GetHostsToPreserve,
     private val pixel: Pixel,
-    private val uncaughtExceptionRepository: UncaughtExceptionRepository
+    private val uncaughtExceptionRepository: UncaughtExceptionRepository,
+    private val dispatcherProvider: DispatcherProvider
 ) : CookieRemover {
 
     override suspend fun removeCookies(): Boolean {
-        return withContext(Dispatchers.IO) {
+        return withContext(dispatcherProvider.io()) {
             val databasePath: String = webViewDatabaseLocator.getDatabasePath()
             if (databasePath.isNotEmpty()) {
                 val excludedHosts = getHostsToPreserve()
@@ -136,8 +137,12 @@ class GetHostsToPreserve(private val fireproofWebsiteDao: FireproofWebsiteDao) {
     }
 }
 
-class WebViewDatabaseLocator(private val context: Context) {
-    fun getDatabasePath(): String {
+interface DatabaseLocator {
+    fun getDatabasePath(): String
+}
+
+class WebViewDatabaseLocator(private val context: Context) : DatabaseLocator {
+    override fun getDatabasePath(): String {
         val knownLocations = listOf("/app_webview/Default/Cookies", "/app_webview/Cookies")
         val detectedPath = knownLocations.find { knownPath ->
             val file = File(context.applicationInfo.dataDir, knownPath)

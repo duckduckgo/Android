@@ -34,6 +34,7 @@ import com.duckduckgo.app.browser.tabpreview.WebViewPreviewPersister
 import com.duckduckgo.app.fire.*
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteDao
 import com.duckduckgo.app.global.AppUrl
+import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.exception.UncaughtExceptionRepository
 import com.duckduckgo.app.global.file.FileDeleter
 import com.duckduckgo.app.global.install.AppInstallStore
@@ -158,9 +159,10 @@ class BrowserModule {
         webViewDatabaseLocator: WebViewDatabaseLocator,
         getHostsToPreserve: GetHostsToPreserve,
         pixel: Pixel,
-        uncaughtExceptionRepository: UncaughtExceptionRepository
+        uncaughtExceptionRepository: UncaughtExceptionRepository,
+        dispatcherProvider: DispatcherProvider
     ): SQLCookieRemover {
-        return SQLCookieRemover(webViewDatabaseLocator, getHostsToPreserve, pixel, uncaughtExceptionRepository)
+        return SQLCookieRemover(webViewDatabaseLocator, getHostsToPreserve, pixel, uncaughtExceptionRepository, dispatcherProvider)
     }
 
     @Provides
