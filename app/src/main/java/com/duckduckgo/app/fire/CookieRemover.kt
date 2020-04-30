@@ -136,23 +136,3 @@ class GetHostsToPreserve(private val fireproofWebsiteDao: FireproofWebsiteDao) {
         }
     }
 }
-
-interface DatabaseLocator {
-    fun getDatabasePath(): String
-}
-
-class WebViewDatabaseLocator(private val context: Context) : DatabaseLocator {
-    override fun getDatabasePath(): String {
-        val knownLocations = listOf("/app_webview/Default/Cookies", "/app_webview/Cookies")
-        val detectedPath = knownLocations.find { knownPath ->
-            val file = File(context.applicationInfo.dataDir, knownPath)
-            file.exists()
-        }
-
-        return detectedPath
-            .takeUnless { it.isNullOrEmpty() }
-            ?.let { nonEmptyPath ->
-                "${context.applicationInfo.dataDir}$nonEmptyPath"
-            }.orEmpty()
-    }
-}
