@@ -141,9 +141,10 @@ class BrowserModule {
     @Provides
     fun cookieManager(
         cookieManager: CookieManager,
-        removeCookies: RemoveCookies
+        removeCookies: RemoveCookies,
+        dispatcherProvider: DispatcherProvider
     ): DuckDuckGoCookieManager {
-        return WebViewCookieManager(cookieManager, AppUrl.Url.HOST, removeCookies)
+        return WebViewCookieManager(cookieManager, AppUrl.Url.HOST, removeCookies, dispatcherProvider)
     }
 
     @Provides

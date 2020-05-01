@@ -18,22 +18,33 @@ package com.duckduckgo.app.fire
 
 import android.webkit.CookieManager
 import android.webkit.ValueCallback
+import com.duckduckgo.app.CoroutineTestRule
+import com.duckduckgo.app.runBlocking
 import com.nhaarman.mockitokotlin2.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 
 private data class Cookie(val url: String, val value: String)
 
 class WebViewCookieManagerTest {
+    @get:Rule
+    @Suppress("unused")
+    val coroutineRule = CoroutineTestRule()
 
     private val removeCookieStrategy = mock<RemoveCookiesStrategy>()
     private val cookieManager = mock<CookieManager>()
     private val ddgCookie = Cookie(DDG_HOST, "da=abc")
     private val externalHostCookie = Cookie("example.com", "dz=zyx")
-    private val testee: WebViewCookieManager = WebViewCookieManager(cookieManager, DDG_HOST, removeCookieStrategy)
+    private val testee: WebViewCookieManager = WebViewCookieManager(
+        cookieManager,
+        DDG_HOST,
+        removeCookieStrategy,
+        coroutineRule.testDispatcherProvider
+    )
 
     @Before
     fun setup() {
@@ -43,7 +54,7 @@ class WebViewCookieManagerTest {
     }
 
     @Test
-    fun whenCookiesRemovedThenInternalCookiesRecreated() = runBlocking {
+    fun whenCookiesRemovedThenInternalCookiesRecreated() = coroutineRule.runBlocking {
         givenCookieManagerWithCookies(ddgCookie, externalHostCookie)
 
         withContext(Dispatchers.Main) {
@@ -54,7 +65,7 @@ class WebViewCookieManagerTest {
     }
 
     @Test
-    fun whenCookiesStoredThenRemoveCookiesExecuted() = runBlocking {
+    fun whenCookiesStoredThenRemoveCookiesExecuted() = coroutineRule.runBlocking {
         givenCookieManagerWithCookies(ddgCookie, externalHostCookie)
 
         withContext(Dispatchers.Main) {
@@ -65,7 +76,7 @@ class WebViewCookieManagerTest {
     }
 
     @Test
-    fun whenCookiesStoredThenFlushBeforeAndAfterInteractingWithCookieManager() = runBlocking {
+    fun whenCookiesStoredThenFlushBeforeAndAfterInteractingWithCookieManager() = coroutineRule.runBlocking {
         givenCookieManagerWithCookies(ddgCookie, externalHostCookie)
 
         withContext(Dispatchers.Main) {
@@ -82,7 +93,7 @@ class WebViewCookieManagerTest {
     }
 
     @Test
-    fun whenNoCookiesThenRemoveProcessNotExecuted() = runBlocking {
+    fun whenNoCookiesThenRemoveProcessNotExecuted() = coroutineRule.runBlocking {
         givenCookieManagerWithCookies()
 
         withContext(Dispatchers.Main) {
