@@ -190,7 +190,6 @@ interface Pixel {
         const val DEFAULT_BROWSER_SET_FROM_ONBOARDING = "fo"
         const val DEFAULT_BROWSER_SET_ORIGIN = "dbo"
         const val CTA_SHOWN = "cta"
-        const val COOKIE_DATABASE_PARAM = "cdb_p"
     }
 
     object PixelValues {
