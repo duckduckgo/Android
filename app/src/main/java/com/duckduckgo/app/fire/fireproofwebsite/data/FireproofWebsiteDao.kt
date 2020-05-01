@@ -22,7 +22,7 @@ import androidx.room.*
 @Dao
 interface FireproofWebsiteDao {
 
-    @Query("select * from $FIREPROOF_WEBSITES_TABLE_NAME")
+    @Query("select * from fireproofWebsites")
     fun fireproofWebsitesEntities(): LiveData<List<FireproofWebsiteEntity>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)

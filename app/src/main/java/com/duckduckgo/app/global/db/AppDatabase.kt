@@ -30,7 +30,6 @@ import com.duckduckgo.app.browser.rating.db.AppEnjoymentTypeConverter
 import com.duckduckgo.app.browser.rating.db.PromptCountConverter
 import com.duckduckgo.app.cta.db.DismissedCtaDao
 import com.duckduckgo.app.cta.model.DismissedCta
-import com.duckduckgo.app.fire.fireproofwebsite.data.FIREPROOF_WEBSITES_TABLE_NAME
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteDao
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
 import com.duckduckgo.app.global.exception.UncaughtExceptionDao
@@ -283,7 +282,7 @@ class MigrationsProvider(val context: Context) {
 
     val MIGRATION_19_TO_20: Migration = object : Migration(19, 20) {
         override fun migrate(database: SupportSQLiteDatabase) {
-            database.execSQL("CREATE TABLE IF NOT EXISTS $FIREPROOF_WEBSITES_TABLE_NAME (`domain` TEXT NOT NULL, PRIMARY KEY(`domain`))")
+            database.execSQL("CREATE TABLE IF NOT EXISTS `fireproofWebsites` (`domain` TEXT NOT NULL, PRIMARY KEY(`domain`))")
         }
     }
 
