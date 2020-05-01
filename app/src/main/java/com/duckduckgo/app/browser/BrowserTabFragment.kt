@@ -43,10 +43,7 @@ import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
-import android.view.View.GONE
-import android.view.View.OnFocusChangeListener
-import android.view.View.VISIBLE
-import android.view.View.inflate
+import android.view.View.*
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import android.webkit.ValueCallback
@@ -55,9 +52,7 @@ import android.webkit.WebSettings
 import android.webkit.WebView
 import android.webkit.WebView.FindListener
 import android.webkit.WebView.HitTestResult
-import android.webkit.WebView.HitTestResult.IMAGE_TYPE
-import android.webkit.WebView.HitTestResult.SRC_IMAGE_ANCHOR_TYPE
-import android.webkit.WebView.HitTestResult.UNKNOWN_TYPE
+import android.webkit.WebView.HitTestResult.*
 import android.webkit.WebViewDatabase
 import android.widget.EditText
 import android.widget.TextView
@@ -86,14 +81,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion
 import com.duckduckgo.app.bookmarks.ui.EditBookmarkDialogFragment
 import com.duckduckgo.app.brokensite.BrokenSiteActivity
-import com.duckduckgo.app.browser.BrowserTabViewModel.AutoCompleteViewState
-import com.duckduckgo.app.browser.BrowserTabViewModel.BrowserViewState
-import com.duckduckgo.app.browser.BrowserTabViewModel.Command
-import com.duckduckgo.app.browser.BrowserTabViewModel.CtaViewState
-import com.duckduckgo.app.browser.BrowserTabViewModel.FindInPageViewState
-import com.duckduckgo.app.browser.BrowserTabViewModel.GlobalLayoutViewState
-import com.duckduckgo.app.browser.BrowserTabViewModel.LoadingViewState
-import com.duckduckgo.app.browser.BrowserTabViewModel.OmnibarViewState
+import com.duckduckgo.app.browser.BrowserTabViewModel.*
 import com.duckduckgo.app.browser.autocomplete.BrowserAutoCompleteSuggestionsAdapter
 import com.duckduckgo.app.browser.downloader.FileDownloadNotificationManager
 import com.duckduckgo.app.browser.downloader.FileDownloader
@@ -122,7 +110,20 @@ import com.duckduckgo.app.fire.fireproofwebsite.data.website
 import com.duckduckgo.app.global.ViewModelFactory
 import com.duckduckgo.app.global.device.DeviceInfo
 import com.duckduckgo.app.global.model.orderedTrackingEntities
-import com.duckduckgo.app.global.view.*
+import com.duckduckgo.app.global.view.DaxDialog
+import com.duckduckgo.app.global.view.DaxDialogListener
+import com.duckduckgo.app.global.view.NonDismissibleBehavior
+import com.duckduckgo.app.global.view.TextChangedWatcher
+import com.duckduckgo.app.global.view.gone
+import com.duckduckgo.app.global.view.hide
+import com.duckduckgo.app.global.view.hideKeyboard
+import com.duckduckgo.app.global.view.isDifferent
+import com.duckduckgo.app.global.view.isImmersiveModeEnabled
+import com.duckduckgo.app.global.view.renderIfChanged
+import com.duckduckgo.app.global.view.show
+import com.duckduckgo.app.global.view.showKeyboard
+import com.duckduckgo.app.global.view.toPx
+import com.duckduckgo.app.global.view.toggleFullScreen
 import com.duckduckgo.app.privacy.model.PrivacyGrade
 import com.duckduckgo.app.privacy.renderer.icon
 import com.duckduckgo.app.privacy.store.PrivacySettingsStore
@@ -159,7 +160,16 @@ import kotlinx.android.synthetic.main.include_new_browser_tab.ctaContainer
 import kotlinx.android.synthetic.main.include_new_browser_tab.ctaTopContainer
 import kotlinx.android.synthetic.main.include_new_browser_tab.ddgLogo
 import kotlinx.android.synthetic.main.include_new_browser_tab.newTabLayout
-import kotlinx.android.synthetic.main.include_omnibar_toolbar.*
+import kotlinx.android.synthetic.main.include_omnibar_toolbar.appBarLayout
+import kotlinx.android.synthetic.main.include_omnibar_toolbar.browserMenu
+import kotlinx.android.synthetic.main.include_omnibar_toolbar.clearTextButton
+import kotlinx.android.synthetic.main.include_omnibar_toolbar.networksContainer
+import kotlinx.android.synthetic.main.include_omnibar_toolbar.omnibarTextInput
+import kotlinx.android.synthetic.main.include_omnibar_toolbar.pageLoadingIndicator
+import kotlinx.android.synthetic.main.include_omnibar_toolbar.privacyGradeButton
+import kotlinx.android.synthetic.main.include_omnibar_toolbar.searchIcon
+import kotlinx.android.synthetic.main.include_omnibar_toolbar.toolbar
+import kotlinx.android.synthetic.main.include_omnibar_toolbar.toolbarContainer
 import kotlinx.android.synthetic.main.include_omnibar_toolbar.view.browserMenu
 import kotlinx.android.synthetic.main.include_omnibar_toolbar.view.fireIconMenu
 import kotlinx.android.synthetic.main.include_omnibar_toolbar.view.privacyGradeButton
@@ -170,7 +180,18 @@ import kotlinx.android.synthetic.main.layout_browser_bottom_navigation_bar.botto
 import kotlinx.android.synthetic.main.layout_browser_bottom_navigation_bar.bottomBarSearchItem
 import kotlinx.android.synthetic.main.layout_browser_bottom_navigation_bar.bottomBarTabsItem
 import kotlinx.android.synthetic.main.popup_window_browser_bottom_tab_menu.view.sharePopupMenuItem
-import kotlinx.android.synthetic.main.popup_window_browser_menu.view.*
+import kotlinx.android.synthetic.main.popup_window_browser_menu.view.addBookmarksPopupMenuItem
+import kotlinx.android.synthetic.main.popup_window_browser_menu.view.addToHome
+import kotlinx.android.synthetic.main.popup_window_browser_menu.view.backPopupMenuItem
+import kotlinx.android.synthetic.main.popup_window_browser_menu.view.bookmarksPopupMenuItem
+import kotlinx.android.synthetic.main.popup_window_browser_menu.view.brokenSitePopupMenuItem
+import kotlinx.android.synthetic.main.popup_window_browser_menu.view.findInPageMenuItem
+import kotlinx.android.synthetic.main.popup_window_browser_menu.view.forwardPopupMenuItem
+import kotlinx.android.synthetic.main.popup_window_browser_menu.view.newTabPopupMenuItem
+import kotlinx.android.synthetic.main.popup_window_browser_menu.view.refreshPopupMenuItem
+import kotlinx.android.synthetic.main.popup_window_browser_menu.view.requestDesktopSiteCheckMenuItem
+import kotlinx.android.synthetic.main.popup_window_browser_menu.view.settingsPopupMenuItem
+import kotlinx.android.synthetic.main.popup_window_browser_menu.view.sharePageMenuItem
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -1463,7 +1484,9 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
                 bottomNavigationBar.animateBarVisibility(isVisible = true)
             } else {
                 bottomNavigationBar.postDelayed(KEYBOARD_DELAY) {
-                    bottomNavigationBar.show()
+                    if (bottomNavigationBar != null) {
+                        bottomNavigationBar.show()
+                    }
                 }
             }
         }
