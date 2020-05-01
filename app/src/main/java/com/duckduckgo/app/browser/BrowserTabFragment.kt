@@ -184,7 +184,7 @@ import javax.inject.Inject
 import kotlin.concurrent.thread
 import kotlin.coroutines.CoroutineContext
 
-class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogListener {
+class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogListener, TrackersAnimatorListener {
 
     private val supervisorJob = SupervisorJob()
 
@@ -271,7 +271,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
         viewModel
     }
 
-    private val animatorHelper by lazy { BrowserTrackersAnimatorHelper() }
+    private val animatorHelper by lazy { BrowserTrackersAnimatorHelper(privacyGradeButton) }
 
     private val smoothProgressAnimator by lazy { SmoothProgressAnimator(pageLoadingIndicator) }
 
@@ -350,6 +350,8 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
         configureKeyboardAwareLogoAnimation()
 
         decorateWithFeatures()
+
+        animatorHelper.setListener(this)
 
         if (savedInstanceState == null) {
             viewModel.onViewReady()
@@ -781,12 +783,16 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
             browserActivity?.launchPrivacyDashboard()
         }
 
-        viewModel.privacyGrade.observe(viewLifecycleOwner, Observer<PrivacyGrade> {
-            Timber.d("Observed grade: $it")
-            it?.let { privacyGrade ->
-                val drawable = context?.getDrawable(privacyGrade.icon()) ?: return@let
+        viewModel.privacyGradeState.observe(viewLifecycleOwner, Observer {
+            Timber.d("MARCOS Observed grade: $it")
+            if (it.canShowPrivacyGrade) {
+                val drawable = context?.getDrawable(it.privacyGrade.icon())
                 privacyGradeButton?.setImageDrawable(drawable)
-                privacyGradeButton?.isEnabled = privacyGrade != PrivacyGrade.UNKNOWN
+                privacyGradeButton?.isEnabled = it.privacyGrade != PrivacyGrade.UNKNOWN
+            } else {
+                val drawable = context?.getDrawable(R.drawable.privacygrade_icon_loading)
+                privacyGradeButton?.setImageDrawable(drawable)
+                privacyGradeButton?.isEnabled = false
             }
         })
     }
@@ -1072,6 +1078,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
     }
 
     override fun onDestroy() {
+        animatorHelper.removeListener()
         supervisorJob.cancel()
         popupMenu.dismiss()
         destroyWebView()
@@ -1211,7 +1218,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
     }
 
     private fun finishTrackerAnimation() {
-        animatorHelper.finishTrackerAnimation(omnibarViews(), networksContainer)
+        animatorHelper.finishTrackerAnimation(omnibarViews(), animationContainer)
     }
 
     private fun showHideTipsDialog(cta: Cta) {
@@ -1248,7 +1255,12 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
             .show()
     }
 
-    fun omnibarViews(): List<View> = listOf(clearTextButton, omnibarTextInput, privacyGradeButton, searchIcon)
+    fun omnibarViews(): List<View> = listOf(clearTextButton, omnibarTextInput, searchIcon)
+
+    override fun onAnimationFinished() {
+        Timber.d("MARCOS animation finished")
+        viewModel.updatePrivacyGrade()
+    }
 
     companion object {
         private const val TAB_ID_ARG = "TAB_ID_ARG"
@@ -1586,6 +1598,10 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
 
                     if (viewState.progress == MAX_PROGRESS) {
                         createTrackersAnimation()
+                        animatorHelper.stopPulseAnimation()
+                    } else {
+                        animatorHelper.pulseAnimation(privacyGradeButton)
+                        viewModel.stopShowPrivacyGrade()
                     }
                 }
             }
@@ -1598,15 +1614,17 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
                 delay(TRACKERS_SECONDARY_DELAY)
                 if (lastSeenOmnibarViewState?.isEditing != true) {
                     val site = viewModel.siteLiveData.value
+                    val grade = viewModel.privacyGradeState.value?.privacyGrade
                     val events = site?.orderedTrackingEntities()
 
                     activity?.let { activity ->
                         animatorHelper.startTrackersAnimation(
                             lastSeenCtaViewState?.cta,
                             activity,
-                            networksContainer,
+                            animationContainer,
                             omnibarViews(),
-                            events
+                            events,
+                            grade
                         )
                     }
                 }
@@ -1615,7 +1633,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
 
         fun cancelAllAnimations() {
             animatorHelper.cancelAnimations()
-            networksContainer.alpha = 0f
+            //animationContainer.alpha = 0f
             clearTextButton.alpha = 1f
             omnibarTextInput.alpha = 1f
         }

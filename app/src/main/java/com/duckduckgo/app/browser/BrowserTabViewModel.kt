@@ -161,6 +161,11 @@ class BrowserTabViewModel(
         val searchResults: AutoCompleteResult = AutoCompleteResult("", emptyList())
     )
 
+    data class PrivacyGradeState(
+        val privacyGrade: PrivacyGrade = PrivacyGrade.UNKNOWN,
+        val canShowPrivacyGrade: Boolean = false
+    )
+
     sealed class Command {
         object Refresh : Command()
         class Navigate(val url: String) : Command()
@@ -209,11 +214,11 @@ class BrowserTabViewModel(
     val findInPageViewState: MutableLiveData<FindInPageViewState> = MutableLiveData()
     val ctaViewState: MutableLiveData<CtaViewState> = MutableLiveData()
     var siteLiveData: MutableLiveData<Site> = MutableLiveData()
+    val privacyGradeState: MutableLiveData<PrivacyGradeState> = MutableLiveData()
 
     var skipHome = false
     val tabs: LiveData<List<TabEntity>> = tabRepository.liveTabs
     val survey: LiveData<Survey> = ctaViewModel.surveyLiveData
-    val privacyGrade: MutableLiveData<PrivacyGrade> = MutableLiveData()
     val command: SingleLiveEvent<Command> = SingleLiveEvent()
 
     val url: String?
@@ -621,22 +626,31 @@ class BrowserTabViewModel(
     }
 
     private fun onSiteChanged() {
+        Timber.d("MARCOS On Site Changed")
         httpsUpgraded = false
         viewModelScope.launch {
-
             val improvedGrade = withContext(dispatchers.io()) {
                 site?.calculateGrades()?.improvedGrade
             }
 
             withContext(dispatchers.main()) {
                 siteLiveData.value = site
-                privacyGrade.value = improvedGrade
+                privacyGradeState.value = currentPrivacyGradeState().copy(privacyGrade = improvedGrade ?: PrivacyGrade.UNKNOWN)
             }
 
             withContext(dispatchers.io()) {
                 tabRepository.update(tabId, site)
             }
         }
+    }
+
+    fun updatePrivacyGrade() {
+        Timber.d("MARCOS update privacy grade")
+        privacyGradeState.value = currentPrivacyGradeState().copy(canShowPrivacyGrade = true)
+    }
+
+    fun stopShowPrivacyGrade() {
+        privacyGradeState.value = currentPrivacyGradeState().copy(canShowPrivacyGrade = false)
     }
 
     override fun showFileChooser(filePathCallback: ValueCallback<Array<Uri>>, fileChooserParams: WebChromeClient.FileChooserParams) {
@@ -650,6 +664,7 @@ class BrowserTabViewModel(
     private fun currentOmnibarViewState(): OmnibarViewState = omnibarViewState.value!!
     private fun currentLoadingViewState(): LoadingViewState = loadingViewState.value!!
     private fun currentCtaViewState(): CtaViewState = ctaViewState.value!!
+    private fun currentPrivacyGradeState(): PrivacyGradeState = privacyGradeState.value!!
 
     fun onOmnibarInputStateChanged(query: String, hasFocus: Boolean, hasQueryChanged: Boolean) {
 
@@ -827,6 +842,7 @@ class BrowserTabViewModel(
         omnibarViewState.value = OmnibarViewState()
         findInPageViewState.value = FindInPageViewState()
         ctaViewState.value = CtaViewState()
+        privacyGradeState.value = PrivacyGradeState()
     }
 
     fun onShareSelected() {
