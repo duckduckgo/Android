@@ -992,7 +992,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
             Snackbar.LENGTH_LONG
         )
             .setAction(R.string.fireproofWebsiteSnackbarAction) {
-                viewModel.onFireproofWebsiteSnackbarActionClicked(entity)
+                viewModel.onFireproofWebsiteSnackbarUndoClicked(entity)
             }
             .show()
     }

@@ -1759,7 +1759,7 @@ class BrowserTabViewModelTest {
         loadUrl("http://example.com/", isBrowserShowing = true)
         testee.onFireproofWebsiteClicked()
         assertCommandIssued<Command.ShowFireproofWebSiteConfirmation> {
-            testee.onFireproofWebsiteSnackbarActionClicked(this.fireproofWebsiteEntity)
+            testee.onFireproofWebsiteSnackbarUndoClicked(this.fireproofWebsiteEntity)
         }
         assertTrue(browserViewState().canFireproofSite)
     }

@@ -727,7 +727,7 @@ class BrowserTabViewModel(
         }
     }
 
-    fun onFireproofWebsiteSnackbarActionClicked(fireproofWebsiteEntity: FireproofWebsiteEntity) {
+    fun onFireproofWebsiteSnackbarUndoClicked(fireproofWebsiteEntity: FireproofWebsiteEntity) {
         viewModelScope.launch {
             withContext(dispatchers.io()) {
                 fireproofWebsiteDao.delete(fireproofWebsiteEntity)
