@@ -118,21 +118,3 @@ class SQLCookieRemover(
         private const val COOKIES_TABLE_NAME = "cookies"
     }
 }
-
-class GetHostsToPreserve(private val fireproofWebsiteDao: FireproofWebsiteDao) {
-    operator fun invoke(): List<String> {
-        val bookmarksList = fireproofWebsiteDao.fireproofWebsitesSync()
-        return bookmarksList.flatMap { entity ->
-            val acceptedHosts = mutableListOf<String>()
-            val host = entity.domain
-            host.split(".")
-                .foldRight("", { next, acc ->
-                    val next = ".$next$acc"
-                    acceptedHosts.add(next)
-                    next
-                })
-            acceptedHosts.add(host)
-            acceptedHosts
-        }
-    }
-}
