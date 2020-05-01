@@ -59,6 +59,7 @@ class SettingsViewModel @Inject constructor(
 
     sealed class Command {
         object LaunchFeedback : Command()
+        object LaunchFireproofWebsites : Command()
         object LaunchAppIcon : Command()
         object UpdateTheme : Command()
     }
@@ -99,6 +100,10 @@ class SettingsViewModel @Inject constructor(
 
     fun userRequestedToChangeIcon() {
         command.value = Command.LaunchAppIcon
+    }
+
+    fun onFireproofWebsitesClicked() {
+        command.value = Command.LaunchFireproofWebsites
     }
 
     fun onLightThemeToggled(enabled: Boolean) {

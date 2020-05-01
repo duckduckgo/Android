@@ -19,16 +19,13 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:paddingTop="14dp"
-    android:paddingBottom="14dp"
-    android:paddingStart="16dp"
-    android:paddingEnd="16dp"
-    android:background="?android:attr/selectableItemBackground"
-    android:clickable="true"
-    android:focusable="true">
+    android:layout_marginTop="8dp"
+    android:layout_marginBottom="8dp"
+    android:layout_marginStart="16dp"
+    android:layout_marginEnd="16dp">
 
     <FrameLayout
-        android:id="@+id/favicon_container"
+        android:id="@+id/fireproofWebsiteEntryFaviconContainer"
         android:layout_width="40dp"
         android:layout_height="40dp"
         android:background="@drawable/subtle_favicon_background"
@@ -37,7 +34,7 @@
         app:layout_constraintTop_toTopOf="parent">
 
         <ImageView
-            android:id="@+id/favicon"
+            android:id="@+id/fireproofWebsiteEntryFavicon"
             android:layout_width="22dp"
             android:layout_height="22dp"
             android:layout_gravity="center"
@@ -46,37 +43,22 @@
     </FrameLayout>
 
     <TextView
-        android:id="@+id/title"
+        android:id="@+id/fireproofWebsiteEntryDomain"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:fontFamily="sans-serif"
-        android:textColor="?attr/bookmarkTitleTextColor"
+        android:textColor="?attr/fireproofWebsiteTitleTextColor"
         android:textSize="16sp"
         android:textStyle="normal"
         android:maxLines="1"
         android:singleLine="true"
         android:ellipsize="end"
-        app:layout_constraintBottom_toTopOf="@+id/url"
-        app:layout_constraintEnd_toStartOf="@+id/overflowMenu"
-        app:layout_constraintStart_toEndOf="@id/favicon_container"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:text="Bookmark" />
-
-    <TextView
-        android:id="@+id/url"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:fontFamily="sans-serif"
-        android:paddingTop="2dp"
-        android:paddingBottom="4dp"
-        android:textColor="?attr/bookmarkSubtitleTextColor"
-        android:textSize="14sp"
-        android:textStyle="normal"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/overflowMenu"
-        app:layout_constraintStart_toStartOf="@id/title"
-        app:layout_constraintTop_toBottomOf="@id/title"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@id/fireproofWebsiteEntryFaviconContainer"
+        app:layout_constraintTop_toTopOf="parent"
         tools:text="Bookmark" />
 
     <ImageView
