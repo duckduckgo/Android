@@ -17,7 +17,7 @@ android {
         minSdkVersion 21
         targetSdkVersion 28
         versionCode buildVersionCode()
-        versionName buildVersionName() + "-cookies"
+        versionName buildVersionName()
         testInstrumentationRunner "com.duckduckgo.app.TestRunner"
         archivesBaseName = "duckduckgo-$versionName"
         vectorDrawables.useSupportLibrary = true
