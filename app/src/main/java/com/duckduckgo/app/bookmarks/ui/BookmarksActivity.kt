@@ -59,7 +59,7 @@ class BookmarksActivity : DuckDuckGoActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_bookmarks)
-        setupActionBar()
+        setupToolbar(toolbar)
         setupBookmarksRecycler()
         observeViewModel()
     }
@@ -70,11 +70,6 @@ class BookmarksActivity : DuckDuckGoActivity() {
 
         val separator = DividerItemDecoration(this, VERTICAL)
         recycler.addItemDecoration(separator)
-    }
-
-    private fun setupActionBar() {
-        setSupportActionBar(toolbar)
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
     }
 
     private fun observeViewModel() {

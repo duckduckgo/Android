@@ -14,41 +14,23 @@
   ~ limitations under the License.
   -->
 
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="48dp"
-    android:layout_height="48dp">
-
-    <com.airbnb.lottie.LottieAnimationView
-        android:id="@+id/anim"
-        android:layout_width="24dp"
-        android:layout_height="24dp"
-        android:layout_centerInParent="true"
-        android:clickable="false"
-        app:lottie_colorFilter="?attr/toolbarIconColor"
-        app:lottie_rawRes="@raw/new_tab" />
+    tools:parentTag="android.widget.RelativeLayout">
 
     <TextView
         android:id="@+id/tabCount"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
         android:textAlignment="center"
-        android:textColor="?attr/toolbarIconColor"
+        android:textColor="?toolbarIconColor"
         android:textSize="12sp"
+        android:fontFamily="sans-serif-black"
         android:textStyle="bold"
-        android:typeface="normal"
+        android:gravity="center"
+        android:background="@drawable/ic_tabs"
         tools:text="66" />
 
-    <FrameLayout
-        android:id="@+id/clickZone"
-        android:layout_width="24dp"
-        android:layout_height="24dp"
-        android:layout_centerInParent="true"
-        android:background="?attr/selectableItemBackgroundBorderless"
-        android:clickable="true"
-        android:longClickable="true"
-        android:focusable="true" />
-
-</RelativeLayout>
+</merge>

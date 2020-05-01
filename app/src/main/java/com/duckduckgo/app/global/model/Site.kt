@@ -63,6 +63,10 @@ interface Site {
 
 }
 
+fun Site.orderedTrackingEntities(): List<Entity> = trackingEvents
+    .mapNotNull { it.entity }
+    .sortedByDescending { it.prevalence }
+
 fun Site.domainMatchesUrl(matchingUrl: String): Boolean {
     return uri?.baseHost == matchingUrl.toUri().baseHost
 }

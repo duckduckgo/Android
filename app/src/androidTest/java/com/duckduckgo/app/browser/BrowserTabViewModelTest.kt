@@ -612,16 +612,18 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenBrowserNotShownAndOmnibarInputDoesNotHaveFocusThenPrivacyGradeIsNotShown() {
+    fun whenOmnibarDoesNotHaveFocusThenPrivacyGradeIsShownAndSearchIconIsHidden() {
         testee.onOmnibarInputStateChanged(query = "", hasFocus = false, hasQueryChanged = false)
-        assertFalse(browserViewState().showPrivacyGrade)
+        assertTrue(browserViewState().showPrivacyGrade)
+        assertFalse(browserViewState().showSearchIcon)
     }
 
     @Test
-    fun whenBrowserShownAndOmnibarInputDoesNotHaveFocusThenPrivacyGradeIsShown() {
+    fun whenBrowserShownAndOmnibarInputDoesNotHaveFocusThenPrivacyGradeIsShownAndSearchIconIsHidden() {
         testee.onUserSubmittedQuery("foo")
         testee.onOmnibarInputStateChanged(query = "", hasFocus = false, hasQueryChanged = false)
         assertTrue(browserViewState().showPrivacyGrade)
+        assertFalse(browserViewState().showSearchIcon)
     }
 
     @Test
@@ -631,10 +633,11 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenBrowserShownAndOmnibarInputHasFocusThenPrivacyGradeIsShown() {
+    fun whenBrowserShownAndOmnibarInputHasFocusThenSearchIconIsShownAndPrivacyGradeIsHidden() {
         testee.onUserSubmittedQuery("foo")
         testee.onOmnibarInputStateChanged("", true, hasQueryChanged = false)
-        assertTrue(browserViewState().showPrivacyGrade)
+        assertFalse(browserViewState().showPrivacyGrade)
+        assertTrue(browserViewState().showSearchIcon)
     }
 
     @Test
@@ -801,7 +804,7 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenUserSelectsDownloadImageOptionFromContextMenuThenDownloadFileCommandIssued() {
+    fun whenUserSelectsDownloadImageOptionFromContextMenuThenDownloadCommandIssuedWithoutRequirementForFurtherUserConfirmation() {
         whenever(mockLongPressHandler.userSelectedMenuItem(any(), any()))
             .thenReturn(DownloadFile("example.com"))
 
@@ -813,6 +816,7 @@ class BrowserTabViewModelTest {
 
         val lastCommand = commandCaptor.lastValue as Command.DownloadImage
         assertEquals("example.com", lastCommand.url)
+        assertFalse(lastCommand.requestUserConfirmation)
     }
 
     @Test
@@ -1337,7 +1341,6 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenScheduledSurveyChangesAndInstalledDaysDontMatchThenCtaIsNull() {
-        setCovidCtaShown()
         testee.onSurveyChanged(Survey("abc", "http://example.com", daysInstalled = 2, status = Survey.Status.SCHEDULED))
         assertNull(testee.ctaViewState.value!!.cta)
     }
@@ -1359,7 +1362,6 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenCtaRefreshedAndAutoAddSupportedAndWidgetAlreadyInstalledThenCtaIsNull() = coroutineRule.runBlocking {
-        setCovidCtaShown()
         whenever(mockWidgetCapabilities.supportsStandardWidgetAdd).thenReturn(true)
         whenever(mockWidgetCapabilities.supportsAutomaticWidgetAdd).thenReturn(true)
         whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(true)
@@ -1376,7 +1378,6 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenCtaRefreshedAndOnlyStandardAddSupportedAndWidgetAlreadyInstalledThenCtaIsNull() = coroutineRule.runBlocking {
-        setCovidCtaShown()
         whenever(mockWidgetCapabilities.supportsStandardWidgetAdd).thenReturn(true)
         whenever(mockWidgetCapabilities.supportsAutomaticWidgetAdd).thenReturn(false)
         whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(true)
@@ -1386,7 +1387,6 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenCtaRefreshedAndStandardAddNotSupportedAndWidgetNotInstalledThenCtaIsNull() = coroutineRule.runBlocking {
-        setCovidCtaShown()
         whenever(mockWidgetCapabilities.supportsStandardWidgetAdd).thenReturn(false)
         whenever(mockWidgetCapabilities.supportsAutomaticWidgetAdd).thenReturn(false)
         whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(false)
@@ -1396,7 +1396,6 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenCtaRefreshedAndStandardAddNotSupportedAndWidgetAlreadyInstalledThenCtaIsNull() = coroutineRule.runBlocking {
-        setCovidCtaShown()
         whenever(mockWidgetCapabilities.supportsStandardWidgetAdd).thenReturn(false)
         whenever(mockWidgetCapabilities.supportsAutomaticWidgetAdd).thenReturn(false)
         whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(true)
@@ -1443,45 +1442,41 @@ class BrowserTabViewModelTest {
     @Test
     fun whenUserClickedCtaButtonThenFirePixel() {
         val cta = DaxBubbleCta.DaxIntroCta(mockOnboardingStore, mockAppInstallStore)
-        testee.onUserClickCtaOkButton(cta)
+        setCta(cta)
+        testee.onUserClickCtaOkButton()
         verify(mockPixel).fire(cta.okPixel!!, cta.pixelOkParameters())
     }
 
     @Test
     fun whenUserClickedSurveyCtaButtonThenLaunchSurveyCommand() {
         val cta = HomePanelCta.Survey(Survey("abc", "http://example.com", daysInstalled = 1, status = Survey.Status.SCHEDULED))
-        testee.onUserClickCtaOkButton(cta)
+        setCta(cta)
+        testee.onUserClickCtaOkButton()
         assertCommandIssued<Command.LaunchSurvey>()
     }
 
     @Test
     fun whenUserClickedAddWidgetCtaButtonThenLaunchAddWidgetCommand() {
         val cta = HomePanelCta.AddWidgetAuto
-        testee.onUserClickCtaOkButton(cta)
+        setCta(cta)
+        testee.onUserClickCtaOkButton()
         assertCommandIssued<Command.LaunchAddWidget>()
     }
 
     @Test
     fun whenUserClickedLegacyAddWidgetCtaButtonThenLaunchLegacyAddWidgetCommand() {
         val cta = HomePanelCta.AddWidgetInstructions
-        testee.onUserClickCtaOkButton(cta)
+        setCta(cta)
+        testee.onUserClickCtaOkButton()
         assertCommandIssued<Command.LaunchLegacyAddWidget>()
     }
 
     @Test
     fun whenSurveyCtaDismissedAndNoOtherCtaPossibleCtaIsNull() = coroutineRule.runBlocking {
-        givenShownCtas(CtaId.DAX_INTRO, CtaId.DAX_END, CtaId.COVID)
-        testee.onSurveyChanged(Survey("abc", "http://example.com", daysInstalled = 1, status = Survey.Status.SCHEDULED))
-        testee.onUserDismissedCta(testee.ctaViewState.value!!.cta!!)
-        assertNull(testee.ctaViewState.value!!.cta)
-    }
-
-    @Test
-    fun whenSurveyCtaDismissedAndWidgetNotCompatibleAndCovidCtaNotShownThenCtaIsCovid() = coroutineRule.runBlocking {
         givenShownCtas(CtaId.DAX_INTRO, CtaId.DAX_END)
         testee.onSurveyChanged(Survey("abc", "http://example.com", daysInstalled = 1, status = Survey.Status.SCHEDULED))
-        testee.onUserDismissedCta(testee.ctaViewState.value!!.cta!!)
-        assertEquals(HomeTopPanelCta.CovidCta(), testee.ctaViewState.value!!.cta)
+        testee.onUserDismissedCta()
+        assertNull(testee.ctaViewState.value!!.cta)
     }
 
     @Test
@@ -1491,44 +1486,66 @@ class BrowserTabViewModelTest {
         whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(false)
 
         testee.onSurveyChanged(Survey("abc", "http://example.com", daysInstalled = 1, status = Survey.Status.SCHEDULED))
-        testee.onUserDismissedCta(testee.ctaViewState.value!!.cta!!)
+        testee.onUserDismissedCta()
         assertEquals(HomePanelCta.AddWidgetAuto, testee.ctaViewState.value!!.cta)
     }
 
     @Test
     fun whenUserDismissedCtaThenFirePixel() = coroutineRule.runBlocking {
         val cta = HomePanelCta.Survey(Survey("abc", "http://example.com", daysInstalled = 1, status = Survey.Status.SCHEDULED))
-        testee.onUserDismissedCta(cta)
+        setCta(cta)
+        testee.onUserDismissedCta()
         verify(mockPixel).fire(cta.cancelPixel!!, cta.pixelCancelParameters())
+    }
+
+    @Test
+    fun whenUserClickedHideDaxDialogThenHideDaxDialogCommandSent() {
+        val cta = DaxDialogCta.DaxSerpCta(mockOnboardingStore, mockAppInstallStore)
+        setCta(cta)
+        testee.onUserHideDaxDialog()
+        val command = captureCommands().lastValue
+        assertTrue(command is Command.DaxCommand.HideDaxDialog)
+    }
+
+    @Test
+    fun whenUserDismissDaxTrackersBlockedDialogThenFinishTrackerAnimationCommandSent() {
+        val cta = DaxDialogCta.DaxTrackersBlockedCta(mockOnboardingStore, mockAppInstallStore, emptyList(), "")
+        setCta(cta)
+        testee.onDaxDialogDismissed()
+        val command = captureCommands().lastValue
+        assertTrue(command is Command.DaxCommand.FinishTrackerAnimation)
+    }
+
+    @Test
+    fun whenUserDismissDifferentThanDaxTrackersBlockedDialogThenFinishTrackerAnimationCommandNotSent() {
+        val cta = DaxDialogCta.DaxSerpCta(mockOnboardingStore, mockAppInstallStore)
+        setCta(cta)
+        testee.onDaxDialogDismissed()
+        verify(mockCommandObserver, never()).onChanged(commandCaptor.capture())
     }
 
     @Test
     fun whenUserDismissedCtaThenRegisterInDatabase() = coroutineRule.runBlocking {
         val cta = HomePanelCta.AddWidgetAuto
-        testee.onUserDismissedCta(cta)
+        setCta(cta)
+        testee.onUserDismissedCta()
         verify(mockDismissedCtaDao).insert(DismissedCta(cta.ctaId))
     }
 
     @Test
     fun whenUserDismissedSurveyCtaThenDoNotRegisterInDatabase() = coroutineRule.runBlocking {
         val cta = HomePanelCta.Survey(Survey("abc", "http://example.com", daysInstalled = 1, status = Survey.Status.SCHEDULED))
-        testee.onUserDismissedCta(cta)
+        setCta(cta)
+        testee.onUserDismissedCta()
         verify(mockDismissedCtaDao, never()).insert(DismissedCta(cta.ctaId))
     }
 
     @Test
     fun whenUserDismissedSurveyCtaThenCancelScheduledSurveys() = coroutineRule.runBlocking {
         val cta = HomePanelCta.Survey(Survey("abc", "http://example.com", daysInstalled = 1, status = Survey.Status.SCHEDULED))
-        testee.onUserDismissedCta(cta)
+        setCta(cta)
+        testee.onUserDismissedCta()
         verify(mockSurveyDao).cancelScheduledSurveys()
-    }
-
-
-    @Test
-    fun whenUserDismissedHomeTopPanelCtaThenReturnEmptyCta() {
-        val cta = HomeTopPanelCta.CovidCta()
-        testee.onUserDismissedCta(cta)
-        assertNull(testee.ctaViewState.value!!.cta)
     }
 
     @Test
@@ -1558,13 +1575,6 @@ class BrowserTabViewModelTest {
     fun whenOnBrokenSiteSelectedOpenBokenSiteFeedback() = runBlockingTest {
         testee.onBrokenSiteSelected()
         assertCommandIssued<Command.BrokenSiteFeedback>()
-    }
-
-    @Test
-    fun whenUserClickedTopCtaButtonAndCtaIsCovidCtaThenSubmitQuery() {
-        val cta = HomeTopPanelCta.CovidCta()
-        testee.onUserClickTopCta(cta)
-        assertEquals(cta.searchTerm, omnibarViewState().omnibarText)
     }
 
     private inline fun <reified T : Command> assertCommandIssued(instanceAssertions: T.() -> Unit = {}) {
@@ -1605,6 +1615,10 @@ class BrowserTabViewModelTest {
         testee.browserViewState.value = browserViewState().copy(browserShowing = isBrowsing)
     }
 
+    private fun setCta(cta: Cta) {
+        testee.ctaViewState.value = ctaViewState().copy(cta = cta)
+    }
+
     private fun loadUrl(url: String?, title: String? = null, isBrowserShowing: Boolean = true) {
         setBrowserShowing(isBrowserShowing)
         testee.navigationStateChanged(buildWebNavigation(originalUrl = url, currentUrl = url, title = title))
@@ -1614,10 +1628,6 @@ class BrowserTabViewModelTest {
     private fun updateUrl(originalUrl: String?, currentUrl: String?, isBrowserShowing: Boolean) {
         setBrowserShowing(isBrowserShowing)
         testee.navigationStateChanged(buildWebNavigation(originalUrl = originalUrl, currentUrl = currentUrl))
-    }
-
-    private fun setCovidCtaShown() {
-        whenever(mockDismissedCtaDao.exists(CtaId.COVID)).thenReturn(true)
     }
 
     private fun setupNavigation(
@@ -1656,6 +1666,7 @@ class BrowserTabViewModelTest {
         return nav
     }
 
+    private fun ctaViewState() = testee.ctaViewState.value!!
     private fun browserViewState() = testee.browserViewState.value!!
     private fun omnibarViewState() = testee.omnibarViewState.value!!
     private fun loadingViewState() = testee.loadingViewState.value!!

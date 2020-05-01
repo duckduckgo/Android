@@ -4,6 +4,7 @@
     <string name="duckDuckGoPrivacySimplified">Prywatność uproszczona.</string>
     <string name="yes">Tak</string>
     <string name="no">Nie</string>
+    <string name="search">Szukaj</string>
 
     <!-- Onboarding Activity -->
     <string name="onboardingDefaultBrowserDescription">Zmień ustawienia, aby zawsze wyszukiwać i przeglądać strony za pośrednictwem DuckDuckGo.</string>
@@ -392,20 +393,20 @@
     <string name="daxIntroCtaText">Spróbuj teraz odwiedzić jedną z twoich ulubionych stron! &lt;br/&gt;&lt;br/&gt;Zablokuję cię, aby nie mogły cię szpiegować. Jeśli to możliwe, poprawię również bezpieczeństwo twojego połączenia. &#128274;</string>
     <string name="daxEndCtaText">Masz to! &lt;br/&gt;&lt;br/&gt;Pamiętaj: za każdym razem, gdy przeglądasz ze mną Internet, jakaś wścibska reklama przestaje działać. &#128077;</string>
     <string name="daxSerpCtaText">Twoje wyszukiwania w DuckDuckGo są anonimowe, a ja nigdy nie przechowuję Twojej historii wyszukiwania. Przenigdy. &#128588;</string>
-    <string name="daxNonSerpCtaText">Każda strona ma stopień prywatności. Stuknij, aby zobaczyć, jak chroniłem twoją prywatność.&lt;br/&gt;&lt;br/&gt;Chcesz się zachwycić? Spróbuj wyczyścić swoje dane, naciskając przycisk strzału.</string>
-    <string name="daxMainNetworkStep1CtaText">Uwaga!&lt;br/&gt;&lt;br/&gt; %s prowadzi dużą sieć śledzenia.&lt;br/&gt;&lt;br/&gt;Niska ocena prywatności ostrzega przed stronami takimi jak ta.</string>
-    <string name="daxMainNetworkStep1OwnedCtaText">Uwaga!&lt;br/&gt;&lt;br/&gt; %s jest własnością %s, która prowadzi dużą sieć śledzenia.</string>
-    <string name="daxMainNetworkStep21CtaText">Faktem jest, że trackery %s czają się na około %s najpopularniejszych witryn. &#128561;&lt;br/&gt;&lt;br/&gt;</string>
-    <string name="daxMainNetworkStep211CtaText">Faktem jest, że trackery %s czają się w całym Internecie. &#128561;&lt;br/&gt;&lt;br/&gt;</string>
-    <string name="daxMainNetworkStep2CtaText">%s Zablokuję te moduły śledzące, gdy przeglądasz witryny inne niż %s.</string>
     <plurals name="daxTrackersBlockedCtaText">
         <item quantity="one">&#160;i &lt;b&gt;%d inny&lt;/b&gt; próbowali cię tutaj wyśledzić. &lt;br/&gt;&lt;br/&gt;Zablokowałem je!&lt;br/&gt;&lt;br/&gt; can Możesz sprawdzić pasek adresu, aby zobaczyć, kto próbuje cię śledzić, gdy odwiedzasz nową witrynę.️</item>
         <item quantity="few">&#160;i &lt;b&gt;%d inni&lt;/b&gt; próbowali cię tutaj wyśledzić. &lt;br/&gt;&lt;br/&gt;Zablokowałem je!&lt;br/&gt;&lt;br/&gt; can Możesz sprawdzić pasek adresu, aby zobaczyć, kto próbuje cię śledzić, gdy odwiedzasz nową witrynę.️</item>
         <item quantity="many">&#160;i &lt;b&gt;%d innych&lt;/b&gt; próbowali cię tutaj wyśledzić. &lt;br/&gt;&lt;br/&gt;Zablokowałem je!&lt;br/&gt;&lt;br/&gt; can Możesz sprawdzić pasek adresu, aby zobaczyć, kto próbuje cię śledzić, gdy odwiedzasz nową witrynę.️</item>
         <item quantity="other">&#160;i &lt;b&gt;%d inni&lt;/b&gt; próbowali cię tutaj wyśledzić. &lt;br/&gt;&lt;br/&gt;Zablokowałem je!&lt;br/&gt;&lt;br/&gt; can Możesz sprawdzić pasek adresu, aby zobaczyć, kto próbuje cię śledzić, gdy odwiedzasz nową witrynę.️</item>
     </plurals>
-    <string name="daxTrackersBlockedCtaZeroText">&#160;próbował cię tu wyśledzić. &lt;br/&gt;&lt;br/&gt;Zablokowałem to!&lt;br/&gt;&lt;br/&gt; can Możesz sprawdzić pasek adresu URL, aby zobaczyć, kto próbuje Cię śledzić, gdy odwiedzasz nową witrynę.️</string>
+    <plurals name="daxTrackersBlockedCtaZeroText">
+        <item quantity="one">&#160;próbował cię tu wyśledzić. &lt;br/&gt;&lt;br/&gt;Zablokowałem to!&lt;br/&gt;&lt;br/&gt; can Możesz sprawdzić pasek adresu URL, aby zobaczyć, kto próbuje Cię śledzić, gdy odwiedzasz nową witrynę.️</item>
+        <item quantity="few">&#160;próbowali cię tu wyśledzić. &lt;br/&gt;&lt;br/&gt;Zablokowałem to!&lt;br/&gt;&lt;br/&gt; can Możesz sprawdzić pasek adresu URL, aby zobaczyć, kto próbuje Cię śledzić, gdy odwiedzasz nową witrynę.️</item>
+        <item quantity="many">&#160;próbowali cię tu wyśledzić. &lt;br/&gt;&lt;br/&gt;Zablokowałem to!&lt;br/&gt;&lt;br/&gt; can Możesz sprawdzić pasek adresu URL, aby zobaczyć, kto próbuje Cię śledzić, gdy odwiedzasz nową witrynę.️</item>
+        <item quantity="other">&#160;próbowali cię tu wyśledzić. &lt;br/&gt;&lt;br/&gt;Zablokowałem to!&lt;br/&gt;&lt;br/&gt; can Możesz sprawdzić pasek adresu URL, aby zobaczyć, kto próbuje Cię śledzić, gdy odwiedzasz nową witrynę.️</item>
+    </plurals>
+    <string name="daxNonSerpCtaText">Gdy korzystasz z przeglądarki, ja blokuję nieznośne moduły śledzące.&lt;br/&gt;&lt;br/&gt;Śmiało – kontynuuj przeglądanie.</string>
+    <string name="daxMainNetworkOwnedCtaText">Uwaga! %s jest własnością firmy %s.&lt;br/&gt;&lt;br/&gt;Moduły śledzące firmy %s czają się na około %s najpopularniejszych witryn &#128561;, ale nie martw się!&lt;br/&gt;&lt;br/&gt;Zablokuję śledzenie twojej aktywności przez firmę %s na tych stronach.</string>
+    <string name="daxMainNetworkCtaText">Uwaga! %s to duża sieć śledząca.&lt;br/&gt;&lt;br/&gt;Ich moduły śledzące czają się na około %s najpopularniejszych witryn &#128561;, ale nie martw się!&lt;br/&gt;&lt;br/&gt;Zablokuję śledzenie twojej aktywności przez firmę %s na tych stronach.</string>
 
-    <!-- Covid Cta-->
-    <string name="covidCtaText">Zobacz oficjalne informacje i wskazówki dotyczące COVID-19.</string>
 </resources>

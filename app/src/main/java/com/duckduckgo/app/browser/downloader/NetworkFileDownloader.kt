@@ -19,15 +19,14 @@ package com.duckduckgo.app.browser.downloader
 import android.app.DownloadManager
 import android.content.Context
 import android.webkit.CookieManager
-import android.webkit.URLUtil
 import androidx.core.net.toUri
-import timber.log.Timber
+import com.duckduckgo.app.browser.downloader.FileDownloader.PendingFileDownload
 import javax.inject.Inject
 
 class NetworkFileDownloader @Inject constructor(private val context: Context) {
 
-    fun download(pendingDownload: FileDownloader.PendingFileDownload) {
-        val guessedFileName = guessFileName(pendingDownload)
+    fun download(pendingDownload: PendingFileDownload) {
+        val guessedFileName = pendingDownload.guessFileName()
 
         val request = DownloadManager.Request(pendingDownload.url.toUri()).apply {
             allowScanningByMediaScanner()
@@ -40,10 +39,5 @@ class NetworkFileDownloader @Inject constructor(private val context: Context) {
         val manager = context.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager?
         manager?.enqueue(request)
     }
-
-    private fun guessFileName(pending: FileDownloader.PendingFileDownload): String? {
-        val guessedFileName = URLUtil.guessFileName(pending.url, pending.contentDisposition, pending.mimeType)
-        Timber.i("Guessed filename of $guessedFileName for url ${pending.url}")
-        return guessedFileName
-    }
 }
+

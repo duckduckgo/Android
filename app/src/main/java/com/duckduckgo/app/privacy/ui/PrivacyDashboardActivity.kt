@@ -60,14 +60,9 @@ class PrivacyDashboardActivity : DuckDuckGoActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_privacy_dashboard)
-        configureToolbar()
+        setupToolbar(toolbar)
         setupObservers()
         setupClickListeners()
-    }
-
-    private fun configureToolbar() {
-        setSupportActionBar(toolbar)
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
     }
 
     private fun setupObservers() {

@@ -15,7 +15,14 @@
   -->
 
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
-    <string name="search">Search</string>
+    <!-- Download Confirmation -->
+    <string name="downloadConfirmationContinue">Continue</string>
+    <string name="downloadConfirmationSaveFileTitle">Save %1$s</string>
+    <string name="downloadConfirmationKeepBothFilesText">Keep both</string>
+    <string name="downloadConfirmationReplaceOldFileText">Replace</string>
+    <string name="downloadConfirmationOpenFileText">Open</string>
+    <string name="downloadConfirmationUnableToOpenFileText">Could not open file</string>
+    <string name="downloadConfirmationUnableToDeleteFileText">Could not delete old file</string>
 
     <!-- Change Icon Activity -->
     <string name="changeIconActivityTitle">App Icon</string>
@@ -24,14 +31,6 @@
     <string name="changeIconCtaCancel">Cancel</string>
     <string name="changeIconDialogTitle">Apply New Icon?</string>
     <string name="changeIconDialogMessage">The app may close to apply changes. Come on back after you\'ve admired your handsome new icon.</string>
-
-    <!-- Sticky Search Prompt Notification -->
-    <string name="stickySearchPromptNotificationTitle">Quick Search</string>
-    <string name="stickySearchNotification">Sticky Search</string>
-    <string name="stickySearchNotificationText">Quick Search in Notifications</string>
-    <string name="stickySearchPromptKeep">Keep</string>
-    <string name="stickySearchPromptRemove">Remove</string>
-    <string name="notificationChannelSearch">Search</string>
 
     <!-- !! String changed translate and replace !! -->
     <string name="privacyProtectionToggle">Site Privacy Protection</string>

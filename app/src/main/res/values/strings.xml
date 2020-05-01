@@ -6,6 +6,7 @@
     <string name="duckDuckGoPrivacySimplified">Privacy, simplified.</string>
     <string name="yes">Yes</string>
     <string name="no">No</string>
+    <string name="search">Search</string>
 
     <!-- Onboarding Activity -->
     <string name="onboardingDefaultBrowserDescription">Visit Settings to search and browse with DuckDuckGo every time.</string>
@@ -392,18 +393,15 @@
     <string name="daxIntroCtaText"><![CDATA[Next, try visiting one of your favorite sites!<br/><br/>I\'ll block trackers so they can\'t spy on you. I\'ll also upgrade the security of your connection if possible. 🔒]]></string>
     <string name="daxEndCtaText"><![CDATA[You\'ve got this!<br/><br/>Remember: every time you browse with me a creepy ad loses its wings. 👍]]></string>
     <string name="daxSerpCtaText">Your DuckDuckGo searches are anonymous and I never store your search history. Ever. 🙌</string>
-    <string name="daxNonSerpCtaText"><![CDATA[Every site has a privacy grade. Tap it to see how I protected your privacy.<br/><br/>Want to get fancy? Try clearing your data by hitting the fire button.]]></string>
-    <string name="daxMainNetworkStep1CtaText"><![CDATA[Heads up!<br/><br/> %s runs a major tracking network.<br/><br/>A low privacy grade will tip you off to sites like this.]]></string>
-    <string name="daxMainNetworkStep1OwnedCtaText"><![CDATA[Heads up!<br/><br/> %s is owned by %s, which runs a major tracking network.]]></string>
-    <string name="daxMainNetworkStep21CtaText"><![CDATA[In fact, %s trackers lurk on about %s of top sites. 😱<br/><br/>]]></string>
-    <string name="daxMainNetworkStep211CtaText"><![CDATA[In fact, %s trackers lurk all over the internet. 😱<br/><br/>]]></string>
-    <string name="daxMainNetworkStep2CtaText">%sI\'ll block these trackers when you\'re browsing non-%s sites.</string>
     <plurals name="daxTrackersBlockedCtaText">
         <item quantity="one"><![CDATA[&#160;and <b>%d other</b> were trying to track you here. <br/><br/>I blocked them!<br/><br/> ☝️You can check the URL bar to see who is trying to track you when you visit a new site.️]]></item>
         <item quantity="other"><![CDATA[&#160;and <b>%d others</b> were trying to track you here. <br/><br/>I blocked them!<br/><br/> ☝️You can check the URL bar to see who is trying to track you when you visit a new site.️]]></item>
     </plurals>
-    <string name="daxTrackersBlockedCtaZeroText"><![CDATA[&#160;was trying to track you here. <br/><br/>I blocked it!<br/><br/> ☝️You can check the URL bar to see who is trying to track you when you visit a new site.️]]></string>
-
-    <!-- Covid Cta-->
-    <string name="covidCtaText">Get official COVID-19 info and tips.</string>
+    <plurals name="daxTrackersBlockedCtaZeroText">
+        <item quantity="one"><![CDATA[&#160;was trying to track you here. <br/><br/>I blocked it!<br/><br/> ☝️You can check the URL bar to see who is trying to track you when you visit a new site.️]]></item>
+        <item quantity="other"><![CDATA[&#160;were trying to track you here. <br/><br/>I blocked it!<br/><br/> ☝️You can check the URL bar to see who is trying to track you when you visit a new site.️]]></item>
+    </plurals>
+    <string name="daxNonSerpCtaText"><![CDATA[As you tap and scroll, I\'ll block pesky trackers. <br/><br/>Go ahead — keep browsing!]]></string>
+    <string name="daxMainNetworkOwnedCtaText"><![CDATA[Heads up! %s is owned by %s.<br/><br/> %s\'s trackers lurk on about %s of top websites 😱 but don\'t worry!<br/><br/>I\'ll block %s from seeing your activity on those sites.]]></string>
+    <string name="daxMainNetworkCtaText"><![CDATA[Heads up! %s is a major tracking network.<br/><br/> Their trackers lurk on about %s of top sites 😱 but don\'t worry!<br/><br/>I\'ll block %s from seeing your activity on those sites.]]></string>
 </resources>

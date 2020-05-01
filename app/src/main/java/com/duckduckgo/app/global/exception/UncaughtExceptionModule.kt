@@ -17,6 +17,7 @@
 package com.duckduckgo.app.global.exception
 
 import com.duckduckgo.app.global.AlertingUncaughtExceptionHandler
+import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.statistics.store.OfflinePixelCountDataStore
 import dagger.Module
 import dagger.Provides
@@ -39,10 +40,11 @@ class UncaughtExceptionModule {
     @Singleton
     fun alertingUncaughtExceptionHandler(
         offlinePixelCountDataStore: OfflinePixelCountDataStore,
-        uncaughtExceptionRepository: UncaughtExceptionRepository
+        uncaughtExceptionRepository: UncaughtExceptionRepository,
+        dispatcherProvider: DispatcherProvider
     ): AlertingUncaughtExceptionHandler {
         val originalHandler = Thread.getDefaultUncaughtExceptionHandler()
-        return AlertingUncaughtExceptionHandler(originalHandler, offlinePixelCountDataStore, uncaughtExceptionRepository)
+        return AlertingUncaughtExceptionHandler(originalHandler, offlinePixelCountDataStore, uncaughtExceptionRepository, dispatcherProvider)
     }
 
     @Provides

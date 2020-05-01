@@ -33,9 +33,7 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.feedback.ui.common.FeedbackActivity
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.sendThemeChangedBroadcast
-import com.duckduckgo.app.global.view.gone
 import com.duckduckgo.app.global.view.launchDefaultAppActivity
-import com.duckduckgo.app.global.view.show
 import com.duckduckgo.app.icon.ui.ChangeIconActivity
 import com.duckduckgo.app.privacy.ui.WhitelistActivity
 import com.duckduckgo.app.settings.SettingsViewModel.AutomaticallyClearData
@@ -67,14 +65,10 @@ class SettingsActivity : DuckDuckGoActivity(), SettingsAutomaticallyClearWhatFra
         viewModel.onAutocompleteSettingChanged(isChecked)
     }
 
-    private val searchNotificationToggleListener = OnCheckedChangeListener { _, isChecked ->
-        viewModel.onSearchNotificationSettingChanged(isChecked)
-    }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_settings)
-        setupActionBar()
+        setupToolbar(toolbar)
 
         configureUiEventHandlers()
         observeViewModel()
@@ -104,11 +98,9 @@ class SettingsActivity : DuckDuckGoActivity(), SettingsAutomaticallyClearWhatFra
                 version.setSubtitle(it.version)
                 lightThemeToggle.quietlySetIsChecked(it.lightThemeEnabled, lightThemeToggleListener)
                 autocompleteToggle.quietlySetIsChecked(it.autoCompleteSuggestionsEnabled, autocompleteToggleListener)
-                searchNotificationToggle.quietlySetIsChecked(it.searchNotificationEnabled, searchNotificationToggleListener)
                 updateDefaultBrowserViewVisibility(it)
                 updateAutomaticClearDataOptions(it.automaticallyClearData)
                 changeAppIcon.setImageResource(it.appIcon.icon)
-                showSearchNotification(it.showSearchNotificationToggle)
             }
         })
 
@@ -126,14 +118,6 @@ class SettingsActivity : DuckDuckGoActivity(), SettingsAutomaticallyClearWhatFra
 
         val whenOptionEnabled = automaticallyClearData.clearWhenOptionEnabled
         automaticallyClearWhenSetting.isEnabled = whenOptionEnabled
-    }
-
-    private fun showSearchNotification(enabled: Boolean) {
-        if (enabled) {
-            searchNotificationToggle.show()
-        } else {
-            searchNotificationToggle.gone()
-        }
     }
 
     private fun launchAutomaticallyClearWhatDialog() {
@@ -172,11 +156,6 @@ class SettingsActivity : DuckDuckGoActivity(), SettingsAutomaticallyClearWhatFra
         } else {
             throw IllegalStateException("Unable to launch default app activity on this OS")
         }
-    }
-
-    private fun setupActionBar() {
-        setSupportActionBar(toolbar)
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
     }
 
     private fun launchFeedback() {

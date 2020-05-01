@@ -20,6 +20,7 @@
     <string name="duckDuckGoPrivacySimplified">Gizlilik, basitleştirildi.</string>
     <string name="yes">Evet</string>
     <string name="no">Hayır</string>
+    <string name="search">Arama yap</string>
 
     <!-- Onboarding Activity -->
     <string name="onboardingDefaultBrowserDescription">Her seferinde DuckDuckGo ile arama yapmak ve göz atmak için Ayarlar\'ı ziyaret edin.</string>
@@ -167,7 +168,7 @@
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Kaydet</string>
 
-    <string name="settingsAutomaticallyClearWhat">Otomatik olarak siliniyor...</string>
+    <string name="settingsAutomaticallyClearWhat">Otomatik olarak siliniyor…</string>
     <string name="settingsAutomaticallyClearWhatOptionNone">Yok</string>
     <string name="settingsAutomaticallyClearWhatOptionTabs">Sekmeler</string>
     <string name="settingsAutomaticallyClearWhatOptionTabsAndData">Sekmeler ve veriler</string>
@@ -407,18 +408,15 @@
     <string name="daxIntroCtaText">Şimdi favori sitelerinizden birini ziyaret etmeyi deneyin! &lt;br/&gt;&lt;br/&gt;İzleyicileri engelleyeceğim, böylece sizi gözetlemeyecekler. Mümkünse bağlantınızın güvenliğini de yükselteceğim. &#128274;</string>
     <string name="daxEndCtaText">İşte böyle!&lt;br/&gt;&lt;br/&gt;Unutmayın: benimle İnterneti her gezişinizde tüyler ürpertici bir reklam daha kaybolur . &#128077;</string>
     <string name="daxSerpCtaText">DuckDuckGo aramalarınız anonimdir ve arama geçmişiniz asla saklanmaz. Asla. &#128588;</string>
-    <string name="daxNonSerpCtaText">Her sitenin bir gizlilik derecesi vardır. Gizliliğinizi nasıl koruduğumu görmek için dokunun.&lt;br/&gt;&lt;br/&gt;Biraz daha çılgınlaşmaya ne dersiniz? Yangın düğmesine basarak verilerinizi silmeyi deneyin.</string>
-    <string name="daxMainNetworkStep1CtaText">Dikkat!&lt;br/&gt;&lt;br/&gt; %s büyük bir izleme ağı işletiyor.&lt;br/&gt;&lt;br/&gt;Düşük gizlilik derecesi sizi bu gibi sitelere yönlendirecektir.</string>
-    <string name="daxMainNetworkStep1OwnedCtaText">Dikkat!&lt;br/&gt;&lt;br/&gt; %s, büyük bir izleme ağı işleten %s şirketine aittir.</string>
-    <string name="daxMainNetworkStep21CtaText">Aslında, %s izleyicileri en iyi sitelerin yaklaşık %s kadarına hakim. &#128561; &lt;br/&gt;&lt;br/&gt;</string>
-    <string name="daxMainNetworkStep211CtaText">Aslında, %s izleyicileri İnternetin her yerinde pusuda. &#128561; &lt;br/&gt;&lt;br/&gt;</string>
-    <string name="daxMainNetworkStep2CtaText">%s %s dışındaki sitelere göz atarken bu izleyicileri engelleyeceğim.</string>
     <plurals name="daxTrackersBlockedCtaText">
         <item quantity="one">&#160;ve &lt;b&gt;%d diğer&lt;/b&gt; sizi burada izlemeye çalışıyordu. &lt;br/&gt;&lt;br/&gt;Onları engelledim!&lt;br/&gt;&lt;br/&gt; ☝️Yeni bir siteyi ziyaret ettiğinizde sizi kimin izlemeye çalıştığını görmek için URL çubuğunu kontrol edebilirsiniz.</item>
         <item quantity="other">&#160;ve &lt;b&gt;%d diğerleri&lt;/b&gt; sizi burada izlemeye çalışıyordu. &lt;br/&gt;&lt;br/&gt;Onları engelledim!&lt;br/&gt;&lt;br/&gt; ☝️Yeni bir siteyi ziyaret ettiğinizde sizi kimin izlemeye çalıştığını görmek için URL çubuğunu kontrol edebilirsiniz.</item>
     </plurals>
-    <string name="daxTrackersBlockedCtaZeroText">&#160;sizi burada izlemeye çalışıyordu. &lt;br/&gt;&lt;br/&gt;Onu engelledim!&lt;br/&gt;&lt;br/&gt; ☝️Yeni bir siteyi ziyaret ettiğinizde sizi kimin izlemeye çalıştığını görmek için URL çubuğunu kontrol edebilirsiniz.</string>
-
-    <!-- Covid Cta-->
-    <string name="covidCtaText">Resmi COVID-19 hakkında bilgi ve ipuçları alın.</string>
+    <plurals name="daxTrackersBlockedCtaZeroText">
+        <item quantity="one">&#160;sizi burada izlemeye çalışıyordu. &lt;br/&gt;&lt;br/&gt;Onu engelledim!&lt;br/&gt;&lt;br/&gt; ☝️Yeni bir siteyi ziyaret ettiğinizde sizi kimin izlemeye çalıştığını görmek için URL çubuğunu kontrol edebilirsiniz.</item>
+        <item quantity="other">&#160;sizi burada izlemeye çalışıyordu. &lt;br/&gt;&lt;br/&gt;Onu engelledim!&lt;br/&gt;&lt;br/&gt; ☝️Yeni bir siteyi ziyaret ettiğinizde sizi kimin izlemeye çalıştığını görmek için URL çubuğunu kontrol edebilirsiniz.</item>
+    </plurals>
+    <string name="daxNonSerpCtaText">Siz gezintinize devam ederken sinir bozucu izleyicileri engelleyeceğim. &lt;br/&gt;&lt;br/&gt;Hadi, gezinmeye devam edin!</string>
+    <string name="daxMainNetworkOwnedCtaText">Dikkat! %s, %s şirketine aittir.&lt;br/&gt;&lt;br/&gt; %s\'ın izleyicileri, en iyi web sitelerinin yaklaşık %s kadarını gizliyor ancak endişelenmeyin! &lt;br/&gt;&lt;br/&gt;%s\'nın bu sitelerdeki etkinliğinizi görmesini engelleyeceğim.</string>
+    <string name="daxMainNetworkCtaText">Dikkat! %s büyük bir izleme ağıdır.&lt;br/&gt;&lt;br/&gt; İzleyicileri, en iyi sitelerin yaklaşık %s kadarını gizliyor &#128561; ancak endişelenmeyin! &lt;br/&gt;&lt;br/&gt;%s \'nin bu sitelerdeki etkinliğinizi görmesini engelleyeceğim.</string>
 </resources>

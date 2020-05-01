@@ -80,6 +80,7 @@ import com.jakewharton.rxrelay2.PublishRelay
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
+import kotlinx.android.synthetic.main.include_omnibar_toolbar.*
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -125,6 +126,7 @@ class BrowserTabViewModel(
         val isDesktopBrowsingMode: Boolean = false,
         val canChangeBrowsingMode: Boolean = true,
         val showPrivacyGrade: Boolean = false,
+        val showSearchIcon: Boolean = false,
         val showClearButton: Boolean = false,
         val showTabsButton: Boolean = true,
         val showFireButton: Boolean = true,
@@ -180,7 +182,7 @@ class BrowserTabViewModel(
         object ShowKeyboard : Command()
         object HideKeyboard : Command()
         class ShowFullScreen(val view: View) : Command()
-        class DownloadImage(val url: String) : Command()
+        class DownloadImage(val url: String, val requestUserConfirmation: Boolean) : Command()
         class ShowBookmarkAddedConfirmation(val bookmarkId: Long, val title: String?, val url: String?) : Command()
         class ShareLink(val url: String) : Command()
         class CopyLink(val url: String) : Command()
@@ -198,6 +200,10 @@ class BrowserTabViewModel(
         object GenerateWebViewPreviewImage : Command()
         object LaunchTabSwitcher : Command()
         class ShowErrorWithAction(val action: () -> Unit) : Command()
+        sealed class DaxCommand : Command() {
+            object FinishTrackerAnimation : DaxCommand()
+            class HideDaxDialog(val cta: Cta) : DaxCommand()
+        }
     }
 
     val autoCompleteViewState: MutableLiveData<AutoCompleteViewState> = MutableLiveData()
@@ -485,21 +491,22 @@ class BrowserTabViewModel(
         buildSiteFactory(url, title)
 
         val currentOmnibarViewState = currentOmnibarViewState()
-        omnibarViewState.postValue(currentOmnibarViewState.copy(omnibarText = omnibarTextForUrl(url), shouldMoveCaretToEnd = false))
-
+        omnibarViewState.value = currentOmnibarViewState.copy(omnibarText = omnibarTextForUrl(url), shouldMoveCaretToEnd = false)
         val currentBrowserViewState = currentBrowserViewState()
-        findInPageViewState.postValue(FindInPageViewState(visible = false, canFindInPage = true))
-        browserViewState.postValue(
-            currentBrowserViewState.copy(
-                browserShowing = true,
-                canAddBookmarks = true,
-                addToHomeEnabled = true,
-                addToHomeVisible = addToHomeCapabilityDetector.isAddToHomeSupported(),
-                canSharePage = true,
-                showPrivacyGrade = true,
-                canReportSite = true
-            )
+        findInPageViewState.value = FindInPageViewState(visible = false, canFindInPage = true)
+        browserViewState.value = currentBrowserViewState.copy(
+            browserShowing = true,
+            canAddBookmarks = true,
+            addToHomeEnabled = true,
+            addToHomeVisible = addToHomeCapabilityDetector.isAddToHomeSupported(),
+            canSharePage = true,
+            showPrivacyGrade = true,
+            canReportSite = true,
+            showSearchIcon = false,
+            showClearButton = false
         )
+
+        Timber.d("showPrivacyGrade=true, showSearchIcon=false, showClearButton=false")
 
         if (duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(url)) {
             statisticsUpdater.refreshSearchRetentionAtb()
@@ -546,8 +553,11 @@ class BrowserTabViewModel(
             addToHomeVisible = addToHomeCapabilityDetector.isAddToHomeSupported(),
             canSharePage = false,
             showPrivacyGrade = false,
-            canReportSite = false
+            canReportSite = false,
+            showSearchIcon = true,
+            showClearButton = true
         )
+        Timber.d("showPrivacyGrade=false, showSearchIcon=true, showClearButton=true")
     }
 
     override fun pageRefreshed(refreshedUrl: String) {
@@ -670,17 +680,22 @@ class BrowserTabViewModel(
         val showAutoCompleteSuggestions = hasFocus && query.isNotBlank() && hasQueryChanged && autoCompleteSuggestionsEnabled
         val showClearButton = hasFocus && query.isNotBlank()
         val showControls = !hasFocus || query.isBlank()
+        val showPrivacyGrade = !hasFocus
+        val showSearchIcon = hasFocus
 
         omnibarViewState.value = currentOmnibarViewState.copy(isEditing = hasFocus)
 
         val currentBrowserViewState = currentBrowserViewState()
         browserViewState.value = currentBrowserViewState.copy(
-            showPrivacyGrade = currentBrowserViewState.browserShowing,
+            showPrivacyGrade = showPrivacyGrade,
+            showSearchIcon = showSearchIcon,
             showTabsButton = showControls,
             showFireButton = showControls,
             showMenuButton = showControls,
             showClearButton = showClearButton
         )
+
+        Timber.d("showPrivacyGrade=$showPrivacyGrade, showSearchIcon=$showSearchIcon, showClearButton=$showClearButton")
 
         autoCompleteViewState.value = AutoCompleteViewState(showAutoCompleteSuggestions, autoCompleteSearchResults)
 
@@ -743,7 +758,7 @@ class BrowserTabViewModel(
                 true
             }
             is RequiredAction.DownloadFile -> {
-                command.value = DownloadImage(requiredAction.url)
+                command.value = DownloadImage(requiredAction.url, false)
                 true
             }
             is RequiredAction.ShareLink -> {
@@ -936,12 +951,10 @@ class BrowserTabViewModel(
     }
 
     fun onUserClickTopCta(cta: HomeTopPanelCta) {
-        if (cta is HomeTopPanelCta.CovidCta) {
-            onUserSubmittedQuery(cta.searchTerm)
-        }
     }
 
-    fun onUserClickCtaOkButton(cta: Cta) {
+    fun onUserClickCtaOkButton() {
+        val cta = currentCtaViewState().cta ?: return
         ctaViewModel.onUserClickCtaOkButton(cta)
         command.value = when (cta) {
             is HomePanelCta.Survey -> LaunchSurvey(cta.survey)
@@ -955,10 +968,24 @@ class BrowserTabViewModel(
         ctaViewModel.onUserClickCtaSecondaryButton(cta)
     }
 
-    fun onUserDismissedCta(dismissedCta: Cta) {
+    fun onUserHideDaxDialog() {
+        val cta = currentCtaViewState().cta ?: return
+        command.value = DaxCommand.HideDaxDialog(cta)
+    }
+
+    fun onDaxDialogDismissed() {
+        val cta = currentCtaViewState().cta ?: return
+        if (cta is DaxDialogCta.DaxTrackersBlockedCta) {
+            command.value = DaxCommand.FinishTrackerAnimation
+        }
+        onUserDismissedCta()
+    }
+
+    fun onUserDismissedCta() {
+        val cta = currentCtaViewState().cta ?: return
         viewModelScope.launch {
-            ctaViewModel.onUserDismissedCta(dismissedCta)
-            when (dismissedCta) {
+            ctaViewModel.onUserDismissedCta(cta)
+            when (cta) {
                 is HomeTopPanelCta -> {
                     ctaViewState.value = currentCtaViewState().copy(cta = null)
                 }

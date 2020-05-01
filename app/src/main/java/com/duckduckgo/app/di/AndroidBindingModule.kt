@@ -21,6 +21,7 @@ import com.duckduckgo.app.bookmarks.ui.BookmarksActivity
 import com.duckduckgo.app.brokensite.BrokenSiteActivity
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.BrowserTabFragment
+import com.duckduckgo.app.browser.DownloadConfirmationFragment
 import com.duckduckgo.app.browser.rating.ui.AppEnjoymentDialogFragment
 import com.duckduckgo.app.browser.rating.ui.GiveFeedbackDialogFragment
 import com.duckduckgo.app.browser.rating.ui.RateAppDialogFragment
@@ -43,6 +44,7 @@ import com.duckduckgo.app.settings.SettingsActivity
 import com.duckduckgo.app.survey.ui.SurveyActivity
 import com.duckduckgo.app.systemsearch.SystemSearchActivity
 import com.duckduckgo.app.tabs.ui.TabSwitcherActivity
+import com.duckduckgo.app.tabs.ui.TabSwitcherBottomBarFeatureActivity
 import com.duckduckgo.app.widget.ui.AddWidgetInstructionsActivity
 import dagger.Module
 import dagger.android.ContributesAndroidInjector
@@ -72,6 +74,10 @@ abstract class AndroidBindingModule {
     @ActivityScoped
     @ContributesAndroidInjector
     abstract fun tabsActivity(): TabSwitcherActivity
+
+    @ActivityScoped
+    @ContributesAndroidInjector
+    abstract fun tabsExperimentActivity(): TabSwitcherBottomBarFeatureActivity
 
     @ActivityScoped
     @ContributesAndroidInjector
@@ -133,6 +139,9 @@ abstract class AndroidBindingModule {
 
     @ContributesAndroidInjector
     abstract fun browserTabFragment(): BrowserTabFragment
+
+    @ContributesAndroidInjector
+    abstract fun downloadConfirmationFragment(): DownloadConfirmationFragment
 
     @ContributesAndroidInjector
     abstract fun onboardingDefaultBrowserFragment(): DefaultBrowserPage

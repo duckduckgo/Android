@@ -291,15 +291,6 @@ class CtaViewModelTest {
     }
 
     @Test
-    fun whenRefreshCtaOnHomeTabAndHideTipsIsTrueThenReturnCovidCta() = coroutineRule.runBlocking {
-        whenever(mockSettingsDataStore.hideTips).thenReturn(true)
-        givenSearchWidgetNoCompatible()
-
-        val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = false)
-        assertTrue(value is HomeTopPanelCta.CovidCta)
-    }
-
-    @Test
     fun whenRefreshCtaOnHomeTabAndHideTipsIsTrueAndWidgetCompatibleThenReturnWidgetCta() = coroutineRule.runBlocking {
         whenever(mockSettingsDataStore.hideTips).thenReturn(true)
         whenever(mockWidgetCapabilities.supportsStandardWidgetAdd).thenReturn(true)
@@ -418,14 +409,6 @@ class CtaViewModelTest {
     }
 
     @Test
-    fun whenRefreshCtaOnHomeTabAndDaxEndCtaWasPreviouslyShownThenCovidCtaShown() = runBlockingTest {
-        givenShownDaxOnboardingCtas(listOf(CtaId.DAX_INTRO, CtaId.DAX_END))
-
-        val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = false)
-        assertTrue(value is HomeTopPanelCta.CovidCta)
-    }
-
-    @Test
     fun whenRefreshCtaWhileBrowsingWithDaxOnboardingCompletedButNotAllCtasWereShownThenReturnNull() = runBlockingTest {
         givenShownDaxOnboardingCtas(listOf(CtaId.DAX_INTRO))
         givenDaxOnboardingCompleted()
@@ -434,28 +417,12 @@ class CtaViewModelTest {
         assertNull(value)
     }
 
-    @Test
-    fun whenRefreshCtaOnHomeTabWithDaxOnboardingCompletedButNotAllCtasWereShownThenReturnCovidCta() = runBlockingTest {
-        givenShownDaxOnboardingCtas(listOf(CtaId.DAX_INTRO))
-        givenDaxOnboardingCompleted()
-        givenSearchWidgetNoCompatible()
-
-        val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = false)
-        assertTrue(value is HomeTopPanelCta.CovidCta)
-    }
-
     private suspend fun givenDaxOnboardingActive() {
         whenever(mockUserStageStore.getUserAppStage()).thenReturn(AppStage.DAX_ONBOARDING)
     }
 
-    private suspend fun givenDaxOnboardingCompleted() {
+    private suspend fun givenDaxOnboardingCompleted() { 
         whenever(mockUserStageStore.getUserAppStage()).thenReturn(AppStage.ESTABLISHED)
-    }
-
-    private fun givenSearchWidgetNoCompatible() {
-        whenever(mockWidgetCapabilities.supportsStandardWidgetAdd).thenReturn(false)
-        whenever(mockWidgetCapabilities.supportsAutomaticWidgetAdd).thenReturn(false)
-        whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(false)
     }
 
     private fun givenAtLeastOneDaxDialogCtaShown() {
@@ -470,10 +437,6 @@ class CtaViewModelTest {
 
     private suspend fun givenOnboardingActive() {
         whenever(mockUserStageStore.getUserAppStage()).thenReturn(AppStage.DAX_ONBOARDING)
-    }
-
-    private fun setCovidCtaShown() {
-        whenever(mockDismissedCtaDao.exists(CtaId.COVID)).thenReturn(true)
     }
 
     private fun site(
