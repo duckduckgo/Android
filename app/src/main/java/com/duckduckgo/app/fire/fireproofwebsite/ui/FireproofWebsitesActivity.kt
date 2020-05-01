@@ -39,7 +39,7 @@ class FireproofWebsitesActivity : DuckDuckGoActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_fireproof_websites)
-        setupActionBar()
+        setupToolbar(toolbar)
         setupFireproofWebsiteRecycler()
         observeViewModel()
     }
@@ -47,11 +47,6 @@ class FireproofWebsitesActivity : DuckDuckGoActivity() {
     private fun setupFireproofWebsiteRecycler() {
         adapter = FireproofWebsiteAdapter(viewModel, R.string.fireproofWebsiteFeatureDescription)
         recycler.adapter = adapter
-    }
-
-    private fun setupActionBar() {
-        setSupportActionBar(toolbar)
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
     }
 
     private fun observeViewModel() {
