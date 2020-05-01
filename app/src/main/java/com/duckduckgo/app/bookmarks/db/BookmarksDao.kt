@@ -29,9 +29,6 @@ interface BookmarksDao {
     @Query("select * from bookmarks")
     fun bookmarks(): LiveData<List<BookmarkEntity>>
 
-    @Query("select * from bookmarks")
-    fun bookmarksSync(): List<BookmarkEntity>
-
     @Delete
     fun delete(bookmark: BookmarkEntity)
 
