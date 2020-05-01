@@ -15,11 +15,11 @@
   -->
 
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
-        android:width="24dp"
-        android:height="24dp"
-        android:viewportWidth="24.0"
-        android:viewportHeight="24.0">
-    <path
-        android:fillColor="#FF000000"
-        android:pathData="M15.5,14h-0.79l-0.28,-0.27C15.41,12.59 16,11.11 16,9.5 16,5.91 13.09,3 9.5,3S3,5.91 3,9.5 5.91,16 9.5,16c1.61,0 3.09,-0.59 4.23,-1.57l0.27,0.28v0.79l5,4.99L20.49,19l-4.99,-5zM9.5,14C7.01,14 5,11.99 5,9.5S7.01,5 9.5,5 14,7.01 14,9.5 11.99,14 9.5,14z"/>
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+  <path
+      android:pathData="M5.4175,12.99L16.5875,12.99L11.7075,17.87C11.3175,18.26 11.3175,18.9 11.7075,19.29C12.0975,19.68 12.7275,19.68 13.1175,19.29L19.7075,12.7C20.0975,12.31 20.0975,11.68 19.7075,11.29L13.1175,4.7C12.7275,4.31 12.0975,4.31 11.7075,4.7C11.3175,5.09 11.3175,5.72 11.7075,6.11L16.5875,10.99L5.4175,10.99C4.8675,10.99 4.4175,11.44 4.4175,11.99C4.4175,12.54 4.8675,12.99 5.4175,12.99Z"
+      android:fillColor="@color/bottom_bar_icon_color_selector"/>
 </vector>

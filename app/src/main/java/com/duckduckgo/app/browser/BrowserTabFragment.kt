@@ -23,37 +23,60 @@ import android.annotation.SuppressLint
 import android.app.Activity.RESULT_OK
 import android.app.ActivityOptions
 import android.appwidget.AppWidgetManager
-import android.content.*
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.content.ComponentName
+import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.media.MediaScannerConnection
 import android.net.Uri
-import android.os.*
+import android.os.Build
+import android.os.Bundle
+import android.os.Environment
+import android.os.Handler
+import android.os.Message
 import android.text.Editable
-import android.view.*
+import android.view.ContextMenu
+import android.view.KeyEvent
+import android.view.LayoutInflater
+import android.view.MenuItem
+import android.view.View
 import android.view.View.*
+import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
-import android.webkit.*
+import android.webkit.ValueCallback
+import android.webkit.WebChromeClient
+import android.webkit.WebSettings
+import android.webkit.WebView
 import android.webkit.WebView.FindListener
 import android.webkit.WebView.HitTestResult
 import android.webkit.WebView.HitTestResult.*
+import android.webkit.WebViewDatabase
 import android.widget.EditText
 import android.widget.TextView
 import androidx.annotation.AnyThread
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
 import androidx.constraintlayout.widget.ConstraintSet
+import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.content.ContextCompat
 import androidx.core.content.pm.ShortcutManagerCompat
 import androidx.core.text.HtmlCompat
 import androidx.core.text.HtmlCompat.FROM_HTML_MODE_LEGACY
 import androidx.core.view.isEmpty
+import androidx.core.view.isInvisible
 import androidx.core.view.isNotEmpty
 import androidx.core.view.isVisible
 import androidx.core.view.postDelayed
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.transaction
-import androidx.lifecycle.*
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleObserver
+import androidx.lifecycle.Observer
+import androidx.lifecycle.OnLifecycleEvent
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion
 import com.duckduckgo.app.bookmarks.ui.EditBookmarkDialogFragment
@@ -76,13 +99,31 @@ import com.duckduckgo.app.browser.tabpreview.WebViewPreviewGenerator
 import com.duckduckgo.app.browser.tabpreview.WebViewPreviewPersister
 import com.duckduckgo.app.browser.ui.HttpAuthenticationDialogFragment
 import com.duckduckgo.app.browser.useragent.UserAgentProvider
-import com.duckduckgo.app.cta.ui.*
+import com.duckduckgo.app.cta.ui.Cta
+import com.duckduckgo.app.cta.ui.CtaViewModel
+import com.duckduckgo.app.cta.ui.DaxBubbleCta
+import com.duckduckgo.app.cta.ui.DaxDialogCta
+import com.duckduckgo.app.cta.ui.HomePanelCta
+import com.duckduckgo.app.cta.ui.HomeTopPanelCta
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
 import com.duckduckgo.app.fire.fireproofwebsite.data.website
 import com.duckduckgo.app.global.ViewModelFactory
 import com.duckduckgo.app.global.device.DeviceInfo
 import com.duckduckgo.app.global.model.orderedTrackingEntities
-import com.duckduckgo.app.global.view.*
+import com.duckduckgo.app.global.view.DaxDialog
+import com.duckduckgo.app.global.view.DaxDialogListener
+import com.duckduckgo.app.global.view.NonDismissibleBehavior
+import com.duckduckgo.app.global.view.TextChangedWatcher
+import com.duckduckgo.app.global.view.gone
+import com.duckduckgo.app.global.view.hide
+import com.duckduckgo.app.global.view.hideKeyboard
+import com.duckduckgo.app.global.view.isDifferent
+import com.duckduckgo.app.global.view.isImmersiveModeEnabled
+import com.duckduckgo.app.global.view.renderIfChanged
+import com.duckduckgo.app.global.view.show
+import com.duckduckgo.app.global.view.showKeyboard
+import com.duckduckgo.app.global.view.toPx
+import com.duckduckgo.app.global.view.toggleFullScreen
 import com.duckduckgo.app.privacy.model.PrivacyGrade
 import com.duckduckgo.app.privacy.renderer.icon
 import com.duckduckgo.app.privacy.store.PrivacySettingsStore
@@ -92,24 +133,78 @@ import com.duckduckgo.app.survey.model.Survey
 import com.duckduckgo.app.survey.ui.SurveyActivity
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.ui.TabSwitcherActivity
+import com.duckduckgo.app.tabs.ui.TabSwitcherBottomBarFeatureActivity
 import com.duckduckgo.app.widget.ui.AddWidgetInstructionsActivity
 import com.duckduckgo.widget.SearchWidgetLight
 import com.google.android.material.snackbar.Snackbar
 import dagger.android.support.AndroidSupportInjection
-import kotlinx.android.synthetic.main.fragment_browser_tab.*
-import kotlinx.android.synthetic.main.include_cta_buttons.view.*
-import kotlinx.android.synthetic.main.include_dax_dialog_cta.*
-import kotlinx.android.synthetic.main.include_find_in_page.*
-import kotlinx.android.synthetic.main.include_new_browser_tab.*
-import kotlinx.android.synthetic.main.include_omnibar_toolbar.*
-import kotlinx.android.synthetic.main.include_omnibar_toolbar.view.*
-import kotlinx.android.synthetic.main.include_top_cta.view.*
-import kotlinx.android.synthetic.main.popup_window_browser_menu.view.*
-import kotlinx.coroutines.*
+import kotlinx.android.synthetic.main.fragment_browser_tab.autoCompleteSuggestionsList
+import kotlinx.android.synthetic.main.fragment_browser_tab.bottomNavigationBar
+import kotlinx.android.synthetic.main.fragment_browser_tab.browserLayout
+import kotlinx.android.synthetic.main.fragment_browser_tab.focusDummy
+import kotlinx.android.synthetic.main.fragment_browser_tab.rootView
+import kotlinx.android.synthetic.main.fragment_browser_tab.webViewContainer
+import kotlinx.android.synthetic.main.fragment_browser_tab.webViewFullScreenContainer
+import kotlinx.android.synthetic.main.include_add_widget_instruction_buttons.view.closeButton
+import kotlinx.android.synthetic.main.include_cta_buttons.view.ctaDismissButton
+import kotlinx.android.synthetic.main.include_cta_buttons.view.ctaOkButton
+import kotlinx.android.synthetic.main.include_dax_dialog_cta.daxCtaContainer
+import kotlinx.android.synthetic.main.include_dax_dialog_cta.dialogTextCta
+import kotlinx.android.synthetic.main.include_find_in_page.closeFindInPagePanel
+import kotlinx.android.synthetic.main.include_find_in_page.findInPageContainer
+import kotlinx.android.synthetic.main.include_find_in_page.findInPageInput
+import kotlinx.android.synthetic.main.include_find_in_page.findInPageMatches
+import kotlinx.android.synthetic.main.include_find_in_page.nextSearchTermButton
+import kotlinx.android.synthetic.main.include_find_in_page.previousSearchTermButton
+import kotlinx.android.synthetic.main.include_new_browser_tab.ctaContainer
+import kotlinx.android.synthetic.main.include_new_browser_tab.ctaTopContainer
+import kotlinx.android.synthetic.main.include_new_browser_tab.ddgLogo
+import kotlinx.android.synthetic.main.include_new_browser_tab.newTabLayout
+import kotlinx.android.synthetic.main.include_omnibar_toolbar.appBarLayout
+import kotlinx.android.synthetic.main.include_omnibar_toolbar.browserMenu
+import kotlinx.android.synthetic.main.include_omnibar_toolbar.clearTextButton
+import kotlinx.android.synthetic.main.include_omnibar_toolbar.networksContainer
+import kotlinx.android.synthetic.main.include_omnibar_toolbar.omnibarTextInput
+import kotlinx.android.synthetic.main.include_omnibar_toolbar.pageLoadingIndicator
+import kotlinx.android.synthetic.main.include_omnibar_toolbar.privacyGradeButton
+import kotlinx.android.synthetic.main.include_omnibar_toolbar.searchIcon
+import kotlinx.android.synthetic.main.include_omnibar_toolbar.toolbar
+import kotlinx.android.synthetic.main.include_omnibar_toolbar.toolbarContainer
+import kotlinx.android.synthetic.main.include_omnibar_toolbar.view.browserMenu
+import kotlinx.android.synthetic.main.include_omnibar_toolbar.view.fireIconMenu
+import kotlinx.android.synthetic.main.include_omnibar_toolbar.view.privacyGradeButton
+import kotlinx.android.synthetic.main.include_omnibar_toolbar.view.tabsMenu
+import kotlinx.android.synthetic.main.layout_browser_bottom_navigation_bar.bottomBarBookmarksItemOne
+import kotlinx.android.synthetic.main.layout_browser_bottom_navigation_bar.bottomBarFireItem
+import kotlinx.android.synthetic.main.layout_browser_bottom_navigation_bar.bottomBarOverflowItem
+import kotlinx.android.synthetic.main.layout_browser_bottom_navigation_bar.bottomBarSearchItem
+import kotlinx.android.synthetic.main.layout_browser_bottom_navigation_bar.bottomBarTabsItem
+import kotlinx.android.synthetic.main.popup_window_browser_bottom_tab_menu.view.sharePopupMenuItem
+import kotlinx.android.synthetic.main.popup_window_browser_menu.view.addBookmarksPopupMenuItem
+import kotlinx.android.synthetic.main.popup_window_browser_menu.view.addToHome
+import kotlinx.android.synthetic.main.popup_window_browser_menu.view.backPopupMenuItem
+import kotlinx.android.synthetic.main.popup_window_browser_menu.view.bookmarksPopupMenuItem
+import kotlinx.android.synthetic.main.popup_window_browser_menu.view.brokenSitePopupMenuItem
+import kotlinx.android.synthetic.main.popup_window_browser_menu.view.findInPageMenuItem
+import kotlinx.android.synthetic.main.popup_window_browser_menu.view.forwardPopupMenuItem
+import kotlinx.android.synthetic.main.popup_window_browser_menu.view.newTabPopupMenuItem
+import kotlinx.android.synthetic.main.popup_window_browser_menu.view.refreshPopupMenuItem
+import kotlinx.android.synthetic.main.popup_window_browser_menu.view.requestDesktopSiteCheckMenuItem
+import kotlinx.android.synthetic.main.popup_window_browser_menu.view.settingsPopupMenuItem
+import kotlinx.android.synthetic.main.popup_window_browser_menu.view.sharePageMenuItem
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.jetbrains.anko.longToast
 import org.jetbrains.anko.share
 import timber.log.Timber
 import java.io.File
+import java.util.Locale
 import javax.inject.Inject
 import kotlin.concurrent.thread
 import kotlin.coroutines.CoroutineContext
@@ -193,6 +288,8 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
 
     private lateinit var renderer: BrowserTabFragmentRenderer
 
+    private lateinit var decorator: BrowserTabFragmentDecorator
+
     private val viewModel: BrowserTabViewModel by lazy {
         val viewModel = ViewModelProvider(this, viewModelFactory).get(BrowserTabViewModel::class.java)
         viewModel.loadData(tabId, initialUrl, skipHome)
@@ -209,11 +306,11 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
     private val browserActivity
         get() = activity as? BrowserActivity
 
-    private val tabsButton: MenuItem?
-        get() = toolbar.menu.findItem(R.id.tabs)
+    private val tabsButton: TabSwitcherButton?
+        get() = appBarLayout.tabsMenu
 
-    private val fireMenuButton: MenuItem?
-        get() = toolbar.menu.findItem(R.id.fire)
+    private val fireMenuButton: ViewGroup?
+        get() = appBarLayout.fireIconMenu
 
     private val menuButton: ViewGroup?
         get() = appBarLayout.browserMenu
@@ -250,6 +347,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
         super.onCreate(savedInstanceState)
         removeDaxDialogFromActivity()
         renderer = BrowserTabFragmentRenderer()
+        decorator = BrowserTabFragmentDecorator()
         if (savedInstanceState != null) {
             updateFragmentListener()
         }
@@ -266,17 +364,17 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        createPopupMenu()
+
         configureObservers()
-        configureAppBar()
+        configurePrivacyGrade()
         configureWebView()
         viewModel.registerWebViewListener(webViewClient, webChromeClient)
         configureOmnibarTextInput()
         configureFindInPage()
         configureAutoComplete()
         configureKeyboardAwareLogoAnimation()
-        configureShowTabSwitcherListener()
-        configureLongClickOpensNewTabListener()
+
+        decorateWithFeatures()
 
         if (savedInstanceState == null) {
             viewModel.onViewReady()
@@ -308,8 +406,8 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
         val transport = message.obj as WebView.WebViewTransport
         transport.webView = webView
         message.sendToTarget()
-        val tabsButton = tabsButton?.actionView as TabSwitcherButton
-        tabsButton.animateCount()
+
+        decorator.animateTabsCount()
         viewModel.onMessageProcessed()
     }
 
@@ -323,28 +421,20 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
         }
     }
 
-    private fun configureShowTabSwitcherListener() {
-        tabsButton?.actionView?.setOnClickListener {
-            launch { viewModel.userLaunchingTabSwitcher() }
-        }
-    }
-
-    private fun configureLongClickOpensNewTabListener() {
-        tabsButton?.actionView?.setOnLongClickListener {
-            launch { viewModel.userRequestedOpeningNewTab() }
-            return@setOnLongClickListener true
-        }
-    }
-
     private fun launchTabSwitcher() {
         val activity = activity ?: return
-        startActivity(TabSwitcherActivity.intent(activity, tabId))
+        if (isBottomNavigationFeatureEnabled()) {
+            startActivity(TabSwitcherBottomBarFeatureActivity.intent(activity, tabId))
+        } else {
+            startActivity(TabSwitcherActivity.intent(activity, tabId))
+        }
+
         activity.overridePendingTransition(R.anim.tab_anim_fade_in, R.anim.slide_to_bottom)
     }
 
     override fun onResume() {
         super.onResume()
-        addTextChangedListeners()
+
         appBarLayout.setExpanded(true)
         viewModel.onViewResumed()
         logoHidingListener.onResume()
@@ -353,6 +443,8 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
         if (fragmentIsVisible()) {
             viewModel.onViewVisible()
         }
+
+        addTextChangedListeners()
     }
 
     override fun onPause() {
@@ -364,26 +456,6 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
     private fun dismissDownloadFragment() {
         val fragment = fragmentManager?.findFragmentByTag(DOWNLOAD_CONFIRMATION_TAG) as? DownloadConfirmationFragment
         fragment?.dismiss()
-    }
-
-    private fun createPopupMenu() {
-        popupMenu = BrowserPopupMenu(layoutInflater)
-        val view = popupMenu.contentView
-        popupMenu.apply {
-            onMenuItemClicked(view.forwardPopupMenuItem) { viewModel.onUserPressedForward() }
-            onMenuItemClicked(view.backPopupMenuItem) { activity?.onBackPressed() }
-            onMenuItemClicked(view.refreshPopupMenuItem) { viewModel.onRefreshRequested() }
-            onMenuItemClicked(view.newTabPopupMenuItem) { viewModel.userRequestedOpeningNewTab() }
-            onMenuItemClicked(view.bookmarksPopupMenuItem) { browserActivity?.launchBookmarks() }
-            onMenuItemClicked(view.addBookmarksPopupMenuItem) { launch { viewModel.onBookmarkAddRequested() } }
-            onMenuItemClicked(view.fireproofWebsitePopupMenuItem) { launch { viewModel.onFireproofWebsiteClicked() } }
-            onMenuItemClicked(view.findInPageMenuItem) { viewModel.onFindInPageSelected() }
-            onMenuItemClicked(view.brokenSitePopupMenuItem) { viewModel.onBrokenSiteSelected() }
-            onMenuItemClicked(view.settingsPopupMenuItem) { browserActivity?.launchSettings() }
-            onMenuItemClicked(view.requestDesktopSiteCheckMenuItem) { viewModel.onDesktopSiteModeToggled(view.requestDesktopSiteCheckMenuItem.isChecked) }
-            onMenuItemClicked(view.sharePageMenuItem) { viewModel.onShareSelected() }
-            onMenuItemClicked(view.addToHome) { viewModel.onPinPageToHomeSelected() }
-        }
     }
 
     private fun addHomeShortcut(homeShortcut: Command.AddHomeShortcut, context: Context) {
@@ -433,7 +505,9 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
 
     private fun addTabsObserver() {
         viewModel.tabs.observe(viewLifecycleOwner, Observer<List<TabEntity>> {
-            it?.let { renderer.renderTabIcon(it) }
+            it?.let {
+                decorator.renderTabIcon(it)
+            }
         })
     }
 
@@ -608,11 +682,9 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
 
     private fun openInNewBackgroundTab() {
         appBarLayout.setExpanded(true, true)
+        decorator.updateBottomBarVisibility(true, true)
         viewModel.tabs.removeObservers(this)
-        val view = tabsButton?.actionView as TabSwitcherButton
-        view.increment {
-            addTabsObserver()
-        }
+        decorator.incrementTabs()
     }
 
     private fun openExternalDialog(intent: Intent, fallbackUrl: String? = null, useFirstActivityFound: Boolean = true) {
@@ -719,26 +791,20 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
         autoCompleteSuggestionsList.adapter = autoCompleteSuggestionsAdapter
     }
 
-    private fun configureAppBar() {
-        toolbar.inflateMenu(R.menu.menu_browser_activity)
+    private fun isBottomNavigationFeatureEnabled() =
+        variantManager.getVariant().hasFeature(VariantManager.VariantFeature.BottomBarNavigation)
 
-        toolbar.setOnMenuItemClickListener { menuItem ->
-            when (menuItem.itemId) {
-                R.id.fire -> {
-                    browserActivity?.launchFire()
-                    return@setOnMenuItemClickListener true
-                }
-                else -> return@setOnMenuItemClickListener false
-            }
+    private fun decorateWithFeatures() {
+        if (isBottomNavigationFeatureEnabled()) {
+            decorator.decorateWithBottomBarSearch()
+        } else {
+            decorator.decorateWithToolbar()
         }
+    }
 
+    private fun configurePrivacyGrade() {
         toolbar.privacyGradeButton.setOnClickListener {
             browserActivity?.launchPrivacyDashboard()
-        }
-
-        browserMenu.setOnClickListener {
-            hideKeyboardImmediately()
-            launchPopupMenu()
         }
 
         viewModel.privacyGrade.observe(viewLifecycleOwner, Observer<PrivacyGrade> {
@@ -930,13 +996,8 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
         return super.onContextItemSelected(item)
     }
 
-    private fun launchPopupMenu() {
-        popupMenu.show(rootView, toolbar)
-    }
-
     private fun bookmarkAdded(bookmarkId: Long, title: String?, url: String?) {
-
-        Snackbar.make(rootView, R.string.bookmarkEdited, Snackbar.LENGTH_LONG)
+        Snackbar.make(browserLayout, R.string.bookmarkEdited, Snackbar.LENGTH_LONG)
             .setAction(R.string.edit) {
                 val addBookmarkDialog = EditBookmarkDialogFragment.instance(bookmarkId, title, url)
                 addBookmarkDialog.show(childFragmentManager, ADD_BOOKMARK_FRAGMENT_TAG)
@@ -952,7 +1013,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
             Snackbar.LENGTH_LONG
         )
             .setAction(R.string.fireproofWebsiteSnackbarAction) {
-                viewModel.onFireproofWebsiteSnackbarActionClicked(entity)
+                viewModel.onFireproofWebsiteSnackbarUndoClicked(entity)
             }
             .show()
     }
@@ -1225,7 +1286,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
             .show()
     }
 
-    fun omnibarViews(): List<View> = listOf(clearTextButton, omnibarTextInput, privacyGradeButton)
+    fun omnibarViews(): List<View> = listOf(clearTextButton, omnibarTextInput, privacyGradeButton, searchIcon)
 
     companion object {
         private const val TAB_ID_ARG = "TAB_ID_ARG"
@@ -1262,6 +1323,233 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
         }
     }
 
+    inner class BrowserTabFragmentDecorator {
+        fun decorateToolbar(viewState: BrowserViewState) {
+            if (!variantManager.getVariant().hasFeature(VariantManager.VariantFeature.BottomBarNavigation)) {
+                decorator.decorateToolbarActions(viewState)
+            }
+        }
+
+        private fun decorateToolbarActions(viewState: BrowserViewState) {
+            tabsButton?.isVisible = viewState.showTabsButton
+            fireMenuButton?.isVisible = viewState.showFireButton
+            menuButton?.isVisible = viewState.showMenuButton
+        }
+
+        fun decorateWithToolbar() {
+            hideBottomBar()
+            decorateAppBarWithToolbarOnly()
+            createPopupMenuWithToolbarOnly()
+            configureShowTabSwitcherListenerWithToolbarOnly()
+            configureLongClickOpensNewTabListenerWithToolbarOnly()
+            removeUnnecessaryLayoutBehaviour()
+        }
+
+        fun decorateWithBottomBarSearch() {
+            bindBottomBarButtons()
+            decorateAppBarWithBottomBar()
+            createPopupMenuWithBottomBar()
+            configureShowTabSwitcherListenerWithBottomBarNavigationOnly()
+            configureLongClickOpensNewTabListenerWithBottomBarNavigationOnly()
+        }
+
+        private fun decorateAppBarWithToolbarOnly() {
+            fireMenuButton?.show()
+            fireMenuButton?.setOnClickListener {
+                browserActivity?.launchFire()
+                pixel.fire(String.format(Locale.US, Pixel.PixelName.MENU_ACTION_FIRE_PRESSED.pixelName, variantManager.getVariant().key))
+            }
+
+            tabsButton?.show()
+        }
+
+        private fun decorateAppBarWithBottomBar() {
+            menuButton?.gone()
+            tabsButton?.gone()
+            fireMenuButton?.gone()
+        }
+
+        private fun createPopupMenuWithToolbarOnly() {
+            popupMenu = BrowserPopupMenu(layoutInflater, variantManager.getVariant())
+            val view = popupMenu.contentView
+            popupMenu.apply {
+                onMenuItemClicked(view.forwardPopupMenuItem) { viewModel.onUserPressedForward() }
+                onMenuItemClicked(view.backPopupMenuItem) { activity?.onBackPressed() }
+                onMenuItemClicked(view.refreshPopupMenuItem) {
+                    viewModel.onRefreshRequested()
+                    pixel.fire(String.format(Locale.US, Pixel.PixelName.MENU_ACTION_REFRESH_PRESSED.pixelName, variantManager.getVariant().key))
+                }
+                onMenuItemClicked(view.newTabPopupMenuItem) {
+                    viewModel.userRequestedOpeningNewTab()
+                    pixel.fire(String.format(Locale.US, Pixel.PixelName.MENU_ACTION_NEW_TAB_PRESSED.pixelName, variantManager.getVariant().key))
+                }
+                onMenuItemClicked(view.bookmarksPopupMenuItem) {
+                    browserActivity?.launchBookmarks()
+                    pixel.fire(String.format(Locale.US, Pixel.PixelName.MENU_ACTION_BOOKMARKS_PRESSED.pixelName, variantManager.getVariant().key))
+                }
+                onMenuItemClicked(view.fireproofWebsitePopupMenuItem) { launch { viewModel.onFireproofWebsiteClicked() } }
+                onMenuItemClicked(view.addBookmarksPopupMenuItem) { launch { viewModel.onBookmarkAddRequested() } }
+                onMenuItemClicked(view.findInPageMenuItem) { viewModel.onFindInPageSelected() }
+                onMenuItemClicked(view.brokenSitePopupMenuItem) { viewModel.onBrokenSiteSelected() }
+                onMenuItemClicked(view.settingsPopupMenuItem) { browserActivity?.launchSettings() }
+                onMenuItemClicked(view.requestDesktopSiteCheckMenuItem) { viewModel.onDesktopSiteModeToggled(view.requestDesktopSiteCheckMenuItem.isChecked) }
+                onMenuItemClicked(view.sharePageMenuItem) { viewModel.onShareSelected() }
+                onMenuItemClicked(view.addToHome) { viewModel.onPinPageToHomeSelected() }
+            }
+            browserMenu.setOnClickListener {
+                hideKeyboardImmediately()
+                launchTopAnchoredPopupMenu()
+            }
+        }
+
+        private fun launchTopAnchoredPopupMenu() {
+            popupMenu.show(rootView, toolbar)
+            pixel.fire(String.format(Locale.US, Pixel.PixelName.MENU_ACTION_POPUP_OPENED.pixelName, variantManager.getVariant().key))
+        }
+
+        private fun createPopupMenuWithBottomBar() {
+            popupMenu = BrowserPopupMenu(layoutInflater, variantManager.getVariant())
+            val view = popupMenu.contentView
+            popupMenu.apply {
+                onMenuItemClicked(view.forwardPopupMenuItem) { viewModel.onUserPressedForward() }
+                onMenuItemClicked(view.backPopupMenuItem) { activity?.onBackPressed() }
+                onMenuItemClicked(view.refreshPopupMenuItem) {
+                    viewModel.onRefreshRequested()
+                    pixel.fire(String.format(Locale.US, Pixel.PixelName.MENU_ACTION_REFRESH_PRESSED.pixelName, variantManager.getVariant().key))
+                }
+                onMenuItemClicked(view.sharePopupMenuItem) { viewModel.onShareSelected() }
+                onMenuItemClicked(view.newTabPopupMenuItem) {
+                    viewModel.userRequestedOpeningNewTab()
+                    pixel.fire(String.format(Locale.US, Pixel.PixelName.MENU_ACTION_NEW_TAB_PRESSED.pixelName, variantManager.getVariant().key))
+                }
+                onMenuItemClicked(view.addBookmarksPopupMenuItem) { launch { viewModel.onBookmarkAddRequested() } }
+                onMenuItemClicked(view.fireproofWebsitePopupMenuItem) { launch { viewModel.onFireproofWebsiteClicked() } }
+                onMenuItemClicked(view.findInPageMenuItem) { viewModel.onFindInPageSelected() }
+                onMenuItemClicked(view.brokenSitePopupMenuItem) { viewModel.onBrokenSiteSelected() }
+                onMenuItemClicked(view.settingsPopupMenuItem) { browserActivity?.launchSettings() }
+                onMenuItemClicked(view.requestDesktopSiteCheckMenuItem) { viewModel.onDesktopSiteModeToggled(view.requestDesktopSiteCheckMenuItem.isChecked) }
+                onMenuItemClicked(view.addToHome) { viewModel.onPinPageToHomeSelected() }
+            }
+        }
+
+        private fun launchBottomAnchoredPopupMenu() {
+            popupMenu.show(rootView, bottomNavigationBar)
+            pixel.fire(String.format(Locale.US, Pixel.PixelName.MENU_ACTION_POPUP_OPENED.pixelName, variantManager.getVariant().key))
+        }
+
+        private fun bindBottomBarButtons() {
+            bottomNavigationBar.apply {
+                onItemClicked(bottomBarFireItem) {
+                    browserActivity?.launchFire()
+                    pixel.fire(String.format(Locale.US, Pixel.PixelName.MENU_ACTION_FIRE_PRESSED.pixelName, variantManager.getVariant().key))
+                }
+                onItemClicked(bottomBarBookmarksItemOne) {
+                    browserActivity?.launchBookmarks()
+                    pixel.fire(String.format(Locale.US, Pixel.PixelName.MENU_ACTION_BOOKMARKS_PRESSED.pixelName, variantManager.getVariant().key))
+                }
+                onItemClicked(bottomBarSearchItem) {
+                    omnibarTextInput.requestFocus()
+                    pixel.fire(String.format(Locale.US, Pixel.PixelName.MENU_ACTION_SEARCH_PRESSED.pixelName, variantManager.getVariant().key))
+                }
+                onItemClicked(bottomBarTabsItem) {
+                    viewModel.userLaunchingTabSwitcher()
+                }
+                onItemClicked(bottomBarOverflowItem) {
+                    hideKeyboardImmediately()
+                    launchBottomAnchoredPopupMenu()
+                }
+            }
+        }
+
+        fun updateBottomBarVisibility(shouldShow: Boolean, shouldAnimate: Boolean = false) {
+            if (isBottomNavigationFeatureEnabled()) {
+                if (shouldShow) {
+                    showBottomBar(shouldAnimate)
+                } else {
+                    hideBottomBar(shouldAnimate)
+                }
+            }
+        }
+
+        private fun hideBottomBar(shouldAnimate: Boolean = false) {
+            if (shouldAnimate) {
+                bottomNavigationBar.animateBarVisibility(isVisible = false)
+            }
+            bottomNavigationBar.gone()
+        }
+
+        private fun showBottomBar(shouldAnimate: Boolean) {
+            if (shouldAnimate) {
+                bottomNavigationBar.show()
+                bottomNavigationBar.animateBarVisibility(isVisible = true)
+            } else {
+                bottomNavigationBar.postDelayed(KEYBOARD_DELAY) {
+                    if (bottomNavigationBar != null) {
+                        bottomNavigationBar.show()
+                    }
+                }
+            }
+        }
+
+        private fun configureShowTabSwitcherListenerWithToolbarOnly() {
+            tabsButton?.setOnClickListener {
+                launch { viewModel.userLaunchingTabSwitcher() }
+            }
+        }
+
+        private fun configureShowTabSwitcherListenerWithBottomBarNavigationOnly() {
+            bottomBarTabsItem.setOnClickListener {
+                launch { viewModel.userLaunchingTabSwitcher() }
+            }
+        }
+
+        private fun configureLongClickOpensNewTabListenerWithToolbarOnly() {
+            tabsButton?.setOnLongClickListener {
+                launch { viewModel.userRequestedOpeningNewTab() }
+                return@setOnLongClickListener true
+            }
+        }
+
+        private fun configureLongClickOpensNewTabListenerWithBottomBarNavigationOnly() {
+            bottomBarTabsItem.setOnLongClickListener {
+                launch { viewModel.userRequestedOpeningNewTab() }
+                return@setOnLongClickListener true
+            }
+        }
+
+        private fun removeUnnecessaryLayoutBehaviour() {
+            val params: CoordinatorLayout.LayoutParams = bottomNavigationBar.getLayoutParams() as CoordinatorLayout.LayoutParams
+            params.behavior = null
+        }
+
+        fun animateTabsCount() {
+            tabsButton?.animateCount()
+            bottomBarTabsItem.animateCount()
+        }
+
+        fun renderTabIcon(tabs: List<TabEntity>) {
+            context?.let {
+                tabsButton?.count = tabs.count()
+                tabsButton?.hasUnread = tabs.firstOrNull { !it.viewed } != null
+
+                bottomBarTabsItem.count = tabs.count()
+                bottomBarTabsItem.hasUnread = tabs.firstOrNull { !it.viewed } != null
+            }
+        }
+
+        fun incrementTabs() {
+            if (isBottomNavigationFeatureEnabled()) {
+                bottomBarTabsItem.increment {
+                    addTabsObserver()
+                }
+            } else {
+                tabsButton?.increment {
+                    addTabsObserver()
+                }
+            }
+        }
+    }
+
     inner class BrowserTabFragmentRenderer {
 
         private var lastSeenOmnibarViewState: OmnibarViewState? = null
@@ -1290,17 +1578,33 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
                 lastSeenOmnibarViewState = viewState
 
                 if (viewState.isEditing) {
-                    omniBarContainer.background = null
                     cancelAllAnimations()
-                } else {
-                    omniBarContainer.setBackgroundResource(R.drawable.omnibar_field_background)
                 }
 
                 if (shouldUpdateOmnibarTextInput(viewState, viewState.omnibarText)) {
                     omnibarTextInput.setText(viewState.omnibarText)
                     appBarLayout.setExpanded(true, true)
+                    decorator.updateBottomBarVisibility(true, true)
                     if (viewState.shouldMoveCaretToEnd) {
                         omnibarTextInput.setSelection(viewState.omnibarText.length)
+                    }
+                } else {
+                    decorator.updateBottomBarVisibility(!viewState.isEditing)
+                }
+
+                lastSeenBrowserViewState?.let {
+                    renderToolbarMenus(it)
+                }
+
+                if (ctaContainer.isVisible) {
+                    if (isBottomNavigationFeatureEnabled()) {
+                        lastSeenOmnibarViewState?.let {
+                            if (it.isEditing) {
+                                ctaContainer.setPadding(0, 0, 0, 0)
+                            } else {
+                                ctaContainer.setPadding(0, 0, 0, 46.toPx())
+                            }
+                        } ?: ctaContainer.setPadding(0, 0, 0, 46.toPx())
                     }
                 }
             }
@@ -1356,7 +1660,6 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
             networksContainer.alpha = 0f
             clearTextButton.alpha = 1f
             omnibarTextInput.alpha = 1f
-            privacyGradeButton.alpha = 1f
         }
 
         fun renderGlobalViewState(viewState: GlobalLayoutViewState) {
@@ -1433,11 +1736,17 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
         }
 
         private fun renderToolbarMenus(viewState: BrowserViewState) {
-            privacyGradeButton?.isVisible = viewState.showPrivacyGrade
-            clearTextButton?.isVisible = viewState.showClearButton
-            tabsButton?.isVisible = viewState.showTabsButton
-            fireMenuButton?.isVisible = viewState.showFireButton
-            menuButton?.isVisible = viewState.showMenuButton
+            if (viewState.browserShowing) {
+                privacyGradeButton?.isInvisible = !viewState.showPrivacyGrade
+                clearTextButton?.isVisible = viewState.showClearButton
+                searchIcon?.isVisible = viewState.showSearchIcon
+            } else {
+                privacyGradeButton?.isVisible = false
+                clearTextButton?.isVisible = viewState.showClearButton
+                searchIcon?.isVisible = true
+            }
+
+            decorator.decorateToolbar(viewState)
         }
 
         fun renderFindInPageState(viewState: FindInPageViewState) {
@@ -1454,14 +1763,6 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
             }
 
             popupMenu.contentView.findInPageMenuItem?.isEnabled = viewState.canFindInPage
-        }
-
-        fun renderTabIcon(tabs: List<TabEntity>) {
-            context?.let {
-                val button = tabsButton?.actionView as TabSwitcherButton
-                button.count = tabs.count()
-                button.hasUnread = tabs.firstOrNull { !it.viewed } != null
-            }
         }
 
         fun renderCtaViewState(viewState: CtaViewState) {
@@ -1573,10 +1874,20 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
                 viewModel.onUserDismissedCta()
             }
 
-            ConstraintSet().also {
-                it.clone(newTabLayout)
-                it.connect(ddgLogo.id, ConstraintSet.BOTTOM, ctaContainer.id, ConstraintSet.TOP, 0)
-                it.applyTo(newTabLayout)
+            if (isBottomNavigationFeatureEnabled()) {
+                lastSeenOmnibarViewState?.let {
+                    if (it.isEditing) {
+                        ctaContainer.setPadding(0, 0, 0, 0)
+                    } else {
+                        ctaContainer.setPadding(0, 0, 0, 46.toPx())
+                    }
+                } ?: ctaContainer.setPadding(0, 0, 0, 46.toPx())
+
+                ConstraintSet().also {
+                    it.clone(newTabLayout)
+                    it.connect(ddgLogo.id, ConstraintSet.BOTTOM, ctaContainer.id, ConstraintSet.TOP, 0)
+                    it.applyTo(newTabLayout)
+                }
             }
         }
 

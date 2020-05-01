@@ -20,9 +20,8 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 
 private const val WWW_PREFIX = "www."
-const val FIREPROOF_WEBSITES_TABLE_NAME = "fireproofWebsites"
 
-@Entity(tableName = FIREPROOF_WEBSITES_TABLE_NAME)
+@Entity(tableName = "fireproofWebsites")
 data class FireproofWebsiteEntity(
     @PrimaryKey val domain: String
 )

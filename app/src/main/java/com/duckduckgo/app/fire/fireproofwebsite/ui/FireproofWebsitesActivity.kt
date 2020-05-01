@@ -28,7 +28,6 @@ import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import kotlinx.android.synthetic.main.content_fireproof_websites.*
 import kotlinx.android.synthetic.main.include_toolbar.*
-import org.jetbrains.anko.alert
 
 class FireproofWebsitesActivity : DuckDuckGoActivity() {
 
@@ -40,7 +39,7 @@ class FireproofWebsitesActivity : DuckDuckGoActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_fireproof_websites)
-        setupActionBar()
+        setupToolbar(toolbar)
         setupFireproofWebsiteRecycler()
         observeViewModel()
     }
@@ -48,11 +47,6 @@ class FireproofWebsitesActivity : DuckDuckGoActivity() {
     private fun setupFireproofWebsiteRecycler() {
         adapter = FireproofWebsiteAdapter(viewModel, R.string.fireproofWebsiteFeatureDescription)
         recycler.adapter = adapter
-    }
-
-    private fun setupActionBar() {
-        setSupportActionBar(toolbar)
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
     }
 
     private fun observeViewModel() {
@@ -73,10 +67,12 @@ class FireproofWebsitesActivity : DuckDuckGoActivity() {
     private fun confirmDeleteWebsite(entity: FireproofWebsiteEntity) {
         val message = HtmlCompat.fromHtml(getString(R.string.fireproofWebsiteDeleteConfirmMessage, entity.domain), FROM_HTML_MODE_LEGACY)
         val title = getString(R.string.fireproofWebsiteDeleteConfirmTitle)
-        deleteDialog = alert(message, title) {
-            positiveButton(android.R.string.yes) { viewModel.delete(entity) }
-            negativeButton(android.R.string.no) { }
-        }.build()
+        deleteDialog = AlertDialog.Builder(this)
+            .setTitle(title)
+            .setMessage(message)
+            .setPositiveButton(android.R.string.yes) { _, _ -> viewModel.delete(entity) }
+            .setNegativeButton(android.R.string.no) { _, _ -> }
+            .create()
         deleteDialog?.show()
     }
 

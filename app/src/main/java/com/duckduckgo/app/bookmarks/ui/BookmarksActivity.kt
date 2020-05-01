@@ -46,7 +46,6 @@ import com.duckduckgo.app.global.view.show
 import kotlinx.android.synthetic.main.content_bookmarks.*
 import kotlinx.android.synthetic.main.include_toolbar.*
 import kotlinx.android.synthetic.main.view_bookmark_entry.view.*
-import org.jetbrains.anko.alert
 import timber.log.Timber
 
 class BookmarksActivity : DuckDuckGoActivity() {
@@ -59,7 +58,7 @@ class BookmarksActivity : DuckDuckGoActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_bookmarks)
-        setupActionBar()
+        setupToolbar(toolbar)
         setupBookmarksRecycler()
         observeViewModel()
     }
@@ -67,11 +66,6 @@ class BookmarksActivity : DuckDuckGoActivity() {
     private fun setupBookmarksRecycler() {
         adapter = BookmarksAdapter(applicationContext, viewModel)
         recycler.adapter = adapter
-    }
-
-    private fun setupActionBar() {
-        setSupportActionBar(toolbar)
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
     }
 
     private fun observeViewModel() {
@@ -131,10 +125,12 @@ class BookmarksActivity : DuckDuckGoActivity() {
         val message =
             Html.fromHtml(getString(R.string.bookmarkDeleteConfirmMessage, bookmark.title))
         val title = getString(R.string.bookmarkDeleteConfirmTitle)
-        deleteDialog = alert(message, title) {
-            positiveButton(android.R.string.yes) { delete(bookmark) }
-            negativeButton(android.R.string.no) { }
-        }.build()
+        deleteDialog = AlertDialog.Builder(this)
+            .setTitle(title)
+            .setMessage(message)
+            .setPositiveButton(android.R.string.yes) { _, _ -> delete(bookmark) }
+            .setNegativeButton(android.R.string.no) { _, _ -> }
+            .create()
         deleteDialog?.show()
     }
 

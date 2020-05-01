@@ -23,7 +23,6 @@ import com.duckduckgo.app.fire.fireproofwebsite.ui.FireproofWebsitesViewModel.Co
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.SingleLiveEvent
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 class FireproofWebsitesViewModel(
     private val dao: FireproofWebsiteDao,
@@ -65,10 +64,8 @@ class FireproofWebsitesViewModel(
     }
 
     fun delete(entity: FireproofWebsiteEntity) {
-        viewModelScope.launch {
-            withContext(dispatcherProvider.io()) {
-                dao.delete(entity)
-            }
+        viewModelScope.launch(dispatcherProvider.io()) {
+            dao.delete(entity)
         }
     }
 }

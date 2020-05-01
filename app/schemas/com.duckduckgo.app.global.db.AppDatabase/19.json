@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 19,
-    "identityHash": "c2140ed55b1545ccedf0e1ed968beca1",
+    "identityHash": "ccc7337f2011e6b9a56489375b6ad77a",
     "entities": [
       {
         "tableName": "tds_tracker",
@@ -576,7 +576,7 @@
       },
       {
         "tableName": "UncaughtExceptionEntity",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `exceptionSource` TEXT NOT NULL, `message` TEXT NOT NULL)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `exceptionSource` TEXT NOT NULL, `message` TEXT NOT NULL, `timestamp` INTEGER NOT NULL, `version` TEXT NOT NULL)",
         "fields": [
           {
             "fieldPath": "id",
@@ -593,6 +593,18 @@
           {
             "fieldPath": "message",
             "columnName": "message",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "timestamp",
+            "columnName": "timestamp",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "version",
+            "columnName": "version",
             "affinity": "TEXT",
             "notNull": true
           }
@@ -657,32 +669,12 @@
         },
         "indices": [],
         "foreignKeys": []
-      },
-      {
-        "tableName": "fireproofWebsites",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`domain` TEXT NOT NULL, PRIMARY KEY(`domain`))",
-        "fields": [
-          {
-            "fieldPath": "domain",
-            "columnName": "domain",
-            "affinity": "TEXT",
-            "notNull": true
-          }
-        ],
-        "primaryKey": {
-          "columnNames": [
-            "domain"
-          ],
-          "autoGenerate": false
-        },
-        "indices": [],
-        "foreignKeys": []
       }
     ],
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'c2140ed55b1545ccedf0e1ed968beca1')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'ccc7337f2011e6b9a56489375b6ad77a')"
     ]
   }
 }

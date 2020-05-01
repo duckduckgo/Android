@@ -31,17 +31,12 @@ class AboutDuckDuckGoActivity : DuckDuckGoActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_about_duck_duck_go)
-        configureActionBar()
+        setupToolbar(toolbar)
 
         learnMoreLink.setOnClickListener {
             startActivity(BrowserActivity.intent(this, Url.ABOUT))
             finish()
         }
-    }
-
-    private fun configureActionBar() {
-        setSupportActionBar(toolbar)
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
     }
 
     companion object {

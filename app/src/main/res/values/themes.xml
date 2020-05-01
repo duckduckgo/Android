@@ -86,6 +86,9 @@
 
         <item name="privacyDashboardLogoLetterTextColor">@color/subtleGray</item>
 
+        <item name="bottomBarIconColor">@color/grayish</item>
+        <item name="bottomBarIconColorDisabled">@color/midGray</item>
+
     </style>
 
     <style name="AppTheme.Dark" parent="AppTheme.BaseDark" />
@@ -158,6 +161,10 @@
         <item name="feedbackEditTextHintColor">@color/warmerGray</item>
 
         <item name="privacyDashboardLogoLetterTextColor">@color/whiteFour</item>
+
+        <item name="bottomBarIconColor">@color/grayishBrown</item>
+        <item name="bottomBarIconColorDisabled">@color/pinkish_grey_two</item>
+
     </style>
 
     <style name="AppTheme.Light" parent="AppTheme.BaseLight">
@@ -214,6 +221,11 @@
 
     <style name="DaxDialogFragment" parent="android:Theme.DeviceDefault.Light.NoActionBar">
         <item name="android:windowTranslucentStatus">true</item>
+    </style>
+
+    <style name="PopUpMenuSwitchTheme">
+        <item name="colorAccent">@color/cornflowerBlue</item>
+        <item name="android:textColorSecondary">?bottomBarIconColor</item>
     </style>
 
 </resources>

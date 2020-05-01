@@ -32,14 +32,6 @@
     <string name="changeIconDialogTitle">Apply New Icon?</string>
     <string name="changeIconDialogMessage">The app may close to apply changes. Come on back after you\'ve admired your handsome new icon.</string>
 
-    <!-- Sticky Search Prompt Notification -->
-    <string name="stickySearchPromptNotificationTitle">Quick Search</string>
-    <string name="stickySearchNotification">Sticky Search</string>
-    <string name="stickySearchNotificationText">Quick Search in Notifications</string>
-    <string name="stickySearchPromptKeep">Keep</string>
-    <string name="stickySearchPromptRemove">Remove</string>
-    <string name="notificationChannelSearch">Search</string>
-
     <!-- Fireproof websites -->
     <string name="fireproofWebsitesActivityTitle">Fireproof Websites</string>
     <string name="settingsFireproofWebsites">Fireproof Websites</string>
@@ -50,5 +42,4 @@
     <string name="fireproofWebsiteFeatureDescription">Websites rely on cookies to keep you signed in. When you Fireproof a site, cookies won\'t be erased and you\'ll stay signed in, even after using the Fire Button.</string>
     <string name="fireproofWebsiteOverflowContentDescription">More options for fireproof website %s</string>
     <string name="fireproofWebsiteDeleteConfirmTitle">Confirm</string>
-
 </resources>

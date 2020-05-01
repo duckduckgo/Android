@@ -30,7 +30,6 @@ import com.duckduckgo.app.browser.rating.db.AppEnjoymentTypeConverter
 import com.duckduckgo.app.browser.rating.db.PromptCountConverter
 import com.duckduckgo.app.cta.db.DismissedCtaDao
 import com.duckduckgo.app.cta.model.DismissedCta
-import com.duckduckgo.app.fire.fireproofwebsite.data.FIREPROOF_WEBSITES_TABLE_NAME
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteDao
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
 import com.duckduckgo.app.global.exception.UncaughtExceptionDao
@@ -61,7 +60,7 @@ import com.duckduckgo.app.usage.search.SearchCountDao
 import com.duckduckgo.app.usage.search.SearchCountEntity
 
 @Database(
-    exportSchema = true, version = 19, entities = [
+    exportSchema = true, version = 20, entities = [
         TdsTracker::class,
         TdsEntity::class,
         TdsDomainEntity::class,
@@ -276,7 +275,14 @@ class MigrationsProvider(val context: Context) {
 
     val MIGRATION_18_TO_19: Migration = object : Migration(18, 19) {
         override fun migrate(database: SupportSQLiteDatabase) {
-            database.execSQL("CREATE TABLE IF NOT EXISTS $FIREPROOF_WEBSITES_TABLE_NAME (`domain` TEXT NOT NULL, PRIMARY KEY(`domain`))")
+            database.execSQL("DROP TABLE `UncaughtExceptionEntity`")
+            database.execSQL("CREATE TABLE IF NOT EXISTS `UncaughtExceptionEntity` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `exceptionSource` TEXT NOT NULL, `message` TEXT NOT NULL, `version` TEXT NOT NULL, `timestamp` INTEGER NOT NULL)")
+        }
+    }
+
+    val MIGRATION_19_TO_20: Migration = object : Migration(19, 20) {
+        override fun migrate(database: SupportSQLiteDatabase) {
+            database.execSQL("CREATE TABLE IF NOT EXISTS `fireproofWebsites` (`domain` TEXT NOT NULL, PRIMARY KEY(`domain`))")
         }
     }
 
@@ -299,7 +305,8 @@ class MigrationsProvider(val context: Context) {
             MIGRATION_15_TO_16,
             MIGRATION_16_TO_17,
             MIGRATION_17_TO_18,
-            MIGRATION_18_TO_19
+            MIGRATION_18_TO_19,
+            MIGRATION_19_TO_20
         )
 
     @Deprecated(

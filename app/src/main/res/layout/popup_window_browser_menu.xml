@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?><!--
-  ~ Copyright (c) 2018 DuckDuckGo
-  ~
+  ~ Copyright (c) 2020 DuckDuckGo
+  ~  
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
   ~ You may obtain a copy of the License at
@@ -18,13 +18,12 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@color/white">
+    android:background="@drawable/popup_menu_bg">
 
     <LinearLayout
         android:id="@+id/header"
         android:layout_width="0dp"
         android:layout_height="50dp"
-        android:background="@color/white"
         android:gravity="center"
         android:orientation="horizontal"
         app:layout_constraintTop_toTopOf="parent"
@@ -38,7 +37,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:contentDescription="@string/back"
-            android:src="@drawable/ic_arrow_back_24dp" />
+            android:src="@drawable/ic_back" />
 
         <ImageButton
             android:id="@+id/forwardPopupMenuItem"
@@ -47,7 +46,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:contentDescription="@string/forward"
-            android:src="@drawable/ic_arrow_forward_24dp" />
+            android:src="@drawable/ic_forward" />
 
         <ImageButton
             android:id="@+id/refreshPopupMenuItem"
@@ -56,7 +55,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:contentDescription="@string/refresh"
-            android:src="@drawable/ic_refresh_24dp" />
+            android:src="@drawable/ic_bottom_bar_refresh" />
 
     </LinearLayout>
 
@@ -115,16 +114,17 @@
                 style="@style/BrowserTextMenuItem"
                 android:text="@string/addToHome" />
 
-            <CheckBox
+            <androidx.appcompat.widget.AppCompatCheckBox
                 android:id="@+id/requestDesktopSiteCheckMenuItem"
-                style="@style/BrowserTextMenuItem"
+                style="@style/BrowserCheckBoxMenuItem"
+                android:theme="@style/PopUpMenuSwitchTheme"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="20dp"
                 android:button="@null"
                 android:drawableEnd="?android:attr/listChoiceIndicatorMultiple"
-                android:drawablePadding="30dp"
-                android:paddingStart="30dp"
+                android:drawablePadding="24dp"
+                android:paddingStart="24dp"
                 android:paddingEnd="0dp"
                 android:text="@string/requestDesktopSiteMenuTitle" />
 
