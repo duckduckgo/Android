@@ -84,7 +84,7 @@ class SQLCookieRemoverTest {
     }
 
     @Test
-    fun whenDatabasePathNotFoundThenPixelFiredAndExceptionRecorded() = runBlocking {
+    fun whenDatabasePathNotFoundThenPixelFired() = runBlocking {
         val mockDatabaseLocator = mock<DatabaseLocator> {
             on { getDatabasePath() } doReturn ""
         }
