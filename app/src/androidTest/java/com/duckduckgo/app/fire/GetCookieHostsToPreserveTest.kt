@@ -24,12 +24,12 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
-class GetHostsToPreserveTest {
+class GetCookieHostsToPreserveTest {
 
     private val context = InstrumentationRegistry.getInstrumentation().targetContext
     private val db = Room.inMemoryDatabaseBuilder(context, AppDatabase::class.java).build()
     private val fireproofWebsiteDao = db.fireproofWebsiteDao()
-    private val getHostsToPreserve = GetHostsToPreserve(fireproofWebsiteDao)
+    private val getHostsToPreserve = GetCookieHostsToPreserve(fireproofWebsiteDao)
 
     @Test
     fun whenSubDomainFireproofWebsiteThenExpectedListReturned() {

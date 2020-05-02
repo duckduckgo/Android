@@ -44,7 +44,7 @@ class SQLCookieRemoverTest {
     private val fireproofWebsiteDao = db.fireproofWebsiteDao()
     private val mockPixel = mock<Pixel>()
     private val webViewDatabaseLocator = WebViewDatabaseLocator(context)
-    private val getHostsToPreserve = GetHostsToPreserve(fireproofWebsiteDao)
+    private val getHostsToPreserve = GetCookieHostsToPreserve(fireproofWebsiteDao)
     private val mockUncaughtExceptionRepository = mock<UncaughtExceptionRepository>()
 
     @After
@@ -127,14 +127,14 @@ class SQLCookieRemoverTest {
 
     private fun givenSQLCookieRemover(
         databaseLocator: DatabaseLocator = webViewDatabaseLocator,
-        hostsToPreserve: GetHostsToPreserve = getHostsToPreserve,
+        cookieHostsToPreserve: GetCookieHostsToPreserve = getHostsToPreserve,
         pixel: Pixel = mockPixel,
         uncaughtExceptionRepository: UncaughtExceptionRepository = mockUncaughtExceptionRepository,
         dispatcherProvider: DispatcherProvider = DefaultDispatcherProvider()
     ): SQLCookieRemover {
         return SQLCookieRemover(
             databaseLocator,
-            hostsToPreserve,
+            cookieHostsToPreserve,
             pixel,
             uncaughtExceptionRepository,
             dispatcherProvider

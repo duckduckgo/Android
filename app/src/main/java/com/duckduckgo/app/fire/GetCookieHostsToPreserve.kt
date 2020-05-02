@@ -18,7 +18,7 @@ package com.duckduckgo.app.fire
 
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteDao
 
-class GetHostsToPreserve(private val fireproofWebsiteDao: FireproofWebsiteDao) {
+class GetCookieHostsToPreserve(private val fireproofWebsiteDao: FireproofWebsiteDao) {
     operator fun invoke(): List<String> {
         val fireproofWebsites = fireproofWebsiteDao.fireproofWebsitesSync()
         return fireproofWebsites.flatMap { entity ->

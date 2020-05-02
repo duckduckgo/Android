@@ -16,18 +16,15 @@
 
 package com.duckduckgo.app.fire
 
-import android.content.Context
 import android.database.DatabaseErrorHandler
 import android.database.sqlite.SQLiteDatabase
 import android.webkit.CookieManager
-import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteDao
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.exception.UncaughtExceptionRepository
 import com.duckduckgo.app.global.exception.UncaughtExceptionSource
 import com.duckduckgo.app.statistics.pixels.Pixel
 import kotlinx.coroutines.withContext
 import timber.log.Timber
-import java.io.File
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
@@ -49,7 +46,7 @@ class CookieManagerRemover(private val cookieManager: CookieManager) : CookieRem
 
 class SQLCookieRemover(
     private val webViewDatabaseLocator: DatabaseLocator,
-    private val getHostsToPreserve: GetHostsToPreserve,
+    private val getCookieHostsToPreserve: GetCookieHostsToPreserve,
     private val pixel: Pixel,
     private val uncaughtExceptionRepository: UncaughtExceptionRepository,
     private val dispatcherProvider: DispatcherProvider
@@ -59,7 +56,7 @@ class SQLCookieRemover(
         return withContext(dispatcherProvider.io()) {
             val databasePath: String = webViewDatabaseLocator.getDatabasePath()
             if (databasePath.isNotEmpty()) {
-                val excludedHosts = getHostsToPreserve()
+                val excludedHosts = getCookieHostsToPreserve()
                 return@withContext removeCookies(databasePath, excludedHosts)
             } else {
                 pixel.fire(Pixel.PixelName.COOKIE_DATABASE_NOT_FOUND)
