@@ -71,7 +71,7 @@ class SQLCookieRemover(
                 databasePath,
                 null,
                 SQLiteDatabase.OPEN_READWRITE,
-                DatabaseErrorHandler { Timber.d("COOKIE: onCorruption") })
+                DatabaseErrorHandler { Timber.e("COOKIE: onCorruption") })
         } catch (exception: Exception) {
             pixel.fire(Pixel.PixelName.COOKIE_DATABASE_OPEN_ERROR)
             uncaughtExceptionRepository.recordUncaughtException(exception, UncaughtExceptionSource.COOKIE_DATABASE)
