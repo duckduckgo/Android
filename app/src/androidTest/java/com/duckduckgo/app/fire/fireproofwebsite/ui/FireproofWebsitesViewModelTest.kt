@@ -26,6 +26,7 @@ import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteDao
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
 import com.duckduckgo.app.fire.fireproofwebsite.ui.FireproofWebsitesViewModel.Command.ConfirmDeleteFireproofWebsite
 import com.duckduckgo.app.global.db.AppDatabase
+import com.duckduckgo.app.statistics.pixels.Pixel
 import com.nhaarman.mockitokotlin2.atLeastOnce
 import com.nhaarman.mockitokotlin2.mock
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -63,13 +64,15 @@ class FireproofWebsitesViewModelTest {
 
     private val mockViewStateObserver: Observer<FireproofWebsitesViewModel.ViewState> = mock()
 
+    private val mockPixel: Pixel = mock()
+
     @Before
     fun before() {
         db = Room.inMemoryDatabaseBuilder(InstrumentationRegistry.getInstrumentation().targetContext, AppDatabase::class.java)
             .allowMainThreadQueries()
             .build()
         fireproofWebsiteDao = db.fireproofWebsiteDao()
-        viewModel = FireproofWebsitesViewModel(fireproofWebsiteDao, coroutineRule.testDispatcherProvider)
+        viewModel = FireproofWebsitesViewModel(fireproofWebsiteDao, coroutineRule.testDispatcherProvider, mockPixel)
         viewModel.command.observeForever(mockCommandObserver)
         viewModel.viewState.observeForever(mockViewStateObserver)
     }
@@ -99,6 +102,15 @@ class FireproofWebsitesViewModelTest {
 
         verify(mockViewStateObserver, atLeastOnce()).onChanged(viewStateCaptor.capture())
         assertTrue(viewStateCaptor.value.fireproofWebsitesEntities.isEmpty())
+    }
+
+    @Test
+    fun whenUserConfirmsToDeleteThenPixelSent() {
+        givenFireproofWebsiteDomain("domain.com")
+
+        viewModel.delete(FireproofWebsiteEntity("domain.com"))
+
+        verify(mockPixel).fire(Pixel.PixelName.FIREPROOF_WEBSITE_DELETED)
     }
 
     @Test
