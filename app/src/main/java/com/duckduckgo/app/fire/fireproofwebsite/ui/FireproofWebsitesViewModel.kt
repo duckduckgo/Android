@@ -22,11 +22,14 @@ import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
 import com.duckduckgo.app.fire.fireproofwebsite.ui.FireproofWebsitesViewModel.Command.ConfirmDeleteFireproofWebsite
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.SingleLiveEvent
+import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.FIREPROOF_WEBSITE_DELETED
 import kotlinx.coroutines.launch
 
 class FireproofWebsitesViewModel(
     private val dao: FireproofWebsiteDao,
-    private val dispatcherProvider: DispatcherProvider
+    private val dispatcherProvider: DispatcherProvider,
+    private val pixel: Pixel
 ) : ViewModel() {
 
     data class ViewState(
@@ -64,6 +67,7 @@ class FireproofWebsitesViewModel(
     }
 
     fun delete(entity: FireproofWebsiteEntity) {
+        pixel.fire(FIREPROOF_WEBSITE_DELETED)
         viewModelScope.launch(dispatcherProvider.io()) {
             dao.delete(entity)
         }

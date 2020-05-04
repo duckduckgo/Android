@@ -214,6 +214,7 @@ class ViewModelFactory @Inject constructor(
     private fun fireproofWebsiteViewModel() =
         FireproofWebsitesViewModel(
             dao = fireproofWebsiteDao,
-            dispatcherProvider = dispatcherProvider
+            dispatcherProvider = dispatcherProvider,
+            pixel = pixel
         )
 }
