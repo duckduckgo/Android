@@ -23,11 +23,13 @@ import com.duckduckgo.app.browser.BrowserViewModel.Command
 import com.duckduckgo.app.browser.BrowserViewModel.Command.DisplayMessage
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.fire.DataClearer
+import com.duckduckgo.app.fire.ForgetAllPixelSender
 import com.duckduckgo.app.global.rating.AppEnjoymentPromptEmitter
 import com.duckduckgo.app.global.rating.AppEnjoymentPromptOptions
 import com.duckduckgo.app.global.rating.AppEnjoymentUserEventRecorder
 import com.duckduckgo.app.global.rating.PromptCount
 import com.duckduckgo.app.privacy.ui.PrivacyDashboardActivity
+import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.nhaarman.mockitokotlin2.*
@@ -71,6 +73,9 @@ class BrowserViewModelTest {
     @Mock
     private lateinit var mockAppEnjoymentPromptEmitter: AppEnjoymentPromptEmitter
 
+    @Mock
+    private lateinit var forgetAllPixelSender: ForgetAllPixelSender
+
     private lateinit var testee: BrowserViewModel
 
     @Before
@@ -84,7 +89,8 @@ class BrowserViewModelTest {
             queryUrlConverter = mockOmnibarEntryConverter,
             dataClearer = mockAutomaticDataClearer,
             appEnjoymentPromptEmitter = mockAppEnjoymentPromptEmitter,
-            appEnjoymentUserEventRecorder = mockAppEnjoymentUserEventRecorder
+            appEnjoymentUserEventRecorder = mockAppEnjoymentUserEventRecorder,
+            pixelSender = forgetAllPixelSender
         )
         testee.command.observeForever(mockCommandObserver)
 
@@ -161,6 +167,21 @@ class BrowserViewModelTest {
     @Test
     fun whenViewStateCreatedThenWebViewContentShouldBeHidden() {
         assertTrue(testee.viewState.value!!.hideWebContent)
+    }
+
+    @Test
+    fun whenLaunchFireRequestedThenPixelSent() = runBlocking {
+        testee.onLaunchFireRequested()
+
+        verify(forgetAllPixelSender).forgetAllPressed(Pixel.PixelName.FORGET_ALL_PRESSED_BROWSING)
+    }
+
+    @Test
+    fun whenLaunchFireRequestedThenShowFireDialogTriggered() {
+        testee.onLaunchFireRequested()
+
+        verify(mockCommandObserver).onChanged(commandCaptor.capture())
+        assertEquals(Command.ShowFireDialog, commandCaptor.lastValue)
     }
 
     companion object {
