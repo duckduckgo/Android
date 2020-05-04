@@ -25,7 +25,7 @@ import com.duckduckgo.app.browser.rating.ui.AppEnjoymentDialogFragment
 import com.duckduckgo.app.browser.rating.ui.GiveFeedbackDialogFragment
 import com.duckduckgo.app.browser.rating.ui.RateAppDialogFragment
 import com.duckduckgo.app.fire.DataClearer
-import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteDao
+import com.duckduckgo.app.fire.ForgetAllPixelSender
 import com.duckduckgo.app.global.ApplicationClearDataState
 import com.duckduckgo.app.global.SingleLiveEvent
 import com.duckduckgo.app.global.rating.AppEnjoymentPromptEmitter
@@ -33,9 +33,7 @@ import com.duckduckgo.app.global.rating.AppEnjoymentPromptOptions
 import com.duckduckgo.app.global.rating.AppEnjoymentUserEventRecorder
 import com.duckduckgo.app.global.rating.PromptCount
 import com.duckduckgo.app.privacy.ui.PrivacyDashboardActivity.Companion.RELOAD_RESULT_CODE
-import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.FORGET_ALL_PRESSED_BROWSING
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.CLEAR_PERSONAL_DATA_FIREPROOF_WEBSITES
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
 import kotlinx.coroutines.CoroutineScope
@@ -50,8 +48,7 @@ class BrowserViewModel(
     private val dataClearer: DataClearer,
     private val appEnjoymentPromptEmitter: AppEnjoymentPromptEmitter,
     private val appEnjoymentUserEventRecorder: AppEnjoymentUserEventRecorder,
-    private val pixel: Pixel,
-    private val fireproofWebsiteDao: FireproofWebsiteDao
+    private val pixelSender: ForgetAllPixelSender
 ) : AppEnjoymentDialogFragment.Listener,
     RateAppDialogFragment.Listener,
     GiveFeedbackDialogFragment.Listener,
@@ -145,10 +142,7 @@ class BrowserViewModel(
 
     fun onLaunchFireRequested() {
         viewModelScope.launch(Dispatchers.IO) {
-            pixel.fire(
-                pixel = FORGET_ALL_PRESSED_BROWSING,
-                parameters = mapOf(CLEAR_PERSONAL_DATA_FIREPROOF_WEBSITES to fireproofWebsiteDao.fireproofWebsitesSync().isNotEmpty().toString())
-            )
+            pixelSender.forgetAllPressed(FORGET_ALL_PRESSED_BROWSING)
         }
         command.value = Command.ShowFireDialog
     }

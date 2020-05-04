@@ -20,23 +20,24 @@ import androidx.annotation.StringRes
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.duckduckgo.app.browser.BrowserViewModel
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
+import com.duckduckgo.app.fire.ForgetAllPixelSender
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteDao
 import com.duckduckgo.app.global.SingleLiveEvent
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.FORGET_ALL_PRESSED_TABSWITCHING
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.CLEAR_PERSONAL_DATA_FIREPROOF_WEBSITES
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class TabSwitcherViewModel(
     private val tabRepository: TabRepository,
     private val webViewSessionStorage: WebViewSessionStorage,
-    private val pixel: Pixel,
-    private val fireproofWebsiteDao: FireproofWebsiteDao
+    private val pixelSender: ForgetAllPixelSender
 ) : ViewModel() {
 
     var tabs: LiveData<List<TabEntity>> = tabRepository.liveTabs
@@ -70,11 +71,9 @@ class TabSwitcherViewModel(
 
     fun onLaunchFireRequested() {
         viewModelScope.launch(Dispatchers.IO) {
-            pixel.fire(
-                pixel = Pixel.PixelName.FORGET_ALL_PRESSED_TABSWITCHING,
-                parameters = mapOf(CLEAR_PERSONAL_DATA_FIREPROOF_WEBSITES to fireproofWebsiteDao.fireproofWebsitesSync().isNotEmpty().toString())
-            )
+            pixelSender.forgetAllPressed(FORGET_ALL_PRESSED_TABSWITCHING)
         }
         command.value = Command.ShowFireDialog
     }
 }
+
