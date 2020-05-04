@@ -22,11 +22,15 @@ import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.CLEAR_PERSONAL_
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
-class ForgetAllPixelSender(
+interface ForgetAllPixelSender {
+    suspend fun forgetAllPressed(origin: Pixel.PixelName)
+}
+
+class ForgetAllFireproofPixelSender(
     private val pixel: Pixel,
     private val fireproofWebsiteDao: FireproofWebsiteDao
-) {
-    suspend fun forgetAllPressed(origin: Pixel.PixelName) {
+) : ForgetAllPixelSender {
+    override suspend fun forgetAllPressed(origin: Pixel.PixelName) {
         withContext(Dispatchers.IO) {
             pixel.fire(
                 pixel = origin,
