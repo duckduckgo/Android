@@ -74,7 +74,10 @@ interface Pixel {
         PRIVACY_DASHBOARD_WHITELIST_REMOVE("mp_wlr"),
         PRIVACY_DASHBOARD_MANAGE_WHITELIST("mp_mw"),
         PRIVACY_DASHBOARD_REPORT_BROKEN_SITE("mp_rb"),
-        
+
+        BROWSER_MENU_WHITELIST_ADD("mb_wla"),
+        BROWSER_MENU_WHITELIST_REMOVE("mb_wlr"),
+
         HTTPS_NO_LOOKUP("m_https_nl"),
         HTTPS_LOCAL_UPGRADE("m_https_lu"),
         HTTPS_SERVICE_REQUEST_UPGRADE("m_https_sru"),

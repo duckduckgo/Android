@@ -51,7 +51,6 @@ import com.duckduckgo.app.cta.model.CtaId
 import com.duckduckgo.app.cta.model.DismissedCta
 import com.duckduckgo.app.cta.ui.*
 import com.duckduckgo.app.global.db.AppDatabase
-import com.duckduckgo.app.cta.ui.HomeTopPanelCta
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.model.SiteFactory
 import com.duckduckgo.app.onboarding.store.OnboardingStore
@@ -60,6 +59,7 @@ import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao
 import com.duckduckgo.app.privacy.db.UserWhitelistDao
 import com.duckduckgo.app.privacy.model.PrivacyPractices
 import com.duckduckgo.app.privacy.model.TestEntity
+import com.duckduckgo.app.privacy.model.UserWhitelistedDomain
 import com.duckduckgo.app.runBlocking
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.VariantManager
@@ -222,7 +222,7 @@ class BrowserTabViewModelTest {
         whenever(mockTabsRepository.retrieveSiteData(any())).thenReturn(MutableLiveData())
         whenever(mockPrivacyPractices.privacyPracticesFor(any())).thenReturn(PrivacyPractices.UNKNOWN)
         whenever(mockAppInstallStore.installTimestamp).thenReturn(System.currentTimeMillis() - TimeUnit.DAYS.toMillis(1))
-        whenever(mockUserWhitelistDao.contains(anyString())).thenReturn(true)
+        whenever(mockUserWhitelistDao.contains(anyString())).thenReturn(false)
 
         testee = BrowserTabViewModel(
             statisticsUpdater = mockStatisticsUpdater,
@@ -1062,11 +1062,23 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenUserSelectsToShareLinkThenShareLinkCommandSent() {
-        loadUrl("foo.com")
-        testee.onShareSelected()
-        val command = captureCommands().value as Command.ShareLink
-        assertEquals("foo.com", command.url)
+    fun whenUserTogglesNonWhitelistedSiteThenSiteAddedToWhitelistAndPixelSentAndPageRefreshed() = coroutineRule.runBlocking {
+        whenever(mockUserWhitelistDao.contains("www.example.com")).thenReturn(false)
+        loadUrl("http://www.example.com/home.html")
+        testee.onWhitelistSelected()
+        verify(mockUserWhitelistDao).insert(UserWhitelistedDomain("www.example.com"))
+        verify(mockPixel).fire(Pixel.PixelName.BROWSER_MENU_WHITELIST_ADD)
+        verify(mockCommandObserver).onChanged(Command.Refresh)
+    }
+
+    @Test
+    fun whenUserTogglesWhitelsitedSiteThenSiteRemovedFromWhitelistAndPixelSentAndPageRefreshed() = coroutineRule.runBlocking  {
+        whenever(mockUserWhitelistDao.contains("www.example.com")).thenReturn(true)
+        loadUrl("http://www.example.com/home.html")
+        testee.onWhitelistSelected()
+        verify(mockUserWhitelistDao).delete(UserWhitelistedDomain("www.example.com"))
+        verify(mockPixel).fire(Pixel.PixelName.BROWSER_MENU_WHITELIST_REMOVE)
+        verify(mockCommandObserver).onChanged(Command.Refresh)
     }
 
     @Test
@@ -1082,6 +1094,14 @@ class BrowserTabViewModelTest {
         testee.onBrokenSiteSelected()
         val command = captureCommands().value as Command.BrokenSiteFeedback
         assertEquals("", command.data.url)
+    }
+
+    @Test
+    fun whenUserSelectsToShareLinkThenShareLinkCommandSent() {
+        loadUrl("foo.com")
+        testee.onShareSelected()
+        val command = captureCommands().value as Command.ShareLink
+        assertEquals("foo.com", command.url)
     }
 
     @Test

@@ -23,6 +23,7 @@ import androidx.lifecycle.ViewModel
 import com.duckduckgo.app.global.DefaultDispatcherProvider
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.SingleLiveEvent
+import com.duckduckgo.app.global.UriString
 import com.duckduckgo.app.privacy.db.UserWhitelistDao
 import com.duckduckgo.app.privacy.model.UserWhitelistedDomain
 import com.duckduckgo.app.privacy.ui.WhitelistViewModel.Command.*
@@ -32,7 +33,6 @@ import kotlinx.coroutines.launch
 class WhitelistViewModel(
     private val dao: UserWhitelistDao,
     private val dispatchers: DispatcherProvider = DefaultDispatcherProvider()
-
 ) : ViewModel() {
 
     data class ViewState(
@@ -44,6 +44,7 @@ class WhitelistViewModel(
         object ShowAdd : Command()
         class ShowEdit(val entry: UserWhitelistedDomain) : Command()
         class ConfirmDelete(val entry: UserWhitelistedDomain) : Command()
+        object ShowWhitelistFormatError : Command()
     }
 
     val viewState: MutableLiveData<ViewState> = MutableLiveData()
@@ -74,6 +75,10 @@ class WhitelistViewModel(
     }
 
     fun onEntryAdded(entry: UserWhitelistedDomain) {
+        if (!UriString.isValidDomain(entry.domain)) {
+            command.value = ShowWhitelistFormatError
+            return
+        }
         GlobalScope.launch(dispatchers.io()) {
             dao.insert(entry)
         }
@@ -84,6 +89,10 @@ class WhitelistViewModel(
     }
 
     fun onEntryEdited(old: UserWhitelistedDomain, new: UserWhitelistedDomain) {
+        if (!UriString.isValidDomain(new.domain)) {
+            command.value = ShowWhitelistFormatError
+            return
+        }
         onEntryDeleted(old)
         onEntryAdded(new)
     }

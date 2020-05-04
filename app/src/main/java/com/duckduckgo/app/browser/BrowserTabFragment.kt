@@ -1283,6 +1283,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
                 }
                 onMenuItemClicked(view.addBookmarksPopupMenuItem) { launch { viewModel.onBookmarkAddRequested() } }
                 onMenuItemClicked(view.findInPageMenuItem) { viewModel.onFindInPageSelected() }
+                onMenuItemClicked(view.whitelistPopupMenuItem) { viewModel.onWhitelistSelected() }
                 onMenuItemClicked(view.brokenSitePopupMenuItem) { viewModel.onBrokenSiteSelected() }
                 onMenuItemClicked(view.settingsPopupMenuItem) { browserActivity?.launchSettings() }
                 onMenuItemClicked(view.requestDesktopSiteCheckMenuItem) { viewModel.onDesktopSiteModeToggled(view.requestDesktopSiteCheckMenuItem.isChecked) }
@@ -1317,6 +1318,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
                 }
                 onMenuItemClicked(view.addBookmarksPopupMenuItem) { launch { viewModel.onBookmarkAddRequested() } }
                 onMenuItemClicked(view.findInPageMenuItem) { viewModel.onFindInPageSelected() }
+                onMenuItemClicked(view.whitelistPopupMenuItem) { viewModel.onWhitelistSelected() }
                 onMenuItemClicked(view.brokenSitePopupMenuItem) { viewModel.onBrokenSiteSelected() }
                 onMenuItemClicked(view.settingsPopupMenuItem) { browserActivity?.launchSettings() }
                 onMenuItemClicked(view.requestDesktopSiteCheckMenuItem) { viewModel.onDesktopSiteModeToggled(view.requestDesktopSiteCheckMenuItem.isChecked) }
@@ -1613,6 +1615,8 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
                 newTabPopupMenuItem.isEnabled = browserShowing
                 addBookmarksPopupMenuItem?.isEnabled = viewState.canAddBookmarks
                 sharePageMenuItem?.isEnabled = viewState.canSharePage
+                whitelistPopupMenuItem?.isEnabled = viewState.canWhitelist
+                whitelistPopupMenuItem?.text = getText(if (viewState.isWhitelisted) R.string.whitelistRemove else R.string.whitelistAdd)
                 brokenSitePopupMenuItem?.isEnabled = viewState.canReportSite
                 requestDesktopSiteCheckMenuItem?.isEnabled = viewState.canChangeBrowsingMode
 

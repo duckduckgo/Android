@@ -28,6 +28,7 @@ import android.webkit.WebChromeClient
 import android.webkit.WebView
 import androidx.annotation.AnyThread
 import androidx.annotation.VisibleForTesting
+import androidx.annotation.WorkerThread
 import androidx.core.net.toUri
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -80,7 +81,7 @@ import com.jakewharton.rxrelay2.PublishRelay
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
-import kotlinx.android.synthetic.main.include_omnibar_toolbar.*
+import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -135,6 +136,8 @@ class BrowserTabViewModel(
         val canAddBookmarks: Boolean = false,
         val canGoBack: Boolean = false,
         val canGoForward: Boolean = false,
+        val canWhitelist: Boolean = false,
+        val isWhitelisted: Boolean = false,
         val canReportSite: Boolean = false,
         val addToHomeEnabled: Boolean = false,
         val addToHomeVisible: Boolean = false
@@ -493,7 +496,10 @@ class BrowserTabViewModel(
         val currentOmnibarViewState = currentOmnibarViewState()
         omnibarViewState.value = currentOmnibarViewState.copy(omnibarText = omnibarTextForUrl(url), shouldMoveCaretToEnd = false)
         val currentBrowserViewState = currentBrowserViewState()
+        val domain = site?.domain
+        val canWhitelist = domain != null
         findInPageViewState.value = FindInPageViewState(visible = false, canFindInPage = true)
+
         browserViewState.value = currentBrowserViewState.copy(
             browserShowing = true,
             canAddBookmarks = true,
@@ -502,6 +508,8 @@ class BrowserTabViewModel(
             canSharePage = true,
             showPrivacyGrade = true,
             canReportSite = true,
+            canWhitelist = canWhitelist,
+            isWhitelisted = false,
             showSearchIcon = false,
             showClearButton = false
         )
@@ -513,7 +521,7 @@ class BrowserTabViewModel(
         }
 
         updateLoadingStatePrivacy()
-
+        domain?.let { updateWhitelistedState(domain) }
         registerSiteVisit()
     }
 
@@ -522,6 +530,14 @@ class BrowserTabViewModel(
             site?.domain?.let {
                 loadingViewState.postValue(currentLoadingViewState().copy(privacyOn = !userWhitelistDao.contains(it)))
             }
+        }
+    }
+
+    private fun updateWhitelistedState(domain: String) {
+        viewModelScope.launch(dispatchers.io()) {
+            browserViewState.postValue(
+                currentBrowserViewState().copy(isWhitelisted = userWhitelistDao.contains(domain))
+            )
         }
     }
 
@@ -729,6 +745,32 @@ class BrowserTabViewModel(
 
     fun onBrokenSiteSelected() {
         command.value = BrokenSiteFeedback(BrokenSiteData.fromSite(site))
+    }
+
+    fun onWhitelistSelected() {
+        val domain = site?.domain ?: return
+        GlobalScope.launch(dispatchers.io()) {
+            if (userWhitelistDao.contains(domain)) {
+                removeFromWhitelist(domain)
+            } else {
+                addToWhitelist(domain)
+            }
+            command.postValue(Refresh)
+        }
+    }
+
+    @WorkerThread
+    private fun addToWhitelist(domain: String) {
+        pixel.fire(PixelName.BROWSER_MENU_WHITELIST_ADD)
+        userWhitelistDao.insert(domain)
+        browserViewState.postValue(currentBrowserViewState().copy(isWhitelisted = true))
+    }
+
+    @WorkerThread
+    private fun removeFromWhitelist(domain: String) {
+        pixel.fire(PixelName.BROWSER_MENU_WHITELIST_REMOVE)
+        userWhitelistDao.delete(domain)
+        browserViewState.postValue(currentBrowserViewState().copy(isWhitelisted = false))
     }
 
     fun onUserSelectedToEditQuery(query: String) {

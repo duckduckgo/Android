@@ -17,31 +17,103 @@
 package com.duckduckgo.app.brokensite
 
 import com.duckduckgo.app.global.model.Site
-import com.nhaarman.mockitokotlin2.mock
-import com.nhaarman.mockitokotlin2.whenever
-import org.junit.Assert.assertEquals
+import com.duckduckgo.app.global.model.SiteMonitor
+import com.duckduckgo.app.surrogates.SurrogateResponse
+import com.duckduckgo.app.trackerdetection.model.TrackingEvent
+import org.junit.Assert.*
 import org.junit.Test
 
 class BrokenSiteDataTest {
 
     @Test
-    fun whenSiteIsNotNullThenBrokenSiteDataContainsUrl() {
-        val site = buildSite("foo.com")
-        val data = BrokenSiteData.fromSite(site)
-        assertEquals("foo.com", data.url)
+    fun whenSiteIsNullThenDataIsEmptyAndUpgradedIsFalse() {
+        val data = BrokenSiteData.fromSite(null)
+        assertTrue(data.url.isEmpty())
+        assertTrue(data.blockedTrackers.isEmpty())
+        assertTrue(data.surrogates.isEmpty())
+        assertFalse(data.upgradedToHttps)
     }
 
     @Test
-    fun whenSiteIsNullThenBrokenSiteDataContainsBlankUrl() {
-        val data = BrokenSiteData.fromSite(null)
-        assertEquals("", data.url)
+    fun whenSiteExistsThenDataContainsUrl() {
+        val site = buildSite(SITE_URL)
+        val data = BrokenSiteData.fromSite(site)
+        assertEquals(SITE_URL, data.url)
     }
 
-    private fun buildSite(
-        url: String
-    ): Site {
-        val site: Site = mock()
-        whenever(site.url).thenReturn(url)
-        return site
+    @Test
+    fun whenSiteUpgradedThenHttpsUpgradedIsTrue() {
+        val site = buildSite(SITE_URL, httpsUpgraded = true)
+        val data = BrokenSiteData.fromSite(site)
+        assertTrue(data.upgradedToHttps)
+    }
+
+    @Test
+    fun whenSiteNotUpgradedThenHttpsUpgradedIsFalse() {
+        val site = buildSite(SITE_URL, httpsUpgraded = false)
+        val data = BrokenSiteData.fromSite(site)
+        assertFalse(data.upgradedToHttps)
+    }
+
+    @Test
+    fun whenSiteHasNoTrackersThenBlockedTrackersIsEmpty() {
+        val site = buildSite(SITE_URL)
+        val data = BrokenSiteData.fromSite(site)
+        assertTrue(data.blockedTrackers.isEmpty())
+    }
+
+    @Test
+    fun whenSiteHasBlockedTrackersThenBlockedTrackersExist() {
+        val site = buildSite(SITE_URL)
+        val event = TrackingEvent("http://www.example.com", "http://www.tracker.com/tracker.js", emptyList(), null, false)
+        val anotherEvent = TrackingEvent("http://www.example.com/test", "http://www.anothertracker.com/tracker.js", emptyList(), null, false)
+        site.trackerDetected(event)
+        site.trackerDetected(anotherEvent)
+        assertEquals("www.tracker.com,www.anothertracker.com", BrokenSiteData.fromSite(site).blockedTrackers)
+    }
+
+    @Test
+    fun whenSiteHadSameHostBlockedTrackersThenOnlyUniqueTrackersIncludedInData() {
+        val site = buildSite(SITE_URL)
+        val event = TrackingEvent("http://www.example.com", "http://www.tracker.com/tracker.js", emptyList(), null, false)
+        val anotherEvent = TrackingEvent("http://www.example.com/test", "http://www.tracker.com/tracker2.js", emptyList(), null, false)
+        site.trackerDetected(event)
+        site.trackerDetected(anotherEvent)
+        assertEquals("www.tracker.com", BrokenSiteData.fromSite(site).blockedTrackers)
+    }
+
+    @Test
+    fun whenSiteHasNoSurrogatesThenSurrogatesIsEmpty() {
+        val site = buildSite(SITE_URL)
+        val data = BrokenSiteData.fromSite(site)
+        assertTrue(data.surrogates.isEmpty())
+    }
+
+    @Test
+    fun whenSiteHasSurrogatesThenSurrogatesExist() {
+        val surrogate = SurrogateResponse(true, "surrogate.com/test.js", "", "")
+        val anotherSurrogate = SurrogateResponse(true, "anothersurrogate.com/test.js", "", "")
+        val site = buildSite(SITE_URL)
+        site.surrogateDetected(surrogate)
+        site.surrogateDetected(anotherSurrogate)
+        assertEquals("surrogate.com,anothersurrogate.com", BrokenSiteData.fromSite(site).surrogates)
+    }
+
+    @Test
+    fun whenSiteHasSameHostSurrogatesThenOnlyUniqueSurrogateIncludedInData() {
+        val surrogate = SurrogateResponse(true, "surrogate.com/test.js", "", "")
+        val anotherSurrogate = SurrogateResponse(true, "surrogate.com/test2.js", "", "")
+        val site = buildSite(SITE_URL)
+        site.surrogateDetected(surrogate)
+        site.surrogateDetected(anotherSurrogate)
+        assertEquals("surrogate.com", BrokenSiteData.fromSite(site).surrogates)
+    }
+
+    private fun buildSite(url: String, httpsUpgraded: Boolean = false): Site {
+        return SiteMonitor(url, "", upgradedHttps = httpsUpgraded)
+    }
+
+    companion object {
+        private const val SITE_URL = "foo.com"
     }
 }

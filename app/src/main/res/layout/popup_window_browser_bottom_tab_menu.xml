@@ -77,6 +77,11 @@
                 android:text="@string/requestDesktopSiteMenuTitle" />
 
             <TextView
+                android:id="@+id/whitelistPopupMenuItem"
+                style="@style/BrowserTextMenuItem"
+                android:text="@string/whitelistAdd" />
+
+            <TextView
                 android:id="@+id/brokenSitePopupMenuItem"
                 style="@style/BrowserTextMenuItem"
                 android:text="@string/brokenSiteReportBrokenSiteMenuItem" />
