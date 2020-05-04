@@ -73,7 +73,7 @@ class BrokenSiteDataTest {
     }
 
     @Test
-    fun whenSiteHadSameHostBlockedTrackersThenOnlyUniqueTrackersIncludedInData() {
+    fun whenSiteHasSameHostBlockedTrackersThenOnlyUniqueTrackersIncludedInData() {
         val site = buildSite(SITE_URL)
         val event = TrackingEvent("http://www.example.com", "http://www.tracker.com/tracker.js", emptyList(), null, false)
         val anotherEvent = TrackingEvent("http://www.example.com/test", "http://www.tracker.com/tracker2.js", emptyList(), null, false)

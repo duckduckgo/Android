@@ -38,7 +38,6 @@ import kotlinx.android.synthetic.main.activity_whitelist.*
 import kotlinx.android.synthetic.main.edit_whitelist.*
 import kotlinx.android.synthetic.main.include_toolbar.*
 import kotlinx.android.synthetic.main.view_whitelist_entry.view.*
-import org.jetbrains.anko.toast
 
 class WhitelistActivity : DuckDuckGoActivity() {
 
