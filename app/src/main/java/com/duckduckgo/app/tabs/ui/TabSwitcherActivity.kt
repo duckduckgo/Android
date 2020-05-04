@@ -36,8 +36,7 @@ import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command
-import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.Close
-import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.DisplayMessage
+import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -85,7 +84,7 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
         setContentView(R.layout.activity_tab_switcher)
         extractIntentExtras()
         configureViewReferences()
-       setupToolbar(toolbar)
+        setupToolbar(toolbar)
         configureRecycler()
         configureObservers()
     }
@@ -145,6 +144,7 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
         when (command) {
             is DisplayMessage -> applicationContext?.longToast(command.messageId)
             is Close -> finishAfterTransition()
+            is ShowFireDialog -> showFireDialog()
         }
     }
 
@@ -155,7 +155,7 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
-            R.id.fire -> onFire()
+            R.id.fire -> viewModel.onLaunchFireRequested()
             R.id.newTab, R.id.newTabOverflow -> onNewTabRequested()
             R.id.closeAllTabs -> closeAllTabs()
             R.id.settings -> showSettings()
@@ -163,8 +163,7 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
         return super.onOptionsItemSelected(item)
     }
 
-    private fun onFire() {
-        pixel.fire(Pixel.PixelName.FORGET_ALL_PRESSED_TABSWITCHING)
+    private fun showFireDialog() {
         val dialog = FireDialog(context = this, clearPersonalDataAction = clearPersonalDataAction)
         dialog.clearComplete = { viewModel.onClearComplete() }
         dialog.show()

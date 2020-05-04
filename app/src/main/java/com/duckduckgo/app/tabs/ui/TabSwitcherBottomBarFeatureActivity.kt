@@ -35,8 +35,7 @@ import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command
-import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.Close
-import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.DisplayMessage
+import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.*
 import kotlinx.android.synthetic.main.activity_tab_switcher_bottom_bar_feature.tabsRecycler
 import kotlinx.android.synthetic.main.fragment_browser_tab.bottomNavigationBar
 import kotlinx.android.synthetic.main.layout_tabs_bottom_navigation_bar.bottomBarFireItem
@@ -148,13 +147,14 @@ class TabSwitcherBottomBarFeatureActivity : DuckDuckGoActivity(), TabSwitcherLis
         when (command) {
             is DisplayMessage -> applicationContext?.longToast(command.messageId)
             is Close -> finishAfterTransition()
+            is ShowFireDialog -> showFireDialog()
         }
     }
 
     private fun configureBottomBar() {
         bottomNavigationBar.apply {
             onItemClicked(bottomBarNewTabItem) { onNewTabRequested() }
-            onItemClicked(bottomBarFireItem) { onFire() }
+            onItemClicked(bottomBarFireItem) { viewModel.onLaunchFireRequested() }
             onItemClicked(bottomBarOverflowItem) { popupMenu.show(rootView, bottomNavigationBar) }
         }
     }
@@ -175,7 +175,7 @@ class TabSwitcherBottomBarFeatureActivity : DuckDuckGoActivity(), TabSwitcherLis
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
-            R.id.fire -> onFire()
+            R.id.fire -> viewModel.onLaunchFireRequested()
             R.id.newTab, R.id.newTabOverflow -> onNewTabRequested()
             R.id.closeAllTabs -> closeAllTabs()
             R.id.settings -> showSettings()
@@ -183,8 +183,7 @@ class TabSwitcherBottomBarFeatureActivity : DuckDuckGoActivity(), TabSwitcherLis
         return super.onOptionsItemSelected(item)
     }
 
-    private fun onFire() {
-        pixel.fire(Pixel.PixelName.FORGET_ALL_PRESSED_TABSWITCHING)
+    private fun showFireDialog() {
         val dialog = FireDialog(context = this, clearPersonalDataAction = clearPersonalDataAction)
         dialog.clearComplete = { viewModel.onClearComplete() }
         dialog.show()

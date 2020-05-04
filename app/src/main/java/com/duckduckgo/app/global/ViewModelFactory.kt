@@ -128,7 +128,9 @@ class ViewModelFactory @Inject constructor(
                 isAssignableFrom(OnboardingViewModel::class.java) -> onboardingViewModel()
                 isAssignableFrom(BrowserViewModel::class.java) -> browserViewModel()
                 isAssignableFrom(BrowserTabViewModel::class.java) -> browserTabViewModel()
-                isAssignableFrom(TabSwitcherViewModel::class.java) -> TabSwitcherViewModel(tabRepository, webViewSessionStorage)
+                isAssignableFrom(TabSwitcherViewModel::class.java) -> {
+                    TabSwitcherViewModel(tabRepository, webViewSessionStorage, pixel, fireproofWebsiteDao)
+                }
                 isAssignableFrom(PrivacyDashboardViewModel::class.java) -> privacyDashboardViewModel()
                 isAssignableFrom(ScorecardViewModel::class.java) -> ScorecardViewModel(privacySettingsStore)
                 isAssignableFrom(TrackerNetworksViewModel::class.java) -> TrackerNetworksViewModel()
