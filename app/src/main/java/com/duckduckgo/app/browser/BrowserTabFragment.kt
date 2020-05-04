@@ -102,13 +102,25 @@ import kotlinx.android.synthetic.main.include_dax_dialog_cta.*
 import kotlinx.android.synthetic.main.include_find_in_page.*
 import kotlinx.android.synthetic.main.include_new_browser_tab.*
 import kotlinx.android.synthetic.main.include_omnibar_toolbar.*
+import kotlinx.android.synthetic.main.include_omnibar_toolbar.omnibarTextInput
 import kotlinx.android.synthetic.main.include_omnibar_toolbar.view.browserMenu
 import kotlinx.android.synthetic.main.include_omnibar_toolbar.view.fireIconMenu
 import kotlinx.android.synthetic.main.include_omnibar_toolbar.view.privacyGradeButton
 import kotlinx.android.synthetic.main.include_omnibar_toolbar.view.tabsMenu
 import kotlinx.android.synthetic.main.layout_browser_bottom_navigation_bar.*
-import kotlinx.android.synthetic.main.popup_window_browser_bottom_tab_menu.view.sharePopupMenuItem
+import kotlinx.android.synthetic.main.popup_window_browser_bottom_tab_menu.view.*
 import kotlinx.android.synthetic.main.popup_window_browser_menu.view.*
+import kotlinx.android.synthetic.main.popup_window_browser_menu.view.addBookmarksPopupMenuItem
+import kotlinx.android.synthetic.main.popup_window_browser_menu.view.addToHome
+import kotlinx.android.synthetic.main.popup_window_browser_menu.view.backPopupMenuItem
+import kotlinx.android.synthetic.main.popup_window_browser_menu.view.brokenSitePopupMenuItem
+import kotlinx.android.synthetic.main.popup_window_browser_menu.view.findInPageMenuItem
+import kotlinx.android.synthetic.main.popup_window_browser_menu.view.forwardPopupMenuItem
+import kotlinx.android.synthetic.main.popup_window_browser_menu.view.newTabPopupMenuItem
+import kotlinx.android.synthetic.main.popup_window_browser_menu.view.refreshPopupMenuItem
+import kotlinx.android.synthetic.main.popup_window_browser_menu.view.requestDesktopSiteCheckMenuItem
+import kotlinx.android.synthetic.main.popup_window_browser_menu.view.settingsPopupMenuItem
+import kotlinx.android.synthetic.main.popup_window_browser_menu.view.whitelistPopupMenuItem
 import kotlinx.coroutines.*
 import org.jetbrains.anko.longToast
 import org.jetbrains.anko.share
@@ -1378,7 +1390,9 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
                 bottomNavigationBar.animateBarVisibility(isVisible = true)
             } else {
                 bottomNavigationBar.postDelayed(KEYBOARD_DELAY) {
-                    bottomNavigationBar.show()
+                    if (bottomNavigationBar != null) {
+                        bottomNavigationBar.show()
+                    }
                 }
             }
         }
