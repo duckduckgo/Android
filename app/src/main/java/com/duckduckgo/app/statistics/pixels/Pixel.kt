@@ -174,7 +174,9 @@ interface Pixel {
 
         COOKIE_DATABASE_NOT_FOUND("m_cdb_nf"),
         COOKIE_DATABASE_OPEN_ERROR("m_cdb_oe"),
-        COOKIE_DATABASE_DELETE_ERROR("m_cdb_de")
+        COOKIE_DATABASE_DELETE_ERROR("m_cdb_de"),
+        FIREPROOF_WEBSITE_ADDED("m_fw_a"),
+        FIREPROOF_WEBSITE_UNDO("m_fw_u")
     }
 
     object PixelParameter {
