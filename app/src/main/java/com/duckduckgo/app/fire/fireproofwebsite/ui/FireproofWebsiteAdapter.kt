@@ -30,18 +30,23 @@ import com.duckduckgo.app.fire.fireproofwebsite.data.website
 import com.duckduckgo.app.global.faviconLocation
 import com.duckduckgo.app.global.image.GlideApp
 import kotlinx.android.synthetic.main.view_fireproof_website_description.view.*
+import kotlinx.android.synthetic.main.view_fireproof_website_empty_hint.view.*
 import kotlinx.android.synthetic.main.view_fireproof_website_entry.view.*
 import timber.log.Timber
-import java.lang.IllegalArgumentException
 
 class FireproofWebsiteAdapter(
     private val viewModel: FireproofWebsitesViewModel,
+    @StringRes private val emptyListHintStringRes: Int,
     @StringRes private val listDescriptionStringRes: Int
 ) : RecyclerView.Adapter<FireproofWebSiteViewHolder>() {
 
-    companion object Type {
+    companion object {
         const val FIREPROOF_WEBSITE_TYPE = 0
         const val DESCRIPTION_TYPE = 1
+        const val EMPTY_STATE_TYPE = 2
+
+        const val DESCRIPTION_ITEM_SIZE = 1
+        const val EMPTY_HINT_ITEM_SIZE = 1
     }
 
     var fireproofWebsites: List<FireproofWebsiteEntity> = emptyList()
@@ -57,6 +62,10 @@ class FireproofWebsiteAdapter(
                 val view = inflater.inflate(R.layout.view_fireproof_website_entry, parent, false)
                 FireproofWebSiteViewHolder.FireproofWebsiteItemViewHolder(view, viewModel)
             }
+            EMPTY_STATE_TYPE -> {
+                val view = inflater.inflate(R.layout.view_fireproof_website_empty_hint, parent, false)
+                FireproofWebSiteViewHolder.FireproofWebsiteEmptyHintViewHolder(view)
+            }
             DESCRIPTION_TYPE -> {
                 val view = inflater.inflate(R.layout.view_fireproof_website_description, parent, false)
                 FireproofWebSiteViewHolder.FireproofWebsiteDescriptionViewHolder(view)
@@ -66,10 +75,10 @@ class FireproofWebsiteAdapter(
     }
 
     override fun getItemViewType(position: Int): Int {
-        return if ((fireproofWebsites.size - 1) < position) {
+        return if (position > (getItemsSize() - 1)) {
             DESCRIPTION_TYPE
         } else {
-            FIREPROOF_WEBSITE_TYPE
+            getListItemType()
         }
     }
 
@@ -77,11 +86,26 @@ class FireproofWebsiteAdapter(
         when (holder) {
             is FireproofWebSiteViewHolder.FireproofWebsiteDescriptionViewHolder -> holder.bind(listDescriptionStringRes)
             is FireproofWebSiteViewHolder.FireproofWebsiteItemViewHolder -> holder.bind(fireproofWebsites[position])
+            is FireproofWebSiteViewHolder.FireproofWebsiteEmptyHintViewHolder -> holder.bind(emptyListHintStringRes)
         }
     }
 
     override fun getItemCount(): Int {
-        return fireproofWebsites.size + 1
+        return getItemsSize() + DESCRIPTION_ITEM_SIZE
+    }
+
+    private fun getItemsSize() = if (fireproofWebsites.isEmpty()) {
+        EMPTY_HINT_ITEM_SIZE
+    } else {
+        fireproofWebsites.size
+    }
+
+    private fun getListItemType(): Int {
+        return if (fireproofWebsites.isEmpty()) {
+            EMPTY_STATE_TYPE
+        } else {
+            FIREPROOF_WEBSITE_TYPE
+        }
     }
 }
 
@@ -90,6 +114,12 @@ sealed class FireproofWebSiteViewHolder(itemView: View) : RecyclerView.ViewHolde
     class FireproofWebsiteDescriptionViewHolder(itemView: View) : FireproofWebSiteViewHolder(itemView) {
         fun bind(@StringRes text: Int) = with(itemView) {
             fireproofWebsiteDescription.setText(text)
+        }
+    }
+
+    class FireproofWebsiteEmptyHintViewHolder(itemView: View) : FireproofWebSiteViewHolder(itemView) {
+        fun bind(@StringRes text: Int) = with(itemView) {
+            fireproofWebsiteEmptyHint.setText(text)
         }
     }
 
