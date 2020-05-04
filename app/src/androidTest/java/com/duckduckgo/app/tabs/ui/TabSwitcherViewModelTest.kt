@@ -23,6 +23,8 @@ import androidx.lifecycle.Observer
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.session.WebViewSessionInMemoryStorage
+import com.duckduckgo.app.fire.ForgetAllPixelSender
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.FORGET_ALL_PRESSED_TABSWITCHING
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command
@@ -57,6 +59,9 @@ class TabSwitcherViewModelTest {
     @Mock
     private lateinit var mockTabRepository: TabRepository
 
+    @Mock
+    private lateinit var forgetAllPixelSender: ForgetAllPixelSender
+
     private lateinit var testee: TabSwitcherViewModel
 
     @Before
@@ -64,7 +69,7 @@ class TabSwitcherViewModelTest {
         MockitoAnnotations.initMocks(this)
         runBlocking {
             whenever(mockTabRepository.add()).thenReturn("TAB_ID")
-            testee = TabSwitcherViewModel(mockTabRepository, WebViewSessionInMemoryStorage())
+            testee = TabSwitcherViewModel(mockTabRepository, WebViewSessionInMemoryStorage(), forgetAllPixelSender)
             testee.command.observeForever(mockCommandObserver)
         }
     }
@@ -100,4 +105,18 @@ class TabSwitcherViewModelTest {
         assertEquals(Command.Close, commandCaptor.allValues[1])
     }
 
+    @Test
+    fun whenLaunchFireRequestedThenPixelSent() = runBlocking {
+        testee.onLaunchFireRequested()
+
+        verify(forgetAllPixelSender).forgetAllPressed(FORGET_ALL_PRESSED_TABSWITCHING)
+    }
+
+    @Test
+    fun whenLaunchFireRequestedThenShowFireDialogTriggered() {
+        testee.onLaunchFireRequested()
+
+        verify(mockCommandObserver).onChanged(commandCaptor.capture())
+        assertEquals(Command.ShowFireDialog, commandCaptor.lastValue)
+    }
 }
