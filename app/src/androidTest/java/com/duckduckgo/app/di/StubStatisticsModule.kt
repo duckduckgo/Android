@@ -17,7 +17,6 @@
 package com.duckduckgo.app.di
 
 import android.content.Context
-import com.duckduckgo.app.fire.ForgetAllPixelSender
 import com.duckduckgo.app.global.device.ContextDeviceInfo
 import com.duckduckgo.app.global.device.DeviceInfo
 import com.duckduckgo.app.referral.AppInstallationReferrerStateListener
@@ -83,14 +82,5 @@ class StubStatisticsModule {
         appReferrerStateListener: AppInstallationReferrerStateListener
     ): AtbInitializer {
         return AtbInitializer(statisticsDataStore, statisticsUpdater, appReferrerStateListener)
-    }
-
-    @Provides
-    fun forgetAllPixelSender(): ForgetAllPixelSender {
-        return object : ForgetAllPixelSender {
-            override suspend fun forgetAllPressed(origin: Pixel.PixelName) {
-
-            }
-        }
     }
 }

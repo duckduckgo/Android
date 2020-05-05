@@ -252,7 +252,6 @@ class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope() {
             is Command.ShowAppRatingPrompt -> showAppEnjoymentPrompt(RateAppDialogFragment.create(command.promptCount, viewModel))
             is Command.ShowAppFeedbackPrompt -> showAppEnjoymentPrompt(GiveFeedbackDialogFragment.create(command.promptCount, viewModel))
             is Command.LaunchFeedbackView -> startActivity(FeedbackActivity.intent(this))
-            is Command.ShowFireDialog -> showFireDialog()
         }
     }
 
@@ -266,7 +265,8 @@ class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope() {
         }
     }
 
-    private fun showFireDialog() {
+    fun launchFire() {
+        pixel.fire(Pixel.PixelName.FORGET_ALL_PRESSED_BROWSING)
         val dialog = FireDialog(context = this, clearPersonalDataAction = clearPersonalDataAction)
         dialog.clearStarted = {
             removeObservers()
@@ -275,8 +275,6 @@ class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope() {
         dialog.clearComplete = { viewModel.onClearComplete() }
         dialog.show()
     }
-
-    fun launchFire() = viewModel.onLaunchFireRequested()
 
     fun launchNewTab() {
         launch { viewModel.onNewTabRequested() }

@@ -17,9 +17,6 @@
 package com.duckduckgo.app.di
 
 import android.content.Context
-import com.duckduckgo.app.fire.ForgetAllFireproofPixelSender
-import com.duckduckgo.app.fire.ForgetAllPixelSender
-import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteDao
 import com.duckduckgo.app.global.device.ContextDeviceInfo
 import com.duckduckgo.app.global.device.DeviceInfo
 import com.duckduckgo.app.global.exception.UncaughtExceptionRepository
@@ -79,10 +76,5 @@ class StatisticsModule {
         appReferrerStateListener: AppInstallationReferrerStateListener
     ): AtbInitializer {
         return AtbInitializer(statisticsDataStore, statisticsUpdater, appReferrerStateListener)
-    }
-
-    @Provides
-    fun forgetAllPixelSender(pixel: Pixel, fireproofWebsiteDao: FireproofWebsiteDao): ForgetAllPixelSender {
-        return ForgetAllFireproofPixelSender(pixel, fireproofWebsiteDao)
     }
 }

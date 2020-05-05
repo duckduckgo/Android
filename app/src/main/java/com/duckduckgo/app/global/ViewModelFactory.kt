@@ -37,7 +37,6 @@ import com.duckduckgo.app.feedback.ui.negative.brokensite.BrokenSiteNegativeFeed
 import com.duckduckgo.app.feedback.ui.negative.openended.ShareOpenEndedNegativeFeedbackViewModel
 import com.duckduckgo.app.feedback.ui.positive.initial.PositiveFeedbackLandingViewModel
 import com.duckduckgo.app.fire.DataClearer
-import com.duckduckgo.app.fire.ForgetAllPixelSender
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteDao
 import com.duckduckgo.app.fire.fireproofwebsite.ui.FireproofWebsitesViewModel
 import com.duckduckgo.app.global.install.AppInstallStore
@@ -118,7 +117,6 @@ class ViewModelFactory @Inject constructor(
     private val appInstallationReferrerStateListener: AppInstallationReferrerStateListener,
     private val appIconModifier: IconModifier,
     private val notificationScheduler: AndroidNotificationScheduler,
-    private val forgetDataPixelSender: ForgetAllPixelSender,
     private val dispatcherProvider: DispatcherProvider
 ) : ViewModelProvider.NewInstanceFactory() {
 
@@ -130,9 +128,7 @@ class ViewModelFactory @Inject constructor(
                 isAssignableFrom(OnboardingViewModel::class.java) -> onboardingViewModel()
                 isAssignableFrom(BrowserViewModel::class.java) -> browserViewModel()
                 isAssignableFrom(BrowserTabViewModel::class.java) -> browserTabViewModel()
-                isAssignableFrom(TabSwitcherViewModel::class.java) -> {
-                    TabSwitcherViewModel(tabRepository, webViewSessionStorage, forgetDataPixelSender)
-                }
+                isAssignableFrom(TabSwitcherViewModel::class.java) -> TabSwitcherViewModel(tabRepository, webViewSessionStorage)
                 isAssignableFrom(PrivacyDashboardViewModel::class.java) -> privacyDashboardViewModel()
                 isAssignableFrom(ScorecardViewModel::class.java) -> ScorecardViewModel(privacySettingsStore)
                 isAssignableFrom(TrackerNetworksViewModel::class.java) -> TrackerNetworksViewModel()
@@ -183,8 +179,7 @@ class ViewModelFactory @Inject constructor(
             queryUrlConverter,
             dataClearer,
             appEnjoymentPromptEmitter,
-            appEnjoymentUserEventRecorder,
-            forgetDataPixelSender
+            appEnjoymentUserEventRecorder
         )
     }
 

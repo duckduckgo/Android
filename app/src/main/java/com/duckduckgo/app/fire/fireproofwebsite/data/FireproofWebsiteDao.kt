@@ -18,7 +18,6 @@ package com.duckduckgo.app.fire.fireproofwebsite.data
 
 import androidx.lifecycle.LiveData
 import androidx.room.*
-import com.duckduckgo.app.cta.model.CtaId
 
 @Dao
 interface FireproofWebsiteDao {
@@ -28,9 +27,6 @@ interface FireproofWebsiteDao {
 
     @Query("select * from fireproofWebsites")
     fun fireproofWebsitesEntities(): LiveData<List<FireproofWebsiteEntity>>
-
-    @Query("select CAST(COUNT(*) AS BIT) from fireproofWebsites")
-    fun hasFireproofWebsites(): Boolean
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insert(fireproofWebsiteEntity: FireproofWebsiteEntity): Long
