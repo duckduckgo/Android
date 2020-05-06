@@ -1771,7 +1771,16 @@ class BrowserTabViewModelTest {
         assertTrue(browserViewState().canFireproofSite)
     }
 
-
+    @Test
+    fun whenUserClicksOnFireproofWebsiteSnackbarUndoActionThenPixelSent() {
+        loadUrl("http://example.com/", isBrowserShowing = true)
+        testee.onFireproofWebsiteClicked()
+        assertCommandIssued<Command.ShowFireproofWebSiteConfirmation> {
+            testee.onFireproofWebsiteSnackbarUndoClicked(this.fireproofWebsiteEntity)
+        }
+        verify(mockPixel).fire(Pixel.PixelName.FIREPROOF_WEBSITE_UNDO)
+    }
+    
     private inline fun <reified T : Command> assertCommandIssued(instanceAssertions: T.() -> Unit = {}) {
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
         val issuedCommand = commandCaptor.allValues.find { it is T }
