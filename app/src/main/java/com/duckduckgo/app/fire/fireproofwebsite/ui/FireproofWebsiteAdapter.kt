@@ -22,22 +22,17 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.PopupMenu
-import androidx.annotation.StringRes
 import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
 import com.duckduckgo.app.fire.fireproofwebsite.data.website
 import com.duckduckgo.app.global.faviconLocation
 import com.duckduckgo.app.global.image.GlideApp
-import kotlinx.android.synthetic.main.view_fireproof_website_description.view.*
-import kotlinx.android.synthetic.main.view_fireproof_website_empty_hint.view.*
 import kotlinx.android.synthetic.main.view_fireproof_website_entry.view.*
 import timber.log.Timber
 
 class FireproofWebsiteAdapter(
-    private val viewModel: FireproofWebsitesViewModel,
-    @StringRes private val emptyListHintStringRes: Int,
-    @StringRes private val listDescriptionStringRes: Int
+    private val viewModel: FireproofWebsitesViewModel
 ) : RecyclerView.Adapter<FireproofWebSiteViewHolder>() {
 
     companion object {
@@ -84,9 +79,7 @@ class FireproofWebsiteAdapter(
 
     override fun onBindViewHolder(holder: FireproofWebSiteViewHolder, position: Int) {
         when (holder) {
-            is FireproofWebSiteViewHolder.FireproofWebsiteDescriptionViewHolder -> holder.bind(listDescriptionStringRes)
             is FireproofWebSiteViewHolder.FireproofWebsiteItemViewHolder -> holder.bind(fireproofWebsites[position])
-            is FireproofWebSiteViewHolder.FireproofWebsiteEmptyHintViewHolder -> holder.bind(emptyListHintStringRes)
         }
     }
 
@@ -111,17 +104,9 @@ class FireproofWebsiteAdapter(
 
 sealed class FireproofWebSiteViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
-    class FireproofWebsiteDescriptionViewHolder(itemView: View) : FireproofWebSiteViewHolder(itemView) {
-        fun bind(@StringRes text: Int) = with(itemView) {
-            fireproofWebsiteDescription.setText(text)
-        }
-    }
+    class FireproofWebsiteDescriptionViewHolder(itemView: View) : FireproofWebSiteViewHolder(itemView)
 
-    class FireproofWebsiteEmptyHintViewHolder(itemView: View) : FireproofWebSiteViewHolder(itemView) {
-        fun bind(@StringRes text: Int) = with(itemView) {
-            fireproofWebsiteEmptyHint.setText(text)
-        }
-    }
+    class FireproofWebsiteEmptyHintViewHolder(itemView: View) : FireproofWebSiteViewHolder(itemView)
 
     class FireproofWebsiteItemViewHolder(itemView: View, private val viewModel: FireproofWebsitesViewModel) : FireproofWebSiteViewHolder(itemView) {
 

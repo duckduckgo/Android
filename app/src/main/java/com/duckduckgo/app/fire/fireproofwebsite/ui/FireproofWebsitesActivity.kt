@@ -45,11 +45,7 @@ class FireproofWebsitesActivity : DuckDuckGoActivity() {
     }
 
     private fun setupFireproofWebsiteRecycler() {
-        adapter = FireproofWebsiteAdapter(
-            viewModel = viewModel,
-            emptyListHintStringRes = R.string.fireproofWebsiteEmptyListHint,
-            listDescriptionStringRes = R.string.fireproofWebsiteFeatureDescription
-        )
+        adapter = FireproofWebsiteAdapter(viewModel)
         recycler.adapter = adapter
     }
 

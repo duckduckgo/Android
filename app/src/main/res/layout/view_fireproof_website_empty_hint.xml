@@ -33,5 +33,6 @@
         android:textColor="?attr/fireproofWebsiteTitleTextColor"
         android:textSize="16sp"
         android:textStyle="normal"
+        android:text="@string/fireproofWebsiteEmptyListHint"
         tools:text="Lorem ipsum dolor sit amet" />
 </LinearLayout>
