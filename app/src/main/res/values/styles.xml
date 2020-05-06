@@ -150,7 +150,7 @@
         <item name="android:paddingTop">6dp</item>
         <item name="android:paddingBottom">6dp</item>
         <item name="android:background">?selectableItemBackground</item>
-        <item name="android:tint">?toolbarIconColor</item>
+        <item name="android:tint">?attr/browserIconColorSelector</item>
     </style>
 
     <style name="BrowserTextMenuItem">

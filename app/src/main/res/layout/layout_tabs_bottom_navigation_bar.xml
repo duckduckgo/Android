@@ -48,7 +48,7 @@
         android:layout_weight="1"
         android:background="?selectableItemBackgroundBorderless"
         android:contentDescription="@string/back"
-        android:src="@drawable/ic_fire_black_24dp" />
+        android:src="@drawable/ic_fire_24dp" />
 
     <ImageButton
         android:id="@+id/bottomBarFakeItemTwo"
@@ -69,6 +69,6 @@
         android:layout_weight="1"
         android:background="?selectableItemBackgroundBorderless"
         android:contentDescription="@string/back"
-        android:src="@drawable/ic_overflow_bookmarks_24dp" />
+        android:src="@drawable/ic_overflow" />
 
 </merge>

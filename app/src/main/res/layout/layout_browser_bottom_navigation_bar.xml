@@ -26,7 +26,7 @@
         android:layout_weight="1"
         android:background="?selectableItemBackgroundBorderless"
         android:contentDescription="@string/back"
-        android:src="@drawable/ic_bottom_bar_bookmarks" />
+        android:src="@drawable/ic_bookmarks" />
 
     <ImageButton
         android:id="@+id/bottomBarSearchItem"
@@ -36,7 +36,7 @@
         android:layout_weight="1"
         android:background="?selectableItemBackgroundBorderless"
         android:contentDescription="@string/back"
-        android:src="@drawable/ic_bottom_bar_search" />
+        android:src="@drawable/ic_search" />
 
     <ImageButton
         android:id="@+id/bottomBarFireItem"
@@ -46,7 +46,7 @@
         android:layout_weight="1"
         android:background="?selectableItemBackgroundBorderless"
         android:contentDescription="@string/back"
-        android:src="@drawable/ic_fire_black_24dp" />
+        android:src="@drawable/ic_fire_24dp" />
 
     <com.duckduckgo.app.browser.TabSwitcherButton
         android:id="@+id/bottomBarTabsItem"
@@ -65,6 +65,6 @@
         android:layout_weight="1"
         android:background="?selectableItemBackgroundBorderless"
         android:contentDescription="@string/back"
-        android:src="@drawable/ic_overflow_bookmarks_24dp" />
+        android:src="@drawable/ic_overflow" />
 
 </merge>
