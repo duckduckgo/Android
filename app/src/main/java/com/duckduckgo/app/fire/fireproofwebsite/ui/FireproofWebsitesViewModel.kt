@@ -67,9 +67,9 @@ class FireproofWebsitesViewModel(
     }
 
     fun delete(entity: FireproofWebsiteEntity) {
-        pixel.fire(FIREPROOF_WEBSITE_DELETED)
         viewModelScope.launch(dispatcherProvider.io()) {
             dao.delete(entity)
+            pixel.fire(FIREPROOF_WEBSITE_DELETED)
         }
     }
 }
