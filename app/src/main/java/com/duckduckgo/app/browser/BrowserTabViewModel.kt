@@ -715,7 +715,6 @@ class BrowserTabViewModel(
 
     fun onFireproofWebsiteClicked() {
         viewModelScope.launch {
-            pixel.fire(PixelName.FIREPROOF_WEBSITE_ADDED)
             val url = url ?: return@launch
             val urlDomain = Uri.parse(url).host ?: return@launch
             val fireproofWebsiteEntity = FireproofWebsiteEntity(domain = urlDomain)
@@ -723,17 +722,16 @@ class BrowserTabViewModel(
                 fireproofWebsiteDao.insert(fireproofWebsiteEntity)
             }
             if (id >= 0) {
+                pixel.fire(PixelName.FIREPROOF_WEBSITE_ADDED)
                 command.value = ShowFireproofWebSiteConfirmation(fireproofWebsiteEntity = fireproofWebsiteEntity)
             }
         }
     }
 
     fun onFireproofWebsiteSnackbarUndoClicked(fireproofWebsiteEntity: FireproofWebsiteEntity) {
-        viewModelScope.launch {
-            withContext(dispatchers.io()) {
-                pixel.fire(PixelName.FIREPROOF_WEBSITE_UNDO)
-                fireproofWebsiteDao.delete(fireproofWebsiteEntity)
-            }
+        viewModelScope.launch(dispatchers.io()) {
+            fireproofWebsiteDao.delete(fireproofWebsiteEntity)
+            pixel.fire(PixelName.FIREPROOF_WEBSITE_UNDO)
         }
     }
 
