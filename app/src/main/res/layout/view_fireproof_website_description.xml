@@ -29,6 +29,7 @@
         android:textColor="?attr/settingsMinorTextColor"
         android:textSize="14sp"
         android:textStyle="normal"
+        android:justificationMode="inter_word"
         android:text="@string/fireproofWebsiteFeatureDescription"
         tools:text="Lorem ipsum dolor sit amet" />
 </LinearLayout>
