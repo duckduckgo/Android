@@ -30,7 +30,7 @@
         android:fontFamily="sans-serif"
         android:lineSpacingExtra="4sp"
         android:gravity="center"
-        android:textColor="?attr/bookmarkTitleTextColor"
+        android:textColor="?attr/fireproofWebsiteTitleTextColor"
         android:textSize="16sp"
         android:textStyle="normal"
         tools:text="Lorem ipsum dolor sit amet" />
