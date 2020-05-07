@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.fire
 
+import android.content.Intent
 import android.os.Handler
 import android.os.SystemClock
 import androidx.annotation.UiThread
@@ -46,6 +47,7 @@ import kotlin.coroutines.CoroutineContext
 interface DataClearer : LifecycleObserver {
     val dataClearerState: LiveData<ApplicationClearDataState>
     var isFreshAppLaunch: Boolean
+    fun registerIntent(intent: Intent?)
 }
 
 class AutomaticDataClearer(
@@ -56,6 +58,7 @@ class AutomaticDataClearer(
 ) : DataClearer, LifecycleObserver, CoroutineScope {
 
     private val clearJob: Job = Job()
+    private var intent: Intent? = null
 
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.Main + clearJob
@@ -65,6 +68,10 @@ class AutomaticDataClearer(
     }
 
     override var isFreshAppLaunch = true
+
+    override fun registerIntent(intent: Intent?) {
+        this.intent = intent
+    }
 
     @UiThread
     @OnLifecycleEvent(Lifecycle.Event.ON_START)
@@ -125,7 +132,7 @@ class AutomaticDataClearer(
         if (clearWhatOption == ClearWhatOption.CLEAR_NONE || clearWhenOption == ClearWhenOption.APP_EXIT_ONLY) {
             Timber.d("No background timer required for current configuration: $clearWhatOption / $clearWhenOption")
         } else {
-            scheduleBackgroundTimerToTriggerClear(clearWhenOption.durationMilliseconds())
+            //scheduleBackgroundTimerToTriggerClear(clearWhenOption.durationMilliseconds())
         }
     }
 
@@ -171,7 +178,7 @@ class AutomaticDataClearer(
                     // need a moment to draw background color (reduces flickering UX)
                     Handler().postDelayed(100) {
                         Timber.i("Will now restart process")
-                        clearDataAction.killAndRestartProcess()
+                        clearDataAction.killAndRestartProcess(intent)
                     }
                 } else {
                     Timber.i("Will not restart process")
@@ -218,5 +225,4 @@ class AutomaticDataClearer(
 
         return enoughTimePassed
     }
-
 }

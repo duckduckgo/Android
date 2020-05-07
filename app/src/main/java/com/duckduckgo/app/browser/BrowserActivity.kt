@@ -115,6 +115,7 @@ class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope() {
             Timber.i("Automatic data clearer has finished, so processing intent now")
             launchNewSearchOrQuery(intent)
         } else {
+            dataClearer.registerIntent(intent)
             Timber.i("Automatic data clearer not yet finished, so deferring processing of intent")
             lastIntent = intent
         }

@@ -17,6 +17,7 @@
 package com.duckduckgo.app.global.view
 
 import android.content.Context
+import android.content.Intent
 import android.webkit.WebStorage
 import android.webkit.WebView
 import android.webkit.WebViewDatabase
@@ -42,7 +43,7 @@ interface ClearDataAction {
     suspend fun clearTabsAndAllDataAsync(appInForeground: Boolean, shouldFireDataClearPixel: Boolean): Unit?
     fun setAppUsedSinceLastClearFlag(appUsedSinceLastClear: Boolean)
     fun killProcess()
-    fun killAndRestartProcess()
+    fun killAndRestartProcess(intent: Intent? = null)
 }
 
 class ClearPersonalDataAction @Inject constructor(
@@ -55,9 +56,9 @@ class ClearPersonalDataAction @Inject constructor(
     private val appCacheClearer: AppCacheClearer
 ) : ClearDataAction {
 
-    override fun killAndRestartProcess() {
+    override fun killAndRestartProcess(intent: Intent?) {
         Timber.i("Restarting process")
-        FireActivity.triggerRestart(context)
+        FireActivity.triggerRestart(context, intent)
     }
 
     override fun killProcess() {
