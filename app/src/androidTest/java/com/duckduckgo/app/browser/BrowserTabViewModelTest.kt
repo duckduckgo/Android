@@ -1244,6 +1244,31 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenAuthenticationIsRequiredForSameHostThenNoChangesOnBrowser() {
+        val mockHandler = mock<HttpAuthHandler>()
+        val siteURL = "http://example.com/requires-auth"
+        val authenticationRequest = BasicAuthenticationRequest(mockHandler, "example.com", "test realm", siteURL)
+
+        loadUrl(url = "http://example.com", isBrowserShowing = true)
+        testee.requiresAuthentication(authenticationRequest)
+
+        assertEquals("http://example.com", omnibarViewState().omnibarText)
+    }
+
+    @Test
+    fun whenAuthenticationIsRequiredForDifferentHostThenUpdateUrlAndHideWebContent() {
+        val mockHandler = mock<HttpAuthHandler>()
+        val siteURL = "http://example.com/requires-auth"
+        val authenticationRequest = BasicAuthenticationRequest(mockHandler, "example.com", "test realm", siteURL)
+
+        loadUrl(url = "http://another.website.com", isBrowserShowing = true)
+        testee.requiresAuthentication(authenticationRequest)
+
+        assertCommandIssued<Command.HideWebContent>()
+        assertEquals(siteURL, omnibarViewState().omnibarText)
+    }
+
+    @Test
     fun whenHandleAuthenticationThenHandlerCalledWithParameters() {
         val mockHandler = mock<HttpAuthHandler>()
         val username = "user"
