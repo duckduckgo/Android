@@ -310,4 +310,18 @@
         <item name="android:textColor">?attr/colorAccent</item>
     </style>
 
+    <style name="DaxDialogPositiveButton" parent="@style/Widget.MaterialComponents.Button.TextButton">
+        <item name="android:textColor">?colorAccent</item>
+        <item name="backgroundTint">?colorPrimary</item>
+    </style>
+
+    <style name="DaxDialogNegativeButton" parent="@style/Widget.MaterialComponents.Button.TextButton">
+        <item name="android:textColor">?colorAccent</item>
+        <item name="backgroundTint">?colorPrimary</item>
+    </style>
+
+    <style name="DaxDialogRadioButton">
+        <item name="android:textColor">?normalTextColor</item>
+    </style>
+
 </resources>

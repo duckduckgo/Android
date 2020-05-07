@@ -28,7 +28,7 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.view.show
 import com.duckduckgo.app.settings.clear.ClearWhenOption
 import com.duckduckgo.app.settings.clear.ClearWhenOption.*
-
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
 class SettingsAutomaticallyClearWhenFragment : DialogFragment() {
 
@@ -48,7 +48,7 @@ class SettingsAutomaticallyClearWhenFragment : DialogFragment() {
 
         updateCurrentSelect(currentOption, rootView.findViewById(R.id.settingsClearWhenGroup))
 
-        val alertBuilder = AlertDialog.Builder(requireActivity())
+        val alertBuilder = MaterialAlertDialogBuilder(requireActivity(), R.style.DaxAlertDialog)
             .setView(rootView)
             .setTitle(R.string.settingsAutomaticallyClearWhat)
             .setPositiveButton(R.string.settingsAutomaticallyClearingDialogSave) { _, _ ->

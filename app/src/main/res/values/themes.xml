@@ -31,6 +31,7 @@
         <item name="autoCompleteTextViewStyle">@style/AutoCompleteTextViewStyle</item>
         <item name="android:statusBarColor">?colorPrimary</item>
         <item name="snackbarButtonStyle">@style/snackbarButtonStyle</item>
+        <item name="materialAlertDialogTheme">@style/DaxAlertDialog</item>
     </style>
 
     <style name="AppTheme.BaseDark">
@@ -222,6 +223,13 @@
     <style name="PopUpMenuSwitchTheme">
         <item name="colorAccent">@color/cornflowerBlue</item>
         <item name="android:textColorSecondary">?bottomBarIconColor</item>
+    </style>
+
+    <style name="DaxAlertDialog" parent="ThemeOverlay.MaterialComponents.MaterialAlertDialog">
+        <item name="android:background">?colorPrimary</item>
+        <item name="colorOnSurface">?normalTextColor</item>
+        <item name="buttonBarPositiveButtonStyle">@style/DaxDialogPositiveButton</item>
+        <item name="buttonBarNegativeButtonStyle">@style/DaxDialogNegativeButton</item>
     </style>
 
 </resources>
