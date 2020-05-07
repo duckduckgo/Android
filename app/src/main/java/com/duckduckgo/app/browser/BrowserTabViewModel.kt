@@ -194,6 +194,8 @@ class BrowserTabViewModel(
         class SaveCredentials(val request: BasicAuthenticationRequest, val credentials: BasicAuthenticationCredentials) : Command()
         object GenerateWebViewPreviewImage : Command()
         object LaunchTabSwitcher : Command()
+        object Blank : Command()
+
         class ShowErrorWithAction(val action: () -> Unit) : Command()
         sealed class DaxCommand : Command() {
             object FinishTrackerAnimation : DaxCommand()
@@ -1014,7 +1016,14 @@ class BrowserTabViewModel(
         showErrorWithAction()
     }
 
+    override fun onPageIsAboutToLoad(url: String) {
+        omnibarViewState.value = currentOmnibarViewState().copy(omnibarText = url)
+    }
+
     override fun requiresAuthentication(request: BasicAuthenticationRequest) {
+        if (request.host != site?.uri?.host) {
+            command.value = Blank
+        }
         command.value = RequiresAuthentication(request)
     }
 

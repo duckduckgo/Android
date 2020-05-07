@@ -99,7 +99,8 @@ class BrowserWebViewClient(
                         webView.loadUrl(newUri.toString())
                         return true
                     }
-                    false
+                    webViewClientListener?.onPageIsAboutToLoad(url.toString())
+                    return false
                 }
             }
         } catch (e: Throwable) {
