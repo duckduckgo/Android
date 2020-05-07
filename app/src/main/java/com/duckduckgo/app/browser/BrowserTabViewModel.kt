@@ -193,8 +193,8 @@ class BrowserTabViewModel(
         class SaveCredentials(val request: BasicAuthenticationRequest, val credentials: BasicAuthenticationCredentials) : Command()
         object GenerateWebViewPreviewImage : Command()
         object LaunchTabSwitcher : Command()
-        object HideBrowser : Command()
-        object ShowBrowser : Command()
+        object HideWebView : Command()
+        object ShowWebView : Command()
 
         class ShowErrorWithAction(val action: () -> Unit) : Command()
         sealed class DaxCommand : Command() {
@@ -1019,19 +1019,19 @@ class BrowserTabViewModel(
     override fun requiresAuthentication(request: BasicAuthenticationRequest) {
         if (request.host != site?.uri?.host) {
             omnibarViewState.value = currentOmnibarViewState().copy(omnibarText = request.site)
-            command.value = HideBrowser
+            command.value = HideWebView
         }
         command.value = RequiresAuthentication(request)
     }
 
     override fun handleAuthentication(request: BasicAuthenticationRequest, credentials: BasicAuthenticationCredentials) {
         request.handler.proceed(credentials.username, credentials.password)
-        command.value = ShowBrowser
+        command.value = ShowWebView
         command.value = SaveCredentials(request, credentials)
     }
 
     override fun cancelAuthentication(request: BasicAuthenticationRequest) {
-        command.value = ShowBrowser
+        command.value = ShowWebView
         request.handler.cancel()
     }
 
