@@ -160,7 +160,7 @@
                     android:background="?attr/selectableItemBackgroundBorderless"
                     android:contentDescription="@string/browserPopupMenu"
                     android:padding="3dp"
-                    android:src="@drawable/ic_fire_24dp" />
+                    android:src="@drawable/ic_fire" />
 
             </FrameLayout>
 
