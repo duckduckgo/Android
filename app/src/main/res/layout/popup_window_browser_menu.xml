@@ -55,7 +55,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:contentDescription="@string/refresh"
-            android:src="@drawable/ic_bottom_bar_refresh" />
+            android:src="@drawable/ic_refresh" />
 
     </LinearLayout>
 
