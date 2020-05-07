@@ -202,12 +202,12 @@
     </style>
 
     <style name="TextInputLayoutTheme" parent="Widget.Design.TextInputLayout">
-        <item name="colorControlActivated">@color/cornflowerBlue</item>
-        <item name="colorControlNormal">@color/cornflowerBlue</item>
-        <item name="colorControlHighlight">@color/cornflowerBlue</item>
-        <item name="android:textColor">@color/grayish</item>
-        <item name="android:textColorSecondary">@color/grayish</item>
-        <item name="android:textColorHint">@color/grayish</item>
+        <item name="colorControlActivated">?colorAccent</item>
+        <item name="colorControlNormal">?colorAccent</item>
+        <item name="colorControlHighlight">?colorAccent</item>
+        <item name="android:textColor">?normalTextColor</item>
+        <item name="android:textColorSecondary">?normalTextColor</item>
+        <item name="android:textColorHint">?normalTextColor</item>
     </style>
 
     <style name="AutoCompleteTextViewStyle" parent="Widget.AppCompat.AutoCompleteTextView">

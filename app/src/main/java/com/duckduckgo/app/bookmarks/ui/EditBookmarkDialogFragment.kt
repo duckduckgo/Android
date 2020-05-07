@@ -26,6 +26,7 @@ import androidx.fragment.app.DialogFragment
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.view.hideKeyboard
 import com.duckduckgo.app.global.view.showKeyboard
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import org.jetbrains.anko.find
 
 
@@ -43,7 +44,7 @@ class EditBookmarkDialogFragment : DialogFragment() {
         val titleInput = rootView.find<EditText>(R.id.titleInput)
         val urlInput = rootView.find<EditText>(R.id.urlInput)
 
-        val alertBuilder = AlertDialog.Builder(requireActivity())
+        val alertBuilder = MaterialAlertDialogBuilder(requireActivity(), R.style.DaxAlertDialog)
             .setView(rootView)
             .setTitle(R.string.bookmarkTitleEdit)
             .setPositiveButton(R.string.bookmarkSave) { _, _ ->
