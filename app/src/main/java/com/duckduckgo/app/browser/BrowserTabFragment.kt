@@ -446,7 +446,15 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
     override fun onPause() {
         logoHidingListener.onPause()
         dismissDownloadFragment()
+        dismissAuthenticationDialog()
         super.onPause()
+    }
+
+    private fun dismissAuthenticationDialog() {
+        if (isAdded) {
+            val fragment = parentFragmentManager.findFragmentByTag(AUTHENTICATION_DIALOG_TAG) as? HttpAuthenticationDialogFragment
+            fragment?.dismiss()
+        }
     }
 
     private fun dismissDownloadFragment() {
