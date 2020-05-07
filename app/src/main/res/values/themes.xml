@@ -87,6 +87,7 @@
         <item name="bottomBarIconColor">@color/grayish</item>
         <item name="bottomBarIconColorDisabled">@color/midGray</item>
 
+        <item name="fireIcon">@color/brickOrangeDark</item>
     </style>
 
     <style name="AppTheme.Dark" parent="AppTheme.BaseDark" />
@@ -160,6 +161,8 @@
 
         <item name="bottomBarIconColor">@color/grayishBrown</item>
         <item name="bottomBarIconColorDisabled">@color/pinkish_grey_two</item>
+
+        <item name="fireIcon">@color/brickOrangeLight</item>
 
     </style>
 

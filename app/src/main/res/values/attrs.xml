@@ -62,6 +62,7 @@
     <attr name="privacyDashboardLogoLetterTextColor" format="color" />
     <attr name="bottomBarIconColor" format="color" />
     <attr name="bottomBarIconColorDisabled" format="color" />
+    <attr name="fireIcon" format="color" />
 
     <declare-styleable name="BottomNavigationBar">
         <attr name="layoutResource" format="reference" />
