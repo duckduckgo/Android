@@ -24,6 +24,7 @@ import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.GridLayoutManager
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.DuckDuckGoActivity
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.android.synthetic.main.content_app_icons.appIconsList
 import kotlinx.android.synthetic.main.include_toolbar.toolbar
 
@@ -80,7 +81,7 @@ class ChangeIconActivity : DuckDuckGoActivity() {
                 finish()
             }
             is ChangeIconViewModel.Command.ShowConfirmationDialog -> {
-                AlertDialog.Builder(this)
+                MaterialAlertDialogBuilder(this, R.style.DaxAlertDialog)
                     .setTitle(R.string.changeIconDialogTitle)
                     .setMessage(getString(R.string.changeIconDialogMessage))
                     .setPositiveButton(R.string.changeIconCtaAccept) { _, _ ->
