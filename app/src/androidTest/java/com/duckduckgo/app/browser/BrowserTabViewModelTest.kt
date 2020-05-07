@@ -1281,6 +1281,25 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenAuthenticationDialogAcceptedThenShowWebContent() {
+        val authenticationRequest = BasicAuthenticationRequest(mock(), "example.com", "test realm", "")
+        val credentials = BasicAuthenticationCredentials(username = "user", password = "password")
+
+        testee.handleAuthentication(request = authenticationRequest, credentials = credentials)
+
+        assertCommandIssued<Command.ShowWebContent>()
+    }
+
+    @Test
+    fun whenAuthenticationDialogCanceledThenShowWebContent() {
+        val authenticationRequest = BasicAuthenticationRequest(mock(), "example.com", "test realm", "")
+
+        testee.cancelAuthentication(request = authenticationRequest)
+
+        assertCommandIssued<Command.ShowWebContent>()
+    }
+
+    @Test
     fun whenBookmarkSuggestionSubmittedThenAutoCompleteBookmarkSelectionPixelSent() = runBlocking {
         whenever(mockBookmarksDao.hasBookmarks()).thenReturn(true)
         val suggestion = AutoCompleteBookmarkSuggestion("example", "Example", "https://example.com")
