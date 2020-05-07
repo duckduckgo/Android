@@ -30,7 +30,6 @@ interface WebViewClientListener {
     fun navigationStateChanged(newWebNavigationState: WebNavigationState)
     fun pageRefreshed(refreshedUrl: String)
     fun progressChanged(newProgress: Int)
-    fun onPageIsAboutToLoad(url: String)
 
     fun titleReceived(newTitle: String)
     fun trackerDetected(event: TrackingEvent)

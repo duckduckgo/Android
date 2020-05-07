@@ -1016,12 +1016,9 @@ class BrowserTabViewModel(
         showErrorWithAction()
     }
 
-    override fun onPageIsAboutToLoad(url: String) {
-        omnibarViewState.value = currentOmnibarViewState().copy(omnibarText = url)
-    }
-
     override fun requiresAuthentication(request: BasicAuthenticationRequest) {
         if (request.host != site?.uri?.host) {
+            omnibarViewState.value = currentOmnibarViewState().copy(omnibarText = request.site)
             command.value = Blank
         }
         command.value = RequiresAuthentication(request)
