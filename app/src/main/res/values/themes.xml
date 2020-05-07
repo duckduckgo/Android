@@ -41,6 +41,9 @@
         <item name="normalTextColor">@color/white</item>
         <item name="toolbarIconColor">@color/grayish</item>
         <item name="toolbarTextColor">@color/grayish</item>
+        <item name="browserIconColorSelector">@color/browser_icon_color_selector_dark</item>
+        <item name="browserMenuTextColor">@color/white</item>
+        <item name="browserMenuTextColorDisabled">@color/midGray</item>
         <item name="omnibarRoundedFieldBackgroundColor">@color/midGray</item>
         <item name="omnibarTextColor">@color/white</item>
         <item name="omnibarHintColor">@color/grayishTwo</item>
@@ -84,10 +87,6 @@
         <item name="feedbackEditTextHintColor">@color/grayish</item>
 
         <item name="privacyDashboardLogoLetterTextColor">@color/subtleGray</item>
-
-        <item name="bottomBarIconColor">@color/grayish</item>
-        <item name="bottomBarIconColorDisabled">@color/midGray</item>
-
     </style>
 
     <style name="AppTheme.Dark" parent="AppTheme.BaseDark" />
@@ -115,6 +114,9 @@
         <item name="normalTextColor">@color/grayishBrown</item>
         <item name="toolbarIconColor">@color/grayishBrown</item>
         <item name="toolbarTextColor">@color/grayishBrown</item>
+        <item name="browserIconColorSelector">@color/browser_icon_color_selector_light</item>
+        <item name="browserMenuTextColor">@color/brownishGrayTwo</item>
+        <item name="browserMenuTextColorDisabled">@color/pinkish_grey_two</item>
         <item name="omnibarRoundedFieldBackgroundColor">@color/whiteFour</item>
         <item name="omnibarTextColor">@color/brownishGrayTwo</item>
         <item name="omnibarHintColor">@color/warmGray</item>
@@ -158,10 +160,6 @@
         <item name="feedbackEditTextHintColor">@color/warmerGray</item>
 
         <item name="privacyDashboardLogoLetterTextColor">@color/whiteFour</item>
-
-        <item name="bottomBarIconColor">@color/grayishBrown</item>
-        <item name="bottomBarIconColorDisabled">@color/pinkish_grey_two</item>
-
     </style>
 
     <style name="AppTheme.Light" parent="AppTheme.BaseLight">
@@ -222,7 +220,7 @@
 
     <style name="PopUpMenuSwitchTheme">
         <item name="colorAccent">@color/cornflowerBlue</item>
-        <item name="android:textColorSecondary">?bottomBarIconColor</item>
+        <item name="android:textColorSecondary">?attr/toolbarIconColor</item>
     </style>
 
     <style name="DaxAlertDialog" parent="ThemeOverlay.MaterialComponents.MaterialAlertDialog">
