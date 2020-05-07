@@ -20,6 +20,9 @@
     <attr name="normalTextColor" format="color" />
     <attr name="toolbarIconColor" format="color" />
     <attr name="toolbarTextColor" format="color" />
+    <attr name="browserIconColorSelector" format="color" />
+    <attr name="browserMenuTextColor" format="color" />
+    <attr name="browserMenuTextColorDisabled" format="color" />
     <attr name="omnibarRoundedFieldBackgroundColor" format="color" />
     <attr name="omnibarTextColor" format="color" />
     <attr name="omnibarHintColor" format="color" />
@@ -60,8 +63,6 @@
     <attr name="topCallToActionDescriptionColor" format="color" />
     <attr name="topCallToActionBackgroundColor" format="color" />
     <attr name="privacyDashboardLogoLetterTextColor" format="color" />
-    <attr name="bottomBarIconColor" format="color" />
-    <attr name="bottomBarIconColorDisabled" format="color" />
 
     <declare-styleable name="BottomNavigationBar">
         <attr name="layoutResource" format="reference" />
