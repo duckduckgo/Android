@@ -46,7 +46,7 @@
         android:layout_weight="1"
         android:background="?selectableItemBackgroundBorderless"
         android:contentDescription="@string/back"
-        android:src="@drawable/ic_fire_24dp" />
+        android:src="@drawable/ic_fire" />
 
     <com.duckduckgo.app.browser.TabSwitcherButton
         android:id="@+id/bottomBarTabsItem"
