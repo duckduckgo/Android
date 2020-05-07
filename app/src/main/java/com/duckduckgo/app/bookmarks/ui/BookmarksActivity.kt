@@ -16,7 +16,6 @@
 
 package com.duckduckgo.app.bookmarks.ui
 
-import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
@@ -27,7 +26,7 @@ import android.view.Menu
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
-import android.widget.PopupMenu
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.SearchView
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.DividerItemDecoration
@@ -43,10 +42,16 @@ import com.duckduckgo.app.global.faviconLocation
 import com.duckduckgo.app.global.image.GlideApp
 import com.duckduckgo.app.global.view.gone
 import com.duckduckgo.app.global.view.show
-import kotlinx.android.synthetic.main.content_bookmarks.*
-import kotlinx.android.synthetic.main.include_toolbar.*
-import kotlinx.android.synthetic.main.view_bookmark_entry.view.*
-import org.jetbrains.anko.alert
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import kotlinx.android.synthetic.main.content_bookmarks.emptyBookmarks
+import kotlinx.android.synthetic.main.content_bookmarks.recycler
+import kotlinx.android.synthetic.main.include_toolbar.toolbar
+import kotlinx.android.synthetic.main.popup_window_bookmarks_menu.view.deleteBookmark
+import kotlinx.android.synthetic.main.popup_window_bookmarks_menu.view.editBookmark
+import kotlinx.android.synthetic.main.view_bookmark_entry.view.favicon
+import kotlinx.android.synthetic.main.view_bookmark_entry.view.overflowMenu
+import kotlinx.android.synthetic.main.view_bookmark_entry.view.title
+import kotlinx.android.synthetic.main.view_bookmark_entry.view.url
 import timber.log.Timber
 
 class BookmarksActivity : DuckDuckGoActivity() {
@@ -65,7 +70,7 @@ class BookmarksActivity : DuckDuckGoActivity() {
     }
 
     private fun setupBookmarksRecycler() {
-        adapter = BookmarksAdapter(applicationContext, viewModel)
+        adapter = BookmarksAdapter(layoutInflater, viewModel)
         recycler.adapter = adapter
 
         val separator = DividerItemDecoration(this, VERTICAL)
@@ -129,11 +134,17 @@ class BookmarksActivity : DuckDuckGoActivity() {
         val message =
             Html.fromHtml(getString(R.string.bookmarkDeleteConfirmMessage, bookmark.title))
         val title = getString(R.string.bookmarkDeleteConfirmTitle)
-        deleteDialog = alert(message, title) {
-            positiveButton(android.R.string.yes) { delete(bookmark) }
-            negativeButton(android.R.string.no) { }
-        }.build()
-        deleteDialog?.show()
+
+        deleteDialog = MaterialAlertDialogBuilder(this)
+            .setTitle(title)
+            .setMessage(message)
+            .setPositiveButton(android.R.string.yes) { _, _ ->
+                delete(bookmark)
+            }
+            .setNegativeButton(android.R.string.no) { dialog, _ ->
+                dialog.dismiss()
+            }
+            .show()
     }
 
     private fun delete(bookmark: BookmarkEntity) {
@@ -155,7 +166,7 @@ class BookmarksActivity : DuckDuckGoActivity() {
     }
 
     class BookmarksAdapter(
-        private val context: Context,
+        private val layoutInflater: LayoutInflater,
         private val viewModel: BookmarksViewModel
     ) : Adapter<BookmarksViewHolder>() {
 
@@ -168,7 +179,7 @@ class BookmarksActivity : DuckDuckGoActivity() {
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BookmarksViewHolder {
             val inflater = LayoutInflater.from(parent.context)
             val view = inflater.inflate(R.layout.view_bookmark_entry, parent, false)
-            return BookmarksViewHolder(view, viewModel)
+            return BookmarksViewHolder(layoutInflater, view, viewModel)
         }
 
         override fun onBindViewHolder(holder: BookmarksViewHolder, position: Int) {
@@ -180,8 +191,7 @@ class BookmarksActivity : DuckDuckGoActivity() {
         }
     }
 
-    class BookmarksViewHolder(itemView: View, private val viewModel: BookmarksViewModel) :
-        ViewHolder(itemView) {
+    class BookmarksViewHolder(val layoutInflater: LayoutInflater, itemView: View, private val viewModel: BookmarksViewModel) : ViewHolder(itemView) {
 
         lateinit var bookmark: BookmarkEntity
 
@@ -221,25 +231,15 @@ class BookmarksActivity : DuckDuckGoActivity() {
             return uri.baseHost ?: return urlString
         }
 
-        private fun showOverFlowMenu(overflowMenu: ImageView, bookmark: BookmarkEntity) {
-            val popup = PopupMenu(overflowMenu.context, overflowMenu)
-            popup.inflate(R.menu.bookmarks_individual_overflow_menu)
-            popup.setOnMenuItemClickListener {
-                when (it.itemId) {
-
-                    R.id.edit -> {
-                        editBookmark(bookmark); true
-                    }
-                    R.id.delete -> {
-                        deleteBookmark(bookmark); true
-                    }
-                    else -> false
-
-                }
+        private fun showOverFlowMenu(anchor: ImageView, bookmark: BookmarkEntity) {
+            val popupMenu = BookmarksPopupMenu(layoutInflater)
+            val view = popupMenu.contentView
+            popupMenu.apply {
+                onMenuItemClicked(view.editBookmark) { editBookmark(bookmark) }
+                onMenuItemClicked(view.deleteBookmark) { deleteBookmark(bookmark) }
             }
-            popup.show()
+            popupMenu.show(itemView, anchor)
         }
-
 
         private fun editBookmark(bookmark: BookmarkEntity) {
             Timber.i("Editing bookmark ${bookmark.title}")
