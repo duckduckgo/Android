@@ -18,6 +18,7 @@ package com.duckduckgo.app.browser.ui
 
 import androidx.appcompat.app.AlertDialog
 import android.app.Dialog
+import android.content.DialogInterface
 import android.os.Bundle
 import android.view.View
 import android.view.WindowManager
@@ -71,7 +72,11 @@ class HttpAuthenticationDialogFragment : DialogFragment() {
         showKeyboard(usernameInput, alert)
 
         return alert
+    }
 
+    override fun onDismiss(dialog: DialogInterface) {
+        super.onDismiss(dialog)
+        listener?.cancelAuthentication(request)
     }
 
     private fun validateBundleArguments() {

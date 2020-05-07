@@ -638,7 +638,8 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
             is Command.ShowErrorWithAction -> showErrorSnackbar(it)
             is Command.DaxCommand.FinishTrackerAnimation -> finishTrackerAnimation()
             is Command.DaxCommand.HideDaxDialog -> showHideTipsDialog(it.cta)
-            is Command.Blank -> webView?.hide()
+            is Command.HideBrowser -> webView?.hide()
+            is Command.ShowBrowser -> webView?.show()
         }
     }
 
