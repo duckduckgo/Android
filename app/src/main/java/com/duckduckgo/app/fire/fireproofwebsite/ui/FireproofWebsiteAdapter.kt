@@ -70,7 +70,7 @@ class FireproofWebsiteAdapter(
     }
 
     override fun getItemViewType(position: Int): Int {
-        return if (position > (getItemsSize() - 1)) {
+        return if (position <= (getItemsSize() - 1)) {
             DESCRIPTION_TYPE
         } else {
             getListItemType()
@@ -79,7 +79,7 @@ class FireproofWebsiteAdapter(
 
     override fun onBindViewHolder(holder: FireproofWebSiteViewHolder, position: Int) {
         when (holder) {
-            is FireproofWebSiteViewHolder.FireproofWebsiteItemViewHolder -> holder.bind(fireproofWebsites[position])
+            is FireproofWebSiteViewHolder.FireproofWebsiteItemViewHolder -> holder.bind(fireproofWebsites[getWebsiteItemPosition(position)])
         }
     }
 
@@ -92,6 +92,8 @@ class FireproofWebsiteAdapter(
     } else {
         fireproofWebsites.size
     }
+
+    private fun getWebsiteItemPosition(position: Int) = position - DESCRIPTION_ITEM_SIZE
 
     private fun getListItemType(): Int {
         return if (fireproofWebsites.isEmpty()) {
