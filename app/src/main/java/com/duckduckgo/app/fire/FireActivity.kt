@@ -53,13 +53,13 @@ class FireActivity : DuckDuckGoActivity() {
     companion object {
         private const val KEY_RESTART_INTENTS = "KEY_RESTART_INTENTS"
 
-        fun triggerRestart(context: Context, intent: Intent?) {
-            val nextIntent = intent ?: getRestartIntent(context)
-            nextIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
-            triggerRestartWithNextIntent(context, nextIntent)
+        fun triggerRestart(context: Context, nextIntent: Intent?) {
+            val restartIntent = nextIntent ?: getRestartIntent(context)
+            restartIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+            triggerRestartWitIntent(context, restartIntent)
         }
 
-        private fun triggerRestartWithNextIntent(context: Context, nextIntent: Intent) {
+        private fun triggerRestartWitIntent(context: Context, nextIntent: Intent) {
             val intent = Intent(context, FireActivity::class.java)
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             intent.putExtra(KEY_RESTART_INTENTS, nextIntent)
