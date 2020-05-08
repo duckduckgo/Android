@@ -235,7 +235,7 @@ class CtaViewModel @Inject constructor(
             }
 
             // Trackers blocked
-            return if (!daxDialogTrackersFoundShown() && !isSerpUrl(it.url) && hasTrackersInformation(it.trackingEvents) && host != null) {
+            return if (!daxDialogTrackersFoundShown() && !isSerpUrl(it.url) && it.orderedTrackingEntities().isNotEmpty() && host != null) {
                 DaxDialogCta.DaxTrackersBlockedCta(onboardingStore, appInstallStore, it.orderedTrackingEntities(), host)
             } else if (!isSerpUrl(it.url) && !daxDialogOtherShown() && !daxDialogTrackersFoundShown() && !daxDialogNetworkShown()) {
                 DaxDialogCta.DaxNoSerpCta(onboardingStore, appInstallStore)
@@ -244,13 +244,6 @@ class CtaViewModel @Inject constructor(
             }
         }
     }
-
-    private fun hasTrackersInformation(events: List<TrackingEvent>): Boolean =
-        events.asSequence()
-            .filter { it.entity?.isMajor == true }
-            .map { it.entity?.displayName }
-            .filterNotNull()
-            .any()
 
     private fun hasPrivacySettingsOn(): Boolean = settingsPrivacySettingsStore.privacyOn
 
