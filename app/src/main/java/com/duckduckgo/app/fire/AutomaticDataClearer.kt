@@ -132,7 +132,7 @@ class AutomaticDataClearer(
         if (clearWhatOption == ClearWhatOption.CLEAR_NONE || clearWhenOption == ClearWhenOption.APP_EXIT_ONLY) {
             Timber.d("No background timer required for current configuration: $clearWhatOption / $clearWhenOption")
         } else {
-            //scheduleBackgroundTimerToTriggerClear(clearWhenOption.durationMilliseconds())
+            scheduleBackgroundTimerToTriggerClear(clearWhenOption.durationMilliseconds())
         }
     }
 
