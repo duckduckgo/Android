@@ -70,7 +70,7 @@ class FireproofWebsiteAdapter(
     }
 
     override fun getItemViewType(position: Int): Int {
-        return if (position <= (getItemsSize() - 1)) {
+        return if (position == 0) {
             DESCRIPTION_TYPE
         } else {
             getListItemType()
