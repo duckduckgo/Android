@@ -39,7 +39,7 @@
                 android:id="@+id/toolbar"
                 android:layout_width="0dp"
                 android:layout_height="?attr/actionBarSize"
-                android:background="?attr/colorPrimary"
+                android:background="?attr/toolbarBgColor"
                 app:contentInsetEnd="0dp"
                 app:contentInsetStart="0dp"
                 app:layout_constraintBottom_toBottomOf="parent"

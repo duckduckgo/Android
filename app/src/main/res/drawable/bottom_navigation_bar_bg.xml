@@ -49,7 +49,7 @@
     <item>
         <shape
             android:shape="rectangle">
-            <solid android:color="?attr/colorPrimary"/>
+            <solid android:color="?attr/toolbarBgColor"/>
         </shape>
     </item>
 </layer-list>

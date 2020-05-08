@@ -21,7 +21,7 @@
         <!-- These neutral colors cover cases before dynamic theme can be applied
              such as the app launch color -->
         <item name="colorPrimary">@color/almostBlackDark</item>
-        <item name="colorPrimaryDark">@color/almostBlackDark</item>
+        <item name="colorPrimaryDark">@color/black</item>
         <item name="colorAccent">@color/cornflowerBlue</item>
         <item name="android:windowBackground">?attr/colorPrimaryDark</item>
         <item name="windowActionBar">false</item>
@@ -29,7 +29,7 @@
         <item name="bottomSheetDialogTheme">@style/BottomSheetDialog</item>
         <item name="android:windowActivityTransitions">true</item>
         <item name="autoCompleteTextViewStyle">@style/AutoCompleteTextViewStyle</item>
-        <item name="android:statusBarColor">?colorPrimary</item>
+        <item name="android:statusBarColor">?toolbarBgColor</item>
         <item name="snackbarButtonStyle">@style/snackbarButtonStyle</item>
         <item name="materialAlertDialogTheme">@style/DaxAlertDialog</item>
     </style>
@@ -41,12 +41,14 @@
         <item name="normalTextColor">@color/white</item>
         <item name="toolbarIconColor">@color/white</item>
         <item name="toolbarTextColor">@color/white</item>
+        <item name="toolbarBgColor">@color/newBlack</item>
+        <item name="dialogBgColor">@color/almostBlackDark</item>
         <item name="browserIconColorSelector">@color/browser_icon_color_selector_dark</item>
         <item name="browserMenuTextColor">@color/white</item>
         <item name="browserMenuTextColorDisabled">@color/midGray</item>
-        <item name="omnibarRoundedFieldBackgroundColor">@color/midGray</item>
+        <item name="omnibarRoundedFieldBackgroundColor">@color/almostBlack</item>
         <item name="omnibarTextColor">@color/white</item>
-        <item name="omnibarHintColor">@color/grayishTwo</item>
+        <item name="omnibarHintColor">@color/paleBrownishGray</item>
         <item name="omnibarLogoLetterTextColor">@color/midGray</item>
         <item name="autoCompleteTextColor">@color/white</item>
         <item name="autoCompleteSubtitleTextColor">@color/grayish</item>
@@ -114,12 +116,14 @@
         <item name="normalTextColor">@color/almostBlackDark</item>
         <item name="toolbarIconColor">@color/almostBlackDark</item>
         <item name="toolbarTextColor">@color/almostBlackDark</item>
+        <item name="toolbarBgColor">@color/white</item>
+        <item name="dialogBgColor">@color/lightThemePrimaryDark</item>
         <item name="browserIconColorSelector">@color/browser_icon_color_selector_light</item>
         <item name="browserMenuTextColor">@color/almostBlackDark</item>
         <item name="browserMenuTextColorDisabled">@color/pinkish_grey_two</item>
         <item name="omnibarRoundedFieldBackgroundColor">@color/whiteFour</item>
         <item name="omnibarTextColor">@color/almostBlackDark</item>
-        <item name="omnibarHintColor">@color/warmGray</item>
+        <item name="omnibarHintColor">@color/brownishGrayTwo</item>
         <item name="omnibarLogoLetterTextColor">@color/whiteFour</item>
         <item name="autoCompleteTextColor">@color/almostBlackDark</item>
         <item name="autoCompleteSubtitleTextColor">@color/warmerGray</item>
@@ -224,7 +228,7 @@
     </style>
 
     <style name="DaxAlertDialog" parent="ThemeOverlay.MaterialComponents.MaterialAlertDialog">
-        <item name="android:background">?colorPrimary</item>
+        <item name="android:background">@drawable/popup_menu_bg</item>
         <item name="colorOnSurface">?normalTextColor</item>
         <item name="buttonBarPositiveButtonStyle">@style/DaxDialogPositiveButton</item>
         <item name="buttonBarNegativeButtonStyle">@style/DaxDialogNegativeButton</item>
