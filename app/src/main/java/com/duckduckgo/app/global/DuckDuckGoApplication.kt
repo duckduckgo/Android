@@ -266,7 +266,7 @@ open class DuckDuckGoApplication : HasAndroidInjector, Application(), LifecycleO
         appConfigurationSyncer.scheduleImmediateSync()
             .subscribeOn(Schedulers.io())
             .doAfterTerminate {
-                appConfigurationSyncer.scheduleRegularSync(this)
+                appConfigurationSyncer.scheduleRegularSync()
             }
             .subscribe({}, { Timber.w("Failed to download initial app configuration ${it.localizedMessage}") })
     }

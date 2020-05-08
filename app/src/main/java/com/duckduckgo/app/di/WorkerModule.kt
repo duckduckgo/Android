@@ -22,6 +22,8 @@ import androidx.work.Configuration
 import androidx.work.WorkManager
 import androidx.work.WorkerFactory
 import com.duckduckgo.app.global.view.ClearDataAction
+import com.duckduckgo.app.job.AppConfigurationDownloader
+import com.duckduckgo.app.job.ConfigurationDownloader
 import com.duckduckgo.app.notification.NotificationFactory
 import com.duckduckgo.app.notification.db.NotificationDao
 import com.duckduckgo.app.notification.model.ClearDataNotification
@@ -52,22 +54,24 @@ class WorkerModule {
         offlinePixelSender: OfflinePixelSender,
         settingsDataStore: SettingsDataStore,
         clearDataAction: ClearDataAction,
-        notficationManager: NotificationManagerCompat,
+        notificationManager: NotificationManagerCompat,
         notificationDao: NotificationDao,
         notificationFactory: NotificationFactory,
         clearDataNotification: ClearDataNotification,
         privacyProtectionNotification: PrivacyProtectionNotification,
+        configurationDownloader: ConfigurationDownloader,
         pixel: Pixel
     ): WorkerFactory {
         return DaggerWorkerFactory(
             offlinePixelSender,
             settingsDataStore,
             clearDataAction,
-            notficationManager,
+            notificationManager,
             notificationDao,
             notificationFactory,
             clearDataNotification,
             privacyProtectionNotification,
+            configurationDownloader,
             pixel
         )
     }
