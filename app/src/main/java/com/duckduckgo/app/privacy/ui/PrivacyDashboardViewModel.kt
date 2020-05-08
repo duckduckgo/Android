@@ -17,10 +17,7 @@
 package com.duckduckgo.app.privacy.ui
 
 import androidx.annotation.VisibleForTesting
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModel
+import androidx.lifecycle.*
 import com.duckduckgo.app.brokensite.BrokenSiteData
 import com.duckduckgo.app.global.DefaultDispatcherProvider
 import com.duckduckgo.app.global.DispatcherProvider
@@ -40,6 +37,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.*
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class PrivacyDashboardViewModel(
     private val userWhitelistDao: UserWhitelistDao,
@@ -141,18 +139,20 @@ class PrivacyDashboardViewModel(
 
     private fun updateSite(site: Site) {
         val grades = site.calculateGrades()
-
-        GlobalScope.launch(dispatchers.io()) {
-            viewState.postValue(viewState.value?.copy(
-                domain = site.domain ?: "",
-                beforeGrade = grades.grade,
-                afterGrade = grades.improvedGrade,
-                httpsStatus = site.https,
-                trackerCount = site.trackerCount,
-                allTrackersBlocked = site.allTrackersBlocked,
-                toggleEnabled = site.domain?.let { !userWhitelistDao.contains(it) } ?: true,
-                practices = site.privacyPractices.summary
-            ))
+        viewModelScope.launch(dispatchers.io()) {
+            val toggleEnabled = site.domain?.let { !userWhitelistDao.contains(it) } ?: true
+            withContext(dispatchers.main()) {
+                viewState.value = viewState.value?.copy(
+                    domain = site.domain ?: "",
+                    beforeGrade = grades.grade,
+                    afterGrade = grades.improvedGrade,
+                    httpsStatus = site.https,
+                    trackerCount = site.trackerCount,
+                    allTrackersBlocked = site.allTrackersBlocked,
+                    toggleEnabled = toggleEnabled,
+                    practices = site.privacyPractices.summary
+                )
+            }
         }
     }
 
