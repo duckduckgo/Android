@@ -16,7 +16,6 @@
 
 package com.duckduckgo.app.browser.ui
 
-import androidx.appcompat.app.AlertDialog
 import android.app.Dialog
 import android.content.DialogInterface
 import android.os.Bundle
@@ -24,6 +23,7 @@ import android.view.View
 import android.view.WindowManager
 import android.widget.EditText
 import android.widget.TextView
+import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.DialogFragment
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.model.BasicAuthenticationCredentials
@@ -61,21 +61,22 @@ class HttpAuthenticationDialogFragment : DialogFragment() {
                     request,
                     BasicAuthenticationCredentials(username = usernameInput.text.toString(), password = passwordInput.text.toString())
                 )
-
+                listener = null
             }.setNegativeButton(R.string.authenticationDialogNegativeButton) { _, _ ->
                 rootView.hideKeyboard()
                 listener?.cancelAuthentication(request)
+                listener = null
             }
             .setTitle(R.string.authenticationDialogTitle)
 
         val alert = alertBuilder.create()
         showKeyboard(usernameInput, alert)
-
         return alert
     }
 
     override fun onDismiss(dialog: DialogInterface) {
         super.onDismiss(dialog)
+        //if listener is not null, user didn't press any button. We proceed to cancel.
         listener?.cancelAuthentication(request)
     }
 

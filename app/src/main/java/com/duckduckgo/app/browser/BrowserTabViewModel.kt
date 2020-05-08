@@ -1031,8 +1031,8 @@ class BrowserTabViewModel(
     }
 
     override fun cancelAuthentication(request: BasicAuthenticationRequest) {
-        command.value = ShowWebContent
         request.handler.cancel()
+        command.value = ShowWebContent
     }
 
     fun userLaunchingTabSwitcher() {
