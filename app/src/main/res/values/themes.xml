@@ -89,6 +89,8 @@
         <item name="feedbackEditTextHintColor">@color/grayish</item>
 
         <item name="privacyDashboardLogoLetterTextColor">@color/subtleGray</item>
+
+        <item name="fireIcon">@color/brickOrangeDark</item>
     </style>
 
     <style name="AppTheme.Dark" parent="AppTheme.BaseDark" />
@@ -164,6 +166,8 @@
         <item name="feedbackEditTextHintColor">@color/warmerGray</item>
 
         <item name="privacyDashboardLogoLetterTextColor">@color/whiteFour</item>
+
+        <item name="fireIcon">@color/brickOrangeLight</item>
     </style>
 
     <style name="AppTheme.Light" parent="AppTheme.BaseLight">
