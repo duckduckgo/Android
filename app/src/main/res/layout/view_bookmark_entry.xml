@@ -43,7 +43,7 @@
         android:layout_marginStart="22dp"
         android:fontFamily="sans-serif"
         android:paddingTop="4dp"
-        android:textColor="?attr/bookmarkTitleTextColor"
+        android:textColor="?attr/normalTextColor"
         android:textSize="16sp"
         android:textStyle="normal"
         app:layout_constraintBottom_toTopOf="@+id/url"
