@@ -50,7 +50,7 @@ class AppConfigurationWorker(context: Context, workerParams: WorkerParameters) :
         Timber.i("Running app config sync")
         return appConfigurationDownloader.downloadTask()
             .toSingle {
-                Timber.i("App configuration sync  was successful")
+                Timber.i("App configuration sync was successful")
                 Result.success()
             }
             .onErrorReturn {
