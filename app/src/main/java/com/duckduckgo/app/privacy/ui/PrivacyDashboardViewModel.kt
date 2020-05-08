@@ -56,7 +56,7 @@ class PrivacyDashboardViewModel(
         val trackerCount: Int,
         val allTrackersBlocked: Boolean,
         val practices: PrivacyPractices.Summary,
-        val toggleEnabled: Boolean,
+        val toggleEnabled: Boolean?,
         val shouldShowTrackerNetworkLeaderboard: Boolean,
         val sitesVisited: Int,
         val trackerNetworkEntries: List<NetworkLeaderboardEntry>,
@@ -130,7 +130,7 @@ class PrivacyDashboardViewModel(
             httpsStatus = HttpsStatus.SECURE,
             trackerCount = 0,
             allTrackersBlocked = true,
-            toggleEnabled = true,
+            toggleEnabled = null,
             practices = UNKNOWN,
             shouldShowTrackerNetworkLeaderboard = false,
             sitesVisited = 0,
@@ -157,6 +157,10 @@ class PrivacyDashboardViewModel(
     }
 
     fun onPrivacyToggled(enabled: Boolean) {
+        if (viewState.value?.toggleEnabled == null) {
+            return
+        }
+
         if (enabled == viewState.value?.toggleEnabled) {
             return
         }

@@ -49,6 +49,7 @@ class PrivacyDashboardActivity : DuckDuckGoActivity() {
 
     @Inject
     lateinit var repository: TabRepository
+
     @Inject
     lateinit var pixel: Pixel
 
@@ -99,16 +100,17 @@ class PrivacyDashboardActivity : DuckDuckGoActivity() {
         if (isFinishing) {
             return
         }
-        privacyBanner.setImageResource(viewState.afterGrade.banner(viewState.toggleEnabled))
+        val toggle = viewState.toggleEnabled ?: true
+        privacyBanner.setImageResource(viewState.afterGrade.banner(toggle))
         domain.text = viewState.domain
-        heading.text = upgradeRenderer.heading(this, viewState.beforeGrade, viewState.afterGrade, viewState.toggleEnabled).html(this)
+        heading.text = upgradeRenderer.heading(this, viewState.beforeGrade, viewState.afterGrade, toggle).html(this)
         httpsIcon.setImageResource(viewState.httpsStatus.icon())
         httpsText.text = viewState.httpsStatus.text(this)
         networksIcon.setImageResource(trackersRenderer.networksIcon(viewState.allTrackersBlocked))
         networksText.text = trackersRenderer.trackersText(this, viewState.trackerCount, viewState.allTrackersBlocked)
         practicesIcon.setImageResource(viewState.practices.icon())
         practicesText.text = viewState.practices.text(this)
-        renderToggle(viewState.toggleEnabled)
+        renderToggle(toggle)
         renderTrackerNetworkLeaderboard(viewState)
         updateActivityResult(viewState.shouldReloadPage)
     }
