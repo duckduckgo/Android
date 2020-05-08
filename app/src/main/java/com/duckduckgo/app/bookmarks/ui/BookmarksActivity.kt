@@ -16,7 +16,6 @@
 
 package com.duckduckgo.app.bookmarks.ui
 
-import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
@@ -27,8 +26,6 @@ import android.view.Menu
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
-import androidx.appcompat.app.AlertDialog
-import android.widget.PopupMenu
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.SearchView
 import androidx.lifecycle.Observer
@@ -55,11 +52,6 @@ import kotlinx.android.synthetic.main.view_bookmark_entry.view.favicon
 import kotlinx.android.synthetic.main.view_bookmark_entry.view.overflowMenu
 import kotlinx.android.synthetic.main.view_bookmark_entry.view.title
 import kotlinx.android.synthetic.main.view_bookmark_entry.view.url
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.google.android.material.dialog.MaterialDialogs
-import kotlinx.android.synthetic.main.content_bookmarks.*
-import kotlinx.android.synthetic.main.include_toolbar.*
-import kotlinx.android.synthetic.main.view_bookmark_entry.view.*
 import org.jetbrains.anko.alert
 import timber.log.Timber
 
