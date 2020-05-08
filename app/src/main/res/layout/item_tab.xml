@@ -68,7 +68,7 @@
             android:contentDescription="@string/closeContentDescription"
             android:scaleType="center"
             android:src="@drawable/ic_close_tab"
-            android:tint="@color/grayish"
+            android:tint="?normalTextColor"
             app:layout_constraintBottom_toBottomOf="@id/favicon"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="@id/favicon" />

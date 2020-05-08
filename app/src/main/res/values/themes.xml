@@ -39,8 +39,8 @@
         <item name="colorPrimaryDark">@color/darkThemePrimaryDark</item>
         <item name="daxLogoTextColor">@color/white</item>
         <item name="normalTextColor">@color/white</item>
-        <item name="toolbarIconColor">@color/grayish</item>
-        <item name="toolbarTextColor">@color/grayish</item>
+        <item name="toolbarIconColor">@color/white</item>
+        <item name="toolbarTextColor">@color/white</item>
         <item name="browserIconColorSelector">@color/browser_icon_color_selector_dark</item>
         <item name="browserMenuTextColor">@color/white</item>
         <item name="browserMenuTextColorDisabled">@color/midGray</item>
@@ -176,7 +176,7 @@
         <item name="android:colorBackgroundCacheHint">@null</item>
         <item name="android:windowIsTranslucent">true</item>
         <item name="android:windowAnimationStyle">@android:style/Animation</item>
-        <item name="toolbarIconColor">@color/grayish</item>
+        <item name="toolbarIconColor">@color/white</item>
     </style>
 
     <style name="ToolbarTheme" parent="ThemeOverlay.AppCompat.Dark.ActionBar">
