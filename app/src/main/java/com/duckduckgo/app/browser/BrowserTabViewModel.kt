@@ -199,6 +199,7 @@ class BrowserTabViewModel(
             object FinishTrackerAnimation : DaxCommand()
             class HideDaxDialog(val cta: Cta) : DaxCommand()
         }
+        object CloseCurrentTab : Command()
     }
 
     val autoCompleteViewState: MutableLiveData<AutoCompleteViewState> = MutableLiveData()
@@ -422,7 +423,10 @@ class BrowserTabViewModel(
         if (navigation.canGoBack) {
             command.value = NavigateBack(navigation.stepsToPreviousPage)
             return true
-        } else if (!skipHome) {
+        }else if ((tabs.value?.size?:0) > 0) {
+            command.value = CloseCurrentTab
+            return true
+        }  else if (!skipHome) {
             navigateHome()
             return true
         }
