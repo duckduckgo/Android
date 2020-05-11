@@ -529,6 +529,8 @@ class BrowserTabViewModel(
     }
 
     private fun omnibarTextForUrl(url: String?): String {
+        Timber.v("URL to Display: $url")
+
         if (url == null) return ""
 
         return if (variantManager.getVariant().hasFeature(VariantManager.VariantFeature.SerpHeaderQueryReplacement)) {
@@ -540,8 +542,6 @@ class BrowserTabViewModel(
                 url
             }
         }
-
-        return url
     }
 
     private fun pageCleared() {
