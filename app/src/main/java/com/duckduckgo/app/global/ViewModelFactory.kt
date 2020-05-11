@@ -196,7 +196,8 @@ class ViewModelFactory @Inject constructor(
         addToHomeCapabilityDetector = addToHomeCapabilityDetector,
         ctaViewModel = ctaViewModel,
         searchCountDao = searchCountDao,
-        pixel = pixel
+        pixel = pixel,
+        variantManager = variantManager
     )
 
     private fun changeAppIconViewModel() =

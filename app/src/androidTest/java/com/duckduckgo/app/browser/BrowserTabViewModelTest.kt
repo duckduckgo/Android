@@ -242,6 +242,7 @@ class BrowserTabViewModelTest {
             ctaViewModel = ctaViewModel,
             searchCountDao = mockSearchCountDao,
             pixel = mockPixel,
+            variantManager = mockVariantManager,
             dispatchers = coroutineRule.testDispatcherProvider
         )
 
@@ -345,6 +346,12 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenSubmittedQueryHasWhitespaceItIsTrimmed() {
+        testee.onUserSubmittedQuery(" nytimes.com ")
+        assertEquals("nytimes.com", omnibarViewState().omnibarText)
+    }
+
+    @Test
+    fun whenSubmittedQueryIsDDGWhitespaceItIsTrimmed() {
         testee.onUserSubmittedQuery(" nytimes.com ")
         assertEquals("nytimes.com", omnibarViewState().omnibarText)
     }

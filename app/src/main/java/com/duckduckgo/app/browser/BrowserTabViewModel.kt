@@ -63,6 +63,8 @@ import com.duckduckgo.app.global.model.domainMatchesUrl
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao
 import com.duckduckgo.app.privacy.model.PrivacyGrade
 import com.duckduckgo.app.settings.db.SettingsDataStore
+import com.duckduckgo.app.statistics.ExperimentationVariantManager
+import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.api.StatisticsUpdater
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelName
@@ -102,7 +104,8 @@ class BrowserTabViewModel(
     private val ctaViewModel: CtaViewModel,
     private val searchCountDao: SearchCountDao,
     private val pixel: Pixel,
-    private val dispatchers: DispatcherProvider = DefaultDispatcherProvider()
+    private val dispatchers: DispatcherProvider = DefaultDispatcherProvider(),
+    private val variantManager: VariantManager
 ) : WebViewClientListener, EditBookmarkListener, HttpAuthenticationListener, ViewModel() {
 
     private var buildingSiteFactoryJob: Job? = null
@@ -356,6 +359,13 @@ class BrowserTabViewModel(
             searchCountDao.incrementSearchCount()
         }
 
+        val urlToNavigate = queryUrlConverter.convertQueryToUrl(trimmedInput)
+        val omnibarText = if (variantManager.getVariant().hasFeature(VariantManager.VariantFeature.SerpHeaderQueryReplacement)) {
+            urlToNavigate
+        } else {
+            trimmedInput
+        }
+
         val type = specialUrlDetector.determineType(trimmedInput)
         if (type is IntentType) {
             externalAppLinkClicked(type)
@@ -363,12 +373,12 @@ class BrowserTabViewModel(
             if (shouldClearHistoryOnNewQuery()) {
                 command.value = ResetHistory
             }
-            command.value = Navigate(queryUrlConverter.convertQueryToUrl(trimmedInput))
+            command.value = Navigate(urlToNavigate)
         }
 
         globalLayoutState.value = Browser(isNewTabState = false)
         findInPageViewState.value = FindInPageViewState(visible = false, canFindInPage = true)
-        omnibarViewState.value = currentOmnibarViewState().copy(omnibarText = trimmedInput, shouldMoveCaretToEnd = false)
+        omnibarViewState.value = currentOmnibarViewState().copy(omnibarText = omnibarText, shouldMoveCaretToEnd = false)
         browserViewState.value = currentBrowserViewState().copy(browserShowing = true, showClearButton = false)
         autoCompleteViewState.value = AutoCompleteViewState(false)
     }
@@ -520,9 +530,17 @@ class BrowserTabViewModel(
 
     private fun omnibarTextForUrl(url: String?): String {
         if (url == null) return ""
-        if (duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(url)) {
-            return duckDuckGoUrlDetector.extractQuery(url) ?: ""
+
+        return if (variantManager.getVariant().hasFeature(VariantManager.VariantFeature.SerpHeaderQueryReplacement)) {
+            url
+        } else {
+            if (duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(url)) {
+                duckDuckGoUrlDetector.extractQuery(url) ?: url
+            } else {
+                url
+            }
         }
+
         return url
     }
 
