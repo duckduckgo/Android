@@ -22,7 +22,7 @@ import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.runBlocking
 import com.nhaarman.mockitokotlin2.*
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.withContext
 import org.junit.Before
 import org.junit.Rule
@@ -30,6 +30,7 @@ import org.junit.Test
 
 private data class Cookie(val url: String, val value: String)
 
+@ExperimentalCoroutinesApi
 class WebViewCookieManagerTest {
     @get:Rule
     @Suppress("unused")
