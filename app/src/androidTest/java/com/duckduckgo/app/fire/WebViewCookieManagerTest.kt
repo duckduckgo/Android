@@ -62,7 +62,7 @@ class WebViewCookieManagerTest {
             testee.removeExternalCookies()
         }
 
-        verify(cookieManager, times(1)).setCookie(eq(ddgCookie.url), eq(ddgCookie.value), any())
+        verify(cookieManager).setCookie(eq(ddgCookie.url), eq(ddgCookie.value), any())
     }
 
     @Test
