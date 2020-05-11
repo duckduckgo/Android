@@ -58,6 +58,29 @@ class VariantManagerTest {
         assertEqualsDouble(1.0, variant.weight)
         assertEquals(1, variant.features.size)
         assertTrue(variant.hasFeature(BottomBarNavigation))
+
+    }
+
+    // SERP Header Experiment
+    @Test
+    fun serpHeaderControlVariantHasExpectedWeightAndNoFeatures() {
+        val variant = variants.first { it.key == "zf" }
+        assertEqualsDouble(1.0, variant.weight)
+        assertEquals(0, variant.features.size)
+    }
+
+    @Test
+    fun serpHeaderVariantHasExpectedWeightAndSERPRemovalFeature() {
+        val variant = variants.first { it.key == "zg" }
+        assertEqualsDouble(1.0, variant.weight)
+        assertEquals(1, variant.features.size)
+    }
+
+    @Test
+    fun serpHeaderVariantHasExpectedWeightAndSERPHeaderReplaceFeature() {
+        val variant = variants.first { it.key == "zh" }
+        assertEqualsDouble(1.0, variant.weight)
+        assertEquals(1, variant.features.size)
     }
 
     @Test

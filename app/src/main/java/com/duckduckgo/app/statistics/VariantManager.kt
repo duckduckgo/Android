@@ -30,6 +30,8 @@ interface VariantManager {
     // variant-dependant features listed here
     sealed class VariantFeature {
         object BottomBarNavigation : VariantFeature()
+        object SerpHeaderQueryReplacement : VariantFeature()
+        object SerpHeaderRemoval : VariantFeature()
     }
 
     companion object {
@@ -55,6 +57,23 @@ interface VariantManager {
                 key = "mk",
                 weight = 1.0,
                 features = listOf(BottomBarNavigation),
+                filterBy = { noFilter() }),
+
+            // SERP Header Experiment
+            Variant(
+                key = "zf",
+                weight = 1.0,
+                features = emptyList(),
+                filterBy = { noFilter() }),
+            Variant(
+                key = "zg",
+                weight = 1.0,
+                features = listOf(VariantFeature.SerpHeaderQueryReplacement),
+                filterBy = { noFilter() }),
+            Variant(
+                key = "zh",
+                weight = 1.0,
+                features = listOf(VariantFeature.SerpHeaderRemoval),
                 filterBy = { noFilter() })
 
             // All groups in an experiment (control and variants) MUST use the same filters
