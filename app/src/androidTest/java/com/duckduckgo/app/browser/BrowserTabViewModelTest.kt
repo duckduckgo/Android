@@ -62,6 +62,7 @@ import com.duckduckgo.app.privacy.model.TestEntity
 import com.duckduckgo.app.privacy.store.PrivacySettingsStore
 import com.duckduckgo.app.runBlocking
 import com.duckduckgo.app.settings.db.SettingsDataStore
+import com.duckduckgo.app.statistics.Variant
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.VariantManager.Companion.DEFAULT_VARIANT
 import com.duckduckgo.app.statistics.api.StatisticsUpdater
@@ -347,12 +348,7 @@ class BrowserTabViewModelTest {
     @Test
     fun whenSubmittedQueryHasWhitespaceItIsTrimmed() {
         testee.onUserSubmittedQuery(" nytimes.com ")
-        assertEquals("nytimes.com", omnibarViewState().omnibarText)
-    }
 
-    @Test
-    fun whenSubmittedQueryIsDDGWhitespaceItIsTrimmed() {
-        testee.onUserSubmittedQuery(" nytimes.com ")
         assertEquals("nytimes.com", omnibarViewState().omnibarText)
     }
 
