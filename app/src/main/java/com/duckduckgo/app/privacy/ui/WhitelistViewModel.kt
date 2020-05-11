@@ -80,7 +80,7 @@ class WhitelistViewModel(
             return
         }
         GlobalScope.launch(dispatchers.io()) {
-            dao.insert(entry)
+            addEntryToDatabase(entry)
         }
     }
 
@@ -93,8 +93,10 @@ class WhitelistViewModel(
             command.value = ShowWhitelistFormatError
             return
         }
-        onEntryDeleted(old)
-        onEntryAdded(new)
+        GlobalScope.launch(dispatchers.io()) {
+            deleteEntryFromDatabase(old)
+            addEntryToDatabase(new)
+        }
     }
 
     fun onDeleteRequested(entry: UserWhitelistedDomain) {
@@ -103,7 +105,16 @@ class WhitelistViewModel(
 
     fun onEntryDeleted(entry: UserWhitelistedDomain) {
         GlobalScope.launch(dispatchers.io()) {
-            dao.delete(entry)
+            deleteEntryFromDatabase(entry)
         }
+
+    }
+
+    private suspend fun addEntryToDatabase(entry: UserWhitelistedDomain) {
+        dao.insert(entry)
+    }
+
+    private suspend fun deleteEntryFromDatabase(entry: UserWhitelistedDomain) {
+        dao.delete(entry)
     }
 }
