@@ -29,6 +29,7 @@ import com.duckduckgo.app.privacy.model.UserWhitelistedDomain
 import com.duckduckgo.app.privacy.ui.WhitelistViewModel.Command.*
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class WhitelistViewModel(
     private val dao: UserWhitelistDao,
@@ -110,10 +111,10 @@ class WhitelistViewModel(
     }
 
     private suspend fun addEntryToDatabase(entry: UserWhitelistedDomain) {
-        dao.insert(entry)
+        withContext(dispatchers.io()) { dao.insert(entry) }
     }
 
     private suspend fun deleteEntryFromDatabase(entry: UserWhitelistedDomain) {
-        dao.delete(entry)
+        withContext(dispatchers.io()) { dao.delete(entry) }
     }
 }

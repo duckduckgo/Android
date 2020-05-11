@@ -525,17 +525,21 @@ class BrowserTabViewModel(
     }
 
     private suspend fun updateLoadingStatePrivacy(domain: String) {
-        val whitelisted = withContext(dispatchers.io()) { userWhitelistDao.contains(domain) }
+        val isWhitelisted = isWhitelisted(domain)
         withContext(dispatchers.main()) {
-            loadingViewState.value = currentLoadingViewState().copy(privacyOn = !whitelisted)
+            loadingViewState.value = currentLoadingViewState().copy(privacyOn = !isWhitelisted)
         }
     }
 
     private suspend fun updateWhitelistedState(domain: String) {
-        val isWhitelisted = withContext(dispatchers.io()) { userWhitelistDao.contains(domain) }
+        val isWhitelisted = isWhitelisted(domain)
         withContext(dispatchers.main()) {
             browserViewState.value = currentBrowserViewState().copy(isWhitelisted = isWhitelisted)
         }
+    }
+
+    private suspend fun isWhitelisted(domain: String): Boolean {
+        return withContext(dispatchers.io()) { userWhitelistDao.contains(domain) }
     }
 
     private fun urlUpdated(url: String) {
@@ -746,8 +750,8 @@ class BrowserTabViewModel(
 
     fun onWhitelistSelected() {
         val domain = site?.domain ?: return
-        GlobalScope.launch(dispatchers.default()) {
-            if (userWhitelistDao.contains(domain)) {
+        GlobalScope.launch(dispatchers.io()) {
+            if (isWhitelisted(domain)) {
                 removeFromWhitelist(domain)
             } else {
                 addToWhitelist(domain)

@@ -116,7 +116,7 @@ class PrivacyDashboardViewModel(
         if (site == null) {
             resetViewState()
         } else {
-            updateSite(site)
+            viewModelScope.launch { updateSite(site) }
         }
     }
 
@@ -137,22 +137,22 @@ class PrivacyDashboardViewModel(
         )
     }
 
-    private fun updateSite(site: Site) {
+    private suspend fun updateSite(site: Site) {
         val grades = site.calculateGrades()
-        viewModelScope.launch(dispatchers.io()) {
-            val toggleEnabled = site.domain?.let { !userWhitelistDao.contains(it) } ?: true
-            withContext(dispatchers.main()) {
-                viewState.value = viewState.value?.copy(
-                    domain = site.domain ?: "",
-                    beforeGrade = grades.grade,
-                    afterGrade = grades.improvedGrade,
-                    httpsStatus = site.https,
-                    trackerCount = site.trackerCount,
-                    allTrackersBlocked = site.allTrackersBlocked,
-                    toggleEnabled = toggleEnabled,
-                    practices = site.privacyPractices.summary
-                )
-            }
+        val domain = site.domain ?: ""
+        val toggleEnabled = withContext(dispatchers.io()) { !userWhitelistDao.contains(domain) }
+
+        withContext(dispatchers.main()) {
+            viewState.value = viewState.value?.copy(
+                domain = site.domain ?: "",
+                beforeGrade = grades.grade,
+                afterGrade = grades.improvedGrade,
+                httpsStatus = site.https,
+                trackerCount = site.trackerCount,
+                allTrackersBlocked = site.allTrackersBlocked,
+                toggleEnabled = toggleEnabled,
+                practices = site.privacyPractices.summary
+            )
         }
     }
 
