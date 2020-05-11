@@ -71,10 +71,11 @@ class HttpsUpgraderTest {
     }
 
     @Test
-    fun whenHttpDomainIsUserWhitelistedThenShouldNotUpgrade() {
+    fun whenHttpDomainIsUserWhitelistedThenShouldNotUpgradeAndNoLookupPixelIsSet() {
         whenever(mockUserWhitelistDao.contains("www.local.url")).thenReturn(true)
         bloomFilter.add("www.local.url")
         assertFalse(testee.shouldUpgrade(Uri.parse("http://www.local.url")))
+        mockPixel.fire(Pixel.PixelName.HTTPS_NO_LOOKUP)
     }
 
     @Test
