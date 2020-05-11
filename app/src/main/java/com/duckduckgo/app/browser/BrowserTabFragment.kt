@@ -796,7 +796,6 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
         }
 
         viewModel.privacyGradeState.observe(viewLifecycleOwner, Observer {
-            Timber.d("MARCOS Observed grade: $it")
             if (it.canShowPrivacyGrade) {
                 val drawable = context?.getDrawable(it.privacyGrade.icon())
                 privacyGradeButton?.setImageDrawable(drawable)
@@ -1270,7 +1269,6 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
     fun omnibarViews(): List<View> = listOf(clearTextButton, omnibarTextInput, searchIcon)
 
     override fun onAnimationFinished() {
-        Timber.d("MARCOS animation finished")
         viewModel.updatePrivacyGrade()
     }
 
@@ -1614,7 +1612,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
                         createTrackersAnimation()
                         animatorHelper.stopPulseAnimation()
                     } else {
-                        animatorHelper.pulseAnimation(privacyGradeButton)
+                        animatorHelper.startPulseAnimation(privacyGradeButton)
                         viewModel.stopShowPrivacyGrade()
                     }
                 }
@@ -1628,7 +1626,6 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
                 delay(TRACKERS_SECONDARY_DELAY)
                 if (lastSeenOmnibarViewState?.isEditing != true) {
                     val site = viewModel.siteLiveData.value
-                    val grade = viewModel.privacyGradeState.value?.privacyGrade
                     val events = site?.orderedTrackingEntities()
 
                     activity?.let { activity ->
@@ -1637,8 +1634,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
                             activity,
                             animationContainer,
                             omnibarViews(),
-                            events,
-                            grade
+                            events
                         )
                     }
                 }

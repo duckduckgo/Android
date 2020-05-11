@@ -20,10 +20,10 @@ import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
 import android.animation.PropertyValuesHolder
 import android.app.Activity
+import android.content.Context
 import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
-import android.view.animation.LinearInterpolator
 import android.widget.FrameLayout
 import android.widget.ImageButton
 import android.widget.ImageView
@@ -34,32 +34,30 @@ import androidx.core.animation.addListener
 import androidx.core.content.ContextCompat
 import androidx.core.view.children
 import androidx.core.widget.TextViewCompat
-import androidx.transition.Fade
-import androidx.transition.Slide
-import androidx.transition.TransitionManager
-import androidx.transition.TransitionSet
 import androidx.vectordrawable.graphics.drawable.AnimatedVectorDrawableCompat
 import com.duckduckgo.app.cta.ui.Cta
 import com.duckduckgo.app.cta.ui.DaxDialogCta
 import com.duckduckgo.app.global.view.toPx
-import com.duckduckgo.app.privacy.model.PrivacyGrade
 import com.duckduckgo.app.privacy.renderer.TrackersRenderer
 import com.duckduckgo.app.trackerdetection.model.Entity
-import timber.log.Timber
-import kotlin.math.log
-
 
 interface TrackersAnimatorListener {
     fun onAnimationFinished()
 }
 
-class BrowserTrackersAnimatorHelper(val privacyGradeButton: ImageButton) {
+class BrowserTrackersAnimatorHelper(private val privacyGradeButton: ImageButton) {
 
     private var trackersAnimation: AnimatorSet = AnimatorSet()
     private var pulseAnimation: AnimatorSet = AnimatorSet()
     private var listener: TrackersAnimatorListener? = null
 
-    fun startTrackersAnimation(cta: Cta?, activity: Activity, container: ConstraintLayout, omnibarViews: List<View>, entities: List<Entity>?, grade: PrivacyGrade?) {
+    fun startTrackersAnimation(
+        cta: Cta?,
+        activity: Activity,
+        container: ConstraintLayout,
+        omnibarViews: List<View>,
+        entities: List<Entity>?
+    ) {
         if (entities.isNullOrEmpty()) {
             listener?.onAnimationFinished()
             return
@@ -80,10 +78,33 @@ class BrowserTrackersAnimatorHelper(val privacyGradeButton: ImageButton) {
                     start()
                 }
             } else {
-                createFullTrackersAnimation(container, omnibarViews, logoViews, grade).apply {
+                createFullTrackersAnimation(container, omnibarViews, logoViews).apply {
                     start()
                 }
             }
+        }
+    }
+
+    fun startPulseAnimation(view: View) {
+        if (!pulseAnimation.isRunning) {
+            val scaleDown = ObjectAnimator.ofPropertyValuesHolder(
+                view,
+                PropertyValuesHolder.ofFloat("scaleX", 1f, 0.8f, 1f),
+                PropertyValuesHolder.ofFloat("scaleY", 1f, 0.8f, 1f)
+            )
+            scaleDown.repeatCount = ObjectAnimator.INFINITE
+            scaleDown.duration = PULSE_ANIMATION_DURATION
+
+            pulseAnimation = AnimatorSet().apply {
+                play(scaleDown)
+                start()
+            }
+        }
+    }
+
+    fun stopPulseAnimation() {
+        if (pulseAnimation.isRunning) {
+            pulseAnimation.end()
         }
     }
 
@@ -96,27 +117,17 @@ class BrowserTrackersAnimatorHelper(val privacyGradeButton: ImageButton) {
     }
 
     fun cancelAnimations() {
-        if (trackersAnimation.isRunning) {
-            trackersAnimation.end()
-        }
+        stopTrackersAnimation()
         stopPulseAnimation()
     }
 
-    fun areAnimationsRunning() = trackersAnimation.isRunning
-
     fun finishTrackerAnimation(fadeInViews: List<View>, container: ViewGroup) {
         val animateOmnibarIn = animateOmnibarIn(fadeInViews)
-        val animateLogosOut = animateFadeOut(container)
+        val animateContainerOut = animateFadeOut(container)
         trackersAnimation = AnimatorSet().apply {
-            play(animateLogosOut).before(animateOmnibarIn)
+            play(animateContainerOut).before(animateOmnibarIn)
             start()
-            addListener(
-                onEnd = {
-                    Timber.d("MARCOS DO ON END")
-//                    container.removeViews(1, container.children.count() - 1)
-                    listener?.onAnimationFinished()
-                }
-            )
+            addListener(onEnd = { listener?.onAnimationFinished() })
         }
     }
 
@@ -132,20 +143,20 @@ class BrowserTrackersAnimatorHelper(val privacyGradeButton: ImageButton) {
         container: ViewGroup,
         resourcesId: List<TrackerLogo>
     ): List<View> {
-        return resourcesId.mapIndexed { index, it ->
-            return@mapIndexed when (it) {
+        return resourcesId.map {
+            return@map when (it) {
                 is TrackerLogo.ImageLogo -> {
-                    val imageView = createTrackerImageLogo(activity, it, index)
+                    val imageView = createTrackerImageLogo(activity, it)
                     container.addView(imageView)
                     imageView
                 }
                 is TrackerLogo.LetterLogo -> {
-                    val frameLayout = createTrackerTextLogo(activity, it, index)
+                    val frameLayout = createTrackerTextLogo(activity, it)
                     container.addView(frameLayout)
                     frameLayout
                 }
                 is TrackerLogo.StackedLogo -> {
-                    val imageView = createTrackerStackedLogo(activity, it, index)
+                    val imageView = createTrackerStackedLogo(activity, it)
                     container.addView(imageView)
                     imageView
                 }
@@ -153,79 +164,81 @@ class BrowserTrackersAnimatorHelper(val privacyGradeButton: ImageButton) {
         }
     }
 
-    private fun createTrackerTextLogo(activity: Activity, trackerLogo: TrackerLogo.LetterLogo, index: Int): FrameLayout {
+    private fun getParams(): FrameLayout.LayoutParams {
         val params = FrameLayout.LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT, FrameLayout.LayoutParams.WRAP_CONTENT)
         params.gravity = Gravity.CENTER
-        val frameLayoutParams = FrameLayout.LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT, FrameLayout.LayoutParams.WRAP_CONTENT)
+        return params
+    }
 
-        val frameLayout = FrameLayout(activity)
+    private fun createAnimatedDrawable(context: Context): AnimatedVectorDrawableCompat? {
+        return AnimatedVectorDrawableCompat.create(context, R.drawable.network_cross_anim)
+    }
+
+    private fun createFrameLayoutContainer(context: Context): FrameLayout {
+        val frameLayoutParams = getParams()
+        val frameLayout = FrameLayout(context)
         frameLayout.alpha = 0f
-        frameLayout.visibility = View.INVISIBLE
         frameLayout.id = View.generateViewId()
         frameLayout.layoutParams = frameLayoutParams
         frameLayout.setBackgroundResource(R.drawable.background_tracker_logo)
+        return frameLayout
+    }
+
+    private fun createImageView(context: Context, resId: Int): ImageView {
+        val frameLayoutParams = getParams()
+        val imageView = ImageView(context)
+        imageView.scaleType = ImageView.ScaleType.CENTER_CROP
+        imageView.setBackgroundResource(resId)
+        imageView.id = View.generateViewId()
+        imageView.layoutParams = frameLayoutParams
+        return imageView
+    }
+
+    private fun createTextView(context: Context): AppCompatTextView {
+        val frameLayoutParams = getParams()
+
+        val textView = AppCompatTextView(context)
+        textView.gravity = Gravity.CENTER
+        TextViewCompat.setTextAppearance(textView, R.style.UnknownTrackerText)
+        textView.layoutParams = frameLayoutParams
+
+        return textView
+    }
+
+    private fun createTrackerTextLogo(activity: Activity, trackerLogo: TrackerLogo.LetterLogo): FrameLayout {
+        val frameLayoutParams = getParams()
+        val animatedDrawable = createAnimatedDrawable(activity)
 
         val animationView = ImageView(activity)
-        val animatedDrawable = AnimatedVectorDrawableCompat.create(activity, R.drawable.network_cross_anim)
         animationView.setImageDrawable(animatedDrawable)
-        animationView.layoutParams = params
+        animationView.layoutParams = frameLayoutParams
 
-        val textView = AppCompatTextView(activity)
-        textView.gravity = Gravity.CENTER
+        val textView = createTextView(activity)
         textView.setBackgroundResource(trackerLogo.resId)
-        TextViewCompat.setTextAppearance(textView, R.style.UnknownTrackerText)
         textView.text = trackerLogo.trackerLetter
-        textView.layoutParams = params
 
+        val frameLayout = createFrameLayoutContainer(activity)
         frameLayout.addView(textView)
         frameLayout.addView(animationView)
 
         return frameLayout
     }
 
-    private fun createTrackerStackedLogo(activity: Activity, trackerLogo: TrackerLogo.StackedLogo, index: Int): FrameLayout {
-        val params = FrameLayout.LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT, FrameLayout.LayoutParams.WRAP_CONTENT)
-        val frameLayoutParams = FrameLayout.LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT, FrameLayout.LayoutParams.WRAP_CONTENT)
-
-        params.gravity = Gravity.CENTER
-        val frameLayout = FrameLayout(activity)
-        frameLayout.alpha = 0f
-        frameLayout.visibility = View.INVISIBLE
-        frameLayout.id = View.generateViewId()
-        frameLayout.layoutParams = frameLayoutParams
-        frameLayout.setBackgroundResource(R.drawable.background_tracker_logo)
-
-        val imageView = ImageView(activity)
-        imageView.scaleType = ImageView.ScaleType.CENTER_CROP
-        imageView.setBackgroundResource(trackerLogo.resId)
-        imageView.id = View.generateViewId()
-        imageView.layoutParams = params
+    private fun createTrackerStackedLogo(activity: Activity, trackerLogo: TrackerLogo.StackedLogo): FrameLayout {
+        val imageView = createImageView(activity, trackerLogo.resId)
+        val frameLayout = createFrameLayoutContainer(activity)
 
         frameLayout.addView(imageView)
 
         return frameLayout
     }
 
-    private fun createTrackerImageLogo(activity: Activity, trackerLogo: TrackerLogo.ImageLogo, index: Int): FrameLayout {
-        val params = FrameLayout.LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT, FrameLayout.LayoutParams.WRAP_CONTENT)
-        val frameLayoutParams = FrameLayout.LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT, FrameLayout.LayoutParams.WRAP_CONTENT)
-
-        params.gravity = Gravity.CENTER
-        val frameLayout = FrameLayout(activity)
-        frameLayout.alpha = 0f
-        frameLayout.visibility = View.INVISIBLE
-        frameLayout.id = View.generateViewId()
-        frameLayout.layoutParams = frameLayoutParams
-        frameLayout.setBackgroundResource(R.drawable.background_tracker_logo)
-
-        val imageView = ImageView(activity)
-        imageView.scaleType = ImageView.ScaleType.CENTER_CROP
-        val animatedDrawable = AnimatedVectorDrawableCompat.create(activity, R.drawable.network_cross_anim)
+    private fun createTrackerImageLogo(activity: Activity, trackerLogo: TrackerLogo.ImageLogo): FrameLayout {
+        val imageView = createImageView(activity, trackerLogo.resId)
+        val animatedDrawable = createAnimatedDrawable(activity)
         imageView.setImageDrawable(animatedDrawable)
-        imageView.setBackgroundResource(trackerLogo.resId)
-        imageView.id = View.generateViewId()
-        imageView.layoutParams = params
 
+        val frameLayout = createFrameLayoutContainer(activity)
         frameLayout.addView(imageView)
 
         return frameLayout
@@ -274,12 +287,11 @@ class BrowserTrackersAnimatorHelper(val privacyGradeButton: ImageButton) {
     private fun createFullTrackersAnimation(
         container: ConstraintLayout,
         omnibarViews: List<View>,
-        logoViews: List<View>,
-        grade: PrivacyGrade?
+        logoViews: List<View>
     ): AnimatorSet {
         return AnimatorSet().apply {
             play(createPartialTrackersAnimation(container, omnibarViews, logoViews))
-            play(animateOmnibarMoveToLeft(logoViews))
+            play(animateLogosSlideOut(logoViews))
                 .after(TRACKER_LOGOS_DELAY_ON_SCREEN)
                 .before(animateOmnibarIn(omnibarViews))
             addListener(
@@ -297,12 +309,13 @@ class BrowserTrackersAnimatorHelper(val privacyGradeButton: ImageButton) {
         logoViews: List<View>
     ): AnimatorSet {
         applyConstraintSet(container, logoViews)
+        container.alpha = 1f
         val fadeOmnibarOut = animateOmnibarOut(omnibarViews)
-        animateMoveToRight(container, logoViews)
+        val slideInLogos = animateLogosSlideIn(logoViews)
         animateBlockedLogos(logoViews)
 
         return AnimatorSet().apply {
-            play(fadeOmnibarOut)
+            play(slideInLogos).after(fadeOmnibarOut)
         }
     }
 
@@ -314,22 +327,20 @@ class BrowserTrackersAnimatorHelper(val privacyGradeButton: ImageButton) {
             constraints.connect(view.id, ConstraintSet.TOP, ConstraintSet.PARENT_ID, ConstraintSet.TOP)
             constraints.connect(view.id, ConstraintSet.BOTTOM, ConstraintSet.PARENT_ID, ConstraintSet.BOTTOM)
             if (index == 0) {
-                constraints.connect(view.id, ConstraintSet.START, ConstraintSet.PARENT_ID, ConstraintSet.START, 25.toPx())
+                constraints.connect(view.id, ConstraintSet.START, ConstraintSet.PARENT_ID, ConstraintSet.START, FIRST_LOGO_MARGIN.toPx())
             } else {
-                constraints.setTranslationX(view.id, (-7.toPx() * index).toFloat())
+                constraints.setTranslationX(view.id, (NORMAL_LOGO_MARGIN.toPx() * index))
                 constraints.connect(view.id, ConstraintSet.START, views[index - 1].id, ConstraintSet.END, 0)
             }
             if (index == views.size - 1) {
-                if (views.size == 4) {
-                    constraints.setTranslationX(view.id, (-11.5f.toPx() * index).toFloat())
+                if (views.size == MAX_LOGOS_SHOWN) {
+                    constraints.setTranslationX(view.id, (STACKED_LOGO_MARGIN.toPx() * index))
                 }
                 constraints.connect(view.id, ConstraintSet.END, ConstraintSet.PARENT_ID, ConstraintSet.END)
             }
         }
 
-        views.reversed().map {
-            it.bringToFront()
-        }
+        views.reversed().map { it.bringToFront() }
 
         val viewIds = views.map { it.id }.toIntArray()
 
@@ -346,6 +357,14 @@ class BrowserTrackersAnimatorHelper(val privacyGradeButton: ImageButton) {
         }
 
         constraints.applyTo(container)
+    }
+
+    private fun calculateMarginInPx(position: Int): Int = START_MARGIN_IN_DP.toPx() + (position * LOGO_SIZE_IN_DP.toPx())
+
+    private fun stopTrackersAnimation() {
+        if (trackersAnimation.isRunning) {
+            trackersAnimation.end()
+        }
     }
 
     private fun animateOmnibarOut(views: List<View>): AnimatorSet {
@@ -366,86 +385,41 @@ class BrowserTrackersAnimatorHelper(val privacyGradeButton: ImageButton) {
         }
     }
 
-    private fun animateOmnibarMoveToRight(views: List<View>): AnimatorSet {
-//        val animators = views.map {
-//            animateMoveToRight2(it)
-//        }
-        val animators2 = views.map {
+    private fun animateLogosSlideIn(views: List<View>): AnimatorSet {
+        val initialMargin = (views.first().layoutParams as ConstraintLayout.LayoutParams).marginStart.toFloat()
+        val slideInAnimators = views.mapIndexed { index, it ->
+            val margin = calculateMarginInPx(index) + initialMargin
+            animateSlideIn(it, margin)
+        }
+        val fadeInAnimators = views.map {
             animateFadeIn(it)
         }
         return AnimatorSet().apply {
-            playTogether(animators2)
+            playTogether(slideInAnimators + fadeInAnimators)
         }
     }
 
-    private fun animateOmnibarMoveToLeft(views: List<View>): AnimatorSet {
-        val animators = views.map {
-            animateMoveToLeft(it)
+    private fun animateLogosSlideOut(views: List<View>): AnimatorSet {
+        val slideOutAnimators = views.map {
+            animateSlideOut(it)
         }
-        val animators2 = views.map {
+        val fadeOutAnimators = views.map {
             animateFadeOut(it)
         }
         return AnimatorSet().apply {
-            playTogether(animators + animators2)
+            playTogether(slideOutAnimators + fadeOutAnimators)
         }
     }
 
-    private fun animateMoveToRight2(view: View): ObjectAnimator {
-        return ObjectAnimator.ofFloat(view, "x", view.left.toFloat(), view.left.toFloat()).apply {
+    private fun animateSlideIn(view: View, margin: Float): ObjectAnimator {
+        return ObjectAnimator.ofFloat(view, "x", 0f, margin + view.translationX).apply {
             duration = DEFAULT_ANIMATION_DURATION
         }
     }
 
-    private fun animateMoveToLeft(view: View): ObjectAnimator {
+    private fun animateSlideOut(view: View): ObjectAnimator {
         return ObjectAnimator.ofFloat(view, "x", 0f).apply {
             duration = DEFAULT_ANIMATION_DURATION
-        }
-    }
-
-    private fun animateMoveToRight(viewGroup: ViewGroup, views: List<View>) {
-        val transitionSet = TransitionSet()
-        val transitionSlide = Slide(Gravity.START)
-        transitionSlide.duration = DEFAULT_ANIMATION_DURATION
-        transitionSlide.interpolator = LinearInterpolator()
-
-        val transitionFadeIn = Fade(Fade.IN)
-        transitionFadeIn.duration = DEFAULT_ANIMATION_DURATION
-        transitionFadeIn.interpolator = LinearInterpolator()
-
-        transitionSet.ordering = TransitionSet.ORDERING_TOGETHER
-
-        transitionSet
-            .addTransition(transitionFadeIn)
-            .addTransition(transitionSlide)
-
-        TransitionManager.beginDelayedTransition(viewGroup, transitionSet)
-        viewGroup.alpha = 1f
-        views.map {
-            it.visibility = View.VISIBLE
-            it.alpha = 1f
-        }
-    }
-
-    fun pulseAnimation(view: View) {
-        if (!pulseAnimation.isRunning) {
-            val scaleDown = ObjectAnimator.ofPropertyValuesHolder(
-                view,
-                PropertyValuesHolder.ofFloat("scaleX", 1f, 0.8f, 1f),
-                PropertyValuesHolder.ofFloat("scaleY", 1f, 0.8f, 1f)
-            )
-            scaleDown.repeatCount = ObjectAnimator.INFINITE
-            scaleDown.duration = 750
-
-            pulseAnimation = AnimatorSet().apply {
-                play(scaleDown)
-                start()
-            }
-        }
-    }
-
-    fun stopPulseAnimation() {
-        if (pulseAnimation.isRunning) {
-            pulseAnimation.end()
         }
     }
 
@@ -461,23 +435,21 @@ class BrowserTrackersAnimatorHelper(val privacyGradeButton: ImageButton) {
         }
     }
 
-    private fun animateExpand(view: View): ObjectAnimator {
-        return ObjectAnimator.ofFloat(view, "alpha", 0f, 1f).apply {
-            duration = DEFAULT_ANIMATION_DURATION
-        }
-    }
-
     companion object {
         private const val TRACKER_LOGOS_DELAY_ON_SCREEN = 2400L
-        private const val DEFAULT_ANIMATION_DURATION = 150L
+        private const val DEFAULT_ANIMATION_DURATION = 250L
+        private const val PULSE_ANIMATION_DURATION = 750L
         private const val MAX_LOGOS_SHOWN = 4
+        private const val LOGO_SIZE_IN_DP = 26
+        private const val START_MARGIN_IN_DP = 10
+        private const val STACKED_LOGO_MARGIN = -11.5f
+        private const val NORMAL_LOGO_MARGIN = -7f
+        private const val FIRST_LOGO_MARGIN = 25
     }
 }
 
 sealed class TrackerLogo(val resId: Int) {
     class ImageLogo(resId: Int) : TrackerLogo(resId)
-
     class LetterLogo(val trackerLetter: String = "", resId: Int = R.drawable.other_tracker_bg) : TrackerLogo(resId)
-
     class StackedLogo(resId: Int = R.drawable.other_tracker_bg) : TrackerLogo(resId)
 }
