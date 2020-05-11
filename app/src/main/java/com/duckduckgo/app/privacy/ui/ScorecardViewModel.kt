@@ -16,7 +16,6 @@
 
 package com.duckduckgo.app.privacy.ui
 
-import androidx.annotation.WorkerThread
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -82,7 +81,6 @@ class ScorecardViewModel(
         )
     }
 
-    @WorkerThread
     private fun updateSite(site: Site) {
         val domain = site.domain ?: ""
         val grades = site.calculateGrades()

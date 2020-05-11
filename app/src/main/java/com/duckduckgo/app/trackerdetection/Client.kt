@@ -27,7 +27,6 @@ interface Client {
         // current clients
         TDS(ClientType.BLOCKING),
         TEMPORARY_WHITELIST(ClientType.WHITELIST),
-        USER_WHITELIST(ClientType.WHITELIST),
 
         // legacy clients
         EASYLIST(ClientType.BLOCKING),
