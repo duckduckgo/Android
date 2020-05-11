@@ -28,6 +28,8 @@ import android.widget.FrameLayout
 import android.widget.ImageButton
 import android.widget.ImageView
 import androidx.appcompat.widget.AppCompatTextView
+import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.animation.addListener
 import androidx.core.content.ContextCompat
 import androidx.core.view.children
@@ -57,7 +59,7 @@ class BrowserTrackersAnimatorHelper(val privacyGradeButton: ImageButton) {
     private var pulseAnimation: AnimatorSet = AnimatorSet()
     private var listener: TrackersAnimatorListener? = null
 
-    fun startTrackersAnimation(cta: Cta?, activity: Activity, container: ViewGroup, omnibarViews: List<View>, entities: List<Entity>?, grade: PrivacyGrade?) {
+    fun startTrackersAnimation(cta: Cta?, activity: Activity, container: ConstraintLayout, omnibarViews: List<View>, entities: List<Entity>?, grade: PrivacyGrade?) {
         if (entities.isNullOrEmpty()) {
             listener?.onAnimationFinished()
             return
@@ -111,7 +113,7 @@ class BrowserTrackersAnimatorHelper(val privacyGradeButton: ImageButton) {
             addListener(
                 onEnd = {
                     Timber.d("MARCOS DO ON END")
-                    container.removeViews(1, container.children.count() - 1)
+//                    container.removeViews(1, container.children.count() - 1)
                     listener?.onAnimationFinished()
                 }
             )
@@ -120,14 +122,9 @@ class BrowserTrackersAnimatorHelper(val privacyGradeButton: ImageButton) {
 
     private fun getLogosViewListInContainer(activity: Activity, container: ViewGroup, entities: List<Entity>): List<View> {
         container.removeAllViews()
-        //container.alpha = 0f
+        container.alpha = 0f
         val logos = createResourcesIdList(activity, entities)
-        val logosList = createLogosViewList(activity, container, logos)
-//        logosList.reversed().map {
-//            it.bringToFront()
-//        }
-        logosList.first().bringToFront()
-        return logosList
+        return createLogosViewList(activity, container, logos)
     }
 
     private fun createLogosViewList(
@@ -152,11 +149,12 @@ class BrowserTrackersAnimatorHelper(val privacyGradeButton: ImageButton) {
         val params = FrameLayout.LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT, FrameLayout.LayoutParams.WRAP_CONTENT)
         params.gravity = Gravity.CENTER
         val frameLayoutParams = FrameLayout.LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT, FrameLayout.LayoutParams.WRAP_CONTENT)
-        if (index == 0) {
-            frameLayoutParams.setMargins(25.toPx(), 0, 0, 0)
-        } else {
-            frameLayoutParams.setMargins((-4).toPx(), 0, 0, 0)
-        }
+//        frameLayoutParams.gravity = Gravity.RIGHT
+//        if (index == 0) {
+//            frameLayoutParams.setMargins(25.toPx(), 0, 0, 0)
+//        } else {
+//            frameLayoutParams.setMargins((-4).toPx(), 0, 0, 0)
+//        }
         val frameLayout = FrameLayout(activity)
         frameLayout.alpha = 0f
         frameLayout.visibility = View.INVISIBLE
@@ -185,11 +183,12 @@ class BrowserTrackersAnimatorHelper(val privacyGradeButton: ImageButton) {
     private fun createTrackerImageLogo(activity: Activity, trackerLogo: TrackerLogo, index: Int): FrameLayout {
         val params = FrameLayout.LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT, FrameLayout.LayoutParams.WRAP_CONTENT)
         val frameLayoutParams = FrameLayout.LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT, FrameLayout.LayoutParams.WRAP_CONTENT)
-        if (index == 0) {
-            frameLayoutParams.setMargins(25.toPx(), 0, 0, 0)
-        } else {
-            frameLayoutParams.setMargins((-4).toPx(), 0, 0, 0)
-        }
+//        frameLayoutParams.gravity = Gravity.RIGHT
+//        if (index == 0) {
+//            frameLayoutParams.setMargins(25.toPx(), 0, 0, 0)
+//        } else {
+//            frameLayoutParams.setMargins((-4).toPx(), 0, 0, 0)
+//        }
         params.gravity = Gravity.CENTER
         val frameLayout = FrameLayout(activity)
         frameLayout.alpha = 0f
@@ -252,7 +251,7 @@ class BrowserTrackersAnimatorHelper(val privacyGradeButton: ImageButton) {
     }
 
     private fun createFullTrackersAnimation(
-        container: ViewGroup,
+        container: ConstraintLayout,
         omnibarViews: List<View>,
         logoViews: List<View>,
         grade: PrivacyGrade?
@@ -265,7 +264,8 @@ class BrowserTrackersAnimatorHelper(val privacyGradeButton: ImageButton) {
             addListener(
                 onEnd = {
                     Timber.d("MARCOS DO ON END")
-                    container.removeAllViews()
+                    //container.removeAllViews()
+                    container.alpha = 0f
                     listener?.onAnimationFinished()
                 }
             )
@@ -292,16 +292,16 @@ class BrowserTrackersAnimatorHelper(val privacyGradeButton: ImageButton) {
 //    }
 
     private fun createPartialTrackersAnimation(
-        container: ViewGroup,
+        container: ConstraintLayout,
         omnibarViews: List<View>,
         logoViews: List<View>
     ): AnimatorSet {
+        applyConstraintSet(container, logoViews)
         val fadeOmnibarOut = animateOmnibarOut(omnibarViews)
         //val fadeLogosIn = animateOmnibarMoveToRight(logoViews)
         val fadeLogosIn = animateOmnibarMoveToRight(logoViews)
         animateMoveToRight(container, logoViews)
         //animateMoveToRight(container, logoViews)
-        //applyConstraintSet(container, logoViews)
         animateBlockedLogos(logoViews)
 
         return AnimatorSet().apply {
@@ -310,38 +310,68 @@ class BrowserTrackersAnimatorHelper(val privacyGradeButton: ImageButton) {
         }
     }
 
-//    private fun applyConstraintSet(container: ConstraintLayout, views: List<View>) {
-//        val constraints = ConstraintSet()
-//        constraints.clone(container)
-//
-//        views.mapIndexed { index, view ->
-//            constraints.connect(view.id, ConstraintSet.TOP, ConstraintSet.PARENT_ID, ConstraintSet.TOP)
-//            constraints.connect(view.id, ConstraintSet.BOTTOM, ConstraintSet.PARENT_ID, ConstraintSet.BOTTOM)
-//            if (index == 0) {
-//                constraints.connect(view.id, ConstraintSet.START, ConstraintSet.PARENT_ID, ConstraintSet.START)
+    private fun applyConstraintSet(container: ConstraintLayout, views: List<View>) {
+        val constraints = ConstraintSet()
+        constraints.clone(container)
+
+        views.mapIndexed { index, view ->
+            constraints.connect(view.id, ConstraintSet.TOP, ConstraintSet.PARENT_ID, ConstraintSet.TOP)
+            constraints.connect(view.id, ConstraintSet.BOTTOM, ConstraintSet.PARENT_ID, ConstraintSet.BOTTOM)
+            if (index == 0) {
+                constraints.connect(view.id, ConstraintSet.START, ConstraintSet.PARENT_ID, ConstraintSet.START, 25.toPx())
+            } else {
+                constraints.setTranslationX(view.id, (-7.toPx() * index).toFloat())
+                constraints.connect(view.id, ConstraintSet.START, views[index - 1].id, ConstraintSet.END, 0)
+            }
+            if (index == views.size - 1) {
+                constraints.connect(view.id, ConstraintSet.END, ConstraintSet.PARENT_ID, ConstraintSet.END)
+            }
+        }
+
+        views.reversed().map {
+            it.bringToFront()
+        }
+
+        val viewIds = views.map { it.id }.toIntArray()
+
+        if (viewIds.size > 1) {
+            constraints.createHorizontalChain(
+                ConstraintSet.PARENT_ID,
+                ConstraintSet.LEFT,
+                ConstraintSet.PARENT_ID,
+                ConstraintSet.RIGHT,
+                viewIds,
+                null,
+                ConstraintSet.CHAIN_SPREAD
+            )
+        }
+
+        constraints.applyTo(container)
+    }
+
+//    var previousItem: View? = null
+//    var i = 1
+//    views.map {
+//        val isLastItem = views.indexOf(it) == views.size - 1
+//        constraints.connect(it.id, ConstraintSet.TOP, ConstraintSet.PARENT_ID, ConstraintSet.TOP)
+//        constraints.connect(it.id, ConstraintSet.BOTTOM, ConstraintSet.PARENT_ID, ConstraintSet.BOTTOM)
+//        if (previousItem == null) {
+//            constraints.connect(it.id, ConstraintSet.START, ConstraintSet.PARENT_ID, ConstraintSet.START)
+//        } else {
+//            val margin = if (it is TextView) {
+//                if (views.size == 2) 10 else 0
 //            } else {
-//                constraints.connect(view.id, ConstraintSet.START, views[index - 1].id, ConstraintSet.END, 10)
+//                0
 //            }
-//            if (index == views.size - 1) {
-//                constraints.connect(view.id, ConstraintSet.END, ConstraintSet.PARENT_ID, ConstraintSet.END)
-//            }
+//            val margin2 = if (it is TextView) (10f * (2 - views.size)) else (-15f * views.indexOf(it))
+//            constraints.setTranslationX(it.id, margin2)
+//            constraints.connect(it.id, ConstraintSet.START, (previousItem as View).id, ConstraintSet.END, margin)
 //        }
-//
-//        val viewIds = views.map { it.id }.toIntArray()
-//
-//        if (viewIds.size > 1) {
-//            constraints.createHorizontalChain(
-//                ConstraintSet.PARENT_ID,
-//                ConstraintSet.LEFT,
-//                ConstraintSet.PARENT_ID,
-//                ConstraintSet.RIGHT,
-//                viewIds,
-//                null,
-//                ConstraintSet.CHAIN_SPREAD
-//            )
+//        if (isLastItem) {
+//            constraints.connect(it.id, ConstraintSet.END, ConstraintSet.PARENT_ID, ConstraintSet.END)
 //        }
-//
-//        constraints.applyTo(container)
+//        previousItem = it
+//        i++
 //    }
 
     private fun animateOmnibarOut(views: List<View>): AnimatorSet {
@@ -415,6 +445,7 @@ class BrowserTrackersAnimatorHelper(val privacyGradeButton: ImageButton) {
             .addTransition(transitionSlide)
 
         TransitionManager.beginDelayedTransition(viewGroup, transitionSet)
+        viewGroup.alpha = 1f
         views.map {
             it.visibility = View.VISIBLE
             it.alpha = 1f
@@ -441,7 +472,7 @@ class BrowserTrackersAnimatorHelper(val privacyGradeButton: ImageButton) {
 
     fun stopPulseAnimation() {
         if (pulseAnimation.isRunning) {
-            pulseAnimation.cancel()
+            pulseAnimation.end()
         }
     }
 

@@ -57,6 +57,18 @@
                         android:paddingStart="6dp"
                         android:paddingEnd="6dp">
 
+                        <androidx.constraintlayout.widget.ConstraintLayout
+                            android:id="@+id/animationContainer"
+                            android:paddingStart="10dp"
+                            android:layout_width="wrap_content"
+                            android:layout_height="0dp"
+                            app:layout_constraintBottom_toBottomOf="@id/omnibarIconContainer"
+                            app:layout_constraintStart_toStartOf="@id/omnibarIconContainer"
+                            app:layout_constraintTop_toTopOf="@id/omnibarIconContainer"
+
+                            tools:ignore="RtlSymmetry" >
+                        </androidx.constraintlayout.widget.ConstraintLayout>
+
                         <FrameLayout
                             android:id="@+id/omnibarIconContainer"
                             android:layout_width="wrap_content"
@@ -64,16 +76,6 @@
                             app:layout_constraintBottom_toBottomOf="parent"
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintTop_toTopOf="parent">
-
-                            <LinearLayout
-                                android:id="@+id/animationContainer"
-                                android:orientation="horizontal"
-                                android:gravity="center"
-                                android:paddingStart="10dp"
-                                android:layout_width="wrap_content"
-                                android:layout_height="match_parent"
-                                tools:ignore="RtlSymmetry" >
-                            </LinearLayout>
 
                             <ImageButton
                                 android:id="@+id/privacyGradeButton"

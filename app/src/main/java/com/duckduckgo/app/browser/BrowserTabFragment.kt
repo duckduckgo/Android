@@ -156,16 +156,7 @@ import kotlinx.android.synthetic.main.include_new_browser_tab.ctaContainer
 import kotlinx.android.synthetic.main.include_new_browser_tab.ctaTopContainer
 import kotlinx.android.synthetic.main.include_new_browser_tab.ddgLogo
 import kotlinx.android.synthetic.main.include_new_browser_tab.newTabLayout
-import kotlinx.android.synthetic.main.include_omnibar_toolbar.appBarLayout
-import kotlinx.android.synthetic.main.include_omnibar_toolbar.browserMenu
-import kotlinx.android.synthetic.main.include_omnibar_toolbar.clearTextButton
-import kotlinx.android.synthetic.main.include_omnibar_toolbar.networksContainer
-import kotlinx.android.synthetic.main.include_omnibar_toolbar.omnibarTextInput
-import kotlinx.android.synthetic.main.include_omnibar_toolbar.pageLoadingIndicator
-import kotlinx.android.synthetic.main.include_omnibar_toolbar.privacyGradeButton
-import kotlinx.android.synthetic.main.include_omnibar_toolbar.searchIcon
-import kotlinx.android.synthetic.main.include_omnibar_toolbar.toolbar
-import kotlinx.android.synthetic.main.include_omnibar_toolbar.toolbarContainer
+import kotlinx.android.synthetic.main.include_omnibar_toolbar.*
 import kotlinx.android.synthetic.main.include_omnibar_toolbar.view.browserMenu
 import kotlinx.android.synthetic.main.include_omnibar_toolbar.view.fireIconMenu
 import kotlinx.android.synthetic.main.include_omnibar_toolbar.view.privacyGradeButton
@@ -1656,7 +1647,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
 
         fun cancelAllAnimations() {
             animatorHelper.cancelAnimations()
-            //animationContainer.alpha = 0f
+            animationContainer.alpha = 0f
             clearTextButton.alpha = 1f
             omnibarTextInput.alpha = 1f
         }
