@@ -28,7 +28,6 @@ import android.webkit.WebChromeClient
 import android.webkit.WebView
 import androidx.annotation.AnyThread
 import androidx.annotation.VisibleForTesting
-import androidx.annotation.WorkerThread
 import androidx.core.net.toUri
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -520,24 +519,22 @@ class BrowserTabViewModel(
             statisticsUpdater.refreshSearchRetentionAtb()
         }
 
-        updateLoadingStatePrivacy()
-        domain?.let { updateWhitelistedState(domain) }
+        domain?.let { viewModelScope.launch { updateLoadingStatePrivacy(domain) } }
+        domain?.let { viewModelScope.launch { updateWhitelistedState(domain) } }
         registerSiteVisit()
     }
 
-    private fun updateLoadingStatePrivacy() {
-        viewModelScope.launch(dispatchers.io()) {
-            site?.domain?.let {
-                loadingViewState.postValue(currentLoadingViewState().copy(privacyOn = !userWhitelistDao.contains(it)))
-            }
+    private suspend fun updateLoadingStatePrivacy(domain: String) {
+        val whitelisted = withContext(dispatchers.io()) { userWhitelistDao.contains(domain) }
+        withContext(dispatchers.main()) {
+            loadingViewState.value = currentLoadingViewState().copy(privacyOn = !whitelisted)
         }
     }
 
-    private fun updateWhitelistedState(domain: String) {
-        viewModelScope.launch(dispatchers.io()) {
-            browserViewState.postValue(
-                currentBrowserViewState().copy(isWhitelisted = userWhitelistDao.contains(domain))
-            )
+    private suspend fun updateWhitelistedState(domain: String) {
+        val isWhitelisted = withContext(dispatchers.io()) { userWhitelistDao.contains(domain) }
+        withContext(dispatchers.main()) {
+            browserViewState.value = currentBrowserViewState().copy(isWhitelisted = isWhitelisted)
         }
     }
 
@@ -749,7 +746,7 @@ class BrowserTabViewModel(
 
     fun onWhitelistSelected() {
         val domain = site?.domain ?: return
-        GlobalScope.launch(dispatchers.io()) {
+        GlobalScope.launch(dispatchers.default()) {
             if (userWhitelistDao.contains(domain)) {
                 removeFromWhitelist(domain)
             } else {
@@ -759,18 +756,24 @@ class BrowserTabViewModel(
         }
     }
 
-    @WorkerThread
-    private fun addToWhitelist(domain: String) {
+    private suspend fun addToWhitelist(domain: String) {
         pixel.fire(PixelName.BROWSER_MENU_WHITELIST_ADD)
-        userWhitelistDao.insert(domain)
-        browserViewState.postValue(currentBrowserViewState().copy(isWhitelisted = true))
+        withContext(dispatchers.io()) {
+            userWhitelistDao.insert(domain)
+        }
+        withContext(dispatchers.main()) {
+            browserViewState.value = currentBrowserViewState().copy(isWhitelisted = true)
+        }
     }
 
-    @WorkerThread
-    private fun removeFromWhitelist(domain: String) {
+    private suspend fun removeFromWhitelist(domain: String) {
         pixel.fire(PixelName.BROWSER_MENU_WHITELIST_REMOVE)
-        userWhitelistDao.delete(domain)
-        browserViewState.postValue(currentBrowserViewState().copy(isWhitelisted = false))
+        withContext(dispatchers.io()) {
+            userWhitelistDao.delete(domain)
+        }
+        withContext(dispatchers.main()) {
+            browserViewState.value = currentBrowserViewState().copy(isWhitelisted = false)
+        }
     }
 
     fun onUserSelectedToEditQuery(query: String) {

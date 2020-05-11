@@ -29,6 +29,7 @@ import com.duckduckgo.app.privacy.model.PrivacyGrade
 import com.duckduckgo.app.privacy.model.PrivacyPractices
 import com.duckduckgo.app.privacy.model.PrivacyPractices.Summary.UNKNOWN
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class ScorecardViewModel(
     private val userWhitelistDao: UserWhitelistDao,
@@ -61,7 +62,7 @@ class ScorecardViewModel(
         if (site == null) {
             resetViewState()
         } else {
-            updateSite(site)
+            viewModelScope.launch { updateSite(site) }
         }
     }
 
@@ -81,27 +82,27 @@ class ScorecardViewModel(
         )
     }
 
-    private fun updateSite(site: Site) {
+    private suspend fun updateSite(site: Site) {
         val domain = site.domain ?: ""
         val grades = site.calculateGrades()
         val grade = grades.grade
         val improvedGrade = grades.improvedGrade
 
-        viewModelScope.launch(dispatchers.io()) {
-            viewState.postValue(
-                viewState.value?.copy(
-                    domain = domain,
-                    beforeGrade = grade,
-                    afterGrade = improvedGrade,
-                    trackerCount = site.trackerCount,
-                    majorNetworkCount = site.majorNetworkCount,
-                    httpsStatus = site.https,
-                    allTrackersBlocked = site.allTrackersBlocked,
-                    practices = site.privacyPractices.summary,
-                    privacyOn = !userWhitelistDao.contains(domain),
-                    showIsMemberOfMajorNetwork = site.entity?.isMajor ?: false,
-                    showEnhancedGrade = grade != improvedGrade
-                )
+        val isWhitelisted = withContext(dispatchers.io()) { userWhitelistDao.contains(domain) }
+
+        withContext(dispatchers.main()) {
+            viewState.value = viewState.value?.copy(
+                domain = domain,
+                beforeGrade = grade,
+                afterGrade = improvedGrade,
+                trackerCount = site.trackerCount,
+                majorNetworkCount = site.majorNetworkCount,
+                httpsStatus = site.https,
+                allTrackersBlocked = site.allTrackersBlocked,
+                practices = site.privacyPractices.summary,
+                privacyOn = !isWhitelisted,
+                showIsMemberOfMajorNetwork = site.entity?.isMajor ?: false,
+                showEnhancedGrade = grade != improvedGrade
             )
         }
     }

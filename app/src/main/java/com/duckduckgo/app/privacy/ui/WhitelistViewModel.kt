@@ -107,7 +107,6 @@ class WhitelistViewModel(
         GlobalScope.launch(dispatchers.io()) {
             deleteEntryFromDatabase(entry)
         }
-
     }
 
     private suspend fun addEntryToDatabase(entry: UserWhitelistedDomain) {
