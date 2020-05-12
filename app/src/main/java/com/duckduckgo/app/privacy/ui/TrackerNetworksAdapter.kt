@@ -104,7 +104,7 @@ class TrackerNetworksAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
             holder.icon.show()
             holder.unknownIcon.gone()
         } else {
-            val drawable = Theming.getThemedDrawable(holder.icon.context, R.drawable.other_tracker_bg, DuckDuckGoTheme.LIGHT)
+            val drawable = Theming.getThemedDrawable(holder.icon.context, R.drawable.other_tracker_privacy_dashboard_bg, DuckDuckGoTheme.LIGHT)
             holder.unknownIcon.text = viewElement.networkDisplayName.take(1)
             holder.unknownIcon.background = drawable
             holder.unknownIcon.show()

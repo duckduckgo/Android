@@ -626,7 +626,6 @@ class BrowserTabViewModel(
     }
 
     private fun onSiteChanged() {
-        Timber.d("MARCOS On Site Changed")
         httpsUpgraded = false
         viewModelScope.launch {
             val improvedGrade = withContext(dispatchers.io()) {
@@ -645,7 +644,6 @@ class BrowserTabViewModel(
     }
 
     fun updatePrivacyGrade() {
-        Timber.d("MARCOS update privacy grade")
         privacyGradeState.value = currentPrivacyGradeState().copy(canShowPrivacyGrade = true)
     }
 

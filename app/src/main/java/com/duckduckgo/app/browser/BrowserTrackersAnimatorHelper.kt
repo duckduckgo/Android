@@ -89,8 +89,8 @@ class BrowserTrackersAnimatorHelper(private val privacyGradeButton: ImageButton)
         if (!pulseAnimation.isRunning) {
             val scaleDown = ObjectAnimator.ofPropertyValuesHolder(
                 view,
-                PropertyValuesHolder.ofFloat("scaleX", 1f, 0.8f, 1f),
-                PropertyValuesHolder.ofFloat("scaleY", 1f, 0.8f, 1f)
+                PropertyValuesHolder.ofFloat("scaleX", 1f, 0.9f, 1f),
+                PropertyValuesHolder.ofFloat("scaleY", 1f, 0.9f, 1f)
             )
             scaleDown.repeatCount = ObjectAnimator.INFINITE
             scaleDown.duration = PULSE_ANIMATION_DURATION
@@ -437,8 +437,8 @@ class BrowserTrackersAnimatorHelper(private val privacyGradeButton: ImageButton)
 
     companion object {
         private const val TRACKER_LOGOS_DELAY_ON_SCREEN = 2400L
-        private const val DEFAULT_ANIMATION_DURATION = 250L
-        private const val PULSE_ANIMATION_DURATION = 750L
+        private const val DEFAULT_ANIMATION_DURATION = 150L
+        private const val PULSE_ANIMATION_DURATION = 1500L
         private const val MAX_LOGOS_SHOWN = 4
         private const val LOGO_SIZE_IN_DP = 26
         private const val START_MARGIN_IN_DP = 10
