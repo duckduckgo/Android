@@ -97,7 +97,7 @@ class SQLCookieRemoverTest {
     }
 
     @Test
-    fun whenUnableToOpenDatabaseThenPixelFiredAndExceptionRecorded() = runBlocking {
+    fun whenUnableToOpenDatabaseThenPixelFiredAndSaveOfflineCount() = runBlocking {
         val mockDatabaseLocator = mock<DatabaseLocator> {
             on { getDatabasePath() } doReturn "fakePath"
         }
