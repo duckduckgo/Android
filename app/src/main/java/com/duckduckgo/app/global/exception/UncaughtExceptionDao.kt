@@ -35,7 +35,6 @@ abstract class UncaughtExceptionDao {
 
     @Query("DELETE FROM UncaughtExceptionEntity WHERE id=:id")
     abstract fun delete(id: Long)
-
 }
 
 enum class UncaughtExceptionSource {
@@ -49,8 +48,7 @@ enum class UncaughtExceptionSource {
     HIDE_CUSTOM_VIEW,
     ON_PROGRESS_CHANGED,
     RECEIVED_PAGE_TITLE,
-    SHOW_FILE_CHOOSER,
-    COOKIE_DATABASE
+    SHOW_FILE_CHOOSER
 }
 
 class UncaughtExceptionSourceConverter {
@@ -60,5 +58,4 @@ class UncaughtExceptionSourceConverter {
 
     @TypeConverter
     fun convertFromDb(value: String): UncaughtExceptionSource? = UncaughtExceptionSource.valueOf(value)
-
 }

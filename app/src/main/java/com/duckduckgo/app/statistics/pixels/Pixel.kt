@@ -49,7 +49,6 @@ interface Pixel {
         APPLICATION_CRASH_WEBVIEW_ON_PROGRESS_CHANGED("m_d_ac_wpc"),
         APPLICATION_CRASH_WEBVIEW_RECEIVED_PAGE_TITLE("m_d_ac_wpt"),
         APPLICATION_CRASH_WEBVIEW_SHOW_FILE_CHOOSER("m_d_ac_wfc"),
-        APPLICATION_CRASH_COOKIE_DATABASE("m_d_ac_cdb"),
 
         WEB_RENDERER_GONE_CRASH("m_d_wrg_c"),
         WEB_RENDERER_GONE_KILLED("m_d_wrg_k"),
@@ -174,7 +173,10 @@ interface Pixel {
 
         COOKIE_DATABASE_NOT_FOUND("m_cdb_nf"),
         COOKIE_DATABASE_OPEN_ERROR("m_cdb_oe"),
-        COOKIE_DATABASE_DELETE_ERROR("m_cdb_de")
+        COOKIE_DATABASE_DELETE_ERROR("m_cdb_de"),
+
+        COOKIE_DATABASE_EXCEPTION_OPEN_ERROR("m_cdb_e_oe"),
+        COOKIE_DATABASE_EXCEPTION_DELETE_ERROR("m_cdb_e_de")
     }
 
     object PixelParameter {

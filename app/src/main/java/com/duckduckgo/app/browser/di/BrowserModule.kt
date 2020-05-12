@@ -42,6 +42,7 @@ import com.duckduckgo.app.httpsupgrade.HttpsUpgrader
 import com.duckduckgo.app.privacy.db.PrivacyProtectionCountDao
 import com.duckduckgo.app.referral.AppReferrerDataStore
 import com.duckduckgo.app.statistics.VariantManager
+import com.duckduckgo.app.statistics.pixels.ExceptionPixel
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.store.OfflinePixelCountDataStore
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
@@ -160,10 +161,10 @@ class BrowserModule {
         webViewDatabaseLocator: WebViewDatabaseLocator,
         getCookieHostsToPreserve: GetCookieHostsToPreserve,
         pixel: Pixel,
-        uncaughtExceptionRepository: UncaughtExceptionRepository,
+        exceptionPixel: ExceptionPixel,
         dispatcherProvider: DispatcherProvider
     ): SQLCookieRemover {
-        return SQLCookieRemover(webViewDatabaseLocator, getCookieHostsToPreserve, pixel, uncaughtExceptionRepository, dispatcherProvider)
+        return SQLCookieRemover(webViewDatabaseLocator, getCookieHostsToPreserve, pixel, exceptionPixel, dispatcherProvider)
     }
 
     @Provides

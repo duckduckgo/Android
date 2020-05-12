@@ -20,8 +20,7 @@ import android.database.DatabaseErrorHandler
 import android.database.sqlite.SQLiteDatabase
 import android.webkit.CookieManager
 import com.duckduckgo.app.global.DispatcherProvider
-import com.duckduckgo.app.global.exception.UncaughtExceptionRepository
-import com.duckduckgo.app.global.exception.UncaughtExceptionSource
+import com.duckduckgo.app.statistics.pixels.ExceptionPixel
 import com.duckduckgo.app.statistics.pixels.Pixel
 import kotlinx.coroutines.withContext
 import timber.log.Timber
@@ -48,7 +47,7 @@ class SQLCookieRemover(
     private val webViewDatabaseLocator: DatabaseLocator,
     private val getCookieHostsToPreserve: GetCookieHostsToPreserve,
     private val pixel: Pixel,
-    private val uncaughtExceptionRepository: UncaughtExceptionRepository,
+    private val exceptionPixel: ExceptionPixel,
     private val dispatcherProvider: DispatcherProvider
 ) : CookieRemover {
 
@@ -65,7 +64,7 @@ class SQLCookieRemover(
         }
     }
 
-    private suspend fun openReadableDatabase(databasePath: String): SQLiteDatabase? {
+    private fun openReadableDatabase(databasePath: String): SQLiteDatabase? {
         return try {
             SQLiteDatabase.openDatabase(
                 databasePath,
@@ -74,12 +73,12 @@ class SQLCookieRemover(
                 DatabaseErrorHandler { Timber.e("COOKIE: onCorruption") })
         } catch (exception: Exception) {
             pixel.fire(Pixel.PixelName.COOKIE_DATABASE_OPEN_ERROR)
-            uncaughtExceptionRepository.recordUncaughtException(exception, UncaughtExceptionSource.COOKIE_DATABASE)
+            exceptionPixel.sendExceptionPixel(Pixel.PixelName.COOKIE_DATABASE_EXCEPTION_OPEN_ERROR, exception)
             null
         }
     }
 
-    private suspend fun removeCookies(databasePath: String, excludedSites: List<String>): Boolean {
+    private fun removeCookies(databasePath: String, excludedSites: List<String>): Boolean {
         var deleteExecuted = false
         openReadableDatabase(databasePath)?.apply {
             try {
@@ -90,7 +89,7 @@ class SQLCookieRemover(
             } catch (exception: Exception) {
                 Timber.e(exception)
                 pixel.fire(Pixel.PixelName.COOKIE_DATABASE_DELETE_ERROR)
-                uncaughtExceptionRepository.recordUncaughtException(exception, UncaughtExceptionSource.COOKIE_DATABASE)
+                exceptionPixel.sendExceptionPixel(Pixel.PixelName.COOKIE_DATABASE_EXCEPTION_DELETE_ERROR, exception)
             } finally {
                 close()
             }

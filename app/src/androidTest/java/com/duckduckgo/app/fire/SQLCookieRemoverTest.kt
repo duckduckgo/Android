@@ -23,8 +23,8 @@ import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
 import com.duckduckgo.app.global.DefaultDispatcherProvider
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.db.AppDatabase
-import com.duckduckgo.app.global.exception.UncaughtExceptionRepository
-import com.duckduckgo.app.global.exception.UncaughtExceptionSource
+import com.duckduckgo.app.global.exception.RootExceptionFinder
+import com.duckduckgo.app.statistics.pixels.ExceptionPixel
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.nhaarman.mockitokotlin2.*
 import kotlinx.coroutines.Dispatchers
@@ -45,7 +45,6 @@ class SQLCookieRemoverTest {
     private val mockPixel = mock<Pixel>()
     private val webViewDatabaseLocator = WebViewDatabaseLocator(context)
     private val getHostsToPreserve = GetCookieHostsToPreserve(fireproofWebsiteDao)
-    private val mockUncaughtExceptionRepository = mock<UncaughtExceptionRepository>()
 
     @After
     fun after() = runBlocking {
@@ -105,7 +104,7 @@ class SQLCookieRemoverTest {
         sqlCookieRemover.removeCookies()
 
         verify(mockPixel).fire(Pixel.PixelName.COOKIE_DATABASE_OPEN_ERROR)
-        verify(mockUncaughtExceptionRepository).recordUncaughtException(any(), eq(UncaughtExceptionSource.COOKIE_DATABASE))
+        verify(mockPixel).fire(eq(Pixel.PixelName.COOKIE_DATABASE_EXCEPTION_OPEN_ERROR), any(), any())
     }
 
     private fun givenFireproofWebsitesStored() {
@@ -129,14 +128,14 @@ class SQLCookieRemoverTest {
         databaseLocator: DatabaseLocator = webViewDatabaseLocator,
         cookieHostsToPreserve: GetCookieHostsToPreserve = getHostsToPreserve,
         pixel: Pixel = mockPixel,
-        uncaughtExceptionRepository: UncaughtExceptionRepository = mockUncaughtExceptionRepository,
+        exceptionPixel: ExceptionPixel = ExceptionPixel(mockPixel, RootExceptionFinder()),
         dispatcherProvider: DispatcherProvider = DefaultDispatcherProvider()
     ): SQLCookieRemover {
         return SQLCookieRemover(
             databaseLocator,
             cookieHostsToPreserve,
             pixel,
-            uncaughtExceptionRepository,
+            exceptionPixel,
             dispatcherProvider
         )
     }

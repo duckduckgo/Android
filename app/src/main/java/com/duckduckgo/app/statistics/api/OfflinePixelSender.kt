@@ -27,11 +27,12 @@ import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.EXCEPTION_MESSA
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.EXCEPTION_TIMESTAMP
 import com.duckduckgo.app.statistics.store.OfflinePixelCountDataStore
 import io.reactivex.Completable
-import io.reactivex.Completable.*
+import io.reactivex.Completable.complete
+import io.reactivex.Completable.defer
+import io.reactivex.Completable.mergeDelayError
 import kotlinx.coroutines.runBlocking
 import timber.log.Timber
 import javax.inject.Inject
-
 
 /**
  * Most pixels are "send and forget" however we sometimes need to guarantee that a pixel will be sent.
@@ -137,7 +138,6 @@ class OfflinePixelSender @Inject constructor(
             ON_PROGRESS_CHANGED -> APPLICATION_CRASH_WEBVIEW_ON_PROGRESS_CHANGED
             RECEIVED_PAGE_TITLE -> APPLICATION_CRASH_WEBVIEW_RECEIVED_PAGE_TITLE
             SHOW_FILE_CHOOSER -> APPLICATION_CRASH_WEBVIEW_SHOW_FILE_CHOOSER
-            COOKIE_DATABASE -> APPLICATION_CRASH_COOKIE_DATABASE
         }.pixelName
     }
 }
