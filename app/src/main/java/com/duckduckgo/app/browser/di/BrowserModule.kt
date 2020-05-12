@@ -160,11 +160,11 @@ class BrowserModule {
     fun sqlCookieRemover(
         webViewDatabaseLocator: WebViewDatabaseLocator,
         getCookieHostsToPreserve: GetCookieHostsToPreserve,
-        pixel: Pixel,
+        offlinePixelCountDataStore: OfflinePixelCountDataStore,
         exceptionPixel: ExceptionPixel,
         dispatcherProvider: DispatcherProvider
     ): SQLCookieRemover {
-        return SQLCookieRemover(webViewDatabaseLocator, getCookieHostsToPreserve, pixel, exceptionPixel, dispatcherProvider)
+        return SQLCookieRemover(webViewDatabaseLocator, getCookieHostsToPreserve, offlinePixelCountDataStore, exceptionPixel, dispatcherProvider)
     }
 
     @Provides

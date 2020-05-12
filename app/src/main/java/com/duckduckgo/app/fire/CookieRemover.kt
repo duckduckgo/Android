@@ -22,6 +22,7 @@ import android.webkit.CookieManager
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.statistics.pixels.ExceptionPixel
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.store.OfflinePixelCountDataStore
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 import kotlin.coroutines.resume
@@ -46,7 +47,7 @@ class CookieManagerRemover(private val cookieManager: CookieManager) : CookieRem
 class SQLCookieRemover(
     private val webViewDatabaseLocator: DatabaseLocator,
     private val getCookieHostsToPreserve: GetCookieHostsToPreserve,
-    private val pixel: Pixel,
+    private val offlinePixelCountDataStore: OfflinePixelCountDataStore,
     private val exceptionPixel: ExceptionPixel,
     private val dispatcherProvider: DispatcherProvider
 ) : CookieRemover {
@@ -58,7 +59,7 @@ class SQLCookieRemover(
                 val excludedHosts = getCookieHostsToPreserve()
                 return@withContext removeCookies(databasePath, excludedHosts)
             } else {
-                pixel.fire(Pixel.PixelName.COOKIE_DATABASE_NOT_FOUND)
+                offlinePixelCountDataStore.cookieDatabaseNotFoundCount += 1
             }
             return@withContext false
         }
@@ -72,7 +73,7 @@ class SQLCookieRemover(
                 SQLiteDatabase.OPEN_READWRITE,
                 DatabaseErrorHandler { Timber.e("COOKIE: onCorruption") })
         } catch (exception: Exception) {
-            pixel.fire(Pixel.PixelName.COOKIE_DATABASE_OPEN_ERROR)
+            offlinePixelCountDataStore.cookieDatabaseOpenErrorCount += 1
             exceptionPixel.sendExceptionPixel(Pixel.PixelName.COOKIE_DATABASE_EXCEPTION_OPEN_ERROR, exception)
             null
         }
@@ -88,7 +89,7 @@ class SQLCookieRemover(
                 Timber.v("$number cookies removed")
             } catch (exception: Exception) {
                 Timber.e(exception)
-                pixel.fire(Pixel.PixelName.COOKIE_DATABASE_DELETE_ERROR)
+                offlinePixelCountDataStore.cookieDatabaseDeleteErrorCount += 1
                 exceptionPixel.sendExceptionPixel(Pixel.PixelName.COOKIE_DATABASE_EXCEPTION_DELETE_ERROR, exception)
             } finally {
                 close()

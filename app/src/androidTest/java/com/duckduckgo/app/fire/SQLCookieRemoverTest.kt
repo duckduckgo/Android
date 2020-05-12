@@ -26,6 +26,7 @@ import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.global.exception.RootExceptionFinder
 import com.duckduckgo.app.statistics.pixels.ExceptionPixel
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.store.OfflinePixelCountDataStore
 import com.nhaarman.mockitokotlin2.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
@@ -43,6 +44,7 @@ class SQLCookieRemoverTest {
     private val cookieManager = CookieManager.getInstance()
     private val fireproofWebsiteDao = db.fireproofWebsiteDao()
     private val mockPixel = mock<Pixel>()
+    private val mockOfflinePixelCountDataStore = mock<OfflinePixelCountDataStore>()
     private val webViewDatabaseLocator = WebViewDatabaseLocator(context)
     private val getHostsToPreserve = GetCookieHostsToPreserve(fireproofWebsiteDao)
 
@@ -91,7 +93,7 @@ class SQLCookieRemoverTest {
 
         sqlCookieRemover.removeCookies()
 
-        verify(mockPixel).fire(Pixel.PixelName.COOKIE_DATABASE_NOT_FOUND)
+        verify(mockOfflinePixelCountDataStore).cookieDatabaseNotFoundCount = 1
     }
 
     @Test
@@ -103,7 +105,7 @@ class SQLCookieRemoverTest {
 
         sqlCookieRemover.removeCookies()
 
-        verify(mockPixel).fire(Pixel.PixelName.COOKIE_DATABASE_OPEN_ERROR)
+        verify(mockOfflinePixelCountDataStore).cookieDatabaseOpenErrorCount = 1
         verify(mockPixel).fire(eq(Pixel.PixelName.COOKIE_DATABASE_EXCEPTION_OPEN_ERROR), any(), any())
     }
 
@@ -127,14 +129,14 @@ class SQLCookieRemoverTest {
     private fun givenSQLCookieRemover(
         databaseLocator: DatabaseLocator = webViewDatabaseLocator,
         cookieHostsToPreserve: GetCookieHostsToPreserve = getHostsToPreserve,
-        pixel: Pixel = mockPixel,
+        offlinePixelCountDataStore: OfflinePixelCountDataStore = mockOfflinePixelCountDataStore,
         exceptionPixel: ExceptionPixel = ExceptionPixel(mockPixel, RootExceptionFinder()),
         dispatcherProvider: DispatcherProvider = DefaultDispatcherProvider()
     ): SQLCookieRemover {
         return SQLCookieRemover(
             databaseLocator,
             cookieHostsToPreserve,
-            pixel,
+            offlinePixelCountDataStore,
             exceptionPixel,
             dispatcherProvider
         )
