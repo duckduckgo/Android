@@ -77,7 +77,6 @@ import com.jakewharton.rxrelay2.PublishRelay
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
-import kotlinx.android.synthetic.main.include_omnibar_toolbar.*
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -162,7 +161,7 @@ class BrowserTabViewModel(
     )
 
     data class PrivacyGradeState(
-        val privacyGrade: PrivacyGrade = PrivacyGrade.UNKNOWN,
+        val privacyGrade: PrivacyGrade? = null,
         val canShowPrivacyGrade: Boolean = false
     )
 
@@ -628,13 +627,14 @@ class BrowserTabViewModel(
     private fun onSiteChanged() {
         httpsUpgraded = false
         viewModelScope.launch {
+
             val improvedGrade = withContext(dispatchers.io()) {
                 site?.calculateGrades()?.improvedGrade
             }
 
             withContext(dispatchers.main()) {
                 siteLiveData.value = site
-                privacyGradeState.value = currentPrivacyGradeState().copy(privacyGrade = improvedGrade ?: PrivacyGrade.UNKNOWN)
+                privacyGradeState.value = currentPrivacyGradeState().copy(privacyGrade = improvedGrade)
             }
 
             withContext(dispatchers.io()) {

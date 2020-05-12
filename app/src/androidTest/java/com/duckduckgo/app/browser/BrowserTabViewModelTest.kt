@@ -577,26 +577,26 @@ class BrowserTabViewModelTest {
     @Test
     fun whenUrlClearedThenPrivacyGradeIsCleared() = coroutineRule.runBlocking {
         loadUrl("https://duckduckgo.com")
-        assertNotNull(testee.privacyGrade.value)
+        assertNotNull(privacyGradeState().privacyGrade)
         loadUrl(null)
-        assertNull(testee.privacyGrade.value)
+        assertNull(privacyGradeState().privacyGrade)
     }
 
     @Test
     fun whenUrlLoadedThenPrivacyGradeIsReset() = coroutineRule.runBlocking {
         loadUrl("https://duckduckgo.com")
-        assertNotNull(testee.privacyGrade.value)
+        assertNotNull(privacyGradeState().privacyGrade)
     }
 
     @Test
     fun whenEnoughTrackersDetectedThenPrivacyGradeIsUpdated() {
-        val grade = testee.privacyGrade.value
+        val grade = privacyGradeState().privacyGrade
         loadUrl("https://example.com")
         val entity = TestEntity("Network1", "Network1", 10.0)
         for (i in 1..10) {
             testee.trackerDetected(TrackingEvent("https://example.com", "", null, entity, false))
         }
-        assertNotEquals(grade, testee.privacyGrade.value)
+        assertNotEquals(grade, privacyGradeState().privacyGrade)
     }
 
     @Test
@@ -1770,6 +1770,7 @@ class BrowserTabViewModelTest {
         return nav
     }
 
+    private fun privacyGradeState() = testee.privacyGradeState.value!!
     private fun ctaViewState() = testee.ctaViewState.value!!
     private fun browserViewState() = testee.browserViewState.value!!
     private fun omnibarViewState() = testee.omnibarViewState.value!!
