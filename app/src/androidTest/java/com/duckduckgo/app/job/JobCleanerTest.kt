@@ -16,11 +16,16 @@
 
 package com.duckduckgo.app.job
 
+import android.util.Log
+import androidx.test.InstrumentationRegistry.getTargetContext
 import androidx.test.platform.app.InstrumentationRegistry
+import androidx.work.Configuration
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import androidx.work.WorkRequest
+import androidx.work.impl.utils.SynchronousExecutor
+import androidx.work.testing.WorkManagerTestInitHelper
 import com.duckduckgo.app.job.JobCleaner.Companion.allDeprecatedNotificationWorkTags
 import com.duckduckgo.app.notification.NotificationScheduler
 import org.junit.Assert.assertTrue
@@ -30,11 +35,13 @@ import org.junit.Test
 class JobCleanerTest {
 
     private val context = InstrumentationRegistry.getInstrumentation().targetContext
-    private var workManager = WorkManager.getInstance(context)
+    private lateinit var workManager: WorkManager
     private lateinit var testee: JobCleaner
 
     @Before
     fun before() {
+        initializeWorkManager()
+        workManager = WorkManager.getInstance(context)
         testee = AndroidJobCleaner(workManager)
     }
 
@@ -43,7 +50,7 @@ class JobCleanerTest {
         allDeprecatedNotificationWorkTags().forEach {
             val requestBuilder = OneTimeWorkRequestBuilder<NotificationScheduler.PrivacyNotificationWorker>()
             val request = requestBuilder
-                .addTag(it)
+                .addTag("tag")
                 .build()
             workManager.enqueue(request)
         }
@@ -55,10 +62,20 @@ class JobCleanerTest {
         }
     }
 
+    // https://developer.android.com/topic/libraries/architecture/workmanager/how-to/integration-testing
+    private fun initializeWorkManager() {
+        val config = Configuration.Builder()
+            .setMinimumLoggingLevel(Log.DEBUG)
+            .setExecutor(SynchronousExecutor())
+            .build()
+
+        WorkManagerTestInitHelper.initializeTestWorkManager(context, config)
+    }
+
     private fun getScheduledWorkers(tag: String): List<WorkInfo> {
         return workManager
             .getWorkInfosByTag(tag)
             .get()
-            // .filter { it.state == WorkInfo.State.ENQUEUED }
+            .filter { it.state == WorkInfo.State.ENQUEUED }
     }
 }
