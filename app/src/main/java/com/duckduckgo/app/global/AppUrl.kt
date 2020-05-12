@@ -36,10 +36,13 @@ class AppUrl {
         const val DEV_MODE = "test"
         const val LANGUAGE = "lg"
         const val COUNTRY = "co"
+        const val HIDE_SERP = "ko"
+        const val VERTICAL = "iar"
     }
 
     object ParamValue {
         const val SOURCE = "ddg_android"
         const val SOURCE_EU_AUCTION = "ddg_androideu"
+        const val HIDE_SERP = "-1"
     }
 }
