@@ -531,17 +531,15 @@ class BrowserTabViewModel(
     private fun omnibarTextForUrl(url: String?): String {
         if (url == null) return ""
 
-        return if (variantManager.getVariant().hasFeature(VariantManager.VariantFeature.SerpHeaderQueryReplacement)) {
-            url
-        } else {
-            if (duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(url)) {
-                duckDuckGoUrlDetector.extractQuery(url) ?: url
-            } else {
-                url
-            }
+        if (variantManager.getVariant().hasFeature(VariantManager.VariantFeature.SerpHeaderQueryReplacement)) {
+            return url
         }
 
-        return url
+        return if (duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(url)) {
+            duckDuckGoUrlDetector.extractQuery(url) ?: url
+        } else {
+            url
+        }
     }
 
     private fun pageCleared() {
