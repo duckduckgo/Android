@@ -59,6 +59,7 @@ class SettingsViewModel @Inject constructor(
 
     sealed class Command {
         object LaunchFeedback : Command()
+        object LaunchWhitelist: Command()
         object LaunchAppIcon : Command()
         object UpdateTheme : Command()
     }
@@ -162,6 +163,11 @@ class SettingsViewModel @Inject constructor(
                 clearWhenNewSetting
             )
         )
+    }
+
+    fun onManageWhitelistSelected() {
+        pixel.fire(SETTINGS_MANAGE_WHITELIST)
+        command.value = Command.LaunchWhitelist
     }
 
     private fun currentViewState(): ViewState {

@@ -189,11 +189,11 @@
     <string name="bookmarksMenuTitle">Könyvjelzők</string>
     <string name="bookmarksActivityTitle">Könyvjelzők</string>
     <string name="bookmarkDeleteConfirmMessage">Biztos, hogy törlöd a(z) &lt;b&gt;%s&lt;/b&gt; könyvjelzőt?</string>
-    <string name="bookmarkDeleteConfirmTitle">Megerősítés</string>
+    <string name="dialogConfirmTitle">Megerősítés</string>
     <string name="bookmarkAddedFeedback">Könyvjelző hozzáadva</string>
     <string name="bookmarkTitleHint">Könyvjelző címe</string>
     <string name="bookmarkUrlHint">Könyvjelző URL</string>
-    <string name="bookmarkSave">Mentés</string>
+    <string name="dialogSave">Mentés</string>
     <string name="bookmarkTitleEdit">Könyvjelző szerkesztése</string>
     <string name="noBookmarks">Még nincsenek könyvjelzők hozzáadva</string>
     <string name="bookmarkOverflowContentDescription">%s könyvjelző további lehetőségei</string>

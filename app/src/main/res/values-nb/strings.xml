@@ -189,11 +189,11 @@
     <string name="bookmarksMenuTitle">Bokmerker</string>
     <string name="bookmarksActivityTitle">Bokmerker</string>
     <string name="bookmarkDeleteConfirmMessage">Er du sikker på at du vil slette bokmerket &lt;b&gt;%s&lt;/b&gt;?</string>
-    <string name="bookmarkDeleteConfirmTitle">Bekreft</string>
+    <string name="dialogConfirmTitle">Bekreft</string>
     <string name="bookmarkAddedFeedback">Bokmerke lagt til</string>
     <string name="bookmarkTitleHint">Bokmerketittel</string>
     <string name="bookmarkUrlHint">Bokmerke-URL</string>
-    <string name="bookmarkSave">Lagre</string>
+    <string name="dialogSave">Lagre</string>
     <string name="bookmarkTitleEdit">Rediger bokmerke</string>
     <string name="noBookmarks">Ingen bokmerker lagt til ennå</string>
     <string name="bookmarkOverflowContentDescription">Flere alternativer for bokmerket %s</string>

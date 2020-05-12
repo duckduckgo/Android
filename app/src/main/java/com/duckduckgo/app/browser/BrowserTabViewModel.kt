@@ -41,6 +41,7 @@ import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.A
 import com.duckduckgo.app.bookmarks.db.BookmarkEntity
 import com.duckduckgo.app.bookmarks.db.BookmarksDao
 import com.duckduckgo.app.bookmarks.ui.EditBookmarkDialogFragment.EditBookmarkListener
+import com.duckduckgo.app.brokensite.BrokenSiteData
 import com.duckduckgo.app.browser.BrowserTabViewModel.Command.*
 import com.duckduckgo.app.browser.BrowserTabViewModel.GlobalLayoutViewState.Browser
 import com.duckduckgo.app.browser.BrowserTabViewModel.GlobalLayoutViewState.Invalidated
@@ -59,8 +60,10 @@ import com.duckduckgo.app.cta.ui.*
 import com.duckduckgo.app.global.*
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.global.model.SiteFactory
+import com.duckduckgo.app.global.model.domain
 import com.duckduckgo.app.global.model.domainMatchesUrl
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao
+import com.duckduckgo.app.privacy.db.UserWhitelistDao
 import com.duckduckgo.app.privacy.model.PrivacyGrade
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.api.StatisticsUpdater
@@ -77,7 +80,7 @@ import com.jakewharton.rxrelay2.PublishRelay
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
-import kotlinx.android.synthetic.main.include_omnibar_toolbar.*
+import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -90,6 +93,7 @@ class BrowserTabViewModel(
     private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector,
     private val siteFactory: SiteFactory,
     private val tabRepository: TabRepository,
+    private val userWhitelistDao: UserWhitelistDao,
     private val networkLeaderboardDao: NetworkLeaderboardDao,
     private val bookmarksDao: BookmarksDao,
     private val autoComplete: AutoComplete,
@@ -131,6 +135,8 @@ class BrowserTabViewModel(
         val canAddBookmarks: Boolean = false,
         val canGoBack: Boolean = false,
         val canGoForward: Boolean = false,
+        val canWhitelist: Boolean = false,
+        val isWhitelisted: Boolean = false,
         val canReportSite: Boolean = false,
         val addToHomeEnabled: Boolean = false,
         val addToHomeVisible: Boolean = false
@@ -144,6 +150,7 @@ class BrowserTabViewModel(
 
     data class LoadingViewState(
         val isLoading: Boolean = false,
+        val privacyOn: Boolean = true,
         val progress: Int = 0
     )
 
@@ -182,7 +189,7 @@ class BrowserTabViewModel(
         class ShareLink(val url: String) : Command()
         class CopyLink(val url: String) : Command()
         class FindInPageCommand(val searchTerm: String) : Command()
-        class BrokenSiteFeedback(val url: String, val blockedTrackers: String, val surrogates: String, val httpsUpgraded: Boolean) : Command()
+        class BrokenSiteFeedback(val data: BrokenSiteData) : Command()
         object DismissFindInPage : Command()
         class ShowFileChooser(val filePathCallback: ValueCallback<Array<Uri>>, val fileChooserParams: WebChromeClient.FileChooserParams) : Command()
         class HandleExternalAppLink(val appLink: IntentType) : Command()
@@ -493,7 +500,10 @@ class BrowserTabViewModel(
         val currentOmnibarViewState = currentOmnibarViewState()
         omnibarViewState.value = currentOmnibarViewState.copy(omnibarText = omnibarTextForUrl(url), shouldMoveCaretToEnd = false)
         val currentBrowserViewState = currentBrowserViewState()
+        val domain = site?.domain
+        val canWhitelist = domain != null
         findInPageViewState.value = FindInPageViewState(visible = false, canFindInPage = true)
+
         browserViewState.value = currentBrowserViewState.copy(
             browserShowing = true,
             canAddBookmarks = true,
@@ -502,6 +512,8 @@ class BrowserTabViewModel(
             canSharePage = true,
             showPrivacyGrade = true,
             canReportSite = true,
+            canWhitelist = canWhitelist,
+            isWhitelisted = false,
             showSearchIcon = false,
             showClearButton = false
         )
@@ -512,7 +524,27 @@ class BrowserTabViewModel(
             statisticsUpdater.refreshSearchRetentionAtb()
         }
 
+        domain?.let { viewModelScope.launch { updateLoadingStatePrivacy(domain) } }
+        domain?.let { viewModelScope.launch { updateWhitelistedState(domain) } }
         registerSiteVisit()
+    }
+
+    private suspend fun updateLoadingStatePrivacy(domain: String) {
+        val isWhitelisted = isWhitelisted(domain)
+        withContext(dispatchers.main()) {
+            loadingViewState.value = currentLoadingViewState().copy(privacyOn = !isWhitelisted)
+        }
+    }
+
+    private suspend fun updateWhitelistedState(domain: String) {
+        val isWhitelisted = isWhitelisted(domain)
+        withContext(dispatchers.main()) {
+            browserViewState.value = currentBrowserViewState().copy(isWhitelisted = isWhitelisted)
+        }
+    }
+
+    private suspend fun isWhitelisted(domain: String): Boolean {
+        return withContext(dispatchers.io()) { userWhitelistDao.contains(domain) }
     }
 
     private fun urlUpdated(url: String) {
@@ -718,13 +750,39 @@ class BrowserTabViewModel(
     }
 
     fun onBrokenSiteSelected() {
-        val events = site?.trackingEvents
-        val blockedTrackers = events?.map { Uri.parse(it.trackerUrl).host }.orEmpty().distinct().joinToString(",")
-        val upgradedHttps = site?.upgradedHttps ?: false
-        val surrogates = site?.surrogates?.map { Uri.parse(it.name).baseHost }.orEmpty().distinct().joinToString(",")
-        val url = url.orEmpty()
+        command.value = BrokenSiteFeedback(BrokenSiteData.fromSite(site))
+    }
 
-        command.value = BrokenSiteFeedback(url, blockedTrackers, surrogates, upgradedHttps)
+    fun onWhitelistSelected() {
+        val domain = site?.domain ?: return
+        GlobalScope.launch(dispatchers.io()) {
+            if (isWhitelisted(domain)) {
+                removeFromWhitelist(domain)
+            } else {
+                addToWhitelist(domain)
+            }
+            command.postValue(Refresh)
+        }
+    }
+
+    private suspend fun addToWhitelist(domain: String) {
+        pixel.fire(PixelName.BROWSER_MENU_WHITELIST_ADD)
+        withContext(dispatchers.io()) {
+            userWhitelistDao.insert(domain)
+        }
+        withContext(dispatchers.main()) {
+            browserViewState.value = currentBrowserViewState().copy(isWhitelisted = true)
+        }
+    }
+
+    private suspend fun removeFromWhitelist(domain: String) {
+        pixel.fire(PixelName.BROWSER_MENU_WHITELIST_REMOVE)
+        withContext(dispatchers.io()) {
+            userWhitelistDao.delete(domain)
+        }
+        withContext(dispatchers.main()) {
+            browserViewState.value = currentBrowserViewState().copy(isWhitelisted = false)
+        }
     }
 
     fun onUserSelectedToEditQuery(query: String) {

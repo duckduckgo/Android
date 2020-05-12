@@ -78,7 +78,6 @@
         android:paddingStart="14dp"
         android:paddingEnd="14dp"
         android:scaleType="center"
-        android:tint="?toolbarIconColor"
         android:src="@drawable/ic_overflow"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

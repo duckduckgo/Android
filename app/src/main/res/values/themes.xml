@@ -55,6 +55,7 @@
         <item name="tabSelectedBorderColor">@color/skyBlue</item>
         <item name="tabsFireTextColor">@color/white</item>
         <item name="tabCardBackgroundColor">@color/almostBlack</item>
+        <item name="whitelistTextColor">@color/white</item>
         <item name="bookmarkIconColor">@color/white</item>
         <item name="bookmarkTitleTextColor">@color/white</item>
         <item name="bookmarkSubtitleTextColor">@color/grayishTwo</item>
@@ -128,6 +129,7 @@
         <item name="tabSelectedBorderColor">@color/cornflowerBlue</item>
         <item name="tabsFireTextColor">@color/warmerGray</item>
         <item name="tabCardBackgroundColor">@color/white</item>
+        <item name="whitelistTextColor">@color/almostBlack</item>
         <item name="bookmarkIconColor">@color/grayishBrown</item>
         <item name="bookmarkTitleTextColor">@color/almostBlack</item>
         <item name="bookmarkSubtitleTextColor">@color/warmerGray</item>
