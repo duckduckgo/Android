@@ -27,6 +27,7 @@ interface OfflinePixelCountDataStore {
     var webRendererGoneKilledCount: Int
     var cookieDatabaseNotFoundCount: Int
     var cookieDatabaseOpenErrorCount: Int
+    var cookieDatabaseCorruptedCount: Int
     var cookieDatabaseDeleteErrorCount: Int
 }
 
@@ -56,6 +57,10 @@ class OfflinePixelCountSharedPreferences @Inject constructor(private val context
         get() = preferences.getInt(KEY_COOKIE_DATABASE_DELETE_ERROR_COUNT, 0)
         set(value) = preferences.edit(true) { putInt(KEY_COOKIE_DATABASE_DELETE_ERROR_COUNT, value) }
 
+    override var cookieDatabaseCorruptedCount: Int
+        get() = preferences.getInt(KEY_COOKIE_DATABASE_CORRUPTED_COUNT, 0)
+        set(value) = preferences.edit(true) { putInt(KEY_COOKIE_DATABASE_CORRUPTED_COUNT, value) }
+
     private val preferences: SharedPreferences
         get() = context.getSharedPreferences(FILENAME, Context.MODE_PRIVATE)
 
@@ -67,5 +72,6 @@ class OfflinePixelCountSharedPreferences @Inject constructor(private val context
         private const val KEY_COOKIE_DATABASE_NOT_FOUND_COUNT = "COOKIE_DATABASE_NOT_FOUND_COUNT"
         private const val KEY_COOKIE_DATABASE_OPEN_ERROR_COUNT = "COOKIE_DATABASE_OPEN_ERROR_COUNT"
         private const val KEY_COOKIE_DATABASE_DELETE_ERROR_COUNT = "COOKIE_DATABASE_DELETE_ERROR_COUNT"
+        private const val KEY_COOKIE_DATABASE_CORRUPTED_COUNT = "COOKIE_DATABASE_CORRUPTED_COUNT"
     }
 }

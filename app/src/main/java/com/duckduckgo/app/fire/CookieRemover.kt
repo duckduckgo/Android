@@ -17,6 +17,7 @@
 package com.duckduckgo.app.fire
 
 import android.database.DatabaseErrorHandler
+import android.database.DefaultDatabaseErrorHandler
 import android.database.sqlite.SQLiteDatabase
 import android.webkit.CookieManager
 import com.duckduckgo.app.global.DispatcherProvider
@@ -52,6 +53,8 @@ class SQLCookieRemover(
     private val dispatcherProvider: DispatcherProvider
 ) : CookieRemover {
 
+    private val databaseErrorHandler = PixelSenderDatabaseErrorHandler(offlinePixelCountDataStore)
+
     override suspend fun removeCookies(): Boolean {
         return withContext(dispatcherProvider.io()) {
             val databasePath: String = webViewDatabaseLocator.getDatabasePath()
@@ -67,11 +70,7 @@ class SQLCookieRemover(
 
     private fun openReadableDatabase(databasePath: String): SQLiteDatabase? {
         return try {
-            SQLiteDatabase.openDatabase(
-                databasePath,
-                null,
-                SQLiteDatabase.OPEN_READWRITE,
-                DatabaseErrorHandler { Timber.e("COOKIE: onCorruption") })
+            SQLiteDatabase.openDatabase(databasePath, null, SQLiteDatabase.OPEN_READWRITE, databaseErrorHandler)
         } catch (exception: Exception) {
             offlinePixelCountDataStore.cookieDatabaseOpenErrorCount += 1
             exceptionPixel.sendExceptionPixel(Pixel.PixelName.COOKIE_DATABASE_EXCEPTION_OPEN_ERROR, exception)
@@ -114,4 +113,17 @@ class SQLCookieRemover(
     companion object {
         private const val COOKIES_TABLE_NAME = "cookies"
     }
+
+    private class PixelSenderDatabaseErrorHandler(
+        private val offlinePixelCountDataStore: OfflinePixelCountDataStore
+    ) : DatabaseErrorHandler {
+
+        private val delegate = DefaultDatabaseErrorHandler()
+
+        override fun onCorruption(dbObj: SQLiteDatabase?) {
+            delegate.onCorruption(dbObj)
+            offlinePixelCountDataStore.cookieDatabaseCorruptedCount += 1
+        }
+    }
 }
+

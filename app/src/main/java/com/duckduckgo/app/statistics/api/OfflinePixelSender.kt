@@ -54,6 +54,7 @@ class OfflinePixelSender @Inject constructor(
                 sendCookieDatabaseNotFoundPixel(),
                 sendCookieDatabaseOpenErrorPixel(),
                 sendCookieDatabaseDeleteErrorPixel(),
+                sendCookieDatabaseCorruptedErrorPixel(),
                 sendUncaughtExceptionsPixel()
             )
         )
@@ -81,6 +82,10 @@ class OfflinePixelSender @Inject constructor(
 
     private fun sendCookieDatabaseNotFoundPixel(): Completable {
         return sendPixelCount(offlineCountCountDataStore::cookieDatabaseNotFoundCount, COOKIE_DATABASE_NOT_FOUND)
+    }
+
+    private fun sendCookieDatabaseCorruptedErrorPixel(): Completable {
+        return sendPixelCount(offlineCountCountDataStore::cookieDatabaseCorruptedCount, COOKIE_DATABASE_CORRUPTED_ERROR)
     }
 
     private fun sendUncaughtExceptionsPixel(): Completable {
