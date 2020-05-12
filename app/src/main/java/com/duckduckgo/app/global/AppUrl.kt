@@ -37,7 +37,8 @@ class AppUrl {
         const val LANGUAGE = "lg"
         const val COUNTRY = "co"
         const val HIDE_SERP = "ko"
-        const val VERTICAL = "iar"
+        const val VERTICAL = "ia"
+        const val VERTICAL_REWRITE = "iar"
     }
 
     object ParamValue {

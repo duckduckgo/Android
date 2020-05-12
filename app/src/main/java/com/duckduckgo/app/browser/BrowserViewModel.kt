@@ -124,7 +124,7 @@ class BrowserViewModel(
     }
 
     suspend fun onOpenInNewTabRequested(query: String, skipHome: Boolean = false): String {
-        return tabRepository.add(queryUrlConverter.convertQueryToUrl(query), skipHome, isDefaultTab = false)
+        return tabRepository.add(queryUrlConverter.convertQueryToUrl(query, query), skipHome, isDefaultTab = false)
     }
 
     suspend fun onTabsUpdated(tabs: List<TabEntity>?) {

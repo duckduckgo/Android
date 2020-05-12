@@ -359,7 +359,7 @@ class BrowserTabViewModel(
             searchCountDao.incrementSearchCount()
         }
 
-        val urlToNavigate = queryUrlConverter.convertQueryToUrl(trimmedInput)
+        val urlToNavigate = queryUrlConverter.convertQueryToUrl(url?:"", trimmedInput)
         val omnibarText = if (variantManager.getVariant().hasFeature(VariantManager.VariantFeature.SerpHeaderQueryReplacement)) {
             urlToNavigate
         } else {
