@@ -99,30 +99,6 @@ class AndroidNotificationSchedulerTest {
         assertNoUnusedAppNotificationScheduled()
     }
 
-    @Test
-    fun whenNotificationIsScheduledOldJobsAreCancelled() = runBlocking<Unit> {
-        whenever(privacyNotification.canShow()).thenReturn(false)
-        whenever(clearNotification.canShow()).thenReturn(false)
-
-        enqueueDeprecatedJobs()
-
-        testee.scheduleNextNotification()
-
-        NotificationScheduler.allDeprecatedNotificationWorkTags().forEach {
-            assertTrue(getScheduledWorkers(it).isEmpty())
-        }
-    }
-
-    private fun enqueueDeprecatedJobs() {
-        NotificationScheduler.allDeprecatedNotificationWorkTags().forEach {
-            val request = OneTimeWorkRequestBuilder<PrivacyNotificationWorker>()
-                .addTag(it)
-                .build()
-
-            workManager.enqueue(request)
-        }
-    }
-
     private fun assertUnusedAppNotificationScheduled(workerName: String) {
         assertTrue(getScheduledWorkers(NotificationScheduler.UNUSED_APP_WORK_REQUEST_TAG).any { it.tags.contains(workerName) })
     }

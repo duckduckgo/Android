@@ -17,9 +17,12 @@
 package com.duckduckgo.app.job
 
 import androidx.test.platform.app.InstrumentationRegistry
+import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
+import androidx.work.WorkRequest
 import com.duckduckgo.app.job.JobCleaner.Companion.allDeprecatedNotificationWorkTags
+import com.duckduckgo.app.notification.NotificationScheduler
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
@@ -36,7 +39,15 @@ class JobCleanerTest {
     }
 
     @Test
-    fun allDeprecatedWorkIsCancelledUponStart() {
+    fun whenStartedThenAllDeprecatedWorkIsCancelled() {
+        allDeprecatedNotificationWorkTags().forEach {
+            val requestBuilder = OneTimeWorkRequestBuilder<NotificationScheduler.PrivacyNotificationWorker>()
+            val request = requestBuilder
+                .addTag(it)
+                .build()
+            workManager.enqueue(request)
+        }
+
         testee.cleanDeprecatedJobs()
 
         allDeprecatedNotificationWorkTags().forEach {
@@ -48,6 +59,6 @@ class JobCleanerTest {
         return workManager
             .getWorkInfosByTag(tag)
             .get()
-            .filter { it.state == WorkInfo.State.ENQUEUED }
+            // .filter { it.state == WorkInfo.State.ENQUEUED }
     }
 }
