@@ -58,7 +58,6 @@ class VariantManagerTest {
         assertEqualsDouble(1.0, variant.weight)
         assertEquals(1, variant.features.size)
         assertTrue(variant.hasFeature(BottomBarNavigation))
-
     }
 
     // Single Search Bar Experiments
