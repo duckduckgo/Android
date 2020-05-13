@@ -54,7 +54,6 @@ class NotificationScheduler(
         allDeprecatedNotificationWorkTags().forEach { tag  ->
             workManager.cancelAllWorkByTag(tag)
         }
-
     }
 
     private suspend fun scheduleInactiveUserNotifications() {

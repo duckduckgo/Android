@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.job
 
+import android.content.Context
 import android.util.Log
 import androidx.test.InstrumentationRegistry.getTargetContext
 import androidx.test.platform.app.InstrumentationRegistry
@@ -24,6 +25,8 @@ import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import androidx.work.WorkRequest
+import androidx.work.Worker
+import androidx.work.WorkerParameters
 import androidx.work.impl.utils.SynchronousExecutor
 import androidx.work.testing.WorkManagerTestInitHelper
 import com.duckduckgo.app.job.JobCleaner.Companion.allDeprecatedNotificationWorkTags
@@ -41,16 +44,15 @@ class JobCleanerTest {
     @Before
     fun before() {
         initializeWorkManager()
-        workManager = WorkManager.getInstance(context)
         testee = AndroidJobCleaner(workManager)
     }
 
     @Test
     fun whenStartedThenAllDeprecatedWorkIsCancelled() {
         allDeprecatedNotificationWorkTags().forEach {
-            val requestBuilder = OneTimeWorkRequestBuilder<NotificationScheduler.PrivacyNotificationWorker>()
+            val requestBuilder = OneTimeWorkRequestBuilder<TestWorker>()
             val request = requestBuilder
-                .addTag("tag")
+                .addTag(it)
                 .build()
             workManager.enqueue(request)
         }
@@ -58,7 +60,8 @@ class JobCleanerTest {
         testee.cleanDeprecatedJobs()
 
         allDeprecatedNotificationWorkTags().forEach {
-            assertTrue(getScheduledWorkers(it).isEmpty())
+            val scheduledWorkers = getScheduledWorkers(it)
+            assertTrue(scheduledWorkers.isEmpty())
         }
     }
 
@@ -70,6 +73,7 @@ class JobCleanerTest {
             .build()
 
         WorkManagerTestInitHelper.initializeTestWorkManager(context, config)
+        workManager = WorkManager.getInstance(context)
     }
 
     private fun getScheduledWorkers(tag: String): List<WorkInfo> {
@@ -78,4 +82,5 @@ class JobCleanerTest {
             .get()
             .filter { it.state == WorkInfo.State.ENQUEUED }
     }
+
 }
