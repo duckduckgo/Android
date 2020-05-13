@@ -35,6 +35,7 @@ class DuckDuckGoRequestRewriterTest {
     private val mockVariantManager: VariantManager = mock()
     private val mockAppReferrerDataStore: AppReferrerDataStore = mock()
     private lateinit var builder: Uri.Builder
+    private val currentUrl = "http://www.duckduckgo.com"
 
     @Before
     fun before() {
@@ -46,7 +47,7 @@ class DuckDuckGoRequestRewriterTest {
 
     @Test
     fun whenAddingCustomParamsSourceParameterIsAdded() {
-        testee.addCustomQueryParams(builder)
+        testee.addCustomQueryParams(currentUrl, builder)
         val uri = builder.build()
         assertTrue(uri.queryParameterNames.contains(ParamKey.SOURCE))
         assertEquals("ddg_android", uri.getQueryParameter(ParamKey.SOURCE))
@@ -55,7 +56,7 @@ class DuckDuckGoRequestRewriterTest {
     @Test
     fun whenAddingCustomParamsAndUserSourcedFromEuAuctionThenEuSourceParameterIsAdded() {
         whenever(mockAppReferrerDataStore.installedFromEuAuction).thenReturn(true)
-        testee.addCustomQueryParams(builder)
+        testee.addCustomQueryParams(currentUrl, builder)
         val uri = builder.build()
         assertTrue(uri.queryParameterNames.contains(ParamKey.SOURCE))
         assertEquals("ddg_androideu", uri.getQueryParameter(ParamKey.SOURCE))
@@ -64,7 +65,7 @@ class DuckDuckGoRequestRewriterTest {
     @Test
     fun whenAddingCustomParamsIfStoreContainsAtbIsAdded() {
         whenever(mockStatisticsStore.atb).thenReturn(Atb("v105-2ma"))
-        testee.addCustomQueryParams(builder)
+        testee.addCustomQueryParams(currentUrl, builder)
         val uri = builder.build()
         assertTrue(uri.queryParameterNames.contains(ParamKey.ATB))
         assertEquals("v105-2ma", uri.getQueryParameter(ParamKey.ATB))
@@ -74,7 +75,7 @@ class DuckDuckGoRequestRewriterTest {
     fun whenAddingCustomParamsIfIsStoreMissingAtbThenAtbIsNotAdded() {
         whenever(mockStatisticsStore.atb).thenReturn(null)
 
-        testee.addCustomQueryParams(builder)
+        testee.addCustomQueryParams(currentUrl, builder)
         val uri = builder.build()
         assertFalse(uri.queryParameterNames.contains(ParamKey.ATB))
     }

@@ -230,7 +230,7 @@ class BrowserTabViewModelTest {
 
         val siteFactory = SiteFactory(mockPrivacyPractices, mockEntityLookup)
 
-        whenever(mockOmnibarConverter.convertQueryToUrl(any())).thenReturn("duckduckgo.com")
+        whenever(mockOmnibarConverter.addQueryToUrl(any(), any())).thenReturn("duckduckgo.com")
         whenever(mockVariantManager.getVariant()).thenReturn(DEFAULT_VARIANT)
         whenever(mockTabsRepository.liveSelectedTab).thenReturn(selectedTabLiveData)
         whenever(mockTabsRepository.retrieveSiteData(any())).thenReturn(MutableLiveData())
@@ -1119,7 +1119,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenRestoringWebViewSessionNotRestorableThenPreviousUrlLoaded() {
-        whenever(mockOmnibarConverter.convertQueryToUrl("foo.com")).thenReturn("foo.com")
+        whenever(mockOmnibarConverter.addQueryToUrl("foo.com","foo.com")).thenReturn("foo.com")
         whenever(webViewSessionStorage.restoreSession(anyOrNull(), anyString())).thenReturn(false)
         testee.restoreWebViewState(null, "foo.com")
 

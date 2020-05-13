@@ -21,8 +21,11 @@ import com.duckduckgo.app.browser.omnibar.QueryUrlConverter
 import com.duckduckgo.app.referral.AppReferrerDataStore
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
+import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.mock
+import com.nhaarman.mockitokotlin2.whenever
 import org.junit.Assert.*
+import org.junit.Before
 import org.junit.Test
 
 class QueryUrlConverterTest {
@@ -32,11 +35,17 @@ class QueryUrlConverterTest {
     private val mockAppReferrerDataStore: AppReferrerDataStore = mock()
     private val requestRewriter = DuckDuckGoRequestRewriter(DuckDuckGoUrlDetector(), mockStatisticsStore, variantManager, mockAppReferrerDataStore)
     private val testee: QueryUrlConverter = QueryUrlConverter(requestRewriter)
+    private val currentUrl = "https://www.duckduckgo.com"
+
+    @Before
+    fun setup(){
+        whenever(variantManager.getVariant(any())).thenReturn(VariantManager.DEFAULT_VARIANT)
+    }
 
     @Test
     fun whenSingleWordThenSearchQueryBuilt() {
         val input = "foo"
-        val result = testee.convertQueryToUrl(input)
+        val result = testee.addQueryToUrl(currentUrl, input)
         assertDuckDuckGoSearchQuery("foo", result)
     }
 
@@ -44,7 +53,7 @@ class QueryUrlConverterTest {
     fun whenWebUrlCalledWithInvalidURLThenEncodedSearchQueryBuilt() {
         val input = "http://test .com"
         val expected = "http%3A%2F%2Ftest%20.com"
-        val result = testee.convertQueryToUrl(input)
+        val result = testee.addQueryToUrl(currentUrl, input)
         assertDuckDuckGoSearchQuery(expected, result)
     }
 
@@ -52,7 +61,7 @@ class QueryUrlConverterTest {
     fun whenEncodingQueryWithSymbolsThenQueryProperlyEncoded() {
         val input = "test \"%-.<>\\^_`{|~"
         val expected = "test%20%22%25-.%3C%3E%5C%5E_%60%7B%7C~"
-        val result = testee.convertQueryToUrl(input)
+        val result = testee.addQueryToUrl(currentUrl, input)
         assertDuckDuckGoSearchQuery(expected, result)
     }
 
@@ -60,7 +69,7 @@ class QueryUrlConverterTest {
     fun whenParamHasInvalidCharactersThenAddingParamAppendsEncodedVersion() {
         val input = "43 + 5"
         val expected = "43%20%2B%205"
-        val result = testee.convertQueryToUrl(input)
+        val result = testee.addQueryToUrl(currentUrl, input)
         assertDuckDuckGoSearchQuery(expected, result)
     }
 
@@ -68,7 +77,7 @@ class QueryUrlConverterTest {
     fun whenIsWebUrlMissingSchemeThenHttpWillBeAddedUponConversion() {
         val input = "example.com"
         val expected = "http://$input"
-        val result = testee.convertQueryToUrl(input)
+        val result = testee.addQueryToUrl(currentUrl, input)
         assertEquals(expected, result)
     }
 
