@@ -189,11 +189,11 @@
     <string name="bookmarksMenuTitle">Lesezeichen</string>
     <string name="bookmarksActivityTitle">Lesezeichen</string>
     <string name="bookmarkDeleteConfirmMessage">Bist du sicher, dass du das Lesezeichen &lt;b&gt;%s&lt;/b&gt; löschen möchtest?</string>
-    <string name="bookmarkDeleteConfirmTitle">Bestätigen</string>
+    <string name="dialogConfirmTitle">Bestätigen</string>
     <string name="bookmarkAddedFeedback">Lesezeichen hinzugefügt</string>
     <string name="bookmarkTitleHint">Lesezeichen-Titel</string>
     <string name="bookmarkUrlHint">Lesezeichen-URL</string>
-    <string name="bookmarkSave">Speichern</string>
+    <string name="dialogSave">Speichern</string>
     <string name="bookmarkTitleEdit">Lesezeichen bearbeiten</string>
     <string name="noBookmarks">Noch keine Lesezeichen hinzugefügt</string>
     <string name="bookmarkOverflowContentDescription">Mehr Optionen für Lesezeichen %s</string>

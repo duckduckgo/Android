@@ -16,7 +16,7 @@
 
 package com.duckduckgo.app.trackerdetection
 
-import com.duckduckgo.app.privacy.store.PrivacySettingsStore
+import com.duckduckgo.app.privacy.db.UserWhitelistDao
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.eq
@@ -32,13 +32,13 @@ class TrackerDetectorClientTypeTest {
     private var mockEntityLookup: EntityLookup = mock()
     private var mockBlockingClient: Client = mock()
     private var mockWhitelistClient: Client = mock()
-    private var mockSettingStore: PrivacySettingsStore = mock()
+    private var mockUserWhitelistDao: UserWhitelistDao = mock()
 
-    private var testee = TrackerDetectorImpl(mockEntityLookup, mockSettingStore)
+    private var testee = TrackerDetectorImpl(mockEntityLookup, mockUserWhitelistDao)
 
     @Before
     fun before() {
-        whenever(mockSettingStore.privacyOn).thenReturn(true)
+        whenever(mockUserWhitelistDao.contains(any())).thenReturn(false)
 
         whenever(mockBlockingClient.matches(eq(Url.BLOCKED), any())).thenReturn(Client.Result(true))
         whenever(mockBlockingClient.matches(eq(Url.BLOCKED_AND_WHITELISTED), any())).thenReturn(Client.Result(true))

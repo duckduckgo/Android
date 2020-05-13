@@ -193,11 +193,11 @@
     <string name="bookmarksMenuTitle">Knjižne oznake</string>
     <string name="bookmarksActivityTitle">Knjižne oznake</string>
     <string name="bookmarkDeleteConfirmMessage">Sigurno želite izbrisati knjižnu oznaku &lt;b&gt;%s&lt;/b&gt;?</string>
-    <string name="bookmarkDeleteConfirmTitle">Potvrdi</string>
+    <string name="dialogConfirmTitle">Potvrdi</string>
     <string name="bookmarkAddedFeedback">Knjižna oznaka je dodana</string>
     <string name="bookmarkTitleHint">Naslov knjižne oznake</string>
     <string name="bookmarkUrlHint">URL knjižne oznake</string>
-    <string name="bookmarkSave">Spremi</string>
+    <string name="dialogSave">Spremi</string>
     <string name="bookmarkTitleEdit">Uredi knjižnu oznaku</string>
     <string name="noBookmarks">Još nema dodanih knjižnih oznaka</string>
     <string name="bookmarkOverflowContentDescription">Više opcija za knjižnu oznaku %s</string>
