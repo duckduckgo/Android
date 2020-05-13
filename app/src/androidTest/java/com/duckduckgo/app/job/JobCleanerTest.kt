@@ -25,6 +25,7 @@ import androidx.work.WorkManager
 import androidx.work.impl.utils.SynchronousExecutor
 import androidx.work.testing.WorkManagerTestInitHelper
 import com.duckduckgo.app.job.JobCleaner.Companion.allDeprecatedNotificationWorkTags
+import com.duckduckgo.app.notification.NotificationScheduler
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -57,9 +58,17 @@ class JobCleanerTest {
     @Test
     fun whenStartedThenAllDeprecatedWorkIsCancelled() {
         enqueueDeprecatedWorkers()
-        assertWorkersAreEnqueued()
+        assertDeprecatedWorkersAreEnqueued()
         testee.cleanDeprecatedJobs()
-        assertWorkersAreNotEnqueued()
+        assertDeprecatedWorkersAreNotEnqueued()
+    }
+
+    @Test
+    fun whenStartedAndNoDeprecatedJobsAreScheduledThenNothingIsRemoved() {
+        enqueueNonDeprecatedWorkers()
+        assertNonDeprecatedWorkersAreEnqueued()
+        testee.cleanDeprecatedJobs()
+        assertNonDeprecatedWorkersAreEnqueued()
     }
 
     private fun enqueueDeprecatedWorkers() {
@@ -73,19 +82,41 @@ class JobCleanerTest {
         }
     }
 
-    private fun assertWorkersAreEnqueued() {
+    private fun enqueueNonDeprecatedWorkers() {
+        allDeprecatedNotificationWorkTags().forEach {
+            val requestBuilder = OneTimeWorkRequestBuilder<TestWorker>()
+            val request = requestBuilder
+                .addTag(NotificationScheduler.UNUSED_APP_WORK_REQUEST_TAG)
+                .setInitialDelay(10, TimeUnit.SECONDS)
+                .build()
+            workManager.enqueue(request)
+        }
+    }
+
+    private fun assertDeprecatedWorkersAreEnqueued() {
         allDeprecatedNotificationWorkTags().forEach {
             val scheduledWorkers = getScheduledWorkers(it)
             assertFalse(scheduledWorkers.isEmpty())
         }
     }
 
-    private fun assertWorkersAreNotEnqueued() {
+    private fun assertDeprecatedWorkersAreNotEnqueued() {
         allDeprecatedNotificationWorkTags().forEach {
             val scheduledWorkers = getScheduledWorkers(it)
             assertTrue(scheduledWorkers.isEmpty())
         }
     }
+
+    private fun assertNonDeprecatedWorkersAreEnqueued() {
+        val scheduledWorkers = getScheduledWorkers(NotificationScheduler.UNUSED_APP_WORK_REQUEST_TAG)
+        assertFalse(scheduledWorkers.isEmpty())
+    }
+
+    private fun assertNonDeprecatedWorkersAreNotEnqueued() {
+        val scheduledWorkers = getScheduledWorkers(NotificationScheduler.UNUSED_APP_WORK_REQUEST_TAG)
+        assertTrue(scheduledWorkers.isEmpty())
+    }
+
 
     private fun getScheduledWorkers(tag: String): List<WorkInfo> {
         return workManager
