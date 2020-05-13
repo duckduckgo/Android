@@ -50,24 +50,24 @@ interface VariantManager {
             // Bottom Bar Navigation Experiment
             Variant(
                 key = "mb",
-                weight = 0.0,
+                weight = 1.0,
                 features = emptyList(),
                 filterBy = { noFilter() }),
             Variant(
                 key = "mk",
-                weight = 0.0,
+                weight = 1.0,
                 features = listOf(BottomBarNavigation),
                 filterBy = { noFilter() }),
 
             // SERP Header Experiment
             Variant(
                 key = "zf",
-                weight = 0.0,
+                weight = 1.0,
                 features = emptyList(),
                 filterBy = { noFilter() }),
             Variant(
                 key = "zg",
-                weight = 0.0,
+                weight = 1.0,
                 features = listOf(VariantFeature.SerpHeaderQueryReplacement),
                 filterBy = { noFilter() }),
             Variant(
