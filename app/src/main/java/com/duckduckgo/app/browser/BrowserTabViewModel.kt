@@ -529,18 +529,16 @@ class BrowserTabViewModel(
     }
 
     private fun omnibarTextForUrl(url: String?): String {
-        Timber.v("URL to Display: $url")
-
         if (url == null) return ""
 
-        return if (variantManager.getVariant().hasFeature(VariantManager.VariantFeature.SerpHeaderQueryReplacement)) {
-            url
+        if (variantManager.getVariant().hasFeature(VariantManager.VariantFeature.SerpHeaderQueryReplacement)) {
+            return url
+        }
+
+        return if (duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(url)) {
+            duckDuckGoUrlDetector.extractQuery(url) ?: url
         } else {
-            if (duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(url)) {
-                duckDuckGoUrlDetector.extractQuery(url) ?: url
-            } else {
-                url
-            }
+            url
         }
     }
 
