@@ -17,12 +17,13 @@
 package com.duckduckgo.app.fire
 
 import android.database.DatabaseErrorHandler
+import android.database.DefaultDatabaseErrorHandler
 import android.database.sqlite.SQLiteDatabase
 import android.webkit.CookieManager
 import com.duckduckgo.app.global.DispatcherProvider
-import com.duckduckgo.app.global.exception.UncaughtExceptionRepository
-import com.duckduckgo.app.global.exception.UncaughtExceptionSource
+import com.duckduckgo.app.statistics.pixels.ExceptionPixel
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.store.OfflinePixelCountDataStore
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 import kotlin.coroutines.resume
@@ -47,10 +48,12 @@ class CookieManagerRemover(private val cookieManager: CookieManager) : CookieRem
 class SQLCookieRemover(
     private val webViewDatabaseLocator: DatabaseLocator,
     private val getCookieHostsToPreserve: GetCookieHostsToPreserve,
-    private val pixel: Pixel,
-    private val uncaughtExceptionRepository: UncaughtExceptionRepository,
+    private val offlinePixelCountDataStore: OfflinePixelCountDataStore,
+    private val exceptionPixel: ExceptionPixel,
     private val dispatcherProvider: DispatcherProvider
 ) : CookieRemover {
+
+    private val databaseErrorHandler = PixelSenderDatabaseErrorHandler(offlinePixelCountDataStore)
 
     override suspend fun removeCookies(): Boolean {
         return withContext(dispatcherProvider.io()) {
@@ -59,27 +62,23 @@ class SQLCookieRemover(
                 val excludedHosts = getCookieHostsToPreserve()
                 return@withContext removeCookies(databasePath, excludedHosts)
             } else {
-                pixel.fire(Pixel.PixelName.COOKIE_DATABASE_NOT_FOUND)
+                offlinePixelCountDataStore.cookieDatabaseNotFoundCount += 1
             }
             return@withContext false
         }
     }
 
-    private suspend fun openReadableDatabase(databasePath: String): SQLiteDatabase? {
+    private fun openReadableDatabase(databasePath: String): SQLiteDatabase? {
         return try {
-            SQLiteDatabase.openDatabase(
-                databasePath,
-                null,
-                SQLiteDatabase.OPEN_READWRITE,
-                DatabaseErrorHandler { Timber.e("COOKIE: onCorruption") })
+            SQLiteDatabase.openDatabase(databasePath, null, SQLiteDatabase.OPEN_READWRITE, databaseErrorHandler)
         } catch (exception: Exception) {
-            pixel.fire(Pixel.PixelName.COOKIE_DATABASE_OPEN_ERROR)
-            uncaughtExceptionRepository.recordUncaughtException(exception, UncaughtExceptionSource.COOKIE_DATABASE)
+            offlinePixelCountDataStore.cookieDatabaseOpenErrorCount += 1
+            exceptionPixel.sendExceptionPixel(Pixel.PixelName.COOKIE_DATABASE_EXCEPTION_OPEN_ERROR, exception)
             null
         }
     }
 
-    private suspend fun removeCookies(databasePath: String, excludedSites: List<String>): Boolean {
+    private fun removeCookies(databasePath: String, excludedSites: List<String>): Boolean {
         var deleteExecuted = false
         openReadableDatabase(databasePath)?.apply {
             try {
@@ -89,8 +88,8 @@ class SQLCookieRemover(
                 Timber.v("$number cookies removed")
             } catch (exception: Exception) {
                 Timber.e(exception)
-                pixel.fire(Pixel.PixelName.COOKIE_DATABASE_DELETE_ERROR)
-                uncaughtExceptionRepository.recordUncaughtException(exception, UncaughtExceptionSource.COOKIE_DATABASE)
+                offlinePixelCountDataStore.cookieDatabaseDeleteErrorCount += 1
+                exceptionPixel.sendExceptionPixel(Pixel.PixelName.COOKIE_DATABASE_EXCEPTION_DELETE_ERROR, exception)
             } finally {
                 close()
             }
@@ -114,4 +113,17 @@ class SQLCookieRemover(
     companion object {
         private const val COOKIES_TABLE_NAME = "cookies"
     }
+
+    private class PixelSenderDatabaseErrorHandler(
+        private val offlinePixelCountDataStore: OfflinePixelCountDataStore
+    ) : DatabaseErrorHandler {
+
+        private val delegate = DefaultDatabaseErrorHandler()
+
+        override fun onCorruption(dbObj: SQLiteDatabase?) {
+            delegate.onCorruption(dbObj)
+            offlinePixelCountDataStore.cookieDatabaseCorruptedCount += 1
+        }
+    }
 }
+
