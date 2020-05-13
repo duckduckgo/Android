@@ -18,10 +18,14 @@
 
 package com.duckduckgo.app.notification
 
+import android.util.Log
 import androidx.test.platform.app.InstrumentationRegistry
+import androidx.work.Configuration
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
+import androidx.work.impl.utils.SynchronousExecutor
+import androidx.work.testing.WorkManagerTestInitHelper
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.notification.NotificationScheduler.ClearDataNotificationWorker
 import com.duckduckgo.app.notification.NotificationScheduler.PrivacyNotificationWorker
@@ -50,17 +54,29 @@ class AndroidNotificationSchedulerTest {
     private val privacyNotification: SchedulableNotification = mock()
 
     private val context = InstrumentationRegistry.getInstrumentation().targetContext
-    private var workManager = WorkManager.getInstance(context)
+    private lateinit var workManager: WorkManager
     private lateinit var testee: NotificationScheduler
 
     @Before
     fun before() {
+        initializeWorkManager()
         whenever(variantManager.getVariant(any())).thenReturn(DEFAULT_VARIANT)
         testee = NotificationScheduler(
             workManager,
             clearNotification,
             privacyNotification
         )
+    }
+
+    // https://developer.android.com/topic/libraries/architecture/workmanager/how-to/integration-testing
+    private fun initializeWorkManager() {
+        val config = Configuration.Builder()
+            .setMinimumLoggingLevel(Log.DEBUG)
+            .setExecutor(SynchronousExecutor())
+            .build()
+
+        WorkManagerTestInitHelper.initializeTestWorkManager(context, config)
+        workManager = WorkManager.getInstance(context)
     }
 
     @Test
