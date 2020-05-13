@@ -17,12 +17,11 @@
 package com.duckduckgo.app.fire
 
 import android.webkit.CookieManager
-import kotlinx.coroutines.Dispatchers
+import com.duckduckgo.app.global.DispatcherProvider
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
-
 
 interface DuckDuckGoCookieManager {
     suspend fun removeExternalCookies()
@@ -31,22 +30,21 @@ interface DuckDuckGoCookieManager {
 
 class WebViewCookieManager(
     private val cookieManager: CookieManager,
-    private val host: String
+    private val host: String,
+    private val removeCookies: RemoveCookiesStrategy,
+    private val dispatcher: DispatcherProvider
 ) : DuckDuckGoCookieManager {
+
     override suspend fun removeExternalCookies() {
-
-        val ddgCookies = getDuckDuckGoCookies()
-
-        suspendCoroutine<Unit> { continuation ->
-            cookieManager.removeAllCookies {
-                Timber.v("All cookies removed; restoring ${ddgCookies.size} DDG cookies")
-                continuation.resume(Unit)
-            }
+        withContext(dispatcher.io()) {
+            flush()
         }
-
-        storeDuckDuckGoCookies(ddgCookies)
-
-        withContext(Dispatchers.IO) {
+        val ddgCookies = getDuckDuckGoCookies()
+        if (cookieManager.hasCookies()) {
+            removeCookies.removeCookies()
+            storeDuckDuckGoCookies(ddgCookies)
+        }
+        withContext(dispatcher.io()) {
             flush()
         }
     }

@@ -192,6 +192,7 @@ import kotlinx.android.synthetic.main.popup_window_browser_menu.view.refreshPopu
 import kotlinx.android.synthetic.main.popup_window_browser_menu.view.requestDesktopSiteCheckMenuItem
 import kotlinx.android.synthetic.main.popup_window_browser_menu.view.settingsPopupMenuItem
 import kotlinx.android.synthetic.main.popup_window_browser_menu.view.sharePageMenuItem
+import kotlinx.android.synthetic.main.popup_window_browser_menu.view.fireproofWebsitePopupMenuItem
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope

@@ -169,7 +169,15 @@ interface Pixel {
         MENU_ACTION_REFRESH_PRESSED("m_nav_r_p_%s"),
         MENU_ACTION_NEW_TAB_PRESSED("m_nav_nt_p_%s"),
         MENU_ACTION_BOOKMARKS_PRESSED("m_nav_b_p_%s"),
-        MENU_ACTION_SEARCH_PRESSED("m_nav_s_p_%s")
+        MENU_ACTION_SEARCH_PRESSED("m_nav_s_p_%s"),
+
+        COOKIE_DATABASE_NOT_FOUND("m_cdb_nf"),
+        COOKIE_DATABASE_OPEN_ERROR("m_cdb_oe"),
+        COOKIE_DATABASE_DELETE_ERROR("m_cdb_de"),
+        COOKIE_DATABASE_CORRUPTED_ERROR("m_cdb_ce"),
+
+        COOKIE_DATABASE_EXCEPTION_OPEN_ERROR("m_cdb_e_oe"),
+        COOKIE_DATABASE_EXCEPTION_DELETE_ERROR("m_cdb_e_de")
     }
 
     object PixelParameter {

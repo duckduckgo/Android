@@ -14,23 +14,11 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.fire.fireproofwebsite.data
+package com.duckduckgo.app.global.exception
 
-import androidx.lifecycle.LiveData
-import androidx.room.*
-
-@Dao
-interface FireproofWebsiteDao {
-
-    @Query("select * from fireproofWebsites")
-    fun fireproofWebsitesSync(): List<FireproofWebsiteEntity>
-
-    @Query("select * from fireproofWebsites")
-    fun fireproofWebsitesEntities(): LiveData<List<FireproofWebsiteEntity>>
-
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insert(fireproofWebsiteEntity: FireproofWebsiteEntity): Long
-
-    @Delete
-    fun delete(fireproofWebsiteEntity: FireproofWebsiteEntity): Int
+fun Throwable?.extractExceptionCause(): String {
+    if (this == null) {
+        return "Exception missing"
+    }
+    return "${this.javaClass.name} - ${this.stackTrace?.firstOrNull()}"
 }

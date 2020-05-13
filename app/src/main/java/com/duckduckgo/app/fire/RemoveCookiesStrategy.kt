@@ -14,23 +14,20 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.fire.fireproofwebsite.data
+package com.duckduckgo.app.fire
 
-import androidx.lifecycle.LiveData
-import androidx.room.*
+interface RemoveCookiesStrategy {
+    suspend fun removeCookies()
+}
 
-@Dao
-interface FireproofWebsiteDao {
-
-    @Query("select * from fireproofWebsites")
-    fun fireproofWebsitesSync(): List<FireproofWebsiteEntity>
-
-    @Query("select * from fireproofWebsites")
-    fun fireproofWebsitesEntities(): LiveData<List<FireproofWebsiteEntity>>
-
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insert(fireproofWebsiteEntity: FireproofWebsiteEntity): Long
-
-    @Delete
-    fun delete(fireproofWebsiteEntity: FireproofWebsiteEntity): Int
+class RemoveCookies(
+    private val cookieManagerRemover: CookieRemover,
+    private val selectiveCookieRemover: CookieRemover
+) : RemoveCookiesStrategy {
+    override suspend fun removeCookies() {
+        val removeSuccess = selectiveCookieRemover.removeCookies()
+        if (!removeSuccess) {
+            cookieManagerRemover.removeCookies()
+        }
+    }
 }
