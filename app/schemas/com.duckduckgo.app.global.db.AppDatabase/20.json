@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 20,
-    "identityHash": "69ae59777659fa9916c95bfda0d9cf4d",
+    "identityHash": "4ebd15639b97a4edeb5417e725b91285",
     "entities": [
       {
         "tableName": "tds_tracker",
@@ -108,6 +108,26 @@
       },
       {
         "tableName": "temporary_tracking_whitelist",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`domain` TEXT NOT NULL, PRIMARY KEY(`domain`))",
+        "fields": [
+          {
+            "fieldPath": "domain",
+            "columnName": "domain",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "domain"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "user_whitelist",
         "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`domain` TEXT NOT NULL, PRIMARY KEY(`domain`))",
         "fields": [
           {
@@ -669,32 +689,12 @@
         },
         "indices": [],
         "foreignKeys": []
-      },
-      {
-        "tableName": "fireproofWebsites",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`domain` TEXT NOT NULL, PRIMARY KEY(`domain`))",
-        "fields": [
-          {
-            "fieldPath": "domain",
-            "columnName": "domain",
-            "affinity": "TEXT",
-            "notNull": true
-          }
-        ],
-        "primaryKey": {
-          "columnNames": [
-            "domain"
-          ],
-          "autoGenerate": false
-        },
-        "indices": [],
-        "foreignKeys": []
       }
     ],
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '69ae59777659fa9916c95bfda0d9cf4d')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '4ebd15639b97a4edeb5417e725b91285')"
     ]
   }
 }

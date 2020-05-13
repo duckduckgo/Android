@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 DuckDuckGo
+ * Copyright (c) 2020 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,20 +14,14 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.onboarding.ui.page
+package com.duckduckgo.app.job
 
-import androidx.lifecycle.ViewModel
-import com.duckduckgo.app.privacy.store.PrivacySettingsStore
+import android.content.Context
+import androidx.work.Worker
+import androidx.work.WorkerParameters
 
-
-class TrackerBlockingSelectionViewModel(private val settingsStore: PrivacySettingsStore) : ViewModel() {
-
-    fun onTrackerBlockingEnabled() {
-        settingsStore.privacyOn = true
+class TestWorker(context: Context, parameters: WorkerParameters) : Worker(context, parameters) {
+    override fun doWork(): Result {
+        return Result.success()
     }
-
-    fun onTrackerBlockingDisabled() {
-        settingsStore.privacyOn = false
-    }
-
 }

@@ -82,6 +82,11 @@
                 android:text="@string/requestDesktopSiteMenuTitle" />
 
             <TextView
+                android:id="@+id/whitelistPopupMenuItem"
+                style="@style/BrowserTextMenuItem"
+                android:text="@string/whitelistAdd" />
+
+            <TextView
                 android:id="@+id/brokenSitePopupMenuItem"
                 style="@style/BrowserTextMenuItem"
                 android:text="@string/brokenSiteReportBrokenSiteMenuItem" />
@@ -134,7 +139,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:contentDescription="@string/refresh"
-            android:src="@drawable/ic_bottom_bar_refresh" />
+            android:src="@drawable/ic_refresh" />
 
         <ImageButton
             android:id="@+id/sharePopupMenuItem"

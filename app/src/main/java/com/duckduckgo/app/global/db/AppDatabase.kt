@@ -42,11 +42,9 @@ import com.duckduckgo.app.httpsupgrade.model.HttpsWhitelistedDomain
 import com.duckduckgo.app.notification.db.NotificationDao
 import com.duckduckgo.app.notification.model.Notification
 import com.duckduckgo.app.onboarding.store.*
-import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao
-import com.duckduckgo.app.privacy.db.NetworkLeaderboardEntry
-import com.duckduckgo.app.privacy.db.PrivacyProtectionCountDao
-import com.duckduckgo.app.privacy.db.SitesVisitedEntity
+import com.duckduckgo.app.privacy.db.*
 import com.duckduckgo.app.privacy.model.PrivacyProtectionCountsEntity
+import com.duckduckgo.app.privacy.model.UserWhitelistedDomain
 import com.duckduckgo.app.survey.db.SurveyDao
 import com.duckduckgo.app.survey.model.Survey
 import com.duckduckgo.app.tabs.db.TabsDao
@@ -60,11 +58,12 @@ import com.duckduckgo.app.usage.search.SearchCountDao
 import com.duckduckgo.app.usage.search.SearchCountEntity
 
 @Database(
-    exportSchema = true, version = 20, entities = [
+    exportSchema = true, version = 21, entities = [
         TdsTracker::class,
         TdsEntity::class,
         TdsDomainEntity::class,
         TemporaryTrackingWhitelistedDomain::class,
+        UserWhitelistedDomain::class,
         HttpsBloomFilterSpec::class,
         HttpsWhitelistedDomain::class,
         NetworkLeaderboardEntry::class,
@@ -103,6 +102,7 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun tdsEntityDao(): TdsEntityDao
     abstract fun tdsDomainEntityDao(): TdsDomainEntityDao
     abstract fun temporaryTrackingWhitelistDao(): TemporaryTrackingWhitelistDao
+    abstract fun userWhitelistDao(): UserWhitelistDao
     abstract fun httpsWhitelistedDao(): HttpsWhitelistDao
     abstract fun httpsBloomFilterSpecDao(): HttpsBloomFilterSpecDao
     abstract fun networkLeaderboardDao(): NetworkLeaderboardDao
@@ -282,6 +282,12 @@ class MigrationsProvider(val context: Context) {
 
     val MIGRATION_19_TO_20: Migration = object : Migration(19, 20) {
         override fun migrate(database: SupportSQLiteDatabase) {
+            database.execSQL("CREATE TABLE IF NOT EXISTS `user_whitelist` (`domain` TEXT NOT NULL, PRIMARY KEY(`domain`))")
+        }
+    }
+
+    val MIGRATION_20_TO_21: Migration = object : Migration(20, 21) {
+        override fun migrate(database: SupportSQLiteDatabase) {
             database.execSQL("CREATE TABLE IF NOT EXISTS `fireproofWebsites` (`domain` TEXT NOT NULL, PRIMARY KEY(`domain`))")
         }
     }
@@ -306,7 +312,8 @@ class MigrationsProvider(val context: Context) {
             MIGRATION_16_TO_17,
             MIGRATION_17_TO_18,
             MIGRATION_18_TO_19,
-            MIGRATION_19_TO_20
+            MIGRATION_19_TO_20,
+            MIGRATION_20_TO_21
         )
 
     @Deprecated(

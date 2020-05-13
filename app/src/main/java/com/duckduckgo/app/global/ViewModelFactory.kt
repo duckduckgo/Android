@@ -47,19 +47,14 @@ import com.duckduckgo.app.icon.api.IconModifier
 import com.duckduckgo.app.icon.ui.ChangeIconViewModel
 import com.duckduckgo.app.launch.LaunchViewModel
 import com.duckduckgo.app.notification.AndroidNotificationScheduler
-import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.onboarding.ui.OnboardingPageManager
 import com.duckduckgo.app.onboarding.ui.OnboardingViewModel
 import com.duckduckgo.app.onboarding.ui.page.DefaultBrowserPageViewModel
-import com.duckduckgo.app.onboarding.ui.page.TrackerBlockingSelectionViewModel
 import com.duckduckgo.app.playstore.PlayStoreUtils
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao
-import com.duckduckgo.app.privacy.store.PrivacySettingsSharedPreferences
-import com.duckduckgo.app.privacy.ui.PrivacyDashboardViewModel
-import com.duckduckgo.app.privacy.ui.PrivacyPracticesViewModel
-import com.duckduckgo.app.privacy.ui.ScorecardViewModel
-import com.duckduckgo.app.privacy.ui.TrackerNetworksViewModel
+import com.duckduckgo.app.privacy.db.UserWhitelistDao
+import com.duckduckgo.app.privacy.ui.*
 import com.duckduckgo.app.referral.AppInstallationReferrerStateListener
 import com.duckduckgo.app.settings.SettingsViewModel
 import com.duckduckgo.app.settings.db.SettingsDataStore
@@ -82,14 +77,13 @@ import javax.inject.Inject
 class ViewModelFactory @Inject constructor(
     private val statisticsUpdater: StatisticsUpdater,
     private val statisticsStore: StatisticsDataStore,
-    private val onboardingStore: OnboardingStore,
     private val userStageStore: UserStageStore,
     private val appInstallStore: AppInstallStore,
     private val queryUrlConverter: QueryUrlConverter,
     private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector,
     private val tabRepository: TabRepository,
-    private val privacySettingsStore: PrivacySettingsSharedPreferences,
     private val siteFactory: SiteFactory,
+    private val userWhitelistDao: UserWhitelistDao,
     private val networkLeaderboardDao: NetworkLeaderboardDao,
     private val bookmarksDao: BookmarksDao,
     private val fireproofWebsiteDao: FireproofWebsiteDao,
@@ -130,9 +124,10 @@ class ViewModelFactory @Inject constructor(
                 isAssignableFrom(BrowserTabViewModel::class.java) -> browserTabViewModel()
                 isAssignableFrom(TabSwitcherViewModel::class.java) -> TabSwitcherViewModel(tabRepository, webViewSessionStorage)
                 isAssignableFrom(PrivacyDashboardViewModel::class.java) -> privacyDashboardViewModel()
-                isAssignableFrom(ScorecardViewModel::class.java) -> ScorecardViewModel(privacySettingsStore)
+                isAssignableFrom(ScorecardViewModel::class.java) -> ScorecardViewModel(userWhitelistDao)
                 isAssignableFrom(TrackerNetworksViewModel::class.java) -> TrackerNetworksViewModel()
                 isAssignableFrom(PrivacyPracticesViewModel::class.java) -> PrivacyPracticesViewModel()
+                isAssignableFrom(WhitelistViewModel::class.java) -> WhitelistViewModel(userWhitelistDao)
                 isAssignableFrom(FeedbackViewModel::class.java) -> FeedbackViewModel(playStoreUtils, feedbackSubmitter)
                 isAssignableFrom(BrokenSiteViewModel::class.java) -> BrokenSiteViewModel(pixel, brokenSiteSender)
                 isAssignableFrom(SurveyViewModel::class.java) -> SurveyViewModel(surveyDao, statisticsStore, appInstallStore)
@@ -143,7 +138,6 @@ class ViewModelFactory @Inject constructor(
                 isAssignableFrom(PositiveFeedbackLandingViewModel::class.java) -> PositiveFeedbackLandingViewModel()
                 isAssignableFrom(ShareOpenEndedNegativeFeedbackViewModel::class.java) -> ShareOpenEndedNegativeFeedbackViewModel()
                 isAssignableFrom(BrokenSiteNegativeFeedbackViewModel::class.java) -> BrokenSiteNegativeFeedbackViewModel()
-                isAssignableFrom(TrackerBlockingSelectionViewModel::class.java) -> TrackerBlockingSelectionViewModel(privacySettingsStore)
                 isAssignableFrom(DefaultBrowserPageViewModel::class.java) -> defaultBrowserPage()
                 isAssignableFrom(ChangeIconViewModel::class.java) -> changeAppIconViewModel()
                 isAssignableFrom(FireproofWebsitesViewModel::class.java) -> fireproofWebsiteViewModel()
@@ -167,7 +161,7 @@ class ViewModelFactory @Inject constructor(
 
     private fun privacyDashboardViewModel(): PrivacyDashboardViewModel {
         return PrivacyDashboardViewModel(
-            privacySettingsStore,
+            userWhitelistDao,
             networkLeaderboardDao,
             pixel
         )
@@ -189,6 +183,7 @@ class ViewModelFactory @Inject constructor(
         duckDuckGoUrlDetector = duckDuckGoUrlDetector,
         siteFactory = siteFactory,
         tabRepository = tabRepository,
+        userWhitelistDao = userWhitelistDao,
         networkLeaderboardDao = networkLeaderboardDao,
         bookmarksDao = bookmarksDao,
         fireproofWebsiteDao = fireproofWebsiteDao,

@@ -21,7 +21,6 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.text.Html
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.View
@@ -42,6 +41,7 @@ import com.duckduckgo.app.global.baseHost
 import com.duckduckgo.app.global.faviconLocation
 import com.duckduckgo.app.global.image.GlideApp
 import com.duckduckgo.app.global.view.gone
+import com.duckduckgo.app.global.view.html
 import com.duckduckgo.app.global.view.show
 import kotlinx.android.synthetic.main.content_bookmarks.*
 import kotlinx.android.synthetic.main.include_toolbar.*
@@ -120,11 +120,9 @@ class BookmarksActivity : DuckDuckGoActivity() {
         finish()
     }
 
-    @Suppress("deprecation")
     private fun confirmDeleteBookmark(bookmark: BookmarkEntity) {
-        val message =
-            Html.fromHtml(getString(R.string.bookmarkDeleteConfirmMessage, bookmark.title))
-        val title = getString(R.string.bookmarkDeleteConfirmTitle)
+        val message = getString(R.string.bookmarkDeleteConfirmMessage, bookmark.title).html(this)
+        val title = getString(R.string.dialogConfirmTitle)
         deleteDialog = AlertDialog.Builder(this)
             .setTitle(title)
             .setMessage(message)
@@ -237,7 +235,6 @@ class BookmarksActivity : DuckDuckGoActivity() {
             }
             popup.show()
         }
-
 
         private fun editBookmark(bookmark: BookmarkEntity) {
             Timber.i("Editing bookmark ${bookmark.title}")

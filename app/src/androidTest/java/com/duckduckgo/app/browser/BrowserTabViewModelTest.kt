@@ -58,9 +58,10 @@ import com.duckduckgo.app.global.model.SiteFactory
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao
+import com.duckduckgo.app.privacy.db.UserWhitelistDao
 import com.duckduckgo.app.privacy.model.PrivacyPractices
 import com.duckduckgo.app.privacy.model.TestEntity
-import com.duckduckgo.app.privacy.store.PrivacySettingsStore
+import com.duckduckgo.app.privacy.model.UserWhitelistedDomain
 import com.duckduckgo.app.runBlocking
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.VariantManager
@@ -173,10 +174,10 @@ class BrowserTabViewModelTest {
     private lateinit var mockWidgetCapabilities: WidgetCapabilities
 
     @Mock
-    private lateinit var mockPrivacySettingsStore: PrivacySettingsStore
+    private lateinit var mockUserStageStore: UserStageStore
 
     @Mock
-    private lateinit var mockUserStageStore: UserStageStore
+    private lateinit var mockUserWhitelistDao: UserWhitelistDao
 
     private lateinit var mockAutoCompleteApi: AutoCompleteApi
 
@@ -210,10 +211,10 @@ class BrowserTabViewModelTest {
             mockSurveyDao,
             mockWidgetCapabilities,
             mockDismissedCtaDao,
+            mockUserWhitelistDao,
             mockVariantManager,
             mockSettingsStore,
             mockOnboardingStore,
-            mockPrivacySettingsStore,
             mockUserStageStore,
             coroutineRule.testDispatcherProvider
         )
@@ -226,7 +227,7 @@ class BrowserTabViewModelTest {
         whenever(mockTabsRepository.retrieveSiteData(any())).thenReturn(MutableLiveData())
         whenever(mockPrivacyPractices.privacyPracticesFor(any())).thenReturn(PrivacyPractices.UNKNOWN)
         whenever(mockAppInstallStore.installTimestamp).thenReturn(System.currentTimeMillis() - TimeUnit.DAYS.toMillis(1))
-        whenever(mockPrivacySettingsStore.privacyOn).thenReturn(true)
+        whenever(mockUserWhitelistDao.contains(anyString())).thenReturn(false)
 
         testee = BrowserTabViewModel(
             statisticsUpdater = mockStatisticsUpdater,
@@ -234,6 +235,7 @@ class BrowserTabViewModelTest {
             duckDuckGoUrlDetector = DuckDuckGoUrlDetector(),
             siteFactory = siteFactory,
             tabRepository = mockTabsRepository,
+            userWhitelistDao = mockUserWhitelistDao,
             networkLeaderboardDao = mockNetworkLeaderboardDao,
             autoComplete = mockAutoCompleteApi,
             appSettingsPreferencesStore = mockSettingsStore,
@@ -878,6 +880,19 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenFindInPageShowingByPressingBackOnBrowserThenViewStateUpdatedInvisibleAndDoesNotGoToPreviousPage() {
+        setupNavigation(isBrowsing = true, canGoBack = true)
+        testee.onFindInPageSelected()
+        testee.onUserPressedBack()
+
+        assertFalse(findInPageViewState().visible)
+        assertCommandIssued<Command.DismissFindInPage>()
+
+        val issuedCommand = commandCaptor.allValues.find { it is Command.NavigateBack }
+        assertNull(issuedCommand)
+    }
+
+    @Test
     fun whenHomeShowingByPressingBackOnInvalidatedBrowserThenForwardButtonInactive() {
         setupNavigation(isBrowsing = true)
         givenInvalidatedGlobalLayout()
@@ -1066,11 +1081,23 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenUserSelectsToShareLinkThenShareLinkCommandSent() {
-        loadUrl("foo.com")
-        testee.onShareSelected()
-        val command = captureCommands().value as Command.ShareLink
-        assertEquals("foo.com", command.url)
+    fun whenUserTogglesNonWhitelistedSiteThenSiteAddedToWhitelistAndPixelSentAndPageRefreshed() = coroutineRule.runBlocking {
+        whenever(mockUserWhitelistDao.contains("www.example.com")).thenReturn(false)
+        loadUrl("http://www.example.com/home.html")
+        testee.onWhitelistSelected()
+        verify(mockUserWhitelistDao).insert(UserWhitelistedDomain("www.example.com"))
+        verify(mockPixel).fire(Pixel.PixelName.BROWSER_MENU_WHITELIST_ADD)
+        verify(mockCommandObserver).onChanged(Command.Refresh)
+    }
+
+    @Test
+    fun whenUserTogglesWhitelsitedSiteThenSiteRemovedFromWhitelistAndPixelSentAndPageRefreshed() = coroutineRule.runBlocking {
+        whenever(mockUserWhitelistDao.contains("www.example.com")).thenReturn(true)
+        loadUrl("http://www.example.com/home.html")
+        testee.onWhitelistSelected()
+        verify(mockUserWhitelistDao).delete(UserWhitelistedDomain("www.example.com"))
+        verify(mockPixel).fire(Pixel.PixelName.BROWSER_MENU_WHITELIST_REMOVE)
+        verify(mockCommandObserver).onChanged(Command.Refresh)
     }
 
     @Test
@@ -1078,14 +1105,22 @@ class BrowserTabViewModelTest {
         loadUrl("foo.com", isBrowserShowing = true)
         testee.onBrokenSiteSelected()
         val command = captureCommands().value as Command.BrokenSiteFeedback
-        assertEquals("foo.com", command.url)
+        assertEquals("foo.com", command.data.url)
     }
 
     @Test
     fun whenNoSiteAndBrokenSiteSelectedThenBrokenSiteFeedbackCommandSentWithoutUrl() {
         testee.onBrokenSiteSelected()
         val command = captureCommands().value as Command.BrokenSiteFeedback
-        assertEquals("", command.url)
+        assertEquals("", command.data.url)
+    }
+
+    @Test
+    fun whenUserSelectsToShareLinkThenShareLinkCommandSent() {
+        loadUrl("foo.com")
+        testee.onShareSelected()
+        val command = captureCommands().value as Command.ShareLink
+        assertEquals("foo.com", command.url)
     }
 
     @Test
@@ -1583,111 +1618,6 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenOnBrokenSiteSelectedAndNoHttpsUpgradedThenReturnHttpsUpgradedFalse() {
-        testee.onBrokenSiteSelected()
-
-        val command = captureCommands().lastValue
-        assertTrue(command is Command.BrokenSiteFeedback)
-
-        val brokenSiteFeedback = command as Command.BrokenSiteFeedback
-        assertFalse(brokenSiteFeedback.httpsUpgraded)
-    }
-
-    @Test
-    fun whenOnBrokenSiteSelectedAndNoTrackersThenReturnBlockedTrackersEmptyString() {
-        givenOneActiveTabSelected()
-
-        testee.onBrokenSiteSelected()
-
-        val command = captureCommands().lastValue
-        assertTrue(command is Command.BrokenSiteFeedback)
-
-        val brokenSiteFeedback = command as Command.BrokenSiteFeedback
-        assertEquals("", brokenSiteFeedback.blockedTrackers)
-    }
-
-    @Test
-    fun whenOnBrokenSiteSelectedAndTrackersBlockedThenReturnBlockedTrackers() {
-        givenOneActiveTabSelected()
-        val event = TrackingEvent("http://www.example.com", "http://www.tracker.com/tracker.js", emptyList(), null, false)
-        val anotherEvent = TrackingEvent("http://www.example.com/test", "http://www.anothertracker.com/tracker.js", emptyList(), null, false)
-
-        testee.trackerDetected(event)
-        testee.trackerDetected(anotherEvent)
-        testee.onBrokenSiteSelected()
-
-        val command = captureCommands().lastValue
-        assertTrue(command is Command.BrokenSiteFeedback)
-
-        val brokenSiteFeedback = command as Command.BrokenSiteFeedback
-        assertEquals("www.tracker.com,www.anothertracker.com", brokenSiteFeedback.blockedTrackers)
-    }
-
-    @Test
-    fun whenOnBrokenSiteSelectedAndSameHostTrackersBlockedThenDoNotReturnDuplicatedBlockedTrackers() {
-        givenOneActiveTabSelected()
-        val event = TrackingEvent("http://www.example.com", "http://www.tracker.com/tracker.js", emptyList(), null, false)
-        val anotherEvent = TrackingEvent("http://www.example.com/test", "http://www.tracker.com/tracker2.js", emptyList(), null, false)
-
-        testee.trackerDetected(event)
-        testee.trackerDetected(anotherEvent)
-        testee.onBrokenSiteSelected()
-
-        val command = captureCommands().lastValue
-        assertTrue(command is Command.BrokenSiteFeedback)
-
-        val brokenSiteFeedback = command as Command.BrokenSiteFeedback
-        assertEquals("www.tracker.com", brokenSiteFeedback.blockedTrackers)
-    }
-
-    @Test
-    fun whenOnBrokenSiteSelectedAndNoSurrogatesThenReturnSurrogatesEmptyString() {
-        givenOneActiveTabSelected()
-
-        testee.onBrokenSiteSelected()
-
-        val command = captureCommands().lastValue
-        assertTrue(command is Command.BrokenSiteFeedback)
-
-        val brokenSiteFeedback = command as Command.BrokenSiteFeedback
-        assertEquals("", brokenSiteFeedback.surrogates)
-    }
-
-    @Test
-    fun whenOnBrokenSiteSelectedAndSurrogatesThenReturnSurrogates() {
-        givenOneActiveTabSelected()
-        val surrogate = SurrogateResponse(true, "surrogate.com/test.js", "", "")
-        val anotherSurrogate = SurrogateResponse(true, "anothersurrogate.com/test.js", "", "")
-
-        testee.surrogateDetected(surrogate)
-        testee.surrogateDetected(anotherSurrogate)
-        testee.onBrokenSiteSelected()
-
-        val command = captureCommands().lastValue
-        assertTrue(command is Command.BrokenSiteFeedback)
-
-        val brokenSiteFeedback = command as Command.BrokenSiteFeedback
-        assertEquals("surrogate.com,anothersurrogate.com", brokenSiteFeedback.surrogates)
-    }
-
-    @Test
-    fun whenOnBrokenSiteSelectedAndSameHostSurrogatesThenDoNotReturnDuplicatedSurrogates() {
-        givenOneActiveTabSelected()
-        val surrogate = SurrogateResponse(true, "surrogate.com/test.js", "", "")
-        val anotherSurrogate = SurrogateResponse(true, "surrogate.com/test2.js", "", "")
-
-        testee.surrogateDetected(surrogate)
-        testee.surrogateDetected(anotherSurrogate)
-        testee.onBrokenSiteSelected()
-
-        val command = captureCommands().lastValue
-        assertTrue(command is Command.BrokenSiteFeedback)
-
-        val brokenSiteFeedback = command as Command.BrokenSiteFeedback
-        assertEquals("surrogate.com", brokenSiteFeedback.surrogates)
-    }
-
-    @Test
     fun whenHomeShowingByPressingBackThenFireproofWebsiteOptionMenuDisabled() {
         setupNavigation(isBrowsing = true)
         testee.onUserPressedBack()
@@ -1780,7 +1710,7 @@ class BrowserTabViewModelTest {
         }
         verify(mockPixel).fire(Pixel.PixelName.FIREPROOF_WEBSITE_UNDO)
     }
-    
+
     private inline fun <reified T : Command> assertCommandIssued(instanceAssertions: T.() -> Unit = {}) {
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
         val issuedCommand = commandCaptor.allValues.find { it is T }

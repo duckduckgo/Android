@@ -20,12 +20,11 @@ import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import androidx.core.text.HtmlCompat
-import androidx.core.text.HtmlCompat.FROM_HTML_MODE_LEGACY
 import androidx.lifecycle.Observer
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
 import com.duckduckgo.app.global.DuckDuckGoActivity
+import com.duckduckgo.app.global.view.html
 import kotlinx.android.synthetic.main.content_fireproof_websites.*
 import kotlinx.android.synthetic.main.include_toolbar.*
 
@@ -50,7 +49,7 @@ class FireproofWebsitesActivity : DuckDuckGoActivity() {
     }
 
     private fun observeViewModel() {
-        viewModel.viewState.observe(this, Observer<FireproofWebsitesViewModel.ViewState> { viewState ->
+        viewModel.viewState.observe(this, Observer { viewState ->
             viewState?.let {
                 adapter.fireproofWebsites = it.fireproofWebsitesEntities
             }
@@ -65,8 +64,8 @@ class FireproofWebsitesActivity : DuckDuckGoActivity() {
 
     @Suppress("deprecation")
     private fun confirmDeleteWebsite(entity: FireproofWebsiteEntity) {
-        val message = HtmlCompat.fromHtml(getString(R.string.fireproofWebsiteDeleteConfirmMessage, entity.domain), FROM_HTML_MODE_LEGACY)
-        val title = getString(R.string.fireproofWebsiteDeleteConfirmTitle)
+        val message = getString(R.string.fireproofWebsiteDeleteConfirmMessage, entity.domain).html(this)
+        val title = getString(R.string.dialogConfirmTitle)
         deleteDialog = AlertDialog.Builder(this)
             .setTitle(title)
             .setMessage(message)

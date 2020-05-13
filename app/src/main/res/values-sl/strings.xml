@@ -197,11 +197,11 @@
     <string name="bookmarksMenuTitle">Zaznamki</string>
     <string name="bookmarksActivityTitle">Zaznamki</string>
     <string name="bookmarkDeleteConfirmMessage">Ste prepričani, da želite izbrisati zaznamek &lt;b&gt;%s&lt;/b&gt;?</string>
-    <string name="bookmarkDeleteConfirmTitle">Potrdi</string>
+    <string name="dialogConfirmTitle">Potrdi</string>
     <string name="bookmarkAddedFeedback">Zaznamek je dodan</string>
     <string name="bookmarkTitleHint">Naslov zaznamka</string>
     <string name="bookmarkUrlHint">URL zaznamka</string>
-    <string name="bookmarkSave">Shrani</string>
+    <string name="dialogSave">Shrani</string>
     <string name="bookmarkTitleEdit">Uredi zaznamek</string>
     <string name="noBookmarks">Zaznamki še niso dodani</string>
     <string name="bookmarkOverflowContentDescription">Več možnosti za zaznamek %s</string>

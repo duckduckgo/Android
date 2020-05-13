@@ -24,6 +24,7 @@ import com.duckduckgo.app.httpsupgrade.api.HttpsBloomFilterFactoryImpl
 import com.duckduckgo.app.httpsupgrade.api.HttpsUpgradeService
 import com.duckduckgo.app.httpsupgrade.db.HttpsBloomFilterSpecDao
 import com.duckduckgo.app.httpsupgrade.db.HttpsWhitelistDao
+import com.duckduckgo.app.privacy.db.UserWhitelistDao
 import com.duckduckgo.app.statistics.pixels.Pixel
 import dagger.Module
 import dagger.Provides
@@ -36,11 +37,12 @@ class HttpsUpgraderModule {
     @Provides
     fun httpsUpgrader(
         whitelistDao: HttpsWhitelistDao,
+        userWhitelistDao: UserWhitelistDao,
         bloomFilterFactory: HttpsBloomFilterFactory,
         httpsUpgradeService: HttpsUpgradeService,
         pixel: Pixel
     ): HttpsUpgrader {
-        return HttpsUpgraderImpl(whitelistDao, bloomFilterFactory, httpsUpgradeService, pixel)
+        return HttpsUpgraderImpl(whitelistDao, userWhitelistDao, bloomFilterFactory, httpsUpgradeService, pixel)
     }
 
     @Provides
