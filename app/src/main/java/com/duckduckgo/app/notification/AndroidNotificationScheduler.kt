@@ -46,14 +46,7 @@ class NotificationScheduler(
 ) : AndroidNotificationScheduler {
 
     override suspend fun scheduleNextNotification() {
-        cancelAllUnnecessaryWork()
         scheduleInactiveUserNotifications()
-    }
-
-    private fun cancelAllUnnecessaryWork(){
-        allDeprecatedNotificationWorkTags().forEach { tag  ->
-            workManager.cancelAllWorkByTag(tag)
-        }
     }
 
     private suspend fun scheduleInactiveUserNotifications() {
@@ -116,11 +109,5 @@ class NotificationScheduler(
 
     companion object {
         const val UNUSED_APP_WORK_REQUEST_TAG = "com.duckduckgo.notification.schedule"
-
-        // below there is a list of TAGs that were used at some point but that are no longer active
-        // we want to make sure that this TAGs are cancelled to avoid inconsistencies
-        private const val CONTINUOUS_APP_USE_REQUEST_TAG = "com.duckduckgo.notification.schedule.continuous" // Sticky Search Experiment
-
-        fun allDeprecatedNotificationWorkTags() = listOf(CONTINUOUS_APP_USE_REQUEST_TAG)
     }
 }
