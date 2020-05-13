@@ -175,9 +175,11 @@ interface Pixel {
         COOKIE_DATABASE_OPEN_ERROR("m_cdb_oe"),
         COOKIE_DATABASE_DELETE_ERROR("m_cdb_de"),
         COOKIE_DATABASE_CORRUPTED_ERROR("m_cdb_ce"),
-
         COOKIE_DATABASE_EXCEPTION_OPEN_ERROR("m_cdb_e_oe"),
-        COOKIE_DATABASE_EXCEPTION_DELETE_ERROR("m_cdb_e_de")
+        COOKIE_DATABASE_EXCEPTION_DELETE_ERROR("m_cdb_e_de"),
+        FIREPROOF_WEBSITE_ADDED("m_fw_a"),
+        FIREPROOF_WEBSITE_DELETED("m_fw_d"),
+        FIREPROOF_WEBSITE_UNDO("m_fw_u")
     }
 
     object PixelParameter {

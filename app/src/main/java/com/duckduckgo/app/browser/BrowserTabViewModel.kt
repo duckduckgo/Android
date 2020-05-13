@@ -722,16 +722,16 @@ class BrowserTabViewModel(
                 fireproofWebsiteDao.insert(fireproofWebsiteEntity)
             }
             if (id >= 0) {
+                pixel.fire(PixelName.FIREPROOF_WEBSITE_ADDED)
                 command.value = ShowFireproofWebSiteConfirmation(fireproofWebsiteEntity = fireproofWebsiteEntity)
             }
         }
     }
 
     fun onFireproofWebsiteSnackbarUndoClicked(fireproofWebsiteEntity: FireproofWebsiteEntity) {
-        viewModelScope.launch {
-            withContext(dispatchers.io()) {
-                fireproofWebsiteDao.delete(fireproofWebsiteEntity)
-            }
+        viewModelScope.launch(dispatchers.io()) {
+            fireproofWebsiteDao.delete(fireproofWebsiteEntity)
+            pixel.fire(PixelName.FIREPROOF_WEBSITE_UNDO)
         }
     }
 
