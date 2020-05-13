@@ -23,7 +23,7 @@ interface JobCleaner {
     fun cleanDeprecatedJobs()
 
     companion object {
-        private const val STICKY_SEARCH_CONTINUOUS_APP_USE_REQUEST_TAG  = "com.duckduckgo.notification.schedule.continuous" // Sticky Search Experiment
+        private const val STICKY_SEARCH_CONTINUOUS_APP_USE_REQUEST_TAG = "com.duckduckgo.notification.schedule.continuous"
 
         fun allDeprecatedNotificationWorkTags() = listOf(STICKY_SEARCH_CONTINUOUS_APP_USE_REQUEST_TAG)
     }

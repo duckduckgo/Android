@@ -16,21 +16,15 @@
 
 package com.duckduckgo.app.job
 
-import android.content.Context
 import android.util.Log
-import androidx.test.InstrumentationRegistry.getTargetContext
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.work.Configuration
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
-import androidx.work.WorkRequest
-import androidx.work.Worker
-import androidx.work.WorkerParameters
 import androidx.work.impl.utils.SynchronousExecutor
 import androidx.work.testing.WorkManagerTestInitHelper
 import com.duckduckgo.app.job.JobCleaner.Companion.allDeprecatedNotificationWorkTags
-import com.duckduckgo.app.notification.NotificationScheduler
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -68,7 +62,7 @@ class JobCleanerTest {
         assertWorkersAreNotEnqueued()
     }
 
-    private fun enqueueDeprecatedWorkers(){
+    private fun enqueueDeprecatedWorkers() {
         allDeprecatedNotificationWorkTags().forEach {
             val requestBuilder = OneTimeWorkRequestBuilder<TestWorker>()
             val request = requestBuilder
@@ -79,14 +73,14 @@ class JobCleanerTest {
         }
     }
 
-    private fun assertWorkersAreEnqueued(){
+    private fun assertWorkersAreEnqueued() {
         allDeprecatedNotificationWorkTags().forEach {
             val scheduledWorkers = getScheduledWorkers(it)
             assertFalse(scheduledWorkers.isEmpty())
         }
     }
 
-    private fun assertWorkersAreNotEnqueued(){
+    private fun assertWorkersAreNotEnqueued() {
         allDeprecatedNotificationWorkTags().forEach {
             val scheduledWorkers = getScheduledWorkers(it)
             assertTrue(scheduledWorkers.isEmpty())
@@ -99,5 +93,4 @@ class JobCleanerTest {
             .get()
             .filter { it.state == WorkInfo.State.ENQUEUED }
     }
-
 }
