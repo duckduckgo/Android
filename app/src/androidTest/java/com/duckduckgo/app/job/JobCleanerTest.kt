@@ -97,6 +97,7 @@ class JobCleanerTest {
         return workManager
             .getWorkInfosByTag(tag)
             .get()
+            .filter { it.state == WorkInfo.State.ENQUEUED }
     }
 
 }
