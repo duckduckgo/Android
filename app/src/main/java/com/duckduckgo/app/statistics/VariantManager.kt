@@ -59,7 +59,7 @@ interface VariantManager {
                 features = listOf(BottomBarNavigation),
                 filterBy = { noFilter() }),
 
-            // SERP Header Experiment
+            // Single Search Bar Experiments
             Variant(
                 key = "zf",
                 weight = 1.0,
