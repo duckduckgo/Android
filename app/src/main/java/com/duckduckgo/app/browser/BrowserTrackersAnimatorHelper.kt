@@ -122,11 +122,11 @@ class BrowserTrackersAnimatorHelper(private val privacyGradeButton: ImageButton)
         listener?.onAnimationFinished()
     }
 
-    fun finishTrackerAnimation(fadeInViews: List<View>, container: ViewGroup) {
-        val animateOmnibarIn = animateOmnibarIn(fadeInViews)
-        val animateContainerOut = animateFadeOut(container)
+    fun finishTrackerAnimation(omnibarViews: List<View>, container: ViewGroup) {
         trackersAnimation = AnimatorSet().apply {
-            play(animateContainerOut).before(animateOmnibarIn)
+            play(animateLogosSlideOut(container.children.toList()))
+                .before(animateOmnibarIn(omnibarViews))
+                .before(animateFadeOut(container))
             start()
             addListener(onEnd = { listener?.onAnimationFinished() })
         }
@@ -271,17 +271,20 @@ class BrowserTrackersAnimatorHelper(private val privacyGradeButton: ImageButton)
         omnibarViews: List<View>,
         logoViews: List<View>
     ): AnimatorSet {
-        return AnimatorSet().apply {
-            play(createPartialTrackersAnimation(container, omnibarViews, logoViews))
+        val finalAnimation = AnimatorSet().apply {
             play(animateLogosSlideOut(logoViews))
                 .after(TRACKER_LOGOS_DELAY_ON_SCREEN)
+                .before(animateFadeOut(container))
                 .before(animateOmnibarIn(omnibarViews))
-            addListener(
-                onEnd = {
-                    container.alpha = 0f
-                    listener?.onAnimationFinished()
-                }
+        }
+
+        return AnimatorSet().apply {
+            playSequentially(
+                createPartialTrackersAnimation(container, omnibarViews, logoViews),
+                finalAnimation
             )
+            start()
+            addListener(onEnd = { listener?.onAnimationFinished() })
         }
     }
 
@@ -293,11 +296,9 @@ class BrowserTrackersAnimatorHelper(private val privacyGradeButton: ImageButton)
         applyConstraintSet(container, logoViews)
         container.alpha = 1f
         animateLogosBlocked(logoViews)
-        val fadeOmnibarOut = animateOmnibarOut(omnibarViews)
-        val slideInLogos = animateLogosSlideIn(logoViews)
 
         return AnimatorSet().apply {
-            play(slideInLogos).after(fadeOmnibarOut)
+            play(animateLogosSlideIn(logoViews)).after(animateOmnibarOut(omnibarViews))
         }
     }
 

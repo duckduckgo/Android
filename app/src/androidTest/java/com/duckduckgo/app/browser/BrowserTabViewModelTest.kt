@@ -601,6 +601,18 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenShowPrivacyGradeThenShowPrivacyGrade() {
+        testee.showPrivacyGrade()
+        assertTrue(privacyGradeState().canShowPrivacyGrade)
+    }
+
+    @Test
+    fun whenHidePrivacyGradeThenDoNotShowPrivacyGrade() {
+        testee.hidePrivacyGrade()
+        assertFalse(privacyGradeState().canShowPrivacyGrade)
+    }
+
+    @Test
     fun whenInitialisedThenPrivacyGradeIsNotShown() {
         assertFalse(browserViewState().showPrivacyGrade)
     }

@@ -681,12 +681,14 @@ class BrowserTabViewModel(
         }
     }
 
-    fun updatePrivacyGrade() {
+    fun showPrivacyGrade() {
         privacyGradeState.value = currentPrivacyGradeState().copy(canShowPrivacyGrade = true)
     }
 
-    fun stopShowPrivacyGrade() {
-        privacyGradeState.value = currentPrivacyGradeState().copy(canShowPrivacyGrade = false)
+    fun hidePrivacyGrade() {
+        if (currentPrivacyGradeState().canShowPrivacyGrade) {
+            privacyGradeState.value = currentPrivacyGradeState().copy(canShowPrivacyGrade = false)
+        }
     }
 
     override fun showFileChooser(filePathCallback: ValueCallback<Array<Uri>>, fileChooserParams: WebChromeClient.FileChooserParams) {

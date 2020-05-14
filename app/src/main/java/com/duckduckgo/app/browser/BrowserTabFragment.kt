@@ -1201,7 +1201,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
     fun omnibarViews(): List<View> = listOf(clearTextButton, omnibarTextInput, searchIcon)
 
     override fun onAnimationFinished() {
-        viewModel.updatePrivacyGrade()
+        viewModel.showPrivacyGrade()
     }
 
     companion object {
@@ -1546,7 +1546,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
                         animatorHelper.stopPulseAnimation()
                     } else {
                         animatorHelper.startPulseAnimation(privacyGradeButton)
-                        viewModel.stopShowPrivacyGrade()
+                        viewModel.hidePrivacyGrade()
                     }
                 }
             }
