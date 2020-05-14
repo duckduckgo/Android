@@ -162,7 +162,7 @@ interface Pixel {
         AUTOCOMPLETE_BOOKMARK_SELECTION("m_aut_s_b"),
         AUTOCOMPLETE_SEARCH_SELECTION("m_aut_s_s"),
 
-        SERP_REQUERY("rq_1"),
+        SERP_REQUERY("rq_%d"),
 
         CHANGE_APP_ICON_OPENED("m_ic"),
 
