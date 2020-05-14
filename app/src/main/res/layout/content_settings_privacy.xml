@@ -42,4 +42,13 @@
         app:layout_constraintTop_toBottomOf="@id/automaticallyClearWhatSetting"
         app:subtitle="test test test"
         app:title="@string/settingsAutomaticallyClearWhen" />
+
+    <TextView
+        android:id="@+id/whitelist"
+        style="@style/SettingsItemClickable"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:text="@string/settingsPrivacyProtectionWhitelist"
+        app:layout_constraintTop_toBottomOf="@id/automaticallyClearWhenSetting" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

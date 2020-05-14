@@ -41,9 +41,6 @@ abstract class StoreModule {
     abstract fun bindOnboardingStore(onboardingStore: OnboardingSharedPreferences): OnboardingStore
 
     @Binds
-    abstract fun bindPrivacySettingsStore(privacySettingsStore: PrivacySettingsSharedPreferences): PrivacySettingsStore
-
-    @Binds
     abstract fun bindTermsOfServiceStore(termsOfServiceStore: TermsOfServiceRawStore): TermsOfServiceStore
 
     @Binds

@@ -25,7 +25,8 @@ class UriString {
 
         private const val localhost = "localhost"
         private const val space = " "
-        private val webUrlRegex = PatternsCompat.WEB_URL.toRegex()
+        private val webUrlRegex by lazy { PatternsCompat.WEB_URL.toRegex() }
+        private val domainRegex by lazy { PatternsCompat.DOMAIN_NAME.toRegex() }
 
         fun host(uriString: String): String? {
             return Uri.parse(uriString).baseHost
@@ -42,17 +43,16 @@ class UriString {
             val uri = Uri.parse(inputQuery).withScheme()
             if (uri.scheme != UrlScheme.http && uri.scheme != UrlScheme.https) return false
             if (uri.userInfo != null) return false
-            if (uri.host == null) return false
-            return isValidHost(uri.host)
-        }
 
-        private fun isValidHost(host: String): Boolean {
+            val host = uri.host ?: return false
             if (host == localhost) return true
             if (host.contains(space)) return false
             if (host.contains("!")) return false
+            return (webUrlRegex.containsMatchIn(host))
+        }
 
-            if (webUrlRegex.containsMatchIn(host)) return true
-            return false
+        fun isValidDomain(domain: String): Boolean {
+            return domainRegex.matches(domain)
         }
     }
 }

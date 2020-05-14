@@ -205,11 +205,11 @@
     <string name="bookmarksMenuTitle">Segnalibri</string>
     <string name="bookmarksActivityTitle">Segnalibri</string>
     <string name="bookmarkDeleteConfirmMessage">Sei sicuro di voler eliminare il segnalibro &lt;b&gt;%s&lt;/b&gt;?</string>
-    <string name="bookmarkDeleteConfirmTitle">Conferma</string>
+    <string name="dialogConfirmTitle">Conferma</string>
     <string name="bookmarkAddedFeedback">Segnalibro aggiunto</string>
     <string name="bookmarkTitleHint">Titolo del segnalibro</string>
     <string name="bookmarkUrlHint">URL del segnalibro</string>
-    <string name="bookmarkSave">Salva</string>
+    <string name="dialogSave">Salva</string>
     <string name="bookmarkTitleEdit">Modifica segnalibro</string>
     <string name="noBookmarks">Non è ancora stato aggiunto nessun segnalibro</string>
     <string name="bookmarkOverflowContentDescription">Ulteriori opzioni per il segnalibro %s</string>

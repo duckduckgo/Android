@@ -185,14 +185,14 @@ class AppDatabaseTest {
     }
 
     @Test
-    fun whenMigratingFromVersion17To18IfUserDidNotSawOnboardingThenMigrateToNew() = coroutineRule.runBlocking {
+    fun whenMigratingFromVersion17To18IfUserDidNotSeeOnboardingThenMigrateToNew() = coroutineRule.runBlocking {
         givenUserNeverSawOnboarding()
         createDatabaseAndMigrate(17, 18, migrationsProvider.MIGRATION_17_TO_18)
         assertEquals(AppStage.NEW, database().userStageDao().currentUserAppStage()?.appStage)
     }
 
     @Test
-    fun whenMigratingFromVersion17To18IfUserSawOnboardingThenMigrateToEstablished() = coroutineRule.runBlocking {
+    fun whenMigratingFromVersion17To18IfUserSeeOnboardingThenMigrateToEstablished() = coroutineRule.runBlocking {
         givenUserSawOnboarding()
         createDatabaseAndMigrate(17, 18, migrationsProvider.MIGRATION_17_TO_18)
         assertEquals(AppStage.ESTABLISHED, database().userStageDao().currentUserAppStage()?.appStage)
@@ -202,6 +202,12 @@ class AppDatabaseTest {
     fun whenMigratingFromVersion18To19ThenValidationSucceedsAndRowsDeletedFromTable() {
         database().uncaughtExceptionDao().add(UncaughtExceptionEntity(1, UncaughtExceptionSource.GLOBAL, "version", 1234))
         createDatabaseAndMigrate(18, 19, migrationsProvider.MIGRATION_18_TO_19)
+        assertEquals(0, database().uncaughtExceptionDao().count())
+    }
+
+    @Test
+    fun whenMigratingFromVersion19To20ThenValidationSucceeds() {
+        createDatabaseAndMigrate(19, 20, migrationsProvider.MIGRATION_19_TO_20)
         assertEquals(0, database().uncaughtExceptionDao().count())
     }
 

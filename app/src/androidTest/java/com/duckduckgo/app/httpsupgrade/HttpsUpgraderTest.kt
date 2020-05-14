@@ -20,6 +20,7 @@ import android.net.Uri
 import com.duckduckgo.app.httpsupgrade.api.HttpsBloomFilterFactory
 import com.duckduckgo.app.httpsupgrade.api.HttpsUpgradeService
 import com.duckduckgo.app.httpsupgrade.db.HttpsWhitelistDao
+import com.duckduckgo.app.privacy.db.UserWhitelistDao
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.mock
@@ -38,6 +39,7 @@ class HttpsUpgraderTest {
 
     private var mockHttpsBloomFilterFactory: HttpsBloomFilterFactory = mock()
     private var mockWhitelistDao: HttpsWhitelistDao = mock()
+    private var mockUserWhitelistDao: UserWhitelistDao = mock()
     private var mockUpgradeService: HttpsUpgradeService = mock()
     private var mockServiceCall: Call<List<String>> = mock()
 
@@ -47,7 +49,7 @@ class HttpsUpgraderTest {
     @Before
     fun before() {
         whenever(mockHttpsBloomFilterFactory.create()).thenReturn(bloomFilter)
-        testee = HttpsUpgraderImpl(mockWhitelistDao, mockHttpsBloomFilterFactory, mockUpgradeService, mockPixel)
+        testee = HttpsUpgraderImpl(mockWhitelistDao, mockUserWhitelistDao, mockHttpsBloomFilterFactory, mockUpgradeService, mockPixel)
         testee.reloadData()
     }
 
@@ -66,6 +68,14 @@ class HttpsUpgraderTest {
     fun whenHttpUriHasOnlyPartDomainInLocalListThenShouldNotUpgrade() {
         bloomFilter.add("local.url")
         assertFalse(testee.shouldUpgrade(Uri.parse("http://www.local.url")))
+    }
+
+    @Test
+    fun whenHttpDomainIsUserWhitelistedThenShouldNotUpgradeAndNoLookupPixelIsSet() {
+        whenever(mockUserWhitelistDao.contains("www.local.url")).thenReturn(true)
+        bloomFilter.add("www.local.url")
+        assertFalse(testee.shouldUpgrade(Uri.parse("http://www.local.url")))
+        mockPixel.fire(Pixel.PixelName.HTTPS_NO_LOOKUP)
     }
 
     @Test

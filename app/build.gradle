@@ -187,6 +187,7 @@ dependencies {
 
     // WorkManager
     implementation "androidx.work:work-runtime-ktx:$workManager"
+    androidTestImplementation "androidx.work:work-testing:$workManager"
 
     // Dagger
     kapt "com.google.dagger:dagger-android-processor:$dagger"

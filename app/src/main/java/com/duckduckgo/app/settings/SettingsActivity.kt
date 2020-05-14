@@ -35,23 +35,17 @@ import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.sendThemeChangedBroadcast
 import com.duckduckgo.app.global.view.launchDefaultAppActivity
 import com.duckduckgo.app.icon.ui.ChangeIconActivity
+import com.duckduckgo.app.privacy.ui.WhitelistActivity
 import com.duckduckgo.app.settings.SettingsViewModel.AutomaticallyClearData
 import com.duckduckgo.app.settings.SettingsViewModel.Command
 import com.duckduckgo.app.settings.clear.ClearWhatOption
 import com.duckduckgo.app.settings.clear.ClearWhenOption
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelName
-import kotlinx.android.synthetic.main.content_settings_general.autocompleteToggle
-import kotlinx.android.synthetic.main.content_settings_general.changeAppIcon
-import kotlinx.android.synthetic.main.content_settings_general.changeAppIconLabel
-import kotlinx.android.synthetic.main.content_settings_general.lightThemeToggle
-import kotlinx.android.synthetic.main.content_settings_general.setAsDefaultBrowserSetting
-import kotlinx.android.synthetic.main.content_settings_other.about
-import kotlinx.android.synthetic.main.content_settings_other.provideFeedback
-import kotlinx.android.synthetic.main.content_settings_other.version
-import kotlinx.android.synthetic.main.content_settings_privacy.automaticallyClearWhatSetting
-import kotlinx.android.synthetic.main.content_settings_privacy.automaticallyClearWhenSetting
-import kotlinx.android.synthetic.main.include_toolbar.toolbar
+import kotlinx.android.synthetic.main.content_settings_general.*
+import kotlinx.android.synthetic.main.content_settings_other.*
+import kotlinx.android.synthetic.main.content_settings_privacy.*
+import kotlinx.android.synthetic.main.include_toolbar.*
 import javax.inject.Inject
 
 class SettingsActivity : DuckDuckGoActivity(), SettingsAutomaticallyClearWhatFragment.Listener, SettingsAutomaticallyClearWhenFragment.Listener {
@@ -95,6 +89,7 @@ class SettingsActivity : DuckDuckGoActivity(), SettingsAutomaticallyClearWhatFra
         setAsDefaultBrowserSetting.setOnCheckedChangeListener(defaultBrowserChangeListener)
         automaticallyClearWhatSetting.setOnClickListener { launchAutomaticallyClearWhatDialog() }
         automaticallyClearWhenSetting.setOnClickListener { launchAutomaticallyClearWhenDialog() }
+        whitelist.setOnClickListener { viewModel.onManageWhitelistSelected() }
     }
 
     private fun observeViewModel() {
@@ -140,6 +135,7 @@ class SettingsActivity : DuckDuckGoActivity(), SettingsAutomaticallyClearWhatFra
     private fun processCommand(it: Command?) {
         when (it) {
             is Command.LaunchFeedback -> launchFeedback()
+            is Command.LaunchWhitelist -> launchWhitelist()
             is Command.LaunchAppIcon -> launchAppIconChange()
             is Command.UpdateTheme -> sendThemeChangedBroadcast()
         }
@@ -165,6 +161,11 @@ class SettingsActivity : DuckDuckGoActivity(), SettingsAutomaticallyClearWhatFra
     private fun launchFeedback() {
         val options = ActivityOptions.makeSceneTransitionAnimation(this).toBundle()
         startActivityForResult(Intent(FeedbackActivity.intent(this)), FEEDBACK_REQUEST_CODE, options)
+    }
+
+    private fun launchWhitelist() {
+        val options = ActivityOptions.makeSceneTransitionAnimation(this).toBundle()
+        startActivity(WhitelistActivity.intent(this), options)
     }
 
     private fun launchAppIconChange() {
