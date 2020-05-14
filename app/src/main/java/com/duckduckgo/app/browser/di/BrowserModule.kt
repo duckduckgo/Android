@@ -31,9 +31,10 @@ import com.duckduckgo.app.browser.tabpreview.FileBasedWebViewPreviewGenerator
 import com.duckduckgo.app.browser.tabpreview.FileBasedWebViewPreviewPersister
 import com.duckduckgo.app.browser.tabpreview.WebViewPreviewGenerator
 import com.duckduckgo.app.browser.tabpreview.WebViewPreviewPersister
-import com.duckduckgo.app.fire.DuckDuckGoCookieManager
-import com.duckduckgo.app.fire.WebViewCookieManager
+import com.duckduckgo.app.fire.*
+import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteDao
 import com.duckduckgo.app.global.AppUrl
+import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.exception.UncaughtExceptionRepository
 import com.duckduckgo.app.global.file.FileDeleter
 import com.duckduckgo.app.global.install.AppInstallStore
@@ -41,6 +42,7 @@ import com.duckduckgo.app.httpsupgrade.HttpsUpgrader
 import com.duckduckgo.app.privacy.db.PrivacyProtectionCountDao
 import com.duckduckgo.app.referral.AppReferrerDataStore
 import com.duckduckgo.app.statistics.VariantManager
+import com.duckduckgo.app.statistics.pixels.ExceptionPixel
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.store.OfflinePixelCountDataStore
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
@@ -138,8 +140,44 @@ class BrowserModule {
     ): RequestInterceptor = WebViewRequestInterceptor(resourceSurrogates, trackerDetector, httpsUpgrader, privacyProtectionCountDao)
 
     @Provides
-    fun cookieManager(cookieManager: CookieManager): DuckDuckGoCookieManager {
-        return WebViewCookieManager(cookieManager, AppUrl.Url.HOST)
+    fun cookieManager(
+        cookieManager: CookieManager,
+        removeCookies: RemoveCookies,
+        dispatcherProvider: DispatcherProvider
+    ): DuckDuckGoCookieManager {
+        return WebViewCookieManager(cookieManager, AppUrl.Url.HOST, removeCookies, dispatcherProvider)
+    }
+
+    @Provides
+    fun removeCookiesStrategy(
+        cookieManagerRemover: CookieManagerRemover,
+        sqlCookieRemover: SQLCookieRemover
+    ): RemoveCookies {
+        return RemoveCookies(cookieManagerRemover, sqlCookieRemover)
+    }
+
+    @Provides
+    fun sqlCookieRemover(
+        webViewDatabaseLocator: WebViewDatabaseLocator,
+        getCookieHostsToPreserve: GetCookieHostsToPreserve,
+        offlinePixelCountDataStore: OfflinePixelCountDataStore,
+        exceptionPixel: ExceptionPixel,
+        dispatcherProvider: DispatcherProvider
+    ): SQLCookieRemover {
+        return SQLCookieRemover(webViewDatabaseLocator, getCookieHostsToPreserve, offlinePixelCountDataStore, exceptionPixel, dispatcherProvider)
+    }
+
+    @Provides
+    fun webViewDatabaseLocator(context: Context): WebViewDatabaseLocator = WebViewDatabaseLocator(context)
+
+    @Provides
+    fun getCookieHostsToPreserve(fireproofWebsiteDao: FireproofWebsiteDao): GetCookieHostsToPreserve = GetCookieHostsToPreserve(fireproofWebsiteDao)
+
+    @Provides
+    fun cookieManagerRemover(
+        cookieManager: CookieManager
+    ): CookieManagerRemover {
+        return CookieManagerRemover(cookieManager)
     }
 
     @Singleton

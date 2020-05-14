@@ -33,6 +33,7 @@ import com.duckduckgo.app.feedback.ui.negative.openended.ShareOpenEndedFeedbackF
 import com.duckduckgo.app.feedback.ui.negative.subreason.SubReasonNegativeFeedbackFragment
 import com.duckduckgo.app.feedback.ui.positive.initial.PositiveFeedbackLandingFragment
 import com.duckduckgo.app.fire.FireActivity
+import com.duckduckgo.app.fire.fireproofwebsite.ui.FireproofWebsitesActivity
 import com.duckduckgo.app.icon.ui.ChangeIconActivity
 import com.duckduckgo.app.job.AppConfigurationJobService
 import com.duckduckgo.app.launch.LaunchBridgeActivity
@@ -122,6 +123,10 @@ abstract class AndroidBindingModule {
     @ActivityScoped
     @ContributesAndroidInjector
     abstract fun bookmarksActivity(): BookmarksActivity
+
+    @ActivityScoped
+    @ContributesAndroidInjector
+    abstract fun fireproofWebsitesActivity(): FireproofWebsitesActivity
 
     @ActivityScoped
     @ContributesAndroidInjector

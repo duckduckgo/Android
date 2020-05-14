@@ -31,6 +31,7 @@ import androidx.annotation.VisibleForTesting
 import androidx.core.net.toUri
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.app.autocomplete.api.AutoComplete
@@ -57,6 +58,8 @@ import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.browser.ui.HttpAuthenticationDialogFragment.HttpAuthenticationListener
 import com.duckduckgo.app.cta.ui.*
+import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteDao
+import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
 import com.duckduckgo.app.global.*
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.global.model.SiteFactory
@@ -96,6 +99,7 @@ class BrowserTabViewModel(
     private val userWhitelistDao: UserWhitelistDao,
     private val networkLeaderboardDao: NetworkLeaderboardDao,
     private val bookmarksDao: BookmarksDao,
+    private val fireproofWebsiteDao: FireproofWebsiteDao,
     private val autoComplete: AutoComplete,
     private val appSettingsPreferencesStore: SettingsDataStore,
     private val longPressHandler: LongPressHandler,
@@ -133,6 +137,7 @@ class BrowserTabViewModel(
         val showMenuButton: Boolean = true,
         val canSharePage: Boolean = false,
         val canAddBookmarks: Boolean = false,
+        val canFireproofSite: Boolean = false,
         val canGoBack: Boolean = false,
         val canGoForward: Boolean = false,
         val canWhitelist: Boolean = false,
@@ -186,6 +191,7 @@ class BrowserTabViewModel(
         class ShowFullScreen(val view: View) : Command()
         class DownloadImage(val url: String, val requestUserConfirmation: Boolean) : Command()
         class ShowBookmarkAddedConfirmation(val bookmarkId: Long, val title: String?, val url: String?) : Command()
+        class ShowFireproofWebSiteConfirmation(val fireproofWebsiteEntity: FireproofWebsiteEntity) : Command()
         class ShareLink(val url: String) : Command()
         class CopyLink(val url: String) : Command()
         class FindInPageCommand(val searchTerm: String) : Command()
@@ -230,15 +236,20 @@ class BrowserTabViewModel(
         get() = site?.title
 
     private val autoCompletePublishSubject = PublishRelay.create<String>()
+    private val fireproofWebsiteState: LiveData<List<FireproofWebsiteEntity>> = fireproofWebsiteDao.fireproofWebsitesEntities()
     private var autoCompleteDisposable: Disposable? = null
     private var site: Site? = null
     private lateinit var tabId: String
     private var webNavigationState: WebNavigationState? = null
     private var httpsUpgraded = false
+    private val fireproofWebsitesObserver = Observer<List<FireproofWebsiteEntity>> {
+        browserViewState.value = currentBrowserViewState().copy(canFireproofSite = canFireproofWebsite())
+    }
 
     init {
         initializeViewStates()
         configureAutoComplete()
+        fireproofWebsiteState.observeForever(fireproofWebsitesObserver)
     }
 
     fun loadData(tabId: String, initialUrl: String?, skipHome: Boolean) {
@@ -302,6 +313,7 @@ class BrowserTabViewModel(
         buildingSiteFactoryJob?.cancel()
         autoCompleteDisposable?.dispose()
         autoCompleteDisposable = null
+        fireproofWebsiteState.removeObserver(fireproofWebsitesObserver)
         super.onCleared()
     }
 
@@ -451,6 +463,7 @@ class BrowserTabViewModel(
         browserViewState.value = currentBrowserViewState().copy(
             browserShowing = false,
             canGoBack = false,
+            canFireproofSite = false,
             canGoForward = currentGlobalLayoutState() !is Invalidated
         )
         omnibarViewState.value = currentOmnibarViewState().copy(omnibarText = "", shouldMoveCaretToEnd = false)
@@ -472,7 +485,6 @@ class BrowserTabViewModel(
     }
 
     override fun navigationStateChanged(newWebNavigationState: WebNavigationState) {
-
         val stateChange = newWebNavigationState.compare(webNavigationState)
         webNavigationState = newWebNavigationState
 
@@ -493,7 +505,6 @@ class BrowserTabViewModel(
     }
 
     private fun pageChanged(url: String, title: String?) {
-
         Timber.v("Page changed: $url")
         buildSiteFactory(url, title)
 
@@ -515,7 +526,8 @@ class BrowserTabViewModel(
             canWhitelist = canWhitelist,
             isWhitelisted = false,
             showSearchIcon = false,
-            showClearButton = false
+            showClearButton = false,
+            canFireproofSite = canFireproofWebsite()
         )
 
         Timber.d("showPrivacyGrade=true, showSearchIcon=false, showClearButton=false")
@@ -553,6 +565,7 @@ class BrowserTabViewModel(
         onSiteChanged()
         val currentOmnibarViewState = currentOmnibarViewState()
         omnibarViewState.postValue(currentOmnibarViewState.copy(omnibarText = omnibarTextForUrl(url), shouldMoveCaretToEnd = false))
+        browserViewState.postValue(currentBrowserViewState().copy(canFireproofSite = canFireproofWebsite()))
     }
 
     private fun omnibarTextForUrl(url: String?): String {
@@ -577,7 +590,8 @@ class BrowserTabViewModel(
             showPrivacyGrade = false,
             canReportSite = false,
             showSearchIcon = true,
-            showClearButton = true
+            showClearButton = true,
+            canFireproofSite = false
         )
         Timber.d("showPrivacyGrade=false, showSearchIcon=true, showClearButton=true")
     }
@@ -734,6 +748,28 @@ class BrowserTabViewModel(
         }
         withContext(dispatchers.main()) {
             command.value = ShowBookmarkAddedConfirmation(id, title, url)
+        }
+    }
+
+    fun onFireproofWebsiteClicked() {
+        viewModelScope.launch {
+            val url = url ?: return@launch
+            val urlDomain = Uri.parse(url).host ?: return@launch
+            val fireproofWebsiteEntity = FireproofWebsiteEntity(domain = urlDomain)
+            val id = withContext(dispatchers.io()) {
+                fireproofWebsiteDao.insert(fireproofWebsiteEntity)
+            }
+            if (id >= 0) {
+                pixel.fire(PixelName.FIREPROOF_WEBSITE_ADDED)
+                command.value = ShowFireproofWebSiteConfirmation(fireproofWebsiteEntity = fireproofWebsiteEntity)
+            }
+        }
+    }
+
+    fun onFireproofWebsiteSnackbarUndoClicked(fireproofWebsiteEntity: FireproofWebsiteEntity) {
+        viewModelScope.launch(dispatchers.io()) {
+            fireproofWebsiteDao.delete(fireproofWebsiteEntity)
+            pixel.fire(PixelName.FIREPROOF_WEBSITE_UNDO)
         }
     }
 
@@ -1094,6 +1130,12 @@ class BrowserTabViewModel(
         command.value = LaunchTabSwitcher
     }
 
+    private fun canFireproofWebsite(): Boolean {
+        val domain = site?.uri?.host ?: return false
+        val fireproofWebsites = fireproofWebsiteState.value
+        return fireproofWebsites?.all { it.domain != domain } ?: true
+    }
+
     private fun invalidateBrowsingActions() {
         globalLayoutState.value = Invalidated
         loadingViewState.value = LoadingViewState()
@@ -1105,7 +1147,8 @@ class BrowserTabViewModel(
             canGoBack = false,
             canGoForward = false,
             canReportSite = false,
-            canChangeBrowsingMode = false
+            canChangeBrowsingMode = false,
+            canFireproofSite = false
         )
     }
 
