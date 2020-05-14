@@ -34,8 +34,9 @@ import org.jetbrains.anko.find
 
 class HttpAuthenticationDialogFragment : DialogFragment() {
 
-    var listener: HttpAuthenticationListener? = null
+    private var didUserCompleteAuthentication: Boolean = false
     lateinit var request: BasicAuthenticationRequest
+    var listener: HttpAuthenticationListener? = null
 
     interface HttpAuthenticationListener {
         fun handleAuthentication(request: BasicAuthenticationRequest, credentials: BasicAuthenticationCredentials)
@@ -61,11 +62,11 @@ class HttpAuthenticationDialogFragment : DialogFragment() {
                     request,
                     BasicAuthenticationCredentials(username = usernameInput.text.toString(), password = passwordInput.text.toString())
                 )
-                listener = null
+                didUserCompleteAuthentication = true
             }.setNegativeButton(R.string.authenticationDialogNegativeButton) { _, _ ->
                 rootView.hideKeyboard()
                 listener?.cancelAuthentication(request)
-                listener = null
+                didUserCompleteAuthentication = true
             }
             .setTitle(R.string.authenticationDialogTitle)
 
@@ -76,8 +77,9 @@ class HttpAuthenticationDialogFragment : DialogFragment() {
 
     override fun onDismiss(dialog: DialogInterface) {
         super.onDismiss(dialog)
-        //if listener is not null, user didn't press any button. We proceed to cancel.
-        listener?.cancelAuthentication(request)
+        if (!didUserCompleteAuthentication) {
+            listener?.cancelAuthentication(request)
+        }
     }
 
     private fun validateBundleArguments() {
