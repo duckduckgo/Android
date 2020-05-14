@@ -1252,6 +1252,7 @@ class BrowserTabViewModelTest {
         loadUrl(url = "http://example.com", isBrowserShowing = true)
         testee.requiresAuthentication(authenticationRequest)
 
+        assertCommandNotIssued<Command.HideWebContent>()
         assertEquals("http://example.com", omnibarViewState().omnibarText)
     }
 
@@ -1730,6 +1731,11 @@ class BrowserTabViewModelTest {
         val issuedCommand = commandCaptor.allValues.find { it is T }
         assertNotNull(issuedCommand)
         (issuedCommand as T).apply { instanceAssertions() }
+    }
+
+    private inline fun <reified T : Command> assertCommandNotIssued() {
+        val issuedCommand = commandCaptor.allValues.find { it is T }
+        assertNull(issuedCommand)
     }
 
     private fun pixelParams(showedBookmarks: Boolean, bookmarkCapable: Boolean) = mapOf(
