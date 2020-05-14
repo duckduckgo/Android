@@ -134,7 +134,7 @@ class BrowserTrackersAnimatorHelper(private val privacyGradeButton: ImageButton)
     private fun getLogosViewListInContainer(activity: Activity, container: ViewGroup, entities: List<Entity>): List<View> {
         container.removeAllViews()
         container.alpha = 0f
-        val logos = createResourcesIdList(activity, entities)
+        val logos = createTrackerLogoList(activity, entities)
         return createLogosViewList(activity, container, logos)
     }
 
@@ -145,9 +145,9 @@ class BrowserTrackersAnimatorHelper(private val privacyGradeButton: ImageButton)
     ): List<View> {
         return resourcesId.map {
             val frameLayout = when (it) {
-                is TrackerLogo.ImageLogo -> { createTrackerImageLogo(activity, it) }
-                is TrackerLogo.LetterLogo -> { createTrackerTextLogo(activity, it) }
-                is TrackerLogo.StackedLogo -> { createTrackerStackedLogo(activity, it) }
+                is TrackerLogo.ImageLogo -> createTrackerImageLogo(activity, it)
+                is TrackerLogo.LetterLogo -> createTrackerTextLogo(activity, it)
+                is TrackerLogo.StackedLogo -> createTrackerStackedLogo(activity, it)
             }
             container.addView(frameLayout)
             return@map frameLayout
@@ -165,43 +165,38 @@ class BrowserTrackersAnimatorHelper(private val privacyGradeButton: ImageButton)
     }
 
     private fun createFrameLayoutContainer(context: Context): FrameLayout {
-        val frameLayoutParams = getParams()
         val frameLayout = FrameLayout(context)
         frameLayout.alpha = 0f
         frameLayout.id = View.generateViewId()
-        frameLayout.layoutParams = frameLayoutParams
+        frameLayout.layoutParams = getParams()
         frameLayout.setBackgroundResource(R.drawable.background_tracker_logo)
         return frameLayout
     }
 
     private fun createImageView(context: Context, resId: Int): ImageView {
-        val frameLayoutParams = getParams()
         val imageView = ImageView(context)
         imageView.scaleType = ImageView.ScaleType.CENTER_CROP
         imageView.setBackgroundResource(resId)
         imageView.id = View.generateViewId()
-        imageView.layoutParams = frameLayoutParams
+        imageView.layoutParams = getParams()
         return imageView
     }
 
     private fun createTextView(context: Context): AppCompatTextView {
-        val frameLayoutParams = getParams()
-
         val textView = AppCompatTextView(context)
         textView.gravity = Gravity.CENTER
         TextViewCompat.setTextAppearance(textView, R.style.UnknownTrackerText)
-        textView.layoutParams = frameLayoutParams
+        textView.layoutParams = getParams()
 
         return textView
     }
 
     private fun createTrackerTextLogo(activity: Activity, trackerLogo: TrackerLogo.LetterLogo): FrameLayout {
-        val frameLayoutParams = getParams()
         val animatedDrawable = createAnimatedDrawable(activity)
 
         val animationView = ImageView(activity)
         animationView.setImageDrawable(animatedDrawable)
-        animationView.layoutParams = frameLayoutParams
+        animationView.layoutParams = getParams()
 
         val textView = createTextView(activity)
         textView.setBackgroundResource(trackerLogo.resId)
@@ -234,36 +229,32 @@ class BrowserTrackersAnimatorHelper(private val privacyGradeButton: ImageButton)
         return frameLayout
     }
 
-    private fun createResourcesIdList(activity: Activity, entities: List<Entity>): List<TrackerLogo> {
+    private fun createTrackerLogoList(activity: Activity, entities: List<Entity>): List<TrackerLogo> {
         if (activity.packageName == null) return emptyList()
-        val resourcesList = entities
+        val trackerLogoList = entities
             .distinct()
             .take(MAX_LOGOS_SHOWN + 1)
             .map {
-                val res = TrackersRenderer().networkLogoIcon(activity, it.name)
-                if (res == null) {
+                val resId = TrackersRenderer().networkLogoIcon(activity, it.name)
+                if (resId == null) {
                     TrackerLogo.LetterLogo(it.displayName.take(1))
                 } else {
-                    TrackerLogo.ImageLogo(res)
+                    TrackerLogo.ImageLogo(resId)
                 }
             }
             .toMutableList()
 
-        return if (resourcesList.size <= MAX_LOGOS_SHOWN) {
-            resourcesList
+        return if (trackerLogoList.size <= MAX_LOGOS_SHOWN) {
+            trackerLogoList
         } else {
-            resourcesList.take(MAX_LOGOS_SHOWN - 1)
+            trackerLogoList.take(MAX_LOGOS_SHOWN - 1)
                 .toMutableList()
                 .apply { add(TrackerLogo.StackedLogo()) }
         }
     }
 
-    private fun animateBlockedLogos(views: List<View>) {
+    private fun animateLogosBlocked(views: List<View>) {
         views.map {
-            if (it is ImageView) {
-                val animatedVectorDrawableCompat = it.drawable as? AnimatedVectorDrawableCompat
-                animatedVectorDrawableCompat?.start()
-            }
             if (it is FrameLayout) {
                 val view: ImageView? = it.children.filter { child -> child is ImageView }.firstOrNull() as ImageView?
                 view?.let {
@@ -300,9 +291,9 @@ class BrowserTrackersAnimatorHelper(private val privacyGradeButton: ImageButton)
     ): AnimatorSet {
         applyConstraintSet(container, logoViews)
         container.alpha = 1f
+        animateLogosBlocked(logoViews)
         val fadeOmnibarOut = animateOmnibarOut(omnibarViews)
         val slideInLogos = animateLogosSlideIn(logoViews)
-        animateBlockedLogos(logoViews)
 
         return AnimatorSet().apply {
             play(slideInLogos).after(fadeOmnibarOut)
