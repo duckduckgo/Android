@@ -67,12 +67,12 @@ interface VariantManager {
                 filterBy = { noFilter() }),
             Variant(
                 key = "zg",
-                weight = 1.0,
+                weight = 0.0,
                 features = listOf(VariantFeature.SerpHeaderQueryReplacement),
                 filterBy = { noFilter() }),
             Variant(
                 key = "zh",
-                weight = 0.0,
+                weight = 1.0,
                 features = listOf(VariantFeature.SerpHeaderRemoval),
                 filterBy = { noFilter() })
 
