@@ -144,23 +144,13 @@ class BrowserTrackersAnimatorHelper(private val privacyGradeButton: ImageButton)
         resourcesId: List<TrackerLogo>
     ): List<View> {
         return resourcesId.map {
-            return@map when (it) {
-                is TrackerLogo.ImageLogo -> {
-                    val imageView = createTrackerImageLogo(activity, it)
-                    container.addView(imageView)
-                    imageView
-                }
-                is TrackerLogo.LetterLogo -> {
-                    val frameLayout = createTrackerTextLogo(activity, it)
-                    container.addView(frameLayout)
-                    frameLayout
-                }
-                is TrackerLogo.StackedLogo -> {
-                    val imageView = createTrackerStackedLogo(activity, it)
-                    container.addView(imageView)
-                    imageView
-                }
+            val frameLayout = when (it) {
+                is TrackerLogo.ImageLogo -> { createTrackerImageLogo(activity, it) }
+                is TrackerLogo.LetterLogo -> { createTrackerTextLogo(activity, it) }
+                is TrackerLogo.StackedLogo -> { createTrackerStackedLogo(activity, it) }
             }
+            container.addView(frameLayout)
+            return@map frameLayout
         }
     }
 
