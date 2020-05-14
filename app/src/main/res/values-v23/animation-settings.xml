@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  ~ Copyright (c) 2019 DuckDuckGo
+  ~ Copyright (c) 2020 DuckDuckGo
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -16,7 +16,5 @@
   -->
 
 <resources>
-    <integer name="tab_switcher_animation_duration_ms">300</integer>
-    <integer name="slide_animation_duration_ms">300</integer>
-    <integer name="crossing_animation_delay_ms">500</integer>
+    <integer name="crossing_animation_delay_ms">1000</integer>
 </resources>

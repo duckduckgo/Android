@@ -255,7 +255,7 @@ class BrowserTrackersAnimatorHelper(private val privacyGradeButton: ImageButton)
     }
 
     private fun animateLogosBlocked(views: List<View>) {
-        views.map {
+        views.take(MAX_ANIMATED_LOGOS).map {
             if (it is FrameLayout) {
                 val view: ImageView? = it.children.filter { child -> child is ImageView }.firstOrNull() as ImageView?
                 view?.let {
@@ -422,6 +422,7 @@ class BrowserTrackersAnimatorHelper(private val privacyGradeButton: ImageButton)
         private const val DEFAULT_ANIMATION_DURATION = 150L
         private const val PULSE_ANIMATION_DURATION = 1500L
         private const val MAX_LOGOS_SHOWN = 4
+        private const val MAX_ANIMATED_LOGOS = MAX_LOGOS_SHOWN - 1
         private const val LOGO_SIZE_IN_DP = 26
         private const val START_MARGIN_IN_DP = 10
         private const val STACKED_LOGO_MARGIN = -11.5f
