@@ -119,6 +119,7 @@ class BrowserTrackersAnimatorHelper(private val privacyGradeButton: ImageButton)
     fun cancelAnimations() {
         stopTrackersAnimation()
         stopPulseAnimation()
+        listener?.onAnimationFinished()
     }
 
     fun finishTrackerAnimation(fadeInViews: List<View>, container: ViewGroup) {
