@@ -82,6 +82,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
+import java.util.Locale
 import java.util.concurrent.TimeUnit
 
 class BrowserTabViewModel(
@@ -371,6 +372,14 @@ class BrowserTabViewModel(
             if (shouldClearHistoryOnNewQuery()) {
                 command.value = ResetHistory
             }
+
+            val queryChanged = if (currentOmnibarViewState().omnibarText == query){
+                PixelParameter.SERP_QUERY_NOT_CHANGED
+            } else {
+                PixelParameter.SERP_QUERY_CHANGED
+            }
+            pixel.fire(String.format(Locale.US, PixelName.SERP_REQUERY.pixelName, queryChanged))
+
             command.value = Navigate(urlToNavigate)
         }
 
