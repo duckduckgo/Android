@@ -87,17 +87,21 @@ class AppConfigurationSyncerTest {
         val config = Configuration.Builder()
             .setMinimumLoggingLevel(Log.DEBUG)
             .setExecutor(SynchronousExecutor())
-            .setWorkerFactory(object : WorkerFactory() {
-                override fun createWorker(appContext: Context, workerClassName: String, workerParameters: WorkerParameters): ListenableWorker? {
-                    return AppConfigurationWorker(appContext, workerParameters).also {
-                        it.appConfigurationDownloader = mockDownloader
-                    }
-                }
-            })
+            .setWorkerFactory(testWorkerFactory())
             .build()
 
         WorkManagerTestInitHelper.initializeTestWorkManager(context, config)
         workManager = WorkManager.getInstance(context)
+    }
+
+    private fun testWorkerFactory(): WorkerFactory {
+        return object : WorkerFactory() {
+            override fun createWorker(appContext: Context, workerClassName: String, workerParameters: WorkerParameters): ListenableWorker? {
+                return AppConfigurationWorker(appContext, workerParameters).also {
+                    it.appConfigurationDownloader = mockDownloader
+                }
+            }
+        }
     }
 
     private fun WorkManager.getSyncWork(): List<WorkInfo> {
