@@ -33,7 +33,7 @@
             android:id="@+id/toolbarContainer"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:theme="@style/OmnibarToolbarTheme">
+            android:background="?toolbarBgColor">
 
             <androidx.appcompat.widget.Toolbar
                 android:id="@+id/toolbar"
@@ -210,6 +210,7 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 tools:progress="50"
+                android:progressDrawable="@drawable/loading_progress"
                 tools:visibility="visible" />
 
             <include

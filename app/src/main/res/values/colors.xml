@@ -18,16 +18,16 @@
 
     <!-- Dark theme primary colors -->
     <color name="darkThemePrimaryDark">@color/black</color>
-    <color name="darkThemePrimary">@color/almostBlack</color>
+    <color name="darkThemePrimary">@color/newBlack</color>
 
     <!-- Light theme primary colors -->
-    <color name="lightThemePrimaryDark">@color/white</color>
+    <color name="lightThemePrimaryDark">@color/whiteFive</color>
     <color name="lightThemePrimary">@color/whiteFive</color>
 
     <!-- Widget colors -->
     <color name="divider">@color/subtleGrayTwo</color>
     <color name="slightlyTransparentDivider">#1A000000</color>
-    <color name="webViewScrollbarTrackColor">#ff333333</color>
+    <color name="webViewScrollbarTrackColor">#ff333333</color>ñ
     <color name="webViewScrollbarThumbColor">#ffababab</color>
 
     <!-- Universal -->

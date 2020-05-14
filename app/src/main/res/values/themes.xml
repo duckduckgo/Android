@@ -45,7 +45,7 @@
         <item name="dialogBgColor">@color/almostBlackDark</item>
         <item name="browserIconColorSelector">@color/browser_icon_color_selector_dark</item>
         <item name="browserMenuTextColor">@color/white</item>
-        <item name="browserMenuTextColorDisabled">@color/midGray</item>
+        <item name="browserMenuTextColorDisabled">@color/warGreyTwo</item>
         <item name="omnibarRoundedFieldBackgroundColor">@color/almostBlack</item>
         <item name="omnibarTextColor">@color/white</item>
         <item name="omnibarHintColor">@color/paleBrownishGray</item>
@@ -62,7 +62,7 @@
         <item name="bookmarkTitleTextColor">@color/white</item>
         <item name="bookmarkSubtitleTextColor">@color/grayishTwo</item>
         <item name="settingsItemTextColor">@color/white</item>
-        <item name="settingsItemTextColorDisabled">@color/midGray</item>
+        <item name="settingsItemTextColorDisabled">@color/warGreyTwo</item>
         <item name="settingsMinorTextColor">@color/grayishTwo</item>
         <item name="settingsSwitchBackgroundColor">@color/subtleGrayTwo</item>
         <item name="settingsDividerColor">@color/almostBlack</item>
