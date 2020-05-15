@@ -65,6 +65,7 @@ interface Site {
 
 fun Site.orderedTrackingEntities(): List<Entity> = trackingEvents
     .mapNotNull { it.entity }
+    .filter { it.displayName.isNotBlank() }
     .sortedByDescending { it.prevalence }
 
 fun Site.domainMatchesUrl(matchingUrl: String): Boolean {

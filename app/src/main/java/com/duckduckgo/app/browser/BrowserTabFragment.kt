@@ -1536,20 +1536,26 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
                     smoothProgressAnimator.onNewProgress(viewState.progress) { if (!viewState.isLoading) hide() }
                 }
 
-                if (viewState.privacyOn) {
-                    if (lastSeenOmnibarViewState?.isEditing == true) {
-                        cancelAllAnimations()
-                    }
+                if (viewState.privacyOn && lastSeenOmnibarViewState?.isEditing == true) {
+                    cancelAllAnimations()
+                }
 
-                    if (viewState.progress == MAX_PROGRESS) {
-                        createTrackersAnimation()
-                        animatorHelper.stopPulseAnimation()
-                    } else {
-                        animatorHelper.startPulseAnimation(privacyGradeButton)
-                        viewModel.hidePrivacyGrade()
-                    }
+                if (viewState.progress == MAX_PROGRESS) {
+                    websiteFinishedLoading(viewState.privacyOn)
+                } else {
+                    animatorHelper.startPulseAnimation(privacyGradeButton)
+                    viewModel.hidePrivacyGrade()
                 }
             }
+        }
+
+        private fun websiteFinishedLoading(isPrivacyOn: Boolean) {
+            if (isPrivacyOn) {
+                createTrackersAnimation()
+            } else {
+                viewModel.showPrivacyGrade()
+            }
+            animatorHelper.stopPulseAnimation()
         }
 
         private fun createTrackersAnimation() {
@@ -1562,13 +1568,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
                     val events = site?.orderedTrackingEntities()
 
                     activity?.let { activity ->
-                        animatorHelper.startTrackersAnimation(
-                            lastSeenCtaViewState?.cta,
-                            activity,
-                            animationContainer,
-                            omnibarViews(),
-                            events
-                        )
+                        animatorHelper.startTrackersAnimation(lastSeenCtaViewState?.cta, activity, animationContainer, omnibarViews(), events)
                     }
                 }
             }

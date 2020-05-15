@@ -233,6 +233,7 @@ class BrowserTrackersAnimatorHelper(private val privacyGradeButton: ImageButton)
     private fun createTrackerLogoList(activity: Activity, entities: List<Entity>): List<TrackerLogo> {
         if (activity.packageName == null) return emptyList()
         val trackerLogoList = entities
+            .asSequence()
             .distinct()
             .take(MAX_LOGOS_SHOWN + 1)
             .map {
@@ -248,14 +249,14 @@ class BrowserTrackersAnimatorHelper(private val privacyGradeButton: ImageButton)
         return if (trackerLogoList.size <= MAX_LOGOS_SHOWN) {
             trackerLogoList
         } else {
-            trackerLogoList.take(MAX_LOGOS_SHOWN - 1)
+            trackerLogoList.take(MAX_LOGOS_SHOWN)
                 .toMutableList()
                 .apply { add(TrackerLogo.StackedLogo()) }
         }
     }
 
     private fun animateLogosBlocked(views: List<View>) {
-        views.take(MAX_ANIMATED_LOGOS).map {
+        views.map {
             if (it is FrameLayout) {
                 val view: ImageView? = it.children.filter { child -> child is ImageView }.firstOrNull() as ImageView?
                 view?.let {
@@ -316,7 +317,7 @@ class BrowserTrackersAnimatorHelper(private val privacyGradeButton: ImageButton)
                 constraints.connect(view.id, ConstraintSet.START, views[index - 1].id, ConstraintSet.END, 0)
             }
             if (index == views.size - 1) {
-                if (views.size == MAX_LOGOS_SHOWN) {
+                if (views.size == MAX_LOGOS_SHOWN + 1) {
                     constraints.setTranslationX(view.id, (STACKED_LOGO_MARGIN.toPx() * index))
                 }
                 constraints.connect(view.id, ConstraintSet.END, ConstraintSet.PARENT_ID, ConstraintSet.END)
@@ -422,8 +423,7 @@ class BrowserTrackersAnimatorHelper(private val privacyGradeButton: ImageButton)
         private const val TRACKER_LOGOS_DELAY_ON_SCREEN = 2400L
         private const val DEFAULT_ANIMATION_DURATION = 150L
         private const val PULSE_ANIMATION_DURATION = 1500L
-        private const val MAX_LOGOS_SHOWN = 4
-        private const val MAX_ANIMATED_LOGOS = MAX_LOGOS_SHOWN - 1
+        private const val MAX_LOGOS_SHOWN = 3
         private const val LOGO_SIZE_IN_DP = 26
         private const val START_MARGIN_IN_DP = 10
         private const val STACKED_LOGO_MARGIN = -11.5f
