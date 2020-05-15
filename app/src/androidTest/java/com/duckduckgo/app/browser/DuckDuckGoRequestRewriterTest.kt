@@ -85,30 +85,23 @@ class DuckDuckGoRequestRewriterTest {
     fun whenAddingCustomParamsIfSERPRemovalVariantThenParameterIsAdded() {
         val serpRemovalVariant = Variant("foo", 100.0, features = listOf(VariantManager.VariantFeature.SerpHeaderRemoval), filterBy = { true })
         whenever(mockVariantManager.getVariant()).thenReturn(serpRemovalVariant)
-        whenever(mockStatisticsStore.atb).thenReturn(null)
 
         testee.addCustomQueryParams(currentUrl, builder)
 
         val uri = builder.build()
-        assertFalse(uri.queryParameterNames.contains(ParamKey.ATB))
         assertTrue(uri.queryParameterNames.contains(ParamKey.HIDE_SERP))
     }
 
     @Test
     fun whenAddingCustomParamsIfNotSERPRemovalVariantThenParameterIsNotAdded() {
-        whenever(mockStatisticsStore.atb).thenReturn(null)
-
         testee.addCustomQueryParams(currentUrl, builder)
 
         val uri = builder.build()
-        assertFalse(uri.queryParameterNames.contains(ParamKey.ATB))
         assertFalse(uri.queryParameterNames.contains(ParamKey.HIDE_SERP))
     }
 
     @Test
     fun whenDuckDuckGoUrlHasVerticalThenVerticalParameterIsKept() {
-        whenever(mockStatisticsStore.atb).thenReturn(null)
-
         val verticalUrl = "https://duckduckgo.com/?q=duck&iax=images&ia=images&t=ddg_android"
         testee.addCustomQueryParams(verticalUrl, builder)
 
@@ -118,8 +111,6 @@ class DuckDuckGoRequestRewriterTest {
 
     @Test
     fun whenDuckDuckGoUrlDoesNotHaveVerticalThenVerticalParameterIsNotAdded() {
-        whenever(mockStatisticsStore.atb).thenReturn(null)
-
         val verticalUrl = "https://duckduckgo.com/?q=duck&t=ddg_android"
         testee.addCustomQueryParams(verticalUrl, builder)
 
