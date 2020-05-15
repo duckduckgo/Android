@@ -24,6 +24,8 @@
     android:layout_height="wrap_content"
     android:id="@+id/appBarLayout"
     android:theme="@style/AppTheme.Dark.AppBarOverlay"
+    android:background="@drawable/appbar_bg"
+    app:elevation="0dp"
     tools:showIn="@layout/activity_tracker_networks">
 
     <androidx.appcompat.widget.Toolbar

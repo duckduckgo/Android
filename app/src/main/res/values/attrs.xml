@@ -22,6 +22,7 @@
     <attr name="toolbarIconColor" format="color" />
     <attr name="toolbarTextColor" format="color" />
     <attr name="toolbarBgColor" format="color" />
+    <attr name="toolbarBgBorderColor" format="color" />
     <attr name="browserIconColorSelector" format="color" />
     <attr name="browserMenuTextColor" format="color" />
     <attr name="browserMenuTextColorDisabled" format="color" />

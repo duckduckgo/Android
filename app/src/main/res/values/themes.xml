@@ -42,6 +42,7 @@
         <item name="toolbarIconColor">@color/white</item>
         <item name="toolbarTextColor">@color/white</item>
         <item name="toolbarBgColor">@color/newBlack</item>
+        <item name="toolbarBgBorderColor">@color/toolbarBorderColorDark</item>
         <item name="dialogBgColor">@color/almostBlackDark</item>
         <item name="browserIconColorSelector">@color/browser_icon_color_selector_dark</item>
         <item name="browserMenuTextColor">@color/white</item>
@@ -119,6 +120,7 @@
         <item name="toolbarIconColor">@color/almostBlackDark</item>
         <item name="toolbarTextColor">@color/almostBlackDark</item>
         <item name="toolbarBgColor">@color/white</item>
+        <item name="toolbarBgBorderColor">@color/toolbarBorderColorLight</item>
         <item name="dialogBgColor">@color/lightThemePrimaryDark</item>
         <item name="browserIconColorSelector">@color/browser_icon_color_selector_light</item>
         <item name="browserMenuTextColor">@color/almostBlackDark</item>

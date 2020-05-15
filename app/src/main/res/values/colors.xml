@@ -90,4 +90,7 @@
     <color name="ic_launcher_purple_background">#7A4BDC</color>
     <color name="ic_launcher_blue_background">#4179ED</color>
     <color name="ic_launcher_black_background">#262626</color>
+
+    <color name="toolbarBorderColorLight">#26000000</color>
+    <color name="toolbarBorderColorDark">#33FFFFFF</color>
 </resources>
