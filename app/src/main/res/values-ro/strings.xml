@@ -193,11 +193,11 @@
     <string name="bookmarksMenuTitle">Semne de carte</string>
     <string name="bookmarksActivityTitle">Semne de carte</string>
     <string name="bookmarkDeleteConfirmMessage">Sunteți sigur că doriți să ștergeți semnul de carte &lt;b&gt;%s&lt;/b&gt;?</string>
-    <string name="bookmarkDeleteConfirmTitle">Confirmare</string>
+    <string name="dialogConfirmTitle">Confirmare</string>
     <string name="bookmarkAddedFeedback">Semn de carte adăugat</string>
     <string name="bookmarkTitleHint">Titlu semn de carte</string>
     <string name="bookmarkUrlHint">Adresă URL semn de carte</string>
-    <string name="bookmarkSave">Salvare</string>
+    <string name="dialogSave">Salvare</string>
     <string name="bookmarkTitleEdit">Editare semn de carte</string>
     <string name="noBookmarks">Nu s-a adăugat niciun semn de carte</string>
     <string name="bookmarkOverflowContentDescription">Mai multe opțiuni pentru semnul de carte %s</string>

@@ -37,7 +37,7 @@ import com.duckduckgo.app.global.rating.AppEnjoymentLifecycleObserver
 import com.duckduckgo.app.global.shortcut.AppShortcutCreator
 import com.duckduckgo.app.httpsupgrade.HttpsUpgrader
 import com.duckduckgo.app.job.AppConfigurationSyncer
-import com.duckduckgo.app.notification.AndroidNotificationScheduler
+import com.duckduckgo.app.job.WorkScheduler
 import com.duckduckgo.app.notification.NotificationRegistrar
 import com.duckduckgo.app.referral.AppInstallationReferrerStateListener
 import com.duckduckgo.app.settings.db.SettingsDataStore
@@ -120,7 +120,7 @@ open class DuckDuckGoApplication : HasAndroidInjector, Application(), LifecycleO
     lateinit var dataClearer: DataClearer
 
     @Inject
-    lateinit var notificationScheduler: AndroidNotificationScheduler
+    lateinit var workScheduler: WorkScheduler
 
     @Inject
     lateinit var workerFactory: WorkerFactory
@@ -266,7 +266,7 @@ open class DuckDuckGoApplication : HasAndroidInjector, Application(), LifecycleO
         appConfigurationSyncer.scheduleImmediateSync()
             .subscribeOn(Schedulers.io())
             .doAfterTerminate {
-                appConfigurationSyncer.scheduleRegularSync(this)
+                appConfigurationSyncer.scheduleRegularSync()
             }
             .subscribe({}, { Timber.w("Failed to download initial app configuration ${it.localizedMessage}") })
     }
@@ -293,7 +293,7 @@ open class DuckDuckGoApplication : HasAndroidInjector, Application(), LifecycleO
     fun onAppResumed() {
         notificationRegistrar.updateStatus()
         GlobalScope.launch {
-            notificationScheduler.scheduleNextNotification()
+            workScheduler.scheduleWork()
             atbInitializer.initializeAfterReferrerAvailable()
         }
     }
