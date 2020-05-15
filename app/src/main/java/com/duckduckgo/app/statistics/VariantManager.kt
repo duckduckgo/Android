@@ -48,7 +48,7 @@ interface VariantManager {
             // Bottom Bar Navigation Experiment
             Variant(
                 key = "mb",
-                weight = 0.0,
+                weight = 1.0,
                 features = emptyList(),
                 filterBy = { noFilter() }),
             Variant(
