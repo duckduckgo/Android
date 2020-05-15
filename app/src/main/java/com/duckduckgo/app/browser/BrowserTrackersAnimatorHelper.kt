@@ -311,14 +311,14 @@ class BrowserTrackersAnimatorHelper(private val privacyGradeButton: ImageButton)
             constraints.connect(view.id, ConstraintSet.TOP, ConstraintSet.PARENT_ID, ConstraintSet.TOP)
             constraints.connect(view.id, ConstraintSet.BOTTOM, ConstraintSet.PARENT_ID, ConstraintSet.BOTTOM)
             if (index == 0) {
-                constraints.connect(view.id, ConstraintSet.START, ConstraintSet.PARENT_ID, ConstraintSet.START, FIRST_LOGO_MARGIN.toPx())
+                constraints.connect(view.id, ConstraintSet.START, ConstraintSet.PARENT_ID, ConstraintSet.START, FIRST_LOGO_MARGIN_IN_DP.toPx())
             } else {
-                constraints.setTranslationX(view.id, (NORMAL_LOGO_MARGIN.toPx() * index))
+                constraints.setTranslationX(view.id, (NORMAL_LOGO_MARGIN_IN_DP.toPx() * index))
                 constraints.connect(view.id, ConstraintSet.START, views[index - 1].id, ConstraintSet.END, 0)
             }
             if (index == views.size - 1) {
                 if (views.size == MAX_LOGOS_SHOWN + 1) {
-                    constraints.setTranslationX(view.id, (STACKED_LOGO_MARGIN.toPx() * index))
+                    constraints.setTranslationX(view.id, (STACKED_LOGO_MARGIN_IN_DP.toPx() * index))
                 }
                 constraints.connect(view.id, ConstraintSet.END, ConstraintSet.PARENT_ID, ConstraintSet.END)
             }
@@ -426,9 +426,9 @@ class BrowserTrackersAnimatorHelper(private val privacyGradeButton: ImageButton)
         private const val MAX_LOGOS_SHOWN = 3
         private const val LOGO_SIZE_IN_DP = 26
         private const val START_MARGIN_IN_DP = 10
-        private const val STACKED_LOGO_MARGIN = -11.5f
-        private const val NORMAL_LOGO_MARGIN = -7f
-        private const val FIRST_LOGO_MARGIN = 25
+        private const val STACKED_LOGO_MARGIN_IN_DP = -11.5f
+        private const val NORMAL_LOGO_MARGIN_IN_DP = -7f
+        private const val FIRST_LOGO_MARGIN_IN_DP = 25
     }
 }
 
