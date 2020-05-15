@@ -64,6 +64,7 @@ class DuckDuckGoRequestRewriter(
     /**
      * Applies cohort (atb) https://duck.co/help/privacy/atb and
      * source (t) https://duck.co/help/privacy/t params to url
+     * Also keeps current Vertical selection (Images, News, Videos, etc...)
      */
     override fun addCustomQueryParams(currentUrl: String, builder: Uri.Builder) {
         val atb = statisticsStore.atb

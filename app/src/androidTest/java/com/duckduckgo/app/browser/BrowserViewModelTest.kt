@@ -90,7 +90,7 @@ class BrowserViewModelTest {
 
         runBlocking<Unit> {
             whenever(mockTabRepository.add()).thenReturn(TAB_ID)
-            whenever(mockOmnibarEntryConverter.addQueryToUrl(any(), any())).then { it.arguments.first() }
+            whenever(mockOmnibarEntryConverter.addQueryToCurrentUrl(any(), any())).then { it.arguments.first() }
         }
     }
 
