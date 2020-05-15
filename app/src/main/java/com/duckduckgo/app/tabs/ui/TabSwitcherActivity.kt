@@ -85,7 +85,7 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
         setContentView(R.layout.activity_tab_switcher)
         extractIntentExtras()
         configureViewReferences()
-       setupToolbar(toolbar)
+        setupToolbar(toolbar)
         configureRecycler()
         configureObservers()
     }

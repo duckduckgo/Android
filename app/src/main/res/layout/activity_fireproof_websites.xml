@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
+
 <!--
-  ~ Copyright (c) 2018 DuckDuckGo
+  ~ Copyright (c) 2020 DuckDuckGo
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -15,7 +16,15 @@
   ~ limitations under the License.
   -->
 
-<selector xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:state_enabled="false" android:color="?attr/bottomBarIconColorDisabled" />
-    <item android:state_enabled="true" android:color="?bottomBarIconColor"/>
-</selector>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context="com.duckduckgo.app.fire.fireproofwebsite.ui.FireproofWebsitesActivity">
+
+    <include layout="@layout/include_toolbar" />
+
+    <include layout="@layout/content_fireproof_websites" />
+
+</LinearLayout>
