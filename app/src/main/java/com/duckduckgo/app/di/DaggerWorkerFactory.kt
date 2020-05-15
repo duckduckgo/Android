@@ -22,7 +22,10 @@ import androidx.work.ListenableWorker
 import androidx.work.WorkerFactory
 import androidx.work.WorkerParameters
 import com.duckduckgo.app.fire.DataClearingWorker
+import com.duckduckgo.app.global.job.AppConfigurationWorker
 import com.duckduckgo.app.global.view.ClearDataAction
+import com.duckduckgo.app.job.AppConfigurationDownloader
+import com.duckduckgo.app.job.ConfigurationDownloader
 import com.duckduckgo.app.notification.NotificationScheduler.ClearDataNotificationWorker
 import com.duckduckgo.app.notification.NotificationScheduler.PrivacyNotificationWorker
 import com.duckduckgo.app.notification.NotificationFactory
@@ -44,6 +47,7 @@ class DaggerWorkerFactory(
     private val notificationFactory: NotificationFactory,
     private val clearDataNotification: ClearDataNotification,
     private val privacyProtectionNotification: PrivacyProtectionNotification,
+    private val configurationDownloader: ConfigurationDownloader,
     private val pixel: Pixel
 ) : WorkerFactory() {
 
@@ -59,6 +63,7 @@ class DaggerWorkerFactory(
                 is DataClearingWorker -> injectDataClearWorker(instance)
                 is ClearDataNotificationWorker -> injectClearDataNotificationWorker(instance)
                 is PrivacyNotificationWorker -> injectPrivacyNotificationWorker(instance)
+                is AppConfigurationWorker -> injectAppConfigurationWorker(instance)
                 else -> Timber.i("No injection required for worker $workerClassName")
             }
 
@@ -68,6 +73,10 @@ class DaggerWorkerFactory(
             return null
         }
 
+    }
+
+    private fun injectAppConfigurationWorker(worker: AppConfigurationWorker) {
+        worker.appConfigurationDownloader = configurationDownloader
     }
 
     private fun injectOfflinePixelWorker(worker: OfflinePixelScheduler.OfflinePixelWorker) {

@@ -33,16 +33,14 @@ import com.duckduckgo.app.feedback.ui.negative.openended.ShareOpenEndedFeedbackF
 import com.duckduckgo.app.feedback.ui.negative.subreason.SubReasonNegativeFeedbackFragment
 import com.duckduckgo.app.feedback.ui.positive.initial.PositiveFeedbackLandingFragment
 import com.duckduckgo.app.fire.FireActivity
+import com.duckduckgo.app.fire.fireproofwebsite.ui.FireproofWebsitesActivity
 import com.duckduckgo.app.icon.ui.ChangeIconActivity
 import com.duckduckgo.app.job.AppConfigurationJobService
 import com.duckduckgo.app.launch.LaunchBridgeActivity
 import com.duckduckgo.app.notification.NotificationHandlerService
 import com.duckduckgo.app.onboarding.ui.OnboardingActivity
 import com.duckduckgo.app.onboarding.ui.page.DefaultBrowserPage
-import com.duckduckgo.app.privacy.ui.PrivacyDashboardActivity
-import com.duckduckgo.app.privacy.ui.PrivacyPracticesActivity
-import com.duckduckgo.app.privacy.ui.ScorecardActivity
-import com.duckduckgo.app.privacy.ui.TrackerNetworksActivity
+import com.duckduckgo.app.privacy.ui.*
 import com.duckduckgo.app.settings.SettingsActivity
 import com.duckduckgo.app.survey.ui.SurveyActivity
 import com.duckduckgo.app.systemsearch.SystemSearchActivity
@@ -100,6 +98,10 @@ abstract class AndroidBindingModule {
 
     @ActivityScoped
     @ContributesAndroidInjector
+    abstract fun whitelistActivity(): WhitelistActivity
+
+    @ActivityScoped
+    @ContributesAndroidInjector
     abstract fun feedbackActivity(): FeedbackActivity
 
     @ActivityScoped
@@ -121,6 +123,10 @@ abstract class AndroidBindingModule {
     @ActivityScoped
     @ContributesAndroidInjector
     abstract fun bookmarksActivity(): BookmarksActivity
+
+    @ActivityScoped
+    @ContributesAndroidInjector
+    abstract fun fireproofWebsitesActivity(): FireproofWebsitesActivity
 
     @ActivityScoped
     @ContributesAndroidInjector

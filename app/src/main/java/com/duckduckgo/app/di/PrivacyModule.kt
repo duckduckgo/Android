@@ -32,7 +32,6 @@ import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.trackerdetection.TdsEntityLookup
 import com.duckduckgo.app.trackerdetection.db.TdsDomainEntityDao
 import com.duckduckgo.app.trackerdetection.db.TdsEntityDao
-import com.duckduckgo.app.trackerdetection.model.TdsEntity
 import dagger.Module
 import dagger.Provides
 import javax.inject.Singleton

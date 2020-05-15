@@ -189,11 +189,11 @@
     <string name="bookmarksMenuTitle">Отметки</string>
     <string name="bookmarksActivityTitle">Отметки</string>
     <string name="bookmarkDeleteConfirmMessage">Наистина ли искате да изтриете отметка &lt;b&gt;%s&lt;/b&gt;?</string>
-    <string name="bookmarkDeleteConfirmTitle">Потвърдете</string>
+    <string name="dialogConfirmTitle">Потвърдете</string>
     <string name="bookmarkAddedFeedback">Добавена е отметка</string>
     <string name="bookmarkTitleHint">Заглавие на отметката</string>
     <string name="bookmarkUrlHint">URL адрес на отметката</string>
-    <string name="bookmarkSave">Запазване</string>
+    <string name="dialogSave">Запазване</string>
     <string name="bookmarkTitleEdit">Редактиране на отметка</string>
     <string name="noBookmarks">Все още няма добавени отметки</string>
     <string name="bookmarkOverflowContentDescription">Още опции за отметка %s</string>

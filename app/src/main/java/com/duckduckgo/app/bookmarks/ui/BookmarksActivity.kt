@@ -20,7 +20,6 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.text.Html
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.View
@@ -29,8 +28,8 @@ import android.widget.ImageView
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.SearchView
 import androidx.lifecycle.Observer
-import androidx.recyclerview.widget.DividerItemDecoration
-import androidx.recyclerview.widget.RecyclerView.*
+import androidx.recyclerview.widget.RecyclerView.Adapter
+import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.duckduckgo.app.bookmarks.db.BookmarkEntity
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
@@ -41,7 +40,11 @@ import com.duckduckgo.app.global.baseHost
 import com.duckduckgo.app.global.faviconLocation
 import com.duckduckgo.app.global.image.GlideApp
 import com.duckduckgo.app.global.view.gone
+import com.duckduckgo.app.global.view.html
 import com.duckduckgo.app.global.view.show
+import kotlinx.android.synthetic.main.content_bookmarks.*
+import kotlinx.android.synthetic.main.include_toolbar.*
+import kotlinx.android.synthetic.main.view_bookmark_entry.view.*
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.android.synthetic.main.content_bookmarks.emptyBookmarks
 import kotlinx.android.synthetic.main.content_bookmarks.recycler
@@ -73,9 +76,6 @@ class BookmarksActivity : DuckDuckGoActivity() {
     private fun setupBookmarksRecycler() {
         adapter = BookmarksAdapter(layoutInflater, viewModel)
         recycler.adapter = adapter
-
-        val separator = DividerItemDecoration(this, VERTICAL)
-        recycler.addItemDecoration(separator)
     }
 
     private fun observeViewModel() {
@@ -130,12 +130,9 @@ class BookmarksActivity : DuckDuckGoActivity() {
         finish()
     }
 
-    @Suppress("deprecation")
     private fun confirmDeleteBookmark(bookmark: BookmarkEntity) {
-        val message =
-            Html.fromHtml(getString(R.string.bookmarkDeleteConfirmMessage, bookmark.title))
-        val title = getString(R.string.bookmarkDeleteConfirmTitle)
-
+        val message = getString(R.string.bookmarkDeleteConfirmMessage, bookmark.title).html(this)
+        val title = getString(R.string.dialogConfirmTitle)
         deleteDialog = MaterialAlertDialogBuilder(this)
             .setTitle(title)
             .setMessage(message)

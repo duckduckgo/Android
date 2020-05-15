@@ -78,6 +78,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:indeterminateTint="@color/white"
+            android:indeterminateTintMode="src_in"
             android:secondaryProgressTint="@color/white"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"

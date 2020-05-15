@@ -21,6 +21,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.duckduckgo.app.global.baseHost
 import com.duckduckgo.app.global.model.Site
+import com.duckduckgo.app.global.model.domain
 import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.app.trackerdetection.model.TdsEntity
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
@@ -56,7 +57,7 @@ class TrackerNetworksViewModel : ViewModel() {
             return
         }
         viewState.value = viewState.value?.copy(
-            domain = site.uri?.host ?: "",
+            domain = site.domain ?: "",
             trackerCount = site.trackerCount,
             allTrackersBlocked = site.allTrackersBlocked,
             trackingEventsByNetwork = distinctTrackersByEntity(site.trackingEvents)
