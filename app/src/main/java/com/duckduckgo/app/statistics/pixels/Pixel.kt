@@ -171,7 +171,7 @@ interface Pixel {
         MENU_ACTION_REFRESH_PRESSED("m_nav_r_p_%s"),
         MENU_ACTION_NEW_TAB_PRESSED("m_nav_nt_p_%s"),
         MENU_ACTION_BOOKMARKS_PRESSED("m_nav_b_p_%s"),
-        MENU_ACTION_SEARCH_PRESSED("m_nav_s_p_%s"),
+        MENU_ACTION_SEARCH_PRESSED("m_nav_s_p_%s")
     }
 
     object PixelParameter {
