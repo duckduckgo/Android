@@ -179,6 +179,7 @@ abstract class AndroidBindingModule {
 
     /* Services */
 
+    @Suppress("DEPRECATION")
     @ContributesAndroidInjector
     abstract fun jobService(): AppConfigurationJobService
 
