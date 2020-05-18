@@ -63,7 +63,6 @@ import com.duckduckgo.app.global.model.domainMatchesUrl
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao
 import com.duckduckgo.app.privacy.model.PrivacyGrade
 import com.duckduckgo.app.settings.db.SettingsDataStore
-import com.duckduckgo.app.statistics.ExperimentationVariantManager
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.api.StatisticsUpdater
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -79,11 +78,11 @@ import com.jakewharton.rxrelay2.PublishRelay
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
-import kotlinx.android.synthetic.main.include_omnibar_toolbar.*
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
+import java.util.Locale
 import java.util.concurrent.TimeUnit
 
 class BrowserTabViewModel(
@@ -359,7 +358,7 @@ class BrowserTabViewModel(
             searchCountDao.incrementSearchCount()
         }
 
-        val urlToNavigate = queryUrlConverter.convertQueryToUrl(trimmedInput)
+        val urlToNavigate = queryUrlConverter.addQueryToCurrentUrl(url?: query, trimmedInput)
         val omnibarText = if (variantManager.getVariant().hasFeature(VariantManager.VariantFeature.SerpHeaderQueryReplacement)) {
             urlToNavigate
         } else {
@@ -373,6 +372,14 @@ class BrowserTabViewModel(
             if (shouldClearHistoryOnNewQuery()) {
                 command.value = ResetHistory
             }
+
+            val queryChanged = if (currentOmnibarViewState().omnibarText == query){
+                PixelParameter.SERP_QUERY_NOT_CHANGED
+            } else {
+                PixelParameter.SERP_QUERY_CHANGED
+            }
+            pixel.fire(String.format(Locale.US, PixelName.SERP_REQUERY.pixelName, queryChanged))
+
             command.value = Navigate(urlToNavigate)
         }
 

@@ -18,5 +18,5 @@ package com.duckduckgo.app.browser.omnibar
 
 interface OmnibarEntryConverter {
 
-    fun convertQueryToUrl(searchQuery: String): String
+    fun addQueryToCurrentUrl(currentUrl: String, searchQuery: String): String
 }
