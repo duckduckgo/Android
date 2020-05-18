@@ -59,6 +59,8 @@ class SettingsViewModel @Inject constructor(
 
     sealed class Command {
         object LaunchFeedback : Command()
+        object LaunchFireproofWebsites : Command()
+        object LaunchWhitelist : Command()
         object LaunchAppIcon : Command()
         object UpdateTheme : Command()
     }
@@ -99,6 +101,10 @@ class SettingsViewModel @Inject constructor(
 
     fun userRequestedToChangeIcon() {
         command.value = Command.LaunchAppIcon
+    }
+
+    fun onFireproofWebsitesClicked() {
+        command.value = Command.LaunchFireproofWebsites
     }
 
     fun onLightThemeToggled(enabled: Boolean) {
@@ -162,6 +168,11 @@ class SettingsViewModel @Inject constructor(
                 clearWhenNewSetting
             )
         )
+    }
+
+    fun onManageWhitelistSelected() {
+        pixel.fire(SETTINGS_MANAGE_WHITELIST)
+        command.value = Command.LaunchWhitelist
     }
 
     private fun currentViewState(): ViewState {

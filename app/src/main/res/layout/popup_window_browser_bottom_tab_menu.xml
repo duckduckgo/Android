@@ -53,6 +53,11 @@
                 android:text="@string/addBookmarkMenuTitle" />
 
             <TextView
+                android:id="@+id/fireproofWebsitePopupMenuItem"
+                style="@style/BrowserTextMenuItem"
+                android:text="@string/fireproofWebsiteMenuTitle" />
+
+            <TextView
                 android:id="@+id/findInPageMenuItem"
                 style="@style/BrowserTextMenuItem"
                 android:text="@string/findInPageMenuTitle" />
@@ -75,6 +80,11 @@
                 android:paddingStart="24dp"
                 android:paddingEnd="0dp"
                 android:text="@string/requestDesktopSiteMenuTitle" />
+
+            <TextView
+                android:id="@+id/whitelistPopupMenuItem"
+                style="@style/BrowserTextMenuItem"
+                android:text="@string/whitelistAdd" />
 
             <TextView
                 android:id="@+id/brokenSitePopupMenuItem"

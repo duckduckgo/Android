@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 DuckDuckGo
+ * Copyright (c) 2020 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,20 +14,20 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.onboarding.ui.page
+package com.duckduckgo.app.job
 
-import androidx.lifecycle.ViewModel
-import com.duckduckgo.app.privacy.store.PrivacySettingsStore
+import com.duckduckgo.app.notification.AndroidNotificationScheduler
 
+interface WorkScheduler {
+    suspend fun scheduleWork()
+}
 
-class TrackerBlockingSelectionViewModel(private val settingsStore: PrivacySettingsStore) : ViewModel() {
-
-    fun onTrackerBlockingEnabled() {
-        settingsStore.privacyOn = true
+class AndroidWorkScheduler(
+    private val notificationScheduler: AndroidNotificationScheduler,
+    private val jobCleaner: JobCleaner
+) : WorkScheduler {
+    override suspend fun scheduleWork() {
+        jobCleaner.cleanDeprecatedJobs()
+        notificationScheduler.scheduleNextNotification()
     }
-
-    fun onTrackerBlockingDisabled() {
-        settingsStore.privacyOn = false
-    }
-
 }

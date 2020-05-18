@@ -25,6 +25,7 @@ import com.duckduckgo.app.global.toHttps
 import com.duckduckgo.app.httpsupgrade.api.HttpsBloomFilterFactory
 import com.duckduckgo.app.httpsupgrade.api.HttpsUpgradeService
 import com.duckduckgo.app.httpsupgrade.db.HttpsWhitelistDao
+import com.duckduckgo.app.privacy.db.UserWhitelistDao
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.*
 import timber.log.Timber
@@ -44,7 +45,8 @@ interface HttpsUpgrader {
 }
 
 class HttpsUpgraderImpl(
-    private val whitelistedDao: HttpsWhitelistDao,
+    private val httpsWhitelistDao: HttpsWhitelistDao,
+    private val userWhitelistDao: UserWhitelistDao,
     private val bloomFactory: HttpsBloomFilterFactory,
     private val httpsUpgradeService: HttpsUpgradeService,
     private val pixel: Pixel
@@ -68,9 +70,15 @@ class HttpsUpgraderImpl(
             return false
         }
 
-        if (whitelistedDao.contains(host)) {
+        if (userWhitelistDao.contains(host)) {
             pixel.fire(HTTPS_NO_LOOKUP)
-            Timber.d("$host is in whitelist and so not upgradable")
+            Timber.d("$host is in user whitelist and so not upgradable")
+            return false
+        }
+
+        if (httpsWhitelistDao.contains(host)) {
+            pixel.fire(HTTPS_NO_LOOKUP)
+            Timber.d("$host is in https whitelist and so not upgradable")
             return false
         }
 
