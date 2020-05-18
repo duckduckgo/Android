@@ -20,7 +20,6 @@ import android.content.Context
 import com.duckduckgo.app.global.view.toDp
 import kotlin.math.min
 
-
 class GridViewColumnCalculator(val context: Context) {
 
     fun calculateNumberOfColumns(columnWidthDp: Int, maxColumns: Int): Int {

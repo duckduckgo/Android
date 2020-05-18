@@ -24,7 +24,6 @@ import com.duckduckgo.app.global.faviconLocation
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.isBlank
 
-
 fun TabEntity.displayTitle(context: Context): String {
     if (isBlank) {
         return context.getString(R.string.homeTab)

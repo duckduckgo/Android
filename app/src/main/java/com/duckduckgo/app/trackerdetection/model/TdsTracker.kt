@@ -96,4 +96,3 @@ class Adapters {
         val stringListAdapter: JsonAdapter<List<String>> = moshi.adapter(stringListType)
     }
 }
-

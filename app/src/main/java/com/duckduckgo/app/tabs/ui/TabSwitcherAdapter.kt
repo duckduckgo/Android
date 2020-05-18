@@ -73,7 +73,6 @@ class TabSwitcherAdapter(private val itemClickListener: TabSwitcherListener, pri
             .error(R.drawable.ic_globe_gray_16dp)
             .into(holder.favicon)
 
-
         loadTabPreviewImage(tab, glide, holder)
 
         attachClickListeners(holder, tab)
@@ -171,5 +170,4 @@ class TabSwitcherAdapter(private val itemClickListener: TabSwitcherListener, pri
         val tabUnread: ImageView,
         val cardContentsContainer: ViewGroup
     ) : ViewHolder(root)
-
 }

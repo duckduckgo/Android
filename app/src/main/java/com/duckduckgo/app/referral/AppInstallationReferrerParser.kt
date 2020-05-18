@@ -19,7 +19,6 @@ package com.duckduckgo.app.referral
 import com.duckduckgo.app.referral.ParsedReferrerResult.*
 import timber.log.Timber
 
-
 interface AppInstallationReferrerParser {
 
     fun parse(referrer: String): ParsedReferrerResult

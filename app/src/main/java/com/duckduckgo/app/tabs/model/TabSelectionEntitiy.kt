@@ -21,7 +21,6 @@ import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
 
-
 @Entity(
     tableName = "tab_selection",
     foreignKeys = [

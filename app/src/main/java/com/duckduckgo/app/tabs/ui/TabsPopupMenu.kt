@@ -67,4 +67,3 @@ class TabsPopupMenu(layoutInflater: LayoutInflater, view: View = inflate(layoutI
         }
     }
 }
-

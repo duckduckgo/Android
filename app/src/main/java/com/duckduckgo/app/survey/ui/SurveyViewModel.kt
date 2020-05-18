@@ -28,7 +28,6 @@ import com.duckduckgo.app.survey.db.SurveyDao
 import com.duckduckgo.app.survey.model.Survey
 import io.reactivex.schedulers.Schedulers
 
-
 class SurveyViewModel(
     private val surveyDao: SurveyDao,
     private val statisticsStore: StatisticsDataStore,

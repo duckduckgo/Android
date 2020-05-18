@@ -32,7 +32,6 @@ import com.duckduckgo.app.systemsearch.SystemSearchActivity
 import com.duckduckgo.app.widget.ui.AppWidgetCapabilities
 import javax.inject.Inject
 
-
 class SearchWidgetLight : SearchWidget(R.layout.search_widget_light)
 
 open class SearchWidget(val layoutId: Int = R.layout.search_widget) : AppWidgetProvider() {
