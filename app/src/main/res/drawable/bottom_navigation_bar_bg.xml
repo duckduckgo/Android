@@ -16,6 +16,30 @@
   -->
 
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item >
+        <shape android:shape="rectangle">
+            <padding android:top="1dp"/>
+            <solid android:color="#00CCCCCC" />
+        </shape>
+    </item>
+    <item >
+        <shape android:shape="rectangle">
+            <padding android:top="1dp"/>
+            <solid android:color="#10CCCCCC" />
+        </shape>
+    </item>
+    <item >
+        <shape android:shape="rectangle">
+            <padding android:top="1dp"/>
+            <solid android:color="#20CCCCCC" />
+        </shape>
+    </item>
+    <item>
+        <shape android:shape="rectangle">
+            <padding android:top="1dp"/>
+            <solid android:color="#30CCCCCC" />
+        </shape>
+    </item>
     <item>
         <shape android:shape="rectangle">
             <padding android:top="1dp"/>

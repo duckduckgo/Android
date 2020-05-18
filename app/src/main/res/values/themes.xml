@@ -124,7 +124,7 @@
         <item name="toolbarTextColor">@color/almostBlackDark</item>
         <item name="toolbarBgColor">@color/white</item>
         <item name="toolbarBgBorderColor">@color/toolbarBorderColorLight</item>
-        <item name="dialogBgColor">@color/lightThemePrimaryDark</item>
+        <item name="dialogBgColor">@color/white</item>
         <item name="browserIconColorSelector">@color/browser_icon_color_selector_light</item>
         <item name="browserMenuTextColor">@color/almostBlackDark</item>
         <item name="browserMenuTextColorDisabled">@color/pinkish_grey_two</item>

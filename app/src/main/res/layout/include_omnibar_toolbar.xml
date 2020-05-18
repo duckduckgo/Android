@@ -27,9 +27,7 @@
         android:id="@+id/appBarLayout"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
-        android:theme="@style/AppTheme.Dark.AppBarOverlay"
-        android:background="@drawable/appbar_bg"
-        app:elevation="0dp">
+        android:theme="@style/AppTheme.Dark.AppBarOverlay">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/toolbarContainer"
