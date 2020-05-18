@@ -27,7 +27,7 @@ class ShareOpenEndedNegativeFeedbackViewModel : ViewModel() {
     val command: SingleLiveEvent<Command> = SingleLiveEvent()
 
     fun userSubmittingPositiveFeedback(feedback: String) {
-            command.value = Command.ExitAndSubmitPositiveFeedback(feedback)
+        command.value = Command.ExitAndSubmitPositiveFeedback(feedback)
     }
 
     fun userSubmittingNegativeFeedback(mainReason: MainReason, subReason: SubReason?, openEndedComment: String) {

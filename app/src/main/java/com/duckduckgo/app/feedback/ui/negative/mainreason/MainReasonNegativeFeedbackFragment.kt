@@ -38,6 +38,7 @@ class MainReasonNegativeFeedbackFragment : FeedbackFragment() {
 
         fun userSelectedNegativeFeedbackMainReason(type: MainReason)
     }
+
     private val listener: MainReasonNegativeFeedbackListener?
         get() = activity as MainReasonNegativeFeedbackListener
 

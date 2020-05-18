@@ -37,7 +37,7 @@ import kotlinx.android.synthetic.main.include_cta_buttons.view.*
 import kotlinx.android.synthetic.main.include_cta_content.view.*
 import kotlinx.android.synthetic.main.include_dax_dialog_cta.view.*
 import kotlinx.android.synthetic.main.include_top_cta.view.*
-import java.util.Locale
+import java.util.*
 
 interface DialogCta {
     fun createCta(activity: FragmentActivity): DaxDialog

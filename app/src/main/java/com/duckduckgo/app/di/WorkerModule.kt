@@ -22,7 +22,6 @@ import androidx.work.Configuration
 import androidx.work.WorkManager
 import androidx.work.WorkerFactory
 import com.duckduckgo.app.global.view.ClearDataAction
-import com.duckduckgo.app.job.AppConfigurationDownloader
 import com.duckduckgo.app.job.ConfigurationDownloader
 import com.duckduckgo.app.notification.NotificationFactory
 import com.duckduckgo.app.notification.db.NotificationDao

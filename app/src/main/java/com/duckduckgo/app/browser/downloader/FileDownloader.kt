@@ -45,7 +45,7 @@ class FileDownloader @Inject constructor(
         val subfolder: String,
         val userAgent: String,
         val directory: File = Environment.getExternalStoragePublicDirectory(subfolder)
-    ): Serializable
+    ) : Serializable
 
     interface FileDownloadListener {
         fun downloadStarted()

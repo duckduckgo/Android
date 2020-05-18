@@ -46,9 +46,9 @@ import androidx.constraintlayout.widget.ConstraintSet
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.content.ContextCompat
 import androidx.core.content.pm.ShortcutManagerCompat
-import androidx.core.view.*
 import androidx.core.text.HtmlCompat
 import androidx.core.text.HtmlCompat.FROM_HTML_MODE_LEGACY
+import androidx.core.view.*
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.transaction
 import androidx.lifecycle.Lifecycle
@@ -119,13 +119,13 @@ import kotlinx.android.synthetic.main.popup_window_browser_menu.view.addToHome
 import kotlinx.android.synthetic.main.popup_window_browser_menu.view.backPopupMenuItem
 import kotlinx.android.synthetic.main.popup_window_browser_menu.view.brokenSitePopupMenuItem
 import kotlinx.android.synthetic.main.popup_window_browser_menu.view.findInPageMenuItem
+import kotlinx.android.synthetic.main.popup_window_browser_menu.view.fireproofWebsitePopupMenuItem
 import kotlinx.android.synthetic.main.popup_window_browser_menu.view.forwardPopupMenuItem
 import kotlinx.android.synthetic.main.popup_window_browser_menu.view.newTabPopupMenuItem
 import kotlinx.android.synthetic.main.popup_window_browser_menu.view.refreshPopupMenuItem
 import kotlinx.android.synthetic.main.popup_window_browser_menu.view.requestDesktopSiteCheckMenuItem
 import kotlinx.android.synthetic.main.popup_window_browser_menu.view.settingsPopupMenuItem
 import kotlinx.android.synthetic.main.popup_window_browser_menu.view.whitelistPopupMenuItem
-import kotlinx.android.synthetic.main.popup_window_browser_menu.view.fireproofWebsitePopupMenuItem
 import kotlinx.coroutines.*
 import org.jetbrains.anko.longToast
 import org.jetbrains.anko.share
@@ -1454,7 +1454,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
         }
 
         private fun removeUnnecessaryLayoutBehaviour() {
-            val params: CoordinatorLayout.LayoutParams = bottomNavigationBar.getLayoutParams() as CoordinatorLayout.LayoutParams
+            val params: CoordinatorLayout.LayoutParams = bottomNavigationBar.layoutParams as CoordinatorLayout.LayoutParams
             params.behavior = null
         }
 

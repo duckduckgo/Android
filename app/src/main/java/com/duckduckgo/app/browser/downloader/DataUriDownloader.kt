@@ -16,8 +16,8 @@
 
 package com.duckduckgo.app.browser.downloader
 
-import androidx.annotation.WorkerThread
 import android.util.Base64
+import androidx.annotation.WorkerThread
 import com.duckduckgo.app.browser.downloader.DataUriParser.GeneratedFilename
 import com.duckduckgo.app.browser.downloader.DataUriParser.ParseResult
 import timber.log.Timber

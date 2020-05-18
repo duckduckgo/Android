@@ -18,14 +18,14 @@ package com.duckduckgo.app.browser
 
 import android.annotation.SuppressLint
 import android.content.Context
-import androidx.core.view.NestedScrollingChild
-import androidx.core.view.NestedScrollingChildHelper
-import androidx.core.view.ViewCompat
 import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputConnection
 import android.webkit.WebView
+import androidx.core.view.NestedScrollingChild
+import androidx.core.view.NestedScrollingChildHelper
+import androidx.core.view.ViewCompat
 
 /**
  * WebView subclass which allows the WebView to

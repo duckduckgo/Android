@@ -41,7 +41,7 @@ sealed class FeedbackType {
         OTHER
     }
 
-    enum class SearchNotGoodEnoughSubReasons : SubReason  {
+    enum class SearchNotGoodEnoughSubReasons : SubReason {
         PROGRAMMING_TECHNICAL_SEARCHES,
         LAYOUT_MORE_LIKE_GOOGLE,
         FASTER_LOAD_TIME,
@@ -50,7 +50,7 @@ sealed class FeedbackType {
         OTHER
     }
 
-    enum class CustomizationSubReasons  : SubReason {
+    enum class CustomizationSubReasons : SubReason {
         HOME_SCREEN_CONFIGURATION,
         TAB_DISPLAY,
         HOW_APP_LOOKS,
@@ -60,7 +60,7 @@ sealed class FeedbackType {
         OTHER
     }
 
-    enum class PerformanceSubReasons  : SubReason {
+    enum class PerformanceSubReasons : SubReason {
         SLOW_WEB_PAGE_LOADS,
         APP_CRASHES_OR_FREEZES,
         MEDIA_PLAYBACK_BUGS,

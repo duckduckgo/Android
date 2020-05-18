@@ -24,11 +24,10 @@ import androidx.work.WorkerParameters
 import com.duckduckgo.app.fire.DataClearingWorker
 import com.duckduckgo.app.global.job.AppConfigurationWorker
 import com.duckduckgo.app.global.view.ClearDataAction
-import com.duckduckgo.app.job.AppConfigurationDownloader
 import com.duckduckgo.app.job.ConfigurationDownloader
+import com.duckduckgo.app.notification.NotificationFactory
 import com.duckduckgo.app.notification.NotificationScheduler.ClearDataNotificationWorker
 import com.duckduckgo.app.notification.NotificationScheduler.PrivacyNotificationWorker
-import com.duckduckgo.app.notification.NotificationFactory
 import com.duckduckgo.app.notification.db.NotificationDao
 import com.duckduckgo.app.notification.model.ClearDataNotification
 import com.duckduckgo.app.notification.model.PrivacyProtectionNotification
@@ -68,7 +67,7 @@ class DaggerWorkerFactory(
             }
 
             return instance
-        } catch (exception: Exception){
+        } catch (exception: Exception) {
             Timber.e(exception, "Worker $workerClassName could not be created")
             return null
         }

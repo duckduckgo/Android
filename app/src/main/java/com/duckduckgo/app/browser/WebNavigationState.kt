@@ -126,9 +126,11 @@ data class WebViewNavigationState(private val stack: WebBackForwardList) : WebNa
 }
 
 @Suppress("DataClassPrivateConstructor")
-data class EmptyNavigationState private constructor(override val originalUrl: String?,
-                                                    override val currentUrl: String?,
-                                                    override val title: String?) : WebNavigationState {
+data class EmptyNavigationState private constructor(
+    override val originalUrl: String?,
+    override val currentUrl: String?,
+    override val title: String?
+) : WebNavigationState {
     companion object {
         operator fun invoke(webNavigationState: WebNavigationState): EmptyNavigationState {
             return EmptyNavigationState(

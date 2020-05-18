@@ -82,7 +82,7 @@ class SettingsAutomaticallyClearWhenFragment : DialogFragment() {
     }
 
     @IdRes
-    private fun ClearWhenOption.radioButtonId() : Int {
+    private fun ClearWhenOption.radioButtonId(): Int {
         return when (this) {
             ClearWhenOption.APP_EXIT_ONLY -> R.id.settingAppExitOnly
             ClearWhenOption.APP_EXIT_OR_5_MINS -> R.id.settingInactive5Mins
