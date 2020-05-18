@@ -31,7 +31,6 @@ import androidx.appcompat.widget.AppCompatTextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.animation.addListener
-import androidx.core.content.ContextCompat
 import androidx.core.view.children
 import androidx.core.widget.TextViewCompat
 import androidx.vectordrawable.graphics.drawable.AnimatedVectorDrawableCompat
@@ -45,7 +44,7 @@ interface TrackersAnimatorListener {
     fun onAnimationFinished()
 }
 
-class BrowserTrackersAnimatorHelper(private val privacyGradeButton: ImageButton) {
+class BrowserTrackersAnimatorHelper {
 
     private var trackersAnimation: AnimatorSet = AnimatorSet()
     private var pulseAnimation: AnimatorSet = AnimatorSet()
@@ -69,9 +68,6 @@ class BrowserTrackersAnimatorHelper(private val privacyGradeButton: ImageButton)
             return
         }
 
-        val drawable = ContextCompat.getDrawable(activity, R.drawable.privacygrade_icon_loading)
-        privacyGradeButton.setImageDrawable(drawable)
-
         if (!trackersAnimation.isRunning) {
             trackersAnimation = if (cta is DaxDialogCta.DaxTrackersBlockedCta) {
                 createPartialTrackersAnimation(container, omnibarViews, logoViews).apply {
@@ -85,7 +81,7 @@ class BrowserTrackersAnimatorHelper(private val privacyGradeButton: ImageButton)
         }
     }
 
-    fun startPulseAnimation(view: View) {
+    fun startPulseAnimation(view: ImageButton) {
         if (!pulseAnimation.isRunning) {
             val scaleDown = ObjectAnimator.ofPropertyValuesHolder(
                 view,
@@ -119,7 +115,6 @@ class BrowserTrackersAnimatorHelper(private val privacyGradeButton: ImageButton)
     fun cancelAnimations() {
         stopTrackersAnimation()
         stopPulseAnimation()
-        listener?.onAnimationFinished()
     }
 
     fun finishTrackerAnimation(omnibarViews: List<View>, container: ViewGroup) {

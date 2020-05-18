@@ -601,15 +601,48 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenShowPrivacyGradeThenShowPrivacyGrade() {
-        testee.showPrivacyGrade()
-        assertTrue(privacyGradeState().canShowPrivacyGrade)
+    fun whenPrivacyGradeFinishedLoadingThenDoNotShowLoadingGrade() {
+        testee.stopShowingEmptyGrade()
+        assertFalse(privacyGradeState().showEmptyGrade)
     }
 
     @Test
-    fun whenHidePrivacyGradeThenDoNotShowPrivacyGrade() {
-        testee.hidePrivacyGrade()
-        assertFalse(privacyGradeState().canShowPrivacyGrade)
+    fun whenProgressChangesWhileBrowsingButSiteNotFullyLoadedThenPrivacyGradeShouldAnimateIsTrue() {
+        setBrowserShowing(true)
+        testee.progressChanged(50)
+        assertTrue(privacyGradeState().shouldAnimate)
+    }
+
+    @Test
+    fun whenProgressChangesWhileBrowsingAndSiteIsFullyLoadedThenPrivacyGradeShouldAnimateIsFalse() {
+        setBrowserShowing(true)
+        testee.progressChanged(100)
+        assertFalse(privacyGradeState().shouldAnimate)
+    }
+
+    @Test
+    fun whenProgressChangesAndPrivacyIsOnThenShowLoadingGradeIsAlwaysTrue() {
+        setBrowserShowing(true)
+        testee.progressChanged(50)
+        assertTrue(privacyGradeState().showEmptyGrade)
+        testee.progressChanged(100)
+        assertTrue(privacyGradeState().showEmptyGrade)
+    }
+
+    @Test
+    fun whenProgressChangesAndPrivacyIsOffButSiteNotFullyLoadedThenShowLoadingGradeIsTrue() {
+        setBrowserShowing(true)
+        testee.loadingViewState.value = loadingViewState().copy(privacyOn = false)
+        testee.progressChanged(50)
+        assertTrue(privacyGradeState().showEmptyGrade)
+    }
+
+    @Test
+    fun whenProgressChangesAndPrivacyIsOffAndSiteIsFullyLoadedThenShowLoadingGradeIsFalse() {
+        setBrowserShowing(true)
+        testee.loadingViewState.value = loadingViewState().copy(privacyOn = false)
+        testee.progressChanged(100)
+        assertFalse(privacyGradeState().showEmptyGrade)
     }
 
     @Test
@@ -1711,7 +1744,7 @@ class BrowserTabViewModelTest {
         return nav
     }
 
-    private fun privacyGradeState() = testee.privacyGradeState.value!!
+    private fun privacyGradeState() = testee.privacyGradeViewState.value!!
     private fun ctaViewState() = testee.ctaViewState.value!!
     private fun browserViewState() = testee.browserViewState.value!!
     private fun omnibarViewState() = testee.omnibarViewState.value!!

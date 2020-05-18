@@ -28,7 +28,7 @@ class TdsJson {
 
     fun jsonToEntities(): List<TdsEntity> {
         return entities.mapNotNull { (key, value) ->
-            TdsEntity(key, value.displayName ?: key, value.prevalence)
+            TdsEntity(key, value.displayName.takeIf { !it.isNullOrBlank() } ?: key, value.prevalence)
         }
     }
 
