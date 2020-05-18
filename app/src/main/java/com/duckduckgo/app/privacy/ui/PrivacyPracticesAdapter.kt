@@ -63,4 +63,3 @@ class PrivacyPracticesAdapter : RecyclerView.Adapter<PrivacyPracticesAdapter.Pra
     ) : RecyclerView.ViewHolder(root)
 
 }
-

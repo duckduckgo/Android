@@ -35,7 +35,6 @@ import com.duckduckgo.app.survey.ui.SurveyViewModel.Command.*
 import kotlinx.android.synthetic.main.activity_user_survey.*
 import javax.inject.Inject
 
-
 class SurveyActivity : DuckDuckGoActivity() {
 
     private val viewModel: SurveyViewModel by bindViewModel()

@@ -24,7 +24,6 @@ import timber.log.Timber
 import java.io.IOException
 import javax.inject.Inject
 
-
 class ResourceSurrogateListDownloader @Inject constructor(
     private val service: ResourceSurrogateListService,
     private val surrogatesDataStore: ResourceSurrogateDataStore,

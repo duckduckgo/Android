@@ -22,7 +22,6 @@ import com.duckduckgo.app.statistics.api.StatisticsUpdater
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import kotlinx.coroutines.withTimeoutOrNull
 
-
 class AtbInitializer(
     private val statisticsDataStore: StatisticsDataStore,
     private val statisticsUpdater: StatisticsUpdater,

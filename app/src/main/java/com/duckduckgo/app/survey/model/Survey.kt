@@ -51,7 +51,3 @@ data class Survey(
         }
     }
 }
-
-
-
-
