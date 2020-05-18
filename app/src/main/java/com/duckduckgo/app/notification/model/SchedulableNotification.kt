@@ -38,4 +38,3 @@ interface NotificationSpec {
     val pixelSuffix: String
     val autoCancel: Boolean
 }
-

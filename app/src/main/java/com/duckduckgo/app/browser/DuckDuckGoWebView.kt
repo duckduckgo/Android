@@ -54,7 +54,6 @@ class DuckDuckGoWebView : WebView, NestedScrollingChild {
         return inputConnection
     }
 
-
     private fun addNoPersonalisedFlag(outAttrs: EditorInfo) {
         outAttrs.imeOptions = outAttrs.imeOptions or IME_FLAG_NO_PERSONALIZED_LEARNING
     }

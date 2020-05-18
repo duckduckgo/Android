@@ -78,7 +78,7 @@ class QueryParamReferrerParser : AppInstallationReferrerParser {
         }
 
         val condensedSuffix = suffix.take(2)
-        Timber.i("Found suffix $condensedSuffix (looking for ${prefix}, found in $part)")
+        Timber.i("Found suffix $condensedSuffix (looking for $prefix, found in $part)")
         return CampaignReferrerFound(condensedSuffix)
     }
 

@@ -22,7 +22,6 @@ import com.duckduckgo.app.settings.db.SettingsSharedPreferences
 import dagger.Module
 import dagger.Provides
 
-
 @Module
 class BrowserAutoCompleteModule {
 

@@ -21,7 +21,6 @@ import androidx.core.net.toUri
 import com.duckduckgo.app.browser.WebNavigationStateChange.*
 import com.duckduckgo.app.global.isHttpsVersionOfUri
 
-
 interface WebNavigationState {
     val originalUrl: String?
     val currentUrl: String?

@@ -23,7 +23,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 
-
 interface WebViewPreviewGenerator {
     suspend fun generatePreview(webView: WebView): Bitmap
 }

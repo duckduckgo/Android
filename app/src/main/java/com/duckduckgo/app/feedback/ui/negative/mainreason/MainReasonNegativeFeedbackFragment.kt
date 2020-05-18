@@ -30,7 +30,6 @@ import com.duckduckgo.app.feedback.ui.negative.FeedbackTypeDisplay
 import com.duckduckgo.app.feedback.ui.negative.FeedbackTypeDisplay.FeedbackTypeMainReasonDisplay
 import kotlinx.android.synthetic.main.content_feedback_negative_disambiguation_main_reason.*
 
-
 class MainReasonNegativeFeedbackFragment : FeedbackFragment() {
     private lateinit var recyclerAdapter: MainReasonAdapter
 
@@ -66,7 +65,6 @@ class MainReasonNegativeFeedbackFragment : FeedbackFragment() {
             recyclerAdapter.submitList(listValues)
         }
     }
-
 
     private fun getMainReasonsDisplayText(): List<FeedbackTypeMainReasonDisplay> {
         return MainReason.values().mapNotNull {

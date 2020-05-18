@@ -21,7 +21,6 @@ import com.duckduckgo.app.feedback.ui.negative.FeedbackType.MainReason
 import com.duckduckgo.app.feedback.ui.negative.FeedbackType.SubReason
 import com.duckduckgo.app.global.SingleLiveEvent
 
-
 class ShareOpenEndedNegativeFeedbackViewModel : ViewModel() {
 
     val command: SingleLiveEvent<Command> = SingleLiveEvent()
@@ -40,4 +39,3 @@ class ShareOpenEndedNegativeFeedbackViewModel : ViewModel() {
         object Exit : Command()
     }
 }
-

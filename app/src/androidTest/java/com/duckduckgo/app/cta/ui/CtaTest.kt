@@ -100,7 +100,6 @@ class CtaTest {
         assertTrue(testee.pixelShownParameters().isEmpty())
     }
 
-
     @Test
     fun whenCtaIsAddWidgetInstructionsReturnEmptyOkParameters() {
         val testee = HomePanelCta.AddWidgetInstructions

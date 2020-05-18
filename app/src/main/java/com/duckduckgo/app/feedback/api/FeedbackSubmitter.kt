@@ -30,7 +30,6 @@ import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.util.*
 
-
 interface FeedbackSubmitter {
 
     suspend fun sendNegativeFeedback(mainReason: MainReason, subReason: SubReason?, openEnded: String)

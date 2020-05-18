@@ -29,7 +29,6 @@ import com.duckduckgo.app.global.view.show
 import com.duckduckgo.app.settings.clear.ClearWhenOption
 import com.duckduckgo.app.settings.clear.ClearWhenOption.*
 
-
 class SettingsAutomaticallyClearWhenFragment : DialogFragment() {
 
     interface Listener {

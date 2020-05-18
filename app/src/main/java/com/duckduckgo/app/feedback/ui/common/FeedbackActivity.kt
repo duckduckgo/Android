@@ -40,7 +40,6 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
-
 class FeedbackActivity : DuckDuckGoActivity(),
     InitialFeedbackFragment.InitialFeedbackListener,
     PositiveFeedbackLandingFragment.PositiveFeedbackLandingListener,

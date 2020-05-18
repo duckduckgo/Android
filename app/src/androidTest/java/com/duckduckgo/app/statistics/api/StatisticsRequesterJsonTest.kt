@@ -47,7 +47,6 @@ import java.net.InetSocketAddress
 import java.net.Proxy
 import java.util.concurrent.TimeUnit
 
-
 class StatisticsRequesterJsonTest {
 
     private var mockVariantManager: VariantManager = mock()

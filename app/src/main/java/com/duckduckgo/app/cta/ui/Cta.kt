@@ -353,7 +353,7 @@ sealed class HomeTopPanelCta(
 fun DaxCta.addCtaToHistory(newCta: String): String {
     val param = onboardingStore.onboardingDialogJourney?.split("-").orEmpty().toMutableList()
     val daysInstalled = minOf(appInstallStore.daysInstalled().toInt(), MAX_DAYS_ALLOWED)
-    param.add("$newCta:${daysInstalled}")
+    param.add("$newCta:$daysInstalled")
     val finalParam = param.joinToString("-")
     onboardingStore.onboardingDialogJourney = finalParam
     return finalParam

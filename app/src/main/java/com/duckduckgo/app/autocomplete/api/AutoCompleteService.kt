@@ -21,7 +21,6 @@ import io.reactivex.Observable
 import retrofit2.http.GET
 import retrofit2.http.Query
 
-
 interface AutoCompleteService {
 
     @GET("${AppUrl.Url.API}/ac/")

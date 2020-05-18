@@ -19,7 +19,6 @@ package com.duckduckgo.app.global
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 
-
 interface DispatcherProvider {
 
     fun main(): CoroutineDispatcher = Dispatchers.Main

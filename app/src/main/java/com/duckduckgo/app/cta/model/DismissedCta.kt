@@ -52,4 +52,3 @@ data class DismissedCta(
         }
     }
 }
-

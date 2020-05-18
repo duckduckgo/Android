@@ -106,7 +106,7 @@ class SystemSearchViewModelTest {
         testee.resetViewState()
         testee.userUpdatedQuery("test")
 
-        //no crash
+        // no crash
     }
 
     @Test

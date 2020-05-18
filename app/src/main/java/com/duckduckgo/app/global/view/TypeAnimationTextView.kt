@@ -23,7 +23,9 @@ import kotlinx.coroutines.*
 import kotlin.coroutines.CoroutineContext
 
 class TypeAnimationTextView @JvmOverloads constructor(
-    context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
+    context: Context,
+    attrs: AttributeSet? = null,
+    defStyleAttr: Int = 0
 ) : AppCompatTextView(context, attrs, defStyleAttr), CoroutineScope {
 
     override val coroutineContext: CoroutineContext

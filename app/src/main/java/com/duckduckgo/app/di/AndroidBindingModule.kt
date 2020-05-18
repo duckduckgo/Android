@@ -50,7 +50,6 @@ import com.duckduckgo.app.widget.ui.AddWidgetInstructionsActivity
 import dagger.Module
 import dagger.android.ContributesAndroidInjector
 
-
 @Module
 abstract class AndroidBindingModule {
 

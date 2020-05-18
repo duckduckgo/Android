@@ -27,7 +27,6 @@ import com.duckduckgo.app.playstore.PlayStoreUtils
 import kotlinx.android.synthetic.main.content_feedback_positive_landing.*
 import javax.inject.Inject
 
-
 class PositiveFeedbackLandingFragment : FeedbackFragment() {
 
     interface PositiveFeedbackLandingListener {
