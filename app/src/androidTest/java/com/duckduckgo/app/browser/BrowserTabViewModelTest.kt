@@ -265,9 +265,8 @@ class BrowserTabViewModelTest {
             searchCountDao = mockSearchCountDao,
             pixel = mockPixel,
             dispatchers = coroutineRule.testDispatcherProvider,
-            fireproofWebsiteDao = fireproofWebsiteDao
-            variantManager = mockVariantManager,
-            dispatchers = coroutineRule.testDispatcherProvider
+            fireproofWebsiteDao = fireproofWebsiteDao,
+            variantManager = mockVariantManager
         )
 
         testee.loadData("abc", null, false)
