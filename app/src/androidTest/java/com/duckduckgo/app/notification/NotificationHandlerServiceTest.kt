@@ -30,7 +30,6 @@ import com.nhaarman.mockitokotlin2.verify
 import org.junit.Before
 import org.junit.Test
 
-
 class NotificationHandlerServiceTest {
 
     private var mockPixel: Pixel = mock()

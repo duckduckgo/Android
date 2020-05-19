@@ -19,7 +19,6 @@ package com.duckduckgo.app.global.view
 import android.text.Editable
 import android.text.TextWatcher
 
-
 abstract class TextChangedWatcher : TextWatcher {
 
     abstract override fun afterTextChanged(editable: Editable)

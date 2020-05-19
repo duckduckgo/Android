@@ -33,6 +33,3 @@ abstract class AppDaysUsedDao {
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     abstract fun insert(appUsedEntity: AppDaysUsedEntity)
 }
-
-
-

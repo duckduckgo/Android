@@ -29,7 +29,6 @@ import com.duckduckgo.app.settings.db.SettingsDataStore
 import kotlinx.android.synthetic.main.content_feedback.*
 import javax.inject.Inject
 
-
 class InitialFeedbackFragment : FeedbackFragment() {
 
     @Inject

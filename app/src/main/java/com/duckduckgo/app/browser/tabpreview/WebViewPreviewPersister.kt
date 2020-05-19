@@ -16,7 +16,6 @@
 
 package com.duckduckgo.app.browser.tabpreview
 
-
 import android.content.Context
 import android.graphics.Bitmap
 import com.duckduckgo.app.global.file.FileDeleter
@@ -25,7 +24,6 @@ import kotlinx.coroutines.withContext
 import timber.log.Timber
 import java.io.File
 import java.io.FileOutputStream
-
 
 interface WebViewPreviewPersister {
 

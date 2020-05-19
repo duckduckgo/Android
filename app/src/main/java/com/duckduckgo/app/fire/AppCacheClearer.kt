@@ -20,7 +20,6 @@ import android.content.Context
 import com.duckduckgo.app.global.api.NetworkApiCache
 import com.duckduckgo.app.global.file.FileDeleter
 
-
 interface AppCacheClearer {
 
     suspend fun clearCache()

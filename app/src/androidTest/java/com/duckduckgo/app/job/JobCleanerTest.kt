@@ -117,7 +117,6 @@ class JobCleanerTest {
         assertTrue(scheduledWorkers.isEmpty())
     }
 
-
     private fun getScheduledWorkers(tag: String): List<WorkInfo> {
         return workManager
             .getWorkInfosByTag(tag)

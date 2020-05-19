@@ -26,7 +26,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 
-
 interface PromptTypeDecider {
     suspend fun determineInitialPromptType(): AppEnjoymentPromptOptions
 }

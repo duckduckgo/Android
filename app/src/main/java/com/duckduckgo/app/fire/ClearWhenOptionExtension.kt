@@ -19,7 +19,6 @@ package com.duckduckgo.app.fire
 import com.duckduckgo.app.settings.clear.ClearWhenOption
 import java.util.concurrent.TimeUnit
 
-
 fun ClearWhenOption.durationMilliseconds(): Long {
     return when (this) {
         ClearWhenOption.APP_EXIT_ONLY -> 0

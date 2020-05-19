@@ -16,7 +16,6 @@
 
 package com.duckduckgo.app.global
 
-
 class UrlScheme {
     companion object {
         const val https = "https"

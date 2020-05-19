@@ -23,7 +23,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.app.tabs.model.TabEntity
 import kotlin.math.abs
 
-
 class SwipeToCloseTabListener(
     private val tabSwitcherAdapter: TabSwitcherAdapter,
     private val numberGridColumns: Int,

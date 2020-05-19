@@ -379,7 +379,6 @@ class CtaViewModelTest {
         assertTrue(value is DaxDialogCta.DaxSerpCta)
     }
 
-
     @Test
     fun whenRefreshCtaWhileBrowsingThenReturnNoSerpCta() = coroutineRule.runBlocking {
         givenDaxOnboardingActive()
@@ -431,7 +430,7 @@ class CtaViewModelTest {
         whenever(mockUserStageStore.getUserAppStage()).thenReturn(AppStage.DAX_ONBOARDING)
     }
 
-    private suspend fun givenDaxOnboardingCompleted() { 
+    private suspend fun givenDaxOnboardingCompleted() {
         whenever(mockUserStageStore.getUserAppStage()).thenReturn(AppStage.ESTABLISHED)
     }
 

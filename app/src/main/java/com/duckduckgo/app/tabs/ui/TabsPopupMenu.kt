@@ -54,7 +54,7 @@ class TabsPopupMenu(layoutInflater: LayoutInflater, view: View = inflate(layoutI
         val anchorLocation = IntArray(2)
         anchorView.getLocationOnScreen(anchorLocation)
         val x = MARGIN
-        val y = anchorLocation[1] - 2*anchorView.height
+        val y = anchorLocation[1] - 2 * anchorView.height
         showAtLocation(rootView, Gravity.TOP or Gravity.END, x, y)
     }
 
@@ -67,4 +67,3 @@ class TabsPopupMenu(layoutInflater: LayoutInflater, view: View = inflate(layoutI
         }
     }
 }
-

@@ -19,7 +19,6 @@ package com.duckduckgo.app.referral
 import com.duckduckgo.app.referral.ParsedReferrerResult.*
 import timber.log.Timber
 
-
 interface AppInstallationReferrerParser {
 
     fun parse(referrer: String): ParsedReferrerResult
@@ -79,7 +78,7 @@ class QueryParamReferrerParser : AppInstallationReferrerParser {
         }
 
         val condensedSuffix = suffix.take(2)
-        Timber.i("Found suffix $condensedSuffix (looking for ${prefix}, found in $part)")
+        Timber.i("Found suffix $condensedSuffix (looking for $prefix, found in $part)")
         return CampaignReferrerFound(condensedSuffix)
     }
 

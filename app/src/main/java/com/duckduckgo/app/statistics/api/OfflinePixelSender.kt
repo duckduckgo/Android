@@ -27,9 +27,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.EXCEPTION_MESSA
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.EXCEPTION_TIMESTAMP
 import com.duckduckgo.app.statistics.store.OfflinePixelCountDataStore
 import io.reactivex.Completable
-import io.reactivex.Completable.complete
-import io.reactivex.Completable.defer
-import io.reactivex.Completable.mergeDelayError
+import io.reactivex.Completable.*
 import kotlinx.coroutines.runBlocking
 import timber.log.Timber
 import javax.inject.Inject
