@@ -57,6 +57,7 @@ import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao
 import com.duckduckgo.app.privacy.db.UserWhitelistDao
+import com.duckduckgo.app.privacy.model.PrivacyGrade
 import com.duckduckgo.app.privacy.model.PrivacyPractices
 import com.duckduckgo.app.privacy.model.TestEntity
 import com.duckduckgo.app.privacy.model.UserWhitelistedDomain
@@ -643,6 +644,24 @@ class BrowserTabViewModelTest {
         testee.loadingViewState.value = loadingViewState().copy(privacyOn = false)
         testee.progressChanged(100)
         assertFalse(privacyGradeState().showEmptyGrade)
+    }
+
+    @Test
+    fun whenNotShowingEmptyGradeAndPrivacyGradeIsNotUnknownThenIsEnableIsTrue() {
+        val testee = BrowserTabViewModel.PrivacyGradeViewState(PrivacyGrade.A, shouldAnimate = false, showEmptyGrade = false)
+        assertTrue(testee.isEnabled)
+    }
+
+    @Test
+    fun whenPrivacyGradeIsUnknownThenIsEnableIsFalse() {
+        val testee = BrowserTabViewModel.PrivacyGradeViewState(PrivacyGrade.UNKNOWN, shouldAnimate = false, showEmptyGrade = false)
+        assertFalse(testee.isEnabled)
+    }
+
+    @Test
+    fun whenShowEmptyGradeIsTrueThenIsEnableIsFalse() {
+        val testee = BrowserTabViewModel.PrivacyGradeViewState(PrivacyGrade.A, shouldAnimate = false, showEmptyGrade = true)
+        assertFalse(testee.isEnabled)
     }
 
     @Test
