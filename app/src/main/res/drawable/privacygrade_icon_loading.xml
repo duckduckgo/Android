@@ -20,7 +20,7 @@
     android:viewportWidth="22"
     android:viewportHeight="22">
   <path
-      android:pathData="M11,22C4.925,22 0,17.075 0,11C0,4.925 4.925,0 11,0C17.075,0 22,4.925 22,11C22,17.075 17.075,22 11,22ZM15.758,15.4L12.224,6.229L9.776,6.229L6.242,15.4L8.456,15.4L9.034,13.846L12.966,13.846L13.544,15.4L15.757,15.4L15.758,15.4ZM12.43,12.128L9.57,12.128L11,8.18L12.43,12.127L12.43,12.128Z"
+      android:pathData="M11,11m-11,0a11,11 0,1 1,22 0a11,11 0,1 1,-22 0"
       android:strokeWidth="1"
       android:fillColor="?attr/toolbarIconColor"
       android:fillType="evenOdd"

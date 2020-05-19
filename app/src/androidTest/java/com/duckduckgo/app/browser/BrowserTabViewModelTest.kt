@@ -59,6 +59,7 @@ import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao
 import com.duckduckgo.app.privacy.db.UserWhitelistDao
+import com.duckduckgo.app.privacy.model.PrivacyGrade
 import com.duckduckgo.app.privacy.model.PrivacyPractices
 import com.duckduckgo.app.privacy.model.TestEntity
 import com.duckduckgo.app.privacy.model.UserWhitelistedDomain
@@ -584,26 +585,89 @@ class BrowserTabViewModelTest {
     @Test
     fun whenUrlClearedThenPrivacyGradeIsCleared() = coroutineRule.runBlocking {
         loadUrl("https://duckduckgo.com")
-        assertNotNull(testee.privacyGrade.value)
+        assertNotNull(privacyGradeState().privacyGrade)
         loadUrl(null)
-        assertNull(testee.privacyGrade.value)
+        assertNull(privacyGradeState().privacyGrade)
     }
 
     @Test
     fun whenUrlLoadedThenPrivacyGradeIsReset() = coroutineRule.runBlocking {
         loadUrl("https://duckduckgo.com")
-        assertNotNull(testee.privacyGrade.value)
+        assertNotNull(privacyGradeState().privacyGrade)
     }
 
     @Test
     fun whenEnoughTrackersDetectedThenPrivacyGradeIsUpdated() {
-        val grade = testee.privacyGrade.value
+        val grade = privacyGradeState().privacyGrade
         loadUrl("https://example.com")
         val entity = TestEntity("Network1", "Network1", 10.0)
         for (i in 1..10) {
             testee.trackerDetected(TrackingEvent("https://example.com", "", null, entity, false))
         }
-        assertNotEquals(grade, testee.privacyGrade.value)
+        assertNotEquals(grade, privacyGradeState().privacyGrade)
+    }
+
+    @Test
+    fun whenPrivacyGradeFinishedLoadingThenDoNotShowLoadingGrade() {
+        testee.stopShowingEmptyGrade()
+        assertFalse(privacyGradeState().showEmptyGrade)
+    }
+
+    @Test
+    fun whenProgressChangesWhileBrowsingButSiteNotFullyLoadedThenPrivacyGradeShouldAnimateIsTrue() {
+        setBrowserShowing(true)
+        testee.progressChanged(50)
+        assertTrue(privacyGradeState().shouldAnimate)
+    }
+
+    @Test
+    fun whenProgressChangesWhileBrowsingAndSiteIsFullyLoadedThenPrivacyGradeShouldAnimateIsFalse() {
+        setBrowserShowing(true)
+        testee.progressChanged(100)
+        assertFalse(privacyGradeState().shouldAnimate)
+    }
+
+    @Test
+    fun whenProgressChangesAndPrivacyIsOnThenShowLoadingGradeIsAlwaysTrue() {
+        setBrowserShowing(true)
+        testee.progressChanged(50)
+        assertTrue(privacyGradeState().showEmptyGrade)
+        testee.progressChanged(100)
+        assertTrue(privacyGradeState().showEmptyGrade)
+    }
+
+    @Test
+    fun whenProgressChangesAndPrivacyIsOffButSiteNotFullyLoadedThenShowLoadingGradeIsTrue() {
+        setBrowserShowing(true)
+        testee.loadingViewState.value = loadingViewState().copy(privacyOn = false)
+        testee.progressChanged(50)
+        assertTrue(privacyGradeState().showEmptyGrade)
+    }
+
+    @Test
+    fun whenProgressChangesAndPrivacyIsOffAndSiteIsFullyLoadedThenShowLoadingGradeIsFalse() {
+        setBrowserShowing(true)
+        testee.loadingViewState.value = loadingViewState().copy(privacyOn = false)
+        testee.progressChanged(100)
+        assertFalse(privacyGradeState().showEmptyGrade)
+    }
+
+    @Test
+    fun whenNotShowingEmptyGradeAndPrivacyGradeIsNotUnknownThenIsEnableIsTrue() {
+        val testee = BrowserTabViewModel.PrivacyGradeViewState(PrivacyGrade.A, shouldAnimate = false, showEmptyGrade = false)
+        assertTrue(testee.isEnabled)
+    }
+
+    @Test
+    fun whenPrivacyGradeIsUnknownThenIsEnableIsFalse() {
+        val testee = BrowserTabViewModel.PrivacyGradeViewState(PrivacyGrade.UNKNOWN, shouldAnimate = false, showEmptyGrade = false)
+        assertFalse(testee.isEnabled)
+    }
+
+    @Test
+    fun whenShowEmptyGradeIsTrueThenIsEnableIsFalse() {
+        val testee = BrowserTabViewModel.PrivacyGradeViewState(PrivacyGrade.A, shouldAnimate = false, showEmptyGrade = true)
+        assertFalse(testee.isEnabled)
     }
 
     @Test
@@ -615,6 +679,12 @@ class BrowserTabViewModelTest {
     fun whenUrlUpdatedThenPrivacyGradeIsShown() {
         loadUrl("")
         assertTrue(browserViewState().showPrivacyGrade)
+    }
+
+    @Test
+    fun whenOmnibarDoesNotHaveFocusThenShowEmptyGradeIsFalse() {
+        testee.onOmnibarInputStateChanged(query = "", hasFocus = false, hasQueryChanged = false)
+        assertFalse(privacyGradeState().showEmptyGrade)
     }
 
     @Test
@@ -1856,6 +1926,7 @@ class BrowserTabViewModelTest {
         return nav
     }
 
+    private fun privacyGradeState() = testee.privacyGradeViewState.value!!
     private fun ctaViewState() = testee.ctaViewState.value!!
     private fun browserViewState() = testee.browserViewState.value!!
     private fun omnibarViewState() = testee.omnibarViewState.value!!

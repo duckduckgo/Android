@@ -164,6 +164,14 @@ class BrowserTabViewModel(
         val canFindInPage: Boolean = false
     )
 
+    data class PrivacyGradeViewState(
+        val privacyGrade: PrivacyGrade? = null,
+        val shouldAnimate: Boolean = false,
+        val showEmptyGrade: Boolean = true
+    ) {
+        val isEnabled: Boolean = !showEmptyGrade && privacyGrade != PrivacyGrade.UNKNOWN
+    }
+
     data class AutoCompleteViewState(
         val showSuggestions: Boolean = false,
         val searchResults: AutoCompleteResult = AutoCompleteResult("", emptyList())
@@ -221,11 +229,11 @@ class BrowserTabViewModel(
     val findInPageViewState: MutableLiveData<FindInPageViewState> = MutableLiveData()
     val ctaViewState: MutableLiveData<CtaViewState> = MutableLiveData()
     var siteLiveData: MutableLiveData<Site> = MutableLiveData()
+    val privacyGradeViewState: MutableLiveData<PrivacyGradeViewState> = MutableLiveData()
 
     var skipHome = false
     val tabs: LiveData<List<TabEntity>> = tabRepository.liveTabs
     val survey: LiveData<Survey> = ctaViewModel.surveyLiveData
-    val privacyGrade: MutableLiveData<PrivacyGrade> = MutableLiveData()
     val command: SingleLiveEvent<Command> = SingleLiveEvent()
 
     val url: String?
@@ -613,6 +621,9 @@ class BrowserTabViewModel(
             newProgress
         }
         loadingViewState.value = progress.copy(isLoading = isLoading, progress = visualProgress)
+
+        val showLoadingGrade = progress.privacyOn || isLoading
+        privacyGradeViewState.value = currentPrivacyGradeState().copy(shouldAnimate = isLoading, showEmptyGrade = showLoadingGrade)
     }
 
     private fun registerSiteVisit() {
@@ -680,12 +691,18 @@ class BrowserTabViewModel(
 
             withContext(dispatchers.main()) {
                 siteLiveData.value = site
-                privacyGrade.value = improvedGrade
+                privacyGradeViewState.value = currentPrivacyGradeState().copy(privacyGrade = improvedGrade)
             }
 
             withContext(dispatchers.io()) {
                 tabRepository.update(tabId, site)
             }
+        }
+    }
+
+    fun stopShowingEmptyGrade() {
+        if (currentPrivacyGradeState().showEmptyGrade) {
+            privacyGradeViewState.value = currentPrivacyGradeState().copy(showEmptyGrade = false)
         }
     }
 
@@ -700,6 +717,7 @@ class BrowserTabViewModel(
     private fun currentOmnibarViewState(): OmnibarViewState = omnibarViewState.value!!
     private fun currentLoadingViewState(): LoadingViewState = loadingViewState.value!!
     private fun currentCtaViewState(): CtaViewState = ctaViewState.value!!
+    private fun currentPrivacyGradeState(): PrivacyGradeViewState = privacyGradeViewState.value!!
 
     fun onOmnibarInputStateChanged(query: String, hasFocus: Boolean, hasQueryChanged: Boolean) {
 
@@ -717,6 +735,11 @@ class BrowserTabViewModel(
         val showControls = !hasFocus || query.isBlank()
         val showPrivacyGrade = !hasFocus
         val showSearchIcon = hasFocus
+
+        // show the real grade in case the animation was canceled before changing the state, this avoids showing an empty grade when regaining focus.
+        if (showPrivacyGrade) {
+            privacyGradeViewState.value = currentPrivacyGradeState().copy(showEmptyGrade = false)
+        }
 
         omnibarViewState.value = currentOmnibarViewState.copy(isEditing = hasFocus)
 
@@ -925,6 +948,7 @@ class BrowserTabViewModel(
         omnibarViewState.value = OmnibarViewState()
         findInPageViewState.value = FindInPageViewState()
         ctaViewState.value = CtaViewState()
+        privacyGradeViewState.value = PrivacyGradeViewState()
     }
 
     fun onShareSelected() {

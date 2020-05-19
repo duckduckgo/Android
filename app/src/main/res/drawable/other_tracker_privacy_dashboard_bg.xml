@@ -1,6 +1,5 @@
-<?xml version="1.0" encoding="utf-8"?>
 <!--
-  ~ Copyright (c) 2019 DuckDuckGo
+  ~ Copyright (c) 2020 DuckDuckGo
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -15,8 +14,10 @@
   ~ limitations under the License.
   -->
 
-<resources>
-    <integer name="tab_switcher_animation_duration_ms">300</integer>
-    <integer name="slide_animation_duration_ms">300</integer>
-    <integer name="crossing_animation_delay_ms">500</integer>
-</resources>
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="oval">
+    <solid android:color="?attr/toolbarIconColor" />
+    <size
+        android:height="24dp"
+        android:width="24dp" />
+</shape>

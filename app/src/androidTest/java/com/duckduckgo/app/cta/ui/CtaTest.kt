@@ -310,6 +310,21 @@ class CtaTest {
     }
 
     @Test
+    fun whenTrackersBlockedReturnOnlyTrackersWithDisplayName() {
+        val trackers = listOf(
+            TrackingEvent("facebook.com", "facebook.com", blocked = true, entity = TestEntity("Facebook", "Facebook", 3.0), categories = null),
+            TrackingEvent("other.com", "other.com", blocked = true, entity = TestEntity("Other", "", 9.0), categories = null)
+        )
+        val site = site(events = trackers)
+
+        val testee =
+            DaxDialogCta.DaxTrackersBlockedCta(mockOnboardingStore, mockAppInstallStore, site.orderedTrackingEntities(), "http://www.trackers.com")
+        val value = testee.getDaxText(mockActivity)
+
+        assertEquals("<b>Facebook</b>withZero", value)
+    }
+
+    @Test
     fun whenMultipleTrackersFromSameNetworkBlockedReturnOnlyOneWithZeroString() {
         val trackers = listOf(
             TestEntity("Facebook", "Facebook", 9.0),
