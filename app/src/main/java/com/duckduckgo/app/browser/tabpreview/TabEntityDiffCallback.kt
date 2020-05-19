@@ -20,7 +20,6 @@ import android.os.Bundle
 import androidx.recyclerview.widget.DiffUtil
 import com.duckduckgo.app.tabs.model.TabEntity
 
-
 class TabEntityDiffCallback : DiffUtil.ItemCallback<TabEntity>() {
 
     override fun areItemsTheSame(oldItem: TabEntity, newItem: TabEntity): Boolean {

@@ -20,7 +20,6 @@ import android.net.Uri
 import org.junit.Assert.*
 import org.junit.Test
 
-
 class UriExtensionTest {
 
     @Test

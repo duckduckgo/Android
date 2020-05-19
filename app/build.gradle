@@ -4,6 +4,7 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
 apply from: '../versioning.gradle'
+apply from: "$rootDir/ktlint.gradle"
 
 ext {
     USE_ORCHESTRATOR = project.hasProperty('orchestrator') ? project.property('orchestrator') : false
@@ -188,6 +189,7 @@ dependencies {
     // WorkManager
     implementation "androidx.work:work-runtime-ktx:$workManager"
     androidTestImplementation "androidx.work:work-testing:$workManager"
+    implementation "androidx.work:work-rxjava2:$workManager"
 
     // Dagger
     kapt "com.google.dagger:dagger-android-processor:$dagger"

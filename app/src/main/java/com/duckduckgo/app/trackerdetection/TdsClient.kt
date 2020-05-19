@@ -64,7 +64,6 @@ class TdsClient(override val name: Client.ClientName, private val trackers: List
             if (sameOrSubdomain(documentUrl, it)) {
                 return true
             }
-
         }
         return false
     }

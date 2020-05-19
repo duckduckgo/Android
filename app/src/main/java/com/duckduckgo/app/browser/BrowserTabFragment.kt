@@ -46,6 +46,8 @@ import androidx.constraintlayout.widget.ConstraintSet
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.content.ContextCompat
 import androidx.core.content.pm.ShortcutManagerCompat
+import androidx.core.text.HtmlCompat
+import androidx.core.text.HtmlCompat.FROM_HTML_MODE_LEGACY
 import androidx.core.view.*
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.transaction
@@ -78,6 +80,8 @@ import com.duckduckgo.app.browser.tabpreview.WebViewPreviewPersister
 import com.duckduckgo.app.browser.ui.HttpAuthenticationDialogFragment
 import com.duckduckgo.app.browser.useragent.UserAgentProvider
 import com.duckduckgo.app.cta.ui.*
+import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
+import com.duckduckgo.app.fire.fireproofwebsite.data.website
 import com.duckduckgo.app.global.ViewModelFactory
 import com.duckduckgo.app.global.device.DeviceInfo
 import com.duckduckgo.app.global.model.orderedTrackingEntities
@@ -115,6 +119,7 @@ import kotlinx.android.synthetic.main.popup_window_browser_menu.view.addToHome
 import kotlinx.android.synthetic.main.popup_window_browser_menu.view.backPopupMenuItem
 import kotlinx.android.synthetic.main.popup_window_browser_menu.view.brokenSitePopupMenuItem
 import kotlinx.android.synthetic.main.popup_window_browser_menu.view.findInPageMenuItem
+import kotlinx.android.synthetic.main.popup_window_browser_menu.view.fireproofWebsitePopupMenuItem
 import kotlinx.android.synthetic.main.popup_window_browser_menu.view.forwardPopupMenuItem
 import kotlinx.android.synthetic.main.popup_window_browser_menu.view.newTabPopupMenuItem
 import kotlinx.android.synthetic.main.popup_window_browser_menu.view.refreshPopupMenuItem
@@ -371,7 +376,15 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
     override fun onPause() {
         logoHidingListener.onPause()
         dismissDownloadFragment()
+        dismissAuthenticationDialog()
         super.onPause()
+    }
+
+    private fun dismissAuthenticationDialog() {
+        if (isAdded) {
+            val fragment = parentFragmentManager.findFragmentByTag(AUTHENTICATION_DIALOG_TAG) as? HttpAuthenticationDialogFragment
+            fragment?.dismiss()
+        }
     }
 
     private fun dismissDownloadFragment() {
@@ -496,6 +509,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
             }
             is Command.LaunchNewTab -> browserActivity?.launchNewTab()
             is Command.ShowBookmarkAddedConfirmation -> bookmarkAdded(it.bookmarkId, it.title, it.url)
+            is Command.ShowFireproofWebSiteConfirmation -> fireproofWebsiteConfirmation(it.fireproofWebsiteEntity)
             is Command.Navigate -> {
                 navigate(it.url)
             }
@@ -567,6 +581,8 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
             is Command.ShowErrorWithAction -> showErrorSnackbar(it)
             is Command.DaxCommand.FinishTrackerAnimation -> finishTrackerAnimation()
             is Command.DaxCommand.HideDaxDialog -> showHideTipsDialog(it.cta)
+            is Command.HideWebContent -> webView?.hide()
+            is Command.ShowWebContent -> webView?.show()
         }
     }
 
@@ -578,7 +594,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
     }
 
     private fun showErrorSnackbar(command: Command.ShowErrorWithAction) {
-        //Snackbar is global and it should appear only the foreground fragment
+        // Snackbar is global and it should appear only the foreground fragment
         if (!errorSnackbar.view.isAttachedToWindow && isVisible) {
             errorSnackbar.setAction(R.string.crashedWebViewErrorAction) { command.action() }.show()
         }
@@ -917,6 +933,18 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
                 val addBookmarkDialog = EditBookmarkDialogFragment.instance(bookmarkId, title, url)
                 addBookmarkDialog.show(childFragmentManager, ADD_BOOKMARK_FRAGMENT_TAG)
                 addBookmarkDialog.listener = viewModel
+            }
+            .show()
+    }
+
+    private fun fireproofWebsiteConfirmation(entity: FireproofWebsiteEntity) {
+        Snackbar.make(
+            rootView,
+            HtmlCompat.fromHtml(getString(R.string.fireproofWebsiteSnackbarConfirmation, entity.website()), FROM_HTML_MODE_LEGACY),
+            Snackbar.LENGTH_LONG
+        )
+            .setAction(R.string.fireproofWebsiteSnackbarAction) {
+                viewModel.onFireproofWebsiteSnackbarUndoClicked(entity)
             }
             .show()
     }
@@ -1295,6 +1323,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
                     browserActivity?.launchBookmarks()
                     pixel.fire(String.format(Locale.US, Pixel.PixelName.MENU_ACTION_BOOKMARKS_PRESSED.pixelName, variantManager.getVariant().key))
                 }
+                onMenuItemClicked(view.fireproofWebsitePopupMenuItem) { launch { viewModel.onFireproofWebsiteClicked() } }
                 onMenuItemClicked(view.addBookmarksPopupMenuItem) { launch { viewModel.onBookmarkAddRequested() } }
                 onMenuItemClicked(view.findInPageMenuItem) { viewModel.onFindInPageSelected() }
                 onMenuItemClicked(view.whitelistPopupMenuItem) { viewModel.onWhitelistSelected() }
@@ -1331,6 +1360,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
                     pixel.fire(String.format(Locale.US, Pixel.PixelName.MENU_ACTION_NEW_TAB_PRESSED.pixelName, variantManager.getVariant().key))
                 }
                 onMenuItemClicked(view.addBookmarksPopupMenuItem) { launch { viewModel.onBookmarkAddRequested() } }
+                onMenuItemClicked(view.fireproofWebsitePopupMenuItem) { launch { viewModel.onFireproofWebsiteClicked() } }
                 onMenuItemClicked(view.findInPageMenuItem) { viewModel.onFindInPageSelected() }
                 onMenuItemClicked(view.whitelistPopupMenuItem) { viewModel.onWhitelistSelected() }
                 onMenuItemClicked(view.brokenSitePopupMenuItem) { viewModel.onBrokenSiteSelected() }
@@ -1426,7 +1456,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
         }
 
         private fun removeUnnecessaryLayoutBehaviour() {
-            val params: CoordinatorLayout.LayoutParams = bottomNavigationBar.getLayoutParams() as CoordinatorLayout.LayoutParams
+            val params: CoordinatorLayout.LayoutParams = bottomNavigationBar.layoutParams as CoordinatorLayout.LayoutParams
             params.behavior = null
         }
 
@@ -1655,6 +1685,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
                 refreshPopupMenuItem.isEnabled = browserShowing
                 newTabPopupMenuItem.isEnabled = browserShowing
                 addBookmarksPopupMenuItem?.isEnabled = viewState.canAddBookmarks
+                fireproofWebsitePopupMenuItem?.isEnabled = viewState.canFireproofSite
                 sharePageMenuItem?.isEnabled = viewState.canSharePage
                 whitelistPopupMenuItem?.isEnabled = viewState.canWhitelist
                 whitelistPopupMenuItem?.text = getText(if (viewState.isWhitelisted) R.string.whitelistRemove else R.string.whitelistAdd)

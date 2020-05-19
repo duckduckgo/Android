@@ -30,7 +30,6 @@ import com.duckduckgo.app.settings.db.SettingsDataStore
 import dagger.android.AndroidInjection
 import javax.inject.Inject
 
-
 abstract class DuckDuckGoActivity : AppCompatActivity() {
 
     @Inject

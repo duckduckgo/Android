@@ -211,6 +211,11 @@ class AppDatabaseTest {
         assertEquals(0, database().uncaughtExceptionDao().count())
     }
 
+    @Test
+    fun whenMigratingFromVersion20To21ThenValidationSucceeds() {
+        createDatabaseAndMigrate(20, 21, migrationsProvider.MIGRATION_20_TO_21)
+    }
+
     private fun createDatabase(version: Int) {
         testHelper.createDatabase(TEST_DB_NAME, version).close()
     }

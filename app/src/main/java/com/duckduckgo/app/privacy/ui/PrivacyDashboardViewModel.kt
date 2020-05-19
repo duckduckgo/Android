@@ -197,6 +197,3 @@ class PrivacyDashboardViewModel(
         private const val LEADERBOARD_MIN_DOMAINS_EXCLUSIVE = 30
     }
 }
-
-
-

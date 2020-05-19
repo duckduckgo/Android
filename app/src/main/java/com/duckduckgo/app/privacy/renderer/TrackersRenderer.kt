@@ -22,7 +22,6 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardEntry
 import java.util.*
 
-
 class TrackersRenderer {
 
     fun trackersText(context: Context, trackerCount: Int, allTrackersBlocked: Boolean): String {

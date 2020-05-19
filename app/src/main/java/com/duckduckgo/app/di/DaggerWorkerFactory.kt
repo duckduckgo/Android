@@ -22,10 +22,12 @@ import androidx.work.ListenableWorker
 import androidx.work.WorkerFactory
 import androidx.work.WorkerParameters
 import com.duckduckgo.app.fire.DataClearingWorker
+import com.duckduckgo.app.global.job.AppConfigurationWorker
 import com.duckduckgo.app.global.view.ClearDataAction
+import com.duckduckgo.app.job.ConfigurationDownloader
+import com.duckduckgo.app.notification.NotificationFactory
 import com.duckduckgo.app.notification.NotificationScheduler.ClearDataNotificationWorker
 import com.duckduckgo.app.notification.NotificationScheduler.PrivacyNotificationWorker
-import com.duckduckgo.app.notification.NotificationFactory
 import com.duckduckgo.app.notification.db.NotificationDao
 import com.duckduckgo.app.notification.model.ClearDataNotification
 import com.duckduckgo.app.notification.model.PrivacyProtectionNotification
@@ -44,6 +46,7 @@ class DaggerWorkerFactory(
     private val notificationFactory: NotificationFactory,
     private val clearDataNotification: ClearDataNotification,
     private val privacyProtectionNotification: PrivacyProtectionNotification,
+    private val configurationDownloader: ConfigurationDownloader,
     private val pixel: Pixel
 ) : WorkerFactory() {
 
@@ -59,15 +62,20 @@ class DaggerWorkerFactory(
                 is DataClearingWorker -> injectDataClearWorker(instance)
                 is ClearDataNotificationWorker -> injectClearDataNotificationWorker(instance)
                 is PrivacyNotificationWorker -> injectPrivacyNotificationWorker(instance)
+                is AppConfigurationWorker -> injectAppConfigurationWorker(instance)
                 else -> Timber.i("No injection required for worker $workerClassName")
             }
 
             return instance
-        } catch (exception: Exception){
+        } catch (exception: Exception) {
             Timber.e(exception, "Worker $workerClassName could not be created")
             return null
         }
 
+    }
+
+    private fun injectAppConfigurationWorker(worker: AppConfigurationWorker) {
+        worker.appConfigurationDownloader = configurationDownloader
     }
 
     private fun injectOfflinePixelWorker(worker: OfflinePixelScheduler.OfflinePixelWorker) {

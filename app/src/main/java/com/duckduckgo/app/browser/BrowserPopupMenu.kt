@@ -78,4 +78,3 @@ class BrowserPopupMenu(layoutInflater: LayoutInflater, variant: Variant, view: V
         }
     }
 }
-

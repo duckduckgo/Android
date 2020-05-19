@@ -46,7 +46,6 @@ import org.jetbrains.anko.longToast
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 
-
 class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, CoroutineScope {
 
     override val coroutineContext: CoroutineContext
@@ -85,7 +84,7 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
         setContentView(R.layout.activity_tab_switcher)
         extractIntentExtras()
         configureViewReferences()
-       setupToolbar(toolbar)
+        setupToolbar(toolbar)
         configureRecycler()
         configureObservers()
     }
@@ -111,7 +110,6 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
             }
         }))
         swipeListener.attachToRecyclerView(tabsRecycler)
-
 
         tabGridItemDecorator = TabGridItemDecorator(this, selectedTabId)
         tabsRecycler.addItemDecoration(tabGridItemDecorator)

@@ -31,6 +31,3 @@ abstract class NotificationDao {
     @Query("select count(1) > 0 from notification where notificationId = :notificationId")
     abstract fun exists(notificationId: String): Boolean
 }
-
-
-

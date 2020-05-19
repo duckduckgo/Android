@@ -35,8 +35,8 @@ class AppEnjoymentAppCreationObserver(
     @UiThread
     @OnLifecycleEvent(Lifecycle.Event.ON_START)
     fun onAppStart() {
-            GlobalScope.launch(Dispatchers.Main) {
-                appEnjoymentPromptEmitter.promptType.value = promptTypeDecider.determineInitialPromptType()
-            }
+        GlobalScope.launch(Dispatchers.Main) {
+            appEnjoymentPromptEmitter.promptType.value = promptTypeDecider.determineInitialPromptType()
+        }
     }
 }

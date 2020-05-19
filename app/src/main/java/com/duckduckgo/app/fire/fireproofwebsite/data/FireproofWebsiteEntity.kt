@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 DuckDuckGo
+ * Copyright (c) 2020 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,25 +14,19 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.tabs.model
+package com.duckduckgo.app.fire.fireproofwebsite.data
 
 import androidx.room.Entity
-import androidx.room.ForeignKey
-import androidx.room.Index
 import androidx.room.PrimaryKey
 
+private const val WWW_PREFIX = "www."
 
-@Entity(
-    tableName = "tab_selection",
-    foreignKeys = [
-        ForeignKey(
-            entity = TabEntity::class,
-            parentColumns = ["tabId"],
-            childColumns = ["tabId"],
-            onDelete = ForeignKey.SET_NULL
-        )],
-    indices = [
-        Index("tabId")
-    ]
+@Entity(tableName = "fireproofWebsites")
+data class FireproofWebsiteEntity(
+    @PrimaryKey val domain: String
 )
-data class TabSelectionEntity(@PrimaryKey var id: Int = 1, var tabId: String?)
+
+fun FireproofWebsiteEntity.website(): String {
+    return domain.takeIf { it.startsWith(WWW_PREFIX, ignoreCase = true) }
+        ?.drop(WWW_PREFIX.length) ?: domain
+}

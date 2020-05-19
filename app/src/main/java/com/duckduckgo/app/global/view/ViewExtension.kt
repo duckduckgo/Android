@@ -21,7 +21,6 @@ import android.content.res.Resources
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 
-
 /*
  * Common view operations, simplified as Kotlin extensions
  * Based on https://github.com/ravidsrk/kotlinextensions.com

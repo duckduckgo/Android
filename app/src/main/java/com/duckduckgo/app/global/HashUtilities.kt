@@ -22,7 +22,6 @@ import java.security.MessageDigest
 val ByteArray.sha256: String
     get() = sha("SHA-256", this)
 
-
 fun ByteArray.verifySha256(sha256: String): Boolean {
     return this.sha256 == sha256
 }

@@ -38,7 +38,6 @@ import kotlinx.android.synthetic.main.item_tracker_network_header.view.*
 import java.util.*
 import kotlin.collections.ArrayList
 
-
 class TrackerNetworksAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     companion object {
@@ -159,4 +158,3 @@ class TrackerNetworksAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
         }
     }
 }
-

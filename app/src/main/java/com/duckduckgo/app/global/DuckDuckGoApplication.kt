@@ -266,7 +266,7 @@ open class DuckDuckGoApplication : HasAndroidInjector, Application(), LifecycleO
         appConfigurationSyncer.scheduleImmediateSync()
             .subscribeOn(Schedulers.io())
             .doAfterTerminate {
-                appConfigurationSyncer.scheduleRegularSync(this)
+                appConfigurationSyncer.scheduleRegularSync()
             }
             .subscribe({}, { Timber.w("Failed to download initial app configuration ${it.localizedMessage}") })
     }
@@ -301,6 +301,5 @@ open class DuckDuckGoApplication : HasAndroidInjector, Application(), LifecycleO
     companion object {
         private const val APP_RESTART_CAUSED_BY_FIRE_GRACE_PERIOD: Long = 10_000L
     }
-
 
 }

@@ -33,6 +33,7 @@ import com.duckduckgo.app.feedback.ui.negative.openended.ShareOpenEndedFeedbackF
 import com.duckduckgo.app.feedback.ui.negative.subreason.SubReasonNegativeFeedbackFragment
 import com.duckduckgo.app.feedback.ui.positive.initial.PositiveFeedbackLandingFragment
 import com.duckduckgo.app.fire.FireActivity
+import com.duckduckgo.app.fire.fireproofwebsite.ui.FireproofWebsitesActivity
 import com.duckduckgo.app.icon.ui.ChangeIconActivity
 import com.duckduckgo.app.job.AppConfigurationJobService
 import com.duckduckgo.app.launch.LaunchBridgeActivity
@@ -48,7 +49,6 @@ import com.duckduckgo.app.tabs.ui.TabSwitcherBottomBarFeatureActivity
 import com.duckduckgo.app.widget.ui.AddWidgetInstructionsActivity
 import dagger.Module
 import dagger.android.ContributesAndroidInjector
-
 
 @Module
 abstract class AndroidBindingModule {
@@ -125,6 +125,10 @@ abstract class AndroidBindingModule {
 
     @ActivityScoped
     @ContributesAndroidInjector
+    abstract fun fireproofWebsitesActivity(): FireproofWebsitesActivity
+
+    @ActivityScoped
+    @ContributesAndroidInjector
     abstract fun fireActivity(): FireActivity
 
     @ActivityScoped
@@ -175,9 +179,11 @@ abstract class AndroidBindingModule {
 
     /* Services */
 
+    @Suppress("DEPRECATION")
     @ContributesAndroidInjector
     abstract fun jobService(): AppConfigurationJobService
 
     @ContributesAndroidInjector
     abstract fun notificationHandlerService(): NotificationHandlerService
+
 }

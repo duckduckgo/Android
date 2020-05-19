@@ -19,7 +19,6 @@ package com.duckduckgo.app.feedback.ui.positive.initial
 import androidx.lifecycle.ViewModel
 import com.duckduckgo.app.global.SingleLiveEvent
 
-
 class PositiveFeedbackLandingViewModel : ViewModel() {
 
     val command: SingleLiveEvent<Command> = SingleLiveEvent()
