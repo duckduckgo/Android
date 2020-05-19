@@ -115,6 +115,7 @@ class BrowserTrackersAnimatorHelper {
     fun cancelAnimations() {
         stopTrackersAnimation()
         stopPulseAnimation()
+        listener?.onAnimationFinished()
     }
 
     fun finishTrackerAnimation(omnibarViews: List<View>, container: ViewGroup) {

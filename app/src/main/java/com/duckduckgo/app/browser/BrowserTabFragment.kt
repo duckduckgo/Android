@@ -1592,7 +1592,6 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
 
         fun cancelTrackersAnimation() {
             animatorHelper.cancelAnimations()
-            viewModel.stopShowingEmptyGrade()
         }
 
         fun renderGlobalViewState(viewState: GlobalLayoutViewState) {
