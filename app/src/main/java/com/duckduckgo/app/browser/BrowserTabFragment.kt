@@ -1591,7 +1591,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
         }
 
         fun cancelTrackersAnimation() {
-            animatorHelper.cancelAnimations()
+            animatorHelper.cancelAnimations(omnibarViews(), animationContainer)
         }
 
         fun renderGlobalViewState(viewState: GlobalLayoutViewState) {

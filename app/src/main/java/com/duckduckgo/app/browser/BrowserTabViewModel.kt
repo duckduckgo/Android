@@ -723,6 +723,11 @@ class BrowserTabViewModel(
         val showPrivacyGrade = !hasFocus
         val showSearchIcon = hasFocus
 
+        // show the real grade in case the animation was canceled before changing the state, this avoids showing an empty grade when regaining focus.
+        if (showPrivacyGrade) {
+            privacyGradeViewState.value = currentPrivacyGradeState().copy(showEmptyGrade = false)
+        }
+
         omnibarViewState.value = currentOmnibarViewState.copy(isEditing = hasFocus)
 
         val currentBrowserViewState = currentBrowserViewState()

@@ -676,6 +676,12 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenOmnibarDoesNotHaveFocusThenShowEmptyGradeIsFalse() {
+        testee.onOmnibarInputStateChanged(query = "", hasFocus = false, hasQueryChanged = false)
+        assertFalse(privacyGradeState().showEmptyGrade)
+    }
+
+    @Test
     fun whenOmnibarDoesNotHaveFocusThenPrivacyGradeIsShownAndSearchIconIsHidden() {
         testee.onOmnibarInputStateChanged(query = "", hasFocus = false, hasQueryChanged = false)
         assertTrue(browserViewState().showPrivacyGrade)
