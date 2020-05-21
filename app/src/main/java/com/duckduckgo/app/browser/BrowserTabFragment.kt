@@ -1512,7 +1512,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
 
                 if (canChangeGrade) {
                     context?.let {
-                        val drawable = if (viewState.showEmptyGrade) {
+                        val drawable = if (viewState.showEmptyGrade || viewState.shouldAnimate) {
                             ContextCompat.getDrawable(it, R.drawable.privacygrade_icon_loading)
                         } else {
                             ContextCompat.getDrawable(it, viewState.privacyGrade.icon())

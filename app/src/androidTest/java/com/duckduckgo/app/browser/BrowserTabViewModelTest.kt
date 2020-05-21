@@ -653,6 +653,15 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenProgressChangesButIsTheSameAsBeforeThenDoNotUpdateState() {
+        setBrowserShowing(true)
+        testee.progressChanged(100)
+        testee.stopShowingEmptyGrade()
+        testee.progressChanged(100)
+        assertFalse(privacyGradeState().showEmptyGrade)
+    }
+
+    @Test
     fun whenNotShowingEmptyGradeAndPrivacyGradeIsNotUnknownThenIsEnableIsTrue() {
         val testee = BrowserTabViewModel.PrivacyGradeViewState(PrivacyGrade.A, shouldAnimate = false, showEmptyGrade = false)
         assertTrue(testee.isEnabled)
