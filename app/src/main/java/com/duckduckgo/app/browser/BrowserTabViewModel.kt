@@ -615,6 +615,7 @@ class BrowserTabViewModel(
         if (!currentBrowserViewState().browserShowing) return
         val isLoading = newProgress < 100
         val progress = currentLoadingViewState()
+        if (progress.progress == newProgress) return
         val visualProgress = if (newProgress < FIXED_PROGRESS) {
             FIXED_PROGRESS
         } else {
