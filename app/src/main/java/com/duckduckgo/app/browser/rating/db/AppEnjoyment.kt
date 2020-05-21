@@ -55,7 +55,8 @@ interface AppEnjoymentDao {
 data class AppEnjoymentEntity(
     val eventType: AppEnjoymentEventType,
     val promptCount: PromptCount,
-    val timestamp: Long = System.currentTimeMillis(), @PrimaryKey(autoGenerate = true) val primaryKey: Int = 0
+    val timestamp: Long = System.currentTimeMillis(),
+    @PrimaryKey(autoGenerate = true) val primaryKey: Int = 0
 )
 
 enum class AppEnjoymentEventType(val value: Int) {

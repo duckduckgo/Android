@@ -28,7 +28,6 @@ import com.duckduckgo.app.global.view.hideKeyboard
 import com.duckduckgo.app.global.view.showKeyboard
 import org.jetbrains.anko.find
 
-
 class EditBookmarkDialogFragment : DialogFragment() {
 
     interface EditBookmarkListener {

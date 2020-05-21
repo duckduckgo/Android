@@ -32,7 +32,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 
-
 class FeedbackViewModel(private val playStoreUtils: PlayStoreUtils, private val feedbackSubmitter: FeedbackSubmitter) : ViewModel() {
 
     val command: SingleLiveEvent<Command> = SingleLiveEvent()
@@ -44,7 +43,6 @@ class FeedbackViewModel(private val playStoreUtils: PlayStoreUtils, private val 
 
     private val currentViewState: UpdateViewCommand
         get() = updateViewCommand.value!!
-
 
     fun userSelectedNegativeFeedbackMainReason(mainReason: MainReason) {
         val newState = when (mainReason) {

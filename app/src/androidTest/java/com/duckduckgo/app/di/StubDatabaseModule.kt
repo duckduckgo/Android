@@ -23,7 +23,6 @@ import dagger.Module
 import dagger.Provides
 import javax.inject.Singleton
 
-
 @Module(includes = [DaoModule::class])
 class StubDatabaseModule {
 

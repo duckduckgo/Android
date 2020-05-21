@@ -24,7 +24,6 @@ import androidx.core.view.isVisible
 import com.duckduckgo.app.global.view.toDp
 import timber.log.Timber
 
-
 class LogoHidingLayoutChangeLifecycleListener(private var ddgLogoView: View) : View.OnLayoutChangeListener {
 
     var callToActionView: View? = null

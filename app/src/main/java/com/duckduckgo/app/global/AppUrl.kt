@@ -16,7 +16,6 @@
 
 package com.duckduckgo.app.global
 
-
 class AppUrl {
 
     object Url {

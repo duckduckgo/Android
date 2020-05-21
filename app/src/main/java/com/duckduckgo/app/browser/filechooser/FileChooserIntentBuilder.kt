@@ -21,7 +21,6 @@ import android.net.Uri
 import timber.log.Timber
 import javax.inject.Inject
 
-
 class FileChooserIntentBuilder @Inject constructor() {
 
     fun intent(acceptTypes: Array<String>, canChooseMultiple: Boolean = false): Intent {

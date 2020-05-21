@@ -29,7 +29,6 @@ import com.duckduckgo.app.global.view.show
 import com.duckduckgo.app.settings.clear.ClearWhenOption
 import com.duckduckgo.app.settings.clear.ClearWhenOption.*
 
-
 class SettingsAutomaticallyClearWhenFragment : DialogFragment() {
 
     interface Listener {
@@ -82,7 +81,7 @@ class SettingsAutomaticallyClearWhenFragment : DialogFragment() {
     }
 
     @IdRes
-    private fun ClearWhenOption.radioButtonId() : Int {
+    private fun ClearWhenOption.radioButtonId(): Int {
         return when (this) {
             ClearWhenOption.APP_EXIT_ONLY -> R.id.settingAppExitOnly
             ClearWhenOption.APP_EXIT_OR_5_MINS -> R.id.settingInactive5Mins

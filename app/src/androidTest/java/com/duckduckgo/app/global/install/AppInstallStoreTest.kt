@@ -22,7 +22,6 @@ import org.junit.Assert.assertEquals
 import org.junit.Test
 import java.util.concurrent.TimeUnit
 
-
 class AppInstallStoreTest {
 
     var testee: AppInstallStore = mock()

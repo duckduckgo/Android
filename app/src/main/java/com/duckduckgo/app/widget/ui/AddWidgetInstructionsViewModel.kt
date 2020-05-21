@@ -37,5 +37,4 @@ class AddWidgetInstructionsViewModel : ViewModel() {
     fun onClosePressed() {
         command.value = Close
     }
-
 }

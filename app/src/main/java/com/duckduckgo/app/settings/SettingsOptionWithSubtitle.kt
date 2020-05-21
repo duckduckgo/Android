@@ -27,7 +27,6 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import com.duckduckgo.app.browser.R
 import org.jetbrains.anko.childrenRecursiveSequence
 
-
 class SettingsOptionWithSubtitle : ConstraintLayout {
 
     private var root: View
@@ -60,6 +59,5 @@ class SettingsOptionWithSubtitle : ConstraintLayout {
         root.childrenRecursiveSequence().forEach { it.isEnabled = enabled }
         super.setEnabled(enabled)
     }
-
 
 }

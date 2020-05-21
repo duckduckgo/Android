@@ -50,7 +50,6 @@ import com.duckduckgo.app.widget.ui.AddWidgetInstructionsActivity
 import dagger.Module
 import dagger.android.ContributesAndroidInjector
 
-
 @Module
 abstract class AndroidBindingModule {
 
@@ -180,9 +179,11 @@ abstract class AndroidBindingModule {
 
     /* Services */
 
+    @Suppress("DEPRECATION")
     @ContributesAndroidInjector
     abstract fun jobService(): AppConfigurationJobService
 
     @ContributesAndroidInjector
     abstract fun notificationHandlerService(): NotificationHandlerService
+
 }

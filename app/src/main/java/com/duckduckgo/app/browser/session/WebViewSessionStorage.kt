@@ -22,7 +22,6 @@ import android.util.LruCache
 import android.webkit.WebView
 import timber.log.Timber
 
-
 interface WebViewSessionStorage {
     fun saveSession(webView: WebView?, tabId: String)
     fun restoreSession(webView: WebView?, tabId: String): Boolean

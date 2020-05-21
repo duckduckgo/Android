@@ -40,4 +40,3 @@ class NetworkFileDownloader @Inject constructor(private val context: Context) {
         manager?.enqueue(request)
     }
 }
-

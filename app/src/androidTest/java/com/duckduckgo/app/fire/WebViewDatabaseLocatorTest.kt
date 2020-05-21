@@ -33,8 +33,8 @@ class WebViewDatabaseLocatorTest {
 
         val databasePath = webViewDatabaseLocator.getDatabasePath()
 
-        //If this test fails, it means WebViewDatabase path has changed its location
-        //If so, add a new database location to knownLocations list
+        // If this test fails, it means WebViewDatabase path has changed its location
+        // If so, add a new database location to knownLocations list
         assertTrue(databasePath.isNotEmpty())
     }
 

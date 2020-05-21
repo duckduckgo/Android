@@ -32,7 +32,6 @@ import kotlinx.coroutines.*
 import timber.log.Timber
 import java.net.URI
 
-
 class BrowserWebViewClient(
     private val requestRewriter: RequestRewriter,
     private val specialUrlDetector: SpecialUrlDetector,

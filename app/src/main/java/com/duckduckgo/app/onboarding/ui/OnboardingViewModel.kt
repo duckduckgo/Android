@@ -43,7 +43,7 @@ class OnboardingViewModel(
     }
 
     fun onOnboardingDone() {
-        //Executing this on IO to avoid any delay changing threads between Main-IO.
+        // Executing this on IO to avoid any delay changing threads between Main-IO.
         viewModelScope.launch(dispatchers.io()) {
             userStageStore.stageCompleted(AppStage.NEW)
         }
