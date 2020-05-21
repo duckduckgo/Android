@@ -32,7 +32,6 @@ import kotlinx.coroutines.*
 import timber.log.Timber
 import java.net.URI
 
-
 class BrowserWebViewClient(
     private val requestRewriter: RequestRewriter,
     private val specialUrlDetector: SpecialUrlDetector,
@@ -132,12 +131,15 @@ class BrowserWebViewClient(
         }
     }
 
+    private val loginDetector = LoginDetector()
+
     @UiThread
     override fun onPageFinished(webView: WebView, url: String?) {
         try {
             val navigationList = webView.safeCopyBackForwardList() ?: return
             webViewClientListener?.navigationStateChanged(WebViewNavigationState(navigationList))
             flushCookies()
+            loginDetector.injectJS(webView)
         } catch (e: Throwable) {
             GlobalScope.launch {
                 uncaughtExceptionRepository.recordUncaughtException(e, ON_PAGE_FINISHED)
@@ -242,5 +244,121 @@ class BrowserWebViewClient(
 
             it.requiresAuthentication(request)
         }
+    }
+}
+
+class LoginDetector() {
+
+    fun injectJS(webView: WebView) {
+        val javascript = "(function() {\n" +
+                "  LoginDetection.showToast(\"installing loginDetection.js - IN\");\n" +
+                "\n" +
+                "  function loginFormDetected() {\n" +
+                "    try {\n" +
+                "      LoginDetection.loginDetected(\"login detected\");\n" +
+                "    } catch (error) {\n" +
+                "    }\n" +
+                "  }\n" +
+                "\n" +
+                "  function inputVisible(input) {\n" +
+                "    return !(input.offsetWidth === 0 && input.offsetHeight === 0) && !input.ariaHidden && !input.hidden;\n" +
+                "  }\n" +
+                "\n" +
+                "  function checkIsLoginForm(form) {\n" +
+                "    LoginDetection.showToast(\"checking form \" + form);\n" +
+                "\n" +
+                "    var inputs = form.getElementsByTagName(\"input\");\n" +
+                "    if (!inputs) {\n" +
+                "      return;\n" +
+                "    }\n" +
+                "\n" +
+                "    for (var i = 0; i < inputs.length; i++) {\n" +
+                "      var input = inputs.item(i);\n" +
+                "      if (input.type == \"password\" && inputVisible(input)) {\n" +
+                "        LoginDetection.showToast(\"found password in form \" + form);\n" +
+                "        loginFormDetected();\n" +
+                "        return true;\n" +
+                "      }\n" +
+                "    }\n" +
+                "\n" +
+                "    LoginDetection.showToast(\"no password field in form \" + form);\n" +
+                "    return false;\n" +
+                "  }\n" +
+                "\n" +
+                "  function submitHandler(event) {\n" +
+                "    checkIsLoginForm(event.target);\n" +
+                "  }\n" +
+                "\n" +
+                "  function scanForForms() {\n" +
+                "    LoginDetection.showToast(\"Scanning for forms\");\n" +
+                "\n" +
+                "    var forms = document.forms;\n" +
+                "    if (!forms || forms.length == 0) {\n" +
+                "      LoginDetection.showToast(\"No forms found\");\n" +
+                "      return;\n" +
+                "    }\n" +
+                "\n" +
+                "    for (var i = 0; i < forms.length; i++) {\n" +
+                "      var form = forms[i];\n" +
+                "      form.removeEventListener(\"submit\", submitHandler);\n" +
+                "      form.addEventListener(\"submit\", submitHandler);\n" +
+                "      LoginDetection.showToast(\"adding form handler \" + i);\n" +
+                "    }\n" +
+                "\n" +
+                "  }\n" +
+                "\n" +
+                "  window.addEventListener(\"DOMContentLoaded\", function(event) {\n" +
+                "    LoginDetection.showToast(\"Adding to DOM\");\n" +
+                "    setTimeout(scanForForms, 1000);\n" +
+                "  });\n" +
+                "\n" +
+                "  window.addEventListener(\"click\", scanForForms);\n" +
+                "  window.addEventListener(\"beforeunload\", scanForForms);\n" +
+                "\n" +
+                "  window.addEventListener(\"submit\", submitHandler);\n" +
+                "\n" +
+                "  try {\n" +
+                "    const observer = new PerformanceObserver((list, observer) => {\n" +
+                "      LoginDetection.showToast(\"XHR: Observer callback - IN\");\n" +
+                "      const entries = list.getEntries().filter((entry) => {\n" +
+                "        var found = entry.initiatorType == \"xmlhttprequest\" && entry.name.split(\"?\")[0].match(/login|sign-in/);\n" +
+                "        if (found) {\n" +
+                "          LoginDetection.showToast(\"XHR: observed login - \" + entry.name.split(\"?\")[0]);\n" +
+                "          LoginDetection.loginDetected(\"XHR: observed login - \" + entry.name.split(\"?\")[0]);\n" +
+                "        }\n" +
+                "        return found;\n" +
+                "      });\n" +
+                "\n" +
+                "      if (entries.length == 0) {\n" +
+                "        return;\n" +
+                "      }\n" +
+                "\n" +
+                "      LoginDetection.showToast(\"XHR: checking forms - IN\");\n" +
+                "      var forms = document.forms;\n" +
+                "      if (!forms || forms.length == 0) {\n" +
+                "        LoginDetection.showToast(\"XHR: No forms found\");\n" +
+                "        return;\n" +
+                "      }\n" +
+                "\n" +
+                "      for (var i = 0; i < forms.length; i++) {\n" +
+                "        if (checkIsLoginForm(forms[i])) {\n" +
+                "          LoginDetection.showToast(\"XHR: found login form\");\n" +
+                "          break;\n" +
+                "        }\n" +
+                "      }\n" +
+                "      LoginDetection.showToast(\"XHR: checking forms - OUT\");\n" +
+                "\n" +
+                "    });\n" +
+                "    observer.observe({\n" +
+                "      entryTypes: [\"resource\"]\n" +
+                "    });\n" +
+                "  } catch (error) {\n" +
+                "  }\n" +
+                "\n" +
+                "  setTimeout(scanForForms, 1000);" +
+                "  LoginDetection.showToast(\"installing loginDetection.js - OUT\");\n" +
+                "\n" +
+                "})();"
+        webView.evaluateJavascript("javascript:$javascript", null)
     }
 }

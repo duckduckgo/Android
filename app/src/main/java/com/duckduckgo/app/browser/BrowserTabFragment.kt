@@ -860,6 +860,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
             registerForContextMenu(it)
 
             it.setFindListener(this)
+            it.addJavascriptInterface(LoginDetectionInterface(requireContext(), viewModel), "LoginDetection")
         }
 
         if (BuildConfig.DEBUG) {

@@ -29,11 +29,7 @@ import android.webkit.WebView
 import androidx.annotation.AnyThread
 import androidx.annotation.VisibleForTesting
 import androidx.core.net.toUri
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import com.duckduckgo.app.autocomplete.api.AutoComplete
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteResult
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion
@@ -51,6 +47,7 @@ import com.duckduckgo.app.browser.SpecialUrlDetector.UrlType.IntentType
 import com.duckduckgo.app.browser.WebNavigationStateChange.*
 import com.duckduckgo.app.browser.addtohome.AddToHomeCapabilityDetector
 import com.duckduckgo.app.browser.favicon.FaviconDownloader
+import com.duckduckgo.app.browser.logindetection.LoginDetectionDelegate
 import com.duckduckgo.app.browser.model.BasicAuthenticationCredentials
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.browser.model.LongPressTarget
@@ -245,6 +242,7 @@ class BrowserTabViewModel(
     private lateinit var tabId: String
     private var webNavigationState: WebNavigationState? = null
     private var httpsUpgraded = false
+    private val loginDetection = LoginDetectionDelegate()
     private val fireproofWebsitesObserver = Observer<List<FireproofWebsiteEntity>> {
         browserViewState.value = currentBrowserViewState().copy(canFireproofSite = canFireproofWebsite())
     }
@@ -505,6 +503,11 @@ class BrowserTabViewModel(
             is UrlUpdated -> urlUpdated(stateChange.url)
             is PageNavigationCleared -> disableUserNavigation()
         }
+
+        val loginDetected = loginDetection.onEvent(LoginDetectionDelegate.Event.NavigationEvent(stateChange))
+        if (loginDetected) {
+            command.value = ShowFireproofWebSiteConfirmation(FireproofWebsiteEntity(url!!))
+        }
     }
 
     private fun pageChanged(url: String, title: String?) {
@@ -617,6 +620,10 @@ class BrowserTabViewModel(
             newProgress
         }
         loadingViewState.value = progress.copy(isLoading = isLoading, progress = visualProgress)
+
+        if (!isLoading) {
+            loginDetection.onEvent(LoginDetectionDelegate.Event.PageFinished)
+        }
     }
 
     private fun registerSiteVisit() {
@@ -1168,6 +1175,10 @@ class BrowserTabViewModel(
     private fun recoverTabWithQuery(query: String) {
         closeCurrentTab()
         command.value = OpenInNewTab(query)
+    }
+
+    fun loginDetected() {
+        url?.takeIf { it.isNotEmpty() }?.let { loginDetection.onEvent(LoginDetectionDelegate.Event.LoginDetected(it)) }
     }
 
     companion object {
