@@ -506,7 +506,7 @@ class BrowserTabViewModel(
 
         val loginDetected = loginDetection.onEvent(LoginDetectionDelegate.Event.NavigationEvent(stateChange))
         if (loginDetected) {
-            command.value = ShowFireproofWebSiteConfirmation(FireproofWebsiteEntity(url!!))
+            onFireproofWebsiteClicked()
         }
     }
 
@@ -1177,7 +1177,7 @@ class BrowserTabViewModel(
         command.value = OpenInNewTab(query)
     }
 
-    fun loginDetected() {
+    override fun loginDetected() {
         url?.takeIf { it.isNotEmpty() }?.let { loginDetection.onEvent(LoginDetectionDelegate.Event.LoginDetected(it)) }
     }
 

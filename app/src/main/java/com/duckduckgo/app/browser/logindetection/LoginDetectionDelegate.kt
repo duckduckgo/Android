@@ -18,6 +18,7 @@ package com.duckduckgo.app.browser.logindetection
 
 import android.net.Uri
 import com.duckduckgo.app.browser.WebNavigationStateChange
+import timber.log.Timber
 
 class LoginDetectionDelegate {
     private var loginDetected: String? = null
@@ -29,6 +30,7 @@ class LoginDetectionDelegate {
     }
 
     fun onEvent(event: Event): Boolean {
+        Timber.i("LoginDetectionInterface $event")
         return when (event) {
             is Event.PageFinished -> {
                 loginDetected = null
@@ -66,6 +68,7 @@ class LoginDetectionDelegate {
     }
 
     private fun detectLogin(url: String): Boolean {
+        Timber.i("LoginDetectionInterface $loginDetected vs $url")
         if (loginDetected != null) {
             val loginURI = Uri.parse(loginDetected)
             val currentURI = Uri.parse(url)

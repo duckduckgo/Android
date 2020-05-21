@@ -159,7 +159,10 @@ class BrowserWebViewClient(
         return runBlocking {
             try {
                 val documentUrl = withContext(Dispatchers.Main) { webView.url }
-                Timber.v("Intercepting resource ${request.url} on page $documentUrl")
+                if (loginDetector.interceptPost(request)) {
+                    webViewClientListener?.loginDetected()
+                }
+                Timber.v("Intercepting resource ${request.url} type:${request.method} on page $documentUrl")
                 requestInterceptor.shouldIntercept(request, webView, documentUrl, webViewClientListener)
             } catch (e: Throwable) {
                 uncaughtExceptionRepository.recordUncaughtException(e, SHOULD_INTERCEPT_REQUEST)
@@ -247,7 +250,18 @@ class BrowserWebViewClient(
     }
 }
 
-class LoginDetector() {
+class LoginDetector {
+
+    fun interceptPost(request: WebResourceRequest): Boolean {
+        if (request.method == "POST") {
+            Timber.i("LoginDetectionInterface evaluate ${request.url}")
+            if (request.url?.path?.contains(Regex("login|sign-in|sessions")) == true) {
+                Timber.i("LoginDetectionInterface post login DETECTED")
+                return true
+            }
+        }
+        return false
+    }
 
     fun injectJS(webView: WebView) {
         val javascript = "(function() {\n" +
