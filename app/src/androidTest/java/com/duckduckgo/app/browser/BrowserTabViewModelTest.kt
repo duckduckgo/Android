@@ -565,10 +565,6 @@ class BrowserTabViewModelTest {
     fun whenBrowsingAndViewModelGetsProgressUpdateLowerThan50ThenViewStateIsUpdatedTo50() {
         setBrowserShowing(true)
 
-        testee.progressChanged(0)
-        assertEquals(50, loadingViewState().progress)
-        assertEquals(true, loadingViewState().isLoading)
-
         testee.progressChanged(15)
         assertEquals(50, loadingViewState().progress)
         assertEquals(true, loadingViewState().isLoading)
@@ -648,6 +644,15 @@ class BrowserTabViewModelTest {
     fun whenProgressChangesAndPrivacyIsOffAndSiteIsFullyLoadedThenShowLoadingGradeIsFalse() {
         setBrowserShowing(true)
         testee.loadingViewState.value = loadingViewState().copy(privacyOn = false)
+        testee.progressChanged(100)
+        assertFalse(privacyGradeState().showEmptyGrade)
+    }
+
+    @Test
+    fun whenProgressChangesButIsTheSameAsBeforeThenDoNotUpdateState() {
+        setBrowserShowing(true)
+        testee.progressChanged(100)
+        testee.stopShowingEmptyGrade()
         testee.progressChanged(100)
         assertFalse(privacyGradeState().showEmptyGrade)
     }
