@@ -565,10 +565,6 @@ class BrowserTabViewModelTest {
     fun whenBrowsingAndViewModelGetsProgressUpdateLowerThan50ThenViewStateIsUpdatedTo50() {
         setBrowserShowing(true)
 
-        testee.progressChanged(0)
-        assertEquals(50, loadingViewState().progress)
-        assertEquals(true, loadingViewState().isLoading)
-
         testee.progressChanged(15)
         assertEquals(50, loadingViewState().progress)
         assertEquals(true, loadingViewState().isLoading)
