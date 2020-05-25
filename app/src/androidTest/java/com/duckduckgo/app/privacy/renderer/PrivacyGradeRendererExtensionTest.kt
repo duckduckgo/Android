@@ -21,7 +21,6 @@ import com.duckduckgo.app.privacy.model.PrivacyGrade
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
-
 class PrivacyGradeRendererExtensionTest {
 
     @Test

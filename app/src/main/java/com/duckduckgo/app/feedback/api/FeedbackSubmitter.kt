@@ -30,7 +30,6 @@ import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.util.*
 
-
 interface FeedbackSubmitter {
 
     suspend fun sendNegativeFeedback(mainReason: MainReason, subReason: SubReason?, openEnded: String)
@@ -40,11 +39,11 @@ interface FeedbackSubmitter {
 }
 
 class FireAndForgetFeedbackSubmitter(
-        private val feedbackService: FeedbackService,
-        private val variantManager: VariantManager,
-        private val apiKeyMapper: SubReasonApiMapper,
-        private val statisticsDataStore: StatisticsDataStore,
-        private val pixel: Pixel
+    private val feedbackService: FeedbackService,
+    private val variantManager: VariantManager,
+    private val apiKeyMapper: SubReasonApiMapper,
+    private val statisticsDataStore: StatisticsDataStore,
+    private val pixel: Pixel
 ) : FeedbackSubmitter {
     override suspend fun sendNegativeFeedback(mainReason: MainReason, subReason: SubReason?, openEnded: String) {
         Timber.i("User provided negative feedback: {$openEnded}. mainReason = $mainReason, subReason = $subReason")
@@ -95,7 +94,8 @@ class FireAndForgetFeedbackSubmitter(
                     rating = NEGATIVE_FEEDBACK,
                     url = brokenSite,
                     openEnded = openEnded,
-                    category = category)
+                    category = category
+                )
             }
                 .onSuccess { Timber.i("Successfully submitted broken site feedback") }
                 .onFailure { Timber.w(it, "Failed to send broken site feedback") }

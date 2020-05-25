@@ -30,7 +30,6 @@ import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
 import javax.inject.Inject
 
-
 class AppShortcutCreator @Inject constructor() {
 
     @RequiresApi(Build.VERSION_CODES.N_MR1)

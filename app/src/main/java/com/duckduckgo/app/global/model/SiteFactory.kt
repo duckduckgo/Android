@@ -24,7 +24,6 @@ import com.duckduckgo.app.trackerdetection.model.Entity
 import javax.inject.Inject
 import javax.inject.Singleton
 
-
 @Singleton
 class SiteFactory @Inject constructor(
     private val privacyPractices: PrivacyPractices,
@@ -55,7 +54,8 @@ class SiteFactory @Inject constructor(
     }
 
     data class SitePrivacyData(
-        val url: String, val practices: PrivacyPractices.Practices,
+        val url: String,
+        val practices: PrivacyPractices.Practices,
         val entity: Entity?,
         val prevalence: Double?
     )

@@ -57,7 +57,6 @@ class ResourceSurrogatesTest {
         assertTrue(retrieved.responseAvailable)
     }
 
-
     @Test
     fun whenSearchingForSubstringMatchingExistingSurrogateThenCanFindByName() {
         val surrogate = SurrogateResponse(name = "foo.com")

@@ -72,7 +72,6 @@ import com.duckduckgo.app.usage.search.SearchCountDao
 import com.duckduckgo.app.widget.ui.AddWidgetInstructionsViewModel
 import javax.inject.Inject
 
-
 @Suppress("UNCHECKED_CAST")
 class ViewModelFactory @Inject constructor(
     private val statisticsUpdater: StatisticsUpdater,

@@ -21,10 +21,10 @@ import androidx.lifecycle.Observer
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.DuckDuckGoActivity
-import kotlinx.coroutines.MainScope
-import kotlinx.coroutines.launch
 import com.duckduckgo.app.onboarding.ui.OnboardingActivity
 import com.duckduckgo.app.statistics.VariantManager
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 class LaunchBridgeActivity : DuckDuckGoActivity() {

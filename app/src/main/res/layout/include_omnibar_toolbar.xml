@@ -57,86 +57,87 @@
                     android:paddingStart="6dp"
                     android:paddingEnd="6dp">
 
-                    <androidx.constraintlayout.widget.ConstraintLayout
-                        android:id="@+id/networksContainer"
-                        android:layout_width="wrap_content"
-                        android:layout_height="match_parent"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toStartOf="parent" />
+                        <androidx.constraintlayout.widget.ConstraintLayout
+                            android:id="@+id/animationContainer"
+                            android:paddingStart="10dp"
+                            android:layout_width="wrap_content"
+                            android:layout_height="0dp"
+                            app:layout_constraintBottom_toBottomOf="@id/omnibarIconContainer"
+                            app:layout_constraintStart_toStartOf="@id/omnibarIconContainer"
+                            app:layout_constraintTop_toTopOf="@id/omnibarIconContainer"
 
-                    <FrameLayout
-                        android:id="@+id/omnibarIconContainer"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent">
+                            tools:ignore="RtlSymmetry" >
+                        </androidx.constraintlayout.widget.ConstraintLayout>
 
-                        <ImageButton
-                            android:id="@+id/privacyGradeButton"
+                        <FrameLayout
+                            android:id="@+id/omnibarIconContainer"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:background="?attr/selectableItemBackgroundBorderless"
-                            android:contentDescription="@string/privacyGradeContentDescription"
-                            android:padding="4dp"
-                            android:src="@drawable/privacygrade_icon_a"
                             app:layout_constraintBottom_toBottomOf="parent"
                             app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toTopOf="parent" />
+                            app:layout_constraintTop_toTopOf="parent">
+
+                            <ImageButton
+                                android:id="@+id/privacyGradeButton"
+                                android:layout_width="wrap_content"
+                                android:layout_height="match_parent"
+                                android:gravity="center"
+                                android:padding="4dp"
+                                android:background="?attr/selectableItemBackgroundBorderless"
+                                android:contentDescription="@string/privacyGradeContentDescription"
+                                android:src="@drawable/privacygrade_icon_loading" />
+
+                            <ImageView
+                                android:id="@+id/searchIcon"
+                                android:layout_width="wrap_content"
+                                android:layout_height="match_parent"
+                                android:gravity="center"
+                                android:contentDescription="@string/privacyGradeContentDescription"
+                                android:padding="4dp"
+                                android:src="@drawable/ic_loupe_24dp" />
+
+                        </FrameLayout>
+
+                        <com.duckduckgo.app.browser.omnibar.KeyboardAwareEditText
+                            android:id="@+id/omnibarTextInput"
+                            style="@style/Base.V7.Widget.AppCompat.EditText"
+                            android:layout_width="0dp"
+                            android:layout_height="0dp"
+                            android:background="@null"
+                            android:fontFamily="sans-serif"
+                            android:hint="@string/omnibarInputHint"
+                            android:imeOptions="flagNoExtractUi|actionGo|flagNoPersonalizedLearning"
+                            android:inputType="textUri|textNoSuggestions"
+                            android:maxLines="1"
+                            android:paddingStart="5dp"
+                            android:paddingEnd="8dp"
+                            android:selectAllOnFocus="true"
+                            android:textColor="?attr/omnibarTextColor"
+                            android:textColorHint="?attr/omnibarHintColor"
+                            android:textCursorDrawable="@drawable/text_cursor"
+                            android:textSize="16sp"
+                            android:textStyle="normal"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toStartOf="@id/clearTextButton"
+                            app:layout_constraintStart_toEndOf="@id/omnibarIconContainer"
+                            app:layout_constraintTop_toTopOf="parent"
+                            tools:text="https://duckduckgo.com/?q=areallylongexampleexample" />
 
                         <ImageView
-                            android:id="@+id/searchIcon"
+                            android:id="@+id/clearTextButton"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:contentDescription="@string/privacyGradeContentDescription"
-                            android:padding="4dp"
-                            android:src="@drawable/ic_loupe_24dp"
+                            android:background="?selectableItemBackground"
+                            android:contentDescription="@string/clearButtonContentDescription"
+                            android:padding="3dp"
+                            android:src="@drawable/ic_close"
+                            android:visibility="gone"
                             app:layout_constraintBottom_toBottomOf="parent"
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toTopOf="parent" />
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintTop_toTopOf="parent"
+                            tools:visibility="visible" />
 
-                    </FrameLayout>
-
-                    <com.duckduckgo.app.browser.omnibar.KeyboardAwareEditText
-                        android:id="@+id/omnibarTextInput"
-                        style="@style/Base.V7.Widget.AppCompat.EditText"
-                        android:layout_width="0dp"
-                        android:layout_height="0dp"
-                        android:background="@null"
-                        android:fontFamily="sans-serif"
-                        android:hint="@string/omnibarInputHint"
-                        android:imeOptions="flagNoExtractUi|actionGo|flagNoPersonalizedLearning"
-                        android:inputType="textUri|textNoSuggestions"
-                        android:maxLines="1"
-                        android:paddingStart="5dp"
-                        android:paddingEnd="8dp"
-                        android:selectAllOnFocus="true"
-                        android:textColor="?attr/omnibarTextColor"
-                        android:textColorHint="?attr/omnibarHintColor"
-                        android:textCursorDrawable="@drawable/text_cursor"
-                        android:textSize="16sp"
-                        android:textStyle="normal"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintEnd_toStartOf="@id/clearTextButton"
-                        app:layout_constraintStart_toEndOf="@id/omnibarIconContainer"
-                        app:layout_constraintTop_toTopOf="parent"
-                        tools:text="https://duckduckgo.com/?q=areallylongexampleexample" />
-
-                    <ImageView
-                        android:id="@+id/clearTextButton"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:background="?selectableItemBackground"
-                        android:contentDescription="@string/clearButtonContentDescription"
-                        android:padding="3dp"
-                        android:src="@drawable/ic_close"
-                        android:visibility="gone"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintTop_toTopOf="parent"
-                        tools:visibility="visible" />
-
-                </androidx.constraintlayout.widget.ConstraintLayout>
+                    </androidx.constraintlayout.widget.ConstraintLayout>
 
             </androidx.appcompat.widget.Toolbar>
 

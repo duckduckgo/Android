@@ -42,7 +42,7 @@ class SmoothProgressAnimator(private val pageLoadingIndicator: ProgressBar) {
             }
         }
     }
-    
+
     companion object {
         private const val MIN_PROGRESS_BAR = 75
         private const val ANIM_DURATION_PROGRESS_LONG = 1500L

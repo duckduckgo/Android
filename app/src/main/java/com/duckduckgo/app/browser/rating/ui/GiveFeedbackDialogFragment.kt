@@ -25,6 +25,7 @@ import com.duckduckgo.app.global.rating.PromptCount
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.*
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
+
 class GiveFeedbackDialogFragment : EnjoymentDialog() {
 
     interface Listener {

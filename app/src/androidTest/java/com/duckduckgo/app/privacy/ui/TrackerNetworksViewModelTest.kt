@@ -116,7 +116,6 @@ class TrackerNetworksViewModelTest {
         return site
     }
 
-
     object Entity {
         val MINOR_ENTITY_A = TestEntity("Minor A", "Minor A", 0.0)
         val MINOR_ENTITY_B = TestEntity("Minor B", "Minor B", 0.0)

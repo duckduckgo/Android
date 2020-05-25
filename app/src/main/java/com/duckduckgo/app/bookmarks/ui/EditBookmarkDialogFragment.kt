@@ -29,7 +29,6 @@ import com.duckduckgo.app.global.view.showKeyboard
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import org.jetbrains.anko.find
 
-
 class EditBookmarkDialogFragment : DialogFragment() {
 
     interface EditBookmarkListener {

@@ -25,7 +25,6 @@ import com.duckduckgo.app.global.ViewModelFactory
 import dagger.android.support.AndroidSupportInjection
 import javax.inject.Inject
 
-
 abstract class FeedbackFragment : Fragment() {
 
     @Inject

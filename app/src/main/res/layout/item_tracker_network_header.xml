@@ -57,7 +57,7 @@
         android:id="@+id/unknownIcon"
         android:layout_width="24dp"
         android:layout_height="24dp"
-        android:background="@drawable/other_tracker_bg"
+        android:background="@drawable/other_tracker_privacy_dashboard_bg"
         android:gravity="center"
         android:importantForAccessibility="no"
         android:textAppearance="@style/UnknownTrackerText"

@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-
 package com.duckduckgo.app.privacy.model
 
 import com.duckduckgo.app.FileUtilities
@@ -26,7 +25,6 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
 import timber.log.Timber
-
 
 @RunWith(Parameterized::class)
 class PredefinedGradeAvailableTest(private val testCase: GradeTestCase) {
