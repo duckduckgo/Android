@@ -24,7 +24,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup.LayoutParams.WRAP_CONTENT
 import android.widget.PopupWindow
-import com.duckduckgo.app.browser.BrowserPopupMenu
 import com.duckduckgo.app.browser.R
 
 class BookmarksPopupMenu(layoutInflater: LayoutInflater, view: View = inflate(layoutInflater, R.layout.popup_window_bookmarks_menu)) :
@@ -68,4 +67,3 @@ class BookmarksPopupMenu(layoutInflater: LayoutInflater, view: View = inflate(la
         }
     }
 }
-

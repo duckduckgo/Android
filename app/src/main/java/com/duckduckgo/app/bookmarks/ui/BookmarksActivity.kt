@@ -55,7 +55,6 @@ import kotlinx.android.synthetic.main.view_bookmark_entry.view.favicon
 import kotlinx.android.synthetic.main.view_bookmark_entry.view.overflowMenu
 import kotlinx.android.synthetic.main.view_bookmark_entry.view.title
 import kotlinx.android.synthetic.main.view_bookmark_entry.view.url
-import org.jetbrains.anko.alert
 import timber.log.Timber
 
 class BookmarksActivity : DuckDuckGoActivity() {

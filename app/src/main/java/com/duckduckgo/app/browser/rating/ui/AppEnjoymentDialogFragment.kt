@@ -18,7 +18,6 @@ package com.duckduckgo.app.browser.rating.ui
 
 import android.app.Dialog
 import android.os.Bundle
-import androidx.appcompat.app.AlertDialog
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.dialog.BackKeyListener
 import com.duckduckgo.app.global.rating.PromptCount

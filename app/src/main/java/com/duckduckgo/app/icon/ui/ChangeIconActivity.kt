@@ -19,7 +19,6 @@ package com.duckduckgo.app.icon.ui
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import androidx.appcompat.app.AlertDialog
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.GridLayoutManager
 import com.duckduckgo.app.browser.R

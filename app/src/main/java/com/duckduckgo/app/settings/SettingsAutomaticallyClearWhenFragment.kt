@@ -21,7 +21,6 @@ import android.os.Bundle
 import android.view.View
 import android.widget.RadioGroup
 import androidx.annotation.IdRes
-import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.DialogFragment
 import com.duckduckgo.app.browser.BuildConfig
 import com.duckduckgo.app.browser.R
