@@ -504,10 +504,10 @@ class BrowserTabViewModel(
             is PageNavigationCleared -> disableUserNavigation()
         }
 
-        val loginDetected = loginDetection.onEvent(LoginDetectionDelegate.Event.NavigationEvent(stateChange))
+        /*val loginDetected = loginDetection.onEvent(LoginDetectionDelegate.Event.NavigationEvent(stateChange))
         if (loginDetected) {
             onFireproofWebsiteClicked()
-        }
+        }*/
     }
 
     private fun pageChanged(url: String, title: String?) {
@@ -621,9 +621,11 @@ class BrowserTabViewModel(
         }
         loadingViewState.value = progress.copy(isLoading = isLoading, progress = visualProgress)
 
+        /*
         if (!isLoading) {
             loginDetection.onEvent(LoginDetectionDelegate.Event.PageFinished)
         }
+        */
     }
 
     private fun registerSiteVisit() {
@@ -1178,7 +1180,9 @@ class BrowserTabViewModel(
     }
 
     override fun loginDetected() {
-        url?.takeIf { it.isNotEmpty() }?.let { loginDetection.onEvent(LoginDetectionDelegate.Event.LoginDetected(it)) }
+        url?.takeIf { it.isNotEmpty() }
+            ?.let { onFireproofWebsiteClicked() }
+        //?.let { loginDetection.onEvent(LoginDetectionDelegate.Event.LoginDetected(it)) }
     }
 
     companion object {
