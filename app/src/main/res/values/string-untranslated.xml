@@ -71,7 +71,7 @@
     <string name="fireproofWebsiteOverflowContentDescription">More options for fireproof website %s</string>
 
     <!-- Download Manager problems -->
-    <string name="downloadManagerDisabled">Download failed because Download Manager is disabled</string>
+    <string name="downloadManagerDisabled">Download Manager is disabled</string>
     <string name="downloadManagerIncompatible">Download Manager not available on this device</string>
     <string name="enable">Enable</string>
 
