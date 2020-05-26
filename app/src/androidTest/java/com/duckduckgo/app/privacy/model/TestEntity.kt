@@ -23,4 +23,3 @@ data class TestEntity(
     override val displayName: String,
     override val prevalence: Double
 ) : Entity
-

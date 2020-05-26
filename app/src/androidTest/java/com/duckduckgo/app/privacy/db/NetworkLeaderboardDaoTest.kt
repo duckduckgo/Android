@@ -60,7 +60,6 @@ class NetworkLeaderboardDaoTest {
         assertTrue(data.contains(NetworkLeaderboardEntry("Network1", 1)))
     }
 
-
     @Test
     fun whenNetworksIncrementedMultipleTimesThenReturnedWithCountInDescendingOrder() {
         dao.incrementNetworkCount("Network1")

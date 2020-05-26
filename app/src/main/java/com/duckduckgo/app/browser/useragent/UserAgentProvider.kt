@@ -19,7 +19,6 @@ package com.duckduckgo.app.browser.useragent
 import android.os.Build
 import com.duckduckgo.app.global.device.DeviceInfo
 
-
 /**
  * Example Default User Agent (From Chrome):
  * Mozilla/5.0 (Linux; Android 8.1.0; Nexus 6P Build/OPM3.171019.014) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.137 Mobile Safari/537.36

@@ -24,7 +24,6 @@ import com.duckduckgo.app.global.dialog.BackKeyListener
 import com.duckduckgo.app.global.rating.PromptCount
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.*
 
-
 class AppEnjoymentDialogFragment : EnjoymentDialog() {
 
     interface Listener {

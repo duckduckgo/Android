@@ -19,7 +19,6 @@ package com.duckduckgo.app
 import com.duckduckgo.app.di.DaggerTestAppComponent
 import com.duckduckgo.app.global.DuckDuckGoApplication
 
-
 class TestApplication : DuckDuckGoApplication() {
 
     /**

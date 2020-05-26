@@ -302,5 +302,4 @@ open class DuckDuckGoApplication : HasAndroidInjector, Application(), LifecycleO
         private const val APP_RESTART_CAUSED_BY_FIRE_GRACE_PERIOD: Long = 10_000L
     }
 
-
 }

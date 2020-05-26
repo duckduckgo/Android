@@ -13,7 +13,10 @@ The file can be found [here](ddg-settings.zip).
 ![Setting kotlin style screenshot](import_settings_one.png)
 
 * Select the file you just downloaded
-* Import all components required (AndroidEditors and Code Style)
+* Import all components required (AndroidEditors, Code Style and Code Style (schemes))
+![Setting kotlin style screenshot](import_settings_three.png)
+* Select the new scheme on Android Studio -> Preferences... -> Code style -> Schemes: DDG
+![Setting kotlin style screenshot](import_settings_four.png)
 
 ##  Code conventions
 

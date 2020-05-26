@@ -21,7 +21,6 @@ import com.duckduckgo.app.global.AppUrl
 import com.duckduckgo.app.global.AppUrl.ParamKey
 import javax.inject.Inject
 
-
 class DuckDuckGoUrlDetector @Inject constructor() {
 
     fun isDuckDuckGoUrl(uri: String): Boolean {

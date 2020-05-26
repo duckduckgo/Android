@@ -22,7 +22,7 @@ import com.duckduckgo.app.statistics.VariantManager.Companion.referrerVariant
 import com.duckduckgo.app.statistics.VariantManager.VariantFeature.BottomBarNavigation
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import timber.log.Timber
-import java.util.Locale
+import java.util.*
 
 @WorkerThread
 interface VariantManager {

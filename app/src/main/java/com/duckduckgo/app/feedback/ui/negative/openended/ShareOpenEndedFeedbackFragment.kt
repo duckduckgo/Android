@@ -32,7 +32,6 @@ import com.duckduckgo.app.feedback.ui.negative.FeedbackTypeDisplay.Companion.sub
 import com.duckduckgo.app.feedback.ui.negative.openended.ShareOpenEndedNegativeFeedbackViewModel.Command
 import kotlinx.android.synthetic.main.content_feedback_open_ended_feedback.*
 
-
 class ShareOpenEndedFeedbackFragment : FeedbackFragment() {
 
     interface OpenEndedFeedbackListener {

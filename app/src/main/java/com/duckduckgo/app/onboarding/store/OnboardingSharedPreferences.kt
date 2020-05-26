@@ -21,7 +21,6 @@ import android.content.SharedPreferences
 import androidx.core.content.edit
 import javax.inject.Inject
 
-
 class OnboardingSharedPreferences @Inject constructor(private val context: Context) : OnboardingStore {
 
     override var onboardingDialogJourney: String?

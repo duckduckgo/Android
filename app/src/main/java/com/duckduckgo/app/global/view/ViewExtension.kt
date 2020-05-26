@@ -21,7 +21,6 @@ import android.content.res.Resources
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 
-
 /*
  * Common view operations, simplified as Kotlin extensions
  * Based on https://github.com/ravidsrk/kotlinextensions.com
@@ -81,3 +80,4 @@ fun View.hideKeyboard(): Boolean {
 
 fun Int.toDp(): Int = (this / Resources.getSystem().displayMetrics.density).toInt()
 fun Int.toPx(): Int = (this * Resources.getSystem().displayMetrics.density).toInt()
+fun Float.toPx(): Float = (this * Resources.getSystem().displayMetrics.density)

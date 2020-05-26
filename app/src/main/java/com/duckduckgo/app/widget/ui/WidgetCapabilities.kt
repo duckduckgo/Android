@@ -24,7 +24,6 @@ import com.duckduckgo.widget.SearchWidget
 import com.duckduckgo.widget.SearchWidgetLight
 import javax.inject.Inject
 
-
 interface WidgetCapabilities {
     val supportsStandardWidgetAdd: Boolean
     val supportsAutomaticWidgetAdd: Boolean

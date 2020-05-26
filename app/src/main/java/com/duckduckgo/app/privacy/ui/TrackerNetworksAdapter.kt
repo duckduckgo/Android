@@ -38,7 +38,6 @@ import kotlinx.android.synthetic.main.item_tracker_network_header.view.*
 import java.util.*
 import kotlin.collections.ArrayList
 
-
 class TrackerNetworksAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     companion object {
@@ -104,7 +103,7 @@ class TrackerNetworksAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
             holder.icon.show()
             holder.unknownIcon.gone()
         } else {
-            val drawable = Theming.getThemedDrawable(holder.icon.context, R.drawable.other_tracker_bg, DuckDuckGoTheme.LIGHT)
+            val drawable = Theming.getThemedDrawable(holder.icon.context, R.drawable.other_tracker_privacy_dashboard_bg, DuckDuckGoTheme.LIGHT)
             holder.unknownIcon.text = viewElement.networkDisplayName.take(1)
             holder.unknownIcon.background = drawable
             holder.unknownIcon.show()
@@ -159,4 +158,3 @@ class TrackerNetworksAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
         }
     }
 }
-

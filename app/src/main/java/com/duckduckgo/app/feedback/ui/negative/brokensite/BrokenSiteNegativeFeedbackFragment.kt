@@ -27,7 +27,6 @@ import com.duckduckgo.app.feedback.ui.common.FeedbackFragment
 import com.duckduckgo.app.feedback.ui.common.LayoutScrollingTouchListener
 import kotlinx.android.synthetic.main.content_feedback_negative_broken_site_feedback.*
 
-
 class BrokenSiteNegativeFeedbackFragment : FeedbackFragment() {
 
     interface BrokenSiteFeedbackListener {

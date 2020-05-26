@@ -26,7 +26,6 @@ import com.duckduckgo.app.browser.R
 import java.util.*
 import javax.inject.Inject
 
-
 class ShortcutBuilder @Inject constructor() {
 
     fun buildPinnedPageShortcut(context: Context, homeShortcut: BrowserTabViewModel.Command.AddHomeShortcut): ShortcutInfoCompat {

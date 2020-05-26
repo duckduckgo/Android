@@ -71,9 +71,9 @@ class BookmarksViewModel(val dao: BookmarksDao) : EditBookmarkListener, ViewMode
 
     private fun onBookmarksChanged(bookmarks: List<BookmarkEntity>) {
         viewState.value = viewState.value?.copy(
-                showBookmarks = bookmarks.isNotEmpty(),
-                bookmarks = bookmarks,
-                enableSearch = bookmarks.size > MIN_BOOKMARKS_FOR_SEARCH
+            showBookmarks = bookmarks.isNotEmpty(),
+            bookmarks = bookmarks,
+            enableSearch = bookmarks.size > MIN_BOOKMARKS_FOR_SEARCH
         )
     }
 
