@@ -39,7 +39,9 @@ class FireproofWebsiteAdapter(
         const val FIREPROOF_WEBSITE_TYPE = 0
         const val DESCRIPTION_TYPE = 1
         const val EMPTY_STATE_TYPE = 2
+        const val TOGGLE_TYPE = 3
 
+        const val TOGGLE_ITEM_SIZE = 1
         const val DESCRIPTION_ITEM_SIZE = 1
         const val EMPTY_HINT_ITEM_SIZE = 1
     }
@@ -53,6 +55,10 @@ class FireproofWebsiteAdapter(
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FireproofWebSiteViewHolder {
         val inflater = LayoutInflater.from(parent.context)
         return when (viewType) {
+            TOGGLE_TYPE -> {
+                val view = inflater.inflate(R.layout.view_fireproof_website_toggle, parent, false)
+                FireproofWebSiteViewHolder.FireproofWebsiteToggleViewHolder(view)
+            }
             FIREPROOF_WEBSITE_TYPE -> {
                 val view = inflater.inflate(R.layout.view_fireproof_website_entry, parent, false)
                 FireproofWebSiteViewHolder.FireproofWebsiteItemViewHolder(view, viewModel)
@@ -70,10 +76,10 @@ class FireproofWebsiteAdapter(
     }
 
     override fun getItemViewType(position: Int): Int {
-        return if (position == 0) {
-            DESCRIPTION_TYPE
-        } else {
-            getListItemType()
+        return when (position) {
+            0 -> TOGGLE_TYPE
+            1 -> DESCRIPTION_TYPE
+            else -> getListItemType()
         }
     }
 
@@ -84,7 +90,7 @@ class FireproofWebsiteAdapter(
     }
 
     override fun getItemCount(): Int {
-        return getItemsSize() + DESCRIPTION_ITEM_SIZE
+        return getItemsSize() + itemsOnTopOfList()
     }
 
     private fun getItemsSize() = if (fireproofWebsites.isEmpty()) {
@@ -93,7 +99,9 @@ class FireproofWebsiteAdapter(
         fireproofWebsites.size
     }
 
-    private fun getWebsiteItemPosition(position: Int) = position - DESCRIPTION_ITEM_SIZE
+    private fun itemsOnTopOfList() = DESCRIPTION_ITEM_SIZE + TOGGLE_ITEM_SIZE
+
+    private fun getWebsiteItemPosition(position: Int) = position - itemsOnTopOfList()
 
     private fun getListItemType(): Int {
         return if (fireproofWebsites.isEmpty()) {
@@ -105,6 +113,8 @@ class FireproofWebsiteAdapter(
 }
 
 sealed class FireproofWebSiteViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+
+    class FireproofWebsiteToggleViewHolder(itemView: View) : FireproofWebSiteViewHolder(itemView)
 
     class FireproofWebsiteDescriptionViewHolder(itemView: View) : FireproofWebSiteViewHolder(itemView)
 
