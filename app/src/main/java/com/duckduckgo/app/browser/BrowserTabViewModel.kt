@@ -106,8 +106,6 @@ import kotlinx.coroutines.withContext
 import timber.log.Timber
 import java.util.Locale
 import java.util.concurrent.TimeUnit
-import java.util.regex.Matcher
-import java.util.regex.Pattern
 
 class BrowserTabViewModel(
     private val statisticsUpdater: StatisticsUpdater,
@@ -433,10 +431,10 @@ class BrowserTabViewModel(
         autoCompleteViewState.value = AutoCompleteViewState(false)
     }
 
-    private fun fireQueryChangedPixel(omnibarText: String){
-        val oldParameter =  UriString.extractURLParameter(AppUrl.ParamKey.QUERY, currentOmnibarViewState().omnibarText)
-        val newParameter =  UriString.extractURLParameter(AppUrl.ParamKey.QUERY, omnibarText)
-        if (oldParameter == newParameter){
+    private fun fireQueryChangedPixel(omnibarText: String) {
+        val oldParameter = UriString.extractURLParameter(AppUrl.ParamKey.QUERY, currentOmnibarViewState().omnibarText)
+        val newParameter = UriString.extractURLParameter(AppUrl.ParamKey.QUERY, omnibarText)
+        if (oldParameter == newParameter) {
             pixel.fire(String.format(Locale.US, PixelName.SERP_REQUERY.pixelName, PixelParameter.SERP_QUERY_NOT_CHANGED))
         } else {
             pixel.fire(String.format(Locale.US, PixelName.SERP_REQUERY.pixelName, PixelParameter.SERP_QUERY_CHANGED))

@@ -60,7 +60,7 @@ class UriString {
         fun extractURLParameter(parameter: String, url: String): String {
             val p: Pattern = Pattern.compile("(?<=$parameter=).*?(?=&|\$)")
             val m: Matcher = p.matcher(url)
-            return if (m.find()){
+            return if (m.find()) {
                 m.group()
             } else {
                 url
