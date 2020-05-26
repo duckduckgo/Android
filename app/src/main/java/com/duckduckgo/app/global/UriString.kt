@@ -18,6 +18,8 @@ package com.duckduckgo.app.global
 
 import android.net.Uri
 import androidx.core.util.PatternsCompat
+import java.util.regex.Matcher
+import java.util.regex.Pattern
 
 class UriString {
 
@@ -53,6 +55,16 @@ class UriString {
 
         fun isValidDomain(domain: String): Boolean {
             return domainRegex.matches(domain)
+        }
+
+        fun extractURLParameter(parameter: String, url: String): String {
+            val p: Pattern = Pattern.compile("(?<=$parameter=).*?(?=&|\$)")
+            val m: Matcher = p.matcher(url)
+            return if (m.find()){
+                m.group()
+            } else {
+                url
+            }
         }
     }
 }

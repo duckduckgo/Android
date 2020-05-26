@@ -16,8 +16,10 @@
 
 package com.duckduckgo.app.global
 
+import com.duckduckgo.app.global.UriString.Companion.extractURLParameter
 import com.duckduckgo.app.global.UriString.Companion.isWebUrl
 import com.duckduckgo.app.global.UriString.Companion.sameOrSubdomain
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -289,6 +291,23 @@ class UriStringTest {
     @Test
     fun whenGivenNumberThenIsWebUrlIsFalse() {
         assertFalse(isWebUrl("33"))
+    }
+
+    @Test
+    fun whenGivenNuThenIsWebUrlIsFalse() {
+        assertFalse(isWebUrl("33"))
+    }
+
+    @Test
+    fun whenParamExistsThenItsReturned() {
+        val parameter = extractURLParameter("q", "https://duckduckgo.com/?q=test&iar=web&ia=web&atb=v222-7zg&t=ddg_android)")
+        assertEquals(parameter, "test")
+    }
+
+    @Test
+    fun whenParamDoesNotExistsThenRulReturned() {
+        val parameter = extractURLParameter("f", "https://duckduckgo.com/?q=test&iar=web&ia=web&atb=v222-7zg&t=ddg_android)")
+        assertEquals(parameter, "https://duckduckgo.com/?q=test&iar=web&ia=web&atb=v222-7zg&t=ddg_android)")
     }
 
 }

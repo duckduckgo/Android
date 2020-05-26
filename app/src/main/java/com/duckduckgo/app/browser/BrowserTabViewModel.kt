@@ -29,7 +29,11 @@ import android.webkit.WebView
 import androidx.annotation.AnyThread
 import androidx.annotation.VisibleForTesting
 import androidx.core.net.toUri
-import androidx.lifecycle.*
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.duckduckgo.app.autocomplete.api.AutoComplete
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteResult
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion
@@ -44,7 +48,10 @@ import com.duckduckgo.app.browser.BrowserTabViewModel.GlobalLayoutViewState.Brow
 import com.duckduckgo.app.browser.BrowserTabViewModel.GlobalLayoutViewState.Invalidated
 import com.duckduckgo.app.browser.LongPressHandler.RequiredAction
 import com.duckduckgo.app.browser.SpecialUrlDetector.UrlType.IntentType
-import com.duckduckgo.app.browser.WebNavigationStateChange.*
+import com.duckduckgo.app.browser.WebNavigationStateChange.NewPage
+import com.duckduckgo.app.browser.WebNavigationStateChange.PageCleared
+import com.duckduckgo.app.browser.WebNavigationStateChange.PageNavigationCleared
+import com.duckduckgo.app.browser.WebNavigationStateChange.UrlUpdated
 import com.duckduckgo.app.browser.addtohome.AddToHomeCapabilityDetector
 import com.duckduckgo.app.browser.favicon.FaviconDownloader
 import com.duckduckgo.app.browser.model.BasicAuthenticationCredentials
@@ -53,14 +60,26 @@ import com.duckduckgo.app.browser.model.LongPressTarget
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.browser.ui.HttpAuthenticationDialogFragment.HttpAuthenticationListener
-import com.duckduckgo.app.cta.ui.*
+import com.duckduckgo.app.cta.ui.Cta
+import com.duckduckgo.app.cta.ui.CtaViewModel
+import com.duckduckgo.app.cta.ui.DaxDialogCta
+import com.duckduckgo.app.cta.ui.HomePanelCta
+import com.duckduckgo.app.cta.ui.HomeTopPanelCta
+import com.duckduckgo.app.cta.ui.SecondaryButtonCta
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteDao
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
-import com.duckduckgo.app.global.*
+import com.duckduckgo.app.global.AppUrl
+import com.duckduckgo.app.global.DefaultDispatcherProvider
+import com.duckduckgo.app.global.DispatcherProvider
+import com.duckduckgo.app.global.SingleLiveEvent
+import com.duckduckgo.app.global.UriString
+import com.duckduckgo.app.global.baseHost
+import com.duckduckgo.app.global.isMobileSite
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.global.model.SiteFactory
 import com.duckduckgo.app.global.model.domain
 import com.duckduckgo.app.global.model.domainMatchesUrl
+import com.duckduckgo.app.global.toDesktopUri
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao
 import com.duckduckgo.app.privacy.db.UserWhitelistDao
 import com.duckduckgo.app.privacy.model.PrivacyGrade
@@ -87,6 +106,8 @@ import kotlinx.coroutines.withContext
 import timber.log.Timber
 import java.util.Locale
 import java.util.concurrent.TimeUnit
+import java.util.regex.Matcher
+import java.util.regex.Pattern
 
 class BrowserTabViewModel(
     private val statisticsUpdater: StatisticsUpdater,
@@ -400,12 +421,7 @@ class BrowserTabViewModel(
                 command.value = ResetHistory
             }
 
-            val queryChanged = if (currentOmnibarViewState().omnibarText == query) {
-                PixelParameter.SERP_QUERY_NOT_CHANGED
-            } else {
-                PixelParameter.SERP_QUERY_CHANGED
-            }
-            pixel.fire(String.format(Locale.US, PixelName.SERP_REQUERY.pixelName, queryChanged))
+            fireQueryChangedPixel(omnibarText)
 
             command.value = Navigate(urlToNavigate)
         }
@@ -415,6 +431,16 @@ class BrowserTabViewModel(
         omnibarViewState.value = currentOmnibarViewState().copy(omnibarText = omnibarText, shouldMoveCaretToEnd = false)
         browserViewState.value = currentBrowserViewState().copy(browserShowing = true, showClearButton = false)
         autoCompleteViewState.value = AutoCompleteViewState(false)
+    }
+
+    private fun fireQueryChangedPixel(omnibarText: String){
+        val oldParameter =  UriString.extractURLParameter(AppUrl.ParamKey.QUERY, currentOmnibarViewState().omnibarText)
+        val newParameter =  UriString.extractURLParameter(AppUrl.ParamKey.QUERY, omnibarText)
+        if (oldParameter == newParameter){
+            pixel.fire(String.format(Locale.US, PixelName.SERP_REQUERY.pixelName, PixelParameter.SERP_QUERY_NOT_CHANGED))
+        } else {
+            pixel.fire(String.format(Locale.US, PixelName.SERP_REQUERY.pixelName, PixelParameter.SERP_QUERY_CHANGED))
+        }
     }
 
     private fun shouldClearHistoryOnNewQuery(): Boolean {
