@@ -38,7 +38,7 @@ class QueryUrlConverterTest {
     private val currentUrl = "https://www.duckduckgo.com"
 
     @Before
-    fun setup(){
+    fun setup() {
         whenever(variantManager.getVariant(any())).thenReturn(VariantManager.DEFAULT_VARIANT)
     }
 

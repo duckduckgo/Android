@@ -17,7 +17,6 @@
 package com.duckduckgo.app.browser
 
 import android.net.Uri
-import androidx.core.net.toUri
 import com.duckduckgo.app.global.AppUrl.ParamKey
 import com.duckduckgo.app.global.AppUrl.ParamValue
 import com.duckduckgo.app.referral.AppReferrerDataStore
@@ -74,11 +73,11 @@ class DuckDuckGoRequestRewriter(
 
         val sourceValue = if (appReferrerDataStore.installedFromEuAuction) ParamValue.SOURCE_EU_AUCTION else ParamValue.SOURCE
 
-        if (variantManager.getVariant().hasFeature(VariantManager.VariantFeature.SerpHeaderRemoval)){
+        if (variantManager.getVariant().hasFeature(VariantManager.VariantFeature.SerpHeaderRemoval)) {
             builder.appendQueryParameter(ParamKey.HIDE_SERP, ParamValue.HIDE_SERP)
         }
 
-        if (duckDuckGoUrlDetector.isDuckDuckGoVerticalUrl(currentUrl)){
+        if (duckDuckGoUrlDetector.isDuckDuckGoVerticalUrl(currentUrl)) {
             val vertical = duckDuckGoUrlDetector.extractVertical(currentUrl)
             builder.appendQueryParameter(ParamKey.VERTICAL_REWRITE, vertical)
         }

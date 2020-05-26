@@ -29,7 +29,6 @@ class DuckDuckGoUrlDetectorTest {
         testee = DuckDuckGoUrlDetector()
     }
 
-
     @Test
     fun whenCheckingSearchTermThenIdentifiedAsNotDDGUrl() {
         assertFalse(testee.isDuckDuckGoUrl("foo"))

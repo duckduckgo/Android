@@ -385,7 +385,7 @@ class BrowserTabViewModel(
             searchCountDao.incrementSearchCount()
         }
 
-        val urlToNavigate = queryUrlConverter.addQueryToCurrentUrl(url?: query, trimmedInput)
+        val urlToNavigate = queryUrlConverter.addQueryToCurrentUrl(url ?: query, trimmedInput)
         val omnibarText = if (variantManager.getVariant().hasFeature(VariantManager.VariantFeature.SerpHeaderQueryReplacement)) {
             urlToNavigate
         } else {
@@ -400,7 +400,7 @@ class BrowserTabViewModel(
                 command.value = ResetHistory
             }
 
-            val queryChanged = if (currentOmnibarViewState().omnibarText == query){
+            val queryChanged = if (currentOmnibarViewState().omnibarText == query) {
                 PixelParameter.SERP_QUERY_NOT_CHANGED
             } else {
                 PixelParameter.SERP_QUERY_CHANGED

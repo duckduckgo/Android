@@ -1236,7 +1236,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenRestoringWebViewSessionNotRestorableThenPreviousUrlLoaded() {
-        whenever(mockOmnibarConverter.addQueryToCurrentUrl("foo.com","foo.com")).thenReturn("foo.com")
+        whenever(mockOmnibarConverter.addQueryToCurrentUrl("foo.com", "foo.com")).thenReturn("foo.com")
         whenever(webViewSessionStorage.restoreSession(anyOrNull(), anyString())).thenReturn(false)
         testee.restoreWebViewState(null, "foo.com")
 

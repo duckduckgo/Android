@@ -18,7 +18,6 @@ package com.duckduckgo.app.browser.omnibar
 
 import android.net.Uri
 import android.webkit.URLUtil
-import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
 import com.duckduckgo.app.browser.RequestRewriter
 import com.duckduckgo.app.global.AppUrl
 import com.duckduckgo.app.global.AppUrl.Url
