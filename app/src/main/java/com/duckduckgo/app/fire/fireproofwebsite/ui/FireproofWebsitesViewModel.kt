@@ -35,6 +35,7 @@ class FireproofWebsitesViewModel(
 ) : ViewModel() {
 
     data class ViewState(
+        val loginDetectionEnabled: Boolean = false,
         val fireproofWebsitesEntities: List<FireproofWebsiteEntity> = emptyList()
     )
 
@@ -42,14 +43,17 @@ class FireproofWebsitesViewModel(
         class ConfirmDeleteFireproofWebsite(val entity: FireproofWebsiteEntity) : Command()
     }
 
-    val viewState: MutableLiveData<ViewState> = MutableLiveData()
+    private val _viewState: MutableLiveData<ViewState> = MutableLiveData()
+    val viewState: LiveData<ViewState> = _viewState
     val command: SingleLiveEvent<Command> = SingleLiveEvent()
 
     private val fireproofWebsites: LiveData<List<FireproofWebsiteEntity>> = dao.fireproofWebsitesEntities()
     private val fireproofWebsitesObserver = Observer<List<FireproofWebsiteEntity>> { onPreservedCookiesEntitiesChanged(it!!) }
 
     init {
-        viewState.value = ViewState()
+        _viewState.value = ViewState(
+            loginDetectionEnabled = settingsDataStore.appLoginDetection
+        )
         fireproofWebsites.observeForever(fireproofWebsitesObserver)
     }
 
@@ -59,7 +63,7 @@ class FireproofWebsitesViewModel(
     }
 
     private fun onPreservedCookiesEntitiesChanged(entities: List<FireproofWebsiteEntity>) {
-        viewState.value = viewState.value?.copy(
+        _viewState.value = viewState.value?.copy(
             fireproofWebsitesEntities = entities
         )
     }
@@ -77,5 +81,6 @@ class FireproofWebsitesViewModel(
 
     fun onUserToggleLoginDetection(enabled: Boolean) {
         settingsDataStore.appLoginDetection = enabled
+        _viewState.value = _viewState.value?.copy(loginDetectionEnabled = enabled)
     }
 }

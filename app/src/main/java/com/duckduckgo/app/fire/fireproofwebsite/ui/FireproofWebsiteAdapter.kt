@@ -20,8 +20,10 @@ import android.net.Uri
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.CompoundButton
 import android.widget.ImageView
 import android.widget.PopupMenu
+import androidx.appcompat.widget.SwitchCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
@@ -53,12 +55,15 @@ class FireproofWebsiteAdapter(
             notifyDataSetChanged()
         }
 
+    var loginDetectionEnabled: Boolean = false
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FireproofWebSiteViewHolder {
         val inflater = LayoutInflater.from(parent.context)
         return when (viewType) {
             TOGGLE_TYPE -> {
                 val view = inflater.inflate(R.layout.view_fireproof_website_toggle, parent, false)
-                FireproofWebSiteViewHolder.FireproofWebsiteToggleViewHolder(view, viewModel)
+                return FireproofWebSiteViewHolder.FireproofWebsiteToggleViewHolder(view,
+                    CompoundButton.OnCheckedChangeListener { _, isChecked -> viewModel.onUserToggleLoginDetection(isChecked) })
             }
             FIREPROOF_WEBSITE_TYPE -> {
                 val view = inflater.inflate(R.layout.view_fireproof_website_entry, parent, false)
@@ -86,7 +91,9 @@ class FireproofWebsiteAdapter(
 
     override fun onBindViewHolder(holder: FireproofWebSiteViewHolder, position: Int) {
         when (holder) {
-            is FireproofWebSiteViewHolder.FireproofWebsiteToggleViewHolder -> holder.bind(false)
+            is FireproofWebSiteViewHolder.FireproofWebsiteToggleViewHolder -> {
+                holder.bind(loginDetectionEnabled)
+            }
             is FireproofWebSiteViewHolder.FireproofWebsiteItemViewHolder -> holder.bind(fireproofWebsites[getWebsiteItemPosition(position)])
         }
     }
@@ -114,14 +121,18 @@ class FireproofWebsiteAdapter(
     }
 }
 
+private fun SwitchCompat.quietlySetIsChecked(newCheckedState: Boolean, changeListener: CompoundButton.OnCheckedChangeListener?) {
+    setOnCheckedChangeListener(null)
+    isChecked = newCheckedState
+    setOnCheckedChangeListener(changeListener)
+}
+
 sealed class FireproofWebSiteViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
-    class FireproofWebsiteToggleViewHolder(itemView: View, private val viewModel: FireproofWebsitesViewModel) : FireproofWebSiteViewHolder(itemView) {
+    class FireproofWebsiteToggleViewHolder(itemView: View, private val listener: CompoundButton.OnCheckedChangeListener) :
+        FireproofWebSiteViewHolder(itemView) {
         fun bind(loginDetectionEnabled: Boolean) {
-            itemView.fireproofWebsiteToggle.isChecked = loginDetectionEnabled
-            itemView.fireproofWebsiteToggle.setOnCheckedChangeListener { _, isChecked ->
-                viewModel.onUserToggleLoginDetection(isChecked)
-            }
+            itemView.fireproofWebsiteToggle.quietlySetIsChecked(loginDetectionEnabled, listener)
         }
     }
 
