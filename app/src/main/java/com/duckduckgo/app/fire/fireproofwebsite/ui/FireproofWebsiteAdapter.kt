@@ -29,6 +29,7 @@ import com.duckduckgo.app.fire.fireproofwebsite.data.website
 import com.duckduckgo.app.global.faviconLocation
 import com.duckduckgo.app.global.image.GlideApp
 import kotlinx.android.synthetic.main.view_fireproof_website_entry.view.*
+import kotlinx.android.synthetic.main.view_fireproof_website_toggle.view.*
 import timber.log.Timber
 
 class FireproofWebsiteAdapter(
@@ -57,7 +58,7 @@ class FireproofWebsiteAdapter(
         return when (viewType) {
             TOGGLE_TYPE -> {
                 val view = inflater.inflate(R.layout.view_fireproof_website_toggle, parent, false)
-                FireproofWebSiteViewHolder.FireproofWebsiteToggleViewHolder(view)
+                FireproofWebSiteViewHolder.FireproofWebsiteToggleViewHolder(view, viewModel)
             }
             FIREPROOF_WEBSITE_TYPE -> {
                 val view = inflater.inflate(R.layout.view_fireproof_website_entry, parent, false)
@@ -85,6 +86,7 @@ class FireproofWebsiteAdapter(
 
     override fun onBindViewHolder(holder: FireproofWebSiteViewHolder, position: Int) {
         when (holder) {
+            is FireproofWebSiteViewHolder.FireproofWebsiteToggleViewHolder -> holder.bind(false)
             is FireproofWebSiteViewHolder.FireproofWebsiteItemViewHolder -> holder.bind(fireproofWebsites[getWebsiteItemPosition(position)])
         }
     }
@@ -114,7 +116,14 @@ class FireproofWebsiteAdapter(
 
 sealed class FireproofWebSiteViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
-    class FireproofWebsiteToggleViewHolder(itemView: View) : FireproofWebSiteViewHolder(itemView)
+    class FireproofWebsiteToggleViewHolder(itemView: View, private val viewModel: FireproofWebsitesViewModel) : FireproofWebSiteViewHolder(itemView) {
+        fun bind(loginDetectionEnabled: Boolean) {
+            itemView.fireproofWebsiteToggle.isChecked = loginDetectionEnabled
+            itemView.fireproofWebsiteToggle.setOnCheckedChangeListener { _, isChecked ->
+                viewModel.onUserToggleLoginDetection(isChecked)
+            }
+        }
+    }
 
     class FireproofWebsiteDescriptionViewHolder(itemView: View) : FireproofWebSiteViewHolder(itemView)
 

@@ -22,6 +22,7 @@ import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
 import com.duckduckgo.app.fire.fireproofwebsite.ui.FireproofWebsitesViewModel.Command.ConfirmDeleteFireproofWebsite
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.SingleLiveEvent
+import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.FIREPROOF_WEBSITE_DELETED
 import kotlinx.coroutines.launch
@@ -29,7 +30,8 @@ import kotlinx.coroutines.launch
 class FireproofWebsitesViewModel(
     private val dao: FireproofWebsiteDao,
     private val dispatcherProvider: DispatcherProvider,
-    private val pixel: Pixel
+    private val pixel: Pixel,
+    private val settingsDataStore: SettingsDataStore
 ) : ViewModel() {
 
     data class ViewState(
@@ -71,5 +73,9 @@ class FireproofWebsitesViewModel(
             dao.delete(entity)
             pixel.fire(FIREPROOF_WEBSITE_DELETED)
         }
+    }
+
+    fun onUserToggleLoginDetection(enabled: Boolean) {
+        settingsDataStore.appLoginDetection = enabled
     }
 }
