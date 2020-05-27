@@ -51,8 +51,10 @@ class FireproofWebsiteAdapter(
 
     var fireproofWebsites: List<FireproofWebsiteEntity> = emptyList()
         set(value) {
-            field = value
-            notifyDataSetChanged()
+            if (field != value) {
+                field = value
+                notifyDataSetChanged()
+            }
         }
 
     var loginDetectionEnabled: Boolean = false
