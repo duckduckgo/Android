@@ -63,7 +63,7 @@ class FireproofWebsitesViewModel(
     }
 
     private fun onPreservedCookiesEntitiesChanged(entities: List<FireproofWebsiteEntity>) {
-        _viewState.value = viewState.value?.copy(
+        _viewState.value = _viewState.value?.copy(
             fireproofWebsitesEntities = entities
         )
     }
