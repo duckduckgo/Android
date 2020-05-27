@@ -31,7 +31,6 @@
         <item name="autoCompleteTextViewStyle">@style/AutoCompleteTextViewStyle</item>
         <item name="android:statusBarColor">?toolbarBgColor</item>
         <item name="snackbarButtonStyle">@style/snackbarButtonStyle</item>
-        <item name="materialAlertDialogTheme">@style/DaxAlertDialog</item>
     </style>
 
     <style name="AppTheme.BaseDark">
@@ -94,7 +93,7 @@
 
         <item name="privacyDashboardLogoLetterTextColor">@color/subtleGray</item>
 
-        <item name="fireIcon">@color/brickOrangeDark</item>
+        <item name="fireIconColor">@color/brickOrangeDark</item>
     </style>
 
     <style name="AppTheme.Dark" parent="AppTheme.BaseDark" />
@@ -175,7 +174,7 @@
 
         <item name="privacyDashboardLogoLetterTextColor">@color/whiteFour</item>
 
-        <item name="fireIcon">@color/brickOrangeLight</item>
+        <item name="fireIconColor">@color/brickOrangeLight</item>
     </style>
 
     <style name="AppTheme.Light" parent="AppTheme.BaseLight">
@@ -238,16 +237,5 @@
         <item name="colorAccent">@color/cornflowerBlue</item>
         <item name="android:textColorSecondary">?attr/toolbarIconColor</item>
     </style>
-
-    <style name="DaxAlertDialog" parent="ThemeOverlay.MaterialComponents.MaterialAlertDialog">
-        <item name="android:background">?dialogBgColor</item>
-        <item name="colorOnSurface">?normalTextColor</item>
-        <item name="android:textColor">?normalTextColor</item>
-        <item name="buttonBarPositiveButtonStyle">@style/DaxDialogPositiveButton</item>
-        <item name="buttonBarNegativeButtonStyle">@style/DaxDialogNegativeButton</item>
-        <item name="checkedTextViewStyle">@style/DaxDialogCheckedTextView</item>
-    </style>
-
-
 
 </resources>

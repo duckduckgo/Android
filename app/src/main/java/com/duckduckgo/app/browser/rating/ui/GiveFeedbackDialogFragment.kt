@@ -18,6 +18,7 @@ package com.duckduckgo.app.browser.rating.ui
 
 import android.app.Dialog
 import android.os.Bundle
+import androidx.appcompat.app.AlertDialog
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.dialog.BackKeyListener
 import com.duckduckgo.app.global.rating.PromptCount
@@ -37,7 +38,7 @@ class GiveFeedbackDialogFragment : EnjoymentDialog() {
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         firePixelWithPromptCount(APP_FEEDBACK_DIALOG_SHOWN)
 
-        return MaterialAlertDialogBuilder(requireActivity())
+        return AlertDialog.Builder(requireActivity(), R.style.AlertDialogTheme)
             .setTitle(R.string.giveFeedbackDialogTitle)
             .setMessage(R.string.giveFeedbackDialogMessage)
             .setPositiveButton(R.string.giveFeedbackDialogPositiveButton) { _, _ ->

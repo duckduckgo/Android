@@ -202,6 +202,15 @@
         <item name="android:textAllCaps">false</item>
     </style>
 
+    <style name="AlertDialogTheme" parent="Theme.AppCompat.Light.Dialog.Alert">
+        <item name="buttonBarNegativeButtonStyle">@style/AlertDialogButtonStyle</item>
+        <item name="buttonBarPositiveButtonStyle">@style/AlertDialogButtonStyle</item>
+    </style>
+
+    <style name="AlertDialogButtonStyle" parent="Widget.AppCompat.Button.ButtonBar.AlertDialog">
+        <item name="android:textColor">@color/cornflowerBlue</item>
+    </style>
+
     <style name="FeedbackFragmentStyle">
         <item name="android:background">?attr/colorPrimaryDark</item>
         <item name="android:layout_width">match_parent</item>
@@ -299,24 +308,6 @@
 
     <style name="snackbarButtonStyle" parent="Widget.MaterialComponents.Button.TextButton.Snackbar">
         <item name="android:textColor">?attr/colorAccent</item>
-    </style>
-
-    <style name="DaxDialogPositiveButton" parent="@style/Widget.MaterialComponents.Button.TextButton">
-        <item name="android:textColor">?colorAccent</item>
-        <item name="backgroundTint">?dialogBgColor</item>
-    </style>
-
-    <style name="DaxDialogNegativeButton" parent="@style/Widget.MaterialComponents.Button.TextButton">
-        <item name="android:textColor">?colorAccent</item>
-        <item name="backgroundTint">?dialogBgColor</item>
-    </style>
-
-    <style name="DaxDialogCheckedTextView" parent="Widget.MaterialComponents.CheckedTextView">
-        <item name="android:textColor">?normalTextColor</item>
-    </style>
-
-    <style name="DaxDialogRadioButton">
-        <item name="android:textColor">?normalTextColor</item>
     </style>
 
 </resources>

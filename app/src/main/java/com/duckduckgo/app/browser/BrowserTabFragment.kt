@@ -657,7 +657,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
         val isShowing = alertDialog?.isShowing
 
         if (isShowing != true) {
-            alertDialog = MaterialAlertDialogBuilder(context)
+            alertDialog = AlertDialog.Builder(context)
                 .setTitle(R.string.launchingExternalApp)
                 .setMessage(getString(R.string.confirmOpenExternalApp))
                 .setPositiveButton(R.string.yes) { _, _ ->

@@ -33,7 +33,6 @@
 
         <RadioButton
             android:id="@+id/settingAppExitOnly"
-            style="@style/DaxDialogRadioButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
@@ -44,7 +43,6 @@
 
         <RadioButton
             android:id="@+id/settingInactive5Seconds"
-            style="@style/DaxDialogRadioButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
@@ -57,7 +55,6 @@
 
         <RadioButton
             android:id="@+id/settingInactive5Mins"
-            style="@style/DaxDialogRadioButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
@@ -68,7 +65,6 @@
 
         <RadioButton
             android:id="@+id/settingInactive15Mins"
-            style="@style/DaxDialogRadioButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
@@ -79,7 +75,6 @@
 
         <RadioButton
             android:id="@+id/settingInactive30Mins"
-            style="@style/DaxDialogRadioButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
@@ -90,7 +85,6 @@
 
         <RadioButton
             android:id="@+id/settingInactive60Mins"
-            style="@style/DaxDialogRadioButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"

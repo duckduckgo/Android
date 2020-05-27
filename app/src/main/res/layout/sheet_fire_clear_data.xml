@@ -19,7 +19,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="?dialogBgColor"
+    android:background="@color/white"
     app:layout_behavior="@string/bottom_sheet_behavior">
 
     <TextView
@@ -27,7 +27,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:background="?attr/selectableItemBackground"
-        android:drawableStart="@drawable/ic_fire_red"
+        android:drawableStart="@drawable/icon_fire_glyph_24dp"
         android:drawablePadding="24dp"
         android:fontFamily="sans-serif"
         android:paddingStart="24dp"
@@ -35,7 +35,7 @@
         android:paddingEnd="24dp"
         android:paddingBottom="17dp"
         android:text="@string/fireClearAll"
-        android:textColor="?fireIcon"
+        android:textColor="@color/brickOrange"
         android:textSize="16sp"
         android:textStyle="normal"
         app:layout_constraintEnd_toEndOf="parent"

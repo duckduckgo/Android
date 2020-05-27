@@ -43,7 +43,7 @@ class EditBookmarkDialogFragment : DialogFragment() {
         val titleInput = rootView.find<EditText>(R.id.titleInput)
         val urlInput = rootView.find<EditText>(R.id.urlInput)
 
-        val alertBuilder = MaterialAlertDialogBuilder(requireActivity())
+        val alertBuilder = AlertDialog.Builder(requireActivity())
             .setView(rootView)
             .setTitle(R.string.bookmarkTitleEdit)
             .setPositiveButton(R.string.dialogSave) { _, _ ->

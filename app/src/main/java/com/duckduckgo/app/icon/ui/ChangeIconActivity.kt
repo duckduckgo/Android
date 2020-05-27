@@ -19,6 +19,7 @@ package com.duckduckgo.app.icon.ui
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import androidx.appcompat.app.AlertDialog
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.GridLayoutManager
 import com.duckduckgo.app.browser.R
@@ -82,7 +83,7 @@ class ChangeIconActivity : DuckDuckGoActivity() {
                 finish()
             }
             is ChangeIconViewModel.Command.ShowConfirmationDialog -> {
-                MaterialAlertDialogBuilder(this)
+                AlertDialog.Builder(this)
                     .setTitle(R.string.changeIconDialogTitle)
                     .setMessage(getString(R.string.changeIconDialogMessage))
                     .setPositiveButton(R.string.changeIconCtaAccept) { _, _ ->

@@ -29,16 +29,13 @@ import com.duckduckgo.app.browser.R
 class BookmarksPopupMenu(layoutInflater: LayoutInflater, view: View = inflate(layoutInflater, R.layout.popup_window_bookmarks_menu)) :
     PopupWindow(view, WRAP_CONTENT, WRAP_CONTENT, true) {
 
-    // popupwindow gets stuck on the screen on API 22 (tested on 23) without a background
-    // color.  Adding it however garbles the elevation so we cannot have elevation here.
-
     init {
         if (SDK_INT <= 22) {
             // popupwindow gets stuck on the screen on API 22 (tested on 23) without a background
             // color.  Adding it however garbles the elevation so we cannot have elevation here.
             setBackgroundDrawable(ColorDrawable(Color.WHITE))
         } else {
-            elevation = 6.toFloat()
+            elevation = ELEVATION
         }
         animationStyle = android.R.style.Animation_Dialog
     }
@@ -61,6 +58,7 @@ class BookmarksPopupMenu(layoutInflater: LayoutInflater, view: View = inflate(la
     companion object {
 
         private const val MARGIN = 30
+        private const val ELEVATION = 6f
 
         fun inflate(layoutInflater: LayoutInflater, resourceId: Int): View {
             return layoutInflater.inflate(resourceId, null)

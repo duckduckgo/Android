@@ -132,7 +132,7 @@ class BookmarksActivity : DuckDuckGoActivity() {
     private fun confirmDeleteBookmark(bookmark: BookmarkEntity) {
         val message = getString(R.string.bookmarkDeleteConfirmMessage, bookmark.title).html(this)
         val title = getString(R.string.dialogConfirmTitle)
-        deleteDialog = MaterialAlertDialogBuilder(this)
+        deleteDialog = AlertDialog.Builder(this)
             .setTitle(title)
             .setMessage(message)
             .setPositiveButton(android.R.string.yes) { _, _ ->

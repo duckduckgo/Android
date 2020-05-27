@@ -68,7 +68,6 @@
     <attr name="topCallToActionDescriptionColor" format="color" />
     <attr name="topCallToActionBackgroundColor" format="color" />
     <attr name="privacyDashboardLogoLetterTextColor" format="color" />
-    <attr name="fireIcon" format="color" />
     <attr name="fireproofWebsiteTitleTextColor" format="color" />
 
     <declare-styleable name="BottomNavigationBar">

@@ -21,6 +21,7 @@ import android.os.Bundle
 import android.view.View
 import android.widget.RadioGroup
 import androidx.annotation.IdRes
+import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.DialogFragment
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.settings.clear.ClearWhatOption
@@ -40,7 +41,7 @@ class SettingsAutomaticallyClearWhatFragment : DialogFragment() {
         val rootView = View.inflate(activity, R.layout.settings_automatically_clear_what_fragment, null)
         updateCurrentSelect(currentOption, rootView.findViewById(R.id.settingsClearWhatGroup))
 
-        val alertBuilder = MaterialAlertDialogBuilder(requireActivity())
+        val alertBuilder = AlertDialog.Builder(requireActivity())
             .setView(rootView)
             .setTitle(R.string.settingsAutomaticallyClearWhat)
             .setPositiveButton(R.string.settingsAutomaticallyClearingDialogSave) { _, _ ->
