@@ -37,7 +37,7 @@ import com.duckduckgo.app.feedback.ui.negative.brokensite.BrokenSiteNegativeFeed
 import com.duckduckgo.app.feedback.ui.negative.openended.ShareOpenEndedNegativeFeedbackViewModel
 import com.duckduckgo.app.feedback.ui.positive.initial.PositiveFeedbackLandingViewModel
 import com.duckduckgo.app.fire.DataClearer
-import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteDao
+import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepository
 import com.duckduckgo.app.fire.fireproofwebsite.ui.FireproofWebsitesViewModel
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.model.SiteFactory
@@ -72,7 +72,6 @@ import com.duckduckgo.app.usage.search.SearchCountDao
 import com.duckduckgo.app.widget.ui.AddWidgetInstructionsViewModel
 import javax.inject.Inject
 
-
 @Suppress("UNCHECKED_CAST")
 class ViewModelFactory @Inject constructor(
     private val statisticsUpdater: StatisticsUpdater,
@@ -86,7 +85,7 @@ class ViewModelFactory @Inject constructor(
     private val userWhitelistDao: UserWhitelistDao,
     private val networkLeaderboardDao: NetworkLeaderboardDao,
     private val bookmarksDao: BookmarksDao,
-    private val fireproofWebsiteDao: FireproofWebsiteDao,
+    private val fireproofWebsiteRepository: FireproofWebsiteRepository,
     private val surveyDao: SurveyDao,
     private val autoCompleteApi: AutoCompleteApi,
     private val deviceAppLookup: DeviceAppLookup,
@@ -186,7 +185,7 @@ class ViewModelFactory @Inject constructor(
         userWhitelistDao = userWhitelistDao,
         networkLeaderboardDao = networkLeaderboardDao,
         bookmarksDao = bookmarksDao,
-        fireproofWebsiteDao = fireproofWebsiteDao,
+        fireproofWebsiteRepository = fireproofWebsiteRepository,
         autoComplete = autoCompleteApi,
         appSettingsPreferencesStore = appSettingsPreferencesStore,
         longPressHandler = webViewLongPressHandler,
@@ -204,7 +203,7 @@ class ViewModelFactory @Inject constructor(
 
     private fun fireproofWebsiteViewModel() =
         FireproofWebsitesViewModel(
-            dao = fireproofWebsiteDao,
+            fireproofWebsiteRepository = fireproofWebsiteRepository,
             dispatcherProvider = dispatcherProvider,
             pixel = pixel,
             settingsDataStore = appSettingsPreferencesStore

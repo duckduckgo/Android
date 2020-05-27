@@ -57,6 +57,7 @@ import com.duckduckgo.app.browser.ui.HttpAuthenticationDialogFragment.HttpAuthen
 import com.duckduckgo.app.cta.ui.*
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteDao
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
+import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepository
 import com.duckduckgo.app.global.*
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.global.model.SiteFactory
@@ -96,7 +97,7 @@ class BrowserTabViewModel(
     private val userWhitelistDao: UserWhitelistDao,
     private val networkLeaderboardDao: NetworkLeaderboardDao,
     private val bookmarksDao: BookmarksDao,
-    private val fireproofWebsiteDao: FireproofWebsiteDao,
+    private val fireproofWebsiteRepository: FireproofWebsiteRepository,
     private val autoComplete: AutoComplete,
     private val appSettingsPreferencesStore: SettingsDataStore,
     private val longPressHandler: LongPressHandler,
@@ -189,6 +190,7 @@ class BrowserTabViewModel(
         class DownloadImage(val url: String, val requestUserConfirmation: Boolean) : Command()
         class ShowBookmarkAddedConfirmation(val bookmarkId: Long, val title: String?, val url: String?) : Command()
         class ShowFireproofWebSiteConfirmation(val fireproofWebsiteEntity: FireproofWebsiteEntity) : Command()
+        class AskToFireproofWebsite(val siteUrl: String) : Command()
         class ShareLink(val url: String) : Command()
         class CopyLink(val url: String) : Command()
         class FindInPageCommand(val searchTerm: String) : Command()
@@ -236,13 +238,12 @@ class BrowserTabViewModel(
         get() = site?.title
 
     private val autoCompletePublishSubject = PublishRelay.create<String>()
-    private val fireproofWebsiteState: LiveData<List<FireproofWebsiteEntity>> = fireproofWebsiteDao.fireproofWebsitesEntities()
+    private val fireproofWebsiteState: LiveData<List<FireproofWebsiteEntity>> = fireproofWebsiteRepository.getFireproofWebsites()
     private var autoCompleteDisposable: Disposable? = null
     private var site: Site? = null
     private lateinit var tabId: String
     private var webNavigationState: WebNavigationState? = null
     private var httpsUpgraded = false
-    private val loginDetection = LoginDetectionDelegate()
     private val fireproofWebsitesObserver = Observer<List<FireproofWebsiteEntity>> {
         browserViewState.value = currentBrowserViewState().copy(canFireproofSite = canFireproofWebsite())
     }
@@ -763,24 +764,21 @@ class BrowserTabViewModel(
         }
     }
 
-    fun onFireproofWebsiteClicked() {
+    fun onFireproofWebsiteClicked(siteUrl: String? = site?.url) {
         viewModelScope.launch {
-            val url = url ?: return@launch
-            val urlDomain = Uri.parse(url).host ?: return@launch
-            val fireproofWebsiteEntity = FireproofWebsiteEntity(domain = urlDomain)
-            val id = withContext(dispatchers.io()) {
-                fireproofWebsiteDao.insert(fireproofWebsiteEntity)
-            }
-            if (id >= 0) {
-                pixel.fire(PixelName.FIREPROOF_WEBSITE_ADDED)
-                command.value = ShowFireproofWebSiteConfirmation(fireproofWebsiteEntity = fireproofWebsiteEntity)
+            siteUrl?.takeUnless { it.isBlank() }?.let { nonEmptyUrl ->
+                val entity = fireproofWebsiteRepository.fireproofWebsite(nonEmptyUrl)
+                if (entity != null) {
+                    pixel.fire(PixelName.FIREPROOF_WEBSITE_ADDED)
+                    command.value = ShowFireproofWebSiteConfirmation(fireproofWebsiteEntity = entity)
+                }
             }
         }
     }
 
     fun onFireproofWebsiteSnackbarUndoClicked(fireproofWebsiteEntity: FireproofWebsiteEntity) {
         viewModelScope.launch(dispatchers.io()) {
-            fireproofWebsiteDao.delete(fireproofWebsiteEntity)
+            fireproofWebsiteRepository.removeFireproofWebsite(fireproofWebsiteEntity)
             pixel.fire(PixelName.FIREPROOF_WEBSITE_UNDO)
         }
     }
@@ -1180,9 +1178,13 @@ class BrowserTabViewModel(
     }
 
     override fun loginDetected() {
-        url?.takeIf { it.isNotEmpty() }
-            ?.let { onFireproofWebsiteClicked() }
-        //?.let { loginDetection.onEvent(LoginDetectionDelegate.Event.LoginDetected(it)) }
+        viewModelScope.launch {
+            if (canFireproofWebsite()) {
+                site?.url?.let {
+                    command.value = AskToFireproofWebsite(it)
+                }
+            }
+        }
     }
 
     companion object {

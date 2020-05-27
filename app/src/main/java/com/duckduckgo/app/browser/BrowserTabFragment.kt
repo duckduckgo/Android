@@ -577,6 +577,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
             is Command.DaxCommand.HideDaxDialog -> showHideTipsDialog(it.cta)
             is Command.HideWebContent -> webView?.hide()
             is Command.ShowWebContent -> webView?.show()
+            is Command.AskToFireproofWebsite -> viewModel.onFireproofWebsiteClicked(it.siteUrl)
         }
     }
 

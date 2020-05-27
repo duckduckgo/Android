@@ -17,8 +17,8 @@
 package com.duckduckgo.app.fire.fireproofwebsite.ui
 
 import androidx.lifecycle.*
-import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteDao
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
+import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepository
 import com.duckduckgo.app.fire.fireproofwebsite.ui.FireproofWebsitesViewModel.Command.ConfirmDeleteFireproofWebsite
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.SingleLiveEvent
@@ -28,7 +28,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.FIREPROOF_WEBSITE_DE
 import kotlinx.coroutines.launch
 
 class FireproofWebsitesViewModel(
-    private val dao: FireproofWebsiteDao,
+    private val fireproofWebsiteRepository: FireproofWebsiteRepository,
     private val dispatcherProvider: DispatcherProvider,
     private val pixel: Pixel,
     private val settingsDataStore: SettingsDataStore
@@ -47,7 +47,7 @@ class FireproofWebsitesViewModel(
     val viewState: LiveData<ViewState> = _viewState
     val command: SingleLiveEvent<Command> = SingleLiveEvent()
 
-    private val fireproofWebsites: LiveData<List<FireproofWebsiteEntity>> = dao.fireproofWebsitesEntities()
+    private val fireproofWebsites: LiveData<List<FireproofWebsiteEntity>> = fireproofWebsiteRepository.getFireproofWebsites()
     private val fireproofWebsitesObserver = Observer<List<FireproofWebsiteEntity>> { onPreservedCookiesEntitiesChanged(it!!) }
 
     init {
@@ -74,7 +74,7 @@ class FireproofWebsitesViewModel(
 
     fun delete(entity: FireproofWebsiteEntity) {
         viewModelScope.launch(dispatcherProvider.io()) {
-            dao.delete(entity)
+            fireproofWebsiteRepository.removeFireproofWebsite(entity)
             pixel.fire(FIREPROOF_WEBSITE_DELETED)
         }
     }
