@@ -279,7 +279,7 @@ class LoginDetector {
                 "\t}\n" +
                 "\n" +
                 "\tfunction inputVisible(input) {\n" +
-                "\t\treturn !(input.offsetWidth === 0 && input.offsetHeight === 0) && !input.ariaHidden && !input.hidden;\n" +
+                "\t\treturn !(input.offsetWidth === 0 && input.offsetHeight === 0) && !input.ariaHidden && !input.hidden && input.value != \"\";\n" +
                 "\t}\n" +
                 "\n" +
                 "\tfunction checkIsLoginForm(form) {\n" +
@@ -456,7 +456,7 @@ class LoginDetector {
                 "\t}\n" +
                 "\n" +
                 "\tfunction inputVisible(input) {\n" +
-                "\t\treturn !(input.offsetWidth === 0 && input.offsetHeight === 0) && !input.ariaHidden && !input.hidden;\n" +
+                "\t\treturn !(input.offsetWidth === 0 && input.offsetHeight === 0) && !input.ariaHidden && !input.hidden && input.value != \"\";\n" +
                 "\t}\n" +
                 "\n" +
                 "\tfunction checkIsLoginForm(form) {\n" +
