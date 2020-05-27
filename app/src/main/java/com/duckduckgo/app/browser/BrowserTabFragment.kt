@@ -1700,10 +1700,22 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
 
         private fun renderToolbarMenus(viewState: BrowserViewState) {
             if (viewState.browserShowing) {
-                privacyGradeButton?.isInvisible = !viewState.showPrivacyGrade
+                if (variantManager.getVariant().hasFeature(VariantManager.VariantFeature.SerpHeaderRemoval)) {
+                    if (viewState.showPrivacyGrade && viewState.isSERPPage){
+                        daxIcon.isVisible = true
+                        privacyGradeButton.gone()
+                    } else {
+                        daxIcon.isVisible = false
+                        privacyGradeButton?.isInvisible = !viewState.showPrivacyGrade
+                    }
+                } else {
+                    daxIcon.isVisible = false
+                    privacyGradeButton?.isInvisible = !viewState.showPrivacyGrade
+                }
                 clearTextButton?.isVisible = viewState.showClearButton
                 searchIcon?.isVisible = viewState.showSearchIcon
             } else {
+                daxIcon.isVisible = false
                 privacyGradeButton?.isVisible = false
                 clearTextButton?.isVisible = viewState.showClearButton
                 searchIcon?.isVisible = true

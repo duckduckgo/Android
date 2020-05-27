@@ -162,7 +162,8 @@ class BrowserTabViewModel(
         val isWhitelisted: Boolean = false,
         val canReportSite: Boolean = false,
         val addToHomeEnabled: Boolean = false,
-        val addToHomeVisible: Boolean = false
+        val addToHomeVisible: Boolean = false,
+        val isSERPPage: Boolean = false
     )
 
     data class OmnibarViewState(
@@ -576,7 +577,8 @@ class BrowserTabViewModel(
             isWhitelisted = false,
             showSearchIcon = false,
             showClearButton = false,
-            canFireproofSite = canFireproofWebsite()
+            canFireproofSite = canFireproofWebsite(),
+            isSERPPage = duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(url)
         )
 
         Timber.d("showPrivacyGrade=true, showSearchIcon=false, showClearButton=false")
@@ -614,7 +616,7 @@ class BrowserTabViewModel(
         onSiteChanged()
         val currentOmnibarViewState = currentOmnibarViewState()
         omnibarViewState.postValue(currentOmnibarViewState.copy(omnibarText = omnibarTextForUrl(url), shouldMoveCaretToEnd = false))
-        browserViewState.postValue(currentBrowserViewState().copy(canFireproofSite = canFireproofWebsite()))
+        browserViewState.postValue(currentBrowserViewState().copy(canFireproofSite = canFireproofWebsite(), isSERPPage = duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(url)))
     }
 
     private fun omnibarTextForUrl(url: String?): String {
