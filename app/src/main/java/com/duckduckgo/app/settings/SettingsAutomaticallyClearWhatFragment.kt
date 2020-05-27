@@ -26,7 +26,6 @@ import androidx.fragment.app.DialogFragment
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.settings.clear.ClearWhatOption
 import com.duckduckgo.app.settings.clear.ClearWhatOption.*
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
 class SettingsAutomaticallyClearWhatFragment : DialogFragment() {
 

@@ -26,7 +26,6 @@ import androidx.fragment.app.DialogFragment
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.view.hideKeyboard
 import com.duckduckgo.app.global.view.showKeyboard
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import org.jetbrains.anko.find
 
 class EditBookmarkDialogFragment : DialogFragment() {

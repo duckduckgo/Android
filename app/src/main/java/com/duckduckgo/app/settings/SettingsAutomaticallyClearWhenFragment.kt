@@ -28,7 +28,6 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.view.show
 import com.duckduckgo.app.settings.clear.ClearWhenOption
 import com.duckduckgo.app.settings.clear.ClearWhenOption.*
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
 class SettingsAutomaticallyClearWhenFragment : DialogFragment() {
 
