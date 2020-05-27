@@ -56,7 +56,7 @@
         android:paddingEnd="24dp"
         android:paddingBottom="24dp"
         android:text="@string/fireCancel"
-        android:textColor="?normalTextColor"
+        android:textColor="@color/brownishGray"
         android:textSize="16sp"
         android:textStyle="normal"
         app:layout_constraintEnd_toEndOf="parent"
