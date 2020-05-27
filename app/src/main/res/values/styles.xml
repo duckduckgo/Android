@@ -311,6 +311,10 @@
         <item name="backgroundTint">?dialogBgColor</item>
     </style>
 
+    <style name="DaxDialogCheckedTextView" parent="Widget.MaterialComponents.CheckedTextView">
+        <item name="android:textColor">?normalTextColor</item>
+    </style>
+
     <style name="DaxDialogRadioButton">
         <item name="android:textColor">?normalTextColor</item>
     </style>

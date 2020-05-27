@@ -242,8 +242,12 @@
     <style name="DaxAlertDialog" parent="ThemeOverlay.MaterialComponents.MaterialAlertDialog">
         <item name="android:background">?dialogBgColor</item>
         <item name="colorOnSurface">?normalTextColor</item>
+        <item name="android:textColor">?normalTextColor</item>
         <item name="buttonBarPositiveButtonStyle">@style/DaxDialogPositiveButton</item>
         <item name="buttonBarNegativeButtonStyle">@style/DaxDialogNegativeButton</item>
+        <item name="checkedTextViewStyle">@style/DaxDialogCheckedTextView</item>
     </style>
+
+
 
 </resources>
