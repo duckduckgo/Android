@@ -33,13 +33,13 @@
             android:id="@+id/toolbarContainer"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:theme="@style/OmnibarToolbarTheme">
+            android:background="?toolbarBgColor">
 
             <androidx.appcompat.widget.Toolbar
                 android:id="@+id/toolbar"
                 android:layout_width="0dp"
                 android:layout_height="?attr/actionBarSize"
-                android:background="?attr/colorPrimary"
+                android:background="?attr/toolbarBgColor"
                 app:contentInsetEnd="0dp"
                 app:contentInsetStart="0dp"
                 app:layout_constraintBottom_toBottomOf="parent"
@@ -48,14 +48,14 @@
                 app:layout_constraintTop_toTopOf="parent"
                 app:popupTheme="@style/AppTheme.Dark.PopupOverlay">
 
-                    <androidx.constraintlayout.widget.ConstraintLayout
-                        android:id="@+id/omniBarContainer"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_margin="8dp"
-                        android:background="@drawable/omnibar_field_background"
-                        android:paddingStart="6dp"
-                        android:paddingEnd="6dp">
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/omniBarContainer"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_margin="8dp"
+                    android:background="@drawable/omnibar_field_background"
+                    android:paddingStart="6dp"
+                    android:paddingEnd="6dp">
 
                         <androidx.constraintlayout.widget.ConstraintLayout
                             android:id="@+id/animationContainer"
@@ -216,6 +216,7 @@
                 style="@style/Widget.AppCompat.ProgressBar.Horizontal"
                 android:layout_width="match_parent"
                 android:layout_height="4dp"
+                android:progressDrawable="@drawable/loading_progress"
                 android:visibility="invisible"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"

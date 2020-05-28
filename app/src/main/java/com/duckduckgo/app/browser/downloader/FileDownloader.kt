@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.browser.downloader
 
+import android.net.Uri
 import android.os.Environment
 import android.webkit.URLUtil
 import androidx.annotation.WorkerThread
@@ -32,9 +33,9 @@ class FileDownloader @Inject constructor(
     @WorkerThread
     fun download(pending: PendingFileDownload, callback: FileDownloadListener) {
         when {
-            pending.isNetworkUrl -> networkFileDownloader.download(pending)
+            pending.isNetworkUrl -> networkFileDownloader.download(pending, callback)
             pending.isDataUrl -> dataUriDownloader.download(pending, callback)
-            else -> callback.downloadFailed("Not supported")
+            else -> callback.downloadFailed("Not supported", DownloadFailReason.UnsupportedUrlType)
         }
     }
 
@@ -50,7 +51,7 @@ class FileDownloader @Inject constructor(
     interface FileDownloadListener {
         fun downloadStarted()
         fun downloadFinished(file: File, mimeType: String?)
-        fun downloadFailed(message: String)
+        fun downloadFailed(message: String, downloadFailReason: DownloadFailReason)
     }
 }
 
@@ -63,3 +64,15 @@ fun FileDownloader.PendingFileDownload.guessFileName(): String {
 val FileDownloader.PendingFileDownload.isDataUrl get() = URLUtil.isDataUrl(url)
 
 val FileDownloader.PendingFileDownload.isNetworkUrl get() = URLUtil.isNetworkUrl(url)
+
+sealed class DownloadFailReason {
+
+    object DownloadManagerDisabled : DownloadFailReason()
+    object UnsupportedUrlType : DownloadFailReason()
+    object Other : DownloadFailReason()
+    object DataUriParseException : DownloadFailReason()
+
+    companion object {
+        val DOWNLOAD_MANAGER_SETTINGS_URI: Uri = Uri.parse("package:com.android.providers.downloads")
+    }
+}
