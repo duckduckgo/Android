@@ -25,6 +25,7 @@ import com.duckduckgo.app.browser.addtohome.AddToHomeSystemCapabilityDetector
 import com.duckduckgo.app.browser.defaultbrowsing.AndroidDefaultBrowserDetector
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserObserver
+import com.duckduckgo.app.browser.logindetection.LoginDetector
 import com.duckduckgo.app.browser.session.WebViewSessionInMemoryStorage
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.browser.tabpreview.FileBasedWebViewPreviewGenerator
@@ -73,7 +74,8 @@ class BrowserModule {
         requestInterceptor: RequestInterceptor,
         offlinePixelCountDataStore: OfflinePixelCountDataStore,
         uncaughtExceptionRepository: UncaughtExceptionRepository,
-        cookieManager: CookieManager
+        cookieManager: CookieManager,
+        loginDetector: LoginDetector
     ): BrowserWebViewClient {
         return BrowserWebViewClient(
             requestRewriter,
@@ -81,7 +83,8 @@ class BrowserModule {
             requestInterceptor,
             offlinePixelCountDataStore,
             uncaughtExceptionRepository,
-            cookieManager
+            cookieManager,
+            loginDetector
         )
     }
 

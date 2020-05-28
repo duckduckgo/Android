@@ -23,6 +23,7 @@ import android.webkit.*
 import androidx.annotation.RequiresApi
 import androidx.annotation.UiThread
 import androidx.annotation.WorkerThread
+import com.duckduckgo.app.browser.logindetection.LoginDetector
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.browser.navigation.safeCopyBackForwardList
 import com.duckduckgo.app.global.exception.UncaughtExceptionRepository
@@ -31,8 +32,6 @@ import com.duckduckgo.app.statistics.store.OfflinePixelCountDataStore
 import kotlinx.coroutines.*
 import timber.log.Timber
 import java.net.URI
-import kotlin.coroutines.resume
-import kotlin.coroutines.suspendCoroutine
 
 class BrowserWebViewClient(
     private val requestRewriter: RequestRewriter,
@@ -40,7 +39,8 @@ class BrowserWebViewClient(
     private val requestInterceptor: RequestInterceptor,
     private val offlinePixelCountDataStore: OfflinePixelCountDataStore,
     private val uncaughtExceptionRepository: UncaughtExceptionRepository,
-    private val cookieManager: CookieManager
+    private val cookieManager: CookieManager,
+    private val loginDetector: LoginDetector
 ) : WebViewClient() {
 
     var webViewClientListener: WebViewClientListener? = null
@@ -118,24 +118,24 @@ class BrowserWebViewClient(
 
     @UiThread
     override fun onPageStarted(webView: WebView, url: String?, favicon: Bitmap?) {
-        try {
-            Timber.v("onPageStarted webViewUrl: ${webView.url} URL: $url")
-            val navigationList = webView.safeCopyBackForwardList() ?: return
-            webViewClientListener?.navigationStateChanged(WebViewNavigationState(navigationList))
-            if (url != null && url == lastPageStarted) {
-                webViewClientListener?.pageRefreshed(url)
-            }
-            lastPageStarted = url
-            loginDetector.injectJSWithoutXHR(webView)
-        } catch (e: Throwable) {
-            GlobalScope.launch {
-                uncaughtExceptionRepository.recordUncaughtException(e, ON_PAGE_STARTED)
-                throw e
+        return runBlocking {
+            try {
+                Timber.v("onPageStarted webViewUrl: ${webView.url} URL: $url")
+                val navigationList = webView.safeCopyBackForwardList() ?: return@runBlocking
+                webViewClientListener?.navigationStateChanged(WebViewNavigationState(navigationList))
+                if (url != null && url == lastPageStarted) {
+                    webViewClientListener?.pageRefreshed(url)
+                }
+                lastPageStarted = url
+                loginDetector.onEvent(LoginDetector.WebNavigationEvent.OnPageStarted(webView))
+            } catch (e: Throwable) {
+                GlobalScope.launch {
+                    uncaughtExceptionRepository.recordUncaughtException(e, ON_PAGE_STARTED)
+                    throw e
+                }
             }
         }
     }
-
-    private val loginDetector = LoginDetector()
 
     @UiThread
     override fun onPageFinished(webView: WebView, url: String?) {
@@ -163,10 +163,7 @@ class BrowserWebViewClient(
         return runBlocking {
             try {
                 val documentUrl = withContext(Dispatchers.Main) { webView.url }
-                if (loginDetector.interceptPost(request)) {
-                    //webViewClientListener?.loginDetected()
-                    withContext(Dispatchers.Main) { loginDetector.injectOnlyFormsJS(webView) }
-                }
+                loginDetector.onEvent(LoginDetector.WebNavigationEvent.ShouldInterceptRequest(webView, request))
                 Timber.v("Intercepting resource ${request.url} type:${request.method} on page $documentUrl")
                 requestInterceptor.shouldIntercept(request, webView, documentUrl, webViewClientListener)
             } catch (e: Throwable) {
@@ -252,33 +249,5 @@ class BrowserWebViewClient(
 
             it.requiresAuthentication(request)
         }
-    }
-}
-
-class LoginDetector {
-
-    fun interceptPost(request: WebResourceRequest): Boolean {
-        if (request.method == "POST") {
-            Timber.i("LoginDetectionInterface evaluate ${request.url}")
-            if (request.url?.path?.contains(Regex("login|sign-in|signin|sessions")) == true) {
-                Timber.v("LoginDetectionInterface post login DETECTED")
-                return true
-            }
-        }
-        return false
-    }
-
-    suspend fun injectOnlyFormsJS(webView: WebView): Boolean {
-        return suspendCoroutine { continuation ->
-            webView.evaluateJavascript("javascript:scanForPasswordField()") { result ->
-                Timber.v("LoginDetectionInterface Result: $result")
-                continuation.resume(result?.toBoolean() ?: false)
-            }
-        }
-    }
-
-    fun injectJSWithoutXHR(webView: WebView) {
-        val javascript = webView.context.resources.openRawResource(R.raw.login_form_detection).bufferedReader().use { it.readText() }
-        webView.evaluateJavascript("javascript:$javascript", null)
     }
 }

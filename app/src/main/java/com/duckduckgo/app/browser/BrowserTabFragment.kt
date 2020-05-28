@@ -46,9 +46,9 @@ import androidx.constraintlayout.widget.ConstraintSet
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.content.ContextCompat
 import androidx.core.content.pm.ShortcutManagerCompat
-import androidx.core.view.*
 import androidx.core.text.HtmlCompat
 import androidx.core.text.HtmlCompat.FROM_HTML_MODE_LEGACY
+import androidx.core.view.*
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.transaction
 import androidx.lifecycle.Lifecycle
@@ -68,6 +68,7 @@ import com.duckduckgo.app.browser.downloader.FileDownloader
 import com.duckduckgo.app.browser.downloader.FileDownloader.FileDownloadListener
 import com.duckduckgo.app.browser.downloader.FileDownloader.PendingFileDownload
 import com.duckduckgo.app.browser.filechooser.FileChooserIntentBuilder
+import com.duckduckgo.app.browser.logindetection.LoginDetector
 import com.duckduckgo.app.browser.model.BasicAuthenticationCredentials
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.browser.model.LongPressTarget
@@ -119,13 +120,13 @@ import kotlinx.android.synthetic.main.popup_window_browser_menu.view.addToHome
 import kotlinx.android.synthetic.main.popup_window_browser_menu.view.backPopupMenuItem
 import kotlinx.android.synthetic.main.popup_window_browser_menu.view.brokenSitePopupMenuItem
 import kotlinx.android.synthetic.main.popup_window_browser_menu.view.findInPageMenuItem
+import kotlinx.android.synthetic.main.popup_window_browser_menu.view.fireproofWebsitePopupMenuItem
 import kotlinx.android.synthetic.main.popup_window_browser_menu.view.forwardPopupMenuItem
 import kotlinx.android.synthetic.main.popup_window_browser_menu.view.newTabPopupMenuItem
 import kotlinx.android.synthetic.main.popup_window_browser_menu.view.refreshPopupMenuItem
 import kotlinx.android.synthetic.main.popup_window_browser_menu.view.requestDesktopSiteCheckMenuItem
 import kotlinx.android.synthetic.main.popup_window_browser_menu.view.settingsPopupMenuItem
 import kotlinx.android.synthetic.main.popup_window_browser_menu.view.whitelistPopupMenuItem
-import kotlinx.android.synthetic.main.popup_window_browser_menu.view.fireproofWebsitePopupMenuItem
 import kotlinx.coroutines.*
 import org.jetbrains.anko.longToast
 import org.jetbrains.anko.share
@@ -190,6 +191,9 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
 
     @Inject
     lateinit var variantManager: VariantManager
+
+    @Inject
+    lateinit var loginDetector: LoginDetector
 
     val tabId get() = requireArguments()[TAB_ID_ARG] as String
 
@@ -861,7 +865,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
             registerForContextMenu(it)
 
             it.setFindListener(this)
-            it.addJavascriptInterface(LoginDetectionInterface(viewModel), LOGIN_DETECTION_INTERFACE_NAME)
+            loginDetector.addLoginDetection(it) { viewModel.loginDetected() }
         }
 
         if (BuildConfig.DEBUG) {

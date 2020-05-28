@@ -16,26 +16,23 @@
 
 package com.duckduckgo.app.browser
 
-import android.content.Context
 import android.webkit.JavascriptInterface
 import timber.log.Timber
 
 // Interface name used inside login_form_detection.js
 const val LOGIN_DETECTION_INTERFACE_NAME = "LoginDetection"
 
-class LoginDetectionInterface(private val viewModel: BrowserTabViewModel) {
+@Suppress("unused")
+class LoginDetectionInterface(private val onLoginDetected: () -> Unit) {
 
-    /** Show a toast from the web page  */
     @JavascriptInterface
     fun showToast(toast: String) {
         Timber.i("LoginDetectionInterface $toast")
     }
 
-    /** Show a toast from the web page  */
     @JavascriptInterface
     fun loginDetected(toast: String) {
         Timber.i("LoginDetectionInterface $toast")
-        //Toast.makeText(mContext, toast, Toast.LENGTH_SHORT).show()
-        viewModel.loginDetected()
+        onLoginDetected()
     }
 }
