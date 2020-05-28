@@ -348,12 +348,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
 
     private fun launchTabSwitcher() {
         val activity = activity ?: return
-        if (isBottomNavigationFeatureEnabled()) {
-            startActivity(TabSwitcherBottomBarFeatureActivity.intent(activity, tabId))
-        } else {
-            startActivity(TabSwitcherActivity.intent(activity, tabId))
-        }
-
+        startActivity(TabSwitcherActivity.intent(activity, tabId))
         activity.overridePendingTransition(R.anim.tab_anim_fade_in, R.anim.slide_to_bottom)
     }
 
@@ -621,7 +616,6 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
 
     private fun openInNewBackgroundTab() {
         appBarLayout.setExpanded(true, true)
-        decorator.updateBottomBarVisibility(true, true)
         viewModel.tabs.removeObservers(this)
         decorator.incrementTabs()
     }
@@ -730,15 +724,8 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
         autoCompleteSuggestionsList.adapter = autoCompleteSuggestionsAdapter
     }
 
-    private fun isBottomNavigationFeatureEnabled() =
-        variantManager.getVariant().hasFeature(VariantManager.VariantFeature.BottomBarNavigation)
-
     private fun decorateWithFeatures() {
-        if (isBottomNavigationFeatureEnabled()) {
-            decorator.decorateWithBottomBarSearch()
-        } else {
-            decorator.decorateWithToolbar()
-        }
+        decorator.decorateWithToolbar()
     }
 
     private fun configurePrivacyGrade() {
@@ -1260,9 +1247,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
 
     inner class BrowserTabFragmentDecorator {
         fun decorateToolbar(viewState: BrowserViewState) {
-            if (!variantManager.getVariant().hasFeature(VariantManager.VariantFeature.BottomBarNavigation)) {
-                decorator.decorateToolbarActions(viewState)
-            }
+            decorator.decorateToolbarActions(viewState)
         }
 
         private fun decorateToolbarActions(viewState: BrowserViewState) {
@@ -1272,20 +1257,11 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
         }
 
         fun decorateWithToolbar() {
-            hideBottomBar()
             decorateAppBarWithToolbarOnly()
             createPopupMenuWithToolbarOnly()
             configureShowTabSwitcherListenerWithToolbarOnly()
             configureLongClickOpensNewTabListenerWithToolbarOnly()
             removeUnnecessaryLayoutBehaviour()
-        }
-
-        fun decorateWithBottomBarSearch() {
-            bindBottomBarButtons()
-            decorateAppBarWithBottomBar()
-            createPopupMenuWithBottomBar()
-            configureShowTabSwitcherListenerWithBottomBarNavigationOnly()
-            configureLongClickOpensNewTabListenerWithBottomBarNavigationOnly()
         }
 
         private fun decorateAppBarWithToolbarOnly() {
@@ -1296,12 +1272,6 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
             }
 
             tabsButton?.show()
-        }
-
-        private fun decorateAppBarWithBottomBar() {
-            menuButton?.gone()
-            tabsButton?.gone()
-            fireMenuButton?.gone()
         }
 
         private fun createPopupMenuWithToolbarOnly() {
@@ -1343,112 +1313,14 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
             pixel.fire(String.format(Locale.US, Pixel.PixelName.MENU_ACTION_POPUP_OPENED.pixelName, variantManager.getVariant().key))
         }
 
-        private fun createPopupMenuWithBottomBar() {
-            popupMenu = BrowserPopupMenu(layoutInflater, variantManager.getVariant())
-            val view = popupMenu.contentView
-            popupMenu.apply {
-                onMenuItemClicked(view.forwardPopupMenuItem) { viewModel.onUserPressedForward() }
-                onMenuItemClicked(view.backPopupMenuItem) { activity?.onBackPressed() }
-                onMenuItemClicked(view.refreshPopupMenuItem) {
-                    viewModel.onRefreshRequested()
-                    pixel.fire(String.format(Locale.US, Pixel.PixelName.MENU_ACTION_REFRESH_PRESSED.pixelName, variantManager.getVariant().key))
-                }
-                onMenuItemClicked(view.sharePopupMenuItem) { viewModel.onShareSelected() }
-                onMenuItemClicked(view.newTabPopupMenuItem) {
-                    viewModel.userRequestedOpeningNewTab()
-                    pixel.fire(String.format(Locale.US, Pixel.PixelName.MENU_ACTION_NEW_TAB_PRESSED.pixelName, variantManager.getVariant().key))
-                }
-                onMenuItemClicked(view.addBookmarksPopupMenuItem) { launch { viewModel.onBookmarkAddRequested() } }
-                onMenuItemClicked(view.fireproofWebsitePopupMenuItem) { launch { viewModel.onFireproofWebsiteClicked() } }
-                onMenuItemClicked(view.findInPageMenuItem) { viewModel.onFindInPageSelected() }
-                onMenuItemClicked(view.whitelistPopupMenuItem) { viewModel.onWhitelistSelected() }
-                onMenuItemClicked(view.brokenSitePopupMenuItem) { viewModel.onBrokenSiteSelected() }
-                onMenuItemClicked(view.settingsPopupMenuItem) { browserActivity?.launchSettings() }
-                onMenuItemClicked(view.requestDesktopSiteCheckMenuItem) { viewModel.onDesktopSiteModeToggled(view.requestDesktopSiteCheckMenuItem.isChecked) }
-                onMenuItemClicked(view.addToHome) { viewModel.onPinPageToHomeSelected() }
-            }
-        }
-
-        private fun launchBottomAnchoredPopupMenu() {
-            popupMenu.show(rootView, bottomNavigationBar)
-            pixel.fire(String.format(Locale.US, Pixel.PixelName.MENU_ACTION_POPUP_OPENED.pixelName, variantManager.getVariant().key))
-        }
-
-        private fun bindBottomBarButtons() {
-            bottomNavigationBar.apply {
-                onItemClicked(bottomBarFireItem) {
-                    browserActivity?.launchFire()
-                    pixel.fire(String.format(Locale.US, Pixel.PixelName.MENU_ACTION_FIRE_PRESSED.pixelName, variantManager.getVariant().key))
-                }
-                onItemClicked(bottomBarBookmarksItemOne) {
-                    browserActivity?.launchBookmarks()
-                    pixel.fire(String.format(Locale.US, Pixel.PixelName.MENU_ACTION_BOOKMARKS_PRESSED.pixelName, variantManager.getVariant().key))
-                }
-                onItemClicked(bottomBarSearchItem) {
-                    omnibarTextInput.requestFocus()
-                    pixel.fire(String.format(Locale.US, Pixel.PixelName.MENU_ACTION_SEARCH_PRESSED.pixelName, variantManager.getVariant().key))
-                }
-                onItemClicked(bottomBarTabsItem) {
-                    viewModel.userLaunchingTabSwitcher()
-                }
-                onItemClicked(bottomBarOverflowItem) {
-                    hideKeyboardImmediately()
-                    launchBottomAnchoredPopupMenu()
-                }
-            }
-        }
-
-        fun updateBottomBarVisibility(shouldShow: Boolean, shouldAnimate: Boolean = false) {
-            if (isBottomNavigationFeatureEnabled()) {
-                if (shouldShow) {
-                    showBottomBar(shouldAnimate)
-                } else {
-                    hideBottomBar(shouldAnimate)
-                }
-            }
-        }
-
-        private fun hideBottomBar(shouldAnimate: Boolean = false) {
-            if (shouldAnimate) {
-                bottomNavigationBar.animateBarVisibility(isVisible = false)
-            }
-            bottomNavigationBar.gone()
-        }
-
-        private fun showBottomBar(shouldAnimate: Boolean) {
-            if (shouldAnimate) {
-                bottomNavigationBar.show()
-                bottomNavigationBar.animateBarVisibility(isVisible = true)
-            } else {
-                bottomNavigationBar.postDelayed(KEYBOARD_DELAY) {
-                    if (bottomNavigationBar != null) {
-                        bottomNavigationBar.show()
-                    }
-                }
-            }
-        }
-
         private fun configureShowTabSwitcherListenerWithToolbarOnly() {
             tabsButton?.setOnClickListener {
                 launch { viewModel.userLaunchingTabSwitcher() }
             }
         }
 
-        private fun configureShowTabSwitcherListenerWithBottomBarNavigationOnly() {
-            bottomBarTabsItem.setOnClickListener {
-                launch { viewModel.userLaunchingTabSwitcher() }
-            }
-        }
-
         private fun configureLongClickOpensNewTabListenerWithToolbarOnly() {
             tabsButton?.setOnLongClickListener {
-                launch { viewModel.userRequestedOpeningNewTab() }
-                return@setOnLongClickListener true
-            }
-        }
-
-        private fun configureLongClickOpensNewTabListenerWithBottomBarNavigationOnly() {
-            bottomBarTabsItem.setOnLongClickListener {
                 launch { viewModel.userRequestedOpeningNewTab() }
                 return@setOnLongClickListener true
             }
@@ -1475,14 +1347,8 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
         }
 
         fun incrementTabs() {
-            if (isBottomNavigationFeatureEnabled()) {
-                bottomBarTabsItem.increment {
-                    addTabsObserver()
-                }
-            } else {
-                tabsButton?.increment {
-                    addTabsObserver()
-                }
+            tabsButton?.increment {
+                addTabsObserver()
             }
         }
     }
@@ -1555,28 +1421,13 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
                 if (shouldUpdateOmnibarTextInput(viewState, viewState.omnibarText)) {
                     omnibarTextInput.setText(viewState.omnibarText)
                     appBarLayout.setExpanded(true, true)
-                    decorator.updateBottomBarVisibility(true, true)
                     if (viewState.shouldMoveCaretToEnd) {
                         omnibarTextInput.setSelection(viewState.omnibarText.length)
                     }
-                } else {
-                    decorator.updateBottomBarVisibility(!viewState.isEditing)
                 }
 
                 lastSeenBrowserViewState?.let {
                     renderToolbarMenus(it)
-                }
-
-                if (ctaContainer.isVisible) {
-                    if (isBottomNavigationFeatureEnabled()) {
-                        lastSeenOmnibarViewState?.let {
-                            if (it.isEditing) {
-                                ctaContainer.setPadding(0, 0, 0, 0)
-                            } else {
-                                ctaContainer.setPadding(0, 0, 0, 46.toPx())
-                            }
-                        } ?: ctaContainer.setPadding(0, 0, 0, 46.toPx())
-                    }
                 }
             }
         }
@@ -1835,22 +1686,6 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
 
             ctaContainer.ctaDismissButton.setOnClickListener {
                 viewModel.onUserDismissedCta()
-            }
-
-            if (isBottomNavigationFeatureEnabled()) {
-                lastSeenOmnibarViewState?.let {
-                    if (it.isEditing) {
-                        ctaContainer.setPadding(0, 0, 0, 0)
-                    } else {
-                        ctaContainer.setPadding(0, 0, 0, 46.toPx())
-                    }
-                } ?: ctaContainer.setPadding(0, 0, 0, 46.toPx())
-
-                ConstraintSet().also {
-                    it.clone(newTabLayout)
-                    it.connect(ddgLogo.id, ConstraintSet.BOTTOM, ctaContainer.id, ConstraintSet.TOP, 0)
-                    it.applyTo(newTabLayout)
-                }
             }
         }
 
