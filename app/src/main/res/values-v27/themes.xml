@@ -21,7 +21,7 @@
     <style name="AppTheme.Dark" parent="AppTheme.BaseDark">
         <item name="android:windowLightStatusBar">false</item>
         <item name="android:windowLightNavigationBar">false</item>
-        <item name="android:navigationBarColor">@color/black</item>
+        <item name="android:navigationBarColor">?toolbarBgColor</item>
     </style>
 
     <style name="AppTheme.Light" parent="AppTheme.BaseLight">
