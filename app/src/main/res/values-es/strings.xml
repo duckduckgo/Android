@@ -411,7 +411,7 @@
     <string name="changeIconCtaLabel">Cambiar icono de la aplicación</string>
     <string name="changeIconCtaAccept">Usar</string>
     <string name="changeIconCtaCancel">Cancelar</string>
-    <string name="changeIconDialogTitle">¿Usar nuevo ícono?</string>
+    <string name="changeIconDialogTitle">¿Usar nuevo icono?</string>
     <string name="changeIconDialogMessage">La aplicación puede cerrarse para actualizar los cambios. Vuelve después de que hayas admirado tu nuevo y atractivo icono.</string>
 
     <!-- New dashboard / menu buttons -->
@@ -431,7 +431,7 @@
     <string name="whitelistExplanation">Estos sitios web incluidos en la lista blanca no se actualizarán por Protección de Privacidad</string>
     <string name="whitelistNoEntries">Aún no hay sitios web en la lista blanca</string>
     <string name="whitelistDomainHint">www.ejemplo.com</string>
-    <string name="whitelistFormatError">No se ha podido guardar, ingresa un dominio como <b>example.com</b>
+    <string name="whitelistFormatError">No se ha podido guardar, ingresa un dominio como <b>ejemplo.com</b>
   </string>
 
     <!-- Settings -->
@@ -441,10 +441,10 @@
     <string name="fireproofWebsitesActivityTitle">Sitios web a prueba de fuego</string>
     <string name="settingsFireproofWebsites">Sitios web a prueba de fuego</string>
     <string name="fireproofWebsiteMenuTitle">Sitio web a prueba de fuego</string>
-    <string name="fireproofWebsiteSnackbarConfirmation">¡&lt;b&gt;%s&lt;/b&gt; ahora es a prueba de fuego! Visita Ajustes para obtener más información.</string>
+    <string name="fireproofWebsiteSnackbarConfirmation">¡&lt;b&gt;%s&lt;/b&gt; es ahora a prueba de fuego! Visita Ajustes para obtener más información.</string>
     <string name="fireproofWebsiteSnackbarAction">Deshacer</string>
     <string name="fireproofWebsiteDeleteConfirmMessage">¿Está seguro de que desea eliminar &lt;b&gt;%s&lt;/b&gt;?</string>
-    <string name="fireproofWebsiteEmptyListHint">No hay sitios web a prueba de fuego todavía</string>
+    <string name="fireproofWebsiteEmptyListHint">Todavía no hay sitios web a prueba de fuego</string>
     <string name="fireproofWebsiteFeatureDescription">Los sitios web usan cookies para mantener la sesión del usuario. Cuando hagas un sitio web a prueba de fuego, las cookies no se borrarán y permanecerás conectado, incluso después de usar el botón fuego.</string>
     <string name="fireproofWebsiteOverflowContentDescription">Más opciones para el sitio web a prueba de fuego %s</string>
 </resources>
