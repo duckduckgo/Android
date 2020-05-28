@@ -25,7 +25,6 @@ import android.view.View
 import android.view.ViewGroup.LayoutParams.WRAP_CONTENT
 import android.widget.PopupWindow
 import com.duckduckgo.app.statistics.Variant
-import com.duckduckgo.app.statistics.VariantManager
 
 class BrowserPopupMenu(layoutInflater: LayoutInflater, variant: Variant, view: View = inflate(layoutInflater, variant)) :
     PopupWindow(view, WRAP_CONTENT, WRAP_CONTENT, true) {

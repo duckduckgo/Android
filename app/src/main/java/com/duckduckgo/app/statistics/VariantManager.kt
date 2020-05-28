@@ -27,9 +27,7 @@ import java.util.*
 interface VariantManager {
 
     // variant-dependant features listed here
-    sealed class VariantFeature {
-
-    }
+    sealed class VariantFeature
 
     companion object {
 

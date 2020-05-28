@@ -146,7 +146,6 @@ class TabSwitcherBottomBarFeatureActivity : DuckDuckGoActivity(), TabSwitcherLis
         }
     }
 
-
     private fun createPopUpMenu() {
         popupMenu = TabsPopupMenu(layoutInflater)
         val view = popupMenu.contentView
