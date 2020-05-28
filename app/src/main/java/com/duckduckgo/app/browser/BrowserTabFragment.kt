@@ -42,8 +42,6 @@ import android.widget.TextView
 import androidx.annotation.AnyThread
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
-import androidx.constraintlayout.widget.ConstraintSet
-import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.content.ContextCompat
 import androidx.core.content.pm.ShortcutManagerCompat
 import androidx.core.text.HtmlCompat
@@ -93,7 +91,6 @@ import com.duckduckgo.app.survey.model.Survey
 import com.duckduckgo.app.survey.ui.SurveyActivity
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.ui.TabSwitcherActivity
-import com.duckduckgo.app.tabs.ui.TabSwitcherBottomBarFeatureActivity
 import com.duckduckgo.app.widget.ui.AddWidgetInstructionsActivity
 import com.duckduckgo.widget.SearchWidgetLight
 import com.google.android.material.snackbar.Snackbar
@@ -723,7 +720,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
     }
 
     private fun decorateWithFeatures() {
-        decorator.decorateWithToolbar()
+        decorator.decorate()
     }
 
     private fun configurePrivacyGrade() {
@@ -1244,24 +1241,25 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
     }
 
     inner class BrowserTabFragmentDecorator {
-        fun decorateToolbar(viewState: BrowserViewState) {
-            decorator.decorateToolbarActions(viewState)
+
+        fun decorate() {
+            decorateToolbarWithButtons()
+            createPopupMenu()
+            configureShowTabSwitcherListener()
+            configureLongClickOpensNewTabListener()
         }
 
-        private fun decorateToolbarActions(viewState: BrowserViewState) {
+        fun decorateToolbarMenus(viewState: BrowserViewState) {
+            decorator.updateToolbarActionsVisibility(viewState)
+        }
+
+        private fun updateToolbarActionsVisibility(viewState: BrowserViewState) {
             tabsButton?.isVisible = viewState.showTabsButton
             fireMenuButton?.isVisible = viewState.showFireButton
             menuButton?.isVisible = viewState.showMenuButton
         }
 
-        fun decorateWithToolbar() {
-            decorateAppBarWithToolbarOnly()
-            createPopupMenuWithToolbarOnly()
-            configureShowTabSwitcherListenerWithToolbarOnly()
-            configureLongClickOpensNewTabListenerWithToolbarOnly()
-        }
-
-        private fun decorateAppBarWithToolbarOnly() {
+        private fun decorateToolbarWithButtons() {
             fireMenuButton?.show()
             fireMenuButton?.setOnClickListener {
                 browserActivity?.launchFire()
@@ -1271,7 +1269,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
             tabsButton?.show()
         }
 
-        private fun createPopupMenuWithToolbarOnly() {
+        private fun createPopupMenu() {
             popupMenu = BrowserPopupMenu(layoutInflater, variantManager.getVariant())
             val view = popupMenu.contentView
             popupMenu.apply {
@@ -1310,13 +1308,13 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
             pixel.fire(String.format(Locale.US, Pixel.PixelName.MENU_ACTION_POPUP_OPENED.pixelName, variantManager.getVariant().key))
         }
 
-        private fun configureShowTabSwitcherListenerWithToolbarOnly() {
+        private fun configureShowTabSwitcherListener() {
             tabsButton?.setOnClickListener {
                 launch { viewModel.userLaunchingTabSwitcher() }
             }
         }
 
-        private fun configureLongClickOpensNewTabListenerWithToolbarOnly() {
+        private fun configureLongClickOpensNewTabListener() {
             tabsButton?.setOnLongClickListener {
                 launch { viewModel.userRequestedOpeningNewTab() }
                 return@setOnLongClickListener true
@@ -1548,7 +1546,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
                 searchIcon?.isVisible = true
             }
 
-            decorator.decorateToolbar(viewState)
+            decorator.decorateToolbarMenus(viewState)
         }
 
         fun renderFindInPageState(viewState: FindInPageViewState) {
