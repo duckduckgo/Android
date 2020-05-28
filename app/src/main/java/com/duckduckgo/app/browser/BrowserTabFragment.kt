@@ -110,8 +110,6 @@ import kotlinx.android.synthetic.main.include_omnibar_toolbar.view.browserMenu
 import kotlinx.android.synthetic.main.include_omnibar_toolbar.view.fireIconMenu
 import kotlinx.android.synthetic.main.include_omnibar_toolbar.view.privacyGradeButton
 import kotlinx.android.synthetic.main.include_omnibar_toolbar.view.tabsMenu
-import kotlinx.android.synthetic.main.layout_browser_bottom_navigation_bar.*
-import kotlinx.android.synthetic.main.popup_window_browser_bottom_tab_menu.view.*
 import kotlinx.android.synthetic.main.popup_window_browser_menu.view.*
 import kotlinx.android.synthetic.main.popup_window_browser_menu.view.addBookmarksPopupMenuItem
 import kotlinx.android.synthetic.main.popup_window_browser_menu.view.addToHome
@@ -1261,7 +1259,6 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
             createPopupMenuWithToolbarOnly()
             configureShowTabSwitcherListenerWithToolbarOnly()
             configureLongClickOpensNewTabListenerWithToolbarOnly()
-            removeUnnecessaryLayoutBehaviour()
         }
 
         private fun decorateAppBarWithToolbarOnly() {
@@ -1326,23 +1323,14 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
             }
         }
 
-        private fun removeUnnecessaryLayoutBehaviour() {
-            val params: CoordinatorLayout.LayoutParams = bottomNavigationBar.layoutParams as CoordinatorLayout.LayoutParams
-            params.behavior = null
-        }
-
         fun animateTabsCount() {
             tabsButton?.animateCount()
-            bottomBarTabsItem.animateCount()
         }
 
         fun renderTabIcon(tabs: List<TabEntity>) {
             context?.let {
                 tabsButton?.count = tabs.count()
                 tabsButton?.hasUnread = tabs.firstOrNull { !it.viewed } != null
-
-                bottomBarTabsItem.count = tabs.count()
-                bottomBarTabsItem.hasUnread = tabs.firstOrNull { !it.viewed } != null
             }
         }
 
