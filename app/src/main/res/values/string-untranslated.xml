@@ -69,4 +69,10 @@
     <string name="fireproofWebsiteEmptyListHint">No websites fireproofed yet</string>
     <string name="fireproofWebsiteFeatureDescription">Websites rely on cookies to keep you signed in. When you Fireproof a site, cookies won\'t be erased and you\'ll stay signed in, even after using the Fire Button.</string>
     <string name="fireproofWebsiteOverflowContentDescription">More options for fireproof website %s</string>
+
+    <!-- Download Manager problems -->
+    <string name="downloadManagerDisabled">Download Manager is disabled</string>
+    <string name="downloadManagerIncompatible">Download Manager not available on this device</string>
+    <string name="enable">Enable</string>
+
 </resources>
