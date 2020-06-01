@@ -24,6 +24,7 @@ import android.content.Intent
 import androidx.annotation.VisibleForTesting
 import androidx.core.app.NotificationManagerCompat
 import com.duckduckgo.app.browser.BrowserActivity
+import com.duckduckgo.app.icon.ui.ChangeIconActivity
 import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEvent.APP_FEATURE
 import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEvent.APP_LAUNCH
 import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEvent.CANCEL
@@ -70,7 +71,7 @@ class NotificationHandlerService : IntentService("NotificationHandlerService") {
             CLEAR_DATA_LAUNCH -> onClearDataLaunched(pixelSuffix)
             CANCEL -> onCancelled(pixelSuffix)
             WEBSITE -> onArticleNotification(intent, pixelSuffix)
-            APP_FEATURE -> onAppLaunched(pixelSuffix)
+            APP_FEATURE -> onFeatureLaunched(pixelSuffix)
         }
 
         if (intent.getBooleanExtra(NOTIFICATION_AUTO_CANCEL, true)) {
@@ -87,6 +88,14 @@ class NotificationHandlerService : IntentService("NotificationHandlerService") {
             .addNextIntentWithParentStack(newIntent)
             .startActivities()
         pixel.fire("${NOTIFICATION_LAUNCHED.pixelName}_$pixelSuffix")
+    }
+
+    private fun onFeatureLaunched(pixelSuffix: String) {
+        val intent = ChangeIconActivity.intent(context)
+        TaskStackBuilder.create(context)
+            .addNextIntentWithParentStack(intent)
+            .startActivities()
+        //pixel.fire("${NOTIFICATION_LAUNCHED.pixelName}_$pixelSuffix")
     }
 
     private fun onAppLaunched(pixelSuffix: String) {
