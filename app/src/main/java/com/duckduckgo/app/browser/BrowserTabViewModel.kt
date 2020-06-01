@@ -468,6 +468,7 @@ class BrowserTabViewModel(
     private fun navigateHome() {
         site = null
         onSiteChanged()
+        webNavigationState = null
 
         val browserState = browserStateModifier.copyForHomeShowing(currentBrowserViewState()).copy(
             canGoForward = currentGlobalLayoutState() !is Invalidated
