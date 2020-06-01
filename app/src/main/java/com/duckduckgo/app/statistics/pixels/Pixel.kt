@@ -70,6 +70,13 @@ interface Pixel {
         PRIVACY_DASHBOARD_GLOBAL_STATS("mp_s"),
         PRIVACY_DASHBOARD_PRIVACY_PRACTICES("mp_p"),
         PRIVACY_DASHBOARD_NETWORKS("mp_n"),
+        PRIVACY_DASHBOARD_WHITELIST_ADD("mp_wla"),
+        PRIVACY_DASHBOARD_WHITELIST_REMOVE("mp_wlr"),
+        PRIVACY_DASHBOARD_MANAGE_WHITELIST("mp_mw"),
+        PRIVACY_DASHBOARD_REPORT_BROKEN_SITE("mp_rb"),
+
+        BROWSER_MENU_WHITELIST_ADD("mb_wla"),
+        BROWSER_MENU_WHITELIST_REMOVE("mb_wlr"),
 
         HTTPS_NO_LOOKUP("m_https_nl"),
         HTTPS_LOCAL_UPGRADE("m_https_lu"),
@@ -77,9 +84,6 @@ interface Pixel {
         HTTPS_SERVICE_CACHE_UPGRADE("m_https_scu"),
         HTTPS_SERVICE_REQUEST_NO_UPGRADE("m_https_srn"),
         HTTPS_SERVICE_CACHE_NO_UPGRADE("m_https_scn"),
-
-        TRACKER_BLOCKER_DASHBOARD_TURNED_ON(pixelName = "m_tb_on_pd"),
-        TRACKER_BLOCKER_DASHBOARD_TURNED_OFF(pixelName = "m_tb_off_pd"),
 
         DEFAULT_BROWSER_SET("m_db_s"),
         DEFAULT_BROWSER_NOT_SET("m_db_ns"),
@@ -117,6 +121,7 @@ interface Pixel {
         SETTINGS_OPENED("ms"),
         SETTINGS_THEME_TOGGLED_LIGHT("ms_tl"),
         SETTINGS_THEME_TOGGLED_DARK("ms_td"),
+        SETTINGS_MANAGE_WHITELIST("ms_mw"),
 
         SURVEY_CTA_SHOWN(pixelName = "mus_cs"),
         SURVEY_CTA_DISMISSED(pixelName = "mus_cd"),
@@ -164,13 +169,22 @@ interface Pixel {
 
         CHANGE_APP_ICON_OPENED("m_ic"),
 
-        QUICK_SEARCH_PROMPT_NOTIFICATION_SHOWN("m_qs_pn_s"),
-        QUICK_SEARCH_PROMPT_NOTIFICATION_LAUNCHED("m_qs_pn_l"),
-        QUICK_SEARCH_PROMPT_NOTIFICATION_KEEP("m_qs_pn_k"),
-        QUICK_SEARCH_PROMPT_NOTIFICATION_REMOVE("m_qs_pn_r"),
-        QUICK_SEARCH_NOTIFICATION_ENABLED("m_qs_sn_e"),
-        QUICK_SEARCH_NOTIFICATION_DISABLED("m_qs_sn_d"),
-        QUICK_SEARCH_NOTIFICATION_LAUNCHED("m_qs_sn_l")
+        MENU_ACTION_POPUP_OPENED("m_nav_pm_o_%s"),
+        MENU_ACTION_FIRE_PRESSED("m_nav_f_p_%s"),
+        MENU_ACTION_REFRESH_PRESSED("m_nav_r_p_%s"),
+        MENU_ACTION_NEW_TAB_PRESSED("m_nav_nt_p_%s"),
+        MENU_ACTION_BOOKMARKS_PRESSED("m_nav_b_p_%s"),
+        MENU_ACTION_SEARCH_PRESSED("m_nav_s_p_%s"),
+
+        COOKIE_DATABASE_NOT_FOUND("m_cdb_nf"),
+        COOKIE_DATABASE_OPEN_ERROR("m_cdb_oe"),
+        COOKIE_DATABASE_DELETE_ERROR("m_cdb_de"),
+        COOKIE_DATABASE_CORRUPTED_ERROR("m_cdb_ce"),
+        COOKIE_DATABASE_EXCEPTION_OPEN_ERROR("m_cdb_e_oe"),
+        COOKIE_DATABASE_EXCEPTION_DELETE_ERROR("m_cdb_e_de"),
+        FIREPROOF_WEBSITE_ADDED("m_fw_a"),
+        FIREPROOF_WEBSITE_DELETED("m_fw_d"),
+        FIREPROOF_WEBSITE_UNDO("m_fw_u")
     }
 
     object PixelParameter {
@@ -178,6 +192,8 @@ interface Pixel {
         const val URL = "url"
         const val COUNT = "count"
         const val EXCEPTION_MESSAGE = "m"
+        const val EXCEPTION_APP_VERSION = "v"
+        const val EXCEPTION_TIMESTAMP = "t"
         const val BOOKMARK_CAPABLE = "bc"
         const val SHOWED_BOOKMARKS = "sb"
         const val DEFAULT_BROWSER_BEHAVIOUR_TRIGGERED = "bt"

@@ -22,23 +22,21 @@ import androidx.work.ListenableWorker
 import androidx.work.WorkerFactory
 import androidx.work.WorkerParameters
 import com.duckduckgo.app.fire.DataClearingWorker
+import com.duckduckgo.app.global.job.AppConfigurationWorker
 import com.duckduckgo.app.global.view.ClearDataAction
+import com.duckduckgo.app.job.ConfigurationDownloader
+import com.duckduckgo.app.notification.NotificationFactory
+import com.duckduckgo.app.notification.NotificationScheduler
 import com.duckduckgo.app.notification.NotificationScheduler.ClearDataNotificationWorker
 import com.duckduckgo.app.notification.NotificationScheduler.PrivacyNotificationWorker
-import com.duckduckgo.app.notification.NotificationScheduler.SearchPromptNotificationWorker
-import com.duckduckgo.app.notification.NotificationScheduler.StickySearchNotificationWorker
-import com.duckduckgo.app.notification.NotificationScheduler.DismissSearchNotificationWorker
 import com.duckduckgo.app.notification.NotificationScheduler.ArticleNotificationWorker
 import com.duckduckgo.app.notification.NotificationScheduler.BlogNotificationWorker
 import com.duckduckgo.app.notification.NotificationScheduler.AppFeatureNotificationWorker
-import com.duckduckgo.app.notification.NotificationFactory
 import com.duckduckgo.app.notification.db.NotificationDao
 import com.duckduckgo.app.notification.model.AppFeatureNotification
 import com.duckduckgo.app.notification.model.WebsiteNotification
 import com.duckduckgo.app.notification.model.ClearDataNotification
 import com.duckduckgo.app.notification.model.PrivacyProtectionNotification
-import com.duckduckgo.app.notification.model.SearchPromptNotification
-import com.duckduckgo.app.notification.model.StickySearchNotification
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.api.OfflinePixelScheduler
 import com.duckduckgo.app.statistics.api.OfflinePixelSender
@@ -54,8 +52,7 @@ class DaggerWorkerFactory(
     private val notificationFactory: NotificationFactory,
     private val clearDataNotification: ClearDataNotification,
     private val privacyProtectionNotification: PrivacyProtectionNotification,
-    private val stickySearchPromptNotification: SearchPromptNotification,
-    private val stickySearchNotification: StickySearchNotification,
+    private val configurationDownloader: ConfigurationDownloader,
     private val articleNotification: WebsiteNotification,
     private val blogNotification: WebsiteNotification,
     private val appFeatureNotification: AppFeatureNotification,
@@ -74,9 +71,7 @@ class DaggerWorkerFactory(
                 is DataClearingWorker -> injectDataClearWorker(instance)
                 is ClearDataNotificationWorker -> injectClearDataNotificationWorker(instance)
                 is PrivacyNotificationWorker -> injectPrivacyNotificationWorker(instance)
-                is SearchPromptNotificationWorker -> injectSearchPromptNotificationWorker(instance)
-                is StickySearchNotificationWorker -> injectStickySearchNotificationWorker(instance)
-                is DismissSearchNotificationWorker -> injectDismissSearchNotificationWorker(instance)
+                is AppConfigurationWorker -> injectAppConfigurationWorker(instance)
                 is ArticleNotificationWorker -> injectArticleNotificationWorker(instance)
                 is BlogNotificationWorker -> injectBlogNotificationWorker(instance)
                 is AppFeatureNotificationWorker -> injectAppFeatureNotificationWorker(instance)
@@ -89,6 +84,10 @@ class DaggerWorkerFactory(
             return null
         }
 
+    }
+
+    private fun injectAppConfigurationWorker(worker: AppConfigurationWorker) {
+        worker.appConfigurationDownloader = configurationDownloader
     }
 
     private fun injectOfflinePixelWorker(worker: OfflinePixelScheduler.OfflinePixelWorker) {
@@ -116,7 +115,7 @@ class DaggerWorkerFactory(
         worker.notification = privacyProtectionNotification
     }
 
-    private fun injectArticleNotificationWorker(worker: ArticleNotificationWorker) {
+    private fun injectArticleNotificationWorker(worker: NotificationScheduler.ArticleNotificationWorker) {
         worker.manager = notificationManager
         worker.notificationDao = notificationDao
         worker.factory = notificationFactory
@@ -124,7 +123,7 @@ class DaggerWorkerFactory(
         worker.notification = articleNotification
     }
 
-    private fun injectBlogNotificationWorker(worker: BlogNotificationWorker) {
+    private fun injectBlogNotificationWorker(worker: NotificationScheduler.BlogNotificationWorker) {
         worker.manager = notificationManager
         worker.notificationDao = notificationDao
         worker.factory = notificationFactory
@@ -132,7 +131,7 @@ class DaggerWorkerFactory(
         worker.notification = blogNotification
     }
 
-    private fun injectAppFeatureNotificationWorker(worker: AppFeatureNotificationWorker) {
+    private fun injectAppFeatureNotificationWorker(worker: NotificationScheduler.AppFeatureNotificationWorker) {
         worker.manager = notificationManager
         worker.notificationDao = notificationDao
         worker.factory = notificationFactory
@@ -140,25 +139,4 @@ class DaggerWorkerFactory(
         worker.notification = appFeatureNotification
     }
 
-    private fun injectSearchPromptNotificationWorker(worker: SearchPromptNotificationWorker) {
-        worker.manager = notificationManager
-        worker.notificationDao = notificationDao
-        worker.factory = notificationFactory
-        worker.pixel = pixel
-        worker.notification = stickySearchPromptNotification
-    }
-
-    private fun injectStickySearchNotificationWorker(worker: StickySearchNotificationWorker) {
-        worker.manager = notificationManager
-        worker.notificationDao = notificationDao
-        worker.factory = notificationFactory
-        worker.pixel = pixel
-        worker.notification = stickySearchNotification
-    }
-
-    private fun injectDismissSearchNotificationWorker(worker: DismissSearchNotificationWorker) {
-        worker.manager = notificationManager
-        worker.notificationDao = notificationDao
-        worker.notification = stickySearchNotification
-    }
 }

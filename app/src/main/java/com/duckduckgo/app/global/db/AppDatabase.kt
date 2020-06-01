@@ -30,6 +30,8 @@ import com.duckduckgo.app.browser.rating.db.AppEnjoymentTypeConverter
 import com.duckduckgo.app.browser.rating.db.PromptCountConverter
 import com.duckduckgo.app.cta.db.DismissedCtaDao
 import com.duckduckgo.app.cta.model.DismissedCta
+import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteDao
+import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
 import com.duckduckgo.app.global.exception.UncaughtExceptionDao
 import com.duckduckgo.app.global.exception.UncaughtExceptionEntity
 import com.duckduckgo.app.global.exception.UncaughtExceptionSourceConverter
@@ -40,11 +42,9 @@ import com.duckduckgo.app.httpsupgrade.model.HttpsWhitelistedDomain
 import com.duckduckgo.app.notification.db.NotificationDao
 import com.duckduckgo.app.notification.model.Notification
 import com.duckduckgo.app.onboarding.store.*
-import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao
-import com.duckduckgo.app.privacy.db.NetworkLeaderboardEntry
-import com.duckduckgo.app.privacy.db.PrivacyProtectionCountDao
-import com.duckduckgo.app.privacy.db.SitesVisitedEntity
+import com.duckduckgo.app.privacy.db.*
 import com.duckduckgo.app.privacy.model.PrivacyProtectionCountsEntity
+import com.duckduckgo.app.privacy.model.UserWhitelistedDomain
 import com.duckduckgo.app.survey.db.SurveyDao
 import com.duckduckgo.app.survey.model.Survey
 import com.duckduckgo.app.tabs.db.TabsDao
@@ -58,11 +58,12 @@ import com.duckduckgo.app.usage.search.SearchCountDao
 import com.duckduckgo.app.usage.search.SearchCountEntity
 
 @Database(
-    exportSchema = true, version = 18, entities = [
+    exportSchema = true, version = 21, entities = [
         TdsTracker::class,
         TdsEntity::class,
         TdsDomainEntity::class,
         TemporaryTrackingWhitelistedDomain::class,
+        UserWhitelistedDomain::class,
         HttpsBloomFilterSpec::class,
         HttpsWhitelistedDomain::class,
         NetworkLeaderboardEntry::class,
@@ -79,7 +80,8 @@ import com.duckduckgo.app.usage.search.SearchCountEntity
         PrivacyProtectionCountsEntity::class,
         UncaughtExceptionEntity::class,
         TdsMetadata::class,
-        UserStage::class
+        UserStage::class,
+        FireproofWebsiteEntity::class
     ]
 )
 
@@ -100,6 +102,7 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun tdsEntityDao(): TdsEntityDao
     abstract fun tdsDomainEntityDao(): TdsDomainEntityDao
     abstract fun temporaryTrackingWhitelistDao(): TemporaryTrackingWhitelistDao
+    abstract fun userWhitelistDao(): UserWhitelistDao
     abstract fun httpsWhitelistedDao(): HttpsWhitelistDao
     abstract fun httpsBloomFilterSpecDao(): HttpsBloomFilterSpecDao
     abstract fun networkLeaderboardDao(): NetworkLeaderboardDao
@@ -115,6 +118,7 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun uncaughtExceptionDao(): UncaughtExceptionDao
     abstract fun tdsDao(): TdsMetadataDao
     abstract fun userStageDao(): UserStageDao
+    abstract fun fireproofWebsiteDao(): FireproofWebsiteDao
 }
 
 @Suppress("PropertyName")
@@ -269,6 +273,25 @@ class MigrationsProvider(val context: Context) {
         }
     }
 
+    val MIGRATION_18_TO_19: Migration = object : Migration(18, 19) {
+        override fun migrate(database: SupportSQLiteDatabase) {
+            database.execSQL("DROP TABLE `UncaughtExceptionEntity`")
+            database.execSQL("CREATE TABLE IF NOT EXISTS `UncaughtExceptionEntity` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `exceptionSource` TEXT NOT NULL, `message` TEXT NOT NULL, `version` TEXT NOT NULL, `timestamp` INTEGER NOT NULL)")
+        }
+    }
+
+    val MIGRATION_19_TO_20: Migration = object : Migration(19, 20) {
+        override fun migrate(database: SupportSQLiteDatabase) {
+            database.execSQL("CREATE TABLE IF NOT EXISTS `user_whitelist` (`domain` TEXT NOT NULL, PRIMARY KEY(`domain`))")
+        }
+    }
+
+    val MIGRATION_20_TO_21: Migration = object : Migration(20, 21) {
+        override fun migrate(database: SupportSQLiteDatabase) {
+            database.execSQL("CREATE TABLE IF NOT EXISTS `fireproofWebsites` (`domain` TEXT NOT NULL, PRIMARY KEY(`domain`))")
+        }
+    }
+
     val ALL_MIGRATIONS: List<Migration>
         get() = listOf(
             MIGRATION_1_TO_2,
@@ -287,7 +310,10 @@ class MigrationsProvider(val context: Context) {
             MIGRATION_14_TO_15,
             MIGRATION_15_TO_16,
             MIGRATION_16_TO_17,
-            MIGRATION_17_TO_18
+            MIGRATION_17_TO_18,
+            MIGRATION_18_TO_19,
+            MIGRATION_19_TO_20,
+            MIGRATION_20_TO_21
         )
 
     @Deprecated(

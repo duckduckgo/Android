@@ -78,8 +78,6 @@
 
     <!-- Privacy Dashboard Activities -->
     <string name="privacyDashboardActivityTitle">Privacy Dashboard</string>
-    <string name="privacyProtectionEnabled">PRIVACY PROTECTION ENABLED</string>
-    <string name="privacyProtectionDisabled">PRIVACY PROTECTION DISABLED</string>
     <string name="privacyProtectionUpgraded" tools:ignore="TypographyQuotes">ENHANCED FROM &lt;img src="%d" /> TO &lt;img src="%d" /></string>
     <string name="privacyGradeContentDescription">Privacy Grade</string>
 
@@ -125,7 +123,6 @@
     <string name="practicesTosdrLink">Privacy Practices results from&#160;<b><u>ToS;DR</u></b></string>
     <string name="practicesIconContentGood">Good Practice Icon</string>
     <string name="practicesIconContentBad">Bad Practice Icon</string>
-    <string name="privacyProtectionToggle">Privacy Protection</string>
 
     <string name="networkTrackerSummaryHeader">TRACKER NETWORK TOP OFFENDERS</string>
     <string name="networkTrackerSummaryNotReady">We\'re still collecting data to show how many trackers we\'ve blocked.</string>
@@ -196,17 +193,19 @@
     <string name="bookmarksMenuTitle">Bookmarks</string>
     <string name="bookmarksActivityTitle">Bookmarks</string>
     <string name="bookmarkDeleteConfirmMessage">Are you sure you want to delete bookmark &lt;b>%s&lt;/b>?</string>
-    <string name="bookmarkDeleteConfirmTitle">Confirm</string>
     <string name="bookmarkAddedFeedback">Bookmark added</string>
     <string name="bookmarkTitleHint">Bookmark title</string>
     <string name="bookmarkUrlHint">Bookmark URL</string>
-    <string name="bookmarkSave">Save</string>
     <string name="bookmarkTitleEdit">Edit Bookmark</string>
     <string name="noBookmarks">No bookmarks added yet</string>
     <string name="bookmarkOverflowContentDescription">More options for bookmark %s</string>
+    <string name="bookmarkEdited">Bookmark added</string>
+
+    <!-- Dialogs -->
+    <string name="dialogConfirmTitle">Confirm</string>
+    <string name="dialogSave">Save</string>
     <string name="delete">Delete</string>
     <string name="edit">Edit</string>
-    <string name="bookmarkEdited">Bookmark added</string>
 
     <!-- Widget -->
     <string name="searchWidgetTextHint">Search DuckDuckGo</string>

@@ -43,7 +43,7 @@ class TrackerNetworksActivity : DuckDuckGoActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_tracker_networks)
-        configureToolbar()
+        setupToolbar(toolbar)
         configureRecycler()
 
         viewModel.viewState.observe(this, Observer<TrackerNetworksViewModel.ViewState> {
@@ -53,11 +53,6 @@ class TrackerNetworksActivity : DuckDuckGoActivity() {
         repository.retrieveSiteData(intent.tabId!!).observe(this, Observer<Site> {
             viewModel.onSiteChanged(it)
         })
-    }
-
-    private fun configureToolbar() {
-        setSupportActionBar(toolbar)
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
     }
 
     private fun configureRecycler() {

@@ -16,7 +16,6 @@
 
 package com.duckduckgo.app.global.exception
 
-
 class RootExceptionFinder {
 
     fun findRootException(throwable: Throwable?): Throwable? {

@@ -25,6 +25,7 @@ import com.duckduckgo.app.bookmarks.db.BookmarksDao
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.whenever
+import org.junit.After
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -62,6 +63,12 @@ class BookmarksViewModelTest {
         whenever(bookmarksDao.bookmarks()).thenReturn(liveData)
     }
 
+    @After
+    fun after() {
+        testee.viewState.removeObserver(viewStateObserver)
+        testee.command.removeObserver(commandObserver)
+    }
+
     @Test
     fun whenBookmarkDeletedThenDaoUpdated() {
         testee.delete(bookmark)
@@ -94,5 +101,4 @@ class BookmarksViewModelTest {
         assertNotNull(captor.value)
         assertNotNull(captor.value.bookmarks)
     }
-
 }

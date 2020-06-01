@@ -27,7 +27,6 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.settings.clear.ClearWhatOption
 import com.duckduckgo.app.settings.clear.ClearWhatOption.*
 
-
 class SettingsAutomaticallyClearWhatFragment : DialogFragment() {
 
     interface Listener {

@@ -70,7 +70,6 @@ class FileDownloadNotificationManager @Inject constructor(
 
     fun showDownloadFailedNotification() {
         applicationContext.runOnUiThread {
-            applicationContext.longToast(getString(R.string.downloadFailed))
 
             val notification = NotificationCompat.Builder(applicationContext, ChannelType.FILE_DOWNLOADED.id)
                 .setContentTitle(applicationContext.getString(R.string.downloadFailed))

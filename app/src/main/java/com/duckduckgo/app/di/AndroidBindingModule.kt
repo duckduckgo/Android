@@ -33,24 +33,22 @@ import com.duckduckgo.app.feedback.ui.negative.openended.ShareOpenEndedFeedbackF
 import com.duckduckgo.app.feedback.ui.negative.subreason.SubReasonNegativeFeedbackFragment
 import com.duckduckgo.app.feedback.ui.positive.initial.PositiveFeedbackLandingFragment
 import com.duckduckgo.app.fire.FireActivity
+import com.duckduckgo.app.fire.fireproofwebsite.ui.FireproofWebsitesActivity
 import com.duckduckgo.app.icon.ui.ChangeIconActivity
 import com.duckduckgo.app.job.AppConfigurationJobService
 import com.duckduckgo.app.launch.LaunchBridgeActivity
 import com.duckduckgo.app.notification.NotificationHandlerService
 import com.duckduckgo.app.onboarding.ui.OnboardingActivity
 import com.duckduckgo.app.onboarding.ui.page.DefaultBrowserPage
-import com.duckduckgo.app.privacy.ui.PrivacyDashboardActivity
-import com.duckduckgo.app.privacy.ui.PrivacyPracticesActivity
-import com.duckduckgo.app.privacy.ui.ScorecardActivity
-import com.duckduckgo.app.privacy.ui.TrackerNetworksActivity
+import com.duckduckgo.app.privacy.ui.*
 import com.duckduckgo.app.settings.SettingsActivity
 import com.duckduckgo.app.survey.ui.SurveyActivity
 import com.duckduckgo.app.systemsearch.SystemSearchActivity
 import com.duckduckgo.app.tabs.ui.TabSwitcherActivity
+import com.duckduckgo.app.tabs.ui.TabSwitcherBottomBarFeatureActivity
 import com.duckduckgo.app.widget.ui.AddWidgetInstructionsActivity
 import dagger.Module
 import dagger.android.ContributesAndroidInjector
-
 
 @Module
 abstract class AndroidBindingModule {
@@ -79,6 +77,10 @@ abstract class AndroidBindingModule {
 
     @ActivityScoped
     @ContributesAndroidInjector
+    abstract fun tabsExperimentActivity(): TabSwitcherBottomBarFeatureActivity
+
+    @ActivityScoped
+    @ContributesAndroidInjector
     abstract fun privacyDashboardActivity(): PrivacyDashboardActivity
 
     @ActivityScoped
@@ -92,6 +94,10 @@ abstract class AndroidBindingModule {
     @ActivityScoped
     @ContributesAndroidInjector
     abstract fun privacyTermsActivity(): PrivacyPracticesActivity
+
+    @ActivityScoped
+    @ContributesAndroidInjector
+    abstract fun whitelistActivity(): WhitelistActivity
 
     @ActivityScoped
     @ContributesAndroidInjector
@@ -116,6 +122,10 @@ abstract class AndroidBindingModule {
     @ActivityScoped
     @ContributesAndroidInjector
     abstract fun bookmarksActivity(): BookmarksActivity
+
+    @ActivityScoped
+    @ContributesAndroidInjector
+    abstract fun fireproofWebsitesActivity(): FireproofWebsitesActivity
 
     @ActivityScoped
     @ContributesAndroidInjector
@@ -169,9 +179,11 @@ abstract class AndroidBindingModule {
 
     /* Services */
 
+    @Suppress("DEPRECATION")
     @ContributesAndroidInjector
     abstract fun jobService(): AppConfigurationJobService
 
     @ContributesAndroidInjector
     abstract fun notificationHandlerService(): NotificationHandlerService
+
 }

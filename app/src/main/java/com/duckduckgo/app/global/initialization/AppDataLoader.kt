@@ -21,7 +21,6 @@ import com.duckduckgo.app.privacy.store.TermsOfServiceStore
 import timber.log.Timber
 import javax.inject.Inject
 
-
 class AppDataLoader @Inject constructor(
     private val termsOfServiceStore: TermsOfServiceStore,
     private val privacyPractices: PrivacyPractices

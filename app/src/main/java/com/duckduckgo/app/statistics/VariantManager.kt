@@ -19,17 +19,17 @@ package com.duckduckgo.app.statistics
 import androidx.annotation.WorkerThread
 import com.duckduckgo.app.statistics.VariantManager.Companion.DEFAULT_VARIANT
 import com.duckduckgo.app.statistics.VariantManager.Companion.referrerVariant
-import com.duckduckgo.app.statistics.VariantManager.VariantFeature.*
+import com.duckduckgo.app.statistics.VariantManager.VariantFeature.BottomBarNavigation
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import timber.log.Timber
-import java.util.Locale
+import java.util.*
 
 @WorkerThread
 interface VariantManager {
 
     // variant-dependant features listed here
     sealed class VariantFeature {
-        object StickySearchNotification : VariantFeature()
+        object BottomBarNavigation : VariantFeature()
         object DripNotification : VariantFeature()
         object Day1PrivacyNotification : VariantFeature()
         object Day3ClearDataNotification : VariantFeature()
@@ -48,46 +48,50 @@ interface VariantManager {
         val ACTIVE_VARIANTS = listOf(
             // SERP variants. "sc" may also be used as a shared control for mobile experiments in
             // the future if we can filter by app version
-            Variant(key = "sc", weight = 1.0, features = emptyList(), filterBy = { noFilter() }),
-            Variant(key = "se", weight = 1.0, features = emptyList(), filterBy = { noFilter() }),
+            Variant(key = "sc", weight = 0.0, features = emptyList(), filterBy = { noFilter() }),
+            Variant(key = "se", weight = 0.0, features = emptyList(), filterBy = { noFilter() }),
 
-            // Quick Search Notification Experiment
+            // Bottom Bar Navigation Experiment
             Variant(
-                key = "mf",
+                key = "mb",
                 weight = 1.0,
                 features = emptyList(),
-                filterBy = { isEnglishLocale() }),
+                filterBy = { noFilter() }),
             Variant(
-                key = "mg",
+                key = "mk",
                 weight = 1.0,
-                features = listOf(StickySearchNotification),
-                filterBy = { isEnglishLocale() }),
+                features = listOf(BottomBarNavigation),
+                filterBy = { noFilter() }),
 
             // Notification Drip Experiment
             Variant(
                 key = "za",
                 weight = 1.0,
-                features = listOf(DripNotification, Day1PrivacyNotification, Day3ClearDataNotification),
+                features = listOf(VariantFeature.DripNotification, VariantFeature.Day1PrivacyNotification, VariantFeature.Day3ClearDataNotification),
                 filterBy = { isEnglishLocale() }),
             Variant(
                 key = "zb",
                 weight = 1.0,
-                features = listOf(DripNotification),
+                features = listOf(VariantFeature.DripNotification),
                 filterBy = { isEnglishLocale() }),
             Variant(
                 key = "zc",
                 weight = 1.0,
-                features = listOf(DripNotification, Day1ArticleNotification, Day3ClearDataNotification),
+                features = listOf(VariantFeature.DripNotification, VariantFeature.Day1ArticleNotification, VariantFeature.Day3ClearDataNotification),
                 filterBy = { isEnglishLocale() }),
             Variant(
                 key = "zd",
                 weight = 1.0,
-                features = listOf(DripNotification, Day1BlogNotification, Day3ClearDataNotification),
+                features = listOf(VariantFeature.DripNotification, VariantFeature.Day1BlogNotification, VariantFeature.Day3ClearDataNotification),
                 filterBy = { isEnglishLocale() }),
             Variant(
                 key = "ze",
                 weight = 1.0,
-                features = listOf(DripNotification, Day1AppFeatureNotification, Day3ClearDataNotification),
+                features = listOf(
+                    VariantFeature.DripNotification,
+                    VariantFeature.Day1AppFeatureNotification,
+                    VariantFeature.Day3ClearDataNotification
+                ),
                 filterBy = { isEnglishLocale() })
 
             // All groups in an experiment (control and variants) MUST use the same filters

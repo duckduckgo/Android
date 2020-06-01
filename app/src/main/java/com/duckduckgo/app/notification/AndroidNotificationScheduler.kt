@@ -19,11 +19,7 @@ package com.duckduckgo.app.notification
 import android.content.Context
 import androidx.annotation.WorkerThread
 import androidx.core.app.NotificationManagerCompat
-import androidx.work.CoroutineWorker
-import androidx.work.OneTimeWorkRequest
-import androidx.work.OneTimeWorkRequestBuilder
-import androidx.work.WorkManager
-import androidx.work.WorkerParameters
+import androidx.work.*
 import com.duckduckgo.app.notification.db.NotificationDao
 import com.duckduckgo.app.notification.model.Notification
 import com.duckduckgo.app.notification.model.SchedulableNotification
@@ -45,15 +41,12 @@ import java.util.concurrent.TimeUnit
 @WorkerThread
 interface AndroidNotificationScheduler {
     suspend fun scheduleNextNotification()
-    fun launchStickySearchNotification()
-    fun dismissStickySearchNotification()
-    fun launchSearchPromptNotification()
 }
 
 class NotificationScheduler(
     private val workManager: WorkManager,
     private val clearDataNotification: SchedulableNotification,
-    private val privacyNotification: SchedulableNotification,
+    private val privacyNotification: SchedulableNotification
     private val searchPromptNotification: SearchNotification,
     private val articleNotification: SchedulableNotification,
     private val blogNotification: SchedulableNotification,
@@ -63,13 +56,6 @@ class NotificationScheduler(
 
     override suspend fun scheduleNextNotification() {
         scheduleInactiveUserNotifications()
-        scheduleActiveUserNotifications()
-    }
-
-    private suspend fun scheduleActiveUserNotifications() {
-        if (searchPromptNotification.canShow()) {
-            scheduleNotification(OneTimeWorkRequestBuilder<SearchPromptNotificationWorker>(), 2, TimeUnit.DAYS, CONTINUOUS_APP_USE_REQUEST_TAG)
-        }
     }
 
     private suspend fun scheduleInactiveUserNotifications() {
@@ -104,33 +90,6 @@ class NotificationScheduler(
     private fun isFromDripNotificationVariant(): Boolean = variant().hasFeature(DripNotification)
 
     private fun isNotDripVariant(): Boolean = !variant().hasFeature(DripNotification)
-
-    override fun launchStickySearchNotification() {
-        Timber.v("Posting sticky notification")
-        val request = OneTimeWorkRequestBuilder<StickySearchNotificationWorker>()
-            .addTag(STICKY_REQUEST_TAG)
-            .build()
-
-        workManager.enqueue(request)
-    }
-
-    override fun dismissStickySearchNotification() {
-        Timber.v("Dismissing sticky notification")
-        val request = OneTimeWorkRequestBuilder<DismissSearchNotificationWorker>()
-            .addTag(STICKY_REQUEST_TAG)
-            .build()
-
-        workManager.enqueue(request)
-    }
-
-    override fun launchSearchPromptNotification() {
-        Timber.v("Posting sticky search prompt notification")
-        val request = OneTimeWorkRequestBuilder<SearchPromptNotificationWorker>()
-            .addTag(STICKY_PROMPT_REQUEST_TAG)
-            .build()
-
-        workManager.enqueue(request)
-    }
 
     private fun scheduleNotification(builder: OneTimeWorkRequest.Builder, duration: Long, unit: TimeUnit, tag: String) {
         Timber.v("Scheduling notification")
@@ -179,86 +138,7 @@ class NotificationScheduler(
         }
     }
 
-    class SearchPromptNotificationWorker(val context: Context, val params: WorkerParameters) : CoroutineWorker(context, params) {
-        lateinit var manager: NotificationManagerCompat
-        lateinit var factory: NotificationFactory
-        lateinit var notificationDao: NotificationDao
-        lateinit var notification: SearchNotification
-        lateinit var pixel: Pixel
-
-        override suspend fun doWork(): Result {
-
-            if (!notification.canShow()) {
-                Timber.v("Notification no longer showable")
-                return Result.success()
-            }
-
-            val specification = notification.buildSpecification()
-
-            val launchIntent = NotificationHandlerService.pendingNotificationHandlerIntent(context, notification.launchIntent, specification)
-            val cancelIntent = NotificationHandlerService.pendingNotificationHandlerIntent(context, notification.cancelIntent, specification)
-            val pressIntent = NotificationHandlerService.pendingNotificationHandlerIntent(context, notification.pressIntent, specification)
-
-            val systemNotification =
-                factory.createSearchNotificationPrompt(
-                    specification,
-                    launchIntent,
-                    cancelIntent,
-                    pressIntent,
-                    notification.layoutId,
-                    specification.channel.priority
-                )
-
-            notificationDao.insert(Notification(notification.id))
-            manager.notify(NotificationRegistrar.NotificationId.StickySearch, systemNotification)
-
-            pixel.fire(Pixel.PixelName.QUICK_SEARCH_PROMPT_NOTIFICATION_SHOWN)
-            return Result.success()
-        }
-    }
-
-    class StickySearchNotificationWorker(val context: Context, params: WorkerParameters) : CoroutineWorker(context, params) {
-
-        lateinit var manager: NotificationManagerCompat
-        lateinit var factory: NotificationFactory
-        lateinit var notificationDao: NotificationDao
-        lateinit var notification: SearchNotification
-        lateinit var pixel: Pixel
-
-        override suspend fun doWork(): Result {
-
-            val specification = notification.buildSpecification()
-
-            val launchIntent = NotificationHandlerService.pendingNotificationHandlerIntent(context, notification.launchIntent, specification)
-            val cancelIntent = NotificationHandlerService.pendingNotificationHandlerIntent(context, notification.cancelIntent, specification)
-
-            val systemNotification =
-                factory.createSearchNotification(specification, launchIntent, cancelIntent, notification.layoutId, specification.channel.priority)
-
-            notificationDao.insert(Notification(notification.id))
-            manager.notify(NotificationRegistrar.NotificationId.StickySearch, systemNotification)
-
-            return Result.success()
-        }
-    }
-
-    class DismissSearchNotificationWorker(val context: Context, params: WorkerParameters) : CoroutineWorker(context, params) {
-
-        lateinit var manager: NotificationManagerCompat
-        lateinit var notificationDao: NotificationDao
-        lateinit var notification: SearchNotification
-
-        override suspend fun doWork(): Result {
-            val specification = notification.buildSpecification()
-            manager.cancel(specification.systemId)
-            return Result.success()
-        }
-    }
-
     companion object {
         const val UNUSED_APP_WORK_REQUEST_TAG = "com.duckduckgo.notification.schedule"
-        const val CONTINUOUS_APP_USE_REQUEST_TAG = "com.duckduckgo.notification.schedule.continuous"
-        const val STICKY_REQUEST_TAG = "com.duckduckgo.notification.sticky"
-        const val STICKY_PROMPT_REQUEST_TAG = "com.duckduckgo.notification.sticky.prompt"
     }
 }

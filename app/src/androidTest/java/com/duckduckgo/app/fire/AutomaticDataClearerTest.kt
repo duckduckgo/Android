@@ -517,11 +517,10 @@ class AutomaticDataClearerTest {
         }
     }
 
-
     @Test
     fun whenNotFreshAppLaunchAndIconNotChangedThenShouldClear() = runBlocking<Unit> {
         val isFreshAppLaunch = false
-        
+
         configureAppIconNotChanged()
         configureAppNotUsedSinceLastClear()
         configureUserOptions(ClearWhatOption.CLEAR_TABS_AND_DATA, ClearWhenOption.APP_EXIT_OR_5_MINS)

@@ -26,9 +26,8 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.ViewPropertyAnimatorCompat
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.view.html
-import kotlinx.android.synthetic.main.include_dax_dialog_cta.*
 import kotlinx.android.synthetic.main.content_onboarding_welcome.*
-import kotlinx.android.synthetic.main.content_onboarding_welcome.longDescriptionContainer
+import kotlinx.android.synthetic.main.include_dax_dialog_cta.*
 
 class WelcomePage : OnboardingPageFragment() {
 

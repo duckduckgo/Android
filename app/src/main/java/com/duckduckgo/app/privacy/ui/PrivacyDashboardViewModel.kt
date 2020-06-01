@@ -17,25 +17,33 @@
 package com.duckduckgo.app.privacy.ui
 
 import androidx.annotation.VisibleForTesting
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModel
+import androidx.lifecycle.*
+import com.duckduckgo.app.brokensite.BrokenSiteData
+import com.duckduckgo.app.global.DefaultDispatcherProvider
+import com.duckduckgo.app.global.DispatcherProvider
+import com.duckduckgo.app.global.SingleLiveEvent
 import com.duckduckgo.app.global.model.Site
+import com.duckduckgo.app.global.model.domain
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardEntry
+import com.duckduckgo.app.privacy.db.UserWhitelistDao
 import com.duckduckgo.app.privacy.model.HttpsStatus
 import com.duckduckgo.app.privacy.model.PrivacyGrade
 import com.duckduckgo.app.privacy.model.PrivacyPractices
 import com.duckduckgo.app.privacy.model.PrivacyPractices.Summary.UNKNOWN
-import com.duckduckgo.app.privacy.store.PrivacySettingsStore
+import com.duckduckgo.app.privacy.ui.PrivacyDashboardViewModel.Command.LaunchManageWhitelist
+import com.duckduckgo.app.privacy.ui.PrivacyDashboardViewModel.Command.LaunchReportBrokenSite
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.*
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class PrivacyDashboardViewModel(
-    private val settingsStore: PrivacySettingsStore,
+    private val userWhitelistDao: UserWhitelistDao,
     networkLeaderboardDao: NetworkLeaderboardDao,
-    private val pixel: Pixel
+    private val pixel: Pixel,
+    private val dispatchers: DispatcherProvider = DefaultDispatcherProvider()
 ) : ViewModel() {
 
     data class ViewState(
@@ -46,25 +54,26 @@ class PrivacyDashboardViewModel(
         val trackerCount: Int,
         val allTrackersBlocked: Boolean,
         val practices: PrivacyPractices.Summary,
-        val toggleEnabled: Boolean,
+        val toggleEnabled: Boolean?,
         val shouldShowTrackerNetworkLeaderboard: Boolean,
         val sitesVisited: Int,
         val trackerNetworkEntries: List<NetworkLeaderboardEntry>,
         val shouldReloadPage: Boolean
     )
 
+    sealed class Command {
+        object LaunchManageWhitelist : Command()
+        class LaunchReportBrokenSite(val data: BrokenSiteData) : Command()
+    }
+
     val viewState: MutableLiveData<ViewState> = MutableLiveData()
+    val command: SingleLiveEvent<Command> = SingleLiveEvent()
     private var site: Site? = null
 
     private val sitesVisited: LiveData<Int> = networkLeaderboardDao.sitesVisited()
     private val sitesVisitedObserver = Observer<Int> { onSitesVisitedChanged(it) }
     private val trackerNetworkLeaderboard: LiveData<List<NetworkLeaderboardEntry>> = networkLeaderboardDao.trackerNetworkLeaderboard()
     private val trackerNetworkActivityObserver = Observer<List<NetworkLeaderboardEntry>> { onTrackerNetworkEntriesChanged(it) }
-
-    private val privacyInitiallyOn = settingsStore.privacyOn
-
-    private val shouldReloadPage: Boolean
-        get() = privacyInitiallyOn != settingsStore.privacyOn
 
     init {
         pixel.fire(PRIVACY_DASHBOARD_OPENED)
@@ -107,7 +116,7 @@ class PrivacyDashboardViewModel(
         if (site == null) {
             resetViewState()
         } else {
-            updateSite(site)
+            viewModelScope.launch { updateSite(site) }
         }
     }
 
@@ -119,41 +128,68 @@ class PrivacyDashboardViewModel(
             httpsStatus = HttpsStatus.SECURE,
             trackerCount = 0,
             allTrackersBlocked = true,
-            toggleEnabled = settingsStore.privacyOn,
+            toggleEnabled = null,
             practices = UNKNOWN,
             shouldShowTrackerNetworkLeaderboard = false,
             sitesVisited = 0,
             trackerNetworkEntries = emptyList(),
-            shouldReloadPage = shouldReloadPage
+            shouldReloadPage = false
         )
     }
 
-    private fun updateSite(site: Site) {
+    private suspend fun updateSite(site: Site) {
         val grades = site.calculateGrades()
+        val domain = site.domain ?: ""
+        val toggleEnabled = withContext(dispatchers.io()) { !userWhitelistDao.contains(domain) }
 
-        viewState.value = viewState.value?.copy(
-            domain = site.uri?.host ?: "",
-            beforeGrade = grades.grade,
-            afterGrade = grades.improvedGrade,
-            httpsStatus = site.https,
-            trackerCount = site.trackerCount,
-            allTrackersBlocked = site.allTrackersBlocked,
-            practices = site.privacyPractices.summary
-        )
+        withContext(dispatchers.main()) {
+            viewState.value = viewState.value?.copy(
+                domain = site.domain ?: "",
+                beforeGrade = grades.grade,
+                afterGrade = grades.improvedGrade,
+                httpsStatus = site.https,
+                trackerCount = site.trackerCount,
+                allTrackersBlocked = site.allTrackersBlocked,
+                toggleEnabled = toggleEnabled,
+                practices = site.privacyPractices.summary
+            )
+        }
     }
 
     fun onPrivacyToggled(enabled: Boolean) {
-        if (enabled != viewState.value?.toggleEnabled) {
-
-            settingsStore.privacyOn = enabled
-            val pixelName = if (enabled) TRACKER_BLOCKER_DASHBOARD_TURNED_ON else TRACKER_BLOCKER_DASHBOARD_TURNED_OFF
-            pixel.fire(pixelName)
-
-            viewState.value = viewState.value?.copy(
-                toggleEnabled = enabled,
-                shouldReloadPage = shouldReloadPage
-            )
+        if (viewState.value?.toggleEnabled == null) {
+            return
         }
+
+        if (enabled == viewState.value?.toggleEnabled) {
+            return
+        }
+
+        viewState.value = viewState.value?.copy(
+            toggleEnabled = enabled,
+            shouldReloadPage = true
+        )
+
+        val domain = site?.domain ?: return
+        GlobalScope.launch(dispatchers.io()) {
+            if (enabled) {
+                userWhitelistDao.delete(domain)
+                pixel.fire(PRIVACY_DASHBOARD_WHITELIST_REMOVE)
+            } else {
+                userWhitelistDao.insert(domain)
+                pixel.fire(PRIVACY_DASHBOARD_WHITELIST_ADD)
+            }
+        }
+    }
+
+    fun onManageWhitelistSelected() {
+        pixel.fire(PRIVACY_DASHBOARD_MANAGE_WHITELIST)
+        command.value = LaunchManageWhitelist
+    }
+
+    fun onReportBrokenSiteSelected() {
+        pixel.fire(PRIVACY_DASHBOARD_REPORT_BROKEN_SITE)
+        command.value = LaunchReportBrokenSite(BrokenSiteData.fromSite(site))
     }
 
     private companion object {
@@ -161,6 +197,3 @@ class PrivacyDashboardViewModel(
         private const val LEADERBOARD_MIN_DOMAINS_EXCLUSIVE = 30
     }
 }
-
-
-

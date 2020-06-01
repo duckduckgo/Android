@@ -33,7 +33,6 @@ import com.duckduckgo.app.feedback.ui.negative.displayText
 import kotlinx.android.synthetic.main.content_feedback_negative_disambiguation_sub_reason.*
 import timber.log.Timber
 
-
 class SubReasonNegativeFeedbackFragment : FeedbackFragment() {
 
     private lateinit var recyclerAdapter: SubReasonAdapter
@@ -82,7 +81,6 @@ class SubReasonNegativeFeedbackFragment : FeedbackFragment() {
             recyclerView.layoutManager = LinearLayoutManager(it)
             recyclerView.adapter = recyclerAdapter
             recyclerView.addItemDecoration(FeedbackItemDecoration(ContextCompat.getDrawable(it, R.drawable.feedback_list_divider)!!))
-
 
             arguments?.let { args ->
 

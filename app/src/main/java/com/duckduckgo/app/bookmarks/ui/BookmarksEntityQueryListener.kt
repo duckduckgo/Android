@@ -20,8 +20,8 @@ import androidx.appcompat.widget.SearchView
 import com.duckduckgo.app.bookmarks.db.BookmarkEntity
 
 class BookmarksEntityQueryListener(
-        val bookmarks: List<BookmarkEntity>?,
-        val adapter: BookmarksActivity.BookmarksAdapter
+    val bookmarks: List<BookmarkEntity>?,
+    val adapter: BookmarksActivity.BookmarksAdapter
 ) : SearchView.OnQueryTextListener {
 
     override fun onQueryTextChange(newText: String): Boolean {

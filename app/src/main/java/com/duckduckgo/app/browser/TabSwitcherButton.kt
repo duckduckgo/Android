@@ -19,11 +19,16 @@ package com.duckduckgo.app.browser
 import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
 import android.content.Context
-import android.view.LayoutInflater
-import android.widget.FrameLayout
+import android.util.AttributeSet
+import android.view.View
+import android.widget.RelativeLayout
 import kotlinx.android.synthetic.main.view_tab_switcher_button.view.*
 
-class TabSwitcherButton(context: Context) : FrameLayout(context) {
+class TabSwitcherButton @JvmOverloads constructor(
+    context: Context,
+    attrs: AttributeSet? = null,
+    defStyleAttr: Int = 0
+) : RelativeLayout(context, attrs, defStyleAttr) {
 
     var count = 0
         set(value) {
@@ -35,46 +40,33 @@ class TabSwitcherButton(context: Context) : FrameLayout(context) {
     var hasUnread = false
         set(value) {
             field = value
-            anim.progress = if (hasUnread) 1.0f else 0.0f
         }
 
-    init {
-        LayoutInflater.from(context).inflate(R.layout.view_tab_switcher_button, this, true)
+    override fun onFinishInflate() {
+        super.onFinishInflate()
+        View.inflate(context, R.layout.view_tab_switcher_button, this)
 
-        clickZone.setOnClickListener {
+        setOnClickListener {
             super.callOnClick()
         }
 
-        clickZone.setOnLongClickListener {
+        setOnLongClickListener {
             super.performLongClick()
         }
     }
 
     fun increment(callback: () -> Unit) {
-        anim.progress = 0.0f
-
-        anim.addAnimatorListener(object : AnimatorListenerAdapter() {
-            override fun onAnimationEnd(animation: Animator?) {
-                callback()
-            }
-        })
-
         fadeOutCount {
             count += 1
             fadeInCount()
+            callback()
         }
-
-        anim.playAnimation()
     }
 
     fun animateCount() {
-        anim.progress = 0.0f
-
         fadeOutCount {
             fadeInCount()
         }
-
-        anim.playAnimation()
     }
 
     private fun fadeOutCount(callback: () -> Unit) {

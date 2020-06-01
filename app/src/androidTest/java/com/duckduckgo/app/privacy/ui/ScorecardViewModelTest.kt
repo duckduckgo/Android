@@ -18,19 +18,23 @@ package com.duckduckgo.app.privacy.ui
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.Observer
+import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.global.model.Site
+import com.duckduckgo.app.privacy.db.UserWhitelistDao
 import com.duckduckgo.app.privacy.model.HttpsStatus
 import com.duckduckgo.app.privacy.model.PrivacyGrade
 import com.duckduckgo.app.privacy.model.PrivacyPractices
 import com.duckduckgo.app.privacy.model.PrivacyPractices.Practices
 import com.duckduckgo.app.privacy.model.PrivacyPractices.Summary.GOOD
 import com.duckduckgo.app.privacy.model.TestEntity
-import com.duckduckgo.app.privacy.store.PrivacySettingsStore
 import com.duckduckgo.app.trackerdetection.model.Entity
+import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.whenever
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.junit.After
 import org.junit.Assert.*
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 
@@ -40,13 +44,22 @@ class ScorecardViewModelTest {
     @Suppress("unused")
     var instantTaskExecutorRule = InstantTaskExecutorRule()
 
+    @ExperimentalCoroutinesApi
+    @get:Rule
+    var coroutineRule = CoroutineTestRule()
+
     private var viewStateObserver: Observer<ScorecardViewModel.ViewState> = mock()
-    private var settingStore: PrivacySettingsStore = mock()
+    private var userWhitelistDao: UserWhitelistDao = mock()
 
     private val testee: ScorecardViewModel by lazy {
-        val model = ScorecardViewModel(settingStore)
+        val model = ScorecardViewModel(userWhitelistDao, coroutineRule.testDispatcherProvider)
         model.viewState.observeForever(viewStateObserver)
         model
+    }
+
+    @Before
+    fun before() {
+        whenever(userWhitelistDao.contains(any())).thenReturn(true)
     }
 
     @After

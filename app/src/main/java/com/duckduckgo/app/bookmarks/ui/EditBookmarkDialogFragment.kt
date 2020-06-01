@@ -28,7 +28,6 @@ import com.duckduckgo.app.global.view.hideKeyboard
 import com.duckduckgo.app.global.view.showKeyboard
 import org.jetbrains.anko.find
 
-
 class EditBookmarkDialogFragment : DialogFragment() {
 
     interface EditBookmarkListener {
@@ -46,7 +45,7 @@ class EditBookmarkDialogFragment : DialogFragment() {
         val alertBuilder = AlertDialog.Builder(requireActivity())
             .setView(rootView)
             .setTitle(R.string.bookmarkTitleEdit)
-            .setPositiveButton(R.string.bookmarkSave) { _, _ ->
+            .setPositiveButton(R.string.dialogSave) { _, _ ->
                 userAcceptedDialog(titleInput, urlInput)
             }
 

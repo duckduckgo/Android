@@ -21,19 +21,16 @@ import android.content.Context
 import androidx.core.app.NotificationManagerCompat
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.work.WorkManager
-import com.duckduckgo.app.notification.NotificationScheduler
-import com.duckduckgo.app.notification.NotificationFactory
 import com.duckduckgo.app.notification.AndroidNotificationScheduler
+import com.duckduckgo.app.notification.NotificationFactory
+import com.duckduckgo.app.notification.NotificationScheduler
 import com.duckduckgo.app.notification.db.NotificationDao
 import com.duckduckgo.app.notification.model.AppFeatureNotification
 import com.duckduckgo.app.notification.model.ClearDataNotification
 import com.duckduckgo.app.notification.model.PrivacyProtectionNotification
-import com.duckduckgo.app.notification.model.SearchPromptNotification
-import com.duckduckgo.app.notification.model.StickySearchNotification
 import com.duckduckgo.app.notification.model.WebsiteNotification
 import com.duckduckgo.app.privacy.db.PrivacyProtectionCountDao
 import com.duckduckgo.app.settings.db.SettingsDataStore
-import com.duckduckgo.app.statistics.VariantManager
 import dagger.Module
 import dagger.Provides
 import javax.inject.Named
@@ -79,24 +76,6 @@ class NotificationModule {
     }
 
     @Provides
-    fun provideStickySearchNotification(
-        context: Context,
-        notificationDao: NotificationDao
-    ): StickySearchNotification {
-        return StickySearchNotification(context, notificationDao)
-    }
-
-    @Provides
-    fun provideSearchPromptNotification(
-        context: Context,
-        notificationDao: NotificationDao,
-        variantManager: VariantManager,
-        settingsDataStore: SettingsDataStore
-    ): SearchPromptNotification {
-        return SearchPromptNotification(context, notificationDao, variantManager, settingsDataStore)
-    }
-
-    @Provides
     @Named("articleNotification")
     fun provideArticleNotification(
         context: Context,
@@ -128,7 +107,6 @@ class NotificationModule {
         workManager: WorkManager,
         clearDataNotification: ClearDataNotification,
         privacyProtectionNotification: PrivacyProtectionNotification,
-        stickySearchNotification: StickySearchNotification,
         @Named("articleNotification") articleNotification: WebsiteNotification,
         @Named("blogNotification") blogNotification: WebsiteNotification,
         appFeatureNotification: AppFeatureNotification,
@@ -138,7 +116,6 @@ class NotificationModule {
             workManager,
             clearDataNotification,
             privacyProtectionNotification,
-            stickySearchNotification,
             articleNotification,
             blogNotification,
             appFeatureNotification,

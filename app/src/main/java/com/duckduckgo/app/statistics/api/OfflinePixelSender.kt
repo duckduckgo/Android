@@ -22,14 +22,16 @@ import com.duckduckgo.app.global.exception.UncaughtExceptionSource.*
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.*
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.COUNT
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.EXCEPTION_APP_VERSION
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.EXCEPTION_MESSAGE
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.EXCEPTION_TIMESTAMP
 import com.duckduckgo.app.statistics.store.OfflinePixelCountDataStore
 import io.reactivex.Completable
 import io.reactivex.Completable.*
 import kotlinx.coroutines.runBlocking
 import timber.log.Timber
 import javax.inject.Inject
-
+import kotlin.reflect.KMutableProperty0
 
 /**
  * Most pixels are "send and forget" however we sometimes need to guarantee that a pixel will be sent.
@@ -47,51 +49,41 @@ class OfflinePixelSender @Inject constructor(
                 sendApplicationKilledPixel(),
                 sendWebRendererCrashedPixel(),
                 sendWebRendererKilledPixel(),
+                sendCookieDatabaseNotFoundPixel(),
+                sendCookieDatabaseOpenErrorPixel(),
+                sendCookieDatabaseDeleteErrorPixel(),
+                sendCookieDatabaseCorruptedErrorPixel(),
                 sendUncaughtExceptionsPixel()
             )
         )
     }
 
     private fun sendApplicationKilledPixel(): Completable {
-        return defer {
-            val count = offlineCountCountDataStore.applicationCrashCount
-            if (count == 0) {
-                return@defer complete()
-            }
-            val params = mapOf(COUNT to count.toString())
-            pixel.fireCompletable(APPLICATION_CRASH.pixelName, params).andThen {
-                Timber.v("Offline pixel sent ${APPLICATION_CRASH.pixelName} count: $count")
-                offlineCountCountDataStore.applicationCrashCount = 0
-            }
-        }
+        return sendPixelCount(offlineCountCountDataStore::applicationCrashCount, APPLICATION_CRASH)
     }
 
     private fun sendWebRendererCrashedPixel(): Completable {
-        return defer {
-            val count = offlineCountCountDataStore.webRendererGoneCrashCount
-            if (count == 0) {
-                return@defer complete()
-            }
-            val params = mapOf(COUNT to count.toString())
-            pixel.fireCompletable(WEB_RENDERER_GONE_CRASH.pixelName, params).andThen {
-                Timber.v("Offline pixel sent ${WEB_RENDERER_GONE_CRASH.pixelName} count: $count")
-                offlineCountCountDataStore.webRendererGoneCrashCount = 0
-            }
-        }
+        return sendPixelCount(offlineCountCountDataStore::webRendererGoneCrashCount, WEB_RENDERER_GONE_CRASH)
     }
 
     private fun sendWebRendererKilledPixel(): Completable {
-        return defer {
-            val count = offlineCountCountDataStore.webRendererGoneKilledCount
-            if (count == 0) {
-                return@defer complete()
-            }
-            val params = mapOf(COUNT to count.toString())
-            pixel.fireCompletable(WEB_RENDERER_GONE_KILLED.pixelName, params).andThen {
-                Timber.v("Offline pixel sent ${WEB_RENDERER_GONE_KILLED.pixelName} count: $count")
-                offlineCountCountDataStore.webRendererGoneKilledCount = 0
-            }
-        }
+        return sendPixelCount(offlineCountCountDataStore::webRendererGoneKilledCount, WEB_RENDERER_GONE_KILLED)
+    }
+
+    private fun sendCookieDatabaseDeleteErrorPixel(): Completable {
+        return sendPixelCount(offlineCountCountDataStore::cookieDatabaseDeleteErrorCount, COOKIE_DATABASE_DELETE_ERROR)
+    }
+
+    private fun sendCookieDatabaseOpenErrorPixel(): Completable {
+        return sendPixelCount(offlineCountCountDataStore::cookieDatabaseOpenErrorCount, COOKIE_DATABASE_OPEN_ERROR)
+    }
+
+    private fun sendCookieDatabaseNotFoundPixel(): Completable {
+        return sendPixelCount(offlineCountCountDataStore::cookieDatabaseNotFoundCount, COOKIE_DATABASE_NOT_FOUND)
+    }
+
+    private fun sendCookieDatabaseCorruptedErrorPixel(): Completable {
+        return sendPixelCount(offlineCountCountDataStore::cookieDatabaseCorruptedCount, COOKIE_DATABASE_CORRUPTED_ERROR)
     }
 
     private fun sendUncaughtExceptionsPixel(): Completable {
@@ -103,11 +95,15 @@ class OfflinePixelSender @Inject constructor(
             exceptions.forEach { exception ->
                 Timber.d("Analysing exception $exception")
                 val pixelName = determinePixelName(exception)
-                val params = mapOf(EXCEPTION_MESSAGE to exception.message)
+                val params = mapOf(
+                    EXCEPTION_MESSAGE to exception.message,
+                    EXCEPTION_APP_VERSION to exception.version,
+                    EXCEPTION_TIMESTAMP to exception.formattedTimestamp()
+                )
 
                 val pixel = pixel.fireCompletable(pixelName, params)
                     .doOnComplete {
-                        Timber.d("Sent pixel containing exception; deleting exception with id=${exception.id}")
+                        Timber.d("Sent pixel with params: $params containing exception; deleting exception with id=${exception.id}")
                         runBlocking { uncaughtExceptionRepository.deleteException(exception.id) }
                     }
 
@@ -132,5 +128,19 @@ class OfflinePixelSender @Inject constructor(
             RECEIVED_PAGE_TITLE -> APPLICATION_CRASH_WEBVIEW_RECEIVED_PAGE_TITLE
             SHOW_FILE_CHOOSER -> APPLICATION_CRASH_WEBVIEW_SHOW_FILE_CHOOSER
         }.pixelName
+    }
+
+    private fun sendPixelCount(counter: KMutableProperty0<Int>, pixelName: Pixel.PixelName): Completable {
+        return defer {
+            val count = counter.get()
+            if (count == 0) {
+                return@defer complete()
+            }
+            val params = mapOf(COUNT to count.toString())
+            pixel.fireCompletable(pixelName.pixelName, params).andThen {
+                Timber.v("Offline pixel sent ${pixelName.pixelName} count: $count")
+                counter.set(0)
+            }
+        }
     }
 }

@@ -40,7 +40,6 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
-
 class FeedbackActivity : DuckDuckGoActivity(),
     InitialFeedbackFragment.InitialFeedbackListener,
     PositiveFeedbackLandingFragment.PositiveFeedbackLandingListener,
@@ -54,13 +53,8 @@ class FeedbackActivity : DuckDuckGoActivity(),
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_feedback)
-        setupActionBar()
+        setupToolbar(toolbar)
         configureObservers()
-    }
-
-    private fun setupActionBar() {
-        setSupportActionBar(toolbar)
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
     }
 
     private fun configureObservers() {

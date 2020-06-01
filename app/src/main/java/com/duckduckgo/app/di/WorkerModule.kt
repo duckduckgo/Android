@@ -22,14 +22,13 @@ import androidx.work.Configuration
 import androidx.work.WorkManager
 import androidx.work.WorkerFactory
 import com.duckduckgo.app.global.view.ClearDataAction
+import com.duckduckgo.app.job.ConfigurationDownloader
 import com.duckduckgo.app.notification.NotificationFactory
 import com.duckduckgo.app.notification.db.NotificationDao
 import com.duckduckgo.app.notification.model.AppFeatureNotification
 import com.duckduckgo.app.notification.model.WebsiteNotification
 import com.duckduckgo.app.notification.model.ClearDataNotification
 import com.duckduckgo.app.notification.model.PrivacyProtectionNotification
-import com.duckduckgo.app.notification.model.SearchPromptNotification
-import com.duckduckgo.app.notification.model.StickySearchNotification
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.api.OfflinePixelSender
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -57,13 +56,12 @@ class WorkerModule {
         offlinePixelSender: OfflinePixelSender,
         settingsDataStore: SettingsDataStore,
         clearDataAction: ClearDataAction,
-        notficationManager: NotificationManagerCompat,
+        notificationManager: NotificationManagerCompat,
         notificationDao: NotificationDao,
         notificationFactory: NotificationFactory,
         clearDataNotification: ClearDataNotification,
         privacyProtectionNotification: PrivacyProtectionNotification,
-        stickySearchNotification: StickySearchNotification,
-        stickySearchPromptNotification: SearchPromptNotification,
+        configurationDownloader: ConfigurationDownloader,
         @Named("articleNotification") articleNotification: WebsiteNotification,
         @Named("blogNotification") blogNotification: WebsiteNotification,
         appFeatureNotification: AppFeatureNotification,
@@ -73,13 +71,12 @@ class WorkerModule {
             offlinePixelSender,
             settingsDataStore,
             clearDataAction,
-            notficationManager,
+            notificationManager,
             notificationDao,
             notificationFactory,
             clearDataNotification,
             privacyProtectionNotification,
-            stickySearchPromptNotification,
-            stickySearchNotification,
+            configurationDownloader,
             articleNotification,
             blogNotification,
             appFeatureNotification,

@@ -16,8 +16,8 @@
 
 package com.duckduckgo.app.di
 
-import android.app.job.JobScheduler
 import android.content.Context
+import androidx.work.WorkManager
 import com.duckduckgo.app.autocomplete.api.AutoCompleteService
 import com.duckduckgo.app.brokensite.api.BrokenSiteSender
 import com.duckduckgo.app.brokensite.api.BrokenSiteSubmitter
@@ -28,7 +28,7 @@ import com.duckduckgo.app.feedback.api.SubReasonApiMapper
 import com.duckduckgo.app.global.AppUrl.Url
 import com.duckduckgo.app.global.api.ApiRequestInterceptor
 import com.duckduckgo.app.global.api.NetworkApiCache
-import com.duckduckgo.app.global.job.JobBuilder
+import com.duckduckgo.app.global.job.AppConfigurationSyncWorkRequestBuilder
 import com.duckduckgo.app.httpsupgrade.api.HttpsUpgradeService
 import com.duckduckgo.app.job.AppConfigurationSyncer
 import com.duckduckgo.app.job.ConfigurationDownloader
@@ -52,7 +52,6 @@ import retrofit2.converter.scalars.ScalarsConverterFactory
 import java.io.File
 import javax.inject.Named
 import javax.inject.Singleton
-
 
 @Module
 class NetworkModule {
@@ -155,11 +154,11 @@ class NetworkModule {
     @Provides
     @Singleton
     fun appConfigurationSyncer(
-        jobBuilder: JobBuilder,
-        jobScheduler: JobScheduler,
+        appConfigurationSyncWorkRequestBuilder: AppConfigurationSyncWorkRequestBuilder,
+        workManager: WorkManager,
         appConfigurationDownloader: ConfigurationDownloader
     ): AppConfigurationSyncer {
-        return AppConfigurationSyncer(jobBuilder, jobScheduler, appConfigurationDownloader)
+        return AppConfigurationSyncer(appConfigurationSyncWorkRequestBuilder, workManager, appConfigurationDownloader)
     }
 
     companion object {

@@ -260,7 +260,6 @@ class WebViewRequestInterceptorTest {
         assertRequestCanContinueToLoad(response)
     }
 
-
     @Test
     fun whenRequestShouldBlockAndNoSurrogateThenCancellingResponseReturned() = runBlocking<Unit> {
         whenever(mockResourceSurrogates.get(any())).thenReturn(SurrogateResponse(responseAvailable = false))

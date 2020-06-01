@@ -28,11 +28,6 @@ import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEv
 import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEvent.APP_LAUNCH
 import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEvent.CANCEL
 import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEvent.CLEAR_DATA_LAUNCH
-import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEvent.QUICK_SEARCH_LAUNCH
-import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEvent.QUICK_SEARCH_KEEP
-import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEvent.QUICK_SEARCH_PROMPT_LAUNCH
-import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEvent.QUICK_SEARCH_REMOVE
-import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEvent.WEBSITE
 import com.duckduckgo.app.notification.model.NotificationSpec
 import com.duckduckgo.app.notification.model.WebsiteNotificationSpecification
 import com.duckduckgo.app.settings.SettingsActivity
@@ -40,7 +35,7 @@ import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.NOTIFICATION_CANCELLED
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.NOTIFICATION_LAUNCHED
-import com.duckduckgo.app.systemsearch.SystemSearchActivity
+import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEvent.WEBSITE
 import dagger.android.AndroidInjection
 import timber.log.Timber
 import javax.inject.Inject
@@ -74,10 +69,6 @@ class NotificationHandlerService : IntentService("NotificationHandlerService") {
             APP_LAUNCH -> onAppLaunched(pixelSuffix)
             CLEAR_DATA_LAUNCH -> onClearDataLaunched(pixelSuffix)
             CANCEL -> onCancelled(pixelSuffix)
-            QUICK_SEARCH_PROMPT_LAUNCH -> onQuickSearchPromptRequest()
-            QUICK_SEARCH_REMOVE -> onQuickSearchNotificationRemove(intent)
-            QUICK_SEARCH_KEEP -> onQuickSearchNotificationKeep(intent)
-            QUICK_SEARCH_LAUNCH -> onQuickSearchRequest()
             WEBSITE -> onArticleNotification(intent, pixelSuffix)
             APP_FEATURE -> onAppLaunched(pixelSuffix)
         }
@@ -119,40 +110,6 @@ class NotificationHandlerService : IntentService("NotificationHandlerService") {
         pixel.fire("${NOTIFICATION_CANCELLED.pixelName}_$pixelSuffix")
     }
 
-    private fun onQuickSearchNotificationKeep(intent: Intent) {
-        Timber.i("Sticky Search Notification Requested!")
-        settingsDataStore.searchNotificationEnabled = true
-        notificationScheduler.launchStickySearchNotification()
-        pixel.fire(Pixel.PixelName.QUICK_SEARCH_PROMPT_NOTIFICATION_KEEP)
-    }
-
-    private fun onQuickSearchNotificationRemove(intent: Intent) {
-        Timber.i("Sticky Search Notification Dismissed!")
-        val notificationId = intent.getIntExtra(NOTIFICATION_SYSTEM_ID_EXTRA, 0)
-        pixel.fire(Pixel.PixelName.QUICK_SEARCH_PROMPT_NOTIFICATION_REMOVE)
-        settingsDataStore.searchNotificationEnabled = false
-        clearNotification(notificationId)
-        closeNotificationPanel()
-    }
-
-    private fun onQuickSearchPromptRequest() {
-        Timber.i("Search from Prompt Notification Requested!")
-        val searchIntent = SystemSearchActivity.fromNotification(context)
-        TaskStackBuilder.create(context)
-            .addNextIntentWithParentStack(searchIntent)
-            .startActivities()
-        pixel.fire(Pixel.PixelName.QUICK_SEARCH_PROMPT_NOTIFICATION_LAUNCHED)
-    }
-
-    private fun onQuickSearchRequest() {
-        Timber.i("Search from Notification Requested!")
-        val searchIntent = SystemSearchActivity.fromNotification(context)
-        TaskStackBuilder.create(context)
-            .addNextIntentWithParentStack(searchIntent)
-            .startActivities()
-        pixel.fire(Pixel.PixelName.QUICK_SEARCH_NOTIFICATION_LAUNCHED)
-    }
-
     private fun clearNotification(notificationId: Int) {
         notificationManager.cancel(notificationId)
     }
@@ -166,10 +123,6 @@ class NotificationHandlerService : IntentService("NotificationHandlerService") {
         const val APP_LAUNCH = "com.duckduckgo.notification.launch.app"
         const val CLEAR_DATA_LAUNCH = "com.duckduckgo.notification.launch.clearData"
         const val CANCEL = "com.duckduckgo.notification.cancel"
-        const val QUICK_SEARCH_PROMPT_LAUNCH = "com.duckduckgo.notification.search.launch"
-        const val QUICK_SEARCH_KEEP = "com.duckduckgo.notification.search.keep"
-        const val QUICK_SEARCH_REMOVE = "com.duckduckgo.notification.search.remove"
-        const val QUICK_SEARCH_LAUNCH = "com.duckduckgo.notification.search"
         const val WEBSITE = "com.duckduckgo.notification.website"
         const val APP_FEATURE = "com.duckduckgo.notification.app.feature"
     }

@@ -26,19 +26,19 @@ import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.install.daysInstalled
 import com.duckduckgo.app.global.model.Site
+import com.duckduckgo.app.global.model.domain
 import com.duckduckgo.app.global.model.orderedTrackingEntities
 import com.duckduckgo.app.onboarding.store.AppStage
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.onboarding.store.daxOnboardingActive
-import com.duckduckgo.app.privacy.store.PrivacySettingsStore
+import com.duckduckgo.app.privacy.db.UserWhitelistDao
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.Variant
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.survey.db.SurveyDao
 import com.duckduckgo.app.survey.model.Survey
-import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import com.duckduckgo.app.widget.ui.WidgetCapabilities
 import kotlinx.coroutines.withContext
 import timber.log.Timber
@@ -53,10 +53,10 @@ class CtaViewModel @Inject constructor(
     private val surveyDao: SurveyDao,
     private val widgetCapabilities: WidgetCapabilities,
     private val dismissedCtaDao: DismissedCtaDao,
+    private val userWhitelistDao: UserWhitelistDao,
     private val variantManager: VariantManager,
     private val settingsDataStore: SettingsDataStore,
     private val onboardingStore: OnboardingStore,
-    private val settingsPrivacySettingsStore: PrivacySettingsStore,
     private val userStageStore: UserStageStore,
     private val dispatchers: DispatcherProvider
 ) {
@@ -202,14 +202,13 @@ class CtaViewModel @Inject constructor(
 
     @WorkerThread
     private suspend fun canShowDaxCtaEndOfJourney(): Boolean = daxOnboardingActive() &&
-            hasPrivacySettingsOn() &&
             !daxDialogEndShown() &&
             daxDialogIntroShown() &&
             !settingsDataStore.hideTips &&
             (daxDialogNetworkShown() || daxDialogOtherShown() || daxDialogSerpShown() || daxDialogTrackersFoundShown())
 
     private suspend fun canShowDaxDialogCta(): Boolean {
-        if (!daxOnboardingActive() || settingsDataStore.hideTips || !hasPrivacySettingsOn()) {
+        if (!daxOnboardingActive() || settingsDataStore.hideTips) {
             return false
         }
         return true
@@ -219,10 +218,14 @@ class CtaViewModel @Inject constructor(
     private fun getDaxDialogCta(site: Site?): Cta? {
         val nonNullSite = site ?: return null
 
+        val host = nonNullSite.domain
+        if (host == null || userWhitelistDao.contains(host)) {
+            return null
+        }
+
         nonNullSite.let {
             // Is major network
-            val host = it.uri?.host
-            if (it.entity != null && host != null) {
+            if (it.entity != null) {
                 it.entity?.let { entity ->
                     if (!daxDialogNetworkShown() && DaxDialogCta.mainTrackerNetworks.contains(entity.displayName)) {
                         return DaxDialogCta.DaxMainNetworkCta(onboardingStore, appInstallStore, entity.displayName, host)
@@ -235,7 +238,7 @@ class CtaViewModel @Inject constructor(
             }
 
             // Trackers blocked
-            return if (!daxDialogTrackersFoundShown() && !isSerpUrl(it.url) && hasTrackersInformation(it.trackingEvents) && host != null) {
+            return if (!daxDialogTrackersFoundShown() && !isSerpUrl(it.url) && it.orderedTrackingEntities().isNotEmpty()) {
                 DaxDialogCta.DaxTrackersBlockedCta(onboardingStore, appInstallStore, it.orderedTrackingEntities(), host)
             } else if (!isSerpUrl(it.url) && !daxDialogOtherShown() && !daxDialogTrackersFoundShown() && !daxDialogNetworkShown()) {
                 DaxDialogCta.DaxNoSerpCta(onboardingStore, appInstallStore)
@@ -244,15 +247,6 @@ class CtaViewModel @Inject constructor(
             }
         }
     }
-
-    private fun hasTrackersInformation(events: List<TrackingEvent>): Boolean =
-        events.asSequence()
-            .filter { it.entity?.isMajor == true }
-            .map { it.entity?.displayName }
-            .filterNotNull()
-            .any()
-
-    private fun hasPrivacySettingsOn(): Boolean = settingsPrivacySettingsStore.privacyOn
 
     private fun variant(): Variant = variantManager.getVariant()
 
