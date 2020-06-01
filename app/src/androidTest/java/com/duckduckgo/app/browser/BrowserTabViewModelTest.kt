@@ -1887,6 +1887,54 @@ class BrowserTabViewModelTest {
         assertTrue(browserViewState().canGoForward)
     }
 
+    @Test
+    fun whenUserBrowsingPressesBackAndForwardThenCanAddBookmark() {
+        setupNavigation(skipHome = false, isBrowsing = true, canGoBack = false)
+        testee.onUserPressedBack()
+        testee.onUserPressedForward()
+        assertTrue(browserViewState().canAddBookmarks)
+    }
+
+    @Test
+    fun whenUserBrowsingPressesBackAndForwardThenCanWhitelist() {
+        setupNavigation(skipHome = false, isBrowsing = true, canGoBack = false)
+        testee.onUserPressedBack()
+        testee.onUserPressedForward()
+        assertTrue(browserViewState().canWhitelist)
+    }
+
+    @Test
+    fun whenUserBrowsingPressesBackAndForwardThenCanShare() {
+        setupNavigation(skipHome = false, isBrowsing = true, canGoBack = false)
+        testee.onUserPressedBack()
+        testee.onUserPressedForward()
+        assertTrue(browserViewState().canSharePage)
+    }
+
+    @Test
+    fun whenUserBrowsingPressesBackAndForwardThenCanReportSite() {
+        setupNavigation(skipHome = false, isBrowsing = true, canGoBack = false)
+        testee.onUserPressedBack()
+        testee.onUserPressedForward()
+        assertTrue(browserViewState().canReportSite)
+    }
+
+    @Test
+    fun whenUserBrowsingPressesBackAndForwardThenCanAddToHome() {
+        setupNavigation(skipHome = false, isBrowsing = true, canGoBack = false)
+        testee.onUserPressedBack()
+        testee.onUserPressedForward()
+        assertTrue(browserViewState().addToHomeEnabled)
+    }
+
+    @Test
+    fun whenUserBrowsingPressesBackAndForwardThenCanFindInPage() {
+        setupNavigation(skipHome = false, isBrowsing = true, canGoBack = false)
+        testee.onUserPressedBack()
+        testee.onUserPressedForward()
+        assertTrue(findInPageViewState().canFindInPage)
+    }
+
     private inline fun <reified T : Command> assertCommandIssued(instanceAssertions: T.() -> Unit = {}) {
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
         val issuedCommand = commandCaptor.allValues.find { it is T }
