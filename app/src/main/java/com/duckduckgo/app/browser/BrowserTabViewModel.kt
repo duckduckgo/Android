@@ -471,8 +471,15 @@ class BrowserTabViewModel(
             browserShowing = false,
             canGoBack = false,
             canFireproofSite = false,
+            canSharePage = false,
+            canAddBookmarks = false,
+            canReportSite = false,
+            addToHomeEnabled = false,
+            canWhitelist = false,
             canGoForward = currentGlobalLayoutState() !is Invalidated
         )
+
+        findInPageViewState.value = FindInPageViewState()
         omnibarViewState.value = currentOmnibarViewState().copy(omnibarText = "", shouldMoveCaretToEnd = false)
         loadingViewState.value = currentLoadingViewState().copy(isLoading = false)
 
