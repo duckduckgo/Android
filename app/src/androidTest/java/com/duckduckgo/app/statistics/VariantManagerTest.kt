@@ -100,7 +100,7 @@ class VariantManagerTest {
     fun notificationDripTestArticleVariantHasDay1ArticleNotificationAndDay3ClearDataNotificationAndDripNotification() {
         val variant = variants.firstOrNull { it.key == "zc" }
         assertEquals(3, variant!!.features.size)
-        assertTrue(variant.hasFeature(Day1ArticleNotification))
+        assertTrue(variant.hasFeature(Day1DripA1Notification))
         assertTrue(variant.hasFeature(Day3ClearDataNotification))
         assertTrue(variant.hasFeature(DripNotification))
     }
@@ -115,7 +115,7 @@ class VariantManagerTest {
     fun notificationDripTestBlogVariantHasDay1BlogNotificationAndDay3ClearDataNotificationAndDripNotification() {
         val variant = variants.firstOrNull { it.key == "zd" }
         assertEquals(3, variant!!.features.size)
-        assertTrue(variant.hasFeature(Day1BlogNotification))
+        assertTrue(variant.hasFeature(Day1DripA2Notification))
         assertTrue(variant.hasFeature(Day3ClearDataNotification))
         assertTrue(variant.hasFeature(DripNotification))
     }
@@ -130,7 +130,7 @@ class VariantManagerTest {
     fun notificationDripTestAppFeatureVariantHasDay1AppFeatureNotificationAndDay3ClearDataNotificationAndDripNotification() {
         val variant = variants.firstOrNull { it.key == "ze" }
         assertEquals(3, variant!!.features.size)
-        assertTrue(variant.hasFeature(Day1AppFeatureNotification))
+        assertTrue(variant.hasFeature(Day1DripB1Notification))
         assertTrue(variant.hasFeature(Day3ClearDataNotification))
         assertTrue(variant.hasFeature(DripNotification))
     }

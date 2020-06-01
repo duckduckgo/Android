@@ -28,17 +28,16 @@ import androidx.work.testing.WorkManagerTestInitHelper
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.notification.NotificationScheduler.ClearDataNotificationWorker
 import com.duckduckgo.app.notification.NotificationScheduler.PrivacyNotificationWorker
-import com.duckduckgo.app.notification.NotificationScheduler.BlogNotificationWorker
-import com.duckduckgo.app.notification.NotificationScheduler.ArticleNotificationWorker
-import com.duckduckgo.app.notification.NotificationScheduler.AppFeatureNotificationWorker
+import com.duckduckgo.app.notification.NotificationScheduler.DripA2NotificationWorker
+import com.duckduckgo.app.notification.NotificationScheduler.DripB1NotificationWorker
 import com.duckduckgo.app.notification.model.SchedulableNotification
 import com.duckduckgo.app.statistics.Variant
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.VariantManager.VariantFeature.DripNotification
 import com.duckduckgo.app.statistics.VariantManager.VariantFeature.Day1PrivacyNotification
-import com.duckduckgo.app.statistics.VariantManager.VariantFeature.Day1ArticleNotification
-import com.duckduckgo.app.statistics.VariantManager.VariantFeature.Day1BlogNotification
-import com.duckduckgo.app.statistics.VariantManager.VariantFeature.Day1AppFeatureNotification
+import com.duckduckgo.app.statistics.VariantManager.VariantFeature.Day1DripA1Notification
+import com.duckduckgo.app.statistics.VariantManager.VariantFeature.Day1DripA2Notification
+import com.duckduckgo.app.statistics.VariantManager.VariantFeature.Day1DripB1Notification
 import com.duckduckgo.app.statistics.VariantManager.VariantFeature.Day3ClearDataNotification
 import com.duckduckgo.app.statistics.VariantManager.Companion.DEFAULT_VARIANT
 import com.nhaarman.mockitokotlin2.any
@@ -61,9 +60,10 @@ class AndroidNotificationSchedulerTest {
     private val variantManager: VariantManager = mock()
     private val clearNotification: SchedulableNotification = mock()
     private val privacyNotification: SchedulableNotification = mock()
-    private val articleNotification: SchedulableNotification = mock()
-    private val blogNotification: SchedulableNotification = mock()
-    private val appFeatureNotification: SchedulableNotification = mock()
+    private val dripA1Notification: SchedulableNotification = mock()
+    private val dripA2Notification: SchedulableNotification = mock()
+    private val dripB1Notification: SchedulableNotification = mock()
+    private val dripB2Notification: SchedulableNotification = mock()
 
     private val context = InstrumentationRegistry.getInstrumentation().targetContext
     private lateinit var workManager: WorkManager
@@ -77,9 +77,10 @@ class AndroidNotificationSchedulerTest {
             workManager,
             clearNotification,
             privacyNotification,
-            articleNotification,
-            blogNotification,
-            appFeatureNotification,
+            dripA1Notification,
+            dripA2Notification,
+            dripB1Notification,
+            dripB2Notification,
             variantManager
         )
     }
@@ -136,7 +137,7 @@ class AndroidNotificationSchedulerTest {
     @Test
     fun whenArticleVariantAndNoNotificationCanShowThenNoNotificationScheduled() = runBlocking<Unit> {
         setArticleVariant()
-        whenever(articleNotification.canShow()).thenReturn(false)
+        whenever(dripA1Notification.canShow()).thenReturn(false)
         whenever(clearNotification.canShow()).thenReturn(false)
         testee.scheduleNextNotification()
 
@@ -146,51 +147,51 @@ class AndroidNotificationSchedulerTest {
     @Test
     fun whenBlogVariantAndBlogNotificationClearDataAndSearchPromptCanShowThenBothAreScheduled() = runBlocking<Unit> {
         setBlogVariant()
-        whenever(blogNotification.canShow()).thenReturn(true)
+        whenever(dripA2Notification.canShow()).thenReturn(true)
         whenever(clearNotification.canShow()).thenReturn(true)
 
         testee.scheduleNextNotification()
 
-        assertUnusedAppNotificationScheduled(BlogNotificationWorker::class.jvmName)
+        assertUnusedAppNotificationScheduled(DripA2NotificationWorker::class.jvmName)
     }
 
     @Test
     fun whenBlogVariantAndBlogNotificationClearDataCanShowButSearchPromptCannotThenBlogNotificationScheduled() = runBlocking<Unit> {
         setBlogVariant()
-        whenever(blogNotification.canShow()).thenReturn(true)
+        whenever(dripA2Notification.canShow()).thenReturn(true)
         whenever(clearNotification.canShow()).thenReturn(true)
 
         testee.scheduleNextNotification()
 
-        assertUnusedAppNotificationScheduled(BlogNotificationWorker::class.jvmName)
+        assertUnusedAppNotificationScheduled(DripA2NotificationWorker::class.jvmName)
     }
 
     @Test
     fun whenBlogVariantAndBlogNotificationAndSearchPromptCanShowButClearDataCannotShowThenBothAreScheduled() = runBlocking<Unit> {
         setBlogVariant()
-        whenever(blogNotification.canShow()).thenReturn(true)
+        whenever(dripA2Notification.canShow()).thenReturn(true)
         whenever(clearNotification.canShow()).thenReturn(false)
 
         testee.scheduleNextNotification()
 
-        assertUnusedAppNotificationScheduled(BlogNotificationWorker::class.jvmName)
+        assertUnusedAppNotificationScheduled(DripA2NotificationWorker::class.jvmName)
     }
 
     @Test
     fun whenBlogVariantAndBlogNotificationCanShowButClearDataAndSearchPromptCannotThenBlogScheduled() = runBlocking<Unit> {
         setBlogVariant()
-        whenever(blogNotification.canShow()).thenReturn(true)
+        whenever(dripA2Notification.canShow()).thenReturn(true)
         whenever(clearNotification.canShow()).thenReturn(false)
 
         testee.scheduleNextNotification()
 
-        assertUnusedAppNotificationScheduled(BlogNotificationWorker::class.jvmName)
+        assertUnusedAppNotificationScheduled(DripA2NotificationWorker::class.jvmName)
     }
 
     @Test
     fun whenBlogVariantAndBlogNotificationCannotShowButSearchPromptAndClearNotificationCanThenBothAreScheduled() = runBlocking<Unit> {
         setBlogVariant()
-        whenever(blogNotification.canShow()).thenReturn(false)
+        whenever(dripA2Notification.canShow()).thenReturn(false)
         whenever(clearNotification.canShow()).thenReturn(true)
 
         testee.scheduleNextNotification()
@@ -201,7 +202,7 @@ class AndroidNotificationSchedulerTest {
     @Test
     fun whenBlogVariantAndBlogNotificationAndClearNotificationCannotShowButSearchPromptCanThenNotificationScheduled() = runBlocking<Unit> {
         setBlogVariant()
-        whenever(blogNotification.canShow()).thenReturn(false)
+        whenever(dripA2Notification.canShow()).thenReturn(false)
         whenever(clearNotification.canShow()).thenReturn(false)
         testee.scheduleNextNotification()
 
@@ -211,7 +212,7 @@ class AndroidNotificationSchedulerTest {
     @Test
     fun whenBlogVariantAndNoNotificationCanShowThenNoNotificationScheduled() = runBlocking<Unit> {
         setBlogVariant()
-        whenever(blogNotification.canShow()).thenReturn(false)
+        whenever(dripA2Notification.canShow()).thenReturn(false)
         whenever(clearNotification.canShow()).thenReturn(false)
         testee.scheduleNextNotification()
 
@@ -221,51 +222,51 @@ class AndroidNotificationSchedulerTest {
     @Test
     fun whenAppFeatureVariantAndAppFeatureNotificationClearDataAndSearchPromptCanShowThenBothAreScheduled() = runBlocking<Unit> {
         setAppFeatureVariant()
-        whenever(appFeatureNotification.canShow()).thenReturn(true)
+        whenever(dripB1Notification.canShow()).thenReturn(true)
         whenever(clearNotification.canShow()).thenReturn(true)
 
         testee.scheduleNextNotification()
 
-        assertUnusedAppNotificationScheduled(AppFeatureNotificationWorker::class.jvmName)
+        assertUnusedAppNotificationScheduled(DripB1NotificationWorker::class.jvmName)
     }
 
     @Test
     fun whenAppFeatureVariantAndAppFeatureNotificationClearDataCanShowButSearchPromptCannotThenAppFeatureNotificationScheduled() = runBlocking<Unit> {
         setAppFeatureVariant()
-        whenever(appFeatureNotification.canShow()).thenReturn(true)
+        whenever(dripB1Notification.canShow()).thenReturn(true)
         whenever(clearNotification.canShow()).thenReturn(true)
 
         testee.scheduleNextNotification()
 
-        assertUnusedAppNotificationScheduled(AppFeatureNotificationWorker::class.jvmName)
+        assertUnusedAppNotificationScheduled(DripB1NotificationWorker::class.jvmName)
     }
 
     @Test
     fun whenAppFeatureVariantAndAppFeatureNotificationAndSearchPromptCanShowButClearDataCannotShowThenBothAreScheduled() = runBlocking<Unit> {
         setAppFeatureVariant()
-        whenever(appFeatureNotification.canShow()).thenReturn(true)
+        whenever(dripB1Notification.canShow()).thenReturn(true)
         whenever(clearNotification.canShow()).thenReturn(false)
 
         testee.scheduleNextNotification()
 
-        assertUnusedAppNotificationScheduled(AppFeatureNotificationWorker::class.jvmName)
+        assertUnusedAppNotificationScheduled(DripB1NotificationWorker::class.jvmName)
     }
 
     @Test
     fun whenAppFeatureVariantAndAppFeatureNotificationCanShowButClearDataAndSearchPromptCannotThenAppFeatureScheduled() = runBlocking<Unit> {
         setAppFeatureVariant()
-        whenever(appFeatureNotification.canShow()).thenReturn(true)
+        whenever(dripB1Notification.canShow()).thenReturn(true)
         whenever(clearNotification.canShow()).thenReturn(false)
 
         testee.scheduleNextNotification()
 
-        assertUnusedAppNotificationScheduled(AppFeatureNotificationWorker::class.jvmName)
+        assertUnusedAppNotificationScheduled(DripB1NotificationWorker::class.jvmName)
     }
 
     @Test
     fun whenAppFeatureVariantAndAppFeatureNotificationCannotShowButSearchPromptAndClearNotificationCanThenBothAreScheduled() = runBlocking<Unit> {
         setAppFeatureVariant()
-        whenever(appFeatureNotification.canShow()).thenReturn(false)
+        whenever(dripB1Notification.canShow()).thenReturn(false)
         whenever(clearNotification.canShow()).thenReturn(true)
 
         testee.scheduleNextNotification()
@@ -276,7 +277,7 @@ class AndroidNotificationSchedulerTest {
     @Test
     fun whenAppFeatureVariantAndAppNotificationAndClearNotificationCannotShowButSearchPromptCanThenNotificationScheduled() = runBlocking<Unit> {
         setAppFeatureVariant()
-        whenever(appFeatureNotification.canShow()).thenReturn(false)
+        whenever(dripB1Notification.canShow()).thenReturn(false)
         whenever(clearNotification.canShow()).thenReturn(false)
         testee.scheduleNextNotification()
 
@@ -286,7 +287,7 @@ class AndroidNotificationSchedulerTest {
     @Test
     fun whenAppFeatureVariantAndNoNotificationCanShowThenNoNotificationScheduled() = runBlocking<Unit> {
         setAppFeatureVariant()
-        whenever(appFeatureNotification.canShow()).thenReturn(false)
+        whenever(dripB1Notification.canShow()).thenReturn(false)
         whenever(clearNotification.canShow()).thenReturn(false)
         testee.scheduleNextNotification()
 
@@ -372,9 +373,9 @@ class AndroidNotificationSchedulerTest {
     fun whenNullVariantAndAllNotificationsCanShowThenSearchPromptNotificationScheduled() = runBlocking<Unit> {
         setNotificationNullVariant()
         whenever(privacyNotification.canShow()).thenReturn(true)
-        whenever(articleNotification.canShow()).thenReturn(true)
-        whenever(blogNotification.canShow()).thenReturn(true)
-        whenever(appFeatureNotification.canShow()).thenReturn(true)
+        whenever(dripA1Notification.canShow()).thenReturn(true)
+        whenever(dripA2Notification.canShow()).thenReturn(true)
+        whenever(dripB1Notification.canShow()).thenReturn(true)
         whenever(clearNotification.canShow()).thenReturn(true)
         testee.scheduleNextNotification()
 
@@ -385,9 +386,9 @@ class AndroidNotificationSchedulerTest {
     fun whenNullVariantAndOnlySearchPromptCannotShowThenNoNotificationsScheduled() = runBlocking<Unit> {
         setNotificationNullVariant()
         whenever(privacyNotification.canShow()).thenReturn(true)
-        whenever(articleNotification.canShow()).thenReturn(true)
-        whenever(blogNotification.canShow()).thenReturn(true)
-        whenever(appFeatureNotification.canShow()).thenReturn(true)
+        whenever(dripA1Notification.canShow()).thenReturn(true)
+        whenever(dripA2Notification.canShow()).thenReturn(true)
+        whenever(dripB1Notification.canShow()).thenReturn(true)
         whenever(clearNotification.canShow()).thenReturn(true)
         testee.scheduleNextNotification()
 
@@ -398,9 +399,9 @@ class AndroidNotificationSchedulerTest {
     fun whenNullVariantAndNoNotificationCanShowThenNoNotificationScheduled() = runBlocking<Unit> {
         setNotificationNullVariant()
         whenever(privacyNotification.canShow()).thenReturn(false)
-        whenever(articleNotification.canShow()).thenReturn(false)
-        whenever(blogNotification.canShow()).thenReturn(false)
-        whenever(appFeatureNotification.canShow()).thenReturn(false)
+        whenever(dripA1Notification.canShow()).thenReturn(false)
+        whenever(dripA2Notification.canShow()).thenReturn(false)
+        whenever(dripB1Notification.canShow()).thenReturn(false)
         whenever(clearNotification.canShow()).thenReturn(false)
         testee.scheduleNextNotification()
 
@@ -409,19 +410,19 @@ class AndroidNotificationSchedulerTest {
 
     private fun setArticleVariant() {
         whenever(variantManager.getVariant()).thenReturn(
-            Variant("test", features = listOf(DripNotification, Day1ArticleNotification, Day3ClearDataNotification), filterBy = { true })
+            Variant("test", features = listOf(DripNotification, Day1DripA1Notification, Day3ClearDataNotification), filterBy = { true })
         )
     }
 
     private fun setBlogVariant() {
         whenever(variantManager.getVariant()).thenReturn(
-            Variant("test", features = listOf(DripNotification, Day1BlogNotification, Day3ClearDataNotification), filterBy = { true })
+            Variant("test", features = listOf(DripNotification, Day1DripA2Notification, Day3ClearDataNotification), filterBy = { true })
         )
     }
 
     private fun setAppFeatureVariant() {
         whenever(variantManager.getVariant()).thenReturn(
-            Variant("test", features = listOf(DripNotification, Day1AppFeatureNotification, Day3ClearDataNotification), filterBy = { true })
+            Variant("test", features = listOf(DripNotification, Day1DripB1Notification, Day3ClearDataNotification), filterBy = { true })
         )
     }
 

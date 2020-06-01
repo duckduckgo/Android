@@ -18,20 +18,23 @@ package com.duckduckgo.app.notification.model
 
 import android.content.Context
 import android.os.Bundle
+import androidx.annotation.StringRes
 import com.duckduckgo.app.browser.R
-import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEvent.APP_FEATURE
+import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEvent.APP_LAUNCH
 import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEvent.CANCEL
 import com.duckduckgo.app.notification.NotificationRegistrar
 import com.duckduckgo.app.notification.db.NotificationDao
 
 class AppFeatureNotification(
     private val context: Context,
-    private val notificationDao: NotificationDao
+    private val notificationDao: NotificationDao,
+    @StringRes private val title: Int,
+    @StringRes private val description: Int,
+    private val pixelSuffix: String,
+    override val launchIntent: String = APP_LAUNCH
 ) : SchedulableNotification {
 
     override val id = "com.duckduckgo.privacy.app.feature"
-
-    override val launchIntent: String = APP_FEATURE
 
     override val cancelIntent: String = CANCEL
 
@@ -40,24 +43,33 @@ class AppFeatureNotification(
     }
 
     override suspend fun buildSpecification(): NotificationSpec {
-        return AppFeatureNotificationSpecification(context)
+        return AppFeatureNotificationSpecification(context, title, description, pixelSuffix)
+    }
+
+    companion object {
+        const val DRIP_B_1_PIXEL = "b1n"
+        const val DRIP_B_2_PIXEL = "b2n"
+        const val DRIP_B_1_TITLE = R.string.dripB1Title
+        const val DRIP_B_1_DESCRIPTION = R.string.dripB1Description
+        const val DRIP_B_2_TITLE = R.string.dripB1Title
+        const val DRIP_B_2_DESCRIPTION = R.string.dripB1Description
     }
 }
 
-class AppFeatureNotificationSpecification(context: Context) : NotificationSpec {
+class AppFeatureNotificationSpecification(
+    context: Context,
+    @StringRes titleRes: Int,
+    @StringRes descriptionRes: Int,
+    override val pixelSuffix: String
+) : NotificationSpec {
     override val bundle: Bundle = Bundle()
-
     override val channel = NotificationRegistrar.ChannelType.TUTORIALS
     override val systemId = NotificationRegistrar.NotificationId.AppFeature
     override val name = "AppFeature"
     override val icon = R.drawable.notification_sheild_lock
-    override val launchButton: String = context.getString(R.string.privacyProtectionNotificationLaunchButton)
+    override val launchButton: String = context.getString(R.string.dripBButtonText)
     override val closeButton: String? = null
     override val autoCancel = true
-
-    override val title: String = "This is the title"
-
-    override val description: String = "This is the description"
-
-    override val pixelSuffix: String = "fn"
+    override val title: String = context.getString(titleRes)
+    override val description: String = context.getString(descriptionRes)
 }

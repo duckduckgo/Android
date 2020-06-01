@@ -25,7 +25,7 @@ import androidx.annotation.VisibleForTesting
 import androidx.core.app.NotificationManagerCompat
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.icon.ui.ChangeIconActivity
-import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEvent.APP_FEATURE
+import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEvent.CUSTOMIZE_ICON_FEATURE
 import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEvent.APP_LAUNCH
 import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEvent.CANCEL
 import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEvent.CLEAR_DATA_LAUNCH
@@ -70,8 +70,8 @@ class NotificationHandlerService : IntentService("NotificationHandlerService") {
             APP_LAUNCH -> onAppLaunched(pixelSuffix)
             CLEAR_DATA_LAUNCH -> onClearDataLaunched(pixelSuffix)
             CANCEL -> onCancelled(pixelSuffix)
-            WEBSITE -> onArticleNotification(intent, pixelSuffix)
-            APP_FEATURE -> onFeatureLaunched(pixelSuffix)
+            WEBSITE -> onWebsiteNotification(intent, pixelSuffix)
+            CUSTOMIZE_ICON_FEATURE -> onCustomizeIconLaunched(pixelSuffix)
         }
 
         if (intent.getBooleanExtra(NOTIFICATION_AUTO_CANCEL, true)) {
@@ -81,7 +81,7 @@ class NotificationHandlerService : IntentService("NotificationHandlerService") {
         }
     }
 
-    private fun onArticleNotification(intent: Intent, pixelSuffix: String) {
+    private fun onWebsiteNotification(intent: Intent, pixelSuffix: String) {
         val url = intent.getStringExtra(WebsiteNotificationSpecification.WEBSITE_KEY)
         val newIntent = BrowserActivity.intent(context, queryExtra = url)
         TaskStackBuilder.create(context)
@@ -90,12 +90,12 @@ class NotificationHandlerService : IntentService("NotificationHandlerService") {
         pixel.fire("${NOTIFICATION_LAUNCHED.pixelName}_$pixelSuffix")
     }
 
-    private fun onFeatureLaunched(pixelSuffix: String) {
+    private fun onCustomizeIconLaunched(pixelSuffix: String) {
         val intent = ChangeIconActivity.intent(context)
         TaskStackBuilder.create(context)
             .addNextIntentWithParentStack(intent)
             .startActivities()
-        //pixel.fire("${NOTIFICATION_LAUNCHED.pixelName}_$pixelSuffix")
+        pixel.fire("${NOTIFICATION_LAUNCHED.pixelName}_$pixelSuffix")
     }
 
     private fun onAppLaunched(pixelSuffix: String) {
@@ -133,7 +133,7 @@ class NotificationHandlerService : IntentService("NotificationHandlerService") {
         const val CLEAR_DATA_LAUNCH = "com.duckduckgo.notification.launch.clearData"
         const val CANCEL = "com.duckduckgo.notification.cancel"
         const val WEBSITE = "com.duckduckgo.notification.website"
-        const val APP_FEATURE = "com.duckduckgo.notification.app.feature"
+        const val CUSTOMIZE_ICON_FEATURE = "com.duckduckgo.notification.app.feature.customizeIcon"
     }
 
     companion object {

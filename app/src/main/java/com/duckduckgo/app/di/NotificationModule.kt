@@ -23,6 +23,7 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.work.WorkManager
 import com.duckduckgo.app.notification.AndroidNotificationScheduler
 import com.duckduckgo.app.notification.NotificationFactory
+import com.duckduckgo.app.notification.NotificationHandlerService
 import com.duckduckgo.app.notification.NotificationScheduler
 import com.duckduckgo.app.notification.db.NotificationDao
 import com.duckduckgo.app.notification.model.AppFeatureNotification
@@ -77,29 +78,66 @@ class NotificationModule {
     }
 
     @Provides
-    @Named("articleNotification")
-    fun provideArticleNotification(
+    @Named("dripA1Notification")
+    fun provideDripA1Notification(
         context: Context,
         notificationDao: NotificationDao
     ): WebsiteNotification {
-        return WebsiteNotification(context, notificationDao, WebsiteNotification.ARTICLE_URL, WebsiteNotification.ARTICLE_PIXEL)
+        return WebsiteNotification(
+            context,
+            notificationDao,
+            WebsiteNotification.DRIP_A_1_URL,
+            WebsiteNotification.DRIP_A_1_TITLE,
+            WebsiteNotification.DRIP_A_1_DESCRIPTION,
+            WebsiteNotification.DRIP_A_1_PIXEL
+        )
     }
 
     @Provides
-    @Named("blogNotification")
-    fun provideBlogNotification(
+    @Named("dripA2Notification")
+    fun provideDripA2Notification(
         context: Context,
         notificationDao: NotificationDao
     ): WebsiteNotification {
-        return WebsiteNotification(context, notificationDao, WebsiteNotification.BLOG_URL, WebsiteNotification.BLOG_PIXEL)
+        return WebsiteNotification(
+            context,
+            notificationDao,
+            WebsiteNotification.DRIP_A_2_URL,
+            WebsiteNotification.DRIP_A_2_TITLE,
+            WebsiteNotification.DRIP_A_2_DESCRIPTION,
+            WebsiteNotification.DRIP_A_2_PIXEL
+        )
     }
 
     @Provides
-    fun provideAppFeatureNotification(
+    @Named("dripB1Notification")
+    fun provideADripB1Notification(
         context: Context,
         notificationDao: NotificationDao
     ): AppFeatureNotification {
-        return AppFeatureNotification(context, notificationDao)
+        return AppFeatureNotification(
+            context,
+            notificationDao,
+            AppFeatureNotification.DRIP_B_1_TITLE,
+            AppFeatureNotification.DRIP_B_1_DESCRIPTION,
+            AppFeatureNotification.DRIP_B_1_PIXEL,
+            NotificationHandlerService.NotificationEvent.CUSTOMIZE_ICON_FEATURE
+        )
+    }
+
+    @Provides
+    @Named("dripB2Notification")
+    fun provideADripB2Notification(
+        context: Context,
+        notificationDao: NotificationDao
+    ): AppFeatureNotification {
+        return AppFeatureNotification(
+            context,
+            notificationDao,
+            AppFeatureNotification.DRIP_B_2_TITLE,
+            AppFeatureNotification.DRIP_B_2_DESCRIPTION,
+            AppFeatureNotification.DRIP_B_2_PIXEL
+        )
     }
 
     @Provides
@@ -108,18 +146,20 @@ class NotificationModule {
         workManager: WorkManager,
         clearDataNotification: ClearDataNotification,
         privacyProtectionNotification: PrivacyProtectionNotification,
-        @Named("articleNotification") articleNotification: WebsiteNotification,
-        @Named("blogNotification") blogNotification: WebsiteNotification,
-        appFeatureNotification: AppFeatureNotification,
+        @Named("dripA1Notification") dripA1Notification: WebsiteNotification,
+        @Named("dripA2Notification") dripA2Notification: WebsiteNotification,
+        @Named("dripB1Notification") dripB1Notification: AppFeatureNotification,
+        @Named("dripB2Notification") dripB2Notification: AppFeatureNotification,
         variantManager: VariantManager
     ): AndroidNotificationScheduler {
         return NotificationScheduler(
             workManager,
             clearDataNotification,
             privacyProtectionNotification,
-            articleNotification,
-            blogNotification,
-            appFeatureNotification,
+            dripA1Notification,
+            dripA2Notification,
+            dripB1Notification,
+            dripB2Notification,
             variantManager
         )
     }

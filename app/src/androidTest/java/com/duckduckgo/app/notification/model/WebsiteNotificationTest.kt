@@ -39,7 +39,7 @@ class WebsiteNotificationTest {
 
     @Before
     fun before() {
-        testee = WebsiteNotification(context, notificationsDao, URL, PIXEL)
+        testee = WebsiteNotification(context, notificationsDao, URL, 1, 1, PIXEL)
     }
 
     @Test

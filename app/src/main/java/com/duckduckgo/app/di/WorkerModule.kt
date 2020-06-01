@@ -62,9 +62,10 @@ class WorkerModule {
         clearDataNotification: ClearDataNotification,
         privacyProtectionNotification: PrivacyProtectionNotification,
         configurationDownloader: ConfigurationDownloader,
-        @Named("articleNotification") articleNotification: WebsiteNotification,
-        @Named("blogNotification") blogNotification: WebsiteNotification,
-        appFeatureNotification: AppFeatureNotification,
+        @Named("dripA1Notification") dripA1Notification: WebsiteNotification,
+        @Named("dripA2Notification") dripA2Notification: WebsiteNotification,
+        @Named("dripB1Notification") dripB1Notification: AppFeatureNotification,
+        @Named("dripB2Notification") dripB2Notification: AppFeatureNotification,
         pixel: Pixel
     ): WorkerFactory {
         return DaggerWorkerFactory(
@@ -77,9 +78,10 @@ class WorkerModule {
             clearDataNotification,
             privacyProtectionNotification,
             configurationDownloader,
-            articleNotification,
-            blogNotification,
-            appFeatureNotification,
+            dripA1Notification,
+            dripA2Notification,
+            dripB1Notification,
+            dripB2Notification,
             pixel
         )
     }

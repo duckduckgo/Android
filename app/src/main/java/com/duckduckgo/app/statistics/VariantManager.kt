@@ -33,9 +33,10 @@ interface VariantManager {
         object DripNotification : VariantFeature()
         object Day1PrivacyNotification : VariantFeature()
         object Day3ClearDataNotification : VariantFeature()
-        object Day1ArticleNotification : VariantFeature()
-        object Day1BlogNotification : VariantFeature()
-        object Day1AppFeatureNotification : VariantFeature()
+        object Day1DripA1Notification : VariantFeature()
+        object Day1DripA2Notification : VariantFeature()
+        object Day1DripB1Notification : VariantFeature()
+        object Day1DripB2Notification : VariantFeature()
     }
 
     companion object {
@@ -77,21 +78,22 @@ interface VariantManager {
             Variant(
                 key = "zc",
                 weight = 0.0,
-                features = listOf(VariantFeature.DripNotification, VariantFeature.Day1ArticleNotification, VariantFeature.Day3ClearDataNotification),
+                features = listOf(VariantFeature.DripNotification, VariantFeature.Day1DripA1Notification, VariantFeature.Day3ClearDataNotification),
                 filterBy = { isEnglishLocale() }),
             Variant(
                 key = "zd",
                 weight = 0.0,
-                features = listOf(VariantFeature.DripNotification, VariantFeature.Day1BlogNotification, VariantFeature.Day3ClearDataNotification),
+                features = listOf(VariantFeature.DripNotification, VariantFeature.Day1DripA2Notification, VariantFeature.Day3ClearDataNotification),
                 filterBy = { isEnglishLocale() }),
             Variant(
                 key = "ze",
                 weight = 1.0,
-                features = listOf(
-                    VariantFeature.DripNotification,
-                    VariantFeature.Day1AppFeatureNotification,
-                    VariantFeature.Day3ClearDataNotification
-                ),
+                features = listOf(VariantFeature.DripNotification, VariantFeature.Day1DripB1Notification, VariantFeature.Day3ClearDataNotification),
+                filterBy = { isEnglishLocale() }),
+            Variant(
+                key = "zf",
+                weight = 0.0,
+                features = listOf(VariantFeature.DripNotification, VariantFeature.Day1DripB2Notification, VariantFeature.Day3ClearDataNotification),
                 filterBy = { isEnglishLocale() })
 
             // All groups in an experiment (control and variants) MUST use the same filters

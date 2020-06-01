@@ -26,12 +26,12 @@ import com.duckduckgo.app.global.job.AppConfigurationWorker
 import com.duckduckgo.app.global.view.ClearDataAction
 import com.duckduckgo.app.job.ConfigurationDownloader
 import com.duckduckgo.app.notification.NotificationFactory
-import com.duckduckgo.app.notification.NotificationScheduler
 import com.duckduckgo.app.notification.NotificationScheduler.ClearDataNotificationWorker
 import com.duckduckgo.app.notification.NotificationScheduler.PrivacyNotificationWorker
-import com.duckduckgo.app.notification.NotificationScheduler.ArticleNotificationWorker
-import com.duckduckgo.app.notification.NotificationScheduler.BlogNotificationWorker
-import com.duckduckgo.app.notification.NotificationScheduler.AppFeatureNotificationWorker
+import com.duckduckgo.app.notification.NotificationScheduler.DripA1NotificationWorker
+import com.duckduckgo.app.notification.NotificationScheduler.DripA2NotificationWorker
+import com.duckduckgo.app.notification.NotificationScheduler.DripB1NotificationWorker
+import com.duckduckgo.app.notification.NotificationScheduler.DripB2NotificationWorker
 import com.duckduckgo.app.notification.db.NotificationDao
 import com.duckduckgo.app.notification.model.AppFeatureNotification
 import com.duckduckgo.app.notification.model.WebsiteNotification
@@ -53,9 +53,10 @@ class DaggerWorkerFactory(
     private val clearDataNotification: ClearDataNotification,
     private val privacyProtectionNotification: PrivacyProtectionNotification,
     private val configurationDownloader: ConfigurationDownloader,
-    private val articleNotification: WebsiteNotification,
-    private val blogNotification: WebsiteNotification,
-    private val appFeatureNotification: AppFeatureNotification,
+    private val dripA1Notification: WebsiteNotification,
+    private val dripA2Notification: WebsiteNotification,
+    private val dripB1Notification: AppFeatureNotification,
+    private val dripB2Notification: AppFeatureNotification,
     private val pixel: Pixel
 ) : WorkerFactory() {
 
@@ -72,9 +73,10 @@ class DaggerWorkerFactory(
                 is ClearDataNotificationWorker -> injectClearDataNotificationWorker(instance)
                 is PrivacyNotificationWorker -> injectPrivacyNotificationWorker(instance)
                 is AppConfigurationWorker -> injectAppConfigurationWorker(instance)
-                is ArticleNotificationWorker -> injectArticleNotificationWorker(instance)
-                is BlogNotificationWorker -> injectBlogNotificationWorker(instance)
-                is AppFeatureNotificationWorker -> injectAppFeatureNotificationWorker(instance)
+                is DripA1NotificationWorker -> injectDripA1NotificationWorker(instance)
+                is DripA2NotificationWorker -> injectDripA2NotificationWorker(instance)
+                is DripB1NotificationWorker -> injectDripB1NotificationWorker(instance)
+                is DripB2NotificationWorker -> injectDripB2NotificationWorker(instance)
                 else -> Timber.i("No injection required for worker $workerClassName")
             }
 
@@ -115,28 +117,35 @@ class DaggerWorkerFactory(
         worker.notification = privacyProtectionNotification
     }
 
-    private fun injectArticleNotificationWorker(worker: NotificationScheduler.ArticleNotificationWorker) {
+    private fun injectDripA1NotificationWorker(worker: DripA1NotificationWorker) {
         worker.manager = notificationManager
         worker.notificationDao = notificationDao
         worker.factory = notificationFactory
         worker.pixel = pixel
-        worker.notification = articleNotification
+        worker.notification = dripA1Notification
     }
 
-    private fun injectBlogNotificationWorker(worker: NotificationScheduler.BlogNotificationWorker) {
+    private fun injectDripA2NotificationWorker(worker: DripA2NotificationWorker) {
         worker.manager = notificationManager
         worker.notificationDao = notificationDao
         worker.factory = notificationFactory
         worker.pixel = pixel
-        worker.notification = blogNotification
+        worker.notification = dripA2Notification
     }
 
-    private fun injectAppFeatureNotificationWorker(worker: NotificationScheduler.AppFeatureNotificationWorker) {
+    private fun injectDripB1NotificationWorker(worker: DripB1NotificationWorker) {
         worker.manager = notificationManager
         worker.notificationDao = notificationDao
         worker.factory = notificationFactory
         worker.pixel = pixel
-        worker.notification = appFeatureNotification
+        worker.notification = dripB1Notification
     }
 
+    private fun injectDripB2NotificationWorker(worker: DripB2NotificationWorker) {
+        worker.manager = notificationManager
+        worker.notificationDao = notificationDao
+        worker.factory = notificationFactory
+        worker.pixel = pixel
+        worker.notification = dripB2Notification
+    }
 }

@@ -38,7 +38,7 @@ class AppFeatureNotificationTest {
 
     @Before
     fun before() {
-        testee = AppFeatureNotification(context, notificationsDao)
+        testee = AppFeatureNotification(context, notificationsDao, 1, 1, "a")
     }
 
     @Test

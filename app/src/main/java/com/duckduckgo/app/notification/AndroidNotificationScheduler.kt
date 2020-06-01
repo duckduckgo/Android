@@ -25,9 +25,9 @@ import com.duckduckgo.app.notification.model.Notification
 import com.duckduckgo.app.notification.model.SchedulableNotification
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.VariantManager.VariantFeature.DripNotification
-import com.duckduckgo.app.statistics.VariantManager.VariantFeature.Day1AppFeatureNotification
-import com.duckduckgo.app.statistics.VariantManager.VariantFeature.Day1BlogNotification
-import com.duckduckgo.app.statistics.VariantManager.VariantFeature.Day1ArticleNotification
+import com.duckduckgo.app.statistics.VariantManager.VariantFeature.Day1DripB1Notification
+import com.duckduckgo.app.statistics.VariantManager.VariantFeature.Day1DripA2Notification
+import com.duckduckgo.app.statistics.VariantManager.VariantFeature.Day1DripA1Notification
 import com.duckduckgo.app.statistics.VariantManager.VariantFeature.Day1PrivacyNotification
 import com.duckduckgo.app.statistics.VariantManager.VariantFeature.Day3ClearDataNotification
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -46,9 +46,10 @@ class NotificationScheduler(
     private val workManager: WorkManager,
     private val clearDataNotification: SchedulableNotification,
     private val privacyNotification: SchedulableNotification,
-    private val articleNotification: SchedulableNotification,
-    private val blogNotification: SchedulableNotification,
-    private val appFeatureNotification: SchedulableNotification,
+    private val dripA1Notification: SchedulableNotification,
+    private val dripA2Notification: SchedulableNotification,
+    private val dripB1Notification: SchedulableNotification,
+    private val dripB2Notification: SchedulableNotification,
     private val variantManager: VariantManager
 ) : AndroidNotificationScheduler {
 
@@ -60,14 +61,17 @@ class NotificationScheduler(
         workManager.cancelAllWorkByTag(UNUSED_APP_WORK_REQUEST_TAG)
 
         when {
-            variant().hasFeature(Day1ArticleNotification) && articleNotification.canShow() -> {
-                scheduleNotification(OneTimeWorkRequestBuilder<ArticleNotificationWorker>(), 1, TimeUnit.DAYS, UNUSED_APP_WORK_REQUEST_TAG)
+            variant().hasFeature(Day1DripA1Notification) && dripA1Notification.canShow() -> {
+                scheduleNotification(OneTimeWorkRequestBuilder<DripA1NotificationWorker>(), 1, TimeUnit.DAYS, UNUSED_APP_WORK_REQUEST_TAG)
             }
-            variant().hasFeature(Day1BlogNotification) && blogNotification.canShow() -> {
-                scheduleNotification(OneTimeWorkRequestBuilder<BlogNotificationWorker>(), 1, TimeUnit.DAYS, UNUSED_APP_WORK_REQUEST_TAG)
+            variant().hasFeature(Day1DripA2Notification) && dripA2Notification.canShow() -> {
+                scheduleNotification(OneTimeWorkRequestBuilder<DripA1NotificationWorker>(), 1, TimeUnit.DAYS, UNUSED_APP_WORK_REQUEST_TAG)
             }
-            variant().hasFeature(Day1AppFeatureNotification) && appFeatureNotification.canShow() -> {
-                scheduleNotification(OneTimeWorkRequestBuilder<AppFeatureNotificationWorker>(), 1, TimeUnit.DAYS, UNUSED_APP_WORK_REQUEST_TAG)
+            variant().hasFeature(Day1DripB1Notification) && dripB1Notification.canShow() -> {
+                scheduleNotification(OneTimeWorkRequestBuilder<DripB1NotificationWorker>(), 1, TimeUnit.DAYS, UNUSED_APP_WORK_REQUEST_TAG)
+            }
+            variant().hasFeature(Day1DripB1Notification) && dripB2Notification.canShow() -> {
+                scheduleNotification(OneTimeWorkRequestBuilder<DripB2NotificationWorker>(), 1, TimeUnit.DAYS, UNUSED_APP_WORK_REQUEST_TAG)
             }
             (isNotDripVariant() || isDripVariantAndHasPrivacyFeature()) && privacyNotification.canShow() -> {
                 scheduleNotification(OneTimeWorkRequestBuilder<PrivacyNotificationWorker>(), 1, TimeUnit.DAYS, UNUSED_APP_WORK_REQUEST_TAG)
@@ -105,9 +109,10 @@ class NotificationScheduler(
 
     open class ClearDataNotificationWorker(context: Context, params: WorkerParameters) : SchedulableNotificationWorker(context, params)
     class PrivacyNotificationWorker(context: Context, params: WorkerParameters) : SchedulableNotificationWorker(context, params)
-    class ArticleNotificationWorker(context: Context, params: WorkerParameters) : SchedulableNotificationWorker(context, params)
-    class BlogNotificationWorker(context: Context, params: WorkerParameters) : SchedulableNotificationWorker(context, params)
-    class AppFeatureNotificationWorker(context: Context, params: WorkerParameters) : SchedulableNotificationWorker(context, params)
+    class DripA1NotificationWorker(context: Context, params: WorkerParameters) : SchedulableNotificationWorker(context, params)
+    class DripA2NotificationWorker(context: Context, params: WorkerParameters) : SchedulableNotificationWorker(context, params)
+    class DripB1NotificationWorker(context: Context, params: WorkerParameters) : SchedulableNotificationWorker(context, params)
+    class DripB2NotificationWorker(context: Context, params: WorkerParameters) : SchedulableNotificationWorker(context, params)
 
     open class SchedulableNotificationWorker(val context: Context, params: WorkerParameters) : CoroutineWorker(context, params) {
 
