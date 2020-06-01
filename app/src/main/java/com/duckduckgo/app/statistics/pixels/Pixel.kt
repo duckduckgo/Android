@@ -169,11 +169,11 @@ interface Pixel {
 
         CHANGE_APP_ICON_OPENED("m_ic"),
 
-        MENU_ACTION_POPUP_OPENED("m_nav_pm_o_%s"),
-        MENU_ACTION_FIRE_PRESSED("m_nav_f_p_%s"),
-        MENU_ACTION_REFRESH_PRESSED("m_nav_r_p_%s"),
-        MENU_ACTION_NEW_TAB_PRESSED("m_nav_nt_p_%s"),
-        MENU_ACTION_BOOKMARKS_PRESSED("m_nav_b_p_%s"),
+        MENU_ACTION_POPUP_OPENED("m_nav_pm_o"),
+        MENU_ACTION_FIRE_PRESSED("m_nav_f_p"),
+        MENU_ACTION_REFRESH_PRESSED("m_nav_r_p"),
+        MENU_ACTION_NEW_TAB_PRESSED("m_nav_nt_p"),
+        MENU_ACTION_BOOKMARKS_PRESSED("m_nav_b_p"),
 
         COOKIE_DATABASE_NOT_FOUND("m_cdb_nf"),
         COOKIE_DATABASE_OPEN_ERROR("m_cdb_oe"),

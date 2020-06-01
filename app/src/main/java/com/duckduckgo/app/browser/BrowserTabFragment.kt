@@ -1286,7 +1286,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
             fireMenuButton?.show()
             fireMenuButton?.setOnClickListener {
                 browserActivity?.launchFire()
-                pixel.fire(String.format(Locale.US, Pixel.PixelName.MENU_ACTION_FIRE_PRESSED.pixelName, variantManager.getVariant().key))
+                pixel.fire(Pixel.PixelName.MENU_ACTION_FIRE_PRESSED.pixelName)
             }
 
             tabsButton?.show()
@@ -1300,15 +1300,15 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
                 onMenuItemClicked(view.backPopupMenuItem) { activity?.onBackPressed() }
                 onMenuItemClicked(view.refreshPopupMenuItem) {
                     viewModel.onRefreshRequested()
-                    pixel.fire(String.format(Locale.US, Pixel.PixelName.MENU_ACTION_REFRESH_PRESSED.pixelName, variantManager.getVariant().key))
+                    pixel.fire(Pixel.PixelName.MENU_ACTION_REFRESH_PRESSED.pixelName)
                 }
                 onMenuItemClicked(view.newTabPopupMenuItem) {
                     viewModel.userRequestedOpeningNewTab()
-                    pixel.fire(String.format(Locale.US, Pixel.PixelName.MENU_ACTION_NEW_TAB_PRESSED.pixelName, variantManager.getVariant().key))
+                    pixel.fire(Pixel.PixelName.MENU_ACTION_NEW_TAB_PRESSED.pixelName)
                 }
                 onMenuItemClicked(view.bookmarksPopupMenuItem) {
                     browserActivity?.launchBookmarks()
-                    pixel.fire(String.format(Locale.US, Pixel.PixelName.MENU_ACTION_BOOKMARKS_PRESSED.pixelName, variantManager.getVariant().key))
+                    pixel.fire(Pixel.PixelName.MENU_ACTION_BOOKMARKS_PRESSED.pixelName)
                 }
                 onMenuItemClicked(view.fireproofWebsitePopupMenuItem) { launch { viewModel.onFireproofWebsiteClicked() } }
                 onMenuItemClicked(view.addBookmarksPopupMenuItem) { launch { viewModel.onBookmarkAddRequested() } }
@@ -1328,7 +1328,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
 
         private fun launchTopAnchoredPopupMenu() {
             popupMenu.show(rootView, toolbar)
-            pixel.fire(String.format(Locale.US, Pixel.PixelName.MENU_ACTION_POPUP_OPENED.pixelName, variantManager.getVariant().key))
+            pixel.fire(Pixel.PixelName.MENU_ACTION_POPUP_OPENED.pixelName)
         }
 
         private fun configureShowTabSwitcherListener() {
