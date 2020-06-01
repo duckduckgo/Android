@@ -28,8 +28,10 @@ import androidx.work.testing.WorkManagerTestInitHelper
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.notification.NotificationScheduler.ClearDataNotificationWorker
 import com.duckduckgo.app.notification.NotificationScheduler.PrivacyNotificationWorker
+import com.duckduckgo.app.notification.NotificationScheduler.BlogNotificationWorker
+import com.duckduckgo.app.notification.NotificationScheduler.ArticleNotificationWorker
+import com.duckduckgo.app.notification.NotificationScheduler.AppFeatureNotificationWorker
 import com.duckduckgo.app.notification.model.SchedulableNotification
-import com.duckduckgo.app.notification.model.SearchNotification
 import com.duckduckgo.app.statistics.Variant
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.VariantManager.VariantFeature.DripNotification
@@ -59,7 +61,6 @@ class AndroidNotificationSchedulerTest {
     private val variantManager: VariantManager = mock()
     private val clearNotification: SchedulableNotification = mock()
     private val privacyNotification: SchedulableNotification = mock()
-    private val searchPromptNotification: SearchNotification = mock()
     private val articleNotification: SchedulableNotification = mock()
     private val blogNotification: SchedulableNotification = mock()
     private val appFeatureNotification: SchedulableNotification = mock()
@@ -76,7 +77,6 @@ class AndroidNotificationSchedulerTest {
             workManager,
             clearNotification,
             privacyNotification,
-            searchPromptNotification,
             articleNotification,
             blogNotification,
             appFeatureNotification,
@@ -116,7 +116,6 @@ class AndroidNotificationSchedulerTest {
 
     @Test
     fun whenPrivacyNotificationCannotShowAndClearNotificationCanShowThenClearNotificationIsScheduled() = runBlocking<Unit> {
-    fun whenPrivacyNotificationCannotShowButSearchPromptAndClearNotificationCanShowThenBothAreScheduled() = runBlocking<Unit> {
         whenever(variantManager.getVariant(any())).thenReturn(DEFAULT_VARIANT)
         whenever(privacyNotification.canShow()).thenReturn(false)
         whenever(clearNotification.canShow()).thenReturn(true)
@@ -139,10 +138,9 @@ class AndroidNotificationSchedulerTest {
         setArticleVariant()
         whenever(articleNotification.canShow()).thenReturn(false)
         whenever(clearNotification.canShow()).thenReturn(false)
-        whenever(searchPromptNotification.canShow()).thenReturn(false)
         testee.scheduleNextNotification()
 
-        assertNoNotificationScheduled()
+        assertNoUnusedAppNotificationScheduled()
     }
 
     @Test
@@ -150,12 +148,10 @@ class AndroidNotificationSchedulerTest {
         setBlogVariant()
         whenever(blogNotification.canShow()).thenReturn(true)
         whenever(clearNotification.canShow()).thenReturn(true)
-        whenever(searchPromptNotification.canShow()).thenReturn(true)
 
         testee.scheduleNextNotification()
 
         assertUnusedAppNotificationScheduled(BlogNotificationWorker::class.jvmName)
-        assertContinuousAppUseNotificationScheduled(SearchPromptNotificationWorker::class.jvmName)
     }
 
     @Test
@@ -163,12 +159,10 @@ class AndroidNotificationSchedulerTest {
         setBlogVariant()
         whenever(blogNotification.canShow()).thenReturn(true)
         whenever(clearNotification.canShow()).thenReturn(true)
-        whenever(searchPromptNotification.canShow()).thenReturn(false)
 
         testee.scheduleNextNotification()
 
         assertUnusedAppNotificationScheduled(BlogNotificationWorker::class.jvmName)
-        assertNoContinuousAppNotificationScheduled()
     }
 
     @Test
@@ -176,12 +170,10 @@ class AndroidNotificationSchedulerTest {
         setBlogVariant()
         whenever(blogNotification.canShow()).thenReturn(true)
         whenever(clearNotification.canShow()).thenReturn(false)
-        whenever(searchPromptNotification.canShow()).thenReturn(true)
 
         testee.scheduleNextNotification()
 
         assertUnusedAppNotificationScheduled(BlogNotificationWorker::class.jvmName)
-        assertContinuousAppUseNotificationScheduled(SearchPromptNotificationWorker::class.jvmName)
     }
 
     @Test
@@ -189,12 +181,10 @@ class AndroidNotificationSchedulerTest {
         setBlogVariant()
         whenever(blogNotification.canShow()).thenReturn(true)
         whenever(clearNotification.canShow()).thenReturn(false)
-        whenever(searchPromptNotification.canShow()).thenReturn(false)
 
         testee.scheduleNextNotification()
 
         assertUnusedAppNotificationScheduled(BlogNotificationWorker::class.jvmName)
-        assertNoContinuousAppNotificationScheduled()
     }
 
     @Test
@@ -202,12 +192,10 @@ class AndroidNotificationSchedulerTest {
         setBlogVariant()
         whenever(blogNotification.canShow()).thenReturn(false)
         whenever(clearNotification.canShow()).thenReturn(true)
-        whenever(searchPromptNotification.canShow()).thenReturn(true)
 
         testee.scheduleNextNotification()
 
         assertUnusedAppNotificationScheduled(ClearDataNotificationWorker::class.jvmName)
-        assertContinuousAppUseNotificationScheduled(SearchPromptNotificationWorker::class.jvmName)
     }
 
     @Test
@@ -215,10 +203,8 @@ class AndroidNotificationSchedulerTest {
         setBlogVariant()
         whenever(blogNotification.canShow()).thenReturn(false)
         whenever(clearNotification.canShow()).thenReturn(false)
-        whenever(searchPromptNotification.canShow()).thenReturn(true)
         testee.scheduleNextNotification()
 
-        assertContinuousAppUseNotificationScheduled(SearchPromptNotificationWorker::class.jvmName)
         assertNoUnusedAppNotificationScheduled()
     }
 
@@ -227,10 +213,9 @@ class AndroidNotificationSchedulerTest {
         setBlogVariant()
         whenever(blogNotification.canShow()).thenReturn(false)
         whenever(clearNotification.canShow()).thenReturn(false)
-        whenever(searchPromptNotification.canShow()).thenReturn(false)
         testee.scheduleNextNotification()
 
-        assertNoNotificationScheduled()
+        assertNoUnusedAppNotificationScheduled()
     }
 
     @Test
@@ -238,12 +223,10 @@ class AndroidNotificationSchedulerTest {
         setAppFeatureVariant()
         whenever(appFeatureNotification.canShow()).thenReturn(true)
         whenever(clearNotification.canShow()).thenReturn(true)
-        whenever(searchPromptNotification.canShow()).thenReturn(true)
 
         testee.scheduleNextNotification()
 
         assertUnusedAppNotificationScheduled(AppFeatureNotificationWorker::class.jvmName)
-        assertContinuousAppUseNotificationScheduled(SearchPromptNotificationWorker::class.jvmName)
     }
 
     @Test
@@ -251,12 +234,10 @@ class AndroidNotificationSchedulerTest {
         setAppFeatureVariant()
         whenever(appFeatureNotification.canShow()).thenReturn(true)
         whenever(clearNotification.canShow()).thenReturn(true)
-        whenever(searchPromptNotification.canShow()).thenReturn(false)
 
         testee.scheduleNextNotification()
 
         assertUnusedAppNotificationScheduled(AppFeatureNotificationWorker::class.jvmName)
-        assertNoContinuousAppNotificationScheduled()
     }
 
     @Test
@@ -264,12 +245,10 @@ class AndroidNotificationSchedulerTest {
         setAppFeatureVariant()
         whenever(appFeatureNotification.canShow()).thenReturn(true)
         whenever(clearNotification.canShow()).thenReturn(false)
-        whenever(searchPromptNotification.canShow()).thenReturn(true)
 
         testee.scheduleNextNotification()
 
         assertUnusedAppNotificationScheduled(AppFeatureNotificationWorker::class.jvmName)
-        assertContinuousAppUseNotificationScheduled(SearchPromptNotificationWorker::class.jvmName)
     }
 
     @Test
@@ -277,12 +256,10 @@ class AndroidNotificationSchedulerTest {
         setAppFeatureVariant()
         whenever(appFeatureNotification.canShow()).thenReturn(true)
         whenever(clearNotification.canShow()).thenReturn(false)
-        whenever(searchPromptNotification.canShow()).thenReturn(false)
 
         testee.scheduleNextNotification()
 
         assertUnusedAppNotificationScheduled(AppFeatureNotificationWorker::class.jvmName)
-        assertNoContinuousAppNotificationScheduled()
     }
 
     @Test
@@ -290,12 +267,10 @@ class AndroidNotificationSchedulerTest {
         setAppFeatureVariant()
         whenever(appFeatureNotification.canShow()).thenReturn(false)
         whenever(clearNotification.canShow()).thenReturn(true)
-        whenever(searchPromptNotification.canShow()).thenReturn(true)
 
         testee.scheduleNextNotification()
 
         assertUnusedAppNotificationScheduled(ClearDataNotificationWorker::class.jvmName)
-        assertContinuousAppUseNotificationScheduled(SearchPromptNotificationWorker::class.jvmName)
     }
 
     @Test
@@ -303,10 +278,8 @@ class AndroidNotificationSchedulerTest {
         setAppFeatureVariant()
         whenever(appFeatureNotification.canShow()).thenReturn(false)
         whenever(clearNotification.canShow()).thenReturn(false)
-        whenever(searchPromptNotification.canShow()).thenReturn(true)
         testee.scheduleNextNotification()
 
-        assertContinuousAppUseNotificationScheduled(SearchPromptNotificationWorker::class.jvmName)
         assertNoUnusedAppNotificationScheduled()
     }
 
@@ -315,10 +288,9 @@ class AndroidNotificationSchedulerTest {
         setAppFeatureVariant()
         whenever(appFeatureNotification.canShow()).thenReturn(false)
         whenever(clearNotification.canShow()).thenReturn(false)
-        whenever(searchPromptNotification.canShow()).thenReturn(false)
         testee.scheduleNextNotification()
 
-        assertNoNotificationScheduled()
+        assertNoUnusedAppNotificationScheduled()
     }
 
     @Test
@@ -326,12 +298,10 @@ class AndroidNotificationSchedulerTest {
         setNotificationControlVariant()
         whenever(privacyNotification.canShow()).thenReturn(true)
         whenever(clearNotification.canShow()).thenReturn(true)
-        whenever(searchPromptNotification.canShow()).thenReturn(true)
 
         testee.scheduleNextNotification()
 
         assertUnusedAppNotificationScheduled(PrivacyNotificationWorker::class.jvmName)
-        assertContinuousAppUseNotificationScheduled(SearchPromptNotificationWorker::class.jvmName)
     }
 
     @Test
@@ -339,12 +309,10 @@ class AndroidNotificationSchedulerTest {
         setNotificationControlVariant()
         whenever(privacyNotification.canShow()).thenReturn(true)
         whenever(clearNotification.canShow()).thenReturn(true)
-        whenever(searchPromptNotification.canShow()).thenReturn(false)
 
         testee.scheduleNextNotification()
 
         assertUnusedAppNotificationScheduled(PrivacyNotificationWorker::class.jvmName)
-        assertNoContinuousAppNotificationScheduled()
     }
 
     @Test
@@ -352,12 +320,10 @@ class AndroidNotificationSchedulerTest {
         setNotificationControlVariant()
         whenever(privacyNotification.canShow()).thenReturn(true)
         whenever(clearNotification.canShow()).thenReturn(false)
-        whenever(searchPromptNotification.canShow()).thenReturn(true)
 
         testee.scheduleNextNotification()
 
         assertUnusedAppNotificationScheduled(PrivacyNotificationWorker::class.jvmName)
-        assertContinuousAppUseNotificationScheduled(SearchPromptNotificationWorker::class.jvmName)
     }
 
     @Test
@@ -365,12 +331,10 @@ class AndroidNotificationSchedulerTest {
         setNotificationControlVariant()
         whenever(privacyNotification.canShow()).thenReturn(true)
         whenever(clearNotification.canShow()).thenReturn(false)
-        whenever(searchPromptNotification.canShow()).thenReturn(false)
 
         testee.scheduleNextNotification()
 
         assertUnusedAppNotificationScheduled(PrivacyNotificationWorker::class.jvmName)
-        assertNoContinuousAppNotificationScheduled()
     }
 
     @Test
@@ -378,12 +342,10 @@ class AndroidNotificationSchedulerTest {
         setNotificationControlVariant()
         whenever(privacyNotification.canShow()).thenReturn(false)
         whenever(clearNotification.canShow()).thenReturn(true)
-        whenever(searchPromptNotification.canShow()).thenReturn(true)
 
         testee.scheduleNextNotification()
 
         assertUnusedAppNotificationScheduled(ClearDataNotificationWorker::class.jvmName)
-        assertContinuousAppUseNotificationScheduled(SearchPromptNotificationWorker::class.jvmName)
     }
 
     @Test
@@ -391,10 +353,8 @@ class AndroidNotificationSchedulerTest {
         setNotificationControlVariant()
         whenever(privacyNotification.canShow()).thenReturn(false)
         whenever(clearNotification.canShow()).thenReturn(false)
-        whenever(searchPromptNotification.canShow()).thenReturn(true)
         testee.scheduleNextNotification()
 
-        assertContinuousAppUseNotificationScheduled(SearchPromptNotificationWorker::class.jvmName)
         assertNoUnusedAppNotificationScheduled()
     }
 
@@ -403,10 +363,9 @@ class AndroidNotificationSchedulerTest {
         setNotificationControlVariant()
         whenever(privacyNotification.canShow()).thenReturn(false)
         whenever(clearNotification.canShow()).thenReturn(false)
-        whenever(searchPromptNotification.canShow()).thenReturn(false)
         testee.scheduleNextNotification()
 
-        assertNoNotificationScheduled()
+        assertNoUnusedAppNotificationScheduled()
     }
 
     @Test
@@ -417,7 +376,6 @@ class AndroidNotificationSchedulerTest {
         whenever(blogNotification.canShow()).thenReturn(true)
         whenever(appFeatureNotification.canShow()).thenReturn(true)
         whenever(clearNotification.canShow()).thenReturn(true)
-        whenever(searchPromptNotification.canShow()).thenReturn(true)
         testee.scheduleNextNotification()
 
         assertNoUnusedAppNotificationScheduled()
@@ -431,10 +389,9 @@ class AndroidNotificationSchedulerTest {
         whenever(blogNotification.canShow()).thenReturn(true)
         whenever(appFeatureNotification.canShow()).thenReturn(true)
         whenever(clearNotification.canShow()).thenReturn(true)
-        whenever(searchPromptNotification.canShow()).thenReturn(false)
         testee.scheduleNextNotification()
 
-        assertNoNotificationScheduled()
+        assertNoUnusedAppNotificationScheduled()
     }
 
     @Test
@@ -445,10 +402,9 @@ class AndroidNotificationSchedulerTest {
         whenever(blogNotification.canShow()).thenReturn(false)
         whenever(appFeatureNotification.canShow()).thenReturn(false)
         whenever(clearNotification.canShow()).thenReturn(false)
-        whenever(searchPromptNotification.canShow()).thenReturn(false)
         testee.scheduleNextNotification()
 
-        assertNoNotificationScheduled()
+        assertNoUnusedAppNotificationScheduled()
     }
 
     private fun setArticleVariant() {

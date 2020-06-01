@@ -23,7 +23,6 @@ import androidx.work.*
 import com.duckduckgo.app.notification.db.NotificationDao
 import com.duckduckgo.app.notification.model.Notification
 import com.duckduckgo.app.notification.model.SchedulableNotification
-import com.duckduckgo.app.notification.model.SearchNotification
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.VariantManager.VariantFeature.DripNotification
 import com.duckduckgo.app.statistics.VariantManager.VariantFeature.Day1AppFeatureNotification
@@ -46,8 +45,7 @@ interface AndroidNotificationScheduler {
 class NotificationScheduler(
     private val workManager: WorkManager,
     private val clearDataNotification: SchedulableNotification,
-    private val privacyNotification: SchedulableNotification
-    private val searchPromptNotification: SearchNotification,
+    private val privacyNotification: SchedulableNotification,
     private val articleNotification: SchedulableNotification,
     private val blogNotification: SchedulableNotification,
     private val appFeatureNotification: SchedulableNotification,
