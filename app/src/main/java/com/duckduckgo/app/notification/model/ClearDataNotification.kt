@@ -69,4 +69,5 @@ class ClearDataSpecification(context: Context) : NotificationSpec {
     override val pixelSuffix = "cd"
     override val autoCancel = true
     override val bundle: Bundle = Bundle()
+    override val color: Int = R.color.cornflowerBlue
 }

@@ -47,12 +47,12 @@ class AppFeatureNotification(
     }
 
     companion object {
-        const val DRIP_B_1_PIXEL = "b1n"
-        const val DRIP_B_2_PIXEL = "b2n"
+        const val DRIP_B_1_PIXEL = "b1"
+        const val DRIP_B_2_PIXEL = "b2"
         const val DRIP_B_1_TITLE = R.string.dripB1Title
         const val DRIP_B_1_DESCRIPTION = R.string.dripB1Description
-        const val DRIP_B_2_TITLE = R.string.dripB1Title
-        const val DRIP_B_2_DESCRIPTION = R.string.dripB1Description
+        const val DRIP_B_2_TITLE = R.string.dripB2Title
+        const val DRIP_B_2_DESCRIPTION = R.string.dripB2Description
     }
 }
 
@@ -66,10 +66,11 @@ class AppFeatureNotificationSpecification(
     override val channel = NotificationRegistrar.ChannelType.TUTORIALS
     override val systemId = NotificationRegistrar.NotificationId.AppFeature
     override val name = "AppFeature"
-    override val icon = R.drawable.notification_sheild_lock
+    override val icon = R.drawable.notification_logo
     override val launchButton: String = context.getString(R.string.dripBButtonText)
     override val closeButton: String? = null
     override val autoCancel = true
     override val title: String = context.getString(titleRes)
     override val description: String = context.getString(descriptionRes)
+    override val color: Int = R.color.brickOrange
 }

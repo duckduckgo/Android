@@ -25,6 +25,7 @@ import com.duckduckgo.app.notification.model.Notification
 import com.duckduckgo.app.notification.model.SchedulableNotification
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.VariantManager.VariantFeature.DripNotification
+import com.duckduckgo.app.statistics.VariantManager.VariantFeature.Day1DripB2Notification
 import com.duckduckgo.app.statistics.VariantManager.VariantFeature.Day1DripB1Notification
 import com.duckduckgo.app.statistics.VariantManager.VariantFeature.Day1DripA2Notification
 import com.duckduckgo.app.statistics.VariantManager.VariantFeature.Day1DripA1Notification
@@ -65,12 +66,12 @@ class NotificationScheduler(
                 scheduleNotification(OneTimeWorkRequestBuilder<DripA1NotificationWorker>(), 1, TimeUnit.DAYS, UNUSED_APP_WORK_REQUEST_TAG)
             }
             variant().hasFeature(Day1DripA2Notification) && dripA2Notification.canShow() -> {
-                scheduleNotification(OneTimeWorkRequestBuilder<DripA1NotificationWorker>(), 1, TimeUnit.DAYS, UNUSED_APP_WORK_REQUEST_TAG)
+                scheduleNotification(OneTimeWorkRequestBuilder<DripA2NotificationWorker>(), 1, TimeUnit.DAYS, UNUSED_APP_WORK_REQUEST_TAG)
             }
             variant().hasFeature(Day1DripB1Notification) && dripB1Notification.canShow() -> {
                 scheduleNotification(OneTimeWorkRequestBuilder<DripB1NotificationWorker>(), 1, TimeUnit.DAYS, UNUSED_APP_WORK_REQUEST_TAG)
             }
-            variant().hasFeature(Day1DripB1Notification) && dripB2Notification.canShow() -> {
+            variant().hasFeature(Day1DripB2Notification) && dripB2Notification.canShow() -> {
                 scheduleNotification(OneTimeWorkRequestBuilder<DripB2NotificationWorker>(), 1, TimeUnit.DAYS, UNUSED_APP_WORK_REQUEST_TAG)
             }
             (isNotDripVariant() || isDripVariantAndHasPrivacyFeature()) && privacyNotification.canShow() -> {

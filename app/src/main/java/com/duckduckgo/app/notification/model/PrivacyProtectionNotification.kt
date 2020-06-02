@@ -58,6 +58,7 @@ class PrivacyProtectionNotificationSpecification(context: Context, trackers: Int
     override val closeButton: String? = null
     override val autoCancel = true
     override val bundle: Bundle = Bundle()
+    override val color: Int = R.color.cornflowerBlue
 
     override val title: String = when {
         trackers < TRACKER_THRESHOLD && upgrades < UPGRADE_THRESHOLD -> context.getString(R.string.privacyProtectionNotificationDefaultTitle)

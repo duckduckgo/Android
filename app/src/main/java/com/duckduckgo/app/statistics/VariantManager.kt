@@ -53,36 +53,28 @@ interface VariantManager {
             Variant(key = "se", weight = 0.0, features = emptyList(), filterBy = { noFilter() }),
 
             // Bottom Bar Navigation Experiment
-            Variant(
-                key = "mb",
-                weight = 0.0,
-                features = emptyList(),
-                filterBy = { noFilter() }),
-            Variant(
-                key = "mk",
-                weight = 0.0,
-                features = listOf(BottomBarNavigation),
-                filterBy = { noFilter() }),
+            Variant(key = "mb", weight = 0.0, features = emptyList(), filterBy = { noFilter() }),
+            Variant(key = "mk", weight = 0.0, features = listOf(BottomBarNavigation), filterBy = { noFilter() }),
 
             // Notification Drip Experiment
             Variant(
                 key = "za",
-                weight = 0.0,
+                weight = 1.0,
                 features = listOf(VariantFeature.DripNotification, VariantFeature.Day1PrivacyNotification, VariantFeature.Day3ClearDataNotification),
                 filterBy = { isEnglishLocale() }),
             Variant(
                 key = "zb",
-                weight = 0.0,
+                weight = 1.0,
                 features = listOf(VariantFeature.DripNotification),
                 filterBy = { isEnglishLocale() }),
             Variant(
                 key = "zc",
-                weight = 0.0,
+                weight = 1.0,
                 features = listOf(VariantFeature.DripNotification, VariantFeature.Day1DripA1Notification, VariantFeature.Day3ClearDataNotification),
                 filterBy = { isEnglishLocale() }),
             Variant(
                 key = "zd",
-                weight = 0.0,
+                weight = 1.0,
                 features = listOf(VariantFeature.DripNotification, VariantFeature.Day1DripA2Notification, VariantFeature.Day3ClearDataNotification),
                 filterBy = { isEnglishLocale() }),
             Variant(
@@ -92,7 +84,7 @@ interface VariantManager {
                 filterBy = { isEnglishLocale() }),
             Variant(
                 key = "zf",
-                weight = 0.0,
+                weight = 1.0,
                 features = listOf(VariantFeature.DripNotification, VariantFeature.Day1DripB2Notification, VariantFeature.Day3ClearDataNotification),
                 filterBy = { isEnglishLocale() })
 
