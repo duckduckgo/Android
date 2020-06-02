@@ -149,13 +149,13 @@
     <style name="BrowserIconMenuItem">
         <item name="android:paddingTop">6dp</item>
         <item name="android:paddingBottom">6dp</item>
-        <item name="android:background">@android:color/transparent</item>
-        <item name="android:tint">@color/browser_menu_icon</item>
+        <item name="android:background">?selectableItemBackground</item>
+        <item name="android:tint">?attr/browserIconColorSelector</item>
     </style>
 
     <style name="BrowserTextMenuItem">
-        <item name="android:paddingEnd">30dp</item>
-        <item name="android:paddingStart">30dp</item>
+        <item name="android:paddingEnd">24dp</item>
+        <item name="android:paddingStart">24dp</item>
         <item name="android:paddingTop">14dp</item>
         <item name="android:paddingBottom">14dp</item>
         <item name="android:textSize">16sp</item>
@@ -165,23 +165,33 @@
         <item name="android:layout_height">wrap_content</item>
         <item name="android:textColor">@color/browser_menu_text</item>
         <item name="android:background">?attr/selectableItemBackground</item>
-        <item name="android:color">@color/browser_menu_text</item>
     </style>
 
-    <style name="OnboardingButtonPrimaryRoundedCta">
-        <item name="android:foreground">?attr/selectableItemBackground</item>
+    <style name="BrowserCheckBoxMenuItem">
+        <item name="android:paddingEnd">24dp</item>
+        <item name="android:paddingStart">24dp</item>
+        <item name="android:paddingTop">14dp</item>
+        <item name="android:paddingBottom">14dp</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textColor">@color/browser_menu_text</item>
+        <item name="android:background">?attr/selectableItemBackground</item>
+    </style>
+
+    <style name="OnboardingButtonPrimaryRoundedCta" parent="Widget.AppCompat.Button.Borderless">
         <item name="android:layout_marginBottom">20dp</item>
         <item name="android:textSize">15sp</item>
         <item name="android:textColor">@color/white</item>
         <item name="layout_constraintWidth_max">400dp</item>
         <item name="layout_constraintWidth_percent">0.8</item>
-        <item name="backgroundTint">@color/cornflowerBlue</item>
         <item name="android:background">@drawable/onboarding_primary_cta_button_rounded_bg</item>
         <item name="android:textAllCaps">false</item>
     </style>
 
-    <style name="OnboardingButtonSecondaryRoundedCta">
-        <item name="android:foreground">?attr/selectableItemBackground</item>
+    <style name="OnboardingButtonSecondaryRoundedCta" parent="Widget.AppCompat.Button.Borderless">
         <item name="android:layout_marginBottom">20dp</item>
         <item name="android:textSize">15sp</item>
         <item name="android:textColor">@color/cornflowerDark</item>
@@ -286,6 +296,18 @@
         <item name="android:backgroundTint">?attr/daxDialogBackgroundColor</item>
         <item name="android:textColor">?attr/daxDialogSecondaryButtonTextColor</item>
         <item name="rippleColor">?attr/daxDialogSecondaryButtonRippleColor</item>
+    </style>
+
+    <style name="UnknownTrackerText">
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:textAlignment">center</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">?attr/omnibarLogoLetterTextColor</item>
+        <item name="android:textSize">13sp</item>
+    </style>
+
+    <style name="snackbarButtonStyle" parent="Widget.MaterialComponents.Button.TextButton.Snackbar">
+        <item name="android:textColor">?attr/colorAccent</item>
     </style>
 
 </resources>

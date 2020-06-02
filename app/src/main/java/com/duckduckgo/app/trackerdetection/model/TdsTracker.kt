@@ -65,7 +65,7 @@ class RuleTypeConverter {
 
     @TypeConverter
     fun toRules(value: String): List<Rule> {
-        return Adapters.ruleListAdapter.fromJson(value)
+        return Adapters.ruleListAdapter.fromJson(value)!!
     }
 
     @TypeConverter
@@ -78,7 +78,7 @@ class CategoriesTypeConverter {
 
     @TypeConverter
     fun toCategories(value: String): List<String> {
-        return Adapters.stringListAdapter.fromJson(value)
+        return Adapters.stringListAdapter.fromJson(value)!!
     }
 
     @TypeConverter
@@ -96,4 +96,3 @@ class Adapters {
         val stringListAdapter: JsonAdapter<List<String>> = moshi.adapter(stringListType)
     }
 }
-

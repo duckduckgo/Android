@@ -28,7 +28,6 @@ import com.duckduckgo.app.global.view.hideKeyboard
 import com.duckduckgo.app.global.view.showKeyboard
 import org.jetbrains.anko.find
 
-
 class EditBookmarkDialogFragment : DialogFragment() {
 
     interface EditBookmarkListener {
@@ -43,10 +42,10 @@ class EditBookmarkDialogFragment : DialogFragment() {
         val titleInput = rootView.find<EditText>(R.id.titleInput)
         val urlInput = rootView.find<EditText>(R.id.urlInput)
 
-        val alertBuilder = AlertDialog.Builder(activity!!)
+        val alertBuilder = AlertDialog.Builder(requireActivity())
             .setView(rootView)
             .setTitle(R.string.bookmarkTitleEdit)
-            .setPositiveButton(R.string.bookmarkSave) { _, _ ->
+            .setPositiveButton(R.string.dialogSave) { _, _ ->
                 userAcceptedDialog(titleInput, urlInput)
             }
 
@@ -80,13 +79,13 @@ class EditBookmarkDialogFragment : DialogFragment() {
         urlInput.setText(getExistingUrl())
     }
 
-    private fun getExistingId(): Long = arguments!!.getLong(KEY_BOOKMARK_ID)
-    private fun getExistingTitle(): String? = arguments!!.getString(KEY_PREEXISTING_TITLE)
-    private fun getExistingUrl(): String? = arguments!!.getString(KEY_PREEXISTING_URL)
+    private fun getExistingId(): Long = requireArguments().getLong(KEY_BOOKMARK_ID)
+    private fun getExistingTitle(): String? = requireArguments().getString(KEY_PREEXISTING_TITLE)
+    private fun getExistingUrl(): String? = requireArguments().getString(KEY_PREEXISTING_URL)
 
     private fun validateBundleArguments() {
         if (arguments == null) throw IllegalArgumentException("Missing arguments bundle")
-        val args = arguments!!
+        val args = requireArguments()
         if (!args.containsKey(KEY_PREEXISTING_TITLE) ||
             !args.containsKey(KEY_PREEXISTING_URL)
         ) {

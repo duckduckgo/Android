@@ -24,7 +24,6 @@ import com.duckduckgo.app.global.dialog.BackKeyListener
 import com.duckduckgo.app.global.rating.PromptCount
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.*
 
-
 class AppEnjoymentDialogFragment : EnjoymentDialog() {
 
     interface Listener {
@@ -38,7 +37,7 @@ class AppEnjoymentDialogFragment : EnjoymentDialog() {
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         firePixelWithPromptCount(APP_ENJOYMENT_DIALOG_SHOWN)
 
-        return AlertDialog.Builder(activity!!, R.style.AlertDialogTheme)
+        return AlertDialog.Builder(requireActivity(), R.style.AlertDialogTheme)
             .setTitle(R.string.appEnjoymentDialogTitle)
             .setMessage(R.string.appEnjoymentDialogMessage)
             .setPositiveButton(R.string.appEnjoymentDialogPositiveButton) { _, _ ->

@@ -50,16 +50,19 @@ import com.duckduckgo.app.cta.db.DismissedCtaDao
 import com.duckduckgo.app.cta.model.CtaId
 import com.duckduckgo.app.cta.model.DismissedCta
 import com.duckduckgo.app.cta.ui.*
+import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteDao
+import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
 import com.duckduckgo.app.global.db.AppDatabase
-import com.duckduckgo.app.cta.ui.HomeTopPanelCta
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.model.SiteFactory
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao
+import com.duckduckgo.app.privacy.db.UserWhitelistDao
+import com.duckduckgo.app.privacy.model.PrivacyGrade
 import com.duckduckgo.app.privacy.model.PrivacyPractices
 import com.duckduckgo.app.privacy.model.TestEntity
-import com.duckduckgo.app.privacy.store.PrivacySettingsStore
+import com.duckduckgo.app.privacy.model.UserWhitelistedDomain
 import com.duckduckgo.app.runBlocking
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.VariantManager
@@ -172,10 +175,10 @@ class BrowserTabViewModelTest {
     private lateinit var mockWidgetCapabilities: WidgetCapabilities
 
     @Mock
-    private lateinit var mockPrivacySettingsStore: PrivacySettingsStore
+    private lateinit var mockUserStageStore: UserStageStore
 
     @Mock
-    private lateinit var mockUserStageStore: UserStageStore
+    private lateinit var mockUserWhitelistDao: UserWhitelistDao
 
     private lateinit var mockAutoCompleteApi: AutoCompleteApi
 
@@ -188,6 +191,8 @@ class BrowserTabViewModelTest {
 
     private lateinit var testee: BrowserTabViewModel
 
+    private lateinit var fireproofWebsiteDao: FireproofWebsiteDao
+
     private val selectedTabLiveData = MutableLiveData<TabEntity>()
 
     @Before
@@ -197,6 +202,7 @@ class BrowserTabViewModelTest {
         db = Room.inMemoryDatabaseBuilder(getInstrumentation().targetContext, AppDatabase::class.java)
             .allowMainThreadQueries()
             .build()
+        fireproofWebsiteDao = db.fireproofWebsiteDao()
 
         mockAutoCompleteApi = AutoCompleteApi(mockAutoCompleteService, mockBookmarksDao)
 
@@ -206,10 +212,10 @@ class BrowserTabViewModelTest {
             mockSurveyDao,
             mockWidgetCapabilities,
             mockDismissedCtaDao,
+            mockUserWhitelistDao,
             mockVariantManager,
             mockSettingsStore,
             mockOnboardingStore,
-            mockPrivacySettingsStore,
             mockUserStageStore,
             coroutineRule.testDispatcherProvider
         )
@@ -222,7 +228,7 @@ class BrowserTabViewModelTest {
         whenever(mockTabsRepository.retrieveSiteData(any())).thenReturn(MutableLiveData())
         whenever(mockPrivacyPractices.privacyPracticesFor(any())).thenReturn(PrivacyPractices.UNKNOWN)
         whenever(mockAppInstallStore.installTimestamp).thenReturn(System.currentTimeMillis() - TimeUnit.DAYS.toMillis(1))
-        whenever(mockPrivacySettingsStore.privacyOn).thenReturn(true)
+        whenever(mockUserWhitelistDao.contains(anyString())).thenReturn(false)
 
         testee = BrowserTabViewModel(
             statisticsUpdater = mockStatisticsUpdater,
@@ -230,6 +236,7 @@ class BrowserTabViewModelTest {
             duckDuckGoUrlDetector = DuckDuckGoUrlDetector(),
             siteFactory = siteFactory,
             tabRepository = mockTabsRepository,
+            userWhitelistDao = mockUserWhitelistDao,
             networkLeaderboardDao = mockNetworkLeaderboardDao,
             autoComplete = mockAutoCompleteApi,
             appSettingsPreferencesStore = mockSettingsStore,
@@ -242,7 +249,8 @@ class BrowserTabViewModelTest {
             ctaViewModel = ctaViewModel,
             searchCountDao = mockSearchCountDao,
             pixel = mockPixel,
-            dispatchers = coroutineRule.testDispatcherProvider
+            dispatchers = coroutineRule.testDispatcherProvider,
+            fireproofWebsiteDao = fireproofWebsiteDao
         )
 
         testee.loadData("abc", null, false)
@@ -557,10 +565,6 @@ class BrowserTabViewModelTest {
     fun whenBrowsingAndViewModelGetsProgressUpdateLowerThan50ThenViewStateIsUpdatedTo50() {
         setBrowserShowing(true)
 
-        testee.progressChanged(0)
-        assertEquals(50, loadingViewState().progress)
-        assertEquals(true, loadingViewState().isLoading)
-
         testee.progressChanged(15)
         assertEquals(50, loadingViewState().progress)
         assertEquals(true, loadingViewState().isLoading)
@@ -577,26 +581,98 @@ class BrowserTabViewModelTest {
     @Test
     fun whenUrlClearedThenPrivacyGradeIsCleared() = coroutineRule.runBlocking {
         loadUrl("https://duckduckgo.com")
-        assertNotNull(testee.privacyGrade.value)
+        assertNotNull(privacyGradeState().privacyGrade)
         loadUrl(null)
-        assertNull(testee.privacyGrade.value)
+        assertNull(privacyGradeState().privacyGrade)
     }
 
     @Test
     fun whenUrlLoadedThenPrivacyGradeIsReset() = coroutineRule.runBlocking {
         loadUrl("https://duckduckgo.com")
-        assertNotNull(testee.privacyGrade.value)
+        assertNotNull(privacyGradeState().privacyGrade)
     }
 
     @Test
     fun whenEnoughTrackersDetectedThenPrivacyGradeIsUpdated() {
-        val grade = testee.privacyGrade.value
+        val grade = privacyGradeState().privacyGrade
         loadUrl("https://example.com")
         val entity = TestEntity("Network1", "Network1", 10.0)
         for (i in 1..10) {
             testee.trackerDetected(TrackingEvent("https://example.com", "", null, entity, false))
         }
-        assertNotEquals(grade, testee.privacyGrade.value)
+        assertNotEquals(grade, privacyGradeState().privacyGrade)
+    }
+
+    @Test
+    fun whenPrivacyGradeFinishedLoadingThenDoNotShowLoadingGrade() {
+        testee.stopShowingEmptyGrade()
+        assertFalse(privacyGradeState().showEmptyGrade)
+    }
+
+    @Test
+    fun whenProgressChangesWhileBrowsingButSiteNotFullyLoadedThenPrivacyGradeShouldAnimateIsTrue() {
+        setBrowserShowing(true)
+        testee.progressChanged(50)
+        assertTrue(privacyGradeState().shouldAnimate)
+    }
+
+    @Test
+    fun whenProgressChangesWhileBrowsingAndSiteIsFullyLoadedThenPrivacyGradeShouldAnimateIsFalse() {
+        setBrowserShowing(true)
+        testee.progressChanged(100)
+        assertFalse(privacyGradeState().shouldAnimate)
+    }
+
+    @Test
+    fun whenProgressChangesAndPrivacyIsOnThenShowLoadingGradeIsAlwaysTrue() {
+        setBrowserShowing(true)
+        testee.progressChanged(50)
+        assertTrue(privacyGradeState().showEmptyGrade)
+        testee.progressChanged(100)
+        assertTrue(privacyGradeState().showEmptyGrade)
+    }
+
+    @Test
+    fun whenProgressChangesAndPrivacyIsOffButSiteNotFullyLoadedThenShowLoadingGradeIsTrue() {
+        setBrowserShowing(true)
+        testee.loadingViewState.value = loadingViewState().copy(privacyOn = false)
+        testee.progressChanged(50)
+        assertTrue(privacyGradeState().showEmptyGrade)
+    }
+
+    @Test
+    fun whenProgressChangesAndPrivacyIsOffAndSiteIsFullyLoadedThenShowLoadingGradeIsFalse() {
+        setBrowserShowing(true)
+        testee.loadingViewState.value = loadingViewState().copy(privacyOn = false)
+        testee.progressChanged(100)
+        assertFalse(privacyGradeState().showEmptyGrade)
+    }
+
+    @Test
+    fun whenProgressChangesButIsTheSameAsBeforeThenDoNotUpdateState() {
+        setBrowserShowing(true)
+        testee.progressChanged(100)
+        testee.stopShowingEmptyGrade()
+        testee.progressChanged(100)
+        assertFalse(privacyGradeState().showEmptyGrade)
+    }
+
+    @Test
+    fun whenNotShowingEmptyGradeAndPrivacyGradeIsNotUnknownThenIsEnableIsTrue() {
+        val testee = BrowserTabViewModel.PrivacyGradeViewState(PrivacyGrade.A, shouldAnimate = false, showEmptyGrade = false)
+        assertTrue(testee.isEnabled)
+    }
+
+    @Test
+    fun whenPrivacyGradeIsUnknownThenIsEnableIsFalse() {
+        val testee = BrowserTabViewModel.PrivacyGradeViewState(PrivacyGrade.UNKNOWN, shouldAnimate = false, showEmptyGrade = false)
+        assertFalse(testee.isEnabled)
+    }
+
+    @Test
+    fun whenShowEmptyGradeIsTrueThenIsEnableIsFalse() {
+        val testee = BrowserTabViewModel.PrivacyGradeViewState(PrivacyGrade.A, shouldAnimate = false, showEmptyGrade = true)
+        assertFalse(testee.isEnabled)
     }
 
     @Test
@@ -611,16 +687,24 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenBrowserNotShownAndOmnibarInputDoesNotHaveFocusThenPrivacyGradeIsNotShown() {
+    fun whenOmnibarDoesNotHaveFocusThenShowEmptyGradeIsFalse() {
         testee.onOmnibarInputStateChanged(query = "", hasFocus = false, hasQueryChanged = false)
-        assertFalse(browserViewState().showPrivacyGrade)
+        assertFalse(privacyGradeState().showEmptyGrade)
     }
 
     @Test
-    fun whenBrowserShownAndOmnibarInputDoesNotHaveFocusThenPrivacyGradeIsShown() {
+    fun whenOmnibarDoesNotHaveFocusThenPrivacyGradeIsShownAndSearchIconIsHidden() {
+        testee.onOmnibarInputStateChanged(query = "", hasFocus = false, hasQueryChanged = false)
+        assertTrue(browserViewState().showPrivacyGrade)
+        assertFalse(browserViewState().showSearchIcon)
+    }
+
+    @Test
+    fun whenBrowserShownAndOmnibarInputDoesNotHaveFocusThenPrivacyGradeIsShownAndSearchIconIsHidden() {
         testee.onUserSubmittedQuery("foo")
         testee.onOmnibarInputStateChanged(query = "", hasFocus = false, hasQueryChanged = false)
         assertTrue(browserViewState().showPrivacyGrade)
+        assertFalse(browserViewState().showSearchIcon)
     }
 
     @Test
@@ -630,10 +714,11 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenBrowserShownAndOmnibarInputHasFocusThenPrivacyGradeIsShown() {
+    fun whenBrowserShownAndOmnibarInputHasFocusThenSearchIconIsShownAndPrivacyGradeIsHidden() {
         testee.onUserSubmittedQuery("foo")
         testee.onOmnibarInputStateChanged("", true, hasQueryChanged = false)
-        assertTrue(browserViewState().showPrivacyGrade)
+        assertFalse(browserViewState().showPrivacyGrade)
+        assertTrue(browserViewState().showSearchIcon)
     }
 
     @Test
@@ -800,7 +885,7 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenUserSelectsDownloadImageOptionFromContextMenuThenDownloadFileCommandIssued() {
+    fun whenUserSelectsDownloadImageOptionFromContextMenuThenDownloadCommandIssuedWithoutRequirementForFurtherUserConfirmation() {
         whenever(mockLongPressHandler.userSelectedMenuItem(any(), any()))
             .thenReturn(DownloadFile("example.com"))
 
@@ -812,6 +897,7 @@ class BrowserTabViewModelTest {
 
         val lastCommand = commandCaptor.lastValue as Command.DownloadImage
         assertEquals("example.com", lastCommand.url)
+        assertFalse(lastCommand.requestUserConfirmation)
     }
 
     @Test
@@ -866,6 +952,19 @@ class BrowserTabViewModelTest {
         testee.onUserPressedBack()
         assertFalse(browserViewState().browserShowing)
         assertTrue(browserViewState().canGoForward)
+    }
+
+    @Test
+    fun whenFindInPageShowingByPressingBackOnBrowserThenViewStateUpdatedInvisibleAndDoesNotGoToPreviousPage() {
+        setupNavigation(isBrowsing = true, canGoBack = true)
+        testee.onFindInPageSelected()
+        testee.onUserPressedBack()
+
+        assertFalse(findInPageViewState().visible)
+        assertCommandIssued<Command.DismissFindInPage>()
+
+        val issuedCommand = commandCaptor.allValues.find { it is Command.NavigateBack }
+        assertNull(issuedCommand)
     }
 
     @Test
@@ -1057,11 +1156,23 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenUserSelectsToShareLinkThenShareLinkCommandSent() {
-        loadUrl("foo.com")
-        testee.onShareSelected()
-        val command = captureCommands().value as Command.ShareLink
-        assertEquals("foo.com", command.url)
+    fun whenUserTogglesNonWhitelistedSiteThenSiteAddedToWhitelistAndPixelSentAndPageRefreshed() = coroutineRule.runBlocking {
+        whenever(mockUserWhitelistDao.contains("www.example.com")).thenReturn(false)
+        loadUrl("http://www.example.com/home.html")
+        testee.onWhitelistSelected()
+        verify(mockUserWhitelistDao).insert(UserWhitelistedDomain("www.example.com"))
+        verify(mockPixel).fire(Pixel.PixelName.BROWSER_MENU_WHITELIST_ADD)
+        verify(mockCommandObserver).onChanged(Command.Refresh)
+    }
+
+    @Test
+    fun whenUserTogglesWhitelsitedSiteThenSiteRemovedFromWhitelistAndPixelSentAndPageRefreshed() = coroutineRule.runBlocking {
+        whenever(mockUserWhitelistDao.contains("www.example.com")).thenReturn(true)
+        loadUrl("http://www.example.com/home.html")
+        testee.onWhitelistSelected()
+        verify(mockUserWhitelistDao).delete(UserWhitelistedDomain("www.example.com"))
+        verify(mockPixel).fire(Pixel.PixelName.BROWSER_MENU_WHITELIST_REMOVE)
+        verify(mockCommandObserver).onChanged(Command.Refresh)
     }
 
     @Test
@@ -1069,14 +1180,22 @@ class BrowserTabViewModelTest {
         loadUrl("foo.com", isBrowserShowing = true)
         testee.onBrokenSiteSelected()
         val command = captureCommands().value as Command.BrokenSiteFeedback
-        assertEquals("foo.com", command.url)
+        assertEquals("foo.com", command.data.url)
     }
 
     @Test
     fun whenNoSiteAndBrokenSiteSelectedThenBrokenSiteFeedbackCommandSentWithoutUrl() {
         testee.onBrokenSiteSelected()
         val command = captureCommands().value as Command.BrokenSiteFeedback
-        assertEquals("", command.url)
+        assertEquals("", command.data.url)
+    }
+
+    @Test
+    fun whenUserSelectsToShareLinkThenShareLinkCommandSent() {
+        loadUrl("foo.com")
+        testee.onShareSelected()
+        val command = captureCommands().value as Command.ShareLink
+        assertEquals("foo.com", command.url)
     }
 
     @Test
@@ -1221,6 +1340,7 @@ class BrowserTabViewModelTest {
         assertFalse(browserViewState().canGoForward)
         assertFalse(browserViewState().canReportSite)
         assertFalse(browserViewState().canChangeBrowsingMode)
+        assertFalse(browserViewState().canFireproofSite)
         assertFalse(findInPageViewState().canFindInPage)
     }
 
@@ -1240,6 +1360,32 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenAuthenticationIsRequiredForSameHostThenNoChangesOnBrowser() {
+        val mockHandler = mock<HttpAuthHandler>()
+        val siteURL = "http://example.com/requires-auth"
+        val authenticationRequest = BasicAuthenticationRequest(mockHandler, "example.com", "test realm", siteURL)
+
+        loadUrl(url = "http://example.com", isBrowserShowing = true)
+        testee.requiresAuthentication(authenticationRequest)
+
+        assertCommandNotIssued<Command.HideWebContent>()
+        assertEquals("http://example.com", omnibarViewState().omnibarText)
+    }
+
+    @Test
+    fun whenAuthenticationIsRequiredForDifferentHostThenUpdateUrlAndHideWebContent() {
+        val mockHandler = mock<HttpAuthHandler>()
+        val siteURL = "http://example.com/requires-auth"
+        val authenticationRequest = BasicAuthenticationRequest(mockHandler, "example.com", "test realm", siteURL)
+
+        loadUrl(url = "http://another.website.com", isBrowserShowing = true)
+        testee.requiresAuthentication(authenticationRequest)
+
+        assertCommandIssued<Command.HideWebContent>()
+        assertEquals(siteURL, omnibarViewState().omnibarText)
+    }
+
+    @Test
     fun whenHandleAuthenticationThenHandlerCalledWithParameters() {
         val mockHandler = mock<HttpAuthHandler>()
         val username = "user"
@@ -1249,6 +1395,25 @@ class BrowserTabViewModelTest {
         testee.handleAuthentication(request = authenticationRequest, credentials = credentials)
 
         verify(mockHandler, atLeastOnce()).proceed(username, password)
+    }
+
+    @Test
+    fun whenAuthenticationDialogAcceptedThenShowWebContent() {
+        val authenticationRequest = BasicAuthenticationRequest(mock(), "example.com", "test realm", "")
+        val credentials = BasicAuthenticationCredentials(username = "user", password = "password")
+
+        testee.handleAuthentication(request = authenticationRequest, credentials = credentials)
+
+        assertCommandIssued<Command.ShowWebContent>()
+    }
+
+    @Test
+    fun whenAuthenticationDialogCanceledThenShowWebContent() {
+        val authenticationRequest = BasicAuthenticationRequest(mock(), "example.com", "test realm", "")
+
+        testee.cancelAuthentication(request = authenticationRequest)
+
+        assertCommandIssued<Command.ShowWebContent>()
     }
 
     @Test
@@ -1336,7 +1501,6 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenScheduledSurveyChangesAndInstalledDaysDontMatchThenCtaIsNull() {
-        setCovidCtaShown()
         testee.onSurveyChanged(Survey("abc", "http://example.com", daysInstalled = 2, status = Survey.Status.SCHEDULED))
         assertNull(testee.ctaViewState.value!!.cta)
     }
@@ -1358,7 +1522,6 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenCtaRefreshedAndAutoAddSupportedAndWidgetAlreadyInstalledThenCtaIsNull() = coroutineRule.runBlocking {
-        setCovidCtaShown()
         whenever(mockWidgetCapabilities.supportsStandardWidgetAdd).thenReturn(true)
         whenever(mockWidgetCapabilities.supportsAutomaticWidgetAdd).thenReturn(true)
         whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(true)
@@ -1375,7 +1538,6 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenCtaRefreshedAndOnlyStandardAddSupportedAndWidgetAlreadyInstalledThenCtaIsNull() = coroutineRule.runBlocking {
-        setCovidCtaShown()
         whenever(mockWidgetCapabilities.supportsStandardWidgetAdd).thenReturn(true)
         whenever(mockWidgetCapabilities.supportsAutomaticWidgetAdd).thenReturn(false)
         whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(true)
@@ -1385,7 +1547,6 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenCtaRefreshedAndStandardAddNotSupportedAndWidgetNotInstalledThenCtaIsNull() = coroutineRule.runBlocking {
-        setCovidCtaShown()
         whenever(mockWidgetCapabilities.supportsStandardWidgetAdd).thenReturn(false)
         whenever(mockWidgetCapabilities.supportsAutomaticWidgetAdd).thenReturn(false)
         whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(false)
@@ -1395,7 +1556,6 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenCtaRefreshedAndStandardAddNotSupportedAndWidgetAlreadyInstalledThenCtaIsNull() = coroutineRule.runBlocking {
-        setCovidCtaShown()
         whenever(mockWidgetCapabilities.supportsStandardWidgetAdd).thenReturn(false)
         whenever(mockWidgetCapabilities.supportsAutomaticWidgetAdd).thenReturn(false)
         whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(true)
@@ -1442,45 +1602,41 @@ class BrowserTabViewModelTest {
     @Test
     fun whenUserClickedCtaButtonThenFirePixel() {
         val cta = DaxBubbleCta.DaxIntroCta(mockOnboardingStore, mockAppInstallStore)
-        testee.onUserClickCtaOkButton(cta)
+        setCta(cta)
+        testee.onUserClickCtaOkButton()
         verify(mockPixel).fire(cta.okPixel!!, cta.pixelOkParameters())
     }
 
     @Test
     fun whenUserClickedSurveyCtaButtonThenLaunchSurveyCommand() {
         val cta = HomePanelCta.Survey(Survey("abc", "http://example.com", daysInstalled = 1, status = Survey.Status.SCHEDULED))
-        testee.onUserClickCtaOkButton(cta)
+        setCta(cta)
+        testee.onUserClickCtaOkButton()
         assertCommandIssued<Command.LaunchSurvey>()
     }
 
     @Test
     fun whenUserClickedAddWidgetCtaButtonThenLaunchAddWidgetCommand() {
         val cta = HomePanelCta.AddWidgetAuto
-        testee.onUserClickCtaOkButton(cta)
+        setCta(cta)
+        testee.onUserClickCtaOkButton()
         assertCommandIssued<Command.LaunchAddWidget>()
     }
 
     @Test
     fun whenUserClickedLegacyAddWidgetCtaButtonThenLaunchLegacyAddWidgetCommand() {
         val cta = HomePanelCta.AddWidgetInstructions
-        testee.onUserClickCtaOkButton(cta)
+        setCta(cta)
+        testee.onUserClickCtaOkButton()
         assertCommandIssued<Command.LaunchLegacyAddWidget>()
     }
 
     @Test
     fun whenSurveyCtaDismissedAndNoOtherCtaPossibleCtaIsNull() = coroutineRule.runBlocking {
-        givenShownCtas(CtaId.DAX_INTRO, CtaId.DAX_END, CtaId.COVID)
-        testee.onSurveyChanged(Survey("abc", "http://example.com", daysInstalled = 1, status = Survey.Status.SCHEDULED))
-        testee.onUserDismissedCta(testee.ctaViewState.value!!.cta!!)
-        assertNull(testee.ctaViewState.value!!.cta)
-    }
-
-    @Test
-    fun whenSurveyCtaDismissedAndWidgetNotCompatibleAndCovidCtaNotShownThenCtaIsCovid() = coroutineRule.runBlocking {
         givenShownCtas(CtaId.DAX_INTRO, CtaId.DAX_END)
         testee.onSurveyChanged(Survey("abc", "http://example.com", daysInstalled = 1, status = Survey.Status.SCHEDULED))
-        testee.onUserDismissedCta(testee.ctaViewState.value!!.cta!!)
-        assertEquals(HomeTopPanelCta.CovidCta(), testee.ctaViewState.value!!.cta)
+        testee.onUserDismissedCta()
+        assertNull(testee.ctaViewState.value!!.cta)
     }
 
     @Test
@@ -1490,44 +1646,66 @@ class BrowserTabViewModelTest {
         whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(false)
 
         testee.onSurveyChanged(Survey("abc", "http://example.com", daysInstalled = 1, status = Survey.Status.SCHEDULED))
-        testee.onUserDismissedCta(testee.ctaViewState.value!!.cta!!)
+        testee.onUserDismissedCta()
         assertEquals(HomePanelCta.AddWidgetAuto, testee.ctaViewState.value!!.cta)
     }
 
     @Test
     fun whenUserDismissedCtaThenFirePixel() = coroutineRule.runBlocking {
         val cta = HomePanelCta.Survey(Survey("abc", "http://example.com", daysInstalled = 1, status = Survey.Status.SCHEDULED))
-        testee.onUserDismissedCta(cta)
+        setCta(cta)
+        testee.onUserDismissedCta()
         verify(mockPixel).fire(cta.cancelPixel!!, cta.pixelCancelParameters())
+    }
+
+    @Test
+    fun whenUserClickedHideDaxDialogThenHideDaxDialogCommandSent() {
+        val cta = DaxDialogCta.DaxSerpCta(mockOnboardingStore, mockAppInstallStore)
+        setCta(cta)
+        testee.onUserHideDaxDialog()
+        val command = captureCommands().lastValue
+        assertTrue(command is Command.DaxCommand.HideDaxDialog)
+    }
+
+    @Test
+    fun whenUserDismissDaxTrackersBlockedDialogThenFinishTrackerAnimationCommandSent() {
+        val cta = DaxDialogCta.DaxTrackersBlockedCta(mockOnboardingStore, mockAppInstallStore, emptyList(), "")
+        setCta(cta)
+        testee.onDaxDialogDismissed()
+        val command = captureCommands().lastValue
+        assertTrue(command is Command.DaxCommand.FinishTrackerAnimation)
+    }
+
+    @Test
+    fun whenUserDismissDifferentThanDaxTrackersBlockedDialogThenFinishTrackerAnimationCommandNotSent() {
+        val cta = DaxDialogCta.DaxSerpCta(mockOnboardingStore, mockAppInstallStore)
+        setCta(cta)
+        testee.onDaxDialogDismissed()
+        verify(mockCommandObserver, never()).onChanged(commandCaptor.capture())
     }
 
     @Test
     fun whenUserDismissedCtaThenRegisterInDatabase() = coroutineRule.runBlocking {
         val cta = HomePanelCta.AddWidgetAuto
-        testee.onUserDismissedCta(cta)
+        setCta(cta)
+        testee.onUserDismissedCta()
         verify(mockDismissedCtaDao).insert(DismissedCta(cta.ctaId))
     }
 
     @Test
     fun whenUserDismissedSurveyCtaThenDoNotRegisterInDatabase() = coroutineRule.runBlocking {
         val cta = HomePanelCta.Survey(Survey("abc", "http://example.com", daysInstalled = 1, status = Survey.Status.SCHEDULED))
-        testee.onUserDismissedCta(cta)
+        setCta(cta)
+        testee.onUserDismissedCta()
         verify(mockDismissedCtaDao, never()).insert(DismissedCta(cta.ctaId))
     }
 
     @Test
     fun whenUserDismissedSurveyCtaThenCancelScheduledSurveys() = coroutineRule.runBlocking {
         val cta = HomePanelCta.Survey(Survey("abc", "http://example.com", daysInstalled = 1, status = Survey.Status.SCHEDULED))
-        testee.onUserDismissedCta(cta)
+        setCta(cta)
+        testee.onUserDismissedCta()
         verify(mockSurveyDao).cancelScheduledSurveys()
-    }
-
-
-    @Test
-    fun whenUserDismissedHomeTopPanelCtaThenReturnEmptyCta() {
-        val cta = HomeTopPanelCta.CovidCta()
-        testee.onUserDismissedCta(cta)
-        assertNull(testee.ctaViewState.value!!.cta)
     }
 
     @Test
@@ -1560,115 +1738,97 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenOnBrokenSiteSelectedAndNoHttpsUpgradedThenReturnHttpsUpgradedFalse() {
-        testee.onBrokenSiteSelected()
-
-        val command = captureCommands().lastValue
-        assertTrue(command is Command.BrokenSiteFeedback)
-
-        val brokenSiteFeedback = command as Command.BrokenSiteFeedback
-        assertFalse(brokenSiteFeedback.httpsUpgraded)
+    fun whenHomeShowingByPressingBackThenFireproofWebsiteOptionMenuDisabled() {
+        setupNavigation(isBrowsing = true)
+        testee.onUserPressedBack()
+        assertFalse(browserViewState().canFireproofSite)
     }
 
     @Test
-    fun whenOnBrokenSiteSelectedAndNoTrackersThenReturnBlockedTrackersEmptyString() {
-        givenOneActiveTabSelected()
-
-        testee.onBrokenSiteSelected()
-
-        val command = captureCommands().lastValue
-        assertTrue(command is Command.BrokenSiteFeedback)
-
-        val brokenSiteFeedback = command as Command.BrokenSiteFeedback
-        assertEquals("", brokenSiteFeedback.blockedTrackers)
+    fun whenUserLoadsNotFireproofWebsiteThenFireproofWebsiteOptionMenuEnabled() {
+        loadUrl("http://www.example.com/path", isBrowserShowing = true)
+        assertTrue(browserViewState().canFireproofSite)
     }
 
     @Test
-    fun whenOnBrokenSiteSelectedAndTrackersBlockedThenReturnBlockedTrackers() {
-        givenOneActiveTabSelected()
-        val event = TrackingEvent("http://www.example.com", "http://www.tracker.com/tracker.js", emptyList(), null, false)
-        val anotherEvent = TrackingEvent("http://www.example.com/test", "http://www.anothertracker.com/tracker.js", emptyList(), null, false)
-
-        testee.trackerDetected(event)
-        testee.trackerDetected(anotherEvent)
-        testee.onBrokenSiteSelected()
-
-        val command = captureCommands().lastValue
-        assertTrue(command is Command.BrokenSiteFeedback)
-
-        val brokenSiteFeedback = command as Command.BrokenSiteFeedback
-        assertEquals("www.tracker.com,www.anothertracker.com", brokenSiteFeedback.blockedTrackers)
+    fun whenUserLoadsFireproofWebsiteThenFireproofWebsiteOptionMenuDisabled() {
+        givenFireproofWebsiteDomain("www.example.com")
+        loadUrl("http://www.example.com/path", isBrowserShowing = true)
+        assertFalse(browserViewState().canFireproofSite)
     }
 
     @Test
-    fun whenOnBrokenSiteSelectedAndSameHostTrackersBlockedThenDoNotReturnDuplicatedBlockedTrackers() {
-        givenOneActiveTabSelected()
-        val event = TrackingEvent("http://www.example.com", "http://www.tracker.com/tracker.js", emptyList(), null, false)
-        val anotherEvent = TrackingEvent("http://www.example.com/test", "http://www.tracker.com/tracker2.js", emptyList(), null, false)
-
-        testee.trackerDetected(event)
-        testee.trackerDetected(anotherEvent)
-        testee.onBrokenSiteSelected()
-
-        val command = captureCommands().lastValue
-        assertTrue(command is Command.BrokenSiteFeedback)
-
-        val brokenSiteFeedback = command as Command.BrokenSiteFeedback
-        assertEquals("www.tracker.com", brokenSiteFeedback.blockedTrackers)
+    fun whenUserLoadsFireproofWebsiteSubDomainThenFireproofWebsiteOptionMenuEnabled() {
+        givenFireproofWebsiteDomain("example.com")
+        loadUrl("http://mobile.example.com/path", isBrowserShowing = true)
+        assertTrue(browserViewState().canFireproofSite)
     }
 
     @Test
-    fun whenOnBrokenSiteSelectedAndNoSurrogatesThenReturnSurrogatesEmptyString() {
-        givenOneActiveTabSelected()
-
-        testee.onBrokenSiteSelected()
-
-        val command = captureCommands().lastValue
-        assertTrue(command is Command.BrokenSiteFeedback)
-
-        val brokenSiteFeedback = command as Command.BrokenSiteFeedback
-        assertEquals("", brokenSiteFeedback.surrogates)
+    fun whenUrlClearedThenFireproofWebsiteOptionMenuDisabled() {
+        loadUrl("http://www.example.com/path")
+        assertTrue(browserViewState().canFireproofSite)
+        loadUrl(null)
+        assertFalse(browserViewState().canFireproofSite)
     }
 
     @Test
-    fun whenOnBrokenSiteSelectedAndSurrogatesThenReturnSurrogates() {
-        givenOneActiveTabSelected()
-        val surrogate = SurrogateResponse(true, "surrogate.com/test.js", "", "")
-        val anotherSurrogate = SurrogateResponse(true, "anothersurrogate.com/test.js", "", "")
-
-        testee.surrogateDetected(surrogate)
-        testee.surrogateDetected(anotherSurrogate)
-        testee.onBrokenSiteSelected()
-
-        val command = captureCommands().lastValue
-        assertTrue(command is Command.BrokenSiteFeedback)
-
-        val brokenSiteFeedback = command as Command.BrokenSiteFeedback
-        assertEquals("surrogate.com,anothersurrogate.com", brokenSiteFeedback.surrogates)
+    fun whenUrlIsUpdatedWithNonFireproofWebsiteThenFireproofWebsiteOptionMenuEnabled() {
+        givenFireproofWebsiteDomain("www.example.com")
+        loadUrl("http://www.example.com/", isBrowserShowing = true)
+        updateUrl("http://www.example.com/", "http://twitter.com/explore", true)
+        assertTrue(browserViewState().canFireproofSite)
     }
 
     @Test
-    fun whenOnBrokenSiteSelectedAndSameHostSurrogatesThenDoNotReturnDuplicatedSurrogates() {
-        givenOneActiveTabSelected()
-        val surrogate = SurrogateResponse(true, "surrogate.com/test.js", "", "")
-        val anotherSurrogate = SurrogateResponse(true, "surrogate.com/test2.js", "", "")
-
-        testee.surrogateDetected(surrogate)
-        testee.surrogateDetected(anotherSurrogate)
-        testee.onBrokenSiteSelected()
-
-        val command = captureCommands().lastValue
-        assertTrue(command is Command.BrokenSiteFeedback)
-
-        val brokenSiteFeedback = command as Command.BrokenSiteFeedback
-        assertEquals("surrogate.com", brokenSiteFeedback.surrogates)
+    fun whenUrlIsUpdatedWithFireproofWebsiteThenFireproofWebsiteOptionMenuDisabled() {
+        givenFireproofWebsiteDomain("twitter.com")
+        loadUrl("http://example.com/", isBrowserShowing = true)
+        updateUrl("http://example.com/", "http://twitter.com/explore", true)
+        assertFalse(browserViewState().canFireproofSite)
     }
 
     @Test
-    fun whenUserClickedTopCtaButtonAndCtaIsCovidCtaThenSubmitQuery() {
-        val cta = HomeTopPanelCta.CovidCta()
-        testee.onUserClickTopCta(cta)
-        assertEquals(cta.searchTerm, omnibarViewState().omnibarText)
+    fun whenUserClicksFireproofWebsiteOptionMenuThenShowConfirmationIsIssued() {
+        loadUrl("http://mobile.example.com/", isBrowserShowing = true)
+        testee.onFireproofWebsiteClicked()
+        assertCommandIssued<Command.ShowFireproofWebSiteConfirmation> {
+            assertEquals("mobile.example.com", this.fireproofWebsiteEntity.domain)
+        }
+    }
+
+    @Test
+    fun whenUserClicksFireproofWebsiteOptionMenuThenFireproofWebsiteOptionMenuDisabled() {
+        loadUrl("http://example.com/", isBrowserShowing = true)
+        testee.onFireproofWebsiteClicked()
+        assertFalse(browserViewState().canFireproofSite)
+    }
+
+    @Test
+    fun whenFireproofWebsiteAddedThenPixelSent() {
+        loadUrl("http://example.com/", isBrowserShowing = true)
+        testee.onFireproofWebsiteClicked()
+        verify(mockPixel).fire(Pixel.PixelName.FIREPROOF_WEBSITE_ADDED)
+    }
+
+    @Test
+    fun whenUserClicksOnFireproofWebsiteSnackbarUndoActionThenFireproofWebsiteIsRemoved() {
+        loadUrl("http://example.com/", isBrowserShowing = true)
+        testee.onFireproofWebsiteClicked()
+        assertCommandIssued<Command.ShowFireproofWebSiteConfirmation> {
+            testee.onFireproofWebsiteSnackbarUndoClicked(this.fireproofWebsiteEntity)
+        }
+        assertTrue(browserViewState().canFireproofSite)
+    }
+
+    @Test
+    fun whenUserClicksOnFireproofWebsiteSnackbarUndoActionThenPixelSent() {
+        loadUrl("http://example.com/", isBrowserShowing = true)
+        testee.onFireproofWebsiteClicked()
+        assertCommandIssued<Command.ShowFireproofWebSiteConfirmation> {
+            testee.onFireproofWebsiteSnackbarUndoClicked(this.fireproofWebsiteEntity)
+        }
+        verify(mockPixel).fire(Pixel.PixelName.FIREPROOF_WEBSITE_UNDO)
     }
 
     private inline fun <reified T : Command> assertCommandIssued(instanceAssertions: T.() -> Unit = {}) {
@@ -1676,6 +1836,11 @@ class BrowserTabViewModelTest {
         val issuedCommand = commandCaptor.allValues.find { it is T }
         assertNotNull(issuedCommand)
         (issuedCommand as T).apply { instanceAssertions() }
+    }
+
+    private inline fun <reified T : Command> assertCommandNotIssued() {
+        val issuedCommand = commandCaptor.allValues.find { it is T }
+        assertNull(issuedCommand)
     }
 
     private fun pixelParams(showedBookmarks: Boolean, bookmarkCapable: Boolean) = mapOf(
@@ -1705,8 +1870,18 @@ class BrowserTabViewModelTest {
         testee.loadData("TAB_ID", "https://example.com", false)
     }
 
+    private fun givenFireproofWebsiteDomain(vararg fireproofWebsitesDomain: String) {
+        fireproofWebsitesDomain.forEach {
+            fireproofWebsiteDao.insert(FireproofWebsiteEntity(domain = it))
+        }
+    }
+
     private fun setBrowserShowing(isBrowsing: Boolean) {
         testee.browserViewState.value = browserViewState().copy(browserShowing = isBrowsing)
+    }
+
+    private fun setCta(cta: Cta) {
+        testee.ctaViewState.value = ctaViewState().copy(cta = cta)
     }
 
     private fun loadUrl(url: String?, title: String? = null, isBrowserShowing: Boolean = true) {
@@ -1718,10 +1893,6 @@ class BrowserTabViewModelTest {
     private fun updateUrl(originalUrl: String?, currentUrl: String?, isBrowserShowing: Boolean) {
         setBrowserShowing(isBrowserShowing)
         testee.navigationStateChanged(buildWebNavigation(originalUrl = originalUrl, currentUrl = currentUrl))
-    }
-
-    private fun setCovidCtaShown() {
-        whenever(mockDismissedCtaDao.exists(CtaId.COVID)).thenReturn(true)
     }
 
     private fun setupNavigation(
@@ -1760,6 +1931,8 @@ class BrowserTabViewModelTest {
         return nav
     }
 
+    private fun privacyGradeState() = testee.privacyGradeViewState.value!!
+    private fun ctaViewState() = testee.ctaViewState.value!!
     private fun browserViewState() = testee.browserViewState.value!!
     private fun omnibarViewState() = testee.omnibarViewState.value!!
     private fun loadingViewState() = testee.loadingViewState.value!!

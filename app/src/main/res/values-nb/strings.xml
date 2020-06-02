@@ -4,6 +4,7 @@
     <string name="duckDuckGoPrivacySimplified">Personvern gjort enkelt.</string>
     <string name="yes">Ja</string>
     <string name="no">Nei</string>
+    <string name="search">Søk</string>
 
     <!-- Onboarding Activity -->
     <string name="onboardingDefaultBrowserDescription">Åpne innstillinger for å søke og bruke nettleseren med DuckDuckGo hver gang.</string>
@@ -188,11 +189,11 @@
     <string name="bookmarksMenuTitle">Bokmerker</string>
     <string name="bookmarksActivityTitle">Bokmerker</string>
     <string name="bookmarkDeleteConfirmMessage">Er du sikker på at du vil slette bokmerket &lt;b&gt;%s&lt;/b&gt;?</string>
-    <string name="bookmarkDeleteConfirmTitle">Bekreft</string>
+    <string name="dialogConfirmTitle">Bekreft</string>
     <string name="bookmarkAddedFeedback">Bokmerke lagt til</string>
     <string name="bookmarkTitleHint">Bokmerketittel</string>
     <string name="bookmarkUrlHint">Bokmerke-URL</string>
-    <string name="bookmarkSave">Lagre</string>
+    <string name="dialogSave">Lagre</string>
     <string name="bookmarkTitleEdit">Rediger bokmerke</string>
     <string name="noBookmarks">Ingen bokmerker lagt til ennå</string>
     <string name="bookmarkOverflowContentDescription">Flere alternativer for bokmerket %s</string>
@@ -384,18 +385,15 @@
     <string name="daxIntroCtaText">Deretter kan du besøke et av favorittnettstedene dine! &lt;br/&gt;&lt;br/&gt;Jeg blokkerer sporere slik at de ikke kan spionere på deg. Jeg vil også oppgradere sikkerheten til tilkoblingen din hvis mulig. &#128274;</string>
     <string name="daxEndCtaText">Dette har du skjønt! &lt;br/&gt;&lt;br/&gt;Husk: hver gang du surfer med meg, mister en skummel annonse vingene. &#128077;</string>
     <string name="daxSerpCtaText">DuckDuckGo-søkene dine er anonyme, jeg lagrer aldri søkehistorikken din. Noensinne. &#128588;</string>
-    <string name="daxNonSerpCtaText">Hvert nettsted har en personvernsgrad. Trykk på den for å se hvordan jeg beskyttet personvernet ditt.&lt;br/&gt;&lt;br/&gt;Vil du se noe fancy? Prøv å tømme dataene dine ved å trykke på brann-knappen.</string>
-    <string name="daxMainNetworkStep1CtaText">Følg med!&lt;br/&gt;&lt;br/&gt; %s driver et stort sporingsnettverk.&lt;br/&gt;&lt;br/&gt;En lav personvernsgrad vil tipse deg om slike nettsteder.</string>
-    <string name="daxMainNetworkStep1OwnedCtaText">Følg med!&lt;br/&gt;&lt;br/&gt; %s eies av %s, som driver et stort sporingsnettverk.</string>
-    <string name="daxMainNetworkStep21CtaText">Faktisk lurer %s sporere på omtrent %s av topp-nettstedene. &#128561;&lt;br/&gt;&lt;br/&gt;</string>
-    <string name="daxMainNetworkStep211CtaText">Faktisk lurer %s sporere over hele internett. &#128561;&lt;br/&gt;&lt;br/&gt;</string>
-    <string name="daxMainNetworkStep2CtaText">%s Jeg blokkerer disse sporerne når du surfer på ikke-%s nettsteder.</string>
     <plurals name="daxTrackersBlockedCtaText">
         <item quantity="one">&#160;og &lt;b&gt;%d andre&lt;/b&gt; prøvde å spore deg her. &lt;br/&gt;&lt;br/&gt;Jeg blokkerte dem!&lt;br/&gt;&lt;br/&gt; ☝️Du kan sjekke URL-linjen for å se hvem som prøver å spore deg når du besøker et nytt nettsted.️</item>
         <item quantity="other">&#160;og &lt;b&gt;%d andre&lt;/b&gt; prøvde å spore deg her. &lt;br/&gt;&lt;br/&gt;Jeg blokkerte dem!&lt;br/&gt;&lt;br/&gt; ☝️Du kan sjekke URL-linjen for å se hvem som prøver å spore deg når du besøker et nytt nettsted.️</item>
     </plurals>
-    <string name="daxTrackersBlockedCtaZeroText">&#160;prøvde å spore deg her. &lt;br/&gt;&lt;br/&gt;Jeg har blokkert det!&lt;br/&gt;&lt;br/&gt; ☝️Du kan sjekke URL-linjen for å se hvem som prøver å spore deg når du besøker et nytt nettsted.️</string>
-
-    <!-- Covid Cta-->
-    <string name="covidCtaText">Få offisiell info og tips om COVID-19.</string>
+    <plurals name="daxTrackersBlockedCtaZeroText">
+        <item quantity="one">&#160;prøvde å spore deg her. &lt;br/&gt;&lt;br/&gt;Jeg har blokkert det!&lt;br/&gt;&lt;br/&gt; ☝️Du kan sjekke URL-linjen for å se hvem som prøver å spore deg når du besøker et nytt nettsted.️</item>
+        <item quantity="other">&#160;prøvde å spore deg her. &lt;br/&gt;&lt;br/&gt;Jeg har blokkert det!&lt;br/&gt;&lt;br/&gt; ☝️Du kan sjekke URL-linjen for å se hvem som prøver å spore deg når du besøker et nytt nettsted.️</item>
+    </plurals>
+    <string name="daxNonSerpCtaText">Når du trykker og blar, blokkerer jeg irriterende trackere. &lt;br/&gt;&lt;br/&gt;Gå videre – fortsett å bla!</string>
+    <string name="daxMainNetworkOwnedCtaText">Følg med! %s eies av %s.&lt;br/&gt;&lt;br/&gt; %ss trackere lurer på omtrent %s av ledende nettsteder &#128561; men ikke bekymre deg! &lt;br/&gt;&lt;br/&gt;Jeg blokkerer %s fra å se aktiviteten din på disse nettstedene.</string>
+    <string name="daxMainNetworkCtaText">Følg med! %s er et stort sporingsnettverk.&lt;br/&gt;&lt;br/&gt; Trackerne deres lurer på omtrent %s av ledende nettsteder &#128561; men ikke bekymre deg! &lt;br/&gt;&lt;br/&gt;Jeg hindrer %s fra å se aktiviteten din på disse nettstedene.</string>
 </resources>

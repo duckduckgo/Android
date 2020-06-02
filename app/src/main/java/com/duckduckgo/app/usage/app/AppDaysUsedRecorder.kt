@@ -23,7 +23,6 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
-
 class AppDaysUsedRecorder(private val appDaysUsedRepository: AppDaysUsedRepository) : LifecycleObserver {
 
     @OnLifecycleEvent(Lifecycle.Event.ON_START)

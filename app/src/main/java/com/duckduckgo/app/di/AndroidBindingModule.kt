@@ -21,6 +21,7 @@ import com.duckduckgo.app.bookmarks.ui.BookmarksActivity
 import com.duckduckgo.app.brokensite.BrokenSiteActivity
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.BrowserTabFragment
+import com.duckduckgo.app.browser.DownloadConfirmationFragment
 import com.duckduckgo.app.browser.rating.ui.AppEnjoymentDialogFragment
 import com.duckduckgo.app.browser.rating.ui.GiveFeedbackDialogFragment
 import com.duckduckgo.app.browser.rating.ui.RateAppDialogFragment
@@ -32,24 +33,22 @@ import com.duckduckgo.app.feedback.ui.negative.openended.ShareOpenEndedFeedbackF
 import com.duckduckgo.app.feedback.ui.negative.subreason.SubReasonNegativeFeedbackFragment
 import com.duckduckgo.app.feedback.ui.positive.initial.PositiveFeedbackLandingFragment
 import com.duckduckgo.app.fire.FireActivity
+import com.duckduckgo.app.fire.fireproofwebsite.ui.FireproofWebsitesActivity
 import com.duckduckgo.app.icon.ui.ChangeIconActivity
 import com.duckduckgo.app.job.AppConfigurationJobService
 import com.duckduckgo.app.launch.LaunchBridgeActivity
 import com.duckduckgo.app.notification.NotificationHandlerService
 import com.duckduckgo.app.onboarding.ui.OnboardingActivity
 import com.duckduckgo.app.onboarding.ui.page.DefaultBrowserPage
-import com.duckduckgo.app.privacy.ui.PrivacyDashboardActivity
-import com.duckduckgo.app.privacy.ui.PrivacyPracticesActivity
-import com.duckduckgo.app.privacy.ui.ScorecardActivity
-import com.duckduckgo.app.privacy.ui.TrackerNetworksActivity
+import com.duckduckgo.app.privacy.ui.*
 import com.duckduckgo.app.settings.SettingsActivity
 import com.duckduckgo.app.survey.ui.SurveyActivity
 import com.duckduckgo.app.systemsearch.SystemSearchActivity
 import com.duckduckgo.app.tabs.ui.TabSwitcherActivity
+import com.duckduckgo.app.tabs.ui.TabSwitcherBottomBarFeatureActivity
 import com.duckduckgo.app.widget.ui.AddWidgetInstructionsActivity
 import dagger.Module
 import dagger.android.ContributesAndroidInjector
-
 
 @Module
 abstract class AndroidBindingModule {
@@ -78,6 +77,10 @@ abstract class AndroidBindingModule {
 
     @ActivityScoped
     @ContributesAndroidInjector
+    abstract fun tabsExperimentActivity(): TabSwitcherBottomBarFeatureActivity
+
+    @ActivityScoped
+    @ContributesAndroidInjector
     abstract fun privacyDashboardActivity(): PrivacyDashboardActivity
 
     @ActivityScoped
@@ -91,6 +94,10 @@ abstract class AndroidBindingModule {
     @ActivityScoped
     @ContributesAndroidInjector
     abstract fun privacyTermsActivity(): PrivacyPracticesActivity
+
+    @ActivityScoped
+    @ContributesAndroidInjector
+    abstract fun whitelistActivity(): WhitelistActivity
 
     @ActivityScoped
     @ContributesAndroidInjector
@@ -118,6 +125,10 @@ abstract class AndroidBindingModule {
 
     @ActivityScoped
     @ContributesAndroidInjector
+    abstract fun fireproofWebsitesActivity(): FireproofWebsitesActivity
+
+    @ActivityScoped
+    @ContributesAndroidInjector
     abstract fun fireActivity(): FireActivity
 
     @ActivityScoped
@@ -132,6 +143,9 @@ abstract class AndroidBindingModule {
 
     @ContributesAndroidInjector
     abstract fun browserTabFragment(): BrowserTabFragment
+
+    @ContributesAndroidInjector
+    abstract fun downloadConfirmationFragment(): DownloadConfirmationFragment
 
     @ContributesAndroidInjector
     abstract fun onboardingDefaultBrowserFragment(): DefaultBrowserPage
@@ -165,9 +179,11 @@ abstract class AndroidBindingModule {
 
     /* Services */
 
+    @Suppress("DEPRECATION")
     @ContributesAndroidInjector
     abstract fun jobService(): AppConfigurationJobService
 
     @ContributesAndroidInjector
     abstract fun notificationHandlerService(): NotificationHandlerService
+
 }

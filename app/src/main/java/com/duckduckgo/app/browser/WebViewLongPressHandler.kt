@@ -29,7 +29,6 @@ import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.*
 import timber.log.Timber
 import javax.inject.Inject
 
-
 interface LongPressHandler {
     fun handleLongPress(longPressTargetType: Int, longPressTargetUrl: String?, menu: ContextMenu)
     fun userSelectedMenuItem(longPressTarget: LongPressTarget, item: MenuItem): RequiredAction
@@ -128,7 +127,6 @@ class WebViewLongPressHandler @Inject constructor(private val context: Context, 
             else -> None
         }
     }
-
 
     companion object {
         const val CONTEXT_MENU_ID_OPEN_IN_NEW_TAB = 1

@@ -37,6 +37,8 @@ import com.duckduckgo.app.feedback.ui.negative.brokensite.BrokenSiteNegativeFeed
 import com.duckduckgo.app.feedback.ui.negative.openended.ShareOpenEndedNegativeFeedbackViewModel
 import com.duckduckgo.app.feedback.ui.positive.initial.PositiveFeedbackLandingViewModel
 import com.duckduckgo.app.fire.DataClearer
+import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteDao
+import com.duckduckgo.app.fire.fireproofwebsite.ui.FireproofWebsitesViewModel
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.model.SiteFactory
 import com.duckduckgo.app.global.rating.AppEnjoymentPromptEmitter
@@ -45,19 +47,14 @@ import com.duckduckgo.app.icon.api.IconModifier
 import com.duckduckgo.app.icon.ui.ChangeIconViewModel
 import com.duckduckgo.app.launch.LaunchViewModel
 import com.duckduckgo.app.notification.AndroidNotificationScheduler
-import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.onboarding.ui.OnboardingPageManager
 import com.duckduckgo.app.onboarding.ui.OnboardingViewModel
 import com.duckduckgo.app.onboarding.ui.page.DefaultBrowserPageViewModel
-import com.duckduckgo.app.onboarding.ui.page.TrackerBlockingSelectionViewModel
 import com.duckduckgo.app.playstore.PlayStoreUtils
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao
-import com.duckduckgo.app.privacy.store.PrivacySettingsSharedPreferences
-import com.duckduckgo.app.privacy.ui.PrivacyDashboardViewModel
-import com.duckduckgo.app.privacy.ui.PrivacyPracticesViewModel
-import com.duckduckgo.app.privacy.ui.ScorecardViewModel
-import com.duckduckgo.app.privacy.ui.TrackerNetworksViewModel
+import com.duckduckgo.app.privacy.db.UserWhitelistDao
+import com.duckduckgo.app.privacy.ui.*
 import com.duckduckgo.app.referral.AppInstallationReferrerStateListener
 import com.duckduckgo.app.settings.SettingsViewModel
 import com.duckduckgo.app.settings.db.SettingsDataStore
@@ -75,21 +72,20 @@ import com.duckduckgo.app.usage.search.SearchCountDao
 import com.duckduckgo.app.widget.ui.AddWidgetInstructionsViewModel
 import javax.inject.Inject
 
-
 @Suppress("UNCHECKED_CAST")
 class ViewModelFactory @Inject constructor(
     private val statisticsUpdater: StatisticsUpdater,
     private val statisticsStore: StatisticsDataStore,
-    private val onboardingStore: OnboardingStore,
     private val userStageStore: UserStageStore,
     private val appInstallStore: AppInstallStore,
     private val queryUrlConverter: QueryUrlConverter,
     private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector,
     private val tabRepository: TabRepository,
-    private val privacySettingsStore: PrivacySettingsSharedPreferences,
     private val siteFactory: SiteFactory,
+    private val userWhitelistDao: UserWhitelistDao,
     private val networkLeaderboardDao: NetworkLeaderboardDao,
     private val bookmarksDao: BookmarksDao,
+    private val fireproofWebsiteDao: FireproofWebsiteDao,
     private val surveyDao: SurveyDao,
     private val autoCompleteApi: AutoCompleteApi,
     private val deviceAppLookup: DeviceAppLookup,
@@ -127,9 +123,10 @@ class ViewModelFactory @Inject constructor(
                 isAssignableFrom(BrowserTabViewModel::class.java) -> browserTabViewModel()
                 isAssignableFrom(TabSwitcherViewModel::class.java) -> TabSwitcherViewModel(tabRepository, webViewSessionStorage)
                 isAssignableFrom(PrivacyDashboardViewModel::class.java) -> privacyDashboardViewModel()
-                isAssignableFrom(ScorecardViewModel::class.java) -> ScorecardViewModel(privacySettingsStore)
+                isAssignableFrom(ScorecardViewModel::class.java) -> ScorecardViewModel(userWhitelistDao)
                 isAssignableFrom(TrackerNetworksViewModel::class.java) -> TrackerNetworksViewModel()
                 isAssignableFrom(PrivacyPracticesViewModel::class.java) -> PrivacyPracticesViewModel()
+                isAssignableFrom(WhitelistViewModel::class.java) -> WhitelistViewModel(userWhitelistDao)
                 isAssignableFrom(FeedbackViewModel::class.java) -> FeedbackViewModel(playStoreUtils, feedbackSubmitter)
                 isAssignableFrom(BrokenSiteViewModel::class.java) -> BrokenSiteViewModel(pixel, brokenSiteSender)
                 isAssignableFrom(SurveyViewModel::class.java) -> SurveyViewModel(surveyDao, statisticsStore, appInstallStore)
@@ -140,9 +137,9 @@ class ViewModelFactory @Inject constructor(
                 isAssignableFrom(PositiveFeedbackLandingViewModel::class.java) -> PositiveFeedbackLandingViewModel()
                 isAssignableFrom(ShareOpenEndedNegativeFeedbackViewModel::class.java) -> ShareOpenEndedNegativeFeedbackViewModel()
                 isAssignableFrom(BrokenSiteNegativeFeedbackViewModel::class.java) -> BrokenSiteNegativeFeedbackViewModel()
-                isAssignableFrom(TrackerBlockingSelectionViewModel::class.java) -> TrackerBlockingSelectionViewModel(privacySettingsStore)
                 isAssignableFrom(DefaultBrowserPageViewModel::class.java) -> defaultBrowserPage()
                 isAssignableFrom(ChangeIconViewModel::class.java) -> changeAppIconViewModel()
+                isAssignableFrom(FireproofWebsitesViewModel::class.java) -> fireproofWebsiteViewModel()
 
                 else -> throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")
             }
@@ -157,14 +154,13 @@ class ViewModelFactory @Inject constructor(
             appSettingsPreferencesStore,
             defaultBrowserDetector,
             variantManager,
-            pixel,
-            notificationScheduler
+            pixel
         )
     }
 
     private fun privacyDashboardViewModel(): PrivacyDashboardViewModel {
         return PrivacyDashboardViewModel(
-            privacySettingsStore,
+            userWhitelistDao,
             networkLeaderboardDao,
             pixel
         )
@@ -186,8 +182,10 @@ class ViewModelFactory @Inject constructor(
         duckDuckGoUrlDetector = duckDuckGoUrlDetector,
         siteFactory = siteFactory,
         tabRepository = tabRepository,
+        userWhitelistDao = userWhitelistDao,
         networkLeaderboardDao = networkLeaderboardDao,
         bookmarksDao = bookmarksDao,
+        fireproofWebsiteDao = fireproofWebsiteDao,
         autoComplete = autoCompleteApi,
         appSettingsPreferencesStore = appSettingsPreferencesStore,
         longPressHandler = webViewLongPressHandler,
@@ -202,4 +200,11 @@ class ViewModelFactory @Inject constructor(
 
     private fun changeAppIconViewModel() =
         ChangeIconViewModel(settingsDataStore = appSettingsPreferencesStore, appIconModifier = appIconModifier, pixel = pixel)
+
+    private fun fireproofWebsiteViewModel() =
+        FireproofWebsitesViewModel(
+            dao = fireproofWebsiteDao,
+            dispatcherProvider = dispatcherProvider,
+            pixel = pixel
+        )
 }

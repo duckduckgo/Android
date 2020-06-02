@@ -23,7 +23,6 @@ import androidx.core.content.edit
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
-
 interface AppInstallStore {
     var installTimestamp: Long
 
@@ -64,4 +63,3 @@ class AppInstallSharedPreferences @Inject constructor(private val context: Conte
         const val KEY_DEFAULT_BROWSER = "KEY_DEFAULT_BROWSER"
     }
 }
-

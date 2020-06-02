@@ -41,7 +41,7 @@ class TermsOfServiceListAdapterTest {
     @Test
     fun whenFormatIsValidThenDataIsConvertedCorrectly() {
         val json = loadText("json/tosdr.json")
-        val terms = jsonAdapter.fromJson(json)
+        val terms = jsonAdapter.fromJson(json)!!
 
         val firstTerm = terms.first { it.name == "example.com" }
         assertEquals(-20, firstTerm.score)

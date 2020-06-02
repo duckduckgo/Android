@@ -23,7 +23,6 @@ import timber.log.Timber
 import java.util.*
 import java.util.concurrent.Executors
 
-
 interface AppEnjoymentRepository {
 
     suspend fun onUserSelectedToRateApp(promptCount: PromptCount)

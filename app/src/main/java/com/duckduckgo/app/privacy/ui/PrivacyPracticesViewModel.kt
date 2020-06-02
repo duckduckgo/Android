@@ -19,6 +19,7 @@ package com.duckduckgo.app.privacy.ui
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.duckduckgo.app.global.model.Site
+import com.duckduckgo.app.global.model.domain
 import com.duckduckgo.app.privacy.model.PrivacyPractices
 import com.duckduckgo.app.privacy.model.PrivacyPractices.Summary.UNKNOWN
 
@@ -52,7 +53,7 @@ class PrivacyPracticesViewModel : ViewModel() {
             return
         }
         viewState.value = viewState.value?.copy(
-            domain = site.uri?.host ?: "",
+            domain = site.domain ?: "",
             practices = site.privacyPractices.summary,
             goodTerms = site.privacyPractices.goodReasons,
             badTerms = site.privacyPractices.badReasons

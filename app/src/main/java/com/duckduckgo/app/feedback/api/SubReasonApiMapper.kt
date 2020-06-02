@@ -23,7 +23,6 @@ import com.duckduckgo.app.feedback.ui.negative.FeedbackType.PerformanceSubReason
 import com.duckduckgo.app.feedback.ui.negative.FeedbackType.SearchNotGoodEnoughSubReasons.*
 import javax.inject.Inject
 
-
 class SubReasonApiMapper @Inject constructor() {
 
     fun apiKeyFromSubReason(subReason: SubReason?): String {

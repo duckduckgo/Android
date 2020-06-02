@@ -20,11 +20,10 @@ import android.content.Context
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProviders
+import androidx.lifecycle.ViewModelProvider
 import com.duckduckgo.app.global.ViewModelFactory
 import dagger.android.support.AndroidSupportInjection
 import javax.inject.Inject
-
 
 abstract class FeedbackFragment : Fragment() {
 
@@ -45,5 +44,5 @@ abstract class FeedbackFragment : Fragment() {
     open fun configureViewModelObservers() {}
     open fun configureListeners() {}
 
-    protected inline fun <reified V : ViewModel> bindViewModel() = lazy { ViewModelProviders.of(this, viewModelFactory).get(V::class.java) }
+    protected inline fun <reified V : ViewModel> bindViewModel() = lazy { ViewModelProvider(this, viewModelFactory).get(V::class.java) }
 }

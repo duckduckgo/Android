@@ -24,14 +24,13 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import dagger.android.support.AndroidSupportInjection
 import javax.inject.Inject
 
-
 abstract class EnjoymentDialog : DialogFragment() {
 
     @Inject
     lateinit var pixel: Pixel
 
     val promptCount: PromptCount
-        get() = PromptCount(arguments!![PROMPT_COUNT_BUNDLE_KEY] as Int)
+        get() = PromptCount(requireArguments()[PROMPT_COUNT_BUNDLE_KEY] as Int)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

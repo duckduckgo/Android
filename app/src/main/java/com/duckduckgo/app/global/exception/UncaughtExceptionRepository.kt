@@ -20,7 +20,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 
-
 interface UncaughtExceptionRepository {
     suspend fun recordUncaughtException(e: Throwable?, exceptionSource: UncaughtExceptionSource)
     suspend fun getExceptions(): List<UncaughtExceptionEntity>
@@ -43,7 +42,7 @@ class UncaughtExceptionRepositoryDb(
             Timber.e(e, "Uncaught exception - $exceptionSource")
 
             val rootCause = rootExceptionFinder.findRootException(e)
-            val exceptionEntity = UncaughtExceptionEntity(message = extractExceptionCause(rootCause), exceptionSource = exceptionSource)
+            val exceptionEntity = UncaughtExceptionEntity(message = rootCause.extractExceptionCause(), exceptionSource = exceptionSource)
             uncaughtExceptionDao.add(exceptionEntity)
 
             lastSeenException = e
@@ -54,14 +53,6 @@ class UncaughtExceptionRepositoryDb(
         return withContext(Dispatchers.IO) {
             uncaughtExceptionDao.all()
         }
-    }
-
-    private fun extractExceptionCause(e: Throwable?): String {
-        if (e == null) {
-            return "Exception missing"
-        }
-
-        return "${e.javaClass.name} - ${e.stackTrace?.firstOrNull()}"
     }
 
     override suspend fun deleteException(id: Long) {

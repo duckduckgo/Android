@@ -47,7 +47,6 @@ import java.net.InetSocketAddress
 import java.net.Proxy
 import java.util.concurrent.TimeUnit
 
-
 class StatisticsRequesterJsonTest {
 
     private var mockVariantManager: VariantManager = mock()
@@ -354,11 +353,11 @@ class StatisticsRequesterJsonTest {
     }
 
     private fun RecordedRequest.requestUri(): Uri {
-        return path.toUri()
+        return requestLine.toUri()
     }
 
     private fun RecordedRequest.extractQueryParam(keyName: String): String? {
-        return requestUri().getQueryParameter(keyName)
+        return toString().split(" ")[1].toUri().getQueryParameter(keyName)
     }
 
     private fun RecordedRequest.encodedPath(): String? {

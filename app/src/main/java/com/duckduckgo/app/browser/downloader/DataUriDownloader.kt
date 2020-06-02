@@ -16,8 +16,8 @@
 
 package com.duckduckgo.app.browser.downloader
 
-import androidx.annotation.WorkerThread
 import android.util.Base64
+import androidx.annotation.WorkerThread
 import com.duckduckgo.app.browser.downloader.DataUriParser.GeneratedFilename
 import com.duckduckgo.app.browser.downloader.DataUriParser.ParseResult
 import timber.log.Timber
@@ -35,11 +35,10 @@ class DataUriDownloader @Inject constructor(
         try {
             callback?.downloadStarted()
 
-            val parsedDataUri = dataUriParser.generate(pending.url)
-            when (parsedDataUri) {
+            when (val parsedDataUri = dataUriParser.generate(pending.url)) {
                 is ParseResult.Invalid -> {
                     Timber.w("Failed to extract data from data URI")
-                    callback?.downloadFailed("Failed to extract data from data URI")
+                    callback?.downloadFailed("Failed to extract data from data URI", DownloadFailReason.DataUriParseException)
                     return
                 }
                 is ParseResult.ParsedDataUri -> {
@@ -51,7 +50,7 @@ class DataUriDownloader @Inject constructor(
             }
         } catch (e: IOException) {
             Timber.e(e, "Failed to save data uri")
-            callback?.downloadFailed("Failed to download data uri")
+            callback?.downloadFailed("Failed to download data uri", DownloadFailReason.DataUriParseException)
         }
     }
 

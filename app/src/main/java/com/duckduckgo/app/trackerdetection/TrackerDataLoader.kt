@@ -21,11 +21,7 @@ import androidx.annotation.WorkerThread
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.trackerdetection.api.TdsJson
-import com.duckduckgo.app.trackerdetection.db.TdsMetadataDao
-import com.duckduckgo.app.trackerdetection.db.TdsDomainEntityDao
-import com.duckduckgo.app.trackerdetection.db.TdsEntityDao
-import com.duckduckgo.app.trackerdetection.db.TdsTrackerDao
-import com.duckduckgo.app.trackerdetection.db.TemporaryTrackingWhitelistDao
+import com.duckduckgo.app.trackerdetection.db.*
 import com.duckduckgo.app.trackerdetection.model.TdsMetadata
 import com.squareup.moshi.Moshi
 import timber.log.Timber
@@ -62,7 +58,7 @@ class TrackerDataLoader @Inject constructor(
         Timber.d("Updating tds from file")
         val json = context.resources.openRawResource(R.raw.tds).bufferedReader().use { it.readText() }
         val adapter = moshi.adapter(TdsJson::class.java)
-        persistTds(DEFAULT_ETAG, adapter.fromJson(json))
+        persistTds(DEFAULT_ETAG, adapter.fromJson(json)!!)
     }
 
     fun persistTds(eTag: String, tdsJson: TdsJson) {
@@ -90,6 +86,6 @@ class TrackerDataLoader @Inject constructor(
     }
 
     companion object {
-        const val DEFAULT_ETAG = "c6dbe27844bea5bb6b2b812dd097fcf6"
+        const val DEFAULT_ETAG = "5c5dda7f1873f3183b141c0739a187ca"
     }
 }

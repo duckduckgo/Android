@@ -31,11 +31,11 @@ import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.onboarding.store.AppStage
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.store.UserStageStore
+import com.duckduckgo.app.privacy.db.UserWhitelistDao
 import com.duckduckgo.app.privacy.model.HttpsStatus
 import com.duckduckgo.app.privacy.model.PrivacyGrade
 import com.duckduckgo.app.privacy.model.PrivacyPractices
 import com.duckduckgo.app.privacy.model.TestEntity
-import com.duckduckgo.app.privacy.store.PrivacySettingsStore
 import com.duckduckgo.app.runBlocking
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.VariantManager
@@ -101,7 +101,7 @@ class CtaViewModelTest {
     private lateinit var mockOnboardingStore: OnboardingStore
 
     @Mock
-    private lateinit var mockPrivacySettingsStore: PrivacySettingsStore
+    private lateinit var mockUserWhitelistDao: UserWhitelistDao
 
     @Mock
     private lateinit var mockUserStageStore: UserStageStore
@@ -126,7 +126,7 @@ class CtaViewModelTest {
             .build()
 
         whenever(mockAppInstallStore.installTimestamp).thenReturn(System.currentTimeMillis() - TimeUnit.DAYS.toMillis(1))
-        whenever(mockPrivacySettingsStore.privacyOn).thenReturn(true)
+        whenever(mockUserWhitelistDao.contains(any())).thenReturn(false)
 
         testee = CtaViewModel(
             mockAppInstallStore,
@@ -134,10 +134,10 @@ class CtaViewModelTest {
             mockSurveyDao,
             mockWidgetCapabilities,
             mockDismissedCtaDao,
+            mockUserWhitelistDao,
             mockVariantManager,
             mockSettingsDataStore,
             mockOnboardingStore,
-            mockPrivacySettingsStore,
             mockUserStageStore,
             coroutineRule.testDispatcherProvider
         )
@@ -291,15 +291,6 @@ class CtaViewModelTest {
     }
 
     @Test
-    fun whenRefreshCtaOnHomeTabAndHideTipsIsTrueThenReturnCovidCta() = coroutineRule.runBlocking {
-        whenever(mockSettingsDataStore.hideTips).thenReturn(true)
-        givenSearchWidgetNoCompatible()
-
-        val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = false)
-        assertTrue(value is HomeTopPanelCta.CovidCta)
-    }
-
-    @Test
     fun whenRefreshCtaOnHomeTabAndHideTipsIsTrueAndWidgetCompatibleThenReturnWidgetCta() = coroutineRule.runBlocking {
         whenever(mockSettingsDataStore.hideTips).thenReturn(true)
         whenever(mockWidgetCapabilities.supportsStandardWidgetAdd).thenReturn(true)
@@ -310,9 +301,9 @@ class CtaViewModelTest {
     }
 
     @Test
-    fun whenRefreshCtaWhileBrowsingAndPrivacyOffThenReturnNull() = coroutineRule.runBlocking {
+    fun whenRefreshCtaWhileBrowsingAndPrivacyOffForSiteThenReturnNull() = coroutineRule.runBlocking {
         givenDaxOnboardingActive()
-        whenever(mockPrivacySettingsStore.privacyOn).thenReturn(false)
+        whenever(mockUserWhitelistDao.contains(any())).thenReturn(true)
         val site = site(url = "http://www.facebook.com", entity = TestEntity("Facebook", "Facebook", 9.0))
 
         val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = true, site = site)
@@ -361,6 +352,16 @@ class CtaViewModelTest {
     }
 
     @Test
+    fun whenRefreshCtaWhileBrowsingAndTrackersAreNotMajorThenReturnTrackersBlockedCta() = coroutineRule.runBlocking {
+        givenDaxOnboardingActive()
+        val trackingEvent = TrackingEvent("test.com", "test.com", null, TestEntity("test", "test", 0.123), true)
+        val site = site(url = "http://www.cnn.com", trackerCount = 1, events = listOf(trackingEvent))
+        val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = true, site = site)
+
+        assertTrue(value is DaxDialogCta.DaxTrackersBlockedCta)
+    }
+
+    @Test
     fun whenRefreshCtaWhileBrowsingAndNoTrackersInformationThenReturnNoSerpCta() = coroutineRule.runBlocking {
         givenDaxOnboardingActive()
         val site = site(url = "http://www.cnn.com", trackerCount = 1)
@@ -377,7 +378,6 @@ class CtaViewModelTest {
 
         assertTrue(value is DaxDialogCta.DaxSerpCta)
     }
-
 
     @Test
     fun whenRefreshCtaWhileBrowsingThenReturnNoSerpCta() = coroutineRule.runBlocking {
@@ -418,14 +418,6 @@ class CtaViewModelTest {
     }
 
     @Test
-    fun whenRefreshCtaOnHomeTabAndDaxEndCtaWasPreviouslyShownThenCovidCtaShown() = runBlockingTest {
-        givenShownDaxOnboardingCtas(listOf(CtaId.DAX_INTRO, CtaId.DAX_END))
-
-        val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = false)
-        assertTrue(value is HomeTopPanelCta.CovidCta)
-    }
-
-    @Test
     fun whenRefreshCtaWhileBrowsingWithDaxOnboardingCompletedButNotAllCtasWereShownThenReturnNull() = runBlockingTest {
         givenShownDaxOnboardingCtas(listOf(CtaId.DAX_INTRO))
         givenDaxOnboardingCompleted()
@@ -434,28 +426,12 @@ class CtaViewModelTest {
         assertNull(value)
     }
 
-    @Test
-    fun whenRefreshCtaOnHomeTabWithDaxOnboardingCompletedButNotAllCtasWereShownThenReturnCovidCta() = runBlockingTest {
-        givenShownDaxOnboardingCtas(listOf(CtaId.DAX_INTRO))
-        givenDaxOnboardingCompleted()
-        givenSearchWidgetNoCompatible()
-
-        val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = false)
-        assertTrue(value is HomeTopPanelCta.CovidCta)
-    }
-
     private suspend fun givenDaxOnboardingActive() {
         whenever(mockUserStageStore.getUserAppStage()).thenReturn(AppStage.DAX_ONBOARDING)
     }
 
     private suspend fun givenDaxOnboardingCompleted() {
         whenever(mockUserStageStore.getUserAppStage()).thenReturn(AppStage.ESTABLISHED)
-    }
-
-    private fun givenSearchWidgetNoCompatible() {
-        whenever(mockWidgetCapabilities.supportsStandardWidgetAdd).thenReturn(false)
-        whenever(mockWidgetCapabilities.supportsAutomaticWidgetAdd).thenReturn(false)
-        whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(false)
     }
 
     private fun givenAtLeastOneDaxDialogCtaShown() {
@@ -470,10 +446,6 @@ class CtaViewModelTest {
 
     private suspend fun givenOnboardingActive() {
         whenever(mockUserStageStore.getUserAppStage()).thenReturn(AppStage.DAX_ONBOARDING)
-    }
-
-    private fun setCovidCtaShown() {
-        whenever(mockDismissedCtaDao.exists(CtaId.COVID)).thenReturn(true)
     }
 
     private fun site(

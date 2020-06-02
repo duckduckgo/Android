@@ -28,7 +28,6 @@ import timber.log.Timber
 import javax.inject.Inject
 import javax.inject.Singleton
 
-
 /**
  * This raw file store is temporary. Once we move to an api call to retrieve the json
  * we'll store the content in a db rather than a raw file.
@@ -44,7 +43,7 @@ class TermsOfServiceRawStore @Inject constructor(private val moshi: Moshi, priva
             val json = context.resources.openRawResource(R.raw.tosdr).bufferedReader().use { it.readText() }
             val type = Types.newParameterizedType(List::class.java, TermsOfService::class.java)
             val adapter: JsonAdapter<List<TermsOfService>> = moshi.adapter(type)
-            data = adapter.fromJson(json)
+            data = adapter.fromJson(json)!!
             Timber.i("Initialised TermsOfService data")
             initialized = true
         }

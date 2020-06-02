@@ -27,7 +27,6 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.feedback.ui.negative.FeedbackTypeDisplay.FeedbackTypeSubReasonDisplay
 import kotlinx.android.synthetic.main.item_feedback_reason.view.*
 
-
 class SubReasonAdapter(private val itemClickListener: (FeedbackTypeSubReasonDisplay) -> Unit) :
     ListAdapter<FeedbackTypeSubReasonDisplay, SubReasonAdapter.ViewHolder>(DiffCallback()) {
 

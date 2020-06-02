@@ -168,7 +168,7 @@ class SystemSearchActivity : DuckDuckGoActivity() {
 
         omnibarTextInput.removeTextChangedListener(textChangeWatcher)
         omnibarTextInput.addTextChangedListener(textChangeWatcher)
-        clearTextButton.setOnClickListener { viewModel.userClearedQuery() }
+        clearTextButton.setOnClickListener { viewModel.userRequestedClear() }
     }
 
     private fun renderOnboardingViewState(viewState: SystemSearchViewModel.OnboardingViewState) {
@@ -189,11 +189,6 @@ class SystemSearchActivity : DuckDuckGoActivity() {
     }
 
     private fun renderResultsViewState(viewState: SystemSearchResultsViewState) {
-        if (omnibarTextInput.text.toString() != viewState.queryText) {
-            omnibarTextInput.setText(viewState.queryText)
-            omnibarTextInput.setSelection(viewState.queryText.length)
-        }
-
         deviceLabel.isVisible = viewState.appResults.isNotEmpty()
         autocompleteSuggestionsAdapter.updateData(viewState.autocompleteResults.query, viewState.autocompleteResults.suggestions)
         deviceAppSuggestionsAdapter.updateData(viewState.appResults)
@@ -201,6 +196,11 @@ class SystemSearchActivity : DuckDuckGoActivity() {
 
     private fun processCommand(command: SystemSearchViewModel.Command) {
         when (command) {
+            is ClearInputText -> {
+                omnibarTextInput.removeTextChangedListener(textChangeWatcher)
+                omnibarTextInput.setText("")
+                omnibarTextInput.addTextChangedListener(textChangeWatcher)
+            }
             is LaunchDuckDuckGo -> {
                 launchDuckDuckGo()
             }

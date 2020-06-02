@@ -16,8 +16,9 @@
 
 package com.duckduckgo.app.trackerdetection
 
+import androidx.core.net.toUri
 import com.duckduckgo.app.global.UriString.Companion.sameOrSubdomain
-import com.duckduckgo.app.privacy.store.PrivacySettingsStore
+import com.duckduckgo.app.privacy.db.UserWhitelistDao
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import timber.log.Timber
 import java.util.concurrent.CopyOnWriteArrayList
@@ -29,7 +30,7 @@ interface TrackerDetector {
 
 class TrackerDetectorImpl(
     private val entityLookup: EntityLookup,
-    private val settings: PrivacySettingsStore
+    private val userWhitelistDao: UserWhitelistDao
 ) : TrackerDetector {
 
     private val clients = CopyOnWriteArrayList<Client>()
@@ -62,7 +63,7 @@ class TrackerDetectorImpl(
         if (result != null) {
             Timber.v("$documentUrl resource $url WAS identified as a tracker")
             val entity = if (result.entityName != null) entityLookup.entityForName(result.entityName) else null
-            return TrackingEvent(documentUrl, url, result.categories, entity, settings.privacyOn)
+            return TrackingEvent(documentUrl, url, result.categories, entity, !userWhitelistDao.isDocumentWhitelisted(documentUrl))
         }
 
         Timber.v("$documentUrl resource $url was not identified as a tracker")
@@ -83,4 +84,11 @@ class TrackerDetectorImpl(
     }
 
     val clientCount get() = clients.count()
+}
+
+private fun UserWhitelistDao.isDocumentWhitelisted(document: String?): Boolean {
+    document?.toUri()?.host?.let {
+        return contains(it)
+    }
+    return false
 }

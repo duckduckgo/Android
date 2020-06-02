@@ -19,7 +19,6 @@ package com.duckduckgo.app.httpsupgrade.model
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
-
 @Entity(tableName = "https_bloom_filter_spec")
 data class HttpsBloomFilterSpec(
     @PrimaryKey val id: Int = 1,

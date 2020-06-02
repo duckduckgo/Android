@@ -4,6 +4,7 @@
     <string name="duckDuckGoPrivacySimplified">Despre confidențialitate, pe scurt.</string>
     <string name="yes">Da</string>
     <string name="no">Nu</string>
+    <string name="search">Căutare</string>
 
     <!-- Onboarding Activity -->
     <string name="onboardingDefaultBrowserDescription">Accesați „Setări” pentru a căuta și naviga cu DuckDuckGo de fiecare dată.</string>
@@ -192,11 +193,11 @@
     <string name="bookmarksMenuTitle">Semne de carte</string>
     <string name="bookmarksActivityTitle">Semne de carte</string>
     <string name="bookmarkDeleteConfirmMessage">Sunteți sigur că doriți să ștergeți semnul de carte &lt;b&gt;%s&lt;/b&gt;?</string>
-    <string name="bookmarkDeleteConfirmTitle">Confirmare</string>
+    <string name="dialogConfirmTitle">Confirmare</string>
     <string name="bookmarkAddedFeedback">Semn de carte adăugat</string>
     <string name="bookmarkTitleHint">Titlu semn de carte</string>
     <string name="bookmarkUrlHint">Adresă URL semn de carte</string>
-    <string name="bookmarkSave">Salvare</string>
+    <string name="dialogSave">Salvare</string>
     <string name="bookmarkTitleEdit">Editare semn de carte</string>
     <string name="noBookmarks">Nu s-a adăugat niciun semn de carte</string>
     <string name="bookmarkOverflowContentDescription">Mai multe opțiuni pentru semnul de carte %s</string>
@@ -388,19 +389,17 @@
     <string name="daxIntroCtaText">Apoi, încearcă să vizitezi unul din site-urile tale preferate! &lt;br/&gt;&lt;br/&gt;Voi bloca urmăritorii ca să nu te mai spioneze. Voi îmbunătăți, de asemenea, securitatea conexiunii tale, dacă este posibil. &#128274;</string>
     <string name="daxEndCtaText">Ai ghicit! &lt;br/&gt;&lt;br/&gt;Reține: de fiecare dată când navighezi cu mine, o reclamă terifiantă își pierde aripile. &#128077;</string>
     <string name="daxSerpCtaText">Căutările tale DuckDuckGo sunt anonime și nu îți voi stoca niciodată istoricul căutării. Niciodată. &#128588;</string>
-    <string name="daxNonSerpCtaText">Fiecare site are un grad de confidențialitate. Atingeți-l ca să vezi cum ți-am protejat confidențialitatea.&lt;br/&gt;&lt;br/&gt;Vrei să te dai mare? Încearcă să-ți ștergi datele, apăsând butonul de tragere.</string>
-    <string name="daxMainNetworkStep1CtaText">Atenție!&lt;br/&gt;&lt;br/&gt; %s rulează o rețea de urmărire majoră.&lt;br/&gt;&lt;br/&gt;Un grad de confidențialitate scăzut te va avertiza despre site-uri de acest fel.</string>
-    <string name="daxMainNetworkStep1OwnedCtaText">Atenție!&lt;br/&gt;&lt;br/&gt; %s este deținută de %s, care administrează o rețea de urmărire semnificativă.</string>
-    <string name="daxMainNetworkStep21CtaText">De fapt, %s urmăritorii dau târcoale %s site-urilor de top. &#128561;&lt;br/&gt;&lt;br/&gt;</string>
-    <string name="daxMainNetworkStep211CtaText">De fapt, %s urmăritorii stau la pândă oriunde în internet. &#128561;&lt;br/&gt;&lt;br/&gt;</string>
-    <string name="daxMainNetworkStep2CtaText">%s Voi bloca acești urmăritori când navighezi pe site-uri non-%s.</string>
     <plurals name="daxTrackersBlockedCtaText">
         <item quantity="one">&#160;și &lt;b&gt;%d altul&lt;/b&gt; încercau să te urmărească aici. &lt;br/&gt;&lt;br/&gt;I-am blocat!&lt;br/&gt;&lt;br/&gt; ☝️ Poți verifica bara URL pentru a vedea cine încearcă să te urmărească atunci când vizitezi un nou site.️</item>
         <item quantity="few">&#160;și &lt;b&gt;%d alții&lt;/b&gt; încercau să te urmărească aici. &lt;br/&gt;&lt;br/&gt;I-am blocat!&lt;br/&gt;&lt;br/&gt; ☝️ Poți verifica bara URL pentru a vedea cine încearcă să te urmărească atunci când vizitezi un nou site.️</item>
         <item quantity="other">&#160;și &lt;b&gt;%d alții&lt;/b&gt; încercau să te urmărească aici. &lt;br/&gt;&lt;br/&gt;I-am blocat!&lt;br/&gt;&lt;br/&gt; ☝️ Puteți verifica bara URL pentru a vedea cine încearcă să vă urmărească atunci când vizitați un nou site.️</item>
     </plurals>
-    <string name="daxTrackersBlockedCtaZeroText">&#160;încerca să te urmărească aici. &lt;br/&gt;&lt;br/&gt;Am blocat-o!&lt;br/&gt;&lt;br/&gt; ☝️ Poți verifica bara URL pentru a vedea cine încearcă să te urmărească atunci când vizitezi un nou site.️</string>
-
-    <!-- Covid Cta-->
-    <string name="covidCtaText">Obține informații și sfaturi oficiale COVID-19.</string>
+    <plurals name="daxTrackersBlockedCtaZeroText">
+        <item quantity="one">&#160;încerca să te urmărească aici. &lt;br/&gt;&lt;br/&gt;Am blocat-o!&lt;br/&gt;&lt;br/&gt; ☝️ Poți verifica bara URL pentru a vedea cine încearcă să te urmărească atunci când vizitezi un nou site.</item>
+        <item quantity="few">&#160;încercau să te urmărească aici. &lt;br/&gt;&lt;br/&gt;Am blocat-o!&lt;br/&gt;&lt;br/&gt; ☝️ Poți verifica bara URL pentru a vedea cine încearcă să te urmărească atunci când vizitezi un nou site.</item>
+        <item quantity="other">&#160;încercau să te urmărească aici. &lt;br/&gt;&lt;br/&gt;Am blocat-o!&lt;br/&gt;&lt;br/&gt; ☝️ Poți verifica bara URL pentru a vedea cine încearcă să te urmărească atunci când vizitezi un nou site.</item>
+    </plurals>
+    <string name="daxNonSerpCtaText">În timp ce atingi și derulezi, voi bloca urmăritorii pisălogi. &lt;br/&gt;&lt;br/&gt;Dă-i bătaie- continuă să navighezi!</string>
+    <string name="daxMainNetworkOwnedCtaText">Atenție! %s este deținut de %s.&lt;br/&gt;&lt;br/&gt; Urmăritorii %s spionează %s site-urile web de top, &#128561; dar nu îți face griji! &lt;br/&gt;&lt;br/&gt;Îi voi bloca %s să nu vadă activitatea ta pe acele site-uri.</string>
+    <string name="daxMainNetworkCtaText">Atenție! %s este o rețea semnificativă de urmărire.&lt;br/&gt;&lt;br/&gt; Urmăritorii lor spionează %s site-uri de top, &#128561; dar nu îți face griji! &lt;br/&gt;&lt;br/&gt;Îi voi bloca %s să nu vadă activitatea ta pe acele site-uri.</string>
 </resources>

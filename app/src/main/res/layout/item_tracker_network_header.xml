@@ -45,12 +45,27 @@
 
     <ImageView
         android:id="@+id/icon"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
         android:importantForAccessibility="no"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:src="@drawable/network_pill_facebook_inc" />
+
+    <TextView
+        android:id="@+id/unknownIcon"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:background="@drawable/other_tracker_privacy_dashboard_bg"
+        android:gravity="center"
+        android:importantForAccessibility="no"
+        android:textAppearance="@style/UnknownTrackerText"
+        android:textColor="?attr/privacyDashboardLogoLetterTextColor"
+        android:textSize="13sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="S" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -19,7 +19,6 @@ package com.duckduckgo.app.feedback.ui.negative.brokensite
 import androidx.lifecycle.ViewModel
 import com.duckduckgo.app.global.SingleLiveEvent
 
-
 class BrokenSiteNegativeFeedbackViewModel : ViewModel() {
 
     val command: SingleLiveEvent<Command> = SingleLiveEvent()
@@ -33,4 +32,3 @@ class BrokenSiteNegativeFeedbackViewModel : ViewModel() {
         object Exit : Command()
     }
 }
-
