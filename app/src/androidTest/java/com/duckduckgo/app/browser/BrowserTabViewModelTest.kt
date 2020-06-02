@@ -1831,6 +1831,110 @@ class BrowserTabViewModelTest {
         verify(mockPixel).fire(Pixel.PixelName.FIREPROOF_WEBSITE_UNDO)
     }
 
+    @Test
+    fun whenUserBrowsingPressesBackThenCannotAddBookmark() {
+        setupNavigation(skipHome = false, isBrowsing = true, canGoBack = false)
+        assertTrue(testee.onUserPressedBack())
+        assertFalse(browserViewState().canAddBookmarks)
+    }
+
+    @Test
+    fun whenUserBrowsingPressesBackThenCannotSharePage() {
+        setupNavigation(skipHome = false, isBrowsing = true, canGoBack = false)
+        assertTrue(testee.onUserPressedBack())
+        assertFalse(browserViewState().canSharePage)
+    }
+
+    @Test
+    fun whenUserBrowsingPressesBackThenCannotReportSite() {
+        setupNavigation(skipHome = false, isBrowsing = true, canGoBack = false)
+        assertTrue(testee.onUserPressedBack())
+        assertFalse(browserViewState().canReportSite)
+    }
+
+    @Test
+    fun whenUserBrowsingPressesBackThenCannotAddToHome() {
+        setupNavigation(skipHome = false, isBrowsing = true, canGoBack = false)
+        assertTrue(testee.onUserPressedBack())
+        assertFalse(browserViewState().addToHomeEnabled)
+    }
+
+    @Test
+    fun whenUserBrowsingPressesBackThenCannotWhitelist() {
+        setupNavigation(skipHome = false, isBrowsing = true, canGoBack = false)
+        assertTrue(testee.onUserPressedBack())
+        assertFalse(browserViewState().canWhitelist)
+    }
+
+    @Test
+    fun whenUserBrowsingPressesBackThenCannotNavigateBack() {
+        setupNavigation(skipHome = false, isBrowsing = true, canGoBack = false)
+        assertTrue(testee.onUserPressedBack())
+        assertFalse(browserViewState().canGoBack)
+    }
+
+    @Test
+    fun whenUserBrowsingPressesBackThenCannotFindInPage() {
+        setupNavigation(skipHome = false, isBrowsing = true, canGoBack = false)
+        assertTrue(testee.onUserPressedBack())
+        assertFalse(findInPageViewState().canFindInPage)
+    }
+
+    @Test
+    fun whenUserBrowsingPressesBackThenCanGoForward() {
+        setupNavigation(skipHome = false, isBrowsing = true, canGoBack = false)
+        assertTrue(testee.onUserPressedBack())
+        assertTrue(browserViewState().canGoForward)
+    }
+
+    @Test
+    fun whenUserBrowsingPressesBackAndForwardThenCanAddBookmark() {
+        setupNavigation(skipHome = false, isBrowsing = true, canGoBack = false)
+        testee.onUserPressedBack()
+        testee.onUserPressedForward()
+        assertTrue(browserViewState().canAddBookmarks)
+    }
+
+    @Test
+    fun whenUserBrowsingPressesBackAndForwardThenCanWhitelist() {
+        setupNavigation(skipHome = false, isBrowsing = true, canGoBack = false)
+        testee.onUserPressedBack()
+        testee.onUserPressedForward()
+        assertTrue(browserViewState().canWhitelist)
+    }
+
+    @Test
+    fun whenUserBrowsingPressesBackAndForwardThenCanShare() {
+        setupNavigation(skipHome = false, isBrowsing = true, canGoBack = false)
+        testee.onUserPressedBack()
+        testee.onUserPressedForward()
+        assertTrue(browserViewState().canSharePage)
+    }
+
+    @Test
+    fun whenUserBrowsingPressesBackAndForwardThenCanReportSite() {
+        setupNavigation(skipHome = false, isBrowsing = true, canGoBack = false)
+        testee.onUserPressedBack()
+        testee.onUserPressedForward()
+        assertTrue(browserViewState().canReportSite)
+    }
+
+    @Test
+    fun whenUserBrowsingPressesBackAndForwardThenCanAddToHome() {
+        setupNavigation(skipHome = false, isBrowsing = true, canGoBack = false)
+        testee.onUserPressedBack()
+        testee.onUserPressedForward()
+        assertTrue(browserViewState().addToHomeEnabled)
+    }
+
+    @Test
+    fun whenUserBrowsingPressesBackAndForwardThenCanFindInPage() {
+        setupNavigation(skipHome = false, isBrowsing = true, canGoBack = false)
+        testee.onUserPressedBack()
+        testee.onUserPressedForward()
+        assertTrue(findInPageViewState().canFindInPage)
+    }
+
     private inline fun <reified T : Command> assertCommandIssued(instanceAssertions: T.() -> Unit = {}) {
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
         val issuedCommand = commandCaptor.allValues.find { it is T }
