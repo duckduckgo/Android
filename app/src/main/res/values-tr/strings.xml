@@ -91,9 +91,10 @@
     <string name="closeTab">Sekmeyi kapat</string>
 
     <!-- Privacy Dashboard Activities -->
+    <string name="privacyProtectionToggle">Site Gizlilik Koruması</string>
+    <string name="privacyProtectionEnabled">SAHA KORUMASI ETKİN</string>
+    <string name="privacyProtectionDisabled">SİTE KORUMASI KAPATILDI</string>
     <string name="privacyDashboardActivityTitle">Gizlilik Tablosu</string>
-    <string name="privacyProtectionEnabled">GİZLİLİK KORUMASI ETKİN</string>
-    <string name="privacyProtectionDisabled">GİZLİLİK KORUMASI KAPALI</string>
     <string name="privacyProtectionUpgraded" tools:ignore="TypographyQuotes">&lt;img src="%d" /&gt; \'dan &lt;img src="%d" /&gt;\' ye GELİŞTİRİLDİ</string>
     <string name="privacyGradeContentDescription">Gizlilik Derecesi</string>
 
@@ -142,7 +143,6 @@
   </string>
     <string name="practicesIconContentGood">İyi Uygulama Simgesi</string>
     <string name="practicesIconContentBad">Kötü Uygulama Simgesi</string>
-    <string name="privacyProtectionToggle">Gizlilik Koruması</string>
 
     <string name="networkTrackerSummaryHeader">İZLEYİCİ AĞ ÜSTÜ TEKLİFLER</string>
     <string name="networkTrackerSummaryNotReady">Kaç izleyiciyi engellediğimizi göstermek için hala veri topluyoruz.</string>
@@ -419,4 +419,54 @@
     <string name="daxNonSerpCtaText">Siz gezintinize devam ederken sinir bozucu izleyicileri engelleyeceğim. &lt;br/&gt;&lt;br/&gt;Hadi, gezinmeye devam edin!</string>
     <string name="daxMainNetworkOwnedCtaText">Dikkat! %s, %s şirketine aittir.&lt;br/&gt;&lt;br/&gt; %s\'ın izleyicileri, en iyi web sitelerinin yaklaşık %s kadarını gizliyor ancak endişelenmeyin! &lt;br/&gt;&lt;br/&gt;%s\'nın bu sitelerdeki etkinliğinizi görmesini engelleyeceğim.</string>
     <string name="daxMainNetworkCtaText">Dikkat! %s büyük bir izleme ağıdır.&lt;br/&gt;&lt;br/&gt; İzleyicileri, en iyi sitelerin yaklaşık %s kadarını gizliyor &#128561; ancak endişelenmeyin! &lt;br/&gt;&lt;br/&gt;%s \'nin bu sitelerdeki etkinliğinizi görmesini engelleyeceğim.</string>
+
+    <!-- Download Confirmation -->
+    <string name="downloadConfirmationContinue">Devam et</string>
+    <string name="downloadConfirmationSaveFileTitle">Kaydet %1$s</string>
+    <string name="downloadConfirmationKeepBothFilesText">Her ikisini de sakla</string>
+    <string name="downloadConfirmationReplaceOldFileText">Üzerine kaydet</string>
+    <string name="downloadConfirmationOpenFileText">Aç</string>
+    <string name="downloadConfirmationUnableToOpenFileText">Dosya açılamadı</string>
+    <string name="downloadConfirmationUnableToDeleteFileText">Eski dosya silinemedi</string>
+
+    <!-- Change Icon Activity -->
+    <string name="changeIconActivityTitle">Uygulama Simgesi</string>
+    <string name="changeIconCtaLabel">Uygulama Simgesini Değiştir</string>
+    <string name="changeIconCtaAccept">Uygula</string>
+    <string name="changeIconCtaCancel">İptal</string>
+    <string name="changeIconDialogTitle">Yeni simge uygulansın mı?</string>
+    <string name="changeIconDialogMessage">Uygulama, değişiklikleri uygulamak için kapanabilir. Yeni simgenize hayran olduktan sonra tekrar gelin.</string>
+
+    <!-- New dashboard / menu buttons -->
+    <string name="manageWhitelist">Beyaz Listeyi Yönet</string>
+    <string name="reportBrokenSite">Hatalı Siteyi Bildir</string>
+
+    <!-- Dialogs -->
+    <string name="dialogAddTitle">Ekle</string>
+    <string name="dialogEditTitle">Düzenle</string>
+
+    <!-- Whitelist -->
+    <string name="whitelisetActivityTitle">Beyaz Liste</string>
+    <string name="whitelistAdd">Beyaz Listeye Ekle</string>
+    <string name="whitelistRemove">Beyaz Listeden Sil</string>
+    <string name="whitelistEntryOverflowContentDescription">Beyaz liste girişi %s için daha fazla seçenek</string>
+    <string name="whitelistEntryDeleteConfirmMessage">&lt;b&gt;%s&lt;/b&gt; \'ı beyaz listeden silmek istediğinizden emin misiniz?</string>
+    <string name="whitelistExplanation">Beyaz listeye alınan bu siteler Gizlilik Koruması tarafından yeni sürüme geçirilmez</string>
+    <string name="whitelistNoEntries">Henüz beyaz listeye eklenmemiş site yok</string>
+    <string name="whitelistDomainHint">www.example.com</string>
+    <string name="whitelistFormatError">Kaydedilemedi, <b>example.com</b> gibi bir alan adı girin</string>
+
+    <!-- Settings -->
+    <string name="settingsPrivacyProtectionWhitelist">Gizlilik Koruması Beyaz Listesi</string>
+
+    <!-- Fireproof websites -->
+    <string name="fireproofWebsitesActivityTitle">Korumalı Web Siteleri</string>
+    <string name="settingsFireproofWebsites">Korumalı Web Siteleri</string>
+    <string name="fireproofWebsiteMenuTitle">Korumalı Web Sitesi</string>
+    <string name="fireproofWebsiteSnackbarConfirmation">&lt;b&gt;%s&lt;/b&gt; artık koruma altında! Daha fazla bilgi edinmek için Ayarlar\'a gidin.</string>
+    <string name="fireproofWebsiteSnackbarAction">Geri al</string>
+    <string name="fireproofWebsiteDeleteConfirmMessage">&lt;b&gt;%s&lt;/b&gt; \'ı silmek istediğinizden emin misiniz?</string>
+    <string name="fireproofWebsiteEmptyListHint">Henüz hiçbir web sitesi koruma altına alınmadı</string>
+    <string name="fireproofWebsiteFeatureDescription">Web siteleri, oturumunuzu açık tutmak için çerezlere ihtiyaç duyar. Bir siteyi Koruma Altına alırsanız, çerezler silinmez ve Fire (Yok et) Düğmesini kullandıktan sonra bile oturumunuz açık kalır.</string>
+    <string name="fireproofWebsiteOverflowContentDescription">Korumalı web sitesi %s için daha fazla seçenek</string>
 </resources>
