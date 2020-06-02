@@ -34,7 +34,7 @@ class WebsiteNotification(
     private val pixelSuffix: String
 ) : SchedulableNotification {
 
-    override val id = "com.duckduckgo.privacy.website"
+    override val id = "com.duckduckgo.privacy.website.$pixelSuffix"
 
     override val launchIntent: String = WEBSITE
 

@@ -34,7 +34,7 @@ class AppFeatureNotification(
     override val launchIntent: String = APP_LAUNCH
 ) : SchedulableNotification {
 
-    override val id = "com.duckduckgo.privacy.app.feature"
+    override val id = "com.duckduckgo.privacy.app.feature.$pixelSuffix"
 
     override val cancelIntent: String = CANCEL
 
