@@ -28,10 +28,10 @@
         android:layout_width="match_parent"
         android:layout_height="@dimen/bottomBarHeight"
         android:layout_gravity="bottom"
-        android:background="@drawable/bottom_navigation_bar_bg"
         android:elevation="8dp"
         android:gravity="center"
         android:orientation="horizontal"
+        android:background="?toolbarBgColor"
         app:layoutResource="@layout/layout_browser_bottom_navigation_bar"
         app:layout_behavior="com.duckduckgo.app.browser.ui.BottomNavigationBehavior" />
 
@@ -61,8 +61,8 @@
         android:id="@+id/autoCompleteSuggestionsList"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="?attr/colorPrimary"
-        android:backgroundTint="?attr/colorPrimary"
+        android:background="?toolbarBgColor"
+        android:backgroundTint="?toolbarBgColor"
         android:clipToPadding="false"
         android:elevation="4dp"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"

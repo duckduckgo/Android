@@ -15,4 +15,8 @@
   -->
 
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
+    <!-- Download Manager problems -->
+    <string name="downloadManagerDisabled">Download Manager is disabled</string>
+    <string name="downloadManagerIncompatible">Download Manager not available on this device</string>
+    <string name="enable">Enable</string>
 </resources>

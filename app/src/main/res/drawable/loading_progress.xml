@@ -14,8 +14,22 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@android:id/background">
+        <shape>
+            <solid
+                android:color="?toolbarBgColor" />
+        </shape>
+    </item>
 
-<selector xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:state_enabled="false" android:color="@color/pinkish_grey_two" />
-    <item android:color="@color/almostBlackDark"/>
-</selector>
+    <item
+        android:id="@android:id/progress">
+        <clip>
+            <shape>
+                <solid
+                    android:color="?colorAccent" />
+            </shape>
+        </clip>
+    </item>
+
+</layer-list>

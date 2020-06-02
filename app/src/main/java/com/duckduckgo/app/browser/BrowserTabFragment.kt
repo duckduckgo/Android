@@ -29,6 +29,7 @@ import android.content.res.Configuration
 import android.media.MediaScannerConnection
 import android.net.Uri
 import android.os.*
+import android.provider.Settings
 import android.text.Editable
 import android.view.*
 import android.view.View.*
@@ -63,6 +64,7 @@ import com.duckduckgo.app.brokensite.BrokenSiteActivity
 import com.duckduckgo.app.brokensite.BrokenSiteData
 import com.duckduckgo.app.browser.BrowserTabViewModel.*
 import com.duckduckgo.app.browser.autocomplete.BrowserAutoCompleteSuggestionsAdapter
+import com.duckduckgo.app.browser.downloader.DownloadFailReason
 import com.duckduckgo.app.browser.downloader.FileDownloadNotificationManager
 import com.duckduckgo.app.browser.downloader.FileDownloader
 import com.duckduckgo.app.browser.downloader.FileDownloader.FileDownloadListener
@@ -1112,9 +1114,30 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
                 }
             }
 
-            override fun downloadFailed(message: String) {
+            override fun downloadFailed(message: String, downloadFailReason: DownloadFailReason) {
                 Timber.w("Failed to download file [$message]")
+
                 fileDownloadNotificationManager.showDownloadFailedNotification()
+
+                val snackbar = Snackbar.make(toolbar, R.string.downloadFailed, Snackbar.LENGTH_INDEFINITE)
+                if (downloadFailReason == DownloadFailReason.DownloadManagerDisabled) {
+                    snackbar.setText(message)
+                    snackbar.setAction(getString(R.string.enable)) {
+                        showDownloadManagerAppSettings()
+                    }
+                }
+                snackbar.show()
+            }
+
+            private fun showDownloadManagerAppSettings() {
+                try {
+                    val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
+                    intent.data = DownloadFailReason.DOWNLOAD_MANAGER_SETTINGS_URI
+                    startActivity(intent)
+                } catch (e: ActivityNotFoundException) {
+                    Timber.w(e, "Could not open DownloadManager settings")
+                    Snackbar.make(toolbar, R.string.downloadManagerIncompatible, Snackbar.LENGTH_INDEFINITE).show()
+                }
             }
         }
     }
