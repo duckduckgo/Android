@@ -61,17 +61,17 @@ interface VariantManager {
 
             // Single Search Bar Experiments
             Variant(
-                key = "zf",
+                key = "zg",
                 weight = 1.0,
                 features = emptyList(),
                 filterBy = { noFilter() }),
             Variant(
-                key = "zg",
+                key = "zh",
                 weight = 1.0,
                 features = listOf(VariantFeature.SerpHeaderQueryReplacement),
                 filterBy = { noFilter() }),
             Variant(
-                key = "zh",
+                key = "zi",
                 weight = 1.0,
                 features = listOf(VariantFeature.SerpHeaderRemoval),
                 filterBy = { noFilter() })
