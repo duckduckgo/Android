@@ -43,8 +43,10 @@ class FireproofWebsiteAdapter(
         const val DESCRIPTION_TYPE = 1
         const val EMPTY_STATE_TYPE = 2
         const val TOGGLE_TYPE = 3
+        const val DIVIDER_TYPE = 4
 
         const val TOGGLE_ITEM_SIZE = 1
+        const val DIVIDER_SIZE = 1
         const val DESCRIPTION_ITEM_SIZE = 1
         const val EMPTY_HINT_ITEM_SIZE = 1
     }
@@ -64,7 +66,7 @@ class FireproofWebsiteAdapter(
         return when (viewType) {
             TOGGLE_TYPE -> {
                 val view = inflater.inflate(R.layout.view_fireproof_website_toggle, parent, false)
-                return FireproofWebSiteViewHolder.FireproofWebsiteToggleViewHolder(view,
+                FireproofWebSiteViewHolder.FireproofWebsiteToggleViewHolder(view,
                     CompoundButton.OnCheckedChangeListener { _, isChecked -> viewModel.onUserToggleLoginDetection(isChecked) })
             }
             FIREPROOF_WEBSITE_TYPE -> {
@@ -79,6 +81,10 @@ class FireproofWebsiteAdapter(
                 val view = inflater.inflate(R.layout.view_fireproof_website_description, parent, false)
                 FireproofWebSiteViewHolder.FireproofWebsiteDescriptionViewHolder(view)
             }
+            DIVIDER_TYPE -> {
+                val view = inflater.inflate(R.layout.view_fireproof_divider, parent, false)
+                FireproofWebSiteViewHolder.FireproofWebsiteDividerViewHolder(view)
+            }
             else -> throw IllegalArgumentException("viewType not found")
         }
     }
@@ -87,6 +93,7 @@ class FireproofWebsiteAdapter(
         return when (position) {
             0 -> DESCRIPTION_TYPE
             1 -> TOGGLE_TYPE
+            2 -> DIVIDER_TYPE
             else -> getListItemType()
         }
     }
@@ -110,7 +117,7 @@ class FireproofWebsiteAdapter(
         fireproofWebsites.size
     }
 
-    private fun itemsOnTopOfList() = DESCRIPTION_ITEM_SIZE + TOGGLE_ITEM_SIZE
+    private fun itemsOnTopOfList() = DESCRIPTION_ITEM_SIZE + TOGGLE_ITEM_SIZE + DIVIDER_SIZE
 
     private fun getWebsiteItemPosition(position: Int) = position - itemsOnTopOfList()
 
@@ -137,6 +144,8 @@ sealed class FireproofWebSiteViewHolder(itemView: View) : RecyclerView.ViewHolde
             itemView.fireproofWebsiteToggle.quietlySetIsChecked(loginDetectionEnabled, listener)
         }
     }
+
+    class FireproofWebsiteDividerViewHolder(itemView: View) : FireproofWebSiteViewHolder(itemView)
 
     class FireproofWebsiteDescriptionViewHolder(itemView: View) : FireproofWebSiteViewHolder(itemView)
 
