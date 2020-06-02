@@ -123,8 +123,7 @@ class BrowserChromeClient @Inject constructor(private val uncaughtExceptionRepos
     }
 
     override fun onGeolocationPermissionsShowPrompt(origin: String?, callback: GeolocationPermissions.Callback?) {
-        Timber.d("onGeolocationPermissionsShowPrompt")
+        webViewClientListener?.onGeoLocationPermissionRequested(origin, callback)
     }
-
 
 }

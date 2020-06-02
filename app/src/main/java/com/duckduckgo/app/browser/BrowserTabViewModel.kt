@@ -23,11 +23,13 @@ import android.os.Message
 import android.view.ContextMenu
 import android.view.MenuItem
 import android.view.View
+import android.webkit.GeolocationPermissions
 import android.webkit.ValueCallback
 import android.webkit.WebChromeClient
 import android.webkit.WebView
 import androidx.annotation.AnyThread
 import androidx.annotation.VisibleForTesting
+import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
 import androidx.lifecycle.*
 import com.duckduckgo.app.autocomplete.api.AutoComplete
@@ -213,6 +215,7 @@ class BrowserTabViewModel(
         object LaunchTabSwitcher : Command()
         object HideWebContent : Command()
         object ShowWebContent : Command()
+        object AskGeoPermission : Command()
 
         class ShowErrorWithAction(val action: () -> Unit) : Command()
         sealed class DaxCommand : Command() {
@@ -241,6 +244,9 @@ class BrowserTabViewModel(
 
     val title: String?
         get() = site?.title
+
+    private lateinit var permissionOrigin: String
+    private lateinit var permissionCallback: GeolocationPermissions.Callback
 
     private val autoCompletePublishSubject = PublishRelay.create<String>()
     private val fireproofWebsiteState: LiveData<List<FireproofWebsiteEntity>> = fireproofWebsiteDao.fireproofWebsitesEntities()
@@ -626,6 +632,31 @@ class BrowserTabViewModel(
         val showLoadingGrade = progress.privacyOn || isLoading
         privacyGradeViewState.value = currentPrivacyGradeState().copy(shouldAnimate = isLoading, showEmptyGrade = showLoadingGrade)
     }
+
+    override fun onGeoLocationPermissionRequested(origin: String?, callback: GeolocationPermissions.Callback?) {
+        Timber.d("onGeolocationPermissionsShowPrompt $origin")
+        origin?.let { permissionOrigin = origin }
+        callback?.let { permissionCallback = callback }
+
+        if (origin != null){
+            command.postValue(AskGeoPermission)
+            // if (duckDuckGoUrlDetector.isDuckDuckGoUrl(origin)){
+            // } else {
+            //    onGeoLocationPermissionDenied()
+            // }
+        } else {
+            onGeoLocationPermissionDenied()
+        }
+    }
+
+    fun onGeoLocationPermissionGranted() {
+        permissionCallback?.invoke(permissionOrigin, true, true)
+    }
+
+    fun onGeoLocationPermissionDenied() {
+        permissionCallback?.invoke(permissionOrigin, false, true)
+    }
+
 
     private fun registerSiteVisit() {
         Schedulers.io().scheduleDirect {
@@ -1190,6 +1221,7 @@ class BrowserTabViewModel(
         closeCurrentTab()
         command.value = OpenInNewTab(query)
     }
+
 
     companion object {
         private const val FIXED_PROGRESS = 50

@@ -18,6 +18,7 @@ package com.duckduckgo.app.browser
 
 import android.view.MenuItem
 import android.view.View
+import android.webkit.GeolocationPermissions
 import android.webkit.HttpAuthHandler
 import android.webkit.WebView
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
@@ -186,6 +187,12 @@ class BrowserTabViewModelTest {
 
     @Captor
     private lateinit var commandCaptor: ArgumentCaptor<Command>
+
+    @Captor
+    private lateinit var permissionCallbackCaptor: ArgumentCaptor<GeolocationPermissions.Callback>
+
+    @Mock
+    private lateinit var permissionCallback: GeolocationPermissions.Callback
 
     private lateinit var db: AppDatabase
 
@@ -1829,6 +1836,19 @@ class BrowserTabViewModelTest {
             testee.onFireproofWebsiteSnackbarUndoClicked(this.fireproofWebsiteEntity)
         }
         verify(mockPixel).fire(Pixel.PixelName.FIREPROOF_WEBSITE_UNDO)
+    }
+
+    @Test
+    fun whenGeoPermissionisRequestedAndOriginIsNotDDGThenItsDenied(){
+        val originUrl = "http://example.com"
+        testee.onGeoLocationPermissionRequested(originUrl, permissionCallback)
+
+        verify(permissionCallback.invoke(anyString(), false, false))
+    }
+
+    @Test
+    fun whenGeoPermissionisRequestedAndOriginIsDDGThenItsGranted(){
+
     }
 
     private inline fun <reified T : Command> assertCommandIssued(instanceAssertions: T.() -> Unit = {}) {

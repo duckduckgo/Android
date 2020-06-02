@@ -584,6 +584,15 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
             is Command.DaxCommand.HideDaxDialog -> showHideTipsDialog(it.cta)
             is Command.HideWebContent -> webView?.hide()
             is Command.ShowWebContent -> webView?.show()
+            is Command.AskGeoPermission -> requestGeoPermission()
+        }
+    }
+
+    private fun requestGeoPermission(){
+        if (ContextCompat.checkSelfPermission(requireActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED){
+            requestPermissions(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), PERMISSION_REQUEST_GEO_LOCATION)
+        } else {
+            viewModel.onGeoLocationPermissionGranted()
         }
     }
 
@@ -1172,13 +1181,24 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
-        if (requestCode == PERMISSION_REQUEST_WRITE_EXTERNAL_STORAGE) {
-            if ((grantResults.isNotEmpty()) && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                Timber.i("Write external storage permission granted")
-                downloadFile(requestUserConfirmation = false)
-            } else {
-                Timber.i("Write external storage permission refused")
-                Snackbar.make(toolbar, R.string.permissionRequiredToDownload, Snackbar.LENGTH_LONG).show()
+        when (requestCode){
+            PERMISSION_REQUEST_WRITE_EXTERNAL_STORAGE -> {
+                if ((grantResults.isNotEmpty()) && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    Timber.i("Write external storage permission granted")
+                    downloadFile(requestUserConfirmation = false)
+                } else {
+                    Timber.i("Write external storage permission refused")
+                    Snackbar.make(toolbar, R.string.permissionRequiredToDownload, Snackbar.LENGTH_LONG).show()
+                }
+            }
+            PERMISSION_REQUEST_GEO_LOCATION -> {
+                if ((grantResults.isNotEmpty()) && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    Timber.i("Geo location permission granted")
+                    viewModel.onGeoLocationPermissionGranted()
+               } else {
+                    Timber.i("Geo location permission refused")
+                    viewModel.onGeoLocationPermissionDenied()
+                }
             }
         }
     }
@@ -1257,6 +1277,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
 
         private const val REQUEST_CODE_CHOOSE_FILE = 100
         private const val PERMISSION_REQUEST_WRITE_EXTERNAL_STORAGE = 200
+        private const val PERMISSION_REQUEST_GEO_LOCATION = 300
 
         private const val URL_BUNDLE_KEY = "url"
 
