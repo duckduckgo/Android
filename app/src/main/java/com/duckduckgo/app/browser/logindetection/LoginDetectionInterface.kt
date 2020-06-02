@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.browser
+package com.duckduckgo.app.browser.logindetection
 
 import android.webkit.JavascriptInterface
 import timber.log.Timber

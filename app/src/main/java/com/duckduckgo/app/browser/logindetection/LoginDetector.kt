@@ -18,16 +18,12 @@ package com.duckduckgo.app.browser.logindetection
 
 import android.webkit.WebResourceRequest
 import android.webkit.WebView
-import com.duckduckgo.app.browser.BrowserTabViewModel
-import com.duckduckgo.app.browser.LOGIN_DETECTION_INTERFACE_NAME
-import com.duckduckgo.app.browser.LoginDetectionInterface
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 import javax.inject.Inject
-
 
 class LoginDetector @Inject constructor(private val settingsDataStore: SettingsDataStore) {
 
@@ -37,7 +33,10 @@ class LoginDetector @Inject constructor(private val settingsDataStore: SettingsD
     }
 
     fun addLoginDetection(webView: WebView, onLoginDetected: () -> Unit) {
-        webView.addJavascriptInterface(LoginDetectionInterface { onLoginDetected() }, LOGIN_DETECTION_INTERFACE_NAME)
+        webView.addJavascriptInterface(
+            LoginDetectionInterface { onLoginDetected() },
+            LOGIN_DETECTION_INTERFACE_NAME
+        )
     }
 
     suspend fun onEvent(event: WebNavigationEvent) {
