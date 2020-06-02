@@ -24,6 +24,7 @@ import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.whenever
 import kotlinx.coroutines.runBlocking
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -33,12 +34,11 @@ class AppFeatureNotificationTest {
 
     private val context = InstrumentationRegistry.getInstrumentation().targetContext
     private val notificationsDao: NotificationDao = mock()
-
     private lateinit var testee: AppFeatureNotification
 
     @Before
     fun before() {
-        testee = AppFeatureNotification(context, notificationsDao, 1, 1, "a")
+        testee = AppFeatureNotification(context, notificationsDao, TITLE, DESCRIPTION, PIXEL)
     }
 
     @Test
@@ -51,5 +51,17 @@ class AppFeatureNotificationTest {
     fun whenNotificationAlreadySeenThenCanShowIsFalse() = runBlocking<Unit> {
         whenever(notificationsDao.exists(any())).thenReturn(true)
         assertFalse(testee.canShow())
+    }
+
+    @Test
+    fun whenBuildSpecificationSetCorrectPixelSuffix() = runBlocking<Unit> {
+        val spec = testee.buildSpecification()
+        assertEquals(PIXEL, spec.pixelSuffix)
+    }
+
+    companion object {
+        private const val PIXEL = "pixel"
+        private const val TITLE = AppFeatureNotification.DRIP_B_1_TITLE
+        private const val DESCRIPTION = AppFeatureNotification.DRIP_B_1_DESCRIPTION
     }
 }

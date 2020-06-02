@@ -39,7 +39,7 @@ class WebsiteNotificationTest {
 
     @Before
     fun before() {
-        testee = WebsiteNotification(context, notificationsDao, URL, 1, 1, PIXEL)
+        testee = WebsiteNotification(context, notificationsDao, URL, TITLE, DESCRIPTION, PIXEL)
     }
 
     @Test
@@ -69,5 +69,7 @@ class WebsiteNotificationTest {
     companion object {
         private const val URL = "test"
         private const val PIXEL = "pixel"
+        private const val TITLE = WebsiteNotification.DRIP_A_1_TITLE
+        private const val DESCRIPTION = WebsiteNotification.DRIP_A_1_DESCRIPTION
     }
 }
