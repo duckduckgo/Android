@@ -89,9 +89,10 @@
     <string name="closeTab">Chiudi scheda</string>
 
     <!-- Privacy Dashboard Activities -->
+    <string name="privacyProtectionToggle">Protezione della privacy del sito</string>
+    <string name="privacyProtectionEnabled">PROTEZIONE DEL SITO ABILITATA</string>
+    <string name="privacyProtectionDisabled">PROTEZIONE DEL SITO DISATTIVATA</string>
     <string name="privacyDashboardActivityTitle">Dashboard sulla privacy</string>
-    <string name="privacyProtectionEnabled">PROTEZIONE DELLA PRIVACY ABILITATA</string>
-    <string name="privacyProtectionDisabled">PROTEZIONE DELLA PRIVACY DISABILITATA</string>
     <string name="privacyProtectionUpgraded" tools:ignore="TypographyQuotes">MIGLIORATO DA &lt;img src="%d" /&gt; A &lt;img src="%d" /&gt;</string>
     <string name="privacyGradeContentDescription">Punteggio sulla privacy</string>
 
@@ -137,7 +138,6 @@
     <string name="practicesTosdrLink">Le pratiche sulla privacy sono il risultato di <b><u>ToS;DR</u></b></string>
     <string name="practicesIconContentGood">Icona buone pratiche</string>
     <string name="practicesIconContentBad">Icona cattive pratiche</string>
-    <string name="privacyProtectionToggle">Protezione della privacy</string>
 
     <string name="networkTrackerSummaryHeader">PRINCIPALI MINACCE DELLE RETI DI TRACCIAMENTO</string>
     <string name="networkTrackerSummaryNotReady">Stiamo raccogliendo dati per mostrarti quanti sistemi di tracciamento abbiamo bloccato.</string>
@@ -412,4 +412,55 @@
     <string name="daxNonSerpCtaText">Mentre clicchi e scrolli, io bloccherò i fastidiosi tracker. &lt;br/&gt;&lt;br/&gt;Continua pure a navigare in tranquillità!</string>
     <string name="daxMainNetworkOwnedCtaText">Attenzione! %s è di proprietà di %s. I tracker di &lt;br/&gt;&lt;br/&gt; %s si nascondono nel %s dei siti più popolari &#128561; ma non preoccuparti!&lt;br/&gt;&lt;br/&gt;Impedirò a %s di spiare la tua attività su questi siti.</string>
     <string name="daxMainNetworkCtaText">Attenzione! %s è un\'importante rete di tracciamento.&lt;br/&gt;&lt;br/&gt; I loro tracker si nascondono nel %s dei siti più popolari &#128561; ma non preoccuparti! &lt;br/&gt;&lt;br/&gt;Impedirò a %s di spiare la tua attività su quei siti.</string>
+
+    <!-- Download Confirmation -->
+    <string name="downloadConfirmationContinue">Continua</string>
+    <string name="downloadConfirmationSaveFileTitle">Salva%1$s</string>
+    <string name="downloadConfirmationKeepBothFilesText">Conserva entrambi</string>
+    <string name="downloadConfirmationReplaceOldFileText">Sostituisci</string>
+    <string name="downloadConfirmationOpenFileText">Apri</string>
+    <string name="downloadConfirmationUnableToOpenFileText">Impossibile aprire il file</string>
+    <string name="downloadConfirmationUnableToDeleteFileText">Impossibile eliminare il vecchio file</string>
+
+    <!-- Change Icon Activity -->
+    <string name="changeIconActivityTitle">Icona dell\'app</string>
+    <string name="changeIconCtaLabel">Cambia l\'icona dell\'app</string>
+    <string name="changeIconCtaAccept">Applica</string>
+    <string name="changeIconCtaCancel">Annulla</string>
+    <string name="changeIconDialogTitle">Applicare la nuova icona?</string>
+    <string name="changeIconDialogMessage">L\'app potrebbe chiudersi per applicare le modifiche. Torna dopo aver ammirato la tua bella nuova icona.</string>
+
+    <!-- New dashboard / menu buttons -->
+    <string name="manageWhitelist">Gestisci whitelist</string>
+    <string name="reportBrokenSite">Segnala sito danneggiato</string>
+
+    <!-- Dialogs -->
+    <string name="dialogAddTitle">Aggiungi</string>
+    <string name="dialogEditTitle">Modifica</string>
+
+    <!-- Whitelist -->
+    <string name="whitelisetActivityTitle">Whitelist</string>
+    <string name="whitelistAdd">Aggiungi alla whitelist</string>
+    <string name="whitelistRemove">Rimuovi dalla whitelist</string>
+    <string name="whitelistEntryOverflowContentDescription">Altre opzioni per l\'inserimento nella whitelist %s</string>
+    <string name="whitelistEntryDeleteConfirmMessage">Sei sicuro di voler eliminare &lt;b&gt;%s&lt;/b&gt; dalla whitelist?</string>
+    <string name="whitelistExplanation">Questi siti autorizzati non verranno aggiornati da Privacy Protection</string>
+    <string name="whitelistNoEntries">Ancora nessun sito nella whitelist </string>
+    <string name="whitelistDomainHint">www.example.com</string>
+    <string name="whitelistFormatError">Impossibile salvare, inserisci un dominio come <b>example.com</b>
+  </string>
+
+    <!-- Settings -->
+    <string name="settingsPrivacyProtectionWhitelist">Whitelist di Privacy Protection</string>
+
+    <!-- Fireproof websites -->
+    <string name="fireproofWebsitesActivityTitle">Siti web a prova di bomba</string>
+    <string name="settingsFireproofWebsites">Siti web a prova di bomba</string>
+    <string name="fireproofWebsiteMenuTitle">Sito web a prova di bomba</string>
+    <string name="fireproofWebsiteSnackbarConfirmation">&lt;b&gt;%s&lt;/b&gt; ora è a prova di bomba! Visita le Impostazioni per saperne di più.</string>
+    <string name="fireproofWebsiteSnackbarAction">Annulla</string>
+    <string name="fireproofWebsiteDeleteConfirmMessage">Sei sicuro di voler eliminare &lt;b&gt;%s&lt;/b&gt;?</string>
+    <string name="fireproofWebsiteEmptyListHint">Ancora nessun sito web a prova di bomba</string>
+    <string name="fireproofWebsiteFeatureDescription">I siti web si affidano ai cookie per mantenere l\'accesso. Quando imposti un sito a prova di bomba, i cookie non vengono cancellati e rimani connesso, anche dopo aver utilizzato il pulsante.</string>
+    <string name="fireproofWebsiteOverflowContentDescription">Altre opzioni per impostare il sito web a prova di bomba %s</string>
 </resources>
