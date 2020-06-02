@@ -78,7 +78,7 @@ open class WebsiteNotificationSpecification(
     override val autoCancel = true
     override val title: String = context.getString(titleRes)
     override val description: String = context.getString(descriptionRes)
-    override val color: Int = R.color.brickOrange
+    override val color: Int = R.color.ic_launcher_red_background
 
     companion object {
         const val WEBSITE_KEY = "websiteKey"
