@@ -48,7 +48,6 @@ class PrivacyPracticesImpl @Inject constructor(
     private val entityLookup: EntityLookup
 ) : PrivacyPractices {
 
-
     private var entityScores: Map<String, Int> = mapOf()
 
     override suspend fun loadData() {

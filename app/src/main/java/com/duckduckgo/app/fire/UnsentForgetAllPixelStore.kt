@@ -22,7 +22,6 @@ import androidx.annotation.VisibleForTesting
 import androidx.core.content.edit
 import javax.inject.Inject
 
-
 interface UnsentForgetAllPixelStore {
     val pendingPixelCountClearData: Int
     val lastClearTimestamp: Long

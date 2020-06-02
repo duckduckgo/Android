@@ -119,7 +119,6 @@ class ApiBasedPixelTest {
         whenever(mockDeviceInfo.formFactor()).thenReturn(DeviceInfo.FormFactor.PHONE)
         whenever(mockDeviceInfo.appVersion).thenReturn("1.0.0")
 
-
         val pixel = ApiBasedPixel(mockPixelService, mockStatisticsDataStore, mockVariantManager, mockDeviceInfo)
         pixel.fire(PRIVACY_DASHBOARD_OPENED)
         val expectedParams = mapOf("appVersion" to "1.0.0")

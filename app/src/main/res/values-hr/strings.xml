@@ -73,9 +73,10 @@
     <string name="closeTab">Zatvori kartica</string>
 
     <!-- Privacy Dashboard Activities -->
+    <string name="privacyProtectionToggle">Zaštita privatnosti web stranice</string>
+    <string name="privacyProtectionEnabled">ZAŠTITA STRANICE UKLJUČENA</string>
+    <string name="privacyProtectionDisabled">ZAŠTITA STRANICE JE ISKLJUČENA</string>
     <string name="privacyDashboardActivityTitle">Nadzorna ploča zaštite privatnosti</string>
-    <string name="privacyProtectionEnabled">ZAŠTITA PRIVATNOSTI OMOGUĆENA</string>
-    <string name="privacyProtectionDisabled">ZAŠTITA PRIVATNOSTI ONEMOGUĆENA</string>
     <string name="privacyProtectionUpgraded" tools:ignore="TypographyQuotes">POBOLJŠANO OD &lt;img src="%d" /&gt; DO &lt;img src="%d" /&gt;</string>
     <string name="privacyGradeContentDescription">Ocjena zaštite privatnosti</string>
 
@@ -125,7 +126,6 @@
     <string name="practicesTosdrLink">Prakse zaštite privatnosti rezultat su <b><u>ToS;DR</u></b></string>
     <string name="practicesIconContentGood">Ikona za dobru praksu</string>
     <string name="practicesIconContentBad">Ikona za lošu praksu</string>
-    <string name="privacyProtectionToggle">Zaštita privatnosti</string>
 
     <string name="networkTrackerSummaryHeader">NAJVEĆI PREKRŠITELJI OD MREŽA ZA PRAĆENJE</string>
     <string name="networkTrackerSummaryNotReady">Još uvijek prikupljamo podatke kako bismo pokazali koliko smo alata za praćenje blokirali.</string>
@@ -402,4 +402,55 @@
     <string name="daxNonSerpCtaText">Čim dodirnete i pomičete, blokirat ću neugodne tragače. &lt;br/&gt;&lt;br/&gt;Naprijed - nastavite pretraživati!</string>
     <string name="daxMainNetworkOwnedCtaText">Obratite pozornost! %s je u vlasništvu %s.&lt;br/&gt;&lt;br/&gt; %s tragači vrebaju na oko %s top web-mjesta &#128561;, ali ne brinite! &lt;br/&gt;&lt;br/&gt;Blokirat ću %s da  ne vide vašu aktivnost na tim stranicama.</string>
     <string name="daxMainNetworkCtaText">Obratite pozornost! %s je glavna mreža za praćenje.&lt;br/&gt;&lt;br/&gt; Njihovi tragači vrebaju na oko %s top web-mjesta &#128561;, ali ne brinite! &lt;br/&gt;&lt;br/&gt;Blokirat ću %s  da ne vide vašu aktivnost na tim stranicama.</string>
+
+    <!-- Download Confirmation -->
+    <string name="downloadConfirmationContinue">Nastaviti</string>
+    <string name="downloadConfirmationSaveFileTitle">Spremi %1$s</string>
+    <string name="downloadConfirmationKeepBothFilesText">Zadrži oboje</string>
+    <string name="downloadConfirmationReplaceOldFileText">Zamijeniti</string>
+    <string name="downloadConfirmationOpenFileText">Otvorena</string>
+    <string name="downloadConfirmationUnableToOpenFileText">Datoteka se ne može otvoriti</string>
+    <string name="downloadConfirmationUnableToDeleteFileText">Staru datoteku nije moguće izbrisati</string>
+
+    <!-- Change Icon Activity -->
+    <string name="changeIconActivityTitle">Ikona aplikacije</string>
+    <string name="changeIconCtaLabel">Promijeni ikonu aplikacije</string>
+    <string name="changeIconCtaAccept">Primijeni</string>
+    <string name="changeIconCtaCancel">Otkaži</string>
+    <string name="changeIconDialogTitle">Primijeniti novu ikonu?</string>
+    <string name="changeIconDialogMessage">Aplikacija se može zatvoriti radi primjene promjena. Vratite se nakon što ste se divili svojoj lijepoj novoj ikoni.</string>
+
+    <!-- New dashboard / menu buttons -->
+    <string name="manageWhitelist">Upravljajte popisom dopuštenih</string>
+    <string name="reportBrokenSite">Prijavi neispravnu web stranicu</string>
+
+    <!-- Dialogs -->
+    <string name="dialogAddTitle">Dodati</string>
+    <string name="dialogEditTitle">Uredi</string>
+
+    <!-- Whitelist -->
+    <string name="whitelisetActivityTitle">Popis dopuštenih</string>
+    <string name="whitelistAdd">Dodaj u popis dopuštenih</string>
+    <string name="whitelistRemove">Ukloni s popisa dopuštenih</string>
+    <string name="whitelistEntryOverflowContentDescription">Dodatne mogućnosti za unos u popis dopuštenih %s</string>
+    <string name="whitelistEntryDeleteConfirmMessage">Jeste li sigurni da želite izbrisati &lt;b&gt;%s&lt;/b&gt; s popisa dopuštenih?</string>
+    <string name="whitelistExplanation">Web lokacije sa popisa dopuštenih neće biti nadograđene Zaštitom privatnosti</string>
+    <string name="whitelistNoEntries">Još nema lokacija na popisu dopuštenih</string>
+    <string name="whitelistDomainHint">www.example.com</string>
+    <string name="whitelistFormatError">Nije moguće spremiti, unesite domenu kao <b>example.com</b>
+  </string>
+
+    <!-- Settings -->
+    <string name="settingsPrivacyProtectionWhitelist">Popis dopuštenih za zaštitu privatnosti</string>
+
+    <!-- Fireproof websites -->
+    <string name="fireproofWebsitesActivityTitle">Vatrootporne web stranice</string>
+    <string name="settingsFireproofWebsites">Vatrootporne web stranice</string>
+    <string name="fireproofWebsiteMenuTitle">Vatrootporna web stranica</string>
+    <string name="fireproofWebsiteSnackbarConfirmation">&lt;b&gt;%s&lt;/b&gt; je sada vatrootporan! Posjetite Postavke da biste saznali više.</string>
+    <string name="fireproofWebsiteSnackbarAction">Poništi</string>
+    <string name="fireproofWebsiteDeleteConfirmMessage">Jeste li sigurni da želite izbrisati &lt;b&gt;%s&lt;/b&gt;?</string>
+    <string name="fireproofWebsiteEmptyListHint">Još nema vatrootpornih web lokacija</string>
+    <string name="fireproofWebsiteFeatureDescription">Web stranice se oslanjaju na kolačiće kako biste ostali prijavljeni. Kada web stranicu učinite otpornom na vatru, kolačići se neće izbrisati i ostat ćete prijavljeni, čak i nakon upotrebe gumba Fire.</string>
+    <string name="fireproofWebsiteOverflowContentDescription">Dodatne mogućnosti za vatrootpornu web stranicu %s</string>
 </resources>

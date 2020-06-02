@@ -28,7 +28,6 @@ interface HttpsBloomFilterFactory {
     fun create(): BloomFilter?
 }
 
-
 class HttpsBloomFilterFactoryImpl @Inject constructor(private val dao: HttpsBloomFilterSpecDao, private val binaryDataStore: BinaryDataStore) :
     HttpsBloomFilterFactory {
 

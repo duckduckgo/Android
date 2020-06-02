@@ -36,7 +36,6 @@ class BloomFilter {
 
     private external fun createBloomFilterFromFile(path: String, maxItems: Int): Long
 
-
     fun add(element: String) {
         add(nativePointer, element)
     }

@@ -14,11 +14,24 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.global.image
+package com.duckduckgo.app.tabs.model
 
-import com.bumptech.glide.annotation.GlideModule
-import com.bumptech.glide.module.AppGlideModule
+import androidx.room.Entity
+import androidx.room.ForeignKey
+import androidx.room.Index
+import androidx.room.PrimaryKey
 
-
-@GlideModule
-class GlobalGlideModule : AppGlideModule()
+@Entity(
+    tableName = "tab_selection",
+    foreignKeys = [
+        ForeignKey(
+            entity = TabEntity::class,
+            parentColumns = ["tabId"],
+            childColumns = ["tabId"],
+            onDelete = ForeignKey.SET_NULL
+        )],
+    indices = [
+        Index("tabId")
+    ]
+)
+data class TabSelectionEntity(@PrimaryKey var id: Int = 1, var tabId: String?)

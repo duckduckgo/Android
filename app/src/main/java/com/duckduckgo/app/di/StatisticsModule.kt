@@ -34,7 +34,6 @@ import retrofit2.Retrofit
 import javax.inject.Named
 import javax.inject.Singleton
 
-
 @Module
 class StatisticsModule {
 

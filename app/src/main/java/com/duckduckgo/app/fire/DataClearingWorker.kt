@@ -29,7 +29,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 
-
 class DataClearingWorker(context: Context, workerParams: WorkerParameters) : CoroutineWorker(context, workerParams), CoroutineScope {
 
     lateinit var settingsDataStore: SettingsDataStore
@@ -88,4 +87,3 @@ class DataClearingWorker(context: Context, workerParams: WorkerParameters) : Cor
         const val WORK_REQUEST_TAG = "background-clear-data"
     }
 }
-

@@ -39,9 +39,7 @@ import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.Close
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.DisplayMessage
 import kotlinx.android.synthetic.main.activity_tab_switcher_bottom_bar_feature.tabsRecycler
 import kotlinx.android.synthetic.main.fragment_browser_tab.bottomNavigationBar
-import kotlinx.android.synthetic.main.layout_tabs_bottom_navigation_bar.bottomBarFireItem
-import kotlinx.android.synthetic.main.layout_tabs_bottom_navigation_bar.bottomBarNewTabItem
-import kotlinx.android.synthetic.main.layout_tabs_bottom_navigation_bar.bottomBarOverflowItem
+import kotlinx.android.synthetic.main.layout_tabs_bottom_navigation_bar.*
 import kotlinx.android.synthetic.main.popup_window_browser_menu.view.settingsPopupMenuItem
 import kotlinx.android.synthetic.main.popup_window_tabs_menu.view.closeAllTabs
 import kotlinx.coroutines.CoroutineScope

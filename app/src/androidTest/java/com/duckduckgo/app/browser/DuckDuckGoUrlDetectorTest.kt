@@ -71,4 +71,3 @@ class DuckDuckGoUrlDetectorTest {
         assertFalse(testee.isDuckDuckGoQueryUrl("https://example.com?q=test%20search"))
     }
 }
-

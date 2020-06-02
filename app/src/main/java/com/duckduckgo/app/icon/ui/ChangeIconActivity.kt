@@ -26,6 +26,8 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import kotlinx.android.synthetic.main.content_app_icons.appIconsList
 import kotlinx.android.synthetic.main.include_toolbar.toolbar
+import kotlinx.android.synthetic.main.content_app_icons.*
+import kotlinx.android.synthetic.main.include_toolbar.*
 
 class ChangeIconActivity : DuckDuckGoActivity() {
 
@@ -94,5 +96,3 @@ class ChangeIconActivity : DuckDuckGoActivity() {
         }
     }
 }
-
-
