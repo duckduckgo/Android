@@ -17,11 +17,17 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:padding="16dp">
+    android:padding="16dp"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/fireproofWebsiteToggleTitle"
+        style="@style/FireproofWebsiteTitle"
+        android:text="@string/fireproofWebsiteToogleTitle"/>
 
     <androidx.appcompat.widget.SwitchCompat
         android:id="@+id/fireproofWebsiteToggle"
-        style="@style/SettingsSwitch"
+        style="@style/FireproofWebsiteSwitch"
         android:text="@string/fireproofWebsiteToogleText"
         android:theme="@style/SettingsSwitchTheme" />
 </LinearLayout>

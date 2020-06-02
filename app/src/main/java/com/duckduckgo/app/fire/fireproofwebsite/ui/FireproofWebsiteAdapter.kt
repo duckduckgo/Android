@@ -85,8 +85,8 @@ class FireproofWebsiteAdapter(
 
     override fun getItemViewType(position: Int): Int {
         return when (position) {
-            0 -> TOGGLE_TYPE
-            1 -> DESCRIPTION_TYPE
+            0 -> DESCRIPTION_TYPE
+            1 -> TOGGLE_TYPE
             else -> getListItemType()
         }
     }
