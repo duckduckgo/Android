@@ -43,23 +43,6 @@ class VariantManagerTest {
         assertEquals(0, variant.features.size)
     }
 
-    // Bottom Bar Navigation Experiment
-
-    @Test
-    fun bottomBarNavigationControlVariantIsActiveAndHasNoFeatures() {
-        val variant = variants.first { it.key == "mb" }
-        assertEqualsDouble(1.0, variant.weight)
-        assertEquals(0, variant.features.size)
-    }
-
-    @Test
-    fun bottomBarNavigationVariantIsActiveAndHasBottomBarNavigationFeature() {
-        val variant = variants.first { it.key == "mk" }
-        assertEqualsDouble(1.0, variant.weight)
-        assertEquals(1, variant.features.size)
-        assertTrue(variant.hasFeature(BottomBarNavigation))
-    }
-
     @Test
     fun verifyNoDuplicateVariantNames() {
         val existingNames = mutableSetOf<String>()
