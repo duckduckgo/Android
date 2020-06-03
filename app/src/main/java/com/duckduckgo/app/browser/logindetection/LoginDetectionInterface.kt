@@ -26,8 +26,8 @@ const val LOGIN_DETECTION_INTERFACE_NAME = "LoginDetection"
 class LoginDetectionInterface(private val onLoginDetected: () -> Unit) {
 
     @JavascriptInterface
-    fun showToast(toast: String) {
-        Timber.i("LoginDetectionInterface $toast")
+    fun log(message: String) {
+        Timber.i("LoginDetectionInterface $message")
     }
 
     @JavascriptInterface

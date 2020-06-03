@@ -1,4 +1,4 @@
-LoginDetection.showToast("installing loginDetection.js - IN");
+LoginDetection.log("installing loginDetection.js - IN");
 
 function loginFormDetected() {
     try {
@@ -11,7 +11,7 @@ function inputVisible(input) {
 }
 
 function checkIsLoginForm(form) {
-    LoginDetection.showToast("checking form " + form);
+    LoginDetection.log("checking form " + form);
 
     var inputs = form.getElementsByTagName("input");
     if (!inputs) {
@@ -21,13 +21,13 @@ function checkIsLoginForm(form) {
     for (var i = 0; i < inputs.length; i++) {
         var input = inputs.item(i);
         if (input.type == "password" && inputVisible(input)) {
-            LoginDetection.showToast("found password in form " + form);
+            LoginDetection.log("found password in form " + form);
             loginFormDetected();
             return true;
         }
     }
 
-    LoginDetection.showToast("no password field in form " + form);
+    LoginDetection.log("no password field in form " + form);
     return false;
 }
 
@@ -36,11 +36,11 @@ function submitHandler(event) {
 }
 
 function scanForForms() {
-    LoginDetection.showToast("Scanning for forms");
+    LoginDetection.log("Scanning for forms");
 
     var forms = document.forms;
     if (!forms || forms.length === 0) {
-        LoginDetection.showToast("No forms found");
+        LoginDetection.log("No forms found");
         return;
     }
 
@@ -48,16 +48,16 @@ function scanForForms() {
         var form = forms[i];
         form.removeEventListener("submit", submitHandler);
         form.addEventListener("submit", submitHandler);
-        LoginDetection.showToast("adding form handler " + i);
+        LoginDetection.log("adding form handler " + i);
     }
 }
 
 function scanForPasswordField() {
-    LoginDetection.showToast("Scanning for password");
+    LoginDetection.log("Scanning for password");
 
     var forms = document.forms;
     if (!forms || forms.length === 0) {
-        LoginDetection.showToast("No forms found");
+        LoginDetection.log("No forms found");
         return;
     }
 
@@ -71,7 +71,7 @@ function scanForPasswordField() {
 }
 
 window.addEventListener("DOMContentLoaded", function(event) {
-    LoginDetection.showToast("Adding to DOM");
+    LoginDetection.log("Adding to DOM");
     setTimeout(scanForForms, 1000);
 });
 
@@ -80,4 +80,4 @@ window.addEventListener("beforeunload", scanForForms);
 
 window.addEventListener("submit", submitHandler);
 
-LoginDetection.showToast("installing loginDetection.js - OUT");
+LoginDetection.log("installing loginDetection.js - OUT");
