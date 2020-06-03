@@ -294,18 +294,13 @@ class UriStringTest {
     }
 
     @Test
-    fun whenGivenNuThenIsWebUrlIsFalse() {
-        assertFalse(isWebUrl("33"))
-    }
-
-    @Test
     fun whenParamExistsThenItsReturned() {
         val parameter = extractURLParameter("q", "https://duckduckgo.com/?q=test&iar=web&ia=web&atb=v222-7zg&t=ddg_android)")
         assertEquals(parameter, "test")
     }
 
     @Test
-    fun whenParamDoesNotExistsThenRulReturned() {
+    fun whenParamDoesNotExistsThenUrlIsReturned() {
         val parameter = extractURLParameter("f", "https://duckduckgo.com/?q=test&iar=web&ia=web&atb=v222-7zg&t=ddg_android)")
         assertEquals(parameter, "https://duckduckgo.com/?q=test&iar=web&ia=web&atb=v222-7zg&t=ddg_android)")
     }
