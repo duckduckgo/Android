@@ -23,13 +23,13 @@ import android.view.ViewGroup
 import android.widget.CompoundButton
 import android.widget.ImageView
 import android.widget.PopupMenu
-import androidx.appcompat.widget.SwitchCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
 import com.duckduckgo.app.fire.fireproofwebsite.data.website
 import com.duckduckgo.app.global.faviconLocation
 import com.duckduckgo.app.global.image.GlideApp
+import com.duckduckgo.app.global.view.quietlySetIsChecked
 import kotlinx.android.synthetic.main.view_fireproof_title.view.*
 import kotlinx.android.synthetic.main.view_fireproof_website_entry.view.*
 import kotlinx.android.synthetic.main.view_fireproof_website_toggle.view.*
@@ -133,12 +133,6 @@ class FireproofWebsiteAdapter(
             FIREPROOF_WEBSITE_TYPE
         }
     }
-}
-
-private fun SwitchCompat.quietlySetIsChecked(newCheckedState: Boolean, changeListener: CompoundButton.OnCheckedChangeListener?) {
-    setOnCheckedChangeListener(null)
-    isChecked = newCheckedState
-    setOnCheckedChangeListener(changeListener)
 }
 
 sealed class FireproofWebSiteViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
