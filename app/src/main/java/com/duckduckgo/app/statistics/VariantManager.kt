@@ -19,7 +19,6 @@ package com.duckduckgo.app.statistics
 import androidx.annotation.WorkerThread
 import com.duckduckgo.app.statistics.VariantManager.Companion.DEFAULT_VARIANT
 import com.duckduckgo.app.statistics.VariantManager.Companion.referrerVariant
-import com.duckduckgo.app.statistics.VariantManager.VariantFeature.BottomBarNavigation
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import timber.log.Timber
 import java.util.*
@@ -29,7 +28,6 @@ interface VariantManager {
 
     // variant-dependant features listed here
     sealed class VariantFeature {
-        object BottomBarNavigation : VariantFeature()
         object DripNotification : VariantFeature()
         object Day1PrivacyNotification : VariantFeature()
         object Day3ClearDataNotification : VariantFeature()
@@ -51,10 +49,6 @@ interface VariantManager {
             // the future if we can filter by app version
             Variant(key = "sc", weight = 0.0, features = emptyList(), filterBy = { noFilter() }),
             Variant(key = "se", weight = 0.0, features = emptyList(), filterBy = { noFilter() }),
-
-            // Bottom Bar Navigation Experiment
-            Variant(key = "mb", weight = 0.0, features = emptyList(), filterBy = { noFilter() }),
-            Variant(key = "mk", weight = 0.0, features = listOf(BottomBarNavigation), filterBy = { noFilter() }),
 
             // Notification Drip Experiment
             Variant(
