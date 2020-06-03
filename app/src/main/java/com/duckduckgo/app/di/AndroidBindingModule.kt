@@ -45,7 +45,6 @@ import com.duckduckgo.app.settings.SettingsActivity
 import com.duckduckgo.app.survey.ui.SurveyActivity
 import com.duckduckgo.app.systemsearch.SystemSearchActivity
 import com.duckduckgo.app.tabs.ui.TabSwitcherActivity
-import com.duckduckgo.app.tabs.ui.TabSwitcherBottomBarFeatureActivity
 import com.duckduckgo.app.widget.ui.AddWidgetInstructionsActivity
 import dagger.Module
 import dagger.android.ContributesAndroidInjector

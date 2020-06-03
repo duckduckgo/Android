@@ -127,7 +127,6 @@ import org.jetbrains.anko.longToast
 import org.jetbrains.anko.share
 import timber.log.Timber
 import java.io.File
-import java.util.*
 import javax.inject.Inject
 import kotlin.concurrent.thread
 import kotlin.coroutines.CoroutineContext
@@ -294,7 +293,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
         configureAutoComplete()
         configureKeyboardAwareLogoAnimation()
 
-        decorateWithFeatures()
+        decorator.decorateWithFeatures()
 
         animatorHelper.setListener(this)
 
@@ -719,10 +718,6 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
             }
         )
         autoCompleteSuggestionsList.adapter = autoCompleteSuggestionsAdapter
-    }
-
-    private fun decorateWithFeatures() {
-        decorator.decorate()
     }
 
     private fun configurePrivacyGrade() {
@@ -1265,18 +1260,14 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
 
     inner class BrowserTabFragmentDecorator {
 
-        fun decorate() {
+        fun decorateWithFeatures() {
             decorateToolbarWithButtons()
             createPopupMenu()
             configureShowTabSwitcherListener()
             configureLongClickOpensNewTabListener()
         }
 
-        fun decorateToolbarMenus(viewState: BrowserViewState) {
-            decorator.updateToolbarActionsVisibility(viewState)
-        }
-
-        private fun updateToolbarActionsVisibility(viewState: BrowserViewState) {
+        fun updateToolbarActionsVisibility(viewState: BrowserViewState) {
             tabsButton?.isVisible = viewState.showTabsButton
             fireMenuButton?.isVisible = viewState.showFireButton
             menuButton?.isVisible = viewState.showMenuButton
@@ -1569,7 +1560,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
                 searchIcon?.isVisible = true
             }
 
-            decorator.decorateToolbarMenus(viewState)
+            decorator.updateToolbarActionsVisibility(viewState)
         }
 
         fun renderFindInPageState(viewState: FindInPageViewState) {

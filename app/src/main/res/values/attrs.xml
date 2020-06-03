@@ -70,8 +70,4 @@
     <attr name="privacyDashboardLogoLetterTextColor" format="color" />
     <attr name="fireproofWebsiteTitleTextColor" format="color" />
 
-    <declare-styleable name="BottomNavigationBar">
-        <attr name="layoutResource" format="reference" />
-    </declare-styleable>
-
 </resources>
