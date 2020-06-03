@@ -21,6 +21,7 @@
     <string name="enable">Enable</string>
 
     <!-- Fireproof websites -->
+    <string name="fireproofWebsiteItemsSectionTitle">Websites</string>
     <string name="fireproofWebsiteToogleText">When Signing In</string>
     <string name="fireproofWebsiteToogleTitle">Ask to Fireproof Websites</string>
 </resources>

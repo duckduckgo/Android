@@ -30,6 +30,8 @@ import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
 import com.duckduckgo.app.fire.fireproofwebsite.data.website
 import com.duckduckgo.app.global.faviconLocation
 import com.duckduckgo.app.global.image.GlideApp
+import kotlinx.android.synthetic.main.settings_automatically_clear_when_fragment.view.*
+import kotlinx.android.synthetic.main.view_fireproof_title.view.*
 import kotlinx.android.synthetic.main.view_fireproof_website_entry.view.*
 import kotlinx.android.synthetic.main.view_fireproof_website_toggle.view.*
 import timber.log.Timber
@@ -64,10 +66,23 @@ class FireproofWebsiteAdapter(
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FireproofWebSiteViewHolder {
         val inflater = LayoutInflater.from(parent.context)
         return when (viewType) {
+            DESCRIPTION_TYPE -> {
+                val view = inflater.inflate(R.layout.view_fireproof_website_description, parent, false)
+                FireproofWebSiteViewHolder.FireproofWebsiteSimpleViewViewHolder(view)
+            }
             TOGGLE_TYPE -> {
                 val view = inflater.inflate(R.layout.view_fireproof_website_toggle, parent, false)
                 FireproofWebSiteViewHolder.FireproofWebsiteToggleViewHolder(view,
                     CompoundButton.OnCheckedChangeListener { _, isChecked -> viewModel.onUserToggleLoginDetection(isChecked) })
+            }
+            DIVIDER_TYPE -> {
+                val view = inflater.inflate(R.layout.view_fireproof_divider, parent, false)
+                FireproofWebSiteViewHolder.FireproofWebsiteSimpleViewViewHolder(view)
+            }
+            SECTION_TITLE_TYPE -> {
+                val view = inflater.inflate(R.layout.view_fireproof_title, parent, false)
+                view.fireproofWebsiteSectionTitle.setText(R.string.fireproofWebsiteItemsSectionTitle)
+                FireproofWebSiteViewHolder.FireproofWebsiteSimpleViewViewHolder(view)
             }
             FIREPROOF_WEBSITE_TYPE -> {
                 val view = inflater.inflate(R.layout.view_fireproof_website_entry, parent, false)
@@ -77,31 +92,9 @@ class FireproofWebsiteAdapter(
                 val view = inflater.inflate(R.layout.view_fireproof_website_empty_hint, parent, false)
                 FireproofWebSiteViewHolder.FireproofWebsiteSimpleViewViewHolder(view)
             }
-            DESCRIPTION_TYPE -> {
-                val view = inflater.inflate(R.layout.view_fireproof_website_description, parent, false)
-                FireproofWebSiteViewHolder.FireproofWebsiteSimpleViewViewHolder(view)
-            }
-            DIVIDER_TYPE -> {
-                val view = inflater.inflate(R.layout.view_fireproof_divider, parent, false)
-                FireproofWebSiteViewHolder.FireproofWebsiteSimpleViewViewHolder(view)
-            }
-            SECTION_TITLE_TYPE -> {
-                val view = inflater.inflate(R.layout.view_fireproof_title, parent, false)
-                FireproofWebSiteViewHolder.FireproofWebsiteSimpleViewViewHolder(view)
-            }
             else -> throw IllegalArgumentException("viewType not found")
         }
     }
-
-/*    override fun getItemViewType(position: Int): Int {
-        return when (position) {
-            0 -> DESCRIPTION_TYPE
-            1 -> TOGGLE_TYPE
-            2 -> DIVIDER_TYPE
-            3 -> SECTION_TITLE_TYPE
-            else -> getListItemType()
-        }
-    }*/
 
     override fun getItemViewType(position: Int): Int {
         return if (position < headerElements.size) {
@@ -154,6 +147,7 @@ sealed class FireproofWebSiteViewHolder(itemView: View) : RecyclerView.ViewHolde
     class FireproofWebsiteToggleViewHolder(itemView: View, private val listener: CompoundButton.OnCheckedChangeListener) :
         FireproofWebSiteViewHolder(itemView) {
         fun bind(loginDetectionEnabled: Boolean) {
+            itemView.fireproofWebsiteSectionTitle.setText(R.string.fireproofWebsiteToogleTitle)
             itemView.fireproofWebsiteToggle.quietlySetIsChecked(loginDetectionEnabled, listener)
         }
     }

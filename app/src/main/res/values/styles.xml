@@ -339,8 +339,8 @@
     <style name="FireproofWebsiteGroupDivider">
         <item name="android:background">?attr/settingsDividerColor</item>
         <item name="android:layout_width">match_parent</item>
-        <item name="android:layout_marginTop">25dp</item>
-        <item name="android:layout_marginBottom">25dp</item>
+        <item name="android:layout_marginTop">24dp</item>
+        <item name="android:layout_marginBottom">24dp</item>
         <item name="android:layout_height">1dp</item>
     </style>
 

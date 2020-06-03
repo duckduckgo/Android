@@ -14,25 +14,20 @@
   ~ limitations under the License.
   -->
 
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<com.google.android.material.textview.MaterialTextView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/fireproofWebsiteDescription"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:paddingTop="12dp"
-    android:paddingBottom="12dp"
+    android:fontFamily="sans-serif"
+    android:justificationMode="inter_word"
+    android:lineSpacingExtra="4sp"
     android:paddingStart="16dp"
-    android:paddingEnd="16dp">
-
-    <com.google.android.material.textview.MaterialTextView
-        android:id="@+id/fireproofWebsiteDescription"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:fontFamily="sans-serif"
-        android:lineSpacingExtra="4sp"
-        android:textColor="?attr/settingsMinorTextColor"
-        android:textSize="14sp"
-        android:textStyle="normal"
-        android:justificationMode="inter_word"
-        android:text="@string/fireproofWebsiteFeatureDescription"
-        tools:text="Lorem ipsum dolor sit amet" />
-</LinearLayout>
+    android:paddingTop="12dp"
+    android:paddingEnd="16dp"
+    android:paddingBottom="12dp"
+    android:text="@string/fireproofWebsiteFeatureDescription"
+    android:textColor="?attr/settingsMinorTextColor"
+    android:textSize="14sp"
+    android:textStyle="normal"
+    tools:text="Lorem ipsum dolor sit amet" />
