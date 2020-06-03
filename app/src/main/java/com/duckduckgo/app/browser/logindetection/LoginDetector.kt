@@ -27,10 +27,16 @@ import javax.inject.Inject
 
 class LoginDetector @Inject constructor(private val settingsDataStore: SettingsDataStore) {
 
+    companion object {
+        const val HTTP_POST = "POST"
+    }
+
     sealed class WebNavigationEvent {
         data class OnPageStarted(val webView: WebView) : WebNavigationEvent()
         data class ShouldInterceptRequest(val webView: WebView, val request: WebResourceRequest) : WebNavigationEvent()
     }
+
+    private val loginPathRegex = Regex("login|sign-in|signin|sessions")
 
     fun addLoginDetection(webView: WebView, onLoginDetected: () -> Unit) {
         webView.addJavascriptInterface(
@@ -44,26 +50,26 @@ class LoginDetector @Inject constructor(private val settingsDataStore: SettingsD
             when (event) {
                 is WebNavigationEvent.OnPageStarted -> injectLoginFormDetectionJS(event.webView)
                 is WebNavigationEvent.ShouldInterceptRequest -> {
-                    if (interceptPost(event.request)) {
-                        scanPasswordFields(event.webView)
+                    if (evaluateIfLoginPostRequest(event.request)) {
+                        scanForPasswordFields(event.webView)
                     }
                 }
             }
         }
     }
 
-    private fun interceptPost(request: WebResourceRequest): Boolean {
-        if (request.method == "POST") {
-            Timber.i("LoginDetectionInterface evaluate ${request.url}")
-            if (request.url?.path?.contains(Regex("login|sign-in|signin|sessions")) == true) {
-                Timber.v("LoginDetectionInterface post login DETECTED")
+    private fun evaluateIfLoginPostRequest(request: WebResourceRequest): Boolean {
+        if (request.method == HTTP_POST) {
+            Timber.i("LoginDetector: evaluate ${request.url}")
+            if (request.url?.path?.contains(loginPathRegex) == true) {
+                Timber.v("LoginDetector: post login DETECTED")
                 return true
             }
         }
         return false
     }
 
-    private suspend fun scanPasswordFields(webView: WebView) {
+    private suspend fun scanForPasswordFields(webView: WebView) {
         return withContext(Dispatchers.Main) {
             webView.evaluateJavascript("javascript:scanForPasswordField()", null)
         }
