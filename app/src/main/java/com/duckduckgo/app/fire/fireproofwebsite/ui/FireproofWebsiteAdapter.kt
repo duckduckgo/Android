@@ -44,12 +44,12 @@ class FireproofWebsiteAdapter(
         const val EMPTY_STATE_TYPE = 2
         const val TOGGLE_TYPE = 3
         const val DIVIDER_TYPE = 4
+        const val SECTION_TITLE_TYPE = 5
 
-        const val TOGGLE_ITEM_SIZE = 1
-        const val DIVIDER_SIZE = 1
-        const val DESCRIPTION_ITEM_SIZE = 1
         const val EMPTY_HINT_ITEM_SIZE = 1
     }
+
+    private val headerElements = listOf(DESCRIPTION_TYPE, TOGGLE_TYPE, DIVIDER_TYPE, SECTION_TITLE_TYPE)
 
     var fireproofWebsites: List<FireproofWebsiteEntity> = emptyList()
         set(value) {
@@ -75,26 +75,39 @@ class FireproofWebsiteAdapter(
             }
             EMPTY_STATE_TYPE -> {
                 val view = inflater.inflate(R.layout.view_fireproof_website_empty_hint, parent, false)
-                FireproofWebSiteViewHolder.FireproofWebsiteEmptyHintViewHolder(view)
+                FireproofWebSiteViewHolder.FireproofWebsiteSimpleViewViewHolder(view)
             }
             DESCRIPTION_TYPE -> {
                 val view = inflater.inflate(R.layout.view_fireproof_website_description, parent, false)
-                FireproofWebSiteViewHolder.FireproofWebsiteDescriptionViewHolder(view)
+                FireproofWebSiteViewHolder.FireproofWebsiteSimpleViewViewHolder(view)
             }
             DIVIDER_TYPE -> {
                 val view = inflater.inflate(R.layout.view_fireproof_divider, parent, false)
-                FireproofWebSiteViewHolder.FireproofWebsiteDividerViewHolder(view)
+                FireproofWebSiteViewHolder.FireproofWebsiteSimpleViewViewHolder(view)
+            }
+            SECTION_TITLE_TYPE -> {
+                val view = inflater.inflate(R.layout.view_fireproof_title, parent, false)
+                FireproofWebSiteViewHolder.FireproofWebsiteSimpleViewViewHolder(view)
             }
             else -> throw IllegalArgumentException("viewType not found")
         }
     }
 
-    override fun getItemViewType(position: Int): Int {
+/*    override fun getItemViewType(position: Int): Int {
         return when (position) {
             0 -> DESCRIPTION_TYPE
             1 -> TOGGLE_TYPE
             2 -> DIVIDER_TYPE
+            3 -> SECTION_TITLE_TYPE
             else -> getListItemType()
+        }
+    }*/
+
+    override fun getItemViewType(position: Int): Int {
+        return if (position < headerElements.size) {
+            headerElements[position]
+        } else {
+            getListItemType()
         }
     }
 
@@ -117,7 +130,7 @@ class FireproofWebsiteAdapter(
         fireproofWebsites.size
     }
 
-    private fun itemsOnTopOfList() = DESCRIPTION_ITEM_SIZE + TOGGLE_ITEM_SIZE + DIVIDER_SIZE
+    private fun itemsOnTopOfList() = headerElements.size
 
     private fun getWebsiteItemPosition(position: Int) = position - itemsOnTopOfList()
 
@@ -145,11 +158,7 @@ sealed class FireproofWebSiteViewHolder(itemView: View) : RecyclerView.ViewHolde
         }
     }
 
-    class FireproofWebsiteDividerViewHolder(itemView: View) : FireproofWebSiteViewHolder(itemView)
-
-    class FireproofWebsiteDescriptionViewHolder(itemView: View) : FireproofWebSiteViewHolder(itemView)
-
-    class FireproofWebsiteEmptyHintViewHolder(itemView: View) : FireproofWebSiteViewHolder(itemView)
+    class FireproofWebsiteSimpleViewViewHolder(itemView: View) : FireproofWebSiteViewHolder(itemView)
 
     class FireproofWebsiteItemViewHolder(itemView: View, private val viewModel: FireproofWebsitesViewModel) : FireproofWebSiteViewHolder(itemView) {
 
