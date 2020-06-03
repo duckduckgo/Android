@@ -25,7 +25,7 @@ import androidx.annotation.VisibleForTesting
 import androidx.core.app.NotificationManagerCompat
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.icon.ui.ChangeIconActivity
-import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEvent.CUSTOMIZE_ICON_FEATURE
+import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEvent.CHANGE_ICON_FEATURE
 import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEvent.APP_LAUNCH
 import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEvent.CANCEL
 import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEvent.CLEAR_DATA_LAUNCH
@@ -71,7 +71,7 @@ class NotificationHandlerService : IntentService("NotificationHandlerService") {
             CLEAR_DATA_LAUNCH -> onClearDataLaunched(pixelSuffix)
             CANCEL -> onCancelled(pixelSuffix)
             WEBSITE -> onWebsiteNotification(intent, pixelSuffix)
-            CUSTOMIZE_ICON_FEATURE -> onCustomizeIconLaunched(pixelSuffix)
+            CHANGE_ICON_FEATURE -> onCustomizeIconLaunched(pixelSuffix)
         }
 
         if (intent.getBooleanExtra(NOTIFICATION_AUTO_CANCEL, true)) {
@@ -133,7 +133,7 @@ class NotificationHandlerService : IntentService("NotificationHandlerService") {
         const val CLEAR_DATA_LAUNCH = "com.duckduckgo.notification.launch.clearData"
         const val CANCEL = "com.duckduckgo.notification.cancel"
         const val WEBSITE = "com.duckduckgo.notification.website"
-        const val CUSTOMIZE_ICON_FEATURE = "com.duckduckgo.notification.app.feature.customizeIcon"
+        const val CHANGE_ICON_FEATURE = "com.duckduckgo.notification.app.feature.changeIcon"
     }
 
     companion object {

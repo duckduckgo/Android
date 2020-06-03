@@ -121,7 +121,7 @@ class NotificationModule {
             AppFeatureNotification.DRIP_B_1_TITLE,
             AppFeatureNotification.DRIP_B_1_DESCRIPTION,
             AppFeatureNotification.DRIP_B_1_PIXEL,
-            NotificationHandlerService.NotificationEvent.CUSTOMIZE_ICON_FEATURE
+            NotificationHandlerService.NotificationEvent.CHANGE_ICON_FEATURE
         )
     }
 
