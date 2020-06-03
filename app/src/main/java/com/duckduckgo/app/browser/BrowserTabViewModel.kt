@@ -272,6 +272,7 @@ class BrowserTabViewModel(
     private lateinit var tabId: String
     private var webNavigationState: WebNavigationState? = null
     private var httpsUpgraded = false
+    private val browserStateModifier = BrowserStateModifier()
     private val fireproofWebsitesObserver = Observer<List<FireproofWebsiteEntity>> {
         browserViewState.value = currentBrowserViewState().copy(canFireproofSite = canFireproofWebsite())
     }
@@ -460,7 +461,8 @@ class BrowserTabViewModel(
 
     fun onUserPressedForward() {
         if (!currentBrowserViewState().browserShowing) {
-            browserViewState.value = currentBrowserViewState().copy(browserShowing = true)
+            browserViewState.value = browserStateModifier.copyForBrowserShowing(currentBrowserViewState())
+            findInPageViewState.value = currentFindInPageViewState().copy(canFindInPage = true)
             command.value = Refresh
         } else {
             command.value = NavigateForward
@@ -509,13 +511,14 @@ class BrowserTabViewModel(
     private fun navigateHome() {
         site = null
         onSiteChanged()
+        webNavigationState = null
 
-        browserViewState.value = currentBrowserViewState().copy(
-            browserShowing = false,
-            canGoBack = false,
-            canFireproofSite = false,
+        val browserState = browserStateModifier.copyForHomeShowing(currentBrowserViewState()).copy(
             canGoForward = currentGlobalLayoutState() !is Invalidated
         )
+        browserViewState.value = browserState
+
+        findInPageViewState.value = FindInPageViewState()
         omnibarViewState.value = currentOmnibarViewState().copy(omnibarText = "", shouldMoveCaretToEnd = false)
         loadingViewState.value = currentLoadingViewState().copy(isLoading = false)
 

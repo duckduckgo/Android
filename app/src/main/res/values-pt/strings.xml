@@ -73,9 +73,10 @@
     <string name="closeTab">Fechar separador</string>
 
     <!-- Privacy Dashboard Activities -->
+    <string name="privacyProtectionToggle">Proteção de Privacidade do Site</string>
+    <string name="privacyProtectionEnabled">PROTEÇÃO DO SITE ATIVADA</string>
+    <string name="privacyProtectionDisabled">PROTEÇÃO DO SITE DESATIVADA</string>
     <string name="privacyDashboardActivityTitle">Painel de privacidade</string>
-    <string name="privacyProtectionEnabled">PROTEÇÃO DE PRIVACIDADE ATIVADA</string>
-    <string name="privacyProtectionDisabled">PROTEÇÃO DE PRIVACIDADE DESATIVADA</string>
     <string name="privacyProtectionUpgraded" tools:ignore="TypographyQuotes">MELHORADO DE &lt;img src="%d" /&gt; PARA &lt;img src="%d" /&gt;</string>
     <string name="privacyGradeContentDescription">Grau de privacidade</string>
 
@@ -121,7 +122,6 @@
     <string name="practicesTosdrLink">As práticas de privacidade resultam de <b><u>ToS;DR</u></b></string>
     <string name="practicesIconContentGood">Ícone de boas práticas</string>
     <string name="practicesIconContentBad">Ícone de más práticas</string>
-    <string name="privacyProtectionToggle">Proteção da privacidade</string>
 
     <string name="networkTrackerSummaryHeader">PRINCIPAIS INFRATORES DA REDE DE RASTREAMENTO</string>
     <string name="networkTrackerSummaryNotReady">Ainda estamos a recolher dados para mostrar quantos rastreadores bloqueámos.</string>
@@ -396,4 +396,55 @@
     <string name="daxNonSerpCtaText">Enquanto toca e desliza, eu bloqueio rastreadores irritantes. &lt;br/&gt;&lt;br/&gt;Prossiga - continue a navegar!</string>
     <string name="daxMainNetworkOwnedCtaText">Atenção! %s é propriedade de %s.Os rastreadores de &lt;br/&gt;&lt;br/&gt; %s estão ocultos em cerca de %s dos principais sites &#128561;, mas não se preocupe! &lt;br/&gt;&lt;br/&gt;Eu impeço %s de ver a sua atividade nesses sites.</string>
     <string name="daxMainNetworkCtaText">Atenção! %s é uma grande rede de rastreamento.&lt;br/&gt;&lt;br/&gt; Os seus rastreadores estão à espreita em cerca de %s dos principais sites &#128561;, mas não se preocupe! &lt;br/&gt;&lt;br/&gt;Eu impeço %s de ver a sua atividade nesses sites.</string>
+
+    <!-- Download Confirmation -->
+    <string name="downloadConfirmationContinue">Continuar</string>
+    <string name="downloadConfirmationSaveFileTitle">Guardar %1$s</string>
+    <string name="downloadConfirmationKeepBothFilesText">Manter os dois</string>
+    <string name="downloadConfirmationReplaceOldFileText">Substituir</string>
+    <string name="downloadConfirmationOpenFileText">Abrir</string>
+    <string name="downloadConfirmationUnableToOpenFileText">Não foi possível abrir o ficheiro</string>
+    <string name="downloadConfirmationUnableToDeleteFileText">Não foi possível eliminar o ficheiro antigo</string>
+
+    <!-- Change Icon Activity -->
+    <string name="changeIconActivityTitle">Ícone da aplicação</string>
+    <string name="changeIconCtaLabel">Alterar ícone da aplicação</string>
+    <string name="changeIconCtaAccept">Aplicar</string>
+    <string name="changeIconCtaCancel">Cancelar</string>
+    <string name="changeIconDialogTitle">Aplicar novo ícone?</string>
+    <string name="changeIconDialogMessage">A aplicação pode fechar para aplicar as alterações. Volte depois de admirar o seu belo e novo ícone.</string>
+
+    <!-- New dashboard / menu buttons -->
+    <string name="manageWhitelist">Gerir a lista de permissões</string>
+    <string name="reportBrokenSite">Denunciar site danificado</string>
+
+    <!-- Dialogs -->
+    <string name="dialogAddTitle">Adicionar</string>
+    <string name="dialogEditTitle">Editar</string>
+
+    <!-- Whitelist -->
+    <string name="whitelisetActivityTitle">Lista de permissões</string>
+    <string name="whitelistAdd">Adicionar à lista de permissões</string>
+    <string name="whitelistRemove">Remover da lista de permissões</string>
+    <string name="whitelistEntryOverflowContentDescription">Mais opções para a entrada da lista de permissões %s</string>
+    <string name="whitelistEntryDeleteConfirmMessage">Tem a certeza de que deseja eliminar &lt;b&gt;%s&lt;/b&gt; da lista de permissões?</string>
+    <string name="whitelistExplanation">Esses sites da lista de permissões não serão atualizados pela Proteção de Privacidade</string>
+    <string name="whitelistNoEntries">Ainda não há sites na lista de permissões</string>
+    <string name="whitelistDomainHint">www.example.com</string>
+    <string name="whitelistFormatError">Não foi possível guardar, insira um domínio como <b>example.com</b>
+  </string>
+
+    <!-- Settings -->
+    <string name="settingsPrivacyProtectionWhitelist">Lista de permissões de proteção de privacidade</string>
+
+    <!-- Fireproof websites -->
+    <string name="fireproofWebsitesActivityTitle">Sites à prova de fogo</string>
+    <string name="settingsFireproofWebsites">Sites à prova de fogo</string>
+    <string name="fireproofWebsiteMenuTitle">Site à prova de fogo</string>
+    <string name="fireproofWebsiteSnackbarConfirmation">&lt;b&gt;%s&lt;/b&gt; já é à prova de fogo! Aceda a Configurações para saber mais.</string>
+    <string name="fireproofWebsiteSnackbarAction">Anular</string>
+    <string name="fireproofWebsiteDeleteConfirmMessage">Tem a certeza de que deseja eliminar &lt;b&gt;%s&lt;/b&gt;?</string>
+    <string name="fireproofWebsiteEmptyListHint">Ainda não há sites à prova de fogo</string>
+    <string name="fireproofWebsiteFeatureDescription">Os sites contam com cookies para o manter com sessão iniciada. Quando protege um site, os cookies não serão apagados e permanecerá ligado, mesmo depois de usar o botão de disparo.</string>
+    <string name="fireproofWebsiteOverflowContentDescription">Mais opções para o site à prova de fogo %s</string>
 </resources>

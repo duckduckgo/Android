@@ -29,7 +29,6 @@ interface VariantManager {
 
     // variant-dependant features listed here
     sealed class VariantFeature {
-        object BottomBarNavigation : VariantFeature()
         object SerpHeaderQueryReplacement : VariantFeature()
         object SerpHeaderRemoval : VariantFeature()
     }
@@ -46,18 +45,6 @@ interface VariantManager {
             // the future if we can filter by app version
             Variant(key = "sc", weight = 0.0, features = emptyList(), filterBy = { noFilter() }),
             Variant(key = "se", weight = 0.0, features = emptyList(), filterBy = { noFilter() }),
-
-            // Bottom Bar Navigation Experiment
-            Variant(
-                key = "mb",
-                weight = 1.0,
-                features = emptyList(),
-                filterBy = { noFilter() }),
-            Variant(
-                key = "mk",
-                weight = 1.0,
-                features = listOf(BottomBarNavigation),
-                filterBy = { noFilter() }),
 
             // Single Search Bar Experiments
             Variant(
