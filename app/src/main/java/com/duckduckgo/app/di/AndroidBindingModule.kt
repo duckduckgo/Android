@@ -76,10 +76,6 @@ abstract class AndroidBindingModule {
 
     @ActivityScoped
     @ContributesAndroidInjector
-    abstract fun tabsExperimentActivity(): TabSwitcherBottomBarFeatureActivity
-
-    @ActivityScoped
-    @ContributesAndroidInjector
     abstract fun privacyDashboardActivity(): PrivacyDashboardActivity
 
     @ActivityScoped
