@@ -30,7 +30,6 @@ import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
 import com.duckduckgo.app.fire.fireproofwebsite.data.website
 import com.duckduckgo.app.global.faviconLocation
 import com.duckduckgo.app.global.image.GlideApp
-import kotlinx.android.synthetic.main.settings_automatically_clear_when_fragment.view.*
 import kotlinx.android.synthetic.main.view_fireproof_title.view.*
 import kotlinx.android.synthetic.main.view_fireproof_website_entry.view.*
 import kotlinx.android.synthetic.main.view_fireproof_website_toggle.view.*
@@ -51,7 +50,7 @@ class FireproofWebsiteAdapter(
         const val EMPTY_HINT_ITEM_SIZE = 1
     }
 
-    private val headerElements = listOf(DESCRIPTION_TYPE, TOGGLE_TYPE, DIVIDER_TYPE, SECTION_TITLE_TYPE)
+    private val sortedHeaderElements = listOf(DESCRIPTION_TYPE, TOGGLE_TYPE, DIVIDER_TYPE, SECTION_TITLE_TYPE)
 
     var fireproofWebsites: List<FireproofWebsiteEntity> = emptyList()
         set(value) {
@@ -97,8 +96,8 @@ class FireproofWebsiteAdapter(
     }
 
     override fun getItemViewType(position: Int): Int {
-        return if (position < headerElements.size) {
-            headerElements[position]
+        return if (position < sortedHeaderElements.size) {
+            sortedHeaderElements[position]
         } else {
             getListItemType()
         }
@@ -123,7 +122,7 @@ class FireproofWebsiteAdapter(
         fireproofWebsites.size
     }
 
-    private fun itemsOnTopOfList() = headerElements.size
+    private fun itemsOnTopOfList() = sortedHeaderElements.size
 
     private fun getWebsiteItemPosition(position: Int) = position - itemsOnTopOfList()
 
