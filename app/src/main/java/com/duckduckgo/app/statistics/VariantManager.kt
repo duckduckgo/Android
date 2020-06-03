@@ -19,7 +19,6 @@ package com.duckduckgo.app.statistics
 import androidx.annotation.WorkerThread
 import com.duckduckgo.app.statistics.VariantManager.Companion.DEFAULT_VARIANT
 import com.duckduckgo.app.statistics.VariantManager.Companion.referrerVariant
-import com.duckduckgo.app.statistics.VariantManager.VariantFeature.BottomBarNavigation
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import timber.log.Timber
 import java.util.*
@@ -47,19 +46,20 @@ interface VariantManager {
             Variant(key = "se", weight = 0.0, features = emptyList(), filterBy = { noFilter() }),
 
             // Single Search Bar Experiments
+            // Disabled until Drip Notifications Experiments are completed
             Variant(
                 key = "zg",
-                weight = 1.0,
+                weight = 0.0,
                 features = emptyList(),
                 filterBy = { noFilter() }),
             Variant(
                 key = "zh",
-                weight = 1.0,
+                weight = 0.0,
                 features = listOf(VariantFeature.SerpHeaderQueryReplacement),
                 filterBy = { noFilter() }),
             Variant(
                 key = "zi",
-                weight = 1.0,
+                weight = 0.0,
                 features = listOf(VariantFeature.SerpHeaderRemoval),
                 filterBy = { noFilter() })
 
