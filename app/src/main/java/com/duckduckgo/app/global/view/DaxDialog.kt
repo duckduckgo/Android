@@ -41,6 +41,7 @@ interface DaxDialog {
 interface DaxDialogListener {
     fun onDaxDialogDismiss()
     fun onDaxDialogPrimaryCtaClick()
+    fun onDaxDialogSecondaryCtaClick()
     fun onDaxDialogHideClick()
 }
 
@@ -52,6 +53,7 @@ class TypewriterDaxDialog : DialogFragment(), DaxDialog {
     private var toolbarDimmed: Boolean = true
     private var dismissible: Boolean = true
     private var typingDelayInMs: Long = DEFAULT_TYPING_DELAY
+    private var showHideButton: Boolean = true
 
     private var daxDialogListener: DaxDialogListener? = null
 
@@ -93,6 +95,9 @@ class TypewriterDaxDialog : DialogFragment(), DaxDialog {
             }
             if (containsKey(ARG_TYPING_DELAY)) {
                 typingDelayInMs = getLong(ARG_TYPING_DELAY)
+            }
+            if (containsKey(ARG_SHOW_HIDE_BUTTON)) {
+                showHideButton = getBoolean(ARG_SHOW_HIDE_BUTTON)
             }
         }
     }
@@ -150,6 +155,12 @@ class TypewriterDaxDialog : DialogFragment(), DaxDialog {
             dismiss()
         }
 
+        secondaryCta.setOnClickListener {
+            dialogText.cancelAnimation()
+            daxDialogListener?.onDaxDialogSecondaryCtaClick()
+            dismiss()
+        }
+
         if (dismissible) {
             dialogContainer.setOnClickListener {
                 dialogText.cancelAnimation()
@@ -172,6 +183,7 @@ class TypewriterDaxDialog : DialogFragment(), DaxDialog {
             secondaryCta.text = secondaryButtonText
             secondaryCta.visibility = if (secondaryButtonText.isEmpty()) View.GONE else View.VISIBLE
             dialogText.typingDelayInMs = typingDelayInMs
+            hideText.visibility = if (showHideButton) View.VISIBLE else View.GONE
         }
     }
 
@@ -183,7 +195,8 @@ class TypewriterDaxDialog : DialogFragment(), DaxDialog {
             secondaryButtonText: String? = "",
             toolbarDimmed: Boolean = true,
             dismissible: Boolean = true,
-            typingDelayInMs: Long = DEFAULT_TYPING_DELAY
+            typingDelayInMs: Long = DEFAULT_TYPING_DELAY,
+            showHideButton: Boolean = true
         ): TypewriterDaxDialog {
             return TypewriterDaxDialog().apply {
                 arguments = Bundle().apply {
@@ -193,6 +206,7 @@ class TypewriterDaxDialog : DialogFragment(), DaxDialog {
                     putBoolean(ARG_TOOLBAR_DIMMED, toolbarDimmed)
                     putBoolean(ARG_DISMISSIBLE, dismissible)
                     putLong(ARG_TYPING_DELAY, typingDelayInMs)
+                    putBoolean(ARG_SHOW_HIDE_BUTTON, showHideButton)
                 }
             }
         }
@@ -204,5 +218,6 @@ class TypewriterDaxDialog : DialogFragment(), DaxDialog {
         private const val ARG_TOOLBAR_DIMMED = "toolbarDimmed"
         private const val ARG_DISMISSIBLE = "isDismissible"
         private const val ARG_TYPING_DELAY = "typingDelay"
+        private const val ARG_SHOW_HIDE_BUTTON = "showHideButton"
     }
 }

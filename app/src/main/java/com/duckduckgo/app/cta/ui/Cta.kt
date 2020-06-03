@@ -68,10 +68,31 @@ interface Cta {
     fun pixelOkParameters(): Map<String, String>
 }
 
-interface SecondaryButtonCta {
-    val secondaryButtonPixel: Pixel.PixelName?
+class DaxFacebookCta(
+    @StringRes val text: Int = R.string.facebookDialogText,
+    @StringRes val okButton: Int = R.string.facebookDialogButtonText,
+    @StringRes val cancelButton: Int = R.string.facebookDialogCancelButtonText,
+    override val ctaId: CtaId = CtaId.FB_FLOW,
+    override val shownPixel: Pixel.PixelName? = null,
+    override val okPixel: Pixel.PixelName?= null,
+    override val cancelPixel: Pixel.PixelName? = null
+) : Cta, DialogCta {
 
-    fun pixelSecondaryButtonParameters(): Map<String, String>
+    override fun createCta(activity: FragmentActivity): DaxDialog =
+        TypewriterDaxDialog.newInstance(
+            daxText = activity.resources.getString(text),
+            primaryButtonText = activity.resources.getString(okButton),
+            secondaryButtonText = activity.resources.getString(cancelButton),
+            dismissible = false,
+            showHideButton = false
+        )
+
+    override fun pixelCancelParameters(): Map<String, String> = emptyMap()
+
+    override fun pixelOkParameters(): Map<String, String> = emptyMap()
+
+    override fun pixelShownParameters(): Map<String, String> = emptyMap()
+
 }
 
 sealed class DaxDialogCta(

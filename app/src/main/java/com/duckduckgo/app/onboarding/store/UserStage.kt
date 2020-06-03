@@ -31,6 +31,7 @@ data class UserStage(
 enum class AppStage {
     NEW,
     DAX_ONBOARDING,
+    FLOW_FB,
     ESTABLISHED;
 }
 

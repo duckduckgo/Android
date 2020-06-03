@@ -48,6 +48,7 @@ class NotificationRegistrar @Inject constructor(
     object NotificationId {
         const val ClearData = 100
         const val PrivacyProtection = 101
+        const val Facebook = 105
     }
 
     object ChannelType {

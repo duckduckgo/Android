@@ -38,11 +38,21 @@ interface AndroidNotificationScheduler {
 class NotificationScheduler(
     private val workManager: WorkManager,
     private val clearDataNotification: SchedulableNotification,
-    private val privacyNotification: SchedulableNotification
+    private val privacyNotification: SchedulableNotification,
+    private val facebookNotification: SchedulableNotification
 ) : AndroidNotificationScheduler {
 
     override suspend fun scheduleNextNotification() {
         scheduleInactiveUserNotifications()
+        scheduleFacebookNotification()
+    }
+
+    private suspend fun scheduleFacebookNotification() {
+        when {
+            facebookNotification.canShow() -> {
+                scheduleUniqueNotification(OneTimeWorkRequestBuilder<FacebookNotificationWorker>(), 15, TimeUnit.SECONDS, FACEBOOK_WORK_REQUEST_TAG)
+            }
+        }
     }
 
     private suspend fun scheduleInactiveUserNotifications() {
@@ -57,6 +67,16 @@ class NotificationScheduler(
             }
             else -> Timber.v("Notifications not enabled for this variant")
         }
+    }
+
+    private fun scheduleUniqueNotification(builder: OneTimeWorkRequest.Builder, duration: Long, unit: TimeUnit, tag: String) {
+        Timber.v("MARCOS Scheduling unique notification")
+        val request = builder
+            .addTag(tag)
+            .setInitialDelay(duration, unit)
+            .build()
+
+        workManager.enqueueUniqueWork(tag, ExistingWorkPolicy.KEEP, request)
     }
 
     private fun scheduleNotification(builder: OneTimeWorkRequest.Builder, duration: Long, unit: TimeUnit, tag: String) {
@@ -75,6 +95,7 @@ class NotificationScheduler(
 
     open class ClearDataNotificationWorker(context: Context, params: WorkerParameters) : SchedulableNotificationWorker(context, params)
     class PrivacyNotificationWorker(context: Context, params: WorkerParameters) : SchedulableNotificationWorker(context, params)
+    class FacebookNotificationWorker(context: Context, params: WorkerParameters) : SchedulableNotificationWorker(context, params)
 
     open class SchedulableNotificationWorker(val context: Context, params: WorkerParameters) : CoroutineWorker(context, params) {
 
@@ -105,5 +126,6 @@ class NotificationScheduler(
 
     companion object {
         const val UNUSED_APP_WORK_REQUEST_TAG = "com.duckduckgo.notification.schedule"
+        const val FACEBOOK_WORK_REQUEST_TAG = "com.duckduckgo.notification.facebook"
     }
 }

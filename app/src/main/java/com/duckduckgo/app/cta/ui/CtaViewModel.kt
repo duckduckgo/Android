@@ -32,6 +32,7 @@ import com.duckduckgo.app.onboarding.store.AppStage
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.onboarding.store.daxOnboardingActive
+import com.duckduckgo.app.onboarding.store.fbFlowActive
 import com.duckduckgo.app.privacy.db.UserWhitelistDao
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.Variant
@@ -111,6 +112,13 @@ class CtaViewModel @Inject constructor(
         }
     }
 
+    private suspend fun completeStageIfUserInFBFlowState() {
+        if (fbFlowIsActive()) {
+            Timber.d("Completing FB FLOW")
+            userStageStore.stageCompleted(AppStage.FLOW_FB)
+        }
+    }
+
     suspend fun onUserDismissedCta(cta: Cta) {
         withContext(dispatchers.io()) {
             cta.cancelPixel?.let {
@@ -124,6 +132,7 @@ class CtaViewModel @Inject constructor(
                 dismissedCtaDao.insert(DismissedCta(cta.ctaId))
             }
 
+            completeStageIfUserInFBFlowState()
             completeStageIfDaxOnboardingCompleted()
         }
     }
@@ -131,12 +140,6 @@ class CtaViewModel @Inject constructor(
     fun onUserClickCtaOkButton(cta: Cta) {
         cta.okPixel?.let {
             pixel.fire(it, cta.pixelOkParameters())
-        }
-    }
-
-    fun onUserClickCtaSecondaryButton(cta: SecondaryButtonCta) {
-        cta.secondaryButtonPixel?.let {
-            pixel.fire(it, cta.pixelSecondaryButtonParameters())
         }
     }
 
@@ -161,6 +164,9 @@ class CtaViewModel @Inject constructor(
             }
             canShowDaxCtaEndOfJourney() -> {
                 DaxBubbleCta.DaxEndCta(onboardingStore, appInstallStore)
+            }
+            canShowFacebookDialog() -> {
+                DaxFacebookCta()
             }
             canShowWidgetCta() -> {
                 if (widgetCapabilities.supportsAutomaticWidgetAdd) AddWidgetAuto else AddWidgetInstructions
@@ -189,6 +195,9 @@ class CtaViewModel @Inject constructor(
         }
         return null
     }
+
+    @WorkerThread
+    private suspend fun canShowFacebookDialog(): Boolean = fbFlowIsActive() && !fbDialogShown()
 
     @WorkerThread
     private fun canShowWidgetCta(): Boolean {
@@ -250,6 +259,8 @@ class CtaViewModel @Inject constructor(
 
     private fun variant(): Variant = variantManager.getVariant()
 
+    private fun fbDialogShown(): Boolean = dismissedCtaDao.exists(CtaId.FB_FLOW)
+
     private fun daxDialogIntroShown(): Boolean = dismissedCtaDao.exists(CtaId.DAX_INTRO)
 
     private fun daxDialogEndShown(): Boolean = dismissedCtaDao.exists(CtaId.DAX_END)
@@ -263,6 +274,8 @@ class CtaViewModel @Inject constructor(
     private fun daxDialogNetworkShown(): Boolean = dismissedCtaDao.exists(CtaId.DAX_DIALOG_NETWORK)
 
     private fun isSerpUrl(url: String): Boolean = url.contains(DaxDialogCta.SERP)
+
+    private suspend fun fbFlowIsActive(): Boolean = userStageStore.fbFlowActive()
 
     private suspend fun daxOnboardingActive(): Boolean = userStageStore.daxOnboardingActive()
 

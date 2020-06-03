@@ -213,6 +213,7 @@ class BrowserTabViewModel(
         object LaunchTabSwitcher : Command()
         object HideWebContent : Command()
         object ShowWebContent : Command()
+        class NavigateAndAddShortCut(val shortcut: AddHomeShortcut) : Command()
 
         class ShowErrorWithAction(val action: () -> Unit) : Command()
         sealed class DaxCommand : Command() {
@@ -1077,12 +1078,22 @@ class BrowserTabViewModel(
             is HomePanelCta.Survey -> LaunchSurvey(cta.survey)
             is HomePanelCta.AddWidgetAuto -> LaunchAddWidget
             is HomePanelCta.AddWidgetInstructions -> LaunchLegacyAddWidget
+            is DaxFacebookCta -> navigatetoUrlAndAddShorcut(url = "https://www.facebook.com", title = "Facebook")
             else -> return
         }
     }
 
-    fun onUserClickCtaSecondaryButton(cta: SecondaryButtonCta) {
-        ctaViewModel.onUserClickCtaSecondaryButton(cta)
+    private fun navigatetoUrlAndAddShorcut(url: String, title: String): AddHomeShortcut {
+        val convertedUrl = queryUrlConverter.convertQueryToUrl(url)
+        onUserSubmittedQuery(convertedUrl)
+        return AddHomeShortcut(title, convertedUrl)
+    }
+
+    fun onUserClickCtaSecondaryButton() {
+        viewModelScope.launch {
+            val cta = currentCtaViewState().cta ?: return@launch
+            ctaViewModel.onUserDismissedCta(cta)
+        }
     }
 
     fun onUserHideDaxDialog() {

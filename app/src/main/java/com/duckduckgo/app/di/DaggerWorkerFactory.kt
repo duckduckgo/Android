@@ -26,10 +26,13 @@ import com.duckduckgo.app.global.job.AppConfigurationWorker
 import com.duckduckgo.app.global.view.ClearDataAction
 import com.duckduckgo.app.job.ConfigurationDownloader
 import com.duckduckgo.app.notification.NotificationFactory
+import com.duckduckgo.app.notification.NotificationScheduler
 import com.duckduckgo.app.notification.NotificationScheduler.ClearDataNotificationWorker
 import com.duckduckgo.app.notification.NotificationScheduler.PrivacyNotificationWorker
+import com.duckduckgo.app.notification.NotificationScheduler.FacebookNotificationWorker
 import com.duckduckgo.app.notification.db.NotificationDao
 import com.duckduckgo.app.notification.model.ClearDataNotification
+import com.duckduckgo.app.notification.model.FacebookNotification
 import com.duckduckgo.app.notification.model.PrivacyProtectionNotification
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.api.OfflinePixelScheduler
@@ -46,6 +49,7 @@ class DaggerWorkerFactory(
     private val notificationFactory: NotificationFactory,
     private val clearDataNotification: ClearDataNotification,
     private val privacyProtectionNotification: PrivacyProtectionNotification,
+    private val facebookNotification: FacebookNotification,
     private val configurationDownloader: ConfigurationDownloader,
     private val pixel: Pixel
 ) : WorkerFactory() {
@@ -63,6 +67,7 @@ class DaggerWorkerFactory(
                 is ClearDataNotificationWorker -> injectClearDataNotificationWorker(instance)
                 is PrivacyNotificationWorker -> injectPrivacyNotificationWorker(instance)
                 is AppConfigurationWorker -> injectAppConfigurationWorker(instance)
+                is FacebookNotificationWorker -> injectFacebookNotificationWorker(instance)
                 else -> Timber.i("No injection required for worker $workerClassName")
             }
 
@@ -103,4 +108,11 @@ class DaggerWorkerFactory(
         worker.notification = privacyProtectionNotification
     }
 
+    private fun injectFacebookNotificationWorker(worker: FacebookNotificationWorker) {
+        worker.manager = notificationManager
+        worker.notificationDao = notificationDao
+        worker.factory = notificationFactory
+        worker.pixel = pixel
+        worker.notification = facebookNotification
+    }
 }

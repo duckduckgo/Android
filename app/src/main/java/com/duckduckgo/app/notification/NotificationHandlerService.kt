@@ -21,19 +21,27 @@ import android.app.PendingIntent
 import android.app.TaskStackBuilder
 import android.content.Context
 import android.content.Intent
+import android.os.Bundle
 import androidx.annotation.VisibleForTesting
 import androidx.core.app.NotificationManagerCompat
 import com.duckduckgo.app.browser.BrowserActivity
+import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEvent.APP_LAUNCH
 import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEvent.CANCEL
 import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEvent.CLEAR_DATA_LAUNCH
+import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEvent.START_FB_FLOW
 import com.duckduckgo.app.notification.model.NotificationSpec
+import com.duckduckgo.app.onboarding.store.AppStage
+import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.settings.SettingsActivity
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.NOTIFICATION_CANCELLED
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.NOTIFICATION_LAUNCHED
 import dagger.android.AndroidInjection
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.MainCoroutineDispatcher
+import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -54,6 +62,12 @@ class NotificationHandlerService : IntentService("NotificationHandlerService") {
     @Inject
     lateinit var settingsDataStore: SettingsDataStore
 
+    @Inject
+    lateinit var userStageStore: UserStageStore
+
+    @Inject
+    lateinit var dispatcher: DispatcherProvider
+
     override fun onCreate() {
         super.onCreate()
         AndroidInjection.inject(this)
@@ -66,6 +80,12 @@ class NotificationHandlerService : IntentService("NotificationHandlerService") {
             APP_LAUNCH -> onAppLaunched(pixelSuffix)
             CLEAR_DATA_LAUNCH -> onClearDataLaunched(pixelSuffix)
             CANCEL -> onCancelled(pixelSuffix)
+            START_FB_FLOW -> {
+                GlobalScope.launch(dispatcher.io()) {
+                    userStageStore.registerInStage(AppStage.FLOW_FB)
+                }
+                onAppLaunched(pixelSuffix)
+            }
         }
 
         if (intent.getBooleanExtra(NOTIFICATION_AUTO_CANCEL, true)) {
@@ -109,6 +129,7 @@ class NotificationHandlerService : IntentService("NotificationHandlerService") {
         const val APP_LAUNCH = "com.duckduckgo.notification.launch.app"
         const val CLEAR_DATA_LAUNCH = "com.duckduckgo.notification.launch.clearData"
         const val CANCEL = "com.duckduckgo.notification.cancel"
+        const val START_FB_FLOW = "com.duckduckgo.notification.flow.fb"
     }
 
     companion object {
