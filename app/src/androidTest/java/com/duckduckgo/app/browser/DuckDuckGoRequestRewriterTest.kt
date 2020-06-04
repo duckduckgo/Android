@@ -48,7 +48,7 @@ class DuckDuckGoRequestRewriterTest {
 
     @Test
     fun whenAddingCustomParamsSourceParameterIsAdded() {
-        testee.addCustomQueryParams(currentUrl, builder)
+        testee.addCustomQueryParams(builder)
         val uri = builder.build()
         assertTrue(uri.queryParameterNames.contains(ParamKey.SOURCE))
         assertEquals("ddg_android", uri.getQueryParameter(ParamKey.SOURCE))
@@ -57,7 +57,7 @@ class DuckDuckGoRequestRewriterTest {
     @Test
     fun whenAddingCustomParamsAndUserSourcedFromEuAuctionThenEuSourceParameterIsAdded() {
         whenever(mockAppReferrerDataStore.installedFromEuAuction).thenReturn(true)
-        testee.addCustomQueryParams(currentUrl, builder)
+        testee.addCustomQueryParams(builder)
         val uri = builder.build()
         assertTrue(uri.queryParameterNames.contains(ParamKey.SOURCE))
         assertEquals("ddg_androideu", uri.getQueryParameter(ParamKey.SOURCE))
@@ -66,7 +66,7 @@ class DuckDuckGoRequestRewriterTest {
     @Test
     fun whenAddingCustomParamsIfStoreContainsAtbIsAdded() {
         whenever(mockStatisticsStore.atb).thenReturn(Atb("v105-2ma"))
-        testee.addCustomQueryParams(currentUrl, builder)
+        testee.addCustomQueryParams(builder)
         val uri = builder.build()
         assertTrue(uri.queryParameterNames.contains(ParamKey.ATB))
         assertEquals("v105-2ma", uri.getQueryParameter(ParamKey.ATB))
@@ -76,7 +76,7 @@ class DuckDuckGoRequestRewriterTest {
     fun whenAddingCustomParamsIfIsStoreMissingAtbThenAtbIsNotAdded() {
         whenever(mockStatisticsStore.atb).thenReturn(null)
 
-        testee.addCustomQueryParams(currentUrl, builder)
+        testee.addCustomQueryParams(builder)
         val uri = builder.build()
         assertFalse(uri.queryParameterNames.contains(ParamKey.ATB))
     }
@@ -86,7 +86,7 @@ class DuckDuckGoRequestRewriterTest {
         val serpRemovalVariant = Variant("foo", 100.0, features = listOf(VariantManager.VariantFeature.SerpHeaderRemoval), filterBy = { true })
         whenever(mockVariantManager.getVariant()).thenReturn(serpRemovalVariant)
 
-        testee.addCustomQueryParams(currentUrl, builder)
+        testee.addCustomQueryParams(builder)
 
         val uri = builder.build()
         assertTrue(uri.queryParameterNames.contains(ParamKey.HIDE_SERP))
@@ -94,7 +94,7 @@ class DuckDuckGoRequestRewriterTest {
 
     @Test
     fun whenSerpRemovalFeatureIsInactiveThenHideParamIsNotAddedToSerpUrl() {
-        testee.addCustomQueryParams(currentUrl, builder)
+        testee.addCustomQueryParams(builder)
 
         val uri = builder.build()
         assertFalse(uri.queryParameterNames.contains(ParamKey.HIDE_SERP))
@@ -103,7 +103,7 @@ class DuckDuckGoRequestRewriterTest {
     @Test
     fun whenDuckDuckGoUrlHasVerticalThenVerticalParameterIsKept() {
         val verticalUrl = "https://duckduckgo.com/?q=duck&iax=images&ia=images&t=ddg_android"
-        testee.addCustomQueryParams(verticalUrl, builder)
+        testee.addCustomQueryParams(builder)
 
         val uri = builder.build()
         assertTrue(uri.queryParameterNames.contains(ParamKey.VERTICAL_REWRITE))
@@ -112,7 +112,7 @@ class DuckDuckGoRequestRewriterTest {
     @Test
     fun whenDuckDuckGoUrlDoesNotHaveVerticalThenVerticalParameterIsNotAdded() {
         val verticalUrl = "https://duckduckgo.com/?q=duck&t=ddg_android"
-        testee.addCustomQueryParams(verticalUrl, builder)
+        testee.addCustomQueryParams(builder)
 
         val uri = builder.build()
         assertFalse(uri.queryParameterNames.contains(ParamKey.VERTICAL_REWRITE))
