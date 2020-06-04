@@ -434,8 +434,8 @@ class BrowserTabViewModel(
     }
 
     private fun fireQueryChangedPixel(omnibarText: String) {
-        val oldParameter = UriString.extractURLParameter(AppUrl.ParamKey.QUERY, currentOmnibarViewState().omnibarText)
-        val newParameter = UriString.extractURLParameter(AppUrl.ParamKey.QUERY, omnibarText)
+        val oldParameter = currentOmnibarViewState().omnibarText.toUri()?.getQueryParameter(AppUrl.ParamKey.QUERY)
+        val newParameter = omnibarText.toUri()?.getQueryParameter(AppUrl.ParamKey.QUERY)
         if (oldParameter == newParameter) {
             pixel.fire(String.format(Locale.US, PixelName.SERP_REQUERY.pixelName, PixelParameter.SERP_QUERY_NOT_CHANGED))
         } else {
