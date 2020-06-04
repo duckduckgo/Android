@@ -50,11 +50,7 @@ import androidx.core.text.HtmlCompat.FROM_HTML_MODE_LEGACY
 import androidx.core.view.*
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.transaction
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleObserver
-import androidx.lifecycle.Observer
-import androidx.lifecycle.OnLifecycleEvent
-import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.*
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion
 import com.duckduckgo.app.bookmarks.ui.EditBookmarkDialogFragment
@@ -105,24 +101,8 @@ import kotlinx.android.synthetic.main.include_dax_dialog_cta.*
 import kotlinx.android.synthetic.main.include_find_in_page.*
 import kotlinx.android.synthetic.main.include_new_browser_tab.*
 import kotlinx.android.synthetic.main.include_omnibar_toolbar.*
-import kotlinx.android.synthetic.main.include_omnibar_toolbar.omnibarTextInput
-import kotlinx.android.synthetic.main.include_omnibar_toolbar.view.browserMenu
-import kotlinx.android.synthetic.main.include_omnibar_toolbar.view.fireIconMenu
-import kotlinx.android.synthetic.main.include_omnibar_toolbar.view.privacyGradeButton
-import kotlinx.android.synthetic.main.include_omnibar_toolbar.view.tabsMenu
+import kotlinx.android.synthetic.main.include_omnibar_toolbar.view.*
 import kotlinx.android.synthetic.main.popup_window_browser_menu.view.*
-import kotlinx.android.synthetic.main.popup_window_browser_menu.view.addBookmarksPopupMenuItem
-import kotlinx.android.synthetic.main.popup_window_browser_menu.view.addToHome
-import kotlinx.android.synthetic.main.popup_window_browser_menu.view.backPopupMenuItem
-import kotlinx.android.synthetic.main.popup_window_browser_menu.view.brokenSitePopupMenuItem
-import kotlinx.android.synthetic.main.popup_window_browser_menu.view.findInPageMenuItem
-import kotlinx.android.synthetic.main.popup_window_browser_menu.view.fireproofWebsitePopupMenuItem
-import kotlinx.android.synthetic.main.popup_window_browser_menu.view.forwardPopupMenuItem
-import kotlinx.android.synthetic.main.popup_window_browser_menu.view.newTabPopupMenuItem
-import kotlinx.android.synthetic.main.popup_window_browser_menu.view.refreshPopupMenuItem
-import kotlinx.android.synthetic.main.popup_window_browser_menu.view.requestDesktopSiteCheckMenuItem
-import kotlinx.android.synthetic.main.popup_window_browser_menu.view.settingsPopupMenuItem
-import kotlinx.android.synthetic.main.popup_window_browser_menu.view.whitelistPopupMenuItem
 import kotlinx.coroutines.*
 import org.jetbrains.anko.longToast
 import org.jetbrains.anko.share
@@ -260,6 +240,8 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
     private val logoHidingListener by lazy { LogoHidingLayoutChangeLifecycleListener(ddgLogo) }
 
     private var alertDialog: AlertDialog? = null
+
+    private var loginDetectionDialog: AlertDialog? = null
 
     override fun onAttach(context: Context) {
         AndroidSupportInjection.inject(this)
@@ -577,7 +559,11 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
             is Command.DaxCommand.HideDaxDialog -> showHideTipsDialog(it.cta)
             is Command.HideWebContent -> webView?.hide()
             is Command.ShowWebContent -> webView?.show()
-            is Command.AskToFireproofWebsite -> viewModel.onFireproofWebsiteClicked(it.siteUrl)
+            is Command.AskToFireproofWebsite -> {
+                askToFireproofWebsite(requireContext(), it.fireproofWebsite) {
+                    viewModel.onFireproofWebsiteClicked(it.fireproofWebsite.domain)
+                }
+            }
         }
     }
 
@@ -644,6 +630,22 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
                     launchExternalAppDialog(it) { it.startActivity(intentChooser) }
                 }
             }
+        }
+    }
+
+    private fun askToFireproofWebsite(context: Context, fireproofWebsite: FireproofWebsiteEntity, onClick: () -> Unit) {
+        val isShowing = loginDetectionDialog?.isShowing
+
+        if (isShowing != true) {
+            loginDetectionDialog = AlertDialog.Builder(context)
+                .setTitle(getString(R.string.fireproofWebsiteLoginDialogTitle, fireproofWebsite.website()))
+                .setMessage(R.string.fireproofWebsiteLoginDialogDescription)
+                .setPositiveButton(R.string.fireproofWebsiteLoginDialogPositive) { _, _ ->
+                    onClick()
+                }
+                .setNegativeButton(R.string.fireproofWebsiteLoginDialogNegative) { dialog, _ ->
+                    dialog.dismiss()
+                }.show()
         }
     }
 
@@ -1028,6 +1030,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
         animatorHelper.removeListener()
         supervisorJob.cancel()
         popupMenu.dismiss()
+        loginDetectionDialog?.dismiss()
         destroyWebView()
         super.onDestroy()
     }

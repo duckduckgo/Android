@@ -16,7 +16,6 @@
 
 package com.duckduckgo.app.fire.fireproofwebsite.data
 
-import android.net.Uri
 import androidx.lifecycle.LiveData
 import com.duckduckgo.app.global.DispatcherProvider
 import kotlinx.coroutines.withContext
@@ -26,10 +25,8 @@ class FireproofWebsiteRepository @Inject constructor(
     private val fireproofWebsiteDao: FireproofWebsiteDao,
     private val dispatchers: DispatcherProvider
 ) {
-    suspend fun fireproofWebsite(url: String): FireproofWebsiteEntity? {
-        val urlDomain = Uri.parse(url).host ?: return null
-
-        val fireproofWebsiteEntity = FireproofWebsiteEntity(domain = urlDomain)
+    suspend fun fireproofWebsite(domain: String): FireproofWebsiteEntity? {
+        val fireproofWebsiteEntity = FireproofWebsiteEntity(domain = domain)
         val id = withContext(dispatchers.io()) {
             fireproofWebsiteDao.insert(fireproofWebsiteEntity)
         }

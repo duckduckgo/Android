@@ -196,7 +196,7 @@ class BrowserTabViewModel(
         class DownloadImage(val url: String, val requestUserConfirmation: Boolean) : Command()
         class ShowBookmarkAddedConfirmation(val bookmarkId: Long, val title: String?, val url: String?) : Command()
         class ShowFireproofWebSiteConfirmation(val fireproofWebsiteEntity: FireproofWebsiteEntity) : Command()
-        class AskToFireproofWebsite(val siteUrl: String) : Command()
+        class AskToFireproofWebsite(val fireproofWebsite: FireproofWebsiteEntity) : Command()
         class ShareLink(val url: String) : Command()
         class CopyLink(val url: String) : Command()
         class FindInPageCommand(val searchTerm: String) : Command()
@@ -783,10 +783,10 @@ class BrowserTabViewModel(
         }
     }
 
-    fun onFireproofWebsiteClicked(siteUrl: String? = site?.url) {
+    fun onFireproofWebsiteClicked(host: String? = site?.uri?.host) {
         viewModelScope.launch {
-            siteUrl?.takeUnless { it.isBlank() }?.let { nonEmptyUrl ->
-                val entity = fireproofWebsiteRepository.fireproofWebsite(nonEmptyUrl)
+            host?.takeUnless { it.isBlank() }?.let { nonEmptyHost ->
+                val entity = fireproofWebsiteRepository.fireproofWebsite(nonEmptyHost)
                 if (entity != null) {
                     pixel.fire(PixelName.FIREPROOF_WEBSITE_ADDED)
                     command.value = ShowFireproofWebSiteConfirmation(fireproofWebsiteEntity = entity)
@@ -1200,8 +1200,8 @@ class BrowserTabViewModel(
     override fun loginDetected() {
         viewModelScope.launch {
             if (canFireproofWebsite()) {
-                site?.url?.let {
-                    command.value = AskToFireproofWebsite(it)
+                site?.uri?.host?.let {
+                    command.value = AskToFireproofWebsite(FireproofWebsiteEntity(it))
                 }
             }
         }
