@@ -16,6 +16,6 @@
 
 <TextView xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/fireproofWebsiteSectionTitle"
-    style="@style/FireproofWebsiteTitle"
+    style="@style/FireproofWebsiteSectionTitle"
     android:paddingStart="16dp"
     android:paddingEnd="16dp" />

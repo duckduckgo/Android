@@ -310,7 +310,7 @@
         <item name="android:textColor">?attr/colorAccent</item>
     </style>
 
-    <style name="FireproofWebsiteTitle">
+    <style name="FireproofWebsiteSectionTitle">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:paddingTop">16dp</item>
