@@ -95,7 +95,7 @@ class DuckDuckGoUrlDetectorTest {
 
     @Test
     fun whenCheckingNonDDGUrThenVerticalUrlIsNotDetected() {
-        assertFalse(testee.isDuckDuckGoVerticalUrl("https://example.com?q=test%20search"))
+        assertFalse(testee.isDuckDuckGoVerticalUrl("https://example.com?ia=images"))
     }
 
 }
