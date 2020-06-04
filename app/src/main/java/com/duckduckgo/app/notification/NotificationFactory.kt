@@ -37,6 +37,7 @@ class NotificationFactory @Inject constructor(val context: Context, val manager:
             .setPriority(specification.channel.priority)
             .setSmallIcon(specification.icon)
             .setContentTitle(specification.title)
+            .setContentText(specification.description)
             .setStyle(NotificationCompat.BigTextStyle().bigText(specification.description))
             .setColor(ContextCompat.getColor(context, specification.color))
             .setContentIntent(launchIntent)
