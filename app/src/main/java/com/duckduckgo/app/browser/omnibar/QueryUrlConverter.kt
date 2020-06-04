@@ -28,7 +28,7 @@ import javax.inject.Inject
 
 class QueryUrlConverter @Inject constructor(private val requestRewriter: RequestRewriter) : OmnibarEntryConverter {
 
-    override fun addQueryToCurrentUrl(currentUrl: String, searchQuery: String): String {
+    override fun convertQueryToUrl(searchQuery: String, vertical: String?): String {
         if (UriString.isWebUrl(searchQuery)) {
             return convertUri(searchQuery)
         }
@@ -42,7 +42,11 @@ class QueryUrlConverter @Inject constructor(private val requestRewriter: Request
             .appendQueryParameter(AppUrl.ParamKey.QUERY, searchQuery)
             .authority(Url.HOST)
 
-        requestRewriter.addCustomQueryParams(currentUrl, uriBuilder)
+        vertical?.let{
+            uriBuilder.appendQueryParameter(AppUrl.ParamKey.VERTICAL_REWRITE, vertical)
+        }
+
+        requestRewriter.addCustomQueryParams(uriBuilder)
         return uriBuilder.build().toString()
     }
 

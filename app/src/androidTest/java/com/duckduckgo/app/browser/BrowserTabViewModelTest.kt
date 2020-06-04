@@ -49,7 +49,6 @@ import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.cta.db.DismissedCtaDao
 import com.duckduckgo.app.cta.model.CtaId
 import com.duckduckgo.app.cta.model.DismissedCta
-import com.duckduckgo.app.cta.ui.*
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteDao
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
 import com.duckduckgo.app.cta.ui.Cta
@@ -238,7 +237,7 @@ class BrowserTabViewModelTest {
 
         val siteFactory = SiteFactory(mockPrivacyPractices, mockEntityLookup)
 
-        whenever(mockOmnibarConverter.addQueryToCurrentUrl(any(), any())).thenReturn("duckduckgo.com")
+        whenever(mockOmnibarConverter.convertQueryToUrl(any(), any())).thenReturn("duckduckgo.com")
         whenever(mockVariantManager.getVariant()).thenReturn(DEFAULT_VARIANT)
         whenever(mockTabsRepository.liveSelectedTab).thenReturn(selectedTabLiveData)
         whenever(mockTabsRepository.retrieveSiteData(any())).thenReturn(MutableLiveData())
@@ -1236,7 +1235,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenRestoringWebViewSessionNotRestorableThenPreviousUrlLoaded() {
-        whenever(mockOmnibarConverter.addQueryToCurrentUrl("foo.com", "foo.com")).thenReturn("foo.com")
+        whenever(mockOmnibarConverter.convertQueryToUrl("foo.com", "foo.com")).thenReturn("foo.com")
         whenever(webViewSessionStorage.restoreSession(anyOrNull(), anyString())).thenReturn(false)
         testee.restoreWebViewState(null, "foo.com")
 

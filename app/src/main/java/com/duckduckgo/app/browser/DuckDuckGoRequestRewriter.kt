@@ -27,7 +27,7 @@ import timber.log.Timber
 interface RequestRewriter {
     fun shouldRewriteRequest(uri: Uri): Boolean
     fun rewriteRequestWithCustomQueryParams(request: Uri): Uri
-    fun addCustomQueryParams(currentUrl: String, builder: Uri.Builder)
+    fun addCustomQueryParams(builder: Uri.Builder)
 }
 
 class DuckDuckGoRequestRewriter(
@@ -48,7 +48,7 @@ class DuckDuckGoRequestRewriter(
             .filter { it != ParamKey.SOURCE && it != ParamKey.ATB }
             .forEach { builder.appendQueryParameter(it, request.getQueryParameter(it)) }
 
-        addCustomQueryParams(request.toString(), builder)
+        addCustomQueryParams(builder)
         val newUri = builder.build()
 
         Timber.d("Rewriting request\n$request [original]\n$newUri [rewritten]")
@@ -63,9 +63,8 @@ class DuckDuckGoRequestRewriter(
     /**
      * Applies cohort (atb) https://duck.co/help/privacy/atb and
      * source (t) https://duck.co/help/privacy/t params to url
-     * Also keeps current Vertical selection (Images, News, Videos, etc...)
      */
-    override fun addCustomQueryParams(currentUrl: String, builder: Uri.Builder) {
+    override fun addCustomQueryParams(builder: Uri.Builder) {
         val atb = statisticsStore.atb
         if (atb != null) {
             builder.appendQueryParameter(ParamKey.ATB, atb.formatWithVariant(variantManager.getVariant()))
@@ -75,11 +74,6 @@ class DuckDuckGoRequestRewriter(
 
         if (variantManager.getVariant().hasFeature(VariantManager.VariantFeature.SerpHeaderRemoval)) {
             builder.appendQueryParameter(ParamKey.HIDE_SERP, ParamValue.HIDE_SERP)
-        }
-
-        if (duckDuckGoUrlDetector.isDuckDuckGoVerticalUrl(currentUrl)) {
-            val vertical = duckDuckGoUrlDetector.extractVertical(currentUrl)
-            builder.appendQueryParameter(ParamKey.VERTICAL_REWRITE, vertical)
         }
 
         builder.appendQueryParameter(ParamKey.SOURCE, sourceValue)
