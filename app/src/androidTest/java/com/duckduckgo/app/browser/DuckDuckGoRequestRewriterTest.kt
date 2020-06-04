@@ -82,7 +82,7 @@ class DuckDuckGoRequestRewriterTest {
     }
 
     @Test
-    fun whenAddingCustomParamsIfSERPRemovalVariantThenParameterIsAdded() {
+    fun whenSerpRemovalFeatureIsActiveThenHideParamIsAddedToSerpUrl() {
         val serpRemovalVariant = Variant("foo", 100.0, features = listOf(VariantManager.VariantFeature.SerpHeaderRemoval), filterBy = { true })
         whenever(mockVariantManager.getVariant()).thenReturn(serpRemovalVariant)
 
@@ -93,7 +93,7 @@ class DuckDuckGoRequestRewriterTest {
     }
 
     @Test
-    fun whenAddingCustomParamsIfNotSERPRemovalVariantThenParameterIsNotAdded() {
+    fun whenSerpRemovalFeatureIsInactiveThenHideParamIsNotAddedToSerpUrl() {
         testee.addCustomQueryParams(currentUrl, builder)
 
         val uri = builder.build()
