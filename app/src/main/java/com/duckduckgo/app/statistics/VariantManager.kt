@@ -27,7 +27,15 @@ import java.util.*
 interface VariantManager {
 
     // variant-dependant features listed here
-    sealed class VariantFeature
+    sealed class VariantFeature {
+        object DripNotification : VariantFeature()
+        object Day1PrivacyNotification : VariantFeature()
+        object Day3ClearDataNotification : VariantFeature()
+        object Day1DripA1Notification : VariantFeature()
+        object Day1DripA2Notification : VariantFeature()
+        object Day1DripB1Notification : VariantFeature()
+        object Day1DripB2Notification : VariantFeature()
+    }
 
     companion object {
 
@@ -40,7 +48,39 @@ interface VariantManager {
             // SERP variants. "sc" may also be used as a shared control for mobile experiments in
             // the future if we can filter by app version
             Variant(key = "sc", weight = 0.0, features = emptyList(), filterBy = { noFilter() }),
-            Variant(key = "se", weight = 0.0, features = emptyList(), filterBy = { noFilter() })
+            Variant(key = "se", weight = 0.0, features = emptyList(), filterBy = { noFilter() }),
+
+            // Notification Drip Experiment
+            Variant(
+                key = "za",
+                weight = 1.0,
+                features = listOf(VariantFeature.DripNotification, VariantFeature.Day1PrivacyNotification, VariantFeature.Day3ClearDataNotification),
+                filterBy = { isEnglishLocale() }),
+            Variant(
+                key = "zb",
+                weight = 1.0,
+                features = listOf(VariantFeature.DripNotification),
+                filterBy = { isEnglishLocale() }),
+            Variant(
+                key = "zc",
+                weight = 1.0,
+                features = listOf(VariantFeature.DripNotification, VariantFeature.Day1DripA1Notification, VariantFeature.Day3ClearDataNotification),
+                filterBy = { isEnglishLocale() }),
+            Variant(
+                key = "zd",
+                weight = 1.0,
+                features = listOf(VariantFeature.DripNotification, VariantFeature.Day1DripA2Notification, VariantFeature.Day3ClearDataNotification),
+                filterBy = { isEnglishLocale() }),
+            Variant(
+                key = "ze",
+                weight = 1.0,
+                features = listOf(VariantFeature.DripNotification, VariantFeature.Day1DripB1Notification, VariantFeature.Day3ClearDataNotification),
+                filterBy = { isEnglishLocale() }),
+            Variant(
+                key = "zf",
+                weight = 1.0,
+                features = listOf(VariantFeature.DripNotification, VariantFeature.Day1DripB2Notification, VariantFeature.Day3ClearDataNotification),
+                filterBy = { isEnglishLocale() })
 
             // All groups in an experiment (control and variants) MUST use the same filters
         )
