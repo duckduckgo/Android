@@ -780,8 +780,8 @@ class BrowserTabViewModel(
 
     fun onFireproofWebsiteMenuClicked() {
         viewModelScope.launch {
-            site?.uri?.host?.takeUnless { it.isBlank() }?.let { nonEmptyHost ->
-                val entity = fireproofWebsiteRepository.fireproofWebsite(nonEmptyHost)
+            site?.domain?.let { nonNullDomain ->
+                val entity = fireproofWebsiteRepository.fireproofWebsite(nonNullDomain)
                 if (entity != null) {
                     pixel.fire(PixelName.FIREPROOF_WEBSITE_ADDED)
                     command.value = ShowFireproofWebSiteConfirmation(fireproofWebsiteEntity = entity)
@@ -790,14 +790,12 @@ class BrowserTabViewModel(
         }
     }
 
-    fun onFireproofLoginDialogClicked(host: String) {
+    fun onFireproofLoginDialogClicked(domain: String) {
         viewModelScope.launch {
-            host.takeUnless { it.isBlank() }?.let { nonEmptyHost ->
-                val entity = fireproofWebsiteRepository.fireproofWebsite(nonEmptyHost)
-                if (entity != null) {
-                    pixel.fire(PixelName.FIREPROOF_WEBSITE_LOGIN_ADDED)
-                    command.value = ShowFireproofWebSiteConfirmation(fireproofWebsiteEntity = entity)
-                }
+            val entity = fireproofWebsiteRepository.fireproofWebsite(domain)
+            if (entity != null) {
+                pixel.fire(PixelName.FIREPROOF_WEBSITE_LOGIN_ADDED)
+                command.value = ShowFireproofWebSiteConfirmation(fireproofWebsiteEntity = entity)
             }
         }
     }
@@ -1178,7 +1176,7 @@ class BrowserTabViewModel(
     }
 
     private fun canFireproofWebsite(): Boolean {
-        val domain = site?.uri?.host ?: return false
+        val domain = site?.domain ?: return false
         val fireproofWebsites = fireproofWebsiteState.value
         return fireproofWebsites?.all { it.domain != domain } ?: true
     }
@@ -1211,7 +1209,7 @@ class BrowserTabViewModel(
     override fun loginDetected() {
         viewModelScope.launch {
             if (canFireproofWebsite()) {
-                site?.uri?.host?.let {
+                site?.domain?.let {
                     command.value = AskToFireproofWebsite(FireproofWebsiteEntity(it))
                 }
             }

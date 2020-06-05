@@ -26,6 +26,8 @@ class FireproofWebsiteRepository @Inject constructor(
     private val dispatchers: DispatcherProvider
 ) {
     suspend fun fireproofWebsite(domain: String): FireproofWebsiteEntity? {
+        if (domain.isBlank()) return null
+
         val fireproofWebsiteEntity = FireproofWebsiteEntity(domain = domain)
         val id = withContext(dispatchers.io()) {
             fireproofWebsiteDao.insert(fireproofWebsiteEntity)
