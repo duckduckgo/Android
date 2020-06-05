@@ -86,7 +86,9 @@ class BrowserViewModelTest {
             appEnjoymentPromptEmitter = mockAppEnjoymentPromptEmitter,
             appEnjoymentUserEventRecorder = mockAppEnjoymentUserEventRecorder
         )
+
         testee.command.observeForever(mockCommandObserver)
+
 
         runBlocking<Unit> {
             whenever(mockTabRepository.add()).thenReturn(TAB_ID)
@@ -108,6 +110,7 @@ class BrowserViewModelTest {
     @Test
     fun whenOpenInNewTabRequestedThenTabAddedToRepository() = runBlocking<Unit> {
         val url = "http://example.com"
+        whenever(mockOmnibarEntryConverter.convertQueryToUrl(url)).thenReturn(url)
         testee.onOpenInNewTabRequested(url)
         verify(mockTabRepository).add(url)
     }

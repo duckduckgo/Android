@@ -100,21 +100,4 @@ class DuckDuckGoRequestRewriterTest {
         assertFalse(uri.queryParameterNames.contains(ParamKey.HIDE_SERP))
     }
 
-    @Test
-    fun whenDuckDuckGoUrlHasVerticalThenVerticalParameterIsKept() {
-        val verticalUrl = "https://duckduckgo.com/?q=duck&iax=images&ia=images&t=ddg_android"
-        testee.addCustomQueryParams(builder)
-
-        val uri = builder.build()
-        assertTrue(uri.queryParameterNames.contains(ParamKey.VERTICAL_REWRITE))
-    }
-
-    @Test
-    fun whenDuckDuckGoUrlDoesNotHaveVerticalThenVerticalParameterIsNotAdded() {
-        val verticalUrl = "https://duckduckgo.com/?q=duck&t=ddg_android"
-        testee.addCustomQueryParams(builder)
-
-        val uri = builder.build()
-        assertFalse(uri.queryParameterNames.contains(ParamKey.VERTICAL_REWRITE))
-    }
 }

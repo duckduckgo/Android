@@ -69,6 +69,7 @@ import com.duckduckgo.app.privacy.model.TestEntity
 import com.duckduckgo.app.privacy.model.UserWhitelistedDomain
 import com.duckduckgo.app.runBlocking
 import com.duckduckgo.app.settings.db.SettingsDataStore
+import com.duckduckgo.app.statistics.Variant
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.VariantManager.Companion.DEFAULT_VARIANT
 import com.duckduckgo.app.statistics.api.StatisticsUpdater
@@ -369,6 +370,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenSubmittedQueryHasWhitespaceItIsTrimmed() {
+        whenever(mockOmnibarConverter.convertQueryToUrl("nytimes.com", null)).thenReturn("foo.com")
         testee.onUserSubmittedQuery(" nytimes.com ")
         assertEquals("nytimes.com", omnibarViewState().omnibarText)
     }
@@ -429,6 +431,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenNonEmptyInputThenNavigateCommandSubmittedToActivity() {
+        whenever(mockOmnibarConverter.convertQueryToUrl("foo", null)).thenReturn("foo.com")
         testee.onUserSubmittedQuery("foo")
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
         assertTrue(commandCaptor.lastValue is Navigate)
@@ -717,6 +720,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenBrowserShownAndOmnibarInputDoesNotHaveFocusThenPrivacyGradeIsShownAndSearchIconIsHidden() {
+        whenever(mockOmnibarConverter.convertQueryToUrl("foo", null)).thenReturn("foo.com")
         testee.onUserSubmittedQuery("foo")
         testee.onOmnibarInputStateChanged(query = "", hasFocus = false, hasQueryChanged = false)
         assertTrue(browserViewState().showPrivacyGrade)
@@ -731,6 +735,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenBrowserShownAndOmnibarInputHasFocusThenSearchIconIsShownAndPrivacyGradeIsHidden() {
+        whenever(mockOmnibarConverter.convertQueryToUrl("foo", null)).thenReturn("foo.com")
         testee.onUserSubmittedQuery("foo")
         testee.onOmnibarInputStateChanged("", true, hasQueryChanged = false)
         assertFalse(browserViewState().showPrivacyGrade)
@@ -869,6 +874,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenEnteringNonEmptyQueryThenHideKeyboardCommandIssued() {
+        whenever(mockOmnibarConverter.convertQueryToUrl("foo", null)).thenReturn("foo.com")
         testee.onUserSubmittedQuery("foo")
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
         assertTrue(commandCaptor.allValues.any { it == Command.HideKeyboard })
@@ -1235,7 +1241,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenRestoringWebViewSessionNotRestorableThenPreviousUrlLoaded() {
-        whenever(mockOmnibarConverter.convertQueryToUrl("foo.com", "foo.com")).thenReturn("foo.com")
+        whenever(mockOmnibarConverter.convertQueryToUrl("foo.com", null)).thenReturn("foo.com")
         whenever(webViewSessionStorage.restoreSession(anyOrNull(), anyString())).thenReturn(false)
         testee.restoreWebViewState(null, "foo.com")
 
@@ -1468,6 +1474,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenUserSubmitsQueryThenCaretDoesNotMoveToTheEnd() {
+        whenever(mockOmnibarConverter.convertQueryToUrl("foo", null)).thenReturn("foo.com")
         testee.onUserSubmittedQuery("foo")
         assertFalse(omnibarViewState().shouldMoveCaretToEnd)
     }
@@ -1950,6 +1957,39 @@ class BrowserTabViewModelTest {
         testee.onUserPressedForward()
         assertTrue(findInPageViewState().canFindInPage)
     }
+
+    @Test
+    fun whenSERPRemovalFeatureIsActiveAndBrowsingDDGSiteAndPrivacyGradeIsVisibleThenShowDaxIconIsTrue() {
+        val serpRemovalVariant = Variant("foo", 100.0, features = listOf(VariantManager.VariantFeature.SerpHeaderRemoval), filterBy = { true })
+        whenever(mockVariantManager.getVariant()).thenReturn(serpRemovalVariant)
+        val url = "https://duckduckgo.com?q=test%20search"
+        loadUrl(url, isBrowserShowing = true)
+        assertTrue(browserViewState().showDaxIcon)
+    }
+
+    @Test
+    fun whenSERPRemovalFeatureIsActiveAndPrivacyGradeIsVisibleThenShowDaxIconIsFalse() {
+        val serpRemovalVariant = Variant("foo", 100.0, features = listOf(VariantManager.VariantFeature.SerpHeaderRemoval), filterBy = { true })
+        whenever(mockVariantManager.getVariant()).thenReturn(serpRemovalVariant)
+        val url = "https://example.com"
+        loadUrl(url, isBrowserShowing = true)
+        assertFalse(browserViewState().showDaxIcon)
+    }
+
+    @Test
+    fun whenSERPRemovalFeatureIsInaactiveAndBrowsingDDGSiteAndPrivacyGradeIsVisibleThenShowDaxIconIsFalse() {
+        val url = "https://duckduckgo.com?q=test%20search"
+        loadUrl(url, isBrowserShowing = true)
+        assertFalse(browserViewState().showDaxIcon)
+    }
+
+    @Test
+    fun whenSERPRemovalFeatureIsInaactiveAndPrivacyGradeIsVisibleThenShowDaxIconIsFalse() {
+        val url = "https://example.com"
+        loadUrl(url, isBrowserShowing = true)
+        assertFalse(browserViewState().showDaxIcon)
+    }
+
 
     private inline fun <reified T : Command> assertCommandIssued(instanceAssertions: T.() -> Unit = {}) {
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
