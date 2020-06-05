@@ -513,11 +513,6 @@ class BrowserTabViewModel(
             is UrlUpdated -> urlUpdated(stateChange.url)
             is PageNavigationCleared -> disableUserNavigation()
         }
-
-        /*val loginDetected = loginDetection.onEvent(LoginDetectionDelegate.Event.NavigationEvent(stateChange))
-        if (loginDetected) {
-            onFireproofWebsiteClicked()
-        }*/
     }
 
     private fun pageChanged(url: String, title: String?) {
