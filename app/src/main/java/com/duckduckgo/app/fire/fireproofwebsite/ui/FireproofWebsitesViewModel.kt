@@ -17,6 +17,7 @@
 package com.duckduckgo.app.fire.fireproofwebsite.ui
 
 import androidx.lifecycle.*
+import androidx.lifecycle.Observer
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepository
 import com.duckduckgo.app.fire.fireproofwebsite.ui.FireproofWebsitesViewModel.Command.ConfirmDeleteFireproofWebsite
@@ -26,6 +27,7 @@ import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.FIREPROOF_WEBSITE_DELETED
 import kotlinx.coroutines.launch
+import java.util.*
 
 class FireproofWebsitesViewModel(
     private val fireproofWebsiteRepository: FireproofWebsiteRepository,
@@ -80,6 +82,7 @@ class FireproofWebsitesViewModel(
     }
 
     fun onUserToggleLoginDetection(enabled: Boolean) {
+        pixel.fire(String.format(Locale.US, Pixel.PixelName.FIREPROOF_WEBSITE_LOGIN_TOOGLE.pixelName, enabled))
         settingsDataStore.appLoginDetection = enabled
         _viewState.value = _viewState.value?.copy(loginDetectionEnabled = enabled)
     }
