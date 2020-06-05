@@ -1791,7 +1791,7 @@ class BrowserTabViewModelTest {
     @Test
     fun whenUserClicksFireproofWebsiteOptionMenuThenShowConfirmationIsIssued() {
         loadUrl("http://mobile.example.com/", isBrowserShowing = true)
-        testee.onFireproofWebsiteClicked()
+        testee.onFireproofWebsiteMenuClicked()
         assertCommandIssued<Command.ShowFireproofWebSiteConfirmation> {
             assertEquals("mobile.example.com", this.fireproofWebsiteEntity.domain)
         }
@@ -1800,21 +1800,21 @@ class BrowserTabViewModelTest {
     @Test
     fun whenUserClicksFireproofWebsiteOptionMenuThenFireproofWebsiteOptionMenuDisabled() {
         loadUrl("http://example.com/", isBrowserShowing = true)
-        testee.onFireproofWebsiteClicked()
+        testee.onFireproofWebsiteMenuClicked()
         assertFalse(browserViewState().canFireproofSite)
     }
 
     @Test
     fun whenFireproofWebsiteAddedThenPixelSent() {
         loadUrl("http://example.com/", isBrowserShowing = true)
-        testee.onFireproofWebsiteClicked()
+        testee.onFireproofWebsiteMenuClicked()
         verify(mockPixel).fire(Pixel.PixelName.FIREPROOF_WEBSITE_ADDED)
     }
 
     @Test
     fun whenUserClicksOnFireproofWebsiteSnackbarUndoActionThenFireproofWebsiteIsRemoved() {
         loadUrl("http://example.com/", isBrowserShowing = true)
-        testee.onFireproofWebsiteClicked()
+        testee.onFireproofWebsiteMenuClicked()
         assertCommandIssued<Command.ShowFireproofWebSiteConfirmation> {
             testee.onFireproofWebsiteSnackbarUndoClicked(this.fireproofWebsiteEntity)
         }
@@ -1824,7 +1824,7 @@ class BrowserTabViewModelTest {
     @Test
     fun whenUserClicksOnFireproofWebsiteSnackbarUndoActionThenPixelSent() {
         loadUrl("http://example.com/", isBrowserShowing = true)
-        testee.onFireproofWebsiteClicked()
+        testee.onFireproofWebsiteMenuClicked()
         assertCommandIssued<Command.ShowFireproofWebSiteConfirmation> {
             testee.onFireproofWebsiteSnackbarUndoClicked(this.fireproofWebsiteEntity)
         }

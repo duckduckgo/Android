@@ -559,11 +559,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
             is Command.DaxCommand.HideDaxDialog -> showHideTipsDialog(it.cta)
             is Command.HideWebContent -> webView?.hide()
             is Command.ShowWebContent -> webView?.show()
-            is Command.AskToFireproofWebsite -> {
-                askToFireproofWebsite(requireContext(), it.fireproofWebsite) {
-                    viewModel.onFireproofWebsiteClicked(it.fireproofWebsite.domain)
-                }
-            }
+            is Command.AskToFireproofWebsite -> askToFireproofWebsite(requireContext(), it.fireproofWebsite)
         }
     }
 
@@ -633,7 +629,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
         }
     }
 
-    private fun askToFireproofWebsite(context: Context, fireproofWebsite: FireproofWebsiteEntity, onClick: () -> Unit) {
+    private fun askToFireproofWebsite(context: Context, fireproofWebsite: FireproofWebsiteEntity) {
         val isShowing = loginDetectionDialog?.isShowing
 
         if (isShowing != true) {
@@ -641,10 +637,11 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
                 .setTitle(getString(R.string.fireproofWebsiteLoginDialogTitle, fireproofWebsite.website()))
                 .setMessage(R.string.fireproofWebsiteLoginDialogDescription)
                 .setPositiveButton(R.string.fireproofWebsiteLoginDialogPositive) { _, _ ->
-                    onClick()
+                    viewModel.onFireproofLoginDialogClicked(fireproofWebsite.domain)
                 }
                 .setNegativeButton(R.string.fireproofWebsiteLoginDialogNegative) { dialog, _ ->
                     dialog.dismiss()
+                    viewModel.onUserDismissedFireproofLoginDialog()
                 }.show()
         }
     }
@@ -1310,7 +1307,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
                     browserActivity?.launchBookmarks()
                     pixel.fire(Pixel.PixelName.MENU_ACTION_BOOKMARKS_PRESSED.pixelName)
                 }
-                onMenuItemClicked(view.fireproofWebsitePopupMenuItem) { launch { viewModel.onFireproofWebsiteClicked() } }
+                onMenuItemClicked(view.fireproofWebsitePopupMenuItem) { launch { viewModel.onFireproofWebsiteMenuClicked() } }
                 onMenuItemClicked(view.addBookmarksPopupMenuItem) { launch { viewModel.onBookmarkAddRequested() } }
                 onMenuItemClicked(view.findInPageMenuItem) { viewModel.onFindInPageSelected() }
                 onMenuItemClicked(view.whitelistPopupMenuItem) { viewModel.onWhitelistSelected() }

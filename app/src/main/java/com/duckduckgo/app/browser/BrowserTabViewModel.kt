@@ -783,9 +783,9 @@ class BrowserTabViewModel(
         }
     }
 
-    fun onFireproofWebsiteClicked(host: String? = site?.uri?.host) {
+    fun onFireproofWebsiteMenuClicked() {
         viewModelScope.launch {
-            host?.takeUnless { it.isBlank() }?.let { nonEmptyHost ->
+            site?.uri?.host?.takeUnless { it.isBlank() }?.let { nonEmptyHost ->
                 val entity = fireproofWebsiteRepository.fireproofWebsite(nonEmptyHost)
                 if (entity != null) {
                     pixel.fire(PixelName.FIREPROOF_WEBSITE_ADDED)
@@ -793,6 +793,22 @@ class BrowserTabViewModel(
                 }
             }
         }
+    }
+
+    fun onFireproofLoginDialogClicked(host: String) {
+        viewModelScope.launch {
+            host.takeUnless { it.isBlank() }?.let { nonEmptyHost ->
+                val entity = fireproofWebsiteRepository.fireproofWebsite(nonEmptyHost)
+                if (entity != null) {
+                    pixel.fire(PixelName.FIREPROOF_WEBSITE_LOGIN_ADDED)
+                    command.value = ShowFireproofWebSiteConfirmation(fireproofWebsiteEntity = entity)
+                }
+            }
+        }
+    }
+
+    fun onUserDismissedFireproofLoginDialog() {
+        pixel.fire(PixelName.FIREPROOF_WEBSITE_LOGIN_DISMISS)
     }
 
     fun onFireproofWebsiteSnackbarUndoClicked(fireproofWebsiteEntity: FireproofWebsiteEntity) {
