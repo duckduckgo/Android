@@ -25,6 +25,7 @@ import android.webkit.WebView
 import androidx.test.annotation.UiThreadTest
 import androidx.test.filters.SdkSuppress
 import androidx.test.platform.app.InstrumentationRegistry
+import com.duckduckgo.app.browser.logindetection.LoginDetector
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.global.exception.UncaughtExceptionRepository
 import com.duckduckgo.app.statistics.store.OfflinePixelCountDataStore
@@ -42,6 +43,7 @@ class BrowserWebViewClientTest {
     private val requestInterceptor: RequestInterceptor = mock()
     private val listener: WebViewClientListener = mock()
     private val cookieManager: CookieManager = mock()
+    private val loginDetector: LoginDetector = mock()
     private val offlinePixelCountDataStore: OfflinePixelCountDataStore = mock()
     private val uncaughtExceptionRepository: UncaughtExceptionRepository = mock()
 
@@ -55,7 +57,8 @@ class BrowserWebViewClientTest {
             requestInterceptor,
             offlinePixelCountDataStore,
             uncaughtExceptionRepository,
-            cookieManager
+            cookieManager,
+            loginDetector
         )
         testee.webViewClientListener = listener
     }

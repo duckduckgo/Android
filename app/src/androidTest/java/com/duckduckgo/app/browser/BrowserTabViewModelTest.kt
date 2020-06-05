@@ -52,6 +52,7 @@ import com.duckduckgo.app.cta.model.DismissedCta
 import com.duckduckgo.app.cta.ui.*
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteDao
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
+import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepository
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.model.SiteFactory
@@ -250,7 +251,7 @@ class BrowserTabViewModelTest {
             searchCountDao = mockSearchCountDao,
             pixel = mockPixel,
             dispatchers = coroutineRule.testDispatcherProvider,
-            fireproofWebsiteDao = fireproofWebsiteDao
+            fireproofWebsiteRepository = FireproofWebsiteRepository(fireproofWebsiteDao, coroutineRule.testDispatcherProvider)
         )
 
         testee.loadData("abc", null, false)

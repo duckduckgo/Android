@@ -24,8 +24,10 @@ import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.InstantSchedulersRule
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteDao
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
+import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepository
 import com.duckduckgo.app.fire.fireproofwebsite.ui.FireproofWebsitesViewModel.Command.ConfirmDeleteFireproofWebsite
 import com.duckduckgo.app.global.db.AppDatabase
+import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.nhaarman.mockitokotlin2.atLeastOnce
 import com.nhaarman.mockitokotlin2.mock
@@ -66,13 +68,20 @@ class FireproofWebsitesViewModelTest {
 
     private val mockPixel: Pixel = mock()
 
+    private val settingsDataStore: SettingsDataStore = mock()
+
     @Before
     fun before() {
         db = Room.inMemoryDatabaseBuilder(InstrumentationRegistry.getInstrumentation().targetContext, AppDatabase::class.java)
             .allowMainThreadQueries()
             .build()
         fireproofWebsiteDao = db.fireproofWebsiteDao()
-        viewModel = FireproofWebsitesViewModel(fireproofWebsiteDao, coroutineRule.testDispatcherProvider, mockPixel)
+        viewModel = FireproofWebsitesViewModel(
+            FireproofWebsiteRepository(fireproofWebsiteDao, coroutineRule.testDispatcherProvider),
+            coroutineRule.testDispatcherProvider,
+            mockPixel,
+            settingsDataStore
+        )
         viewModel.command.observeForever(mockCommandObserver)
         viewModel.viewState.observeForever(mockViewStateObserver)
     }
