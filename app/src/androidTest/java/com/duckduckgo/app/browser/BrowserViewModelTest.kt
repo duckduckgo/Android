@@ -89,7 +89,6 @@ class BrowserViewModelTest {
 
         testee.command.observeForever(mockCommandObserver)
 
-
         runBlocking<Unit> {
             whenever(mockTabRepository.add()).thenReturn(TAB_ID)
             whenever(mockOmnibarEntryConverter.convertQueryToUrl(any(), any())).then { it.arguments.first() }

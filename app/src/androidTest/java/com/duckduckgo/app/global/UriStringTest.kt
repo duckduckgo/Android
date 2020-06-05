@@ -16,10 +16,8 @@
 
 package com.duckduckgo.app.global
 
-import com.duckduckgo.app.global.UriString.Companion.extractURLParameter
 import com.duckduckgo.app.global.UriString.Companion.isWebUrl
 import com.duckduckgo.app.global.UriString.Companion.sameOrSubdomain
-import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test

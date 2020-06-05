@@ -42,7 +42,7 @@ class QueryUrlConverter @Inject constructor(private val requestRewriter: Request
             .appendQueryParameter(AppUrl.ParamKey.QUERY, searchQuery)
             .authority(Url.HOST)
 
-        vertical?.let{
+        vertical?.let {
             uriBuilder.appendQueryParameter(AppUrl.ParamKey.VERTICAL_REWRITE, vertical)
         }
 

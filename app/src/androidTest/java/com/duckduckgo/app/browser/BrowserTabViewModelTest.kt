@@ -1990,7 +1990,6 @@ class BrowserTabViewModelTest {
         assertFalse(browserViewState().showDaxIcon)
     }
 
-
     private inline fun <reified T : Command> assertCommandIssued(instanceAssertions: T.() -> Unit = {}) {
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
         val issuedCommand = commandCaptor.allValues.find { it is T }
