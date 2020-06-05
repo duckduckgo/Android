@@ -25,27 +25,32 @@ import kotlinx.coroutines.withContext
 import timber.log.Timber
 import javax.inject.Inject
 
-class LoginDetector @Inject constructor(private val settingsDataStore: SettingsDataStore) {
+interface LoginDetector {
+    fun addLoginDetection(webView: WebView, onLoginDetected: () -> Unit)
+    suspend fun onEvent(event: WebNavigationEvent)
+}
+
+sealed class WebNavigationEvent {
+    data class OnPageStarted(val webView: WebView) : WebNavigationEvent()
+    data class ShouldInterceptRequest(val webView: WebView, val request: WebResourceRequest) : WebNavigationEvent()
+}
+
+class JSLoginDetector @Inject constructor(private val settingsDataStore: SettingsDataStore) : LoginDetector {
 
     companion object {
         const val HTTP_POST = "POST"
     }
 
-    sealed class WebNavigationEvent {
-        data class OnPageStarted(val webView: WebView) : WebNavigationEvent()
-        data class ShouldInterceptRequest(val webView: WebView, val request: WebResourceRequest) : WebNavigationEvent()
-    }
-
     private val loginPathRegex = Regex("login|sign-in|signin|sessions")
 
-    fun addLoginDetection(webView: WebView, onLoginDetected: () -> Unit) {
+    override fun addLoginDetection(webView: WebView, onLoginDetected: () -> Unit) {
         webView.addJavascriptInterface(
             LoginDetectionInterface { onLoginDetected() },
             LOGIN_DETECTION_INTERFACE_NAME
         )
     }
 
-    suspend fun onEvent(event: WebNavigationEvent) {
+    override suspend fun onEvent(event: WebNavigationEvent) {
         if (settingsDataStore.appLoginDetection) {
             when (event) {
                 is WebNavigationEvent.OnPageStarted -> injectLoginFormDetectionJS(event.webView)

@@ -24,6 +24,7 @@ import androidx.annotation.RequiresApi
 import androidx.annotation.UiThread
 import androidx.annotation.WorkerThread
 import com.duckduckgo.app.browser.logindetection.LoginDetector
+import com.duckduckgo.app.browser.logindetection.WebNavigationEvent
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.browser.navigation.safeCopyBackForwardList
 import com.duckduckgo.app.global.exception.UncaughtExceptionRepository
@@ -127,7 +128,7 @@ class BrowserWebViewClient(
                     webViewClientListener?.pageRefreshed(url)
                 }
                 lastPageStarted = url
-                loginDetector.onEvent(LoginDetector.WebNavigationEvent.OnPageStarted(webView))
+                loginDetector.onEvent(WebNavigationEvent.OnPageStarted(webView))
             } catch (e: Throwable) {
                 GlobalScope.launch {
                     uncaughtExceptionRepository.recordUncaughtException(e, ON_PAGE_STARTED)
@@ -163,7 +164,7 @@ class BrowserWebViewClient(
         return runBlocking {
             try {
                 val documentUrl = withContext(Dispatchers.Main) { webView.url }
-                loginDetector.onEvent(LoginDetector.WebNavigationEvent.ShouldInterceptRequest(webView, request))
+                loginDetector.onEvent(WebNavigationEvent.ShouldInterceptRequest(webView, request))
                 Timber.v("Intercepting resource ${request.url} type:${request.method} on page $documentUrl")
                 requestInterceptor.shouldIntercept(request, webView, documentUrl, webViewClientListener)
             } catch (e: Throwable) {

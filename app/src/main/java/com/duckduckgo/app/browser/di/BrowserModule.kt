@@ -25,6 +25,7 @@ import com.duckduckgo.app.browser.addtohome.AddToHomeSystemCapabilityDetector
 import com.duckduckgo.app.browser.defaultbrowsing.AndroidDefaultBrowserDetector
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserObserver
+import com.duckduckgo.app.browser.logindetection.JSLoginDetector
 import com.duckduckgo.app.browser.logindetection.LoginDetector
 import com.duckduckgo.app.browser.session.WebViewSessionInMemoryStorage
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
@@ -42,6 +43,7 @@ import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.httpsupgrade.HttpsUpgrader
 import com.duckduckgo.app.privacy.db.PrivacyProtectionCountDao
 import com.duckduckgo.app.referral.AppReferrerDataStore
+import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.pixels.ExceptionPixel
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -204,5 +206,10 @@ class BrowserModule {
     @Provides
     fun webViewPreviewGenerator(): WebViewPreviewGenerator {
         return FileBasedWebViewPreviewGenerator()
+    }
+
+    @Provides
+    fun loginDetector(settingsDataStore: SettingsDataStore): LoginDetector {
+        return JSLoginDetector(settingsDataStore)
     }
 }
