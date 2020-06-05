@@ -370,7 +370,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenSubmittedQueryHasWhitespaceItIsTrimmed() {
-        whenever(mockOmnibarConverter.convertQueryToUrl("nytimes.com", null)).thenReturn("foo.com")
+        whenever(mockOmnibarConverter.convertQueryToUrl("nytimes.com", null)).thenReturn("nytimes.com")
         testee.onUserSubmittedQuery(" nytimes.com ")
         assertEquals("nytimes.com", omnibarViewState().omnibarText)
     }
@@ -1241,7 +1241,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenRestoringWebViewSessionNotRestorableThenPreviousUrlLoaded() {
-        whenever(mockOmnibarConverter.convertQueryToUrl("foo.com", null)).thenReturn("foo.com")
+        whenever(mockOmnibarConverter.convertQueryToUrl("foo.com")).thenReturn("foo.com")
         whenever(webViewSessionStorage.restoreSession(anyOrNull(), anyString())).thenReturn(false)
         testee.restoreWebViewState(null, "foo.com")
 
@@ -1968,7 +1968,7 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenSERPRemovalFeatureIsActiveAndPrivacyGradeIsVisibleThenShowDaxIconIsFalse() {
+    fun whenSERPRemovalFeatureIsActiveAndBrowsingNonDDGSiteAndPrivacyGradeIsVisibleThenShowDaxIconIsFalse() {
         val serpRemovalVariant = Variant("foo", 100.0, features = listOf(VariantManager.VariantFeature.SerpHeaderRemoval), filterBy = { true })
         whenever(mockVariantManager.getVariant()).thenReturn(serpRemovalVariant)
         val url = "https://example.com"
@@ -1977,14 +1977,14 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenSERPRemovalFeatureIsInaactiveAndBrowsingDDGSiteAndPrivacyGradeIsVisibleThenShowDaxIconIsFalse() {
+    fun whenSERPRemovalFeatureIsInactiveAndBrowsingDDGSiteAndPrivacyGradeIsVisibleThenShowDaxIconIsFalse() {
         val url = "https://duckduckgo.com?q=test%20search"
         loadUrl(url, isBrowserShowing = true)
         assertFalse(browserViewState().showDaxIcon)
     }
 
     @Test
-    fun whenSERPRemovalFeatureIsInaactiveAndPrivacyGradeIsVisibleThenShowDaxIconIsFalse() {
+    fun whenSERPRemovalFeatureIsInactiveAndBrowsingNonDDGSiteAndPrivacyGradeIsVisibleThenShowDaxIconIsFalse() {
         val url = "https://example.com"
         loadUrl(url, isBrowserShowing = true)
         assertFalse(browserViewState().showDaxIcon)
