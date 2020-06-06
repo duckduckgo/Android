@@ -44,6 +44,7 @@ class SettingsViewModel @Inject constructor(
         val loading: Boolean = true,
         val version: String = "",
         val lightThemeEnabled: Boolean = false,
+        val darkModeEnabled: Boolean = false,
         val autoCompleteSuggestionsEnabled: Boolean = true,
         val showDefaultBrowserSetting: Boolean = false,
         val isAppDefaultBrowser: Boolean = false,
@@ -86,6 +87,7 @@ class SettingsViewModel @Inject constructor(
         viewState.value = currentViewState().copy(
             loading = false,
             lightThemeEnabled = isLightTheme,
+                darkModeEnabled = settingsDataStore.darkMode,
             autoCompleteSuggestionsEnabled = settingsDataStore.autoCompleteSuggestionsEnabled,
             isAppDefaultBrowser = defaultBrowserAlready,
             showDefaultBrowserSetting = defaultWebBrowserCapability.deviceSupportsDefaultBrowserConfiguration(),
@@ -115,6 +117,12 @@ class SettingsViewModel @Inject constructor(
 
         val pixelName = if (enabled) SETTINGS_THEME_TOGGLED_LIGHT else SETTINGS_THEME_TOGGLED_DARK
         pixel.fire(pixelName)
+    }
+
+    fun onDarkModeToggled(enabled: Boolean) {
+        Timber.i("User toggled dark mode, is now enabled: $enabled")
+        settingsDataStore.darkMode = enabled
+        viewState.value = currentViewState().copy(darkModeEnabled = enabled)
     }
 
     fun onAutocompleteSettingChanged(enabled: Boolean) {

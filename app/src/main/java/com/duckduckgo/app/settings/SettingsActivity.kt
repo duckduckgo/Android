@@ -62,6 +62,10 @@ class SettingsActivity : DuckDuckGoActivity(), SettingsAutomaticallyClearWhatFra
         viewModel.onLightThemeToggled(isChecked)
     }
 
+    private val darkModeToggleListener = OnCheckedChangeListener { _, isChecked ->
+        viewModel.onDarkModeToggled(isChecked)
+    }
+
     private val autocompleteToggleListener = OnCheckedChangeListener { _, isChecked ->
         viewModel.onAutocompleteSettingChanged(isChecked)
     }
@@ -87,6 +91,7 @@ class SettingsActivity : DuckDuckGoActivity(), SettingsAutomaticallyClearWhatFra
         fireproofWebsites.setOnClickListener { viewModel.onFireproofWebsitesClicked() }
 
         lightThemeToggle.setOnCheckedChangeListener(lightThemeToggleListener)
+        darkModeToogle.setOnCheckedChangeListener(darkModeToggleListener)
         autocompleteToggle.setOnCheckedChangeListener(autocompleteToggleListener)
         setAsDefaultBrowserSetting.setOnCheckedChangeListener(defaultBrowserChangeListener)
         automaticallyClearWhatSetting.setOnClickListener { launchAutomaticallyClearWhatDialog() }
@@ -99,6 +104,7 @@ class SettingsActivity : DuckDuckGoActivity(), SettingsAutomaticallyClearWhatFra
             viewState?.let {
                 version.setSubtitle(it.version)
                 lightThemeToggle.quietlySetIsChecked(it.lightThemeEnabled, lightThemeToggleListener)
+                darkModeToogle.quietlySetIsChecked(it.darkModeEnabled, darkModeToggleListener)
                 autocompleteToggle.quietlySetIsChecked(it.autoCompleteSuggestionsEnabled, autocompleteToggleListener)
                 updateDefaultBrowserViewVisibility(it)
                 updateAutomaticClearDataOptions(it.automaticallyClearData)

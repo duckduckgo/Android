@@ -56,6 +56,8 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.OnLifecycleEvent
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.webkit.WebSettingsCompat
+import androidx.webkit.WebViewFeature
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion
 import com.duckduckgo.app.bookmarks.ui.EditBookmarkDialogFragment
 import com.duckduckgo.app.brokensite.BrokenSiteActivity
@@ -87,6 +89,7 @@ import com.duckduckgo.app.global.device.DeviceInfo
 import com.duckduckgo.app.global.model.orderedTrackingEntities
 import com.duckduckgo.app.global.view.*
 import com.duckduckgo.app.privacy.renderer.icon
+import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.survey.model.Survey
@@ -185,6 +188,9 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
 
     @Inject
     lateinit var variantManager: VariantManager
+
+    @Inject
+    lateinit var settingsDataStore: SettingsDataStore
 
     val tabId get() = requireArguments()[TAB_ID_ARG] as String
 
@@ -309,6 +315,15 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
             fun onStop() {
                 if (isVisible) {
                     updateOrDeleteWebViewPreview()
+                }
+            }
+
+            @OnLifecycleEvent(Lifecycle.Event.ON_START)
+            fun onStart() {
+                if (isVisible && WebViewFeature.isFeatureSupported(WebViewFeature.FORCE_DARK)) {
+                    WebSettingsCompat.setForceDark(webView!!.settings,
+                            if (settingsDataStore.darkMode) WebSettingsCompat.FORCE_DARK_ON
+                            else WebSettingsCompat.FORCE_DARK_OFF)
                 }
             }
         })

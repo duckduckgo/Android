@@ -39,13 +39,22 @@
         app:layout_constraintTop_toBottomOf="@id/settingsGeneralTitle" />
 
     <androidx.appcompat.widget.SwitchCompat
+        android:id="@+id/darkModeToogle"
+        style="@style/SettingsSwitch"
+        android:text="@string/settingsDarkMode"
+        android:theme="@style/SettingsSwitchTheme"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/lightThemeToggle" />
+
+    <androidx.appcompat.widget.SwitchCompat
         android:id="@+id/autocompleteToggle"
         style="@style/SettingsSwitch"
         android:text="@string/settingsAutocompleteEnabled"
         android:theme="@style/SettingsSwitchTheme"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/lightThemeToggle" />
+        app:layout_constraintTop_toBottomOf="@id/darkModeToogle" />
 
     <androidx.appcompat.widget.SwitchCompat
         android:id="@+id/setAsDefaultBrowserSetting"

@@ -30,6 +30,7 @@ interface SettingsDataStore {
 
     var lastExecutedJobId: String?
     var theme: DuckDuckGoTheme?
+    var darkMode: Boolean
     var hideTips: Boolean
     var autoCompleteSuggestionsEnabled: Boolean
     var appIcon: AppIcon
@@ -70,6 +71,10 @@ class SettingsSharedPreferences @Inject constructor(private val context: Context
             return DuckDuckGoTheme.valueOf(themeName)
         }
         set(theme) = preferences.edit { putString(KEY_THEME, theme.toString()) }
+
+    override var darkMode: Boolean
+        get() = preferences.getBoolean(KEY_DARK_MODE, false)
+        set(enabled) = preferences.edit { putBoolean(KEY_DARK_MODE, enabled) }
 
     override var hideTips: Boolean
         get() = preferences.getBoolean(KEY_HIDE_TIPS, false)
@@ -143,6 +148,7 @@ class SettingsSharedPreferences @Inject constructor(private val context: Context
         const val FILENAME = "com.duckduckgo.app.settings_activity.settings"
         const val KEY_BACKGROUND_JOB_ID = "BACKGROUND_JOB_ID"
         const val KEY_THEME = "THEME"
+        const val KEY_DARK_MODE = "DARK_MODE"
         const val KEY_AUTOCOMPLETE_ENABLED = "AUTOCOMPLETE_ENABLED"
         const val KEY_AUTOMATICALLY_CLEAR_WHAT_OPTION = "AUTOMATICALLY_CLEAR_WHAT_OPTION"
         const val KEY_AUTOMATICALLY_CLEAR_WHEN_OPTION = "AUTOMATICALLY_CLEAR_WHEN_OPTION"
