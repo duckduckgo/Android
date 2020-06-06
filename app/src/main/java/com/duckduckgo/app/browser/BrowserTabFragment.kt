@@ -320,7 +320,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
 
             @OnLifecycleEvent(Lifecycle.Event.ON_START)
             fun onStart() {
-                if (isVisible && WebViewFeature.isFeatureSupported(WebViewFeature.FORCE_DARK)) {
+                if (WebViewFeature.isFeatureSupported(WebViewFeature.FORCE_DARK)) {
                     WebSettingsCompat.setForceDark(webView!!.settings,
                             if (settingsDataStore.darkMode) WebSettingsCompat.FORCE_DARK_ON
                             else WebSettingsCompat.FORCE_DARK_OFF)
