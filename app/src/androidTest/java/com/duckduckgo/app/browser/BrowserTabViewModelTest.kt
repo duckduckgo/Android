@@ -1833,6 +1833,44 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenUserFireproofsWebsiteFromLoginDialogThenShowConfirmationIsIssuedWithExpectedDomain() {
+        loadUrl("http://mobile.example.com/", isBrowserShowing = true)
+        testee.onFireproofLoginDialogClicked("login.example.com")
+        assertCommandIssued<Command.ShowFireproofWebSiteConfirmation> {
+            assertEquals("login.example.com", this.fireproofWebsiteEntity.domain)
+        }
+    }
+
+    @Test
+    fun whenUserFireproofsWebsiteFromLoginDialogThenPixelSent() {
+        testee.onFireproofLoginDialogClicked("login.example.com")
+        verify(mockPixel).fire(Pixel.PixelName.FIREPROOF_WEBSITE_LOGIN_ADDED)
+    }
+
+    @Test
+    fun whenUserDismissesFireproofWebsiteLoginDialogThenPixelSent() {
+        testee.onUserDismissedFireproofLoginDialog()
+        verify(mockPixel).fire(Pixel.PixelName.FIREPROOF_WEBSITE_LOGIN_DISMISS)
+    }
+
+    @Test
+    fun whenLoginDetectedOnAFireproofedWebsiteThenDoNotAskToFireproofWebiste() {
+        givenFireproofWebsiteDomain("example.com")
+        loadUrl("http://example.com/", isBrowserShowing = true)
+        testee.loginDetected()
+        assertCommandNotIssued<Command.AskToFireproofWebsite>()
+    }
+
+    @Test
+    fun whenLoginDetectedOnANonFireproofedWebsiteThenAskToFireproofWebiste() {
+        loadUrl("http://example.com/", isBrowserShowing = true)
+        testee.loginDetected()
+        assertCommandIssued<Command.AskToFireproofWebsite> {
+            assertEquals(FireproofWebsiteEntity("example.com"), this.fireproofWebsite)
+        }
+    }
+
+    @Test
     fun whenUserBrowsingPressesBackThenCannotAddBookmark() {
         setupNavigation(skipHome = false, isBrowsing = true, canGoBack = false)
         assertTrue(testee.onUserPressedBack())
