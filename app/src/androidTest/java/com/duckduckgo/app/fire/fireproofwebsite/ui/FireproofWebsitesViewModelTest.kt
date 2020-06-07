@@ -40,6 +40,7 @@ import org.junit.Test
 import org.mockito.ArgumentCaptor
 import org.mockito.Mockito.verify
 
+@Suppress("EXPERIMENTAL_API_USAGE")
 class FireproofWebsitesViewModelTest {
 
     @get:Rule
