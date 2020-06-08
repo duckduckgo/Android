@@ -1854,7 +1854,7 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenLoginDetectedOnAFireproofedWebsiteThenDoNotAskToFireproofWebiste() {
+    fun whenLoginDetectedOnAFireproofedWebsiteThenDoNotAskToFireproofWebsite() {
         givenFireproofWebsiteDomain("example.com")
         loadUrl("http://example.com/", isBrowserShowing = true)
         testee.loginDetected()
@@ -1862,7 +1862,7 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenLoginDetectedOnANonFireproofedWebsiteThenAskToFireproofWebiste() {
+    fun whenLoginDetectedOnANonFireproofedWebsiteThenAskToFireproofWebsite() {
         loadUrl("http://example.com/", isBrowserShowing = true)
         testee.loginDetected()
         assertCommandIssued<Command.AskToFireproofWebsite> {
