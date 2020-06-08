@@ -23,7 +23,7 @@ import org.junit.Test
 class LoginDetectionInterfaceTest {
 
     @Test
-    fun whenLoginDetectedThenCallback() {
+    fun whenLoginDetectedThenNotifyCallback() {
         val loginDetected = mock<() -> Unit>()
         val loginDetectionInterface = LoginDetectionInterface(loginDetected)
 
