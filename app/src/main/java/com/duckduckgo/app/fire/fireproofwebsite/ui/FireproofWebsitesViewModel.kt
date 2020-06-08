@@ -82,7 +82,7 @@ class FireproofWebsitesViewModel(
     }
 
     fun onUserToggleLoginDetection(enabled: Boolean) {
-        pixel.fire(String.format(Locale.US, Pixel.PixelName.FIREPROOF_WEBSITE_LOGIN_TOOGLE.pixelName, enabled))
+        pixel.fire(String.format(Locale.US, Pixel.PixelName.FIREPROOF_WEBSITE_LOGIN_TOGGLE.pixelName, enabled))
         settingsDataStore.appLoginDetection = enabled
         _viewState.value = _viewState.value?.copy(loginDetectionEnabled = enabled)
     }

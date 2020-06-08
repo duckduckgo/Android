@@ -1208,6 +1208,7 @@ class BrowserTabViewModel(
         viewModelScope.launch {
             if (canFireproofWebsite()) {
                 site?.domain?.let {
+                    pixel.fire(PixelName.FIREPROOF_WEBSITE_LOGIN_DIALOG)
                     command.value = AskToFireproofWebsite(FireproofWebsiteEntity(it))
                 }
             }

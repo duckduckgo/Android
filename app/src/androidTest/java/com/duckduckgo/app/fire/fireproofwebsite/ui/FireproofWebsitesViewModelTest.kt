@@ -29,7 +29,7 @@ import com.duckduckgo.app.fire.fireproofwebsite.ui.FireproofWebsitesViewModel.Co
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.FIREPROOF_WEBSITE_LOGIN_TOOGLE
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.FIREPROOF_WEBSITE_LOGIN_TOGGLE
 import com.nhaarman.mockitokotlin2.atLeastOnce
 import com.nhaarman.mockitokotlin2.mock
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -144,7 +144,7 @@ class FireproofWebsitesViewModelTest {
     fun whenUserTogglesLoginDetectionThenFirePixel() {
         viewModel.onUserToggleLoginDetection(true)
 
-        verify(mockPixel).fire(String.format(Locale.US, FIREPROOF_WEBSITE_LOGIN_TOOGLE.pixelName, true))
+        verify(mockPixel).fire(String.format(Locale.US, FIREPROOF_WEBSITE_LOGIN_TOGGLE.pixelName, true))
     }
 
     @Test
