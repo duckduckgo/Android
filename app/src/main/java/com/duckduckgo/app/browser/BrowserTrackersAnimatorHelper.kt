@@ -234,6 +234,7 @@ class BrowserTrackersAnimatorHelper {
             .asSequence()
             .distinct()
             .take(MAX_LOGOS_SHOWN + 1)
+            .sortedWith(compareBy { "AEIOU".contains(it.displayName[0]) })
             .map {
                 val resId = TrackersRenderer().networkLogoIcon(activity, it.name)
                 if (resId == null) {
