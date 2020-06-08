@@ -63,13 +63,25 @@ class FireproofWebsiteRepositoryTest {
     }
 
     @Test
-    fun whenFireprooWebsiteEmptyThenNoEntityIsCreated() = coroutineRule.runBlocking {
+    fun whenFireproofWebsiteEmptyThenNoEntityIsCreated() = coroutineRule.runBlocking {
         val fireproofWebsiteEntity = fireproofWebsiteRepository.fireproofWebsite("")
         assertNull(fireproofWebsiteEntity)
     }
 
     @Test
-    fun whenFireprooWebsiteIsValidThenEntityCreated() = coroutineRule.runBlocking {
+    fun whenFireproofWebsiteInvalidThenNoEntityIsCreated() = coroutineRule.runBlocking {
+        val fireproofWebsiteEntity = fireproofWebsiteRepository.fireproofWebsite("aa1111")
+        assertNull(fireproofWebsiteEntity)
+    }
+
+    @Test
+    fun whenFireproofWebsiteWithSchemaThenNoEntityIsCreated() = coroutineRule.runBlocking {
+        val fireproofWebsiteEntity = fireproofWebsiteRepository.fireproofWebsite("https://aa1111.com")
+        assertNull(fireproofWebsiteEntity)
+    }
+
+    @Test
+    fun whenFireproofWebsiteIsValidThenEntityCreated() = coroutineRule.runBlocking {
         val fireproofWebsiteEntity = fireproofWebsiteRepository.fireproofWebsite("example.com")
         assertEquals(FireproofWebsiteEntity("example.com"), fireproofWebsiteEntity)
     }
