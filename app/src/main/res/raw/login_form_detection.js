@@ -2,7 +2,7 @@ LoginDetection.log("installing loginDetection.js - IN");
 
 function loginFormDetected() {
     try {
-        LoginDetection.loginDetected("login detected");
+        LoginDetection.loginDetected();
     } catch (error) {}
 }
 
