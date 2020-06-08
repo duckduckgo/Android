@@ -16,7 +16,6 @@
 
 package com.duckduckgo.app.fire.fireproofwebsite.data
 
-import android.net.Uri
 import androidx.lifecycle.LiveData
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.UriString
