@@ -75,10 +75,10 @@ class FireproofWebsiteRepositoryTest {
     }
 
     @Test
-    fun whenGetAllFireproofWebsitesThenReturnLiveData() = coroutineRule.runBlocking {
+    fun whenGetAllFireproofWebsitesThenReturnLiveDataWithAllItemsFromDatabase() = coroutineRule.runBlocking {
         givenFireproofWebsiteDomain("example.com", "example2.com")
-        val fireproofWebsiteEntities = fireproofWebsiteRepository.getFireproofWebsites().blockingObserve()
-        assertEquals(fireproofWebsiteEntities!!.size, 2)
+        val fireproofWebsiteEntities = fireproofWebsiteRepository.getFireproofWebsites().blockingObserve()!!
+        assertEquals(fireproofWebsiteEntities.size, 2)
     }
 
     @Test
@@ -87,8 +87,8 @@ class FireproofWebsiteRepositoryTest {
 
         fireproofWebsiteRepository.removeFireproofWebsite(FireproofWebsiteEntity("example.com"))
 
-        val fireproofWebsiteEntities = fireproofWebsiteRepository.getFireproofWebsites().blockingObserve()
-        assertEquals(fireproofWebsiteEntities!!.size, 1)
+        val fireproofWebsiteEntities = fireproofWebsiteDao.fireproofWebsitesSync()
+        assertEquals(fireproofWebsiteEntities.size, 1)
     }
 
     private fun givenFireproofWebsiteDomain(vararg fireproofWebsitesDomain: String) {
