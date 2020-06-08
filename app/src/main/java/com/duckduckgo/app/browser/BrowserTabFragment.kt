@@ -43,8 +43,6 @@ import android.widget.TextView
 import androidx.annotation.AnyThread
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
-import androidx.constraintlayout.widget.ConstraintSet
-import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.content.ContextCompat
 import androidx.core.content.pm.ShortcutManagerCompat
 import androidx.core.text.HtmlCompat
@@ -95,7 +93,6 @@ import com.duckduckgo.app.survey.model.Survey
 import com.duckduckgo.app.survey.ui.SurveyActivity
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.ui.TabSwitcherActivity
-import com.duckduckgo.app.tabs.ui.TabSwitcherBottomBarFeatureActivity
 import com.duckduckgo.app.widget.ui.AddWidgetInstructionsActivity
 import com.duckduckgo.widget.SearchWidgetLight
 import com.google.android.material.snackbar.Snackbar
@@ -112,8 +109,6 @@ import kotlinx.android.synthetic.main.include_omnibar_toolbar.view.browserMenu
 import kotlinx.android.synthetic.main.include_omnibar_toolbar.view.fireIconMenu
 import kotlinx.android.synthetic.main.include_omnibar_toolbar.view.privacyGradeButton
 import kotlinx.android.synthetic.main.include_omnibar_toolbar.view.tabsMenu
-import kotlinx.android.synthetic.main.layout_browser_bottom_navigation_bar.*
-import kotlinx.android.synthetic.main.popup_window_browser_bottom_tab_menu.view.*
 import kotlinx.android.synthetic.main.popup_window_browser_menu.view.*
 import kotlinx.android.synthetic.main.popup_window_browser_menu.view.addBookmarksPopupMenuItem
 import kotlinx.android.synthetic.main.popup_window_browser_menu.view.addToHome
@@ -132,7 +127,6 @@ import org.jetbrains.anko.longToast
 import org.jetbrains.anko.share
 import timber.log.Timber
 import java.io.File
-import java.util.*
 import javax.inject.Inject
 import kotlin.concurrent.thread
 import kotlin.coroutines.CoroutineContext
@@ -299,7 +293,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
         configureAutoComplete()
         configureKeyboardAwareLogoAnimation()
 
-        decorateWithFeatures()
+        decorator.decorateWithFeatures()
 
         animatorHelper.setListener(this)
 
@@ -350,12 +344,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
 
     private fun launchTabSwitcher() {
         val activity = activity ?: return
-        if (isBottomNavigationFeatureEnabled()) {
-            startActivity(TabSwitcherBottomBarFeatureActivity.intent(activity, tabId))
-        } else {
-            startActivity(TabSwitcherActivity.intent(activity, tabId))
-        }
-
+        startActivity(TabSwitcherActivity.intent(activity, tabId))
         activity.overridePendingTransition(R.anim.tab_anim_fade_in, R.anim.slide_to_bottom)
     }
 
@@ -588,8 +577,8 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
         }
     }
 
-    private fun requestGeoPermission(){
-        if (ContextCompat.checkSelfPermission(requireActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED){
+    private fun requestGeoPermission() {
+        if (ContextCompat.checkSelfPermission(requireActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             requestPermissions(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), PERMISSION_REQUEST_GEO_LOCATION)
         } else {
             viewModel.onGeoLocationPermissionGranted()
@@ -632,7 +621,6 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
 
     private fun openInNewBackgroundTab() {
         appBarLayout.setExpanded(true, true)
-        decorator.updateBottomBarVisibility(true, true)
         viewModel.tabs.removeObservers(this)
         decorator.incrementTabs()
     }
@@ -739,17 +727,6 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
             }
         )
         autoCompleteSuggestionsList.adapter = autoCompleteSuggestionsAdapter
-    }
-
-    private fun isBottomNavigationFeatureEnabled() =
-        variantManager.getVariant().hasFeature(VariantManager.VariantFeature.BottomBarNavigation)
-
-    private fun decorateWithFeatures() {
-        if (isBottomNavigationFeatureEnabled()) {
-            decorator.decorateWithBottomBarSearch()
-        } else {
-            decorator.decorateWithToolbar()
-        }
     }
 
     private fun configurePrivacyGrade() {
@@ -1181,7 +1158,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
-        when (requestCode){
+        when (requestCode) {
             PERMISSION_REQUEST_WRITE_EXTERNAL_STORAGE -> {
                 if ((grantResults.isNotEmpty()) && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     Timber.i("Write external storage permission granted")
@@ -1195,7 +1172,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
                 if ((grantResults.isNotEmpty()) && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     Timber.i("Geo location permission granted")
                     viewModel.onGeoLocationPermissionGranted()
-               } else {
+                } else {
                     Timber.i("Geo location permission refused")
                     viewModel.onGeoLocationPermissionDenied()
                 }
@@ -1303,52 +1280,31 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
     }
 
     inner class BrowserTabFragmentDecorator {
-        fun decorateToolbar(viewState: BrowserViewState) {
-            if (!variantManager.getVariant().hasFeature(VariantManager.VariantFeature.BottomBarNavigation)) {
-                decorator.decorateToolbarActions(viewState)
-            }
+
+        fun decorateWithFeatures() {
+            decorateToolbarWithButtons()
+            createPopupMenu()
+            configureShowTabSwitcherListener()
+            configureLongClickOpensNewTabListener()
         }
 
-        private fun decorateToolbarActions(viewState: BrowserViewState) {
+        fun updateToolbarActionsVisibility(viewState: BrowserViewState) {
             tabsButton?.isVisible = viewState.showTabsButton
             fireMenuButton?.isVisible = viewState.showFireButton
             menuButton?.isVisible = viewState.showMenuButton
         }
 
-        fun decorateWithToolbar() {
-            hideBottomBar()
-            decorateAppBarWithToolbarOnly()
-            createPopupMenuWithToolbarOnly()
-            configureShowTabSwitcherListenerWithToolbarOnly()
-            configureLongClickOpensNewTabListenerWithToolbarOnly()
-            removeUnnecessaryLayoutBehaviour()
-        }
-
-        fun decorateWithBottomBarSearch() {
-            bindBottomBarButtons()
-            decorateAppBarWithBottomBar()
-            createPopupMenuWithBottomBar()
-            configureShowTabSwitcherListenerWithBottomBarNavigationOnly()
-            configureLongClickOpensNewTabListenerWithBottomBarNavigationOnly()
-        }
-
-        private fun decorateAppBarWithToolbarOnly() {
+        private fun decorateToolbarWithButtons() {
             fireMenuButton?.show()
             fireMenuButton?.setOnClickListener {
                 browserActivity?.launchFire()
-                pixel.fire(String.format(Locale.US, Pixel.PixelName.MENU_ACTION_FIRE_PRESSED.pixelName, variantManager.getVariant().key))
+                pixel.fire(Pixel.PixelName.MENU_ACTION_FIRE_PRESSED.pixelName)
             }
 
             tabsButton?.show()
         }
 
-        private fun decorateAppBarWithBottomBar() {
-            menuButton?.gone()
-            tabsButton?.gone()
-            fireMenuButton?.gone()
-        }
-
-        private fun createPopupMenuWithToolbarOnly() {
+        private fun createPopupMenu() {
             popupMenu = BrowserPopupMenu(layoutInflater, variantManager.getVariant())
             val view = popupMenu.contentView
             popupMenu.apply {
@@ -1356,15 +1312,15 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
                 onMenuItemClicked(view.backPopupMenuItem) { activity?.onBackPressed() }
                 onMenuItemClicked(view.refreshPopupMenuItem) {
                     viewModel.onRefreshRequested()
-                    pixel.fire(String.format(Locale.US, Pixel.PixelName.MENU_ACTION_REFRESH_PRESSED.pixelName, variantManager.getVariant().key))
+                    pixel.fire(Pixel.PixelName.MENU_ACTION_REFRESH_PRESSED.pixelName)
                 }
                 onMenuItemClicked(view.newTabPopupMenuItem) {
                     viewModel.userRequestedOpeningNewTab()
-                    pixel.fire(String.format(Locale.US, Pixel.PixelName.MENU_ACTION_NEW_TAB_PRESSED.pixelName, variantManager.getVariant().key))
+                    pixel.fire(Pixel.PixelName.MENU_ACTION_NEW_TAB_PRESSED.pixelName)
                 }
                 onMenuItemClicked(view.bookmarksPopupMenuItem) {
                     browserActivity?.launchBookmarks()
-                    pixel.fire(String.format(Locale.US, Pixel.PixelName.MENU_ACTION_BOOKMARKS_PRESSED.pixelName, variantManager.getVariant().key))
+                    pixel.fire(Pixel.PixelName.MENU_ACTION_BOOKMARKS_PRESSED.pixelName)
                 }
                 onMenuItemClicked(view.fireproofWebsitePopupMenuItem) { launch { viewModel.onFireproofWebsiteClicked() } }
                 onMenuItemClicked(view.addBookmarksPopupMenuItem) { launch { viewModel.onBookmarkAddRequested() } }
@@ -1384,149 +1340,36 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
 
         private fun launchTopAnchoredPopupMenu() {
             popupMenu.show(rootView, toolbar)
-            pixel.fire(String.format(Locale.US, Pixel.PixelName.MENU_ACTION_POPUP_OPENED.pixelName, variantManager.getVariant().key))
+            pixel.fire(Pixel.PixelName.MENU_ACTION_POPUP_OPENED.pixelName)
         }
 
-        private fun createPopupMenuWithBottomBar() {
-            popupMenu = BrowserPopupMenu(layoutInflater, variantManager.getVariant())
-            val view = popupMenu.contentView
-            popupMenu.apply {
-                onMenuItemClicked(view.forwardPopupMenuItem) { viewModel.onUserPressedForward() }
-                onMenuItemClicked(view.backPopupMenuItem) { activity?.onBackPressed() }
-                onMenuItemClicked(view.refreshPopupMenuItem) {
-                    viewModel.onRefreshRequested()
-                    pixel.fire(String.format(Locale.US, Pixel.PixelName.MENU_ACTION_REFRESH_PRESSED.pixelName, variantManager.getVariant().key))
-                }
-                onMenuItemClicked(view.sharePopupMenuItem) { viewModel.onShareSelected() }
-                onMenuItemClicked(view.newTabPopupMenuItem) {
-                    viewModel.userRequestedOpeningNewTab()
-                    pixel.fire(String.format(Locale.US, Pixel.PixelName.MENU_ACTION_NEW_TAB_PRESSED.pixelName, variantManager.getVariant().key))
-                }
-                onMenuItemClicked(view.addBookmarksPopupMenuItem) { launch { viewModel.onBookmarkAddRequested() } }
-                onMenuItemClicked(view.fireproofWebsitePopupMenuItem) { launch { viewModel.onFireproofWebsiteClicked() } }
-                onMenuItemClicked(view.findInPageMenuItem) { viewModel.onFindInPageSelected() }
-                onMenuItemClicked(view.whitelistPopupMenuItem) { viewModel.onWhitelistSelected() }
-                onMenuItemClicked(view.brokenSitePopupMenuItem) { viewModel.onBrokenSiteSelected() }
-                onMenuItemClicked(view.settingsPopupMenuItem) { browserActivity?.launchSettings() }
-                onMenuItemClicked(view.requestDesktopSiteCheckMenuItem) { viewModel.onDesktopSiteModeToggled(view.requestDesktopSiteCheckMenuItem.isChecked) }
-                onMenuItemClicked(view.addToHome) { viewModel.onPinPageToHomeSelected() }
-            }
-        }
-
-        private fun launchBottomAnchoredPopupMenu() {
-            popupMenu.show(rootView, bottomNavigationBar)
-            pixel.fire(String.format(Locale.US, Pixel.PixelName.MENU_ACTION_POPUP_OPENED.pixelName, variantManager.getVariant().key))
-        }
-
-        private fun bindBottomBarButtons() {
-            bottomNavigationBar.apply {
-                onItemClicked(bottomBarFireItem) {
-                    browserActivity?.launchFire()
-                    pixel.fire(String.format(Locale.US, Pixel.PixelName.MENU_ACTION_FIRE_PRESSED.pixelName, variantManager.getVariant().key))
-                }
-                onItemClicked(bottomBarBookmarksItemOne) {
-                    browserActivity?.launchBookmarks()
-                    pixel.fire(String.format(Locale.US, Pixel.PixelName.MENU_ACTION_BOOKMARKS_PRESSED.pixelName, variantManager.getVariant().key))
-                }
-                onItemClicked(bottomBarSearchItem) {
-                    omnibarTextInput.requestFocus()
-                    pixel.fire(String.format(Locale.US, Pixel.PixelName.MENU_ACTION_SEARCH_PRESSED.pixelName, variantManager.getVariant().key))
-                }
-                onItemClicked(bottomBarTabsItem) {
-                    viewModel.userLaunchingTabSwitcher()
-                }
-                onItemClicked(bottomBarOverflowItem) {
-                    hideKeyboardImmediately()
-                    launchBottomAnchoredPopupMenu()
-                }
-            }
-        }
-
-        fun updateBottomBarVisibility(shouldShow: Boolean, shouldAnimate: Boolean = false) {
-            if (isBottomNavigationFeatureEnabled()) {
-                if (shouldShow) {
-                    showBottomBar(shouldAnimate)
-                } else {
-                    hideBottomBar(shouldAnimate)
-                }
-            }
-        }
-
-        private fun hideBottomBar(shouldAnimate: Boolean = false) {
-            if (shouldAnimate) {
-                bottomNavigationBar.animateBarVisibility(isVisible = false)
-            }
-            bottomNavigationBar.gone()
-        }
-
-        private fun showBottomBar(shouldAnimate: Boolean) {
-            if (shouldAnimate) {
-                bottomNavigationBar.show()
-                bottomNavigationBar.animateBarVisibility(isVisible = true)
-            } else {
-                bottomNavigationBar.postDelayed(KEYBOARD_DELAY) {
-                    if (bottomNavigationBar != null) {
-                        bottomNavigationBar.show()
-                    }
-                }
-            }
-        }
-
-        private fun configureShowTabSwitcherListenerWithToolbarOnly() {
+        private fun configureShowTabSwitcherListener() {
             tabsButton?.setOnClickListener {
                 launch { viewModel.userLaunchingTabSwitcher() }
             }
         }
 
-        private fun configureShowTabSwitcherListenerWithBottomBarNavigationOnly() {
-            bottomBarTabsItem.setOnClickListener {
-                launch { viewModel.userLaunchingTabSwitcher() }
-            }
-        }
-
-        private fun configureLongClickOpensNewTabListenerWithToolbarOnly() {
+        private fun configureLongClickOpensNewTabListener() {
             tabsButton?.setOnLongClickListener {
                 launch { viewModel.userRequestedOpeningNewTab() }
                 return@setOnLongClickListener true
             }
         }
 
-        private fun configureLongClickOpensNewTabListenerWithBottomBarNavigationOnly() {
-            bottomBarTabsItem.setOnLongClickListener {
-                launch { viewModel.userRequestedOpeningNewTab() }
-                return@setOnLongClickListener true
-            }
-        }
-
-        private fun removeUnnecessaryLayoutBehaviour() {
-            val params: CoordinatorLayout.LayoutParams = bottomNavigationBar.layoutParams as CoordinatorLayout.LayoutParams
-            params.behavior = null
-        }
-
         fun animateTabsCount() {
             tabsButton?.animateCount()
-            bottomBarTabsItem.animateCount()
         }
 
         fun renderTabIcon(tabs: List<TabEntity>) {
             context?.let {
                 tabsButton?.count = tabs.count()
                 tabsButton?.hasUnread = tabs.firstOrNull { !it.viewed } != null
-
-                bottomBarTabsItem.count = tabs.count()
-                bottomBarTabsItem.hasUnread = tabs.firstOrNull { !it.viewed } != null
             }
         }
 
         fun incrementTabs() {
-            if (isBottomNavigationFeatureEnabled()) {
-                bottomBarTabsItem.increment {
-                    addTabsObserver()
-                }
-            } else {
-                tabsButton?.increment {
-                    addTabsObserver()
-                }
+            tabsButton?.increment {
+                addTabsObserver()
             }
         }
     }
@@ -1599,28 +1442,13 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
                 if (shouldUpdateOmnibarTextInput(viewState, viewState.omnibarText)) {
                     omnibarTextInput.setText(viewState.omnibarText)
                     appBarLayout.setExpanded(true, true)
-                    decorator.updateBottomBarVisibility(true, true)
                     if (viewState.shouldMoveCaretToEnd) {
                         omnibarTextInput.setSelection(viewState.omnibarText.length)
                     }
-                } else {
-                    decorator.updateBottomBarVisibility(!viewState.isEditing)
                 }
 
                 lastSeenBrowserViewState?.let {
                     renderToolbarMenus(it)
-                }
-
-                if (ctaContainer.isVisible) {
-                    if (isBottomNavigationFeatureEnabled()) {
-                        lastSeenOmnibarViewState?.let {
-                            if (it.isEditing) {
-                                ctaContainer.setPadding(0, 0, 0, 0)
-                            } else {
-                                ctaContainer.setPadding(0, 0, 0, 46.toPx())
-                            }
-                        } ?: ctaContainer.setPadding(0, 0, 0, 46.toPx())
-                    }
                 }
             }
         }
@@ -1753,7 +1581,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
                 searchIcon?.isVisible = true
             }
 
-            decorator.decorateToolbar(viewState)
+            decorator.updateToolbarActionsVisibility(viewState)
         }
 
         fun renderFindInPageState(viewState: FindInPageViewState) {
@@ -1879,22 +1707,6 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
 
             ctaContainer.ctaDismissButton.setOnClickListener {
                 viewModel.onUserDismissedCta()
-            }
-
-            if (isBottomNavigationFeatureEnabled()) {
-                lastSeenOmnibarViewState?.let {
-                    if (it.isEditing) {
-                        ctaContainer.setPadding(0, 0, 0, 0)
-                    } else {
-                        ctaContainer.setPadding(0, 0, 0, 46.toPx())
-                    }
-                } ?: ctaContainer.setPadding(0, 0, 0, 46.toPx())
-
-                ConstraintSet().also {
-                    it.clone(newTabLayout)
-                    it.connect(ddgLogo.id, ConstraintSet.BOTTOM, ctaContainer.id, ConstraintSet.TOP, 0)
-                    it.applyTo(newTabLayout)
-                }
             }
         }
 

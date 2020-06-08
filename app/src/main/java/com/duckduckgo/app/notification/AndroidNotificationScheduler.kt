@@ -23,6 +23,14 @@ import androidx.work.*
 import com.duckduckgo.app.notification.db.NotificationDao
 import com.duckduckgo.app.notification.model.Notification
 import com.duckduckgo.app.notification.model.SchedulableNotification
+import com.duckduckgo.app.statistics.VariantManager
+import com.duckduckgo.app.statistics.VariantManager.VariantFeature.DripNotification
+import com.duckduckgo.app.statistics.VariantManager.VariantFeature.Day1DripB2Notification
+import com.duckduckgo.app.statistics.VariantManager.VariantFeature.Day1DripB1Notification
+import com.duckduckgo.app.statistics.VariantManager.VariantFeature.Day1DripA2Notification
+import com.duckduckgo.app.statistics.VariantManager.VariantFeature.Day1DripA1Notification
+import com.duckduckgo.app.statistics.VariantManager.VariantFeature.Day1PrivacyNotification
+import com.duckduckgo.app.statistics.VariantManager.VariantFeature.Day3ClearDataNotification
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.NOTIFICATION_SHOWN
 import timber.log.Timber
@@ -38,7 +46,12 @@ interface AndroidNotificationScheduler {
 class NotificationScheduler(
     private val workManager: WorkManager,
     private val clearDataNotification: SchedulableNotification,
-    private val privacyNotification: SchedulableNotification
+    private val privacyNotification: SchedulableNotification,
+    private val dripA1Notification: SchedulableNotification,
+    private val dripA2Notification: SchedulableNotification,
+    private val dripB1Notification: SchedulableNotification,
+    private val dripB2Notification: SchedulableNotification,
+    private val variantManager: VariantManager
 ) : AndroidNotificationScheduler {
 
     override suspend fun scheduleNextNotification() {
@@ -49,15 +62,37 @@ class NotificationScheduler(
         workManager.cancelAllWorkByTag(UNUSED_APP_WORK_REQUEST_TAG)
 
         when {
-            privacyNotification.canShow() -> {
+            variant().hasFeature(Day1DripA1Notification) && dripA1Notification.canShow() -> {
+                scheduleNotification(OneTimeWorkRequestBuilder<DripA1NotificationWorker>(), 1, TimeUnit.DAYS, UNUSED_APP_WORK_REQUEST_TAG)
+            }
+            variant().hasFeature(Day1DripA2Notification) && dripA2Notification.canShow() -> {
+                scheduleNotification(OneTimeWorkRequestBuilder<DripA2NotificationWorker>(), 1, TimeUnit.DAYS, UNUSED_APP_WORK_REQUEST_TAG)
+            }
+            variant().hasFeature(Day1DripB1Notification) && dripB1Notification.canShow() -> {
+                scheduleNotification(OneTimeWorkRequestBuilder<DripB1NotificationWorker>(), 1, TimeUnit.DAYS, UNUSED_APP_WORK_REQUEST_TAG)
+            }
+            variant().hasFeature(Day1DripB2Notification) && dripB2Notification.canShow() -> {
+                scheduleNotification(OneTimeWorkRequestBuilder<DripB2NotificationWorker>(), 1, TimeUnit.DAYS, UNUSED_APP_WORK_REQUEST_TAG)
+            }
+            (isNotDripVariant() || isDripVariantAndHasPrivacyFeature()) && privacyNotification.canShow() -> {
                 scheduleNotification(OneTimeWorkRequestBuilder<PrivacyNotificationWorker>(), 1, TimeUnit.DAYS, UNUSED_APP_WORK_REQUEST_TAG)
             }
-            clearDataNotification.canShow() -> {
+            (isNotDripVariant() || isDripVariantAndHasClearDataFeature()) && clearDataNotification.canShow() -> {
                 scheduleNotification(OneTimeWorkRequestBuilder<ClearDataNotificationWorker>(), 3, TimeUnit.DAYS, UNUSED_APP_WORK_REQUEST_TAG)
             }
             else -> Timber.v("Notifications not enabled for this variant")
         }
     }
+
+    private fun variant() = variantManager.getVariant()
+
+    private fun isDripVariantAndHasPrivacyFeature(): Boolean = isFromDripNotificationVariant() && variant().hasFeature(Day1PrivacyNotification)
+
+    private fun isDripVariantAndHasClearDataFeature(): Boolean = isFromDripNotificationVariant() && variant().hasFeature(Day3ClearDataNotification)
+
+    private fun isFromDripNotificationVariant(): Boolean = variant().hasFeature(DripNotification)
+
+    private fun isNotDripVariant(): Boolean = !variant().hasFeature(DripNotification)
 
     private fun scheduleNotification(builder: OneTimeWorkRequest.Builder, duration: Long, unit: TimeUnit, tag: String) {
         Timber.v("Scheduling notification")
@@ -75,6 +110,10 @@ class NotificationScheduler(
 
     open class ClearDataNotificationWorker(context: Context, params: WorkerParameters) : SchedulableNotificationWorker(context, params)
     class PrivacyNotificationWorker(context: Context, params: WorkerParameters) : SchedulableNotificationWorker(context, params)
+    class DripA1NotificationWorker(context: Context, params: WorkerParameters) : SchedulableNotificationWorker(context, params)
+    class DripA2NotificationWorker(context: Context, params: WorkerParameters) : SchedulableNotificationWorker(context, params)
+    class DripB1NotificationWorker(context: Context, params: WorkerParameters) : SchedulableNotificationWorker(context, params)
+    class DripB2NotificationWorker(context: Context, params: WorkerParameters) : SchedulableNotificationWorker(context, params)
 
     open class SchedulableNotificationWorker(val context: Context, params: WorkerParameters) : CoroutineWorker(context, params) {
 

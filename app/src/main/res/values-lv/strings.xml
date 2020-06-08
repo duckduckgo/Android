@@ -91,9 +91,10 @@
     <string name="closeTab">Aizvērt cilni</string>
 
     <!-- Privacy Dashboard Activities -->
+    <string name="privacyProtectionToggle">Vietnes privātuma aizsardzība</string>
+    <string name="privacyProtectionEnabled">VIETNES AIZSARDZĪBA IR IESPĒJOTA</string>
+    <string name="privacyProtectionDisabled">VIETAS AIZSARDZĪBA IR ATSPĒJOTA</string>
     <string name="privacyDashboardActivityTitle">Privātuma informācijas panelis</string>
-    <string name="privacyProtectionEnabled">PRIVĀTUMA AIZSARDZĪBA IESPĒJOTA</string>
-    <string name="privacyProtectionDisabled">PRIVĀTUMA AIZSARDZĪBA ATSPĒJOTA</string>
     <string name="privacyProtectionUpgraded" tools:ignore="TypographyQuotes">UZLABOTS NO &lt;img src="%d" /&gt; UZ &lt;img src="%d" /&gt;</string>
     <string name="privacyGradeContentDescription">Privātuma līmenis</string>
 
@@ -143,7 +144,6 @@
     <string name="practicesTosdrLink">Privātuma prakses rezultāti rodas no <b><u>ToS;DR</u></b></string>
     <string name="practicesIconContentGood">Labas prakses ikona</string>
     <string name="practicesIconContentBad">Sliktas prakses ikona</string>
-    <string name="privacyProtectionToggle">Privātuma aizsardzība</string>
 
     <string name="networkTrackerSummaryHeader">IZSEKOTĀJU TĪKLA LIELĀKIE PĀRKĀPĒJI</string>
     <string name="networkTrackerSummaryNotReady">Mēs joprojām apkopojam datus, lai parādītu, cik daudz izsekotāju esam nobloķējuši.</string>
@@ -421,4 +421,55 @@
     <string name="daxNonSerpCtaText">Kad pieskarsies un ritināsi, es bloķēšu uzmācīgos izsekotājus. &lt;br/&gt;&lt;br/&gt;Aiziet – turpini pārlūkot!</string>
     <string name="daxMainNetworkOwnedCtaText">Galvu augšā! %s pieder %s.&lt;br/&gt;&lt;br/&gt; %s izsekotāji slēpjas apmēram %s populārākajās vietnēs &#128561;, bet nevajag satraukties! &lt;br/&gt;&lt;br/&gt;Es bloķēšu %s iespēju redzēt tavas darbības šajās vietnēs.</string>
     <string name="daxMainNetworkCtaText">Galvu augšā! %s ir galvenais izsekošanas tīkls.&lt;br/&gt;&lt;br/&gt; To izsekotāji slēpjas apmēram %s populārākajās vietnēs &#128561;, bet nevajag satraukties! &lt;br/&gt;&lt;br/&gt;Es bloķēšu %s iespēju redzēt tavas darbības šajās vietnēs.</string>
+
+    <!-- Download Confirmation -->
+    <string name="downloadConfirmationContinue">Turpināt</string>
+    <string name="downloadConfirmationSaveFileTitle">Saglabāt %1$s</string>
+    <string name="downloadConfirmationKeepBothFilesText">Paturēt abus</string>
+    <string name="downloadConfirmationReplaceOldFileText">Aizvietot</string>
+    <string name="downloadConfirmationOpenFileText">Atvērt</string>
+    <string name="downloadConfirmationUnableToOpenFileText">Nevarēja atvērt failu</string>
+    <string name="downloadConfirmationUnableToDeleteFileText">Nevarēja izdzēst veco failu</string>
+
+    <!-- Change Icon Activity -->
+    <string name="changeIconActivityTitle">Lietotnes ikona</string>
+    <string name="changeIconCtaLabel">Mainīt lietotnes ikonu</string>
+    <string name="changeIconCtaAccept">Apstiprināt</string>
+    <string name="changeIconCtaCancel">Atcelt</string>
+    <string name="changeIconDialogTitle">Vai lietot jauno ikonu?</string>
+    <string name="changeIconDialogMessage">Lietotne var aizvērties, lai veiktu izmaiņas. Atgriezieties pēc tam, kad būsiet apbrīnojis savu jauno, glīto ikonu.</string>
+
+    <!-- New dashboard / menu buttons -->
+    <string name="manageWhitelist">Pārvaldīt balto sarakstu</string>
+    <string name="reportBrokenSite">Ziņot par bojātu vietni</string>
+
+    <!-- Dialogs -->
+    <string name="dialogAddTitle">Pievienot</string>
+    <string name="dialogEditTitle">Rediģēt</string>
+
+    <!-- Whitelist -->
+    <string name="whitelisetActivityTitle">Baltais saraksts</string>
+    <string name="whitelistAdd">Pievienot baltajam sarakstam</string>
+    <string name="whitelistRemove">Noņemt no baltā saraksta</string>
+    <string name="whitelistEntryOverflowContentDescription">Papildu iespējas baltā saraksta ierakstam %s</string>
+    <string name="whitelistEntryDeleteConfirmMessage">Vai tiešām vēlaties izdzēst &lt;b&gt;%s&lt;/b&gt; no baltā saraksta?</string>
+    <string name="whitelistExplanation">Šīs baltajā sarakstā iekļautās vietnes netiks atjauninātas, izmantojot privātuma aizsardzību</string>
+    <string name="whitelistNoEntries">Nav baltajā sarakstā iekļautu vietņu</string>
+    <string name="whitelistDomainHint">www.piemērs.com</string>
+    <string name="whitelistFormatError">Nevarēja saglabāt, ievadiet domēnu, piemēram, <b>piemērs.com</b>
+  </string>
+
+    <!-- Settings -->
+    <string name="settingsPrivacyProtectionWhitelist">Privātuma aizsardzības baltais saraksts</string>
+
+    <!-- Fireproof websites -->
+    <string name="fireproofWebsitesActivityTitle">Ugunsdrošas tīmekļa vietnes</string>
+    <string name="settingsFireproofWebsites">Ugunsdrošas tīmekļa vietnes</string>
+    <string name="fireproofWebsiteMenuTitle">Ugunsdrošā tīmekļa vietne</string>
+    <string name="fireproofWebsiteSnackbarConfirmation">&lt;b&gt;%s&lt;/b&gt; tagad ir ugunsdrošs! Lai uzzinātu vairāk, apmeklējiet iestatījumus.</string>
+    <string name="fireproofWebsiteSnackbarAction">Atsaukt</string>
+    <string name="fireproofWebsiteDeleteConfirmMessage">Vai tiešām vēlaties izdzēst &lt;b&gt;%s&lt;/b&gt;?</string>
+    <string name="fireproofWebsiteEmptyListHint">Pagaidām neviena tīmekļa vietne nav ugunsdroša</string>
+    <string name="fireproofWebsiteFeatureDescription">Vietnes paļaujas uz sīkdatnēm, lai jūs vienmēr būtu pierakstījies. Kad vietne būs ugunsdroša, sīkfaili netiks izdzēsti, un jūs būsiet pierakstījies pat pēc tam, kad lietosiet pogu Uguni.</string>
+    <string name="fireproofWebsiteOverflowContentDescription">Citas iespējas ugunsdrošai tīmekļa vietnei %s</string>
 </resources>

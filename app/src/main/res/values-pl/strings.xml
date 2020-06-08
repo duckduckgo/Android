@@ -73,9 +73,10 @@
     <string name="closeTab">Zamknij karta</string>
 
     <!-- Privacy Dashboard Activities -->
+    <string name="privacyProtectionToggle">Ochrona prywatności witryny</string>
+    <string name="privacyProtectionEnabled">WŁĄCZONA OCHRONA STRONY</string>
+    <string name="privacyProtectionDisabled">WYŁĄCZONA OCHRONA STRONY</string>
     <string name="privacyDashboardActivityTitle">Panel zarządzania prywatnością</string>
-    <string name="privacyProtectionEnabled">OCHRONA PRYWATNOŚCI JEST WŁĄCZONA</string>
-    <string name="privacyProtectionDisabled">OCHRONA PRYWATNOŚCI JEST WYŁĄCZONA</string>
     <string name="privacyProtectionUpgraded" tools:ignore="TypographyQuotes">USPRAWNIONY OD &lt;img src="%d" /&gt; DO &lt;img src="%d" /&gt;</string>
     <string name="privacyGradeContentDescription">Poziom prywatności</string>
 
@@ -129,7 +130,6 @@
     <string name="practicesTosdrLink">Dane polityki prywatności od <b><u>ToS;DR</u></b></string>
     <string name="practicesIconContentGood">Ikona dobrej polityki prywatności</string>
     <string name="practicesIconContentBad">Ikona złej polityki prywatności</string>
-    <string name="privacyProtectionToggle">Ochrona prywatności</string>
 
     <string name="networkTrackerSummaryHeader">SIECI SKRYPTÓW ŚLEDZĄCYCH – NAJWIĘKSI ZŁOCZYŃCY</string>
     <string name="networkTrackerSummaryNotReady">Nadal gromadzimy dane, aby pokazać, jak wiele skryptów śledzących zablokowaliśmy.</string>
@@ -409,4 +409,54 @@
     <string name="daxMainNetworkOwnedCtaText">Uwaga! %s jest własnością firmy %s.&lt;br/&gt;&lt;br/&gt;Moduły śledzące firmy %s czają się na około %s najpopularniejszych witryn &#128561;, ale nie martw się!&lt;br/&gt;&lt;br/&gt;Zablokuję śledzenie twojej aktywności przez firmę %s na tych stronach.</string>
     <string name="daxMainNetworkCtaText">Uwaga! %s to duża sieć śledząca.&lt;br/&gt;&lt;br/&gt;Ich moduły śledzące czają się na około %s najpopularniejszych witryn &#128561;, ale nie martw się!&lt;br/&gt;&lt;br/&gt;Zablokuję śledzenie twojej aktywności przez firmę %s na tych stronach.</string>
 
+    <!-- Download Confirmation -->
+    <string name="downloadConfirmationContinue">Dalej</string>
+    <string name="downloadConfirmationSaveFileTitle">Zapisz %1$s</string>
+    <string name="downloadConfirmationKeepBothFilesText">Zatrzymaj oba</string>
+    <string name="downloadConfirmationReplaceOldFileText">Zastąp</string>
+    <string name="downloadConfirmationOpenFileText">Otwórz</string>
+    <string name="downloadConfirmationUnableToOpenFileText">Nie można otworzyć pliku</string>
+    <string name="downloadConfirmationUnableToDeleteFileText">Nie można usunąć starego pliku</string>
+
+    <!-- Change Icon Activity -->
+    <string name="changeIconActivityTitle">Ikona aplikacji</string>
+    <string name="changeIconCtaLabel">Zmień ikonę aplikacji</string>
+    <string name="changeIconCtaAccept">Zastosuj</string>
+    <string name="changeIconCtaCancel">Anuluj</string>
+    <string name="changeIconDialogTitle">Zastosować nową ikonę?</string>
+    <string name="changeIconDialogMessage">Aplikacja może się zamknąć, aby zastosować zmiany. Wróć po podziwianiu swojej pięknej nowej ikony.</string>
+
+    <!-- New dashboard / menu buttons -->
+    <string name="manageWhitelist">Zarządzaj białą listą</string>
+    <string name="reportBrokenSite">Zgłoś uszkodzoną witrynę</string>
+
+    <!-- Dialogs -->
+    <string name="dialogAddTitle">Dodaj</string>
+    <string name="dialogEditTitle">Edytuj</string>
+
+    <!-- Whitelist -->
+    <string name="whitelisetActivityTitle">Biała lista</string>
+    <string name="whitelistAdd">Dodaj do białej listy</string>
+    <string name="whitelistRemove">Usuń z białej listy</string>
+    <string name="whitelistEntryOverflowContentDescription">Więcej opcji wpisu na białej liście %s</string>
+    <string name="whitelistEntryDeleteConfirmMessage">Czy na pewno chcesz usunąć &lt;b&gt;%s&lt;/b&gt; z białej listy?</string>
+    <string name="whitelistExplanation">Te witryny z białej listy nie zostaną zaktualizowane przez Ochronę prywatności</string>
+    <string name="whitelistNoEntries">Brak stron z białej listy</string>
+    <string name="whitelistDomainHint">www.example.com</string>
+    <string name="whitelistFormatError">Nie można zapisać, wprowadź domenę taką jak <b>example.com</b>
+  </string>
+
+    <!-- Settings -->
+    <string name="settingsPrivacyProtectionWhitelist">Biała lista ochrony prywatności</string>
+
+    <!-- Fireproof websites -->
+    <string name="fireproofWebsitesActivityTitle">Bezpieczne strony internetowe</string>
+    <string name="settingsFireproofWebsites">Bezpieczne strony internetowe</string>
+    <string name="fireproofWebsiteMenuTitle">Bezpieczna strona internetowa</string>
+    <string name="fireproofWebsiteSnackbarConfirmation">&lt;b&gt;%s&lt;/b&gt; jest teraz bezpieczna! Odwiedź Ustawienia, aby dowiedzieć się więcej.</string>
+    <string name="fireproofWebsiteSnackbarAction">Cofnij</string>
+    <string name="fireproofWebsiteDeleteConfirmMessage">Czy na pewno chcesz usunąć &lt;b&gt;%s&lt;/b&gt;?</string>
+    <string name="fireproofWebsiteEmptyListHint">Żadne strony nie są jeszcze zabezpieczone</string>
+    <string name="fireproofWebsiteFeatureDescription">Strony internetowe używają plików cookie, aby pozostawać zalogowanym. Gdy strona zostanie zabezpieczona, pliki cookie nie zostaną usunięte, a użytkownik pozostanie zalogowany, nawet po użyciu przycisku Fire.</string>
+    <string name="fireproofWebsiteOverflowContentDescription">Więcej opcji dla bezpiecznej strony internetowej %s</string>
 </resources>

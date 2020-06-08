@@ -29,7 +29,6 @@ import android.webkit.WebChromeClient
 import android.webkit.WebView
 import androidx.annotation.AnyThread
 import androidx.annotation.VisibleForTesting
-import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
 import androidx.lifecycle.*
 import com.duckduckgo.app.autocomplete.api.AutoComplete
@@ -255,6 +254,7 @@ class BrowserTabViewModel(
     private lateinit var tabId: String
     private var webNavigationState: WebNavigationState? = null
     private var httpsUpgraded = false
+    private val browserStateModifier = BrowserStateModifier()
     private val fireproofWebsitesObserver = Observer<List<FireproofWebsiteEntity>> {
         browserViewState.value = currentBrowserViewState().copy(canFireproofSite = canFireproofWebsite())
     }
@@ -423,7 +423,8 @@ class BrowserTabViewModel(
 
     fun onUserPressedForward() {
         if (!currentBrowserViewState().browserShowing) {
-            browserViewState.value = currentBrowserViewState().copy(browserShowing = true)
+            browserViewState.value = browserStateModifier.copyForBrowserShowing(currentBrowserViewState())
+            findInPageViewState.value = currentFindInPageViewState().copy(canFindInPage = true)
             command.value = Refresh
         } else {
             command.value = NavigateForward
@@ -472,13 +473,14 @@ class BrowserTabViewModel(
     private fun navigateHome() {
         site = null
         onSiteChanged()
+        webNavigationState = null
 
-        browserViewState.value = currentBrowserViewState().copy(
-            browserShowing = false,
-            canGoBack = false,
-            canFireproofSite = false,
+        val browserState = browserStateModifier.copyForHomeShowing(currentBrowserViewState()).copy(
             canGoForward = currentGlobalLayoutState() !is Invalidated
         )
+        browserViewState.value = browserState
+
+        findInPageViewState.value = FindInPageViewState()
         omnibarViewState.value = currentOmnibarViewState().copy(omnibarText = "", shouldMoveCaretToEnd = false)
         loadingViewState.value = currentLoadingViewState().copy(isLoading = false)
 
@@ -638,7 +640,7 @@ class BrowserTabViewModel(
         origin?.let { permissionOrigin = origin }
         callback?.let { permissionCallback = callback }
 
-        if (origin != null){
+        if (origin != null) {
             command.postValue(AskGeoPermission)
             // if (duckDuckGoUrlDetector.isDuckDuckGoUrl(origin)){
             // } else {
@@ -656,7 +658,6 @@ class BrowserTabViewModel(
     fun onGeoLocationPermissionDenied() {
         permissionCallback?.invoke(permissionOrigin, false, true)
     }
-
 
     private fun registerSiteVisit() {
         Schedulers.io().scheduleDirect {
@@ -1221,7 +1222,6 @@ class BrowserTabViewModel(
         closeCurrentTab()
         command.value = OpenInNewTab(query)
     }
-
 
     companion object {
         private const val FIXED_PROGRESS = 50

@@ -18,7 +18,6 @@ package com.duckduckgo.app.browser
 
 import android.view.MenuItem
 import android.view.View
-import android.webkit.GeolocationPermissions
 import android.webkit.HttpAuthHandler
 import android.webkit.WebView
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
@@ -187,12 +186,6 @@ class BrowserTabViewModelTest {
 
     @Captor
     private lateinit var commandCaptor: ArgumentCaptor<Command>
-
-    @Captor
-    private lateinit var permissionCallbackCaptor: ArgumentCaptor<GeolocationPermissions.Callback>
-
-    @Mock
-    private lateinit var permissionCallback: GeolocationPermissions.Callback
 
     private lateinit var db: AppDatabase
 
@@ -1839,7 +1832,111 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenGeoPermissionisRequestedAndOriginIsNotDDGThenItsDenied(){
+    fun whenUserBrowsingPressesBackThenCannotAddBookmark() {
+        setupNavigation(skipHome = false, isBrowsing = true, canGoBack = false)
+        assertTrue(testee.onUserPressedBack())
+        assertFalse(browserViewState().canAddBookmarks)
+    }
+
+    @Test
+    fun whenUserBrowsingPressesBackThenCannotSharePage() {
+        setupNavigation(skipHome = false, isBrowsing = true, canGoBack = false)
+        assertTrue(testee.onUserPressedBack())
+        assertFalse(browserViewState().canSharePage)
+    }
+
+    @Test
+    fun whenUserBrowsingPressesBackThenCannotReportSite() {
+        setupNavigation(skipHome = false, isBrowsing = true, canGoBack = false)
+        assertTrue(testee.onUserPressedBack())
+        assertFalse(browserViewState().canReportSite)
+    }
+
+    @Test
+    fun whenUserBrowsingPressesBackThenCannotAddToHome() {
+        setupNavigation(skipHome = false, isBrowsing = true, canGoBack = false)
+        assertTrue(testee.onUserPressedBack())
+        assertFalse(browserViewState().addToHomeEnabled)
+    }
+
+    @Test
+    fun whenUserBrowsingPressesBackThenCannotWhitelist() {
+        setupNavigation(skipHome = false, isBrowsing = true, canGoBack = false)
+        assertTrue(testee.onUserPressedBack())
+        assertFalse(browserViewState().canWhitelist)
+    }
+
+    @Test
+    fun whenUserBrowsingPressesBackThenCannotNavigateBack() {
+        setupNavigation(skipHome = false, isBrowsing = true, canGoBack = false)
+        assertTrue(testee.onUserPressedBack())
+        assertFalse(browserViewState().canGoBack)
+    }
+
+    @Test
+    fun whenUserBrowsingPressesBackThenCannotFindInPage() {
+        setupNavigation(skipHome = false, isBrowsing = true, canGoBack = false)
+        assertTrue(testee.onUserPressedBack())
+        assertFalse(findInPageViewState().canFindInPage)
+    }
+
+    @Test
+    fun whenUserBrowsingPressesBackThenCanGoForward() {
+        setupNavigation(skipHome = false, isBrowsing = true, canGoBack = false)
+        assertTrue(testee.onUserPressedBack())
+        assertTrue(browserViewState().canGoForward)
+    }
+
+    @Test
+    fun whenUserBrowsingPressesBackAndForwardThenCanAddBookmark() {
+        setupNavigation(skipHome = false, isBrowsing = true, canGoBack = false)
+        testee.onUserPressedBack()
+        testee.onUserPressedForward()
+        assertTrue(browserViewState().canAddBookmarks)
+    }
+
+    @Test
+    fun whenUserBrowsingPressesBackAndForwardThenCanWhitelist() {
+        setupNavigation(skipHome = false, isBrowsing = true, canGoBack = false)
+        testee.onUserPressedBack()
+        testee.onUserPressedForward()
+        assertTrue(browserViewState().canWhitelist)
+    }
+
+    @Test
+    fun whenUserBrowsingPressesBackAndForwardThenCanShare() {
+        setupNavigation(skipHome = false, isBrowsing = true, canGoBack = false)
+        testee.onUserPressedBack()
+        testee.onUserPressedForward()
+        assertTrue(browserViewState().canSharePage)
+    }
+
+    @Test
+    fun whenUserBrowsingPressesBackAndForwardThenCanReportSite() {
+        setupNavigation(skipHome = false, isBrowsing = true, canGoBack = false)
+        testee.onUserPressedBack()
+        testee.onUserPressedForward()
+        assertTrue(browserViewState().canReportSite)
+    }
+
+    @Test
+    fun whenUserBrowsingPressesBackAndForwardThenCanAddToHome() {
+        setupNavigation(skipHome = false, isBrowsing = true, canGoBack = false)
+        testee.onUserPressedBack()
+        testee.onUserPressedForward()
+        assertTrue(browserViewState().addToHomeEnabled)
+    }
+
+    @Test
+    fun whenUserBrowsingPressesBackAndForwardThenCanFindInPage() {
+        setupNavigation(skipHome = false, isBrowsing = true, canGoBack = false)
+        testee.onUserPressedBack()
+        testee.onUserPressedForward()
+        assertTrue(findInPageViewState().canFindInPage)
+    }
+
+    @Test
+    fun whenGeoPermissionisRequestedAndOriginIsNotDDGThenItsDenied() {
         val originUrl = "http://example.com"
         testee.onGeoLocationPermissionRequested(originUrl, permissionCallback)
 
@@ -1847,7 +1944,7 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenGeoPermissionisRequestedAndOriginIsDDGThenItsGranted(){
+    fun whenGeoPermissionisRequestedAndOriginIsDDGThenItsGranted() {
 
     }
 
