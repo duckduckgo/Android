@@ -234,7 +234,7 @@ class BrowserTrackersAnimatorHelper {
             .asSequence()
             .distinct()
             .take(MAX_LOGOS_SHOWN + 1)
-            .sortedWith(compareBy { "AEIOU".contains(it.displayName[0]) })
+            .sortedWithDisplayNamesStartingWithVowelsToTheEnd()
             .map {
                 val resId = TrackersRenderer().networkLogoIcon(activity, it.name)
                 if (resId == null) {
@@ -418,6 +418,10 @@ class BrowserTrackersAnimatorHelper {
         }
     }
 
+    private fun Sequence<Entity>.sortedWithDisplayNamesStartingWithVowelsToTheEnd(): Sequence<Entity> {
+        return sortedWith(compareBy { "AEIOU".contains(it.displayName.take(1)) })
+    }
+
     companion object {
         private const val TRACKER_LOGOS_DELAY_ON_SCREEN = 2400L
         private const val DEFAULT_ANIMATION_DURATION = 150L
@@ -436,3 +440,4 @@ sealed class TrackerLogo(val resId: Int) {
     class LetterLogo(val trackerLetter: String = "", resId: Int = R.drawable.other_tracker_bg) : TrackerLogo(resId)
     class StackedLogo(resId: Int = R.drawable.other_tracker_bg) : TrackerLogo(resId)
 }
+
