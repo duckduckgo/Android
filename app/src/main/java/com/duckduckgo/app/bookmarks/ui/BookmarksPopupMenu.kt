@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 DuckDuckGo
+ * Copyright (c) 2020 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.browser
+package com.duckduckgo.app.bookmarks.ui
 
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
@@ -24,19 +24,18 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup.LayoutParams.WRAP_CONTENT
 import android.widget.PopupWindow
-import com.duckduckgo.app.statistics.Variant
+import com.duckduckgo.app.browser.R
 
-class BrowserPopupMenu(layoutInflater: LayoutInflater, variant: Variant, view: View = inflate(layoutInflater, variant)) :
+class BookmarksPopupMenu(layoutInflater: LayoutInflater, view: View = inflate(layoutInflater, R.layout.popup_window_bookmarks_menu)) :
     PopupWindow(view, WRAP_CONTENT, WRAP_CONTENT, true) {
-
-    // popupwindow gets stuck on the screen on API 22 (tested on 23) without a background
-    // color.  Adding it however garbles the elevation so we cannot have elevation here.
 
     init {
         if (SDK_INT <= 22) {
+            // popupwindow gets stuck on the screen on API 22 (tested on 23) without a background
+            // color.  Adding it however garbles the elevation so we cannot have elevation here.
             setBackgroundDrawable(ColorDrawable(Color.WHITE))
         } else {
-            elevation = 6.toFloat()
+            elevation = ELEVATION
         }
         animationStyle = android.R.style.Animation_Dialog
     }
@@ -51,17 +50,18 @@ class BrowserPopupMenu(layoutInflater: LayoutInflater, variant: Variant, view: V
     fun show(rootView: View, anchorView: View) {
         val anchorLocation = IntArray(2)
         anchorView.getLocationOnScreen(anchorLocation)
-        val x = margin
-        val y = anchorLocation[1] + margin
+        val x = MARGIN
+        val y = anchorLocation[1] + MARGIN
         showAtLocation(rootView, Gravity.TOP or Gravity.END, x, y)
     }
 
     companion object {
 
-        private const val margin = 30
+        private const val MARGIN = 30
+        private const val ELEVATION = 6f
 
-        fun inflate(layoutInflater: LayoutInflater, variant: Variant): View {
-            return layoutInflater.inflate(R.layout.popup_window_browser_menu, null)
+        fun inflate(layoutInflater: LayoutInflater, resourceId: Int): View {
+            return layoutInflater.inflate(resourceId, null)
         }
     }
 }

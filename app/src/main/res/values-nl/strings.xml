@@ -73,9 +73,10 @@
     <string name="closeTab">Tabblad sluiten</string>
 
     <!-- Privacy Dashboard Activities -->
+    <string name="privacyProtectionToggle">Privacybescherming van de site</string>
+    <string name="privacyProtectionEnabled">BESCHERMING VAN DE SITE INGESCHAKELD</string>
+    <string name="privacyProtectionDisabled">BESCHERMING VAN DE SITE UITGESCHAKELD</string>
     <string name="privacyDashboardActivityTitle">Privacydashboard</string>
-    <string name="privacyProtectionEnabled">PRIVACYBESCHERMING INGESCHAKELD</string>
-    <string name="privacyProtectionDisabled">PRIVACYBESCHERMING UITGESCHAKELD</string>
     <string name="privacyProtectionUpgraded" tools:ignore="TypographyQuotes">VERBETERD VAN &lt;img src="%d" /&gt; NAAR &lt;img src="%d" /&gt;</string>
     <string name="privacyGradeContentDescription">Privacyniveau</string>
 
@@ -121,7 +122,6 @@
     <string name="practicesTosdrLink">Privacypraktijken zijn het resultaat van <b><u>ToS;DR</u></b></string>
     <string name="practicesIconContentGood">Pictogram Goede praktijken</string>
     <string name="practicesIconContentBad">Pictogram Slechte praktijken</string>
-    <string name="privacyProtectionToggle">Privacybescherming</string>
 
     <string name="networkTrackerSummaryHeader">TOPOVERTREDERS TRACKERNETWERK</string>
     <string name="networkTrackerSummaryNotReady">We verzamelen nog steeds gegevens om te laten zien hoeveel trackers we hebben geblokkeerd.</string>
@@ -396,4 +396,55 @@
     <string name="daxNonSerpCtaText">Terwijl je tikt en scrolt, blokkeer ik vervelende trackers. &lt;br/&gt;&lt;br/&gt;Ga je gang - blijf browsen!</string>
     <string name="daxMainNetworkOwnedCtaText">Let op! %s is eigendom van %s.&lt;br/&gt;De trackers van &lt;br/&gt; %s liggen op de loer op ongeveer %s van de beste websites &#128561; maar maak je geen zorgen! &lt;br/&gt;&lt;br/&gt;Ik blokkeer %s voor het zien van jouw activiteit op die websites.</string>
     <string name="daxMainNetworkCtaText">Let op! %s is een belangrijk volgnetwerk.&lt;br/&gt;&lt;br/&gt; Hun trackers liggen op de loer op ongeveer %s van de beste sites &#128561; maar maak je geen zorgen! &lt;br/&gt;&lt;br/&gt;Ik blokkeer %s voor het zien van jouw activiteit op die websites.</string>
+
+    <!-- Download Confirmation -->
+    <string name="downloadConfirmationContinue">Doorgaan</string>
+    <string name="downloadConfirmationSaveFileTitle">Opslaan%1$s</string>
+    <string name="downloadConfirmationKeepBothFilesText">Houd beide</string>
+    <string name="downloadConfirmationReplaceOldFileText">Vervangen</string>
+    <string name="downloadConfirmationOpenFileText">Open</string>
+    <string name="downloadConfirmationUnableToOpenFileText">Kon het bestand niet openen</string>
+    <string name="downloadConfirmationUnableToDeleteFileText">Kon oud bestand niet verwijderen</string>
+
+    <!-- Change Icon Activity -->
+    <string name="changeIconActivityTitle">App-pictogram</string>
+    <string name="changeIconCtaLabel">App-pictogram wijzigen</string>
+    <string name="changeIconCtaAccept">Toepassen</string>
+    <string name="changeIconCtaCancel">Annuleren</string>
+    <string name="changeIconDialogTitle">Nieuw pictogram toepassen?</string>
+    <string name="changeIconDialogMessage">De app wordt mogelijk gesloten om wijzigingen toe te passen. Kom terug nadat je je knappe nieuwe icoon heeft bewonderd.</string>
+
+    <!-- New dashboard / menu buttons -->
+    <string name="manageWhitelist">Witte lijst beheren</string>
+    <string name="reportBrokenSite">Defecte website melden</string>
+
+    <!-- Dialogs -->
+    <string name="dialogAddTitle">Toevoegen</string>
+    <string name="dialogEditTitle">Bewerken</string>
+
+    <!-- Whitelist -->
+    <string name="whitelisetActivityTitle">Witte lijst</string>
+    <string name="whitelistAdd">Toevoegen aan witte lijst</string>
+    <string name="whitelistRemove">Verwijderen uit witte lijst</string>
+    <string name="whitelistEntryOverflowContentDescription">Meer opties voor vermelding op de witte lijst %s</string>
+    <string name="whitelistEntryDeleteConfirmMessage">Weet je zeker dat je &lt;b&gt;%s&lt;/b&gt; van de witte lijst wilt verwijderen?</string>
+    <string name="whitelistExplanation">Deze sites op de witte lijst worden niet bijgewerkt door Privacybescherming</string>
+    <string name="whitelistNoEntries">Nog geen sites op de witte lijst</string>
+    <string name="whitelistDomainHint">www.voorbeeld.com</string>
+    <string name="whitelistFormatError">Kan niet opslaan, voer een domein in zoals <b>example.com</b>
+  </string>
+
+    <!-- Settings -->
+    <string name="settingsPrivacyProtectionWhitelist">Witte lijst met privacybescherming</string>
+
+    <!-- Fireproof websites -->
+    <string name="fireproofWebsitesActivityTitle">Brandveilige websites</string>
+    <string name="settingsFireproofWebsites">Brandveilige websites</string>
+    <string name="fireproofWebsiteMenuTitle">Brandveilige website</string>
+    <string name="fireproofWebsiteSnackbarConfirmation">&lt;b&gt;%s&lt;/b&gt; is nu brandveilig! Ga naar Instellingen voor meer informatie.</string>
+    <string name="fireproofWebsiteSnackbarAction">Ongedaan maken</string>
+    <string name="fireproofWebsiteDeleteConfirmMessage">Weet je zeker dat je &lt;b&gt;%s&lt;/b&gt; wilt verwijderen?</string>
+    <string name="fireproofWebsiteEmptyListHint">Nog geen websites brandveilig gemaakt</string>
+    <string name="fireproofWebsiteFeatureDescription">Websites vertrouwen op cookies om u aangemeld te houden. Wanneer u een site brandveilig maakt, worden cookies niet gewist en blijft u ingelogd, zelfs na het gebruik van de vuurknop.</string>
+    <string name="fireproofWebsiteOverflowContentDescription">Meer opties voor een vuurvaste website %s</string>
 </resources>

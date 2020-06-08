@@ -18,8 +18,11 @@
 
     <attr name="daxLogoTextColor" format="color" />
     <attr name="normalTextColor" format="color" />
+    <attr name="dialogBgColor" format="color" />
     <attr name="toolbarIconColor" format="color" />
     <attr name="toolbarTextColor" format="color" />
+    <attr name="toolbarBgColor" format="color" />
+    <attr name="toolbarBgBorderColor" format="color" />
     <attr name="browserIconColorSelector" format="color" />
     <attr name="browserMenuTextColor" format="color" />
     <attr name="browserMenuTextColorDisabled" format="color" />
@@ -66,9 +69,5 @@
     <attr name="topCallToActionBackgroundColor" format="color" />
     <attr name="privacyDashboardLogoLetterTextColor" format="color" />
     <attr name="fireproofWebsiteTitleTextColor" format="color" />
-
-    <declare-styleable name="BottomNavigationBar">
-        <attr name="layoutResource" format="reference" />
-    </declare-styleable>
 
 </resources>

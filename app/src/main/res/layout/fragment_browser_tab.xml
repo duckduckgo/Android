@@ -23,18 +23,6 @@
 
     <include layout="@layout/include_omnibar_toolbar" />
 
-    <com.duckduckgo.app.browser.ui.BottomNavigationBar
-        android:id="@+id/bottomNavigationBar"
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/bottomBarHeight"
-        android:layout_gravity="bottom"
-        android:background="@drawable/bottom_navigation_bar_bg"
-        android:elevation="8dp"
-        android:gravity="center"
-        android:orientation="horizontal"
-        app:layoutResource="@layout/layout_browser_bottom_navigation_bar"
-        app:layout_behavior="com.duckduckgo.app.browser.ui.BottomNavigationBehavior" />
-
     <include
         android:id="@+id/defaultCard"
         layout="@layout/content_onboarding_default_browser_card"
@@ -61,8 +49,8 @@
         android:id="@+id/autoCompleteSuggestionsList"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="?attr/colorPrimary"
-        android:backgroundTint="?attr/colorPrimary"
+        android:background="?toolbarBgColor"
+        android:backgroundTint="?toolbarBgColor"
         android:clipToPadding="false"
         android:elevation="4dp"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"

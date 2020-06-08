@@ -73,9 +73,10 @@
     <string name="closeTab">Alle tab</string>
 
     <!-- Privacy Dashboard Activities -->
+    <string name="privacyProtectionToggle">Datenschutz der Website</string>
+    <string name="privacyProtectionEnabled">WEBSITE-SCHUTZ AKTIVIERT</string>
+    <string name="privacyProtectionDisabled">WEBSITE-SCHUTZ DEAKTIVIERT</string>
     <string name="privacyDashboardActivityTitle">Privatsphäre-Dashboard</string>
-    <string name="privacyProtectionEnabled">PRIVATSPHÄRENSCHUTZ AKTIVIERT</string>
-    <string name="privacyProtectionDisabled">PRIVATSPHÄRENSCHUTZ DEAKTIVIERT</string>
     <string name="privacyProtectionUpgraded" tools:ignore="TypographyQuotes">VERBESSERT VON &lt;img src="%d" /&gt; AUF &lt;img src="%d" /&gt;</string>
     <string name="privacyGradeContentDescription">Datenschutzstufe</string>
 
@@ -121,7 +122,6 @@
     <string name="practicesTosdrLink">Datenschutzpraktiken ergeben sich aus <b><u>ToS;DR</u></b></string>
     <string name="practicesIconContentGood">Good Practice Icon</string>
     <string name="practicesIconContentBad">Bad Practice Icon</string>
-    <string name="privacyProtectionToggle">Schutz der Privatsphäre</string>
 
     <string name="networkTrackerSummaryHeader">HARTNÄCKIGSTE TRACKER-NETZWERKE</string>
     <string name="networkTrackerSummaryNotReady">Wir sammeln immer noch Daten, um anzuzeigen, wie viele Tracker wir blockiert haben.</string>
@@ -396,4 +396,54 @@
     <string name="daxNonSerpCtaText">Während Sie antippen und scrollen, blockiere ich lästige Tracker. &lt;br/&gt;&lt;br/&gt;Auf geht\'s! — Surfen Sie weiter!</string>
     <string name="daxMainNetworkOwnedCtaText">Aufgepasst! %s gehört zu %s.&lt;br/&gt;&lt;br/&gt; Die Tracker von %s lauern auf ungefähr %s der Top-Websites &#128561;, aber keine Sorge! &lt;br/&gt;&lt;br/&gt; Ich werde %s daran hindern, Ihre Aktivitäten auf diesen Websites zu sehen.</string>
     <string name="daxMainNetworkCtaText">Aufgepasst! %s ist ein großes Tracking-Netzwerk.&lt;br/&gt;&lt;br/&gt; Deren Tracker lauern auf ungefähr %s der Top-Websites &#128561;, aber keine Sorge! &lt;br/&gt;&lt;br/&gt;Ich werde %s daran hindern, Ihre Aktivitäten auf diesen Websites zu sehen.</string>
+
+    <!-- Download Confirmation -->
+    <string name="downloadConfirmationContinue">Fortsetzen</string>
+    <string name="downloadConfirmationSaveFileTitle">Speichern %1$s</string>
+    <string name="downloadConfirmationKeepBothFilesText">Beide behalten</string>
+    <string name="downloadConfirmationReplaceOldFileText">Ersetzen</string>
+    <string name="downloadConfirmationOpenFileText">Öffnen</string>
+    <string name="downloadConfirmationUnableToOpenFileText">Die Datei konnte nicht geöffnet werden</string>
+    <string name="downloadConfirmationUnableToDeleteFileText">Alte Datei konnte nicht gelöscht werden</string>
+
+    <!-- Change Icon Activity -->
+    <string name="changeIconActivityTitle">App-Symbol</string>
+    <string name="changeIconCtaLabel">App-Symbol ändern</string>
+    <string name="changeIconCtaAccept">Übernehmen</string>
+    <string name="changeIconCtaCancel">Abbrechen</string>
+    <string name="changeIconDialogTitle">Neues Symbol übernehmen?</string>
+    <string name="changeIconDialogMessage">Die App wird möglicherweise geschlossen, um Änderungen anzuwenden. Kommen Sie zurück, nachdem Sie Ihr schönes neues Symbol bewundert haben.</string>
+
+    <!-- New dashboard / menu buttons -->
+    <string name="manageWhitelist">Whitelist verwalten</string>
+    <string name="reportBrokenSite">Fehlerhafte Website melden</string>
+
+    <!-- Dialogs -->
+    <string name="dialogAddTitle">Hinzufügen</string>
+    <string name="dialogEditTitle">Bearbeiten</string>
+
+    <!-- Whitelist -->
+    <string name="whitelisetActivityTitle">Whitelist</string>
+    <string name="whitelistAdd">Zur Whitelist hinzufügen</string>
+    <string name="whitelistRemove">Aus der Whitelist entfernen</string>
+    <string name="whitelistEntryOverflowContentDescription">Weitere Optionen für den Whitelist-Eintrag %s</string>
+    <string name="whitelistEntryDeleteConfirmMessage">Möchten Sie &lt;b&gt;%s&lt;/b&gt; wirklich aus der Whitelist löschen?</string>
+    <string name="whitelistExplanation">Diese Websites auf der Whitelist werden vom Datenschutz nicht aktualisiert</string>
+    <string name="whitelistNoEntries">Noch keine Websites auf der Whitelist</string>
+    <string name="whitelistDomainHint">www.example.com</string>
+    <string name="whitelistFormatError">Konnte nicht speichern, geben Sie eine Domain wie <b>example.com</b> ein</string>
+
+    <!-- Settings -->
+    <string name="settingsPrivacyProtectionWhitelist">Whitelist zum Schutz der Privatsphäre</string>
+
+    <!-- Fireproof websites -->
+    <string name="fireproofWebsitesActivityTitle">Feuersichere Websites</string>
+    <string name="settingsFireproofWebsites">Feuersichere Websites</string>
+    <string name="fireproofWebsiteMenuTitle">Feuersichere Website</string>
+    <string name="fireproofWebsiteSnackbarConfirmation">&lt;b&gt;%s&lt;/b&gt; ist jetzt feuersicher! Besuchen Sie die Einstellungen, um mehr zu erfahren.</string>
+    <string name="fireproofWebsiteSnackbarAction">Rückgängig machen</string>
+    <string name="fireproofWebsiteDeleteConfirmMessage">Möchten Sie &lt;b&gt;%s&lt;/b&gt; wirklich löschen?</string>
+    <string name="fireproofWebsiteEmptyListHint">Noch keine Websites feuersicher gemacht</string>
+    <string name="fireproofWebsiteFeatureDescription">Websites sind auf Cookies angewiesen, damit Sie angemeldet bleiben. Wenn Sie eine Website feuersicher machen, werden Cookies nicht gelöscht und Sie bleiben auch nach Verwendung der Feuertaste angemeldet.</string>
+    <string name="fireproofWebsiteOverflowContentDescription">Weitere Optionen für die feuersichere Website %s</string>
 </resources>

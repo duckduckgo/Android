@@ -73,9 +73,10 @@
     <string name="closeTab">Lap bezárása</string>
 
     <!-- Privacy Dashboard Activities -->
+    <string name="privacyProtectionToggle">A weboldal adatvédelme</string>
+    <string name="privacyProtectionEnabled">WEBOLDAL VÉDELME ENGEDÉLYEZVE</string>
+    <string name="privacyProtectionDisabled">WEBOLDAL VÉDELME LETILTVA</string>
     <string name="privacyDashboardActivityTitle">Adatvédelmi műszerfal</string>
-    <string name="privacyProtectionEnabled">ADATVÉDELEM ENGEDÉLYEZVE</string>
-    <string name="privacyProtectionDisabled">ADATVÉDELEM LETILTVA</string>
     <string name="privacyProtectionUpgraded" tools:ignore="TypographyQuotes">TOVÁBBFEJLESZTETT ETTŐL: &lt;img src="%d" /&gt; EDDIG: &lt;img src="%d" /&gt;</string>
     <string name="privacyGradeContentDescription">Adatvédelmi fokozat</string>
 
@@ -121,7 +122,6 @@
     <string name="practicesTosdrLink">Adatvédelmi gyakorlat forrása: <b><u>ToS;DR</u></b></string>
     <string name="practicesIconContentGood">Jó gyakorlat ikon</string>
     <string name="practicesIconContentBad">Hibás gyakorlat ikon</string>
-    <string name="privacyProtectionToggle">Adatvédelem</string>
 
     <string name="networkTrackerSummaryHeader">A NYOMKÖVETŐ-HÁLÓZAT LEGNAGYOBB BŰNELKÖVETŐI</string>
     <string name="networkTrackerSummaryNotReady">Folyamatosan gyűjtjük az adatokat, hogy bemutathassuk, hány követőt tiltottunk le.</string>
@@ -396,4 +396,55 @@
     <string name="daxNonSerpCtaText">Ahogy megérinti és görgeti, én blokkolni fogom a bosszantó nyomkövetőket. &lt;br/&gt;&lt;br/&gt;Menjen tovább - folytassa a böngészést!</string>
     <string name="daxMainNetworkOwnedCtaText">Fel a fejjel! A(z) %s tulajdonosa a(z) %s.&lt;br/&gt;&lt;br/&gt; %s nyomkövetői ott leselkednek a legfontosabb webhelyek %s oldalán &#128561; de ne aggódjon! &lt;br/&gt;&lt;br/&gt;meg fogom akadályozni, hogy a(z) %s láthassa az Ön tevékenységeit azokon az oldalakon.</string>
     <string name="daxMainNetworkCtaText">Fel a fejjel! A(z) %s egy nagy nyomkövető hálózat.&lt;br/&gt;&lt;br/&gt; A nyomkövetői ott leselkednek a legfontosabb webhelyek %s oldalán &#128561;, de ne aggódjon! &lt;br/&gt;&lt;br/&gt;meg fogom akadályozni, hogy a(z) %s láthassa az Ön tevékenységét azokon a webhelyeken.</string>
+
+    <!-- Download Confirmation -->
+    <string name="downloadConfirmationContinue">Folytatás</string>
+    <string name="downloadConfirmationSaveFileTitle">%1$s mentése</string>
+    <string name="downloadConfirmationKeepBothFilesText">Mindkettő megtartása</string>
+    <string name="downloadConfirmationReplaceOldFileText">Lecserél</string>
+    <string name="downloadConfirmationOpenFileText">Megnyitás</string>
+    <string name="downloadConfirmationUnableToOpenFileText">Nem sikerült megnyitni a fájlt</string>
+    <string name="downloadConfirmationUnableToDeleteFileText">Nem sikerült törölni a régi fájlt</string>
+
+    <!-- Change Icon Activity -->
+    <string name="changeIconActivityTitle">Alkalmazásikon</string>
+    <string name="changeIconCtaLabel">Alkalmazásikon módosítása</string>
+    <string name="changeIconCtaAccept">Alkalmaz</string>
+    <string name="changeIconCtaCancel">Mégsem</string>
+    <string name="changeIconDialogTitle">Alkalmazod az új ikont?</string>
+    <string name="changeIconDialogMessage">A módosítások végrehajtásához az alkalmazás bezárulhat. Térj vissza, miután megcsodáltad a csinos új ikonodat.</string>
+
+    <!-- New dashboard / menu buttons -->
+    <string name="manageWhitelist">Engedélyezési lista kezelése</string>
+    <string name="reportBrokenSite">Hibás weboldal jelentése</string>
+
+    <!-- Dialogs -->
+    <string name="dialogAddTitle">Hozzáadás</string>
+    <string name="dialogEditTitle">Szerkesztés</string>
+
+    <!-- Whitelist -->
+    <string name="whitelisetActivityTitle">Engedélyezési lista</string>
+    <string name="whitelistAdd">Hozzáadás az engedélyezési listához</string>
+    <string name="whitelistRemove">Eltávolítás az engedélyezési listáról</string>
+    <string name="whitelistEntryOverflowContentDescription">További lehetőségek a bejegyzéshez az engedélyezési listában %s</string>
+    <string name="whitelistEntryDeleteConfirmMessage">Biztosan törlöd  az engedélyezési listáról ezt: &lt;b&gt;%s&lt;/b&gt;?</string>
+    <string name="whitelistExplanation">Ezeket az engedélyezett oldalakat az Adatvédelem nem frissíti</string>
+    <string name="whitelistNoEntries">Még nincsenek engedélyezett oldalak</string>
+    <string name="whitelistDomainHint">www.example.com</string>
+    <string name="whitelistFormatError">A mentés nem sikerült , írj be egy domain nevet, például <b>example.com</b>
+  </string>
+
+    <!-- Settings -->
+    <string name="settingsPrivacyProtectionWhitelist">Adatvédelem Engedélyezési lista</string>
+
+    <!-- Fireproof websites -->
+    <string name="fireproofWebsitesActivityTitle">Tűzálló weboldalak</string>
+    <string name="settingsFireproofWebsites">Tűzálló weboldalak</string>
+    <string name="fireproofWebsiteMenuTitle">Tűzálló weboldal</string>
+    <string name="fireproofWebsiteSnackbarConfirmation">A &lt;b&gt;%s&lt;/b&gt; most már tűzálló! További információkért nézd meg a Beállításokat.</string>
+    <string name="fireproofWebsiteSnackbarAction">Visszavonás</string>
+    <string name="fireproofWebsiteDeleteConfirmMessage">Biztos, hogy törölni akarod a (z) &lt;b&gt;%s&lt;/b&gt; fájlt?</string>
+    <string name="fireproofWebsiteEmptyListHint">Még nem lett tűzállóvá téve egy weboldal sem</string>
+    <string name="fireproofWebsiteFeatureDescription">A weboldalak sütikkel tartanak bejelentkezve. Amikor egy weboldalt tűzállóvá teszel, a sütik nem kerülnek törlésre, és még a Tűz gomb használata után is bejelentkezve maradsz.</string>
+    <string name="fireproofWebsiteOverflowContentDescription">További lehetőségek a %s tűzálló weboldalhoz</string>
 </resources>
