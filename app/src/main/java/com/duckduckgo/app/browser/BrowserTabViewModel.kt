@@ -781,10 +781,9 @@ class BrowserTabViewModel(
     fun onFireproofWebsiteMenuClicked() {
         viewModelScope.launch {
             site?.domain?.let { nonNullDomain ->
-                val entity = fireproofWebsiteRepository.fireproofWebsite(nonNullDomain)
-                if (entity != null) {
+                fireproofWebsiteRepository.fireproofWebsite(nonNullDomain)?.let {
                     pixel.fire(PixelName.FIREPROOF_WEBSITE_ADDED)
-                    command.value = ShowFireproofWebSiteConfirmation(fireproofWebsiteEntity = entity)
+                    command.value = ShowFireproofWebSiteConfirmation(fireproofWebsiteEntity = it)
                 }
             }
         }
@@ -792,10 +791,9 @@ class BrowserTabViewModel(
 
     fun onFireproofLoginDialogClicked(domain: String) {
         viewModelScope.launch {
-            val entity = fireproofWebsiteRepository.fireproofWebsite(domain)
-            if (entity != null) {
+            fireproofWebsiteRepository.fireproofWebsite(domain)?.let {
                 pixel.fire(PixelName.FIREPROOF_WEBSITE_LOGIN_ADDED)
-                command.value = ShowFireproofWebSiteConfirmation(fireproofWebsiteEntity = entity)
+                command.value = ShowFireproofWebSiteConfirmation(fireproofWebsiteEntity = it)
             }
         }
     }
