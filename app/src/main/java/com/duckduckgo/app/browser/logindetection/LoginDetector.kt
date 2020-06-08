@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.browser.logindetection
 
+import android.content.Context
 import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import com.duckduckgo.app.browser.R
@@ -41,6 +42,7 @@ class JSLoginDetector @Inject constructor(private val settingsDataStore: Setting
         const val HTTP_POST = "POST"
     }
 
+    private val javaScriptDetector = JavaScriptDetector()
     private val loginPathRegex = Regex("login|sign-in|signin|sessions")
 
     override fun addLoginDetection(webView: WebView, onLoginDetected: () -> Unit) {
@@ -75,13 +77,39 @@ class JSLoginDetector @Inject constructor(private val settingsDataStore: Setting
     }
 
     private suspend fun scanForPasswordFields(webView: WebView) {
-        return withContext(Dispatchers.Main) {
-            webView.evaluateJavascript("javascript:scanForPasswordField()", null)
+        withContext(Dispatchers.Main) {
+            webView.evaluateJavascript("javascript:${javaScriptDetector.loginFormDetector(webView.context)}", null)
         }
     }
 
     private fun injectLoginFormDetectionJS(webView: WebView) {
-        val javascript = webView.context.resources.openRawResource(R.raw.login_form_detection).bufferedReader().use { it.readText() }
-        webView.evaluateJavascript("javascript:$javascript", null)
+        webView.evaluateJavascript("javascript:${javaScriptDetector.loginFormEventsDetector(webView.context)}", null)
+    }
+
+    private class JavaScriptDetector {
+        private lateinit var functions: String
+        private lateinit var handlers: String
+
+        private fun getFunctionsJS(context: Context): String {
+            if (!this::functions.isInitialized) {
+                functions = context.resources.openRawResource(R.raw.login_form_detection_functions).bufferedReader().use { it.readText() }
+            }
+            return functions
+        }
+
+        private fun getHandlersJS(context: Context): String {
+            if (!this::handlers.isInitialized) {
+                handlers = context.resources.openRawResource(R.raw.login_form_detection_handlers).bufferedReader().use { it.readText() }
+            }
+            return handlers
+        }
+
+        fun loginFormEventsDetector(context: Context): String {
+            return getFunctionsJS(context) + getHandlersJS(context)
+        }
+
+        fun loginFormDetector(context: Context): String {
+            return getFunctionsJS(context) + "scanForPasswordField();"
+        }
     }
 }
