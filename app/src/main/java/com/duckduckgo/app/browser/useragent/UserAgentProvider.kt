@@ -88,7 +88,7 @@ class UserAgentProvider constructor(private val defaultUserAgent: String, privat
     }
 
     companion object {
-        val SPACE = " "
+        const val SPACE = " "
         val mobilePrefix = "Mozilla/5.0 (Linux; Android ${Build.VERSION.RELEASE})"
         val desktopPrefix = "Mozilla/5.0 (X11; Linux ${System.getProperty("os.arch")})"
 
