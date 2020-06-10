@@ -23,6 +23,9 @@ import androidx.work.*
 import com.duckduckgo.app.notification.db.NotificationDao
 import com.duckduckgo.app.notification.model.Notification
 import com.duckduckgo.app.notification.model.SchedulableNotification
+import com.duckduckgo.app.onboarding.store.AppStage
+import com.duckduckgo.app.onboarding.store.UserStageStore
+import com.duckduckgo.app.onboarding.store.useOurAppNotification
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.NOTIFICATION_SHOWN
 import timber.log.Timber
@@ -39,7 +42,8 @@ class NotificationScheduler(
     private val workManager: WorkManager,
     private val clearDataNotification: SchedulableNotification,
     private val privacyNotification: SchedulableNotification,
-    private val facebookNotification: SchedulableNotification
+    private val useOurAppNotification: SchedulableNotification,
+    private val userStageStore: UserStageStore
 ) : AndroidNotificationScheduler {
 
     override suspend fun scheduleNextNotification() {
@@ -48,9 +52,18 @@ class NotificationScheduler(
     }
 
     private suspend fun scheduleFacebookNotification() {
-        when {
-            facebookNotification.canShow() -> {
-                scheduleUniqueNotification(OneTimeWorkRequestBuilder<FacebookNotificationWorker>(), 15, TimeUnit.SECONDS, FACEBOOK_WORK_REQUEST_TAG)
+        if (userStageStore.useOurAppNotification()) {
+            val operation = scheduleUniqueNotification(
+                OneTimeWorkRequestBuilder<UseOurAppNotificationWorker>(),
+                15,
+                TimeUnit.SECONDS,
+                USE_OUR_APP_WORK_REQUEST_TAG
+            )
+            try {
+                operation.await()
+                userStageStore.stageCompleted(AppStage.USE_OUR_APP_NOTIFICATION)
+            } catch (e: Exception) {
+                Timber.v("Notification could not be scheduled: $e")
             }
         }
     }
@@ -69,14 +82,14 @@ class NotificationScheduler(
         }
     }
 
-    private fun scheduleUniqueNotification(builder: OneTimeWorkRequest.Builder, duration: Long, unit: TimeUnit, tag: String) {
-        Timber.v("MARCOS Scheduling unique notification")
+    private fun scheduleUniqueNotification(builder: OneTimeWorkRequest.Builder, duration: Long, unit: TimeUnit, tag: String): Operation {
+        Timber.v("Scheduling unique notification")
         val request = builder
             .addTag(tag)
             .setInitialDelay(duration, unit)
             .build()
 
-        workManager.enqueueUniqueWork(tag, ExistingWorkPolicy.KEEP, request)
+        return workManager.enqueueUniqueWork(tag, ExistingWorkPolicy.KEEP, request)
     }
 
     private fun scheduleNotification(builder: OneTimeWorkRequest.Builder, duration: Long, unit: TimeUnit, tag: String) {
@@ -95,7 +108,7 @@ class NotificationScheduler(
 
     open class ClearDataNotificationWorker(context: Context, params: WorkerParameters) : SchedulableNotificationWorker(context, params)
     class PrivacyNotificationWorker(context: Context, params: WorkerParameters) : SchedulableNotificationWorker(context, params)
-    class FacebookNotificationWorker(context: Context, params: WorkerParameters) : SchedulableNotificationWorker(context, params)
+    class UseOurAppNotificationWorker(context: Context, params: WorkerParameters) : SchedulableNotificationWorker(context, params)
 
     open class SchedulableNotificationWorker(val context: Context, params: WorkerParameters) : CoroutineWorker(context, params) {
 
@@ -126,6 +139,6 @@ class NotificationScheduler(
 
     companion object {
         const val UNUSED_APP_WORK_REQUEST_TAG = "com.duckduckgo.notification.schedule"
-        const val FACEBOOK_WORK_REQUEST_TAG = "com.duckduckgo.notification.facebook"
+        const val USE_OUR_APP_WORK_REQUEST_TAG = "com.duckduckgo.notification.useOurApp"
     }
 }

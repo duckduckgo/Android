@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2020 DuckDuckGo
- *
+ *  
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -14,37 +14,33 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.onboarding.store
+package com.duckduckgo.app.global.timestamps.db
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import androidx.room.TypeConverter
 
-const val USER_STAGE_TABLE_NAME = "userStage"
+const val KEY_TIMESTAMPS_TABLE_NAME = "keyTimestamps"
 
-@Entity(tableName = USER_STAGE_TABLE_NAME)
-data class UserStage(
-    @PrimaryKey val key: Int = 1,
-    val appStage: AppStage
+@Entity(tableName = KEY_TIMESTAMPS_TABLE_NAME)
+data class KeyTimestampEntity(
+    @PrimaryKey val id: TimestampKey,
+    val timestamp: Int
 )
 
-enum class AppStage {
-    NEW,
-    DAX_ONBOARDING,
-    USE_OUR_APP_NOTIFICATION,
-    USE_OUR_APP_ONBOARDING,
-    ESTABLISHED;
+enum class TimestampKey {
+    USE_OUR_APP_SHORTCUT_ADDED
 }
 
-class StageTypeConverter {
+class TimestampKeyTypeConverter {
 
     @TypeConverter
-    fun toStage(stage: String): AppStage {
-        return AppStage.valueOf(stage)
+    fun toKey(stage: String): TimestampKey {
+        return TimestampKey.valueOf(stage)
     }
 
     @TypeConverter
-    fun fromStage(stage: AppStage): String {
+    fun fromKey(stage: TimestampKey): String {
         return stage.name
     }
 }

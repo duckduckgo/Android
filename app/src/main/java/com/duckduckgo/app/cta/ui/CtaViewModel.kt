@@ -32,7 +32,7 @@ import com.duckduckgo.app.onboarding.store.AppStage
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.onboarding.store.daxOnboardingActive
-import com.duckduckgo.app.onboarding.store.fbFlowActive
+import com.duckduckgo.app.onboarding.store.useOurAppOnboarding
 import com.duckduckgo.app.privacy.db.UserWhitelistDao
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.Variant
@@ -112,10 +112,10 @@ class CtaViewModel @Inject constructor(
         }
     }
 
-    private suspend fun completeStageIfUserInFBFlowState() {
-        if (fbFlowIsActive()) {
-            Timber.d("Completing FB FLOW")
-            userStageStore.stageCompleted(AppStage.FLOW_FB)
+    private suspend fun completeStageIfUserInUseOurAppCompleted() {
+        if (useOurAppActive()) {
+            Timber.d("Completing USE OUR APP ONBOARDING")
+            userStageStore.stageCompleted(AppStage.USE_OUR_APP_ONBOARDING)
         }
     }
 
@@ -132,7 +132,7 @@ class CtaViewModel @Inject constructor(
                 dismissedCtaDao.insert(DismissedCta(cta.ctaId))
             }
 
-            completeStageIfUserInFBFlowState()
+            completeStageIfUserInUseOurAppCompleted()
             completeStageIfDaxOnboardingCompleted()
         }
     }
@@ -197,7 +197,7 @@ class CtaViewModel @Inject constructor(
     }
 
     @WorkerThread
-    private suspend fun canShowFacebookDialog(): Boolean = fbFlowIsActive() && !fbDialogShown()
+    private suspend fun canShowFacebookDialog(): Boolean = useOurAppActive() && !fbDialogShown()
 
     @WorkerThread
     private fun canShowWidgetCta(): Boolean {
@@ -257,8 +257,6 @@ class CtaViewModel @Inject constructor(
         }
     }
 
-    private fun variant(): Variant = variantManager.getVariant()
-
     private fun fbDialogShown(): Boolean = dismissedCtaDao.exists(CtaId.FB_FLOW)
 
     private fun daxDialogIntroShown(): Boolean = dismissedCtaDao.exists(CtaId.DAX_INTRO)
@@ -275,7 +273,7 @@ class CtaViewModel @Inject constructor(
 
     private fun isSerpUrl(url: String): Boolean = url.contains(DaxDialogCta.SERP)
 
-    private suspend fun fbFlowIsActive(): Boolean = userStageStore.fbFlowActive()
+    private suspend fun useOurAppActive(): Boolean = userStageStore.useOurAppOnboarding()
 
     private suspend fun daxOnboardingActive(): Boolean = userStageStore.daxOnboardingActive()
 

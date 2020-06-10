@@ -26,9 +26,9 @@ import com.duckduckgo.app.notification.NotificationFactory
 import com.duckduckgo.app.notification.NotificationScheduler
 import com.duckduckgo.app.notification.db.NotificationDao
 import com.duckduckgo.app.notification.model.ClearDataNotification
-import com.duckduckgo.app.notification.model.FacebookNotification
+import com.duckduckgo.app.notification.model.UseOurAppNotification
 import com.duckduckgo.app.notification.model.PrivacyProtectionNotification
-import com.duckduckgo.app.onboarding.store.AppUserStageStore
+import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.privacy.db.PrivacyProtectionCountDao
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import dagger.Module
@@ -59,10 +59,9 @@ class NotificationModule {
     @Provides
     fun provideFacebookNotification(
         context: Context,
-        notificationDao: NotificationDao,
-        userStageStore: AppUserStageStore
-    ): FacebookNotification {
-        return FacebookNotification(context, notificationDao, userStageStore)
+        notificationDao: NotificationDao
+    ): UseOurAppNotification {
+        return UseOurAppNotification(context, notificationDao)
     }
 
     @Provides
@@ -89,13 +88,15 @@ class NotificationModule {
         workManager: WorkManager,
         clearDataNotification: ClearDataNotification,
         privacyProtectionNotification: PrivacyProtectionNotification,
-        facebookNotification: FacebookNotification
+        useOurAppNotification: UseOurAppNotification,
+        stageStore: UserStageStore
     ): AndroidNotificationScheduler {
         return NotificationScheduler(
             workManager,
             clearDataNotification,
             privacyProtectionNotification,
-            facebookNotification
+            useOurAppNotification,
+            stageStore
         )
     }
 

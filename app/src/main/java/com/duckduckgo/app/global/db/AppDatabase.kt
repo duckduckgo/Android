@@ -35,6 +35,9 @@ import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
 import com.duckduckgo.app.global.exception.UncaughtExceptionDao
 import com.duckduckgo.app.global.exception.UncaughtExceptionEntity
 import com.duckduckgo.app.global.exception.UncaughtExceptionSourceConverter
+import com.duckduckgo.app.global.timestamps.db.KeyTimestampDao
+import com.duckduckgo.app.global.timestamps.db.KeyTimestampEntity
+import com.duckduckgo.app.global.timestamps.db.TimestampKeyTypeConverter
 import com.duckduckgo.app.httpsupgrade.db.HttpsBloomFilterSpecDao
 import com.duckduckgo.app.httpsupgrade.db.HttpsWhitelistDao
 import com.duckduckgo.app.httpsupgrade.model.HttpsBloomFilterSpec
@@ -58,7 +61,7 @@ import com.duckduckgo.app.usage.search.SearchCountDao
 import com.duckduckgo.app.usage.search.SearchCountEntity
 
 @Database(
-    exportSchema = true, version = 21, entities = [
+    exportSchema = true, version = 22, entities = [
         TdsTracker::class,
         TdsEntity::class,
         TdsDomainEntity::class,
@@ -81,7 +84,8 @@ import com.duckduckgo.app.usage.search.SearchCountEntity
         UncaughtExceptionEntity::class,
         TdsMetadata::class,
         UserStage::class,
-        FireproofWebsiteEntity::class
+        FireproofWebsiteEntity::class,
+        KeyTimestampEntity::class
     ]
 )
 
@@ -94,7 +98,8 @@ import com.duckduckgo.app.usage.search.SearchCountEntity
     RuleTypeConverter::class,
     CategoriesTypeConverter::class,
     UncaughtExceptionSourceConverter::class,
-    StageTypeConverter::class
+    StageTypeConverter::class,
+    TimestampKeyTypeConverter::class
 )
 abstract class AppDatabase : RoomDatabase() {
 
@@ -119,6 +124,7 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun tdsDao(): TdsMetadataDao
     abstract fun userStageDao(): UserStageDao
     abstract fun fireproofWebsiteDao(): FireproofWebsiteDao
+    abstract fun keyTimestampDao(): KeyTimestampDao
 }
 
 @Suppress("PropertyName")
@@ -292,6 +298,13 @@ class MigrationsProvider(val context: Context) {
         }
     }
 
+    val MIGRATION_21_TO_22: Migration = object : Migration(21, 22) {
+        override fun migrate(database: SupportSQLiteDatabase) {
+            database.execSQL("CREATE TABLE IF NOT EXISTS `keyTimestamps` (`id` TEXT NOT NULL PRIMARY KEY, `timestamp` INTEGER NOT NULL)")
+            database.execSQL("UPDATE $USER_STAGE_TABLE_NAME SET appStage = \"${AppStage.USE_OUR_APP_NOTIFICATION}\" WHERE appStage = \"${AppStage.ESTABLISHED}\"")
+        }
+    }
+
     val ALL_MIGRATIONS: List<Migration>
         get() = listOf(
             MIGRATION_1_TO_2,
@@ -313,7 +326,8 @@ class MigrationsProvider(val context: Context) {
             MIGRATION_17_TO_18,
             MIGRATION_18_TO_19,
             MIGRATION_19_TO_20,
-            MIGRATION_20_TO_21
+            MIGRATION_20_TO_21,
+            MIGRATION_21_TO_22
         )
 
     @Deprecated(

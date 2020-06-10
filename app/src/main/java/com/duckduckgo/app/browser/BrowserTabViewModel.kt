@@ -1078,15 +1078,15 @@ class BrowserTabViewModel(
             is HomePanelCta.Survey -> LaunchSurvey(cta.survey)
             is HomePanelCta.AddWidgetAuto -> LaunchAddWidget
             is HomePanelCta.AddWidgetInstructions -> LaunchLegacyAddWidget
-            is DaxFacebookCta -> navigatetoUrlAndAddShorcut(url = "https://www.facebook.com", title = "Facebook")
+            is DaxFacebookCta -> navigateToUrlAndAddShorcut(url = "https://www.facebook.com", title = "Facebook", icon = R.drawable.ic_fb_favicon)
             else -> return
         }
     }
 
-    private fun navigatetoUrlAndAddShorcut(url: String, title: String): AddHomeShortcut {
+    private fun navigateToUrlAndAddShorcut(url: String, title: String, icon: Int): AddHomeShortcut {
         val convertedUrl = queryUrlConverter.convertQueryToUrl(url)
         onUserSubmittedQuery(convertedUrl)
-        return AddHomeShortcut(title, convertedUrl)
+        return AddHomeShortcut(title, convertedUrl, faviconDownloader.load(icon))
     }
 
     fun onUserClickCtaSecondaryButton() {

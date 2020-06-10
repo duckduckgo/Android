@@ -42,7 +42,8 @@ class AppUserStageStore @Inject constructor(
             val newAppStage = when (appStage) {
                 AppStage.NEW -> AppStage.DAX_ONBOARDING
                 AppStage.DAX_ONBOARDING -> AppStage.ESTABLISHED
-                AppStage.FLOW_FB -> AppStage.ESTABLISHED
+                AppStage.USE_OUR_APP_NOTIFICATION -> AppStage.ESTABLISHED
+                AppStage.USE_OUR_APP_ONBOARDING -> AppStage.ESTABLISHED
                 AppStage.ESTABLISHED -> AppStage.ESTABLISHED
             }
 
@@ -67,6 +68,10 @@ suspend fun UserStageStore.daxOnboardingActive(): Boolean {
     return this.getUserAppStage() == AppStage.DAX_ONBOARDING
 }
 
-suspend fun UserStageStore.fbFlowActive(): Boolean {
-    return this.getUserAppStage() == AppStage.FLOW_FB
+suspend fun UserStageStore.useOurAppOnboarding(): Boolean {
+    return this.getUserAppStage() == AppStage.USE_OUR_APP_ONBOARDING
+}
+
+suspend fun UserStageStore.useOurAppNotification(): Boolean {
+    return this.getUserAppStage() == AppStage.USE_OUR_APP_NOTIFICATION
 }
