@@ -1205,12 +1205,11 @@ class BrowserTabViewModel(
     }
 
     override fun loginDetected() {
+        val domain = site?.domain ?: return
         viewModelScope.launch {
             if (canFireproofWebsite()) {
-                site?.domain?.let {
-                    pixel.fire(PixelName.FIREPROOF_WEBSITE_LOGIN_DIALOG)
-                    command.value = AskToFireproofWebsite(FireproofWebsiteEntity(it))
-                }
+                pixel.fire(PixelName.FIREPROOF_WEBSITE_LOGIN_DIALOG)
+                command.value = AskToFireproofWebsite(FireproofWebsiteEntity(domain))
             }
         }
     }
