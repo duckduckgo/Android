@@ -119,21 +119,19 @@ class BrowserWebViewClient(
 
     @UiThread
     override fun onPageStarted(webView: WebView, url: String?, favicon: Bitmap?) {
-        return runBlocking {
-            try {
-                Timber.v("onPageStarted webViewUrl: ${webView.url} URL: $url")
-                val navigationList = webView.safeCopyBackForwardList() ?: return@runBlocking
-                webViewClientListener?.navigationStateChanged(WebViewNavigationState(navigationList))
-                if (url != null && url == lastPageStarted) {
-                    webViewClientListener?.pageRefreshed(url)
-                }
-                lastPageStarted = url
-                loginDetector.onEvent(WebNavigationEvent.OnPageStarted(webView))
-            } catch (e: Throwable) {
-                GlobalScope.launch {
-                    uncaughtExceptionRepository.recordUncaughtException(e, ON_PAGE_STARTED)
-                    throw e
-                }
+        try {
+            Timber.v("onPageStarted webViewUrl: ${webView.url} URL: $url")
+            val navigationList = webView.safeCopyBackForwardList() ?: return
+            webViewClientListener?.navigationStateChanged(WebViewNavigationState(navigationList))
+            if (url != null && url == lastPageStarted) {
+                webViewClientListener?.pageRefreshed(url)
+            }
+            lastPageStarted = url
+            loginDetector.onEvent(WebNavigationEvent.OnPageStarted(webView))
+        } catch (e: Throwable) {
+            GlobalScope.launch {
+                uncaughtExceptionRepository.recordUncaughtException(e, ON_PAGE_STARTED)
+                throw e
             }
         }
     }
@@ -164,7 +162,9 @@ class BrowserWebViewClient(
         return runBlocking {
             try {
                 val documentUrl = withContext(Dispatchers.Main) { webView.url }
-                loginDetector.onEvent(WebNavigationEvent.ShouldInterceptRequest(webView, request))
+                withContext(Dispatchers.Main) {
+                    loginDetector.onEvent(WebNavigationEvent.ShouldInterceptRequest(webView, request))
+                }
                 Timber.v("Intercepting resource ${request.url} type:${request.method} on page $documentUrl")
                 requestInterceptor.shouldIntercept(request, webView, documentUrl, webViewClientListener)
             } catch (e: Throwable) {

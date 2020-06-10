@@ -19,6 +19,7 @@ package com.duckduckgo.app.browser.logindetection
 import android.content.Context
 import android.webkit.WebResourceRequest
 import android.webkit.WebView
+import androidx.annotation.UiThread
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import kotlinx.coroutines.Dispatchers
@@ -28,7 +29,7 @@ import javax.inject.Inject
 
 interface LoginDetector {
     fun addLoginDetection(webView: WebView, onLoginDetected: () -> Unit)
-    suspend fun onEvent(event: WebNavigationEvent)
+    fun onEvent(event: WebNavigationEvent)
 }
 
 sealed class WebNavigationEvent {
@@ -49,7 +50,8 @@ class JSLoginDetector @Inject constructor(private val settingsDataStore: Setting
         webView.addJavascriptInterface(LoginDetectionJsInterface { onLoginDetected() }, LOGIN_DETECTION_JS_INTERFACE_NAME)
     }
 
-    override suspend fun onEvent(event: WebNavigationEvent) {
+    @UiThread
+    override fun onEvent(event: WebNavigationEvent) {
         if (settingsDataStore.appLoginDetection) {
             when (event) {
                 is WebNavigationEvent.OnPageStarted -> injectLoginFormDetectionJS(event.webView)
@@ -73,12 +75,12 @@ class JSLoginDetector @Inject constructor(private val settingsDataStore: Setting
         return false
     }
 
-    private suspend fun scanForPasswordFields(webView: WebView) {
-        withContext(Dispatchers.Main) {
-            webView.evaluateJavascript("javascript:${javaScriptDetector.loginFormDetector(webView.context)}", null)
-        }
+    @UiThread
+    private fun scanForPasswordFields(webView: WebView) {
+        webView.evaluateJavascript("javascript:${javaScriptDetector.loginFormDetector(webView.context)}", null)
     }
 
+    @UiThread
     private fun injectLoginFormDetectionJS(webView: WebView) {
         webView.evaluateJavascript("javascript:${javaScriptDetector.loginFormEventsDetector(webView.context)}", null)
     }
