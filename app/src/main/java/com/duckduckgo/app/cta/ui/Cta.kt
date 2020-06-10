@@ -92,7 +92,30 @@ class UseOurAppCta(
     override fun pixelOkParameters(): Map<String, String> = emptyMap()
 
     override fun pixelShownParameters(): Map<String, String> = emptyMap()
+}
 
+class UseOurAppDeletionCta(
+    @StringRes val text: Int = R.string.deletionDialogText,
+    @StringRes val okButton: Int = R.string.daxDialogGotIt,
+    override val ctaId: CtaId = CtaId.USE_OUR_APP_DELETION,
+    override val shownPixel: Pixel.PixelName? = null,
+    override val okPixel: Pixel.PixelName? = null,
+    override val cancelPixel: Pixel.PixelName? = null
+) : Cta, DialogCta {
+
+    override fun createCta(activity: FragmentActivity): DaxDialog =
+        TypewriterDaxDialog.newInstance(
+            daxText = activity.resources.getString(text),
+            primaryButtonText = activity.resources.getString(okButton),
+            dismissible = false,
+            showHideButton = false
+        )
+
+    override fun pixelCancelParameters(): Map<String, String> = emptyMap()
+
+    override fun pixelOkParameters(): Map<String, String> = emptyMap()
+
+    override fun pixelShownParameters(): Map<String, String> = emptyMap()
 }
 
 sealed class DaxDialogCta(

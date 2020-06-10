@@ -27,7 +27,10 @@ import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.install.daysInstalled
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.global.model.domain
+import com.duckduckgo.app.global.model.domainMatchesUrl
 import com.duckduckgo.app.global.model.orderedTrackingEntities
+import com.duckduckgo.app.global.timestamps.db.KeyTimestampStore
+import com.duckduckgo.app.global.timestamps.db.TimestampKey
 import com.duckduckgo.app.onboarding.store.AppStage
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.store.UserStageStore
@@ -42,6 +45,7 @@ import com.duckduckgo.app.survey.model.Survey
 import com.duckduckgo.app.widget.ui.WidgetCapabilities
 import kotlinx.coroutines.withContext
 import timber.log.Timber
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlin.coroutines.CoroutineContext
@@ -58,6 +62,7 @@ class CtaViewModel @Inject constructor(
     private val settingsDataStore: SettingsDataStore,
     private val onboardingStore: OnboardingStore,
     private val userStageStore: UserStageStore,
+    private val keyTimestampStore: KeyTimestampStore,
     private val dispatchers: DispatcherProvider
 ) {
     val surveyLiveData: LiveData<Survey> = surveyDao.getLiveScheduled()
@@ -179,6 +184,7 @@ class CtaViewModel @Inject constructor(
             canShowDaxDialogCta() -> {
                 getDaxDialogCta(site)
             }
+            canShowUseOurAppDeletionDialog(site) -> UseOurAppDeletionCta()
             else -> null
         }
     }
@@ -193,6 +199,22 @@ class CtaViewModel @Inject constructor(
             }
         }
         return null
+    }
+
+    @WorkerThread
+    private suspend fun canShowUseOurAppDeletionDialog(site: Site?): Boolean =
+        isOnUseOurAppSite(site) && twoDaysSinceShortcutAdded() && !useOurAppDeletionDialogShown()
+
+    @WorkerThread
+    private suspend fun twoDaysSinceShortcutAdded(): Boolean {
+        val timestampKey = keyTimestampStore.getTimestamp(TimestampKey.USE_OUR_APP_SHORTCUT_ADDED) ?: return false
+        val days = TimeUnit.MILLISECONDS.toDays(System.currentTimeMillis() - timestampKey.timestamp)
+        return (days >= 2)
+    }
+
+    private fun isOnUseOurAppSite(site: Site?): Boolean {
+        if (site == null) return false
+        return site.domainMatchesUrl("m.facebook.com") || site.domainMatchesUrl("facebook.com")
     }
 
     @WorkerThread
@@ -255,6 +277,8 @@ class CtaViewModel @Inject constructor(
             }
         }
     }
+
+    private fun useOurAppDeletionDialogShown(): Boolean = dismissedCtaDao.exists(CtaId.USE_OUR_APP_DELETION)
 
     private fun useOurAppDialogShown(): Boolean = dismissedCtaDao.exists(CtaId.USE_OUR_APP)
 
