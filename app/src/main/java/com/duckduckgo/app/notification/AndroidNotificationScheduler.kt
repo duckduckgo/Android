@@ -60,6 +60,7 @@ class NotificationScheduler(
 ) : AndroidNotificationScheduler {
 
     override suspend fun scheduleNextNotification() {
+        scheduleFacebookNotification()
         scheduleInactiveUserNotifications()
     }
 

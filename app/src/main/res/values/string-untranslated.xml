@@ -36,5 +36,7 @@
     <string name="facebookDialogText">Did you know the Facebook app can make requests for data even when you\'re not using?&lt;br/&gt;&lt;br/&gt;Replace the app with a home screen shortcut that opens Facebook in DuckDuckGo. Then delete the Facebook app.</string>
     <string name="facebookDialogButtonText">Add Facebook Shortcut</string>
     <string name="facebookDialogCancelButtonText">Not Now</string>
+    <string name="useOurAppNotificationTitle">Worried about Facebook tracking you?</string>
+    <string name="useOurAppNotificationDescription">Here\'s a simply way to reduce it\'s reach.</string>
 
 </resources>

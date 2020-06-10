@@ -29,8 +29,8 @@ enum class CtaId {
     DAX_DIALOG_NETWORK,
     DAX_DIALOG_OTHER,
     DAX_END,
-    FB_FLOW,
-    DELETE_FB
+    USE_OUR_APP,
+    USE_OUR_APP_DELETION
 }
 
 @Entity(

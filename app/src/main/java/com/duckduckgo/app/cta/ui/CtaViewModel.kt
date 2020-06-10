@@ -35,7 +35,6 @@ import com.duckduckgo.app.onboarding.store.daxOnboardingActive
 import com.duckduckgo.app.onboarding.store.useOurAppOnboarding
 import com.duckduckgo.app.privacy.db.UserWhitelistDao
 import com.duckduckgo.app.settings.db.SettingsDataStore
-import com.duckduckgo.app.statistics.Variant
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.survey.db.SurveyDao
@@ -165,7 +164,7 @@ class CtaViewModel @Inject constructor(
             canShowDaxCtaEndOfJourney() -> {
                 DaxBubbleCta.DaxEndCta(onboardingStore, appInstallStore)
             }
-            canShowFacebookDialog() -> {
+            canShowUseOurAppDialog() -> {
                 DaxFacebookCta()
             }
             canShowWidgetCta() -> {
@@ -197,7 +196,7 @@ class CtaViewModel @Inject constructor(
     }
 
     @WorkerThread
-    private suspend fun canShowFacebookDialog(): Boolean = useOurAppActive() && !fbDialogShown()
+    private suspend fun canShowUseOurAppDialog(): Boolean = useOurAppActive() && !useOurAppDialogShown()
 
     @WorkerThread
     private fun canShowWidgetCta(): Boolean {
@@ -257,7 +256,7 @@ class CtaViewModel @Inject constructor(
         }
     }
 
-    private fun fbDialogShown(): Boolean = dismissedCtaDao.exists(CtaId.FB_FLOW)
+    private fun useOurAppDialogShown(): Boolean = dismissedCtaDao.exists(CtaId.USE_OUR_APP)
 
     private fun daxDialogIntroShown(): Boolean = dismissedCtaDao.exists(CtaId.DAX_INTRO)
 

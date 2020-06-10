@@ -72,7 +72,7 @@ class DaxFacebookCta(
     @StringRes val text: Int = R.string.facebookDialogText,
     @StringRes val okButton: Int = R.string.facebookDialogButtonText,
     @StringRes val cancelButton: Int = R.string.facebookDialogCancelButtonText,
-    override val ctaId: CtaId = CtaId.FB_FLOW,
+    override val ctaId: CtaId = CtaId.USE_OUR_APP,
     override val shownPixel: Pixel.PixelName? = null,
     override val okPixel: Pixel.PixelName?= null,
     override val cancelPixel: Pixel.PixelName? = null

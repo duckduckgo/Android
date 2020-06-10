@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.onboarding.store
 
+import com.duckduckgo.app.browser.addtohome.AddToHomeCapabilityDetector
 import com.duckduckgo.app.global.DispatcherProvider
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -28,7 +29,8 @@ interface UserStageStore {
 
 class AppUserStageStore @Inject constructor(
     private val userStageDao: UserStageDao,
-    private val dispatcher: DispatcherProvider
+    private val dispatcher: DispatcherProvider,
+    private val addToHomeCapabilityDetector: AddToHomeCapabilityDetector
 ) : UserStageStore {
     override suspend fun getUserAppStage(): AppStage {
         return withContext(dispatcher.io()) {
@@ -41,7 +43,13 @@ class AppUserStageStore @Inject constructor(
         return withContext(dispatcher.io()) {
             val newAppStage = when (appStage) {
                 AppStage.NEW -> AppStage.DAX_ONBOARDING
-                AppStage.DAX_ONBOARDING -> AppStage.ESTABLISHED
+                AppStage.DAX_ONBOARDING -> {
+                    if (addToHomeCapabilityDetector.isAddToHomeSupported()) {
+                        AppStage.USE_OUR_APP_NOTIFICATION
+                    } else {
+                        AppStage.ESTABLISHED
+                    }
+                }
                 AppStage.USE_OUR_APP_NOTIFICATION -> AppStage.ESTABLISHED
                 AppStage.USE_OUR_APP_ONBOARDING -> AppStage.ESTABLISHED
                 AppStage.ESTABLISHED -> AppStage.ESTABLISHED

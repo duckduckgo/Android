@@ -17,6 +17,7 @@
 package com.duckduckgo.app.notification.model
 
 import android.content.Context
+import android.os.Bundle
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.notification.NotificationHandlerService
 import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEvent.CANCEL
@@ -29,7 +30,7 @@ class UseOurAppNotification(
     private val notificationDao: NotificationDao
 ) : SchedulableNotification {
 
-    override val id = "com.duckduckgo.privacytips.fb"
+    override val id = "com.duckduckgo.privacytips.useOurApp"
     override val launchIntent = NotificationHandlerService.NotificationEvent.USE_OUR_APP
     override val cancelIntent = CANCEL
 
@@ -49,13 +50,15 @@ class UseOurAppNotification(
 
 class UseOurAppSpecification(context: Context) : NotificationSpec {
     override val channel = NotificationRegistrar.ChannelType.TUTORIALS
-    override val systemId = NotificationRegistrar.NotificationId.Facebook
+    override val systemId = NotificationRegistrar.NotificationId.UseOurApp
     override val name = "Use our app"
     override val icon = R.drawable.notification_logo
-    override val title: String = "Worried about Facebook tracking you?"
-    override val description: String = "Here's a simply way to reduce it's reach."
+    override val title: String = context.getString(R.string.useOurAppNotificationTitle)
+    override val description: String = context.getString(R.string.useOurAppNotificationDescription)
     override val launchButton: String? = null
     override val closeButton: String? = null
     override val pixelSuffix = "uoa"
     override val autoCancel = true
+    override val bundle: Bundle = Bundle()
+    override val color: Int = R.color.ic_launcher_red_background
 }
