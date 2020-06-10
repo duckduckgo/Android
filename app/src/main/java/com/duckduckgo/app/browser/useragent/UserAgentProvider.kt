@@ -17,6 +17,7 @@
 package com.duckduckgo.app.browser.useragent
 
 import android.os.Build
+import com.duckduckgo.app.global.UriString
 import com.duckduckgo.app.global.device.DeviceInfo
 
 /**
@@ -50,8 +51,9 @@ class UserAgentProvider constructor(private val defaultUserAgent: String, privat
      * We include everything from the original UA string from AppleWebKit onwards (omitting if missing)
      */
     fun userAgent(host: String? = null, isDesktop: Boolean = false): String {
-        val omitApplicationComponent = sitesThatOmitApplication.contains(host)
-        val omitVersionComponent = sitesThatOmitVersion.contains(host)
+
+        val omitApplicationComponent = if (host != null) sitesThatOmitApplication.any { UriString.sameOrSubdomain(host, it) } else false
+        val omitVersionComponent = if (host != null) sitesThatOmitVersion.any { UriString.sameOrSubdomain(host, it) } else false
 
         var prefix = if (isDesktop) baseDesktopAgent else baseAgent
         if (omitVersionComponent) {
@@ -93,12 +95,13 @@ class UserAgentProvider constructor(private val defaultUserAgent: String, privat
         val desktopPrefix = "Mozilla/5.0 (X11; Linux ${System.getProperty("os.arch")})"
 
         val sitesThatOmitApplication = listOf(
-            "www.cvs.com",
-            "cvs.com"
+            "cvs.com",
+            "chase.com"
         )
 
         val sitesThatOmitVersion = listOf(
-            "mijn.ing.nl"
+            "mijn.ing.nl",
+            "chase.com"
         )
     }
 }
