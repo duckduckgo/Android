@@ -779,12 +779,11 @@ class BrowserTabViewModel(
     }
 
     fun onFireproofWebsiteMenuClicked() {
+        val domain = site?.domain ?: return
         viewModelScope.launch {
-            site?.domain?.let { nonNullDomain ->
-                fireproofWebsiteRepository.fireproofWebsite(nonNullDomain)?.let {
-                    pixel.fire(PixelName.FIREPROOF_WEBSITE_ADDED)
-                    command.value = ShowFireproofWebSiteConfirmation(fireproofWebsiteEntity = it)
-                }
+            fireproofWebsiteRepository.fireproofWebsite(domain)?.let {
+                pixel.fire(PixelName.FIREPROOF_WEBSITE_ADDED)
+                command.value = ShowFireproofWebSiteConfirmation(fireproofWebsiteEntity = it)
             }
         }
     }
