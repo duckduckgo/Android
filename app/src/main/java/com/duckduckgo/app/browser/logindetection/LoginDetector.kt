@@ -46,10 +46,7 @@ class JSLoginDetector @Inject constructor(private val settingsDataStore: Setting
     private val loginPathRegex = Regex("login|sign-in|signin|sessions")
 
     override fun addLoginDetection(webView: WebView, onLoginDetected: () -> Unit) {
-        webView.addJavascriptInterface(
-            LoginDetectionInterface { onLoginDetected() },
-            LOGIN_DETECTION_INTERFACE_NAME
-        )
+        webView.addJavascriptInterface(LoginDetectionJsInterface { onLoginDetected() }, LOGIN_DETECTION_JS_INTERFACE_NAME)
     }
 
     override suspend fun onEvent(event: WebNavigationEvent) {

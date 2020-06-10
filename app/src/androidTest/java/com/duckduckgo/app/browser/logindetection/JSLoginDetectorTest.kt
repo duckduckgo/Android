@@ -45,7 +45,7 @@ class JSLoginDetectorTest {
     fun whenAddLoginDetectionThenJSInterfaceAdded() = coroutinesTestRule.runBlocking {
         val webView = spy(WebView(InstrumentationRegistry.getInstrumentation().targetContext))
         testee.addLoginDetection(webView) {}
-        verify(webView).addJavascriptInterface(any<LoginDetectionInterface>(), eq(LOGIN_DETECTION_INTERFACE_NAME))
+        verify(webView).addJavascriptInterface(any<LoginDetectionJsInterface>(), eq(LOGIN_DETECTION_JS_INTERFACE_NAME))
     }
 
     @UiThreadTest
