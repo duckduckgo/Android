@@ -32,7 +32,6 @@ import javax.inject.Inject
 interface FaviconDownloader {
 
     fun download(currentPageUrl: Uri): Single<Bitmap>
-    fun load(@DrawableRes drawableRes: Int): Bitmap?
 }
 
 class GlideFaviconDownloader @Inject constructor(private val context: Context) : FaviconDownloader {
@@ -51,8 +50,6 @@ class GlideFaviconDownloader @Inject constructor(private val context: Context) :
                 .get(TIMEOUT_PERIOD_SECONDS, TimeUnit.SECONDS)
         }
     }
-
-    override fun load(drawableRes: Int): Bitmap? = ContextCompat.getDrawable(context, drawableRes)?.toBitmap()
 
     companion object {
         private const val DESIRED_IMAGE_SIZE_DP = 24

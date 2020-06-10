@@ -52,6 +52,8 @@ import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.browser.model.LongPressTarget
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
+import com.duckduckgo.app.browser.shortcut.ShortcutBuilder.Companion.USE_OUR_APP_SHORTCUT_TITLE
+import com.duckduckgo.app.browser.shortcut.ShortcutBuilder.Companion.USE_OUR_APP_SHORTCUT_URL
 import com.duckduckgo.app.browser.ui.HttpAuthenticationDialogFragment.HttpAuthenticationListener
 import com.duckduckgo.app.cta.ui.*
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteDao
@@ -213,7 +215,6 @@ class BrowserTabViewModel(
         object LaunchTabSwitcher : Command()
         object HideWebContent : Command()
         object ShowWebContent : Command()
-        class NavigateAndAddShortCut(val shortcut: AddHomeShortcut) : Command()
 
         class ShowErrorWithAction(val action: () -> Unit) : Command()
         sealed class DaxCommand : Command() {
@@ -1078,15 +1079,14 @@ class BrowserTabViewModel(
             is HomePanelCta.Survey -> LaunchSurvey(cta.survey)
             is HomePanelCta.AddWidgetAuto -> LaunchAddWidget
             is HomePanelCta.AddWidgetInstructions -> LaunchLegacyAddWidget
-            is DaxFacebookCta -> navigateToUrlAndAddShorcut(url = "https://www.facebook.com", title = "Facebook", icon = R.drawable.ic_fb_favicon)
+            is UseOurAppCta -> navigateToUrlAndAddShortcut(url = USE_OUR_APP_SHORTCUT_URL, title = USE_OUR_APP_SHORTCUT_TITLE)
             else -> return
         }
     }
 
-    private fun navigateToUrlAndAddShorcut(url: String, title: String, icon: Int): AddHomeShortcut {
-        val convertedUrl = queryUrlConverter.convertQueryToUrl(url)
-        onUserSubmittedQuery(convertedUrl)
-        return AddHomeShortcut(title, convertedUrl, faviconDownloader.load(icon))
+    private fun navigateToUrlAndAddShortcut(url: String, title: String): AddHomeShortcut {
+        onUserSubmittedQuery(url)
+        return AddHomeShortcut(title, url)
     }
 
     fun onUserClickCtaSecondaryButton() {

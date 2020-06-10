@@ -165,7 +165,7 @@ class CtaViewModel @Inject constructor(
                 DaxBubbleCta.DaxEndCta(onboardingStore, appInstallStore)
             }
             canShowUseOurAppDialog() -> {
-                DaxFacebookCta()
+                UseOurAppCta()
             }
             canShowWidgetCta() -> {
                 if (widgetCapabilities.supportsAutomaticWidgetAdd) AddWidgetAuto else AddWidgetInstructions

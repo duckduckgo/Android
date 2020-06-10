@@ -197,4 +197,8 @@ class BrowserViewModel(
     override fun onUserCancelledGiveFeedbackDialog(promptCount: PromptCount) {
         onUserDeclinedToGiveFeedback(promptCount)
     }
+
+    fun onOpenShortcut(url: String) {
+        tabRepository.selectByUrlOrNewTab(url, queryUrlConverter.convertQueryToUrl(url))
+    }
 }

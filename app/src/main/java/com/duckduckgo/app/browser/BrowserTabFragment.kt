@@ -44,7 +44,6 @@ import androidx.annotation.AnyThread
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
-import androidx.core.content.pm.ShortcutManagerCompat
 import androidx.core.text.HtmlCompat
 import androidx.core.text.HtmlCompat.FROM_HTML_MODE_LEGACY
 import androidx.core.view.*
@@ -383,8 +382,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
     }
 
     private fun addHomeShortcut(homeShortcut: Command.AddHomeShortcut, context: Context) {
-        val shortcutInfo = shortcutBuilder.buildPinnedPageShortcut(context, homeShortcut)
-        ShortcutManagerCompat.requestPinShortcut(context, shortcutInfo, null)
+        shortcutBuilder.requestPinShortcut(context, homeShortcut)
     }
 
     private fun configureObservers() {
@@ -465,16 +463,6 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
 
     fun submitQuery(query: String) {
         viewModel.onUserSubmittedQuery(query)
-    }
-
-    private fun navigateAndAddShortcut(shortCut: Command.AddHomeShortcut) {
-        hideKeyboard()
-        renderer.hideFindInPage()
-        viewModel.registerDaxBubbleCtaDismissed()
-        webView?.loadUrl(shortCut.url)
-//        context?.let { context ->
-//            addHomeShortcut(shortCut, context)
-//        }
     }
 
     private fun navigate(url: String) {
@@ -583,9 +571,6 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
             is Command.DaxCommand.HideDaxDialog -> showHideTipsDialog(it.cta)
             is Command.HideWebContent -> webView?.hide()
             is Command.ShowWebContent -> webView?.show()
-            is Command.NavigateAndAddShortCut -> {
-                navigateAndAddShortcut(it.shortcut)
-            }
         }
     }
 

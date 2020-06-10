@@ -25,7 +25,7 @@ const val KEY_TIMESTAMPS_TABLE_NAME = "keyTimestamps"
 @Entity(tableName = KEY_TIMESTAMPS_TABLE_NAME)
 data class KeyTimestampEntity(
     @PrimaryKey val id: TimestampKey,
-    val timestamp: Int
+    val timestamp: Long = System.currentTimeMillis()
 )
 
 enum class TimestampKey {

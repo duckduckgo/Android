@@ -68,7 +68,7 @@ interface Cta {
     fun pixelOkParameters(): Map<String, String>
 }
 
-class DaxFacebookCta(
+class UseOurAppCta(
     @StringRes val text: Int = R.string.facebookDialogText,
     @StringRes val okButton: Int = R.string.facebookDialogButtonText,
     @StringRes val cancelButton: Int = R.string.facebookDialogCancelButtonText,
