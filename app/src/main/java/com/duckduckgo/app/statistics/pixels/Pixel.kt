@@ -36,6 +36,8 @@ interface Pixel {
         FORGET_ALL_PRESSED_BROWSING("mf_bp"),
         FORGET_ALL_PRESSED_TABSWITCHING("mf_tp"),
         FORGET_ALL_EXECUTED("mf"),
+        FORGET_ALL_AUTO_RESTART("mf_r"),
+        FORGET_ALL_AUTO_RESTART_WITH_INTENT("mf_ri"),
 
         APPLICATION_CRASH("m_d_ac"),
         APPLICATION_CRASH_GLOBAL("m_d_ac_g"),

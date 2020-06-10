@@ -17,10 +17,21 @@
 package com.duckduckgo.app.fire
 
 import android.content.Context
+import android.content.Intent
 import android.content.SharedPreferences
+import androidx.annotation.UiThread
 import androidx.annotation.VisibleForTesting
 import androidx.core.content.edit
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleObserver
+import androidx.lifecycle.OnLifecycleEvent
+import com.duckduckgo.app.global.intentText
+import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.systemsearch.SystemSearchActivity
+import kotlinx.coroutines.launch
+import timber.log.Timber
 import javax.inject.Inject
+import javax.inject.Singleton
 
 interface UnsentForgetAllPixelStore {
     val pendingPixelCountClearData: Int
@@ -67,5 +78,96 @@ class UnsentForgetAllPixelStoreSharedPreferences @Inject constructor(private val
         const val FILENAME = "com.duckduckgo.app.fire.unsentpixels.settings"
         const val KEY_UNSENT_CLEAR_PIXELS = "KEY_UNSENT_CLEAR_PIXELS"
         const val KEY_TIMESTAMP_LAST_CLEARED = "KEY_TIMESTAMP_LAST_CLEARED"
+    }
+}
+
+
+/**
+ * Stores information about unsent clear data Pixels.
+ *
+ * When writing values here to SharedPreferences, it is crucial to use `commit = true`. As otherwise the change can be lost in the process restart.
+ */
+@Singleton
+class UnsentPixelDataClearerAppRestartedWithIntentStoreSharedPreferences @Inject constructor(
+    private val context: Context,
+    private val pixel: Pixel
+): LifecycleObserver {
+    private var externalIntent: Boolean = false
+
+    private val pendingAppForegroundRestart: Int
+        get() = preferences.getInt(KEY_UNSENT_CLEAR_APP_RESTARTED_PIXELS, 0)
+
+    private val pendingAppForegroundRestartWithIntent: Int
+        get() = preferences.getInt(KEY_UNSENT_CLEAR_APP_RESTARTED_WITH_INTENT_PIXELS, 0)
+
+    @UiThread
+    @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
+    fun onAppForegrounded() {
+        Timber.i("Registered App on_stop")
+        externalIntent = false
+    }
+
+    fun registerIntent(intent: Intent?) {
+        if (widgetActivity(intent)) {
+            Timber.i("Registered Intent with extras")
+            externalIntent = true
+        } else {
+            if (!intent?.intentText.isNullOrEmpty()) {
+                externalIntent = true
+                Timber.i("Registered Intent with extras")
+            }
+        }
+    }
+
+    fun incrementCount() {
+        if (externalIntent) {
+            Timber.i("Registered restart with intent")
+            incrementCount(pendingAppForegroundRestart, KEY_UNSENT_CLEAR_APP_RESTARTED_WITH_INTENT_PIXELS)
+        } else {
+            Timber.i("Registered restart w/ intent")
+            incrementCount(pendingAppForegroundRestartWithIntent, KEY_UNSENT_CLEAR_APP_RESTARTED_PIXELS)
+        }
+    }
+
+    fun firePendingPixels() {
+        firePendingPixels(pendingAppForegroundRestart, Pixel.PixelName.FORGET_ALL_AUTO_RESTART)
+        firePendingPixels(pendingAppForegroundRestartWithIntent, Pixel.PixelName.FORGET_ALL_AUTO_RESTART_WITH_INTENT)
+        resetCount()
+    }
+
+    private fun incrementCount(counter: Int, sharedPrefKey: String) {
+        val updated = counter + 1
+        preferences.edit(commit = true) {
+            putInt(sharedPrefKey, updated)
+        }
+    }
+
+    private fun firePendingPixels(counter: Int, pixelName: Pixel.PixelName) {
+        if (counter > 0) {
+            for (i in 1..counter) {
+                Timber.i("Fired pixel: ${pixelName.pixelName}/$counter")
+                pixel.fire(pixelName)
+            }
+        }
+    }
+
+    private fun resetCount() {
+        preferences.edit(commit = true) {
+            putInt(KEY_UNSENT_CLEAR_APP_RESTARTED_PIXELS, 0)
+            putInt(KEY_UNSENT_CLEAR_APP_RESTARTED_WITH_INTENT_PIXELS, 0)
+        }
+        Timber.i("counter reset")
+    }
+
+    private fun widgetActivity(intent: Intent?): Boolean = intent?.component?.className?.contains(SystemSearchActivity::class.java.canonicalName.orEmpty()) == true
+
+    private val preferences: SharedPreferences
+        get() = context.getSharedPreferences(FILENAME, Context.MODE_PRIVATE)
+
+    companion object {
+        @VisibleForTesting
+        const val FILENAME = "com.duckduckgo.app.fire.unsentpixels.settings"
+        const val KEY_UNSENT_CLEAR_APP_RESTARTED_PIXELS = "KEY_UNSENT_CLEAR_APP_RESTARTED_PIXELS"
+        const val KEY_UNSENT_CLEAR_APP_RESTARTED_WITH_INTENT_PIXELS = "KEY_UNSENT_CLEAR_APP_RESTARTED_WITH_INTENT_PIXELS"
     }
 }

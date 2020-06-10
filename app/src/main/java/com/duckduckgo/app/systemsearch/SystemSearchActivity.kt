@@ -34,6 +34,7 @@ import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.autocomplete.BrowserAutoCompleteSuggestionsAdapter
 import com.duckduckgo.app.browser.omnibar.OmnibarScrolling
+import com.duckduckgo.app.fire.UnsentPixelDataClearerAppRestartedWithIntentStoreSharedPreferences
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.view.TextChangedWatcher
 import com.duckduckgo.app.global.view.hideKeyboard
@@ -43,6 +44,7 @@ import com.duckduckgo.app.systemsearch.SystemSearchViewModel.Command.*
 import com.duckduckgo.app.systemsearch.SystemSearchViewModel.SystemSearchResultsViewState
 import kotlinx.android.synthetic.main.activity_system_search.*
 import kotlinx.android.synthetic.main.include_system_search_onboarding.*
+import timber.log.Timber
 import javax.inject.Inject
 
 class SystemSearchActivity : DuckDuckGoActivity() {
@@ -52,6 +54,9 @@ class SystemSearchActivity : DuckDuckGoActivity() {
 
     @Inject
     lateinit var omnibarScrolling: OmnibarScrolling
+
+    @Inject
+    lateinit var unsentPixelDataClearerRestart: UnsentPixelDataClearerAppRestartedWithIntentStoreSharedPreferences
 
     private val viewModel: SystemSearchViewModel by bindViewModel()
     private lateinit var autocompleteSuggestionsAdapter: BrowserAutoCompleteSuggestionsAdapter
@@ -66,6 +71,8 @@ class SystemSearchActivity : DuckDuckGoActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        Timber.i("onCreate called")
+        unsentPixelDataClearerRestart.registerIntent(intent)
         setContentView(R.layout.activity_system_search)
         configureObservers()
         configureOnboarding()
@@ -82,6 +89,8 @@ class SystemSearchActivity : DuckDuckGoActivity() {
 
     override fun onNewIntent(newIntent: Intent?) {
         super.onNewIntent(newIntent)
+        Timber.i("onNewIntent")
+        unsentPixelDataClearerRestart.registerIntent(newIntent)
         viewModel.resetViewState()
         newIntent?.let { sendLaunchPixels(it) }
     }

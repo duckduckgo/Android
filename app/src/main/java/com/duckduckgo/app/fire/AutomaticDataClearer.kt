@@ -44,7 +44,8 @@ class AutomaticDataClearer(
     private val workManager: WorkManager,
     private val settingsDataStore: SettingsDataStore,
     private val clearDataAction: ClearDataAction,
-    private val dataClearerTimeKeeper: BackgroundTimeKeeper
+    private val dataClearerTimeKeeper: BackgroundTimeKeeper,
+    private val unsentPixelDataClearerRestart: UnsentPixelDataClearerAppRestartedWithIntentStoreSharedPreferences
 ) : DataClearer, LifecycleObserver, CoroutineScope {
 
     private val clearJob: Job = Job()
@@ -159,7 +160,7 @@ class AutomaticDataClearer(
                 Timber.i("All data now cleared, will restart process? $processNeedsRestarted")
                 if (processNeedsRestarted) {
                     clearDataAction.setAppUsedSinceLastClearFlag(false)
-
+                    unsentPixelDataClearerRestart.incrementCount()
                     // need a moment to draw background color (reduces flickering UX)
                     Handler().postDelayed(100) {
                         Timber.i("Will now restart process")

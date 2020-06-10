@@ -30,6 +30,7 @@ import com.duckduckgo.app.di.DaggerAppComponent
 import com.duckduckgo.app.fire.DataClearer
 import com.duckduckgo.app.fire.FireActivity
 import com.duckduckgo.app.fire.UnsentForgetAllPixelStore
+import com.duckduckgo.app.fire.UnsentPixelDataClearerAppRestartedWithIntentStoreSharedPreferences
 import com.duckduckgo.app.global.Theming.initializeTheme
 import com.duckduckgo.app.global.initialization.AppDataLoader
 import com.duckduckgo.app.global.install.AppInstallStore
@@ -111,6 +112,9 @@ open class DuckDuckGoApplication : HasAndroidInjector, Application(), LifecycleO
     lateinit var unsentForgetAllPixelStore: UnsentForgetAllPixelStore
 
     @Inject
+    lateinit var unsentPixelDataClearerRestart: UnsentPixelDataClearerAppRestartedWithIntentStoreSharedPreferences
+
+    @Inject
     lateinit var offlinePixelScheduler: OfflinePixelScheduler
 
     @Inject
@@ -170,6 +174,7 @@ open class DuckDuckGoApplication : HasAndroidInjector, Application(), LifecycleO
             it.addObserver(appDaysUsedRecorder)
             it.addObserver(defaultBrowserObserver)
             it.addObserver(appEnjoymentLifecycleObserver)
+            it.addObserver(unsentPixelDataClearerRestart)
         }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1) {
@@ -254,6 +259,11 @@ open class DuckDuckGoApplication : HasAndroidInjector, Application(), LifecycleO
             }
             unsentForgetAllPixelStore.resetCount()
         }
+        submitUnsentFireAppRestartedWithIntentPixels()
+    }
+
+    private fun submitUnsentFireAppRestartedWithIntentPixels() {
+        unsentPixelDataClearerRestart.firePendingPixels()
     }
 
     /**
