@@ -19,9 +19,6 @@ package com.duckduckgo.app.browser.logindetection
 import android.webkit.JavascriptInterface
 import timber.log.Timber
 
-// Interface name used inside login_form_detection.js
-const val LOGIN_DETECTION_JS_INTERFACE_NAME = "LoginDetection"
-
 @Suppress("unused")
 class LoginDetectionJavascriptInterface(private val onLoginDetected: () -> Unit) {
 
@@ -33,5 +30,10 @@ class LoginDetectionJavascriptInterface(private val onLoginDetected: () -> Unit)
     @JavascriptInterface
     fun loginDetected() {
         onLoginDetected()
+    }
+
+    companion object {
+        // Interface name used inside login_form_detection.js
+        const val JAVASCRIPT_INTERFACE_NAME = "LoginDetection"
     }
 }

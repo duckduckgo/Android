@@ -22,6 +22,7 @@ import android.webkit.WebView
 import androidx.test.annotation.UiThreadTest
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.CoroutineTestRule
+import com.duckduckgo.app.browser.logindetection.LoginDetectionJavascriptInterface.Companion.JAVASCRIPT_INTERFACE_NAME
 import com.duckduckgo.app.runBlocking
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.nhaarman.mockitokotlin2.*
@@ -45,7 +46,7 @@ class JSLoginDetectorTest {
     fun whenAddLoginDetectionThenJSInterfaceAdded() = coroutinesTestRule.runBlocking {
         val webView = spy(WebView(InstrumentationRegistry.getInstrumentation().targetContext))
         testee.addLoginDetection(webView) {}
-        verify(webView).addJavascriptInterface(any<LoginDetectionJavascriptInterface>(), eq(LOGIN_DETECTION_JS_INTERFACE_NAME))
+        verify(webView).addJavascriptInterface(any<LoginDetectionJavascriptInterface>(), eq(JAVASCRIPT_INTERFACE_NAME))
     }
 
     @UiThreadTest
