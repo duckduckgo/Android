@@ -98,11 +98,15 @@ class JsLoginDetector @Inject constructor(private val settingsDataStore: Setting
         }
 
         fun loginFormEventsDetector(context: Context): String {
-            return getFunctionsJS(context) + getHandlersJS(context)
+            return wrapIntoAnonymousFunction(getFunctionsJS(context) + getHandlersJS(context))
         }
 
         fun loginFormDetector(context: Context): String {
-            return getFunctionsJS(context) + "scanForPasswordField();"
+            return wrapIntoAnonymousFunction(getFunctionsJS(context) + "scanForPasswordField();")
+        }
+
+        private fun wrapIntoAnonymousFunction(rawJavaScript: String): String {
+            return "(function() { $rawJavaScript })();"
         }
     }
 

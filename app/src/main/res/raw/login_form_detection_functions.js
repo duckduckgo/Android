@@ -1,3 +1,5 @@
+// Do not wrap this code into an anonymous function. Used in JavaScriptDetector.kt
+
 function loginFormDetected() {
     try {
         LoginDetection.loginDetected();
