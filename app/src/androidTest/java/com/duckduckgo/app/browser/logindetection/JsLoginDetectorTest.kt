@@ -31,7 +31,7 @@ import org.junit.Rule
 import org.junit.Test
 
 @ExperimentalCoroutinesApi
-class JSLoginDetectorTest {
+class JsLoginDetectorTest {
 
     @ExperimentalCoroutinesApi
     @get:Rule
@@ -39,7 +39,7 @@ class JSLoginDetectorTest {
 
     private val settingsDataStore: SettingsDataStore = mock()
 
-    private val testee = JSLoginDetector(settingsDataStore)
+    private val testee = JsLoginDetector(settingsDataStore)
 
     @UiThreadTest
     @Test
@@ -51,7 +51,7 @@ class JSLoginDetectorTest {
 
     @UiThreadTest
     @Test
-    fun whenLoginDetectionDisabledAndPageStartedEventThenNothing() = coroutinesTestRule.runBlocking {
+    fun whenLoginDetectionDisabledAndPageStartedEventThenNoWebViewInteractions() = coroutinesTestRule.runBlocking {
         whenever(settingsDataStore.appLoginDetection).thenReturn(false)
         val webView = spy(WebView(InstrumentationRegistry.getInstrumentation().targetContext))
         testee.onEvent(WebNavigationEvent.OnPageStarted(webView))
@@ -60,7 +60,7 @@ class JSLoginDetectorTest {
 
     @UiThreadTest
     @Test
-    fun whenLoginDetectionDisabledAndInterceptRequestEventThenNothing() = coroutinesTestRule.runBlocking {
+    fun whenLoginDetectionDisabledAndInterceptRequestEventThenNoWebViewInteractions() = coroutinesTestRule.runBlocking {
         whenever(settingsDataStore.appLoginDetection).thenReturn(false)
         val webView = spy(WebView(InstrumentationRegistry.getInstrumentation().targetContext))
         val webResourceRequest = aWebResourceRequest()
@@ -89,7 +89,7 @@ class JSLoginDetectorTest {
 
     @UiThreadTest
     @Test
-    fun whenLoginDetectionEnabledAndNoLoginPostRequestCapturedThenNothing() = coroutinesTestRule.runBlocking {
+    fun whenLoginDetectionEnabledAndNoLoginPostRequestCapturedThenNoWebViewInteractions() = coroutinesTestRule.runBlocking {
         whenever(settingsDataStore.appLoginDetection).thenReturn(true)
         val webView = spy(WebView(InstrumentationRegistry.getInstrumentation().targetContext))
         val webResourceRequest = aWebResourceRequest("POST", "")
@@ -99,7 +99,7 @@ class JSLoginDetectorTest {
 
     @UiThreadTest
     @Test
-    fun whenLoginDetectionEnabledAndGetRequestCapturedThenNothing() = coroutinesTestRule.runBlocking {
+    fun whenLoginDetectionEnabledAndGetRequestCapturedThenNoWebViewInteractions() = coroutinesTestRule.runBlocking {
         whenever(settingsDataStore.appLoginDetection).thenReturn(true)
         val webView = spy(WebView(InstrumentationRegistry.getInstrumentation().targetContext))
         val webResourceRequest = aWebResourceRequest("GET")

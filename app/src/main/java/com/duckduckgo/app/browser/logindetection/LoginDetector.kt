@@ -36,7 +36,7 @@ sealed class WebNavigationEvent {
     data class ShouldInterceptRequest(val webView: WebView, val request: WebResourceRequest) : WebNavigationEvent()
 }
 
-class JSLoginDetector @Inject constructor(private val settingsDataStore: SettingsDataStore) : LoginDetector {
+class JsLoginDetector @Inject constructor(private val settingsDataStore: SettingsDataStore) : LoginDetector {
     private val javaScriptDetector = JavaScriptDetector()
     private val loginPathRegex = Regex("login|sign-in|signin|sessions")
 
