@@ -35,6 +35,8 @@ interface VariantManager {
         object Day1DripA2Notification : VariantFeature()
         object Day1DripB1Notification : VariantFeature()
         object Day1DripB2Notification : VariantFeature()
+        object SerpHeaderQueryReplacement : VariantFeature()
+        object SerpHeaderRemoval : VariantFeature()
     }
 
     companion object {
@@ -80,7 +82,25 @@ interface VariantManager {
                 key = "zf",
                 weight = 1.0,
                 features = listOf(VariantFeature.DripNotification, VariantFeature.Day1DripB2Notification, VariantFeature.Day3ClearDataNotification),
-                filterBy = { isEnglishLocale() })
+                filterBy = { isEnglishLocale() }),
+
+            // Single Search Bar Experiments
+            // Disabled until Drip Notifications Experiments are completed
+            Variant(
+                key = "zg",
+                weight = 0.0,
+                features = emptyList(),
+                filterBy = { noFilter() }),
+            Variant(
+                key = "zh",
+                weight = 0.0,
+                features = listOf(VariantFeature.SerpHeaderQueryReplacement),
+                filterBy = { noFilter() }),
+            Variant(
+                key = "zi",
+                weight = 0.0,
+                features = listOf(VariantFeature.SerpHeaderRemoval),
+                filterBy = { noFilter() })
 
             // All groups in an experiment (control and variants) MUST use the same filters
         )

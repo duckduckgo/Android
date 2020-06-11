@@ -61,10 +61,12 @@ import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.global.model.SiteFactory
 import com.duckduckgo.app.global.model.domain
 import com.duckduckgo.app.global.model.domainMatchesUrl
+import com.duckduckgo.app.global.toDesktopUri
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao
 import com.duckduckgo.app.privacy.db.UserWhitelistDao
 import com.duckduckgo.app.privacy.model.PrivacyGrade
 import com.duckduckgo.app.settings.db.SettingsDataStore
+import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.api.StatisticsUpdater
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelName
@@ -84,6 +86,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
+import java.util.Locale
 import java.util.concurrent.TimeUnit
 
 class BrowserTabViewModel(
@@ -106,7 +109,8 @@ class BrowserTabViewModel(
     private val ctaViewModel: CtaViewModel,
     private val searchCountDao: SearchCountDao,
     private val pixel: Pixel,
-    private val dispatchers: DispatcherProvider = DefaultDispatcherProvider()
+    private val dispatchers: DispatcherProvider = DefaultDispatcherProvider(),
+    private val variantManager: VariantManager
 ) : WebViewClientListener, EditBookmarkListener, HttpAuthenticationListener, ViewModel() {
 
     private var buildingSiteFactoryJob: Job? = null
@@ -141,7 +145,8 @@ class BrowserTabViewModel(
         val isWhitelisted: Boolean = false,
         val canReportSite: Boolean = false,
         val addToHomeEnabled: Boolean = false,
-        val addToHomeVisible: Boolean = false
+        val addToHomeVisible: Boolean = false,
+        val showDaxIcon: Boolean = false
     )
 
     data class OmnibarViewState(
@@ -385,6 +390,14 @@ class BrowserTabViewModel(
             searchCountDao.incrementSearchCount()
         }
 
+        val verticalParameter = extractVerticalParameter(url)
+        val urlToNavigate = queryUrlConverter.convertQueryToUrl(trimmedInput, verticalParameter)
+        val omnibarText = if (variantManager.getVariant().hasFeature(VariantManager.VariantFeature.SerpHeaderQueryReplacement)) {
+            urlToNavigate
+        } else {
+            trimmedInput
+        }
+
         val type = specialUrlDetector.determineType(trimmedInput)
         if (type is IntentType) {
             externalAppLinkClicked(type)
@@ -392,14 +405,37 @@ class BrowserTabViewModel(
             if (shouldClearHistoryOnNewQuery()) {
                 command.value = ResetHistory
             }
-            command.value = Navigate(queryUrlConverter.convertQueryToUrl(trimmedInput))
+
+            fireQueryChangedPixel(omnibarText)
+
+            command.value = Navigate(urlToNavigate)
         }
 
         globalLayoutState.value = Browser(isNewTabState = false)
         findInPageViewState.value = FindInPageViewState(visible = false, canFindInPage = true)
-        omnibarViewState.value = currentOmnibarViewState().copy(omnibarText = trimmedInput, shouldMoveCaretToEnd = false)
+        omnibarViewState.value = currentOmnibarViewState().copy(omnibarText = omnibarText, shouldMoveCaretToEnd = false)
         browserViewState.value = currentBrowserViewState().copy(browserShowing = true, showClearButton = false)
         autoCompleteViewState.value = AutoCompleteViewState(false)
+    }
+
+    private fun extractVerticalParameter(currentUrl: String?): String? {
+        val url = currentUrl ?: return null
+
+        return if (duckDuckGoUrlDetector.isDuckDuckGoVerticalUrl(url)) {
+            duckDuckGoUrlDetector.extractVertical(url)
+        } else {
+            null
+        }
+    }
+
+    private fun fireQueryChangedPixel(omnibarText: String) {
+        val oldParameter = currentOmnibarViewState().omnibarText.toUri()?.getQueryParameter(AppUrl.ParamKey.QUERY)
+        val newParameter = omnibarText.toUri()?.getQueryParameter(AppUrl.ParamKey.QUERY)
+        if (oldParameter == newParameter) {
+            pixel.fire(String.format(Locale.US, PixelName.SERP_REQUERY.pixelName, PixelParameter.SERP_QUERY_NOT_CHANGED))
+        } else {
+            pixel.fire(String.format(Locale.US, PixelName.SERP_REQUERY.pixelName, PixelParameter.SERP_QUERY_CHANGED))
+        }
     }
 
     private fun shouldClearHistoryOnNewQuery(): Boolean {
@@ -541,7 +577,8 @@ class BrowserTabViewModel(
             showSearchIcon = false,
             showClearButton = false,
             canFireproofSite = canFireproofSite,
-            isFireproofWebsite = isFireproofWebsite()
+            isFireproofWebsite = isFireproofWebsite(),
+            showDaxIcon = shouldShowDaxIcon(url, true)
         )
 
         Timber.d("showPrivacyGrade=true, showSearchIcon=false, showClearButton=false")
@@ -553,6 +590,16 @@ class BrowserTabViewModel(
         domain?.let { viewModelScope.launch { updateLoadingStatePrivacy(domain) } }
         domain?.let { viewModelScope.launch { updateWhitelistedState(domain) } }
         registerSiteVisit()
+    }
+
+    private fun shouldShowDaxIcon(currentUrl: String?, showPrivacyGrade: Boolean): Boolean {
+        if (!variantManager.getVariant().hasFeature(VariantManager.VariantFeature.SerpHeaderRemoval)) {
+            return false
+        }
+
+        val url = currentUrl ?: return false
+
+        return showPrivacyGrade && duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(url)
     }
 
     private suspend fun updateLoadingStatePrivacy(domain: String) {
@@ -584,10 +631,16 @@ class BrowserTabViewModel(
 
     private fun omnibarTextForUrl(url: String?): String {
         if (url == null) return ""
-        if (duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(url)) {
-            return duckDuckGoUrlDetector.extractQuery(url) ?: ""
+
+        if (variantManager.getVariant().hasFeature(VariantManager.VariantFeature.SerpHeaderQueryReplacement)) {
+            return url
         }
-        return url
+
+        return if (duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(url)) {
+            duckDuckGoUrlDetector.extractQuery(url) ?: url
+        } else {
+            url
+        }
     }
 
     private fun pageCleared() {
@@ -605,7 +658,8 @@ class BrowserTabViewModel(
             canReportSite = false,
             showSearchIcon = true,
             showClearButton = true,
-            canFireproofSite = false
+            canFireproofSite = false,
+            showDaxIcon = false
         )
         Timber.d("showPrivacyGrade=false, showSearchIcon=true, showClearButton=true")
     }
@@ -758,7 +812,8 @@ class BrowserTabViewModel(
             showTabsButton = showControls,
             showFireButton = showControls,
             showMenuButton = showControls,
-            showClearButton = showClearButton
+            showClearButton = showClearButton,
+            showDaxIcon = shouldShowDaxIcon(url, showPrivacyGrade)
         )
 
         Timber.d("showPrivacyGrade=$showPrivacyGrade, showSearchIcon=$showSearchIcon, showClearButton=$showClearButton")

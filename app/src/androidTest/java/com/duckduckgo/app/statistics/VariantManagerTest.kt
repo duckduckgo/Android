@@ -133,6 +133,30 @@ class VariantManagerTest {
         assertTrue(variant.hasFeature(DripNotification))
     }
 
+    // Single Search Bar Experiments
+    @Test
+    fun serpHeaderControlVariantHasExpectedWeightAndNoFeatures() {
+        val variant = variants.first { it.key == "zg" }
+        assertEqualsDouble(0.0, variant.weight)
+        assertEquals(0, variant.features.size)
+    }
+
+    @Test
+    fun serpHeaderVariantHasExpectedWeightAndSERPHeaderRemovalFeature() {
+        val variant = variants.first { it.key == "zi" }
+        assertEqualsDouble(0.0, variant.weight)
+        assertEquals(1, variant.features.size)
+        assertEquals(SerpHeaderRemoval, variant.features[0])
+    }
+
+    @Test
+    fun serpHeaderVariantHasExpectedWeightAndSERPHeaderQueryReplacementFeature() {
+        val variant = variants.first { it.key == "zh" }
+        assertEqualsDouble(0.0, variant.weight)
+        assertEquals(1, variant.features.size)
+        assertEquals(SerpHeaderQueryReplacement, variant.features[0])
+    }
+
     @Test
     fun verifyNoDuplicateVariantNames() {
         val existingNames = mutableSetOf<String>()
