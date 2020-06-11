@@ -1832,6 +1832,22 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenUserRemovesFireproofWebsiteFromOptionMenuThenFireproofWebsiteBrowserStateUpdated() {
+        givenFireproofWebsiteDomain("mobile.example.com")
+        loadUrl("http://mobile.example.com/", isBrowserShowing = true)
+        testee.onFireproofWebsiteMenuClicked()
+        assertFalse(browserViewState().isFireproofWebsite)
+    }
+
+    @Test
+    fun whenUserRemovesFireproofWebsiteFromOptionMenuThenPixelSent() {
+        givenFireproofWebsiteDomain("mobile.example.com")
+        loadUrl("http://mobile.example.com/", isBrowserShowing = true)
+        testee.onFireproofWebsiteMenuClicked()
+        verify(mockPixel).fire(Pixel.PixelName.FIREPROOF_WEBSITE_REMOVE)
+    }
+
+    @Test
     fun whenUserClicksOnFireproofWebsiteSnackbarUndoActionThenFireproofWebsiteIsRemoved() {
         loadUrl("http://example.com/", isBrowserShowing = true)
         testee.onFireproofWebsiteMenuClicked()
