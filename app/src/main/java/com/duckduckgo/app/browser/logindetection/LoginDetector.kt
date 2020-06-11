@@ -37,11 +37,6 @@ sealed class WebNavigationEvent {
 }
 
 class JSLoginDetector @Inject constructor(private val settingsDataStore: SettingsDataStore) : LoginDetector {
-
-    companion object {
-        const val HTTP_POST = "POST"
-    }
-
     private val javaScriptDetector = JavaScriptDetector()
     private val loginPathRegex = Regex("login|sign-in|signin|sessions")
 
@@ -109,5 +104,9 @@ class JSLoginDetector @Inject constructor(private val settingsDataStore: Setting
         fun loginFormDetector(context: Context): String {
             return getFunctionsJS(context) + "scanForPasswordField();"
         }
+    }
+
+    companion object {
+        const val HTTP_POST = "POST"
     }
 }
