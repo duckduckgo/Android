@@ -186,7 +186,8 @@ interface Pixel {
         FIREPROOF_WEBSITE_LOGIN_ADDED("m_fw_l_a"),
         FIREPROOF_WEBSITE_LOGIN_DISMISS("m_fw_l_d"),
         FIREPROOF_WEBSITE_DELETED("m_fw_d"),
-        FIREPROOF_WEBSITE_LOGIN_TOGGLE("m_fw_d_%s"),
+        FIREPROOF_LOGIN_TOGGLE_ENABLED("m_fw_d_e"),
+        FIREPROOF_LOGIN_TOGGLE_DISABLED("m_fw_d_d"),
         FIREPROOF_WEBSITE_UNDO("m_fw_u")
     }
 
