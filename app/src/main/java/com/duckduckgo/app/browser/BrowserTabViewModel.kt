@@ -1207,7 +1207,7 @@ class BrowserTabViewModel(
         val domain = site?.domain ?: return
         viewModelScope.launch {
             if (canFireproofWebsite()) {
-                pixel.fire(PixelName.FIREPROOF_WEBSITE_LOGIN_DIALOG)
+                pixel.fire(PixelName.FIREPROOF_LOGIN_DIALOG_SHOWN)
                 command.value = AskToFireproofWebsite(FireproofWebsiteEntity(domain))
             }
         }
