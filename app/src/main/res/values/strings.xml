@@ -450,7 +450,7 @@
     <!-- Fireproof websites -->
     <string name="fireproofWebsitesActivityTitle">Fireproof Websites</string>
     <string name="settingsFireproofWebsites">Fireproof Websites</string>
-    <string name="fireproofWebsiteMenuTitle">Fireproof Website</string>
+    <string name="fireproofWebsiteMenuTitleAdd">Fireproof Website</string>
     <string name="fireproofWebsiteSnackbarConfirmation">&lt;b>%s&lt;/b> is now fireproof! Visit Settings to learn more.</string>
     <string name="fireproofWebsiteSnackbarAction">Undo</string>
     <string name="fireproofWebsiteDeleteConfirmMessage">Are you sure you want to delete &lt;b>%s&lt;/b>?</string>

@@ -440,7 +440,7 @@
     <!-- Fireproof websites -->
     <string name="fireproofWebsitesActivityTitle">Palonkestävät verkkosivustot</string>
     <string name="settingsFireproofWebsites">Palonkestävät verkkosivustot</string>
-    <string name="fireproofWebsiteMenuTitle">Palonkestävä verkkosivusto</string>
+    <string name="fireproofWebsiteMenuTitleAdd">Palonkestävä verkkosivusto</string>
     <string name="fireproofWebsiteSnackbarConfirmation">&lt;b&gt;%s&lt;/b&gt; on nyt palonkestävä! Siirry asetuksiin oppiaksesi lisää.</string>
     <string name="fireproofWebsiteSnackbarAction">Kumoa</string>
     <string name="fireproofWebsiteDeleteConfirmMessage">Haluatko varmasti poistaa &lt;b&gt;%s&lt;/b&gt;?</string>

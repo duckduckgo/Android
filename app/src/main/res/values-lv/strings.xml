@@ -465,7 +465,7 @@
     <!-- Fireproof websites -->
     <string name="fireproofWebsitesActivityTitle">Ugunsdrošas tīmekļa vietnes</string>
     <string name="settingsFireproofWebsites">Ugunsdrošas tīmekļa vietnes</string>
-    <string name="fireproofWebsiteMenuTitle">Ugunsdrošā tīmekļa vietne</string>
+    <string name="fireproofWebsiteMenuTitleAdd">Ugunsdrošā tīmekļa vietne</string>
     <string name="fireproofWebsiteSnackbarConfirmation">&lt;b&gt;%s&lt;/b&gt; tagad ir ugunsdrošs! Lai uzzinātu vairāk, apmeklējiet iestatījumus.</string>
     <string name="fireproofWebsiteSnackbarAction">Atsaukt</string>
     <string name="fireproofWebsiteDeleteConfirmMessage">Vai tiešām vēlaties izdzēst &lt;b&gt;%s&lt;/b&gt;?</string>

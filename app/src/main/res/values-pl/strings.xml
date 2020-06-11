@@ -452,7 +452,7 @@
     <!-- Fireproof websites -->
     <string name="fireproofWebsitesActivityTitle">Bezpieczne strony internetowe</string>
     <string name="settingsFireproofWebsites">Bezpieczne strony internetowe</string>
-    <string name="fireproofWebsiteMenuTitle">Bezpieczna strona internetowa</string>
+    <string name="fireproofWebsiteMenuTitleAdd">Bezpieczna strona internetowa</string>
     <string name="fireproofWebsiteSnackbarConfirmation">&lt;b&gt;%s&lt;/b&gt; jest teraz bezpieczna! Odwiedź Ustawienia, aby dowiedzieć się więcej.</string>
     <string name="fireproofWebsiteSnackbarAction">Cofnij</string>
     <string name="fireproofWebsiteDeleteConfirmMessage">Czy na pewno chcesz usunąć &lt;b&gt;%s&lt;/b&gt;?</string>

@@ -97,7 +97,7 @@
             <TextView
                 android:id="@+id/fireproofWebsitePopupMenuItem"
                 style="@style/BrowserTextMenuItem"
-                android:text="@string/fireproofWebsiteMenuTitle" />
+                android:text="@string/fireproofWebsiteMenuTitleAdd" />
 
             <TextView
                 android:id="@+id/sharePageMenuItem"

@@ -440,7 +440,7 @@
     <!-- Fireproof websites -->
     <string name="fireproofWebsitesActivityTitle">Tűzálló weboldalak</string>
     <string name="settingsFireproofWebsites">Tűzálló weboldalak</string>
-    <string name="fireproofWebsiteMenuTitle">Tűzálló weboldal</string>
+    <string name="fireproofWebsiteMenuTitleAdd">Tűzálló weboldal</string>
     <string name="fireproofWebsiteSnackbarConfirmation">A &lt;b&gt;%s&lt;/b&gt; most már tűzálló! További információkért nézd meg a Beállításokat.</string>
     <string name="fireproofWebsiteSnackbarAction">Visszavonás</string>
     <string name="fireproofWebsiteDeleteConfirmMessage">Biztos, hogy törölni akarod a (z) &lt;b&gt;%s&lt;/b&gt; fájlt?</string>
