@@ -182,6 +182,7 @@ interface Pixel {
         COOKIE_DATABASE_EXCEPTION_OPEN_ERROR("m_cdb_e_oe"),
         COOKIE_DATABASE_EXCEPTION_DELETE_ERROR("m_cdb_e_de"),
         FIREPROOF_WEBSITE_ADDED("m_fw_a"),
+        FIREPROOF_WEBSITE_REMOVE("m_fw_r"),
         FIREPROOF_LOGIN_DIALOG_SHOWN("m_fw_ld_s"),
         FIREPROOF_WEBSITE_LOGIN_ADDED("m_fw_l_a"),
         FIREPROOF_WEBSITE_LOGIN_DISMISS("m_fw_l_d"),

@@ -1746,23 +1746,25 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenUserLoadsNotFireproofWebsiteThenFireproofWebsiteOptionMenuEnabled() {
+    fun whenUserLoadsNotFireproofWebsiteThenFireproofWebsiteBrowserStateUpdated() {
         loadUrl("http://www.example.com/path", isBrowserShowing = true)
         assertTrue(browserViewState().canFireproofSite)
+        assertFalse(browserViewState().isFireproofWebsite)
     }
 
     @Test
-    fun whenUserLoadsFireproofWebsiteThenFireproofWebsiteOptionMenuDisabled() {
+    fun whenUserLoadsFireproofWebsiteThenFireproofWebsiteBrowserStateUpdated() {
         givenFireproofWebsiteDomain("www.example.com")
         loadUrl("http://www.example.com/path", isBrowserShowing = true)
-        assertFalse(browserViewState().canFireproofSite)
+        assertTrue(browserViewState().isFireproofWebsite)
     }
 
     @Test
-    fun whenUserLoadsFireproofWebsiteSubDomainThenFireproofWebsiteOptionMenuEnabled() {
+    fun whenUserLoadsFireproofWebsiteSubDomainThenFireproofWebsiteBrowserStateUpdated() {
         givenFireproofWebsiteDomain("example.com")
         loadUrl("http://mobile.example.com/path", isBrowserShowing = true)
         assertTrue(browserViewState().canFireproofSite)
+        assertFalse(browserViewState().isFireproofWebsite)
     }
 
     @Test
@@ -1774,19 +1776,20 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenUrlIsUpdatedWithNonFireproofWebsiteThenFireproofWebsiteOptionMenuEnabled() {
+    fun whenUrlIsUpdatedWithNonFireproofWebsiteThenFireproofWebsiteBrowserStateUpdated() {
         givenFireproofWebsiteDomain("www.example.com")
         loadUrl("http://www.example.com/", isBrowserShowing = true)
         updateUrl("http://www.example.com/", "http://twitter.com/explore", true)
         assertTrue(browserViewState().canFireproofSite)
+        assertFalse(browserViewState().isFireproofWebsite)
     }
 
     @Test
-    fun whenUrlIsUpdatedWithFireproofWebsiteThenFireproofWebsiteOptionMenuDisabled() {
+    fun whenUrlIsUpdatedWithFireproofWebsiteThenFireproofWebsiteBrowserStateUpdated() {
         givenFireproofWebsiteDomain("twitter.com")
         loadUrl("http://example.com/", isBrowserShowing = true)
         updateUrl("http://example.com/", "http://twitter.com/explore", true)
-        assertFalse(browserViewState().canFireproofSite)
+        assertTrue(browserViewState().isFireproofWebsite)
     }
 
     @Test
@@ -1799,10 +1802,10 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenUserClicksFireproofWebsiteOptionMenuThenFireproofWebsiteOptionMenuDisabled() {
+    fun whenUserClicksFireproofWebsiteOptionMenuThenFireproofWebsiteBrowserStateUpdated() {
         loadUrl("http://example.com/", isBrowserShowing = true)
         testee.onFireproofWebsiteMenuClicked()
-        assertFalse(browserViewState().canFireproofSite)
+        assertTrue(browserViewState().isFireproofWebsite)
     }
 
     @Test
@@ -1820,6 +1823,7 @@ class BrowserTabViewModelTest {
             testee.onFireproofWebsiteSnackbarUndoClicked(this.fireproofWebsiteEntity)
         }
         assertTrue(browserViewState().canFireproofSite)
+        assertFalse(browserViewState().isFireproofWebsite)
     }
 
     @Test

@@ -134,6 +134,7 @@ class BrowserTabViewModel(
         val canSharePage: Boolean = false,
         val canAddBookmarks: Boolean = false,
         val canFireproofSite: Boolean = false,
+        val isFireproofWebsite: Boolean = false,
         val canGoBack: Boolean = false,
         val canGoForward: Boolean = false,
         val canWhitelist: Boolean = false,
@@ -252,7 +253,7 @@ class BrowserTabViewModel(
     private var httpsUpgraded = false
     private val browserStateModifier = BrowserStateModifier()
     private val fireproofWebsitesObserver = Observer<List<FireproofWebsiteEntity>> {
-        browserViewState.value = currentBrowserViewState().copy(canFireproofSite = canFireproofWebsite())
+        browserViewState.value = currentBrowserViewState().copy(isFireproofWebsite = isFireproofWebsite())
     }
 
     init {
@@ -524,6 +525,7 @@ class BrowserTabViewModel(
         val currentBrowserViewState = currentBrowserViewState()
         val domain = site?.domain
         val canWhitelist = domain != null
+        val canFireproofSite = domain != null
         findInPageViewState.value = FindInPageViewState(visible = false, canFindInPage = true)
 
         browserViewState.value = currentBrowserViewState.copy(
@@ -538,7 +540,8 @@ class BrowserTabViewModel(
             isWhitelisted = false,
             showSearchIcon = false,
             showClearButton = false,
-            canFireproofSite = canFireproofWebsite()
+            canFireproofSite = canFireproofSite,
+            isFireproofWebsite = isFireproofWebsite()
         )
 
         Timber.d("showPrivacyGrade=true, showSearchIcon=false, showClearButton=false")
@@ -576,7 +579,7 @@ class BrowserTabViewModel(
         onSiteChanged()
         val currentOmnibarViewState = currentOmnibarViewState()
         omnibarViewState.postValue(currentOmnibarViewState.copy(omnibarText = omnibarTextForUrl(url), shouldMoveCaretToEnd = false))
-        browserViewState.postValue(currentBrowserViewState().copy(canFireproofSite = canFireproofWebsite()))
+        browserViewState.postValue(currentBrowserViewState().copy(isFireproofWebsite = isFireproofWebsite()))
     }
 
     private fun omnibarTextForUrl(url: String?): String {
@@ -781,9 +784,14 @@ class BrowserTabViewModel(
     fun onFireproofWebsiteMenuClicked() {
         val domain = site?.domain ?: return
         viewModelScope.launch {
-            fireproofWebsiteRepository.fireproofWebsite(domain)?.let {
-                pixel.fire(PixelName.FIREPROOF_WEBSITE_ADDED)
-                command.value = ShowFireproofWebSiteConfirmation(fireproofWebsiteEntity = it)
+            if (currentBrowserViewState().isFireproofWebsite) {
+                fireproofWebsiteRepository.removeFireproofWebsite(FireproofWebsiteEntity(domain))
+                pixel.fire(PixelName.FIREPROOF_WEBSITE_REMOVE)
+            } else {
+                fireproofWebsiteRepository.fireproofWebsite(domain)?.let {
+                    pixel.fire(PixelName.FIREPROOF_WEBSITE_ADDED)
+                    command.value = ShowFireproofWebSiteConfirmation(fireproofWebsiteEntity = it)
+                }
             }
         }
     }
@@ -1172,10 +1180,10 @@ class BrowserTabViewModel(
         command.value = LaunchTabSwitcher
     }
 
-    private fun canFireproofWebsite(): Boolean {
+    private fun isFireproofWebsite(): Boolean {
         val domain = site?.domain ?: return false
         val fireproofWebsites = fireproofWebsiteState.value
-        return fireproofWebsites?.all { it.domain != domain } ?: true
+        return fireproofWebsites?.any { it.domain == domain } ?: false
     }
 
     private fun invalidateBrowsingActions() {
@@ -1206,7 +1214,7 @@ class BrowserTabViewModel(
     override fun loginDetected() {
         val domain = site?.domain ?: return
         viewModelScope.launch {
-            if (canFireproofWebsite()) {
+            if (!isFireproofWebsite()) {
                 pixel.fire(PixelName.FIREPROOF_LOGIN_DIALOG_SHOWN)
                 command.value = AskToFireproofWebsite(FireproofWebsiteEntity(domain))
             }
