@@ -87,8 +87,8 @@ class NotificationHandlerService : IntentService("NotificationHandlerService") {
             USE_OUR_APP -> {
                 GlobalScope.launch(dispatcher.io()) {
                     userStageStore.registerInStage(AppStage.USE_OUR_APP_ONBOARDING)
+                    onAppLaunched(pixelSuffix)
                 }
-                onAppLaunched(pixelSuffix)
             }
         }
 

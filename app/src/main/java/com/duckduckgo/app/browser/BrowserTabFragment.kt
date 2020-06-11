@@ -446,7 +446,6 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
     private fun showHome() {
         errorSnackbar.dismiss()
         newTabLayout.show()
-        showKeyboardImmediately()
         appBarLayout.setExpanded(true)
         webView?.onPause()
         webView?.hide()
@@ -940,7 +939,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
 
     private fun hideKeyboardImmediately() {
         if (!isHidden) {
-            Timber.v("Keyboard now hiding")
+            Timber.v("Keyboard now hiding immediately")
             omnibarTextInput.hideKeyboard()
             focusDummy.requestFocus()
         }
@@ -956,7 +955,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
 
     private fun showKeyboardImmediately() {
         if (!isHidden) {
-            Timber.v("Keyboard now showing")
+            Timber.v("Keyboard now showing immediately")
             omnibarTextInput?.showKeyboard()
         }
     }

@@ -333,7 +333,6 @@ class BrowserTabViewModel(
     }
 
     fun onViewResumed() {
-        command.value = if (!currentBrowserViewState().browserShowing) ShowKeyboard else HideKeyboard
         if (currentGlobalLayoutState() is Invalidated && currentBrowserViewState().browserShowing) {
             showErrorWithAction()
         }
@@ -342,7 +341,10 @@ class BrowserTabViewModel(
     fun onViewVisible() {
         // we expect refreshCta to be called when a site is fully loaded if browsingShowing -trackers data available-.
         if (!currentBrowserViewState().browserShowing) {
-            refreshCta()
+            viewModelScope.launch {
+                val cta = refreshCta()
+                showOrHideKeyboard(cta) // we hide the keyboard when showing a DialogCta type in the home screen otherwise we show it
+            }
         }
     }
 
@@ -459,6 +461,7 @@ class BrowserTabViewModel(
             return true
         } else if (!skipHome) {
             navigateHome()
+            command.value = ShowKeyboard
             return true
         }
 
@@ -480,7 +483,6 @@ class BrowserTabViewModel(
         findInPageViewState.value = FindInPageViewState()
         omnibarViewState.value = currentOmnibarViewState().copy(omnibarText = "", shouldMoveCaretToEnd = false)
         loadingViewState.value = currentLoadingViewState().copy(isLoading = false)
-
         deleteTabPreview(tabId)
     }
 
@@ -1038,7 +1040,9 @@ class BrowserTabViewModel(
     fun onSurveyChanged(survey: Survey?) {
         val activeSurvey = ctaViewModel.onSurveyChanged(survey)
         if (activeSurvey != null) {
-            refreshCta()
+            viewModelScope.launch {
+                refreshCta()
+            }
         }
     }
 
@@ -1051,15 +1055,20 @@ class BrowserTabViewModel(
         ctaViewModel.onCtaShown(cta)
     }
 
-    fun refreshCta() {
+    suspend fun refreshCta(): Cta? {
         if (currentGlobalLayoutState() is Browser) {
-            viewModelScope.launch {
-                val cta = withContext(dispatchers.io()) {
-                    ctaViewModel.refreshCta(dispatchers.io(), currentBrowserViewState().browserShowing, siteLiveData.value)
-                }
-                ctaViewState.value = currentCtaViewState().copy(cta = cta)
+            val cta = withContext(dispatchers.io()) {
+                ctaViewModel.refreshCta(dispatchers.io(), currentBrowserViewState().browserShowing, siteLiveData.value)
             }
+            ctaViewState.value = currentCtaViewState().copy(cta = cta)
+            return cta
         }
+        return null
+    }
+
+    private fun showOrHideKeyboard(cta: Cta?) {
+        val browserState = currentBrowserViewState()
+        command.value = if (!browserState.browserShowing && cta !is DialogCta) ShowKeyboard else HideKeyboard
     }
 
     fun registerDaxBubbleCtaDismissed() {
@@ -1093,6 +1102,9 @@ class BrowserTabViewModel(
         viewModelScope.launch {
             val cta = currentCtaViewState().cta ?: return@launch
             ctaViewModel.onUserDismissedCta(cta)
+            if (cta is UseOurAppCta) {
+                command.value = ShowKeyboard
+            }
         }
     }
 
