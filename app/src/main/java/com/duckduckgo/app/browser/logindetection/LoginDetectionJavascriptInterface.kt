@@ -16,19 +16,22 @@
 
 package com.duckduckgo.app.browser.logindetection
 
-import com.nhaarman.mockitokotlin2.mock
-import com.nhaarman.mockitokotlin2.verify
-import org.junit.Test
+import android.webkit.JavascriptInterface
+import timber.log.Timber
 
-class LoginDetectionJsInterfaceTest {
+// Interface name used inside login_form_detection.js
+const val LOGIN_DETECTION_JS_INTERFACE_NAME = "LoginDetection"
 
-    @Test
-    fun whenLoginDetectedThenNotifyCallback() {
-        val loginDetected = mock<() -> Unit>()
-        val loginDetectionInterface = LoginDetectionJsInterface(loginDetected)
+@Suppress("unused")
+class LoginDetectionJavascriptInterface(private val onLoginDetected: () -> Unit) {
 
-        loginDetectionInterface.loginDetected()
+    @JavascriptInterface
+    fun log(message: String) {
+        Timber.i("LoginDetectionInterface $message")
+    }
 
-        verify(loginDetected).invoke()
+    @JavascriptInterface
+    fun loginDetected() {
+        onLoginDetected()
     }
 }

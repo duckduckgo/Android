@@ -22,8 +22,6 @@ import android.webkit.WebView
 import androidx.annotation.UiThread
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.settings.db.SettingsDataStore
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -47,7 +45,7 @@ class JSLoginDetector @Inject constructor(private val settingsDataStore: Setting
     private val loginPathRegex = Regex("login|sign-in|signin|sessions")
 
     override fun addLoginDetection(webView: WebView, onLoginDetected: () -> Unit) {
-        webView.addJavascriptInterface(LoginDetectionJsInterface { onLoginDetected() }, LOGIN_DETECTION_JS_INTERFACE_NAME)
+        webView.addJavascriptInterface(LoginDetectionJavascriptInterface { onLoginDetected() }, LOGIN_DETECTION_JS_INTERFACE_NAME)
     }
 
     @UiThread
