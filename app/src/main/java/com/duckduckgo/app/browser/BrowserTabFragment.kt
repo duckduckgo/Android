@@ -637,7 +637,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
                 .setTitle(getString(R.string.fireproofWebsiteLoginDialogTitle, fireproofWebsite.website()))
                 .setMessage(R.string.fireproofWebsiteLoginDialogDescription)
                 .setPositiveButton(R.string.fireproofWebsiteLoginDialogPositive) { _, _ ->
-                    viewModel.onFireproofLoginDialogClicked(fireproofWebsite.domain)
+                    viewModel.onUserConfirmedFireproofDialog(fireproofWebsite.domain)
                 }
                 .setNegativeButton(R.string.fireproofWebsiteLoginDialogNegative) { dialog, _ ->
                     dialog.dismiss()

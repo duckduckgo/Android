@@ -788,7 +788,7 @@ class BrowserTabViewModel(
         }
     }
 
-    fun onFireproofLoginDialogClicked(domain: String) {
+    fun onUserConfirmedFireproofDialog(domain: String) {
         viewModelScope.launch {
             fireproofWebsiteRepository.fireproofWebsite(domain)?.let {
                 pixel.fire(PixelName.FIREPROOF_WEBSITE_LOGIN_ADDED)

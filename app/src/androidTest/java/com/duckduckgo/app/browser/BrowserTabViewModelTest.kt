@@ -1835,7 +1835,7 @@ class BrowserTabViewModelTest {
     @Test
     fun whenUserFireproofsWebsiteFromLoginDialogThenShowConfirmationIsIssuedWithExpectedDomain() {
         loadUrl("http://mobile.example.com/", isBrowserShowing = true)
-        testee.onFireproofLoginDialogClicked("login.example.com")
+        testee.onUserConfirmedFireproofDialog("login.example.com")
         assertCommandIssued<Command.ShowFireproofWebSiteConfirmation> {
             assertEquals("login.example.com", this.fireproofWebsiteEntity.domain)
         }
@@ -1843,7 +1843,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenUserFireproofsWebsiteFromLoginDialogThenPixelSent() {
-        testee.onFireproofLoginDialogClicked("login.example.com")
+        testee.onUserConfirmedFireproofDialog("login.example.com")
         verify(mockPixel).fire(Pixel.PixelName.FIREPROOF_WEBSITE_LOGIN_ADDED)
     }
 
