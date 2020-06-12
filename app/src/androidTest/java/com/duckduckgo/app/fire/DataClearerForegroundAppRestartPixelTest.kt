@@ -78,6 +78,18 @@ class DataClearerForegroundAppRestartPixelTest {
         verify(pixel).fire(Pixel.PixelName.FORGET_ALL_AUTO_RESTART)
     }
 
+    @Test
+    fun whenAppRestartedAfterGoingBackFromBackgroundThenPixelIsSent() {
+        val intent = SystemSearchActivity.fromWidget(context)
+        testee.registerIntent(intent)
+        testee.onAppBackgrounded()
+        testee.incrementCount()
+
+        testee.firePendingPixels()
+
+        verify(pixel).fire(Pixel.PixelName.FORGET_ALL_AUTO_RESTART)
+    }
+
     private fun givenEmptyIntent(): Intent = Intent(context, BrowserActivity::class.java)
 
     private fun givenIntentWithData(url: String) = Intent(Intent.ACTION_VIEW).apply {

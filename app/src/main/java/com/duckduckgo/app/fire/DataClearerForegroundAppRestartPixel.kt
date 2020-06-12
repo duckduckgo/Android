@@ -53,7 +53,7 @@ class DataClearerForegroundAppRestartPixel @Inject constructor(
 
     @UiThread
     @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
-    fun onAppForegrounded() {
+    fun onAppBackgrounded() {
         Timber.i("Registered App on_stop")
         detectedUserIntent = false
     }
