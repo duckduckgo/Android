@@ -17,21 +17,10 @@
 package com.duckduckgo.app.fire
 
 import android.content.Context
-import android.content.Intent
 import android.content.SharedPreferences
-import androidx.annotation.UiThread
 import androidx.annotation.VisibleForTesting
 import androidx.core.content.edit
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleObserver
-import androidx.lifecycle.OnLifecycleEvent
-import com.duckduckgo.app.global.intentText
-import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.app.systemsearch.SystemSearchActivity
-import kotlinx.coroutines.launch
-import timber.log.Timber
 import javax.inject.Inject
-import javax.inject.Singleton
 
 interface UnsentForgetAllPixelStore {
     val pendingPixelCountClearData: Int
