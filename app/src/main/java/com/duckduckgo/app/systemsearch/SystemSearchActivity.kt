@@ -71,7 +71,6 @@ class SystemSearchActivity : DuckDuckGoActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        Timber.i("onCreate called")
         dataClearerForegroundAppRestartPixel.registerIntent(intent)
         setContentView(R.layout.activity_system_search)
         configureObservers()
@@ -89,7 +88,6 @@ class SystemSearchActivity : DuckDuckGoActivity() {
 
     override fun onNewIntent(newIntent: Intent?) {
         super.onNewIntent(newIntent)
-        Timber.i("onNewIntent")
         dataClearerForegroundAppRestartPixel.registerIntent(newIntent)
         viewModel.resetViewState()
         newIntent?.let { sendLaunchPixels(it) }
