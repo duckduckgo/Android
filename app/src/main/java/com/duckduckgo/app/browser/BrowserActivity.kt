@@ -66,7 +66,7 @@ class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope() {
     lateinit var playStoreUtils: PlayStoreUtils
 
     @Inject
-    lateinit var unsentPixelDataClearerRestart: DataClearerForegroundAppRestartPixel
+    lateinit var dataClearerForegroundAppRestartPixel: DataClearerForegroundAppRestartPixel
 
     private var currentTab: BrowserTabFragment? = null
 
@@ -86,7 +86,7 @@ class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.daggerInject()
         Timber.i("onCreate called. freshAppLaunch: ${dataClearer.isFreshAppLaunch}, savedInstanceState: $savedInstanceState")
-        unsentPixelDataClearerRestart.registerIntent(intent)
+        dataClearerForegroundAppRestartPixel.registerIntent(intent)
         renderer = BrowserStateRenderer()
         val newInstanceState = if (dataClearer.isFreshAppLaunch) null else savedInstanceState
         instanceStateBundles = CombinedInstanceState(originalInstanceState = savedInstanceState, newInstanceState = newInstanceState)
@@ -112,7 +112,7 @@ class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope() {
     override fun onNewIntent(intent: Intent?) {
         super.onNewIntent(intent)
         Timber.i("onNewIntent: $intent")
-        unsentPixelDataClearerRestart.registerIntent(intent)
+        dataClearerForegroundAppRestartPixel.registerIntent(intent)
 
         if (dataClearer.dataClearerState.value == ApplicationClearDataState.FINISHED) {
             Timber.i("Automatic data clearer has finished, so processing intent now")

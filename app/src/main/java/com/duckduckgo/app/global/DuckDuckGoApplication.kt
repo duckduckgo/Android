@@ -112,7 +112,7 @@ open class DuckDuckGoApplication : HasAndroidInjector, Application(), LifecycleO
     lateinit var unsentForgetAllPixelStore: UnsentForgetAllPixelStore
 
     @Inject
-    lateinit var unsentPixelDataClearerRestart: DataClearerForegroundAppRestartPixel
+    lateinit var dataClearerForegroundAppRestartPixel: DataClearerForegroundAppRestartPixel
 
     @Inject
     lateinit var offlinePixelScheduler: OfflinePixelScheduler
@@ -174,7 +174,7 @@ open class DuckDuckGoApplication : HasAndroidInjector, Application(), LifecycleO
             it.addObserver(appDaysUsedRecorder)
             it.addObserver(defaultBrowserObserver)
             it.addObserver(appEnjoymentLifecycleObserver)
-            it.addObserver(unsentPixelDataClearerRestart)
+            it.addObserver(dataClearerForegroundAppRestartPixel)
         }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1) {
@@ -263,7 +263,7 @@ open class DuckDuckGoApplication : HasAndroidInjector, Application(), LifecycleO
     }
 
     private fun submitUnsentFireAppRestartedWithIntentPixels() {
-        unsentPixelDataClearerRestart.firePendingPixels()
+        dataClearerForegroundAppRestartPixel.firePendingPixels()
     }
 
     /**

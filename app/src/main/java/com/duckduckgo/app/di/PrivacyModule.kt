@@ -74,9 +74,9 @@ class PrivacyModule {
         settingsDataStore: SettingsDataStore,
         clearDataAction: ClearDataAction,
         dataClearerTimeKeeper: BackgroundTimeKeeper,
-        unsentPixelDataClearerRestart: DataClearerForegroundAppRestartPixel
+        dataClearerForegroundAppRestartPixel: DataClearerForegroundAppRestartPixel
     ): DataClearer {
-        return AutomaticDataClearer(workManager, settingsDataStore, clearDataAction, dataClearerTimeKeeper, unsentPixelDataClearerRestart)
+        return AutomaticDataClearer(workManager, settingsDataStore, clearDataAction, dataClearerTimeKeeper, dataClearerForegroundAppRestartPixel)
     }
 
     @Provides

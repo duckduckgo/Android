@@ -56,7 +56,7 @@ class SystemSearchActivity : DuckDuckGoActivity() {
     lateinit var omnibarScrolling: OmnibarScrolling
 
     @Inject
-    lateinit var unsentPixelDataClearerRestart: DataClearerForegroundAppRestartPixel
+    lateinit var dataClearerForegroundAppRestartPixel: DataClearerForegroundAppRestartPixel
 
     private val viewModel: SystemSearchViewModel by bindViewModel()
     private lateinit var autocompleteSuggestionsAdapter: BrowserAutoCompleteSuggestionsAdapter
@@ -72,7 +72,7 @@ class SystemSearchActivity : DuckDuckGoActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         Timber.i("onCreate called")
-        unsentPixelDataClearerRestart.registerIntent(intent)
+        dataClearerForegroundAppRestartPixel.registerIntent(intent)
         setContentView(R.layout.activity_system_search)
         configureObservers()
         configureOnboarding()
@@ -90,7 +90,7 @@ class SystemSearchActivity : DuckDuckGoActivity() {
     override fun onNewIntent(newIntent: Intent?) {
         super.onNewIntent(newIntent)
         Timber.i("onNewIntent")
-        unsentPixelDataClearerRestart.registerIntent(newIntent)
+        dataClearerForegroundAppRestartPixel.registerIntent(newIntent)
         viewModel.resetViewState()
         newIntent?.let { sendLaunchPixels(it) }
     }
