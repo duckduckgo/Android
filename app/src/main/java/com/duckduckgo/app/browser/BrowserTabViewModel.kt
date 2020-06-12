@@ -345,6 +345,8 @@ class BrowserTabViewModel(
                 val cta = refreshCta()
                 showOrHideKeyboard(cta) // we hide the keyboard when showing a DialogCta type in the home screen otherwise we show it
             }
+        } else {
+            command.value = HideKeyboard
         }
     }
 
@@ -1067,8 +1069,7 @@ class BrowserTabViewModel(
     }
 
     private fun showOrHideKeyboard(cta: Cta?) {
-        val browserState = currentBrowserViewState()
-        command.value = if (!browserState.browserShowing && cta !is DialogCta) ShowKeyboard else HideKeyboard
+        command.value = if (cta is DialogCta) HideKeyboard else ShowKeyboard
     }
 
     fun registerDaxBubbleCtaDismissed() {

@@ -74,7 +74,7 @@ class UseOurAppCta(
     @StringRes val cancelButton: Int = R.string.facebookDialogCancelButtonText,
     override val ctaId: CtaId = CtaId.USE_OUR_APP,
     override val shownPixel: Pixel.PixelName? = null,
-    override val okPixel: Pixel.PixelName?= null,
+    override val okPixel: Pixel.PixelName? = null,
     override val cancelPixel: Pixel.PixelName? = null
 ) : Cta, DialogCta {
 

@@ -69,7 +69,6 @@ import timber.log.Timber
 import javax.inject.Inject
 import kotlin.concurrent.thread
 
-
 open class DuckDuckGoApplication : HasAndroidInjector, Application(), LifecycleObserver {
 
     @Inject

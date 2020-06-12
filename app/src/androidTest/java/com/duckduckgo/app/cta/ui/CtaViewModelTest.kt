@@ -28,6 +28,7 @@ import com.duckduckgo.app.cta.model.DismissedCta
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.model.Site
+import com.duckduckgo.app.global.timestamps.db.KeyTimestampStore
 import com.duckduckgo.app.onboarding.store.AppStage
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.store.UserStageStore
@@ -106,6 +107,9 @@ class CtaViewModelTest {
     @Mock
     private lateinit var mockUserStageStore: UserStageStore
 
+    @Mock
+    private lateinit var mockKeyTimestampStore: KeyTimestampStore
+
     private val requiredDaxOnboardingCtas: List<CtaId> = listOf(
         CtaId.DAX_INTRO,
         CtaId.DAX_DIALOG_SERP,
@@ -139,6 +143,7 @@ class CtaViewModelTest {
             mockSettingsDataStore,
             mockOnboardingStore,
             mockUserStageStore,
+            mockKeyTimestampStore,
             coroutineRule.testDispatcherProvider
         )
     }
@@ -184,14 +189,6 @@ class CtaViewModelTest {
     fun whenCtaLaunchedPixelIsFired() {
         testee.onUserClickCtaOkButton(HomePanelCta.Survey(Survey("abc", "http://example.com", 1, SCHEDULED)))
         verify(mockPixel).fire(eq(SURVEY_CTA_LAUNCHED), any(), any())
-    }
-
-    @Test
-    fun whenCtaSecondaryButtonClickedPixelIsFired() {
-        val secondaryButtonCta = mock<SecondaryButtonCta>()
-        whenever(secondaryButtonCta.secondaryButtonPixel).thenReturn(ONBOARDING_DAX_ALL_CTA_HIDDEN)
-        testee.onUserClickCtaSecondaryButton(secondaryButtonCta)
-        verify(mockPixel).fire(eq(ONBOARDING_DAX_ALL_CTA_HIDDEN), any(), any())
     }
 
     @Test

@@ -16,12 +16,15 @@
 
 package com.duckduckgo.app.global.db
 
+import android.content.ContentValues
 import android.content.Context
 import android.content.SharedPreferences
+import android.database.sqlite.SQLiteDatabase
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.room.Room
 import androidx.room.migration.Migration
 import androidx.room.testing.MigrationTestHelper
+import androidx.sqlite.db.SupportSQLiteDatabase
 import androidx.sqlite.db.framework.FrameworkSQLiteOpenHelperFactory
 import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
 import com.duckduckgo.app.CoroutineTestRule
@@ -192,10 +195,11 @@ class AppDatabaseTest {
     }
 
     @Test
-    fun whenMigratingFromVersion17To18IfUserSeeOnboardingThenMigrateToEstablished() = coroutineRule.runBlocking {
+    fun whenMigratingFromVersion17To18IfUserSeeOnboardingThenMigrateToEstablished() {
         givenUserSawOnboarding()
-        createDatabaseAndMigrate(17, 18, migrationsProvider.MIGRATION_17_TO_18)
-        assertEquals(AppStage.ESTABLISHED, database().userStageDao().currentUserAppStage()?.appStage)
+        val database = createDatabaseAndMigrate(17, 18, migrationsProvider.MIGRATION_17_TO_18)
+        val stage = getUserStage(database)
+        assertEquals(AppStage.ESTABLISHED.name, stage)
     }
 
     @Test
@@ -216,19 +220,48 @@ class AppDatabaseTest {
         createDatabaseAndMigrate(20, 21, migrationsProvider.MIGRATION_20_TO_21)
     }
 
+    @Test
+    fun whenMigratingFromVersion21To22ThenValidationSucceeds() {
+        createDatabaseAndMigrate(21, 22, migrationsProvider.MIGRATION_21_TO_22)
+    }
+
+    @Test
+    fun whenMigratingFromVersion21To22IfUserIsEstablishedThenMigrateToNotification() {
+        val values: ContentValues = ContentValues().apply {
+            put("key", 1)
+            put("appStage", AppStage.ESTABLISHED.name)
+        }
+        testHelper.createDatabase(TEST_DB_NAME, 21).use {
+            it.insert("userStage", SQLiteDatabase.CONFLICT_REPLACE, values)
+            testHelper.runMigrationsAndValidate(TEST_DB_NAME, 22, true, migrationsProvider.MIGRATION_21_TO_22)
+            val stage = getUserStage(it)
+            assertEquals(AppStage.USE_OUR_APP_NOTIFICATION.name, stage)
+        }
+    }
+
+    private fun getUserStage(database: SupportSQLiteDatabase): String {
+        var stage = ""
+        database.query("SELECT appStage from userStage limit 1").use {
+            it.moveToFirst()
+            stage = it.getString(0)
+        }
+        return stage
+    }
+
     private fun createDatabase(version: Int) {
         testHelper.createDatabase(TEST_DB_NAME, version).close()
     }
 
-    private fun runMigrations(newVersion: Int, vararg migrations: Migration) {
-        testHelper.runMigrationsAndValidate(TEST_DB_NAME, newVersion, true, *migrations)
+    private fun runMigrations(newVersion: Int, vararg migrations: Migration): SupportSQLiteDatabase {
+        return testHelper.runMigrationsAndValidate(TEST_DB_NAME, newVersion, true, *migrations)
     }
 
-    private fun createDatabaseAndMigrate(originalVersion: Int, newVersion: Int, vararg migrations: Migration) {
+    private fun createDatabaseAndMigrate(originalVersion: Int, newVersion: Int, vararg migrations: Migration): SupportSQLiteDatabase {
         createDatabase(originalVersion)
-        runMigrations(newVersion, *migrations)
+        return runMigrations(newVersion, *migrations)
     }
 
+    @Deprecated("Don't use anymore, instead execute a query directly to the database, see getUserStage as an example")
     private fun database(): AppDatabase {
         val database = Room
             .databaseBuilder(getInstrumentation().targetContext, AppDatabase::class.java, TEST_DB_NAME)

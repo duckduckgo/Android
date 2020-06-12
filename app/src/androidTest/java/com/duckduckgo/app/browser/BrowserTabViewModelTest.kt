@@ -55,6 +55,8 @@ import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.model.SiteFactory
+import com.duckduckgo.app.global.timestamps.db.KeyTimestampStore
+import com.duckduckgo.app.onboarding.store.AppStage
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao
@@ -180,6 +182,9 @@ class BrowserTabViewModelTest {
     @Mock
     private lateinit var mockUserWhitelistDao: UserWhitelistDao
 
+    @Mock
+    private lateinit var mockKeyTimestampStore: KeyTimestampStore
+
     private lateinit var mockAutoCompleteApi: AutoCompleteApi
 
     private lateinit var ctaViewModel: CtaViewModel
@@ -217,6 +222,7 @@ class BrowserTabViewModelTest {
             mockSettingsStore,
             mockOnboardingStore,
             mockUserStageStore,
+            mockKeyTimestampStore,
             coroutineRule.testDispatcherProvider
         )
 
@@ -300,19 +306,31 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenViewIsResumedAndBrowserShowingThenKeyboardHidden() {
-        setBrowserShowing(true)
-        testee.onViewResumed()
+    fun whenViewBecomesVisibleAndHomeShowingAndUserIsInUseOurAppOnboardingStageThenKeyboardShown() = coroutineRule.runBlocking {
+        whenever(mockUserStageStore.getUserAppStage()).thenReturn(AppStage.ESTABLISHED)
+        setBrowserShowing(false)
+
+        testee.onViewVisible()
+        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+        assertTrue(commandCaptor.allValues.contains(Command.ShowKeyboard))
+    }
+
+    @Test
+    fun whenViewBecomesVisibleAndHomeShowingAndUserIsNotInUseOurAppOnboardingStageThenKeyboardHidden() = coroutineRule.runBlocking {
+        whenever(mockUserStageStore.getUserAppStage()).thenReturn(AppStage.USE_OUR_APP_ONBOARDING)
+        setBrowserShowing(false)
+
+        testee.onViewVisible()
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
         assertTrue(commandCaptor.allValues.contains(Command.HideKeyboard))
     }
 
     @Test
-    fun whenViewIsResumedAndHomeShowingThenKeyboardShown() {
-        setBrowserShowing(false)
-        testee.onViewResumed()
+    fun whenViewBecomesVisibleAndBrowserShowingThenKeyboardHidden() {
+        setBrowserShowing(true)
+        testee.onViewVisible()
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
-        assertTrue(commandCaptor.allValues.contains(Command.ShowKeyboard))
+        assertTrue(commandCaptor.allValues.contains(Command.HideKeyboard))
     }
 
     @Test
@@ -1490,7 +1508,15 @@ class BrowserTabViewModelTest {
     fun whenUserPressesBackAndNotSkippingHomeThenWebViewPreviewNotGenerated() {
         setupNavigation(isBrowsing = true, canGoBack = false, skipHome = false)
         testee.onUserPressedBack()
-        verify(mockCommandObserver, never()).onChanged(commandCaptor.capture())
+        assertFalse(commandCaptor.allValues.contains(Command.GenerateWebViewPreviewImage))
+    }
+
+    @Test
+    fun whenUserPressesBackAndGoesToHomeThenKeyboardShown() {
+        setupNavigation(isBrowsing = true, canGoBack = false, skipHome = false)
+        testee.onUserPressedBack()
+        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+        assertTrue(commandCaptor.allValues.contains(Command.ShowKeyboard))
     }
 
     @Test

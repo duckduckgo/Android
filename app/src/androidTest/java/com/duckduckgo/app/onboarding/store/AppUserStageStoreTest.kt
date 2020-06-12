@@ -17,21 +17,25 @@
 package com.duckduckgo.app.onboarding.store
 
 import com.duckduckgo.app.CoroutineTestRule
+import com.duckduckgo.app.browser.addtohome.AddToHomeCapabilityDetector
 import com.duckduckgo.app.runBlocking
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.whenever
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
 
+@ExperimentalCoroutinesApi
 class AppUserStageStoreTest {
 
     @get:Rule
     var coroutineRule = CoroutineTestRule()
 
     private val userStageDao = mock<UserStageDao>()
+    private val addToHomeCapabilityDetector = mock<AddToHomeCapabilityDetector>()
 
-    private val testee = AppUserStageStore(userStageDao, coroutineRule.testDispatcherProvider)
+    private val testee = AppUserStageStore(userStageDao, coroutineRule.testDispatcherProvider, addToHomeCapabilityDetector)
 
     @Test
     fun whenGetUserAppStageThenRetunCurrentStage() = coroutineRule.runBlocking {

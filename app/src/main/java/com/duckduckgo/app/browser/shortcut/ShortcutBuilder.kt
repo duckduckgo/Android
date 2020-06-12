@@ -26,7 +26,6 @@ import androidx.core.graphics.drawable.IconCompat
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.BrowserTabViewModel
 import com.duckduckgo.app.browser.R
-import timber.log.Timber
 import java.util.UUID
 import javax.inject.Inject
 

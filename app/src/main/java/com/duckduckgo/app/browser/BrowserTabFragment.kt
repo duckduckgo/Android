@@ -1202,7 +1202,6 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
         viewModel.onUserClickCtaSecondaryButton()
     }
 
-
     private fun launchHideTipsDialog(context: Context, cta: Cta) {
         AlertDialog.Builder(context)
             .setTitle(R.string.hideTipsTitle)

@@ -33,6 +33,7 @@ import com.duckduckgo.app.notification.NotificationScheduler.DripA2NotificationW
 import com.duckduckgo.app.notification.NotificationScheduler.DripB1NotificationWorker
 import com.duckduckgo.app.notification.NotificationScheduler.DripB2NotificationWorker
 import com.duckduckgo.app.notification.model.SchedulableNotification
+import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.statistics.Variant
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.VariantManager.VariantFeature.DripNotification
@@ -61,12 +62,14 @@ class AndroidNotificationSchedulerTest {
     var coroutinesTestRule = CoroutineTestRule()
 
     private val variantManager: VariantManager = mock()
+    private val userStageStore: UserStageStore = mock()
     private val clearNotification: SchedulableNotification = mock()
     private val privacyNotification: SchedulableNotification = mock()
     private val dripA1Notification: SchedulableNotification = mock()
     private val dripA2Notification: SchedulableNotification = mock()
     private val dripB1Notification: SchedulableNotification = mock()
     private val dripB2Notification: SchedulableNotification = mock()
+    private val ourAppNotification: SchedulableNotification = mock()
 
     private val context = InstrumentationRegistry.getInstrumentation().targetContext
     private lateinit var workManager: WorkManager
@@ -84,7 +87,9 @@ class AndroidNotificationSchedulerTest {
             dripA2Notification,
             dripB1Notification,
             dripB2Notification,
-            variantManager
+            ourAppNotification,
+            variantManager,
+            userStageStore
         )
     }
 
