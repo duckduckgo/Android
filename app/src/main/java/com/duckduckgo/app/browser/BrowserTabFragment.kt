@@ -1542,13 +1542,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
                 newTabPopupMenuItem.isEnabled = browserShowing
                 addBookmarksPopupMenuItem?.isEnabled = viewState.canAddBookmarks
                 fireproofWebsitePopupMenuItem?.isEnabled = viewState.canFireproofSite
-                fireproofWebsitePopupMenuItem?.text = getText(
-                    if (viewState.isFireproofWebsite) {
-                        R.string.fireproofWebsiteMenuTitleRemove
-                    } else {
-                        R.string.fireproofWebsiteMenuTitleAdd
-                    }
-                )
+                fireproofWebsitePopupMenuItem?.isChecked = viewState.canFireproofSite && viewState.isFireproofWebsite
                 sharePageMenuItem?.isEnabled = viewState.canSharePage
                 whitelistPopupMenuItem?.isEnabled = viewState.canWhitelist
                 whitelistPopupMenuItem?.text = getText(if (viewState.isWhitelisted) R.string.whitelistRemove else R.string.whitelistAdd)

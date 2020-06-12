@@ -40,5 +40,4 @@
     <string name="fireproofWebsiteItemsSectionTitle">Websites</string>
     <string name="fireproofWebsiteToogleText">When Signing In</string>
     <string name="fireproofWebsiteToogleTitle">Ask to Fireproof Websites</string>
-    <string name="fireproofWebsiteMenuTitleRemove">Remove Fireproofing</string>
 </resources>
