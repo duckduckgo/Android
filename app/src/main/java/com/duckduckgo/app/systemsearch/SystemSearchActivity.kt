@@ -44,7 +44,6 @@ import com.duckduckgo.app.systemsearch.SystemSearchViewModel.Command.*
 import com.duckduckgo.app.systemsearch.SystemSearchViewModel.SystemSearchResultsViewState
 import kotlinx.android.synthetic.main.activity_system_search.*
 import kotlinx.android.synthetic.main.include_system_search_onboarding.*
-import timber.log.Timber
 import javax.inject.Inject
 
 class SystemSearchActivity : DuckDuckGoActivity() {
