@@ -19,7 +19,9 @@ package com.duckduckgo.app.browser.shortcut
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.os.Build
 import android.widget.Toast
+import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.shortcut.ShortcutBuilder.Companion.SHORTCUT_TITLE_ARG
 import com.duckduckgo.app.browser.shortcut.ShortcutBuilder.Companion.SHORTCUT_URL_ARG
 import com.duckduckgo.app.browser.shortcut.ShortcutBuilder.Companion.USE_OUR_APP_SHORTCUT_URL
@@ -39,12 +41,20 @@ class ShortcutReceiver @Inject constructor(private val keyTimestampStore: KeyTim
         val originUrl = intent?.getStringExtra(SHORTCUT_URL_ARG)
         val title = intent?.getStringExtra(SHORTCUT_TITLE_ARG)
 
-        Toast.makeText(context, "Success! $title has been added to your home screen.", Toast.LENGTH_SHORT).show()
+        if (!IGNORE_MANUFACTURERS_LIST.contains(Build.MANUFACTURER)) {
+            context?.let {
+                Toast.makeText(it, it.getString(R.string.useOurAppShortcutAddedText, title), Toast.LENGTH_SHORT).show()
+            }
+        }
 
         GlobalScope.launch(dispatcher.io()) {
             if (originUrl == USE_OUR_APP_SHORTCUT_URL) {
                 keyTimestampStore.registerTimestamp(KeyTimestampEntity(TimestampKey.USE_OUR_APP_SHORTCUT_ADDED))
             }
         }
+    }
+
+    companion object {
+        val IGNORE_MANUFACTURERS_LIST = listOf("samsung", "huawei")
     }
 }
