@@ -30,7 +30,7 @@ import com.duckduckgo.app.di.DaggerAppComponent
 import com.duckduckgo.app.fire.DataClearer
 import com.duckduckgo.app.fire.FireActivity
 import com.duckduckgo.app.fire.UnsentForgetAllPixelStore
-import com.duckduckgo.app.fire.UnsentPixelDataClearerAppRestartedWithIntentStoreSharedPreferences
+import com.duckduckgo.app.fire.DataClearerForegroundAppRestartPixel
 import com.duckduckgo.app.global.Theming.initializeTheme
 import com.duckduckgo.app.global.initialization.AppDataLoader
 import com.duckduckgo.app.global.install.AppInstallStore
@@ -112,7 +112,7 @@ open class DuckDuckGoApplication : HasAndroidInjector, Application(), LifecycleO
     lateinit var unsentForgetAllPixelStore: UnsentForgetAllPixelStore
 
     @Inject
-    lateinit var unsentPixelDataClearerRestart: UnsentPixelDataClearerAppRestartedWithIntentStoreSharedPreferences
+    lateinit var unsentPixelDataClearerRestart: DataClearerForegroundAppRestartPixel
 
     @Inject
     lateinit var offlinePixelScheduler: OfflinePixelScheduler

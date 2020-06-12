@@ -34,7 +34,7 @@ import com.duckduckgo.app.browser.rating.ui.GiveFeedbackDialogFragment
 import com.duckduckgo.app.browser.rating.ui.RateAppDialogFragment
 import com.duckduckgo.app.feedback.ui.common.FeedbackActivity
 import com.duckduckgo.app.fire.DataClearer
-import com.duckduckgo.app.fire.UnsentPixelDataClearerAppRestartedWithIntentStoreSharedPreferences
+import com.duckduckgo.app.fire.DataClearerForegroundAppRestartPixel
 import com.duckduckgo.app.global.ApplicationClearDataState
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.intentText
@@ -66,7 +66,7 @@ class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope() {
     lateinit var playStoreUtils: PlayStoreUtils
 
     @Inject
-    lateinit var unsentPixelDataClearerRestart: UnsentPixelDataClearerAppRestartedWithIntentStoreSharedPreferences
+    lateinit var unsentPixelDataClearerRestart: DataClearerForegroundAppRestartPixel
 
     private var currentTab: BrowserTabFragment? = null
 

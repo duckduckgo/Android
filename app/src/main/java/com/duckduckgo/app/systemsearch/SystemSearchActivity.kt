@@ -34,7 +34,7 @@ import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.autocomplete.BrowserAutoCompleteSuggestionsAdapter
 import com.duckduckgo.app.browser.omnibar.OmnibarScrolling
-import com.duckduckgo.app.fire.UnsentPixelDataClearerAppRestartedWithIntentStoreSharedPreferences
+import com.duckduckgo.app.fire.DataClearerForegroundAppRestartPixel
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.view.TextChangedWatcher
 import com.duckduckgo.app.global.view.hideKeyboard
@@ -56,7 +56,7 @@ class SystemSearchActivity : DuckDuckGoActivity() {
     lateinit var omnibarScrolling: OmnibarScrolling
 
     @Inject
-    lateinit var unsentPixelDataClearerRestart: UnsentPixelDataClearerAppRestartedWithIntentStoreSharedPreferences
+    lateinit var unsentPixelDataClearerRestart: DataClearerForegroundAppRestartPixel
 
     private val viewModel: SystemSearchViewModel by bindViewModel()
     private lateinit var autocompleteSuggestionsAdapter: BrowserAutoCompleteSuggestionsAdapter

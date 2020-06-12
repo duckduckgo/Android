@@ -45,7 +45,7 @@ class AutomaticDataClearer(
     private val settingsDataStore: SettingsDataStore,
     private val clearDataAction: ClearDataAction,
     private val dataClearerTimeKeeper: BackgroundTimeKeeper,
-    private val unsentPixelDataClearerRestart: UnsentPixelDataClearerAppRestartedWithIntentStoreSharedPreferences
+    private val unsentPixelDataClearerRestart: DataClearerForegroundAppRestartPixel
 ) : DataClearer, LifecycleObserver, CoroutineScope {
 
     private val clearJob: Job = Job()
