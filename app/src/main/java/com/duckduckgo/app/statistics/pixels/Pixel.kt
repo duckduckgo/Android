@@ -169,6 +169,8 @@ interface Pixel {
         AUTOCOMPLETE_BOOKMARK_SELECTION("m_aut_s_b"),
         AUTOCOMPLETE_SEARCH_SELECTION("m_aut_s_s"),
 
+        SERP_REQUERY("rq_%s"),
+
         CHANGE_APP_ICON_OPENED("m_ic"),
 
         MENU_ACTION_POPUP_OPENED("m_nav_pm_o"),
@@ -201,6 +203,8 @@ interface Pixel {
         const val DEFAULT_BROWSER_SET_FROM_ONBOARDING = "fo"
         const val DEFAULT_BROWSER_SET_ORIGIN = "dbo"
         const val CTA_SHOWN = "cta"
+        const val SERP_QUERY_CHANGED = "1"
+        const val SERP_QUERY_NOT_CHANGED = "0"
     }
 
     object PixelValues {
