@@ -105,8 +105,9 @@ class DataClearerForegroundAppRestartPixel @Inject constructor(
     private fun widgetActivity(intent: Intent?): Boolean =
         intent?.component?.className?.contains(SystemSearchActivity::class.java.canonicalName.orEmpty()) == true
 
-    private val preferences: SharedPreferences
-        get() = context.getSharedPreferences(FILENAME, Context.MODE_PRIVATE)
+    private val preferences: SharedPreferences by lazy {
+        context.getSharedPreferences(FILENAME, Context.MODE_PRIVATE)
+    }
 
     companion object {
         @VisibleForTesting
