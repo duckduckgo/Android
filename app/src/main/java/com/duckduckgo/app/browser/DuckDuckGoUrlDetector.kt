@@ -40,6 +40,19 @@ class DuckDuckGoUrlDetector @Inject constructor() {
         return uri.getQueryParameter(ParamKey.QUERY)
     }
 
+    fun isDuckDuckGoVerticalUrl(uri: String): Boolean {
+        return isDuckDuckGoUrl(uri) && hasVertical(uri)
+    }
+
+    private fun hasVertical(uri: String): Boolean {
+        return uri.toUri().queryParameterNames.contains(ParamKey.VERTICAL)
+    }
+
+    fun extractVertical(uriString: String): String? {
+        val uri = uriString.toUri()
+        return uri.getQueryParameter(ParamKey.VERTICAL)
+    }
+
     private fun String.toUri(): Uri {
         return Uri.parse(this)
     }

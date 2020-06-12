@@ -234,6 +234,7 @@ class BrowserTrackersAnimatorHelper {
             .asSequence()
             .distinct()
             .take(MAX_LOGOS_SHOWN + 1)
+            .sortedWithDisplayNamesStartingWithVowelsToTheEnd()
             .map {
                 val resId = TrackersRenderer().networkLogoIcon(activity, it.name)
                 if (resId == null) {
@@ -415,6 +416,10 @@ class BrowserTrackersAnimatorHelper {
         return ObjectAnimator.ofFloat(view, "alpha", 0f, 1f).apply {
             duration = DEFAULT_ANIMATION_DURATION
         }
+    }
+
+    private fun Sequence<Entity>.sortedWithDisplayNamesStartingWithVowelsToTheEnd(): Sequence<Entity> {
+        return sortedWith(compareBy { "AEIOU".contains(it.displayName.take(1)) })
     }
 
     companion object {
