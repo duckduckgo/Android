@@ -1,4 +1,4 @@
-// Do not wrap this code into an anonymous function. Used in JavaScriptDetector.kt
+// This code must be wrapped in an anonymous function which is done in JavaScriptDetector.kt to allow for dynamic changes before wrapping.
 
 window.addEventListener("DOMContentLoaded", function(event) {
     LoginDetection.log("Adding to DOM");
