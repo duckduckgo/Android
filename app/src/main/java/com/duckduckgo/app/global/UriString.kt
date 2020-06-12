@@ -54,5 +54,6 @@ class UriString {
         fun isValidDomain(domain: String): Boolean {
             return domainRegex.matches(domain)
         }
+
     }
 }
