@@ -73,8 +73,8 @@ class UserAgentProvider constructor(private val defaultUserAgent: String, privat
         return result
     }
 
-    private fun concatWithSpaces(vararg words: String?): String {
-        return words.filterNotNull().joinToString(SPACE)
+    private fun concatWithSpaces(vararg elements: String?): String {
+        return elements.filterNotNull().joinToString(SPACE)
     }
 
     private fun getSafariComponent(): String? {

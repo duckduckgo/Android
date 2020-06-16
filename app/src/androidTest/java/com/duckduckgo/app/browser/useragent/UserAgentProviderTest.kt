@@ -35,7 +35,7 @@ class UserAgentProviderTest {
     }
 
     @Test
-    fun whenUARetrievedWithNoParamsThenDeviceStrippedAndApplicationComponentAddedBeforeSafari() {
+    fun whenUaRetrievedWithNoParamsThenDeviceStrippedAndApplicationComponentAddedBeforeSafari() {
         testee = UserAgentProvider(Agent.DEFAULT, deviceInfo)
         val actual = testee.userAgent()
         assertTrue("$actual does not match expected regex", ValidationRegex.converted.matches(actual))
