@@ -83,7 +83,10 @@ class DuckDuckGoWebView : WebView, NestedScrollingChild {
 
                 returnValue = super.onTouchEvent(event)
 
-                if (dispatchNestedScroll(0, scrollOffset[1], 0, deltaY, scrollOffset)) {
+                if (scrollY == 0) {
+                    // Give parents control (required for SwipeRefreshLayout to work)
+                    stopNestedScroll()
+                } else if (dispatchNestedScroll(0, scrollOffset[1], 0, deltaY, scrollOffset)) {
                     event.offsetLocation(0f, scrollOffset[1].toFloat())
                     nestedOffsetY += scrollOffset[1]
                     lastY -= scrollOffset[1]

@@ -71,16 +71,23 @@
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
         tools:context="com.duckduckgo.app.browser.BrowserActivity">
 
-        <FrameLayout
-            android:id="@+id/webViewContainer"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            app:layout_behavior="@string/appbar_scrolling_view_behavior"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            tools:background="#4F00" />
+        <com.duckduckgo.app.browser.ui.ScrollAwareRefreshLayout
+            android:id="@+id/swipeRefreshContainer"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+                <FrameLayout
+                    android:id="@+id/webViewContainer"
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    tools:background="#4F00" />
+
+        </com.duckduckgo.app.browser.ui.ScrollAwareRefreshLayout>
 
         <View
             android:id="@+id/focusDummy"

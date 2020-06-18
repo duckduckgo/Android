@@ -287,6 +287,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
         configureObservers()
         configurePrivacyGrade()
         configureWebView()
+        configureSwipeRefresh()
         viewModel.registerWebViewListener(webViewClient, webChromeClient)
         configureOmnibarTextInput()
         configureFindInPage()
@@ -840,6 +841,21 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
         if (BuildConfig.DEBUG) {
             WebView.setWebContentsDebuggingEnabled(true)
         }
+    }
+
+    private fun configureSwipeRefresh() {
+        swipeRefreshContainer.setColorSchemeColors(ContextCompat.getColor(requireContext(), R.color.cornflowerBlue))
+
+        swipeRefreshContainer.setOnRefreshListener {
+            onRefreshRequested()
+        }
+
+        swipeRefreshContainer.setCanChildScrollUpCallback {
+            webView?.canScrollVertically(-1) ?: false
+        }
+
+        // avoids progressView from showing under toolbar
+        swipeRefreshContainer.progressViewStartOffset = swipeRefreshContainer.progressViewStartOffset - 15
     }
 
     /**
@@ -1450,6 +1466,10 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
                     if (viewState.progress == MAX_PROGRESS) {
                         createTrackersAnimation()
                     }
+                }
+
+                if (!viewState.isLoading) {
+                    swipeRefreshContainer.isRefreshing = false
                 }
             }
         }
