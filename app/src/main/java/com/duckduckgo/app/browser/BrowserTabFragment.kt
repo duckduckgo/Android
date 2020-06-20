@@ -234,7 +234,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
     private val menuButton: ViewGroup?
         get() = appBarLayout.browserMenu
 
-    private var webView: WebView? = null
+    private var webView: DuckDuckGoWebView? = null
 
     private val errorSnackbar: Snackbar by lazy {
         Snackbar.make(browserLayout, R.string.crashedWebViewErrorMessage, Snackbar.LENGTH_INDEFINITE)
@@ -800,7 +800,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
             R.layout.include_duckduckgo_browser_webview,
             webViewContainer,
             true
-        ).findViewById(R.id.browserWebView) as WebView
+        ).findViewById(R.id.browserWebView) as DuckDuckGoWebView
 
         webView?.let {
             userAgentProvider = UserAgentProvider(it.settings.userAgentString, deviceInfo)
@@ -831,6 +831,10 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
                     focusDummy.requestFocus()
                 }
                 false
+            }
+
+            it.setEnableSwipeRefreshCallback { enable ->
+                swipeRefreshContainer?.isEnabled = enable
             }
 
             registerForContextMenu(it)

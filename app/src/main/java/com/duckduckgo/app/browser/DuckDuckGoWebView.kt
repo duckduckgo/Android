@@ -35,6 +35,9 @@ import androidx.core.view.ViewCompat
  * Originally based on https://github.com/takahirom/webview-in-coordinatorlayout for scrolling behaviour
  */
 class DuckDuckGoWebView : WebView, NestedScrollingChild {
+    private var lastClampedY: Boolean = false
+    private var enableSwipeRefreshCallback: ((Boolean) -> Unit)? = null
+
     private var lastY: Int = 0
     private val scrollOffset = IntArray(2)
     private val scrollConsumed = IntArray(2)
@@ -74,6 +77,10 @@ class DuckDuckGoWebView : WebView, NestedScrollingChild {
             MotionEvent.ACTION_MOVE -> {
                 var deltaY = lastY - eventY
 
+                if (deltaY > 0) {
+                    lastClampedY = false
+                }
+
                 if (dispatchNestedPreScroll(0, deltaY, scrollConsumed, scrollOffset)) {
                     deltaY -= scrollConsumed[1]
                     lastY = eventY - scrollOffset[1]
@@ -83,8 +90,9 @@ class DuckDuckGoWebView : WebView, NestedScrollingChild {
 
                 returnValue = super.onTouchEvent(event)
 
-                if (scrollY == 0) {
-                    // Give parents control (required for SwipeRefreshLayout to work)
+                if (scrollY == 0 && lastClampedY) {
+                    // we have reached the top and are clamped -> enable swipeRefresh (by default always disabled)
+                    enableSwipeRefresh(true)
                     stopNestedScroll()
                 } else if (dispatchNestedScroll(0, scrollOffset[1], 0, deltaY, scrollOffset)) {
                     event.offsetLocation(0f, scrollOffset[1].toFloat())
@@ -94,6 +102,9 @@ class DuckDuckGoWebView : WebView, NestedScrollingChild {
             }
 
             MotionEvent.ACTION_DOWN -> {
+                // disable swipeRefresh until we can be sure it should be enabled
+                enableSwipeRefresh(false)
+
                 returnValue = super.onTouchEvent(event)
                 lastY = eventY
                 startNestedScroll(ViewCompat.SCROLL_AXIS_VERTICAL)
@@ -133,6 +144,20 @@ class DuckDuckGoWebView : WebView, NestedScrollingChild {
 
     override fun dispatchNestedPreFling(velocityX: Float, velocityY: Float): Boolean =
         nestedScrollHelper.dispatchNestedPreFling(velocityX, velocityY)
+
+    override fun onOverScrolled(scrollX: Int, scrollY: Int, clampedX: Boolean, clampedY: Boolean) {
+        lastClampedY = clampedY
+        enableSwipeRefresh(clampedY && scrollY == 0)
+        super.onOverScrolled(scrollX, scrollY, clampedX, clampedY)
+    }
+
+    private fun enableSwipeRefresh(enable: Boolean) {
+        enableSwipeRefreshCallback?.invoke(enable)
+    }
+
+    fun setEnableSwipeRefreshCallback(callback: (Boolean) -> Unit) {
+        enableSwipeRefreshCallback = callback
+    }
 
     companion object {
 
