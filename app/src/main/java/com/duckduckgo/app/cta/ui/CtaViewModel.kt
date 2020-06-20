@@ -27,7 +27,7 @@ import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.install.daysInstalled
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.global.model.domain
-import com.duckduckgo.app.global.model.domainMatchesUrl
+import com.duckduckgo.app.global.model.isUseOurAppDomain
 import com.duckduckgo.app.global.model.orderedTrackingEntities
 import com.duckduckgo.app.global.timestamps.db.KeyTimestampStore
 import com.duckduckgo.app.global.timestamps.db.TimestampKey
@@ -203,18 +203,13 @@ class CtaViewModel @Inject constructor(
 
     @WorkerThread
     private suspend fun canShowUseOurAppDeletionDialog(site: Site?): Boolean =
-        isOnUseOurAppSite(site) && twoDaysSinceShortcutAdded() && !useOurAppDeletionDialogShown()
+        !useOurAppDeletionDialogShown() && site.isUseOurAppDomain() && twoDaysSinceShortcutAdded()
 
     @WorkerThread
     private suspend fun twoDaysSinceShortcutAdded(): Boolean {
         val timestampKey = keyTimestampStore.getTimestamp(TimestampKey.USE_OUR_APP_SHORTCUT_ADDED) ?: return false
         val days = TimeUnit.MILLISECONDS.toDays(System.currentTimeMillis() - timestampKey.timestamp)
         return (days >= 2)
-    }
-
-    private fun isOnUseOurAppSite(site: Site?): Boolean {
-        if (site == null) return false
-        return site.domainMatchesUrl("m.facebook.com") || site.domainMatchesUrl("facebook.com")
     }
 
     @WorkerThread

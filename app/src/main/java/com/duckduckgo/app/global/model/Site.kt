@@ -72,4 +72,9 @@ fun Site.domainMatchesUrl(matchingUrl: String): Boolean {
     return uri?.baseHost == matchingUrl.toUri().baseHost
 }
 
+fun Site?.isUseOurAppDomain(): Boolean {
+    if (this == null) return false
+    return domainMatchesUrl("m.facebook.com") || domainMatchesUrl("facebook.com")
+}
+
 val Site.domain get() = uri?.host

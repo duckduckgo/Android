@@ -31,7 +31,7 @@ class UseOurAppNotification(
     private val notificationDao: NotificationDao
 ) : SchedulableNotification {
 
-    override val id = "com.duckduckgo.privacytips.useOurApp"
+    override val id = ID
     override val launchIntent = NotificationHandlerService.NotificationEvent.USE_OUR_APP
     override val cancelIntent = CANCEL
 
@@ -46,6 +46,10 @@ class UseOurAppNotification(
 
     override suspend fun buildSpecification(): NotificationSpec {
         return UseOurAppSpecification(context)
+    }
+
+    companion object {
+        const val ID = "com.duckduckgo.privacytips.useOurApp"
     }
 }
 

@@ -60,6 +60,7 @@ import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.model.SiteFactory
 import com.duckduckgo.app.global.timestamps.db.KeyTimestampStore
+import com.duckduckgo.app.notification.db.NotificationDao
 import com.duckduckgo.app.onboarding.store.AppStage
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.store.UserStageStore
@@ -201,6 +202,9 @@ class BrowserTabViewModelTest {
     @Mock
     private lateinit var mockKeyTimestampStore: KeyTimestampStore
 
+    @Mock
+    private lateinit var mockNotificationDao: NotificationDao
+
     private lateinit var mockAutoCompleteApi: AutoCompleteApi
 
     private lateinit var ctaViewModel: CtaViewModel
@@ -273,6 +277,8 @@ class BrowserTabViewModelTest {
             pixel = mockPixel,
             dispatchers = coroutineRule.testDispatcherProvider,
             fireproofWebsiteDao = fireproofWebsiteDao,
+            keyTimestampStore = mockKeyTimestampStore,
+            notificationDao = mockNotificationDao,
             variantManager = mockVariantManager
         )
 

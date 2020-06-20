@@ -28,6 +28,7 @@ import com.duckduckgo.app.global.rating.AppEnjoymentPromptOptions
 import com.duckduckgo.app.global.rating.AppEnjoymentUserEventRecorder
 import com.duckduckgo.app.global.rating.PromptCount
 import com.duckduckgo.app.privacy.ui.PrivacyDashboardActivity
+import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.nhaarman.mockitokotlin2.*
@@ -71,6 +72,9 @@ class BrowserViewModelTest {
     @Mock
     private lateinit var mockAppEnjoymentPromptEmitter: AppEnjoymentPromptEmitter
 
+    @Mock
+    private lateinit var mockPixel: Pixel
+
     private lateinit var testee: BrowserViewModel
 
     @Before
@@ -84,7 +88,8 @@ class BrowserViewModelTest {
             queryUrlConverter = mockOmnibarEntryConverter,
             dataClearer = mockAutomaticDataClearer,
             appEnjoymentPromptEmitter = mockAppEnjoymentPromptEmitter,
-            appEnjoymentUserEventRecorder = mockAppEnjoymentUserEventRecorder
+            appEnjoymentUserEventRecorder = mockAppEnjoymentUserEventRecorder,
+            pixel = mockPixel
         )
 
         testee.command.observeForever(mockCommandObserver)

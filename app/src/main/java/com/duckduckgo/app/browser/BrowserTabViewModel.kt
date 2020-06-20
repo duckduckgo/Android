@@ -65,9 +65,10 @@ import com.duckduckgo.app.browser.ui.HttpAuthenticationDialogFragment.HttpAuthen
 import com.duckduckgo.app.cta.ui.Cta
 import com.duckduckgo.app.cta.ui.CtaViewModel
 import com.duckduckgo.app.cta.ui.DaxDialogCta
+import com.duckduckgo.app.cta.ui.DialogCta
 import com.duckduckgo.app.cta.ui.HomePanelCta
 import com.duckduckgo.app.cta.ui.HomeTopPanelCta
-import com.duckduckgo.app.cta.ui.SecondaryButtonCta
+import com.duckduckgo.app.cta.ui.UseOurAppCta
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteDao
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
 import com.duckduckgo.app.global.AppUrl
@@ -80,7 +81,12 @@ import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.global.model.SiteFactory
 import com.duckduckgo.app.global.model.domain
 import com.duckduckgo.app.global.model.domainMatchesUrl
+import com.duckduckgo.app.global.model.isUseOurAppDomain
+import com.duckduckgo.app.global.timestamps.db.KeyTimestampStore
+import com.duckduckgo.app.global.timestamps.db.TimestampKey
 import com.duckduckgo.app.global.toDesktopUri
+import com.duckduckgo.app.notification.db.NotificationDao
+import com.duckduckgo.app.notification.model.UseOurAppNotification
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao
 import com.duckduckgo.app.privacy.db.UserWhitelistDao
 import com.duckduckgo.app.privacy.model.PrivacyGrade
@@ -129,6 +135,8 @@ class BrowserTabViewModel(
     private val searchCountDao: SearchCountDao,
     private val pixel: Pixel,
     private val dispatchers: DispatcherProvider = DefaultDispatcherProvider(),
+    private val keyTimestampStore: KeyTimestampStore,
+    private val notificationDao: NotificationDao,
     private val variantManager: VariantManager
 ) : WebViewClientListener, EditBookmarkListener, HttpAuthenticationListener, ViewModel() {
 
@@ -295,6 +303,7 @@ class BrowserTabViewModel(
 
     fun onViewReady() {
         url?.let {
+            isDomainSameAsUseOurAppSiteDomain()
             onUserSubmittedQuery(it)
         }
     }
@@ -575,7 +584,15 @@ class BrowserTabViewModel(
 
     private fun pageChanged(url: String, title: String?) {
         Timber.v("Page changed: $url")
-        buildSiteFactory(url, title)
+
+        val oldSite = site
+
+        buildSiteFactory(url, title) // Immediately updates site with the new URL
+
+        // Navigating from different website to use our app website
+        if (!oldSite.isUseOurAppDomain()) {
+            isDomainSameAsUseOurAppSiteDomain()
+        }
 
         val currentOmnibarViewState = currentOmnibarViewState()
         omnibarViewState.value = currentOmnibarViewState.copy(omnibarText = omnibarTextForUrl(url), shouldMoveCaretToEnd = false)
@@ -609,6 +626,25 @@ class BrowserTabViewModel(
         domain?.let { viewModelScope.launch { updateLoadingStatePrivacy(domain) } }
         domain?.let { viewModelScope.launch { updateWhitelistedState(domain) } }
         registerSiteVisit()
+    }
+
+    private fun isDomainSameAsUseOurAppSiteDomain() {
+        if (site.isUseOurAppDomain()) {
+            viewModelScope.launch { sendPixelIfUseOurAppSiteVisited() }
+        }
+    }
+
+    private suspend fun sendPixelIfUseOurAppSiteVisited() {
+        withContext(dispatchers.io()) {
+            val isShortcutAdded = keyTimestampStore.getTimestamp(TimestampKey.USE_OUR_APP_SHORTCUT_ADDED)
+            val isUseOurAppNotificationSeen = notificationDao.exists(UseOurAppNotification.ID)
+
+            if (isShortcutAdded != null) {
+                pixel.fire(PixelName.UOA_VISITED_AFTER_SHORTCUT)
+            } else if (isUseOurAppNotificationSeen) {
+                pixel.fire(PixelName.UOA_VISITED_AFTER_NOTIFICATION)
+            }
+        }
     }
 
     private fun shouldShowDaxIcon(currentUrl: String?, showPrivacyGrade: Boolean): Boolean {
