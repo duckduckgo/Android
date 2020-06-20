@@ -50,6 +50,7 @@ class ShortcutReceiver @Inject constructor(private val keyTimestampStore: KeyTim
         GlobalScope.launch(dispatcher.io()) {
             if (originUrl == USE_OUR_APP_SHORTCUT_URL) {
                 keyTimestampStore.registerTimestamp(KeyTimestampEntity(TimestampKey.USE_OUR_APP_SHORTCUT_ADDED))
+                pixel.fire(Pixel.PixelName.USE_OUR_APP_SHORTCUT_ADDED)
             }
         }
     }

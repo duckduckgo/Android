@@ -27,6 +27,7 @@ import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.browser.rating.ui.AppEnjoymentDialogFragment
 import com.duckduckgo.app.browser.rating.ui.GiveFeedbackDialogFragment
 import com.duckduckgo.app.browser.rating.ui.RateAppDialogFragment
+import com.duckduckgo.app.browser.shortcut.ShortcutBuilder
 import com.duckduckgo.app.fire.DataClearer
 import com.duckduckgo.app.global.ApplicationClearDataState
 import com.duckduckgo.app.global.SingleLiveEvent
@@ -35,6 +36,7 @@ import com.duckduckgo.app.global.rating.AppEnjoymentPromptOptions
 import com.duckduckgo.app.global.rating.AppEnjoymentUserEventRecorder
 import com.duckduckgo.app.global.rating.PromptCount
 import com.duckduckgo.app.privacy.ui.PrivacyDashboardActivity.Companion.RELOAD_RESULT_CODE
+import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
 import kotlinx.coroutines.CoroutineScope
@@ -48,7 +50,8 @@ class BrowserViewModel(
     private val queryUrlConverter: OmnibarEntryConverter,
     private val dataClearer: DataClearer,
     private val appEnjoymentPromptEmitter: AppEnjoymentPromptEmitter,
-    private val appEnjoymentUserEventRecorder: AppEnjoymentUserEventRecorder
+    private val appEnjoymentUserEventRecorder: AppEnjoymentUserEventRecorder,
+    private val pixel: Pixel
 ) : AppEnjoymentDialogFragment.Listener,
     RateAppDialogFragment.Listener,
     GiveFeedbackDialogFragment.Listener,
@@ -200,5 +203,10 @@ class BrowserViewModel(
 
     fun onOpenShortcut(url: String) {
         tabRepository.selectByUrlOrNewTab(url, queryUrlConverter.convertQueryToUrl(url))
+        if (url == ShortcutBuilder.USE_OUR_APP_SHORTCUT_URL) {
+            pixel.fire(Pixel.PixelName.USE_OUR_APP_SHORTCUT_OPENED)
+        } else {
+            pixel.fire(Pixel.PixelName.SHORTCUT_OPENED)
+        }
     }
 }

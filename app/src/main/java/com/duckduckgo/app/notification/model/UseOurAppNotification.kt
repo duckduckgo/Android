@@ -23,6 +23,7 @@ import com.duckduckgo.app.notification.NotificationHandlerService
 import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEvent.CANCEL
 import com.duckduckgo.app.notification.NotificationRegistrar
 import com.duckduckgo.app.notification.db.NotificationDao
+import com.duckduckgo.app.statistics.pixels.Pixel
 import timber.log.Timber
 
 class UseOurAppNotification(
@@ -57,7 +58,7 @@ class UseOurAppSpecification(context: Context) : NotificationSpec {
     override val description: String = context.getString(R.string.useOurAppNotificationDescription)
     override val launchButton: String? = null
     override val closeButton: String? = null
-    override val pixelSuffix = "uoa"
+    override val pixelSuffix = Pixel.PixelName.USE_OUR_APP_NOTIFICATION_SUFFIX.pixelName
     override val autoCancel = true
     override val bundle: Bundle = Bundle()
     override val color: Int = R.color.ic_launcher_red_background

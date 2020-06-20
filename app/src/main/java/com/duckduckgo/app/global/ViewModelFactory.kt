@@ -172,7 +172,8 @@ class ViewModelFactory @Inject constructor(
             queryUrlConverter,
             dataClearer,
             appEnjoymentPromptEmitter,
-            appEnjoymentUserEventRecorder
+            appEnjoymentUserEventRecorder,
+            pixel
         )
     }
 

@@ -73,9 +73,9 @@ class UseOurAppCta(
     @StringRes val okButton: Int = R.string.facebookDialogButtonText,
     @StringRes val cancelButton: Int = R.string.facebookDialogCancelButtonText,
     override val ctaId: CtaId = CtaId.USE_OUR_APP,
-    override val shownPixel: Pixel.PixelName? = null,
-    override val okPixel: Pixel.PixelName? = null,
-    override val cancelPixel: Pixel.PixelName? = null
+    override val shownPixel: Pixel.PixelName? = Pixel.PixelName.USE_OUR_APP_DIALOG_SHOWN,
+    override val okPixel: Pixel.PixelName? = Pixel.PixelName.USE_OUR_APP_DIALOG_OK,
+    override val cancelPixel: Pixel.PixelName? = Pixel.PixelName.USE_OUR_APP_DIALOG_CANCELLED
 ) : Cta, DialogCta {
 
     override fun createCta(activity: FragmentActivity): DaxDialog =
@@ -98,7 +98,7 @@ class UseOurAppDeletionCta(
     @StringRes val text: Int = R.string.deletionDialogText,
     @StringRes val okButton: Int = R.string.daxDialogGotIt,
     override val ctaId: CtaId = CtaId.USE_OUR_APP_DELETION,
-    override val shownPixel: Pixel.PixelName? = null,
+    override val shownPixel: Pixel.PixelName? = Pixel.PixelName.USE_OUR_APP_DIALOG_DELETE_SHOWN,
     override val okPixel: Pixel.PixelName? = null,
     override val cancelPixel: Pixel.PixelName? = null
 ) : Cta, DialogCta {
