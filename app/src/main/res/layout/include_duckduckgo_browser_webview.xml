@@ -29,6 +29,7 @@
     android:scrollbarThumbVertical="@color/webViewScrollbarThumbColor"
     android:scrollbarTrackHorizontal="@color/webViewScrollbarTrackColor"
     android:scrollbarTrackVertical="@color/webViewScrollbarTrackColor"
+    android:overScrollMode="always"
     android:visibility="gone"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:visibility="visible">
