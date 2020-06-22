@@ -579,11 +579,31 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
 
     private fun requestGeoPermission() {
         if (ContextCompat.checkSelfPermission(requireActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            requestPermissions(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), PERMISSION_REQUEST_GEO_LOCATION)
+            launchLocationPermissionDialog{
+                requestPermissions(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), PERMISSION_REQUEST_GEO_LOCATION)
+            }
         } else {
             viewModel.onGeoLocationPermissionGranted()
         }
     }
+
+    private fun launchLocationPermissionDialog(onClick: () -> Unit) {
+        val isShowing = alertDialog?.isShowing
+
+        if (isShowing != true) {
+            alertDialog = AlertDialog.Builder(requireContext())
+                .setTitle("Allow Location Permissions?")
+                .setMessage("Why? Don't worry, we are not going to store anything but the Maps function will give you better results.")
+                .setPositiveButton(R.string.yes) { _, _ ->
+                    onClick()
+                }
+                .setNegativeButton(R.string.no) { dialog, _ ->
+                    dialog.dismiss()
+                }
+                .show()
+        }
+    }
+
 
     private fun launchBrokenSiteFeedback(data: BrokenSiteData) {
         context?.let {
