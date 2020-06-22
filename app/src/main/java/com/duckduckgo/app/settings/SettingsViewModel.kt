@@ -87,7 +87,7 @@ class SettingsViewModel @Inject constructor(
         viewState.value = currentViewState().copy(
             loading = false,
             lightThemeEnabled = isLightTheme,
-                darkModeEnabled = settingsDataStore.darkMode,
+            darkModeEnabled = settingsDataStore.darkMode,
             autoCompleteSuggestionsEnabled = settingsDataStore.autoCompleteSuggestionsEnabled,
             isAppDefaultBrowser = defaultBrowserAlready,
             showDefaultBrowserSetting = defaultWebBrowserCapability.deviceSupportsDefaultBrowserConfiguration(),
