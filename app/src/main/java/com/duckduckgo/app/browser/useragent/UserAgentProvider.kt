@@ -65,7 +65,7 @@ class UserAgentProvider constructor(private val defaultUserAgent: String, privat
     }
 
     private fun getWebKitVersionOnwards(forDesktop: Boolean): String? {
-        val matches = AgentRegex.webkit_until_safari.find(defaultUserAgent) ?: AgentRegex.webkit_until_end.find(defaultUserAgent) ?: return null
+        val matches = AgentRegex.webkitUntilSafari.find(defaultUserAgent) ?: AgentRegex.webkitUntilEnd.find(defaultUserAgent) ?: return null
         var result = matches.groupValues.last()
         if (forDesktop) {
             result = result.replace(" Mobile", "")
@@ -83,8 +83,8 @@ class UserAgentProvider constructor(private val defaultUserAgent: String, privat
     }
 
     private object AgentRegex {
-        val webkit_until_safari = Regex("(AppleWebKit/.*) Safari")
-        val webkit_until_end = Regex("(AppleWebKit/.*)")
+        val webkitUntilSafari = Regex("(AppleWebKit/.*) Safari")
+        val webkitUntilEnd = Regex("(AppleWebKit/.*)")
         val safari = Regex("(Safari/[^ ]+) *")
         val version = Regex("(Version/[^ ]+) *")
     }
@@ -100,7 +100,7 @@ class UserAgentProvider constructor(private val defaultUserAgent: String, privat
         )
 
         val sitesThatOmitVersion = listOf(
-            "mijn.ing.nl",
+            "ing.nl",
             "chase.com"
         )
     }

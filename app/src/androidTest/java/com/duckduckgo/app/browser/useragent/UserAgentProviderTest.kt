@@ -56,58 +56,74 @@ class UserAgentProviderTest {
     }
 
     @Test
-    fun whenMissingAppleWebKitComponentThenUAContainsMozillaAndApplicationAndSafariComponents() {
+    fun whenMissingAppleWebKitComponentThenUaContainsMozillaAndApplicationAndSafariComponents() {
         testee = UserAgentProvider(Agent.NO_WEBKIT, deviceInfo)
         val actual = testee.userAgent(isDesktop = false)
         assertTrue("$actual does not match expected regex", ValidationRegex.missingWebKit.matches(actual))
     }
 
     @Test
-    fun whenMissingSafariComponentThenUAContainsMozillaAndVersionAndApplicationComponents() {
+    fun whenMissingSafariComponentThenUaContainsMozillaAndVersionAndApplicationComponents() {
         testee = UserAgentProvider(Agent.NO_SAFARI, deviceInfo)
         val actual = testee.userAgent(isDesktop = false)
         assertTrue("$actual does not match expected result", ValidationRegex.missingSafari.matches(actual))
     }
 
     @Test
-    fun whenMissingVersionComponentThenUAContainsMozillaAndApplicationAndSafariComponents() {
+    fun whenMissingVersionComponentThenUaContainsMozillaAndApplicationAndSafariComponents() {
         testee = UserAgentProvider(Agent.NO_VERSION, deviceInfo)
         val actual = testee.userAgent(isDesktop = false)
         assertTrue("$actual does not match expected result", ValidationRegex.noVersion.matches(actual))
     }
 
     @Test
-    fun whenHostDoesNotSupportApplicationThenUAOmitsApplicationComponent() {
+    fun whenDomainDoesNotSupportApplicationThenUaOmitsApplicationComponent() {
         testee = UserAgentProvider(Agent.DEFAULT, deviceInfo)
-        val actual = testee.userAgent(NO_APPLICATION_HOST)
+        val actual = testee.userAgent(NO_APPLICATION_DOMAIN)
         assertTrue("$actual does not match expected regex", ValidationRegex.noApplication.matches(actual))
     }
 
     @Test
-    fun whenHostSupportsApplicationThenUAAddsApplicationComponentBeforeSafari() {
+    fun whenSubdomsinDoesNotSupportApplicationThenUaOmitsApplicationComponent() {
         testee = UserAgentProvider(Agent.DEFAULT, deviceInfo)
-        val actual = testee.userAgent(HOST)
+        val actual = testee.userAgent(NO_APPLICATION_SUBDOMAIN)
+        assertTrue("$actual does not match expected regex", ValidationRegex.noApplication.matches(actual))
+    }
+
+    @Test
+    fun whenDomainSupportsApplicationThenUaAddsApplicationComponentBeforeSafari() {
+        testee = UserAgentProvider(Agent.DEFAULT, deviceInfo)
+        val actual = testee.userAgent(DOMAIN)
         assertTrue("$actual does not match expected regex", ValidationRegex.converted.matches(actual))
     }
 
     @Test
-    fun whenHostDoesNotSupportVersionThenUAOmitsVersionComponent() {
+    fun whenDomainDoesNotSupportVersionThenUaOmitsVersionComponent() {
         testee = UserAgentProvider(Agent.DEFAULT, deviceInfo)
-        val actual = testee.userAgent(NO_VERSION_HOST)
+        val actual = testee.userAgent(NO_VERSION_DOMAIN)
         assertTrue("$actual does not match expected regex", ValidationRegex.noVersion.matches(actual))
     }
 
     @Test
-    fun whenHostSupportsVersionThenUAIncludesVersionComponentInUsualLocation() {
+    fun whenSubdomainDoesNotSupportVersionThenUaOmitsVersionComponent() {
         testee = UserAgentProvider(Agent.DEFAULT, deviceInfo)
-        val actual = testee.userAgent(HOST)
+        val actual = testee.userAgent(NO_VERSION_SUBDOMAIN)
+        assertTrue("$actual does not match expected regex", ValidationRegex.noVersion.matches(actual))
+    }
+
+    @Test
+    fun whenDomainSupportsVersionThenUaIncludesVersionComponentInUsualLocation() {
+        testee = UserAgentProvider(Agent.DEFAULT, deviceInfo)
+        val actual = testee.userAgent(DOMAIN)
         assertTrue("$actual does not match expected regex", ValidationRegex.converted.matches(actual))
     }
 
     companion object {
-        const val HOST = "example.com"
-        const val NO_APPLICATION_HOST = "cvs.com"
-        const val NO_VERSION_HOST = "mijn.ing.nl"
+        const val DOMAIN = "example.com"
+        const val NO_APPLICATION_DOMAIN = "cvs.com"
+        const val NO_APPLICATION_SUBDOMAIN = "subdomain.cvs.com"
+        const val NO_VERSION_DOMAIN = "ing.nl"
+        const val NO_VERSION_SUBDOMAIN = "subdomain.ing.nl"
     }
 
     private object Agent {
