@@ -23,7 +23,7 @@ import androidx.test.annotation.UiThreadTest
 import androidx.test.filters.SdkSuppress
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.CoroutineTestRule
-import com.duckduckgo.app.browser.logindetection.LoginDetector
+import com.duckduckgo.app.browser.logindetection.DOMLoginDetector
 import com.duckduckgo.app.browser.logindetection.WebNavigationEvent
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.global.exception.UncaughtExceptionRepository
@@ -49,7 +49,7 @@ class BrowserWebViewClientTest {
     private val requestInterceptor: RequestInterceptor = mock()
     private val listener: WebViewClientListener = mock()
     private val cookieManager: CookieManager = mock()
-    private val loginDetector: LoginDetector = mock()
+    private val loginDetector: DOMLoginDetector = mock()
     private val offlinePixelCountDataStore: OfflinePixelCountDataStore = mock()
     private val uncaughtExceptionRepository: UncaughtExceptionRepository = mock()
 
