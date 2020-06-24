@@ -29,7 +29,11 @@ import android.webkit.WebView
 import androidx.annotation.AnyThread
 import androidx.annotation.VisibleForTesting
 import androidx.core.net.toUri
-import androidx.lifecycle.*
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.duckduckgo.app.autocomplete.api.AutoComplete
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteResult
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion
@@ -47,6 +51,7 @@ import com.duckduckgo.app.browser.SpecialUrlDetector.UrlType.IntentType
 import com.duckduckgo.app.browser.WebNavigationStateChange.*
 import com.duckduckgo.app.browser.addtohome.AddToHomeCapabilityDetector
 import com.duckduckgo.app.browser.favicon.FaviconDownloader
+import com.duckduckgo.app.browser.logindetection.LoginDetectionDelegate
 import com.duckduckgo.app.browser.model.BasicAuthenticationCredentials
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.browser.model.LongPressTarget
@@ -61,7 +66,6 @@ import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.global.model.SiteFactory
 import com.duckduckgo.app.global.model.domain
 import com.duckduckgo.app.global.model.domainMatchesUrl
-import com.duckduckgo.app.global.toDesktopUri
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao
 import com.duckduckgo.app.privacy.db.UserWhitelistDao
 import com.duckduckgo.app.privacy.model.PrivacyGrade
@@ -86,7 +90,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
-import java.util.Locale
+import java.util.*
 import java.util.concurrent.TimeUnit
 
 class BrowserTabViewModel(
@@ -112,6 +116,8 @@ class BrowserTabViewModel(
     private val dispatchers: DispatcherProvider = DefaultDispatcherProvider(),
     private val variantManager: VariantManager
 ) : WebViewClientListener, EditBookmarkListener, HttpAuthenticationListener, ViewModel() {
+
+    private val loginDetectionDelegate = LoginDetectionDelegate()
 
     private var buildingSiteFactoryJob: Job? = null
 
@@ -257,14 +263,24 @@ class BrowserTabViewModel(
     private var webNavigationState: WebNavigationState? = null
     private var httpsUpgraded = false
     private val browserStateModifier = BrowserStateModifier()
+
     private val fireproofWebsitesObserver = Observer<List<FireproofWebsiteEntity>> {
         browserViewState.value = currentBrowserViewState().copy(isFireproofWebsite = isFireproofWebsite())
+    }
+
+    private val loginDetectionObserver = Observer<LoginDetectionDelegate.LoginDetected> { loginEvent ->
+        Timber.i("LoginDetection for $loginEvent")
+        if (!isFireproofWebsite(loginEvent.forwardedToDomain)) {
+            pixel.fire(PixelName.FIREPROOF_LOGIN_DIALOG_SHOWN)
+            command.value = AskToFireproofWebsite(FireproofWebsiteEntity(loginEvent.forwardedToDomain))
+        }
     }
 
     init {
         initializeViewStates()
         configureAutoComplete()
         fireproofWebsiteState.observeForever(fireproofWebsitesObserver)
+        loginDetectionDelegate.loginDetectedLD.observeForever(loginDetectionObserver)
     }
 
     fun loadData(tabId: String, initialUrl: String?, skipHome: Boolean) {
@@ -329,6 +345,7 @@ class BrowserTabViewModel(
         autoCompleteDisposable?.dispose()
         autoCompleteDisposable = null
         fireproofWebsiteState.removeObserver(fireproofWebsitesObserver)
+        loginDetectionDelegate.loginDetectedLD.removeObserver(loginDetectionObserver)
         super.onCleared()
     }
 
@@ -374,6 +391,8 @@ class BrowserTabViewModel(
     }
 
     fun onUserSubmittedQuery(query: String) {
+        loginDetectionDelegate.onEvent(LoginDetectionDelegate.Event.UserAction.NewQuerySubmitted)
+
         if (query.isBlank()) {
             return
         }
@@ -455,6 +474,7 @@ class BrowserTabViewModel(
     }
 
     fun onUserPressedForward() {
+        loginDetectionDelegate.onEvent(LoginDetectionDelegate.Event.UserAction.NavigateForward)
         if (!currentBrowserViewState().browserShowing) {
             browserViewState.value = browserStateModifier.copyForBrowserShowing(currentBrowserViewState())
             findInPageViewState.value = currentFindInPageViewState().copy(canFindInPage = true)
@@ -465,6 +485,7 @@ class BrowserTabViewModel(
     }
 
     fun onRefreshRequested() {
+        loginDetectionDelegate.onEvent(LoginDetectionDelegate.Event.UserAction.Refresh)
         if (currentGlobalLayoutState() is Invalidated) {
             recoverTabWithQuery(url.orEmpty())
         } else {
@@ -479,6 +500,7 @@ class BrowserTabViewModel(
      * @return true if navigation handled, otherwise false
      */
     fun onUserPressedBack(): Boolean {
+        loginDetectionDelegate.onEvent(LoginDetectionDelegate.Event.UserAction.NavigateBack)
         val navigation = webNavigationState ?: return false
 
         if (currentFindInPageViewState().visible) {
@@ -550,6 +572,7 @@ class BrowserTabViewModel(
             is UrlUpdated -> urlUpdated(stateChange.url)
             is PageNavigationCleared -> disableUserNavigation()
         }
+        loginDetectionDelegate.onEvent(LoginDetectionDelegate.Event.WebNavigationEvent(stateChange))
     }
 
     private fun pageChanged(url: String, title: String?) {
@@ -686,6 +709,9 @@ class BrowserTabViewModel(
 
         val showLoadingGrade = progress.privacyOn || isLoading
         privacyGradeViewState.value = currentPrivacyGradeState().copy(shouldAnimate = isLoading, showEmptyGrade = showLoadingGrade)
+        if (newProgress == 100) {
+            loginDetectionDelegate.onEvent(LoginDetectionDelegate.Event.PageFinished)
+        }
     }
 
     private fun registerSiteVisit() {
@@ -1235,8 +1261,8 @@ class BrowserTabViewModel(
         command.value = LaunchTabSwitcher
     }
 
-    private fun isFireproofWebsite(): Boolean {
-        val domain = site?.domain ?: return false
+    private fun isFireproofWebsite(domain: String? = site?.domain): Boolean {
+        if (domain == null) return false
         val fireproofWebsites = fireproofWebsiteState.value
         return fireproofWebsites?.any { it.domain == domain } ?: false
     }
@@ -1267,13 +1293,8 @@ class BrowserTabViewModel(
     }
 
     override fun loginDetected() {
-        val domain = site?.domain ?: return
-        viewModelScope.launch {
-            if (!isFireproofWebsite()) {
-                pixel.fire(PixelName.FIREPROOF_LOGIN_DIALOG_SHOWN)
-                command.value = AskToFireproofWebsite(FireproofWebsiteEntity(domain))
-            }
-        }
+        val currentUrl = site?.url ?: return
+        loginDetectionDelegate.onEvent(LoginDetectionDelegate.Event.LoginAttempt(currentUrl))
     }
 
     companion object {
