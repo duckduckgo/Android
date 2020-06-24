@@ -136,7 +136,7 @@ class BrowserModule {
 
     @Provides
     @Singleton
-    fun userAgentProiver(context: Context, deviceInfo: DeviceInfo): UserAgentProvider {
+    fun userAgentProvider(context: Context, deviceInfo: DeviceInfo): UserAgentProvider {
         return UserAgentProvider(WebSettings.getDefaultUserAgent(context), deviceInfo)
     }
 
