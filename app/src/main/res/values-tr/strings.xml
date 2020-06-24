@@ -152,7 +152,6 @@
     <string name="fireClearAll">Tüm Sekmeleri ve Verileri Temizle</string>
     <string name="fireCancel">İptal</string>
     <string name="fireDataCleared">Veri silindi</string>
-    <string name="fireProcessName" translatable="false">:fire</string>
 
     <!-- Settings Activity -->
     <string name="settingsActivityTitle">Ayarlar</string>

@@ -153,7 +153,6 @@
     <string name="fireClearAll">Izdzēst visas cilnes un datus</string>
     <string name="fireCancel">Atcelt</string>
     <string name="fireDataCleared">Dati ir nodzēsti</string>
-    <string name="fireProcessName" translatable="false">:fire</string>
 
     <!-- Settings Activity -->
     <string name="settingsActivityTitle">Iestatījumi</string>
