@@ -24,7 +24,7 @@ import timber.log.Timber
 class LoginDetectionDelegate {
 
     private var loginAttempt: Event.LoginAttempt? = null
-    var loginDetectedLD = MutableLiveData<LoginDetected>()
+    var loginEventLiveData = MutableLiveData<LoginDetected>()
 
     data class LoginDetected(val authLoginDomain: String, val forwardedToDomain: String)
 
@@ -92,7 +92,7 @@ class LoginDetectionDelegate {
 
         Timber.i("LoginDetectionDelegate ${loginAttemptEvent.url} vs $forwardedToUrl")
         if (loginURI.host != forwardedToUri.host || loginURI.path != forwardedToUri.path) {
-            loginDetectedLD.value = LoginDetected(loginURI.host, forwardedToUri.host)
+            loginEventLiveData.value = LoginDetected(loginURI.host, forwardedToUri.host)
             loginAttempt = null
         }
     }

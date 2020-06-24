@@ -280,7 +280,7 @@ class BrowserTabViewModel(
         initializeViewStates()
         configureAutoComplete()
         fireproofWebsiteState.observeForever(fireproofWebsitesObserver)
-        loginDetectionDelegate.loginDetectedLD.observeForever(loginDetectionObserver)
+        loginDetectionDelegate.loginEventLiveData.observeForever(loginDetectionObserver)
     }
 
     fun loadData(tabId: String, initialUrl: String?, skipHome: Boolean) {
@@ -345,7 +345,7 @@ class BrowserTabViewModel(
         autoCompleteDisposable?.dispose()
         autoCompleteDisposable = null
         fireproofWebsiteState.removeObserver(fireproofWebsitesObserver)
-        loginDetectionDelegate.loginDetectedLD.removeObserver(loginDetectionObserver)
+        loginDetectionDelegate.loginEventLiveData.removeObserver(loginDetectionObserver)
         super.onCleared()
     }
 
