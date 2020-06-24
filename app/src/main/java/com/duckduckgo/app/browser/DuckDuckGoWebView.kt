@@ -35,10 +35,12 @@ import androidx.core.view.ViewCompat
  * Originally based on https://github.com/takahirom/webview-in-coordinatorlayout for scrolling behaviour
  */
 class DuckDuckGoWebView : WebView, NestedScrollingChild {
-    private var lastClampedY: Boolean = false
+    private var lastClampedTopY: Boolean = false
+    private var contentAllowsSwipeToRefresh: Boolean = true
     private var enableSwipeRefreshCallback: ((Boolean) -> Unit)? = null
 
     private var lastY: Int = 0
+    private var lastDeltaY: Int = 0
     private val scrollOffset = IntArray(2)
     private val scrollConsumed = IntArray(2)
     private var nestedOffsetY: Int = 0
@@ -78,7 +80,7 @@ class DuckDuckGoWebView : WebView, NestedScrollingChild {
                 var deltaY = lastY - eventY
 
                 if (deltaY > 0) {
-                    lastClampedY = false
+                    lastClampedTopY = false
                 }
 
                 if (dispatchNestedPreScroll(0, deltaY, scrollConsumed, scrollOffset)) {
@@ -90,15 +92,18 @@ class DuckDuckGoWebView : WebView, NestedScrollingChild {
 
                 returnValue = super.onTouchEvent(event)
 
-                if (scrollY == 0 && lastClampedY) {
+                if (scrollY == 0 && lastClampedTopY) {
                     // we have reached the top and are clamped -> enable swipeRefresh (by default always disabled)
                     enableSwipeRefresh(true)
+
                     stopNestedScroll()
                 } else if (dispatchNestedScroll(0, scrollOffset[1], 0, deltaY, scrollOffset)) {
                     event.offsetLocation(0f, scrollOffset[1].toFloat())
                     nestedOffsetY += scrollOffset[1]
                     lastY -= scrollOffset[1]
                 }
+
+                lastDeltaY = deltaY
             }
 
             MotionEvent.ACTION_DOWN -> {
@@ -146,17 +151,25 @@ class DuckDuckGoWebView : WebView, NestedScrollingChild {
         nestedScrollHelper.dispatchNestedPreFling(velocityX, velocityY)
 
     override fun onOverScrolled(scrollX: Int, scrollY: Int, clampedX: Boolean, clampedY: Boolean) {
-        lastClampedY = clampedY
+        // taking into account lastDeltaY since we are only interested whether we clamped at the top
+        lastClampedTopY = clampedY && lastDeltaY <= 0
         enableSwipeRefresh(clampedY && scrollY == 0)
         super.onOverScrolled(scrollX, scrollY, clampedX, clampedY)
     }
 
     private fun enableSwipeRefresh(enable: Boolean) {
-        enableSwipeRefreshCallback?.invoke(enable)
+        enableSwipeRefreshCallback?.invoke(enable && contentAllowsSwipeToRefresh)
     }
 
     fun setEnableSwipeRefreshCallback(callback: (Boolean) -> Unit) {
         enableSwipeRefreshCallback = callback
+    }
+
+    fun setContentAllowsSwipeToRefresh(allowed: Boolean) {
+        contentAllowsSwipeToRefresh = allowed
+        if (!allowed) {
+            enableSwipeRefresh(false)
+        }
     }
 
     companion object {

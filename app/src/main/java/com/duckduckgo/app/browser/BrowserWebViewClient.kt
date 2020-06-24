@@ -137,12 +137,23 @@ class BrowserWebViewClient(
             val navigationList = webView.safeCopyBackForwardList() ?: return
             webViewClientListener?.navigationStateChanged(WebViewNavigationState(navigationList))
             flushCookies()
+            detectOverscrollBehavior(webView)
         } catch (e: Throwable) {
             GlobalScope.launch {
                 uncaughtExceptionRepository.recordUncaughtException(e, ON_PAGE_FINISHED)
                 throw e
             }
         }
+    }
+
+    private fun detectOverscrollBehavior(webView: WebView) {
+        webView.loadUrl(
+            """
+                        javascript:(function() {
+                            ddg_swipe_handler.registerOverscrollBehavior(getComputedStyle(document.querySelector('body')).overscrollBehaviorY);
+                        })();
+                    """
+        )
     }
 
     private fun flushCookies() {
@@ -240,6 +251,13 @@ class BrowserWebViewClient(
             )
 
             it.requiresAuthentication(request)
+        }
+    }
+
+    class WebAppInterface internal constructor(private var enableSwipeRefresh: (Boolean) -> Unit) {
+        @JavascriptInterface
+        fun registerOverscrollBehavior(behavior: String) {
+            enableSwipeRefresh(behavior == "auto")
         }
     }
 }

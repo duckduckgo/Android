@@ -834,8 +834,13 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
             }
 
             it.setEnableSwipeRefreshCallback { enable ->
-                swipeRefreshContainer?.isEnabled = enable
+                activity?.runOnUiThread {
+                    swipeRefreshContainer?.isEnabled = enable
+                }
             }
+            it.addJavascriptInterface(BrowserWebViewClient.WebAppInterface { enable ->
+                it.setContentAllowsSwipeToRefresh(enable)
+            }, "ddg_swipe_handler")
 
             registerForContextMenu(it)
 
