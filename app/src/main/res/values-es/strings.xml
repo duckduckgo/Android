@@ -428,7 +428,7 @@
     <string name="whitelistRemove">Deshabilitar Protección</string>
     <string name="whitelistEntryOverflowContentDescription">Más opciones para el sitio desprotegido %s</string>
     <string name="whitelistEntryDeleteConfirmMessage">Seguro que quieres habilitar de nuevo Protección de Privacidad para el sitio &lt;b>%s&lt;/b>?</string>
-    <string name="whitelistExplanation">Estos sitios no estarán mejorados por Protección de Privacidad</string>
+    <string name="whitelistExplanation">La Protección de Privacidad no está aplicada a estos sitios</string>
     <string name="whitelistNoEntries">Protección de Privacidad está habilitado para todos los sitios.</string>
     <string name="whitelistDomainHint">www.ejemplo.com</string>
     <string name="whitelistFormatError">No se ha podido guardar, ingresa un dominio como <b>ejemplo.com</b></string>
