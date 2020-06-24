@@ -96,7 +96,6 @@ class NextPageLoginDetectionTest {
         assertEventNotIssued<LoginDetected>()
     }
 
-
     @Test
     fun whenLoginAttemptedAndNextPageFinishedThenLoadingNewPageDoesNotDetectLogin() {
         loginDetector.onEvent(NavigationEvent.LoginAttempt("http://example.com/login"))

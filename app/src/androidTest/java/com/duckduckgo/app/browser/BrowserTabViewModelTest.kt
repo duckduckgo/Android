@@ -41,6 +41,9 @@ import com.duckduckgo.app.browser.LongPressHandler.RequiredAction.DownloadFile
 import com.duckduckgo.app.browser.LongPressHandler.RequiredAction.OpenInNewTab
 import com.duckduckgo.app.browser.addtohome.AddToHomeCapabilityDetector
 import com.duckduckgo.app.browser.favicon.FaviconDownloader
+import com.duckduckgo.app.browser.logindetection.LoginDetected
+import com.duckduckgo.app.browser.logindetection.NavigationAwareLoginDetector
+import com.duckduckgo.app.browser.logindetection.NavigationEvent.LoginAttempt
 import com.duckduckgo.app.browser.model.BasicAuthenticationCredentials
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.browser.model.LongPressTarget
@@ -49,14 +52,10 @@ import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.cta.db.DismissedCtaDao
 import com.duckduckgo.app.cta.model.CtaId
 import com.duckduckgo.app.cta.model.DismissedCta
+import com.duckduckgo.app.cta.ui.*
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteDao
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepository
-import com.duckduckgo.app.cta.ui.Cta
-import com.duckduckgo.app.cta.ui.CtaViewModel
-import com.duckduckgo.app.cta.ui.DaxBubbleCta
-import com.duckduckgo.app.cta.ui.DaxDialogCta
-import com.duckduckgo.app.cta.ui.HomePanelCta
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.model.SiteFactory
@@ -95,14 +94,10 @@ import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import org.mockito.ArgumentCaptor
+import org.mockito.*
 import org.mockito.ArgumentMatchers.anyString
-import org.mockito.Captor
-import org.mockito.Mock
-import org.mockito.Mockito
 import org.mockito.Mockito.never
 import org.mockito.Mockito.verify
-import org.mockito.MockitoAnnotations
 import java.util.concurrent.TimeUnit
 
 @ExperimentalCoroutinesApi
@@ -190,6 +185,9 @@ class BrowserTabViewModelTest {
     @Mock
     private lateinit var mockUserWhitelistDao: UserWhitelistDao
 
+    @Mock
+    private lateinit var mockNavigationAwareLoginDetector: NavigationAwareLoginDetector
+
     private lateinit var mockAutoCompleteApi: AutoCompleteApi
 
     private lateinit var ctaViewModel: CtaViewModel
@@ -204,6 +202,8 @@ class BrowserTabViewModelTest {
     private lateinit var fireproofWebsiteDao: FireproofWebsiteDao
 
     private val selectedTabLiveData = MutableLiveData<TabEntity>()
+
+    private val loginEventLiveData = MutableLiveData<LoginDetected>()
 
     @Before
     fun before() {
@@ -235,6 +235,7 @@ class BrowserTabViewModelTest {
         whenever(mockOmnibarConverter.convertQueryToUrl(any(), any())).thenReturn("duckduckgo.com")
         whenever(mockVariantManager.getVariant()).thenReturn(DEFAULT_VARIANT)
         whenever(mockTabsRepository.liveSelectedTab).thenReturn(selectedTabLiveData)
+        whenever(mockNavigationAwareLoginDetector.loginEventLiveData).thenReturn(loginEventLiveData)
         whenever(mockTabsRepository.retrieveSiteData(any())).thenReturn(MutableLiveData())
         whenever(mockPrivacyPractices.privacyPracticesFor(any())).thenReturn(PrivacyPractices.UNKNOWN)
         whenever(mockAppInstallStore.installTimestamp).thenReturn(System.currentTimeMillis() - TimeUnit.DAYS.toMillis(1))
@@ -261,6 +262,7 @@ class BrowserTabViewModelTest {
             pixel = mockPixel,
             dispatchers = coroutineRule.testDispatcherProvider,
             fireproofWebsiteRepository = FireproofWebsiteRepository(fireproofWebsiteDao, coroutineRule.testDispatcherProvider),
+            navigationAwareLoginDetector = mockNavigationAwareLoginDetector,
             variantManager = mockVariantManager
         )
 
@@ -1890,17 +1892,24 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenLoginAttempDetectedThenNotifyNavigationAwareLoginDetector() {
+        loadUrl("http://example.com/", isBrowserShowing = true)
+
+        testee.loginDetected()
+
+        verify(mockNavigationAwareLoginDetector).onEvent(LoginAttempt("http://example.com/"))
+    }
+
+    @Test
     fun whenLoginDetectedOnAFireproofedWebsiteThenDoNotAskToFireproofWebsite() {
         givenFireproofWebsiteDomain("example.com")
-        loadUrl("http://example.com/", isBrowserShowing = true)
-        testee.loginDetected()
+        loginEventLiveData.value = givenLoginDetected("example.com")
         assertCommandNotIssued<Command.AskToFireproofWebsite>()
     }
 
     @Test
-    fun whenLoginDetectedOnANonFireproofedWebsiteThenAskToFireproofWebsite() {
-        loadUrl("http://example.com/", isBrowserShowing = true)
-        testee.loginDetected()
+    fun whenLoginDetectedThenAskToFireproofWebsite() {
+        loginEventLiveData.value = givenLoginDetected("example.com")
         assertCommandIssued<Command.AskToFireproofWebsite> {
             assertEquals(FireproofWebsiteEntity("example.com"), this.fireproofWebsite)
         }
@@ -2086,6 +2095,8 @@ class BrowserTabViewModelTest {
             fireproofWebsiteDao.insert(FireproofWebsiteEntity(domain = it))
         }
     }
+
+    private fun givenLoginDetected(domain: String) = LoginDetected(authLoginDomain = "", forwardedToDomain = domain)
 
     private fun setBrowserShowing(isBrowsing: Boolean) {
         testee.browserViewState.value = browserViewState().copy(browserShowing = isBrowsing)
