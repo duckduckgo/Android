@@ -40,7 +40,7 @@
     <string name="whitelistAdd">Turn Protection On</string>
     <string name="whitelistRemove">Turn Protection Off</string>
     <string name="whitelistEntryOverflowContentDescription">More options for unprotected site %s</string>
-    <string name="whitelistEntryDeleteConfirmMessage">Are you sure you want to turn Privacy Protection on again for &lt;b>%s&lt;/b> ?</string>
+    <string name="whitelistEntryDeleteConfirmMessage">Are you sure you want to turn Privacy Protection on again for &lt;b>%s&lt;/b>?</string>
     <string name="whitelistExplanation">These sites will not be enhanced by Privacy Protection</string>
     <string name="whitelistNoEntries">Privacy Protection is on for all sites.</string>
 
