@@ -22,6 +22,7 @@ import androidx.lifecycle.Observer
 import com.duckduckgo.app.browser.BrowserViewModel.Command
 import com.duckduckgo.app.browser.BrowserViewModel.Command.DisplayMessage
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
+import com.duckduckgo.app.cta.ui.UseOurAppCta
 import com.duckduckgo.app.fire.DataClearer
 import com.duckduckgo.app.global.rating.AppEnjoymentPromptEmitter
 import com.duckduckgo.app.global.rating.AppEnjoymentPromptOptions
@@ -43,7 +44,6 @@ import org.mockito.ArgumentCaptor
 import org.mockito.Captor
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations
-import java.util.Arrays.asList
 
 class BrowserViewModelTest {
 
@@ -127,7 +127,7 @@ class BrowserViewModelTest {
 
     @Test
     fun whenTabsUpdatedWithTabsThenNewTabNotLaunched() = runBlocking {
-        testee.onTabsUpdated(asList(TabEntity(TAB_ID, "", "", false, true, 0)))
+        testee.onTabsUpdated(listOf(TabEntity(TAB_ID, "", "", skipHome = false, viewed = true, position = 0)))
         verify(mockCommandObserver, never()).onChanged(any())
     }
 
@@ -168,6 +168,30 @@ class BrowserViewModelTest {
     @Test
     fun whenViewStateCreatedThenWebViewContentShouldBeHidden() {
         assertTrue(testee.viewState.value!!.hideWebContent)
+    }
+
+    @Test
+    fun whenOpenShortcutThenSelectByUrlOrNewTab() {
+        val url = "example.com"
+        whenever(mockOmnibarEntryConverter.convertQueryToUrl(url)).thenReturn(url)
+        testee.onOpenShortcut(url)
+        verify(mockTabRepository).selectByUrlOrNewTab(url, url)
+    }
+
+    @Test
+    fun whenOpenShortcutIfUrlIsUSeOurAppUrlThenFirePixel() {
+        val url = UseOurAppCta.USE_OUR_APP_SHORTCUT_URL
+        whenever(mockOmnibarEntryConverter.convertQueryToUrl(url)).thenReturn(url)
+        testee.onOpenShortcut(url)
+        verify(mockPixel).fire(Pixel.PixelName.USE_OUR_APP_SHORTCUT_OPENED)
+    }
+
+    @Test
+    fun whenOpenShortcutIfUrlIsNotUSeOurAppUrlThenFirePixel() {
+        val url = "example.com"
+        whenever(mockOmnibarEntryConverter.convertQueryToUrl(url)).thenReturn(url)
+        testee.onOpenShortcut(url)
+        verify(mockPixel).fire(Pixel.PixelName.SHORTCUT_OPENED)
     }
 
     companion object {
