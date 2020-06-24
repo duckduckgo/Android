@@ -17,58 +17,65 @@
 package com.duckduckgo.app.browser.logindetection
 
 import android.net.Uri
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.duckduckgo.app.browser.WebNavigationStateChange
 import timber.log.Timber
+import javax.inject.Inject
 
-class LoginDetectionDelegate {
+interface NavigationAwareLoginDetection {
+    val loginEventLiveData: LiveData<LoginDetected>
+    fun onEvent(navigationEvent: NavigationEvent)
+}
 
-    private var loginAttempt: Event.LoginAttempt? = null
-    var loginEventLiveData = MutableLiveData<LoginDetected>()
+data class LoginDetected(val authLoginDomain: String, val forwardedToDomain: String)
 
-    data class LoginDetected(val authLoginDomain: String, val forwardedToDomain: String)
-
-    sealed class Event {
-        sealed class UserAction : Event() {
-            object NavigateForward : UserAction()
-            object NavigateBack : UserAction()
-            object NewQuerySubmitted : UserAction()
-            object Refresh : UserAction()
-        }
-
-        data class WebNavigationEvent(val navigationStateChange: WebNavigationStateChange) : Event()
-        object PageFinished : Event()
-        data class LoginAttempt(val url: String) : Event()
+sealed class NavigationEvent {
+    sealed class UserAction : NavigationEvent() {
+        object NavigateForward : UserAction()
+        object NavigateBack : UserAction()
+        object NewQuerySubmitted : UserAction()
+        object Refresh : UserAction()
     }
 
-    fun onEvent(event: Event) {
-        Timber.i("LoginDetectionDelegate $event")
-        return when (event) {
-            is Event.PageFinished -> {
+    data class WebNavigationEvent(val navigationStateChange: WebNavigationStateChange) : NavigationEvent()
+    object PageFinished : NavigationEvent()
+    data class LoginAttempt(val url: String) : NavigationEvent()
+}
+
+class LoginDetectionDelegate @Inject constructor() : NavigationAwareLoginDetection {
+
+    private var loginAttempt: NavigationEvent.LoginAttempt? = null
+    override val loginEventLiveData = MutableLiveData<LoginDetected>()
+
+    override fun onEvent(navigationEvent: NavigationEvent) {
+        Timber.i("LoginDetectionDelegate $navigationEvent")
+        return when (navigationEvent) {
+            is NavigationEvent.PageFinished -> {
                 discardLoginAttempt()
             }
-            is Event.WebNavigationEvent -> {
-                handleNavigationEvent(event)
+            is NavigationEvent.WebNavigationEvent -> {
+                handleNavigationEvent(navigationEvent)
             }
-            is Event.LoginAttempt -> {
-                saveLoginAttempt(event)
+            is NavigationEvent.LoginAttempt -> {
+                saveLoginAttempt(navigationEvent)
             }
-            is Event.UserAction -> {
+            is NavigationEvent.UserAction -> {
                 discardLoginAttempt()
             }
         }
     }
 
-    private fun saveLoginAttempt(event: Event.LoginAttempt) {
-        loginAttempt = event
+    private fun saveLoginAttempt(navigationEvent: NavigationEvent.LoginAttempt) {
+        loginAttempt = navigationEvent
     }
 
     private fun discardLoginAttempt() {
         loginAttempt = null
     }
 
-    private fun handleNavigationEvent(event: Event.WebNavigationEvent) {
-        return when (val navigationStateChange = event.navigationStateChange) {
+    private fun handleNavigationEvent(navigationEvent: NavigationEvent.WebNavigationEvent) {
+        return when (val navigationStateChange = navigationEvent.navigationStateChange) {
             is WebNavigationStateChange.NewPage -> {
                 detectLogin(navigationStateChange.url)
             }

@@ -26,7 +26,7 @@ import com.duckduckgo.app.settings.db.SettingsDataStore
 import timber.log.Timber
 import javax.inject.Inject
 
-interface LoginDetector {
+interface DOMLoginDetector {
     fun addLoginDetection(webView: WebView, onLoginDetected: () -> Unit)
     fun onEvent(event: WebNavigationEvent)
 }
@@ -36,7 +36,7 @@ sealed class WebNavigationEvent {
     data class ShouldInterceptRequest(val webView: WebView, val request: WebResourceRequest) : WebNavigationEvent()
 }
 
-class JsLoginDetector @Inject constructor(private val settingsDataStore: SettingsDataStore) : LoginDetector {
+class JsLoginDetector @Inject constructor(private val settingsDataStore: SettingsDataStore) : DOMLoginDetector {
     private val javaScriptDetector = JavaScriptDetector()
     private val loginPathRegex = Regex("login|sign-in|signin|sessions")
 

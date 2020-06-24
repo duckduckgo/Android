@@ -51,7 +51,9 @@ import com.duckduckgo.app.browser.SpecialUrlDetector.UrlType.IntentType
 import com.duckduckgo.app.browser.WebNavigationStateChange.*
 import com.duckduckgo.app.browser.addtohome.AddToHomeCapabilityDetector
 import com.duckduckgo.app.browser.favicon.FaviconDownloader
-import com.duckduckgo.app.browser.logindetection.LoginDetectionDelegate
+import com.duckduckgo.app.browser.logindetection.NavigationEvent
+import com.duckduckgo.app.browser.logindetection.LoginDetected
+import com.duckduckgo.app.browser.logindetection.NavigationAwareLoginDetection
 import com.duckduckgo.app.browser.model.BasicAuthenticationCredentials
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.browser.model.LongPressTarget
@@ -103,6 +105,7 @@ class BrowserTabViewModel(
     private val networkLeaderboardDao: NetworkLeaderboardDao,
     private val bookmarksDao: BookmarksDao,
     private val fireproofWebsiteRepository: FireproofWebsiteRepository,
+    private val loginDetectionDelegate: NavigationAwareLoginDetection,
     private val autoComplete: AutoComplete,
     private val appSettingsPreferencesStore: SettingsDataStore,
     private val longPressHandler: LongPressHandler,
@@ -116,8 +119,6 @@ class BrowserTabViewModel(
     private val dispatchers: DispatcherProvider = DefaultDispatcherProvider(),
     private val variantManager: VariantManager
 ) : WebViewClientListener, EditBookmarkListener, HttpAuthenticationListener, ViewModel() {
-
-    private val loginDetectionDelegate = LoginDetectionDelegate()
 
     private var buildingSiteFactoryJob: Job? = null
 
@@ -268,7 +269,7 @@ class BrowserTabViewModel(
         browserViewState.value = currentBrowserViewState().copy(isFireproofWebsite = isFireproofWebsite())
     }
 
-    private val loginDetectionObserver = Observer<LoginDetectionDelegate.LoginDetected> { loginEvent ->
+    private val loginDetectionObserver = Observer<LoginDetected> { loginEvent ->
         Timber.i("LoginDetection for $loginEvent")
         if (!isFireproofWebsite(loginEvent.forwardedToDomain)) {
             pixel.fire(PixelName.FIREPROOF_LOGIN_DIALOG_SHOWN)
@@ -391,7 +392,7 @@ class BrowserTabViewModel(
     }
 
     fun onUserSubmittedQuery(query: String) {
-        loginDetectionDelegate.onEvent(LoginDetectionDelegate.Event.UserAction.NewQuerySubmitted)
+        loginDetectionDelegate.onEvent(NavigationEvent.UserAction.NewQuerySubmitted)
 
         if (query.isBlank()) {
             return
@@ -474,7 +475,7 @@ class BrowserTabViewModel(
     }
 
     fun onUserPressedForward() {
-        loginDetectionDelegate.onEvent(LoginDetectionDelegate.Event.UserAction.NavigateForward)
+        loginDetectionDelegate.onEvent(NavigationEvent.UserAction.NavigateForward)
         if (!currentBrowserViewState().browserShowing) {
             browserViewState.value = browserStateModifier.copyForBrowserShowing(currentBrowserViewState())
             findInPageViewState.value = currentFindInPageViewState().copy(canFindInPage = true)
@@ -485,7 +486,7 @@ class BrowserTabViewModel(
     }
 
     fun onRefreshRequested() {
-        loginDetectionDelegate.onEvent(LoginDetectionDelegate.Event.UserAction.Refresh)
+        loginDetectionDelegate.onEvent(NavigationEvent.UserAction.Refresh)
         if (currentGlobalLayoutState() is Invalidated) {
             recoverTabWithQuery(url.orEmpty())
         } else {
@@ -500,7 +501,7 @@ class BrowserTabViewModel(
      * @return true if navigation handled, otherwise false
      */
     fun onUserPressedBack(): Boolean {
-        loginDetectionDelegate.onEvent(LoginDetectionDelegate.Event.UserAction.NavigateBack)
+        loginDetectionDelegate.onEvent(NavigationEvent.UserAction.NavigateBack)
         val navigation = webNavigationState ?: return false
 
         if (currentFindInPageViewState().visible) {
@@ -572,7 +573,7 @@ class BrowserTabViewModel(
             is UrlUpdated -> urlUpdated(stateChange.url)
             is PageNavigationCleared -> disableUserNavigation()
         }
-        loginDetectionDelegate.onEvent(LoginDetectionDelegate.Event.WebNavigationEvent(stateChange))
+        loginDetectionDelegate.onEvent(NavigationEvent.WebNavigationEvent(stateChange))
     }
 
     private fun pageChanged(url: String, title: String?) {
@@ -710,7 +711,7 @@ class BrowserTabViewModel(
         val showLoadingGrade = progress.privacyOn || isLoading
         privacyGradeViewState.value = currentPrivacyGradeState().copy(shouldAnimate = isLoading, showEmptyGrade = showLoadingGrade)
         if (newProgress == 100) {
-            loginDetectionDelegate.onEvent(LoginDetectionDelegate.Event.PageFinished)
+            loginDetectionDelegate.onEvent(NavigationEvent.PageFinished)
         }
     }
 
@@ -1294,7 +1295,7 @@ class BrowserTabViewModel(
 
     override fun loginDetected() {
         val currentUrl = site?.url ?: return
-        loginDetectionDelegate.onEvent(LoginDetectionDelegate.Event.LoginAttempt(currentUrl))
+        loginDetectionDelegate.onEvent(NavigationEvent.LoginAttempt(currentUrl))
     }
 
     companion object {

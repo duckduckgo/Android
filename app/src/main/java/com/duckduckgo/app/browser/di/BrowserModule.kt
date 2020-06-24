@@ -26,7 +26,7 @@ import com.duckduckgo.app.browser.defaultbrowsing.AndroidDefaultBrowserDetector
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserObserver
 import com.duckduckgo.app.browser.logindetection.JsLoginDetector
-import com.duckduckgo.app.browser.logindetection.LoginDetector
+import com.duckduckgo.app.browser.logindetection.DOMLoginDetector
 import com.duckduckgo.app.browser.session.WebViewSessionInMemoryStorage
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.browser.tabpreview.FileBasedWebViewPreviewGenerator
@@ -77,7 +77,7 @@ class BrowserModule {
         offlinePixelCountDataStore: OfflinePixelCountDataStore,
         uncaughtExceptionRepository: UncaughtExceptionRepository,
         cookieManager: CookieManager,
-        loginDetector: LoginDetector
+        loginDetector: DOMLoginDetector
     ): BrowserWebViewClient {
         return BrowserWebViewClient(
             requestRewriter,
@@ -209,7 +209,7 @@ class BrowserModule {
     }
 
     @Provides
-    fun loginDetector(settingsDataStore: SettingsDataStore): LoginDetector {
+    fun loginDetector(settingsDataStore: SettingsDataStore): DOMLoginDetector {
         return JsLoginDetector(settingsDataStore)
     }
 }

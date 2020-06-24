@@ -23,7 +23,7 @@ import android.webkit.*
 import androidx.annotation.RequiresApi
 import androidx.annotation.UiThread
 import androidx.annotation.WorkerThread
-import com.duckduckgo.app.browser.logindetection.LoginDetector
+import com.duckduckgo.app.browser.logindetection.DOMLoginDetector
 import com.duckduckgo.app.browser.logindetection.WebNavigationEvent
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.browser.navigation.safeCopyBackForwardList
@@ -41,7 +41,7 @@ class BrowserWebViewClient(
     private val offlinePixelCountDataStore: OfflinePixelCountDataStore,
     private val uncaughtExceptionRepository: UncaughtExceptionRepository,
     private val cookieManager: CookieManager,
-    private val loginDetector: LoginDetector
+    private val loginDetector: DOMLoginDetector
 ) : WebViewClient() {
 
     var webViewClientListener: WebViewClientListener? = null
