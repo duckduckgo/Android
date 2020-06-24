@@ -23,7 +23,7 @@ import com.duckduckgo.app.browser.WebNavigationStateChange
 import timber.log.Timber
 import javax.inject.Inject
 
-interface NavigationAwareLoginDetection {
+interface NavigationAwareLoginDetector {
     val loginEventLiveData: LiveData<LoginDetected>
     fun onEvent(navigationEvent: NavigationEvent)
 }
@@ -43,7 +43,7 @@ sealed class NavigationEvent {
     data class LoginAttempt(val url: String) : NavigationEvent()
 }
 
-class LoginDetectionDelegate @Inject constructor() : NavigationAwareLoginDetection {
+class NextPageLoginDetection @Inject constructor() : NavigationAwareLoginDetector {
 
     private var loginAttempt: NavigationEvent.LoginAttempt? = null
     override val loginEventLiveData = MutableLiveData<LoginDetected>()

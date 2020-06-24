@@ -27,6 +27,7 @@ import com.duckduckgo.app.browser.*
 import com.duckduckgo.app.browser.addtohome.AddToHomeCapabilityDetector
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.browser.favicon.FaviconDownloader
+import com.duckduckgo.app.browser.logindetection.NavigationAwareLoginDetector
 import com.duckduckgo.app.browser.omnibar.QueryUrlConverter
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.cta.ui.CtaViewModel
@@ -86,6 +87,7 @@ class ViewModelFactory @Inject constructor(
     private val networkLeaderboardDao: NetworkLeaderboardDao,
     private val bookmarksDao: BookmarksDao,
     private val fireproofWebsiteRepository: FireproofWebsiteRepository,
+    private val navigationAwareLoginDetector: NavigationAwareLoginDetector,
     private val surveyDao: SurveyDao,
     private val autoCompleteApi: AutoCompleteApi,
     private val deviceAppLookup: DeviceAppLookup,
@@ -186,6 +188,7 @@ class ViewModelFactory @Inject constructor(
         networkLeaderboardDao = networkLeaderboardDao,
         bookmarksDao = bookmarksDao,
         fireproofWebsiteRepository = fireproofWebsiteRepository,
+        navigationAwareLoginDetector = navigationAwareLoginDetector,
         autoComplete = autoCompleteApi,
         appSettingsPreferencesStore = appSettingsPreferencesStore,
         longPressHandler = webViewLongPressHandler,
