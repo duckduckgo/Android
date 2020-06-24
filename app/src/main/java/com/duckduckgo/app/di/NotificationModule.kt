@@ -62,7 +62,7 @@ class NotificationModule {
     }
 
     @Provides
-    fun provideFacebookNotification(
+    fun provideUseOurAppNotification(
         context: Context,
         notificationDao: NotificationDao
     ): UseOurAppNotification {

@@ -69,9 +69,9 @@ interface Cta {
 }
 
 class UseOurAppCta(
-    @StringRes val text: Int = R.string.facebookDialogText,
-    @StringRes val okButton: Int = R.string.facebookDialogButtonText,
-    @StringRes val cancelButton: Int = R.string.facebookDialogCancelButtonText,
+    @StringRes val text: Int = R.string.useOurAppDialogText,
+    @StringRes val okButton: Int = R.string.useOurAppDialogButtonText,
+    @StringRes val cancelButton: Int = R.string.useOurAppDialogCancelButtonText,
     override val ctaId: CtaId = CtaId.USE_OUR_APP,
     override val shownPixel: Pixel.PixelName? = Pixel.PixelName.USE_OUR_APP_DIALOG_SHOWN,
     override val okPixel: Pixel.PixelName? = Pixel.PixelName.USE_OUR_APP_DIALOG_OK,
@@ -92,10 +92,17 @@ class UseOurAppCta(
     override fun pixelOkParameters(): Map<String, String> = emptyMap()
 
     override fun pixelShownParameters(): Map<String, String> = emptyMap()
+
+    companion object {
+        const val USE_OUR_APP_SHORTCUT_URL: String = "https://m.facebook.com"
+        const val USE_OUR_APP_SHORTCUT_TITLE: String = "Facebook"
+        const val USE_OUR_APP_DOMAIN = "facebook.com"
+        const val USE_OUR_APP_MOBILE_DOMAIN = "m.facebook.com"
+    }
 }
 
 class UseOurAppDeletionCta(
-    @StringRes val text: Int = R.string.deletionDialogText,
+    @StringRes val text: Int = R.string.useOurAppDeletionDialogText,
     @StringRes val okButton: Int = R.string.daxDialogGotIt,
     override val ctaId: CtaId = CtaId.USE_OUR_APP_DELETION,
     override val shownPixel: Pixel.PixelName? = Pixel.PixelName.USE_OUR_APP_DIALOG_DELETE_SHOWN,

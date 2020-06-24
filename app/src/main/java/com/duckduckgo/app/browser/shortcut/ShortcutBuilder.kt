@@ -26,6 +26,7 @@ import androidx.core.graphics.drawable.IconCompat
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.BrowserTabViewModel
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.cta.ui.UseOurAppCta.Companion.USE_OUR_APP_SHORTCUT_URL
 import java.util.UUID
 import javax.inject.Inject
 
@@ -65,8 +66,6 @@ class ShortcutBuilder @Inject constructor() {
     }
 
     companion object {
-        const val USE_OUR_APP_SHORTCUT_URL: String = "https://m.facebook.com"
-        const val USE_OUR_APP_SHORTCUT_TITLE: String = "Facebook"
         const val USE_OUR_APP_SHORTCUT_ADDED: String = "useOurAppShortcutAdded"
         const val USE_OUR_APP_SHORTCUT_ADDED_CODE = 9000
 

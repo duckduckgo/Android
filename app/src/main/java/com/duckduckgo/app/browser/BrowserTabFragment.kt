@@ -939,7 +939,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
 
     private fun hideKeyboardImmediately() {
         if (!isHidden) {
-            Timber.v("Keyboard now hiding immediately")
+            Timber.v("Keyboard now hiding")
             omnibarTextInput.hideKeyboard()
             focusDummy.requestFocus()
         }
@@ -955,7 +955,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
 
     private fun showKeyboardImmediately() {
         if (!isHidden) {
-            Timber.v("Keyboard now showing immediately")
+            Timber.v("Keyboard now showing")
             omnibarTextInput?.showKeyboard()
         }
     }

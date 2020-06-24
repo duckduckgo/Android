@@ -18,6 +18,8 @@ package com.duckduckgo.app.global.model
 
 import android.net.Uri
 import androidx.core.net.toUri
+import com.duckduckgo.app.cta.ui.UseOurAppCta.Companion.USE_OUR_APP_DOMAIN
+import com.duckduckgo.app.cta.ui.UseOurAppCta.Companion.USE_OUR_APP_MOBILE_DOMAIN
 import com.duckduckgo.app.global.baseHost
 import com.duckduckgo.app.global.model.SiteFactory.SitePrivacyData
 import com.duckduckgo.app.privacy.model.HttpsStatus
@@ -74,7 +76,7 @@ fun Site.domainMatchesUrl(matchingUrl: String): Boolean {
 
 fun Site?.isUseOurAppDomain(): Boolean {
     if (this == null) return false
-    return domainMatchesUrl("m.facebook.com") || domainMatchesUrl("facebook.com")
+    return domainMatchesUrl(USE_OUR_APP_DOMAIN) || domainMatchesUrl(USE_OUR_APP_MOBILE_DOMAIN)
 }
 
 val Site.domain get() = uri?.host

@@ -24,7 +24,7 @@ import android.widget.Toast
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.shortcut.ShortcutBuilder.Companion.SHORTCUT_TITLE_ARG
 import com.duckduckgo.app.browser.shortcut.ShortcutBuilder.Companion.SHORTCUT_URL_ARG
-import com.duckduckgo.app.browser.shortcut.ShortcutBuilder.Companion.USE_OUR_APP_SHORTCUT_URL
+import com.duckduckgo.app.cta.ui.UseOurAppCta.Companion.USE_OUR_APP_SHORTCUT_URL
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.timestamps.db.KeyTimestampEntity
 import com.duckduckgo.app.global.timestamps.db.KeyTimestampStore

@@ -56,11 +56,18 @@ import com.duckduckgo.app.cta.ui.CtaViewModel
 import com.duckduckgo.app.cta.ui.DaxBubbleCta
 import com.duckduckgo.app.cta.ui.DaxDialogCta
 import com.duckduckgo.app.cta.ui.HomePanelCta
+import com.duckduckgo.app.cta.ui.UseOurAppCta
+import com.duckduckgo.app.cta.ui.UseOurAppCta.Companion.USE_OUR_APP_DOMAIN
+import com.duckduckgo.app.cta.ui.UseOurAppCta.Companion.USE_OUR_APP_SHORTCUT_URL
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.global.install.AppInstallStore
+import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.global.model.SiteFactory
+import com.duckduckgo.app.global.timestamps.db.KeyTimestampEntity
 import com.duckduckgo.app.global.timestamps.db.KeyTimestampStore
+import com.duckduckgo.app.global.timestamps.db.TimestampKey.*
 import com.duckduckgo.app.notification.db.NotificationDao
+import com.duckduckgo.app.notification.model.UseOurAppNotification
 import com.duckduckgo.app.onboarding.store.AppStage
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.store.UserStageStore
@@ -1687,6 +1694,16 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenUserClickedUseOurAppCtaOkButtonThenLaunchAddHomeShortcutAndNavigateCommand() {
+        whenever(mockOmnibarConverter.convertQueryToUrl(USE_OUR_APP_SHORTCUT_URL, null)).thenReturn(USE_OUR_APP_SHORTCUT_URL)
+        val cta = UseOurAppCta()
+        setCta(cta)
+        testee.onUserClickCtaOkButton()
+        assertCommandIssued<Command.AddHomeShortcut>()
+        assertCommandIssued<Navigate>()
+    }
+
+    @Test
     fun whenSurveyCtaDismissedAndNoOtherCtaPossibleCtaIsNull() = coroutineRule.runBlocking {
         givenShownCtas(CtaId.DAX_INTRO, CtaId.DAX_END)
         testee.onSurveyChanged(Survey("abc", "http://example.com", daysInstalled = 1, status = Survey.Status.SCHEDULED))
@@ -1761,6 +1778,22 @@ class BrowserTabViewModelTest {
         setCta(cta)
         testee.onUserDismissedCta()
         verify(mockSurveyDao).cancelScheduledSurveys()
+    }
+
+    @Test
+    fun whenUserClickedSecondaryCtaButtonThenFirePixel() {
+        val cta = UseOurAppCta()
+        setCta(cta)
+        testee.onUserClickCtaSecondaryButton()
+        verify(mockPixel).fire(cta.cancelPixel!!, cta.pixelCancelParameters())
+    }
+
+    @Test
+    fun whenUserClickedSecondaryCtaButtonInUseOurAppCtaThenLaunchShowKeyboardCommand() {
+        val cta = UseOurAppCta()
+        setCta(cta)
+        testee.onUserClickCtaSecondaryButton()
+        assertCommandIssued<Command.ShowKeyboard>()
     }
 
     @Test
@@ -2022,6 +2055,75 @@ class BrowserTabViewModelTest {
         assertFalse(browserViewState().showDaxIcon)
     }
 
+    @Test
+    fun whenViewReadyIfDomainSameAsUseOurAppAfterNotificationSeenThenPixelSent() = coroutineRule.runBlocking {
+        givenUseOurAppSiteSelected()
+        whenever(mockNotificationDao.exists(UseOurAppNotification.ID)).thenReturn(true)
+        testee.onViewReady()
+        verify(mockPixel).fire(Pixel.PixelName.UOA_VISITED_AFTER_NOTIFICATION)
+    }
+
+    @Test
+    fun whenViewReadyIfDomainSameAsUseOurAppAfterShortcutAddedThenPixelSent() = coroutineRule.runBlocking {
+        givenUseOurAppSiteSelected()
+        whenever(mockKeyTimestampStore.getTimestamp(USE_OUR_APP_SHORTCUT_ADDED)).thenReturn(KeyTimestampEntity(USE_OUR_APP_SHORTCUT_ADDED))
+        testee.onViewReady()
+        verify(mockPixel).fire(Pixel.PixelName.UOA_VISITED_AFTER_SHORTCUT)
+    }
+
+    @Test
+    fun whenViewReadyIfDomainSameAsUseOurAppAfterDeleteCtaShownThenPixelSent() = coroutineRule.runBlocking {
+        givenUseOurAppSiteSelected()
+        whenever(mockDismissedCtaDao.exists(CtaId.USE_OUR_APP_DELETION)).thenReturn(true)
+        testee.onViewReady()
+        verify(mockPixel).fire(Pixel.PixelName.UOA_VISITED_AFTER_DELETE_CTA)
+    }
+
+    @Test
+    fun whenPageRefreshedIfPreviousOneWasNotUseOurAppSiteAfterNotificationSeenThenPixelSent() = coroutineRule.runBlocking {
+        whenever(mockNotificationDao.exists(UseOurAppNotification.ID)).thenReturn(true)
+        testee.pageRefreshed(USE_OUR_APP_DOMAIN)
+        verify(mockPixel).fire(Pixel.PixelName.UOA_VISITED_AFTER_NOTIFICATION)
+    }
+
+    @Test
+    fun whenPageRefreshedIfPreviousOneWasNotUseOurAppSiteAfterShortcutAddedThenPixelSent() = coroutineRule.runBlocking {
+        whenever(mockKeyTimestampStore.getTimestamp(USE_OUR_APP_SHORTCUT_ADDED)).thenReturn(KeyTimestampEntity(USE_OUR_APP_SHORTCUT_ADDED))
+        testee.pageRefreshed(USE_OUR_APP_DOMAIN)
+        verify(mockPixel).fire(Pixel.PixelName.UOA_VISITED_AFTER_SHORTCUT)
+    }
+
+    @Test
+    fun whenPageRefreshedIfPreviousOneWasNotUseOurAppSiteAfterDeleteCtaShownThenPixelSent() = coroutineRule.runBlocking {
+        whenever(mockDismissedCtaDao.exists(CtaId.USE_OUR_APP_DELETION)).thenReturn(true)
+        testee.pageRefreshed(USE_OUR_APP_DOMAIN)
+        verify(mockPixel).fire(Pixel.PixelName.UOA_VISITED_AFTER_DELETE_CTA)
+    }
+
+    @Test
+    fun whenPageRefreshedIfPreviousOneWasNotUseOurAppSiteAfterNotificationSeenThenPixelNotSent() = coroutineRule.runBlocking {
+        givenUseOurAppSiteSelected()
+        whenever(mockNotificationDao.exists(UseOurAppNotification.ID)).thenReturn(true)
+        testee.pageRefreshed(USE_OUR_APP_DOMAIN)
+        verify(mockPixel, never()).fire(Pixel.PixelName.UOA_VISITED_AFTER_NOTIFICATION)
+    }
+
+    @Test
+    fun whenPageRefreshedIfPreviousOneWasNotUseOurAppSiteAfterShortcutAddedThenPixelNotSent() = coroutineRule.runBlocking {
+        givenUseOurAppSiteSelected()
+        whenever(mockKeyTimestampStore.getTimestamp(USE_OUR_APP_SHORTCUT_ADDED)).thenReturn(KeyTimestampEntity(USE_OUR_APP_SHORTCUT_ADDED))
+        testee.pageRefreshed(USE_OUR_APP_DOMAIN)
+        verify(mockPixel, never()).fire(Pixel.PixelName.UOA_VISITED_AFTER_SHORTCUT)
+    }
+
+    @Test
+    fun whenPageRefreshedIfPreviousOneWasNotUseOurAppSiteThenAfterDeleteCtaShownPixelNotSent() = coroutineRule.runBlocking {
+        givenUseOurAppSiteSelected()
+        whenever(mockDismissedCtaDao.exists(CtaId.USE_OUR_APP_DELETION)).thenReturn(true)
+        testee.pageRefreshed(USE_OUR_APP_DOMAIN)
+        verify(mockPixel, never()).fire(Pixel.PixelName.UOA_VISITED_AFTER_DELETE_CTA)
+    }
+
     private inline fun <reified T : Command> assertCommandIssued(instanceAssertions: T.() -> Unit = {}) {
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
         val issuedCommand = commandCaptor.allValues.find { it is T }
@@ -2059,6 +2161,16 @@ class BrowserTabViewModelTest {
     private fun givenOneActiveTabSelected() {
         selectedTabLiveData.value = TabEntity("TAB_ID", "https://example.com", "", skipHome = false, viewed = true, position = 0)
         testee.loadData("TAB_ID", "https://example.com", false)
+    }
+
+    private fun givenUseOurAppSiteSelected() {
+        whenever(mockOmnibarConverter.convertQueryToUrl(USE_OUR_APP_DOMAIN, null)).thenReturn(USE_OUR_APP_DOMAIN)
+        val site: Site = mock()
+        whenever(site.url).thenReturn(USE_OUR_APP_DOMAIN)
+        val siteLiveData = MutableLiveData<Site>()
+        siteLiveData.value = site
+        whenever(mockTabsRepository.retrieveSiteData("TAB_ID")).thenReturn(siteLiveData)
+        testee.loadData("TAB_ID", USE_OUR_APP_DOMAIN, false)
     }
 
     private fun givenFireproofWebsiteDomain(vararg fireproofWebsitesDomain: String) {
