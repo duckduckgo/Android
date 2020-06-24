@@ -195,6 +195,7 @@ interface Pixel {
         USE_OUR_APP_DIALOG_DELETE_SHOWN("m_uoa_dd"),
         UOA_VISITED_AFTER_SHORTCUT("m_uoa_vas"),
         UOA_VISITED_AFTER_NOTIFICATION("m_uoa_van"),
+        UOA_VISITED_AFTER_DELETE_CTA("m_uoa_vad"),
 
         USE_OUR_APP_SHORTCUT_OPENED("m_sho_uoa_o"),
         SHORTCUT_OPENED("m_sho_o"),

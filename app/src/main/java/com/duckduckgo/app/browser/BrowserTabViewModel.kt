@@ -638,11 +638,12 @@ class BrowserTabViewModel(
         withContext(dispatchers.io()) {
             val isShortcutAdded = keyTimestampStore.getTimestamp(TimestampKey.USE_OUR_APP_SHORTCUT_ADDED)
             val isUseOurAppNotificationSeen = notificationDao.exists(UseOurAppNotification.ID)
+            val deleteCtaShown = ctaViewModel.useOurAppDeletionDialogShown()
 
-            if (isShortcutAdded != null) {
-                pixel.fire(PixelName.UOA_VISITED_AFTER_SHORTCUT)
-            } else if (isUseOurAppNotificationSeen) {
-                pixel.fire(PixelName.UOA_VISITED_AFTER_NOTIFICATION)
+            when {
+                deleteCtaShown -> pixel.fire(PixelName.UOA_VISITED_AFTER_DELETE_CTA)
+                isShortcutAdded != null -> pixel.fire(PixelName.UOA_VISITED_AFTER_SHORTCUT)
+                isUseOurAppNotificationSeen -> pixel.fire(PixelName.UOA_VISITED_AFTER_NOTIFICATION)
             }
         }
     }

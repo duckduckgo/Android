@@ -273,7 +273,7 @@ class CtaViewModel @Inject constructor(
         }
     }
 
-    private fun useOurAppDeletionDialogShown(): Boolean = dismissedCtaDao.exists(CtaId.USE_OUR_APP_DELETION)
+    fun useOurAppDeletionDialogShown(): Boolean = dismissedCtaDao.exists(CtaId.USE_OUR_APP_DELETION)
 
     private fun useOurAppDialogShown(): Boolean = dismissedCtaDao.exists(CtaId.USE_OUR_APP)
 
