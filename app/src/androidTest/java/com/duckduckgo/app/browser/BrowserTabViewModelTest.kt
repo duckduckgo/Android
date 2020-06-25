@@ -1781,14 +1781,6 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenUserClickedSecondaryCtaButtonThenFirePixel() {
-        val cta = UseOurAppCta()
-        setCta(cta)
-        testee.onUserClickCtaSecondaryButton()
-        verify(mockPixel).fire(cta.cancelPixel!!, cta.pixelCancelParameters())
-    }
-
-    @Test
     fun whenUserClickedSecondaryCtaButtonInUseOurAppCtaThenLaunchShowKeyboardCommand() {
         val cta = UseOurAppCta()
         setCta(cta)

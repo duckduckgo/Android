@@ -75,7 +75,7 @@ class UseOurAppCta(
     override val ctaId: CtaId = CtaId.USE_OUR_APP,
     override val shownPixel: Pixel.PixelName? = Pixel.PixelName.USE_OUR_APP_DIALOG_SHOWN,
     override val okPixel: Pixel.PixelName? = Pixel.PixelName.USE_OUR_APP_DIALOG_OK,
-    override val cancelPixel: Pixel.PixelName? = Pixel.PixelName.USE_OUR_APP_DIALOG_CANCELLED
+    override val cancelPixel: Pixel.PixelName? = null
 ) : Cta, DialogCta {
 
     override fun createCta(activity: FragmentActivity): DaxDialog =
