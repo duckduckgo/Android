@@ -34,7 +34,7 @@ import javax.inject.Singleton
 
 /**
  * Stores information about unsent automatic data clearer restart Pixels, detecting if user started the app from an external Intent.
- * Contains logic to sent unsent pixels.
+ * Contains logic to send unsent pixels.
  *
  * When writing values here to SharedPreferences, it is crucial to use `commit = true`. As otherwise the change can be lost in the process restart.
  */
@@ -67,7 +67,7 @@ class DataClearerForegroundAppRestartPixel @Inject constructor(
             Timber.i("Registered restart with intent")
             incrementCount(pendingAppForegroundRestart, KEY_UNSENT_CLEAR_APP_RESTARTED_WITH_INTENT_PIXELS)
         } else {
-            Timber.i("Registered restart w/ intent")
+            Timber.i("Registered restart without intent")
             incrementCount(pendingAppForegroundRestartWithIntent, KEY_UNSENT_CLEAR_APP_RESTARTED_PIXELS)
         }
     }
