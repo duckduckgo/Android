@@ -259,10 +259,7 @@ open class DuckDuckGoApplication : HasAndroidInjector, Application(), LifecycleO
             }
             unsentForgetAllPixelStore.resetCount()
         }
-        submitUnsentFireAppRestartedWithIntentPixels()
-    }
 
-    private fun submitUnsentFireAppRestartedWithIntentPixels() {
         dataClearerForegroundAppRestartPixel.firePendingPixels()
     }
 
