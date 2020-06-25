@@ -111,6 +111,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
+import java.lang.UnsupportedOperationException
 import java.util.Locale
 import java.util.concurrent.TimeUnit
 
@@ -460,8 +461,20 @@ class BrowserTabViewModel(
     }
 
     private fun fireQueryChangedPixel(omnibarText: String) {
-        val oldParameter = currentOmnibarViewState().omnibarText.toUri()?.getQueryParameter(AppUrl.ParamKey.QUERY)
-        val newParameter = omnibarText.toUri()?.getQueryParameter(AppUrl.ParamKey.QUERY)
+        val oldUri = currentOmnibarViewState().omnibarText.toUri()
+        val newUri = omnibarText.toUri()
+
+        val oldParameter = try {
+            oldUri.getQueryParameter(AppUrl.ParamKey.QUERY)
+        } catch (e: UnsupportedOperationException) {
+            null
+        }
+        val newParameter = try {
+            newUri.getQueryParameter(AppUrl.ParamKey.QUERY)
+        } catch (e: UnsupportedOperationException) {
+            null
+        }
+
         if (oldParameter == newParameter) {
             pixel.fire(String.format(Locale.US, PixelName.SERP_REQUERY.pixelName, PixelParameter.SERP_QUERY_NOT_CHANGED))
         } else {
