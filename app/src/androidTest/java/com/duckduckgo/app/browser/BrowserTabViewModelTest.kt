@@ -2051,6 +2051,12 @@ class BrowserTabViewModelTest {
         assertFalse(browserViewState().showDaxIcon)
     }
 
+    @Test
+    fun whenQueryIsNotHierarchicalThenUnsupportedOperationExceptionIsHandled() {
+        whenever(mockOmnibarConverter.convertQueryToUrl("about:blank", null)).thenReturn("about:blank")
+        testee.onUserSubmittedQuery("about:blank")
+    }
+
     private inline fun <reified T : Command> assertCommandIssued(instanceAssertions: T.() -> Unit = {}) {
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
         val issuedCommand = commandCaptor.allValues.find { it is T }

@@ -19,6 +19,7 @@ package com.duckduckgo.app.browser.di
 import android.content.ClipboardManager
 import android.content.Context
 import android.webkit.CookieManager
+import android.webkit.WebSettings
 import com.duckduckgo.app.browser.*
 import com.duckduckgo.app.browser.addtohome.AddToHomeCapabilityDetector
 import com.duckduckgo.app.browser.addtohome.AddToHomeSystemCapabilityDetector
@@ -35,10 +36,12 @@ import com.duckduckgo.app.browser.tabpreview.FileBasedWebViewPreviewGenerator
 import com.duckduckgo.app.browser.tabpreview.FileBasedWebViewPreviewPersister
 import com.duckduckgo.app.browser.tabpreview.WebViewPreviewGenerator
 import com.duckduckgo.app.browser.tabpreview.WebViewPreviewPersister
+import com.duckduckgo.app.browser.useragent.UserAgentProvider
 import com.duckduckgo.app.fire.*
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteDao
 import com.duckduckgo.app.global.AppUrl
 import com.duckduckgo.app.global.DispatcherProvider
+import com.duckduckgo.app.global.device.DeviceInfo
 import com.duckduckgo.app.global.exception.UncaughtExceptionRepository
 import com.duckduckgo.app.global.file.FileDeleter
 import com.duckduckgo.app.global.install.AppInstallStore
@@ -137,6 +140,12 @@ class BrowserModule {
 
     @Provides
     fun specialUrlDetector(): SpecialUrlDetector = SpecialUrlDetectorImpl()
+
+    @Provides
+    @Singleton
+    fun userAgentProvider(context: Context, deviceInfo: DeviceInfo): UserAgentProvider {
+        return UserAgentProvider(WebSettings.getDefaultUserAgent(context), deviceInfo)
+    }
 
     @Provides
     fun webViewRequestInterceptor(

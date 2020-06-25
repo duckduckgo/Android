@@ -80,7 +80,6 @@ import com.duckduckgo.app.cta.ui.*
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
 import com.duckduckgo.app.fire.fireproofwebsite.data.website
 import com.duckduckgo.app.global.ViewModelFactory
-import com.duckduckgo.app.global.device.DeviceInfo
 import com.duckduckgo.app.global.model.orderedTrackingEntities
 import com.duckduckgo.app.global.view.*
 import com.duckduckgo.app.privacy.renderer.icon
@@ -129,9 +128,6 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
     lateinit var viewModelFactory: ViewModelFactory
 
     @Inject
-    lateinit var deviceInfo: DeviceInfo
-
-    @Inject
     lateinit var fileChooserIntentBuilder: FileChooserIntentBuilder
 
     @Inject
@@ -172,6 +168,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
 
     val tabId get() = requireArguments()[TAB_ID_ARG] as String
 
+    @Inject
     lateinit var userAgentProvider: UserAgentProvider
 
     var messageFromPreviousTab: Message? = null
@@ -559,6 +556,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
             is Command.DaxCommand.HideDaxDialog -> showHideTipsDialog(it.cta)
             is Command.HideWebContent -> webView?.hide()
             is Command.ShowWebContent -> webView?.show()
+            is Command.RefreshUserAgent -> refreshUserAgent(it.host, it.isDesktop)
             is Command.AskToFireproofWebsite -> askToFireproofWebsite(requireContext(), it.fireproofWebsite)
         }
     }
@@ -806,13 +804,11 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
         ).findViewById(R.id.browserWebView) as WebView
 
         webView?.let {
-            userAgentProvider = UserAgentProvider(it.settings.userAgentString, deviceInfo)
-
             it.webViewClient = webViewClient
             it.webChromeClient = webChromeClient
 
             it.settings.apply {
-                userAgentString = userAgentProvider.getUserAgent()
+                userAgentString = userAgentProvider.userAgent()
                 javaScriptEnabled = true
                 domStorageEnabled = true
                 loadWithOverviewMode = true
@@ -975,6 +971,15 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
         }
     }
 
+    private fun refreshUserAgent(host: String?, isDesktop: Boolean) {
+        val currentAgent = webView?.settings?.userAgentString
+        val newAgent = userAgentProvider.userAgent(host, isDesktop)
+        if (newAgent != currentAgent) {
+            Timber.d("User Agent Changed, new ${if (isDesktop) "Desktop" else "Mobile"} UA is $newAgent")
+            webView?.settings?.userAgentString = newAgent
+        }
+    }
+
     /**
      * Attempting to save the WebView's state can result in a TransactionTooLargeException being thrown.
      * This will only happen if the bundle size is too large - but the exact size is undefined.
@@ -1043,7 +1048,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
             url = url,
             contentDisposition = contentDisposition,
             mimeType = mimeType,
-            userAgent = userAgentProvider.getUserAgent(),
+            userAgent = userAgentProvider.userAgent(),
             subfolder = Environment.DIRECTORY_DOWNLOADS
         )
 
@@ -1057,7 +1062,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
     private fun requestImageDownload(url: String, requestUserConfirmation: Boolean) {
         pendingFileDownload = PendingFileDownload(
             url = url,
-            userAgent = userAgentProvider.getUserAgent(),
+            userAgent = userAgentProvider.userAgent(),
             subfolder = Environment.DIRECTORY_PICTURES
         )
 
@@ -1517,7 +1522,6 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
                     }
                 }
 
-                toggleDesktopSiteMode(viewState.isDesktopBrowsingMode)
                 renderToolbarMenus(viewState)
                 renderPopupMenus(browserShowing, viewState)
                 renderFullscreenMode(viewState)
@@ -1548,6 +1552,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
                 whitelistPopupMenuItem?.text = getText(if (viewState.isWhitelisted) R.string.whitelistRemove else R.string.whitelistAdd)
                 brokenSitePopupMenuItem?.isEnabled = viewState.canReportSite
                 requestDesktopSiteCheckMenuItem?.isEnabled = viewState.canChangeBrowsingMode
+                requestDesktopSiteCheckMenuItem?.isChecked = viewState.isDesktopBrowsingMode
 
                 addToHome?.let {
                     it.visibility = if (viewState.addToHomeVisible) VISIBLE else GONE
@@ -1721,10 +1726,6 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
             } else {
                 findInPageMatches.hide()
             }
-        }
-
-        private fun toggleDesktopSiteMode(isDesktopSiteMode: Boolean) {
-            webView?.settings?.userAgentString = userAgentProvider.getUserAgent(isDesktopSiteMode)
         }
 
         private fun goFullScreen() {

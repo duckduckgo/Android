@@ -92,7 +92,8 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
-import java.util.*
+import java.lang.UnsupportedOperationException
+import java.util.Locale
 import java.util.concurrent.TimeUnit
 
 class BrowserTabViewModel(
@@ -227,6 +228,7 @@ class BrowserTabViewModel(
         object LaunchTabSwitcher : Command()
         object HideWebContent : Command()
         object ShowWebContent : Command()
+        class RefreshUserAgent(val host: String?, val isDesktop: Boolean) : Command()
 
         class ShowErrorWithAction(val action: () -> Unit) : Command()
         sealed class DaxCommand : Command() {
@@ -449,8 +451,20 @@ class BrowserTabViewModel(
     }
 
     private fun fireQueryChangedPixel(omnibarText: String) {
-        val oldParameter = currentOmnibarViewState().omnibarText.toUri()?.getQueryParameter(AppUrl.ParamKey.QUERY)
-        val newParameter = omnibarText.toUri()?.getQueryParameter(AppUrl.ParamKey.QUERY)
+        val oldUri = currentOmnibarViewState().omnibarText.toUri()
+        val newUri = omnibarText.toUri()
+
+        val oldParameter = try {
+            oldUri.getQueryParameter(AppUrl.ParamKey.QUERY)
+        } catch (e: UnsupportedOperationException) {
+            null
+        }
+        val newParameter = try {
+            newUri.getQueryParameter(AppUrl.ParamKey.QUERY)
+        } catch (e: UnsupportedOperationException) {
+            null
+        }
+
         if (oldParameter == newParameter) {
             pixel.fire(String.format(Locale.US, PixelName.SERP_REQUERY.pixelName, PixelParameter.SERP_QUERY_NOT_CHANGED))
         } else {
@@ -579,6 +593,7 @@ class BrowserTabViewModel(
     private fun pageChanged(url: String, title: String?) {
         Timber.v("Page changed: $url")
         buildSiteFactory(url, title)
+        command.value = RefreshUserAgent(site?.uri?.host, currentBrowserViewState().isDesktopBrowsingMode)
 
         val currentOmnibarViewState = currentOmnibarViewState()
         omnibarViewState.value = currentOmnibarViewState.copy(omnibarText = omnibarTextForUrl(url), shouldMoveCaretToEnd = false)
@@ -1031,6 +1046,7 @@ class BrowserTabViewModel(
     fun onDesktopSiteModeToggled(desktopSiteRequested: Boolean) {
         val currentBrowserViewState = currentBrowserViewState()
         browserViewState.value = currentBrowserViewState.copy(isDesktopBrowsingMode = desktopSiteRequested)
+        command.value = RefreshUserAgent(site?.uri?.host, desktopSiteRequested)
 
         val uri = site?.uri ?: return
 
