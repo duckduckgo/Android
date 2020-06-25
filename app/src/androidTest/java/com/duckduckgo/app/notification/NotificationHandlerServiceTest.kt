@@ -88,6 +88,7 @@ class NotificationHandlerServiceTest {
     fun whenIntentIsUseOurAppThenRegisterInUseOurAppOnboardingStage() = coroutinesTestRule.runBlocking {
         val intent = Intent(context, NotificationHandlerService::class.java)
         intent.type = USE_OUR_APP
+        intent.putExtra(PIXEL_SUFFIX_EXTRA, "abc")
         testee.onHandleIntent(intent)
         verify(mockUserStageStore).registerInStage(AppStage.USE_OUR_APP_ONBOARDING)
     }

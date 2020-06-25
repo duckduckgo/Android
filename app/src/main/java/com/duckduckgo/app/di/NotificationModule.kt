@@ -160,7 +160,6 @@ class NotificationModule {
         @Named("dripA2Notification") dripA2Notification: WebsiteNotification,
         @Named("dripB1Notification") dripB1Notification: AppFeatureNotification,
         @Named("dripB2Notification") dripB2Notification: AppFeatureNotification,
-        useOurAppNotification: UseOurAppNotification,
         variantManager: VariantManager,
         stageStore: UserStageStore
     ): AndroidNotificationScheduler {
@@ -172,7 +171,6 @@ class NotificationModule {
             dripA2Notification,
             dripB1Notification,
             dripB2Notification,
-            useOurAppNotification,
             variantManager,
             stageStore
         )

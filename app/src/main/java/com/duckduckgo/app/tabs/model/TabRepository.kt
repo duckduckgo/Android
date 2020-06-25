@@ -50,5 +50,5 @@ interface TabRepository {
 
     fun updateTabPreviewImage(tabId: String, fileName: String?)
 
-    fun selectByUrlOrNewTab(url: String, query: String)
+    suspend fun selectByUrlOrNewTab(url: String)
 }

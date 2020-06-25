@@ -32,7 +32,9 @@ import com.duckduckgo.app.notification.NotificationScheduler.DripA1NotificationW
 import com.duckduckgo.app.notification.NotificationScheduler.DripA2NotificationWorker
 import com.duckduckgo.app.notification.NotificationScheduler.DripB1NotificationWorker
 import com.duckduckgo.app.notification.NotificationScheduler.DripB2NotificationWorker
+import com.duckduckgo.app.notification.NotificationScheduler.UseOurAppNotificationWorker
 import com.duckduckgo.app.notification.model.SchedulableNotification
+import com.duckduckgo.app.onboarding.store.AppStage
 import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.statistics.Variant
 import com.duckduckgo.app.statistics.VariantManager
@@ -46,6 +48,7 @@ import com.duckduckgo.app.statistics.VariantManager.VariantFeature.Day3ClearData
 import com.duckduckgo.app.statistics.VariantManager.Companion.DEFAULT_VARIANT
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.mock
+import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.whenever
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
@@ -62,14 +65,13 @@ class AndroidNotificationSchedulerTest {
     var coroutinesTestRule = CoroutineTestRule()
 
     private val variantManager: VariantManager = mock()
-    private val userStageStore: UserStageStore = mock()
+    private val mockUserStageStore: UserStageStore = mock()
     private val clearNotification: SchedulableNotification = mock()
     private val privacyNotification: SchedulableNotification = mock()
     private val dripA1Notification: SchedulableNotification = mock()
     private val dripA2Notification: SchedulableNotification = mock()
     private val dripB1Notification: SchedulableNotification = mock()
     private val dripB2Notification: SchedulableNotification = mock()
-    private val ourAppNotification: SchedulableNotification = mock()
 
     private val context = InstrumentationRegistry.getInstrumentation().targetContext
     private lateinit var workManager: WorkManager
@@ -87,9 +89,8 @@ class AndroidNotificationSchedulerTest {
             dripA2Notification,
             dripB1Notification,
             dripB2Notification,
-            ourAppNotification,
             variantManager,
-            userStageStore
+            mockUserStageStore
         )
     }
 
@@ -111,7 +112,7 @@ class AndroidNotificationSchedulerTest {
         whenever(clearNotification.canShow()).thenReturn(true)
         testee.scheduleNextNotification()
 
-        assertUnusedAppNotificationScheduled(PrivacyNotificationWorker::class.jvmName)
+        assertNotificationScheduled(PrivacyNotificationWorker::class.jvmName)
     }
 
     @Test
@@ -121,7 +122,7 @@ class AndroidNotificationSchedulerTest {
         whenever(clearNotification.canShow()).thenReturn(false)
         testee.scheduleNextNotification()
 
-        assertUnusedAppNotificationScheduled(PrivacyNotificationWorker::class.jvmName)
+        assertNotificationScheduled(PrivacyNotificationWorker::class.jvmName)
     }
 
     @Test
@@ -131,7 +132,7 @@ class AndroidNotificationSchedulerTest {
         whenever(clearNotification.canShow()).thenReturn(true)
         testee.scheduleNextNotification()
 
-        assertUnusedAppNotificationScheduled(ClearDataNotificationWorker::class.jvmName)
+        assertNotificationScheduled(ClearDataNotificationWorker::class.jvmName)
     }
 
     @Test
@@ -141,7 +142,7 @@ class AndroidNotificationSchedulerTest {
         whenever(clearNotification.canShow()).thenReturn(false)
         testee.scheduleNextNotification()
 
-        assertNoUnusedAppNotificationScheduled()
+        assertNoNotificationScheduled()
     }
 
     // Drip A1
@@ -153,7 +154,7 @@ class AndroidNotificationSchedulerTest {
 
         testee.scheduleNextNotification()
 
-        assertUnusedAppNotificationScheduled(DripA1NotificationWorker::class.jvmName)
+        assertNotificationScheduled(DripA1NotificationWorker::class.jvmName)
     }
 
     @Test
@@ -164,7 +165,7 @@ class AndroidNotificationSchedulerTest {
 
         testee.scheduleNextNotification()
 
-        assertUnusedAppNotificationScheduled(ClearDataNotificationWorker::class.jvmName)
+        assertNotificationScheduled(ClearDataNotificationWorker::class.jvmName)
     }
 
     @Test
@@ -175,7 +176,7 @@ class AndroidNotificationSchedulerTest {
 
         testee.scheduleNextNotification()
 
-        assertNoUnusedAppNotificationScheduled()
+        assertNoNotificationScheduled()
     }
 
     @Test
@@ -186,7 +187,7 @@ class AndroidNotificationSchedulerTest {
 
         testee.scheduleNextNotification()
 
-        assertUnusedAppNotificationScheduled(DripA1NotificationWorker::class.jvmName)
+        assertNotificationScheduled(DripA1NotificationWorker::class.jvmName)
     }
 
     // Drip A2
@@ -198,7 +199,7 @@ class AndroidNotificationSchedulerTest {
 
         testee.scheduleNextNotification()
 
-        assertUnusedAppNotificationScheduled(DripA2NotificationWorker::class.jvmName)
+        assertNotificationScheduled(DripA2NotificationWorker::class.jvmName)
     }
 
     @Test
@@ -209,7 +210,7 @@ class AndroidNotificationSchedulerTest {
 
         testee.scheduleNextNotification()
 
-        assertUnusedAppNotificationScheduled(ClearDataNotificationWorker::class.jvmName)
+        assertNotificationScheduled(ClearDataNotificationWorker::class.jvmName)
     }
 
     @Test
@@ -220,7 +221,7 @@ class AndroidNotificationSchedulerTest {
 
         testee.scheduleNextNotification()
 
-        assertNoUnusedAppNotificationScheduled()
+        assertNoNotificationScheduled()
     }
 
     @Test
@@ -231,7 +232,7 @@ class AndroidNotificationSchedulerTest {
 
         testee.scheduleNextNotification()
 
-        assertUnusedAppNotificationScheduled(DripA2NotificationWorker::class.jvmName)
+        assertNotificationScheduled(DripA2NotificationWorker::class.jvmName)
     }
 
     // Drip B1
@@ -244,7 +245,7 @@ class AndroidNotificationSchedulerTest {
 
         testee.scheduleNextNotification()
 
-        assertUnusedAppNotificationScheduled(DripB1NotificationWorker::class.jvmName)
+        assertNotificationScheduled(DripB1NotificationWorker::class.jvmName)
     }
 
     @Test
@@ -255,7 +256,7 @@ class AndroidNotificationSchedulerTest {
 
         testee.scheduleNextNotification()
 
-        assertUnusedAppNotificationScheduled(ClearDataNotificationWorker::class.jvmName)
+        assertNotificationScheduled(ClearDataNotificationWorker::class.jvmName)
     }
 
     @Test
@@ -266,7 +267,7 @@ class AndroidNotificationSchedulerTest {
 
         testee.scheduleNextNotification()
 
-        assertNoUnusedAppNotificationScheduled()
+        assertNoNotificationScheduled()
     }
 
     @Test
@@ -277,7 +278,7 @@ class AndroidNotificationSchedulerTest {
 
         testee.scheduleNextNotification()
 
-        assertUnusedAppNotificationScheduled(DripB1NotificationWorker::class.jvmName)
+        assertNotificationScheduled(DripB1NotificationWorker::class.jvmName)
     }
 
     // Drip B2
@@ -290,7 +291,7 @@ class AndroidNotificationSchedulerTest {
 
         testee.scheduleNextNotification()
 
-        assertUnusedAppNotificationScheduled(DripB2NotificationWorker::class.jvmName)
+        assertNotificationScheduled(DripB2NotificationWorker::class.jvmName)
     }
 
     @Test
@@ -301,7 +302,7 @@ class AndroidNotificationSchedulerTest {
 
         testee.scheduleNextNotification()
 
-        assertUnusedAppNotificationScheduled(ClearDataNotificationWorker::class.jvmName)
+        assertNotificationScheduled(ClearDataNotificationWorker::class.jvmName)
     }
 
     @Test
@@ -312,7 +313,7 @@ class AndroidNotificationSchedulerTest {
 
         testee.scheduleNextNotification()
 
-        assertNoUnusedAppNotificationScheduled()
+        assertNoNotificationScheduled()
     }
 
     @Test
@@ -323,7 +324,7 @@ class AndroidNotificationSchedulerTest {
 
         testee.scheduleNextNotification()
 
-        assertUnusedAppNotificationScheduled(DripB2NotificationWorker::class.jvmName)
+        assertNotificationScheduled(DripB2NotificationWorker::class.jvmName)
     }
 
     // Control
@@ -335,7 +336,7 @@ class AndroidNotificationSchedulerTest {
 
         testee.scheduleNextNotification()
 
-        assertUnusedAppNotificationScheduled(PrivacyNotificationWorker::class.jvmName)
+        assertNotificationScheduled(PrivacyNotificationWorker::class.jvmName)
     }
 
     @Test
@@ -346,7 +347,7 @@ class AndroidNotificationSchedulerTest {
 
         testee.scheduleNextNotification()
 
-        assertUnusedAppNotificationScheduled(PrivacyNotificationWorker::class.jvmName)
+        assertNotificationScheduled(PrivacyNotificationWorker::class.jvmName)
     }
 
     @Test
@@ -357,7 +358,7 @@ class AndroidNotificationSchedulerTest {
 
         testee.scheduleNextNotification()
 
-        assertUnusedAppNotificationScheduled(ClearDataNotificationWorker::class.jvmName)
+        assertNotificationScheduled(ClearDataNotificationWorker::class.jvmName)
     }
 
     @Test
@@ -368,7 +369,7 @@ class AndroidNotificationSchedulerTest {
 
         testee.scheduleNextNotification()
 
-        assertNoUnusedAppNotificationScheduled()
+        assertNoNotificationScheduled()
     }
 
     // Null variant
@@ -384,7 +385,7 @@ class AndroidNotificationSchedulerTest {
 
         testee.scheduleNextNotification()
 
-        assertNoUnusedAppNotificationScheduled()
+        assertNoNotificationScheduled()
     }
 
     @Test
@@ -399,7 +400,43 @@ class AndroidNotificationSchedulerTest {
 
         testee.scheduleNextNotification()
 
-        assertNoUnusedAppNotificationScheduled()
+        assertNoNotificationScheduled()
+    }
+
+    @Test
+    fun whenStageIsUseOurAppNotificationThenNotificationScheduled() = runBlocking {
+        givenStageIsUserOurAppNotification()
+
+        testee.scheduleNextNotification()
+
+        assertNotificationScheduled(UseOurAppNotificationWorker::class.jvmName, NotificationScheduler.USE_OUR_APP_WORK_REQUEST_TAG)
+    }
+
+    @Test
+    fun whenStageIsUseOurAppNotificationAndNotificationScheduledThenStageCompleted() = runBlocking<Unit> {
+        givenStageIsUserOurAppNotification()
+
+        testee.scheduleNextNotification()
+
+        verify(mockUserStageStore).stageCompleted(AppStage.USE_OUR_APP_NOTIFICATION)
+    }
+
+    @Test
+    fun whenStageIsUseOurAppNotificationThenNoNotificationScheduled() = runBlocking {
+        givenStageIsEstablished()
+
+        testee.scheduleNextNotification()
+
+        assertNoNotificationScheduled(NotificationScheduler.USE_OUR_APP_WORK_REQUEST_TAG)
+    }
+
+    @Test
+    fun whenStageIsNotUseOurAppNotificationThenNoNotificationScheduled() = runBlocking {
+        givenStageIsEstablished()
+
+        testee.scheduleNextNotification()
+
+        assertNoNotificationScheduled(NotificationScheduler.USE_OUR_APP_WORK_REQUEST_TAG)
     }
 
     private fun setDripA1Variant() {
@@ -438,12 +475,24 @@ class AndroidNotificationSchedulerTest {
         )
     }
 
-    private fun assertUnusedAppNotificationScheduled(workerName: String) {
-        assertTrue(getScheduledWorkers(NotificationScheduler.UNUSED_APP_WORK_REQUEST_TAG).any { it.tags.contains(workerName) })
+    private suspend fun givenStageIsUserOurAppNotification() {
+        whenever(privacyNotification.canShow()).thenReturn(false)
+        whenever(clearNotification.canShow()).thenReturn(false)
+        whenever(mockUserStageStore.getUserAppStage()).thenReturn(AppStage.USE_OUR_APP_NOTIFICATION)
     }
 
-    private fun assertNoUnusedAppNotificationScheduled() {
-        assertTrue(getScheduledWorkers(NotificationScheduler.UNUSED_APP_WORK_REQUEST_TAG).isEmpty())
+    private suspend fun givenStageIsEstablished() {
+        whenever(privacyNotification.canShow()).thenReturn(false)
+        whenever(clearNotification.canShow()).thenReturn(false)
+        whenever(mockUserStageStore.getUserAppStage()).thenReturn(AppStage.ESTABLISHED)
+    }
+
+    private fun assertNotificationScheduled(workerName: String, tag: String = NotificationScheduler.UNUSED_APP_WORK_REQUEST_TAG) {
+        assertTrue(getScheduledWorkers(tag).any { it.tags.contains(workerName) })
+    }
+
+    private fun assertNoNotificationScheduled(tag: String = NotificationScheduler.UNUSED_APP_WORK_REQUEST_TAG) {
+        assertTrue(getScheduledWorkers(tag).isEmpty())
     }
 
     private fun getScheduledWorkers(tag: String): List<WorkInfo> {

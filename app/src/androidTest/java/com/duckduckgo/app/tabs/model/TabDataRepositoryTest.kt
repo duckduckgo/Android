@@ -229,6 +229,27 @@ class TabDataRepositoryTest {
         assertTrue(captor.firstValue.position == 1)
     }
 
+    @Test
+    fun whenSelectByUrlOrNewTabIfUrlAlreadyExistedInATabThenSelectTheTab() = runBlocking<Unit> {
+        val url = "http://www.example.com"
+
+        whenever(mockDao.selectTabByUrl(url)).thenReturn("tabid")
+
+        testee.selectByUrlOrNewTab(url)
+
+        verify(mockDao).insertTabSelection(TabSelectionEntity(tabId = "tabid"))
+    }
+
+    @Test
+    fun whenSelectByUrlOrNewTabIfUrlNotExistedInATabThenAddNewTab() = runBlocking<Unit> {
+        whenever(mockDao.tabs()).thenReturn(emptyList())
+
+        testee.selectByUrlOrNewTab("http://www.example.com")
+
+        val captor = argumentCaptor<TabEntity>()
+        verify(mockDao).addAndSelectTab(captor.capture())
+    }
+
     companion object {
         const val TAB_ID = "abcd"
     }

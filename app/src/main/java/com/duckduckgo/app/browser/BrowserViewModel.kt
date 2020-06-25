@@ -202,7 +202,7 @@ class BrowserViewModel(
     }
 
     fun onOpenShortcut(url: String) {
-        tabRepository.selectByUrlOrNewTab(url, queryUrlConverter.convertQueryToUrl(url))
+        launch { tabRepository.selectByUrlOrNewTab(queryUrlConverter.convertQueryToUrl(url)) }
         if (url == USE_OUR_APP_SHORTCUT_URL) {
             pixel.fire(Pixel.PixelName.USE_OUR_APP_SHORTCUT_OPENED)
         } else {

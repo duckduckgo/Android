@@ -19,6 +19,7 @@ package com.duckduckgo.app.browser
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
+import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.browser.BrowserViewModel.Command
 import com.duckduckgo.app.browser.BrowserViewModel.Command.DisplayMessage
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
@@ -29,10 +30,12 @@ import com.duckduckgo.app.global.rating.AppEnjoymentPromptOptions
 import com.duckduckgo.app.global.rating.AppEnjoymentUserEventRecorder
 import com.duckduckgo.app.global.rating.PromptCount
 import com.duckduckgo.app.privacy.ui.PrivacyDashboardActivity
+import com.duckduckgo.app.runBlocking
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.nhaarman.mockitokotlin2.*
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
 import org.junit.After
 import org.junit.Assert.assertEquals
@@ -45,11 +48,15 @@ import org.mockito.Captor
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations
 
+@ExperimentalCoroutinesApi
 class BrowserViewModelTest {
 
     @get:Rule
     @Suppress("unused")
     var instantTaskExecutorRule = InstantTaskExecutorRule()
+
+    @get:Rule
+    var coroutinesTestRule = CoroutineTestRule()
 
     @Mock
     private lateinit var mockCommandObserver: Observer<Command>
@@ -171,11 +178,11 @@ class BrowserViewModelTest {
     }
 
     @Test
-    fun whenOpenShortcutThenSelectByUrlOrNewTab() {
+    fun whenOpenShortcutThenSelectByUrlOrNewTab() = coroutinesTestRule.runBlocking {
         val url = "example.com"
         whenever(mockOmnibarEntryConverter.convertQueryToUrl(url)).thenReturn(url)
         testee.onOpenShortcut(url)
-        verify(mockTabRepository).selectByUrlOrNewTab(url, url)
+        verify(mockTabRepository).selectByUrlOrNewTab(url)
     }
 
     @Test

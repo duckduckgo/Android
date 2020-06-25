@@ -54,17 +54,16 @@ class NotificationScheduler(
     private val dripA2Notification: SchedulableNotification,
     private val dripB1Notification: SchedulableNotification,
     private val dripB2Notification: SchedulableNotification,
-    private val useOurAppNotification: SchedulableNotification,
     private val variantManager: VariantManager,
     private val userStageStore: UserStageStore
 ) : AndroidNotificationScheduler {
 
     override suspend fun scheduleNextNotification() {
-        scheduleFacebookNotification()
+        scheduleUseOurAppNotification()
         scheduleInactiveUserNotifications()
     }
 
-    private suspend fun scheduleFacebookNotification() {
+    private suspend fun scheduleUseOurAppNotification() {
         if (userStageStore.useOurAppNotification()) {
             val operation = scheduleUniqueNotification(
                 OneTimeWorkRequestBuilder<UseOurAppNotificationWorker>(),
