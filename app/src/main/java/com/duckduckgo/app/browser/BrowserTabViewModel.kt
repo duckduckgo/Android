@@ -245,6 +245,7 @@ class BrowserTabViewModel(
         object LaunchTabSwitcher : Command()
         object HideWebContent : Command()
         object ShowWebContent : Command()
+        class RefreshUserAgent(val host: String?, val isDesktop: Boolean) : Command()
 
         class ShowErrorWithAction(val action: () -> Unit) : Command()
         sealed class DaxCommand : Command() {
@@ -547,6 +548,7 @@ class BrowserTabViewModel(
         findInPageViewState.value = FindInPageViewState()
         omnibarViewState.value = currentOmnibarViewState().copy(omnibarText = "", shouldMoveCaretToEnd = false)
         loadingViewState.value = currentLoadingViewState().copy(isLoading = false)
+
         deleteTabPreview(tabId)
     }
 
@@ -594,6 +596,7 @@ class BrowserTabViewModel(
             isDomainSameAsUseOurAppSiteDomain()
         }
 
+        command.value = RefreshUserAgent(site?.uri?.host, currentBrowserViewState().isDesktopBrowsingMode)
         val currentOmnibarViewState = currentOmnibarViewState()
         omnibarViewState.value = currentOmnibarViewState.copy(omnibarText = omnibarTextForUrl(url), shouldMoveCaretToEnd = false)
         val currentBrowserViewState = currentBrowserViewState()
@@ -1051,6 +1054,7 @@ class BrowserTabViewModel(
     fun onDesktopSiteModeToggled(desktopSiteRequested: Boolean) {
         val currentBrowserViewState = currentBrowserViewState()
         browserViewState.value = currentBrowserViewState.copy(isDesktopBrowsingMode = desktopSiteRequested)
+        command.value = RefreshUserAgent(site?.uri?.host, desktopSiteRequested)
 
         val uri = site?.uri ?: return
 
