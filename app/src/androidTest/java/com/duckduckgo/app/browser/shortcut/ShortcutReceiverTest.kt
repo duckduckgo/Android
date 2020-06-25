@@ -16,7 +16,6 @@
 
 package com.duckduckgo.app.browser.shortcut
 
-import android.content.Context
 import android.content.Intent
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.cta.ui.UseOurAppCta
@@ -41,7 +40,6 @@ class ShortcutReceiverTest {
     private val mockKeyTimestampStore: KeyTimestampStore = mock()
     private val mockPixel: Pixel = mock()
     private lateinit var testee: ShortcutReceiver
-    private val context: Context = mock()
 
     @Before
     fun before() {
@@ -53,7 +51,7 @@ class ShortcutReceiverTest {
         val intent = Intent()
         intent.putExtra(ShortcutBuilder.SHORTCUT_URL_ARG, UseOurAppCta.USE_OUR_APP_SHORTCUT_URL)
         intent.putExtra(ShortcutBuilder.SHORTCUT_TITLE_ARG, "Title")
-        testee.onReceive(context, intent)
+        testee.onReceive(null, intent)
 
         verify(mockKeyTimestampStore).registerTimestamp(any())
     }
@@ -63,7 +61,7 @@ class ShortcutReceiverTest {
         val intent = Intent()
         intent.putExtra(ShortcutBuilder.SHORTCUT_URL_ARG, UseOurAppCta.USE_OUR_APP_SHORTCUT_URL)
         intent.putExtra(ShortcutBuilder.SHORTCUT_TITLE_ARG, "Title")
-        testee.onReceive(context, intent)
+        testee.onReceive(null, intent)
 
         verify(mockPixel).fire(Pixel.PixelName.USE_OUR_APP_SHORTCUT_ADDED)
     }
@@ -73,7 +71,7 @@ class ShortcutReceiverTest {
         val intent = Intent()
         intent.putExtra(ShortcutBuilder.SHORTCUT_URL_ARG, "www.example.com")
         intent.putExtra(ShortcutBuilder.SHORTCUT_TITLE_ARG, "Title")
-        testee.onReceive(context, intent)
+        testee.onReceive(null, intent)
 
         verify(mockKeyTimestampStore, never()).registerTimestamp(any())
     }
@@ -83,7 +81,7 @@ class ShortcutReceiverTest {
         val intent = Intent()
         intent.putExtra(ShortcutBuilder.SHORTCUT_URL_ARG, "www.example.com")
         intent.putExtra(ShortcutBuilder.SHORTCUT_TITLE_ARG, "Title")
-        testee.onReceive(context, intent)
+        testee.onReceive(null, intent)
 
         verify(mockPixel, never()).fire(Pixel.PixelName.USE_OUR_APP_SHORTCUT_ADDED)
     }
