@@ -57,21 +57,17 @@ import com.duckduckgo.app.cta.ui.DaxBubbleCta
 import com.duckduckgo.app.cta.ui.DaxDialogCta
 import com.duckduckgo.app.cta.ui.HomePanelCta
 import com.duckduckgo.app.cta.ui.UseOurAppCta
-import com.duckduckgo.app.cta.ui.UseOurAppCta
 import com.duckduckgo.app.cta.ui.UseOurAppCta.Companion.USE_OUR_APP_DOMAIN
 import com.duckduckgo.app.cta.ui.UseOurAppCta.Companion.USE_OUR_APP_SHORTCUT_URL
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.global.model.SiteFactory
-import com.duckduckgo.app.global.timestamps.db.KeyTimestampEntity
 import com.duckduckgo.app.global.timestamps.db.TimestampKey
 import com.duckduckgo.app.notification.model.UseOurAppNotification
 import com.duckduckgo.app.global.timestamps.db.KeyTimestampEntity
 import com.duckduckgo.app.global.timestamps.db.KeyTimestampStore
-import com.duckduckgo.app.global.timestamps.db.TimestampKey.*
 import com.duckduckgo.app.notification.db.NotificationDao
-import com.duckduckgo.app.notification.model.UseOurAppNotification
 import com.duckduckgo.app.onboarding.store.AppStage
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.store.UserStageStore
@@ -2092,21 +2088,21 @@ class BrowserTabViewModelTest {
     @Test
     fun whenPageRefreshedIfPreviousOneWasNotUseOurAppSiteAfterNotificationSeenThenPixelSent() = coroutineRule.runBlocking {
         whenever(mockNotificationDao.exists(UseOurAppNotification.ID)).thenReturn(true)
-        testee.pageRefreshed(UseOurAppCta.USE_OUR_APP_DOMAIN)
+        testee.pageRefreshed(USE_OUR_APP_DOMAIN)
         verify(mockPixel).fire(Pixel.PixelName.UOA_VISITED_AFTER_NOTIFICATION)
     }
 
     @Test
     fun whenPageRefreshedIfPreviousOneWasNotUseOurAppSiteAfterShortcutAddedThenPixelSent() = coroutineRule.runBlocking {
         whenever(mockKeyTimestampStore.getTimestamp(TimestampKey.USE_OUR_APP_SHORTCUT_ADDED)).thenReturn(KeyTimestampEntity(TimestampKey.USE_OUR_APP_SHORTCUT_ADDED))
-        testee.pageRefreshed(UseOurAppCta.USE_OUR_APP_DOMAIN)
+        testee.pageRefreshed(USE_OUR_APP_DOMAIN)
         verify(mockPixel).fire(Pixel.PixelName.UOA_VISITED_AFTER_SHORTCUT)
     }
 
     @Test
     fun whenPageRefreshedIfPreviousOneWasNotUseOurAppSiteAfterDeleteCtaShownThenPixelSent() = coroutineRule.runBlocking {
         whenever(mockDismissedCtaDao.exists(CtaId.USE_OUR_APP_DELETION)).thenReturn(true)
-        testee.pageRefreshed(UseOurAppCta.USE_OUR_APP_DOMAIN)
+        testee.pageRefreshed(USE_OUR_APP_DOMAIN)
         verify(mockPixel).fire(Pixel.PixelName.UOA_VISITED_AFTER_DELETE_CTA)
     }
 
@@ -2114,15 +2110,16 @@ class BrowserTabViewModelTest {
     fun whenPageRefreshedIfPreviousOneWasNotUseOurAppSiteAfterNotificationSeenThenPixelNotSent() = coroutineRule.runBlocking {
         givenUseOurAppSiteSelected()
         whenever(mockNotificationDao.exists(UseOurAppNotification.ID)).thenReturn(true)
-        testee.pageRefreshed(UseOurAppCta.USE_OUR_APP_DOMAIN)
+        testee.pageRefreshed(USE_OUR_APP_DOMAIN)
         verify(mockPixel, never()).fire(Pixel.PixelName.UOA_VISITED_AFTER_NOTIFICATION)
     }
 
     @Test
     fun whenPageRefreshedIfPreviousOneWasNotUseOurAppSiteAfterShortcutAddedThenPixelNotSent() = coroutineRule.runBlocking {
         givenUseOurAppSiteSelected()
-        whenever(mockKeyTimestampStore.getTimestamp(TimestampKey.USE_OUR_APP_SHORTCUT_ADDED)).thenReturn(KeyTimestampEntity(TimestampKey.USE_OUR_APP_SHORTCUT_ADDED))
-        testee.pageRefreshed(UseOurAppCta.USE_OUR_APP_DOMAIN)
+        val timestampEntity = KeyTimestampEntity(TimestampKey.USE_OUR_APP_SHORTCUT_ADDED)
+        whenever(mockKeyTimestampStore.getTimestamp(TimestampKey.USE_OUR_APP_SHORTCUT_ADDED)).thenReturn(timestampEntity)
+        testee.pageRefreshed(USE_OUR_APP_DOMAIN)
         verify(mockPixel, never()).fire(Pixel.PixelName.UOA_VISITED_AFTER_SHORTCUT)
     }
 
@@ -2130,7 +2127,7 @@ class BrowserTabViewModelTest {
     fun whenPageRefreshedIfPreviousOneWasNotUseOurAppSiteThenAfterDeleteCtaShownPixelNotSent() = coroutineRule.runBlocking {
         givenUseOurAppSiteSelected()
         whenever(mockDismissedCtaDao.exists(CtaId.USE_OUR_APP_DELETION)).thenReturn(true)
-        testee.pageRefreshed(UseOurAppCta.USE_OUR_APP_DOMAIN)
+        testee.pageRefreshed(USE_OUR_APP_DOMAIN)
         verify(mockPixel, never()).fire(Pixel.PixelName.UOA_VISITED_AFTER_DELETE_CTA)
     }
 

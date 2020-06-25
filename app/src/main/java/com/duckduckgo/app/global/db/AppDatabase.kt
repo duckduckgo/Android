@@ -24,6 +24,7 @@ import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.duckduckgo.app.bookmarks.db.BookmarkEntity
 import com.duckduckgo.app.bookmarks.db.BookmarksDao
+import com.duckduckgo.app.browser.addtohome.AddToHomeCapabilityDetector
 import com.duckduckgo.app.browser.rating.db.AppEnjoymentDao
 import com.duckduckgo.app.browser.rating.db.AppEnjoymentEntity
 import com.duckduckgo.app.browser.rating.db.AppEnjoymentTypeConverter
@@ -48,6 +49,7 @@ import com.duckduckgo.app.onboarding.store.*
 import com.duckduckgo.app.privacy.db.*
 import com.duckduckgo.app.privacy.model.PrivacyProtectionCountsEntity
 import com.duckduckgo.app.privacy.model.UserWhitelistedDomain
+import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.survey.db.SurveyDao
 import com.duckduckgo.app.survey.model.Survey
 import com.duckduckgo.app.tabs.db.TabsDao
@@ -128,7 +130,11 @@ abstract class AppDatabase : RoomDatabase() {
 }
 
 @Suppress("PropertyName")
-class MigrationsProvider(val context: Context) {
+class MigrationsProvider(
+    val context: Context,
+    val settingsDataStore: SettingsDataStore,
+    val addToHomeCapabilityDetector: AddToHomeCapabilityDetector
+) {
 
     val MIGRATION_1_TO_2: Migration = object : Migration(1, 2) {
         override fun migrate(database: SupportSQLiteDatabase) {
@@ -301,7 +307,10 @@ class MigrationsProvider(val context: Context) {
     val MIGRATION_21_TO_22: Migration = object : Migration(21, 22) {
         override fun migrate(database: SupportSQLiteDatabase) {
             database.execSQL("CREATE TABLE IF NOT EXISTS `keyTimestamps` (`id` TEXT NOT NULL PRIMARY KEY, `timestamp` INTEGER NOT NULL)")
-            database.execSQL("UPDATE $USER_STAGE_TABLE_NAME SET appStage = \"${AppStage.USE_OUR_APP_NOTIFICATION}\" WHERE appStage = \"${AppStage.ESTABLISHED}\"")
+
+            if (!settingsDataStore.hideTips && addToHomeCapabilityDetector.isAddToHomeSupported()) {
+                database.execSQL("UPDATE $USER_STAGE_TABLE_NAME SET appStage = \"${AppStage.USE_OUR_APP_NOTIFICATION}\" WHERE appStage = \"${AppStage.ESTABLISHED}\"")
+            }
         }
     }
 

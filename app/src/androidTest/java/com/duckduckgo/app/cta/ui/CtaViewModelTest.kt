@@ -435,6 +435,15 @@ class CtaViewModelTest {
     }
 
     @Test
+    fun whenRefreshCtaOnHomeTabAndUseOurAppOnboardingActiveAndHideTipsIsTrueThenReturnNull() = runBlockingTest {
+        givenUseOurAppActive()
+        whenever(mockSettingsDataStore.hideTips).thenReturn(true)
+
+        val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = false)
+        assertNull(value)
+    }
+
+    @Test
     fun whenRefreshCtaOnHomeTabAndUseOurAppOnboardingActiveAndCtaShownThenReturnNull() = runBlockingTest {
         givenUseOurAppActive()
         whenever(mockDismissedCtaDao.exists(CtaId.USE_OUR_APP)).thenReturn(true)
@@ -451,6 +460,17 @@ class CtaViewModelTest {
 
         val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = true, site = site(url = USE_OUR_APP_SHORTCUT_URL))
         assertTrue(value is UseOurAppDeletionCta)
+    }
+
+    @Test
+    fun whenRefreshCtaWhileBrowsingAndSiteIsUseOurAppAndTwoDaysSinceShortcutAddedAndHideTipsIsTrueThenReturnNull() = runBlockingTest {
+        givenUserIsEstablished()
+        val timestampEntity = KeyTimestampEntity(TimestampKey.USE_OUR_APP_SHORTCUT_ADDED, System.currentTimeMillis() - TimeUnit.DAYS.toMillis(2))
+        whenever(mockKeyTimestampStore.getTimestamp(TimestampKey.USE_OUR_APP_SHORTCUT_ADDED)).thenReturn(timestampEntity)
+        whenever(mockSettingsDataStore.hideTips).thenReturn(true)
+
+        val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = true, site = site(url = USE_OUR_APP_SHORTCUT_URL))
+        assertNull(value)
     }
 
     @Test

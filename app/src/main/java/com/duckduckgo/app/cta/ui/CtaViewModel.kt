@@ -203,7 +203,7 @@ class CtaViewModel @Inject constructor(
 
     @WorkerThread
     private suspend fun canShowUseOurAppDeletionDialog(site: Site?): Boolean =
-        !useOurAppDeletionDialogShown() && site.isUseOurAppDomain() && twoDaysSinceShortcutAdded()
+        !settingsDataStore.hideTips && !useOurAppDeletionDialogShown() && site.isUseOurAppDomain() && twoDaysSinceShortcutAdded()
 
     @WorkerThread
     private suspend fun twoDaysSinceShortcutAdded(): Boolean {
@@ -213,7 +213,7 @@ class CtaViewModel @Inject constructor(
     }
 
     @WorkerThread
-    private suspend fun canShowUseOurAppDialog(): Boolean = useOurAppActive() && !useOurAppDialogShown()
+    private suspend fun canShowUseOurAppDialog(): Boolean = !settingsDataStore.hideTips && useOurAppActive() && !useOurAppDialogShown()
 
     @WorkerThread
     private fun canShowWidgetCta(): Boolean {

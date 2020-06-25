@@ -19,6 +19,7 @@ package com.duckduckgo.app.onboarding.store
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.browser.addtohome.AddToHomeCapabilityDetector
 import com.duckduckgo.app.runBlocking
+import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.whenever
@@ -35,8 +36,9 @@ class AppUserStageStoreTest {
 
     private val userStageDao = mock<UserStageDao>()
     private val mockAddToHomeCapabilityDetector = mock<AddToHomeCapabilityDetector>()
+    private val mockSettingsDataStore = mock<SettingsDataStore>()
 
-    private val testee = AppUserStageStore(userStageDao, coroutineRule.testDispatcherProvider, mockAddToHomeCapabilityDetector)
+    private val testee = AppUserStageStore(userStageDao, coroutineRule.testDispatcherProvider, mockAddToHomeCapabilityDetector, mockSettingsDataStore)
 
     @Test
     fun whenGetUserAppStageThenRetunCurrentStage() = coroutineRule.runBlocking {
@@ -72,6 +74,16 @@ class AppUserStageStoreTest {
         val nextStage = testee.stageCompleted(AppStage.DAX_ONBOARDING)
 
         assertEquals(AppStage.USE_OUR_APP_NOTIFICATION, nextStage)
+    }
+
+    @Test
+    fun whenStageDaxOnboardingCompletedAndAbleToAddShortcutsButHideTipsIsTrueThenStageEstablishedReturned() = coroutineRule.runBlocking {
+        givenCurrentStage(AppStage.DAX_ONBOARDING)
+        whenever(mockSettingsDataStore.hideTips).thenReturn(true)
+        whenever(mockAddToHomeCapabilityDetector.isAddToHomeSupported()).thenReturn(true)
+        val nextStage = testee.stageCompleted(AppStage.DAX_ONBOARDING)
+
+        assertEquals(AppStage.ESTABLISHED, nextStage)
     }
 
     @Test

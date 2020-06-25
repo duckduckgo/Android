@@ -29,10 +29,12 @@ import androidx.sqlite.db.framework.FrameworkSQLiteOpenHelperFactory
 import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.blockingObserve
+import com.duckduckgo.app.browser.addtohome.AddToHomeCapabilityDetector
 import com.duckduckgo.app.global.exception.UncaughtExceptionEntity
 import com.duckduckgo.app.global.exception.UncaughtExceptionSource
 import com.duckduckgo.app.onboarding.store.AppStage
 import com.duckduckgo.app.runBlocking
+import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.eq
 import com.nhaarman.mockitokotlin2.mock
@@ -58,8 +60,10 @@ class AppDatabaseTest {
     val testHelper = MigrationTestHelper(getInstrumentation(), AppDatabase::class.qualifiedName, FrameworkSQLiteOpenHelperFactory())
 
     private val context = mock<Context>()
+    private val mockSettingsDataStore = mock<SettingsDataStore>()
+    private val mockAddToHomeCapabilityDetector = mock<AddToHomeCapabilityDetector>()
 
-    private val migrationsProvider: MigrationsProvider = MigrationsProvider(context)
+    private val migrationsProvider: MigrationsProvider = MigrationsProvider(context, mockSettingsDataStore, mockAddToHomeCapabilityDetector)
 
     @Before
     fun setup() {
@@ -226,7 +230,9 @@ class AppDatabaseTest {
     }
 
     @Test
-    fun whenMigratingFromVersion21To22IfUserIsEstablishedThenMigrateToNotification() {
+    fun whenMigratingFromVersion21To22IfUserIsEstablishedAndConditionsAreMetThenMigrateToNotification() {
+        whenever(mockSettingsDataStore.hideTips).thenReturn(false)
+        whenever(mockAddToHomeCapabilityDetector.isAddToHomeSupported()).thenReturn(true)
         val values: ContentValues = ContentValues().apply {
             put("key", 1)
             put("appStage", AppStage.ESTABLISHED.name)
@@ -236,6 +242,38 @@ class AppDatabaseTest {
             testHelper.runMigrationsAndValidate(TEST_DB_NAME, 22, true, migrationsProvider.MIGRATION_21_TO_22)
             val stage = getUserStage(it)
             assertEquals(AppStage.USE_OUR_APP_NOTIFICATION.name, stage)
+        }
+    }
+
+    @Test
+    fun whenMigratingFromVersion21To22IfUserIsEstablishedAndHideTipsIsTrueThenDoNotMigrateToNotification() {
+        whenever(mockSettingsDataStore.hideTips).thenReturn(true)
+        whenever(mockAddToHomeCapabilityDetector.isAddToHomeSupported()).thenReturn(true)
+        val values: ContentValues = ContentValues().apply {
+            put("key", 1)
+            put("appStage", AppStage.ESTABLISHED.name)
+        }
+        testHelper.createDatabase(TEST_DB_NAME, 21).use {
+            it.insert("userStage", SQLiteDatabase.CONFLICT_REPLACE, values)
+            testHelper.runMigrationsAndValidate(TEST_DB_NAME, 22, true, migrationsProvider.MIGRATION_21_TO_22)
+            val stage = getUserStage(it)
+            assertEquals(AppStage.ESTABLISHED.name, stage)
+        }
+    }
+
+    @Test
+    fun whenMigratingFromVersion21To22IfUserIsEstablishedAndHomeShortcutNotSupportedThenDoNotMigrateToNotification() {
+        whenever(mockSettingsDataStore.hideTips).thenReturn(false)
+        whenever(mockAddToHomeCapabilityDetector.isAddToHomeSupported()).thenReturn(false)
+        val values: ContentValues = ContentValues().apply {
+            put("key", 1)
+            put("appStage", AppStage.ESTABLISHED.name)
+        }
+        testHelper.createDatabase(TEST_DB_NAME, 21).use {
+            it.insert("userStage", SQLiteDatabase.CONFLICT_REPLACE, values)
+            testHelper.runMigrationsAndValidate(TEST_DB_NAME, 22, true, migrationsProvider.MIGRATION_21_TO_22)
+            val stage = getUserStage(it)
+            assertEquals(AppStage.ESTABLISHED.name, stage)
         }
     }
 
