@@ -29,7 +29,11 @@ import android.webkit.WebView
 import androidx.annotation.AnyThread
 import androidx.annotation.VisibleForTesting
 import androidx.core.net.toUri
-import androidx.lifecycle.*
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.duckduckgo.app.autocomplete.api.AutoComplete
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteResult
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion
@@ -44,7 +48,10 @@ import com.duckduckgo.app.browser.BrowserTabViewModel.GlobalLayoutViewState.Brow
 import com.duckduckgo.app.browser.BrowserTabViewModel.GlobalLayoutViewState.Invalidated
 import com.duckduckgo.app.browser.LongPressHandler.RequiredAction
 import com.duckduckgo.app.browser.SpecialUrlDetector.UrlType.IntentType
-import com.duckduckgo.app.browser.WebNavigationStateChange.*
+import com.duckduckgo.app.browser.WebNavigationStateChange.NewPage
+import com.duckduckgo.app.browser.WebNavigationStateChange.PageCleared
+import com.duckduckgo.app.browser.WebNavigationStateChange.PageNavigationCleared
+import com.duckduckgo.app.browser.WebNavigationStateChange.UrlUpdated
 import com.duckduckgo.app.browser.addtohome.AddToHomeCapabilityDetector
 import com.duckduckgo.app.browser.favicon.FaviconDownloader
 import com.duckduckgo.app.browser.model.BasicAuthenticationCredentials
@@ -53,18 +60,30 @@ import com.duckduckgo.app.browser.model.LongPressTarget
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.browser.ui.HttpAuthenticationDialogFragment.HttpAuthenticationListener
-import com.duckduckgo.app.cta.ui.*
+import com.duckduckgo.app.cta.ui.Cta
+import com.duckduckgo.app.cta.ui.CtaViewModel
+import com.duckduckgo.app.cta.ui.DaxDialogCta
+import com.duckduckgo.app.cta.ui.HomePanelCta
+import com.duckduckgo.app.cta.ui.HomeTopPanelCta
+import com.duckduckgo.app.cta.ui.SecondaryButtonCta
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteDao
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
-import com.duckduckgo.app.global.*
+import com.duckduckgo.app.global.AppUrl
+import com.duckduckgo.app.global.DefaultDispatcherProvider
+import com.duckduckgo.app.global.DispatcherProvider
+import com.duckduckgo.app.global.SingleLiveEvent
+import com.duckduckgo.app.global.baseHost
+import com.duckduckgo.app.global.isMobileSite
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.global.model.SiteFactory
 import com.duckduckgo.app.global.model.domain
 import com.duckduckgo.app.global.model.domainMatchesUrl
+import com.duckduckgo.app.global.toDesktopUri
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao
 import com.duckduckgo.app.privacy.db.UserWhitelistDao
 import com.duckduckgo.app.privacy.model.PrivacyGrade
 import com.duckduckgo.app.settings.db.SettingsDataStore
+import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.api.StatisticsUpdater
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelName
@@ -84,6 +103,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
+import java.util.Locale
 import java.util.concurrent.TimeUnit
 
 class BrowserTabViewModel(
@@ -106,7 +126,8 @@ class BrowserTabViewModel(
     private val ctaViewModel: CtaViewModel,
     private val searchCountDao: SearchCountDao,
     private val pixel: Pixel,
-    private val dispatchers: DispatcherProvider = DefaultDispatcherProvider()
+    private val dispatchers: DispatcherProvider = DefaultDispatcherProvider(),
+    private val variantManager: VariantManager
 ) : WebViewClientListener, EditBookmarkListener, HttpAuthenticationListener, ViewModel() {
 
     private var buildingSiteFactoryJob: Job? = null
@@ -140,7 +161,8 @@ class BrowserTabViewModel(
         val isWhitelisted: Boolean = false,
         val canReportSite: Boolean = false,
         val addToHomeEnabled: Boolean = false,
-        val addToHomeVisible: Boolean = false
+        val addToHomeVisible: Boolean = false,
+        val showDaxIcon: Boolean = false
     )
 
     data class OmnibarViewState(
@@ -213,6 +235,7 @@ class BrowserTabViewModel(
         object LaunchTabSwitcher : Command()
         object HideWebContent : Command()
         object ShowWebContent : Command()
+        class RefreshUserAgent(val host: String?, val isDesktop: Boolean) : Command()
 
         class ShowErrorWithAction(val action: () -> Unit) : Command()
         sealed class DaxCommand : Command() {
@@ -383,6 +406,14 @@ class BrowserTabViewModel(
             searchCountDao.incrementSearchCount()
         }
 
+        val verticalParameter = extractVerticalParameter(url)
+        val urlToNavigate = queryUrlConverter.convertQueryToUrl(trimmedInput, verticalParameter)
+        val omnibarText = if (variantManager.getVariant().hasFeature(VariantManager.VariantFeature.SerpHeaderQueryReplacement)) {
+            urlToNavigate
+        } else {
+            trimmedInput
+        }
+
         val type = specialUrlDetector.determineType(trimmedInput)
         if (type is IntentType) {
             externalAppLinkClicked(type)
@@ -390,14 +421,37 @@ class BrowserTabViewModel(
             if (shouldClearHistoryOnNewQuery()) {
                 command.value = ResetHistory
             }
-            command.value = Navigate(queryUrlConverter.convertQueryToUrl(trimmedInput))
+
+            fireQueryChangedPixel(omnibarText)
+
+            command.value = Navigate(urlToNavigate)
         }
 
         globalLayoutState.value = Browser(isNewTabState = false)
         findInPageViewState.value = FindInPageViewState(visible = false, canFindInPage = true)
-        omnibarViewState.value = currentOmnibarViewState().copy(omnibarText = trimmedInput, shouldMoveCaretToEnd = false)
+        omnibarViewState.value = currentOmnibarViewState().copy(omnibarText = omnibarText, shouldMoveCaretToEnd = false)
         browserViewState.value = currentBrowserViewState().copy(browserShowing = true, showClearButton = false)
         autoCompleteViewState.value = AutoCompleteViewState(false)
+    }
+
+    private fun extractVerticalParameter(currentUrl: String?): String? {
+        val url = currentUrl ?: return null
+
+        return if (duckDuckGoUrlDetector.isDuckDuckGoVerticalUrl(url)) {
+            duckDuckGoUrlDetector.extractVertical(url)
+        } else {
+            null
+        }
+    }
+
+    private fun fireQueryChangedPixel(omnibarText: String) {
+        val oldParameter = currentOmnibarViewState().omnibarText.toUri()?.getQueryParameter(AppUrl.ParamKey.QUERY)
+        val newParameter = omnibarText.toUri()?.getQueryParameter(AppUrl.ParamKey.QUERY)
+        if (oldParameter == newParameter) {
+            pixel.fire(String.format(Locale.US, PixelName.SERP_REQUERY.pixelName, PixelParameter.SERP_QUERY_NOT_CHANGED))
+        } else {
+            pixel.fire(String.format(Locale.US, PixelName.SERP_REQUERY.pixelName, PixelParameter.SERP_QUERY_CHANGED))
+        }
     }
 
     private fun shouldClearHistoryOnNewQuery(): Boolean {
@@ -517,6 +571,7 @@ class BrowserTabViewModel(
     private fun pageChanged(url: String, title: String?) {
         Timber.v("Page changed: $url")
         buildSiteFactory(url, title)
+        command.value = RefreshUserAgent(site?.uri?.host, currentBrowserViewState().isDesktopBrowsingMode)
 
         val currentOmnibarViewState = currentOmnibarViewState()
         omnibarViewState.value = currentOmnibarViewState.copy(omnibarText = omnibarTextForUrl(url), shouldMoveCaretToEnd = false)
@@ -537,7 +592,8 @@ class BrowserTabViewModel(
             isWhitelisted = false,
             showSearchIcon = false,
             showClearButton = false,
-            canFireproofSite = canFireproofWebsite()
+            canFireproofSite = canFireproofWebsite(),
+            showDaxIcon = shouldShowDaxIcon(url, true)
         )
 
         Timber.d("showPrivacyGrade=true, showSearchIcon=false, showClearButton=false")
@@ -549,6 +605,16 @@ class BrowserTabViewModel(
         domain?.let { viewModelScope.launch { updateLoadingStatePrivacy(domain) } }
         domain?.let { viewModelScope.launch { updateWhitelistedState(domain) } }
         registerSiteVisit()
+    }
+
+    private fun shouldShowDaxIcon(currentUrl: String?, showPrivacyGrade: Boolean): Boolean {
+        if (!variantManager.getVariant().hasFeature(VariantManager.VariantFeature.SerpHeaderRemoval)) {
+            return false
+        }
+
+        val url = currentUrl ?: return false
+
+        return showPrivacyGrade && duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(url)
     }
 
     private suspend fun updateLoadingStatePrivacy(domain: String) {
@@ -575,15 +641,25 @@ class BrowserTabViewModel(
         onSiteChanged()
         val currentOmnibarViewState = currentOmnibarViewState()
         omnibarViewState.postValue(currentOmnibarViewState.copy(omnibarText = omnibarTextForUrl(url), shouldMoveCaretToEnd = false))
-        browserViewState.postValue(currentBrowserViewState().copy(canFireproofSite = canFireproofWebsite()))
+        browserViewState.postValue(
+            currentBrowserViewState().copy(
+                canFireproofSite = canFireproofWebsite()
+            )
+        )
     }
 
     private fun omnibarTextForUrl(url: String?): String {
         if (url == null) return ""
-        if (duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(url)) {
-            return duckDuckGoUrlDetector.extractQuery(url) ?: ""
+
+        if (variantManager.getVariant().hasFeature(VariantManager.VariantFeature.SerpHeaderQueryReplacement)) {
+            return url
         }
-        return url
+
+        return if (duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(url)) {
+            duckDuckGoUrlDetector.extractQuery(url) ?: url
+        } else {
+            url
+        }
     }
 
     private fun pageCleared() {
@@ -601,7 +677,8 @@ class BrowserTabViewModel(
             canReportSite = false,
             showSearchIcon = true,
             showClearButton = true,
-            canFireproofSite = false
+            canFireproofSite = false,
+            showDaxIcon = false
         )
         Timber.d("showPrivacyGrade=false, showSearchIcon=true, showClearButton=true")
     }
@@ -754,7 +831,8 @@ class BrowserTabViewModel(
             showTabsButton = showControls,
             showFireButton = showControls,
             showMenuButton = showControls,
-            showClearButton = showClearButton
+            showClearButton = showClearButton,
+            showDaxIcon = shouldShowDaxIcon(url, showPrivacyGrade)
         )
 
         Timber.d("showPrivacyGrade=$showPrivacyGrade, showSearchIcon=$showSearchIcon, showClearButton=$showClearButton")
@@ -932,6 +1010,7 @@ class BrowserTabViewModel(
     fun onDesktopSiteModeToggled(desktopSiteRequested: Boolean) {
         val currentBrowserViewState = currentBrowserViewState()
         browserViewState.value = currentBrowserViewState.copy(isDesktopBrowsingMode = desktopSiteRequested)
+        command.value = RefreshUserAgent(site?.uri?.host, desktopSiteRequested)
 
         val uri = site?.uri ?: return
 

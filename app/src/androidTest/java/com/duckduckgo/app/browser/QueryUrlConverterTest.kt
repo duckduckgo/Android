@@ -21,8 +21,11 @@ import com.duckduckgo.app.browser.omnibar.QueryUrlConverter
 import com.duckduckgo.app.referral.AppReferrerDataStore
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
+import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.mock
+import com.nhaarman.mockitokotlin2.whenever
 import org.junit.Assert.*
+import org.junit.Before
 import org.junit.Test
 
 class QueryUrlConverterTest {
@@ -32,6 +35,11 @@ class QueryUrlConverterTest {
     private val mockAppReferrerDataStore: AppReferrerDataStore = mock()
     private val requestRewriter = DuckDuckGoRequestRewriter(DuckDuckGoUrlDetector(), mockStatisticsStore, variantManager, mockAppReferrerDataStore)
     private val testee: QueryUrlConverter = QueryUrlConverter(requestRewriter)
+
+    @Before
+    fun setup() {
+        whenever(variantManager.getVariant(any())).thenReturn(VariantManager.DEFAULT_VARIANT)
+    }
 
     @Test
     fun whenSingleWordThenSearchQueryBuilt() {

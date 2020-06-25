@@ -149,7 +149,6 @@
     <string name="fireClearAll">Kustuta kõik vahekaardid ja andmed</string>
     <string name="fireCancel">Tühista</string>
     <string name="fireDataCleared">Andmed on kustutatud</string>
-    <string name="fireProcessName" translatable="false">:fire</string>
 
     <!-- Settings Activity -->
     <string name="settingsActivityTitle">Sätted</string>

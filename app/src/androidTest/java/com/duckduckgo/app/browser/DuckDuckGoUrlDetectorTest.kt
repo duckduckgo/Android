@@ -70,4 +70,32 @@ class DuckDuckGoUrlDetectorTest {
     fun whenNonDDGUrlContainsQueryThenQueryIsNotDetected() {
         assertFalse(testee.isDuckDuckGoQueryUrl("https://example.com?q=test%20search"))
     }
+
+    @Test
+    fun whenDDGUrlContainsVerticalThenVerticalCanBeExtracted() {
+        val vertical = testee.extractVertical("https://duckduckgo.com/?q=new+zealand+images&t=ffab&atb=v218-6&iar=images&iax=images&ia=images")
+        assertEquals("images", vertical)
+    }
+
+    @Test
+    fun whenDDGUrlDoesNotContainVerticalThenVerticalIsNull() {
+        val vertical = testee.extractVertical("https://duckduckgo.com")
+        assertNull(vertical)
+    }
+
+    @Test
+    fun whenDDGUrlContainsVerticalThenVerticalUrlDetected() {
+        assertTrue(testee.isDuckDuckGoVerticalUrl("https://duckduckgo.com?ia=images"))
+    }
+
+    @Test
+    fun whenDDGUrlDoesNotContainsVerticalThenVerticalUrlIsNotDetected() {
+        assertFalse(testee.isDuckDuckGoVerticalUrl("https://duckduckgo.com"))
+    }
+
+    @Test
+    fun whenCheckingNonDDGUrThenVerticalUrlIsNotDetected() {
+        assertFalse(testee.isDuckDuckGoVerticalUrl("https://example.com?ia=images"))
+    }
+
 }

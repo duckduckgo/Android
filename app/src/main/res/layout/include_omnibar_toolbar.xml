@@ -77,6 +77,16 @@
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintTop_toTopOf="parent">
 
+                            <ImageView
+                                android:id="@+id/daxIcon"
+                                android:layout_width="wrap_content"
+                                android:layout_height="match_parent"
+                                android:gravity="center"
+                                android:contentDescription="@string/privacyGradeContentDescription"
+                                android:padding="4dp"
+                                android:visibility="gone"
+                                android:src="@drawable/ic_dax_toolbar" />
+
                             <ImageButton
                                 android:id="@+id/privacyGradeButton"
                                 android:layout_width="wrap_content"
