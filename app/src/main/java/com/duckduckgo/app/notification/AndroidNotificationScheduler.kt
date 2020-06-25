@@ -67,8 +67,8 @@ class NotificationScheduler(
         if (userStageStore.useOurAppNotification()) {
             val operation = scheduleUniqueNotification(
                 OneTimeWorkRequestBuilder<UseOurAppNotificationWorker>(),
-                15,
-                TimeUnit.SECONDS,
+                1,
+                TimeUnit.DAYS,
                 USE_OUR_APP_WORK_REQUEST_TAG
             )
             try {

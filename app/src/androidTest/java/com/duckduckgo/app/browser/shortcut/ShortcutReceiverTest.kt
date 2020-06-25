@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.browser.shortcut
 
+import android.content.Context
 import android.content.Intent
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.CoroutineTestRule
@@ -41,11 +42,10 @@ class ShortcutReceiverTest {
     private val mockKeyTimestampStore: KeyTimestampStore = mock()
     private val mockPixel: Pixel = mock()
     private lateinit var testee: ShortcutReceiver
-    private val context = InstrumentationRegistry.getInstrumentation().targetContext
+    private val context: Context = mock()
 
     @Before
     fun before() {
-
         testee = ShortcutReceiver(mockKeyTimestampStore, coroutinesTestRule.testDispatcherProvider, mockPixel)
     }
 
