@@ -18,7 +18,6 @@ package com.duckduckgo.app.browser.shortcut
 
 import android.content.Context
 import android.content.Intent
-import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.cta.ui.UseOurAppCta
 import com.duckduckgo.app.global.timestamps.db.KeyTimestampStore
