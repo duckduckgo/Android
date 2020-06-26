@@ -426,15 +426,15 @@
     <string name="whitelisetActivityTitle">Gestionar Protección</string>
     <string name="whitelistAdd">Habilitar Protección</string>
     <string name="whitelistRemove">Deshabilitar Protección</string>
-    <string name="whitelistEntryOverflowContentDescription">Más opciones para el sitio desprotegido %s</string>
+    <string name="whitelistEntryOverflowContentDescription">Más opciones para el sitio no protegido %s</string>
     <string name="whitelistEntryDeleteConfirmMessage">Seguro que quieres habilitar de nuevo Protección de Privacidad para el sitio &lt;b>%s&lt;/b>?</string>
-    <string name="whitelistExplanation">La Protección de Privacidad no está aplicada a estos sitios</string>
-    <string name="whitelistNoEntries">Protección de Privacidad está habilitado para todos los sitios.</string>
+    <string name="whitelistExplanation">La Protección de Privacidad está deshabilitada para estos sitios</string>
+    <string name="whitelistNoEntries">Protección de Privacidad habilitada para todos los sitios.</string>
     <string name="whitelistDomainHint">www.ejemplo.com</string>
-    <string name="whitelistFormatError">No se ha podido guardar, ingresa un dominio como <b>ejemplo.com</b></string>
+    <string name="whitelistFormatError">Ha habido un error al guardar, introduce un dominio válido como <b>ejemplo.com</b></string>
 
     <!-- Settings -->
-    <string name="settingsPrivacyProtectionWhitelist">Sitios desprotegidos</string>
+    <string name="settingsPrivacyProtectionWhitelist">Sitios no protegidos</string>
 
     <!-- Fireproof websites -->
     <string name="fireproofWebsitesActivityTitle">Sitios web a prueba de fuego</string>
