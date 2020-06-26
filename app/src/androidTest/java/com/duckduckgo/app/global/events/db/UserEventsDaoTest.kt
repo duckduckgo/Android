@@ -60,16 +60,16 @@ class UserEventsDaoTest {
 
     @Test
     fun whenGetTimestampAndDatabaseEmptyThenReturnNull() = coroutineRule.runBlocking {
-        val value = testee.getTimestamp(UserEventKey.USE_OUR_APP_SHORTCUT_ADDED)
+        val value = testee.getUserEvent(UserEventKey.USE_OUR_APP_SHORTCUT_ADDED)
         assertNull(value)
     }
 
     @Test
     fun whenInsertingTimestampThenReturnSameTimestamp() = coroutineRule.runBlocking {
         val entity = UserEventEntity(UserEventKey.USE_OUR_APP_SHORTCUT_ADDED)
-        testee.registerTimestamp(entity)
+        testee.registerUserEvent(entity)
 
-        assertEquals(entity.timestamp, testee.getTimestamp(UserEventKey.USE_OUR_APP_SHORTCUT_ADDED)?.timestamp)
+        assertEquals(entity.timestamp, testee.getUserEvent(UserEventKey.USE_OUR_APP_SHORTCUT_ADDED)?.timestamp)
     }
 
     @Test
@@ -77,9 +77,9 @@ class UserEventsDaoTest {
         val entity = UserEventEntity(UserEventKey.USE_OUR_APP_SHORTCUT_ADDED)
         val newEntity = UserEventEntity(UserEventKey.USE_OUR_APP_SHORTCUT_ADDED, System.currentTimeMillis() + - TimeUnit.DAYS.toMillis(1))
 
-        testee.registerTimestamp(entity)
-        testee.registerTimestamp(newEntity)
+        testee.registerUserEvent(entity)
+        testee.registerUserEvent(newEntity)
 
-        assertEquals(newEntity.timestamp, testee.getTimestamp(UserEventKey.USE_OUR_APP_SHORTCUT_ADDED)?.timestamp)
+        assertEquals(newEntity.timestamp, testee.getUserEvent(UserEventKey.USE_OUR_APP_SHORTCUT_ADDED)?.timestamp)
     }
 }

@@ -53,7 +53,7 @@ class ShortcutReceiverTest {
         intent.putExtra(ShortcutBuilder.SHORTCUT_TITLE_ARG, "Title")
         testee.onReceive(null, intent)
 
-        verify(mockUserEventsStore).registerTimestamp(any())
+        verify(mockUserEventsStore).registerUserEvent(any())
     }
 
     @Test
@@ -73,7 +73,7 @@ class ShortcutReceiverTest {
         intent.putExtra(ShortcutBuilder.SHORTCUT_TITLE_ARG, "Title")
         testee.onReceive(null, intent)
 
-        verify(mockUserEventsStore, never()).registerTimestamp(any())
+        verify(mockUserEventsStore, never()).registerUserEvent(any())
     }
 
     @Test

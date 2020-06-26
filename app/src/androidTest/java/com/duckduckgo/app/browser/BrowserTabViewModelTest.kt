@@ -2067,7 +2067,7 @@ class BrowserTabViewModelTest {
     @Test
     fun whenViewReadyIfDomainSameAsUseOurAppAfterShortcutAddedThenPixelSent() = coroutineRule.runBlocking {
         givenUseOurAppSiteSelected()
-        whenever(mockUserEventsStore.getTimestamp(UserEventKey.USE_OUR_APP_SHORTCUT_ADDED)).thenReturn(UserEventEntity(UserEventKey.USE_OUR_APP_SHORTCUT_ADDED))
+        whenever(mockUserEventsStore.getUserEvent(UserEventKey.USE_OUR_APP_SHORTCUT_ADDED)).thenReturn(UserEventEntity(UserEventKey.USE_OUR_APP_SHORTCUT_ADDED))
         testee.onViewReady()
         verify(mockPixel).fire(Pixel.PixelName.UOA_VISITED_AFTER_SHORTCUT)
     }
@@ -2089,7 +2089,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenPageRefreshedIfPreviousOneWasNotUseOurAppSiteAfterShortcutAddedThenPixelSent() = coroutineRule.runBlocking {
-        whenever(mockUserEventsStore.getTimestamp(UserEventKey.USE_OUR_APP_SHORTCUT_ADDED)).thenReturn(UserEventEntity(UserEventKey.USE_OUR_APP_SHORTCUT_ADDED))
+        whenever(mockUserEventsStore.getUserEvent(UserEventKey.USE_OUR_APP_SHORTCUT_ADDED)).thenReturn(UserEventEntity(UserEventKey.USE_OUR_APP_SHORTCUT_ADDED))
         testee.pageRefreshed(USE_OUR_APP_DOMAIN)
         verify(mockPixel).fire(Pixel.PixelName.UOA_VISITED_AFTER_SHORTCUT)
     }
@@ -2113,7 +2113,7 @@ class BrowserTabViewModelTest {
     fun whenPageRefreshedIfPreviousOneWasNotUseOurAppSiteAfterShortcutAddedThenPixelNotSent() = coroutineRule.runBlocking {
         givenUseOurAppSiteSelected()
         val timestampEntity = UserEventEntity(UserEventKey.USE_OUR_APP_SHORTCUT_ADDED)
-        whenever(mockUserEventsStore.getTimestamp(UserEventKey.USE_OUR_APP_SHORTCUT_ADDED)).thenReturn(timestampEntity)
+        whenever(mockUserEventsStore.getUserEvent(UserEventKey.USE_OUR_APP_SHORTCUT_ADDED)).thenReturn(timestampEntity)
         testee.pageRefreshed(USE_OUR_APP_DOMAIN)
         verify(mockPixel, never()).fire(Pixel.PixelName.UOA_VISITED_AFTER_SHORTCUT)
     }

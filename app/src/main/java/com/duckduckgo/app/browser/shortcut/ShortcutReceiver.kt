@@ -49,7 +49,7 @@ class ShortcutReceiver @Inject constructor(private val userEventsStore: UserEven
 
         GlobalScope.launch(dispatcher.io()) {
             if (originUrl == USE_OUR_APP_SHORTCUT_URL) {
-                userEventsStore.registerTimestamp(UserEventEntity(UserEventKey.USE_OUR_APP_SHORTCUT_ADDED))
+                userEventsStore.registerUserEvent(UserEventEntity(UserEventKey.USE_OUR_APP_SHORTCUT_ADDED))
                 pixel.fire(Pixel.PixelName.USE_OUR_APP_SHORTCUT_ADDED)
             }
         }

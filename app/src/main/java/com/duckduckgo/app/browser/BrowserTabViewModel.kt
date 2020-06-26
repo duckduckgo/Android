@@ -652,7 +652,7 @@ class BrowserTabViewModel(
 
     private suspend fun sendPixelIfUseOurAppSiteVisited() {
         withContext(dispatchers.io()) {
-            val isShortcutAdded = userEventsStore.getTimestamp(UserEventKey.USE_OUR_APP_SHORTCUT_ADDED)
+            val isShortcutAdded = userEventsStore.getUserEvent(UserEventKey.USE_OUR_APP_SHORTCUT_ADDED)
             val isUseOurAppNotificationSeen = notificationDao.exists(UseOurAppNotification.ID)
             val deleteCtaShown = ctaViewModel.useOurAppDeletionDialogShown()
 

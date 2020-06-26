@@ -21,8 +21,8 @@ import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 interface UserEventsStore {
-    suspend fun getTimestamp(userEventKey: UserEventKey): UserEventEntity?
-    suspend fun registerTimestamp(timestampEntity: UserEventEntity)
+    suspend fun getUserEvent(userEventKey: UserEventKey): UserEventEntity?
+    suspend fun registerUserEvent(timestampEntity: UserEventEntity)
 }
 
 class AppUserEventsStore @Inject constructor(
@@ -30,13 +30,13 @@ class AppUserEventsStore @Inject constructor(
     private val dispatcher: DispatcherProvider
 ) : UserEventsStore {
 
-    override suspend fun getTimestamp(userEventKey: UserEventKey): UserEventEntity? {
+    override suspend fun getUserEvent(userEventKey: UserEventKey): UserEventEntity? {
         return withContext(dispatcher.io()) {
-            userEventsDao.getTimestamp(userEventKey)
+            userEventsDao.getUserEvent(userEventKey)
         }
     }
 
-    override suspend fun registerTimestamp(timestampEntity: UserEventEntity) {
+    override suspend fun registerUserEvent(timestampEntity: UserEventEntity) {
         withContext(dispatcher.io()) {
             userEventsDao.insert(timestampEntity)
         }
