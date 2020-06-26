@@ -57,8 +57,8 @@ import com.duckduckgo.app.cta.ui.DaxBubbleCta
 import com.duckduckgo.app.cta.ui.DaxDialogCta
 import com.duckduckgo.app.cta.ui.HomePanelCta
 import com.duckduckgo.app.cta.ui.UseOurAppCta
-import com.duckduckgo.app.cta.ui.UseOurAppCta.Companion.USE_OUR_APP_DOMAIN
-import com.duckduckgo.app.cta.ui.UseOurAppCta.Companion.USE_OUR_APP_SHORTCUT_URL
+import com.duckduckgo.app.global.useourapp.UseOurAppDetector.Companion.USE_OUR_APP_DOMAIN
+import com.duckduckgo.app.global.useourapp.UseOurAppDetector.Companion.USE_OUR_APP_SHORTCUT_URL
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.model.Site
@@ -67,6 +67,7 @@ import com.duckduckgo.app.global.events.db.UserEventKey
 import com.duckduckgo.app.notification.model.UseOurAppNotification
 import com.duckduckgo.app.global.events.db.UserEventEntity
 import com.duckduckgo.app.global.events.db.UserEventsStore
+import com.duckduckgo.app.global.useourapp.UseOurAppDetector
 import com.duckduckgo.app.notification.db.NotificationDao
 import com.duckduckgo.app.onboarding.store.AppStage
 import com.duckduckgo.app.onboarding.store.OnboardingStore
@@ -250,6 +251,7 @@ class BrowserTabViewModelTest {
             mockOnboardingStore,
             mockUserStageStore,
             mockUserEventsStore,
+            UseOurAppDetector(),
             coroutineRule.testDispatcherProvider
         )
 
@@ -286,6 +288,7 @@ class BrowserTabViewModelTest {
             fireproofWebsiteDao = fireproofWebsiteDao,
             userEventsStore = mockUserEventsStore,
             notificationDao = mockNotificationDao,
+            useOurAppDetector = UseOurAppDetector(),
             variantManager = mockVariantManager
         )
 

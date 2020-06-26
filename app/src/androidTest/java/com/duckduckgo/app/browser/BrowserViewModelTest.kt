@@ -23,12 +23,12 @@ import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.browser.BrowserViewModel.Command
 import com.duckduckgo.app.browser.BrowserViewModel.Command.DisplayMessage
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
-import com.duckduckgo.app.cta.ui.UseOurAppCta
 import com.duckduckgo.app.fire.DataClearer
 import com.duckduckgo.app.global.rating.AppEnjoymentPromptEmitter
 import com.duckduckgo.app.global.rating.AppEnjoymentPromptOptions
 import com.duckduckgo.app.global.rating.AppEnjoymentUserEventRecorder
 import com.duckduckgo.app.global.rating.PromptCount
+import com.duckduckgo.app.global.useourapp.UseOurAppDetector.Companion.USE_OUR_APP_SHORTCUT_URL
 import com.duckduckgo.app.privacy.ui.PrivacyDashboardActivity
 import com.duckduckgo.app.runBlocking
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -187,7 +187,7 @@ class BrowserViewModelTest {
 
     @Test
     fun whenOpenShortcutIfUrlIsUSeOurAppUrlThenFirePixel() {
-        val url = UseOurAppCta.USE_OUR_APP_SHORTCUT_URL
+        val url = USE_OUR_APP_SHORTCUT_URL
         whenever(mockOmnibarEntryConverter.convertQueryToUrl(url)).thenReturn(url)
         testee.onOpenShortcut(url)
         verify(mockPixel).fire(Pixel.PixelName.USE_OUR_APP_SHORTCUT_OPENED)

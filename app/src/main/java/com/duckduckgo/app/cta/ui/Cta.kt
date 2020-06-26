@@ -92,13 +92,6 @@ class UseOurAppCta(
     override fun pixelOkParameters(): Map<String, String> = emptyMap()
 
     override fun pixelShownParameters(): Map<String, String> = emptyMap()
-
-    companion object {
-        const val USE_OUR_APP_SHORTCUT_URL: String = "https://m.facebook.com"
-        const val USE_OUR_APP_SHORTCUT_TITLE: String = "Facebook"
-        const val USE_OUR_APP_DOMAIN = "facebook.com"
-        const val USE_OUR_APP_MOBILE_DOMAIN = "m.facebook.com"
-    }
 }
 
 class UseOurAppDeletionCta(

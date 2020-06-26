@@ -67,8 +67,6 @@ import com.duckduckgo.app.cta.ui.DialogCta
 import com.duckduckgo.app.cta.ui.HomePanelCta
 import com.duckduckgo.app.cta.ui.HomeTopPanelCta
 import com.duckduckgo.app.cta.ui.UseOurAppCta
-import com.duckduckgo.app.cta.ui.UseOurAppCta.Companion.USE_OUR_APP_SHORTCUT_TITLE
-import com.duckduckgo.app.cta.ui.UseOurAppCta.Companion.USE_OUR_APP_SHORTCUT_URL
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteDao
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
 import com.duckduckgo.app.global.AppUrl
@@ -81,10 +79,12 @@ import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.global.model.SiteFactory
 import com.duckduckgo.app.global.model.domain
 import com.duckduckgo.app.global.model.domainMatchesUrl
-import com.duckduckgo.app.global.model.isUseOurAppDomain
 import com.duckduckgo.app.global.events.db.UserEventsStore
 import com.duckduckgo.app.global.events.db.UserEventKey
 import com.duckduckgo.app.global.toDesktopUri
+import com.duckduckgo.app.global.useourapp.UseOurAppDetector
+import com.duckduckgo.app.global.useourapp.UseOurAppDetector.Companion.USE_OUR_APP_SHORTCUT_TITLE
+import com.duckduckgo.app.global.useourapp.UseOurAppDetector.Companion.USE_OUR_APP_SHORTCUT_URL
 import com.duckduckgo.app.notification.db.NotificationDao
 import com.duckduckgo.app.notification.model.UseOurAppNotification
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao
@@ -138,6 +138,7 @@ class BrowserTabViewModel(
     private val dispatchers: DispatcherProvider = DefaultDispatcherProvider(),
     private val userEventsStore: UserEventsStore,
     private val notificationDao: NotificationDao,
+    private val useOurAppDetector: UseOurAppDetector,
     private val variantManager: VariantManager
 ) : WebViewClientListener, EditBookmarkListener, HttpAuthenticationListener, ViewModel() {
 
@@ -305,7 +306,7 @@ class BrowserTabViewModel(
 
     fun onViewReady() {
         url?.let {
-            isDomainSameAsUseOurAppSiteDomain()
+            isDomainSameAsUseOurAppDomain(it)
             onUserSubmittedQuery(it)
         }
     }
@@ -599,14 +600,13 @@ class BrowserTabViewModel(
 
     private fun pageChanged(url: String, title: String?) {
         Timber.v("Page changed: $url")
+        val oldUrl = site?.url
 
-        val oldSite = site
-
-        buildSiteFactory(url, title) // Immediately updates site with the new URL
+        buildSiteFactory(url, title)
 
         // Navigating from different website to use our app website
-        if (!oldSite.isUseOurAppDomain()) {
-            isDomainSameAsUseOurAppSiteDomain()
+        if (!useOurAppDetector.isUseOurAppUrl(oldUrl)) {
+            isDomainSameAsUseOurAppDomain(url)
         }
 
         command.value = RefreshUserAgent(site?.uri?.host, currentBrowserViewState().isDesktopBrowsingMode)
@@ -644,8 +644,8 @@ class BrowserTabViewModel(
         registerSiteVisit()
     }
 
-    private fun isDomainSameAsUseOurAppSiteDomain() {
-        if (site.isUseOurAppDomain()) {
+    private fun isDomainSameAsUseOurAppDomain(url: String) {
+        if (useOurAppDetector.isUseOurAppUrl(url)) {
             viewModelScope.launch { sendPixelIfUseOurAppSiteVisited() }
         }
     }

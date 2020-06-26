@@ -27,10 +27,10 @@ import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.install.daysInstalled
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.global.model.domain
-import com.duckduckgo.app.global.model.isUseOurAppDomain
 import com.duckduckgo.app.global.model.orderedTrackingEntities
 import com.duckduckgo.app.global.events.db.UserEventsStore
 import com.duckduckgo.app.global.events.db.UserEventKey
+import com.duckduckgo.app.global.useourapp.UseOurAppDetector
 import com.duckduckgo.app.onboarding.store.AppStage
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.store.UserStageStore
@@ -63,6 +63,7 @@ class CtaViewModel @Inject constructor(
     private val onboardingStore: OnboardingStore,
     private val userStageStore: UserStageStore,
     private val userEventsStore: UserEventsStore,
+    private val useOurAppDetector: UseOurAppDetector,
     private val dispatchers: DispatcherProvider
 ) {
     val surveyLiveData: LiveData<Survey> = surveyDao.getLiveScheduled()
@@ -203,7 +204,7 @@ class CtaViewModel @Inject constructor(
 
     @WorkerThread
     private suspend fun canShowUseOurAppDeletionDialog(site: Site?): Boolean =
-        !settingsDataStore.hideTips && !useOurAppDeletionDialogShown() && site.isUseOurAppDomain() && twoDaysSinceShortcutAdded()
+        !settingsDataStore.hideTips && !useOurAppDeletionDialogShown() && useOurAppDetector.isUseOurAppUrl(site?.url) && twoDaysSinceShortcutAdded()
 
     @WorkerThread
     private suspend fun twoDaysSinceShortcutAdded(): Boolean {

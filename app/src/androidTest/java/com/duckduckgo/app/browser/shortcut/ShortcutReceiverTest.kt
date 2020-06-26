@@ -18,8 +18,8 @@ package com.duckduckgo.app.browser.shortcut
 
 import android.content.Intent
 import com.duckduckgo.app.CoroutineTestRule
-import com.duckduckgo.app.cta.ui.UseOurAppCta
 import com.duckduckgo.app.global.events.db.UserEventsStore
+import com.duckduckgo.app.global.useourapp.UseOurAppDetector.Companion.USE_OUR_APP_SHORTCUT_URL
 import com.duckduckgo.app.runBlocking
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.nhaarman.mockitokotlin2.any
@@ -49,7 +49,7 @@ class ShortcutReceiverTest {
     @Test
     fun whenIntentReceivedIfUrlIsFromUseOurAppUrlThenRegisterTimestamp() = coroutinesTestRule.runBlocking {
         val intent = Intent()
-        intent.putExtra(ShortcutBuilder.SHORTCUT_URL_ARG, UseOurAppCta.USE_OUR_APP_SHORTCUT_URL)
+        intent.putExtra(ShortcutBuilder.SHORTCUT_URL_ARG, USE_OUR_APP_SHORTCUT_URL)
         intent.putExtra(ShortcutBuilder.SHORTCUT_TITLE_ARG, "Title")
         testee.onReceive(null, intent)
 
@@ -59,7 +59,7 @@ class ShortcutReceiverTest {
     @Test
     fun whenIntentReceivedIfUrlIsFromUseOurAppUrlThenFirePixel() {
         val intent = Intent()
-        intent.putExtra(ShortcutBuilder.SHORTCUT_URL_ARG, UseOurAppCta.USE_OUR_APP_SHORTCUT_URL)
+        intent.putExtra(ShortcutBuilder.SHORTCUT_URL_ARG, USE_OUR_APP_SHORTCUT_URL)
         intent.putExtra(ShortcutBuilder.SHORTCUT_TITLE_ARG, "Title")
         testee.onReceive(null, intent)
 
