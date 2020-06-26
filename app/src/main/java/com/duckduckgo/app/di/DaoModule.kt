@@ -84,5 +84,5 @@ class DaoModule {
     fun fireproofWebsiteDao(database: AppDatabase) = database.fireproofWebsiteDao()
 
     @Provides
-    fun keyTimestampDao(database: AppDatabase) = database.keyTimestampDao()
+    fun userEventsDao(database: AppDatabase) = database.userEventsDao()
 }

@@ -19,7 +19,7 @@ package com.duckduckgo.app.browser.shortcut
 import android.content.Intent
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.cta.ui.UseOurAppCta
-import com.duckduckgo.app.global.timestamps.db.KeyTimestampStore
+import com.duckduckgo.app.global.events.db.UserEventsStore
 import com.duckduckgo.app.runBlocking
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.nhaarman.mockitokotlin2.any
@@ -37,13 +37,13 @@ class ShortcutReceiverTest {
     @get:Rule
     var coroutinesTestRule = CoroutineTestRule()
 
-    private val mockKeyTimestampStore: KeyTimestampStore = mock()
+    private val mockUserEventsStore: UserEventsStore = mock()
     private val mockPixel: Pixel = mock()
     private lateinit var testee: ShortcutReceiver
 
     @Before
     fun before() {
-        testee = ShortcutReceiver(mockKeyTimestampStore, coroutinesTestRule.testDispatcherProvider, mockPixel)
+        testee = ShortcutReceiver(mockUserEventsStore, coroutinesTestRule.testDispatcherProvider, mockPixel)
     }
 
     @Test
@@ -53,7 +53,7 @@ class ShortcutReceiverTest {
         intent.putExtra(ShortcutBuilder.SHORTCUT_TITLE_ARG, "Title")
         testee.onReceive(null, intent)
 
-        verify(mockKeyTimestampStore).registerTimestamp(any())
+        verify(mockUserEventsStore).registerTimestamp(any())
     }
 
     @Test
@@ -73,7 +73,7 @@ class ShortcutReceiverTest {
         intent.putExtra(ShortcutBuilder.SHORTCUT_TITLE_ARG, "Title")
         testee.onReceive(null, intent)
 
-        verify(mockKeyTimestampStore, never()).registerTimestamp(any())
+        verify(mockUserEventsStore, never()).registerTimestamp(any())
     }
 
     @Test

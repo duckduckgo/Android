@@ -43,7 +43,7 @@ import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.model.SiteFactory
 import com.duckduckgo.app.global.rating.AppEnjoymentPromptEmitter
 import com.duckduckgo.app.global.rating.AppEnjoymentUserEventRecorder
-import com.duckduckgo.app.global.timestamps.db.KeyTimestampStore
+import com.duckduckgo.app.global.events.db.UserEventsStore
 import com.duckduckgo.app.icon.api.IconModifier
 import com.duckduckgo.app.icon.ui.ChangeIconViewModel
 import com.duckduckgo.app.launch.LaunchViewModel
@@ -110,7 +110,7 @@ class ViewModelFactory @Inject constructor(
     private val onboardingPageManager: OnboardingPageManager,
     private val appInstallationReferrerStateListener: AppInstallationReferrerStateListener,
     private val appIconModifier: IconModifier,
-    private val keyTimestampStore: KeyTimestampStore,
+    private val userEventsStore: UserEventsStore,
     private val notificationDao: NotificationDao,
     private val dispatcherProvider: DispatcherProvider
 ) : ViewModelProvider.NewInstanceFactory() {
@@ -199,7 +199,7 @@ class ViewModelFactory @Inject constructor(
         ctaViewModel = ctaViewModel,
         searchCountDao = searchCountDao,
         pixel = pixel,
-        keyTimestampStore = keyTimestampStore,
+        userEventsStore = userEventsStore,
         notificationDao = notificationDao,
         variantManager = variantManager
     )

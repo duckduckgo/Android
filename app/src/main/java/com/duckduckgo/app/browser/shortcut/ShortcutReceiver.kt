@@ -26,15 +26,15 @@ import com.duckduckgo.app.browser.shortcut.ShortcutBuilder.Companion.SHORTCUT_TI
 import com.duckduckgo.app.browser.shortcut.ShortcutBuilder.Companion.SHORTCUT_URL_ARG
 import com.duckduckgo.app.cta.ui.UseOurAppCta.Companion.USE_OUR_APP_SHORTCUT_URL
 import com.duckduckgo.app.global.DispatcherProvider
-import com.duckduckgo.app.global.timestamps.db.KeyTimestampEntity
-import com.duckduckgo.app.global.timestamps.db.KeyTimestampStore
-import com.duckduckgo.app.global.timestamps.db.TimestampKey
+import com.duckduckgo.app.global.events.db.UserEventEntity
+import com.duckduckgo.app.global.events.db.UserEventsStore
+import com.duckduckgo.app.global.events.db.UserEventKey
 import com.duckduckgo.app.statistics.pixels.Pixel
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-class ShortcutReceiver @Inject constructor(private val keyTimestampStore: KeyTimestampStore, val dispatcher: DispatcherProvider, val pixel: Pixel) :
+class ShortcutReceiver @Inject constructor(private val userEventsStore: UserEventsStore, val dispatcher: DispatcherProvider, val pixel: Pixel) :
     BroadcastReceiver() {
 
     override fun onReceive(context: Context?, intent: Intent?) {
@@ -49,7 +49,7 @@ class ShortcutReceiver @Inject constructor(private val keyTimestampStore: KeyTim
 
         GlobalScope.launch(dispatcher.io()) {
             if (originUrl == USE_OUR_APP_SHORTCUT_URL) {
-                keyTimestampStore.registerTimestamp(KeyTimestampEntity(TimestampKey.USE_OUR_APP_SHORTCUT_ADDED))
+                userEventsStore.registerTimestamp(UserEventEntity(UserEventKey.USE_OUR_APP_SHORTCUT_ADDED))
                 pixel.fire(Pixel.PixelName.USE_OUR_APP_SHORTCUT_ADDED)
             }
         }

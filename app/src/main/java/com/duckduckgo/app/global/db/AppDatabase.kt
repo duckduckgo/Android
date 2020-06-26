@@ -36,9 +36,9 @@ import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
 import com.duckduckgo.app.global.exception.UncaughtExceptionDao
 import com.duckduckgo.app.global.exception.UncaughtExceptionEntity
 import com.duckduckgo.app.global.exception.UncaughtExceptionSourceConverter
-import com.duckduckgo.app.global.timestamps.db.KeyTimestampDao
-import com.duckduckgo.app.global.timestamps.db.KeyTimestampEntity
-import com.duckduckgo.app.global.timestamps.db.TimestampKeyTypeConverter
+import com.duckduckgo.app.global.events.db.UserEventsDao
+import com.duckduckgo.app.global.events.db.UserEventEntity
+import com.duckduckgo.app.global.events.db.UserEventTypeConverter
 import com.duckduckgo.app.httpsupgrade.db.HttpsBloomFilterSpecDao
 import com.duckduckgo.app.httpsupgrade.db.HttpsWhitelistDao
 import com.duckduckgo.app.httpsupgrade.model.HttpsBloomFilterSpec
@@ -87,7 +87,7 @@ import com.duckduckgo.app.usage.search.SearchCountEntity
         TdsMetadata::class,
         UserStage::class,
         FireproofWebsiteEntity::class,
-        KeyTimestampEntity::class
+        UserEventEntity::class
     ]
 )
 
@@ -101,7 +101,7 @@ import com.duckduckgo.app.usage.search.SearchCountEntity
     CategoriesTypeConverter::class,
     UncaughtExceptionSourceConverter::class,
     StageTypeConverter::class,
-    TimestampKeyTypeConverter::class
+    UserEventTypeConverter::class
 )
 abstract class AppDatabase : RoomDatabase() {
 
@@ -126,7 +126,7 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun tdsDao(): TdsMetadataDao
     abstract fun userStageDao(): UserStageDao
     abstract fun fireproofWebsiteDao(): FireproofWebsiteDao
-    abstract fun keyTimestampDao(): KeyTimestampDao
+    abstract fun userEventsDao(): UserEventsDao
 }
 
 @Suppress("PropertyName")
@@ -306,7 +306,7 @@ class MigrationsProvider(
 
     val MIGRATION_21_TO_22: Migration = object : Migration(21, 22) {
         override fun migrate(database: SupportSQLiteDatabase) {
-            database.execSQL("CREATE TABLE IF NOT EXISTS `keyTimestamps` (`id` TEXT NOT NULL PRIMARY KEY, `timestamp` INTEGER NOT NULL)")
+            database.execSQL("CREATE TABLE IF NOT EXISTS `user_events` (`id` TEXT NOT NULL PRIMARY KEY, `timestamp` INTEGER NOT NULL)")
 
             if (!settingsDataStore.hideTips && addToHomeCapabilityDetector.isAddToHomeSupported()) {
                 database.execSQL("UPDATE $USER_STAGE_TABLE_NAME SET appStage = \"${AppStage.USE_OUR_APP_NOTIFICATION}\" WHERE appStage = \"${AppStage.ESTABLISHED}\"")

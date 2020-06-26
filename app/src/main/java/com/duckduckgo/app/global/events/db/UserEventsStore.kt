@@ -14,31 +14,31 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.global.timestamps.db
+package com.duckduckgo.app.global.events.db
 
 import com.duckduckgo.app.global.DispatcherProvider
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
-interface KeyTimestampStore {
-    suspend fun getTimestamp(timestampKey: TimestampKey): KeyTimestampEntity?
-    suspend fun registerTimestamp(timestampEntity: KeyTimestampEntity)
+interface UserEventsStore {
+    suspend fun getTimestamp(userEventKey: UserEventKey): UserEventEntity?
+    suspend fun registerTimestamp(timestampEntity: UserEventEntity)
 }
 
-class AppKeyTimestampStore @Inject constructor(
-    private val keyTimestampDao: KeyTimestampDao,
+class AppUserEventsStore @Inject constructor(
+    private val userEventsDao: UserEventsDao,
     private val dispatcher: DispatcherProvider
-) : KeyTimestampStore {
+) : UserEventsStore {
 
-    override suspend fun getTimestamp(timestampKey: TimestampKey): KeyTimestampEntity? {
+    override suspend fun getTimestamp(userEventKey: UserEventKey): UserEventEntity? {
         return withContext(dispatcher.io()) {
-            keyTimestampDao.getTimestamp(timestampKey)
+            userEventsDao.getTimestamp(userEventKey)
         }
     }
 
-    override suspend fun registerTimestamp(timestampEntity: KeyTimestampEntity) {
+    override suspend fun registerTimestamp(timestampEntity: UserEventEntity) {
         withContext(dispatcher.io()) {
-            keyTimestampDao.insert(timestampEntity)
+            userEventsDao.insert(timestampEntity)
         }
     }
 }

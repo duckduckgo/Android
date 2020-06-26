@@ -29,9 +29,9 @@ import com.duckduckgo.app.cta.ui.UseOurAppCta.Companion.USE_OUR_APP_SHORTCUT_URL
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.model.Site
-import com.duckduckgo.app.global.timestamps.db.KeyTimestampEntity
-import com.duckduckgo.app.global.timestamps.db.KeyTimestampStore
-import com.duckduckgo.app.global.timestamps.db.TimestampKey
+import com.duckduckgo.app.global.events.db.UserEventEntity
+import com.duckduckgo.app.global.events.db.UserEventsStore
+import com.duckduckgo.app.global.events.db.UserEventKey
 import com.duckduckgo.app.onboarding.store.AppStage
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.store.UserStageStore
@@ -111,7 +111,7 @@ class CtaViewModelTest {
     private lateinit var mockUserStageStore: UserStageStore
 
     @Mock
-    private lateinit var mockKeyTimestampStore: KeyTimestampStore
+    private lateinit var mockUserEventsStore: UserEventsStore
 
     private val requiredDaxOnboardingCtas: List<CtaId> = listOf(
         CtaId.DAX_INTRO,
@@ -146,7 +146,7 @@ class CtaViewModelTest {
             mockSettingsDataStore,
             mockOnboardingStore,
             mockUserStageStore,
-            mockKeyTimestampStore,
+            mockUserEventsStore,
             coroutineRule.testDispatcherProvider
         )
     }
@@ -455,8 +455,8 @@ class CtaViewModelTest {
     @Test
     fun whenRefreshCtaWhileBrowsingAndSiteIsUseOurAppAndTwoDaysSinceShortcutAddedThenShowUseOurAppDeletionCta() = runBlockingTest {
         givenUserIsEstablished()
-        val timestampEntity = KeyTimestampEntity(TimestampKey.USE_OUR_APP_SHORTCUT_ADDED, System.currentTimeMillis() - TimeUnit.DAYS.toMillis(2))
-        whenever(mockKeyTimestampStore.getTimestamp(TimestampKey.USE_OUR_APP_SHORTCUT_ADDED)).thenReturn(timestampEntity)
+        val timestampEntity = UserEventEntity(UserEventKey.USE_OUR_APP_SHORTCUT_ADDED, System.currentTimeMillis() - TimeUnit.DAYS.toMillis(2))
+        whenever(mockUserEventsStore.getTimestamp(UserEventKey.USE_OUR_APP_SHORTCUT_ADDED)).thenReturn(timestampEntity)
 
         val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = true, site = site(url = USE_OUR_APP_SHORTCUT_URL))
         assertTrue(value is UseOurAppDeletionCta)
@@ -465,8 +465,8 @@ class CtaViewModelTest {
     @Test
     fun whenRefreshCtaWhileBrowsingAndSiteIsUseOurAppAndTwoDaysSinceShortcutAddedAndHideTipsIsTrueThenReturnNull() = runBlockingTest {
         givenUserIsEstablished()
-        val timestampEntity = KeyTimestampEntity(TimestampKey.USE_OUR_APP_SHORTCUT_ADDED, System.currentTimeMillis() - TimeUnit.DAYS.toMillis(2))
-        whenever(mockKeyTimestampStore.getTimestamp(TimestampKey.USE_OUR_APP_SHORTCUT_ADDED)).thenReturn(timestampEntity)
+        val timestampEntity = UserEventEntity(UserEventKey.USE_OUR_APP_SHORTCUT_ADDED, System.currentTimeMillis() - TimeUnit.DAYS.toMillis(2))
+        whenever(mockUserEventsStore.getTimestamp(UserEventKey.USE_OUR_APP_SHORTCUT_ADDED)).thenReturn(timestampEntity)
         whenever(mockSettingsDataStore.hideTips).thenReturn(true)
 
         val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = true, site = site(url = USE_OUR_APP_SHORTCUT_URL))
@@ -476,8 +476,8 @@ class CtaViewModelTest {
     @Test
     fun whenRefreshCtaWhileBrowsingAndSiteIsUseOurAppAndTwoDaysSinceShortcutAddedAndCtaShownThenReturnNull() = runBlockingTest {
         givenUserIsEstablished()
-        val timestampEntity = KeyTimestampEntity(TimestampKey.USE_OUR_APP_SHORTCUT_ADDED, System.currentTimeMillis() - TimeUnit.DAYS.toMillis(2))
-        whenever(mockKeyTimestampStore.getTimestamp(TimestampKey.USE_OUR_APP_SHORTCUT_ADDED)).thenReturn(timestampEntity)
+        val timestampEntity = UserEventEntity(UserEventKey.USE_OUR_APP_SHORTCUT_ADDED, System.currentTimeMillis() - TimeUnit.DAYS.toMillis(2))
+        whenever(mockUserEventsStore.getTimestamp(UserEventKey.USE_OUR_APP_SHORTCUT_ADDED)).thenReturn(timestampEntity)
         whenever(mockDismissedCtaDao.exists(CtaId.USE_OUR_APP_DELETION)).thenReturn(true)
 
         val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = true, site = site(url = USE_OUR_APP_SHORTCUT_URL))
@@ -487,8 +487,8 @@ class CtaViewModelTest {
     @Test
     fun whenRefreshCtaWhileBrowsingAndSiteIsUseOurAppAndTwoDaysSinceShortcutAddedThenReturnNull() = runBlockingTest {
         givenUserIsEstablished()
-        val timestampEntity = KeyTimestampEntity(TimestampKey.USE_OUR_APP_SHORTCUT_ADDED, System.currentTimeMillis() - TimeUnit.DAYS.toMillis(1))
-        whenever(mockKeyTimestampStore.getTimestamp(TimestampKey.USE_OUR_APP_SHORTCUT_ADDED)).thenReturn(timestampEntity)
+        val timestampEntity = UserEventEntity(UserEventKey.USE_OUR_APP_SHORTCUT_ADDED, System.currentTimeMillis() - TimeUnit.DAYS.toMillis(1))
+        whenever(mockUserEventsStore.getTimestamp(UserEventKey.USE_OUR_APP_SHORTCUT_ADDED)).thenReturn(timestampEntity)
 
         val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = true, site = site(url = USE_OUR_APP_SHORTCUT_URL))
         assertNull(value)
@@ -497,8 +497,8 @@ class CtaViewModelTest {
     @Test
     fun whenRefreshCtaWhileBrowsingAndSiteIsNotUseOurAppAndTwoDaysSinceShortcutAddedThenReturnNull() = runBlockingTest {
         givenUserIsEstablished()
-        val timestampEntity = KeyTimestampEntity(TimestampKey.USE_OUR_APP_SHORTCUT_ADDED, System.currentTimeMillis() - TimeUnit.DAYS.toMillis(2))
-        whenever(mockKeyTimestampStore.getTimestamp(TimestampKey.USE_OUR_APP_SHORTCUT_ADDED)).thenReturn(timestampEntity)
+        val timestampEntity = UserEventEntity(UserEventKey.USE_OUR_APP_SHORTCUT_ADDED, System.currentTimeMillis() - TimeUnit.DAYS.toMillis(2))
+        whenever(mockUserEventsStore.getTimestamp(UserEventKey.USE_OUR_APP_SHORTCUT_ADDED)).thenReturn(timestampEntity)
 
         val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = true, site = site(url = "test"))
         assertNull(value)

@@ -29,8 +29,8 @@ import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.global.model.domain
 import com.duckduckgo.app.global.model.isUseOurAppDomain
 import com.duckduckgo.app.global.model.orderedTrackingEntities
-import com.duckduckgo.app.global.timestamps.db.KeyTimestampStore
-import com.duckduckgo.app.global.timestamps.db.TimestampKey
+import com.duckduckgo.app.global.events.db.UserEventsStore
+import com.duckduckgo.app.global.events.db.UserEventKey
 import com.duckduckgo.app.onboarding.store.AppStage
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.store.UserStageStore
@@ -62,7 +62,7 @@ class CtaViewModel @Inject constructor(
     private val settingsDataStore: SettingsDataStore,
     private val onboardingStore: OnboardingStore,
     private val userStageStore: UserStageStore,
-    private val keyTimestampStore: KeyTimestampStore,
+    private val userEventsStore: UserEventsStore,
     private val dispatchers: DispatcherProvider
 ) {
     val surveyLiveData: LiveData<Survey> = surveyDao.getLiveScheduled()
@@ -207,7 +207,7 @@ class CtaViewModel @Inject constructor(
 
     @WorkerThread
     private suspend fun twoDaysSinceShortcutAdded(): Boolean {
-        val timestampKey = keyTimestampStore.getTimestamp(TimestampKey.USE_OUR_APP_SHORTCUT_ADDED) ?: return false
+        val timestampKey = userEventsStore.getTimestamp(UserEventKey.USE_OUR_APP_SHORTCUT_ADDED) ?: return false
         val days = TimeUnit.MILLISECONDS.toDays(System.currentTimeMillis() - timestampKey.timestamp)
         return (days >= 2)
     }

@@ -14,33 +14,33 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.global.timestamps.db
+package com.duckduckgo.app.global.events.db
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import androidx.room.TypeConverter
 
-const val KEY_TIMESTAMPS_TABLE_NAME = "keyTimestamps"
+const val USER_EVENTS_TABLE_NAME = "user_events"
 
-@Entity(tableName = KEY_TIMESTAMPS_TABLE_NAME)
-data class KeyTimestampEntity(
-    @PrimaryKey val id: TimestampKey,
+@Entity(tableName = USER_EVENTS_TABLE_NAME)
+data class UserEventEntity(
+    @PrimaryKey val id: UserEventKey,
     val timestamp: Long = System.currentTimeMillis()
 )
 
-enum class TimestampKey {
+enum class UserEventKey {
     USE_OUR_APP_SHORTCUT_ADDED
 }
 
-class TimestampKeyTypeConverter {
+class UserEventTypeConverter {
 
     @TypeConverter
-    fun toKey(stage: String): TimestampKey {
-        return TimestampKey.valueOf(stage)
+    fun toKey(stage: String): UserEventKey {
+        return UserEventKey.valueOf(stage)
     }
 
     @TypeConverter
-    fun fromKey(stage: TimestampKey): String {
+    fun fromKey(stage: UserEventKey): String {
         return stage.name
     }
 }

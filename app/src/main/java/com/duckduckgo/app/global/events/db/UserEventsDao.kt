@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.global.timestamps.db
+package com.duckduckgo.app.global.events.db
 
 import androidx.room.Dao
 import androidx.room.Insert
@@ -22,11 +22,11 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 
 @Dao
-interface KeyTimestampDao {
+interface UserEventsDao {
 
-    @Query("select * from $KEY_TIMESTAMPS_TABLE_NAME where id=:timestampKey")
-    suspend fun getTimestamp(timestampKey: TimestampKey): KeyTimestampEntity?
+    @Query("select * from $USER_EVENTS_TABLE_NAME where id=:userEventKey")
+    suspend fun getTimestamp(userEventKey: UserEventKey): UserEventEntity?
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insert(keyTimestampEntity: KeyTimestampEntity)
+    fun insert(userEventEntity: UserEventEntity)
 }

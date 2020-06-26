@@ -63,10 +63,10 @@ import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.global.model.SiteFactory
-import com.duckduckgo.app.global.timestamps.db.TimestampKey
+import com.duckduckgo.app.global.events.db.UserEventKey
 import com.duckduckgo.app.notification.model.UseOurAppNotification
-import com.duckduckgo.app.global.timestamps.db.KeyTimestampEntity
-import com.duckduckgo.app.global.timestamps.db.KeyTimestampStore
+import com.duckduckgo.app.global.events.db.UserEventEntity
+import com.duckduckgo.app.global.events.db.UserEventsStore
 import com.duckduckgo.app.notification.db.NotificationDao
 import com.duckduckgo.app.onboarding.store.AppStage
 import com.duckduckgo.app.onboarding.store.OnboardingStore
@@ -207,7 +207,7 @@ class BrowserTabViewModelTest {
     private lateinit var mockUserWhitelistDao: UserWhitelistDao
 
     @Mock
-    private lateinit var mockKeyTimestampStore: KeyTimestampStore
+    private lateinit var mockUserEventsStore: UserEventsStore
 
     @Mock
     private lateinit var mockNotificationDao: NotificationDao
@@ -249,7 +249,7 @@ class BrowserTabViewModelTest {
             mockSettingsStore,
             mockOnboardingStore,
             mockUserStageStore,
-            mockKeyTimestampStore,
+            mockUserEventsStore,
             coroutineRule.testDispatcherProvider
         )
 
@@ -284,7 +284,7 @@ class BrowserTabViewModelTest {
             pixel = mockPixel,
             dispatchers = coroutineRule.testDispatcherProvider,
             fireproofWebsiteDao = fireproofWebsiteDao,
-            keyTimestampStore = mockKeyTimestampStore,
+            userEventsStore = mockUserEventsStore,
             notificationDao = mockNotificationDao,
             variantManager = mockVariantManager
         )
@@ -2064,7 +2064,7 @@ class BrowserTabViewModelTest {
     @Test
     fun whenViewReadyIfDomainSameAsUseOurAppAfterShortcutAddedThenPixelSent() = coroutineRule.runBlocking {
         givenUseOurAppSiteSelected()
-        whenever(mockKeyTimestampStore.getTimestamp(TimestampKey.USE_OUR_APP_SHORTCUT_ADDED)).thenReturn(KeyTimestampEntity(TimestampKey.USE_OUR_APP_SHORTCUT_ADDED))
+        whenever(mockUserEventsStore.getTimestamp(UserEventKey.USE_OUR_APP_SHORTCUT_ADDED)).thenReturn(UserEventEntity(UserEventKey.USE_OUR_APP_SHORTCUT_ADDED))
         testee.onViewReady()
         verify(mockPixel).fire(Pixel.PixelName.UOA_VISITED_AFTER_SHORTCUT)
     }
@@ -2086,7 +2086,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenPageRefreshedIfPreviousOneWasNotUseOurAppSiteAfterShortcutAddedThenPixelSent() = coroutineRule.runBlocking {
-        whenever(mockKeyTimestampStore.getTimestamp(TimestampKey.USE_OUR_APP_SHORTCUT_ADDED)).thenReturn(KeyTimestampEntity(TimestampKey.USE_OUR_APP_SHORTCUT_ADDED))
+        whenever(mockUserEventsStore.getTimestamp(UserEventKey.USE_OUR_APP_SHORTCUT_ADDED)).thenReturn(UserEventEntity(UserEventKey.USE_OUR_APP_SHORTCUT_ADDED))
         testee.pageRefreshed(USE_OUR_APP_DOMAIN)
         verify(mockPixel).fire(Pixel.PixelName.UOA_VISITED_AFTER_SHORTCUT)
     }
@@ -2109,8 +2109,8 @@ class BrowserTabViewModelTest {
     @Test
     fun whenPageRefreshedIfPreviousOneWasNotUseOurAppSiteAfterShortcutAddedThenPixelNotSent() = coroutineRule.runBlocking {
         givenUseOurAppSiteSelected()
-        val timestampEntity = KeyTimestampEntity(TimestampKey.USE_OUR_APP_SHORTCUT_ADDED)
-        whenever(mockKeyTimestampStore.getTimestamp(TimestampKey.USE_OUR_APP_SHORTCUT_ADDED)).thenReturn(timestampEntity)
+        val timestampEntity = UserEventEntity(UserEventKey.USE_OUR_APP_SHORTCUT_ADDED)
+        whenever(mockUserEventsStore.getTimestamp(UserEventKey.USE_OUR_APP_SHORTCUT_ADDED)).thenReturn(timestampEntity)
         testee.pageRefreshed(USE_OUR_APP_DOMAIN)
         verify(mockPixel, never()).fire(Pixel.PixelName.UOA_VISITED_AFTER_SHORTCUT)
     }

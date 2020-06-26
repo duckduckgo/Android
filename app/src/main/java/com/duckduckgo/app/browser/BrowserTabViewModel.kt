@@ -82,8 +82,8 @@ import com.duckduckgo.app.global.model.SiteFactory
 import com.duckduckgo.app.global.model.domain
 import com.duckduckgo.app.global.model.domainMatchesUrl
 import com.duckduckgo.app.global.model.isUseOurAppDomain
-import com.duckduckgo.app.global.timestamps.db.KeyTimestampStore
-import com.duckduckgo.app.global.timestamps.db.TimestampKey
+import com.duckduckgo.app.global.events.db.UserEventsStore
+import com.duckduckgo.app.global.events.db.UserEventKey
 import com.duckduckgo.app.global.toDesktopUri
 import com.duckduckgo.app.notification.db.NotificationDao
 import com.duckduckgo.app.notification.model.UseOurAppNotification
@@ -136,7 +136,7 @@ class BrowserTabViewModel(
     private val searchCountDao: SearchCountDao,
     private val pixel: Pixel,
     private val dispatchers: DispatcherProvider = DefaultDispatcherProvider(),
-    private val keyTimestampStore: KeyTimestampStore,
+    private val userEventsStore: UserEventsStore,
     private val notificationDao: NotificationDao,
     private val variantManager: VariantManager
 ) : WebViewClientListener, EditBookmarkListener, HttpAuthenticationListener, ViewModel() {
@@ -652,7 +652,7 @@ class BrowserTabViewModel(
 
     private suspend fun sendPixelIfUseOurAppSiteVisited() {
         withContext(dispatchers.io()) {
-            val isShortcutAdded = keyTimestampStore.getTimestamp(TimestampKey.USE_OUR_APP_SHORTCUT_ADDED)
+            val isShortcutAdded = userEventsStore.getTimestamp(UserEventKey.USE_OUR_APP_SHORTCUT_ADDED)
             val isUseOurAppNotificationSeen = notificationDao.exists(UseOurAppNotification.ID)
             val deleteCtaShown = ctaViewModel.useOurAppDeletionDialogShown()
 
