@@ -274,6 +274,7 @@
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">match_parent</item>
         <item name="android:gravity">top</item>
+        <item name="android:textCursorDrawable">@null</item>
         <item name="android:textColor">?attr/normalTextColor</item>
     </style>
 
