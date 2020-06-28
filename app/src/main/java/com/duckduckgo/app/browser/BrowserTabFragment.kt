@@ -834,13 +834,8 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
             }
 
             it.setEnableSwipeRefreshCallback { enable ->
-                activity?.runOnUiThread {
-                    swipeRefreshContainer?.isEnabled = enable
-                }
+                swipeRefreshContainer?.isEnabled = enable
             }
-            it.addJavascriptInterface(BrowserWebViewClient.WebAppInterface { enable ->
-                it.setContentAllowsSwipeToRefresh(enable)
-            }, "ddg_swipe_handler")
 
             registerForContextMenu(it)
 
@@ -1479,6 +1474,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
 
                 if (!viewState.isLoading) {
                     swipeRefreshContainer.isRefreshing = false
+                    detectOverscrollBehavior()
                 }
             }
         }
@@ -1764,5 +1760,17 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
 
         private fun shouldUpdateOmnibarTextInput(viewState: OmnibarViewState, omnibarInput: String?) =
             (!viewState.isEditing || omnibarInput.isNullOrEmpty()) && omnibarTextInput.isDifferent(omnibarInput)
+    }
+
+    /**
+     * Allows us to determine whether to (de)activate Swipe to Refresh behavior for the current page content, e.g. if page implements a swipe behavior of its
+     * own already (see twitter.com).
+     */
+    private fun detectOverscrollBehavior() {
+        webView?.let { webView ->
+            webView.evaluateJavascript("(function() { return getComputedStyle(document.querySelector('body')).overscrollBehaviorY; })();") { behavior ->
+                webView.setContentAllowsSwipeToRefresh(behavior.replace("\"", "") == "auto")
+            }
+        }
     }
 }
