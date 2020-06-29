@@ -14,18 +14,10 @@
   ~ limitations under the License.
   -->
 
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:orientation="vertical">
-
-    <include layout="@layout/view_fireproof_title" />
-
-    <androidx.appcompat.widget.SwitchCompat
-        android:id="@+id/fireproofWebsiteToggle"
-        style="@style/FireproofWebsiteSwitch"
-        android:paddingStart="16dp"
-        android:paddingEnd="16dp"
-        android:text="@string/fireproofWebsiteToogleText"
-        android:theme="@style/SettingsSwitchTheme" />
-</LinearLayout>
+<androidx.appcompat.widget.SwitchCompat xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/fireproofWebsiteToggle"
+    style="@style/FireproofWebsiteSwitch"
+    android:paddingStart="16dp"
+    android:paddingEnd="16dp"
+    android:text="@string/fireproofWebsiteToogleText"
+    android:theme="@style/SettingsSwitchTheme" />

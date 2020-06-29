@@ -140,7 +140,6 @@ sealed class FireproofWebSiteViewHolder(itemView: View) : RecyclerView.ViewHolde
     class FireproofWebsiteToggleViewHolder(itemView: View, private val listener: CompoundButton.OnCheckedChangeListener) :
         FireproofWebSiteViewHolder(itemView) {
         fun bind(loginDetectionEnabled: Boolean) {
-            itemView.fireproofWebsiteSectionTitle.setText(R.string.fireproofWebsiteToogleTitle)
             itemView.fireproofWebsiteToggle.quietlySetIsChecked(loginDetectionEnabled, listener)
         }
     }
