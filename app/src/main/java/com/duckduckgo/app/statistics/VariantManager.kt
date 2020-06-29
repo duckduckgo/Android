@@ -88,17 +88,17 @@ interface VariantManager {
             // Disabled until Drip Notifications Experiments are completed
             Variant(
                 key = "zg",
-                weight = 0.0,
+                weight = 1.0,
                 features = emptyList(),
                 filterBy = { noFilter() }),
             Variant(
                 key = "zh",
-                weight = 0.0,
+                weight = 1.0,
                 features = listOf(VariantFeature.SerpHeaderQueryReplacement),
                 filterBy = { noFilter() }),
             Variant(
                 key = "zi",
-                weight = 0.0,
+                weight = 1.0,
                 features = listOf(VariantFeature.SerpHeaderRemoval),
                 filterBy = { noFilter() })
 
