@@ -446,7 +446,7 @@
     <!-- Fireproof websites -->
     <string name="fireproofWebsitesActivityTitle">Vatrootporne web stranice</string>
     <string name="settingsFireproofWebsites">Vatrootporne web stranice</string>
-    <string name="fireproofWebsiteMenuTitle">Vatrootporna web stranica</string>
+    <string name="fireproofWebsiteMenuTitleAdd">Vatrootporna web stranica</string>
     <string name="fireproofWebsiteSnackbarConfirmation">&lt;b&gt;%s&lt;/b&gt; je sada vatrootporan! Posjetite Postavke da biste saznali više.</string>
     <string name="fireproofWebsiteSnackbarAction">Poništi</string>
     <string name="fireproofWebsiteDeleteConfirmMessage">Jeste li sigurni da želite izbrisati &lt;b&gt;%s&lt;/b&gt;?</string>

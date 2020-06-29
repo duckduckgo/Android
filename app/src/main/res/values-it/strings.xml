@@ -456,7 +456,7 @@
     <!-- Fireproof websites -->
     <string name="fireproofWebsitesActivityTitle">Siti web a prova di bomba</string>
     <string name="settingsFireproofWebsites">Siti web a prova di bomba</string>
-    <string name="fireproofWebsiteMenuTitle">Sito web a prova di bomba</string>
+    <string name="fireproofWebsiteMenuTitleAdd">Sito web a prova di bomba</string>
     <string name="fireproofWebsiteSnackbarConfirmation">&lt;b&gt;%s&lt;/b&gt; ora è a prova di bomba! Visita le Impostazioni per saperne di più.</string>
     <string name="fireproofWebsiteSnackbarAction">Annulla</string>
     <string name="fireproofWebsiteDeleteConfirmMessage">Sei sicuro di voler eliminare &lt;b&gt;%s&lt;/b&gt;?</string>

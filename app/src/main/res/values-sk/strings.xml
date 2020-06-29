@@ -446,7 +446,7 @@
     <!-- Fireproof websites -->
     <string name="fireproofWebsitesActivityTitle">Zabezpečené webové stránky</string>
     <string name="settingsFireproofWebsites">Zabezpečené webové stránky</string>
-    <string name="fireproofWebsiteMenuTitle">Zabezpečiť webovú stránku</string>
+    <string name="fireproofWebsiteMenuTitleAdd">Zabezpečiť webovú stránku</string>
     <string name="fireproofWebsiteSnackbarConfirmation">&lt;b&gt;%s&lt;/b&gt; je teraz zabezpečená! Viac informácií nájdete na stránke Nastavenia.</string>
     <string name="fireproofWebsiteSnackbarAction">Vrátenie späť</string>
     <string name="fireproofWebsiteDeleteConfirmMessage">Naozaj chcete odstrániť &lt;b&gt;%s&lt;/b&gt;?</string>

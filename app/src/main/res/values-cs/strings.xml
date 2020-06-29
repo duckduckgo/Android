@@ -446,7 +446,7 @@
     <!-- Fireproof websites -->
     <string name="fireproofWebsitesActivityTitle">Webové stránky pro ochranu souborů</string>
     <string name="settingsFireproofWebsites">Webové stránky pro ochranu souborů</string>
-    <string name="fireproofWebsiteMenuTitle">Webová stránka pro ochranu souborů</string>
+    <string name="fireproofWebsiteMenuTitleAdd">Webová stránka pro ochranu souborů</string>
     <string name="fireproofWebsiteSnackbarConfirmation">&lt;b&gt;%s&lt;/b&gt; je nyní chráněný! Další informace naleznete v části Nastavení.</string>
     <string name="fireproofWebsiteSnackbarAction">Vrátit</string>
     <string name="fireproofWebsiteDeleteConfirmMessage">Opravdu chcete smazat &lt;b&gt;%s&lt;/b&gt;?</string>
