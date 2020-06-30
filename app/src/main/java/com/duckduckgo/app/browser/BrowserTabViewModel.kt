@@ -450,12 +450,12 @@ class BrowserTabViewModel(
     }
 
     private fun fireQueryChangedPixel(omnibarText: String) {
-        val oldQuery = currentOmnibarViewState().omnibarText.toUri()
-        val newQuery = omnibarText.toUri()
-
         if (!variantManager.getVariant().hasFeature(VariantManager.VariantFeature.SerpHeaderRemoval)) {
             return
         }
+
+        val oldQuery = currentOmnibarViewState().omnibarText.toUri()
+        val newQuery = omnibarText.toUri()
 
         if (oldQuery == newQuery) {
             pixel.fire(String.format(Locale.US, PixelName.SERP_REQUERY.pixelName, PixelParameter.SERP_QUERY_NOT_CHANGED))
