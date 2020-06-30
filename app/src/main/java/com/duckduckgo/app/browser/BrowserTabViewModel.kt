@@ -453,7 +453,7 @@ class BrowserTabViewModel(
         val oldQuery = currentOmnibarViewState().omnibarText.toUri()
         val newQuery = omnibarText.toUri()
 
-        if (!variantManager.getVariant().hasFeature(VariantManager.VariantFeature.SerpHeaderRemoval)){
+        if (!variantManager.getVariant().hasFeature(VariantManager.VariantFeature.SerpHeaderRemoval)) {
             return
         }
 
