@@ -16,17 +16,36 @@
 
 package com.duckduckgo.app.global.useourapp
 
+import android.webkit.WebView
+import com.duckduckgo.app.CoroutineTestRule
+import com.duckduckgo.app.browser.logindetection.WebNavigationEvent
+import com.duckduckgo.app.global.events.db.UserEventEntity
+import com.duckduckgo.app.global.events.db.UserEventKey
+import com.duckduckgo.app.global.events.db.UserEventsStore
+import com.duckduckgo.app.runBlocking
+import com.nhaarman.mockitokotlin2.mock
+import com.nhaarman.mockitokotlin2.never
+import com.nhaarman.mockitokotlin2.verify
+import com.nhaarman.mockitokotlin2.whenever
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.junit.Assert.*
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 
+@ExperimentalCoroutinesApi
 class UseOurAppDetectorTest {
+
+    @get:Rule
+    var coroutineRule = CoroutineTestRule()
 
     private lateinit var testee: UseOurAppDetector
 
+    private val mockUserEventsStore: UserEventsStore = mock()
+
     @Before
     fun setup() {
-        testee = UseOurAppDetector()
+        testee = UseOurAppDetector(mockUserEventsStore)
     }
 
     @Test
@@ -54,4 +73,88 @@ class UseOurAppDetectorTest {
         assertFalse(testee.isUseOurAppUrl("http://example.com"))
     }
 
+    @Test
+    fun whenAllowLoginDetectionAndShortcutNotAddedThenReturnFalse() = coroutineRule.runBlocking {
+        val webView: WebView = mock()
+        whenever(mockUserEventsStore.getUserEvent(UserEventKey.USE_OUR_APP_SHORTCUT_ADDED)).thenReturn(null)
+
+        assertFalse(testee.allowLoginDetection(WebNavigationEvent.OnPageStarted(webView)))
+    }
+
+    @Test
+    fun whenAllowLoginDetectionAndFireProofAlreadySeenThenReturnFalse() = coroutineRule.runBlocking {
+        val webView: WebView = mock()
+        whenever(mockUserEventsStore.getUserEvent(UserEventKey.USE_OUR_APP_SHORTCUT_ADDED)).thenReturn(UserEventEntity(UserEventKey.USE_OUR_APP_SHORTCUT_ADDED))
+        whenever(mockUserEventsStore.getUserEvent(UserEventKey.USE_OUR_APP_FIREPROOF_SEEN)).thenReturn(UserEventEntity(UserEventKey.USE_OUR_APP_FIREPROOF_SEEN))
+
+        assertFalse(testee.allowLoginDetection(WebNavigationEvent.OnPageStarted(webView)))
+    }
+
+    @Test
+    fun whenAllowLoginDetectionWithOnPageStartedEventAndUrlIsUseOurAppThenReturnTrue() = coroutineRule.runBlocking {
+        val webView: WebView = mock()
+        whenever(webView.url).thenReturn("http://m.facebook.com")
+        givenShortcutIsAddedAndFireproofNotSeen()
+
+        assertTrue(testee.allowLoginDetection(WebNavigationEvent.OnPageStarted(webView)))
+    }
+
+    @Test
+    fun whenAllowLoginDetectionWithOnPageStartedEventAndUrlIsNotUseOurAppThenReturnFalse() = coroutineRule.runBlocking {
+        val webView: WebView = mock()
+        whenever(webView.url).thenReturn("http://example.com")
+        givenShortcutIsAddedAndFireproofNotSeen()
+
+        assertFalse(testee.allowLoginDetection(WebNavigationEvent.OnPageStarted(webView)))
+    }
+
+    @Test
+    fun whenAllowLoginDetectionWithShouldInterceptEventAndUrlIsUseOurAppThenReturnTrue() = coroutineRule.runBlocking {
+        val webView: WebView = mock()
+        whenever(webView.url).thenReturn("http://m.facebook.com")
+        givenShortcutIsAddedAndFireproofNotSeen()
+
+        assertTrue(testee.allowLoginDetection(WebNavigationEvent.ShouldInterceptRequest(webView, mock())))
+    }
+
+    @Test
+    fun whenAllowLoginDetectionWithOnShouldInterceptEventAndUrlIsNotUseOurAppThenReturnFalse() = coroutineRule.runBlocking {
+        val webView: WebView = mock()
+        whenever(webView.url).thenReturn("http://example.com")
+        givenShortcutIsAddedAndFireproofNotSeen()
+
+        assertFalse(testee.allowLoginDetection(WebNavigationEvent.ShouldInterceptRequest(webView, mock())))
+    }
+
+    @Test
+    fun whenRegisterIfFireproofSeenForTheFirstTimeAndUrlIsUseOurAppThenRegisterUserEvent() = coroutineRule.runBlocking {
+        whenever(mockUserEventsStore.getUserEvent(UserEventKey.USE_OUR_APP_FIREPROOF_SEEN)).thenReturn(null)
+
+        testee.registerIfFireproofSeenForTheFirstTime("http://m.facebook.com")
+
+        verify(mockUserEventsStore).registerUserEvent(UserEventEntity(UserEventKey.USE_OUR_APP_FIREPROOF_SEEN))
+    }
+
+    @Test
+    fun whenRegisterIfFireproofSeenForTheFirstTimeAndUrlIsNotUseOurAppThenDoNotRegisterUserEvent() = coroutineRule.runBlocking {
+        whenever(mockUserEventsStore.getUserEvent(UserEventKey.USE_OUR_APP_FIREPROOF_SEEN)).thenReturn(null)
+
+        testee.registerIfFireproofSeenForTheFirstTime("example.com")
+
+        verify(mockUserEventsStore, never()).registerUserEvent(UserEventEntity(UserEventKey.USE_OUR_APP_FIREPROOF_SEEN))
+    }
+
+    @Test
+    fun whenRegisterIfFireproofSeenForTheFirstTimeButAlreadySeenThenDoNotRegisterUserEvent() = coroutineRule.runBlocking {
+        whenever(mockUserEventsStore.getUserEvent(UserEventKey.USE_OUR_APP_FIREPROOF_SEEN)).thenReturn(UserEventEntity(UserEventKey.USE_OUR_APP_FIREPROOF_SEEN))
+
+        testee.registerIfFireproofSeenForTheFirstTime("http://m.facebook.com")
+
+        verify(mockUserEventsStore, never()).registerUserEvent(UserEventEntity(UserEventKey.USE_OUR_APP_FIREPROOF_SEEN))
+    }
+
+    private suspend fun givenShortcutIsAddedAndFireproofNotSeen() {
+        whenever(mockUserEventsStore.getUserEvent(UserEventKey.USE_OUR_APP_SHORTCUT_ADDED)).thenReturn(UserEventEntity(UserEventKey.USE_OUR_APP_SHORTCUT_ADDED))
+        whenever(mockUserEventsStore.getUserEvent(UserEventKey.USE_OUR_APP_FIREPROOF_SEEN)).thenReturn(null)
+    }
 }

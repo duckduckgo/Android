@@ -148,7 +148,7 @@ class CtaViewModelTest {
             mockOnboardingStore,
             mockUserStageStore,
             mockUserEventsStore,
-            UseOurAppDetector(),
+            UseOurAppDetector(mockUserEventsStore),
             coroutineRule.testDispatcherProvider
         )
     }

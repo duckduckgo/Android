@@ -291,6 +291,8 @@ class BrowserTabViewModel(
 
     private val loginDetectionObserver = Observer<LoginDetected> { loginEvent ->
         Timber.i("LoginDetection for $loginEvent")
+        viewModelScope.launch { useOurAppDetector.registerIfFireproofSeenForTheFirstTime(loginEvent.forwardedToDomain) }
+
         if (!isFireproofWebsite(loginEvent.forwardedToDomain)) {
             pixel.fire(PixelName.FIREPROOF_LOGIN_DIALOG_SHOWN)
             command.value = AskToFireproofWebsite(FireproofWebsiteEntity(loginEvent.forwardedToDomain))

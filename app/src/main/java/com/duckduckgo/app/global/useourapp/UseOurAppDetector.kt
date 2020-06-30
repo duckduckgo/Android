@@ -18,10 +18,15 @@ package com.duckduckgo.app.global.useourapp
 
 import android.net.Uri
 import androidx.core.net.toUri
+import com.duckduckgo.app.browser.logindetection.WebNavigationEvent
 import com.duckduckgo.app.global.baseHost
+import com.duckduckgo.app.global.events.db.UserEventEntity
+import com.duckduckgo.app.global.events.db.UserEventKey
+import com.duckduckgo.app.global.events.db.UserEventsStore
+import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
 
-class UseOurAppDetector @Inject constructor() {
+class UseOurAppDetector @Inject constructor(val userEventsStore: UserEventsStore) {
 
     fun isUseOurAppUrl(url: String?): Boolean {
         if (url == null) return false
@@ -34,6 +39,31 @@ class UseOurAppDetector @Inject constructor() {
 
     private fun domainMatchesUrl(uri: Uri, matchingUrl: String): Boolean {
         return uri.baseHost == matchingUrl.toUri().baseHost
+    }
+
+    fun allowLoginDetection(event: WebNavigationEvent): Boolean {
+        val canShowFireproof = runBlocking {
+            if (userEventsStore.getUserEvent(UserEventKey.USE_OUR_APP_SHORTCUT_ADDED) == null) {
+                false
+            } else {
+                (userEventsStore.getUserEvent(UserEventKey.USE_OUR_APP_FIREPROOF_SEEN) == null)
+            }
+        }
+
+        return if (canShowFireproof) {
+            when (event) {
+                is WebNavigationEvent.OnPageStarted -> isUseOurAppUrl(event.webView.url)
+                is WebNavigationEvent.ShouldInterceptRequest -> isUseOurAppUrl(event.webView.url)
+            }
+        } else {
+            false
+        }
+    }
+
+    suspend fun registerIfFireproofSeenForTheFirstTime(url: String) {
+        if (userEventsStore.getUserEvent(UserEventKey.USE_OUR_APP_FIREPROOF_SEEN) == null && isUseOurAppUrl(url)) {
+            userEventsStore.registerUserEvent(UserEventEntity(UserEventKey.USE_OUR_APP_FIREPROOF_SEEN))
+        }
     }
 
     companion object {

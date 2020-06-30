@@ -22,7 +22,7 @@ import javax.inject.Inject
 
 interface UserEventsStore {
     suspend fun getUserEvent(userEventKey: UserEventKey): UserEventEntity?
-    suspend fun registerUserEvent(timestampEntity: UserEventEntity)
+    suspend fun registerUserEvent(userEventEntity: UserEventEntity)
 }
 
 class AppUserEventsStore @Inject constructor(
@@ -36,9 +36,9 @@ class AppUserEventsStore @Inject constructor(
         }
     }
 
-    override suspend fun registerUserEvent(timestampEntity: UserEventEntity) {
+    override suspend fun registerUserEvent(userEventEntity: UserEventEntity) {
         withContext(dispatcher.io()) {
-            userEventsDao.insert(timestampEntity)
+            userEventsDao.insert(userEventEntity)
         }
     }
 }

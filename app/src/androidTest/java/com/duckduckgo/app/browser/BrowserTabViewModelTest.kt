@@ -52,7 +52,6 @@ import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.cta.db.DismissedCtaDao
 import com.duckduckgo.app.cta.model.CtaId
 import com.duckduckgo.app.cta.model.DismissedCta
-import com.duckduckgo.app.cta.ui.*
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteDao
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepository
@@ -250,7 +249,7 @@ class BrowserTabViewModelTest {
             mockOnboardingStore,
             mockUserStageStore,
             mockUserEventsStore,
-            UseOurAppDetector(),
+            UseOurAppDetector(mockUserEventsStore),
             coroutineRule.testDispatcherProvider
         )
 
@@ -289,7 +288,7 @@ class BrowserTabViewModelTest {
             navigationAwareLoginDetector = mockNavigationAwareLoginDetector,
             userEventsStore = mockUserEventsStore,
             notificationDao = mockNotificationDao,
-            useOurAppDetector = UseOurAppDetector(),
+            useOurAppDetector = UseOurAppDetector(mockUserEventsStore),
             variantManager = mockVariantManager
         )
 
@@ -1978,6 +1977,30 @@ class BrowserTabViewModelTest {
         assertCommandIssued<Command.AskToFireproofWebsite> {
             assertEquals(FireproofWebsiteEntity("example.com"), this.fireproofWebsite)
         }
+    }
+
+    @Test
+    fun whenLoginDetectedAndUrlIsUseOurAppThenRegisterUserEvent() = coroutineRule.runBlocking {
+        whenever(mockUserEventsStore.getUserEvent(UserEventKey.USE_OUR_APP_FIREPROOF_SEEN)).thenReturn(null)
+        loginEventLiveData.value = givenLoginDetected(USE_OUR_APP_SHORTCUT_URL)
+
+        verify(mockUserEventsStore).registerUserEvent(any())
+    }
+
+    @Test
+    fun whenLoginDetectedAndUrlIsNotUseOurAppThenDoNotRegisterUserEvent() = coroutineRule.runBlocking {
+        whenever(mockUserEventsStore.getUserEvent(UserEventKey.USE_OUR_APP_FIREPROOF_SEEN)).thenReturn(null)
+        loginEventLiveData.value = givenLoginDetected("example.com")
+
+        verify(mockUserEventsStore, never()).registerUserEvent(any())
+    }
+
+    @Test
+    fun whenLoginDetectedAndDialogAlreadySeenThenDoNotRegisterUserEvent() = coroutineRule.runBlocking {
+        whenever(mockUserEventsStore.getUserEvent(UserEventKey.USE_OUR_APP_FIREPROOF_SEEN)).thenReturn(UserEventEntity(UserEventKey.USE_OUR_APP_FIREPROOF_SEEN))
+        loginEventLiveData.value = givenLoginDetected(USE_OUR_APP_SHORTCUT_URL)
+
+        verify(mockUserEventsStore, never()).registerUserEvent(any())
     }
 
     @Test
