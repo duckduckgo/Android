@@ -467,7 +467,7 @@
     <!-- Fireproof websites -->
     <string name="fireproofWebsitesActivityTitle">Обезопасить сайты</string>
     <string name="settingsFireproofWebsites">Обезопасить сайты</string>
-    <string name="fireproofWebsiteMenuTitle">Обезопасить сайт</string>
+    <string name="fireproofWebsiteMenuTitleAdd">Обезопасить сайт</string>
     <string name="fireproofWebsiteSnackbarConfirmation">&lt;b&gt;%s&lt;/b&gt; теперь безопасен! Зайдите в Настройки, чтобы узнать больше.</string>
     <string name="fireproofWebsiteSnackbarAction">Отменить действие</string>
     <string name="fireproofWebsiteDeleteConfirmMessage">Вы уверены, что хотите удалить &lt;b&gt;%s&lt;/b&gt;?</string>

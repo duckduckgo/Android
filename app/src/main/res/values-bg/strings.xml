@@ -439,7 +439,7 @@
     <!-- Fireproof websites -->
     <string name="fireproofWebsitesActivityTitle">Огнеустойчиви уебсайтове</string>
     <string name="settingsFireproofWebsites">Огнеустойчиви уебсайтове</string>
-    <string name="fireproofWebsiteMenuTitle">Огнеустойчив уебсайт</string>
+    <string name="fireproofWebsiteMenuTitleAdd">Огнеустойчив уебсайт</string>
     <string name="fireproofWebsiteSnackbarConfirmation">&lt;b&gt;%s&lt;/b&gt; вече е огнеустойчив! Посетете Настройки, за да научите повече.</string>
     <string name="fireproofWebsiteSnackbarAction">Отмяна</string>
     <string name="fireproofWebsiteDeleteConfirmMessage">Сигурни ли сте, че искате да изтриете &lt;b&gt;%s&lt;/b&gt;?</string>

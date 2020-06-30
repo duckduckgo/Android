@@ -149,7 +149,6 @@
     <string name="fireClearAll">Kustuta kõik vahekaardid ja andmed</string>
     <string name="fireCancel">Tühista</string>
     <string name="fireDataCleared">Andmed on kustutatud</string>
-    <string name="fireProcessName" translatable="false">:fire</string>
 
     <!-- Settings Activity -->
     <string name="settingsActivityTitle">Sätted</string>
@@ -461,7 +460,7 @@
     <!-- Fireproof websites -->
     <string name="fireproofWebsitesActivityTitle">Tulekindlad veebisaidid</string>
     <string name="settingsFireproofWebsites">Tulekindlad veebisaidid</string>
-    <string name="fireproofWebsiteMenuTitle">Tulekindel veebisait</string>
+    <string name="fireproofWebsiteMenuTitleAdd">Tulekindel veebisait</string>
     <string name="fireproofWebsiteSnackbarConfirmation">&lt;b&gt;%s&lt;/b&gt; on nüüd tulekindel! Lisateabe saamiseks vaata üle seaded.</string>
     <string name="fireproofWebsiteSnackbarAction">Võta tagasi</string>
     <string name="fireproofWebsiteDeleteConfirmMessage">Kas soovite kindlasti kustutada saidi &lt;b&gt;%s&lt;/b&gt;?</string>

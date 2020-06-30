@@ -36,6 +36,8 @@ interface Pixel {
         FORGET_ALL_PRESSED_BROWSING("mf_bp"),
         FORGET_ALL_PRESSED_TABSWITCHING("mf_tp"),
         FORGET_ALL_EXECUTED("mf"),
+        FORGET_ALL_AUTO_RESTART("m_f_r"),
+        FORGET_ALL_AUTO_RESTART_WITH_INTENT("m_f_ri"),
 
         APPLICATION_CRASH("m_d_ac"),
         APPLICATION_CRASH_GLOBAL("m_d_ac_g"),
@@ -167,6 +169,8 @@ interface Pixel {
         AUTOCOMPLETE_BOOKMARK_SELECTION("m_aut_s_b"),
         AUTOCOMPLETE_SEARCH_SELECTION("m_aut_s_s"),
 
+        SERP_REQUERY("rq_%s"),
+
         CHANGE_APP_ICON_OPENED("m_ic"),
 
         MENU_ACTION_POPUP_OPENED("m_nav_pm_o"),
@@ -182,7 +186,13 @@ interface Pixel {
         COOKIE_DATABASE_EXCEPTION_OPEN_ERROR("m_cdb_e_oe"),
         COOKIE_DATABASE_EXCEPTION_DELETE_ERROR("m_cdb_e_de"),
         FIREPROOF_WEBSITE_ADDED("m_fw_a"),
+        FIREPROOF_WEBSITE_REMOVE("m_fw_r"),
+        FIREPROOF_LOGIN_DIALOG_SHOWN("m_fw_ld_s"),
+        FIREPROOF_WEBSITE_LOGIN_ADDED("m_fw_l_a"),
+        FIREPROOF_WEBSITE_LOGIN_DISMISS("m_fw_l_d"),
         FIREPROOF_WEBSITE_DELETED("m_fw_d"),
+        FIREPROOF_LOGIN_TOGGLE_ENABLED("m_fw_d_e"),
+        FIREPROOF_LOGIN_TOGGLE_DISABLED("m_fw_d_d"),
         FIREPROOF_WEBSITE_UNDO("m_fw_u")
     }
 
@@ -199,6 +209,8 @@ interface Pixel {
         const val DEFAULT_BROWSER_SET_FROM_ONBOARDING = "fo"
         const val DEFAULT_BROWSER_SET_ORIGIN = "dbo"
         const val CTA_SHOWN = "cta"
+        const val SERP_QUERY_CHANGED = "1"
+        const val SERP_QUERY_NOT_CHANGED = "0"
     }
 
     object PixelValues {

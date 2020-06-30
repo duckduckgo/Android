@@ -27,6 +27,7 @@ import com.duckduckgo.app.browser.*
 import com.duckduckgo.app.browser.addtohome.AddToHomeCapabilityDetector
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.browser.favicon.FaviconDownloader
+import com.duckduckgo.app.browser.logindetection.NavigationAwareLoginDetector
 import com.duckduckgo.app.browser.omnibar.QueryUrlConverter
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.cta.ui.CtaViewModel
@@ -37,7 +38,7 @@ import com.duckduckgo.app.feedback.ui.negative.brokensite.BrokenSiteNegativeFeed
 import com.duckduckgo.app.feedback.ui.negative.openended.ShareOpenEndedNegativeFeedbackViewModel
 import com.duckduckgo.app.feedback.ui.positive.initial.PositiveFeedbackLandingViewModel
 import com.duckduckgo.app.fire.DataClearer
-import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteDao
+import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepository
 import com.duckduckgo.app.fire.fireproofwebsite.ui.FireproofWebsitesViewModel
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.model.SiteFactory
@@ -85,7 +86,8 @@ class ViewModelFactory @Inject constructor(
     private val userWhitelistDao: UserWhitelistDao,
     private val networkLeaderboardDao: NetworkLeaderboardDao,
     private val bookmarksDao: BookmarksDao,
-    private val fireproofWebsiteDao: FireproofWebsiteDao,
+    private val fireproofWebsiteRepository: FireproofWebsiteRepository,
+    private val navigationAwareLoginDetector: NavigationAwareLoginDetector,
     private val surveyDao: SurveyDao,
     private val autoCompleteApi: AutoCompleteApi,
     private val deviceAppLookup: DeviceAppLookup,
@@ -185,7 +187,8 @@ class ViewModelFactory @Inject constructor(
         userWhitelistDao = userWhitelistDao,
         networkLeaderboardDao = networkLeaderboardDao,
         bookmarksDao = bookmarksDao,
-        fireproofWebsiteDao = fireproofWebsiteDao,
+        fireproofWebsiteRepository = fireproofWebsiteRepository,
+        navigationAwareLoginDetector = navigationAwareLoginDetector,
         autoComplete = autoCompleteApi,
         appSettingsPreferencesStore = appSettingsPreferencesStore,
         longPressHandler = webViewLongPressHandler,
@@ -195,7 +198,8 @@ class ViewModelFactory @Inject constructor(
         addToHomeCapabilityDetector = addToHomeCapabilityDetector,
         ctaViewModel = ctaViewModel,
         searchCountDao = searchCountDao,
-        pixel = pixel
+        pixel = pixel,
+        variantManager = variantManager
     )
 
     private fun changeAppIconViewModel() =
@@ -203,8 +207,9 @@ class ViewModelFactory @Inject constructor(
 
     private fun fireproofWebsiteViewModel() =
         FireproofWebsitesViewModel(
-            dao = fireproofWebsiteDao,
+            fireproofWebsiteRepository = fireproofWebsiteRepository,
             dispatcherProvider = dispatcherProvider,
-            pixel = pixel
+            pixel = pixel,
+            settingsDataStore = appSettingsPreferencesStore
         )
 }

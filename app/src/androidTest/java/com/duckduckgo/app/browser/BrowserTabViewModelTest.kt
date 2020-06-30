@@ -41,6 +41,9 @@ import com.duckduckgo.app.browser.LongPressHandler.RequiredAction.DownloadFile
 import com.duckduckgo.app.browser.LongPressHandler.RequiredAction.OpenInNewTab
 import com.duckduckgo.app.browser.addtohome.AddToHomeCapabilityDetector
 import com.duckduckgo.app.browser.favicon.FaviconDownloader
+import com.duckduckgo.app.browser.logindetection.LoginDetected
+import com.duckduckgo.app.browser.logindetection.NavigationAwareLoginDetector
+import com.duckduckgo.app.browser.logindetection.NavigationEvent.LoginAttempt
 import com.duckduckgo.app.browser.model.BasicAuthenticationCredentials
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.browser.model.LongPressTarget
@@ -52,6 +55,7 @@ import com.duckduckgo.app.cta.model.DismissedCta
 import com.duckduckgo.app.cta.ui.*
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteDao
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
+import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepository
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.model.SiteFactory
@@ -65,6 +69,7 @@ import com.duckduckgo.app.privacy.model.TestEntity
 import com.duckduckgo.app.privacy.model.UserWhitelistedDomain
 import com.duckduckgo.app.runBlocking
 import com.duckduckgo.app.settings.db.SettingsDataStore
+import com.duckduckgo.app.statistics.Variant
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.VariantManager.Companion.DEFAULT_VARIANT
 import com.duckduckgo.app.statistics.api.StatisticsUpdater
@@ -180,6 +185,9 @@ class BrowserTabViewModelTest {
     @Mock
     private lateinit var mockUserWhitelistDao: UserWhitelistDao
 
+    @Mock
+    private lateinit var mockNavigationAwareLoginDetector: NavigationAwareLoginDetector
+
     private lateinit var mockAutoCompleteApi: AutoCompleteApi
 
     private lateinit var ctaViewModel: CtaViewModel
@@ -194,6 +202,8 @@ class BrowserTabViewModelTest {
     private lateinit var fireproofWebsiteDao: FireproofWebsiteDao
 
     private val selectedTabLiveData = MutableLiveData<TabEntity>()
+
+    private val loginEventLiveData = MutableLiveData<LoginDetected>()
 
     @Before
     fun before() {
@@ -222,9 +232,10 @@ class BrowserTabViewModelTest {
 
         val siteFactory = SiteFactory(mockPrivacyPractices, mockEntityLookup)
 
-        whenever(mockOmnibarConverter.convertQueryToUrl(any())).thenReturn("duckduckgo.com")
+        whenever(mockOmnibarConverter.convertQueryToUrl(any(), any())).thenReturn("duckduckgo.com")
         whenever(mockVariantManager.getVariant()).thenReturn(DEFAULT_VARIANT)
         whenever(mockTabsRepository.liveSelectedTab).thenReturn(selectedTabLiveData)
+        whenever(mockNavigationAwareLoginDetector.loginEventLiveData).thenReturn(loginEventLiveData)
         whenever(mockTabsRepository.retrieveSiteData(any())).thenReturn(MutableLiveData())
         whenever(mockPrivacyPractices.privacyPracticesFor(any())).thenReturn(PrivacyPractices.UNKNOWN)
         whenever(mockAppInstallStore.installTimestamp).thenReturn(System.currentTimeMillis() - TimeUnit.DAYS.toMillis(1))
@@ -250,7 +261,9 @@ class BrowserTabViewModelTest {
             searchCountDao = mockSearchCountDao,
             pixel = mockPixel,
             dispatchers = coroutineRule.testDispatcherProvider,
-            fireproofWebsiteDao = fireproofWebsiteDao
+            fireproofWebsiteRepository = FireproofWebsiteRepository(fireproofWebsiteDao, coroutineRule.testDispatcherProvider),
+            navigationAwareLoginDetector = mockNavigationAwareLoginDetector,
+            variantManager = mockVariantManager
         )
 
         testee.loadData("abc", null, false)
@@ -353,6 +366,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenSubmittedQueryHasWhitespaceItIsTrimmed() {
+        whenever(mockOmnibarConverter.convertQueryToUrl("nytimes.com", null)).thenReturn("nytimes.com")
         testee.onUserSubmittedQuery(" nytimes.com ")
         assertEquals("nytimes.com", omnibarViewState().omnibarText)
     }
@@ -413,6 +427,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenNonEmptyInputThenNavigateCommandSubmittedToActivity() {
+        whenever(mockOmnibarConverter.convertQueryToUrl("foo", null)).thenReturn("foo.com")
         testee.onUserSubmittedQuery("foo")
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
         assertTrue(commandCaptor.lastValue is Navigate)
@@ -701,6 +716,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenBrowserShownAndOmnibarInputDoesNotHaveFocusThenPrivacyGradeIsShownAndSearchIconIsHidden() {
+        whenever(mockOmnibarConverter.convertQueryToUrl("foo", null)).thenReturn("foo.com")
         testee.onUserSubmittedQuery("foo")
         testee.onOmnibarInputStateChanged(query = "", hasFocus = false, hasQueryChanged = false)
         assertTrue(browserViewState().showPrivacyGrade)
@@ -715,6 +731,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenBrowserShownAndOmnibarInputHasFocusThenSearchIconIsShownAndPrivacyGradeIsHidden() {
+        whenever(mockOmnibarConverter.convertQueryToUrl("foo", null)).thenReturn("foo.com")
         testee.onUserSubmittedQuery("foo")
         testee.onOmnibarInputStateChanged("", true, hasQueryChanged = false)
         assertFalse(browserViewState().showPrivacyGrade)
@@ -853,6 +870,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenEnteringNonEmptyQueryThenHideKeyboardCommandIssued() {
+        whenever(mockOmnibarConverter.convertQueryToUrl("foo", null)).thenReturn("foo.com")
         testee.onUserSubmittedQuery("foo")
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
         assertTrue(commandCaptor.allValues.any { it == Command.HideKeyboard })
@@ -1452,6 +1470,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenUserSubmitsQueryThenCaretDoesNotMoveToTheEnd() {
+        whenever(mockOmnibarConverter.convertQueryToUrl("foo", null)).thenReturn("foo.com")
         testee.onUserSubmittedQuery("foo")
         assertFalse(omnibarViewState().shouldMoveCaretToEnd)
     }
@@ -1745,23 +1764,25 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenUserLoadsNotFireproofWebsiteThenFireproofWebsiteOptionMenuEnabled() {
+    fun whenUserLoadsNotFireproofWebsiteThenFireproofWebsiteBrowserStateUpdated() {
         loadUrl("http://www.example.com/path", isBrowserShowing = true)
         assertTrue(browserViewState().canFireproofSite)
+        assertFalse(browserViewState().isFireproofWebsite)
     }
 
     @Test
-    fun whenUserLoadsFireproofWebsiteThenFireproofWebsiteOptionMenuDisabled() {
+    fun whenUserLoadsFireproofWebsiteThenFireproofWebsiteBrowserStateUpdated() {
         givenFireproofWebsiteDomain("www.example.com")
         loadUrl("http://www.example.com/path", isBrowserShowing = true)
-        assertFalse(browserViewState().canFireproofSite)
+        assertTrue(browserViewState().isFireproofWebsite)
     }
 
     @Test
-    fun whenUserLoadsFireproofWebsiteSubDomainThenFireproofWebsiteOptionMenuEnabled() {
+    fun whenUserLoadsFireproofWebsiteSubDomainThenFireproofWebsiteBrowserStateUpdated() {
         givenFireproofWebsiteDomain("example.com")
         loadUrl("http://mobile.example.com/path", isBrowserShowing = true)
         assertTrue(browserViewState().canFireproofSite)
+        assertFalse(browserViewState().isFireproofWebsite)
     }
 
     @Test
@@ -1773,62 +1794,125 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenUrlIsUpdatedWithNonFireproofWebsiteThenFireproofWebsiteOptionMenuEnabled() {
+    fun whenUrlIsUpdatedWithNonFireproofWebsiteThenFireproofWebsiteBrowserStateUpdated() {
         givenFireproofWebsiteDomain("www.example.com")
         loadUrl("http://www.example.com/", isBrowserShowing = true)
         updateUrl("http://www.example.com/", "http://twitter.com/explore", true)
         assertTrue(browserViewState().canFireproofSite)
+        assertFalse(browserViewState().isFireproofWebsite)
     }
 
     @Test
-    fun whenUrlIsUpdatedWithFireproofWebsiteThenFireproofWebsiteOptionMenuDisabled() {
+    fun whenUrlIsUpdatedWithFireproofWebsiteThenFireproofWebsiteBrowserStateUpdated() {
         givenFireproofWebsiteDomain("twitter.com")
         loadUrl("http://example.com/", isBrowserShowing = true)
         updateUrl("http://example.com/", "http://twitter.com/explore", true)
-        assertFalse(browserViewState().canFireproofSite)
+        assertTrue(browserViewState().isFireproofWebsite)
     }
 
     @Test
     fun whenUserClicksFireproofWebsiteOptionMenuThenShowConfirmationIsIssued() {
         loadUrl("http://mobile.example.com/", isBrowserShowing = true)
-        testee.onFireproofWebsiteClicked()
+        testee.onFireproofWebsiteMenuClicked()
         assertCommandIssued<Command.ShowFireproofWebSiteConfirmation> {
             assertEquals("mobile.example.com", this.fireproofWebsiteEntity.domain)
         }
     }
 
     @Test
-    fun whenUserClicksFireproofWebsiteOptionMenuThenFireproofWebsiteOptionMenuDisabled() {
+    fun whenUserClicksFireproofWebsiteOptionMenuThenFireproofWebsiteBrowserStateUpdated() {
         loadUrl("http://example.com/", isBrowserShowing = true)
-        testee.onFireproofWebsiteClicked()
-        assertFalse(browserViewState().canFireproofSite)
+        testee.onFireproofWebsiteMenuClicked()
+        assertTrue(browserViewState().isFireproofWebsite)
     }
 
     @Test
     fun whenFireproofWebsiteAddedThenPixelSent() {
         loadUrl("http://example.com/", isBrowserShowing = true)
-        testee.onFireproofWebsiteClicked()
+        testee.onFireproofWebsiteMenuClicked()
         verify(mockPixel).fire(Pixel.PixelName.FIREPROOF_WEBSITE_ADDED)
+    }
+
+    @Test
+    fun whenUserRemovesFireproofWebsiteFromOptionMenuThenFireproofWebsiteBrowserStateUpdated() {
+        givenFireproofWebsiteDomain("mobile.example.com")
+        loadUrl("http://mobile.example.com/", isBrowserShowing = true)
+        testee.onFireproofWebsiteMenuClicked()
+        assertFalse(browserViewState().isFireproofWebsite)
+    }
+
+    @Test
+    fun whenUserRemovesFireproofWebsiteFromOptionMenuThenPixelSent() {
+        givenFireproofWebsiteDomain("mobile.example.com")
+        loadUrl("http://mobile.example.com/", isBrowserShowing = true)
+        testee.onFireproofWebsiteMenuClicked()
+        verify(mockPixel).fire(Pixel.PixelName.FIREPROOF_WEBSITE_REMOVE)
     }
 
     @Test
     fun whenUserClicksOnFireproofWebsiteSnackbarUndoActionThenFireproofWebsiteIsRemoved() {
         loadUrl("http://example.com/", isBrowserShowing = true)
-        testee.onFireproofWebsiteClicked()
+        testee.onFireproofWebsiteMenuClicked()
         assertCommandIssued<Command.ShowFireproofWebSiteConfirmation> {
             testee.onFireproofWebsiteSnackbarUndoClicked(this.fireproofWebsiteEntity)
         }
         assertTrue(browserViewState().canFireproofSite)
+        assertFalse(browserViewState().isFireproofWebsite)
     }
 
     @Test
     fun whenUserClicksOnFireproofWebsiteSnackbarUndoActionThenPixelSent() {
         loadUrl("http://example.com/", isBrowserShowing = true)
-        testee.onFireproofWebsiteClicked()
+        testee.onFireproofWebsiteMenuClicked()
         assertCommandIssued<Command.ShowFireproofWebSiteConfirmation> {
             testee.onFireproofWebsiteSnackbarUndoClicked(this.fireproofWebsiteEntity)
         }
         verify(mockPixel).fire(Pixel.PixelName.FIREPROOF_WEBSITE_UNDO)
+    }
+
+    @Test
+    fun whenUserFireproofsWebsiteFromLoginDialogThenShowConfirmationIsIssuedWithExpectedDomain() {
+        loadUrl("http://mobile.example.com/", isBrowserShowing = true)
+        testee.onUserConfirmedFireproofDialog("login.example.com")
+        assertCommandIssued<Command.ShowFireproofWebSiteConfirmation> {
+            assertEquals("login.example.com", this.fireproofWebsiteEntity.domain)
+        }
+    }
+
+    @Test
+    fun whenUserFireproofsWebsiteFromLoginDialogThenPixelSent() {
+        testee.onUserConfirmedFireproofDialog("login.example.com")
+        verify(mockPixel).fire(Pixel.PixelName.FIREPROOF_WEBSITE_LOGIN_ADDED)
+    }
+
+    @Test
+    fun whenUserDismissesFireproofWebsiteLoginDialogThenPixelSent() {
+        testee.onUserDismissedFireproofLoginDialog()
+        verify(mockPixel).fire(Pixel.PixelName.FIREPROOF_WEBSITE_LOGIN_DISMISS)
+    }
+
+    @Test
+    fun whenLoginAttempDetectedThenNotifyNavigationAwareLoginDetector() {
+        loadUrl("http://example.com/", isBrowserShowing = true)
+
+        testee.loginDetected()
+
+        verify(mockNavigationAwareLoginDetector).onEvent(LoginAttempt("http://example.com/"))
+    }
+
+    @Test
+    fun whenLoginDetectedOnAFireproofedWebsiteThenDoNotAskToFireproofWebsite() {
+        givenFireproofWebsiteDomain("example.com")
+        loginEventLiveData.value = givenLoginDetected("example.com")
+        assertCommandNotIssued<Command.AskToFireproofWebsite>()
+    }
+
+    @Test
+    fun whenLoginDetectedThenAskToFireproofWebsite() {
+        loginEventLiveData.value = givenLoginDetected("example.com")
+        assertCommandIssued<Command.AskToFireproofWebsite> {
+            assertEquals(FireproofWebsiteEntity("example.com"), this.fireproofWebsite)
+        }
     }
 
     @Test
@@ -1936,6 +2020,7 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+<<<<<<< HEAD
     fun whenGeoPermissionisRequestedAndOriginIsNotDDGThenItsDenied() {
         val originUrl = "http://example.com"
         testee.onGeoLocationPermissionRequested(originUrl, permissionCallback)
@@ -1946,6 +2031,43 @@ class BrowserTabViewModelTest {
     @Test
     fun whenGeoPermissionisRequestedAndOriginIsDDGThenItsGranted() {
 
+=======
+    fun whenSERPRemovalFeatureIsActiveAndBrowsingDDGSiteAndPrivacyGradeIsVisibleThenShowDaxIconIsTrue() {
+        val serpRemovalVariant = Variant("foo", 100.0, features = listOf(VariantManager.VariantFeature.SerpHeaderRemoval), filterBy = { true })
+        whenever(mockVariantManager.getVariant()).thenReturn(serpRemovalVariant)
+        val url = "https://duckduckgo.com?q=test%20search"
+        loadUrl(url, isBrowserShowing = true)
+        assertTrue(browserViewState().showDaxIcon)
+    }
+
+    @Test
+    fun whenSERPRemovalFeatureIsActiveAndBrowsingNonDDGSiteAndPrivacyGradeIsVisibleThenShowDaxIconIsFalse() {
+        val serpRemovalVariant = Variant("foo", 100.0, features = listOf(VariantManager.VariantFeature.SerpHeaderRemoval), filterBy = { true })
+        whenever(mockVariantManager.getVariant()).thenReturn(serpRemovalVariant)
+        val url = "https://example.com"
+        loadUrl(url, isBrowserShowing = true)
+        assertFalse(browserViewState().showDaxIcon)
+    }
+
+    @Test
+    fun whenSERPRemovalFeatureIsInactiveAndBrowsingDDGSiteAndPrivacyGradeIsVisibleThenShowDaxIconIsFalse() {
+        val url = "https://duckduckgo.com?q=test%20search"
+        loadUrl(url, isBrowserShowing = true)
+        assertFalse(browserViewState().showDaxIcon)
+    }
+
+    @Test
+    fun whenSERPRemovalFeatureIsInactiveAndBrowsingNonDDGSiteAndPrivacyGradeIsVisibleThenShowDaxIconIsFalse() {
+        val url = "https://example.com"
+        loadUrl(url, isBrowserShowing = true)
+        assertFalse(browserViewState().showDaxIcon)
+    }
+
+    @Test
+    fun whenQueryIsNotHierarchicalThenUnsupportedOperationExceptionIsHandled() {
+        whenever(mockOmnibarConverter.convertQueryToUrl("about:blank", null)).thenReturn("about:blank")
+        testee.onUserSubmittedQuery("about:blank")
+>>>>>>> develop
     }
 
     private inline fun <reified T : Command> assertCommandIssued(instanceAssertions: T.() -> Unit = {}) {
@@ -1992,6 +2114,8 @@ class BrowserTabViewModelTest {
             fireproofWebsiteDao.insert(FireproofWebsiteEntity(domain = it))
         }
     }
+
+    private fun givenLoginDetected(domain: String) = LoginDetected(authLoginDomain = "", forwardedToDomain = domain)
 
     private fun setBrowserShowing(isBrowsing: Boolean) {
         testee.browserViewState.value = browserViewState().copy(browserShowing = isBrowsing)

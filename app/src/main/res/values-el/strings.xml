@@ -439,7 +439,7 @@
     <!-- Fireproof websites -->
     <string name="fireproofWebsitesActivityTitle">Ασφαλείς ιστότοποι</string>
     <string name="settingsFireproofWebsites">Ασφαλείς ιστότοποι</string>
-    <string name="fireproofWebsiteMenuTitle">Ασφαλής ιστότοπος</string>
+    <string name="fireproofWebsiteMenuTitleAdd">Ασφαλής ιστότοπος</string>
     <string name="fireproofWebsiteSnackbarConfirmation">Το &lt;b&gt;%s&lt;/b&gt; είναι πλέον ασφαλές! Επισκεφτείτε τις Ρυθμίσεις για να μάθετε περισσότερα.</string>
     <string name="fireproofWebsiteSnackbarAction">Αναίρεση</string>
     <string name="fireproofWebsiteDeleteConfirmMessage">Είστε βέβαιοι ότι θέλετε να διαγράψετε το &lt;b&gt;%s&lt;/b&gt;;</string>

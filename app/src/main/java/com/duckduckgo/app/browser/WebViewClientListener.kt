@@ -52,4 +52,6 @@ interface WebViewClientListener {
     fun closeCurrentTab()
     fun upgradedToHttps()
     fun surrogateDetected(surrogate: SurrogateResponse)
+
+    fun loginDetected()
 }
