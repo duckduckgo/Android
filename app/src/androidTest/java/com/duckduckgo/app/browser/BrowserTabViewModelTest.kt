@@ -41,6 +41,9 @@ import com.duckduckgo.app.browser.LongPressHandler.RequiredAction.DownloadFile
 import com.duckduckgo.app.browser.LongPressHandler.RequiredAction.OpenInNewTab
 import com.duckduckgo.app.browser.addtohome.AddToHomeCapabilityDetector
 import com.duckduckgo.app.browser.favicon.FaviconDownloader
+import com.duckduckgo.app.browser.logindetection.LoginDetected
+import com.duckduckgo.app.browser.logindetection.NavigationAwareLoginDetector
+import com.duckduckgo.app.browser.logindetection.NavigationEvent.LoginAttempt
 import com.duckduckgo.app.browser.model.BasicAuthenticationCredentials
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.browser.model.LongPressTarget
@@ -49,8 +52,10 @@ import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.cta.db.DismissedCtaDao
 import com.duckduckgo.app.cta.model.CtaId
 import com.duckduckgo.app.cta.model.DismissedCta
+import com.duckduckgo.app.cta.ui.*
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteDao
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
+import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepository
 import com.duckduckgo.app.cta.ui.Cta
 import com.duckduckgo.app.cta.ui.CtaViewModel
 import com.duckduckgo.app.cta.ui.DaxBubbleCta
@@ -94,14 +99,7 @@ import com.duckduckgo.app.trackerdetection.EntityLookup
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import com.duckduckgo.app.usage.search.SearchCountDao
 import com.duckduckgo.app.widget.ui.WidgetCapabilities
-import com.nhaarman.mockitokotlin2.any
-import com.nhaarman.mockitokotlin2.anyOrNull
-import com.nhaarman.mockitokotlin2.atLeastOnce
-import com.nhaarman.mockitokotlin2.doReturn
-import com.nhaarman.mockitokotlin2.firstValue
-import com.nhaarman.mockitokotlin2.lastValue
-import com.nhaarman.mockitokotlin2.mock
-import com.nhaarman.mockitokotlin2.whenever
+import com.nhaarman.mockitokotlin2.*
 import io.reactivex.Observable
 import io.reactivex.Single
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -112,14 +110,10 @@ import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import org.mockito.ArgumentCaptor
+import org.mockito.*
 import org.mockito.ArgumentMatchers.anyString
-import org.mockito.Captor
-import org.mockito.Mock
-import org.mockito.Mockito
 import org.mockito.Mockito.never
 import org.mockito.Mockito.verify
-import org.mockito.MockitoAnnotations
 import java.util.concurrent.TimeUnit
 
 @ExperimentalCoroutinesApi
@@ -208,6 +202,9 @@ class BrowserTabViewModelTest {
     private lateinit var mockUserWhitelistDao: UserWhitelistDao
 
     @Mock
+    private lateinit var mockNavigationAwareLoginDetector: NavigationAwareLoginDetector
+
+    @Mock
     private lateinit var mockUserEventsStore: UserEventsStore
 
     @Mock
@@ -227,6 +224,8 @@ class BrowserTabViewModelTest {
     private lateinit var fireproofWebsiteDao: FireproofWebsiteDao
 
     private val selectedTabLiveData = MutableLiveData<TabEntity>()
+
+    private val loginEventLiveData = MutableLiveData<LoginDetected>()
 
     @Before
     fun before() {
@@ -260,6 +259,7 @@ class BrowserTabViewModelTest {
         whenever(mockOmnibarConverter.convertQueryToUrl(any(), any())).thenReturn("duckduckgo.com")
         whenever(mockVariantManager.getVariant()).thenReturn(DEFAULT_VARIANT)
         whenever(mockTabsRepository.liveSelectedTab).thenReturn(selectedTabLiveData)
+        whenever(mockNavigationAwareLoginDetector.loginEventLiveData).thenReturn(loginEventLiveData)
         whenever(mockTabsRepository.retrieveSiteData(any())).thenReturn(MutableLiveData())
         whenever(mockPrivacyPractices.privacyPracticesFor(any())).thenReturn(PrivacyPractices.UNKNOWN)
         whenever(mockAppInstallStore.installTimestamp).thenReturn(System.currentTimeMillis() - TimeUnit.DAYS.toMillis(1))
@@ -285,7 +285,8 @@ class BrowserTabViewModelTest {
             searchCountDao = mockSearchCountDao,
             pixel = mockPixel,
             dispatchers = coroutineRule.testDispatcherProvider,
-            fireproofWebsiteDao = fireproofWebsiteDao,
+            fireproofWebsiteRepository = FireproofWebsiteRepository(fireproofWebsiteDao, coroutineRule.testDispatcherProvider),
+            navigationAwareLoginDetector = mockNavigationAwareLoginDetector,
             userEventsStore = mockUserEventsStore,
             notificationDao = mockNotificationDao,
             useOurAppDetector = UseOurAppDetector(),
@@ -1828,23 +1829,25 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenUserLoadsNotFireproofWebsiteThenFireproofWebsiteOptionMenuEnabled() {
+    fun whenUserLoadsNotFireproofWebsiteThenFireproofWebsiteBrowserStateUpdated() {
         loadUrl("http://www.example.com/path", isBrowserShowing = true)
         assertTrue(browserViewState().canFireproofSite)
+        assertFalse(browserViewState().isFireproofWebsite)
     }
 
     @Test
-    fun whenUserLoadsFireproofWebsiteThenFireproofWebsiteOptionMenuDisabled() {
+    fun whenUserLoadsFireproofWebsiteThenFireproofWebsiteBrowserStateUpdated() {
         givenFireproofWebsiteDomain("www.example.com")
         loadUrl("http://www.example.com/path", isBrowserShowing = true)
-        assertFalse(browserViewState().canFireproofSite)
+        assertTrue(browserViewState().isFireproofWebsite)
     }
 
     @Test
-    fun whenUserLoadsFireproofWebsiteSubDomainThenFireproofWebsiteOptionMenuEnabled() {
+    fun whenUserLoadsFireproofWebsiteSubDomainThenFireproofWebsiteBrowserStateUpdated() {
         givenFireproofWebsiteDomain("example.com")
         loadUrl("http://mobile.example.com/path", isBrowserShowing = true)
         assertTrue(browserViewState().canFireproofSite)
+        assertFalse(browserViewState().isFireproofWebsite)
     }
 
     @Test
@@ -1856,62 +1859,125 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenUrlIsUpdatedWithNonFireproofWebsiteThenFireproofWebsiteOptionMenuEnabled() {
+    fun whenUrlIsUpdatedWithNonFireproofWebsiteThenFireproofWebsiteBrowserStateUpdated() {
         givenFireproofWebsiteDomain("www.example.com")
         loadUrl("http://www.example.com/", isBrowserShowing = true)
         updateUrl("http://www.example.com/", "http://twitter.com/explore", true)
         assertTrue(browserViewState().canFireproofSite)
+        assertFalse(browserViewState().isFireproofWebsite)
     }
 
     @Test
-    fun whenUrlIsUpdatedWithFireproofWebsiteThenFireproofWebsiteOptionMenuDisabled() {
+    fun whenUrlIsUpdatedWithFireproofWebsiteThenFireproofWebsiteBrowserStateUpdated() {
         givenFireproofWebsiteDomain("twitter.com")
         loadUrl("http://example.com/", isBrowserShowing = true)
         updateUrl("http://example.com/", "http://twitter.com/explore", true)
-        assertFalse(browserViewState().canFireproofSite)
+        assertTrue(browserViewState().isFireproofWebsite)
     }
 
     @Test
     fun whenUserClicksFireproofWebsiteOptionMenuThenShowConfirmationIsIssued() {
         loadUrl("http://mobile.example.com/", isBrowserShowing = true)
-        testee.onFireproofWebsiteClicked()
+        testee.onFireproofWebsiteMenuClicked()
         assertCommandIssued<Command.ShowFireproofWebSiteConfirmation> {
             assertEquals("mobile.example.com", this.fireproofWebsiteEntity.domain)
         }
     }
 
     @Test
-    fun whenUserClicksFireproofWebsiteOptionMenuThenFireproofWebsiteOptionMenuDisabled() {
+    fun whenUserClicksFireproofWebsiteOptionMenuThenFireproofWebsiteBrowserStateUpdated() {
         loadUrl("http://example.com/", isBrowserShowing = true)
-        testee.onFireproofWebsiteClicked()
-        assertFalse(browserViewState().canFireproofSite)
+        testee.onFireproofWebsiteMenuClicked()
+        assertTrue(browserViewState().isFireproofWebsite)
     }
 
     @Test
     fun whenFireproofWebsiteAddedThenPixelSent() {
         loadUrl("http://example.com/", isBrowserShowing = true)
-        testee.onFireproofWebsiteClicked()
+        testee.onFireproofWebsiteMenuClicked()
         verify(mockPixel).fire(Pixel.PixelName.FIREPROOF_WEBSITE_ADDED)
+    }
+
+    @Test
+    fun whenUserRemovesFireproofWebsiteFromOptionMenuThenFireproofWebsiteBrowserStateUpdated() {
+        givenFireproofWebsiteDomain("mobile.example.com")
+        loadUrl("http://mobile.example.com/", isBrowserShowing = true)
+        testee.onFireproofWebsiteMenuClicked()
+        assertFalse(browserViewState().isFireproofWebsite)
+    }
+
+    @Test
+    fun whenUserRemovesFireproofWebsiteFromOptionMenuThenPixelSent() {
+        givenFireproofWebsiteDomain("mobile.example.com")
+        loadUrl("http://mobile.example.com/", isBrowserShowing = true)
+        testee.onFireproofWebsiteMenuClicked()
+        verify(mockPixel).fire(Pixel.PixelName.FIREPROOF_WEBSITE_REMOVE)
     }
 
     @Test
     fun whenUserClicksOnFireproofWebsiteSnackbarUndoActionThenFireproofWebsiteIsRemoved() {
         loadUrl("http://example.com/", isBrowserShowing = true)
-        testee.onFireproofWebsiteClicked()
+        testee.onFireproofWebsiteMenuClicked()
         assertCommandIssued<Command.ShowFireproofWebSiteConfirmation> {
             testee.onFireproofWebsiteSnackbarUndoClicked(this.fireproofWebsiteEntity)
         }
         assertTrue(browserViewState().canFireproofSite)
+        assertFalse(browserViewState().isFireproofWebsite)
     }
 
     @Test
     fun whenUserClicksOnFireproofWebsiteSnackbarUndoActionThenPixelSent() {
         loadUrl("http://example.com/", isBrowserShowing = true)
-        testee.onFireproofWebsiteClicked()
+        testee.onFireproofWebsiteMenuClicked()
         assertCommandIssued<Command.ShowFireproofWebSiteConfirmation> {
             testee.onFireproofWebsiteSnackbarUndoClicked(this.fireproofWebsiteEntity)
         }
         verify(mockPixel).fire(Pixel.PixelName.FIREPROOF_WEBSITE_UNDO)
+    }
+
+    @Test
+    fun whenUserFireproofsWebsiteFromLoginDialogThenShowConfirmationIsIssuedWithExpectedDomain() {
+        loadUrl("http://mobile.example.com/", isBrowserShowing = true)
+        testee.onUserConfirmedFireproofDialog("login.example.com")
+        assertCommandIssued<Command.ShowFireproofWebSiteConfirmation> {
+            assertEquals("login.example.com", this.fireproofWebsiteEntity.domain)
+        }
+    }
+
+    @Test
+    fun whenUserFireproofsWebsiteFromLoginDialogThenPixelSent() {
+        testee.onUserConfirmedFireproofDialog("login.example.com")
+        verify(mockPixel).fire(Pixel.PixelName.FIREPROOF_WEBSITE_LOGIN_ADDED)
+    }
+
+    @Test
+    fun whenUserDismissesFireproofWebsiteLoginDialogThenPixelSent() {
+        testee.onUserDismissedFireproofLoginDialog()
+        verify(mockPixel).fire(Pixel.PixelName.FIREPROOF_WEBSITE_LOGIN_DISMISS)
+    }
+
+    @Test
+    fun whenLoginAttempDetectedThenNotifyNavigationAwareLoginDetector() {
+        loadUrl("http://example.com/", isBrowserShowing = true)
+
+        testee.loginDetected()
+
+        verify(mockNavigationAwareLoginDetector).onEvent(LoginAttempt("http://example.com/"))
+    }
+
+    @Test
+    fun whenLoginDetectedOnAFireproofedWebsiteThenDoNotAskToFireproofWebsite() {
+        givenFireproofWebsiteDomain("example.com")
+        loginEventLiveData.value = givenLoginDetected("example.com")
+        assertCommandNotIssued<Command.AskToFireproofWebsite>()
+    }
+
+    @Test
+    fun whenLoginDetectedThenAskToFireproofWebsite() {
+        loginEventLiveData.value = givenLoginDetected("example.com")
+        assertCommandIssued<Command.AskToFireproofWebsite> {
+            assertEquals(FireproofWebsiteEntity("example.com"), this.fireproofWebsite)
+        }
     }
 
     @Test
@@ -2180,6 +2246,8 @@ class BrowserTabViewModelTest {
             fireproofWebsiteDao.insert(FireproofWebsiteEntity(domain = it))
         }
     }
+
+    private fun givenLoginDetected(domain: String) = LoginDetected(authLoginDomain = "", forwardedToDomain = domain)
 
     private fun setBrowserShowing(isBrowsing: Boolean) {
         testee.browserViewState.value = browserViewState().copy(browserShowing = isBrowsing)

@@ -440,7 +440,7 @@
     <!-- Fireproof websites -->
     <string name="fireproofWebsitesActivityTitle">Brannsikre nettsteder</string>
     <string name="settingsFireproofWebsites">Brannsikre nettsteder</string>
-    <string name="fireproofWebsiteMenuTitle">Brannsikkert nettsted</string>
+    <string name="fireproofWebsiteMenuTitleAdd">Brannsikkert nettsted</string>
     <string name="fireproofWebsiteSnackbarConfirmation">&lt;b&gt;%s&lt;/b&gt; er nå brannsikkert! Besøk Innstillinger for å lære mer.</string>
     <string name="fireproofWebsiteSnackbarAction">Angre</string>
     <string name="fireproofWebsiteDeleteConfirmMessage">Er du sikker på at du vil slette &lt;b&gt;%s&lt;/b&gt;?</string>

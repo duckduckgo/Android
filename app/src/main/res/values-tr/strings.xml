@@ -461,7 +461,7 @@
     <!-- Fireproof websites -->
     <string name="fireproofWebsitesActivityTitle">Korumalı Web Siteleri</string>
     <string name="settingsFireproofWebsites">Korumalı Web Siteleri</string>
-    <string name="fireproofWebsiteMenuTitle">Korumalı Web Sitesi</string>
+    <string name="fireproofWebsiteMenuTitleAdd">Korumalı Web Sitesi</string>
     <string name="fireproofWebsiteSnackbarConfirmation">&lt;b&gt;%s&lt;/b&gt; artık koruma altında! Daha fazla bilgi edinmek için Ayarlar\'a gidin.</string>
     <string name="fireproofWebsiteSnackbarAction">Geri al</string>
     <string name="fireproofWebsiteDeleteConfirmMessage">&lt;b&gt;%s&lt;/b&gt; \'ı silmek istediğinizden emin misiniz?</string>

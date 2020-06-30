@@ -35,6 +35,7 @@ import com.duckduckgo.app.browser.rating.ui.RateAppDialogFragment
 import com.duckduckgo.app.browser.shortcut.ShortcutBuilder
 import com.duckduckgo.app.feedback.ui.common.FeedbackActivity
 import com.duckduckgo.app.fire.DataClearer
+import com.duckduckgo.app.fire.DataClearerForegroundAppRestartPixel
 import com.duckduckgo.app.global.ApplicationClearDataState
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.intentText
@@ -65,6 +66,9 @@ class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope() {
     @Inject
     lateinit var playStoreUtils: PlayStoreUtils
 
+    @Inject
+    lateinit var dataClearerForegroundAppRestartPixel: DataClearerForegroundAppRestartPixel
+
     private var currentTab: BrowserTabFragment? = null
 
     private val viewModel: BrowserViewModel by bindViewModel()
@@ -82,11 +86,9 @@ class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope() {
     @SuppressLint("MissingSuperCall")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.daggerInject()
-
-        renderer = BrowserStateRenderer()
-
         Timber.i("onCreate called. freshAppLaunch: ${dataClearer.isFreshAppLaunch}, savedInstanceState: $savedInstanceState")
-
+        dataClearerForegroundAppRestartPixel.registerIntent(intent)
+        renderer = BrowserStateRenderer()
         val newInstanceState = if (dataClearer.isFreshAppLaunch) null else savedInstanceState
         instanceStateBundles = CombinedInstanceState(originalInstanceState = savedInstanceState, newInstanceState = newInstanceState)
 
@@ -111,6 +113,7 @@ class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope() {
     override fun onNewIntent(intent: Intent?) {
         super.onNewIntent(intent)
         Timber.i("onNewIntent: $intent")
+        dataClearerForegroundAppRestartPixel.registerIntent(intent)
 
         if (dataClearer.dataClearerState.value == ApplicationClearDataState.FINISHED) {
             Timber.i("Automatic data clearer has finished, so processing intent now")
