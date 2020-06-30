@@ -259,11 +259,16 @@
         <item name="android:layout_height">match_parent</item>
     </style>
 
+    <style name="BlueCursor" parent="ThemeOverlay.MaterialComponents.TextInputEditText.OutlinedBox">
+        <item name="android:colorControlActivated">@color/cornflowerBlue</item>
+    </style>
+
     <style name="FeedbackInputBoxStyle" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox">
         <item name="boxStrokeColor">@color/cornflowerBlue</item>
         <item name="hintTextColor">@color/cornflowerBlue</item>
         <item name="android:textColorHint">?attr/feedbackEditTextHintColor</item>
         <item name="boxBackgroundColor">?attr/feedbackEditTextBackgroundColor</item>
+        <item name="android:theme">@style/BlueCursor</item>
     </style>
 
     <style name="FeedbackEditTextInputStyle" parent="Widget.MaterialComponents.TextInputEditText.FilledBox">
@@ -274,7 +279,6 @@
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">match_parent</item>
         <item name="android:gravity">top</item>
-        <item name="android:textCursorDrawable">@null</item>
         <item name="android:textColor">?attr/normalTextColor</item>
     </style>
 
