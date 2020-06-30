@@ -21,6 +21,7 @@ import androidx.room.Room
 import com.duckduckgo.app.browser.addtohome.AddToHomeCapabilityDetector
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.global.db.MigrationsProvider
+import com.duckduckgo.app.global.useourapp.UseOurAppMigrationManager
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import dagger.Module
 import dagger.Provides
@@ -41,8 +42,9 @@ class DatabaseModule {
     fun provideDatabaseMigrations(
         context: Context,
         settingsDataStore: SettingsDataStore,
-        addToHomeCapabilityDetector: AddToHomeCapabilityDetector
+        addToHomeCapabilityDetector: AddToHomeCapabilityDetector,
+        useOurAppMigrationManager: UseOurAppMigrationManager
     ): MigrationsProvider {
-        return MigrationsProvider(context, settingsDataStore, addToHomeCapabilityDetector)
+        return MigrationsProvider(context, settingsDataStore, addToHomeCapabilityDetector, useOurAppMigrationManager)
     }
 }

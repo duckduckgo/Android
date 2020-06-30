@@ -59,28 +59,9 @@ class AppUserStageStoreTest {
     }
 
     @Test
-    fun whenStageDaxOnboardingCompletedAndNotAbleToAddShortcutsThenStageEstablishedReturned() = coroutineRule.runBlocking {
+    fun whenStageDaxOnboardingCompletedThenStageEstablishedReturned() = coroutineRule.runBlocking {
         givenCurrentStage(AppStage.DAX_ONBOARDING)
 
-        val nextStage = testee.stageCompleted(AppStage.DAX_ONBOARDING)
-
-        assertEquals(AppStage.ESTABLISHED, nextStage)
-    }
-
-    @Test
-    fun whenStageDaxOnboardingCompletedAndAbleToAddShortcutsThenStageUseOurAppNotificationReturned() = coroutineRule.runBlocking {
-        givenCurrentStage(AppStage.DAX_ONBOARDING)
-        whenever(mockAddToHomeCapabilityDetector.isAddToHomeSupported()).thenReturn(true)
-        val nextStage = testee.stageCompleted(AppStage.DAX_ONBOARDING)
-
-        assertEquals(AppStage.USE_OUR_APP_NOTIFICATION, nextStage)
-    }
-
-    @Test
-    fun whenStageDaxOnboardingCompletedAndAbleToAddShortcutsButHideTipsIsTrueThenStageEstablishedReturned() = coroutineRule.runBlocking {
-        givenCurrentStage(AppStage.DAX_ONBOARDING)
-        whenever(mockSettingsDataStore.hideTips).thenReturn(true)
-        whenever(mockAddToHomeCapabilityDetector.isAddToHomeSupported()).thenReturn(true)
         val nextStage = testee.stageCompleted(AppStage.DAX_ONBOARDING)
 
         assertEquals(AppStage.ESTABLISHED, nextStage)

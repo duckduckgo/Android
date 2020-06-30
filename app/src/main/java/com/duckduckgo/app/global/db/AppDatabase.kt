@@ -39,6 +39,7 @@ import com.duckduckgo.app.global.exception.UncaughtExceptionSourceConverter
 import com.duckduckgo.app.global.events.db.UserEventsDao
 import com.duckduckgo.app.global.events.db.UserEventEntity
 import com.duckduckgo.app.global.events.db.UserEventTypeConverter
+import com.duckduckgo.app.global.useourapp.MigrationManager
 import com.duckduckgo.app.httpsupgrade.db.HttpsBloomFilterSpecDao
 import com.duckduckgo.app.httpsupgrade.db.HttpsWhitelistDao
 import com.duckduckgo.app.httpsupgrade.model.HttpsBloomFilterSpec
@@ -133,7 +134,8 @@ abstract class AppDatabase : RoomDatabase() {
 class MigrationsProvider(
     val context: Context,
     val settingsDataStore: SettingsDataStore,
-    val addToHomeCapabilityDetector: AddToHomeCapabilityDetector
+    val addToHomeCapabilityDetector: AddToHomeCapabilityDetector,
+    val useOurAppMigrationManager: MigrationManager
 ) {
 
     val MIGRATION_1_TO_2: Migration = object : Migration(1, 2) {
@@ -309,7 +311,9 @@ class MigrationsProvider(
             database.execSQL("CREATE TABLE IF NOT EXISTS `user_events` (`id` TEXT NOT NULL PRIMARY KEY, `timestamp` INTEGER NOT NULL)")
 
             if (!settingsDataStore.hideTips && addToHomeCapabilityDetector.isAddToHomeSupported()) {
-                database.execSQL("UPDATE $USER_STAGE_TABLE_NAME SET appStage = \"${AppStage.USE_OUR_APP_NOTIFICATION}\" WHERE appStage = \"${AppStage.ESTABLISHED}\"")
+                if (useOurAppMigrationManager.shouldRunMigration()) {
+                    database.execSQL("UPDATE $USER_STAGE_TABLE_NAME SET appStage = \"${AppStage.USE_OUR_APP_NOTIFICATION}\" WHERE appStage = \"${AppStage.ESTABLISHED}\"")
+                }
             }
         }
     }

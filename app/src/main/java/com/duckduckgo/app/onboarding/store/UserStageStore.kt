@@ -45,13 +45,7 @@ class AppUserStageStore @Inject constructor(
         return withContext(dispatcher.io()) {
             val newAppStage = when (appStage) {
                 AppStage.NEW -> AppStage.DAX_ONBOARDING
-                AppStage.DAX_ONBOARDING -> {
-                    if (!settingsDataStore.hideTips && addToHomeCapabilityDetector.isAddToHomeSupported()) {
-                        AppStage.USE_OUR_APP_NOTIFICATION
-                    } else {
-                        AppStage.ESTABLISHED
-                    }
-                }
+                AppStage.DAX_ONBOARDING -> AppStage.ESTABLISHED
                 AppStage.USE_OUR_APP_NOTIFICATION -> AppStage.ESTABLISHED
                 AppStage.USE_OUR_APP_ONBOARDING -> AppStage.ESTABLISHED
                 AppStage.ESTABLISHED -> AppStage.ESTABLISHED
