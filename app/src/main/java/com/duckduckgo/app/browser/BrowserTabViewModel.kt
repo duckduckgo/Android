@@ -454,22 +454,16 @@ class BrowserTabViewModel(
         val oldUri = currentOmnibarViewState().omnibarText.toUri()
         val newUri = omnibarText.toUri()
 
-        val oldParameter = try {
-            oldUri.getQueryParameter(AppUrl.ParamKey.QUERY)
-        } catch (e: UnsupportedOperationException) {
-            null
-        }
-        val newParameter = try {
-            newUri.getQueryParameter(AppUrl.ParamKey.QUERY)
-        } catch (e: UnsupportedOperationException) {
-            null
+        if (!variantManager.getVariant().hasFeature(VariantManager.VariantFeature.SerpHeaderRemoval)){
+            return
         }
 
-        if (oldParameter == newParameter) {
+        if (oldUri == newUri) {
             pixel.fire(String.format(Locale.US, PixelName.SERP_REQUERY.pixelName, PixelParameter.SERP_QUERY_NOT_CHANGED))
         } else {
             pixel.fire(String.format(Locale.US, PixelName.SERP_REQUERY.pixelName, PixelParameter.SERP_QUERY_CHANGED))
         }
+
     }
 
     private fun shouldClearHistoryOnNewQuery(): Boolean {
