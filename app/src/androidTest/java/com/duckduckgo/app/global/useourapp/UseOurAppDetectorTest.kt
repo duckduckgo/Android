@@ -85,7 +85,7 @@ class UseOurAppDetectorTest {
     fun whenAllowLoginDetectionAndFireProofAlreadySeenThenReturnFalse() = coroutineRule.runBlocking {
         val webView: WebView = mock()
         whenever(mockUserEventsStore.getUserEvent(UserEventKey.USE_OUR_APP_SHORTCUT_ADDED)).thenReturn(UserEventEntity(UserEventKey.USE_OUR_APP_SHORTCUT_ADDED))
-        whenever(mockUserEventsStore.getUserEvent(UserEventKey.USE_OUR_APP_FIREPROOF_SEEN)).thenReturn(UserEventEntity(UserEventKey.USE_OUR_APP_FIREPROOF_SEEN))
+        whenever(mockUserEventsStore.getUserEvent(UserEventKey.USE_OUR_APP_FIREPROOF_DIALOG_SEEN)).thenReturn(UserEventEntity(UserEventKey.USE_OUR_APP_FIREPROOF_DIALOG_SEEN))
 
         assertFalse(testee.allowLoginDetection(WebNavigationEvent.OnPageStarted(webView)))
     }
@@ -128,33 +128,33 @@ class UseOurAppDetectorTest {
 
     @Test
     fun whenRegisterIfFireproofSeenForTheFirstTimeAndUrlIsUseOurAppThenRegisterUserEvent() = coroutineRule.runBlocking {
-        whenever(mockUserEventsStore.getUserEvent(UserEventKey.USE_OUR_APP_FIREPROOF_SEEN)).thenReturn(null)
+        whenever(mockUserEventsStore.getUserEvent(UserEventKey.USE_OUR_APP_FIREPROOF_DIALOG_SEEN)).thenReturn(null)
 
         testee.registerIfFireproofSeenForTheFirstTime("http://m.facebook.com")
 
-        verify(mockUserEventsStore).registerUserEvent(UserEventEntity(UserEventKey.USE_OUR_APP_FIREPROOF_SEEN))
+        verify(mockUserEventsStore).registerUserEvent(UserEventEntity(UserEventKey.USE_OUR_APP_FIREPROOF_DIALOG_SEEN))
     }
 
     @Test
     fun whenRegisterIfFireproofSeenForTheFirstTimeAndUrlIsNotUseOurAppThenDoNotRegisterUserEvent() = coroutineRule.runBlocking {
-        whenever(mockUserEventsStore.getUserEvent(UserEventKey.USE_OUR_APP_FIREPROOF_SEEN)).thenReturn(null)
+        whenever(mockUserEventsStore.getUserEvent(UserEventKey.USE_OUR_APP_FIREPROOF_DIALOG_SEEN)).thenReturn(null)
 
         testee.registerIfFireproofSeenForTheFirstTime("example.com")
 
-        verify(mockUserEventsStore, never()).registerUserEvent(UserEventEntity(UserEventKey.USE_OUR_APP_FIREPROOF_SEEN))
+        verify(mockUserEventsStore, never()).registerUserEvent(UserEventEntity(UserEventKey.USE_OUR_APP_FIREPROOF_DIALOG_SEEN))
     }
 
     @Test
     fun whenRegisterIfFireproofSeenForTheFirstTimeButAlreadySeenThenDoNotRegisterUserEvent() = coroutineRule.runBlocking {
-        whenever(mockUserEventsStore.getUserEvent(UserEventKey.USE_OUR_APP_FIREPROOF_SEEN)).thenReturn(UserEventEntity(UserEventKey.USE_OUR_APP_FIREPROOF_SEEN))
+        whenever(mockUserEventsStore.getUserEvent(UserEventKey.USE_OUR_APP_FIREPROOF_DIALOG_SEEN)).thenReturn(UserEventEntity(UserEventKey.USE_OUR_APP_FIREPROOF_DIALOG_SEEN))
 
         testee.registerIfFireproofSeenForTheFirstTime("http://m.facebook.com")
 
-        verify(mockUserEventsStore, never()).registerUserEvent(UserEventEntity(UserEventKey.USE_OUR_APP_FIREPROOF_SEEN))
+        verify(mockUserEventsStore, never()).registerUserEvent(UserEventEntity(UserEventKey.USE_OUR_APP_FIREPROOF_DIALOG_SEEN))
     }
 
     private suspend fun givenShortcutIsAddedAndFireproofNotSeen() {
         whenever(mockUserEventsStore.getUserEvent(UserEventKey.USE_OUR_APP_SHORTCUT_ADDED)).thenReturn(UserEventEntity(UserEventKey.USE_OUR_APP_SHORTCUT_ADDED))
-        whenever(mockUserEventsStore.getUserEvent(UserEventKey.USE_OUR_APP_FIREPROOF_SEEN)).thenReturn(null)
+        whenever(mockUserEventsStore.getUserEvent(UserEventKey.USE_OUR_APP_FIREPROOF_DIALOG_SEEN)).thenReturn(null)
     }
 }

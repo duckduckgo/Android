@@ -26,6 +26,7 @@ import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.never
 import com.nhaarman.mockitokotlin2.verify
+import com.nhaarman.mockitokotlin2.verifyZeroInteractions
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.junit.Before
 import org.junit.Rule
@@ -67,7 +68,7 @@ class ShortcutReceiverTest {
     }
 
     @Test
-    fun whenIntentReceivedIfUrlIsNotFromUseOurAppUrlThenDoNotRegisterTimestamp() = coroutinesTestRule.runBlocking {
+    fun whenIntentReceivedIfUrlIsNotFromUseOurAppUrlThenDoNotRegisterEvent() = coroutinesTestRule.runBlocking {
         val intent = Intent()
         intent.putExtra(ShortcutBuilder.SHORTCUT_URL_ARG, "www.example.com")
         intent.putExtra(ShortcutBuilder.SHORTCUT_TITLE_ARG, "Title")
@@ -83,6 +84,6 @@ class ShortcutReceiverTest {
         intent.putExtra(ShortcutBuilder.SHORTCUT_TITLE_ARG, "Title")
         testee.onReceive(null, intent)
 
-        verify(mockPixel, never()).fire(Pixel.PixelName.USE_OUR_APP_SHORTCUT_ADDED)
+        verifyZeroInteractions(mockPixel)
     }
 }

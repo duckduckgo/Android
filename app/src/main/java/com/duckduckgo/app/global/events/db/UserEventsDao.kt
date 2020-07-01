@@ -24,7 +24,7 @@ import androidx.room.Query
 @Dao
 interface UserEventsDao {
 
-    @Query("select * from $USER_EVENTS_TABLE_NAME where id=:userEventKey")
+    @Query("select * from user_events where id=:userEventKey")
     suspend fun getUserEvent(userEventKey: UserEventKey): UserEventEntity?
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)

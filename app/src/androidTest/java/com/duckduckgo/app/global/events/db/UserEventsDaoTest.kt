@@ -59,13 +59,13 @@ class UserEventsDaoTest {
     }
 
     @Test
-    fun whenGetTimestampAndDatabaseEmptyThenReturnNull() = coroutineRule.runBlocking {
+    fun whenGetUserEventAndDatabaseEmptyThenReturnNull() = coroutineRule.runBlocking {
         val value = testee.getUserEvent(UserEventKey.USE_OUR_APP_SHORTCUT_ADDED)
         assertNull(value)
     }
 
     @Test
-    fun whenInsertingTimestampThenReturnSameTimestamp() = coroutineRule.runBlocking {
+    fun whenInsertingUserEventThenReturnSameTimestamp() = coroutineRule.runBlocking {
         val entity = UserEventEntity(UserEventKey.USE_OUR_APP_SHORTCUT_ADDED)
         testee.registerUserEvent(entity)
 
@@ -73,7 +73,7 @@ class UserEventsDaoTest {
     }
 
     @Test
-    fun whenInsertingSameTimestampThenReplaceOldTimestampWithTheNew() = coroutineRule.runBlocking {
+    fun whenInsertingSameUserEventThenReplaceOldTimestampWithTheNew() = coroutineRule.runBlocking {
         val entity = UserEventEntity(UserEventKey.USE_OUR_APP_SHORTCUT_ADDED)
         val newEntity = UserEventEntity(UserEventKey.USE_OUR_APP_SHORTCUT_ADDED, System.currentTimeMillis() + - TimeUnit.DAYS.toMillis(1))
 

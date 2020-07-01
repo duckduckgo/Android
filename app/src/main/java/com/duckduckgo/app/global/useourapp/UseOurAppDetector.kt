@@ -46,7 +46,7 @@ class UseOurAppDetector @Inject constructor(val userEventsStore: UserEventsStore
             if (userEventsStore.getUserEvent(UserEventKey.USE_OUR_APP_SHORTCUT_ADDED) == null) {
                 false
             } else {
-                (userEventsStore.getUserEvent(UserEventKey.USE_OUR_APP_FIREPROOF_SEEN) == null)
+                (userEventsStore.getUserEvent(UserEventKey.USE_OUR_APP_FIREPROOF_DIALOG_SEEN) == null)
             }
         }
 
@@ -61,8 +61,8 @@ class UseOurAppDetector @Inject constructor(val userEventsStore: UserEventsStore
     }
 
     suspend fun registerIfFireproofSeenForTheFirstTime(url: String) {
-        if (userEventsStore.getUserEvent(UserEventKey.USE_OUR_APP_FIREPROOF_SEEN) == null && isUseOurAppUrl(url)) {
-            userEventsStore.registerUserEvent(UserEventEntity(UserEventKey.USE_OUR_APP_FIREPROOF_SEEN))
+        if (userEventsStore.getUserEvent(UserEventKey.USE_OUR_APP_FIREPROOF_DIALOG_SEEN) == null && isUseOurAppUrl(url)) {
+            userEventsStore.registerUserEvent(UserEventEntity(UserEventKey.USE_OUR_APP_FIREPROOF_DIALOG_SEEN))
         }
     }
 

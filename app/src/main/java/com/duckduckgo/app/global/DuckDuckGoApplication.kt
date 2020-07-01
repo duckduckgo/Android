@@ -299,7 +299,7 @@ open class DuckDuckGoApplication : HasAndroidInjector, Application(), LifecycleO
             Timber.i("Suppressing app launch pixel")
             return
         }
-        registerReceiver(shortcutReceiver, IntentFilter(ShortcutBuilder.USE_OUR_APP_SHORTCUT_ADDED))
+        registerReceiver(shortcutReceiver, IntentFilter(ShortcutBuilder.USE_OUR_APP_SHORTCUT_ADDED_ACTION))
         pixel.fire(APP_LAUNCH)
     }
 

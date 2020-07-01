@@ -487,7 +487,7 @@ class CtaViewModelTest {
     }
 
     @Test
-    fun whenRefreshCtaWhileBrowsingAndSiteIsUseOurAppAndTwoDaysSinceShortcutAddedThenReturnNull() = runBlockingTest {
+    fun whenRefreshCtaWhileBrowsingAndSiteIsUseOurAppAndLessThanTwoDaysSinceShortcutAddedThenReturnNull() = runBlockingTest {
         givenUserIsEstablished()
         val timestampEntity = UserEventEntity(UserEventKey.USE_OUR_APP_SHORTCUT_ADDED, System.currentTimeMillis() - TimeUnit.DAYS.toMillis(1))
         whenever(mockUserEventsStore.getUserEvent(UserEventKey.USE_OUR_APP_SHORTCUT_ADDED)).thenReturn(timestampEntity)

@@ -52,7 +52,7 @@ class ShortcutBuilder @Inject constructor() {
     }
 
     private fun buildPendingIntent(context: Context, url: String, title: String): PendingIntent? {
-        val pinnedShortcutCallbackIntent = Intent(USE_OUR_APP_SHORTCUT_ADDED)
+        val pinnedShortcutCallbackIntent = Intent(USE_OUR_APP_SHORTCUT_ADDED_ACTION)
         pinnedShortcutCallbackIntent.putExtra(SHORTCUT_URL_ARG, url)
         pinnedShortcutCallbackIntent.putExtra(SHORTCUT_TITLE_ARG, title)
         return PendingIntent.getBroadcast(context, USE_OUR_APP_SHORTCUT_ADDED_CODE, pinnedShortcutCallbackIntent, FLAG_UPDATE_CURRENT)
@@ -66,7 +66,7 @@ class ShortcutBuilder @Inject constructor() {
     }
 
     companion object {
-        const val USE_OUR_APP_SHORTCUT_ADDED: String = "useOurAppShortcutAdded"
+        const val USE_OUR_APP_SHORTCUT_ADDED_ACTION: String = "useOurAppShortcutAdded"
         const val USE_OUR_APP_SHORTCUT_ADDED_CODE = 9000
 
         const val SHORTCUT_EXTRA_ARG = "shortCutAdded"

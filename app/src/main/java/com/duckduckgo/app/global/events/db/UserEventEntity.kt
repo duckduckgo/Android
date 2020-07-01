@@ -20,9 +20,7 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import androidx.room.TypeConverter
 
-const val USER_EVENTS_TABLE_NAME = "user_events"
-
-@Entity(tableName = USER_EVENTS_TABLE_NAME)
+@Entity(tableName = "user_events")
 data class UserEventEntity(
     @PrimaryKey val id: UserEventKey,
     val timestamp: Long = System.currentTimeMillis()
@@ -30,7 +28,7 @@ data class UserEventEntity(
 
 enum class UserEventKey {
     USE_OUR_APP_SHORTCUT_ADDED,
-    USE_OUR_APP_FIREPROOF_SEEN
+    USE_OUR_APP_FIREPROOF_DIALOG_SEEN
 }
 
 class UserEventTypeConverter {

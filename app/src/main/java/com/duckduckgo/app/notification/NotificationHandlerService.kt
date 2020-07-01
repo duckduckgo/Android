@@ -86,7 +86,7 @@ class NotificationHandlerService : IntentService("NotificationHandlerService") {
             CHANGE_ICON_FEATURE -> onCustomizeIconLaunched(pixelSuffix)
             USE_OUR_APP -> {
                 GlobalScope.launch(dispatcher.io()) {
-                    userStageStore.registerInStage(AppStage.USE_OUR_APP_ONBOARDING)
+                    userStageStore.moveToStage(AppStage.USE_OUR_APP_ONBOARDING)
                     onAppLaunched(pixelSuffix)
                 }
             }

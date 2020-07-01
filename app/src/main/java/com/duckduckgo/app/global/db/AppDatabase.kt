@@ -308,7 +308,7 @@ class MigrationsProvider(
 
     val MIGRATION_21_TO_22: Migration = object : Migration(21, 22) {
         override fun migrate(database: SupportSQLiteDatabase) {
-            database.execSQL("CREATE TABLE IF NOT EXISTS `user_events` (`id` TEXT NOT NULL PRIMARY KEY, `timestamp` INTEGER NOT NULL)")
+            database.execSQL("CREATE TABLE IF NOT EXISTS `user_events` (`id` TEXT NOT NULL, `timestamp` INTEGER NOT NULL, PRIMARY KEY(`id`))")
 
             if (!settingsDataStore.hideTips && addToHomeCapabilityDetector.isAddToHomeSupported()) {
                 if (useOurAppMigrationManager.shouldRunMigration()) {

@@ -60,7 +60,6 @@ import com.duckduckgo.app.browser.model.LongPressTarget
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.browser.ui.HttpAuthenticationDialogFragment.HttpAuthenticationListener
-import com.duckduckgo.app.cta.ui.*
 import com.duckduckgo.app.cta.ui.Cta
 import com.duckduckgo.app.cta.ui.CtaViewModel
 import com.duckduckgo.app.cta.ui.DaxDialogCta
@@ -1252,12 +1251,12 @@ class BrowserTabViewModel(
             is HomePanelCta.Survey -> LaunchSurvey(cta.survey)
             is HomePanelCta.AddWidgetAuto -> LaunchAddWidget
             is HomePanelCta.AddWidgetInstructions -> LaunchLegacyAddWidget
-            is UseOurAppCta -> navigateToUrlAndAddShortcut(url = USE_OUR_APP_SHORTCUT_URL, title = USE_OUR_APP_SHORTCUT_TITLE)
+            is UseOurAppCta -> navigateToUrlAndLaunchShortcut(url = USE_OUR_APP_SHORTCUT_URL, title = USE_OUR_APP_SHORTCUT_TITLE)
             else -> return
         }
     }
 
-    private fun navigateToUrlAndAddShortcut(url: String, title: String): AddHomeShortcut {
+    private fun navigateToUrlAndLaunchShortcut(url: String, title: String): AddHomeShortcut {
         onUserSubmittedQuery(url)
         return AddHomeShortcut(title, url)
     }

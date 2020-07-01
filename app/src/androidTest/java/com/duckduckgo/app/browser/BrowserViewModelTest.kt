@@ -186,7 +186,7 @@ class BrowserViewModelTest {
     }
 
     @Test
-    fun whenOpenShortcutIfUrlIsUSeOurAppUrlThenFirePixel() {
+    fun whenOpenShortcutIfUrlIsUseOurAppUrlThenFirePixel() {
         val url = USE_OUR_APP_SHORTCUT_URL
         whenever(mockOmnibarEntryConverter.convertQueryToUrl(url)).thenReturn(url)
         testee.onOpenShortcut(url)

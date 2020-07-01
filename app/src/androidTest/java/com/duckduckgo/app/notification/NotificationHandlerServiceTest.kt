@@ -90,6 +90,6 @@ class NotificationHandlerServiceTest {
         intent.type = USE_OUR_APP
         intent.putExtra(PIXEL_SUFFIX_EXTRA, "abc")
         testee.onHandleIntent(intent)
-        verify(mockUserStageStore).registerInStage(AppStage.USE_OUR_APP_ONBOARDING)
+        verify(mockUserStageStore).moveToStage(AppStage.USE_OUR_APP_ONBOARDING)
     }
 }

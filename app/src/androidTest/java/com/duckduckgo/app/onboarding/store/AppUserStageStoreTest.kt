@@ -95,8 +95,8 @@ class AppUserStageStoreTest {
     }
 
     @Test
-    fun whenRegisterInStageThenUpdateUserStageInDao() = coroutineRule.runBlocking {
-        testee.registerInStage(AppStage.USE_OUR_APP_ONBOARDING)
+    fun whenMoveToStageThenUpdateUserStageInDao() = coroutineRule.runBlocking {
+        testee.moveToStage(AppStage.USE_OUR_APP_ONBOARDING)
         verify(userStageDao).updateUserStage(AppStage.USE_OUR_APP_ONBOARDING)
     }
 

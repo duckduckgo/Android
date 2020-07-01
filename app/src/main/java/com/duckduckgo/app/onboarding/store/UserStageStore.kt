@@ -25,7 +25,7 @@ import javax.inject.Inject
 interface UserStageStore {
     suspend fun getUserAppStage(): AppStage
     suspend fun stageCompleted(appStage: AppStage): AppStage
-    suspend fun registerInStage(appStage: AppStage)
+    suspend fun moveToStage(appStage: AppStage)
 }
 
 class AppUserStageStore @Inject constructor(
@@ -59,7 +59,7 @@ class AppUserStageStore @Inject constructor(
         }
     }
 
-    override suspend fun registerInStage(appStage: AppStage) {
+    override suspend fun moveToStage(appStage: AppStage) {
         userStageDao.updateUserStage(appStage)
     }
 }
