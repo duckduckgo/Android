@@ -405,6 +405,7 @@ class AndroidNotificationSchedulerTest {
 
     @Test
     fun whenStageIsUseOurAppNotificationThenNotificationScheduled() = runBlocking {
+        givenNoInactiveUserNotifications()
         givenStageIsUseOurAppNotification()
 
         testee.scheduleNextNotification()
@@ -414,6 +415,7 @@ class AndroidNotificationSchedulerTest {
 
     @Test
     fun whenStageIsUseOurAppNotificationAndNotificationScheduledThenStageCompleted() = runBlocking<Unit> {
+        givenNoInactiveUserNotifications()
         givenStageIsUseOurAppNotification()
 
         testee.scheduleNextNotification()
@@ -475,9 +477,12 @@ class AndroidNotificationSchedulerTest {
         )
     }
 
-    private suspend fun givenStageIsUseOurAppNotification() {
+    private suspend fun givenNoInactiveUserNotifications() {
         whenever(privacyNotification.canShow()).thenReturn(false)
         whenever(clearNotification.canShow()).thenReturn(false)
+    }
+
+    private suspend fun givenStageIsUseOurAppNotification() {
         whenever(mockUserStageStore.getUserAppStage()).thenReturn(AppStage.USE_OUR_APP_NOTIFICATION)
     }
 
