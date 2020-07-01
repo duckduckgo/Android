@@ -237,7 +237,7 @@ class AppDatabaseTest {
     fun whenMigratingFromVersion21To22IfUserIsEstablishedAndConditionsAreMetThenMigrateToNotification() {
         testHelper.createDatabase(TEST_DB_NAME, 21).use {
             givenUseOurAppStateIs(canMigrate = true, hideTips = false, canAddToHome = true)
-            givenUserIsEstablished(it)
+            givenUserStageIs(it, AppStage.ESTABLISHED)
 
             testHelper.runMigrationsAndValidate(TEST_DB_NAME, 22, true, migrationsProvider.MIGRATION_21_TO_22)
             val stage = getUserStage(it)
@@ -250,7 +250,7 @@ class AppDatabaseTest {
     fun whenMigratingFromVersion21To22IfUserIsEstablishedAndHideTipsIsTrueThenDoNotMigrateToNotification() {
         testHelper.createDatabase(TEST_DB_NAME, 21).use {
             givenUseOurAppStateIs(canMigrate = true, hideTips = true, canAddToHome = true)
-            givenUserIsEstablished(it)
+            givenUserStageIs(it, AppStage.ESTABLISHED)
 
             testHelper.runMigrationsAndValidate(TEST_DB_NAME, 22, true, migrationsProvider.MIGRATION_21_TO_22)
             val stage = getUserStage(it)
@@ -263,7 +263,20 @@ class AppDatabaseTest {
     fun whenMigratingFromVersion21To22IfUserIsEstablishedAndHomeShortcutNotSupportedThenDoNotMigrateToNotification() {
         testHelper.createDatabase(TEST_DB_NAME, 21).use {
             givenUseOurAppStateIs(canMigrate = true, hideTips = false, canAddToHome = false)
-            givenUserIsEstablished(it)
+            givenUserStageIs(it, AppStage.ESTABLISHED)
+
+            testHelper.runMigrationsAndValidate(TEST_DB_NAME, 22, true, migrationsProvider.MIGRATION_21_TO_22)
+            val stage = getUserStage(it)
+
+            assertEquals(AppStage.ESTABLISHED.name, stage)
+        }
+    }
+
+    @Test
+    fun whenMigratingFromVersion21To22IfUserIsNotEstablishedThenDoNotMigrateToNotification() {
+        testHelper.createDatabase(TEST_DB_NAME, 21).use {
+            givenUseOurAppStateIs(canMigrate = true, hideTips = false, canAddToHome = false)
+            givenUserStageIs(it, AppStage.ESTABLISHED)
 
             testHelper.runMigrationsAndValidate(TEST_DB_NAME, 22, true, migrationsProvider.MIGRATION_21_TO_22)
             val stage = getUserStage(it)
@@ -276,7 +289,7 @@ class AppDatabaseTest {
     fun whenMigratingFromVersion21To22IfShouldNotRunMigrationThenDoNotMigrateToNotification2() {
         testHelper.createDatabase(TEST_DB_NAME, 21).use {
             givenUseOurAppStateIs(canMigrate = false)
-            givenUserIsEstablished(it)
+            givenUserStageIs(it, AppStage.ESTABLISHED)
 
             testHelper.runMigrationsAndValidate(TEST_DB_NAME, 22, true, migrationsProvider.MIGRATION_21_TO_22)
             val stage = getUserStage(it)
@@ -291,13 +304,12 @@ class AppDatabaseTest {
         whenever(mockAddToHomeCapabilityDetector.isAddToHomeSupported()).thenReturn(canAddToHome)
     }
 
-    private fun givenUserIsEstablished(database: SupportSQLiteDatabase) {
+    private fun givenUserStageIs(database: SupportSQLiteDatabase, appStage: AppStage) {
         val values: ContentValues = ContentValues().apply {
             put("key", 1)
-            put("appStage", AppStage.ESTABLISHED.name)
+            put("appStage", appStage.name)
         }
 
-        // Do not close the database
         database.apply {
             insert("userStage", SQLiteDatabase.CONFLICT_REPLACE, values)
         }
@@ -306,7 +318,6 @@ class AppDatabaseTest {
     private fun getUserStage(database: SupportSQLiteDatabase): String {
         var stage = ""
 
-        // Do not close the database
         database.query("SELECT appStage from userStage limit 1").apply {
             moveToFirst()
             stage = getString(0)

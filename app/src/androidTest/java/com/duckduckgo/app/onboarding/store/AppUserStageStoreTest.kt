@@ -17,9 +17,7 @@
 package com.duckduckgo.app.onboarding.store
 
 import com.duckduckgo.app.CoroutineTestRule
-import com.duckduckgo.app.browser.addtohome.AddToHomeCapabilityDetector
 import com.duckduckgo.app.runBlocking
-import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.whenever
@@ -35,10 +33,8 @@ class AppUserStageStoreTest {
     var coroutineRule = CoroutineTestRule()
 
     private val userStageDao = mock<UserStageDao>()
-    private val mockAddToHomeCapabilityDetector = mock<AddToHomeCapabilityDetector>()
-    private val mockSettingsDataStore = mock<SettingsDataStore>()
 
-    private val testee = AppUserStageStore(userStageDao, coroutineRule.testDispatcherProvider, mockAddToHomeCapabilityDetector, mockSettingsDataStore)
+    private val testee = AppUserStageStore(userStageDao, coroutineRule.testDispatcherProvider)
 
     @Test
     fun whenGetUserAppStageThenRetunCurrentStage() = coroutineRule.runBlocking {

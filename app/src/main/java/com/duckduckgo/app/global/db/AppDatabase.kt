@@ -310,13 +310,16 @@ class MigrationsProvider(
         override fun migrate(database: SupportSQLiteDatabase) {
             database.execSQL("CREATE TABLE IF NOT EXISTS `user_events` (`id` TEXT NOT NULL, `timestamp` INTEGER NOT NULL, PRIMARY KEY(`id`))")
 
-            if (!settingsDataStore.hideTips && addToHomeCapabilityDetector.isAddToHomeSupported()) {
+            if (canUserBeMigratedToUseOurAppFlow(database)) {
                 if (useOurAppMigrationManager.shouldRunMigration()) {
                     database.execSQL("UPDATE $USER_STAGE_TABLE_NAME SET appStage = \"${AppStage.USE_OUR_APP_NOTIFICATION}\" WHERE appStage = \"${AppStage.ESTABLISHED}\"")
                 }
             }
         }
     }
+
+    private fun canUserBeMigratedToUseOurAppFlow(database: SupportSQLiteDatabase): Boolean =
+        isUserEstablished(database) && !settingsDataStore.hideTips && addToHomeCapabilityDetector.isAddToHomeSupported()
 
     val ALL_MIGRATIONS: List<Migration>
         get() = listOf(
@@ -342,6 +345,17 @@ class MigrationsProvider(
             MIGRATION_20_TO_21,
             MIGRATION_21_TO_22
         )
+
+    private fun isUserEstablished(database: SupportSQLiteDatabase): Boolean {
+        var stage: String
+
+        database.query("SELECT appStage from userStage limit 1").apply {
+            moveToFirst()
+            if (count == 0) return false
+            stage = getString(0)
+        }
+        return (stage == AppStage.ESTABLISHED.name)
+    }
 
     @Deprecated(
         message = "This class should be only used by database migrations.",

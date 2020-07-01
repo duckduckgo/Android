@@ -32,14 +32,6 @@ class UseOurAppDetector @Inject constructor(val userEventsStore: UserEventsStore
         return isUseOurAppUrl(url.toUri())
     }
 
-    private fun isUseOurAppUrl(uri: Uri): Boolean {
-        return domainMatchesUrl(uri)
-    }
-
-    private fun domainMatchesUrl(uri: Uri): Boolean {
-        return uri.baseHost?.contains(USE_OUR_APP_DOMAIN) ?: false
-    }
-
     fun allowLoginDetection(event: WebNavigationEvent): Boolean {
         val canShowFireproof = runBlocking {
             if (userEventsStore.getUserEvent(UserEventKey.USE_OUR_APP_SHORTCUT_ADDED) == null) {
@@ -65,8 +57,16 @@ class UseOurAppDetector @Inject constructor(val userEventsStore: UserEventsStore
         }
     }
 
+    private fun isUseOurAppUrl(uri: Uri): Boolean {
+        return domainMatchesUrl(uri)
+    }
+
+    private fun domainMatchesUrl(uri: Uri): Boolean {
+        return uri.baseHost?.contains(USE_OUR_APP_DOMAIN) ?: false
+    }
+
     companion object {
-        const val USE_OUR_APP_SHORTCUT_URL: String = "https://m.facebook.com"
+        const val USE_OUR_APP_SHORTCUT_URL: String = "https://m.facebook.com/"
         const val USE_OUR_APP_SHORTCUT_TITLE: String = "Facebook"
         const val USE_OUR_APP_DOMAIN = "facebook.com"
     }

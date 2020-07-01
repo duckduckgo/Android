@@ -16,9 +16,7 @@
 
 package com.duckduckgo.app.onboarding.store
 
-import com.duckduckgo.app.browser.addtohome.AddToHomeCapabilityDetector
 import com.duckduckgo.app.global.DispatcherProvider
-import com.duckduckgo.app.settings.db.SettingsDataStore
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
@@ -30,9 +28,7 @@ interface UserStageStore {
 
 class AppUserStageStore @Inject constructor(
     private val userStageDao: UserStageDao,
-    private val dispatcher: DispatcherProvider,
-    private val addToHomeCapabilityDetector: AddToHomeCapabilityDetector,
-    private val settingsDataStore: SettingsDataStore
+    private val dispatcher: DispatcherProvider
 ) : UserStageStore {
     override suspend fun getUserAppStage(): AppStage {
         return withContext(dispatcher.io()) {

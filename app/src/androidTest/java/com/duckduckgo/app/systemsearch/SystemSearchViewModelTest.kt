@@ -24,10 +24,8 @@ import com.duckduckgo.app.InstantSchedulersRule
 import com.duckduckgo.app.autocomplete.api.AutoComplete
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteResult
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteSearchSuggestion
-import com.duckduckgo.app.browser.addtohome.AddToHomeCapabilityDetector
 import com.duckduckgo.app.onboarding.store.*
 import com.duckduckgo.app.runBlocking
-import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.*
 import com.duckduckgo.app.systemsearch.SystemSearchViewModel.Command
@@ -59,8 +57,6 @@ class SystemSearchViewModelTest {
     private val mockDeviceAppLookup: DeviceAppLookup = mock()
     private val mockAutoComplete: AutoComplete = mock()
     private val mockPixel: Pixel = mock()
-    private val addToHomeCapabilityDetector: AddToHomeCapabilityDetector = mock()
-    private val settingsDataStore: SettingsDataStore = mock()
 
     private val commandObserver: Observer<Command> = mock()
     private val commandCaptor = argumentCaptor<Command>()
@@ -277,7 +273,7 @@ class SystemSearchViewModelTest {
             override suspend fun currentUserAppStage() = UserStage(appStage = AppStage.NEW)
             override fun insert(userStage: UserStage) {}
         }
-        return AppUserStageStore(emptyUserStageDao, coroutineRule.testDispatcherProvider, addToHomeCapabilityDetector, settingsDataStore)
+        return AppUserStageStore(emptyUserStageDao, coroutineRule.testDispatcherProvider)
     }
 
     companion object {
