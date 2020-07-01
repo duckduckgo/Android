@@ -92,7 +92,6 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
-import java.lang.UnsupportedOperationException
 import java.util.Locale
 import java.util.concurrent.TimeUnit
 
@@ -451,25 +450,19 @@ class BrowserTabViewModel(
     }
 
     private fun fireQueryChangedPixel(omnibarText: String) {
-        val oldUri = currentOmnibarViewState().omnibarText.toUri()
-        val newUri = omnibarText.toUri()
-
-        val oldParameter = try {
-            oldUri.getQueryParameter(AppUrl.ParamKey.QUERY)
-        } catch (e: UnsupportedOperationException) {
-            null
-        }
-        val newParameter = try {
-            newUri.getQueryParameter(AppUrl.ParamKey.QUERY)
-        } catch (e: UnsupportedOperationException) {
-            null
+        if (!variantManager.getVariant().hasFeature(VariantManager.VariantFeature.SerpHeaderRemoval)) {
+            return
         }
 
-        if (oldParameter == newParameter) {
+        val oldQuery = currentOmnibarViewState().omnibarText.toUri()
+        val newQuery = omnibarText.toUri()
+
+        if (oldQuery == newQuery) {
             pixel.fire(String.format(Locale.US, PixelName.SERP_REQUERY.pixelName, PixelParameter.SERP_QUERY_NOT_CHANGED))
         } else {
             pixel.fire(String.format(Locale.US, PixelName.SERP_REQUERY.pixelName, PixelParameter.SERP_QUERY_CHANGED))
         }
+
     }
 
     private fun shouldClearHistoryOnNewQuery(): Boolean {
