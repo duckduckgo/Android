@@ -33,16 +33,16 @@
     <string name="dripBButtonText">Try It Out</string>
 
     <!-- New dashboard / menu buttons -->
-    <string name="manageWhitelist">Manage Protection</string>
+    <string name="manageWhitelist">Unprotected Sites</string>
 
     <!-- Whitelist -->
-    <string name="whitelisetActivityTitle">Manage Protection</string>
-    <string name="whitelistAdd">Turn Protection On</string>
-    <string name="whitelistRemove">Turn Protection Off</string>
+    <string name="whitelisetActivityTitle">Unprotected Sites</string>
+    <string name="whitelistAdd">Enable Privacy Protection</string>
+    <string name="whitelistRemove">Disable Privacy Protection</string>
     <string name="whitelistEntryOverflowContentDescription">More options for unprotected site %s</string>
-    <string name="whitelistEntryDeleteConfirmMessage">Are you sure you want to turn Privacy Protection on again for &lt;b>%s&lt;/b>?</string>
+    <string name="whitelistEntryDeleteConfirmMessage">Are you sure you want to remove &lt;b>%s&lt;/b> from unprotected sites?</string>
     <string name="whitelistExplanation">These sites will not be enhanced by Privacy Protection</string>
-    <string name="whitelistNoEntries">Privacy Protection is on for all sites.</string>
+    <string name="whitelistNoEntries">No Unprotected Sites Yet.</string>
 
     <!-- Settings -->
     <string name="settingsPrivacyProtectionWhitelist">Unprotected Sites</string>
