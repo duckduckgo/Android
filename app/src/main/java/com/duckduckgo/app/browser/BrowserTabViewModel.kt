@@ -315,7 +315,7 @@ class BrowserTabViewModel(
 
     fun onViewReady() {
         url?.let {
-            sendPixelIfUserOurAppSiteVisitedFirstTime(it)
+            sendPixelIfUseOurAppSiteVisitedFirstTime(it)
             onUserSubmittedQuery(it)
         }
     }
@@ -610,13 +610,13 @@ class BrowserTabViewModel(
 
     private fun pageChanged(url: String, title: String?) {
         Timber.v("Page changed: $url")
-        val oldUrl = site?.url
+        val previousUrl = site?.url
 
         buildSiteFactory(url, title)
 
         // Navigating from different website to use our app website
-        if (!useOurAppDetector.isUseOurAppUrl(oldUrl)) {
-            sendPixelIfUserOurAppSiteVisitedFirstTime(url)
+        if (!useOurAppDetector.isUseOurAppUrl(previousUrl)) {
+            sendPixelIfUseOurAppSiteVisitedFirstTime(url)
         }
 
         command.value = RefreshUserAgent(site?.uri?.host, currentBrowserViewState().isDesktopBrowsingMode)
@@ -657,7 +657,7 @@ class BrowserTabViewModel(
         registerSiteVisit()
     }
 
-    private fun sendPixelIfUserOurAppSiteVisitedFirstTime(url: String) {
+    private fun sendPixelIfUseOurAppSiteVisitedFirstTime(url: String) {
         if (useOurAppDetector.isUseOurAppUrl(url)) {
             viewModelScope.launch { sendUseOurAppSiteVisitedPixel() }
         }
