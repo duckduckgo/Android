@@ -456,7 +456,7 @@
     <!-- Fireproof websites -->
     <string name="fireproofWebsitesActivityTitle">Brandsäkra webbplatser</string>
     <string name="settingsFireproofWebsites">Brandsäkra webbplatser</string>
-    <string name="fireproofWebsiteMenuTitle">Brandsäker webbplats</string>
+    <string name="fireproofWebsiteMenuTitleAdd">Brandsäker webbplats</string>
     <string name="fireproofWebsiteSnackbarConfirmation">&lt;b&gt;%s&lt;/b&gt; är nu brandsäker! Besök Inställningar för att lära dig mer.</string>
     <string name="fireproofWebsiteSnackbarAction">Återställ</string>
     <string name="fireproofWebsiteDeleteConfirmMessage">Är du säker på att du vill ta bort &lt;b&gt;%s&lt;/b&gt;?</string>

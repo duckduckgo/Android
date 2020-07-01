@@ -51,6 +51,7 @@ class FireproofWebsitesActivity : DuckDuckGoActivity() {
     private fun observeViewModel() {
         viewModel.viewState.observe(this, Observer { viewState ->
             viewState?.let {
+                adapter.loginDetectionEnabled = it.loginDetectionEnabled
                 adapter.fireproofWebsites = it.fireproofWebsitesEntities
             }
         })

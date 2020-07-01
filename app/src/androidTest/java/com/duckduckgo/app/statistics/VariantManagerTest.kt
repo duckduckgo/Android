@@ -46,9 +46,9 @@ class VariantManagerTest {
     // Notification Drip Experiment
 
     @Test
-    fun notificationDripTestControlGroupVariantActive() {
+    fun notificationDripTestControlGroupVariantIsNotActive() {
         val variant = variants.firstOrNull { it.key == "za" }
-        assertEqualsDouble(1.0, variant!!.weight)
+        assertEqualsDouble(0.0, variant!!.weight)
     }
 
     @Test
@@ -61,9 +61,9 @@ class VariantManagerTest {
     }
 
     @Test
-    fun notificationDripTestNullVariantActive() {
+    fun notificationDripTestNullVariantIsNotActive() {
         val variant = variants.firstOrNull { it.key == "zb" }
-        assertEqualsDouble(1.0, variant!!.weight)
+        assertEqualsDouble(0.0, variant!!.weight)
     }
 
     @Test
@@ -74,9 +74,9 @@ class VariantManagerTest {
     }
 
     @Test
-    fun notificationDripA1TestVariantActive() {
+    fun notificationDripA1TestVariantIsNotActive() {
         val variant = variants.firstOrNull { it.key == "zc" }
-        assertEqualsDouble(1.0, variant!!.weight)
+        assertEqualsDouble(0.0, variant!!.weight)
     }
 
     @Test
@@ -89,9 +89,9 @@ class VariantManagerTest {
     }
 
     @Test
-    fun notificationDripA2TestVariantActive() {
+    fun notificationDripA2TestVariantIsNotActive() {
         val variant = variants.firstOrNull { it.key == "zd" }
-        assertEqualsDouble(1.0, variant!!.weight)
+        assertEqualsDouble(0.0, variant!!.weight)
     }
 
     @Test
@@ -104,9 +104,9 @@ class VariantManagerTest {
     }
 
     @Test
-    fun notificationDripB1TestVariantActive() {
+    fun notificationDripB1TestVariantIsNotActive() {
         val variant = variants.firstOrNull { it.key == "ze" }
-        assertEqualsDouble(1.0, variant!!.weight)
+        assertEqualsDouble(0.0, variant!!.weight)
     }
 
     @Test
@@ -119,9 +119,9 @@ class VariantManagerTest {
     }
 
     @Test
-    fun notificationDripB2TestVariantActive() {
+    fun notificationDripB2TestVariantIsNotActive() {
         val variant = variants.firstOrNull { it.key == "zf" }
-        assertEqualsDouble(1.0, variant!!.weight)
+        assertEqualsDouble(0.0, variant!!.weight)
     }
 
     @Test
@@ -137,14 +137,14 @@ class VariantManagerTest {
     @Test
     fun serpHeaderControlVariantHasExpectedWeightAndNoFeatures() {
         val variant = variants.first { it.key == "zg" }
-        assertEqualsDouble(0.0, variant.weight)
+        assertEqualsDouble(1.0, variant.weight)
         assertEquals(0, variant.features.size)
     }
 
     @Test
     fun serpHeaderVariantHasExpectedWeightAndSERPHeaderRemovalFeature() {
         val variant = variants.first { it.key == "zi" }
-        assertEqualsDouble(0.0, variant.weight)
+        assertEqualsDouble(1.0, variant.weight)
         assertEquals(1, variant.features.size)
         assertEquals(SerpHeaderRemoval, variant.features[0])
     }
@@ -152,7 +152,7 @@ class VariantManagerTest {
     @Test
     fun serpHeaderVariantHasExpectedWeightAndSERPHeaderQueryReplacementFeature() {
         val variant = variants.first { it.key == "zh" }
-        assertEqualsDouble(0.0, variant.weight)
+        assertEqualsDouble(1.0, variant.weight)
         assertEquals(1, variant.features.size)
         assertEquals(SerpHeaderQueryReplacement, variant.features[0])
     }

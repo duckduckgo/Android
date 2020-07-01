@@ -439,7 +439,7 @@
     <!-- Fireproof websites -->
     <string name="fireproofWebsitesActivityTitle">Feuersichere Websites</string>
     <string name="settingsFireproofWebsites">Feuersichere Websites</string>
-    <string name="fireproofWebsiteMenuTitle">Feuersichere Website</string>
+    <string name="fireproofWebsiteMenuTitleAdd">Feuersichere Website</string>
     <string name="fireproofWebsiteSnackbarConfirmation">&lt;b&gt;%s&lt;/b&gt; ist jetzt feuersicher! Besuchen Sie die Einstellungen, um mehr zu erfahren.</string>
     <string name="fireproofWebsiteSnackbarAction">Rückgängig machen</string>
     <string name="fireproofWebsiteDeleteConfirmMessage">Möchten Sie &lt;b&gt;%s&lt;/b&gt; wirklich löschen?</string>

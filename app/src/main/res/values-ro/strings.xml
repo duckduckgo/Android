@@ -446,7 +446,7 @@
     <!-- Fireproof websites -->
     <string name="fireproofWebsitesActivityTitle">Site-uri ignifuge</string>
     <string name="settingsFireproofWebsites">Site-uri ignifuge</string>
-    <string name="fireproofWebsiteMenuTitle">Website ignifug</string>
+    <string name="fireproofWebsiteMenuTitleAdd">Website ignifug</string>
     <string name="fireproofWebsiteSnackbarConfirmation">&lt;b&gt;%s&lt;/b&gt; este acum ignifugat! Accesați Setări pentru a afla mai multe.</string>
     <string name="fireproofWebsiteSnackbarAction">Anulați</string>
     <string name="fireproofWebsiteDeleteConfirmMessage">Sigur doriți să ștergeți &lt;b&gt;%s&lt;/b&gt;?</string>
