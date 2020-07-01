@@ -315,7 +315,7 @@ class BrowserTabViewModel(
 
     fun onViewReady() {
         url?.let {
-            isDomainSameAsUseOurAppDomain(it)
+            sendPixelIfUserOurAppSiteVisitedFirstTime(it)
             onUserSubmittedQuery(it)
         }
     }
@@ -616,7 +616,7 @@ class BrowserTabViewModel(
 
         // Navigating from different website to use our app website
         if (!useOurAppDetector.isUseOurAppUrl(oldUrl)) {
-            isDomainSameAsUseOurAppDomain(url)
+            sendPixelIfUserOurAppSiteVisitedFirstTime(url)
         }
 
         command.value = RefreshUserAgent(site?.uri?.host, currentBrowserViewState().isDesktopBrowsingMode)
@@ -657,13 +657,13 @@ class BrowserTabViewModel(
         registerSiteVisit()
     }
 
-    private fun isDomainSameAsUseOurAppDomain(url: String) {
+    private fun sendPixelIfUserOurAppSiteVisitedFirstTime(url: String) {
         if (useOurAppDetector.isUseOurAppUrl(url)) {
-            viewModelScope.launch { sendPixelIfUseOurAppSiteVisited() }
+            viewModelScope.launch { sendUseOurAppSiteVisitedPixel() }
         }
     }
 
-    private suspend fun sendPixelIfUseOurAppSiteVisited() {
+    private suspend fun sendUseOurAppSiteVisitedPixel() {
         withContext(dispatchers.io()) {
             val isShortcutAdded = userEventsStore.getUserEvent(UserEventKey.USE_OUR_APP_SHORTCUT_ADDED)
             val isUseOurAppNotificationSeen = notificationDao.exists(UseOurAppNotification.ID)

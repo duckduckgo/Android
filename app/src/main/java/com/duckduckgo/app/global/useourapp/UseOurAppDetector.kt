@@ -20,7 +20,6 @@ import android.net.Uri
 import androidx.core.net.toUri
 import com.duckduckgo.app.browser.logindetection.WebNavigationEvent
 import com.duckduckgo.app.global.baseHost
-import com.duckduckgo.app.global.events.db.UserEventEntity
 import com.duckduckgo.app.global.events.db.UserEventKey
 import com.duckduckgo.app.global.events.db.UserEventsStore
 import kotlinx.coroutines.runBlocking
@@ -34,11 +33,11 @@ class UseOurAppDetector @Inject constructor(val userEventsStore: UserEventsStore
     }
 
     private fun isUseOurAppUrl(uri: Uri): Boolean {
-        return domainMatchesUrl(uri, USE_OUR_APP_DOMAIN) || domainMatchesUrl(uri, USE_OUR_APP_MOBILE_DOMAIN)
+        return domainMatchesUrl(uri)
     }
 
-    private fun domainMatchesUrl(uri: Uri, matchingUrl: String): Boolean {
-        return uri.baseHost == matchingUrl.toUri().baseHost
+    private fun domainMatchesUrl(uri: Uri): Boolean {
+        return uri.baseHost?.contains(USE_OUR_APP_DOMAIN) ?: false
     }
 
     fun allowLoginDetection(event: WebNavigationEvent): Boolean {
@@ -62,7 +61,7 @@ class UseOurAppDetector @Inject constructor(val userEventsStore: UserEventsStore
 
     suspend fun registerIfFireproofSeenForTheFirstTime(url: String) {
         if (userEventsStore.getUserEvent(UserEventKey.USE_OUR_APP_FIREPROOF_DIALOG_SEEN) == null && isUseOurAppUrl(url)) {
-            userEventsStore.registerUserEvent(UserEventEntity(UserEventKey.USE_OUR_APP_FIREPROOF_DIALOG_SEEN))
+            userEventsStore.registerUserEvent(UserEventKey.USE_OUR_APP_FIREPROOF_DIALOG_SEEN)
         }
     }
 
@@ -70,6 +69,5 @@ class UseOurAppDetector @Inject constructor(val userEventsStore: UserEventsStore
         const val USE_OUR_APP_SHORTCUT_URL: String = "https://m.facebook.com"
         const val USE_OUR_APP_SHORTCUT_TITLE: String = "Facebook"
         const val USE_OUR_APP_DOMAIN = "facebook.com"
-        const val USE_OUR_APP_MOBILE_DOMAIN = "m.facebook.com"
     }
 }

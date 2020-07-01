@@ -25,7 +25,6 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.shortcut.ShortcutBuilder.Companion.SHORTCUT_TITLE_ARG
 import com.duckduckgo.app.browser.shortcut.ShortcutBuilder.Companion.SHORTCUT_URL_ARG
 import com.duckduckgo.app.global.DispatcherProvider
-import com.duckduckgo.app.global.events.db.UserEventEntity
 import com.duckduckgo.app.global.events.db.UserEventsStore
 import com.duckduckgo.app.global.events.db.UserEventKey
 import com.duckduckgo.app.global.useourapp.UseOurAppDetector.Companion.USE_OUR_APP_SHORTCUT_URL
@@ -49,7 +48,7 @@ class ShortcutReceiver @Inject constructor(private val userEventsStore: UserEven
 
         GlobalScope.launch(dispatcher.io()) {
             if (originUrl == USE_OUR_APP_SHORTCUT_URL) {
-                userEventsStore.registerUserEvent(UserEventEntity(UserEventKey.USE_OUR_APP_SHORTCUT_ADDED))
+                userEventsStore.registerUserEvent(UserEventKey.USE_OUR_APP_SHORTCUT_ADDED)
                 pixel.fire(Pixel.PixelName.USE_OUR_APP_SHORTCUT_ADDED)
             }
         }

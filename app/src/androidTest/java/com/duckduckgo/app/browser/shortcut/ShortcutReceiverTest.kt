@@ -18,11 +18,11 @@ package com.duckduckgo.app.browser.shortcut
 
 import android.content.Intent
 import com.duckduckgo.app.CoroutineTestRule
+import com.duckduckgo.app.global.events.db.UserEventKey
 import com.duckduckgo.app.global.events.db.UserEventsStore
 import com.duckduckgo.app.global.useourapp.UseOurAppDetector.Companion.USE_OUR_APP_SHORTCUT_URL
 import com.duckduckgo.app.runBlocking
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.never
 import com.nhaarman.mockitokotlin2.verify
@@ -54,7 +54,7 @@ class ShortcutReceiverTest {
         intent.putExtra(ShortcutBuilder.SHORTCUT_TITLE_ARG, "Title")
         testee.onReceive(null, intent)
 
-        verify(mockUserEventsStore).registerUserEvent(any())
+        verify(mockUserEventsStore).registerUserEvent(UserEventKey.USE_OUR_APP_SHORTCUT_ADDED)
     }
 
     @Test
@@ -74,7 +74,7 @@ class ShortcutReceiverTest {
         intent.putExtra(ShortcutBuilder.SHORTCUT_TITLE_ARG, "Title")
         testee.onReceive(null, intent)
 
-        verify(mockUserEventsStore, never()).registerUserEvent(any())
+        verify(mockUserEventsStore, never()).registerUserEvent(UserEventKey.USE_OUR_APP_SHORTCUT_ADDED)
     }
 
     @Test

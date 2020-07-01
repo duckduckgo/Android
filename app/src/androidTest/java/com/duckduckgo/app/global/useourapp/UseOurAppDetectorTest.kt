@@ -132,7 +132,7 @@ class UseOurAppDetectorTest {
 
         testee.registerIfFireproofSeenForTheFirstTime("http://m.facebook.com")
 
-        verify(mockUserEventsStore).registerUserEvent(UserEventEntity(UserEventKey.USE_OUR_APP_FIREPROOF_DIALOG_SEEN))
+        verify(mockUserEventsStore).registerUserEvent(UserEventKey.USE_OUR_APP_FIREPROOF_DIALOG_SEEN)
     }
 
     @Test
@@ -141,7 +141,7 @@ class UseOurAppDetectorTest {
 
         testee.registerIfFireproofSeenForTheFirstTime("example.com")
 
-        verify(mockUserEventsStore, never()).registerUserEvent(UserEventEntity(UserEventKey.USE_OUR_APP_FIREPROOF_DIALOG_SEEN))
+        verify(mockUserEventsStore, never()).registerUserEvent(UserEventKey.USE_OUR_APP_FIREPROOF_DIALOG_SEEN)
     }
 
     @Test
@@ -150,7 +150,7 @@ class UseOurAppDetectorTest {
 
         testee.registerIfFireproofSeenForTheFirstTime("http://m.facebook.com")
 
-        verify(mockUserEventsStore, never()).registerUserEvent(UserEventEntity(UserEventKey.USE_OUR_APP_FIREPROOF_DIALOG_SEEN))
+        verify(mockUserEventsStore, never()).registerUserEvent(UserEventKey.USE_OUR_APP_FIREPROOF_DIALOG_SEEN)
     }
 
     private suspend fun givenShortcutIsAddedAndFireproofNotSeen() {

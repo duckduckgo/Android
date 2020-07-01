@@ -1984,7 +1984,7 @@ class BrowserTabViewModelTest {
         whenever(mockUserEventsStore.getUserEvent(UserEventKey.USE_OUR_APP_FIREPROOF_DIALOG_SEEN)).thenReturn(null)
         loginEventLiveData.value = givenLoginDetected(USE_OUR_APP_SHORTCUT_URL)
 
-        verify(mockUserEventsStore).registerUserEvent(any())
+        verify(mockUserEventsStore).registerUserEvent(UserEventKey.USE_OUR_APP_FIREPROOF_DIALOG_SEEN)
     }
 
     @Test
@@ -1992,7 +1992,7 @@ class BrowserTabViewModelTest {
         whenever(mockUserEventsStore.getUserEvent(UserEventKey.USE_OUR_APP_FIREPROOF_DIALOG_SEEN)).thenReturn(null)
         loginEventLiveData.value = givenLoginDetected("example.com")
 
-        verify(mockUserEventsStore, never()).registerUserEvent(any())
+        verify(mockUserEventsStore, never()).registerUserEvent(UserEventKey.USE_OUR_APP_FIREPROOF_DIALOG_SEEN)
     }
 
     @Test
@@ -2000,7 +2000,7 @@ class BrowserTabViewModelTest {
         whenever(mockUserEventsStore.getUserEvent(UserEventKey.USE_OUR_APP_FIREPROOF_DIALOG_SEEN)).thenReturn(UserEventEntity(UserEventKey.USE_OUR_APP_FIREPROOF_DIALOG_SEEN))
         loginEventLiveData.value = givenLoginDetected(USE_OUR_APP_SHORTCUT_URL)
 
-        verify(mockUserEventsStore, never()).registerUserEvent(any())
+        verify(mockUserEventsStore, never()).registerUserEvent(UserEventKey.USE_OUR_APP_FIREPROOF_DIALOG_SEEN)
     }
 
     @Test

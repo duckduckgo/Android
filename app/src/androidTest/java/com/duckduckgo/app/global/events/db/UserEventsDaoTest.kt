@@ -25,11 +25,9 @@ import com.duckduckgo.app.runBlocking
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.junit.After
 import org.junit.Test
-
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Rule
-import java.util.concurrent.TimeUnit
 
 @ExperimentalCoroutinesApi
 class UserEventsDaoTest {
@@ -60,26 +58,23 @@ class UserEventsDaoTest {
 
     @Test
     fun whenGetUserEventAndDatabaseEmptyThenReturnNull() = coroutineRule.runBlocking {
-        val value = testee.getUserEvent(UserEventKey.USE_OUR_APP_SHORTCUT_ADDED)
-        assertNull(value)
+        assertNull(testee.getUserEvent(UserEventKey.USE_OUR_APP_SHORTCUT_ADDED))
     }
 
     @Test
-    fun whenInsertingUserEventThenReturnSameTimestamp() = coroutineRule.runBlocking {
-        val entity = UserEventEntity(UserEventKey.USE_OUR_APP_SHORTCUT_ADDED)
-        testee.registerUserEvent(entity)
+    fun whenInsertingUserEventThenTimestampIsNotNull() = coroutineRule.runBlocking {
+        testee.registerUserEvent(UserEventKey.USE_OUR_APP_SHORTCUT_ADDED)
 
-        assertEquals(entity.timestamp, testee.getUserEvent(UserEventKey.USE_OUR_APP_SHORTCUT_ADDED)?.timestamp)
+        assertNotNull(testee.getUserEvent(UserEventKey.USE_OUR_APP_SHORTCUT_ADDED)?.timestamp)
     }
 
     @Test
-    fun whenInsertingSameUserEventThenReplaceOldTimestampWithTheNew() = coroutineRule.runBlocking {
-        val entity = UserEventEntity(UserEventKey.USE_OUR_APP_SHORTCUT_ADDED)
-        val newEntity = UserEventEntity(UserEventKey.USE_OUR_APP_SHORTCUT_ADDED, System.currentTimeMillis() + - TimeUnit.DAYS.toMillis(1))
+    fun whenInsertingSameUserEventThenReplaceOldTimestamp() = coroutineRule.runBlocking {
+        testee.registerUserEvent(UserEventKey.USE_OUR_APP_SHORTCUT_ADDED)
+        val timestamp = testee.getUserEvent(UserEventKey.USE_OUR_APP_SHORTCUT_ADDED)?.timestamp
 
-        testee.registerUserEvent(entity)
-        testee.registerUserEvent(newEntity)
+        testee.registerUserEvent(UserEventKey.USE_OUR_APP_SHORTCUT_ADDED)
 
-        assertEquals(newEntity.timestamp, testee.getUserEvent(UserEventKey.USE_OUR_APP_SHORTCUT_ADDED)?.timestamp)
+        assertNotEquals(timestamp, testee.getUserEvent(UserEventKey.USE_OUR_APP_SHORTCUT_ADDED)?.timestamp)
     }
 }
