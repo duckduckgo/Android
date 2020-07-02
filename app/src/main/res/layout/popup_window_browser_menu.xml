@@ -94,10 +94,19 @@
                 style="@style/BrowserTextMenuItem"
                 android:text="@string/addBookmarkMenuTitle" />
 
-            <TextView
+            <androidx.appcompat.widget.AppCompatCheckBox
                 android:id="@+id/fireproofWebsitePopupMenuItem"
-                style="@style/BrowserTextMenuItem"
-                android:text="@string/fireproofWebsiteMenuTitle" />
+                style="@style/BrowserCheckBoxMenuItem"
+                android:theme="@style/PopUpMenuSwitchTheme"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="20dp"
+                android:button="@null"
+                android:drawableEnd="?android:attr/listChoiceIndicatorMultiple"
+                android:drawablePadding="24dp"
+                android:paddingStart="24dp"
+                android:paddingEnd="0dp"
+                android:text="@string/fireproofWebsiteMenuTitleAdd" />
 
             <TextView
                 android:id="@+id/sharePageMenuItem"

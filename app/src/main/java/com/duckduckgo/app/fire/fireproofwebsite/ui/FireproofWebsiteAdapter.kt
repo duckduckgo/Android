@@ -20,6 +20,7 @@ import android.net.Uri
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.CompoundButton
 import android.widget.ImageView
 import android.widget.PopupMenu
 import androidx.recyclerview.widget.RecyclerView
@@ -28,7 +29,10 @@ import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
 import com.duckduckgo.app.fire.fireproofwebsite.data.website
 import com.duckduckgo.app.global.faviconLocation
 import com.duckduckgo.app.global.image.GlideApp
+import com.duckduckgo.app.global.view.quietlySetIsChecked
+import kotlinx.android.synthetic.main.view_fireproof_title.view.*
 import kotlinx.android.synthetic.main.view_fireproof_website_entry.view.*
+import kotlinx.android.synthetic.main.view_fireproof_website_toggle.view.*
 import timber.log.Timber
 
 class FireproofWebsiteAdapter(
@@ -39,39 +43,61 @@ class FireproofWebsiteAdapter(
         const val FIREPROOF_WEBSITE_TYPE = 0
         const val DESCRIPTION_TYPE = 1
         const val EMPTY_STATE_TYPE = 2
+        const val TOGGLE_TYPE = 3
+        const val DIVIDER_TYPE = 4
+        const val SECTION_TITLE_TYPE = 5
 
-        const val DESCRIPTION_ITEM_SIZE = 1
         const val EMPTY_HINT_ITEM_SIZE = 1
     }
 
+    private val sortedHeaderElements = listOf(DESCRIPTION_TYPE, TOGGLE_TYPE, DIVIDER_TYPE, SECTION_TITLE_TYPE)
+
     var fireproofWebsites: List<FireproofWebsiteEntity> = emptyList()
         set(value) {
-            field = value
-            notifyDataSetChanged()
+            if (field != value) {
+                field = value
+                notifyDataSetChanged()
+            }
         }
+
+    var loginDetectionEnabled: Boolean = false
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FireproofWebSiteViewHolder {
         val inflater = LayoutInflater.from(parent.context)
         return when (viewType) {
+            DESCRIPTION_TYPE -> {
+                val view = inflater.inflate(R.layout.view_fireproof_website_description, parent, false)
+                FireproofWebSiteViewHolder.FireproofWebsiteSimpleViewViewHolder(view)
+            }
+            TOGGLE_TYPE -> {
+                val view = inflater.inflate(R.layout.view_fireproof_website_toggle, parent, false)
+                FireproofWebSiteViewHolder.FireproofWebsiteToggleViewHolder(view,
+                    CompoundButton.OnCheckedChangeListener { _, isChecked -> viewModel.onUserToggleLoginDetection(isChecked) })
+            }
+            DIVIDER_TYPE -> {
+                val view = inflater.inflate(R.layout.view_fireproof_divider, parent, false)
+                FireproofWebSiteViewHolder.FireproofWebsiteSimpleViewViewHolder(view)
+            }
+            SECTION_TITLE_TYPE -> {
+                val view = inflater.inflate(R.layout.view_fireproof_title, parent, false)
+                view.fireproofWebsiteSectionTitle.setText(R.string.fireproofWebsiteItemsSectionTitle)
+                FireproofWebSiteViewHolder.FireproofWebsiteSimpleViewViewHolder(view)
+            }
             FIREPROOF_WEBSITE_TYPE -> {
                 val view = inflater.inflate(R.layout.view_fireproof_website_entry, parent, false)
                 FireproofWebSiteViewHolder.FireproofWebsiteItemViewHolder(view, viewModel)
             }
             EMPTY_STATE_TYPE -> {
                 val view = inflater.inflate(R.layout.view_fireproof_website_empty_hint, parent, false)
-                FireproofWebSiteViewHolder.FireproofWebsiteEmptyHintViewHolder(view)
-            }
-            DESCRIPTION_TYPE -> {
-                val view = inflater.inflate(R.layout.view_fireproof_website_description, parent, false)
-                FireproofWebSiteViewHolder.FireproofWebsiteDescriptionViewHolder(view)
+                FireproofWebSiteViewHolder.FireproofWebsiteSimpleViewViewHolder(view)
             }
             else -> throw IllegalArgumentException("viewType not found")
         }
     }
 
     override fun getItemViewType(position: Int): Int {
-        return if (position == 0) {
-            DESCRIPTION_TYPE
+        return if (position < sortedHeaderElements.size) {
+            sortedHeaderElements[position]
         } else {
             getListItemType()
         }
@@ -79,12 +105,15 @@ class FireproofWebsiteAdapter(
 
     override fun onBindViewHolder(holder: FireproofWebSiteViewHolder, position: Int) {
         when (holder) {
+            is FireproofWebSiteViewHolder.FireproofWebsiteToggleViewHolder -> {
+                holder.bind(loginDetectionEnabled)
+            }
             is FireproofWebSiteViewHolder.FireproofWebsiteItemViewHolder -> holder.bind(fireproofWebsites[getWebsiteItemPosition(position)])
         }
     }
 
     override fun getItemCount(): Int {
-        return getItemsSize() + DESCRIPTION_ITEM_SIZE
+        return getItemsSize() + itemsOnTopOfList()
     }
 
     private fun getItemsSize() = if (fireproofWebsites.isEmpty()) {
@@ -93,7 +122,9 @@ class FireproofWebsiteAdapter(
         fireproofWebsites.size
     }
 
-    private fun getWebsiteItemPosition(position: Int) = position - DESCRIPTION_ITEM_SIZE
+    private fun itemsOnTopOfList() = sortedHeaderElements.size
+
+    private fun getWebsiteItemPosition(position: Int) = position - itemsOnTopOfList()
 
     private fun getListItemType(): Int {
         return if (fireproofWebsites.isEmpty()) {
@@ -106,9 +137,14 @@ class FireproofWebsiteAdapter(
 
 sealed class FireproofWebSiteViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
-    class FireproofWebsiteDescriptionViewHolder(itemView: View) : FireproofWebSiteViewHolder(itemView)
+    class FireproofWebsiteToggleViewHolder(itemView: View, private val listener: CompoundButton.OnCheckedChangeListener) :
+        FireproofWebSiteViewHolder(itemView) {
+        fun bind(loginDetectionEnabled: Boolean) {
+            itemView.fireproofWebsiteToggle.quietlySetIsChecked(loginDetectionEnabled, listener)
+        }
+    }
 
-    class FireproofWebsiteEmptyHintViewHolder(itemView: View) : FireproofWebSiteViewHolder(itemView)
+    class FireproofWebsiteSimpleViewViewHolder(itemView: View) : FireproofWebSiteViewHolder(itemView)
 
     class FireproofWebsiteItemViewHolder(itemView: View, private val viewModel: FireproofWebsitesViewModel) : FireproofWebSiteViewHolder(itemView) {
 

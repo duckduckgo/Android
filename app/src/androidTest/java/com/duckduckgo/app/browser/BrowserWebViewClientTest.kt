@@ -18,21 +18,28 @@ package com.duckduckgo.app.browser
 
 import android.content.Context
 import android.os.Build
-import android.webkit.CookieManager
-import android.webkit.HttpAuthHandler
-import android.webkit.RenderProcessGoneDetail
-import android.webkit.WebView
+import android.webkit.*
 import androidx.test.annotation.UiThreadTest
 import androidx.test.filters.SdkSuppress
 import androidx.test.platform.app.InstrumentationRegistry
+import com.duckduckgo.app.CoroutineTestRule
+import com.duckduckgo.app.browser.logindetection.DOMLoginDetector
+import com.duckduckgo.app.browser.logindetection.WebNavigationEvent
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.global.exception.UncaughtExceptionRepository
+import com.duckduckgo.app.runBlocking
 import com.duckduckgo.app.statistics.store.OfflinePixelCountDataStore
 import com.nhaarman.mockitokotlin2.*
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 
+@ExperimentalCoroutinesApi
 class BrowserWebViewClientTest {
+
+    @get:Rule
+    var coroutinesTestRule = CoroutineTestRule()
 
     private lateinit var testee: BrowserWebViewClient
     private lateinit var webView: WebView
@@ -42,6 +49,7 @@ class BrowserWebViewClientTest {
     private val requestInterceptor: RequestInterceptor = mock()
     private val listener: WebViewClientListener = mock()
     private val cookieManager: CookieManager = mock()
+    private val loginDetector: DOMLoginDetector = mock()
     private val offlinePixelCountDataStore: OfflinePixelCountDataStore = mock()
     private val uncaughtExceptionRepository: UncaughtExceptionRepository = mock()
 
@@ -55,7 +63,8 @@ class BrowserWebViewClientTest {
             requestInterceptor,
             offlinePixelCountDataStore,
             uncaughtExceptionRepository,
-            cookieManager
+            cookieManager,
+            loginDetector
         )
         testee.webViewClientListener = listener
     }
@@ -85,6 +94,13 @@ class BrowserWebViewClientTest {
 
     @UiThreadTest
     @Test
+    fun whenOnPageStartedCalledThenEventSentToLoginDetector() = coroutinesTestRule.runBlocking {
+        testee.onPageStarted(webView, EXAMPLE_URL, null)
+        verify(loginDetector).onEvent(WebNavigationEvent.OnPageStarted(webView))
+    }
+
+    @UiThreadTest
+    @Test
     fun whenOnPageFinishedCalledThenListenerInstructedToUpdateNavigationState() {
         testee.onPageFinished(webView, EXAMPLE_URL)
         verify(listener).navigationStateChanged(any())
@@ -97,6 +113,14 @@ class BrowserWebViewClientTest {
         val authenticationRequest = BasicAuthenticationRequest(mockHandler, EXAMPLE_URL, EXAMPLE_URL, EXAMPLE_URL)
         testee.onReceivedHttpAuthRequest(webView, mockHandler, EXAMPLE_URL, EXAMPLE_URL)
         verify(listener).requiresAuthentication(authenticationRequest)
+    }
+
+    @UiThreadTest
+    @Test
+    fun whenShouldInterceptRequestThenEventSentToLoginDetector() = coroutinesTestRule.runBlocking {
+        val webResourceRequest = mock<WebResourceRequest>()
+        testee.shouldInterceptRequest(webView, webResourceRequest)
+        verify(loginDetector).onEvent(WebNavigationEvent.ShouldInterceptRequest(webView, webResourceRequest))
     }
 
     @Test

@@ -26,7 +26,6 @@ import android.view.View
 import android.widget.CompoundButton.OnCheckedChangeListener
 import android.widget.Toast
 import androidx.annotation.StringRes
-import androidx.appcompat.widget.SwitchCompat
 import androidx.lifecycle.Observer
 import com.duckduckgo.app.about.AboutDuckDuckGoActivity
 import com.duckduckgo.app.browser.R
@@ -35,6 +34,7 @@ import com.duckduckgo.app.fire.fireproofwebsite.ui.FireproofWebsitesActivity
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.sendThemeChangedBroadcast
 import com.duckduckgo.app.global.view.launchDefaultAppActivity
+import com.duckduckgo.app.global.view.quietlySetIsChecked
 import com.duckduckgo.app.icon.ui.ChangeIconActivity
 import com.duckduckgo.app.privacy.ui.WhitelistActivity
 import com.duckduckgo.app.settings.SettingsViewModel.AutomaticallyClearData
@@ -233,18 +233,4 @@ class SettingsActivity : DuckDuckGoActivity(), SettingsAutomaticallyClearWhatFra
             return Intent(context, SettingsActivity::class.java)
         }
     }
-}
-
-/**
- * Utility method to toggle a switch without broadcasting to its change listener
- *
- * This is useful for when setting the checked state from the view model where we want the switch state to match some value, but this act itself
- * should not result in the checked change event handler being fired
- *
- * Requires the change listener to be provided explicitly as it is held privately in the super class and cannot be accessed automatically.
- */
-private fun SwitchCompat.quietlySetIsChecked(newCheckedState: Boolean, changeListener: OnCheckedChangeListener?) {
-    setOnCheckedChangeListener(null)
-    isChecked = newCheckedState
-    setOnCheckedChangeListener(changeListener)
 }

@@ -440,7 +440,7 @@
     <!-- Fireproof websites -->
     <string name="fireproofWebsitesActivityTitle">Sites Web coupe-feu</string>
     <string name="settingsFireproofWebsites">Sites Web coupe-feu</string>
-    <string name="fireproofWebsiteMenuTitle">Site Web coupe-feu</string>
+    <string name="fireproofWebsiteMenuTitleAdd">Site Web coupe-feu</string>
     <string name="fireproofWebsiteSnackbarConfirmation">&lt;b&gt;%s&lt;/b&gt; est maintenant coupe-feu ! Visitez Paramètres pour en savoir plus.</string>
     <string name="fireproofWebsiteSnackbarAction">Annuler</string>
     <string name="fireproofWebsiteDeleteConfirmMessage">Voulez-vous vraiment supprimer &lt;b&gt;%s&lt;/b&gt; ?</string>

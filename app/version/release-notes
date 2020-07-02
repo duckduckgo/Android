@@ -1,5 +1,6 @@
 ## What's new in this release?
-We've improved the animation in the URL bar that shows you when the app blocks third party trackers.
+Now the app can prompt you to Fireproof a site when you sign in. Enable this in Settings > Fireproof Websites.
+Bug fixes and other improvements.
 
 ## Have feedback?
 We've adjusted the color contrast in both light and dark themes to improve visibility.

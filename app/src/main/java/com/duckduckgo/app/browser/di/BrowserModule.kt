@@ -19,28 +19,36 @@ package com.duckduckgo.app.browser.di
 import android.content.ClipboardManager
 import android.content.Context
 import android.webkit.CookieManager
+import android.webkit.WebSettings
 import com.duckduckgo.app.browser.*
 import com.duckduckgo.app.browser.addtohome.AddToHomeCapabilityDetector
 import com.duckduckgo.app.browser.addtohome.AddToHomeSystemCapabilityDetector
 import com.duckduckgo.app.browser.defaultbrowsing.AndroidDefaultBrowserDetector
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserObserver
+import com.duckduckgo.app.browser.logindetection.JsLoginDetector
+import com.duckduckgo.app.browser.logindetection.DOMLoginDetector
+import com.duckduckgo.app.browser.logindetection.NextPageLoginDetection
+import com.duckduckgo.app.browser.logindetection.NavigationAwareLoginDetector
 import com.duckduckgo.app.browser.session.WebViewSessionInMemoryStorage
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.browser.tabpreview.FileBasedWebViewPreviewGenerator
 import com.duckduckgo.app.browser.tabpreview.FileBasedWebViewPreviewPersister
 import com.duckduckgo.app.browser.tabpreview.WebViewPreviewGenerator
 import com.duckduckgo.app.browser.tabpreview.WebViewPreviewPersister
+import com.duckduckgo.app.browser.useragent.UserAgentProvider
 import com.duckduckgo.app.fire.*
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteDao
 import com.duckduckgo.app.global.AppUrl
 import com.duckduckgo.app.global.DispatcherProvider
+import com.duckduckgo.app.global.device.DeviceInfo
 import com.duckduckgo.app.global.exception.UncaughtExceptionRepository
 import com.duckduckgo.app.global.file.FileDeleter
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.httpsupgrade.HttpsUpgrader
 import com.duckduckgo.app.privacy.db.PrivacyProtectionCountDao
 import com.duckduckgo.app.referral.AppReferrerDataStore
+import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.pixels.ExceptionPixel
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -73,7 +81,8 @@ class BrowserModule {
         requestInterceptor: RequestInterceptor,
         offlinePixelCountDataStore: OfflinePixelCountDataStore,
         uncaughtExceptionRepository: UncaughtExceptionRepository,
-        cookieManager: CookieManager
+        cookieManager: CookieManager,
+        loginDetector: DOMLoginDetector
     ): BrowserWebViewClient {
         return BrowserWebViewClient(
             requestRewriter,
@@ -81,7 +90,8 @@ class BrowserModule {
             requestInterceptor,
             offlinePixelCountDataStore,
             uncaughtExceptionRepository,
-            cookieManager
+            cookieManager,
+            loginDetector
         )
     }
 
@@ -130,6 +140,12 @@ class BrowserModule {
 
     @Provides
     fun specialUrlDetector(): SpecialUrlDetector = SpecialUrlDetectorImpl()
+
+    @Provides
+    @Singleton
+    fun userAgentProvider(context: Context, deviceInfo: DeviceInfo): UserAgentProvider {
+        return UserAgentProvider(WebSettings.getDefaultUserAgent(context), deviceInfo)
+    }
 
     @Provides
     fun webViewRequestInterceptor(
@@ -201,5 +217,15 @@ class BrowserModule {
     @Provides
     fun webViewPreviewGenerator(): WebViewPreviewGenerator {
         return FileBasedWebViewPreviewGenerator()
+    }
+
+    @Provides
+    fun domLoginDetector(settingsDataStore: SettingsDataStore): DOMLoginDetector {
+        return JsLoginDetector(settingsDataStore)
+    }
+
+    @Provides
+    fun navigationAwareLoginDetector(): NavigationAwareLoginDetector {
+        return NextPageLoginDetection()
     }
 }
