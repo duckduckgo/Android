@@ -157,15 +157,25 @@ class DuckDuckGoWebView : WebView, NestedScrollingChild {
         super.onOverScrolled(scrollX, scrollY, clampedX, clampedY)
     }
 
-    private fun enableSwipeRefresh(enable: Boolean) {
-        enableSwipeRefreshCallback?.invoke(enable && contentAllowsSwipeToRefresh)
-    }
-
     fun setEnableSwipeRefreshCallback(callback: (Boolean) -> Unit) {
         enableSwipeRefreshCallback = callback
     }
 
-    fun setContentAllowsSwipeToRefresh(allowed: Boolean) {
+    /**
+     * Allows us to determine whether to (de)activate Swipe to Refresh behavior for the current page content, e.g. if page implements a swipe behavior of its
+     * own already (see twitter.com).
+     */
+    fun detectOverscrollBehavior() {
+        evaluateJavascript("(function() { return getComputedStyle(document.querySelector('body')).overscrollBehaviorY; })();") { behavior ->
+            setContentAllowsSwipeToRefresh(behavior.replace("\"", "") == "auto")
+        }
+    }
+
+    private fun enableSwipeRefresh(enable: Boolean) {
+        enableSwipeRefreshCallback?.invoke(enable && contentAllowsSwipeToRefresh)
+    }
+
+    private fun setContentAllowsSwipeToRefresh(allowed: Boolean) {
         contentAllowsSwipeToRefresh = allowed
         if (!allowed) {
             enableSwipeRefresh(false)
