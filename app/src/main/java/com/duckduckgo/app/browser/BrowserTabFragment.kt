@@ -557,6 +557,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
             is Command.HideWebContent -> webView?.hide()
             is Command.ShowWebContent -> webView?.show()
             is Command.CheckGeoPermission -> checkGeoPermission()
+            is Command.AskDomainPermission -> askDomainPermission(it.domain)
             is Command.RefreshUserAgent -> refreshUserAgent(it.host, it.isDesktop)
             is Command.AskToFireproofWebsite -> askToFireproofWebsite(requireContext(), it.fireproofWebsite)
         }
@@ -564,18 +565,13 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
 
     private fun checkGeoPermission() {
         if (ContextCompat.checkSelfPermission(requireActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            launchLocationPermissionInformationDialog{
-                launchLocationPermissionDialog{
-                    requestPermissions(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), PERMISSION_REQUEST_GEO_LOCATION)
-                }
-
+            launchLocationPermissionInformationDialog {
                 requestPermissions(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), PERMISSION_REQUEST_GEO_LOCATION)
             }
         } else {
             viewModel.onGeoLocationPermissionGranted()
         }
     }
-
 
     private fun launchLocationPermissionInformationDialog(onAccepted: () -> Unit) {
         val isShowing = alertDialog?.isShowing
@@ -597,6 +593,13 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
         }
     }
 
+    private fun askDomainPermission(domain: String) {
+        // this is not Custom Dialog 2 yet
+        launchLocationPermissionDialog {
+            viewModel.onGeoLocationPermissionGranted()
+        }
+    }
+
     private fun launchLocationPermissionDialog(onClick: () -> Unit) {
         val isShowing = alertDialog?.isShowing
 
@@ -613,7 +616,6 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
                 .show()
         }
     }
-
 
     private fun launchBrokenSiteFeedback(data: BrokenSiteData) {
         context?.let {

@@ -69,6 +69,8 @@ import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.global.model.SiteFactory
 import com.duckduckgo.app.global.model.domain
 import com.duckduckgo.app.global.model.domainMatchesUrl
+import com.duckduckgo.app.location.data.LocationPermissionType
+import com.duckduckgo.app.location.data.LocationPermissionsRepository
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao
 import com.duckduckgo.app.privacy.db.UserWhitelistDao
 import com.duckduckgo.app.privacy.model.PrivacyGrade
@@ -106,6 +108,7 @@ class BrowserTabViewModel(
     private val networkLeaderboardDao: NetworkLeaderboardDao,
     private val bookmarksDao: BookmarksDao,
     private val fireproofWebsiteRepository: FireproofWebsiteRepository,
+    private val locationPermissionsRepository: LocationPermissionsRepository,
     private val navigationAwareLoginDetector: NavigationAwareLoginDetector,
     private val autoComplete: AutoComplete,
     private val appSettingsPreferencesStore: SettingsDataStore,
@@ -229,6 +232,7 @@ class BrowserTabViewModel(
         object HideWebContent : Command()
         object ShowWebContent : Command()
         object CheckGeoPermission : Command()
+        class AskDomainPermission(val domain: String) : Command()
         class RefreshUserAgent(val host: String?, val isDesktop: Boolean) : Command()
         class ShowErrorWithAction(val action: () -> Unit) : Command()
         sealed class DaxCommand : Command() {
@@ -741,11 +745,27 @@ class BrowserTabViewModel(
     fun onGeoLocationPermissionGranted() {
         val domain = site?.domain ?: return
 
-        // check if user has given permission to this domain
-        // if so react to it
-        // otherwise should custom dialog 1
-
-        permissionCallback?.invoke(permissionOrigin, true, true)
+        viewModelScope.launch {
+            if (locationPermissionsRepository.hasUserGivenPermissionTo(domain)){
+                // user has already given permission to this site, we need to know which
+                when (locationPermissionsRepository.getDomainPermission(domain)){
+                    LocationPermissionType.ALLOW_ALWAYS -> {
+                        permissionCallback?.invoke(permissionOrigin, true, true)
+                    }
+                    LocationPermissionType.ALLOW_ONCE -> {
+                        permissionCallback?.invoke(permissionOrigin, true, false)
+                    }
+                    LocationPermissionType.DENY_ALWAYS -> {
+                        permissionCallback?.invoke(permissionOrigin, false, true)
+                    }
+                    LocationPermissionType.DENY_ONCE -> {
+                        permissionCallback?.invoke(permissionOrigin, false, false)
+                    }
+                }
+            } else {
+                command.postValue(AskDomainPermission(domain))
+            }
+        }
     }
 
     fun onGeoLocationPermissionDenied() {

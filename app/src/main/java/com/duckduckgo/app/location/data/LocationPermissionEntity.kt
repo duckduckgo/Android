@@ -38,7 +38,7 @@ enum class LocationPermissionType(val value: Int) {
     DENY_ONCE(TYPE_DENY_ONCE);
 
     companion object {
-        private val map = LocationPermissionType.values().associateBy(LocationPermissionType::value)
+        private val map = values().associateBy(LocationPermissionType::value)
         fun fromValue(value: Int) = map[value]
     }
 

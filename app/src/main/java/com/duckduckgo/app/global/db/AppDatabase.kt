@@ -40,6 +40,7 @@ import com.duckduckgo.app.httpsupgrade.db.HttpsBloomFilterSpecDao
 import com.duckduckgo.app.httpsupgrade.db.HttpsWhitelistDao
 import com.duckduckgo.app.httpsupgrade.model.HttpsBloomFilterSpec
 import com.duckduckgo.app.httpsupgrade.model.HttpsWhitelistedDomain
+import com.duckduckgo.app.location.data.LocationPermissionsDao
 import com.duckduckgo.app.notification.db.NotificationDao
 import com.duckduckgo.app.notification.model.Notification
 import com.duckduckgo.app.onboarding.store.*
@@ -59,7 +60,7 @@ import com.duckduckgo.app.usage.search.SearchCountDao
 import com.duckduckgo.app.usage.search.SearchCountEntity
 
 @Database(
-    exportSchema = true, version = 21, entities = [
+    exportSchema = true, version = 22, entities = [
         TdsTracker::class,
         TdsEntity::class,
         TdsDomainEntity::class,
@@ -121,6 +122,7 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun tdsDao(): TdsMetadataDao
     abstract fun userStageDao(): UserStageDao
     abstract fun fireproofWebsiteDao(): FireproofWebsiteDao
+    abstract fun locationPermissionsDao(): LocationPermissionsDao
 }
 
 @Suppress("PropertyName")
