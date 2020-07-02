@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 22,
-    "identityHash": "731dc1f9e0785f4eda1db2708d1bf9eb",
+    "identityHash": "91bb2a91d4af3c6466c386e712b9233f",
     "entities": [
       {
         "tableName": "tds_tracker",
@@ -709,12 +709,38 @@
         },
         "indices": [],
         "foreignKeys": []
+      },
+      {
+        "tableName": "locationPermissions",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`domain` TEXT NOT NULL, `permission` INTEGER NOT NULL, PRIMARY KEY(`domain`))",
+        "fields": [
+          {
+            "fieldPath": "domain",
+            "columnName": "domain",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "permission",
+            "columnName": "permission",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "domain"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [],
+        "foreignKeys": []
       }
     ],
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '731dc1f9e0785f4eda1db2708d1bf9eb')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '91bb2a91d4af3c6466c386e712b9233f')"
     ]
   }
 }

@@ -746,9 +746,18 @@ class BrowserTabViewModel(
         val domain = site?.domain ?: return
 
         viewModelScope.launch {
-            if (locationPermissionsRepository.hasUserGivenPermissionTo(domain)){
+
+            val userHasGivenPermission = withContext(dispatchers.io()) {
+                locationPermissionsRepository.hasUserGivenPermissionTo(domain)
+            }
+
+            if (userHasGivenPermission) {
                 // user has already given permission to this site, we need to know which
-                when (locationPermissionsRepository.getDomainPermission(domain)){
+                val domainPermission = withContext(dispatchers.io()) {
+                    locationPermissionsRepository.getDomainPermission(domain)
+                }
+
+                when (domainPermission) {
                     LocationPermissionType.ALLOW_ALWAYS -> {
                         permissionCallback?.invoke(permissionOrigin, true, true)
                     }
@@ -765,6 +774,13 @@ class BrowserTabViewModel(
             } else {
                 command.postValue(AskDomainPermission(domain))
             }
+        }
+    }
+
+    fun onDomainLocationPermission(permissionType: LocationPermissionType) {
+        val domain = site?.domain ?: return
+        viewModelScope.launch {
+            locationPermissionsRepository.saveLocationPermission(domain, permissionType)
         }
     }
 

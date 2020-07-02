@@ -59,6 +59,8 @@ import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepository
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.model.SiteFactory
+import com.duckduckgo.app.location.data.LocationPermissionsDao
+import com.duckduckgo.app.location.data.LocationPermissionsRepository
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao
@@ -201,6 +203,8 @@ class BrowserTabViewModelTest {
 
     private lateinit var fireproofWebsiteDao: FireproofWebsiteDao
 
+    private lateinit var locationPermissionsDao: LocationPermissionsDao
+
     private val selectedTabLiveData = MutableLiveData<TabEntity>()
 
     private val loginEventLiveData = MutableLiveData<LoginDetected>()
@@ -262,6 +266,7 @@ class BrowserTabViewModelTest {
             pixel = mockPixel,
             dispatchers = coroutineRule.testDispatcherProvider,
             fireproofWebsiteRepository = FireproofWebsiteRepository(fireproofWebsiteDao, coroutineRule.testDispatcherProvider),
+            locationPermissionsRepository = LocationPermissionsRepository(locationPermissionsDao, coroutineRule.testDispatcherProvider),
             navigationAwareLoginDetector = mockNavigationAwareLoginDetector,
             variantManager = mockVariantManager
         )
@@ -2020,18 +2025,6 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-<<<<<<< HEAD
-    fun whenGeoPermissionisRequestedAndOriginIsNotDDGThenItsDenied() {
-        val originUrl = "http://example.com"
-        testee.onGeoLocationPermissionRequested(originUrl, permissionCallback)
-
-        verify(permissionCallback.invoke(anyString(), false, false))
-    }
-
-    @Test
-    fun whenGeoPermissionisRequestedAndOriginIsDDGThenItsGranted() {
-
-=======
     fun whenSERPRemovalFeatureIsActiveAndBrowsingDDGSiteAndPrivacyGradeIsVisibleThenShowDaxIconIsTrue() {
         val serpRemovalVariant = Variant("foo", 100.0, features = listOf(VariantManager.VariantFeature.SerpHeaderRemoval), filterBy = { true })
         whenever(mockVariantManager.getVariant()).thenReturn(serpRemovalVariant)
@@ -2067,7 +2060,6 @@ class BrowserTabViewModelTest {
     fun whenQueryIsNotHierarchicalThenUnsupportedOperationExceptionIsHandled() {
         whenever(mockOmnibarConverter.convertQueryToUrl("about:blank", null)).thenReturn("about:blank")
         testee.onUserSubmittedQuery("about:blank")
->>>>>>> develop
     }
 
     private inline fun <reified T : Command> assertCommandIssued(instanceAssertions: T.() -> Unit = {}) {

@@ -40,6 +40,7 @@ import com.duckduckgo.app.httpsupgrade.db.HttpsBloomFilterSpecDao
 import com.duckduckgo.app.httpsupgrade.db.HttpsWhitelistDao
 import com.duckduckgo.app.httpsupgrade.model.HttpsBloomFilterSpec
 import com.duckduckgo.app.httpsupgrade.model.HttpsWhitelistedDomain
+import com.duckduckgo.app.location.data.LocationPermissionEntity
 import com.duckduckgo.app.location.data.LocationPermissionsDao
 import com.duckduckgo.app.notification.db.NotificationDao
 import com.duckduckgo.app.notification.model.Notification
@@ -83,7 +84,8 @@ import com.duckduckgo.app.usage.search.SearchCountEntity
         UncaughtExceptionEntity::class,
         TdsMetadata::class,
         UserStage::class,
-        FireproofWebsiteEntity::class
+        FireproofWebsiteEntity::class,
+        LocationPermissionEntity::class
     ]
 )
 
@@ -164,7 +166,6 @@ class MigrationsProvider(val context: Context) {
                         val tabId = it.getString(it.getColumnIndex("tabId"))
                         database.execSQL("UPDATE `tabs` SET position=$index where `tabId` = \"$tabId\"")
                         index += 1
-
                     } while (it.moveToNext())
                 }
             }
@@ -269,7 +270,7 @@ class MigrationsProvider(val context: Context) {
             val userStage = UserStage(appStage = appStage)
             database.execSQL(
                 "CREATE TABLE IF NOT EXISTS `$USER_STAGE_TABLE_NAME` " +
-                        "(`key` INTEGER NOT NULL, `appStage` TEXT NOT NULL, PRIMARY KEY(`key`))"
+                    "(`key` INTEGER NOT NULL, `appStage` TEXT NOT NULL, PRIMARY KEY(`key`))"
             )
             database.execSQL(
                 "INSERT INTO $USER_STAGE_TABLE_NAME VALUES (${userStage.key}, \"${userStage.appStage}\") "

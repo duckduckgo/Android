@@ -82,6 +82,7 @@ import com.duckduckgo.app.fire.fireproofwebsite.data.website
 import com.duckduckgo.app.global.ViewModelFactory
 import com.duckduckgo.app.global.model.orderedTrackingEntities
 import com.duckduckgo.app.global.view.*
+import com.duckduckgo.app.location.data.LocationPermissionType
 import com.duckduckgo.app.privacy.renderer.icon
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -595,22 +596,22 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
 
     private fun askDomainPermission(domain: String) {
         // this is not Custom Dialog 2 yet
-        launchLocationPermissionDialog {
-            viewModel.onGeoLocationPermissionGranted()
-        }
+        launchLocationPermissionDialog()
     }
 
-    private fun launchLocationPermissionDialog(onClick: () -> Unit) {
+    private fun launchLocationPermissionDialog() {
         val isShowing = alertDialog?.isShowing
 
         if (isShowing != true) {
             alertDialog = AlertDialog.Builder(requireContext())
                 .setTitle("Allow Location Permissions?")
                 .setMessage("Why? Don't worry, we are not going to store anything but the Maps function will give you better results.")
-                .setPositiveButton(R.string.yes) { _, _ ->
-                    onClick()
+                .setPositiveButton(R.string.yes) { dialog, _ ->
+                    viewModel.onDomainLocationPermission(LocationPermissionType.ALLOW_ALWAYS)
+                    dialog.dismiss()
                 }
                 .setNegativeButton(R.string.no) { dialog, _ ->
+                    viewModel.onDomainLocationPermission(LocationPermissionType.DENY_ALWAYS)
                     dialog.dismiss()
                 }
                 .show()
