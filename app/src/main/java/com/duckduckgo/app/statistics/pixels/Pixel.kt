@@ -205,6 +205,7 @@ interface Pixel {
         UOA_VISITED_AFTER_DELETE_CTA("m_uoa_vad"),
 
         USE_OUR_APP_SHORTCUT_OPENED("m_sho_uoa_o"),
+        SHORTCUT_ADDED("m_sho_a"),
         SHORTCUT_OPENED("m_sho_o"),
     }
 

@@ -24,6 +24,8 @@ import android.widget.Toast
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.shortcut.ShortcutBuilder.Companion.SHORTCUT_TITLE_ARG
 import com.duckduckgo.app.browser.shortcut.ShortcutBuilder.Companion.SHORTCUT_URL_ARG
+import com.duckduckgo.app.cta.db.DismissedCtaDao
+import com.duckduckgo.app.cta.model.CtaId
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.events.db.UserEventsStore
 import com.duckduckgo.app.global.events.db.UserEventKey
@@ -33,7 +35,12 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-class ShortcutReceiver @Inject constructor(private val userEventsStore: UserEventsStore, val dispatcher: DispatcherProvider, val pixel: Pixel) :
+class ShortcutReceiver @Inject constructor(
+    private val userEventsStore: UserEventsStore,
+    private val ctaDao: DismissedCtaDao,
+    private val dispatcher: DispatcherProvider,
+    private val pixel: Pixel
+) :
     BroadcastReceiver() {
 
     override fun onReceive(context: Context?, intent: Intent?) {
@@ -47,9 +54,11 @@ class ShortcutReceiver @Inject constructor(private val userEventsStore: UserEven
         }
 
         GlobalScope.launch(dispatcher.io()) {
-            if (originUrl == USE_OUR_APP_SHORTCUT_URL) {
+            if (ctaDao.exists(CtaId.USE_OUR_APP) && originUrl == USE_OUR_APP_SHORTCUT_URL) {
                 userEventsStore.registerUserEvent(UserEventKey.USE_OUR_APP_SHORTCUT_ADDED)
                 pixel.fire(Pixel.PixelName.USE_OUR_APP_SHORTCUT_ADDED)
+            } else {
+                pixel.fire(Pixel.PixelName.SHORTCUT_ADDED)
             }
         }
     }
