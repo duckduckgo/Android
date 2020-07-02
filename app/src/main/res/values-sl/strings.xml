@@ -452,7 +452,7 @@
     <!-- Fireproof websites -->
     <string name="fireproofWebsitesActivityTitle">Spletne stran s požarno zaščito</string>
     <string name="settingsFireproofWebsites">Spletna stran s požarno zaščito</string>
-    <string name="fireproofWebsiteMenuTitle">Spletna stran s požarno zaščito</string>
+    <string name="fireproofWebsiteMenuTitleAdd">Spletna stran s požarno zaščito</string>
     <string name="fireproofWebsiteSnackbarConfirmation">&lt;b&gt;%s&lt;/b&gt; ima sedaj požarno zaščito! Za več informacij obiščite Nastavitve.</string>
     <string name="fireproofWebsiteSnackbarAction">Prekliči spremembe</string>
     <string name="fireproofWebsiteDeleteConfirmMessage">Ste prepričani, da želite izbrisati &lt;b&gt;%s&lt;/b&gt;?</string>

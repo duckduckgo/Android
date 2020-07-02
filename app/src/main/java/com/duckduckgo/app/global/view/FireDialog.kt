@@ -25,7 +25,10 @@ import kotlinx.android.synthetic.main.sheet_fire_clear_data.*
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 
-class FireDialog(context: Context, private val clearPersonalDataAction: ClearPersonalDataAction) : BottomSheetDialog(context) {
+class FireDialog(
+    context: Context,
+    private val clearPersonalDataAction: ClearPersonalDataAction
+) : BottomSheetDialog(context, R.style.FireDialog) {
 
     var clearStarted: (() -> Unit) = {}
     var clearComplete: (() -> Unit) = {}

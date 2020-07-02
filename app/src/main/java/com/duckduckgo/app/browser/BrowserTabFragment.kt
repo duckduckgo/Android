@@ -50,11 +50,7 @@ import androidx.core.text.HtmlCompat.FROM_HTML_MODE_LEGACY
 import androidx.core.view.*
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.transaction
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleObserver
-import androidx.lifecycle.Observer
-import androidx.lifecycle.OnLifecycleEvent
-import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.*
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion
 import com.duckduckgo.app.bookmarks.ui.EditBookmarkDialogFragment
@@ -68,6 +64,7 @@ import com.duckduckgo.app.browser.downloader.FileDownloader
 import com.duckduckgo.app.browser.downloader.FileDownloader.FileDownloadListener
 import com.duckduckgo.app.browser.downloader.FileDownloader.PendingFileDownload
 import com.duckduckgo.app.browser.filechooser.FileChooserIntentBuilder
+import com.duckduckgo.app.browser.logindetection.DOMLoginDetector
 import com.duckduckgo.app.browser.model.BasicAuthenticationCredentials
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.browser.model.LongPressTarget
@@ -83,7 +80,6 @@ import com.duckduckgo.app.cta.ui.*
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
 import com.duckduckgo.app.fire.fireproofwebsite.data.website
 import com.duckduckgo.app.global.ViewModelFactory
-import com.duckduckgo.app.global.device.DeviceInfo
 import com.duckduckgo.app.global.model.orderedTrackingEntities
 import com.duckduckgo.app.global.view.*
 import com.duckduckgo.app.privacy.renderer.icon
@@ -104,24 +100,8 @@ import kotlinx.android.synthetic.main.include_dax_dialog_cta.*
 import kotlinx.android.synthetic.main.include_find_in_page.*
 import kotlinx.android.synthetic.main.include_new_browser_tab.*
 import kotlinx.android.synthetic.main.include_omnibar_toolbar.*
-import kotlinx.android.synthetic.main.include_omnibar_toolbar.omnibarTextInput
-import kotlinx.android.synthetic.main.include_omnibar_toolbar.view.browserMenu
-import kotlinx.android.synthetic.main.include_omnibar_toolbar.view.fireIconMenu
-import kotlinx.android.synthetic.main.include_omnibar_toolbar.view.privacyGradeButton
-import kotlinx.android.synthetic.main.include_omnibar_toolbar.view.tabsMenu
+import kotlinx.android.synthetic.main.include_omnibar_toolbar.view.*
 import kotlinx.android.synthetic.main.popup_window_browser_menu.view.*
-import kotlinx.android.synthetic.main.popup_window_browser_menu.view.addBookmarksPopupMenuItem
-import kotlinx.android.synthetic.main.popup_window_browser_menu.view.addToHome
-import kotlinx.android.synthetic.main.popup_window_browser_menu.view.backPopupMenuItem
-import kotlinx.android.synthetic.main.popup_window_browser_menu.view.brokenSitePopupMenuItem
-import kotlinx.android.synthetic.main.popup_window_browser_menu.view.findInPageMenuItem
-import kotlinx.android.synthetic.main.popup_window_browser_menu.view.fireproofWebsitePopupMenuItem
-import kotlinx.android.synthetic.main.popup_window_browser_menu.view.forwardPopupMenuItem
-import kotlinx.android.synthetic.main.popup_window_browser_menu.view.newTabPopupMenuItem
-import kotlinx.android.synthetic.main.popup_window_browser_menu.view.refreshPopupMenuItem
-import kotlinx.android.synthetic.main.popup_window_browser_menu.view.requestDesktopSiteCheckMenuItem
-import kotlinx.android.synthetic.main.popup_window_browser_menu.view.settingsPopupMenuItem
-import kotlinx.android.synthetic.main.popup_window_browser_menu.view.whitelistPopupMenuItem
 import kotlinx.coroutines.*
 import org.jetbrains.anko.longToast
 import org.jetbrains.anko.share
@@ -146,9 +126,6 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
 
     @Inject
     lateinit var viewModelFactory: ViewModelFactory
-
-    @Inject
-    lateinit var deviceInfo: DeviceInfo
 
     @Inject
     lateinit var fileChooserIntentBuilder: FileChooserIntentBuilder
@@ -186,8 +163,12 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
     @Inject
     lateinit var variantManager: VariantManager
 
+    @Inject
+    lateinit var loginDetector: DOMLoginDetector
+
     val tabId get() = requireArguments()[TAB_ID_ARG] as String
 
+    @Inject
     lateinit var userAgentProvider: UserAgentProvider
 
     var messageFromPreviousTab: Message? = null
@@ -256,6 +237,8 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
     private val logoHidingListener by lazy { LogoHidingLayoutChangeLifecycleListener(ddgLogo) }
 
     private var alertDialog: AlertDialog? = null
+
+    private var loginDetectionDialog: AlertDialog? = null
 
     override fun onAttach(context: Context) {
         AndroidSupportInjection.inject(this)
@@ -573,6 +556,8 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
             is Command.DaxCommand.HideDaxDialog -> showHideTipsDialog(it.cta)
             is Command.HideWebContent -> webView?.hide()
             is Command.ShowWebContent -> webView?.show()
+            is Command.RefreshUserAgent -> refreshUserAgent(it.host, it.isDesktop)
+            is Command.AskToFireproofWebsite -> askToFireproofWebsite(requireContext(), it.fireproofWebsite)
         }
     }
 
@@ -639,6 +624,23 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
                     launchExternalAppDialog(it) { it.startActivity(intentChooser) }
                 }
             }
+        }
+    }
+
+    private fun askToFireproofWebsite(context: Context, fireproofWebsite: FireproofWebsiteEntity) {
+        val isShowing = loginDetectionDialog?.isShowing
+
+        if (isShowing != true) {
+            loginDetectionDialog = AlertDialog.Builder(context)
+                .setTitle(getString(R.string.fireproofWebsiteLoginDialogTitle, fireproofWebsite.website()))
+                .setMessage(R.string.fireproofWebsiteLoginDialogDescription)
+                .setPositiveButton(R.string.fireproofWebsiteLoginDialogPositive) { _, _ ->
+                    viewModel.onUserConfirmedFireproofDialog(fireproofWebsite.domain)
+                }
+                .setNegativeButton(R.string.fireproofWebsiteLoginDialogNegative) { dialog, _ ->
+                    dialog.dismiss()
+                    viewModel.onUserDismissedFireproofLoginDialog()
+                }.show()
         }
     }
 
@@ -802,13 +804,11 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
         ).findViewById(R.id.browserWebView) as WebView
 
         webView?.let {
-            userAgentProvider = UserAgentProvider(it.settings.userAgentString, deviceInfo)
-
             it.webViewClient = webViewClient
             it.webChromeClient = webChromeClient
 
             it.settings.apply {
-                userAgentString = userAgentProvider.getUserAgent()
+                userAgentString = userAgentProvider.userAgent()
                 javaScriptEnabled = true
                 domStorageEnabled = true
                 loadWithOverviewMode = true
@@ -835,6 +835,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
             registerForContextMenu(it)
 
             it.setFindListener(this)
+            loginDetector.addLoginDetection(it) { viewModel.loginDetected() }
         }
 
         if (BuildConfig.DEBUG) {
@@ -970,6 +971,15 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
         }
     }
 
+    private fun refreshUserAgent(host: String?, isDesktop: Boolean) {
+        val currentAgent = webView?.settings?.userAgentString
+        val newAgent = userAgentProvider.userAgent(host, isDesktop)
+        if (newAgent != currentAgent) {
+            Timber.d("User Agent Changed, new ${if (isDesktop) "Desktop" else "Mobile"} UA is $newAgent")
+            webView?.settings?.userAgentString = newAgent
+        }
+    }
+
     /**
      * Attempting to save the WebView's state can result in a TransactionTooLargeException being thrown.
      * This will only happen if the bundle size is too large - but the exact size is undefined.
@@ -1022,6 +1032,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
         animatorHelper.removeListener()
         supervisorJob.cancel()
         popupMenu.dismiss()
+        loginDetectionDialog?.dismiss()
         destroyWebView()
         super.onDestroy()
     }
@@ -1037,7 +1048,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
             url = url,
             contentDisposition = contentDisposition,
             mimeType = mimeType,
-            userAgent = userAgentProvider.getUserAgent(),
+            userAgent = userAgentProvider.userAgent(),
             subfolder = Environment.DIRECTORY_DOWNLOADS
         )
 
@@ -1051,7 +1062,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
     private fun requestImageDownload(url: String, requestUserConfirmation: Boolean) {
         pendingFileDownload = PendingFileDownload(
             url = url,
-            userAgent = userAgentProvider.getUserAgent(),
+            userAgent = userAgentProvider.userAgent(),
             subfolder = Environment.DIRECTORY_PICTURES
         )
 
@@ -1301,7 +1312,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
                     browserActivity?.launchBookmarks()
                     pixel.fire(Pixel.PixelName.MENU_ACTION_BOOKMARKS_PRESSED.pixelName)
                 }
-                onMenuItemClicked(view.fireproofWebsitePopupMenuItem) { launch { viewModel.onFireproofWebsiteClicked() } }
+                onMenuItemClicked(view.fireproofWebsitePopupMenuItem) { launch { viewModel.onFireproofWebsiteMenuClicked() } }
                 onMenuItemClicked(view.addBookmarksPopupMenuItem) { launch { viewModel.onBookmarkAddRequested() } }
                 onMenuItemClicked(view.findInPageMenuItem) { viewModel.onFindInPageSelected() }
                 onMenuItemClicked(view.whitelistPopupMenuItem) { viewModel.onWhitelistSelected() }
@@ -1511,7 +1522,6 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
                     }
                 }
 
-                toggleDesktopSiteMode(viewState.isDesktopBrowsingMode)
                 renderToolbarMenus(viewState)
                 renderPopupMenus(browserShowing, viewState)
                 renderFullscreenMode(viewState)
@@ -1536,11 +1546,13 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
                 newTabPopupMenuItem.isEnabled = browserShowing
                 addBookmarksPopupMenuItem?.isEnabled = viewState.canAddBookmarks
                 fireproofWebsitePopupMenuItem?.isEnabled = viewState.canFireproofSite
+                fireproofWebsitePopupMenuItem?.isChecked = viewState.canFireproofSite && viewState.isFireproofWebsite
                 sharePageMenuItem?.isEnabled = viewState.canSharePage
                 whitelistPopupMenuItem?.isEnabled = viewState.canWhitelist
                 whitelistPopupMenuItem?.text = getText(if (viewState.isWhitelisted) R.string.whitelistRemove else R.string.whitelistAdd)
                 brokenSitePopupMenuItem?.isEnabled = viewState.canReportSite
                 requestDesktopSiteCheckMenuItem?.isEnabled = viewState.canChangeBrowsingMode
+                requestDesktopSiteCheckMenuItem?.isChecked = viewState.isDesktopBrowsingMode
 
                 addToHome?.let {
                     it.visibility = if (viewState.addToHomeVisible) VISIBLE else GONE
@@ -1714,10 +1726,6 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
             } else {
                 findInPageMatches.hide()
             }
-        }
-
-        private fun toggleDesktopSiteMode(isDesktopSiteMode: Boolean) {
-            webView?.settings?.userAgentString = userAgentProvider.getUserAgent(isDesktopSiteMode)
         }
 
         private fun goFullScreen() {

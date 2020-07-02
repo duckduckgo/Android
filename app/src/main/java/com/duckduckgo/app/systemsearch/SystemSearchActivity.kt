@@ -34,6 +34,7 @@ import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.autocomplete.BrowserAutoCompleteSuggestionsAdapter
 import com.duckduckgo.app.browser.omnibar.OmnibarScrolling
+import com.duckduckgo.app.fire.DataClearerForegroundAppRestartPixel
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.view.TextChangedWatcher
 import com.duckduckgo.app.global.view.hideKeyboard
@@ -53,6 +54,9 @@ class SystemSearchActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var omnibarScrolling: OmnibarScrolling
 
+    @Inject
+    lateinit var dataClearerForegroundAppRestartPixel: DataClearerForegroundAppRestartPixel
+
     private val viewModel: SystemSearchViewModel by bindViewModel()
     private lateinit var autocompleteSuggestionsAdapter: BrowserAutoCompleteSuggestionsAdapter
     private lateinit var deviceAppSuggestionsAdapter: DeviceAppSuggestionsAdapter
@@ -66,6 +70,7 @@ class SystemSearchActivity : DuckDuckGoActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        dataClearerForegroundAppRestartPixel.registerIntent(intent)
         setContentView(R.layout.activity_system_search)
         configureObservers()
         configureOnboarding()
@@ -82,6 +87,7 @@ class SystemSearchActivity : DuckDuckGoActivity() {
 
     override fun onNewIntent(newIntent: Intent?) {
         super.onNewIntent(newIntent)
+        dataClearerForegroundAppRestartPixel.registerIntent(newIntent)
         viewModel.resetViewState()
         newIntent?.let { sendLaunchPixels(it) }
     }

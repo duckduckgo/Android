@@ -439,7 +439,7 @@
     <!-- Fireproof websites -->
     <string name="fireproofWebsitesActivityTitle">Sitios web a prueba de fuego</string>
     <string name="settingsFireproofWebsites">Sitios web a prueba de fuego</string>
-    <string name="fireproofWebsiteMenuTitle">Sitio web a prueba de fuego</string>
+    <string name="fireproofWebsiteMenuTitleAdd">Sitio web a prueba de fuego</string>
     <string name="fireproofWebsiteSnackbarConfirmation">¡&lt;b&gt;%s&lt;/b&gt; es ahora a prueba de fuego! Visita Ajustes para obtener más información.</string>
     <string name="fireproofWebsiteSnackbarAction">Deshacer</string>
     <string name="fireproofWebsiteDeleteConfirmMessage">¿Está seguro de que desea eliminar &lt;b&gt;%s&lt;/b&gt;?</string>

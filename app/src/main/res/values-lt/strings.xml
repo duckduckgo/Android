@@ -446,7 +446,7 @@
     <!-- Fireproof websites -->
     <string name="fireproofWebsitesActivityTitle">Patikrinti svetaines</string>
     <string name="settingsFireproofWebsites">Patikrinti svetaines</string>
-    <string name="fireproofWebsiteMenuTitle">Patikrinti svetainę</string>
+    <string name="fireproofWebsiteMenuTitleAdd">Patikrinti svetainę</string>
     <string name="fireproofWebsiteSnackbarConfirmation">&lt;b&gt;%s&lt;/b&gt; dabar yra patikrinta! Apsilankykite „Nustatymuose“ ir sužinokite daugiau.</string>
     <string name="fireproofWebsiteSnackbarAction">Anuliuoti</string>
     <string name="fireproofWebsiteDeleteConfirmMessage">Ar tikrai norite ištrinti &lt;b&gt;%s&lt;/b&gt;?</string>
