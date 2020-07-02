@@ -23,6 +23,8 @@ import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.browser.BrowserViewModel.Command
 import com.duckduckgo.app.browser.BrowserViewModel.Command.DisplayMessage
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
+import com.duckduckgo.app.cta.db.DismissedCtaDao
+import com.duckduckgo.app.cta.model.CtaId
 import com.duckduckgo.app.fire.DataClearer
 import com.duckduckgo.app.global.rating.AppEnjoymentPromptEmitter
 import com.duckduckgo.app.global.rating.AppEnjoymentPromptOptions
@@ -82,6 +84,9 @@ class BrowserViewModelTest {
     @Mock
     private lateinit var mockPixel: Pixel
 
+    @Mock
+    private lateinit var mockDismissedCtaDao: DismissedCtaDao
+
     private lateinit var testee: BrowserViewModel
 
     @Before
@@ -96,6 +101,7 @@ class BrowserViewModelTest {
             dataClearer = mockAutomaticDataClearer,
             appEnjoymentPromptEmitter = mockAppEnjoymentPromptEmitter,
             appEnjoymentUserEventRecorder = mockAppEnjoymentUserEventRecorder,
+            ctaDao = mockDismissedCtaDao,
             pixel = mockPixel
         )
 
@@ -186,11 +192,21 @@ class BrowserViewModelTest {
     }
 
     @Test
-    fun whenOpenShortcutIfUrlIsUseOurAppUrlThenFirePixel() {
+    fun whenOpenShortcutIfUrlIsUseOurAppUrlAndCtaHasBeenSeenThenFirePixel() {
+        givenUseOurAppCtaHasBeenSeen()
         val url = USE_OUR_APP_SHORTCUT_URL
         whenever(mockOmnibarEntryConverter.convertQueryToUrl(url)).thenReturn(url)
         testee.onOpenShortcut(url)
         verify(mockPixel).fire(Pixel.PixelName.USE_OUR_APP_SHORTCUT_OPENED)
+    }
+
+    @Test
+    fun whenOpenShortcutIfUrlIsUseOurAppUrlAndCtaHasNotBeenSeenThenDoNotFireUseOurAppPixel() {
+        val url = USE_OUR_APP_SHORTCUT_URL
+        whenever(mockOmnibarEntryConverter.convertQueryToUrl(url)).thenReturn(url)
+        testee.onOpenShortcut(url)
+        verify(mockPixel, never()).fire(Pixel.PixelName.USE_OUR_APP_SHORTCUT_OPENED)
+        verify(mockPixel).fire(Pixel.PixelName.SHORTCUT_OPENED)
     }
 
     @Test
@@ -199,6 +215,10 @@ class BrowserViewModelTest {
         whenever(mockOmnibarEntryConverter.convertQueryToUrl(url)).thenReturn(url)
         testee.onOpenShortcut(url)
         verify(mockPixel).fire(Pixel.PixelName.SHORTCUT_OPENED)
+    }
+
+    private fun givenUseOurAppCtaHasBeenSeen() {
+        whenever(mockDismissedCtaDao.exists(CtaId.USE_OUR_APP)).thenReturn(true)
     }
 
     companion object {

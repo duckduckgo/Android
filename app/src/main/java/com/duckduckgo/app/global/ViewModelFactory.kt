@@ -30,6 +30,7 @@ import com.duckduckgo.app.browser.favicon.FaviconDownloader
 import com.duckduckgo.app.browser.logindetection.NavigationAwareLoginDetector
 import com.duckduckgo.app.browser.omnibar.QueryUrlConverter
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
+import com.duckduckgo.app.cta.db.DismissedCtaDao
 import com.duckduckgo.app.cta.ui.CtaViewModel
 import com.duckduckgo.app.feedback.api.FeedbackSubmitter
 import com.duckduckgo.app.feedback.ui.common.FeedbackViewModel
@@ -116,6 +117,7 @@ class ViewModelFactory @Inject constructor(
     private val userEventsStore: UserEventsStore,
     private val notificationDao: NotificationDao,
     private val userOurAppDetector: UseOurAppDetector,
+    private val dismissedCtaDao: DismissedCtaDao,
     private val dispatcherProvider: DispatcherProvider
 ) : ViewModelProvider.NewInstanceFactory() {
 
@@ -179,6 +181,7 @@ class ViewModelFactory @Inject constructor(
             dataClearer,
             appEnjoymentPromptEmitter,
             appEnjoymentUserEventRecorder,
+            dismissedCtaDao,
             pixel
         )
     }
