@@ -14,19 +14,32 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.fire.fireproofwebsite.data
+package com.duckduckgo.app.location.data
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
-private const val WWW_PREFIX = "www."
-
-@Entity(tableName = "fireproofWebsites")
-data class FireproofWebsiteEntity(
-    @PrimaryKey val domain: String
+@Entity(tableName = "locationPermissions")
+data class LocationPermissionEntity(
+    @PrimaryKey val domain: String,
+    val permission: LocationPermissionType
 )
 
-fun FireproofWebsiteEntity.website(): String {
-    return domain.takeIf { it.startsWith(WWW_PREFIX, ignoreCase = true) }
-        ?.drop(WWW_PREFIX.length) ?: domain
+private const val TYPE_ALLOW_ALWAYS = 1
+private const val TYPE_ALLOW_ONCE = 2
+private const val TYPE_DENY_ALWAYS = 3
+private const val TYPE_DENY_ONCE = 4
+
+enum class LocationPermissionType(val value: Int) {
+
+    ALLOW_ALWAYS(TYPE_ALLOW_ALWAYS),
+    ALLOW_ONCE(TYPE_ALLOW_ONCE),
+    DENY_ALWAYS(TYPE_DENY_ALWAYS),
+    DENY_ONCE(TYPE_DENY_ONCE);
+
+    companion object {
+        private val map = LocationPermissionType.values().associateBy(LocationPermissionType::value)
+        fun fromValue(value: Int) = map[value]
+    }
+
 }

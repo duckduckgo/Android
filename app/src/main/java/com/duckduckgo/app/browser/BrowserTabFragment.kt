@@ -556,7 +556,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
             is Command.DaxCommand.HideDaxDialog -> showHideTipsDialog(it.cta)
             is Command.HideWebContent -> webView?.hide()
             is Command.ShowWebContent -> webView?.show()
-            is Command.AskGeoPermission -> requestGeoPermission()
+            is Command.CheckGeoPermission -> requestGeoPermission()
             is Command.RefreshUserAgent -> refreshUserAgent(it.host, it.isDesktop)
             is Command.AskToFireproofWebsite -> askToFireproofWebsite(requireContext(), it.fireproofWebsite)
         }

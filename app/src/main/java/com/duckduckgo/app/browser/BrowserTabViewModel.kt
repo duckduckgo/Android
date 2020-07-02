@@ -228,7 +228,7 @@ class BrowserTabViewModel(
         object LaunchTabSwitcher : Command()
         object HideWebContent : Command()
         object ShowWebContent : Command()
-        object AskGeoPermission : Command()
+        object CheckGeoPermission : Command()
         class RefreshUserAgent(val host: String?, val isDesktop: Boolean) : Command()
         class ShowErrorWithAction(val action: () -> Unit) : Command()
         sealed class DaxCommand : Command() {
@@ -733,17 +733,19 @@ class BrowserTabViewModel(
         callback?.let { permissionCallback = callback }
 
         if (origin != null) {
-            command.postValue(AskGeoPermission)
-            // if (duckDuckGoUrlDetector.isDuckDuckGoUrl(origin)){
-            // } else {
-            //    onGeoLocationPermissionDenied()
-            // }
+            command.postValue(CheckGeoPermission)
         } else {
             onGeoLocationPermissionDenied()
         }
     }
 
     fun onGeoLocationPermissionGranted() {
+        val domain = site?.domain ?: return
+
+        // check if user has given permission to this domain
+        // if so react to it
+        // otherwise should custom dialog 1
+
         permissionCallback?.invoke(permissionOrigin, true, true)
     }
 

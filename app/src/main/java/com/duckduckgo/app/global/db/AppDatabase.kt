@@ -27,6 +27,7 @@ import com.duckduckgo.app.bookmarks.db.BookmarksDao
 import com.duckduckgo.app.browser.rating.db.AppEnjoymentDao
 import com.duckduckgo.app.browser.rating.db.AppEnjoymentEntity
 import com.duckduckgo.app.browser.rating.db.AppEnjoymentTypeConverter
+import com.duckduckgo.app.browser.rating.db.LocationPermissionTypeConverter
 import com.duckduckgo.app.browser.rating.db.PromptCountConverter
 import com.duckduckgo.app.cta.db.DismissedCtaDao
 import com.duckduckgo.app.cta.model.DismissedCta
@@ -94,7 +95,8 @@ import com.duckduckgo.app.usage.search.SearchCountEntity
     RuleTypeConverter::class,
     CategoriesTypeConverter::class,
     UncaughtExceptionSourceConverter::class,
-    StageTypeConverter::class
+    StageTypeConverter::class,
+    LocationPermissionTypeConverter::class
 )
 abstract class AppDatabase : RoomDatabase() {
 
@@ -292,6 +294,12 @@ class MigrationsProvider(val context: Context) {
         }
     }
 
+    val MIGRATION_21_TO_22: Migration = object : Migration(21, 22) {
+        override fun migrate(database: SupportSQLiteDatabase) {
+            database.execSQL("CREATE TABLE IF NOT EXISTS `locationPermissions` (`domain` TEXT NOT NULL, `permission` INTEGER NOT NULL, PRIMARY KEY(`domain`))")
+        }
+    }
+
     val ALL_MIGRATIONS: List<Migration>
         get() = listOf(
             MIGRATION_1_TO_2,
@@ -313,7 +321,8 @@ class MigrationsProvider(val context: Context) {
             MIGRATION_17_TO_18,
             MIGRATION_18_TO_19,
             MIGRATION_19_TO_20,
-            MIGRATION_20_TO_21
+            MIGRATION_20_TO_21,
+            MIGRATION_21_TO_22
         )
 
     @Deprecated(

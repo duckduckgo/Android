@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.fire.fireproofwebsite.data
+package com.duckduckgo.app.location.data
 
 import androidx.lifecycle.LiveData
 import com.duckduckgo.app.global.DispatcherProvider
@@ -22,30 +22,31 @@ import com.duckduckgo.app.global.UriString
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
-class FireproofWebsiteRepository @Inject constructor(
-    private val fireproofWebsiteDao: FireproofWebsiteDao,
+class LocationPermissionsRepository @Inject constructor(
+    private val locationPermissionsDao: LocationPermissionsDao,
     private val dispatchers: DispatcherProvider
 ) {
-    suspend fun fireproofWebsite(domain: String): FireproofWebsiteEntity? {
+
+    fun getLocationPermissions(): LiveData<List<LocationPermissionEntity>> = locationPermissionsDao.allPermissionsEntities()
+
+    suspend fun saveLocationPermission(domain: String, permission: LocationPermissionType): LocationPermissionEntity? {
         if (!UriString.isValidDomain(domain)) return null
 
-        val fireproofWebsiteEntity = FireproofWebsiteEntity(domain = domain)
+        val locationPermissionEntity = LocationPermissionEntity(domain = domain, permission = permission)
         val id = withContext(dispatchers.io()) {
-            fireproofWebsiteDao.insert(fireproofWebsiteEntity)
+            locationPermissionsDao.insert(locationPermissionEntity)
         }
 
         return if (id >= 0) {
-            fireproofWebsiteEntity
+            locationPermissionEntity
         } else {
             null
         }
     }
 
-    fun getFireproofWebsites(): LiveData<List<FireproofWebsiteEntity>> = fireproofWebsiteDao.fireproofWebsitesEntities()
-
-    suspend fun removeFireproofWebsite(fireproofWebsiteEntity: FireproofWebsiteEntity) {
+    suspend fun removeLocationPermission(fireproofWebsiteEntity: LocationPermissionEntity) {
         withContext(dispatchers.io()) {
-            fireproofWebsiteDao.delete(fireproofWebsiteEntity)
+            locationPermissionsDao.delete(fireproofWebsiteEntity)
         }
     }
 }
