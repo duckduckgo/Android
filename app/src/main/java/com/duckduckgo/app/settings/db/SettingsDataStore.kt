@@ -35,6 +35,7 @@ interface SettingsDataStore {
     var appIcon: AppIcon
     var appIconChanged: Boolean
     var appLoginDetection: Boolean
+    var appLocationPermission: Boolean
 
     /**
      * This will be checked upon app startup and used to decide whether it should perform a clear or not.
@@ -83,6 +84,10 @@ class SettingsSharedPreferences @Inject constructor(private val context: Context
     override var appLoginDetection: Boolean
         get() = preferences.getBoolean(KEY_LOGIN_DETECTION_ENABLED, false)
         set(enabled) = preferences.edit { putBoolean(KEY_LOGIN_DETECTION_ENABLED, enabled) }
+
+    override var appLocationPermission: Boolean
+        get() = preferences.getBoolean(KEY_LOCATION_PERMISSION_ENABLED, false)
+        set(enabled) = preferences.edit { putBoolean(KEY_LOCATION_PERMISSION_ENABLED, enabled) }
 
     override var appIcon: AppIcon
         get() {
@@ -158,6 +163,7 @@ class SettingsSharedPreferences @Inject constructor(private val context: Context
         const val KEY_HIDE_TIPS = "HIDE_TIPS"
         const val KEY_APP_ICON = "APP_ICON"
         const val KEY_APP_ICON_CHANGED = "APP_ICON_CHANGED"
+        const val KEY_LOCATION_PERMISSION_ENABLED = "KEY_LOCATION_PERMISSION_ENABLED"
 
         private val DEFAULT_ICON = if (BuildConfig.DEBUG) {
             AppIcon.BLUE

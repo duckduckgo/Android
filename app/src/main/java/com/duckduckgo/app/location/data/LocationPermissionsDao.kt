@@ -32,6 +32,9 @@ interface LocationPermissionsDao {
     @Query("select * from locationPermissions")
     fun allPermissionsEntities(): LiveData<List<LocationPermissionEntity>>
 
+    @Query("select * from locationPermissions WHERE domain = :domain")
+    fun hasUserGivenPermissionTo(domain: String): LocationPermissionEntity?
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insert(locationPermissionEntity: LocationPermissionEntity): Long
 
