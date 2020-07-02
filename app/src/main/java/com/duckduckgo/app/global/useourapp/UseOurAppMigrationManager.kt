@@ -18,7 +18,6 @@ package com.duckduckgo.app.global.useourapp
 
 import com.duckduckgo.app.statistics.IndexRandomizer
 import com.duckduckgo.app.statistics.Probabilistic
-import java.util.Locale
 
 interface MigrationManager {
     fun shouldRunMigration(): Boolean
@@ -29,12 +28,7 @@ class UseOurAppMigrationManager constructor(private val indexRandomizer: IndexRa
     override fun shouldRunMigration(): Boolean {
         val randomizedIndex = indexRandomizer.random(MIGRATION_VARIANTS)
         val variant = MIGRATION_VARIANTS[randomizedIndex]
-        return (isEnglishLocale() && variant == useOurAppMigration)
-    }
-
-    private fun isEnglishLocale(): Boolean {
-        val locale = Locale.getDefault()
-        return locale != null && locale.language == "en"
+        return (variant == useOurAppMigration)
     }
 
     companion object {

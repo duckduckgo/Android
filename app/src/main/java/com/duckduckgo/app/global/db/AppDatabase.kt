@@ -62,6 +62,7 @@ import com.duckduckgo.app.usage.app.AppDaysUsedDao
 import com.duckduckgo.app.usage.app.AppDaysUsedEntity
 import com.duckduckgo.app.usage.search.SearchCountDao
 import com.duckduckgo.app.usage.search.SearchCountEntity
+import java.util.Locale
 
 @Database(
     exportSchema = true, version = 22, entities = [
@@ -319,7 +320,12 @@ class MigrationsProvider(
     }
 
     private fun canUserBeMigratedToUseOurAppFlow(database: SupportSQLiteDatabase): Boolean =
-        isUserEstablished(database) && !settingsDataStore.hideTips && addToHomeCapabilityDetector.isAddToHomeSupported()
+        isEnglishLocale() && isUserEstablished(database) && !settingsDataStore.hideTips && addToHomeCapabilityDetector.isAddToHomeSupported()
+
+    private fun isEnglishLocale(): Boolean {
+        val locale = Locale.getDefault()
+        return locale != null && locale.language == "en"
+    }
 
     val ALL_MIGRATIONS: List<Migration>
         get() = listOf(
