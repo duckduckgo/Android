@@ -466,7 +466,6 @@ class BrowserTabViewModel(
         } else {
             pixel.fire(String.format(Locale.US, PixelName.SERP_REQUERY.pixelName, PixelParameter.SERP_QUERY_CHANGED))
         }
-
     }
 
     private fun shouldClearHistoryOnNewQuery(): Boolean {
@@ -751,6 +750,11 @@ class BrowserTabViewModel(
 
     fun onGeoLocationPermissionDenied() {
         permissionCallback?.invoke(permissionOrigin, false, true)
+    }
+
+    fun onLocationPermissionDeniedForever() {
+        appSettingsPreferencesStore.appLocationPermission = false
+        onGeoLocationPermissionDenied()
     }
 
     private fun registerSiteVisit() {

@@ -556,19 +556,44 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
             is Command.DaxCommand.HideDaxDialog -> showHideTipsDialog(it.cta)
             is Command.HideWebContent -> webView?.hide()
             is Command.ShowWebContent -> webView?.show()
-            is Command.CheckGeoPermission -> requestGeoPermission()
+            is Command.CheckGeoPermission -> checkGeoPermission()
             is Command.RefreshUserAgent -> refreshUserAgent(it.host, it.isDesktop)
             is Command.AskToFireproofWebsite -> askToFireproofWebsite(requireContext(), it.fireproofWebsite)
         }
     }
 
-    private fun requestGeoPermission() {
+    private fun checkGeoPermission() {
         if (ContextCompat.checkSelfPermission(requireActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            launchLocationPermissionDialog{
+            launchLocationPermissionInformationDialog{
+                launchLocationPermissionDialog{
+                    requestPermissions(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), PERMISSION_REQUEST_GEO_LOCATION)
+                }
+
                 requestPermissions(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), PERMISSION_REQUEST_GEO_LOCATION)
             }
         } else {
             viewModel.onGeoLocationPermissionGranted()
+        }
+    }
+
+
+    private fun launchLocationPermissionInformationDialog(onAccepted: () -> Unit) {
+        val isShowing = alertDialog?.isShowing
+
+        if (isShowing != true) {
+            alertDialog = AlertDialog.Builder(requireContext())
+                .setTitle("We have something to ask")
+                .setMessage("This site is wants to see your location. If you want to give it access we first need to ask Location permissions. We won't use the location for anything, would you like to give Location permission?")
+                .setPositiveButton(R.string.yes) { _, _ ->
+                    onAccepted()
+                }
+                .setNeutralButton("No, never") { _, _ ->
+                    viewModel.onLocationPermissionDeniedForever()
+                }
+                .setNegativeButton(R.string.no) { dialog, _ ->
+                    dialog.dismiss()
+                }
+                .show()
         }
     }
 
