@@ -176,13 +176,13 @@ class ViewModelFactory @Inject constructor(
 
     private fun browserViewModel(): BrowserViewModel {
         return BrowserViewModel(
-            tabRepository,
-            queryUrlConverter,
-            dataClearer,
-            appEnjoymentPromptEmitter,
-            appEnjoymentUserEventRecorder,
-            dismissedCtaDao,
-            pixel
+            tabRepository = tabRepository,
+            queryUrlConverter = queryUrlConverter,
+            dataClearer = dataClearer,
+            appEnjoymentPromptEmitter = appEnjoymentPromptEmitter,
+            appEnjoymentUserEventRecorder = appEnjoymentUserEventRecorder,
+            ctaDao = dismissedCtaDao,
+            pixel = pixel
         )
     }
 

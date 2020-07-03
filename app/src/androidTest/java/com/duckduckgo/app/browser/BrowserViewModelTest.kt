@@ -102,6 +102,7 @@ class BrowserViewModelTest {
             appEnjoymentPromptEmitter = mockAppEnjoymentPromptEmitter,
             appEnjoymentUserEventRecorder = mockAppEnjoymentUserEventRecorder,
             ctaDao = mockDismissedCtaDao,
+            dispatchers = coroutinesTestRule.testDispatcherProvider,
             pixel = mockPixel
         )
 

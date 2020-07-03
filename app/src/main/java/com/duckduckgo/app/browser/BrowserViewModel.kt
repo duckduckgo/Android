@@ -31,6 +31,8 @@ import com.duckduckgo.app.cta.db.DismissedCtaDao
 import com.duckduckgo.app.cta.model.CtaId
 import com.duckduckgo.app.fire.DataClearer
 import com.duckduckgo.app.global.ApplicationClearDataState
+import com.duckduckgo.app.global.DefaultDispatcherProvider
+import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.SingleLiveEvent
 import com.duckduckgo.app.global.rating.AppEnjoymentPromptEmitter
 import com.duckduckgo.app.global.rating.AppEnjoymentPromptOptions
@@ -54,6 +56,7 @@ class BrowserViewModel(
     private val appEnjoymentPromptEmitter: AppEnjoymentPromptEmitter,
     private val appEnjoymentUserEventRecorder: AppEnjoymentUserEventRecorder,
     private val ctaDao: DismissedCtaDao,
+    private val dispatchers: DispatcherProvider = DefaultDispatcherProvider(),
     private val pixel: Pixel
 ) : AppEnjoymentDialogFragment.Listener,
     RateAppDialogFragment.Listener,
@@ -205,11 +208,13 @@ class BrowserViewModel(
     }
 
     fun onOpenShortcut(url: String) {
-        launch { tabRepository.selectByUrlOrNewTab(queryUrlConverter.convertQueryToUrl(url)) }
-        if (ctaDao.exists(CtaId.USE_OUR_APP) && url == USE_OUR_APP_SHORTCUT_URL) {
-            pixel.fire(Pixel.PixelName.USE_OUR_APP_SHORTCUT_OPENED)
-        } else {
-            pixel.fire(Pixel.PixelName.SHORTCUT_OPENED)
+        launch(dispatchers.io()) {
+            tabRepository.selectByUrlOrNewTab(queryUrlConverter.convertQueryToUrl(url))
+            if (ctaDao.exists(CtaId.USE_OUR_APP) && url == USE_OUR_APP_SHORTCUT_URL) {
+                pixel.fire(Pixel.PixelName.USE_OUR_APP_SHORTCUT_OPENED)
+            } else {
+                pixel.fire(Pixel.PixelName.SHORTCUT_OPENED)
+            }
         }
     }
 }
