@@ -607,11 +607,11 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
                 .setTitle("Allow Location Permissions?")
                 .setMessage("Why? Don't worry, we are not going to store anything but the Maps function will give you better results.")
                 .setPositiveButton(R.string.yes) { dialog, _ ->
-                    viewModel.onDomainLocationPermission(LocationPermissionType.ALLOW_ALWAYS)
+                    viewModel.onGeoLocationPermissionSelected(LocationPermissionType.ALLOW_ONCE)
                     dialog.dismiss()
                 }
                 .setNegativeButton(R.string.no) { dialog, _ ->
-                    viewModel.onDomainLocationPermission(LocationPermissionType.DENY_ALWAYS)
+                    viewModel.onGeoLocationPermissionSelected(LocationPermissionType.DENY_ONCE)
                     dialog.dismiss()
                 }
                 .show()
@@ -1229,10 +1229,10 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
             }
             PERMISSION_REQUEST_GEO_LOCATION -> {
                 if ((grantResults.isNotEmpty()) && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    Timber.i("Geo location permission granted")
+                    Timber.i("System Geo location permission granted")
                     viewModel.onGeoLocationPermissionGranted()
                 } else {
-                    Timber.i("Geo location permission refused")
+                    Timber.i("System Geo location permission refused")
                     viewModel.onGeoLocationPermissionDenied()
                 }
             }

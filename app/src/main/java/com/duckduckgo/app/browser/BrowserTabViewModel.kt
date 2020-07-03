@@ -71,6 +71,7 @@ import com.duckduckgo.app.global.model.domain
 import com.duckduckgo.app.global.model.domainMatchesUrl
 import com.duckduckgo.app.location.data.LocationPermissionType
 import com.duckduckgo.app.location.data.LocationPermissionsRepository
+import com.duckduckgo.app.location.ui.LocationPermissionDialogFragment
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao
 import com.duckduckgo.app.privacy.db.UserWhitelistDao
 import com.duckduckgo.app.privacy.model.PrivacyGrade
@@ -92,6 +93,7 @@ import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
@@ -122,7 +124,7 @@ class BrowserTabViewModel(
     private val pixel: Pixel,
     private val dispatchers: DispatcherProvider = DefaultDispatcherProvider(),
     private val variantManager: VariantManager
-) : WebViewClientListener, EditBookmarkListener, HttpAuthenticationListener, ViewModel() {
+) : WebViewClientListener, EditBookmarkListener, HttpAuthenticationListener, LocationPermissionDialogFragment.Listener, ViewModel() {
 
     private var buildingSiteFactoryJob: Job? = null
 
@@ -743,49 +745,52 @@ class BrowserTabViewModel(
     }
 
     fun onGeoLocationPermissionGranted() {
-        val domain = site?.domain ?: return
-
         viewModelScope.launch {
 
             val userHasGivenPermission = withContext(dispatchers.io()) {
-                locationPermissionsRepository.hasUserGivenPermissionTo(domain)
+                locationPermissionsRepository.hasUserGivenPermissionTo(permissionOrigin)
             }
 
             if (userHasGivenPermission) {
                 // user has already given permission to this site, we need to know which
                 val domainPermission = withContext(dispatchers.io()) {
-                    locationPermissionsRepository.getDomainPermission(domain)
+                    locationPermissionsRepository.getDomainPermission(permissionOrigin)
                 }
 
-                when (domainPermission) {
-                    LocationPermissionType.ALLOW_ALWAYS -> {
-                        permissionCallback?.invoke(permissionOrigin, true, true)
-                    }
-                    LocationPermissionType.ALLOW_ONCE -> {
-                        permissionCallback?.invoke(permissionOrigin, true, false)
-                    }
-                    LocationPermissionType.DENY_ALWAYS -> {
-                        permissionCallback?.invoke(permissionOrigin, false, true)
-                    }
-                    LocationPermissionType.DENY_ONCE -> {
-                        permissionCallback?.invoke(permissionOrigin, false, false)
-                    }
-                }
+                reactToPermission(domainPermission)
+
             } else {
-                command.postValue(AskDomainPermission(domain))
+                command.postValue(AskDomainPermission(permissionOrigin))
             }
         }
     }
 
-    fun onDomainLocationPermission(permissionType: LocationPermissionType) {
-        val domain = site?.domain ?: return
+    override fun onGeoLocationPermissionSelected(permission: LocationPermissionType) {
         viewModelScope.launch {
-            locationPermissionsRepository.saveLocationPermission(domain, permissionType)
+            locationPermissionsRepository.saveLocationPermission(permissionOrigin, permission)
+            reactToPermission(permission)
+        }
+    }
+
+    private fun reactToPermission(permission: LocationPermissionType){
+        when (permission) {
+            LocationPermissionType.ALLOW_ALWAYS -> {
+                permissionCallback?.invoke(permissionOrigin, true, true)
+            }
+            LocationPermissionType.ALLOW_ONCE -> {
+                permissionCallback?.invoke(permissionOrigin, true, false)
+            }
+            LocationPermissionType.DENY_ALWAYS -> {
+                permissionCallback?.invoke(permissionOrigin, false, true)
+            }
+            LocationPermissionType.DENY_ONCE -> {
+                permissionCallback?.invoke(permissionOrigin, false, false)
+            }
         }
     }
 
     fun onGeoLocationPermissionDenied() {
-        permissionCallback?.invoke(permissionOrigin, false, true)
+        reactToPermission(LocationPermissionType.DENY_ONCE)
     }
 
     fun onLocationPermissionDeniedForever() {
@@ -1380,4 +1385,5 @@ class BrowserTabViewModel(
     companion object {
         private const val FIXED_PROGRESS = 50
     }
+
 }

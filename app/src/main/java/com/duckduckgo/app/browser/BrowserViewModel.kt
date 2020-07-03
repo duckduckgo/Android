@@ -34,6 +34,8 @@ import com.duckduckgo.app.global.rating.AppEnjoymentPromptEmitter
 import com.duckduckgo.app.global.rating.AppEnjoymentPromptOptions
 import com.duckduckgo.app.global.rating.AppEnjoymentUserEventRecorder
 import com.duckduckgo.app.global.rating.PromptCount
+import com.duckduckgo.app.location.data.LocationPermissionType
+import com.duckduckgo.app.location.ui.LocationPermissionDialogFragment
 import com.duckduckgo.app.privacy.ui.PrivacyDashboardActivity.Companion.RELOAD_RESULT_CODE
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
@@ -197,4 +199,5 @@ class BrowserViewModel(
     override fun onUserCancelledGiveFeedbackDialog(promptCount: PromptCount) {
         onUserDeclinedToGiveFeedback(promptCount)
     }
+
 }
