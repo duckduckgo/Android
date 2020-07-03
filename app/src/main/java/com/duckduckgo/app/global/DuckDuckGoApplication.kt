@@ -17,6 +17,7 @@
 package com.duckduckgo.app.global
 
 import android.app.Application
+import android.content.IntentFilter
 import android.os.Build
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleObserver
@@ -25,6 +26,8 @@ import androidx.lifecycle.ProcessLifecycleOwner
 import androidx.work.WorkerFactory
 import com.duckduckgo.app.browser.BuildConfig
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserObserver
+import com.duckduckgo.app.browser.shortcut.ShortcutBuilder
+import com.duckduckgo.app.browser.shortcut.ShortcutReceiver
 import com.duckduckgo.app.di.AppComponent
 import com.duckduckgo.app.di.DaggerAppComponent
 import com.duckduckgo.app.fire.DataClearer
@@ -149,6 +152,9 @@ open class DuckDuckGoApplication : HasAndroidInjector, Application(), LifecycleO
 
     @Inject
     lateinit var atbInitializer: AtbInitializer
+
+    @Inject
+    lateinit var shortcutReceiver: ShortcutReceiver
 
     @Inject
     lateinit var variantManager: VariantManager
@@ -293,6 +299,7 @@ open class DuckDuckGoApplication : HasAndroidInjector, Application(), LifecycleO
             Timber.i("Suppressing app launch pixel")
             return
         }
+        registerReceiver(shortcutReceiver, IntentFilter(ShortcutBuilder.USE_OUR_APP_SHORTCUT_ADDED_ACTION))
         pixel.fire(APP_LAUNCH)
     }
 
@@ -303,6 +310,11 @@ open class DuckDuckGoApplication : HasAndroidInjector, Application(), LifecycleO
             workScheduler.scheduleWork()
             atbInitializer.initializeAfterReferrerAvailable()
         }
+    }
+
+    @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
+    fun onAppStopped() {
+        unregisterReceiver(shortcutReceiver)
     }
 
     companion object {

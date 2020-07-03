@@ -26,11 +26,15 @@ import androidx.core.app.NotificationManagerCompat
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.icon.ui.ChangeIconActivity
 import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEvent.CHANGE_ICON_FEATURE
+import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEvent.APP_LAUNCH
 import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEvent.CANCEL
 import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEvent.CLEAR_DATA_LAUNCH
+import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEvent.USE_OUR_APP
 import com.duckduckgo.app.notification.model.NotificationSpec
 import com.duckduckgo.app.notification.model.WebsiteNotificationSpecification
+import com.duckduckgo.app.onboarding.store.AppStage
+import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.settings.SettingsActivity
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -38,6 +42,8 @@ import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.NOTIFICATION_CANCELL
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.NOTIFICATION_LAUNCHED
 import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEvent.WEBSITE
 import dagger.android.AndroidInjection
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -58,6 +64,12 @@ class NotificationHandlerService : IntentService("NotificationHandlerService") {
     @Inject
     lateinit var settingsDataStore: SettingsDataStore
 
+    @Inject
+    lateinit var userStageStore: UserStageStore
+
+    @Inject
+    lateinit var dispatcher: DispatcherProvider
+
     override fun onCreate() {
         super.onCreate()
         AndroidInjection.inject(this)
@@ -72,6 +84,12 @@ class NotificationHandlerService : IntentService("NotificationHandlerService") {
             CANCEL -> onCancelled(pixelSuffix)
             WEBSITE -> onWebsiteNotification(intent, pixelSuffix)
             CHANGE_ICON_FEATURE -> onCustomizeIconLaunched(pixelSuffix)
+            USE_OUR_APP -> {
+                GlobalScope.launch(dispatcher.io()) {
+                    userStageStore.moveToStage(AppStage.USE_OUR_APP_ONBOARDING)
+                    onAppLaunched(pixelSuffix)
+                }
+            }
         }
 
         if (intent.getBooleanExtra(NOTIFICATION_AUTO_CANCEL, true)) {
@@ -134,6 +152,7 @@ class NotificationHandlerService : IntentService("NotificationHandlerService") {
         const val CANCEL = "com.duckduckgo.notification.cancel"
         const val WEBSITE = "com.duckduckgo.notification.website"
         const val CHANGE_ICON_FEATURE = "com.duckduckgo.notification.app.feature.changeIcon"
+        const val USE_OUR_APP = "com.duckduckgo.notification.flow.useOurApp"
     }
 
     companion object {

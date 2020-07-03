@@ -85,6 +85,15 @@ class TabDataRepository @Inject constructor(
         }
     }
 
+    override suspend fun selectByUrlOrNewTab(url: String) {
+        val tabId = tabsDao.selectTabByUrl(url)
+        if (tabId != null) {
+            select(tabId)
+        } else {
+            add(url, skipHome = true, isDefaultTab = false)
+        }
+    }
+
     override suspend fun addNewTabAfterExistingTab(url: String?, tabId: String) {
         databaseExecutor().scheduleDirect {
             val position = tabsDao.tab(tabId)?.position ?: -1

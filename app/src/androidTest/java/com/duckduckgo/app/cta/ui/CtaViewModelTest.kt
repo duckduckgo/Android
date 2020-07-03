@@ -25,9 +25,14 @@ import com.duckduckgo.app.InstantSchedulersRule
 import com.duckduckgo.app.cta.db.DismissedCtaDao
 import com.duckduckgo.app.cta.model.CtaId
 import com.duckduckgo.app.cta.model.DismissedCta
+import com.duckduckgo.app.global.useourapp.UseOurAppDetector.Companion.USE_OUR_APP_SHORTCUT_URL
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.model.Site
+import com.duckduckgo.app.global.events.db.UserEventEntity
+import com.duckduckgo.app.global.events.db.UserEventsStore
+import com.duckduckgo.app.global.events.db.UserEventKey
+import com.duckduckgo.app.global.useourapp.UseOurAppDetector
 import com.duckduckgo.app.onboarding.store.AppStage
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.store.UserStageStore
@@ -106,6 +111,9 @@ class CtaViewModelTest {
     @Mock
     private lateinit var mockUserStageStore: UserStageStore
 
+    @Mock
+    private lateinit var mockUserEventsStore: UserEventsStore
+
     private val requiredDaxOnboardingCtas: List<CtaId> = listOf(
         CtaId.DAX_INTRO,
         CtaId.DAX_DIALOG_SERP,
@@ -139,6 +147,8 @@ class CtaViewModelTest {
             mockSettingsDataStore,
             mockOnboardingStore,
             mockUserStageStore,
+            mockUserEventsStore,
+            UseOurAppDetector(mockUserEventsStore),
             coroutineRule.testDispatcherProvider
         )
     }
@@ -184,14 +194,6 @@ class CtaViewModelTest {
     fun whenCtaLaunchedPixelIsFired() {
         testee.onUserClickCtaOkButton(HomePanelCta.Survey(Survey("abc", "http://example.com", 1, SCHEDULED)))
         verify(mockPixel).fire(eq(SURVEY_CTA_LAUNCHED), any(), any())
-    }
-
-    @Test
-    fun whenCtaSecondaryButtonClickedPixelIsFired() {
-        val secondaryButtonCta = mock<SecondaryButtonCta>()
-        whenever(secondaryButtonCta.secondaryButtonPixel).thenReturn(ONBOARDING_DAX_ALL_CTA_HIDDEN)
-        testee.onUserClickCtaSecondaryButton(secondaryButtonCta)
-        verify(mockPixel).fire(eq(ONBOARDING_DAX_ALL_CTA_HIDDEN), any(), any())
     }
 
     @Test
@@ -420,17 +422,102 @@ class CtaViewModelTest {
     @Test
     fun whenRefreshCtaWhileBrowsingWithDaxOnboardingCompletedButNotAllCtasWereShownThenReturnNull() = runBlockingTest {
         givenShownDaxOnboardingCtas(listOf(CtaId.DAX_INTRO))
-        givenDaxOnboardingCompleted()
+        givenUserIsEstablished()
 
         val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = true)
         assertNull(value)
+    }
+
+    @Test
+    fun whenRefreshCtaOnHomeTabAndUseOurAppOnboardingActiveThenUseOurAppCtaShown() = runBlockingTest {
+        givenUseOurAppActive()
+
+        val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = false)
+        assertTrue(value is UseOurAppCta)
+    }
+
+    @Test
+    fun whenRefreshCtaOnHomeTabAndUseOurAppOnboardingActiveAndHideTipsIsTrueThenReturnNull() = runBlockingTest {
+        givenUseOurAppActive()
+        whenever(mockSettingsDataStore.hideTips).thenReturn(true)
+
+        val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = false)
+        assertNull(value)
+    }
+
+    @Test
+    fun whenRefreshCtaOnHomeTabAndUseOurAppOnboardingActiveAndCtaShownThenReturnNull() = runBlockingTest {
+        givenUseOurAppActive()
+        whenever(mockDismissedCtaDao.exists(CtaId.USE_OUR_APP)).thenReturn(true)
+
+        val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = false)
+        assertNull(value)
+    }
+
+    @Test
+    fun whenRefreshCtaWhileBrowsingAndSiteIsUseOurAppAndTwoDaysSinceShortcutAddedThenShowUseOurAppDeletionCta() = runBlockingTest {
+        givenUserIsEstablished()
+        val timestampEntity = UserEventEntity(UserEventKey.USE_OUR_APP_SHORTCUT_ADDED, System.currentTimeMillis() - TimeUnit.DAYS.toMillis(2))
+        whenever(mockUserEventsStore.getUserEvent(UserEventKey.USE_OUR_APP_SHORTCUT_ADDED)).thenReturn(timestampEntity)
+
+        val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = true, site = site(url = USE_OUR_APP_SHORTCUT_URL))
+        assertTrue(value is UseOurAppDeletionCta)
+    }
+
+    @Test
+    fun whenRefreshCtaWhileBrowsingAndSiteIsUseOurAppAndTwoDaysSinceShortcutAddedAndHideTipsIsTrueThenReturnNull() = runBlockingTest {
+        givenUserIsEstablished()
+        val timestampEntity = UserEventEntity(UserEventKey.USE_OUR_APP_SHORTCUT_ADDED, System.currentTimeMillis() - TimeUnit.DAYS.toMillis(2))
+        whenever(mockUserEventsStore.getUserEvent(UserEventKey.USE_OUR_APP_SHORTCUT_ADDED)).thenReturn(timestampEntity)
+        whenever(mockSettingsDataStore.hideTips).thenReturn(true)
+
+        val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = true, site = site(url = USE_OUR_APP_SHORTCUT_URL))
+        assertNull(value)
+    }
+
+    @Test
+    fun whenRefreshCtaWhileBrowsingAndSiteIsUseOurAppAndTwoDaysSinceShortcutAddedAndCtaShownThenReturnNull() = runBlockingTest {
+        givenUserIsEstablished()
+        val timestampEntity = UserEventEntity(UserEventKey.USE_OUR_APP_SHORTCUT_ADDED, System.currentTimeMillis() - TimeUnit.DAYS.toMillis(2))
+        whenever(mockUserEventsStore.getUserEvent(UserEventKey.USE_OUR_APP_SHORTCUT_ADDED)).thenReturn(timestampEntity)
+        whenever(mockDismissedCtaDao.exists(CtaId.USE_OUR_APP_DELETION)).thenReturn(true)
+
+        val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = true, site = site(url = USE_OUR_APP_SHORTCUT_URL))
+        assertNull(value)
+    }
+
+    @Test
+    fun whenRefreshCtaWhileBrowsingAndSiteIsUseOurAppAndLessThanTwoDaysSinceShortcutAddedThenReturnNull() = runBlockingTest {
+        givenUserIsEstablished()
+        val timestampEntity = UserEventEntity(UserEventKey.USE_OUR_APP_SHORTCUT_ADDED, System.currentTimeMillis() - TimeUnit.DAYS.toMillis(1))
+        whenever(mockUserEventsStore.getUserEvent(UserEventKey.USE_OUR_APP_SHORTCUT_ADDED)).thenReturn(timestampEntity)
+
+        val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = true, site = site(url = USE_OUR_APP_SHORTCUT_URL))
+        assertNull(value)
+    }
+
+    @Test
+    fun whenRefreshCtaWhileBrowsingAndSiteIsNotUseOurAppAndTwoDaysSinceShortcutAddedThenReturnNull() = runBlockingTest {
+        givenUserIsEstablished()
+        val timestampEntity = UserEventEntity(UserEventKey.USE_OUR_APP_SHORTCUT_ADDED, System.currentTimeMillis() - TimeUnit.DAYS.toMillis(2))
+        whenever(mockUserEventsStore.getUserEvent(UserEventKey.USE_OUR_APP_SHORTCUT_ADDED)).thenReturn(timestampEntity)
+
+        val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = true, site = site(url = "test"))
+        assertNull(value)
+    }
+
+    @Test
+    fun whenUseOurAppCtaDismissedThenStageCompleted() = coroutineRule.runBlocking {
+        givenUseOurAppActive()
+        testee.onUserDismissedCta(UseOurAppCta())
+        verify(mockUserStageStore).stageCompleted(AppStage.USE_OUR_APP_ONBOARDING)
     }
 
     private suspend fun givenDaxOnboardingActive() {
         whenever(mockUserStageStore.getUserAppStage()).thenReturn(AppStage.DAX_ONBOARDING)
     }
 
-    private suspend fun givenDaxOnboardingCompleted() {
+    private suspend fun givenUserIsEstablished() {
         whenever(mockUserStageStore.getUserAppStage()).thenReturn(AppStage.ESTABLISHED)
     }
 
@@ -446,6 +533,10 @@ class CtaViewModelTest {
 
     private suspend fun givenOnboardingActive() {
         whenever(mockUserStageStore.getUserAppStage()).thenReturn(AppStage.DAX_ONBOARDING)
+    }
+
+    private suspend fun givenUseOurAppActive() {
+        whenever(mockUserStageStore.getUserAppStage()).thenReturn(AppStage.USE_OUR_APP_ONBOARDING)
     }
 
     private fun site(

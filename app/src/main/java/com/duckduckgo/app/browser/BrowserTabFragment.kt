@@ -44,7 +44,6 @@ import androidx.annotation.AnyThread
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
-import androidx.core.content.pm.ShortcutManagerCompat
 import androidx.core.text.HtmlCompat
 import androidx.core.text.HtmlCompat.FROM_HTML_MODE_LEGACY
 import androidx.core.view.*
@@ -366,8 +365,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
     }
 
     private fun addHomeShortcut(homeShortcut: Command.AddHomeShortcut, context: Context) {
-        val shortcutInfo = shortcutBuilder.buildPinnedPageShortcut(context, homeShortcut)
-        ShortcutManagerCompat.requestPinShortcut(context, shortcutInfo, null)
+        shortcutBuilder.requestPinShortcut(context, homeShortcut)
     }
 
     private fun configureObservers() {
@@ -431,7 +429,6 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
     private fun showHome() {
         errorSnackbar.dismiss()
         newTabLayout.show()
-        showKeyboardImmediately()
         appBarLayout.setExpanded(true)
         webView?.onPause()
         webView?.hide()
@@ -1212,6 +1209,10 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
         viewModel.onUserClickCtaOkButton()
     }
 
+    override fun onDaxDialogSecondaryCtaClick() {
+        viewModel.onUserClickCtaSecondaryButton()
+    }
+
     private fun launchHideTipsDialog(context: Context, cta: Cta) {
         AlertDialog.Builder(context)
             .setTitle(R.string.hideTipsTitle)
@@ -1615,14 +1616,14 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
             when (configuration) {
                 is HomePanelCta -> showHomeCta(configuration)
                 is DaxBubbleCta -> showDaxCta(configuration)
-                is DaxDialogCta -> showDaxDialogCta(configuration)
+                is DialogCta -> showDaxDialogCta(configuration)
                 is HomeTopPanelCta -> showHomeTopCta(configuration)
             }
 
             viewModel.onCtaShown()
         }
 
-        private fun showDaxDialogCta(configuration: DaxDialogCta) {
+        private fun showDaxDialogCta(configuration: DialogCta) {
             hideHomeCta()
             hideDaxCta()
             activity?.let { activity ->

@@ -193,7 +193,20 @@ interface Pixel {
         FIREPROOF_WEBSITE_DELETED("m_fw_d"),
         FIREPROOF_LOGIN_TOGGLE_ENABLED("m_fw_d_e"),
         FIREPROOF_LOGIN_TOGGLE_DISABLED("m_fw_d_d"),
-        FIREPROOF_WEBSITE_UNDO("m_fw_u")
+        FIREPROOF_WEBSITE_UNDO("m_fw_u"),
+
+        USE_OUR_APP_NOTIFICATION_SUFFIX("uoa"),
+        USE_OUR_APP_DIALOG_SHOWN("m_uoa_d"),
+        USE_OUR_APP_DIALOG_OK("m_uoa_d_ok"),
+        USE_OUR_APP_SHORTCUT_ADDED("m_uoa_s_a"),
+        USE_OUR_APP_DIALOG_DELETE_SHOWN("m_uoa_dd"),
+        UOA_VISITED_AFTER_SHORTCUT("m_uoa_vas"),
+        UOA_VISITED_AFTER_NOTIFICATION("m_uoa_van"),
+        UOA_VISITED_AFTER_DELETE_CTA("m_uoa_vad"),
+
+        USE_OUR_APP_SHORTCUT_OPENED("m_sho_uoa_o"),
+        SHORTCUT_ADDED("m_sho_a"),
+        SHORTCUT_OPENED("m_sho_o"),
     }
 
     object PixelParameter {
