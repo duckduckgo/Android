@@ -30,6 +30,7 @@ import com.duckduckgo.app.browser.favicon.FaviconDownloader
 import com.duckduckgo.app.browser.logindetection.NavigationAwareLoginDetector
 import com.duckduckgo.app.browser.omnibar.QueryUrlConverter
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
+import com.duckduckgo.app.cta.db.DismissedCtaDao
 import com.duckduckgo.app.cta.ui.CtaViewModel
 import com.duckduckgo.app.feedback.api.FeedbackSubmitter
 import com.duckduckgo.app.feedback.ui.common.FeedbackViewModel
@@ -44,10 +45,12 @@ import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.model.SiteFactory
 import com.duckduckgo.app.global.rating.AppEnjoymentPromptEmitter
 import com.duckduckgo.app.global.rating.AppEnjoymentUserEventRecorder
+import com.duckduckgo.app.global.events.db.UserEventsStore
+import com.duckduckgo.app.global.useourapp.UseOurAppDetector
 import com.duckduckgo.app.icon.api.IconModifier
 import com.duckduckgo.app.icon.ui.ChangeIconViewModel
 import com.duckduckgo.app.launch.LaunchViewModel
-import com.duckduckgo.app.notification.AndroidNotificationScheduler
+import com.duckduckgo.app.notification.db.NotificationDao
 import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.onboarding.ui.OnboardingPageManager
 import com.duckduckgo.app.onboarding.ui.OnboardingViewModel
@@ -111,7 +114,10 @@ class ViewModelFactory @Inject constructor(
     private val onboardingPageManager: OnboardingPageManager,
     private val appInstallationReferrerStateListener: AppInstallationReferrerStateListener,
     private val appIconModifier: IconModifier,
-    private val notificationScheduler: AndroidNotificationScheduler,
+    private val userEventsStore: UserEventsStore,
+    private val notificationDao: NotificationDao,
+    private val userOurAppDetector: UseOurAppDetector,
+    private val dismissedCtaDao: DismissedCtaDao,
     private val dispatcherProvider: DispatcherProvider
 ) : ViewModelProvider.NewInstanceFactory() {
 
@@ -170,11 +176,13 @@ class ViewModelFactory @Inject constructor(
 
     private fun browserViewModel(): BrowserViewModel {
         return BrowserViewModel(
-            tabRepository,
-            queryUrlConverter,
-            dataClearer,
-            appEnjoymentPromptEmitter,
-            appEnjoymentUserEventRecorder
+            tabRepository = tabRepository,
+            queryUrlConverter = queryUrlConverter,
+            dataClearer = dataClearer,
+            appEnjoymentPromptEmitter = appEnjoymentPromptEmitter,
+            appEnjoymentUserEventRecorder = appEnjoymentUserEventRecorder,
+            ctaDao = dismissedCtaDao,
+            pixel = pixel
         )
     }
 
@@ -199,6 +207,9 @@ class ViewModelFactory @Inject constructor(
         ctaViewModel = ctaViewModel,
         searchCountDao = searchCountDao,
         pixel = pixel,
+        userEventsStore = userEventsStore,
+        notificationDao = notificationDao,
+        useOurAppDetector = userOurAppDetector,
         variantManager = variantManager
     )
 
