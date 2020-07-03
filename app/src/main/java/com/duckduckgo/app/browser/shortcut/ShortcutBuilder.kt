@@ -39,8 +39,8 @@ class ShortcutBuilder @Inject constructor() {
         intent.putExtra(SHORTCUT_EXTRA_ARG, true)
 
         val icon = when {
-            homeShortcut.icon != null -> IconCompat.createWithBitmap(homeShortcut.icon)
             homeShortcut.url == USE_OUR_APP_SHORTCUT_URL -> IconCompat.createWithResource(context, R.drawable.ic_fb_favicon)
+            homeShortcut.icon != null -> IconCompat.createWithBitmap(homeShortcut.icon)
             else -> IconCompat.createWithResource(context, R.drawable.logo_mini)
         }
 
