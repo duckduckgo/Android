@@ -19,18 +19,25 @@ package com.duckduckgo.app.browser
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
+import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.browser.BrowserViewModel.Command
 import com.duckduckgo.app.browser.BrowserViewModel.Command.DisplayMessage
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
+import com.duckduckgo.app.cta.db.DismissedCtaDao
+import com.duckduckgo.app.cta.model.CtaId
 import com.duckduckgo.app.fire.DataClearer
 import com.duckduckgo.app.global.rating.AppEnjoymentPromptEmitter
 import com.duckduckgo.app.global.rating.AppEnjoymentPromptOptions
 import com.duckduckgo.app.global.rating.AppEnjoymentUserEventRecorder
 import com.duckduckgo.app.global.rating.PromptCount
+import com.duckduckgo.app.global.useourapp.UseOurAppDetector.Companion.USE_OUR_APP_SHORTCUT_URL
 import com.duckduckgo.app.privacy.ui.PrivacyDashboardActivity
+import com.duckduckgo.app.runBlocking
+import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.nhaarman.mockitokotlin2.*
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
 import org.junit.After
 import org.junit.Assert.assertEquals
@@ -42,13 +49,16 @@ import org.mockito.ArgumentCaptor
 import org.mockito.Captor
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations
-import java.util.Arrays.asList
 
+@ExperimentalCoroutinesApi
 class BrowserViewModelTest {
 
     @get:Rule
     @Suppress("unused")
     var instantTaskExecutorRule = InstantTaskExecutorRule()
+
+    @get:Rule
+    var coroutinesTestRule = CoroutineTestRule()
 
     @Mock
     private lateinit var mockCommandObserver: Observer<Command>
@@ -71,6 +81,12 @@ class BrowserViewModelTest {
     @Mock
     private lateinit var mockAppEnjoymentPromptEmitter: AppEnjoymentPromptEmitter
 
+    @Mock
+    private lateinit var mockPixel: Pixel
+
+    @Mock
+    private lateinit var mockDismissedCtaDao: DismissedCtaDao
+
     private lateinit var testee: BrowserViewModel
 
     @Before
@@ -84,7 +100,10 @@ class BrowserViewModelTest {
             queryUrlConverter = mockOmnibarEntryConverter,
             dataClearer = mockAutomaticDataClearer,
             appEnjoymentPromptEmitter = mockAppEnjoymentPromptEmitter,
-            appEnjoymentUserEventRecorder = mockAppEnjoymentUserEventRecorder
+            appEnjoymentUserEventRecorder = mockAppEnjoymentUserEventRecorder,
+            ctaDao = mockDismissedCtaDao,
+            dispatchers = coroutinesTestRule.testDispatcherProvider,
+            pixel = mockPixel
         )
 
         testee.command.observeForever(mockCommandObserver)
@@ -122,7 +141,7 @@ class BrowserViewModelTest {
 
     @Test
     fun whenTabsUpdatedWithTabsThenNewTabNotLaunched() = runBlocking {
-        testee.onTabsUpdated(asList(TabEntity(TAB_ID, "", "", false, true, 0)))
+        testee.onTabsUpdated(listOf(TabEntity(TAB_ID, "", "", skipHome = false, viewed = true, position = 0)))
         verify(mockCommandObserver, never()).onChanged(any())
     }
 
@@ -163,6 +182,44 @@ class BrowserViewModelTest {
     @Test
     fun whenViewStateCreatedThenWebViewContentShouldBeHidden() {
         assertTrue(testee.viewState.value!!.hideWebContent)
+    }
+
+    @Test
+    fun whenOpenShortcutThenSelectByUrlOrNewTab() = coroutinesTestRule.runBlocking {
+        val url = "example.com"
+        whenever(mockOmnibarEntryConverter.convertQueryToUrl(url)).thenReturn(url)
+        testee.onOpenShortcut(url)
+        verify(mockTabRepository).selectByUrlOrNewTab(url)
+    }
+
+    @Test
+    fun whenOpenShortcutIfUrlIsUseOurAppUrlAndCtaHasBeenSeenThenFirePixel() {
+        givenUseOurAppCtaHasBeenSeen()
+        val url = USE_OUR_APP_SHORTCUT_URL
+        whenever(mockOmnibarEntryConverter.convertQueryToUrl(url)).thenReturn(url)
+        testee.onOpenShortcut(url)
+        verify(mockPixel).fire(Pixel.PixelName.USE_OUR_APP_SHORTCUT_OPENED)
+    }
+
+    @Test
+    fun whenOpenShortcutIfUrlIsUseOurAppUrlAndCtaHasNotBeenSeenThenDoNotFireUseOurAppPixel() {
+        val url = USE_OUR_APP_SHORTCUT_URL
+        whenever(mockOmnibarEntryConverter.convertQueryToUrl(url)).thenReturn(url)
+        testee.onOpenShortcut(url)
+        verify(mockPixel, never()).fire(Pixel.PixelName.USE_OUR_APP_SHORTCUT_OPENED)
+        verify(mockPixel).fire(Pixel.PixelName.SHORTCUT_OPENED)
+    }
+
+    @Test
+    fun whenOpenShortcutIfUrlIsNotUSeOurAppUrlThenFirePixel() {
+        val url = "example.com"
+        whenever(mockOmnibarEntryConverter.convertQueryToUrl(url)).thenReturn(url)
+        testee.onOpenShortcut(url)
+        verify(mockPixel).fire(Pixel.PixelName.SHORTCUT_OPENED)
+    }
+
+    private fun givenUseOurAppCtaHasBeenSeen() {
+        whenever(mockDismissedCtaDao.exists(CtaId.USE_OUR_APP)).thenReturn(true)
     }
 
     companion object {

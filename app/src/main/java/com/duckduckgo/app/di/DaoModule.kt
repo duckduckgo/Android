@@ -82,4 +82,7 @@ class DaoModule {
 
     @Provides
     fun fireproofWebsiteDao(database: AppDatabase) = database.fireproofWebsiteDao()
+
+    @Provides
+    fun userEventsDao(database: AppDatabase) = database.userEventsDao()
 }

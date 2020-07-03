@@ -32,10 +32,12 @@ import com.duckduckgo.app.notification.NotificationScheduler.DripA1NotificationW
 import com.duckduckgo.app.notification.NotificationScheduler.DripA2NotificationWorker
 import com.duckduckgo.app.notification.NotificationScheduler.DripB1NotificationWorker
 import com.duckduckgo.app.notification.NotificationScheduler.DripB2NotificationWorker
+import com.duckduckgo.app.notification.NotificationScheduler.UseOurAppNotificationWorker
 import com.duckduckgo.app.notification.db.NotificationDao
 import com.duckduckgo.app.notification.model.AppFeatureNotification
 import com.duckduckgo.app.notification.model.WebsiteNotification
 import com.duckduckgo.app.notification.model.ClearDataNotification
+import com.duckduckgo.app.notification.model.UseOurAppNotification
 import com.duckduckgo.app.notification.model.PrivacyProtectionNotification
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.api.OfflinePixelScheduler
@@ -52,6 +54,7 @@ class DaggerWorkerFactory(
     private val notificationFactory: NotificationFactory,
     private val clearDataNotification: ClearDataNotification,
     private val privacyProtectionNotification: PrivacyProtectionNotification,
+    private val useOurAppNotification: UseOurAppNotification,
     private val configurationDownloader: ConfigurationDownloader,
     private val dripA1Notification: WebsiteNotification,
     private val dripA2Notification: WebsiteNotification,
@@ -77,6 +80,7 @@ class DaggerWorkerFactory(
                 is DripA2NotificationWorker -> injectDripA2NotificationWorker(instance)
                 is DripB1NotificationWorker -> injectDripB1NotificationWorker(instance)
                 is DripB2NotificationWorker -> injectDripB2NotificationWorker(instance)
+                is UseOurAppNotificationWorker -> injectUseOurAppNotificationWorker(instance)
                 else -> Timber.i("No injection required for worker $workerClassName")
             }
 
@@ -147,5 +151,13 @@ class DaggerWorkerFactory(
         worker.factory = notificationFactory
         worker.pixel = pixel
         worker.notification = dripB2Notification
+    }
+
+    private fun injectUseOurAppNotificationWorker(worker: UseOurAppNotificationWorker) {
+        worker.manager = notificationManager
+        worker.notificationDao = notificationDao
+        worker.factory = notificationFactory
+        worker.pixel = pixel
+        worker.notification = useOurAppNotification
     }
 }
