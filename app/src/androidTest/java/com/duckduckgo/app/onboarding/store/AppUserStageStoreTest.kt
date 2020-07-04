@@ -19,11 +19,14 @@ package com.duckduckgo.app.onboarding.store
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.runBlocking
 import com.nhaarman.mockitokotlin2.mock
+import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.whenever
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
 
+@ExperimentalCoroutinesApi
 class AppUserStageStoreTest {
 
     @get:Rule
@@ -61,12 +64,36 @@ class AppUserStageStoreTest {
     }
 
     @Test
+    fun whenStageUseOurAppNotificationCompletedThenStageEstablishedReturned() = coroutineRule.runBlocking {
+        givenCurrentStage(AppStage.USE_OUR_APP_NOTIFICATION)
+
+        val nextStage = testee.stageCompleted(AppStage.USE_OUR_APP_NOTIFICATION)
+
+        assertEquals(AppStage.ESTABLISHED, nextStage)
+    }
+
+    @Test
+    fun whenStageUseOurAppOnboardingCompletedThenStageEstablishedReturned() = coroutineRule.runBlocking {
+        givenCurrentStage(AppStage.USE_OUR_APP_ONBOARDING)
+
+        val nextStage = testee.stageCompleted(AppStage.USE_OUR_APP_ONBOARDING)
+
+        assertEquals(AppStage.ESTABLISHED, nextStage)
+    }
+
+    @Test
     fun whenStageEstablishedCompletedThenStageEstablishedReturned() = coroutineRule.runBlocking {
         givenCurrentStage(AppStage.ESTABLISHED)
 
         val nextStage = testee.stageCompleted(AppStage.ESTABLISHED)
 
         assertEquals(AppStage.ESTABLISHED, nextStage)
+    }
+
+    @Test
+    fun whenMoveToStageThenUpdateUserStageInDao() = coroutineRule.runBlocking {
+        testee.moveToStage(AppStage.USE_OUR_APP_ONBOARDING)
+        verify(userStageDao).updateUserStage(AppStage.USE_OUR_APP_ONBOARDING)
     }
 
     private suspend fun givenCurrentStage(appStage: AppStage) {

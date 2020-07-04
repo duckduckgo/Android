@@ -28,8 +28,10 @@ import com.duckduckgo.app.notification.NotificationScheduler
 import com.duckduckgo.app.notification.db.NotificationDao
 import com.duckduckgo.app.notification.model.AppFeatureNotification
 import com.duckduckgo.app.notification.model.ClearDataNotification
+import com.duckduckgo.app.notification.model.UseOurAppNotification
 import com.duckduckgo.app.notification.model.PrivacyProtectionNotification
 import com.duckduckgo.app.notification.model.WebsiteNotification
+import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.privacy.db.PrivacyProtectionCountDao
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.VariantManager
@@ -57,6 +59,14 @@ class NotificationModule {
     @Singleton
     fun provideLocalBroadcastManager(context: Context): LocalBroadcastManager {
         return LocalBroadcastManager.getInstance(context)
+    }
+
+    @Provides
+    fun provideUseOurAppNotification(
+        context: Context,
+        notificationDao: NotificationDao
+    ): UseOurAppNotification {
+        return UseOurAppNotification(context, notificationDao)
     }
 
     @Provides
@@ -150,7 +160,8 @@ class NotificationModule {
         @Named("dripA2Notification") dripA2Notification: WebsiteNotification,
         @Named("dripB1Notification") dripB1Notification: AppFeatureNotification,
         @Named("dripB2Notification") dripB2Notification: AppFeatureNotification,
-        variantManager: VariantManager
+        variantManager: VariantManager,
+        stageStore: UserStageStore
     ): AndroidNotificationScheduler {
         return NotificationScheduler(
             workManager,
@@ -160,7 +171,8 @@ class NotificationModule {
             dripA2Notification,
             dripB1Notification,
             dripB2Notification,
-            variantManager
+            variantManager,
+            stageStore
         )
     }
 

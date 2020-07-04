@@ -23,6 +23,9 @@ import androidx.work.*
 import com.duckduckgo.app.notification.db.NotificationDao
 import com.duckduckgo.app.notification.model.Notification
 import com.duckduckgo.app.notification.model.SchedulableNotification
+import com.duckduckgo.app.onboarding.store.AppStage
+import com.duckduckgo.app.onboarding.store.UserStageStore
+import com.duckduckgo.app.onboarding.store.useOurAppNotification
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.VariantManager.VariantFeature.DripNotification
 import com.duckduckgo.app.statistics.VariantManager.VariantFeature.Day1DripB2Notification
@@ -51,11 +54,30 @@ class NotificationScheduler(
     private val dripA2Notification: SchedulableNotification,
     private val dripB1Notification: SchedulableNotification,
     private val dripB2Notification: SchedulableNotification,
-    private val variantManager: VariantManager
+    private val variantManager: VariantManager,
+    private val userStageStore: UserStageStore
 ) : AndroidNotificationScheduler {
 
     override suspend fun scheduleNextNotification() {
+        scheduleUseOurAppNotification()
         scheduleInactiveUserNotifications()
+    }
+
+    private suspend fun scheduleUseOurAppNotification() {
+        if (userStageStore.useOurAppNotification()) {
+            val operation = scheduleUniqueNotification(
+                OneTimeWorkRequestBuilder<UseOurAppNotificationWorker>(),
+                1,
+                TimeUnit.DAYS,
+                USE_OUR_APP_WORK_REQUEST_TAG
+            )
+            try {
+                operation.await()
+                userStageStore.stageCompleted(AppStage.USE_OUR_APP_NOTIFICATION)
+            } catch (e: Exception) {
+                Timber.v("Notification could not be scheduled: $e")
+            }
+        }
     }
 
     private suspend fun scheduleInactiveUserNotifications() {
@@ -94,6 +116,16 @@ class NotificationScheduler(
 
     private fun isNotDripVariant(): Boolean = !variant().hasFeature(DripNotification)
 
+    private fun scheduleUniqueNotification(builder: OneTimeWorkRequest.Builder, duration: Long, unit: TimeUnit, tag: String): Operation {
+        Timber.v("Scheduling unique notification")
+        val request = builder
+            .addTag(tag)
+            .setInitialDelay(duration, unit)
+            .build()
+
+        return workManager.enqueueUniqueWork(tag, ExistingWorkPolicy.KEEP, request)
+    }
+
     private fun scheduleNotification(builder: OneTimeWorkRequest.Builder, duration: Long, unit: TimeUnit, tag: String) {
         Timber.v("Scheduling notification")
         val request = builder
@@ -114,6 +146,7 @@ class NotificationScheduler(
     class DripA2NotificationWorker(context: Context, params: WorkerParameters) : SchedulableNotificationWorker(context, params)
     class DripB1NotificationWorker(context: Context, params: WorkerParameters) : SchedulableNotificationWorker(context, params)
     class DripB2NotificationWorker(context: Context, params: WorkerParameters) : SchedulableNotificationWorker(context, params)
+    class UseOurAppNotificationWorker(context: Context, params: WorkerParameters) : SchedulableNotificationWorker(context, params)
 
     open class SchedulableNotificationWorker(val context: Context, params: WorkerParameters) : CoroutineWorker(context, params) {
 
@@ -144,5 +177,6 @@ class NotificationScheduler(
 
     companion object {
         const val UNUSED_APP_WORK_REQUEST_TAG = "com.duckduckgo.notification.schedule"
+        const val USE_OUR_APP_WORK_REQUEST_TAG = "com.duckduckgo.notification.useOurApp"
     }
 }
