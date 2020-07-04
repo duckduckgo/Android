@@ -120,11 +120,19 @@ class BrowserViewModel(
     }
 
     suspend fun onNewTabRequested(isDefaultTab: Boolean = false): String {
-        return tabRepository.add(isDefaultTab = isDefaultTab)
+        return tabRepository.addWithSource(
+                isDefaultTab = isDefaultTab,
+                source = tabRepository.liveSelectedTab.value
+        )
     }
 
     suspend fun onOpenInNewTabRequested(query: String, skipHome: Boolean = false): String {
-        return tabRepository.add(queryUrlConverter.convertQueryToUrl(query), skipHome, isDefaultTab = false)
+        return tabRepository.addWithSource(
+                queryUrlConverter.convertQueryToUrl(query),
+                skipHome,
+                isDefaultTab = false,
+                source = tabRepository.liveSelectedTab.value
+        )
     }
 
     suspend fun onTabsUpdated(tabs: List<TabEntity>?) {

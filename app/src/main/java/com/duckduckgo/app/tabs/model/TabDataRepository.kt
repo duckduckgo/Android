@@ -51,6 +51,18 @@ class TabDataRepository @Inject constructor(
         return tabId
     }
 
+    override suspend fun addWithSource(url: String?, skipHome: Boolean, isDefaultTab: Boolean, source: TabEntity?): String {
+        val tabId = generateTabId()
+        add(
+                tabId,
+                buildSiteData(url),
+                skipHome = skipHome,
+                isDefaultTab = isDefaultTab,
+                source = source
+        )
+        return tabId
+    }
+
     private fun generateTabId() = UUID.randomUUID().toString()
 
     private fun buildSiteData(url: String?): MutableLiveData<Site> {
@@ -62,7 +74,7 @@ class TabDataRepository @Inject constructor(
         return data
     }
 
-    override suspend fun add(tabId: String, data: MutableLiveData<Site>, skipHome: Boolean, isDefaultTab: Boolean) {
+    override suspend fun add(tabId: String, data: MutableLiveData<Site>, skipHome: Boolean, isDefaultTab: Boolean, source: TabEntity?) {
         siteData[tabId] = data
         databaseExecutor().scheduleDirect {
 
@@ -81,7 +93,7 @@ class TabDataRepository @Inject constructor(
             }
             Timber.i("About to add a new tab, isDefaultTab: $isDefaultTab. $tabId, position: $position")
 
-            tabsDao.addAndSelectTab(TabEntity(tabId, data.value?.url, data.value?.title, skipHome, true, position))
+            tabsDao.addAndSelectTab(TabEntity(tabId, data.value?.url, data.value?.title, skipHome, true, position, null, source?.tabId))
         }
     }
 
@@ -126,6 +138,18 @@ class TabDataRepository @Inject constructor(
             tabsDao.deleteTabAndUpdateSelection(tab)
         }
         siteData.remove(tab.tabId)
+    }
+
+    override suspend fun deleteAndSelectSource(tabToDelete: TabEntity) {
+        databaseExecutor().scheduleDirect {
+            deleteOldPreviewImages(tabToDelete.tabId)
+            tabToDelete.sourceTabId?.let { sourceTabId ->
+                if (tabsDao.tab(sourceTabId) != null) {
+                    tabsDao.insertTabSelection(TabSelectionEntity(tabId = sourceTabId))
+                    tabsDao.deleteTab(tabToDelete)
+                }
+            }
+        }
     }
 
     override fun deleteAll() {

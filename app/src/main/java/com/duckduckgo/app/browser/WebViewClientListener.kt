@@ -47,6 +47,7 @@ interface WebViewClientListener {
     fun recoverFromRenderProcessGone()
     fun requiresAuthentication(request: BasicAuthenticationRequest)
     fun closeCurrentTab()
+    fun closeAndSelectSourceTab()
     fun upgradedToHttps()
     fun surrogateDetected(surrogate: SurrogateResponse)
 

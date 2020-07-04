@@ -52,6 +52,8 @@ class FileDownloader @Inject constructor(
         fun downloadStarted()
         fun downloadFinished(file: File, mimeType: String?)
         fun downloadFailed(message: String, downloadFailReason: DownloadFailReason)
+        fun downloadCancelled()
+        fun downloadOpened()
     }
 }
 

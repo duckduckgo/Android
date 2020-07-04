@@ -58,7 +58,7 @@ import com.duckduckgo.app.usage.search.SearchCountDao
 import com.duckduckgo.app.usage.search.SearchCountEntity
 
 @Database(
-    exportSchema = true, version = 21, entities = [
+    exportSchema = true, version = 22, entities = [
         TdsTracker::class,
         TdsEntity::class,
         TdsDomainEntity::class,
@@ -292,6 +292,12 @@ class MigrationsProvider(val context: Context) {
         }
     }
 
+    val MIGRATION_21_TO_22: Migration = object : Migration(21, 22) {
+        override fun migrate(database: SupportSQLiteDatabase) {
+            database.execSQL("ALTER TABLE `tabs` ADD COLUMN `sourceTabId` TEXT")
+        }
+    }
+
     val ALL_MIGRATIONS: List<Migration>
         get() = listOf(
             MIGRATION_1_TO_2,
@@ -313,7 +319,8 @@ class MigrationsProvider(val context: Context) {
             MIGRATION_17_TO_18,
             MIGRATION_18_TO_19,
             MIGRATION_19_TO_20,
-            MIGRATION_20_TO_21
+            MIGRATION_20_TO_21,
+            MIGRATION_21_TO_22
         )
 
     @Deprecated(

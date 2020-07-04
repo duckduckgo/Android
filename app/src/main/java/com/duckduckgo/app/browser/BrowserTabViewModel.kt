@@ -481,6 +481,17 @@ class BrowserTabViewModel(
         viewModelScope.launch { removeCurrentTabFromRepository() }
     }
 
+    override fun closeAndSelectSourceTab() {
+        GlobalScope.launch { removeAndSelectTabsFromRepository() }
+    }
+
+    private suspend fun removeAndSelectTabsFromRepository() {
+        val currentTab = tabRepository.liveSelectedTab.value
+        currentTab?.let {
+            tabRepository.deleteAndSelectSource(currentTab)
+        }
+    }
+
     fun onUserPressedForward() {
         navigationAwareLoginDetector.onEvent(NavigationEvent.UserAction.NavigateForward)
         if (!currentBrowserViewState().browserShowing) {
