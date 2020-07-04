@@ -122,7 +122,7 @@ class BrowserViewModel(
     suspend fun onNewTabRequested(isDefaultTab: Boolean = false): String {
         return tabRepository.addWithSource(
                 isDefaultTab = isDefaultTab,
-                source = tabRepository.liveSelectedTab.value
+                sourceTabId = tabRepository.liveSelectedTab.value?.tabId
         )
     }
 
@@ -131,7 +131,7 @@ class BrowserViewModel(
                 queryUrlConverter.convertQueryToUrl(query),
                 skipHome,
                 isDefaultTab = false,
-                source = tabRepository.liveSelectedTab.value
+                sourceTabId = tabRepository.liveSelectedTab.value?.tabId
         )
     }
 

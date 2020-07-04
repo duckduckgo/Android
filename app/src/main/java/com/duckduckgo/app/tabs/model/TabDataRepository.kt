@@ -51,14 +51,14 @@ class TabDataRepository @Inject constructor(
         return tabId
     }
 
-    override suspend fun addWithSource(url: String?, skipHome: Boolean, isDefaultTab: Boolean, source: TabEntity?): String {
+    override suspend fun addWithSource(url: String?, skipHome: Boolean, isDefaultTab: Boolean, sourceTabId: String?): String {
         val tabId = generateTabId()
         add(
                 tabId,
                 buildSiteData(url),
                 skipHome = skipHome,
                 isDefaultTab = isDefaultTab,
-                source = source
+                sourceTabId = sourceTabId
         )
         return tabId
     }
@@ -74,7 +74,7 @@ class TabDataRepository @Inject constructor(
         return data
     }
 
-    override suspend fun add(tabId: String, data: MutableLiveData<Site>, skipHome: Boolean, isDefaultTab: Boolean, source: TabEntity?) {
+    override suspend fun add(tabId: String, data: MutableLiveData<Site>, skipHome: Boolean, isDefaultTab: Boolean, sourceTabId: String?) {
         siteData[tabId] = data
         databaseExecutor().scheduleDirect {
 
@@ -93,7 +93,7 @@ class TabDataRepository @Inject constructor(
             }
             Timber.i("About to add a new tab, isDefaultTab: $isDefaultTab. $tabId, position: $position")
 
-            tabsDao.addAndSelectTab(TabEntity(tabId, data.value?.url, data.value?.title, skipHome, true, position, null, source?.tabId))
+            tabsDao.addAndSelectTab(TabEntity(tabId, data.value?.url, data.value?.title, skipHome, true, position, null, sourceTabId))
         }
     }
 
