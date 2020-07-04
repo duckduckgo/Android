@@ -143,13 +143,15 @@ class TabDataRepository @Inject constructor(
     override suspend fun deleteAndSelectSource(tabToDelete: TabEntity) {
         databaseExecutor().scheduleDirect {
             deleteOldPreviewImages(tabToDelete.tabId)
+
             tabToDelete.sourceTabId?.let { sourceTabId ->
                 if (tabsDao.tab(sourceTabId) != null) {
-                    tabsDao.insertTabSelection(TabSelectionEntity(tabId = sourceTabId))
                     tabsDao.deleteTab(tabToDelete)
+                    tabsDao.insertTabSelection(TabSelectionEntity(tabId = sourceTabId))
                 }
             }
         }
+        siteData.remove(tabToDelete.tabId)
     }
 
     override fun deleteAll() {

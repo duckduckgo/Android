@@ -482,7 +482,7 @@ class BrowserTabViewModel(
     }
 
     override fun closeAndSelectSourceTab() {
-        GlobalScope.launch { removeAndSelectTabsFromRepository() }
+        viewModelScope.launch { removeAndSelectTabsFromRepository() }
     }
 
     private suspend fun removeAndSelectTabsFromRepository() {

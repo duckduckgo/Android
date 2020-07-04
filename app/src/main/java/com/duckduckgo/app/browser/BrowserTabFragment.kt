@@ -1090,9 +1090,13 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
         }
     }
 
-    private fun closeAndReturnToSource() {
-        launch {
-            viewModel.closeAndSelectSourceTab()
+    private fun closeAndReturnToSourceIfBlankTab() {
+        if (viewModel.url == null) {
+            launch {
+                dismissDownloadFragment()
+                destroyWebView()
+                viewModel.closeAndSelectSourceTab()
+            }
         }
     }
 
@@ -1100,9 +1104,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
         return object : FileDownloadListener {
             override fun downloadStarted() {
                 fileDownloadNotificationManager.showDownloadInProgressNotification()
-                if (viewModel.url == null) {
-                    closeAndReturnToSource()
-                }
+                closeAndReturnToSourceIfBlankTab()
             }
 
             override fun downloadFinished(file: File, mimeType: String?) {
@@ -1127,15 +1129,11 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
             }
 
             override fun downloadCancelled() {
-                if (viewModel.url == null) {
-                    closeAndReturnToSource()
-                }
+                closeAndReturnToSourceIfBlankTab()
             }
 
             override fun downloadOpened() {
-                if (viewModel.url == null) {
-                    closeAndReturnToSource()
-                }
+                closeAndReturnToSourceIfBlankTab()
             }
 
             private fun showDownloadManagerAppSettings() {
