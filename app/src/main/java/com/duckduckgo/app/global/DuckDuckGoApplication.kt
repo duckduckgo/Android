@@ -194,6 +194,7 @@ open class DuckDuckGoApplication : HasAndroidInjector, Application(), LifecycleO
         scheduleOfflinePixels()
 
         notificationRegistrar.registerApp()
+        registerReceiver(shortcutReceiver, IntentFilter(ShortcutBuilder.USE_OUR_APP_SHORTCUT_ADDED_ACTION))
 
         initializeHttpsUpgrader()
         submitUnsentFirePixels()
@@ -299,7 +300,6 @@ open class DuckDuckGoApplication : HasAndroidInjector, Application(), LifecycleO
             Timber.i("Suppressing app launch pixel")
             return
         }
-        registerReceiver(shortcutReceiver, IntentFilter(ShortcutBuilder.USE_OUR_APP_SHORTCUT_ADDED_ACTION))
         pixel.fire(APP_LAUNCH)
     }
 
@@ -310,11 +310,6 @@ open class DuckDuckGoApplication : HasAndroidInjector, Application(), LifecycleO
             workScheduler.scheduleWork()
             atbInitializer.initializeAfterReferrerAvailable()
         }
-    }
-
-    @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
-    fun onAppStopped() {
-        unregisterReceiver(shortcutReceiver)
     }
 
     companion object {
