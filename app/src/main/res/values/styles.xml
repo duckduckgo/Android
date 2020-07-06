@@ -349,4 +349,37 @@
         <item name="android:statusBarColor">@android:color/transparent</item>
     </style>
 
+    <style name="LocationPermissionDialogTitle">
+        <item name="android:textAlignment">center</item>
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">?attr/normalTextColor</item>
+        <item name="android:layout_marginStart">10dp</item>
+        <item name="android:layout_marginEnd">10dp</item>
+        <item name="android:textSize">22sp</item>
+    </style>
+
+    <style name="LocationPermissionDialogSubtitle">
+        <item name="android:layout_marginTop">12dp</item>
+        <item name="android:textAlignment">center</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:layout_marginStart">10dp</item>
+        <item name="android:layout_marginEnd">10dp</item>
+        <item name="android:textColor">?attr/normalTextColor</item>
+        <item name="android:textSize">15sp</item>
+        <item name="layout_constraintWidth_percent">0.8</item>
+    </style>
+
+    <style name="LocationPermissionDialogButton">
+        <item name="android:textAllCaps">false</item>
+        <item name="android:layout_marginTop">12dp</item>
+        <item name="android:textAlignment">center</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:layout_marginStart">10dp</item>
+        <item name="android:layout_marginEnd">10dp</item>
+        <item name="android:textColor">?android:colorAccent</item>
+        <item name="android:textSize">15sp</item>
+        <item name="layout_constraintWidth_percent">0.8</item>
+    </style>
+
 </resources>

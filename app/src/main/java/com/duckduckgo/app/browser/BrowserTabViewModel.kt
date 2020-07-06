@@ -71,7 +71,8 @@ import com.duckduckgo.app.global.model.domain
 import com.duckduckgo.app.global.model.domainMatchesUrl
 import com.duckduckgo.app.location.data.LocationPermissionType
 import com.duckduckgo.app.location.data.LocationPermissionsRepository
-import com.duckduckgo.app.location.ui.LocationPermissionDialogFragment
+import com.duckduckgo.app.location.ui.SiteLocationPermissionFragment
+import com.duckduckgo.app.location.ui.SystemLocationPermissionFragment
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao
 import com.duckduckgo.app.privacy.db.UserWhitelistDao
 import com.duckduckgo.app.privacy.model.PrivacyGrade
@@ -124,7 +125,8 @@ class BrowserTabViewModel(
     private val pixel: Pixel,
     private val dispatchers: DispatcherProvider = DefaultDispatcherProvider(),
     private val variantManager: VariantManager
-) : WebViewClientListener, EditBookmarkListener, HttpAuthenticationListener, LocationPermissionDialogFragment.Listener, ViewModel() {
+) : WebViewClientListener, EditBookmarkListener, HttpAuthenticationListener, SiteLocationPermissionFragment.Listener,
+    SystemLocationPermissionFragment.SystemLocationPermissionDialogListener, ViewModel() {
 
     private var buildingSiteFactoryJob: Job? = null
 
@@ -233,8 +235,9 @@ class BrowserTabViewModel(
         object LaunchTabSwitcher : Command()
         object HideWebContent : Command()
         object ShowWebContent : Command()
-        object CheckSystemLocationPermission : Command()
+        class CheckSystemLocationPermission(val domain: String) : Command()
         class AskDomainPermission(val domain: String) : Command()
+        object RequestSystemLocationPermission: Command()
         class RefreshUserAgent(val host: String?, val isDesktop: Boolean) : Command()
         class ShowErrorWithAction(val action: () -> Unit) : Command()
         sealed class DaxCommand : Command() {
@@ -736,26 +739,37 @@ class BrowserTabViewModel(
         origin?.let { permissionOrigin = origin }
         callback?.let { permissionCallback = callback }
 
-        callback?.invoke(origin, true, false)
-
-        // if (origin != null) {
-        //     command.postValue(CheckSystemLocationPermission)
-        // } else {
-        //     onSiteLocationPermissionDenied()
-        // }
+        if (origin != null) {
+            command.postValue(CheckSystemLocationPermission(origin))
+        } else {
+            onSiteLocationPermissionDenied()
+        }
     }
 
     override fun onSiteLocationPermissionSelected(permission: LocationPermissionType) {
-        viewModelScope.launch {
-            withContext(dispatchers.io()) {
-                locationPermissionsRepository.saveLocationPermission(permissionOrigin, permission)
-            }
-        }
         if (permission == LocationPermissionType.ALLOW_ONCE || permission == LocationPermissionType.ALLOW_ALWAYS) {
             onSiteLocationPermissionAllowed()
         } else {
             onSiteLocationPermissionDenied()
         }
+        viewModelScope.launch {
+            withContext(dispatchers.io()) {
+                locationPermissionsRepository.saveLocationPermission(permissionOrigin, permission)
+            }
+        }
+    }
+
+    override fun onSystemLocationPermissionAllowed() {
+        command.postValue(RequestSystemLocationPermission)
+    }
+
+    override fun onSystemLocationPermissionNotAllowed() {
+        onSiteLocationPermissionDenied()
+    }
+
+    override fun onSystemLocationPermissionNeverAllowed() {
+        appSettingsPreferencesStore.appLocationPermission = false
+        onSiteLocationPermissionDenied()
     }
 
     fun onSystemLocationPermissionGranted() {
@@ -804,11 +818,6 @@ class BrowserTabViewModel(
 
     fun onSiteLocationPermissionDenied() {
         permissionCallback?.invoke(permissionOrigin, false, false)
-    }
-
-    fun onSystemLocationPermissionDeniedForever() {
-        appSettingsPreferencesStore.appLocationPermission = false
-        onSiteLocationPermissionDenied()
     }
 
     private fun registerSiteVisit() {
@@ -1398,4 +1407,5 @@ class BrowserTabViewModel(
     companion object {
         private const val FIXED_PROGRESS = 50
     }
+
 }

@@ -23,21 +23,44 @@ import android.annotation.SuppressLint
 import android.app.Activity.RESULT_OK
 import android.app.ActivityOptions
 import android.appwidget.AppWidgetManager
-import android.content.*
+import android.content.ActivityNotFoundException
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.content.ComponentName
+import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.media.MediaScannerConnection
 import android.net.Uri
-import android.os.*
+import android.os.Build
+import android.os.Bundle
+import android.os.Environment
+import android.os.Handler
+import android.os.Message
 import android.provider.Settings
 import android.text.Editable
-import android.view.*
-import android.view.View.*
+import android.view.ContextMenu
+import android.view.KeyEvent
+import android.view.LayoutInflater
+import android.view.MenuItem
+import android.view.View
+import android.view.View.GONE
+import android.view.View.OnFocusChangeListener
+import android.view.View.VISIBLE
+import android.view.View.inflate
+import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
-import android.webkit.*
+import android.webkit.ValueCallback
+import android.webkit.WebChromeClient
+import android.webkit.WebSettings
+import android.webkit.WebView
 import android.webkit.WebView.FindListener
 import android.webkit.WebView.HitTestResult
-import android.webkit.WebView.HitTestResult.*
+import android.webkit.WebView.HitTestResult.IMAGE_TYPE
+import android.webkit.WebView.HitTestResult.SRC_IMAGE_ANCHOR_TYPE
+import android.webkit.WebView.HitTestResult.UNKNOWN_TYPE
+import android.webkit.WebViewDatabase
 import android.widget.EditText
 import android.widget.TextView
 import androidx.annotation.AnyThread
@@ -47,16 +70,32 @@ import androidx.core.content.ContextCompat
 import androidx.core.content.pm.ShortcutManagerCompat
 import androidx.core.text.HtmlCompat
 import androidx.core.text.HtmlCompat.FROM_HTML_MODE_LEGACY
-import androidx.core.view.*
+import androidx.core.view.isEmpty
+import androidx.core.view.isInvisible
+import androidx.core.view.isNotEmpty
+import androidx.core.view.isVisible
+import androidx.core.view.postDelayed
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.transaction
-import androidx.lifecycle.*
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleObserver
+import androidx.lifecycle.Observer
+import androidx.lifecycle.OnLifecycleEvent
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion
 import com.duckduckgo.app.bookmarks.ui.EditBookmarkDialogFragment
 import com.duckduckgo.app.brokensite.BrokenSiteActivity
 import com.duckduckgo.app.brokensite.BrokenSiteData
-import com.duckduckgo.app.browser.BrowserTabViewModel.*
+import com.duckduckgo.app.browser.BrowserTabViewModel.AutoCompleteViewState
+import com.duckduckgo.app.browser.BrowserTabViewModel.BrowserViewState
+import com.duckduckgo.app.browser.BrowserTabViewModel.Command
+import com.duckduckgo.app.browser.BrowserTabViewModel.CtaViewState
+import com.duckduckgo.app.browser.BrowserTabViewModel.FindInPageViewState
+import com.duckduckgo.app.browser.BrowserTabViewModel.GlobalLayoutViewState
+import com.duckduckgo.app.browser.BrowserTabViewModel.LoadingViewState
+import com.duckduckgo.app.browser.BrowserTabViewModel.OmnibarViewState
+import com.duckduckgo.app.browser.BrowserTabViewModel.PrivacyGradeViewState
 import com.duckduckgo.app.browser.autocomplete.BrowserAutoCompleteSuggestionsAdapter
 import com.duckduckgo.app.browser.downloader.DownloadFailReason
 import com.duckduckgo.app.browser.downloader.FileDownloadNotificationManager
@@ -76,13 +115,20 @@ import com.duckduckgo.app.browser.tabpreview.WebViewPreviewGenerator
 import com.duckduckgo.app.browser.tabpreview.WebViewPreviewPersister
 import com.duckduckgo.app.browser.ui.HttpAuthenticationDialogFragment
 import com.duckduckgo.app.browser.useragent.UserAgentProvider
-import com.duckduckgo.app.cta.ui.*
+import com.duckduckgo.app.cta.ui.Cta
+import com.duckduckgo.app.cta.ui.CtaViewModel
+import com.duckduckgo.app.cta.ui.DaxBubbleCta
+import com.duckduckgo.app.cta.ui.DaxDialogCta
+import com.duckduckgo.app.cta.ui.HomePanelCta
+import com.duckduckgo.app.cta.ui.HomeTopPanelCta
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
 import com.duckduckgo.app.fire.fireproofwebsite.data.website
 import com.duckduckgo.app.global.ViewModelFactory
 import com.duckduckgo.app.global.model.orderedTrackingEntities
 import com.duckduckgo.app.global.view.*
 import com.duckduckgo.app.location.data.LocationPermissionType
+import com.duckduckgo.app.location.ui.SiteLocationPermissionFragment
+import com.duckduckgo.app.location.ui.SystemLocationPermissionFragment
 import com.duckduckgo.app.privacy.renderer.icon
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -94,16 +140,41 @@ import com.duckduckgo.app.widget.ui.AddWidgetInstructionsActivity
 import com.duckduckgo.widget.SearchWidgetLight
 import com.google.android.material.snackbar.Snackbar
 import dagger.android.support.AndroidSupportInjection
-import kotlinx.android.synthetic.main.fragment_browser_tab.*
-import kotlinx.android.synthetic.main.include_add_widget_instruction_buttons.view.*
-import kotlinx.android.synthetic.main.include_cta_buttons.view.*
-import kotlinx.android.synthetic.main.include_dax_dialog_cta.*
-import kotlinx.android.synthetic.main.include_find_in_page.*
-import kotlinx.android.synthetic.main.include_new_browser_tab.*
+import kotlinx.android.synthetic.main.fragment_browser_tab.autoCompleteSuggestionsList
+import kotlinx.android.synthetic.main.fragment_browser_tab.browserLayout
+import kotlinx.android.synthetic.main.fragment_browser_tab.focusDummy
+import kotlinx.android.synthetic.main.fragment_browser_tab.rootView
+import kotlinx.android.synthetic.main.fragment_browser_tab.webViewContainer
+import kotlinx.android.synthetic.main.fragment_browser_tab.webViewFullScreenContainer
+import kotlinx.android.synthetic.main.include_add_widget_instruction_buttons.view.closeButton
+import kotlinx.android.synthetic.main.include_cta_buttons.view.ctaDismissButton
+import kotlinx.android.synthetic.main.include_cta_buttons.view.ctaOkButton
+import kotlinx.android.synthetic.main.include_dax_dialog_cta.daxCtaContainer
+import kotlinx.android.synthetic.main.include_dax_dialog_cta.dialogTextCta
+import kotlinx.android.synthetic.main.include_find_in_page.closeFindInPagePanel
+import kotlinx.android.synthetic.main.include_find_in_page.findInPageContainer
+import kotlinx.android.synthetic.main.include_find_in_page.findInPageInput
+import kotlinx.android.synthetic.main.include_find_in_page.findInPageMatches
+import kotlinx.android.synthetic.main.include_find_in_page.nextSearchTermButton
+import kotlinx.android.synthetic.main.include_find_in_page.previousSearchTermButton
+import kotlinx.android.synthetic.main.include_new_browser_tab.ctaContainer
+import kotlinx.android.synthetic.main.include_new_browser_tab.ctaTopContainer
+import kotlinx.android.synthetic.main.include_new_browser_tab.ddgLogo
+import kotlinx.android.synthetic.main.include_new_browser_tab.newTabLayout
 import kotlinx.android.synthetic.main.include_omnibar_toolbar.*
-import kotlinx.android.synthetic.main.include_omnibar_toolbar.view.*
+import kotlinx.android.synthetic.main.include_omnibar_toolbar.view.browserMenu
+import kotlinx.android.synthetic.main.include_omnibar_toolbar.view.fireIconMenu
+import kotlinx.android.synthetic.main.include_omnibar_toolbar.view.privacyGradeButton
+import kotlinx.android.synthetic.main.include_omnibar_toolbar.view.tabsMenu
 import kotlinx.android.synthetic.main.popup_window_browser_menu.view.*
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.jetbrains.anko.longToast
 import org.jetbrains.anko.share
 import timber.log.Timber
@@ -112,7 +183,7 @@ import javax.inject.Inject
 import kotlin.concurrent.thread
 import kotlin.coroutines.CoroutineContext
 
-class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogListener, TrackersAnimatorListener {
+class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogListener, TrackersAnimatorListener{
 
     private val supervisorJob = SupervisorJob()
 
@@ -557,66 +628,26 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
             is Command.DaxCommand.HideDaxDialog -> showHideTipsDialog(it.cta)
             is Command.HideWebContent -> webView?.hide()
             is Command.ShowWebContent -> webView?.show()
-            is Command.CheckSystemLocationPermission -> checkSystemLocationPermission()
+            is Command.CheckSystemLocationPermission -> checkSystemLocationPermission(it.domain)
+            is Command.RequestSystemLocationPermission -> requestPermissions(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), PERMISSION_REQUEST_GEO_LOCATION)
             is Command.AskDomainPermission -> askSiteLocationPermission(it.domain)
             is Command.RefreshUserAgent -> refreshUserAgent(it.host, it.isDesktop)
             is Command.AskToFireproofWebsite -> askToFireproofWebsite(requireContext(), it.fireproofWebsite)
         }
     }
 
-    private fun checkSystemLocationPermission() {
+    private fun checkSystemLocationPermission(domain: String) {
         if (ContextCompat.checkSelfPermission(requireActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            launchSystemLocationPermissionInformationDialog {
-                requestPermissions(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), PERMISSION_REQUEST_GEO_LOCATION)
-            }
+            val dialog = SystemLocationPermissionFragment.instance(domain, viewModel)
+            dialog.show(requireActivity().supportFragmentManager, SystemLocationPermissionFragment.SYSTEM_LOCATION_PERMISSION_TAG)
         } else {
             viewModel.onSystemLocationPermissionGranted()
         }
     }
 
-    private fun launchSystemLocationPermissionInformationDialog(onAccepted: () -> Unit) {
-        val isShowing = alertDialog?.isShowing
-
-        if (isShowing != true) {
-            alertDialog = AlertDialog.Builder(requireContext())
-                .setTitle("We have something to ask")
-                .setMessage("This site is wants to see your location. If you want to give it access we first need to ask Location permissions. We won't use the location for anything, would you like to give Location permission?")
-                .setPositiveButton(R.string.yes) { dialog, _ ->
-                    onAccepted()
-                    dialog.dismiss()
-                }
-                .setNeutralButton("No, never") { _, _ ->
-                    viewModel.onSystemLocationPermissionDeniedForever()
-                }
-                .setNegativeButton(R.string.no) { dialog, _ ->
-                    dialog.dismiss()
-                }
-                .show()
-        }
-    }
-
     private fun askSiteLocationPermission(domain: String) {
-        // this is not Custom Dialog 2 yet
-        launchSiteLocatioPermissionDialg()
-    }
-
-    private fun launchSiteLocatioPermissionDialg() {
-        val isShowing = alertDialog?.isShowing
-
-        if (isShowing != true) {
-            alertDialog = AlertDialog.Builder(requireContext())
-                .setTitle("Allow Location Permissions?")
-                .setMessage("Why? Don't worry, we are not going to store anything but the Maps function will give you better results.")
-                .setPositiveButton(R.string.yes) { dialog, _ ->
-                    viewModel.onSiteLocationPermissionSelected(LocationPermissionType.ALLOW_ONCE)
-                    dialog.dismiss()
-                }
-                .setNegativeButton(R.string.no) { dialog, _ ->
-                    viewModel.onSiteLocationPermissionSelected(LocationPermissionType.DENY_ONCE)
-                    dialog.dismiss()
-                }
-                .show()
-        }
+        val dialog = SiteLocationPermissionFragment.instance(domain, viewModel)
+        dialog.show(requireActivity().supportFragmentManager, SiteLocationPermissionFragment.SITE_LOCATION_PERMISSION_TAG)
     }
 
     private fun launchBrokenSiteFeedback(data: BrokenSiteData) {
@@ -1814,4 +1845,5 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
         private fun shouldUpdateOmnibarTextInput(viewState: OmnibarViewState, omnibarInput: String?) =
             (!viewState.isEditing || omnibarInput.isNullOrEmpty()) && omnibarTextInput.isDifferent(omnibarInput)
     }
+
 }

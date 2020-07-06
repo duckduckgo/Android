@@ -41,4 +41,17 @@
     <string name="fireproofWebsiteToogleText">Ask When Signing In</string>
     <!-- !! String changed translate and replace !! -->
     <string name="fireproofWebsiteFeatureDescription">Websites rely on cookies to keep you signed in. When you Fireproof a site, cookies won\'t be erased and you\'ll stay signed in, even after using the Fire Button. We still block third-party trackers found on Fireproof websites.</string>
+
+    <!-- Precise Location -->
+    <string name="preciseLocationSystemDialogTitle">Allow %s to access this device\'s location?</string>
+    <string name="preciseLocationSystemDialogSubtitle">The show your local results, we need to know where you are when using the app.</string>
+    <string name="preciseLocationSystemDialogAllow">Allow Location Services</string>
+    <string name="preciseLocationSystemDialogDeny">Maybe Later</string>
+    <string name="preciseLocationSystemDialogNeverAllow">Don\'t Ask Again</string>
+    <string name="preciseLocationSiteDialogTitle">Allow %s to access this device\'s location?</string>
+    <string name="preciseLocationSiteDialogSubtitle">The website is requesting access to your location while on the site.</string>
+    <string name="preciseLocationSiteDialogAllowAlways">Always Allow</string>
+    <string name="preciseLocationSiteDialogAllowOnce">Allow this Session</string>
+    <string name="preciseLocationSiteDialogDenyAlways">Always Deny</string>
+    <string name="preciseLocationSiteDialogDenyOnce">Deny this Session</string>
 </resources>
