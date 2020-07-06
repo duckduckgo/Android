@@ -123,7 +123,7 @@ class BrowserChromeClient @Inject constructor(private val uncaughtExceptionRepos
     }
 
     override fun onGeolocationPermissionsShowPrompt(origin: String?, callback: GeolocationPermissions.Callback?) {
-        webViewClientListener?.onGeoLocationPermissionRequested(origin, callback)
+        webViewClientListener?.onSiteLocationPermissionRequested(origin, callback)
     }
 
 }

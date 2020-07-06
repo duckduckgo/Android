@@ -557,35 +557,36 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
             is Command.DaxCommand.HideDaxDialog -> showHideTipsDialog(it.cta)
             is Command.HideWebContent -> webView?.hide()
             is Command.ShowWebContent -> webView?.show()
-            is Command.CheckGeoPermission -> checkGeoPermission()
-            is Command.AskDomainPermission -> askDomainPermission(it.domain)
+            is Command.CheckSystemLocationPermission -> checkSystemLocationPermission()
+            is Command.AskDomainPermission -> askSiteLocationPermission(it.domain)
             is Command.RefreshUserAgent -> refreshUserAgent(it.host, it.isDesktop)
             is Command.AskToFireproofWebsite -> askToFireproofWebsite(requireContext(), it.fireproofWebsite)
         }
     }
 
-    private fun checkGeoPermission() {
+    private fun checkSystemLocationPermission() {
         if (ContextCompat.checkSelfPermission(requireActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            launchLocationPermissionInformationDialog {
+            launchSystemLocationPermissionInformationDialog {
                 requestPermissions(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), PERMISSION_REQUEST_GEO_LOCATION)
             }
         } else {
-            viewModel.onGeoLocationPermissionGranted()
+            viewModel.onSystemLocationPermissionGranted()
         }
     }
 
-    private fun launchLocationPermissionInformationDialog(onAccepted: () -> Unit) {
+    private fun launchSystemLocationPermissionInformationDialog(onAccepted: () -> Unit) {
         val isShowing = alertDialog?.isShowing
 
         if (isShowing != true) {
             alertDialog = AlertDialog.Builder(requireContext())
                 .setTitle("We have something to ask")
                 .setMessage("This site is wants to see your location. If you want to give it access we first need to ask Location permissions. We won't use the location for anything, would you like to give Location permission?")
-                .setPositiveButton(R.string.yes) { _, _ ->
+                .setPositiveButton(R.string.yes) { dialog, _ ->
                     onAccepted()
+                    dialog.dismiss()
                 }
                 .setNeutralButton("No, never") { _, _ ->
-                    viewModel.onLocationPermissionDeniedForever()
+                    viewModel.onSystemLocationPermissionDeniedForever()
                 }
                 .setNegativeButton(R.string.no) { dialog, _ ->
                     dialog.dismiss()
@@ -594,12 +595,12 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
         }
     }
 
-    private fun askDomainPermission(domain: String) {
+    private fun askSiteLocationPermission(domain: String) {
         // this is not Custom Dialog 2 yet
-        launchLocationPermissionDialog()
+        launchSiteLocatioPermissionDialg()
     }
 
-    private fun launchLocationPermissionDialog() {
+    private fun launchSiteLocatioPermissionDialg() {
         val isShowing = alertDialog?.isShowing
 
         if (isShowing != true) {
@@ -607,11 +608,11 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
                 .setTitle("Allow Location Permissions?")
                 .setMessage("Why? Don't worry, we are not going to store anything but the Maps function will give you better results.")
                 .setPositiveButton(R.string.yes) { dialog, _ ->
-                    viewModel.onGeoLocationPermissionSelected(LocationPermissionType.ALLOW_ONCE)
+                    viewModel.onSiteLocationPermissionSelected(LocationPermissionType.ALLOW_ONCE)
                     dialog.dismiss()
                 }
                 .setNegativeButton(R.string.no) { dialog, _ ->
-                    viewModel.onGeoLocationPermissionSelected(LocationPermissionType.DENY_ONCE)
+                    viewModel.onSiteLocationPermissionSelected(LocationPermissionType.DENY_ONCE)
                     dialog.dismiss()
                 }
                 .show()
@@ -1230,10 +1231,10 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
             PERMISSION_REQUEST_GEO_LOCATION -> {
                 if ((grantResults.isNotEmpty()) && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     Timber.i("System Geo location permission granted")
-                    viewModel.onGeoLocationPermissionGranted()
+                    viewModel.onSystemLocationPermissionGranted()
                 } else {
                     Timber.i("System Geo location permission refused")
-                    viewModel.onGeoLocationPermissionDenied()
+                    viewModel.onSiteLocationPermissionDenied()
                 }
             }
         }

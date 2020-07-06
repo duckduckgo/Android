@@ -32,7 +32,7 @@ interface WebViewClientListener {
     fun pageRefreshed(refreshedUrl: String)
     fun progressChanged(newProgress: Int)
 
-    fun onGeoLocationPermissionRequested(origin: String?, callback: GeolocationPermissions.Callback?)
+    fun onSiteLocationPermissionRequested(origin: String?, callback: GeolocationPermissions.Callback?)
 
     fun titleReceived(newTitle: String)
     fun trackerDetected(event: TrackingEvent)

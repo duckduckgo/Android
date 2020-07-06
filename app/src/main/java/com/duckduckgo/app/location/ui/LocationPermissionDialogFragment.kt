@@ -28,7 +28,7 @@ import org.jetbrains.anko.find
 class LocationPermissionDialogFragment : DialogFragment() {
 
     interface Listener {
-        fun onGeoLocationPermissionSelected(permission: LocationPermissionType)
+        fun onSiteLocationPermissionSelected(permission: LocationPermissionType)
     }
 
     private lateinit var listener: Listener
@@ -43,19 +43,19 @@ class LocationPermissionDialogFragment : DialogFragment() {
         val rootView = layoutInflater.inflate(R.layout.content_location_permission_dialog, null)
 
         rootView.find<TextView>(R.id.locationPermissionDialogAllowAlways).setOnClickListener {
-            listener.onGeoLocationPermissionSelected(LocationPermissionType.ALLOW_ALWAYS)
+            listener.onSiteLocationPermissionSelected(LocationPermissionType.ALLOW_ALWAYS)
         }
 
         rootView.find<TextView>(R.id.locationPermissionDialogAllowAlways).setOnClickListener {
-            listener.onGeoLocationPermissionSelected(LocationPermissionType.ALLOW_ONCE)
+            listener.onSiteLocationPermissionSelected(LocationPermissionType.ALLOW_ONCE)
         }
 
         rootView.find<TextView>(R.id.locationPermissionDialogAllowAlways).setOnClickListener {
-            listener.onGeoLocationPermissionSelected(LocationPermissionType.DENY_ALWAYS)
+            listener.onSiteLocationPermissionSelected(LocationPermissionType.DENY_ALWAYS)
         }
 
         rootView.find<TextView>(R.id.locationPermissionDialogAllowAlways).setOnClickListener {
-            listener.onGeoLocationPermissionSelected(LocationPermissionType.DENY_ONCE)
+            listener.onSiteLocationPermissionSelected(LocationPermissionType.DENY_ONCE)
         }
 
         return AlertDialog.Builder(requireActivity(), R.style.AlertDialogTheme)

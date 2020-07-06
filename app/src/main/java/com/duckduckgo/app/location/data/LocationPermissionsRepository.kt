@@ -53,9 +53,11 @@ class LocationPermissionsRepository @Inject constructor(
         return true
     }
 
-    suspend fun removeLocationPermission(fireproofWebsiteEntity: LocationPermissionEntity) {
+    suspend fun removeLocationPermission(domain: String) {
         withContext(dispatchers.io()) {
-            locationPermissionsDao.delete(fireproofWebsiteEntity)
+            val entity = locationPermissionsDao.getPermission(domain)
+            entity?.let { locationPermissionsDao.delete(entity) }
+
         }
     }
 }
