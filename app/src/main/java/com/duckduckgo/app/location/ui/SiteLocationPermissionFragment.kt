@@ -17,12 +17,17 @@
 package com.duckduckgo.app.location.ui
 
 import android.app.Dialog
+import android.net.Uri
 import android.os.Bundle
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.DialogFragment
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.global.faviconLocation
+import com.duckduckgo.app.global.image.GlideApp
 import com.duckduckgo.app.location.data.LocationPermissionType
+import kotlinx.android.synthetic.main.view_bookmark_entry.view.favicon
 import org.jetbrains.anko.find
 import java.util.Locale
 
@@ -45,6 +50,7 @@ class SiteLocationPermissionFragment : DialogFragment() {
         val rootView = layoutInflater.inflate(R.layout.content_site_location_permission_dialog, null)
 
         val title = rootView.find<TextView>(R.id.sitePermissionDialogTitle)
+        val favicon = rootView.find<ImageView>(R.id.sitePermissionDialogFavicon)
         val allowAlways = rootView.find<TextView>(R.id.siteAllowAlwaysLocationPermission)
         val allowOnce = rootView.find<TextView>(R.id.siteAllowOnceLocationPermission)
         val denyOnce = rootView.find<TextView>(R.id.siteDenyOnceLocationPermission)
@@ -55,9 +61,30 @@ class SiteLocationPermissionFragment : DialogFragment() {
 
         validateBundleArguments()
         populateTitle(title)
+        populateFavicon(favicon)
         configureListeners(allowAlways, allowOnce, denyOnce, denyAlways)
 
         return alertDialog.create()
+    }
+
+    private fun populateTitle(title: TextView) {
+        arguments?.let { args ->
+            val originUrl = args.getString(KEY_REQUEST_ORIGIN)
+            val dialogTitle = String.format(Locale.US, getString(R.string.preciseLocationSiteDialogTitle), originUrl)
+            title.text = dialogTitle
+        }
+    }
+
+    private fun populateFavicon(imageView: ImageView){
+        arguments?.let { args ->
+            val originUrl = args.getString(KEY_REQUEST_ORIGIN)
+            val faviconUrl = Uri.parse(originUrl).faviconLocation()
+
+            GlideApp.with(requireContext())
+                .load(faviconUrl)
+                .error(R.drawable.ic_dax_toolbar)
+                .into(imageView)
+        }
     }
 
     private fun configureListeners(
@@ -81,14 +108,6 @@ class SiteLocationPermissionFragment : DialogFragment() {
         denyAlways.setOnClickListener {
             dismiss()
             listener.onSiteLocationPermissionSelected(LocationPermissionType.DENY_ALWAYS)
-        }
-    }
-
-    private fun populateTitle(title: TextView) {
-        arguments?.let { args ->
-            val originUrl = args.getString(KEY_REQUEST_ORIGIN)
-            val dialogTitle = String.format(Locale.US, getString(R.string.preciseLocationSiteDialogTitle), originUrl)
-            title.text = dialogTitle
         }
     }
 

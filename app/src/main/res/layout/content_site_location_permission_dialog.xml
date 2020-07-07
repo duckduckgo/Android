@@ -25,7 +25,7 @@
     android:background="?toolbarBgColor">
 
         <ImageView
-            android:id="@+id/faviconImage"
+            android:id="@+id/sitePermissionDialogFavicon"
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:layout_marginTop="@dimen/feedbackTitleMarginTop"

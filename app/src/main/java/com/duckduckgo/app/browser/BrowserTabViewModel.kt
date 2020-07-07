@@ -237,7 +237,7 @@ class BrowserTabViewModel(
         object ShowWebContent : Command()
         class CheckSystemLocationPermission(val domain: String) : Command()
         class AskDomainPermission(val domain: String) : Command()
-        object RequestSystemLocationPermission: Command()
+        object RequestSystemLocationPermission : Command()
         class RefreshUserAgent(val host: String?, val isDesktop: Boolean) : Command()
         class ShowErrorWithAction(val action: () -> Unit) : Command()
         sealed class DaxCommand : Command() {
@@ -753,9 +753,7 @@ class BrowserTabViewModel(
             onSiteLocationPermissionDenied()
         }
         viewModelScope.launch {
-            withContext(dispatchers.io()) {
-                locationPermissionsRepository.saveLocationPermission(permissionOrigin, permission)
-            }
+            locationPermissionsRepository.saveLocationPermission(permissionOrigin, permission)
         }
     }
 
@@ -774,23 +772,12 @@ class BrowserTabViewModel(
 
     fun onSystemLocationPermissionGranted() {
         viewModelScope.launch {
-
-            val userHasGivenPermission = withContext(dispatchers.io()) {
-                locationPermissionsRepository.hasUserGivenPermissionTo(permissionOrigin)
-            }
-
+            val userHasGivenPermission = locationPermissionsRepository.hasUserGivenPermissionTo(permissionOrigin)
             if (userHasGivenPermission) {
-                val domainPermission = withContext(dispatchers.io()) {
-                    locationPermissionsRepository.getDomainPermission(permissionOrigin)
-                }
-
-                withContext(Dispatchers.Main) {
-                    reactToSitePermission(domainPermission)
-                }
+                val domainPermission = locationPermissionsRepository.getDomainPermission(permissionOrigin)
+                reactToSitePermission(domainPermission)
             } else {
-                withContext(Dispatchers.Main) {
-                    command.postValue(AskDomainPermission(permissionOrigin))
-                }
+                command.postValue(AskDomainPermission(permissionOrigin))
             }
         }
     }
@@ -813,10 +800,16 @@ class BrowserTabViewModel(
     }
 
     private fun onSiteLocationPermissionAllowed() {
+        val geoLocationPermissions = GeolocationPermissions.getInstance()
+        geoLocationPermissions.allow(permissionOrigin)
+
         permissionCallback?.invoke(permissionOrigin, true, false)
     }
 
     fun onSiteLocationPermissionDenied() {
+        val geoLocationPermissions = GeolocationPermissions.getInstance()
+        geoLocationPermissions.clear(permissionOrigin)
+
         permissionCallback?.invoke(permissionOrigin, false, false)
     }
 
@@ -1407,5 +1400,4 @@ class BrowserTabViewModel(
     companion object {
         private const val FIXED_PROGRESS = 50
     }
-
 }
