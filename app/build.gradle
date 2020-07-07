@@ -5,6 +5,7 @@ apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
 apply from: '../versioning.gradle'
 apply from: "$rootDir/ktlint.gradle"
+apply plugin: 'com.juliozynger.floorplan'
 
 ext {
     USE_ORCHESTRATOR = project.hasProperty('orchestrator') ? project.property('orchestrator') : false
@@ -93,6 +94,16 @@ android {
     } else {
         println "Signing properties not found at ${propertiesPath}, releases will NOT succeed"
         android.buildTypes.release.signingConfig = null
+    }
+}
+
+floorPlan {
+    schemaLocation = "$projectDir/schemas".toString()
+    outputLocation = "$projectDir/floorplan-output".toString()
+    outputFormat {
+        svg {
+            enabled = true
+        }
     }
 }
 
