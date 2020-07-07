@@ -20,71 +20,72 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:orientation="vertical"
+    android:background="?toolbarBgColor"
     android:gravity="center"
-    android:background="?toolbarBgColor">
+    android:orientation="vertical">
 
-        <ImageView
-            android:id="@+id/sitePermissionDialogFavicon"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:layout_marginTop="@dimen/feedbackTitleMarginTop"
-            android:importantForAccessibility="no"
-            android:src="@drawable/ic_dax_toolbar"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+    <ImageView
+        android:id="@+id/sitePermissionDialogFavicon"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_marginTop="24dp"
+        android:importantForAccessibility="no"
+        android:src="@drawable/ic_dax_toolbar"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
-        <TextView
-            android:id="@+id/sitePermissionDialogTitle"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            style="@style/LocationPermissionDialogTitle"
-            android:layout_marginTop="12dp"
-            android:text="@string/preciseLocationSiteDialogTitle" />
+    <TextView
+        android:id="@+id/sitePermissionDialogTitle"
+        style="@style/LocationPermissionDialogTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="@string/preciseLocationSiteDialogTitle" />
 
-        <TextView
-            android:id="@+id/sitePermissionDialogSubtitle"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            style="@style/LocationPermissionDialogSubtitle"
-            android:layout_marginTop="12dp"
-            android:text="@string/preciseLocationSiteDialogSubtitle" />
+    <TextView
+        android:id="@+id/sitePermissionDialogSubtitle"
+        style="@style/LocationPermissionDialogSubtitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:layout_marginBottom="24dp"
+        android:text="@string/preciseLocationSiteDialogSubtitle" />
 
-        <Button
-            android:id="@+id/siteAllowAlwaysLocationPermission"
-            style="@style/LocationPermissionDialogButton"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="?selectableItemBackground"
-            android:text="@string/preciseLocationSiteDialogAllowAlways"
-            android:textSize="15sp" />
+    <View style="@style/LocationPermissionDialogSplitter" />
 
-        <Button
-            android:id="@+id/siteAllowOnceLocationPermission"
-            style="@style/LocationPermissionDialogButton"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="?selectableItemBackground"
-            android:text="@string/preciseLocationSiteDialogAllowOnce"
-            android:textSize="15sp" />
+    <Button
+        android:id="@+id/siteAllowAlwaysLocationPermission"
+        style="@style/LocationPermissionDialogButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/preciseLocationSiteDialogAllowAlways" />
 
-        <Button
-            android:id="@+id/siteDenyOnceLocationPermission"
-            style="@style/LocationPermissionDialogButton"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="?selectableItemBackground"
-            android:text="@string/preciseLocationSiteDialogDenyOnce"
-            android:textSize="15sp" />
+    <View style="@style/LocationPermissionDialogSplitter" />
 
-        <Button
-            android:id="@+id/siteDenyAlwaysLocationPermission"
-            style="@style/LocationPermissionDialogButton"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="?selectableItemBackground"
-            android:text="@string/preciseLocationSiteDialogDenyAlways"
-            android:textSize="15sp" />
+    <Button
+        android:id="@+id/siteAllowOnceLocationPermission"
+        style="@style/LocationPermissionDialogButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/preciseLocationSiteDialogAllowOnce" />
+
+    <View style="@style/LocationPermissionDialogSplitter" />
+
+    <Button
+        android:id="@+id/siteDenyOnceLocationPermission"
+        style="@style/LocationPermissionDialogButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/preciseLocationSiteDialogDenyOnce" />
+
+    <View style="@style/LocationPermissionDialogSplitter" />
+
+    <Button
+        android:id="@+id/siteDenyAlwaysLocationPermission"
+        style="@style/LocationPermissionDialogButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/preciseLocationSiteDialogDenyAlways" />
 
 </LinearLayout>

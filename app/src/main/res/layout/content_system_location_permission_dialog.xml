@@ -28,7 +28,7 @@
             android:id="@+id/faviconImage"
             android:layout_width="48dp"
             android:layout_height="48dp"
-            android:layout_marginTop="@dimen/feedbackTitleMarginTop"
+            android:layout_marginTop="24dp"
             android:importantForAccessibility="no"
             android:src="@drawable/ic_dax_toolbar"
             app:layout_constraintEnd_toEndOf="parent"
@@ -40,7 +40,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             style="@style/LocationPermissionDialogTitle"
-            android:layout_marginTop="12dp"
+            android:layout_marginTop="16dp"
             android:text="@string/preciseLocationSystemDialogTitle" />
 
         <TextView
@@ -49,33 +49,34 @@
             android:layout_height="wrap_content"
             style="@style/LocationPermissionDialogSubtitle"
             android:layout_marginTop="12dp"
+            android:layout_marginBottom="24dp"
             android:text="@string/preciseLocationSystemDialogSubtitle" />
+
+        <View style="@style/LocationPermissionDialogSplitter" />
 
         <Button
             android:id="@+id/allowLocationPermission"
             style="@style/LocationPermissionDialogButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="?selectableItemBackground"
-            android:text="@string/preciseLocationSystemDialogAllow"
-            android:textSize="15sp" />
+            android:text="@string/preciseLocationSystemDialogAllow" />
+
+        <View style="@style/LocationPermissionDialogSplitter" />
 
         <Button
             android:id="@+id/denyLocationPermission"
             style="@style/LocationPermissionDialogButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="?selectableItemBackground"
-            android:text="@string/preciseLocationSystemDialogDeny"
-            android:textSize="15sp" />
+            android:text="@string/preciseLocationSystemDialogDeny" />
+
+        <View style="@style/LocationPermissionDialogSplitter" />
 
         <Button
             android:id="@+id/neverAllowLocationPermission"
             style="@style/LocationPermissionDialogButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="?selectableItemBackground"
-            android:text="@string/preciseLocationSystemDialogNeverAllow"
-            android:textSize="15sp" />
+            android:text="@string/preciseLocationSystemDialogNeverAllow" />
 
 </LinearLayout>

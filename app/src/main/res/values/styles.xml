@@ -354,17 +354,17 @@
         <item name="android:fontFamily">sans-serif</item>
         <item name="android:textStyle">bold</item>
         <item name="android:textColor">?attr/normalTextColor</item>
-        <item name="android:layout_marginStart">10dp</item>
-        <item name="android:layout_marginEnd">10dp</item>
-        <item name="android:textSize">22sp</item>
+        <item name="android:layout_marginStart">24dp</item>
+        <item name="android:layout_marginEnd">24dp</item>
+        <item name="android:textSize">20sp</item>
     </style>
 
     <style name="LocationPermissionDialogSubtitle">
         <item name="android:layout_marginTop">12dp</item>
         <item name="android:textAlignment">center</item>
         <item name="android:textStyle">normal</item>
-        <item name="android:layout_marginStart">10dp</item>
-        <item name="android:layout_marginEnd">10dp</item>
+        <item name="android:layout_marginStart">24dp</item>
+        <item name="android:layout_marginEnd">24dp</item>
         <item name="android:textColor">?attr/normalTextColor</item>
         <item name="android:textSize">15sp</item>
         <item name="layout_constraintWidth_percent">0.8</item>
@@ -372,14 +372,19 @@
 
     <style name="LocationPermissionDialogButton">
         <item name="android:textAllCaps">false</item>
-        <item name="android:layout_marginTop">12dp</item>
         <item name="android:textAlignment">center</item>
         <item name="android:textStyle">normal</item>
-        <item name="android:layout_marginStart">10dp</item>
-        <item name="android:layout_marginEnd">10dp</item>
         <item name="android:textColor">?android:colorAccent</item>
         <item name="android:textSize">15sp</item>
         <item name="layout_constraintWidth_percent">0.8</item>
+        <item name="android:padding">12dp</item>
+        <item name="android:background">?selectableItemBackground</item>
+    </style>
+
+    <style name="LocationPermissionDialogSplitter">
+        <item name="android:background">?toolbarBgBorderColor</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">1dp</item>
     </style>
 
 </resources>
