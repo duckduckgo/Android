@@ -48,6 +48,7 @@ import com.duckduckgo.app.icon.api.IconModifier
 import com.duckduckgo.app.icon.ui.ChangeIconViewModel
 import com.duckduckgo.app.launch.LaunchViewModel
 import com.duckduckgo.app.location.data.LocationPermissionsRepository
+import com.duckduckgo.app.location.ui.LocationPermissionsViewModel
 import com.duckduckgo.app.notification.AndroidNotificationScheduler
 import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.onboarding.ui.OnboardingPageManager
@@ -144,6 +145,7 @@ class ViewModelFactory @Inject constructor(
                 isAssignableFrom(DefaultBrowserPageViewModel::class.java) -> defaultBrowserPage()
                 isAssignableFrom(ChangeIconViewModel::class.java) -> changeAppIconViewModel()
                 isAssignableFrom(FireproofWebsitesViewModel::class.java) -> fireproofWebsiteViewModel()
+                isAssignableFrom(LocationPermissionsViewModel::class.java) -> locationPermissionsViewModel()
 
                 else -> throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")
             }
@@ -213,6 +215,13 @@ class ViewModelFactory @Inject constructor(
             fireproofWebsiteRepository = fireproofWebsiteRepository,
             dispatcherProvider = dispatcherProvider,
             pixel = pixel,
+            settingsDataStore = appSettingsPreferencesStore
+        )
+
+    private fun locationPermissionsViewModel() =
+        LocationPermissionsViewModel(
+            locationPermissionsRepository = locationPermissionsRepository,
+            dispatcherProvider = dispatcherProvider,
             settingsDataStore = appSettingsPreferencesStore
         )
 }

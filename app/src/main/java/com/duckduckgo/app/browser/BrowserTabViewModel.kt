@@ -771,6 +771,7 @@ class BrowserTabViewModel(
     }
 
     fun onSystemLocationPermissionGranted() {
+        appSettingsPreferencesStore.appLocationPermission = true
         viewModelScope.launch {
             val userHasGivenPermission = locationPermissionsRepository.hasUserGivenPermissionTo(permissionOrigin)
             if (userHasGivenPermission) {

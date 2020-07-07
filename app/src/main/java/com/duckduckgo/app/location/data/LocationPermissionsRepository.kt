@@ -30,8 +30,6 @@ class LocationPermissionsRepository @Inject constructor(
     fun getLocationPermissions(): LiveData<List<LocationPermissionEntity>> = locationPermissionsDao.allPermissionsEntities()
 
     suspend fun saveLocationPermission(domain: String, permission: LocationPermissionType): LocationPermissionEntity? {
-        if (!UriString.isValidDomain(domain)) return null
-
         val locationPermissionEntity = LocationPermissionEntity(domain = domain, permission = permission)
         val id = withContext(dispatchers.io()) {
             locationPermissionsDao.insert(locationPermissionEntity)

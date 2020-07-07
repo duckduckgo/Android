@@ -54,4 +54,11 @@
     <string name="preciseLocationSiteDialogAllowOnce">Allow this Session</string>
     <string name="preciseLocationSiteDialogDenyAlways">Always Deny</string>
     <string name="preciseLocationSiteDialogDenyOnce">Deny this Session</string>
+    <string name="settingsPreciseLocation">Location</string>
+    <string name="preciseLocationFeatureDescription">As you browse the web, some websites may ask for your permission to find your location. This is common when looking for specific stores or services near you.</string>
+    <string name="preciseLocationToggleText">Allow Websites to Request Location</string>
+    <string name="preciseLocationEmptyListHint">No domains with Location Permission yet</string>
+    <string name="preciseLocationActivityTitle">Location Permissions</string>
+    <string name="preciseLocationDeleteConfirmMessage">Are you sure you want to delete &lt;b>%s&lt;/b>?</string>
+    <string name="preciseLocationDeleteContentDescription">Delete location permissions for domain %s</string>
 </resources>

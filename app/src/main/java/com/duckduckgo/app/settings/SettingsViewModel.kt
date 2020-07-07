@@ -60,6 +60,7 @@ class SettingsViewModel @Inject constructor(
     sealed class Command {
         object LaunchFeedback : Command()
         object LaunchFireproofWebsites : Command()
+        object LaunchLocation : Command()
         object LaunchWhitelist : Command()
         object LaunchAppIcon : Command()
         object UpdateTheme : Command()
@@ -106,6 +107,11 @@ class SettingsViewModel @Inject constructor(
     fun onFireproofWebsitesClicked() {
         command.value = Command.LaunchFireproofWebsites
     }
+
+    fun onLocationClicked() {
+        command.value = Command.LaunchLocation
+    }
+
 
     fun onLightThemeToggled(enabled: Boolean) {
         Timber.i("User toggled light theme, is now enabled: $enabled")

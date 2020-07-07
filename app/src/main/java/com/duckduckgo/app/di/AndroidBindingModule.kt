@@ -37,6 +37,7 @@ import com.duckduckgo.app.fire.fireproofwebsite.ui.FireproofWebsitesActivity
 import com.duckduckgo.app.icon.ui.ChangeIconActivity
 import com.duckduckgo.app.job.AppConfigurationJobService
 import com.duckduckgo.app.launch.LaunchBridgeActivity
+import com.duckduckgo.app.location.ui.LocationPermissionsActivity
 import com.duckduckgo.app.notification.NotificationHandlerService
 import com.duckduckgo.app.onboarding.ui.OnboardingActivity
 import com.duckduckgo.app.onboarding.ui.page.DefaultBrowserPage
@@ -133,6 +134,11 @@ abstract class AndroidBindingModule {
     @ActivityScoped
     @ContributesAndroidInjector
     abstract fun changeAppIconActivity(): ChangeIconActivity
+
+
+    @ActivityScoped
+    @ContributesAndroidInjector
+    abstract fun locationPermissionsActivity(): LocationPermissionsActivity
 
     /* Fragments */
 
