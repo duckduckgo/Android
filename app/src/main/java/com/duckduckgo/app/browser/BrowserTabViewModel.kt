@@ -71,8 +71,8 @@ import com.duckduckgo.app.global.model.domain
 import com.duckduckgo.app.global.model.domainMatchesUrl
 import com.duckduckgo.app.location.data.LocationPermissionType
 import com.duckduckgo.app.location.data.LocationPermissionsRepository
-import com.duckduckgo.app.location.ui.SiteLocationPermissionFragment
-import com.duckduckgo.app.location.ui.SystemLocationPermissionFragment
+import com.duckduckgo.app.location.ui.SiteLocationPermissionDialog
+import com.duckduckgo.app.location.ui.SystemLocationPermissionDialog
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao
 import com.duckduckgo.app.privacy.db.UserWhitelistDao
 import com.duckduckgo.app.privacy.model.PrivacyGrade
@@ -92,7 +92,6 @@ import com.jakewharton.rxrelay2.PublishRelay
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
@@ -125,8 +124,8 @@ class BrowserTabViewModel(
     private val pixel: Pixel,
     private val dispatchers: DispatcherProvider = DefaultDispatcherProvider(),
     private val variantManager: VariantManager
-) : WebViewClientListener, EditBookmarkListener, HttpAuthenticationListener, SiteLocationPermissionFragment.Listener,
-    SystemLocationPermissionFragment.SystemLocationPermissionDialogListener, ViewModel() {
+) : WebViewClientListener, EditBookmarkListener, HttpAuthenticationListener, SiteLocationPermissionDialog.Listener,
+    SystemLocationPermissionDialog.SystemLocationPermissionDialogListener, ViewModel() {
 
     private var buildingSiteFactoryJob: Job? = null
 

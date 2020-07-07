@@ -24,16 +24,24 @@
     android:gravity="center"
     android:background="?toolbarBgColor">
 
-        <ImageView
-            android:id="@+id/faviconImage"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
+        <FrameLayout
+            android:id="@+id/systemPermissionDialogFaviconContainer"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
             android:layout_marginTop="24dp"
-            android:importantForAccessibility="no"
-            android:src="@drawable/ic_dax_toolbar"
-            app:layout_constraintEnd_toEndOf="parent"
+            android:background="@drawable/subtle_favicon_background"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent">
+
+                <ImageView
+                    android:id="@+id/faviconImage"
+                    android:layout_width="22dp"
+                    android:layout_height="22dp"
+                    android:layout_gravity="center"
+                    android:importantForAccessibility="no"
+                    android:src="@drawable/ic_globe_gray_16dp" />
+        </FrameLayout>
 
         <TextView
             android:id="@+id/systemPermissionDialogTitle"

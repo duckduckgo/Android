@@ -163,7 +163,7 @@ sealed class LocationPermissionsViewHolder(itemView: View) : RecyclerView.ViewHo
         }
 
         private fun loadFavicon(domain: String) {
-            val faviconUrl = Uri.parse("http://$domain").faviconLocation()
+            val faviconUrl = Uri.parse(domain).faviconLocation()
 
             GlideApp.with(itemView)
                 .load(faviconUrl)

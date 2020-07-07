@@ -126,9 +126,8 @@ import com.duckduckgo.app.fire.fireproofwebsite.data.website
 import com.duckduckgo.app.global.ViewModelFactory
 import com.duckduckgo.app.global.model.orderedTrackingEntities
 import com.duckduckgo.app.global.view.*
-import com.duckduckgo.app.location.data.LocationPermissionType
-import com.duckduckgo.app.location.ui.SiteLocationPermissionFragment
-import com.duckduckgo.app.location.ui.SystemLocationPermissionFragment
+import com.duckduckgo.app.location.ui.SiteLocationPermissionDialog
+import com.duckduckgo.app.location.ui.SystemLocationPermissionDialog
 import com.duckduckgo.app.privacy.renderer.icon
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -638,16 +637,16 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
 
     private fun checkSystemLocationPermission(domain: String) {
         if (ContextCompat.checkSelfPermission(requireActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            val dialog = SystemLocationPermissionFragment.instance(domain, viewModel)
-            dialog.show(requireActivity().supportFragmentManager, SystemLocationPermissionFragment.SYSTEM_LOCATION_PERMISSION_TAG)
+            val dialog = SystemLocationPermissionDialog.instance(domain, viewModel)
+            dialog.show(requireActivity().supportFragmentManager, SystemLocationPermissionDialog.SYSTEM_LOCATION_PERMISSION_TAG)
         } else {
             viewModel.onSystemLocationPermissionGranted()
         }
     }
 
     private fun askSiteLocationPermission(domain: String) {
-        val dialog = SiteLocationPermissionFragment.instance(domain, viewModel)
-        dialog.show(requireActivity().supportFragmentManager, SiteLocationPermissionFragment.SITE_LOCATION_PERMISSION_TAG)
+        val dialog = SiteLocationPermissionDialog.instance(domain, viewModel)
+        dialog.show(requireActivity().supportFragmentManager, SiteLocationPermissionDialog.SITE_LOCATION_PERMISSION_TAG)
     }
 
     private fun launchBrokenSiteFeedback(data: BrokenSiteData) {

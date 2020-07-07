@@ -22,7 +22,6 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.lifecycle.Observer
 import com.duckduckgo.app.browser.R
-import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.view.html
 import com.duckduckgo.app.location.data.LocationPermissionEntity
