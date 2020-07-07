@@ -1,0 +1,274 @@
+<svg width="608px" height="1844px"
+ viewBox="0.00 0.00 607.66 1844.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(1.0 1.0) rotate(0) translate(36 1808)">
+<polygon fill="white" stroke="transparent" points="-36,36 -36,-1808 571.66,-1808 571.66,36 -36,36"/>
+<!-- disconnect_tracker -->
+<g id="node1" class="node">
+<title>disconnect_tracker</title>
+<polygon fill="#caff70" stroke="transparent" points="57.5,-88 57.5,-110 185.5,-110 185.5,-88 57.5,-88"/>
+<polygon fill="none" stroke="black" points="57.5,-88 57.5,-110 185.5,-110 185.5,-88 57.5,-88"/>
+<text text-anchor="start" x="68.64" y="-95.4" font-family="Times,serif" font-weight="bold" font-size="14.00">disconnect_tracker</text>
+<polygon fill="none" stroke="black" points="57.5,-66 57.5,-88 185.5,-88 185.5,-66 57.5,-66"/>
+<text text-anchor="start" x="92.15" y="-73.4" font-family="Times,serif" font-weight="bold" font-size="14.00">url: </text>
+<text text-anchor="start" x="115.09" y="-73.4" font-family="Times,serif" font-weight="bold" font-style="italic" font-size="14.00">TEXT</text>
+<polygon fill="none" stroke="black" points="57.5,-44 57.5,-66 185.5,-66 185.5,-44 57.5,-44"/>
+<text text-anchor="start" x="75.82" y="-51.4" font-family="Times,serif" font-size="14.00">category: </text>
+<text text-anchor="start" x="131.41" y="-51.4" font-family="Times,serif" font-style="italic" font-size="14.00">TEXT</text>
+<polygon fill="none" stroke="black" points="57.5,-22 57.5,-44 185.5,-44 185.5,-22 57.5,-22"/>
+<text text-anchor="start" x="60.27" y="-29.4" font-family="Times,serif" font-size="14.00">networkName: </text>
+<text text-anchor="start" x="146.96" y="-29.4" font-family="Times,serif" font-style="italic" font-size="14.00">TEXT</text>
+<polygon fill="none" stroke="black" points="57.5,0 57.5,-22 185.5,-22 185.5,0 57.5,0"/>
+<text text-anchor="start" x="67.66" y="-7.4" font-family="Times,serif" font-size="14.00">networkUrl: </text>
+<text text-anchor="start" x="139.58" y="-7.4" font-family="Times,serif" font-style="italic" font-size="14.00">TEXT</text>
+</g>
+<!-- https_bloom_filter_spec -->
+<g id="node2" class="node">
+<title>https_bloom_filter_spec</title>
+<polygon fill="#caff70" stroke="transparent" points="50.5,-234 50.5,-256 192.5,-256 192.5,-234 50.5,-234"/>
+<polygon fill="none" stroke="black" points="50.5,-234 50.5,-256 192.5,-256 192.5,-234 50.5,-234"/>
+<text text-anchor="start" x="53.46" y="-241.4" font-family="Times,serif" font-weight="bold" font-size="14.00">https_bloom_filter_spec</text>
+<polygon fill="none" stroke="black" points="50.5,-212 50.5,-234 192.5,-234 192.5,-212 50.5,-212"/>
+<text text-anchor="start" x="82.43" y="-219.4" font-family="Times,serif" font-weight="bold" font-size="14.00">id: </text>
+<text text-anchor="start" x="100.71" y="-219.4" font-family="Times,serif" font-weight="bold" font-style="italic" font-size="14.00">INTEGER</text>
+<polygon fill="none" stroke="black" points="50.5,-190 50.5,-212 192.5,-212 192.5,-190 50.5,-190"/>
+<text text-anchor="start" x="73.1" y="-197.4" font-family="Times,serif" font-size="14.00">errorRate: </text>
+<text text-anchor="start" x="133.35" y="-197.4" font-family="Times,serif" font-style="italic" font-size="14.00">REAL</text>
+<polygon fill="none" stroke="black" points="50.5,-168 50.5,-190 192.5,-190 192.5,-168 50.5,-168"/>
+<text text-anchor="start" x="55.6" y="-175.4" font-family="Times,serif" font-size="14.00">totalEntries: </text>
+<text text-anchor="start" x="127.53" y="-175.4" font-family="Times,serif" font-style="italic" font-size="14.00">INTEGER</text>
+<polygon fill="none" stroke="black" points="50.5,-146 50.5,-168 192.5,-168 192.5,-146 50.5,-146"/>
+<text text-anchor="start" x="80.09" y="-153.4" font-family="Times,serif" font-size="14.00">sha256: </text>
+<text text-anchor="start" x="127.14" y="-153.4" font-family="Times,serif" font-style="italic" font-size="14.00">TEXT</text>
+</g>
+<!-- https_whitelisted_domain -->
+<g id="node3" class="node">
+<title>https_whitelisted_domain</title>
+<polygon fill="#caff70" stroke="transparent" points="46.5,-314 46.5,-336 196.5,-336 196.5,-314 46.5,-314"/>
+<polygon fill="none" stroke="black" points="46.5,-314 46.5,-336 196.5,-336 196.5,-314 46.5,-314"/>
+<text text-anchor="start" x="49.17" y="-321.4" font-family="Times,serif" font-weight="bold" font-size="14.00">https_whitelisted_domain</text>
+<polygon fill="none" stroke="black" points="46.5,-292 46.5,-314 196.5,-314 196.5,-292 46.5,-292"/>
+<text text-anchor="start" x="78.92" y="-299.4" font-family="Times,serif" font-weight="bold" font-size="14.00">domain: </text>
+<text text-anchor="start" x="128.31" y="-299.4" font-family="Times,serif" font-weight="bold" font-style="italic" font-size="14.00">TEXT</text>
+</g>
+<!-- network_leaderboard -->
+<g id="node4" class="node">
+<title>network_leaderboard</title>
+<polygon fill="#caff70" stroke="transparent" points="57.5,-416 57.5,-438 185.5,-438 185.5,-416 57.5,-416"/>
+<polygon fill="none" stroke="black" points="57.5,-416 57.5,-438 185.5,-438 185.5,-416 57.5,-416"/>
+<text text-anchor="start" x="62.03" y="-423.4" font-family="Times,serif" font-weight="bold" font-size="14.00">network_leaderboard</text>
+<polygon fill="none" stroke="black" points="57.5,-394 57.5,-416 185.5,-416 185.5,-394 57.5,-394"/>
+<text text-anchor="start" x="60.27" y="-401.4" font-family="Times,serif" font-weight="bold" font-size="14.00">networkName: </text>
+<text text-anchor="start" x="146.96" y="-401.4" font-family="Times,serif" font-weight="bold" font-style="italic" font-size="14.00">TEXT</text>
+<polygon fill="none" stroke="black" points="57.5,-372 57.5,-394 185.5,-394 185.5,-372 57.5,-372"/>
+<text text-anchor="start" x="72.32" y="-379.4" font-family="Times,serif" font-size="14.00">count: </text>
+<text text-anchor="start" x="110.81" y="-379.4" font-family="Times,serif" font-style="italic" font-size="14.00">INTEGER</text>
+</g>
+<!-- sites_visited -->
+<g id="node5" class="node">
+<title>sites_visited</title>
+<polygon fill="#caff70" stroke="transparent" points="69.5,-518 69.5,-540 173.5,-540 173.5,-518 69.5,-518"/>
+<polygon fill="none" stroke="black" points="69.5,-518 69.5,-540 173.5,-540 173.5,-518 69.5,-518"/>
+<text text-anchor="start" x="86.89" y="-525.4" font-family="Times,serif" font-weight="bold" font-size="14.00">sites_visited</text>
+<polygon fill="none" stroke="black" points="69.5,-496 69.5,-518 173.5,-518 173.5,-496 69.5,-496"/>
+<text text-anchor="start" x="89.82" y="-503.4" font-family="Times,serif" font-weight="bold" font-size="14.00">key: </text>
+<text text-anchor="start" x="117.42" y="-503.4" font-family="Times,serif" font-weight="bold" font-style="italic" font-size="14.00">TEXT</text>
+<polygon fill="none" stroke="black" points="69.5,-474 69.5,-496 173.5,-496 173.5,-474 69.5,-474"/>
+<text text-anchor="start" x="72.32" y="-481.4" font-family="Times,serif" font-size="14.00">count: </text>
+<text text-anchor="start" x="110.81" y="-481.4" font-family="Times,serif" font-style="italic" font-size="14.00">INTEGER</text>
+</g>
+<!-- app_configuration -->
+<g id="node6" class="node">
+<title>app_configuration</title>
+<polygon fill="#caff70" stroke="transparent" points="0.5,-620 0.5,-642 243.5,-642 243.5,-620 0.5,-620"/>
+<polygon fill="none" stroke="black" points="0.5,-620 0.5,-642 243.5,-642 243.5,-620 0.5,-620"/>
+<text text-anchor="start" x="70.68" y="-627.4" font-family="Times,serif" font-weight="bold" font-size="14.00">app_configuration</text>
+<polygon fill="none" stroke="black" points="0.5,-598 0.5,-620 243.5,-620 243.5,-598 0.5,-598"/>
+<text text-anchor="start" x="90.32" y="-605.4" font-family="Times,serif" font-weight="bold" font-size="14.00">key: </text>
+<text text-anchor="start" x="117.92" y="-605.4" font-family="Times,serif" font-weight="bold" font-style="italic" font-size="14.00">TEXT</text>
+<polygon fill="none" stroke="black" points="0.5,-576 0.5,-598 243.5,-598 243.5,-576 0.5,-576"/>
+<text text-anchor="start" x="3.22" y="-583.4" font-family="Times,serif" font-size="14.00">appConfigurationDownloaded: </text>
+<text text-anchor="start" x="180.91" y="-583.4" font-family="Times,serif" font-style="italic" font-size="14.00">INTEGER</text>
+</g>
+<!-- tabs -->
+<g id="node7" class="node">
+<title>tabs</title>
+<polygon fill="#caff70" stroke="transparent" points="405.66,-744 405.66,-766 535.66,-766 535.66,-744 405.66,-744"/>
+<polygon fill="none" stroke="black" points="405.66,-744 405.66,-766 535.66,-766 535.66,-744 405.66,-744"/>
+<text text-anchor="start" x="459.39" y="-751.4" font-family="Times,serif" font-weight="bold" font-size="14.00">tabs</text>
+<polygon fill="none" stroke="black" points="405.66,-722 405.66,-744 535.66,-744 535.66,-722 405.66,-722"/>
+<text text-anchor="start" x="434.7" y="-729.4" font-family="Times,serif" font-weight="bold" font-size="14.00">tabId: </text>
+<text text-anchor="start" x="470.86" y="-729.4" font-family="Times,serif" font-weight="bold" font-style="italic" font-size="14.00">TEXT</text>
+<polygon fill="none" stroke="black" points="405.66,-700 405.66,-722 535.66,-722 535.66,-700 405.66,-700"/>
+<text text-anchor="start" x="441.31" y="-707.4" font-family="Times,serif" font-size="14.00">url: </text>
+<text text-anchor="start" x="464.25" y="-707.4" font-family="Times,serif" font-style="italic" font-size="14.00">TEXT</text>
+<polygon fill="none" stroke="black" points="405.66,-678 405.66,-700 535.66,-700 535.66,-678 405.66,-678"/>
+<text text-anchor="start" x="438.19" y="-685.4" font-family="Times,serif" font-size="14.00">title: </text>
+<text text-anchor="start" x="467.36" y="-685.4" font-family="Times,serif" font-style="italic" font-size="14.00">TEXT</text>
+<polygon fill="none" stroke="black" points="405.66,-656 405.66,-678 535.66,-678 535.66,-656 405.66,-656"/>
+<text text-anchor="start" x="408.26" y="-663.4" font-family="Times,serif" font-size="14.00">skipHome: </text>
+<text text-anchor="start" x="473.2" y="-663.4" font-family="Times,serif" font-style="italic" font-size="14.00">INTEGER</text>
+<polygon fill="none" stroke="black" points="405.66,-634 405.66,-656 535.66,-656 535.66,-634 405.66,-634"/>
+<text text-anchor="start" x="416.82" y="-641.4" font-family="Times,serif" font-size="14.00">viewed: </text>
+<text text-anchor="start" x="464.63" y="-641.4" font-family="Times,serif" font-style="italic" font-size="14.00">INTEGER</text>
+<polygon fill="none" stroke="black" points="405.66,-612 405.66,-634 535.66,-634 535.66,-612 405.66,-612"/>
+<text text-anchor="start" x="414.47" y="-619.4" font-family="Times,serif" font-size="14.00">position: </text>
+<text text-anchor="start" x="466.98" y="-619.4" font-family="Times,serif" font-style="italic" font-size="14.00">INTEGER</text>
+<polygon fill="#c1cdcd" stroke="transparent" points="405.66,-590 405.66,-612 535.66,-612 535.66,-590 405.66,-590"/>
+<polygon fill="none" stroke="black" points="405.66,-590 405.66,-612 535.66,-612 535.66,-590 405.66,-590"/>
+<text text-anchor="start" x="450.45" y="-597.4" font-family="Times,serif" font-style="italic" font-size="14.00">Indices</text>
+<polygon fill="none" stroke="black" points="405.66,-568 405.66,-590 535.66,-590 535.66,-568 405.66,-568"/>
+<text text-anchor="start" x="422.45" y="-574.4" font-family="Times,serif" font-size="14.00">index_tabs_tabId</text>
+</g>
+<!-- tab_selection -->
+<g id="node8" class="node">
+<title>tab_selection</title>
+<polygon fill="#caff70" stroke="transparent" points="45.5,-766 45.5,-788 198.5,-788 198.5,-766 45.5,-766"/>
+<polygon fill="none" stroke="black" points="45.5,-766 45.5,-788 198.5,-788 198.5,-766 45.5,-766"/>
+<text text-anchor="start" x="85.07" y="-773.4" font-family="Times,serif" font-weight="bold" font-size="14.00">tab_selection</text>
+<polygon fill="none" stroke="black" points="45.5,-744 45.5,-766 198.5,-766 198.5,-744 45.5,-744"/>
+<text text-anchor="start" x="82.93" y="-751.4" font-family="Times,serif" font-weight="bold" font-size="14.00">id: </text>
+<text text-anchor="start" x="101.21" y="-751.4" font-family="Times,serif" font-weight="bold" font-style="italic" font-size="14.00">INTEGER</text>
+<polygon fill="none" stroke="black" points="45.5,-722 45.5,-744 198.5,-744 198.5,-722 45.5,-722"/>
+<text text-anchor="start" x="86.04" y="-729.4" font-family="Times,serif" font-size="14.00">tabId: </text>
+<text text-anchor="start" x="122.2" y="-729.4" font-family="Times,serif" font-style="italic" font-size="14.00">TEXT</text>
+<polygon fill="#c1cdcd" stroke="transparent" points="45.5,-700 45.5,-722 198.5,-722 198.5,-700 45.5,-700"/>
+<polygon fill="none" stroke="black" points="45.5,-700 45.5,-722 198.5,-722 198.5,-700 45.5,-700"/>
+<text text-anchor="start" x="101.79" y="-707.4" font-family="Times,serif" font-style="italic" font-size="14.00">Indices</text>
+<polygon fill="none" stroke="black" points="45.5,-678 45.5,-700 198.5,-700 198.5,-678 45.5,-678"/>
+<text text-anchor="start" x="48.13" y="-684.4" font-family="Times,serif" font-size="14.00">index_tab_selection_tabId</text>
+</g>
+<!-- tab_selection&#45;&gt;tabs -->
+<g id="edge1" class="edge">
+<title>tab_selection:tabId&#45;&gt;tabs:tabId</title>
+<path fill="none" stroke="black" stroke-dasharray="5,2" d="M199.5,-733C287.64,-733 312.19,-733 395.48,-733"/>
+<polygon fill="black" stroke="black" points="395.66,-736.5 405.66,-733 395.66,-729.5 395.66,-736.5"/>
+<text text-anchor="middle" x="324.33" y="-737.2" font-family="Times,serif" font-size="14.00">1&#45;1</text>
+</g>
+<!-- bookmarks -->
+<g id="node9" class="node">
+<title>bookmarks</title>
+<polygon fill="#caff70" stroke="transparent" points="79.5,-890 79.5,-912 163.5,-912 163.5,-890 79.5,-890"/>
+<polygon fill="none" stroke="black" points="79.5,-890 79.5,-912 163.5,-912 163.5,-890 79.5,-890"/>
+<text text-anchor="start" x="90.39" y="-897.4" font-family="Times,serif" font-weight="bold" font-size="14.00">bookmarks</text>
+<polygon fill="none" stroke="black" points="79.5,-868 79.5,-890 163.5,-890 163.5,-868 79.5,-868"/>
+<text text-anchor="start" x="82.43" y="-875.4" font-family="Times,serif" font-weight="bold" font-size="14.00">id: </text>
+<text text-anchor="start" x="100.71" y="-875.4" font-family="Times,serif" font-weight="bold" font-style="italic" font-size="14.00">INTEGER</text>
+<polygon fill="none" stroke="black" points="79.5,-846 79.5,-868 163.5,-868 163.5,-846 79.5,-846"/>
+<text text-anchor="start" x="89.03" y="-853.4" font-family="Times,serif" font-size="14.00">title: </text>
+<text text-anchor="start" x="118.2" y="-853.4" font-family="Times,serif" font-style="italic" font-size="14.00">TEXT</text>
+<polygon fill="none" stroke="black" points="79.5,-824 79.5,-846 163.5,-846 163.5,-824 79.5,-824"/>
+<text text-anchor="start" x="92.15" y="-831.4" font-family="Times,serif" font-size="14.00">url: </text>
+<text text-anchor="start" x="115.09" y="-831.4" font-family="Times,serif" font-style="italic" font-size="14.00">TEXT</text>
+</g>
+<!-- entity_list -->
+<g id="node10" class="node">
+<title>entity_list</title>
+<polygon fill="#caff70" stroke="transparent" points="59.5,-992 59.5,-1014 183.5,-1014 183.5,-992 59.5,-992"/>
+<polygon fill="none" stroke="black" points="59.5,-992 59.5,-1014 183.5,-1014 183.5,-992 59.5,-992"/>
+<text text-anchor="start" x="93.5" y="-999.4" font-family="Times,serif" font-weight="bold" font-size="14.00">entity_list</text>
+<polygon fill="none" stroke="black" points="59.5,-970 59.5,-992 183.5,-992 183.5,-970 59.5,-970"/>
+<text text-anchor="start" x="62.21" y="-977.4" font-family="Times,serif" font-weight="bold" font-size="14.00">domainName: </text>
+<text text-anchor="start" x="145.02" y="-977.4" font-family="Times,serif" font-weight="bold" font-style="italic" font-size="14.00">TEXT</text>
+<polygon fill="none" stroke="black" points="59.5,-948 59.5,-970 183.5,-970 183.5,-948 59.5,-948"/>
+<text text-anchor="start" x="67.27" y="-955.4" font-family="Times,serif" font-size="14.00">entityName: </text>
+<text text-anchor="start" x="139.97" y="-955.4" font-family="Times,serif" font-style="italic" font-size="14.00">TEXT</text>
+</g>
+<!-- survey -->
+<g id="node11" class="node">
+<title>survey</title>
+<polygon fill="#caff70" stroke="transparent" points="48.5,-1138 48.5,-1160 195.5,-1160 195.5,-1138 48.5,-1138"/>
+<polygon fill="none" stroke="black" points="48.5,-1138 48.5,-1160 195.5,-1160 195.5,-1138 48.5,-1138"/>
+<text text-anchor="start" x="103.34" y="-1145.4" font-family="Times,serif" font-weight="bold" font-size="14.00">survey</text>
+<polygon fill="none" stroke="black" points="48.5,-1116 48.5,-1138 195.5,-1138 195.5,-1116 48.5,-1116"/>
+<text text-anchor="start" x="75.93" y="-1123.4" font-family="Times,serif" font-weight="bold" font-size="14.00">surveyId: </text>
+<text text-anchor="start" x="132.3" y="-1123.4" font-family="Times,serif" font-weight="bold" font-style="italic" font-size="14.00">TEXT</text>
+<polygon fill="none" stroke="black" points="48.5,-1094 48.5,-1116 195.5,-1116 195.5,-1094 48.5,-1094"/>
+<text text-anchor="start" x="92.65" y="-1101.4" font-family="Times,serif" font-size="14.00">url: </text>
+<text text-anchor="start" x="115.59" y="-1101.4" font-family="Times,serif" font-style="italic" font-size="14.00">TEXT</text>
+<polygon fill="none" stroke="black" points="48.5,-1072 48.5,-1094 195.5,-1094 195.5,-1072 48.5,-1072"/>
+<text text-anchor="start" x="51.44" y="-1079.4" font-family="Times,serif" font-size="14.00">daysInstalled: </text>
+<text text-anchor="start" x="132.69" y="-1079.4" font-family="Times,serif" font-style="italic" font-size="14.00">INTEGER</text>
+<polygon fill="none" stroke="black" points="48.5,-1050 48.5,-1072 195.5,-1072 195.5,-1050 48.5,-1050"/>
+<text text-anchor="start" x="84.48" y="-1057.4" font-family="Times,serif" font-size="14.00">status: </text>
+<text text-anchor="start" x="123.76" y="-1057.4" font-family="Times,serif" font-style="italic" font-size="14.00">TEXT</text>
+</g>
+<!-- dismissed_cta -->
+<g id="node12" class="node">
+<title>dismissed_cta</title>
+<polygon fill="#caff70" stroke="transparent" points="79.5,-1218 79.5,-1240 163.5,-1240 163.5,-1218 79.5,-1218"/>
+<polygon fill="none" stroke="black" points="79.5,-1218 79.5,-1240 163.5,-1240 163.5,-1218 79.5,-1218"/>
+<text text-anchor="start" x="82.23" y="-1225.4" font-family="Times,serif" font-weight="bold" font-size="14.00">dismissed_cta</text>
+<polygon fill="none" stroke="black" points="79.5,-1196 79.5,-1218 163.5,-1218 163.5,-1196 79.5,-1196"/>
+<text text-anchor="start" x="85.93" y="-1203.4" font-family="Times,serif" font-weight="bold" font-size="14.00">ctaId: </text>
+<text text-anchor="start" x="121.3" y="-1203.4" font-family="Times,serif" font-weight="bold" font-style="italic" font-size="14.00">TEXT</text>
+</g>
+<!-- search_count -->
+<g id="node13" class="node">
+<title>search_count</title>
+<polygon fill="#caff70" stroke="transparent" points="69.5,-1320 69.5,-1342 173.5,-1342 173.5,-1320 69.5,-1320"/>
+<polygon fill="none" stroke="black" points="69.5,-1320 69.5,-1342 173.5,-1342 173.5,-1320 69.5,-1320"/>
+<text text-anchor="start" x="84.57" y="-1327.4" font-family="Times,serif" font-weight="bold" font-size="14.00">search_count</text>
+<polygon fill="none" stroke="black" points="69.5,-1298 69.5,-1320 173.5,-1320 173.5,-1298 69.5,-1298"/>
+<text text-anchor="start" x="89.82" y="-1305.4" font-family="Times,serif" font-weight="bold" font-size="14.00">key: </text>
+<text text-anchor="start" x="117.42" y="-1305.4" font-family="Times,serif" font-weight="bold" font-style="italic" font-size="14.00">TEXT</text>
+<polygon fill="none" stroke="black" points="69.5,-1276 69.5,-1298 173.5,-1298 173.5,-1276 69.5,-1276"/>
+<text text-anchor="start" x="72.32" y="-1283.4" font-family="Times,serif" font-size="14.00">count: </text>
+<text text-anchor="start" x="110.81" y="-1283.4" font-family="Times,serif" font-style="italic" font-size="14.00">INTEGER</text>
+</g>
+<!-- app_days_used -->
+<g id="node14" class="node">
+<title>app_days_used</title>
+<polygon fill="#caff70" stroke="transparent" points="76.5,-1400 76.5,-1422 167.5,-1422 167.5,-1400 76.5,-1400"/>
+<polygon fill="none" stroke="black" points="76.5,-1400 76.5,-1422 167.5,-1422 167.5,-1400 76.5,-1400"/>
+<text text-anchor="start" x="79.23" y="-1407.4" font-family="Times,serif" font-weight="bold" font-size="14.00">app_days_used</text>
+<polygon fill="none" stroke="black" points="76.5,-1378 76.5,-1400 167.5,-1400 167.5,-1378 76.5,-1378"/>
+<text text-anchor="start" x="88.76" y="-1385.4" font-family="Times,serif" font-weight="bold" font-size="14.00">date: </text>
+<text text-anchor="start" x="119.47" y="-1385.4" font-family="Times,serif" font-weight="bold" font-style="italic" font-size="14.00">TEXT</text>
+</g>
+<!-- app_enjoyment -->
+<g id="node15" class="node">
+<title>app_enjoyment</title>
+<polygon fill="#caff70" stroke="transparent" points="48.5,-1546 48.5,-1568 195.5,-1568 195.5,-1546 48.5,-1546"/>
+<polygon fill="none" stroke="black" points="48.5,-1546 48.5,-1568 195.5,-1568 195.5,-1546 48.5,-1546"/>
+<text text-anchor="start" x="78.84" y="-1553.4" font-family="Times,serif" font-weight="bold" font-size="14.00">app_enjoyment</text>
+<polygon fill="none" stroke="black" points="48.5,-1524 48.5,-1546 195.5,-1546 195.5,-1524 48.5,-1524"/>
+<text text-anchor="start" x="58.83" y="-1531.4" font-family="Times,serif" font-size="14.00">eventType: </text>
+<text text-anchor="start" x="125.3" y="-1531.4" font-family="Times,serif" font-style="italic" font-size="14.00">INTEGER</text>
+<polygon fill="none" stroke="black" points="48.5,-1502 48.5,-1524 195.5,-1524 195.5,-1502 48.5,-1502"/>
+<text text-anchor="start" x="51.04" y="-1509.4" font-family="Times,serif" font-size="14.00">promptCount: </text>
+<text text-anchor="start" x="133.1" y="-1509.4" font-family="Times,serif" font-style="italic" font-size="14.00">INTEGER</text>
+<polygon fill="none" stroke="black" points="48.5,-1480 48.5,-1502 195.5,-1502 195.5,-1480 48.5,-1480"/>
+<text text-anchor="start" x="59.21" y="-1487.4" font-family="Times,serif" font-size="14.00">timestamp: </text>
+<text text-anchor="start" x="124.92" y="-1487.4" font-family="Times,serif" font-style="italic" font-size="14.00">INTEGER</text>
+<polygon fill="none" stroke="black" points="48.5,-1458 48.5,-1480 195.5,-1480 195.5,-1458 48.5,-1458"/>
+<text text-anchor="start" x="54.55" y="-1465.4" font-family="Times,serif" font-weight="bold" font-size="14.00">primaryKey: </text>
+<text text-anchor="start" x="129.58" y="-1465.4" font-family="Times,serif" font-weight="bold" font-style="italic" font-size="14.00">INTEGER</text>
+</g>
+<!-- notification -->
+<g id="node16" class="node">
+<title>notification</title>
+<polygon fill="#caff70" stroke="transparent" points="59.5,-1626 59.5,-1648 184.5,-1648 184.5,-1626 59.5,-1626"/>
+<polygon fill="none" stroke="black" points="59.5,-1626 59.5,-1648 184.5,-1648 184.5,-1626 59.5,-1626"/>
+<text text-anchor="start" x="89.73" y="-1633.4" font-family="Times,serif" font-weight="bold" font-size="14.00">notification</text>
+<polygon fill="none" stroke="black" points="59.5,-1604 59.5,-1626 184.5,-1626 184.5,-1604 59.5,-1604"/>
+<text text-anchor="start" x="62.32" y="-1611.4" font-family="Times,serif" font-weight="bold" font-size="14.00">notificationId: </text>
+<text text-anchor="start" x="145.91" y="-1611.4" font-family="Times,serif" font-weight="bold" font-style="italic" font-size="14.00">TEXT</text>
+</g>
+<!-- privacy_protection_count -->
+<g id="node17" class="node">
+<title>privacy_protection_count</title>
+<polygon fill="#caff70" stroke="transparent" points="21.5,-1750 21.5,-1772 222.5,-1772 222.5,-1750 21.5,-1750"/>
+<polygon fill="none" stroke="black" points="21.5,-1750 21.5,-1772 222.5,-1772 222.5,-1750 21.5,-1750"/>
+<text text-anchor="start" x="50.08" y="-1757.4" font-family="Times,serif" font-weight="bold" font-size="14.00">privacy_protection_count</text>
+<polygon fill="none" stroke="black" points="21.5,-1728 21.5,-1750 222.5,-1750 222.5,-1728 21.5,-1728"/>
+<text text-anchor="start" x="90.32" y="-1735.4" font-family="Times,serif" font-weight="bold" font-size="14.00">key: </text>
+<text text-anchor="start" x="117.92" y="-1735.4" font-family="Times,serif" font-weight="bold" font-style="italic" font-size="14.00">TEXT</text>
+<polygon fill="none" stroke="black" points="21.5,-1706 21.5,-1728 222.5,-1728 222.5,-1706 21.5,-1706"/>
+<text text-anchor="start" x="24.23" y="-1713.4" font-family="Times,serif" font-size="14.00">blocked_tracker_count: </text>
+<text text-anchor="start" x="159.9" y="-1713.4" font-family="Times,serif" font-style="italic" font-size="14.00">INTEGER</text>
+<polygon fill="none" stroke="black" points="21.5,-1684 21.5,-1706 222.5,-1706 222.5,-1684 21.5,-1684"/>
+<text text-anchor="start" x="46.77" y="-1691.4" font-family="Times,serif" font-size="14.00">upgrade_count: </text>
+<text text-anchor="start" x="137.36" y="-1691.4" font-family="Times,serif" font-style="italic" font-size="14.00">INTEGER</text>
+</g>
+</g>
+</svg>
