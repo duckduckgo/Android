@@ -20,6 +20,8 @@ import com.duckduckgo.app.fire.UnsentForgetAllPixelStore
 import com.duckduckgo.app.fire.UnsentForgetAllPixelStoreSharedPreferences
 import com.duckduckgo.app.global.install.AppInstallSharedPreferences
 import com.duckduckgo.app.global.install.AppInstallStore
+import com.duckduckgo.app.global.events.db.AppUserEventsStore
+import com.duckduckgo.app.global.events.db.UserEventsStore
 import com.duckduckgo.app.onboarding.store.AppUserStageStore
 import com.duckduckgo.app.onboarding.store.OnboardingSharedPreferences
 import com.duckduckgo.app.onboarding.store.OnboardingStore
@@ -60,5 +62,8 @@ abstract class StoreModule {
     abstract fun bindOfflinePixelDataStore(store: OfflinePixelCountSharedPreferences): OfflinePixelCountDataStore
 
     @Binds
-    abstract fun bindUserStageStore(userStageDao: AppUserStageStore): UserStageStore
+    abstract fun bindUserStageStore(userStageStore: AppUserStageStore): UserStageStore
+
+    @Binds
+    abstract fun bindUserEventsStore(userEventsStore: AppUserEventsStore): UserEventsStore
 }

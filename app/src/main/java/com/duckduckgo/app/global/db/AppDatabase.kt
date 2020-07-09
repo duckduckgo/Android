@@ -24,6 +24,7 @@ import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.duckduckgo.app.bookmarks.db.BookmarkEntity
 import com.duckduckgo.app.bookmarks.db.BookmarksDao
+import com.duckduckgo.app.browser.addtohome.AddToHomeCapabilityDetector
 import com.duckduckgo.app.browser.rating.db.AppEnjoymentDao
 import com.duckduckgo.app.browser.rating.db.AppEnjoymentEntity
 import com.duckduckgo.app.browser.rating.db.AppEnjoymentTypeConverter
@@ -36,6 +37,10 @@ import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
 import com.duckduckgo.app.global.exception.UncaughtExceptionDao
 import com.duckduckgo.app.global.exception.UncaughtExceptionEntity
 import com.duckduckgo.app.global.exception.UncaughtExceptionSourceConverter
+import com.duckduckgo.app.global.events.db.UserEventsDao
+import com.duckduckgo.app.global.events.db.UserEventEntity
+import com.duckduckgo.app.global.events.db.UserEventTypeConverter
+import com.duckduckgo.app.global.useourapp.MigrationManager
 import com.duckduckgo.app.httpsupgrade.db.HttpsBloomFilterSpecDao
 import com.duckduckgo.app.httpsupgrade.db.HttpsWhitelistDao
 import com.duckduckgo.app.httpsupgrade.model.HttpsBloomFilterSpec
@@ -48,6 +53,7 @@ import com.duckduckgo.app.onboarding.store.*
 import com.duckduckgo.app.privacy.db.*
 import com.duckduckgo.app.privacy.model.PrivacyProtectionCountsEntity
 import com.duckduckgo.app.privacy.model.UserWhitelistedDomain
+import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.survey.db.SurveyDao
 import com.duckduckgo.app.survey.model.Survey
 import com.duckduckgo.app.tabs.db.TabsDao
@@ -59,9 +65,10 @@ import com.duckduckgo.app.usage.app.AppDaysUsedDao
 import com.duckduckgo.app.usage.app.AppDaysUsedEntity
 import com.duckduckgo.app.usage.search.SearchCountDao
 import com.duckduckgo.app.usage.search.SearchCountEntity
+import java.util.Locale
 
 @Database(
-    exportSchema = true, version = 22, entities = [
+    exportSchema = true, version = 23, entities = [
         TdsTracker::class,
         TdsEntity::class,
         TdsDomainEntity::class,
@@ -85,6 +92,7 @@ import com.duckduckgo.app.usage.search.SearchCountEntity
         TdsMetadata::class,
         UserStage::class,
         FireproofWebsiteEntity::class,
+        UserEventEntity::class,
         LocationPermissionEntity::class
     ]
 )
@@ -99,6 +107,7 @@ import com.duckduckgo.app.usage.search.SearchCountEntity
     CategoriesTypeConverter::class,
     UncaughtExceptionSourceConverter::class,
     StageTypeConverter::class,
+    UserEventTypeConverter::class,
     LocationPermissionTypeConverter::class
 )
 abstract class AppDatabase : RoomDatabase() {
@@ -124,11 +133,17 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun tdsDao(): TdsMetadataDao
     abstract fun userStageDao(): UserStageDao
     abstract fun fireproofWebsiteDao(): FireproofWebsiteDao
+    abstract fun userEventsDao(): UserEventsDao
     abstract fun locationPermissionsDao(): LocationPermissionsDao
 }
 
 @Suppress("PropertyName")
-class MigrationsProvider(val context: Context) {
+class MigrationsProvider(
+    val context: Context,
+    val settingsDataStore: SettingsDataStore,
+    val addToHomeCapabilityDetector: AddToHomeCapabilityDetector,
+    val useOurAppMigrationManager: MigrationManager
+) {
 
     val MIGRATION_1_TO_2: Migration = object : Migration(1, 2) {
         override fun migrate(database: SupportSQLiteDatabase) {
@@ -299,8 +314,28 @@ class MigrationsProvider(val context: Context) {
 
     val MIGRATION_21_TO_22: Migration = object : Migration(21, 22) {
         override fun migrate(database: SupportSQLiteDatabase) {
+            database.execSQL("CREATE TABLE IF NOT EXISTS `user_events` (`id` TEXT NOT NULL, `timestamp` INTEGER NOT NULL, PRIMARY KEY(`id`))")
+
+            if (canUserBeMigratedToUseOurAppFlow(database)) {
+                if (useOurAppMigrationManager.shouldRunMigration()) {
+                    database.execSQL("UPDATE $USER_STAGE_TABLE_NAME SET appStage = \"${AppStage.USE_OUR_APP_NOTIFICATION}\" WHERE appStage = \"${AppStage.ESTABLISHED}\"")
+                }
+            }
+        }
+    }
+
+    val MIGRATION_22_TO_23: Migration = object : Migration(21, 22) {
+        override fun migrate(database: SupportSQLiteDatabase) {
             database.execSQL("CREATE TABLE IF NOT EXISTS `locationPermissions` (`domain` TEXT NOT NULL, `permission` INTEGER NOT NULL, PRIMARY KEY(`domain`))")
         }
+    }
+
+    private fun canUserBeMigratedToUseOurAppFlow(database: SupportSQLiteDatabase): Boolean =
+        isEnglishLocale() && isUserEstablished(database) && !settingsDataStore.hideTips && addToHomeCapabilityDetector.isAddToHomeSupported()
+
+    private fun isEnglishLocale(): Boolean {
+        val locale = Locale.getDefault()
+        return locale != null && locale.language == "en"
     }
 
     val ALL_MIGRATIONS: List<Migration>
@@ -325,8 +360,20 @@ class MigrationsProvider(val context: Context) {
             MIGRATION_18_TO_19,
             MIGRATION_19_TO_20,
             MIGRATION_20_TO_21,
-            MIGRATION_21_TO_22
+            MIGRATION_21_TO_22,
+            MIGRATION_22_TO_23
         )
+
+    private fun isUserEstablished(database: SupportSQLiteDatabase): Boolean {
+        var stage: String
+
+        database.query("SELECT appStage from userStage limit 1").apply {
+            moveToFirst()
+            if (count == 0) return false
+            stage = getString(0)
+        }
+        return (stage == AppStage.ESTABLISHED.name)
+    }
 
     @Deprecated(
         message = "This class should be only used by database migrations.",

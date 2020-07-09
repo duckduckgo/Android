@@ -31,6 +31,8 @@ data class UserStage(
 enum class AppStage {
     NEW,
     DAX_ONBOARDING,
+    USE_OUR_APP_NOTIFICATION,
+    USE_OUR_APP_ONBOARDING,
     ESTABLISHED;
 }
 

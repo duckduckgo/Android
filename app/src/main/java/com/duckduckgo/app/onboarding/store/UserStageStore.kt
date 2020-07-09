@@ -23,6 +23,7 @@ import javax.inject.Inject
 interface UserStageStore {
     suspend fun getUserAppStage(): AppStage
     suspend fun stageCompleted(appStage: AppStage): AppStage
+    suspend fun moveToStage(appStage: AppStage)
 }
 
 class AppUserStageStore @Inject constructor(
@@ -41,6 +42,8 @@ class AppUserStageStore @Inject constructor(
             val newAppStage = when (appStage) {
                 AppStage.NEW -> AppStage.DAX_ONBOARDING
                 AppStage.DAX_ONBOARDING -> AppStage.ESTABLISHED
+                AppStage.USE_OUR_APP_NOTIFICATION -> AppStage.ESTABLISHED
+                AppStage.USE_OUR_APP_ONBOARDING -> AppStage.ESTABLISHED
                 AppStage.ESTABLISHED -> AppStage.ESTABLISHED
             }
 
@@ -51,6 +54,10 @@ class AppUserStageStore @Inject constructor(
             return@withContext newAppStage
         }
     }
+
+    override suspend fun moveToStage(appStage: AppStage) {
+        userStageDao.updateUserStage(appStage)
+    }
 }
 
 suspend fun UserStageStore.isNewUser(): Boolean {
@@ -59,4 +66,12 @@ suspend fun UserStageStore.isNewUser(): Boolean {
 
 suspend fun UserStageStore.daxOnboardingActive(): Boolean {
     return this.getUserAppStage() == AppStage.DAX_ONBOARDING
+}
+
+suspend fun UserStageStore.useOurAppOnboarding(): Boolean {
+    return this.getUserAppStage() == AppStage.USE_OUR_APP_ONBOARDING
+}
+
+suspend fun UserStageStore.useOurAppNotification(): Boolean {
+    return this.getUserAppStage() == AppStage.USE_OUR_APP_NOTIFICATION
 }

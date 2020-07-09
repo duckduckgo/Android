@@ -22,6 +22,7 @@ import android.webkit.WebView
 import androidx.annotation.UiThread
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.logindetection.LoginDetectionJavascriptInterface.Companion.JAVASCRIPT_INTERFACE_NAME
+import com.duckduckgo.app.global.useourapp.UseOurAppDetector
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import timber.log.Timber
 import javax.inject.Inject
@@ -36,7 +37,8 @@ sealed class WebNavigationEvent {
     data class ShouldInterceptRequest(val webView: WebView, val request: WebResourceRequest) : WebNavigationEvent()
 }
 
-class JsLoginDetector @Inject constructor(private val settingsDataStore: SettingsDataStore) : DOMLoginDetector {
+class JsLoginDetector @Inject constructor(private val settingsDataStore: SettingsDataStore, private val useOurAppDetector: UseOurAppDetector) :
+    DOMLoginDetector {
     private val javaScriptDetector = JavaScriptDetector()
     private val loginPathRegex = Regex("login|sign-in|signin|sessions")
 
@@ -46,7 +48,7 @@ class JsLoginDetector @Inject constructor(private val settingsDataStore: Setting
 
     @UiThread
     override fun onEvent(event: WebNavigationEvent) {
-        if (settingsDataStore.appLoginDetection) {
+        if (settingsDataStore.appLoginDetection || useOurAppDetector.allowLoginDetection(event)) {
             when (event) {
                 is WebNavigationEvent.OnPageStarted -> injectLoginFormDetectionJS(event.webView)
                 is WebNavigationEvent.ShouldInterceptRequest -> {

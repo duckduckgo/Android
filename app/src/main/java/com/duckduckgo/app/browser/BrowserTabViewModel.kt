@@ -61,7 +61,13 @@ import com.duckduckgo.app.browser.model.LongPressTarget
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.browser.ui.HttpAuthenticationDialogFragment.HttpAuthenticationListener
-import com.duckduckgo.app.cta.ui.*
+import com.duckduckgo.app.cta.ui.Cta
+import com.duckduckgo.app.cta.ui.CtaViewModel
+import com.duckduckgo.app.cta.ui.DaxDialogCta
+import com.duckduckgo.app.cta.ui.DialogCta
+import com.duckduckgo.app.cta.ui.HomePanelCta
+import com.duckduckgo.app.cta.ui.HomeTopPanelCta
+import com.duckduckgo.app.cta.ui.UseOurAppCta
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepository
 import com.duckduckgo.app.global.*
@@ -69,6 +75,14 @@ import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.global.model.SiteFactory
 import com.duckduckgo.app.global.model.domain
 import com.duckduckgo.app.global.model.domainMatchesUrl
+import com.duckduckgo.app.global.events.db.UserEventsStore
+import com.duckduckgo.app.global.events.db.UserEventKey
+import com.duckduckgo.app.global.toDesktopUri
+import com.duckduckgo.app.global.useourapp.UseOurAppDetector
+import com.duckduckgo.app.global.useourapp.UseOurAppDetector.Companion.USE_OUR_APP_SHORTCUT_TITLE
+import com.duckduckgo.app.global.useourapp.UseOurAppDetector.Companion.USE_OUR_APP_SHORTCUT_URL
+import com.duckduckgo.app.notification.db.NotificationDao
+import com.duckduckgo.app.notification.model.UseOurAppNotification
 import com.duckduckgo.app.location.GeoLocationPermissions
 import com.duckduckgo.app.location.data.LocationPermissionType
 import com.duckduckgo.app.location.data.LocationPermissionsRepository
@@ -125,6 +139,9 @@ class BrowserTabViewModel(
     private val searchCountDao: SearchCountDao,
     private val pixel: Pixel,
     private val dispatchers: DispatcherProvider = DefaultDispatcherProvider(),
+    private val userEventsStore: UserEventsStore,
+    private val notificationDao: NotificationDao,
+    private val useOurAppDetector: UseOurAppDetector,
     private val variantManager: VariantManager
 ) : WebViewClientListener, EditBookmarkListener, HttpAuthenticationListener, SiteLocationPermissionDialog.Listener,
     SystemLocationPermissionDialog.SystemLocationPermissionDialogListener, ViewModel() {
@@ -286,6 +303,8 @@ class BrowserTabViewModel(
 
     private val loginDetectionObserver = Observer<LoginDetected> { loginEvent ->
         Timber.i("LoginDetection for $loginEvent")
+        viewModelScope.launch { useOurAppDetector.registerIfFireproofSeenForTheFirstTime(loginEvent.forwardedToDomain) }
+
         if (!isFireproofWebsite(loginEvent.forwardedToDomain)) {
             pixel.fire(PixelName.FIREPROOF_LOGIN_DIALOG_SHOWN)
             command.value = AskToFireproofWebsite(FireproofWebsiteEntity(loginEvent.forwardedToDomain))
@@ -310,6 +329,7 @@ class BrowserTabViewModel(
 
     fun onViewReady() {
         url?.let {
+            sendPixelIfUseOurAppSiteVisitedFirstTime(it)
             onUserSubmittedQuery(it)
         }
     }
@@ -371,7 +391,6 @@ class BrowserTabViewModel(
     }
 
     fun onViewResumed() {
-        command.value = if (!currentBrowserViewState().browserShowing) ShowKeyboard else HideKeyboard
         if (currentGlobalLayoutState() is Invalidated && currentBrowserViewState().browserShowing) {
             showErrorWithAction()
         }
@@ -380,7 +399,12 @@ class BrowserTabViewModel(
     fun onViewVisible() {
         // we expect refreshCta to be called when a site is fully loaded if browsingShowing -trackers data available-.
         if (!currentBrowserViewState().browserShowing) {
-            refreshCta()
+            viewModelScope.launch {
+                val cta = refreshCta()
+                showOrHideKeyboard(cta) // we hide the keyboard when showing a DialogCta type in the home screen otherwise we show it
+            }
+        } else {
+            command.value = HideKeyboard
         }
     }
 
@@ -476,6 +500,7 @@ class BrowserTabViewModel(
         } else {
             pixel.fire(String.format(Locale.US, PixelName.SERP_REQUERY.pixelName, PixelParameter.SERP_QUERY_CHANGED))
         }
+
     }
 
     private fun shouldClearHistoryOnNewQuery(): Boolean {
@@ -538,6 +563,7 @@ class BrowserTabViewModel(
             return true
         } else if (!skipHome) {
             navigateHome()
+            command.value = ShowKeyboard
             return true
         }
 
@@ -598,7 +624,15 @@ class BrowserTabViewModel(
 
     private fun pageChanged(url: String, title: String?) {
         Timber.v("Page changed: $url")
+        val previousUrl = site?.url
+
         buildSiteFactory(url, title)
+
+        // Navigating from different website to use our app website
+        if (!useOurAppDetector.isUseOurAppUrl(previousUrl)) {
+            sendPixelIfUseOurAppSiteVisitedFirstTime(url)
+        }
+
         command.value = RefreshUserAgent(site?.uri?.host, currentBrowserViewState().isDesktopBrowsingMode)
 
         val currentOmnibarViewState = currentOmnibarViewState()
@@ -635,6 +669,26 @@ class BrowserTabViewModel(
         domain?.let { viewModelScope.launch { updateLoadingStatePrivacy(domain) } }
         domain?.let { viewModelScope.launch { updateWhitelistedState(domain) } }
         registerSiteVisit()
+    }
+
+    private fun sendPixelIfUseOurAppSiteVisitedFirstTime(url: String) {
+        if (useOurAppDetector.isUseOurAppUrl(url)) {
+            viewModelScope.launch { sendUseOurAppSiteVisitedPixel() }
+        }
+    }
+
+    private suspend fun sendUseOurAppSiteVisitedPixel() {
+        withContext(dispatchers.io()) {
+            val isShortcutAdded = userEventsStore.getUserEvent(UserEventKey.USE_OUR_APP_SHORTCUT_ADDED)
+            val isUseOurAppNotificationSeen = notificationDao.exists(UseOurAppNotification.ID)
+            val deleteCtaShown = ctaViewModel.useOurAppDeletionDialogShown()
+
+            when {
+                deleteCtaShown -> pixel.fire(PixelName.UOA_VISITED_AFTER_DELETE_CTA)
+                isShortcutAdded != null -> pixel.fire(PixelName.UOA_VISITED_AFTER_SHORTCUT)
+                isUseOurAppNotificationSeen -> pixel.fire(PixelName.UOA_VISITED_AFTER_NOTIFICATION)
+            }
+        }
     }
 
     private fun shouldShowDaxIcon(currentUrl: String?, showPrivacyGrade: Boolean): Boolean {
@@ -1237,7 +1291,9 @@ class BrowserTabViewModel(
     fun onSurveyChanged(survey: Survey?) {
         val activeSurvey = ctaViewModel.onSurveyChanged(survey)
         if (activeSurvey != null) {
-            refreshCta()
+            viewModelScope.launch {
+                refreshCta()
+            }
         }
     }
 
@@ -1250,15 +1306,19 @@ class BrowserTabViewModel(
         ctaViewModel.onCtaShown(cta)
     }
 
-    fun refreshCta() {
+    suspend fun refreshCta(): Cta? {
         if (currentGlobalLayoutState() is Browser) {
-            viewModelScope.launch {
-                val cta = withContext(dispatchers.io()) {
-                    ctaViewModel.refreshCta(dispatchers.io(), currentBrowserViewState().browserShowing, siteLiveData.value)
-                }
-                ctaViewState.value = currentCtaViewState().copy(cta = cta)
+            val cta = withContext(dispatchers.io()) {
+                ctaViewModel.refreshCta(dispatchers.io(), currentBrowserViewState().browserShowing, siteLiveData.value)
             }
+            ctaViewState.value = currentCtaViewState().copy(cta = cta)
+            return cta
         }
+        return null
+    }
+
+    private fun showOrHideKeyboard(cta: Cta?) {
+        command.value = if (cta is DialogCta) HideKeyboard else ShowKeyboard
     }
 
     fun registerDaxBubbleCtaDismissed() {
@@ -1278,12 +1338,24 @@ class BrowserTabViewModel(
             is HomePanelCta.Survey -> LaunchSurvey(cta.survey)
             is HomePanelCta.AddWidgetAuto -> LaunchAddWidget
             is HomePanelCta.AddWidgetInstructions -> LaunchLegacyAddWidget
+            is UseOurAppCta -> navigateToUrlAndLaunchShortcut(url = USE_OUR_APP_SHORTCUT_URL, title = USE_OUR_APP_SHORTCUT_TITLE)
             else -> return
         }
     }
 
-    fun onUserClickCtaSecondaryButton(cta: SecondaryButtonCta) {
-        ctaViewModel.onUserClickCtaSecondaryButton(cta)
+    private fun navigateToUrlAndLaunchShortcut(url: String, title: String): AddHomeShortcut {
+        onUserSubmittedQuery(url)
+        return AddHomeShortcut(title, url)
+    }
+
+    fun onUserClickCtaSecondaryButton() {
+        viewModelScope.launch {
+            val cta = currentCtaViewState().cta ?: return@launch
+            ctaViewModel.onUserDismissedCta(cta)
+            if (cta is UseOurAppCta) {
+                command.value = ShowKeyboard
+            }
+        }
     }
 
     fun onUserHideDaxDialog() {

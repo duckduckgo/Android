@@ -338,6 +338,42 @@ class CtaTest {
         assertEquals("<b>Facebook</b>withZero", value)
     }
 
+    @Test
+    fun whenCtaIsUseOurAppReturnEmptyOkParameters() {
+        val testee = UseOurAppCta()
+        assertTrue(testee.pixelOkParameters().isEmpty())
+    }
+
+    @Test
+    fun whenCtaIsUseOurAppReturnEmptyCancelParameters() {
+        val testee = UseOurAppCta()
+        assertTrue(testee.pixelCancelParameters().isEmpty())
+    }
+
+    @Test
+    fun whenCtaIsUseOurAppReturnEmptyShownParameters() {
+        val testee = UseOurAppCta()
+        assertTrue(testee.pixelShownParameters().isEmpty())
+    }
+
+    @Test
+    fun whenCtaIsUseOurAppDeletionReturnEmptyOkParameters() {
+        val testee = UseOurAppDeletionCta()
+        assertTrue(testee.pixelOkParameters().isEmpty())
+    }
+
+    @Test
+    fun whenCtaIsUseOurAppDeletionReturnEmptyCancelParameters() {
+        val testee = UseOurAppDeletionCta()
+        assertTrue(testee.pixelCancelParameters().isEmpty())
+    }
+
+    @Test
+    fun whenCtaIsUseOurAppDeletionReturnEmptyShownParameters() {
+        val testee = UseOurAppDeletionCta()
+        assertTrue(testee.pixelShownParameters().isEmpty())
+    }
+
     private fun site(
         url: String = "http://www.test.com",
         uri: Uri? = Uri.parse(url),

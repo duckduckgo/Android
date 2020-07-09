@@ -67,7 +67,6 @@ import androidx.annotation.AnyThread
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
-import androidx.core.content.pm.ShortcutManagerCompat
 import androidx.core.text.HtmlCompat
 import androidx.core.text.HtmlCompat.FROM_HTML_MODE_LEGACY
 import androidx.core.view.isEmpty
@@ -286,7 +285,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
     private val menuButton: ViewGroup?
         get() = appBarLayout.browserMenu
 
-    private var webView: WebView? = null
+    private var webView: DuckDuckGoWebView? = null
 
     private val errorSnackbar: Snackbar by lazy {
         Snackbar.make(browserLayout, R.string.crashedWebViewErrorMessage, Snackbar.LENGTH_INDEFINITE)
@@ -341,6 +340,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
         configureObservers()
         configurePrivacyGrade()
         configureWebView()
+        configureSwipeRefresh()
         viewModel.registerWebViewListener(webViewClient, webChromeClient)
         configureOmnibarTextInput()
         configureFindInPage()
@@ -437,8 +437,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
     }
 
     private fun addHomeShortcut(homeShortcut: Command.AddHomeShortcut, context: Context) {
-        val shortcutInfo = shortcutBuilder.buildPinnedPageShortcut(context, homeShortcut)
-        ShortcutManagerCompat.requestPinShortcut(context, shortcutInfo, null)
+        shortcutBuilder.requestPinShortcut(context, homeShortcut)
     }
 
     private fun configureObservers() {
@@ -502,7 +501,6 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
     private fun showHome() {
         errorSnackbar.dismiss()
         newTabLayout.show()
-        showKeyboardImmediately()
         appBarLayout.setExpanded(true)
         webView?.onPause()
         webView?.hide()
@@ -889,7 +887,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
             R.layout.include_duckduckgo_browser_webview,
             webViewContainer,
             true
-        ).findViewById(R.id.browserWebView) as WebView
+        ).findViewById(R.id.browserWebView) as DuckDuckGoWebView
 
         webView?.let {
             it.webViewClient = webViewClient
@@ -920,6 +918,10 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
                 false
             }
 
+            it.setEnableSwipeRefreshCallback { enable ->
+                swipeRefreshContainer?.isEnabled = enable
+            }
+
             registerForContextMenu(it)
 
             it.setFindListener(this)
@@ -929,6 +931,21 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
         if (BuildConfig.DEBUG) {
             WebView.setWebContentsDebuggingEnabled(true)
         }
+    }
+
+    private fun configureSwipeRefresh() {
+        swipeRefreshContainer.setColorSchemeColors(ContextCompat.getColor(requireContext(), R.color.cornflowerBlue))
+
+        swipeRefreshContainer.setOnRefreshListener {
+            onRefreshRequested()
+        }
+
+        swipeRefreshContainer.setCanChildScrollUpCallback {
+            webView?.canScrollVertically(-1) ?: false
+        }
+
+        // avoids progressView from showing under toolbar
+        swipeRefreshContainer.progressViewStartOffset = swipeRefreshContainer.progressViewStartOffset - 15
     }
 
     /**
@@ -1311,6 +1328,10 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
         viewModel.onUserClickCtaOkButton()
     }
 
+    override fun onDaxDialogSecondaryCtaClick() {
+        viewModel.onUserClickCtaSecondaryButton()
+    }
+
     private fun launchHideTipsDialog(context: Context, cta: Cta) {
         AlertDialog.Builder(context)
             .setTitle(R.string.hideTipsTitle)
@@ -1562,6 +1583,11 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
                         createTrackersAnimation()
                     }
                 }
+
+                if (!viewState.isLoading) {
+                    swipeRefreshContainer.isRefreshing = false
+                    webView?.detectOverscrollBehavior()
+                }
             }
         }
 
@@ -1715,14 +1741,14 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
             when (configuration) {
                 is HomePanelCta -> showHomeCta(configuration)
                 is DaxBubbleCta -> showDaxCta(configuration)
-                is DaxDialogCta -> showDaxDialogCta(configuration)
+                is DialogCta -> showDaxDialogCta(configuration)
                 is HomeTopPanelCta -> showHomeTopCta(configuration)
             }
 
             viewModel.onCtaShown()
         }
 
-        private fun showDaxDialogCta(configuration: DaxDialogCta) {
+        private fun showDaxDialogCta(configuration: DialogCta) {
             hideHomeCta()
             hideDaxCta()
             activity?.let { activity ->

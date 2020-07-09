@@ -20,10 +20,14 @@ package com.duckduckgo.app.tabs.model
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.MutableLiveData
+import androidx.room.Room
 import androidx.test.annotation.UiThreadTest
+import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.InstantSchedulersRule
+import com.duckduckgo.app.blockingObserve
 import com.duckduckgo.app.browser.tabpreview.WebViewPreviewPersister
+import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.global.model.SiteFactory
 import com.duckduckgo.app.privacy.model.PrivacyPractices
@@ -227,6 +231,43 @@ class TabDataRepositoryTest {
         verify(mockDao).addAndSelectTab(captor.capture())
 
         assertTrue(captor.firstValue.position == 1)
+    }
+
+    @Test
+    fun whenSelectByUrlOrNewTabIfUrlAlreadyExistedInATabThenSelectTheTab() = runBlocking<Unit> {
+        val db = createDatabase()
+        val dao = db.tabsDao()
+        dao.insertTab(TabEntity(tabId = "id", url = "http://www.example.com", skipHome = false, viewed = true, position = 0))
+
+        testee = TabDataRepository(dao, SiteFactory(mockPrivacyPractices, mockEntityLookup), mockWebViewPreviewPersister)
+
+        testee.selectByUrlOrNewTab("http://www.example.com")
+
+        val value = testee.liveSelectedTab.blockingObserve()?.tabId
+        assertEquals("id", value)
+
+        db.close()
+    }
+
+    @Test
+    fun whenSelectByUrlOrNewTabIfUrlNotExistedInATabThenAddNewTab() = runBlocking<Unit> {
+        val db = createDatabase()
+        val dao = db.tabsDao()
+
+        testee = TabDataRepository(dao, SiteFactory(mockPrivacyPractices, mockEntityLookup), mockWebViewPreviewPersister)
+
+        testee.selectByUrlOrNewTab("http://www.example.com")
+
+        val value = testee.liveSelectedTab.blockingObserve()?.url
+        assertEquals("http://www.example.com", value)
+
+        db.close()
+    }
+
+    private fun createDatabase(): AppDatabase {
+        return Room.inMemoryDatabaseBuilder(InstrumentationRegistry.getInstrumentation().targetContext, AppDatabase::class.java)
+            .allowMainThreadQueries()
+            .build()
     }
 
     companion object {

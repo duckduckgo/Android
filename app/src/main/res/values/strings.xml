@@ -425,7 +425,6 @@
     <string name="changeIconDialogMessage">The app may close to apply changes. Come on back after you\'ve admired your handsome new icon.</string>
 
     <!-- New dashboard / menu buttons -->
-    <string name="manageWhitelist">Manage Whitelist</string>
     <string name="reportBrokenSite">Report Broken Site</string>
 
     <!-- Dialogs -->
@@ -433,18 +432,8 @@
     <string name="dialogEditTitle">Edit</string>
 
     <!-- Whitelist -->
-    <string name="whitelisetActivityTitle">Whitelist</string>
-    <string name="whitelistAdd">Add to Whitelist</string>
-    <string name="whitelistRemove">Remove from Whitelist</string>
-    <string name="whitelistEntryOverflowContentDescription">More options for whitelist entry %s</string>
-    <string name="whitelistEntryDeleteConfirmMessage">Are you sure you want to delete &lt;b>%s&lt;/b> from whitelist?</string>
-    <string name="whitelistExplanation">These whitelisted sites will not be upgraded by Privacy Protection</string>
-    <string name="whitelistNoEntries">No whitelisted sites yet</string>
     <string name="whitelistDomainHint">www.example.com</string>
     <string name="whitelistFormatError">Could not save, enter a domain like <b>example.com</b></string>
-
-    <!-- Settings -->
-    <string name="settingsPrivacyProtectionWhitelist">Privacy Protection Whitelist</string>
 
     <!-- Fireproof websites -->
     <string name="fireproofWebsitesActivityTitle">Fireproof Websites</string>

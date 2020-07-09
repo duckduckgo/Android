@@ -42,6 +42,30 @@
     <!-- !! String changed translate and replace !! -->
     <string name="fireproofWebsiteFeatureDescription">Websites rely on cookies to keep you signed in. When you Fireproof a site, cookies won\'t be erased and you\'ll stay signed in, even after using the Fire Button. We still block third-party trackers found on Fireproof websites.</string>
 
+    <!-- Use Our App Flow -->
+    <string name="useOurAppDialogText">Did you know the Facebook app can make requests for data even when you\'re not using it?&lt;br/&gt;&lt;br/&gt;Replace the app with a home screen shortcut that opens Facebook in DuckDuckGo. Then delete the Facebook app.</string>
+    <string name="useOurAppDialogButtonText">Add Facebook Shortcut</string>
+    <string name="useOurAppDialogCancelButtonText">Not Now</string>
+    <string name="useOurAppNotificationTitle">Worried about Facebook tracking you?</string>
+    <string name="useOurAppNotificationDescription">Here\'s a simple way to reduce its reach.</string>
+    <string name="useOurAppShortcutAddedText">Success! %s has been added to your home screen.</string>
+    <string name="useOurAppDeletionDialogText">Checking your feed in DuckDuckGo is a great alternative to using the Facebook app!&lt;br/&gt;&lt;br/&gt;But if the Facebook app is on your phone, it can make requests for data even when you\'re not using it.&lt;br/&gt;&lt;br/&gt;Prevent this by deleting it now!</string>
+
+    <!-- New dashboard / menu buttons -->
+    <string name="manageWhitelist">Unprotected Sites</string>
+
+    <!-- Whitelist -->
+    <string name="whitelisetActivityTitle">Unprotected Sites</string>
+    <string name="whitelistAdd">Enable Privacy Protection</string>
+    <string name="whitelistRemove">Disable Privacy Protection</string>
+    <string name="whitelistEntryOverflowContentDescription">More options for unprotected site %s</string>
+    <string name="whitelistEntryDeleteConfirmMessage">Are you sure you want to remove &lt;b>%s&lt;/b> from unprotected sites?</string>
+    <string name="whitelistExplanation">These sites will not be enhanced by Privacy Protection</string>
+    <string name="whitelistNoEntries">No Unprotected Sites Yet</string>
+
+    <!-- Settings -->
+    <string name="settingsPrivacyProtectionWhitelist">Unprotected Sites</string>
+
     <!-- Precise Location -->
     <string name="preciseLocationSystemDialogTitle">Allow %s to access this device\'s location?</string>
     <string name="preciseLocationSystemDialogSubtitle">The show your local results, we need to know where you are when using the app.</string>

@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 22,
-    "identityHash": "91bb2a91d4af3c6466c386e712b9233f",
+    "identityHash": "d6e385bcc19ae0df396817590763b709",
     "entities": [
       {
         "tableName": "tds_tracker",
@@ -711,25 +711,25 @@
         "foreignKeys": []
       },
       {
-        "tableName": "locationPermissions",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`domain` TEXT NOT NULL, `permission` INTEGER NOT NULL, PRIMARY KEY(`domain`))",
+        "tableName": "user_events",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `timestamp` INTEGER NOT NULL, PRIMARY KEY(`id`))",
         "fields": [
           {
-            "fieldPath": "domain",
-            "columnName": "domain",
+            "fieldPath": "id",
+            "columnName": "id",
             "affinity": "TEXT",
             "notNull": true
           },
           {
-            "fieldPath": "permission",
-            "columnName": "permission",
+            "fieldPath": "timestamp",
+            "columnName": "timestamp",
             "affinity": "INTEGER",
             "notNull": true
           }
         ],
         "primaryKey": {
           "columnNames": [
-            "domain"
+            "id"
           ],
           "autoGenerate": false
         },
@@ -740,7 +740,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '91bb2a91d4af3c6466c386e712b9233f')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'd6e385bcc19ae0df396817590763b709')"
     ]
   }
 }

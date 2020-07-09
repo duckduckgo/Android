@@ -44,6 +44,9 @@ abstract class TabsDao {
     @Query("select * from tabs where tabId = :tabId")
     abstract fun tab(tabId: String): TabEntity?
 
+    @Query("select tabId from tabs where url LIKE :url")
+    abstract suspend fun selectTabByUrl(url: String): String?
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     abstract fun insertTab(tab: TabEntity)
 

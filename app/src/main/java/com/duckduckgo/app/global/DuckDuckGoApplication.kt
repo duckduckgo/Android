@@ -17,6 +17,7 @@
 package com.duckduckgo.app.global
 
 import android.app.Application
+import android.content.IntentFilter
 import android.os.Build
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleObserver
@@ -25,6 +26,8 @@ import androidx.lifecycle.ProcessLifecycleOwner
 import androidx.work.WorkerFactory
 import com.duckduckgo.app.browser.BuildConfig
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserObserver
+import com.duckduckgo.app.browser.shortcut.ShortcutBuilder
+import com.duckduckgo.app.browser.shortcut.ShortcutReceiver
 import com.duckduckgo.app.di.AppComponent
 import com.duckduckgo.app.di.DaggerAppComponent
 import com.duckduckgo.app.fire.DataClearer
@@ -151,6 +154,9 @@ open class DuckDuckGoApplication : HasAndroidInjector, Application(), LifecycleO
     lateinit var atbInitializer: AtbInitializer
 
     @Inject
+    lateinit var shortcutReceiver: ShortcutReceiver
+
+    @Inject
     lateinit var variantManager: VariantManager
 
     private var launchedByFireAction: Boolean = false
@@ -188,6 +194,7 @@ open class DuckDuckGoApplication : HasAndroidInjector, Application(), LifecycleO
         scheduleOfflinePixels()
 
         notificationRegistrar.registerApp()
+        registerReceiver(shortcutReceiver, IntentFilter(ShortcutBuilder.USE_OUR_APP_SHORTCUT_ADDED_ACTION))
 
         initializeHttpsUpgrader()
         submitUnsentFirePixels()

@@ -31,6 +31,7 @@
         <item name="autoCompleteTextViewStyle">@style/AutoCompleteTextViewStyle</item>
         <item name="android:statusBarColor">?toolbarBgColor</item>
         <item name="snackbarButtonStyle">@style/snackbarButtonStyle</item>
+        <item name="android:colorEdgeEffect">@color/newBlack</item>
     </style>
 
     <style name="AppTheme.BaseDark">

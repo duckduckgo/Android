@@ -32,6 +32,7 @@ import com.duckduckgo.app.browser.BrowserViewModel.Command.Refresh
 import com.duckduckgo.app.browser.rating.ui.AppEnjoymentDialogFragment
 import com.duckduckgo.app.browser.rating.ui.GiveFeedbackDialogFragment
 import com.duckduckgo.app.browser.rating.ui.RateAppDialogFragment
+import com.duckduckgo.app.browser.shortcut.ShortcutBuilder
 import com.duckduckgo.app.feedback.ui.common.FeedbackActivity
 import com.duckduckgo.app.fire.DataClearer
 import com.duckduckgo.app.fire.DataClearerForegroundAppRestartPixel
@@ -205,9 +206,14 @@ class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope() {
 
         val sharedText = intent.intentText
         if (sharedText != null) {
-            Timber.w("opening in new tab requested for $sharedText")
-            launch { viewModel.onOpenInNewTabRequested(sharedText, true) }
-            return
+            if (intent.getBooleanExtra(ShortcutBuilder.SHORTCUT_EXTRA_ARG, false)) {
+                Timber.d("Shortcut opened with url $sharedText")
+                launch { viewModel.onOpenShortcut(sharedText) }
+            } else {
+                Timber.w("opening in new tab requested for $sharedText")
+                launch { viewModel.onOpenInNewTabRequested(sharedText, true) }
+                return
+            }
         }
     }
 
