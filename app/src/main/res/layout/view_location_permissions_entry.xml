@@ -62,14 +62,14 @@
         tools:text="Bookmark" />
 
     <ImageView
-        android:id="@+id/locationPermissionDelete"
+        android:id="@+id/locationPermissionMenu"
         android:layout_width="wrap_content"
         android:layout_height="0dp"
         android:background="?selectableItemBackground"
         android:paddingStart="14dp"
         android:paddingEnd="14dp"
         android:scaleType="center"
-        android:src="@drawable/ic_close"
+        android:src="@drawable/ic_overflow"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"

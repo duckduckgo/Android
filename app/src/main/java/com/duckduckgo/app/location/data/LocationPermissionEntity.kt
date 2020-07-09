@@ -33,7 +33,6 @@ fun LocationPermissionEntity.host(): String {
         ?.drop(WWW_HOST_PREFIX.length)?.dropLast(WWW_SUFFIX.length) ?: domain
 }
 
-
 private const val TYPE_ALLOW_ALWAYS = 1
 private const val TYPE_ALLOW_ONCE = 2
 private const val TYPE_DENY_ALWAYS = 3

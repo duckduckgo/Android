@@ -22,6 +22,7 @@ import androidx.lifecycle.Observer
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.SingleLiveEvent
 import com.duckduckgo.app.location.data.LocationPermissionEntity
+import com.duckduckgo.app.location.data.LocationPermissionType
 import com.duckduckgo.app.location.data.LocationPermissionsRepository
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import kotlinx.coroutines.launch
@@ -30,7 +31,7 @@ class LocationPermissionsViewModel(
     private val locationPermissionsRepository: LocationPermissionsRepository,
     private val dispatcherProvider: DispatcherProvider,
     private val settingsDataStore: SettingsDataStore
-) : ViewModel() {
+) : SiteLocationPermissionDialog.Listener, ViewModel() {
 
     data class ViewState(
         val locationPermissionEnabled: Boolean = false,
@@ -81,5 +82,11 @@ class LocationPermissionsViewModel(
     fun onLocationPermissionToggled(enabled: Boolean) {
         settingsDataStore.appLocationPermission = enabled
         _viewState.value = _viewState.value?.copy(locationPermissionEnabled = enabled)
+    }
+
+    override fun onSiteLocationPermissionSelected(domain: String, permission: LocationPermissionType) {
+        viewModelScope.launch {
+            locationPermissionsRepository.saveLocationPermission(domain, permission)
+        }
     }
 }

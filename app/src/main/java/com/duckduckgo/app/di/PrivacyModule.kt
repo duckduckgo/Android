@@ -17,7 +17,6 @@
 package com.duckduckgo.app.di
 
 import android.content.Context
-import android.webkit.GeolocationPermissions
 import androidx.work.WorkManager
 import com.duckduckgo.app.browser.WebDataManager
 import com.duckduckgo.app.fire.*

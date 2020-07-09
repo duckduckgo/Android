@@ -33,7 +33,7 @@ import org.jetbrains.anko.find
 class SiteLocationPermissionDialog : DialogFragment() {
 
     interface Listener {
-        fun onSiteLocationPermissionSelected(permission: LocationPermissionType)
+        fun onSiteLocationPermissionSelected(domain: String, permission: LocationPermissionType)
     }
 
     private lateinit var listener: Listener
@@ -92,21 +92,24 @@ class SiteLocationPermissionDialog : DialogFragment() {
         denyOnce: TextView,
         denyAlways: TextView
     ) {
-        allowAlways.setOnClickListener {
-            dismiss()
-            listener.onSiteLocationPermissionSelected(LocationPermissionType.ALLOW_ALWAYS)
-        }
-        allowOnce.setOnClickListener {
-            dismiss()
-            listener.onSiteLocationPermissionSelected(LocationPermissionType.ALLOW_ONCE)
-        }
-        denyOnce.setOnClickListener {
-            dismiss()
-            listener.onSiteLocationPermissionSelected(LocationPermissionType.DENY_ONCE)
-        }
-        denyAlways.setOnClickListener {
-            dismiss()
-            listener.onSiteLocationPermissionSelected(LocationPermissionType.DENY_ALWAYS)
+        arguments?.let { args ->
+            val originUrl = args.getString(KEY_REQUEST_ORIGIN)
+            allowAlways.setOnClickListener {
+                dismiss()
+                listener.onSiteLocationPermissionSelected(originUrl, LocationPermissionType.ALLOW_ALWAYS)
+            }
+            allowOnce.setOnClickListener {
+                dismiss()
+                listener.onSiteLocationPermissionSelected(originUrl, LocationPermissionType.ALLOW_ONCE)
+            }
+            denyOnce.setOnClickListener {
+                dismiss()
+                listener.onSiteLocationPermissionSelected(originUrl, LocationPermissionType.DENY_ONCE)
+            }
+            denyAlways.setOnClickListener {
+                dismiss()
+                listener.onSiteLocationPermissionSelected(originUrl, LocationPermissionType.DENY_ALWAYS)
+            }
         }
     }
 
@@ -132,5 +135,4 @@ class SiteLocationPermissionDialog : DialogFragment() {
             }
         }
     }
-
 }

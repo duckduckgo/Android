@@ -811,14 +811,14 @@ class BrowserTabViewModel(
         }
     }
 
-    override fun onSiteLocationPermissionSelected(permission: LocationPermissionType) {
+    override fun onSiteLocationPermissionSelected(domain: String, permission: LocationPermissionType) {
         if (permission == LocationPermissionType.ALLOW_ONCE || permission == LocationPermissionType.ALLOW_ALWAYS) {
             onSiteLocationPermissionAllowed()
         } else {
             onSiteLocationPermissionDenied()
         }
         viewModelScope.launch {
-            locationPermissionsRepository.saveLocationPermission(permissionOrigin, permission)
+            locationPermissionsRepository.saveLocationPermission(domain, permission)
         }
     }
 

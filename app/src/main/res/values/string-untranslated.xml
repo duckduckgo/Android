@@ -84,5 +84,5 @@
     <string name="preciseLocationEmptyListHint">No domains with Location Permission yet</string>
     <string name="preciseLocationActivityTitle">Location Permissions</string>
     <string name="preciseLocationDeleteConfirmMessage">Are you sure you want to delete &lt;b>%s&lt;/b>?</string>
-    <string name="preciseLocationDeleteContentDescription">Delete location permissions for domain %s</string>
+    <string name="preciseLocationDeleteContentDescription">More options for location permissions in domain %s</string>
 </resources>

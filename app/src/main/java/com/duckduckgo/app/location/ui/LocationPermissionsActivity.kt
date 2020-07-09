@@ -45,8 +45,15 @@ class LocationPermissionsActivity : DuckDuckGoActivity() {
     }
 
     private fun setupRecyclerView() {
-        adapter = LocationPermissionsAdapter(viewModel)
+        adapter = LocationPermissionsAdapter(viewModel) { domain ->
+            editSiteLocationPermission(domain)
+        }
         recycler.adapter = adapter
+    }
+
+    private fun editSiteLocationPermission(domain: String) {
+        val dialog = SiteLocationPermissionDialog.instance(domain, viewModel)
+        dialog.show(supportFragmentManager, SiteLocationPermissionDialog.SITE_LOCATION_PERMISSION_TAG)
     }
 
     private fun observeViewModel() {

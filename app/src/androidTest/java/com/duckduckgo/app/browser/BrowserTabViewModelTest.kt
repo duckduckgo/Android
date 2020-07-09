@@ -75,7 +75,6 @@ import com.duckduckgo.app.global.events.db.UserEventEntity
 import com.duckduckgo.app.global.events.db.UserEventsStore
 import com.duckduckgo.app.global.useourapp.UseOurAppDetector
 import com.duckduckgo.app.location.GeoLocationPermissions
-import com.duckduckgo.app.location.GeoLocationPermissionsManager
 import com.duckduckgo.app.notification.db.NotificationDao
 import com.duckduckgo.app.onboarding.store.AppStage
 import com.duckduckgo.app.onboarding.store.OnboardingStore
