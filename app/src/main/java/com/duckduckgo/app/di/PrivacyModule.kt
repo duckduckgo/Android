@@ -106,6 +106,6 @@ class PrivacyModule {
         locationPermissionsRepository: LocationPermissionsRepository,
         fireproofWebsiteRepository: FireproofWebsiteRepository
     ): GeoLocationPermissions {
-        return GeoLocationPermissionsManager(GeolocationPermissions.getInstance(), locationPermissionsRepository, fireproofWebsiteRepository)
+        return GeoLocationPermissionsManager(locationPermissionsRepository, fireproofWebsiteRepository)
     }
 }

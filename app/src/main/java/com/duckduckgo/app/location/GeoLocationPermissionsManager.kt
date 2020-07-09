@@ -19,6 +19,7 @@ package com.duckduckgo.app.location
 import android.webkit.GeolocationPermissions
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepository
 import com.duckduckgo.app.location.data.LocationPermissionsRepository
+import com.duckduckgo.app.location.data.host
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import timber.log.Timber
@@ -31,29 +32,34 @@ interface GeoLocationPermissions {
 }
 
 class GeoLocationPermissionsManager @Inject constructor(
-    private val geolocationPermissions: GeolocationPermissions,
     private val permissionsRepository: LocationPermissionsRepository,
     private val fireproofWebsiteRepository: FireproofWebsiteRepository
 ) : GeoLocationPermissions {
 
     override fun allow(domain: String) {
+        val geolocationPermissions = GeolocationPermissions.getInstance()
         geolocationPermissions.allow(domain)
     }
 
     override fun deny(domain: String) {
+        val geolocationPermissions = GeolocationPermissions.getInstance()
         geolocationPermissions.clear(domain)
     }
 
     override suspend fun clearAll() {
-        val permissions = withContext(Dispatchers.IO) {
-            permissionsRepository.getLocationPermissionsSync()
-        }
-        Timber.i("GeoLocationsPermissionsManager: $permissions")
-        permissions.forEach {
-            if (!fireproofWebsiteRepository.isDomainFireproofed(it.domain)) {
-                geolocationPermissions.clear(it.domain)
-                permissionsRepository.removeLocationPermission(it.domain)
+        withContext(Dispatchers.IO) {
+            val geolocationPermissions = GeolocationPermissions.getInstance()
+            val permissions = permissionsRepository.getLocationPermissionsSync()
+            val fireproofed = fireproofWebsiteRepository.getFireproofWebsitesSync()
+            Timber.i("GeoLocationsPermissionsManager: $permissions, fireproofed: $fireproofed")
+            permissions.forEach {
+                if (!fireproofWebsiteRepository.isDomainFireproofed(it.host())) {
+                    geolocationPermissions.clear(it.domain)
+                    permissionsRepository.removeLocationPermission(it.domain)
+                    Timber.i("GeoLocationsPermissionsManager: Remove permission from ${it.domain}")
+                }
             }
         }
+
     }
 }

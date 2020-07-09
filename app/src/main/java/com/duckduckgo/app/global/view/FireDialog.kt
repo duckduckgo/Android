@@ -19,6 +19,7 @@ package com.duckduckgo.app.global.view
 import android.content.Context
 import android.os.Bundle
 import android.view.View
+import android.webkit.GeolocationPermissions
 import com.duckduckgo.app.browser.R
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import kotlinx.android.synthetic.main.sheet_fire_clear_data.*

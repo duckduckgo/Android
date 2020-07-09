@@ -70,12 +70,14 @@ class ClearPersonalDataAction @Inject constructor(
     override suspend fun clearTabsAndAllDataAsync(appInForeground: Boolean, shouldFireDataClearPixel: Boolean) {
         withContext(Dispatchers.IO) {
             cookieManager.flush()
+            geoLocationPermissions.clearAll()
             clearTabsAsync(appInForeground)
         }
 
         withContext(Dispatchers.Main) {
             clearDataAsync(shouldFireDataClearPixel)
         }
+
         Timber.i("Finished clearing everything")
     }
 
@@ -98,7 +100,6 @@ class ClearPersonalDataAction @Inject constructor(
 
         dataManager.clearData(createWebView(), createWebStorage(), WebViewDatabase.getInstance(context))
         appCacheClearer.clearCache()
-        geoLocationPermissions.clearAll()
 
         Timber.i("Finished clearing data")
     }

@@ -29,7 +29,6 @@ import com.duckduckgo.app.global.image.GlideApp
 import com.duckduckgo.app.global.view.website
 import com.duckduckgo.app.location.data.LocationPermissionType
 import org.jetbrains.anko.find
-import java.util.Locale
 
 class SiteLocationPermissionDialog : DialogFragment() {
 

@@ -74,6 +74,8 @@ import com.duckduckgo.app.notification.model.UseOurAppNotification
 import com.duckduckgo.app.global.events.db.UserEventEntity
 import com.duckduckgo.app.global.events.db.UserEventsStore
 import com.duckduckgo.app.global.useourapp.UseOurAppDetector
+import com.duckduckgo.app.location.GeoLocationPermissions
+import com.duckduckgo.app.location.GeoLocationPermissionsManager
 import com.duckduckgo.app.notification.db.NotificationDao
 import com.duckduckgo.app.onboarding.store.AppStage
 import com.duckduckgo.app.onboarding.store.OnboardingStore
@@ -211,6 +213,9 @@ class BrowserTabViewModelTest {
     @Mock
     private lateinit var mockNotificationDao: NotificationDao
 
+    @Mock
+    private lateinit var geoLocationPermissions: GeoLocationPermissions
+
     private lateinit var mockAutoCompleteApi: AutoCompleteApi
 
     private lateinit var ctaViewModel: CtaViewModel
@@ -289,8 +294,9 @@ class BrowserTabViewModelTest {
             pixel = mockPixel,
             dispatchers = coroutineRule.testDispatcherProvider,
             fireproofWebsiteRepository = FireproofWebsiteRepository(fireproofWebsiteDao, coroutineRule.testDispatcherProvider),
-            locationPermissionsRepository = LocationPermissionsRepository(locationPermissionsDao, coroutineRule.testDispatcherProvider),
             navigationAwareLoginDetector = mockNavigationAwareLoginDetector,
+            locationPermissionsRepository = LocationPermissionsRepository(locationPermissionsDao, coroutineRule.testDispatcherProvider),
+            geoLocationPermissions = geoLocationPermissions,
             userEventsStore = mockUserEventsStore,
             notificationDao = mockNotificationDao,
             useOurAppDetector = UseOurAppDetector(mockUserEventsStore),

@@ -25,6 +25,15 @@ data class LocationPermissionEntity(
     val permission: LocationPermissionType
 )
 
+private const val WWW_HOST_PREFIX = "https://"
+private const val WWW_SUFFIX = "/"
+
+fun LocationPermissionEntity.host(): String {
+    return domain.takeIf { it.startsWith(WWW_HOST_PREFIX, ignoreCase = true) && it.endsWith(WWW_SUFFIX, ignoreCase = true) }
+        ?.drop(WWW_HOST_PREFIX.length)?.dropLast(WWW_SUFFIX.length) ?: domain
+}
+
+
 private const val TYPE_ALLOW_ALWAYS = 1
 private const val TYPE_ALLOW_ONCE = 2
 private const val TYPE_DENY_ALWAYS = 3
