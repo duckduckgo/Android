@@ -16,17 +16,14 @@
 
 package com.duckduckgo.app.location.ui
 
+import android.webkit.GeolocationPermissions
 import androidx.lifecycle.*
 import androidx.lifecycle.Observer
-import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
-import com.duckduckgo.app.fire.fireproofwebsite.ui.FireproofWebsitesViewModel.Command.ConfirmDeleteFireproofWebsite
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.SingleLiveEvent
 import com.duckduckgo.app.location.data.LocationPermissionEntity
 import com.duckduckgo.app.location.data.LocationPermissionsRepository
 import com.duckduckgo.app.settings.db.SettingsDataStore
-import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.*
 import kotlinx.coroutines.launch
 
 class LocationPermissionsViewModel(
@@ -48,7 +45,7 @@ class LocationPermissionsViewModel(
     val viewState: LiveData<ViewState> = _viewState
     val command: SingleLiveEvent<Command> = SingleLiveEvent()
 
-    private val locationPermissions: LiveData<List<LocationPermissionEntity>> = locationPermissionsRepository.getLocationPermissions()
+    private val locationPermissions: LiveData<List<LocationPermissionEntity>> = locationPermissionsRepository.getLocationPermissionsAsync()
     private val fireproofWebsitesObserver = Observer<List<LocationPermissionEntity>> { onLocationPermissionsEntitiesChanged(it!!) }
 
     init {
@@ -76,6 +73,8 @@ class LocationPermissionsViewModel(
     fun delete(entity: LocationPermissionEntity) {
         viewModelScope.launch(dispatcherProvider.io()) {
             locationPermissionsRepository.removeLocationPermission(entity.domain)
+            val geolocationPermissions = GeolocationPermissions.getInstance()
+            geolocationPermissions.clear(entity.domain)
         }
     }
 

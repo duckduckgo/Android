@@ -69,6 +69,7 @@ import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.global.model.SiteFactory
 import com.duckduckgo.app.global.model.domain
 import com.duckduckgo.app.global.model.domainMatchesUrl
+import com.duckduckgo.app.location.GeoLocationPermissions
 import com.duckduckgo.app.location.data.LocationPermissionType
 import com.duckduckgo.app.location.data.LocationPermissionsRepository
 import com.duckduckgo.app.location.ui.SiteLocationPermissionDialog
@@ -111,6 +112,7 @@ class BrowserTabViewModel(
     private val bookmarksDao: BookmarksDao,
     private val fireproofWebsiteRepository: FireproofWebsiteRepository,
     private val locationPermissionsRepository: LocationPermissionsRepository,
+    private val geoLocationPermissions: GeoLocationPermissions,
     private val navigationAwareLoginDetector: NavigationAwareLoginDetector,
     private val autoComplete: AutoComplete,
     private val appSettingsPreferencesStore: SettingsDataStore,
@@ -738,6 +740,11 @@ class BrowserTabViewModel(
         origin?.let { permissionOrigin = origin }
         callback?.let { permissionCallback = callback }
 
+        if (!appSettingsPreferencesStore.appLocationPermission) {
+            onSiteLocationPermissionDenied()
+            return
+        }
+
         if (origin != null) {
             command.postValue(CheckSystemLocationPermission(origin))
         } else {
@@ -753,6 +760,33 @@ class BrowserTabViewModel(
         }
         viewModelScope.launch {
             locationPermissionsRepository.saveLocationPermission(permissionOrigin, permission)
+        }
+    }
+
+    private fun onSiteLocationPermissionAllowed() {
+        geoLocationPermissions.allow(permissionOrigin)
+        permissionCallback?.invoke(permissionOrigin, true, false)
+    }
+
+    fun onSiteLocationPermissionDenied() {
+        geoLocationPermissions.deny(permissionOrigin)
+        permissionCallback?.invoke(permissionOrigin, false, false)
+    }
+
+    private fun reactToSitePermission(permission: LocationPermissionType) {
+        when (permission) {
+            LocationPermissionType.ALLOW_ALWAYS -> {
+                onSiteLocationPermissionAllowed()
+            }
+            LocationPermissionType.ALLOW_ONCE -> {
+                command.postValue(AskDomainPermission(permissionOrigin))
+            }
+            LocationPermissionType.DENY_ALWAYS -> {
+                onSiteLocationPermissionDenied()
+            }
+            LocationPermissionType.DENY_ONCE -> {
+                command.postValue(AskDomainPermission(permissionOrigin))
+            }
         }
     }
 
@@ -780,37 +814,6 @@ class BrowserTabViewModel(
                 command.postValue(AskDomainPermission(permissionOrigin))
             }
         }
-    }
-
-    private fun reactToSitePermission(permission: LocationPermissionType) {
-        when (permission) {
-            LocationPermissionType.ALLOW_ALWAYS -> {
-                onSiteLocationPermissionAllowed()
-            }
-            LocationPermissionType.ALLOW_ONCE -> {
-                command.postValue(AskDomainPermission(permissionOrigin))
-            }
-            LocationPermissionType.DENY_ALWAYS -> {
-                onSiteLocationPermissionDenied()
-            }
-            LocationPermissionType.DENY_ONCE -> {
-                command.postValue(AskDomainPermission(permissionOrigin))
-            }
-        }
-    }
-
-    private fun onSiteLocationPermissionAllowed() {
-        val geoLocationPermissions = GeolocationPermissions.getInstance()
-        geoLocationPermissions.allow(permissionOrigin)
-
-        permissionCallback?.invoke(permissionOrigin, true, false)
-    }
-
-    fun onSiteLocationPermissionDenied() {
-        val geoLocationPermissions = GeolocationPermissions.getInstance()
-        geoLocationPermissions.clear(permissionOrigin)
-
-        permissionCallback?.invoke(permissionOrigin, false, false)
     }
 
     private fun registerSiteVisit() {

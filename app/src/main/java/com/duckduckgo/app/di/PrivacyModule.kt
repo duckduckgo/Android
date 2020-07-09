@@ -17,12 +17,15 @@
 package com.duckduckgo.app.di
 
 import android.content.Context
+import android.webkit.GeolocationPermissions
 import androidx.work.WorkManager
 import com.duckduckgo.app.browser.WebDataManager
 import com.duckduckgo.app.fire.*
 import com.duckduckgo.app.global.file.FileDeleter
 import com.duckduckgo.app.global.view.ClearDataAction
 import com.duckduckgo.app.global.view.ClearPersonalDataAction
+import com.duckduckgo.app.location.GeoLocationPermissions
+import com.duckduckgo.app.location.GeoLocationPermissionsManager
 import com.duckduckgo.app.privacy.model.PrivacyPractices
 import com.duckduckgo.app.privacy.model.PrivacyPracticesImpl
 import com.duckduckgo.app.privacy.store.TermsOfServiceStore
@@ -83,5 +86,11 @@ class PrivacyModule {
     @Singleton
     fun appCacheCleaner(context: Context, fileDeleter: FileDeleter): AppCacheClearer {
         return AndroidAppCacheClearer(context, fileDeleter)
+    }
+
+    @Provides
+    @Singleton
+    fun geoLocationPermissions(): GeoLocationPermissions {
+        return GeoLocationPermissionsManager(GeolocationPermissions.getInstance())
     }
 }

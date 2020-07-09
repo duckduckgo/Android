@@ -43,6 +43,13 @@ class FireproofWebsiteRepository @Inject constructor(
 
     fun getFireproofWebsites(): LiveData<List<FireproofWebsiteEntity>> = fireproofWebsiteDao.fireproofWebsitesEntities()
 
+    suspend fun isDomainFireproofed(domain: String): Boolean {
+        return withContext(dispatchers.io()) {
+            val fireproofWebsite = fireproofWebsiteDao.getFireproofWebsiteSync(domain)
+            fireproofWebsite != null
+        }
+    }
+
     suspend fun removeFireproofWebsite(fireproofWebsiteEntity: FireproofWebsiteEntity) {
         withContext(dispatchers.io()) {
             fireproofWebsiteDao.delete(fireproofWebsiteEntity)

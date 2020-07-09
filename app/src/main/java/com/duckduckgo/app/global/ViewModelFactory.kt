@@ -47,6 +47,7 @@ import com.duckduckgo.app.global.rating.AppEnjoymentUserEventRecorder
 import com.duckduckgo.app.icon.api.IconModifier
 import com.duckduckgo.app.icon.ui.ChangeIconViewModel
 import com.duckduckgo.app.launch.LaunchViewModel
+import com.duckduckgo.app.location.GeoLocationPermissions
 import com.duckduckgo.app.location.data.LocationPermissionsRepository
 import com.duckduckgo.app.location.ui.LocationPermissionsViewModel
 import com.duckduckgo.app.notification.AndroidNotificationScheduler
@@ -90,6 +91,7 @@ class ViewModelFactory @Inject constructor(
     private val bookmarksDao: BookmarksDao,
     private val fireproofWebsiteRepository: FireproofWebsiteRepository,
     private val locationPermissionsRepository: LocationPermissionsRepository,
+    private val geoLocationPermissions: GeoLocationPermissions,
     private val navigationAwareLoginDetector: NavigationAwareLoginDetector,
     private val surveyDao: SurveyDao,
     private val autoCompleteApi: AutoCompleteApi,
@@ -193,6 +195,7 @@ class ViewModelFactory @Inject constructor(
         bookmarksDao = bookmarksDao,
         fireproofWebsiteRepository = fireproofWebsiteRepository,
         locationPermissionsRepository = locationPermissionsRepository,
+        geoLocationPermissions = geoLocationPermissions,
         navigationAwareLoginDetector = navigationAwareLoginDetector,
         autoComplete = autoCompleteApi,
         appSettingsPreferencesStore = appSettingsPreferencesStore,

@@ -86,7 +86,7 @@ class SettingsSharedPreferences @Inject constructor(private val context: Context
         set(enabled) = preferences.edit { putBoolean(KEY_LOGIN_DETECTION_ENABLED, enabled) }
 
     override var appLocationPermission: Boolean
-        get() = preferences.getBoolean(KEY_LOCATION_PERMISSION_ENABLED, false)
+        get() = preferences.getBoolean(KEY_LOCATION_PERMISSION_ENABLED, true)
         set(enabled) = preferences.edit { putBoolean(KEY_LOCATION_PERMISSION_ENABLED, enabled) }
 
     override var appIcon: AppIcon
