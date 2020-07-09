@@ -18,7 +18,6 @@ package com.duckduckgo.app.location.data
 
 import androidx.lifecycle.LiveData
 import com.duckduckgo.app.global.DispatcherProvider
-import com.duckduckgo.app.global.UriString
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 

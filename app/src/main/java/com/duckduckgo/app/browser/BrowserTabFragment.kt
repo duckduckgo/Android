@@ -117,7 +117,7 @@ import com.duckduckgo.app.browser.useragent.UserAgentProvider
 import com.duckduckgo.app.cta.ui.Cta
 import com.duckduckgo.app.cta.ui.CtaViewModel
 import com.duckduckgo.app.cta.ui.DaxBubbleCta
-import com.duckduckgo.app.cta.ui.DaxDialogCta
+import com.duckduckgo.app.cta.ui.DialogCta
 import com.duckduckgo.app.cta.ui.HomePanelCta
 import com.duckduckgo.app.cta.ui.HomeTopPanelCta
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
@@ -142,6 +142,7 @@ import kotlinx.android.synthetic.main.fragment_browser_tab.autoCompleteSuggestio
 import kotlinx.android.synthetic.main.fragment_browser_tab.browserLayout
 import kotlinx.android.synthetic.main.fragment_browser_tab.focusDummy
 import kotlinx.android.synthetic.main.fragment_browser_tab.rootView
+import kotlinx.android.synthetic.main.fragment_browser_tab.swipeRefreshContainer
 import kotlinx.android.synthetic.main.fragment_browser_tab.webViewContainer
 import kotlinx.android.synthetic.main.fragment_browser_tab.webViewFullScreenContainer
 import kotlinx.android.synthetic.main.include_add_widget_instruction_buttons.view.closeButton
@@ -181,7 +182,7 @@ import javax.inject.Inject
 import kotlin.concurrent.thread
 import kotlin.coroutines.CoroutineContext
 
-class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogListener, TrackersAnimatorListener{
+class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogListener, TrackersAnimatorListener {
 
     private val supervisorJob = SupervisorJob()
 

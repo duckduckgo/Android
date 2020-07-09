@@ -112,7 +112,6 @@ class SettingsViewModel @Inject constructor(
         command.value = Command.LaunchLocation
     }
 
-
     fun onLightThemeToggled(enabled: Boolean) {
         Timber.i("User toggled light theme, is now enabled: $enabled")
         settingsDataStore.theme = if (enabled) DuckDuckGoTheme.LIGHT else DuckDuckGoTheme.DARK

@@ -43,7 +43,7 @@ class GeoLocationPermissionsManager @Inject constructor(
 
     override suspend fun clearAll() {
         permissionsRepository.getLocationPermissionsSync().forEach {
-            if (!fireproofWebsiteRepository.isDomainFireproofed(it.domain)){
+            if (!fireproofWebsiteRepository.isDomainFireproofed(it.domain)) {
                 geolocationPermissions.clear(it.domain)
             }
         }

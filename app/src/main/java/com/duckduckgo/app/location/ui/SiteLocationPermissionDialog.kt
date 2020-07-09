@@ -74,7 +74,7 @@ class SiteLocationPermissionDialog : DialogFragment() {
         }
     }
 
-    private fun populateFavicon(imageView: ImageView){
+    private fun populateFavicon(imageView: ImageView) {
         arguments?.let { args ->
             val originUrl = args.getString(KEY_REQUEST_ORIGIN)
             val faviconUrl = Uri.parse(originUrl).faviconLocation()

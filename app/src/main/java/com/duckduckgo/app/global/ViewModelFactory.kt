@@ -54,7 +54,6 @@ import com.duckduckgo.app.notification.db.NotificationDao
 import com.duckduckgo.app.location.GeoLocationPermissions
 import com.duckduckgo.app.location.data.LocationPermissionsRepository
 import com.duckduckgo.app.location.ui.LocationPermissionsViewModel
-import com.duckduckgo.app.notification.AndroidNotificationScheduler
 import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.onboarding.ui.OnboardingPageManager
 import com.duckduckgo.app.onboarding.ui.OnboardingViewModel

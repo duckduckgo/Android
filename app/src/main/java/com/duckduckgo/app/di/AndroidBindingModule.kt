@@ -135,7 +135,6 @@ abstract class AndroidBindingModule {
     @ContributesAndroidInjector
     abstract fun changeAppIconActivity(): ChangeIconActivity
 
-
     @ActivityScoped
     @ContributesAndroidInjector
     abstract fun locationPermissionsActivity(): LocationPermissionsActivity

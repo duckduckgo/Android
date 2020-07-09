@@ -21,11 +21,13 @@ import android.webkit.GeolocationPermissions
 import androidx.work.WorkManager
 import com.duckduckgo.app.browser.WebDataManager
 import com.duckduckgo.app.fire.*
+import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepository
 import com.duckduckgo.app.global.file.FileDeleter
 import com.duckduckgo.app.global.view.ClearDataAction
 import com.duckduckgo.app.global.view.ClearPersonalDataAction
 import com.duckduckgo.app.location.GeoLocationPermissions
 import com.duckduckgo.app.location.GeoLocationPermissionsManager
+import com.duckduckgo.app.location.data.LocationPermissionsRepository
 import com.duckduckgo.app.privacy.model.PrivacyPractices
 import com.duckduckgo.app.privacy.model.PrivacyPracticesImpl
 import com.duckduckgo.app.privacy.store.TermsOfServiceStore
@@ -60,9 +62,19 @@ class PrivacyModule {
         tabRepository: TabRepository,
         settingsDataStore: SettingsDataStore,
         cookieManager: DuckDuckGoCookieManager,
-        appCacheClearer: AppCacheClearer
+        appCacheClearer: AppCacheClearer,
+        geoLocationPermissions: GeoLocationPermissions
     ): ClearDataAction {
-        return ClearPersonalDataAction(context, dataManager, clearingStore, tabRepository, settingsDataStore, cookieManager, appCacheClearer)
+        return ClearPersonalDataAction(
+            context,
+            dataManager,
+            clearingStore,
+            tabRepository,
+            settingsDataStore,
+            cookieManager,
+            appCacheClearer,
+            geoLocationPermissions
+        )
     }
 
     @Provides
@@ -90,7 +102,10 @@ class PrivacyModule {
 
     @Provides
     @Singleton
-    fun geoLocationPermissions(): GeoLocationPermissions {
-        return GeoLocationPermissionsManager(GeolocationPermissions.getInstance())
+    fun geoLocationPermissions(
+        locationPermissionsRepository: LocationPermissionsRepository,
+        fireproofWebsiteRepository: FireproofWebsiteRepository
+    ): GeoLocationPermissions {
+        return GeoLocationPermissionsManager(GeolocationPermissions.getInstance(), locationPermissionsRepository, fireproofWebsiteRepository)
     }
 }
