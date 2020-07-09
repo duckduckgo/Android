@@ -214,7 +214,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
     private val menuButton: ViewGroup?
         get() = appBarLayout.browserMenu
 
-    private var webView: WebView? = null
+    private var webView: DuckDuckGoWebView? = null
 
     private val errorSnackbar: Snackbar by lazy {
         Snackbar.make(browserLayout, R.string.crashedWebViewErrorMessage, Snackbar.LENGTH_INDEFINITE)
@@ -269,6 +269,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
         configureObservers()
         configurePrivacyGrade()
         configureWebView()
+        configureSwipeRefresh()
         viewModel.registerWebViewListener(webViewClient, webChromeClient)
         configureOmnibarTextInput()
         configureFindInPage()
@@ -798,7 +799,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
             R.layout.include_duckduckgo_browser_webview,
             webViewContainer,
             true
-        ).findViewById(R.id.browserWebView) as WebView
+        ).findViewById(R.id.browserWebView) as DuckDuckGoWebView
 
         webView?.let {
             it.webViewClient = webViewClient
@@ -829,6 +830,10 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
                 false
             }
 
+            it.setEnableSwipeRefreshCallback { enable ->
+                swipeRefreshContainer?.isEnabled = enable
+            }
+
             registerForContextMenu(it)
 
             it.setFindListener(this)
@@ -838,6 +843,21 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
         if (BuildConfig.DEBUG) {
             WebView.setWebContentsDebuggingEnabled(true)
         }
+    }
+
+    private fun configureSwipeRefresh() {
+        swipeRefreshContainer.setColorSchemeColors(ContextCompat.getColor(requireContext(), R.color.cornflowerBlue))
+
+        swipeRefreshContainer.setOnRefreshListener {
+            onRefreshRequested()
+        }
+
+        swipeRefreshContainer.setCanChildScrollUpCallback {
+            webView?.canScrollVertically(-1) ?: false
+        }
+
+        // avoids progressView from showing under toolbar
+        swipeRefreshContainer.progressViewStartOffset = swipeRefreshContainer.progressViewStartOffset - 15
     }
 
     /**
@@ -1462,6 +1482,11 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
                     if (viewState.progress == MAX_PROGRESS) {
                         createTrackersAnimation()
                     }
+                }
+
+                if (!viewState.isLoading) {
+                    swipeRefreshContainer.isRefreshing = false
+                    webView?.detectOverscrollBehavior()
                 }
             }
         }
