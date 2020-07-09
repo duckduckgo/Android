@@ -500,7 +500,6 @@ class BrowserTabViewModel(
         } else {
             pixel.fire(String.format(Locale.US, PixelName.SERP_REQUERY.pixelName, PixelParameter.SERP_QUERY_CHANGED))
         }
-
     }
 
     private fun shouldClearHistoryOnNewQuery(): Boolean {
@@ -791,8 +790,14 @@ class BrowserTabViewModel(
     }
 
     override fun onSiteLocationPermissionRequested(origin: String?, callback: GeolocationPermissions.Callback?) {
-        origin?.let { permissionOrigin = origin }
         callback?.let { permissionCallback = callback }
+        origin?.let { permissionOrigin = origin }
+
+        if (site?.domainMatchesUrl(permissionOrigin) == false) {
+            Timber.d("Can't accept request from $origin, it does not match the current domain")
+            onSiteLocationPermissionDenied()
+            return
+        }
 
         if (!appSettingsPreferencesStore.appLocationPermission) {
             onSiteLocationPermissionDenied()
