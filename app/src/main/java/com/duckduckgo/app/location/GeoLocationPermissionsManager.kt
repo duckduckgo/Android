@@ -19,6 +19,9 @@ package com.duckduckgo.app.location
 import android.webkit.GeolocationPermissions
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepository
 import com.duckduckgo.app.location.data.LocationPermissionsRepository
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import timber.log.Timber
 import javax.inject.Inject
 
 interface GeoLocationPermissions {
@@ -42,9 +45,14 @@ class GeoLocationPermissionsManager @Inject constructor(
     }
 
     override suspend fun clearAll() {
-        permissionsRepository.getLocationPermissionsSync().forEach {
+        val permissions = withContext(Dispatchers.IO) {
+            permissionsRepository.getLocationPermissionsSync()
+        }
+        Timber.i("GeoLocationsPermissionsManager: $permissions")
+        permissions.forEach {
             if (!fireproofWebsiteRepository.isDomainFireproofed(it.domain)) {
                 geolocationPermissions.clear(it.domain)
+                permissionsRepository.removeLocationPermission(it.domain)
             }
         }
     }

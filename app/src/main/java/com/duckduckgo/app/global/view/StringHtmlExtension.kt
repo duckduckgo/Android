@@ -35,3 +35,11 @@ private fun htmlDrawable(context: Context, resource: Int): Drawable {
     drawable.setBounds(0, 0, drawable.intrinsicWidth, drawable.intrinsicHeight)
     return drawable
 }
+
+private const val WWW_PREFIX = "https://www."
+private const val WWW_SUFFIX = "/"
+
+fun String.website(): String {
+    return this.takeIf { it.startsWith(WWW_PREFIX, ignoreCase = true) && it.endsWith(WWW_SUFFIX, ignoreCase = true) }
+        ?.drop(WWW_PREFIX.length)?.dropLast(WWW_SUFFIX.length) ?: this
+}

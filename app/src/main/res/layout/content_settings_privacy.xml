@@ -36,11 +36,19 @@
         android:text="@string/settingsFireproofWebsites"
         app:layout_constraintTop_toBottomOf="@id/settingsPrivacyTitle" />
 
+    <TextView
+        android:id="@+id/locationPermissions"
+        style="@style/SettingsItemClickable"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:text="@string/settingsPreciseLocation"
+        app:layout_constraintTop_toBottomOf="@id/fireproofWebsites" />
+
     <com.duckduckgo.app.settings.SettingsOptionWithSubtitle
         android:id="@+id/automaticallyClearWhatSetting"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@id/fireproofWebsites"
+        app:layout_constraintTop_toBottomOf="@id/locationPermissions"
         app:subtitle="test test test"
         app:title="@string/settingsAutomaticallyClearWhat" />
 
@@ -61,13 +69,5 @@
         app:layout_constraintEnd_toEndOf="parent"
         android:text="@string/settingsPrivacyProtectionWhitelist"
         app:layout_constraintTop_toBottomOf="@id/automaticallyClearWhenSetting" />
-
-    <TextView
-        android:id="@+id/location"
-        style="@style/SettingsItemClickable"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:text="@string/settingsPreciseLocation"
-        app:layout_constraintTop_toBottomOf="@id/whitelist" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

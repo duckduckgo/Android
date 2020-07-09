@@ -17,11 +17,16 @@
 package com.duckduckgo.app.location.ui
 
 import android.app.Dialog
+import android.net.Uri
 import android.os.Bundle
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.DialogFragment
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.global.faviconLocation
+import com.duckduckgo.app.global.image.GlideApp
+import com.duckduckgo.app.global.view.website
 import org.jetbrains.anko.find
 import java.util.Locale
 
@@ -41,6 +46,7 @@ class SystemLocationPermissionDialog : DialogFragment() {
         val rootView = layoutInflater.inflate(R.layout.content_system_location_permission_dialog, null)
 
         val title = rootView.find<TextView>(R.id.systemPermissionDialogTitle)
+        val favicon = rootView.find<ImageView>(R.id.faviconImage)
         val allowLocationPermission = rootView.find<TextView>(R.id.allowLocationPermission)
         val denyLocationPermission = rootView.find<TextView>(R.id.denyLocationPermission)
         val neverAllowLocationPermission = rootView.find<TextView>(R.id.neverAllowLocationPermission)
@@ -50,6 +56,7 @@ class SystemLocationPermissionDialog : DialogFragment() {
 
         validateBundleArguments()
         populateTitle(title)
+        populateFavicon(favicon)
         configureListeners(allowLocationPermission, denyLocationPermission, neverAllowLocationPermission)
 
         return alertBuilder.create()
@@ -66,8 +73,20 @@ class SystemLocationPermissionDialog : DialogFragment() {
     private fun populateTitle(title: TextView) {
         arguments?.let { args ->
             val originUrl = args.getString(KEY_REQUEST_ORIGIN)
-            val dialogTitle = String.format(Locale.US, getString(R.string.preciseLocationSystemDialogTitle), originUrl)
+            val dialogTitle = String.format(Locale.US, getString(R.string.preciseLocationSystemDialogTitle), originUrl.website())
             title.text = dialogTitle
+        }
+    }
+
+    private fun populateFavicon(imageView: ImageView) {
+        arguments?.let { args ->
+            val originUrl = args.getString(KEY_REQUEST_ORIGIN)
+            val faviconUrl = Uri.parse(originUrl).faviconLocation()
+
+            GlideApp.with(requireContext())
+                .load(faviconUrl)
+                .error(R.drawable.ic_globe_gray_16dp)
+                .into(imageView)
         }
     }
 

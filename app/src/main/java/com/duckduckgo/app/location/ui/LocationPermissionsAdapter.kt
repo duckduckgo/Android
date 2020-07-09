@@ -26,6 +26,7 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.faviconLocation
 import com.duckduckgo.app.global.image.GlideApp
 import com.duckduckgo.app.global.view.quietlySetIsChecked
+import com.duckduckgo.app.global.view.website
 import com.duckduckgo.app.location.data.LocationPermissionEntity
 import kotlinx.android.synthetic.main.view_fireproof_website_entry.view.*
 import kotlinx.android.synthetic.main.view_fireproof_website_toggle.view.*
@@ -102,7 +103,11 @@ class LocationPermissionsAdapter(
             is LocationPermissionsViewHolder.LocationPermissionsToggleViewHolder -> {
                 holder.bind(locationPermissionEnabled)
             }
-            is LocationPermissionsViewHolder.LocationPermissionsItemViewHolder -> holder.bind(locationPermissions[getLocationPermissionPosition(position)])
+            is LocationPermissionsViewHolder.LocationPermissionsItemViewHolder -> holder.bind(
+                locationPermissions[getLocationPermissionPosition(
+                    position
+                )]
+            )
         }
     }
 
@@ -140,19 +145,21 @@ sealed class LocationPermissionsViewHolder(itemView: View) : RecyclerView.ViewHo
 
     class LocationPermissionsSimpleViewViewHolder(itemView: View) : LocationPermissionsViewHolder(itemView)
 
-    class LocationPermissionsItemViewHolder(itemView: View, private val viewModel: LocationPermissionsViewModel) : LocationPermissionsViewHolder(itemView) {
+    class LocationPermissionsItemViewHolder(itemView: View, private val viewModel: LocationPermissionsViewModel) :
+        LocationPermissionsViewHolder(itemView) {
 
         lateinit var entity: LocationPermissionEntity
 
         fun bind(entity: LocationPermissionEntity) {
             this.entity = entity
+            val website = entity.domain.website()
 
             itemView.locationPermissionDelete.contentDescription = itemView.context.getString(
                 R.string.preciseLocationDeleteContentDescription,
-                entity.domain
+                website
             )
 
-            itemView.locationPermissionEntryDomain.text = entity.domain
+            itemView.locationPermissionEntryDomain.text = website
             loadFavicon(entity.domain)
 
             itemView.locationPermissionDelete.setOnClickListener {

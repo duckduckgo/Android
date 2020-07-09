@@ -26,6 +26,7 @@ import androidx.fragment.app.DialogFragment
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.faviconLocation
 import com.duckduckgo.app.global.image.GlideApp
+import com.duckduckgo.app.global.view.website
 import com.duckduckgo.app.location.data.LocationPermissionType
 import org.jetbrains.anko.find
 import java.util.Locale
@@ -69,7 +70,7 @@ class SiteLocationPermissionDialog : DialogFragment() {
     private fun populateTitle(title: TextView) {
         arguments?.let { args ->
             val originUrl = args.getString(KEY_REQUEST_ORIGIN)
-            val dialogTitle = String.format(Locale.US, getString(R.string.preciseLocationSiteDialogTitle), originUrl)
+            val dialogTitle = getString(R.string.preciseLocationSiteDialogTitle, originUrl.website())
             title.text = dialogTitle
         }
     }
