@@ -21,6 +21,7 @@ import androidx.lifecycle.*
 import androidx.lifecycle.Observer
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.SingleLiveEvent
+import com.duckduckgo.app.location.GeoLocationPermissions
 import com.duckduckgo.app.location.data.LocationPermissionEntity
 import com.duckduckgo.app.location.data.LocationPermissionType
 import com.duckduckgo.app.location.data.LocationPermissionsRepository
@@ -29,6 +30,7 @@ import kotlinx.coroutines.launch
 
 class LocationPermissionsViewModel(
     private val locationPermissionsRepository: LocationPermissionsRepository,
+    private val geoLocationPermissions: GeoLocationPermissions,
     private val dispatcherProvider: DispatcherProvider,
     private val settingsDataStore: SettingsDataStore
 ) : SiteLocationPermissionDialog.Listener, ViewModel() {
@@ -40,6 +42,7 @@ class LocationPermissionsViewModel(
 
     sealed class Command {
         class ConfirmDeleteLocationPermission(val entity: LocationPermissionEntity) : Command()
+        class EditLocationPermissions(val entity: LocationPermissionEntity) : Command()
     }
 
     private val _viewState: MutableLiveData<ViewState> = MutableLiveData()
@@ -71,11 +74,14 @@ class LocationPermissionsViewModel(
         command.value = Command.ConfirmDeleteLocationPermission(entity)
     }
 
+    fun onEditRequested(entity: LocationPermissionEntity) {
+        command.value = Command.EditLocationPermissions(entity)
+    }
+
     fun delete(entity: LocationPermissionEntity) {
         viewModelScope.launch(dispatcherProvider.io()) {
             locationPermissionsRepository.removeLocationPermission(entity.domain)
-            val geolocationPermissions = GeolocationPermissions.getInstance()
-            geolocationPermissions.clear(entity.domain)
+            geoLocationPermissions.deny(entity.domain)
         }
     }
 

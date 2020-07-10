@@ -235,6 +235,7 @@ class ViewModelFactory @Inject constructor(
     private fun locationPermissionsViewModel() =
         LocationPermissionsViewModel(
             locationPermissionsRepository = locationPermissionsRepository,
+            geoLocationPermissions = geoLocationPermissions,
             dispatcherProvider = dispatcherProvider,
             settingsDataStore = appSettingsPreferencesStore
         )

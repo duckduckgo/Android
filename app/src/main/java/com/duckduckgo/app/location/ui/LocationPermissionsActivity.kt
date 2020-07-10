@@ -45,15 +45,8 @@ class LocationPermissionsActivity : DuckDuckGoActivity() {
     }
 
     private fun setupRecyclerView() {
-        adapter = LocationPermissionsAdapter(viewModel) { domain ->
-            editSiteLocationPermission(domain)
-        }
+        adapter = LocationPermissionsAdapter(viewModel)
         recycler.adapter = adapter
-    }
-
-    private fun editSiteLocationPermission(domain: String) {
-        val dialog = SiteLocationPermissionDialog.instance(domain, viewModel)
-        dialog.show(supportFragmentManager, SiteLocationPermissionDialog.SITE_LOCATION_PERMISSION_TAG)
     }
 
     private fun observeViewModel() {
@@ -67,6 +60,7 @@ class LocationPermissionsActivity : DuckDuckGoActivity() {
         viewModel.command.observe(this, Observer {
             when (it) {
                 is LocationPermissionsViewModel.Command.ConfirmDeleteLocationPermission -> confirmDeleteWebsite(it.entity)
+                is LocationPermissionsViewModel.Command.EditLocationPermissions -> editSiteLocationPermission(it.entity)
             }
         })
     }
@@ -83,6 +77,13 @@ class LocationPermissionsActivity : DuckDuckGoActivity() {
             .create()
         deleteDialog?.show()
     }
+
+
+    private fun editSiteLocationPermission(entity: LocationPermissionEntity) {
+        val dialog = SiteLocationPermissionDialog.instance(entity.domain, viewModel)
+        dialog.show(supportFragmentManager, SiteLocationPermissionDialog.SITE_LOCATION_PERMISSION_TAG)
+    }
+
 
     override fun onDestroy() {
         deleteDialog?.dismiss()

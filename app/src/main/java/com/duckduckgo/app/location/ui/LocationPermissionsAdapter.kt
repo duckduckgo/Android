@@ -38,8 +38,7 @@ import kotlinx.android.synthetic.main.view_location_permissions_toggle.view.loca
 import timber.log.Timber
 
 class LocationPermissionsAdapter(
-    private val viewModel: LocationPermissionsViewModel,
-    private val onOverflowClick: (String) -> Unit
+    private val viewModel: LocationPermissionsViewModel
 ) : RecyclerView.Adapter<LocationPermissionsViewHolder>() {
 
     companion object {
@@ -82,7 +81,7 @@ class LocationPermissionsAdapter(
             }
             PRECISE_LOCATION_DOMAIN_TYPE -> {
                 val view = inflater.inflate(R.layout.view_location_permissions_entry, parent, false)
-                LocationPermissionsViewHolder.LocationPermissionsItemViewHolder(view, onOverflowClick, viewModel)
+                LocationPermissionsViewHolder.LocationPermissionsItemViewHolder(view, viewModel)
             }
             EMPTY_STATE_TYPE -> {
                 val view = inflater.inflate(R.layout.view_location_permissions_empty_hint, parent, false)
@@ -147,7 +146,7 @@ sealed class LocationPermissionsViewHolder(itemView: View) : RecyclerView.ViewHo
 
     class LocationPermissionsSimpleViewViewHolder(itemView: View) : LocationPermissionsViewHolder(itemView)
 
-    class LocationPermissionsItemViewHolder(itemView: View, private val onOverflowClick: (String) -> Unit, private val viewModel: LocationPermissionsViewModel) :
+    class LocationPermissionsItemViewHolder(itemView: View, private val viewModel: LocationPermissionsViewModel) :
         LocationPermissionsViewHolder(itemView) {
 
         lateinit var entity: LocationPermissionEntity
@@ -165,7 +164,7 @@ sealed class LocationPermissionsViewHolder(itemView: View) : RecyclerView.ViewHo
             loadFavicon(entity.domain)
 
             itemView.locationPermissionMenu.setOnClickListener {
-                showOverFlowMenu(itemView.locationPermissionMenu, entity, onOverflowClick)
+                showOverFlowMenu(itemView.locationPermissionMenu, entity)
             }
         }
 
@@ -179,14 +178,13 @@ sealed class LocationPermissionsViewHolder(itemView: View) : RecyclerView.ViewHo
                 .into(itemView.locationPermissionEntryFavicon)
         }
 
-        private fun showOverFlowMenu(overflowMenu: ImageView, entity: LocationPermissionEntity, onOverflowClick: (String) -> Unit) {
+        private fun showOverFlowMenu(overflowMenu: ImageView, entity: LocationPermissionEntity) {
             val popup = PopupMenu(overflowMenu.context, overflowMenu)
             popup.inflate(R.menu.location_permissions_individual_overflow_menu)
             popup.setOnMenuItemClickListener {
                 when (it.itemId) {
                     R.id.edit -> {
-                        onOverflowClick(entity.domain)
-                        true
+                        editEntity(entity); true
                     }
                     R.id.delete -> {
                         deleteEntity(entity); true
@@ -195,6 +193,11 @@ sealed class LocationPermissionsViewHolder(itemView: View) : RecyclerView.ViewHo
                 }
             }
             popup.show()
+        }
+
+        private fun editEntity(entity: LocationPermissionEntity) {
+            Timber.i("Edit permissions from domain: ${entity.domain}")
+            viewModel.onEditRequested(entity)
         }
 
         private fun deleteEntity(entity: LocationPermissionEntity) {
