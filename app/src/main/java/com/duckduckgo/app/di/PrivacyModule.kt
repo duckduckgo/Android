@@ -21,6 +21,7 @@ import androidx.work.WorkManager
 import com.duckduckgo.app.browser.WebDataManager
 import com.duckduckgo.app.fire.*
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepository
+import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.file.FileDeleter
 import com.duckduckgo.app.global.view.ClearDataAction
 import com.duckduckgo.app.global.view.ClearPersonalDataAction
@@ -103,8 +104,9 @@ class PrivacyModule {
     @Singleton
     fun geoLocationPermissions(
         locationPermissionsRepository: LocationPermissionsRepository,
-        fireproofWebsiteRepository: FireproofWebsiteRepository
+        fireproofWebsiteRepository: FireproofWebsiteRepository,
+        dispatcherProvider: DispatcherProvider
     ): GeoLocationPermissions {
-        return GeoLocationPermissionsManager(locationPermissionsRepository, fireproofWebsiteRepository)
+        return GeoLocationPermissionsManager(locationPermissionsRepository, fireproofWebsiteRepository, dispatcherProvider)
     }
 }
