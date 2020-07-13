@@ -18,7 +18,6 @@ package com.duckduckgo.app.browser
 
 import android.view.MenuItem
 import android.view.View
-import android.webkit.GeolocationPermissions
 import android.webkit.HttpAuthHandler
 import android.webkit.WebView
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
@@ -68,15 +67,14 @@ import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.global.model.SiteFactory
-import com.duckduckgo.app.location.data.LocationPermissionsDao
-import com.duckduckgo.app.location.data.LocationPermissionsRepository
 import com.duckduckgo.app.global.events.db.UserEventKey
 import com.duckduckgo.app.notification.model.UseOurAppNotification
 import com.duckduckgo.app.global.events.db.UserEventEntity
 import com.duckduckgo.app.global.events.db.UserEventsStore
 import com.duckduckgo.app.global.useourapp.UseOurAppDetector
 import com.duckduckgo.app.location.GeoLocationPermissions
-import com.duckduckgo.app.location.ui.LocationPermissionsViewModel
+import com.duckduckgo.app.location.data.LocationPermissionsDao
+import com.duckduckgo.app.location.data.LocationPermissionsRepository
 import com.duckduckgo.app.notification.db.NotificationDao
 import com.duckduckgo.app.onboarding.store.AppStage
 import com.duckduckgo.app.onboarding.store.OnboardingStore
@@ -244,6 +242,7 @@ class BrowserTabViewModelTest {
             .allowMainThreadQueries()
             .build()
         fireproofWebsiteDao = db.fireproofWebsiteDao()
+        locationPermissionsDao = db.locationPermissionsDao()
 
         mockAutoCompleteApi = AutoCompleteApi(mockAutoCompleteService, mockBookmarksDao)
 
@@ -295,9 +294,9 @@ class BrowserTabViewModelTest {
             pixel = mockPixel,
             dispatchers = coroutineRule.testDispatcherProvider,
             fireproofWebsiteRepository = FireproofWebsiteRepository(fireproofWebsiteDao, coroutineRule.testDispatcherProvider),
-            navigationAwareLoginDetector = mockNavigationAwareLoginDetector,
             locationPermissionsRepository = LocationPermissionsRepository(locationPermissionsDao, coroutineRule.testDispatcherProvider),
             geoLocationPermissions = geoLocationPermissions,
+            navigationAwareLoginDetector = mockNavigationAwareLoginDetector,
             userEventsStore = mockUserEventsStore,
             notificationDao = mockNotificationDao,
             useOurAppDetector = UseOurAppDetector(mockUserEventsStore),
@@ -1559,7 +1558,15 @@ class BrowserTabViewModelTest {
     fun whenUserPressesBackAndNotSkippingHomeThenWebViewPreviewNotGenerated() {
         setupNavigation(isBrowsing = true, canGoBack = false, skipHome = false)
         testee.onUserPressedBack()
-        verify(mockCommandObserver, never()).onChanged(commandCaptor.capture())
+        assertFalse(commandCaptor.allValues.contains(Command.GenerateWebViewPreviewImage))
+    }
+
+    @Test
+    fun whenUserPressesBackAndGoesToHomeThenKeyboardShown() {
+        setupNavigation(isBrowsing = true, canGoBack = false, skipHome = false)
+        testee.onUserPressedBack()
+        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+        assertTrue(commandCaptor.allValues.contains(Command.ShowKeyboard))
     }
 
     @Test
@@ -2268,15 +2275,6 @@ class BrowserTabViewModelTest {
         loadUrl(USE_OUR_APP_DOMAIN, isBrowserShowing = true)
 
         verify(mockPixel, never()).fire(Pixel.PixelName.UOA_VISITED_AFTER_DELETE_CTA)
-    }
-
-    @Test
-    fun whenSiteLocationPermissionIsRequestedThenItsDeniedIfDomainDoesNotMatchOriginUrl() {
-        givenUseOurAppSiteIsNotSelected()
-        val commandCaptor = ArgumentCaptor.forClass(GeolocationPermissions.Callback::class.java)
-        testee.onSiteLocationPermissionRequested("notthesamedomain.com", commandCaptor.capture())
-
-        verify(geoLocationPermissions).deny("notthesamedomain.com")
     }
 
     private inline fun <reified T : Command> assertCommandIssued(instanceAssertions: T.() -> Unit = {}) {
