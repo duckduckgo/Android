@@ -71,9 +71,8 @@ class SystemLocationPermissionDialog : DialogFragment() {
     }
 
     private fun populateTitle(title: TextView) {
-        arguments?.let { args ->
-            val originUrl = args.getString(KEY_REQUEST_ORIGIN)
-            val dialogTitle = String.format(Locale.US, getString(R.string.preciseLocationSystemDialogTitle), originUrl.website())
+        arguments?.let { _ ->
+            val dialogTitle = getString(R.string.preciseLocationSystemDialogTitle)
             title.text = dialogTitle
         }
     }

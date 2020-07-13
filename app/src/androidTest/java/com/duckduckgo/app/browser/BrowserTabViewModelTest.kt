@@ -18,6 +18,7 @@ package com.duckduckgo.app.browser
 
 import android.view.MenuItem
 import android.view.View
+import android.webkit.GeolocationPermissions
 import android.webkit.HttpAuthHandler
 import android.webkit.WebView
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
@@ -75,6 +76,7 @@ import com.duckduckgo.app.global.events.db.UserEventEntity
 import com.duckduckgo.app.global.events.db.UserEventsStore
 import com.duckduckgo.app.global.useourapp.UseOurAppDetector
 import com.duckduckgo.app.location.GeoLocationPermissions
+import com.duckduckgo.app.location.ui.LocationPermissionsViewModel
 import com.duckduckgo.app.notification.db.NotificationDao
 import com.duckduckgo.app.onboarding.store.AppStage
 import com.duckduckgo.app.onboarding.store.OnboardingStore
@@ -2266,6 +2268,15 @@ class BrowserTabViewModelTest {
         loadUrl(USE_OUR_APP_DOMAIN, isBrowserShowing = true)
 
         verify(mockPixel, never()).fire(Pixel.PixelName.UOA_VISITED_AFTER_DELETE_CTA)
+    }
+
+    @Test
+    fun whenSiteLocationPermissionIsRequestedThenItsDeniedIfDomainDoesNotMatchOriginUrl() {
+        givenUseOurAppSiteIsNotSelected()
+        val commandCaptor = ArgumentCaptor.forClass(GeolocationPermissions.Callback::class.java)
+        testee.onSiteLocationPermissionRequested("notthesamedomain.com", commandCaptor.capture())
+
+        verify(geoLocationPermissions).deny("notthesamedomain.com")
     }
 
     private inline fun <reified T : Command> assertCommandIssued(instanceAssertions: T.() -> Unit = {}) {

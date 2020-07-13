@@ -67,21 +67,21 @@
     <string name="settingsPrivacyProtectionWhitelist">Unprotected Sites</string>
 
     <!-- Precise Location -->
-    <string name="preciseLocationSystemDialogTitle">Allow %s to access this device\'s location?</string>
-    <string name="preciseLocationSystemDialogSubtitle">The show your local results, we need to know where you are when using the app.</string>
-    <string name="preciseLocationSystemDialogAllow">Allow Location Services</string>
+    <string name="preciseLocationSystemDialogTitle">Continue to enable location services for DuckDuckGo?</string>
+    <string name="preciseLocationSystemDialogSubtitle">Your location is always anonymous to us. Individual sites can\'t access your location until you opt to share it with them.</string>
+    <string name="preciseLocationSystemDialogAllow">Continue</string>
     <string name="preciseLocationSystemDialogDeny">Maybe Later</string>
     <string name="preciseLocationSystemDialogNeverAllow">Don\'t Ask Again</string>
-    <string name="preciseLocationSiteDialogTitle">Allow %s to access this device\'s location?</string>
-    <string name="preciseLocationSiteDialogSubtitle">The website is requesting access to your location while on the site.</string>
-    <string name="preciseLocationSiteDialogAllowAlways">Always Allow</string>
-    <string name="preciseLocationSiteDialogAllowOnce">Allow this Session</string>
-    <string name="preciseLocationSiteDialogDenyAlways">Always Deny</string>
-    <string name="preciseLocationSiteDialogDenyOnce">Deny this Session</string>
+    <string name="preciseLocationSiteDialogTitle">Would you like to share your location with %s?</string>
+    <string name="preciseLocationSiteDialogSubtitle">Your device location will remain anonymous to us. You can manage site location permissions in Settings</string>
+    <string name="preciseLocationSiteDialogAllowAlways">Share always</string>
+    <string name="preciseLocationSiteDialogAllowOnce">Share only for this session</string>
+    <string name="preciseLocationSiteDialogDenyAlways">Deny always</string>
+    <string name="preciseLocationSiteDialogDenyOnce">Deny only for this session</string>
     <string name="settingsPreciseLocation">Location Permissions</string>
-    <string name="preciseLocationFeatureDescription">As you browse the web, some websites may ask for your permission to find your location. This is common when looking for specific stores or services near you.</string>
-    <string name="preciseLocationToggleText">Allow Websites to Request Location</string>
-    <string name="preciseLocationEmptyListHint">No domains with Location Permission yet</string>
+    <string name="preciseLocationFeatureDescription">Your device location is stored locally and always anonymous to us. Individual sites can\'t access your location unless you opt to share it with them.</string>
+    <string name="preciseLocationToggleText">Sites can ask to access my location</string>
+    <string name="preciseLocationEmptyListHint">No websites granted location permissions.</string>
     <string name="preciseLocationActivityTitle">Location Permissions</string>
     <string name="preciseLocationDeleteConfirmMessage">Are you sure you want to delete &lt;b>%s&lt;/b>?</string>
     <string name="preciseLocationDeleteContentDescription">More options for location permissions in domain %s</string>
