@@ -324,7 +324,7 @@ class MigrationsProvider(
         }
     }
 
-    val MIGRATION_22_TO_23: Migration = object : Migration(21, 22) {
+    val MIGRATION_22_TO_23: Migration = object : Migration(22, 23) {
         override fun migrate(database: SupportSQLiteDatabase) {
             database.execSQL("CREATE TABLE IF NOT EXISTS `locationPermissions` (`domain` TEXT NOT NULL, `permission` INTEGER NOT NULL, PRIMARY KEY(`domain`))")
         }
