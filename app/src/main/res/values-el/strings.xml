@@ -423,8 +423,8 @@
 
     <!-- Whitelist -->
     <string name="whitelisetActivityTitle">Λευκή λίστα</string>
-    <string name="whitelistAdd">Προσθήκη στη λευκή λίστα</string>
-    <string name="whitelistRemove">Αφαίρεση από τη λευκή λίστα</string>
+    <string name="enablePrivacyProtection">Προσθήκη στη λευκή λίστα</string>
+    <string name="disablePrivacyProtection">Αφαίρεση από τη λευκή λίστα</string>
     <string name="whitelistEntryOverflowContentDescription">Περισσότερες επιλογές για καταχώριση στη λευκή λίστα %s</string>
     <string name="whitelistEntryDeleteConfirmMessage">Είστε βέβαιοι ότι θέλετε να διαγράψετε το &lt;b&gt;%s&lt;/b&gt; από τη λευκή λίστα;</string>
     <string name="whitelistExplanation">Αυτοί οι ιστότοποι στη λευκή λίστα δεν θα αναβαθμιστούν από την Προστασία της Ιδιωτικότητας</string>

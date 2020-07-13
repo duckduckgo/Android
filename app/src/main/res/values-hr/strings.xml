@@ -430,8 +430,8 @@
 
     <!-- Whitelist -->
     <string name="whitelisetActivityTitle">Popis dopuštenih</string>
-    <string name="whitelistAdd">Dodaj u popis dopuštenih</string>
-    <string name="whitelistRemove">Ukloni s popisa dopuštenih</string>
+    <string name="enablePrivacyProtection">Dodaj u popis dopuštenih</string>
+    <string name="disablePrivacyProtection">Ukloni s popisa dopuštenih</string>
     <string name="whitelistEntryOverflowContentDescription">Dodatne mogućnosti za unos u popis dopuštenih %s</string>
     <string name="whitelistEntryDeleteConfirmMessage">Jeste li sigurni da želite izbrisati &lt;b&gt;%s&lt;/b&gt; s popisa dopuštenih?</string>
     <string name="whitelistExplanation">Web lokacije sa popisa dopuštenih neće biti nadograđene Zaštitom privatnosti</string>

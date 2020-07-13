@@ -424,8 +424,8 @@
 
     <!-- Whitelist -->
     <string name="whitelisetActivityTitle">Whitelist</string>
-    <string name="whitelistAdd">Føj til Whitelist</string>
-    <string name="whitelistRemove">Fjern fra Whitelist</string>
+    <string name="enablePrivacyProtection">Føj til Whitelist</string>
+    <string name="disablePrivacyProtection">Fjern fra Whitelist</string>
     <string name="whitelistEntryOverflowContentDescription">Flere muligheder for tilføjelse af Whitelist %s</string>
     <string name="whitelistEntryDeleteConfirmMessage">Er du sikker på, at du vil slette &lt;b&gt;%s&lt;/b&gt; fra Whitelist?</string>
     <string name="whitelistExplanation">Disse Whitelist sider opgraderes ikke af beskyttelsen af personlige oplysninger</string>

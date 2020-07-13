@@ -430,8 +430,8 @@
 
     <!-- Whitelist -->
     <string name="whitelisetActivityTitle">Lista albă</string>
-    <string name="whitelistAdd">Adăugați la lista albă</string>
-    <string name="whitelistRemove">Înlocuiți din lista albă</string>
+    <string name="enablePrivacyProtection">Adăugați la lista albă</string>
+    <string name="disablePrivacyProtection">Înlocuiți din lista albă</string>
     <string name="whitelistEntryOverflowContentDescription">Mai multe opțiuni pentru intrarea în lista albă %s</string>
     <string name="whitelistEntryDeleteConfirmMessage">Sigur doriți să ștergeți &lt;b&gt;%s&lt;/b&gt; din lista albă?</string>
     <string name="whitelistExplanation">Aceste site-uri listate în alb nu vor fi actualizate de Protecția confidențialității</string>
