@@ -18,6 +18,7 @@ package com.duckduckgo.app.browser
 
 import android.view.MenuItem
 import android.view.View
+import android.webkit.GeolocationPermissions
 import android.webkit.HttpAuthHandler
 import android.webkit.WebView
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
@@ -221,6 +222,9 @@ class BrowserTabViewModelTest {
 
     @Captor
     private lateinit var commandCaptor: ArgumentCaptor<Command>
+
+    @Captor
+    private lateinit var geoLocationPermissionsCallback: ArgumentCaptor<GeolocationPermissions.Callback>
 
     private lateinit var db: AppDatabase
 
@@ -2277,6 +2281,15 @@ class BrowserTabViewModelTest {
         verify(mockPixel, never()).fire(Pixel.PixelName.UOA_VISITED_AFTER_DELETE_CTA)
     }
 
+    @Test
+    fun whenCurrentSiteDoesNotMatchPermissionRequestOriginThenPermissionIsDenied() = coroutineRule.runBlocking {
+        givenCurrentSite("example.com")
+
+
+        verify(geoLocationPermissions).deny("example.com")
+        verify(geoLocationPermissionsCallback.firstValue.invoke("example.com", false, false))
+    }
+
     private inline fun <reified T : Command> assertCommandIssued(instanceAssertions: T.() -> Unit = {}) {
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
         val issuedCommand = commandCaptor.allValues.find { it is T }
@@ -2343,6 +2356,15 @@ class BrowserTabViewModelTest {
     }
 
     private fun givenLoginDetected(domain: String) = LoginDetected(authLoginDomain = "", forwardedToDomain = domain)
+
+    private fun givenCurrentSite(domain: String) {
+        val site: Site = mock()
+        whenever(site.url).thenReturn(domain)
+        val siteLiveData = MutableLiveData<Site>()
+        siteLiveData.value = site
+        whenever(mockTabsRepository.retrieveSiteData("TAB_ID")).thenReturn(siteLiveData)
+        testee.loadData("TAB_ID", domain, false)
+    }
 
     private fun setBrowserShowing(isBrowsing: Boolean) {
         testee.browserViewState.value = browserViewState().copy(browserShowing = isBrowsing)
