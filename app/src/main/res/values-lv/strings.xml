@@ -448,8 +448,8 @@
 
     <!-- Whitelist -->
     <string name="whitelisetActivityTitle">Baltais saraksts</string>
-    <string name="whitelistAdd">Pievienot baltajam sarakstam</string>
-    <string name="whitelistRemove">Noņemt no baltā saraksta</string>
+    <string name="enablePrivacyProtection">Pievienot baltajam sarakstam</string>
+    <string name="disablePrivacyProtection">Noņemt no baltā saraksta</string>
     <string name="whitelistEntryOverflowContentDescription">Papildu iespējas baltā saraksta ierakstam %s</string>
     <string name="whitelistEntryDeleteConfirmMessage">Vai tiešām vēlaties izdzēst &lt;b&gt;%s&lt;/b&gt; no baltā saraksta?</string>
     <string name="whitelistExplanation">Šīs baltajā sarakstā iekļautās vietnes netiks atjauninātas, izmantojot privātuma aizsardzību</string>

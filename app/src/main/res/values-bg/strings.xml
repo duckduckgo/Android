@@ -423,8 +423,8 @@
 
     <!-- Whitelist -->
     <string name="whitelisetActivityTitle">Бял списък</string>
-    <string name="whitelistAdd">Добавяне към белия списък</string>
-    <string name="whitelistRemove">Премахване от белия списък</string>
+    <string name="enablePrivacyProtection">Добавяне към белия списък</string>
+    <string name="disablePrivacyProtection">Премахване от белия списък</string>
     <string name="whitelistEntryOverflowContentDescription">Още опции за въвеждане в белия списък %s</string>
     <string name="whitelistEntryDeleteConfirmMessage">Сигурни ли сте, че искате да изтриете &lt;b&gt;%s&lt;/b&gt; от белия списък?</string>
     <string name="whitelistExplanation">Тези сайтове в белия списък няма да бъдат надградени от Защитата на поверителността</string>

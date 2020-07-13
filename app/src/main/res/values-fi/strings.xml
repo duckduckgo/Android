@@ -424,8 +424,8 @@
 
     <!-- Whitelist -->
     <string name="whitelisetActivityTitle">Sallittujen lista</string>
-    <string name="whitelistAdd">Lisää sallittujen listaan</string>
-    <string name="whitelistRemove">Poista sallittujen listasta</string>
+    <string name="enablePrivacyProtection">Lisää sallittujen listaan</string>
+    <string name="disablePrivacyProtection">Poista sallittujen listasta</string>
     <string name="whitelistEntryOverflowContentDescription">Lisää sallittujen listaan merkitsemisen vaihtoehtoja %s</string>
     <string name="whitelistEntryDeleteConfirmMessage">Haluatko varmasti poistaa &lt;b&gt;%s&lt;/b&gt; sallittujen listoista?</string>
     <string name="whitelistExplanation">Tietosuoja ei päivitä näitä sallittujen listojen sivustoja</string>

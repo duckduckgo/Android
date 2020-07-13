@@ -440,8 +440,8 @@
 
     <!-- Whitelist -->
     <string name="whitelisetActivityTitle">Whitelist</string>
-    <string name="whitelistAdd">Aggiungi alla whitelist</string>
-    <string name="whitelistRemove">Rimuovi dalla whitelist</string>
+    <string name="enablePrivacyProtection">Aggiungi alla whitelist</string>
+    <string name="disablePrivacyProtection">Rimuovi dalla whitelist</string>
     <string name="whitelistEntryOverflowContentDescription">Altre opzioni per l\'inserimento nella whitelist %s</string>
     <string name="whitelistEntryDeleteConfirmMessage">Sei sicuro di voler eliminare &lt;b&gt;%s&lt;/b&gt; dalla whitelist?</string>
     <string name="whitelistExplanation">Questi siti autorizzati non verranno aggiornati da Privacy Protection</string>
