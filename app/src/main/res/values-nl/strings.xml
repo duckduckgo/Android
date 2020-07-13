@@ -424,8 +424,8 @@
 
     <!-- Whitelist -->
     <string name="whitelisetActivityTitle">Witte lijst</string>
-    <string name="whitelistAdd">Toevoegen aan witte lijst</string>
-    <string name="whitelistRemove">Verwijderen uit witte lijst</string>
+    <string name="enablePrivacyProtection">Toevoegen aan witte lijst</string>
+    <string name="disablePrivacyProtection">Verwijderen uit witte lijst</string>
     <string name="whitelistEntryOverflowContentDescription">Meer opties voor vermelding op de witte lijst %s</string>
     <string name="whitelistEntryDeleteConfirmMessage">Weet je zeker dat je &lt;b&gt;%s&lt;/b&gt; van de witte lijst wilt verwijderen?</string>
     <string name="whitelistExplanation">Deze sites op de witte lijst worden niet bijgewerkt door Privacybescherming</string>

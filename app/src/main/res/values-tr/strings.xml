@@ -446,8 +446,8 @@
 
     <!-- Whitelist -->
     <string name="whitelisetActivityTitle">Beyaz Liste</string>
-    <string name="whitelistAdd">Beyaz Listeye Ekle</string>
-    <string name="whitelistRemove">Beyaz Listeden Sil</string>
+    <string name="enablePrivacyProtection">Beyaz Listeye Ekle</string>
+    <string name="disablePrivacyProtection">Beyaz Listeden Sil</string>
     <string name="whitelistEntryOverflowContentDescription">Beyaz liste girişi %s için daha fazla seçenek</string>
     <string name="whitelistEntryDeleteConfirmMessage">&lt;b&gt;%s&lt;/b&gt; \'ı beyaz listeden silmek istediğinizden emin misiniz?</string>
     <string name="whitelistExplanation">Beyaz listeye alınan bu siteler Gizlilik Koruması tarafından yeni sürüme geçirilmez</string>

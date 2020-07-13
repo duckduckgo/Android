@@ -430,8 +430,8 @@
 
     <!-- Whitelist -->
     <string name="whitelisetActivityTitle">Biela listina</string>
-    <string name="whitelistAdd">Pridať na bielu listinu</string>
-    <string name="whitelistRemove">Odstrániť z bielej listiny</string>
+    <string name="enablePrivacyProtection">Pridať na bielu listinu</string>
+    <string name="disablePrivacyProtection">Odstrániť z bielej listiny</string>
     <string name="whitelistEntryOverflowContentDescription">Ďalšie možnosti pre vstup na bielu listinu %s</string>
     <string name="whitelistEntryDeleteConfirmMessage">Naozaj chcete odstrániť &lt;b&gt;%s&lt;/b&gt; zo zoznamu povolených?</string>
     <string name="whitelistExplanation">Tieto weby na zozname povolených položiek nebudú inovované pomocou ochrany osobných údajov</string>

@@ -436,8 +436,8 @@
 
     <!-- Whitelist -->
     <string name="whitelisetActivityTitle">Beli seznam</string>
-    <string name="whitelistAdd">Dodaj na beli seznam</string>
-    <string name="whitelistRemove">Odstrani z belega seznama</string>
+    <string name="enablePrivacyProtection">Dodaj na beli seznam</string>
+    <string name="disablePrivacyProtection">Odstrani z belega seznama</string>
     <string name="whitelistEntryOverflowContentDescription">Več možnosti za vnašanje na beli seznam %s</string>
     <string name="whitelistEntryDeleteConfirmMessage">Ste prepričani, da želite ta naslov izbrisati &lt;b&gt;%s&lt;/b&gt; z belega seznama?</string>
     <string name="whitelistExplanation">Naslednje strani na belem seznamu ne bodo nadgrajene z zaščito zasebnosti.</string>

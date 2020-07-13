@@ -430,8 +430,8 @@
 
     <!-- Whitelist -->
     <string name="whitelisetActivityTitle">Seznam povolených</string>
-    <string name="whitelistAdd">Přidat na seznam povolených</string>
-    <string name="whitelistRemove">Odebrat ze seznamu povolených</string>
+    <string name="enablePrivacyProtection">Přidat na seznam povolených</string>
+    <string name="disablePrivacyProtection">Odebrat ze seznamu povolených</string>
     <string name="whitelistEntryOverflowContentDescription">Další možnosti pro zápis na seznam povolených %s</string>
     <string name="whitelistEntryDeleteConfirmMessage">Opravdu chcete smazat &lt;b&gt;%s&lt;/b&gt; ze seznamu povolených?</string>
     <string name="whitelistExplanation">Tyto weby na seznamu povolených nebudou aktualizovány pomocí Ochrany osobních údajů</string>

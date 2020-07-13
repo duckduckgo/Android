@@ -436,8 +436,8 @@
 
     <!-- Whitelist -->
     <string name="whitelisetActivityTitle">Biała lista</string>
-    <string name="whitelistAdd">Dodaj do białej listy</string>
-    <string name="whitelistRemove">Usuń z białej listy</string>
+    <string name="enablePrivacyProtection">Dodaj do białej listy</string>
+    <string name="disablePrivacyProtection">Usuń z białej listy</string>
     <string name="whitelistEntryOverflowContentDescription">Więcej opcji wpisu na białej liście %s</string>
     <string name="whitelistEntryDeleteConfirmMessage">Czy na pewno chcesz usunąć &lt;b&gt;%s&lt;/b&gt; z białej listy?</string>
     <string name="whitelistExplanation">Te witryny z białej listy nie zostaną zaktualizowane przez Ochronę prywatności</string>
