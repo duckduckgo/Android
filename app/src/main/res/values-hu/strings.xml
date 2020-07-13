@@ -424,8 +424,8 @@
 
     <!-- Whitelist -->
     <string name="whitelisetActivityTitle">Engedélyezési lista</string>
-    <string name="whitelistAdd">Hozzáadás az engedélyezési listához</string>
-    <string name="whitelistRemove">Eltávolítás az engedélyezési listáról</string>
+    <string name="enablePrivacyProtection">Hozzáadás az engedélyezési listához</string>
+    <string name="disablePrivacyProtection">Eltávolítás az engedélyezési listáról</string>
     <string name="whitelistEntryOverflowContentDescription">További lehetőségek a bejegyzéshez az engedélyezési listában %s</string>
     <string name="whitelistEntryDeleteConfirmMessage">Biztosan törlöd  az engedélyezési listáról ezt: &lt;b&gt;%s&lt;/b&gt;?</string>
     <string name="whitelistExplanation">Ezeket az engedélyezett oldalakat az Adatvédelem nem frissíti</string>

@@ -424,8 +424,8 @@
 
     <!-- Whitelist -->
     <string name="whitelisetActivityTitle">Whitelist</string>
-    <string name="whitelistAdd">Zur Whitelist hinzufügen</string>
-    <string name="whitelistRemove">Aus der Whitelist entfernen</string>
+    <string name="enablePrivacyProtection">Zur Whitelist hinzufügen</string>
+    <string name="disablePrivacyProtection">Aus der Whitelist entfernen</string>
     <string name="whitelistEntryOverflowContentDescription">Weitere Optionen für den Whitelist-Eintrag %s</string>
     <string name="whitelistEntryDeleteConfirmMessage">Möchten Sie &lt;b&gt;%s&lt;/b&gt; wirklich aus der Whitelist löschen?</string>
     <string name="whitelistExplanation">Diese Websites auf der Whitelist werden vom Datenschutz nicht aktualisiert</string>

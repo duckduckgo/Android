@@ -430,8 +430,8 @@
 
     <!-- Whitelist -->
     <string name="whitelisetActivityTitle">Baltasis sąrašas</string>
-    <string name="whitelistAdd">Įtraukti į baltąjį sąrašą</string>
-    <string name="whitelistRemove">Pašalinti iš baltojo sąrašo</string>
+    <string name="enablePrivacyProtection">Įtraukti į baltąjį sąrašą</string>
+    <string name="disablePrivacyProtection">Pašalinti iš baltojo sąrašo</string>
     <string name="whitelistEntryOverflowContentDescription">Daugiau baltojo sąrašo įrašo parinkčių %s</string>
     <string name="whitelistEntryDeleteConfirmMessage">Ar tikrai norite ištrinti &lt;b&gt;%s&lt;/b&gt; iš baltojo sąrašo?</string>
     <string name="whitelistExplanation">Šios į baltąjį sąrašą įtrauktos svetainės nebus atnaujintos privatumo apsauga</string>

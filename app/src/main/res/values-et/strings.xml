@@ -444,8 +444,8 @@
 
     <!-- Whitelist -->
     <string name="whitelisetActivityTitle">Valges nimekirjas</string>
-    <string name="whitelistAdd">Lisa valgesse nimekirja</string>
-    <string name="whitelistRemove">Eemalda lubatud loendist</string>
+    <string name="enablePrivacyProtection">Lisa valgesse nimekirja</string>
+    <string name="disablePrivacyProtection">Eemalda lubatud loendist</string>
     <string name="whitelistEntryOverflowContentDescription">Rohkem valikuid valgesse nimekirja lisamiseks %s</string>
     <string name="whitelistEntryDeleteConfirmMessage">Kas soovid kindlasti kustutada &lt;b&gt;%s&lt;/b&gt; lubatud loendist?</string>
     <string name="whitelistExplanation">Neid valgesse nimekirja lisatud saite privaatsuskaitse ei uuenda</string>

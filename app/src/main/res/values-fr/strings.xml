@@ -424,8 +424,8 @@
 
     <!-- Whitelist -->
     <string name="whitelisetActivityTitle">Liste blanche</string>
-    <string name="whitelistAdd">Ajouter à la liste blanche</string>
-    <string name="whitelistRemove">Supprimer de la liste blanche</string>
+    <string name="enablePrivacyProtection">Ajouter à la liste blanche</string>
+    <string name="disablePrivacyProtection">Supprimer de la liste blanche</string>
     <string name="whitelistEntryOverflowContentDescription">Plus d\'options pour l\'entrée dans la liste blanche %s</string>
     <string name="whitelistEntryDeleteConfirmMessage">Voulez-vous vraiment supprimer &lt;b&gt;%s&lt;/b&gt; de la liste blanche ?</string>
     <string name="whitelistExplanation">Ces sites en liste blanche ne seront pas mis à niveau par la protection de la vie privée</string>
