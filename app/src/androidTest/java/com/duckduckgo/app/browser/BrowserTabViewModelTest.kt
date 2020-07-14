@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.browser
 
+import android.net.Uri
 import android.view.MenuItem
 import android.view.View
 import android.webkit.GeolocationPermissions
@@ -74,6 +75,8 @@ import com.duckduckgo.app.global.events.db.UserEventEntity
 import com.duckduckgo.app.global.events.db.UserEventsStore
 import com.duckduckgo.app.global.useourapp.UseOurAppDetector
 import com.duckduckgo.app.location.GeoLocationPermissions
+import com.duckduckgo.app.location.data.LocationPermissionEntity
+import com.duckduckgo.app.location.data.LocationPermissionType
 import com.duckduckgo.app.location.data.LocationPermissionsDao
 import com.duckduckgo.app.location.data.LocationPermissionsRepository
 import com.duckduckgo.app.notification.db.NotificationDao
@@ -222,9 +225,6 @@ class BrowserTabViewModelTest {
 
     @Captor
     private lateinit var commandCaptor: ArgumentCaptor<Command>
-
-    @Captor
-    private lateinit var geoLocationPermissionsCallback: ArgumentCaptor<GeolocationPermissions.Callback>
 
     private lateinit var db: AppDatabase
 
@@ -2282,12 +2282,186 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenCurrentSiteDoesNotMatchPermissionRequestOriginThenPermissionIsDenied() = coroutineRule.runBlocking {
+    fun whenCurrentDomainAndPermissionRequestingDomainAreDifferentThenSitePermissionIsDenied() = coroutineRule.runBlocking {
         givenCurrentSite("example.com")
+        givenNewPermissionRequestFromDomain("anotherexample.com")
 
+        verify(geoLocationPermissions).deny("anotherexample.com")
+    }
 
-        verify(geoLocationPermissions).deny("example.com")
-        verify(geoLocationPermissionsCallback.firstValue.invoke("example.com", false, false))
+    @Test
+    fun whenDomainRequestsSitePermissionThenAppChecksSystemLocationPermission() = coroutineRule.runBlocking {
+        val domain = "example.com"
+
+        givenLocationPermissionIsEnabled(true)
+        givenCurrentSite(domain)
+        givenNewPermissionRequestFromDomain(domain)
+
+        assertCommandIssued<Command.CheckSystemLocationPermission>()
+    }
+
+    @Test
+    fun whenAppLocationPermissionIsDeniedThenSitePermissionIsDenied() = coroutineRule.runBlocking {
+        val domain = "example.com"
+
+        givenLocationPermissionIsEnabled(false)
+        givenCurrentSite(domain)
+        givenNewPermissionRequestFromDomain(domain)
+
+        verify(geoLocationPermissions).deny(domain)
+    }
+
+    @Test
+    fun whenUserGrantsSystemLocationPermissionThenSettingsLocationPermissionShoulbBeEnabled() = coroutineRule.runBlocking {
+        val domain = "example.com"
+
+        givenLocationPermissionIsEnabled(true)
+        givenCurrentSite(domain)
+        givenNewPermissionRequestFromDomain(domain)
+
+        testee.onSystemLocationPermissionGranted()
+
+        verify(mockSettingsStore).appLocationPermission = true
+    }
+
+    @Test
+    fun whenUserChoosesToAlwaysAllowSitePermissionThenGeoPermissionIsAllowed() = coroutineRule.runBlocking {
+        val domain = "example.com"
+
+        givenLocationPermissionIsEnabled(true)
+        givenCurrentSite(domain)
+        givenUserAlreadySelectedPermissionForDomain(domain, LocationPermissionType.ALLOW_ALWAYS)
+        givenNewPermissionRequestFromDomain(domain)
+
+        testee.onSystemLocationPermissionGranted()
+
+        verify(geoLocationPermissions).allow(domain)
+    }
+
+    @Test
+    fun whenUserChoosesToAlwaysDenySitePermissionThenGeoPermissionIsAllowed() = coroutineRule.runBlocking {
+        val domain = "example.com"
+
+        givenLocationPermissionIsEnabled(true)
+        givenCurrentSite(domain)
+        givenUserAlreadySelectedPermissionForDomain(domain, LocationPermissionType.DENY_ALWAYS)
+        givenNewPermissionRequestFromDomain(domain)
+
+        testee.onSystemLocationPermissionGranted()
+
+        verify(geoLocationPermissions).deny(domain)
+    }
+
+    @Test
+    fun whenUserChoosesToAllowSitePermissionThenGeoPermissionIsAllowed() = coroutineRule.runBlocking {
+        val domain = "example.com"
+
+        givenLocationPermissionIsEnabled(true)
+        givenCurrentSite(domain)
+        givenUserAlreadySelectedPermissionForDomain(domain, LocationPermissionType.ALLOW_ONCE)
+        givenNewPermissionRequestFromDomain(domain)
+
+        testee.onSystemLocationPermissionGranted()
+
+        assertCommandIssued<Command.AskDomainPermission>()
+    }
+
+    @Test
+    fun whenUserChoosesToDenySitePermissionThenGeoPermissionIsAllowed() = coroutineRule.runBlocking {
+        val domain = "example.com"
+
+        givenLocationPermissionIsEnabled(true)
+        givenCurrentSite(domain)
+        givenUserAlreadySelectedPermissionForDomain(domain, LocationPermissionType.DENY_ONCE)
+        givenNewPermissionRequestFromDomain(domain)
+
+        testee.onSystemLocationPermissionGranted()
+
+        assertCommandIssued<Command.AskDomainPermission>()
+    }
+
+    @Test
+    fun whenNewDomainRequestsForPermissionThenUserShouldBeAskedToGivePermission() = coroutineRule.runBlocking {
+        val domain = "example.com"
+
+        givenLocationPermissionIsEnabled(true)
+        givenCurrentSite(domain)
+        givenNewPermissionRequestFromDomain(domain)
+
+        testee.onSystemLocationPermissionGranted()
+
+        assertCommandIssued<Command.AskDomainPermission>()
+    }
+
+    @Test
+    fun whenSystemLocationPermissionIsDeniedThenSitePermissionIsDenied() = coroutineRule.runBlocking {
+        val domain = "example.com"
+
+        givenLocationPermissionIsEnabled(true)
+        givenCurrentSite(domain)
+        givenNewPermissionRequestFromDomain(domain)
+
+        testee.onSystemLocationPermissionNotAllowed()
+
+        verify(geoLocationPermissions).deny(domain)
+    }
+
+    @Test
+    fun whenSystemLocationPermissionIsNeverAllowedThenSitePermissionIsDenied() = coroutineRule.runBlocking {
+        val domain = "example.com"
+
+        givenLocationPermissionIsEnabled(true)
+        givenCurrentSite(domain)
+        givenNewPermissionRequestFromDomain(domain)
+
+        testee.onSystemLocationPermissionNeverAllowed()
+
+        verify(mockSettingsStore).appLocationPermission = false
+        verify(geoLocationPermissions).deny(domain)
+    }
+
+    @Test
+    fun whenSystemLocationPermissionIsAllowedThenAppAsksForSystemPermission() = coroutineRule.runBlocking {
+        val domain = "example.com"
+
+        givenLocationPermissionIsEnabled(true)
+        givenCurrentSite(domain)
+        givenNewPermissionRequestFromDomain(domain)
+
+        testee.onSystemLocationPermissionAllowed()
+
+        assertCommandIssued<Command.RequestSystemLocationPermission>()
+    }
+
+    @Test
+    fun whenUserDeniesSitePermissionThenSitePermissionIsDenied() = coroutineRule.runBlocking {
+        val domain = "example.com"
+
+        givenLocationPermissionIsEnabled(true)
+        givenCurrentSite(domain)
+        givenNewPermissionRequestFromDomain(domain)
+
+        testee.onSiteLocationPermissionDenied()
+
+        verify(geoLocationPermissions).deny(domain)
+    }
+
+    private fun givenNewPermissionRequestFromDomain(domain: String) {
+        testee.onSiteLocationPermissionRequested(domain, StubPermissionCallback())
+    }
+
+    private fun givenLocationPermissionIsEnabled(state: Boolean) {
+        whenever(mockSettingsStore.appLocationPermission).thenReturn(state)
+    }
+
+    private fun givenUserAlreadySelectedPermissionForDomain(domain: String, permission: LocationPermissionType) {
+        locationPermissionsDao.insert(LocationPermissionEntity(domain, permission))
+    }
+
+    class StubPermissionCallback : GeolocationPermissions.Callback {
+        override fun invoke(p0: String?, p1: Boolean, p2: Boolean) {
+            // nothing to see
+        }
     }
 
     private inline fun <reified T : Command> assertCommandIssued(instanceAssertions: T.() -> Unit = {}) {
@@ -2360,6 +2534,7 @@ class BrowserTabViewModelTest {
     private fun givenCurrentSite(domain: String) {
         val site: Site = mock()
         whenever(site.url).thenReturn(domain)
+        whenever(site.uri).thenReturn(Uri.parse(domain))
         val siteLiveData = MutableLiveData<Site>()
         siteLiveData.value = site
         whenever(mockTabsRepository.retrieveSiteData("TAB_ID")).thenReturn(siteLiveData)
