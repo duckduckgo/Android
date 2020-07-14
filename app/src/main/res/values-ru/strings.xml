@@ -451,8 +451,8 @@
 
     <!-- Whitelist -->
     <string name="whitelisetActivityTitle">Белый список</string>
-    <string name="whitelistAdd">Добавить в белый список</string>
-    <string name="whitelistRemove">Удалить из белого списка</string>
+    <string name="enablePrivacyProtection">Добавить в белый список</string>
+    <string name="disablePrivacyProtection">Удалить из белого списка</string>
     <string name="whitelistEntryOverflowContentDescription">Дополнительные параметры для внесения записей в белый список %s</string>
     <string name="whitelistEntryDeleteConfirmMessage">Вы уверены, что хотите удалить &lt;b&gt;%s&lt;/b&gt; из белого списка?</string>
     <string name="whitelistExplanation">Эти сайты из белого списка не будут обновлены с помощью защиты конфиденциальности</string>

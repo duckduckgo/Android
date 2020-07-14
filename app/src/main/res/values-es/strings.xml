@@ -424,8 +424,8 @@
 
     <!-- Whitelist -->
     <string name="whitelisetActivityTitle">Sitios no protegidos</string>
-    <string name="whitelistAdd">Habilitar Protección</string>
-    <string name="whitelistRemove">Deshabilitar Protección</string>
+    <string name="enablePrivacyProtection">Habilitar Protección</string>
+    <string name="disablePrivacyProtection">Deshabilitar Protección</string>
     <string name="whitelistEntryOverflowContentDescription">Más opciones para el sitio no protegido %s</string>
     <string name="whitelistEntryDeleteConfirmMessage">¿Seguro que quieres eliminar &lt;b>%s&lt;/b> de los sitios no protegidos?</string>
     <string name="whitelistExplanation">La Protección de Privacidad está deshabilitada para estos sitios</string>

@@ -440,8 +440,8 @@
 
     <!-- Whitelist -->
     <string name="whitelisetActivityTitle">Vitlista</string>
-    <string name="whitelistAdd">Lägg till i vitlista</string>
-    <string name="whitelistRemove">Ta bort från vitlista</string>
+    <string name="enablePrivacyProtection">Lägg till i vitlista</string>
+    <string name="disablePrivacyProtection">Ta bort från vitlista</string>
     <string name="whitelistEntryOverflowContentDescription">Fler alternativ för inmatning av vitlista %s</string>
     <string name="whitelistEntryDeleteConfirmMessage">Är du säker på att du vill ta bort &lt;b&gt;%s&lt;/b&gt; från vitlistan?</string>
     <string name="whitelistExplanation">Dessa vitlistade webbplatser kommer inte att uppgraderas av Integritetsskydd</string>
