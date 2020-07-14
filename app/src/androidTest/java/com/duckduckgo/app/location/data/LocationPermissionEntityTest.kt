@@ -16,9 +16,6 @@
 
 package com.duckduckgo.app.location.data
 
-import com.duckduckgo.app.location.data.LocationPermissionEntity
-import com.duckduckgo.app.location.data.LocationPermissionType
-import com.duckduckgo.app.location.data.host
 import org.junit.Assert
 import org.junit.Test
 

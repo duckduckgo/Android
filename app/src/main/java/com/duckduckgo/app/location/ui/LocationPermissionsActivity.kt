@@ -78,12 +78,10 @@ class LocationPermissionsActivity : DuckDuckGoActivity() {
         deleteDialog?.show()
     }
 
-
     private fun editSiteLocationPermission(entity: LocationPermissionEntity) {
         val dialog = SiteLocationPermissionDialog.instance(entity.domain, viewModel)
         dialog.show(supportFragmentManager, SiteLocationPermissionDialog.SITE_LOCATION_PERMISSION_TAG)
     }
-
 
     override fun onDestroy() {
         deleteDialog?.dismiss()

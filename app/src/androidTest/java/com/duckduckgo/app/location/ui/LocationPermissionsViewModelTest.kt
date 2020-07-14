@@ -22,10 +22,6 @@ import androidx.room.Room
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.InstantSchedulersRule
-import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteDao
-import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
-import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepository
-import com.duckduckgo.app.fire.fireproofwebsite.ui.FireproofWebsitesViewModel
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.location.GeoLocationPermissions
 import com.duckduckgo.app.location.data.LocationPermissionEntity
@@ -33,7 +29,6 @@ import com.duckduckgo.app.location.data.LocationPermissionType
 import com.duckduckgo.app.location.data.LocationPermissionsDao
 import com.duckduckgo.app.location.data.LocationPermissionsRepository
 import com.duckduckgo.app.settings.db.SettingsDataStore
-import com.duckduckgo.app.statistics.pixels.Pixel
 import com.nhaarman.mockitokotlin2.atLeastOnce
 import com.nhaarman.mockitokotlin2.lastValue
 import com.nhaarman.mockitokotlin2.mock
@@ -108,7 +103,7 @@ class LocationPermissionsViewModelTest {
 
     @Test
     fun whenViewModelInitialisedThenViewStateShowsCurrentLocationPermissions() {
-        givenLocationPermission(LocationPermissionType.ALLOW_ONCE,"domain.com")
+        givenLocationPermission(LocationPermissionType.ALLOW_ONCE, "domain.com")
 
         Mockito.verify(mockViewStateObserver, atLeastOnce()).onChanged(viewStateCaptor.capture())
         Assert.assertTrue(viewStateCaptor.value.locationPermissionEntities.size == 1)

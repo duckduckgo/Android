@@ -26,9 +26,7 @@ import androidx.fragment.app.DialogFragment
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.faviconLocation
 import com.duckduckgo.app.global.image.GlideApp
-import com.duckduckgo.app.global.view.website
 import org.jetbrains.anko.find
-import java.util.Locale
 
 class SystemLocationPermissionDialog : DialogFragment() {
 

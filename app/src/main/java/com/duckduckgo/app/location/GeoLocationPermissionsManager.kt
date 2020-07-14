@@ -21,7 +21,6 @@ import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepository
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.location.data.LocationPermissionsRepository
 import com.duckduckgo.app.location.data.host
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 import javax.inject.Inject

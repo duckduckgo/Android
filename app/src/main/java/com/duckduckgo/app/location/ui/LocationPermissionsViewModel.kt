@@ -16,7 +16,6 @@
 
 package com.duckduckgo.app.location.ui
 
-import android.webkit.GeolocationPermissions
 import androidx.lifecycle.*
 import androidx.lifecycle.Observer
 import com.duckduckgo.app.global.DispatcherProvider
