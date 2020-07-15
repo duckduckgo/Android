@@ -67,22 +67,24 @@
     <string name="settingsPrivacyProtectionWhitelist">Unprotected Sites</string>
 
     <!-- Precise Location -->
-    <string name="preciseLocationSystemDialogTitle">Continue to enable location services for DuckDuckGo?</string>
-    <string name="preciseLocationSystemDialogSubtitle">Your location is always anonymous to us. Individual sites can\'t access your location until you opt to share it with them.</string>
-    <string name="preciseLocationSystemDialogAllow">Continue</string>
+    <string name="preciseLocationSystemDialogTitle">Enable location services for DuckDuckGo Privacy Browser?</string>
+    <string name="preciseLocationSystemDialogSubtitle">Sites you visit may request permission to access your device location. They won\'t be able to access it until you explicitly grant permission.</string>
+    <string name="preciseLocationSystemDialogAllow">Enable</string>
     <string name="preciseLocationSystemDialogDeny">Maybe Later</string>
     <string name="preciseLocationSystemDialogNeverAllow">Don\'t Ask Again</string>
-    <string name="preciseLocationSiteDialogTitle">Would you like to share your location with %s?</string>
-    <string name="preciseLocationSiteDialogSubtitle">Your device location will remain anonymous to us. You can manage site location permissions in Settings</string>
-    <string name="preciseLocationSiteDialogAllowAlways">Share always</string>
-    <string name="preciseLocationSiteDialogAllowOnce">Share only for this session</string>
+    <string name="preciseLocationSiteDialogTitle">Grant %s permission to access location?</string>
+    <string name="preciseLocationSiteDialogSubtitle">You can manage the location access permissions you\’ve granted individual sites in Settings.</string>
+    <string name="preciseLocationSiteDialogAllowAlways">Always</string>
+    <string name="preciseLocationSiteDialogAllowOnce">Only for this session</string>
     <string name="preciseLocationSiteDialogDenyAlways">Deny always</string>
-    <string name="preciseLocationSiteDialogDenyOnce">Deny only for this session</string>
-    <string name="settingsPreciseLocation">Location Permissions</string>
-    <string name="preciseLocationFeatureDescription">Your device location is stored locally and always anonymous to us. Individual sites can\'t access your location unless you opt to share it with them.</string>
-    <string name="preciseLocationToggleText">Sites can ask to access my location</string>
-    <string name="preciseLocationEmptyListHint">No websites granted location permissions.</string>
-    <string name="preciseLocationActivityTitle">Location Permissions</string>
+    <string name="preciseLocationSiteDialogDenyOnce">Deny for this session</string>
+    <string name="settingsPreciseLocation">Location</string>
+    <string name="preciseLocationFeatureDescription">Sites you visit may request permission to access your location. They won\'t be able to access it until you explicitly grant permission. DuckDuckGo only uses your location anonymously to deliver local search results.</string>
+    <string name="preciseLocationToggleText">Sites can ask for my location</string>
+    <string name="preciseLocationEmptyListHint">No websites granted permission to access location.</string>
+    <string name="preciseLocationActivityTitle">Location</string>
     <string name="preciseLocationDeleteConfirmMessage">Are you sure you want to delete &lt;b>%s&lt;/b>?</string>
     <string name="preciseLocationDeleteContentDescription">More options for location permissions in domain %s</string>
+    <string name="preciseLocationAllowedSitesSectionTitle">Granted</string>
+    <string name="preciseLocationDeniedSitesSectionTitle">Denied</string>
 </resources>

@@ -90,6 +90,12 @@ class LocationPermissionsViewModel(
     }
 
     override fun onSiteLocationPermissionSelected(domain: String, permission: LocationPermissionType) {
+        if (permission == LocationPermissionType.ALLOW_ONCE || permission == LocationPermissionType.ALLOW_ALWAYS) {
+            geoLocationPermissions.allow(domain)
+        } else {
+            geoLocationPermissions.deny(domain)
+        }
+
         viewModelScope.launch {
             locationPermissionsRepository.saveLocationPermission(domain, permission)
         }

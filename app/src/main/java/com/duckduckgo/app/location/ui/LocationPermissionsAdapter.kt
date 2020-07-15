@@ -23,6 +23,8 @@ import android.view.ViewGroup
 import android.widget.CompoundButton
 import android.widget.ImageView
 import android.widget.PopupMenu
+import androidx.core.view.isGone
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.faviconLocation
@@ -30,10 +32,11 @@ import com.duckduckgo.app.global.image.GlideApp
 import com.duckduckgo.app.global.view.quietlySetIsChecked
 import com.duckduckgo.app.global.view.website
 import com.duckduckgo.app.location.data.LocationPermissionEntity
-import kotlinx.android.synthetic.main.view_fireproof_website_entry.view.*
+import com.duckduckgo.app.location.data.LocationPermissionType
 import kotlinx.android.synthetic.main.view_location_permissions_entry.view.locationPermissionEntryDomain
 import kotlinx.android.synthetic.main.view_location_permissions_entry.view.locationPermissionEntryFavicon
 import kotlinx.android.synthetic.main.view_location_permissions_entry.view.locationPermissionMenu
+import kotlinx.android.synthetic.main.view_location_permissions_section_title.view.locationPermissionsSectionTitle
 import kotlinx.android.synthetic.main.view_location_permissions_toggle.view.locationPermissionsToggle
 import timber.log.Timber
 
@@ -47,21 +50,54 @@ class LocationPermissionsAdapter(
         const val EMPTY_STATE_TYPE = 2
         const val TOGGLE_TYPE = 3
         const val DIVIDER_TYPE = 4
+        const val ALLOWED_SITES_SECTION_TITLE_TYPE = 5
+        const val DENIED_SITES_SECTION_TITLE_TYPE = 6
 
         const val EMPTY_HINT_ITEM_SIZE = 1
     }
 
-    private val sortedHeaderElements = listOf(DESCRIPTION_TYPE, TOGGLE_TYPE, DIVIDER_TYPE)
+    fun updatePermissions(
+        isLocationPermissionEnabled: Boolean,
+        newPermissions: List<LocationPermissionEntity>
+    ) {
+        locationPermissionEnabled = isLocationPermissionEnabled
+        locationPermissions = newPermissions
+        notifyDataSetChanged()
 
-    var locationPermissions: List<LocationPermissionEntity> = emptyList()
+        // val diffCallback = DiffCallback(locationPermissions, newPermissions)
+        // val diffResult = DiffUtil.calculateDiff(diffCallback)
+        // locationPermissions = newPermissions
+        // diffResult.dispatchUpdatesTo(this)
+    }
+
+    private var locationPermissionEnabled: Boolean = false
+
+    private var locationPermissions: List<LocationPermissionEntity> = emptyList()
         set(value) {
             if (field != value) {
                 field = value
-                notifyDataSetChanged()
+                allowedLocationPermissions.clear()
+                deniedLocationPermissions.clear()
+                value.forEach {
+                    if (it.permission == LocationPermissionType.ALLOW_ONCE || it.permission == LocationPermissionType.ALLOW_ALWAYS) {
+                        allowedLocationPermissions.add(it)
+                    } else {
+                        deniedLocationPermissions.add(it)
+                    }
+                }
             }
         }
 
-    var locationPermissionEnabled: Boolean = false
+    private var allowedLocationPermissions: MutableList<LocationPermissionEntity> = mutableListOf()
+    private var deniedLocationPermissions: MutableList<LocationPermissionEntity> = mutableListOf()
+
+    private fun getSortedHeaderElements(): List<Int> {
+        return if (allowedLocationPermissions.isEmpty()) {
+            listOf(DESCRIPTION_TYPE, TOGGLE_TYPE, DIVIDER_TYPE)
+        } else {
+            listOf(DESCRIPTION_TYPE, TOGGLE_TYPE, DIVIDER_TYPE, ALLOWED_SITES_SECTION_TITLE_TYPE)
+        }
+    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): LocationPermissionsViewHolder {
         val inflater = LayoutInflater.from(parent.context)
@@ -87,13 +123,24 @@ class LocationPermissionsAdapter(
                 val view = inflater.inflate(R.layout.view_location_permissions_empty_hint, parent, false)
                 LocationPermissionsViewHolder.LocationPermissionsSimpleViewViewHolder(view)
             }
+            ALLOWED_SITES_SECTION_TITLE_TYPE -> {
+                val view = inflater.inflate(R.layout.view_location_permissions_section_title, parent, false)
+                LocationPermissionsViewHolder.LocationPermissionsAllowedSectionViewHolder(view)
+            }
+            DENIED_SITES_SECTION_TITLE_TYPE -> {
+                val view = inflater.inflate(R.layout.view_location_permissions_section_title, parent, false)
+                view.locationPermissionsSectionTitle.setText(R.string.preciseLocationDeniedSitesSectionTitle)
+                LocationPermissionsViewHolder.LocationPermissionsDeniedSectionViewHolder(view)
+            }
             else -> throw IllegalArgumentException("viewType not found")
         }
     }
 
     override fun getItemViewType(position: Int): Int {
-        return if (position < sortedHeaderElements.size) {
-            sortedHeaderElements[position]
+        return if (position < getSortedHeaderElements().size) {
+            getSortedHeaderElements()[position]
+        } else if (deniedLocationPermissions.isNotEmpty() && position == getSortedHeaderElements().size + allowedLocationPermissions.size) {
+            DENIED_SITES_SECTION_TITLE_TYPE
         } else {
             getListItemType()
         }
@@ -104,16 +151,20 @@ class LocationPermissionsAdapter(
             is LocationPermissionsViewHolder.LocationPermissionsToggleViewHolder -> {
                 holder.bind(locationPermissionEnabled)
             }
-            is LocationPermissionsViewHolder.LocationPermissionsItemViewHolder -> holder.bind(
-                locationPermissions[getLocationPermissionPosition(
-                    position
-                )]
-            )
+            is LocationPermissionsViewHolder.LocationPermissionsAllowedSectionViewHolder -> {
+                holder.bind(allowedLocationPermissions.isNotEmpty())
+            }
+            is LocationPermissionsViewHolder.LocationPermissionsDeniedSectionViewHolder -> {
+                holder.bind(deniedLocationPermissions.isNotEmpty())
+            }
+            is LocationPermissionsViewHolder.LocationPermissionsItemViewHolder -> {
+                holder.bind(getLocationPermission(position))
+            }
         }
     }
 
     override fun getItemCount(): Int {
-        return getItemsSize() + itemsOnTopOfList()
+        return getItemsSize() + itemsNotOnList()
     }
 
     private fun getItemsSize() = if (locationPermissions.isEmpty()) {
@@ -122,9 +173,25 @@ class LocationPermissionsAdapter(
         locationPermissions.size
     }
 
-    private fun itemsOnTopOfList() = sortedHeaderElements.size
+    private fun itemsNotOnList(): Int {
+        return if (deniedLocationPermissions.isEmpty()) {
+            getSortedHeaderElements().size
+        } else {
+            getSortedHeaderElements().size + 1
+        }
+    }
 
-    private fun getLocationPermissionPosition(position: Int) = position - itemsOnTopOfList()
+    private fun getLocationPermission(position: Int): LocationPermissionEntity {
+        return if (allowedLocationPermissions.isNotEmpty()) {
+            if (position >= getSortedHeaderElements().size && position < getSortedHeaderElements().size + allowedLocationPermissions.size) {
+                allowedLocationPermissions[position - getSortedHeaderElements().size]
+            } else {
+                deniedLocationPermissions[position - itemsNotOnList() - allowedLocationPermissions.size]
+            }
+        } else {
+            deniedLocationPermissions[position - itemsNotOnList()]
+        }
+    }
 
     private fun getListItemType(): Int {
         return if (locationPermissions.isEmpty()) {
@@ -141,6 +208,22 @@ sealed class LocationPermissionsViewHolder(itemView: View) : RecyclerView.ViewHo
         LocationPermissionsViewHolder(itemView) {
         fun bind(locationPermissionEnabled: Boolean) {
             itemView.locationPermissionsToggle.quietlySetIsChecked(locationPermissionEnabled, listener)
+        }
+    }
+
+    class LocationPermissionsAllowedSectionViewHolder(itemView: View) :
+        LocationPermissionsViewHolder(itemView) {
+        fun bind(allowedPermissions: Boolean) {
+            itemView.locationPermissionsSectionTitle.setText(R.string.preciseLocationAllowedSitesSectionTitle)
+            itemView.isGone = !allowedPermissions
+        }
+    }
+
+    class LocationPermissionsDeniedSectionViewHolder(itemView: View) :
+        LocationPermissionsViewHolder(itemView) {
+        fun bind(deniedPermissionsItems: Boolean) {
+            itemView.locationPermissionsSectionTitle.setText(R.string.preciseLocationDeniedSitesSectionTitle)
+            itemView.locationPermissionsSectionTitle.isGone = !deniedPermissionsItems
         }
     }
 

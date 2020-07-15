@@ -52,8 +52,7 @@ class LocationPermissionsActivity : DuckDuckGoActivity() {
     private fun observeViewModel() {
         viewModel.viewState.observe(this, Observer { viewState ->
             viewState?.let {
-                adapter.locationPermissionEnabled = it.locationPermissionEnabled
-                adapter.locationPermissions = it.locationPermissionEntities
+                adapter.updatePermissions(it.locationPermissionEnabled, it.locationPermissionEntities)
             }
         })
 
