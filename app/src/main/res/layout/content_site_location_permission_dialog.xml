@@ -69,7 +69,9 @@
         android:layout_height="wrap_content"
         android:text="@string/preciseLocationSiteDialogAllowAlways" />
 
-    <View style="@style/LocationPermissionDialogSplitter" />
+    <View
+        android:id="@+id/siteAllowOnceLocationPermissionDivider"
+        style="@style/LocationPermissionDialogSplitter" />
 
     <Button
         android:id="@+id/siteAllowOnceLocationPermission"

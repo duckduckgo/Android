@@ -112,6 +112,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runBlockingTest
 import org.junit.After
+import org.junit.Assert
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Rule
@@ -2440,6 +2441,7 @@ class BrowserTabViewModelTest {
 
         verify(mockSettingsStore).appLocationPermission = false
         verify(geoLocationPermissions).clear(domain)
+        Assert.assertEquals(locationPermissionsDao.getPermission(domain)!!.permission, LocationPermissionType.DENY_ALWAYS)
     }
 
     @Test

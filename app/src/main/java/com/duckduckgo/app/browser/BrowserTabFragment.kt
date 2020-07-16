@@ -1139,6 +1139,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
         supervisorJob.cancel()
         popupMenu.dismiss()
         loginDetectionDialog?.dismiss()
+        viewModel.clearTemporaryLocationPermission()
         destroyWebView()
         super.onDestroy()
     }
@@ -1278,10 +1279,10 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
             }
             PERMISSION_REQUEST_GEO_LOCATION -> {
                 if ((grantResults.isNotEmpty()) && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    Timber.i("System Geo location permission granted")
+                    Timber.i("Precise Location - System Geo location permission granted")
                     viewModel.onSystemLocationPermissionGranted()
                 } else {
-                    Timber.i("System Geo location permission refused")
+                    Timber.i("Precise Location - System Geo location permission denied")
                     viewModel.onSystemLocationPermissionDenied()
                 }
             }

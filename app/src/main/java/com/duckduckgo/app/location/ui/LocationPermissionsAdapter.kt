@@ -24,7 +24,6 @@ import android.widget.CompoundButton
 import android.widget.ImageView
 import android.widget.PopupMenu
 import androidx.core.view.isGone
-import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.faviconLocation

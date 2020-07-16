@@ -28,7 +28,6 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.faviconLocation
 import com.duckduckgo.app.global.image.GlideApp
 import com.duckduckgo.app.global.view.gone
-import com.duckduckgo.app.global.view.show
 import com.duckduckgo.app.global.view.website
 import com.duckduckgo.app.location.data.LocationPermissionType
 import kotlinx.android.synthetic.main.content_site_location_permission_dialog.siteAllowOnceLocationPermissionDivider
@@ -118,7 +117,7 @@ class SiteLocationPermissionDialog : DialogFragment() {
             }
 
             val isEditing = args.getBoolean(KEY_EDITING_PERMISSION)
-            if (isEditing){
+            if (isEditing) {
                 allowOnce.gone()
                 denyOnce.gone()
                 extraDivider.gone()

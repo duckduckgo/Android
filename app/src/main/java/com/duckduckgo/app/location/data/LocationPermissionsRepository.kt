@@ -19,6 +19,7 @@ package com.duckduckgo.app.location.data
 import androidx.lifecycle.LiveData
 import com.duckduckgo.app.global.DispatcherProvider
 import kotlinx.coroutines.withContext
+import timber.log.Timber
 import javax.inject.Inject
 
 class LocationPermissionsRepository @Inject constructor(
@@ -53,9 +54,9 @@ class LocationPermissionsRepository @Inject constructor(
         }
     }
 
-    suspend fun getDomainPermission(domain: String): LocationPermissionType {
+    suspend fun getDomainPermission(domain: String): LocationPermissionEntity? {
         return withContext(dispatchers.io()) {
-            locationPermissionsDao.getPermission(domain)!!.permission
+            locationPermissionsDao.getPermission(domain)
         }
     }
 
@@ -72,4 +73,5 @@ class LocationPermissionsRepository @Inject constructor(
             entity?.let { locationPermissionsDao.delete(entity) }
         }
     }
+
 }

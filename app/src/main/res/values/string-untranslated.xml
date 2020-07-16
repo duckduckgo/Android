@@ -68,21 +68,21 @@
 
     <!-- Precise Location -->
     <string name="preciseLocationSystemDialogTitle">Enable location services for DuckDuckGo Privacy Browser?</string>
-    <string name="preciseLocationSystemDialogSubtitle">Sites you visit may request permission to access your device location. They won\'t know it until you explicitly grant permission.</string>
+    <string name="preciseLocationSystemDialogSubtitle">This site is requesting your device location. You\'ll first need to allow the browser to send your device location, then the site can ask permission.</string>
     <string name="preciseLocationSystemDialogAllow">Enable</string>
     <string name="preciseLocationSystemDialogDeny">Maybe Later</string>
-    <string name="preciseLocationSystemDialogNeverAllow">Don\'t Ask Again</string>
+    <string name="preciseLocationSystemDialogNeverAllow">Don\'t Ask Again for this Site</string>
     <string name="preciseLocationSiteDialogTitle">Grant %s permission to access location?</string>
-    <string name="preciseLocationSiteDialogSubtitle">You can manage the location access permissions you\’ve granted individual sites in Settings.</string>
+    <string name="preciseLocationSiteDialogSubtitle">You can manage the location access permissions you’ve granted to individual sites in Settings.</string>
     <string name="preciseLocationSiteDialogAllowAlways">Always</string>
     <string name="preciseLocationSiteDialogAllowOnce">Only for this session</string>
     <string name="preciseLocationSiteDialogDenyAlways">Deny always</string>
     <string name="preciseLocationSiteDialogDenyOnce">Deny for this session</string>
     <string name="settingsPreciseLocation">Location</string>
-    <string name="preciseLocationFeatureDescription">Sites you visit may request permission to access your location. They won\'t be able to access it until you explicitly grant permission. DuckDuckGo only uses your location anonymously to deliver local search results.</string>
+    <string name="preciseLocationFeatureDescription">Sites you visit may ask to know your device location. They won\'t be able to access it until you explicitly grant permission. DuckDuckGo only uses your location anonymously to deliver local search results.</string>
     <string name="preciseLocationToggleText">Sites can ask for my location</string>
-    <string name="preciseLocationEmptyListHint">No websites granted permission to access location.</string>
-    <string name="preciseLocationNoSystemPermission">To manage the location access permissions you\’ve granted to individual sites, enable location in <u>Android Settings.</u></string>
+    <string name="preciseLocationEmptyListHint">No websites granted permission to access location</string>
+    <string name="preciseLocationNoSystemPermission">To manage the location access permissions you\’ve granted to individual sites, enable location for this app in Android Settings.</string>
     <string name="preciseLocationActivityTitle">Location</string>
     <string name="preciseLocationDeleteConfirmMessage">Are you sure you want to delete &lt;b>%s&lt;/b>?</string>
     <string name="preciseLocationDeleteContentDescription">More options for location permissions in domain %s</string>

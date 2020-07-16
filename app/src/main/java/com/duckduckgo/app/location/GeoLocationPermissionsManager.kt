@@ -61,6 +61,5 @@ class GeoLocationPermissionsManager @Inject constructor(
                 }
             }
         }
-
     }
 }
