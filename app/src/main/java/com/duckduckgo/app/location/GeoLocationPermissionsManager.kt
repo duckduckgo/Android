@@ -27,7 +27,7 @@ import javax.inject.Inject
 
 interface GeoLocationPermissions {
     fun allow(domain: String)
-    fun deny(domain: String)
+    fun clear(domain: String)
     suspend fun clearAll()
 }
 
@@ -42,7 +42,7 @@ class GeoLocationPermissionsManager @Inject constructor(
         geolocationPermissions.allow(domain)
     }
 
-    override fun deny(domain: String) {
+    override fun clear(domain: String) {
         val geolocationPermissions = GeolocationPermissions.getInstance()
         geolocationPermissions.clear(domain)
     }

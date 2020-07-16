@@ -185,6 +185,7 @@ interface Pixel {
         COOKIE_DATABASE_CORRUPTED_ERROR("m_cdb_ce"),
         COOKIE_DATABASE_EXCEPTION_OPEN_ERROR("m_cdb_e_oe"),
         COOKIE_DATABASE_EXCEPTION_DELETE_ERROR("m_cdb_e_de"),
+
         FIREPROOF_WEBSITE_ADDED("m_fw_a"),
         FIREPROOF_WEBSITE_REMOVE("m_fw_r"),
         FIREPROOF_LOGIN_DIALOG_SHOWN("m_fw_ld_s"),
@@ -207,6 +208,16 @@ interface Pixel {
         USE_OUR_APP_SHORTCUT_OPENED("m_sho_uoa_o"),
         SHORTCUT_ADDED("m_sho_a"),
         SHORTCUT_OPENED("m_sho_o"),
+
+        PRECISE_LOCATION_SYSTEM_DIALOG_ENABLE("m_pc_syd_e"),
+        PRECISE_LOCATION_SYSTEM_DIALOG_LATER("m_pc_syd_l"),
+        PRECISE_LOCATION_SYSTEM_DIALOG_NEVER("m_pc_syd_n"),
+        PRECISE_LOCATION_SETTINGS_LOCATION_PERMISSION_ENABLE("m_pc_s_l_e"),
+        PRECISE_LOCATION_SETTINGS_LOCATION_PERMISSION_DISABLE("m_pc_s_l_d"),
+        PRECISE_LOCATION_SITE_DIALOG_ALLOW_ALWAYS("m_pc_sd_aa"),
+        PRECISE_LOCATION_SITE_DIALOG_ALLOW_ONCE("m_pc_sd_ao"),
+        PRECISE_LOCATION_SITE_DIALOG_DENY_ALWAYS("m_pc_sd_da"),
+        PRECISE_LOCATION_SITE_DIALOG_DENY_ONCE("m_pc_sd_do"),
     }
 
     object PixelParameter {

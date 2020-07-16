@@ -2286,7 +2286,7 @@ class BrowserTabViewModelTest {
         givenCurrentSite("example.com")
         givenNewPermissionRequestFromDomain("anotherexample.com")
 
-        verify(geoLocationPermissions).deny("anotherexample.com")
+        verify(geoLocationPermissions).clear("anotherexample.com")
     }
 
     @Test
@@ -2308,7 +2308,29 @@ class BrowserTabViewModelTest {
         givenCurrentSite(domain)
         givenNewPermissionRequestFromDomain(domain)
 
-        verify(geoLocationPermissions).deny(domain)
+        verify(geoLocationPermissions).clear(domain)
+    }
+
+    @Test
+    fun whenSystemPermissionIsGrantedThenSettingsDataStoreIsUpdated() = coroutineRule.runBlocking {
+        val domain = "example.com"
+        givenLocationPermissionIsEnabled(true)
+        givenCurrentSite(domain)
+        givenNewPermissionRequestFromDomain(domain)
+
+        testee.onSystemLocationPermissionGranted()
+        verify(mockSettingsStore).systemLocationPermissionDialogResponse = true
+    }
+
+    @Test
+    fun whenSystemPermissionIsDeniedThenSettingsDataStoreIsUpdated() = coroutineRule.runBlocking {
+        val domain = "example.com"
+        givenLocationPermissionIsEnabled(true)
+        givenCurrentSite(domain)
+        givenNewPermissionRequestFromDomain(domain)
+
+        testee.onSystemLocationPermissionDenied()
+        verify(mockSettingsStore).systemLocationPermissionDialogResponse = false
     }
 
     @Test
@@ -2349,7 +2371,7 @@ class BrowserTabViewModelTest {
 
         testee.onSystemLocationPermissionGranted()
 
-        verify(geoLocationPermissions).deny(domain)
+        verify(geoLocationPermissions).clear(domain)
     }
 
     @Test
@@ -2403,7 +2425,7 @@ class BrowserTabViewModelTest {
 
         testee.onSystemLocationPermissionNotAllowed()
 
-        verify(geoLocationPermissions).deny(domain)
+        verify(geoLocationPermissions).clear(domain)
     }
 
     @Test
@@ -2417,7 +2439,7 @@ class BrowserTabViewModelTest {
         testee.onSystemLocationPermissionNeverAllowed()
 
         verify(mockSettingsStore).appLocationPermission = false
-        verify(geoLocationPermissions).deny(domain)
+        verify(geoLocationPermissions).clear(domain)
     }
 
     @Test
@@ -2443,7 +2465,7 @@ class BrowserTabViewModelTest {
 
         testee.onSiteLocationPermissionDenied()
 
-        verify(geoLocationPermissions).deny(domain)
+        verify(geoLocationPermissions).clear(domain)
     }
 
     private fun givenNewPermissionRequestFromDomain(domain: String) {

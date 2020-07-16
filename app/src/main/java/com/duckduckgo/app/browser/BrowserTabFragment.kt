@@ -644,7 +644,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
     }
 
     private fun askSiteLocationPermission(domain: String) {
-        val dialog = SiteLocationPermissionDialog.instance(domain, viewModel)
+        val dialog = SiteLocationPermissionDialog.instance(domain, false, viewModel)
         dialog.show(requireActivity().supportFragmentManager, SiteLocationPermissionDialog.SITE_LOCATION_PERMISSION_TAG)
     }
 
@@ -1282,7 +1282,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
                     viewModel.onSystemLocationPermissionGranted()
                 } else {
                     Timber.i("System Geo location permission refused")
-                    viewModel.onSiteLocationPermissionDenied()
+                    viewModel.onSystemLocationPermissionDenied()
                 }
             }
         }

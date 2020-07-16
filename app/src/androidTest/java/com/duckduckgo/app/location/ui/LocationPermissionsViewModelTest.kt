@@ -28,10 +28,12 @@ import com.duckduckgo.app.location.data.LocationPermissionEntity
 import com.duckduckgo.app.location.data.LocationPermissionType
 import com.duckduckgo.app.location.data.LocationPermissionsDao
 import com.duckduckgo.app.location.data.LocationPermissionsRepository
+import com.duckduckgo.app.runBlocking
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.nhaarman.mockitokotlin2.atLeastOnce
 import com.nhaarman.mockitokotlin2.lastValue
 import com.nhaarman.mockitokotlin2.mock
+import com.nhaarman.mockitokotlin2.verify
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.junit.After
 import org.junit.Assert
@@ -143,7 +145,7 @@ class LocationPermissionsViewModelTest {
         val locationPermissionEntity = LocationPermissionEntity("domain.com", LocationPermissionType.ALLOW_ONCE)
         viewModel.delete(locationPermissionEntity)
 
-        Mockito.verify(mockGeoLocationPermissions).deny("domain.com")
+        Mockito.verify(mockGeoLocationPermissions).clear("domain.com")
     }
 
     @Test
@@ -188,6 +190,43 @@ class LocationPermissionsViewModelTest {
 
         val newPermission = viewStateCaptor.lastValue.locationPermissionEntities[0].permission
         Assert.assertTrue(newPermission == LocationPermissionType.DENY_ALWAYS)
+    }
+
+    @Test
+    fun whenAllowAlwaysPermissionsIsGrantedThenGeoLocationPermissionIsAllowed() = coroutineRule.runBlocking {
+        val domain = "example.com"
+        viewModel.onSiteLocationPermissionSelected(domain, LocationPermissionType.ALLOW_ALWAYS)
+
+        verify(mockGeoLocationPermissions).allow(domain)
+        Assert.assertEquals(locationPermissionsDao.getPermission(domain)!!.permission, LocationPermissionType.ALLOW_ALWAYS)
+    }
+
+    @Test
+    fun whenAllowOncePermissionsIsGrantedThenGeoLocationPermissionIsAllowed() = coroutineRule.runBlocking {
+        val domain = "example.com"
+        viewModel.onSiteLocationPermissionSelected(domain, LocationPermissionType.ALLOW_ONCE)
+
+        verify(mockGeoLocationPermissions).allow(domain)
+
+        Assert.assertEquals(locationPermissionsDao.getPermission(domain)!!.permission, LocationPermissionType.ALLOW_ONCE)
+    }
+
+    @Test
+    fun whenDenyOncePermissionsIsGrantedThenGeoLocationPermissionIsAllowed() = coroutineRule.runBlocking {
+        val domain = "example.com"
+        viewModel.onSiteLocationPermissionSelected(domain, LocationPermissionType.DENY_ONCE)
+
+        verify(mockGeoLocationPermissions).clear(domain)
+        Assert.assertEquals(locationPermissionsDao.getPermission(domain)!!.permission, LocationPermissionType.DENY_ONCE)
+    }
+
+    @Test
+    fun whenDenyAlwaysPermissionsIsGrantedThenGeoLocationPermissionIsAllowed() = coroutineRule.runBlocking {
+        val domain = "example.com"
+        viewModel.onSiteLocationPermissionSelected(domain, LocationPermissionType.DENY_ALWAYS)
+
+        verify(mockGeoLocationPermissions).clear(domain)
+        Assert.assertEquals(locationPermissionsDao.getPermission(domain)!!.permission, LocationPermissionType.DENY_ALWAYS)
     }
 
     private fun givenLocationPermission(permission: LocationPermissionType = LocationPermissionType.ALLOW_ONCE, vararg domain: String) {

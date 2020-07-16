@@ -36,6 +36,8 @@ class LocationPermissionsViewModel(
 
     data class ViewState(
         val locationPermissionEnabled: Boolean = false,
+        val systemLocationPermissionDialogResponse: Boolean = false,
+        val systemLocationPermissionGranted: Boolean = false,
         val locationPermissionEntities: List<LocationPermissionEntity> = emptyList()
     )
 
@@ -49,18 +51,20 @@ class LocationPermissionsViewModel(
     val command: SingleLiveEvent<Command> = SingleLiveEvent()
 
     private val locationPermissions: LiveData<List<LocationPermissionEntity>> = locationPermissionsRepository.getLocationPermissionsAsync()
-    private val fireproofWebsitesObserver = Observer<List<LocationPermissionEntity>> { onLocationPermissionsEntitiesChanged(it!!) }
-
-    init {
-        _viewState.value = ViewState(
-            locationPermissionEnabled = settingsDataStore.appLocationPermission
-        )
-        locationPermissions.observeForever(fireproofWebsitesObserver)
-    }
+    private val locationPermissionsObserver = Observer<List<LocationPermissionEntity>> { onLocationPermissionsEntitiesChanged(it!!) }
 
     override fun onCleared() {
         super.onCleared()
-        locationPermissions.removeObserver(fireproofWebsitesObserver)
+        locationPermissions.removeObserver(locationPermissionsObserver)
+    }
+
+    fun loadLocationPermissions(systemLocationPermissionEnabled: Boolean) {
+        _viewState.value = ViewState(
+            locationPermissionEnabled = settingsDataStore.appLocationPermission,
+            systemLocationPermissionDialogResponse = settingsDataStore.systemLocationPermissionDialogResponse,
+            systemLocationPermissionGranted = systemLocationPermissionEnabled
+        )
+        locationPermissions.observeForever(locationPermissionsObserver)
     }
 
     private fun onLocationPermissionsEntitiesChanged(entities: List<LocationPermissionEntity>) {
@@ -80,7 +84,7 @@ class LocationPermissionsViewModel(
     fun delete(entity: LocationPermissionEntity) {
         viewModelScope.launch(dispatcherProvider.io()) {
             locationPermissionsRepository.removeLocationPermission(entity.domain)
-            geoLocationPermissions.deny(entity.domain)
+            geoLocationPermissions.clear(entity.domain)
         }
     }
 
@@ -90,14 +94,27 @@ class LocationPermissionsViewModel(
     }
 
     override fun onSiteLocationPermissionSelected(domain: String, permission: LocationPermissionType) {
-        if (permission == LocationPermissionType.ALLOW_ONCE || permission == LocationPermissionType.ALLOW_ALWAYS) {
-            geoLocationPermissions.allow(domain)
-        } else {
-            geoLocationPermissions.deny(domain)
-        }
-
-        viewModelScope.launch {
-            locationPermissionsRepository.saveLocationPermission(domain, permission)
+        when (permission) {
+            LocationPermissionType.ALLOW_ALWAYS -> {
+                geoLocationPermissions.allow(domain)
+                viewModelScope.launch {
+                    locationPermissionsRepository.savePermissionForNextTime(domain, permission)
+                }
+            }
+            LocationPermissionType.DENY_ALWAYS -> {
+                geoLocationPermissions.clear(domain)
+                viewModelScope.launch {
+                    locationPermissionsRepository.savePermissionForNextTime(domain, permission)
+                }
+            }
+            else -> {
+                geoLocationPermissions.clear(domain)
+                viewModelScope.launch {
+                    locationPermissionsRepository.deletePermission(domain, permission)
+                }
+            }
         }
     }
+
+
 }

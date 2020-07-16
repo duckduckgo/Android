@@ -19,6 +19,7 @@ package com.duckduckgo.app.location.ui
 import android.app.Dialog
 import android.net.Uri
 import android.os.Bundle
+import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
@@ -26,8 +27,11 @@ import androidx.fragment.app.DialogFragment
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.faviconLocation
 import com.duckduckgo.app.global.image.GlideApp
+import com.duckduckgo.app.global.view.gone
+import com.duckduckgo.app.global.view.show
 import com.duckduckgo.app.global.view.website
 import com.duckduckgo.app.location.data.LocationPermissionType
+import kotlinx.android.synthetic.main.content_site_location_permission_dialog.siteAllowOnceLocationPermissionDivider
 import org.jetbrains.anko.find
 
 class SiteLocationPermissionDialog : DialogFragment() {
@@ -54,6 +58,7 @@ class SiteLocationPermissionDialog : DialogFragment() {
         val allowOnce = rootView.find<TextView>(R.id.siteAllowOnceLocationPermission)
         val denyOnce = rootView.find<TextView>(R.id.siteDenyOnceLocationPermission)
         val denyAlways = rootView.find<TextView>(R.id.siteDenyAlwaysLocationPermission)
+        val extraDivider = rootView.find<View>(R.id.siteAllowOnceLocationPermissionDivider)
 
         val alertDialog = AlertDialog.Builder(requireActivity(), R.style.AlertDialogTheme)
             .setView(rootView)
@@ -61,7 +66,7 @@ class SiteLocationPermissionDialog : DialogFragment() {
         validateBundleArguments()
         populateTitle(title)
         populateFavicon(favicon)
-        configureListeners(allowAlways, allowOnce, denyOnce, denyAlways)
+        configureListeners(allowAlways, allowOnce, denyOnce, denyAlways, extraDivider)
 
         return alertDialog.create()
     }
@@ -90,7 +95,8 @@ class SiteLocationPermissionDialog : DialogFragment() {
         allowAlways: TextView,
         allowOnce: TextView,
         denyOnce: TextView,
-        denyAlways: TextView
+        denyAlways: TextView,
+        extraDivider: View
     ) {
         arguments?.let { args ->
             val originUrl = args.getString(KEY_REQUEST_ORIGIN)
@@ -110,6 +116,13 @@ class SiteLocationPermissionDialog : DialogFragment() {
                 dismiss()
                 listener.onSiteLocationPermissionSelected(originUrl, LocationPermissionType.DENY_ALWAYS)
             }
+
+            val isEditing = args.getBoolean(KEY_EDITING_PERMISSION)
+            if (isEditing){
+                allowOnce.gone()
+                denyOnce.gone()
+                extraDivider.gone()
+            }
         }
     }
 
@@ -123,13 +136,15 @@ class SiteLocationPermissionDialog : DialogFragment() {
 
     companion object {
 
-        const val SITE_LOCATION_PERMISSION_TAG = "SitemLocationPermission"
+        const val SITE_LOCATION_PERMISSION_TAG = "SiteLocationPermission"
         private const val KEY_REQUEST_ORIGIN = "KEY_REQUEST_ORIGIN"
+        private const val KEY_EDITING_PERMISSION = "KEY_SCREEN_FROM"
 
-        fun instance(origin: String, listener: Listener): SiteLocationPermissionDialog {
+        fun instance(origin: String, isEditingPermission: Boolean, listener: Listener): SiteLocationPermissionDialog {
             return SiteLocationPermissionDialog().also { fragment ->
                 val bundle = Bundle()
                 bundle.putString(KEY_REQUEST_ORIGIN, origin)
+                bundle.putBoolean(KEY_EDITING_PERMISSION, isEditingPermission)
                 fragment.arguments = bundle
                 fragment.listener = listener
             }

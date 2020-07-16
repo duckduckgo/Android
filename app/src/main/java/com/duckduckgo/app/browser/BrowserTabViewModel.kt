@@ -812,13 +812,40 @@ class BrowserTabViewModel(
     }
 
     override fun onSiteLocationPermissionSelected(domain: String, permission: LocationPermissionType) {
-        if (permission == LocationPermissionType.ALLOW_ONCE || permission == LocationPermissionType.ALLOW_ALWAYS) {
-            onSiteLocationPermissionAllowed()
-        } else {
-            onSiteLocationPermissionDenied()
-        }
-        viewModelScope.launch {
-            locationPermissionsRepository.saveLocationPermission(domain, permission)
+        // if (permission == LocationPermissionType.ALLOW_ONCE || permission == LocationPermissionType.ALLOW_ALWAYS) {
+        //     onSiteLocationPermissionAllowed()
+        // } else {
+        //     onSiteLocationPermissionDenied()
+        // }
+        // viewModelScope.launch {
+        //     locationPermissionsRepository.updateLocationPermission(domain, permission)
+        // }
+
+        when (permission) {
+            LocationPermissionType.ALLOW_ALWAYS -> {
+                onSiteLocationPermissionAllowed()
+                viewModelScope.launch {
+                    locationPermissionsRepository.savePermissionForNextTime(domain, permission)
+                }
+            }
+            LocationPermissionType.ALLOW_ONCE -> {
+                permissionCallback?.invoke(permissionOrigin, true, false)
+                viewModelScope.launch {
+                    locationPermissionsRepository.deletePermission(domain, permission)
+                }
+            }
+            LocationPermissionType.DENY_ALWAYS -> {
+                onSiteLocationPermissionDenied()
+                viewModelScope.launch {
+                    locationPermissionsRepository.savePermissionForNextTime(domain, permission)
+                }
+            }
+            LocationPermissionType.DENY_ONCE -> {
+                permissionCallback?.invoke(permissionOrigin, false, false)
+                viewModelScope.launch {
+                    locationPermissionsRepository.deletePermission(domain, permission)
+                }
+            }
         }
     }
 
@@ -828,7 +855,7 @@ class BrowserTabViewModel(
     }
 
     fun onSiteLocationPermissionDenied() {
-        geoLocationPermissions.deny(permissionOrigin)
+        geoLocationPermissions.clear(permissionOrigin)
         permissionCallback?.invoke(permissionOrigin, false, false)
     }
 
@@ -863,6 +890,7 @@ class BrowserTabViewModel(
     }
 
     fun onSystemLocationPermissionGranted() {
+        appSettingsPreferencesStore.systemLocationPermissionDialogResponse = true
         appSettingsPreferencesStore.appLocationPermission = true
         viewModelScope.launch {
             val userHasGivenPermission = locationPermissionsRepository.hasUserGivenPermissionTo(permissionOrigin)
@@ -873,6 +901,11 @@ class BrowserTabViewModel(
                 command.postValue(AskDomainPermission(permissionOrigin))
             }
         }
+    }
+
+    fun onSystemLocationPermissionDenied() {
+        appSettingsPreferencesStore.systemLocationPermissionDialogResponse = false
+        onSiteLocationPermissionDenied()
     }
 
     private fun registerSiteVisit() {

@@ -16,18 +16,29 @@
 
 package com.duckduckgo.app.location.ui
 
+import android.Manifest
 import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.os.Bundle
+import android.text.Html
+import android.widget.TextView
+import androidx.core.content.ContextCompat
+import androidx.core.text.HtmlCompat
 import androidx.lifecycle.Observer
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.fire.fireproofwebsite.data.website
 import com.duckduckgo.app.global.DuckDuckGoActivity
+import com.duckduckgo.app.global.view.gone
 import com.duckduckgo.app.global.view.html
+import com.duckduckgo.app.global.view.show
 import com.duckduckgo.app.global.view.website
 import com.duckduckgo.app.location.data.LocationPermissionEntity
-import kotlinx.android.synthetic.main.content_fireproof_websites.*
-import kotlinx.android.synthetic.main.include_toolbar.*
+import kotlinx.android.synthetic.main.content_location_permissions.locationPermissionsNoSystemPermission
+import kotlinx.android.synthetic.main.content_location_permissions.recycler
+import kotlinx.android.synthetic.main.content_site_location_permission_dialog.siteAllowOnceLocationPermissionDivider
+import kotlinx.android.synthetic.main.include_toolbar.toolbar
 
 class LocationPermissionsActivity : DuckDuckGoActivity() {
 
@@ -44,6 +55,11 @@ class LocationPermissionsActivity : DuckDuckGoActivity() {
         observeViewModel()
     }
 
+    override fun onResume() {
+        super.onResume()
+        loadSystemPermission()
+    }
+
     private fun setupRecyclerView() {
         adapter = LocationPermissionsAdapter(viewModel)
         recycler.adapter = adapter
@@ -52,7 +68,15 @@ class LocationPermissionsActivity : DuckDuckGoActivity() {
     private fun observeViewModel() {
         viewModel.viewState.observe(this, Observer { viewState ->
             viewState?.let {
-                adapter.updatePermissions(it.locationPermissionEnabled, it.locationPermissionEntities)
+                if (!it.systemLocationPermissionGranted){
+                    recycler.gone()
+                    locationPermissionsNoSystemPermission.text = getString(R.string.preciseLocationNoSystemPermission).html(this)
+                    locationPermissionsNoSystemPermission.show()
+                } else {
+                    recycler.show()
+                    locationPermissionsNoSystemPermission.gone()
+                    adapter.updatePermissions(it.locationPermissionEnabled, it.locationPermissionEntities)
+                }
             }
         })
 
@@ -62,6 +86,10 @@ class LocationPermissionsActivity : DuckDuckGoActivity() {
                 is LocationPermissionsViewModel.Command.EditLocationPermissions -> editSiteLocationPermission(it.entity)
             }
         })
+    }
+
+    private fun loadSystemPermission(){
+        viewModel.loadLocationPermissions(ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED)
     }
 
     @Suppress("deprecation")
@@ -78,7 +106,7 @@ class LocationPermissionsActivity : DuckDuckGoActivity() {
     }
 
     private fun editSiteLocationPermission(entity: LocationPermissionEntity) {
-        val dialog = SiteLocationPermissionDialog.instance(entity.domain, viewModel)
+        val dialog = SiteLocationPermissionDialog.instance(entity.domain, true, viewModel)
         dialog.show(supportFragmentManager, SiteLocationPermissionDialog.SITE_LOCATION_PERMISSION_TAG)
     }
 
