@@ -19,7 +19,6 @@ package com.duckduckgo.app.location.data
 import androidx.lifecycle.LiveData
 import com.duckduckgo.app.global.DispatcherProvider
 import kotlinx.coroutines.withContext
-import timber.log.Timber
 import javax.inject.Inject
 
 class LocationPermissionsRepository @Inject constructor(
