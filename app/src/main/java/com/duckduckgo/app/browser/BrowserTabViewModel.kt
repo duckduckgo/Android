@@ -860,19 +860,6 @@ class BrowserTabViewModel(
         permissionCallback?.invoke(permissionOrigin, false, false)
     }
 
-    fun clearTemporaryLocationPermission(){
-        Timber.i("Precise Location - Closing tab, clearing up temporary permission for $permissionOrigin")
-        viewModelScope.launch {
-            val userHasGivenPermission = locationPermissionsRepository.hasUserGivenPermissionTo(permissionOrigin)
-            if (!userHasGivenPermission){
-                Timber.i("Precise Location - Clearing up temporary permission for $permissionOrigin")
-                geoLocationPermissions.clear(permissionOrigin)
-            } else {
-                Timber.i("Precise Location - $permissionOrigin has a permanent permission, we won't remove it")
-            }
-        }
-    }
-
     private fun reactToSitePermission(permission: LocationPermissionType) {
         when (permission) {
             LocationPermissionType.ALLOW_ALWAYS -> {

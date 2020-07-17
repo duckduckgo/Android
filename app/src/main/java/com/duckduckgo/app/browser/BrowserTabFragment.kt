@@ -1139,7 +1139,6 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
         supervisorJob.cancel()
         popupMenu.dismiss()
         loginDetectionDialog?.dismiss()
-        viewModel.clearTemporaryLocationPermission()
         destroyWebView()
         super.onDestroy()
     }
