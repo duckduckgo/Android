@@ -61,7 +61,6 @@ class LocationPermissionsViewModel(
     fun loadLocationPermissions(systemLocationPermissionEnabled: Boolean) {
         _viewState.value = ViewState(
             locationPermissionEnabled = settingsDataStore.appLocationPermission,
-            systemLocationPermissionDialogResponse = settingsDataStore.systemLocationPermissionDialogResponse,
             systemLocationPermissionGranted = systemLocationPermissionEnabled
         )
         locationPermissions.observeForever(locationPermissionsObserver)

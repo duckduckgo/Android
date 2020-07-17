@@ -36,7 +36,6 @@ interface SettingsDataStore {
     var appIconChanged: Boolean
     var appLoginDetection: Boolean
     var appLocationPermission: Boolean
-    var systemLocationPermissionDialogResponse: Boolean
 
     /**
      * This will be checked upon app startup and used to decide whether it should perform a clear or not.
@@ -89,10 +88,6 @@ class SettingsSharedPreferences @Inject constructor(private val context: Context
     override var appLocationPermission: Boolean
         get() = preferences.getBoolean(KEY_SITE_LOCATION_PERMISSION_ENABLED, true)
         set(enabled) = preferences.edit { putBoolean(KEY_SITE_LOCATION_PERMISSION_ENABLED, enabled) }
-
-    override var systemLocationPermissionDialogResponse: Boolean
-        get() = preferences.getBoolean(KEY_SYSTEM_LOCATION_PERMISSION_ENABLED, true)
-        set(enabled) = preferences.edit { putBoolean(KEY_SYSTEM_LOCATION_PERMISSION_ENABLED, enabled) }
 
     override var appIcon: AppIcon
         get() {

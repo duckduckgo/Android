@@ -806,8 +806,22 @@ class BrowserTabViewModel(
         }
 
         if (origin != null) {
-            Timber.i("Precise Location - Checking for System Location Permission")
-            command.postValue(CheckSystemLocationPermission(origin))
+            viewModelScope.launch {
+                val userHasGivenPermission = locationPermissionsRepository.hasUserGivenPermissionTo(permissionOrigin)
+                if (userHasGivenPermission) {
+                    val permissionEntity = locationPermissionsRepository.getDomainPermission(permissionOrigin)!!
+                    if (permissionEntity.permission == LocationPermissionType.DENY_ALWAYS){
+                        onSiteLocationPermissionDenied()
+                    } else {
+                        Timber.i("Precise Location - $permissionOrigin has permission $permissionEntity")
+                        command.postValue(CheckSystemLocationPermission(origin))
+                    }
+                } else {
+                    Timber.i("Precise Location - $permissionOrigin does not have permission yet")
+                    Timber.i("Precise Location - Checking for System Location Permission")
+                    command.postValue(CheckSystemLocationPermission(origin))
+                }
+            }
         } else {
             onSiteLocationPermissionDenied()
         }
@@ -896,7 +910,6 @@ class BrowserTabViewModel(
     }
 
     fun onSystemLocationPermissionGranted() {
-        appSettingsPreferencesStore.systemLocationPermissionDialogResponse = true
         appSettingsPreferencesStore.appLocationPermission = true
         viewModelScope.launch {
             val userHasGivenPermission = locationPermissionsRepository.hasUserGivenPermissionTo(permissionOrigin)
@@ -915,7 +928,6 @@ class BrowserTabViewModel(
 
     fun onSystemLocationPermissionDenied() {
         Timber.i("Precise Location - System Location permission denied")
-        appSettingsPreferencesStore.systemLocationPermissionDialogResponse = false
         onSiteLocationPermissionDenied()
     }
 
