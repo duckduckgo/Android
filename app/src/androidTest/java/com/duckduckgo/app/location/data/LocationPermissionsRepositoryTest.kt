@@ -136,14 +136,14 @@ class LocationPermissionsRepositoryTest {
     fun whenPermissionStoredThenHasUserGivenPermissionIsTrue() = coroutineRule.runBlocking {
         givenPermissionStored("example.com", "example2.com")
 
-        Assert.assertTrue(repository.hasUserGivenPermissionTo( "example2.com"))
+        Assert.assertTrue(repository.hasUserGivenPermissionTo("example2.com"))
     }
 
     @Test
     fun whenPermissionNotStoredThenHasUserGivenPermissionIsFalse() = coroutineRule.runBlocking {
         givenPermissionStored("example.com", "example2.com")
 
-        Assert.assertFalse(repository.hasUserGivenPermissionTo( "example3.com"))
+        Assert.assertFalse(repository.hasUserGivenPermissionTo("example3.com"))
     }
 
     private fun givenPermissionStored(vararg domains: String) {
