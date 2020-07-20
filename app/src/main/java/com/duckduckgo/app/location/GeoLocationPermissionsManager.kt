@@ -56,7 +56,7 @@ class GeoLocationPermissionsManager @Inject constructor(
             permissions.forEach {
                 if (!fireproofWebsiteRepository.isDomainFireproofed(it.host())) {
                     geolocationPermissions.clear(it.domain)
-                    permissionsRepository.removeLocationPermission(it.domain)
+                    permissionsRepository.deletePermission(it.domain)
                     Timber.i("GeoLocationsPermissionsManager: Remove permission from ${it.domain}")
                 }
             }

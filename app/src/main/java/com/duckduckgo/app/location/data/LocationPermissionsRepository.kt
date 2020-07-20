@@ -29,22 +29,10 @@ class LocationPermissionsRepository @Inject constructor(
     fun getLocationPermissionsSync(): List<LocationPermissionEntity> = locationPermissionsDao.allPermissions()
     fun getLocationPermissionsAsync(): LiveData<List<LocationPermissionEntity>> = locationPermissionsDao.allPermissionsEntities()
 
-    suspend fun savePermissionForNextTime(domain: String, permission: LocationPermissionType): LocationPermissionEntity? {
+    suspend fun savePermission(domain: String, permission: LocationPermissionType): LocationPermissionEntity? {
         val locationPermissionEntity = LocationPermissionEntity(domain = domain, permission = permission)
         val id = withContext(dispatchers.io()) {
             locationPermissionsDao.insert(locationPermissionEntity)
-        }
-        return if (id >= 0) {
-            locationPermissionEntity
-        } else {
-            null
-        }
-    }
-
-    suspend fun deletePermission(domain: String, permission: LocationPermissionType): LocationPermissionEntity? {
-        val locationPermissionEntity = LocationPermissionEntity(domain = domain, permission = permission)
-        val id = withContext(dispatchers.io()) {
-            locationPermissionsDao.delete(locationPermissionEntity)
         }
         return if (id >= 0) {
             locationPermissionEntity
@@ -66,7 +54,7 @@ class LocationPermissionsRepository @Inject constructor(
         }
     }
 
-    suspend fun removeLocationPermission(domain: String) {
+    suspend fun deletePermission(domain: String) {
         withContext(dispatchers.io()) {
             val entity = locationPermissionsDao.getPermission(domain)
             entity?.let { locationPermissionsDao.delete(entity) }

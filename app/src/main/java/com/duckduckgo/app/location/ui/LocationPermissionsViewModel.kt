@@ -82,7 +82,7 @@ class LocationPermissionsViewModel(
 
     fun delete(entity: LocationPermissionEntity) {
         viewModelScope.launch(dispatcherProvider.io()) {
-            locationPermissionsRepository.removeLocationPermission(entity.domain)
+            locationPermissionsRepository.deletePermission(entity.domain)
             geoLocationPermissions.clear(entity.domain)
         }
     }
@@ -97,19 +97,19 @@ class LocationPermissionsViewModel(
             LocationPermissionType.ALLOW_ALWAYS -> {
                 geoLocationPermissions.allow(domain)
                 viewModelScope.launch {
-                    locationPermissionsRepository.savePermissionForNextTime(domain, permission)
+                    locationPermissionsRepository.savePermission(domain, permission)
                 }
             }
             LocationPermissionType.DENY_ALWAYS -> {
                 geoLocationPermissions.clear(domain)
                 viewModelScope.launch {
-                    locationPermissionsRepository.savePermissionForNextTime(domain, permission)
+                    locationPermissionsRepository.savePermission(domain, permission)
                 }
             }
             else -> {
                 geoLocationPermissions.clear(domain)
                 viewModelScope.launch {
-                    locationPermissionsRepository.deletePermission(domain, permission)
+                    locationPermissionsRepository.deletePermission(domain)
                 }
             }
         }

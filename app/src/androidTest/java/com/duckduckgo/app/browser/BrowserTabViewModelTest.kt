@@ -2467,7 +2467,6 @@ class BrowserTabViewModelTest {
 
         testee.onSystemLocationPermissionNeverAllowed()
 
-        verify(mockSettingsStore).appLocationPermission = false
         verify(geoLocationPermissions).clear(domain)
         Assert.assertEquals(locationPermissionsDao.getPermission(domain)!!.permission, LocationPermissionType.DENY_ALWAYS)
     }
@@ -2493,7 +2492,7 @@ class BrowserTabViewModelTest {
         givenCurrentSite(domain)
         givenNewPermissionRequestFromDomain(domain)
 
-        testee.onSiteLocationPermissionDenied()
+        testee.onSiteLocationPermissionAlwaysDenied()
 
         verify(geoLocationPermissions).clear(domain)
     }

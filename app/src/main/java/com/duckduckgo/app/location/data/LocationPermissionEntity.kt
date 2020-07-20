@@ -38,6 +38,7 @@ private const val TYPE_ALLOW_ONCE = 2
 private const val TYPE_DENY_ALWAYS = 3
 private const val TYPE_DENY_ONCE = 4
 
+
 enum class LocationPermissionType(val value: Int) {
 
     ALLOW_ALWAYS(TYPE_ALLOW_ALWAYS),

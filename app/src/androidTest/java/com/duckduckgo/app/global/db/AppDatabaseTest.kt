@@ -113,7 +113,6 @@ class AppDatabaseTest {
         assertEquals(1, database().tabsDao().tabs()[1].position)
     }
 
-    @Test
     fun whenMigratingFromVersion4To5ThenTabsAreConsideredViewed() {
         testHelper.createDatabase(TEST_DB_NAME, 4).use {
             it.execSQL("INSERT INTO `tabs` values ('tabid1', 'url', 'title') ")
