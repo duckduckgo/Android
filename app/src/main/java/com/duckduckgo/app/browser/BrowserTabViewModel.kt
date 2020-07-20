@@ -810,7 +810,7 @@ class BrowserTabViewModel(
                 val userHasGivenPermission = locationPermissionsRepository.hasUserGivenPermissionTo(permissionOrigin)
                 if (userHasGivenPermission) {
                     val permissionEntity = locationPermissionsRepository.getDomainPermission(permissionOrigin)!!
-                    if (permissionEntity.permission == LocationPermissionType.DENY_ALWAYS){
+                    if (permissionEntity.permission == LocationPermissionType.DENY_ALWAYS) {
                         onSiteLocationPermissionDenied()
                     } else {
                         Timber.i("Precise Location - $permissionOrigin has permission $permissionEntity")

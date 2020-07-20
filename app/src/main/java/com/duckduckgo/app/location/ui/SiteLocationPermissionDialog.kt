@@ -30,7 +30,6 @@ import com.duckduckgo.app.global.image.GlideApp
 import com.duckduckgo.app.global.view.gone
 import com.duckduckgo.app.global.view.website
 import com.duckduckgo.app.location.data.LocationPermissionType
-import kotlinx.android.synthetic.main.content_site_location_permission_dialog.siteAllowOnceLocationPermissionDivider
 import org.jetbrains.anko.find
 
 class SiteLocationPermissionDialog : DialogFragment() {
@@ -58,6 +57,7 @@ class SiteLocationPermissionDialog : DialogFragment() {
         val denyOnce = rootView.find<TextView>(R.id.siteDenyOnceLocationPermission)
         val denyAlways = rootView.find<TextView>(R.id.siteDenyAlwaysLocationPermission)
         val extraDivider = rootView.find<View>(R.id.siteAllowOnceLocationPermissionDivider)
+        val anotherDivider = rootView.find<View>(R.id.siteDenyLocationPermissionDivider)
 
         val alertDialog = AlertDialog.Builder(requireActivity(), R.style.AlertDialogTheme)
             .setView(rootView)
@@ -65,7 +65,8 @@ class SiteLocationPermissionDialog : DialogFragment() {
         validateBundleArguments()
         populateTitle(title)
         populateFavicon(favicon)
-        configureListeners(allowAlways, allowOnce, denyOnce, denyAlways, extraDivider)
+        configureListeners(allowAlways, allowOnce, denyOnce, denyAlways)
+        hideExtraViews(allowOnce, denyOnce, extraDivider, anotherDivider)
 
         return alertDialog.create()
     }
@@ -94,8 +95,7 @@ class SiteLocationPermissionDialog : DialogFragment() {
         allowAlways: TextView,
         allowOnce: TextView,
         denyOnce: TextView,
-        denyAlways: TextView,
-        extraDivider: View
+        denyAlways: TextView
     ) {
         arguments?.let { args ->
             val originUrl = args.getString(KEY_REQUEST_ORIGIN)
@@ -115,12 +115,23 @@ class SiteLocationPermissionDialog : DialogFragment() {
                 dismiss()
                 listener.onSiteLocationPermissionSelected(originUrl, LocationPermissionType.DENY_ALWAYS)
             }
+        }
+    }
+
+    private fun hideExtraViews(
+        allowOnce: TextView,
+        denyOnce: TextView,
+        dividerOne: View,
+        dividerTwo: View
+    ) {
+        arguments?.let { args ->
 
             val isEditing = args.getBoolean(KEY_EDITING_PERMISSION)
             if (isEditing) {
+                dividerOne.gone()
+                dividerTwo.gone()
                 allowOnce.gone()
                 denyOnce.gone()
-                extraDivider.gone()
             }
         }
     }

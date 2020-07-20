@@ -80,7 +80,8 @@
         android:layout_height="wrap_content"
         android:text="@string/preciseLocationSiteDialogAllowOnce" />
 
-    <View style="@style/LocationPermissionDialogSplitter" />
+    <View style="@style/LocationPermissionDialogSplitter"
+        android:id="@+id/siteDenyLocationPermissionDivider"/>
 
     <Button
         android:id="@+id/siteDenyOnceLocationPermission"

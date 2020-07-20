@@ -627,7 +627,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
             is Command.HideWebContent -> webView?.hide()
             is Command.ShowWebContent -> webView?.show()
             is Command.CheckSystemLocationPermission -> checkSystemLocationPermission(it.domain)
-            is Command.RequestSystemLocationPermission -> requestPermissions(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), PERMISSION_REQUEST_GEO_LOCATION)
+            is Command.RequestSystemLocationPermission -> requestPermissions(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION), PERMISSION_REQUEST_GEO_LOCATION)
             is Command.AskDomainPermission -> askSiteLocationPermission(it.domain)
             is Command.RefreshUserAgent -> refreshUserAgent(it.host, it.isDesktop)
             is Command.AskToFireproofWebsite -> askToFireproofWebsite(requireContext(), it.fireproofWebsite)
@@ -635,7 +635,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
     }
 
     private fun checkSystemLocationPermission(domain: String) {
-        if (ContextCompat.checkSelfPermission(requireActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+        if (ContextCompat.checkSelfPermission(requireActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             val dialog = SystemLocationPermissionDialog.instance(domain, viewModel)
             dialog.show(requireActivity().supportFragmentManager, SystemLocationPermissionDialog.SYSTEM_LOCATION_PERMISSION_TAG)
         } else {
