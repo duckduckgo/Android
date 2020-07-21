@@ -85,7 +85,7 @@ class SystemSearchViewModelTest {
 
         val viewState = testee.onboardingViewState.value
         assertFalse(viewState!!.visible)
-        assertFalse(viewState!!.expanded)
+        assertFalse(viewState.expanded)
     }
 
     @Test
@@ -95,7 +95,7 @@ class SystemSearchViewModelTest {
 
         val viewState = testee.onboardingViewState.value
         assertTrue(viewState!!.visible)
-        assertFalse(viewState!!.expanded)
+        assertFalse(viewState.expanded)
     }
 
     @Test
@@ -261,6 +261,14 @@ class SystemSearchViewModelTest {
         verify(mockDeviceAppLookup, times(2)).refreshAppList()
         verify(commandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
         assertEquals(Command.ShowAppNotFoundMessage(deviceApp.shortName), commandCaptor.lastValue)
+    }
+
+    @Test
+    fun whenUserSelectedToUpdateQueryThenEditQueryCommandSent() {
+        val query = "test"
+        testee.onUserSelectedToEditQuery(query)
+        verify(commandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+        assertEquals(Command.EditQuery(query), commandCaptor.lastValue)
     }
 
     private suspend fun whenOnboardingShowing() {
