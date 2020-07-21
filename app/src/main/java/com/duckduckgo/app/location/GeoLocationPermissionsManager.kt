@@ -19,6 +19,7 @@ package com.duckduckgo.app.location
 import android.webkit.GeolocationPermissions
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepository
 import com.duckduckgo.app.global.DispatcherProvider
+import com.duckduckgo.app.location.data.LocationPermissionType
 import com.duckduckgo.app.location.data.LocationPermissionsRepository
 import com.duckduckgo.app.location.data.host
 import kotlinx.coroutines.withContext
@@ -54,7 +55,7 @@ class GeoLocationPermissionsManager @Inject constructor(
             val fireproofed = fireproofWebsiteRepository.getFireproofWebsitesSync()
             Timber.i("GeoLocationsPermissionsManager: $permissions, fireproofed: $fireproofed")
             permissions.forEach {
-                if (!fireproofWebsiteRepository.isDomainFireproofed(it.host())) {
+                if (!fireproofWebsiteRepository.isDomainFireproofed(it.host()) && it.permission != LocationPermissionType.DENY_ALWAYS) {
                     geolocationPermissions.clear(it.domain)
                     permissionsRepository.deletePermission(it.domain)
                     Timber.i("GeoLocationsPermissionsManager: Remove permission from ${it.domain}")

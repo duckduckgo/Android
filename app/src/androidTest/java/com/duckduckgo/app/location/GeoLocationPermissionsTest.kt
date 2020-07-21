@@ -79,7 +79,7 @@ class GeoLocationPermissionsTest {
     }
 
     @Test
-    fun whenAllPermissionsAreClearedThenOnlyNoFireproofedSitesAreDeleted() = coroutineRule.runBlocking {
+    fun whenAllAllowedPermissionsAreClearedThenOnlyNoFireproofedSitesAreDeleted() = coroutineRule.runBlocking {
         givenFireproofWebsiteDomain("anotherdomain.com")
         givenLocationPermissionsDomain("domain.com")
 
@@ -99,7 +99,7 @@ class GeoLocationPermissionsTest {
     }
 
     @Test
-    fun whenAllPermissionsAreClearedAndNoFireproofedSitesThenAllSitePermissionsAreDeleted() = coroutineRule.runBlocking {
+    fun whenAllAllowedPermissionsAreClearedAndNoFireproofedSitesThenAllSitePermissionsAreDeleted() = coroutineRule.runBlocking {
         givenLocationPermissionsDomain("domain.com")
 
         val oldLocationPermissions = locationPermissionsDao.allPermissions()
@@ -112,7 +112,7 @@ class GeoLocationPermissionsTest {
     }
 
     @Test
-    fun whenAllPermissionsAreClearedAndSiteIsFireproofedThenIsNotDeleted() = coroutineRule.runBlocking {
+    fun whenAllAllowedPermissionsAreClearedAndSiteIsFireproofedThenIsNotDeleted() = coroutineRule.runBlocking {
         givenFireproofWebsiteDomain("domain.com")
         givenLocationPermissionsDomain("domain.com")
 
@@ -131,15 +131,27 @@ class GeoLocationPermissionsTest {
         assertEquals(newLocationPermissions.size, 1)
     }
 
+    @Test
+    fun whenAllStoredPermissionsAreAlwaysDenyThenNoPermissionsAreDeleted() = coroutineRule.runBlocking {
+        givenFireproofWebsiteDomain("anotherdomain.com")
+        givenLocationPermissionsDomain("domain.com", LocationPermissionType.DENY_ALWAYS)
+
+        val oldLocationPermissions = locationPermissionsDao.allPermissions()
+        assertEquals(oldLocationPermissions.size, 1)
+
+        geoLocationPermissions.clearAll()
+
+        val newLocationPermissions = locationPermissionsDao.allPermissions()
+        assertEquals(newLocationPermissions.size, 1)
+    }
+
     private fun givenFireproofWebsiteDomain(vararg fireproofWebsitesDomain: String) {
         fireproofWebsitesDomain.forEach {
             fireproofWebsiteDao.insert(FireproofWebsiteEntity(domain = it))
         }
     }
 
-    private fun givenLocationPermissionsDomain(vararg locationPermissions: String) {
-        locationPermissions.forEach {
-            locationPermissionsDao.insert(LocationPermissionEntity(domain = it, permission = LocationPermissionType.ALLOW_ONCE))
-        }
+    private fun givenLocationPermissionsDomain(domain: String, permissionType: LocationPermissionType = LocationPermissionType.ALLOW_ALWAYS) {
+        locationPermissionsDao.insert(LocationPermissionEntity(domain = domain, permission = permissionType))
     }
 }
