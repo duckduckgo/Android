@@ -259,7 +259,7 @@
         <item name="android:layout_height">match_parent</item>
     </style>
 
-    <style name="BlueCursor" parent="ThemeOverlay.MaterialComponents.TextInputEditText.OutlinedBox">
+    <style name="TextInputEditTextTheme" parent="ThemeOverlay.MaterialComponents.TextInputEditText.OutlinedBox">
         <item name="android:colorControlActivated">@color/cornflowerBlue</item>
     </style>
 
