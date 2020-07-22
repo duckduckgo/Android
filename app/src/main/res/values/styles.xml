@@ -268,7 +268,7 @@
         <item name="hintTextColor">@color/cornflowerBlue</item>
         <item name="android:textColorHint">?attr/feedbackEditTextHintColor</item>
         <item name="boxBackgroundColor">?attr/feedbackEditTextBackgroundColor</item>
-        <item name="android:theme">@style/BlueCursor</item>
+        <item name="android:theme">@style/TextInputEditTextTheme</item>
     </style>
 
     <style name="FeedbackEditTextInputStyle" parent="Widget.MaterialComponents.TextInputEditText.FilledBox">
