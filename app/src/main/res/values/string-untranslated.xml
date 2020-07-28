@@ -68,7 +68,7 @@
 
     <!-- Precise Location -->
     <string name="preciseLocationSystemDialogTitle">Enable location services for DuckDuckGo Privacy Browser?</string>
-    <string name="preciseLocationSystemDialogSubtitle">This site is requesting your device location. You\'ll first need to allow the browser to send your device location, then the site can ask permission.</string>
+    <string name="preciseLocationSystemDialogSubtitle">This site is requesting your device location. You\'ll first need to allow the app to send your device location, then the site can ask permission.</string>
     <string name="preciseLocationSystemDialogAllow">Enable</string>
     <string name="preciseLocationSystemDialogDeny">Maybe Later</string>
     <string name="preciseLocationSystemDialogNeverAllow">Don\'t Ask Again for this Site</string>
