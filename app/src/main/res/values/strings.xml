@@ -425,6 +425,7 @@
     <string name="changeIconDialogMessage">The app may close to apply changes. Come on back after you\'ve admired your handsome new icon.</string>
 
     <!-- New dashboard / menu buttons -->
+    <string name="manageWhitelist">Unprotected Sites</string>
     <string name="reportBrokenSite">Report Broken Site</string>
 
     <!-- Dialogs -->
@@ -432,8 +433,18 @@
     <string name="dialogEditTitle">Edit</string>
 
     <!-- Whitelist -->
+    <string name="whitelisetActivityTitle">Unprotected Sites</string>
+    <string name="enablePrivacyProtection">Enable Privacy Protection</string>
+    <string name="disablePrivacyProtection">Disable Privacy Protection</string>
+    <string name="whitelistEntryOverflowContentDescription">More options for unprotected site %s</string>
+    <string name="whitelistEntryDeleteConfirmMessage">Are you sure you want to remove &lt;b>%s&lt;/b> from unprotected sites?</string>
+    <string name="whitelistExplanation">These sites will not be enhanced by Privacy Protection.</string>
+    <string name="whitelistNoEntries">No Unprotected Sites Yet</string>
     <string name="whitelistDomainHint">www.example.com</string>
     <string name="whitelistFormatError">Could not save, enter a domain like <b>example.com</b></string>
+
+    <!-- Settings -->
+    <string name="settingsPrivacyProtectionWhitelist">Unprotected Sites</string>
 
     <!-- Fireproof websites -->
     <string name="fireproofWebsitesActivityTitle">Fireproof Websites</string>

@@ -415,7 +415,7 @@
     <string name="changeIconDialogMessage">De app wordt mogelijk gesloten om wijzigingen toe te passen. Kom terug nadat je je knappe nieuwe icoon heeft bewonderd.</string>
 
     <!-- New dashboard / menu buttons -->
-    <string name="manageWhitelist">Witte lijst beheren</string>
+    <string name="manageWhitelist">Onbeschermde sites</string>
     <string name="reportBrokenSite">Defecte website melden</string>
 
     <!-- Dialogs -->
@@ -423,19 +423,18 @@
     <string name="dialogEditTitle">Bewerken</string>
 
     <!-- Whitelist -->
-    <string name="whitelisetActivityTitle">Witte lijst</string>
-    <string name="enablePrivacyProtection">Toevoegen aan witte lijst</string>
-    <string name="disablePrivacyProtection">Verwijderen uit witte lijst</string>
-    <string name="whitelistEntryOverflowContentDescription">Meer opties voor vermelding op de witte lijst %s</string>
-    <string name="whitelistEntryDeleteConfirmMessage">Weet je zeker dat je &lt;b&gt;%s&lt;/b&gt; van de witte lijst wilt verwijderen?</string>
-    <string name="whitelistExplanation">Deze sites op de witte lijst worden niet bijgewerkt door Privacybescherming</string>
-    <string name="whitelistNoEntries">Nog geen sites op de witte lijst</string>
+    <string name="whitelisetActivityTitle">Onbeschermde sites</string>
+    <string name="enablePrivacyProtection">Privacybescherming inschakelen</string>
+    <string name="disablePrivacyProtection">Privacybescherming uitschakelen</string>
+    <string name="whitelistEntryOverflowContentDescription">Meer opties voor onbeschermde site %s</string>
+    <string name="whitelistEntryDeleteConfirmMessage">Weet je zeker dat je &lt;b&gt;%s&lt;/b&gt; wilt verwijderen uit onbeschermde sites?</string>
+    <string name="whitelistExplanation">Deze sites worden niet beschermd met Privacybescherming.</string>
+    <string name="whitelistNoEntries">Nog geen onbeschermde sites</string>
     <string name="whitelistDomainHint">www.voorbeeld.com</string>
-    <string name="whitelistFormatError">Kan niet opslaan, voer een domein in zoals <b>example.com</b>
-  </string>
+    <string name="whitelistFormatError">Kan niet opslaan, voer een domein in zoals <b>example.com</b></string>
 
     <!-- Settings -->
-    <string name="settingsPrivacyProtectionWhitelist">Witte lijst met privacybescherming</string>
+    <string name="settingsPrivacyProtectionWhitelist">Onbeschermde sites</string>
 
     <!-- Fireproof websites -->
     <string name="fireproofWebsitesActivityTitle">Brandveilige websites</string>
