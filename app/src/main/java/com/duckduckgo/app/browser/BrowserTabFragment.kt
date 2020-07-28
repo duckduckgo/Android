@@ -1090,8 +1090,6 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
     private fun closeAndReturnToSourceIfBlankTab() {
         if (viewModel.url == null) {
             launch {
-                dismissDownloadFragment()
-                destroyWebView()
                 viewModel.closeAndSelectSourceTab()
             }
         }

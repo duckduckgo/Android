@@ -506,14 +506,11 @@ class BrowserTabViewModel(
     }
 
     override fun closeAndSelectSourceTab() {
-        viewModelScope.launch { removeAndSelectTabsFromRepository() }
+        viewModelScope.launch { removeAndSelectTabFromRepository() }
     }
 
-    private suspend fun removeAndSelectTabsFromRepository() {
-        val currentTab = tabRepository.liveSelectedTab.value
-        currentTab?.let {
-            tabRepository.deleteAndSelectSource(currentTab)
-        }
+    private suspend fun removeAndSelectTabFromRepository() {
+        tabRepository.deleteCurrentTabAndSelectSource()
     }
 
     fun onUserPressedForward() {

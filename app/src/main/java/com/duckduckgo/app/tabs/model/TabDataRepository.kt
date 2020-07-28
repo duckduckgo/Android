@@ -51,14 +51,14 @@ class TabDataRepository @Inject constructor(
         return tabId
     }
 
-    override suspend fun addWithSource(url: String?, skipHome: Boolean, isDefaultTab: Boolean, sourceTabId: String?): String {
+    override suspend fun addWithSource(url: String?, skipHome: Boolean, isDefaultTab: Boolean): String {
         val tabId = generateTabId()
         add(
-                tabId,
-                buildSiteData(url),
-                skipHome = skipHome,
-                isDefaultTab = isDefaultTab,
-                sourceTabId = sourceTabId
+            tabId,
+            buildSiteData(url),
+            skipHome = skipHome,
+            isDefaultTab = isDefaultTab,
+            sourceTabId = liveSelectedTab.value?.tabId
         )
         return tabId
     }
@@ -149,18 +149,21 @@ class TabDataRepository @Inject constructor(
         siteData.remove(tab.tabId)
     }
 
-    override suspend fun deleteAndSelectSource(tabToDelete: TabEntity) {
+    override suspend fun deleteCurrentTabAndSelectSource() {
+        val tabToDelete = liveSelectedTab.value
         databaseExecutor().scheduleDirect {
-            deleteOldPreviewImages(tabToDelete.tabId)
+            tabToDelete?.tabId?.let {
+                deleteOldPreviewImages(tabToDelete.tabId)
+                tabsDao.deleteTab(tabToDelete)
+                siteData.remove(tabToDelete.tabId)
+            }
 
-            tabToDelete.sourceTabId?.let { sourceTabId ->
+            tabToDelete?.sourceTabId?.let { sourceTabId ->
                 if (tabsDao.tab(sourceTabId) != null) {
-                    tabsDao.deleteTab(tabToDelete)
                     tabsDao.insertTabSelection(TabSelectionEntity(tabId = sourceTabId))
                 }
             }
         }
-        siteData.remove(tabToDelete.tabId)
     }
 
     override fun deleteAll() {
