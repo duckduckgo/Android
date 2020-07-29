@@ -73,6 +73,7 @@ import com.duckduckgo.app.global.events.db.UserEventKey
 import com.duckduckgo.app.notification.model.UseOurAppNotification
 import com.duckduckgo.app.global.events.db.UserEventEntity
 import com.duckduckgo.app.global.events.db.UserEventsStore
+import com.duckduckgo.app.global.model.domain
 import com.duckduckgo.app.global.useourapp.UseOurAppDetector
 import com.duckduckgo.app.location.GeoLocationPermissions
 import com.duckduckgo.app.location.data.LocationPermissionEntity
@@ -2495,6 +2496,40 @@ class BrowserTabViewModelTest {
         testee.onSiteLocationPermissionAlwaysDenied()
 
         verify(geoLocationPermissions).clear(domain)
+    }
+
+    @Test
+    fun whenUserVisitsDomainWithPermanentLocationPermissionThenMessageIsShown() = coroutineRule.runBlocking {
+        val domain = "example.com"
+
+        givenUserAlreadySelectedPermissionForDomain(domain, LocationPermissionType.ALLOW_ALWAYS)
+        givenCurrentSite(domain)
+        givenLocationPermissionIsEnabled(true)
+
+        loadUrl("http://example.com", isBrowserShowing = true)
+
+        assertCommandIssued<Command.ShowDomainHasPermissionMessage>()
+    }
+
+    @Test
+    fun whenUserVisitsDomainWithoutLocationPermissionThenMessageIsNotShown() = coroutineRule.runBlocking {
+        val domain = "example.com"
+        givenLocationPermissionIsEnabled(true)
+        givenCurrentSite(domain)
+        loadUrl("http://example.com", isBrowserShowing = true)
+
+        assertCommandNotIssued<Command.ShowDomainHasPermissionMessage>()
+    }
+
+    @Test
+    fun whenUserVisitsDomainAndLocationIsNotEnabledThenMessageIsNotShown() = coroutineRule.runBlocking {
+        val domain = "example.com"
+        givenLocationPermissionIsEnabled(false)
+        givenCurrentSite(domain)
+
+        loadUrl("www.example.com", isBrowserShowing = true)
+
+        assertCommandNotIssued<Command.ShowDomainHasPermissionMessage>()
     }
 
     private fun givenNewPermissionRequestFromDomain(domain: String) {

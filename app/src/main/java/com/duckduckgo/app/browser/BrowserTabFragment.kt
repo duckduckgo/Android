@@ -631,6 +631,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
             is Command.AskDomainPermission -> askSiteLocationPermission(it.domain)
             is Command.RefreshUserAgent -> refreshUserAgent(it.host, it.isDesktop)
             is Command.AskToFireproofWebsite -> askToFireproofWebsite(requireContext(), it.fireproofWebsite)
+            is Command.ShowDomainHasPermissionMessage -> showMessageSnackbar(it.domain)
         }
     }
 
@@ -660,6 +661,15 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
         if (!errorSnackbar.view.isAttachedToWindow && isVisible) {
             errorSnackbar.setAction(R.string.crashedWebViewErrorAction) { command.action() }.show()
         }
+    }
+
+    private fun showMessageSnackbar(message: String) {
+        val snackbar = Snackbar.make(rootView, getString(R.string.preciseLocationSnackbarMessage, message), Snackbar.LENGTH_SHORT)
+        val snackbarView = snackbar.view
+        snackbarView.setOnClickListener {
+            browserActivity?.launchLocationSettings()
+        }
+        snackbar.show()
     }
 
     private fun generateWebViewPreviewImage() {

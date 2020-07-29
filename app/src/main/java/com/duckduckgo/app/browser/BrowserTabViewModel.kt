@@ -81,6 +81,7 @@ import com.duckduckgo.app.global.toDesktopUri
 import com.duckduckgo.app.global.useourapp.UseOurAppDetector
 import com.duckduckgo.app.global.useourapp.UseOurAppDetector.Companion.USE_OUR_APP_SHORTCUT_TITLE
 import com.duckduckgo.app.global.useourapp.UseOurAppDetector.Companion.USE_OUR_APP_SHORTCUT_URL
+import com.duckduckgo.app.global.view.website
 import com.duckduckgo.app.notification.db.NotificationDao
 import com.duckduckgo.app.notification.model.UseOurAppNotification
 import com.duckduckgo.app.location.GeoLocationPermissions
@@ -258,6 +259,7 @@ class BrowserTabViewModel(
         object RequestSystemLocationPermission : Command()
         class RefreshUserAgent(val host: String?, val isDesktop: Boolean) : Command()
         class ShowErrorWithAction(val action: () -> Unit) : Command()
+        class ShowDomainHasPermissionMessage(val domain: String) : Command()
         sealed class DaxCommand : Command() {
             object FinishTrackerAnimation : DaxCommand()
             class HideDaxDialog(val cta: Cta) : DaxCommand()
@@ -667,6 +669,8 @@ class BrowserTabViewModel(
 
         domain?.let { viewModelScope.launch { updateLoadingStatePrivacy(domain) } }
         domain?.let { viewModelScope.launch { updateWhitelistedState(domain) } }
+        domain?.let { viewModelScope.launch { notifyPermanentLocationPermission(domain) } }
+
         registerSiteVisit()
     }
 
@@ -716,6 +720,22 @@ class BrowserTabViewModel(
 
     private suspend fun isWhitelisted(domain: String): Boolean {
         return withContext(dispatchers.io()) { userWhitelistDao.contains(domain) }
+    }
+
+    private suspend fun notifyPermanentLocationPermission(domain: String) {
+        if (!appSettingsPreferencesStore.appLocationPermission) {
+            Timber.i("Precise Location - Location is not enabled")
+            return
+        }
+
+        Timber.i("Precise Location - Checking for $domain Location Permission")
+        val userHasGivenPermission = locationPermissionsRepository.hasUserGivenPermissionTo(domain)
+        if (userHasGivenPermission) {
+            val permissionEntity = locationPermissionsRepository.getDomainPermission(domain)!!
+            if (permissionEntity.permission == LocationPermissionType.ALLOW_ALWAYS) {
+                command.postValue(ShowDomainHasPermissionMessage(domain))
+            }
+        }
     }
 
     private fun urlUpdated(url: String) {
@@ -854,6 +874,7 @@ class BrowserTabViewModel(
         Timber.i("Precise Location - Permission allowed for $permissionOrigin")
         geoLocationPermissions.allow(permissionOrigin)
         permissionCallback?.invoke(permissionOrigin, true, false)
+        command.value = ShowDomainHasPermissionMessage(permissionOrigin)
     }
 
     fun onSiteLocationPermissionAlwaysDenied() {
