@@ -37,7 +37,7 @@ class AppUserStageStoreTest {
     private val testee = AppUserStageStore(userStageDao, coroutineRule.testDispatcherProvider)
 
     @Test
-    fun whenGetUserAppStageThenRetunCurrentStage() = coroutineRule.runBlocking {
+    fun whenGetUserAppStageThenReturnCurrentStage() = coroutineRule.runBlocking {
         givenCurrentStage(AppStage.DAX_ONBOARDING)
 
         val userAppStage = testee.getUserAppStage()

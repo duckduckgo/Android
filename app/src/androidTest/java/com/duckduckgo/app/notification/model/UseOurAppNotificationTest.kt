@@ -41,7 +41,7 @@ class UseOurAppNotificationTest {
     }
 
     @Test
-    fun whenNotificationNotSeenThenCanShowIsTrue() = runBlocking {
+    fun whenNotificationNotSeenAndHiseTipsIsFalseThenCanShowIsTrue() = runBlocking {
         whenever(notificationsDao.exists(any())).thenReturn(false)
         whenever(mockSettingsDataStore.hideTips).thenReturn(false)
         assertTrue(testee.canShow())
@@ -52,13 +52,6 @@ class UseOurAppNotificationTest {
         whenever(notificationsDao.exists(any())).thenReturn(true)
         whenever(mockSettingsDataStore.hideTips).thenReturn(false)
         assertFalse(testee.canShow())
-    }
-
-    @Test
-    fun whenHideTipsIsFalseThenCanShowIsTrue() = runBlocking {
-        whenever(notificationsDao.exists(any())).thenReturn(false)
-        whenever(mockSettingsDataStore.hideTips).thenReturn(false)
-        assertTrue(testee.canShow())
     }
 
     @Test
