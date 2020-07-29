@@ -310,6 +310,38 @@ sealed class DaxBubbleCta(
     )
 }
 
+sealed class DaxFireCta(
+    override val ctaId: CtaId,
+    @StringRes open val description: Int,
+    override val shownPixel: Pixel.PixelName?,
+    override val okPixel: Pixel.PixelName?,
+    override val cancelPixel: Pixel.PixelName?
+) : Cta, ViewCta {
+
+    override fun showCta(view: View) {
+        val daxText = view.context.getString(description)
+        view.show()
+        view.alpha = 1f
+        view.hiddenTextCta.text = daxText.html(view.context)
+        view.primaryCta.gone()
+        view.dialogTextCta.startTypingAnimation(daxText, true)
+    }
+
+    override fun pixelCancelParameters(): Map<String, String> = emptyMap()
+
+    override fun pixelOkParameters(): Map<String, String> = emptyMap()
+
+    override fun pixelShownParameters(): Map<String, String> = emptyMap()
+
+    class FireCta() : DaxFireCta(
+        CtaId.DAX_INTRO,
+        R.string.daxClearDataCtaText,
+        Pixel.PixelName.ONBOARDING_DAX_CTA_SHOWN,
+        Pixel.PixelName.ONBOARDING_DAX_CTA_OK_BUTTON,
+        null
+    )
+}
+
 sealed class HomePanelCta(
     override val ctaId: CtaId,
     @DrawableRes open val image: Int,

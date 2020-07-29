@@ -65,4 +65,7 @@
 
     <!-- Settings -->
     <string name="settingsPrivacyProtectionWhitelist">Unprotected Sites</string>
+
+    <!--Fire button education-->
+    <string name="daxClearDataCtaText">Now tap below to burn your browsing history. Give it a try! &#128071;</string>
 </resources>
