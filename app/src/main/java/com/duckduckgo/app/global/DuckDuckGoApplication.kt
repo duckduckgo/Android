@@ -329,7 +329,7 @@ open class DuckDuckGoApplication : HasAndroidInjector, Application(), LifecycleO
         GlobalScope.launch {
             workScheduler.scheduleWork()
             atbInitializer.initializeAfterReferrerAvailable()
-            if (variantManager.getVariant().hasFeature(VariantManager.VariantFeature.RemoveDay1AndDay3Notifications)) {
+            if (variantManager.getVariant().hasFeature(VariantManager.VariantFeature.KillOnboarding)) {
                 moveUserToEstablished3DaysAfterInstall()
             }
         }
