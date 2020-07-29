@@ -68,6 +68,10 @@ suspend fun UserStageStore.daxOnboardingActive(): Boolean {
     return this.getUserAppStage() == AppStage.DAX_ONBOARDING
 }
 
+suspend fun UserStageStore.isEstablished(): Boolean {
+    return this.getUserAppStage() == AppStage.ESTABLISHED
+}
+
 suspend fun UserStageStore.useOurAppOnboarding(): Boolean {
     return this.getUserAppStage() == AppStage.USE_OUR_APP_ONBOARDING
 }

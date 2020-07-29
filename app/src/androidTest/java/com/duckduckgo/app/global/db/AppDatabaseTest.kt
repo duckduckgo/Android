@@ -16,10 +16,8 @@
 
 package com.duckduckgo.app.global.db
 
-import android.content.ContentValues
 import android.content.Context
 import android.content.SharedPreferences
-import android.database.sqlite.SQLiteDatabase
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.room.Room
 import androidx.room.migration.Migration
@@ -66,7 +64,7 @@ class AppDatabaseTest {
     private val mockUseOurAppMigrationManager = mock<MigrationManager>()
 
     private val migrationsProvider: MigrationsProvider =
-        MigrationsProvider(context, mockSettingsDataStore, mockAddToHomeCapabilityDetector, mockUseOurAppMigrationManager)
+        MigrationsProvider(context, mockSettingsDataStore, mockAddToHomeCapabilityDetector)
 
     @Before
     fun setup() {
@@ -233,90 +231,8 @@ class AppDatabaseTest {
         createDatabaseAndMigrate(21, 22, migrationsProvider.MIGRATION_21_TO_22)
     }
 
-    @Test
-    fun whenMigratingFromVersion21To22IfUserIsEstablishedAndConditionsAreMetThenMigrateToNotification() {
-        testHelper.createDatabase(TEST_DB_NAME, 21).use {
-            givenUseOurAppStateIs(canMigrate = true, hideTips = false, canAddToHome = true)
-            givenUserStageIs(it, AppStage.ESTABLISHED)
-
-            testHelper.runMigrationsAndValidate(TEST_DB_NAME, 22, true, migrationsProvider.MIGRATION_21_TO_22)
-            val stage = getUserStage(it)
-
-            assertEquals(AppStage.USE_OUR_APP_NOTIFICATION.name, stage)
-        }
-    }
-
-    @Test
-    fun whenMigratingFromVersion21To22IfUserIsEstablishedAndHideTipsIsTrueThenDoNotMigrateToNotification() {
-        testHelper.createDatabase(TEST_DB_NAME, 21).use {
-            givenUseOurAppStateIs(canMigrate = true, hideTips = true, canAddToHome = true)
-            givenUserStageIs(it, AppStage.ESTABLISHED)
-
-            testHelper.runMigrationsAndValidate(TEST_DB_NAME, 22, true, migrationsProvider.MIGRATION_21_TO_22)
-            val stage = getUserStage(it)
-
-            assertEquals(AppStage.ESTABLISHED.name, stage)
-        }
-    }
-
-    @Test
-    fun whenMigratingFromVersion21To22IfUserIsEstablishedAndHomeShortcutNotSupportedThenDoNotMigrateToNotification() {
-        testHelper.createDatabase(TEST_DB_NAME, 21).use {
-            givenUseOurAppStateIs(canMigrate = true, hideTips = false, canAddToHome = false)
-            givenUserStageIs(it, AppStage.ESTABLISHED)
-
-            testHelper.runMigrationsAndValidate(TEST_DB_NAME, 22, true, migrationsProvider.MIGRATION_21_TO_22)
-            val stage = getUserStage(it)
-
-            assertEquals(AppStage.ESTABLISHED.name, stage)
-        }
-    }
-
-    @Test
-    fun whenMigratingFromVersion21To22IfUserIsNotEstablishedThenDoNotMigrateToNotification() {
-        testHelper.createDatabase(TEST_DB_NAME, 21).use {
-            givenUseOurAppStateIs(canMigrate = true, hideTips = false, canAddToHome = false)
-            givenUserStageIs(it, AppStage.ESTABLISHED)
-
-            testHelper.runMigrationsAndValidate(TEST_DB_NAME, 22, true, migrationsProvider.MIGRATION_21_TO_22)
-            val stage = getUserStage(it)
-
-            assertEquals(AppStage.ESTABLISHED.name, stage)
-        }
-    }
-
-    @Test
-    fun whenMigratingFromVersion21To22IfShouldNotRunMigrationThenDoNotMigrateToNotification2() {
-        testHelper.createDatabase(TEST_DB_NAME, 21).use {
-            givenUseOurAppStateIs(canMigrate = false)
-            givenUserStageIs(it, AppStage.ESTABLISHED)
-
-            testHelper.runMigrationsAndValidate(TEST_DB_NAME, 22, true, migrationsProvider.MIGRATION_21_TO_22)
-            val stage = getUserStage(it)
-
-            assertEquals(AppStage.ESTABLISHED.name, stage)
-        }
-    }
-
-    private fun givenUseOurAppStateIs(canMigrate: Boolean = true, hideTips: Boolean = false, canAddToHome: Boolean = true) {
-        whenever(mockUseOurAppMigrationManager.shouldRunMigration()).thenReturn(canMigrate)
-        whenever(mockSettingsDataStore.hideTips).thenReturn(hideTips)
-        whenever(mockAddToHomeCapabilityDetector.isAddToHomeSupported()).thenReturn(canAddToHome)
-    }
-
-    private fun givenUserStageIs(database: SupportSQLiteDatabase, appStage: AppStage) {
-        val values: ContentValues = ContentValues().apply {
-            put("key", 1)
-            put("appStage", appStage.name)
-        }
-
-        database.apply {
-            insert("userStage", SQLiteDatabase.CONFLICT_REPLACE, values)
-        }
-    }
-
     private fun getUserStage(database: SupportSQLiteDatabase): String {
-        var stage = ""
+        var stage: String
 
         database.query("SELECT appStage from userStage limit 1").apply {
             moveToFirst()

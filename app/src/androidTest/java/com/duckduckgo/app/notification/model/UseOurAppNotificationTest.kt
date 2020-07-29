@@ -18,6 +18,7 @@ package com.duckduckgo.app.notification.model
 
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.notification.db.NotificationDao
+import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.whenever
@@ -30,23 +31,40 @@ class UseOurAppNotificationTest {
 
     private val context = InstrumentationRegistry.getInstrumentation().targetContext
     private val notificationsDao: NotificationDao = mock()
+    private val mockSettingsDataStore: SettingsDataStore = mock()
 
     private lateinit var testee: UseOurAppNotification
 
     @Before
     fun before() {
-        testee = UseOurAppNotification(context, notificationsDao)
+        testee = UseOurAppNotification(context, notificationsDao, mockSettingsDataStore)
     }
 
     @Test
     fun whenNotificationNotSeenThenCanShowIsTrue() = runBlocking {
         whenever(notificationsDao.exists(any())).thenReturn(false)
+        whenever(mockSettingsDataStore.hideTips).thenReturn(false)
         assertTrue(testee.canShow())
     }
 
     @Test
-    fun whenNotificationAlreadySeenThenCanShowIsFalse() = runBlocking<Unit> {
+    fun whenNotificationAlreadySeenThenCanShowIsFalse() = runBlocking {
         whenever(notificationsDao.exists(any())).thenReturn(true)
+        whenever(mockSettingsDataStore.hideTips).thenReturn(false)
+        assertFalse(testee.canShow())
+    }
+
+    @Test
+    fun whenHideTipsIsFalseThenCanShowIsTrue() = runBlocking {
+        whenever(notificationsDao.exists(any())).thenReturn(false)
+        whenever(mockSettingsDataStore.hideTips).thenReturn(false)
+        assertTrue(testee.canShow())
+    }
+
+    @Test
+    fun whenHideTipsIsTrueThenCanShowIsFalse() = runBlocking {
+        whenever(notificationsDao.exists(any())).thenReturn(false)
+        whenever(mockSettingsDataStore.hideTips).thenReturn(true)
         assertFalse(testee.canShow())
     }
 }

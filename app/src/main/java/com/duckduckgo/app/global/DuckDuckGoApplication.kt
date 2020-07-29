@@ -43,6 +43,10 @@ import com.duckduckgo.app.httpsupgrade.HttpsUpgrader
 import com.duckduckgo.app.job.AppConfigurationSyncer
 import com.duckduckgo.app.job.WorkScheduler
 import com.duckduckgo.app.notification.NotificationRegistrar
+import com.duckduckgo.app.onboarding.store.AppStage
+import com.duckduckgo.app.onboarding.store.UserStageStore
+import com.duckduckgo.app.onboarding.store.daxOnboardingActive
+import com.duckduckgo.app.onboarding.store.isEstablished
 import com.duckduckgo.app.referral.AppInstallationReferrerStateListener
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.AtbInitializer
@@ -67,6 +71,7 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import org.jetbrains.anko.doAsync
 import timber.log.Timber
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import kotlin.concurrent.thread
 
@@ -159,6 +164,9 @@ open class DuckDuckGoApplication : HasAndroidInjector, Application(), LifecycleO
     @Inject
     lateinit var variantManager: VariantManager
 
+    @Inject
+    lateinit var userStageStore: UserStageStore
+
     private var launchedByFireAction: Boolean = false
 
     open lateinit var daggerAppComponent: AppComponent
@@ -202,6 +210,18 @@ open class DuckDuckGoApplication : HasAndroidInjector, Application(), LifecycleO
         GlobalScope.launch {
             referralStateListener.initialiseReferralRetrieval()
             appDataLoader.loadData()
+        }
+    }
+
+    private suspend fun moveUserToEstablished3DaysAfterInstall() {
+        if (appInstallStore.hasInstallTimestampRecorded() &&
+            !userStageStore.isEstablished() &&
+            userStageStore.daxOnboardingActive()
+        ) {
+            val days = TimeUnit.MILLISECONDS.toDays(System.currentTimeMillis() - appInstallStore.installTimestamp)
+            if (days >= 3) {
+                userStageStore.moveToStage(AppStage.ESTABLISHED)
+            }
         }
     }
 
@@ -309,6 +329,9 @@ open class DuckDuckGoApplication : HasAndroidInjector, Application(), LifecycleO
         GlobalScope.launch {
             workScheduler.scheduleWork()
             atbInitializer.initializeAfterReferrerAvailable()
+            if (variantManager.getVariant().hasFeature(VariantManager.VariantFeature.RemoveDay1AndDay3Notifications)) {
+                moveUserToEstablished3DaysAfterInstall()
+            }
         }
     }
 
