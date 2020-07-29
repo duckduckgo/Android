@@ -14,7 +14,7 @@ android {
     compileSdkVersion 28
     ndkVersion '21.0.6113669'
     defaultConfig {
-        applicationId "com.duckduckgo.mobile.android"
+        applicationId "com.duckduckgo.mobile.android.nucleus"
         minSdkVersion 21
         targetSdkVersion 28
         versionCode buildVersionCode()
@@ -135,6 +135,7 @@ ext {
 
 
 dependencies {
+    implementation project(path: ':vpn')
     implementation "androidx.legacy:legacy-support-v4:$legacySupport"
     debugImplementation "com.squareup.leakcanary:leakcanary-android:$leakCanary"
 
