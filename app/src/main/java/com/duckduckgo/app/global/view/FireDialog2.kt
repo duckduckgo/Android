@@ -35,15 +35,12 @@ class FireDialog2(
     var clearStarted: (() -> Unit) = {}
     var clearComplete: (() -> Unit) = {}
 
-    var localContentView: View = View.inflate(context, R.layout.sheet_fire_clear_data_2, null)
-
     init {
-        setContentView(localContentView)
+        setContentView(R.layout.sheet_fire_clear_data_2)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        (localContentView.parent as View).setBackgroundColor(context.resources.getColor(android.R.color.transparent))
 
         val fireCta = DaxFireCta.FireCta()
         fireCta.showCta(daxCtaContainer)

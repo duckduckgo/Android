@@ -34,13 +34,11 @@
         <item name="android:windowIsFloating">false</item>
         <item name="android:navigationBarColor">?toolbarBgColor</item>
         <item name="android:statusBarColor">@android:color/transparent</item>
-        <item name="bottomSheetStyle">@style/Widget.Design.BottomSheet.Modal</item>
+        <item name="bottomSheetStyle">@style/FireDialogStyle</item>
     </style>
 
     <style name="FireDialogStyle" parent="@style/Widget.Design.BottomSheet.Modal">
         <item name="android:background">@android:color/transparent</item>
-        <item name="android:colorBackground">@android:color/transparent</item>
-        <item name="backgroundTint">@android:color/transparent</item>
     </style>
 
 </resources>
