@@ -43,7 +43,7 @@ class FireDialog(
         super.onCreate(savedInstanceState)
 
         launch {
-            ctaViewModel.onFireDialogShown()?.let { cta ->
+            ctaViewModel.getFireDialogCta()?.let { cta ->
                 fireCtaViewStub.inflate()
                 cta.showCta(daxCtaContainer)
                 ctaViewModel.onCtaShown(cta)

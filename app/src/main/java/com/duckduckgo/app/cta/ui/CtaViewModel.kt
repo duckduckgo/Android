@@ -158,7 +158,7 @@ class CtaViewModel @Inject constructor(
         }
     }
 
-    suspend fun onFireDialogShown(): DaxFireCta? =
+    suspend fun getFireDialogCta(): DaxFireCta? =
         withContext(dispatchers.io()) {
             if (settingsDataStore.hideTips || daxDialogFireEducationShown()) return@withContext null
             return@withContext DaxFireCta.FireCta()
