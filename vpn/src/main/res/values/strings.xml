@@ -15,6 +15,6 @@
   -->
 
 <resources>
-    <string name="title_activity_vpn_controller">VpnControllerActivity</string>
+    <string name="title_activity_vpn_controller">DDG Vpn</string>
     <string name="vpnNotificationTitle">App Tracker Protection Active</string>
 </resources>

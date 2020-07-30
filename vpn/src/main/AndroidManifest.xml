@@ -10,7 +10,12 @@
             android:name="dummy.VpnControllerActivity"
             android:exported="true"
             android:label="@string/title_activity_vpn_controller"
-            android:theme="@style/Theme.AndroidVpn.NoActionBar" />
+            android:theme="@style/Theme.AndroidVpn.NoActionBar">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
 
         <service
             android:name=".PassthroughVpnService"

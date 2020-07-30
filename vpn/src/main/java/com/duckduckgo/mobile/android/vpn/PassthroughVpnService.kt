@@ -43,15 +43,6 @@ class PassthroughVpnService : VpnService(), CoroutineScope by MainScope() {
     override fun onCreate() {
         super.onCreate()
         Timber.i("onCreate")
-
-        tickerJob?.cancel()
-        tickerJob = launch {
-            val startTime = System.currentTimeMillis()
-            while (true) {
-                Timber.v("VPN service running for ${TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis() - startTime)} seconds")
-                delay(1000)
-            }
-        }
     }
 
     override fun onBind(p0: Intent?): IBinder? {
@@ -61,7 +52,6 @@ class PassthroughVpnService : VpnService(), CoroutineScope by MainScope() {
     override fun onDestroy() {
         super.onDestroy()
         Timber.i("onDestroy")
-        tickerJob?.cancel()
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -87,11 +77,21 @@ class PassthroughVpnService : VpnService(), CoroutineScope by MainScope() {
         Timber.i("Starting VPN")
         startForeground(FOREGROUND_VPN_SERVICE_ID, VpnNotificationBuilder.build(this))
         running = true
+
+        tickerJob?.cancel()
+        tickerJob = launch {
+            val startTime = System.currentTimeMillis()
+            while (true) {
+                Timber.v("VPN service running for ${TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis() - startTime)} seconds")
+                delay(1000)
+            }
+        }
     }
 
     private fun stopVpn() {
         Timber.i("Stopping VPN")
         running = false
+        tickerJob?.cancel()
         stopForeground(true)
         stopSelf()
     }
@@ -100,22 +100,26 @@ class PassthroughVpnService : VpnService(), CoroutineScope by MainScope() {
 
         var running: Boolean = false
 
-        private const val ACTION_START_VPN = "ACTION_START_VPN"
-        private const val ACTION_STOP_VPN = "ACTION_STOP_VPN"
-
-        const val FOREGROUND_VPN_SERVICE_ID = 200
+        fun serviceIntent(context: Context): Intent {
+            return Intent(context, PassthroughVpnService::class.java)
+        }
 
         fun startIntent(context: Context): Intent {
-            return Intent(context, PassthroughVpnService::class.java).also {
+            return serviceIntent(context).also {
                 it.action = ACTION_START_VPN
             }
         }
 
         fun stopIntent(context: Context): Intent {
-            return Intent(context, PassthroughVpnService::class.java).also {
+            return serviceIntent(context).also {
                 it.action = ACTION_STOP_VPN
             }
         }
+
+        private const val ACTION_START_VPN = "ACTION_START_VPN"
+        private const val ACTION_STOP_VPN = "ACTION_STOP_VPN"
+
+        const val FOREGROUND_VPN_SERVICE_ID = 200
 
     }
 }

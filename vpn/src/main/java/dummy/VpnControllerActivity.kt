@@ -17,20 +17,29 @@
 package dummy
 
 import android.app.Activity
+import android.content.ComponentName
+import android.content.Context
 import android.content.Intent
+import android.content.ServiceConnection
 import android.net.VpnService
 import android.os.Bundle
+import android.os.IBinder
+import android.widget.CompoundButton
 import android.widget.TextView
 import android.widget.ToggleButton
 import androidx.appcompat.app.AppCompatActivity
 import com.duckduckgo.mobile.android.vpn.PassthroughVpnService
 import com.duckduckgo.mobile.android.vpn.R
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.MainScope
 import timber.log.Timber
 
-class VpnControllerActivity : AppCompatActivity(R.layout.activity_vpn_controller) {
+class VpnControllerActivity : AppCompatActivity(R.layout.activity_vpn_controller), CoroutineScope by MainScope() {
 
     private lateinit var vpnRunningToggleButton: ToggleButton
     private lateinit var vpnPermissionTextView: TextView
+
+    private var vpnService: PassthroughVpnService? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -39,21 +48,23 @@ class VpnControllerActivity : AppCompatActivity(R.layout.activity_vpn_controller
         configureUiHandlers()
     }
 
+    override fun onStart() {
+        super.onStart()
+        bindService(PassthroughVpnService.serviceIntent(this), serviceConnection, Context.BIND_AUTO_CREATE)
+    }
+
+    override fun onStop() {
+        super.onStop()
+        unbindService(serviceConnection)
+    }
+
     private fun setViewReferences() {
         vpnRunningToggleButton = findViewById(R.id.vpnRunningButton)
         vpnPermissionTextView = findViewById(R.id.vpnPermissionStatus)
     }
 
     private fun configureUiHandlers() {
-        vpnRunningToggleButton.setOnCheckedChangeListener { _, enabled ->
-            Timber.i("Toggle changed. enabled=$enabled")
-
-            if (enabled) {
-                startVpnIfAllowed()
-            } else {
-                stopVpn()
-            }
-        }
+        vpnRunningToggleButton.setOnCheckedChangeListener(runningButtonChangeListener)
     }
 
     private fun startVpnIfAllowed() {
@@ -109,6 +120,33 @@ class VpnControllerActivity : AppCompatActivity(R.layout.activity_vpn_controller
         startService(PassthroughVpnService.stopIntent(this))
     }
 
+    private val serviceConnection: ServiceConnection = object : ServiceConnection {
+
+        override fun onServiceConnected(component: ComponentName, binder: IBinder) {
+            vpnService = (binder as PassthroughVpnService.VpnServiceBinder).getService()
+            Timber.i("Bound to VPN service")
+            updateRunningToggleButtonState()
+        }
+
+        override fun onServiceDisconnected(component: ComponentName) {
+            vpnService = null
+            Timber.i("Unbound from VPN service")
+        }
+    }
+
+    private val runningButtonChangeListener = CompoundButton.OnCheckedChangeListener { _, checked ->
+        Timber.i("Toggle changed. enabled=$checked")
+
+        if (checked) {
+            startVpnIfAllowed()
+        } else {
+            stopVpn()
+        }
+    }
+
+    private fun updateRunningToggleButtonState() {
+        vpnRunningToggleButton.quietlySetIsChecked(PassthroughVpnService.running, runningButtonChangeListener)
+    }
 
     private sealed class VpnPermissionStatus {
         object Granted : VpnPermissionStatus()
