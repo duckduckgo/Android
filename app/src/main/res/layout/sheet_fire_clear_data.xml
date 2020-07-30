@@ -13,55 +13,63 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/fireDialogRootView"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@color/white"
+    android:orientation="vertical"
     app:layout_behavior="@string/bottom_sheet_behavior">
 
-    <TextView
-        android:id="@+id/clearAllOption"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:background="?attr/selectableItemBackground"
-        android:drawableStart="@drawable/icon_fire_glyph_24dp"
-        android:drawablePadding="24dp"
-        android:fontFamily="sans-serif"
-        android:paddingStart="24dp"
-        android:paddingTop="24dp"
-        android:paddingEnd="24dp"
-        android:paddingBottom="17dp"
-        android:text="@string/fireClearAll"
-        android:textColor="@color/brickOrange"
-        android:textSize="16sp"
-        android:textStyle="normal"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+    <include layout="@layout/include_dax_dialog_cta" />
 
-    <!-- Drawable tint does not work on API 21 so we have to use a pre-colored drawable -->
-    <TextView
-        android:id="@+id/cancelOption"
-        android:layout_width="0dp"
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="?attr/selectableItemBackground"
-        android:drawableStart="@drawable/ic_cancel_brownish_24dp"
-        android:drawablePadding="24dp"
-        android:fontFamily="sans-serif"
-        android:paddingStart="24dp"
-        android:paddingTop="17dp"
-        android:paddingEnd="24dp"
-        android:paddingBottom="24dp"
-        android:text="@string/fireCancel"
-        android:textColor="@color/brownishGray"
-        android:textSize="16sp"
-        android:textStyle="normal"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/clearAllOption"
-        tools:ignore="UnusedAttribute" />
+        android:background="@color/white">
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+        <TextView
+            android:id="@+id/clearAllOption"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:background="?attr/selectableItemBackground"
+            android:drawableStart="@drawable/icon_fire_glyph_24dp"
+            android:drawablePadding="24dp"
+            android:fontFamily="sans-serif"
+            android:paddingStart="24dp"
+            android:paddingTop="24dp"
+            android:paddingEnd="24dp"
+            android:paddingBottom="17dp"
+            android:text="@string/fireClearAll"
+            android:textColor="@color/brickOrange"
+            android:textSize="16sp"
+            android:textStyle="normal"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <!-- Drawable tint does not work on API 21 so we have to use a pre-colored drawable -->
+        <TextView
+            android:id="@+id/cancelOption"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:background="?attr/selectableItemBackground"
+            android:drawableStart="@drawable/ic_cancel_brownish_24dp"
+            android:drawablePadding="24dp"
+            android:fontFamily="sans-serif"
+            android:paddingStart="24dp"
+            android:paddingTop="17dp"
+            android:paddingEnd="24dp"
+            android:paddingBottom="24dp"
+            android:text="@string/fireCancel"
+            android:textColor="@color/brownishGray"
+            android:textSize="16sp"
+            android:textStyle="normal"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/clearAllOption"
+            tools:ignore="UnusedAttribute" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</LinearLayout>

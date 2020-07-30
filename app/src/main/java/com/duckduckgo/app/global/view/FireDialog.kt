@@ -18,9 +18,10 @@ package com.duckduckgo.app.global.view
 
 import android.content.Context
 import android.os.Bundle
-import android.view.View
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.cta.ui.DaxFireCta
 import com.google.android.material.bottomsheet.BottomSheetDialog
+import kotlinx.android.synthetic.main.include_dax_dialog_cta.*
 import kotlinx.android.synthetic.main.sheet_fire_clear_data.*
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -34,12 +35,14 @@ class FireDialog(
     var clearComplete: (() -> Unit) = {}
 
     init {
-        val contentView = View.inflate(context, R.layout.sheet_fire_clear_data, null)
-        setContentView(contentView)
+        setContentView(R.layout.sheet_fire_clear_data)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        val fireCta = DaxFireCta.FireCta()
+        fireCta.showCta(daxCtaContainer)
 
         clearAllOption.setOnClickListener {
             dismiss()
