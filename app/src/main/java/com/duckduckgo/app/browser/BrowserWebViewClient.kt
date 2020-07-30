@@ -71,7 +71,7 @@ class BrowserWebViewClient(
 
         Timber.v("shouldOverride $url")
 
-        // Also validate on API 24
+        // TODO: Also validate on API <24 and move into try block for exception monitoring
         if (urlIsGeneratingDos(url)) {
             Timber.d("DOS TESTING - SHOULD OVERRIDE killing load")
             return false
@@ -167,6 +167,7 @@ class BrowserWebViewClient(
     @WorkerThread
     override fun shouldInterceptRequest(webView: WebView, request: WebResourceRequest): WebResourceResponse? {
 
+        //TODO: include this in exception handling (but not run blocking)
         if (request.isForMainFrame && urlIsGeneratingDos(request.url)) {
             Timber.d("DOS TESTiNG - SHOULD INTERCEPT killing load")
             return WebResourceResponse(null, null, null)
@@ -187,7 +188,7 @@ class BrowserWebViewClient(
         }
     }
 
-    // Hacky test implement properly
+    // TODO: Hacky test implement properly
     var count = 0
     var lastUrl: Uri? = null
     private fun urlIsGeneratingDos(url: Uri?): Boolean {
