@@ -81,7 +81,7 @@ import com.duckduckgo.app.global.toDesktopUri
 import com.duckduckgo.app.global.useourapp.UseOurAppDetector
 import com.duckduckgo.app.global.useourapp.UseOurAppDetector.Companion.USE_OUR_APP_SHORTCUT_TITLE
 import com.duckduckgo.app.global.useourapp.UseOurAppDetector.Companion.USE_OUR_APP_SHORTCUT_URL
-import com.duckduckgo.app.global.view.website
+import com.duckduckgo.app.global.view.asLocationPermissionOrigin
 import com.duckduckgo.app.notification.db.NotificationDao
 import com.duckduckgo.app.notification.model.UseOurAppNotification
 import com.duckduckgo.app.location.GeoLocationPermissions
@@ -669,7 +669,9 @@ class BrowserTabViewModel(
 
         domain?.let { viewModelScope.launch { updateLoadingStatePrivacy(domain) } }
         domain?.let { viewModelScope.launch { updateWhitelistedState(domain) } }
-        domain?.let { viewModelScope.launch { notifyPermanentLocationPermission(domain) } }
+
+        val permissionOrigin = site?.uri?.host?.asLocationPermissionOrigin()
+        permissionOrigin?.let { viewModelScope.launch { notifyPermanentLocationPermission(permissionOrigin) } }
 
         registerSiteVisit()
     }
@@ -724,7 +726,6 @@ class BrowserTabViewModel(
 
     private suspend fun notifyPermanentLocationPermission(domain: String) {
         if (!appSettingsPreferencesStore.appLocationPermission) {
-            Timber.i("Precise Location - Location is not enabled")
             return
         }
 
@@ -732,9 +733,12 @@ class BrowserTabViewModel(
         val userHasGivenPermission = locationPermissionsRepository.hasUserGivenPermissionTo(domain)
         if (userHasGivenPermission) {
             val permissionEntity = locationPermissionsRepository.getDomainPermission(domain)!!
+            Timber.i("Precise Location - $domain has $permissionEntity")
             if (permissionEntity.permission == LocationPermissionType.ALLOW_ALWAYS) {
                 command.postValue(ShowDomainHasPermissionMessage(domain))
             }
+        } else {
+            Timber.i("Precise Location - $domain does not have Permission")
         }
     }
 
@@ -851,6 +855,10 @@ class BrowserTabViewModel(
         when (permission) {
             LocationPermissionType.ALLOW_ALWAYS -> {
                 onSiteLocationPermissionAlwaysAllowed()
+                Timber.i("Precise Location - Saving $permission for $domain")
+                viewModelScope.launch {
+                    locationPermissionsRepository.savePermission(domain, permission)
+                }
             }
             LocationPermissionType.ALLOW_ONCE -> {
                 Timber.i("Precise Location - Permission $permission for $domain allowed once")
@@ -862,11 +870,11 @@ class BrowserTabViewModel(
             LocationPermissionType.DENY_ONCE -> {
                 Timber.i("Precise Location - Permission $permission for $domain denied once")
                 permissionCallback?.invoke(permissionOrigin, false, false)
+                Timber.i("Precise Location - Saving $permission for $domain")
+                viewModelScope.launch {
+                    locationPermissionsRepository.savePermission(domain, permission)
+                }
             }
-        }
-        Timber.i("Precise Location - Saving $permission for $domain")
-        viewModelScope.launch {
-            locationPermissionsRepository.savePermission(domain, permission)
         }
     }
 
@@ -874,7 +882,6 @@ class BrowserTabViewModel(
         Timber.i("Precise Location - Permission allowed for $permissionOrigin")
         geoLocationPermissions.allow(permissionOrigin)
         permissionCallback?.invoke(permissionOrigin, true, false)
-        command.value = ShowDomainHasPermissionMessage(permissionOrigin)
     }
 
     fun onSiteLocationPermissionAlwaysDenied() {
@@ -914,7 +921,11 @@ class BrowserTabViewModel(
 
     override fun onSystemLocationPermissionNeverAllowed() {
         Timber.i("Precise Location - System permission Never allowed")
-        onSiteLocationPermissionSelected(permissionOrigin, LocationPermissionType.DENY_ALWAYS)
+        val neverAllowedPermission =  LocationPermissionType.DENY_ALWAYS
+        onSiteLocationPermissionSelected(permissionOrigin, neverAllowedPermission)
+        viewModelScope.launch {
+            locationPermissionsRepository.savePermission(permissionOrigin, neverAllowedPermission)
+        }
     }
 
     fun onSystemLocationPermissionGranted() {

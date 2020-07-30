@@ -2285,15 +2285,15 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenCurrentDomainAndPermissionRequestingDomainAreDifferentThenSitePermissionIsDenied() = coroutineRule.runBlocking {
-        givenCurrentSite("example.com")
-        givenNewPermissionRequestFromDomain("anotherexample.com")
+        givenCurrentSite("https://wwww.example.com/")
+        givenNewPermissionRequestFromDomain("https://wwww.anotherexample.com/")
 
-        verify(geoLocationPermissions).clear("anotherexample.com")
+        verify(geoLocationPermissions).clear("https://wwww.anotherexample.com/")
     }
 
     @Test
     fun whenDomainRequestsSitePermissionThenAppChecksSystemLocationPermission() = coroutineRule.runBlocking {
-        val domain = "example.com"
+        val domain = "https://www.example.com/"
 
         givenLocationPermissionIsEnabled(true)
         givenCurrentSite(domain)
@@ -2304,7 +2304,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenDomainRequestsSitePermissionAndAlreadyRepliedThenAppChecksSystemLocationPermission() = coroutineRule.runBlocking {
-        val domain = "example.com"
+        val domain = "https://www.example.com/"
 
         givenLocationPermissionIsEnabled(true)
         givenCurrentSite(domain)
@@ -2317,7 +2317,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenDomainRequestsSitePermissionAndAllowedThenAppChecksSystemLocationPermission() = coroutineRule.runBlocking {
-        val domain = "example.com"
+        val domain = "https://www.example.com/"
 
         givenLocationPermissionIsEnabled(true)
         givenCurrentSite(domain)
@@ -2330,7 +2330,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenAppLocationPermissionIsDeniedThenSitePermissionIsDenied() = coroutineRule.runBlocking {
-        val domain = "example.com"
+        val domain = "https://www.example.com/"
 
         givenLocationPermissionIsEnabled(false)
         givenCurrentSite(domain)
@@ -2341,7 +2341,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenSystemPermissionIsGrantedThenSettingsDataStoreIsUpdated() = coroutineRule.runBlocking {
-        val domain = "example.com"
+        val domain = "https://www.example.com/"
         givenLocationPermissionIsEnabled(true)
         givenCurrentSite(domain)
         givenNewPermissionRequestFromDomain(domain)
@@ -2353,7 +2353,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenSystemPermissionIsDeniedThenSitePermissionIsCleared() = coroutineRule.runBlocking {
-        val domain = "example.com"
+        val domain = "https://www.example.com/"
         givenLocationPermissionIsEnabled(true)
         givenCurrentSite(domain)
         givenNewPermissionRequestFromDomain(domain)
@@ -2365,7 +2365,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenUserGrantsSystemLocationPermissionThenSettingsLocationPermissionShoulbBeEnabled() = coroutineRule.runBlocking {
-        val domain = "example.com"
+        val domain = "https://www.example.com/"
 
         givenLocationPermissionIsEnabled(true)
         givenCurrentSite(domain)
@@ -2378,7 +2378,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenUserChoosesToAlwaysAllowSitePermissionThenGeoPermissionIsAllowed() = coroutineRule.runBlocking {
-        val domain = "example.com"
+        val domain = "https://www.example.com/"
 
         givenLocationPermissionIsEnabled(true)
         givenCurrentSite(domain)
@@ -2392,7 +2392,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenUserChoosesToAlwaysDenySitePermissionThenGeoPermissionIsAllowed() = coroutineRule.runBlocking {
-        val domain = "example.com"
+        val domain = "https://www.example.com/"
 
         givenLocationPermissionIsEnabled(true)
         givenCurrentSite(domain)
@@ -2406,7 +2406,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenUserChoosesToAllowSitePermissionThenGeoPermissionIsAllowed() = coroutineRule.runBlocking {
-        val domain = "example.com"
+        val domain = "https://www.example.com/"
 
         givenLocationPermissionIsEnabled(true)
         givenCurrentSite(domain)
@@ -2420,7 +2420,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenUserChoosesToDenySitePermissionThenGeoPermissionIsAllowed() = coroutineRule.runBlocking {
-        val domain = "example.com"
+        val domain = "https://www.example.com/"
 
         givenLocationPermissionIsEnabled(true)
         givenCurrentSite(domain)
@@ -2434,7 +2434,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenNewDomainRequestsForPermissionThenUserShouldBeAskedToGivePermission() = coroutineRule.runBlocking {
-        val domain = "example.com"
+        val domain = "https://www.example.com/"
 
         givenLocationPermissionIsEnabled(true)
         givenCurrentSite(domain)
@@ -2447,7 +2447,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenSystemLocationPermissionIsDeniedThenSitePermissionIsDenied() = coroutineRule.runBlocking {
-        val domain = "example.com"
+        val domain = "https://www.example.com/"
 
         givenLocationPermissionIsEnabled(true)
         givenCurrentSite(domain)
@@ -2460,7 +2460,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenSystemLocationPermissionIsNeverAllowedThenSitePermissionIsDenied() = coroutineRule.runBlocking {
-        val domain = "example.com"
+        val domain = "https://www.example.com/"
 
         givenLocationPermissionIsEnabled(true)
         givenCurrentSite(domain)
@@ -2474,7 +2474,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenSystemLocationPermissionIsAllowedThenAppAsksForSystemPermission() = coroutineRule.runBlocking {
-        val domain = "example.com"
+        val domain = "https://www.example.com/"
 
         givenLocationPermissionIsEnabled(true)
         givenCurrentSite(domain)
@@ -2487,7 +2487,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenUserDeniesSitePermissionThenSitePermissionIsDenied() = coroutineRule.runBlocking {
-        val domain = "example.com"
+        val domain = "https://www.example.com/"
 
         givenLocationPermissionIsEnabled(true)
         givenCurrentSite(domain)
@@ -2500,34 +2500,47 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenUserVisitsDomainWithPermanentLocationPermissionThenMessageIsShown() = coroutineRule.runBlocking {
-        val domain = "example.com"
+        val domain = "https://www.example.com/"
 
         givenUserAlreadySelectedPermissionForDomain(domain, LocationPermissionType.ALLOW_ALWAYS)
         givenCurrentSite(domain)
         givenLocationPermissionIsEnabled(true)
 
-        loadUrl("http://example.com", isBrowserShowing = true)
+        loadUrl("https://www.example.com", isBrowserShowing = true)
 
         assertCommandIssued<Command.ShowDomainHasPermissionMessage>()
     }
 
     @Test
+    fun whenUserVisitsDomainWithoutPermanentLocationPermissionThenMessageIsNotShown() = coroutineRule.runBlocking {
+        val domain = "https://www.example.com/"
+
+        givenUserAlreadySelectedPermissionForDomain(domain, LocationPermissionType.DENY_ALWAYS)
+        givenCurrentSite(domain)
+        givenLocationPermissionIsEnabled(true)
+
+        loadUrl("https://www.example.com", isBrowserShowing = true)
+
+        assertCommandNotIssued<Command.ShowDomainHasPermissionMessage>()
+    }
+
+    @Test
     fun whenUserVisitsDomainWithoutLocationPermissionThenMessageIsNotShown() = coroutineRule.runBlocking {
-        val domain = "example.com"
+        val domain = "https://www.example.com"
         givenLocationPermissionIsEnabled(true)
         givenCurrentSite(domain)
-        loadUrl("http://example.com", isBrowserShowing = true)
+        loadUrl("https://www.example.com", isBrowserShowing = true)
 
         assertCommandNotIssued<Command.ShowDomainHasPermissionMessage>()
     }
 
     @Test
     fun whenUserVisitsDomainAndLocationIsNotEnabledThenMessageIsNotShown() = coroutineRule.runBlocking {
-        val domain = "example.com"
+        val domain = "https://www.example.com"
         givenLocationPermissionIsEnabled(false)
         givenCurrentSite(domain)
 
-        loadUrl("www.example.com", isBrowserShowing = true)
+        loadUrl("https://www.example.com", isBrowserShowing = true)
 
         assertCommandNotIssued<Command.ShowDomainHasPermissionMessage>()
     }

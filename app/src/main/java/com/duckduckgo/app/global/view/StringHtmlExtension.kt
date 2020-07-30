@@ -36,10 +36,15 @@ private fun htmlDrawable(context: Context, resource: Int): Drawable {
     return drawable
 }
 
+private const val HTTPS_PREFIX = "https://"
 private const val WWW_PREFIX = "https://www."
 private const val WWW_SUFFIX = "/"
 
 fun String.website(): String {
     return this.takeIf { it.startsWith(WWW_PREFIX, ignoreCase = true) && it.endsWith(WWW_SUFFIX, ignoreCase = true) }
         ?.drop(WWW_PREFIX.length)?.dropLast(WWW_SUFFIX.length) ?: this
+}
+
+fun String.asLocationPermissionOrigin(): String {
+    return HTTPS_PREFIX + this + WWW_SUFFIX
 }

@@ -663,8 +663,8 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
         }
     }
 
-    private fun showMessageSnackbar(message: String) {
-        val snackbar = Snackbar.make(rootView, getString(R.string.preciseLocationSnackbarMessage, message), Snackbar.LENGTH_SHORT)
+    private fun showMessageSnackbar(domain: String) {
+        val snackbar = Snackbar.make(rootView, getString(R.string.preciseLocationSnackbarMessage, domain.website()), Snackbar.LENGTH_SHORT)
         val snackbarView = snackbar.view
         snackbarView.setOnClickListener {
             browserActivity?.launchLocationSettings()

@@ -28,7 +28,7 @@ data class LocationPermissionEntity(
 private const val HTTPS_HOST_PREFIX = "https://"
 private const val WWW_SUFFIX = "/"
 
-fun LocationPermissionEntity.host(): String {
+fun LocationPermissionEntity.forFireproofing(): String {
     return domain.takeIf { it.startsWith(HTTPS_HOST_PREFIX, ignoreCase = true) && it.endsWith(WWW_SUFFIX, ignoreCase = true) }
         ?.drop(HTTPS_HOST_PREFIX.length)?.dropLast(WWW_SUFFIX.length) ?: domain
 }
