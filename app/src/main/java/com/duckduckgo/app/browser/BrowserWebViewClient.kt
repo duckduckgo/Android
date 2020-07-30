@@ -68,9 +68,16 @@ class BrowserWebViewClient(
      * API-agnostic implementation of deciding whether to override url or not
      */
     private fun shouldOverride(webView: WebView, url: Uri): Boolean {
-        try {
-            Timber.v("shouldOverride $url")
 
+        Timber.v("shouldOverride $url")
+
+        // Also validate on API 24
+        if (urlIsGeneratingDos(url)) {
+            Timber.d("DOS TESTING - SHOULD OVERRIDE killing load")
+            return false
+        }
+
+        try {
             return when (val urlType = specialUrlDetector.determineType(url)) {
                 is SpecialUrlDetector.UrlType.Email -> {
                     webViewClientListener?.sendEmailRequested(urlType.emailAddress)
@@ -159,6 +166,12 @@ class BrowserWebViewClient(
 
     @WorkerThread
     override fun shouldInterceptRequest(webView: WebView, request: WebResourceRequest): WebResourceResponse? {
+
+        if (request.isForMainFrame && urlIsGeneratingDos(request.url)) {
+            Timber.d("DOS TESTiNG - SHOULD INTERCEPT killing load")
+            return WebResourceResponse(null, null, null)
+        }
+
         return runBlocking {
             try {
                 val documentUrl = withContext(Dispatchers.Main) { webView.url }
@@ -172,6 +185,20 @@ class BrowserWebViewClient(
                 throw e
             }
         }
+    }
+
+    // Hacky test implement properly
+    var count = 0
+    var lastUrl: Uri? = null
+    private fun urlIsGeneratingDos(url: Uri?): Boolean {
+        if (lastUrl == url) {
+            count++
+        } else {
+            count = 0
+        }
+        lastUrl = url
+        Timber.d("DOS TESTING - count is $count")
+        return count >= 6
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
