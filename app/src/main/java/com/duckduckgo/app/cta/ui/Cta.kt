@@ -334,10 +334,10 @@ sealed class DaxFireCta(
     override fun pixelShownParameters(): Map<String, String> = emptyMap()
 
     class FireCta() : DaxFireCta(
-        CtaId.DAX_INTRO,
+        CtaId.DAX_FIRE_BUTTON,
         R.string.daxClearDataCtaText,
         Pixel.PixelName.ONBOARDING_DAX_CTA_SHOWN,
-        Pixel.PixelName.ONBOARDING_DAX_CTA_OK_BUTTON,
+        null,
         null
     )
 }
