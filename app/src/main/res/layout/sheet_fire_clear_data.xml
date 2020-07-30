@@ -19,10 +19,13 @@
     android:id="@+id/fireDialogRootView"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical"
-    app:layout_behavior="@string/bottom_sheet_behavior">
+    android:orientation="vertical">
 
-    <include layout="@layout/include_dax_dialog_cta" />
+    <ViewStub
+        android:id="@+id/fireCtaViewStub"
+        android:layout="@layout/include_dax_dialog_cta"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"

@@ -23,19 +23,15 @@ import com.duckduckgo.app.cta.model.CtaId
 import com.duckduckgo.app.cta.model.DismissedCta
 import com.duckduckgo.app.cta.ui.HomePanelCta.*
 import com.duckduckgo.app.global.DispatcherProvider
+import com.duckduckgo.app.global.events.db.UserEventKey
+import com.duckduckgo.app.global.events.db.UserEventsStore
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.install.daysInstalled
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.global.model.domain
 import com.duckduckgo.app.global.model.orderedTrackingEntities
-import com.duckduckgo.app.global.events.db.UserEventsStore
-import com.duckduckgo.app.global.events.db.UserEventKey
 import com.duckduckgo.app.global.useourapp.UseOurAppDetector
-import com.duckduckgo.app.onboarding.store.AppStage
-import com.duckduckgo.app.onboarding.store.OnboardingStore
-import com.duckduckgo.app.onboarding.store.UserStageStore
-import com.duckduckgo.app.onboarding.store.daxOnboardingActive
-import com.duckduckgo.app.onboarding.store.useOurAppOnboarding
+import com.duckduckgo.app.onboarding.store.*
 import com.duckduckgo.app.privacy.db.UserWhitelistDao
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.VariantManager
@@ -161,6 +157,12 @@ class CtaViewModel @Inject constructor(
             }
         }
     }
+
+    suspend fun onFireDialogShown(): DaxFireCta? =
+        withContext(dispatchers.io()) {
+            if (settingsDataStore.hideTips || daxDialogFireEducationShown()) return@withContext null
+            return@withContext DaxFireCta.FireCta()
+        }
 
     private suspend fun getHomeCta(): Cta? {
         return when {
@@ -289,6 +291,8 @@ class CtaViewModel @Inject constructor(
     private fun daxDialogTrackersFoundShown(): Boolean = dismissedCtaDao.exists(CtaId.DAX_DIALOG_TRACKERS_FOUND)
 
     private fun daxDialogNetworkShown(): Boolean = dismissedCtaDao.exists(CtaId.DAX_DIALOG_NETWORK)
+
+    private fun daxDialogFireEducationShown(): Boolean = dismissedCtaDao.exists(CtaId.DAX_FIRE_BUTTON)
 
     private fun isSerpUrl(url: String): Boolean = url.contains(DaxDialogCta.SERP)
 

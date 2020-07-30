@@ -33,6 +33,7 @@ import com.duckduckgo.app.browser.rating.ui.AppEnjoymentDialogFragment
 import com.duckduckgo.app.browser.rating.ui.GiveFeedbackDialogFragment
 import com.duckduckgo.app.browser.rating.ui.RateAppDialogFragment
 import com.duckduckgo.app.browser.shortcut.ShortcutBuilder
+import com.duckduckgo.app.cta.ui.CtaViewModel
 import com.duckduckgo.app.feedback.ui.common.FeedbackActivity
 import com.duckduckgo.app.fire.DataClearer
 import com.duckduckgo.app.fire.DataClearerForegroundAppRestartPixel
@@ -68,6 +69,9 @@ class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope() {
 
     @Inject
     lateinit var dataClearerForegroundAppRestartPixel: DataClearerForegroundAppRestartPixel
+
+    @Inject
+    lateinit var ctaViewModel: CtaViewModel
 
     private var currentTab: BrowserTabFragment? = null
 
@@ -276,7 +280,7 @@ class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope() {
 
     fun launchFire() {
         pixel.fire(Pixel.PixelName.FORGET_ALL_PRESSED_BROWSING)
-        val dialog = FireDialog(context = this, clearPersonalDataAction = clearPersonalDataAction)
+        val dialog = FireDialog(context = this, clearPersonalDataAction = clearPersonalDataAction, ctaViewModel = ctaViewModel)
         dialog.clearStarted = {
             removeObservers()
             clearingInProgressView.show()

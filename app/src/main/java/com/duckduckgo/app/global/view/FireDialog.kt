@@ -19,17 +19,18 @@ package com.duckduckgo.app.global.view
 import android.content.Context
 import android.os.Bundle
 import com.duckduckgo.app.browser.R
-import com.duckduckgo.app.cta.ui.DaxFireCta
+import com.duckduckgo.app.cta.ui.CtaViewModel
+import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import kotlinx.android.synthetic.main.include_dax_dialog_cta.*
 import kotlinx.android.synthetic.main.sheet_fire_clear_data.*
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 
 class FireDialog(
     context: Context,
+    private val ctaViewModel: CtaViewModel,
     private val clearPersonalDataAction: ClearPersonalDataAction
-) : BottomSheetDialog(context, R.style.FireDialog) {
+) : BottomSheetDialog(context, R.style.FireDialog), CoroutineScope by MainScope() {
 
     var clearStarted: (() -> Unit) = {}
     var clearComplete: (() -> Unit) = {}
@@ -41,8 +42,18 @@ class FireDialog(
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val fireCta = DaxFireCta.FireCta()
-        fireCta.showCta(daxCtaContainer)
+        launch {
+            ctaViewModel.onFireDialogShown()?.let { cta ->
+                fireCtaViewStub.inflate()
+                cta.showCta(daxCtaContainer)
+                ctaViewModel.onCtaShown(cta)
+                setOnDismissListener {
+                    GlobalScope.launch {
+                        ctaViewModel.onUserDismissedCta(cta)
+                    }
+                }
+            }
+        }
 
         clearAllOption.setOnClickListener {
             dismiss()
@@ -58,5 +69,7 @@ class FireDialog(
         cancelOption.setOnClickListener {
             dismiss()
         }
+
+        behavior.state = BottomSheetBehavior.STATE_EXPANDED
     }
 }
