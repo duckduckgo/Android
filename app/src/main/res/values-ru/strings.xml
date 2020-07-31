@@ -442,7 +442,7 @@
     <string name="changeIconDialogMessage">Приложение может закрыться, чтобы применить изменения. Возвращайтесь после того, как налюбуетесь своим новым привлекательным значком.</string>
 
     <!-- New dashboard / menu buttons -->
-    <string name="manageWhitelist">Управление белым списком</string>
+    <string name="manageWhitelist">Незащищенные сайты</string>
     <string name="reportBrokenSite">Сообщить о неработающем сайте</string>
 
     <!-- Dialogs -->
@@ -450,19 +450,18 @@
     <string name="dialogEditTitle">Редактировать</string>
 
     <!-- Whitelist -->
-    <string name="whitelisetActivityTitle">Белый список</string>
-    <string name="enablePrivacyProtection">Добавить в белый список</string>
-    <string name="disablePrivacyProtection">Удалить из белого списка</string>
-    <string name="whitelistEntryOverflowContentDescription">Дополнительные параметры для внесения записей в белый список %s</string>
-    <string name="whitelistEntryDeleteConfirmMessage">Вы уверены, что хотите удалить &lt;b&gt;%s&lt;/b&gt; из белого списка?</string>
-    <string name="whitelistExplanation">Эти сайты из белого списка не будут обновлены с помощью защиты конфиденциальности</string>
-    <string name="whitelistNoEntries">В белом списке пока нет сайтов</string>
+    <string name="whitelisetActivityTitle">Незащищенные сайты</string>
+    <string name="enablePrivacyProtection">Включить защиту конфиденциальности</string>
+    <string name="disablePrivacyProtection">Отключить защиту конфиденциальности</string>
+    <string name="whitelistEntryOverflowContentDescription">Дополнительные опции для незащищенного сайта %s</string>
+    <string name="whitelistEntryDeleteConfirmMessage">Вы точно хотите удалить &lt;b&gt;%s&lt;/b&gt; из списка незащищенных сайтов?</string>
+    <string name="whitelistExplanation">Сайты без защиты конфиденциальности.</string>
+    <string name="whitelistNoEntries">Незащищенных сайтов пока нет</string>
     <string name="whitelistDomainHint">www.example.com</string>
-    <string name="whitelistFormatError">Не удалось сохранить, введите домен, например, <b>example.com</b>
-  </string>
+    <string name="whitelistFormatError">Не удалось сохранить, введите домен, например, <b>example.com</b></string>
 
     <!-- Settings -->
-    <string name="settingsPrivacyProtectionWhitelist">Белый список защиты конфиденциальности</string>
+    <string name="settingsPrivacyProtectionWhitelist">Незащищенные сайты</string>
 
     <!-- Fireproof websites -->
     <string name="fireproofWebsitesActivityTitle">Обезопасить сайты</string>
