@@ -25,8 +25,10 @@ import com.duckduckgo.app.global.model.SiteFactory
 import com.duckduckgo.app.tabs.db.TabsDao
 import io.reactivex.Scheduler
 import io.reactivex.schedulers.Schedulers
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import timber.log.Timber
 import java.util.*
 import javax.inject.Inject
@@ -53,13 +55,20 @@ class TabDataRepository @Inject constructor(
 
     override suspend fun addWithSource(url: String?, skipHome: Boolean, isDefaultTab: Boolean): String {
         val tabId = generateTabId()
+        var sourceTabId: String? = null
+
+        withContext(Dispatchers.IO) {
+            sourceTabId = tabsDao.selectedTab()?.tabId
+        }
+
         add(
-            tabId,
-            buildSiteData(url),
-            skipHome = skipHome,
-            isDefaultTab = isDefaultTab,
-            sourceTabId = liveSelectedTab.value?.tabId
+                tabId,
+                buildSiteData(url),
+                skipHome = skipHome,
+                isDefaultTab = isDefaultTab,
+                sourceTabId = sourceTabId
         )
+
         return tabId
     }
 
@@ -150,8 +159,8 @@ class TabDataRepository @Inject constructor(
     }
 
     override suspend fun deleteCurrentTabAndSelectSource() {
-        val tabToDelete = liveSelectedTab.value
         databaseExecutor().scheduleDirect {
+            val tabToDelete = tabsDao.selectedTab()
             tabToDelete?.tabId?.let {
                 deleteOldPreviewImages(tabToDelete.tabId)
                 tabsDao.deleteTab(tabToDelete)
