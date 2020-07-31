@@ -65,9 +65,10 @@ class NotificationModule {
     fun provideUseOurAppNotification(
         context: Context,
         notificationDao: NotificationDao,
-        settingsDataStore: SettingsDataStore
+        settingsDataStore: SettingsDataStore,
+        addToHomeCapabilityDetector: AddToHomeCapabilityDetector
     ): UseOurAppNotification {
-        return UseOurAppNotification(context, notificationDao, settingsDataStore)
+        return UseOurAppNotification(context, notificationDao, settingsDataStore, addToHomeCapabilityDetector)
     }
 
     @Provides
@@ -158,7 +159,6 @@ class NotificationModule {
         clearDataNotification: ClearDataNotification,
         privacyProtectionNotification: PrivacyProtectionNotification,
         useOurAppNotification: UseOurAppNotification,
-        addToHomeCapabilityDetector: AddToHomeCapabilityDetector,
         variantManager: VariantManager
     ): AndroidNotificationScheduler {
         return NotificationScheduler(
@@ -166,7 +166,6 @@ class NotificationModule {
             clearDataNotification,
             privacyProtectionNotification,
             useOurAppNotification,
-            addToHomeCapabilityDetector,
             variantManager
         )
     }

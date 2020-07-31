@@ -20,7 +20,6 @@ import android.content.Context
 import androidx.annotation.WorkerThread
 import androidx.core.app.NotificationManagerCompat
 import androidx.work.*
-import com.duckduckgo.app.browser.addtohome.AddToHomeCapabilityDetector
 import com.duckduckgo.app.notification.db.NotificationDao
 import com.duckduckgo.app.notification.model.Notification
 import com.duckduckgo.app.notification.model.SchedulableNotification
@@ -42,7 +41,6 @@ class NotificationScheduler(
     private val clearDataNotification: SchedulableNotification,
     private val privacyNotification: SchedulableNotification,
     private val useOurAppNotification: SchedulableNotification,
-    private val addToHomeCapabilityDetector: AddToHomeCapabilityDetector,
     private val variantManager: VariantManager
 ) : AndroidNotificationScheduler {
 
@@ -52,7 +50,7 @@ class NotificationScheduler(
     }
 
     private suspend fun scheduleUseOurAppNotification() {
-        if (variant().hasFeature(VariantManager.VariantFeature.InAppUsage) && addToHomeCapabilityDetector.isAddToHomeSupported() && useOurAppNotification.canShow()) {
+        if (variant().hasFeature(VariantManager.VariantFeature.InAppUsage) && useOurAppNotification.canShow()) {
             val operation = scheduleUniqueNotification(
                 OneTimeWorkRequestBuilder<UseOurAppNotificationWorker>(),
                 3,

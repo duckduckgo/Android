@@ -88,12 +88,13 @@ class TabDataRepository @Inject constructor(
     }
 
     override suspend fun selectByUrlOrNewTab(url: String) {
-        var searchUrl = url
-        if (useOurAppDetector.isUseOurAppUrl(url)) {
-            searchUrl = "%${UseOurAppDetector.USE_OUR_APP_DOMAIN}%"
+        val query = if (useOurAppDetector.isUseOurAppUrl(url)) {
+            UseOurAppDetector.USE_OUR_APP_DOMAIN_QUERY
+        } else {
+            url
         }
 
-        val tabId = tabsDao.selectTabByUrl(searchUrl)
+        val tabId = tabsDao.selectTabByUrl(query)
         if (tabId != null) {
             select(tabId)
         } else {
