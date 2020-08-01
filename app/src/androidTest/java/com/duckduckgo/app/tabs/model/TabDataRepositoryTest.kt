@@ -264,6 +264,39 @@ class TabDataRepositoryTest {
         db.close()
     }
 
+    @Test
+    fun whenAddWithSourceEnsureTabEntryContainsExpectedSourceId() = runBlocking<Unit> {
+        val db = createDatabase()
+        val dao = db.tabsDao()
+        val sourceTab = TabEntity(tabId = "sourceId", url = "http://www.example.com", position = 0)
+        dao.addAndSelectTab(sourceTab)
+
+        testee = TabDataRepository(dao, SiteFactory(mockPrivacyPractices, mockEntityLookup), mockWebViewPreviewPersister)
+
+        val addedTabId = testee.addWithSource("http://www.example.com", skipHome = false, isDefaultTab = false)
+        val addedTab = testee.liveSelectedTab.blockingObserve()
+        assertEquals(addedTabId, addedTab?.tabId)
+        assertEquals(addedTab?.sourceTabId, sourceTab.tabId)
+    }
+
+    @Test
+    fun whenDeleteCurrentTabAndSelectSourceLiveSelectedTabReturnsToSourceTab() = runBlocking<Unit> {
+        val db = createDatabase()
+        val dao = db.tabsDao()
+        val sourceTab = TabEntity(tabId = "sourceId", url = "http://www.example.com", position = 0)
+        val tabToDelete = TabEntity(tabId = "tabToDeleteId", url = "http://www.example.com", position = 1, sourceTabId = "sourceId")
+        dao.addAndSelectTab(sourceTab)
+        dao.addAndSelectTab(tabToDelete)
+
+        testee = TabDataRepository(dao, SiteFactory(mockPrivacyPractices, mockEntityLookup), mockWebViewPreviewPersister)
+
+        var currentSelectedTabId = testee.liveSelectedTab.blockingObserve()?.tabId
+        assertEquals(currentSelectedTabId, tabToDelete.tabId)
+        testee.deleteCurrentTabAndSelectSource()
+        currentSelectedTabId = testee.liveSelectedTab.blockingObserve()?.tabId
+        assertEquals(currentSelectedTabId, sourceTab.tabId)
+    }
+
     private fun createDatabase(): AppDatabase {
         return Room.inMemoryDatabaseBuilder(InstrumentationRegistry.getInstrumentation().targetContext, AppDatabase::class.java)
             .allowMainThreadQueries()
