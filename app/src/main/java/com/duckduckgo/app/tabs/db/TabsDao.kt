@@ -85,6 +85,24 @@ abstract class TabsDao {
         }
     }
 
+    @Transaction
+    open fun deleteTabAndUpdateSelection(tab: TabEntity, newSelectedTab: TabEntity? = null) {
+        deleteTab(tab)
+
+        if (newSelectedTab != null) {
+            insertTabSelection(TabSelectionEntity(tabId = newSelectedTab.tabId))
+            return
+        }
+
+        if (selectedTab() != null) {
+            return
+        }
+
+        firstTab()?.let {
+            insertTabSelection(TabSelectionEntity(tabId = it.tabId))
+        }
+    }
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     abstract fun insertTabSelection(tabSelectionEntity: TabSelectionEntity)
 

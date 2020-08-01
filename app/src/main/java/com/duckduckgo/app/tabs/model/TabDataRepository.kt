@@ -55,18 +55,16 @@ class TabDataRepository @Inject constructor(
 
     override suspend fun addWithSource(url: String?, skipHome: Boolean, isDefaultTab: Boolean): String {
         val tabId = generateTabId()
-        var sourceTabId: String? = null
-
-        withContext(Dispatchers.IO) {
-            sourceTabId = tabsDao.selectedTab()?.tabId
+        val sourceTabId = withContext(Dispatchers.IO) {
+            tabsDao.selectedTab()?.tabId
         }
 
         add(
-                tabId,
-                buildSiteData(url),
-                skipHome = skipHome,
-                isDefaultTab = isDefaultTab,
-                sourceTabId = sourceTabId
+            tabId,
+            buildSiteData(url),
+            skipHome = skipHome,
+            isDefaultTab = isDefaultTab,
+            sourceTabId = sourceTabId
         )
 
         return tabId
@@ -102,7 +100,15 @@ class TabDataRepository @Inject constructor(
             }
             Timber.i("About to add a new tab, isDefaultTab: $isDefaultTab. $tabId, position: $position")
 
-            tabsDao.addAndSelectTab(TabEntity(tabId, data.value?.url, data.value?.title, skipHome, true, position, null, sourceTabId))
+            tabsDao.addAndSelectTab(TabEntity(
+                    tabId = tabId,
+                    url = data.value?.url,
+                    title = data.value?.title,
+                    skipHome = skipHome,
+                    viewed = true,
+                    position = position,
+                    sourceTabId = sourceTabId
+            ))
         }
     }
 
@@ -160,18 +166,16 @@ class TabDataRepository @Inject constructor(
 
     override suspend fun deleteCurrentTabAndSelectSource() {
         databaseExecutor().scheduleDirect {
-            val tabToDelete = tabsDao.selectedTab()
-            tabToDelete?.tabId?.let {
-                deleteOldPreviewImages(tabToDelete.tabId)
-                tabsDao.deleteTab(tabToDelete)
-                siteData.remove(tabToDelete.tabId)
-            }
+            val tabToDelete = tabsDao.selectedTab() ?: return@scheduleDirect
 
-            tabToDelete?.sourceTabId?.let { sourceTabId ->
-                if (tabsDao.tab(sourceTabId) != null) {
-                    tabsDao.insertTabSelection(TabSelectionEntity(tabId = sourceTabId))
-                }
-            }
+            deleteOldPreviewImages(tabToDelete.tabId)
+            val tabToSelect = tabToDelete.sourceTabId
+                    .takeUnless { it.isNullOrBlank() }
+                    ?.let {
+                        tabsDao.tab(it)
+                    }
+            tabsDao.deleteTabAndUpdateSelection(tabToDelete, tabToSelect)
+            siteData.remove(tabToDelete.tabId)
         }
     }
 
