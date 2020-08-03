@@ -921,7 +921,7 @@ class BrowserTabViewModel(
 
     override fun onSystemLocationPermissionNeverAllowed() {
         Timber.i("Precise Location - System permission Never allowed")
-        val neverAllowedPermission =  LocationPermissionType.DENY_ALWAYS
+        val neverAllowedPermission = LocationPermissionType.DENY_ALWAYS
         onSiteLocationPermissionSelected(permissionOrigin, neverAllowedPermission)
         viewModelScope.launch {
             locationPermissionsRepository.savePermission(permissionOrigin, neverAllowedPermission)
