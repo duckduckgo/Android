@@ -88,5 +88,5 @@
     <string name="preciseLocationDeleteContentDescription">More options for location permissions in domain %s</string>
     <string name="preciseLocationAllowedSitesSectionTitle">Granted</string>
     <string name="preciseLocationDeniedSitesSectionTitle">Denied</string>
-    <string name="preciseLocationSnackbarMessage">%s has access to your location</string>
+    <string name="preciseLocationSnackbarMessage">You previously granted %s permission to access your device location.</string>
 </resources>
