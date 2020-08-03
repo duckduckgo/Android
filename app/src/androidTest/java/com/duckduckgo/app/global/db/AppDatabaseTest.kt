@@ -282,8 +282,8 @@ class AppDatabaseTest {
     }
 
     @Test
-    fun whenMigratingFromVersion22To23ThenValidationSucceeds() {
-        createDatabaseAndMigrate(22, 23, migrationsProvider.MIGRATION_22_TO_23)
+    fun whenMigratingFromVersion23To24ThenValidationSucceeds() {
+        createDatabaseAndMigrate(23, 24, migrationsProvider.MIGRATION_23_TO_24)
     }
 
     private fun createDatabase(version: Int) {
