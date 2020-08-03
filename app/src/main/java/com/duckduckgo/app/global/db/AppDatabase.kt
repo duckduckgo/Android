@@ -39,7 +39,6 @@ import com.duckduckgo.app.global.exception.UncaughtExceptionSourceConverter
 import com.duckduckgo.app.global.events.db.UserEventsDao
 import com.duckduckgo.app.global.events.db.UserEventEntity
 import com.duckduckgo.app.global.events.db.UserEventTypeConverter
-import com.duckduckgo.app.global.useourapp.MigrationManager
 import com.duckduckgo.app.httpsupgrade.db.HttpsBloomFilterSpecDao
 import com.duckduckgo.app.httpsupgrade.db.HttpsWhitelistDao
 import com.duckduckgo.app.httpsupgrade.model.HttpsBloomFilterSpec
@@ -62,7 +61,6 @@ import com.duckduckgo.app.usage.app.AppDaysUsedDao
 import com.duckduckgo.app.usage.app.AppDaysUsedEntity
 import com.duckduckgo.app.usage.search.SearchCountDao
 import com.duckduckgo.app.usage.search.SearchCountEntity
-import java.util.Locale
 
 @Database(
     exportSchema = true, version = 23, entities = [
@@ -135,8 +133,7 @@ abstract class AppDatabase : RoomDatabase() {
 class MigrationsProvider(
     val context: Context,
     val settingsDataStore: SettingsDataStore,
-    val addToHomeCapabilityDetector: AddToHomeCapabilityDetector,
-    val useOurAppMigrationManager: MigrationManager
+    val addToHomeCapabilityDetector: AddToHomeCapabilityDetector
 ) {
 
     val MIGRATION_1_TO_2: Migration = object : Migration(1, 2) {
@@ -310,21 +307,13 @@ class MigrationsProvider(
     val MIGRATION_21_TO_22: Migration = object : Migration(21, 22) {
         override fun migrate(database: SupportSQLiteDatabase) {
             database.execSQL("CREATE TABLE IF NOT EXISTS `user_events` (`id` TEXT NOT NULL, `timestamp` INTEGER NOT NULL, PRIMARY KEY(`id`))")
-
-            if (canUserBeMigratedToUseOurAppFlow(database)) {
-                if (useOurAppMigrationManager.shouldRunMigration()) {
-                    database.execSQL("UPDATE $USER_STAGE_TABLE_NAME SET appStage = \"${AppStage.USE_OUR_APP_NOTIFICATION}\" WHERE appStage = \"${AppStage.ESTABLISHED}\"")
-                }
-            }
         }
     }
 
-    private fun canUserBeMigratedToUseOurAppFlow(database: SupportSQLiteDatabase): Boolean =
-        isEnglishLocale() && isUserEstablished(database) && !settingsDataStore.hideTips && addToHomeCapabilityDetector.isAddToHomeSupported()
-
-    private fun isEnglishLocale(): Boolean {
-        val locale = Locale.getDefault()
-        return locale != null && locale.language == "en"
+    val MIGRATION_22_TO_23: Migration = object : Migration(22, 23) {
+        override fun migrate(database: SupportSQLiteDatabase) {
+            database.execSQL("UPDATE $USER_STAGE_TABLE_NAME SET appStage = \"${AppStage.ESTABLISHED}\" WHERE appStage = \"${AppStage.USE_OUR_APP_NOTIFICATION}\"")
+        }
     }
 
     val MIGRATION_22_TO_23: Migration = object : Migration(22, 23) {
@@ -358,17 +347,6 @@ class MigrationsProvider(
             MIGRATION_21_TO_22,
             MIGRATION_22_TO_23
         )
-
-    private fun isUserEstablished(database: SupportSQLiteDatabase): Boolean {
-        var stage: String
-
-        database.query("SELECT appStage from userStage limit 1").apply {
-            moveToFirst()
-            if (count == 0) return false
-            stage = getString(0)
-        }
-        return (stage == AppStage.ESTABLISHED.name)
-    }
 
     @Deprecated(
         message = "This class should be only used by database migrations.",

@@ -435,7 +435,7 @@
     <string name="changeIconDialogMessage">Rakendus võib muudatuste salvestamiseks sulguda. Tule pärast oma kena uue ikooni imetlemist tagasi.</string>
 
     <!-- New dashboard / menu buttons -->
-    <string name="manageWhitelist">Halda valgeloendit</string>
+    <string name="manageWhitelist">Kaitseta saidid</string>
     <string name="reportBrokenSite">Teata mittetoimivast saidist</string>
 
     <!-- Dialogs -->
@@ -443,19 +443,18 @@
     <string name="dialogEditTitle">Redigeeri</string>
 
     <!-- Whitelist -->
-    <string name="whitelisetActivityTitle">Valges nimekirjas</string>
-    <string name="whitelistAdd">Lisa valgesse nimekirja</string>
-    <string name="whitelistRemove">Eemalda lubatud loendist</string>
-    <string name="whitelistEntryOverflowContentDescription">Rohkem valikuid valgesse nimekirja lisamiseks %s</string>
-    <string name="whitelistEntryDeleteConfirmMessage">Kas soovid kindlasti kustutada &lt;b&gt;%s&lt;/b&gt; lubatud loendist?</string>
-    <string name="whitelistExplanation">Neid valgesse nimekirja lisatud saite privaatsuskaitse ei uuenda</string>
-    <string name="whitelistNoEntries">Veel pole valgesse nimekirja lisatud saite</string>
+    <string name="whitelisetActivityTitle">Kaitseta saidid</string>
+    <string name="enablePrivacyProtection">Luba Eraelu puutumatuse kaitse</string>
+    <string name="disablePrivacyProtection">Keela Eraelu puutumatuse kaitse</string>
+    <string name="whitelistEntryOverflowContentDescription">Rohkem võimalusi kaitseta saidi %s jaoks</string>
+    <string name="whitelistEntryDeleteConfirmMessage">Oled kindel, et soovite eemaldada &lt;b&gt;%s&lt;/b&gt; kaisteta saitide hulgast?</string>
+    <string name="whitelistExplanation">Nendele saitidele ei laiene Eraelu puutumatuse kaitse.</string>
+    <string name="whitelistNoEntries">Kaitseta saite ei ole veel</string>
     <string name="whitelistDomainHint">www.example.com</string>
-    <string name="whitelistFormatError">Salvestamine ebaõnnestus, sisestage domeen kujul <b>example.com</b>
-  </string>
+    <string name="whitelistFormatError">Salvestamine ebaõnnestus, sisestage domeen kujul <b>example.com</b></string>
 
     <!-- Settings -->
-    <string name="settingsPrivacyProtectionWhitelist">Privaatsuse kaitse valge nimekiri</string>
+    <string name="settingsPrivacyProtectionWhitelist">Kaitseta saidid</string>
 
     <!-- Fireproof websites -->
     <string name="fireproofWebsitesActivityTitle">Tulekindlad veebisaidid</string>

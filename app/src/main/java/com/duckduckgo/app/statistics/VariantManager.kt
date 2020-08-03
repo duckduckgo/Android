@@ -37,6 +37,9 @@ interface VariantManager {
         object Day1DripB2Notification : VariantFeature()
         object SerpHeaderQueryReplacement : VariantFeature()
         object SerpHeaderRemoval : VariantFeature()
+        object InAppUsage : VariantFeature()
+        object KillOnboarding : VariantFeature()
+        object RemoveDay1AndDay3Notifications : VariantFeature()
     }
 
     companion object {
@@ -85,22 +88,22 @@ interface VariantManager {
                 filterBy = { isEnglishLocale() }),
 
             // Single Search Bar Experiments
-            // Disabled until Drip Notifications Experiments are completed
+            Variant(key = "zg", weight = 0.0, features = emptyList(), filterBy = { noFilter() }),
+            Variant(key = "zh", weight = 0.0, features = listOf(VariantFeature.SerpHeaderQueryReplacement), filterBy = { noFilter() }),
+            Variant(key = "zi", weight = 0.0, features = listOf(VariantFeature.SerpHeaderRemoval), filterBy = { noFilter() }),
+
+            // InAppUsage Experiments
+            Variant(key = "zj", weight = 1.0, features = emptyList(), filterBy = { isEnglishLocale() }),
             Variant(
-                key = "zg",
+                key = "zk",
                 weight = 1.0,
-                features = emptyList(),
-                filterBy = { noFilter() }),
+                features = listOf(VariantFeature.KillOnboarding, VariantFeature.RemoveDay1AndDay3Notifications),
+                filterBy = { isEnglishLocale() }),
             Variant(
-                key = "zh",
+                key = "zl",
                 weight = 1.0,
-                features = listOf(VariantFeature.SerpHeaderQueryReplacement),
-                filterBy = { noFilter() }),
-            Variant(
-                key = "zi",
-                weight = 1.0,
-                features = listOf(VariantFeature.SerpHeaderRemoval),
-                filterBy = { noFilter() })
+                features = listOf(VariantFeature.KillOnboarding, VariantFeature.InAppUsage, VariantFeature.RemoveDay1AndDay3Notifications),
+                filterBy = { isEnglishLocale() })
 
             // All groups in an experiment (control and variants) MUST use the same filters
         )

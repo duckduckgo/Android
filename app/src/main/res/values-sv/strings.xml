@@ -431,7 +431,7 @@
     <string name="changeIconDialogMessage">Appen kanske måste stängas för att tillämpa ändringar. Kom tillbaka när du har tillämpat din nya ikon.</string>
 
     <!-- New dashboard / menu buttons -->
-    <string name="manageWhitelist">Hantera vitlista</string>
+    <string name="manageWhitelist">Oskyddade webbplatser</string>
     <string name="reportBrokenSite">Rapportera bruten webbplats</string>
 
     <!-- Dialogs -->
@@ -439,19 +439,18 @@
     <string name="dialogEditTitle">Redigera</string>
 
     <!-- Whitelist -->
-    <string name="whitelisetActivityTitle">Vitlista</string>
-    <string name="whitelistAdd">Lägg till i vitlista</string>
-    <string name="whitelistRemove">Ta bort från vitlista</string>
-    <string name="whitelistEntryOverflowContentDescription">Fler alternativ för inmatning av vitlista %s</string>
-    <string name="whitelistEntryDeleteConfirmMessage">Är du säker på att du vill ta bort &lt;b&gt;%s&lt;/b&gt; från vitlistan?</string>
-    <string name="whitelistExplanation">Dessa vitlistade webbplatser kommer inte att uppgraderas av Integritetsskydd</string>
-    <string name="whitelistNoEntries">Inga vitlistade webbplatser än</string>
+    <string name="whitelisetActivityTitle">Oskyddade webbplatser</string>
+    <string name="enablePrivacyProtection">Aktivera integritetsskydd</string>
+    <string name="disablePrivacyProtection">Inaktivera integritetsskydd</string>
+    <string name="whitelistEntryOverflowContentDescription">Fler alternativ för den oskyddade webbplatsen %s</string>
+    <string name="whitelistEntryDeleteConfirmMessage">Är du säker på att du vill ta bort &lt;b&gt;%s&lt;/b&gt; från de oskyddade webbplatserna?</string>
+    <string name="whitelistExplanation">Dessa webbplatser kommer inte att förbättras av integritetsskydd.</string>
+    <string name="whitelistNoEntries">Inga oskyddade webbplatser än</string>
     <string name="whitelistDomainHint">www.example.com</string>
-    <string name="whitelistFormatError">Det gick inte att spara, ange en domän som <b>example.com</b>
-  </string>
+    <string name="whitelistFormatError">Det gick inte att spara, ange en domän som <b>example.com</b></string>
 
     <!-- Settings -->
-    <string name="settingsPrivacyProtectionWhitelist">Vitlista för integritetsskydd</string>
+    <string name="settingsPrivacyProtectionWhitelist">Oskyddade webbplatser</string>
 
     <!-- Fireproof websites -->
     <string name="fireproofWebsitesActivityTitle">Brandsäkra webbplatser</string>

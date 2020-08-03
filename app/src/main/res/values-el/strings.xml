@@ -414,7 +414,7 @@
     <string name="changeIconDialogMessage">Η εφαρμογή μπορεί να κλείσει για να εφαρμοστούν οι αλλαγές. Επιστρέψτε αφού θαυμάσετε το νέο σας όμορφο εικονίδιο.</string>
 
     <!-- New dashboard / menu buttons -->
-    <string name="manageWhitelist">Διαχείριση Λευκής λίστας</string>
+    <string name="manageWhitelist">Μη προστατευόμενοι ιστότοποι</string>
     <string name="reportBrokenSite">Αναφορά ιστότοπου που δεν λειτουργεί</string>
 
     <!-- Dialogs -->
@@ -422,19 +422,18 @@
     <string name="dialogEditTitle">Επεξεργασία</string>
 
     <!-- Whitelist -->
-    <string name="whitelisetActivityTitle">Λευκή λίστα</string>
-    <string name="whitelistAdd">Προσθήκη στη λευκή λίστα</string>
-    <string name="whitelistRemove">Αφαίρεση από τη λευκή λίστα</string>
-    <string name="whitelistEntryOverflowContentDescription">Περισσότερες επιλογές για καταχώριση στη λευκή λίστα %s</string>
-    <string name="whitelistEntryDeleteConfirmMessage">Είστε βέβαιοι ότι θέλετε να διαγράψετε το &lt;b&gt;%s&lt;/b&gt; από τη λευκή λίστα;</string>
-    <string name="whitelistExplanation">Αυτοί οι ιστότοποι στη λευκή λίστα δεν θα αναβαθμιστούν από την Προστασία της Ιδιωτικότητας</string>
-    <string name="whitelistNoEntries">Δεν υπάρχουν ακόμη ιστότοποι στη λευκή λίστα</string>
+    <string name="whitelisetActivityTitle">Μη προστατευόμενοι ιστότοποι</string>
+    <string name="enablePrivacyProtection">Ενεργοποίηση Προστασίας προσωπικών δεδομένων</string>
+    <string name="disablePrivacyProtection">Απενεργοποίηση Προστασίας προσωπικών δεδομένων</string>
+    <string name="whitelistEntryOverflowContentDescription">Περισσότερες επιλογές για τον μη προστατευόμενο ιστότοπο %s</string>
+    <string name="whitelistEntryDeleteConfirmMessage">Είστε βέβαιοι ότι θέλετε να καταργήσετε το &lt;b>%s&lt;/b> από τους μη προστατευόμενους ιστότοπους;</string>
+    <string name="whitelistExplanation">Οι ιστότοποι αυτοί δεν θα ενισχυθούν από την Προστασία προσωπικών δεδομένων.</string>
+    <string name="whitelistNoEntries">Δεν υπάρχουν ακόμα μη προστατευόμενοι ιστότοποι</string>
     <string name="whitelistDomainHint">www.example.com</string>
-    <string name="whitelistFormatError">Δεν ήταν δυνατή η αποθήκευση, εισαγάγετε ένα πεδίο όπως το <b>example.com</b>
-  </string>
+    <string name="whitelistFormatError">Δεν ήταν δυνατή η αποθήκευση, εισαγάγετε ένα πεδίο όπως το <b>example.com</b></string>
 
     <!-- Settings -->
-    <string name="settingsPrivacyProtectionWhitelist">Λευκή λίστα Προστασία της Ιδιωτικότητας</string>
+    <string name="settingsPrivacyProtectionWhitelist">Μη προστατευόμενοι ιστότοποι</string>
 
     <!-- Fireproof websites -->
     <string name="fireproofWebsitesActivityTitle">Ασφαλείς ιστότοποι</string>

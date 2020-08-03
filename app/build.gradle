@@ -99,6 +99,7 @@ android {
 ext {
     androidX = "1.2.0-beta01"
     materialDesign = "1.2.0-alpha05"
+    swipeRefreshLayout = "1.0.0"
     architectureComponents = "1.1.1"
     architectureComponentsExtensions = "1.1.1"
     androidKtxCore = "1.2.0"
@@ -146,6 +147,7 @@ dependencies {
     implementation "androidx.appcompat:appcompat:$androidX"
     implementation "com.google.android.material:material:$materialDesign"
     implementation "androidx.constraintlayout:constraintlayout:$constraintLayout"
+    implementation "androidx.swiperefreshlayout:swiperefreshlayout:$swipeRefreshLayout"
     implementation "androidx.webkit:webkit:$webkit"
     implementation "com.squareup.okhttp3:okhttp:$okHttp"
     implementation "com.squareup.retrofit2:retrofit:$retrofit"

@@ -27,8 +27,6 @@ import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.browser.rating.ui.AppEnjoymentDialogFragment
 import com.duckduckgo.app.browser.rating.ui.GiveFeedbackDialogFragment
 import com.duckduckgo.app.browser.rating.ui.RateAppDialogFragment
-import com.duckduckgo.app.cta.db.DismissedCtaDao
-import com.duckduckgo.app.cta.model.CtaId
 import com.duckduckgo.app.fire.DataClearer
 import com.duckduckgo.app.global.ApplicationClearDataState
 import com.duckduckgo.app.global.DefaultDispatcherProvider
@@ -38,7 +36,7 @@ import com.duckduckgo.app.global.rating.AppEnjoymentPromptEmitter
 import com.duckduckgo.app.global.rating.AppEnjoymentPromptOptions
 import com.duckduckgo.app.global.rating.AppEnjoymentUserEventRecorder
 import com.duckduckgo.app.global.rating.PromptCount
-import com.duckduckgo.app.global.useourapp.UseOurAppDetector.Companion.USE_OUR_APP_SHORTCUT_URL
+import com.duckduckgo.app.global.useourapp.UseOurAppDetector
 import com.duckduckgo.app.privacy.ui.PrivacyDashboardActivity.Companion.RELOAD_RESULT_CODE
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.tabs.model.TabEntity
@@ -55,9 +53,9 @@ class BrowserViewModel(
     private val dataClearer: DataClearer,
     private val appEnjoymentPromptEmitter: AppEnjoymentPromptEmitter,
     private val appEnjoymentUserEventRecorder: AppEnjoymentUserEventRecorder,
-    private val ctaDao: DismissedCtaDao,
     private val dispatchers: DispatcherProvider = DefaultDispatcherProvider(),
-    private val pixel: Pixel
+    private val pixel: Pixel,
+    private val useOurAppDetector: UseOurAppDetector
 ) : AppEnjoymentDialogFragment.Listener,
     RateAppDialogFragment.Listener,
     GiveFeedbackDialogFragment.Listener,
@@ -214,7 +212,7 @@ class BrowserViewModel(
     fun onOpenShortcut(url: String) {
         launch(dispatchers.io()) {
             tabRepository.selectByUrlOrNewTab(queryUrlConverter.convertQueryToUrl(url))
-            if (ctaDao.exists(CtaId.USE_OUR_APP) && url == USE_OUR_APP_SHORTCUT_URL) {
+            if (useOurAppDetector.isUseOurAppUrl(url)) {
                 pixel.fire(Pixel.PixelName.USE_OUR_APP_SHORTCUT_OPENED)
             } else {
                 pixel.fire(Pixel.PixelName.SHORTCUT_OPENED)

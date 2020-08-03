@@ -69,5 +69,6 @@ class UseOurAppDetector @Inject constructor(val userEventsStore: UserEventsStore
         const val USE_OUR_APP_SHORTCUT_URL: String = "https://m.facebook.com/"
         const val USE_OUR_APP_SHORTCUT_TITLE: String = "Facebook"
         const val USE_OUR_APP_DOMAIN = "facebook.com"
+        const val USE_OUR_APP_DOMAIN_QUERY = "%facebook.com%"
     }
 }

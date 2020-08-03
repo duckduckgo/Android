@@ -421,7 +421,7 @@
     <string name="changeIconDialogMessage">Aplikacija se može zatvoriti radi primjene promjena. Vratite se nakon što ste se divili svojoj lijepoj novoj ikoni.</string>
 
     <!-- New dashboard / menu buttons -->
-    <string name="manageWhitelist">Upravljajte popisom dopuštenih</string>
+    <string name="manageWhitelist">Nezaštićena mrežna mjesta</string>
     <string name="reportBrokenSite">Prijavi neispravnu web stranicu</string>
 
     <!-- Dialogs -->
@@ -429,19 +429,18 @@
     <string name="dialogEditTitle">Uredi</string>
 
     <!-- Whitelist -->
-    <string name="whitelisetActivityTitle">Popis dopuštenih</string>
-    <string name="whitelistAdd">Dodaj u popis dopuštenih</string>
-    <string name="whitelistRemove">Ukloni s popisa dopuštenih</string>
-    <string name="whitelistEntryOverflowContentDescription">Dodatne mogućnosti za unos u popis dopuštenih %s</string>
-    <string name="whitelistEntryDeleteConfirmMessage">Jeste li sigurni da želite izbrisati &lt;b&gt;%s&lt;/b&gt; s popisa dopuštenih?</string>
-    <string name="whitelistExplanation">Web lokacije sa popisa dopuštenih neće biti nadograđene Zaštitom privatnosti</string>
-    <string name="whitelistNoEntries">Još nema lokacija na popisu dopuštenih</string>
+    <string name="whitelisetActivityTitle">Nezaštićena mrežna mjesta</string>
+    <string name="enablePrivacyProtection">Omogući zaštitu privatnosti</string>
+    <string name="disablePrivacyProtection">Onemogući zaštitu privatnosti</string>
+    <string name="whitelistEntryOverflowContentDescription">Dodatne mogućnosti za nezaštićeno mrežno mjesto %s</string>
+    <string name="whitelistEntryDeleteConfirmMessage">Jeste li sigurni da želite ukloniti &lt;b&gt;%s&lt;/b&gt; iz nezaštićenih mrežnih mjesta?</string>
+    <string name="whitelistExplanation">Zaštita privatnosti neće poboljšati ova mrežna mjesta.</string>
+    <string name="whitelistNoEntries">Još nema nezaštićenih mrežnih mjesta</string>
     <string name="whitelistDomainHint">www.example.com</string>
-    <string name="whitelistFormatError">Nije moguće spremiti, unesite domenu kao <b>example.com</b>
-  </string>
+    <string name="whitelistFormatError">Nije moguće spremiti, unesite domenu kao <b>example.com</b></string>
 
     <!-- Settings -->
-    <string name="settingsPrivacyProtectionWhitelist">Popis dopuštenih za zaštitu privatnosti</string>
+    <string name="settingsPrivacyProtectionWhitelist">Nezaštićena mrežna mjesta</string>
 
     <!-- Fireproof websites -->
     <string name="fireproofWebsitesActivityTitle">Vatrootporne web stranice</string>

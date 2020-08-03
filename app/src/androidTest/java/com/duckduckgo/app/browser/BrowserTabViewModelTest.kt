@@ -2176,6 +2176,15 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenViewReadyIfDomainSameAsUseOurAppThenPixelSent() = coroutineRule.runBlocking {
+        givenUseOurAppSiteSelected()
+
+        testee.onViewReady()
+
+        verify(mockPixel).fire(Pixel.PixelName.UOA_VISITED)
+    }
+
+    @Test
     fun whenViewReadyIfDomainIsNotTheSameAsUseOurAppAfterNotificationSeenThenPixelNotSent() = coroutineRule.runBlocking {
         givenUseOurAppSiteIsNotSelected()
         whenever(mockNotificationDao.exists(UseOurAppNotification.ID)).thenReturn(true)
@@ -2203,6 +2212,15 @@ class BrowserTabViewModelTest {
         testee.onViewReady()
 
         verify(mockPixel, never()).fire(Pixel.PixelName.UOA_VISITED_AFTER_DELETE_CTA)
+    }
+
+    @Test
+    fun whenViewReadyIfDomainIsNotTheSameAsUseOurAppAThenPixelNotSent() = coroutineRule.runBlocking {
+        givenUseOurAppSiteIsNotSelected()
+
+        testee.onViewReady()
+
+        verify(mockPixel, never()).fire(Pixel.PixelName.UOA_VISITED)
     }
 
     @Test
@@ -2236,6 +2254,15 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenPageChangedIfPreviousOneWasNotUseOurAppSiteThenPixelSent() = coroutineRule.runBlocking {
+        givenUseOurAppSiteIsNotSelected()
+
+        loadUrl(USE_OUR_APP_DOMAIN, isBrowserShowing = true)
+
+        verify(mockPixel).fire(Pixel.PixelName.UOA_VISITED)
+    }
+
+    @Test
     fun whenPageChangedIfPreviousOneWasUseOurAppSiteAfterNotificationSeenThenPixelNotSent() = coroutineRule.runBlocking {
         givenUseOurAppSiteSelected()
         whenever(mockNotificationDao.exists(UseOurAppNotification.ID)).thenReturn(true)
@@ -2264,6 +2291,15 @@ class BrowserTabViewModelTest {
         loadUrl(USE_OUR_APP_DOMAIN, isBrowserShowing = true)
 
         verify(mockPixel, never()).fire(Pixel.PixelName.UOA_VISITED_AFTER_DELETE_CTA)
+    }
+
+    @Test
+    fun whenPageChangedIfPreviousOneWasUseOurAppSiteThenNotSent() = coroutineRule.runBlocking {
+        givenUseOurAppSiteSelected()
+
+        loadUrl(USE_OUR_APP_DOMAIN, isBrowserShowing = true)
+
+        verify(mockPixel, never()).fire(Pixel.PixelName.UOA_VISITED)
     }
 
     private inline fun <reified T : Command> assertCommandIssued(instanceAssertions: T.() -> Unit = {}) {

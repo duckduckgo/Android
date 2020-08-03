@@ -140,7 +140,7 @@
             <TextView
                 android:id="@+id/whitelistPopupMenuItem"
                 style="@style/BrowserTextMenuItem"
-                android:text="@string/whitelistAdd" />
+                android:text="@string/enablePrivacyProtection" />
 
             <TextView
                 android:id="@+id/brokenSitePopupMenuItem"

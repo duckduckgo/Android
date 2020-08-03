@@ -17,7 +17,9 @@
 package com.duckduckgo.app.notification.model
 
 import androidx.test.platform.app.InstrumentationRegistry
+import com.duckduckgo.app.browser.addtohome.AddToHomeCapabilityDetector
 import com.duckduckgo.app.notification.db.NotificationDao
+import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.whenever
@@ -30,23 +32,45 @@ class UseOurAppNotificationTest {
 
     private val context = InstrumentationRegistry.getInstrumentation().targetContext
     private val notificationsDao: NotificationDao = mock()
+    private val mockSettingsDataStore: SettingsDataStore = mock()
+    private val mockAddToHomeCapabilityDetector: AddToHomeCapabilityDetector = mock()
 
     private lateinit var testee: UseOurAppNotification
 
     @Before
     fun before() {
-        testee = UseOurAppNotification(context, notificationsDao)
+        testee = UseOurAppNotification(context, notificationsDao, mockSettingsDataStore, mockAddToHomeCapabilityDetector)
     }
 
     @Test
-    fun whenNotificationNotSeenThenCanShowIsTrue() = runBlocking {
+    fun whenNotificationNotSeenAndHideTipsIsFalseAndAddToHomeSupportedThenCanShowIsTrue() = runBlocking {
+        whenever(mockAddToHomeCapabilityDetector.isAddToHomeSupported()).thenReturn(true)
         whenever(notificationsDao.exists(any())).thenReturn(false)
+        whenever(mockSettingsDataStore.hideTips).thenReturn(false)
         assertTrue(testee.canShow())
     }
 
     @Test
-    fun whenNotificationAlreadySeenThenCanShowIsFalse() = runBlocking<Unit> {
+    fun whenNotificationAlreadySeenThenCanShowIsFalse() = runBlocking {
         whenever(notificationsDao.exists(any())).thenReturn(true)
+        whenever(mockAddToHomeCapabilityDetector.isAddToHomeSupported()).thenReturn(true)
+        whenever(mockSettingsDataStore.hideTips).thenReturn(false)
+        assertFalse(testee.canShow())
+    }
+
+    @Test
+    fun whenHideTipsIsTrueThenCanShowIsFalse() = runBlocking {
+        whenever(notificationsDao.exists(any())).thenReturn(false)
+        whenever(mockAddToHomeCapabilityDetector.isAddToHomeSupported()).thenReturn(true)
+        whenever(mockSettingsDataStore.hideTips).thenReturn(true)
+        assertFalse(testee.canShow())
+    }
+
+    @Test
+    fun whenAddToHomeNotSupportedThenCanShowIsFalse() = runBlocking {
+        whenever(notificationsDao.exists(any())).thenReturn(false)
+        whenever(mockAddToHomeCapabilityDetector.isAddToHomeSupported()).thenReturn(false)
+        whenever(mockSettingsDataStore.hideTips).thenReturn(false)
         assertFalse(testee.canShow())
     }
 }

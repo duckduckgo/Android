@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 23,
-    "identityHash": "03673f6d5937091013955e2520b94c0e",
+    "identityHash": "d6e385bcc19ae0df396817590763b709",
     "entities": [
       {
         "tableName": "tds_tracker",
@@ -258,7 +258,7 @@
       },
       {
         "tableName": "tabs",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`tabId` TEXT NOT NULL, `url` TEXT, `title` TEXT, `skipHome` INTEGER NOT NULL, `viewed` INTEGER NOT NULL, `position` INTEGER NOT NULL, `tabPreviewFile` TEXT, `sourceTabId` TEXT, PRIMARY KEY(`tabId`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`tabId` TEXT NOT NULL, `url` TEXT, `title` TEXT, `skipHome` INTEGER NOT NULL, `viewed` INTEGER NOT NULL, `position` INTEGER NOT NULL, `tabPreviewFile` TEXT, PRIMARY KEY(`tabId`))",
         "fields": [
           {
             "fieldPath": "tabId",
@@ -299,12 +299,6 @@
           {
             "fieldPath": "tabPreviewFile",
             "columnName": "tabPreviewFile",
-            "affinity": "TEXT",
-            "notNull": false
-          },
-          {
-            "fieldPath": "sourceTabId",
-            "columnName": "sourceTabId",
             "affinity": "TEXT",
             "notNull": false
           }
@@ -746,7 +740,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '03673f6d5937091013955e2520b94c0e')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'd6e385bcc19ae0df396817590763b709')"
     ]
   }
 }

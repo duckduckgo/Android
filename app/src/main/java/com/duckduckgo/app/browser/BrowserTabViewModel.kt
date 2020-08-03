@@ -681,6 +681,7 @@ class BrowserTabViewModel(
                 deleteCtaShown -> pixel.fire(PixelName.UOA_VISITED_AFTER_DELETE_CTA)
                 isShortcutAdded != null -> pixel.fire(PixelName.UOA_VISITED_AFTER_SHORTCUT)
                 isUseOurAppNotificationSeen -> pixel.fire(PixelName.UOA_VISITED_AFTER_NOTIFICATION)
+                else -> pixel.fire(PixelName.UOA_VISITED)
             }
         }
     }

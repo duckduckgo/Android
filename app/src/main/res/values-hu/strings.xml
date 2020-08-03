@@ -415,7 +415,7 @@
     <string name="changeIconDialogMessage">A módosítások végrehajtásához az alkalmazás bezárulhat. Térj vissza, miután megcsodáltad a csinos új ikonodat.</string>
 
     <!-- New dashboard / menu buttons -->
-    <string name="manageWhitelist">Engedélyezési lista kezelése</string>
+    <string name="manageWhitelist">Védelem nélküli weboldalak</string>
     <string name="reportBrokenSite">Hibás weboldal jelentése</string>
 
     <!-- Dialogs -->
@@ -423,19 +423,18 @@
     <string name="dialogEditTitle">Szerkesztés</string>
 
     <!-- Whitelist -->
-    <string name="whitelisetActivityTitle">Engedélyezési lista</string>
-    <string name="whitelistAdd">Hozzáadás az engedélyezési listához</string>
-    <string name="whitelistRemove">Eltávolítás az engedélyezési listáról</string>
-    <string name="whitelistEntryOverflowContentDescription">További lehetőségek a bejegyzéshez az engedélyezési listában %s</string>
-    <string name="whitelistEntryDeleteConfirmMessage">Biztosan törlöd  az engedélyezési listáról ezt: &lt;b&gt;%s&lt;/b&gt;?</string>
-    <string name="whitelistExplanation">Ezeket az engedélyezett oldalakat az Adatvédelem nem frissíti</string>
-    <string name="whitelistNoEntries">Még nincsenek engedélyezett oldalak</string>
+    <string name="whitelisetActivityTitle">Védelem nélküli weboldalak</string>
+    <string name="enablePrivacyProtection">Adatvédelem engedélyezése</string>
+    <string name="disablePrivacyProtection">Adatvédelem letiltása</string>
+    <string name="whitelistEntryOverflowContentDescription">További lehetőségek az %s védelem nélküli weboldalhoz</string>
+    <string name="whitelistEntryDeleteConfirmMessage">Biztosan eltávolítod az &lt;b&gt;%s&lt;/b&gt; elemet a védelem nélküli weboldalak közül?</string>
+    <string name="whitelistExplanation">Ezeket az oldalakat nem erősíti adatvédelem.</string>
+    <string name="whitelistNoEntries">Még nincs védelem nélküli weboldal</string>
     <string name="whitelistDomainHint">www.example.com</string>
-    <string name="whitelistFormatError">A mentés nem sikerült , írj be egy domain nevet, például <b>example.com</b>
-  </string>
+    <string name="whitelistFormatError">A mentés nem sikerült , írj be egy domain nevet, például <b>example.com</b></string>
 
     <!-- Settings -->
-    <string name="settingsPrivacyProtectionWhitelist">Adatvédelem Engedélyezési lista</string>
+    <string name="settingsPrivacyProtectionWhitelist">Védelem nélküli weboldalak</string>
 
     <!-- Fireproof websites -->
     <string name="fireproofWebsitesActivityTitle">Tűzálló weboldalak</string>

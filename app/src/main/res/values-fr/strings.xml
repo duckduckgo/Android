@@ -415,7 +415,7 @@
     <string name="changeIconDialogMessage">L\'appli peut se fermer pour appliquer les modifications. Revenez après avoir admiré votre magnifique nouvelle icône.</string>
 
     <!-- New dashboard / menu buttons -->
-    <string name="manageWhitelist">Gérer la liste blanche</string>
+    <string name="manageWhitelist">Sites non protégés</string>
     <string name="reportBrokenSite">Signaler un site cassé</string>
 
     <!-- Dialogs -->
@@ -423,19 +423,18 @@
     <string name="dialogEditTitle">Modifier</string>
 
     <!-- Whitelist -->
-    <string name="whitelisetActivityTitle">Liste blanche</string>
-    <string name="whitelistAdd">Ajouter à la liste blanche</string>
-    <string name="whitelistRemove">Supprimer de la liste blanche</string>
-    <string name="whitelistEntryOverflowContentDescription">Plus d\'options pour l\'entrée dans la liste blanche %s</string>
-    <string name="whitelistEntryDeleteConfirmMessage">Voulez-vous vraiment supprimer &lt;b&gt;%s&lt;/b&gt; de la liste blanche ?</string>
-    <string name="whitelistExplanation">Ces sites en liste blanche ne seront pas mis à niveau par la protection de la vie privée</string>
-    <string name="whitelistNoEntries">Pas encore de sites en liste blanche</string>
+    <string name="whitelisetActivityTitle">Sites non protégés</string>
+    <string name="enablePrivacyProtection">Activer la protection de la confidentialité</string>
+    <string name="disablePrivacyProtection">Désactiver la protection de la confidentialité</string>
+    <string name="whitelistEntryOverflowContentDescription">Plus d\'options pour le site non protégé %s</string>
+    <string name="whitelistEntryDeleteConfirmMessage">Voulez-vous vraiment retirer &lt;b&gt;%s&lt;/b&gt; des sites non protégés ?</string>
+    <string name="whitelistExplanation">Les sites suivants ne bénéficient pas de la protection de la confidentialité.</string>
+    <string name="whitelistNoEntries">Aucun site non protégé</string>
     <string name="whitelistDomainHint">www.example.com</string>
-    <string name="whitelistFormatError">Impossible d\'enregistrer, saisissez un domaine comme <b>example.com</b>
-  </string>
+    <string name="whitelistFormatError">Impossible d\'enregistrer, saisissez un domaine comme <b>example.com</b></string>
 
     <!-- Settings -->
-    <string name="settingsPrivacyProtectionWhitelist">Liste blanche de protection de la vie privée</string>
+    <string name="settingsPrivacyProtectionWhitelist">Sites non protégés</string>
 
     <!-- Fireproof websites -->
     <string name="fireproofWebsitesActivityTitle">Sites Web coupe-feu</string>

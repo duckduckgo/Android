@@ -43,6 +43,7 @@ import com.duckduckgo.app.httpsupgrade.HttpsUpgrader
 import com.duckduckgo.app.job.AppConfigurationSyncer
 import com.duckduckgo.app.job.WorkScheduler
 import com.duckduckgo.app.notification.NotificationRegistrar
+import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.referral.AppInstallationReferrerStateListener
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.AtbInitializer
@@ -159,6 +160,9 @@ open class DuckDuckGoApplication : HasAndroidInjector, Application(), LifecycleO
     @Inject
     lateinit var variantManager: VariantManager
 
+    @Inject
+    lateinit var userStageStore: UserStageStore
+
     private var launchedByFireAction: Boolean = false
 
     open lateinit var daggerAppComponent: AppComponent
@@ -181,6 +185,7 @@ open class DuckDuckGoApplication : HasAndroidInjector, Application(), LifecycleO
             it.addObserver(defaultBrowserObserver)
             it.addObserver(appEnjoymentLifecycleObserver)
             it.addObserver(dataClearerForegroundAppRestartPixel)
+            it.addObserver(userStageStore)
         }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1) {
@@ -194,6 +199,7 @@ open class DuckDuckGoApplication : HasAndroidInjector, Application(), LifecycleO
         scheduleOfflinePixels()
 
         notificationRegistrar.registerApp()
+        registerReceiver(shortcutReceiver, IntentFilter(ShortcutBuilder.USE_OUR_APP_SHORTCUT_ADDED_ACTION))
 
         initializeHttpsUpgrader()
         submitUnsentFirePixels()
@@ -299,7 +305,6 @@ open class DuckDuckGoApplication : HasAndroidInjector, Application(), LifecycleO
             Timber.i("Suppressing app launch pixel")
             return
         }
-        registerReceiver(shortcutReceiver, IntentFilter(ShortcutBuilder.USE_OUR_APP_SHORTCUT_ADDED_ACTION))
         pixel.fire(APP_LAUNCH)
     }
 
@@ -310,11 +315,6 @@ open class DuckDuckGoApplication : HasAndroidInjector, Application(), LifecycleO
             workScheduler.scheduleWork()
             atbInitializer.initializeAfterReferrerAvailable()
         }
-    }
-
-    @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
-    fun onAppStopped() {
-        unregisterReceiver(shortcutReceiver)
     }
 
     companion object {

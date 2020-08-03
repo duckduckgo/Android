@@ -421,7 +421,7 @@
     <string name="changeIconDialogMessage">Programėlė gali būti uždaryta, kad būtų pritaikyti pakeitimai. Grįžkite pasigrožėję savo gražia nauja piktograma.</string>
 
     <!-- New dashboard / menu buttons -->
-    <string name="manageWhitelist">Tvarkyti baltąjį sąrašą</string>
+    <string name="manageWhitelist">Neapsaugotos svetainės</string>
     <string name="reportBrokenSite">Pranešti apie sugadintą svetainę</string>
 
     <!-- Dialogs -->
@@ -429,19 +429,18 @@
     <string name="dialogEditTitle">Redaguoti</string>
 
     <!-- Whitelist -->
-    <string name="whitelisetActivityTitle">Baltasis sąrašas</string>
-    <string name="whitelistAdd">Įtraukti į baltąjį sąrašą</string>
-    <string name="whitelistRemove">Pašalinti iš baltojo sąrašo</string>
-    <string name="whitelistEntryOverflowContentDescription">Daugiau baltojo sąrašo įrašo parinkčių %s</string>
-    <string name="whitelistEntryDeleteConfirmMessage">Ar tikrai norite ištrinti &lt;b&gt;%s&lt;/b&gt; iš baltojo sąrašo?</string>
-    <string name="whitelistExplanation">Šios į baltąjį sąrašą įtrauktos svetainės nebus atnaujintos privatumo apsauga</string>
-    <string name="whitelistNoEntries">Kol kas nėra baltojo sąrašo svetainių</string>
+    <string name="whitelisetActivityTitle">Neapsaugotos svetainės</string>
+    <string name="enablePrivacyProtection">Įjungti privatumo apsaugą</string>
+    <string name="disablePrivacyProtection">Išjungti privatumo apsaugą</string>
+    <string name="whitelistEntryOverflowContentDescription">Daugiau neapsaugotos svetainės %s parinkčių</string>
+    <string name="whitelistEntryDeleteConfirmMessage">Ar tikrai norite pašalinti &lt;b&gt;%s&lt;/b&gt; iš neapsaugotų svetainių sąrašo?</string>
+    <string name="whitelistExplanation">Šių svetainių nepatobulins privatumo apsauga.</string>
+    <string name="whitelistNoEntries">Neapsaugotų svetainių dar nėra</string>
     <string name="whitelistDomainHint">www.example.com</string>
-    <string name="whitelistFormatError">Nepavyko išsaugoti, įveskite domeną, pvz., <b>example.com</b>
-  </string>
+    <string name="whitelistFormatError">Nepavyko išsaugoti, įveskite domeną, pvz., <b>example.com</b></string>
 
     <!-- Settings -->
-    <string name="settingsPrivacyProtectionWhitelist">Privatumo apsaugos baltasis sąrašas</string>
+    <string name="settingsPrivacyProtectionWhitelist">Neapsaugotos svetainės</string>
 
     <!-- Fireproof websites -->
     <string name="fireproofWebsitesActivityTitle">Patikrinti svetaines</string>

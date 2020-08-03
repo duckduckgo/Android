@@ -439,7 +439,7 @@
     <string name="changeIconDialogMessage">Lietotne var aizvērties, lai veiktu izmaiņas. Atgriezieties pēc tam, kad būsiet apbrīnojis savu jauno, glīto ikonu.</string>
 
     <!-- New dashboard / menu buttons -->
-    <string name="manageWhitelist">Pārvaldīt balto sarakstu</string>
+    <string name="manageWhitelist">Neaizsargātas vietnes</string>
     <string name="reportBrokenSite">Ziņot par bojātu vietni</string>
 
     <!-- Dialogs -->
@@ -447,19 +447,18 @@
     <string name="dialogEditTitle">Rediģēt</string>
 
     <!-- Whitelist -->
-    <string name="whitelisetActivityTitle">Baltais saraksts</string>
-    <string name="whitelistAdd">Pievienot baltajam sarakstam</string>
-    <string name="whitelistRemove">Noņemt no baltā saraksta</string>
-    <string name="whitelistEntryOverflowContentDescription">Papildu iespējas baltā saraksta ierakstam %s</string>
-    <string name="whitelistEntryDeleteConfirmMessage">Vai tiešām vēlaties izdzēst &lt;b&gt;%s&lt;/b&gt; no baltā saraksta?</string>
-    <string name="whitelistExplanation">Šīs baltajā sarakstā iekļautās vietnes netiks atjauninātas, izmantojot privātuma aizsardzību</string>
-    <string name="whitelistNoEntries">Nav baltajā sarakstā iekļautu vietņu</string>
+    <string name="whitelisetActivityTitle">Neaizsargātas vietnes</string>
+    <string name="enablePrivacyProtection">Iespējot privātuma aizsardzību</string>
+    <string name="disablePrivacyProtection">Atspējot privātuma aizsardzību</string>
+    <string name="whitelistEntryOverflowContentDescription">Citas iespējas neaizsargātai vietnei %s</string>
+    <string name="whitelistEntryDeleteConfirmMessage">Vai tiešām vēlies noņemt &lt;b&gt;%s&lt;/b&gt; no neaizsargātām vietnēm?</string>
+    <string name="whitelistExplanation">Šīs vietnes netiks uzlabotas ar privātuma aizsardzību.</string>
+    <string name="whitelistNoEntries">Pagaidām nav neaizsargātu vietņu</string>
     <string name="whitelistDomainHint">www.piemērs.com</string>
-    <string name="whitelistFormatError">Nevarēja saglabāt, ievadiet domēnu, piemēram, <b>piemērs.com</b>
-  </string>
+    <string name="whitelistFormatError">Nevarēja saglabāt, ievadiet domēnu, piemēram, <b>piemērs.com</b></string>
 
     <!-- Settings -->
-    <string name="settingsPrivacyProtectionWhitelist">Privātuma aizsardzības baltais saraksts</string>
+    <string name="settingsPrivacyProtectionWhitelist">Neaizsargātas vietnes</string>
 
     <!-- Fireproof websites -->
     <string name="fireproofWebsitesActivityTitle">Ugunsdrošas tīmekļa vietnes</string>

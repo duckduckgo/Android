@@ -415,7 +415,7 @@
     <string name="changeIconDialogMessage">Det er muligt at appen lukker for at anvende ændringer. Kom tilbage, når du har beundret dit smukke nye ikon.</string>
 
     <!-- New dashboard / menu buttons -->
-    <string name="manageWhitelist">Administrer Whitelist</string>
+    <string name="manageWhitelist">Ubeskyttede websteder</string>
     <string name="reportBrokenSite">Rapporter ødelagt websted</string>
 
     <!-- Dialogs -->
@@ -423,19 +423,18 @@
     <string name="dialogEditTitle">Rediger</string>
 
     <!-- Whitelist -->
-    <string name="whitelisetActivityTitle">Whitelist</string>
-    <string name="whitelistAdd">Føj til Whitelist</string>
-    <string name="whitelistRemove">Fjern fra Whitelist</string>
-    <string name="whitelistEntryOverflowContentDescription">Flere muligheder for tilføjelse af Whitelist %s</string>
-    <string name="whitelistEntryDeleteConfirmMessage">Er du sikker på, at du vil slette &lt;b&gt;%s&lt;/b&gt; fra Whitelist?</string>
-    <string name="whitelistExplanation">Disse Whitelist sider opgraderes ikke af beskyttelsen af personlige oplysninger</string>
-    <string name="whitelistNoEntries">Der er endnu ingen Whitelist websteder</string>
+    <string name="whitelisetActivityTitle">Ubeskyttede websteder</string>
+    <string name="enablePrivacyProtection">Aktiver Beskyttelse af privatlivet</string>
+    <string name="disablePrivacyProtection">Deaktiver Beskyttelse af privatlivet</string>
+    <string name="whitelistEntryOverflowContentDescription">Flere indstillinger for ubeskyttet websted %s</string>
+    <string name="whitelistEntryDeleteConfirmMessage">Er du sikker på, at du vil fjerne &lt;b&gt;%s&lt;/b&gt; fra ubeskyttede websteder?</string>
+    <string name="whitelistExplanation">Disse websteder vil ikke blive forbedret ved Beskyttelse af privatlivet.</string>
+    <string name="whitelistNoEntries">Ingen ubeskyttede websteder endnu</string>
     <string name="whitelistDomainHint">www.example.com</string>
-    <string name="whitelistFormatError">Kunne ikke gemme, indtast et domæne som <b>eksempel.dk</b>
-  </string>
+    <string name="whitelistFormatError">Kunne ikke gemme, indtast et domæne som <b>eksempel.dk</b></string>
 
     <!-- Settings -->
-    <string name="settingsPrivacyProtectionWhitelist">Whitelist til beskyttelsen af personlige oplysninger</string>
+    <string name="settingsPrivacyProtectionWhitelist">Ubeskyttede websteder</string>
 
     <!-- Fireproof websites -->
     <string name="fireproofWebsitesActivityTitle">Brandsikre websteder</string>

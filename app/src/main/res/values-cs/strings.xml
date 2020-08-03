@@ -421,7 +421,7 @@
     <string name="changeIconDialogMessage">Aplikace se může zavřít, aby aplikovala změny. Až se pokocháte svou krásnou novou ikonou, vraťte se zpátky.</string>
 
     <!-- New dashboard / menu buttons -->
-    <string name="manageWhitelist">Spravovat seznam povolených</string>
+    <string name="manageWhitelist">Nechráněné stránky</string>
     <string name="reportBrokenSite">Nahlásit nefunkční webové stránky</string>
 
     <!-- Dialogs -->
@@ -429,19 +429,19 @@
     <string name="dialogEditTitle">Upravit</string>
 
     <!-- Whitelist -->
-    <string name="whitelisetActivityTitle">Seznam povolených</string>
-    <string name="whitelistAdd">Přidat na seznam povolených</string>
-    <string name="whitelistRemove">Odebrat ze seznamu povolených</string>
-    <string name="whitelistEntryOverflowContentDescription">Další možnosti pro zápis na seznam povolených %s</string>
-    <string name="whitelistEntryDeleteConfirmMessage">Opravdu chcete smazat &lt;b&gt;%s&lt;/b&gt; ze seznamu povolených?</string>
-    <string name="whitelistExplanation">Tyto weby na seznamu povolených nebudou aktualizovány pomocí Ochrany osobních údajů</string>
-    <string name="whitelistNoEntries">Zatím žádné seznamy povolených webových stránek</string>
+    <string name="whitelisetActivityTitle">Nechráněné stránky</string>
+    <string name="enablePrivacyProtection">Povolit ochranu soukromí</string>
+    <string name="disablePrivacyProtection">Zakázat ochranu soukromí</string>
+    <string name="whitelistEntryOverflowContentDescription">Další možnosti pro nechráněný web %s</string>
+    <string name="whitelistEntryDeleteConfirmMessage">Opravdu chcete odstranit &lt;b&gt;%s&lt;/b&gt; z nechráněných stránek?</string>
+    <string name="whitelistExplanation">Tyto stránky nebudou vylepšeny ochranou soukromí.</string>
+    <string name="whitelistNoEntries">Zatím žádné nechráněné stránky</string>
     <string name="whitelistDomainHint">www.example.com</string>
     <string name="whitelistFormatError">Nelze uložit, doménu zadejte jako <b>example.com</b>
   </string>
 
     <!-- Settings -->
-    <string name="settingsPrivacyProtectionWhitelist">Seznam povolených pro ochranu osobních údajů</string>
+    <string name="settingsPrivacyProtectionWhitelist">Nechráněné stránky</string>
 
     <!-- Fireproof websites -->
     <string name="fireproofWebsitesActivityTitle">Webové stránky pro ochranu souborů</string>
