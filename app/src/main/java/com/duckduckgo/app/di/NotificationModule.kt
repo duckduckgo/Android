@@ -21,6 +21,7 @@ import android.content.Context
 import androidx.core.app.NotificationManagerCompat
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.work.WorkManager
+import com.duckduckgo.app.browser.addtohome.AddToHomeCapabilityDetector
 import com.duckduckgo.app.notification.AndroidNotificationScheduler
 import com.duckduckgo.app.notification.NotificationFactory
 import com.duckduckgo.app.notification.NotificationHandlerService
@@ -31,7 +32,6 @@ import com.duckduckgo.app.notification.model.ClearDataNotification
 import com.duckduckgo.app.notification.model.UseOurAppNotification
 import com.duckduckgo.app.notification.model.PrivacyProtectionNotification
 import com.duckduckgo.app.notification.model.WebsiteNotification
-import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.privacy.db.PrivacyProtectionCountDao
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.VariantManager
@@ -64,9 +64,11 @@ class NotificationModule {
     @Provides
     fun provideUseOurAppNotification(
         context: Context,
-        notificationDao: NotificationDao
+        notificationDao: NotificationDao,
+        settingsDataStore: SettingsDataStore,
+        addToHomeCapabilityDetector: AddToHomeCapabilityDetector
     ): UseOurAppNotification {
-        return UseOurAppNotification(context, notificationDao)
+        return UseOurAppNotification(context, notificationDao, settingsDataStore, addToHomeCapabilityDetector)
     }
 
     @Provides
@@ -156,23 +158,15 @@ class NotificationModule {
         workManager: WorkManager,
         clearDataNotification: ClearDataNotification,
         privacyProtectionNotification: PrivacyProtectionNotification,
-        @Named("dripA1Notification") dripA1Notification: WebsiteNotification,
-        @Named("dripA2Notification") dripA2Notification: WebsiteNotification,
-        @Named("dripB1Notification") dripB1Notification: AppFeatureNotification,
-        @Named("dripB2Notification") dripB2Notification: AppFeatureNotification,
-        variantManager: VariantManager,
-        stageStore: UserStageStore
+        useOurAppNotification: UseOurAppNotification,
+        variantManager: VariantManager
     ): AndroidNotificationScheduler {
         return NotificationScheduler(
             workManager,
             clearDataNotification,
             privacyProtectionNotification,
-            dripA1Notification,
-            dripA2Notification,
-            dripB1Notification,
-            dripB2Notification,
-            variantManager,
-            stageStore
+            useOurAppNotification,
+            variantManager
         )
     }
 

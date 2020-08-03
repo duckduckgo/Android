@@ -18,12 +18,12 @@ package com.duckduckgo.app.browser.shortcut
 
 import android.content.Intent
 import com.duckduckgo.app.CoroutineTestRule
-import com.duckduckgo.app.cta.db.DismissedCtaDao
-import com.duckduckgo.app.cta.model.CtaId
 import com.duckduckgo.app.global.events.db.UserEventKey
 import com.duckduckgo.app.global.events.db.UserEventsStore
-import com.duckduckgo.app.global.useourapp.UseOurAppDetector.Companion.USE_OUR_APP_SHORTCUT_URL
+import com.duckduckgo.app.global.useourapp.UseOurAppDetector
 import com.duckduckgo.app.runBlocking
+import com.duckduckgo.app.statistics.Variant
+import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.never
@@ -42,19 +42,25 @@ class ShortcutReceiverTest {
 
     private val mockUserEventsStore: UserEventsStore = mock()
     private val mockPixel: Pixel = mock()
-    private val mockDismissedCtaDao: DismissedCtaDao = mock()
+    private val mockVariantManager: VariantManager = mock()
     private lateinit var testee: ShortcutReceiver
 
     @Before
     fun before() {
-        testee = ShortcutReceiver(mockUserEventsStore, mockDismissedCtaDao, coroutinesTestRule.testDispatcherProvider, mockPixel)
+        testee = ShortcutReceiver(
+            mockUserEventsStore,
+            coroutinesTestRule.testDispatcherProvider,
+            UseOurAppDetector(mockUserEventsStore),
+            mockVariantManager,
+            mockPixel
+        )
     }
 
     @Test
-    fun whenIntentReceivedIfUrlIsFromUseOurAppUrlThenRegisterTimestamp() = coroutinesTestRule.runBlocking {
-        givenUseOurAppCtaHasBeenSeen()
+    fun whenIntentReceivedIfUrlIsFromUseOurAppDomainAndVariantIsInAppUsageThenRegisterTimestamp() = coroutinesTestRule.runBlocking {
+        setInAppUsageVariant()
         val intent = Intent()
-        intent.putExtra(ShortcutBuilder.SHORTCUT_URL_ARG, USE_OUR_APP_SHORTCUT_URL)
+        intent.putExtra(ShortcutBuilder.SHORTCUT_URL_ARG, "https://facebook.com")
         intent.putExtra(ShortcutBuilder.SHORTCUT_TITLE_ARG, "Title")
         testee.onReceive(null, intent)
 
@@ -62,10 +68,21 @@ class ShortcutReceiverTest {
     }
 
     @Test
-    fun whenIntentReceivedIfUrlIsFromUseOurAppUrlThenFirePixel() {
-        givenUseOurAppCtaHasBeenSeen()
+    fun whenIntentReceivedIfUrlIsFromUseOurAppDomainAndVariantIsNotInAppUsageThenDoNotRegisterTimestamp() = coroutinesTestRule.runBlocking {
+        setDefaultVariant()
         val intent = Intent()
-        intent.putExtra(ShortcutBuilder.SHORTCUT_URL_ARG, USE_OUR_APP_SHORTCUT_URL)
+        intent.putExtra(ShortcutBuilder.SHORTCUT_URL_ARG, "https://facebook.com")
+        intent.putExtra(ShortcutBuilder.SHORTCUT_TITLE_ARG, "Title")
+        testee.onReceive(null, intent)
+
+        verify(mockUserEventsStore, never()).registerUserEvent(UserEventKey.USE_OUR_APP_SHORTCUT_ADDED)
+    }
+
+    @Test
+    fun whenIntentReceivedIfUrlContainsUseOurAppDomainThenFirePixel() {
+        setDefaultVariant()
+        val intent = Intent()
+        intent.putExtra(ShortcutBuilder.SHORTCUT_URL_ARG, "https://facebook.com")
         intent.putExtra(ShortcutBuilder.SHORTCUT_TITLE_ARG, "Title")
         testee.onReceive(null, intent)
 
@@ -73,8 +90,8 @@ class ShortcutReceiverTest {
     }
 
     @Test
-    fun whenIntentReceivedIfUrlIsNotFromUseOurAppUrlThenDoNotRegisterEvent() = coroutinesTestRule.runBlocking {
-        givenUseOurAppCtaHasBeenSeen()
+    fun whenIntentReceivedIfUrlIsNotFromUseOurAppDomainThenDoNotRegisterEvent() = coroutinesTestRule.runBlocking {
+        setDefaultVariant()
         val intent = Intent()
         intent.putExtra(ShortcutBuilder.SHORTCUT_URL_ARG, "www.example.com")
         intent.putExtra(ShortcutBuilder.SHORTCUT_TITLE_ARG, "Title")
@@ -84,7 +101,8 @@ class ShortcutReceiverTest {
     }
 
     @Test
-    fun whenIntentReceivedIfUrlIsNotFromUseOurAppUrlThenFireShortcutAddedPixel() {
+    fun whenIntentReceivedIfUrlIsNotFromUseOurAppDomainThenFireShortcutAddedPixel() {
+        setDefaultVariant()
         val intent = Intent()
         intent.putExtra(ShortcutBuilder.SHORTCUT_URL_ARG, "www.example.com")
         intent.putExtra(ShortcutBuilder.SHORTCUT_TITLE_ARG, "Title")
@@ -93,19 +111,20 @@ class ShortcutReceiverTest {
         verify(mockPixel).fire(Pixel.PixelName.SHORTCUT_ADDED)
     }
 
-    @Test
-    fun whenIntentReceivedAndCtaNotSeenIfUrlIsFromUseOurAppUrlThenDoNotFireUseOurAppPixelAndFireShortcutPixel() = coroutinesTestRule.runBlocking {
-        val intent = Intent()
-        intent.putExtra(ShortcutBuilder.SHORTCUT_URL_ARG, USE_OUR_APP_SHORTCUT_URL)
-
-        intent.putExtra(ShortcutBuilder.SHORTCUT_TITLE_ARG, "Title")
-        testee.onReceive(null, intent)
-
-        verify(mockPixel, never()).fire(Pixel.PixelName.USE_OUR_APP_SHORTCUT_ADDED)
-        verify(mockPixel).fire(Pixel.PixelName.SHORTCUT_ADDED)
+    private fun setDefaultVariant() {
+        whenever(mockVariantManager.getVariant()).thenReturn(VariantManager.DEFAULT_VARIANT)
     }
 
-    private fun givenUseOurAppCtaHasBeenSeen() {
-        whenever(mockDismissedCtaDao.exists(CtaId.USE_OUR_APP)).thenReturn(true)
+    private fun setInAppUsageVariant() {
+        whenever(mockVariantManager.getVariant()).thenReturn(
+            Variant(
+                "test",
+                features = listOf(
+                    VariantManager.VariantFeature.InAppUsage,
+                    VariantManager.VariantFeature.RemoveDay1AndDay3Notifications,
+                    VariantManager.VariantFeature.KillOnboarding
+                ),
+                filterBy = { true })
+        )
     }
 }
