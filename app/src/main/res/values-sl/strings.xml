@@ -427,7 +427,7 @@
     <string name="changeIconDialogMessage">Aplikacija se bo mogoče zaprla, da izvede spremembe. Vrnite se na aplikacijo potem, ko se vam prikaže vaša privlačna nova ikona.</string>
 
     <!-- New dashboard / menu buttons -->
-    <string name="manageWhitelist">Uredi beli seznam</string>
+    <string name="manageWhitelist">Nezaščitene strani</string>
     <string name="reportBrokenSite">Prijavi nedelujočo stran</string>
 
     <!-- Dialogs -->
@@ -435,19 +435,18 @@
     <string name="dialogEditTitle">Uredi</string>
 
     <!-- Whitelist -->
-    <string name="whitelisetActivityTitle">Beli seznam</string>
-    <string name="enablePrivacyProtection">Dodaj na beli seznam</string>
-    <string name="disablePrivacyProtection">Odstrani z belega seznama</string>
-    <string name="whitelistEntryOverflowContentDescription">Več možnosti za vnašanje na beli seznam %s</string>
-    <string name="whitelistEntryDeleteConfirmMessage">Ste prepričani, da želite ta naslov izbrisati &lt;b&gt;%s&lt;/b&gt; z belega seznama?</string>
-    <string name="whitelistExplanation">Naslednje strani na belem seznamu ne bodo nadgrajene z zaščito zasebnosti.</string>
-    <string name="whitelistNoEntries">Na belem seznamu še ni nobene strani</string>
+    <string name="whitelisetActivityTitle">Nezaščitene strani</string>
+    <string name="enablePrivacyProtection">Omogoči zaščito zasebnosti</string>
+    <string name="disablePrivacyProtection">Onemogoči zaščito zasebnosti</string>
+    <string name="whitelistEntryOverflowContentDescription">Več možnosti za nezaščiteno stran %s</string>
+    <string name="whitelistEntryDeleteConfirmMessage">Ali si prepričan/​a, da želite odstraniti &lt;b&gt;%s&lt;/b&gt; z nezaščitenih spletnih strani?</string>
+    <string name="whitelistExplanation">Varnost teh strani se z zaščito zasebnosti ne bo izboljšala.</string>
+    <string name="whitelistNoEntries">Zaenkrat ni nezaščitenih strani</string>
     <string name="whitelistDomainHint">www.example.com</string>
-    <string name="whitelistFormatError">Shranjevanje ni bilo mogoče, vnesite domeno, kot na primer <b>example.com</b>
-  </string>
+    <string name="whitelistFormatError">Shranjevanje ni bilo mogoče, vnesite domeno, kot na primer <b>example.com</b></string>
 
     <!-- Settings -->
-    <string name="settingsPrivacyProtectionWhitelist">Beli seznam za zaščito zasebnosti</string>
+    <string name="settingsPrivacyProtectionWhitelist">Nezaščitene strani</string>
 
     <!-- Fireproof websites -->
     <string name="fireproofWebsitesActivityTitle">Spletne stran s požarno zaščito</string>

@@ -22,6 +22,7 @@ import androidx.lifecycle.MutableLiveData
 import com.duckduckgo.app.browser.tabpreview.WebViewPreviewPersister
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.global.model.SiteFactory
+import com.duckduckgo.app.global.useourapp.UseOurAppDetector
 import com.duckduckgo.app.tabs.db.TabsDao
 import io.reactivex.Scheduler
 import io.reactivex.schedulers.Schedulers
@@ -36,7 +37,8 @@ import javax.inject.Singleton
 class TabDataRepository @Inject constructor(
     private val tabsDao: TabsDao,
     private val siteFactory: SiteFactory,
-    private val webViewPreviewPersister: WebViewPreviewPersister
+    private val webViewPreviewPersister: WebViewPreviewPersister,
+    private val useOurAppDetector: UseOurAppDetector
 ) : TabRepository {
 
     override val liveTabs: LiveData<List<TabEntity>> = tabsDao.liveTabs()
@@ -86,7 +88,13 @@ class TabDataRepository @Inject constructor(
     }
 
     override suspend fun selectByUrlOrNewTab(url: String) {
-        val tabId = tabsDao.selectTabByUrl(url)
+        val query = if (useOurAppDetector.isUseOurAppUrl(url)) {
+            UseOurAppDetector.USE_OUR_APP_DOMAIN_QUERY
+        } else {
+            url
+        }
+
+        val tabId = tabsDao.selectTabByUrl(query)
         if (tabId != null) {
             select(tabId)
         } else {

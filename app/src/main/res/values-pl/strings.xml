@@ -427,7 +427,7 @@
     <string name="changeIconDialogMessage">Aplikacja może się zamknąć, aby zastosować zmiany. Wróć po podziwianiu swojej pięknej nowej ikony.</string>
 
     <!-- New dashboard / menu buttons -->
-    <string name="manageWhitelist">Zarządzaj białą listą</string>
+    <string name="manageWhitelist">Niezabezpieczone witryny</string>
     <string name="reportBrokenSite">Zgłoś uszkodzoną witrynę</string>
 
     <!-- Dialogs -->
@@ -435,19 +435,18 @@
     <string name="dialogEditTitle">Edytuj</string>
 
     <!-- Whitelist -->
-    <string name="whitelisetActivityTitle">Biała lista</string>
-    <string name="enablePrivacyProtection">Dodaj do białej listy</string>
-    <string name="disablePrivacyProtection">Usuń z białej listy</string>
-    <string name="whitelistEntryOverflowContentDescription">Więcej opcji wpisu na białej liście %s</string>
-    <string name="whitelistEntryDeleteConfirmMessage">Czy na pewno chcesz usunąć &lt;b&gt;%s&lt;/b&gt; z białej listy?</string>
-    <string name="whitelistExplanation">Te witryny z białej listy nie zostaną zaktualizowane przez Ochronę prywatności</string>
-    <string name="whitelistNoEntries">Brak stron z białej listy</string>
+    <string name="whitelisetActivityTitle">Niezabezpieczone witryny</string>
+    <string name="enablePrivacyProtection">Włącz ochronę prywatności</string>
+    <string name="disablePrivacyProtection">Wyłącz ochronę prywatności</string>
+    <string name="whitelistEntryOverflowContentDescription">Więcej opcji dla niezabezpieczonej witryny %s</string>
+    <string name="whitelistEntryDeleteConfirmMessage">Na pewno usunąć &lt;b&gt;%s&lt;/b&gt; z niezabezpieczonych witryn?</string>
+    <string name="whitelistExplanation">Te witryny nie będą ulepszane przez ochronę prywatności.</string>
+    <string name="whitelistNoEntries">Nie ma jeszcze niezabezpieczonych witryn</string>
     <string name="whitelistDomainHint">www.example.com</string>
-    <string name="whitelistFormatError">Nie można zapisać, wprowadź domenę taką jak <b>example.com</b>
-  </string>
+    <string name="whitelistFormatError">Nie można zapisać, wprowadź domenę taką jak <b>example.com</b></string>
 
     <!-- Settings -->
-    <string name="settingsPrivacyProtectionWhitelist">Biała lista ochrony prywatności</string>
+    <string name="settingsPrivacyProtectionWhitelist">Niezabezpieczone witryny</string>
 
     <!-- Fireproof websites -->
     <string name="fireproofWebsitesActivityTitle">Bezpieczne strony internetowe</string>

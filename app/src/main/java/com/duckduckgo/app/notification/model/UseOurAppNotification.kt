@@ -19,16 +19,20 @@ package com.duckduckgo.app.notification.model
 import android.content.Context
 import android.os.Bundle
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.browser.addtohome.AddToHomeCapabilityDetector
 import com.duckduckgo.app.notification.NotificationHandlerService
 import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEvent.CANCEL
 import com.duckduckgo.app.notification.NotificationRegistrar
 import com.duckduckgo.app.notification.db.NotificationDao
+import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import timber.log.Timber
 
 class UseOurAppNotification(
     private val context: Context,
-    private val notificationDao: NotificationDao
+    private val notificationDao: NotificationDao,
+    private val settingsDataStore: SettingsDataStore,
+    private val addToHomeCapabilityDetector: AddToHomeCapabilityDetector
 ) : SchedulableNotification {
 
     override val id = ID
@@ -36,7 +40,7 @@ class UseOurAppNotification(
     override val cancelIntent = CANCEL
 
     override suspend fun canShow(): Boolean {
-        if (notificationDao.exists(id)) {
+        if (notificationDao.exists(id) || settingsDataStore.hideTips || !addToHomeCapabilityDetector.isAddToHomeSupported()) {
             Timber.v("Notification already seen")
             return false
         }

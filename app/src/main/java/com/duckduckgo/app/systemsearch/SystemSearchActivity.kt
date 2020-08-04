@@ -129,7 +129,7 @@ class SystemSearchActivity : DuckDuckGoActivity() {
                 viewModel.userSubmittedAutocompleteResult(it.phrase)
             },
             editableSearchClickListener = {
-                viewModel.userUpdatedQuery(it.phrase)
+                viewModel.onUserSelectedToEditQuery(it.phrase)
             }
         )
         autocompleteSuggestions.adapter = autocompleteSuggestionsAdapter
@@ -222,7 +222,15 @@ class SystemSearchActivity : DuckDuckGoActivity() {
             is DismissKeyboard -> {
                 omnibarTextInput.hideKeyboard()
             }
+            is EditQuery -> {
+                editQuery(command.query)
+            }
         }
+    }
+
+    private fun editQuery(query: String) {
+        omnibarTextInput.setText(query)
+        omnibarTextInput.setSelection(query.length)
     }
 
     private fun launchDuckDuckGo() {
