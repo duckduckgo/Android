@@ -72,9 +72,9 @@ class PulseAnimation {
 
         val highlightImageView = ImageView(targetView.context)
         highlightImageView.id = View.generateViewId()
-        highlightImageView.setImageResource(R.drawable.ic_circle)
+        highlightImageView.setImageResource(R.drawable.ic_circle_pulse)
         val layoutParams = FrameLayout.LayoutParams(targetView.width, targetView.height, Gravity.CENTER)
-        (targetView.parent as ViewGroup).addView(highlightImageView, layoutParams)
+        (targetView.parent as ViewGroup).addView(highlightImageView, 0, layoutParams)
         return highlightImageView
     }
 
