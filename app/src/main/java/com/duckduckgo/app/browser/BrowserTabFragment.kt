@@ -239,6 +239,8 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
 
     private var loginDetectionDialog: AlertDialog? = null
 
+    private val pulseAnimation = PulseAnimation()
+
     override fun onAttach(context: Context) {
         AndroidSupportInjection.inject(this)
         super.onAttach(context)
@@ -1046,6 +1048,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
     }
 
     override fun onDestroy() {
+        pulseAnimation.stop()
         animatorHelper.removeListener()
         supervisorJob.cancel()
         popupMenu.dismiss()
@@ -1303,6 +1306,16 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
             tabsButton?.isVisible = viewState.showTabsButton
             fireMenuButton?.isVisible = viewState.showFireButton
             menuButton?.isVisible = viewState.showMenuButton
+
+            if (viewState.showFireButton) {
+                playPulseAnimation()
+            }
+        }
+
+        private fun playPulseAnimation() {
+            toolbarContainer.doOnLayout {
+                pulseAnimation.playOn(fireIconImageView)
+            }
         }
 
         private fun decorateToolbarWithButtons() {
