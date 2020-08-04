@@ -21,15 +21,21 @@ import android.content.Context
 import android.content.Intent
 import android.net.VpnService
 import android.os.Binder
+import android.os.Build
 import android.os.IBinder
+import android.os.ParcelFileDescriptor
 import kotlinx.coroutines.*
 import timber.log.Timber
+import java.nio.channels.DatagramChannel
 import java.util.concurrent.TimeUnit
 
 
-class PassthroughVpnService : VpnService(), CoroutineScope by MainScope() {
+class PassthroughVpnService : VpnService(), CoroutineScope by MainScope(), DatagramChannelCreator {
 
+    private var tunInterface: ParcelFileDescriptor? = null
     private val binder: VpnServiceBinder = VpnServiceBinder()
+
+    val deviceToNetworkPacketProcessor = DeviceToNetworkPacketProcessor(createDatagram())
 
     inner class VpnServiceBinder : Binder() {
 
@@ -75,25 +81,65 @@ class PassthroughVpnService : VpnService(), CoroutineScope by MainScope() {
 
     private fun startVpn() {
         Timber.i("Starting VPN")
-        startForeground(FOREGROUND_VPN_SERVICE_ID, VpnNotificationBuilder.build(this))
-        running = true
-
         tickerJob?.cancel()
-        tickerJob = launch {
-            val startTime = System.currentTimeMillis()
-            while (true) {
-                Timber.v("VPN service running for ${TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis() - startTime)} seconds")
-                delay(1000)
+
+        establishVpnInterface()
+
+        tunInterface?.let { vpnInterface ->
+            running = true
+            startForeground(FOREGROUND_VPN_SERVICE_ID, VpnNotificationBuilder.build(this))
+            startStatTicker()
+
+            val packetHandler = PacketHandler(deviceToNetworkPacketProcessor)
+            GlobalScope.launch {
+                TunPacketProcessor(vpnInterface, packetHandler).run()
             }
         }
     }
 
+    private fun startStatTicker() {
+//        tickerJob = launch {
+//            val startTime = System.currentTimeMillis()
+//            while (true) {
+//                Timber.v("VPN service running for ${TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis() - startTime)} seconds")
+//                delay(1000)
+//            }
+//        }
+    }
+
+    private fun establishVpnInterface() {
+        tunInterface = Builder().run {
+            addAddress("192.168.0.2", 32)
+            addRoute("0.0.0.0", 0)
+            addDnsServer("8.8.8.8")
+            configureMeteredConnection()
+            establish()
+        }
+    }
+
+
     private fun stopVpn() {
         Timber.i("Stopping VPN")
-        running = false
         tickerJob?.cancel()
+        tunInterface?.close()
+        tunInterface = null
         stopForeground(true)
+
+
         stopSelf()
+        running = false
+    }
+
+    private fun VpnService.Builder.configureMeteredConnection() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            setMetered(false)
+        }
+    }
+
+    override fun onRevoke() {
+        super.onRevoke()
+        Timber.w("VPN onRevoke called")
+        stopVpn()
     }
 
     companion object {
@@ -120,6 +166,20 @@ class PassthroughVpnService : VpnService(), CoroutineScope by MainScope() {
         private const val ACTION_STOP_VPN = "ACTION_STOP_VPN"
 
         const val FOREGROUND_VPN_SERVICE_ID = 200
-
     }
+
+    override fun createDatagram(): DatagramChannel {
+        return DatagramChannel.open().also { datagramChannel ->
+            datagramChannel.configureBlocking(false)
+            datagramChannel.socket().also { socket ->
+                socket.soTimeout = 0
+                protect(socket)
+            }
+        }
+    }
+
+}
+
+interface DatagramChannelCreator {
+    fun createDatagram(): DatagramChannel
 }
