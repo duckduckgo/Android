@@ -18,47 +18,53 @@ package com.duckduckgo.app.browser.downloader
 
 import android.webkit.URLUtil
 import androidx.core.net.toUri
-import com.duckduckgo.app.browser.downloader.FilenameExtractor.GuessQuality.*
-import timber.log.Timber
+import com.duckduckgo.app.browser.downloader.FilenameExtractor.GuessQuality.NotGoodEnough
+import com.duckduckgo.app.browser.downloader.FilenameExtractor.GuessQuality.TriedAllOptions
 import javax.inject.Inject
 
 class FilenameExtractor @Inject constructor() {
 
     fun extract(url: String, contentDisposition: String?, mimeType: String?): String {
         val firstGuess = guessFromUrl(url, contentDisposition, mimeType)
+        val guesses = Guesses(bestGuess = null, latestGuess = firstGuess)
+        val baseUrl = url.toUri().host ?: ""
         var pathSegments = pathSegments(url)
-        var bestGuess = firstGuess
 
-        while (true) {
-
-            when (determineGuessQuality(bestGuess, pathSegments)) {
-                is GoodEnough -> return bestGuess
-                is OutOfOptions -> return firstGuess
-                is NotGoodEnough -> {
-                    pathSegments = pathSegments.dropLast(1)
-                    bestGuess = guessFromUrl(pathSegments.rebuildUrl(), contentDisposition, mimeType)
-                }
-            }
-
+        while (evaluateGuessQuality(guesses, pathSegments) != TriedAllOptions) {
+            pathSegments = pathSegments.dropLast(1)
+            guesses.latestGuess = guessFromUrl(baseUrl + "/" + pathSegments.rebuildUrl(), contentDisposition, mimeType)
         }
+        return guesses.bestGuess ?: guesses.latestGuess
+
     }
 
-    private fun determineGuessQuality(guess: String, pathSegments: List<String>): GuessQuality {
-        Timber.v("Best guess is now $guess")
+    private fun evaluateGuessQuality(guesses: Guesses, pathSegments: List<String>): GuessQuality {
+        val latestGuess = guesses.latestGuess
 
-        if (!guess.endsWith(DEFAULT_FILE_TYPE)) return GoodEnough
-        if (pathSegments.isEmpty()) return OutOfOptions
+        // if it contains a '.' then it's a good chance of a filetype and we can update our best guess
+        if (latestGuess.contains(".")) {
+            guesses.bestGuess = latestGuess
+        }
+
+        if (pathSegments.isEmpty()) return TriedAllOptions
 
         return NotGoodEnough
     }
 
     private fun guessFromUrl(url: String, contentDisposition: String?, mimeType: String?): String {
-        return URLUtil.guessFileName(url, contentDisposition, mimeType)
+        val tidiedUrl = url.removeSuffix("/")
+        var guessedFilename = URLUtil.guessFileName(tidiedUrl, contentDisposition, mimeType)
+
+        // we only want to keep the default .bin filetype on the guess if the URL actually has that too
+        if (guessedFilename.endsWith(DEFAULT_FILE_TYPE) && !tidiedUrl.endsWith(DEFAULT_FILE_TYPE)) {
+            guessedFilename = guessedFilename.removeSuffix(DEFAULT_FILE_TYPE)
+        }
+
+        return guessedFilename
     }
 
     private fun pathSegments(url: String): List<String> {
-        val uri = url.toUri()
-        return uri.pathSegments ?: emptyList()
+        return url.toUri().pathSegments ?: emptyList()
     }
 
     private fun List<String>.rebuildUrl(): String {
@@ -70,9 +76,10 @@ class FilenameExtractor @Inject constructor() {
     }
 
     sealed class GuessQuality {
-        object GoodEnough : GuessQuality()
         object NotGoodEnough : GuessQuality()
-        object OutOfOptions : GuessQuality()
+        object TriedAllOptions : GuessQuality()
     }
+
+    data class Guesses(var latestGuess: String, var bestGuess: String? = null)
 
 }

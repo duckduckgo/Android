@@ -69,8 +69,26 @@ class UriUtilsFilenameExtractorTest {
     }
 
     @Test
-    fun whenFilenameActuallyEndsInBinThenThatIsExtracted() {
+    fun whenFilenameEndsInBinThenThatIsExtracted() {
         val url = "https://example.com/realFilename.bin"
+        val mimeType: String? = null
+        val contentDisposition: String? = null
+        val extracted = testee.extract(url, contentDisposition, mimeType)
+        assertEquals("realFilename.bin", extracted)
+    }
+
+    @Test
+    fun whenFilenameEndsInBinWithASlashThenThatIsExtracted() {
+        val url = "https://example.com/realFilename.bin/"
+        val mimeType: String? = null
+        val contentDisposition: String? = null
+        val extracted = testee.extract(url, contentDisposition, mimeType)
+        assertEquals("realFilename.bin", extracted)
+    }
+
+    @Test
+    fun whenFilenameContainsBinThenThatIsExtracted() {
+        val url = "https://example.com/realFilename.bin/foo/bar"
         val mimeType: String? = null
         val contentDisposition: String? = null
         val extracted = testee.extract(url, contentDisposition, mimeType)
@@ -83,7 +101,7 @@ class UriUtilsFilenameExtractorTest {
         val mimeType: String? = null
         val contentDisposition: String? = null
         val extracted = testee.extract(url, contentDisposition, mimeType)
-        assertEquals("downloadfile.bin", extracted)
+        assertEquals("downloadfile", extracted)
     }
 
     @Test
