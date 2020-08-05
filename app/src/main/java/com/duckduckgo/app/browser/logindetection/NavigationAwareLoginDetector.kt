@@ -91,7 +91,6 @@ class NextPageLoginDetection @Inject constructor() : NavigationAwareLoginDetecto
         }
     }
 
-    @Suppress("NULLABILITY_MISMATCH_BASED_ON_JAVA_ANNOTATIONS")
     private fun detectLogin(forwardedToUrl: String) {
         val loginAttemptEvent = loginAttempt ?: return
         val loginURI = Uri.parse(loginAttemptEvent.url).takeUnless { it.host.isNullOrBlank() } ?: return
@@ -99,7 +98,13 @@ class NextPageLoginDetection @Inject constructor() : NavigationAwareLoginDetecto
 
         Timber.i("LoginDetectionDelegate ${loginAttemptEvent.url} vs $forwardedToUrl")
         if (loginURI.host != forwardedToUri.host || loginURI.path != forwardedToUri.path) {
-            loginEventLiveData.value = LoginDetected(loginURI.host, forwardedToUri.host)
+            val loginUriHost = loginURI.host
+            val forwardedToUriHost = forwardedToUri.host
+
+            if (loginUriHost != null && forwardedToUriHost != null) {
+                loginEventLiveData.value = LoginDetected(loginUriHost, forwardedToUriHost)
+            }
+
             loginAttempt = null
         }
     }
