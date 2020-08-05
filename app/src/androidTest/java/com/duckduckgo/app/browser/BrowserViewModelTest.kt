@@ -121,16 +121,18 @@ class BrowserViewModelTest {
 
     @Test
     fun whenNewTabRequestedThenTabAddedToRepository() = runBlocking<Unit> {
+        whenever(mockTabRepository.liveSelectedTab).doReturn(MutableLiveData())
         testee.onNewTabRequested()
-        verify(mockTabRepository).add()
+        verify(mockTabRepository).addWithSource()
     }
 
     @Test
     fun whenOpenInNewTabRequestedThenTabAddedToRepository() = runBlocking<Unit> {
         val url = "http://example.com"
         whenever(mockOmnibarEntryConverter.convertQueryToUrl(url)).thenReturn(url)
+        whenever(mockTabRepository.liveSelectedTab).doReturn(MutableLiveData())
         testee.onOpenInNewTabRequested(url)
-        verify(mockTabRepository).add(url)
+        verify(mockTabRepository).addWithSource(url)
     }
 
     @Test
