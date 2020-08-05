@@ -83,7 +83,7 @@ class TabDataRepository @Inject constructor(
         return data
     }
 
-    override suspend fun add(tabId: String, data: MutableLiveData<Site>, skipHome: Boolean, isDefaultTab: Boolean, sourceTabId: String?) {
+    private fun add(tabId: String, data: MutableLiveData<Site>, skipHome: Boolean, isDefaultTab: Boolean, sourceTabId: String? = null) {
         siteData[tabId] = data
         databaseExecutor().scheduleDirect {
 
