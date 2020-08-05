@@ -78,6 +78,15 @@ class UriUtilsFilenameExtractorTest {
     }
 
     @Test
+    fun whenUrlContainsNoFileNameButLotsOfPathsSegmentsThenFirstSegmentNameIsUsed() {
+        val url = "https://example.com/foo/bar/files"
+        val mimeType: String? = null
+        val contentDisposition: String? = null
+        val extracted = testee.extract(url, contentDisposition, mimeType)
+        assertEquals("foo", extracted)
+    }
+
+    @Test
     fun whenFilenameEndsInBinWithASlashThenThatIsExtracted() {
         val url = "https://example.com/realFilename.bin/"
         val mimeType: String? = null

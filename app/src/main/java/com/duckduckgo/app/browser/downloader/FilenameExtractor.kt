@@ -20,6 +20,7 @@ import android.webkit.URLUtil
 import androidx.core.net.toUri
 import com.duckduckgo.app.browser.downloader.FilenameExtractor.GuessQuality.NotGoodEnough
 import com.duckduckgo.app.browser.downloader.FilenameExtractor.GuessQuality.TriedAllOptions
+import timber.log.Timber
 import javax.inject.Inject
 
 class FilenameExtractor @Inject constructor() {
@@ -46,7 +47,7 @@ class FilenameExtractor @Inject constructor() {
             guesses.bestGuess = latestGuess
         }
 
-        if (pathSegments.isEmpty()) return TriedAllOptions
+        if (pathSegments.size < 2) return TriedAllOptions
 
         return NotGoodEnough
     }
@@ -60,6 +61,7 @@ class FilenameExtractor @Inject constructor() {
             guessedFilename = guessedFilename.removeSuffix(DEFAULT_FILE_TYPE)
         }
 
+        Timber.v("From URL [$url], guessed [$guessedFilename]")
         return guessedFilename
     }
 
