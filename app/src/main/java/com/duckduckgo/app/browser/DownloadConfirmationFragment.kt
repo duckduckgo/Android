@@ -27,6 +27,7 @@ import androidx.core.content.FileProvider.getUriForFile
 import com.duckduckgo.app.browser.downloader.FileDownloader
 import com.duckduckgo.app.browser.downloader.FileDownloader.FileDownloadListener
 import com.duckduckgo.app.browser.downloader.FileDownloader.PendingFileDownload
+import com.duckduckgo.app.browser.downloader.FilenameExtractor
 import com.duckduckgo.app.browser.downloader.guessFileName
 import com.duckduckgo.app.browser.downloader.isDataUrl
 import com.duckduckgo.app.global.view.gone
@@ -45,6 +46,9 @@ class DownloadConfirmationFragment : BottomSheetDialogFragment() {
 
     @Inject
     lateinit var downloader: FileDownloader
+
+    @Inject
+    lateinit var filenameExtractor: FilenameExtractor
 
     lateinit var downloadListener: FileDownloadListener
 
@@ -67,7 +71,7 @@ class DownloadConfirmationFragment : BottomSheetDialogFragment() {
     }
 
     private fun setupDownload() {
-        file = if (!pendingDownload.isDataUrl) File(pendingDownload.directory, pendingDownload.guessFileName()) else null
+        file = if (!pendingDownload.isDataUrl) File(pendingDownload.directory, pendingDownload.guessFileName(filenameExtractor)) else null
     }
 
     private fun setupViews(view: View) {

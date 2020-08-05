@@ -27,7 +27,8 @@ import javax.inject.Inject
 
 class FileDownloader @Inject constructor(
     private val dataUriDownloader: DataUriDownloader,
-    private val networkFileDownloader: NetworkFileDownloader
+    private val networkFileDownloader: NetworkFileDownloader,
+    private val filenameExtractor: FilenameExtractor
 ) {
 
     @WorkerThread
@@ -57,8 +58,8 @@ class FileDownloader @Inject constructor(
     }
 }
 
-fun FileDownloader.PendingFileDownload.guessFileName(): String {
-    val guessedFileName = URLUtil.guessFileName(url, contentDisposition, mimeType)
+fun FileDownloader.PendingFileDownload.guessFileName(filenameExtractor: FilenameExtractor): String {
+    val guessedFileName = filenameExtractor.extract(url, contentDisposition, mimeType)
     Timber.i("Guessed filename of $guessedFileName for url $url")
     return guessedFileName
 }
