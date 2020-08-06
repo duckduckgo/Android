@@ -77,7 +77,7 @@ abstract class TabsDao {
 
     @Transaction
     open fun deleteTabAndUpdateSelection(tab: TabEntity) {
-        deleteTabAndClearTabRefs(tab)
+        deleteTab(tab)
 
         if (selectedTab() != null) {
             return
@@ -90,7 +90,7 @@ abstract class TabsDao {
 
     @Transaction
     open fun deleteTabAndUpdateSelection(tab: TabEntity, newSelectedTab: TabEntity? = null) {
-        deleteTabAndClearTabRefs(tab)
+        deleteTab(tab)
 
         if (newSelectedTab != null) {
             insertTabSelection(TabSelectionEntity(tabId = newSelectedTab.tabId))
@@ -113,11 +113,6 @@ abstract class TabsDao {
     open fun insertTabAtPosition(tab: TabEntity) {
         incrementPositionStartingAt(tab.position)
         insertTab(tab)
-    }
-
-    private fun deleteTabAndClearTabRefs(tab: TabEntity) {
-        deleteTab(tab)
-        updateSourceTabIdRefs(tab.tabId)
     }
 
     fun lastTab(): TabEntity? {
