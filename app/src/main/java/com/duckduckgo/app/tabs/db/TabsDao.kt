@@ -65,9 +65,6 @@ abstract class TabsDao {
     @Query("update tabs set position = position + 1 where position >= :position")
     abstract fun incrementPositionStartingAt(position: Int)
 
-    @Query("update tabs set sourceTabId = null where sourceTabId = :removedTabId")
-    abstract fun updateSourceTabIdRefs(removedTabId: String)
-
     @Transaction
     open fun addAndSelectTab(tab: TabEntity) {
         deleteBlankTabs()
