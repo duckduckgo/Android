@@ -26,6 +26,7 @@ import androidx.fragment.app.DialogFragment
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.faviconLocation
 import com.duckduckgo.app.global.image.GlideApp
+import com.duckduckgo.app.global.view.website
 import org.jetbrains.anko.find
 
 class SystemLocationPermissionDialog : DialogFragment() {
@@ -43,7 +44,7 @@ class SystemLocationPermissionDialog : DialogFragment() {
 
         val rootView = layoutInflater.inflate(R.layout.content_system_location_permission_dialog, null)
 
-        val title = rootView.find<TextView>(R.id.systemPermissionDialogTitle)
+        val subtitle = rootView.find<TextView>(R.id.systemPermissionDialogSubtitle)
         val favicon = rootView.find<ImageView>(R.id.faviconImage)
         val allowLocationPermission = rootView.find<TextView>(R.id.allowLocationPermission)
         val denyLocationPermission = rootView.find<TextView>(R.id.denyLocationPermission)
@@ -53,7 +54,7 @@ class SystemLocationPermissionDialog : DialogFragment() {
             .setView(rootView)
 
         validateBundleArguments()
-        populateTitle(title)
+        populateSubtitle(subtitle)
         populateFavicon(favicon)
         configureListeners(allowLocationPermission, denyLocationPermission, neverAllowLocationPermission)
 
@@ -68,10 +69,11 @@ class SystemLocationPermissionDialog : DialogFragment() {
         }
     }
 
-    private fun populateTitle(title: TextView) {
-        arguments?.let { _ ->
-            val dialogTitle = getString(R.string.preciseLocationSystemDialogTitle)
-            title.text = dialogTitle
+    private fun populateSubtitle(view: TextView) {
+        arguments?.let { args ->
+            val originUrl = args.getString(KEY_REQUEST_ORIGIN).website()
+            val subtitle = getString(R.string.preciseLocationSystemDialogSubtitle, originUrl, originUrl)
+            view.text = subtitle
         }
     }
 

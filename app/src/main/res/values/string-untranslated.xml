@@ -52,8 +52,8 @@
     <string name="useOurAppDeletionDialogText">Checking your feed in DuckDuckGo is a great alternative to using the Facebook app!&lt;br/&gt;&lt;br/&gt;But if the Facebook app is on your phone, it can make requests for data even when you\'re not using it.&lt;br/&gt;&lt;br/&gt;Prevent this by deleting it now!</string>
 
     <!-- Precise Location -->
-    <string name="preciseLocationSystemDialogTitle">Enable location services for DuckDuckGo Privacy Browser?</string>
-    <string name="preciseLocationSystemDialogSubtitle">This site is requesting your device location. You\'ll first need to allow the app to send your device location, then the site can ask permission.</string>
+    <string name="preciseLocationSystemDialogTitle">Enable device location for DuckDuckGo Privacy Browser?</string>
+    <string name="preciseLocationSystemDialogSubtitle">%s is requesting your device location. You\'ll first need to allow the app to send your device location, then %s can ask permission.</string>
     <string name="preciseLocationSystemDialogAllow">Enable</string>
     <string name="preciseLocationSystemDialogDeny">Maybe Later</string>
     <string name="preciseLocationSystemDialogNeverAllow">Don\'t Ask Again for this Site</string>
