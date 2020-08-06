@@ -66,7 +66,7 @@ abstract class TabsDao {
     abstract fun incrementPositionStartingAt(position: Int)
 
     @Query("update tabs set sourceTabId = null where sourceTabId = :removedTabId")
-    abstract fun updateChildTabSourceTabId(removedTabId: String)
+    abstract fun updateSourceTabIdRefs(removedTabId: String)
 
     @Transaction
     open fun addAndSelectTab(tab: TabEntity) {
@@ -77,7 +77,7 @@ abstract class TabsDao {
 
     @Transaction
     open fun deleteTabAndUpdateSelection(tab: TabEntity) {
-        deleteTabAndChildRef(tab)
+        deleteTabAndClearTabRefs(tab)
 
         if (selectedTab() != null) {
             return
@@ -90,7 +90,7 @@ abstract class TabsDao {
 
     @Transaction
     open fun deleteTabAndUpdateSelection(tab: TabEntity, newSelectedTab: TabEntity? = null) {
-        deleteTabAndChildRef(tab)
+        deleteTabAndClearTabRefs(tab)
 
         if (newSelectedTab != null) {
             insertTabSelection(TabSelectionEntity(tabId = newSelectedTab.tabId))
@@ -115,9 +115,9 @@ abstract class TabsDao {
         insertTab(tab)
     }
 
-    private fun deleteTabAndChildRef(tab: TabEntity) {
+    private fun deleteTabAndClearTabRefs(tab: TabEntity) {
         deleteTab(tab)
-        updateChildTabSourceTabId(tab.tabId)
+        updateSourceTabIdRefs(tab.tabId)
     }
 
     fun lastTab(): TabEntity? {
