@@ -470,7 +470,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
         when (it) {
             is Command.Refresh -> refresh()
             is Command.OpenInNewTab -> {
-                browserActivity?.openInNewTab(it.query)
+                browserActivity?.openInNewTab(it.query, it.fromCurrentTab)
             }
             is Command.OpenMessageInNewTab -> {
                 browserActivity?.openMessageInNewTab(it.message)
