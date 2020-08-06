@@ -33,6 +33,7 @@ import com.duckduckgo.app.statistics.store.OfflinePixelCountDataStore
 import kotlinx.coroutines.*
 import timber.log.Timber
 import java.net.URI
+import java.util.concurrent.Executors
 
 class BrowserWebViewClient(
     private val requestRewriter: RequestRewriter,
@@ -188,18 +189,29 @@ class BrowserWebViewClient(
         }
     }
 
-    // TODO: Hacky test implement properly
-    var count = 0
     var lastUrl: Uri? = null
+    var lastUrlLoadTime: Long? = null
+
+    // TODO validate threading, may not even need this
+    var sharedThred = Executors.newFixedThreadPool(1).asCoroutineDispatcher()
+
     private fun urlIsGeneratingDos(url: Uri?): Boolean {
-        if (lastUrl == url) {
-            count++
-        } else {
-            count = 0
+        return runBlocking(sharedThred) {
+            val lastKnownRefresh = lastUrlLoadTime
+            val now = System.currentTimeMillis()
+            if (lastKnownRefresh == null || now - lastKnownRefresh > 1000 || lastUrl != url) {
+                Timber.d("DOS TESTING: Valid INITIAL request for $url, permitting")
+
+                lastUrl = url
+                lastUrlLoadTime = System.currentTimeMillis()
+                return@runBlocking false
+            }
+            lastUrl = url
+            lastUrlLoadTime = System.currentTimeMillis()
+
+            Timber.d("DOS TESTING: Inalid request for $url, blocking")
+            return@runBlocking true
         }
-        lastUrl = url
-        Timber.d("DOS TESTING - count is $count")
-        return count >= 6
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
