@@ -535,6 +535,7 @@ class BrowserTabViewModel(
     fun onUserPressedBack(): Boolean {
         navigationAwareLoginDetector.onEvent(NavigationEvent.UserAction.NavigateBack)
         val navigation = webNavigationState ?: return false
+        val hasParentTab = tabRepository.liveSelectedTab.value?.sourceTabId != null
 
         if (currentFindInPageViewState().visible) {
             dismissFindInView()
@@ -547,6 +548,11 @@ class BrowserTabViewModel(
 
         if (navigation.canGoBack) {
             command.value = NavigateBack(navigation.stepsToPreviousPage)
+            return true
+        } else if (hasParentTab) {
+            viewModelScope.launch {
+                tabRepository.deleteCurrentTabAndSelectSource()
+            }
             return true
         } else if (!skipHome) {
             navigateHome()
