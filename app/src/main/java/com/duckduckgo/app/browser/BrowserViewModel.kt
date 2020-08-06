@@ -126,26 +126,24 @@ class BrowserViewModel(
         appEnjoymentPromptEmitter.promptType.observeForever(appEnjoymentObserver)
     }
 
-    suspend fun onNewTabRequested(isDefaultTab: Boolean = false, fromCurrentTab: Boolean = false): String {
+    suspend fun onNewTabRequested(fromCurrentTab: Boolean = false): String {
         return if (fromCurrentTab) {
-            tabRepository.addWithSource(isDefaultTab = isDefaultTab)
+            tabRepository.addFromCurrentTab()
         } else {
-            tabRepository.add(isDefaultTab = isDefaultTab)
+            tabRepository.add()
         }
     }
 
     suspend fun onOpenInNewTabRequested(query: String, fromCurrentTab: Boolean = false, skipHome: Boolean = fromCurrentTab): String {
         return if (fromCurrentTab) {
-            tabRepository.addWithSource(
+            tabRepository.addFromCurrentTab(
                 url = queryUrlConverter.convertQueryToUrl(query),
-                isDefaultTab = false,
                 skipHome = skipHome
             )
         } else {
             tabRepository.add(
                 url = queryUrlConverter.convertQueryToUrl(query),
-                skipHome = skipHome,
-                isDefaultTab = false
+                skipHome = skipHome
             )
         }
     }

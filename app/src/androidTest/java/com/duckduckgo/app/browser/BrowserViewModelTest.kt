@@ -123,7 +123,7 @@ class BrowserViewModelTest {
     fun whenNewTabRequestedThenTabAddedToRepository() = runBlocking<Unit> {
         whenever(mockTabRepository.liveSelectedTab).doReturn(MutableLiveData())
         testee.onNewTabRequested()
-        verify(mockTabRepository).addWithSource()
+        verify(mockTabRepository).addFromCurrentTab()
     }
 
     @Test
@@ -132,7 +132,7 @@ class BrowserViewModelTest {
         whenever(mockOmnibarEntryConverter.convertQueryToUrl(url)).thenReturn(url)
         whenever(mockTabRepository.liveSelectedTab).doReturn(MutableLiveData())
         testee.onOpenInNewTabRequested(url)
-        verify(mockTabRepository).addWithSource(url)
+        verify(mockTabRepository).addFromCurrentTab(url)
     }
 
     @Test

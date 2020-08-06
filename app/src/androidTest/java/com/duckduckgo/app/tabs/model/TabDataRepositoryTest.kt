@@ -306,7 +306,7 @@ class TabDataRepositoryTest {
 
         testee = TabDataRepository(dao, SiteFactory(mockPrivacyPractices, mockEntityLookup), mockWebViewPreviewPersister, useOurAppDetector)
 
-        val addedTabId = testee.addWithSource("http://www.example.com", skipHome = false, isDefaultTab = false)
+        val addedTabId = testee.addFromCurrentTab("http://www.example.com", skipHome = false, isDefaultTab = false)
         val addedTab = testee.liveSelectedTab.blockingObserve()
         assertEquals(addedTabId, addedTab?.tabId)
         assertEquals(addedTab?.sourceTabId, sourceTab.tabId)
