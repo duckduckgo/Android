@@ -318,7 +318,16 @@ class MigrationsProvider(
 
     val MIGRATION_23_TO_24: Migration = object : Migration(23, 24) {
         override fun migrate(database: SupportSQLiteDatabase) {
-            database.execSQL("ALTER TABLE `tabs` ADD COLUMN `sourceTabId` TEXT")
+            database.execSQL("CREATE TABLE IF NOT EXISTS tabs_new " +
+                    "(tabId TEXT NOT NULL, url TEXT, title TEXT, skipHome INTEGER NOT NULL, viewed INTEGER NOT NULL, position INTEGER NOT NULL, tabPreviewFile TEXT, sourceTabId TEXT," +
+                    " PRIMARY KEY(tabId)," +
+                    " FOREIGN KEY(sourceTabId) REFERENCES tabs(tabId) ON UPDATE SET NULL ON DELETE SET NULL )")
+            database.execSQL("INSERT INTO tabs_new (tabId, url, title, skipHome, viewed, position, tabPreviewFile) "
+                    + "SELECT tabId, url, title, skipHome, viewed, position, tabPreviewFile "
+                    + "FROM tabs")
+            database.execSQL("DROP TABLE tabs")
+            database.execSQL("ALTER TABLE tabs_new RENAME TO tabs")
+            database.execSQL("CREATE INDEX IF NOT EXISTS index_tabs_tabId ON tabs (tabId)")
         }
     }
 
