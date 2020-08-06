@@ -134,7 +134,7 @@ class BrowserViewModel(
         }
     }
 
-    suspend fun onOpenInNewTabRequested(query: String, skipHome: Boolean = false, fromCurrentTab: Boolean = false): String {
+    suspend fun onOpenInNewTabRequested(query: String, fromCurrentTab: Boolean = false, skipHome: Boolean = fromCurrentTab): String {
         return if (fromCurrentTab) {
             tabRepository.addWithSource(
                 url = queryUrlConverter.convertQueryToUrl(query),
