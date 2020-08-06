@@ -26,10 +26,8 @@ import com.duckduckgo.app.global.useourapp.UseOurAppDetector
 import com.duckduckgo.app.tabs.db.TabsDao
 import io.reactivex.Scheduler
 import io.reactivex.schedulers.Schedulers
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import timber.log.Timber
 import java.util.*
 import javax.inject.Inject
@@ -59,11 +57,11 @@ class TabDataRepository @Inject constructor(
         val tabId = generateTabId()
 
         add(
-                tabId,
-                buildSiteData(url),
-                skipHome = skipHome,
-                isDefaultTab = isDefaultTab,
-                sourceTabId = sourceTabId
+            tabId,
+            buildSiteData(url),
+            skipHome = skipHome,
+            isDefaultTab = isDefaultTab,
+            sourceTabId = sourceTabId
         )
 
         return tabId
@@ -99,7 +97,8 @@ class TabDataRepository @Inject constructor(
             }
             Timber.i("About to add a new tab, isDefaultTab: $isDefaultTab. $tabId, position: $position")
 
-            tabsDao.addAndSelectTab(TabEntity(
+            tabsDao.addAndSelectTab(
+                TabEntity(
                     tabId = tabId,
                     url = data.value?.url,
                     title = data.value?.title,
@@ -107,7 +106,8 @@ class TabDataRepository @Inject constructor(
                     viewed = true,
                     position = position,
                     sourceTabId = sourceTabId
-            ))
+                )
+            )
         }
     }
 
@@ -176,10 +176,10 @@ class TabDataRepository @Inject constructor(
 
             deleteOldPreviewImages(tabToDelete.tabId)
             val tabToSelect = tabToDelete.sourceTabId
-                    .takeUnless { it.isNullOrBlank() }
-                    ?.let {
-                        tabsDao.tab(it)
-                    }
+                .takeUnless { it.isNullOrBlank() }
+                ?.let {
+                    tabsDao.tab(it)
+                }
             tabsDao.deleteTabAndUpdateSelection(tabToDelete, tabToSelect)
             siteData.remove(tabToDelete.tabId)
         }

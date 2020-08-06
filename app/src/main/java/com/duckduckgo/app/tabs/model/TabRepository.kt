@@ -31,7 +31,7 @@ interface TabRepository {
      */
     suspend fun add(url: String? = null, skipHome: Boolean = false, isDefaultTab: Boolean = false): String
 
-    suspend fun addFromSourceTab(url: String? = null, skipHome: Boolean = false, isDefaultTab: Boolean= false, sourceTabId: String?): String
+    suspend fun addFromSourceTab(url: String? = null, skipHome: Boolean = false, isDefaultTab: Boolean = false, sourceTabId: String?): String
 
     suspend fun addNewTabAfterExistingTab(url: String? = null, tabId: String)
 
