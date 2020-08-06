@@ -421,7 +421,7 @@
     <string name="changeIconDialogMessage">Pri použití zmien sa aplikácia môže zavrieť. Po nadšení zo svojej novej peknej ikony sa vráťte späť.</string>
 
     <!-- New dashboard / menu buttons -->
-    <string name="manageWhitelist">Spravovať bielu listinu</string>
+    <string name="manageWhitelist">Nezabezpečené webové stránky</string>
     <string name="reportBrokenSite">Nahlásiť nefunkčnú stránku</string>
 
     <!-- Dialogs -->
@@ -429,19 +429,18 @@
     <string name="dialogEditTitle">Editovať</string>
 
     <!-- Whitelist -->
-    <string name="whitelisetActivityTitle">Biela listina</string>
-    <string name="enablePrivacyProtection">Pridať na bielu listinu</string>
-    <string name="disablePrivacyProtection">Odstrániť z bielej listiny</string>
-    <string name="whitelistEntryOverflowContentDescription">Ďalšie možnosti pre vstup na bielu listinu %s</string>
-    <string name="whitelistEntryDeleteConfirmMessage">Naozaj chcete odstrániť &lt;b&gt;%s&lt;/b&gt; zo zoznamu povolených?</string>
-    <string name="whitelistExplanation">Tieto weby na zozname povolených položiek nebudú inovované pomocou ochrany osobných údajov</string>
-    <string name="whitelistNoEntries">Zatiaľ nie sú na zozname povolených stránok</string>
+    <string name="whitelisetActivityTitle">Nezabezpečené webové stránky</string>
+    <string name="enablePrivacyProtection">Povoliť ochranu súkromia</string>
+    <string name="disablePrivacyProtection">Vypnúť ochranu súkromia</string>
+    <string name="whitelistEntryOverflowContentDescription">Viac možností pre nezabezpečené webové stránky %s</string>
+    <string name="whitelistEntryDeleteConfirmMessage">Naozaj chcete odstrániť &lt;b&gt;%s&lt;/b&gt; z nezabezpečených webových stránok?</string>
+    <string name="whitelistExplanation">Tieto webové stránky nebudú rozšírené o ochranu súkromia.</string>
+    <string name="whitelistNoEntries">Zatiaľ neexistujú žiadne nezabezpečené webové stránky</string>
     <string name="whitelistDomainHint">www.example.com</string>
-    <string name="whitelistFormatError">Nepodarilo sa uložiť, zadajte doménu ako <b>example.com</b>
-  </string>
+    <string name="whitelistFormatError">Nepodarilo sa uložiť, zadajte doménu ako <b>example.com</b></string>
 
     <!-- Settings -->
-    <string name="settingsPrivacyProtectionWhitelist">Zoznam dôveryhodných osôb na ochranu súkromia</string>
+    <string name="settingsPrivacyProtectionWhitelist">Nezabezpečené webové stránky</string>
 
     <!-- Fireproof websites -->
     <string name="fireproofWebsitesActivityTitle">Zabezpečené webové stránky</string>

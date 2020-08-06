@@ -431,7 +431,7 @@
     <string name="changeIconDialogMessage">L\'app potrebbe chiudersi per applicare le modifiche. Torna dopo aver ammirato la tua bella nuova icona.</string>
 
     <!-- New dashboard / menu buttons -->
-    <string name="manageWhitelist">Gestisci whitelist</string>
+    <string name="manageWhitelist">Siti non protetti</string>
     <string name="reportBrokenSite">Segnala sito danneggiato</string>
 
     <!-- Dialogs -->
@@ -439,19 +439,18 @@
     <string name="dialogEditTitle">Modifica</string>
 
     <!-- Whitelist -->
-    <string name="whitelisetActivityTitle">Whitelist</string>
-    <string name="enablePrivacyProtection">Aggiungi alla whitelist</string>
-    <string name="disablePrivacyProtection">Rimuovi dalla whitelist</string>
-    <string name="whitelistEntryOverflowContentDescription">Altre opzioni per l\'inserimento nella whitelist %s</string>
-    <string name="whitelistEntryDeleteConfirmMessage">Sei sicuro di voler eliminare &lt;b&gt;%s&lt;/b&gt; dalla whitelist?</string>
-    <string name="whitelistExplanation">Questi siti autorizzati non verranno aggiornati da Privacy Protection</string>
-    <string name="whitelistNoEntries">Ancora nessun sito nella whitelist </string>
+    <string name="whitelisetActivityTitle">Siti non protetti</string>
+    <string name="enablePrivacyProtection">Attiva la tutela della privacy</string>
+    <string name="disablePrivacyProtection">Disattiva la tutela della privacy</string>
+    <string name="whitelistEntryOverflowContentDescription">Altre opzioni per il sito non protetto %s</string>
+    <string name="whitelistEntryDeleteConfirmMessage">Confermi di voler rimuovere &lt;b&gt;%s&lt;/b&gt; dai siti non protetti?</string>
+    <string name="whitelistExplanation">Questi siti non saranno ottimizzati dalla tutela della privacy.</string>
+    <string name="whitelistNoEntries">Attualmente, non sono presenti siti non protetti</string>
     <string name="whitelistDomainHint">www.example.com</string>
-    <string name="whitelistFormatError">Impossibile salvare, inserisci un dominio come <b>example.com</b>
-  </string>
+    <string name="whitelistFormatError">Impossibile salvare, inserisci un dominio come <b>example.com</b></string>
 
     <!-- Settings -->
-    <string name="settingsPrivacyProtectionWhitelist">Whitelist di Privacy Protection</string>
+    <string name="settingsPrivacyProtectionWhitelist">Siti non protetti</string>
 
     <!-- Fireproof websites -->
     <string name="fireproofWebsitesActivityTitle">Siti web a prova di bomba</string>

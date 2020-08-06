@@ -1107,10 +1107,19 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
         }
     }
 
+    private fun closeAndReturnToSourceIfBlankTab() {
+        if (viewModel.url == null) {
+            launch {
+                viewModel.closeAndSelectSourceTab()
+            }
+        }
+    }
+
     private fun createDownloadListener(): FileDownloadListener {
         return object : FileDownloadListener {
             override fun downloadStarted() {
                 fileDownloadNotificationManager.showDownloadInProgressNotification()
+                closeAndReturnToSourceIfBlankTab()
             }
 
             override fun downloadFinished(file: File, mimeType: String?) {
@@ -1132,6 +1141,14 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
                     }
                 }
                 snackbar.show()
+            }
+
+            override fun downloadCancelled() {
+                closeAndReturnToSourceIfBlankTab()
+            }
+
+            override fun downloadOpened() {
+                closeAndReturnToSourceIfBlankTab()
             }
 
             private fun showDownloadManagerAppSettings() {

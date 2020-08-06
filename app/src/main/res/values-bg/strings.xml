@@ -414,7 +414,7 @@
     <string name="changeIconDialogMessage">Приложението може да се затвори, за да приложи промените. Върнете се, след като се насладите на красивата си нова икона.</string>
 
     <!-- New dashboard / menu buttons -->
-    <string name="manageWhitelist">Управление на белия списък</string>
+    <string name="manageWhitelist">Незащитени сайтове</string>
     <string name="reportBrokenSite">Подаване на сигнал за повреден сайт</string>
 
     <!-- Dialogs -->
@@ -422,19 +422,19 @@
     <string name="dialogEditTitle">Редактиране</string>
 
     <!-- Whitelist -->
-    <string name="whitelisetActivityTitle">Бял списък</string>
-    <string name="enablePrivacyProtection">Добавяне към белия списък</string>
-    <string name="disablePrivacyProtection">Премахване от белия списък</string>
-    <string name="whitelistEntryOverflowContentDescription">Още опции за въвеждане в белия списък %s</string>
-    <string name="whitelistEntryDeleteConfirmMessage">Сигурни ли сте, че искате да изтриете &lt;b&gt;%s&lt;/b&gt; от белия списък?</string>
-    <string name="whitelistExplanation">Тези сайтове в белия списък няма да бъдат надградени от Защитата на поверителността</string>
-    <string name="whitelistNoEntries">Все още няма сайтове в белия списък</string>
+    <string name="whitelisetActivityTitle">Незащитени сайтове</string>
+    <string name="enablePrivacyProtection">Активиране на защита на поверителността</string>
+    <string name="disablePrivacyProtection">Деактивиране на защита на поверителността</string>
+    <string name="whitelistEntryOverflowContentDescription">Още опции за незащитен сайт %s</string>
+    <string name="whitelistEntryDeleteConfirmMessage">Сигурни ли сте, че искате да премахнете &lt;b>%s&lt;/b> от незащитените сайтове?</string>
+    <string name="whitelistExplanation">Към тези сайтове няма да бъде приложена защита на поверителността.</string>
+    <string name="whitelistNoEntries">Все още няма незащитени сайтове</string>
     <string name="whitelistDomainHint">www.example.com</string>
     <string name="whitelistFormatError">Не можа да се запази, въведете домейн, например <b>example.com</b>
   </string>
 
     <!-- Settings -->
-    <string name="settingsPrivacyProtectionWhitelist">Бял списък за Защита на поверителността</string>
+    <string name="settingsPrivacyProtectionWhitelist">Незащитени сайтове</string>
 
     <!-- Fireproof websites -->
     <string name="fireproofWebsitesActivityTitle">Огнеустойчиви уебсайтове</string>

@@ -421,7 +421,7 @@
     <string name="changeIconDialogMessage">Aplicația se poate închide pentru aplicarea modificărilor. Reveniți după ce ați admirat noua dvs. splendidă pictogramă.</string>
 
     <!-- New dashboard / menu buttons -->
-    <string name="manageWhitelist">Gestionați lista albă</string>
+    <string name="manageWhitelist">Site-uri neprotejate</string>
     <string name="reportBrokenSite">Raportați Site-ul Distrus</string>
 
     <!-- Dialogs -->
@@ -429,19 +429,18 @@
     <string name="dialogEditTitle">Editați</string>
 
     <!-- Whitelist -->
-    <string name="whitelisetActivityTitle">Lista albă</string>
-    <string name="enablePrivacyProtection">Adăugați la lista albă</string>
-    <string name="disablePrivacyProtection">Înlocuiți din lista albă</string>
-    <string name="whitelistEntryOverflowContentDescription">Mai multe opțiuni pentru intrarea în lista albă %s</string>
-    <string name="whitelistEntryDeleteConfirmMessage">Sigur doriți să ștergeți &lt;b&gt;%s&lt;/b&gt; din lista albă?</string>
-    <string name="whitelistExplanation">Aceste site-uri listate în alb nu vor fi actualizate de Protecția confidențialității</string>
-    <string name="whitelistNoEntries">Nu există încă site-uri listate cu lista albă</string>
+    <string name="whitelisetActivityTitle">Site-uri neprotejate</string>
+    <string name="enablePrivacyProtection">Activează protecția confidențialității</string>
+    <string name="disablePrivacyProtection">Dezactivează protecția confidențialității</string>
+    <string name="whitelistEntryOverflowContentDescription">Mai multe opțiuni pentru site-ul neprotejat %s</string>
+    <string name="whitelistEntryDeleteConfirmMessage">Sigur dorești să elimini &lt;b&gt;%s&lt;/b&gt; din site-urile neprotejate?</string>
+    <string name="whitelistExplanation">Aceste site-uri nu vor fi îmbunătățite de protecția confidențialității.</string>
+    <string name="whitelistNoEntries">Nu există site-uri neprotejate</string>
     <string name="whitelistDomainHint">www.example.com</string>
-    <string name="whitelistFormatError">Nu s-a putut salva, introduceți un domeniu precum <b>example.com</b>
-  </string>
+    <string name="whitelistFormatError">Nu s-a putut salva, introduceți un domeniu precum <b>example.com</b></string>
 
     <!-- Settings -->
-    <string name="settingsPrivacyProtectionWhitelist">Lista de protecție a confidențialității</string>
+    <string name="settingsPrivacyProtectionWhitelist">Site-uri neprotejate</string>
 
     <!-- Fireproof websites -->
     <string name="fireproofWebsitesActivityTitle">Site-uri ignifuge</string>

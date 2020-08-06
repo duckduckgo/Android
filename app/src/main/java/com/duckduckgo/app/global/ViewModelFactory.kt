@@ -181,7 +181,7 @@ class ViewModelFactory @Inject constructor(
             dataClearer = dataClearer,
             appEnjoymentPromptEmitter = appEnjoymentPromptEmitter,
             appEnjoymentUserEventRecorder = appEnjoymentUserEventRecorder,
-            ctaDao = dismissedCtaDao,
+            useOurAppDetector = userOurAppDetector,
             pixel = pixel
         )
     }

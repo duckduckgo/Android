@@ -437,7 +437,7 @@
     <string name="changeIconDialogMessage">Uygulama, değişiklikleri uygulamak için kapanabilir. Yeni simgenize hayran olduktan sonra tekrar gelin.</string>
 
     <!-- New dashboard / menu buttons -->
-    <string name="manageWhitelist">Beyaz Listeyi Yönet</string>
+    <string name="manageWhitelist">Korumasız Siteler</string>
     <string name="reportBrokenSite">Hatalı Siteyi Bildir</string>
 
     <!-- Dialogs -->
@@ -445,18 +445,18 @@
     <string name="dialogEditTitle">Düzenle</string>
 
     <!-- Whitelist -->
-    <string name="whitelisetActivityTitle">Beyaz Liste</string>
-    <string name="enablePrivacyProtection">Beyaz Listeye Ekle</string>
-    <string name="disablePrivacyProtection">Beyaz Listeden Sil</string>
-    <string name="whitelistEntryOverflowContentDescription">Beyaz liste girişi %s için daha fazla seçenek</string>
-    <string name="whitelistEntryDeleteConfirmMessage">&lt;b&gt;%s&lt;/b&gt; \'ı beyaz listeden silmek istediğinizden emin misiniz?</string>
-    <string name="whitelistExplanation">Beyaz listeye alınan bu siteler Gizlilik Koruması tarafından yeni sürüme geçirilmez</string>
-    <string name="whitelistNoEntries">Henüz beyaz listeye eklenmemiş site yok</string>
+    <string name="whitelisetActivityTitle">Korumasız Siteler</string>
+    <string name="enablePrivacyProtection">Gizlilik Korumasını Etkinleştir</string>
+    <string name="disablePrivacyProtection">Gizlilik Korumasını Devre Dışı Bırak</string>
+    <string name="whitelistEntryOverflowContentDescription">Korumasız %s sitesi için diğer seçenekler</string>
+    <string name="whitelistEntryDeleteConfirmMessage">&lt;b&gt;%s&lt;/b&gt; sitesini korumasız sitelerden kaldırmak istediğinizden emin misiniz?</string>
+    <string name="whitelistExplanation">Bu siteler için Gizlilik Koruması uygulanamayacaktır.</string>
+    <string name="whitelistNoEntries">Henüz Korumasız Site Yok</string>
     <string name="whitelistDomainHint">www.example.com</string>
     <string name="whitelistFormatError">Kaydedilemedi, <b>example.com</b> gibi bir alan adı girin</string>
 
     <!-- Settings -->
-    <string name="settingsPrivacyProtectionWhitelist">Gizlilik Koruması Beyaz Listesi</string>
+    <string name="settingsPrivacyProtectionWhitelist">Korumasız Siteler</string>
 
     <!-- Fireproof websites -->
     <string name="fireproofWebsitesActivityTitle">Korumalı Web Siteleri</string>

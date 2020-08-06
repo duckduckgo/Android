@@ -505,6 +505,14 @@ class BrowserTabViewModel(
         viewModelScope.launch { removeCurrentTabFromRepository() }
     }
 
+    override fun closeAndSelectSourceTab() {
+        viewModelScope.launch { removeAndSelectTabFromRepository() }
+    }
+
+    private suspend fun removeAndSelectTabFromRepository() {
+        tabRepository.deleteCurrentTabAndSelectSource()
+    }
+
     fun onUserPressedForward() {
         navigationAwareLoginDetector.onEvent(NavigationEvent.UserAction.NavigateForward)
         if (!currentBrowserViewState().browserShowing) {
@@ -673,6 +681,7 @@ class BrowserTabViewModel(
                 deleteCtaShown -> pixel.fire(PixelName.UOA_VISITED_AFTER_DELETE_CTA)
                 isShortcutAdded != null -> pixel.fire(PixelName.UOA_VISITED_AFTER_SHORTCUT)
                 isUseOurAppNotificationSeen -> pixel.fire(PixelName.UOA_VISITED_AFTER_NOTIFICATION)
+                else -> pixel.fire(PixelName.UOA_VISITED)
             }
         }
     }

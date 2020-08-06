@@ -46,6 +46,7 @@ class NetworkFileDownloader @Inject constructor(private val context: Context) {
         }
         val manager = context.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager?
         manager?.enqueue(request)
+        callback.downloadStarted()
     }
 
     private fun downloadManagerAvailable(): Boolean {
