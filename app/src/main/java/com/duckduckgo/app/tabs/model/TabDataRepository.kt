@@ -140,7 +140,8 @@ class TabDataRepository @Inject constructor(
                 title = title,
                 skipHome = false,
                 viewed = false,
-                position = position + 1
+                position = position + 1,
+                sourceTabId = tabId
             )
             tabsDao.insertTabAtPosition(tab)
         }
