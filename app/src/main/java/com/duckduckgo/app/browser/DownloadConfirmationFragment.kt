@@ -49,7 +49,7 @@ class DownloadConfirmationFragment : BottomSheetDialogFragment() {
     lateinit var downloadListener: FileDownloadListener
 
     private val pendingDownload: PendingFileDownload by lazy {
-        arguments!![PENDING_DOWNLOAD_BUNDLE_KEY] as PendingFileDownload
+        requireArguments()[PENDING_DOWNLOAD_BUNDLE_KEY] as PendingFileDownload
     }
 
     private var file: File? = null
@@ -87,6 +87,7 @@ class DownloadConfirmationFragment : BottomSheetDialogFragment() {
         }
         view.cancel.setOnClickListener {
             Timber.i("Cancelled download for url ${pendingDownload.url}")
+            downloadListener.downloadCancelled()
             dismiss()
         }
 
@@ -126,6 +127,7 @@ class DownloadConfirmationFragment : BottomSheetDialogFragment() {
                 Timber.e("No suitable activity found")
                 Toast.makeText(activity, R.string.downloadConfirmationUnableToOpenFileText, Toast.LENGTH_SHORT).show()
             }
+            downloadListener.downloadOpened()
         }
     }
 
