@@ -55,18 +55,15 @@ class TabDataRepository @Inject constructor(
         return tabId
     }
 
-    override suspend fun addFromCurrentTab(url: String?, skipHome: Boolean, isDefaultTab: Boolean): String {
+    override suspend fun addFromSourceTab(url: String?, skipHome: Boolean, isDefaultTab: Boolean, sourceTabId: String?): String {
         val tabId = generateTabId()
-        val sourceTabId = withContext(Dispatchers.IO) {
-            tabsDao.selectedTab()?.tabId
-        }
 
         add(
-            tabId,
-            buildSiteData(url),
-            skipHome = skipHome,
-            isDefaultTab = isDefaultTab,
-            sourceTabId = sourceTabId
+                tabId,
+                buildSiteData(url),
+                skipHome = skipHome,
+                isDefaultTab = isDefaultTab,
+                sourceTabId = sourceTabId
         )
 
         return tabId

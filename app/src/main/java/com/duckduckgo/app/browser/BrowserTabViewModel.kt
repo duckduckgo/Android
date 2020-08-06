@@ -205,8 +205,8 @@ class BrowserTabViewModel(
         class Navigate(val url: String) : Command()
         class NavigateBack(val steps: Int) : Command()
         object NavigateForward : Command()
-        class OpenInNewTab(val query: String, val fromCurrentTab: Boolean = false) : Command()
-        class OpenMessageInNewTab(val message: Message) : Command()
+        class OpenInNewTab(val query: String, val sourceTabId: String? = null) : Command()
+        class OpenMessageInNewTab(val message: Message, val sourceTabId: String? = null) : Command()
         class OpenInNewBackgroundTab(val query: String) : Command()
         object LaunchNewTab : Command()
         object ResetHistory : Command()
@@ -1033,7 +1033,7 @@ class BrowserTabViewModel(
         return when (requiredAction) {
             is RequiredAction.OpenInNewTab -> {
                 command.value = GenerateWebViewPreviewImage
-                command.value = OpenInNewTab(query = requiredAction.url, fromCurrentTab = true)
+                command.value = OpenInNewTab(query = requiredAction.url, sourceTabId = tabId)
                 true
             }
             is RequiredAction.OpenInNewBackgroundTab -> {
@@ -1316,7 +1316,7 @@ class BrowserTabViewModel(
     }
 
     override fun openMessageInNewTab(message: Message) {
-        command.value = OpenMessageInNewTab(message)
+        command.value = OpenMessageInNewTab(message, tabId)
     }
 
     override fun recoverFromRenderProcessGone() {
