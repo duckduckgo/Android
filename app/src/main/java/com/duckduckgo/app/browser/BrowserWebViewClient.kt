@@ -191,27 +191,32 @@ class BrowserWebViewClient(
 
     var lastUrl: Uri? = null
     var lastUrlLoadTime: Long? = null
+    var dosCount = 0
 
     // TODO validate threading, may not even need this
-    var sharedThred = Executors.newFixedThreadPool(1).asCoroutineDispatcher()
+    var sharedThread = Executors.newFixedThreadPool(1).asCoroutineDispatcher()
 
     private fun urlIsGeneratingDos(url: Uri?): Boolean {
-        return runBlocking(sharedThred) {
-            val lastKnownRefresh = lastUrlLoadTime
-            val now = System.currentTimeMillis()
-            if (lastKnownRefresh == null || now - lastKnownRefresh > 1000 || lastUrl != url) {
-                Timber.d("DOS TESTING: Valid INITIAL request for $url, permitting")
-
-                lastUrl = url
-                lastUrlLoadTime = System.currentTimeMillis()
-                return@runBlocking false
-            }
-            lastUrl = url
-            lastUrlLoadTime = System.currentTimeMillis()
-
-            Timber.d("DOS TESTING: Inalid request for $url, blocking")
-            return@runBlocking true
+        val lastKnownRefresh = lastUrlLoadTime
+        val now = System.currentTimeMillis()
+        val diffInMs = lastKnownRefresh?.let { now - lastKnownRefresh } ?: 0
+        Timber.d("DOS TESTING: Values are $lastKnownRefresh $diffInMs $lastUrl $dosCount")
+        val isUrlGeneratingDos = if (dosCount < 5 || lastKnownRefresh == null || diffInMs > 1000 || lastUrl != url) {
+            Timber.d("DOS TESTING: Valid INITIAL request for $url, permitting")
+            false
+        } else {
+            Timber.d("DOS TESTING: Invalid request for $url, blocking")
+            true
         }
+        if (lastUrl != url) {
+            dosCount = 0
+        } else {
+            dosCount++
+        }
+
+        lastUrl = url
+        lastUrlLoadTime = System.currentTimeMillis()
+        return isUrlGeneratingDos
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
