@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 24,
-    "identityHash": "03673f6d5937091013955e2520b94c0e",
+    "identityHash": "d6df0e21b463f404e4ea0a430f7d905c",
     "entities": [
       {
         "tableName": "tds_tracker",
@@ -258,7 +258,7 @@
       },
       {
         "tableName": "tabs",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`tabId` TEXT NOT NULL, `url` TEXT, `title` TEXT, `skipHome` INTEGER NOT NULL, `viewed` INTEGER NOT NULL, `position` INTEGER NOT NULL, `tabPreviewFile` TEXT, `sourceTabId` TEXT, PRIMARY KEY(`tabId`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`tabId` TEXT NOT NULL, `url` TEXT, `title` TEXT, `skipHome` INTEGER NOT NULL, `viewed` INTEGER NOT NULL, `position` INTEGER NOT NULL, `tabPreviewFile` TEXT, `sourceTabId` TEXT, PRIMARY KEY(`tabId`), FOREIGN KEY(`sourceTabId`) REFERENCES `tabs`(`tabId`) ON UPDATE SET NULL ON DELETE SET NULL )",
         "fields": [
           {
             "fieldPath": "tabId",
@@ -325,7 +325,19 @@
             "createSql": "CREATE INDEX IF NOT EXISTS `index_tabs_tabId` ON `${TABLE_NAME}` (`tabId`)"
           }
         ],
-        "foreignKeys": []
+        "foreignKeys": [
+          {
+            "table": "tabs",
+            "onDelete": "SET NULL",
+            "onUpdate": "SET NULL",
+            "columns": [
+              "sourceTabId"
+            ],
+            "referencedColumns": [
+              "tabId"
+            ]
+          }
+        ]
       },
       {
         "tableName": "tab_selection",
@@ -746,7 +758,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '03673f6d5937091013955e2520b94c0e')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'd6df0e21b463f404e4ea0a430f7d905c')"
     ]
   }
 }

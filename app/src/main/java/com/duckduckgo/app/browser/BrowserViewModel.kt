@@ -126,22 +126,33 @@ class BrowserViewModel(
         appEnjoymentPromptEmitter.promptType.observeForever(appEnjoymentObserver)
     }
 
-    suspend fun onNewTabRequested(isDefaultTab: Boolean = false): String {
-        return tabRepository.addWithSource(isDefaultTab = isDefaultTab)
+    suspend fun onNewTabRequested(sourceTabId: String? = null): String {
+        return if (sourceTabId != null) {
+            tabRepository.addFromSourceTab(sourceTabId = sourceTabId)
+        } else {
+            tabRepository.add()
+        }
     }
 
-    suspend fun onOpenInNewTabRequested(query: String, skipHome: Boolean = false): String {
-        return tabRepository.addWithSource(
-                queryUrlConverter.convertQueryToUrl(query),
-                skipHome,
-                isDefaultTab = false
-        )
+    suspend fun onOpenInNewTabRequested(query: String, sourceTabId: String? = null, skipHome: Boolean = false): String {
+        return if (sourceTabId != null) {
+            tabRepository.addFromSourceTab(
+                url = queryUrlConverter.convertQueryToUrl(query),
+                skipHome = skipHome,
+                sourceTabId = sourceTabId
+            )
+        } else {
+            tabRepository.add(
+                url = queryUrlConverter.convertQueryToUrl(query),
+                skipHome = skipHome
+            )
+        }
     }
 
     suspend fun onTabsUpdated(tabs: List<TabEntity>?) {
-        if (tabs == null || tabs.isEmpty()) {
+        if (tabs.isNullOrEmpty()) {
             Timber.i("Tabs list is null or empty; adding default tab")
-            tabRepository.add(isDefaultTab = true)
+            tabRepository.addDefaultTab()
             return
         }
     }

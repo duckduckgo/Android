@@ -51,32 +51,25 @@ import com.duckduckgo.app.browser.SpecialUrlDetector.UrlType.IntentType
 import com.duckduckgo.app.browser.WebNavigationStateChange.*
 import com.duckduckgo.app.browser.addtohome.AddToHomeCapabilityDetector
 import com.duckduckgo.app.browser.favicon.FaviconDownloader
-import com.duckduckgo.app.browser.logindetection.NavigationEvent
 import com.duckduckgo.app.browser.logindetection.LoginDetected
 import com.duckduckgo.app.browser.logindetection.NavigationAwareLoginDetector
+import com.duckduckgo.app.browser.logindetection.NavigationEvent
 import com.duckduckgo.app.browser.model.BasicAuthenticationCredentials
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.browser.model.LongPressTarget
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.browser.ui.HttpAuthenticationDialogFragment.HttpAuthenticationListener
-import com.duckduckgo.app.cta.ui.Cta
-import com.duckduckgo.app.cta.ui.CtaViewModel
-import com.duckduckgo.app.cta.ui.DaxDialogCta
-import com.duckduckgo.app.cta.ui.DialogCta
-import com.duckduckgo.app.cta.ui.HomePanelCta
-import com.duckduckgo.app.cta.ui.HomeTopPanelCta
-import com.duckduckgo.app.cta.ui.UseOurAppCta
+import com.duckduckgo.app.cta.ui.*
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepository
 import com.duckduckgo.app.global.*
+import com.duckduckgo.app.global.events.db.UserEventKey
+import com.duckduckgo.app.global.events.db.UserEventsStore
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.global.model.SiteFactory
 import com.duckduckgo.app.global.model.domain
 import com.duckduckgo.app.global.model.domainMatchesUrl
-import com.duckduckgo.app.global.events.db.UserEventsStore
-import com.duckduckgo.app.global.events.db.UserEventKey
-import com.duckduckgo.app.global.toDesktopUri
 import com.duckduckgo.app.global.useourapp.UseOurAppDetector
 import com.duckduckgo.app.global.useourapp.UseOurAppDetector.Companion.USE_OUR_APP_SHORTCUT_TITLE
 import com.duckduckgo.app.global.useourapp.UseOurAppDetector.Companion.USE_OUR_APP_SHORTCUT_URL
@@ -212,8 +205,8 @@ class BrowserTabViewModel(
         class Navigate(val url: String) : Command()
         class NavigateBack(val steps: Int) : Command()
         object NavigateForward : Command()
-        class OpenInNewTab(val query: String) : Command()
-        class OpenMessageInNewTab(val message: Message) : Command()
+        class OpenInNewTab(val query: String, val sourceTabId: String? = null) : Command()
+        class OpenMessageInNewTab(val message: Message, val sourceTabId: String? = null) : Command()
         class OpenInNewBackgroundTab(val query: String) : Command()
         object LaunchNewTab : Command()
         object ResetHistory : Command()
@@ -542,6 +535,7 @@ class BrowserTabViewModel(
     fun onUserPressedBack(): Boolean {
         navigationAwareLoginDetector.onEvent(NavigationEvent.UserAction.NavigateBack)
         val navigation = webNavigationState ?: return false
+        val hasSourceTab = tabRepository.liveSelectedTab.value?.sourceTabId != null
 
         if (currentFindInPageViewState().visible) {
             dismissFindInView()
@@ -554,6 +548,11 @@ class BrowserTabViewModel(
 
         if (navigation.canGoBack) {
             command.value = NavigateBack(navigation.stepsToPreviousPage)
+            return true
+        } else if (hasSourceTab) {
+            viewModelScope.launch {
+                tabRepository.deleteCurrentTabAndSelectSource()
+            }
             return true
         } else if (!skipHome) {
             navigateHome()
@@ -1034,7 +1033,7 @@ class BrowserTabViewModel(
         return when (requiredAction) {
             is RequiredAction.OpenInNewTab -> {
                 command.value = GenerateWebViewPreviewImage
-                command.value = OpenInNewTab(requiredAction.url)
+                command.value = OpenInNewTab(query = requiredAction.url, sourceTabId = tabId)
                 true
             }
             is RequiredAction.OpenInNewBackgroundTab -> {
@@ -1312,12 +1311,8 @@ class BrowserTabViewModel(
         command.value = HandleExternalAppLink(appLink)
     }
 
-    override fun openInNewTab(url: String?) {
-        command.value = OpenInNewTab(url.orEmpty())
-    }
-
     override fun openMessageInNewTab(message: Message) {
-        command.value = OpenMessageInNewTab(message)
+        command.value = OpenMessageInNewTab(message, tabId)
     }
 
     override fun recoverFromRenderProcessGone() {
