@@ -132,15 +132,6 @@ class UriUtilsFilenameExtractorTest {
     }
 
     @Test
-    fun whenUrlIsEmptyStringAndConflictingContentDispositionAndMimeTypeProvidedThenExtractFromContentDisposition() {
-        val url = ""
-        val mimeType: String? = "image/jpeg"
-        val contentDisposition: String? = "Content-Disposition: attachment; filename=fromDisposition.json"
-        val extracted = testee.extract(buildPendingDownload(url, contentDisposition, mimeType))
-        assertEquals("fromDisposition.jpg", extracted)
-    }
-
-    @Test
     fun whenNoFilenameAndNoPathSegmentsThenDomainNameReturned() {
         val url = "http://example.com"
         val mimeType: String? = null
