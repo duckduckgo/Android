@@ -476,7 +476,9 @@ class BrowserTabViewModelTest {
         givenOneActiveTabSelected()
         givenInvalidatedGlobalLayout()
         testee.onUserSubmittedQuery("foo")
-        assertCommandIssued<Command.OpenInNewTab>()
+        assertCommandIssued<Command.OpenInNewTab> {
+            assertNull(sourceTabId)
+        }
     }
 
     @Test
@@ -1093,7 +1095,9 @@ class BrowserTabViewModelTest {
 
         testee.onRefreshRequested()
 
-        assertCommandIssued<Command.OpenInNewTab>()
+        assertCommandIssued<Command.OpenInNewTab>() {
+            assertNull(sourceTabId)
+        }
     }
 
     @Test
@@ -1188,6 +1192,10 @@ class BrowserTabViewModelTest {
         testee.userSelectedItemFromLongPressMenu(longPressTarget, mockMenItem)
         val command = captureCommands().value as Command.OpenInNewTab
         assertEquals("http://example.com", command.query)
+
+        assertCommandIssued<Command.OpenInNewTab> {
+            assertNotNull(sourceTabId)
+        }
     }
 
     @Test
@@ -1320,18 +1328,6 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenOpenInNewTabThenOpenInNewTabCommandWithCorrectUrlSent() {
-        val url = "https://example.com"
-        testee.openInNewTab(url)
-        verify(mockCommandObserver).onChanged(commandCaptor.capture())
-
-        val command = commandCaptor.lastValue
-        assertTrue(command is Command.OpenInNewTab)
-        command as Command.OpenInNewTab
-        assertEquals(url, command.query)
-    }
-
-    @Test
     fun whenRecoveringFromProcessGoneThenShowErrorWithAction() {
         testee.recoverFromRenderProcessGone()
         assertCommandIssued<Command.ShowErrorWithAction>()
@@ -1348,6 +1344,7 @@ class BrowserTabViewModelTest {
 
         assertCommandIssued<Command.OpenInNewTab> {
             assertEquals("https://example.com", query)
+            assertNull(sourceTabId)
         }
     }
 
@@ -1556,6 +1553,16 @@ class BrowserTabViewModelTest {
         testee.onUserPressedBack()
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
         assertTrue(commandCaptor.allValues.contains(Command.ShowKeyboard))
+    }
+
+    @Test
+    fun whenUserPressesBackOnATabWithASourceTabThenDeleteCurrentAndSelectSource() = coroutineRule.runBlocking {
+        selectedTabLiveData.value = TabEntity("TAB_ID", "https://example.com", position = 0, sourceTabId = "TAB_ID_SOURCE")
+        setupNavigation(isBrowsing = true)
+
+        testee.onUserPressedBack()
+
+        verify(mockTabsRepository).deleteCurrentTabAndSelectSource()
     }
 
     @Test

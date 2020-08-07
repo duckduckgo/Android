@@ -26,10 +26,8 @@ import com.duckduckgo.app.global.useourapp.UseOurAppDetector
 import com.duckduckgo.app.tabs.db.TabsDao
 import io.reactivex.Scheduler
 import io.reactivex.schedulers.Schedulers
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import timber.log.Timber
 import java.util.*
 import javax.inject.Inject
@@ -49,24 +47,34 @@ class TabDataRepository @Inject constructor(
 
     private val siteData: LinkedHashMap<String, MutableLiveData<Site>> = LinkedHashMap()
 
-    override suspend fun add(url: String?, skipHome: Boolean, isDefaultTab: Boolean): String {
+    override suspend fun add(url: String?, skipHome: Boolean): String {
         val tabId = generateTabId()
-        add(tabId, buildSiteData(url), skipHome = skipHome, isDefaultTab = isDefaultTab)
+        add(tabId, buildSiteData(url), skipHome = skipHome, isDefaultTab = false)
         return tabId
     }
 
-    override suspend fun addWithSource(url: String?, skipHome: Boolean, isDefaultTab: Boolean): String {
+    override suspend fun addFromSourceTab(url: String?, skipHome: Boolean, sourceTabId: String): String {
         val tabId = generateTabId()
-        val sourceTabId = withContext(Dispatchers.IO) {
-            tabsDao.selectedTab()?.tabId
-        }
 
         add(
-            tabId,
-            buildSiteData(url),
+            tabId = tabId,
+            data = buildSiteData(url),
             skipHome = skipHome,
-            isDefaultTab = isDefaultTab,
+            isDefaultTab = false,
             sourceTabId = sourceTabId
+        )
+
+        return tabId
+    }
+
+    override suspend fun addDefaultTab(): String {
+        val tabId = generateTabId()
+
+        add(
+            tabId = tabId,
+            data = buildSiteData(null),
+            skipHome = false,
+            isDefaultTab = true
         )
 
         return tabId
@@ -83,7 +91,7 @@ class TabDataRepository @Inject constructor(
         return data
     }
 
-    override suspend fun add(tabId: String, data: MutableLiveData<Site>, skipHome: Boolean, isDefaultTab: Boolean, sourceTabId: String?) {
+    private fun add(tabId: String, data: MutableLiveData<Site>, skipHome: Boolean, isDefaultTab: Boolean, sourceTabId: String? = null) {
         siteData[tabId] = data
         databaseExecutor().scheduleDirect {
 
@@ -102,7 +110,8 @@ class TabDataRepository @Inject constructor(
             }
             Timber.i("About to add a new tab, isDefaultTab: $isDefaultTab. $tabId, position: $position")
 
-            tabsDao.addAndSelectTab(TabEntity(
+            tabsDao.addAndSelectTab(
+                TabEntity(
                     tabId = tabId,
                     url = data.value?.url,
                     title = data.value?.title,
@@ -110,7 +119,8 @@ class TabDataRepository @Inject constructor(
                     viewed = true,
                     position = position,
                     sourceTabId = sourceTabId
-            ))
+                )
+            )
         }
     }
 
@@ -125,7 +135,7 @@ class TabDataRepository @Inject constructor(
         if (tabId != null) {
             select(tabId)
         } else {
-            add(url, skipHome = true, isDefaultTab = false)
+            add(url, skipHome = true)
         }
     }
 
@@ -140,7 +150,8 @@ class TabDataRepository @Inject constructor(
                 title = title,
                 skipHome = false,
                 viewed = false,
-                position = position + 1
+                position = position + 1,
+                sourceTabId = tabId
             )
             tabsDao.insertTabAtPosition(tab)
         }
@@ -178,10 +189,10 @@ class TabDataRepository @Inject constructor(
 
             deleteOldPreviewImages(tabToDelete.tabId)
             val tabToSelect = tabToDelete.sourceTabId
-                    .takeUnless { it.isNullOrBlank() }
-                    ?.let {
-                        tabsDao.tab(it)
-                    }
+                .takeUnless { it.isNullOrBlank() }
+                ?.let {
+                    tabsDao.tab(it)
+                }
             tabsDao.deleteTabAndUpdateSelection(tabToDelete, tabToSelect)
             siteData.remove(tabToDelete.tabId)
         }
