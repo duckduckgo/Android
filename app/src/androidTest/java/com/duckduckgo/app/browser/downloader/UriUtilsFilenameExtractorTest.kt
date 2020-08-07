@@ -28,7 +28,7 @@ class UriUtilsFilenameExtractorTest {
         val url = "https://example.com/realFilename.jpg"
         val mimeType: String? = null
         val contentDisposition: String? = null
-        val extracted = testee.extract(url, contentDisposition, mimeType)
+        val extracted = testee.extract(buildPendingDownload(url, contentDisposition, mimeType))
         assertEquals("realFilename.jpg", extracted)
     }
 
@@ -37,7 +37,7 @@ class UriUtilsFilenameExtractorTest {
         val url = "https://foo.example.com/path/images/b/b1/realFilename.jpg/other/stuff"
         val mimeType: String? = null
         val contentDisposition: String? = null
-        val extracted = testee.extract(url, contentDisposition, mimeType)
+        val extracted = testee.extract(buildPendingDownload(url, contentDisposition, mimeType))
         assertEquals("realFilename.jpg", extracted)
     }
 
@@ -46,7 +46,7 @@ class UriUtilsFilenameExtractorTest {
         val url = "https://foo.example.com/path/images/b/b1/realFilename.jpg/other/stuff?cb=123"
         val mimeType: String? = null
         val contentDisposition: String? = null
-        val extracted = testee.extract(url, contentDisposition, mimeType)
+        val extracted = testee.extract(buildPendingDownload(url, contentDisposition, mimeType))
         assertEquals("realFilename.jpg", extracted)
     }
 
@@ -55,7 +55,7 @@ class UriUtilsFilenameExtractorTest {
         val url = "https://foo.example.com/path/images/b/b1/realFilename.jpg/other/stuff?cb=123.com"
         val mimeType: String? = null
         val contentDisposition: String? = null
-        val extracted = testee.extract(url, contentDisposition, mimeType)
+        val extracted = testee.extract(buildPendingDownload(url, contentDisposition, mimeType))
         assertEquals("realFilename.jpg", extracted)
     }
 
@@ -64,7 +64,7 @@ class UriUtilsFilenameExtractorTest {
         val url = "https://example.com/filename.jpg"
         val mimeType: String? = null
         val contentDisposition: String? = "Content-Disposition: attachment; filename=fromDisposition.jpg"
-        val extracted = testee.extract(url, contentDisposition, mimeType)
+        val extracted = testee.extract(buildPendingDownload(url, contentDisposition, mimeType))
         assertEquals("fromDisposition.jpg", extracted)
     }
 
@@ -73,7 +73,7 @@ class UriUtilsFilenameExtractorTest {
         val url = "https://example.com/realFilename.bin"
         val mimeType: String? = null
         val contentDisposition: String? = null
-        val extracted = testee.extract(url, contentDisposition, mimeType)
+        val extracted = testee.extract(buildPendingDownload(url, contentDisposition, mimeType))
         assertEquals("realFilename.bin", extracted)
     }
 
@@ -82,7 +82,7 @@ class UriUtilsFilenameExtractorTest {
         val url = "https://example.com/foo/bar/files"
         val mimeType: String? = null
         val contentDisposition: String? = null
-        val extracted = testee.extract(url, contentDisposition, mimeType)
+        val extracted = testee.extract(buildPendingDownload(url, contentDisposition, mimeType))
         assertEquals("foo.bin", extracted)
     }
 
@@ -91,7 +91,7 @@ class UriUtilsFilenameExtractorTest {
         val url = "https://example.com/realFilename.bin/"
         val mimeType: String? = null
         val contentDisposition: String? = null
-        val extracted = testee.extract(url, contentDisposition, mimeType)
+        val extracted = testee.extract(buildPendingDownload(url, contentDisposition, mimeType))
         assertEquals("realFilename.bin", extracted)
     }
 
@@ -100,7 +100,7 @@ class UriUtilsFilenameExtractorTest {
         val url = "https://example.com/realFilename.bin/foo/bar"
         val mimeType: String? = null
         val contentDisposition: String? = null
-        val extracted = testee.extract(url, contentDisposition, mimeType)
+        val extracted = testee.extract(buildPendingDownload(url, contentDisposition, mimeType))
         assertEquals("realFilename.bin", extracted)
     }
 
@@ -109,7 +109,7 @@ class UriUtilsFilenameExtractorTest {
         val url = ""
         val mimeType: String? = null
         val contentDisposition: String? = null
-        val extracted = testee.extract(url, contentDisposition, mimeType)
+        val extracted = testee.extract(buildPendingDownload(url, contentDisposition, mimeType))
         assertEquals("downloadfile.bin", extracted)
     }
 
@@ -118,7 +118,7 @@ class UriUtilsFilenameExtractorTest {
         val url = ""
         val mimeType: String? = "image/jpeg"
         val contentDisposition: String? = null
-        val extracted = testee.extract(url, contentDisposition, mimeType)
+        val extracted = testee.extract(buildPendingDownload(url, contentDisposition, mimeType))
         assertEquals("downloadfile.jpg", extracted)
     }
 
@@ -127,7 +127,7 @@ class UriUtilsFilenameExtractorTest {
         val url = ""
         val mimeType: String? = null
         val contentDisposition: String? = "Content-Disposition: attachment; filename=fromDisposition.jpg"
-        val extracted = testee.extract(url, contentDisposition, mimeType)
+        val extracted = testee.extract(buildPendingDownload(url, contentDisposition, mimeType))
         assertEquals("fromDisposition.jpg", extracted)
     }
 
@@ -136,7 +136,7 @@ class UriUtilsFilenameExtractorTest {
         val url = ""
         val mimeType: String? = "image/jpeg"
         val contentDisposition: String? = "Content-Disposition: attachment; filename=fromDisposition.json"
-        val extracted = testee.extract(url, contentDisposition, mimeType)
+        val extracted = testee.extract(buildPendingDownload(url, contentDisposition, mimeType))
         assertEquals("fromDisposition.jpg", extracted)
     }
 
@@ -145,7 +145,17 @@ class UriUtilsFilenameExtractorTest {
         val url = "http://example.com"
         val mimeType: String? = null
         val contentDisposition: String? = null
-        val extracted = testee.extract(url, contentDisposition, mimeType)
+        val extracted = testee.extract(buildPendingDownload(url, contentDisposition, mimeType))
         assertEquals("example.com", extracted)
+    }
+
+    private fun buildPendingDownload(url: String, contentDisposition: String?, mimeType: String?): FileDownloader.PendingFileDownload {
+        return FileDownloader.PendingFileDownload(
+            url = url,
+            contentDisposition = contentDisposition,
+            mimeType = mimeType,
+            subfolder = "aFolder",
+            userAgent = "aUserAgent"
+        )
     }
 }

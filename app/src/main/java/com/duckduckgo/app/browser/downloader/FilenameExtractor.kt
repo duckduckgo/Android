@@ -18,6 +18,7 @@ package com.duckduckgo.app.browser.downloader
 
 import android.webkit.URLUtil
 import androidx.core.net.toUri
+import com.duckduckgo.app.browser.downloader.FileDownloader.PendingFileDownload
 import com.duckduckgo.app.browser.downloader.FilenameExtractor.GuessQuality.NotGoodEnough
 import com.duckduckgo.app.browser.downloader.FilenameExtractor.GuessQuality.TriedAllOptions
 import timber.log.Timber
@@ -25,7 +26,11 @@ import javax.inject.Inject
 
 class FilenameExtractor @Inject constructor() {
 
-    fun extract(url: String, contentDisposition: String?, mimeType: String?): String {
+    fun extract(pendingDownload: PendingFileDownload): String {
+        val url = pendingDownload.url
+        val mimeType = pendingDownload.mimeType
+        val contentDisposition = pendingDownload.contentDisposition
+
         val firstGuess = guessFilename(url, contentDisposition, mimeType)
         val guesses = Guesses(bestGuess = null, latestGuess = firstGuess)
         val baseUrl = url.toUri().host ?: ""

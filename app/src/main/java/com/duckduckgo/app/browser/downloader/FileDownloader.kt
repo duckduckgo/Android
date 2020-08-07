@@ -20,7 +20,6 @@ import android.net.Uri
 import android.os.Environment
 import android.webkit.URLUtil
 import androidx.annotation.WorkerThread
-import timber.log.Timber
 import java.io.File
 import java.io.Serializable
 import javax.inject.Inject
@@ -52,12 +51,6 @@ class FileDownloader @Inject constructor(private val dataUriDownloader: DataUriD
         fun downloadCancelled()
         fun downloadOpened()
     }
-}
-
-fun FileDownloader.PendingFileDownload.guessFileName(filenameExtractor: FilenameExtractor): String {
-    val guessedFileName = filenameExtractor.extract(url, contentDisposition, mimeType)
-    Timber.i("Guessed filename of $guessedFileName for url $url")
-    return guessedFileName
 }
 
 val FileDownloader.PendingFileDownload.isDataUrl get() = URLUtil.isDataUrl(url)

@@ -34,7 +34,7 @@ class NetworkFileDownloader @Inject constructor(private val context: Context, pr
             return
         }
 
-        val guessedFileName = pendingDownload.guessFileName(filenameExtractor)
+        val guessedFileName = filenameExtractor.extract(pendingDownload)
 
         val request = DownloadManager.Request(pendingDownload.url.toUri()).apply {
             allowScanningByMediaScanner()
