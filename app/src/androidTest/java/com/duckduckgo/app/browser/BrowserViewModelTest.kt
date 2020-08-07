@@ -123,7 +123,14 @@ class BrowserViewModelTest {
     fun whenNewTabRequestedThenTabAddedToRepository() = runBlocking<Unit> {
         whenever(mockTabRepository.liveSelectedTab).doReturn(MutableLiveData())
         testee.onNewTabRequested()
-        verify(mockTabRepository).addFromCurrentTab()
+        verify(mockTabRepository).add()
+    }
+
+    @Test
+    fun whenNewTabRequestedFromSourceTabThenTabAddedToRepositoryWithSourceTabId() = runBlocking<Unit> {
+        whenever(mockTabRepository.liveSelectedTab).doReturn(MutableLiveData())
+        testee.onNewTabRequested("sourceTabId")
+        verify(mockTabRepository).addFromSourceTab(sourceTabId = "sourceTabId")
     }
 
     @Test
@@ -132,13 +139,22 @@ class BrowserViewModelTest {
         whenever(mockOmnibarEntryConverter.convertQueryToUrl(url)).thenReturn(url)
         whenever(mockTabRepository.liveSelectedTab).doReturn(MutableLiveData())
         testee.onOpenInNewTabRequested(url)
-        verify(mockTabRepository).addFromCurrentTab(url)
+        verify(mockTabRepository).add(url = url, skipHome = false)
     }
 
     @Test
-    fun whenTabsUpdatedAndNoTabsThenNewTabAddedToRepository() = runBlocking<Unit> {
+    fun whenOpenInNewTabRequestedWithSourceTabIdThenTabAddedToRepositoryWithSourceTabId() = runBlocking<Unit> {
+        val url = "http://example.com"
+        whenever(mockOmnibarEntryConverter.convertQueryToUrl(url)).thenReturn(url)
+        whenever(mockTabRepository.liveSelectedTab).doReturn(MutableLiveData())
+        testee.onOpenInNewTabRequested(url, sourceTabId = "tabId")
+        verify(mockTabRepository).addFromSourceTab(url = url, skipHome = false, sourceTabId = "tabId")
+    }
+
+    @Test
+    fun whenTabsUpdatedAndNoTabsThenDefaultTabAddedToRepository() = runBlocking<Unit> {
         testee.onTabsUpdated(ArrayList())
-        verify(mockTabRepository).add(null, false, true)
+        verify(mockTabRepository).addDefaultTab()
     }
 
     @Test
