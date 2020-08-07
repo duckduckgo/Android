@@ -26,17 +26,17 @@ import javax.inject.Inject
 class FilenameExtractor @Inject constructor() {
 
     fun extract(url: String, contentDisposition: String?, mimeType: String?): String {
-        val firstGuess = guessFromUrl(url, contentDisposition, mimeType)
+        val firstGuess = guessFilename(url, contentDisposition, mimeType)
         val guesses = Guesses(bestGuess = null, latestGuess = firstGuess)
         val baseUrl = url.toUri().host ?: ""
         var pathSegments = pathSegments(url)
 
         while (evaluateGuessQuality(guesses, pathSegments) != TriedAllOptions) {
             pathSegments = pathSegments.dropLast(1)
-            guesses.latestGuess = guessFromUrl(baseUrl + "/" + pathSegments.rebuildUrl(), contentDisposition, mimeType)
+            guesses.latestGuess = guessFilename(baseUrl + "/" + pathSegments.rebuildUrl(), contentDisposition, mimeType)
         }
-        return guesses.bestGuess ?: guesses.latestGuess
 
+        return bestGuess(guesses)
     }
 
     private fun evaluateGuessQuality(guesses: Guesses, pathSegments: List<String>): GuessQuality {
@@ -52,7 +52,7 @@ class FilenameExtractor @Inject constructor() {
         return NotGoodEnough
     }
 
-    private fun guessFromUrl(url: String, contentDisposition: String?, mimeType: String?): String {
+    private fun guessFilename(url: String, contentDisposition: String?, mimeType: String?): String {
         val tidiedUrl = url.removeSuffix("/")
         var guessedFilename = URLUtil.guessFileName(tidiedUrl, contentDisposition, mimeType)
 
@@ -63,6 +63,14 @@ class FilenameExtractor @Inject constructor() {
 
         Timber.v("From URL [$url], guessed [$guessedFilename]")
         return guessedFilename
+    }
+
+    private fun bestGuess(guesses: Guesses): String {
+        val guess = guesses.bestGuess ?: guesses.latestGuess
+        if (!guess.contains(".")) {
+            return guess + DEFAULT_FILE_TYPE
+        }
+        return guess
     }
 
     private fun pathSegments(url: String): List<String> {

@@ -83,7 +83,7 @@ class UriUtilsFilenameExtractorTest {
         val mimeType: String? = null
         val contentDisposition: String? = null
         val extracted = testee.extract(url, contentDisposition, mimeType)
-        assertEquals("foo", extracted)
+        assertEquals("foo.bin", extracted)
     }
 
     @Test
@@ -110,7 +110,7 @@ class UriUtilsFilenameExtractorTest {
         val mimeType: String? = null
         val contentDisposition: String? = null
         val extracted = testee.extract(url, contentDisposition, mimeType)
-        assertEquals("downloadfile", extracted)
+        assertEquals("downloadfile.bin", extracted)
     }
 
     @Test
