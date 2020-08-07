@@ -46,8 +46,14 @@ platform :android do
     desc "Create new release"
       lane :release do
 
+                versionCode = gradle(
+                    task: 'versionCode'
+                 )
+
+              UI.message ("New version code is #{versionCode}")
+
         UI.header "Creating a new release"
-        UI.message ("Checking current branch: #{git_branch}")
+        UI.message ("Cecking current branch: #{git_branch}")
 
         ensure_git_status_clean
 

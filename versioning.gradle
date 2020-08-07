@@ -12,4 +12,11 @@ ext {
         file("version/version.properties").withInputStream { props.load(it) }
         return props.getProperty("VERSION")
     }
+
+    tasks.register("versionCode") {
+        doLast {
+            println buildVersionCode()
+        }
+    }
+
 }
