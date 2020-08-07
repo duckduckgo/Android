@@ -1,0 +1,23 @@
+Datenschutz vereinfacht.
+
+Wir bei DuckDuckGo glauben, dass das Internet kein unheimlicher Ort sein muss und dass Sie auch online ein Anrecht auf Privatsphäre haben. Und diese sollte sich nicht schwieriger wahren lassen, als Vorhänge zuzuziehen. 
+
+Wir bieten Ihnen die notwendige Privatsphäre, um Ihre persönlichen Daten bei der Suche und beim Surfen im Internet nahtlos im Griff zu haben, und zwar überall im Netz.
+• Vermeiden Sie Werbenetzwerk-Tracker — Unser Datenschutzprogramm blockiert alle versteckten Tracker, die wir finden können, sodass Sie mit der Zeit selbst nachverfolgen können, welche umfassenden Werbenetzwerke Ihnen auf der Spur sein wollen.
+• Optimierter Verschlüsselungsschutz — Wir zwingen Websites dazu, soweit verfügbar eine verschlüsselte Verbindung aufzubauen, wodurch Ihre Daten vor neugierigen Augen, wie denen von Internetdienstanbietern, geschützt werden.
+• Suche im Privatsphäremodus — Sie vertrauen Suchmaschinen Ihre wichtigsten persönlichen Daten an, darunter finanzielle, medizinische und politische Fragen. Wonach Sie suchen, geht niemanden etwas an, deshalb verfolgt Sie die DuckDuckGo-Suchmaschine auch nicht. Niemals.
+• Datenschutzrichtlinien entschlüsseln - Wir haben uns mit dem Projekt Terms of Service Didn't Read zusammengeschlossen und dessen Bewertungen und Kennzeichnungen der Nutzungsbedingungen und Datenschutzrichtlinien von Websites soweit verfügbar in unsere Suchmaschine integriert. 
+
+Wenn Sie über DuckDuckGo eine Internetsuche machen und im Web surfen, wird Ihnen die Beurteilung der Privatsphäre (mit Noten von A–F) der aufgerufenen Website angezeigt. Mit dieser Beurteilung erkennen Sie auf einen Blick, inwieweit Sie geschützt sind und wen wir dabei erwischt haben, Sie auszuspionieren. Außerdem erfahren Sie, wie wir die Datenschutzmaßnahmen der zugrunde liegenden Website erweitert haben. Die automatische Benotung der Privatsphäre richtet sich nach der Häufigkeit versteckter Tracker-Netzwerke, der verfügbaren Verschlüsselung und dem Datenschutzverfahren der Website.
+
+Unsere App bietet übliche Browserfunktionen, einschließlich Tabs, Lesezeichen und Autovervollständigung. Neben dem leistungsstarken Schutz Ihrer Privatsphäre, wie oben beschrieben, haben wir den Browser mit einigen zusätzlichen Datenschutzfunktionen ausgestattet:
+• Selbstzerstörungsknopf — Mit dieser Schaltfläche können Sie mit einem Klick alle Ihre Tabs und Daten löschen.
+
+Viel zu viele Menschen glauben, dass man im Internet einfach keine Privatsphäre erwarten kann. Wir kämpfen darum, das zu ändern, und haben es uns zur Aufgabe gemacht, einen neuen Vertrauensstandard online einzuführen. Installieren Sie DuckDuckGo — so haben Sie Ihre Privatsphäre selbst im Griff.
+
+Über uns: https://duckduckgo.com/about/
+Datenschutz-Tipps für unterschiedliche Geräte: https://spreadprivacy.com/tag/device-privacy-tips/
+Weitere Datenschutz-Tipps: https://spreadprivacy.com/tag/privacy-newsletter/
+Unsere Datenschutzrichtlinie: https://duckduckgo.com/privacy/
+
+Open Source unter https://github.com/duckduckgo/Android
