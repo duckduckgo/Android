@@ -318,6 +318,8 @@ class MigrationsProvider(
 
     val MIGRATION_23_TO_24: Migration = object : Migration(23, 24) {
         override fun migrate(database: SupportSQLiteDatabase) {
+            //https://stackoverflow.com/a/57797179/980345
+            //SQLite does not support Alter table operations like Foreign keys
             database.execSQL(
                 "CREATE TABLE IF NOT EXISTS tabs_new " +
                         "(tabId TEXT NOT NULL, url TEXT, title TEXT, skipHome INTEGER NOT NULL, viewed INTEGER NOT NULL, position INTEGER NOT NULL, tabPreviewFile TEXT, sourceTabId TEXT," +
