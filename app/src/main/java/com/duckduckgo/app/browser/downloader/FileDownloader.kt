@@ -25,11 +25,7 @@ import java.io.File
 import java.io.Serializable
 import javax.inject.Inject
 
-class FileDownloader @Inject constructor(
-    private val dataUriDownloader: DataUriDownloader,
-    private val networkFileDownloader: NetworkFileDownloader,
-    private val filenameExtractor: FilenameExtractor
-) {
+class FileDownloader @Inject constructor(private val dataUriDownloader: DataUriDownloader, private val networkFileDownloader: NetworkFileDownloader) {
 
     @WorkerThread
     fun download(pending: PendingFileDownload, callback: FileDownloadListener) {
