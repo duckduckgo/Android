@@ -1311,10 +1311,6 @@ class BrowserTabViewModel(
         command.value = HandleExternalAppLink(appLink)
     }
 
-    override fun openInNewTab(url: String?) {
-        command.value = OpenInNewTab(url.orEmpty())
-    }
-
     override fun openMessageInNewTab(message: Message) {
         command.value = OpenMessageInNewTab(message, tabId)
     }
