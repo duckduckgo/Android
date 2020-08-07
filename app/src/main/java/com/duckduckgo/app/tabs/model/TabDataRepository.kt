@@ -53,7 +53,7 @@ class TabDataRepository @Inject constructor(
         return tabId
     }
 
-    override suspend fun addFromSourceTab(url: String?, skipHome: Boolean, sourceTabId: String?): String {
+    override suspend fun addFromSourceTab(url: String?, skipHome: Boolean, sourceTabId: String): String {
         val tabId = generateTabId()
 
         add(
