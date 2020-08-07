@@ -1,4 +1,1 @@
-Bug fixes and other improvements.
-
-<b>Have feedback?</b>
-You can always reach us at https://duckduckgo.com/feedback.
+Prywatność uproszczona. Chroń swoje dane podczas przeszukiwania i przeglądania: blokowanie funkcji śledzenia, bardziej zaawansowane szyfrowanie, prywatne wyszukiwanie i nie tylko.

@@ -1,4 +1,1 @@
-Bug fixes and other improvements.
-
-<b>Have feedback?</b>
-You can always reach us at https://duckduckgo.com/feedback.
+個人情報保護をシンプルに。検索・閲覧する際に、あなたのデータを保護しましょう。トラッカーのブロック、よりスマートな暗号化、プライベート検索などが可能です。

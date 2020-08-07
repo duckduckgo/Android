@@ -1,4 +1,1 @@
-Bug fixes and other improvements.
-
-<b>Have feedback?</b>
-You can always reach us at https://duckduckgo.com/feedback.
+Gizlilik, basitleştirildi. Arama yaparken ve gezinirken verilerinizi koruyun: Takip engelleme, daha akıllı şifreleme, gizli arama ve daha fazlası.

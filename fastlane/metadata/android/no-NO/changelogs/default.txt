@@ -1,4 +1,1 @@
-Bug fixes and other improvements.
-
-<b>Have feedback?</b>
-You can always reach us at https://duckduckgo.com/feedback.
+Personvern, forenklet. Beskytt dataene dine mens du søker og surfer: Sporingsblokkering, smartere kryptering, private søk og mer.
