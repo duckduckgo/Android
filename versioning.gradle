@@ -15,7 +15,7 @@ ext {
 
     tasks.register("versionCode") {
         doLast {
-            println buildVersionCode()
+            print buildVersionCode()
         }
     }
 

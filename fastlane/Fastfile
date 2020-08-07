@@ -46,14 +46,14 @@ platform :android do
     desc "Create new release"
       lane :release do
 
-                versionCode = gradle(
-                    task: 'versionCode'
-                 )
-
-              UI.message ("New version code is #{versionCode}")
-
         UI.header "Creating a new release"
-        UI.message ("Cecking current branch: #{git_branch}")
+        UI.message ("Checking current branch: #{git_branch}")
+
+        versionCode = prompt(text: "Enter New Version Code:")
+        UI.message ("Writing release notes to en-CA for version: #{versionCode}")
+        File.open('../fastlane/metadata/android/en-CA/changelogs/#{versionCode}', 'w') do |file|
+            file.write("just a test")
+        end
 
         ensure_git_status_clean
 
@@ -71,7 +71,6 @@ platform :android do
             merge_commit_filtering: "exclude_merges"
         )
         UI.message ("Performing a new release for #{newVersion}")
-
 
         if UI.confirm("Are you sure you're happy with this release?\n\nVersion=#{newVersion}\nCommits Since Last Release:\n#{commits}\nRelease Notes:\n#{releaseNotes}\n")
           UI.success "Creating release branch for release/#{newVersion}"

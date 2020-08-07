@@ -83,7 +83,6 @@ android {
     def propertiesPath = "${staticConfigPath}/ddg_android_build.properties"
     def propertiesFile = new File(propertiesPath)
     if (propertiesFile.exists()) {
-        println "Signing properties found"
         def props = new Properties()
         props.load(new FileInputStream(propertiesFile))
         android.signingConfigs.release.storeFile = file("${staticConfigPath}/${props['key.store']}")
