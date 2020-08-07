@@ -50,33 +50,28 @@ import com.duckduckgo.app.browser.LongPressHandler.RequiredAction
 import com.duckduckgo.app.browser.SpecialUrlDetector.UrlType.IntentType
 import com.duckduckgo.app.browser.WebNavigationStateChange.*
 import com.duckduckgo.app.browser.addtohome.AddToHomeCapabilityDetector
+import com.duckduckgo.app.browser.downloader.DownloadFailReason
+import com.duckduckgo.app.browser.downloader.FileDownloader
 import com.duckduckgo.app.browser.favicon.FaviconDownloader
-import com.duckduckgo.app.browser.logindetection.NavigationEvent
 import com.duckduckgo.app.browser.logindetection.LoginDetected
 import com.duckduckgo.app.browser.logindetection.NavigationAwareLoginDetector
+import com.duckduckgo.app.browser.logindetection.NavigationEvent
 import com.duckduckgo.app.browser.model.BasicAuthenticationCredentials
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.browser.model.LongPressTarget
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.browser.ui.HttpAuthenticationDialogFragment.HttpAuthenticationListener
-import com.duckduckgo.app.cta.ui.Cta
-import com.duckduckgo.app.cta.ui.CtaViewModel
-import com.duckduckgo.app.cta.ui.DaxDialogCta
-import com.duckduckgo.app.cta.ui.DialogCta
-import com.duckduckgo.app.cta.ui.HomePanelCta
-import com.duckduckgo.app.cta.ui.HomeTopPanelCta
-import com.duckduckgo.app.cta.ui.UseOurAppCta
+import com.duckduckgo.app.cta.ui.*
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepository
 import com.duckduckgo.app.global.*
+import com.duckduckgo.app.global.events.db.UserEventKey
+import com.duckduckgo.app.global.events.db.UserEventsStore
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.global.model.SiteFactory
 import com.duckduckgo.app.global.model.domain
 import com.duckduckgo.app.global.model.domainMatchesUrl
-import com.duckduckgo.app.global.events.db.UserEventsStore
-import com.duckduckgo.app.global.events.db.UserEventKey
-import com.duckduckgo.app.global.toDesktopUri
 import com.duckduckgo.app.global.useourapp.UseOurAppDetector
 import com.duckduckgo.app.global.useourapp.UseOurAppDetector.Companion.USE_OUR_APP_SHORTCUT_TITLE
 import com.duckduckgo.app.global.useourapp.UseOurAppDetector.Companion.USE_OUR_APP_SHORTCUT_URL
@@ -106,7 +101,8 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
-import java.util.Locale
+import java.io.File
+import java.util.*
 import java.util.concurrent.TimeUnit
 
 class BrowserTabViewModel(
@@ -134,7 +130,8 @@ class BrowserTabViewModel(
     private val userEventsStore: UserEventsStore,
     private val notificationDao: NotificationDao,
     private val useOurAppDetector: UseOurAppDetector,
-    private val variantManager: VariantManager
+    private val variantManager: VariantManager,
+    private val fileDownloader: FileDownloader
 ) : WebViewClientListener, EditBookmarkListener, HttpAuthenticationListener, ViewModel() {
 
     private var buildingSiteFactoryJob: Job? = null
@@ -250,6 +247,13 @@ class BrowserTabViewModel(
         sealed class DaxCommand : Command() {
             object FinishTrackerAnimation : DaxCommand()
             class HideDaxDialog(val cta: Cta) : DaxCommand()
+        }
+
+        sealed class DownloadCommand : Command() {
+            class ScanMediaFiles(val file: File) : DownloadCommand()
+            class ShowDownloadFailedNotification(val message: String, val reason: DownloadFailReason) : DownloadCommand()
+            class ShowDownloadFinishedNotification(val file: File, val mimeType: String?) : DownloadCommand()
+            object ShowDownloadInProgressNotification : DownloadCommand()
         }
     }
 
@@ -503,6 +507,12 @@ class BrowserTabViewModel(
 
     override fun closeCurrentTab() {
         viewModelScope.launch { removeCurrentTabFromRepository() }
+    }
+
+    fun closeAndReturnToSourceIfBlankTab() {
+        if (url == null) {
+            closeAndSelectSourceTab()
+        }
     }
 
     override fun closeAndSelectSourceTab() {
@@ -1385,6 +1395,49 @@ class BrowserTabViewModel(
     override fun loginDetected() {
         val currentUrl = site?.url ?: return
         navigationAwareLoginDetector.onEvent(NavigationEvent.LoginAttempt(currentUrl))
+    }
+
+    fun download(pendingFileDownload: FileDownloader.PendingFileDownload) {
+        viewModelScope.launch(dispatchers.io()) {
+            fileDownloader.download(pendingFileDownload, object : FileDownloader.FileDownloadListener {
+
+                override fun downloadStartedNetworkFile() {
+                    Timber.d("download started: network file")
+                    closeAndReturnToSourceIfBlankTab()
+                }
+
+                override fun downloadFinishedNetworkFile(file: File, mimeType: String?) {
+                    Timber.i("downloadFinished network file")
+                }
+
+                override fun downloadStartedDataUri() {
+                    Timber.i("downloadStarted data uri")
+                    command.postValue(DownloadCommand.ShowDownloadInProgressNotification)
+                    closeAndReturnToSourceIfBlankTab()
+                }
+
+                override fun downloadFinishedDataUri(file: File, mimeType: String?) {
+                    Timber.i("downloadFinished data uri")
+                    command.postValue(DownloadCommand.ScanMediaFiles(file))
+                    command.postValue(DownloadCommand.ShowDownloadFinishedNotification(file, mimeType))
+                }
+
+                override fun downloadFailed(message: String, downloadFailReason: DownloadFailReason) {
+                    Timber.w("Failed to download file [$message]")
+                    command.postValue(DownloadCommand.ShowDownloadFailedNotification(message, downloadFailReason))
+                }
+
+                override fun downloadCancelled() {
+                    Timber.i("Download cancelled")
+                    closeAndReturnToSourceIfBlankTab()
+                }
+
+                override fun downloadOpened() {
+                    closeAndReturnToSourceIfBlankTab()
+                }
+
+            })
+        }
     }
 
     companion object {

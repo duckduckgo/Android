@@ -33,7 +33,7 @@ class DataUriDownloader @Inject constructor(
     fun download(pending: FileDownloader.PendingFileDownload, callback: FileDownloader.FileDownloadListener?) {
 
         try {
-            callback?.downloadStarted()
+            callback?.downloadStartedDataUri()
 
             when (val parsedDataUri = dataUriParser.generate(pending.url)) {
                 is ParseResult.Invalid -> {
@@ -45,7 +45,7 @@ class DataUriDownloader @Inject constructor(
                     val file = initialiseFilesOnDisk(pending, parsedDataUri.filename)
 
                     writeBytesToFiles(parsedDataUri.data, file)
-                    callback?.downloadFinished(file, parsedDataUri.mimeType)
+                    callback?.downloadFinishedDataUri(file, parsedDataUri.mimeType)
                 }
             }
         } catch (e: IOException) {
