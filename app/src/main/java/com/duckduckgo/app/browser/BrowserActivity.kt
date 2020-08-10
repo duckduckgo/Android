@@ -211,7 +211,7 @@ class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope() {
                 launch { viewModel.onOpenShortcut(sharedText) }
             } else {
                 Timber.w("opening in new tab requested for $sharedText")
-                launch { viewModel.onOpenInNewTabRequested(sharedText, true) }
+                launch { viewModel.onOpenInNewTabRequested(query = sharedText, skipHome = true) }
                 return
             }
         }
@@ -289,13 +289,15 @@ class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope() {
         launch { viewModel.onNewTabRequested() }
     }
 
-    fun openInNewTab(query: String) {
-        launch { viewModel.onOpenInNewTabRequested(query) }
+    fun openInNewTab(query: String, sourceTabId: String?) {
+        launch {
+            viewModel.onOpenInNewTabRequested(query = query, sourceTabId = sourceTabId)
+        }
     }
 
-    fun openMessageInNewTab(message: Message) {
+    fun openMessageInNewTab(message: Message, sourceTabId: String?) {
         openMessageInNewTabJob = launch {
-            val tabId = viewModel.onNewTabRequested()
+            val tabId = viewModel.onNewTabRequested(sourceTabId = sourceTabId)
             val fragment = openNewTab(tabId, null, false)
             fragment.messageFromPreviousTab = message
         }

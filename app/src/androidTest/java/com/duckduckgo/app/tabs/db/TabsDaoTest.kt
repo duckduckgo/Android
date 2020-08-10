@@ -206,7 +206,6 @@ class TabsDaoTest {
 
     @Test
     fun whenTabInsertedAtPositionThenOtherTabsReordered() {
-
         testee.insertTab(TabEntity("TAB_ID1", position = 0))
         testee.insertTab(TabEntity("TAB_ID2", position = 1))
         testee.insertTab(TabEntity("TAB_ID3", position = 2))
@@ -226,7 +225,18 @@ class TabsDaoTest {
 
         assertEquals(3, tabs[3].position)
         assertEquals("TAB_ID3", tabs[3].tabId)
-
     }
 
+    @Test
+    fun whenSourceTabDeletedThenRelatedTabsUpdated() {
+        val firstTab = TabEntity("TAB_ID", "http//updatedexample.com", position = 0)
+        val secondTab = TabEntity("TAB_ID_1", "http//updatedexample.com", position = 1, sourceTabId = "TAB_ID")
+        testee.insertTab(firstTab)
+        testee.insertTab(secondTab)
+
+        testee.deleteTab(firstTab)
+
+        assertNotNull(testee.tab("TAB_ID_1"))
+        assertNull(testee.tab("TAB_ID_1")?.sourceTabId)
+    }
 }

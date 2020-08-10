@@ -17,14 +17,21 @@
 package com.duckduckgo.app.onboarding.store
 
 import com.duckduckgo.app.CoroutineTestRule
+import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.runBlocking
+import com.duckduckgo.app.statistics.Variant
+import com.duckduckgo.app.statistics.VariantManager
+import com.duckduckgo.app.statistics.VariantManager.Companion.DEFAULT_VARIANT
+import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.mock
+import com.nhaarman.mockitokotlin2.never
 import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.whenever
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
+import java.util.concurrent.TimeUnit
 
 @ExperimentalCoroutinesApi
 class AppUserStageStoreTest {
@@ -32,12 +39,14 @@ class AppUserStageStoreTest {
     @get:Rule
     var coroutineRule = CoroutineTestRule()
 
-    private val userStageDao = mock<UserStageDao>()
+    private val userStageDao: UserStageDao = mock()
+    private val variantManager: VariantManager = mock()
+    private val appInstallStore: AppInstallStore = mock()
 
-    private val testee = AppUserStageStore(userStageDao, coroutineRule.testDispatcherProvider)
+    private val testee = AppUserStageStore(userStageDao, coroutineRule.testDispatcherProvider, variantManager, appInstallStore)
 
     @Test
-    fun whenGetUserAppStageThenRetunCurrentStage() = coroutineRule.runBlocking {
+    fun whenGetUserAppStageThenReturnCurrentStage() = coroutineRule.runBlocking {
         givenCurrentStage(AppStage.DAX_ONBOARDING)
 
         val userAppStage = testee.getUserAppStage()
@@ -94,6 +103,54 @@ class AppUserStageStoreTest {
     fun whenMoveToStageThenUpdateUserStageInDao() = coroutineRule.runBlocking {
         testee.moveToStage(AppStage.USE_OUR_APP_ONBOARDING)
         verify(userStageDao).updateUserStage(AppStage.USE_OUR_APP_ONBOARDING)
+    }
+
+    @Test
+    fun whenAppResumedAndInstalledFor3DaysAndKillOnboardingFeatureNotActiveIfUserInOnboardingThenDoNotUpdateUserStage() = coroutineRule.runBlocking {
+        givenDefaultVariant()
+        givenCurrentStage(AppStage.DAX_ONBOARDING)
+        givenAppInstalledByDays(days = 3)
+
+        testee.onAppResumed()
+
+        verify(userStageDao, never()).updateUserStage(AppStage.ESTABLISHED)
+    }
+
+    @Test
+    fun whenAppResumedAndInstalledFor3DaysAndKillOnboardingFeatureActiveIfUserInOnboardingThenMoveToEstablished() = coroutineRule.runBlocking {
+        givenKillOnboardingFeature()
+        givenCurrentStage(AppStage.DAX_ONBOARDING)
+        givenAppInstalledByDays(days = 3)
+
+        testee.onAppResumed()
+
+        verify(userStageDao).updateUserStage(AppStage.ESTABLISHED)
+    }
+
+    @Test
+    fun whenAppResumedAndInstalledForLess3DaysAndKillOnboardingFeatureActiveThenDoNotUpdateUserStage() = coroutineRule.runBlocking {
+        givenKillOnboardingFeature()
+        givenCurrentStage(AppStage.DAX_ONBOARDING)
+        givenAppInstalledByDays(days = 2)
+
+        testee.onAppResumed()
+
+        verify(userStageDao, never()).updateUserStage(any())
+    }
+
+    private fun givenAppInstalledByDays(days: Long) {
+        whenever(appInstallStore.hasInstallTimestampRecorded()).thenReturn(true)
+        whenever(appInstallStore.installTimestamp).thenReturn(System.currentTimeMillis() - TimeUnit.DAYS.toMillis(days) - 1)
+    }
+
+    private fun givenDefaultVariant() {
+        whenever(variantManager.getVariant(any())).thenReturn(DEFAULT_VARIANT)
+    }
+
+    private fun givenKillOnboardingFeature() {
+        whenever(variantManager.getVariant()).thenReturn(
+            Variant("test", features = listOf(VariantManager.VariantFeature.KillOnboarding), filterBy = { true })
+        )
     }
 
     private suspend fun givenCurrentStage(appStage: AppStage) {

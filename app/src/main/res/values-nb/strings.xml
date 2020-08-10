@@ -415,7 +415,7 @@
     <string name="changeIconDialogMessage">Det kan hende at appen lukkes for å bruke endringene. Kom tilbake etter at du har beundret det kjekke, nye ikonet ditt.</string>
 
     <!-- New dashboard / menu buttons -->
-    <string name="manageWhitelist">Administrer hviteliste</string>
+    <string name="manageWhitelist">Ubeskyttede nettsteder</string>
     <string name="reportBrokenSite">Rapporter ødelagt nettsted</string>
 
     <!-- Dialogs -->
@@ -423,19 +423,18 @@
     <string name="dialogEditTitle">Rediger</string>
 
     <!-- Whitelist -->
-    <string name="whitelisetActivityTitle">Hviteliste</string>
-    <string name="enablePrivacyProtection">Legg til hviteliste</string>
-    <string name="disablePrivacyProtection">Fjern fra hvitelisten</string>
-    <string name="whitelistEntryOverflowContentDescription">Flere alternativer for hvitelisteoppføring %s</string>
-    <string name="whitelistEntryDeleteConfirmMessage">Er du sikker på at du vil slette &lt;b&gt;%s&lt;/b&gt; fra hvitelisten?</string>
-    <string name="whitelistExplanation">Disse hvitelistenettstedene vil ikke bli oppgradert av Personvern</string>
-    <string name="whitelistNoEntries">Ingen hvitlistede nettsteder ennå</string>
+    <string name="whitelisetActivityTitle">Ubeskyttede nettsteder</string>
+    <string name="enablePrivacyProtection">Aktiver personvernbeskyttelse</string>
+    <string name="disablePrivacyProtection">Deaktiver personvernbeskyttelse</string>
+    <string name="whitelistEntryOverflowContentDescription">Flere alternativer for det ubeskyttede nettstedet %s</string>
+    <string name="whitelistEntryDeleteConfirmMessage">Er du sikker på at du vil fjerne &lt;b&gt;%s&lt;/b&gt; fra ubeskyttede nettsteder?</string>
+    <string name="whitelistExplanation">Disse nettstedene blir ikke dekket av personvernbeskyttelse.</string>
+    <string name="whitelistNoEntries">Ingen ubeskyttede nettsteder ennå</string>
     <string name="whitelistDomainHint">www.example.com</string>
-    <string name="whitelistFormatError">Kunne ikke lagre, skriv inn et domene som <b>example.com</b>
-  </string>
+    <string name="whitelistFormatError">Kunne ikke lagre, skriv inn et domene som <b>example.com</b></string>
 
     <!-- Settings -->
-    <string name="settingsPrivacyProtectionWhitelist">Hviteliste for personvern</string>
+    <string name="settingsPrivacyProtectionWhitelist">Ubeskyttede nettsteder</string>
 
     <!-- Fireproof websites -->
     <string name="fireproofWebsitesActivityTitle">Brannsikre nettsteder</string>
