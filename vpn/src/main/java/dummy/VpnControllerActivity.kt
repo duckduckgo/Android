@@ -24,19 +24,12 @@ import android.content.ServiceConnection
 import android.net.VpnService
 import android.os.Bundle
 import android.os.IBinder
-import android.view.textclassifier.SelectionEvent
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import com.duckduckgo.mobile.android.vpn.PassthroughVpnService
 import com.duckduckgo.mobile.android.vpn.R
-import com.duckduckgo.mobile.android.vpn.data.Packet
 import kotlinx.coroutines.*
 import timber.log.Timber
-import java.net.InetSocketAddress
-import java.nio.ByteBuffer
-import java.nio.channels.DatagramChannel
-import java.nio.channels.SelectionKey
-import java.util.concurrent.Executors
 
 class VpnControllerActivity : AppCompatActivity(R.layout.activity_vpn_controller), CoroutineScope by MainScope() {
 
@@ -45,24 +38,19 @@ class VpnControllerActivity : AppCompatActivity(R.layout.activity_vpn_controller
     private lateinit var processorStartButton: Button
     private lateinit var processorStopButton: Button
     private lateinit var addPacketButton: Button
-    private lateinit var selectorReadyToWrite: Button
 
     private var vpnService: PassthroughVpnService? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setSupportActionBar(findViewById(R.id.toolbar))
+        bindService(PassthroughVpnService.serviceIntent(this), serviceConnection, Context.BIND_AUTO_CREATE)
         setViewReferences()
         configureUiHandlers()
     }
 
-    override fun onStart() {
-        super.onStart()
-        bindService(PassthroughVpnService.serviceIntent(this), serviceConnection, Context.BIND_AUTO_CREATE)
-    }
-
-    override fun onStop() {
-        super.onStop()
+    override fun onDestroy() {
+        super.onDestroy()
         unbindService(serviceConnection)
     }
 
@@ -72,7 +60,6 @@ class VpnControllerActivity : AppCompatActivity(R.layout.activity_vpn_controller
         processorStartButton = findViewById(R.id.processStart)
         processorStopButton = findViewById(R.id.processStop)
         addPacketButton = findViewById(R.id.addPacket)
-        selectorReadyToWrite = findViewById(R.id.selectorReadyToWrite)
     }
 
     private fun configureUiHandlers() {
@@ -85,28 +72,16 @@ class VpnControllerActivity : AppCompatActivity(R.layout.activity_vpn_controller
             }
         }
         processorStopButton.setOnClickListener { vpnService?.deviceToNetworkPacketProcessor?.stop() }
-        addPacketButton.setOnClickListener { vpnService?.deviceToNetworkPacketProcessor?.addPacket(Packet(ByteBuffer.allocate(0))) }
-        addPacketButton.setOnLongClickListener { bulkAddPackets(); true }
-
-        selectorReadyToWrite.setOnClickListener { vpnService?.deviceToNetworkPacketProcessor?.selector?.let {
-            GlobalScope.launch(Executors.newSingleThreadExecutor().asCoroutineDispatcher()) {
-                val channel = DatagramChannel.open()
-                channel.configureBlocking(false)
-                vpnService?.protect(channel.socket())
-                it.wakeup()
-                Timber.i("About to register write interest on selector")
-                channel.register(it, SelectionKey.OP_WRITE, "hi")
-                Timber.i("Finished registering")
-            }
-        } }
+        //addPacketButton.setOnClickListener { vpnService?.deviceToNetworkPacketProcessor?.addPacket(Packet(ByteBuffer.allocate(0))) }
+        //addPacketButton.setOnLongClickListener { bulkAddPackets(); true }
 
     }
 
-    private fun bulkAddPackets() {
-        for (i in 0 until 100) {
-            vpnService?.deviceToNetworkPacketProcessor?.addPacket(Packet(ByteBuffer.allocate(0)))
-        }
-    }
+//    private fun bulkAddPackets() {
+//        for (i in 0 until 100) {
+//            vpnService?.deviceToNetworkPacketProcessor?.addPacket(Packet(ByteBuffer.allocate(0)))
+//        }
+//    }
 
     private fun startVpnIfAllowed() {
         when (val permissionStatus = checkVpnPermission()) {

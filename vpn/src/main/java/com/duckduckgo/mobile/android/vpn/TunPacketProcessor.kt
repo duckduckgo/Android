@@ -17,16 +17,20 @@
 package com.duckduckgo.mobile.android.vpn
 
 import android.os.ParcelFileDescriptor
+import thirdpartyneedsrewritten.hexene.localvpn.HexenePacket
 import timber.log.Timber
 import java.io.FileInputStream
 import java.io.FileOutputStream
 import java.nio.ByteBuffer
+import java.nio.channels.FileChannel
+import java.util.concurrent.TimeUnit
 
 
-class TunPacketProcessor(private val tunInterface: ParcelFileDescriptor,
-                         private val packetHandler: PacketHandler) {
+class TunPacketProcessor(
+    private val tunInterface: ParcelFileDescriptor,
+    private val queues: VpnQueues
+) {
 
-    private val packet = ByteBuffer.allocate(Short.MAX_VALUE.toInt())
     private var running = false
 
     fun run() {
@@ -34,27 +38,77 @@ class TunPacketProcessor(private val tunInterface: ParcelFileDescriptor,
 
         running = true
 
-        // reading from the TUN; this means packets coming from apps on this device
-        val inStream = FileInputStream(tunInterface.fileDescriptor)
 
-        // communicating with servers outside of the device
-        val outStream = FileOutputStream(tunInterface.fileDescriptor)
+        // reading from the TUN; this means packets coming from apps on this device
+        val vpnInput = FileInputStream(tunInterface.fileDescriptor).channel
+
+        // writing back data to the TUN;
+        val vpnOutput = FileOutputStream(tunInterface.fileDescriptor).channel
+
+        try {
+            executeReadLoop(vpnInput)
+            executeWriteLoop(vpnOutput)
+        } finally {
+            vpnInput.close()
+            vpnOutput.close()
+        }
+
+    }
+
+    private fun executeReadLoop(vpnInput: FileChannel) {
+        var bufferToNetwork = byteBuffer()
+        var dataSent = true
 
         while (running) {
             try {
-                val inPacketLength = inStream.read(packet.array())
-                if (inPacketLength > 0) {
-                    packet.limit(inPacketLength)
-                    packetHandler.handleDeviceToNetworkPacket(packet)
-                    packet.clear()
+
+                if(dataSent) {
+                    bufferToNetwork = byteBuffer()
+                } else {
+                    bufferToNetwork.clear()
                 }
 
+                val inPacketLength = vpnInput.read(bufferToNetwork)
+                if (inPacketLength > 0) {
+                    dataSent = true
+                    bufferToNetwork.flip()
+                    val packet = HexenePacket(bufferToNetwork)
+                    if (packet.isUDP) {
+                        queues.deviceToNetwork.offer(packet)
+                    }
+                } else {
+                    dataSent = false
+                }
             } catch (e: Exception) {
                 Timber.w(e, "Failed polling for VPN data")
                 running = false
             }
 
         }
+    }
 
+    private fun byteBuffer() : ByteBuffer {
+        return ByteBuffer.allocate(Short.MAX_VALUE.toInt())
+    }
+
+    private fun executeWriteLoop(vpnOutput: FileChannel) {
+        while (running) {
+            val bufferFromNetwork = queues.networkToDevice.poll(1, TimeUnit.SECONDS)
+            if (bufferFromNetwork == null) {
+                Timber.v("Nothing received from network")
+            } else {
+                Timber.i("***\n***\n*** Got data from network")
+                bufferFromNetwork.flip()
+                while (bufferFromNetwork.hasRemaining()) {
+                    val bytesWrittenToVpn = vpnOutput.write(bufferFromNetwork)
+                    Timber.v("Wrote %d bytes to the VPN tun", bytesWrittenToVpn)
+                }
+            }
+        }
+    }
+
+    fun stop() {
+        running = false
+        Timber.w("TunPacketProcess stopped")
     }
 }

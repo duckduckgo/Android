@@ -24,7 +24,7 @@ import java.nio.ByteBuffer;
  * Representation of an IP Packet
  */
 // TODO: Reduce public mutability
-public class Packet
+public class HexenePacket
 {
     public static final int IP4_HEADER_SIZE = 20;
     public static final int TCP_HEADER_SIZE = 20;
@@ -38,7 +38,7 @@ public class Packet
     private boolean isTCP;
     private boolean isUDP;
 
-    public Packet(ByteBuffer buffer) throws UnknownHostException {
+    public HexenePacket(ByteBuffer buffer) throws UnknownHostException {
         this.ip4Header = new IP4Header(buffer);
         if (this.ip4Header.protocol == IP4Header.TransportProtocol.TCP) {
             this.tcpHeader = new TCPHeader(buffer);

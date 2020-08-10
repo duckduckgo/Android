@@ -25,17 +25,22 @@ import android.os.Build
 import android.os.IBinder
 import android.os.ParcelFileDescriptor
 import kotlinx.coroutines.*
+import thirdpartyneedsrewritten.hexene.localvpn.HexenePacket
 import timber.log.Timber
+import java.nio.ByteBuffer
 import java.nio.channels.DatagramChannel
-import java.util.concurrent.TimeUnit
+import java.util.concurrent.BlockingQueue
+import java.util.concurrent.LinkedBlockingQueue
 
 
 class PassthroughVpnService : VpnService(), CoroutineScope by MainScope(), DatagramChannelCreator {
 
     private var tunInterface: ParcelFileDescriptor? = null
     private val binder: VpnServiceBinder = VpnServiceBinder()
+    private val queues = VpnQueues()
+    private var tunPacketProcessor: TunPacketProcessor? = null
 
-    val deviceToNetworkPacketProcessor = DeviceToNetworkPacketProcessor(createDatagram())
+    val deviceToNetworkPacketProcessor = DeviceToNetworkPacketProcessor(this, queues)
 
     inner class VpnServiceBinder : Binder() {
 
@@ -90,9 +95,10 @@ class PassthroughVpnService : VpnService(), CoroutineScope by MainScope(), Datag
             startForeground(FOREGROUND_VPN_SERVICE_ID, VpnNotificationBuilder.build(this))
             startStatTicker()
 
-            val packetHandler = PacketHandler(deviceToNetworkPacketProcessor)
-            GlobalScope.launch {
-                TunPacketProcessor(vpnInterface, packetHandler).run()
+            tunPacketProcessor = TunPacketProcessor(vpnInterface, queues).also {
+                GlobalScope.launch {
+                    it.run()
+                }
             }
         }
     }
@@ -121,10 +127,11 @@ class PassthroughVpnService : VpnService(), CoroutineScope by MainScope(), Datag
     private fun stopVpn() {
         Timber.i("Stopping VPN")
         tickerJob?.cancel()
+        tunPacketProcessor?.stop()
+        deviceToNetworkPacketProcessor.stop()
         tunInterface?.close()
         tunInterface = null
         stopForeground(true)
-
 
         stopSelf()
         running = false
@@ -170,11 +177,8 @@ class PassthroughVpnService : VpnService(), CoroutineScope by MainScope(), Datag
 
     override fun createDatagram(): DatagramChannel {
         return DatagramChannel.open().also { datagramChannel ->
+            protect(datagramChannel.socket())
             datagramChannel.configureBlocking(false)
-            datagramChannel.socket().also { socket ->
-                socket.soTimeout = 0
-                protect(socket)
-            }
         }
     }
 
@@ -182,4 +186,9 @@ class PassthroughVpnService : VpnService(), CoroutineScope by MainScope(), Datag
 
 interface DatagramChannelCreator {
     fun createDatagram(): DatagramChannel
+}
+
+class VpnQueues {
+    val deviceToNetwork: BlockingQueue<HexenePacket> = LinkedBlockingQueue()
+    val networkToDevice: BlockingQueue<ByteBuffer> = LinkedBlockingQueue<ByteBuffer>()
 }

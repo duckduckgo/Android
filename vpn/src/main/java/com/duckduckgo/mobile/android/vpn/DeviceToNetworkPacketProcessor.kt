@@ -16,139 +16,125 @@
 
 package com.duckduckgo.mobile.android.vpn
 
-import android.os.Looper
 import android.os.Process.setThreadPriority
-import com.duckduckgo.mobile.android.vpn.data.Packet
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.launch
+import thirdpartyneedsrewritten.hexene.localvpn.HexenePacket
 import thirdpartyneedsrewritten.ip.IpDatagram
 import timber.log.Timber
 import java.net.InetSocketAddress
 import java.nio.ByteBuffer
-import java.nio.channels.*
-import java.nio.channels.spi.SelectorProvider
-import java.util.concurrent.BlockingQueue
+import java.nio.channels.DatagramChannel
+import java.nio.channels.SelectionKey
+import java.nio.channels.Selector
 import java.util.concurrent.Executors
-import java.util.concurrent.LinkedBlockingQueue
 import java.util.concurrent.TimeUnit
 
-class DeviceToNetworkPacketProcessor(private val datagramChannel: DatagramChannel) {
+class DeviceToNetworkPacketProcessor(
+    private val datagramChannelCreator: DatagramChannelCreator,
+    private val queues: VpnQueues
+) {
 
-    private val queue: BlockingQueue<Packet> = LinkedBlockingQueue<Packet>()
     private var pollJob: Job? = null
-    private var pollSelectorJob: Job? = null
-    lateinit var packetHandler: PacketHandler
 
-    private val SOCKET_BYTEBUFFER_WRITE_SIZE = 1024 * 16
-    private val socketBuffer = ByteBuffer.allocateDirect(SOCKET_BYTEBUFFER_WRITE_SIZE)
-
-    val selector: Selector = SelectorProvider.provider().openSelector()
-    private var datagramChannelMap: Map<Channel, Packet> = HashMap()
+    val selector: Selector = Selector.open()
 
     fun start() {
         Timber.i("Starting DeviceToNetworkPacketProcessor.")
 
         if (pollJob == null) {
-            pollJob = GlobalScope.launch(Executors.newSingleThreadExecutor().asCoroutineDispatcher()) { pollNetworkToDevice() }
+            pollJob = GlobalScope.launch(Executors.newSingleThreadExecutor().asCoroutineDispatcher()) { pollDeviceToNetwork() }
         }
 
-        if (pollSelectorJob == null) {
-            pollSelectorJob = GlobalScope.launch(Executors.newSingleThreadExecutor().asCoroutineDispatcher()) { pollSelector() }
-        }
     }
 
     fun stop() {
+        Timber.i("Stopping DeviceToNetworkPacketProcessor.")
         pollJob?.cancel()
         pollJob = null
     }
 
-    private fun pollNetworkToDevice() {
+    private fun pollDeviceToNetwork() {
         setThreadPriority(android.os.Process.THREAD_PRIORITY_URGENT_DISPLAY)
 
         while (pollJob?.isActive == true) {
 
             kotlin.runCatching {
-                val packet = queue.poll(1, TimeUnit.SECONDS)
-                if (packet == null) {
-                    Timber.v("No packets available %d", System.currentTimeMillis())
-                } else {
-                    Timber.i("Got a packet. %d packets remain", queue.size)
+                run {
+                    val packet = queues.deviceToNetwork.poll(1, TimeUnit.SECONDS)
+                    if (packet == null) {
+                        Timber.v("No packets available %d", System.currentTimeMillis())
+                    } else {
+                        Timber.v("Got a packet. %d packets remain", queues.deviceToNetwork.size)
 
-                    val destination = InetSocketAddress(IpDatagram.readDestinationIP(packet.rawData), IpDatagram.readDestinationPort(packet.rawData))
-                    Timber.i("Packet destination: %s:%s %s", destination.address, destination.port, String(packet.rawData.array()))
+                        //val destination = InetSocketAddress(IpDatagram.readDestinationIP(packet.rawData), IpDatagram.readDestinationPort(packet.rawData))
+                        //Timber.i("Packet destination: %s:%s ", destination.address, destination.port)
 
+                        val outputChannel = datagramChannelCreator.createDatagram()
+                        val destinationAddress = packet.ip4Header.destinationAddress
+                        val destinationPort = packet.udpHeader.destinationPort
+                        outputChannel.connect(InetSocketAddress(destinationAddress, destinationPort))
 
-                    selector.wakeup()
-                    val key = datagramChannel.register(selector, SelectionKey.OP_WRITE, packet)
+                        packet.swapSourceAndDestination()
+
+                        selector.wakeup()
+                        outputChannel.register(selector, SelectionKey.OP_READ, packet)
+
+                        val payloadBuffer = packet.backingBuffer
+                        while (payloadBuffer.hasRemaining()) {
+                            val bytesWritten = outputChannel.write(payloadBuffer)
+                            Timber.v("Wrote %d bytes to network (%s:%s)", bytesWritten, destinationAddress, destinationPort)
+                        }
+                    }
                 }
+
+                networkToDeviceProcessing()
+
             }.onFailure {
                 Timber.w(it, "Failed to process packet")
             }
-
         }
     }
 
-    private fun pollSelector() {
+    private fun networkToDeviceProcessing() {
+        val selectedKeys = selector.selectNow()
+        Timber.d("%d selected keys", selectedKeys)
+        val iterator = selector.selectedKeys().iterator()
+        while (iterator.hasNext()) {
+            val key = iterator.next()
 
-        while (pollSelectorJob?.isActive == true) {
+            kotlin.runCatching {
+                if (key.isValid && key.isReadable) {
+                    iterator.remove()
 
-            try {
-                Timber.i("About to select. main thread? %s", Thread.currentThread().id == Looper.getMainLooper().thread.id)
-                selector.select()
-                Timber.e("Finished selecting")
-                val selectedKeys = selector.selectedKeys().iterator()
-                while (selectedKeys.hasNext()) {
-                    val key = selectedKeys.next()
+                    val receiveBuffer = ByteBuffer.allocate(Short.MAX_VALUE.toInt())
+                    receiveBuffer.position(HexenePacket.IP4_HEADER_SIZE + HexenePacket.UDP_HEADER_SIZE)
 
-                    if (key.isValid && key.isReadable) {
-                        // read from channel
-                        Timber.i("SELECTOR: read from channel")
-                    } else if (key.isValid && key.isWritable) {
-                        writeToChannel(key)
-                        key.cancel()
-                    } else if (key.isValid && key.isConnectable) {
-                        // initialize connection (TCP only?)
-                        Timber.i("SELECTOR: initialize connection")
-                    }
+                    val inputChannel = key.channel() as DatagramChannel
+                    val readBytes = inputChannel.read(receiveBuffer)
+                    Timber.i("Read %d bytes from datagram channel %s", readBytes, String(receiveBuffer.array()))
 
-                    selectedKeys.remove()
+                    val referencePacket = key.attachment() as HexenePacket
+                    referencePacket.updateUDPBuffer(receiveBuffer, readBytes)
+                    receiveBuffer.position(HEADER_SIZE + readBytes)
+
+                    queues.networkToDevice.offer(receiveBuffer)
                 }
-
-            } catch (e: CancelledKeyException) {
-                Timber.w(e, "Key cancelled")
-            } catch (e: Exception) {
-                Timber.w(e, "General issue encountered while processing selected keys")
+            }.onFailure {
+                Timber.w(it, "Failure processing selected key for selector")
+                key.cancel()
             }
         }
     }
 
-    private fun writeToChannel(key: SelectionKey) {
-        Timber.i("SELECTOR: write to channel. main thread? %s", Thread.currentThread().id == Looper.getMainLooper().thread.id)
-
-        if (key.channel() is DatagramChannel) {
-
-            Timber.i("Ready to write: %s", key.attachment())
-
-//            val packet = key.attachment() as Packet
-//            val destination = InetSocketAddress(IpDatagram.readDestinationIP(packet.rawData), IpDatagram.readDestinationPort(packet.rawData))
-//            val packetData: ByteArray = UDPPacket.extractUDPv4Data(packet.rawData.array())
-//            Timber.d("Writing to datagram channel to %s, %d bytes", destination, packetData.size)
-
-            // put data in socket buffer somehow
-
-
-//            datagramChannel.let {
-//                it.send(socketBuffer, destination)
-//                it.register(selector, SelectionKey.OP_WRITE)
-//            }
-
-        }
+    companion object {
+        private const val HEADER_SIZE = HexenePacket.IP4_HEADER_SIZE + HexenePacket.UDP_HEADER_SIZE
     }
 
-    fun addPacket(packet: Packet) {
-        queue.offer(packet)
-    }
+//    fun addPacket(packet: Packet) {
+//        queue.offer(packet)
+//    }
 
 }
