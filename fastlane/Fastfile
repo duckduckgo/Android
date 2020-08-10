@@ -17,6 +17,19 @@ default_platform(:android)
 
 platform :android do
 
+  desc "Upload APK to Play Store"
+  lane :deploy_playstore do
+
+    props = property_file_read(file: "app/version/version.properties")
+    version = props["VERSION"]
+    apkPath = "app/build/outputs/apk/release/duckduckgo-#{version}-release.apk"
+
+    upload_to_play_store(
+      apk: apkPath,
+      track: 'internal'
+    )
+  end
+
   desc "Deploy APK to GitHub"
   lane :deploy_github do
 
@@ -48,12 +61,6 @@ platform :android do
 
         UI.header "Creating a new release"
         UI.message ("Checking current branch: #{git_branch}")
-
-        versionCode = prompt(text: "Enter New Version Code:")
-        UI.message ("Writing release notes to en-CA for version: #{versionCode}")
-        File.open('../fastlane/metadata/android/en-CA/changelogs/#{versionCode}', 'w') do |file|
-            file.write("just a test")
-        end
 
         ensure_git_status_clean
 
