@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package thirdpartyneedsrewritten.hexene.localvpn;
+package xyz.hexene.localvpn;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -24,7 +24,7 @@ import java.nio.ByteBuffer;
  * Representation of an IP Packet
  */
 // TODO: Reduce public mutability
-public class HexenePacket
+public class Packet
 {
     public static final int IP4_HEADER_SIZE = 20;
     public static final int TCP_HEADER_SIZE = 20;
@@ -38,7 +38,7 @@ public class HexenePacket
     private boolean isTCP;
     private boolean isUDP;
 
-    public HexenePacket(ByteBuffer buffer) throws UnknownHostException {
+    public Packet(ByteBuffer buffer) throws UnknownHostException {
         this.ip4Header = new IP4Header(buffer);
         if (this.ip4Header.protocol == IP4Header.TransportProtocol.TCP) {
             this.tcpHeader = new TCPHeader(buffer);

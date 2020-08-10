@@ -24,9 +24,12 @@ import android.os.Binder
 import android.os.Build
 import android.os.IBinder
 import android.os.ParcelFileDescriptor
+import com.duckduckgo.mobile.android.vpn.processor.TunPacketProcessor
+import com.duckduckgo.mobile.android.vpn.processor.UdpPacketProcessor
+import com.duckduckgo.mobile.android.vpn.ui.notification.VpnNotificationBuilder
 import kotlinx.coroutines.*
-import thirdpartyneedsrewritten.hexene.localvpn.HexenePacket
 import timber.log.Timber
+import xyz.hexene.localvpn.Packet
 import java.nio.ByteBuffer
 import java.nio.channels.DatagramChannel
 import java.util.concurrent.BlockingQueue
@@ -40,7 +43,7 @@ class PassthroughVpnService : VpnService(), CoroutineScope by MainScope(), Datag
     private val queues = VpnQueues()
     private var tunPacketProcessor: TunPacketProcessor? = null
 
-    val deviceToNetworkPacketProcessor = DeviceToNetworkPacketProcessor(this, queues)
+    val deviceToNetworkPacketProcessor = UdpPacketProcessor(this, queues)
 
     inner class VpnServiceBinder : Binder() {
 
@@ -189,6 +192,6 @@ interface DatagramChannelCreator {
 }
 
 class VpnQueues {
-    val deviceToNetwork: BlockingQueue<HexenePacket> = LinkedBlockingQueue()
+    val deviceToNetwork: BlockingQueue<Packet> = LinkedBlockingQueue()
     val networkToDevice: BlockingQueue<ByteBuffer> = LinkedBlockingQueue<ByteBuffer>()
 }

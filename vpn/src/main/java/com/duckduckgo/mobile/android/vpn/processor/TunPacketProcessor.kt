@@ -14,11 +14,12 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.mobile.android.vpn
+package com.duckduckgo.mobile.android.vpn.processor
 
 import android.os.ParcelFileDescriptor
-import thirdpartyneedsrewritten.hexene.localvpn.HexenePacket
+import com.duckduckgo.mobile.android.vpn.VpnQueues
 import timber.log.Timber
+import xyz.hexene.localvpn.Packet
 import java.io.FileInputStream
 import java.io.FileOutputStream
 import java.nio.ByteBuffer
@@ -72,7 +73,7 @@ class TunPacketProcessor(
                 if (inPacketLength > 0) {
                     dataSent = true
                     bufferToNetwork.flip()
-                    val packet = HexenePacket(bufferToNetwork)
+                    val packet = Packet(bufferToNetwork)
                     if (packet.isUDP) {
                         queues.deviceToNetwork.offer(packet)
                     }

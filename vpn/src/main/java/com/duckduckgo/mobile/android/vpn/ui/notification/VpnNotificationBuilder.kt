@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.mobile.android.vpn
+package com.duckduckgo.mobile.android.vpn.ui.notification
 
 import android.app.Notification
 import android.app.NotificationChannel
@@ -22,7 +22,7 @@ import android.app.NotificationManager
 import android.content.Context
 import android.os.Build
 import androidx.core.app.NotificationCompat
-import androidx.core.app.NotificationManagerCompat
+import com.duckduckgo.mobile.android.vpn.R
 
 
 class VpnNotificationBuilder {
@@ -32,7 +32,9 @@ class VpnNotificationBuilder {
         fun build(context: Context): Notification {
             registerChannel(context)
 
-            return NotificationCompat.Builder(context, VPN_FOREGROUND_SERVICE_NOTIFICATION_CHANNEL_ID)
+            return NotificationCompat.Builder(context,
+                VPN_FOREGROUND_SERVICE_NOTIFICATION_CHANNEL_ID
+            )
                 .setContentTitle(context.getString(R.string.vpnNotificationTitle))
                 .setSmallIcon(R.drawable.ic_vpn_notification_24)
                 .setOngoing(true)
