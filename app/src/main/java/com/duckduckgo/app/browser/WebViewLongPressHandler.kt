@@ -46,7 +46,7 @@ interface LongPressHandler {
 class WebViewLongPressHandler @Inject constructor(private val context: Context, private val pixel: Pixel) : LongPressHandler {
 
     override fun handleLongPress(longPressTargetType: Int, longPressTargetUrl: String?, menu: ContextMenu) {
-        menu.setHeaderTitle(longPressTargetUrl ?: context.getString(R.string.options))
+        menu.setHeaderTitle(longPressTargetUrl?.take(MAX_TITLE_LENGTH) ?: context.getString(R.string.options))
 
         var menuShown = true
         when (longPressTargetType) {
@@ -135,5 +135,7 @@ class WebViewLongPressHandler @Inject constructor(private val context: Context, 
         const val CONTEXT_MENU_ID_SHARE_LINK = 4
         const val CONTEXT_MENU_ID_DOWNLOAD_IMAGE = 5
         const val CONTEXT_MENU_ID_OPEN_IMAGE_IN_NEW_BACKGROUND_TAB = 6
+
+        private const val MAX_TITLE_LENGTH = 100
     }
 }
