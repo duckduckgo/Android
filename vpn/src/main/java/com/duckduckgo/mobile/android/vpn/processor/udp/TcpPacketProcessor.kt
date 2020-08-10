@@ -43,7 +43,7 @@ class TcpPacketProcessor(private val queues: VpnQueues) {
 
 
     fun start() {
-        Timber.i("Starting TcpPacketProcessor")
+        Timber.i("Starting ${this::class.simpleName}")
 
         if (pollJobDeviceToNetwork == null) {
             pollJobDeviceToNetwork = GlobalScope.launch(Executors.newSingleThreadExecutor().asCoroutineDispatcher()) { pollForDeviceToNetworkWork() }
@@ -56,7 +56,7 @@ class TcpPacketProcessor(private val queues: VpnQueues) {
     }
 
     fun stop() {
-        Timber.i("Stopping TcpPacketProcessor")
+        Timber.i("Stopping ${this::class.simpleName}")
 
         pollJobDeviceToNetwork?.cancel()
         pollJobDeviceToNetwork = null

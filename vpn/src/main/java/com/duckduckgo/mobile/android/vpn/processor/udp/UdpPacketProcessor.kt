@@ -46,7 +46,7 @@ class UdpPacketProcessor(
 
 
     fun start() {
-        Timber.i("Starting UdpPacketProcessor.")
+        Timber.i("Starting ${this::class.simpleName}")
 
         if (pollJobDeviceToNetwork == null) {
             pollJobDeviceToNetwork = GlobalScope.launch(Executors.newSingleThreadExecutor().asCoroutineDispatcher()) { pollForDeviceToNetworkWork() }
@@ -59,7 +59,7 @@ class UdpPacketProcessor(
     }
 
     fun stop() {
-        Timber.i("Stopping DeviceToNetworkPacketProcessor")
+        Timber.i("Stopping ${this::class.simpleName}")
 
         pollJobDeviceToNetwork?.cancel()
         pollJobDeviceToNetwork = null
