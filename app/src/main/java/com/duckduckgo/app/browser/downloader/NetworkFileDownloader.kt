@@ -25,7 +25,7 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.downloader.FileDownloader.PendingFileDownload
 import javax.inject.Inject
 
-class NetworkFileDownloader @Inject constructor(private val context: Context) {
+class NetworkFileDownloader @Inject constructor(private val context: Context, private val filenameExtractor: FilenameExtractor) {
 
     fun download(pendingDownload: PendingFileDownload, callback: FileDownloader.FileDownloadListener) {
 
@@ -34,7 +34,7 @@ class NetworkFileDownloader @Inject constructor(private val context: Context) {
             return
         }
 
-        val guessedFileName = pendingDownload.guessFileName()
+        val guessedFileName = filenameExtractor.extract(pendingDownload)
 
         val request = DownloadManager.Request(pendingDownload.url.toUri()).apply {
             allowScanningByMediaScanner()

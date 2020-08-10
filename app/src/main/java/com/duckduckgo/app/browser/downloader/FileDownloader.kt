@@ -22,7 +22,6 @@ import android.webkit.URLUtil
 import androidx.annotation.WorkerThread
 import com.duckduckgo.app.browser.downloader.FileDownloader.FileDownloadListener
 import com.duckduckgo.app.browser.downloader.FileDownloader.PendingFileDownload
-import timber.log.Timber
 import java.io.File
 import java.io.Serializable
 import javax.inject.Inject
@@ -65,12 +64,6 @@ class AndroidFileDownloader @Inject constructor(
             else -> callback.downloadFailed("Not supported", DownloadFailReason.UnsupportedUrlType)
         }
     }
-}
-
-fun PendingFileDownload.guessFileName(): String {
-    val guessedFileName = URLUtil.guessFileName(url, contentDisposition, mimeType)
-    Timber.i("Guessed filename of $guessedFileName for url $url")
-    return guessedFileName
 }
 
 val PendingFileDownload.isDataUrl get() = URLUtil.isDataUrl(url)

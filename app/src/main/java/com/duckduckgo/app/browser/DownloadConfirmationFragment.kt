@@ -22,7 +22,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.duckduckgo.app.browser.downloader.FileDownloader.PendingFileDownload
-import com.duckduckgo.app.browser.downloader.guessFileName
+import com.duckduckgo.app.browser.downloader.FilenameExtractor
 import com.duckduckgo.app.browser.downloader.isDataUrl
 import com.duckduckgo.app.global.view.gone
 import com.duckduckgo.app.global.view.leftDrawable
@@ -32,11 +32,15 @@ import dagger.android.support.AndroidSupportInjection
 import kotlinx.android.synthetic.main.download_confirmation.view.*
 import timber.log.Timber
 import java.io.File
+import javax.inject.Inject
 
 class DownloadConfirmationFragment : BottomSheetDialogFragment() {
 
     val listener: DownloadConfirmationDialogListener
         get() = parentFragment as DownloadConfirmationDialogListener
+
+    @Inject
+    lateinit var filenameExtractor: FilenameExtractor
 
     private var file: File? = null
 
@@ -57,7 +61,7 @@ class DownloadConfirmationFragment : BottomSheetDialogFragment() {
     }
 
     private fun setupDownload() {
-        file = if (!pendingDownload.isDataUrl) File(pendingDownload.directory, pendingDownload.guessFileName()) else null
+        file = if (!pendingDownload.isDataUrl) File(pendingDownload.directory, filenameExtractor.extract(pendingDownload)) else null
     }
 
     private fun setupViews(view: View) {
