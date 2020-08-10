@@ -33,7 +33,6 @@ import com.duckduckgo.app.statistics.store.OfflinePixelCountDataStore
 import kotlinx.coroutines.*
 import timber.log.Timber
 import java.net.URI
-import java.util.concurrent.Executors
 
 class BrowserWebViewClient(
     private val requestRewriter: RequestRewriter,
@@ -42,7 +41,8 @@ class BrowserWebViewClient(
     private val offlinePixelCountDataStore: OfflinePixelCountDataStore,
     private val uncaughtExceptionRepository: UncaughtExceptionRepository,
     private val cookieManager: CookieManager,
-    private val loginDetector: DOMLoginDetector
+    private val loginDetector: DOMLoginDetector,
+    private val dosDetector: DosDetector
 ) : WebViewClient() {
 
     var webViewClientListener: WebViewClientListener? = null
@@ -53,7 +53,7 @@ class BrowserWebViewClient(
      */
     override fun shouldOverrideUrlLoading(view: WebView, request: WebResourceRequest): Boolean {
         val url = request.url
-        return shouldOverride(view, url)
+        return shouldOverride(view, url, request.isForMainFrame)
     }
 
     /**
@@ -62,23 +62,22 @@ class BrowserWebViewClient(
     @Suppress("OverridingDeprecatedMember")
     override fun shouldOverrideUrlLoading(view: WebView, urlString: String): Boolean {
         val url = Uri.parse(urlString)
-        return shouldOverride(view, url)
+        return shouldOverride(view, url, true)
     }
 
     /**
      * API-agnostic implementation of deciding whether to override url or not
      */
-    private fun shouldOverride(webView: WebView, url: Uri): Boolean {
+    private fun shouldOverride(webView: WebView, url: Uri, isForMainFrame: Boolean): Boolean {
 
         Timber.v("shouldOverride $url")
-
-        // TODO: Also validate on API <24 and move into try block for exception monitoring
-        if (urlIsGeneratingDos(url)) {
-            Timber.d("DOS TESTING - SHOULD OVERRIDE killing load")
-            return false
-        }
-
         try {
+            if (isForMainFrame && dosDetector.isUrlGeneratingDos(url)) {
+                webView.loadUrl("about:blank")
+                webViewClientListener?.dosAttackDetected()
+                return false
+            }
+
             return when (val urlType = specialUrlDetector.determineType(url)) {
                 is SpecialUrlDetector.UrlType.Email -> {
                     webViewClientListener?.sendEmailRequested(urlType.emailAddress)
@@ -167,13 +166,6 @@ class BrowserWebViewClient(
 
     @WorkerThread
     override fun shouldInterceptRequest(webView: WebView, request: WebResourceRequest): WebResourceResponse? {
-
-        //TODO: include this in exception handling (but not run blocking)
-        if (request.isForMainFrame && urlIsGeneratingDos(request.url)) {
-            Timber.d("DOS TESTiNG - SHOULD INTERCEPT killing load")
-            return WebResourceResponse(null, null, null)
-        }
-
         return runBlocking {
             try {
                 val documentUrl = withContext(Dispatchers.Main) { webView.url }
@@ -187,36 +179,6 @@ class BrowserWebViewClient(
                 throw e
             }
         }
-    }
-
-    var lastUrl: Uri? = null
-    var lastUrlLoadTime: Long? = null
-    var dosCount = 0
-
-    // TODO validate threading, may not even need this
-    var sharedThread = Executors.newFixedThreadPool(1).asCoroutineDispatcher()
-
-    private fun urlIsGeneratingDos(url: Uri?): Boolean {
-        val lastKnownRefresh = lastUrlLoadTime
-        val now = System.currentTimeMillis()
-        val diffInMs = lastKnownRefresh?.let { now - lastKnownRefresh } ?: 0
-        Timber.d("DOS TESTING: Values are $lastKnownRefresh $diffInMs $lastUrl $dosCount")
-        val isUrlGeneratingDos = if (dosCount < 5 || lastKnownRefresh == null || diffInMs > 1000 || lastUrl != url) {
-            Timber.d("DOS TESTING: Valid INITIAL request for $url, permitting")
-            false
-        } else {
-            Timber.d("DOS TESTING: Invalid request for $url, blocking")
-            true
-        }
-        if (lastUrl != url) {
-            dosCount = 0
-        } else {
-            dosCount++
-        }
-
-        lastUrl = url
-        lastUrlLoadTime = System.currentTimeMillis()
-        return isUrlGeneratingDos
     }
 
     @RequiresApi(Build.VERSION_CODES.O)

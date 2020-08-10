@@ -782,6 +782,11 @@ class BrowserTabViewModel(
         }
     }
 
+    override fun dosAttackDetected() {
+        invalidateBrowsingActions()
+        command.value = ShowErrorWithAction { this.onUserSubmittedQuery(url.orEmpty()) }
+    }
+
     override fun titleReceived(newTitle: String) {
         site?.title = newTitle
         onSiteChanged()
