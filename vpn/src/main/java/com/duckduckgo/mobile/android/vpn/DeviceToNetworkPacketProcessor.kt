@@ -22,7 +22,6 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.launch
 import thirdpartyneedsrewritten.hexene.localvpn.HexenePacket
-import thirdpartyneedsrewritten.ip.IpDatagram
 import timber.log.Timber
 import java.net.InetSocketAddress
 import java.nio.ByteBuffer
