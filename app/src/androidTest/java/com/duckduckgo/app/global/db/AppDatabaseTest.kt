@@ -32,7 +32,6 @@ import com.duckduckgo.app.blockingObserve
 import com.duckduckgo.app.browser.addtohome.AddToHomeCapabilityDetector
 import com.duckduckgo.app.global.exception.UncaughtExceptionEntity
 import com.duckduckgo.app.global.exception.UncaughtExceptionSource
-import com.duckduckgo.app.global.useourapp.MigrationManager
 import com.duckduckgo.app.onboarding.store.AppStage
 import com.duckduckgo.app.runBlocking
 import com.duckduckgo.app.settings.db.SettingsDataStore
@@ -63,10 +62,9 @@ class AppDatabaseTest {
     private val context = mock<Context>()
     private val mockSettingsDataStore = mock<SettingsDataStore>()
     private val mockAddToHomeCapabilityDetector = mock<AddToHomeCapabilityDetector>()
-    private val mockUseOurAppMigrationManager = mock<MigrationManager>()
 
     private val migrationsProvider: MigrationsProvider =
-        MigrationsProvider(context, mockSettingsDataStore, mockAddToHomeCapabilityDetector, mockUseOurAppMigrationManager)
+        MigrationsProvider(context, mockSettingsDataStore, mockAddToHomeCapabilityDetector)
 
     @Before
     fun setup() {
@@ -113,6 +111,7 @@ class AppDatabaseTest {
         assertEquals(1, database().tabsDao().tabs()[1].position)
     }
 
+    @Test
     fun whenMigratingFromVersion4To5ThenTabsAreConsideredViewed() {
         testHelper.createDatabase(TEST_DB_NAME, 4).use {
             it.execSQL("INSERT INTO `tabs` values ('tabid1', 'url', 'title') ")
@@ -233,79 +232,32 @@ class AppDatabaseTest {
     }
 
     @Test
-    fun whenMigratingFromVersion21To22IfUserIsEstablishedAndConditionsAreMetThenMigrateToNotification() {
-        testHelper.createDatabase(TEST_DB_NAME, 21).use {
-            givenUseOurAppStateIs(canMigrate = true, hideTips = false, canAddToHome = true)
-            givenUserStageIs(it, AppStage.ESTABLISHED)
-
-            testHelper.runMigrationsAndValidate(TEST_DB_NAME, 22, true, migrationsProvider.MIGRATION_21_TO_22)
-            val stage = getUserStage(it)
-
-            assertEquals(AppStage.USE_OUR_APP_NOTIFICATION.name, stage)
-        }
-    }
-
-    @Test
-    fun whenMigratingFromVersion21To22IfUserIsEstablishedAndHideTipsIsTrueThenDoNotMigrateToNotification() {
-        testHelper.createDatabase(TEST_DB_NAME, 21).use {
-            givenUseOurAppStateIs(canMigrate = true, hideTips = true, canAddToHome = true)
-            givenUserStageIs(it, AppStage.ESTABLISHED)
-
-            testHelper.runMigrationsAndValidate(TEST_DB_NAME, 22, true, migrationsProvider.MIGRATION_21_TO_22)
-            val stage = getUserStage(it)
-
-            assertEquals(AppStage.ESTABLISHED.name, stage)
-        }
-    }
-
-    @Test
-    fun whenMigratingFromVersion21To22IfUserIsEstablishedAndHomeShortcutNotSupportedThenDoNotMigrateToNotification() {
-        testHelper.createDatabase(TEST_DB_NAME, 21).use {
-            givenUseOurAppStateIs(canMigrate = true, hideTips = false, canAddToHome = false)
-            givenUserStageIs(it, AppStage.ESTABLISHED)
-
-            testHelper.runMigrationsAndValidate(TEST_DB_NAME, 22, true, migrationsProvider.MIGRATION_21_TO_22)
-            val stage = getUserStage(it)
-
-            assertEquals(AppStage.ESTABLISHED.name, stage)
-        }
-    }
-
-    @Test
-    fun whenMigratingFromVersion21To22IfUserIsNotEstablishedThenDoNotMigrateToNotification() {
-        testHelper.createDatabase(TEST_DB_NAME, 21).use {
-            givenUseOurAppStateIs(canMigrate = true, hideTips = false, canAddToHome = false)
-            givenUserStageIs(it, AppStage.ESTABLISHED)
-
-            testHelper.runMigrationsAndValidate(TEST_DB_NAME, 22, true, migrationsProvider.MIGRATION_21_TO_22)
-            val stage = getUserStage(it)
-
-            assertEquals(AppStage.ESTABLISHED.name, stage)
-        }
-    }
-
-    @Test
-    fun whenMigratingFromVersion21To22IfShouldNotRunMigrationThenDoNotMigrateToNotification2() {
-        testHelper.createDatabase(TEST_DB_NAME, 21).use {
-            givenUseOurAppStateIs(canMigrate = false)
-            givenUserStageIs(it, AppStage.ESTABLISHED)
-
-            testHelper.runMigrationsAndValidate(TEST_DB_NAME, 22, true, migrationsProvider.MIGRATION_21_TO_22)
-            val stage = getUserStage(it)
-
-            assertEquals(AppStage.ESTABLISHED.name, stage)
-        }
-    }
-
-    @Test
     fun whenMigratingFromVersion22To23ThenValidationSucceeds() {
         createDatabaseAndMigrate(22, 23, migrationsProvider.MIGRATION_22_TO_23)
     }
 
-    private fun givenUseOurAppStateIs(canMigrate: Boolean = true, hideTips: Boolean = false, canAddToHome: Boolean = true) {
-        whenever(mockUseOurAppMigrationManager.shouldRunMigration()).thenReturn(canMigrate)
-        whenever(mockSettingsDataStore.hideTips).thenReturn(hideTips)
-        whenever(mockAddToHomeCapabilityDetector.isAddToHomeSupported()).thenReturn(canAddToHome)
+    @Test
+    fun whenMigratingFromVersion22To23IfUserStageIsUseOurAppNotificationThenMigrateToEstablished() {
+        testHelper.createDatabase(TEST_DB_NAME, 22).use {
+            givenUserStageIs(it, AppStage.USE_OUR_APP_NOTIFICATION)
+
+            testHelper.runMigrationsAndValidate(TEST_DB_NAME, 23, true, migrationsProvider.MIGRATION_22_TO_23)
+            val stage = getUserStage(it)
+
+            assertEquals(AppStage.ESTABLISHED.name, stage)
+        }
+    }
+
+    @Test
+    fun whenMigratingFromVersion22To23IfUserStageIsNotUseOurAppNotificationThenDoNotMigrateToEstablished() {
+        testHelper.createDatabase(TEST_DB_NAME, 22).use {
+            givenUserStageIs(it, AppStage.ESTABLISHED)
+
+            testHelper.runMigrationsAndValidate(TEST_DB_NAME, 23, true, migrationsProvider.MIGRATION_22_TO_23)
+            val stage = getUserStage(it)
+
+            assertEquals(AppStage.ESTABLISHED.name, stage)
+        }
     }
 
     private fun givenUserStageIs(database: SupportSQLiteDatabase, appStage: AppStage) {
@@ -320,13 +272,23 @@ class AppDatabaseTest {
     }
 
     private fun getUserStage(database: SupportSQLiteDatabase): String {
-        var stage = ""
+        var stage: String
 
         database.query("SELECT appStage from userStage limit 1").apply {
             moveToFirst()
             stage = getString(0)
         }
         return stage
+    }
+
+    @Test
+    fun whenMigratingFromVersion23To24ThenValidationSucceeds() {
+        createDatabaseAndMigrate(23, 24, migrationsProvider.MIGRATION_23_TO_24)
+    }
+
+    @Test
+    fun whenMigratingFromVersion24To25ThenValidationSucceeds() {
+        createDatabaseAndMigrate(24, 25, migrationsProvider.MIGRATION_24_TO_25)
     }
 
     private fun createDatabase(version: Int) {

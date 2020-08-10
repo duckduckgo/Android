@@ -73,7 +73,6 @@ import com.duckduckgo.app.global.events.db.UserEventKey
 import com.duckduckgo.app.notification.model.UseOurAppNotification
 import com.duckduckgo.app.global.events.db.UserEventEntity
 import com.duckduckgo.app.global.events.db.UserEventsStore
-import com.duckduckgo.app.global.model.domain
 import com.duckduckgo.app.global.useourapp.UseOurAppDetector
 import com.duckduckgo.app.location.GeoLocationPermissions
 import com.duckduckgo.app.location.data.LocationPermissionEntity
@@ -493,7 +492,9 @@ class BrowserTabViewModelTest {
         givenOneActiveTabSelected()
         givenInvalidatedGlobalLayout()
         testee.onUserSubmittedQuery("foo")
-        assertCommandIssued<Command.OpenInNewTab>()
+        assertCommandIssued<Command.OpenInNewTab> {
+            assertNull(sourceTabId)
+        }
     }
 
     @Test
@@ -1337,18 +1338,6 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenOpenInNewTabThenOpenInNewTabCommandWithCorrectUrlSent() {
-        val url = "https://example.com"
-        testee.openInNewTab(url)
-        verify(mockCommandObserver).onChanged(commandCaptor.capture())
-
-        val command = commandCaptor.lastValue
-        assertTrue(command is Command.OpenInNewTab)
-        command as Command.OpenInNewTab
-        assertEquals(url, command.query)
-    }
-
-    @Test
     fun whenRecoveringFromProcessGoneThenShowErrorWithAction() {
         testee.recoverFromRenderProcessGone()
         assertCommandIssued<Command.ShowErrorWithAction>()
@@ -1365,6 +1354,7 @@ class BrowserTabViewModelTest {
 
         assertCommandIssued<Command.OpenInNewTab> {
             assertEquals("https://example.com", query)
+            assertNull(sourceTabId)
         }
     }
 
@@ -1573,6 +1563,16 @@ class BrowserTabViewModelTest {
         testee.onUserPressedBack()
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
         assertTrue(commandCaptor.allValues.contains(Command.ShowKeyboard))
+    }
+
+    @Test
+    fun whenUserPressesBackOnATabWithASourceTabThenDeleteCurrentAndSelectSource() = coroutineRule.runBlocking {
+        selectedTabLiveData.value = TabEntity("TAB_ID", "https://example.com", position = 0, sourceTabId = "TAB_ID_SOURCE")
+        setupNavigation(isBrowsing = true)
+
+        testee.onUserPressedBack()
+
+        verify(mockTabsRepository).deleteCurrentTabAndSelectSource()
     }
 
     @Test
@@ -2193,6 +2193,15 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenViewReadyIfDomainSameAsUseOurAppThenPixelSent() = coroutineRule.runBlocking {
+        givenUseOurAppSiteSelected()
+
+        testee.onViewReady()
+
+        verify(mockPixel).fire(Pixel.PixelName.UOA_VISITED)
+    }
+
+    @Test
     fun whenViewReadyIfDomainIsNotTheSameAsUseOurAppAfterNotificationSeenThenPixelNotSent() = coroutineRule.runBlocking {
         givenUseOurAppSiteIsNotSelected()
         whenever(mockNotificationDao.exists(UseOurAppNotification.ID)).thenReturn(true)
@@ -2220,6 +2229,15 @@ class BrowserTabViewModelTest {
         testee.onViewReady()
 
         verify(mockPixel, never()).fire(Pixel.PixelName.UOA_VISITED_AFTER_DELETE_CTA)
+    }
+
+    @Test
+    fun whenViewReadyIfDomainIsNotTheSameAsUseOurAppAThenPixelNotSent() = coroutineRule.runBlocking {
+        givenUseOurAppSiteIsNotSelected()
+
+        testee.onViewReady()
+
+        verify(mockPixel, never()).fire(Pixel.PixelName.UOA_VISITED)
     }
 
     @Test
@@ -2253,6 +2271,15 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenPageChangedIfPreviousOneWasNotUseOurAppSiteThenPixelSent() = coroutineRule.runBlocking {
+        givenUseOurAppSiteIsNotSelected()
+
+        loadUrl(USE_OUR_APP_DOMAIN, isBrowserShowing = true)
+
+        verify(mockPixel).fire(Pixel.PixelName.UOA_VISITED)
+    }
+
+    @Test
     fun whenPageChangedIfPreviousOneWasUseOurAppSiteAfterNotificationSeenThenPixelNotSent() = coroutineRule.runBlocking {
         givenUseOurAppSiteSelected()
         whenever(mockNotificationDao.exists(UseOurAppNotification.ID)).thenReturn(true)
@@ -2281,6 +2308,15 @@ class BrowserTabViewModelTest {
         loadUrl(USE_OUR_APP_DOMAIN, isBrowserShowing = true)
 
         verify(mockPixel, never()).fire(Pixel.PixelName.UOA_VISITED_AFTER_DELETE_CTA)
+    }
+
+    @Test
+    fun whenPageChangedIfPreviousOneWasUseOurAppSiteThenNotSent() = coroutineRule.runBlocking {
+        givenUseOurAppSiteSelected()
+
+        loadUrl(USE_OUR_APP_DOMAIN, isBrowserShowing = true)
+
+        verify(mockPixel, never()).fire(Pixel.PixelName.UOA_VISITED)
     }
 
     @Test
