@@ -34,10 +34,7 @@ import java.nio.channels.SelectionKey
 import java.nio.channels.Selector
 import java.util.concurrent.Executors
 
-class UdpPacketProcessor(
-    private val datagramChannelCreator: DatagramChannelCreator,
-    private val queues: VpnQueues
-) {
+class TcpPacketProcessor(private val queues: VpnQueues) {
 
     private var pollJobDeviceToNetwork: Job? = null
     private var pollJobNetworkToDevice: Job? = null
@@ -46,7 +43,7 @@ class UdpPacketProcessor(
 
 
     fun start() {
-        Timber.i("Starting UdpPacketProcessor.")
+        Timber.i("Starting TcpPacketProcessor")
 
         if (pollJobDeviceToNetwork == null) {
             pollJobDeviceToNetwork = GlobalScope.launch(Executors.newSingleThreadExecutor().asCoroutineDispatcher()) { pollForDeviceToNetworkWork() }
@@ -59,7 +56,7 @@ class UdpPacketProcessor(
     }
 
     fun stop() {
-        Timber.i("Stopping DeviceToNetworkPacketProcessor")
+        Timber.i("Stopping TcpPacketProcessor")
 
         pollJobDeviceToNetwork?.cancel()
         pollJobDeviceToNetwork = null
@@ -75,7 +72,7 @@ class UdpPacketProcessor(
             kotlin.runCatching {
                 deviceToNetworkProcessing()
             }.onFailure {
-                Timber.w(it, "Failed to process device-to-network packet")
+                Timber.w(it, "Failed to process TCP device-to-network packet")
             }
         }
     }
@@ -87,7 +84,7 @@ class UdpPacketProcessor(
             kotlin.runCatching {
                 networkToDeviceProcessing()
             }.onFailure {
-                Timber.w(it, "Failed to process network-to-device packet")
+                Timber.w(it, "Failed to process TCP network-to-device packet")
             }
         }
     }
@@ -99,27 +96,12 @@ class UdpPacketProcessor(
     private fun deviceToNetworkProcessing() {
         Timber.v("Waiting for next device-to-network packet")
         val startTime = SystemClock.uptimeMillis()
-        val packet = queues.udpDeviceToNetwork.take()
+        val packet = queues.tcpDeviceToNetwork.take()
         Timber.v("Got next device-to-network packet after ${SystemClock.uptimeMillis()-startTime}ms wait")
-        if (packet == null) {
-            Timber.v("No packets available %d", System.currentTimeMillis())
-        } else {
-            val channel = datagramChannelCreator.createDatagram()
-            val destinationAddress = packet.ip4Header.destinationAddress
-            val destinationPort = packet.udpHeader.destinationPort
-            channel.connect(InetSocketAddress(destinationAddress, destinationPort))
 
-            packet.swapSourceAndDestination()
-
-            selector.wakeup()
-            channel.register(selector, SelectionKey.OP_READ, packet)
-
-            val payloadBuffer = packet.backingBuffer
-            while (payloadBuffer.hasRemaining()) {
-                val bytesWritten = channel.write(payloadBuffer)
-                Timber.v("Wrote %d bytes to network (%s:%d)", bytesWritten, destinationAddress, destinationPort)
-            }
-        }
+        val destinationAddress = packet.ip4Header.destinationAddress
+        val destinationPort = packet.tcpHeader.destinationPort
+        Timber.i("TCP connection: $destinationAddress:$destinationPort")
     }
 
     /**
@@ -148,31 +130,12 @@ class UdpPacketProcessor(
                 if (key.isValid && key.isReadable) {
                     iterator.remove()
 
-                    val receiveBuffer = ByteBuffer.allocate(Short.MAX_VALUE.toInt())
-                    receiveBuffer.position(Packet.IP4_HEADER_SIZE + Packet.UDP_HEADER_SIZE)
-
-                    val inputChannel = (key.channel() as DatagramChannel)
-                    val readBytes = inputChannel.read(receiveBuffer)
-                    Timber.i("Read %d bytes from datagram channel %s %s", readBytes, inputChannel, String(receiveBuffer.array()))
-
-                    key.cancel()
-                    inputChannel.close()
-
-                    val referencePacket = key.attachment() as Packet
-                    referencePacket.updateUDPBuffer(receiveBuffer, readBytes)
-                    receiveBuffer.position(HEADER_SIZE + readBytes)
-
-                    queues.networkToDevice.offer(receiveBuffer)
                 }
             }.onFailure {
                 Timber.w(it, "Failure processing selected key for selector")
                 key.cancel()
             }
         }
-    }
-
-    companion object {
-        private const val HEADER_SIZE = Packet.IP4_HEADER_SIZE + Packet.UDP_HEADER_SIZE
     }
 
 }

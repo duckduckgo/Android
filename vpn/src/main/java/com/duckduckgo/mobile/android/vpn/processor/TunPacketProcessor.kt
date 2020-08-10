@@ -75,7 +75,9 @@ class TunPacketProcessor(
                     bufferToNetwork.flip()
                     val packet = Packet(bufferToNetwork)
                     if (packet.isUDP) {
-                        queues.deviceToNetwork.offer(packet)
+                        queues.udpDeviceToNetwork.offer(packet)
+                    } else if(packet.isTCP) {
+                        queues.tcpDeviceToNetwork.offer(packet)
                     }
                 } else {
                     dataSent = false

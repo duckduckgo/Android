@@ -71,11 +71,19 @@ class VpnControllerActivity : AppCompatActivity(R.layout.activity_vpn_controller
                 Toast.makeText(this, "VPN Service not bound yet", Toast.LENGTH_SHORT).show()
             } else {
                 vpnService?.udpPacketProcessor?.start()
+                vpnService?.tcpPacketProcessor?.start()
             }
         }
-        processorStopButton.setOnClickListener { vpnService?.udpPacketProcessor?.stop() }
+        processorStopButton.setOnClickListener {
+            vpnService?.udpPacketProcessor?.stop()
+            vpnService?.tcpPacketProcessor?.stop()
+        }
         addPacketButton.setOnClickListener {
-            vpnService?.queues?.deviceToNetwork?.offer(Packet(ByteBuffer.allocate(Short.MAX_VALUE.toInt())))
+            vpnService?.queues?.udpDeviceToNetwork?.offer(Packet(ByteBuffer.allocate(Short.MAX_VALUE.toInt())))
+        }
+        addPacketButton.setOnLongClickListener {
+            vpnService?.queues?.tcpDeviceToNetwork?.offer(Packet(ByteBuffer.allocate(Short.MAX_VALUE.toInt())))
+            true
         }
         //addPacketButton.setOnLongClickListener { bulkAddPackets(); true }
 

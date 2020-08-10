@@ -25,6 +25,7 @@ import android.os.Build
 import android.os.IBinder
 import android.os.ParcelFileDescriptor
 import com.duckduckgo.mobile.android.vpn.processor.TunPacketProcessor
+import com.duckduckgo.mobile.android.vpn.processor.udp.TcpPacketProcessor
 import com.duckduckgo.mobile.android.vpn.processor.udp.UdpPacketProcessor
 import com.duckduckgo.mobile.android.vpn.ui.notification.VpnNotificationBuilder
 import kotlinx.coroutines.*
@@ -45,6 +46,7 @@ class PassthroughVpnService : VpnService(), CoroutineScope by MainScope(), Datag
     private var tunPacketProcessor: TunPacketProcessor? = null
 
     val udpPacketProcessor = UdpPacketProcessor(this, queues)
+    val tcpPacketProcessor = TcpPacketProcessor(queues)
 
     inner class VpnServiceBinder : Binder() {
 
@@ -133,6 +135,7 @@ class PassthroughVpnService : VpnService(), CoroutineScope by MainScope(), Datag
         tickerJob?.cancel()
         tunPacketProcessor?.stop()
         udpPacketProcessor.stop()
+        tcpPacketProcessor.stop()
         tunInterface?.close()
         tunInterface = null
         stopForeground(true)
@@ -193,6 +196,7 @@ interface DatagramChannelCreator {
 }
 
 class VpnQueues {
-    val deviceToNetwork: BlockingQueue<Packet> = LinkedBlockingQueue()
+    val tcpDeviceToNetwork: BlockingQueue<Packet> = LinkedBlockingQueue()
+    val udpDeviceToNetwork: BlockingQueue<Packet> = LinkedBlockingQueue()
     val networkToDevice: BlockingQueue<ByteBuffer> = LinkedBlockingQueue<ByteBuffer>()
 }
