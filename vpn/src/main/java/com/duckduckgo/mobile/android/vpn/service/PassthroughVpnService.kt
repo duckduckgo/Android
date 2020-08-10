@@ -38,12 +38,13 @@ import java.util.concurrent.LinkedBlockingQueue
 
 class PassthroughVpnService : VpnService(), CoroutineScope by MainScope(), DatagramChannelCreator {
 
+    val queues = VpnQueues()
+
     private var tunInterface: ParcelFileDescriptor? = null
     private val binder: VpnServiceBinder = VpnServiceBinder()
-    private val queues = VpnQueues()
     private var tunPacketProcessor: TunPacketProcessor? = null
 
-    val deviceToNetworkPacketProcessor = UdpPacketProcessor(this, queues)
+    val udpPacketProcessor = UdpPacketProcessor(this, queues)
 
     inner class VpnServiceBinder : Binder() {
 
@@ -131,7 +132,7 @@ class PassthroughVpnService : VpnService(), CoroutineScope by MainScope(), Datag
         Timber.i("Stopping VPN")
         tickerJob?.cancel()
         tunPacketProcessor?.stop()
-        deviceToNetworkPacketProcessor.stop()
+        udpPacketProcessor.stop()
         tunInterface?.close()
         tunInterface = null
         stopForeground(true)
