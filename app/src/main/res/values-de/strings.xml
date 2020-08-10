@@ -415,7 +415,7 @@
     <string name="changeIconDialogMessage">Die App wird möglicherweise geschlossen, um Änderungen anzuwenden. Kommen Sie zurück, nachdem Sie Ihr schönes neues Symbol bewundert haben.</string>
 
     <!-- New dashboard / menu buttons -->
-    <string name="manageWhitelist">Whitelist verwalten</string>
+    <string name="manageWhitelist">Ungeschützte Websites</string>
     <string name="reportBrokenSite">Fehlerhafte Website melden</string>
 
     <!-- Dialogs -->
@@ -423,18 +423,18 @@
     <string name="dialogEditTitle">Bearbeiten</string>
 
     <!-- Whitelist -->
-    <string name="whitelisetActivityTitle">Whitelist</string>
-    <string name="enablePrivacyProtection">Zur Whitelist hinzufügen</string>
-    <string name="disablePrivacyProtection">Aus der Whitelist entfernen</string>
-    <string name="whitelistEntryOverflowContentDescription">Weitere Optionen für den Whitelist-Eintrag %s</string>
-    <string name="whitelistEntryDeleteConfirmMessage">Möchten Sie &lt;b&gt;%s&lt;/b&gt; wirklich aus der Whitelist löschen?</string>
-    <string name="whitelistExplanation">Diese Websites auf der Whitelist werden vom Datenschutz nicht aktualisiert</string>
-    <string name="whitelistNoEntries">Noch keine Websites auf der Whitelist</string>
+    <string name="whitelisetActivityTitle">Ungeschützte Websites</string>
+    <string name="enablePrivacyProtection">Datenschutz aktivieren</string>
+    <string name="disablePrivacyProtection">Datenschutz deaktivieren</string>
+    <string name="whitelistEntryOverflowContentDescription">Weitere Optionen für die ungeschützte Website %s</string>
+    <string name="whitelistEntryDeleteConfirmMessage">Möchten Sie &lt;b&gt;%s&lt;/b&gt; wirklich von den ungeschützten Websites entfernen?</string>
+    <string name="whitelistExplanation">Für diese Websites ist der Datenschutz nicht aktiviert.</string>
+    <string name="whitelistNoEntries">Noch keine ungeschützten Websites</string>
     <string name="whitelistDomainHint">www.example.com</string>
     <string name="whitelistFormatError">Konnte nicht speichern, geben Sie eine Domain wie <b>example.com</b> ein</string>
 
     <!-- Settings -->
-    <string name="settingsPrivacyProtectionWhitelist">Whitelist zum Schutz der Privatsphäre</string>
+    <string name="settingsPrivacyProtectionWhitelist">Ungeschützte Websites</string>
 
     <!-- Fireproof websites -->
     <string name="fireproofWebsitesActivityTitle">Feuersichere Websites</string>

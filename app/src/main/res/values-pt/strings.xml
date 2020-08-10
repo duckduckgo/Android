@@ -415,7 +415,7 @@
     <string name="changeIconDialogMessage">A aplicação pode fechar para aplicar as alterações. Volte depois de admirar o seu belo e novo ícone.</string>
 
     <!-- New dashboard / menu buttons -->
-    <string name="manageWhitelist">Gerir a lista de permissões</string>
+    <string name="manageWhitelist">Sites desprotegidos</string>
     <string name="reportBrokenSite">Denunciar site danificado</string>
 
     <!-- Dialogs -->
@@ -423,19 +423,18 @@
     <string name="dialogEditTitle">Editar</string>
 
     <!-- Whitelist -->
-    <string name="whitelisetActivityTitle">Lista de permissões</string>
-    <string name="enablePrivacyProtection">Adicionar à lista de permissões</string>
-    <string name="disablePrivacyProtection">Remover da lista de permissões</string>
-    <string name="whitelistEntryOverflowContentDescription">Mais opções para a entrada da lista de permissões %s</string>
-    <string name="whitelistEntryDeleteConfirmMessage">Tem a certeza de que deseja eliminar &lt;b&gt;%s&lt;/b&gt; da lista de permissões?</string>
-    <string name="whitelistExplanation">Esses sites da lista de permissões não serão atualizados pela Proteção de Privacidade</string>
-    <string name="whitelistNoEntries">Ainda não há sites na lista de permissões</string>
+    <string name="whitelisetActivityTitle">Sites desprotegidos</string>
+    <string name="enablePrivacyProtection">Ativar Proteção de Privacidade</string>
+    <string name="disablePrivacyProtection">Desativar Proteção de Privacidade</string>
+    <string name="whitelistEntryOverflowContentDescription">Mais opções para o site desprotegido %s</string>
+    <string name="whitelistEntryDeleteConfirmMessage">Quer mesmo remover &lt;b&gt;%s&lt;/b&gt; da lista de sites desprotegidos?</string>
+    <string name="whitelistExplanation">Estes sites não serão aprimorados pela Proteção de Privacidade.</string>
+    <string name="whitelistNoEntries">Ainda não há sites desprotegidos</string>
     <string name="whitelistDomainHint">www.example.com</string>
-    <string name="whitelistFormatError">Não foi possível guardar, insira um domínio como <b>example.com</b>
-  </string>
+    <string name="whitelistFormatError">Não foi possível guardar, insira um domínio como <b>example.com</b></string>
 
     <!-- Settings -->
-    <string name="settingsPrivacyProtectionWhitelist">Lista de permissões de proteção de privacidade</string>
+    <string name="settingsPrivacyProtectionWhitelist">Sites desprotegidos</string>
 
     <!-- Fireproof websites -->
     <string name="fireproofWebsitesActivityTitle">Sites à prova de fogo</string>

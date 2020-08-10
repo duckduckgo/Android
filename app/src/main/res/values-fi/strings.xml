@@ -415,7 +415,7 @@
     <string name="changeIconDialogMessage">Sovellus voi sulkeutua muutosten tekemiseksi. Tule takaisin, kun olet ihaillut komeaa uutta kuvakettasi.</string>
 
     <!-- New dashboard / menu buttons -->
-    <string name="manageWhitelist">Hallitse sallittujen listaa</string>
+    <string name="manageWhitelist">Suojaamattomat sivustot</string>
     <string name="reportBrokenSite">Ilmoita viallisesta sivustosta</string>
 
     <!-- Dialogs -->
@@ -423,19 +423,18 @@
     <string name="dialogEditTitle">Muokkaa</string>
 
     <!-- Whitelist -->
-    <string name="whitelisetActivityTitle">Sallittujen lista</string>
-    <string name="enablePrivacyProtection">Lisää sallittujen listaan</string>
-    <string name="disablePrivacyProtection">Poista sallittujen listasta</string>
-    <string name="whitelistEntryOverflowContentDescription">Lisää sallittujen listaan merkitsemisen vaihtoehtoja %s</string>
-    <string name="whitelistEntryDeleteConfirmMessage">Haluatko varmasti poistaa &lt;b&gt;%s&lt;/b&gt; sallittujen listoista?</string>
-    <string name="whitelistExplanation">Tietosuoja ei päivitä näitä sallittujen listojen sivustoja</string>
-    <string name="whitelistNoEntries">Ei sallittujen listojen sivustoja vielä</string>
+    <string name="whitelisetActivityTitle">Suojaamattomat sivustot</string>
+    <string name="enablePrivacyProtection">Ota yksityisyyden suoja käyttöön</string>
+    <string name="disablePrivacyProtection">Poista yksityisyyden suoja käytöstä</string>
+    <string name="whitelistEntryOverflowContentDescription">Lisää valintoja suojaamattomalle sivustolle %s</string>
+    <string name="whitelistEntryDeleteConfirmMessage">Haluatko varmasti poistaa sivuston &lt;b&gt;%s&lt;/b&gt; suojaamattomista sivustoista?</string>
+    <string name="whitelistExplanation">Yksityisyyden suoja ei paranna näitä sivustoja.</string>
+    <string name="whitelistNoEntries">Ei vielä suojaamattomia sivustoja</string>
     <string name="whitelistDomainHint">www.esimerkki.com</string>
-    <string name="whitelistFormatError">Tallennus epäonnistui, kirjoita verkkotunnus kuten <b>esimerkki.com</b>
-  </string>
+    <string name="whitelistFormatError">Tallennus epäonnistui, kirjoita verkkotunnus kuten <b>esimerkki.com</b></string>
 
     <!-- Settings -->
-    <string name="settingsPrivacyProtectionWhitelist">Yksityisyyden suojan sallittu lista</string>
+    <string name="settingsPrivacyProtectionWhitelist">Suojaamattomat sivustot</string>
 
     <!-- Fireproof websites -->
     <string name="fireproofWebsitesActivityTitle">Palonkestävät verkkosivustot</string>

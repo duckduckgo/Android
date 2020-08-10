@@ -203,6 +203,7 @@ interface Pixel {
         UOA_VISITED_AFTER_SHORTCUT("m_uoa_vas"),
         UOA_VISITED_AFTER_NOTIFICATION("m_uoa_van"),
         UOA_VISITED_AFTER_DELETE_CTA("m_uoa_vad"),
+        UOA_VISITED("m_uoa_v"),
 
         USE_OUR_APP_SHORTCUT_OPENED("m_sho_uoa_o"),
         SHORTCUT_ADDED("m_sho_a"),

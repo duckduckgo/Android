@@ -67,6 +67,7 @@ class SystemSearchViewModel(
         data class LaunchDeviceApplication(val deviceApp: DeviceApp) : Command()
         data class ShowAppNotFoundMessage(val appName: String) : Command()
         object DismissKeyboard : Command()
+        data class EditQuery(val query: String) : Command()
     }
 
     val onboardingViewState: MutableLiveData<OnboardingViewState> = MutableLiveData()
@@ -147,6 +148,10 @@ class SystemSearchViewModel(
             userStageStore.stageCompleted(AppStage.NEW)
             pixel.fire(INTERSTITIAL_ONBOARDING_DISMISSED)
         }
+    }
+
+    fun onUserSelectedToEditQuery(query: String) {
+        command.value = Command.EditQuery(query)
     }
 
     fun userUpdatedQuery(query: String) {
