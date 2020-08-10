@@ -349,11 +349,6 @@ class MigrationsProvider(
         }
     }
 
-    private fun isEnglishLocale(): Boolean {
-        val locale = Locale.getDefault()
-        return locale != null && locale.language == "en"
-    }
-
     val ALL_MIGRATIONS: List<Migration>
         get() = listOf(
             MIGRATION_1_TO_2,

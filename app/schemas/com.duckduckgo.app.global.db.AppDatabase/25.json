@@ -1,8 +1,8 @@
 {
   "formatVersion": 1,
   "database": {
-    "version": 23,
-    "identityHash": "d6e385bcc19ae0df396817590763b709",
+    "version": 25,
+    "identityHash": "51c73022cce6b3a3224edeacd3caa139",
     "entities": [
       {
         "tableName": "tds_tracker",
@@ -258,7 +258,7 @@
       },
       {
         "tableName": "tabs",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`tabId` TEXT NOT NULL, `url` TEXT, `title` TEXT, `skipHome` INTEGER NOT NULL, `viewed` INTEGER NOT NULL, `position` INTEGER NOT NULL, `tabPreviewFile` TEXT, PRIMARY KEY(`tabId`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`tabId` TEXT NOT NULL, `url` TEXT, `title` TEXT, `skipHome` INTEGER NOT NULL, `viewed` INTEGER NOT NULL, `position` INTEGER NOT NULL, `tabPreviewFile` TEXT, `sourceTabId` TEXT, PRIMARY KEY(`tabId`), FOREIGN KEY(`sourceTabId`) REFERENCES `tabs`(`tabId`) ON UPDATE SET NULL ON DELETE SET NULL )",
         "fields": [
           {
             "fieldPath": "tabId",
@@ -301,6 +301,12 @@
             "columnName": "tabPreviewFile",
             "affinity": "TEXT",
             "notNull": false
+          },
+          {
+            "fieldPath": "sourceTabId",
+            "columnName": "sourceTabId",
+            "affinity": "TEXT",
+            "notNull": false
           }
         ],
         "primaryKey": {
@@ -319,7 +325,19 @@
             "createSql": "CREATE INDEX IF NOT EXISTS `index_tabs_tabId` ON `${TABLE_NAME}` (`tabId`)"
           }
         ],
-        "foreignKeys": []
+        "foreignKeys": [
+          {
+            "table": "tabs",
+            "onDelete": "SET NULL",
+            "onUpdate": "SET NULL",
+            "columns": [
+              "sourceTabId"
+            ],
+            "referencedColumns": [
+              "tabId"
+            ]
+          }
+        ]
       },
       {
         "tableName": "tab_selection",
@@ -735,12 +753,38 @@
         },
         "indices": [],
         "foreignKeys": []
+      },
+      {
+        "tableName": "locationPermissions",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`domain` TEXT NOT NULL, `permission` INTEGER NOT NULL, PRIMARY KEY(`domain`))",
+        "fields": [
+          {
+            "fieldPath": "domain",
+            "columnName": "domain",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "permission",
+            "columnName": "permission",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "domain"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [],
+        "foreignKeys": []
       }
     ],
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'd6e385bcc19ae0df396817590763b709')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '51c73022cce6b3a3224edeacd3caa139')"
     ]
   }
 }
