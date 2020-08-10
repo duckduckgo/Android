@@ -30,6 +30,8 @@ import com.duckduckgo.mobile.android.vpn.service.PassthroughVpnService
 import com.duckduckgo.mobile.android.vpn.R
 import kotlinx.coroutines.*
 import timber.log.Timber
+import xyz.hexene.localvpn.Packet
+import java.nio.ByteBuffer
 
 class VpnControllerActivity : AppCompatActivity(R.layout.activity_vpn_controller), CoroutineScope by MainScope() {
 
@@ -68,11 +70,13 @@ class VpnControllerActivity : AppCompatActivity(R.layout.activity_vpn_controller
             if (vpnService == null) {
                 Toast.makeText(this, "VPN Service not bound yet", Toast.LENGTH_SHORT).show()
             } else {
-                vpnService?.deviceToNetworkPacketProcessor?.start()
+                vpnService?.udpPacketProcessor?.start()
             }
         }
-        processorStopButton.setOnClickListener { vpnService?.deviceToNetworkPacketProcessor?.stop() }
-        //addPacketButton.setOnClickListener { vpnService?.deviceToNetworkPacketProcessor?.addPacket(Packet(ByteBuffer.allocate(0))) }
+        processorStopButton.setOnClickListener { vpnService?.udpPacketProcessor?.stop() }
+        addPacketButton.setOnClickListener {
+            vpnService?.queues?.deviceToNetwork?.offer(Packet(ByteBuffer.allocate(Short.MAX_VALUE.toInt())))
+        }
         //addPacketButton.setOnLongClickListener { bulkAddPackets(); true }
 
     }
