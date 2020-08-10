@@ -64,7 +64,6 @@ import com.duckduckgo.app.usage.app.AppDaysUsedDao
 import com.duckduckgo.app.usage.app.AppDaysUsedEntity
 import com.duckduckgo.app.usage.search.SearchCountDao
 import com.duckduckgo.app.usage.search.SearchCountEntity
-import java.util.Locale
 
 @Database(
     exportSchema = true, version = 25, entities = [

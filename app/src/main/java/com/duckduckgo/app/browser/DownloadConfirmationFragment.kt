@@ -17,17 +17,12 @@
 package com.duckduckgo.app.browser
 
 import android.content.Context
-import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
-import androidx.core.content.FileProvider.getUriForFile
-import com.duckduckgo.app.browser.downloader.FileDownloader
-import com.duckduckgo.app.browser.downloader.FileDownloader.FileDownloadListener
 import com.duckduckgo.app.browser.downloader.FileDownloader.PendingFileDownload
-import com.duckduckgo.app.browser.downloader.guessFileName
+import com.duckduckgo.app.browser.downloader.FilenameExtractor
 import com.duckduckgo.app.browser.downloader.isDataUrl
 import com.duckduckgo.app.global.view.gone
 import com.duckduckgo.app.global.view.leftDrawable
@@ -37,22 +32,21 @@ import dagger.android.support.AndroidSupportInjection
 import kotlinx.android.synthetic.main.download_confirmation.view.*
 import timber.log.Timber
 import java.io.File
-import java.io.IOException
 import javax.inject.Inject
-import kotlin.concurrent.thread
 
 class DownloadConfirmationFragment : BottomSheetDialogFragment() {
 
-    @Inject
-    lateinit var downloader: FileDownloader
+    val listener: DownloadConfirmationDialogListener
+        get() = parentFragment as DownloadConfirmationDialogListener
 
-    lateinit var downloadListener: FileDownloadListener
+    @Inject
+    lateinit var filenameExtractor: FilenameExtractor
+
+    private var file: File? = null
 
     private val pendingDownload: PendingFileDownload by lazy {
         requireArguments()[PENDING_DOWNLOAD_BUNDLE_KEY] as PendingFileDownload
     }
-
-    private var file: File? = null
 
     override fun onAttach(context: Context) {
         AndroidSupportInjection.inject(this)
@@ -67,27 +61,26 @@ class DownloadConfirmationFragment : BottomSheetDialogFragment() {
     }
 
     private fun setupDownload() {
-        file = if (!pendingDownload.isDataUrl) File(pendingDownload.directory, pendingDownload.guessFileName()) else null
+        file = if (!pendingDownload.isDataUrl) File(pendingDownload.directory, filenameExtractor.extract(pendingDownload)) else null
     }
 
     private fun setupViews(view: View) {
         view.downloadMessage.text = getString(R.string.downloadConfirmationSaveFileTitle, file?.name ?: "")
         view.replace.setOnClickListener {
-            deleteFile()
-            completeDownload(pendingDownload, downloadListener)
+            listener.replaceExistingFile(file, pendingDownload)
             dismiss()
         }
         view.continueDownload.setOnClickListener {
-            completeDownload(pendingDownload, downloadListener)
+            listener.continueDownload(pendingDownload)
             dismiss()
         }
         view.openWith.setOnClickListener {
-            openFile()
+            listener.openExistingFile(file)
             dismiss()
         }
         view.cancel.setOnClickListener {
             Timber.i("Cancelled download for url ${pendingDownload.url}")
-            downloadListener.downloadCancelled()
+            listener.cancelDownload()
             dismiss()
         }
 
@@ -104,52 +97,23 @@ class DownloadConfirmationFragment : BottomSheetDialogFragment() {
         }
     }
 
-    private fun deleteFile() {
-        try {
-            file?.delete()
-        } catch (e: IOException) {
-            Toast.makeText(activity, R.string.downloadConfirmationUnableToDeleteFileText, Toast.LENGTH_SHORT).show()
-        }
-    }
-
-    private fun completeDownload(pendingDownload: PendingFileDownload, callback: FileDownloadListener) {
-        thread {
-            downloader.download(pendingDownload, callback)
-        }
-    }
-
-    private fun openFile() {
-        val intent = context?.let { createIntentToOpenFile(it) }
-        activity?.packageManager?.let { packageManager ->
-            if (intent?.resolveActivity(packageManager) != null) {
-                startActivity(intent)
-            } else {
-                Timber.e("No suitable activity found")
-                Toast.makeText(activity, R.string.downloadConfirmationUnableToOpenFileText, Toast.LENGTH_SHORT).show()
-            }
-            downloadListener.downloadOpened()
-        }
-    }
-
-    private fun createIntentToOpenFile(context: Context): Intent? {
-        val file = file ?: return null
-        val uri = getUriForFile(context, "${BuildConfig.APPLICATION_ID}.provider", file)
-        val mime = activity?.contentResolver?.getType(uri) ?: return null
-        val intent = Intent(Intent.ACTION_VIEW)
-        intent.setDataAndType(uri, mime)
-        return intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+    interface DownloadConfirmationDialogListener {
+        fun openExistingFile(file: File?)
+        fun replaceExistingFile(file: File?, pendingFileDownload: PendingFileDownload)
+        fun continueDownload(pendingFileDownload: PendingFileDownload)
+        fun cancelDownload()
     }
 
     companion object {
 
         private const val PENDING_DOWNLOAD_BUNDLE_KEY = "PENDING_DOWNLOAD_BUNDLE_KEY"
 
-        fun instance(pendingDownload: PendingFileDownload, downloadListener: FileDownloadListener): DownloadConfirmationFragment {
+        fun instance(pendingDownload: PendingFileDownload): DownloadConfirmationFragment {
             val fragment = DownloadConfirmationFragment()
+            fragment.isCancelable = false
             val bundle = Bundle()
             bundle.putSerializable(PENDING_DOWNLOAD_BUNDLE_KEY, pendingDownload)
             fragment.arguments = bundle
-            fragment.downloadListener = downloadListener
             return fragment
         }
     }

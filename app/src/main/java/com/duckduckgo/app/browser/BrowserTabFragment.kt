@@ -63,10 +63,13 @@ import android.webkit.WebView.HitTestResult.UNKNOWN_TYPE
 import android.webkit.WebViewDatabase
 import android.widget.EditText
 import android.widget.TextView
+import android.widget.Toast
 import androidx.annotation.AnyThread
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
+import androidx.core.content.FileProvider
+import androidx.core.net.toUri
 import androidx.core.text.HtmlCompat
 import androidx.core.text.HtmlCompat.FROM_HTML_MODE_LEGACY
 import androidx.core.view.isEmpty
@@ -75,6 +78,7 @@ import androidx.core.view.isNotEmpty
 import androidx.core.view.isVisible
 import androidx.core.view.postDelayed
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.commitNow
 import androidx.fragment.app.transaction
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleObserver
@@ -86,6 +90,9 @@ import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion
 import com.duckduckgo.app.bookmarks.ui.EditBookmarkDialogFragment
 import com.duckduckgo.app.brokensite.BrokenSiteActivity
 import com.duckduckgo.app.brokensite.BrokenSiteData
+import com.duckduckgo.app.browser.BrowserTabViewModel.*
+import com.duckduckgo.app.browser.BrowserTabViewModel.Command.DownloadCommand
+import com.duckduckgo.app.browser.DownloadConfirmationFragment.DownloadConfirmationDialogListener
 import com.duckduckgo.app.browser.BrowserTabViewModel.AutoCompleteViewState
 import com.duckduckgo.app.browser.BrowserTabViewModel.BrowserViewState
 import com.duckduckgo.app.browser.BrowserTabViewModel.Command
@@ -179,10 +186,9 @@ import org.jetbrains.anko.share
 import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
-import kotlin.concurrent.thread
 import kotlin.coroutines.CoroutineContext
 
-class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogListener, TrackersAnimatorListener {
+class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogListener, TrackersAnimatorListener, DownloadConfirmationDialogListener {
 
     private val supervisorJob = SupervisorJob()
 
@@ -321,14 +327,6 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
         removeDaxDialogFromActivity()
         renderer = BrowserTabFragmentRenderer()
         decorator = BrowserTabFragmentDecorator()
-        if (savedInstanceState != null) {
-            updateFragmentListener()
-        }
-    }
-
-    private fun updateFragmentListener() {
-        val fragment = fragmentManager?.findFragmentByTag(DOWNLOAD_CONFIRMATION_TAG) as? DownloadConfirmationFragment
-        fragment?.downloadListener = createDownloadListener()
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -632,6 +630,35 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
             is Command.RefreshUserAgent -> refreshUserAgent(it.host, it.isDesktop)
             is Command.AskToFireproofWebsite -> askToFireproofWebsite(requireContext(), it.fireproofWebsite)
             is Command.ShowDomainHasPermissionMessage -> showMessageSnackbar(it.domain)
+            is DownloadCommand -> processDownloadCommand(it)
+        }
+    }
+
+    private fun processDownloadCommand(it: DownloadCommand) {
+        when (it) {
+            is DownloadCommand.ScanMediaFiles -> {
+                context?.applicationContext?.let { context ->
+                    MediaScannerConnection.scanFile(context, arrayOf(it.file.absolutePath), null, null)
+                }
+            }
+            is DownloadCommand.ShowDownloadFinishedNotification -> {
+                fileDownloadNotificationManager.showDownloadFinishedNotification(it.file.name, it.file.absolutePath.toUri(), it.mimeType)
+            }
+            DownloadCommand.ShowDownloadInProgressNotification -> {
+                fileDownloadNotificationManager.showDownloadInProgressNotification()
+            }
+            is DownloadCommand.ShowDownloadFailedNotification -> {
+                fileDownloadNotificationManager.showDownloadFailedNotification()
+
+                val snackbar = Snackbar.make(toolbar, R.string.downloadFailed, Snackbar.LENGTH_INDEFINITE)
+                if (it.reason == DownloadFailReason.DownloadManagerDisabled) {
+                    snackbar.setText(it.message)
+                    snackbar.setAction(getString(R.string.enable)) {
+                        showDownloadManagerAppSettings()
+                    }
+                }
+                snackbar.show()
+            }
         }
     }
 
@@ -1191,90 +1218,28 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
 
     @AnyThread
     private fun downloadFile(requestUserConfirmation: Boolean) {
-        val pendingDownload = pendingFileDownload
+        val pendingDownload = pendingFileDownload ?: return
+
         pendingFileDownload = null
 
-        if (pendingDownload == null) {
-            return
-        }
-
-        val downloadListener = createDownloadListener()
         if (requestUserConfirmation) {
-            requestDownloadConfirmation(pendingDownload, downloadListener)
+            requestDownloadConfirmation(pendingDownload)
         } else {
-            completeDownload(pendingDownload, downloadListener)
+            continueDownload(pendingDownload)
         }
     }
 
-    private fun closeAndReturnToSourceIfBlankTab() {
-        if (viewModel.url == null) {
-            launch {
-                viewModel.closeAndSelectSourceTab()
-            }
+    private fun requestDownloadConfirmation(pendingDownload: PendingFileDownload) {
+        val downloadConfirmationFragment = DownloadConfirmationFragment.instance(pendingDownload)
+        childFragmentManager.findFragmentByTag(DOWNLOAD_CONFIRMATION_TAG)?.let {
+            Timber.i("Found existing dialog; removing it now")
+            childFragmentManager.commitNow { remove(it) }
         }
-    }
-
-    private fun createDownloadListener(): FileDownloadListener {
-        return object : FileDownloadListener {
-            override fun downloadStarted() {
-                fileDownloadNotificationManager.showDownloadInProgressNotification()
-                closeAndReturnToSourceIfBlankTab()
-            }
-
-            override fun downloadFinished(file: File, mimeType: String?) {
-                MediaScannerConnection.scanFile(context, arrayOf(file.absolutePath), null) { _, uri ->
-                    fileDownloadNotificationManager.showDownloadFinishedNotification(file.name, uri, mimeType)
-                }
-            }
-
-            override fun downloadFailed(message: String, downloadFailReason: DownloadFailReason) {
-                Timber.w("Failed to download file [$message]")
-
-                fileDownloadNotificationManager.showDownloadFailedNotification()
-
-                val snackbar = Snackbar.make(toolbar, R.string.downloadFailed, Snackbar.LENGTH_INDEFINITE)
-                if (downloadFailReason == DownloadFailReason.DownloadManagerDisabled) {
-                    snackbar.setText(message)
-                    snackbar.setAction(getString(R.string.enable)) {
-                        showDownloadManagerAppSettings()
-                    }
-                }
-                snackbar.show()
-            }
-
-            override fun downloadCancelled() {
-                closeAndReturnToSourceIfBlankTab()
-            }
-
-            override fun downloadOpened() {
-                closeAndReturnToSourceIfBlankTab()
-            }
-
-            private fun showDownloadManagerAppSettings() {
-                try {
-                    val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
-                    intent.data = DownloadFailReason.DOWNLOAD_MANAGER_SETTINGS_URI
-                    startActivity(intent)
-                } catch (e: ActivityNotFoundException) {
-                    Timber.w(e, "Could not open DownloadManager settings")
-                    Snackbar.make(toolbar, R.string.downloadManagerIncompatible, Snackbar.LENGTH_INDEFINITE).show()
-                }
-            }
-        }
-    }
-
-    private fun requestDownloadConfirmation(pendingDownload: PendingFileDownload, downloadListener: FileDownloadListener) {
-        fragmentManager?.let {
-            if (!it.isStateSaved) {
-                DownloadConfirmationFragment.instance(pendingDownload, downloadListener).show(it, DOWNLOAD_CONFIRMATION_TAG)
-            }
-        }
+        downloadConfirmationFragment.show(childFragmentManager, DOWNLOAD_CONFIRMATION_TAG)
     }
 
     private fun completeDownload(pendingDownload: PendingFileDownload, callback: FileDownloadListener) {
-        thread {
-            fileDownloader.download(pendingDownload, callback)
-        }
+        viewModel.download(pendingDownload)
     }
 
     private fun launchFilePicker(command: Command.ShowFileChooser) {
@@ -1897,6 +1862,57 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
 
         private fun shouldUpdateOmnibarTextInput(viewState: OmnibarViewState, omnibarInput: String?) =
             (!viewState.isEditing || omnibarInput.isNullOrEmpty()) && omnibarTextInput.isDifferent(omnibarInput)
+    }
+
+    override fun openExistingFile(file: File?) {
+        if (file == null) {
+            Toast.makeText(activity, R.string.downloadConfirmationUnableToOpenFileText, Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        val intent = context?.let { createIntentToOpenFile(it, file) }
+        activity?.packageManager?.let { packageManager ->
+            if (intent?.resolveActivity(packageManager) != null) {
+                startActivity(intent)
+            } else {
+                Timber.e("No suitable activity found")
+                Toast.makeText(activity, R.string.downloadConfirmationUnableToOpenFileText, Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
+    override fun replaceExistingFile(file: File?, pendingFileDownload: PendingFileDownload) {
+        Timber.i("Deleting existing file: $file")
+        runCatching { file?.delete() }
+        continueDownload(pendingFileDownload)
+    }
+
+    private fun showDownloadManagerAppSettings() {
+        try {
+            val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
+            intent.data = DownloadFailReason.DOWNLOAD_MANAGER_SETTINGS_URI
+            startActivity(intent)
+        } catch (e: ActivityNotFoundException) {
+            Timber.w(e, "Could not open DownloadManager settings")
+            Snackbar.make(toolbar, R.string.downloadManagerIncompatible, Snackbar.LENGTH_INDEFINITE).show()
+        }
+    }
+
+    private fun createIntentToOpenFile(context: Context, file: File): Intent? {
+        val uri = FileProvider.getUriForFile(context, "${BuildConfig.APPLICATION_ID}.provider", file)
+        val mime = activity?.contentResolver?.getType(uri) ?: return null
+        val intent = Intent(Intent.ACTION_VIEW)
+        intent.setDataAndType(uri, mime)
+        return intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+    }
+
+    override fun continueDownload(pendingFileDownload: PendingFileDownload) {
+        Timber.i("Continuing to download $pendingFileDownload")
+        viewModel.download(pendingFileDownload)
+    }
+
+    override fun cancelDownload() {
+        viewModel.closeAndReturnToSourceIfBlankTab()
     }
 
 }
