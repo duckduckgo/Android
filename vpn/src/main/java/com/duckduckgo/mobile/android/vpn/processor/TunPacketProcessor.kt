@@ -17,7 +17,7 @@
 package com.duckduckgo.mobile.android.vpn.processor
 
 import android.os.ParcelFileDescriptor
-import com.duckduckgo.mobile.android.vpn.VpnQueues
+import com.duckduckgo.mobile.android.vpn.service.VpnQueues
 import timber.log.Timber
 import xyz.hexene.localvpn.Packet
 import java.io.FileInputStream

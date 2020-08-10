@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.mobile.android.vpn
+package com.duckduckgo.mobile.android.vpn.service
 
 import android.app.Service
 import android.content.Context
@@ -25,7 +25,7 @@ import android.os.Build
 import android.os.IBinder
 import android.os.ParcelFileDescriptor
 import com.duckduckgo.mobile.android.vpn.processor.TunPacketProcessor
-import com.duckduckgo.mobile.android.vpn.processor.UdpPacketProcessor
+import com.duckduckgo.mobile.android.vpn.processor.udp.UdpPacketProcessor
 import com.duckduckgo.mobile.android.vpn.ui.notification.VpnNotificationBuilder
 import kotlinx.coroutines.*
 import timber.log.Timber

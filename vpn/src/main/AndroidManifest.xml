@@ -18,7 +18,7 @@
         </activity>
 
         <service
-            android:name=".PassthroughVpnService"
+            android:name=".service.PassthroughVpnService"
             android:permission="android.permission.BIND_VPN_SERVICE">
             <intent-filter>
                 <action android:name="android.net.VpnService" />

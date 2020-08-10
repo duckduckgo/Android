@@ -21,6 +21,7 @@ import android.content.Intent
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.rule.ServiceTestRule
+import com.duckduckgo.mobile.android.vpn.service.PassthroughVpnService
 import org.junit.After
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue

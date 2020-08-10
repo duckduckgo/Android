@@ -26,7 +26,7 @@ import android.os.Bundle
 import android.os.IBinder
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
-import com.duckduckgo.mobile.android.vpn.PassthroughVpnService
+import com.duckduckgo.mobile.android.vpn.service.PassthroughVpnService
 import com.duckduckgo.mobile.android.vpn.R
 import kotlinx.coroutines.*
 import timber.log.Timber
