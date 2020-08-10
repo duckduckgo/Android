@@ -20,20 +20,16 @@ import android.net.Uri
 import android.os.Environment
 import android.webkit.URLUtil
 import androidx.annotation.WorkerThread
+import com.duckduckgo.app.browser.downloader.FileDownloader.FileDownloadListener
+import com.duckduckgo.app.browser.downloader.FileDownloader.PendingFileDownload
 import java.io.File
 import java.io.Serializable
 import javax.inject.Inject
 
-class FileDownloader @Inject constructor(private val dataUriDownloader: DataUriDownloader, private val networkFileDownloader: NetworkFileDownloader) {
+interface FileDownloader {
 
     @WorkerThread
-    fun download(pending: PendingFileDownload, callback: FileDownloadListener) {
-        when {
-            pending.isNetworkUrl -> networkFileDownloader.download(pending, callback)
-            pending.isDataUrl -> dataUriDownloader.download(pending, callback)
-            else -> callback.downloadFailed("Not supported", DownloadFailReason.UnsupportedUrlType)
-        }
-    }
+    fun download(pending: PendingFileDownload, callback: FileDownloadListener)
 
     data class PendingFileDownload(
         val url: String,
@@ -45,17 +41,34 @@ class FileDownloader @Inject constructor(private val dataUriDownloader: DataUriD
     ) : Serializable
 
     interface FileDownloadListener {
-        fun downloadStarted()
-        fun downloadFinished(file: File, mimeType: String?)
+        fun downloadStartedDataUri()
+        fun downloadStartedNetworkFile()
+        fun downloadFinishedDataUri(file: File, mimeType: String?)
+        fun downloadFinishedNetworkFile(file: File, mimeType: String?)
         fun downloadFailed(message: String, downloadFailReason: DownloadFailReason)
         fun downloadCancelled()
         fun downloadOpened()
     }
 }
 
-val FileDownloader.PendingFileDownload.isDataUrl get() = URLUtil.isDataUrl(url)
+class AndroidFileDownloader @Inject constructor(
+    private val dataUriDownloader: DataUriDownloader,
+    private val networkFileDownloader: NetworkFileDownloader
+) : FileDownloader {
 
-val FileDownloader.PendingFileDownload.isNetworkUrl get() = URLUtil.isNetworkUrl(url)
+    @WorkerThread
+    override fun download(pending: PendingFileDownload, callback: FileDownloadListener) {
+        when {
+            pending.isNetworkUrl -> networkFileDownloader.download(pending, callback)
+            pending.isDataUrl -> dataUriDownloader.download(pending, callback)
+            else -> callback.downloadFailed("Not supported", DownloadFailReason.UnsupportedUrlType)
+        }
+    }
+}
+
+val PendingFileDownload.isDataUrl get() = URLUtil.isDataUrl(url)
+
+val PendingFileDownload.isNetworkUrl get() = URLUtil.isNetworkUrl(url)
 
 sealed class DownloadFailReason {
 

@@ -26,6 +26,7 @@ import com.duckduckgo.app.brokensite.api.BrokenSiteSender
 import com.duckduckgo.app.browser.*
 import com.duckduckgo.app.browser.addtohome.AddToHomeCapabilityDetector
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
+import com.duckduckgo.app.browser.downloader.FileDownloader
 import com.duckduckgo.app.browser.favicon.FaviconDownloader
 import com.duckduckgo.app.browser.logindetection.NavigationAwareLoginDetector
 import com.duckduckgo.app.browser.omnibar.QueryUrlConverter
@@ -118,6 +119,7 @@ class ViewModelFactory @Inject constructor(
     private val notificationDao: NotificationDao,
     private val userOurAppDetector: UseOurAppDetector,
     private val dismissedCtaDao: DismissedCtaDao,
+    private val fileDownloader: FileDownloader,
     private val dispatcherProvider: DispatcherProvider
 ) : ViewModelProvider.NewInstanceFactory() {
 
@@ -210,7 +212,8 @@ class ViewModelFactory @Inject constructor(
         userEventsStore = userEventsStore,
         notificationDao = notificationDao,
         useOurAppDetector = userOurAppDetector,
-        variantManager = variantManager
+        variantManager = variantManager,
+        fileDownloader = fileDownloader
     )
 
     private fun changeAppIconViewModel() =
