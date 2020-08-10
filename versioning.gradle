@@ -13,10 +13,4 @@ ext {
         return props.getProperty("VERSION")
     }
 
-    tasks.register("versionCode") {
-        doLast {
-            print buildVersionCode()
-        }
-    }
-
 }
