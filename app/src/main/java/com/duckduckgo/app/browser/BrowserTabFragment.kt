@@ -595,6 +595,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
     private fun showErrorSnackbar(command: Command.ShowErrorWithAction) {
         // Snackbar is global and it should appear only the foreground fragment
         if (!errorSnackbar.view.isAttachedToWindow && isVisible) {
+            errorSnackbar.setText(command.textResId)
             errorSnackbar.setAction(R.string.crashedWebViewErrorAction) { command.action() }.show()
         }
     }
