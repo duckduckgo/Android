@@ -240,6 +240,7 @@ class ViewModelFactory @Inject constructor(
             locationPermissionsRepository = locationPermissionsRepository,
             geoLocationPermissions = geoLocationPermissions,
             dispatcherProvider = dispatcherProvider,
-            settingsDataStore = appSettingsPreferencesStore
+            settingsDataStore = appSettingsPreferencesStore,
+            pixel = pixel
         )
 }

@@ -25,13 +25,15 @@ import com.duckduckgo.app.location.data.LocationPermissionEntity
 import com.duckduckgo.app.location.data.LocationPermissionType
 import com.duckduckgo.app.location.data.LocationPermissionsRepository
 import com.duckduckgo.app.settings.db.SettingsDataStore
+import com.duckduckgo.app.statistics.pixels.Pixel
 import kotlinx.coroutines.launch
 
 class LocationPermissionsViewModel(
     private val locationPermissionsRepository: LocationPermissionsRepository,
     private val geoLocationPermissions: GeoLocationPermissions,
     private val dispatcherProvider: DispatcherProvider,
-    private val settingsDataStore: SettingsDataStore
+    private val settingsDataStore: SettingsDataStore,
+    private val pixel: Pixel
 ) : SiteLocationPermissionDialog.Listener, ViewModel() {
 
     data class ViewState(
@@ -95,6 +97,7 @@ class LocationPermissionsViewModel(
     override fun onSiteLocationPermissionSelected(domain: String, permission: LocationPermissionType) {
         when (permission) {
             LocationPermissionType.ALLOW_ALWAYS -> {
+                pixel.fire(Pixel.PixelName.PRECISE_LOCATION_SITE_DIALOG_ALLOW_ALWAYS)
                 geoLocationPermissions.allow(domain)
                 viewModelScope.launch {
                     locationPermissionsRepository.savePermission(domain, permission)
@@ -102,6 +105,7 @@ class LocationPermissionsViewModel(
             }
             LocationPermissionType.DENY_ALWAYS -> {
                 geoLocationPermissions.clear(domain)
+                pixel.fire(Pixel.PixelName.PRECISE_LOCATION_SITE_DIALOG_DENY_ALWAYS)
                 viewModelScope.launch {
                     locationPermissionsRepository.savePermission(domain, permission)
                 }

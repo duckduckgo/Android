@@ -2378,18 +2378,6 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenSystemPermissionIsGrantedThenSettingsDataStoreIsUpdated() = coroutineRule.runBlocking {
-        val domain = "https://www.example.com/"
-        givenLocationPermissionIsEnabled(true)
-        givenCurrentSite(domain)
-        givenNewPermissionRequestFromDomain(domain)
-
-        testee.onSystemLocationPermissionGranted()
-
-        // check for domain being stored
-    }
-
-    @Test
     fun whenSystemPermissionIsDeniedThenSitePermissionIsCleared() = coroutineRule.runBlocking {
         val domain = "https://www.example.com/"
         givenLocationPermissionIsEnabled(true)
@@ -2398,6 +2386,7 @@ class BrowserTabViewModelTest {
 
         testee.onSystemLocationPermissionDenied()
 
+        verify(mockPixel).fire(Pixel.PixelName.PRECISE_LOCATION_SETTINGS_LOCATION_PERMISSION_DISABLE)
         verify(geoLocationPermissions).clear(domain)
     }
 
@@ -2413,6 +2402,20 @@ class BrowserTabViewModelTest {
 
         verify(mockSettingsStore).appLocationPermission = true
     }
+
+    @Test
+    fun whenUserGrantsSystemLocationPermissionThenPixelIsFired() = coroutineRule.runBlocking {
+        val domain = "https://www.example.com/"
+
+        givenLocationPermissionIsEnabled(true)
+        givenCurrentSite(domain)
+        givenNewPermissionRequestFromDomain(domain)
+
+        testee.onSystemLocationPermissionGranted()
+
+        verify(mockPixel).fire(Pixel.PixelName.PRECISE_LOCATION_SETTINGS_LOCATION_PERMISSION_ENABLE)
+    }
+
 
     @Test
     fun whenUserChoosesToAlwaysAllowSitePermissionThenGeoPermissionIsAllowed() = coroutineRule.runBlocking {
@@ -2493,6 +2496,7 @@ class BrowserTabViewModelTest {
 
         testee.onSystemLocationPermissionNotAllowed()
 
+        verify(mockPixel).fire(Pixel.PixelName.PRECISE_LOCATION_SYSTEM_DIALOG_LATER)
         verify(geoLocationPermissions).clear(domain)
     }
 
@@ -2506,6 +2510,7 @@ class BrowserTabViewModelTest {
 
         testee.onSystemLocationPermissionNeverAllowed()
 
+        verify(mockPixel).fire(Pixel.PixelName.PRECISE_LOCATION_SYSTEM_DIALOG_NEVER)
         verify(geoLocationPermissions).clear(domain)
         Assert.assertEquals(locationPermissionsDao.getPermission(domain)!!.permission, LocationPermissionType.DENY_ALWAYS)
     }
@@ -2532,6 +2537,8 @@ class BrowserTabViewModelTest {
         givenNewPermissionRequestFromDomain(domain)
 
         testee.onSiteLocationPermissionAlwaysDenied()
+
+        verify(mockPixel).fire(Pixel.PixelName.PRECISE_LOCATION_SYSTEM_DIALOG_ENABLE)
 
         verify(geoLocationPermissions).clear(domain)
     }

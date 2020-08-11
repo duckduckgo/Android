@@ -881,19 +881,23 @@ class BrowserTabViewModel(
             LocationPermissionType.ALLOW_ALWAYS -> {
                 onSiteLocationPermissionAlwaysAllowed()
                 Timber.i("Precise Location - Saving $permission for $domain")
+                pixel.fire(PixelName.PRECISE_LOCATION_SITE_DIALOG_ALLOW_ALWAYS)
                 viewModelScope.launch {
                     locationPermissionsRepository.savePermission(domain, permission)
                 }
             }
             LocationPermissionType.ALLOW_ONCE -> {
+                pixel.fire(PixelName.PRECISE_LOCATION_SITE_DIALOG_ALLOW_ONCE)
                 Timber.i("Precise Location - Permission $permission for $domain allowed once")
                 permissionCallback?.invoke(permissionOrigin, true, false)
             }
             LocationPermissionType.DENY_ALWAYS -> {
+                pixel.fire(PixelName.PRECISE_LOCATION_SITE_DIALOG_DENY_ALWAYS)
                 onSiteLocationPermissionAlwaysDenied()
             }
             LocationPermissionType.DENY_ONCE -> {
                 Timber.i("Precise Location - Permission $permission for $domain denied once")
+                pixel.fire(PixelName.PRECISE_LOCATION_SITE_DIALOG_DENY_ONCE)
                 permissionCallback?.invoke(permissionOrigin, false, false)
                 Timber.i("Precise Location - Saving $permission for $domain")
                 viewModelScope.launch {
@@ -936,11 +940,13 @@ class BrowserTabViewModel(
 
     override fun onSystemLocationPermissionAllowed() {
         Timber.i("Precise Location - System permission allowed")
+        pixel.fire(PixelName.PRECISE_LOCATION_SYSTEM_DIALOG_ENABLE)
         command.postValue(RequestSystemLocationPermission)
     }
 
     override fun onSystemLocationPermissionNotAllowed() {
         Timber.i("Precise Location - System permission Not allowed")
+        pixel.fire(PixelName.PRECISE_LOCATION_SYSTEM_DIALOG_LATER)
         onSiteLocationPermissionAlwaysDenied()
     }
 
@@ -948,6 +954,7 @@ class BrowserTabViewModel(
         Timber.i("Precise Location - System permission Never allowed")
         val neverAllowedPermission = LocationPermissionType.DENY_ALWAYS
         onSiteLocationPermissionSelected(permissionOrigin, neverAllowedPermission)
+        pixel.fire(Pixel.PixelName.PRECISE_LOCATION_SYSTEM_DIALOG_NEVER)
         viewModelScope.launch {
             locationPermissionsRepository.savePermission(permissionOrigin, neverAllowedPermission)
         }
@@ -955,6 +962,7 @@ class BrowserTabViewModel(
 
     fun onSystemLocationPermissionGranted() {
         appSettingsPreferencesStore.appLocationPermission = true
+        pixel.fire(Pixel.PixelName.PRECISE_LOCATION_SETTINGS_LOCATION_PERMISSION_ENABLE)
         viewModelScope.launch {
             val userHasGivenPermission = locationPermissionsRepository.hasUserGivenPermissionTo(permissionOrigin)
             if (userHasGivenPermission) {
@@ -972,6 +980,7 @@ class BrowserTabViewModel(
 
     fun onSystemLocationPermissionDenied() {
         Timber.i("Precise Location - System Location permission denied")
+        pixel.fire(Pixel.PixelName.PRECISE_LOCATION_SETTINGS_LOCATION_PERMISSION_DISABLE)
         onSiteLocationPermissionAlwaysDenied()
     }
 

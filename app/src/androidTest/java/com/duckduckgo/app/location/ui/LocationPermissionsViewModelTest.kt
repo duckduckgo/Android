@@ -30,6 +30,7 @@ import com.duckduckgo.app.location.data.LocationPermissionsDao
 import com.duckduckgo.app.location.data.LocationPermissionsRepository
 import com.duckduckgo.app.runBlocking
 import com.duckduckgo.app.settings.db.SettingsDataStore
+import com.duckduckgo.app.statistics.pixels.Pixel
 import com.nhaarman.mockitokotlin2.atLeastOnce
 import com.nhaarman.mockitokotlin2.lastValue
 import com.nhaarman.mockitokotlin2.mock
@@ -73,6 +74,8 @@ class LocationPermissionsViewModelTest {
 
     private val mockGeoLocationPermissions: GeoLocationPermissions = mock()
 
+    private val mockPixel: Pixel = mock()
+
     @Before
     fun before() {
         db = Room.inMemoryDatabaseBuilder(InstrumentationRegistry.getInstrumentation().targetContext, AppDatabase::class.java)
@@ -83,7 +86,8 @@ class LocationPermissionsViewModelTest {
             LocationPermissionsRepository(locationPermissionsDao, coroutineRule.testDispatcherProvider),
             mockGeoLocationPermissions,
             coroutineRule.testDispatcherProvider,
-            settingsDataStore
+            settingsDataStore,
+            mockPixel
         )
         viewModel.command.observeForever(mockCommandObserver)
         viewModel.viewState.observeForever(mockViewStateObserver)
@@ -195,6 +199,7 @@ class LocationPermissionsViewModelTest {
 
         viewModel.onSiteLocationPermissionSelected("domain.com", LocationPermissionType.DENY_ALWAYS)
 
+        verify(mockPixel).fire(Pixel.PixelName.PRECISE_LOCATION_SITE_DIALOG_DENY_ALWAYS)
         Mockito.verify(mockViewStateObserver, atLeastOnce()).onChanged(viewStateCaptor.capture())
         Assert.assertTrue(viewStateCaptor.lastValue.locationPermissionEntities.size == 1)
 
@@ -208,6 +213,7 @@ class LocationPermissionsViewModelTest {
 
         viewModel.onSiteLocationPermissionSelected(domain, LocationPermissionType.ALLOW_ALWAYS)
 
+        verify(mockPixel).fire(Pixel.PixelName.PRECISE_LOCATION_SITE_DIALOG_ALLOW_ALWAYS)
         verify(mockGeoLocationPermissions).allow(domain)
         Assert.assertEquals(locationPermissionsDao.getPermission(domain)!!.permission, LocationPermissionType.ALLOW_ALWAYS)
     }
