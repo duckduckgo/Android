@@ -754,16 +754,12 @@ class BrowserTabViewModel(
             return
         }
 
-        Timber.i("Precise Location - Checking for $domain Location Permission")
         val userHasGivenPermission = locationPermissionsRepository.hasUserGivenPermissionTo(domain)
         if (userHasGivenPermission) {
             val permissionEntity = locationPermissionsRepository.getDomainPermission(domain)!!
-            Timber.i("Precise Location - $domain has $permissionEntity")
             if (permissionEntity.permission == LocationPermissionType.ALLOW_ALWAYS) {
                 command.postValue(ShowDomainHasPermissionMessage(domain))
             }
-        } else {
-            Timber.i("Precise Location - $domain does not have Permission")
         }
     }
 
@@ -843,13 +839,11 @@ class BrowserTabViewModel(
         origin?.let { permissionOrigin = origin }
 
         if (site?.domainMatchesUrl(permissionOrigin) == false) {
-            Timber.i("Precise Location - Can't accept request from $origin, it does not match the current domain")
             onSiteLocationPermissionAlwaysDenied()
             return
         }
 
         if (!appSettingsPreferencesStore.appLocationPermission) {
-            Timber.i("Precise Location - User chose to not share location from Settings")
             onSiteLocationPermissionAlwaysDenied()
             return
         }
@@ -862,12 +856,9 @@ class BrowserTabViewModel(
                     if (permissionEntity.permission == LocationPermissionType.DENY_ALWAYS) {
                         onSiteLocationPermissionAlwaysDenied()
                     } else {
-                        Timber.i("Precise Location - $permissionOrigin has permission $permissionEntity")
                         command.postValue(CheckSystemLocationPermission(origin))
                     }
                 } else {
-                    Timber.i("Precise Location - $permissionOrigin does not have permission yet")
-                    Timber.i("Precise Location - Checking for System Location Permission")
                     command.postValue(CheckSystemLocationPermission(origin))
                 }
             }
@@ -880,7 +871,6 @@ class BrowserTabViewModel(
         when (permission) {
             LocationPermissionType.ALLOW_ALWAYS -> {
                 onSiteLocationPermissionAlwaysAllowed()
-                Timber.i("Precise Location - Saving $permission for $domain")
                 pixel.fire(PixelName.PRECISE_LOCATION_SITE_DIALOG_ALLOW_ALWAYS)
                 viewModelScope.launch {
                     locationPermissionsRepository.savePermission(domain, permission)
@@ -888,7 +878,6 @@ class BrowserTabViewModel(
             }
             LocationPermissionType.ALLOW_ONCE -> {
                 pixel.fire(PixelName.PRECISE_LOCATION_SITE_DIALOG_ALLOW_ONCE)
-                Timber.i("Precise Location - Permission $permission for $domain allowed once")
                 permissionCallback?.invoke(permissionOrigin, true, false)
             }
             LocationPermissionType.DENY_ALWAYS -> {
@@ -896,10 +885,8 @@ class BrowserTabViewModel(
                 onSiteLocationPermissionAlwaysDenied()
             }
             LocationPermissionType.DENY_ONCE -> {
-                Timber.i("Precise Location - Permission $permission for $domain denied once")
                 pixel.fire(PixelName.PRECISE_LOCATION_SITE_DIALOG_DENY_ONCE)
                 permissionCallback?.invoke(permissionOrigin, false, false)
-                Timber.i("Precise Location - Saving $permission for $domain")
                 viewModelScope.launch {
                     locationPermissionsRepository.savePermission(domain, permission)
                 }
@@ -908,13 +895,11 @@ class BrowserTabViewModel(
     }
 
     private fun onSiteLocationPermissionAlwaysAllowed() {
-        Timber.i("Precise Location - Permission allowed for $permissionOrigin")
         geoLocationPermissions.allow(permissionOrigin)
         permissionCallback?.invoke(permissionOrigin, true, false)
     }
 
     fun onSiteLocationPermissionAlwaysDenied() {
-        Timber.i("Precise Location - Permission denied for $permissionOrigin")
         geoLocationPermissions.clear(permissionOrigin)
         permissionCallback?.invoke(permissionOrigin, false, false)
     }
@@ -925,33 +910,28 @@ class BrowserTabViewModel(
                 onSiteLocationPermissionAlwaysAllowed()
             }
             LocationPermissionType.ALLOW_ONCE -> {
-                Timber.i("Precise Location - Asking permission for $permissionOrigin")
                 command.postValue(AskDomainPermission(permissionOrigin))
             }
             LocationPermissionType.DENY_ALWAYS -> {
                 onSiteLocationPermissionAlwaysDenied()
             }
             LocationPermissionType.DENY_ONCE -> {
-                Timber.i("Precise Location - Asking permission for $permissionOrigin")
                 command.postValue(AskDomainPermission(permissionOrigin))
             }
         }
     }
 
     override fun onSystemLocationPermissionAllowed() {
-        Timber.i("Precise Location - System permission allowed")
         pixel.fire(PixelName.PRECISE_LOCATION_SYSTEM_DIALOG_ENABLE)
         command.postValue(RequestSystemLocationPermission)
     }
 
     override fun onSystemLocationPermissionNotAllowed() {
-        Timber.i("Precise Location - System permission Not allowed")
         pixel.fire(PixelName.PRECISE_LOCATION_SYSTEM_DIALOG_LATER)
         onSiteLocationPermissionAlwaysDenied()
     }
 
     override fun onSystemLocationPermissionNeverAllowed() {
-        Timber.i("Precise Location - System permission Never allowed")
         val neverAllowedPermission = LocationPermissionType.DENY_ALWAYS
         onSiteLocationPermissionSelected(permissionOrigin, neverAllowedPermission)
         pixel.fire(Pixel.PixelName.PRECISE_LOCATION_SYSTEM_DIALOG_NEVER)
@@ -968,18 +948,15 @@ class BrowserTabViewModel(
             if (userHasGivenPermission) {
                 val permissionEntity = locationPermissionsRepository.getDomainPermission(permissionOrigin)
                 permissionEntity?.let {
-                    Timber.i("Precise Location - $permissionOrigin has permission $permissionEntity")
                     reactToSitePermission(permissionEntity.permission)
                 }
             } else {
-                Timber.i("Precise Location - $permissionOrigin does not have permission yet")
                 command.postValue(AskDomainPermission(permissionOrigin))
             }
         }
     }
 
     fun onSystemLocationPermissionDenied() {
-        Timber.i("Precise Location - System Location permission denied")
         pixel.fire(Pixel.PixelName.PRECISE_LOCATION_SETTINGS_LOCATION_PERMISSION_DISABLE)
         onSiteLocationPermissionAlwaysDenied()
     }

@@ -2416,7 +2416,6 @@ class BrowserTabViewModelTest {
         verify(mockPixel).fire(Pixel.PixelName.PRECISE_LOCATION_SETTINGS_LOCATION_PERMISSION_ENABLE)
     }
 
-
     @Test
     fun whenUserChoosesToAlwaysAllowSitePermissionThenGeoPermissionIsAllowed() = coroutineRule.runBlocking {
         val domain = "https://www.example.com/"
@@ -2537,8 +2536,6 @@ class BrowserTabViewModelTest {
         givenNewPermissionRequestFromDomain(domain)
 
         testee.onSiteLocationPermissionAlwaysDenied()
-
-        verify(mockPixel).fire(Pixel.PixelName.PRECISE_LOCATION_SYSTEM_DIALOG_ENABLE)
 
         verify(geoLocationPermissions).clear(domain)
     }

@@ -1270,10 +1270,8 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
             }
             PERMISSION_REQUEST_GEO_LOCATION -> {
                 if ((grantResults.isNotEmpty()) && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    Timber.i("Precise Location - System Geo location permission granted")
                     viewModel.onSystemLocationPermissionGranted()
                 } else {
-                    Timber.i("Precise Location - System Geo location permission denied")
                     viewModel.onSystemLocationPermissionDenied()
                 }
             }
