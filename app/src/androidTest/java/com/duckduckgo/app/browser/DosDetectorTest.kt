@@ -18,7 +18,7 @@ package com.duckduckgo.app.browser
 
 import android.net.Uri
 import com.duckduckgo.app.browser.DosDetector.Companion.MAX_REQUESTS_COUNT
-import com.duckduckgo.app.browser.DosDetector.Companion.MIN_DIFF_IN_MS
+import com.duckduckgo.app.browser.DosDetector.Companion.DOS_TIME_WINDOW_MS
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertFalse
@@ -50,18 +50,18 @@ class DosDetectorTest {
             for (i in 0..MAX_REQUESTS_COUNT) {
                 assertFalse(testee.isUrlGeneratingDos(Uri.parse("http://example.com")))
             }
-            delay((MIN_DIFF_IN_MS + 100).toLong())
+            delay((DOS_TIME_WINDOW_MS + 100).toLong())
             assertFalse(testee.isUrlGeneratingDos(Uri.parse("http://example.com")))
         }
     }
 
     @Test
-    fun whenMoreThanMaxRequestsCountCallsWithSameUrlAndDelayGreaterThanLimitThenCountIsResetSoNextAndSusequentRequestsReturnFalse() {
+    fun whenMoreThanMaxRequestsCountCallsWithSameUrlAndDelayGreaterThanLimitThenCountIsResetSoNextAndSubsequentRequestsReturnFalse() {
         runBlocking {
             for (i in 0..MAX_REQUESTS_COUNT) {
                 assertFalse(testee.isUrlGeneratingDos(Uri.parse("http://example.com")))
             }
-            delay((MIN_DIFF_IN_MS + 100).toLong())
+            delay((DOS_TIME_WINDOW_MS + 100).toLong())
             assertFalse(testee.isUrlGeneratingDos(Uri.parse("http://example.com")))
             assertFalse(testee.isUrlGeneratingDos(Uri.parse("http://example.com")))
         }

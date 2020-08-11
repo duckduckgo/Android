@@ -52,11 +52,11 @@ class DosDetector @Inject constructor() {
 
     private fun withinDosTimeWindow(currentLoadTime: Long): Boolean {
         val previousLoadTime = lastUrlLoadTime ?: return false
-        return (currentLoadTime - previousLoadTime) < MIN_DIFF_IN_MS
+        return (currentLoadTime - previousLoadTime) < DOS_TIME_WINDOW_MS
     }
 
     companion object {
-        const val MIN_DIFF_IN_MS = 1_000
+        const val DOS_TIME_WINDOW_MS = 1_000
         const val MAX_REQUESTS_COUNT = 20
     }
 }
