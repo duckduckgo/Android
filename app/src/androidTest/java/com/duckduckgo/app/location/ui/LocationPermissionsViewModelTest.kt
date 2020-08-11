@@ -36,6 +36,7 @@ import com.nhaarman.mockitokotlin2.lastValue
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.verify
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.runBlocking
 import org.junit.After
 import org.junit.Assert
 import org.junit.Before
@@ -185,10 +186,24 @@ class LocationPermissionsViewModelTest {
     }
 
     @Test
-    fun whenUserTogglesLoginDetectionThenUpdateSettingsDataStore() {
+    fun whenUserTogglesLocationPermissionThenUpdateSettingsDataStore() {
         viewModel.onLocationPermissionToggled(true)
 
         Mockito.verify(settingsDataStore).appLocationPermission = true
+    }
+
+    @Test
+    fun whenUserDisablesLocationPermissionThenAllPermissionsAreCleared() = coroutineRule.runBlocking {
+        viewModel.onLocationPermissionToggled(false)
+
+        Mockito.verify(mockGeoLocationPermissions).clearAll()
+    }
+
+    @Test
+    fun whenUserEnablesLocationPermissionThenPermissionsAreNotModified() = coroutineRule.runBlocking {
+        viewModel.onLocationPermissionToggled(true)
+
+        Mockito.verifyNoMoreInteractions(mockGeoLocationPermissions)
     }
 
     @Test

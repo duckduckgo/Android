@@ -90,7 +90,12 @@ class LocationPermissionsViewModel(
     }
 
     fun onLocationPermissionToggled(enabled: Boolean) {
-        settingsDataStore.appLocationPermission = enabled
+        viewModelScope.launch(dispatcherProvider.io()) {
+            settingsDataStore.appLocationPermission = enabled
+            if (!enabled) {
+                geoLocationPermissions.clearAll()
+            }
+        }
         _viewState.value = _viewState.value?.copy(locationPermissionEnabled = enabled)
     }
 
@@ -118,5 +123,4 @@ class LocationPermissionsViewModel(
             }
         }
     }
-
 }

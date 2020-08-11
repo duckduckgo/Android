@@ -85,19 +85,6 @@ class LocationPermissionsAdapter(
                     }
                 }
             }
-
-            // val filteredValue = value.filter { it.permission == LocationPermissionType.ALLOW_ALWAYS || it.permission == LocationPermissionType.DENY_ALWAYS  }
-            // if (field != filteredValue) {
-            //     field = filteredValue
-            //     allowedLocationPermissions.clear()
-            //     deniedLocationPermissions.clear()
-            //     filteredValue.forEach {
-            //         if (it.permission == LocationPermissionType.ALLOW_ALWAYS) {
-            //             allowedLocationPermissions.add(it)
-            //         } else if (it.permission == LocationPermissionType.DENY_ALWAYS) {
-            //             deniedLocationPermissions.add(it)
-            //         }
-
         }
 
     private var allowedLocationPermissions: MutableList<LocationPermissionEntity> = mutableListOf()
