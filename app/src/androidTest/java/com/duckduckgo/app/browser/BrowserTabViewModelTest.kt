@@ -2309,6 +2309,12 @@ class BrowserTabViewModelTest {
         verify(mockPixel, never()).fire(Pixel.PixelName.UOA_VISITED)
     }
 
+    @Test
+    fun whenDosAttackDetectedThenErrorIsShown() {
+        testee.dosAttackDetected()
+        assertCommandIssued<Command.ShowErrorWithAction>()
+    }
+
     private inline fun <reified T : Command> assertCommandIssued(instanceAssertions: T.() -> Unit = {}) {
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
         val issuedCommand = commandCaptor.allValues.find { it is T }

@@ -243,7 +243,7 @@ class BrowserTabViewModel(
         object ShowWebContent : Command()
         class RefreshUserAgent(val host: String?, val isDesktop: Boolean) : Command()
 
-        class ShowErrorWithAction(val action: () -> Unit) : Command()
+        class ShowErrorWithAction(val textResId: Int, val action: () -> Unit) : Command()
         sealed class DaxCommand : Command() {
             object FinishTrackerAnimation : DaxCommand()
             class HideDaxDialog(val cta: Cta) : DaxCommand()
@@ -805,6 +805,11 @@ class BrowserTabViewModel(
         Schedulers.io().scheduleDirect {
             networkLeaderboardDao.incrementSitesVisited()
         }
+    }
+
+    override fun dosAttackDetected() {
+        invalidateBrowsingActions()
+        showErrorWithAction(R.string.dosErrorMessage)
     }
 
     override fun titleReceived(newTitle: String) {
@@ -1385,8 +1390,8 @@ class BrowserTabViewModel(
         )
     }
 
-    private fun showErrorWithAction() {
-        command.value = ShowErrorWithAction { this.onUserSubmittedQuery(url.orEmpty()) }
+    private fun showErrorWithAction(errorMessage: Int = R.string.crashedWebViewErrorMessage) {
+        command.value = ShowErrorWithAction(errorMessage) { this.onUserSubmittedQuery(url.orEmpty()) }
     }
 
     private fun recoverTabWithQuery(query: String) {

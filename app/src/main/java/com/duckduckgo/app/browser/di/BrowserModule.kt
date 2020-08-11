@@ -87,7 +87,8 @@ class BrowserModule {
         offlinePixelCountDataStore: OfflinePixelCountDataStore,
         uncaughtExceptionRepository: UncaughtExceptionRepository,
         cookieManager: CookieManager,
-        loginDetector: DOMLoginDetector
+        loginDetector: DOMLoginDetector,
+        dosDetector: DosDetector
     ): BrowserWebViewClient {
         return BrowserWebViewClient(
             requestRewriter,
@@ -96,7 +97,8 @@ class BrowserModule {
             offlinePixelCountDataStore,
             uncaughtExceptionRepository,
             cookieManager,
-            loginDetector
+            loginDetector,
+            dosDetector
         )
     }
 
