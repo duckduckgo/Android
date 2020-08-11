@@ -1285,11 +1285,13 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
 
         fun updateToolbarActionsVisibility(viewState: BrowserViewState) {
             tabsButton?.isVisible = viewState.showTabsButton
-            fireMenuButton?.isVisible = viewState.showFireButton
+            fireMenuButton?.isVisible = viewState.fireButton is FireButton.Visible
             menuButton?.isVisible = viewState.showMenuButton
 
-            if (viewState.showFireButton) {
+            if (viewState.fireButton.playPulseAnimation()) {
                 playPulseAnimation()
+            } else {
+                pulseAnimation.stop()
             }
         }
 

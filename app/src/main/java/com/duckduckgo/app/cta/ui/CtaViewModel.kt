@@ -39,6 +39,8 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.survey.db.SurveyDao
 import com.duckduckgo.app.survey.model.Survey
 import com.duckduckgo.app.widget.ui.WidgetCapabilities
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
@@ -63,6 +65,20 @@ class CtaViewModel @Inject constructor(
     private val dispatchers: DispatcherProvider
 ) {
     val surveyLiveData: LiveData<Survey> = surveyDao.getLiveScheduled()
+
+    val shouldShowPulseAnimation: Flow<Boolean> = dismissedCtaDao
+        .dismissedCtas()
+        .map { dismissedCtaDao ->
+            withContext(dispatchers.io()) {
+                if (daxDialogFireEducationShown() || settingsDataStore.hideTips) return@withContext false
+
+                return@withContext dismissedCtaDao.any {
+                    it.ctaId == CtaId.DAX_DIALOG_TRACKERS_FOUND ||
+                            it.ctaId == CtaId.DAX_DIALOG_OTHER ||
+                            it.ctaId == CtaId.DAX_DIALOG_NETWORK
+                }
+            }
+        }
 
     private var activeSurvey: Survey? = null
 

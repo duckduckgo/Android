@@ -175,6 +175,7 @@ dependencies {
     // ViewModel and LiveData
     implementation "androidx.lifecycle:lifecycle-extensions:$lifecycle"
     implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycle"
+    implementation "androidx.lifecycle:lifecycle-livedata-ktx:$lifecycle"
 
     implementation "androidx.lifecycle:lifecycle-common-java8:$lifecycle"
     testImplementation "androidx.arch.core:core-testing:$coreTesting"
