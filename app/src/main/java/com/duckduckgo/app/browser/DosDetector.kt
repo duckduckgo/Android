@@ -26,21 +26,33 @@ class DosDetector @Inject constructor() {
     var dosCount = 0
 
     fun isUrlGeneratingDos(url: Uri?): Boolean {
-        val lastKnownRefresh = lastUrlLoadTime
-        val now = System.currentTimeMillis()
 
-        val isUrlGeneratingDos =
-            !(dosCount < MAX_REQUESTS_COUNT || lastKnownRefresh == null || (now - lastKnownRefresh) > MIN_DIFF_IN_MS || lastUrl != url)
+        val currentUrlLoadTime = System.currentTimeMillis()
 
-        if (lastUrl != url) {
-            dosCount = 0
-        } else {
-            dosCount++
+        if (url != lastUrl) {
+            reset(url, currentUrlLoadTime)
+            return false
         }
 
+        if (!withinDosTimeWindow(currentUrlLoadTime)) {
+            reset(url, currentUrlLoadTime)
+            return false
+        }
+
+        dosCount++
+        lastUrlLoadTime = currentUrlLoadTime
+        return dosCount > MAX_REQUESTS_COUNT
+    }
+
+    private fun reset(url: Uri?, currentLoadTime: Long) {
+        dosCount = 0
         lastUrl = url
-        lastUrlLoadTime = System.currentTimeMillis()
-        return isUrlGeneratingDos
+        lastUrlLoadTime = currentLoadTime
+    }
+
+    private fun withinDosTimeWindow(currentLoadTime: Long): Boolean {
+        val previousLoadTime = lastUrlLoadTime ?: return false
+        return (currentLoadTime - previousLoadTime) < MIN_DIFF_IN_MS
     }
 
     companion object {
