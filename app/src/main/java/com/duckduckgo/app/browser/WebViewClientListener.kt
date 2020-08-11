@@ -54,4 +54,5 @@ interface WebViewClientListener {
     fun surrogateDetected(surrogate: SurrogateResponse)
 
     fun loginDetected()
+    fun dosAttackDetected()
 }

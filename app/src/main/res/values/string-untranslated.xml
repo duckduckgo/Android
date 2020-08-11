@@ -51,6 +51,9 @@
     <string name="useOurAppShortcutAddedText">Success! %s has been added to your home screen.</string>
     <string name="useOurAppDeletionDialogText">Checking your feed in DuckDuckGo is a great alternative to using the Facebook app!&lt;br/&gt;&lt;br/&gt;But if the Facebook app is on your phone, it can make requests for data even when you\'re not using it.&lt;br/&gt;&lt;br/&gt;Prevent this by deleting it now!</string>
 
+    <!-- Dos Attack error-->
+    <string name="dosErrorMessage">Connection aborted. Website could be harmful to your device.</string>
+
     <!-- Precise Location -->
     <string name="preciseLocationSystemDialogTitle">Enable device location for DuckDuckGo Privacy Browser?</string>
     <string name="preciseLocationSystemDialogSubtitle">%s is requesting your device location. You\'ll first need to allow the app to send your device location, then %s can ask permission.</string>
@@ -74,4 +77,5 @@
     <string name="preciseLocationAllowedSitesSectionTitle">Granted</string>
     <string name="preciseLocationDeniedSitesSectionTitle">Denied</string>
     <string name="preciseLocationSnackbarMessage">You previously granted %s permission to access your device location.</string>
+
 </resources>

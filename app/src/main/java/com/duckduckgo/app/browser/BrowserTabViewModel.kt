@@ -76,7 +76,6 @@ import com.duckduckgo.app.global.model.domainMatchesUrl
 import com.duckduckgo.app.global.useourapp.UseOurAppDetector
 import com.duckduckgo.app.global.useourapp.UseOurAppDetector.Companion.USE_OUR_APP_SHORTCUT_TITLE
 import com.duckduckgo.app.global.useourapp.UseOurAppDetector.Companion.USE_OUR_APP_SHORTCUT_URL
-import com.duckduckgo.app.global.view.asLocationPermissionOrigin
 import com.duckduckgo.app.notification.db.NotificationDao
 import com.duckduckgo.app.notification.model.UseOurAppNotification
 import com.duckduckgo.app.location.GeoLocationPermissions
@@ -255,7 +254,7 @@ class BrowserTabViewModel(
         class AskDomainPermission(val domain: String) : Command()
         object RequestSystemLocationPermission : Command()
         class RefreshUserAgent(val host: String?, val isDesktop: Boolean) : Command()
-        class ShowErrorWithAction(val action: () -> Unit) : Command()
+        class ShowErrorWithAction(val textResId: Int, val action: () -> Unit) : Command()
         class ShowDomainHasPermissionMessage(val domain: String) : Command()
         sealed class DaxCommand : Command() {
             object FinishTrackerAnimation : DaxCommand()
@@ -693,10 +692,6 @@ class BrowserTabViewModel(
 
         domain?.let { viewModelScope.launch { updateLoadingStatePrivacy(domain) } }
         domain?.let { viewModelScope.launch { updateWhitelistedState(domain) } }
-
-        val permissionOrigin = site?.uri?.host?.asLocationPermissionOrigin()
-        permissionOrigin?.let { viewModelScope.launch { notifyPermanentLocationPermission(permissionOrigin) } }
-
         registerSiteVisit()
     }
 
@@ -747,20 +742,6 @@ class BrowserTabViewModel(
 
     private suspend fun isWhitelisted(domain: String): Boolean {
         return withContext(dispatchers.io()) { userWhitelistDao.contains(domain) }
-    }
-
-    private suspend fun notifyPermanentLocationPermission(domain: String) {
-        if (!appSettingsPreferencesStore.appLocationPermission) {
-            return
-        }
-
-        val userHasGivenPermission = locationPermissionsRepository.hasUserGivenPermissionTo(domain)
-        if (userHasGivenPermission) {
-            val permissionEntity = locationPermissionsRepository.getDomainPermission(domain)!!
-            if (permissionEntity.permission == LocationPermissionType.ALLOW_ALWAYS) {
-                command.postValue(ShowDomainHasPermissionMessage(domain))
-            }
-        }
     }
 
     private fun urlUpdated(url: String) {
@@ -965,6 +946,11 @@ class BrowserTabViewModel(
         Schedulers.io().scheduleDirect {
             networkLeaderboardDao.incrementSitesVisited()
         }
+    }
+
+    override fun dosAttackDetected() {
+        invalidateBrowsingActions()
+        showErrorWithAction(R.string.dosErrorMessage)
     }
 
     override fun titleReceived(newTitle: String) {
@@ -1545,8 +1531,8 @@ class BrowserTabViewModel(
         )
     }
 
-    private fun showErrorWithAction() {
-        command.value = ShowErrorWithAction { this.onUserSubmittedQuery(url.orEmpty()) }
+    private fun showErrorWithAction(errorMessage: Int = R.string.crashedWebViewErrorMessage) {
+        command.value = ShowErrorWithAction(errorMessage) { this.onUserSubmittedQuery(url.orEmpty()) }
     }
 
     private fun recoverTabWithQuery(query: String) {
@@ -1597,7 +1583,6 @@ class BrowserTabViewModel(
                 override fun downloadOpened() {
                     closeAndReturnToSourceIfBlankTab()
                 }
-
             })
         }
     }
