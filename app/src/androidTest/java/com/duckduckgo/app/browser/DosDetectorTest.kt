@@ -56,6 +56,18 @@ class DosDetectorTest {
     }
 
     @Test
+    fun whenMoreThanMaxRequestsCountCallsWithSameUrlAndDelayGreaterThanLimitThenCountIsResetSoNextAndSusequentRequestsReturnFalse() {
+        runBlocking {
+            for (i in 0..MAX_REQUESTS_COUNT) {
+                assertFalse(testee.isUrlGeneratingDos(Uri.parse("http://example.com")))
+            }
+            delay((MIN_DIFF_IN_MS + 100).toLong())
+            assertFalse(testee.isUrlGeneratingDos(Uri.parse("http://example.com")))
+            assertFalse(testee.isUrlGeneratingDos(Uri.parse("http://example.com")))
+        }
+    }
+
+    @Test
     fun whenMultipleRequestsFromDifferentUrlsThenReturnFalse() {
         for (i in 0 until MAX_REQUESTS_COUNT * 2) {
             if (i % 2 == 0) {
