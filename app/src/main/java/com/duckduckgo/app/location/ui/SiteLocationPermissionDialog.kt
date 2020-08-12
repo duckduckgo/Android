@@ -46,7 +46,6 @@ class SiteLocationPermissionDialog : DialogFragment() {
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        isCancelable = false
 
         val rootView = layoutInflater.inflate(R.layout.content_site_location_permission_dialog, null)
 
@@ -67,6 +66,7 @@ class SiteLocationPermissionDialog : DialogFragment() {
         populateFavicon(favicon)
         configureListeners(allowAlways, allowOnce, denyOnce, denyAlways)
         hideExtraViews(allowOnce, denyOnce, extraDivider, anotherDivider)
+        makeCancellable()
 
         return alertDialog.create()
     }
@@ -133,6 +133,13 @@ class SiteLocationPermissionDialog : DialogFragment() {
                 allowOnce.gone()
                 denyOnce.gone()
             }
+        }
+    }
+
+    private fun makeCancellable(){
+        arguments?.let { args ->
+            val isEditing = args.getBoolean(KEY_EDITING_PERMISSION)
+            isCancelable = isEditing
         }
     }
 
