@@ -25,14 +25,14 @@ import com.duckduckgo.app.InstantSchedulersRule
 import com.duckduckgo.app.cta.db.DismissedCtaDao
 import com.duckduckgo.app.cta.model.CtaId
 import com.duckduckgo.app.cta.model.DismissedCta
-import com.duckduckgo.app.global.useourapp.UseOurAppDetector.Companion.USE_OUR_APP_SHORTCUT_URL
 import com.duckduckgo.app.global.db.AppDatabase
+import com.duckduckgo.app.global.events.db.UserEventEntity
+import com.duckduckgo.app.global.events.db.UserEventKey
+import com.duckduckgo.app.global.events.db.UserEventsStore
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.model.Site
-import com.duckduckgo.app.global.events.db.UserEventEntity
-import com.duckduckgo.app.global.events.db.UserEventsStore
-import com.duckduckgo.app.global.events.db.UserEventKey
 import com.duckduckgo.app.global.useourapp.UseOurAppDetector
+import com.duckduckgo.app.global.useourapp.UseOurAppDetector.Companion.USE_OUR_APP_SHORTCUT_URL
 import com.duckduckgo.app.onboarding.store.AppStage
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.store.UserStageStore
@@ -54,6 +54,12 @@ import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import com.duckduckgo.app.widget.ui.WidgetCapabilities
 import com.nhaarman.mockitokotlin2.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.consumeAsFlow
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.toList
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runBlockingTest
 import org.junit.After
 import org.junit.Assert.*
@@ -62,6 +68,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations
+import java.lang.IllegalStateException
 import java.util.concurrent.TimeUnit
 
 @ExperimentalCoroutinesApi
@@ -114,6 +121,8 @@ class CtaViewModelTest {
     @Mock
     private lateinit var mockUserEventsStore: UserEventsStore
 
+    private val dismissedCtaDaoChannel = Channel<List<DismissedCta>>()
+
     private val requiredDaxOnboardingCtas: List<CtaId> = listOf(
         CtaId.DAX_INTRO,
         CtaId.DAX_DIALOG_SERP,
@@ -135,6 +144,7 @@ class CtaViewModelTest {
 
         whenever(mockAppInstallStore.installTimestamp).thenReturn(System.currentTimeMillis() - TimeUnit.DAYS.toMillis(1))
         whenever(mockUserWhitelistDao.contains(any())).thenReturn(false)
+        whenever(mockDismissedCtaDao.dismissedCtas()).thenReturn(dismissedCtaDaoChannel.consumeAsFlow())
 
         testee = CtaViewModel(
             mockAppInstallStore,
@@ -155,6 +165,7 @@ class CtaViewModelTest {
 
     @After
     fun after() {
+        dismissedCtaDaoChannel.close()
         db.close()
     }
 
@@ -511,6 +522,59 @@ class CtaViewModelTest {
         givenUseOurAppActive()
         testee.onUserDismissedCta(UseOurAppCta())
         verify(mockUserStageStore).stageCompleted(AppStage.USE_OUR_APP_ONBOARDING)
+    }
+
+    @Test
+    fun whenUserHidAllTipsThenFireButtonAnimationShouldNotShow() = coroutineRule.runBlocking {
+        whenever(mockSettingsDataStore.hideTips).thenReturn(true)
+        launch {
+            dismissedCtaDaoChannel.send(emptyList())
+        }
+
+        assertFalse(testee.showFireButtonPulseAnimation.first())
+    }
+
+    @Test
+    fun whenUserHasAlreadySeenFireButtonCtaThenFireButtonAnimationShouldNotShow() = coroutineRule.runBlocking {
+        whenever(mockDismissedCtaDao.exists(CtaId.DAX_FIRE_BUTTON)).thenReturn(true)
+        launch {
+            dismissedCtaDaoChannel.send(emptyList())
+        }
+
+        assertFalse(testee.showFireButtonPulseAnimation.first())
+    }
+
+    @Test
+    fun whenTipsAndFireOnboardingActiveAndUserSeesAnyTriggerFirePulseAnimationCtaThenFireButtonAnimationShouldShow() = coroutineRule.runBlocking {
+        val willTriggerFirePulseAnimationCtas = listOf(CtaId.DAX_DIALOG_TRACKERS_FOUND, CtaId.DAX_DIALOG_NETWORK, CtaId.DAX_DIALOG_OTHER)
+
+        val launch = launch {
+            testee.showFireButtonPulseAnimation.collect {
+                assertTrue(it)
+            }
+        }
+        willTriggerFirePulseAnimationCtas.forEach {
+            dismissedCtaDaoChannel.send(listOf(DismissedCta(it)))
+        }
+
+        launch.cancel()
+    }
+
+    @Test
+    fun whenTipsAndFireOnboardingActiveAndUserSeesAnyNonTriggerFirePulseAnimationCtaThenFireButtonAnimationShouldNotShow() = coroutineRule.runBlocking {
+        val willTriggerFirePulseAnimationCtas = listOf(CtaId.DAX_DIALOG_TRACKERS_FOUND, CtaId.DAX_DIALOG_NETWORK, CtaId.DAX_DIALOG_OTHER)
+        val willNotTriggerFirePulseAnimationCtas = CtaId.values().toList() - willTriggerFirePulseAnimationCtas
+
+        val launch = launch {
+            testee.showFireButtonPulseAnimation.collect {
+                assertFalse(it)
+            }
+        }
+        willNotTriggerFirePulseAnimationCtas.forEach {
+            dismissedCtaDaoChannel.send(listOf(DismissedCta(it)))
+        }
+
+        launch.cancel()
     }
 
     private suspend fun givenDaxOnboardingActive() {
