@@ -136,7 +136,7 @@ class SiteLocationPermissionDialog : DialogFragment() {
         }
     }
 
-    private fun makeCancellable(){
+    private fun makeCancellable() {
         arguments?.let { args ->
             val isEditing = args.getBoolean(KEY_EDITING_PERMISSION)
             isCancelable = isEditing
