@@ -67,7 +67,6 @@ import android.widget.Toast
 import androidx.annotation.AnyThread
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
-import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.core.net.toUri
@@ -626,7 +625,12 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
             is Command.HideWebContent -> webView?.hide()
             is Command.ShowWebContent -> webView?.show()
             is Command.CheckSystemLocationPermission -> checkSystemLocationPermission(it.domain)
-            is Command.RequestSystemLocationPermission -> requestPermissions(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION), PERMISSION_REQUEST_GEO_LOCATION)
+            is Command.RequestSystemLocationPermission -> requestPermissions(
+                arrayOf(
+                    Manifest.permission.ACCESS_FINE_LOCATION,
+                    Manifest.permission.ACCESS_COARSE_LOCATION
+                ), PERMISSION_REQUEST_GEO_LOCATION
+            )
             is Command.AskDomainPermission -> askSiteLocationPermission(it.domain)
             is Command.RefreshUserAgent -> refreshUserAgent(it.host, it.isDesktop)
             is Command.AskToFireproofWebsite -> askToFireproofWebsite(requireContext(), it.fireproofWebsite)
@@ -664,18 +668,11 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
     }
 
     private fun checkSystemLocationPermission(domain: String) {
-        if (ContextCompat.checkSelfPermission(requireActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+        if (ContextCompat.checkSelfPermission(requireActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            val dialog = SystemLocationPermissionDialog.instance(domain, viewModel)
+            dialog.show(requireActivity().supportFragmentManager, SystemLocationPermissionDialog.SYSTEM_LOCATION_PERMISSION_TAG)
+        } else {
             viewModel.onSystemLocationPermissionGranted()
-            return
-        }
-
-        if (ContextCompat.checkSelfPermission(requireActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_DENIED) {
-            if (ActivityCompat.shouldShowRequestPermissionRationale(requireActivity(), Manifest.permission.ACCESS_COARSE_LOCATION)) {
-                val dialog = SystemLocationPermissionDialog.instance(domain, viewModel)
-                dialog.show(requireActivity().supportFragmentManager, SystemLocationPermissionDialog.SYSTEM_LOCATION_PERMISSION_TAG)
-            } else {
-                viewModel.onSystemLocationPermissionDenied()
-            }
         }
     }
 
@@ -1675,7 +1672,8 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
                 fireproofWebsitePopupMenuItem?.isChecked = viewState.canFireproofSite && viewState.isFireproofWebsite
                 sharePageMenuItem?.isEnabled = viewState.canSharePage
                 whitelistPopupMenuItem?.isEnabled = viewState.canWhitelist
-                whitelistPopupMenuItem?.text = getText(if (viewState.isWhitelisted) R.string.enablePrivacyProtection else R.string.disablePrivacyProtection)
+                whitelistPopupMenuItem?.text =
+                    getText(if (viewState.isWhitelisted) R.string.enablePrivacyProtection else R.string.disablePrivacyProtection)
                 brokenSitePopupMenuItem?.isEnabled = viewState.canReportSite
                 requestDesktopSiteCheckMenuItem?.isEnabled = viewState.canChangeBrowsingMode
                 requestDesktopSiteCheckMenuItem?.isChecked = viewState.isDesktopBrowsingMode
@@ -1921,5 +1919,4 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
     override fun cancelDownload() {
         viewModel.closeAndReturnToSourceIfBlankTab()
     }
-
 }
