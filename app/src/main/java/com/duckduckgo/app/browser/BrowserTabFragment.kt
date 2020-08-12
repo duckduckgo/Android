@@ -664,6 +664,11 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
     }
 
     private fun checkSystemLocationPermission(domain: String) {
+        if (ContextCompat.checkSelfPermission(requireActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            viewModel.onSystemLocationPermissionGranted()
+            return
+        }
+
         if (ContextCompat.checkSelfPermission(requireActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_DENIED) {
             if (ActivityCompat.shouldShowRequestPermissionRationale(requireActivity(), Manifest.permission.ACCESS_COARSE_LOCATION)) {
                 val dialog = SystemLocationPermissionDialog.instance(domain, viewModel)
@@ -671,8 +676,6 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
             } else {
                 viewModel.onSystemLocationPermissionDenied()
             }
-        } else {
-            viewModel.onSystemLocationPermissionGranted()
         }
     }
 
