@@ -289,7 +289,7 @@ class BrowserTabViewModel(
 
     private val autoCompletePublishSubject = PublishRelay.create<String>()
     private val fireproofWebsiteState: LiveData<List<FireproofWebsiteEntity>> = fireproofWebsiteRepository.getFireproofWebsites()
-    private val showPulseAnimation: LiveData<Boolean> = ctaViewModel.shouldShowPulseAnimation.asLiveData(context = viewModelScope.coroutineContext)
+    private val showPulseAnimation: LiveData<Boolean> = ctaViewModel.showFireButtonPulseAnimation.asLiveData(context = viewModelScope.coroutineContext)
     private var autoCompleteDisposable: Disposable? = null
     private var site: Site? = null
     private lateinit var tabId: String

@@ -66,7 +66,7 @@ class CtaViewModel @Inject constructor(
 ) {
     val surveyLiveData: LiveData<Survey> = surveyDao.getLiveScheduled()
 
-    val shouldShowPulseAnimation: Flow<Boolean> = dismissedCtaDao
+    val showFireButtonPulseAnimation: Flow<Boolean> = dismissedCtaDao
         .dismissedCtas()
         .map { dismissedCtaDao ->
             withContext(dispatchers.io()) {
