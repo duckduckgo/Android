@@ -67,6 +67,7 @@ import android.widget.Toast
 import androidx.annotation.AnyThread
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
+import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.core.net.toUri
@@ -663,9 +664,13 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
     }
 
     private fun checkSystemLocationPermission(domain: String) {
-        if (ContextCompat.checkSelfPermission(requireActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            val dialog = SystemLocationPermissionDialog.instance(domain, viewModel)
-            dialog.show(requireActivity().supportFragmentManager, SystemLocationPermissionDialog.SYSTEM_LOCATION_PERMISSION_TAG)
+        if (ContextCompat.checkSelfPermission(requireActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_DENIED) {
+            if (ActivityCompat.shouldShowRequestPermissionRationale(requireActivity(), Manifest.permission.ACCESS_COARSE_LOCATION)){
+                val dialog = SystemLocationPermissionDialog.instance(domain, viewModel)
+                dialog.show(requireActivity().supportFragmentManager, SystemLocationPermissionDialog.SYSTEM_LOCATION_PERMISSION_TAG)
+            } else {
+               viewModel.onSystemLocationPermissionDenied()
+            }
         } else {
             viewModel.onSystemLocationPermissionGranted()
         }

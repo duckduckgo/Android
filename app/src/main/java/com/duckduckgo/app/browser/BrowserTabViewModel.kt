@@ -1211,7 +1211,7 @@ class BrowserTabViewModel(
             is RequiredAction.ShareLink -> {
                 command.value = ShareLink(requiredAction.url)
                 true
-            }
+        }
             is RequiredAction.CopyLink -> {
                 command.value = CopyLink(requiredAction.url)
                 true
