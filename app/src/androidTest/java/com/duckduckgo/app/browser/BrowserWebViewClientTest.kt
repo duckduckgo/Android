@@ -52,6 +52,7 @@ class BrowserWebViewClientTest {
     private val loginDetector: DOMLoginDetector = mock()
     private val offlinePixelCountDataStore: OfflinePixelCountDataStore = mock()
     private val uncaughtExceptionRepository: UncaughtExceptionRepository = mock()
+    private val dosDetector: DosDetector = DosDetector()
 
     @UiThreadTest
     @Before
@@ -64,7 +65,8 @@ class BrowserWebViewClientTest {
             offlinePixelCountDataStore,
             uncaughtExceptionRepository,
             cookieManager,
-            loginDetector
+            loginDetector,
+            dosDetector
         )
         testee.webViewClientListener = listener
     }

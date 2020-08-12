@@ -33,12 +33,12 @@ import com.duckduckgo.app.cta.db.DismissedCtaDao
 import com.duckduckgo.app.cta.model.DismissedCta
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteDao
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
+import com.duckduckgo.app.global.events.db.UserEventEntity
+import com.duckduckgo.app.global.events.db.UserEventTypeConverter
+import com.duckduckgo.app.global.events.db.UserEventsDao
 import com.duckduckgo.app.global.exception.UncaughtExceptionDao
 import com.duckduckgo.app.global.exception.UncaughtExceptionEntity
 import com.duckduckgo.app.global.exception.UncaughtExceptionSourceConverter
-import com.duckduckgo.app.global.events.db.UserEventsDao
-import com.duckduckgo.app.global.events.db.UserEventEntity
-import com.duckduckgo.app.global.events.db.UserEventTypeConverter
 import com.duckduckgo.app.httpsupgrade.db.HttpsBloomFilterSpecDao
 import com.duckduckgo.app.httpsupgrade.db.HttpsWhitelistDao
 import com.duckduckgo.app.httpsupgrade.model.HttpsBloomFilterSpec
@@ -63,7 +63,7 @@ import com.duckduckgo.app.usage.search.SearchCountDao
 import com.duckduckgo.app.usage.search.SearchCountEntity
 
 @Database(
-    exportSchema = true, version = 23, entities = [
+    exportSchema = true, version = 24, entities = [
         TdsTracker::class,
         TdsEntity::class,
         TdsDomainEntity::class,
@@ -316,6 +316,27 @@ class MigrationsProvider(
         }
     }
 
+    val MIGRATION_23_TO_24: Migration = object : Migration(23, 24) {
+        override fun migrate(database: SupportSQLiteDatabase) {
+            // https://stackoverflow.com/a/57797179/980345
+            // SQLite does not support Alter table operations like Foreign keys
+            database.execSQL(
+                "CREATE TABLE IF NOT EXISTS tabs_new " +
+                        "(tabId TEXT NOT NULL, url TEXT, title TEXT, skipHome INTEGER NOT NULL, viewed INTEGER NOT NULL, position INTEGER NOT NULL, tabPreviewFile TEXT, sourceTabId TEXT," +
+                        " PRIMARY KEY(tabId)," +
+                        " FOREIGN KEY(sourceTabId) REFERENCES tabs(tabId) ON UPDATE SET NULL ON DELETE SET NULL )"
+            )
+            database.execSQL(
+                "INSERT INTO tabs_new (tabId, url, title, skipHome, viewed, position, tabPreviewFile) " +
+                        "SELECT tabId, url, title, skipHome, viewed, position, tabPreviewFile " +
+                        "FROM tabs"
+            )
+            database.execSQL("DROP TABLE tabs")
+            database.execSQL("ALTER TABLE tabs_new RENAME TO tabs")
+            database.execSQL("CREATE INDEX IF NOT EXISTS index_tabs_tabId ON tabs (tabId)")
+        }
+    }
+
     val ALL_MIGRATIONS: List<Migration>
         get() = listOf(
             MIGRATION_1_TO_2,
@@ -339,7 +360,8 @@ class MigrationsProvider(
             MIGRATION_19_TO_20,
             MIGRATION_20_TO_21,
             MIGRATION_21_TO_22,
-            MIGRATION_22_TO_23
+            MIGRATION_22_TO_23,
+            MIGRATION_23_TO_24
         )
 
     @Deprecated(

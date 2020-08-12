@@ -17,6 +17,19 @@ default_platform(:android)
 
 platform :android do
 
+  desc "Upload APK to Play Store"
+  lane :deploy_playstore do
+
+    props = property_file_read(file: "app/version/version.properties")
+    version = props["VERSION"]
+    apkPath = "app/build/outputs/apk/release/duckduckgo-#{version}-release.apk"
+
+    upload_to_play_store(
+      apk: apkPath,
+      track: 'internal'
+    )
+  end
+
   desc "Deploy APK to GitHub"
   lane :deploy_github do
 
@@ -65,7 +78,6 @@ platform :android do
             merge_commit_filtering: "exclude_merges"
         )
         UI.message ("Performing a new release for #{newVersion}")
-
 
         if UI.confirm("Are you sure you're happy with this release?\n\nVersion=#{newVersion}\nCommits Since Last Release:\n#{commits}\nRelease Notes:\n#{releaseNotes}\n")
           UI.success "Creating release branch for release/#{newVersion}"

@@ -92,15 +92,15 @@ class DuckDuckGoWebView : WebView, NestedScrollingChild {
 
                 returnValue = super.onTouchEvent(event)
 
-                if (scrollY == 0 && lastClampedTopY) {
-                    // we have reached the top and are clamped -> enable swipeRefresh (by default always disabled)
-                    enableSwipeRefresh(true)
-
-                    stopNestedScroll()
-                } else if (dispatchNestedScroll(0, scrollOffset[1], 0, deltaY, scrollOffset)) {
+                if (dispatchNestedScroll(0, scrollOffset[1], 0, deltaY, scrollOffset)) {
                     event.offsetLocation(0f, scrollOffset[1].toFloat())
                     nestedOffsetY += scrollOffset[1]
                     lastY -= scrollOffset[1]
+                }
+
+                if (scrollY == 0 && lastClampedTopY && nestedOffsetY == 0) {
+                    // we have reached the top, are clamped vertically and nestedScrollY is done too -> enable swipeRefresh (by default always disabled)
+                    enableSwipeRefresh(true)
                 }
 
                 lastDeltaY = deltaY
@@ -153,7 +153,7 @@ class DuckDuckGoWebView : WebView, NestedScrollingChild {
     override fun onOverScrolled(scrollX: Int, scrollY: Int, clampedX: Boolean, clampedY: Boolean) {
         // taking into account lastDeltaY since we are only interested whether we clamped at the top
         lastClampedTopY = clampedY && lastDeltaY <= 0
-        enableSwipeRefresh(clampedY && scrollY == 0)
+        enableSwipeRefresh(clampedY && scrollY == 0 && (lastDeltaY <= 0 || nestedOffsetY == 0))
         super.onOverScrolled(scrollX, scrollY, clampedX, clampedY)
     }
 
