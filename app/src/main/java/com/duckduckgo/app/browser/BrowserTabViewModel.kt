@@ -864,13 +864,13 @@ class BrowserTabViewModel(
             LocationPermissionType.DENY_ALWAYS -> {
                 pixel.fire(PixelName.PRECISE_LOCATION_SITE_DIALOG_DENY_ALWAYS)
                 onSiteLocationPermissionAlwaysDenied()
+                viewModelScope.launch {
+                    locationPermissionsRepository.savePermission(domain, permission)
+                }
             }
             LocationPermissionType.DENY_ONCE -> {
                 pixel.fire(PixelName.PRECISE_LOCATION_SITE_DIALOG_DENY_ONCE)
                 permissionCallback?.invoke(permissionOrigin, false, false)
-                viewModelScope.launch {
-                    locationPermissionsRepository.savePermission(domain, permission)
-                }
             }
         }
     }
