@@ -34,7 +34,7 @@ class LocationPermissionsViewModel(
     private val dispatcherProvider: DispatcherProvider,
     private val settingsDataStore: SettingsDataStore,
     private val pixel: Pixel
-) : SiteLocationPermissionDialog.Listener, ViewModel() {
+) : SiteLocationPermissionDialog.SiteLocationPermissionDialogListener, ViewModel() {
 
     data class ViewState(
         val locationPermissionEnabled: Boolean = false,

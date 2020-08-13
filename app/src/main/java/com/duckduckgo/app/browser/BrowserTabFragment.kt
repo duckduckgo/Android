@@ -131,6 +131,7 @@ import com.duckduckgo.app.fire.fireproofwebsite.data.website
 import com.duckduckgo.app.global.ViewModelFactory
 import com.duckduckgo.app.global.model.orderedTrackingEntities
 import com.duckduckgo.app.global.view.*
+import com.duckduckgo.app.location.data.LocationPermissionType
 import com.duckduckgo.app.location.ui.SiteLocationPermissionDialog
 import com.duckduckgo.app.location.ui.SystemLocationPermissionDialog
 import com.duckduckgo.app.privacy.renderer.icon
@@ -187,7 +188,8 @@ import java.io.File
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 
-class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogListener, TrackersAnimatorListener, DownloadConfirmationDialogListener {
+class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogListener, TrackersAnimatorListener, DownloadConfirmationDialogListener,
+    SiteLocationPermissionDialog.SiteLocationPermissionDialogListener, SystemLocationPermissionDialog.SystemLocationPermissionDialogListener {
 
     private val supervisorJob = SupervisorJob()
 
@@ -671,8 +673,8 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
             if (deniedForever) {
                 viewModel.onSystemLocationPermissionDenied()
             } else {
-                val dialog = SystemLocationPermissionDialog.instance(domain, viewModel)
-                dialog.show(requireActivity().supportFragmentManager, SystemLocationPermissionDialog.SYSTEM_LOCATION_PERMISSION_TAG)
+                val dialog = SystemLocationPermissionDialog.instance(domain)
+                dialog.show(childFragmentManager, SystemLocationPermissionDialog.SYSTEM_LOCATION_PERMISSION_TAG)
             }
         } else {
             viewModel.onSystemLocationPermissionGranted()
@@ -680,8 +682,8 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
     }
 
     private fun askSiteLocationPermission(domain: String) {
-        val dialog = SiteLocationPermissionDialog.instance(domain, false, viewModel)
-        dialog.show(requireActivity().supportFragmentManager, SiteLocationPermissionDialog.SITE_LOCATION_PERMISSION_TAG)
+        val dialog = SiteLocationPermissionDialog.instance(domain, false)
+        dialog.show(childFragmentManager, SiteLocationPermissionDialog.SITE_LOCATION_PERMISSION_TAG)
     }
 
     private fun launchBrokenSiteFeedback(data: BrokenSiteData) {
@@ -1925,5 +1927,21 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
 
     override fun cancelDownload() {
         viewModel.closeAndReturnToSourceIfBlankTab()
+    }
+
+    override fun onSiteLocationPermissionSelected(domain: String, permission: LocationPermissionType) {
+        viewModel.onSiteLocationPermissionSelected(domain, permission)
+    }
+
+    override fun onSystemLocationPermissionAllowed() {
+        viewModel.onSystemLocationPermissionAllowed()
+    }
+
+    override fun onSystemLocationPermissionNotAllowed() {
+        viewModel.onSystemLocationPermissionNotAllowed()
+    }
+
+    override fun onSystemLocationPermissionNeverAllowed() {
+        viewModel.onSystemLocationPermissionNeverAllowed()
     }
 }

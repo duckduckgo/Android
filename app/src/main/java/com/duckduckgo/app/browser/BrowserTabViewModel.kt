@@ -141,7 +141,7 @@ class BrowserTabViewModel(
     private val useOurAppDetector: UseOurAppDetector,
     private val variantManager: VariantManager,
     private val fileDownloader: FileDownloader
-) : WebViewClientListener, EditBookmarkListener, HttpAuthenticationListener, SiteLocationPermissionDialog.Listener,
+) : WebViewClientListener, EditBookmarkListener, HttpAuthenticationListener, SiteLocationPermissionDialog.SiteLocationPermissionDialogListener,
     SystemLocationPermissionDialog.SystemLocationPermissionDialogListener, ViewModel() {
 
     private var buildingSiteFactoryJob: Job? = null

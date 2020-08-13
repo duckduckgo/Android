@@ -34,11 +34,18 @@ import org.jetbrains.anko.find
 
 class SiteLocationPermissionDialog : DialogFragment() {
 
-    interface Listener {
+    interface SiteLocationPermissionDialogListener {
         fun onSiteLocationPermissionSelected(domain: String, permission: LocationPermissionType)
     }
 
-    private lateinit var listener: Listener
+    val listener: SiteLocationPermissionDialogListener
+        get() {
+            return if (parentFragment is SiteLocationPermissionDialogListener) {
+                parentFragment as SiteLocationPermissionDialogListener
+            } else {
+                activity as SiteLocationPermissionDialogListener
+            }
+        }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -157,13 +164,12 @@ class SiteLocationPermissionDialog : DialogFragment() {
         private const val KEY_REQUEST_ORIGIN = "KEY_REQUEST_ORIGIN"
         private const val KEY_EDITING_PERMISSION = "KEY_SCREEN_FROM"
 
-        fun instance(origin: String, isEditingPermission: Boolean, listener: Listener): SiteLocationPermissionDialog {
+        fun instance(origin: String, isEditingPermission: Boolean): SiteLocationPermissionDialog {
             return SiteLocationPermissionDialog().also { fragment ->
                 val bundle = Bundle()
                 bundle.putString(KEY_REQUEST_ORIGIN, origin)
                 bundle.putBoolean(KEY_EDITING_PERMISSION, isEditingPermission)
                 fragment.arguments = bundle
-                fragment.listener = listener
             }
         }
     }

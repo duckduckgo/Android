@@ -37,7 +37,8 @@ class SystemLocationPermissionDialog : DialogFragment() {
         fun onSystemLocationPermissionNeverAllowed()
     }
 
-    private lateinit var listener: SystemLocationPermissionDialogListener
+    val listener: SystemLocationPermissionDialogListener
+        get() = parentFragment as SystemLocationPermissionDialogListener
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         isCancelable = false
@@ -113,12 +114,11 @@ class SystemLocationPermissionDialog : DialogFragment() {
         const val SYSTEM_LOCATION_PERMISSION_TAG = "SystemLocationPermission"
         private const val KEY_REQUEST_ORIGIN = "KEY_REQUEST_ORIGIN"
 
-        fun instance(origin: String, listener: SystemLocationPermissionDialogListener): SystemLocationPermissionDialog {
+        fun instance(origin: String): SystemLocationPermissionDialog {
             return SystemLocationPermissionDialog().also { fragment ->
                 val bundle = Bundle()
                 bundle.putString(KEY_REQUEST_ORIGIN, origin)
                 fragment.arguments = bundle
-                fragment.listener = listener
             }
         }
     }

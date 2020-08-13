@@ -31,11 +31,12 @@ import com.duckduckgo.app.global.view.html
 import com.duckduckgo.app.global.view.show
 import com.duckduckgo.app.global.view.website
 import com.duckduckgo.app.location.data.LocationPermissionEntity
+import com.duckduckgo.app.location.data.LocationPermissionType
 import kotlinx.android.synthetic.main.content_location_permissions.locationPermissionsNoSystemPermission
 import kotlinx.android.synthetic.main.content_location_permissions.recycler
 import kotlinx.android.synthetic.main.include_toolbar.toolbar
 
-class LocationPermissionsActivity : DuckDuckGoActivity() {
+class LocationPermissionsActivity : DuckDuckGoActivity(), SiteLocationPermissionDialog.SiteLocationPermissionDialogListener {
 
     lateinit var adapter: LocationPermissionsAdapter
     private var deleteDialog: AlertDialog? = null
@@ -101,7 +102,7 @@ class LocationPermissionsActivity : DuckDuckGoActivity() {
     }
 
     private fun editSiteLocationPermission(entity: LocationPermissionEntity) {
-        val dialog = SiteLocationPermissionDialog.instance(entity.domain, true, viewModel)
+        val dialog = SiteLocationPermissionDialog.instance(entity.domain, true)
         dialog.show(supportFragmentManager, SiteLocationPermissionDialog.SITE_LOCATION_PERMISSION_TAG)
     }
 
@@ -110,9 +111,14 @@ class LocationPermissionsActivity : DuckDuckGoActivity() {
         super.onDestroy()
     }
 
+    override fun onSiteLocationPermissionSelected(domain: String, permission: LocationPermissionType) {
+        viewModel.onSiteLocationPermissionSelected(domain, permission)
+    }
+
     companion object {
         fun intent(context: Context): Intent {
             return Intent(context, LocationPermissionsActivity::class.java)
         }
+
     }
 }
