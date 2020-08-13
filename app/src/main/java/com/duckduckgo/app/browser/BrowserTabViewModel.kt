@@ -250,7 +250,7 @@ class BrowserTabViewModel(
         object LaunchTabSwitcher : Command()
         object HideWebContent : Command()
         object ShowWebContent : Command()
-        class CheckSystemLocationPermission(val domain: String) : Command()
+        class CheckSystemLocationPermission(val domain: String, val deniedForever: Boolean) : Command()
         class AskDomainPermission(val domain: String) : Command()
         object RequestSystemLocationPermission : Command()
         class RefreshUserAgent(val host: String?, val isDesktop: Boolean) : Command()
@@ -832,15 +832,16 @@ class BrowserTabViewModel(
         if (origin != null) {
             viewModelScope.launch {
                 val userHasGivenPermission = locationPermissionsRepository.hasUserGivenPermissionTo(permissionOrigin)
+                val previouslyDeniedForever = appSettingsPreferencesStore.appLocationPermissionDeniedForever
                 if (userHasGivenPermission) {
                     val permissionEntity = locationPermissionsRepository.getDomainPermission(permissionOrigin)!!
                     if (permissionEntity.permission == LocationPermissionType.DENY_ALWAYS) {
                         onSiteLocationPermissionAlwaysDenied()
                     } else {
-                        command.postValue(CheckSystemLocationPermission(origin))
+                        command.postValue(CheckSystemLocationPermission(origin, previouslyDeniedForever))
                     }
                 } else {
-                    command.postValue(CheckSystemLocationPermission(origin))
+                    command.postValue(CheckSystemLocationPermission(origin, previouslyDeniedForever))
                 }
             }
         } else {
@@ -880,7 +881,7 @@ class BrowserTabViewModel(
         permissionCallback?.invoke(permissionOrigin, true, false)
     }
 
-    fun onSiteLocationPermissionAlwaysDenied() {
+    private fun onSiteLocationPermissionAlwaysDenied() {
         geoLocationPermissions.clear(permissionOrigin)
         permissionCallback?.invoke(permissionOrigin, false, false)
     }
@@ -922,6 +923,7 @@ class BrowserTabViewModel(
     }
 
     fun onSystemLocationPermissionGranted() {
+        appSettingsPreferencesStore.appLocationPermissionDeniedForever = false
         appSettingsPreferencesStore.appLocationPermission = true
         pixel.fire(Pixel.PixelName.PRECISE_LOCATION_SETTINGS_LOCATION_PERMISSION_ENABLE)
         viewModelScope.launch {
@@ -940,6 +942,11 @@ class BrowserTabViewModel(
     fun onSystemLocationPermissionDenied() {
         pixel.fire(Pixel.PixelName.PRECISE_LOCATION_SETTINGS_LOCATION_PERMISSION_DISABLE)
         onSiteLocationPermissionAlwaysDenied()
+    }
+
+    fun onSystemLocationPermissionDeniedForever() {
+        appSettingsPreferencesStore.appLocationPermissionDeniedForever = true
+        onSystemLocationPermissionDenied()
     }
 
     private fun registerSiteVisit() {
