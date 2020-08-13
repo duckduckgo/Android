@@ -18,6 +18,7 @@ package com.duckduckgo.app.location.ui
 
 import androidx.lifecycle.*
 import androidx.lifecycle.Observer
+import com.duckduckgo.app.bookmarks.ui.BookmarksViewModel
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.SingleLiveEvent
 import com.duckduckgo.app.location.GeoLocationPermissions
@@ -60,12 +61,17 @@ class LocationPermissionsViewModel(
         locationPermissions.removeObserver(locationPermissionsObserver)
     }
 
-    fun loadLocationPermissions(systemLocationPermissionEnabled: Boolean) {
+    init {
         _viewState.value = ViewState(
-            locationPermissionEnabled = settingsDataStore.appLocationPermission,
-            systemLocationPermissionGranted = systemLocationPermissionEnabled
+            locationPermissionEnabled = settingsDataStore.appLocationPermission
         )
         locationPermissions.observeForever(locationPermissionsObserver)
+    }
+
+    fun loadLocationPermissions(systemLocationPermissionEnabled: Boolean) {
+        _viewState.value = _viewState.value?.copy(
+            systemLocationPermissionGranted = systemLocationPermissionEnabled
+        )
     }
 
     private fun onLocationPermissionsEntitiesChanged(entities: List<LocationPermissionEntity>) {

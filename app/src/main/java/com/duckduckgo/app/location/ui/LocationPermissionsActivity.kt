@@ -22,6 +22,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
+import android.os.PersistableBundle
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
 import com.duckduckgo.app.browser.R
@@ -49,10 +50,6 @@ class LocationPermissionsActivity : DuckDuckGoActivity(), SiteLocationPermission
         setupToolbar(toolbar)
         setupRecyclerView()
         observeViewModel()
-    }
-
-    override fun onResume() {
-        super.onResume()
         loadSystemPermission()
     }
 
