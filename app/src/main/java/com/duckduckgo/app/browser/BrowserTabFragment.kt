@@ -106,7 +106,6 @@ import com.duckduckgo.app.browser.autocomplete.BrowserAutoCompleteSuggestionsAda
 import com.duckduckgo.app.browser.downloader.DownloadFailReason
 import com.duckduckgo.app.browser.downloader.FileDownloadNotificationManager
 import com.duckduckgo.app.browser.downloader.FileDownloader
-import com.duckduckgo.app.browser.downloader.FileDownloader.FileDownloadListener
 import com.duckduckgo.app.browser.downloader.FileDownloader.PendingFileDownload
 import com.duckduckgo.app.browser.filechooser.FileChooserIntentBuilder
 import com.duckduckgo.app.browser.logindetection.DOMLoginDetector
@@ -1240,16 +1239,14 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
     }
 
     private fun requestDownloadConfirmation(pendingDownload: PendingFileDownload) {
+        if (isStateSaved) return
+
         val downloadConfirmationFragment = DownloadConfirmationFragment.instance(pendingDownload)
         childFragmentManager.findFragmentByTag(DOWNLOAD_CONFIRMATION_TAG)?.let {
             Timber.i("Found existing dialog; removing it now")
-            childFragmentManager.commitNow { remove(it) }
+            childFragmentManager.commitNow(allowStateLoss = true) { remove(it) }
         }
         downloadConfirmationFragment.show(childFragmentManager, DOWNLOAD_CONFIRMATION_TAG)
-    }
-
-    private fun completeDownload(pendingDownload: PendingFileDownload, callback: FileDownloadListener) {
-        viewModel.download(pendingDownload)
     }
 
     private fun launchFilePicker(command: Command.ShowFileChooser) {

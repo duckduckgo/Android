@@ -52,7 +52,10 @@
     <string name="useOurAppDeletionDialogText">Checking your feed in DuckDuckGo is a great alternative to using the Facebook app!&lt;br/&gt;&lt;br/&gt;But if the Facebook app is on your phone, it can make requests for data even when you\'re not using it.&lt;br/&gt;&lt;br/&gt;Prevent this by deleting it now!</string>
 
     <!-- Dos Attack error-->
-    <string name="dosErrorMessage">Connection aborted. Website could be harmful to your device.</string>
+    <string name="dosErrorMessage">Connection aborted. This website could be harmful to your device.</string>
+
+    <!-- Dax Dialog, this string has changed. We have to translate and replace it!! -->
+    <string name="daxMainNetworkOwnedCtaText">Heads up! Since %s owns %s, I can\'t stop them from seeing your activity here.&lt;br/&gt;&lt;br/&gt;But browse with me, and I can reduce what %s knows about you overall by blocking their trackers on lots of other sites.</string>
 
     <!-- Precise Location -->
     <string name="preciseLocationSystemDialogTitle">Enable device location for DuckDuckGo Privacy Browser?</string>

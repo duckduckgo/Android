@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.cta.ui
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.net.Uri
 import android.view.View
@@ -212,6 +213,7 @@ sealed class DaxDialogCta(
         appInstallStore
     ) {
 
+        @SuppressLint("StringFormatMatches")
         @ExperimentalStdlibApi
         override fun getDaxText(context: Context): String {
             val percentage = networkPropertyPercentages[network]
@@ -219,14 +221,24 @@ sealed class DaxDialogCta(
             return if (isFromSameNetworkDomain()) {
                 context.resources.getString(R.string.daxMainNetworkCtaText, network, percentage, network)
             } else {
-                context.resources.getString(
-                    R.string.daxMainNetworkOwnedCtaText,
-                    Uri.parse(siteHost).baseHost?.removePrefix("m.")?.capitalize(Locale.getDefault()),
-                    network,
-                    network,
-                    percentage,
-                    network
-                )
+                val locale = Locale.getDefault()
+                if (locale != null && locale.language == "en") {
+                    context.resources.getString(
+                        R.string.daxMainNetworkOwnedCtaText,
+                        network,
+                        Uri.parse(siteHost).baseHost?.removePrefix("m."),
+                        network
+                    )
+                } else {
+                    context.resources.getString(
+                        R.string.daxMainNetworkOwnedCtaText,
+                        Uri.parse(siteHost).baseHost?.removePrefix("m.")?.capitalize(Locale.getDefault()),
+                        network,
+                        network,
+                        percentage,
+                        network
+                    )
+                }
             }
         }
 
