@@ -16,8 +16,10 @@
 
 package com.duckduckgo.app.browser
 
+import android.net.Uri
 import android.view.MenuItem
 import android.view.View
+import android.webkit.GeolocationPermissions
 import android.webkit.HttpAuthHandler
 import android.webkit.WebView
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
@@ -68,6 +70,8 @@ import com.duckduckgo.app.global.useourapp.UseOurAppDetector
 import com.duckduckgo.app.global.useourapp.UseOurAppDetector.Companion.USE_OUR_APP_DOMAIN
 import com.duckduckgo.app.global.useourapp.UseOurAppDetector.Companion.USE_OUR_APP_SHORTCUT_URL
 import com.duckduckgo.app.location.GeoLocationPermissions
+import com.duckduckgo.app.location.data.LocationPermissionEntity
+import com.duckduckgo.app.location.data.LocationPermissionType
 import com.duckduckgo.app.location.data.LocationPermissionsDao
 import com.duckduckgo.app.location.data.LocationPermissionsRepository
 import com.duckduckgo.app.notification.db.NotificationDao
@@ -104,6 +108,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runBlockingTest
 import org.junit.After
+import org.junit.Assert
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Rule
@@ -2320,6 +2325,342 @@ class BrowserTabViewModelTest {
         verify(mockPixel, never()).fire(Pixel.PixelName.UOA_VISITED)
     }
 
+    @Test
+    fun whenCurrentDomainAndPermissionRequestingDomainAreDifferentThenSitePermissionIsDenied() = coroutineRule.runBlocking {
+        givenCurrentSite("https://wwww.example.com/")
+        givenNewPermissionRequestFromDomain("https://wwww.anotherexample.com/")
+
+        verify(geoLocationPermissions).clear("https://wwww.anotherexample.com/")
+    }
+
+    @Test
+    fun whenDomainRequestsSitePermissionThenAppChecksSystemLocationPermission() = coroutineRule.runBlocking {
+        val domain = "https://www.example.com/"
+
+        givenLocationPermissionIsEnabled(true)
+        givenCurrentSite(domain)
+        givenNewPermissionRequestFromDomain(domain)
+
+        assertCommandIssued<Command.CheckSystemLocationPermission>()
+    }
+
+    @Test
+    fun whenDomainRequestsSitePermissionAndAlreadyRepliedThenAppChecksSystemLocationPermission() = coroutineRule.runBlocking {
+        val domain = "https://www.example.com/"
+
+        givenLocationPermissionIsEnabled(true)
+        givenCurrentSite(domain)
+        givenUserAlreadySelectedPermissionForDomain(domain, LocationPermissionType.DENY_ALWAYS)
+
+        givenNewPermissionRequestFromDomain(domain)
+
+        verify(geoLocationPermissions).clear(domain)
+    }
+
+    @Test
+    fun whenDomainRequestsSitePermissionAndAllowedThenAppChecksSystemLocationPermission() = coroutineRule.runBlocking {
+        val domain = "https://www.example.com/"
+
+        givenLocationPermissionIsEnabled(true)
+        givenCurrentSite(domain)
+        givenUserAlreadySelectedPermissionForDomain(domain, LocationPermissionType.ALLOW_ALWAYS)
+
+        givenNewPermissionRequestFromDomain(domain)
+
+        assertCommandIssued<Command.CheckSystemLocationPermission>()
+    }
+
+    @Test
+    fun whenAppLocationPermissionIsDeniedThenSitePermissionIsDenied() = coroutineRule.runBlocking {
+        val domain = "https://www.example.com/"
+
+        givenLocationPermissionIsEnabled(false)
+        givenCurrentSite(domain)
+        givenNewPermissionRequestFromDomain(domain)
+
+        verify(geoLocationPermissions).clear(domain)
+    }
+
+    @Test
+    fun whenSystemPermissionIsDeniedThenSitePermissionIsCleared() = coroutineRule.runBlocking {
+        val domain = "https://www.example.com/"
+        givenLocationPermissionIsEnabled(true)
+        givenCurrentSite(domain)
+        givenNewPermissionRequestFromDomain(domain)
+
+        testee.onSystemLocationPermissionDenied()
+
+        verify(mockPixel).fire(Pixel.PixelName.PRECISE_LOCATION_SETTINGS_LOCATION_PERMISSION_DISABLE)
+        verify(geoLocationPermissions).clear(domain)
+    }
+
+    @Test
+    fun whenUserGrantsSystemLocationPermissionThenSettingsLocationPermissionShoulbBeEnabled() = coroutineRule.runBlocking {
+        val domain = "https://www.example.com/"
+
+        givenLocationPermissionIsEnabled(true)
+        givenCurrentSite(domain)
+        givenNewPermissionRequestFromDomain(domain)
+
+        testee.onSystemLocationPermissionGranted()
+
+        verify(mockSettingsStore).appLocationPermission = true
+    }
+
+    @Test
+    fun whenUserGrantsSystemLocationPermissionThenPixelIsFired() = coroutineRule.runBlocking {
+        val domain = "https://www.example.com/"
+
+        givenLocationPermissionIsEnabled(true)
+        givenCurrentSite(domain)
+        givenNewPermissionRequestFromDomain(domain)
+
+        testee.onSystemLocationPermissionGranted()
+
+        verify(mockPixel).fire(Pixel.PixelName.PRECISE_LOCATION_SETTINGS_LOCATION_PERMISSION_ENABLE)
+    }
+
+    @Test
+    fun whenUserChoosesToAlwaysAllowSitePermissionThenGeoPermissionIsAllowed() = coroutineRule.runBlocking {
+        val domain = "https://www.example.com/"
+
+        givenLocationPermissionIsEnabled(true)
+        givenCurrentSite(domain)
+        givenUserAlreadySelectedPermissionForDomain(domain, LocationPermissionType.ALLOW_ALWAYS)
+        givenNewPermissionRequestFromDomain(domain)
+
+        testee.onSystemLocationPermissionGranted()
+
+        verify(geoLocationPermissions, atLeastOnce()).allow(domain)
+    }
+
+    @Test
+    fun whenUserChoosesToAlwaysDenySitePermissionThenGeoPermissionIsAllowed() = coroutineRule.runBlocking {
+        val domain = "https://www.example.com/"
+
+        givenLocationPermissionIsEnabled(true)
+        givenCurrentSite(domain)
+        givenUserAlreadySelectedPermissionForDomain(domain, LocationPermissionType.DENY_ALWAYS)
+        givenNewPermissionRequestFromDomain(domain)
+
+        testee.onSystemLocationPermissionGranted()
+
+        verify(geoLocationPermissions, atLeastOnce()).clear(domain)
+    }
+
+    @Test
+    fun whenUserChoosesToAllowSitePermissionThenGeoPermissionIsAllowed() = coroutineRule.runBlocking {
+        val domain = "https://www.example.com/"
+
+        givenLocationPermissionIsEnabled(true)
+        givenCurrentSite(domain)
+        givenUserAlreadySelectedPermissionForDomain(domain, LocationPermissionType.ALLOW_ONCE)
+        givenNewPermissionRequestFromDomain(domain)
+
+        testee.onSystemLocationPermissionGranted()
+
+        assertCommandIssued<Command.AskDomainPermission>()
+    }
+
+    @Test
+    fun whenUserChoosesToDenySitePermissionThenGeoPermissionIsAllowed() = coroutineRule.runBlocking {
+        val domain = "https://www.example.com/"
+
+        givenLocationPermissionIsEnabled(true)
+        givenCurrentSite(domain)
+        givenUserAlreadySelectedPermissionForDomain(domain, LocationPermissionType.DENY_ONCE)
+        givenNewPermissionRequestFromDomain(domain)
+
+        testee.onSystemLocationPermissionGranted()
+
+        assertCommandIssued<Command.AskDomainPermission>()
+    }
+
+    @Test
+    fun whenNewDomainRequestsForPermissionThenUserShouldBeAskedToGivePermission() = coroutineRule.runBlocking {
+        val domain = "https://www.example.com/"
+
+        givenLocationPermissionIsEnabled(true)
+        givenCurrentSite(domain)
+        givenNewPermissionRequestFromDomain(domain)
+
+        testee.onSystemLocationPermissionGranted()
+
+        assertCommandIssued<Command.AskDomainPermission>()
+    }
+
+    @Test
+    fun whenSystemLocationPermissionIsDeniedThenSitePermissionIsDenied() = coroutineRule.runBlocking {
+        val domain = "https://www.example.com/"
+
+        givenLocationPermissionIsEnabled(true)
+        givenCurrentSite(domain)
+        givenNewPermissionRequestFromDomain(domain)
+
+        testee.onSystemLocationPermissionNotAllowed()
+
+        verify(mockPixel).fire(Pixel.PixelName.PRECISE_LOCATION_SYSTEM_DIALOG_LATER)
+        verify(geoLocationPermissions).clear(domain)
+    }
+
+    @Test
+    fun whenSystemLocationPermissionIsNeverAllowedThenSitePermissionIsDenied() = coroutineRule.runBlocking {
+        val domain = "https://www.example.com/"
+
+        givenLocationPermissionIsEnabled(true)
+        givenCurrentSite(domain)
+        givenNewPermissionRequestFromDomain(domain)
+
+        testee.onSystemLocationPermissionNeverAllowed()
+
+        verify(mockPixel).fire(Pixel.PixelName.PRECISE_LOCATION_SYSTEM_DIALOG_NEVER)
+        verify(geoLocationPermissions).clear(domain)
+        Assert.assertEquals(locationPermissionsDao.getPermission(domain)!!.permission, LocationPermissionType.DENY_ALWAYS)
+    }
+
+    @Test
+    fun whenSystemLocationPermissionIsAllowedThenAppAsksForSystemPermission() = coroutineRule.runBlocking {
+        val domain = "https://www.example.com/"
+
+        givenLocationPermissionIsEnabled(true)
+        givenCurrentSite(domain)
+        givenNewPermissionRequestFromDomain(domain)
+
+        testee.onSystemLocationPermissionAllowed()
+
+        assertCommandIssued<Command.RequestSystemLocationPermission>()
+    }
+
+    @Test
+    fun whenUserDeniesSitePermissionThenSitePermissionIsDenied() = coroutineRule.runBlocking {
+        val domain = "https://www.example.com/"
+
+        givenLocationPermissionIsEnabled(true)
+        givenCurrentSite(domain)
+        givenNewPermissionRequestFromDomain(domain)
+
+        testee.onSiteLocationPermissionAlwaysDenied()
+
+        verify(geoLocationPermissions).clear(domain)
+    }
+
+    @Test
+    fun whenUserVisitsDomainWithPermanentLocationPermissionThenMessageIsShown() = coroutineRule.runBlocking {
+        val domain = "https://www.example.com/"
+
+        givenUserAlreadySelectedPermissionForDomain(domain, LocationPermissionType.ALLOW_ALWAYS)
+        givenCurrentSite(domain)
+        givenLocationPermissionIsEnabled(true)
+
+        loadUrl("https://www.example.com", isBrowserShowing = true)
+
+        assertCommandIssued<Command.ShowDomainHasPermissionMessage>()
+    }
+
+    @Test
+    fun whenUserVisitsDomainWithoutPermanentLocationPermissionThenMessageIsNotShown() = coroutineRule.runBlocking {
+        val domain = "https://www.example.com/"
+
+        givenUserAlreadySelectedPermissionForDomain(domain, LocationPermissionType.DENY_ALWAYS)
+        givenCurrentSite(domain)
+        givenLocationPermissionIsEnabled(true)
+
+        loadUrl("https://www.example.com", isBrowserShowing = true)
+
+        assertCommandNotIssued<Command.ShowDomainHasPermissionMessage>()
+    }
+
+    @Test
+    fun whenUserVisitsDomainWithoutLocationPermissionThenMessageIsNotShown() = coroutineRule.runBlocking {
+        val domain = "https://www.example.com"
+        givenLocationPermissionIsEnabled(true)
+        givenCurrentSite(domain)
+        loadUrl("https://www.example.com", isBrowserShowing = true)
+
+        assertCommandNotIssued<Command.ShowDomainHasPermissionMessage>()
+    }
+
+    @Test
+    fun whenUserVisitsDomainAndLocationIsNotEnabledThenMessageIsNotShown() = coroutineRule.runBlocking {
+        val domain = "https://www.example.com"
+        givenLocationPermissionIsEnabled(false)
+        givenCurrentSite(domain)
+
+        loadUrl("https://www.example.com", isBrowserShowing = true)
+
+        assertCommandNotIssued<Command.ShowDomainHasPermissionMessage>()
+    }
+
+    @Test
+    fun whenSystemLocationPermissionIsDeniedThenSiteLocationPermissionIsAlwaysDenied() = coroutineRule.runBlocking {
+        val domain = "https://www.example.com/"
+
+        givenLocationPermissionIsEnabled(true)
+        givenCurrentSite(domain)
+        givenNewPermissionRequestFromDomain(domain)
+
+        testee.onSystemLocationPermissionDenied()
+
+        verify(geoLocationPermissions).clear(domain)
+    }
+
+    @Test
+    fun whenSystemLocationPermissionIsDeniedForeverThenSiteLocationPermissionIsAlwaysDenied() = coroutineRule.runBlocking {
+        val domain = "https://www.example.com/"
+
+        givenLocationPermissionIsEnabled(true)
+        givenCurrentSite(domain)
+        givenNewPermissionRequestFromDomain(domain)
+
+        testee.onSystemLocationPermissionDeniedForever()
+
+        verify(geoLocationPermissions).clear(domain)
+    }
+
+    @Test
+    fun whenSystemLocationPermissionIsDeniedForeverThenSettingsFlagIsUpdated() = coroutineRule.runBlocking {
+        val domain = "https://www.example.com/"
+
+        givenLocationPermissionIsEnabled(true)
+        givenCurrentSite(domain)
+        givenNewPermissionRequestFromDomain(domain)
+
+        testee.onSystemLocationPermissionDeniedForever()
+
+        verify(mockSettingsStore).appLocationPermissionDeniedForever = true
+    }
+
+    @Test
+    fun whenSystemLocationIsGrantedThenSettingsFlagIsUpdated() = coroutineRule.runBlocking {
+        val domain = "https://www.example.com/"
+
+        givenLocationPermissionIsEnabled(true)
+        givenCurrentSite(domain)
+        givenNewPermissionRequestFromDomain(domain)
+
+        testee.onSystemLocationPermissionGranted()
+
+        verify(mockSettingsStore).appLocationPermissionDeniedForever = false
+    }
+
+    private fun givenNewPermissionRequestFromDomain(domain: String) {
+        testee.onSiteLocationPermissionRequested(domain, StubPermissionCallback())
+    }
+
+    private fun givenLocationPermissionIsEnabled(state: Boolean) {
+        whenever(mockSettingsStore.appLocationPermission).thenReturn(state)
+    }
+
+    private fun givenUserAlreadySelectedPermissionForDomain(domain: String, permission: LocationPermissionType) {
+        locationPermissionsDao.insert(LocationPermissionEntity(domain, permission))
+    }
+
+    class StubPermissionCallback : GeolocationPermissions.Callback {
+        override fun invoke(p0: String?, p1: Boolean, p2: Boolean) {
+            // nothing to see
+        }
+    }
+
     private inline fun <reified T : Command> assertCommandIssued(instanceAssertions: T.() -> Unit = {}) {
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
         val issuedCommand = commandCaptor.allValues.find { it is T }
@@ -2386,6 +2727,16 @@ class BrowserTabViewModelTest {
     }
 
     private fun givenLoginDetected(domain: String) = LoginDetected(authLoginDomain = "", forwardedToDomain = domain)
+
+    private fun givenCurrentSite(domain: String) {
+        val site: Site = mock()
+        whenever(site.url).thenReturn(domain)
+        whenever(site.uri).thenReturn(Uri.parse(domain))
+        val siteLiveData = MutableLiveData<Site>()
+        siteLiveData.value = site
+        whenever(mockTabsRepository.retrieveSiteData("TAB_ID")).thenReturn(siteLiveData)
+        testee.loadData("TAB_ID", domain, false)
+    }
 
     private fun setBrowserShowing(isBrowsing: Boolean) {
         testee.browserViewState.value = browserViewState().copy(browserShowing = isBrowsing)
