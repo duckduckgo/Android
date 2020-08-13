@@ -18,7 +18,6 @@ package com.duckduckgo.app.location.ui
 
 import androidx.lifecycle.*
 import androidx.lifecycle.Observer
-import com.duckduckgo.app.bookmarks.ui.BookmarksViewModel
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.SingleLiveEvent
 import com.duckduckgo.app.location.GeoLocationPermissions
