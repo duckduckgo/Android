@@ -35,6 +35,7 @@ import com.duckduckgo.app.onboarding.store.*
 import com.duckduckgo.app.privacy.db.UserWhitelistDao
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.VariantManager
+import com.duckduckgo.app.statistics.VariantManager.VariantFeature.FireButtonEducation
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.survey.db.SurveyDao
 import com.duckduckgo.app.survey.model.Survey
@@ -70,6 +71,7 @@ class CtaViewModel @Inject constructor(
         .dismissedCtas()
         .map { dismissedCtaDao ->
             withContext(dispatchers.io()) {
+                if (!variantManager.getVariant().hasFeature(FireButtonEducation)) return@withContext false
                 if (daxDialogFireEducationShown() || settingsDataStore.hideTips) return@withContext false
 
                 return@withContext dismissedCtaDao.any {

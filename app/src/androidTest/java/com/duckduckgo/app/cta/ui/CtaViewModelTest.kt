@@ -43,7 +43,9 @@ import com.duckduckgo.app.privacy.model.PrivacyPractices
 import com.duckduckgo.app.privacy.model.TestEntity
 import com.duckduckgo.app.runBlocking
 import com.duckduckgo.app.settings.db.SettingsDataStore
+import com.duckduckgo.app.statistics.Variant
 import com.duckduckgo.app.statistics.VariantManager
+import com.duckduckgo.app.statistics.VariantManager.Companion.DEFAULT_VARIANT
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.*
 import com.duckduckgo.app.survey.db.SurveyDao
@@ -58,7 +60,6 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.consumeAsFlow
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runBlockingTest
 import org.junit.After
@@ -68,7 +69,6 @@ import org.junit.Rule
 import org.junit.Test
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations
-import java.lang.IllegalStateException
 import java.util.concurrent.TimeUnit
 
 @ExperimentalCoroutinesApi
@@ -526,6 +526,7 @@ class CtaViewModelTest {
 
     @Test
     fun whenUserHidAllTipsThenFireButtonAnimationShouldNotShow() = coroutineRule.runBlocking {
+        givenFireButtonEducationActive()
         whenever(mockSettingsDataStore.hideTips).thenReturn(true)
         launch {
             dismissedCtaDaoChannel.send(emptyList())
@@ -536,6 +537,7 @@ class CtaViewModelTest {
 
     @Test
     fun whenUserHasAlreadySeenFireButtonCtaThenFireButtonAnimationShouldNotShow() = coroutineRule.runBlocking {
+        givenFireButtonEducationActive()
         whenever(mockDismissedCtaDao.exists(CtaId.DAX_FIRE_BUTTON)).thenReturn(true)
         launch {
             dismissedCtaDaoChannel.send(emptyList())
@@ -546,6 +548,7 @@ class CtaViewModelTest {
 
     @Test
     fun whenTipsAndFireOnboardingActiveAndUserSeesAnyTriggerFirePulseAnimationCtaThenFireButtonAnimationShouldShow() = coroutineRule.runBlocking {
+        givenFireButtonEducationActive()
         val willTriggerFirePulseAnimationCtas = listOf(CtaId.DAX_DIALOG_TRACKERS_FOUND, CtaId.DAX_DIALOG_NETWORK, CtaId.DAX_DIALOG_OTHER)
 
         val launch = launch {
@@ -562,6 +565,7 @@ class CtaViewModelTest {
 
     @Test
     fun whenTipsAndFireOnboardingActiveAndUserSeesAnyNonTriggerFirePulseAnimationCtaThenFireButtonAnimationShouldNotShow() = coroutineRule.runBlocking {
+        givenFireButtonEducationActive()
         val willTriggerFirePulseAnimationCtas = listOf(CtaId.DAX_DIALOG_TRACKERS_FOUND, CtaId.DAX_DIALOG_NETWORK, CtaId.DAX_DIALOG_OTHER)
         val willNotTriggerFirePulseAnimationCtas = CtaId.values().toList() - willTriggerFirePulseAnimationCtas
 
@@ -571,6 +575,23 @@ class CtaViewModelTest {
             }
         }
         willNotTriggerFirePulseAnimationCtas.forEach {
+            dismissedCtaDaoChannel.send(listOf(DismissedCta(it)))
+        }
+
+        launch.cancel()
+    }
+
+    @Test
+    fun whenFireEducationDisabledAndUserSeesAnyCtaThenFireButtonAnimationShouldNotShow() = coroutineRule.runBlocking {
+        givenControlGroup()
+        val allCtas = CtaId.values().toList()
+
+        val launch = launch {
+            testee.showFireButtonPulseAnimation.collect {
+                assertFalse(it)
+            }
+        }
+        allCtas.forEach {
             dismissedCtaDaoChannel.send(listOf(DismissedCta(it)))
         }
 
@@ -601,6 +622,21 @@ class CtaViewModelTest {
 
     private suspend fun givenUseOurAppActive() {
         whenever(mockUserStageStore.getUserAppStage()).thenReturn(AppStage.USE_OUR_APP_ONBOARDING)
+    }
+
+    private fun givenFireButtonEducationActive() {
+        whenever(mockVariantManager.getVariant()).thenReturn(
+            Variant(
+                "test",
+                features = listOf(
+                    VariantManager.VariantFeature.FireButtonEducation
+                ),
+                filterBy = { true })
+        )
+    }
+
+    private fun givenControlGroup() {
+        whenever(mockVariantManager.getVariant()).thenReturn(DEFAULT_VARIANT)
     }
 
     private fun site(
