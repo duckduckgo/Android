@@ -70,7 +70,7 @@ class ClearPersonalDataAction @Inject constructor(
     override suspend fun clearTabsAndAllDataAsync(appInForeground: Boolean, shouldFireDataClearPixel: Boolean) {
         withContext(Dispatchers.IO) {
             cookieManager.flush()
-            geoLocationPermissions.clearAll()
+            geoLocationPermissions.clearAllButFireproofed()
             clearTabsAsync(appInForeground)
         }
 

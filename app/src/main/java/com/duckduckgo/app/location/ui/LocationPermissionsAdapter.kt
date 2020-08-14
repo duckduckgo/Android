@@ -62,11 +62,6 @@ class LocationPermissionsAdapter(
         locationPermissionEnabled = isLocationPermissionEnabled
         locationPermissions = newPermissions
         notifyDataSetChanged()
-
-        // val diffCallback = DiffCallback(locationPermissions, newPermissions)
-        // val diffResult = DiffUtil.calculateDiff(diffCallback)
-        // locationPermissions = newPermissions
-        // diffResult.dispatchUpdatesTo(this)
     }
 
     private var locationPermissionEnabled: Boolean = false

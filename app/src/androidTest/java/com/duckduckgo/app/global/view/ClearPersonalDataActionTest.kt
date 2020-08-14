@@ -98,6 +98,6 @@ class ClearPersonalDataActionTest {
     @Test
     fun whenClearCalledThenGeoLocationPermissionsAreCleared() = runBlocking<Unit> {
         testee.clearTabsAndAllDataAsync(appInForeground = false, shouldFireDataClearPixel = false)
-        verify(mockGeoLocationPermissions).clearAll()
+        verify(mockGeoLocationPermissions).clearAllButFireproofed()
     }
 }

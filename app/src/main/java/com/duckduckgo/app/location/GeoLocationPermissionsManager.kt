@@ -30,6 +30,7 @@ interface GeoLocationPermissions {
     fun allow(domain: String)
     fun clear(domain: String)
     suspend fun clearAll()
+    suspend fun clearAllButFireproofed()
 }
 
 class GeoLocationPermissionsManager @Inject constructor(
@@ -52,13 +53,21 @@ class GeoLocationPermissionsManager @Inject constructor(
         withContext(dispatchers.io()) {
             val geolocationPermissions = GeolocationPermissions.getInstance()
             val permissions = permissionsRepository.getLocationPermissionsSync()
-            val fireproofed = fireproofWebsiteRepository.getFireproofWebsitesSync()
-            Timber.i("GeoLocationsPermissionsManager: $permissions, fireproofed: $fireproofed")
             permissions.forEach {
-                if (!fireproofWebsiteRepository.isDomainFireproofed(it.forFireproofing()) && it.permission != LocationPermissionType.DENY_ALWAYS) {
+                geolocationPermissions.clear(it.domain)
+                permissionsRepository.deletePermission(it.domain)
+            }
+        }
+    }
+
+    override suspend fun clearAllButFireproofed() {
+        withContext(dispatchers.io()) {
+            val geolocationPermissions = GeolocationPermissions.getInstance()
+            val permissions = permissionsRepository.getLocationPermissionsSync()
+            permissions.forEach {
+                if (!fireproofWebsiteRepository.isDomainFireproofed(it.forFireproofing())) {
                     geolocationPermissions.clear(it.domain)
                     permissionsRepository.deletePermission(it.domain)
-                    Timber.i("GeoLocationsPermissionsManager: Remove permission from ${it.domain}")
                 }
             }
         }
