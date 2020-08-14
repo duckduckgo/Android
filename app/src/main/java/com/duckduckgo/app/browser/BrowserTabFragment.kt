@@ -145,33 +145,16 @@ import com.duckduckgo.app.widget.ui.AddWidgetInstructionsActivity
 import com.duckduckgo.widget.SearchWidgetLight
 import com.google.android.material.snackbar.Snackbar
 import dagger.android.support.AndroidSupportInjection
-import kotlinx.android.synthetic.main.fragment_browser_tab.autoCompleteSuggestionsList
-import kotlinx.android.synthetic.main.fragment_browser_tab.browserLayout
-import kotlinx.android.synthetic.main.fragment_browser_tab.focusDummy
-import kotlinx.android.synthetic.main.fragment_browser_tab.rootView
-import kotlinx.android.synthetic.main.fragment_browser_tab.swipeRefreshContainer
-import kotlinx.android.synthetic.main.fragment_browser_tab.webViewContainer
-import kotlinx.android.synthetic.main.fragment_browser_tab.webViewFullScreenContainer
+import kotlinx.android.synthetic.main.fragment_browser_tab.*
 import kotlinx.android.synthetic.main.include_add_widget_instruction_buttons.view.closeButton
 import kotlinx.android.synthetic.main.include_cta_buttons.view.ctaDismissButton
 import kotlinx.android.synthetic.main.include_cta_buttons.view.ctaOkButton
 import kotlinx.android.synthetic.main.include_dax_dialog_cta.daxCtaContainer
 import kotlinx.android.synthetic.main.include_dax_dialog_cta.dialogTextCta
-import kotlinx.android.synthetic.main.include_find_in_page.closeFindInPagePanel
-import kotlinx.android.synthetic.main.include_find_in_page.findInPageContainer
-import kotlinx.android.synthetic.main.include_find_in_page.findInPageInput
-import kotlinx.android.synthetic.main.include_find_in_page.findInPageMatches
-import kotlinx.android.synthetic.main.include_find_in_page.nextSearchTermButton
-import kotlinx.android.synthetic.main.include_find_in_page.previousSearchTermButton
-import kotlinx.android.synthetic.main.include_new_browser_tab.ctaContainer
-import kotlinx.android.synthetic.main.include_new_browser_tab.ctaTopContainer
-import kotlinx.android.synthetic.main.include_new_browser_tab.ddgLogo
-import kotlinx.android.synthetic.main.include_new_browser_tab.newTabLayout
+import kotlinx.android.synthetic.main.include_find_in_page.*
+import kotlinx.android.synthetic.main.include_new_browser_tab.*
 import kotlinx.android.synthetic.main.include_omnibar_toolbar.*
-import kotlinx.android.synthetic.main.include_omnibar_toolbar.view.browserMenu
-import kotlinx.android.synthetic.main.include_omnibar_toolbar.view.fireIconMenu
-import kotlinx.android.synthetic.main.include_omnibar_toolbar.view.privacyGradeButton
-import kotlinx.android.synthetic.main.include_omnibar_toolbar.view.tabsMenu
+import kotlinx.android.synthetic.main.include_omnibar_toolbar.view.*
 import kotlinx.android.synthetic.main.popup_window_browser_menu.view.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -626,16 +609,11 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
             is Command.HideWebContent -> webView?.hide()
             is Command.ShowWebContent -> webView?.show()
             is Command.CheckSystemLocationPermission -> checkSystemLocationPermission(it.domain, it.deniedForever)
-            is Command.RequestSystemLocationPermission -> requestPermissions(
-                arrayOf(
-                    Manifest.permission.ACCESS_FINE_LOCATION,
-                    Manifest.permission.ACCESS_COARSE_LOCATION
-                ), PERMISSION_REQUEST_GEO_LOCATION
-            )
+            is Command.RequestSystemLocationPermission -> requestLocationPermissions()
             is Command.AskDomainPermission -> askSiteLocationPermission(it.domain)
             is Command.RefreshUserAgent -> refreshUserAgent(it.host, it.isDesktop)
             is Command.AskToFireproofWebsite -> askToFireproofWebsite(requireContext(), it.fireproofWebsite)
-            is Command.ShowDomainHasPermissionMessage -> showMessageSnackbar(it.domain)
+            is Command.ShowDomainHasPermissionMessage -> showDomainHasLocationPermission(it.domain)
             is DownloadCommand -> processDownloadCommand(it)
         }
     }
@@ -671,7 +649,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
     private fun checkSystemLocationPermission(domain: String, deniedForever: Boolean) {
         if (ContextCompat.checkSelfPermission(requireActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             if (deniedForever) {
-                viewModel.onSystemLocationPermissionDenied()
+                viewModel.onSystemLocationPermissionDeniedOneTime()
             } else {
                 val dialog = SystemLocationPermissionDialog.instance(domain)
                 dialog.show(childFragmentManager, SystemLocationPermissionDialog.SYSTEM_LOCATION_PERMISSION_TAG)
@@ -679,6 +657,15 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
         } else {
             viewModel.onSystemLocationPermissionGranted()
         }
+    }
+
+    private fun requestLocationPermissions() {
+        requestPermissions(
+            arrayOf(
+                Manifest.permission.ACCESS_FINE_LOCATION,
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            ), PERMISSION_REQUEST_GEO_LOCATION
+        )
     }
 
     private fun askSiteLocationPermission(domain: String) {
@@ -701,10 +688,9 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
         }
     }
 
-    private fun showMessageSnackbar(domain: String) {
-        val snackbar = Snackbar.make(rootView, getString(R.string.preciseLocationSnackbarMessage, domain.website()), Snackbar.LENGTH_SHORT)
-        val snackbarView = snackbar.view
-        snackbarView.setOnClickListener {
+    private fun showDomainHasLocationPermission(domain: String) {
+        val snackbar = Snackbar.make(rootView, getString(R.string.preciseLocationSnackbarMessage, domain.websiteFromGeoLocationsApiOrigin()), Snackbar.LENGTH_SHORT)
+        snackbar.view.setOnClickListener {
             browserActivity?.launchLocationSettings()
         }
         snackbar.show()
@@ -1269,7 +1255,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
         when (requestCode) {
             PERMISSION_REQUEST_WRITE_EXTERNAL_STORAGE -> {
-                if ((grantResults.isNotEmpty()) && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     Timber.i("Write external storage permission granted")
                     downloadFile(requestUserConfirmation = false)
                 } else {
@@ -1282,10 +1268,8 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
                     viewModel.onSystemLocationPermissionGranted()
                 } else {
                     if (ActivityCompat.shouldShowRequestPermissionRationale(requireActivity(), Manifest.permission.ACCESS_FINE_LOCATION)) {
-                        // now, user has denied permission (but not permanently!)
-                        viewModel.onSystemLocationPermissionDenied()
+                        viewModel.onSystemLocationPermissionDeniedOneTime()
                     } else {
-                        // now, user has denied permission permanently!
                         viewModel.onSystemLocationPermissionDeniedForever()
                     }
                 }

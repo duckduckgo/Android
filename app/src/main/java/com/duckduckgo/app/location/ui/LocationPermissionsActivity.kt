@@ -29,7 +29,7 @@ import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.view.gone
 import com.duckduckgo.app.global.view.html
 import com.duckduckgo.app.global.view.show
-import com.duckduckgo.app.global.view.website
+import com.duckduckgo.app.global.view.websiteFromGeoLocationsApiOrigin
 import com.duckduckgo.app.location.data.LocationPermissionEntity
 import com.duckduckgo.app.location.data.LocationPermissionType
 import kotlinx.android.synthetic.main.content_location_permissions.locationPermissionsNoSystemPermission
@@ -86,7 +86,7 @@ class LocationPermissionsActivity : DuckDuckGoActivity(), SiteLocationPermission
 
     @Suppress("deprecation")
     private fun confirmDeleteWebsite(entity: LocationPermissionEntity) {
-        val message = getString(R.string.preciseLocationDeleteConfirmMessage, entity.domain.website()).html(this)
+        val message = getString(R.string.preciseLocationDeleteConfirmMessage, entity.domain.websiteFromGeoLocationsApiOrigin()).html(this)
         val title = getString(R.string.dialogConfirmTitle)
         deleteDialog = AlertDialog.Builder(this, R.style.AlertDialogTheme)
             .setTitle(title)

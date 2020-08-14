@@ -754,16 +754,11 @@ class BrowserTabViewModel(
             return
         }
 
-        Timber.i("Precise Location - Checking for $domain Location Permission")
-        val userHasGivenPermission = locationPermissionsRepository.hasUserGivenPermissionTo(domain)
-        if (userHasGivenPermission) {
-            val permissionEntity = locationPermissionsRepository.getDomainPermission(domain)!!
-            Timber.i("Precise Location - $domain has $permissionEntity")
-            if (permissionEntity.permission == LocationPermissionType.ALLOW_ALWAYS) {
+        val permissionEntity = locationPermissionsRepository.getDomainPermission(domain)
+        permissionEntity?.let {
+            if (it.permission == LocationPermissionType.ALLOW_ALWAYS) {
                 command.postValue(ShowDomainHasPermissionMessage(domain))
             }
-        } else {
-            Timber.i("Precise Location - $domain does not have Permission")
         }
     }
 
@@ -838,9 +833,9 @@ class BrowserTabViewModel(
         }
     }
 
-    override fun onSiteLocationPermissionRequested(origin: String?, callback: GeolocationPermissions.Callback?) {
-        callback?.let { permissionCallback = callback }
-        origin?.let { permissionOrigin = origin }
+    override fun onSiteLocationPermissionRequested(origin: String, callback: GeolocationPermissions.Callback) {
+        permissionCallback = callback
+        permissionOrigin = origin
 
         if (site?.domainMatchesUrl(permissionOrigin) == false) {
             onSiteLocationPermissionAlwaysDenied()
@@ -852,23 +847,18 @@ class BrowserTabViewModel(
             return
         }
 
-        if (origin != null) {
-            viewModelScope.launch {
-                val userHasGivenPermission = locationPermissionsRepository.hasUserGivenPermissionTo(permissionOrigin)
-                val previouslyDeniedForever = appSettingsPreferencesStore.appLocationPermissionDeniedForever
-                if (userHasGivenPermission) {
-                    val permissionEntity = locationPermissionsRepository.getDomainPermission(permissionOrigin)!!
-                    if (permissionEntity.permission == LocationPermissionType.DENY_ALWAYS) {
-                        onSiteLocationPermissionAlwaysDenied()
-                    } else {
-                        command.postValue(CheckSystemLocationPermission(origin, previouslyDeniedForever))
-                    }
+        viewModelScope.launch {
+            val previouslyDeniedForever = appSettingsPreferencesStore.appLocationPermissionDeniedForever
+            val permissionEntity = locationPermissionsRepository.getDomainPermission(permissionOrigin)
+            if (permissionEntity == null) {
+                command.postValue(CheckSystemLocationPermission(origin, previouslyDeniedForever))
+            } else {
+                if (permissionEntity.permission == LocationPermissionType.DENY_ALWAYS) {
+                    onSiteLocationPermissionAlwaysDenied()
                 } else {
                     command.postValue(CheckSystemLocationPermission(origin, previouslyDeniedForever))
                 }
             }
-        } else {
-            onSiteLocationPermissionAlwaysDenied()
         }
     }
 
@@ -950,26 +940,23 @@ class BrowserTabViewModel(
         appSettingsPreferencesStore.appLocationPermission = true
         pixel.fire(Pixel.PixelName.PRECISE_LOCATION_SETTINGS_LOCATION_PERMISSION_ENABLE)
         viewModelScope.launch {
-            val userHasGivenPermission = locationPermissionsRepository.hasUserGivenPermissionTo(permissionOrigin)
-            if (userHasGivenPermission) {
-                val permissionEntity = locationPermissionsRepository.getDomainPermission(permissionOrigin)
-                permissionEntity?.let {
-                    reactToSitePermission(permissionEntity.permission)
-                }
-            } else {
+            val permissionEntity = locationPermissionsRepository.getDomainPermission(permissionOrigin)
+            if (permissionEntity == null) {
                 command.postValue(AskDomainPermission(permissionOrigin))
+            } else {
+                reactToSitePermission(permissionEntity.permission)
             }
         }
     }
 
-    fun onSystemLocationPermissionDenied() {
+    fun onSystemLocationPermissionDeniedOneTime() {
         pixel.fire(Pixel.PixelName.PRECISE_LOCATION_SETTINGS_LOCATION_PERMISSION_DISABLE)
         onSiteLocationPermissionAlwaysDenied()
     }
 
     fun onSystemLocationPermissionDeniedForever() {
         appSettingsPreferencesStore.appLocationPermissionDeniedForever = true
-        onSystemLocationPermissionDenied()
+        onSystemLocationPermissionDeniedOneTime()
     }
 
     private fun registerSiteVisit() {
@@ -1241,7 +1228,7 @@ class BrowserTabViewModel(
             is RequiredAction.ShareLink -> {
                 command.value = ShareLink(requiredAction.url)
                 true
-        }
+            }
             is RequiredAction.CopyLink -> {
                 command.value = CopyLink(requiredAction.url)
                 true

@@ -19,11 +19,9 @@ package com.duckduckgo.app.location
 import android.webkit.GeolocationPermissions
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepository
 import com.duckduckgo.app.global.DispatcherProvider
-import com.duckduckgo.app.location.data.LocationPermissionType
+import com.duckduckgo.app.global.view.websiteFromGeoLocationsApiOrigin
 import com.duckduckgo.app.location.data.LocationPermissionsRepository
-import com.duckduckgo.app.location.data.forFireproofing
 import kotlinx.coroutines.withContext
-import timber.log.Timber
 import javax.inject.Inject
 
 interface GeoLocationPermissions {
@@ -65,7 +63,7 @@ class GeoLocationPermissionsManager @Inject constructor(
             val geolocationPermissions = GeolocationPermissions.getInstance()
             val permissions = permissionsRepository.getLocationPermissionsSync()
             permissions.forEach {
-                if (!fireproofWebsiteRepository.isDomainFireproofed(it.forFireproofing())) {
+                if (!fireproofWebsiteRepository.isDomainFireproofed(it.domain.websiteFromGeoLocationsApiOrigin())) {
                     geolocationPermissions.clear(it.domain)
                     permissionsRepository.deletePermission(it.domain)
                 }

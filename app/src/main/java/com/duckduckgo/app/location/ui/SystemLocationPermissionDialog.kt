@@ -26,7 +26,7 @@ import androidx.fragment.app.DialogFragment
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.faviconLocation
 import com.duckduckgo.app.global.image.GlideApp
-import com.duckduckgo.app.global.view.website
+import com.duckduckgo.app.global.view.websiteFromGeoLocationsApiOrigin
 import org.jetbrains.anko.find
 
 class SystemLocationPermissionDialog : DialogFragment() {
@@ -72,7 +72,7 @@ class SystemLocationPermissionDialog : DialogFragment() {
 
     private fun populateSubtitle(view: TextView) {
         arguments?.let { args ->
-            val originUrl = args.getString(KEY_REQUEST_ORIGIN).website()
+            val originUrl = args.getString(KEY_REQUEST_ORIGIN)!!.websiteFromGeoLocationsApiOrigin()
             val subtitle = getString(R.string.preciseLocationSystemDialogSubtitle, originUrl, originUrl)
             view.text = subtitle
         }

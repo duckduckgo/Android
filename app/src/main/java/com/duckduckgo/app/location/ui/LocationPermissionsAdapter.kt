@@ -29,7 +29,7 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.faviconLocation
 import com.duckduckgo.app.global.image.GlideApp
 import com.duckduckgo.app.global.view.quietlySetIsChecked
-import com.duckduckgo.app.global.view.website
+import com.duckduckgo.app.global.view.websiteFromGeoLocationsApiOrigin
 import com.duckduckgo.app.location.data.LocationPermissionEntity
 import com.duckduckgo.app.location.data.LocationPermissionType
 import kotlinx.android.synthetic.main.view_location_permissions_entry.view.locationPermissionEntryDomain
@@ -42,6 +42,9 @@ import timber.log.Timber
 class LocationPermissionsAdapter(
     private val viewModel: LocationPermissionsViewModel
 ) : RecyclerView.Adapter<LocationPermissionsViewHolder>() {
+
+    private var allowedLocationPermissions: MutableList<LocationPermissionEntity> = mutableListOf()
+    private var deniedLocationPermissions: MutableList<LocationPermissionEntity> = mutableListOf()
 
     companion object {
         const val PRECISE_LOCATION_DOMAIN_TYPE = 0
@@ -81,9 +84,6 @@ class LocationPermissionsAdapter(
                 }
             }
         }
-
-    private var allowedLocationPermissions: MutableList<LocationPermissionEntity> = mutableListOf()
-    private var deniedLocationPermissions: MutableList<LocationPermissionEntity> = mutableListOf()
 
     private fun getSortedHeaderElements(): List<Int> {
         return if (allowedLocationPermissions.isEmpty()) {
@@ -230,7 +230,7 @@ sealed class LocationPermissionsViewHolder(itemView: View) : RecyclerView.ViewHo
 
         fun bind(entity: LocationPermissionEntity) {
             this.entity = entity
-            val website = entity.domain.website()
+            val website = entity.domain.websiteFromGeoLocationsApiOrigin()
 
             itemView.locationPermissionMenu.contentDescription = itemView.context.getString(
                 R.string.preciseLocationDeleteContentDescription,

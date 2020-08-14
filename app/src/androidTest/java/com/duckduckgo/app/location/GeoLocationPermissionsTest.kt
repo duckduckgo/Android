@@ -31,7 +31,6 @@ import com.duckduckgo.app.location.data.LocationPermissionsDao
 import com.duckduckgo.app.location.data.LocationPermissionsRepository
 import com.duckduckgo.app.runBlocking
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.runBlocking
 import org.junit.After
 import org.junit.Assert.*
 import org.junit.Before
@@ -80,7 +79,7 @@ class GeoLocationPermissionsTest {
     }
 
     @Test
-    fun whenClearingAllPermissionsButFireproofedThenOnlyNoFireproofedSitesAreDeleted() = coroutineRule.runBlocking {
+    fun whenClearingAllPermissionsButFireproofedThenOnlyNonFireproofedSitesAreDeleted() = coroutineRule.runBlocking {
         givenFireproofWebsiteDomain("anotherdomain.com")
         givenLocationPermissionsDomain("domain.com")
 

@@ -2394,7 +2394,7 @@ class BrowserTabViewModelTest {
         givenCurrentSite(domain)
         givenNewPermissionRequestFromDomain(domain)
 
-        testee.onSystemLocationPermissionDenied()
+        testee.onSystemLocationPermissionDeniedOneTime()
 
         verify(mockPixel).fire(Pixel.PixelName.PRECISE_LOCATION_SETTINGS_LOCATION_PERMISSION_DISABLE)
         verify(geoLocationPermissions).clear(domain)
@@ -2605,7 +2605,7 @@ class BrowserTabViewModelTest {
         givenCurrentSite(domain)
         givenNewPermissionRequestFromDomain(domain)
 
-        testee.onSystemLocationPermissionDenied()
+        testee.onSystemLocationPermissionDeniedOneTime()
 
         verify(geoLocationPermissions).clear(domain)
     }

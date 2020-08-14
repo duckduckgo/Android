@@ -36,7 +36,6 @@ import com.nhaarman.mockitokotlin2.lastValue
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.verify
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.runBlocking
 import org.junit.After
 import org.junit.Assert
 import org.junit.Before
@@ -44,7 +43,11 @@ import org.junit.Rule
 import org.junit.Test
 import org.mockito.ArgumentCaptor
 import org.mockito.Mockito
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 
+@ExperimentalCoroutinesApi
 class LocationPermissionsViewModelTest {
 
     @get:Rule
@@ -108,17 +111,17 @@ class LocationPermissionsViewModelTest {
         viewModel.loadLocationPermissions(true)
 
         Mockito.verify(mockViewStateObserver, atLeastOnce()).onChanged(viewStateCaptor.capture())
-        Assert.assertEquals(defaultViewState, viewStateCaptor.value)
+        assertEquals(defaultViewState, viewStateCaptor.value)
     }
 
     @Test
-    fun whenSystemLocationPermissionsAreDisablabledAndViewModelIsLoadedThenInitialisedWithProperViewState() {
+    fun whenSystemLocationPermissionsAreDisabledAndViewModelIsLoadedThenInitialisedWithProperViewState() {
         val defaultViewState = LocationPermissionsViewModel.ViewState(false, false, false, emptyList())
 
         viewModel.loadLocationPermissions(false)
 
         Mockito.verify(mockViewStateObserver, atLeastOnce()).onChanged(viewStateCaptor.capture())
-        Assert.assertEquals(defaultViewState, viewStateCaptor.value)
+        assertEquals(defaultViewState, viewStateCaptor.value)
     }
 
     @Test
@@ -128,7 +131,7 @@ class LocationPermissionsViewModelTest {
         viewModel.loadLocationPermissions(true)
 
         Mockito.verify(mockViewStateObserver, atLeastOnce()).onChanged(viewStateCaptor.capture())
-        Assert.assertTrue(viewStateCaptor.value.locationPermissionEntities.size == 1)
+        assertTrue(viewStateCaptor.value.locationPermissionEntities.size == 1)
     }
 
     @Test
@@ -137,7 +140,7 @@ class LocationPermissionsViewModelTest {
         viewModel.onDeleteRequested(locationPermissionEntity)
 
         assertCommandIssued<LocationPermissionsViewModel.Command.ConfirmDeleteLocationPermission> {
-            Assert.assertEquals(locationPermissionEntity, this.entity)
+            assertEquals(locationPermissionEntity, this.entity)
         }
     }
 
@@ -151,7 +154,7 @@ class LocationPermissionsViewModelTest {
         viewModel.delete(locationPermissionEntity)
 
         Mockito.verify(mockViewStateObserver, atLeastOnce()).onChanged(viewStateCaptor.capture())
-        Assert.assertTrue(viewStateCaptor.lastValue.locationPermissionEntities.isEmpty())
+        assertTrue(viewStateCaptor.lastValue.locationPermissionEntities.isEmpty())
     }
 
     @Test
@@ -162,7 +165,7 @@ class LocationPermissionsViewModelTest {
         val locationPermissionEntity = LocationPermissionEntity(domain, LocationPermissionType.ALLOW_ONCE)
         viewModel.delete(locationPermissionEntity)
 
-        Assert.assertNull(locationPermissionsDao.getPermission(domain))
+        assertNull(locationPermissionsDao.getPermission(domain))
         Mockito.verify(mockGeoLocationPermissions).clear(domain)
     }
 
@@ -172,7 +175,7 @@ class LocationPermissionsViewModelTest {
         viewModel.onEditRequested(locationPermissionEntity)
 
         assertCommandIssued<LocationPermissionsViewModel.Command.EditLocationPermissions> {
-            Assert.assertEquals(locationPermissionEntity, this.entity)
+            assertEquals(locationPermissionEntity, this.entity)
         }
     }
 
@@ -182,7 +185,7 @@ class LocationPermissionsViewModelTest {
         viewModel.onLocationPermissionToggled(true)
 
         Mockito.verify(mockViewStateObserver, atLeastOnce()).onChanged(viewStateCaptor.capture())
-        Assert.assertTrue(viewStateCaptor.value.locationPermissionEnabled)
+        assertTrue(viewStateCaptor.value.locationPermissionEnabled)
     }
 
     @Test
@@ -216,10 +219,10 @@ class LocationPermissionsViewModelTest {
 
         verify(mockPixel).fire(Pixel.PixelName.PRECISE_LOCATION_SITE_DIALOG_DENY_ALWAYS)
         Mockito.verify(mockViewStateObserver, atLeastOnce()).onChanged(viewStateCaptor.capture())
-        Assert.assertTrue(viewStateCaptor.lastValue.locationPermissionEntities.size == 1)
+        assertTrue(viewStateCaptor.lastValue.locationPermissionEntities.size == 1)
 
         val newPermission = viewStateCaptor.lastValue.locationPermissionEntities[0].permission
-        Assert.assertTrue(newPermission == LocationPermissionType.DENY_ALWAYS)
+        assertTrue(newPermission == LocationPermissionType.DENY_ALWAYS)
     }
 
     @Test
@@ -230,7 +233,7 @@ class LocationPermissionsViewModelTest {
 
         verify(mockPixel).fire(Pixel.PixelName.PRECISE_LOCATION_SITE_DIALOG_ALLOW_ALWAYS)
         verify(mockGeoLocationPermissions).allow(domain)
-        Assert.assertEquals(locationPermissionsDao.getPermission(domain)!!.permission, LocationPermissionType.ALLOW_ALWAYS)
+        assertEquals(locationPermissionsDao.getPermission(domain)!!.permission, LocationPermissionType.ALLOW_ALWAYS)
     }
 
     @Test
@@ -240,7 +243,7 @@ class LocationPermissionsViewModelTest {
 
         verify(mockGeoLocationPermissions).clear(domain)
 
-        Assert.assertNull(locationPermissionsDao.getPermission(domain))
+        assertNull(locationPermissionsDao.getPermission(domain))
     }
 
     @Test
@@ -250,7 +253,7 @@ class LocationPermissionsViewModelTest {
 
         verify(mockGeoLocationPermissions).clear(domain)
 
-        Assert.assertNull(locationPermissionsDao.getPermission(domain))
+        assertNull(locationPermissionsDao.getPermission(domain))
     }
 
     @Test
@@ -259,7 +262,7 @@ class LocationPermissionsViewModelTest {
         viewModel.onSiteLocationPermissionSelected(domain, LocationPermissionType.DENY_ALWAYS)
 
         verify(mockGeoLocationPermissions).clear(domain)
-        Assert.assertEquals(locationPermissionsDao.getPermission(domain)!!.permission, LocationPermissionType.DENY_ALWAYS)
+        assertEquals(locationPermissionsDao.getPermission(domain)!!.permission, LocationPermissionType.DENY_ALWAYS)
     }
 
     private fun givenLocationPermission(permission: LocationPermissionType = LocationPermissionType.ALLOW_ONCE, vararg domain: String) {
