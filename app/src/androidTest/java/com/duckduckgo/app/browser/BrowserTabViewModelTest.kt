@@ -2326,6 +2326,12 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenDosAttackDetectedThenErrorIsShown() {
+        testee.dosAttackDetected()
+        assertCommandIssued<Command.ShowErrorWithAction>()
+    }
+
+    @Test
     fun whenCurrentDomainAndPermissionRequestingDomainAreDifferentThenSitePermissionIsDenied() = coroutineRule.runBlocking {
         givenCurrentSite("https://wwww.example.com/")
         givenNewPermissionRequestFromDomain("https://wwww.anotherexample.com/")
