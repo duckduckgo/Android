@@ -84,13 +84,20 @@ class CtaViewModel @Inject constructor(
 
     private var activeSurvey: Survey? = null
 
-    private val requiredDaxOnboardingCtas: Array<CtaId> = arrayOf(
-        CtaId.DAX_INTRO,
-        CtaId.DAX_DIALOG_SERP,
-        CtaId.DAX_DIALOG_TRACKERS_FOUND,
-        CtaId.DAX_DIALOG_NETWORK,
-        CtaId.DAX_END
-    )
+    private val requiredDaxOnboardingCtas: Array<CtaId> by lazy {
+        arrayOf(
+            CtaId.DAX_INTRO,
+            CtaId.DAX_DIALOG_SERP,
+            CtaId.DAX_DIALOG_TRACKERS_FOUND,
+            CtaId.DAX_DIALOG_NETWORK,
+            CtaId.DAX_END
+        ).run {
+            if (variantManager.getVariant().hasFeature(FireButtonEducation)) {
+                return@run this.plus(CtaId.DAX_FIRE_BUTTON)
+            }
+            return@run this
+        }
+    }
 
     fun onSurveyChanged(survey: Survey?): Survey? {
         activeSurvey = survey

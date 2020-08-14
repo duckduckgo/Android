@@ -131,6 +131,15 @@ class CtaViewModelTest {
         CtaId.DAX_END
     )
 
+    private val requiredFireEducationDaxOnboardingCtas: List<CtaId> = listOf(
+        CtaId.DAX_INTRO,
+        CtaId.DAX_DIALOG_SERP,
+        CtaId.DAX_DIALOG_TRACKERS_FOUND,
+        CtaId.DAX_DIALOG_NETWORK,
+        CtaId.DAX_FIRE_BUTTON,
+        CtaId.DAX_END
+    )
+
     private lateinit var testee: CtaViewModel
 
     @Before
@@ -239,6 +248,33 @@ class CtaViewModelTest {
     fun whenCtaDismissedAndAllDaxOnboardingCtasShownThenStageCompleted() = coroutineRule.runBlocking {
         givenOnboardingActive()
         givenShownDaxOnboardingCtas(requiredDaxOnboardingCtas)
+        testee.onUserDismissedCta(DaxDialogCta.DaxSerpCta(mockOnboardingStore, mockAppInstallStore))
+        verify(mockUserStageStore).stageCompleted(AppStage.DAX_ONBOARDING)
+    }
+
+    @Test
+    fun whenFireEducationEnabledCtaDismissedAndUserHasPendingOnboardingCtasThenStageNotCompleted() = coroutineRule.runBlocking {
+        givenFireButtonEducationActive()
+        givenOnboardingActive()
+        givenShownDaxOnboardingCtas(emptyList())
+        testee.onUserDismissedCta(DaxBubbleCta.DaxEndCta(mockOnboardingStore, mockAppInstallStore))
+        verify(mockUserStageStore, times(0)).stageCompleted(any())
+    }
+
+    @Test
+    fun whenFireEducationEnabledAndCtaDismissedAndAllDaxOnboardingCtasShownThenStageNotCompleted() = coroutineRule.runBlocking {
+        givenFireButtonEducationActive()
+        givenOnboardingActive()
+        givenShownDaxOnboardingCtas(requiredDaxOnboardingCtas)
+        testee.onUserDismissedCta(DaxDialogCta.DaxSerpCta(mockOnboardingStore, mockAppInstallStore))
+        verify(mockUserStageStore, times(0)).stageCompleted(any())
+    }
+
+    @Test
+    fun whenFireEducationEnabledAndCtaDismissedAndAllFireEducationDaxOnboardingCtasShownThenStageCompleted() = coroutineRule.runBlocking {
+        givenFireButtonEducationActive()
+        givenOnboardingActive()
+        givenShownDaxOnboardingCtas(requiredFireEducationDaxOnboardingCtas)
         testee.onUserDismissedCta(DaxDialogCta.DaxSerpCta(mockOnboardingStore, mockAppInstallStore))
         verify(mockUserStageStore).stageCompleted(AppStage.DAX_ONBOARDING)
     }
