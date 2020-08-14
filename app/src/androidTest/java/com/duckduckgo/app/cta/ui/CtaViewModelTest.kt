@@ -145,6 +145,7 @@ class CtaViewModelTest {
         whenever(mockAppInstallStore.installTimestamp).thenReturn(System.currentTimeMillis() - TimeUnit.DAYS.toMillis(1))
         whenever(mockUserWhitelistDao.contains(any())).thenReturn(false)
         whenever(mockDismissedCtaDao.dismissedCtas()).thenReturn(dismissedCtaDaoChannel.consumeAsFlow())
+        givenControlGroup()
 
         testee = CtaViewModel(
             mockAppInstallStore,
@@ -549,6 +550,7 @@ class CtaViewModelTest {
     @Test
     fun whenTipsAndFireOnboardingActiveAndUserSeesAnyTriggerFirePulseAnimationCtaThenFireButtonAnimationShouldShow() = coroutineRule.runBlocking {
         givenFireButtonEducationActive()
+        givenOnboardingActive()
         val willTriggerFirePulseAnimationCtas = listOf(CtaId.DAX_DIALOG_TRACKERS_FOUND, CtaId.DAX_DIALOG_NETWORK, CtaId.DAX_DIALOG_OTHER)
 
         val launch = launch {
@@ -566,6 +568,7 @@ class CtaViewModelTest {
     @Test
     fun whenTipsAndFireOnboardingActiveAndUserSeesAnyNonTriggerFirePulseAnimationCtaThenFireButtonAnimationShouldNotShow() = coroutineRule.runBlocking {
         givenFireButtonEducationActive()
+        givenOnboardingActive()
         val willTriggerFirePulseAnimationCtas = listOf(CtaId.DAX_DIALOG_TRACKERS_FOUND, CtaId.DAX_DIALOG_NETWORK, CtaId.DAX_DIALOG_OTHER)
         val willNotTriggerFirePulseAnimationCtas = CtaId.values().toList() - willTriggerFirePulseAnimationCtas
 
@@ -584,6 +587,7 @@ class CtaViewModelTest {
     @Test
     fun whenFireEducationDisabledAndUserSeesAnyCtaThenFireButtonAnimationShouldNotShow() = coroutineRule.runBlocking {
         givenControlGroup()
+        givenOnboardingActive()
         val allCtas = CtaId.values().toList()
 
         val launch = launch {
@@ -596,6 +600,48 @@ class CtaViewModelTest {
         }
 
         launch.cancel()
+    }
+
+    @Test
+    fun whenFirstTimeUserClicksOnFireButtonThenFireDialogCtaReturned() = coroutineRule.runBlocking {
+        givenFireButtonEducationActive()
+        givenOnboardingActive()
+
+        val fireDialogCta = testee.getFireDialogCta()
+
+        assertTrue(fireDialogCta is DaxFireCta.FireCta)
+    }
+
+    @Test
+    fun whenFirstTimeUserClicksOnFireButtonButUserHidAllTipsThenFireDialogCtaIsNull() = coroutineRule.runBlocking {
+        givenFireButtonEducationActive()
+        givenOnboardingActive()
+        whenever(mockSettingsDataStore.hideTips).thenReturn(true)
+
+        val fireDialogCta = testee.getFireDialogCta()
+
+        assertNull(fireDialogCta)
+    }
+
+    @Test
+    fun whenFireCtaDismissedThenFireDialogCtaIsNull() = coroutineRule.runBlocking {
+        givenFireButtonEducationActive()
+        givenOnboardingActive()
+        whenever(mockDismissedCtaDao.exists(CtaId.DAX_FIRE_BUTTON)).thenReturn(true)
+
+        val fireDialogCta = testee.getFireDialogCta()
+
+        assertNull(fireDialogCta)
+    }
+
+    @Test
+    fun whenFireEducationDisabledThenFireDialogCtaIsNull() = coroutineRule.runBlocking {
+        givenControlGroup()
+        givenOnboardingActive()
+
+        val fireDialogCta = testee.getFireDialogCta()
+
+        assertNull(fireDialogCta)
     }
 
     private suspend fun givenDaxOnboardingActive() {

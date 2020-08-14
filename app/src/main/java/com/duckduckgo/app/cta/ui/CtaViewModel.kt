@@ -72,7 +72,7 @@ class CtaViewModel @Inject constructor(
         .map { dismissedCtaDao ->
             withContext(dispatchers.io()) {
                 if (!variantManager.getVariant().hasFeature(FireButtonEducation)) return@withContext false
-                if (daxDialogFireEducationShown() || settingsDataStore.hideTips) return@withContext false
+                if (!daxOnboardingActive() || daxDialogFireEducationShown() || settingsDataStore.hideTips) return@withContext false
 
                 return@withContext dismissedCtaDao.any {
                     it.ctaId == CtaId.DAX_DIALOG_TRACKERS_FOUND ||
@@ -176,11 +176,14 @@ class CtaViewModel @Inject constructor(
         }
     }
 
-    suspend fun getFireDialogCta(): DaxFireCta? =
-        withContext(dispatchers.io()) {
+    suspend fun getFireDialogCta(): DaxFireCta? {
+        if (!variantManager.getVariant().hasFeature(FireButtonEducation) || !daxOnboardingActive()) return null
+
+        return withContext(dispatchers.io()) {
             if (settingsDataStore.hideTips || daxDialogFireEducationShown()) return@withContext null
             return@withContext DaxFireCta.FireCta()
         }
+    }
 
     private suspend fun getHomeCta(): Cta? {
         return when {
