@@ -112,8 +112,6 @@ interface VariantManager {
                 weight = 1.0,
                 features = listOf(VariantFeature.FireButtonEducation),
                 filterBy = { isEnglishLocale() })
-
-
             // All groups in an experiment (control and variants) MUST use the same filters
         )
 
