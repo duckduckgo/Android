@@ -239,6 +239,10 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
 
     private val logoHidingListener by lazy { LogoHidingLayoutChangeLifecycleListener(ddgLogo) }
 
+    private val ctaViewStateObserver = Observer<CtaViewState> {
+        it?.let { renderer.renderCtaViewState(it) }
+    }
+
     private var alertDialog: AlertDialog? = null
 
     private var loginDetectionDialog: AlertDialog? = null
@@ -392,9 +396,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
             it?.let { renderer.renderFindInPageState(it) }
         })
 
-        viewModel.ctaViewState.observe(viewLifecycleOwner, Observer {
-            it?.let { renderer.renderCtaViewState(it) }
-        })
+        viewModel.ctaViewState.observe(viewLifecycleOwner, ctaViewStateObserver)
 
         viewModel.command.observe(viewLifecycleOwner, Observer {
             processCommand(it)
@@ -1619,6 +1621,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
             }
 
             renderIfChanged(viewState, lastSeenCtaViewState) {
+
                 ddgLogo.show()
                 lastSeenCtaViewState = viewState
                 if (viewState.cta != null) {
@@ -1814,5 +1817,13 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
 
     override fun cancelDownload() {
         viewModel.closeAndReturnToSourceIfBlankTab()
+    }
+
+    fun onFireDialogVisibilityChanged(isVisible: Boolean) {
+        if (isVisible) {
+            viewModel.ctaViewState.removeObserver(ctaViewStateObserver)
+        } else {
+            viewModel.ctaViewState.observe(viewLifecycleOwner, ctaViewStateObserver)
+        }
     }
 }

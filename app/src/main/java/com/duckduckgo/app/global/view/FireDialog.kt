@@ -67,7 +67,7 @@ class FireDialog(
         }
 
         cancelOption.setOnClickListener {
-            dismiss()
+            cancel()
         }
 
         behavior.state = BottomSheetBehavior.STATE_EXPANDED

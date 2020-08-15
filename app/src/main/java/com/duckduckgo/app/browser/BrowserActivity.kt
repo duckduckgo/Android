@@ -286,6 +286,8 @@ class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope() {
             clearingInProgressView.show()
         }
         dialog.clearComplete = { viewModel.onClearComplete() }
+        dialog.setOnShowListener { currentTab?.onFireDialogVisibilityChanged(isVisible = true) }
+        dialog.setOnCancelListener { currentTab?.onFireDialogVisibilityChanged(isVisible = false) }
         dialog.show()
     }
 
