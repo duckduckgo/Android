@@ -18,8 +18,10 @@ package com.duckduckgo.app.browser
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.os.Handler
 import android.util.AttributeSet
 import android.view.MotionEvent
+import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputConnection
 import android.webkit.WebView
@@ -35,6 +37,11 @@ import androidx.core.view.ViewCompat
  * Originally based on https://github.com/takahirom/webview-in-coordinatorlayout for scrolling behaviour
  */
 class DuckDuckGoWebView : WebView, NestedScrollingChild {
+    private var swipeRefreshHandler: Handler = Handler()
+    private var enableSwipeRefreshRunnable: Runnable = Runnable {
+        enableSwipeRefresh(true)
+    }
+    private var lastClampedTopYTimestamp: Long? = null
     private var lastClampedTopY: Boolean = false
     private var contentAllowsSwipeToRefresh: Boolean = true
     private var enableSwipeRefreshCallback: ((Boolean) -> Unit)? = null
@@ -65,7 +72,7 @@ class DuckDuckGoWebView : WebView, NestedScrollingChild {
 
     @SuppressLint("ClickableViewAccessibility")
     override fun onTouchEvent(ev: MotionEvent): Boolean {
-        var returnValue = false
+        val returnValue: Boolean
 
         val event = MotionEvent.obtain(ev)
         val action = event.actionMasked
@@ -98,8 +105,8 @@ class DuckDuckGoWebView : WebView, NestedScrollingChild {
                     lastY -= scrollOffset[1]
                 }
 
-                if (scrollY == 0 && lastClampedTopY && nestedOffsetY == 0) {
-                    // we have reached the top, are clamped vertically and nestedScrollY is done too -> enable swipeRefresh (by default always disabled)
+                if (scrollY == 0 && lastClampedTopY && nestedOffsetY == 0 && isOverScrollGlowEffectReceded()) {
+                    // we have reached the top, are clamped vertically and nestedScrollY is done too -> enable swipeRefresh (by default always disabled on ACTION_DOWN)
                     enableSwipeRefresh(true)
                 }
 
@@ -107,7 +114,7 @@ class DuckDuckGoWebView : WebView, NestedScrollingChild {
             }
 
             MotionEvent.ACTION_DOWN -> {
-                // disable swipeRefresh until we can be sure it should be enabled
+                // disable swipeRefresh until we can be sure it should be enabled - this is required to avoid https://github.com/duckduckgo/Android/pull/750#pullrequestreview-383768114
                 enableSwipeRefresh(false)
 
                 returnValue = super.onTouchEvent(event)
@@ -151,10 +158,30 @@ class DuckDuckGoWebView : WebView, NestedScrollingChild {
         nestedScrollHelper.dispatchNestedPreFling(velocityX, velocityY)
 
     override fun onOverScrolled(scrollX: Int, scrollY: Int, clampedX: Boolean, clampedY: Boolean) {
-        // taking into account lastDeltaY since we are only interested whether we clamped at the top
-        lastClampedTopY = clampedY && lastDeltaY <= 0
-        enableSwipeRefresh(clampedY && scrollY == 0 && (lastDeltaY <= 0 || nestedOffsetY == 0))
+        lastClampedTopY = scrollY == 0 && clampedY
+
+        // if we reach this swipeRefresh must be disabled
+        if (lastClampedTopY) {
+            // schedule enable after over scroll effect has receded
+            scheduleEnableSwipeRefresh()
+        }
+
+        lastClampedTopYTimestamp = if (lastClampedTopY) {
+            System.currentTimeMillis()
+        } else {
+            null
+        }
+
         super.onOverScrolled(scrollX, scrollY, clampedX, clampedY)
+    }
+
+    private fun scheduleEnableSwipeRefresh() {
+        swipeRefreshHandler.removeCallbacks(enableSwipeRefreshRunnable)
+        swipeRefreshHandler.postDelayed(enableSwipeRefreshRunnable, OVER_SCROLL_EDGE_EFFECT_RECEDE_TIME)
+    }
+
+    private fun isOverScrollGlowEffectReceded(): Boolean {
+        return lastClampedTopYTimestamp != null && System.currentTimeMillis() - OVER_SCROLL_EDGE_EFFECT_RECEDE_TIME >= lastClampedTopYTimestamp!!
     }
 
     fun setEnableSwipeRefreshCallback(callback: (Boolean) -> Unit) {
@@ -172,6 +199,13 @@ class DuckDuckGoWebView : WebView, NestedScrollingChild {
     }
 
     private fun enableSwipeRefresh(enable: Boolean) {
+        overScrollMode = if (!enable) {
+            swipeRefreshHandler.removeCallbacks(enableSwipeRefreshRunnable)
+            View.OVER_SCROLL_ALWAYS
+        } else {
+            View.OVER_SCROLL_NEVER
+        }
+
         enableSwipeRefreshCallback?.invoke(enable && contentAllowsSwipeToRefresh)
     }
 
@@ -182,6 +216,11 @@ class DuckDuckGoWebView : WebView, NestedScrollingChild {
         }
     }
 
+    override fun destroy() {
+        swipeRefreshHandler.removeCallbacks(enableSwipeRefreshRunnable)
+        super.destroy()
+    }
+
     companion object {
 
         /*
@@ -189,5 +228,10 @@ class DuckDuckGoWebView : WebView, NestedScrollingChild {
          * We can't use that value directly as it was only added on Oreo, but we can apply the value anyway.
          */
         private const val IME_FLAG_NO_PERSONALIZED_LEARNING = 0x1000000
+
+        /*
+        * Taken from EdgeEffect.RECEDE_TIME
+         */
+        private const val OVER_SCROLL_EDGE_EFFECT_RECEDE_TIME = 600L
     }
 }
