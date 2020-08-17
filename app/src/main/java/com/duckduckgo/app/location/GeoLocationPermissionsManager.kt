@@ -18,8 +18,6 @@ package com.duckduckgo.app.location
 
 import android.content.Context
 import android.location.LocationManager
-import android.os.Build
-import android.provider.Settings
 import android.webkit.GeolocationPermissions
 import androidx.core.location.LocationManagerCompat
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepository
