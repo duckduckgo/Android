@@ -837,8 +837,7 @@ class BrowserTabViewModel(
         permissionCallback = callback
         permissionOrigin = origin
 
-
-        if (!geoLocationPermissions.isDeviceLocationSharingEnabled()){
+        if (!geoLocationPermissions.isDeviceLocationSharingEnabled()) {
             onSiteLocationPermissionAlwaysDenied()
             return
         }

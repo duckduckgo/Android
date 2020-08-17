@@ -2673,7 +2673,7 @@ class BrowserTabViewModelTest {
         testee.onSiteLocationPermissionRequested(domain, StubPermissionCallback())
     }
 
-    private fun givenDeviceLocationSharingIsEnabled(state: Boolean){
+    private fun givenDeviceLocationSharingIsEnabled(state: Boolean) {
         whenever(geoLocationPermissions.isDeviceLocationSharingEnabled()).thenReturn(state)
     }
 
