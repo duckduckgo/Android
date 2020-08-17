@@ -29,7 +29,7 @@ import java.nio.channels.Selector
 import java.nio.channels.SocketChannel
 import kotlin.random.Random
 
-class TcpPacketRouter constructor(private val queues: VpnQueues, private val selector: Selector, private val networkChannelCreator: NetworkChannelCreator) {
+class TcpConnectionInitializer constructor(private val queues: VpnQueues, private val selector: Selector, private val networkChannelCreator: NetworkChannelCreator) {
 
     fun initializeConnection(params: TcpConnectionParams) {
         val key = params.key()

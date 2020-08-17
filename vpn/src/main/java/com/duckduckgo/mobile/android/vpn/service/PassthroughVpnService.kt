@@ -185,7 +185,7 @@ class PassthroughVpnService : VpnService(), CoroutineScope by MainScope(), Netwo
         const val FOREGROUND_VPN_SERVICE_ID = 200
     }
 
-    override fun createDatagram(): DatagramChannel {
+    override fun createDatagramChannel(): DatagramChannel {
         return DatagramChannel.open().also { channel ->
             protect(channel.socket())
             channel.configureBlocking(false)
@@ -202,7 +202,7 @@ class PassthroughVpnService : VpnService(), CoroutineScope by MainScope(), Netwo
 }
 
 interface NetworkChannelCreator {
-    fun createDatagram(): DatagramChannel
+    fun createDatagramChannel(): DatagramChannel
     fun createSocket(): SocketChannel
 }
 

@@ -19,12 +19,14 @@ package com.duckduckgo.mobile.android.vpn.processor
 import android.os.ParcelFileDescriptor
 import com.duckduckgo.mobile.android.vpn.service.VpnQueues
 import timber.log.Timber
+import xyz.hexene.localvpn.ByteBufferPool
 import xyz.hexene.localvpn.Packet
 import java.io.FileInputStream
 import java.io.FileOutputStream
 import java.io.IOException
 import java.nio.ByteBuffer
 import java.nio.channels.FileChannel
+import java.util.concurrent.TimeUnit
 
 
 class TunPacketProcessor(
@@ -33,6 +35,7 @@ class TunPacketProcessor(
 ) {
 
     private var running = false
+    var bufferToNetwork = byteBuffer()
 
     fun run() {
         Timber.w("TunPacketProcess started")
@@ -45,12 +48,13 @@ class TunPacketProcessor(
         // writing back data to the TUN; this means packet from the network flowing back to apps on the device
         val vpnOutput = FileOutputStream(tunInterface.fileDescriptor).channel
 
+        var dataSentPreviously = false
         try {
             while (running) {
-                val dataSent = executeReadLoop(vpnInput)
+                dataSentPreviously = executeReadLoop(vpnInput, dataSentPreviously)
                 val dataReceived = executeWriteLoop(vpnOutput)
 
-                if (!dataSent && !dataReceived) {
+                if (!dataSentPreviously && !dataReceived) {
                     Thread.sleep(10)
                 }
             }
@@ -60,20 +64,20 @@ class TunPacketProcessor(
         } finally {
             vpnInput.close()
             vpnOutput.close()
+            ByteBufferPool.clear()
         }
     }
 
-    private fun executeReadLoop(vpnInput: FileChannel): Boolean {
-        var bufferToNetwork = byteBuffer()
-        var dataSent = true
-
-        if (dataSent) {
+    private fun executeReadLoop(vpnInput: FileChannel, dataSentPreviously: Boolean): Boolean {
+        if(dataSentPreviously) {
             bufferToNetwork = byteBuffer()
         } else {
             bufferToNetwork.clear()
         }
 
+        val dataSent : Boolean
         val inPacketLength = vpnInput.read(bufferToNetwork)
+
         if (inPacketLength > 0) {
             dataSent = true
             bufferToNetwork.flip()
@@ -89,10 +93,6 @@ class TunPacketProcessor(
         return dataSent
     }
 
-    private fun byteBuffer(): ByteBuffer {
-        return ByteBuffer.allocate(Short.MAX_VALUE.toInt())
-    }
-
     private fun executeWriteLoop(vpnOutput: FileChannel): Boolean {
         val bufferFromNetwork = queues.networkToDevice.poll() ?: return false
 
@@ -103,7 +103,13 @@ class TunPacketProcessor(
             if (bytesWrittenToVpn > 0) dataReceived = true
         }
 
+        ByteBufferPool.release(bufferFromNetwork)
+
         return dataReceived
+    }
+
+    private fun byteBuffer(): ByteBuffer {
+        return ByteBufferPool.acquire()
     }
 
     fun stop() {

@@ -19,7 +19,7 @@ package com.duckduckgo.mobile.android.vpn.processor.tcp
 import android.os.Process.THREAD_PRIORITY_URGENT_DISPLAY
 import android.os.Process.setThreadPriority
 import android.os.SystemClock
-import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpPacketRouter.TcpConnectionParams
+import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpConnectionInitializer.TcpConnectionParams
 import com.duckduckgo.mobile.android.vpn.service.NetworkChannelCreator
 import com.duckduckgo.mobile.android.vpn.service.VpnQueues
 import kotlinx.coroutines.GlobalScope
@@ -27,6 +27,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import xyz.hexene.localvpn.ByteBufferPool
 import xyz.hexene.localvpn.Packet
 import xyz.hexene.localvpn.Packet.TCPHeader
 import xyz.hexene.localvpn.TCB
@@ -45,7 +46,7 @@ class TcpPacketProcessor(private val queues: VpnQueues, networkChannelCreator: N
     private var pollJobDeviceToNetwork: Job? = null
     private var pollJobNetworkToDevice: Job? = null
 
-    private val packetRouter = TcpPacketRouter(queues, selector, networkChannelCreator)
+    private val connectionInitializer = TcpConnectionInitializer(queues, selector, networkChannelCreator)
 
 
     fun start() {
@@ -106,7 +107,7 @@ class TcpPacketProcessor(private val queues: VpnQueues, networkChannelCreator: N
 
         if (channelsReady == 0) {
             Timber.v("Selector woken up but no channels ready; sleeping again")
-            Thread.sleep(10)
+            Thread.sleep(100)
             return
         }
 
@@ -147,7 +148,7 @@ class TcpPacketProcessor(private val queues: VpnQueues, networkChannelCreator: N
         val payloadBuffer = packet.backingBuffer
         packet.backingBuffer = null
 
-        val responseBuffer = ByteBuffer.allocate(Short.MAX_VALUE.toInt())
+        val responseBuffer = ByteBufferPool.acquire()
         val connectionParams = TcpConnectionParams(destinationAddress.hostAddress, destinationPort, sourcePort, packet, responseBuffer)
         val connectionKey = connectionParams.key()
 
@@ -164,17 +165,21 @@ class TcpPacketProcessor(private val queues: VpnQueues, networkChannelCreator: N
         val tcb = TCB.getTCB(connectionKey)
         if (tcb == null) {
             Timber.i("Need to initialize TCP connection for $connectionKey")
-            packetRouter.initializeConnection(connectionParams)
+            connectionInitializer.initializeConnection(connectionParams)
         } else {
-            Timber.i("Already have a TCP connection for $connectionKey")
             when {
                 tcpHeader.isSYN -> processDuplicateSyn(tcb, connectionParams)
-                tcpHeader.isRST -> closeConnection(tcb)
+                tcpHeader.isRST -> closeConnection(tcb, responseBuffer)
                 tcpHeader.isFIN -> processFin(tcb, connectionParams)
                 tcpHeader.isACK -> processAck(tcb, payloadBuffer, connectionParams)
                 else -> Timber.w("TCP packet has no known flags; dropping")
             }
         }
+
+        if (responseBuffer.position() == 0) {
+            ByteBufferPool.release(responseBuffer)
+        }
+        ByteBufferPool.release(payloadBuffer)
     }
 
     private fun processAck(tcb: TCB, payloadBuffer: ByteBuffer, connectionParams: TcpConnectionParams) {
@@ -190,7 +195,7 @@ class TcpPacketProcessor(private val queues: VpnQueues, networkChannelCreator: N
                 tcb.selectionKey = socket.register(selector, OP_READ, tcb)
                 tcb.waitingForNetworkData = true
             } else if (tcb.status == TCB.TCBStatus.LAST_ACK) {
-                closeConnection(tcb)
+                closeConnection(tcb, connectionParams.responseBuffer)
                 return
             }
 
@@ -258,7 +263,7 @@ class TcpPacketProcessor(private val queues: VpnQueues, networkChannelCreator: N
     }
 
     private fun processRead(key: SelectionKey) {
-        val receiveBuffer = ByteBuffer.allocate(Short.MAX_VALUE.toInt())
+        val receiveBuffer = ByteBufferPool.acquire()
         receiveBuffer.position(HEADER_SIZE)
 
         val tcb = key.attachment() as TCB
@@ -279,6 +284,7 @@ class TcpPacketProcessor(private val queues: VpnQueues, networkChannelCreator: N
                 if (endOfStream(readBytes)) {
                     key.interestOps(0)
                     if (tcb.status != TCB.TCBStatus.CLOSE_WAIT) {
+                        ByteBufferPool.release(receiveBuffer)
                         return
                     }
 
@@ -315,7 +321,7 @@ class TcpPacketProcessor(private val queues: VpnQueues, networkChannelCreator: N
                 iterator.remove()
                 tcb.status = TCB.TCBStatus.SYN_RECEIVED
 
-                val responseBuffer = ByteBuffer.allocate(Short.MAX_VALUE.toInt())
+                val responseBuffer = ByteBufferPool.acquire()
                 packet.updateTCPBuffer(responseBuffer, (TCPHeader.SYN or TCPHeader.ACK).toByte(), tcb.mySequenceNum, tcb.myAcknowledgementNum, 0)
                 queues.networkToDevice.offer(responseBuffer)
                 tcb.mySequenceNum++
@@ -325,15 +331,16 @@ class TcpPacketProcessor(private val queues: VpnQueues, networkChannelCreator: N
             }
         }.onFailure {
             Timber.w(it, "Failed to process TCP connect")
-            val responseBuffer = ByteBuffer.allocate((Short.MAX_VALUE.toInt()))
+            val responseBuffer = ByteBufferPool.acquire()
             packet.updateTCPBuffer(responseBuffer, TCPHeader.RST.toByte(), 0, tcb.myAcknowledgementNum, 0)
             queues.networkToDevice.offer(responseBuffer)
             TCB.closeTCB(tcb)
         }
     }
 
-    private fun closeConnection(tcb: TCB?) {
+    private fun closeConnection(tcb: TCB?, buffer: ByteBuffer) {
         Timber.v("Closing TCB connection")
+        ByteBufferPool.release(buffer)
         TCB.closeTCB(tcb)
     }
 
