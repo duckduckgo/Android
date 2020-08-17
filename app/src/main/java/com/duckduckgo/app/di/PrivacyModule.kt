@@ -103,10 +103,11 @@ class PrivacyModule {
     @Provides
     @Singleton
     fun geoLocationPermissions(
+        context: Context,
         locationPermissionsRepository: LocationPermissionsRepository,
         fireproofWebsiteRepository: FireproofWebsiteRepository,
         dispatcherProvider: DispatcherProvider
     ): GeoLocationPermissions {
-        return GeoLocationPermissionsManager(locationPermissionsRepository, fireproofWebsiteRepository, dispatcherProvider)
+        return GeoLocationPermissionsManager(context, locationPermissionsRepository, fireproofWebsiteRepository, dispatcherProvider)
     }
 }

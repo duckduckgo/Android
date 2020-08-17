@@ -2332,7 +2332,19 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenDeviceLocationSharingIsDisabledThenSitePermissionIsDenied() = coroutineRule.runBlocking {
+        val domain = "https://www.example.com/"
+
+        givenDeviceLocationSharingIsEnabled(false)
+        givenCurrentSite(domain)
+        givenNewPermissionRequestFromDomain(domain)
+
+        verify(geoLocationPermissions).clear(domain)
+    }
+
+    @Test
     fun whenCurrentDomainAndPermissionRequestingDomainAreDifferentThenSitePermissionIsDenied() = coroutineRule.runBlocking {
+        givenDeviceLocationSharingIsEnabled(true)
         givenCurrentSite("https://wwww.example.com/")
         givenNewPermissionRequestFromDomain("https://wwww.anotherexample.com/")
 
@@ -2343,6 +2355,7 @@ class BrowserTabViewModelTest {
     fun whenDomainRequestsSitePermissionThenAppChecksSystemLocationPermission() = coroutineRule.runBlocking {
         val domain = "https://www.example.com/"
 
+        givenDeviceLocationSharingIsEnabled(true)
         givenLocationPermissionIsEnabled(true)
         givenCurrentSite(domain)
         givenNewPermissionRequestFromDomain(domain)
@@ -2354,6 +2367,7 @@ class BrowserTabViewModelTest {
     fun whenDomainRequestsSitePermissionAndAlreadyRepliedThenAppChecksSystemLocationPermission() = coroutineRule.runBlocking {
         val domain = "https://www.example.com/"
 
+        givenDeviceLocationSharingIsEnabled(true)
         givenLocationPermissionIsEnabled(true)
         givenCurrentSite(domain)
         givenUserAlreadySelectedPermissionForDomain(domain, LocationPermissionType.DENY_ALWAYS)
@@ -2367,6 +2381,7 @@ class BrowserTabViewModelTest {
     fun whenDomainRequestsSitePermissionAndAllowedThenAppChecksSystemLocationPermission() = coroutineRule.runBlocking {
         val domain = "https://www.example.com/"
 
+        givenDeviceLocationSharingIsEnabled(true)
         givenLocationPermissionIsEnabled(true)
         givenCurrentSite(domain)
         givenUserAlreadySelectedPermissionForDomain(domain, LocationPermissionType.ALLOW_ALWAYS)
@@ -2379,7 +2394,7 @@ class BrowserTabViewModelTest {
     @Test
     fun whenAppLocationPermissionIsDeniedThenSitePermissionIsDenied() = coroutineRule.runBlocking {
         val domain = "https://www.example.com/"
-
+        givenDeviceLocationSharingIsEnabled(true)
         givenLocationPermissionIsEnabled(false)
         givenCurrentSite(domain)
         givenNewPermissionRequestFromDomain(domain)
@@ -2390,6 +2405,7 @@ class BrowserTabViewModelTest {
     @Test
     fun whenSystemPermissionIsDeniedThenSitePermissionIsCleared() = coroutineRule.runBlocking {
         val domain = "https://www.example.com/"
+        givenDeviceLocationSharingIsEnabled(true)
         givenLocationPermissionIsEnabled(true)
         givenCurrentSite(domain)
         givenNewPermissionRequestFromDomain(domain)
@@ -2403,7 +2419,7 @@ class BrowserTabViewModelTest {
     @Test
     fun whenUserGrantsSystemLocationPermissionThenSettingsLocationPermissionShoulbBeEnabled() = coroutineRule.runBlocking {
         val domain = "https://www.example.com/"
-
+        givenDeviceLocationSharingIsEnabled(true)
         givenLocationPermissionIsEnabled(true)
         givenCurrentSite(domain)
         givenNewPermissionRequestFromDomain(domain)
@@ -2416,7 +2432,7 @@ class BrowserTabViewModelTest {
     @Test
     fun whenUserGrantsSystemLocationPermissionThenPixelIsFired() = coroutineRule.runBlocking {
         val domain = "https://www.example.com/"
-
+        givenDeviceLocationSharingIsEnabled(true)
         givenLocationPermissionIsEnabled(true)
         givenCurrentSite(domain)
         givenNewPermissionRequestFromDomain(domain)
@@ -2429,7 +2445,7 @@ class BrowserTabViewModelTest {
     @Test
     fun whenUserChoosesToAlwaysAllowSitePermissionThenGeoPermissionIsAllowed() = coroutineRule.runBlocking {
         val domain = "https://www.example.com/"
-
+        givenDeviceLocationSharingIsEnabled(true)
         givenLocationPermissionIsEnabled(true)
         givenCurrentSite(domain)
         givenUserAlreadySelectedPermissionForDomain(domain, LocationPermissionType.ALLOW_ALWAYS)
@@ -2443,7 +2459,7 @@ class BrowserTabViewModelTest {
     @Test
     fun whenUserChoosesToAlwaysDenySitePermissionThenGeoPermissionIsAllowed() = coroutineRule.runBlocking {
         val domain = "https://www.example.com/"
-
+        givenDeviceLocationSharingIsEnabled(true)
         givenLocationPermissionIsEnabled(true)
         givenCurrentSite(domain)
         givenUserAlreadySelectedPermissionForDomain(domain, LocationPermissionType.DENY_ALWAYS)
@@ -2457,7 +2473,7 @@ class BrowserTabViewModelTest {
     @Test
     fun whenUserChoosesToAllowSitePermissionThenGeoPermissionIsAllowed() = coroutineRule.runBlocking {
         val domain = "https://www.example.com/"
-
+        givenDeviceLocationSharingIsEnabled(true)
         givenLocationPermissionIsEnabled(true)
         givenCurrentSite(domain)
         givenUserAlreadySelectedPermissionForDomain(domain, LocationPermissionType.ALLOW_ONCE)
@@ -2471,7 +2487,7 @@ class BrowserTabViewModelTest {
     @Test
     fun whenUserChoosesToDenySitePermissionThenGeoPermissionIsAllowed() = coroutineRule.runBlocking {
         val domain = "https://www.example.com/"
-
+        givenDeviceLocationSharingIsEnabled(true)
         givenLocationPermissionIsEnabled(true)
         givenCurrentSite(domain)
         givenUserAlreadySelectedPermissionForDomain(domain, LocationPermissionType.DENY_ONCE)
@@ -2485,7 +2501,7 @@ class BrowserTabViewModelTest {
     @Test
     fun whenNewDomainRequestsForPermissionThenUserShouldBeAskedToGivePermission() = coroutineRule.runBlocking {
         val domain = "https://www.example.com/"
-
+        givenDeviceLocationSharingIsEnabled(true)
         givenLocationPermissionIsEnabled(true)
         givenCurrentSite(domain)
         givenNewPermissionRequestFromDomain(domain)
@@ -2498,7 +2514,7 @@ class BrowserTabViewModelTest {
     @Test
     fun whenSystemLocationPermissionIsDeniedThenSitePermissionIsDenied() = coroutineRule.runBlocking {
         val domain = "https://www.example.com/"
-
+        givenDeviceLocationSharingIsEnabled(true)
         givenLocationPermissionIsEnabled(true)
         givenCurrentSite(domain)
         givenNewPermissionRequestFromDomain(domain)
@@ -2512,7 +2528,7 @@ class BrowserTabViewModelTest {
     @Test
     fun whenSystemLocationPermissionIsNeverAllowedThenSitePermissionIsDenied() = coroutineRule.runBlocking {
         val domain = "https://www.example.com/"
-
+        givenDeviceLocationSharingIsEnabled(true)
         givenLocationPermissionIsEnabled(true)
         givenCurrentSite(domain)
         givenNewPermissionRequestFromDomain(domain)
@@ -2527,7 +2543,7 @@ class BrowserTabViewModelTest {
     @Test
     fun whenSystemLocationPermissionIsAllowedThenAppAsksForSystemPermission() = coroutineRule.runBlocking {
         val domain = "https://www.example.com/"
-
+        givenDeviceLocationSharingIsEnabled(true)
         givenLocationPermissionIsEnabled(true)
         givenCurrentSite(domain)
         givenNewPermissionRequestFromDomain(domain)
@@ -2540,7 +2556,7 @@ class BrowserTabViewModelTest {
     @Test
     fun whenUserDeniesSitePermissionThenSitePermissionIsDenied() = coroutineRule.runBlocking {
         val domain = "https://www.example.com/"
-
+        givenDeviceLocationSharingIsEnabled(true)
         givenLocationPermissionIsEnabled(true)
         givenCurrentSite(domain)
         givenNewPermissionRequestFromDomain(domain)
@@ -2556,6 +2572,7 @@ class BrowserTabViewModelTest {
 
         givenUserAlreadySelectedPermissionForDomain(domain, LocationPermissionType.ALLOW_ALWAYS)
         givenCurrentSite(domain)
+        givenDeviceLocationSharingIsEnabled(true)
         givenLocationPermissionIsEnabled(true)
 
         loadUrl("https://www.example.com", isBrowserShowing = true)
@@ -2569,6 +2586,7 @@ class BrowserTabViewModelTest {
 
         givenUserAlreadySelectedPermissionForDomain(domain, LocationPermissionType.DENY_ALWAYS)
         givenCurrentSite(domain)
+        givenDeviceLocationSharingIsEnabled(true)
         givenLocationPermissionIsEnabled(true)
 
         loadUrl("https://www.example.com", isBrowserShowing = true)
@@ -2579,6 +2597,7 @@ class BrowserTabViewModelTest {
     @Test
     fun whenUserVisitsDomainWithoutLocationPermissionThenMessageIsNotShown() = coroutineRule.runBlocking {
         val domain = "https://www.example.com"
+        givenDeviceLocationSharingIsEnabled(true)
         givenLocationPermissionIsEnabled(true)
         givenCurrentSite(domain)
         loadUrl("https://www.example.com", isBrowserShowing = true)
@@ -2589,6 +2608,7 @@ class BrowserTabViewModelTest {
     @Test
     fun whenUserVisitsDomainAndLocationIsNotEnabledThenMessageIsNotShown() = coroutineRule.runBlocking {
         val domain = "https://www.example.com"
+        givenDeviceLocationSharingIsEnabled(true)
         givenLocationPermissionIsEnabled(false)
         givenCurrentSite(domain)
 
@@ -2600,7 +2620,7 @@ class BrowserTabViewModelTest {
     @Test
     fun whenSystemLocationPermissionIsDeniedThenSiteLocationPermissionIsAlwaysDenied() = coroutineRule.runBlocking {
         val domain = "https://www.example.com/"
-
+        givenDeviceLocationSharingIsEnabled(true)
         givenLocationPermissionIsEnabled(true)
         givenCurrentSite(domain)
         givenNewPermissionRequestFromDomain(domain)
@@ -2613,7 +2633,7 @@ class BrowserTabViewModelTest {
     @Test
     fun whenSystemLocationPermissionIsDeniedForeverThenSiteLocationPermissionIsAlwaysDenied() = coroutineRule.runBlocking {
         val domain = "https://www.example.com/"
-
+        givenDeviceLocationSharingIsEnabled(true)
         givenLocationPermissionIsEnabled(true)
         givenCurrentSite(domain)
         givenNewPermissionRequestFromDomain(domain)
@@ -2626,7 +2646,7 @@ class BrowserTabViewModelTest {
     @Test
     fun whenSystemLocationPermissionIsDeniedForeverThenSettingsFlagIsUpdated() = coroutineRule.runBlocking {
         val domain = "https://www.example.com/"
-
+        givenDeviceLocationSharingIsEnabled(true)
         givenLocationPermissionIsEnabled(true)
         givenCurrentSite(domain)
         givenNewPermissionRequestFromDomain(domain)
@@ -2639,7 +2659,7 @@ class BrowserTabViewModelTest {
     @Test
     fun whenSystemLocationIsGrantedThenSettingsFlagIsUpdated() = coroutineRule.runBlocking {
         val domain = "https://www.example.com/"
-
+        givenDeviceLocationSharingIsEnabled(true)
         givenLocationPermissionIsEnabled(true)
         givenCurrentSite(domain)
         givenNewPermissionRequestFromDomain(domain)
@@ -2651,6 +2671,10 @@ class BrowserTabViewModelTest {
 
     private fun givenNewPermissionRequestFromDomain(domain: String) {
         testee.onSiteLocationPermissionRequested(domain, StubPermissionCallback())
+    }
+
+    private fun givenDeviceLocationSharingIsEnabled(state: Boolean){
+        whenever(geoLocationPermissions.isDeviceLocationSharingEnabled()).thenReturn(state)
     }
 
     private fun givenLocationPermissionIsEnabled(state: Boolean) {

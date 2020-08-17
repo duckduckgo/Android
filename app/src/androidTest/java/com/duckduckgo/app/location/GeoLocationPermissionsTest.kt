@@ -67,6 +67,7 @@ class GeoLocationPermissionsTest {
         fireproofWebsiteDao = db.fireproofWebsiteDao()
 
         geoLocationPermissions = GeoLocationPermissionsManager(
+            InstrumentationRegistry.getInstrumentation().targetContext,
             LocationPermissionsRepository(locationPermissionsDao, coroutineRule.testDispatcherProvider),
             FireproofWebsiteRepository(fireproofWebsiteDao, coroutineRule.testDispatcherProvider),
             coroutineRule.testDispatcherProvider
