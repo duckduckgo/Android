@@ -103,10 +103,12 @@ import com.jakewharton.rxrelay2.PublishRelay
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
+import io.reactivex.schedulers.Schedulers.io
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import okhttp3.Dispatcher
 import timber.log.Timber
 import java.io.File
 import java.util.*
@@ -750,6 +752,13 @@ class BrowserTabViewModel(
     }
 
     private suspend fun notifyPermanentLocationPermission(domain: String) {
+        if (!geoLocationPermissions.isDeviceLocationEnabled()) {
+            viewModelScope.launch(dispatchers.io()) {
+                onDeviceLocationDisabled()
+            }
+            return
+        }
+
         if (!appSettingsPreferencesStore.appLocationPermission) {
             return
         }
@@ -837,7 +846,10 @@ class BrowserTabViewModel(
         permissionCallback = callback
         permissionOrigin = origin
 
-        if (!geoLocationPermissions.isDeviceLocationSharingEnabled()) {
+        if (!geoLocationPermissions.isDeviceLocationEnabled()) {
+            viewModelScope.launch(dispatchers.io()) {
+                onDeviceLocationDisabled()
+            }
             onSiteLocationPermissionAlwaysDenied()
             return
         }
@@ -878,7 +890,7 @@ class BrowserTabViewModel(
             }
             LocationPermissionType.ALLOW_ONCE -> {
                 pixel.fire(PixelName.PRECISE_LOCATION_SITE_DIALOG_ALLOW_ONCE)
-                permissionCallback?.invoke(permissionOrigin, true, false)
+                permissionCallback.invoke(permissionOrigin, true, false)
             }
             LocationPermissionType.DENY_ALWAYS -> {
                 pixel.fire(PixelName.PRECISE_LOCATION_SITE_DIALOG_DENY_ALWAYS)
@@ -889,19 +901,23 @@ class BrowserTabViewModel(
             }
             LocationPermissionType.DENY_ONCE -> {
                 pixel.fire(PixelName.PRECISE_LOCATION_SITE_DIALOG_DENY_ONCE)
-                permissionCallback?.invoke(permissionOrigin, false, false)
+                permissionCallback.invoke(permissionOrigin, false, false)
             }
         }
     }
 
     private fun onSiteLocationPermissionAlwaysAllowed() {
         geoLocationPermissions.allow(permissionOrigin)
-        permissionCallback?.invoke(permissionOrigin, true, false)
+        permissionCallback.invoke(permissionOrigin, true, false)
     }
 
     fun onSiteLocationPermissionAlwaysDenied() {
         geoLocationPermissions.clear(permissionOrigin)
-        permissionCallback?.invoke(permissionOrigin, false, false)
+        permissionCallback.invoke(permissionOrigin, false, false)
+    }
+
+    private suspend fun onDeviceLocationDisabled() {
+        geoLocationPermissions.clearAll()
     }
 
     private fun reactToSitePermission(permission: LocationPermissionType) {

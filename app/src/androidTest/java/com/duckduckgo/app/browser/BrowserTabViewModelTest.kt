@@ -2674,7 +2674,7 @@ class BrowserTabViewModelTest {
     }
 
     private fun givenDeviceLocationSharingIsEnabled(state: Boolean) {
-        whenever(geoLocationPermissions.isDeviceLocationSharingEnabled()).thenReturn(state)
+        whenever(geoLocationPermissions.isDeviceLocationEnabled()).thenReturn(state)
     }
 
     private fun givenLocationPermissionIsEnabled(state: Boolean) {

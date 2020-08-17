@@ -18,7 +18,10 @@ package com.duckduckgo.app.location
 
 import android.content.Context
 import android.location.LocationManager
+import android.os.Build
+import android.provider.Settings
 import android.webkit.GeolocationPermissions
+import androidx.core.location.LocationManagerCompat
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepository
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.view.websiteFromGeoLocationsApiOrigin
@@ -27,7 +30,7 @@ import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 interface GeoLocationPermissions {
-    fun isDeviceLocationSharingEnabled(): Boolean
+    fun isDeviceLocationEnabled(): Boolean
     fun allow(domain: String)
     fun clear(domain: String)
     suspend fun clearAll()
@@ -41,11 +44,9 @@ class GeoLocationPermissionsManager @Inject constructor(
     private val dispatchers: DispatcherProvider
 ) : GeoLocationPermissions {
 
-    override fun isDeviceLocationSharingEnabled(): Boolean {
-        val lm: LocationManager = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
-        val gpsLocationEnabled = lm.isProviderEnabled(LocationManager.GPS_PROVIDER)
-        val networkLocationEnabled = lm.isProviderEnabled(LocationManager.NETWORK_PROVIDER)
-        return gpsLocationEnabled || networkLocationEnabled
+    override fun isDeviceLocationEnabled(): Boolean {
+        val locationManager = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
+        return LocationManagerCompat.isLocationEnabled(locationManager)
     }
 
     override fun allow(domain: String) {
