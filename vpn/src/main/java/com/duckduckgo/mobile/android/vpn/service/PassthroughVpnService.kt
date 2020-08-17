@@ -25,7 +25,7 @@ import android.os.Build
 import android.os.IBinder
 import android.os.ParcelFileDescriptor
 import com.duckduckgo.mobile.android.vpn.processor.TunPacketProcessor
-import com.duckduckgo.mobile.android.vpn.processor.udp.TcpPacketProcessor
+import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpPacketProcessor
 import com.duckduckgo.mobile.android.vpn.processor.udp.UdpPacketProcessor
 import com.duckduckgo.mobile.android.vpn.ui.notification.VpnNotificationBuilder
 import kotlinx.coroutines.*
@@ -33,11 +33,13 @@ import timber.log.Timber
 import xyz.hexene.localvpn.Packet
 import java.nio.ByteBuffer
 import java.nio.channels.DatagramChannel
+import java.nio.channels.SocketChannel
 import java.util.concurrent.BlockingQueue
+import java.util.concurrent.ConcurrentLinkedQueue
 import java.util.concurrent.LinkedBlockingQueue
 
 
-class PassthroughVpnService : VpnService(), CoroutineScope by MainScope(), DatagramChannelCreator {
+class PassthroughVpnService : VpnService(), CoroutineScope by MainScope(), NetworkChannelCreator {
 
     val queues = VpnQueues()
 
@@ -45,8 +47,8 @@ class PassthroughVpnService : VpnService(), CoroutineScope by MainScope(), Datag
     private val binder: VpnServiceBinder = VpnServiceBinder()
     private var tunPacketProcessor: TunPacketProcessor? = null
 
-    val udpPacketProcessor = UdpPacketProcessor(this, queues)
-    val tcpPacketProcessor = TcpPacketProcessor(queues)
+    val udpPacketProcessor = UdpPacketProcessor(queues, this)
+    val tcpPacketProcessor = TcpPacketProcessor(queues, this)
 
     inner class VpnServiceBinder : Binder() {
 
@@ -121,9 +123,10 @@ class PassthroughVpnService : VpnService(), CoroutineScope by MainScope(), Datag
 
     private fun establishVpnInterface() {
         tunInterface = Builder().run {
-            addAddress("192.168.0.2", 32)
+            addAddress("10.0.0.2", 32)
             addRoute("0.0.0.0", 0)
-            addDnsServer("8.8.8.8")
+            //addDnsServer("8.8.8.8")
+            addAllowedApplication("com.duckduckgo.networkrequestor")
             configureMeteredConnection()
             establish()
         }
@@ -183,20 +186,29 @@ class PassthroughVpnService : VpnService(), CoroutineScope by MainScope(), Datag
     }
 
     override fun createDatagram(): DatagramChannel {
-        return DatagramChannel.open().also { datagramChannel ->
-            protect(datagramChannel.socket())
-            datagramChannel.configureBlocking(false)
+        return DatagramChannel.open().also { channel ->
+            protect(channel.socket())
+            channel.configureBlocking(false)
+        }
+    }
+
+    override fun createSocket(): SocketChannel {
+        return SocketChannel.open().also { channel ->
+            channel.configureBlocking(false)
+            protect(channel.socket())
         }
     }
 
 }
 
-interface DatagramChannelCreator {
+interface NetworkChannelCreator {
     fun createDatagram(): DatagramChannel
+    fun createSocket(): SocketChannel
 }
 
 class VpnQueues {
     val tcpDeviceToNetwork: BlockingQueue<Packet> = LinkedBlockingQueue()
     val udpDeviceToNetwork: BlockingQueue<Packet> = LinkedBlockingQueue()
-    val networkToDevice: BlockingQueue<ByteBuffer> = LinkedBlockingQueue<ByteBuffer>()
+    //val networkToDevice: BlockingQueue<ByteBuffer> = LinkedBlockingQueue<ByteBuffer>()
+    val networkToDevice: ConcurrentLinkedQueue<ByteBuffer> = ConcurrentLinkedQueue<ByteBuffer>()
 }

@@ -19,7 +19,7 @@ package com.duckduckgo.mobile.android.vpn.processor.udp
 import android.os.Process.THREAD_PRIORITY_URGENT_DISPLAY
 import android.os.Process.setThreadPriority
 import android.os.SystemClock
-import com.duckduckgo.mobile.android.vpn.service.DatagramChannelCreator
+import com.duckduckgo.mobile.android.vpn.service.NetworkChannelCreator
 import com.duckduckgo.mobile.android.vpn.service.VpnQueues
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.Job
@@ -35,8 +35,8 @@ import java.nio.channels.Selector
 import java.util.concurrent.Executors
 
 class UdpPacketProcessor(
-    private val datagramChannelCreator: DatagramChannelCreator,
-    private val queues: VpnQueues
+    private val queues: VpnQueues,
+    private val networkChannelCreator: NetworkChannelCreator
 ) {
 
     private var pollJobDeviceToNetwork: Job? = null
@@ -104,7 +104,7 @@ class UdpPacketProcessor(
         if (packet == null) {
             Timber.v("No packets available %d", System.currentTimeMillis())
         } else {
-            val channel = datagramChannelCreator.createDatagram()
+            val channel = networkChannelCreator.createDatagram()
             val destinationAddress = packet.ip4Header.destinationAddress
             val destinationPort = packet.udpHeader.destinationPort
             channel.connect(InetSocketAddress(destinationAddress, destinationPort))
