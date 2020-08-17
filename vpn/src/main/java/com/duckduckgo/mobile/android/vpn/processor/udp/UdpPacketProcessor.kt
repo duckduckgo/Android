@@ -197,7 +197,7 @@ class UdpPacketProcessor(
 
                     val inputChannel = (key.channel() as DatagramChannel)
                     val readBytes = inputChannel.read(receiveBuffer)
-                    Timber.i("Read %d bytes from datagram channel %s %s", readBytes, inputChannel, String(receiveBuffer.array()))
+                    Timber.i("Read %d bytes from datagram channel %s", readBytes, inputChannel)
 
                     //key.cancel()
                     //inputChannel.close()
