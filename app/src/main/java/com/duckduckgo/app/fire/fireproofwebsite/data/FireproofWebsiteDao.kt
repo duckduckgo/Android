@@ -29,7 +29,7 @@ interface FireproofWebsiteDao {
     fun fireproofWebsitesEntities(): LiveData<List<FireproofWebsiteEntity>>
 
     @Query("select * from fireproofWebsites WHERE domain = :domain")
-    fun getFireproofWebsiteSync(domain: String): FireproofWebsiteEntity
+    fun getFireproofWebsiteSync(domain: String): FireproofWebsiteEntity?
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insert(fireproofWebsiteEntity: FireproofWebsiteEntity): Long

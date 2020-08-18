@@ -18,6 +18,7 @@ package com.duckduckgo.app.global.view
 
 import android.content.Context
 import android.graphics.drawable.Drawable
+import android.net.Uri
 import android.os.Build
 import android.text.Html.*
 import android.text.Spanned
@@ -37,12 +38,16 @@ private fun htmlDrawable(context: Context, resource: Int): Drawable {
 }
 
 private const val HTTPS_PREFIX = "https://"
-private const val WWW_PREFIX = "https://www."
+private const val WWW_PREFIX = "www."
 private const val WWW_SUFFIX = "/"
 
 fun String.websiteFromGeoLocationsApiOrigin(): String {
-    return this.takeIf { it.startsWith(WWW_PREFIX, ignoreCase = true) && it.endsWith(WWW_SUFFIX, ignoreCase = true) }
-        ?.drop(WWW_PREFIX.length)?.dropLast(WWW_SUFFIX.length) ?: this
+    val uri = Uri.parse(this)
+    val host = uri.host ?: return this
+
+    return host.takeIf { it.startsWith(WWW_PREFIX, ignoreCase = true) }
+        ?.drop(WWW_PREFIX.length) ?: host
+
 }
 
 fun String.asLocationPermissionOrigin(): String {

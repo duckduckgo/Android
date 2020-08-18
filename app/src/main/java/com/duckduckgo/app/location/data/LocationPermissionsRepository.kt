@@ -47,13 +47,6 @@ class LocationPermissionsRepository @Inject constructor(
         }
     }
 
-    suspend fun hasUserGivenPermissionTo(domain: String): Boolean {
-        return withContext(dispatchers.io()) {
-            val domainPermission = locationPermissionsDao.getPermission(domain)
-            domainPermission != null
-        }
-    }
-
     suspend fun deletePermission(domain: String) {
         withContext(dispatchers.io()) {
             val entity = locationPermissionsDao.getPermission(domain)
