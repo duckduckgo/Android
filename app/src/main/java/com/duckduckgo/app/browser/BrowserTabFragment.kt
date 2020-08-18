@@ -646,8 +646,13 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
         }
     }
 
+    private fun locationPermissionsHaveNotBeenGranted(): Boolean {
+        return ContextCompat.checkSelfPermission(requireActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED ||
+            ContextCompat.checkSelfPermission(requireActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
+    }
+
     private fun checkSystemLocationPermission(domain: String, deniedForever: Boolean) {
-        if (ContextCompat.checkSelfPermission(requireActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+        if (locationPermissionsHaveNotBeenGranted()) {
             if (deniedForever) {
                 viewModel.onSystemLocationPermissionDeniedOneTime()
             } else {
