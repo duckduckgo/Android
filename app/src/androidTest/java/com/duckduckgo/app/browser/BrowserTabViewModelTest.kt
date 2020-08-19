@@ -2131,34 +2131,24 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenSERPRemovalFeatureIsActiveAndBrowsingDDGSiteAndPrivacyGradeIsVisibleThenShowDaxIconIsTrue() {
-        val serpRemovalVariant = Variant("foo", 100.0, features = listOf(VariantManager.VariantFeature.SerpHeaderRemoval), filterBy = { true })
-        whenever(mockVariantManager.getVariant()).thenReturn(serpRemovalVariant)
+    fun whenBrowsingDDGSiteAndPrivacyGradeIsVisibleThenDaxIconIsVisible() {
         val url = "https://duckduckgo.com?q=test%20search"
         loadUrl(url, isBrowserShowing = true)
         assertTrue(browserViewState().showDaxIcon)
+        assertFalse(browserViewState().showSearchIcon)
     }
 
     @Test
-    fun whenSERPRemovalFeatureIsActiveAndBrowsingNonDDGSiteAndPrivacyGradeIsVisibleThenShowDaxIconIsFalse() {
-        val serpRemovalVariant = Variant("foo", 100.0, features = listOf(VariantManager.VariantFeature.SerpHeaderRemoval), filterBy = { true })
-        whenever(mockVariantManager.getVariant()).thenReturn(serpRemovalVariant)
+    fun whenBrowsingNonDDGSiteAndPrivacyGradeIsVisibleThenDaxIconIsNotVisible() {
         val url = "https://example.com"
         loadUrl(url, isBrowserShowing = true)
         assertFalse(browserViewState().showDaxIcon)
+        assertTrue(browserViewState().showPrivacyGrade)
     }
 
     @Test
-    fun whenSERPRemovalFeatureIsInactiveAndBrowsingDDGSiteAndPrivacyGradeIsVisibleThenShowDaxIconIsFalse() {
-        val url = "https://duckduckgo.com?q=test%20search"
-        loadUrl(url, isBrowserShowing = true)
-        assertFalse(browserViewState().showDaxIcon)
-    }
-
-    @Test
-    fun whenSERPRemovalFeatureIsInactiveAndBrowsingNonDDGSiteAndPrivacyGradeIsVisibleThenShowDaxIconIsFalse() {
-        val url = "https://example.com"
-        loadUrl(url, isBrowserShowing = true)
+    fun whenNotBrowsingAndDDGUrlPresentThenDaxIconIsNotVisible() {
+        loadUrl("https://duckduckgo.com?q=test%20search", isBrowserShowing = false)
         assertFalse(browserViewState().showDaxIcon)
     }
 

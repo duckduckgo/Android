@@ -19,7 +19,6 @@ package com.duckduckgo.app.browser
 import android.net.Uri
 import com.duckduckgo.app.global.AppUrl.ParamKey
 import com.duckduckgo.app.referral.AppReferrerDataStore
-import com.duckduckgo.app.statistics.Variant
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.model.Atb
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
@@ -83,21 +82,10 @@ class DuckDuckGoRequestRewriterTest {
 
     @Test
     fun whenSerpRemovalFeatureIsActiveThenHideParamIsAddedToSerpUrl() {
-        val serpRemovalVariant = Variant("foo", 100.0, features = listOf(VariantManager.VariantFeature.SerpHeaderRemoval), filterBy = { true })
-        whenever(mockVariantManager.getVariant()).thenReturn(serpRemovalVariant)
-
         testee.addCustomQueryParams(builder)
 
         val uri = builder.build()
         assertTrue(uri.queryParameterNames.contains(ParamKey.HIDE_SERP))
-    }
-
-    @Test
-    fun whenSerpRemovalFeatureIsInactiveThenHideParamIsNotAddedToSerpUrl() {
-        testee.addCustomQueryParams(builder)
-
-        val uri = builder.build()
-        assertFalse(uri.queryParameterNames.contains(ParamKey.HIDE_SERP))
     }
 
 }
