@@ -52,6 +52,9 @@ import com.duckduckgo.app.icon.api.IconModifier
 import com.duckduckgo.app.icon.ui.ChangeIconViewModel
 import com.duckduckgo.app.launch.LaunchViewModel
 import com.duckduckgo.app.notification.db.NotificationDao
+import com.duckduckgo.app.location.GeoLocationPermissions
+import com.duckduckgo.app.location.data.LocationPermissionsRepository
+import com.duckduckgo.app.location.ui.LocationPermissionsViewModel
 import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.onboarding.ui.OnboardingPageManager
 import com.duckduckgo.app.onboarding.ui.OnboardingViewModel
@@ -91,6 +94,8 @@ class ViewModelFactory @Inject constructor(
     private val networkLeaderboardDao: NetworkLeaderboardDao,
     private val bookmarksDao: BookmarksDao,
     private val fireproofWebsiteRepository: FireproofWebsiteRepository,
+    private val locationPermissionsRepository: LocationPermissionsRepository,
+    private val geoLocationPermissions: GeoLocationPermissions,
     private val navigationAwareLoginDetector: NavigationAwareLoginDetector,
     private val surveyDao: SurveyDao,
     private val autoCompleteApi: AutoCompleteApi,
@@ -150,6 +155,7 @@ class ViewModelFactory @Inject constructor(
                 isAssignableFrom(DefaultBrowserPageViewModel::class.java) -> defaultBrowserPage()
                 isAssignableFrom(ChangeIconViewModel::class.java) -> changeAppIconViewModel()
                 isAssignableFrom(FireproofWebsitesViewModel::class.java) -> fireproofWebsiteViewModel()
+                isAssignableFrom(LocationPermissionsViewModel::class.java) -> locationPermissionsViewModel()
 
                 else -> throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")
             }
@@ -198,6 +204,8 @@ class ViewModelFactory @Inject constructor(
         networkLeaderboardDao = networkLeaderboardDao,
         bookmarksDao = bookmarksDao,
         fireproofWebsiteRepository = fireproofWebsiteRepository,
+        locationPermissionsRepository = locationPermissionsRepository,
+        geoLocationPermissions = geoLocationPermissions,
         navigationAwareLoginDetector = navigationAwareLoginDetector,
         autoComplete = autoCompleteApi,
         appSettingsPreferencesStore = appSettingsPreferencesStore,
@@ -225,5 +233,14 @@ class ViewModelFactory @Inject constructor(
             dispatcherProvider = dispatcherProvider,
             pixel = pixel,
             settingsDataStore = appSettingsPreferencesStore
+        )
+
+    private fun locationPermissionsViewModel() =
+        LocationPermissionsViewModel(
+            locationPermissionsRepository = locationPermissionsRepository,
+            geoLocationPermissions = geoLocationPermissions,
+            dispatcherProvider = dispatcherProvider,
+            settingsDataStore = appSettingsPreferencesStore,
+            pixel = pixel
         )
 }

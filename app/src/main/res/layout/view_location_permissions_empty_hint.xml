@@ -24,16 +24,16 @@
     android:paddingBottom="24dp">
 
     <com.google.android.material.textview.MaterialTextView
-        android:id="@+id/fireproofWebsiteEmptyHint"
+        android:id="@+id/locationPermissionsEmptyHint"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:fontFamily="sans-serif"
         android:lineSpacingExtra="4sp"
         android:gravity="center"
-        android:textColor="?attr/fireproofWebsiteTitleTextColor"
+        android:textColor="?attr/normalTextColor"
         android:textSize="16sp"
         android:textStyle="normal"
-        android:text="@string/fireproofWebsiteEmptyListHint"
+        android:text="@string/preciseLocationEmptyListHint"
         tools:text="Lorem ipsum dolor sit amet" />
 
 </LinearLayout>

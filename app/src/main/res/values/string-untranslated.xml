@@ -57,4 +57,28 @@
     <!-- Dax Dialog, this string has changed. We have to translate and replace it!! -->
     <string name="daxMainNetworkOwnedCtaText">Heads up! Since %s owns %s, I can\'t stop them from seeing your activity here.&lt;br/&gt;&lt;br/&gt;But browse with me, and I can reduce what %s knows about you overall by blocking their trackers on lots of other sites.</string>
 
+    <!-- Precise Location -->
+    <string name="preciseLocationSystemDialogTitle">Enable device location for DuckDuckGo Privacy Browser?</string>
+    <string name="preciseLocationSystemDialogSubtitle">%s is requesting your device location. You\'ll first need to allow the app to send your device location, then %s can ask permission.</string>
+    <string name="preciseLocationSystemDialogAllow">Enable</string>
+    <string name="preciseLocationSystemDialogDeny">Maybe Later</string>
+    <string name="preciseLocationSystemDialogNeverAllow">Don\'t Ask Again for this Site</string>
+    <string name="preciseLocationSiteDialogTitle">Grant %s permission to access location?</string>
+    <string name="preciseLocationSiteDialogSubtitle">You can manage the location access permissions you’ve granted to individual sites in Settings.</string>
+    <string name="preciseLocationSiteDialogAllowAlways">Always</string>
+    <string name="preciseLocationSiteDialogAllowOnce">Only for this session</string>
+    <string name="preciseLocationSiteDialogDenyAlways">Deny always</string>
+    <string name="preciseLocationSiteDialogDenyOnce">Deny for this session</string>
+    <string name="settingsPreciseLocation">Location</string>
+    <string name="preciseLocationFeatureDescription">Sites you visit may ask to know your device location. They won\'t be able to access it until you explicitly grant permission. DuckDuckGo only uses your location anonymously to deliver local search results.</string>
+    <string name="preciseLocationToggleText">Sites can ask for my location</string>
+    <string name="preciseLocationEmptyListHint">No websites granted permission to access location</string>
+    <string name="preciseLocationNoSystemPermission">To manage the location access permissions you\’ve granted to individual sites, enable location for this app in Android Settings.</string>
+    <string name="preciseLocationActivityTitle">Location</string>
+    <string name="preciseLocationDeleteConfirmMessage">Are you sure you want to delete &lt;b>%s&lt;/b>?</string>
+    <string name="preciseLocationDeleteContentDescription">More options for location permissions in domain %s</string>
+    <string name="preciseLocationAllowedSitesSectionTitle">Granted</string>
+    <string name="preciseLocationDeniedSitesSectionTitle">Denied</string>
+    <string name="preciseLocationSnackbarMessage">You previously granted %s permission to access your device location.</string>
+
 </resources>

@@ -27,6 +27,7 @@ import com.duckduckgo.app.fire.AppCacheClearer
 import com.duckduckgo.app.fire.DuckDuckGoCookieManager
 import com.duckduckgo.app.fire.FireActivity
 import com.duckduckgo.app.fire.UnsentForgetAllPixelStore
+import com.duckduckgo.app.location.GeoLocationPermissions
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.tabs.model.TabRepository
 import kotlinx.coroutines.Dispatchers
@@ -52,7 +53,8 @@ class ClearPersonalDataAction @Inject constructor(
     private val tabRepository: TabRepository,
     private val settingsDataStore: SettingsDataStore,
     private val cookieManager: DuckDuckGoCookieManager,
-    private val appCacheClearer: AppCacheClearer
+    private val appCacheClearer: AppCacheClearer,
+    private val geoLocationPermissions: GeoLocationPermissions
 ) : ClearDataAction {
 
     override fun killAndRestartProcess() {
@@ -68,12 +70,14 @@ class ClearPersonalDataAction @Inject constructor(
     override suspend fun clearTabsAndAllDataAsync(appInForeground: Boolean, shouldFireDataClearPixel: Boolean) {
         withContext(Dispatchers.IO) {
             cookieManager.flush()
+            geoLocationPermissions.clearAllButFireproofed()
             clearTabsAsync(appInForeground)
         }
 
         withContext(Dispatchers.Main) {
             clearDataAsync(shouldFireDataClearPixel)
         }
+
         Timber.i("Finished clearing everything")
     }
 
