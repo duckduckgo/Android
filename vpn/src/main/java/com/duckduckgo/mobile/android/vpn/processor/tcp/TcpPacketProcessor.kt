@@ -18,7 +18,6 @@ package com.duckduckgo.mobile.android.vpn.processor.tcp
 
 import android.os.Process.THREAD_PRIORITY_URGENT_DISPLAY
 import android.os.Process.setThreadPriority
-import android.os.SystemClock
 import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpConnectionInitializer.TcpConnectionParams
 import com.duckduckgo.mobile.android.vpn.service.NetworkChannelCreator
 import com.duckduckgo.mobile.android.vpn.service.VpnQueues
@@ -35,11 +34,13 @@ import java.io.IOException
 import java.nio.ByteBuffer
 import java.nio.channels.SelectionKey
 import java.nio.channels.SelectionKey.OP_READ
+import java.nio.channels.SelectionKey.OP_WRITE
 import java.nio.channels.Selector
 import java.nio.channels.SocketChannel
 import java.util.concurrent.Executors
+import java.util.concurrent.TimeUnit
 
-class TcpPacketProcessor(private val queues: VpnQueues, networkChannelCreator: NetworkChannelCreator) {
+class TcpPacketProcessor(private val queues: VpnQueues, networkChannelCreator: NetworkChannelCreator) : Runnable {
 
     val selector: Selector = Selector.open()
 
@@ -49,7 +50,7 @@ class TcpPacketProcessor(private val queues: VpnQueues, networkChannelCreator: N
     private val connectionInitializer = TcpConnectionInitializer(queues, selector, networkChannelCreator)
 
 
-    fun start() {
+    override fun run() {
         Timber.i("Starting ${this::class.simpleName}")
 
         if (pollJobDeviceToNetwork == null) {
@@ -100,18 +101,15 @@ class TcpPacketProcessor(private val queues: VpnQueues, networkChannelCreator: N
      * Reads data from the network when the selector tells us it has a readable key.
      * When data is read, we add it to the network-to-device queue, which will result in the packet being written back to the TUN.
      */
+    @Suppress("BlockingMethodInNonBlockingContext")
     private fun networkToDeviceProcessing() {
-        Timber.v("Waiting for next network-to-device packet")
-        val startTime = SystemClock.uptimeMillis()
+        val startTime = System.nanoTime()
         val channelsReady = selector.select()
 
         if (channelsReady == 0) {
-            Timber.v("Selector woken up but no channels ready; sleeping again")
-            Thread.sleep(100)
+            Thread.sleep(10)
             return
         }
-
-        Timber.v("Got next network-to-device packet after ${SystemClock.uptimeMillis() - startTime}ms wait")
 
         val iterator = selector.selectedKeys().iterator()
         while (iterator.hasNext()) {
@@ -119,10 +117,35 @@ class TcpPacketProcessor(private val queues: VpnQueues, networkChannelCreator: N
 
             kotlin.runCatching {
                 if (key.isValid && key.isReadable) {
+                    Timber.v("Got next network-to-device packet [isReadable] after ${TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startTime)}ms wait")
                     iterator.remove()
                     processRead(key)
                 } else if (key.isValid && key.isConnectable) {
+                    Timber.v("Got next network-to-device packet [isConnectable] after ${TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startTime)}ms wait")
                     processConnect(key, iterator)
+                } else if (key.isValid && key.isWritable) {
+                    iterator.remove()
+
+                    val (tcb, buffer) = key.attachment() as Pair<TCB, ByteBuffer>
+                    Timber.w("Now is the chance to write some more! $tcb, ${buffer.array().size}")
+
+                    val socket = tcb.channel
+                    var fullWrite = true
+                    while (buffer.hasRemaining()) {
+                        val bytesWritten = socket.write(buffer)
+                        if (bytesWritten == 0) {
+                            Timber.e("Hey2, hey2")
+                            socket.register(selector, OP_WRITE, Pair(tcb, buffer))
+                            fullWrite = false
+                            break
+                        }
+                        if (fullWrite) {
+                            key.interestOps(OP_READ)
+                        }
+                    }
+
+                } else {
+                    Timber.w("Umm, what? ${key.interestOps()}")
                 }
             }.onFailure {
                 Timber.w(it, "Failure processing selected key for selector")
@@ -136,10 +159,11 @@ class TcpPacketProcessor(private val queues: VpnQueues, networkChannelCreator: N
      * Instructs the selector we'll be interested in OP_READ for receiving the response to the packet we write.
      */
     private fun deviceToNetworkProcessing() {
-        Timber.v("Waiting for next device-to-network packet")
-        val startTime = SystemClock.uptimeMillis()
-        val packet = queues.tcpDeviceToNetwork.take()
-        Timber.v("Got next device-to-network packet after ${SystemClock.uptimeMillis() - startTime}ms wait")
+        val packet = queues.tcpDeviceToNetwork.poll()
+        if (packet == null) {
+            Thread.sleep(10)
+            return
+        }
 
         val destinationAddress = packet.ip4Header.destinationAddress
         val destinationPort = packet.tcpHeader.destinationPort
@@ -164,7 +188,6 @@ class TcpPacketProcessor(private val queues: VpnQueues, networkChannelCreator: N
 
         val tcb = TCB.getTCB(connectionKey)
         if (tcb == null) {
-            Timber.i("Need to initialize TCP connection for $connectionKey")
             connectionInitializer.initializeConnection(connectionParams)
         } else {
             when {
@@ -183,8 +206,6 @@ class TcpPacketProcessor(private val queues: VpnQueues, networkChannelCreator: N
     }
 
     private fun processAck(tcb: TCB, payloadBuffer: ByteBuffer, connectionParams: TcpConnectionParams) {
-        Timber.v("Processing ACK packet")
-
         val payloadSize = payloadBuffer.limit() - payloadBuffer.position()
         synchronized(tcb) {
             val socket = tcb.channel as SocketChannel
@@ -209,7 +230,17 @@ class TcpPacketProcessor(private val queues: VpnQueues, networkChannelCreator: N
 
             try {
                 while (payloadBuffer.hasRemaining()) {
-                    socket.write(payloadBuffer)
+                    val bytesWritten = socket.write(payloadBuffer)
+                    if (bytesWritten == 0) {
+                        Timber.e("Hey hey, hey. now what? %d bytes remaining of %d", payloadBuffer.remaining(), payloadSize)
+
+                        selector.wakeup()
+                        socket.register(selector, OP_WRITE, Pair(tcb, payloadBuffer))
+
+                        //the code below assumes a full write... do we need to wait until this has sent before continuing? PROBABLY!
+
+                        break
+                    }
                 }
             } catch (e: IOException) {
                 Timber.w(e, "Network write error")
@@ -222,12 +253,10 @@ class TcpPacketProcessor(private val queues: VpnQueues, networkChannelCreator: N
             tcb.referencePacket.updateTCPBuffer(connectionParams.responseBuffer, TCPHeader.ACK.toByte(), tcb.mySequenceNum, tcb.myAcknowledgementNum, 0)
         }
 
-
         queues.networkToDevice.offer(connectionParams.responseBuffer)
     }
 
     private fun processFin(tcb: TCB, connectionParams: TcpConnectionParams) {
-        Timber.v("Processing FIN packet")
         val packet = tcb.referencePacket
         tcb.myAcknowledgementNum = connectionParams.packet.tcpHeader.sequenceNumber + 1
         tcb.theirAcknowledgementNum = connectionParams.packet.tcpHeader.acknowledgementNumber
@@ -275,14 +304,14 @@ class TcpPacketProcessor(private val queues: VpnQueues, networkChannelCreator: N
             val sourcePort = packet.tcpHeader.sourcePort
             val sourceAddress = packet.ip4Header.sourceAddress
 
-            Timber.i("Network-to-device TCP packet, to be sent to TUN. [destination address: ${destinationAddress.hostAddress}, port: $destinationPort], [source address: $sourceAddress, port: $sourcePort], connection key: ${tcb.ipAndPort}")
-
             val channel = key.channel() as SocketChannel
             try {
                 val readBytes = channel.read(receiveBuffer)
 
                 if (endOfStream(readBytes)) {
                     key.interestOps(0)
+                    tcb.waitingForNetworkData = false
+
                     if (tcb.status != TCB.TCBStatus.CLOSE_WAIT) {
                         ByteBufferPool.release(receiveBuffer)
                         return
@@ -293,6 +322,7 @@ class TcpPacketProcessor(private val queues: VpnQueues, networkChannelCreator: N
                     tcb.mySequenceNum++
                 } else {
                     Timber.v("Read TCP packet from network. $readBytes bytes from ${packet.ip4Header.destinationAddress}")
+
                     packet.updateTCPBuffer(receiveBuffer, (TCPHeader.PSH or TCPHeader.ACK).toByte(), tcb.mySequenceNum, tcb.myAcknowledgementNum, readBytes)
                     tcb.mySequenceNum += readBytes
                     receiveBuffer.position(HEADER_SIZE + readBytes)
@@ -316,7 +346,7 @@ class TcpPacketProcessor(private val queues: VpnQueues, networkChannelCreator: N
         val packet = tcb.referencePacket
         runCatching {
             if (tcb.channel.finishConnect()) {
-                Timber.i("Finished connecting to ${packet.ip4Header.sourceAddress}")
+                Timber.v("Finished connecting to ${packet.ip4Header.sourceAddress}")
 
                 iterator.remove()
                 tcb.status = TCB.TCBStatus.SYN_RECEIVED
@@ -325,6 +355,8 @@ class TcpPacketProcessor(private val queues: VpnQueues, networkChannelCreator: N
                 packet.updateTCPBuffer(responseBuffer, (TCPHeader.SYN or TCPHeader.ACK).toByte(), tcb.mySequenceNum, tcb.myAcknowledgementNum, 0)
                 queues.networkToDevice.offer(responseBuffer)
                 tcb.mySequenceNum++
+
+                //key.selector().wakeup()
                 key.interestOps(OP_READ)
             } else {
                 Timber.v("Not finished connecting yet")

@@ -24,18 +24,24 @@ import android.os.Binder
 import android.os.Build
 import android.os.IBinder
 import android.os.ParcelFileDescriptor
-import com.duckduckgo.mobile.android.vpn.processor.TunPacketProcessor
+import com.duckduckgo.mobile.android.vpn.processor.QueueMonitor
+import com.duckduckgo.mobile.android.vpn.processor.TunPacketReader
+import com.duckduckgo.mobile.android.vpn.processor.TunPacketWriter
 import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpPacketProcessor
 import com.duckduckgo.mobile.android.vpn.processor.udp.UdpPacketProcessor
 import com.duckduckgo.mobile.android.vpn.ui.notification.VpnNotificationBuilder
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.MainScope
 import timber.log.Timber
-import xyz.hexene.localvpn.Packet
+import xyz.hexene.localvpn.*
 import java.nio.ByteBuffer
 import java.nio.channels.DatagramChannel
+import java.nio.channels.Selector
 import java.nio.channels.SocketChannel
 import java.util.concurrent.BlockingQueue
-import java.util.concurrent.ConcurrentLinkedQueue
+import java.util.concurrent.ExecutorService
+import java.util.concurrent.Executors
 import java.util.concurrent.LinkedBlockingQueue
 
 
@@ -45,10 +51,20 @@ class PassthroughVpnService : VpnService(), CoroutineScope by MainScope(), Netwo
 
     private var tunInterface: ParcelFileDescriptor? = null
     private val binder: VpnServiceBinder = VpnServiceBinder()
-    private var tunPacketProcessor: TunPacketProcessor? = null
+
 
     val udpPacketProcessor = UdpPacketProcessor(queues, this)
     val tcpPacketProcessor = TcpPacketProcessor(queues, this)
+
+    private val tcpSelector = Selector.open()
+    private val udpSelector = Selector.open()
+
+    private var executorService: ExecutorService? = null
+    private val tcpInput = TCPInput(queues.networkToDevice, tcpSelector)
+    private val tcpOutput = TCPOutput(queues.tcpDeviceToNetwork, queues.networkToDevice, tcpSelector, this)
+    private val udpOutput = UDPOutput(queues.udpDeviceToNetwork, udpSelector, this)
+    private val udpInput = UDPInput(queues.networkToDevice, udpSelector)
+    //private var tunPacketProcessor: TunPacketProcessor? = null
 
     inner class VpnServiceBinder : Binder() {
 
@@ -96,6 +112,8 @@ class PassthroughVpnService : VpnService(), CoroutineScope by MainScope(), Netwo
         Timber.i("Starting VPN")
         tickerJob?.cancel()
 
+        queues.clearAll()
+
         establishVpnInterface()
 
         tunInterface?.let { vpnInterface ->
@@ -103,11 +121,28 @@ class PassthroughVpnService : VpnService(), CoroutineScope by MainScope(), Netwo
             startForeground(FOREGROUND_VPN_SERVICE_ID, VpnNotificationBuilder.build(this))
             startStatTicker()
 
-            tunPacketProcessor = TunPacketProcessor(vpnInterface, queues).also {
-                GlobalScope.launch {
-                    it.run()
-                }
+            executorService?.shutdownNow()
+            val processors = listOf(
+                //QueueMonitor(queues),
+                //tcpInput,
+                //tcpOutput,
+                tcpPacketProcessor,
+                udpInput,
+                udpOutput,
+                TunPacketReader(vpnInterface, queues),
+                TunPacketWriter(vpnInterface, queues)
+            )
+            executorService = Executors.newFixedThreadPool(processors.size).also { executorService ->
+                processors.forEach { executorService.submit(it) }
             }
+
+            //tunPacketProcessor = TunPacketProcessor(vpnInterface, queues).also { executorService.submit(it) }
+
+//            tunPacketProcessor = TunPacketProcessor(vpnInterface, queues).also {
+//                GlobalScope.launch(Executors.newSingleThreadExecutor().asCoroutineDispatcher()) {
+//                    it.run()
+//                }
+//            }
         }
     }
 
@@ -125,8 +160,12 @@ class PassthroughVpnService : VpnService(), CoroutineScope by MainScope(), Netwo
         tunInterface = Builder().run {
             addAddress("10.0.0.2", 32)
             addRoute("0.0.0.0", 0)
+            setBlocking(true)
             //addDnsServer("8.8.8.8")
             addAllowedApplication("com.duckduckgo.networkrequestor")
+            addAllowedApplication("meteor.test.and.grade.internet.connection.speed")
+            addAllowedApplication("org.zwanoo.android.speedtest")
+            addAllowedApplication("com.netflix.Speedtest")
             configureMeteredConnection()
             establish()
         }
@@ -136,7 +175,9 @@ class PassthroughVpnService : VpnService(), CoroutineScope by MainScope(), Netwo
     private fun stopVpn() {
         Timber.i("Stopping VPN")
         tickerJob?.cancel()
-        tunPacketProcessor?.stop()
+        queues.clearAll()
+        //tunPacketProcessor?.stop()
+        executorService?.shutdownNow()
         udpPacketProcessor.stop()
         tcpPacketProcessor.stop()
         tunInterface?.close()
@@ -209,6 +250,13 @@ interface NetworkChannelCreator {
 class VpnQueues {
     val tcpDeviceToNetwork: BlockingQueue<Packet> = LinkedBlockingQueue()
     val udpDeviceToNetwork: BlockingQueue<Packet> = LinkedBlockingQueue()
-    //val networkToDevice: BlockingQueue<ByteBuffer> = LinkedBlockingQueue<ByteBuffer>()
-    val networkToDevice: ConcurrentLinkedQueue<ByteBuffer> = ConcurrentLinkedQueue<ByteBuffer>()
+
+    val networkToDevice: BlockingQueue<ByteBuffer> = LinkedBlockingQueue<ByteBuffer>()
+    //val networkToDevice: ConcurrentLinkedQueue<ByteBuffer> = ConcurrentLinkedQueue()
+
+    fun clearAll() {
+        tcpDeviceToNetwork.clear()
+        udpDeviceToNetwork.clear()
+        networkToDevice.clear()
+    }
 }

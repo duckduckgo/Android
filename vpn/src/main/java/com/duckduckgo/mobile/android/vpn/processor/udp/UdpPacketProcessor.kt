@@ -22,10 +22,7 @@ import android.os.SystemClock
 import android.util.LruCache
 import com.duckduckgo.mobile.android.vpn.service.NetworkChannelCreator
 import com.duckduckgo.mobile.android.vpn.service.VpnQueues
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.asCoroutineDispatcher
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import timber.log.Timber
 import xyz.hexene.localvpn.ByteBufferPool
 import xyz.hexene.localvpn.Packet
@@ -35,6 +32,7 @@ import java.nio.channels.DatagramChannel
 import java.nio.channels.SelectionKey
 import java.nio.channels.Selector
 import java.util.concurrent.Executors
+import java.util.concurrent.TimeUnit
 
 class UdpPacketProcessor(
     private val queues: VpnQueues,
@@ -80,7 +78,7 @@ class UdpPacketProcessor(
         channelCache.evictAll()
     }
 
-    private fun pollForDeviceToNetworkWork() {
+    private suspend fun pollForDeviceToNetworkWork() {
         setThreadPriority(THREAD_PRIORITY_URGENT_DISPLAY)
 
         try {
@@ -97,7 +95,7 @@ class UdpPacketProcessor(
         }
     }
 
-    private fun pollForNetworkToDeviceWork() {
+    private suspend fun pollForNetworkToDeviceWork() {
         setThreadPriority(THREAD_PRIORITY_URGENT_DISPLAY)
 
         while (pollJobNetworkToDevice?.isActive == true) {
@@ -113,42 +111,40 @@ class UdpPacketProcessor(
      * Reads from the device-to-network queue. For any packets in this queue, a new DatagramChannel is created and the packet is written.
      * Instructs the selector we'll be interested in OP_READ for receiving the response to the packet we write.
      */
-    private fun deviceToNetworkProcessing() {
-        Timber.v("Waiting for next device-to-network packet")
-        val startTime = SystemClock.uptimeMillis()
-        val packet = queues.udpDeviceToNetwork.take()
-        Timber.v("Got next device-to-network packet after ${SystemClock.uptimeMillis() - startTime}ms wait")
+    private suspend fun deviceToNetworkProcessing() {
+        val packet = queues.udpDeviceToNetwork.poll()
         if (packet == null) {
-            Timber.v("No packets available %d", System.currentTimeMillis())
-        } else {
-            val destinationAddress = packet.ip4Header.destinationAddress
-            val destinationPort = packet.udpHeader.destinationPort
-            val cacheKey = generateCacheKey(packet)
+            delay(10)
+            return
+        }
 
-            var channel = channelCache[cacheKey]
+        val destinationAddress = packet.ip4Header.destinationAddress
+        val destinationPort = packet.udpHeader.destinationPort
+        val cacheKey = generateCacheKey(packet)
+
+        var channel = channelCache[cacheKey]
+        if (channel == null) {
+            channel = createChannel(InetSocketAddress(destinationAddress, destinationPort), cacheKey)
             if (channel == null) {
-                channel = createChannel(InetSocketAddress(destinationAddress, destinationPort), cacheKey)
-                if (channel == null) {
-                    ByteBufferPool.release(packet.backingBuffer)
-                    return
-                }
+                ByteBufferPool.release(packet.backingBuffer)
+                return
             }
+        }
 
-            packet.swapSourceAndDestination()
+        packet.swapSourceAndDestination()
 
-            selector.wakeup()
-            channel.register(selector, SelectionKey.OP_READ, packet)
+        selector.wakeup()
+        channel.register(selector, SelectionKey.OP_READ, packet)
 
-            try {
-                val payloadBuffer = packet.backingBuffer
-                while (payloadBuffer.hasRemaining()) {
-                    val bytesWritten = channel.write(payloadBuffer)
-                    Timber.v("Wrote %d bytes to network (%s:%d)", bytesWritten, destinationAddress, destinationPort)
-                }
-            } catch (e: IOException) {
-                Timber.w("Network write error")
-                channelCache.remove(cacheKey)
+        try {
+            val payloadBuffer = packet.backingBuffer
+            while (payloadBuffer.hasRemaining()) {
+                val bytesWritten = channel.write(payloadBuffer)
+                Timber.v("Wrote %d bytes to network (%s:%d)", bytesWritten, destinationAddress, destinationPort)
             }
+        } catch (e: IOException) {
+            Timber.w("Network write error")
+            channelCache.remove(cacheKey)
         }
     }
 
@@ -170,19 +166,15 @@ class UdpPacketProcessor(
      * Reads data from the network when the selector tells us it has a readable key.
      * When data is read, we add it to the network-to-device queue, which will result in the packet being written back to the TUN.
      */
-    private fun networkToDeviceProcessing() {
-        Timber.v("Waiting for next network-to-device packet")
+    @Suppress("BlockingMethodInNonBlockingContext")
+    private suspend fun networkToDeviceProcessing() {
         val startTime = SystemClock.uptimeMillis()
-        val channelsReady = selector.select()
-        Timber.v("Selected channels: $channelsReady")
+        val channelsReady = selector.select(TimeUnit.SECONDS.toMillis(1))
 
         if (channelsReady == 0) {
-            Timber.v("Selector woken up but no channels ready; sleeping again")
-            Thread.sleep(10)
+            delay(10)
             return
         }
-
-        Timber.v("Got next network-to-device packet after ${SystemClock.uptimeMillis() - startTime}ms wait")
 
         val iterator = selector.selectedKeys().iterator()
         while (iterator.hasNext()) {
@@ -192,15 +184,14 @@ class UdpPacketProcessor(
                 if (key.isValid && key.isReadable) {
                     iterator.remove()
 
+                    Timber.v("Got next network-to-device packet [isReadable] after ${SystemClock.uptimeMillis() - startTime}ms wait")
+
                     val receiveBuffer = ByteBufferPool.acquire()
                     receiveBuffer.position(Packet.IP4_HEADER_SIZE + Packet.UDP_HEADER_SIZE)
 
                     val inputChannel = (key.channel() as DatagramChannel)
                     val readBytes = inputChannel.read(receiveBuffer)
                     Timber.i("Read %d bytes from datagram channel %s", readBytes, inputChannel)
-
-                    //key.cancel()
-                    //inputChannel.close()
 
                     val referencePacket = key.attachment() as Packet
                     referencePacket.updateUDPBuffer(receiveBuffer, readBytes)

@@ -16,6 +16,7 @@
 
 package com.duckduckgo.mobile.android.vpn.processor.tcp
 
+import com.duckduckgo.mobile.android.vpn.processor.QueuedBuffer
 import com.duckduckgo.mobile.android.vpn.service.NetworkChannelCreator
 import com.duckduckgo.mobile.android.vpn.service.VpnQueues
 import timber.log.Timber
@@ -29,11 +30,14 @@ import java.nio.channels.Selector
 import java.nio.channels.SocketChannel
 import kotlin.random.Random
 
-class TcpConnectionInitializer constructor(private val queues: VpnQueues, private val selector: Selector, private val networkChannelCreator: NetworkChannelCreator) {
+class TcpConnectionInitializer constructor(
+    private val queues: VpnQueues,
+    private val selector: Selector,
+    private val networkChannelCreator: NetworkChannelCreator
+) {
 
     fun initializeConnection(params: TcpConnectionParams) {
         val key = params.key()
-        Timber.v("Initializing TCP connection for $key")
 
         val header = params.packet.tcpHeader
         params.packet.swapSourceAndDestination()
@@ -47,20 +51,21 @@ class TcpConnectionInitializer constructor(private val queues: VpnQueues, privat
         Timber.i("Initializing connection. packet type:\tsyn=$isSyn,\tack=$isAck,\tfin=$isFin,\tpsh=$isPsh,\trst=$isRst,\turg=$isUrg. key=$key")
 
         if (header.isSYN) {
-            Timber.v("is SYN request")
             val channel = networkChannelCreator.createSocket()
             val sequenceNumber = Random.nextLong(Short.MAX_VALUE.toLong() + 1)
             val sequenceFromPacket = header.sequenceNumber
             val ackNumber = header.sequenceNumber + 1
             val ackFromPacket = header.acknowledgementNumber
 
-            val tcb = TCB(key,
+            val tcb = TCB(
+                key,
                 sequenceNumber,
                 sequenceFromPacket,
                 ackNumber,
                 ackFromPacket,
                 channel,
-                params.packet)
+                params.packet
+            )
             TCB.putTCB(params.key(), tcb)
             connect(tcb, channel, params)
         } else {
@@ -73,13 +78,13 @@ class TcpConnectionInitializer constructor(private val queues: VpnQueues, privat
     private fun connect(tcb: TCB, channel: SocketChannel, params: TcpConnectionParams) {
         channel.connect(InetSocketAddress(params.destinationAddress, params.destinationPort))
         if (channel.finishConnect()) {
-            Timber.i("Channel finished connecting to ${params.destinationAddress}")
+            Timber.v("Channel finished connecting to ${params.destinationAddress}")
             tcb.status = TCB.TCBStatus.SYN_RECEIVED
             params.packet.updateTCPBuffer(params.responseBuffer, (TCPHeader.SYN or TCPHeader.ACK).toByte(), tcb.mySequenceNum, tcb.myAcknowledgementNum, 0)
             tcb.mySequenceNum++
             queues.networkToDevice.offer(params.responseBuffer)
         } else {
-            Timber.i("Not finished connecting yet to ${params.destinationAddress}, will register for OP_CONNECT event")
+            Timber.v("Not finished connecting yet to ${params.destinationAddress}, will register for OP_CONNECT event")
             tcb.status = TCB.TCBStatus.SYN_SENT
             selector.wakeup()
             tcb.selectionKey = channel.register(selector, SelectionKey.OP_CONNECT, tcb)

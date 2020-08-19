@@ -26,18 +26,16 @@ import java.io.FileOutputStream
 import java.io.IOException
 import java.nio.ByteBuffer
 import java.nio.channels.FileChannel
-import java.util.concurrent.TimeUnit
+import java.nio.channels.Selector
+import java.nio.channels.SocketChannel
 
 
-class TunPacketProcessor(
-    private val tunInterface: ParcelFileDescriptor,
-    private val queues: VpnQueues
-) {
+class TunPacketProcessor(private val tunInterface: ParcelFileDescriptor, private val queues: VpnQueues) : Runnable {
 
     private var running = false
     var bufferToNetwork = byteBuffer()
 
-    fun run() {
+    override fun run() {
         Timber.w("TunPacketProcess started")
 
         running = true
@@ -55,10 +53,11 @@ class TunPacketProcessor(
                 val dataReceived = executeWriteLoop(vpnOutput)
 
                 if (!dataSentPreviously && !dataReceived) {
-                    Thread.sleep(10)
+                    Thread.sleep(100)
                 }
             }
-        } catch (e: IOException) {
+        }
+        catch (e: Throwable) {
             Timber.w(e, "Failed while reading or writing from the TUN")
             running = false
         } finally {
@@ -69,43 +68,48 @@ class TunPacketProcessor(
     }
 
     private fun executeReadLoop(vpnInput: FileChannel, dataSentPreviously: Boolean): Boolean {
-        if(dataSentPreviously) {
+        if (dataSentPreviously) {
             bufferToNetwork = byteBuffer()
         } else {
             bufferToNetwork.clear()
         }
 
-        val dataSent : Boolean
         val inPacketLength = vpnInput.read(bufferToNetwork)
-
-        if (inPacketLength > 0) {
-            dataSent = true
-            bufferToNetwork.flip()
-            val packet = Packet(bufferToNetwork)
-            if (packet.isUDP) {
-                queues.udpDeviceToNetwork.offer(packet)
-            } else if (packet.isTCP) {
-                queues.tcpDeviceToNetwork.offer(packet)
-            }
-        } else {
-            dataSent = false
+        if (inPacketLength == 0) {
+            return false
         }
-        return dataSent
+
+        bufferToNetwork.flip()
+        val packet = Packet(bufferToNetwork)
+        if (packet.isUDP) {
+            queues.udpDeviceToNetwork.offer(packet)
+        } else if (packet.isTCP) {
+            queues.tcpDeviceToNetwork.offer(packet)
+        }
+        return true
     }
 
     private fun executeWriteLoop(vpnOutput: FileChannel): Boolean {
-        val bufferFromNetwork = queues.networkToDevice.poll() ?: return false
+        try {
+            val bufferFromNetwork = queues.networkToDevice.poll() ?: return false
+            bufferFromNetwork.flip()
 
-        bufferFromNetwork.flip()
-        var dataReceived = false
-        while (bufferFromNetwork.hasRemaining()) {
-            val bytesWrittenToVpn = vpnOutput.write(bufferFromNetwork)
-            if (bytesWrittenToVpn > 0) dataReceived = true
+            var dataReceived = false
+            while (bufferFromNetwork.hasRemaining()) {
+                val bytesWrittenToVpn = vpnOutput.write(bufferFromNetwork)
+                if (bytesWrittenToVpn == 0) {
+                    Timber.w("Failed to write any bytes to TUN")
+                }
+                if (bytesWrittenToVpn > 0) dataReceived = true
+            }
+
+            ByteBufferPool.release(bufferFromNetwork)
+
+            return dataReceived
+        } catch (e: IOException) {
+            Timber.w(e, "Failed writing to the TUN")
+            return false
         }
-
-        ByteBufferPool.release(bufferFromNetwork)
-
-        return dataReceived
     }
 
     private fun byteBuffer(): ByteBuffer {

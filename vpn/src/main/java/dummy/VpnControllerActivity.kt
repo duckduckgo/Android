@@ -28,6 +28,7 @@ import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import com.duckduckgo.mobile.android.vpn.service.PassthroughVpnService
 import com.duckduckgo.mobile.android.vpn.R
+import com.duckduckgo.mobile.android.vpn.processor.QueuedPacket
 import kotlinx.coroutines.*
 import timber.log.Timber
 import xyz.hexene.localvpn.Packet
@@ -70,8 +71,8 @@ class VpnControllerActivity : AppCompatActivity(R.layout.activity_vpn_controller
             if (vpnService == null) {
                 Toast.makeText(this, "VPN Service not bound yet", Toast.LENGTH_SHORT).show()
             } else {
-                vpnService?.udpPacketProcessor?.start()
-                vpnService?.tcpPacketProcessor?.start()
+                //vpnService?.udpPacketProcessor?.start()
+                //vpnService?.tcpPacketProcessor?.start()
             }
         }
         processorStopButton.setOnClickListener {
