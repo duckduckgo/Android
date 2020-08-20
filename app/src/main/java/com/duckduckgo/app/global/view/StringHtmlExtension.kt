@@ -22,6 +22,7 @@ import android.net.Uri
 import android.os.Build
 import android.text.Html.*
 import android.text.Spanned
+import androidx.core.content.ContextCompat
 
 @Suppress("deprecation")
 fun String.html(context: Context): Spanned {
@@ -31,10 +32,10 @@ fun String.html(context: Context): Spanned {
     return fromHtml(this, ImageGetter { htmlDrawable(context, it.toInt()) }, null)
 }
 
-private fun htmlDrawable(context: Context, resource: Int): Drawable {
-    val drawable = context.getDrawable(resource)
-    drawable.setBounds(0, 0, drawable.intrinsicWidth, drawable.intrinsicHeight)
-    return drawable
+private fun htmlDrawable(context: Context, resource: Int): Drawable? {
+    return ContextCompat.getDrawable(context, resource)?.also {
+        it.setBounds(0, 0, it.intrinsicWidth, it.intrinsicHeight)
+    }
 }
 
 private const val HTTPS_PREFIX = "https://"
