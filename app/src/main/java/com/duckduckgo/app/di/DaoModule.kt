@@ -85,4 +85,7 @@ class DaoModule {
 
     @Provides
     fun userEventsDao(database: AppDatabase) = database.userEventsDao()
+
+    @Provides
+    fun locationPermissionsDao(database: AppDatabase) = database.locationPermissionsDao()
 }

@@ -41,6 +41,7 @@ import com.duckduckgo.app.global.ApplicationClearDataState
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.intentText
 import com.duckduckgo.app.global.view.*
+import com.duckduckgo.app.location.ui.LocationPermissionsActivity
 import com.duckduckgo.app.onboarding.ui.page.DefaultBrowserPage
 import com.duckduckgo.app.playstore.PlayStoreUtils
 import com.duckduckgo.app.privacy.ui.PrivacyDashboardActivity
@@ -314,6 +315,10 @@ class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope() {
 
     fun launchSettings() {
         startActivity(SettingsActivity.intent(this))
+    }
+
+    fun launchLocationSettings() {
+        startActivity(LocationPermissionsActivity.intent(this))
     }
 
     fun launchBookmarks() {

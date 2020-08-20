@@ -20,9 +20,14 @@ import android.content.Context
 import androidx.work.WorkManager
 import com.duckduckgo.app.browser.WebDataManager
 import com.duckduckgo.app.fire.*
+import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepository
+import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.file.FileDeleter
 import com.duckduckgo.app.global.view.ClearDataAction
 import com.duckduckgo.app.global.view.ClearPersonalDataAction
+import com.duckduckgo.app.location.GeoLocationPermissions
+import com.duckduckgo.app.location.GeoLocationPermissionsManager
+import com.duckduckgo.app.location.data.LocationPermissionsRepository
 import com.duckduckgo.app.privacy.model.PrivacyPractices
 import com.duckduckgo.app.privacy.model.PrivacyPracticesImpl
 import com.duckduckgo.app.privacy.store.TermsOfServiceStore
@@ -57,9 +62,19 @@ class PrivacyModule {
         tabRepository: TabRepository,
         settingsDataStore: SettingsDataStore,
         cookieManager: DuckDuckGoCookieManager,
-        appCacheClearer: AppCacheClearer
+        appCacheClearer: AppCacheClearer,
+        geoLocationPermissions: GeoLocationPermissions
     ): ClearDataAction {
-        return ClearPersonalDataAction(context, dataManager, clearingStore, tabRepository, settingsDataStore, cookieManager, appCacheClearer)
+        return ClearPersonalDataAction(
+            context,
+            dataManager,
+            clearingStore,
+            tabRepository,
+            settingsDataStore,
+            cookieManager,
+            appCacheClearer,
+            geoLocationPermissions
+        )
     }
 
     @Provides
@@ -83,5 +98,16 @@ class PrivacyModule {
     @Singleton
     fun appCacheCleaner(context: Context, fileDeleter: FileDeleter): AppCacheClearer {
         return AndroidAppCacheClearer(context, fileDeleter)
+    }
+
+    @Provides
+    @Singleton
+    fun geoLocationPermissions(
+        context: Context,
+        locationPermissionsRepository: LocationPermissionsRepository,
+        fireproofWebsiteRepository: FireproofWebsiteRepository,
+        dispatcherProvider: DispatcherProvider
+    ): GeoLocationPermissions {
+        return GeoLocationPermissionsManager(context, locationPermissionsRepository, fireproofWebsiteRepository, dispatcherProvider)
     }
 }

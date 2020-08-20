@@ -23,6 +23,7 @@ import android.os.Message
 import android.view.ContextMenu
 import android.view.MenuItem
 import android.view.View
+import android.webkit.GeolocationPermissions
 import android.webkit.ValueCallback
 import android.webkit.WebChromeClient
 import android.webkit.WebView
@@ -72,8 +73,14 @@ import com.duckduckgo.app.global.model.domainMatchesUrl
 import com.duckduckgo.app.global.useourapp.UseOurAppDetector
 import com.duckduckgo.app.global.useourapp.UseOurAppDetector.Companion.USE_OUR_APP_SHORTCUT_TITLE
 import com.duckduckgo.app.global.useourapp.UseOurAppDetector.Companion.USE_OUR_APP_SHORTCUT_URL
+import com.duckduckgo.app.global.view.asLocationPermissionOrigin
 import com.duckduckgo.app.notification.db.NotificationDao
 import com.duckduckgo.app.notification.model.UseOurAppNotification
+import com.duckduckgo.app.location.GeoLocationPermissions
+import com.duckduckgo.app.location.data.LocationPermissionType
+import com.duckduckgo.app.location.data.LocationPermissionsRepository
+import com.duckduckgo.app.location.ui.SiteLocationPermissionDialog
+import com.duckduckgo.app.location.ui.SystemLocationPermissionDialog
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao
 import com.duckduckgo.app.privacy.db.UserWhitelistDao
 import com.duckduckgo.app.privacy.model.PrivacyGrade
@@ -93,6 +100,7 @@ import com.jakewharton.rxrelay2.PublishRelay
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
+import io.reactivex.schedulers.Schedulers.io
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
@@ -112,6 +120,8 @@ class BrowserTabViewModel(
     private val networkLeaderboardDao: NetworkLeaderboardDao,
     private val bookmarksDao: BookmarksDao,
     private val fireproofWebsiteRepository: FireproofWebsiteRepository,
+    private val locationPermissionsRepository: LocationPermissionsRepository,
+    private val geoLocationPermissions: GeoLocationPermissions,
     private val navigationAwareLoginDetector: NavigationAwareLoginDetector,
     private val autoComplete: AutoComplete,
     private val appSettingsPreferencesStore: SettingsDataStore,
@@ -129,7 +139,8 @@ class BrowserTabViewModel(
     private val useOurAppDetector: UseOurAppDetector,
     private val variantManager: VariantManager,
     private val fileDownloader: FileDownloader
-) : WebViewClientListener, EditBookmarkListener, HttpAuthenticationListener, ViewModel() {
+) : WebViewClientListener, EditBookmarkListener, HttpAuthenticationListener, SiteLocationPermissionDialog.SiteLocationPermissionDialogListener,
+    SystemLocationPermissionDialog.SystemLocationPermissionDialogListener, ViewModel() {
 
     private var buildingSiteFactoryJob: Job? = null
 
@@ -213,6 +224,8 @@ class BrowserTabViewModel(
         val searchResults: AutoCompleteResult = AutoCompleteResult("", emptyList())
     )
 
+    data class LocationPermission(val origin: String, val callback: GeolocationPermissions.Callback)
+
     sealed class Command {
         object Refresh : Command()
         class Navigate(val url: String) : Command()
@@ -250,9 +263,12 @@ class BrowserTabViewModel(
         object LaunchTabSwitcher : Command()
         object HideWebContent : Command()
         object ShowWebContent : Command()
+        class CheckSystemLocationPermission(val domain: String, val deniedForever: Boolean) : Command()
+        class AskDomainPermission(val domain: String) : Command()
+        object RequestSystemLocationPermission : Command()
         class RefreshUserAgent(val host: String?, val isDesktop: Boolean) : Command()
-
         class ShowErrorWithAction(val textResId: Int, val action: () -> Unit) : Command()
+        class ShowDomainHasPermissionMessage(val domain: String) : Command()
         sealed class DaxCommand : Command() {
             object FinishTrackerAnimation : DaxCommand()
             class HideDaxDialog(val cta: Cta) : DaxCommand()
@@ -286,6 +302,8 @@ class BrowserTabViewModel(
 
     val title: String?
         get() = site?.title
+
+    private var locationPermission: LocationPermission? = null
 
     private val autoCompletePublishSubject = PublishRelay.create<String>()
     private val fireproofWebsiteState: LiveData<List<FireproofWebsiteEntity>> = fireproofWebsiteRepository.getFireproofWebsites()
@@ -508,7 +526,6 @@ class BrowserTabViewModel(
         } else {
             pixel.fire(String.format(Locale.US, PixelName.SERP_REQUERY.pixelName, PixelParameter.SERP_QUERY_CHANGED))
         }
-
     }
 
     private fun shouldClearHistoryOnNewQuery(): Boolean {
@@ -696,6 +713,10 @@ class BrowserTabViewModel(
 
         domain?.let { viewModelScope.launch { updateLoadingStatePrivacy(domain) } }
         domain?.let { viewModelScope.launch { updateWhitelistedState(domain) } }
+
+        val permissionOrigin = site?.uri?.host?.asLocationPermissionOrigin()
+        permissionOrigin?.let { viewModelScope.launch { notifyPermanentLocationPermission(permissionOrigin) } }
+
         registerSiteVisit()
     }
 
@@ -746,6 +767,26 @@ class BrowserTabViewModel(
 
     private suspend fun isWhitelisted(domain: String): Boolean {
         return withContext(dispatchers.io()) { userWhitelistDao.contains(domain) }
+    }
+
+    private suspend fun notifyPermanentLocationPermission(domain: String) {
+        if (!geoLocationPermissions.isDeviceLocationEnabled()) {
+            viewModelScope.launch(dispatchers.io()) {
+                onDeviceLocationDisabled()
+            }
+            return
+        }
+
+        if (!appSettingsPreferencesStore.appLocationPermission) {
+            return
+        }
+
+        val permissionEntity = locationPermissionsRepository.getDomainPermission(domain)
+        permissionEntity?.let {
+            if (it.permission == LocationPermissionType.ALLOW_ALWAYS) {
+                command.postValue(ShowDomainHasPermissionMessage(domain))
+            }
+        }
     }
 
     private fun urlUpdated(url: String) {
@@ -817,6 +858,156 @@ class BrowserTabViewModel(
         if (newProgress == 100) {
             navigationAwareLoginDetector.onEvent(NavigationEvent.PageFinished)
         }
+    }
+
+    override fun onSiteLocationPermissionRequested(origin: String, callback: GeolocationPermissions.Callback) {
+        locationPermission = LocationPermission(origin, callback)
+
+        if (!geoLocationPermissions.isDeviceLocationEnabled()) {
+            viewModelScope.launch(dispatchers.io()) {
+                onDeviceLocationDisabled()
+            }
+            onSiteLocationPermissionAlwaysDenied()
+            return
+        }
+
+        if (site?.domainMatchesUrl(origin) == false) {
+            onSiteLocationPermissionAlwaysDenied()
+            return
+        }
+
+        if (!appSettingsPreferencesStore.appLocationPermission) {
+            onSiteLocationPermissionAlwaysDenied()
+            return
+        }
+
+        viewModelScope.launch {
+            val previouslyDeniedForever = appSettingsPreferencesStore.appLocationPermissionDeniedForever
+            val permissionEntity = locationPermissionsRepository.getDomainPermission(origin)
+            if (permissionEntity == null) {
+                command.postValue(CheckSystemLocationPermission(origin, previouslyDeniedForever))
+            } else {
+                if (permissionEntity.permission == LocationPermissionType.DENY_ALWAYS) {
+                    onSiteLocationPermissionAlwaysDenied()
+                } else {
+                    command.postValue(CheckSystemLocationPermission(origin, previouslyDeniedForever))
+                }
+            }
+        }
+    }
+
+    override fun onSiteLocationPermissionSelected(domain: String, permission: LocationPermissionType) {
+        locationPermission?.let { locationPermission ->
+            when (permission) {
+                LocationPermissionType.ALLOW_ALWAYS -> {
+                    onSiteLocationPermissionAlwaysAllowed()
+                    pixel.fire(PixelName.PRECISE_LOCATION_SITE_DIALOG_ALLOW_ALWAYS)
+                    viewModelScope.launch {
+                        locationPermissionsRepository.savePermission(domain, permission)
+                    }
+                }
+                LocationPermissionType.ALLOW_ONCE -> {
+                    pixel.fire(PixelName.PRECISE_LOCATION_SITE_DIALOG_ALLOW_ONCE)
+                    locationPermission.callback.invoke(locationPermission.origin, true, false)
+                }
+                LocationPermissionType.DENY_ALWAYS -> {
+                    pixel.fire(PixelName.PRECISE_LOCATION_SITE_DIALOG_DENY_ALWAYS)
+                    onSiteLocationPermissionAlwaysDenied()
+                    viewModelScope.launch {
+                        locationPermissionsRepository.savePermission(domain, permission)
+                    }
+                }
+                LocationPermissionType.DENY_ONCE -> {
+                    pixel.fire(PixelName.PRECISE_LOCATION_SITE_DIALOG_DENY_ONCE)
+                    locationPermission.callback.invoke(locationPermission.origin, false, false)
+                }
+            }
+        }
+    }
+
+    private fun onSiteLocationPermissionAlwaysAllowed() {
+        locationPermission?.let { locationPermission ->
+            geoLocationPermissions.allow(locationPermission.origin)
+            locationPermission.callback.invoke(locationPermission.origin, true, false)
+        }
+    }
+
+    fun onSiteLocationPermissionAlwaysDenied() {
+        locationPermission?.let { locationPermission ->
+            geoLocationPermissions.clear(locationPermission.origin)
+            locationPermission.callback.invoke(locationPermission.origin, false, false)
+        }
+    }
+
+    private suspend fun onDeviceLocationDisabled() {
+        geoLocationPermissions.clearAll()
+    }
+
+    private fun reactToSitePermission(permission: LocationPermissionType) {
+        locationPermission?.let { locationPermission ->
+            when (permission) {
+                LocationPermissionType.ALLOW_ALWAYS -> {
+                    onSiteLocationPermissionAlwaysAllowed()
+                }
+                LocationPermissionType.ALLOW_ONCE -> {
+                    command.postValue(AskDomainPermission(locationPermission.origin))
+                }
+                LocationPermissionType.DENY_ALWAYS -> {
+                    onSiteLocationPermissionAlwaysDenied()
+                }
+                LocationPermissionType.DENY_ONCE -> {
+                    command.postValue(AskDomainPermission(locationPermission.origin))
+                }
+            }
+
+        }
+    }
+
+    override fun onSystemLocationPermissionAllowed() {
+        pixel.fire(PixelName.PRECISE_LOCATION_SYSTEM_DIALOG_ENABLE)
+        command.postValue(RequestSystemLocationPermission)
+    }
+
+    override fun onSystemLocationPermissionNotAllowed() {
+        pixel.fire(PixelName.PRECISE_LOCATION_SYSTEM_DIALOG_LATER)
+        onSiteLocationPermissionAlwaysDenied()
+    }
+
+    override fun onSystemLocationPermissionNeverAllowed() {
+        locationPermission?.let { locationPermission ->
+            val neverAllowedPermission = LocationPermissionType.DENY_ALWAYS
+            onSiteLocationPermissionSelected(locationPermission.origin, neverAllowedPermission)
+            pixel.fire(Pixel.PixelName.PRECISE_LOCATION_SYSTEM_DIALOG_NEVER)
+            viewModelScope.launch {
+                locationPermissionsRepository.savePermission(locationPermission.origin, neverAllowedPermission)
+            }
+        }
+    }
+
+    fun onSystemLocationPermissionGranted() {
+        locationPermission?.let { locationPermission ->
+            appSettingsPreferencesStore.appLocationPermissionDeniedForever = false
+            appSettingsPreferencesStore.appLocationPermission = true
+            pixel.fire(Pixel.PixelName.PRECISE_LOCATION_SETTINGS_LOCATION_PERMISSION_ENABLE)
+            viewModelScope.launch {
+                val permissionEntity = locationPermissionsRepository.getDomainPermission(locationPermission.origin)
+                if (permissionEntity == null) {
+                    command.postValue(AskDomainPermission(locationPermission.origin))
+                } else {
+                    reactToSitePermission(permissionEntity.permission)
+                }
+            }
+        }
+    }
+
+    fun onSystemLocationPermissionDeniedOneTime() {
+        pixel.fire(Pixel.PixelName.PRECISE_LOCATION_SETTINGS_LOCATION_PERMISSION_DISABLE)
+        onSiteLocationPermissionAlwaysDenied()
+    }
+
+    fun onSystemLocationPermissionDeniedForever() {
+        appSettingsPreferencesStore.appLocationPermissionDeniedForever = true
+        onSystemLocationPermissionDeniedOneTime()
     }
 
     private fun registerSiteVisit() {
@@ -1464,7 +1655,6 @@ class BrowserTabViewModel(
                 override fun downloadOpened() {
                     closeAndReturnToSourceIfBlankTab()
                 }
-
             })
         }
     }

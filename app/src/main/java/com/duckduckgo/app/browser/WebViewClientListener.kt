@@ -19,6 +19,7 @@ package com.duckduckgo.app.browser
 import android.net.Uri
 import android.os.Message
 import android.view.View
+import android.webkit.GeolocationPermissions
 import android.webkit.ValueCallback
 import android.webkit.WebChromeClient
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
@@ -30,6 +31,8 @@ interface WebViewClientListener {
     fun navigationStateChanged(newWebNavigationState: WebNavigationState)
     fun pageRefreshed(refreshedUrl: String)
     fun progressChanged(newProgress: Int)
+
+    fun onSiteLocationPermissionRequested(origin: String, callback: GeolocationPermissions.Callback)
 
     fun titleReceived(newTitle: String)
     fun trackerDetected(event: TrackingEvent)

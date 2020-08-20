@@ -28,6 +28,7 @@ import com.duckduckgo.app.browser.addtohome.AddToHomeCapabilityDetector
 import com.duckduckgo.app.browser.rating.db.AppEnjoymentDao
 import com.duckduckgo.app.browser.rating.db.AppEnjoymentEntity
 import com.duckduckgo.app.browser.rating.db.AppEnjoymentTypeConverter
+import com.duckduckgo.app.browser.rating.db.LocationPermissionTypeConverter
 import com.duckduckgo.app.browser.rating.db.PromptCountConverter
 import com.duckduckgo.app.cta.db.DismissedCtaDao
 import com.duckduckgo.app.cta.model.DismissedCta
@@ -43,6 +44,8 @@ import com.duckduckgo.app.httpsupgrade.db.HttpsBloomFilterSpecDao
 import com.duckduckgo.app.httpsupgrade.db.HttpsWhitelistDao
 import com.duckduckgo.app.httpsupgrade.model.HttpsBloomFilterSpec
 import com.duckduckgo.app.httpsupgrade.model.HttpsWhitelistedDomain
+import com.duckduckgo.app.location.data.LocationPermissionEntity
+import com.duckduckgo.app.location.data.LocationPermissionsDao
 import com.duckduckgo.app.notification.db.NotificationDao
 import com.duckduckgo.app.notification.model.Notification
 import com.duckduckgo.app.onboarding.store.*
@@ -63,7 +66,7 @@ import com.duckduckgo.app.usage.search.SearchCountDao
 import com.duckduckgo.app.usage.search.SearchCountEntity
 
 @Database(
-    exportSchema = true, version = 24, entities = [
+    exportSchema = true, version = 25, entities = [
         TdsTracker::class,
         TdsEntity::class,
         TdsDomainEntity::class,
@@ -87,7 +90,8 @@ import com.duckduckgo.app.usage.search.SearchCountEntity
         TdsMetadata::class,
         UserStage::class,
         FireproofWebsiteEntity::class,
-        UserEventEntity::class
+        UserEventEntity::class,
+        LocationPermissionEntity::class
     ]
 )
 
@@ -101,7 +105,8 @@ import com.duckduckgo.app.usage.search.SearchCountEntity
     CategoriesTypeConverter::class,
     UncaughtExceptionSourceConverter::class,
     StageTypeConverter::class,
-    UserEventTypeConverter::class
+    UserEventTypeConverter::class,
+    LocationPermissionTypeConverter::class
 )
 abstract class AppDatabase : RoomDatabase() {
 
@@ -126,6 +131,7 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun tdsDao(): TdsMetadataDao
     abstract fun userStageDao(): UserStageDao
     abstract fun fireproofWebsiteDao(): FireproofWebsiteDao
+    abstract fun locationPermissionsDao(): LocationPermissionsDao
     abstract fun userEventsDao(): UserEventsDao
 }
 
@@ -172,7 +178,6 @@ class MigrationsProvider(
                         val tabId = it.getString(it.getColumnIndex("tabId"))
                         database.execSQL("UPDATE `tabs` SET position=$index where `tabId` = \"$tabId\"")
                         index += 1
-
                     } while (it.moveToNext())
                 }
             }
@@ -277,7 +282,7 @@ class MigrationsProvider(
             val userStage = UserStage(appStage = appStage)
             database.execSQL(
                 "CREATE TABLE IF NOT EXISTS `$USER_STAGE_TABLE_NAME` " +
-                        "(`key` INTEGER NOT NULL, `appStage` TEXT NOT NULL, PRIMARY KEY(`key`))"
+                    "(`key` INTEGER NOT NULL, `appStage` TEXT NOT NULL, PRIMARY KEY(`key`))"
             )
             database.execSQL(
                 "INSERT INTO $USER_STAGE_TABLE_NAME VALUES (${userStage.key}, \"${userStage.appStage}\") "
@@ -322,18 +327,24 @@ class MigrationsProvider(
             // SQLite does not support Alter table operations like Foreign keys
             database.execSQL(
                 "CREATE TABLE IF NOT EXISTS tabs_new " +
-                        "(tabId TEXT NOT NULL, url TEXT, title TEXT, skipHome INTEGER NOT NULL, viewed INTEGER NOT NULL, position INTEGER NOT NULL, tabPreviewFile TEXT, sourceTabId TEXT," +
-                        " PRIMARY KEY(tabId)," +
-                        " FOREIGN KEY(sourceTabId) REFERENCES tabs(tabId) ON UPDATE SET NULL ON DELETE SET NULL )"
+                    "(tabId TEXT NOT NULL, url TEXT, title TEXT, skipHome INTEGER NOT NULL, viewed INTEGER NOT NULL, position INTEGER NOT NULL, tabPreviewFile TEXT, sourceTabId TEXT," +
+                    " PRIMARY KEY(tabId)," +
+                    " FOREIGN KEY(sourceTabId) REFERENCES tabs(tabId) ON UPDATE SET NULL ON DELETE SET NULL )"
             )
             database.execSQL(
                 "INSERT INTO tabs_new (tabId, url, title, skipHome, viewed, position, tabPreviewFile) " +
-                        "SELECT tabId, url, title, skipHome, viewed, position, tabPreviewFile " +
-                        "FROM tabs"
+                    "SELECT tabId, url, title, skipHome, viewed, position, tabPreviewFile " +
+                    "FROM tabs"
             )
             database.execSQL("DROP TABLE tabs")
             database.execSQL("ALTER TABLE tabs_new RENAME TO tabs")
             database.execSQL("CREATE INDEX IF NOT EXISTS index_tabs_tabId ON tabs (tabId)")
+        }
+    }
+
+    val MIGRATION_24_TO_25: Migration = object : Migration(24, 25) {
+        override fun migrate(database: SupportSQLiteDatabase) {
+            database.execSQL("CREATE TABLE IF NOT EXISTS `locationPermissions` (`domain` TEXT NOT NULL, `permission` INTEGER NOT NULL, PRIMARY KEY(`domain`))")
         }
     }
 
@@ -361,7 +372,8 @@ class MigrationsProvider(
             MIGRATION_20_TO_21,
             MIGRATION_21_TO_22,
             MIGRATION_22_TO_23,
-            MIGRATION_23_TO_24
+            MIGRATION_23_TO_24,
+            MIGRATION_24_TO_25
         )
 
     @Deprecated(
