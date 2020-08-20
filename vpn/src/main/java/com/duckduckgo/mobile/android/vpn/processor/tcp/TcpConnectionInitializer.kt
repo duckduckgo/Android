@@ -16,7 +16,6 @@
 
 package com.duckduckgo.mobile.android.vpn.processor.tcp
 
-import com.duckduckgo.mobile.android.vpn.processor.QueuedBuffer
 import com.duckduckgo.mobile.android.vpn.service.NetworkChannelCreator
 import com.duckduckgo.mobile.android.vpn.service.VpnQueues
 import timber.log.Timber
