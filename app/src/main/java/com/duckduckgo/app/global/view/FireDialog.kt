@@ -16,8 +16,10 @@
 
 package com.duckduckgo.app.global.view
 
+import android.animation.Animator
 import android.content.Context
 import android.os.Bundle
+import androidx.core.view.doOnDetach
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.cta.ui.CtaViewModel
 import com.google.android.material.bottomsheet.BottomSheetBehavior
@@ -25,6 +27,7 @@ import com.google.android.material.bottomsheet.BottomSheetDialog
 import kotlinx.android.synthetic.main.include_dax_dialog_cta.*
 import kotlinx.android.synthetic.main.sheet_fire_clear_data.*
 import kotlinx.coroutines.*
+import timber.log.Timber
 
 class FireDialog(
     context: Context,
@@ -34,6 +37,9 @@ class FireDialog(
 
     var clearStarted: (() -> Unit) = {}
     var clearComplete: (() -> Unit) = {}
+
+    private var canRestart = false
+    private var onClearDataOptionsDismissed: () -> Unit = {}
 
     init {
         setContentView(R.layout.sheet_fire_clear_data)
@@ -47,22 +53,30 @@ class FireDialog(
                 fireCtaViewStub.inflate()
                 cta.showCta(daxCtaContainer)
                 ctaViewModel.onCtaShown(cta)
-                setOnDismissListener {
+                onClearDataOptionsDismissed = {
                     GlobalScope.launch {
+                        Timber.i("FireAnimation userDismissedFireCta")
                         ctaViewModel.onUserDismissedCta(cta)
                     }
+                }
+                daxCtaContainer.doOnDetach {
+                    onClearDataOptionsDismissed()
                 }
             }
         }
 
         clearAllOption.setOnClickListener {
-            dismiss()
+            Timber.i("FireAnimation clearAllStarted")
+            hideClearDataOptions()
+            playAnimation()
             clearStarted()
 
             GlobalScope.launch {
                 clearPersonalDataAction.clearTabsAndAllDataAsync(appInForeground = true, shouldFireDataClearPixel = true)
                 clearPersonalDataAction.setAppUsedSinceLastClearFlag(false)
-                clearPersonalDataAction.killAndRestartProcess()
+                delay(5000)
+                killAndRestartIfNecessary()
+                Timber.i("FireAnimation clearAllFinished")
             }
         }
 
@@ -71,5 +85,43 @@ class FireDialog(
         }
 
         behavior.state = BottomSheetBehavior.STATE_EXPANDED
+    }
+
+    private fun hideClearDataOptions() {
+        fireDialogRootView.gone()
+        onClearDataOptionsDismissed()
+        /*
+         * Avoid calling callback twice when view is detached.
+         * We handle this callback here to ensure pixel is sent before process restarts
+         */
+        onClearDataOptionsDismissed = {}
+    }
+
+    private fun playAnimation() {
+        setCancelable(false)
+        setCanceledOnTouchOutside(false)
+        fireAnimationView.show()
+        fireAnimationView.playAnimation()
+        fireAnimationView.addAnimatorListener(object : Animator.AnimatorListener {
+            override fun onAnimationRepeat(animation: Animator?) {}
+            override fun onAnimationCancel(animation: Animator?) {}
+            override fun onAnimationStart(animation: Animator?) {}
+            override fun onAnimationEnd(animation: Animator?) {
+                Timber.i("FireAnimation onAnimationEnd")
+                killAndRestartIfNecessary()
+            }
+        })
+    }
+
+    private fun killAndRestartIfNecessary() {
+        synchronized(this) {
+            if (!canRestart) {
+                canRestart = true
+            } else {
+                Timber.i("FireAnimation killAndRestartProcess")
+                dismiss()
+                clearPersonalDataAction.killAndRestartProcess()
+            }
+        }
     }
 }
