@@ -22,6 +22,9 @@ import android.os.Bundle
 import androidx.core.view.doOnDetach
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.cta.ui.CtaViewModel
+import com.duckduckgo.app.cta.ui.DaxFireCta
+import com.duckduckgo.app.statistics.VariantManager
+import com.duckduckgo.app.statistics.VariantManager.VariantFeature.FireButtonEducation
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import kotlinx.android.synthetic.main.include_dax_dialog_cta.*
@@ -35,13 +38,14 @@ import timber.log.Timber
 class FireDialog(
     context: Context,
     private val ctaViewModel: CtaViewModel,
-    private val clearPersonalDataAction: ClearPersonalDataAction
+    private val clearPersonalDataAction: ClearPersonalDataAction,
+    private val variantManager: VariantManager
 ) : BottomSheetDialog(context, R.style.FireDialog), CoroutineScope by MainScope() {
 
     var clearStarted: (() -> Unit) = {}
     var clearComplete: (() -> Unit) = {}
 
-    private var canRestart = false
+    private var canRestart = !animationEnabled()
     private var onClearDataOptionsDismissed: () -> Unit = {}
 
     init {
@@ -52,42 +56,51 @@ class FireDialog(
         super.onCreate(savedInstanceState)
 
         launch {
-            ctaViewModel.getFireDialogCta()?.let { cta ->
-                fireCtaViewStub.inflate()
-                cta.showCta(daxCtaContainer)
-                ctaViewModel.onCtaShown(cta)
-                onClearDataOptionsDismissed = {
-                    GlobalScope.launch {
-                        Timber.i("FireAnimation userDismissedFireCta")
-                        ctaViewModel.onUserDismissedCta(cta)
-                    }
-                }
-                daxCtaContainer.doOnDetach {
-                    onClearDataOptionsDismissed()
-                }
+            ctaViewModel.getFireDialogCta()?.let {
+                configureFireDialogCta(it)
             }
         }
 
         clearAllOption.setOnClickListener {
-            Timber.i("FireAnimation clearAllStarted")
-            hideClearDataOptions()
-            playAnimation()
-            clearStarted()
-
-            GlobalScope.launch {
-                clearPersonalDataAction.clearTabsAndAllDataAsync(appInForeground = true, shouldFireDataClearPixel = true)
-                clearPersonalDataAction.setAppUsedSinceLastClearFlag(false)
-                killAndRestartIfAllTasksCompleted()
-                Timber.i("FireAnimation clearAllFinished")
-            }
+            onClearOptionClicked()
         }
-
         cancelOption.setOnClickListener {
             cancel()
         }
 
         behavior.state = BottomSheetBehavior.STATE_EXPANDED
     }
+
+    private fun configureFireDialogCta(cta: DaxFireCta) {
+        fireCtaViewStub.inflate()
+        cta.showCta(daxCtaContainer)
+        ctaViewModel.onCtaShown(cta)
+        onClearDataOptionsDismissed = {
+            GlobalScope.launch {
+                Timber.i("FireAnimation userDismissedFireCta")
+                ctaViewModel.onUserDismissedCta(cta)
+            }
+        }
+        daxCtaContainer.doOnDetach {
+            onClearDataOptionsDismissed()
+        }
+    }
+
+    private fun onClearOptionClicked() {
+        hideClearDataOptions()
+        if (animationEnabled()) {
+            playAnimation()
+        }
+        clearStarted()
+
+        GlobalScope.launch {
+            clearPersonalDataAction.clearTabsAndAllDataAsync(appInForeground = true, shouldFireDataClearPixel = true)
+            clearPersonalDataAction.setAppUsedSinceLastClearFlag(false)
+            killAndRestartIfAllTasksCompleted()
+        }
+    }
+
+    private fun animationEnabled() = variantManager.getVariant().hasFeature(FireButtonEducation)
 
     private fun playAnimation() {
         setCancelable(false)
