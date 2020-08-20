@@ -42,14 +42,20 @@ class TunPacketReader(private val tunInterface: ParcelFileDescriptor, private va
         val vpnInput = FileInputStream(tunInterface.fileDescriptor).channel
 
         try {
-            while (running) {
+            while (running && !Thread.interrupted()) {
                 try {
                     executeReadLoop(vpnInput)
                 } catch (e: Throwable) {
                     Timber.w(e, "Failed while reading from the TUN")
                 }
             }
-        } catch (e: Throwable) {
+
+        }
+        catch (e: InterruptedException) {
+            Timber.w(e, "Thread interrupted")
+            running = false
+        }
+        catch (e: Throwable) {
             Timber.e(e, "Fatal error encountered")
             running = false
         } finally {

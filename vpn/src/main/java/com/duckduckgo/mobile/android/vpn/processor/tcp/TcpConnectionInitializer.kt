@@ -41,14 +41,8 @@ class TcpConnectionInitializer constructor(
 
         val header = params.packet.tcpHeader
         params.packet.swapSourceAndDestination()
-        val isSyn = header.isSYN
-        val isAck = header.isACK
-        val isFin = header.isFIN
-        val isPsh = header.isPSH
-        val isRst = header.isRST
-        val isUrg = header.isURG
 
-        Timber.i("Initializing connection. packet type:\tsyn=$isSyn,\tack=$isAck,\tfin=$isFin,\tpsh=$isPsh,\trst=$isRst,\turg=$isUrg. key=$key")
+        Timber.d("Initializing connection $key")
 
         if (header.isSYN) {
             val channel = networkChannelCreator.createSocket()
@@ -78,14 +72,16 @@ class TcpConnectionInitializer constructor(
     private fun connect(tcb: TCB, channel: SocketChannel, params: TcpConnectionParams) {
         channel.connect(InetSocketAddress(params.destinationAddress, params.destinationPort))
         if (channel.finishConnect()) {
-            Timber.v("Channel finished connecting to ${params.destinationAddress}")
+            Timber.v("Channel finished connecting to ${tcb.selectionKey}")
             tcb.status = TCB.TCBStatus.SYN_RECEIVED
+            Timber.v("Update TCB ${tcb.ipAndPort} status: ${tcb.status}")
             params.packet.updateTCPBuffer(params.responseBuffer, (TCPHeader.SYN or TCPHeader.ACK).toByte(), tcb.mySequenceNum, tcb.myAcknowledgementNum, 0)
             tcb.mySequenceNum++
             queues.networkToDevice.offer(params.responseBuffer)
         } else {
-            Timber.v("Not finished connecting yet to ${params.destinationAddress}, will register for OP_CONNECT event")
+            Timber.v("Not finished connecting yet to ${tcb.selectionKey}, will register for OP_CONNECT event")
             tcb.status = TCB.TCBStatus.SYN_SENT
+            Timber.v("Update TCB ${tcb.ipAndPort} status: ${tcb.status}")
             selector.wakeup()
             tcb.selectionKey = channel.register(selector, SelectionKey.OP_CONNECT, tcb)
         }

@@ -39,10 +39,7 @@ import java.nio.ByteBuffer
 import java.nio.channels.DatagramChannel
 import java.nio.channels.Selector
 import java.nio.channels.SocketChannel
-import java.util.concurrent.BlockingQueue
-import java.util.concurrent.ExecutorService
-import java.util.concurrent.Executors
-import java.util.concurrent.LinkedBlockingQueue
+import java.util.concurrent.*
 
 
 class PassthroughVpnService : VpnService(), CoroutineScope by MainScope(), NetworkChannelCreator {
@@ -150,6 +147,7 @@ class PassthroughVpnService : VpnService(), CoroutineScope by MainScope(), Netwo
 //        tickerJob = launch {
 //            val startTime = System.currentTimeMillis()
 //            while (true) {
+
 //                Timber.v("VPN service running for ${TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis() - startTime)} seconds")
 //                delay(1000)
 //            }
@@ -161,6 +159,7 @@ class PassthroughVpnService : VpnService(), CoroutineScope by MainScope(), Netwo
             addAddress("10.0.0.2", 32)
             addRoute("0.0.0.0", 0)
             setBlocking(true)
+            setMtu(Short.MAX_VALUE.toInt())
             //addDnsServer("8.8.8.8")
             addAllowedApplication("com.duckduckgo.networkrequestor")
             addAllowedApplication("meteor.test.and.grade.internet.connection.speed")
@@ -248,7 +247,7 @@ interface NetworkChannelCreator {
 }
 
 class VpnQueues {
-    val tcpDeviceToNetwork: BlockingQueue<Packet> = LinkedBlockingQueue()
+    val tcpDeviceToNetwork: BlockingDeque<Packet> = LinkedBlockingDeque()
     val udpDeviceToNetwork: BlockingQueue<Packet> = LinkedBlockingQueue()
 
     val networkToDevice: BlockingQueue<ByteBuffer> = LinkedBlockingQueue<ByteBuffer>()

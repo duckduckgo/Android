@@ -20,6 +20,7 @@ import android.os.ParcelFileDescriptor
 import com.duckduckgo.mobile.android.vpn.service.VpnQueues
 import timber.log.Timber
 import xyz.hexene.localvpn.ByteBufferPool
+import xyz.hexene.localvpn.Packet
 import java.io.FileOutputStream
 import java.io.IOException
 import java.nio.ByteBuffer
@@ -39,10 +40,15 @@ class TunPacketWriter(private val tunInterface: ParcelFileDescriptor, private va
         val vpnOutput = FileOutputStream(tunInterface.fileDescriptor).channel
 
         vpnOutput.use { vpnOutput ->
-            while (running) {
+            while (running && !Thread.interrupted()) {
                 try {
                     executeWriteLoop(vpnOutput)
-                } catch (e: Throwable) {
+                }
+                catch (e: InterruptedException) {
+                    Timber.w(e, "Thread interrupted")
+                    running = false
+                }
+                catch (e: Throwable) {
                     Timber.w(e, "Failed while writing to TUN")
                 }
             }
@@ -52,7 +58,6 @@ class TunPacketWriter(private val tunInterface: ParcelFileDescriptor, private va
     private fun executeWriteLoop(vpnOutput: FileChannel) {
         try {
             val bufferFromNetwork = queues.networkToDevice.take() ?: return
-
             bufferFromNetwork.flip()
 
             while (bufferFromNetwork.hasRemaining()) {

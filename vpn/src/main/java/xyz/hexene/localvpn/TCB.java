@@ -43,6 +43,9 @@ public class TCB
         ESTABLISHED,
         CLOSE_WAIT,
         LAST_ACK,
+        FIN_WAIT_1,
+        FIN_WAIT_2,
+        TIME_WAIT
     }
 
     public Packet referencePacket;
