@@ -26,7 +26,10 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import kotlinx.android.synthetic.main.include_dax_dialog_cta.*
 import kotlinx.android.synthetic.main.sheet_fire_clear_data.*
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.launch
 import timber.log.Timber
 
 class FireDialog(
@@ -99,6 +102,9 @@ class FireDialog(
                 killAndRestartIfAllTasksCompleted()
             }
         })
+        fireAnimationView.addAnimatorUpdateListener {
+            window?.setDimAmount(fireAnimationView.progress)
+        }
     }
 
     private fun hideClearDataOptions() {
