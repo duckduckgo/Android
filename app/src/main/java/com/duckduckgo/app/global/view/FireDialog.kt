@@ -74,7 +74,6 @@ class FireDialog(
             GlobalScope.launch {
                 clearPersonalDataAction.clearTabsAndAllDataAsync(appInForeground = true, shouldFireDataClearPixel = true)
                 clearPersonalDataAction.setAppUsedSinceLastClearFlag(false)
-                delay(5000)
                 killAndRestartIfNecessary()
                 Timber.i("FireAnimation clearAllFinished")
             }
