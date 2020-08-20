@@ -283,7 +283,6 @@ class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope() {
         val dialog = FireDialog(context = this, clearPersonalDataAction = clearPersonalDataAction, ctaViewModel = ctaViewModel)
         dialog.clearStarted = {
             removeObservers()
-            clearingInProgressView.show()
         }
         dialog.clearComplete = { viewModel.onClearComplete() }
         dialog.setOnShowListener { currentTab?.onFireDialogVisibilityChanged(isVisible = true) }
