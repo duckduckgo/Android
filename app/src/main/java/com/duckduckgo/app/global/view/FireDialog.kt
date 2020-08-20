@@ -74,7 +74,7 @@ class FireDialog(
             GlobalScope.launch {
                 clearPersonalDataAction.clearTabsAndAllDataAsync(appInForeground = true, shouldFireDataClearPixel = true)
                 clearPersonalDataAction.setAppUsedSinceLastClearFlag(false)
-                killAndRestartIfNecessary()
+                killAndRestartIfAllTasksCompleted()
                 Timber.i("FireAnimation clearAllFinished")
             }
         }
@@ -84,16 +84,6 @@ class FireDialog(
         }
 
         behavior.state = BottomSheetBehavior.STATE_EXPANDED
-    }
-
-    private fun hideClearDataOptions() {
-        fireDialogRootView.gone()
-        onClearDataOptionsDismissed()
-        /*
-         * Avoid calling callback twice when view is detached.
-         * We handle this callback here to ensure pixel is sent before process restarts
-         */
-        onClearDataOptionsDismissed = {}
     }
 
     private fun playAnimation() {
@@ -106,19 +96,26 @@ class FireDialog(
             override fun onAnimationCancel(animation: Animator?) {}
             override fun onAnimationStart(animation: Animator?) {}
             override fun onAnimationEnd(animation: Animator?) {
-                Timber.i("FireAnimation onAnimationEnd")
-                killAndRestartIfNecessary()
+                killAndRestartIfAllTasksCompleted()
             }
         })
     }
 
-    private fun killAndRestartIfNecessary() {
+    private fun hideClearDataOptions() {
+        fireDialogRootView.gone()
+        onClearDataOptionsDismissed()
+        /*
+         * Avoid calling callback twice when view is detached.
+         * We handle this callback here to ensure pixel is sent before process restarts
+         */
+        onClearDataOptionsDismissed = {}
+    }
+
+    private fun killAndRestartIfAllTasksCompleted() {
         synchronized(this) {
             if (!canRestart) {
                 canRestart = true
             } else {
-                Timber.i("FireAnimation killAndRestartProcess")
-                dismiss()
                 clearPersonalDataAction.killAndRestartProcess()
             }
         }
