@@ -23,6 +23,8 @@ import androidx.core.view.doOnDetach
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.cta.ui.CtaViewModel
 import com.duckduckgo.app.cta.ui.DaxFireCta
+import com.duckduckgo.app.global.view.FireDialog.FireDialogClearAllEvent.AnimationFinished
+import com.duckduckgo.app.global.view.FireDialog.FireDialogClearAllEvent.ClearDataFinished
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.VariantManager.VariantFeature.FireButtonEducation
 import com.google.android.material.bottomsheet.BottomSheetBehavior
@@ -97,7 +99,7 @@ class FireDialog(
         GlobalScope.launch {
             clearPersonalDataAction.clearTabsAndAllDataAsync(appInForeground = true, shouldFireDataClearPixel = true)
             clearPersonalDataAction.setAppUsedSinceLastClearFlag(false)
-            killAndRestartIfAllTasksCompleted()
+            killAndRestartIfAllTasksCompleted(ClearDataFinished)
         }
     }
 
@@ -113,7 +115,7 @@ class FireDialog(
             override fun onAnimationCancel(animation: Animator?) {}
             override fun onAnimationStart(animation: Animator?) {}
             override fun onAnimationEnd(animation: Animator?) {
-                killAndRestartIfAllTasksCompleted()
+                killAndRestartIfAllTasksCompleted(AnimationFinished)
             }
         })
         fireAnimationView.addAnimatorUpdateListener {
@@ -136,14 +138,18 @@ class FireDialog(
         onClearDataOptionsDismissed = {}
     }
 
-    private fun killAndRestartIfAllTasksCompleted() {
-        synchronized(this) {
-            if (!canRestart) {
-                speedUpAnimation = true
-                canRestart = true
-            } else {
-                clearPersonalDataAction.killAndRestartProcess()
-            }
+    @Synchronized
+    private fun killAndRestartIfAllTasksCompleted(event: FireDialogClearAllEvent) {
+        if (!canRestart) {
+            speedUpAnimation = event is ClearDataFinished
+            canRestart = true
+        } else {
+            clearPersonalDataAction.killAndRestartProcess()
         }
+    }
+
+    private sealed class FireDialogClearAllEvent {
+        object AnimationFinished : FireDialogClearAllEvent()
+        object ClearDataFinished : FireDialogClearAllEvent()
     }
 }
