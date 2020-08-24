@@ -54,7 +54,7 @@ class FireDialog(
     private val accelerateAnimatorUpdateListener = object : ValueAnimator.AnimatorUpdateListener {
         override fun onAnimationUpdate(animation: ValueAnimator?) {
             fireAnimationView.speed += ANIMATION_SPEED_INCREMENT
-            if (fireAnimationView.speed > ANIMATION_SPEED_INCREMENT) {
+            if (fireAnimationView.speed > ANIMATION_MAX_SPEED) {
                 fireAnimationView.removeUpdateListener(this)
             }
         }
