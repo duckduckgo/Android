@@ -37,8 +37,4 @@
         <item name="bottomSheetStyle">@style/FireDialogStyle</item>
     </style>
 
-    <style name="FireDialogStyle" parent="@style/Widget.Design.BottomSheet.Modal">
-        <item name="android:background">@android:color/transparent</item>
-    </style>
-
 </resources>
