@@ -645,7 +645,7 @@ class CtaViewModelTest {
 
         val fireDialogCta = testee.getFireDialogCta()
 
-        assertTrue(fireDialogCta is DaxFireCta.FireCta)
+        assertTrue(fireDialogCta is DaxFireDialogCta.TryClearDataCta)
     }
 
     @Test

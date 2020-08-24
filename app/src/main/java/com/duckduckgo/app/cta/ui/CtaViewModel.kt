@@ -183,12 +183,12 @@ class CtaViewModel @Inject constructor(
         }
     }
 
-    suspend fun getFireDialogCta(): DaxFireCta? {
+    suspend fun getFireDialogCta(): DaxFireDialogCta? {
         if (!variantManager.getVariant().hasFeature(FireButtonEducation) || !daxOnboardingActive()) return null
 
         return withContext(dispatchers.io()) {
             if (settingsDataStore.hideTips || daxDialogFireEducationShown()) return@withContext null
-            return@withContext DaxFireCta.FireCta()
+            return@withContext DaxFireDialogCta.TryClearDataCta()
         }
     }
 

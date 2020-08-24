@@ -322,7 +322,7 @@ sealed class DaxBubbleCta(
     )
 }
 
-sealed class DaxFireCta(
+sealed class DaxFireDialogCta(
     override val ctaId: CtaId,
     @StringRes open val description: Int,
     override val shownPixel: Pixel.PixelName?,
@@ -345,7 +345,7 @@ sealed class DaxFireCta(
 
     override fun pixelShownParameters(): Map<String, String> = emptyMap()
 
-    class FireCta() : DaxFireCta(
+    class TryClearDataCta : DaxFireDialogCta(
         CtaId.DAX_FIRE_BUTTON,
         R.string.daxClearDataCtaText,
         Pixel.PixelName.ONBOARDING_DAX_CTA_SHOWN,

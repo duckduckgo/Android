@@ -23,7 +23,7 @@ import android.os.Bundle
 import androidx.core.view.doOnDetach
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.cta.ui.CtaViewModel
-import com.duckduckgo.app.cta.ui.DaxFireCta
+import com.duckduckgo.app.cta.ui.DaxFireDialogCta
 import com.duckduckgo.app.global.view.FireDialog.FireDialogClearAllEvent.AnimationFinished
 import com.duckduckgo.app.global.view.FireDialog.FireDialogClearAllEvent.ClearAllDataFinished
 import com.duckduckgo.app.statistics.VariantManager
@@ -36,7 +36,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
-import timber.log.Timber
 
 private const val ANIMATION_MAX_SPEED = 1.4f
 private const val ANIMATION_SPEED_INCREMENT = 0.15f
@@ -85,7 +84,7 @@ class FireDialog(
         behavior.state = BottomSheetBehavior.STATE_EXPANDED
     }
 
-    private fun configureFireDialogCta(cta: DaxFireCta) {
+    private fun configureFireDialogCta(cta: DaxFireDialogCta) {
         fireCtaViewStub.inflate()
         cta.showCta(daxCtaContainer)
         ctaViewModel.onCtaShown(cta)
