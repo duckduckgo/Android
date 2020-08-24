@@ -17,6 +17,7 @@
 package com.duckduckgo.app.global.view
 
 import android.animation.Animator
+import android.animation.ValueAnimator
 import android.content.Context
 import android.os.Bundle
 import androidx.core.view.doOnDetach
@@ -24,7 +25,7 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.cta.ui.CtaViewModel
 import com.duckduckgo.app.cta.ui.DaxFireCta
 import com.duckduckgo.app.global.view.FireDialog.FireDialogClearAllEvent.AnimationFinished
-import com.duckduckgo.app.global.view.FireDialog.FireDialogClearAllEvent.ClearDataFinished
+import com.duckduckgo.app.global.view.FireDialog.FireDialogClearAllEvent.ClearAllDataFinished
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.VariantManager.VariantFeature.FireButtonEducation
 import com.google.android.material.bottomsheet.BottomSheetBehavior
@@ -37,6 +38,9 @@ import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
+private const val ANIMATION_MAX_SPEED = 1.4f
+private const val ANIMATION_SPEED_INCREMENT = 0.15f
+
 class FireDialog(
     context: Context,
     private val ctaViewModel: CtaViewModel,
@@ -47,7 +51,14 @@ class FireDialog(
     var clearStarted: (() -> Unit) = {}
     var clearComplete: (() -> Unit) = {}
 
-    private var speedUpAnimation: Boolean = false
+    private val accelerateAnimatorUpdateListener = object : ValueAnimator.AnimatorUpdateListener {
+        override fun onAnimationUpdate(animation: ValueAnimator?) {
+            fireAnimationView.speed += ANIMATION_SPEED_INCREMENT
+            if (fireAnimationView.speed > ANIMATION_SPEED_INCREMENT) {
+                fireAnimationView.removeUpdateListener(this)
+            }
+        }
+    }
     private var canRestart = !animationEnabled()
     private var onClearDataOptionsDismissed: () -> Unit = {}
 
@@ -80,7 +91,6 @@ class FireDialog(
         ctaViewModel.onCtaShown(cta)
         onClearDataOptionsDismissed = {
             GlobalScope.launch {
-                Timber.i("FireAnimation userDismissedFireCta")
                 ctaViewModel.onUserDismissedCta(cta)
             }
         }
@@ -99,7 +109,7 @@ class FireDialog(
         GlobalScope.launch {
             clearPersonalDataAction.clearTabsAndAllDataAsync(appInForeground = true, shouldFireDataClearPixel = true)
             clearPersonalDataAction.setAppUsedSinceLastClearFlag(false)
-            killAndRestartIfAllTasksCompleted(ClearDataFinished)
+            onFireDialogClearAllEvent(ClearAllDataFinished)
         }
     }
 
@@ -115,17 +125,9 @@ class FireDialog(
             override fun onAnimationCancel(animation: Animator?) {}
             override fun onAnimationStart(animation: Animator?) {}
             override fun onAnimationEnd(animation: Animator?) {
-                killAndRestartIfAllTasksCompleted(AnimationFinished)
+                onFireDialogClearAllEvent(AnimationFinished)
             }
         })
-        fireAnimationView.addAnimatorUpdateListener {
-            if (speedUpAnimation) {
-                fireAnimationView.speed += 0.15f
-                if (fireAnimationView.speed > 1.4f) {
-                    speedUpAnimation = false
-                }
-            }
-        }
     }
 
     private fun hideClearDataOptions() {
@@ -139,10 +141,12 @@ class FireDialog(
     }
 
     @Synchronized
-    private fun killAndRestartIfAllTasksCompleted(event: FireDialogClearAllEvent) {
+    private fun onFireDialogClearAllEvent(event: FireDialogClearAllEvent) {
         if (!canRestart) {
-            speedUpAnimation = event is ClearDataFinished
             canRestart = true
+            if (event is ClearAllDataFinished) {
+                fireAnimationView.addAnimatorUpdateListener(accelerateAnimatorUpdateListener)
+            }
         } else {
             clearPersonalDataAction.killAndRestartProcess()
         }
@@ -150,6 +154,7 @@ class FireDialog(
 
     private sealed class FireDialogClearAllEvent {
         object AnimationFinished : FireDialogClearAllEvent()
-        object ClearDataFinished : FireDialogClearAllEvent()
+        object ClearAllDataFinished : FireDialogClearAllEvent()
     }
 }
+
