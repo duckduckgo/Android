@@ -156,4 +156,3 @@ class FireDialog(
         object ClearAllDataFinished : FireDialogClearAllEvent()
     }
 }
-
