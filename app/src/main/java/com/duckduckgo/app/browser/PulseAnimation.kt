@@ -26,6 +26,7 @@ import android.widget.FrameLayout
 import android.widget.ImageView
 import androidx.core.view.doOnLayout
 import androidx.core.view.isVisible
+import com.duckduckgo.app.global.view.setAllParentsClip
 
 class PulseAnimation {
     private var pulseAnimation: AnimatorSet = AnimatorSet()
@@ -35,7 +36,7 @@ class PulseAnimation {
         if (highlightImageView == null) {
             highlightImageView = addHighlightView(targetView)
             highlightImageView?.doOnLayout {
-                setAllParentsClip(it)
+                it.setAllParentsClip(enabled = false)
                 startPulseAnimation(it)
             }
         }
@@ -76,15 +77,5 @@ class PulseAnimation {
         val layoutParams = FrameLayout.LayoutParams(targetView.width, targetView.height, Gravity.CENTER)
         (targetView.parent as ViewGroup).addView(highlightImageView, 0, layoutParams)
         return highlightImageView
-    }
-
-    private fun setAllParentsClip(childView: View, enabled: Boolean = false) {
-        var view = childView
-        while (view.parent != null && view.parent is ViewGroup) {
-            val viewGroup = view.parent as ViewGroup
-            viewGroup.clipChildren = enabled
-            viewGroup.clipToPadding = enabled
-            view = viewGroup
-        }
     }
 }
