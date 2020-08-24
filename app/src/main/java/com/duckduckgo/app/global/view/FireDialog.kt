@@ -19,7 +19,6 @@ package com.duckduckgo.app.global.view
 import android.animation.Animator
 import android.content.Context
 import android.os.Bundle
-import android.view.View
 import androidx.core.view.doOnDetach
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.cta.ui.CtaViewModel
@@ -54,15 +53,6 @@ class FireDialog(
         setContentView(R.layout.sheet_fire_clear_data)
     }
 
-    private fun setAllParentsClip(childView: View, enabled: Boolean = false) {
-        var view = childView
-        while (view.parent != null && view.parent is View) {
-            val viewGroup = view.parent as View
-            viewGroup.fitsSystemWindows = enabled
-            view = viewGroup
-        }
-    }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -71,10 +61,6 @@ class FireDialog(
                 configureFireDialogCta(it)
             }
         }
-
-        fireAnimationView.fitsSystemWindows = false
-        setAllParentsClip(fireAnimationView, false)
-
         clearAllOption.setOnClickListener {
             onClearOptionClicked()
         }
@@ -82,6 +68,7 @@ class FireDialog(
             cancel()
         }
 
+        fireAnimationView.setAndPropagateUpFitsSystemWindows(false)
         behavior.state = BottomSheetBehavior.STATE_EXPANDED
     }
 

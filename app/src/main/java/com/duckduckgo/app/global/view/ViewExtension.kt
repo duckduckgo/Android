@@ -81,3 +81,14 @@ fun View.hideKeyboard(): Boolean {
 fun Int.toDp(): Int = (this / Resources.getSystem().displayMetrics.density).toInt()
 fun Int.toPx(): Int = (this * Resources.getSystem().displayMetrics.density).toInt()
 fun Float.toPx(): Float = (this * Resources.getSystem().displayMetrics.density)
+
+
+fun View.setAndPropagateUpFitsSystemWindows(enabled: Boolean = false) {
+    fitsSystemWindows = enabled
+    var view = this
+    while (view.parent != null) {
+        val parent = view.parent as View
+        parent.fitsSystemWindows = enabled
+        view = parent
+    }
+}
