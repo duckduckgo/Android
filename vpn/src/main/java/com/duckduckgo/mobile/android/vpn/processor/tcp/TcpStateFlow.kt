@@ -17,7 +17,6 @@
 package com.duckduckgo.mobile.android.vpn.processor.tcp
 
 import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpStateFlow.Event.*
-import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpStateFlow.Transition.MoveToState
 import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpStateFlow.Transition.NoTransition
 import timber.log.Timber
 import xyz.hexene.localvpn.Packet
@@ -29,11 +28,11 @@ class TcpStateFlow {
 
     companion object {
 
-        private val CLOSE_AND_RESET = TcpStateAction(MoveToState(CLOSED), SendReset)
+        // private val CLOSE_AND_RESET = TcpStateAction(MoveToState(CLOSED), SendReset)
 
-        fun newPacket(currentState: TCBStatus, packetType: PacketType): TcpStateAction {
-            return when (currentState) {
-                LISTEN -> handlePacketInStateListen(packetType)
+        fun newPacket(currentState: TCPState, packetType: PacketType): TcpStateAction {
+            val newAction =  when (currentState.serverState) {
+                LISTEN -> handlePacketInStateListen(currentState, packetType)
                 ESTABLISHED -> handlePacketInEstablished(packetType)
                 CLOSED -> handlePacketInStateClosed(packetType)
                 SYN_SENT -> handlePacketInSynSent(packetType)
@@ -48,6 +47,7 @@ class TcpStateFlow {
                     TcpStateAction(NoTransition, NoEvent)
                 }
             }
+            Timber.i("TCPStateFlow: from state: $currentState and packetType $packetType, new actions are ${newAction.events.joinToString() }}")
         }
 
         private fun handlePacketInTimeWait(packetType: PacketType): TcpStateAction {
@@ -58,123 +58,133 @@ class TcpStateFlow {
         }
 
         private fun handlePacketInClosing(packetType: PacketType): TcpStateAction {
-            return when {
-                packetType.isAck -> TcpStateAction(MoveToState(TIME_WAIT))
-                else -> CLOSE_AND_RESET
-            }
+            // return when {
+            //     packetType.isAck -> TcpStateAction(MoveToState(TIME_WAIT))
+            //     else -> CLOSE_AND_RESET
+            // }
+            return TcpStateAction()
         }
 
         private fun handlePacketInFinWait1(packetType: PacketType): TcpStateAction {
-            return when {
-                packetType.isFinAck -> TcpStateAction(MoveToState(TIME_WAIT), SendAck)
-                packetType.isAck -> TcpStateAction(MoveToState(FIN_WAIT_2))
-                packetType.isFin -> TcpStateAction(MoveToState(CLOSING), SendAck)
-                else -> CLOSE_AND_RESET
-            }
+            // return when {
+            //     packetType.isFinAck -> TcpStateAction(MoveToState(TIME_WAIT), SendAck)
+            //     packetType.isAck -> TcpStateAction(MoveToState(FIN_WAIT_2))
+            //     packetType.isFin -> TcpStateAction(MoveToState(CLOSING), SendAck)
+            //     else -> CLOSE_AND_RESET
+            // }
+            return TcpStateAction()
         }
 
         private fun handlePacketInFinWait2(packetType: PacketType): TcpStateAction {
-            return when {
-                packetType.isFin -> TcpStateAction(MoveToState(TIME_WAIT), SendAck)
-                else -> CLOSE_AND_RESET
-            }
+            // return when {
+            //     packetType.isFin -> TcpStateAction(MoveToState(TIME_WAIT), SendAck)
+            //     else -> CLOSE_AND_RESET
+            // }
+            return TcpStateAction()
         }
 
         private fun handlePacketInLastAck(packetType: PacketType): TcpStateAction {
-            return when {
-                packetType.isAck -> TcpStateAction(MoveToState(CLOSED), CloseConnection)
-                else -> CLOSE_AND_RESET
-            }
+            // return when {
+            //     packetType.isAck -> TcpStateAction(MoveToState(CLOSED), CloseConnection)
+            //     else -> CLOSE_AND_RESET
+            // }
+            return TcpStateAction()
         }
 
         private fun handlePacketInStateClosed(packetType: PacketType): TcpStateAction {
             Timber.w("Received packet but in closed state; sending RST")
             return when {
-                packetType.isSyn -> handlePacketInStateListen(packetType)
+                packetType.isSyn -> handlePacketInStateListen(currentState, packetType)
                 else -> TcpStateAction(NoTransition, SendReset)
             }
         }
 
-        private fun handlePacketInStateListen(packetType: PacketType): TcpStateAction {
-            return when {
-                packetType.isSyn -> TcpStateAction(NoTransition, OpenConnection)
-//                packetType.isFin -> {
-//                    Timber.w("In LISTEN, but received FIN packet. Sending FIN-ACK")
-//                    TcpStateAction(NoTransition, SendFinAck)
-//                }
-                packetType.isRst -> TcpStateAction(MoveToState(CLOSED), CloseConnection)
-                else -> TcpStateAction(NoTransition, SendReset)
+        private fun handlePacketInStateListen(
+            currentState: TCPState,
+            packetType: PacketType
+        ): TcpStateAction {
+//             return when {
+//                 packetType.isSyn -> TcpStateAction(NoTransition, OpenConnection)
+// //                packetType.isFin -> {
+// //                    Timber.w("In LISTEN, but received FIN packet. Sending FIN-ACK")
+// //                    TcpStateAction(NoTransition, SendFinAck)
+// //                }
+//                 packetType.isRst -> TcpStateAction(MoveToState(CLOSED), CloseConnection)
+//                 else -> TcpStateAction(NoTransition, SendReset)
+//             }
+            if (currentState.clientState == SYN_SENT){
+                // duplicate syn flag sent through, we don't want to do anything
+                return TcpStateAction()
             }
+
+
+            return TcpStateAction(MoveToState(currentState.copy(clientState = SYN_SENT)))
         }
 
         private fun handlePacketInSynSent(packetType: PacketType): TcpStateAction {
-            return when {
-                packetType.isAck -> TcpStateAction(MoveToState(ESTABLISHED))
-                packetType.isSyn -> TcpStateAction(event = ProcessDuplicateSyn)
-                else -> CLOSE_AND_RESET
-            }
+            // return when {
+            //     packetType.isAck -> TcpStateAction(MoveToState(ESTABLISHED))
+            //     packetType.isSyn -> TcpStateAction(event = ProcessDuplicateSyn)
+            //     else -> CLOSE_AND_RESET
+            // }
+            return TcpStateAction()
         }
 
         private fun handlePacketInSynReceived(packetType: PacketType): TcpStateAction {
-            return when {
-                packetType.isAck -> TcpStateAction(MoveToState(ESTABLISHED), WaitToRead)
-                else -> CLOSE_AND_RESET
-            }
+            // return when {
+            //     packetType.isAck -> TcpStateAction(MoveToState(ESTABLISHED), WaitToRead)
+            //     else -> CLOSE_AND_RESET
+            // }
+            return TcpStateAction()
         }
 
         private fun handlePacketInEstablished(packetType: PacketType): TcpStateAction {
-            return when {
-                packetType.isFin -> TcpStateAction(MoveToState(LAST_ACK), SendFinAck)
-                packetType.isAck -> TcpStateAction(event = ProcessPacket)
-                else -> CLOSE_AND_RESET
-            }
+            // return when {
+            //     packetType.isFin -> TcpStateAction(MoveToState(LAST_ACK), SendFinAck)
+            //     packetType.isAck -> TcpStateAction(event = ProcessPacket)
+            //     else -> CLOSE_AND_RESET
+            // }
+            return TcpStateAction()
         }
 
         fun socketOpening(currentState: TCBStatus, finishedConnecting: Boolean): TcpStateAction {
-            if (currentState != CLOSED) {
-                return CLOSE_AND_RESET
-            }
-
-            return if (finishedConnecting) {
-                TcpStateAction(MoveToState(SYN_RECEIVED), SendSynAck)
-            } else {
-                TcpStateAction(MoveToState(SYN_SENT), WaitToRead)
-            }
+            // if (currentState != CLOSED) {
+            //     return CLOSE_AND_RESET
+            // }
+            //
+            // return if (finishedConnecting) {
+            //     TcpStateAction(MoveToState(SYN_RECEIVED), SendSynAck)
+            // } else {
+            //     TcpStateAction(MoveToState(SYN_SENT), WaitToRead)
+            // }
+            return TcpStateAction()
         }
 
-        fun socketEndOfStream(currentState: TCBStatus): TcpStateAction {
-            return when (currentState) {
-                ESTABLISHED -> TcpStateAction(MoveToState(FIN_WAIT_1), SendFinAck)
-                CLOSE_WAIT -> TcpStateAction(MoveToState(LAST_ACK), SendFinAck)
-                FIN_WAIT_1 -> TcpStateAction(NoTransition, SendFinAck)
-                else -> {
-                    Timber.e("Socket end of stream. in state $currentState")
-                    CLOSE_AND_RESET
-                }
-            }
-        }
-    }
-
-    data class TcpStateAction(val transition: Transition = NoTransition, val event: Event = NoEvent)
-
-    sealed class Transition {
-        object NoTransition : Transition() {
-            override fun toString(): String {
-                return "NoTransition"
-            }
-        }
-
-
-        data class MoveToState(val state: TCBStatus) : Transition() {
-            override fun toString(): String {
-                return "MoveToState: $state"
-            }
+        fun socketEndOfStream(currentState: TCPState): TcpStateAction {
+            // return when (currentState.serverState) {
+            //     ESTABLISHED -> TcpStateAction(MoveToState(FIN_WAIT_1), SendFinAck)
+            //     CLOSE_WAIT -> TcpStateAction(MoveToState(LAST_ACK), SendFinAck)
+            //     FIN_WAIT_1 -> TcpStateAction(NoTransition, SendFinAck)
+            //     else -> {
+            //         Timber.e("Socket end of stream. in state $currentState")
+            //         CLOSE_AND_RESET
+            //     }
+            // }
+            return TcpStateAction()
         }
     }
+
+    data class TcpStateAction(val events: List<Event> = listOf(NoEvent))
 
     sealed class Event {
         override fun toString(): String {
             return this::class.java.simpleName
+        }
+
+        data class MoveToState(val state: TCPState) : Event() {
+            override fun toString(): String {
+                return "MoveToState: $state"
+            }
         }
 
         object NoEvent : Event()

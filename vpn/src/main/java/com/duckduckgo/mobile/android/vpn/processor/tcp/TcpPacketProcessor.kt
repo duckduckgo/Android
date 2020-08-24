@@ -121,9 +121,9 @@ class TcpPacketProcessor(queues: VpnQueues, networkChannelCreator: NetworkChanne
             return String(bytesForLogging)
         }
 
-        fun TCB.updateStatus(newStatus: TCB.TCBStatus) {
-            this.status = newStatus
-            Timber.v("Update TCB $ipAndPort status: $status")
+        fun TCB.updateStatus(newStatus: TCPState) {
+            this.tcbState = newStatus
+            Timber.v("Update TCB $ipAndPort status: $tcbState")
         }
 
         fun TCB.sendFinAck(queues: VpnQueues, packet: Packet, connectionParams: TcpConnectionParams) {

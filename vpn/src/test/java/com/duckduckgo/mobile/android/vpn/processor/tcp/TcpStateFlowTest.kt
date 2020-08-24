@@ -162,7 +162,7 @@ class TcpStateFlowTest {
     }
 
     private fun assertEvent(expected: Event, response: TcpStateAction) {
-        assertNotNull(response.event)
-        assertEquals(expected, response.event)
+        assertNotNull(response.events)
+        assertEquals(expected, response.events)
     }
 }
