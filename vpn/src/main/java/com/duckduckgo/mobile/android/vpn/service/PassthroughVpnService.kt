@@ -24,7 +24,6 @@ import android.os.Binder
 import android.os.Build
 import android.os.IBinder
 import android.os.ParcelFileDescriptor
-import com.duckduckgo.mobile.android.vpn.processor.QueueMonitor
 import com.duckduckgo.mobile.android.vpn.processor.TunPacketReader
 import com.duckduckgo.mobile.android.vpn.processor.TunPacketWriter
 import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpPacketProcessor
@@ -34,10 +33,9 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.MainScope
 import timber.log.Timber
-import xyz.hexene.localvpn.*
+import xyz.hexene.localvpn.Packet
 import java.nio.ByteBuffer
 import java.nio.channels.DatagramChannel
-import java.nio.channels.Selector
 import java.nio.channels.SocketChannel
 import java.util.concurrent.*
 
@@ -53,15 +51,7 @@ class PassthroughVpnService : VpnService(), CoroutineScope by MainScope(), Netwo
     val udpPacketProcessor = UdpPacketProcessor(queues, this)
     val tcpPacketProcessor = TcpPacketProcessor(queues, this)
 
-    private val tcpSelector = Selector.open()
-    private val udpSelector = Selector.open()
-
     private var executorService: ExecutorService? = null
-    private val tcpInput = TCPInput(queues.networkToDevice, tcpSelector)
-    private val tcpOutput = TCPOutput(queues.tcpDeviceToNetwork, queues.networkToDevice, tcpSelector, this)
-    private val udpOutput = UDPOutput(queues.udpDeviceToNetwork, udpSelector, this)
-    private val udpInput = UDPInput(queues.networkToDevice, udpSelector)
-    //private var tunPacketProcessor: TunPacketProcessor? = null
 
     inner class VpnServiceBinder : Binder() {
 
@@ -124,8 +114,7 @@ class PassthroughVpnService : VpnService(), CoroutineScope by MainScope(), Netwo
                 //tcpInput,
                 //tcpOutput,
                 tcpPacketProcessor,
-                udpInput,
-                udpOutput,
+                udpPacketProcessor,
                 TunPacketReader(vpnInterface, queues),
                 TunPacketWriter(vpnInterface, queues)
             )
@@ -250,7 +239,7 @@ class VpnQueues {
     val tcpDeviceToNetwork: BlockingDeque<Packet> = LinkedBlockingDeque()
     val udpDeviceToNetwork: BlockingQueue<Packet> = LinkedBlockingQueue()
 
-    val networkToDevice: BlockingQueue<ByteBuffer> = LinkedBlockingQueue<ByteBuffer>()
+    val networkToDevice: BlockingDeque<ByteBuffer> = LinkedBlockingDeque<ByteBuffer>()
     //val networkToDevice: ConcurrentLinkedQueue<ByteBuffer> = ConcurrentLinkedQueue()
 
     fun clearAll() {

@@ -18,7 +18,6 @@ package com.duckduckgo.mobile.android.vpn.processor
 
 import xyz.hexene.localvpn.Packet
 import java.nio.ByteBuffer
-import java.util.*
 
 data class QueuedBuffer(val buffer: ByteBuffer, val createdTime: Long =  System.nanoTime())
 data class QueuedPacket(val packet: Packet, val createdTime: Long = System.nanoTime())

@@ -27,6 +27,7 @@ import timber.log.Timber
 import xyz.hexene.localvpn.ByteBufferPool
 import xyz.hexene.localvpn.Packet
 import java.io.IOException
+import java.lang.Runnable
 import java.net.InetSocketAddress
 import java.nio.channels.DatagramChannel
 import java.nio.channels.SelectionKey
@@ -34,10 +35,7 @@ import java.nio.channels.Selector
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 
-class UdpPacketProcessor(
-    private val queues: VpnQueues,
-    private val networkChannelCreator: NetworkChannelCreator
-) {
+class UdpPacketProcessor(private val queues: VpnQueues, private val networkChannelCreator: NetworkChannelCreator) : Runnable{
 
     private var pollJobDeviceToNetwork: Job? = null
     private var pollJobNetworkToDevice: Job? = null
@@ -53,7 +51,7 @@ class UdpPacketProcessor(
         }
     }
 
-    fun start() {
+    override fun run() {
         Timber.i("Starting ${this::class.simpleName}")
 
         if (pollJobDeviceToNetwork == null) {
@@ -137,7 +135,7 @@ class UdpPacketProcessor(
         channel.register(selector, SelectionKey.OP_READ, packet)
 
         try {
-            val payloadBuffer = packet.backingBuffer
+            val payloadBuffer = packet.backingBuffer ?: return
             while (payloadBuffer.hasRemaining()) {
                 val bytesWritten = channel.write(payloadBuffer)
                 Timber.v("Wrote %d bytes to network (%s:%d)", bytesWritten, destinationAddress, destinationPort)
@@ -194,7 +192,7 @@ class UdpPacketProcessor(
                     Timber.i("Read %d bytes from datagram channel %s", readBytes, inputChannel)
 
                     val referencePacket = key.attachment() as Packet
-                    referencePacket.updateUDPBuffer(receiveBuffer, readBytes)
+                    referencePacket.updateUdpBuffer(receiveBuffer, readBytes)
                     receiveBuffer.position(HEADER_SIZE + readBytes)
 
                     queues.networkToDevice.offer(receiveBuffer)

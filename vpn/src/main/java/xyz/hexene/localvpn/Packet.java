@@ -24,8 +24,8 @@ import java.nio.ByteBuffer;
  * Representation of an IP Packet
  */
 // TODO: Reduce public mutability
-public class Packet
-{
+public class Packet {
+
     public static final int IP4_HEADER_SIZE = 20;
     public static final int TCP_HEADER_SIZE = 20;
     public static final int UDP_HEADER_SIZE = 8;
@@ -92,7 +92,7 @@ public class Packet
         }
     }
 
-    public void updateTCPBuffer(ByteBuffer buffer, byte flags, long sequenceNum, long ackNum, int payloadSize)
+    public void updateTcpBuffer(ByteBuffer buffer, byte flags, long sequenceNum, long ackNum, int payloadSize)
     {
         buffer.position(0);
         fillHeader(buffer);
@@ -121,7 +121,7 @@ public class Packet
         updateIP4Checksum();
     }
 
-    public void updateUDPBuffer(ByteBuffer buffer, int payloadSize)
+    public void updateUdpBuffer(ByteBuffer buffer, int payloadSize)
     {
         buffer.position(0);
         fillHeader(buffer);
@@ -201,7 +201,7 @@ public class Packet
         backingBuffer.putShort(IP4_HEADER_SIZE + 16, (short) sum);
     }
 
-    public void fillHeader(ByteBuffer buffer)
+    private void fillHeader(ByteBuffer buffer)
     {
         ip4Header.fillHeader(buffer);
         if (isUDP)
@@ -230,7 +230,7 @@ public class Packet
 
         public int optionsAndPadding;
 
-        private enum TransportProtocol
+        public enum TransportProtocol
         {
             TCP(6),
             UDP(17),

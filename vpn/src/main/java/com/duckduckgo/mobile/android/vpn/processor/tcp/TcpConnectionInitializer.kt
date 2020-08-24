@@ -16,6 +16,7 @@
 
 package com.duckduckgo.mobile.android.vpn.processor.tcp
 
+import com.duckduckgo.mobile.android.vpn.processor.tcp.ConnectionInitializer.TcpConnectionParams
 import com.duckduckgo.mobile.android.vpn.service.NetworkChannelCreator
 import com.duckduckgo.mobile.android.vpn.service.VpnQueues
 import timber.log.Timber
@@ -24,18 +25,30 @@ import xyz.hexene.localvpn.Packet.TCPHeader
 import xyz.hexene.localvpn.TCB
 import java.net.InetSocketAddress
 import java.nio.ByteBuffer
-import java.nio.channels.SelectionKey
-import java.nio.channels.Selector
 import java.nio.channels.SocketChannel
 import kotlin.random.Random
 
-class TcpConnectionInitializer constructor(
-    private val queues: VpnQueues,
-    private val selector: Selector,
-    private val networkChannelCreator: NetworkChannelCreator
-) {
+interface ConnectionInitializer {
+    fun initializeConnection(params: TcpConnectionParams): Pair<TCB, SocketChannel>?
 
-    fun initializeConnection(params: TcpConnectionParams) {
+    data class TcpConnectionParams(
+        val destinationAddress: String,
+        val destinationPort: Int,
+        val sourcePort: Int,
+        val packet: Packet,
+        val responseBuffer: ByteBuffer
+    ) {
+
+        fun key(): String {
+            return "$destinationAddress:$destinationPort:$sourcePort"
+        }
+
+    }
+}
+
+class TcpConnectionInitializer(private val queues: VpnQueues, private val networkChannelCreator: NetworkChannelCreator) : ConnectionInitializer {
+
+    override fun initializeConnection(params: TcpConnectionParams): Pair<TCB, SocketChannel>? {
         val key = params.key()
 
         val header = params.packet.tcpHeader
@@ -60,41 +73,31 @@ class TcpConnectionInitializer constructor(
                 params.packet
             )
             TCB.putTCB(params.key(), tcb)
-            connect(tcb, channel, params)
+            channel.connect(InetSocketAddress(params.destinationAddress, params.destinationPort))
+            return Pair(tcb, channel)
         } else {
             Timber.i("Trying to initialize a connection but is not a SYN packet; sending RST")
-            params.packet.updateTCPBuffer(params.responseBuffer, TCPHeader.RST.toByte(), 0, params.packet.tcpHeader.sequenceNumber + 1, 0)
+            params.packet.updateTcpBuffer(params.responseBuffer, TCPHeader.RST.toByte(), 0, params.packet.tcpHeader.sequenceNumber + 1, 0)
             queues.networkToDevice.offer(params.responseBuffer)
+            return null
         }
     }
 
-    private fun connect(tcb: TCB, channel: SocketChannel, params: TcpConnectionParams) {
-        channel.connect(InetSocketAddress(params.destinationAddress, params.destinationPort))
-        if (channel.finishConnect()) {
-            Timber.v("Channel finished connecting to ${tcb.selectionKey}")
-            tcb.status = TCB.TCBStatus.SYN_RECEIVED
-            Timber.v("Update TCB ${tcb.ipAndPort} status: ${tcb.status}")
-            params.packet.updateTCPBuffer(params.responseBuffer, (TCPHeader.SYN or TCPHeader.ACK).toByte(), tcb.mySequenceNum, tcb.myAcknowledgementNum, 0)
-            tcb.mySequenceNum++
-            queues.networkToDevice.offer(params.responseBuffer)
-        } else {
-            Timber.v("Not finished connecting yet to ${tcb.selectionKey}, will register for OP_CONNECT event")
-            tcb.status = TCB.TCBStatus.SYN_SENT
-            Timber.v("Update TCB ${tcb.ipAndPort} status: ${tcb.status}")
-            selector.wakeup()
-            tcb.selectionKey = channel.register(selector, SelectionKey.OP_CONNECT, tcb)
-        }
-    }
-
-    data class TcpConnectionParams(
-        val destinationAddress: String,
-        val destinationPort: Int,
-        val sourcePort: Int,
-        val packet: Packet,
-        val responseBuffer: ByteBuffer
-    ) {
-        fun key(): String {
-            return "$destinationAddress:$destinationPort:$sourcePort"
-        }
-    }
+//    private fun connect(tcb: TCB, channel: SocketChannel, params: TcpConnectionParams) {
+//        channel.connect(InetSocketAddress(params.destinationAddress, params.destinationPort))
+//        if (channel.finishConnect()) {
+//            Timber.v("Channel finished connecting to ${tcb.ipAndPort}")
+//            tcb.status = TCB.TCBStatus.SYN_RECEIVED
+//            Timber.v("Update TCB ${tcb.ipAndPort} status: ${tcb.status}")
+//            params.packet.updateTcpBuffer(params.responseBuffer, (TCPHeader.SYN or TCPHeader.ACK).toByte(), tcb.mySequenceNum, tcb.myAcknowledgementNum, 0)
+//            tcb.mySequenceNum++
+//            queues.networkToDevice.offer(params.responseBuffer)
+//        } else {
+//            Timber.v("Not finished connecting yet to ${tcb.selectionKey}, will register for OP_CONNECT event")
+//            tcb.status = TCB.TCBStatus.SYN_SENT
+//            Timber.v("Update TCB ${tcb.ipAndPort} status: ${tcb.status}")
+//            selector.wakeup()
+//            tcb.selectionKey = channel.register(selector, SelectionKey.OP_CONNECT, tcb)
+//        }
+//    }
 }

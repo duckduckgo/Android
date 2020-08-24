@@ -16,16 +16,18 @@
 
 package com.duckduckgo.mobile.android.vpn.processor.tcp
 
+import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpPacketProcessor.Companion.updateStatus
+import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpStateFlow.Transition.MoveToState
 import com.duckduckgo.mobile.android.vpn.service.VpnQueues
 import timber.log.Timber
 import xyz.hexene.localvpn.ByteBufferPool
 import xyz.hexene.localvpn.Packet
-import xyz.hexene.localvpn.Packet.TCPHeader.ACK
-import xyz.hexene.localvpn.Packet.TCPHeader.FIN
+import xyz.hexene.localvpn.Packet.TCPHeader.*
 import xyz.hexene.localvpn.TCB
-import xyz.hexene.localvpn.TCB.TCBStatus.*
 import java.io.IOException
+import java.nio.ByteBuffer
 import java.nio.channels.SelectionKey
+import java.nio.channels.SelectionKey.OP_CONNECT
 import java.nio.channels.Selector
 import java.nio.channels.SocketChannel
 import java.util.concurrent.TimeUnit
@@ -54,15 +56,15 @@ class TcpNetworkToDevice(
         val iterator = selector.selectedKeys().iterator()
         while (iterator.hasNext()) {
             val key = iterator.next()
+            iterator.remove()
 
             kotlin.runCatching {
                 if (key.isValid && key.isReadable) {
                     Timber.v("Got next network-to-device packet [isReadable] after ${TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startTime)}ms wait")
-                    iterator.remove()
                     processRead(key)
                 } else if (key.isValid && key.isConnectable) {
                     Timber.v("Got next network-to-device packet [isConnectable] after ${TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startTime)}ms wait")
-                    processConnect(key, iterator)
+                    processConnect(key)
                 } else if (key.isValid && key.isWritable) {
 
                     val partialWriteData = key.attachment() as TcpPacketProcessor.PendingWriteData
@@ -71,12 +73,8 @@ class TcpNetworkToDevice(
                     val fullyWritten = tcpSocketWriter.writeToSocket(partialWriteData)
                     Timber.i("Fully written this time? %s", fullyWritten)
                     if (fullyWritten) {
-                        iterator.remove()
                         key.interestOps(SelectionKey.OP_READ)
                     }
-
-                } else {
-                    Timber.w("Umm, what? ${key.interestOps()}")
                 }
             }.onFailure {
                 Timber.w(it, "Failure processing selected key for selector")
@@ -99,18 +97,26 @@ class TcpNetworkToDevice(
                 val readBytes = channel.read(receiveBuffer)
 
                 if (endOfStream(readBytes)) {
-                    key.interestOps(0)
-                    tcb.waitingForNetworkData = false
+                    Timber.w("Network-to-device end of stream ${tcb.ipAndPort}. ${tcb.status} ${TcpPacketProcessor.logPacketDetails(packet)}")
+
+                    // close connection with remote end point as there's no more communication required
                     key.cancel()
+                    channel.close()
 
-                    Timber.i("Network-to-device end of stream ${tcb.ipAndPort}. ${TcpPacketProcessor.logPacketDetails(packet)}")
+                    val action = TcpStateFlow.socketEndOfStream(tcb.status)
 
-                    tcb.status = FIN_WAIT_1
-                    Timber.v("Update TCB ${tcb.ipAndPort} status: ${tcb.status}")
+                    Timber.v("Action: ${action.transition} - ${action.event} for ${tcb.ipAndPort}")
 
-                    packet.updateTCPBuffer(receiveBuffer, (FIN or ACK).toByte(), tcb.mySequenceNum, tcb.myAcknowledgementNum, 0)
-                    tcb.mySequenceNum++
-                    queues.networkToDevice.offer(receiveBuffer)
+                    if (action.transition is MoveToState) {
+                        tcb.updateStatus(action.transition.state)
+                    }
+
+                    when (action.event) {
+                        TcpStateFlow.Event.SendFinAck -> sendFinAck(packet, receiveBuffer, tcb)
+                        TcpStateFlow.Event.SendReset -> sendReset(packet, receiveBuffer, tcb)
+                        else -> Timber.w("Unhandled event for ${tcb.ipAndPort}")
+                    }
+
 
                     //TCB.closeTCB(tcb)
 
@@ -131,7 +137,7 @@ class TcpNetworkToDevice(
 
                     Timber.i("${tcb.ipAndPort} limit=$limit, position=$position, totalLength=$totalLength, readBytes=$readBytes, tcpHeaderLength=${packet.tcpHeader.headerLength}, ipHeaderLength=${packet.ip4Header.headerLength}")
                     Timber.i("Network-to-device packet ${tcb.ipAndPort}. $readBytes bytes. ${TcpPacketProcessor.logPacketDetails(packet)}")
-                    packet.updateTCPBuffer(receiveBuffer, (Packet.TCPHeader.PSH or ACK).toByte(), tcb.mySequenceNum, tcb.myAcknowledgementNum, readBytes)
+                    packet.updateTcpBuffer(receiveBuffer, (PSH or ACK).toByte(), tcb.mySequenceNum, tcb.myAcknowledgementNum, readBytes)
 
                     tcb.mySequenceNum += readBytes
                     receiveBuffer.position(HEADER_SIZE + readBytes)
@@ -139,7 +145,7 @@ class TcpNetworkToDevice(
                 }
             } catch (e: IOException) {
                 Timber.w(e, "Network read error")
-                packet.updateTCPBuffer(receiveBuffer, Packet.TCPHeader.RST.toByte(), 0, tcb.myAcknowledgementNum, 0)
+                packet.updateTcpBuffer(receiveBuffer, Packet.TCPHeader.RST.toByte(), 0, tcb.myAcknowledgementNum, 0)
                 queues.networkToDevice.offer(receiveBuffer)
                 TCB.closeTCB(tcb)
                 return
@@ -148,30 +154,48 @@ class TcpNetworkToDevice(
 
     }
 
-    private fun processConnect(key: SelectionKey, iterator: MutableIterator<SelectionKey>) {
+    private fun sendFin(packet: Packet, receiveBuffer: ByteBuffer?, tcb: TCB) {
+        packet.updateTcpBuffer(receiveBuffer, (FIN).toByte(), tcb.mySequenceNum, tcb.myAcknowledgementNum, 0)
+        tcb.mySequenceNum++
+        queues.networkToDevice.offerFirst(receiveBuffer)
+    }
+
+    private fun sendFinAck(packet: Packet, receiveBuffer: ByteBuffer?, tcb: TCB) {
+        packet.updateTcpBuffer(receiveBuffer, (FIN or ACK).toByte(), tcb.mySequenceNum, tcb.myAcknowledgementNum, 0)
+        tcb.mySequenceNum++
+        queues.networkToDevice.offerFirst(receiveBuffer)
+    }
+
+    private fun sendReset(packet: Packet, receiveBuffer: ByteBuffer?, tcb: TCB) {
+        packet.updateTcpBuffer(receiveBuffer, (RST).toByte(), tcb.mySequenceNum, tcb.myAcknowledgementNum, 0)
+        tcb.mySequenceNum++
+        queues.networkToDevice.offerFirst(receiveBuffer)
+    }
+
+    private fun processConnect(key: SelectionKey) {
         val tcb = key.attachment() as TCB
         val packet = tcb.referencePacket
         runCatching {
             if (tcb.channel.finishConnect()) {
                 Timber.d("Finished connecting to ${tcb.ipAndPort}. Sending SYN+ACK.")
 
-                iterator.remove()
                 tcb.status = TCB.TCBStatus.SYN_RECEIVED
                 Timber.v("Update TCB ${tcb.ipAndPort} status: ${tcb.status}")
 
                 val responseBuffer = ByteBufferPool.acquire()
-                packet.updateTCPBuffer(responseBuffer, (Packet.TCPHeader.SYN or ACK).toByte(), tcb.mySequenceNum, tcb.myAcknowledgementNum, 0)
+                packet.updateTcpBuffer(responseBuffer, (Packet.TCPHeader.SYN or ACK).toByte(), tcb.mySequenceNum, tcb.myAcknowledgementNum, 0)
                 queues.networkToDevice.offer(responseBuffer)
                 tcb.mySequenceNum++
 
-                key.interestOps(SelectionKey.OP_READ)
+                tcb.channel.register(selector, OP_NONE)
             } else {
                 Timber.v("Not finished connecting yet ${tcb.ipAndPort}")
+                tcb.channel.register(selector, OP_CONNECT, tcb)
             }
         }.onFailure {
             Timber.w(it, "Failed to process TCP connect ${tcb.ipAndPort}")
             val responseBuffer = ByteBufferPool.acquire()
-            packet.updateTCPBuffer(responseBuffer, Packet.TCPHeader.RST.toByte(), 0, tcb.myAcknowledgementNum, 0)
+            packet.updateTcpBuffer(responseBuffer, Packet.TCPHeader.RST.toByte(), 0, tcb.myAcknowledgementNum, 0)
             queues.networkToDevice.offer(responseBuffer)
             TCB.closeTCB(tcb)
         }
@@ -181,6 +205,7 @@ class TcpNetworkToDevice(
 
     companion object {
         private const val HEADER_SIZE = Packet.IP4_HEADER_SIZE + Packet.TCP_HEADER_SIZE
+        private const val OP_NONE = 0
     }
 
 }

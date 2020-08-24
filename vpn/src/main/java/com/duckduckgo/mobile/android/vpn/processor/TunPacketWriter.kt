@@ -20,10 +20,8 @@ import android.os.ParcelFileDescriptor
 import com.duckduckgo.mobile.android.vpn.service.VpnQueues
 import timber.log.Timber
 import xyz.hexene.localvpn.ByteBufferPool
-import xyz.hexene.localvpn.Packet
 import java.io.FileOutputStream
 import java.io.IOException
-import java.nio.ByteBuffer
 import java.nio.channels.FileChannel
 
 
@@ -64,6 +62,8 @@ class TunPacketWriter(private val tunInterface: ParcelFileDescriptor, private va
                 val bytesWrittenToVpn = vpnOutput.write(bufferFromNetwork)
                 if (bytesWrittenToVpn == 0) {
                     Timber.w("Failed to write any bytes to TUN")
+                } else {
+                    Timber.v("Wrote %d bytes to TUN", bytesWrittenToVpn)
                 }
             }
 

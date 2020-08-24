@@ -22,8 +22,6 @@ import timber.log.Timber
 import xyz.hexene.localvpn.ByteBufferPool
 import xyz.hexene.localvpn.Packet
 import java.io.FileInputStream
-import java.io.IOException
-import java.nio.BufferUnderflowException
 import java.nio.ByteBuffer
 import java.nio.channels.FileChannel
 

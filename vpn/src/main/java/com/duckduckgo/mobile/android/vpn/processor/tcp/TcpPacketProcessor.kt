@@ -18,7 +18,7 @@ package com.duckduckgo.mobile.android.vpn.processor.tcp
 
 import android.os.Process.THREAD_PRIORITY_URGENT_DISPLAY
 import android.os.Process.setThreadPriority
-import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpConnectionInitializer.TcpConnectionParams
+import com.duckduckgo.mobile.android.vpn.processor.tcp.ConnectionInitializer.TcpConnectionParams
 import com.duckduckgo.mobile.android.vpn.service.NetworkChannelCreator
 import com.duckduckgo.mobile.android.vpn.service.VpnQueues
 import kotlinx.coroutines.GlobalScope
@@ -26,6 +26,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import xyz.hexene.localvpn.ByteBufferPool
 import xyz.hexene.localvpn.Packet
 import xyz.hexene.localvpn.TCB
 import java.nio.ByteBuffer
@@ -42,7 +43,7 @@ class TcpPacketProcessor(queues: VpnQueues, networkChannelCreator: NetworkChanne
 
     private val tcpSocketWriter = TcpSocketWriter(selector)
     private val tcpNetworkToDevice = TcpNetworkToDevice(queues, selector, tcpSocketWriter)
-    private val tcpDeviceToNetwork = TcpDeviceToNetwork(queues, selector, tcpSocketWriter, TcpConnectionInitializer(queues, selector, networkChannelCreator))
+    private val tcpDeviceToNetwork = TcpDeviceToNetwork(queues, selector, tcpSocketWriter, TcpConnectionInitializer(queues, networkChannelCreator))
 
     override fun run() {
         Timber.i("Starting ${this::class.simpleName}")
@@ -98,8 +99,8 @@ class TcpPacketProcessor(queues: VpnQueues, networkChannelCreator: NetworkChanne
         val connectionParams: TcpConnectionParams
     )
 
-    companion object{
-        fun logPacketDetails(packet: Packet) : String {
+    companion object {
+        fun logPacketDetails(packet: Packet): String {
             val tcpHeader = packet.tcpHeader
             val isSyn = tcpHeader.isSYN
             val isAck = tcpHeader.isACK
@@ -119,6 +120,50 @@ class TcpPacketProcessor(queues: VpnQueues, networkChannelCreator: NetworkChanne
             }
             return String(bytesForLogging)
         }
+
+        fun TCB.updateStatus(newStatus: TCB.TCBStatus) {
+            this.status = newStatus
+            Timber.v("Update TCB $ipAndPort status: $status")
+        }
+
+        fun TCB.sendFinAck(queues: VpnQueues, packet: Packet, connectionParams: TcpConnectionParams) {
+            packet.updateTcpBuffer(
+                connectionParams.responseBuffer,
+                (Packet.TCPHeader.FIN or Packet.TCPHeader.ACK).toByte(),
+                this.mySequenceNum,
+                this.myAcknowledgementNum,
+                0
+            )
+            this.mySequenceNum++
+            queues.networkToDevice.offer(connectionParams.responseBuffer)
+        }
+
+        fun TCB.sendAck(queues: VpnQueues, packet: Packet, connectionParams: TcpConnectionParams) {
+            packet.updateTcpBuffer(connectionParams.responseBuffer, (Packet.TCPHeader.ACK).toByte(), this.mySequenceNum, this.myAcknowledgementNum, 0)
+            this.mySequenceNum++
+            queues.networkToDevice.offer(connectionParams.responseBuffer)
+        }
+
+
+        fun TCB.sendResetPacket(queues: VpnQueues, previousPayLoadSize: Int, responseBuffer: ByteBuffer) {
+            Timber.w("Sending device-to-network reset packet ${this.ipAndPort}")
+            this.referencePacket.updateTcpBuffer(responseBuffer, Packet.TCPHeader.RST.toByte(), 0, this.myAcknowledgementNum + previousPayLoadSize, 0)
+            queues.networkToDevice.offer(responseBuffer)
+            TCB.closeTCB(this)
+        }
+
+        fun TCB.closeConnection(buffer: ByteBuffer) {
+            Timber.v("Closing TCB connection $ipAndPort}")
+            ByteBufferPool.release(buffer)
+            TCB.closeTCB(this)
+        }
+
+
+        fun TCB.logAckSeqDetails(): String {
+            return "mySeq:[rel=${mySequenceNum - mySequenceNumberInitial}, abs=$mySequenceNum], myAck: $myAcknowledgementNum"
+        }
+
+
     }
 
 }

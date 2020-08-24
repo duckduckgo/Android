@@ -28,7 +28,6 @@ import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import com.duckduckgo.mobile.android.vpn.service.PassthroughVpnService
 import com.duckduckgo.mobile.android.vpn.R
-import com.duckduckgo.mobile.android.vpn.processor.QueuedPacket
 import kotlinx.coroutines.*
 import timber.log.Timber
 import xyz.hexene.localvpn.Packet

@@ -57,6 +57,8 @@ ext {
     lifecycle = "2.2.0"
     androidXTest = "1.2.0"
 
+    mockitoAndroid = "3.5.2"
+    mockitoKotlin = "2.0.0"
 }
 
 dependencies {
@@ -78,10 +80,14 @@ dependencies {
     androidTestImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutines"
 
     testImplementation 'junit:junit:4.13'
+
     androidTestImplementation "androidx.test:runner:$androidXTest"
     androidTestImplementation "androidx.test:rules:$androidXTest"
     androidTestImplementation 'androidx.test.ext:junit:1.1.1'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
+
+    androidTestImplementation "org.mockito:mockito-android:$mockitoAndroid"
+    androidTestImplementation "com.nhaarman.mockitokotlin2:mockito-kotlin:$mockitoKotlin"
 
     implementation 'com.jakewharton.timber:timber:4.7.1'
 }

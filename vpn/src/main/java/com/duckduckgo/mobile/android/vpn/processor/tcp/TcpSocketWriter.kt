@@ -22,10 +22,14 @@ import java.nio.ByteBuffer
 import java.nio.channels.SelectionKey
 import java.nio.channels.Selector
 
+interface SocketWriter {
+    fun writeToSocket(writeData: TcpPacketProcessor.PendingWriteData): Boolean
+}
 
-class TcpSocketWriter(private val selector:Selector) {
+class TcpSocketWriter(private val selector:Selector) : SocketWriter{
 
-    fun writeToSocket(writeData: TcpPacketProcessor.PendingWriteData): Boolean {
+    override fun writeToSocket(writeData: TcpPacketProcessor.PendingWriteData): Boolean {
+        Timber.v("Writing data to socket ${writeData.tcb.ipAndPort}: ${writeData.payloadSize} bytes")
         val payloadBuffer = writeData.payloadBuffer
         val payloadSize = writeData.payloadSize
         val socket = writeData.socket
@@ -56,7 +60,7 @@ class TcpSocketWriter(private val selector:Selector) {
             socket.register(selector, SelectionKey.OP_READ, tcb)
             tcb.myAcknowledgementNum = connectionParams.packet.tcpHeader.sequenceNumber + payloadSize
             tcb.theirAcknowledgementNum = connectionParams.packet.tcpHeader.acknowledgementNumber
-            tcb.referencePacket.updateTCPBuffer(connectionParams.responseBuffer, Packet.TCPHeader.ACK.toByte(), tcb.mySequenceNum, tcb.myAcknowledgementNum, 0)
+            tcb.referencePacket.updateTcpBuffer(connectionParams.responseBuffer, Packet.TCPHeader.ACK.toByte(), tcb.mySequenceNum, tcb.myAcknowledgementNum, 0)
             return true
         }
     }
