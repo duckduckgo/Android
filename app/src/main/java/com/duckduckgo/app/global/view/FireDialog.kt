@@ -46,6 +46,7 @@ class FireDialog(
     var clearStarted: (() -> Unit) = {}
     var clearComplete: (() -> Unit) = {}
 
+    private var speedUpAnimation: Boolean = false
     private var canRestart = !animationEnabled()
     private var onClearDataOptionsDismissed: () -> Unit = {}
 
@@ -129,7 +130,12 @@ class FireDialog(
             }
         })
         fireAnimationView.addAnimatorUpdateListener {
-            window?.setDimAmount(fireAnimationView.progress)
+            if (speedUpAnimation) {
+                fireAnimationView.speed += 0.15f
+                if (fireAnimationView.speed > 1.4f) {
+                    speedUpAnimation = false
+                }
+            }
         }
     }
 
@@ -146,6 +152,7 @@ class FireDialog(
     private fun killAndRestartIfAllTasksCompleted() {
         synchronized(this) {
             if (!canRestart) {
+                speedUpAnimation = true
                 canRestart = true
             } else {
                 clearPersonalDataAction.killAndRestartProcess()
