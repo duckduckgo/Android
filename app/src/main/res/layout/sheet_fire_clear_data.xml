@@ -27,7 +27,7 @@
         android:scaleType="centerCrop"
         android:visibility="gone"
         app:lottie_loop="false"
-        app:lottie_rawRes="@raw/fire_hero_rising_flame" />
+        app:lottie_rawRes="@raw/fire_hero_rising" />
 
     <LinearLayout
         android:id="@+id/fireDialogRootView"
