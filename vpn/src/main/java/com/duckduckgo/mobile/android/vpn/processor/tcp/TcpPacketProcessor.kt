@@ -38,6 +38,7 @@ import java.nio.ByteBuffer
 import java.nio.channels.Selector
 import java.nio.channels.SocketChannel
 import java.util.concurrent.Executors
+import kotlin.math.pow
 
 class TcpPacketProcessor(queues: VpnQueues, networkChannelCreator: NetworkChannelCreator) : Runnable {
 
@@ -137,7 +138,7 @@ class TcpPacketProcessor(queues: VpnQueues, networkChannelCreator: NetworkChanne
                 connectionParams.responseBuffer,
                 (Packet.TCPHeader.FIN or Packet.TCPHeader.ACK).toByte(),
                 this.mySequenceNum,
-                this.myAcknowledgementNum,
+                this.acknowledgementNumberToClient,
                 0
             )
             this.mySequenceNum++
@@ -145,7 +146,15 @@ class TcpPacketProcessor(queues: VpnQueues, networkChannelCreator: NetworkChanne
         }
 
         fun TCB.sendAck(queues: VpnQueues, packet: Packet, connectionParams: TcpConnectionParams) {
-            packet.updateTcpBuffer(connectionParams.responseBuffer, (Packet.TCPHeader.ACK).toByte(), this.mySequenceNum, this.myAcknowledgementNum, 0)
+            val payloadSize = packet.tcpPayloadSize()
+
+            acknowledgementNumberToClient = increaseSequenceNumber(packet.tcpHeader.sequenceNumber, payloadSize.toLong())
+
+            if (packet.tcpHeader.isRST || packet.tcpHeader.isSYN || packet.tcpHeader.isFIN) {
+                acknowledgementNumberToClient = increaseSequenceNumber(acknowledgementNumberToClient, 1)
+            }
+
+            packet.updateTcpBuffer(connectionParams.responseBuffer, (Packet.TCPHeader.ACK).toByte(), this.mySequenceNum, this.acknowledgementNumberToClient, 0)
             this.mySequenceNum++
             queues.networkToDevice.offer(connectionParams.responseBuffer)
         }
@@ -153,7 +162,7 @@ class TcpPacketProcessor(queues: VpnQueues, networkChannelCreator: NetworkChanne
 
         fun TCB.sendResetPacket(queues: VpnQueues, previousPayLoadSize: Int, responseBuffer: ByteBuffer) {
             Timber.w("Sending device-to-network reset packet ${this.ipAndPort}")
-            this.referencePacket.updateTcpBuffer(responseBuffer, Packet.TCPHeader.RST.toByte(), 0, this.myAcknowledgementNum + previousPayLoadSize, 0)
+            this.referencePacket.updateTcpBuffer(responseBuffer, Packet.TCPHeader.RST.toByte(), 0, this.acknowledgementNumberToClient + previousPayLoadSize, 0)
             queues.networkToDevice.offer(responseBuffer)
             TCB.closeTCB(this)
         }
@@ -166,7 +175,7 @@ class TcpPacketProcessor(queues: VpnQueues, networkChannelCreator: NetworkChanne
 
 
         fun TCB.logAckSeqDetails(): String {
-            return "mySeq:[rel=${mySequenceNum - mySequenceNumberInitial}, abs=$mySequenceNum], myAck: $myAcknowledgementNum"
+            return "mySeq:[rel=${mySequenceNum - mySequenceNumberInitial}, abs=$mySequenceNum], myAck: $acknowledgementNumberToClient"
         }
 
         fun TCB.updateState(state: MoveState) {
@@ -186,6 +195,11 @@ class TcpPacketProcessor(queues: VpnQueues, networkChannelCreator: NetworkChanne
             updateStatus(tcbState.copy(clientState = newState.state))
         }
 
+        private fun increaseSequenceNumber(current: Long, increment: Long): Long {
+            return (current + increment) % MAX_SEQUENCE_NUMBER
+        }
+
+        private val MAX_SEQUENCE_NUMBER = (2.0.pow(32.0) - 1).toLong()
     }
 
 }

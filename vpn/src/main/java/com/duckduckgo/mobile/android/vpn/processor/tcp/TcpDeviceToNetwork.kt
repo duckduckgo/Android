@@ -17,7 +17,6 @@
 package com.duckduckgo.mobile.android.vpn.processor.tcp
 
 import android.os.Handler
-import android.os.Looper
 import androidx.core.os.postDelayed
 import com.duckduckgo.mobile.android.vpn.processor.tcp.ConnectionInitializer.TcpConnectionParams
 import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpPacketProcessor.Companion.closeConnection
@@ -87,7 +86,7 @@ class TcpDeviceToNetwork(
     private fun processPacketTcbNotInitialized(connectionKey: String, packet: Packet, totalPacketLength: Int, connectionParams: TcpConnectionParams) {
         Timber.i("Device-to-network packet: $connectionKey. TCB not initialized. ${TcpPacketProcessor.logPacketDetails(packet)}. Packet length: $totalPacketLength")
         val destinationAddressPort = "${connectionParams.destinationAddress}:${connectionParams.destinationPort}"
-        TcpStateFlow.newPacket(TcbState(), packet.asPacketType()).events.forEach {
+        TcpStateFlow.newPacket(connectionKey, TcbState(), packet.asPacketType()).events.forEach {
             when (it) {
                 OpenConnection -> openConnection(connectionParams)
                 SendReset -> {
@@ -117,7 +116,11 @@ class TcpDeviceToNetwork(
     ) {
         Timber.i("Device-to-network packet: $connectionKey. ${tcb.tcbState}. ${tcb.logAckSeqDetails()} ${TcpPacketProcessor.logPacketDetails(packet)}. Packet length: $totalPacketLength")
 
-        val action = TcpStateFlow.newPacket(tcb.tcbState, packet.asPacketType())
+        if (packet.tcpHeader.isACK) {
+            tcb.acknowledgementNumberToServer = packet.tcpHeader.acknowledgementNumber
+        }
+
+        val action = TcpStateFlow.newPacket(connectionKey, tcb.tcbState, packet.asPacketType())
         Timber.v("Action: ${action.events} for ${tcb.ipAndPort}")
 
         action.events.forEach {
@@ -126,7 +129,7 @@ class TcpDeviceToNetwork(
                 ProcessPacket -> processPacket(tcb, payloadBuffer, connectionParams)
                 SendFinAck -> tcb.sendFinAck(queues, packet, connectionParams)
                 CloseConnection -> tcb.closeConnection(responseBuffer)
-                DelayedCloseConnection -> handler.postDelayed(100) { tcb.closeConnection(responseBuffer) }
+                DelayedCloseConnection -> handler.postDelayed(3_000) { tcb.closeConnection(responseBuffer) }
                 SendAck -> tcb.sendAck(queues, packet, connectionParams)
 //                ProcessDuplicateSyn -> processDuplicateSyn(tcb, connectionParams)
 
@@ -159,7 +162,7 @@ class TcpDeviceToNetwork(
                 is MoveState -> tcb.updateState(it)
                 SendSynAck -> {
                     Timber.v("Channel finished connecting to ${tcb.ipAndPort}")
-                    params.packet.updateTcpBuffer(params.responseBuffer, (SYN or ACK).toByte(), tcb.mySequenceNum, tcb.myAcknowledgementNum, 0)
+                    params.packet.updateTcpBuffer(params.responseBuffer, (SYN or ACK).toByte(), tcb.mySequenceNum, tcb.acknowledgementNumberToClient, 0)
                     tcb.mySequenceNum++
                     queues.networkToDevice.offer(params.responseBuffer)
                 }
@@ -179,7 +182,7 @@ class TcpDeviceToNetwork(
         synchronized(tcb) {
 
             if (!tcb.waitingForNetworkData) {
-                Timber.w("Not waiting for network data ${tcb.ipAndPort}; register for OP_READ and wait for network data")
+                Timber.v("Not waiting for network data ${tcb.ipAndPort}; register for OP_READ and wait for network data")
                 selector.wakeup()
                 tcb.selectionKey.interestOps(SelectionKey.OP_READ)
                 tcb.waitingForNetworkData = true

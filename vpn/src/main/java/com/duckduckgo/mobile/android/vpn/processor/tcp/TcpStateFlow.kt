@@ -29,7 +29,7 @@ class TcpStateFlow {
 
     companion object {
 
-        fun newPacket(currentState: TcbState, packetType: PacketType): TcpStateAction {
+        fun newPacket(connectionKey: String, currentState: TcbState, packetType: PacketType): TcpStateAction {
             val newActions = when (currentState.serverState) {
                 LISTEN -> handlePacketInStateListen(currentState, packetType)
                 SYN_RECEIVED -> handlePacketInSynReceived(currentState, packetType)
@@ -37,7 +37,8 @@ class TcpStateFlow {
                 LAST_ACK -> handlePacketInLastAck(packetType)
                 FIN_WAIT_1 -> handlePacketInFinWait1(currentState, packetType)
                 FIN_WAIT_2 -> handlePacketInFinWait2(currentState, packetType)
-                //CLOSING -> handlePacketInClosing(currentState, packetType)
+                CLOSING -> handlePacketInClosing(currentState, packetType)
+                TIME_WAIT -> handlePacketInTimeWait(packetType)
 //                CLOSED -> handlePacketInStateClosed(packetType)
 //                SYN_SENT -> handlePacketInSynSent(packetType)
 //                SYN_RECEIVED -> handlePacketInSynReceived(packetType)
@@ -48,8 +49,18 @@ class TcpStateFlow {
 //                TIME_WAIT -> handlePacketInTimeWait(packetType)
                 else -> unhandledEvent(currentState, packetType)
             }
-            Timber.i("TCPStateFlow: from state: $currentState and packetType $packetType, new actions are ${newActions.joinToString()}}")
+            Timber.i("$connectionKey. Current states $currentState. $packetType, New actions are [${newActions.ifEmpty { listOf("No Actions") }.joinToString()}]")
             return TcpStateAction(newActions)
+        }
+
+        private fun handlePacketInTimeWait(packetType: PacketType): List<Event> {
+            return when {
+                packetType.isRst -> {
+                    Timber.w("Received RESET while in TIME_WAIT. Closing connection")
+                    listOf(CloseConnection)
+                }
+                else -> listOf(SendAck)
+            }
         }
 
         private fun handlePacketInLastAck(packetType: PacketType): List<Event> {
@@ -65,28 +76,47 @@ class TcpStateFlow {
             }
         }
 
-        private fun handlePacketInFinWait1(currentState: TcbState, packetType: PacketType) : List<Event> {
-            // check if there's data. if so, should ACK it
+        private fun handlePacketInFinWait1(currentState: TcbState, packetType: PacketType): List<Event> {
+            val eventList = mutableListOf<Event>()
 
-            return when {
-                packetType.isFin -> {
-                    listOf(SendAck, MoveServerToState(CLOSING), MoveClientToState(FIN_WAIT_1))
-                }
-                packetType.isAck -> { listOf(MoveServerToState(FIN_WAIT_2))}
-                else -> unhandledEvent(currentState, packetType)
+            // check if there's data. if so, should ACK it
+            if (packetType.hasData) {
+                eventList.add(SendAck)
             }
+
+            eventList.addAll(
+                when {
+                    packetType.isFin -> {
+                        listOf(SendAck, MoveServerToState(CLOSING), MoveClientToState(FIN_WAIT_1))
+                    }
+                    packetType.isAck -> {
+                        listOf(MoveServerToState(FIN_WAIT_2))
+                    }
+                    else -> unhandledEvent(currentState, packetType)
+                }
+            )
+            return eventList
         }
 
-        private fun handlePacketInFinWait2(currentState: TcbState, packetType: PacketType) : List<Event> {
-            // check if there's data. if so, should ACK it
+        private fun handlePacketInFinWait2(currentState: TcbState, packetType: PacketType): List<Event> {
+            val eventList = mutableListOf<Event>()
 
-            return when {
-                packetType.isFin -> {
-                    listOf(SendAck, MoveServerToState(TIME_WAIT), MoveClientToState(LAST_ACK), DelayedCloseConnection)
-                }
-                packetType.isRst -> listOf(CloseConnection)
-                else -> unhandledEvent(currentState, packetType)
+            // check if there's data. if so, should ACK it
+            if (packetType.hasData) {
+                eventList.add(SendAck)
             }
+
+            eventList.addAll(
+                when {
+                    packetType.isFin -> {
+                        listOf(SendAck, MoveServerToState(TIME_WAIT), MoveClientToState(LAST_ACK), DelayedCloseConnection)
+                    }
+                    packetType.isRst -> listOf(CloseConnection)
+                    else -> unhandledEvent(currentState, packetType)
+                }
+            )
+
+            return eventList
         }
 
         //        private fun handlePacketInTimeWait(packetType: PacketType): TcpStateAction {
@@ -96,14 +126,29 @@ class TcpStateFlow {
 //            }
 //        }
 //
-//        private fun handlePacketInClosing(packetType: PacketType): TcpStateAction {
-//            // return when {
-//            //     packetType.isAck -> TcpStateAction(MoveToState(TIME_WAIT))
-//            //     else -> CLOSE_AND_RESET
-//            // }
-//            return TcpStateAction()
-//        }
-//
+        private fun handlePacketInClosing(currentState: TcbState, packetType: PacketType): List<Event> {
+            val eventList = mutableListOf<Event>()
+
+            // check if there's data. if so, should ACK it
+            if (packetType.hasData) {
+                eventList.add(SendAck)
+            }
+
+            eventList.addAll(
+                when {
+                    packetType.isRst -> listOf(CloseConnection)
+                    packetType.isAck -> {
+                        // check for data, and acknowledge it if there is any
+                        listOf(MoveClientToState(CLOSED), MoveServerToState(TIME_WAIT), DelayedCloseConnection)
+                    }
+                    else -> unhandledEvent(currentState, packetType)
+                }
+            )
+
+            return eventList
+        }
+
+        //
 //        private fun handlePacketInFinWait1(packetType: PacketType): TcpStateAction {
 //            // return when {
 //            //     packetType.isFinAck -> TcpStateAction(MoveToState(TIME_WAIT), SendAck)
@@ -140,6 +185,7 @@ class TcpStateFlow {
 //
         private fun handlePacketInStateListen(currentState: TcbState, packetType: PacketType): List<Event> {
             return when {
+                packetType.isRst -> listOf(CloseConnection)
                 packetType.isSyn -> {
                     if (currentState.clientState == SYN_SENT) {
                         Timber.i("Opening a connection when SYN already sent; duplicate SYN can be ignored")
@@ -147,7 +193,12 @@ class TcpStateFlow {
                     }
                     listOf(OpenConnection)
                 }
-                else -> emptyList()
+                packetType.isFin -> {
+                    // todo - potentially update acknowledge number
+                    listOf(SendReset)
+                }
+                packetType.hasData -> listOf(SendReset)
+                else -> unhandledEvent(currentState, packetType)
             }
         }
 
@@ -223,7 +274,7 @@ class TcpStateFlow {
         }
 
         private fun unhandledEvent(currentState: TcbState, packetType: PacketType): List<Event> {
-            Timber.w("Unhandled event in $currentState: $packetType")
+            Timber.e("Unhandled event in $currentState: $packetType")
             return emptyList()
         }
     }
@@ -264,12 +315,23 @@ class TcpStateFlow {
         object DelayedCloseConnection : Event()
     }
 
-    data class PacketType(val isSyn: Boolean = false, val isAck: Boolean = false, val isFin: Boolean = false, val isRst: Boolean = false) {
+    data class PacketType(
+        val isSyn: Boolean = false,
+        val isAck: Boolean = false,
+        val isFin: Boolean = false,
+        val isRst: Boolean = false,
+        val hasData: Boolean = false
+    ) {
         val isFinAck: Boolean = isAck && isFin
     }
 }
 
 fun Packet.asPacketType(): TcpStateFlow.PacketType {
+    val total = ip4Header.totalLength
+    val headerLengths = ip4Header.headerLength + tcpHeader.headerLength + if (tcpHeader.isSYN) 8 else 0
+    val payloadSize = total - headerLengths
+    val hasData = payloadSize != 0
+
     val tcpHeader = this.tcpHeader
-    return TcpStateFlow.PacketType(isSyn = tcpHeader.isSYN, isAck = tcpHeader.isACK, isFin = tcpHeader.isFIN, isRst = tcpHeader.isRST)
+    return TcpStateFlow.PacketType(isSyn = tcpHeader.isSYN, isAck = tcpHeader.isACK, isFin = tcpHeader.isFIN, isRst = tcpHeader.isRST, hasData = hasData)
 }

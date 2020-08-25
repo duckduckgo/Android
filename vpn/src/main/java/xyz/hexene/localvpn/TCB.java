@@ -34,7 +34,7 @@ public class TCB {
 
     public long mySequenceNum, mySequenceNumberInitial;
     public long theirSequenceNum, theirSequenceNumberInitial;
-    public long myAcknowledgementNum, theirAcknowledgementNum;
+    public long acknowledgementNumberToClient, acknowledgementNumberToServer;
 
     public TcbState tcbState;
 
@@ -84,8 +84,8 @@ public class TCB {
     public TCB(String ipAndPort,
                long mySequenceNum,
                long theirSequenceNum,
-               long myAcknowledgementNum,
-               long theirAcknowledgementNum,
+               long acknowledgementNumberToClient,
+               long acknowledgementNumberToServer,
                SocketChannel channel,
                Packet referencePacket) {
 
@@ -96,8 +96,8 @@ public class TCB {
         this.mySequenceNumberInitial = mySequenceNum;
         this.theirSequenceNum = theirSequenceNum;
         this.theirSequenceNumberInitial = theirSequenceNum;
-        this.myAcknowledgementNum = myAcknowledgementNum;
-        this.theirAcknowledgementNum = theirAcknowledgementNum;
+        this.acknowledgementNumberToClient = acknowledgementNumberToClient;
+        this.acknowledgementNumberToServer = acknowledgementNumberToServer;
 
         this.channel = channel;
         this.referencePacket = referencePacket;

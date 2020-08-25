@@ -23,7 +23,7 @@ data class TcbState(
     val serverState: TCB.TCBStatus = TCB.TCBStatus.LISTEN
 ) {
     override fun toString(): String {
-        return "Client: $clientState. Server: $serverState"
+        return "Server: $serverState. Client: $clientState"
     }
 }
 
