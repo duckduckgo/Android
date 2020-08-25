@@ -21,6 +21,7 @@ import android.animation.ValueAnimator
 import android.content.Context
 import android.os.Bundle
 import androidx.core.view.doOnDetach
+import com.airbnb.lottie.RenderMode
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.cta.ui.CtaViewModel
 import com.duckduckgo.app.cta.ui.DaxFireDialogCta
@@ -81,6 +82,8 @@ class FireDialog(
         }
 
         fireAnimationView.setAndPropagateUpFitsSystemWindows(false)
+        fireAnimationView.setRenderMode(RenderMode.SOFTWARE)
+        fireAnimationView.enableMergePathsForKitKatAndAbove(true)
         behavior.state = BottomSheetBehavior.STATE_EXPANDED
     }
 
