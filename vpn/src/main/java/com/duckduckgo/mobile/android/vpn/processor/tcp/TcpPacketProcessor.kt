@@ -16,9 +16,14 @@
 
 package com.duckduckgo.mobile.android.vpn.processor.tcp
 
+import android.os.Handler
+import android.os.Looper
 import android.os.Process.THREAD_PRIORITY_URGENT_DISPLAY
 import android.os.Process.setThreadPriority
 import com.duckduckgo.mobile.android.vpn.processor.tcp.ConnectionInitializer.TcpConnectionParams
+import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpStateFlow.Event.MoveState
+import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpStateFlow.Event.MoveState.MoveClientToState
+import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpStateFlow.Event.MoveState.MoveServerToState
 import com.duckduckgo.mobile.android.vpn.service.NetworkChannelCreator
 import com.duckduckgo.mobile.android.vpn.service.VpnQueues
 import kotlinx.coroutines.GlobalScope
@@ -41,9 +46,11 @@ class TcpPacketProcessor(queues: VpnQueues, networkChannelCreator: NetworkChanne
     private var pollJobDeviceToNetwork: Job? = null
     private var pollJobNetworkToDevice: Job? = null
 
+    private val handler: Handler = Handler(Looper.getMainLooper())
+
     private val tcpSocketWriter = TcpSocketWriter(selector)
-    private val tcpNetworkToDevice = TcpNetworkToDevice(queues, selector, tcpSocketWriter)
-    private val tcpDeviceToNetwork = TcpDeviceToNetwork(queues, selector, tcpSocketWriter, TcpConnectionInitializer(queues, networkChannelCreator))
+    private val tcpNetworkToDevice = TcpNetworkToDevice(queues, selector, tcpSocketWriter, handler)
+    private val tcpDeviceToNetwork = TcpDeviceToNetwork(queues, selector, tcpSocketWriter, TcpConnectionInitializer(queues, networkChannelCreator), handler)
 
     override fun run() {
         Timber.i("Starting ${this::class.simpleName}")
@@ -121,9 +128,8 @@ class TcpPacketProcessor(queues: VpnQueues, networkChannelCreator: NetworkChanne
             return String(bytesForLogging)
         }
 
-        fun TCB.updateStatus(newStatus: TCPState) {
+        private fun TCB.updateStatus(newStatus: TcbState) {
             this.tcbState = newStatus
-            Timber.v("Update TCB $ipAndPort status: $tcbState")
         }
 
         fun TCB.sendFinAck(queues: VpnQueues, packet: Packet, connectionParams: TcpConnectionParams) {
@@ -163,6 +169,22 @@ class TcpPacketProcessor(queues: VpnQueues, networkChannelCreator: NetworkChanne
             return "mySeq:[rel=${mySequenceNum - mySequenceNumberInitial}, abs=$mySequenceNum], myAck: $myAcknowledgementNum"
         }
 
+        fun TCB.updateState(state: MoveState) {
+            when (state) {
+                is MoveClientToState -> updateState(state)
+                is MoveServerToState -> updateState(state)
+            }
+        }
+
+        private fun TCB.updateState(newState: MoveServerToState) {
+            Timber.v("Updating server state: ${newState.state}")
+            updateStatus(tcbState.copy(serverState = newState.state))
+        }
+
+        private fun TCB.updateState(newState: MoveClientToState) {
+            Timber.v("Updating client state: ${newState.state}")
+            updateStatus(tcbState.copy(clientState = newState.state))
+        }
 
     }
 

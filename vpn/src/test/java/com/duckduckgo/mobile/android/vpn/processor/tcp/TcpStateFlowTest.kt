@@ -42,28 +42,28 @@ class TcpStateFlowTest {
 
     @Test
     fun whenConnectionClosedAndSocketOpeningAndImmediatelyConnectedThenMoveToSynReceived() {
-        val response = TcpStateFlow.socketOpening(CLOSED, finishedConnecting = true)
+        val response = TcpStateFlow.socketOpening(CLOSED)
         assertState(SYN_RECEIVED, response)
         assertEvent(SendSynAck, response)
     }
 
     @Test
     fun whenConnectionClosedAndSocketOpeningAndNotImmediatelyConnectedThenMoveToSynSent() {
-        val response = TcpStateFlow.socketOpening(CLOSED, finishedConnecting = false)
+        val response = TcpStateFlow.socketOpening(CLOSED)
         assertState(SYN_SENT, response)
         assertEvent(NoEvent, response)
     }
 
     @Test
     fun whenConnectionNotClosedAndSocketOpeningAndNotImmediatelyConnectedThenResetAndClose() {
-        val response = TcpStateFlow.socketOpening(SYN_SENT, finishedConnecting = false)
+        val response = TcpStateFlow.socketOpening(SYN_SENT)
         assertState(CLOSED, response)
         assertEvent(SendReset, response)
     }
 
     @Test
     fun whenConnectionNotClosedAndSocketOpeningAndImmediatelyConnectedThenResetAndClose() {
-        val response = TcpStateFlow.socketOpening(SYN_SENT, finishedConnecting = true)
+        val response = TcpStateFlow.socketOpening(SYN_SENT)
         assertState(CLOSED, response)
         assertEvent(SendReset, response)
     }
@@ -105,7 +105,7 @@ class TcpStateFlowTest {
 
     @Test
     fun whenEstablishedAndSocketEndOfStreamHitThenMoveToFinWait1() {
-        val response = TcpStateFlow.socketEndOfStream(ESTABLISHED)
+        val response = TcpStateFlow.socketEndOfStream()
         assertState(FIN_WAIT_1, response)
         assertEvent(SendFin, response)
     }

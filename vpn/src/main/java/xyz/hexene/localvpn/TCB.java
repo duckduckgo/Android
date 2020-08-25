@@ -16,7 +16,7 @@
 
 package xyz.hexene.localvpn;
 
-import com.duckduckgo.mobile.android.vpn.processor.tcp.TCPState;
+import com.duckduckgo.mobile.android.vpn.processor.tcp.TcbState;
 
 import java.io.IOException;
 import java.nio.channels.SelectionKey;
@@ -36,7 +36,7 @@ public class TCB {
     public long theirSequenceNum, theirSequenceNumberInitial;
     public long myAcknowledgementNum, theirAcknowledgementNum;
 
-    public TCPState tcbState;
+    public TcbState tcbState;
 
     // TCP has more states, but we need only these
     public enum TCBStatus {
@@ -89,7 +89,7 @@ public class TCB {
                SocketChannel channel,
                Packet referencePacket) {
 
-        this.tcbState = new TCPState();
+        this.tcbState = new TcbState();
         this.ipAndPort = ipAndPort;
 
         this.mySequenceNum = mySequenceNum;

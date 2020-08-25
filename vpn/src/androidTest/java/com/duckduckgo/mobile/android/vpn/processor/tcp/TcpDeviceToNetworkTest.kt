@@ -42,7 +42,7 @@ class TcpDeviceToNetworkTest {
     @Before
     fun setup() {
         TCB.closeAll()
-        testee = TcpDeviceToNetwork(queues, selector, socketWriter, connectionInitializer)
+        testee = TcpDeviceToNetwork(queues, selector, socketWriter, connectionInitializer, handler)
     }
 
     @Test

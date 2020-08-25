@@ -16,22 +16,24 @@
 
 package com.duckduckgo.mobile.android.vpn.processor.tcp
 
+import android.os.Handler
+import android.os.Looper
+import androidx.core.os.postDelayed
 import com.duckduckgo.mobile.android.vpn.processor.tcp.ConnectionInitializer.TcpConnectionParams
 import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpPacketProcessor.Companion.closeConnection
 import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpPacketProcessor.Companion.logAckSeqDetails
 import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpPacketProcessor.Companion.sendAck
 import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpPacketProcessor.Companion.sendFinAck
 import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpPacketProcessor.Companion.sendResetPacket
-import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpPacketProcessor.Companion.updateStatus
+import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpPacketProcessor.Companion.updateState
 import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpPacketProcessor.PendingWriteData
 import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpStateFlow.Event.*
-import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpStateFlow.Transition.MoveToState
 import com.duckduckgo.mobile.android.vpn.service.VpnQueues
 import timber.log.Timber
 import xyz.hexene.localvpn.ByteBufferPool
+import xyz.hexene.localvpn.Packet
 import xyz.hexene.localvpn.Packet.TCPHeader.*
 import xyz.hexene.localvpn.TCB
-import xyz.hexene.localvpn.TCB.TCBStatus.*
 import java.io.IOException
 import java.nio.ByteBuffer
 import java.nio.channels.SelectionKey
@@ -41,7 +43,8 @@ class TcpDeviceToNetwork(
     private val queues: VpnQueues,
     private val selector: Selector,
     private val socketWriter: SocketWriter,
-    private val connectionInitializer: ConnectionInitializer
+    private val connectionInitializer: ConnectionInitializer,
+    private val handler: Handler
 ) {
 
     /**
@@ -70,46 +73,25 @@ class TcpDeviceToNetwork(
 
         val tcb = TCB.getTCB(connectionKey)
         if (tcb == null) {
-            Timber.i("Device-to-network packet: $connectionKey. TCB not initialized. ${TcpPacketProcessor.logPacketDetails(packet)}. Packet length: $totalPacketLength")
-            TcpStateFlow.newPacket(TCPState(), packet.asPacketType()).events.forEach {
-                when (it){
-                    OpenConnection -> openConnection(connectionParams)
-                    SendReset -> {
-                        Timber.i("Trying to initialize a connection but is not a SYN packet; sending RST to $destinationAddress:$destinationPort")
-                        connectionParams.packet.updateTcpBuffer(
-                            connectionParams.responseBuffer,
-                            RST.toByte(),
-                            0,
-                            connectionParams.packet.tcpHeader.sequenceNumber + 1,
-                            0
-                        )
-                        queues.networkToDevice.offer(connectionParams.responseBuffer)
-                    }
-                    is MoveToState -> {
-
-                    }
-                    else -> Timber.w("No connection open and won't open one to $destinationAddress:$destinationPort. Dropping packet.")
-                }
-            }
+            processPacketTcbNotInitialized(connectionKey, packet, totalPacketLength, connectionParams)
         } else {
-            Timber.i("Device-to-network packet: $connectionKey. ${tcb.tcbState}. ${tcb.logAckSeqDetails()} ${TcpPacketProcessor.logPacketDetails(packet)}. Packet length: $totalPacketLength")
+            processPacketTcbExists(connectionKey, tcb, packet, totalPacketLength, connectionParams, responseBuffer, payloadBuffer)
+        }
 
-            val action = TcpStateFlow.newPacket(tcb.tcbState, packet.asPacketType())
-            Timber.v("Action: ${action.transition} - ${action.events} for ${tcb.ipAndPort}")
-            if (action.transition is MoveToState) {
-                tcb.updateStatus(action.transition.state)
-            }
-            when (action.events) {
-                ProcessDuplicateSyn -> processDuplicateSyn(tcb, connectionParams)
-                CloseConnection -> tcb.closeConnection(responseBuffer)
-                SendFinAck -> {
-                    processPacket(tcb, payloadBuffer, connectionParams)
-                    tcb.sendFinAck(queues, packet, connectionParams)
-                }
-                SendAck -> tcb.sendAck(queues, packet, connectionParams)
-                WaitToRead -> waitToRead(tcb)
-                ProcessPacket -> processPacket(tcb, payloadBuffer, connectionParams)
+        if (responseBuffer.position() == 0) {
+            ByteBufferPool.release(responseBuffer)
+        }
+        ByteBufferPool.release(payloadBuffer)
+    }
+
+    private fun processPacketTcbNotInitialized(connectionKey: String, packet: Packet, totalPacketLength: Int, connectionParams: TcpConnectionParams) {
+        Timber.i("Device-to-network packet: $connectionKey. TCB not initialized. ${TcpPacketProcessor.logPacketDetails(packet)}. Packet length: $totalPacketLength")
+        val destinationAddressPort = "${connectionParams.destinationAddress}:${connectionParams.destinationPort}"
+        TcpStateFlow.newPacket(TcbState(), packet.asPacketType()).events.forEach {
+            when (it) {
+                OpenConnection -> openConnection(connectionParams)
                 SendReset -> {
+                    Timber.i("Trying to initialize a connection but is not a SYN packet; sending RST to $destinationAddressPort")
                     connectionParams.packet.updateTcpBuffer(
                         connectionParams.responseBuffer,
                         RST.toByte(),
@@ -119,50 +101,75 @@ class TcpDeviceToNetwork(
                     )
                     queues.networkToDevice.offer(connectionParams.responseBuffer)
                 }
-                SendAckAndCloseConnection -> {
-                    tcb.sendAck(queues, packet, connectionParams)
-                    Timber.e("TODO: Need to kill connection after short delay ${tcb.ipAndPort}")
-                }
-                NoEvent -> {
-                }
-                else -> Timber.w("Unknown event: ${action.events}")
+                else -> Timber.w("No connection open and won't open one to $destinationAddressPort. Dropping packet.")
+            }
+        }
+    }
+
+    private fun processPacketTcbExists(
+        connectionKey: String,
+        tcb: TCB,
+        packet: Packet,
+        totalPacketLength: Int,
+        connectionParams: TcpConnectionParams,
+        responseBuffer: ByteBuffer,
+        payloadBuffer: ByteBuffer
+    ) {
+        Timber.i("Device-to-network packet: $connectionKey. ${tcb.tcbState}. ${tcb.logAckSeqDetails()} ${TcpPacketProcessor.logPacketDetails(packet)}. Packet length: $totalPacketLength")
+
+        val action = TcpStateFlow.newPacket(tcb.tcbState, packet.asPacketType())
+        Timber.v("Action: ${action.events} for ${tcb.ipAndPort}")
+
+        action.events.forEach {
+            when (it) {
+                is MoveState -> tcb.updateState(it)
+                ProcessPacket -> processPacket(tcb, payloadBuffer, connectionParams)
+                SendFinAck -> tcb.sendFinAck(queues, packet, connectionParams)
+                CloseConnection -> tcb.closeConnection(responseBuffer)
+                DelayedCloseConnection -> handler.postDelayed(100) { tcb.closeConnection(responseBuffer) }
+                SendAck -> tcb.sendAck(queues, packet, connectionParams)
+//                ProcessDuplicateSyn -> processDuplicateSyn(tcb, connectionParams)
+
+//
+//                WaitToRead -> waitToRead(tcb)
+//                SendReset -> {
+//                    connectionParams.packet.updateTcpBuffer(
+//                        connectionParams.responseBuffer,
+//                        RST.toByte(),
+//                        0,
+//                        connectionParams.packet.tcpHeader.sequenceNumber + 1,
+//                        0
+//                    )
+//                    queues.networkToDevice.offer(connectionParams.responseBuffer)
+//                }
+//                SendAckAndCloseConnection -> {
+//                    tcb.sendAck(queues, packet, connectionParams)
+//                    Timber.e("TODO: Need to kill connection after short delay ${tcb.ipAndPort}")
+//                }
+                else -> Timber.e("Unknown event for how to process device-to-network packet: ${action.events}")
             }
 
-//            when {
-//                packet.tcpHeader.isSYN -> processDuplicateSyn(tcb, connectionParams)
-//                packet.tcpHeader.isRST -> closeConnection(tcb, responseBuffer)
-//                packet.tcpHeader.isFIN -> processFin(tcb, connectionParams)
-//                packet.tcpHeader.isACK -> processAck(tcb, payloadBuffer, connectionParams)
-//                else -> Timber.w("TCP packet has no known flags; dropping")
-//            }
         }
-
-        if (responseBuffer.position() == 0) {
-            ByteBufferPool.release(responseBuffer)
-        }
-        ByteBufferPool.release(payloadBuffer)
     }
 
     private fun openConnection(params: TcpConnectionParams) {
         val (tcb, channel) = connectionInitializer.initializeConnection(params) ?: return
-        val action = TcpStateFlow.socketOpening(CLOSED, channel.finishConnect())
-        if (action.transition is MoveToState) {
-            tcb.updateStatus(action.transition.state)
-        }
-
-        when (action.events) {
-            SendSynAck -> {
-                Timber.v("Channel finished connecting to ${tcb.ipAndPort}")
-                params.packet.updateTcpBuffer(params.responseBuffer, (SYN or ACK).toByte(), tcb.mySequenceNum, tcb.myAcknowledgementNum, 0)
-                tcb.mySequenceNum++
-                queues.networkToDevice.offer(params.responseBuffer)
+        TcpStateFlow.socketOpening(TcbState()).events.forEach {
+            when (it) {
+                is MoveState -> tcb.updateState(it)
+                SendSynAck -> {
+                    Timber.v("Channel finished connecting to ${tcb.ipAndPort}")
+                    params.packet.updateTcpBuffer(params.responseBuffer, (SYN or ACK).toByte(), tcb.mySequenceNum, tcb.myAcknowledgementNum, 0)
+                    tcb.mySequenceNum++
+                    queues.networkToDevice.offer(params.responseBuffer)
+                }
+                WaitToConnect -> {
+                    Timber.v("Not finished connecting yet to ${tcb.selectionKey}, will register for OP_CONNECT event")
+                    selector.wakeup()
+                    tcb.selectionKey = channel.register(selector, SelectionKey.OP_CONNECT, tcb)
+                }
+                else -> Timber.w("Unexpected action: $it")
             }
-            WaitToRead -> {
-                Timber.v("Not finished connecting yet to ${tcb.selectionKey}, will register for OP_CONNECT event")
-                selector.wakeup()
-                tcb.selectionKey = channel.register(selector, SelectionKey.OP_CONNECT, tcb)
-            }
-            else -> Timber.w("Unexpected action: ${action.events}")
         }
     }
 
@@ -308,3 +315,5 @@ class TcpDeviceToNetwork(
 //        queues.networkToDevice.offer(connectionParams.responseBuffer)
     }
 }
+
+

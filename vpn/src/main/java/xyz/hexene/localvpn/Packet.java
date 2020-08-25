@@ -51,8 +51,7 @@ public class Packet {
     }
 
     @Override
-    public String toString()
-    {
+    public String toString() {
         final StringBuilder sb = new StringBuilder("Packet{");
         sb.append("ip4Header=").append(ip4Header);
         if (isTCP) sb.append(", tcpHeader=").append(tcpHeader);
@@ -62,38 +61,31 @@ public class Packet {
         return sb.toString();
     }
 
-    public boolean isTCP()
-    {
+    public boolean isTCP() {
         return isTCP;
     }
 
-    public boolean isUDP()
-    {
+    public boolean isUDP() {
         return isUDP;
     }
 
-    public void swapSourceAndDestination()
-    {
+    public void swapSourceAndDestination() {
         InetAddress newSourceAddress = ip4Header.destinationAddress;
         ip4Header.destinationAddress = ip4Header.sourceAddress;
         ip4Header.sourceAddress = newSourceAddress;
 
-        if (isUDP)
-        {
+        if (isUDP) {
             int newSourcePort = udpHeader.destinationPort;
             udpHeader.destinationPort = udpHeader.sourcePort;
             udpHeader.sourcePort = newSourcePort;
-        }
-        else if (isTCP)
-        {
+        } else if (isTCP) {
             int newSourcePort = tcpHeader.destinationPort;
             tcpHeader.destinationPort = tcpHeader.sourcePort;
             tcpHeader.sourcePort = newSourcePort;
         }
     }
 
-    public void updateTcpBuffer(ByteBuffer buffer, byte flags, long sequenceNum, long ackNum, int payloadSize)
-    {
+    public void updateTcpBuffer(ByteBuffer buffer, byte flags, long sequenceNum, long ackNum, int payloadSize) {
         buffer.position(0);
         fillHeader(buffer);
         backingBuffer = buffer;
@@ -121,8 +113,7 @@ public class Packet {
         updateIP4Checksum();
     }
 
-    public void updateUdpBuffer(ByteBuffer buffer, int payloadSize)
-    {
+    public void updateUdpBuffer(ByteBuffer buffer, int payloadSize) {
         buffer.position(0);
         fillHeader(buffer);
         backingBuffer = buffer;
@@ -142,8 +133,7 @@ public class Packet {
         updateIP4Checksum();
     }
 
-    private void updateIP4Checksum()
-    {
+    private void updateIP4Checksum() {
         ByteBuffer buffer = backingBuffer.duplicate();
         buffer.position(0);
 
@@ -152,8 +142,7 @@ public class Packet {
 
         int ipLength = ip4Header.headerLength;
         int sum = 0;
-        while (ipLength > 0)
-        {
+        while (ipLength > 0) {
             sum += BitUtils.getUnsignedShort(buffer.getShort());
             ipLength -= 2;
         }
@@ -165,8 +154,7 @@ public class Packet {
         backingBuffer.putShort(10, (short) sum);
     }
 
-    private void updateTCPChecksum(int payloadSize)
-    {
+    private void updateTCPChecksum(int payloadSize) {
         int sum = 0;
         int tcpLength = TCP_HEADER_SIZE + payloadSize;
 
@@ -185,8 +173,7 @@ public class Packet {
 
         // Calculate TCP segment checksum
         buffer.position(IP4_HEADER_SIZE);
-        while (tcpLength > 1)
-        {
+        while (tcpLength > 1) {
             sum += BitUtils.getUnsignedShort(buffer.getShort());
             tcpLength -= 2;
         }
@@ -201,8 +188,7 @@ public class Packet {
         backingBuffer.putShort(IP4_HEADER_SIZE + 16, (short) sum);
     }
 
-    private void fillHeader(ByteBuffer buffer)
-    {
+    private void fillHeader(ByteBuffer buffer) {
         ip4Header.fillHeader(buffer);
         if (isUDP)
             udpHeader.fillHeader(buffer);
@@ -210,8 +196,7 @@ public class Packet {
             tcpHeader.fillHeader(buffer);
     }
 
-    public static class IP4Header
-    {
+    public static class IP4Header {
         public byte version;
         public byte IHL;
         public int headerLength;
@@ -230,21 +215,18 @@ public class Packet {
 
         public int optionsAndPadding;
 
-        public enum TransportProtocol
-        {
+        public enum TransportProtocol {
             TCP(6),
             UDP(17),
             Other(0xFF);
 
             private int protocolNumber;
 
-            TransportProtocol(int protocolNumber)
-            {
+            TransportProtocol(int protocolNumber) {
                 this.protocolNumber = protocolNumber;
             }
 
-            private static TransportProtocol numberToEnum(int protocolNumber)
-            {
+            private static TransportProtocol numberToEnum(int protocolNumber) {
                 if (protocolNumber == 6)
                     return TCP;
                 else if (protocolNumber == 17)
@@ -253,14 +235,12 @@ public class Packet {
                     return Other;
             }
 
-            public int getNumber()
-            {
+            public int getNumber() {
                 return this.protocolNumber;
             }
         }
 
-        private IP4Header(ByteBuffer buffer) throws UnknownHostException
-        {
+        private IP4Header(ByteBuffer buffer) throws UnknownHostException {
             byte versionAndIHL = buffer.get();
             this.version = (byte) (versionAndIHL >> 4);
             this.IHL = (byte) (versionAndIHL & 0x0F);
@@ -286,8 +266,7 @@ public class Packet {
             //this.optionsAndPadding = buffer.getInt();
         }
 
-        public void fillHeader(ByteBuffer buffer)
-        {
+        public void fillHeader(ByteBuffer buffer) {
             buffer.put((byte) (this.version << 4 | this.IHL));
             buffer.put((byte) this.typeOfService);
             buffer.putShort((short) this.totalLength);
@@ -303,8 +282,7 @@ public class Packet {
         }
 
         @Override
-        public String toString()
-        {
+        public String toString() {
             final StringBuilder sb = new StringBuilder("IP4Header{");
             sb.append("version=").append(version);
             sb.append(", IHL=").append(IHL);
@@ -321,8 +299,7 @@ public class Packet {
         }
     }
 
-    public static class TCPHeader
-    {
+    public static class TCPHeader {
         public static final int FIN = 0x01;
         public static final int SYN = 0x02;
         public static final int RST = 0x04;
@@ -346,8 +323,7 @@ public class Packet {
 
         public byte[] optionsAndPadding;
 
-        private TCPHeader(ByteBuffer buffer)
-        {
+        private TCPHeader(ByteBuffer buffer) {
             this.sourcePort = BitUtils.getUnsignedShort(buffer.getShort());
             this.destinationPort = BitUtils.getUnsignedShort(buffer.getShort());
 
@@ -363,45 +339,37 @@ public class Packet {
             this.urgentPointer = BitUtils.getUnsignedShort(buffer.getShort());
 
             int optionsLength = this.headerLength - TCP_HEADER_SIZE;
-            if (optionsLength > 0)
-            {
+            if (optionsLength > 0) {
                 optionsAndPadding = new byte[optionsLength];
                 buffer.get(optionsAndPadding, 0, optionsLength);
             }
         }
 
-        public boolean isFIN()
-        {
+        public boolean isFIN() {
             return (flags & FIN) == FIN;
         }
 
-        public boolean isSYN()
-        {
+        public boolean isSYN() {
             return (flags & SYN) == SYN;
         }
 
-        public boolean isRST()
-        {
+        public boolean isRST() {
             return (flags & RST) == RST;
         }
 
-        public boolean isPSH()
-        {
+        public boolean isPSH() {
             return (flags & PSH) == PSH;
         }
 
-        public boolean isACK()
-        {
+        public boolean isACK() {
             return (flags & ACK) == ACK;
         }
 
-        public boolean isURG()
-        {
+        public boolean isURG() {
             return (flags & URG) == URG;
         }
 
-        private void fillHeader(ByteBuffer buffer)
-        {
+        private void fillHeader(ByteBuffer buffer) {
             buffer.putShort((short) sourcePort);
             buffer.putShort((short) destinationPort);
 
@@ -417,8 +385,7 @@ public class Packet {
         }
 
         @Override
-        public String toString()
-        {
+        public String toString() {
             final StringBuilder sb = new StringBuilder("TCPHeader{");
             sb.append("sourcePort=").append(sourcePort);
             sb.append(", destinationPort=").append(destinationPort);
@@ -439,16 +406,14 @@ public class Packet {
         }
     }
 
-    public static class UDPHeader
-    {
+    public static class UDPHeader {
         public int sourcePort;
         public int destinationPort;
 
         public int length;
         public int checksum;
 
-        private UDPHeader(ByteBuffer buffer)
-        {
+        private UDPHeader(ByteBuffer buffer) {
             this.sourcePort = BitUtils.getUnsignedShort(buffer.getShort());
             this.destinationPort = BitUtils.getUnsignedShort(buffer.getShort());
 
@@ -456,8 +421,7 @@ public class Packet {
             this.checksum = BitUtils.getUnsignedShort(buffer.getShort());
         }
 
-        private void fillHeader(ByteBuffer buffer)
-        {
+        private void fillHeader(ByteBuffer buffer) {
             buffer.putShort((short) this.sourcePort);
             buffer.putShort((short) this.destinationPort);
 
@@ -466,8 +430,7 @@ public class Packet {
         }
 
         @Override
-        public String toString()
-        {
+        public String toString() {
             final StringBuilder sb = new StringBuilder("UDPHeader{");
             sb.append("sourcePort=").append(sourcePort);
             sb.append(", destinationPort=").append(destinationPort);
@@ -478,20 +441,16 @@ public class Packet {
         }
     }
 
-    private static class BitUtils
-    {
-        private static short getUnsignedByte(byte value)
-        {
-            return (short)(value & 0xFF);
+    private static class BitUtils {
+        private static short getUnsignedByte(byte value) {
+            return (short) (value & 0xFF);
         }
 
-        private static int getUnsignedShort(short value)
-        {
+        private static int getUnsignedShort(short value) {
             return value & 0xFFFF;
         }
 
-        private static long getUnsignedInt(int value)
-        {
+        private static long getUnsignedInt(int value) {
             return value & 0xFFFFFFFFL;
         }
     }
