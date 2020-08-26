@@ -69,12 +69,12 @@ class CtaViewModel @Inject constructor(
 
     val showFireButtonPulseAnimation: Flow<Boolean> = dismissedCtaDao
         .dismissedCtas()
-        .map { dismissedCtaDao ->
+        .map { dismissedCtas ->
             withContext(dispatchers.io()) {
                 if (!variantManager.getVariant().hasFeature(FireButtonEducation)) return@withContext false
                 if (!daxOnboardingActive() || daxDialogFireEducationShown() || settingsDataStore.hideTips) return@withContext false
 
-                return@withContext dismissedCtaDao.any {
+                return@withContext dismissedCtas.any {
                     it.ctaId == CtaId.DAX_DIALOG_TRACKERS_FOUND ||
                             it.ctaId == CtaId.DAX_DIALOG_OTHER ||
                             it.ctaId == CtaId.DAX_DIALOG_NETWORK
