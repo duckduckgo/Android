@@ -25,6 +25,7 @@ import android.os.Message
 import android.widget.Toast
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.Observer
+import com.airbnb.lottie.LottieCompositionFactory
 import com.duckduckgo.app.bookmarks.ui.BookmarksActivity
 import com.duckduckgo.app.browser.BrowserViewModel.Command
 import com.duckduckgo.app.browser.BrowserViewModel.Command.Query
@@ -107,6 +108,8 @@ class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope() {
             renderer.renderBrowserViewState(it)
         })
         viewModel.awaitClearDataFinishedNotification()
+
+        LottieCompositionFactory.fromRawRes(this, R.raw.fire_hero_rising)
     }
 
     override fun onStop() {
