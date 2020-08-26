@@ -346,11 +346,11 @@ sealed class DaxFireDialogCta(
     override fun pixelShownParameters(): Map<String, String> = emptyMap()
 
     class TryClearDataCta : DaxFireDialogCta(
-        CtaId.DAX_FIRE_BUTTON,
-        R.string.daxClearDataCtaText,
-        Pixel.PixelName.ONBOARDING_DAX_CTA_SHOWN,
-        null,
-        null
+        ctaId = CtaId.DAX_FIRE_BUTTON,
+        description = R.string.daxClearDataCtaText,
+        shownPixel = Pixel.PixelName.ONBOARDING_DAX_CTA_SHOWN,
+        okPixel = null,
+        cancelPixel = null
     )
 }
 
