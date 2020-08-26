@@ -23,7 +23,6 @@ import androidx.lifecycle.OnLifecycleEvent
 import com.airbnb.lottie.LottieCompositionFactory
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.statistics.VariantManager
-import timber.log.Timber
 import javax.inject.Inject
 
 class FireAnimationLoader @Inject constructor(

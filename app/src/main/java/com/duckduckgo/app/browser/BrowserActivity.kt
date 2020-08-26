@@ -25,7 +25,6 @@ import android.os.Message
 import android.widget.Toast
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.Observer
-import com.airbnb.lottie.LottieCompositionFactory
 import com.duckduckgo.app.bookmarks.ui.BookmarksActivity
 import com.duckduckgo.app.browser.BrowserViewModel.Command
 import com.duckduckgo.app.browser.BrowserViewModel.Command.Query
