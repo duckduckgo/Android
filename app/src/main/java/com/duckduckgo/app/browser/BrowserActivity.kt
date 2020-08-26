@@ -108,8 +108,6 @@ class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope() {
             renderer.renderBrowserViewState(it)
         })
         viewModel.awaitClearDataFinishedNotification()
-
-        LottieCompositionFactory.fromRawRes(this, R.raw.fire_hero_rising)
     }
 
     override fun onStop() {

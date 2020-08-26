@@ -30,10 +30,7 @@ import com.duckduckgo.app.browser.shortcut.ShortcutBuilder
 import com.duckduckgo.app.browser.shortcut.ShortcutReceiver
 import com.duckduckgo.app.di.AppComponent
 import com.duckduckgo.app.di.DaggerAppComponent
-import com.duckduckgo.app.fire.DataClearer
-import com.duckduckgo.app.fire.FireActivity
-import com.duckduckgo.app.fire.UnsentForgetAllPixelStore
-import com.duckduckgo.app.fire.DataClearerForegroundAppRestartPixel
+import com.duckduckgo.app.fire.*
 import com.duckduckgo.app.global.Theming.initializeTheme
 import com.duckduckgo.app.global.initialization.AppDataLoader
 import com.duckduckgo.app.global.install.AppInstallStore
@@ -163,6 +160,9 @@ open class DuckDuckGoApplication : HasAndroidInjector, Application(), LifecycleO
     @Inject
     lateinit var userStageStore: UserStageStore
 
+    @Inject
+    lateinit var fireAnimationLoader: FireAnimationLoader
+
     private var launchedByFireAction: Boolean = false
 
     open lateinit var daggerAppComponent: AppComponent
@@ -186,6 +186,7 @@ open class DuckDuckGoApplication : HasAndroidInjector, Application(), LifecycleO
             it.addObserver(appEnjoymentLifecycleObserver)
             it.addObserver(dataClearerForegroundAppRestartPixel)
             it.addObserver(userStageStore)
+            it.addObserver(fireAnimationLoader)
         }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1) {
