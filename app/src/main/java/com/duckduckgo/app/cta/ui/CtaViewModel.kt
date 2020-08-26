@@ -69,18 +69,7 @@ class CtaViewModel @Inject constructor(
 
     val showFireButtonPulseAnimation: Flow<Boolean> = dismissedCtaDao
         .dismissedCtas()
-        .map { dismissedCtas ->
-            withContext(dispatchers.io()) {
-                if (!variantManager.getVariant().hasFeature(FireButtonEducation)) return@withContext false
-                if (!daxOnboardingActive() || daxDialogFireEducationShown() || settingsDataStore.hideTips) return@withContext false
-
-                return@withContext dismissedCtas.any {
-                    it.ctaId == CtaId.DAX_DIALOG_TRACKERS_FOUND ||
-                            it.ctaId == CtaId.DAX_DIALOG_OTHER ||
-                            it.ctaId == CtaId.DAX_DIALOG_NETWORK
-                }
-            }
-        }
+        .shouldShowPulseAnimation()
 
     private var activeSurvey: Survey? = null
 
@@ -332,6 +321,21 @@ class CtaViewModel @Inject constructor(
         return withContext(dispatchers.io()) {
             requiredDaxOnboardingCtas.all {
                 dismissedCtaDao.exists(it)
+            }
+        }
+    }
+
+    private fun Flow<List<DismissedCta>>.shouldShowPulseAnimation(): Flow<Boolean> {
+        return this.map { dismissedCtaDao ->
+            withContext(dispatchers.io()) {
+                if (!variantManager.getVariant().hasFeature(FireButtonEducation)) return@withContext false
+                if (!daxOnboardingActive() || daxDialogFireEducationShown() || settingsDataStore.hideTips) return@withContext false
+
+                return@withContext dismissedCtaDao.any {
+                    it.ctaId == CtaId.DAX_DIALOG_TRACKERS_FOUND ||
+                            it.ctaId == CtaId.DAX_DIALOG_OTHER ||
+                            it.ctaId == CtaId.DAX_DIALOG_NETWORK
+                }
             }
         }
     }
