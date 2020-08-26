@@ -293,7 +293,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
 
     private var loginDetectionDialog: AlertDialog? = null
 
-    private val pulseAnimation = PulseAnimation()
+    private val pulseAnimation: PulseAnimation = PulseAnimation(this)
 
     override fun onAttach(context: Context) {
         AndroidSupportInjection.inject(this)

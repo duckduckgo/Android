@@ -26,11 +26,32 @@ import android.widget.FrameLayout
 import android.widget.ImageView
 import androidx.core.view.doOnLayout
 import androidx.core.view.isVisible
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleObserver
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.OnLifecycleEvent
 import com.duckduckgo.app.global.view.setAllParentsClip
+import timber.log.Timber
 
-class PulseAnimation {
+class PulseAnimation(private val lifecycleOwner: LifecycleOwner) : LifecycleObserver {
     private var pulseAnimation: AnimatorSet = AnimatorSet()
     private var highlightImageView: View? = null
+
+    @Suppress("unused")
+    @OnLifecycleEvent(Lifecycle.Event.ON_START)
+    fun onStart() {
+        if (pulseAnimation.isPaused) {
+            pulseAnimation.resume()
+        }
+    }
+
+    @Suppress("unused")
+    @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
+    fun onStop() {
+        if (pulseAnimation.isRunning) {
+            pulseAnimation.pause()
+        }
+    }
 
     fun playOn(targetView: View) {
         if (highlightImageView == null) {
@@ -39,6 +60,7 @@ class PulseAnimation {
                 it.setAllParentsClip(enabled = false)
                 startPulseAnimation(it)
             }
+            lifecycleOwner.lifecycle.addObserver(this)
         }
     }
 
@@ -48,6 +70,7 @@ class PulseAnimation {
         }
         highlightImageView?.isVisible = false
         highlightImageView = null
+        lifecycleOwner.lifecycle.removeObserver(this)
     }
 
     private fun startPulseAnimation(view: View) {
