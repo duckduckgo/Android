@@ -31,7 +31,6 @@ import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.OnLifecycleEvent
 import com.duckduckgo.app.global.view.setAllParentsClip
-import timber.log.Timber
 
 class PulseAnimation(private val lifecycleOwner: LifecycleOwner) : LifecycleObserver {
     private var pulseAnimation: AnimatorSet = AnimatorSet()
