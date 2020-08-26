@@ -85,12 +85,12 @@ public class Packet {
         }
     }
 
-    public int tcpPayloadSize() {
-        if(isUDP) return 0;
+    public int tcpPayloadSize(boolean containsIpHeader) {
+        if (isUDP) return 0;
 
         int totalLength = ip4Header.totalLength;
         int tcpHeaderLength = tcpHeader.headerLength;
-        int ipHeaderLength = ip4Header.headerLength;
+        int ipHeaderLength = containsIpHeader ? ip4Header.headerLength : 0;
 
         return totalLength - (tcpHeaderLength + ipHeaderLength);
     }

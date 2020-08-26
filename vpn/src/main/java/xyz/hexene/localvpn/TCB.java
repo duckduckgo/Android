@@ -32,8 +32,8 @@ import timber.log.Timber;
 public class TCB {
     public String ipAndPort;
 
-    public long mySequenceNum, mySequenceNumberInitial;
-    public long theirSequenceNum, theirSequenceNumberInitial;
+    public long sequenceNumberToClient, sequenceNumberToClientInitial;
+    public long sequenceNumberToServer, sequenceNumberToServerInitial;
     public long acknowledgementNumberToClient, acknowledgementNumberToServer;
 
     public TcbState tcbState;
@@ -82,8 +82,8 @@ public class TCB {
     }
 
     public TCB(String ipAndPort,
-               long mySequenceNum,
-               long theirSequenceNum,
+               long sequenceNumberToClient,
+               long sequenceNumberToServer,
                long acknowledgementNumberToClient,
                long acknowledgementNumberToServer,
                SocketChannel channel,
@@ -92,10 +92,10 @@ public class TCB {
         this.tcbState = new TcbState();
         this.ipAndPort = ipAndPort;
 
-        this.mySequenceNum = mySequenceNum;
-        this.mySequenceNumberInitial = mySequenceNum;
-        this.theirSequenceNum = theirSequenceNum;
-        this.theirSequenceNumberInitial = theirSequenceNum;
+        this.sequenceNumberToClient = sequenceNumberToClient;
+        this.sequenceNumberToClientInitial = sequenceNumberToClient;
+        this.sequenceNumberToServer = sequenceNumberToServer;
+        this.sequenceNumberToServerInitial = sequenceNumberToServer;
         this.acknowledgementNumberToClient = acknowledgementNumberToClient;
         this.acknowledgementNumberToServer = acknowledgementNumberToServer;
 

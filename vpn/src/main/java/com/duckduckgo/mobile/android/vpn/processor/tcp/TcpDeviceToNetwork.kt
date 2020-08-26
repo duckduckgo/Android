@@ -84,7 +84,7 @@ class TcpDeviceToNetwork(
     }
 
     private fun processPacketTcbNotInitialized(connectionKey: String, packet: Packet, totalPacketLength: Int, connectionParams: TcpConnectionParams) {
-        Timber.i("Device-to-network packet: $connectionKey. TCB not initialized. ${TcpPacketProcessor.logPacketDetails(packet)}. Packet length: $totalPacketLength")
+        Timber.i("New packet. $connectionKey. TCB not initialized. ${TcpPacketProcessor.logPacketDetails(packet, packet.tcpHeader.sequenceNumber, packet.tcpHeader.sequenceNumber, packet.tcpHeader.acknowledgementNumber)}. Packet length: $totalPacketLength.  Data length: ${packet.tcpPayloadSize(true)}")
         val destinationAddressPort = "${connectionParams.destinationAddress}:${connectionParams.destinationPort}"
         TcpStateFlow.newPacket(connectionKey, TcbState(), packet.asPacketType()).events.forEach {
             when (it) {
@@ -114,7 +114,7 @@ class TcpDeviceToNetwork(
         responseBuffer: ByteBuffer,
         payloadBuffer: ByteBuffer
     ) {
-        Timber.i("Device-to-network packet: $connectionKey. ${tcb.tcbState}. ${tcb.logAckSeqDetails()} ${TcpPacketProcessor.logPacketDetails(packet)}. Packet length: $totalPacketLength")
+        Timber.i("New packet. $connectionKey. ${tcb.tcbState}. ${TcpPacketProcessor.logPacketDetails(packet, tcb.sequenceNumberToServerInitial, packet.tcpHeader.sequenceNumber, packet.tcpHeader.acknowledgementNumber)}. Packet length: $totalPacketLength.  Data length: ${packet.tcpPayloadSize(true)}")
 
         if (packet.tcpHeader.isACK) {
             tcb.acknowledgementNumberToServer = packet.tcpHeader.acknowledgementNumber
@@ -162,8 +162,8 @@ class TcpDeviceToNetwork(
                 is MoveState -> tcb.updateState(it)
                 SendSynAck -> {
                     Timber.v("Channel finished connecting to ${tcb.ipAndPort}")
-                    params.packet.updateTcpBuffer(params.responseBuffer, (SYN or ACK).toByte(), tcb.mySequenceNum, tcb.acknowledgementNumberToClient, 0)
-                    tcb.mySequenceNum++
+                    params.packet.updateTcpBuffer(params.responseBuffer, (SYN or ACK).toByte(), tcb.sequenceNumberToClient, tcb.acknowledgementNumberToClient, 0)
+                    tcb.sequenceNumberToClient++
                     queues.networkToDevice.offer(params.responseBuffer)
                 }
                 WaitToConnect -> {

@@ -108,16 +108,10 @@ class TcpPacketProcessor(queues: VpnQueues, networkChannelCreator: NetworkChanne
     )
 
     companion object {
-        fun logPacketDetails(packet: Packet): String {
-            val tcpHeader = packet.tcpHeader
-            val isSyn = tcpHeader.isSYN
-            val isAck = tcpHeader.isACK
-            val isFin = tcpHeader.isFIN
-            val isPsh = tcpHeader.isPSH
-            val isRst = tcpHeader.isRST
-            val isUrg = tcpHeader.isURG
-
-            return "\tsyn=$isSyn,\tack=$isAck,\tfin=$isFin,\tpsh=$isPsh,\trst=$isRst,\turg=$isUrg"
+        fun logPacketDetails(packet: Packet, initialSeqNumber: Long, sequenceNumber: Long, acknowledgementNumber: Long): String {
+            with(packet.tcpHeader) {
+                return "\tsyn=$isSYN,\tack=$isACK,\tfin=$isFIN,\tpsh=$isPSH,\trst=$isRST,\turg=$isURG. [ackNumber=$acknowledgementNumber, sequenceNumber={ ${sequenceNumber - initialSeqNumber} / $sequenceNumber } ]"
+            }
         }
 
         fun ByteBuffer.copyPayloadAsString(payloadSize: Int): String {
@@ -137,16 +131,16 @@ class TcpPacketProcessor(queues: VpnQueues, networkChannelCreator: NetworkChanne
             packet.updateTcpBuffer(
                 connectionParams.responseBuffer,
                 (Packet.TCPHeader.FIN or Packet.TCPHeader.ACK).toByte(),
-                this.mySequenceNum,
+                this.sequenceNumberToClient,
                 this.acknowledgementNumberToClient,
                 0
             )
-            this.mySequenceNum++
+            this.sequenceNumberToClient++
             queues.networkToDevice.offer(connectionParams.responseBuffer)
         }
 
         fun TCB.sendAck(queues: VpnQueues, packet: Packet, connectionParams: TcpConnectionParams) {
-            val payloadSize = packet.tcpPayloadSize()
+            val payloadSize = packet.tcpPayloadSize(true)
 
             acknowledgementNumberToClient = increaseSequenceNumber(packet.tcpHeader.sequenceNumber, payloadSize.toLong())
 
@@ -154,8 +148,8 @@ class TcpPacketProcessor(queues: VpnQueues, networkChannelCreator: NetworkChanne
                 acknowledgementNumberToClient = increaseSequenceNumber(acknowledgementNumberToClient, 1)
             }
 
-            packet.updateTcpBuffer(connectionParams.responseBuffer, (Packet.TCPHeader.ACK).toByte(), this.mySequenceNum, this.acknowledgementNumberToClient, 0)
-            this.mySequenceNum++
+            packet.updateTcpBuffer(connectionParams.responseBuffer, (Packet.TCPHeader.ACK).toByte(), this.sequenceNumberToClient, this.acknowledgementNumberToClient, 0)
+            this.sequenceNumberToClient++
             queues.networkToDevice.offer(connectionParams.responseBuffer)
         }
 
@@ -175,7 +169,7 @@ class TcpPacketProcessor(queues: VpnQueues, networkChannelCreator: NetworkChanne
 
 
         fun TCB.logAckSeqDetails(): String {
-            return "mySeq:[rel=${mySequenceNum - mySequenceNumberInitial}, abs=$mySequenceNum], myAck: $acknowledgementNumberToClient"
+            return "[mySeq:rel=${sequenceNumberToClient - sequenceNumberToClientInitial}, abs=$sequenceNumberToClient, myAck: $acknowledgementNumberToClient]"
         }
 
         fun TCB.updateState(state: MoveState) {

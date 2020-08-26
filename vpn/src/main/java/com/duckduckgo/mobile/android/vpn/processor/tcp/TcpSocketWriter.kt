@@ -60,7 +60,7 @@ class TcpSocketWriter(private val selector:Selector) : SocketWriter{
             socket.register(selector, SelectionKey.OP_READ, tcb)
             tcb.acknowledgementNumberToClient = connectionParams.packet.tcpHeader.sequenceNumber + payloadSize
             tcb.acknowledgementNumberToServer = connectionParams.packet.tcpHeader.acknowledgementNumber
-            tcb.referencePacket.updateTcpBuffer(connectionParams.responseBuffer, Packet.TCPHeader.ACK.toByte(), tcb.mySequenceNum, tcb.acknowledgementNumberToClient, 0)
+            tcb.referencePacket.updateTcpBuffer(connectionParams.responseBuffer, Packet.TCPHeader.ACK.toByte(), tcb.sequenceNumberToClient, tcb.acknowledgementNumberToClient, 0)
             return true
         }
     }

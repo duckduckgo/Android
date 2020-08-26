@@ -58,20 +58,12 @@ class TcpConnectionInitializer(private val queues: VpnQueues, private val networ
 
         if (header.isSYN) {
             val channel = networkChannelCreator.createSocket()
-            val sequenceNumber = Random.nextLong(Short.MAX_VALUE.toLong() + 1)
-            val sequenceFromPacket = header.sequenceNumber
-            val ackNumber = header.sequenceNumber + 1
-            val ackFromPacket = header.acknowledgementNumber
+            val sequenceNumberToClient = Random.nextLong(Short.MAX_VALUE.toLong() + 1)
+            val sequenceToServer = header.sequenceNumber
+            val ackNumberToClient = header.sequenceNumber + 1
+            val ackNumberToServer = header.acknowledgementNumber
 
-            val tcb = TCB(
-                key,
-                sequenceNumber,
-                sequenceFromPacket,
-                ackNumber,
-                ackFromPacket,
-                channel,
-                params.packet
-            )
+            val tcb = TCB(key, sequenceNumberToClient, sequenceToServer, ackNumberToClient, ackNumberToServer, channel, params.packet)
             TCB.putTCB(params.key(), tcb)
             channel.connect(InetSocketAddress(params.destinationAddress, params.destinationPort))
             return Pair(tcb, channel)

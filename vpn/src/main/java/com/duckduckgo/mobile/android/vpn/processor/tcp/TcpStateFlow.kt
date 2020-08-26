@@ -239,23 +239,11 @@ class TcpStateFlow {
             val eventList = when (currentState.serverState) {
                 LISTEN -> socketOpeningInListenState()
                 else -> {
-                    Timber.w("Could not open new socket as not in LISTEN state")
+                    Timber.e("Could not open new socket as not in LISTEN state")
                     emptyList()
                 }
             }
-
-            Timber.i("TCPStateFlow: from state: $currentState for socketOpening, new actions are ${eventList.joinToString()}}")
             return TcpStateAction(eventList)
-
-            // if (currentState != CLOSED) {
-            //     return CLOSE_AND_RESET
-            // }
-            //
-            // return if (finishedConnecting) {
-            //     TcpStateAction(MoveToState(SYN_RECEIVED), SendSynAck)
-            // } else {
-            //     TcpStateAction(MoveToState(SYN_SENT), WaitToRead)
-            // }
         }
 
 
@@ -275,6 +263,7 @@ class TcpStateFlow {
 
         private fun unhandledEvent(currentState: TcbState, packetType: PacketType): List<Event> {
             Timber.e("Unhandled event in $currentState: $packetType")
+            TODO()
             return emptyList()
         }
     }
