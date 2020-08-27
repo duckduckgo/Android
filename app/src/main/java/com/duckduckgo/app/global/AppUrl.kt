@@ -45,4 +45,10 @@ class AppUrl {
         const val SOURCE_EU_AUCTION = "ddg_androideu"
         const val HIDE_SERP = "-1"
     }
+
+    object StaticUrl {
+        const val SETTINGS = "/settings"
+        const val PARAMS = "/params"
+    }
+
 }

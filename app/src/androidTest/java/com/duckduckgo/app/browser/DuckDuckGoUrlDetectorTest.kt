@@ -98,4 +98,24 @@ class DuckDuckGoUrlDetectorTest {
         assertFalse(testee.isDuckDuckGoVerticalUrl("https://example.com?ia=images"))
     }
 
+    @Test
+    fun whenDDGIsSettingsPageThenStaticPageItsDetected() {
+        assertTrue(testee.isDuckDuckGoStaticUrl("https://duckduckgo.com/settings"))
+    }
+
+    @Test
+    fun whenDDGIsParamsPageThenStaticPageItsDetected() {
+        assertTrue(testee.isDuckDuckGoStaticUrl("https://duckduckgo.com/params"))
+    }
+
+    @Test
+    fun whenDDGIsNotStaticPageThenStaticPageIsNotDetected() {
+        assertFalse(testee.isDuckDuckGoStaticUrl("https://duckduckgo.com/something"))
+    }
+
+    @Test
+    fun whenNonDDGThenStaticPageIsDetected() {
+        assertFalse(testee.isDuckDuckGoStaticUrl("https://example.com/settings"))
+    }
+
 }
