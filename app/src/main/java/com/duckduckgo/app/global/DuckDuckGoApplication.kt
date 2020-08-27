@@ -160,9 +160,6 @@ open class DuckDuckGoApplication : HasAndroidInjector, Application(), LifecycleO
     @Inject
     lateinit var userStageStore: UserStageStore
 
-    @Inject
-    lateinit var fireAnimationLoader: FireAnimationLoader
-
     private var launchedByFireAction: Boolean = false
 
     open lateinit var daggerAppComponent: AppComponent
@@ -186,7 +183,6 @@ open class DuckDuckGoApplication : HasAndroidInjector, Application(), LifecycleO
             it.addObserver(appEnjoymentLifecycleObserver)
             it.addObserver(dataClearerForegroundAppRestartPixel)
             it.addObserver(userStageStore)
-            it.addObserver(fireAnimationLoader)
         }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1) {
