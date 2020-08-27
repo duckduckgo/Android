@@ -18,6 +18,7 @@ package com.duckduckgo.mobile.android.vpn.processor
 
 import com.duckduckgo.mobile.android.vpn.service.VpnQueues
 import timber.log.Timber
+import xyz.hexene.localvpn.TCB
 
 
 class QueueMonitor(private val queues: VpnQueues) : Runnable {
@@ -25,11 +26,15 @@ class QueueMonitor(private val queues: VpnQueues) : Runnable {
     override fun run() {
         while (!Thread.currentThread().isInterrupted) {
             logQueueStatus()
-            Thread.sleep(3_000)
+            Thread.sleep(1_000)
         }
     }
 
     private fun logQueueStatus() {
-        Timber.i("VPN Queues:\nNetwork-to-device: ${queues.networkToDevice.size}\nTCP device-to-network: ${queues.tcpDeviceToNetwork.size}\nUDP device-to-network: ${queues.udpDeviceToNetwork.size}")
+        Timber.i("VPN Queues:\nNetwork-to-device: %d\nTCP device-to-network: %d\nUDP device-to-network: %d\nTCB status: %d",
+            queues.networkToDevice.size,
+            queues.tcpDeviceToNetwork.size,
+            queues.udpDeviceToNetwork.size,
+            TCB.tcbCache.size)
     }
 }

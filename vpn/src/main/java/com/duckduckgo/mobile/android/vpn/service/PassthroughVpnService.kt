@@ -154,6 +154,8 @@ class PassthroughVpnService : VpnService(), CoroutineScope by MainScope(), Netwo
             addAllowedApplication("meteor.test.and.grade.internet.connection.speed")
             addAllowedApplication("org.zwanoo.android.speedtest")
             addAllowedApplication("com.netflix.Speedtest")
+            addAllowedApplication("eu.vspeed.android")
+            addAllowedApplication("net.fireprobe.android")
             configureMeteredConnection()
             establish()
         }

@@ -76,7 +76,7 @@ class UdpPacketProcessor(private val queues: VpnQueues, private val networkChann
         channelCache.evictAll()
     }
 
-    private suspend fun pollForDeviceToNetworkWork() {
+    private fun pollForDeviceToNetworkWork() {
         setThreadPriority(THREAD_PRIORITY_URGENT_DISPLAY)
 
         try {
@@ -109,12 +109,8 @@ class UdpPacketProcessor(private val queues: VpnQueues, private val networkChann
      * Reads from the device-to-network queue. For any packets in this queue, a new DatagramChannel is created and the packet is written.
      * Instructs the selector we'll be interested in OP_READ for receiving the response to the packet we write.
      */
-    private suspend fun deviceToNetworkProcessing() {
-        val packet = queues.udpDeviceToNetwork.poll()
-        if (packet == null) {
-            delay(10)
-            return
-        }
+    private fun deviceToNetworkProcessing() {
+        val packet = queues.udpDeviceToNetwork.take() ?: return
 
         val destinationAddress = packet.ip4Header.destinationAddress
         val destinationPort = packet.udpHeader.destinationPort

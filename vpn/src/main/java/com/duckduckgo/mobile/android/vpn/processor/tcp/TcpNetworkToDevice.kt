@@ -19,9 +19,10 @@ package com.duckduckgo.mobile.android.vpn.processor.tcp
 import android.os.Handler
 import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpPacketProcessor.Companion.logPacketDetails
 import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpPacketProcessor.Companion.updateState
-import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpStateFlow.Event.*
+import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpStateFlow.Event.MoveState
 import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpStateFlow.Event.MoveState.MoveClientToState
 import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpStateFlow.Event.MoveState.MoveServerToState
+import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpStateFlow.Event.SendReset
 import com.duckduckgo.mobile.android.vpn.service.VpnQueues
 import timber.log.Timber
 import xyz.hexene.localvpn.ByteBufferPool
@@ -104,7 +105,14 @@ class TcpNetworkToDevice(
                 val readBytes = channel.read(receiveBuffer)
 
                 if (endOfStream(readBytes)) {
-                    Timber.w("Network-to-device end of stream ${tcb.ipAndPort}. ${tcb.tcbState} ${logPacketDetails(packet, tcb.sequenceNumberToClientInitial,tcb.sequenceNumberToClient, tcb.acknowledgementNumberToClient)}")
+                    Timber.w(
+                        "Network-to-device end of stream ${tcb.ipAndPort}. ${tcb.tcbState} ${logPacketDetails(
+                            packet,
+                            tcb.sequenceNumberToClientInitial,
+                            tcb.sequenceNumberToClient,
+                            tcb.acknowledgementNumberToClient
+                        )}"
+                    )
 
                     // close connection with remote end point as there's no more communication required
                     key.cancel()
@@ -183,12 +191,12 @@ class TcpNetworkToDevice(
 
     private fun logPacket(tcb: TCB, packet: Packet) {
         Timber.i(
-            "New packet. ${tcb.ipAndPort}. ${tcb.tcbState}. ${logPacketDetails(
-                packet,
-                tcb.sequenceNumberToClientInitial,
-                packet.tcpHeader.sequenceNumber,
-                packet.tcpHeader.acknowledgementNumber
-            )}. Packet length: ${packet.ip4Header.totalLength}. Data length: ${packet.tcpPayloadSize(false)}"
+            "New packet. %s. %s. %s. Packet length: %d. Data length: %d",
+            tcb.ipAndPort,
+            tcb.tcbState,
+            logPacketDetails(packet, tcb.sequenceNumberToClientInitial, packet.tcpHeader.sequenceNumber, packet.tcpHeader.acknowledgementNumber),
+            packet.ip4Header.totalLength,
+            packet.tcpPayloadSize(false)
         )
     }
 

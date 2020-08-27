@@ -17,6 +17,7 @@
 package com.duckduckgo.mobile.android.vpn.processor.tcp
 
 import android.os.Handler
+import android.util.Log
 import androidx.core.os.postDelayed
 import com.duckduckgo.mobile.android.vpn.processor.tcp.ConnectionInitializer.TcpConnectionParams
 import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpPacketProcessor.Companion.closeConnection
@@ -51,11 +52,9 @@ class TcpDeviceToNetwork(
      * Instructs the selector we'll be interested in OP_READ for receiving the response to the packet we write.
      */
     fun deviceToNetworkProcessing() {
-        val packet = queues.tcpDeviceToNetwork.poll()
-        if (packet == null) {
-            Thread.sleep(10)
-            return
-        }
+        val packet = queues.tcpDeviceToNetwork.take() ?: return
+
+        val startTime = System.nanoTime()
 
         val destinationAddress = packet.ip4Header.destinationAddress
         val destinationPort = packet.tcpHeader.destinationPort
@@ -70,11 +69,14 @@ class TcpDeviceToNetwork(
 
         val totalPacketLength = payloadBuffer.limit()
 
+
         val tcb = TCB.getTCB(connectionKey)
         if (tcb == null) {
             processPacketTcbNotInitialized(connectionKey, packet, totalPacketLength, connectionParams)
+            Timber.i("Finished processing device-to-network packet. New connection. Took ${(System.nanoTime() - startTime) / 1_000_000}ms")
         } else {
             processPacketTcbExists(connectionKey, tcb, packet, totalPacketLength, connectionParams, responseBuffer, payloadBuffer)
+            Timber.i("Finished processing device-to-network packet. Existing connection. Took ${(System.nanoTime() - startTime) / 1_000_000}ms")
         }
 
 //        if (responseBuffer.position() == 0) {
@@ -126,12 +128,15 @@ class TcpDeviceToNetwork(
         payloadBuffer: ByteBuffer
     ) {
         Timber.i(
-            "New packet. $connectionKey. ${tcb.tcbState}. ${TcpPacketProcessor.logPacketDetails(
+            "New packet. %s. %s. %s. Packet length: %d.  Data length: %d",
+            connectionKey, tcb.tcbState,
+            TcpPacketProcessor.logPacketDetails(
                 packet,
                 tcb.sequenceNumberToServerInitial,
                 packet.tcpHeader.sequenceNumber,
                 packet.tcpHeader.acknowledgementNumber
-            )}. Packet length: $totalPacketLength.  Data length: ${packet.tcpPayloadSize(true)}"
+            ),
+            totalPacketLength, packet.tcpPayloadSize(true)
         )
 
         if (packet.tcpHeader.isACK) {
@@ -139,7 +144,7 @@ class TcpDeviceToNetwork(
         }
 
         val action = TcpStateFlow.newPacket(connectionKey, tcb.tcbState, packet.asPacketType(), tcb.sequenceNumberToClientInitial)
-        Timber.v("Action: ${action.events} for ${tcb.ipAndPort}")
+        //Timber.v("Action: ${action.events} for ${tcb.ipAndPort}")
 
         action.events.forEach {
             when (it) {
@@ -157,6 +162,7 @@ class TcpDeviceToNetwork(
     }
 
     private fun openConnection(params: TcpConnectionParams) {
+        Log.i("TcpDeviceToNetwork", String.format("Opening connection to %s:%s", params.destinationAddress, params.destinationPort))
         val (tcb, channel) = connectionInitializer.initializeConnection(params) ?: return
         TcpStateFlow.socketOpening(TcbState()).events.forEach {
             when (it) {
