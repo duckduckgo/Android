@@ -20,6 +20,7 @@ import android.animation.Animator
 import android.animation.ValueAnimator
 import android.content.Context
 import android.os.Bundle
+import androidx.core.content.ContextCompat
 import androidx.core.view.doOnDetach
 import com.airbnb.lottie.RenderMode
 import com.duckduckgo.app.browser.R
@@ -122,6 +123,7 @@ class FireDialog(
     private fun animationEnabled() = variantManager.getVariant().hasFeature(FireButtonEducation)
 
     private fun playAnimation() {
+        window?.navigationBarColor = ContextCompat.getColor(context, R.color.black)
         setCancelable(false)
         setCanceledOnTouchOutside(false)
         fireAnimationView.show()
