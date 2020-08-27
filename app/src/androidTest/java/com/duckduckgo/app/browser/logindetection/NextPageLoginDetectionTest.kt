@@ -146,6 +146,24 @@ class NextPageLoginDetectionTest {
         assertEventNotIssued<LoginDetected>()
     }
 
+    @Test
+    fun whenLoginAttemptedHasInvalidURLThenNewPageDoesNotDetectLogin() {
+        loginDetector.onEvent(NavigationEvent.LoginAttempt(""))
+
+        loginDetector.onEvent(NavigationEvent.WebNavigationEvent(NewPage(url = "http://example.com", title = "")))
+
+        assertEventNotIssued<LoginDetected>()
+    }
+
+    @Test
+    fun whenLoginAttemptedAndUserForwardedToInvalidNewPageThenLoginDetected() {
+        loginDetector.onEvent(NavigationEvent.LoginAttempt("http://example.com/login"))
+
+        loginDetector.onEvent(NavigationEvent.WebNavigationEvent(NewPage(url = "", title = "")))
+
+        assertEventNotIssued<LoginDetected>()
+    }
+
     private inline fun <reified T> assertEvent(instanceAssertions: T.() -> Unit = {}) {
         verify(loginObserver, atLeastOnce()).onChanged(loginEventCaptor.capture())
         val issuedCommand = loginEventCaptor.allValues.find { it is T }

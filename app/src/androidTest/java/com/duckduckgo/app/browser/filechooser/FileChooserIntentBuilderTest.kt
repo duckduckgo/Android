@@ -69,14 +69,14 @@ class FileChooserIntentBuilderTest {
     @Test
     fun whenUpperCaseTypesGivenThenNormalisedToLowercase() {
         val output = testee.intent(arrayOf("ImAgE/PnG"))
-        assertEquals("image/png", output.getStringArrayExtra(Intent.EXTRA_MIME_TYPES)[0])
+        assertEquals("image/png", output.getStringArrayExtra(Intent.EXTRA_MIME_TYPES)!![0])
     }
 
     @Test
     fun whenEmptyTypesGivenThenNotIncludedInOutput() {
         val output = testee.intent(arrayOf("image/png", "", " ", "image/gif"))
         val mimeTypes = output.getStringArrayExtra(Intent.EXTRA_MIME_TYPES)
-        assertEquals(2, mimeTypes.size)
+        assertEquals(2, mimeTypes!!.size)
         assertEquals("image/png", mimeTypes[0])
         assertEquals("image/gif", mimeTypes[1])
     }
