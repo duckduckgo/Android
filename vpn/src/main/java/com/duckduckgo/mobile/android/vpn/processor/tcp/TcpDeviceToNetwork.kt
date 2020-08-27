@@ -77,9 +77,9 @@ class TcpDeviceToNetwork(
             processPacketTcbExists(connectionKey, tcb, packet, totalPacketLength, connectionParams, responseBuffer, payloadBuffer)
         }
 
-        if (responseBuffer.position() == 0) {
-            ByteBufferPool.release(responseBuffer)
-        }
+//        if (responseBuffer.position() == 0) {
+//            ByteBufferPool.release(responseBuffer)
+//        }
         ByteBufferPool.release(payloadBuffer)
     }
 
@@ -92,20 +92,24 @@ class TcpDeviceToNetwork(
                 packet.tcpHeader.acknowledgementNumber
             )}. Packet length: $totalPacketLength.  Data length: ${packet.tcpPayloadSize(true)}"
         )
-        TcpStateFlow.newPacket(connectionKey, TcbState(), packet.asPacketType()).events.forEach {
+        TcpStateFlow.newPacket(connectionKey, TcbState(), packet.asPacketType(), -1).events.forEach {
             when (it) {
                 OpenConnection -> openConnection(connectionParams)
                 SendAck -> {
-                    connectionParams.packet.updateTcpBuffer(
-                        connectionParams.responseBuffer, ACK.toByte(), 0, connectionParams.packet.tcpHeader.sequenceNumber + 1, 0
-                    )
-                    queues.networkToDevice.offer(connectionParams.responseBuffer)
+                    synchronized(connectionParams.responseBuffer) {
+                        connectionParams.packet.updateTcpBuffer(
+                            connectionParams.responseBuffer, ACK.toByte(), 0, connectionParams.packet.tcpHeader.sequenceNumber + 1, 0
+                        )
+                        queues.networkToDevice.offer(connectionParams.responseBuffer)
+                    }
                 }
                 SendReset -> {
-                    connectionParams.packet.updateTcpBuffer(
-                        connectionParams.responseBuffer, RST.toByte(), 0, connectionParams.packet.tcpHeader.sequenceNumber + 1, 0
-                    )
-                    queues.networkToDevice.offer(connectionParams.responseBuffer)
+                    synchronized(connectionParams.responseBuffer) {
+                        connectionParams.packet.updateTcpBuffer(
+                            connectionParams.responseBuffer, RST.toByte(), 0, connectionParams.packet.tcpHeader.sequenceNumber + 1, 0
+                        )
+                        queues.networkToDevice.offer(connectionParams.responseBuffer)
+                    }
                 }
                 else -> Timber.w("No connection open and won't open one to $connectionKey. Dropping packet. (action=$it)")
             }
@@ -134,7 +138,7 @@ class TcpDeviceToNetwork(
             tcb.acknowledgementNumberToServer = packet.tcpHeader.acknowledgementNumber
         }
 
-        val action = TcpStateFlow.newPacket(connectionKey, tcb.tcbState, packet.asPacketType())
+        val action = TcpStateFlow.newPacket(connectionKey, tcb.tcbState, packet.asPacketType(), tcb.sequenceNumberToClientInitial)
         Timber.v("Action: ${action.events} for ${tcb.ipAndPort}")
 
         action.events.forEach {
@@ -146,24 +150,6 @@ class TcpDeviceToNetwork(
                 CloseConnection -> tcb.closeConnection(responseBuffer)
                 DelayedCloseConnection -> handler.postDelayed(3_000) { tcb.closeConnection(responseBuffer) }
                 SendAck -> tcb.sendAck(queues, packet, connectionParams)
-//                ProcessDuplicateSyn -> processDuplicateSyn(tcb, connectionParams)
-
-//
-//                WaitToRead -> waitToRead(tcb)
-//                SendReset -> {
-//                    connectionParams.packet.updateTcpBuffer(
-//                        connectionParams.responseBuffer,
-//                        RST.toByte(),
-//                        0,
-//                        connectionParams.packet.tcpHeader.sequenceNumber + 1,
-//                        0
-//                    )
-//                    queues.networkToDevice.offer(connectionParams.responseBuffer)
-//                }
-//                SendAckAndCloseConnection -> {
-//                    tcb.sendAck(queues, packet, connectionParams)
-//                    Timber.e("TODO: Need to kill connection after short delay ${tcb.ipAndPort}")
-//                }
                 else -> Timber.e("Unknown event for how to process device-to-network packet: ${action.events}")
             }
 
@@ -177,15 +163,17 @@ class TcpDeviceToNetwork(
                 is MoveState -> tcb.updateState(it)
                 SendSynAck -> {
                     Timber.v("Channel finished connecting to ${tcb.ipAndPort}")
-                    params.packet.updateTcpBuffer(
-                        params.responseBuffer,
-                        (SYN or ACK).toByte(),
-                        tcb.sequenceNumberToClient,
-                        tcb.acknowledgementNumberToClient,
-                        0
-                    )
-                    tcb.sequenceNumberToClient++
-                    queues.networkToDevice.offer(params.responseBuffer)
+                    synchronized(tcb) {
+                        params.packet.updateTcpBuffer(
+                            params.responseBuffer,
+                            (SYN or ACK).toByte(),
+                            tcb.sequenceNumberToClient,
+                            tcb.acknowledgementNumberToClient,
+                            0
+                        )
+                        tcb.sequenceNumberToClient++
+                        queues.networkToDevice.offer(params.responseBuffer)
+                    }
                 }
                 WaitToConnect -> {
                     Timber.v("Not finished connecting yet to ${tcb.selectionKey}, will register for OP_CONNECT event")
@@ -198,9 +186,9 @@ class TcpDeviceToNetwork(
     }
 
     private fun processPacket(tcb: TCB, payloadBuffer: ByteBuffer, connectionParams: TcpConnectionParams) {
-        val payloadSize = payloadBuffer.limit() - payloadBuffer.position()
-        if (payloadSize == 0) return
         synchronized(tcb) {
+            val payloadSize = payloadBuffer.limit() - payloadBuffer.position()
+            if (payloadSize == 0) return
 
             if (!tcb.waitingForNetworkData) {
                 Timber.v("Not waiting for network data ${tcb.ipAndPort}; register for OP_READ and wait for network data")
@@ -212,72 +200,14 @@ class TcpDeviceToNetwork(
             try {
                 socketWriter.writeToSocket(PendingWriteData(payloadBuffer, tcb.channel, payloadSize, tcb, connectionParams))
             } catch (e: IOException) {
-                Timber.w(e, "Network write error")
-                tcb.sendResetPacket(queues, payloadSize, connectionParams.responseBuffer)
+                val bytesUnwritten = payloadBuffer.remaining()
+                val bytesWritten = payloadSize - bytesUnwritten
+                Timber.w(e, "Network write error for ${tcb.ipAndPort}. Wrote $bytesWritten; $bytesUnwritten unwritten")
+                tcb.sendResetPacket(queues, bytesWritten, connectionParams.responseBuffer)
                 return
             }
         }
         queues.networkToDevice.offer(connectionParams.responseBuffer)
-    }
-
-    private fun processAck(tcb: TCB, payloadBuffer: ByteBuffer, connectionParams: TcpConnectionParams) {
-        // val payloadSize = payloadBuffer.limit() - payloadBuffer.position()
-        // synchronized(tcb) {
-        //
-        //     val socket = tcb.channel as SocketChannel
-        //     when (tcb.clientState) {
-        //         SYN_RECEIVED -> {
-        //             tcb.clientState = ESTABLISHED
-        //             Timber.v("Update TCB ${tcb.ipAndPort} status: ${tcb.clientState}")
-        //
-        //             waitToRead(tcb)
-        //         }
-        //         FIN_WAIT_1 -> {
-        //             tcb.clientState = FIN_WAIT_2
-        //             Timber.v("Update TCB ${tcb.ipAndPort} status: ${tcb.clientState}")
-        //             return
-        //         }
-        //         LAST_ACK -> {
-        //             tcb.closeConnection(connectionParams.responseBuffer)
-        //             return
-        //         }
-        //         CLOSE_WAIT -> {
-        //             tcb.closeConnection(connectionParams.responseBuffer)
-        //             return
-        //         }
-        //
-        //         //val payloadString = payloadBuffer.copyPayloadAsString(payloadSize)
-        //         //Timber.v("${tcb.ipAndPort} has $payloadSize bytes of data\n${payloadString}")
-        //     }
-        //
-        //     if (payloadSize == 0) return
-        //
-        //     //val payloadString = payloadBuffer.copyPayloadAsString(payloadSize)
-        //     //Timber.v("${tcb.ipAndPort} has $payloadSize bytes of data\n${payloadString}")
-        //
-        //     if (!tcb.waitingForNetworkData) {
-        //         Timber.w("Not waiting for network data ${tcb.ipAndPort}; register for OP_READ and wait for network data")
-        //         selector.wakeup()
-        //         tcb.selectionKey.interestOps(SelectionKey.OP_READ)
-        //         tcb.waitingForNetworkData = true
-        //     }
-        //
-        //     try {
-        //         socketWriter.writeToSocket(PendingWriteData(payloadBuffer, socket, payloadSize, tcb, connectionParams))
-        //     } catch (e: IOException) {
-        //         Timber.w(e, "Network write error")
-        //         tcb.sendResetPacket(queues, payloadSize, connectionParams.responseBuffer)
-        //         return
-        //     }
-        // }
-        //
-        // queues.networkToDevice.offer(connectionParams.responseBuffer)
-    }
-
-    private fun waitToRead(tcb: TCB) {
-        selector.wakeup()
-        tcb.selectionKey = tcb.channel.register(selector, SelectionKey.OP_READ, tcb)
-        tcb.waitingForNetworkData = true
     }
 
     private fun processDuplicateSyn(tcb: TCB, params: TcpConnectionParams) {

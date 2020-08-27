@@ -134,39 +134,50 @@ class TcpPacketProcessor(queues: VpnQueues, networkChannelCreator: NetworkChanne
         }
 
         fun TCB.sendFinToClient(queues: VpnQueues, packet: Packet, connectionParams: TcpConnectionParams) {
-            packet.updateTcpBuffer(connectionParams.responseBuffer, (FIN).toByte(), sequenceNumberToClient, acknowledgementNumberToClient, 0)
-            sequenceNumberToClient = increaseOrWraparound(sequenceNumberToClient, 1)
-            queues.networkToDevice.offer(connectionParams.responseBuffer)
+            synchronized(this) {
+                val buffer = ByteBufferPool.acquire()
+                packet.updateTcpBuffer(buffer, (FIN).toByte(), sequenceNumberToClient, acknowledgementNumberToClient, 0)
+                sequenceNumberToClient = increaseOrWraparound(sequenceNumberToClient, 1)
+                queues.networkToDevice.offer(buffer)
+            }
         }
 
         fun TCB.sendFinAckToClient(queues: VpnQueues, packet: Packet, connectionParams: TcpConnectionParams) {
-            packet.updateTcpBuffer(connectionParams.responseBuffer, (FIN or ACK).toByte(), sequenceNumberToClient, acknowledgementNumberToClient, 0)
-            sequenceNumberToClient = increaseOrWraparound(sequenceNumberToClient, 1)
-            queues.networkToDevice.offer(connectionParams.responseBuffer)
+            synchronized(this) {
+                val buffer = ByteBufferPool.acquire()
+                packet.updateTcpBuffer(buffer, (FIN or ACK).toByte(), sequenceNumberToClient, acknowledgementNumberToClient, 0)
+                sequenceNumberToClient = increaseOrWraparound(sequenceNumberToClient, 1)
+                queues.networkToDevice.offer(buffer)
+            }
         }
 
         fun TCB.sendAck(queues: VpnQueues, packet: Packet, connectionParams: TcpConnectionParams) {
-            val payloadSize = packet.tcpPayloadSize(true)
+            synchronized(this) {
+                val payloadSize = packet.tcpPayloadSize(true)
 
-            acknowledgementNumberToClient = increaseOrWraparound(packet.tcpHeader.sequenceNumber, payloadSize.toLong())
+                acknowledgementNumberToClient = increaseOrWraparound(packet.tcpHeader.sequenceNumber, payloadSize.toLong())
 
-            if (packet.tcpHeader.isRST || packet.tcpHeader.isSYN || packet.tcpHeader.isFIN) {
-                acknowledgementNumberToClient = increaseOrWraparound(acknowledgementNumberToClient, 1)
+                if (packet.tcpHeader.isRST || packet.tcpHeader.isSYN || packet.tcpHeader.isFIN) {
+                    acknowledgementNumberToClient = increaseOrWraparound(acknowledgementNumberToClient, 1)
+                }
+
+                val buffer = ByteBufferPool.acquire()
+                packet.updateTcpBuffer(buffer, (ACK).toByte(), sequenceNumberToClient, acknowledgementNumberToClient, 0)
+                sequenceNumberToClient = increaseOrWraparound(sequenceNumberToClient, 1)
+                queues.networkToDevice.offer(buffer)
             }
-
-            packet.updateTcpBuffer(connectionParams.responseBuffer, (ACK).toByte(), sequenceNumberToClient, acknowledgementNumberToClient, 0)
-            sequenceNumberToClient = increaseOrWraparound(sequenceNumberToClient, 1)
-            queues.networkToDevice.offer(connectionParams.responseBuffer)
         }
 
-
+        @Synchronized
         fun TCB.sendResetPacket(queues: VpnQueues, previousPayLoadSize: Int, responseBuffer: ByteBuffer) {
             Timber.w("Sending device-to-network reset packet ${this.ipAndPort}")
-            this.referencePacket.updateTcpBuffer(responseBuffer, Packet.TCPHeader.RST.toByte(), 0, this.acknowledgementNumberToClient + previousPayLoadSize, 0)
-            queues.networkToDevice.offer(responseBuffer)
+            val buffer = ByteBufferPool.acquire()
+            this.referencePacket.updateTcpBuffer(buffer, Packet.TCPHeader.RST.toByte(), 0, this.acknowledgementNumberToClient + previousPayLoadSize, 0)
+            queues.networkToDevice.offerFirst(buffer)
             TCB.closeTCB(this)
         }
 
+        @Synchronized
         fun TCB.closeConnection(buffer: ByteBuffer) {
             Timber.v("Closing TCB connection $ipAndPort}")
             ByteBufferPool.release(buffer)

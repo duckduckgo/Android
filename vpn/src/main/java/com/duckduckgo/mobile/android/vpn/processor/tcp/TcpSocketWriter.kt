@@ -28,6 +28,7 @@ interface SocketWriter {
 
 class TcpSocketWriter(private val selector:Selector) : SocketWriter{
 
+    @Synchronized
     override fun writeToSocket(writeData: TcpPacketProcessor.PendingWriteData): Boolean {
         Timber.v("Writing data to socket ${writeData.tcb.ipAndPort}: ${writeData.payloadSize} bytes")
         val payloadBuffer = writeData.payloadBuffer
@@ -40,26 +41,21 @@ class TcpSocketWriter(private val selector:Selector) : SocketWriter{
         if (payloadBuffer.remaining() > 0) {
             Timber.e("Hey hey, hey. now what? %d bytes written. %d bytes remain out of %d", bytesWritten, payloadBuffer.remaining(), payloadSize)
 
-            val remainingData = ByteArray(payloadBuffer.remaining())
-            if (payloadBuffer.hasArray()) {
-                System.arraycopy(payloadBuffer.array(), payloadBuffer.arrayOffset() + payloadBuffer.position(), remainingData, 0, payloadBuffer.remaining())
-            } else {
-                payloadBuffer.get(remainingData)
-            }
-
-            //queues.tcpDeviceToNetwork.offerFirst(Packet(ByteBuffer.wrap(remainingData)))
-
-            selector.wakeup()
-            socket.register(selector,
-                SelectionKey.OP_WRITE,
-                TcpPacketProcessor.PendingWriteData(ByteBuffer.wrap(remainingData), socket, payloadSize, tcb, connectionParams)
-            )
+//            selector.wakeup()
+//            socket.register(selector,
+//                SelectionKey.OP_WRITE,
+//                TcpPacketProcessor.PendingWriteData(ByteBuffer.wrap(remainingData), socket, payloadSize, tcb, connectionParams)
+//            )
             return false
         } else {
             selector.wakeup()
             socket.register(selector, SelectionKey.OP_READ, tcb)
             tcb.acknowledgementNumberToClient = connectionParams.packet.tcpHeader.sequenceNumber + payloadSize
             tcb.acknowledgementNumberToServer = connectionParams.packet.tcpHeader.acknowledgementNumber
+            val seqToClient = tcb.sequenceNumberToClient
+            val ackToServer = tcb.acknowledgementNumberToServer
+            val seqAckDiff = seqToClient-ackToServer
+            Timber.i("seqToClient=$seqToClient, ackToServer=$ackToServer, diff=$seqAckDiff")
             tcb.referencePacket.updateTcpBuffer(connectionParams.responseBuffer, Packet.TCPHeader.ACK.toByte(), tcb.sequenceNumberToClient, tcb.acknowledgementNumberToClient, 0)
             return true
         }

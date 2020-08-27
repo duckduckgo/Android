@@ -17,7 +17,6 @@
 package com.duckduckgo.mobile.android.vpn.processor.tcp
 
 import android.os.Handler
-import androidx.core.os.postDelayed
 import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpPacketProcessor.Companion.logPacketDetails
 import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpPacketProcessor.Companion.updateState
 import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpStateFlow.Event.*
@@ -38,7 +37,6 @@ import java.nio.channels.SelectionKey.OP_CONNECT
 import java.nio.channels.Selector
 import java.nio.channels.SocketChannel
 import java.util.concurrent.TimeUnit
-import kotlin.math.log
 
 
 class TcpNetworkToDevice(
@@ -115,7 +113,7 @@ class TcpNetworkToDevice(
                     TcpStateFlow.socketEndOfStream(tcb.tcbState).events.forEach {
                         when (it) {
                             is MoveState -> tcb.updateState(it)
-                            SendReset -> sendReset(packet, receiveBuffer, tcb)
+                            SendReset -> sendReset(packet, tcb)
                             else -> Timber.w("Unhandled event for ${tcb.ipAndPort}. $it")
                         }
                     }
@@ -131,31 +129,18 @@ class TcpNetworkToDevice(
                 }
             } catch (e: IOException) {
                 Timber.w(e, "Network read error")
-                sendReset(packet, receiveBuffer, tcb)
+                sendReset(packet, tcb)
                 return
             }
         }
 
     }
 
-    private fun sendFin(packet: Packet, receiveBuffer: ByteBuffer, tcb: TCB) {
-        packet.updateTcpBuffer(receiveBuffer, (FIN).toByte(), tcb.sequenceNumberToClient, tcb.acknowledgementNumberToClient, 0)
+    private fun sendReset(packet: Packet, tcb: TCB) {
+        val buffer = ByteBufferPool.acquire()
+        packet.updateTcpBuffer(buffer, (RST).toByte(), tcb.sequenceNumberToClient, tcb.acknowledgementNumberToClient, 0)
         tcb.sequenceNumberToClient++
-
-        offerToNetworkToDeviceQueue(receiveBuffer, tcb, packet)
-    }
-
-    private fun sendFinAck(packet: Packet, receiveBuffer: ByteBuffer, tcb: TCB) {
-        packet.updateTcpBuffer(receiveBuffer, (FIN or ACK).toByte(), tcb.sequenceNumberToClient, tcb.acknowledgementNumberToClient, 0)
-        tcb.sequenceNumberToClient++
-
-        offerToNetworkToDeviceQueue(receiveBuffer, tcb, packet)
-    }
-
-    private fun sendReset(packet: Packet, receiveBuffer: ByteBuffer, tcb: TCB) {
-        packet.updateTcpBuffer(receiveBuffer, (RST).toByte(), tcb.sequenceNumberToClient, tcb.acknowledgementNumberToClient, 0)
-        tcb.sequenceNumberToClient++
-        offerToNetworkToDeviceQueue(receiveBuffer, tcb, packet)
+        offerToNetworkToDeviceQueue(buffer, tcb, packet)
         TCB.closeTCB(tcb)
     }
 

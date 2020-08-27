@@ -29,10 +29,15 @@ class TcpStateFlow {
 
     companion object {
 
-        fun newPacket(connectionKey: String, currentState: TcbState, packetType: PacketType): TcpStateAction {
+        fun newPacket(
+            connectionKey: String,
+            currentState: TcbState,
+            packetType: PacketType,
+            sequenceNumberToClientInitial: Long
+        ): TcpStateAction {
             val newActions = when (currentState.serverState) {
                 LISTEN -> handlePacketInStateListen(currentState, packetType)
-                SYN_RECEIVED -> handlePacketInSynReceived(currentState, packetType)
+                SYN_RECEIVED -> handlePacketInSynReceived(currentState, packetType, sequenceNumberToClientInitial)
                 ESTABLISHED -> handlePacketInEstablished(currentState, packetType)
                 LAST_ACK -> handlePacketInLastAck(packetType)
                 FIN_WAIT_1 -> handlePacketInFinWait1(currentState, packetType)
@@ -193,7 +198,7 @@ class TcpStateFlow {
                     }
                     listOf(OpenConnection)
                 }
-                packetType.isFin -> listOf(SendAck, SendReset)
+                packetType.isFin -> listOf(SendReset)
                 packetType.isAck -> emptyList()
                 packetType.hasData -> listOf(SendReset)
                 else -> unhandledEvent(currentState, packetType)
@@ -216,10 +221,16 @@ class TcpStateFlow {
 //            return TcpStateAction()
 //        }
 //
-        private fun handlePacketInSynReceived(currentState: TcbState, packetType: PacketType): List<Event> {
+        private fun handlePacketInSynReceived(currentState: TcbState, packetType: PacketType, initialSequenceNumberToClient: Long): List<Event> {
             return when {
-                packetType.isAck -> listOf(MoveServerToState(ESTABLISHED), MoveClientToState(ESTABLISHED), ProcessPacket)
                 packetType.isRst -> listOf(CloseConnection)
+                packetType.isAck -> {
+                    if(packetType.ackNum != initialSequenceNumberToClient + 1) {
+                        Timber.e("Acknowledgement numbers don't match")
+                    }
+
+                    listOf(MoveServerToState(ESTABLISHED), MoveClientToState(ESTABLISHED), ProcessPacket)
+                }
                 else -> unhandledEvent(currentState, packetType)
             }
         }
@@ -326,7 +337,8 @@ class TcpStateFlow {
         val isAck: Boolean = false,
         val isFin: Boolean = false,
         val isRst: Boolean = false,
-        val hasData: Boolean = false
+        val hasData: Boolean = false,
+        val ackNum: Long = 0
     ) {
         val isFinAck: Boolean = isAck && isFin
     }
@@ -336,5 +348,12 @@ fun Packet.asPacketType(): TcpStateFlow.PacketType {
     val hasData = tcpPayloadSize(true) > 0
 
     val tcpHeader = this.tcpHeader
-    return TcpStateFlow.PacketType(isSyn = tcpHeader.isSYN, isAck = tcpHeader.isACK, isFin = tcpHeader.isFIN, isRst = tcpHeader.isRST, hasData = hasData)
+    return TcpStateFlow.PacketType(
+        isSyn = tcpHeader.isSYN,
+        isAck = tcpHeader.isACK,
+        isFin = tcpHeader.isFIN,
+        isRst = tcpHeader.isRST,
+        hasData = hasData,
+        ackNum = tcpHeader.acknowledgementNumber
+    )
 }
