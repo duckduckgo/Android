@@ -20,8 +20,7 @@ import android.os.Handler
 import androidx.core.os.postDelayed
 import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpPacketProcessor.Companion.logPacketDetails
 import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpPacketProcessor.Companion.updateState
-import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpStateFlow.Event.DelayedSendFin
-import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpStateFlow.Event.MoveState
+import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpStateFlow.Event.*
 import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpStateFlow.Event.MoveState.MoveClientToState
 import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpStateFlow.Event.MoveState.MoveServerToState
 import com.duckduckgo.mobile.android.vpn.service.VpnQueues
@@ -116,24 +115,13 @@ class TcpNetworkToDevice(
                     TcpStateFlow.socketEndOfStream(tcb.tcbState).events.forEach {
                         when (it) {
                             is MoveState -> tcb.updateState(it)
-                            DelayedSendFin -> {
-                                handler.postDelayed(100) {
-                                    Timber.i("Sending FIN to ${tcb.ipAndPort}")
-                                    sendFinAck(packet, receiveBuffer, tcb)
-                                }
-                            }
+                            SendReset -> sendReset(packet, receiveBuffer, tcb)
                             else -> Timber.w("Unhandled event for ${tcb.ipAndPort}. $it")
                         }
                     }
                     return
                 } else {
-                    val limit = receiveBuffer.limit()
-                    val position = receiveBuffer.position()
-
-                    val totalLength = packet.ip4Header.totalLength
-
-                    Timber.i("${tcb.ipAndPort} limit=$limit, position=$position, totalLength=$totalLength, readBytes=$readBytes, tcpHeaderLength=${packet.tcpHeader.headerLength}, ipHeaderLength=${packet.ip4Header.headerLength}")
-                    Timber.i("Network-to-device packet ${tcb.ipAndPort}. $readBytes bytes. ${logPacketDetails(packet, tcb.sequenceNumberToClientInitial, tcb.sequenceNumberToClient, tcb.acknowledgementNumberToClient)}")
+                    //Timber.i("Network-to-device packet ${tcb.ipAndPort}. $readBytes bytes. ${logPacketDetails(packet, tcb.sequenceNumberToClientInitial, tcb.sequenceNumberToClient, tcb.acknowledgementNumberToClient)}")
                     packet.updateTcpBuffer(receiveBuffer, (PSH or ACK).toByte(), tcb.sequenceNumberToClient, tcb.acknowledgementNumberToClient, readBytes)
 
                     tcb.sequenceNumberToClient += readBytes
@@ -143,10 +131,7 @@ class TcpNetworkToDevice(
                 }
             } catch (e: IOException) {
                 Timber.w(e, "Network read error")
-                packet.updateTcpBuffer(receiveBuffer, RST.toByte(), 0, tcb.acknowledgementNumberToClient, 0)
-
-                offerToNetworkToDeviceQueue(receiveBuffer, tcb, packet)
-                TCB.closeTCB(tcb)
+                sendReset(packet, receiveBuffer, tcb)
                 return
             }
         }
@@ -170,8 +155,8 @@ class TcpNetworkToDevice(
     private fun sendReset(packet: Packet, receiveBuffer: ByteBuffer, tcb: TCB) {
         packet.updateTcpBuffer(receiveBuffer, (RST).toByte(), tcb.sequenceNumberToClient, tcb.acknowledgementNumberToClient, 0)
         tcb.sequenceNumberToClient++
-
         offerToNetworkToDeviceQueue(receiveBuffer, tcb, packet)
+        TCB.closeTCB(tcb)
     }
 
     private fun processConnect(key: SelectionKey) {

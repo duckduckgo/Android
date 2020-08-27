@@ -33,6 +33,8 @@ import kotlinx.coroutines.launch
 import timber.log.Timber
 import xyz.hexene.localvpn.ByteBufferPool
 import xyz.hexene.localvpn.Packet
+import xyz.hexene.localvpn.Packet.TCPHeader.ACK
+import xyz.hexene.localvpn.Packet.TCPHeader.FIN
 import xyz.hexene.localvpn.TCB
 import java.nio.ByteBuffer
 import java.nio.channels.Selector
@@ -110,8 +112,12 @@ class TcpPacketProcessor(queues: VpnQueues, networkChannelCreator: NetworkChanne
     companion object {
         fun logPacketDetails(packet: Packet, initialSeqNumber: Long, sequenceNumber: Long, acknowledgementNumber: Long): String {
             with(packet.tcpHeader) {
-                return "\tsyn=$isSYN,\tack=$isACK,\tfin=$isFIN,\tpsh=$isPSH,\trst=$isRST,\turg=$isURG. [ackNumber=$acknowledgementNumber, sequenceNumber={ ${sequenceNumber - initialSeqNumber} / $sequenceNumber } ]"
+                return "\tflags:[ ${isSYN.printFlag("SYN")}${isACK.printFlag("ACK")}${isFIN.printFlag("FIN")}${isPSH.printFlag("PSH")}${isRST.printFlag("RST")}${isURG.printFlag("URG")}]. [ackNumber=$acknowledgementNumber, sequenceNumber={ ${sequenceNumber - initialSeqNumber} / $sequenceNumber } ]"
             }
+        }
+
+        private fun Boolean.printFlag(name: String) : String {
+            return if(this) "$name " else ""
         }
 
         fun ByteBuffer.copyPayloadAsString(payloadSize: Int): String {
@@ -127,29 +133,29 @@ class TcpPacketProcessor(queues: VpnQueues, networkChannelCreator: NetworkChanne
             this.tcbState = newStatus
         }
 
-        fun TCB.sendFinAck(queues: VpnQueues, packet: Packet, connectionParams: TcpConnectionParams) {
-            packet.updateTcpBuffer(
-                connectionParams.responseBuffer,
-                (Packet.TCPHeader.FIN or Packet.TCPHeader.ACK).toByte(),
-                this.sequenceNumberToClient,
-                this.acknowledgementNumberToClient,
-                0
-            )
-            this.sequenceNumberToClient++
+        fun TCB.sendFinToClient(queues: VpnQueues, packet: Packet, connectionParams: TcpConnectionParams) {
+            packet.updateTcpBuffer(connectionParams.responseBuffer, (FIN).toByte(), sequenceNumberToClient, acknowledgementNumberToClient, 0)
+            sequenceNumberToClient = increaseOrWraparound(sequenceNumberToClient, 1)
+            queues.networkToDevice.offer(connectionParams.responseBuffer)
+        }
+
+        fun TCB.sendFinAckToClient(queues: VpnQueues, packet: Packet, connectionParams: TcpConnectionParams) {
+            packet.updateTcpBuffer(connectionParams.responseBuffer, (FIN or ACK).toByte(), sequenceNumberToClient, acknowledgementNumberToClient, 0)
+            sequenceNumberToClient = increaseOrWraparound(sequenceNumberToClient, 1)
             queues.networkToDevice.offer(connectionParams.responseBuffer)
         }
 
         fun TCB.sendAck(queues: VpnQueues, packet: Packet, connectionParams: TcpConnectionParams) {
             val payloadSize = packet.tcpPayloadSize(true)
 
-            acknowledgementNumberToClient = increaseSequenceNumber(packet.tcpHeader.sequenceNumber, payloadSize.toLong())
+            acknowledgementNumberToClient = increaseOrWraparound(packet.tcpHeader.sequenceNumber, payloadSize.toLong())
 
             if (packet.tcpHeader.isRST || packet.tcpHeader.isSYN || packet.tcpHeader.isFIN) {
-                acknowledgementNumberToClient = increaseSequenceNumber(acknowledgementNumberToClient, 1)
+                acknowledgementNumberToClient = increaseOrWraparound(acknowledgementNumberToClient, 1)
             }
 
-            packet.updateTcpBuffer(connectionParams.responseBuffer, (Packet.TCPHeader.ACK).toByte(), this.sequenceNumberToClient, this.acknowledgementNumberToClient, 0)
-            this.sequenceNumberToClient++
+            packet.updateTcpBuffer(connectionParams.responseBuffer, (ACK).toByte(), sequenceNumberToClient, acknowledgementNumberToClient, 0)
+            sequenceNumberToClient = increaseOrWraparound(sequenceNumberToClient, 1)
             queues.networkToDevice.offer(connectionParams.responseBuffer)
         }
 
@@ -189,7 +195,7 @@ class TcpPacketProcessor(queues: VpnQueues, networkChannelCreator: NetworkChanne
             updateStatus(tcbState.copy(clientState = newState.state))
         }
 
-        private fun increaseSequenceNumber(current: Long, increment: Long): Long {
+        fun increaseOrWraparound(current: Long, increment: Long): Long {
             return (current + increment) % MAX_SEQUENCE_NUMBER
         }
 

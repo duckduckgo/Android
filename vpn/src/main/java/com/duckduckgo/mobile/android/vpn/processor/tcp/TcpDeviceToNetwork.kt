@@ -20,9 +20,9 @@ import android.os.Handler
 import androidx.core.os.postDelayed
 import com.duckduckgo.mobile.android.vpn.processor.tcp.ConnectionInitializer.TcpConnectionParams
 import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpPacketProcessor.Companion.closeConnection
-import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpPacketProcessor.Companion.logAckSeqDetails
 import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpPacketProcessor.Companion.sendAck
-import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpPacketProcessor.Companion.sendFinAck
+import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpPacketProcessor.Companion.sendFinAckToClient
+import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpPacketProcessor.Companion.sendFinToClient
 import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpPacketProcessor.Companion.sendResetPacket
 import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpPacketProcessor.Companion.updateState
 import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpPacketProcessor.PendingWriteData
@@ -84,23 +84,30 @@ class TcpDeviceToNetwork(
     }
 
     private fun processPacketTcbNotInitialized(connectionKey: String, packet: Packet, totalPacketLength: Int, connectionParams: TcpConnectionParams) {
-        Timber.i("New packet. $connectionKey. TCB not initialized. ${TcpPacketProcessor.logPacketDetails(packet, packet.tcpHeader.sequenceNumber, packet.tcpHeader.sequenceNumber, packet.tcpHeader.acknowledgementNumber)}. Packet length: $totalPacketLength.  Data length: ${packet.tcpPayloadSize(true)}")
-        val destinationAddressPort = "${connectionParams.destinationAddress}:${connectionParams.destinationPort}"
+        Timber.i(
+            "New packet. $connectionKey. TCB not initialized. ${TcpPacketProcessor.logPacketDetails(
+                packet,
+                packet.tcpHeader.sequenceNumber,
+                packet.tcpHeader.sequenceNumber,
+                packet.tcpHeader.acknowledgementNumber
+            )}. Packet length: $totalPacketLength.  Data length: ${packet.tcpPayloadSize(true)}"
+        )
         TcpStateFlow.newPacket(connectionKey, TcbState(), packet.asPacketType()).events.forEach {
             when (it) {
                 OpenConnection -> openConnection(connectionParams)
-                SendReset -> {
-                    Timber.i("Trying to initialize a connection but is not a SYN packet; sending RST to $destinationAddressPort")
+                SendAck -> {
                     connectionParams.packet.updateTcpBuffer(
-                        connectionParams.responseBuffer,
-                        RST.toByte(),
-                        0,
-                        connectionParams.packet.tcpHeader.sequenceNumber + 1,
-                        0
+                        connectionParams.responseBuffer, ACK.toByte(), 0, connectionParams.packet.tcpHeader.sequenceNumber + 1, 0
                     )
                     queues.networkToDevice.offer(connectionParams.responseBuffer)
                 }
-                else -> Timber.w("No connection open and won't open one to $destinationAddressPort. Dropping packet.")
+                SendReset -> {
+                    connectionParams.packet.updateTcpBuffer(
+                        connectionParams.responseBuffer, RST.toByte(), 0, connectionParams.packet.tcpHeader.sequenceNumber + 1, 0
+                    )
+                    queues.networkToDevice.offer(connectionParams.responseBuffer)
+                }
+                else -> Timber.w("No connection open and won't open one to $connectionKey. Dropping packet. (action=$it)")
             }
         }
     }
@@ -114,7 +121,14 @@ class TcpDeviceToNetwork(
         responseBuffer: ByteBuffer,
         payloadBuffer: ByteBuffer
     ) {
-        Timber.i("New packet. $connectionKey. ${tcb.tcbState}. ${TcpPacketProcessor.logPacketDetails(packet, tcb.sequenceNumberToServerInitial, packet.tcpHeader.sequenceNumber, packet.tcpHeader.acknowledgementNumber)}. Packet length: $totalPacketLength.  Data length: ${packet.tcpPayloadSize(true)}")
+        Timber.i(
+            "New packet. $connectionKey. ${tcb.tcbState}. ${TcpPacketProcessor.logPacketDetails(
+                packet,
+                tcb.sequenceNumberToServerInitial,
+                packet.tcpHeader.sequenceNumber,
+                packet.tcpHeader.acknowledgementNumber
+            )}. Packet length: $totalPacketLength.  Data length: ${packet.tcpPayloadSize(true)}"
+        )
 
         if (packet.tcpHeader.isACK) {
             tcb.acknowledgementNumberToServer = packet.tcpHeader.acknowledgementNumber
@@ -127,7 +141,8 @@ class TcpDeviceToNetwork(
             when (it) {
                 is MoveState -> tcb.updateState(it)
                 ProcessPacket -> processPacket(tcb, payloadBuffer, connectionParams)
-                SendFinAck -> tcb.sendFinAck(queues, packet, connectionParams)
+                SendFinAck -> tcb.sendFinAckToClient(queues, packet, connectionParams)
+                SendFin -> tcb.sendFinToClient(queues, packet, connectionParams)
                 CloseConnection -> tcb.closeConnection(responseBuffer)
                 DelayedCloseConnection -> handler.postDelayed(3_000) { tcb.closeConnection(responseBuffer) }
                 SendAck -> tcb.sendAck(queues, packet, connectionParams)
@@ -162,7 +177,13 @@ class TcpDeviceToNetwork(
                 is MoveState -> tcb.updateState(it)
                 SendSynAck -> {
                     Timber.v("Channel finished connecting to ${tcb.ipAndPort}")
-                    params.packet.updateTcpBuffer(params.responseBuffer, (SYN or ACK).toByte(), tcb.sequenceNumberToClient, tcb.acknowledgementNumberToClient, 0)
+                    params.packet.updateTcpBuffer(
+                        params.responseBuffer,
+                        (SYN or ACK).toByte(),
+                        tcb.sequenceNumberToClient,
+                        tcb.acknowledgementNumberToClient,
+                        0
+                    )
                     tcb.sequenceNumberToClient++
                     queues.networkToDevice.offer(params.responseBuffer)
                 }
