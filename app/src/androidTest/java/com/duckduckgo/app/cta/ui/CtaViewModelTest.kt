@@ -25,14 +25,14 @@ import com.duckduckgo.app.InstantSchedulersRule
 import com.duckduckgo.app.cta.db.DismissedCtaDao
 import com.duckduckgo.app.cta.model.CtaId
 import com.duckduckgo.app.cta.model.DismissedCta
-import com.duckduckgo.app.global.useourapp.UseOurAppDetector.Companion.USE_OUR_APP_SHORTCUT_URL
 import com.duckduckgo.app.global.db.AppDatabase
+import com.duckduckgo.app.global.events.db.UserEventEntity
+import com.duckduckgo.app.global.events.db.UserEventKey
+import com.duckduckgo.app.global.events.db.UserEventsStore
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.model.Site
-import com.duckduckgo.app.global.events.db.UserEventEntity
-import com.duckduckgo.app.global.events.db.UserEventsStore
-import com.duckduckgo.app.global.events.db.UserEventKey
 import com.duckduckgo.app.global.useourapp.UseOurAppDetector
+import com.duckduckgo.app.global.useourapp.UseOurAppDetector.Companion.USE_OUR_APP_SHORTCUT_URL
 import com.duckduckgo.app.onboarding.store.AppStage
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.store.UserStageStore
@@ -43,7 +43,9 @@ import com.duckduckgo.app.privacy.model.PrivacyPractices
 import com.duckduckgo.app.privacy.model.TestEntity
 import com.duckduckgo.app.runBlocking
 import com.duckduckgo.app.settings.db.SettingsDataStore
+import com.duckduckgo.app.statistics.Variant
 import com.duckduckgo.app.statistics.VariantManager
+import com.duckduckgo.app.statistics.VariantManager.Companion.DEFAULT_VARIANT
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.*
 import com.duckduckgo.app.survey.db.SurveyDao
@@ -54,6 +56,11 @@ import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import com.duckduckgo.app.widget.ui.WidgetCapabilities
 import com.nhaarman.mockitokotlin2.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.consumeAsFlow
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runBlockingTest
 import org.junit.After
 import org.junit.Assert.*
@@ -114,11 +121,22 @@ class CtaViewModelTest {
     @Mock
     private lateinit var mockUserEventsStore: UserEventsStore
 
+    private val dismissedCtaDaoChannel = Channel<List<DismissedCta>>()
+
     private val requiredDaxOnboardingCtas: List<CtaId> = listOf(
         CtaId.DAX_INTRO,
         CtaId.DAX_DIALOG_SERP,
         CtaId.DAX_DIALOG_TRACKERS_FOUND,
         CtaId.DAX_DIALOG_NETWORK,
+        CtaId.DAX_END
+    )
+
+    private val requiredFireEducationDaxOnboardingCtas: List<CtaId> = listOf(
+        CtaId.DAX_INTRO,
+        CtaId.DAX_DIALOG_SERP,
+        CtaId.DAX_DIALOG_TRACKERS_FOUND,
+        CtaId.DAX_DIALOG_NETWORK,
+        CtaId.DAX_FIRE_BUTTON,
         CtaId.DAX_END
     )
 
@@ -135,6 +153,8 @@ class CtaViewModelTest {
 
         whenever(mockAppInstallStore.installTimestamp).thenReturn(System.currentTimeMillis() - TimeUnit.DAYS.toMillis(1))
         whenever(mockUserWhitelistDao.contains(any())).thenReturn(false)
+        whenever(mockDismissedCtaDao.dismissedCtas()).thenReturn(dismissedCtaDaoChannel.consumeAsFlow())
+        givenControlGroup()
 
         testee = CtaViewModel(
             mockAppInstallStore,
@@ -155,6 +175,7 @@ class CtaViewModelTest {
 
     @After
     fun after() {
+        dismissedCtaDaoChannel.close()
         db.close()
     }
 
@@ -227,6 +248,33 @@ class CtaViewModelTest {
     fun whenCtaDismissedAndAllDaxOnboardingCtasShownThenStageCompleted() = coroutineRule.runBlocking {
         givenOnboardingActive()
         givenShownDaxOnboardingCtas(requiredDaxOnboardingCtas)
+        testee.onUserDismissedCta(DaxDialogCta.DaxSerpCta(mockOnboardingStore, mockAppInstallStore))
+        verify(mockUserStageStore).stageCompleted(AppStage.DAX_ONBOARDING)
+    }
+
+    @Test
+    fun whenFireEducationEnabledCtaDismissedAndUserHasPendingOnboardingCtasThenStageNotCompleted() = coroutineRule.runBlocking {
+        givenFireButtonEducationActive()
+        givenOnboardingActive()
+        givenShownDaxOnboardingCtas(emptyList())
+        testee.onUserDismissedCta(DaxBubbleCta.DaxEndCta(mockOnboardingStore, mockAppInstallStore))
+        verify(mockUserStageStore, times(0)).stageCompleted(any())
+    }
+
+    @Test
+    fun whenFireEducationEnabledAndCtaDismissedAndAllDaxOnboardingCtasShownThenStageNotCompleted() = coroutineRule.runBlocking {
+        givenFireButtonEducationActive()
+        givenOnboardingActive()
+        givenShownDaxOnboardingCtas(requiredDaxOnboardingCtas)
+        testee.onUserDismissedCta(DaxDialogCta.DaxSerpCta(mockOnboardingStore, mockAppInstallStore))
+        verify(mockUserStageStore, times(0)).stageCompleted(any())
+    }
+
+    @Test
+    fun whenFireEducationEnabledAndCtaDismissedAndAllFireEducationDaxOnboardingCtasShownThenStageCompleted() = coroutineRule.runBlocking {
+        givenFireButtonEducationActive()
+        givenOnboardingActive()
+        givenShownDaxOnboardingCtas(requiredFireEducationDaxOnboardingCtas)
         testee.onUserDismissedCta(DaxDialogCta.DaxSerpCta(mockOnboardingStore, mockAppInstallStore))
         verify(mockUserStageStore).stageCompleted(AppStage.DAX_ONBOARDING)
     }
@@ -513,6 +561,125 @@ class CtaViewModelTest {
         verify(mockUserStageStore).stageCompleted(AppStage.USE_OUR_APP_ONBOARDING)
     }
 
+    @Test
+    fun whenUserHidAllTipsThenFireButtonAnimationShouldNotShow() = coroutineRule.runBlocking {
+        givenFireButtonEducationActive()
+        whenever(mockSettingsDataStore.hideTips).thenReturn(true)
+        launch {
+            dismissedCtaDaoChannel.send(emptyList())
+        }
+
+        assertFalse(testee.showFireButtonPulseAnimation.first())
+    }
+
+    @Test
+    fun whenUserHasAlreadySeenFireButtonCtaThenFireButtonAnimationShouldNotShow() = coroutineRule.runBlocking {
+        givenFireButtonEducationActive()
+        whenever(mockDismissedCtaDao.exists(CtaId.DAX_FIRE_BUTTON)).thenReturn(true)
+        launch {
+            dismissedCtaDaoChannel.send(emptyList())
+        }
+
+        assertFalse(testee.showFireButtonPulseAnimation.first())
+    }
+
+    @Test
+    fun whenTipsAndFireOnboardingActiveAndUserSeesAnyTriggerFirePulseAnimationCtaThenFireButtonAnimationShouldShow() = coroutineRule.runBlocking {
+        givenFireButtonEducationActive()
+        givenOnboardingActive()
+        val willTriggerFirePulseAnimationCtas = listOf(CtaId.DAX_DIALOG_TRACKERS_FOUND, CtaId.DAX_DIALOG_NETWORK, CtaId.DAX_DIALOG_OTHER)
+
+        val launch = launch {
+            testee.showFireButtonPulseAnimation.collect {
+                assertTrue(it)
+            }
+        }
+        willTriggerFirePulseAnimationCtas.forEach {
+            dismissedCtaDaoChannel.send(listOf(DismissedCta(it)))
+        }
+
+        launch.cancel()
+    }
+
+    @Test
+    fun whenTipsAndFireOnboardingActiveAndUserSeesAnyNonTriggerFirePulseAnimationCtaThenFireButtonAnimationShouldNotShow() = coroutineRule.runBlocking {
+        givenFireButtonEducationActive()
+        givenOnboardingActive()
+        val willTriggerFirePulseAnimationCtas = listOf(CtaId.DAX_DIALOG_TRACKERS_FOUND, CtaId.DAX_DIALOG_NETWORK, CtaId.DAX_DIALOG_OTHER)
+        val willNotTriggerFirePulseAnimationCtas = CtaId.values().toList() - willTriggerFirePulseAnimationCtas
+
+        val launch = launch {
+            testee.showFireButtonPulseAnimation.collect {
+                assertFalse(it)
+            }
+        }
+        willNotTriggerFirePulseAnimationCtas.forEach {
+            dismissedCtaDaoChannel.send(listOf(DismissedCta(it)))
+        }
+
+        launch.cancel()
+    }
+
+    @Test
+    fun whenFireEducationDisabledAndUserSeesAnyCtaThenFireButtonAnimationShouldNotShow() = coroutineRule.runBlocking {
+        givenControlGroup()
+        givenOnboardingActive()
+        val allCtas = CtaId.values().toList()
+
+        val launch = launch {
+            testee.showFireButtonPulseAnimation.collect {
+                assertFalse(it)
+            }
+        }
+        allCtas.forEach {
+            dismissedCtaDaoChannel.send(listOf(DismissedCta(it)))
+        }
+
+        launch.cancel()
+    }
+
+    @Test
+    fun whenFirstTimeUserClicksOnFireButtonThenFireDialogCtaReturned() = coroutineRule.runBlocking {
+        givenFireButtonEducationActive()
+        givenOnboardingActive()
+
+        val fireDialogCta = testee.getFireDialogCta()
+
+        assertTrue(fireDialogCta is DaxFireDialogCta.TryClearDataCta)
+    }
+
+    @Test
+    fun whenFirstTimeUserClicksOnFireButtonButUserHidAllTipsThenFireDialogCtaIsNull() = coroutineRule.runBlocking {
+        givenFireButtonEducationActive()
+        givenOnboardingActive()
+        whenever(mockSettingsDataStore.hideTips).thenReturn(true)
+
+        val fireDialogCta = testee.getFireDialogCta()
+
+        assertNull(fireDialogCta)
+    }
+
+    @Test
+    fun whenFireCtaDismissedThenFireDialogCtaIsNull() = coroutineRule.runBlocking {
+        givenFireButtonEducationActive()
+        givenOnboardingActive()
+        whenever(mockDismissedCtaDao.exists(CtaId.DAX_FIRE_BUTTON)).thenReturn(true)
+
+        val fireDialogCta = testee.getFireDialogCta()
+
+        assertNull(fireDialogCta)
+    }
+
+    @Test
+    fun whenFireEducationDisabledThenFireDialogCtaIsNull() = coroutineRule.runBlocking {
+        givenControlGroup()
+        givenOnboardingActive()
+
+        val fireDialogCta = testee.getFireDialogCta()
+
+        assertNull(fireDialogCta)
+    }
+
     private suspend fun givenDaxOnboardingActive() {
         whenever(mockUserStageStore.getUserAppStage()).thenReturn(AppStage.DAX_ONBOARDING)
     }
@@ -537,6 +704,21 @@ class CtaViewModelTest {
 
     private suspend fun givenUseOurAppActive() {
         whenever(mockUserStageStore.getUserAppStage()).thenReturn(AppStage.USE_OUR_APP_ONBOARDING)
+    }
+
+    private fun givenFireButtonEducationActive() {
+        whenever(mockVariantManager.getVariant()).thenReturn(
+            Variant(
+                "test",
+                features = listOf(
+                    VariantManager.VariantFeature.FireButtonEducation
+                ),
+                filterBy = { true })
+        )
+    }
+
+    private fun givenControlGroup() {
+        whenever(mockVariantManager.getVariant()).thenReturn(DEFAULT_VARIANT)
     }
 
     private fun site(

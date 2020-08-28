@@ -23,26 +23,25 @@ import com.duckduckgo.app.cta.model.CtaId
 import com.duckduckgo.app.cta.model.DismissedCta
 import com.duckduckgo.app.cta.ui.HomePanelCta.*
 import com.duckduckgo.app.global.DispatcherProvider
+import com.duckduckgo.app.global.events.db.UserEventKey
+import com.duckduckgo.app.global.events.db.UserEventsStore
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.install.daysInstalled
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.global.model.domain
 import com.duckduckgo.app.global.model.orderedTrackingEntities
-import com.duckduckgo.app.global.events.db.UserEventsStore
-import com.duckduckgo.app.global.events.db.UserEventKey
 import com.duckduckgo.app.global.useourapp.UseOurAppDetector
-import com.duckduckgo.app.onboarding.store.AppStage
-import com.duckduckgo.app.onboarding.store.OnboardingStore
-import com.duckduckgo.app.onboarding.store.UserStageStore
-import com.duckduckgo.app.onboarding.store.daxOnboardingActive
-import com.duckduckgo.app.onboarding.store.useOurAppOnboarding
+import com.duckduckgo.app.onboarding.store.*
 import com.duckduckgo.app.privacy.db.UserWhitelistDao
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.VariantManager
+import com.duckduckgo.app.statistics.VariantManager.VariantFeature.FireButtonEducation
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.survey.db.SurveyDao
 import com.duckduckgo.app.survey.model.Survey
 import com.duckduckgo.app.widget.ui.WidgetCapabilities
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
@@ -68,15 +67,26 @@ class CtaViewModel @Inject constructor(
 ) {
     val surveyLiveData: LiveData<Survey> = surveyDao.getLiveScheduled()
 
+    val showFireButtonPulseAnimation: Flow<Boolean> = dismissedCtaDao
+        .dismissedCtas()
+        .shouldShowPulseAnimation()
+
     private var activeSurvey: Survey? = null
 
-    private val requiredDaxOnboardingCtas: Array<CtaId> = arrayOf(
-        CtaId.DAX_INTRO,
-        CtaId.DAX_DIALOG_SERP,
-        CtaId.DAX_DIALOG_TRACKERS_FOUND,
-        CtaId.DAX_DIALOG_NETWORK,
-        CtaId.DAX_END
-    )
+    private val requiredDaxOnboardingCtas: Array<CtaId> by lazy {
+        arrayOf(
+            CtaId.DAX_INTRO,
+            CtaId.DAX_DIALOG_SERP,
+            CtaId.DAX_DIALOG_TRACKERS_FOUND,
+            CtaId.DAX_DIALOG_NETWORK,
+            CtaId.DAX_END
+        ).run {
+            if (variantManager.getVariant().hasFeature(FireButtonEducation)) {
+                return@run this.plus(CtaId.DAX_FIRE_BUTTON)
+            }
+            return@run this
+        }
+    }
 
     fun onSurveyChanged(survey: Survey?): Survey? {
         activeSurvey = survey
@@ -159,6 +169,15 @@ class CtaViewModel @Inject constructor(
             } else {
                 getHomeCta()
             }
+        }
+    }
+
+    suspend fun getFireDialogCta(): DaxFireDialogCta? {
+        if (!variantManager.getVariant().hasFeature(FireButtonEducation) || !daxOnboardingActive()) return null
+
+        return withContext(dispatchers.io()) {
+            if (settingsDataStore.hideTips || daxDialogFireEducationShown()) return@withContext null
+            return@withContext DaxFireDialogCta.TryClearDataCta()
         }
     }
 
@@ -290,6 +309,8 @@ class CtaViewModel @Inject constructor(
 
     private fun daxDialogNetworkShown(): Boolean = dismissedCtaDao.exists(CtaId.DAX_DIALOG_NETWORK)
 
+    private fun daxDialogFireEducationShown(): Boolean = dismissedCtaDao.exists(CtaId.DAX_FIRE_BUTTON)
+
     private fun isSerpUrl(url: String): Boolean = url.contains(DaxDialogCta.SERP)
 
     private suspend fun useOurAppActive(): Boolean = userStageStore.useOurAppOnboarding()
@@ -300,6 +321,21 @@ class CtaViewModel @Inject constructor(
         return withContext(dispatchers.io()) {
             requiredDaxOnboardingCtas.all {
                 dismissedCtaDao.exists(it)
+            }
+        }
+    }
+
+    private fun Flow<List<DismissedCta>>.shouldShowPulseAnimation(): Flow<Boolean> {
+        return this.map { dismissedCtaDao ->
+            withContext(dispatchers.io()) {
+                if (!variantManager.getVariant().hasFeature(FireButtonEducation)) return@withContext false
+                if (!daxOnboardingActive() || daxDialogFireEducationShown() || settingsDataStore.hideTips) return@withContext false
+
+                return@withContext dismissedCtaDao.any {
+                    it.ctaId == CtaId.DAX_DIALOG_TRACKERS_FOUND ||
+                            it.ctaId == CtaId.DAX_DIALOG_OTHER ||
+                            it.ctaId == CtaId.DAX_DIALOG_NETWORK
+                }
             }
         }
     }

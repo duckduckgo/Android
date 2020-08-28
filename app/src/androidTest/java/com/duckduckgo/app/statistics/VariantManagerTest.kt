@@ -183,6 +183,21 @@ class VariantManagerTest {
         assertTrue(variant.hasFeature(InAppUsage))
     }
 
+    // Fire button education
+    @Test
+    fun fireButtonEducationControlGroupVariantIsActive() {
+        val variant = variants.first { it.key == "zm" }
+        assertEqualsDouble(1.0, variant.weight)
+    }
+
+    @Test
+    fun fireButtonEducationVariantHasExpectedWeightAndFeatures() {
+        val variant = variants.first { it.key == "zr" }
+        assertEqualsDouble(1.0, variant.weight)
+        assertEquals(1, variant.features.size)
+        assertTrue(variant.hasFeature(FireButtonEducation))
+    }
+
     @Test
     fun verifyNoDuplicateVariantNames() {
         val existingNames = mutableSetOf<String>()
