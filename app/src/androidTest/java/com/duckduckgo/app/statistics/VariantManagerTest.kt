@@ -158,32 +158,6 @@ class VariantManagerTest {
     }
 
     @Test
-    fun inBrowserControlVariantHasExpectedWeightAndNoFeatures() {
-        val variant = variants.first { it.key == "zj" }
-        assertEqualsDouble(0.0, variant.weight)
-        assertEquals(0, variant.features.size)
-    }
-
-    @Test
-    fun inBrowserSecondControlVariantHasExpectedWeightAndRemoveDay1And3NotificationsAndKillOnboardingFeatures() {
-        val variant = variants.first { it.key == "zk" }
-        assertEqualsDouble(0.0, variant.weight)
-        assertEquals(2, variant.features.size)
-        assertTrue(variant.hasFeature(KillOnboarding))
-        assertTrue(variant.hasFeature(RemoveDay1AndDay3Notifications))
-    }
-
-    @Test
-    fun inBrowserInAppUsageVariantHasExpectedWeightAndRemoveDay1And3NotificationsAndKillOnboardingAndInAppUsageFeatures() {
-        val variant = variants.first { it.key == "zl" }
-        assertEqualsDouble(0.0, variant.weight)
-        assertEquals(3, variant.features.size)
-        assertTrue(variant.hasFeature(KillOnboarding))
-        assertTrue(variant.hasFeature(RemoveDay1AndDay3Notifications))
-        assertTrue(variant.hasFeature(InAppUsage))
-    }
-
-    @Test
     fun verifyNoDuplicateVariantNames() {
         val existingNames = mutableSetOf<String>()
         variants.forEach {
