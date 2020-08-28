@@ -85,7 +85,7 @@
                                 android:contentDescription="@string/privacyGradeContentDescription"
                                 android:padding="4dp"
                                 android:visibility="gone"
-                                android:src="@drawable/ic_dax_toolbar" />
+                                android:src="@drawable/ic_ddg_logo" />
 
                             <ImageButton
                                 android:id="@+id/privacyGradeButton"
