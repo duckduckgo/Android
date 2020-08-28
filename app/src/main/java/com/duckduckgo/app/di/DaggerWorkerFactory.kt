@@ -28,14 +28,8 @@ import com.duckduckgo.app.job.ConfigurationDownloader
 import com.duckduckgo.app.notification.NotificationFactory
 import com.duckduckgo.app.notification.NotificationScheduler.ClearDataNotificationWorker
 import com.duckduckgo.app.notification.NotificationScheduler.PrivacyNotificationWorker
-import com.duckduckgo.app.notification.NotificationScheduler.DripA1NotificationWorker
-import com.duckduckgo.app.notification.NotificationScheduler.DripA2NotificationWorker
-import com.duckduckgo.app.notification.NotificationScheduler.DripB1NotificationWorker
-import com.duckduckgo.app.notification.NotificationScheduler.DripB2NotificationWorker
 import com.duckduckgo.app.notification.NotificationScheduler.UseOurAppNotificationWorker
 import com.duckduckgo.app.notification.db.NotificationDao
-import com.duckduckgo.app.notification.model.AppFeatureNotification
-import com.duckduckgo.app.notification.model.WebsiteNotification
 import com.duckduckgo.app.notification.model.ClearDataNotification
 import com.duckduckgo.app.notification.model.UseOurAppNotification
 import com.duckduckgo.app.notification.model.PrivacyProtectionNotification
@@ -56,10 +50,6 @@ class DaggerWorkerFactory(
     private val privacyProtectionNotification: PrivacyProtectionNotification,
     private val useOurAppNotification: UseOurAppNotification,
     private val configurationDownloader: ConfigurationDownloader,
-    private val dripA1Notification: WebsiteNotification,
-    private val dripA2Notification: WebsiteNotification,
-    private val dripB1Notification: AppFeatureNotification,
-    private val dripB2Notification: AppFeatureNotification,
     private val pixel: Pixel
 ) : WorkerFactory() {
 
@@ -76,10 +66,6 @@ class DaggerWorkerFactory(
                 is ClearDataNotificationWorker -> injectClearDataNotificationWorker(instance)
                 is PrivacyNotificationWorker -> injectPrivacyNotificationWorker(instance)
                 is AppConfigurationWorker -> injectAppConfigurationWorker(instance)
-                is DripA1NotificationWorker -> injectDripA1NotificationWorker(instance)
-                is DripA2NotificationWorker -> injectDripA2NotificationWorker(instance)
-                is DripB1NotificationWorker -> injectDripB1NotificationWorker(instance)
-                is DripB2NotificationWorker -> injectDripB2NotificationWorker(instance)
                 is UseOurAppNotificationWorker -> injectUseOurAppNotificationWorker(instance)
                 else -> Timber.i("No injection required for worker $workerClassName")
             }
@@ -119,38 +105,6 @@ class DaggerWorkerFactory(
         worker.factory = notificationFactory
         worker.pixel = pixel
         worker.notification = privacyProtectionNotification
-    }
-
-    private fun injectDripA1NotificationWorker(worker: DripA1NotificationWorker) {
-        worker.manager = notificationManager
-        worker.notificationDao = notificationDao
-        worker.factory = notificationFactory
-        worker.pixel = pixel
-        worker.notification = dripA1Notification
-    }
-
-    private fun injectDripA2NotificationWorker(worker: DripA2NotificationWorker) {
-        worker.manager = notificationManager
-        worker.notificationDao = notificationDao
-        worker.factory = notificationFactory
-        worker.pixel = pixel
-        worker.notification = dripA2Notification
-    }
-
-    private fun injectDripB1NotificationWorker(worker: DripB1NotificationWorker) {
-        worker.manager = notificationManager
-        worker.notificationDao = notificationDao
-        worker.factory = notificationFactory
-        worker.pixel = pixel
-        worker.notification = dripB1Notification
-    }
-
-    private fun injectDripB2NotificationWorker(worker: DripB2NotificationWorker) {
-        worker.manager = notificationManager
-        worker.notificationDao = notificationDao
-        worker.factory = notificationFactory
-        worker.pixel = pixel
-        worker.notification = dripB2Notification
     }
 
     private fun injectUseOurAppNotificationWorker(worker: UseOurAppNotificationWorker) {

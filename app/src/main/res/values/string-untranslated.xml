@@ -20,18 +20,6 @@
     <string name="downloadManagerIncompatible">Download Manager not available on this device</string>
     <string name="enable">Enable</string>
 
-    <!-- Notifications Drip Experiment -->
-    <string name="dripA1Title">How anonymous is DuckDuckGo?</string>
-    <string name="dripA2Title">Tired of being tracked online? We can help.</string>
-    <string name="dripA1Description">Learn why DuckDuckGo is better than Incognito.</string>
-    <string name="dripA2Description">Learn how DuckDuckGo keeps you private.</string>
-    <string name="dripB1Title">Customize your app icon</string>
-    <string name="dripB2Title">Instantly clear tabs &amp; browsing data</string>
-    <string name="dripB1Description">Visit settings to choose a different icon theme.</string>
-    <string name="dripB2Description">Simply tap the Fire Button by the address bar.</string>
-    <string name="dripAButtonText">Show Me</string>
-    <string name="dripBButtonText">Try It Out</string>
-
     <!-- Fireproof websites -->
     <string name="fireproofWebsiteLoginDialogTitle">Would you like to Fireproof %s?</string>
     <string name="fireproofWebsiteLoginDialogDescription">Fireproofing this site will keep you signed in after using the Fire Button.</string>
