@@ -31,7 +31,8 @@ enum class CtaId {
     DAX_DIALOG_OTHER,
     DAX_END,
     USE_OUR_APP,
-    USE_OUR_APP_DELETION
+    USE_OUR_APP_DELETION,
+    UNKNOWN
 }
 
 @Entity(
@@ -46,7 +47,11 @@ data class DismissedCta(
 
         @TypeConverter
         fun toId(value: String): CtaId {
-            return CtaId.valueOf(value)
+            return try {
+                CtaId.valueOf(value)
+            } catch (ex: IllegalArgumentException) {
+                CtaId.UNKNOWN;
+            }
         }
 
         @TypeConverter
