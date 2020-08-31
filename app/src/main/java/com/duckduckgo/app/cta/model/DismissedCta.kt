@@ -50,7 +50,7 @@ data class DismissedCta(
             return try {
                 CtaId.valueOf(value)
             } catch (ex: IllegalArgumentException) {
-                CtaId.UNKNOWN;
+                CtaId.UNKNOWN
             }
         }
 
