@@ -16,7 +16,9 @@
 
 <resources>
 
-    <style name="AppTheme" parent="Theme.MaterialComponents.Light.Bridge">
+    <style name="BaseAppTheme" parent="Theme.MaterialComponents.Light.Bridge"/>
+
+    <style name="AppTheme" parent="BaseAppTheme">
 
         <!-- These neutral colors cover cases before dynamic theme can be applied
              such as the app launch color -->

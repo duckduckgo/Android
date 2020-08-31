@@ -19,6 +19,7 @@ package com.duckduckgo.app.browser
 import android.net.Uri
 import android.os.Message
 import android.view.View
+import android.webkit.GeolocationPermissions
 import android.webkit.ValueCallback
 import android.webkit.WebChromeClient
 import android.webkit.WebView
@@ -120,4 +121,9 @@ class BrowserChromeClient @Inject constructor(private val uncaughtExceptionRepos
     override fun onCloseWindow(window: WebView?) {
         webViewClientListener?.closeCurrentTab()
     }
+
+    override fun onGeolocationPermissionsShowPrompt(origin: String, callback: GeolocationPermissions.Callback) {
+        webViewClientListener?.onSiteLocationPermissionRequested(origin, callback)
+    }
+
 }

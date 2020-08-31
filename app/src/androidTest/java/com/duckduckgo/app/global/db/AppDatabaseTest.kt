@@ -286,6 +286,11 @@ class AppDatabaseTest {
         createDatabaseAndMigrate(23, 24, migrationsProvider.MIGRATION_23_TO_24)
     }
 
+    @Test
+    fun whenMigratingFromVersion24To25ThenValidationSucceeds() {
+        createDatabaseAndMigrate(24, 25, migrationsProvider.MIGRATION_24_TO_25)
+    }
+
     private fun createDatabase(version: Int) {
         testHelper.createDatabase(TEST_DB_NAME, version).close()
     }

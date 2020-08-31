@@ -40,6 +40,7 @@ interface VariantManager {
         object InAppUsage : VariantFeature()
         object KillOnboarding : VariantFeature()
         object RemoveDay1AndDay3Notifications : VariantFeature()
+        object FireButtonEducation : VariantFeature()
     }
 
     companion object {
@@ -103,8 +104,14 @@ interface VariantManager {
                 key = "zl",
                 weight = 0.0,
                 features = listOf(VariantFeature.KillOnboarding, VariantFeature.InAppUsage, VariantFeature.RemoveDay1AndDay3Notifications),
+                filterBy = { isEnglishLocale() }),
+            // Fire Education Experiments
+            Variant(key = "zm", weight = 1.0, features = emptyList(), filterBy = { isEnglishLocale() }),
+            Variant(
+                key = "zr",
+                weight = 1.0,
+                features = listOf(VariantFeature.FireButtonEducation),
                 filterBy = { isEnglishLocale() })
-
             // All groups in an experiment (control and variants) MUST use the same filters
         )
 
