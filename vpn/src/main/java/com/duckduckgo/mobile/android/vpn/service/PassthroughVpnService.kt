@@ -24,6 +24,7 @@ import android.os.Binder
 import android.os.Build
 import android.os.IBinder
 import android.os.ParcelFileDescriptor
+import com.duckduckgo.mobile.android.vpn.processor.QueueMonitor
 import com.duckduckgo.mobile.android.vpn.processor.TunPacketReader
 import com.duckduckgo.mobile.android.vpn.processor.TunPacketWriter
 import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpPacketProcessor

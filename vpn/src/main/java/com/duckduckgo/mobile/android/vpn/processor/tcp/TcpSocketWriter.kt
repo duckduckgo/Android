@@ -50,12 +50,16 @@ class TcpSocketWriter(private val selector:Selector) : SocketWriter{
         } else {
             selector.wakeup()
             socket.register(selector, SelectionKey.OP_READ, tcb)
-            tcb.acknowledgementNumberToClient = connectionParams.packet.tcpHeader.sequenceNumber + payloadSize
-            tcb.acknowledgementNumberToServer = connectionParams.packet.tcpHeader.acknowledgementNumber
+
+            tcb.acknowledgementNumberToClient = writeData.ackNumber
+            tcb.acknowledgementNumberToServer = writeData.seqNumber
+
+            //tcb.acknowledgementNumberToClient = connectionParams.packet.tcpHeader.sequenceNumber + payloadSize
+            //tcb.acknowledgementNumberToServer = connectionParams.packet.tcpHeader.acknowledgementNumber
             val seqToClient = tcb.sequenceNumberToClient
             val ackToServer = tcb.acknowledgementNumberToServer
             val seqAckDiff = seqToClient-ackToServer
-            Timber.i("seqToClient=$seqToClient, ackToServer=$ackToServer, diff=$seqAckDiff")
+            Timber.i("${writeData.tcb.ipAndPort} - seqToClient=$seqToClient, ackToClient=${tcb.acknowledgementNumberToClient}, ackToServer=$ackToServer, diff=$seqAckDiff")
             tcb.referencePacket.updateTcpBuffer(connectionParams.responseBuffer, Packet.TCPHeader.ACK.toByte(), tcb.sequenceNumberToClient, tcb.acknowledgementNumberToClient, 0)
             return true
         }

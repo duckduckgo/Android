@@ -105,35 +105,10 @@ class TcpNetworkToDevice(
                 val readBytes = channel.read(receiveBuffer)
 
                 if (endOfStream(readBytes)) {
-                    Timber.w(
-                        "Network-to-device end of stream ${tcb.ipAndPort}. ${tcb.tcbState} ${logPacketDetails(
-                            packet,
-                            tcb.sequenceNumberToClientInitial,
-                            tcb.sequenceNumberToClient,
-                            tcb.acknowledgementNumberToClient
-                        )}"
-                    )
-
-                    // close connection with remote end point as there's no more communication required
-                    key.cancel()
-                    channel.close()
-//
-                    TcpStateFlow.socketEndOfStream(tcb.tcbState).events.forEach {
-                        when (it) {
-                            is MoveState -> tcb.updateState(it)
-                            SendReset -> sendReset(packet, tcb)
-                            else -> Timber.w("Unhandled event for ${tcb.ipAndPort}. $it")
-                        }
-                    }
+                    handleEndOfStream(tcb, packet, key, channel)
                     return
                 } else {
-                    //Timber.i("Network-to-device packet ${tcb.ipAndPort}. $readBytes bytes. ${logPacketDetails(packet, tcb.sequenceNumberToClientInitial, tcb.sequenceNumberToClient, tcb.acknowledgementNumberToClient)}")
-                    packet.updateTcpBuffer(receiveBuffer, (PSH or ACK).toByte(), tcb.sequenceNumberToClient, tcb.acknowledgementNumberToClient, readBytes)
-
-                    tcb.sequenceNumberToClient += readBytes
-                    receiveBuffer.position(HEADER_SIZE + readBytes)
-
-                    offerToNetworkToDeviceQueue(receiveBuffer, tcb, packet)
+                    sendToNetworkToDeviceQueue(packet, receiveBuffer, tcb, readBytes)
                 }
             } catch (e: IOException) {
                 Timber.w(e, "Network read error")
@@ -144,9 +119,42 @@ class TcpNetworkToDevice(
 
     }
 
+    private fun sendToNetworkToDeviceQueue(packet: Packet, receiveBuffer: ByteBuffer, tcb: TCB, readBytes: Int) {
+        //Timber.i("Network-to-device packet ${tcb.ipAndPort}. $readBytes bytes. ${logPacketDetails(packet, tcb.sequenceNumberToClientInitial, tcb.sequenceNumberToClient, tcb.acknowledgementNumberToClient)}")
+        packet.updateTcpBuffer(receiveBuffer, (PSH or ACK).toByte(), tcb.sequenceNumberToClient, tcb.acknowledgementNumberToClient, readBytes)
+
+        tcb.sequenceNumberToClient += readBytes
+        receiveBuffer.position(HEADER_SIZE + readBytes)
+
+        offerToNetworkToDeviceQueue(receiveBuffer, tcb, packet)
+    }
+
+    private fun handleEndOfStream(tcb: TCB, packet: Packet, key: SelectionKey, channel: SocketChannel) {
+        Timber.w(
+            "Network-to-device end of stream ${tcb.ipAndPort}. ${tcb.tcbState} ${logPacketDetails(
+                packet,
+                tcb.sequenceNumberToClientInitial,
+                tcb.sequenceNumberToClient,
+                tcb.acknowledgementNumberToClient
+            )}"
+        )
+
+        // close connection with remote end point as there's no more communication required
+        key.cancel()
+        channel.close()
+        //
+        TcpStateFlow.socketEndOfStream(tcb.tcbState).events.forEach {
+            when (it) {
+                is MoveState -> tcb.updateState(it)
+                SendReset -> sendReset(packet, tcb)
+                else -> Timber.w("Unhandled event for ${tcb.ipAndPort}. $it")
+            }
+        }
+    }
+
     private fun sendReset(packet: Packet, tcb: TCB) {
         val buffer = ByteBufferPool.acquire()
-        packet.updateTcpBuffer(buffer, (RST).toByte(), tcb.sequenceNumberToClient, tcb.acknowledgementNumberToClient, 0)
+        packet.updateTcpBuffer(buffer, (RST or ACK).toByte(), tcb.sequenceNumberToClient, tcb.acknowledgementNumberToClient, 0)
         tcb.sequenceNumberToClient++
         offerToNetworkToDeviceQueue(buffer, tcb, packet)
         TCB.closeTCB(tcb)

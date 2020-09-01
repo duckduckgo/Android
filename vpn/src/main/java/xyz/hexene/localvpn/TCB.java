@@ -35,6 +35,7 @@ public class TCB {
     public long sequenceNumberToClient, sequenceNumberToClientInitial;
     public long sequenceNumberToServer, sequenceNumberToServerInitial;
     public long acknowledgementNumberToClient, acknowledgementNumberToServer;
+    public long finSequenceNumberToClient = -1;
 
     public TcbState tcbState;
 
