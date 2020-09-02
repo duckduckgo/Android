@@ -172,7 +172,6 @@ class VariantManagerTest {
         assertTrue(variant.hasFeature(FireButtonEducation))
     }
 
-
     @Test
     fun verifyNoDuplicateVariantNames() {
         val existingNames = mutableSetOf<String>()
