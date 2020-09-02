@@ -73,11 +73,7 @@ import androidx.core.content.FileProvider
 import androidx.core.net.toUri
 import androidx.core.text.HtmlCompat
 import androidx.core.text.HtmlCompat.FROM_HTML_MODE_LEGACY
-import androidx.core.view.isEmpty
-import androidx.core.view.isInvisible
-import androidx.core.view.isNotEmpty
-import androidx.core.view.isVisible
-import androidx.core.view.postDelayed
+import androidx.core.view.*
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.commitNow
 import androidx.fragment.app.transaction
@@ -91,17 +87,9 @@ import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion
 import com.duckduckgo.app.bookmarks.ui.EditBookmarkDialogFragment
 import com.duckduckgo.app.brokensite.BrokenSiteActivity
 import com.duckduckgo.app.brokensite.BrokenSiteData
+import com.duckduckgo.app.browser.BrowserTabViewModel.*
 import com.duckduckgo.app.browser.BrowserTabViewModel.Command.DownloadCommand
 import com.duckduckgo.app.browser.DownloadConfirmationFragment.DownloadConfirmationDialogListener
-import com.duckduckgo.app.browser.BrowserTabViewModel.AutoCompleteViewState
-import com.duckduckgo.app.browser.BrowserTabViewModel.BrowserViewState
-import com.duckduckgo.app.browser.BrowserTabViewModel.Command
-import com.duckduckgo.app.browser.BrowserTabViewModel.CtaViewState
-import com.duckduckgo.app.browser.BrowserTabViewModel.FindInPageViewState
-import com.duckduckgo.app.browser.BrowserTabViewModel.GlobalLayoutViewState
-import com.duckduckgo.app.browser.BrowserTabViewModel.LoadingViewState
-import com.duckduckgo.app.browser.BrowserTabViewModel.OmnibarViewState
-import com.duckduckgo.app.browser.BrowserTabViewModel.PrivacyGradeViewState
 import com.duckduckgo.app.browser.autocomplete.BrowserAutoCompleteSuggestionsAdapter
 import com.duckduckgo.app.browser.downloader.DownloadFailReason
 import com.duckduckgo.app.browser.downloader.FileDownloadNotificationManager
@@ -297,9 +285,15 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
 
     private val logoHidingListener by lazy { LogoHidingLayoutChangeLifecycleListener(ddgLogo) }
 
+    private val ctaViewStateObserver = Observer<CtaViewState> {
+        it?.let { renderer.renderCtaViewState(it) }
+    }
+
     private var alertDialog: AlertDialog? = null
 
     private var loginDetectionDialog: AlertDialog? = null
+
+    private val pulseAnimation: PulseAnimation = PulseAnimation(this)
 
     override fun onAttach(context: Context) {
         AndroidSupportInjection.inject(this)
@@ -448,9 +442,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
             it?.let { renderer.renderFindInPageState(it) }
         })
 
-        viewModel.ctaViewState.observe(viewLifecycleOwner, Observer {
-            it?.let { renderer.renderCtaViewState(it) }
-        })
+        viewModel.ctaViewState.observe(viewLifecycleOwner, ctaViewStateObserver)
 
         viewModel.command.observe(viewLifecycleOwner, Observer {
             processCommand(it)
@@ -646,7 +638,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
 
     private fun locationPermissionsHaveNotBeenGranted(): Boolean {
         return ContextCompat.checkSelfPermission(requireActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED ||
-            ContextCompat.checkSelfPermission(requireActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
+                ContextCompat.checkSelfPermission(requireActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
     }
 
     private fun checkSystemLocationPermission(domain: String, deniedForever: Boolean) {
@@ -692,7 +684,8 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
     }
 
     private fun showDomainHasLocationPermission(domain: String) {
-        val snackbar = Snackbar.make(rootView, getString(R.string.preciseLocationSnackbarMessage, domain.websiteFromGeoLocationsApiOrigin()), Snackbar.LENGTH_SHORT)
+        val snackbar =
+            Snackbar.make(rootView, getString(R.string.preciseLocationSnackbarMessage, domain.websiteFromGeoLocationsApiOrigin()), Snackbar.LENGTH_SHORT)
         snackbar.view.setOnClickListener {
             browserActivity?.launchLocationSettings()
         }
@@ -1172,6 +1165,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
     }
 
     override fun onDestroy() {
+        pulseAnimation.stop()
         animatorHelper.removeListener()
         supervisorJob.cancel()
         popupMenu.dismiss()
@@ -1394,8 +1388,20 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
 
         fun updateToolbarActionsVisibility(viewState: BrowserViewState) {
             tabsButton?.isVisible = viewState.showTabsButton
-            fireMenuButton?.isVisible = viewState.showFireButton
+            fireMenuButton?.isVisible = viewState.fireButton is FireButton.Visible
             menuButton?.isVisible = viewState.showMenuButton
+
+            if (viewState.fireButton.playPulseAnimation()) {
+                playPulseAnimation()
+            } else {
+                pulseAnimation.stop()
+            }
+        }
+
+        private fun playPulseAnimation() {
+            toolbarContainer.doOnLayout {
+                pulseAnimation.playOn(fireIconImageView)
+            }
         }
 
         private fun decorateToolbarWithButtons() {
@@ -1577,7 +1583,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
                     }
                 }
 
-                if (!viewState.isLoading) {
+                if (!viewState.isLoading && lastSeenBrowserViewState?.browserShowing == true) {
                     swipeRefreshContainer.isRefreshing = false
                     webView?.detectOverscrollBehavior()
                 }
@@ -1719,6 +1725,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
             }
 
             renderIfChanged(viewState, lastSeenCtaViewState) {
+
                 ddgLogo.show()
                 lastSeenCtaViewState = viewState
                 if (viewState.cta != null) {
@@ -1914,6 +1921,14 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
 
     override fun cancelDownload() {
         viewModel.closeAndReturnToSourceIfBlankTab()
+    }
+
+    fun onFireDialogVisibilityChanged(isVisible: Boolean) {
+        if (isVisible) {
+            viewModel.ctaViewState.removeObserver(ctaViewStateObserver)
+        } else {
+            viewModel.ctaViewState.observe(viewLifecycleOwner, ctaViewStateObserver)
+        }
     }
 
     override fun onSiteLocationPermissionSelected(domain: String, permission: LocationPermissionType) {
