@@ -28,6 +28,7 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.tabpreview.WebViewPreviewPersister
+import com.duckduckgo.app.cta.ui.CtaViewModel
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.view.ClearPersonalDataAction
 import com.duckduckgo.app.global.view.FireDialog
@@ -65,6 +66,9 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
 
     @Inject
     lateinit var pixel: Pixel
+
+    @Inject
+    lateinit var ctaViewModel: CtaViewModel
 
     private val viewModel: TabSwitcherViewModel by bindViewModel()
 
@@ -163,7 +167,7 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
 
     private fun onFire() {
         pixel.fire(Pixel.PixelName.FORGET_ALL_PRESSED_TABSWITCHING)
-        val dialog = FireDialog(context = this, clearPersonalDataAction = clearPersonalDataAction)
+        val dialog = FireDialog(context = this, clearPersonalDataAction = clearPersonalDataAction, ctaViewModel = ctaViewModel, variantManager = variantManager)
         dialog.clearComplete = { viewModel.onClearComplete() }
         dialog.show()
     }

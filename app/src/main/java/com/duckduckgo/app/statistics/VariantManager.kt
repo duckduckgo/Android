@@ -37,6 +37,7 @@ interface VariantManager {
         object Day1DripB2Notification : VariantFeature()
         object SerpHeaderQueryReplacement : VariantFeature()
         object SerpHeaderRemoval : VariantFeature()
+        object FireButtonEducation : VariantFeature()
     }
 
     companion object {
@@ -87,8 +88,15 @@ interface VariantManager {
             // Single Search Bar Experiments
             Variant(key = "zg", weight = 0.0, features = emptyList(), filterBy = { noFilter() }),
             Variant(key = "zh", weight = 0.0, features = listOf(VariantFeature.SerpHeaderQueryReplacement), filterBy = { noFilter() }),
-            Variant(key = "zi", weight = 0.0, features = listOf(VariantFeature.SerpHeaderRemoval), filterBy = { noFilter() })
+            Variant(key = "zi", weight = 0.0, features = listOf(VariantFeature.SerpHeaderRemoval), filterBy = { noFilter() }),
 
+            // Fire Education Experiments
+            Variant(key = "zm", weight = 1.0, features = emptyList(), filterBy = { isEnglishLocale() }),
+            Variant(
+                key = "zr",
+                weight = 1.0,
+                features = listOf(VariantFeature.FireButtonEducation),
+                filterBy = { isEnglishLocale() })
             // All groups in an experiment (control and variants) MUST use the same filters
         )
 
