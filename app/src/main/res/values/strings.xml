@@ -454,4 +454,7 @@
     <string name="fireproofWebsiteDeleteConfirmMessage">Are you sure you want to delete &lt;b>%s&lt;/b>?</string>
     <string name="fireproofWebsiteEmptyListHint">No websites Fireproofed yet</string>
     <string name="fireproofWebsiteOverflowContentDescription">More options for fireproof website %s</string>
+
+    <!-- Developer settings -->
+    <string name="developerSettingsLabel" translatable="false">Developer Settings</string>
 </resources>

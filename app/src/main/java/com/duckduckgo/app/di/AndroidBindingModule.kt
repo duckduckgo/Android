@@ -43,6 +43,7 @@ import com.duckduckgo.app.onboarding.ui.OnboardingActivity
 import com.duckduckgo.app.onboarding.ui.page.DefaultBrowserPage
 import com.duckduckgo.app.privacy.ui.*
 import com.duckduckgo.app.settings.SettingsActivity
+import com.duckduckgo.app.settings.developer.DeveloperSettingsActivity
 import com.duckduckgo.app.survey.ui.SurveyActivity
 import com.duckduckgo.app.systemsearch.SystemSearchActivity
 import com.duckduckgo.app.tabs.ui.TabSwitcherActivity
@@ -138,6 +139,10 @@ abstract class AndroidBindingModule {
     @ActivityScoped
     @ContributesAndroidInjector
     abstract fun locationPermissionsActivity(): LocationPermissionsActivity
+
+    @ActivityScoped
+    @ContributesAndroidInjector
+    abstract fun developerSettingsActivity(): DeveloperSettingsActivity
 
     /* Fragments */
 

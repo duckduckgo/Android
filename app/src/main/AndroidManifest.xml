@@ -302,6 +302,15 @@
             android:label="@string/whitelisetActivityTitle"
             android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity" />
 
+        <activity
+            android:name="com.duckduckgo.app.settings.developer.DeveloperSettingsActivity"
+            android:enabled="@bool/developer_settings_enabled"
+            android:label="@string/developerSettingsLabel">
+            <intent-filter>
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
         <service
             android:name="com.duckduckgo.app.job.AppConfigurationJobService"
             android:permission="android.permission.BIND_JOB_SERVICE" />

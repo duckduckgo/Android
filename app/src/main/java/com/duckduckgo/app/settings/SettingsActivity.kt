@@ -42,6 +42,7 @@ import com.duckduckgo.app.settings.SettingsViewModel.AutomaticallyClearData
 import com.duckduckgo.app.settings.SettingsViewModel.Command
 import com.duckduckgo.app.settings.clear.ClearWhatOption
 import com.duckduckgo.app.settings.clear.ClearWhenOption
+import com.duckduckgo.app.settings.developer.DeveloperSettingsActivity
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelName
 import kotlinx.android.synthetic.main.content_settings_general.*
@@ -72,8 +73,13 @@ class SettingsActivity : DuckDuckGoActivity(), SettingsAutomaticallyClearWhatFra
         setContentView(R.layout.activity_settings)
         setupToolbar(toolbar)
 
+        configureDynamicUi()
         configureUiEventHandlers()
         observeViewModel()
+    }
+
+    private fun configureDynamicUi() {
+        developerSettings.visibility = if (resources.getBoolean(R.bool.developer_settings_enabled)) View.VISIBLE else View.GONE
     }
 
     override fun onStart() {
@@ -94,6 +100,8 @@ class SettingsActivity : DuckDuckGoActivity(), SettingsAutomaticallyClearWhatFra
         automaticallyClearWhatSetting.setOnClickListener { launchAutomaticallyClearWhatDialog() }
         automaticallyClearWhenSetting.setOnClickListener { launchAutomaticallyClearWhenDialog() }
         whitelist.setOnClickListener { viewModel.onManageWhitelistSelected() }
+
+        developerSettings.setOnClickListener { startActivity(DeveloperSettingsActivity.intent(this)) }
     }
 
     private fun observeViewModel() {

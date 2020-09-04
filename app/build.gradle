@@ -62,6 +62,15 @@ android {
             ]
         }
     }
+    flavorDimensions "audience"
+    productFlavors {
+        internal {
+            dimension "audience"
+        }
+        external {
+            dimension "audience"
+        }
+    }
     externalNativeBuild {
 
         cmake {

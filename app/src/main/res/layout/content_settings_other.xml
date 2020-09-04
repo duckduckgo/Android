@@ -53,4 +53,14 @@
         app:title="@string/settingsVersion"
         tools:subtitle="123.43.5456" />
 
+    <TextView
+        android:id="@+id/developerSettings"
+        style="@style/SettingsItemClickable"
+        android:text="@string/developerSettingsLabel"
+        android:visibility="gone"
+        tools:visibility="visible"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/version" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>
