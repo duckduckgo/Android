@@ -46,10 +46,11 @@ class PlaintextDomainExtractor : DomainNameExtractor {
         val packetData = String(subsetArray, StandardCharsets.US_ASCII)
         Timber.v("Got packet data: %s", packetData)
 
-        packetData.split(newlineRegex).forEach {line ->
-            val trimmed = line.trim { it <= ' ' }
-            if (trimmed.startsWith("Host:")) {
-                return trimmed.substring(6)
+        packetData.split(newlineRegex)
+            .map { it.trim() }
+            .forEach { line ->
+            if (line.startsWith("Host:")) {
+                return line.substring(6)
             }
         }
 
