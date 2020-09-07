@@ -211,10 +211,7 @@ class TcpDeviceToNetwork(
         action.events.forEach {
             when (it) {
                 is MoveState -> tcb.updateState(it)
-                ProcessPacket -> {
-                    //packetUploaderExecutor.submit { processPacket(tcb, payloadBuffer, connectionParams) }
-                    processPacket(tcb, packet, payloadBuffer, connectionParams)
-                }
+                ProcessPacket -> processPacket(tcb, packet, payloadBuffer, connectionParams)
                 SendFin -> tcb.sendFinToClient(queues, packet, connectionParams)
                 DelayedSendFin -> handler.postDelayed(3_000) { tcb.sendFinToClient(queues, packet, connectionParams) }
                 CloseConnection -> tcb.closeConnection(responseBuffer)
