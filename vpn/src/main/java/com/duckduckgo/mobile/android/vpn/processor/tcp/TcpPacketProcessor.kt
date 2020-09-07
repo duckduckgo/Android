@@ -24,6 +24,7 @@ import com.duckduckgo.mobile.android.vpn.processor.tcp.ConnectionInitializer.Tcp
 import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpStateFlow.Event.MoveState
 import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpStateFlow.Event.MoveState.MoveClientToState
 import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpStateFlow.Event.MoveState.MoveServerToState
+import com.duckduckgo.mobile.android.vpn.processor.tracker.VpnTrackerDetector
 import com.duckduckgo.mobile.android.vpn.service.NetworkChannelCreator
 import com.duckduckgo.mobile.android.vpn.service.VpnQueues
 import kotlinx.coroutines.Job
@@ -41,7 +42,7 @@ import java.nio.channels.SocketChannel
 import java.util.concurrent.Executors
 import kotlin.math.pow
 
-class TcpPacketProcessor(queues: VpnQueues, networkChannelCreator: NetworkChannelCreator) : Runnable {
+class TcpPacketProcessor(queues: VpnQueues, networkChannelCreator: NetworkChannelCreator, trackerDetector: VpnTrackerDetector) : Runnable {
 
     val selector: Selector = Selector.open()
 
@@ -52,7 +53,8 @@ class TcpPacketProcessor(queues: VpnQueues, networkChannelCreator: NetworkChanne
 
     private val tcpSocketWriter = TcpSocketWriter(selector)
     private val tcpNetworkToDevice = TcpNetworkToDevice(queues, selector, tcpSocketWriter, handler)
-    private val tcpDeviceToNetwork = TcpDeviceToNetwork(queues, selector, tcpSocketWriter, TcpConnectionInitializer(queues, networkChannelCreator), handler)
+    private val tcpDeviceToNetwork =
+        TcpDeviceToNetwork(queues, selector, tcpSocketWriter, TcpConnectionInitializer(queues, networkChannelCreator), handler, trackerDetector)
 
     private val readWriteExecutorService = Executors.newFixedThreadPool(2)
 

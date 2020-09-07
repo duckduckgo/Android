@@ -27,6 +27,8 @@ import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpPacketProcessor.Compan
 import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpPacketProcessor.Companion.updateState
 import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpPacketProcessor.PendingWriteData
 import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpStateFlow.Event.*
+import com.duckduckgo.mobile.android.vpn.processor.tracker.TrackerType
+import com.duckduckgo.mobile.android.vpn.processor.tracker.VpnTrackerDetector
 import com.duckduckgo.mobile.android.vpn.service.VpnQueues
 import timber.log.Timber
 import xyz.hexene.localvpn.ByteBufferPool
@@ -45,7 +47,8 @@ class TcpDeviceToNetwork(
     private val selector: Selector,
     private val socketWriter: SocketWriter,
     private val connectionInitializer: ConnectionInitializer,
-    private val handler: Handler
+    private val handler: Handler,
+    private val trackerDetector: VpnTrackerDetector
 ) {
 
     var lastTimePacketConsumed = 0L
@@ -258,6 +261,14 @@ class TcpDeviceToNetwork(
         synchronized(tcb) {
             val payloadSize = payloadBuffer.limit() - payloadBuffer.position()
             if (payloadSize == 0) return
+
+            when(val type = trackerDetector.determinePacketType(tcb, packet, payloadBuffer)) {
+                is TrackerType.Tracker -> {
+                    Timber.w("Tracker found for %s", tcb.ipAndPort)
+                    tcb.isTracker = true
+                    TODO("Tracker found - need to *not* process packet (drop, RST or FIN?)")
+                }
+            }
 
             if (!tcb.waitingForNetworkData) {
                 Timber.v("Not waiting for network data ${tcb.ipAndPort}; register for OP_READ and wait for network data")

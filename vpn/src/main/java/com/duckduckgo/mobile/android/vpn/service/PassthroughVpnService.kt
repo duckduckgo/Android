@@ -24,10 +24,11 @@ import android.os.Binder
 import android.os.Build
 import android.os.IBinder
 import android.os.ParcelFileDescriptor
-import com.duckduckgo.mobile.android.vpn.processor.QueueMonitor
 import com.duckduckgo.mobile.android.vpn.processor.TunPacketReader
 import com.duckduckgo.mobile.android.vpn.processor.TunPacketWriter
 import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpPacketProcessor
+import com.duckduckgo.mobile.android.vpn.processor.tracker.DomainBasedTrackerDetector
+import com.duckduckgo.mobile.android.vpn.processor.tracker.PlaintextDomainExtractor
 import com.duckduckgo.mobile.android.vpn.processor.udp.UdpPacketProcessor
 import com.duckduckgo.mobile.android.vpn.ui.notification.VpnNotificationBuilder
 import kotlinx.coroutines.CoroutineScope
@@ -48,9 +49,11 @@ class PassthroughVpnService : VpnService(), CoroutineScope by MainScope(), Netwo
     private var tunInterface: ParcelFileDescriptor? = null
     private val binder: VpnServiceBinder = VpnServiceBinder()
 
+    private val domainNameExtractor = PlaintextDomainExtractor()
+    private val trackerDetector = DomainBasedTrackerDetector(domainNameExtractor)
 
     val udpPacketProcessor = UdpPacketProcessor(queues, this)
-    val tcpPacketProcessor = TcpPacketProcessor(queues, this)
+    val tcpPacketProcessor = TcpPacketProcessor(queues, this, trackerDetector)
 
     private var executorService: ExecutorService? = null
 

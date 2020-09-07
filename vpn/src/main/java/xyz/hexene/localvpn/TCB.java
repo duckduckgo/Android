@@ -38,6 +38,7 @@ public class TCB {
     public long finSequenceNumberToClient = -1;
 
     public TcbState tcbState;
+    public boolean isTracker;
 
     // TCP has more states, but we need only these
     public enum TCBStatus {
