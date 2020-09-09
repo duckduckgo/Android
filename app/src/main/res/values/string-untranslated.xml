@@ -15,21 +15,6 @@
   -->
 
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
-    <!-- Download Manager problems -->
-    <string name="downloadManagerDisabled">Download Manager is disabled</string>
-    <string name="downloadManagerIncompatible">Download Manager not available on this device</string>
-    <string name="enable">Enable</string>
-
-    <!-- Fireproof websites -->
-    <string name="fireproofWebsiteLoginDialogTitle">Would you like to Fireproof %s?</string>
-    <string name="fireproofWebsiteLoginDialogDescription">Fireproofing this site will keep you signed in after using the Fire Button.</string>
-    <string name="fireproofWebsiteLoginDialogPositive">Fireproof</string>
-    <string name="fireproofWebsiteLoginDialogNegative">Not now</string>
-    <string name="fireproofWebsiteItemsSectionTitle">Websites</string>
-    <string name="fireproofWebsiteToogleText">Ask When Signing In</string>
-    <!-- !! String changed translate and replace !! -->
-    <string name="fireproofWebsiteFeatureDescription">Websites rely on cookies to keep you signed in. When you Fireproof a site, cookies won\'t be erased and you\'ll stay signed in, even after using the Fire Button. We still block third-party trackers found on Fireproof websites.</string>
-
     <!--Fire button education-->
     <string name="daxClearDataCtaText">Now tap below to burn your browsing history. Give it a try! &#128071;</string>
 
@@ -41,12 +26,6 @@
     <string name="useOurAppNotificationDescription">Here\'s a simple way to reduce its reach.</string>
     <string name="useOurAppShortcutAddedText">Success! %s has been added to your home screen.</string>
     <string name="useOurAppDeletionDialogText">Checking your feed in DuckDuckGo is a great alternative to using the Facebook app!&lt;br/&gt;&lt;br/&gt;But if the Facebook app is on your phone, it can make requests for data even when you\'re not using it.&lt;br/&gt;&lt;br/&gt;Prevent this by deleting it now!</string>
-
-    <!-- Dos Attack error-->
-    <string name="dosErrorMessage">Connection aborted. This website could be harmful to your device.</string>
-
-    <!-- Dax Dialog, this string has changed. We have to translate and replace it!! -->
-    <string name="daxMainNetworkOwnedCtaText">Heads up! Since %s owns %s, I can\'t stop them from seeing your activity here.&lt;br/&gt;&lt;br/&gt;But browse with me, and I can reduce what %s knows about you overall by blocking their trackers on lots of other sites.</string>
 
     <!-- Precise Location -->
     <string name="preciseLocationSystemDialogTitle">Enable device location for DuckDuckGo Privacy Browser?</string>

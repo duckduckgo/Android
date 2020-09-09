@@ -77,7 +77,7 @@
     <string name="privacyProtectionEnabled">PROTECTION DU SITE ACTIVÉE</string>
     <string name="privacyProtectionDisabled">PROTECTION DU SITE DÉSACTIVÉE</string>
     <string name="privacyDashboardActivityTitle">Tableau de bord de confidentialité</string>
-    <string name="privacyProtectionUpgraded" tools:ignore="TypographyQuotes">AMÉLIORÉ DE &lt;img src="%d" /&gt; À &lt;img src="%d" /&gt;</string>
+    <string name="privacyProtectionUpgraded" tools:ignore="TypographyQuotes">AMÉLIORÉ DE &lt;img src=\"%1$d\" /&gt; À &lt;img src=\"%2$d\" /&gt;</string>
     <string name="privacyGradeContentDescription">Degré de confidentialité</string>
 
     <string name="httpsGood">Connexion chiffrée</string>
@@ -89,23 +89,23 @@
     <string name="networksOverview">Les réseaux de trackers regroupent votre historique Web dans un profil de données vous concernant. Les réseaux majeurs de trackers sont plus nuisibles, car ils peuvent vous suivre et vous cibler sur une plus grande partie du Web.</string>
 
     <plurals name="trackersFound">
-        <item quantity="one">%s Tracker trouvé</item>
-        <item quantity="other">%s Trackers trouvés</item>
+        <item quantity="one">%1$s Tracker trouvé</item>
+        <item quantity="other">%1$s Trackers trouvés</item>
     </plurals>
 
     <plurals name="trackerBlocked">
-        <item quantity="one">%s Tracker bloqué</item>
-        <item quantity="other">%s Trackers bloqués</item>
+        <item quantity="one">%1$s Tracker bloqué</item>
+        <item quantity="other">%1$s Trackers bloqués</item>
     </plurals>
 
     <plurals name="majorNetworksFound">
-        <item quantity="one">%s réseau majeur de trackers trouvé</item>
-        <item quantity="other">%s réseaux majeurs de trackers trouvés</item>
+        <item quantity="one">%1$s réseau majeur de trackers trouvé</item>
+        <item quantity="other">%1$s réseaux majeurs de trackers trouvés</item>
     </plurals>
 
     <plurals name="majorNetworksBlocked">
-        <item quantity="one">%s réseau majeur de trackers bloqué</item>
-        <item quantity="other">%s réseaux majeurs de trackers bloqués</item>
+        <item quantity="one">%1$s réseau majeur de trackers bloqué</item>
+        <item quantity="other">%1$s réseaux majeurs de trackers bloqués</item>
     </plurals>
 
     <string name="scorecardActivityTitle">Degré de confidentialité</string>
@@ -115,8 +115,8 @@
 
     <string name="privacyTermsActivityTitle">Pratiques de confidentialité</string>
     <string name="practicesGood">Bonnes pratiques de confidentialité</string>
-    <string name="practicesMixed">« Pratiques de confidentialité mixtes »</string>
-    <string name="practicesBad">« Mauvaises pratiques de confidentialité »</string>
+    <string name="practicesMixed">Pratiques de confidentialité mixtes</string>
+    <string name="practicesBad">Mauvaises pratiques de confidentialité</string>
     <string name="practicesUnknown">Pratiques de confidentialité inconnues</string>
     <string name="practicesOverview">Les pratiques de confidentialité indiquent dans quelle mesure les informations personnelles que vous partagez avec un site Web sont protégées.</string>
     <string name="practicesTosdrLink">Les pratiques de confidentialité résultent de <b><u>ToS;DR</u></b></string>
@@ -162,7 +162,9 @@
     <!-- About Activity -->
     <string name="aboutActivityTitle">À propos de nous</string>
     <string name="aboutDescription">
-        Chez DuckDuckGo, nous établissons la nouvelle norme de confiance en ligne. \n\ Le navigateur de confidentialité DuckDuckGo fournit tous les éléments de confidentialité essentiels dont vous avez besoin pour vous protéger lorsque vous faites des recherches et naviguez sur le Web, notamment le blocage des trackers, le chiffrement plus intelligent et la recherche privée DuckDuckGo.\n\ Après tout, Internet ne devrait pas être aussi effrayant, et obtenir la confidentialité que vous méritez en ligne devrait être aussi simple que de fermer les stores.</string>
+        Chez DuckDuckGo, nous établissons la nouvelle norme de confiance en ligne. \n\
+        Le navigateur de confidentialité DuckDuckGo fournit tous les éléments de confidentialité essentiels dont vous avez besoin pour vous protéger lorsque vous faites des recherches et naviguez sur le Web, notamment le blocage des trackers, le chiffrement plus intelligent et la recherche privée DuckDuckGo.\n\
+        Après tout, Internet ne devrait pas être aussi effrayant, et obtenir la confidentialité que vous méritez en ligne devrait être aussi simple que de fermer les stores.</string>
     <string name="aboutMoreLink">Pour en savoir plus, visitez duckduckgo.com/about</string>
     <string name="no_suggestions">Aucune suggestion</string>
 
@@ -188,18 +190,20 @@
     <!-- Bookmarks Activity -->
     <string name="bookmarksMenuTitle">Signets</string>
     <string name="bookmarksActivityTitle">Signets</string>
-    <string name="bookmarkDeleteConfirmMessage">Êtes-vous sûr(e) de vouloir supprimer le signet &lt;b&gt;%s&lt;/b&gt; ?</string>
-    <string name="dialogConfirmTitle">Confirmer</string>
+    <string name="bookmarkDeleteConfirmMessage">Êtes-vous sûr(e) de vouloir supprimer le signet &lt;b&gt;%1$s&lt;/b&gt; ?</string>
     <string name="bookmarkAddedFeedback">Signet ajouté</string>
     <string name="bookmarkTitleHint">Titre du signet</string>
     <string name="bookmarkUrlHint">URL du signet</string>
-    <string name="dialogSave">Enregistrer</string>
     <string name="bookmarkTitleEdit">Modifier le signet</string>
     <string name="noBookmarks">Aucun signet ajouté pour le moment</string>
-    <string name="bookmarkOverflowContentDescription">Plus d\'options pour le signet %s</string>
+    <string name="bookmarkOverflowContentDescription">Plus d\'options pour le signet %1$s</string>
+    <string name="bookmarkEdited">Favori ajouté</string>
+
+    <!-- Dialogs -->
+    <string name="dialogConfirmTitle">Confirmer</string>
+    <string name="dialogSave">Enregistrer</string>
     <string name="delete">Supprimer</string>
     <string name="edit">Modifier</string>
-    <string name="bookmarkEdited">Favori ajouté</string>
 
     <!-- Widget -->
     <string name="searchWidgetTextHint">Recherche DuckDuckGo</string>
@@ -263,14 +267,14 @@
     <string name="privacyProtectionNotificationDefaultTitle">Nous protégeons votre vie privée</string>
     <string name="privacyProtectionNotificationReportTitle">Votre rapport de confidentialité</string>
     <string name="privacyProtectionNotificationDefaultDescription">L\'utilisation de l\'application DuckDuckGo protège vos données en bloquant les trackers et en chiffrant les connexions.</string>
-    <string name="privacyProtectionNotificationUpgadeDescription">Vous avez protégé vos données en sécurisant %d connexions non chiffrées lors de l\'utilisation de DuckDuckGo.</string>
-    <string name="privacyProtectionNotificationTrackerDescription">Vous avez protégé vos données en bloquant %d trackers lors de l\'utilisation de DuckDuckGo.</string>
-    <string name="privacyProtectionNotificationBothDescription">Vous avez protégé vos données en bloquant %d trackers et en sécurisant %d connexions non chiffrées lors de l\'utilisation de DuckDuckGo.</string>
+    <string name="privacyProtectionNotificationUpgadeDescription">Vous avez protégé vos données en sécurisant %1$d connexions non chiffrées lors de l\'utilisation de DuckDuckGo.</string>
+    <string name="privacyProtectionNotificationTrackerDescription">Vous avez protégé vos données en bloquant %1$d trackers lors de l\'utilisation de DuckDuckGo.</string>
+    <string name="privacyProtectionNotificationBothDescription">Vous avez protégé vos données en bloquant %1$d trackers et en sécurisant %2$d connexions non chiffrées lors de l\'utilisation de DuckDuckGo.</string>
     <string name="privacyProtectionNotificationLaunchButton">Reprendre la navigation</string>
-
+    
     <!-- Authentication -->
     <string name="authenticationDialogTitle">Se connecter</string>
-    <string name="authenticationDialogMessage">%s nécessite un nom d\'utilisateur et un mot de passe.</string>
+    <string name="authenticationDialogMessage">%1$s nécessite un nom d\'utilisateur et un mot de passe.</string>
     <string name="authenticationDialogPositiveButton">Se connecter</string>
     <string name="authenticationDialogNegativeButton">Annuler</string>
     <string name="authenticationDialogUsernameHint">Nom d\'utilisateur</string>
@@ -352,12 +356,12 @@
     <string name="feedbackIsImportantToUs">Vos commentaires anonymes sont importants pour nous.</string>
 
     <!-- Webview Recovery -->
-    <string name="crashedWebViewErrorMessage">Impossible d\'afficher la page Web.</string>
-    <string name="crashedWebViewErrorAction">Recharger</string>
+    <string name="crashedWebViewErrorMessage">"Impossible d'afficher la page Web."</string>
+    <string name="crashedWebViewErrorAction">"Recharger"</string>
 
-    <!-- System Search -->
-    <string name="systemSearchOmnibarInputHint"><font size="13">Faire des recherches ou saisir l\'URL</font></string>
+    <!-- System Search-->
     <string name="systemSearchDeviceAppLabel">Depuis cet appareil</string>
+    <string name="systemSearchOmnibarInputHint"><font size="13">Faire des recherches ou saisir l\'URL</font></string>
     <string name="systemSearchAppNotFound">Impossible de trouver l\'application</string>
     <string name="systemSearchOnboardingText">Merci d\'avoir choisi DuckDuckGo!\nDésormais, lorsque vous utilisez notre recherche ou notre application, vos recherches sont protégées.</string>
     <string name="systemSearchOnboardingFeaturesIntroText">L\'appli DuckDuckGo offre également les fonctionnalités suivantes:</string>
@@ -379,23 +383,23 @@
     <string name="hideTipsButton">Masquer les conseils pour toujours</string>
 
     <!-- New Onboarding Experience -->
-    <string name="onboardingWelcomeTitle">Bienvenue sur DuckDuckGo !</string>
-    <string name="onboardingDaxText">Internet peut être intrusif.&lt;br/&gt;&lt;br/&gt;Cependant ne vous inquiétez pas ! Rechercher et naviguer de manière confidentielle est plus facile que vous ne le pensez.</string>
+    <string name="onboardingWelcomeTitle">"Bienvenue sur DuckDuckGo !"</string>
+    <string name="onboardingDaxText"><![CDATA[Internet peut être intrusif.<br/><br/>Cependant ne vous inquiétez pas ! Rechercher et naviguer de manière confidentielle est plus facile que vous ne le pensez.]]></string>
     <string name="onboardingLetsDoItButton">Allons-y !</string>
-    <string name="daxIntroCtaText">Maintenant, essayez de visiter un de vos sites préférés !&lt;br/&gt;&lt;br/&gt;Je bloquerai les traqueurs afin qu\'ils ne puissent pas vous espionner. J\'améliorerai également la sécurité de votre connexion dans la mesure du possible. &#128274;</string>
-    <string name="daxEndCtaText">Bien joué !&lt;br/&gt;&lt;br/&gt;Rappelez vous : chaque fois que vous naviguez avec moi, des publicités intrusives disparaissent. &#128077;</string>
-    <string name="daxSerpCtaText">Vos recherches effectuées sur DuckDuckGo sont confidentielles et je ne conserve jamais votre historique de recherche. Jamais. &#128588;</string>
+    <string name="daxIntroCtaText"><![CDATA[Maintenant, essayez de visiter un de vos sites préférés !<br/><br/>Je bloquerai les traqueurs afin qu\'ils ne puissent pas vous espionner. J\'améliorerai également la sécurité de votre connexion dans la mesure du possible. 🔒]]></string>
+    <string name="daxEndCtaText"><![CDATA[Bien joué !<br/><br/>Rappelez vous : chaque fois que vous naviguez avec moi, des publicités intrusives disparaissent. 👍]]></string>
+    <string name="daxSerpCtaText">Vos recherches effectuées sur DuckDuckGo sont confidentielles et je ne conserve jamais votre historique de recherche. Jamais. 🙌</string>
     <plurals name="daxTrackersBlockedCtaText">
-        <item quantity="one">&#160;et &lt;b&gt;%d autre&lt;/b&gt; essayaient de vous traquer ici.  &lt;br/&gt;&lt;br/&gt;Je les ai bloqués !&lt;br/&gt;&lt;br/&gt; ☝️Vous pouvez voir dans la barre d\'adresse URL qui essaie de vous traquer lorsque vous visitez un nouveau site.️</item>
-        <item quantity="other">&#160;et &lt;b&gt;%d autres&lt;/b&gt; essayaient de vous traquer ici. &lt;br/&gt;&lt;br/&gt;Je les ai bloqués !&lt;br/&gt;&lt;br/&gt; ☝️Vous pouvez voir dans la barre d\'adresse URL qui essaie de vous traquer lorsque vous visitez un nouveau site.️</item>
+        <item quantity="one"><![CDATA[ et <b>%1$d autre</b> essayaient de vous traquer ici. <br/><br/>Je les ai bloqués !<br/><br/> ☝️Vous pouvez voir dans la barre d\'adresse URL qui essaie de vous traquer lorsque vous visitez un nouveau site.️]]></item>
+        <item quantity="other"><![CDATA[ et <b>%1$d autres</b> essayaient de vous traquer ici. <br/><br/>Je les ai bloqués !<br/><br/> ☝️Vous pouvez voir dans la barre d\'adresse URL qui essaie de vous traquer lorsque vous visitez un nouveau site.️]]></item>
     </plurals>
     <plurals name="daxTrackersBlockedCtaZeroText">
-        <item quantity="one" tools:ignore="ImpliedQuantity">&#160;essayait de vous traquer ici. &lt;br/&gt;&lt;br/&gt;Je l\'ai bloqué !&lt;br/&gt;&lt;br/&gt; ☝️Vous pouvez voir dans la barre d\'adresse URL qui essaie de vous traquer lorsque vous visitez un nouveau site.️️</item>
-        <item quantity="other">&#160;essayaient de vous traquer ici. &lt;br/&gt;&lt;br/&gt;Je l\'ai bloqué !&lt;br/&gt;&lt;br/&gt; ☝️Vous pouvez voir dans la barre d\'adresse URL qui essaie de vous traquer lorsque vous visitez un nouveau site.️️</item>
+        <item quantity="one" tools:ignore="ImpliedQuantity"><![CDATA[ essayait de vous traquer ici. <br/><br/>Je l\'ai bloqué !<br/><br/> ☝️Vous pouvez voir dans la barre d\'adresse URL qui essaie de vous traquer lorsque vous visitez un nouveau site.️️]]></item>
+        <item quantity="other"><![CDATA[ essayaient de vous traquer ici. <br/><br/>Je l\'ai bloqué !<br/><br/> ☝️Vous pouvez voir dans la barre d\'adresse URL qui essaie de vous traquer lorsque vous visitez un nouveau site.️️]]></item>
     </plurals>
-    <string name="daxNonSerpCtaText">Lors de votre navigation, je bloque les traqueurs indésirables. &lt;br/&gt;&lt;br/&gt;Continuez à naviguer librement en toute tranquillité !</string>
-    <string name="daxMainNetworkOwnedCtaText">Attention ! %s appartient à %s. &lt;br/&gt;&lt;br/&gt;Les traqueurs de %s se cachent sur environ %s des sites Web les plus visités &#128561;, mais ne vous inquiétez pas ! &lt;br/&gt;&lt;br/&gt;J’empêche %s de voir votre activité sur ces sites.</string>
-    <string name="daxMainNetworkCtaText">Attention ! %s est un important réseau de traqueurs.&lt;br/&gt;&lt;br/&gt;Leurs traqueurs se cachent sur environ %s des sites les plus visités &#128561;, mais ne vous inquiétez pas ! &lt;br/&gt;&lt;br/&gt;J’empêche %s de voir votre activité sur ces sites.</string>
+    <string name="daxNonSerpCtaText"><![CDATA[Lors de votre navigation, je bloque les traqueurs indésirables. <br/><br/>Continuez à naviguer librement en toute tranquillité !]]></string>
+    <string name="daxMainNetworkCtaText"><![CDATA[Attention ! %1$s est un important réseau de traqueurs.<br/><br/>Leurs traqueurs se cachent sur environ %2$s des sites les plus visités 😱, mais ne vous inquiétez pas ! <br/><br/>J’empêche %3$s de voir votre activité sur ces sites.]]></string>
+    <string name="daxMainNetworkOwnedCtaText">Attention ! Comme %1$s est propriétaire de %2$s, je ne peux pas l\'empêcher d\'y suivre votre activité.&lt;br/&gt;&lt;br/&gt;Si vous naviguez avec moi, je peux réduire les données récoltées par %3$s en bloquant ses traqueurs sur de nombreux autres sites.</string>
 
     <!-- Download Confirmation -->
     <string name="downloadConfirmationContinue">Continuer</string>
@@ -426,8 +430,8 @@
     <string name="whitelisetActivityTitle">Sites non protégés</string>
     <string name="enablePrivacyProtection">Activer la protection de la confidentialité</string>
     <string name="disablePrivacyProtection">Désactiver la protection de la confidentialité</string>
-    <string name="whitelistEntryOverflowContentDescription">Plus d\'options pour le site non protégé %s</string>
-    <string name="whitelistEntryDeleteConfirmMessage">Voulez-vous vraiment retirer &lt;b&gt;%s&lt;/b&gt; des sites non protégés ?</string>
+    <string name="whitelistEntryOverflowContentDescription">Plus d\'options pour le site non protégé %1$s</string>
+    <string name="whitelistEntryDeleteConfirmMessage">Voulez-vous vraiment retirer &lt;b&gt;%1$s&lt;/b&gt; des sites non protégés ?</string>
     <string name="whitelistExplanation">Les sites suivants ne bénéficient pas de la protection de la confidentialité.</string>
     <string name="whitelistNoEntries">Aucun site non protégé</string>
     <string name="whitelistDomainHint">www.example.com</string>
@@ -440,10 +444,24 @@
     <string name="fireproofWebsitesActivityTitle">Sites Web coupe-feu</string>
     <string name="settingsFireproofWebsites">Sites Web coupe-feu</string>
     <string name="fireproofWebsiteMenuTitleAdd">Site Web coupe-feu</string>
-    <string name="fireproofWebsiteSnackbarConfirmation">&lt;b&gt;%s&lt;/b&gt; est maintenant coupe-feu ! Visitez Paramètres pour en savoir plus.</string>
+    <string name="fireproofWebsiteSnackbarConfirmation">&lt;b&gt;%1$s&lt;/b&gt; est maintenant coupe-feu ! Visitez Paramètres pour en savoir plus.</string>
     <string name="fireproofWebsiteSnackbarAction">Annuler</string>
-    <string name="fireproofWebsiteDeleteConfirmMessage">Voulez-vous vraiment supprimer &lt;b&gt;%s&lt;/b&gt; ?</string>
+    <string name="fireproofWebsiteDeleteConfirmMessage">Voulez-vous vraiment supprimer &lt;b&gt;%1$s&lt;/b&gt; ?</string>
     <string name="fireproofWebsiteEmptyListHint">Aucun site Web coupe-feu pour le moment</string>
-    <string name="fireproofWebsiteFeatureDescription">Les sites Web utilisent des cookies pour vous garder connecté. Lorsque vous mettez un site en coupe-feu, les cookies ne sont pas effacés et vous restez connecté, même après avoir utilisé le bouton Fire.</string>
-    <string name="fireproofWebsiteOverflowContentDescription">Plus d\'options pour le site Web coupe-feu %s</string>
+    <string name="fireproofWebsiteFeatureDescription">Les sites Web utilisent des cookies pour maintenir votre connexion. Quand vous placez un site en mode coupe-feu, les cookies sont conservés et vous restez connecté(e), même après avoir utilisé le bouton en forme de flamme. Ceci dit, les traqueurs tiers sont bloqués sur les sites coupe-feu.</string>
+    <string name="fireproofWebsiteOverflowContentDescription">Plus d\'options pour le site Web coupe-feu %1$s</string>
+    <string name="fireproofWebsiteLoginDialogTitle">Souhaitez-vous placer %1$s en mode coupe-feu ?</string>
+    <string name="fireproofWebsiteLoginDialogDescription">Placer ce site en mode coupe-feu et utiliser le bouton en forme de flamme ne vous déconnectera pas.</string>
+    <string name="fireproofWebsiteLoginDialogPositive">Mode coupe-feu</string>
+    <string name="fireproofWebsiteLoginDialogNegative">Pas maintenant</string>
+    <string name="fireproofWebsiteItemsSectionTitle">Sites Web</string>
+    <string name="fireproofWebsiteToogleText">Choisir à la connexion</string>
+
+    <!-- Dos Attack error-->
+    <string name="dosErrorMessage">Connexion interrompue. Ce site Web pourrait nuire à votre appareil.</string>
+
+    <!-- Download Manager problems -->
+    <string name="downloadManagerDisabled">Le gestionnaire de téléchargement est désactivé</string>
+    <string name="downloadManagerIncompatible">Le gestionnaire de téléchargement est indisponible sur cet appareil</string>
+    <string name="enable">Activer</string>
 </resources>

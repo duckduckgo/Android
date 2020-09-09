@@ -77,7 +77,7 @@
     <string name="privacyProtectionEnabled">BESKYTTELSE AV STEDET ER AKTIVERT</string>
     <string name="privacyProtectionDisabled">BESKYTTELSE AV NETTSIDEN DEAKTIVERT</string>
     <string name="privacyDashboardActivityTitle">Dashbord for personvern</string>
-    <string name="privacyProtectionUpgraded" tools:ignore="TypographyQuotes">FORBEDRET FRA &lt;img src="%d" /&gt; TIL &lt;img src="%d" /&gt;</string>
+    <string name="privacyProtectionUpgraded" tools:ignore="TypographyQuotes">FORBEDRET FRA &lt;img src=\"%1$d\" /&gt; TIL &lt;img src=\"%2$d\" /&gt;</string>
     <string name="privacyGradeContentDescription">Grad av personvern</string>
 
     <string name="httpsGood">Kryptert tilkobling</string>
@@ -89,23 +89,23 @@
     <string name="networksOverview">Sporingsnettverk samler netthistorikken din i en dataprofil om deg. Større sporingsnettverk gjør mer skade fordi de kan spore og peile seg inn på deg på flere steder på Internett.</string>
 
     <plurals name="trackersFound">
-        <item quantity="one">% sporing oppdaget</item>
-        <item quantity="other">% sporinger oppdaget</item>
+        <item quantity="one">%% sporing oppdaget</item>
+        <item quantity="other">%% sporinger oppdaget</item>
     </plurals>
 
     <plurals name="trackerBlocked">
-        <item quantity="one">%s sporing blokkert</item>
-        <item quantity="other">%s sporinger blokkert</item>
+        <item quantity="one">%1$s sporing blokkert</item>
+        <item quantity="other">%1$s sporinger blokkert</item>
     </plurals>
 
     <plurals name="majorNetworksFound">
-        <item quantity="one">%s stort sporingsnettverk oppdaget</item>
-        <item quantity="other">%s store sporingsnettverk oppdaget</item>
+        <item quantity="one">%1$s stort sporingsnettverk oppdaget</item>
+        <item quantity="other">%1$s store sporingsnettverk oppdaget</item>
     </plurals>
 
     <plurals name="majorNetworksBlocked">
-        <item quantity="one">%s stort sporingsnettverk blokkert</item>
-        <item quantity="other">%s store sporingsnettverk blokkert</item>
+        <item quantity="one">%1$s stort sporingsnettverk blokkert</item>
+        <item quantity="other">%1$s store sporingsnettverk blokkert</item>
     </plurals>
 
     <string name="scorecardActivityTitle">Grad av personvern</string>
@@ -116,7 +116,7 @@
     <string name="privacyTermsActivityTitle">Personvernpraksis</string>
     <string name="practicesGood">God personvernpraksis</string>
     <string name="practicesMixed">Blandet personvernpraksis</string>
-    <string name="practicesBad">"Dårlig personvernpraksis"</string>
+    <string name="practicesBad">Dårlig personvernpraksis</string>
     <string name="practicesUnknown">Ukjent personvernpraksis</string>
     <string name="practicesOverview">Personvernpraksis indikerer hvor mye av den personlige informasjonen du deler med et nettsted som er beskyttet.</string>
     <string name="practicesTosdrLink">Resultater for personvernpraksis fra <b><u>ToS;DR</u></b></string>
@@ -162,7 +162,9 @@
     <!-- About Activity -->
     <string name="aboutActivityTitle">Om oss</string>
     <string name="aboutDescription">
-        Hos DucDuckGo setter vi den nye standarden for pålitelighet på nettet.\n\ DuckDuckGos private nettleser gir deg alle de grunnleggende personvernfunksjonene du trenger for å beskytte deg selv mens du søker og surfer på nettet, inkludert sporingsblokkering, smartere kryptering og DuckDuckGos private søk.\n\ Når det kommer til stykket, burde det ikke være så guffent å bruke Internett. Det skal ikke være vanskeligere å få det personvernet du fortjener på nett enn å velge gardiner.</string>
+        Hos DucDuckGo setter vi den nye standarden for pålitelighet på nettet.\n\
+        DuckDuckGos private nettleser gir deg alle de grunnleggende personvernfunksjonene du trenger for å beskytte deg selv mens du søker og surfer på nettet, inkludert sporingsblokkering, smartere kryptering og DuckDuckGos private søk.\n\
+        Når det kommer til stykket, burde det ikke være så guffent å bruke Internett. Det skal ikke være vanskeligere å få det personvernet du fortjener på nett enn å velge gardiner.</string>
     <string name="aboutMoreLink">Mer på duckduckgo.com/about</string>
     <string name="no_suggestions">Ingen forslag</string>
 
@@ -188,18 +190,20 @@
     <!-- Bookmarks Activity -->
     <string name="bookmarksMenuTitle">Bokmerker</string>
     <string name="bookmarksActivityTitle">Bokmerker</string>
-    <string name="bookmarkDeleteConfirmMessage">Er du sikker på at du vil slette bokmerket &lt;b&gt;%s&lt;/b&gt;?</string>
-    <string name="dialogConfirmTitle">Bekreft</string>
+    <string name="bookmarkDeleteConfirmMessage">Er du sikker på at du vil slette bokmerket &lt;b&gt;%1$s&lt;/b&gt;?</string>
     <string name="bookmarkAddedFeedback">Bokmerke lagt til</string>
     <string name="bookmarkTitleHint">Bokmerketittel</string>
     <string name="bookmarkUrlHint">Bokmerke-URL</string>
-    <string name="dialogSave">Lagre</string>
     <string name="bookmarkTitleEdit">Rediger bokmerke</string>
     <string name="noBookmarks">Ingen bokmerker lagt til ennå</string>
-    <string name="bookmarkOverflowContentDescription">Flere alternativer for bokmerket %s</string>
+    <string name="bookmarkOverflowContentDescription">Flere alternativer for bokmerket %1$s</string>
+    <string name="bookmarkEdited">Bokmerke lagt til</string>
+
+    <!-- Dialogs -->
+    <string name="dialogConfirmTitle">Bekreft</string>
+    <string name="dialogSave">Lagre</string>
     <string name="delete">Slett</string>
     <string name="edit">Rediger</string>
-    <string name="bookmarkEdited">Bokmerke lagt til</string>
 
     <!-- Widget -->
     <string name="searchWidgetTextHint">Søk på DuckDuckGo</string>
@@ -263,14 +267,14 @@
     <string name="privacyProtectionNotificationDefaultTitle">Vi beskytter personvernet ditt</string>
     <string name="privacyProtectionNotificationReportTitle">Din personvernrapport</string>
     <string name="privacyProtectionNotificationDefaultDescription">Når du bruker DuckDuckGo-appen, beskytter den dataene dine ved å blokkere sporing og krypterte tilkoblinger.</string>
-    <string name="privacyProtectionNotificationUpgadeDescription">Du beskyttet dataene dine ved å sikre %d ukrypterte tilkoblinger mens du brukte DuckDuckGo.</string>
-    <string name="privacyProtectionNotificationTrackerDescription">Du beskyttet dataene dine ved å blokkere %d sporinger mens du brukte DuckDuckGo.</string>
-    <string name="privacyProtectionNotificationBothDescription">Du beskyttet dataene dine ved å blokkere %d sporinger og sikre %d ukrypterte tilkoblinger mens du brukte DuckDuckGo.</string>
+    <string name="privacyProtectionNotificationUpgadeDescription">Du beskyttet dataene dine ved å sikre %1$d ukrypterte tilkoblinger mens du brukte DuckDuckGo.</string>
+    <string name="privacyProtectionNotificationTrackerDescription">Du beskyttet dataene dine ved å blokkere %1$d sporinger mens du brukte DuckDuckGo.</string>
+    <string name="privacyProtectionNotificationBothDescription">Du beskyttet dataene dine ved å blokkere %1$d sporinger og sikre %2$d ukrypterte tilkoblinger mens du brukte DuckDuckGo.</string>
     <string name="privacyProtectionNotificationLaunchButton">Fortsett å bruke nettleseren</string>
-
+    
     <!-- Authentication -->
     <string name="authenticationDialogTitle">Logg inn</string>
-    <string name="authenticationDialogMessage">%s krever brukernavn og passord</string>
+    <string name="authenticationDialogMessage">%1$s krever brukernavn og passord</string>
     <string name="authenticationDialogPositiveButton">Logg inn</string>
     <string name="authenticationDialogNegativeButton">Avbryt</string>
     <string name="authenticationDialogUsernameHint">Brukernavn</string>
@@ -294,7 +298,7 @@
 
     <string name="websiteNotLoadingTitleLong">Nettsteder lastes i hvert fall ikke inn på riktig måte</string>
     <string name="websiteNotLoadingTitleShort">Problemer med innlasting av nettsteder</string>
-    <string name="websiteNotLoadingSubtitle">Hvilket nettsted er ødelagt?"</string>
+    <string name="websiteNotLoadingSubtitle">Hvilket nettsted er ødelagt?</string>
 
     <string name="searchNotGoodEnoughTitleLong">DuckDuckGo-søket er ikke bra nok</string>
     <string name="searchNotGoodEnoughTitleShort">DuckDuckGo-søkeproblemer</string>
@@ -352,12 +356,12 @@
     <string name="feedbackIsImportantToUs">Den anonyme tilbakemeldingen din er viktig for oss.</string>
 
     <!-- Webview Recovery -->
-    <string name="crashedWebViewErrorMessage">Nettstedet kunne ikke vises.</string>
-    <string name="crashedWebViewErrorAction">Last inn på nytt</string>
+    <string name="crashedWebViewErrorMessage">"Nettstedet kunne ikke vises."</string>
+    <string name="crashedWebViewErrorAction">"Last inn på nytt"</string>
 
-    <!-- System Search -->
-    <string name="systemSearchOmnibarInputHint"><font size="13">Søk eller skriv URL</font></string>
+    <!-- System Search-->
     <string name="systemSearchDeviceAppLabel">Fra denne enheten</string>
+    <string name="systemSearchOmnibarInputHint"><font size="13">Søk eller skriv URL</font></string>
     <string name="systemSearchAppNotFound">Programmet ble ikke funnet</string>
     <string name="systemSearchOnboardingText">Takk for at du valgte DuckDuckGo!\nNår du bruker vårt søk eller app, er søkene dine beskyttet.</string>
     <string name="systemSearchOnboardingFeaturesIntroText">DuckDuckGo-appen kan også:</string>
@@ -379,23 +383,23 @@
     <string name="hideTipsButton">Skjul tips for alltid</string>
 
     <!-- New Onboarding Experience -->
-    <string name="onboardingWelcomeTitle">Velkommen til DuckDuckGo!</string>
-    <string name="onboardingDaxText">Internett kan være ganske skummelt.&lt;br/&gt;&lt;br/&gt;Men ikke bekymre deg! Søk og surfing privat er enklere enn du tror.</string>
+    <string name="onboardingWelcomeTitle">"Velkommen til DuckDuckGo!"</string>
+    <string name="onboardingDaxText"><![CDATA[Internett kan være ganske skummelt.<br/><br/>Men ikke bekymre deg! Søk og surfing privat er enklere enn du tror.]]></string>
     <string name="onboardingLetsDoItButton">La oss gjøre det!</string>
-    <string name="daxIntroCtaText">Deretter kan du besøke et av favorittnettstedene dine! &lt;br/&gt;&lt;br/&gt;Jeg blokkerer sporere slik at de ikke kan spionere på deg. Jeg vil også oppgradere sikkerheten til tilkoblingen din hvis mulig. &#128274;</string>
-    <string name="daxEndCtaText">Dette har du skjønt! &lt;br/&gt;&lt;br/&gt;Husk: hver gang du surfer med meg, mister en skummel annonse vingene. &#128077;</string>
-    <string name="daxSerpCtaText">DuckDuckGo-søkene dine er anonyme, jeg lagrer aldri søkehistorikken din. Noensinne. &#128588;</string>
+    <string name="daxIntroCtaText"><![CDATA[Deretter kan du besøke et av favorittnettstedene dine! <br/><br/>Jeg blokkerer sporere slik at de ikke kan spionere på deg. Jeg vil også oppgradere sikkerheten til tilkoblingen din hvis mulig. 🔒]]></string>
+    <string name="daxEndCtaText"><![CDATA[Dette har du skjønt! <br/><br/>Husk: hver gang du surfer med meg, mister en skummel annonse vingene. 👍]]></string>
+    <string name="daxSerpCtaText">DuckDuckGo-søkene dine er anonyme, jeg lagrer aldri søkehistorikken din. Noensinne. 🙌</string>
     <plurals name="daxTrackersBlockedCtaText">
-        <item quantity="one">&#160;og &lt;b&gt;%d andre&lt;/b&gt; prøvde å spore deg her. &lt;br/&gt;&lt;br/&gt;Jeg blokkerte dem!&lt;br/&gt;&lt;br/&gt; ☝️Du kan sjekke URL-linjen for å se hvem som prøver å spore deg når du besøker et nytt nettsted.️</item>
-        <item quantity="other">&#160;og &lt;b&gt;%d andre&lt;/b&gt; prøvde å spore deg her. &lt;br/&gt;&lt;br/&gt;Jeg blokkerte dem!&lt;br/&gt;&lt;br/&gt; ☝️Du kan sjekke URL-linjen for å se hvem som prøver å spore deg når du besøker et nytt nettsted.️</item>
+        <item quantity="one"><![CDATA[ og <b>%1$d andre</b> prøvde å spore deg her. <br/><br/>Jeg blokkerte dem!<br/><br/> ☝️Du kan sjekke URL-linjen for å se hvem som prøver å spore deg når du besøker et nytt nettsted.️]]></item>
+        <item quantity="other"><![CDATA[ og <b>%1$d andre</b> prøvde å spore deg her. <br/><br/>Jeg blokkerte dem!<br/><br/> ☝️Du kan sjekke URL-linjen for å se hvem som prøver å spore deg når du besøker et nytt nettsted.️]]></item>
     </plurals>
     <plurals name="daxTrackersBlockedCtaZeroText">
-        <item quantity="one">&#160;prøvde å spore deg her. &lt;br/&gt;&lt;br/&gt;Jeg har blokkert det!&lt;br/&gt;&lt;br/&gt; ☝️Du kan sjekke URL-linjen for å se hvem som prøver å spore deg når du besøker et nytt nettsted.️</item>
-        <item quantity="other">&#160;prøvde å spore deg her. &lt;br/&gt;&lt;br/&gt;Jeg har blokkert det!&lt;br/&gt;&lt;br/&gt; ☝️Du kan sjekke URL-linjen for å se hvem som prøver å spore deg når du besøker et nytt nettsted.️</item>
+        <item quantity="one"><![CDATA[ prøvde å spore deg her. <br/><br/>Jeg har blokkert det!<br/><br/> ☝️Du kan sjekke URL-linjen for å se hvem som prøver å spore deg når du besøker et nytt nettsted.️]]></item>
+        <item quantity="other"><![CDATA[ prøvde å spore deg her. <br/><br/>Jeg har blokkert det!<br/><br/> ☝️Du kan sjekke URL-linjen for å se hvem som prøver å spore deg når du besøker et nytt nettsted.️]]></item>
     </plurals>
-    <string name="daxNonSerpCtaText">Når du trykker og blar, blokkerer jeg irriterende trackere. &lt;br/&gt;&lt;br/&gt;Gå videre – fortsett å bla!</string>
-    <string name="daxMainNetworkOwnedCtaText">Følg med! %s eies av %s.&lt;br/&gt;&lt;br/&gt; %ss trackere lurer på omtrent %s av ledende nettsteder &#128561; men ikke bekymre deg! &lt;br/&gt;&lt;br/&gt;Jeg blokkerer %s fra å se aktiviteten din på disse nettstedene.</string>
-    <string name="daxMainNetworkCtaText">Følg med! %s er et stort sporingsnettverk.&lt;br/&gt;&lt;br/&gt; Trackerne deres lurer på omtrent %s av ledende nettsteder &#128561; men ikke bekymre deg! &lt;br/&gt;&lt;br/&gt;Jeg hindrer %s fra å se aktiviteten din på disse nettstedene.</string>
+    <string name="daxNonSerpCtaText"><![CDATA[Når du trykker og blar, blokkerer jeg irriterende trackere. <br/><br/>Gå videre – fortsett å bla!]]></string>
+    <string name="daxMainNetworkCtaText"><![CDATA[Følg med! %1$s er et stort sporingsnettverk.<br/><br/> Trackerne deres lurer på omtrent %2$s av ledende nettsteder 😱 men ikke bekymre deg! <br/><br/>Jeg hindrer %3$s fra å se aktiviteten din på disse nettstedene.]]></string>
+    <string name="daxMainNetworkOwnedCtaText">Vennligst merk! Siden %1$s eier %2$s kan jeg ikke hindre dem fra å se aktiviteten din her.&lt;br/&gt;&lt;br/&gt;Men surf med meg, så kan jeg redusere informasjonen %3$s får om deg ved å blokkere sporingsanordningene deres på mange andre nettsteder.</string>
 
     <!-- Download Confirmation -->
     <string name="downloadConfirmationContinue">Fortsett</string>
@@ -426,8 +430,8 @@
     <string name="whitelisetActivityTitle">Ubeskyttede nettsteder</string>
     <string name="enablePrivacyProtection">Aktiver personvernbeskyttelse</string>
     <string name="disablePrivacyProtection">Deaktiver personvernbeskyttelse</string>
-    <string name="whitelistEntryOverflowContentDescription">Flere alternativer for det ubeskyttede nettstedet %s</string>
-    <string name="whitelistEntryDeleteConfirmMessage">Er du sikker på at du vil fjerne &lt;b&gt;%s&lt;/b&gt; fra ubeskyttede nettsteder?</string>
+    <string name="whitelistEntryOverflowContentDescription">Flere alternativer for det ubeskyttede nettstedet %1$s</string>
+    <string name="whitelistEntryDeleteConfirmMessage">Er du sikker på at du vil fjerne &lt;b&gt;%1$s&lt;/b&gt; fra ubeskyttede nettsteder?</string>
     <string name="whitelistExplanation">Disse nettstedene blir ikke dekket av personvernbeskyttelse.</string>
     <string name="whitelistNoEntries">Ingen ubeskyttede nettsteder ennå</string>
     <string name="whitelistDomainHint">www.example.com</string>
@@ -440,10 +444,24 @@
     <string name="fireproofWebsitesActivityTitle">Brannsikre nettsteder</string>
     <string name="settingsFireproofWebsites">Brannsikre nettsteder</string>
     <string name="fireproofWebsiteMenuTitleAdd">Brannsikkert nettsted</string>
-    <string name="fireproofWebsiteSnackbarConfirmation">&lt;b&gt;%s&lt;/b&gt; er nå brannsikkert! Besøk Innstillinger for å lære mer.</string>
+    <string name="fireproofWebsiteSnackbarConfirmation">&lt;b&gt;%1$s&lt;/b&gt; er nå brannsikkert! Besøk Innstillinger for å lære mer.</string>
     <string name="fireproofWebsiteSnackbarAction">Angre</string>
-    <string name="fireproofWebsiteDeleteConfirmMessage">Er du sikker på at du vil slette &lt;b&gt;%s&lt;/b&gt;?</string>
+    <string name="fireproofWebsiteDeleteConfirmMessage">Er du sikker på at du vil slette &lt;b&gt;%1$s&lt;/b&gt;?</string>
     <string name="fireproofWebsiteEmptyListHint">Ingen nettsteder brannsikre ennå</string>
-    <string name="fireproofWebsiteFeatureDescription">Nettsteder er avhengige av informasjonskapsler for å holde deg pålogget. Når du brannsikrer et nettsted, slettes ikke informasjonskapsler, og du vil forbli pålogget, selv etter at du har brukt brannknappen.</string>
-    <string name="fireproofWebsiteOverflowContentDescription">Flere alternativer for brannsikkert nettsted %s</string>
+    <string name="fireproofWebsiteFeatureDescription">Nettsider anvender informasjonskapsler for å holde deg innlogget. Når du gjør en side Brannsikker, vil ikke informasjonskapslene slettes og du holder deg innlogget, selv etter å ha brukt Brannknappen. Vi blokkerer fortsatt tredjeparters sporingsanordninger som blir funnet på Brannsikre nettsteder.</string>
+    <string name="fireproofWebsiteOverflowContentDescription">Flere alternativer for brannsikkert nettsted %1$s</string>
+    <string name="fireproofWebsiteLoginDialogTitle">Ønsker du å Brannsikre %1$s?</string>
+    <string name="fireproofWebsiteLoginDialogDescription">Hvis du Brannsikrer denne siden vil du fortsatt være innlogget etter å ha brukt Brannknappen.</string>
+    <string name="fireproofWebsiteLoginDialogPositive">Brannsikre</string>
+    <string name="fireproofWebsiteLoginDialogNegative">Ikke nå</string>
+    <string name="fireproofWebsiteItemsSectionTitle">Nettsteder</string>
+    <string name="fireproofWebsiteToogleText">Spør ved innlogging</string>
+
+    <!-- Dos Attack error-->
+    <string name="dosErrorMessage">Tilkobling avbrutt. Dette nettstedet kan skade enheten din.</string>
+
+    <!-- Download Manager problems -->
+    <string name="downloadManagerDisabled">Nedlastingsbehandler er deaktivert</string>
+    <string name="downloadManagerIncompatible">Nedlastingsbehandler er ikke tilgjengelig på denne enheten</string>
+    <string name="enable">Aktiver</string>
 </resources>

@@ -77,7 +77,7 @@
     <string name="privacyProtectionEnabled">PROTEÇÃO DO SITE ATIVADA</string>
     <string name="privacyProtectionDisabled">PROTEÇÃO DO SITE DESATIVADA</string>
     <string name="privacyDashboardActivityTitle">Painel de privacidade</string>
-    <string name="privacyProtectionUpgraded" tools:ignore="TypographyQuotes">MELHORADO DE &lt;img src="%d" /&gt; PARA &lt;img src="%d" /&gt;</string>
+    <string name="privacyProtectionUpgraded" tools:ignore="TypographyQuotes">MELHORADO DE &lt;img src=\"%1$d\" /&gt; PARA &lt;img src=\"%2$d\" /&gt;</string>
     <string name="privacyGradeContentDescription">Grau de privacidade</string>
 
     <string name="httpsGood">Ligação encriptada</string>
@@ -89,23 +89,23 @@
     <string name="networksOverview">As redes de rastreamento agregam o seu histórico da web num perfil de dados sobre si. As principais redes de rastreamento são mais prejudiciais porque podem rastreá-lo e segmentá-lo em mais sites da Internet.</string>
 
     <plurals name="trackersFound">
-        <item quantity="one">%s rastreador encontrado</item>
-        <item quantity="other">%s rastreadores encontrados</item>
+        <item quantity="one">%1$s rastreador encontrado</item>
+        <item quantity="other">%1$s rastreadores encontrados</item>
     </plurals>
 
     <plurals name="trackerBlocked">
-        <item quantity="one">%s rastreador bloqueado</item>
-        <item quantity="other">%s rastreadores bloqueados</item>
+        <item quantity="one">%1$s rastreador bloqueado</item>
+        <item quantity="other">%1$s rastreadores bloqueados</item>
     </plurals>
 
     <plurals name="majorNetworksFound">
-        <item quantity="one">%s rede principal de rastreamento encontrada</item>
-        <item quantity="other">%s redes principais de rastreamento encontradas</item>
+        <item quantity="one">%1$s rede principal de rastreamento encontrada</item>
+        <item quantity="other">%1$s redes principais de rastreamento encontradas</item>
     </plurals>
 
     <plurals name="majorNetworksBlocked">
-        <item quantity="one">%s rede principal de rastreamento bloqueada</item>
-        <item quantity="other">%s rede principais de rastreamento bloqueadas</item>
+        <item quantity="one">%1$s rede principal de rastreamento bloqueada</item>
+        <item quantity="other">%1$s rede principais de rastreamento bloqueadas</item>
     </plurals>
 
     <string name="scorecardActivityTitle">Grau de privacidade</string>
@@ -115,8 +115,8 @@
 
     <string name="privacyTermsActivityTitle">Práticas de privacidade</string>
     <string name="practicesGood">Boas práticas de privacidade</string>
-    <string name="practicesMixed">Práticas de privacidade mistas"</string>
-    <string name="practicesBad">"Más práticas de privacidade"</string>
+    <string name="practicesMixed">Práticas de privacidade mistas</string>
+    <string name="practicesBad">Más práticas de privacidade</string>
     <string name="practicesUnknown">Práticas de privacidade desconhecidas</string>
     <string name="practicesOverview">As práticas de privacidade indicam o nível de proteção das informações pessoais que partilha com um site.</string>
     <string name="practicesTosdrLink">As práticas de privacidade resultam de <b><u>ToS;DR</u></b></string>
@@ -162,7 +162,9 @@
     <!-- About Activity -->
     <string name="aboutActivityTitle">Sobre nós</string>
     <string name="aboutDescription">
-        No DuckDuckGo, estamos a definir o novo padrão de confiança online.\n\ O Navegador de Privacidade DuckDuckGo fornece todos os elementos essenciais de privacidade de que necessita para se proteger enquanto pesquisa e navega na Web, incluindo bloqueio de rastreadores, encriptação mais inteligente e pesquisa privada DuckDuckGo.\n\ Afinal de contas, a Internet não deve ser tão assustadora, e obter a privacidade que merece online deve ser tão simples como fechar as persianas.</string>
+        No DuckDuckGo, estamos a definir o novo padrão de confiança online.\n\
+        O Navegador de Privacidade DuckDuckGo fornece todos os elementos essenciais de privacidade de que necessita para se proteger enquanto pesquisa e navega na Web, incluindo bloqueio de rastreadores, encriptação mais inteligente e pesquisa privada DuckDuckGo.\n\
+        Afinal de contas, a Internet não deve ser tão assustadora, e obter a privacidade que merece online deve ser tão simples como fechar as persianas.</string>
     <string name="aboutMoreLink">Mais em duckduckgo.com/about</string>
     <string name="no_suggestions">Sem sugestões</string>
 
@@ -188,18 +190,20 @@
     <!-- Bookmarks Activity -->
     <string name="bookmarksMenuTitle">Marcadores</string>
     <string name="bookmarksActivityTitle">Marcadores</string>
-    <string name="bookmarkDeleteConfirmMessage">Tem a certeza de que pretende eliminar o marcador &lt;b&gt;%s&lt;/b&gt;?</string>
-    <string name="dialogConfirmTitle">Confirmar</string>
+    <string name="bookmarkDeleteConfirmMessage">Tem a certeza de que pretende eliminar o marcador &lt;b&gt;%1$s&lt;/b&gt;?</string>
     <string name="bookmarkAddedFeedback">Marcador adicionado</string>
     <string name="bookmarkTitleHint">Título do marcador</string>
     <string name="bookmarkUrlHint">URL do marcador</string>
-    <string name="dialogSave">Guardar</string>
     <string name="bookmarkTitleEdit">Editar marcador</string>
     <string name="noBookmarks">Ainda não foram adicionados marcadores</string>
-    <string name="bookmarkOverflowContentDescription">Mais opções para o marcador %s</string>
+    <string name="bookmarkOverflowContentDescription">Mais opções para o marcador %1$s</string>
+    <string name="bookmarkEdited">Favorito adicionado</string>
+
+    <!-- Dialogs -->
+    <string name="dialogConfirmTitle">Confirmar</string>
+    <string name="dialogSave">Guardar</string>
     <string name="delete">Eliminar</string>
     <string name="edit">Editar</string>
-    <string name="bookmarkEdited">Favorito adicionado</string>
 
     <!-- Widget -->
     <string name="searchWidgetTextHint">Pesquisar no DuckDuckGo</string>
@@ -263,14 +267,14 @@
     <string name="privacyProtectionNotificationDefaultTitle">Estamos a proteger a sua privacidade</string>
     <string name="privacyProtectionNotificationReportTitle">O seu relatório de privacidade</string>
     <string name="privacyProtectionNotificationDefaultDescription">Utilizar a aplicação DuckDuckGo protege os seus dados bloqueando rastreadores e encriptando ligações.</string>
-    <string name="privacyProtectionNotificationUpgadeDescription">Protegeu os seus dados tornando seguras %d ligações não encriptadas durante a utilização do DuckDuckGo.</string>
-    <string name="privacyProtectionNotificationTrackerDescription">Protegeu os seus dados bloqueando %d rastreadores durante a utilização do DuckDuckGo.</string>
-    <string name="privacyProtectionNotificationBothDescription">Protegeu os seus dados bloqueando %d rastreadores e tornando seguras %d ligações não encriptadas durante a utilização do DuckDuckGo.</string>
+    <string name="privacyProtectionNotificationUpgadeDescription">Protegeu os seus dados tornando seguras %1$d ligações não encriptadas durante a utilização do DuckDuckGo.</string>
+    <string name="privacyProtectionNotificationTrackerDescription">Protegeu os seus dados bloqueando %1$d rastreadores durante a utilização do DuckDuckGo.</string>
+    <string name="privacyProtectionNotificationBothDescription">Protegeu os seus dados bloqueando %1$d rastreadores e tornando seguras %2$d ligações não encriptadas durante a utilização do DuckDuckGo.</string>
     <string name="privacyProtectionNotificationLaunchButton">Retomar navegação</string>
-
+    
     <!-- Authentication -->
     <string name="authenticationDialogTitle">Iniciar sessão</string>
-    <string name="authenticationDialogMessage">%s requer um nome de utilizador e palavra-passe.</string>
+    <string name="authenticationDialogMessage">%1$s requer um nome de utilizador e palavra-passe.</string>
     <string name="authenticationDialogPositiveButton">Iniciar sessão</string>
     <string name="authenticationDialogNegativeButton">Cancelar</string>
     <string name="authenticationDialogUsernameHint">Nome de utilizador</string>
@@ -294,7 +298,7 @@
 
     <string name="websiteNotLoadingTitleLong">Alguns sites não carregam corretamente</string>
     <string name="websiteNotLoadingTitleShort">Problemas de carregamento do site</string>
-    <string name="websiteNotLoadingSubtitle">Que site está com falhas?"</string>
+    <string name="websiteNotLoadingSubtitle">Que site está com falhas?</string>
 
     <string name="searchNotGoodEnoughTitleLong">A pesquisa do DuckDuckGo não é suficiente boa</string>
     <string name="searchNotGoodEnoughTitleShort">Problemas com a pesquisa do DuckDuckGo</string>
@@ -352,12 +356,12 @@
     <string name="feedbackIsImportantToUs">Os seus comentários anônimos são importantes para nós.</string>
 
     <!-- Webview Recovery -->
-    <string name="crashedWebViewErrorMessage">Não foi possível exibir a página web.</string>
-    <string name="crashedWebViewErrorAction">Recarregar</string>
+    <string name="crashedWebViewErrorMessage">"Não foi possível exibir a página web."</string>
+    <string name="crashedWebViewErrorAction">"Recarregar"</string>
 
-    <!-- System Search -->
-    <string name="systemSearchOmnibarInputHint"><font size="13">Pesquisar ou escrever URL</font></string>
+    <!-- System Search-->
     <string name="systemSearchDeviceAppLabel">Deste dispositivo</string>
+    <string name="systemSearchOmnibarInputHint"><font size="13">Pesquisar ou escrever URL</font></string>
     <string name="systemSearchAppNotFound">Não foi possível encontrar a aplicação</string>
     <string name="systemSearchOnboardingText">Obrigado por escolher o DuckDuckGo!\nAgora as suas pesquisas estão protegidas ao usar a nossa pesquisa ou aplicação.</string>
     <string name="systemSearchOnboardingFeaturesIntroText">A aplicação DuckDuckGo também:</string>
@@ -379,23 +383,23 @@
     <string name="hideTipsButton">Ocultar dicas para sempre</string>
 
     <!-- New Onboarding Experience -->
-    <string name="onboardingWelcomeTitle">Bem-vindo(a) ao DuckDuckGo!</string>
-    <string name="onboardingDaxText">A Internet pode ser um pouco assustadora.&lt;br/&gt;&lt;br/&gt;Mas não se preocupe! Pesquisar e navegar em privado é mais fácil do que pensa.</string>
+    <string name="onboardingWelcomeTitle">"Bem-vindo(a) ao DuckDuckGo!"</string>
+    <string name="onboardingDaxText"><![CDATA[A Internet pode ser um pouco assustadora.<br/><br/>Mas não se preocupe! Pesquisar e navegar em privado é mais fácil do que pensa.]]></string>
     <string name="onboardingLetsDoItButton">Vamos lá!</string>
-    <string name="daxIntroCtaText">A seguir, experimente visitar um dos seus sites favoritos! &lt;br/&gt;&lt;br/&gt;Irei bloquear os rastreadores para que eles não possam espiar o que faz. Também irei atualizar a segurança da sua ligação, se possível. &#128274;</string>
-    <string name="daxEndCtaText">Conseguiu! &lt;br/&gt;&lt;br/&gt;Lembre-se: sempre que navega comigo, um anúncio estranho perde as suas asas. &#128077;</string>
-    <string name="daxSerpCtaText">A suas pesquisas no DuckDuckGo são anónimas e eu nunca guardo o seu histórico de pesquisas. Nunca. &#128588;</string>
+    <string name="daxIntroCtaText"><![CDATA[A seguir, experimente visitar um dos seus sites favoritos! <br/><br/>Irei bloquear os rastreadores para que eles não possam espiar o que faz. Também irei atualizar a segurança da sua ligação, se possível. 🔒]]></string>
+    <string name="daxEndCtaText"><![CDATA[Conseguiu! <br/><br/>Lembre-se: sempre que navega comigo, um anúncio estranho perde as suas asas. 👍]]></string>
+    <string name="daxSerpCtaText">A suas pesquisas no DuckDuckGo são anónimas e eu nunca guardo o seu histórico de pesquisas. Nunca. 🙌</string>
     <plurals name="daxTrackersBlockedCtaText">
-        <item quantity="one">&#160;e mais &lt;b&gt;%d outro&lt;/b&gt; estava tentar rastrear aqui. &lt;br/&gt;&lt;br/&gt;Eu bloqueei-os!&lt;br/&gt;&lt;br/&gt; ☝️Pode verificar a barra de URL para ver quem está a tentar rastrear quando visita um novo site.️</item>
-        <item quantity="other">&#160;e mais &lt;b&gt;%d outros&lt;/b&gt; estavam a tentar rastrear aqui. &lt;br/&gt;&lt;br/&gt;Eu bloqueei-os!&lt;br/&gt;&lt;br/&gt; ☝️Pode verificar a barra de URL para ver quem está a tentar rastrear quando visita um novo site.️</item>
+        <item quantity="one"><![CDATA[ e mais <b>%1$d outro</b> estava tentar rastrear aqui. <br/><br/>Eu bloqueei-os!<br/><br/> ☝️Pode verificar a barra de URL para ver quem está a tentar rastrear quando visita um novo site.️]]></item>
+        <item quantity="other"><![CDATA[ e mais <b>%1$d outros</b> estavam a tentar rastrear aqui. <br/><br/>Eu bloqueei-os!<br/><br/> ☝️Pode verificar a barra de URL para ver quem está a tentar rastrear quando visita um novo site.️]]></item>
     </plurals>
     <plurals name="daxTrackersBlockedCtaZeroText">
-        <item quantity="one" tools:ignore="ImpliedQuantity">&#160;estava a tentar rastrear aqui. &lt;br/&gt;&lt;br/&gt;Eu bloqueei-o!&lt;br/&gt;&lt;br/&gt; ☝️Pode verificar a barra de URL para ver quem está a tentar rastrear quando visita um novo site.️</item>
-        <item quantity="other">&#160;estavam a tentar rastrear aqui. &lt;br/&gt;&lt;br/&gt;Eu bloqueei-o!&lt;br/&gt;&lt;br/&gt; ☝️Pode verificar a barra de URL para ver quem está a tentar rastrear quando visita um novo site.️</item>
+        <item quantity="one" tools:ignore="ImpliedQuantity"><![CDATA[ estava a tentar rastrear aqui. <br/><br/>Eu bloqueei-o!<br/><br/> ☝️Pode verificar a barra de URL para ver quem está a tentar rastrear quando visita um novo site.️]]></item>
+        <item quantity="other"><![CDATA[ estavam a tentar rastrear aqui. <br/><br/>Eu bloqueei-o!<br/><br/> ☝️Pode verificar a barra de URL para ver quem está a tentar rastrear quando visita um novo site.️]]></item>
     </plurals>
-    <string name="daxNonSerpCtaText">Enquanto toca e desliza, eu bloqueio rastreadores irritantes. &lt;br/&gt;&lt;br/&gt;Prossiga - continue a navegar!</string>
-    <string name="daxMainNetworkOwnedCtaText">Atenção! %s é propriedade de %s.Os rastreadores de &lt;br/&gt;&lt;br/&gt; %s estão ocultos em cerca de %s dos principais sites &#128561;, mas não se preocupe! &lt;br/&gt;&lt;br/&gt;Eu impeço %s de ver a sua atividade nesses sites.</string>
-    <string name="daxMainNetworkCtaText">Atenção! %s é uma grande rede de rastreamento.&lt;br/&gt;&lt;br/&gt; Os seus rastreadores estão à espreita em cerca de %s dos principais sites &#128561;, mas não se preocupe! &lt;br/&gt;&lt;br/&gt;Eu impeço %s de ver a sua atividade nesses sites.</string>
+    <string name="daxNonSerpCtaText"><![CDATA[Enquanto toca e desliza, eu bloqueio rastreadores irritantes. <br/><br/>Prossiga - continue a navegar!]]></string>
+    <string name="daxMainNetworkCtaText"><![CDATA[Atenção! %1$s é uma grande rede de rastreamento.<br/><br/> Os seus rastreadores estão à espreita em cerca de %2$s dos principais sites 😱, mas não se preocupe! <br/><br/>Eu impeço %3$s de ver a sua atividade nesses sites.]]></string>
+    <string name="daxMainNetworkOwnedCtaText">Alerta! Desde que %1$s possui %2$s, não consigo impedi-los de ver a sua atividade. &lt;br/&gt;&lt;br/&gt;Mas navegue comigo e posso reduzir que %3$s saiba sobre si ao bloquear os seus rastreadores em muitos outros sites.</string>
 
     <!-- Download Confirmation -->
     <string name="downloadConfirmationContinue">Continuar</string>
@@ -426,8 +430,8 @@
     <string name="whitelisetActivityTitle">Sites desprotegidos</string>
     <string name="enablePrivacyProtection">Ativar Proteção de Privacidade</string>
     <string name="disablePrivacyProtection">Desativar Proteção de Privacidade</string>
-    <string name="whitelistEntryOverflowContentDescription">Mais opções para o site desprotegido %s</string>
-    <string name="whitelistEntryDeleteConfirmMessage">Quer mesmo remover &lt;b&gt;%s&lt;/b&gt; da lista de sites desprotegidos?</string>
+    <string name="whitelistEntryOverflowContentDescription">Mais opções para o site desprotegido %1$s</string>
+    <string name="whitelistEntryDeleteConfirmMessage">Quer mesmo remover &lt;b&gt;%1$s&lt;/b&gt; da lista de sites desprotegidos?</string>
     <string name="whitelistExplanation">Estes sites não serão aprimorados pela Proteção de Privacidade.</string>
     <string name="whitelistNoEntries">Ainda não há sites desprotegidos</string>
     <string name="whitelistDomainHint">www.example.com</string>
@@ -440,10 +444,24 @@
     <string name="fireproofWebsitesActivityTitle">Sites à prova de fogo</string>
     <string name="settingsFireproofWebsites">Sites à prova de fogo</string>
     <string name="fireproofWebsiteMenuTitleAdd">Site à prova de fogo</string>
-    <string name="fireproofWebsiteSnackbarConfirmation">&lt;b&gt;%s&lt;/b&gt; já é à prova de fogo! Aceda a Configurações para saber mais.</string>
+    <string name="fireproofWebsiteSnackbarConfirmation">&lt;b&gt;%1$s&lt;/b&gt; já é à prova de fogo! Aceda a Configurações para saber mais.</string>
     <string name="fireproofWebsiteSnackbarAction">Anular</string>
-    <string name="fireproofWebsiteDeleteConfirmMessage">Tem a certeza de que deseja eliminar &lt;b&gt;%s&lt;/b&gt;?</string>
+    <string name="fireproofWebsiteDeleteConfirmMessage">Tem a certeza de que deseja eliminar &lt;b&gt;%1$s&lt;/b&gt;?</string>
     <string name="fireproofWebsiteEmptyListHint">Ainda não há sites à prova de fogo</string>
-    <string name="fireproofWebsiteFeatureDescription">Os sites contam com cookies para o manter com sessão iniciada. Quando protege um site, os cookies não serão apagados e permanecerá ligado, mesmo depois de usar o botão de disparo.</string>
-    <string name="fireproofWebsiteOverflowContentDescription">Mais opções para o site à prova de fogo %s</string>
+    <string name="fireproofWebsiteFeatureDescription">Os websites confiam nos cookies para o manter ligado. Quando se utiliza uma barreira de segurança num site, os cookies não serão apagados e permanecerá ligado, mesmo depois de utilizar o botão de segurança. Ainda bloqueamos rastreadores de terceiros encontrados em sites com barreiras de segurança.</string>
+    <string name="fireproofWebsiteOverflowContentDescription">Mais opções para o site à prova de fogo %1$s</string>
+    <string name="fireproofWebsiteLoginDialogTitle">Quer colocar uma barreira de segurança %1$s?</string>
+    <string name="fireproofWebsiteLoginDialogDescription">Utilizar uma barreira de segurança neste site vai mantê-lo ligado após utilizar o botão de segurança.</string>
+    <string name="fireproofWebsiteLoginDialogPositive">Barreira de segurança</string>
+    <string name="fireproofWebsiteLoginDialogNegative">Agora não</string>
+    <string name="fireproofWebsiteItemsSectionTitle">Websites</string>
+    <string name="fireproofWebsiteToogleText">Perguntar ao iniciar sessão</string>
+
+    <!-- Dos Attack error-->
+    <string name="dosErrorMessage">Ligação abortada. Este website poderá ser prejudicial ao seu dispositivo.</string>
+
+    <!-- Download Manager problems -->
+    <string name="downloadManagerDisabled">Gestor de transferências desativado</string>
+    <string name="downloadManagerIncompatible">Gestor de transferências não disponível neste dispositivo</string>
+    <string name="enable">Permitir</string>
 </resources>
