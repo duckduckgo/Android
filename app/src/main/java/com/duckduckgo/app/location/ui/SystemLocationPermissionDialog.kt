@@ -46,7 +46,6 @@ class SystemLocationPermissionDialog : DialogFragment() {
         val rootView = layoutInflater.inflate(R.layout.content_system_location_permission_dialog, null)
 
         val subtitle = rootView.find<TextView>(R.id.systemPermissionDialogSubtitle)
-        val favicon = rootView.find<ImageView>(R.id.faviconImage)
         val allowLocationPermission = rootView.find<TextView>(R.id.allowLocationPermission)
         val denyLocationPermission = rootView.find<TextView>(R.id.denyLocationPermission)
         val neverAllowLocationPermission = rootView.find<TextView>(R.id.neverAllowLocationPermission)
@@ -56,7 +55,6 @@ class SystemLocationPermissionDialog : DialogFragment() {
 
         validateBundleArguments()
         populateSubtitle(subtitle)
-        populateFavicon(favicon)
         configureListeners(allowLocationPermission, denyLocationPermission, neverAllowLocationPermission)
 
         return alertBuilder.create()
@@ -75,18 +73,6 @@ class SystemLocationPermissionDialog : DialogFragment() {
             val originUrl = args.getString(KEY_REQUEST_ORIGIN)!!.websiteFromGeoLocationsApiOrigin()
             val subtitle = getString(R.string.preciseLocationSystemDialogSubtitle, originUrl, originUrl)
             view.text = subtitle
-        }
-    }
-
-    private fun populateFavicon(imageView: ImageView) {
-        arguments?.let { args ->
-            val originUrl = args.getString(KEY_REQUEST_ORIGIN)
-            val faviconUrl = Uri.parse(originUrl).faviconLocation()
-
-            GlideApp.with(requireContext())
-                .load(faviconUrl)
-                .error(R.drawable.ic_globe_gray_16dp)
-                .into(imageView)
         }
     }
 

@@ -20,71 +20,64 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:orientation="vertical"
+    android:background="?toolbarBgColor"
     android:gravity="center"
-    android:background="?toolbarBgColor">
+    android:orientation="vertical">
 
-        <FrameLayout
-            android:id="@+id/systemPermissionDialogFaviconContainer"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_marginTop="24dp"
-            android:background="@drawable/subtle_favicon_background"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
+    <ImageView
+        android:id="@+id/faviconImage"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_marginTop="24dp"
+        android:layout_gravity="center"
+        android:importantForAccessibility="no"
+        android:src="@drawable/ic_dax_icon"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
-                <ImageView
-                    android:id="@+id/faviconImage"
-                    android:layout_width="22dp"
-                    android:layout_height="22dp"
-                    android:layout_gravity="center"
-                    android:importantForAccessibility="no"
-                    android:src="@drawable/ic_globe_gray_16dp" />
-        </FrameLayout>
+    <TextView
+        android:id="@+id/systemPermissionDialogTitle"
+        style="@style/LocationPermissionDialogTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="@string/preciseLocationSystemDialogTitle" />
 
-        <TextView
-            android:id="@+id/systemPermissionDialogTitle"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            style="@style/LocationPermissionDialogTitle"
-            android:layout_marginTop="16dp"
-            android:text="@string/preciseLocationSystemDialogTitle" />
+    <TextView
+        android:id="@+id/systemPermissionDialogSubtitle"
+        style="@style/LocationPermissionDialogSubtitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:layout_marginBottom="24dp"
+        android:text="@string/preciseLocationSystemDialogSubtitle" />
 
-        <TextView
-            android:id="@+id/systemPermissionDialogSubtitle"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            style="@style/LocationPermissionDialogSubtitle"
-            android:layout_marginTop="12dp"
-            android:layout_marginBottom="24dp"
-            android:text="@string/preciseLocationSystemDialogSubtitle" />
+    <View style="@style/LocationPermissionDialogSplitter" />
 
-        <View style="@style/LocationPermissionDialogSplitter" />
+    <Button
+        android:id="@+id/allowLocationPermission"
+        style="@style/LocationPermissionDialogButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/preciseLocationSystemDialogAllow" />
 
-        <Button
-            android:id="@+id/allowLocationPermission"
-            style="@style/LocationPermissionDialogButton"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/preciseLocationSystemDialogAllow" />
+    <View style="@style/LocationPermissionDialogSplitter" />
 
-        <View style="@style/LocationPermissionDialogSplitter" />
+    <Button
+        android:id="@+id/denyLocationPermission"
+        style="@style/LocationPermissionDialogButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/preciseLocationSystemDialogDeny" />
 
-        <Button
-            android:id="@+id/denyLocationPermission"
-            style="@style/LocationPermissionDialogButton"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/preciseLocationSystemDialogDeny" />
+    <View style="@style/LocationPermissionDialogSplitter" />
 
-        <View style="@style/LocationPermissionDialogSplitter" />
-
-        <Button
-            android:id="@+id/neverAllowLocationPermission"
-            style="@style/LocationPermissionDialogButton"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/preciseLocationSystemDialogNeverAllow" />
+    <Button
+        android:id="@+id/neverAllowLocationPermission"
+        style="@style/LocationPermissionDialogButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/preciseLocationSystemDialogNeverAllow" />
 
 </LinearLayout>
