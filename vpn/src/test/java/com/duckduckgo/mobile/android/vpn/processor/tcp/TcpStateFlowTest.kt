@@ -18,8 +18,6 @@ package com.duckduckgo.mobile.android.vpn.processor.tcp
 
 import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpStateFlow.*
 import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpStateFlow.Event.*
-import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpStateFlow.Transition.MoveToState
-import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpStateFlow.Transition.NoTransition
 import org.junit.Assert.*
 import org.junit.Test
 import xyz.hexene.localvpn.TCB.TCBStatus
