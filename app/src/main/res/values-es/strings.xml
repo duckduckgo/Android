@@ -162,7 +162,7 @@
     <!-- About Activity -->
     <string name="aboutActivityTitle">Acerca de nosotros</string>
     <string name="aboutDescription">
-        En DuckDuckGo, estamos sentando un precedente en la confianza en línea.\n
+        En DuckDuckGo, estamos sentando un precedente en la confianza en línea.\n\
         El navegador privado de DuckDuckGo ofrece todas las funciones de privacidad esenciales que necesitas para protegerte mientras realizas búsquedas y navegas en Internet, lo que incluye el bloqueo de rastreadores, cifrado inteligente y búsqueda privada de DuckDuckGo.\n\
         Después de todo, Internet no debería percibirse como una amenaza y disfrutar de la privacidad en línea que mereces debería ser lo más fácil posible.</string>
     <string name="aboutMoreLink">Más información en duckduckgo.com/about</string>
