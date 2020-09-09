@@ -54,7 +54,7 @@ android {
                     appIconRound: "@mipmap/ic_launcher_blue_round"
             ]
             FirebasePerformance {
-                instrumentationEnabled false
+                instrumentationEnabled true
             }
         }
         release {

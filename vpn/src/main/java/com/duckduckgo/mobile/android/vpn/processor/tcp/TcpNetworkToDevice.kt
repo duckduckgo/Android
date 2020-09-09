@@ -17,6 +17,7 @@
 package com.duckduckgo.mobile.android.vpn.processor.tcp
 
 import android.os.Handler
+import android.view.ViewDebug.trace
 import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpPacketProcessor.Companion.logPacketDetails
 import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpPacketProcessor.Companion.updateState
 import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpStateFlow.Event.MoveState
@@ -24,6 +25,8 @@ import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpStateFlow.Event.MoveSt
 import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpStateFlow.Event.MoveState.MoveServerToState
 import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpStateFlow.Event.SendReset
 import com.duckduckgo.mobile.android.vpn.service.VpnQueues
+import com.google.firebase.perf.FirebasePerformance
+import com.google.firebase.perf.metrics.AddTrace
 import timber.log.Timber
 import xyz.hexene.localvpn.ByteBufferPool
 import xyz.hexene.localvpn.Packet
@@ -39,7 +42,6 @@ import java.nio.channels.Selector
 import java.nio.channels.SocketChannel
 import java.util.concurrent.TimeUnit
 
-
 class TcpNetworkToDevice(
     private val queues: VpnQueues,
     private val selector: Selector,
@@ -52,6 +54,7 @@ class TcpNetworkToDevice(
      * When data is read, we add it to the network-to-device queue, which will result in the packet being written back to the TUN.
      */
     @Suppress("BlockingMethodInNonBlockingContext")
+    @AddTrace(name = "debug.network_to_device_processing", enabled = true)
     fun networkToDeviceProcessing() {
         val startTime = System.nanoTime()
         val channelsReady = selector.select()
@@ -91,6 +94,7 @@ class TcpNetworkToDevice(
         }
     }
 
+    @AddTrace(name = "debug.process_read", enabled = true)
     private fun processRead(key: SelectionKey) {
         val receiveBuffer = ByteBufferPool.acquire()
         receiveBuffer.position(HEADER_SIZE)
@@ -116,9 +120,9 @@ class TcpNetworkToDevice(
                 return
             }
         }
-
     }
 
+    @AddTrace(name = "debug.send_to_network_to_device_queue", enabled = true)
     private fun sendToNetworkToDeviceQueue(packet: Packet, receiveBuffer: ByteBuffer, tcb: TCB, readBytes: Int) {
         //Timber.i("Network-to-device packet ${tcb.ipAndPort}. $readBytes bytes. ${logPacketDetails(packet, tcb.sequenceNumberToClientInitial, tcb.sequenceNumberToClient, tcb.acknowledgementNumberToClient)}")
         packet.updateTcpBuffer(receiveBuffer, (PSH or ACK).toByte(), tcb.sequenceNumberToClient, tcb.acknowledgementNumberToClient, readBytes)
@@ -131,12 +135,14 @@ class TcpNetworkToDevice(
 
     private fun handleEndOfStream(tcb: TCB, packet: Packet, key: SelectionKey, channel: SocketChannel) {
         Timber.w(
-            "Network-to-device end of stream ${tcb.ipAndPort}. ${tcb.tcbState} ${logPacketDetails(
-                packet,
-                tcb.sequenceNumberToClientInitial,
-                tcb.sequenceNumberToClient,
-                tcb.acknowledgementNumberToClient
-            )}"
+            "Network-to-device end of stream ${tcb.ipAndPort}. ${tcb.tcbState} ${
+                logPacketDetails(
+                    packet,
+                    tcb.sequenceNumberToClientInitial,
+                    tcb.sequenceNumberToClient,
+                    tcb.acknowledgementNumberToClient
+                )
+            }"
         )
 
         // close connection with remote end point as there's no more communication required
@@ -152,6 +158,7 @@ class TcpNetworkToDevice(
         }
     }
 
+    @AddTrace(name = "debug.send_reset", enabled = true)
     private fun sendReset(packet: Packet, tcb: TCB) {
         val buffer = ByteBufferPool.acquire()
         packet.updateTcpBuffer(buffer, (RST or ACK).toByte(), tcb.sequenceNumberToClient, tcb.acknowledgementNumberToClient, 0)
@@ -160,6 +167,7 @@ class TcpNetworkToDevice(
         TCB.closeTCB(tcb)
     }
 
+    @AddTrace(name = "debug.process_connect", enabled = true)
     private fun processConnect(key: SelectionKey) {
         val tcb = key.attachment() as TCB
         val packet = tcb.referencePacket
@@ -192,11 +200,13 @@ class TcpNetworkToDevice(
         }
     }
 
+    @AddTrace(name = "debug.offer_network_to_device_queue", enabled = true)
     private fun offerToNetworkToDeviceQueue(buffer: ByteBuffer, tcb: TCB, packet: Packet) {
         logPacket(tcb, packet)
         queues.networkToDevice.offer(buffer)
     }
 
+    @AddTrace(name = "debug.log_packet", enabled = true)
     private fun logPacket(tcb: TCB, packet: Packet) {
         Timber.i(
             "New packet. %s. %s. %s. Packet length: %d. Data length: %d",
@@ -214,5 +224,4 @@ class TcpNetworkToDevice(
         private const val HEADER_SIZE = Packet.IP4_HEADER_SIZE + Packet.TCP_HEADER_SIZE
         private const val OP_NONE = 0
     }
-
 }

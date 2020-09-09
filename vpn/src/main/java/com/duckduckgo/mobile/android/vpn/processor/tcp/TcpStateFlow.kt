@@ -19,6 +19,7 @@ package com.duckduckgo.mobile.android.vpn.processor.tcp
 import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpStateFlow.Event.*
 import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpStateFlow.Event.MoveState.MoveClientToState
 import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpStateFlow.Event.MoveState.MoveServerToState
+import com.google.firebase.perf.metrics.AddTrace
 import timber.log.Timber
 import xyz.hexene.localvpn.Packet
 import xyz.hexene.localvpn.TCB
@@ -29,6 +30,7 @@ class TcpStateFlow {
 
     companion object {
 
+        @AddTrace(name = "debug.new_packet", enabled = true)
         fun newPacket(
             connectionKey: String,
             currentState: TcbState,
