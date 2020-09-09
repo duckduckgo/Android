@@ -1,8 +1,10 @@
 apply plugin: 'com.android.application'
-
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
+apply plugin: 'com.google.gms.google-services'
+apply plugin: 'com.google.firebase.firebase-perf'
+
 apply from: '../versioning.gradle'
 apply from: "$rootDir/ktlint.gradle"
 
@@ -51,6 +53,9 @@ android {
                     appIcon: "@mipmap/ic_launcher_blue",
                     appIconRound: "@mipmap/ic_launcher_blue_round"
             ]
+            FirebasePerformance {
+                instrumentationEnabled false
+            }
         }
         release {
             minifyEnabled false
@@ -115,6 +120,7 @@ ext {
     retrofitCoroutinesAdapter = "0.9.2"
     webkit = "1.2.0"
     referrerLibrary = "1.1.2"
+    firebasePerf = "19.0.8"
 
     junit = "4.12"
     dagger = "2.27"
@@ -144,6 +150,8 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutines"
     androidTestImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutines"
+
+    implementation "com.google.firebase:firebase-perf:$firebasePerf"
 
     implementation "androidx.appcompat:appcompat:$androidX"
     implementation "com.google.android.material:material:$materialDesign"
