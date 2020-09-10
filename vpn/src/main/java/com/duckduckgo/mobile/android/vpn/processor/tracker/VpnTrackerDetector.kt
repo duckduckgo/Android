@@ -22,6 +22,7 @@ import timber.log.Timber
 import xyz.hexene.localvpn.Packet
 import xyz.hexene.localvpn.TCB
 import java.nio.ByteBuffer
+import java.nio.charset.StandardCharsets
 
 
 interface VpnTrackerDetector {
@@ -29,21 +30,41 @@ interface VpnTrackerDetector {
     fun determinePacketType(tcb: TCB, packet: Packet, payloadBuffer: ByteBuffer): TrackerType
 }
 
-class DomainBasedTrackerDetector(private val domainNameExtractor: DomainNameExtractor) : VpnTrackerDetector {
+class DomainBasedTrackerDetector(
+    private val hostNameHeaderExtractor: HostNameHeaderExtractor,
+    private val encryptedRequestHostExtractor: EncryptedRequestHostExtractor,
+    private val payloadBytesExtractor: PayloadBytesExtractor
+) : VpnTrackerDetector {
 
     override fun determinePacketType(tcb: TCB, packet: Packet, payloadBuffer: ByteBuffer): TrackerType {
-        if(tcb.isTracker) return Tracker
-        val domain = domainNameExtractor.extractDomain(packet, payloadBuffer)
-        if(domain != null) {
-            Timber.i("Found domain from plaintext headers: %s", domain)
-        }
+        if (tcb.isTracker) return Tracker
+        val host = tcb.hostName ?: determineHost(packet, payloadBuffer).also { tcb.hostName = it }
 
         return NonTracker
     }
 
+    private fun determineHost(packet: Packet, payloadBuffer: ByteBuffer): String? {
+        val payloadBytes = payloadBytesExtractor.extract(packet, payloadBuffer)
+
+        var host = hostNameHeaderExtractor.extract(String(payloadBytes, StandardCharsets.US_ASCII))
+        if (host != null) {
+            Timber.v("Found domain from plaintext headers: %s", host)
+            return host
+        }
+
+        host = encryptedRequestHostExtractor.extract(payloadBytes)
+        if (host != null) {
+            Timber.v("Found domain from encrypted headers: %s", host)
+            return host
+        }
+
+        Timber.w("Failed to extract host")
+        return null
+    }
 }
+
 
 sealed class TrackerType {
     object Tracker : TrackerType()
-    object NonTracker: TrackerType()
+    object NonTracker : TrackerType()
 }

@@ -28,7 +28,9 @@ import com.duckduckgo.mobile.android.vpn.processor.TunPacketReader
 import com.duckduckgo.mobile.android.vpn.processor.TunPacketWriter
 import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpPacketProcessor
 import com.duckduckgo.mobile.android.vpn.processor.tracker.DomainBasedTrackerDetector
-import com.duckduckgo.mobile.android.vpn.processor.tracker.PlaintextDomainExtractor
+import com.duckduckgo.mobile.android.vpn.processor.tracker.PayloadBytesExtractor
+import com.duckduckgo.mobile.android.vpn.processor.tracker.PlaintextHostHeaderExtractor
+import com.duckduckgo.mobile.android.vpn.processor.tracker.ServerNameIndicationHeaderHostExtractor
 import com.duckduckgo.mobile.android.vpn.processor.udp.UdpPacketProcessor
 import com.duckduckgo.mobile.android.vpn.ui.notification.VpnNotificationBuilder
 import kotlinx.coroutines.CoroutineScope
@@ -49,8 +51,12 @@ class PassthroughVpnService : VpnService(), CoroutineScope by MainScope(), Netwo
     private var tunInterface: ParcelFileDescriptor? = null
     private val binder: VpnServiceBinder = VpnServiceBinder()
 
-    private val domainNameExtractor = PlaintextDomainExtractor()
-    private val trackerDetector = DomainBasedTrackerDetector(domainNameExtractor)
+    // todo - let DI create these dependencies
+    private val domainNameExtractor = PlaintextHostHeaderExtractor()
+    private val payloadBytesExtractor = PayloadBytesExtractor()
+    private val encryptedRequestHostExtractor = ServerNameIndicationHeaderHostExtractor()
+
+    private val trackerDetector = DomainBasedTrackerDetector(domainNameExtractor, encryptedRequestHostExtractor, payloadBytesExtractor)
 
     val udpPacketProcessor = UdpPacketProcessor(queues, this)
     val tcpPacketProcessor = TcpPacketProcessor(queues, this, trackerDetector)
