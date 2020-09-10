@@ -39,11 +39,10 @@ class WebViewCookieManager(
         withContext(dispatcher.io()) {
             flush()
         }
-        // We preserve DuckDuckGo cookies when the fire button is used to keep the previously DuckDuckGo Search Engine Result Pages settings set
-        // by the user. Removing these cookies would reset them and have undesired consequences, i.e. changing the theme, default language, etc.
-        // At DuckDuckGo, no cookies are used by default. If you have changed any settings, then cookies are used to store those changes.
-        // However, in that case, they are not stored in a personally identifiable way. For example, the large size setting is stored as 's=l';
-        // no unique identifier is in there. More info in https://duckduckgo.com/privacy
+        // The Fire Button does not delete the user's DuckDuckGo search settings, which are saved as cookies.
+        // Removing these cookies would reset them and have undesired consequences, i.e. changing the theme, default language, etc.
+        // These cookies are not stored in a personally identifiable way. For example, the large size setting is stored as 's=l.'
+        // More info in https://duckduckgo.com/privacy
         val ddgCookies = getDuckDuckGoCookies()
         if (cookieManager.hasCookies()) {
             removeCookies.removeCookies()
