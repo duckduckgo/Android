@@ -26,6 +26,7 @@ import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpStateFlow.Event.MoveSt
 import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpStateFlow.Event.MoveState.MoveServerToState
 import com.duckduckgo.mobile.android.vpn.service.NetworkChannelCreator
 import com.duckduckgo.mobile.android.vpn.service.VpnQueues
+import com.google.firebase.perf.metrics.AddTrace
 import kotlinx.coroutines.Job
 import timber.log.Timber
 import xyz.hexene.localvpn.ByteBufferPool
@@ -152,6 +153,7 @@ class TcpPacketProcessor(queues: VpnQueues, networkChannelCreator: NetworkChanne
 //            }
 //        }
 
+        @AddTrace(name = "packet_processor_send_fin", enabled = true)
         fun TCB.sendFinToClient(queues: VpnQueues, packet: Packet, connectionParams: TcpConnectionParams) {
             val buffer = ByteBufferPool.acquire()
             synchronized(this) {
@@ -188,6 +190,7 @@ class TcpPacketProcessor(queues: VpnQueues, networkChannelCreator: NetworkChanne
             }
         }
 
+        @AddTrace(name = "packet_processor_send_ack", enabled = true)
         fun TCB.sendAck(queues: VpnQueues, packet: Packet, connectionParams: TcpConnectionParams) {
             synchronized(this) {
                 val payloadSize = packet.tcpPayloadSize(true)
@@ -216,6 +219,7 @@ class TcpPacketProcessor(queues: VpnQueues, networkChannelCreator: NetworkChanne
         }
 
         @Synchronized
+        @AddTrace(name = "packet_processor_send_reset", enabled = true)
         fun TCB.sendResetPacket(queues: VpnQueues, payloadSize: Int) {
             val buffer = ByteBufferPool.acquire()
             synchronized(this) {
@@ -234,6 +238,7 @@ class TcpPacketProcessor(queues: VpnQueues, networkChannelCreator: NetworkChanne
         }
 
         @Synchronized
+        @AddTrace(name = "packet_processor_close_connection", enabled = true)
         fun TCB.closeConnection(buffer: ByteBuffer) {
             Timber.v("Closing TCB connection $ipAndPort}")
             ByteBufferPool.release(buffer)

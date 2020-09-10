@@ -30,7 +30,7 @@ interface SocketWriter {
 class TcpSocketWriter(private val selector:Selector) : SocketWriter{
 
     @Synchronized
-    @AddTrace(name = "debug.write_to_socket", enabled = true)
+    @AddTrace(name = "socket_writer_write_to_socket", enabled = true)
     override fun writeToSocket(writeData: TcpPacketProcessor.PendingWriteData): Boolean {
         Timber.v("Writing data to socket ${writeData.tcb.ipAndPort}: ${writeData.payloadSize} bytes")
         val payloadBuffer = writeData.payloadBuffer

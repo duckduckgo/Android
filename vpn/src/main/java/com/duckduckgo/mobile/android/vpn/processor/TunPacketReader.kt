@@ -32,7 +32,7 @@ class TunPacketReader(private val tunInterface: ParcelFileDescriptor, private va
     private var running = false
     var bufferToNetwork = byteBuffer()
 
-    @AddTrace(name = "debug.read_from_tunnel", enabled = true)
+    @AddTrace(name = "tun_reader_read", enabled = true)
     override fun run() {
         Timber.w("TunPacketReader started")
 
