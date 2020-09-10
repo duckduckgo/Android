@@ -17,22 +17,15 @@
 package com.duckduckgo.app.browser.shortcut
 
 import android.content.Intent
-import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.global.events.db.UserEventsStore
 import com.duckduckgo.app.global.useourapp.UseOurAppDetector
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.verify
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.junit.Before
-import org.junit.Rule
 import org.junit.Test
 
-@ExperimentalCoroutinesApi
 class ShortcutReceiverTest {
-
-    @get:Rule
-    var coroutinesTestRule = CoroutineTestRule()
 
     private val mockUserEventsStore: UserEventsStore = mock()
     private val mockPixel: Pixel = mock()
@@ -40,11 +33,7 @@ class ShortcutReceiverTest {
 
     @Before
     fun before() {
-        testee = ShortcutReceiver(
-            coroutinesTestRule.testDispatcherProvider,
-            UseOurAppDetector(mockUserEventsStore),
-            mockPixel
-        )
+        testee = ShortcutReceiver(UseOurAppDetector(mockUserEventsStore), mockPixel)
     }
 
     @Test
