@@ -17,15 +17,11 @@
 package com.duckduckgo.app.location.ui
 
 import android.app.Dialog
-import android.net.Uri
 import android.os.Bundle
-import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.DialogFragment
 import com.duckduckgo.app.browser.R
-import com.duckduckgo.app.global.faviconLocation
-import com.duckduckgo.app.global.image.GlideApp
 import com.duckduckgo.app.global.view.websiteFromGeoLocationsApiOrigin
 import org.jetbrains.anko.find
 
