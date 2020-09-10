@@ -65,7 +65,7 @@ interface VariantManager {
             Variant(RESERVED_EU_AUCTION_VARIANT, features = emptyList(), filterBy = { noFilter() })
         )
 
-        private val serpRegionToggleTargetCountries = listOf (
+        private val serpRegionToggleTargetCountries = listOf(
             "AU",
             "AT",
             "DK",
