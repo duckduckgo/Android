@@ -30,9 +30,6 @@ interface VariantManager {
     sealed class VariantFeature {
         object SerpHeaderQueryReplacement : VariantFeature()
         object SerpHeaderRemoval : VariantFeature()
-        object InAppUsage : VariantFeature()
-        object KillOnboarding : VariantFeature()
-        object RemoveDay1AndDay3Notifications : VariantFeature()
         object FireButtonEducation : VariantFeature()
     }
 
@@ -54,18 +51,6 @@ interface VariantManager {
             Variant(key = "zh", weight = 0.0, features = listOf(VariantFeature.SerpHeaderQueryReplacement), filterBy = { noFilter() }),
             Variant(key = "zi", weight = 0.0, features = listOf(VariantFeature.SerpHeaderRemoval), filterBy = { noFilter() }),
 
-            // InAppUsage Experiments
-            Variant(key = "zj", weight = 0.0, features = emptyList(), filterBy = { isEnglishLocale() }),
-            Variant(
-                key = "zk",
-                weight = 0.0,
-                features = listOf(VariantFeature.KillOnboarding, VariantFeature.RemoveDay1AndDay3Notifications),
-                filterBy = { isEnglishLocale() }),
-            Variant(
-                key = "zl",
-                weight = 0.0,
-                features = listOf(VariantFeature.KillOnboarding, VariantFeature.InAppUsage, VariantFeature.RemoveDay1AndDay3Notifications),
-                filterBy = { isEnglishLocale() }),
             // Fire Education Experiments
             Variant(key = "zm", weight = 1.0, features = emptyList(), filterBy = { isEnglishLocale() }),
             Variant(

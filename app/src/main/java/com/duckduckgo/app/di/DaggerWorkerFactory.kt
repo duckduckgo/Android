@@ -28,10 +28,8 @@ import com.duckduckgo.app.job.ConfigurationDownloader
 import com.duckduckgo.app.notification.NotificationFactory
 import com.duckduckgo.app.notification.NotificationScheduler.ClearDataNotificationWorker
 import com.duckduckgo.app.notification.NotificationScheduler.PrivacyNotificationWorker
-import com.duckduckgo.app.notification.NotificationScheduler.UseOurAppNotificationWorker
 import com.duckduckgo.app.notification.db.NotificationDao
 import com.duckduckgo.app.notification.model.ClearDataNotification
-import com.duckduckgo.app.notification.model.UseOurAppNotification
 import com.duckduckgo.app.notification.model.PrivacyProtectionNotification
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.api.OfflinePixelScheduler
@@ -48,7 +46,6 @@ class DaggerWorkerFactory(
     private val notificationFactory: NotificationFactory,
     private val clearDataNotification: ClearDataNotification,
     private val privacyProtectionNotification: PrivacyProtectionNotification,
-    private val useOurAppNotification: UseOurAppNotification,
     private val configurationDownloader: ConfigurationDownloader,
     private val pixel: Pixel
 ) : WorkerFactory() {
@@ -66,7 +63,6 @@ class DaggerWorkerFactory(
                 is ClearDataNotificationWorker -> injectClearDataNotificationWorker(instance)
                 is PrivacyNotificationWorker -> injectPrivacyNotificationWorker(instance)
                 is AppConfigurationWorker -> injectAppConfigurationWorker(instance)
-                is UseOurAppNotificationWorker -> injectUseOurAppNotificationWorker(instance)
                 else -> Timber.i("No injection required for worker $workerClassName")
             }
 
@@ -105,13 +101,5 @@ class DaggerWorkerFactory(
         worker.factory = notificationFactory
         worker.pixel = pixel
         worker.notification = privacyProtectionNotification
-    }
-
-    private fun injectUseOurAppNotificationWorker(worker: UseOurAppNotificationWorker) {
-        worker.manager = notificationManager
-        worker.notificationDao = notificationDao
-        worker.factory = notificationFactory
-        worker.pixel = pixel
-        worker.notification = useOurAppNotification
     }
 }

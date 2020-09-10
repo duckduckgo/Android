@@ -26,7 +26,6 @@ import com.duckduckgo.app.job.ConfigurationDownloader
 import com.duckduckgo.app.notification.NotificationFactory
 import com.duckduckgo.app.notification.db.NotificationDao
 import com.duckduckgo.app.notification.model.ClearDataNotification
-import com.duckduckgo.app.notification.model.UseOurAppNotification
 import com.duckduckgo.app.notification.model.PrivacyProtectionNotification
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.api.OfflinePixelSender
@@ -59,7 +58,6 @@ class WorkerModule {
         notificationFactory: NotificationFactory,
         clearDataNotification: ClearDataNotification,
         privacyProtectionNotification: PrivacyProtectionNotification,
-        useOurAppNotification: UseOurAppNotification,
         configurationDownloader: ConfigurationDownloader,
         pixel: Pixel
     ): WorkerFactory {
@@ -72,7 +70,6 @@ class WorkerModule {
             notificationFactory,
             clearDataNotification,
             privacyProtectionNotification,
-            useOurAppNotification,
             configurationDownloader,
             pixel
         )
