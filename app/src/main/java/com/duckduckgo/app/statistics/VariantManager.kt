@@ -43,8 +43,8 @@ interface VariantManager {
         val ACTIVE_VARIANTS = listOf(
             // SERP variants. "sc" may also be used as a shared control for mobile experiments in
             // the future if we can filter by app version
-            Variant(key = "sc", weight = 1.0, features = emptyList(), filterBy = { noFilter() }),
-            Variant(key = "se", weight = 1.0, features = emptyList(), filterBy = { noFilter() }),
+            Variant(key = "sc", weight = 1.0, features = emptyList(), filterBy = { isSerpRegionToggleCountry() }),
+            Variant(key = "se", weight = 1.0, features = emptyList(), filterBy = { isSerpRegionToggleCountry() }),
 
             // Single Search Bar Experiments
             Variant(key = "zg", weight = 0.0, features = emptyList(), filterBy = { noFilter() }),
@@ -65,6 +65,22 @@ interface VariantManager {
             Variant(RESERVED_EU_AUCTION_VARIANT, features = emptyList(), filterBy = { noFilter() })
         )
 
+        private val serpRegionToggleTargetCountries = listOf(
+            "AU",
+            "AT",
+            "DK",
+            "FI",
+            "FR",
+            "DE",
+            "IT",
+            "IE",
+            "NZ",
+            "NO",
+            "ES",
+            "SE",
+            "GB"
+        )
+
         fun referrerVariant(key: String): Variant {
             val knownReferrer = REFERRER_VARIANTS.firstOrNull { it.key == key }
             return knownReferrer ?: Variant(key, features = emptyList(), filterBy = { noFilter() })
@@ -75,6 +91,11 @@ interface VariantManager {
         private fun isEnglishLocale(): Boolean {
             val locale = Locale.getDefault()
             return locale != null && locale.language == "en"
+        }
+
+        private fun isSerpRegionToggleCountry(): Boolean {
+            val locale = Locale.getDefault()
+            return locale != null && serpRegionToggleTargetCountries.contains(locale.country)
         }
     }
 
