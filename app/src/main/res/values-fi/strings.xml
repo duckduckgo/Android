@@ -77,7 +77,7 @@
     <string name="privacyProtectionEnabled">SIVUSTOSUOJAUS KÄYTÖSSÄ</string>
     <string name="privacyProtectionDisabled">SIVUSTOSUOJAUS EI KÄYTÖSSÄ</string>
     <string name="privacyDashboardActivityTitle">Tietosuojan ohjauspaneeli</string>
-    <string name="privacyProtectionUpgraded" tools:ignore="TypographyQuotes">PARANNETTU &lt;img src="%d" /&gt;–&lt;img src="%d" /&gt;</string>
+    <string name="privacyProtectionUpgraded" tools:ignore="TypographyQuotes">PARANNETTU &lt;img src=\"%1$d\" /&gt;–&lt;img src=\"%2$d\" /&gt;</string>
     <string name="privacyGradeContentDescription">Tietosuoja-arvosana</string>
 
     <string name="httpsGood">Salattu yhteys</string>
@@ -89,23 +89,23 @@
     <string name="networksOverview">Seurantaverkostot kokoavat verkkohistoriasi sinua koskevaksi tietoprofiiliksi. Merkittävät seurantaverkostot ovat haitallisempia, koska ne voivat seurata toimiasi ja harjoittaa kohdennusta useammassa osassa verkkoa.</string>
 
     <plurals name="trackersFound">
-        <item quantity="one">%s seurantapalvelin löytynyt</item>
-        <item quantity="other">%s seurantapalvelinta löytynyt</item>
+        <item quantity="one">%1$s seurantapalvelin löytynyt</item>
+        <item quantity="other">%1$s seurantapalvelinta löytynyt</item>
     </plurals>
 
     <plurals name="trackerBlocked">
-        <item quantity="one">%s seurantapalvelin estetty</item>
-        <item quantity="other">%s seurantapalvelinta estetty</item>
+        <item quantity="one">%1$s seurantapalvelin estetty</item>
+        <item quantity="other">%1$s seurantapalvelinta estetty</item>
     </plurals>
 
     <plurals name="majorNetworksFound">
-        <item quantity="one">%s merkittävä seurantaverkosto löytynyt</item>
-        <item quantity="other">%s merkittävää seurantaverkostoa löytynyt</item>
+        <item quantity="one">%1$s merkittävä seurantaverkosto löytynyt</item>
+        <item quantity="other">%1$s merkittävää seurantaverkostoa löytynyt</item>
     </plurals>
 
     <plurals name="majorNetworksBlocked">
-        <item quantity="one">%s merkittävä seurantaverkosto estetty</item>
-        <item quantity="other">%s merkittävää seurantaverkostoa estetty</item>
+        <item quantity="one">%1$s merkittävä seurantaverkosto estetty</item>
+        <item quantity="other">%1$s merkittävää seurantaverkostoa estetty</item>
     </plurals>
 
     <string name="scorecardActivityTitle">Tietosuoja-arvosana</string>
@@ -115,8 +115,8 @@
 
     <string name="privacyTermsActivityTitle">Tietosuojakäytännöt</string>
     <string name="practicesGood">Hyvät tietosuojakäytännöt</string>
-    <string name="practicesMixed">Vaihtelevat tietosuojakäytännöt"</string>
-    <string name="practicesBad">"Huonot tietosuojakäytännöt"</string>
+    <string name="practicesMixed">Vaihtelevat tietosuojakäytännöt</string>
+    <string name="practicesBad">Huonot tietosuojakäytännöt</string>
     <string name="practicesUnknown">Tuntemattomat tietosuojakäytännöt</string>
     <string name="practicesOverview">Tietosuojakäytännöt kertovat, missä määrin verkkosivuston kanssa jakamiasi henkilötietoja suojataan.</string>
     <string name="practicesTosdrLink">Tietosuojakäytäntöjen tulokset kohteesta <b><u>ToS;DR</u></b></string>
@@ -162,7 +162,9 @@
     <!-- About Activity -->
     <string name="aboutActivityTitle">Tietoa meistä</string>
     <string name="aboutDescription">
-        DuckDuckGo asettaa uudet standardit luottamukselle verkossa.\n\ DuckDuckGo-tietosuojaselain tarjoaa kaikki keskeiset tietosuojaominaisuudet nettihakujesi ja -selailusi turvaksi, kuten seurantapalvelinten eston, älykkäämmän salauksen ja yksityisen DuckDuckGo-haun.\n\ Internetin ei pitäisi tuntua karmivalta paikalta ja haluamasi nettiyksityisyyden pitäisi järjestyä sulkemalla verhot.</string>
+        DuckDuckGo asettaa uudet standardit luottamukselle verkossa.\n\
+        DuckDuckGo-tietosuojaselain tarjoaa kaikki keskeiset tietosuojaominaisuudet nettihakujesi ja -selailusi turvaksi, kuten seurantapalvelinten eston, älykkäämmän salauksen ja yksityisen DuckDuckGo-haun.\n\
+        Internetin ei pitäisi tuntua karmivalta paikalta ja haluamasi nettiyksityisyyden pitäisi järjestyä sulkemalla verhot.</string>
     <string name="aboutMoreLink">Lisätietoa: duckduckgo.com/about</string>
     <string name="no_suggestions">Ei ehdotuksia</string>
 
@@ -188,18 +190,20 @@
     <!-- Bookmarks Activity -->
     <string name="bookmarksMenuTitle">Kirjanmerkit</string>
     <string name="bookmarksActivityTitle">Kirjanmerkit</string>
-    <string name="bookmarkDeleteConfirmMessage">Haluatko varmasti poistaa kirjanmerkin &lt;b&gt;%s&lt;/b&gt;?</string>
-    <string name="dialogConfirmTitle">Vahvista</string>
+    <string name="bookmarkDeleteConfirmMessage">Haluatko varmasti poistaa kirjanmerkin &lt;b&gt;%1$s&lt;/b&gt;?</string>
     <string name="bookmarkAddedFeedback">Kirjanmerkki lisätty</string>
     <string name="bookmarkTitleHint">Kirjanmerkin otsikko</string>
     <string name="bookmarkUrlHint">Kirjanmerkin URL-osoite</string>
-    <string name="dialogSave">Tallenna</string>
     <string name="bookmarkTitleEdit">Muokkaa kirjanmerkkiä</string>
     <string name="noBookmarks">Kirjanmerkkejä ei ole vielä lisätty</string>
-    <string name="bookmarkOverflowContentDescription">Lisää vaihtoehtoja kirjanmerkille %s</string>
+    <string name="bookmarkOverflowContentDescription">Lisää vaihtoehtoja kirjanmerkille %1$s</string>
+    <string name="bookmarkEdited">Kirjanmerkki lisätty</string>
+
+    <!-- Dialogs -->
+    <string name="dialogConfirmTitle">Vahvista</string>
+    <string name="dialogSave">Tallenna</string>
     <string name="delete">Poista</string>
     <string name="edit">Muokkaa</string>
-    <string name="bookmarkEdited">Kirjanmerkki lisätty</string>
 
     <!-- Widget -->
     <string name="searchWidgetTextHint">Hae DuckDuckGosta</string>
@@ -263,14 +267,14 @@
     <string name="privacyProtectionNotificationDefaultTitle">Suojelemme yksityisyyttäsi</string>
     <string name="privacyProtectionNotificationReportTitle">Tietosuojaraporttisi</string>
     <string name="privacyProtectionNotificationDefaultDescription">DuckDuckGo-sovelluksen käyttö suojaa tietojasi estämällä seurantapalvelimet ja salaamalla yhteydet.</string>
-    <string name="privacyProtectionNotificationUpgadeDescription">Suojelit tietojasi turvaamalla %d salaamatonta yhteyttä DuckDuckGota käyttäessäsi.</string>
-    <string name="privacyProtectionNotificationTrackerDescription">Suojelit tietojasi estämällä %d seurantapalvelinta DuckDuckGota käyttäessäsi.</string>
-    <string name="privacyProtectionNotificationBothDescription">Suojelit tietojasi estämällä %d seurantapalvelinta ja turvaamalla %d salaamatonta yhteyttä DuckDuckGota käyttäessäsi.</string>
+    <string name="privacyProtectionNotificationUpgadeDescription">Suojelit tietojasi turvaamalla %1$d salaamatonta yhteyttä DuckDuckGota käyttäessäsi.</string>
+    <string name="privacyProtectionNotificationTrackerDescription">Suojelit tietojasi estämällä %1$d seurantapalvelinta DuckDuckGota käyttäessäsi.</string>
+    <string name="privacyProtectionNotificationBothDescription">Suojelit tietojasi estämällä %1$d seurantapalvelinta ja turvaamalla %2$d salaamatonta yhteyttä DuckDuckGota käyttäessäsi.</string>
     <string name="privacyProtectionNotificationLaunchButton">Jatka selailua</string>
-
+    
     <!-- Authentication -->
     <string name="authenticationDialogTitle">Kirjaudu sisään</string>
-    <string name="authenticationDialogMessage">%s vaatii käyttäjätunnuksen ja salasanan.</string>
+    <string name="authenticationDialogMessage">%1$s vaatii käyttäjätunnuksen ja salasanan.</string>
     <string name="authenticationDialogPositiveButton">Kirjaudu sisään</string>
     <string name="authenticationDialogNegativeButton">Peruuta</string>
     <string name="authenticationDialogUsernameHint">Käyttäjätunnus</string>
@@ -294,7 +298,7 @@
 
     <string name="websiteNotLoadingTitleLong">Osa verkkosivustoista ei lataudu oikein</string>
     <string name="websiteNotLoadingTitleShort">Verkkosivustojen latausongelmat</string>
-    <string name="websiteNotLoadingSubtitle">Mikä verkkosivusto on viallinen?"</string>
+    <string name="websiteNotLoadingSubtitle">Mikä verkkosivusto on viallinen?</string>
 
     <string name="searchNotGoodEnoughTitleLong">DuckDuckGo-haku ei ole riittävän hyvä</string>
     <string name="searchNotGoodEnoughTitleShort">DuckDuckGo-hakuongelmat</string>
@@ -352,12 +356,12 @@
     <string name="feedbackIsImportantToUs">Anonyymi palautteesi on meille tärkeää.</string>
 
     <!-- Webview Recovery -->
-    <string name="crashedWebViewErrorMessage">Verkkosivua ei voitu näyttää.</string>
-    <string name="crashedWebViewErrorAction">Lataa uudelleen</string>
+    <string name="crashedWebViewErrorMessage">"Verkkosivua ei voitu näyttää."</string>
+    <string name="crashedWebViewErrorAction">"Lataa uudelleen"</string>
 
-    <!-- System Search -->
-    <string name="systemSearchOmnibarInputHint"><font size="13">Hae tai kirjoita URL</font></string>
+    <!-- System Search-->
     <string name="systemSearchDeviceAppLabel">Tästä laitteesta</string>
+    <string name="systemSearchOmnibarInputHint"><font size="13">Hae tai kirjoita URL</font></string>
     <string name="systemSearchAppNotFound">Sovellusta ei löytynyt</string>
     <string name="systemSearchOnboardingText">Kiitos, että valitsit DuckDuckGon!\nKun nyt käytät hakua tai sovellusta, hakusi ovat suojattu.</string>
     <string name="systemSearchOnboardingFeaturesIntroText">DuckDuckGo-sovellus myös:</string>
@@ -379,23 +383,23 @@
     <string name="hideTipsButton">Piilota vinkit ikuisesti</string>
 
     <!-- New Onboarding Experience -->
-    <string name="onboardingWelcomeTitle">Tervetuloa DuckDuckGo-sovellukseen!</string>
-    <string name="onboardingDaxText">Internet voi olla pelottava.&lt;br/&gt;&lt;br/&gt;Ei hätää! Yksityinen haku ja selaaminen on helpompaa kuin luulet.</string>
+    <string name="onboardingWelcomeTitle">"Tervetuloa DuckDuckGo-sovellukseen!"</string>
+    <string name="onboardingDaxText"><![CDATA[Internet voi olla pelottava.<br/><br/>Ei hätää! Yksityinen haku ja selaaminen on helpompaa kuin luulet.]]></string>
     <string name="onboardingLetsDoItButton">Aloitetaan!</string>
-    <string name="daxIntroCtaText">Seuraavaksi vieraile suosikkisivustoissasi! &lt;br/&gt;&lt;br/&gt;Estän jäljittäjät, jotta he eivät voi vakoilla sinua. Päivitän myös yhteytesi suojauksen, jos mahdollista. &#128274;</string>
-    <string name="daxEndCtaText">Onnistut varmasti! &lt;br/&gt;&lt;br/&gt;Muista: Joka kerta kun selaat kanssani, rasittavat mainokset katoavat. &#128077;</string>
-    <string name="daxSerpCtaText">DuckDuckGo-haut ovat nimettömiä, enkä koskaan tallenna hakuhistoriaasi. Koskaan. &#128588;</string>
+    <string name="daxIntroCtaText"><![CDATA[Seuraavaksi vieraile suosikkisivustoissasi! <br/><br/>Estän jäljittäjät, jotta he eivät voi vakoilla sinua. Päivitän myös yhteytesi suojauksen, jos mahdollista. 🔒]]></string>
+    <string name="daxEndCtaText"><![CDATA[Onnistut varmasti! <br/><br/>Muista: Joka kerta kun selaat kanssani, rasittavat mainokset katoavat. 👍]]></string>
+    <string name="daxSerpCtaText">DuckDuckGo-haut ovat nimettömiä, enkä koskaan tallenna hakuhistoriaasi. Koskaan. 🙌</string>
     <plurals name="daxTrackersBlockedCtaText">
-        <item quantity="one">&#160;ja &lt;b&gt;%d muu&lt;/b&gt; yritti jäljittää sinua täällä. &lt;br/&gt;&lt;br/&gt;Estin heidät!&lt;br/&gt;&lt;br/&gt; ☝️Voit tarkistaa URL-palkin nähdäksesi kuka yrittää seurata sinua vieraillessasi uudella sivustolla.️</item>
-        <item quantity="other">&#160;ja &lt;b&gt;%d muut&lt;/b&gt; yrittivät jäljittää sinua täällä. &lt;br/&gt;&lt;br/&gt;Estin heidät!&lt;br/&gt;&lt;br/&gt; ☝️Voit tarkistaa URL-palkin nähdäksesi kuka yrittää seurata sinua vieraillessasi uudella sivustolla.️</item>
+        <item quantity="one"><![CDATA[ ja <b>%1$d muu</b> yritti jäljittää sinua täällä. <br/><br/>Estin heidät!<br/><br/> ☝️Voit tarkistaa URL-palkin nähdäksesi kuka yrittää seurata sinua vieraillessasi uudella sivustolla.️]]></item>
+        <item quantity="other"><![CDATA[ ja <b>%1$d muut</b> yrittivät jäljittää sinua täällä. <br/><br/>Estin heidät!<br/><br/> ☝️Voit tarkistaa URL-palkin nähdäksesi kuka yrittää seurata sinua vieraillessasi uudella sivustolla.️]]></item>
     </plurals>
     <plurals name="daxTrackersBlockedCtaZeroText">
-        <item quantity="one">&#160;yritti seurata sinua. &lt;br/&gt;&lt;br/&gt;Estin sen!&lt;br/&gt;&lt;br/&gt; ☝️Voit tarkistaa URL-palkin nähdäksesi kuka yrittää seurata sinua vieraillessasi uudella sivustolla.️</item>
-        <item quantity="other">&#160;yrittivät seurata sinua. &lt;br/&gt;&lt;br/&gt;Estin sen!&lt;br/&gt;&lt;br/&gt; ☝️Voit tarkistaa URL-palkin nähdäksesi kuka yrittää seurata sinua vieraillessasi uudella sivustolla.️</item>
+        <item quantity="one"><![CDATA[ yritti seurata sinua. <br/><br/>Estin sen!<br/><br/> ☝️Voit tarkistaa URL-palkin nähdäksesi kuka yrittää seurata sinua vieraillessasi uudella sivustolla.️]]></item>
+        <item quantity="other"><![CDATA[ yrittivät seurata sinua. <br/><br/>Estin sen!<br/><br/> ☝️Voit tarkistaa URL-palkin nähdäksesi kuka yrittää seurata sinua vieraillessasi uudella sivustolla.️]]></item>
     </plurals>
-    <string name="daxNonSerpCtaText">Kun napautat ja selaat, estän ikävät seurantaohjelmat. &lt;br/&gt;&lt;br/&gt;Siirry eteenpäin - jatka selaamista!</string>
-    <string name="daxMainNetworkOwnedCtaText">Pysy valppaana! %s:n omistaa %s.&lt;br/&gt;&lt;br/&gt; %s:n seurantaohjelmat väijyvät noin %s:lla suosituimmista verkkosivustoista &#128561;, mutta älä huoli! &lt;br/&gt;&lt;br/&gt;Estän %s-väijyjää näkemästä toimintaasi näillä sivustoilla.</string>
-    <string name="daxMainNetworkCtaText">Pysy valppaana! %s on merkittävä seurantaverkko.&lt;br/&gt;&lt;br/&gt; Heidän seurantaohjelmansa väijyvät noin %s:lla suosituimmista sivustoista &#128561;, mutta älä huoli! &lt;br/&gt;&lt;br/&gt;Estän %s-väijyjää näkemästä toimintaasi näillä sivustoilla.</string>
+    <string name="daxNonSerpCtaText"><![CDATA[Kun napautat ja selaat, estän ikävät seurantaohjelmat. <br/><br/>Siirry eteenpäin - jatka selaamista!]]></string>
+    <string name="daxMainNetworkCtaText"><![CDATA[Pysy valppaana! %1$s on merkittävä seurantaverkko.<br/><br/> Heidän seurantaohjelmansa väijyvät noin %2$s:lla suosituimmista sivustoista 😱, mutta älä huoli! <br/><br/>Estän %3$s-väijyjää näkemästä toimintaasi näillä sivustoilla.]]></string>
+    <string name="daxMainNetworkOwnedCtaText">Hälytys! Koska %1$s omistaa palvelun %2$s, en voi estää heitä näkemästä, mitä teet täällä.&lt;br/&gt;&lt;br/&gt;Mutta jos käytät minua selaamiseen, voin vähentää, mitä %3$s saa tietää sinusta estämällä heidän seurantansa monilla muilla sivustoilla.</string>
 
     <!-- Download Confirmation -->
     <string name="downloadConfirmationContinue">Jatka</string>
@@ -426,8 +430,8 @@
     <string name="whitelisetActivityTitle">Suojaamattomat sivustot</string>
     <string name="enablePrivacyProtection">Ota yksityisyyden suoja käyttöön</string>
     <string name="disablePrivacyProtection">Poista yksityisyyden suoja käytöstä</string>
-    <string name="whitelistEntryOverflowContentDescription">Lisää valintoja suojaamattomalle sivustolle %s</string>
-    <string name="whitelistEntryDeleteConfirmMessage">Haluatko varmasti poistaa sivuston &lt;b&gt;%s&lt;/b&gt; suojaamattomista sivustoista?</string>
+    <string name="whitelistEntryOverflowContentDescription">Lisää valintoja suojaamattomalle sivustolle %1$s</string>
+    <string name="whitelistEntryDeleteConfirmMessage">Haluatko varmasti poistaa sivuston &lt;b&gt;%1$s&lt;/b&gt; suojaamattomista sivustoista?</string>
     <string name="whitelistExplanation">Yksityisyyden suoja ei paranna näitä sivustoja.</string>
     <string name="whitelistNoEntries">Ei vielä suojaamattomia sivustoja</string>
     <string name="whitelistDomainHint">www.esimerkki.com</string>
@@ -440,10 +444,24 @@
     <string name="fireproofWebsitesActivityTitle">Palonkestävät verkkosivustot</string>
     <string name="settingsFireproofWebsites">Palonkestävät verkkosivustot</string>
     <string name="fireproofWebsiteMenuTitleAdd">Palonkestävä verkkosivusto</string>
-    <string name="fireproofWebsiteSnackbarConfirmation">&lt;b&gt;%s&lt;/b&gt; on nyt palonkestävä! Siirry asetuksiin oppiaksesi lisää.</string>
+    <string name="fireproofWebsiteSnackbarConfirmation">&lt;b&gt;%1$s&lt;/b&gt; on nyt palonkestävä! Siirry asetuksiin oppiaksesi lisää.</string>
     <string name="fireproofWebsiteSnackbarAction">Kumoa</string>
-    <string name="fireproofWebsiteDeleteConfirmMessage">Haluatko varmasti poistaa &lt;b&gt;%s&lt;/b&gt;?</string>
+    <string name="fireproofWebsiteDeleteConfirmMessage">Haluatko varmasti poistaa &lt;b&gt;%1$s&lt;/b&gt;?</string>
     <string name="fireproofWebsiteEmptyListHint">Yhtään verkkosivustoa ei ole vielä merkitty palokestäväksi</string>
-    <string name="fireproofWebsiteFeatureDescription">Verkkosivustot luottavat evästeisiin pitääksesi sinut kirjautuneena sisään. Kun palosuojaat sivuston, evästeet eivät poistu, ja pysyt kirjautuneena sisään myös Palo-painikkeen käyttämisen jälkeen.</string>
-    <string name="fireproofWebsiteOverflowContentDescription">Lisää vaihtoehtoja palonkestävälle verkkosivustolle %s</string>
+    <string name="fireproofWebsiteFeatureDescription">Verkkosivustot käyttävät evästeitä, joilla pysyt kirjautuneena sisään. Kun teet sivustosta palovarman, evästeitä ei poisteta ja pysyt kirjautuneena sisään, vaikka käytät Liekki-painiketta. Estämme edelleen kolmannen osapuolen seurannan palovarmoilla sivustoilla.</string>
+    <string name="fireproofWebsiteOverflowContentDescription">Lisää vaihtoehtoja palonkestävälle verkkosivustolle %1$s</string>
+    <string name="fireproofWebsiteLoginDialogTitle">Haluatko tehdä sivustosta %1$s palovarman?</string>
+    <string name="fireproofWebsiteLoginDialogDescription">Sivuston tekeminen palovarmaksi tarkoittaa, että pysyt kirjautuneena, vaikka käytät Liekki-painiketta.</string>
+    <string name="fireproofWebsiteLoginDialogPositive">Tee palovarmaksi</string>
+    <string name="fireproofWebsiteLoginDialogNegative">Ei nyt</string>
+    <string name="fireproofWebsiteItemsSectionTitle">Verkkosivustot</string>
+    <string name="fireproofWebsiteToogleText">Kysy kirjautuessa sisään</string>
+
+    <!-- Dos Attack error-->
+    <string name="dosErrorMessage">Yhteys keskeytetty. Verkkosivusto voi vahingoittaa laitettasi.</string>
+
+    <!-- Download Manager problems -->
+    <string name="downloadManagerDisabled">Lataustenhallinta ei ole käytössä</string>
+    <string name="downloadManagerIncompatible">Lataustenhallintaa ei ole saatavilla tällä laitteella</string>
+    <string name="enable">Ota käyttöön</string>
 </resources>

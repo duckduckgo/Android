@@ -77,7 +77,7 @@
     <string name="privacyProtectionEnabled">BESCHERMING VAN DE SITE INGESCHAKELD</string>
     <string name="privacyProtectionDisabled">BESCHERMING VAN DE SITE UITGESCHAKELD</string>
     <string name="privacyDashboardActivityTitle">Privacydashboard</string>
-    <string name="privacyProtectionUpgraded" tools:ignore="TypographyQuotes">VERBETERD VAN &lt;img src="%d" /&gt; NAAR &lt;img src="%d" /&gt;</string>
+    <string name="privacyProtectionUpgraded" tools:ignore="TypographyQuotes">VERBETERD VAN &lt;img src=\"%1$d\" /&gt; NAAR &lt;img src=\"%2$d\" /&gt;</string>
     <string name="privacyGradeContentDescription">Privacyniveau</string>
 
     <string name="httpsGood">Gecodeerde verbinding</string>
@@ -89,23 +89,23 @@
     <string name="networksOverview">Trackernetwerken voegen je webgeschiedenis samen tot een gegevensprofiel over jou. Grote trackernetwerken zijn schadelijker omdat ze je verder op het internet kunnen volgen en zich op je kunnen richten.</string>
 
     <plurals name="trackersFound">
-        <item quantity="one">%s tracker gevonden</item>
-        <item quantity="other">%s trackers gevonden</item>
+        <item quantity="one">%1$s tracker gevonden</item>
+        <item quantity="other">%1$s trackers gevonden</item>
     </plurals>
 
     <plurals name="trackerBlocked">
-        <item quantity="one">%s tracker geblokkeerd</item>
-        <item quantity="other">%s trackers geblokkeerd</item>
+        <item quantity="one">%1$s tracker geblokkeerd</item>
+        <item quantity="other">%1$s trackers geblokkeerd</item>
     </plurals>
 
     <plurals name="majorNetworksFound">
-        <item quantity="one">%s groot trackernetwerk gevonden</item>
-        <item quantity="other">%s grote trackernetwerken gevonden</item>
+        <item quantity="one">%1$s groot trackernetwerk gevonden</item>
+        <item quantity="other">%1$s grote trackernetwerken gevonden</item>
     </plurals>
 
     <plurals name="majorNetworksBlocked">
-        <item quantity="one">%s groot trackernetwerk geblokkeerd</item>
-        <item quantity="other">%s grote trackernetwerken geblokkeerd</item>
+        <item quantity="one">%1$s groot trackernetwerk geblokkeerd</item>
+        <item quantity="other">%1$s grote trackernetwerken geblokkeerd</item>
     </plurals>
 
     <string name="scorecardActivityTitle">Privacyniveau</string>
@@ -115,8 +115,8 @@
 
     <string name="privacyTermsActivityTitle">Privacypraktijken</string>
     <string name="practicesGood">Goede privacypraktijken</string>
-    <string name="practicesMixed">Gemengde privacypraktijken"</string>
-    <string name="practicesBad">"Slechte privacypraktijken"</string>
+    <string name="practicesMixed">Gemengde privacypraktijken</string>
+    <string name="practicesBad">Slechte privacypraktijken</string>
     <string name="practicesUnknown">Onbekende privacypraktijken</string>
     <string name="practicesOverview">Privacypraktijken geven aan in hoeverre de persoonsgegevens die u deelt met een website beschermd zijn.</string>
     <string name="practicesTosdrLink">Privacypraktijken zijn het resultaat van <b><u>ToS;DR</u></b></string>
@@ -162,7 +162,9 @@
     <!-- About Activity -->
     <string name="aboutActivityTitle">Over ons</string>
     <string name="aboutDescription">
-        Bij DuckDuckGo zetten we de nieuwe standaard voor vertrouwen online.\ n\ DuckDuckGo Privacy Browser biedt alle privacy-essentials die je nodig hebt om jezelf te beschermen tijdens het zoeken en browsen op het internet, inclusief trackerblokkering, slimmere codering en DuckDuckGo privé-zoekopdrachten.\ n\ Het internet zou namelijk helemaal niet zo griezelig moeten zijn en de privacy die je online verdient, moet net zo eenvoudig zijn als het sluiten van de gordijnen.</string>
+        Bij DuckDuckGo zetten we de nieuwe standaard voor vertrouwen online.\n\
+        DuckDuckGo Privacy Browser biedt alle privacy-essentials die je nodig hebt om jezelf te beschermen tijdens het zoeken en browsen op het internet, inclusief trackerblokkering, slimmere codering en DuckDuckGo privé-zoekopdrachten.\n\
+        Het internet zou namelijk helemaal niet zo griezelig moeten zijn en de privacy die je online verdient, moet net zo eenvoudig zijn als het sluiten van de gordijnen.</string>
     <string name="aboutMoreLink">Meer informatie op duckduckgo.com/about</string>
     <string name="no_suggestions">Geen suggesties</string>
 
@@ -188,18 +190,20 @@
     <!-- Bookmarks Activity -->
     <string name="bookmarksMenuTitle">Bladwijzers</string>
     <string name="bookmarksActivityTitle">Bladwijzers</string>
-    <string name="bookmarkDeleteConfirmMessage">Weet je zeker dat je bladwijzer &lt;b&gt;%s&lt;/b&gt; wilt verwijderen?</string>
-    <string name="dialogConfirmTitle">Bevestigen</string>
+    <string name="bookmarkDeleteConfirmMessage">Weet je zeker dat je bladwijzer &lt;b&gt;%1$s&lt;/b&gt; wilt verwijderen?</string>
     <string name="bookmarkAddedFeedback">Bladwijzer toegevoegd</string>
     <string name="bookmarkTitleHint">Naam bladwijzer</string>
     <string name="bookmarkUrlHint">URL bladwijzer</string>
-    <string name="dialogSave">Opslaan</string>
     <string name="bookmarkTitleEdit">Bladwijzer bewerken</string>
     <string name="noBookmarks">Nog geen bladwijzers toegevoegd</string>
-    <string name="bookmarkOverflowContentDescription">Meer opties voor bladwijzer %s</string>
+    <string name="bookmarkOverflowContentDescription">Meer opties voor bladwijzer %1$s</string>
+    <string name="bookmarkEdited">Bladwijzer toegevoegd</string>
+
+    <!-- Dialogs -->
+    <string name="dialogConfirmTitle">Bevestigen</string>
+    <string name="dialogSave">Opslaan</string>
     <string name="delete">Verwijderen</string>
     <string name="edit">Bewerken</string>
-    <string name="bookmarkEdited">Bladwijzer toegevoegd</string>
 
     <!-- Widget -->
     <string name="searchWidgetTextHint">DuckDuckGo doorzoeken</string>
@@ -263,14 +267,14 @@
     <string name="privacyProtectionNotificationDefaultTitle">Wij beschermen jouw privacy</string>
     <string name="privacyProtectionNotificationReportTitle">Jouw privacyrapport</string>
     <string name="privacyProtectionNotificationDefaultDescription">Het gebruik van de DuckDuckGo-app beschermt je gegevens door trackers te blokkeren en verbindingen te coderen.</string>
-    <string name="privacyProtectionNotificationUpgadeDescription">Je hebt je gegevens beschermd door %d niet-gecodeerde verbindingen te beveiligen terwijl je DuckDuckGo gebruikt.</string>
-    <string name="privacyProtectionNotificationTrackerDescription">Je hebt je gegevens beschermd door %d trackers te blokkeren terwijl je DuckDuckGo gebruikt.</string>
-    <string name="privacyProtectionNotificationBothDescription">Je hebt je gegevens beschermd door %d trackers te blokkeren en %d niet-gecodeerde verbindingen te beveiligen terwijl je DuckDuckGo gebruikt.</string>
+    <string name="privacyProtectionNotificationUpgadeDescription">Je hebt je gegevens beschermd door %1$d niet-gecodeerde verbindingen te beveiligen terwijl je DuckDuckGo gebruikt.</string>
+    <string name="privacyProtectionNotificationTrackerDescription">Je hebt je gegevens beschermd door %1$d trackers te blokkeren terwijl je DuckDuckGo gebruikt.</string>
+    <string name="privacyProtectionNotificationBothDescription">Je hebt je gegevens beschermd door %1$d trackers te blokkeren en %2$d niet-gecodeerde verbindingen te beveiligen terwijl je DuckDuckGo gebruikt.</string>
     <string name="privacyProtectionNotificationLaunchButton">Ga verder met browsen</string>
-
+    
     <!-- Authentication -->
     <string name="authenticationDialogTitle">Aanmelden</string>
-    <string name="authenticationDialogMessage">%s vereist een gebruikersnaam en wachtwoord.</string>
+    <string name="authenticationDialogMessage">%1$s vereist een gebruikersnaam en wachtwoord.</string>
     <string name="authenticationDialogPositiveButton">Aanmelden</string>
     <string name="authenticationDialogNegativeButton">Annuleren</string>
     <string name="authenticationDialogUsernameHint">Gebruikersnaam</string>
@@ -294,7 +298,7 @@
 
     <string name="websiteNotLoadingTitleLong">Bepaalde websites worden niet correct geladen</string>
     <string name="websiteNotLoadingTitleShort">Problemen met laden van website</string>
-    <string name="websiteNotLoadingSubtitle">Welke website is defect?"</string>
+    <string name="websiteNotLoadingSubtitle">Welke website is defect?</string>
 
     <string name="searchNotGoodEnoughTitleLong">DuckDuckGo-zoekopdracht is niet goed genoeg</string>
     <string name="searchNotGoodEnoughTitleShort">DuckDuckGo zoekproblemen</string>
@@ -352,12 +356,12 @@
     <string name="feedbackIsImportantToUs">Jouw anonieme feedback is belangrijk voor ons.</string>
 
     <!-- Webview Recovery -->
-    <string name="crashedWebViewErrorMessage">De webpagina kon niet worden weergegeven.</string>
-    <string name="crashedWebViewErrorAction">Opnieuw laden</string>
+    <string name="crashedWebViewErrorMessage">"De webpagina kon niet worden weergegeven."</string>
+    <string name="crashedWebViewErrorAction">"Opnieuw laden"</string>
 
-    <!-- System Search -->
-    <string name="systemSearchOmnibarInputHint"><font size="13">URL zoeken of typen</font></string>
+    <!-- System Search-->
     <string name="systemSearchDeviceAppLabel">Van dit apparaat</string>
+    <string name="systemSearchOmnibarInputHint"><font size="13">URL zoeken of typen</font></string>
     <string name="systemSearchAppNotFound">Toepassing kon niet worden gevonden</string>
     <string name="systemSearchOnboardingText">Bedankt dat u voor DuckDuckGo heeft gekozen!\nWanneer u nu onze zoekopdracht of app gebruikt, zijn uw zoekopdrachten beveiligd.</string>
     <string name="systemSearchOnboardingFeaturesIntroText">De DuckDuckGo-app:</string>
@@ -379,23 +383,23 @@
     <string name="hideTipsButton">Tips voor altijd verbergen</string>
 
     <!-- New Onboarding Experience -->
-    <string name="onboardingWelcomeTitle">WELKOM BIJ DUCKDUCKGO!</string>
-    <string name="onboardingDaxText">Het internet kan best eng zijn.&lt;br/&gt;&lt;br/&gt;Maak je geen zorgen! Privé zoeken en browsen is eenvoudiger dan u denkt.</string>
+    <string name="onboardingWelcomeTitle">"WELKOM BIJ DUCKDUCKGO!"</string>
+    <string name="onboardingDaxText"><![CDATA[Het internet kan best eng zijn.<br/><br/>Maak je geen zorgen! Privé zoeken en browsen is eenvoudiger dan u denkt.]]></string>
     <string name="onboardingLetsDoItButton">Laten we het Doen!</string>
-    <string name="daxIntroCtaText">Probeer vervolgens een van uw favoriete sites te bezoeken! &lt;br/&gt;&lt;br/&gt;Ik blokkeer trackers zodat ze u niet kunnen bespioneren. Ik zal ook indien mogelijk de beveiliging van uw verbinding upgraden. &#128274;</string>
-    <string name="daxEndCtaText">U kunt het! &lt;br/&gt;&lt;br/&gt;Denk eraan: elke keer als u met mij surft, verliest een enge advertentie zijn vleugels. &#128077;</string>
-    <string name="daxSerpCtaText">Uw DuckDuckGo-zoekopdrachten zijn anoniem en ik sla uw zoekgeschiedenis nooit op. Nooit. &#128588;</string>
+    <string name="daxIntroCtaText"><![CDATA[Probeer vervolgens een van uw favoriete sites te bezoeken! <br/><br/>Ik blokkeer trackers zodat ze u niet kunnen bespioneren. Ik zal ook indien mogelijk de beveiliging van uw verbinding upgraden. 🔒]]></string>
+    <string name="daxEndCtaText"><![CDATA[U kunt het! <br/><br/>Denk eraan: elke keer als u met mij surft, verliest een enge advertentie zijn vleugels. 👍]]></string>
+    <string name="daxSerpCtaText">Uw DuckDuckGo-zoekopdrachten zijn anoniem en ik sla uw zoekgeschiedenis nooit op. Nooit. 🙌</string>
     <plurals name="daxTrackersBlockedCtaText">
-        <item quantity="one">&#160;en &lt;b&gt;%d anderen &lt;/b&gt; probeerden u hier te volgen. &lt;br/&gt;&lt;br/&gt;Ik heb ze geblokkeerd!&lt;br/&gt;&lt;br/&gt; ☝️U kunt de URL-balk bekijken om te zien wie u probeert te volgen wanneer u een nieuwe site bezoekt.️</item>
-        <item quantity="other">&#160;en &lt;b&gt;%d anderen&lt;/b&gt; probeerden u hier te volgen. &lt;br/&gt;&lt;br/&gt;Ik heb ze geblokkeerd!&lt;br/&gt;&lt;br/&gt; ☝️U kunt de URL-balk bekijken om te zien wie u probeert te volgen wanneer u een nieuwe site bezoekt.️</item>
+        <item quantity="one"><![CDATA[ en <b>%1$d anderen </b> probeerden u hier te volgen. <br/><br/>Ik heb ze geblokkeerd!<br/><br/> ☝️U kunt de URL-balk bekijken om te zien wie u probeert te volgen wanneer u een nieuwe site bezoekt.️]]></item>
+        <item quantity="other"><![CDATA[ en <b>%1$d anderen</b> probeerden u hier te volgen. <br/><br/>Ik heb ze geblokkeerd!<br/><br/> ☝️U kunt de URL-balk bekijken om te zien wie u probeert te volgen wanneer u een nieuwe site bezoekt.️]]></item>
     </plurals>
     <plurals name="daxTrackersBlockedCtaZeroText">
-        <item quantity="one">&#160;probeerde u hier te volgen. &lt;br/&gt;&lt;br/&gt;Ik heb het geblokkeerd!&lt;br/&gt;&lt;br/&gt; ☝️U kunt de URL-balk bekijken om te zien wie u probeert te volgen wanneer u een nieuwe site bezoekt.️</item>
-        <item quantity="other">&#160;probeerden u hier te volgen. &lt;br/&gt;&lt;br/&gt;Ik heb het geblokkeerd!&lt;br/&gt;&lt;br/&gt; ☝️U kunt de URL-balk bekijken om te zien wie u probeert te volgen wanneer u een nieuwe site bezoekt.️</item>
+        <item quantity="one"><![CDATA[ probeerde u hier te volgen. <br/><br/>Ik heb het geblokkeerd!<br/><br/> ☝️U kunt de URL-balk bekijken om te zien wie u probeert te volgen wanneer u een nieuwe site bezoekt.️]]></item>
+        <item quantity="other"><![CDATA[ probeerden u hier te volgen. <br/><br/>Ik heb het geblokkeerd!<br/><br/> ☝️U kunt de URL-balk bekijken om te zien wie u probeert te volgen wanneer u een nieuwe site bezoekt.️]]></item>
     </plurals>
-    <string name="daxNonSerpCtaText">Terwijl je tikt en scrolt, blokkeer ik vervelende trackers. &lt;br/&gt;&lt;br/&gt;Ga je gang - blijf browsen!</string>
-    <string name="daxMainNetworkOwnedCtaText">Let op! %s is eigendom van %s.&lt;br/&gt;De trackers van &lt;br/&gt; %s liggen op de loer op ongeveer %s van de beste websites &#128561; maar maak je geen zorgen! &lt;br/&gt;&lt;br/&gt;Ik blokkeer %s voor het zien van jouw activiteit op die websites.</string>
-    <string name="daxMainNetworkCtaText">Let op! %s is een belangrijk volgnetwerk.&lt;br/&gt;&lt;br/&gt; Hun trackers liggen op de loer op ongeveer %s van de beste sites &#128561; maar maak je geen zorgen! &lt;br/&gt;&lt;br/&gt;Ik blokkeer %s voor het zien van jouw activiteit op die websites.</string>
+    <string name="daxNonSerpCtaText"><![CDATA[Terwijl je tikt en scrolt, blokkeer ik vervelende trackers. <br/><br/>Ga je gang - blijf browsen!]]></string>
+    <string name="daxMainNetworkCtaText"><![CDATA[Let op! %1$s is een belangrijk volgnetwerk.<br/><br/> Hun trackers liggen op de loer op ongeveer %2$s van de beste sites 😱 maar maak je geen zorgen! <br/><br/>Ik blokkeer %3$s voor het zien van jouw activiteit op die websites.]]></string>
+    <string name="daxMainNetworkOwnedCtaText">Opgelet! Omdat %1$s eigenaar is van %2$s, kan ik niet voorkomen dat ze jouw activiteit hier kunnen zien.&lt;br/&gt;&lt;br/&gt;Maar als je met mij surft, kan ik ervoor zorgen dat %3$s minder over je te weten komt door hun trackers op andere sites te blokkeren.</string>
 
     <!-- Download Confirmation -->
     <string name="downloadConfirmationContinue">Doorgaan</string>
@@ -426,8 +430,8 @@
     <string name="whitelisetActivityTitle">Onbeschermde sites</string>
     <string name="enablePrivacyProtection">Privacybescherming inschakelen</string>
     <string name="disablePrivacyProtection">Privacybescherming uitschakelen</string>
-    <string name="whitelistEntryOverflowContentDescription">Meer opties voor onbeschermde site %s</string>
-    <string name="whitelistEntryDeleteConfirmMessage">Weet je zeker dat je &lt;b&gt;%s&lt;/b&gt; wilt verwijderen uit onbeschermde sites?</string>
+    <string name="whitelistEntryOverflowContentDescription">Meer opties voor onbeschermde site %1$s</string>
+    <string name="whitelistEntryDeleteConfirmMessage">Weet je zeker dat je &lt;b&gt;%1$s&lt;/b&gt; wilt verwijderen uit onbeschermde sites?</string>
     <string name="whitelistExplanation">Deze sites worden niet beschermd met Privacybescherming.</string>
     <string name="whitelistNoEntries">Nog geen onbeschermde sites</string>
     <string name="whitelistDomainHint">www.voorbeeld.com</string>
@@ -440,10 +444,24 @@
     <string name="fireproofWebsitesActivityTitle">Brandveilige websites</string>
     <string name="settingsFireproofWebsites">Brandveilige websites</string>
     <string name="fireproofWebsiteMenuTitleAdd">Brandveilige website</string>
-    <string name="fireproofWebsiteSnackbarConfirmation">&lt;b&gt;%s&lt;/b&gt; is nu brandveilig! Ga naar Instellingen voor meer informatie.</string>
+    <string name="fireproofWebsiteSnackbarConfirmation">&lt;b&gt;%1$s&lt;/b&gt; is nu brandveilig! Ga naar Instellingen voor meer informatie.</string>
     <string name="fireproofWebsiteSnackbarAction">Ongedaan maken</string>
-    <string name="fireproofWebsiteDeleteConfirmMessage">Weet je zeker dat je &lt;b&gt;%s&lt;/b&gt; wilt verwijderen?</string>
+    <string name="fireproofWebsiteDeleteConfirmMessage">Weet je zeker dat je &lt;b&gt;%1$s&lt;/b&gt; wilt verwijderen?</string>
     <string name="fireproofWebsiteEmptyListHint">Nog geen websites brandveilig gemaakt</string>
-    <string name="fireproofWebsiteFeatureDescription">Websites vertrouwen op cookies om u aangemeld te houden. Wanneer u een site brandveilig maakt, worden cookies niet gewist en blijft u ingelogd, zelfs na het gebruik van de vuurknop.</string>
-    <string name="fireproofWebsiteOverflowContentDescription">Meer opties voor een vuurvaste website %s</string>
+    <string name="fireproofWebsiteFeatureDescription">Websites gebruiken cookies om te zorgen dat je ingelogd blijft. Als je een site brandveilig maakt, worden de cookies niet gewist en blijf je ingelogd, zelfs nadat je de vuurknop hebt gebruikt. Trackers van derden worden ook op brandveilige websites geblokkeerd.</string>
+    <string name="fireproofWebsiteOverflowContentDescription">Meer opties voor een vuurvaste website %1$s</string>
+    <string name="fireproofWebsiteLoginDialogTitle">Wil je %1$s brandveilig maken?</string>
+    <string name="fireproofWebsiteLoginDialogDescription">Als je deze site brandveilig maakt, blijf je ook na het gebruiken van de vuurknop ingelogd.</string>
+    <string name="fireproofWebsiteLoginDialogPositive">Brandveilig</string>
+    <string name="fireproofWebsiteLoginDialogNegative">Niet nu</string>
+    <string name="fireproofWebsiteItemsSectionTitle">Websites</string>
+    <string name="fireproofWebsiteToogleText">Vragen bij inloggen</string>
+
+    <!-- Dos Attack error-->
+    <string name="dosErrorMessage">Verbinding verbroken. Deze website kan schadelijk zijn voor je apparaat.</string>
+
+    <!-- Download Manager problems -->
+    <string name="downloadManagerDisabled">Downloadbeheerder is uitgeschakeld</string>
+    <string name="downloadManagerIncompatible">Downloadbeheerder is niet beschikbaar op dit apparaat</string>
+    <string name="enable">Inschakelen</string>
 </resources>
