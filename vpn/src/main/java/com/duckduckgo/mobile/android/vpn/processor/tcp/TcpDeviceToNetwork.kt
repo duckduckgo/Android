@@ -28,6 +28,7 @@ import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpPacketProcessor.Compan
 import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpPacketProcessor.PendingWriteData
 import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpStateFlow.Event.*
 import com.duckduckgo.mobile.android.vpn.service.VpnQueues
+import com.google.firebase.perf.metrics.AddTrace
 import timber.log.Timber
 import xyz.hexene.localvpn.ByteBufferPool
 import xyz.hexene.localvpn.Packet
@@ -60,6 +61,7 @@ class TcpDeviceToNetwork(
      * Reads from the device-to-network queue. For any packets in this queue, a new DatagramChannel is created and the packet is written.
      * Instructs the selector we'll be interested in OP_READ for receiving the response to the packet we write.
      */
+    @AddTrace(name = "device_to_network_device_to_network_processing", enabled = true)
     fun deviceToNetworkProcessing() {
         val packet = queues.tcpDeviceToNetwork.take() ?: return
         val startTime = System.nanoTime()
@@ -147,6 +149,7 @@ class TcpDeviceToNetwork(
         }
     }
 
+    @AddTrace(name = "device_to_network_process_packet_tcb_not_initialized", enabled = true)
     private fun processPacketTcbNotInitialized(connectionKey: String, packet: Packet, totalPacketLength: Int, connectionParams: TcpConnectionParams) {
         Timber.i(
             "New packet. $connectionKey. TCB not initialized. ${TcpPacketProcessor.logPacketDetails(
@@ -180,6 +183,7 @@ class TcpDeviceToNetwork(
         }
     }
 
+    @AddTrace(name = "device_to_network_process_packet_tcb_exists", enabled = true)
     private fun processPacketTcbExists(
         connectionKey: String,
         tcb: TCB,
@@ -223,6 +227,7 @@ class TcpDeviceToNetwork(
         }
     }
 
+    @AddTrace(name = "device_to_network_open_connection", enabled = true)
     private fun openConnection(params: TcpConnectionParams) {
         Timber.i("Opening connection to %s:%s", params.destinationAddress, params.destinationPort)
         val (tcb, channel) = connectionInitializer.initializeConnection(params) ?: return
@@ -253,6 +258,7 @@ class TcpDeviceToNetwork(
         }
     }
 
+    @AddTrace(name = "device_to_network_process_packet", enabled = true)
     private fun processPacket(tcb: TCB, packet: Packet, payloadBuffer: ByteBuffer, connectionParams: TcpConnectionParams) {
         val entryTime = System.nanoTime()
         synchronized(tcb) {

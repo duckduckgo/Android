@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "545736167954",
+    "firebase_url": "https://ddg-vpn.firebaseio.com",
+    "project_id": "ddg-vpn",
+    "storage_bucket": "ddg-vpn.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:545736167954:android:e377f593f13f2a29f9fecb",
+        "android_client_info": {
+          "package_name": "com.duckduckgo.mobile.android.nucleus"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "545736167954-7ls5br7c250vttrmngmhgviar7rmf56n.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB6hkQOn0pyBKx3TeEa13jAoKUWIBjV2eQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "545736167954-7ls5br7c250vttrmngmhgviar7rmf56n.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

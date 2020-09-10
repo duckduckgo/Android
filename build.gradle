@@ -3,15 +3,22 @@
 buildscript {
     ext.kotlin_version = '1.3.71'
     ext.jetifier = "1.0.0-beta02"
+    ext.google_services = "4.3.3"
+    ext.gradle_plugin = "3.6.2"
+    ext.google_perf_plugin = "1.3.1"
+    ext.google_crashlytics_plugin = "2.2.1"
 
     repositories {
         google()
         jcenter()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.6.2'
+        classpath "com.android.tools.build:gradle:$gradle_plugin"
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
         classpath "com.android.tools.build.jetifier:jetifier-processor:$jetifier"
+        classpath "com.google.gms:google-services:$google_services"
+        classpath "com.google.firebase:perf-plugin:$google_perf_plugin"
+        classpath "com.google.firebase:firebase-crashlytics-gradle:$google_crashlytics_plugin"
 
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
