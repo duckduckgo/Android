@@ -119,8 +119,8 @@
 
     <string name="privacyTermsActivityTitle">Privacy Practices</string>
     <string name="practicesGood">Good Privacy Practices</string>
-    <string name="practicesMixed">Mixed Privacy Practices"</string>
-    <string name="practicesBad">"Poor Privacy Practices"</string>
+    <string name="practicesMixed">Mixed Privacy Practices</string>
+    <string name="practicesBad">Poor Privacy Practices</string>
     <string name="practicesUnknown">Unknown Privacy Practices</string>
     <string name="practicesOverview">Privacy practices indicate how much the personal information that you share with a website is protected.</string>
     <string name="practicesTosdrLink">Privacy Practices results from&#160;<b><u>ToS;DR</u></b></string>
@@ -304,7 +304,7 @@
 
     <string name="websiteNotLoadingTitleLong">Certainly websites don\'t load correctly</string>
     <string name="websiteNotLoadingTitleShort">Website loading Issues</string>
-    <string name="websiteNotLoadingSubtitle">Which website is broken?"</string>
+    <string name="websiteNotLoadingSubtitle">Which website is broken?</string>
 
     <string name="searchNotGoodEnoughTitleLong">DuckDuckGo search isn\'t good enough</string>
     <string name="searchNotGoodEnoughTitleShort">DuckDuckGo Search Issues</string>
@@ -405,6 +405,7 @@
     </plurals>
     <string name="daxNonSerpCtaText"><![CDATA[As you tap and scroll, I\'ll block pesky trackers. <br/><br/>Go ahead — keep browsing!]]></string>
     <string name="daxMainNetworkCtaText"><![CDATA[Heads up! %s is a major tracking network.<br/><br/> Their trackers lurk on about %s of top sites 😱 but don\'t worry!<br/><br/>I\'ll block %s from seeing your activity on those sites.]]></string>
+    <string name="daxMainNetworkOwnedCtaText">Heads up! Since %s owns %s, I can\'t stop them from seeing your activity here.&lt;br/&gt;&lt;br/&gt;But browse with me, and I can reduce what %s knows about you overall by blocking their trackers on lots of other sites.</string>
 
     <!-- Download Confirmation -->
     <string name="downloadConfirmationContinue">Continue</string>
@@ -453,5 +454,20 @@
     <string name="fireproofWebsiteSnackbarAction">Undo</string>
     <string name="fireproofWebsiteDeleteConfirmMessage">Are you sure you want to delete &lt;b>%s&lt;/b>?</string>
     <string name="fireproofWebsiteEmptyListHint">No websites Fireproofed yet</string>
+    <string name="fireproofWebsiteFeatureDescription">Websites rely on cookies to keep you signed in. When you Fireproof a site, cookies won\'t be erased and you\'ll stay signed in, even after using the Fire Button. We still block third-party trackers found on Fireproof websites.</string>
     <string name="fireproofWebsiteOverflowContentDescription">More options for fireproof website %s</string>
+    <string name="fireproofWebsiteLoginDialogTitle">Would you like to Fireproof %s?</string>
+    <string name="fireproofWebsiteLoginDialogDescription">Fireproofing this site will keep you signed in after using the Fire Button.</string>
+    <string name="fireproofWebsiteLoginDialogPositive">Fireproof</string>
+    <string name="fireproofWebsiteLoginDialogNegative">Not now</string>
+    <string name="fireproofWebsiteItemsSectionTitle">Websites</string>
+    <string name="fireproofWebsiteToogleText">Ask When Signing In</string>
+
+    <!-- Dos Attack error-->
+    <string name="dosErrorMessage">Connection aborted. This website could be harmful to your device.</string>
+
+    <!-- Download Manager problems -->
+    <string name="downloadManagerDisabled">Download Manager is disabled</string>
+    <string name="downloadManagerIncompatible">Download Manager not available on this device</string>
+    <string name="enable">Enable</string>
 </resources>

@@ -39,6 +39,10 @@ class WebViewCookieManager(
         withContext(dispatcher.io()) {
             flush()
         }
+        // The Fire Button does not delete the user's DuckDuckGo search settings, which are saved as cookies.
+        // Removing these cookies would reset them and have undesired consequences, i.e. changing the theme, default language, etc.
+        // These cookies are not stored in a personally identifiable way. For example, the large size setting is stored as 's=l.'
+        // More info in https://duckduckgo.com/privacy
         val ddgCookies = getDuckDuckGoCookies()
         if (cookieManager.hasCookies()) {
             removeCookies.removeCookies()

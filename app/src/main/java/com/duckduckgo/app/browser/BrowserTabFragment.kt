@@ -1583,7 +1583,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
                     }
                 }
 
-                if (!viewState.isLoading) {
+                if (!viewState.isLoading && lastSeenBrowserViewState?.browserShowing == true) {
                     swipeRefreshContainer.isRefreshing = false
                     webView?.detectOverscrollBehavior()
                 }

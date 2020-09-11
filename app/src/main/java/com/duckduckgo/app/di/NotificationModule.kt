@@ -24,20 +24,15 @@ import androidx.work.WorkManager
 import com.duckduckgo.app.browser.addtohome.AddToHomeCapabilityDetector
 import com.duckduckgo.app.notification.AndroidNotificationScheduler
 import com.duckduckgo.app.notification.NotificationFactory
-import com.duckduckgo.app.notification.NotificationHandlerService
 import com.duckduckgo.app.notification.NotificationScheduler
 import com.duckduckgo.app.notification.db.NotificationDao
-import com.duckduckgo.app.notification.model.AppFeatureNotification
 import com.duckduckgo.app.notification.model.ClearDataNotification
 import com.duckduckgo.app.notification.model.UseOurAppNotification
 import com.duckduckgo.app.notification.model.PrivacyProtectionNotification
-import com.duckduckgo.app.notification.model.WebsiteNotification
 import com.duckduckgo.app.privacy.db.PrivacyProtectionCountDao
 import com.duckduckgo.app.settings.db.SettingsDataStore
-import com.duckduckgo.app.statistics.VariantManager
 import dagger.Module
 import dagger.Provides
-import javax.inject.Named
 import javax.inject.Singleton
 
 @Module(includes = [DaoModule::class])
@@ -90,83 +85,16 @@ class NotificationModule {
     }
 
     @Provides
-    @Named("dripA1Notification")
-    fun provideDripA1Notification(
-        context: Context,
-        notificationDao: NotificationDao
-    ): WebsiteNotification {
-        return WebsiteNotification(
-            context,
-            notificationDao,
-            WebsiteNotification.DRIP_A_1_URL,
-            WebsiteNotification.DRIP_A_1_TITLE,
-            WebsiteNotification.DRIP_A_1_DESCRIPTION,
-            WebsiteNotification.DRIP_A_1_PIXEL
-        )
-    }
-
-    @Provides
-    @Named("dripA2Notification")
-    fun provideDripA2Notification(
-        context: Context,
-        notificationDao: NotificationDao
-    ): WebsiteNotification {
-        return WebsiteNotification(
-            context,
-            notificationDao,
-            WebsiteNotification.DRIP_A_2_URL,
-            WebsiteNotification.DRIP_A_2_TITLE,
-            WebsiteNotification.DRIP_A_2_DESCRIPTION,
-            WebsiteNotification.DRIP_A_2_PIXEL
-        )
-    }
-
-    @Provides
-    @Named("dripB1Notification")
-    fun provideADripB1Notification(
-        context: Context,
-        notificationDao: NotificationDao
-    ): AppFeatureNotification {
-        return AppFeatureNotification(
-            context,
-            notificationDao,
-            AppFeatureNotification.DRIP_B_1_TITLE,
-            AppFeatureNotification.DRIP_B_1_DESCRIPTION,
-            AppFeatureNotification.DRIP_B_1_PIXEL,
-            NotificationHandlerService.NotificationEvent.CHANGE_ICON_FEATURE
-        )
-    }
-
-    @Provides
-    @Named("dripB2Notification")
-    fun provideADripB2Notification(
-        context: Context,
-        notificationDao: NotificationDao
-    ): AppFeatureNotification {
-        return AppFeatureNotification(
-            context,
-            notificationDao,
-            AppFeatureNotification.DRIP_B_2_TITLE,
-            AppFeatureNotification.DRIP_B_2_DESCRIPTION,
-            AppFeatureNotification.DRIP_B_2_PIXEL
-        )
-    }
-
-    @Provides
     @Singleton
     fun providesNotificationScheduler(
         workManager: WorkManager,
         clearDataNotification: ClearDataNotification,
-        privacyProtectionNotification: PrivacyProtectionNotification,
-        useOurAppNotification: UseOurAppNotification,
-        variantManager: VariantManager
+        privacyProtectionNotification: PrivacyProtectionNotification
     ): AndroidNotificationScheduler {
         return NotificationScheduler(
             workManager,
             clearDataNotification,
-            privacyProtectionNotification,
-            useOurAppNotification,
-            variantManager
+            privacyProtectionNotification
         )
     }
 
