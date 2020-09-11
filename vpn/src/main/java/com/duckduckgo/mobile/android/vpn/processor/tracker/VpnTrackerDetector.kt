@@ -38,28 +38,33 @@ class DomainBasedTrackerDetector(
 
     override fun determinePacketType(tcb: TCB, packet: Packet, payloadBuffer: ByteBuffer): TrackerType {
         if (tcb.isTracker) return Tracker
-        val host = tcb.hostName ?: determineHost(packet, payloadBuffer).also { tcb.hostName = it }
+        determineHost(tcb, packet, payloadBuffer)
+
+        Timber.i("Host is %s for %s", tcb.hostName, tcb.ipAndPort)
 
         return NonTracker
     }
 
-    private fun determineHost(packet: Packet, payloadBuffer: ByteBuffer): String? {
+    private fun determineHost(tcb: TCB, packet: Packet, payloadBuffer: ByteBuffer) {
+        if(tcb.hostName != null) return
+
         val payloadBytes = payloadBytesExtractor.extract(packet, payloadBuffer)
 
         var host = hostNameHeaderExtractor.extract(String(payloadBytes, StandardCharsets.US_ASCII))
         if (host != null) {
             Timber.v("Found domain from plaintext headers: %s", host)
-            return host
+            tcb.hostName = host
+            return
         }
 
         host = encryptedRequestHostExtractor.extract(payloadBytes)
         if (host != null) {
             Timber.v("Found domain from encrypted headers: %s", host)
-            return host
+            tcb.hostName = host
+            return
         }
 
         Timber.w("Failed to extract host")
-        return null
     }
 }
 

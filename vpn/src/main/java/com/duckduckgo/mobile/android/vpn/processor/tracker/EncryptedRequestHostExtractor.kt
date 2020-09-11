@@ -24,16 +24,22 @@ interface EncryptedRequestHostExtractor {
     fun extract(packet: ByteArray): String?
 }
 
+// based on https://www.ietf.org/rfc/rfc5246.txt
 class ServerNameIndicationHeaderHostExtractor : EncryptedRequestHostExtractor {
 
     override fun extract(packet: ByteArray): String? {
 
-        if (!isClientHelloProtocol(packet)) {
-            Timber.v("Not a Client Hello packet")
+        try {
+            if (!isClientHelloProtocol(packet)) {
+                Timber.v("Not a Client Hello packet")
+                return null
+            }
+            return extractHostFromClientHelloSniHeader(packet)
+        } catch (t: Throwable) {
+            Timber.w(t, "Failed to extract ClientHello domain")
             return null
         }
 
-        return extractHostFromClientHelloSniHeader(packet)
     }
 
     private fun extractHostFromClientHelloSniHeader(packet: ByteArray): String? {
@@ -93,18 +99,13 @@ class ServerNameIndicationHeaderHostExtractor : EncryptedRequestHostExtractor {
                 Timber.i("Found extension type for SNI at index %d", index)
                 return index
             } else {
-                val extensionLengthHigher = HigherOrderByte(packet[index])
-                index++
-
-                val extensionLengthLower = LowerOrderByte(packet[index])
-                index++
-
-                val extensionLength = addHigherLowerOrderBytes(extensionLengthHigher, extensionLengthLower)
+                val extensionLength = HigherOrderByte(packet[index]) + LowerOrderByte(packet[index + 1])
+                index += 2
 
                 // skip to next extension, if there is a next one
                 index += extensionLength
 
-                // record number of extension bytes search, which is the current extension length + 4 (2 bytes for type, 2 bytes for length)
+                // record number of extension bytes searched, which is the current extension length + 4 (2 bytes for type, 2 bytes for length)
                 extensionBytesSearched += extensionLength + 4
             }
         }
@@ -112,7 +113,6 @@ class ServerNameIndicationHeaderHostExtractor : EncryptedRequestHostExtractor {
         return -1
     }
 
-    // based on https://www.ietf.org/rfc/rfc5246.txt
     private fun isClientHelloProtocol(packet: ByteArray): Boolean {
         if (packet.size < TLS_HEADER_SIZE) {
             return false
@@ -122,7 +122,7 @@ class ServerNameIndicationHeaderHostExtractor : EncryptedRequestHostExtractor {
         val tlsVersionMajor = packet[1].toInt()
         val tlsVersionMinor = packet[2].toInt()
 
-        Timber.i("Got TLS version, major:%d, minor:%d. Content type=%d", tlsVersionMajor, tlsVersionMinor, contentType)
+        Timber.i("Got TLS version, major:%d, minor:%d. Content type=%d. Packet size=%d", tlsVersionMajor, tlsVersionMinor, contentType, packet.size)
 
         if (tlsVersionMajor < 0x03) {
             Timber.v("TLS version wouldn't include a SNI header so no point in looking further for it")
@@ -138,7 +138,7 @@ class ServerNameIndicationHeaderHostExtractor : EncryptedRequestHostExtractor {
 
         if (packet.size < handshakeLength + TLS_HEADER_SIZE) {
             Timber.w("TLS packet size unexpected. Handshake size reported %d is greater than total packet size %d", handshakeLength, packet.size)
-            return false
+            //return false
         }
 
         val handshakeMessageType = packet[TLS_HEADER_SIZE]
