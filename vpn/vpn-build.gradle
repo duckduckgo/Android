@@ -57,8 +57,12 @@ ext {
     lifecycle = "2.2.0"
     androidXTest = "1.2.0"
 
+    firebasePerf = "19.0.8"
+    firebaseCrash = "17.2.1"
+
     mockitoAndroid = "3.5.2"
     mockitoKotlin = "2.0.0"
+
 }
 
 dependencies {
@@ -71,6 +75,9 @@ dependencies {
     implementation "androidx.core:core-ktx:$androidKtxCore"
     implementation "com.google.android.material:material:$materialDesign"
     implementation "androidx.constraintlayout:constraintlayout:$constraintLayout"
+
+    implementation "com.google.firebase:firebase-perf:$firebasePerf"
+    implementation "com.google.firebase:firebase-crashlytics-ktx:$firebaseCrash"
 
     implementation "androidx.lifecycle:lifecycle-extensions:$lifecycle"
     implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycle"

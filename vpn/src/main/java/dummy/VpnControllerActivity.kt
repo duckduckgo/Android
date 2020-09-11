@@ -31,6 +31,7 @@ import com.duckduckgo.mobile.android.vpn.R
 import kotlinx.coroutines.*
 import timber.log.Timber
 import xyz.hexene.localvpn.Packet
+import java.lang.RuntimeException
 import java.nio.ByteBuffer
 
 class VpnControllerActivity : AppCompatActivity(R.layout.activity_vpn_controller), CoroutineScope by MainScope() {
@@ -164,7 +165,6 @@ class VpnControllerActivity : AppCompatActivity(R.layout.activity_vpn_controller
 
     private val runningButtonChangeListener = CompoundButton.OnCheckedChangeListener { _, checked ->
         Timber.i("Toggle changed. enabled=$checked")
-
         if (checked) {
             startVpnIfAllowed()
         } else {

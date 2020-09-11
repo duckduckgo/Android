@@ -19,6 +19,7 @@ package com.duckduckgo.mobile.android.vpn.processor.tcp
 import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpStateFlow.Event.*
 import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpStateFlow.Event.MoveState.MoveClientToState
 import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpStateFlow.Event.MoveState.MoveServerToState
+import com.google.firebase.perf.metrics.AddTrace
 import timber.log.Timber
 import xyz.hexene.localvpn.Packet
 import xyz.hexene.localvpn.TCB
@@ -29,6 +30,7 @@ class TcpStateFlow {
 
     companion object {
 
+        @AddTrace(name = "tcp_state_flow_new_packet", enabled = true)
         fun newPacket(
             connectionKey: String,
             currentState: TcbState,
@@ -58,6 +60,7 @@ class TcpStateFlow {
             return TcpStateAction(newActions)
         }
 
+        @AddTrace(name = "tcp_state_flow_handle_time_wait", enabled = true)
         private fun handlePacketInTimeWait(packetType: PacketType): List<Event> {
             return when {
                 packetType.isRst -> {
@@ -68,6 +71,7 @@ class TcpStateFlow {
             }
         }
 
+        @AddTrace(name = "tcp_state_flow_handle_last_ack", enabled = true)
         private fun handlePacketInLastAck(packetType: PacketType, connectionKey: String): List<Event> {
             return when {
                 packetType.isRst -> {
@@ -97,6 +101,7 @@ class TcpStateFlow {
             return match
         }
 
+        @AddTrace(name = "tcp_state_flow_handle_fin_wait_1", enabled = true)
         private fun handlePacketInFinWait1(connectionKey: String, currentState: TcbState, packetType: PacketType): List<Event> {
             val eventList = mutableListOf<Event>()
 
@@ -119,6 +124,7 @@ class TcpStateFlow {
             return eventList
         }
 
+        @AddTrace(name = "tcp_state_flow_handle_fin_wait_2", enabled = true)
         private fun handlePacketInFinWait2(connectionKey: String, currentState: TcbState, packetType: PacketType): List<Event> {
             val eventList = mutableListOf<Event>()
 
@@ -147,6 +153,7 @@ class TcpStateFlow {
 //            }
 //        }
 //
+        @AddTrace(name = "tcp_state_flow_handle_closing", enabled = true)
         private fun handlePacketInClosing(connectionKey: String, currentState: TcbState, packetType: PacketType): List<Event> {
             val eventList = mutableListOf<Event>()
 
@@ -204,6 +211,8 @@ class TcpStateFlow {
 //            }
 //        }
 //
+
+        @AddTrace(name = "tcp_state_flow_handle_listen", enabled = true)
         private fun handlePacketInStateListen(connectionKey: String, currentState: TcbState, packetType: PacketType): List<Event> {
             return when {
                 packetType.isRst -> listOf(CloseConnection)
@@ -237,6 +246,7 @@ class TcpStateFlow {
 //            return TcpStateAction()
 //        }
 //
+        @AddTrace(name = "tcp_state_flow_handle_syn_received", enabled = true)
         private fun handlePacketInSynReceived(connectionKey: String, currentState: TcbState, packetType: PacketType, initialSequenceNumberToClient: Long): List<Event> {
             return when {
                 packetType.isRst -> listOf(CloseConnection)
@@ -251,6 +261,7 @@ class TcpStateFlow {
             }
         }
 
+        @AddTrace(name = "tcp_state_flow_handle_established", enabled = true)
         private fun handlePacketInEstablished(connectionKey: String, currentState: TcbState, packetType: PacketType): List<Event> {
             return when {
                 packetType.isFin -> {

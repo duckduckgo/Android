@@ -16,6 +16,7 @@
 
 package com.duckduckgo.mobile.android.vpn.processor.tcp
 
+import com.google.firebase.perf.metrics.AddTrace
 import timber.log.Timber
 import xyz.hexene.localvpn.Packet
 import java.nio.ByteBuffer
@@ -29,6 +30,7 @@ interface SocketWriter {
 class TcpSocketWriter(private val selector:Selector) : SocketWriter{
 
     @Synchronized
+    @AddTrace(name = "socket_writer_write_to_socket", enabled = true)
     override fun writeToSocket(writeData: TcpPacketProcessor.PendingWriteData): Boolean {
         Timber.v("Writing data to socket ${writeData.tcb.ipAndPort}: ${writeData.payloadSize} bytes")
         val payloadBuffer = writeData.payloadBuffer
