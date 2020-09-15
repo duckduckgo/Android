@@ -24,7 +24,8 @@ import com.duckduckgo.mobile.android.vpn.processor.tcp.ConnectionInitializer.Tcp
 import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpStateFlow.Event.MoveState
 import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpStateFlow.Event.MoveState.MoveClientToState
 import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpStateFlow.Event.MoveState.MoveServerToState
-import com.duckduckgo.mobile.android.vpn.processor.tracker.VpnTrackerDetector
+import com.duckduckgo.mobile.android.vpn.processor.tcp.hostname.HostnameExtractor
+import com.duckduckgo.mobile.android.vpn.processor.tcp.tracker.VpnTrackerDetector
 import com.duckduckgo.mobile.android.vpn.service.NetworkChannelCreator
 import com.duckduckgo.mobile.android.vpn.service.VpnQueues
 import com.google.firebase.perf.metrics.AddTrace
@@ -32,8 +33,7 @@ import kotlinx.coroutines.Job
 import timber.log.Timber
 import xyz.hexene.localvpn.ByteBufferPool
 import xyz.hexene.localvpn.Packet
-import xyz.hexene.localvpn.Packet.TCPHeader.ACK
-import xyz.hexene.localvpn.Packet.TCPHeader.FIN
+import xyz.hexene.localvpn.Packet.TCPHeader.*
 import xyz.hexene.localvpn.TCB
 import xyz.hexene.localvpn.TCB.TCBStatus.FIN_WAIT_2
 import xyz.hexene.localvpn.TCB.TCBStatus.LAST_ACK
@@ -43,7 +43,12 @@ import java.nio.channels.SocketChannel
 import java.util.concurrent.Executors
 import kotlin.math.pow
 
-class TcpPacketProcessor(queues: VpnQueues, networkChannelCreator: NetworkChannelCreator, trackerDetector: VpnTrackerDetector) : Runnable {
+class TcpPacketProcessor(
+    queues: VpnQueues,
+    networkChannelCreator: NetworkChannelCreator,
+    trackerDetector: VpnTrackerDetector,
+    hostnameExtractor: HostnameExtractor
+) : Runnable {
 
     val selector: Selector = Selector.open()
 
@@ -55,7 +60,15 @@ class TcpPacketProcessor(queues: VpnQueues, networkChannelCreator: NetworkChanne
     private val tcpSocketWriter = TcpSocketWriter(selector)
     private val tcpNetworkToDevice = TcpNetworkToDevice(queues, selector, tcpSocketWriter, handler)
     private val tcpDeviceToNetwork =
-        TcpDeviceToNetwork(queues, selector, tcpSocketWriter, TcpConnectionInitializer(queues, networkChannelCreator), handler, trackerDetector)
+        TcpDeviceToNetwork(
+            queues,
+            selector,
+            tcpSocketWriter,
+            TcpConnectionInitializer(queues, networkChannelCreator),
+            handler,
+            trackerDetector,
+            hostnameExtractor
+        )
 
     private val readWriteExecutorService = Executors.newFixedThreadPool(2)
 
@@ -224,16 +237,19 @@ class TcpPacketProcessor(queues: VpnQueues, networkChannelCreator: NetworkChanne
         @AddTrace(name = "packet_processor_send_reset", enabled = true)
         fun TCB.sendResetPacket(queues: VpnQueues, payloadSize: Int) {
             val buffer = ByteBufferPool.acquire()
+
+            val responseAck = acknowledgementNumberToClient + payloadSize
+            val responseSeq = acknowledgementNumberToServer
+
             synchronized(this) {
                 Timber.i(
-                    "%s - Sending RST, previous seqNum=%d, payloadSize=%d, ackNum =%d",
+                    "%s - Sending RST, response=[seqNum=%d, ackNum=%d] - previous=[seqNum=%d, ackNum =%d, payloadSize=%d]",
                     ipAndPort,
-                    sequenceNumberToClient,
-                    payloadSize,
-                    acknowledgementNumberToClient
+                    responseSeq, responseAck,
+                    sequenceNumberToClient, acknowledgementNumberToClient, payloadSize
                 )
 
-                this.referencePacket.updateTcpBuffer(buffer, Packet.TCPHeader.RST.toByte(), 0, this.acknowledgementNumberToClient + payloadSize, 0)
+                this.referencePacket.updateTcpBuffer(buffer, (RST or ACK).toByte(), responseSeq, responseAck, 0)
             }
             queues.networkToDevice.offerFirst(buffer)
             TCB.closeTCB(this)

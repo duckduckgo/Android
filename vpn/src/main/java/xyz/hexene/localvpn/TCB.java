@@ -39,7 +39,9 @@ public class TCB {
     public long finSequenceNumberToClient = -1;
 
     public TcbState tcbState;
-    public boolean isTracker;
+
+    public boolean isTracker = false;
+    public boolean trackerTypeDetermined = false;
 
     @Nullable
     public String hostName = null;

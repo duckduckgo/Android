@@ -27,8 +27,9 @@ import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpPacketProcessor.Compan
 import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpPacketProcessor.Companion.updateState
 import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpPacketProcessor.PendingWriteData
 import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpStateFlow.Event.*
-import com.duckduckgo.mobile.android.vpn.processor.tracker.TrackerType
-import com.duckduckgo.mobile.android.vpn.processor.tracker.VpnTrackerDetector
+import com.duckduckgo.mobile.android.vpn.processor.tcp.hostname.HostnameExtractor
+import com.duckduckgo.mobile.android.vpn.processor.tcp.tracker.RequestTrackerType
+import com.duckduckgo.mobile.android.vpn.processor.tcp.tracker.VpnTrackerDetector
 import com.duckduckgo.mobile.android.vpn.service.VpnQueues
 import com.google.firebase.perf.metrics.AddTrace
 import timber.log.Timber
@@ -49,7 +50,8 @@ class TcpDeviceToNetwork(
     private val socketWriter: SocketWriter,
     private val connectionInitializer: ConnectionInitializer,
     private val handler: Handler,
-    private val trackerDetector: VpnTrackerDetector
+    private val trackerDetector: VpnTrackerDetector,
+    private val hostnameExtractor: HostnameExtractor
 ) {
 
     var lastTimePacketConsumed = 0L
@@ -268,12 +270,13 @@ class TcpDeviceToNetwork(
             val payloadSize = payloadBuffer.limit() - payloadBuffer.position()
             if (payloadSize == 0) return
 
-            when(val type = trackerDetector.determinePacketType(tcb, packet, payloadBuffer)) {
-                is TrackerType.Tracker -> {
-                    Timber.w("Tracker found for %s", tcb.ipAndPort)
-                    tcb.isTracker = true
-                    TODO("Tracker found - need to *not* process packet (drop, RST or FIN?)")
-                }
+            val isTracker = determineIfTracker(tcb, packet, payloadBuffer)
+
+            if (isTracker) {
+                Timber.w("Found a tracker: %s", tcb.hostName)
+                // TODO - send RESET, DROP packet?
+                tcb.sendResetPacket(queues, payloadSize)
+                return
             }
 
             if (!tcb.waitingForNetworkData) {
@@ -304,6 +307,32 @@ class TcpDeviceToNetwork(
         }
         measurePacketProcessingTimes(entryTime)
         queues.networkToDevice.offer(connectionParams.responseBuffer)
+    }
+
+    private fun determineIfTracker(tcb: TCB, packet: Packet, payloadBuffer: ByteBuffer): Boolean {
+        if (tcb.trackerTypeDetermined) {
+            return tcb.isTracker
+        }
+
+        val hostname = hostnameExtractor.extract(tcb, packet, payloadBuffer)
+        when (trackerDetector.determinePacketType(tcb, hostname)) {
+            RequestTrackerType.Tracker -> {
+                Timber.w("Determined that %s is a tracker %s", hostname, tcb.ipAndPort)
+                tcb.trackerTypeDetermined = true
+                tcb.isTracker = true
+                return true
+            }
+            RequestTrackerType.NotTracker -> {
+                Timber.v("Determined that %s is not a tracker %s", hostname, tcb.ipAndPort)
+                tcb.trackerTypeDetermined = true
+                tcb.isTracker = false
+                return false
+            }
+            RequestTrackerType.Undetermined -> {
+                Timber.w("Failed to determine if %s is a tracker %s", hostname, tcb.ipAndPort)
+                return false
+            }
+        }
     }
 
     private fun processDuplicateSyn(tcb: TCB, params: TcpConnectionParams) {

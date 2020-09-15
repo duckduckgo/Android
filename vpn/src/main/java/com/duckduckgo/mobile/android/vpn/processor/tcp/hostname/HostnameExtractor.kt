@@ -14,10 +14,8 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.mobile.android.vpn.processor.tracker
+package com.duckduckgo.mobile.android.vpn.processor.tcp.hostname
 
-import com.duckduckgo.mobile.android.vpn.processor.tracker.TrackerType.NonTracker
-import com.duckduckgo.mobile.android.vpn.processor.tracker.TrackerType.Tracker
 import timber.log.Timber
 import xyz.hexene.localvpn.Packet
 import xyz.hexene.localvpn.TCB
@@ -25,28 +23,27 @@ import java.nio.ByteBuffer
 import java.nio.charset.StandardCharsets
 
 
-interface VpnTrackerDetector {
+interface HostnameExtractor {
 
-    fun determinePacketType(tcb: TCB, packet: Packet, payloadBuffer: ByteBuffer): TrackerType
+    fun extract(tcb: TCB, packet: Packet, payloadBuffer: ByteBuffer): String?
+
 }
 
-class DomainBasedTrackerDetector(
+class AndroidHostnameExtractor(
     private val hostNameHeaderExtractor: HostNameHeaderExtractor,
     private val encryptedRequestHostExtractor: EncryptedRequestHostExtractor,
     private val payloadBytesExtractor: PayloadBytesExtractor
-) : VpnTrackerDetector {
+) : HostnameExtractor {
 
-    override fun determinePacketType(tcb: TCB, packet: Packet, payloadBuffer: ByteBuffer): TrackerType {
-        if (tcb.isTracker) return Tracker
+    override fun extract(tcb: TCB, packet: Packet, payloadBuffer: ByteBuffer): String? {
+        if (tcb.hostName != null) return tcb.hostName
         determineHost(tcb, packet, payloadBuffer)
-
         Timber.i("Host is %s for %s", tcb.hostName, tcb.ipAndPort)
-
-        return NonTracker
+        return tcb.hostName
     }
 
     private fun determineHost(tcb: TCB, packet: Packet, payloadBuffer: ByteBuffer) {
-        if(tcb.hostName != null) return
+        if (tcb.hostName != null) return
 
         val payloadBytes = payloadBytesExtractor.extract(packet, payloadBuffer)
 
@@ -66,10 +63,6 @@ class DomainBasedTrackerDetector(
 
         Timber.w("Failed to extract host")
     }
+
 }
 
-
-sealed class TrackerType {
-    object Tracker : TrackerType()
-    object NonTracker : TrackerType()
-}

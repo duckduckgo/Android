@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.mobile.android.vpn.processor.tracker
+package com.duckduckgo.mobile.android.vpn.processor.tcp.hostname
 
 import xyz.hexene.localvpn.Packet
 import java.nio.ByteBuffer

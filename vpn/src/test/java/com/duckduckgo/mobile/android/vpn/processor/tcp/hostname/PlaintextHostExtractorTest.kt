@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.mobile.android.vpn.processor.tracker
+package com.duckduckgo.mobile.android.vpn.processor.tcp.hostname
 
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull

@@ -14,9 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.mobile.android.vpn.processor.tracker
-
-import timber.log.Timber
+package com.duckduckgo.mobile.android.vpn.processor.tcp.hostname
 
 
 interface HostNameHeaderExtractor {

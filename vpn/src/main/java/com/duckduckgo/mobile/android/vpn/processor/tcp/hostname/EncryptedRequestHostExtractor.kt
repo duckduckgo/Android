@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.mobile.android.vpn.processor.tracker
+package com.duckduckgo.mobile.android.vpn.processor.tcp.hostname
 
 import timber.log.Timber
 import kotlin.text.Charsets.US_ASCII
@@ -49,7 +49,9 @@ class ServerNameIndicationHeaderHostExtractor : EncryptedRequestHostExtractor {
         index++
         index += sessionIdLength
 
-        val cipherSuitesLength = HigherOrderByte(packet[index]) + LowerOrderByte(packet[index + 1])
+        val cipherSuitesLength = HigherOrderByte(packet[index]) + LowerOrderByte(
+            packet[index + 1]
+        )
         index += 2
         index += cipherSuitesLength
 
@@ -57,7 +59,9 @@ class ServerNameIndicationHeaderHostExtractor : EncryptedRequestHostExtractor {
         index++
         index += compressionMethodLength
 
-        val extensionsLength = HigherOrderByte(packet[index]) + LowerOrderByte(packet[index + 1])
+        val extensionsLength = HigherOrderByte(packet[index]) + LowerOrderByte(
+            packet[index + 1]
+        )
         index += 2
         if (extensionsLength == 0) {
             return null
@@ -71,7 +75,9 @@ class ServerNameIndicationHeaderHostExtractor : EncryptedRequestHostExtractor {
         // skip 5 bytes for data sizes we don't need to know about
         index += 5
 
-        val serverNameLength = HigherOrderByte(packet[index]) + LowerOrderByte(packet[index + 1])
+        val serverNameLength = HigherOrderByte(packet[index]) + LowerOrderByte(
+            packet[index + 1]
+        )
         index += 2
         val serverNameBytes = ByteArray(serverNameLength)
 
@@ -99,7 +105,9 @@ class ServerNameIndicationHeaderHostExtractor : EncryptedRequestHostExtractor {
                 Timber.i("Found extension type for SNI at index %d", index)
                 return index
             } else {
-                val extensionLength = HigherOrderByte(packet[index]) + LowerOrderByte(packet[index + 1])
+                val extensionLength = HigherOrderByte(packet[index]) + LowerOrderByte(
+                    packet[index + 1]
+                )
                 index += 2
 
                 // skip to next extension, if there is a next one
