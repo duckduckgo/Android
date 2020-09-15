@@ -273,7 +273,6 @@ class TcpDeviceToNetwork(
             val isTracker = determineIfTracker(tcb, packet, payloadBuffer)
 
             if (isTracker) {
-                Timber.w("Found a tracker: %s", tcb.hostName)
                 // TODO - send RESET, DROP packet?
                 tcb.sendResetPacket(queues, payloadSize)
                 return
