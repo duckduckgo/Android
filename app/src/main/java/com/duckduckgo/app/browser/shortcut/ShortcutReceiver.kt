@@ -24,21 +24,12 @@ import android.widget.Toast
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.shortcut.ShortcutBuilder.Companion.SHORTCUT_TITLE_ARG
 import com.duckduckgo.app.browser.shortcut.ShortcutBuilder.Companion.SHORTCUT_URL_ARG
-import com.duckduckgo.app.global.DispatcherProvider
-import com.duckduckgo.app.global.events.db.UserEventsStore
-import com.duckduckgo.app.global.events.db.UserEventKey
 import com.duckduckgo.app.global.useourapp.UseOurAppDetector
-import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.pixels.Pixel
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 class ShortcutReceiver @Inject constructor(
-    private val userEventsStore: UserEventsStore,
-    private val dispatcher: DispatcherProvider,
     private val useOurAppDetector: UseOurAppDetector,
-    private val variantManager: VariantManager,
     private val pixel: Pixel
 ) :
     BroadcastReceiver() {
@@ -53,15 +44,10 @@ class ShortcutReceiver @Inject constructor(
             }
         }
 
-        GlobalScope.launch(dispatcher.io()) {
-            if (useOurAppDetector.isUseOurAppUrl(originUrl)) {
-                pixel.fire(Pixel.PixelName.USE_OUR_APP_SHORTCUT_ADDED)
-                if (variantManager.getVariant().hasFeature(VariantManager.VariantFeature.InAppUsage)) {
-                    userEventsStore.registerUserEvent(UserEventKey.USE_OUR_APP_SHORTCUT_ADDED)
-                }
-            } else {
-                pixel.fire(Pixel.PixelName.SHORTCUT_ADDED)
-            }
+        if (useOurAppDetector.isUseOurAppUrl(originUrl)) {
+            pixel.fire(Pixel.PixelName.USE_OUR_APP_SHORTCUT_ADDED)
+        } else {
+            pixel.fire(Pixel.PixelName.SHORTCUT_ADDED)
         }
     }
 

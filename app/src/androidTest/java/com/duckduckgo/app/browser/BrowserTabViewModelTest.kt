@@ -39,6 +39,7 @@ import com.duckduckgo.app.bookmarks.db.BookmarkEntity
 import com.duckduckgo.app.bookmarks.db.BookmarksDao
 import com.duckduckgo.app.browser.BrowserTabViewModel.Command
 import com.duckduckgo.app.browser.BrowserTabViewModel.Command.Navigate
+import com.duckduckgo.app.browser.BrowserTabViewModel.FireButton
 import com.duckduckgo.app.browser.LongPressHandler.RequiredAction.DownloadFile
 import com.duckduckgo.app.browser.LongPressHandler.RequiredAction.OpenInNewTab
 import com.duckduckgo.app.browser.addtohome.AddToHomeCapabilityDetector
@@ -104,6 +105,7 @@ import com.nhaarman.mockitokotlin2.*
 import io.reactivex.Observable
 import io.reactivex.Single
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runBlockingTest
 import org.junit.After
@@ -248,6 +250,8 @@ class BrowserTabViewModelTest {
         locationPermissionsDao = db.locationPermissionsDao()
 
         mockAutoCompleteApi = AutoCompleteApi(mockAutoCompleteService, mockBookmarksDao)
+
+        whenever(mockDismissedCtaDao.dismissedCtas()).thenReturn(emptyFlow())
 
         ctaViewModel = CtaViewModel(
             mockAppInstallStore,
@@ -795,31 +799,31 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenInitialisedThenFireButtonIsShown() {
-        assertTrue(browserViewState().showFireButton)
+        assertTrue(browserViewState().fireButton is FireButton.Visible)
     }
 
     @Test
     fun whenOmnibarInputDoesNotHaveFocusAndHasQueryThenFireButtonIsShown() {
         testee.onOmnibarInputStateChanged("query", false, hasQueryChanged = false)
-        assertTrue(browserViewState().showFireButton)
+        assertTrue(browserViewState().fireButton is FireButton.Visible)
     }
 
     @Test
     fun whenOmnibarInputDoesNotHaveFocusOrQueryThenFireButtonIsShown() {
         testee.onOmnibarInputStateChanged("", false, hasQueryChanged = false)
-        assertTrue(browserViewState().showFireButton)
+        assertTrue(browserViewState().fireButton is FireButton.Visible)
     }
 
     @Test
     fun whenOmnibarInputHasFocusAndNoQueryThenFireButtonIsShown() {
         testee.onOmnibarInputStateChanged("", true, hasQueryChanged = false)
-        assertTrue(browserViewState().showFireButton)
+        assertTrue(browserViewState().fireButton is FireButton.Visible)
     }
 
     @Test
     fun whenOmnibarInputHasFocusAndQueryThenFireButtonIsHidden() {
         testee.onOmnibarInputStateChanged("query", true, hasQueryChanged = false)
-        assertFalse(browserViewState().showFireButton)
+        assertTrue(browserViewState().fireButton is FireButton.Gone)
     }
 
     @Test
