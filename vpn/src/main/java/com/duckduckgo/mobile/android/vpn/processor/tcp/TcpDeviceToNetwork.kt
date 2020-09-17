@@ -221,11 +221,11 @@ class TcpDeviceToNetwork(
             when (it) {
                 is MoveState -> tcb.updateState(it)
                 ProcessPacket -> processPacket(tcb, packet, payloadBuffer, connectionParams)
-                SendFin -> tcb.sendFinToClient(queues, packet, connectionParams)
-                DelayedSendFin -> handler.postDelayed(3_000) { tcb.sendFinToClient(queues, packet, connectionParams) }
+                SendFin -> tcb.sendFinToClient(queues, packet)
+                DelayedSendFin -> handler.postDelayed(3_000) { tcb.sendFinToClient(queues, packet) }
                 CloseConnection -> tcb.closeConnection(responseBuffer)
                 DelayedCloseConnection -> handler.postDelayed(3_000) { tcb.closeConnection(responseBuffer) }
-                SendAck -> tcb.sendAck(queues, packet, connectionParams)
+                SendAck -> tcb.sendAck(queues, packet)
                 else -> Timber.e("Unknown event for how to process device-to-network packet: ${action.events}")
             }
 
@@ -274,7 +274,7 @@ class TcpDeviceToNetwork(
 
             if (isTracker) {
                 // TODO - send RESET, DROP packet?
-                tcb.sendResetPacket(queues, payloadSize)
+                tcb.sendResetPacket(queues, packet, payloadSize)
                 return
             }
 
@@ -300,7 +300,7 @@ class TcpDeviceToNetwork(
                 val bytesUnwritten = payloadBuffer.remaining()
                 val bytesWritten = payloadSize - bytesUnwritten
                 Timber.w(e, "Network write error for ${tcb.ipAndPort}. Wrote $bytesWritten; $bytesUnwritten unwritten")
-                tcb.sendResetPacket(queues, bytesWritten)
+                tcb.sendResetPacket(queues, packet, bytesWritten)
                 return
             }
         }

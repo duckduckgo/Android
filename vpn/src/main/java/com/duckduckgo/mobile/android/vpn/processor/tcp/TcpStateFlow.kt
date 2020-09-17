@@ -272,10 +272,10 @@ class TcpStateFlow {
                         if (packetType.hasData) {
                             events.add(ProcessPacket)
                         } else {
-                            events.add(SendAck)
+                            //events.add(SendAck)
                             events.add(SendFin)
                         }
-                        events.add(MoveServerToState(CLOSE_WAIT))
+                        events.add(MoveServerToState(LAST_ACK))
 
 //                        // client would normally be in FIN_WAIT_1 until it gets the ACK (FIN_WAIT_2). Safe to jump straight to FIN_WAIT_2
 //                        events.add(MoveClientToState(FIN_WAIT_2))
