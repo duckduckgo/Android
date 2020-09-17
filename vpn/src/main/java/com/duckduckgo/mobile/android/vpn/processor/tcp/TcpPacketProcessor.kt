@@ -155,7 +155,7 @@ class TcpPacketProcessor(
             return String(bytesForLogging)
         }
 
-        private fun TCB.updateState(newStatus: TcbState) {
+        fun TCB.updateState(newStatus: TcbState) {
             this.tcbState = newStatus
         }
 //

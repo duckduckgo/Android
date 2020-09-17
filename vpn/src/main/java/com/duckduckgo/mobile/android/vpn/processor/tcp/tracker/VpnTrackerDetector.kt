@@ -29,7 +29,7 @@ class DomainBasedTrackerDetector(
 ) : VpnTrackerDetector {
 
     override fun determinePacketType(tcb: TCB, hostName: String?): RequestTrackerType {
-        if(hostName == "example.com") return RequestTrackerType.NotTracker
+        if(hostName == "example.com") return Tracker
 
         return RequestTrackerType.NotTracker
     }
