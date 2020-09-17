@@ -79,7 +79,7 @@ class TcpStateFlow {
                     listOf(CloseConnection)
                 }
                 isAckForOurFin(packetType, connectionKey) && (packetType.isAck || packetType.isFin) -> {
-                    listOf(MoveServerToState(TIME_WAIT), MoveClientToState(CLOSED), DelayedCloseConnection)
+                    listOf(CloseConnection)
                 }
                 else -> emptyList()
             }
@@ -93,7 +93,7 @@ class TcpStateFlow {
                     connectionKey, packetType.isFin, packetType.isAck, packetType.finSequenceNumberToClient, packetType.ackNum
                 )
             } else {
-                Timber.w(
+                Timber.d(
                     "%s - In LAST_ACK, received [fin=%s, ack=%s] with matching numbers. %d",
                     connectionKey, packetType.isFin, packetType.isAck, packetType.finSequenceNumberToClient
                 )
@@ -247,7 +247,12 @@ class TcpStateFlow {
 //        }
 //
         @AddTrace(name = "tcp_state_flow_handle_syn_received", enabled = true)
-        private fun handlePacketInSynReceived(connectionKey: String, currentState: TcbState, packetType: PacketType, initialSequenceNumberToClient: Long): List<Event> {
+        private fun handlePacketInSynReceived(
+            connectionKey: String,
+            currentState: TcbState,
+            packetType: PacketType,
+            initialSequenceNumberToClient: Long
+        ): List<Event> {
             return when {
                 packetType.isRst -> listOf(CloseConnection)
                 packetType.isAck -> {
