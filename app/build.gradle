@@ -1,8 +1,11 @@
 apply plugin: 'com.android.application'
-
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
+apply plugin: 'com.google.gms.google-services'
+apply plugin: 'com.google.firebase.firebase-perf'
+apply plugin: 'com.google.firebase.crashlytics'
+
 apply from: '../versioning.gradle'
 apply from: "$rootDir/ktlint.gradle"
 
@@ -14,7 +17,7 @@ android {
     compileSdkVersion 29
     ndkVersion '21.0.6113669'
     defaultConfig {
-        applicationId "com.duckduckgo.mobile.android"
+        applicationId "com.duckduckgo.mobile.android.nucleus"
         minSdkVersion 21
         targetSdkVersion 29
         versionCode buildVersionCode()
@@ -45,12 +48,14 @@ android {
     }
     buildTypes {
         debug {
-            applicationIdSuffix ".debug"
             pseudoLocalesEnabled false
             manifestPlaceholders = [
                     appIcon: "@mipmap/ic_launcher_blue",
                     appIconRound: "@mipmap/ic_launcher_blue_round"
             ]
+            FirebasePerformance {
+                instrumentationEnabled false
+            }
         }
         release {
             minifyEnabled false
@@ -134,6 +139,7 @@ ext {
 
 
 dependencies {
+    implementation project(path: ':vpn')
     implementation "androidx.legacy:legacy-support-v4:$legacySupport"
     debugImplementation "com.squareup.leakcanary:leakcanary-android:$leakCanary"
 
