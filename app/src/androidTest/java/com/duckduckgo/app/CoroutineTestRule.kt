@@ -48,6 +48,6 @@ class CoroutineTestRule(val testDispatcher: TestCoroutineDispatcher = TestCorout
 }
 
 @ExperimentalCoroutinesApi
-fun CoroutineTestRule.runBlocking(block: suspend () -> Unit) = this.testDispatcher.runBlockingTest {
+fun CoroutineTestRule.runBlocking(block: suspend TestCoroutineScope.() -> Unit) = this.testDispatcher.runBlockingTest {
     block()
 }

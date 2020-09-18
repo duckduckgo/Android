@@ -41,7 +41,8 @@ class BrowserWebViewClient(
     private val offlinePixelCountDataStore: OfflinePixelCountDataStore,
     private val uncaughtExceptionRepository: UncaughtExceptionRepository,
     private val cookieManager: CookieManager,
-    private val loginDetector: DOMLoginDetector
+    private val loginDetector: DOMLoginDetector,
+    private val dosDetector: DosDetector
 ) : WebViewClient() {
 
     var webViewClientListener: WebViewClientListener? = null
@@ -52,7 +53,7 @@ class BrowserWebViewClient(
      */
     override fun shouldOverrideUrlLoading(view: WebView, request: WebResourceRequest): Boolean {
         val url = request.url
-        return shouldOverride(view, url)
+        return shouldOverride(view, url, request.isForMainFrame)
     }
 
     /**
@@ -61,15 +62,21 @@ class BrowserWebViewClient(
     @Suppress("OverridingDeprecatedMember")
     override fun shouldOverrideUrlLoading(view: WebView, urlString: String): Boolean {
         val url = Uri.parse(urlString)
-        return shouldOverride(view, url)
+        return shouldOverride(view, url, true)
     }
 
     /**
      * API-agnostic implementation of deciding whether to override url or not
      */
-    private fun shouldOverride(webView: WebView, url: Uri): Boolean {
+    private fun shouldOverride(webView: WebView, url: Uri, isForMainFrame: Boolean): Boolean {
+
+        Timber.v("shouldOverride $url")
         try {
-            Timber.v("shouldOverride $url")
+            if (isForMainFrame && dosDetector.isUrlGeneratingDos(url)) {
+                webView.loadUrl("about:blank")
+                webViewClientListener?.dosAttackDetected()
+                return false
+            }
 
             return when (val urlType = specialUrlDetector.determineType(url)) {
                 is SpecialUrlDetector.UrlType.Email -> {

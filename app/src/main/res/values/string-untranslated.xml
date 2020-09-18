@@ -15,32 +15,8 @@
   -->
 
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
-    <!-- Download Manager problems -->
-    <string name="downloadManagerDisabled">Download Manager is disabled</string>
-    <string name="downloadManagerIncompatible">Download Manager not available on this device</string>
-    <string name="enable">Enable</string>
-
-    <!-- Notifications Drip Experiment -->
-    <string name="dripA1Title">How anonymous is DuckDuckGo?</string>
-    <string name="dripA2Title">Tired of being tracked online? We can help.</string>
-    <string name="dripA1Description">Learn why DuckDuckGo is better than Incognito.</string>
-    <string name="dripA2Description">Learn how DuckDuckGo keeps you private.</string>
-    <string name="dripB1Title">Customize your app icon</string>
-    <string name="dripB2Title">Instantly clear tabs &amp; browsing data</string>
-    <string name="dripB1Description">Visit settings to choose a different icon theme.</string>
-    <string name="dripB2Description">Simply tap the Fire Button by the address bar.</string>
-    <string name="dripAButtonText">Show Me</string>
-    <string name="dripBButtonText">Try It Out</string>
-
-    <!-- Fireproof websites -->
-    <string name="fireproofWebsiteLoginDialogTitle">Would you like to Fireproof %s?</string>
-    <string name="fireproofWebsiteLoginDialogDescription">Fireproofing this site will keep you signed in after using the Fire Button.</string>
-    <string name="fireproofWebsiteLoginDialogPositive">Fireproof</string>
-    <string name="fireproofWebsiteLoginDialogNegative">Not now</string>
-    <string name="fireproofWebsiteItemsSectionTitle">Websites</string>
-    <string name="fireproofWebsiteToogleText">Ask When Signing In</string>
-    <!-- !! String changed translate and replace !! -->
-    <string name="fireproofWebsiteFeatureDescription">Websites rely on cookies to keep you signed in. When you Fireproof a site, cookies won\'t be erased and you\'ll stay signed in, even after using the Fire Button. We still block third-party trackers found on Fireproof websites.</string>
+    <!--Fire button education-->
+    <string name="daxClearDataCtaText">Now tap below to burn your browsing history. Give it a try! &#128071;</string>
 
     <!-- Use Our App Flow -->
     <string name="useOurAppDialogText">Did you know the Facebook app can make requests for data even when you\'re not using it?&lt;br/&gt;&lt;br/&gt;Replace the app with a home screen shortcut that opens Facebook in DuckDuckGo. Then delete the Facebook app.</string>
@@ -51,18 +27,28 @@
     <string name="useOurAppShortcutAddedText">Success! %s has been added to your home screen.</string>
     <string name="useOurAppDeletionDialogText">Checking your feed in DuckDuckGo is a great alternative to using the Facebook app!&lt;br/&gt;&lt;br/&gt;But if the Facebook app is on your phone, it can make requests for data even when you\'re not using it.&lt;br/&gt;&lt;br/&gt;Prevent this by deleting it now!</string>
 
-    <!-- New dashboard / menu buttons -->
-    <string name="manageWhitelist">Unprotected Sites</string>
+    <!-- Precise Location -->
+    <string name="preciseLocationSystemDialogTitle">Enable device location for DuckDuckGo Privacy Browser?</string>
+    <string name="preciseLocationSystemDialogSubtitle">%s is requesting your device location. You\'ll first need to allow the app to send your device location, then %s can ask permission.</string>
+    <string name="preciseLocationSystemDialogAllow">Enable</string>
+    <string name="preciseLocationSystemDialogDeny">Maybe Later</string>
+    <string name="preciseLocationSystemDialogNeverAllow">Don\'t Ask Again for this Site</string>
+    <string name="preciseLocationSiteDialogTitle">Grant %s permission to access location?</string>
+    <string name="preciseLocationSiteDialogSubtitle">You can manage the location access permissions you’ve granted to individual sites in Settings.</string>
+    <string name="preciseLocationSiteDialogAllowAlways">Always</string>
+    <string name="preciseLocationSiteDialogAllowOnce">Only for this session</string>
+    <string name="preciseLocationSiteDialogDenyAlways">Deny always</string>
+    <string name="preciseLocationSiteDialogDenyOnce">Deny for this session</string>
+    <string name="settingsPreciseLocation">Location</string>
+    <string name="preciseLocationFeatureDescription">Sites you visit may ask to know your device location. They won\'t be able to access it until you explicitly grant permission. DuckDuckGo only uses your location anonymously to deliver local search results.</string>
+    <string name="preciseLocationToggleText">Sites can ask for my location</string>
+    <string name="preciseLocationEmptyListHint">No websites granted permission to access location</string>
+    <string name="preciseLocationNoSystemPermission">To manage the location access permissions you\’ve granted to individual sites, enable location for this app in Android Settings.</string>
+    <string name="preciseLocationActivityTitle">Location</string>
+    <string name="preciseLocationDeleteConfirmMessage">Are you sure you want to delete &lt;b>%s&lt;/b>?</string>
+    <string name="preciseLocationDeleteContentDescription">More options for location permissions in domain %s</string>
+    <string name="preciseLocationAllowedSitesSectionTitle">Granted</string>
+    <string name="preciseLocationDeniedSitesSectionTitle">Denied</string>
+    <string name="preciseLocationSnackbarMessage">You previously granted %s permission to access your device location.</string>
 
-    <!-- Whitelist -->
-    <string name="whitelisetActivityTitle">Unprotected Sites</string>
-    <string name="enablePrivacyProtection">Enable Privacy Protection</string>
-    <string name="disablePrivacyProtection">Disable Privacy Protection</string>
-    <string name="whitelistEntryOverflowContentDescription">More options for unprotected site %s</string>
-    <string name="whitelistEntryDeleteConfirmMessage">Are you sure you want to remove &lt;b>%s&lt;/b> from unprotected sites?</string>
-    <string name="whitelistExplanation">These sites will not be enhanced by Privacy Protection</string>
-    <string name="whitelistNoEntries">No Unprotected Sites Yet</string>
-
-    <!-- Settings -->
-    <string name="settingsPrivacyProtectionWhitelist">Unprotected Sites</string>
 </resources>

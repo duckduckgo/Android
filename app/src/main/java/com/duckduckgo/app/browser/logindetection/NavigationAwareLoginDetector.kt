@@ -45,8 +45,8 @@ sealed class NavigationEvent {
 
 class NextPageLoginDetection @Inject constructor() : NavigationAwareLoginDetector {
 
-    private var loginAttempt: NavigationEvent.LoginAttempt? = null
     override val loginEventLiveData = MutableLiveData<LoginDetected>()
+    private var loginAttempt: ValidUrl? = null
 
     override fun onEvent(navigationEvent: NavigationEvent) {
         Timber.i("LoginDetectionDelegate $navigationEvent")
@@ -67,7 +67,7 @@ class NextPageLoginDetection @Inject constructor() : NavigationAwareLoginDetecto
     }
 
     private fun saveLoginAttempt(navigationEvent: NavigationEvent.LoginAttempt) {
-        loginAttempt = navigationEvent
+        loginAttempt = Uri.parse(navigationEvent.url).getValidUrl() ?: return
     }
 
     private fun discardLoginAttempt() {
@@ -91,16 +91,21 @@ class NextPageLoginDetection @Inject constructor() : NavigationAwareLoginDetecto
         }
     }
 
-    @Suppress("NULLABILITY_MISMATCH_BASED_ON_JAVA_ANNOTATIONS")
     private fun detectLogin(forwardedToUrl: String) {
-        val loginAttemptEvent = loginAttempt ?: return
-        val loginURI = Uri.parse(loginAttemptEvent.url).takeUnless { it.host.isNullOrBlank() } ?: return
-        val forwardedToUri = Uri.parse(forwardedToUrl).takeUnless { it.host.isNullOrBlank() } ?: return
+        val validLoginAttempt = loginAttempt ?: return
+        val forwardedToUri = Uri.parse(forwardedToUrl).getValidUrl() ?: return
 
-        Timber.i("LoginDetectionDelegate ${loginAttemptEvent.url} vs $forwardedToUrl")
-        if (loginURI.host != forwardedToUri.host || loginURI.path != forwardedToUri.path) {
-            loginEventLiveData.value = LoginDetected(loginURI.host, forwardedToUri.host)
+        Timber.i("LoginDetectionDelegate $validLoginAttempt vs $forwardedToUrl")
+        if (validLoginAttempt.host != forwardedToUri.host || validLoginAttempt.path != forwardedToUri.path) {
+            loginEventLiveData.value = LoginDetected(validLoginAttempt.host, forwardedToUri.host)
             loginAttempt = null
         }
     }
+
+    private fun Uri.getValidUrl(): ValidUrl? {
+        val validHost = host ?: return null
+        return ValidUrl(validHost, path)
+    }
+
+    private data class ValidUrl(val host: String, val path: String?)
 }

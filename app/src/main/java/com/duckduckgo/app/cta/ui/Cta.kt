@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.cta.ui
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.net.Uri
 import android.view.View
@@ -212,6 +213,7 @@ sealed class DaxDialogCta(
         appInstallStore
     ) {
 
+        @SuppressLint("StringFormatMatches")
         @ExperimentalStdlibApi
         override fun getDaxText(context: Context): String {
             val percentage = networkPropertyPercentages[network]
@@ -219,14 +221,24 @@ sealed class DaxDialogCta(
             return if (isFromSameNetworkDomain()) {
                 context.resources.getString(R.string.daxMainNetworkCtaText, network, percentage, network)
             } else {
-                context.resources.getString(
-                    R.string.daxMainNetworkOwnedCtaText,
-                    Uri.parse(siteHost).baseHost?.removePrefix("m.")?.capitalize(Locale.getDefault()),
-                    network,
-                    network,
-                    percentage,
-                    network
-                )
+                val locale = Locale.getDefault()
+                if (locale != null && locale.language == "en") {
+                    context.resources.getString(
+                        R.string.daxMainNetworkOwnedCtaText,
+                        network,
+                        Uri.parse(siteHost).baseHost?.removePrefix("m."),
+                        network
+                    )
+                } else {
+                    context.resources.getString(
+                        R.string.daxMainNetworkOwnedCtaText,
+                        Uri.parse(siteHost).baseHost?.removePrefix("m.")?.capitalize(Locale.getDefault()),
+                        network,
+                        network,
+                        percentage,
+                        network
+                    )
+                }
             }
         }
 
@@ -307,6 +319,38 @@ sealed class DaxBubbleCta(
         Pixel.PixelValues.DAX_END_CTA,
         onboardingStore,
         appInstallStore
+    )
+}
+
+sealed class DaxFireDialogCta(
+    override val ctaId: CtaId,
+    @StringRes open val description: Int,
+    override val shownPixel: Pixel.PixelName?,
+    override val okPixel: Pixel.PixelName?,
+    override val cancelPixel: Pixel.PixelName?
+) : Cta, ViewCta {
+
+    override fun showCta(view: View) {
+        val daxText = view.context.getString(description)
+        view.show()
+        view.alpha = 1f
+        view.hiddenTextCta.text = daxText.html(view.context)
+        view.primaryCta.gone()
+        view.dialogTextCta.startTypingAnimation(daxText, true)
+    }
+
+    override fun pixelCancelParameters(): Map<String, String> = emptyMap()
+
+    override fun pixelOkParameters(): Map<String, String> = emptyMap()
+
+    override fun pixelShownParameters(): Map<String, String> = emptyMap()
+
+    class TryClearDataCta : DaxFireDialogCta(
+        ctaId = CtaId.DAX_FIRE_BUTTON,
+        description = R.string.daxClearDataCtaText,
+        shownPixel = Pixel.PixelName.ONBOARDING_DAX_CTA_SHOWN,
+        okPixel = null,
+        cancelPixel = null
     )
 }
 

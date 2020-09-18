@@ -23,14 +23,14 @@ import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.browser.BrowserViewModel.Command
 import com.duckduckgo.app.browser.BrowserViewModel.Command.DisplayMessage
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
-import com.duckduckgo.app.cta.db.DismissedCtaDao
-import com.duckduckgo.app.cta.model.CtaId
 import com.duckduckgo.app.fire.DataClearer
+import com.duckduckgo.app.global.events.db.UserEventsStore
 import com.duckduckgo.app.global.rating.AppEnjoymentPromptEmitter
 import com.duckduckgo.app.global.rating.AppEnjoymentPromptOptions
 import com.duckduckgo.app.global.rating.AppEnjoymentUserEventRecorder
 import com.duckduckgo.app.global.rating.PromptCount
-import com.duckduckgo.app.global.useourapp.UseOurAppDetector.Companion.USE_OUR_APP_SHORTCUT_URL
+import com.duckduckgo.app.global.useourapp.UseOurAppDetector
+import com.duckduckgo.app.global.useourapp.UseOurAppDetector.Companion.USE_OUR_APP_DOMAIN
 import com.duckduckgo.app.privacy.ui.PrivacyDashboardActivity
 import com.duckduckgo.app.runBlocking
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -85,7 +85,7 @@ class BrowserViewModelTest {
     private lateinit var mockPixel: Pixel
 
     @Mock
-    private lateinit var mockDismissedCtaDao: DismissedCtaDao
+    private lateinit var mockUserEventsStore: UserEventsStore
 
     private lateinit var testee: BrowserViewModel
 
@@ -101,7 +101,7 @@ class BrowserViewModelTest {
             dataClearer = mockAutomaticDataClearer,
             appEnjoymentPromptEmitter = mockAppEnjoymentPromptEmitter,
             appEnjoymentUserEventRecorder = mockAppEnjoymentUserEventRecorder,
-            ctaDao = mockDismissedCtaDao,
+            useOurAppDetector = UseOurAppDetector(mockUserEventsStore),
             dispatchers = coroutinesTestRule.testDispatcherProvider,
             pixel = mockPixel
         )
@@ -121,22 +121,40 @@ class BrowserViewModelTest {
 
     @Test
     fun whenNewTabRequestedThenTabAddedToRepository() = runBlocking<Unit> {
+        whenever(mockTabRepository.liveSelectedTab).doReturn(MutableLiveData())
         testee.onNewTabRequested()
         verify(mockTabRepository).add()
+    }
+
+    @Test
+    fun whenNewTabRequestedFromSourceTabThenTabAddedToRepositoryWithSourceTabId() = runBlocking<Unit> {
+        whenever(mockTabRepository.liveSelectedTab).doReturn(MutableLiveData())
+        testee.onNewTabRequested("sourceTabId")
+        verify(mockTabRepository).addFromSourceTab(sourceTabId = "sourceTabId")
     }
 
     @Test
     fun whenOpenInNewTabRequestedThenTabAddedToRepository() = runBlocking<Unit> {
         val url = "http://example.com"
         whenever(mockOmnibarEntryConverter.convertQueryToUrl(url)).thenReturn(url)
+        whenever(mockTabRepository.liveSelectedTab).doReturn(MutableLiveData())
         testee.onOpenInNewTabRequested(url)
-        verify(mockTabRepository).add(url)
+        verify(mockTabRepository).add(url = url, skipHome = false)
     }
 
     @Test
-    fun whenTabsUpdatedAndNoTabsThenNewTabAddedToRepository() = runBlocking<Unit> {
+    fun whenOpenInNewTabRequestedWithSourceTabIdThenTabAddedToRepositoryWithSourceTabId() = runBlocking<Unit> {
+        val url = "http://example.com"
+        whenever(mockOmnibarEntryConverter.convertQueryToUrl(url)).thenReturn(url)
+        whenever(mockTabRepository.liveSelectedTab).doReturn(MutableLiveData())
+        testee.onOpenInNewTabRequested(url, sourceTabId = "tabId")
+        verify(mockTabRepository).addFromSourceTab(url = url, skipHome = false, sourceTabId = "tabId")
+    }
+
+    @Test
+    fun whenTabsUpdatedAndNoTabsThenDefaultTabAddedToRepository() = runBlocking<Unit> {
         testee.onTabsUpdated(ArrayList())
-        verify(mockTabRepository).add(null, false, true)
+        verify(mockTabRepository).addDefaultTab()
     }
 
     @Test
@@ -193,21 +211,11 @@ class BrowserViewModelTest {
     }
 
     @Test
-    fun whenOpenShortcutIfUrlIsUseOurAppUrlAndCtaHasBeenSeenThenFirePixel() {
-        givenUseOurAppCtaHasBeenSeen()
-        val url = USE_OUR_APP_SHORTCUT_URL
+    fun whenOpenShortcutIfUrlIsUseOurAppDomainThenFirePixel() {
+        val url = "http://m.$USE_OUR_APP_DOMAIN"
         whenever(mockOmnibarEntryConverter.convertQueryToUrl(url)).thenReturn(url)
         testee.onOpenShortcut(url)
         verify(mockPixel).fire(Pixel.PixelName.USE_OUR_APP_SHORTCUT_OPENED)
-    }
-
-    @Test
-    fun whenOpenShortcutIfUrlIsUseOurAppUrlAndCtaHasNotBeenSeenThenDoNotFireUseOurAppPixel() {
-        val url = USE_OUR_APP_SHORTCUT_URL
-        whenever(mockOmnibarEntryConverter.convertQueryToUrl(url)).thenReturn(url)
-        testee.onOpenShortcut(url)
-        verify(mockPixel, never()).fire(Pixel.PixelName.USE_OUR_APP_SHORTCUT_OPENED)
-        verify(mockPixel).fire(Pixel.PixelName.SHORTCUT_OPENED)
     }
 
     @Test
@@ -216,10 +224,6 @@ class BrowserViewModelTest {
         whenever(mockOmnibarEntryConverter.convertQueryToUrl(url)).thenReturn(url)
         testee.onOpenShortcut(url)
         verify(mockPixel).fire(Pixel.PixelName.SHORTCUT_OPENED)
-    }
-
-    private fun givenUseOurAppCtaHasBeenSeen() {
-        whenever(mockDismissedCtaDao.exists(CtaId.USE_OUR_APP)).thenReturn(true)
     }
 
     companion object {

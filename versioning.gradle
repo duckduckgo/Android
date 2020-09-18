@@ -12,4 +12,5 @@ ext {
         file("version/version.properties").withInputStream { props.load(it) }
         return props.getProperty("VERSION")
     }
+
 }

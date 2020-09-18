@@ -77,7 +77,7 @@
     <string name="privacyProtectionEnabled">WŁĄCZONA OCHRONA STRONY</string>
     <string name="privacyProtectionDisabled">WYŁĄCZONA OCHRONA STRONY</string>
     <string name="privacyDashboardActivityTitle">Panel zarządzania prywatnością</string>
-    <string name="privacyProtectionUpgraded" tools:ignore="TypographyQuotes">USPRAWNIONY OD &lt;img src="%d" /&gt; DO &lt;img src="%d" /&gt;</string>
+    <string name="privacyProtectionUpgraded" tools:ignore="TypographyQuotes">USPRAWNIONY OD &lt;img src=\"%1$d\" /&gt; DO &lt;img src=\"%2$d\" /&gt;</string>
     <string name="privacyGradeContentDescription">Poziom prywatności</string>
 
     <string name="httpsGood">Połączenie zaszyfrowane</string>
@@ -89,31 +89,31 @@
     <string name="networksOverview">Sieci skryptów śledzących tworzą historię wyszukiwania w formie profilu informacyjnego na Twój temat. Największe sieci skryptów śledzących są bardziej szkodliwe, ponieważ mogą śledzić i namierzać Cię na większym obszarze Internetu.</string>
 
     <plurals name="trackersFound">
-        <item quantity="one">%s Znaleziono tracker</item>
-        <item quantity="few">%s Znaleziono trackery</item>
-        <item quantity="many">%s Znaleziono trackerów</item>
-        <item quantity="other">%s Znaleziono trackery</item>
+        <item quantity="one">%1$s Znaleziono tracker</item>
+        <item quantity="few">%1$s Znaleziono trackery</item>
+        <item quantity="many">%1$s Znaleziono trackerów</item>
+        <item quantity="other">%1$s Znaleziono trackery</item>
     </plurals>
 
     <plurals name="trackerBlocked">
-        <item quantity="one">%s Zablokowany tracker</item>
-        <item quantity="few">%s Zablokowane trackery</item>
-        <item quantity="many">%s Zablokowanych trackerów</item>
-        <item quantity="other">%s Zablokowane trackery</item>
+        <item quantity="one">%1$s Zablokowany tracker</item>
+        <item quantity="few">%1$s Zablokowane trackery</item>
+        <item quantity="many">%1$s Zablokowanych trackerów</item>
+        <item quantity="other">%1$s Zablokowane trackery</item>
     </plurals>
 
     <plurals name="majorNetworksFound">
-        <item quantity="one">%s Znaleziono główną sieć śledzenia</item>
-        <item quantity="few">%s Znaleziono główne sieci śledzenia</item>
-        <item quantity="many">%s Znaleziono główne sieci śledzenia</item>
-        <item quantity="other">%s Znaleziono główne sieci śledzenia</item>
+        <item quantity="one">%1$s Znaleziono główną sieć śledzenia</item>
+        <item quantity="few">%1$s Znaleziono główne sieci śledzenia</item>
+        <item quantity="many">%1$s Znaleziono główne sieci śledzenia</item>
+        <item quantity="other">%1$s Znaleziono główne sieci śledzenia</item>
     </plurals>
 
     <plurals name="majorNetworksBlocked">
-        <item quantity="one">%s Zablokowana główna sieć śledząca</item>
-        <item quantity="few">%s Zablokowano główne sieci śledzenia</item>
-        <item quantity="many">%s Zablokowano główne sieci śledzenia</item>
-        <item quantity="other">%s Zablokowano główne sieci śledzenia</item>
+        <item quantity="one">%1$s Zablokowana główna sieć śledząca</item>
+        <item quantity="few">%1$s Zablokowano główne sieci śledzenia</item>
+        <item quantity="many">%1$s Zablokowano główne sieci śledzenia</item>
+        <item quantity="other">%1$s Zablokowano główne sieci śledzenia</item>
     </plurals>
 
     <string name="scorecardActivityTitle">Poziom prywatności</string>
@@ -123,8 +123,8 @@
 
     <string name="privacyTermsActivityTitle">Polityka prywatności</string>
     <string name="practicesGood">Dobra polityka prywatności</string>
-    <string name="practicesMixed">Zróżnicowana polityka prywatności”</string>
-    <string name="practicesBad">„Słaba polityka prywatności”</string>
+    <string name="practicesMixed">Zróżnicowana polityka prywatności</string>
+    <string name="practicesBad">Słaba polityka prywatności</string>
     <string name="practicesUnknown">Nieznana polityka prywatności</string>
     <string name="practicesOverview">Polityka prywatności wskazuje, jak wiele informacji osobowych udostępnianych danej stronie podlega ochronie.</string>
     <string name="practicesTosdrLink">Dane polityki prywatności od <b><u>ToS;DR</u></b></string>
@@ -196,18 +196,20 @@
     <!-- Bookmarks Activity -->
     <string name="bookmarksMenuTitle">Zakładki</string>
     <string name="bookmarksActivityTitle">Zakładki</string>
-    <string name="bookmarkDeleteConfirmMessage">Czy na pewno chcesz usunąć zakładkę &lt;b&gt;%s&lt;/b&gt;?</string>
-    <string name="dialogConfirmTitle">Potwierdź</string>
+    <string name="bookmarkDeleteConfirmMessage">Czy na pewno chcesz usunąć zakładkę &lt;b&gt;%1$s&lt;/b&gt;?</string>
     <string name="bookmarkAddedFeedback">Zakładka została dodana</string>
     <string name="bookmarkTitleHint">Tytuł zakładki</string>
     <string name="bookmarkUrlHint">Adres URL zakładki</string>
-    <string name="dialogSave">Zapisz</string>
     <string name="bookmarkTitleEdit">Edytuj zakładkę</string>
     <string name="noBookmarks">Nie dodano jeszcze żadnych zakładek</string>
-    <string name="bookmarkOverflowContentDescription">Więcej opcji dla zakładki %s</string>
+    <string name="bookmarkOverflowContentDescription">Więcej opcji dla zakładki %1$s</string>
+    <string name="bookmarkEdited">Dodano zakładkę</string>
+
+    <!-- Dialogs -->
+    <string name="dialogConfirmTitle">Potwierdź</string>
+    <string name="dialogSave">Zapisz</string>
     <string name="delete">Usuń</string>
     <string name="edit">Edytuj</string>
-    <string name="bookmarkEdited">Dodano zakładkę</string>
 
     <!-- Widget -->
     <string name="searchWidgetTextHint">Szukaj w DuckDuckGo</string>
@@ -271,14 +273,14 @@
     <string name="privacyProtectionNotificationDefaultTitle">Chronimy Twoją prywatność</string>
     <string name="privacyProtectionNotificationReportTitle">Twój raport na temat prywatności</string>
     <string name="privacyProtectionNotificationDefaultDescription">Aplikacja DuckDuckGo chroni Twoje dane, blokując skrypty śledzące i szyfrując połączenia.</string>
-    <string name="privacyProtectionNotificationUpgadeDescription">Zapewniłeś(-aś) swoim danym ochronę, zabezpieczając dzięki DuckDuckGo %d niezaszyfrowanych połączeń.</string>
-    <string name="privacyProtectionNotificationTrackerDescription">Zapewniłeś(-aś) swoim danym ochronę, blokując dzięki DuckDuckGo %d skryptów śledzących.</string>
-    <string name="privacyProtectionNotificationBothDescription">Zapewniłeś(-aś) swoim danym ochronę, blokując dzięki DuckDuckGo %d skryptów śledzących i zabezpieczając %d niezaszyfrowanych połączeń.</string>
+    <string name="privacyProtectionNotificationUpgadeDescription">Zapewniłeś(-aś) swoim danym ochronę, zabezpieczając dzięki DuckDuckGo %1$d niezaszyfrowanych połączeń.</string>
+    <string name="privacyProtectionNotificationTrackerDescription">Zapewniłeś(-aś) swoim danym ochronę, blokując dzięki DuckDuckGo %1$d skryptów śledzących.</string>
+    <string name="privacyProtectionNotificationBothDescription">Zapewniłeś(-aś) swoim danym ochronę, blokując dzięki DuckDuckGo %1$d skryptów śledzących i zabezpieczając %2$d niezaszyfrowanych połączeń.</string>
     <string name="privacyProtectionNotificationLaunchButton">Powróć do przeglądania</string>
-
+    
     <!-- Authentication -->
     <string name="authenticationDialogTitle">Zaloguj się</string>
-    <string name="authenticationDialogMessage">%s wymaga nazwy użytkownika i hasła.</string>
+    <string name="authenticationDialogMessage">%1$s wymaga nazwy użytkownika i hasła.</string>
     <string name="authenticationDialogPositiveButton">Zaloguj się</string>
     <string name="authenticationDialogNegativeButton">Anuluj</string>
     <string name="authenticationDialogUsernameHint">Nazwa użytkownika</string>
@@ -302,7 +304,7 @@
 
     <string name="websiteNotLoadingTitleLong">Pewne strony nie wczytują się poprawnie</string>
     <string name="websiteNotLoadingTitleShort">Problemy z wczytywaniem stron</string>
-    <string name="websiteNotLoadingSubtitle">Która strona nie działa poprawnie?”</string>
+    <string name="websiteNotLoadingSubtitle">Która strona nie działa poprawnie?</string>
 
     <string name="searchNotGoodEnoughTitleLong">Funkcja wyszukiwania DuckDuckGo nie jest wystarczająco dobra</string>
     <string name="searchNotGoodEnoughTitleShort">Problemy wyszukiwania za pośrednictwem DuckDuckGo</string>
@@ -360,12 +362,12 @@
     <string name="feedbackIsImportantToUs">Twoja anonimowa opinia ma dla nas ogromne znaczenie.</string>
 
     <!-- Webview Recovery -->
-    <string name="crashedWebViewErrorMessage">Nie można wyświetlić strony internetowej.</string>
-    <string name="crashedWebViewErrorAction">Przeładuj</string>
+    <string name="crashedWebViewErrorMessage">"Nie można wyświetlić strony internetowej."</string>
+    <string name="crashedWebViewErrorAction">"Przeładuj"</string>
 
-    <!-- System Search -->
-    <string name="systemSearchOmnibarInputHint"><font size="13">Wyszukaj lub wpisz adres URL</font></string>
+    <!-- System Search-->
     <string name="systemSearchDeviceAppLabel">Z tego urządzenia</string>
+    <string name="systemSearchOmnibarInputHint"><font size="13">Wyszukaj lub wpisz adres URL</font></string>
     <string name="systemSearchAppNotFound">Nie można znaleźć aplikacji</string>
     <string name="systemSearchOnboardingText">Dziękujemy za wybranie DuckDuckGo!\nTeraz, gdy korzystasz z naszej wyszukiwarki lub aplikacji, Twoje wyszukiwania są chronione.</string>
     <string name="systemSearchOnboardingFeaturesIntroText">Aplikacja DuckDuckGo także:</string>
@@ -387,27 +389,27 @@
     <string name="hideTipsButton">Ukryj wskazówki na zawsze</string>
 
     <!-- New Onboarding Experience -->
-    <string name="onboardingWelcomeTitle">WITAMY W DUCKDUCKGO</string>
-    <string name="onboardingDaxText">Internet może być trochę nieprzyjemny.&lt;br/&gt;&lt;br/&gt;Bez obaw! Prywatne wyszukiwanie i przeglądanie jest łatwiejsze niż myślisz.</string>
+    <string name="onboardingWelcomeTitle">"WITAMY W DUCKDUCKGO"</string>
+    <string name="onboardingDaxText"><![CDATA[Internet może być trochę nieprzyjemny.<br/><br/>Bez obaw! Prywatne wyszukiwanie i przeglądanie jest łatwiejsze niż myślisz.]]></string>
     <string name="onboardingLetsDoItButton">Zróbmy to!</string>
-    <string name="daxIntroCtaText">Spróbuj teraz odwiedzić jedną z twoich ulubionych stron! &lt;br/&gt;&lt;br/&gt;Zablokuję cię, aby nie mogły cię szpiegować. Jeśli to możliwe, poprawię również bezpieczeństwo twojego połączenia. &#128274;</string>
-    <string name="daxEndCtaText">Masz to! &lt;br/&gt;&lt;br/&gt;Pamiętaj: za każdym razem, gdy przeglądasz ze mną Internet, jakaś wścibska reklama przestaje działać. &#128077;</string>
-    <string name="daxSerpCtaText">Twoje wyszukiwania w DuckDuckGo są anonimowe, a ja nigdy nie przechowuję Twojej historii wyszukiwania. Przenigdy. &#128588;</string>
+    <string name="daxIntroCtaText"><![CDATA[Spróbuj teraz odwiedzić jedną z twoich ulubionych stron! <br/><br/>Zablokuję cię, aby nie mogły cię szpiegować. Jeśli to możliwe, poprawię również bezpieczeństwo twojego połączenia. 🔒]]></string>
+    <string name="daxEndCtaText"><![CDATA[Masz to! <br/><br/>Pamiętaj: za każdym razem, gdy przeglądasz ze mną Internet, jakaś wścibska reklama przestaje działać. 👍]]></string>
+    <string name="daxSerpCtaText">Twoje wyszukiwania w DuckDuckGo są anonimowe, a ja nigdy nie przechowuję Twojej historii wyszukiwania. Przenigdy. 🙌</string>
     <plurals name="daxTrackersBlockedCtaText">
-        <item quantity="one">&#160;i &lt;b&gt;%d inny&lt;/b&gt; próbowali cię tutaj wyśledzić. &lt;br/&gt;&lt;br/&gt;Zablokowałem je!&lt;br/&gt;&lt;br/&gt; can Możesz sprawdzić pasek adresu, aby zobaczyć, kto próbuje cię śledzić, gdy odwiedzasz nową witrynę.️</item>
-        <item quantity="few">&#160;i &lt;b&gt;%d inni&lt;/b&gt; próbowali cię tutaj wyśledzić. &lt;br/&gt;&lt;br/&gt;Zablokowałem je!&lt;br/&gt;&lt;br/&gt; can Możesz sprawdzić pasek adresu, aby zobaczyć, kto próbuje cię śledzić, gdy odwiedzasz nową witrynę.️</item>
-        <item quantity="many">&#160;i &lt;b&gt;%d innych&lt;/b&gt; próbowali cię tutaj wyśledzić. &lt;br/&gt;&lt;br/&gt;Zablokowałem je!&lt;br/&gt;&lt;br/&gt; can Możesz sprawdzić pasek adresu, aby zobaczyć, kto próbuje cię śledzić, gdy odwiedzasz nową witrynę.️</item>
-        <item quantity="other">&#160;i &lt;b&gt;%d inni&lt;/b&gt; próbowali cię tutaj wyśledzić. &lt;br/&gt;&lt;br/&gt;Zablokowałem je!&lt;br/&gt;&lt;br/&gt; can Możesz sprawdzić pasek adresu, aby zobaczyć, kto próbuje cię śledzić, gdy odwiedzasz nową witrynę.️</item>
+        <item quantity="one"><![CDATA[ i <b>%1$d inny</b> próbowali cię tutaj wyśledzić. <br/><br/>Zablokowałem je!<br/><br/> can Możesz sprawdzić pasek adresu, aby zobaczyć, kto próbuje cię śledzić, gdy odwiedzasz nową witrynę.️]]></item>
+        <item quantity="few"><![CDATA[ i <b>%1$d inni</b> próbowali cię tutaj wyśledzić. <br/><br/>Zablokowałem je!<br/><br/> can Możesz sprawdzić pasek adresu, aby zobaczyć, kto próbuje cię śledzić, gdy odwiedzasz nową witrynę.️]]></item>
+        <item quantity="many"><![CDATA[ i <b>%1$d innych</b> próbowali cię tutaj wyśledzić. <br/><br/>Zablokowałem je!<br/><br/> can Możesz sprawdzić pasek adresu, aby zobaczyć, kto próbuje cię śledzić, gdy odwiedzasz nową witrynę.️]]></item>
+        <item quantity="other"><![CDATA[ i <b>%1$d inni</b> próbowali cię tutaj wyśledzić. <br/><br/>Zablokowałem je!<br/><br/> can Możesz sprawdzić pasek adresu, aby zobaczyć, kto próbuje cię śledzić, gdy odwiedzasz nową witrynę.️]]></item>
     </plurals>
     <plurals name="daxTrackersBlockedCtaZeroText">
-        <item quantity="one">&#160;próbował cię tu wyśledzić. &lt;br/&gt;&lt;br/&gt;Zablokowałem to!&lt;br/&gt;&lt;br/&gt; can Możesz sprawdzić pasek adresu URL, aby zobaczyć, kto próbuje Cię śledzić, gdy odwiedzasz nową witrynę.️</item>
-        <item quantity="few">&#160;próbowali cię tu wyśledzić. &lt;br/&gt;&lt;br/&gt;Zablokowałem to!&lt;br/&gt;&lt;br/&gt; can Możesz sprawdzić pasek adresu URL, aby zobaczyć, kto próbuje Cię śledzić, gdy odwiedzasz nową witrynę.️</item>
-        <item quantity="many">&#160;próbowali cię tu wyśledzić. &lt;br/&gt;&lt;br/&gt;Zablokowałem to!&lt;br/&gt;&lt;br/&gt; can Możesz sprawdzić pasek adresu URL, aby zobaczyć, kto próbuje Cię śledzić, gdy odwiedzasz nową witrynę.️</item>
-        <item quantity="other">&#160;próbowali cię tu wyśledzić. &lt;br/&gt;&lt;br/&gt;Zablokowałem to!&lt;br/&gt;&lt;br/&gt; can Możesz sprawdzić pasek adresu URL, aby zobaczyć, kto próbuje Cię śledzić, gdy odwiedzasz nową witrynę.️</item>
+        <item quantity="one"><![CDATA[ próbował cię tu wyśledzić. <br/><br/>Zablokowałem to!<br/><br/> can Możesz sprawdzić pasek adresu URL, aby zobaczyć, kto próbuje Cię śledzić, gdy odwiedzasz nową witrynę.️]]></item>
+        <item quantity="few"><![CDATA[ próbowali cię tu wyśledzić. <br/><br/>Zablokowałem to!<br/><br/> can Możesz sprawdzić pasek adresu URL, aby zobaczyć, kto próbuje Cię śledzić, gdy odwiedzasz nową witrynę.️]]></item>
+        <item quantity="many"><![CDATA[ próbowali cię tu wyśledzić. <br/><br/>Zablokowałem to!<br/><br/> can Możesz sprawdzić pasek adresu URL, aby zobaczyć, kto próbuje Cię śledzić, gdy odwiedzasz nową witrynę.️]]></item>
+        <item quantity="other"><![CDATA[ próbowali cię tu wyśledzić. <br/><br/>Zablokowałem to!<br/><br/> can Możesz sprawdzić pasek adresu URL, aby zobaczyć, kto próbuje Cię śledzić, gdy odwiedzasz nową witrynę.️]]></item>
     </plurals>
-    <string name="daxNonSerpCtaText">Gdy korzystasz z przeglądarki, ja blokuję nieznośne moduły śledzące.&lt;br/&gt;&lt;br/&gt;Śmiało – kontynuuj przeglądanie.</string>
-    <string name="daxMainNetworkOwnedCtaText">Uwaga! %s jest własnością firmy %s.&lt;br/&gt;&lt;br/&gt;Moduły śledzące firmy %s czają się na około %s najpopularniejszych witryn &#128561;, ale nie martw się!&lt;br/&gt;&lt;br/&gt;Zablokuję śledzenie twojej aktywności przez firmę %s na tych stronach.</string>
-    <string name="daxMainNetworkCtaText">Uwaga! %s to duża sieć śledząca.&lt;br/&gt;&lt;br/&gt;Ich moduły śledzące czają się na około %s najpopularniejszych witryn &#128561;, ale nie martw się!&lt;br/&gt;&lt;br/&gt;Zablokuję śledzenie twojej aktywności przez firmę %s na tych stronach.</string>
+    <string name="daxNonSerpCtaText"><![CDATA[Gdy korzystasz z przeglądarki, ja blokuję nieznośne moduły śledzące.<br/><br/>Śmiało – kontynuuj przeglądanie.]]></string>
+    <string name="daxMainNetworkCtaText"><![CDATA[Uwaga! %1$s to duża sieć śledząca.<br/><br/>Ich moduły śledzące czają się na około %2$s najpopularniejszych witryn 😱, ale nie martw się!<br/><br/>Zablokuję śledzenie twojej aktywności przez firmę %3$s na tych stronach.]]></string>
+    <string name="daxMainNetworkOwnedCtaText">Uwaga! Ponieważ firma %1$s jest właścicielem %2$s, nie możemy jej powstrzymać przez zobaczeniem tutaj Twojej aktywności.&lt;br/&gt;&lt;br/&gt;Przeglądaj jednak ze mną. Mogę ograniczyć to, co %3$s wie o Tobie, blokując ich skrypty śledzące na wielu innych stronach.</string>
 
     <!-- Download Confirmation -->
     <string name="downloadConfirmationContinue">Dalej</string>
@@ -427,7 +429,7 @@
     <string name="changeIconDialogMessage">Aplikacja może się zamknąć, aby zastosować zmiany. Wróć po podziwianiu swojej pięknej nowej ikony.</string>
 
     <!-- New dashboard / menu buttons -->
-    <string name="manageWhitelist">Zarządzaj białą listą</string>
+    <string name="manageWhitelist">Niezabezpieczone witryny</string>
     <string name="reportBrokenSite">Zgłoś uszkodzoną witrynę</string>
 
     <!-- Dialogs -->
@@ -435,28 +437,41 @@
     <string name="dialogEditTitle">Edytuj</string>
 
     <!-- Whitelist -->
-    <string name="whitelisetActivityTitle">Biała lista</string>
-    <string name="enablePrivacyProtection">Dodaj do białej listy</string>
-    <string name="disablePrivacyProtection">Usuń z białej listy</string>
-    <string name="whitelistEntryOverflowContentDescription">Więcej opcji wpisu na białej liście %s</string>
-    <string name="whitelistEntryDeleteConfirmMessage">Czy na pewno chcesz usunąć &lt;b&gt;%s&lt;/b&gt; z białej listy?</string>
-    <string name="whitelistExplanation">Te witryny z białej listy nie zostaną zaktualizowane przez Ochronę prywatności</string>
-    <string name="whitelistNoEntries">Brak stron z białej listy</string>
+    <string name="whitelisetActivityTitle">Niezabezpieczone witryny</string>
+    <string name="enablePrivacyProtection">Włącz ochronę prywatności</string>
+    <string name="disablePrivacyProtection">Wyłącz ochronę prywatności</string>
+    <string name="whitelistEntryOverflowContentDescription">Więcej opcji dla niezabezpieczonej witryny %1$s</string>
+    <string name="whitelistEntryDeleteConfirmMessage">Na pewno usunąć &lt;b&gt;%1$s&lt;/b&gt; z niezabezpieczonych witryn?</string>
+    <string name="whitelistExplanation">Te witryny nie będą ulepszane przez ochronę prywatności.</string>
+    <string name="whitelistNoEntries">Nie ma jeszcze niezabezpieczonych witryn</string>
     <string name="whitelistDomainHint">www.example.com</string>
-    <string name="whitelistFormatError">Nie można zapisać, wprowadź domenę taką jak <b>example.com</b>
-  </string>
+    <string name="whitelistFormatError">Nie można zapisać, wprowadź domenę taką jak <b>example.com</b></string>
 
     <!-- Settings -->
-    <string name="settingsPrivacyProtectionWhitelist">Biała lista ochrony prywatności</string>
+    <string name="settingsPrivacyProtectionWhitelist">Niezabezpieczone witryny</string>
 
     <!-- Fireproof websites -->
     <string name="fireproofWebsitesActivityTitle">Bezpieczne strony internetowe</string>
     <string name="settingsFireproofWebsites">Bezpieczne strony internetowe</string>
     <string name="fireproofWebsiteMenuTitleAdd">Bezpieczna strona internetowa</string>
-    <string name="fireproofWebsiteSnackbarConfirmation">&lt;b&gt;%s&lt;/b&gt; jest teraz bezpieczna! Odwiedź Ustawienia, aby dowiedzieć się więcej.</string>
+    <string name="fireproofWebsiteSnackbarConfirmation">&lt;b&gt;%1$s&lt;/b&gt; jest teraz bezpieczna! Odwiedź Ustawienia, aby dowiedzieć się więcej.</string>
     <string name="fireproofWebsiteSnackbarAction">Cofnij</string>
-    <string name="fireproofWebsiteDeleteConfirmMessage">Czy na pewno chcesz usunąć &lt;b&gt;%s&lt;/b&gt;?</string>
+    <string name="fireproofWebsiteDeleteConfirmMessage">Czy na pewno chcesz usunąć &lt;b&gt;%1$s&lt;/b&gt;?</string>
     <string name="fireproofWebsiteEmptyListHint">Żadne strony nie są jeszcze zabezpieczone</string>
-    <string name="fireproofWebsiteFeatureDescription">Strony internetowe używają plików cookie, aby pozostawać zalogowanym. Gdy strona zostanie zabezpieczona, pliki cookie nie zostaną usunięte, a użytkownik pozostanie zalogowany, nawet po użyciu przycisku Fire.</string>
-    <string name="fireproofWebsiteOverflowContentDescription">Więcej opcji dla bezpiecznej strony internetowej %s</string>
+    <string name="fireproofWebsiteFeatureDescription">W witrynach internetowych są wykorzystywane pliki cookie. Kiedy użyjesz w witrynie funkcji zabezpieczenia, pliki cookie nie zostaną usunięte i pozostaniesz zalogowany(-a) nawet po użyciu przycisku Zabezpiecz. Nadal blokujemy narzędzia śledzące innych firm znalezione w zabezpieczonych witrynach.</string>
+    <string name="fireproofWebsiteOverflowContentDescription">Więcej opcji dla bezpiecznej strony internetowej %1$s</string>
+    <string name="fireproofWebsiteLoginDialogTitle">Czy chcesz skorzystać z zabezpieczenia dla %1$s?</string>
+    <string name="fireproofWebsiteLoginDialogDescription">Zabezpieczenie tej witryny za pomocą przycisku Zabezpiecz nie spowoduje wylogowania Cię z witryny.</string>
+    <string name="fireproofWebsiteLoginDialogPositive">Zabezpiecz</string>
+    <string name="fireproofWebsiteLoginDialogNegative">Nie teraz</string>
+    <string name="fireproofWebsiteItemsSectionTitle">Witryny internetowe</string>
+    <string name="fireproofWebsiteToogleText">Zapytaj przy logowaniu</string>
+
+    <!-- Dos Attack error-->
+    <string name="dosErrorMessage">Połączenie nie powiodło się. Ta strona może być szkodliwa dla Twojego urządzenia.</string>
+
+    <!-- Download Manager problems -->
+    <string name="downloadManagerDisabled">Wyłączono Menedżera pobierania</string>
+    <string name="downloadManagerIncompatible">Menedżer pobierania nie jest dostępny na tym urządzeniu</string>
+    <string name="enable">Włącz</string>
 </resources>

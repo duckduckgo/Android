@@ -33,17 +33,21 @@ import com.duckduckgo.app.browser.rating.ui.AppEnjoymentDialogFragment
 import com.duckduckgo.app.browser.rating.ui.GiveFeedbackDialogFragment
 import com.duckduckgo.app.browser.rating.ui.RateAppDialogFragment
 import com.duckduckgo.app.browser.shortcut.ShortcutBuilder
+import com.duckduckgo.app.cta.ui.CtaViewModel
 import com.duckduckgo.app.feedback.ui.common.FeedbackActivity
 import com.duckduckgo.app.fire.DataClearer
 import com.duckduckgo.app.fire.DataClearerForegroundAppRestartPixel
+import com.duckduckgo.app.fire.FireAnimationLoader
 import com.duckduckgo.app.global.ApplicationClearDataState
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.intentText
 import com.duckduckgo.app.global.view.*
+import com.duckduckgo.app.location.ui.LocationPermissionsActivity
 import com.duckduckgo.app.onboarding.ui.page.DefaultBrowserPage
 import com.duckduckgo.app.playstore.PlayStoreUtils
 import com.duckduckgo.app.privacy.ui.PrivacyDashboardActivity
 import com.duckduckgo.app.settings.SettingsActivity
+import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.tabs.model.TabEntity
 import kotlinx.android.synthetic.main.activity_browser.*
@@ -68,6 +72,15 @@ class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope() {
 
     @Inject
     lateinit var dataClearerForegroundAppRestartPixel: DataClearerForegroundAppRestartPixel
+
+    @Inject
+    lateinit var ctaViewModel: CtaViewModel
+
+    @Inject
+    lateinit var variantManager: VariantManager
+
+    @Inject
+    lateinit var fireAnimationLoader: FireAnimationLoader
 
     private var currentTab: BrowserTabFragment? = null
 
@@ -211,13 +224,14 @@ class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope() {
                 launch { viewModel.onOpenShortcut(sharedText) }
             } else {
                 Timber.w("opening in new tab requested for $sharedText")
-                launch { viewModel.onOpenInNewTabRequested(sharedText, true) }
+                launch { viewModel.onOpenInNewTabRequested(query = sharedText, skipHome = true) }
                 return
             }
         }
     }
 
     private fun configureObservers() {
+        lifecycle.addObserver(fireAnimationLoader)
         viewModel.command.observe(this, Observer {
             processCommand(it)
         })
@@ -276,12 +290,13 @@ class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope() {
 
     fun launchFire() {
         pixel.fire(Pixel.PixelName.FORGET_ALL_PRESSED_BROWSING)
-        val dialog = FireDialog(context = this, clearPersonalDataAction = clearPersonalDataAction)
+        val dialog = FireDialog(context = this, clearPersonalDataAction = clearPersonalDataAction, ctaViewModel = ctaViewModel, variantManager = variantManager)
         dialog.clearStarted = {
             removeObservers()
-            clearingInProgressView.show()
         }
         dialog.clearComplete = { viewModel.onClearComplete() }
+        dialog.setOnShowListener { currentTab?.onFireDialogVisibilityChanged(isVisible = true) }
+        dialog.setOnCancelListener { currentTab?.onFireDialogVisibilityChanged(isVisible = false) }
         dialog.show()
     }
 
@@ -289,13 +304,15 @@ class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope() {
         launch { viewModel.onNewTabRequested() }
     }
 
-    fun openInNewTab(query: String) {
-        launch { viewModel.onOpenInNewTabRequested(query) }
+    fun openInNewTab(query: String, sourceTabId: String?) {
+        launch {
+            viewModel.onOpenInNewTabRequested(query = query, sourceTabId = sourceTabId)
+        }
     }
 
-    fun openMessageInNewTab(message: Message) {
+    fun openMessageInNewTab(message: Message, sourceTabId: String?) {
         openMessageInNewTabJob = launch {
-            val tabId = viewModel.onNewTabRequested()
+            val tabId = viewModel.onNewTabRequested(sourceTabId = sourceTabId)
             val fragment = openNewTab(tabId, null, false)
             fragment.messageFromPreviousTab = message
         }
@@ -303,6 +320,10 @@ class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope() {
 
     fun launchSettings() {
         startActivity(SettingsActivity.intent(this))
+    }
+
+    fun launchLocationSettings() {
+        startActivity(LocationPermissionsActivity.intent(this))
     }
 
     fun launchBookmarks() {

@@ -47,17 +47,6 @@ class WebsiteNotification(
     override suspend fun buildSpecification(): NotificationSpec {
         return WebsiteNotificationSpecification(context, url, title, description, pixelSuffix)
     }
-
-    companion object {
-        const val DRIP_A_1_URL = "https://spreadprivacy.com/how-anonymous-is-duckduckgo/"
-        const val DRIP_A_2_URL = "https://spreadprivacy.com/how-does-the-duckduckgo-app-extension-protect-my-privacy/"
-        const val DRIP_A_1_PIXEL = "a1"
-        const val DRIP_A_2_PIXEL = "a2"
-        const val DRIP_A_1_TITLE = R.string.dripA1Title
-        const val DRIP_A_1_DESCRIPTION = R.string.dripA1Description
-        const val DRIP_A_2_TITLE = R.string.dripA2Title
-        const val DRIP_A_2_DESCRIPTION = R.string.dripA2Description
-    }
 }
 
 open class WebsiteNotificationSpecification(
@@ -73,7 +62,7 @@ open class WebsiteNotificationSpecification(
     override val systemId = NotificationRegistrar.NotificationId.Article
     override val name = "Website"
     override val icon = R.drawable.notification_logo
-    override val launchButton: String = context.getString(R.string.dripAButtonText)
+    override val launchButton: String? = null
     override val closeButton: String? = null
     override val autoCancel = true
     override val title: String = context.getString(titleRes)

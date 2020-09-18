@@ -19,6 +19,7 @@
 package com.duckduckgo.app.notification.model
 
 import androidx.test.platform.app.InstrumentationRegistry
+import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.notification.db.NotificationDao
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.mock
@@ -39,7 +40,7 @@ class WebsiteNotificationTest {
 
     @Before
     fun before() {
-        testee = WebsiteNotification(context, notificationsDao, URL, TITLE, DESCRIPTION, PIXEL)
+        testee = WebsiteNotification(context, notificationsDao, URL, R.string.yes, R.string.no, PIXEL)
     }
 
     @Test
@@ -69,7 +70,5 @@ class WebsiteNotificationTest {
     companion object {
         private const val URL = "test"
         private const val PIXEL = "pixel"
-        private const val TITLE = WebsiteNotification.DRIP_A_1_TITLE
-        private const val DESCRIPTION = WebsiteNotification.DRIP_A_1_DESCRIPTION
     }
 }

@@ -29,9 +29,11 @@ interface TabRepository {
     /**
      * @return tabId of new record
      */
-    suspend fun add(url: String? = null, skipHome: Boolean = false, isDefaultTab: Boolean = false): String
+    suspend fun add(url: String? = null, skipHome: Boolean = false): String
 
-    suspend fun add(tabId: String, data: MutableLiveData<Site>, skipHome: Boolean = false, isDefaultTab: Boolean = false)
+    suspend fun addDefaultTab(): String
+
+    suspend fun addFromSourceTab(url: String? = null, skipHome: Boolean = false, sourceTabId: String): String
 
     suspend fun addNewTabAfterExistingTab(url: String? = null, tabId: String)
 
@@ -43,6 +45,8 @@ interface TabRepository {
     fun retrieveSiteData(tabId: String): MutableLiveData<Site>
 
     suspend fun delete(tab: TabEntity)
+
+    suspend fun deleteCurrentTabAndSelectSource()
 
     fun deleteAll()
 

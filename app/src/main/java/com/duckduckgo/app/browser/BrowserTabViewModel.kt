@@ -23,17 +23,15 @@ import android.os.Message
 import android.view.ContextMenu
 import android.view.MenuItem
 import android.view.View
+import android.webkit.GeolocationPermissions
 import android.webkit.ValueCallback
 import android.webkit.WebChromeClient
 import android.webkit.WebView
 import androidx.annotation.AnyThread
 import androidx.annotation.VisibleForTesting
 import androidx.core.net.toUri
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.*
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import com.duckduckgo.app.autocomplete.api.AutoComplete
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteResult
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion
@@ -50,38 +48,39 @@ import com.duckduckgo.app.browser.LongPressHandler.RequiredAction
 import com.duckduckgo.app.browser.SpecialUrlDetector.UrlType.IntentType
 import com.duckduckgo.app.browser.WebNavigationStateChange.*
 import com.duckduckgo.app.browser.addtohome.AddToHomeCapabilityDetector
+import com.duckduckgo.app.browser.downloader.DownloadFailReason
+import com.duckduckgo.app.browser.downloader.FileDownloader
 import com.duckduckgo.app.browser.favicon.FaviconDownloader
-import com.duckduckgo.app.browser.logindetection.NavigationEvent
 import com.duckduckgo.app.browser.logindetection.LoginDetected
 import com.duckduckgo.app.browser.logindetection.NavigationAwareLoginDetector
+import com.duckduckgo.app.browser.logindetection.NavigationEvent
 import com.duckduckgo.app.browser.model.BasicAuthenticationCredentials
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.browser.model.LongPressTarget
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.browser.ui.HttpAuthenticationDialogFragment.HttpAuthenticationListener
-import com.duckduckgo.app.cta.ui.Cta
-import com.duckduckgo.app.cta.ui.CtaViewModel
-import com.duckduckgo.app.cta.ui.DaxDialogCta
-import com.duckduckgo.app.cta.ui.DialogCta
-import com.duckduckgo.app.cta.ui.HomePanelCta
-import com.duckduckgo.app.cta.ui.HomeTopPanelCta
-import com.duckduckgo.app.cta.ui.UseOurAppCta
+import com.duckduckgo.app.cta.ui.*
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepository
 import com.duckduckgo.app.global.*
+import com.duckduckgo.app.global.events.db.UserEventKey
+import com.duckduckgo.app.global.events.db.UserEventsStore
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.global.model.SiteFactory
 import com.duckduckgo.app.global.model.domain
 import com.duckduckgo.app.global.model.domainMatchesUrl
-import com.duckduckgo.app.global.events.db.UserEventsStore
-import com.duckduckgo.app.global.events.db.UserEventKey
-import com.duckduckgo.app.global.toDesktopUri
 import com.duckduckgo.app.global.useourapp.UseOurAppDetector
 import com.duckduckgo.app.global.useourapp.UseOurAppDetector.Companion.USE_OUR_APP_SHORTCUT_TITLE
 import com.duckduckgo.app.global.useourapp.UseOurAppDetector.Companion.USE_OUR_APP_SHORTCUT_URL
+import com.duckduckgo.app.global.view.asLocationPermissionOrigin
 import com.duckduckgo.app.notification.db.NotificationDao
 import com.duckduckgo.app.notification.model.UseOurAppNotification
+import com.duckduckgo.app.location.GeoLocationPermissions
+import com.duckduckgo.app.location.data.LocationPermissionType
+import com.duckduckgo.app.location.data.LocationPermissionsRepository
+import com.duckduckgo.app.location.ui.SiteLocationPermissionDialog
+import com.duckduckgo.app.location.ui.SystemLocationPermissionDialog
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao
 import com.duckduckgo.app.privacy.db.UserWhitelistDao
 import com.duckduckgo.app.privacy.model.PrivacyGrade
@@ -101,12 +100,14 @@ import com.jakewharton.rxrelay2.PublishRelay
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
+import io.reactivex.schedulers.Schedulers.io
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
-import java.util.Locale
+import java.io.File
+import java.util.*
 import java.util.concurrent.TimeUnit
 
 class BrowserTabViewModel(
@@ -119,6 +120,8 @@ class BrowserTabViewModel(
     private val networkLeaderboardDao: NetworkLeaderboardDao,
     private val bookmarksDao: BookmarksDao,
     private val fireproofWebsiteRepository: FireproofWebsiteRepository,
+    private val locationPermissionsRepository: LocationPermissionsRepository,
+    private val geoLocationPermissions: GeoLocationPermissions,
     private val navigationAwareLoginDetector: NavigationAwareLoginDetector,
     private val autoComplete: AutoComplete,
     private val appSettingsPreferencesStore: SettingsDataStore,
@@ -134,8 +137,10 @@ class BrowserTabViewModel(
     private val userEventsStore: UserEventsStore,
     private val notificationDao: NotificationDao,
     private val useOurAppDetector: UseOurAppDetector,
-    private val variantManager: VariantManager
-) : WebViewClientListener, EditBookmarkListener, HttpAuthenticationListener, ViewModel() {
+    private val variantManager: VariantManager,
+    private val fileDownloader: FileDownloader
+) : WebViewClientListener, EditBookmarkListener, HttpAuthenticationListener, SiteLocationPermissionDialog.SiteLocationPermissionDialogListener,
+    SystemLocationPermissionDialog.SystemLocationPermissionDialogListener, ViewModel() {
 
     private var buildingSiteFactoryJob: Job? = null
 
@@ -157,7 +162,7 @@ class BrowserTabViewModel(
         val showSearchIcon: Boolean = false,
         val showClearButton: Boolean = false,
         val showTabsButton: Boolean = true,
-        val showFireButton: Boolean = true,
+        val fireButton: FireButton = FireButton.Visible(),
         val showMenuButton: Boolean = true,
         val canSharePage: Boolean = false,
         val canAddBookmarks: Boolean = false,
@@ -172,6 +177,18 @@ class BrowserTabViewModel(
         val addToHomeVisible: Boolean = false,
         val showDaxIcon: Boolean = false
     )
+
+    sealed class FireButton {
+        data class Visible(val pulseAnimation: Boolean = false) : FireButton()
+        object Gone : FireButton()
+
+        fun playPulseAnimation(): Boolean {
+            return when (this) {
+                is Visible -> this.pulseAnimation
+                is Gone -> false
+            }
+        }
+    }
 
     data class OmnibarViewState(
         val omnibarText: String = "",
@@ -207,13 +224,15 @@ class BrowserTabViewModel(
         val searchResults: AutoCompleteResult = AutoCompleteResult("", emptyList())
     )
 
+    data class LocationPermission(val origin: String, val callback: GeolocationPermissions.Callback)
+
     sealed class Command {
         object Refresh : Command()
         class Navigate(val url: String) : Command()
         class NavigateBack(val steps: Int) : Command()
         object NavigateForward : Command()
-        class OpenInNewTab(val query: String) : Command()
-        class OpenMessageInNewTab(val message: Message) : Command()
+        class OpenInNewTab(val query: String, val sourceTabId: String? = null) : Command()
+        class OpenMessageInNewTab(val message: Message, val sourceTabId: String? = null) : Command()
         class OpenInNewBackgroundTab(val query: String) : Command()
         object LaunchNewTab : Command()
         object ResetHistory : Command()
@@ -244,12 +263,22 @@ class BrowserTabViewModel(
         object LaunchTabSwitcher : Command()
         object HideWebContent : Command()
         object ShowWebContent : Command()
+        class CheckSystemLocationPermission(val domain: String, val deniedForever: Boolean) : Command()
+        class AskDomainPermission(val domain: String) : Command()
+        object RequestSystemLocationPermission : Command()
         class RefreshUserAgent(val host: String?, val isDesktop: Boolean) : Command()
-
-        class ShowErrorWithAction(val action: () -> Unit) : Command()
+        class ShowErrorWithAction(val textResId: Int, val action: () -> Unit) : Command()
+        class ShowDomainHasPermissionMessage(val domain: String) : Command()
         sealed class DaxCommand : Command() {
             object FinishTrackerAnimation : DaxCommand()
             class HideDaxDialog(val cta: Cta) : DaxCommand()
+        }
+
+        sealed class DownloadCommand : Command() {
+            class ScanMediaFiles(val file: File) : DownloadCommand()
+            class ShowDownloadFailedNotification(val message: String, val reason: DownloadFailReason) : DownloadCommand()
+            class ShowDownloadFinishedNotification(val file: File, val mimeType: String?) : DownloadCommand()
+            object ShowDownloadInProgressNotification : DownloadCommand()
         }
     }
 
@@ -274,8 +303,11 @@ class BrowserTabViewModel(
     val title: String?
         get() = site?.title
 
+    private var locationPermission: LocationPermission? = null
+
     private val autoCompletePublishSubject = PublishRelay.create<String>()
     private val fireproofWebsiteState: LiveData<List<FireproofWebsiteEntity>> = fireproofWebsiteRepository.getFireproofWebsites()
+    private val showPulseAnimation: LiveData<Boolean> = ctaViewModel.showFireButtonPulseAnimation.asLiveData(context = viewModelScope.coroutineContext)
     private var autoCompleteDisposable: Disposable? = null
     private var site: Site? = null
     private lateinit var tabId: String
@@ -285,6 +317,12 @@ class BrowserTabViewModel(
 
     private val fireproofWebsitesObserver = Observer<List<FireproofWebsiteEntity>> {
         browserViewState.value = currentBrowserViewState().copy(isFireproofWebsite = isFireproofWebsite())
+    }
+
+    private val fireButtonAnimation = Observer<Boolean> { shouldShowAnimation ->
+        if (currentBrowserViewState().fireButton is FireButton.Visible) {
+            browserViewState.value = currentBrowserViewState().copy(fireButton = FireButton.Visible(pulseAnimation = shouldShowAnimation))
+        }
     }
 
     private val loginDetectionObserver = Observer<LoginDetected> { loginEvent ->
@@ -302,6 +340,7 @@ class BrowserTabViewModel(
         configureAutoComplete()
         fireproofWebsiteState.observeForever(fireproofWebsitesObserver)
         navigationAwareLoginDetector.loginEventLiveData.observeForever(loginDetectionObserver)
+        showPulseAnimation.observeForever(fireButtonAnimation)
     }
 
     fun loadData(tabId: String, initialUrl: String?, skipHome: Boolean) {
@@ -368,6 +407,7 @@ class BrowserTabViewModel(
         autoCompleteDisposable = null
         fireproofWebsiteState.removeObserver(fireproofWebsitesObserver)
         navigationAwareLoginDetector.loginEventLiveData.removeObserver(loginDetectionObserver)
+        showPulseAnimation.removeObserver(fireButtonAnimation)
         super.onCleared()
     }
 
@@ -486,7 +526,6 @@ class BrowserTabViewModel(
         } else {
             pixel.fire(String.format(Locale.US, PixelName.SERP_REQUERY.pixelName, PixelParameter.SERP_QUERY_CHANGED))
         }
-
     }
 
     private fun shouldClearHistoryOnNewQuery(): Boolean {
@@ -503,6 +542,20 @@ class BrowserTabViewModel(
 
     override fun closeCurrentTab() {
         viewModelScope.launch { removeCurrentTabFromRepository() }
+    }
+
+    fun closeAndReturnToSourceIfBlankTab() {
+        if (url == null) {
+            closeAndSelectSourceTab()
+        }
+    }
+
+    override fun closeAndSelectSourceTab() {
+        viewModelScope.launch { removeAndSelectTabFromRepository() }
+    }
+
+    private suspend fun removeAndSelectTabFromRepository() {
+        tabRepository.deleteCurrentTabAndSelectSource()
     }
 
     fun onUserPressedForward() {
@@ -534,6 +587,7 @@ class BrowserTabViewModel(
     fun onUserPressedBack(): Boolean {
         navigationAwareLoginDetector.onEvent(NavigationEvent.UserAction.NavigateBack)
         val navigation = webNavigationState ?: return false
+        val hasSourceTab = tabRepository.liveSelectedTab.value?.sourceTabId != null
 
         if (currentFindInPageViewState().visible) {
             dismissFindInView()
@@ -546,6 +600,11 @@ class BrowserTabViewModel(
 
         if (navigation.canGoBack) {
             command.value = NavigateBack(navigation.stepsToPreviousPage)
+            return true
+        } else if (hasSourceTab) {
+            viewModelScope.launch {
+                tabRepository.deleteCurrentTabAndSelectSource()
+            }
             return true
         } else if (!skipHome) {
             navigateHome()
@@ -654,6 +713,10 @@ class BrowserTabViewModel(
 
         domain?.let { viewModelScope.launch { updateLoadingStatePrivacy(domain) } }
         domain?.let { viewModelScope.launch { updateWhitelistedState(domain) } }
+
+        val permissionOrigin = site?.uri?.host?.asLocationPermissionOrigin()
+        permissionOrigin?.let { viewModelScope.launch { notifyPermanentLocationPermission(permissionOrigin) } }
+
         registerSiteVisit()
     }
 
@@ -673,6 +736,7 @@ class BrowserTabViewModel(
                 deleteCtaShown -> pixel.fire(PixelName.UOA_VISITED_AFTER_DELETE_CTA)
                 isShortcutAdded != null -> pixel.fire(PixelName.UOA_VISITED_AFTER_SHORTCUT)
                 isUseOurAppNotificationSeen -> pixel.fire(PixelName.UOA_VISITED_AFTER_NOTIFICATION)
+                else -> pixel.fire(PixelName.UOA_VISITED)
             }
         }
     }
@@ -703,6 +767,26 @@ class BrowserTabViewModel(
 
     private suspend fun isWhitelisted(domain: String): Boolean {
         return withContext(dispatchers.io()) { userWhitelistDao.contains(domain) }
+    }
+
+    private suspend fun notifyPermanentLocationPermission(domain: String) {
+        if (!geoLocationPermissions.isDeviceLocationEnabled()) {
+            viewModelScope.launch(dispatchers.io()) {
+                onDeviceLocationDisabled()
+            }
+            return
+        }
+
+        if (!appSettingsPreferencesStore.appLocationPermission) {
+            return
+        }
+
+        val permissionEntity = locationPermissionsRepository.getDomainPermission(domain)
+        permissionEntity?.let {
+            if (it.permission == LocationPermissionType.ALLOW_ALWAYS) {
+                command.postValue(ShowDomainHasPermissionMessage(domain))
+            }
+        }
     }
 
     private fun urlUpdated(url: String) {
@@ -776,10 +860,165 @@ class BrowserTabViewModel(
         }
     }
 
+    override fun onSiteLocationPermissionRequested(origin: String, callback: GeolocationPermissions.Callback) {
+        locationPermission = LocationPermission(origin, callback)
+
+        if (!geoLocationPermissions.isDeviceLocationEnabled()) {
+            viewModelScope.launch(dispatchers.io()) {
+                onDeviceLocationDisabled()
+            }
+            onSiteLocationPermissionAlwaysDenied()
+            return
+        }
+
+        if (site?.domainMatchesUrl(origin) == false) {
+            onSiteLocationPermissionAlwaysDenied()
+            return
+        }
+
+        if (!appSettingsPreferencesStore.appLocationPermission) {
+            onSiteLocationPermissionAlwaysDenied()
+            return
+        }
+
+        viewModelScope.launch {
+            val previouslyDeniedForever = appSettingsPreferencesStore.appLocationPermissionDeniedForever
+            val permissionEntity = locationPermissionsRepository.getDomainPermission(origin)
+            if (permissionEntity == null) {
+                command.postValue(CheckSystemLocationPermission(origin, previouslyDeniedForever))
+            } else {
+                if (permissionEntity.permission == LocationPermissionType.DENY_ALWAYS) {
+                    onSiteLocationPermissionAlwaysDenied()
+                } else {
+                    command.postValue(CheckSystemLocationPermission(origin, previouslyDeniedForever))
+                }
+            }
+        }
+    }
+
+    override fun onSiteLocationPermissionSelected(domain: String, permission: LocationPermissionType) {
+        locationPermission?.let { locationPermission ->
+            when (permission) {
+                LocationPermissionType.ALLOW_ALWAYS -> {
+                    onSiteLocationPermissionAlwaysAllowed()
+                    pixel.fire(PixelName.PRECISE_LOCATION_SITE_DIALOG_ALLOW_ALWAYS)
+                    viewModelScope.launch {
+                        locationPermissionsRepository.savePermission(domain, permission)
+                    }
+                }
+                LocationPermissionType.ALLOW_ONCE -> {
+                    pixel.fire(PixelName.PRECISE_LOCATION_SITE_DIALOG_ALLOW_ONCE)
+                    locationPermission.callback.invoke(locationPermission.origin, true, false)
+                }
+                LocationPermissionType.DENY_ALWAYS -> {
+                    pixel.fire(PixelName.PRECISE_LOCATION_SITE_DIALOG_DENY_ALWAYS)
+                    onSiteLocationPermissionAlwaysDenied()
+                    viewModelScope.launch {
+                        locationPermissionsRepository.savePermission(domain, permission)
+                    }
+                }
+                LocationPermissionType.DENY_ONCE -> {
+                    pixel.fire(PixelName.PRECISE_LOCATION_SITE_DIALOG_DENY_ONCE)
+                    locationPermission.callback.invoke(locationPermission.origin, false, false)
+                }
+            }
+        }
+    }
+
+    private fun onSiteLocationPermissionAlwaysAllowed() {
+        locationPermission?.let { locationPermission ->
+            geoLocationPermissions.allow(locationPermission.origin)
+            locationPermission.callback.invoke(locationPermission.origin, true, false)
+        }
+    }
+
+    fun onSiteLocationPermissionAlwaysDenied() {
+        locationPermission?.let { locationPermission ->
+            geoLocationPermissions.clear(locationPermission.origin)
+            locationPermission.callback.invoke(locationPermission.origin, false, false)
+        }
+    }
+
+    private suspend fun onDeviceLocationDisabled() {
+        geoLocationPermissions.clearAll()
+    }
+
+    private fun reactToSitePermission(permission: LocationPermissionType) {
+        locationPermission?.let { locationPermission ->
+            when (permission) {
+                LocationPermissionType.ALLOW_ALWAYS -> {
+                    onSiteLocationPermissionAlwaysAllowed()
+                }
+                LocationPermissionType.ALLOW_ONCE -> {
+                    command.postValue(AskDomainPermission(locationPermission.origin))
+                }
+                LocationPermissionType.DENY_ALWAYS -> {
+                    onSiteLocationPermissionAlwaysDenied()
+                }
+                LocationPermissionType.DENY_ONCE -> {
+                    command.postValue(AskDomainPermission(locationPermission.origin))
+                }
+            }
+
+        }
+    }
+
+    override fun onSystemLocationPermissionAllowed() {
+        pixel.fire(PixelName.PRECISE_LOCATION_SYSTEM_DIALOG_ENABLE)
+        command.postValue(RequestSystemLocationPermission)
+    }
+
+    override fun onSystemLocationPermissionNotAllowed() {
+        pixel.fire(PixelName.PRECISE_LOCATION_SYSTEM_DIALOG_LATER)
+        onSiteLocationPermissionAlwaysDenied()
+    }
+
+    override fun onSystemLocationPermissionNeverAllowed() {
+        locationPermission?.let { locationPermission ->
+            val neverAllowedPermission = LocationPermissionType.DENY_ALWAYS
+            onSiteLocationPermissionSelected(locationPermission.origin, neverAllowedPermission)
+            pixel.fire(Pixel.PixelName.PRECISE_LOCATION_SYSTEM_DIALOG_NEVER)
+            viewModelScope.launch {
+                locationPermissionsRepository.savePermission(locationPermission.origin, neverAllowedPermission)
+            }
+        }
+    }
+
+    fun onSystemLocationPermissionGranted() {
+        locationPermission?.let { locationPermission ->
+            appSettingsPreferencesStore.appLocationPermissionDeniedForever = false
+            appSettingsPreferencesStore.appLocationPermission = true
+            pixel.fire(Pixel.PixelName.PRECISE_LOCATION_SETTINGS_LOCATION_PERMISSION_ENABLE)
+            viewModelScope.launch {
+                val permissionEntity = locationPermissionsRepository.getDomainPermission(locationPermission.origin)
+                if (permissionEntity == null) {
+                    command.postValue(AskDomainPermission(locationPermission.origin))
+                } else {
+                    reactToSitePermission(permissionEntity.permission)
+                }
+            }
+        }
+    }
+
+    fun onSystemLocationPermissionDeniedOneTime() {
+        pixel.fire(Pixel.PixelName.PRECISE_LOCATION_SETTINGS_LOCATION_PERMISSION_DISABLE)
+        onSiteLocationPermissionAlwaysDenied()
+    }
+
+    fun onSystemLocationPermissionDeniedForever() {
+        appSettingsPreferencesStore.appLocationPermissionDeniedForever = true
+        onSystemLocationPermissionDeniedOneTime()
+    }
+
     private fun registerSiteVisit() {
         Schedulers.io().scheduleDirect {
             networkLeaderboardDao.incrementSitesVisited()
         }
+    }
+
+    override fun dosAttackDetected() {
+        invalidateBrowsingActions()
+        showErrorWithAction(R.string.dosErrorMessage)
     }
 
     override fun titleReceived(newTitle: String) {
@@ -898,7 +1137,11 @@ class BrowserTabViewModel(
             showPrivacyGrade = showPrivacyGrade,
             showSearchIcon = showSearchIcon,
             showTabsButton = showControls,
-            showFireButton = showControls,
+            fireButton = if (showControls) {
+                FireButton.Visible(pulseAnimation = showPulseAnimation.value ?: false)
+            } else {
+                FireButton.Gone
+            },
             showMenuButton = showControls,
             showClearButton = showClearButton,
             showDaxIcon = shouldShowDaxIcon(url, showPrivacyGrade)
@@ -1025,7 +1268,7 @@ class BrowserTabViewModel(
         return when (requiredAction) {
             is RequiredAction.OpenInNewTab -> {
                 command.value = GenerateWebViewPreviewImage
-                command.value = OpenInNewTab(requiredAction.url)
+                command.value = OpenInNewTab(query = requiredAction.url, sourceTabId = tabId)
                 true
             }
             is RequiredAction.OpenInNewBackgroundTab -> {
@@ -1303,12 +1546,8 @@ class BrowserTabViewModel(
         command.value = HandleExternalAppLink(appLink)
     }
 
-    override fun openInNewTab(url: String?) {
-        command.value = OpenInNewTab(url.orEmpty())
-    }
-
     override fun openMessageInNewTab(message: Message) {
-        command.value = OpenMessageInNewTab(message)
+        command.value = OpenMessageInNewTab(message, tabId)
     }
 
     override fun recoverFromRenderProcessGone() {
@@ -1364,8 +1603,8 @@ class BrowserTabViewModel(
         )
     }
 
-    private fun showErrorWithAction() {
-        command.value = ShowErrorWithAction { this.onUserSubmittedQuery(url.orEmpty()) }
+    private fun showErrorWithAction(errorMessage: Int = R.string.crashedWebViewErrorMessage) {
+        command.value = ShowErrorWithAction(errorMessage) { this.onUserSubmittedQuery(url.orEmpty()) }
     }
 
     private fun recoverTabWithQuery(query: String) {
@@ -1376,6 +1615,48 @@ class BrowserTabViewModel(
     override fun loginDetected() {
         val currentUrl = site?.url ?: return
         navigationAwareLoginDetector.onEvent(NavigationEvent.LoginAttempt(currentUrl))
+    }
+
+    fun download(pendingFileDownload: FileDownloader.PendingFileDownload) {
+        viewModelScope.launch(dispatchers.io()) {
+            fileDownloader.download(pendingFileDownload, object : FileDownloader.FileDownloadListener {
+
+                override fun downloadStartedNetworkFile() {
+                    Timber.d("download started: network file")
+                    closeAndReturnToSourceIfBlankTab()
+                }
+
+                override fun downloadFinishedNetworkFile(file: File, mimeType: String?) {
+                    Timber.i("downloadFinished network file")
+                }
+
+                override fun downloadStartedDataUri() {
+                    Timber.i("downloadStarted data uri")
+                    command.postValue(DownloadCommand.ShowDownloadInProgressNotification)
+                    closeAndReturnToSourceIfBlankTab()
+                }
+
+                override fun downloadFinishedDataUri(file: File, mimeType: String?) {
+                    Timber.i("downloadFinished data uri")
+                    command.postValue(DownloadCommand.ScanMediaFiles(file))
+                    command.postValue(DownloadCommand.ShowDownloadFinishedNotification(file, mimeType))
+                }
+
+                override fun downloadFailed(message: String, downloadFailReason: DownloadFailReason) {
+                    Timber.w("Failed to download file [$message]")
+                    command.postValue(DownloadCommand.ShowDownloadFailedNotification(message, downloadFailReason))
+                }
+
+                override fun downloadCancelled() {
+                    Timber.i("Download cancelled")
+                    closeAndReturnToSourceIfBlankTab()
+                }
+
+                override fun downloadOpened() {
+                    closeAndReturnToSourceIfBlankTab()
+                }
+            })
+        }
     }
 
     companion object {

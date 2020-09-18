@@ -46,8 +46,7 @@
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/cardContainer"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:layout_behavior="@string/bottom_sheet_behavior">
+            android:layout_height="wrap_content">
 
             <TextView
                 android:id="@+id/hiddenTextCta"

@@ -26,10 +26,14 @@ import com.duckduckgo.app.browser.addtohome.AddToHomeSystemCapabilityDetector
 import com.duckduckgo.app.browser.defaultbrowsing.AndroidDefaultBrowserDetector
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserObserver
-import com.duckduckgo.app.browser.logindetection.JsLoginDetector
+import com.duckduckgo.app.browser.downloader.AndroidFileDownloader
+import com.duckduckgo.app.browser.downloader.DataUriDownloader
+import com.duckduckgo.app.browser.downloader.FileDownloader
+import com.duckduckgo.app.browser.downloader.NetworkFileDownloader
 import com.duckduckgo.app.browser.logindetection.DOMLoginDetector
-import com.duckduckgo.app.browser.logindetection.NextPageLoginDetection
+import com.duckduckgo.app.browser.logindetection.JsLoginDetector
 import com.duckduckgo.app.browser.logindetection.NavigationAwareLoginDetector
+import com.duckduckgo.app.browser.logindetection.NextPageLoginDetection
 import com.duckduckgo.app.browser.session.WebViewSessionInMemoryStorage
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.browser.tabpreview.FileBasedWebViewPreviewGenerator
@@ -83,7 +87,8 @@ class BrowserModule {
         offlinePixelCountDataStore: OfflinePixelCountDataStore,
         uncaughtExceptionRepository: UncaughtExceptionRepository,
         cookieManager: CookieManager,
-        loginDetector: DOMLoginDetector
+        loginDetector: DOMLoginDetector,
+        dosDetector: DosDetector
     ): BrowserWebViewClient {
         return BrowserWebViewClient(
             requestRewriter,
@@ -92,7 +97,8 @@ class BrowserModule {
             offlinePixelCountDataStore,
             uncaughtExceptionRepository,
             cookieManager,
-            loginDetector
+            loginDetector,
+            dosDetector
         )
     }
 
@@ -228,5 +234,10 @@ class BrowserModule {
     @Provides
     fun navigationAwareLoginDetector(): NavigationAwareLoginDetector {
         return NextPageLoginDetection()
+    }
+
+    @Provides
+    fun fileDownloader(dataUriDownloader: DataUriDownloader, networkFileDownloader: NetworkFileDownloader): FileDownloader {
+        return AndroidFileDownloader(dataUriDownloader, networkFileDownloader)
     }
 }

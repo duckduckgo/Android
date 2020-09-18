@@ -28,15 +28,9 @@ interface VariantManager {
 
     // variant-dependant features listed here
     sealed class VariantFeature {
-        object DripNotification : VariantFeature()
-        object Day1PrivacyNotification : VariantFeature()
-        object Day3ClearDataNotification : VariantFeature()
-        object Day1DripA1Notification : VariantFeature()
-        object Day1DripA2Notification : VariantFeature()
-        object Day1DripB1Notification : VariantFeature()
-        object Day1DripB2Notification : VariantFeature()
         object SerpHeaderQueryReplacement : VariantFeature()
         object SerpHeaderRemoval : VariantFeature()
+        object FireButtonEducation : VariantFeature()
     }
 
     companion object {
@@ -49,64 +43,42 @@ interface VariantManager {
         val ACTIVE_VARIANTS = listOf(
             // SERP variants. "sc" may also be used as a shared control for mobile experiments in
             // the future if we can filter by app version
-            Variant(key = "sc", weight = 0.0, features = emptyList(), filterBy = { noFilter() }),
-            Variant(key = "se", weight = 0.0, features = emptyList(), filterBy = { noFilter() }),
-
-            // Notification Drip Experiment
-            Variant(
-                key = "za",
-                weight = 0.0,
-                features = listOf(VariantFeature.DripNotification, VariantFeature.Day1PrivacyNotification, VariantFeature.Day3ClearDataNotification),
-                filterBy = { isEnglishLocale() }),
-            Variant(
-                key = "zb",
-                weight = 0.0,
-                features = listOf(VariantFeature.DripNotification),
-                filterBy = { isEnglishLocale() }),
-            Variant(
-                key = "zc",
-                weight = 0.0,
-                features = listOf(VariantFeature.DripNotification, VariantFeature.Day1DripA1Notification, VariantFeature.Day3ClearDataNotification),
-                filterBy = { isEnglishLocale() }),
-            Variant(
-                key = "zd",
-                weight = 0.0,
-                features = listOf(VariantFeature.DripNotification, VariantFeature.Day1DripA2Notification, VariantFeature.Day3ClearDataNotification),
-                filterBy = { isEnglishLocale() }),
-            Variant(
-                key = "ze",
-                weight = 0.0,
-                features = listOf(VariantFeature.DripNotification, VariantFeature.Day1DripB1Notification, VariantFeature.Day3ClearDataNotification),
-                filterBy = { isEnglishLocale() }),
-            Variant(
-                key = "zf",
-                weight = 0.0,
-                features = listOf(VariantFeature.DripNotification, VariantFeature.Day1DripB2Notification, VariantFeature.Day3ClearDataNotification),
-                filterBy = { isEnglishLocale() }),
+            Variant(key = "sc", weight = 1.0, features = emptyList(), filterBy = { isSerpRegionToggleCountry() }),
+            Variant(key = "se", weight = 1.0, features = emptyList(), filterBy = { isSerpRegionToggleCountry() }),
 
             // Single Search Bar Experiments
-            // Disabled until Drip Notifications Experiments are completed
-            Variant(
-                key = "zg",
-                weight = 1.0,
-                features = emptyList(),
-                filterBy = { noFilter() }),
-            Variant(
-                key = "zh",
-                weight = 1.0,
-                features = listOf(VariantFeature.SerpHeaderQueryReplacement),
-                filterBy = { noFilter() }),
-            Variant(
-                key = "zi",
-                weight = 1.0,
-                features = listOf(VariantFeature.SerpHeaderRemoval),
-                filterBy = { noFilter() })
+            Variant(key = "zg", weight = 0.0, features = emptyList(), filterBy = { noFilter() }),
+            Variant(key = "zh", weight = 0.0, features = listOf(VariantFeature.SerpHeaderQueryReplacement), filterBy = { noFilter() }),
+            Variant(key = "zi", weight = 0.0, features = listOf(VariantFeature.SerpHeaderRemoval), filterBy = { noFilter() }),
 
+            // Fire Education Experiments
+            Variant(key = "zm", weight = 1.0, features = emptyList(), filterBy = { isEnglishLocale() }),
+            Variant(
+                key = "zr",
+                weight = 1.0,
+                features = listOf(VariantFeature.FireButtonEducation),
+                filterBy = { isEnglishLocale() })
             // All groups in an experiment (control and variants) MUST use the same filters
         )
 
         val REFERRER_VARIANTS = listOf(
             Variant(RESERVED_EU_AUCTION_VARIANT, features = emptyList(), filterBy = { noFilter() })
+        )
+
+        private val serpRegionToggleTargetCountries = listOf(
+            "AU",
+            "AT",
+            "DK",
+            "FI",
+            "FR",
+            "DE",
+            "IT",
+            "IE",
+            "NZ",
+            "NO",
+            "ES",
+            "SE",
+            "GB"
         )
 
         fun referrerVariant(key: String): Variant {
@@ -119,6 +91,11 @@ interface VariantManager {
         private fun isEnglishLocale(): Boolean {
             val locale = Locale.getDefault()
             return locale != null && locale.language == "en"
+        }
+
+        private fun isSerpRegionToggleCountry(): Boolean {
+            val locale = Locale.getDefault()
+            return locale != null && serpRegionToggleTargetCountries.contains(locale.country)
         }
     }
 

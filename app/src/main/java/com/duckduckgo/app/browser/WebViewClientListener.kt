@@ -19,6 +19,7 @@ package com.duckduckgo.app.browser
 import android.net.Uri
 import android.os.Message
 import android.view.View
+import android.webkit.GeolocationPermissions
 import android.webkit.ValueCallback
 import android.webkit.WebChromeClient
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
@@ -31,6 +32,8 @@ interface WebViewClientListener {
     fun pageRefreshed(refreshedUrl: String)
     fun progressChanged(newProgress: Int)
 
+    fun onSiteLocationPermissionRequested(origin: String, callback: GeolocationPermissions.Callback)
+
     fun titleReceived(newTitle: String)
     fun trackerDetected(event: TrackingEvent)
     fun pageHasHttpResources(page: String)
@@ -42,13 +45,14 @@ interface WebViewClientListener {
     fun exitFullScreen()
     fun showFileChooser(filePathCallback: ValueCallback<Array<Uri>>, fileChooserParams: WebChromeClient.FileChooserParams)
     fun externalAppLinkClicked(appLink: SpecialUrlDetector.UrlType.IntentType)
-    fun openInNewTab(url: String?)
     fun openMessageInNewTab(message: Message)
     fun recoverFromRenderProcessGone()
     fun requiresAuthentication(request: BasicAuthenticationRequest)
     fun closeCurrentTab()
+    fun closeAndSelectSourceTab()
     fun upgradedToHttps()
     fun surrogateDetected(surrogate: SurrogateResponse)
 
     fun loginDetected()
+    fun dosAttackDetected()
 }

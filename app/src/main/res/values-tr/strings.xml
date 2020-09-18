@@ -95,7 +95,7 @@
     <string name="privacyProtectionEnabled">SAHA KORUMASI ETKİN</string>
     <string name="privacyProtectionDisabled">SİTE KORUMASI KAPATILDI</string>
     <string name="privacyDashboardActivityTitle">Gizlilik Tablosu</string>
-    <string name="privacyProtectionUpgraded" tools:ignore="TypographyQuotes">&lt;img src="%d" /&gt; \'dan &lt;img src="%d" /&gt;\' ye GELİŞTİRİLDİ</string>
+    <string name="privacyProtectionUpgraded" tools:ignore="TypographyQuotes">&lt;img src=\"%1$d\" /&gt; \'dan &lt;img src=\"%2$d\" /&gt;\' ye GELİŞTİRİLDİ</string>
     <string name="privacyGradeContentDescription">Gizlilik Derecesi</string>
 
     <string name="httpsGood">Şifreli Bağlantı</string>
@@ -107,24 +107,24 @@
     <string name="networksOverview">İzleyici ağları, web geçmişinizi sizinle ilgili bir veri profilinde toplar. Büyük izleyici ağları daha zararlıdır, çünkü sizi İnternet\'te izleyebilir ve hedefleyebilirler.</string>
 
     <plurals name="trackersFound">
-    <item quantity="one">%s İzleyici Bulundu</item>
-    <item quantity="other">%s İzleyici Bulundu</item>
-  </plurals>
+        <item quantity="one">%1$s İzleyici Bulundu</item>
+        <item quantity="other">%1$s İzleyici Bulundu</item>
+    </plurals>
 
     <plurals name="trackerBlocked">
-    <item quantity="one">%s İzleyici Engellendi</item>
-    <item quantity="other">%s İzleyici Engellendi</item>
-  </plurals>
+        <item quantity="one">%1$s İzleyici Engellendi</item>
+        <item quantity="other">%1$s İzleyici Engellendi</item>
+    </plurals>
 
     <plurals name="majorNetworksFound">
-    <item quantity="one">%s Ana İzleyici Ağı Bulundu</item>
-    <item quantity="other">%s Başlıca İzleyici Ağları Bulundu</item>
-  </plurals>
+        <item quantity="one">%1$s Ana İzleyici Ağı Bulundu</item>
+        <item quantity="other">%1$s Başlıca İzleyici Ağları Bulundu</item>
+    </plurals>
 
     <plurals name="majorNetworksBlocked">
-    <item quantity="one">%s Başlıca İzleyici Ağı Engellendi</item>
-    <item quantity="other">%s Başlıca İzleyici Ağları Engellendi</item>
-  </plurals>
+        <item quantity="one">%1$s Başlıca İzleyici Ağı Engellendi</item>
+        <item quantity="other">%1$s Başlıca İzleyici Ağları Engellendi</item>
+    </plurals>
 
     <string name="scorecardActivityTitle">Gizlilik Derecesi</string>
     <string name="scorecardSiteIsMemberOfMajorNetwork">Site Önemli İzleyici Ağlarından</string>
@@ -137,10 +137,7 @@
     <string name="practicesBad">Kötü Gizlilik Uygulamaları</string>
     <string name="practicesUnknown">Bilinmeyen Gizlilik Uygulamaları</string>
     <string name="practicesOverview">Gizlilik uygulamaları, bir web sitesiyle paylaştığınız kişisel bilgilerin ne kadar korunduğunu gösterir.</string>
-    <string name="practicesTosdrLink">Gizlilik Uygulamaları <b>
-      <u>ToS;DR</u>
-    </b>
-  </string>
+    <string name="practicesTosdrLink">Gizlilik Uygulamaları <b> <u>ToS;DR</u> </b></string>
     <string name="practicesIconContentGood">İyi Uygulama Simgesi</string>
     <string name="practicesIconContentBad">Kötü Uygulama Simgesi</string>
 
@@ -182,7 +179,10 @@
 
     <!-- About Activity -->
     <string name="aboutActivityTitle">Hakkımızda</string>
-    <string name="aboutDescription">DuckDuckGo\'da, yeni çevrimiçi güven standardını belirliyoruz.\n DuckDuckGo Gizlilik Tarayıcısı, izleyici engelleme, akıllı şifreleme ve DuckDuckGo özel araması da dahil olmak üzere web\'de arama ve göz atma sırasında kendinizi korumak için ihtiyacınız olan tüm gizlilik özelliklerini sağlar.\n Sonuçta, internet sizi korkutmamalı ve çevrimiçiyken hak ettiğiniz gizliliği elde etmek, panjurları kapatmak kadar basit olmalı.</string>
+    <string name="aboutDescription">
+        DuckDuckGo\'da, yeni çevrimiçi güven standardını belirliyoruz.\n\
+        DuckDuckGo Gizlilik Tarayıcısı, izleyici engelleme, akıllı şifreleme ve DuckDuckGo özel araması da dahil olmak üzere web\'de arama ve göz atma sırasında kendinizi korumak için ihtiyacınız olan tüm gizlilik özelliklerini sağlar.\n\
+        Sonuçta, internet sizi korkutmamalı ve çevrimiçiyken hak ettiğiniz gizliliği elde etmek, panjurları kapatmak kadar basit olmalı.</string>
     <string name="aboutMoreLink">Duckduckgo.com/about adresinde daha fazla bilgi edinin</string>
     <string name="no_suggestions">Öneri yok</string>
 
@@ -208,18 +208,20 @@
     <!-- Bookmarks Activity -->
     <string name="bookmarksMenuTitle">Yer imleri</string>
     <string name="bookmarksActivityTitle">Yer imleri</string>
-    <string name="bookmarkDeleteConfirmMessage">&lt;b&gt;%s&lt;/b&gt; yer imini silmek istediğinizden emin misiniz?</string>
-    <string name="dialogConfirmTitle">Onayla</string>
+    <string name="bookmarkDeleteConfirmMessage">&lt;b&gt;%1$s&lt;/b&gt; yer imini silmek istediğinizden emin misiniz?</string>
     <string name="bookmarkAddedFeedback">Yer imi eklendi</string>
     <string name="bookmarkTitleHint">Yer imi başlığı</string>
     <string name="bookmarkUrlHint">Yer imi URL\'si</string>
-    <string name="dialogSave">Kaydet</string>
     <string name="bookmarkTitleEdit">Yer İşaretini Düzenle</string>
     <string name="noBookmarks">Henüz yer işareti eklenmedi</string>
-    <string name="bookmarkOverflowContentDescription">%s yer imi için diğer seçenekler</string>
+    <string name="bookmarkOverflowContentDescription">%1$s yer imi için diğer seçenekler</string>
+    <string name="bookmarkEdited">Yer imi eklendi</string>
+
+    <!-- Dialogs -->
+    <string name="dialogConfirmTitle">Onayla</string>
+    <string name="dialogSave">Kaydet</string>
     <string name="delete">Sil</string>
     <string name="edit">Düzenle</string>
-    <string name="bookmarkEdited">Yer imi eklendi</string>
 
     <!-- Widget -->
     <string name="searchWidgetTextHint">DuckDuckGo\'da Ara</string>
@@ -285,14 +287,14 @@
     <string name="privacyProtectionNotificationDefaultTitle">Gizliliğinizi koruyoruz</string>
     <string name="privacyProtectionNotificationReportTitle">Gizlilik Raporunuz</string>
     <string name="privacyProtectionNotificationDefaultDescription">DuckDuckGo uygulamasını kullanmak, izleyicileri engelleyerek ve bağlantıları şifreleyerek verilerinizi korur.</string>
-    <string name="privacyProtectionNotificationUpgadeDescription">DuckDuckGo kullanırken %d şifrelenmemiş bağlantıyı güvenli hale getirerek verilerinizi korudunuz.</string>
-    <string name="privacyProtectionNotificationTrackerDescription">DuckDuckGo kullanırken %d izleyiciyi engelleyerek verilerinizi korudunuz.</string>
-    <string name="privacyProtectionNotificationBothDescription">DuckDuckGo kullanırken %d izleyiciyi engelleyerek ve %d şifrelenmemiş bağlantıyı güvenceye alarak verilerinizi korudunuz.</string>
+    <string name="privacyProtectionNotificationUpgadeDescription">DuckDuckGo kullanırken %1$d şifrelenmemiş bağlantıyı güvenli hale getirerek verilerinizi korudunuz.</string>
+    <string name="privacyProtectionNotificationTrackerDescription">DuckDuckGo kullanırken %1$d izleyiciyi engelleyerek verilerinizi korudunuz.</string>
+    <string name="privacyProtectionNotificationBothDescription">DuckDuckGo kullanırken %1$d izleyiciyi engelleyerek ve %2$d şifrelenmemiş bağlantıyı güvenceye alarak verilerinizi korudunuz.</string>
     <string name="privacyProtectionNotificationLaunchButton">Taramayı Sürdür</string>
     
     <!-- Authentication -->
     <string name="authenticationDialogTitle">Oturum aç</string>
-    <string name="authenticationDialogMessage">%s için bir kullanıcı adı ve şifre gerekiyor.</string>
+    <string name="authenticationDialogMessage">%1$s için bir kullanıcı adı ve şifre gerekiyor.</string>
     <string name="authenticationDialogPositiveButton">Oturum aç</string>
     <string name="authenticationDialogNegativeButton">İptal</string>
     <string name="authenticationDialogUsernameHint">Kullanıcı adı</string>
@@ -374,8 +376,8 @@
     <string name="feedbackIsImportantToUs">İsimsiz geri bildiriminiz bizim için önemlidir.</string>
 
     <!-- Webview Recovery -->
-    <string name="crashedWebViewErrorMessage">Web sayfası görüntülenemedi.</string>
-    <string name="crashedWebViewErrorAction">Tekrar yükle</string>
+    <string name="crashedWebViewErrorMessage">"Web sayfası görüntülenemedi."</string>
+    <string name="crashedWebViewErrorAction">"Tekrar yükle"</string>
 
     <!-- System Search-->
     <string name="systemSearchDeviceAppLabel">Bu cihazdan</string>
@@ -401,23 +403,23 @@
     <string name="hideTipsButton">İpuçlarını sonsuza kadar gizle</string>
 
     <!-- New Onboarding Experience -->
-    <string name="onboardingWelcomeTitle">DuckDuckGo\'ya hoş geldiniz!</string>
-    <string name="onboardingDaxText">İnternet biraz ürkütücü olabilir.&lt;br/&gt;&lt;br/&gt;Endişelenmeyin! Özel olarak arama yapmak ve sitelere göz atmak düşündüğünüzden daha kolaydır.</string>
+    <string name="onboardingWelcomeTitle">"DuckDuckGo'ya hoş geldiniz!"</string>
+    <string name="onboardingDaxText"><![CDATA[İnternet biraz ürkütücü olabilir.<br/><br/>Endişelenmeyin! Özel olarak arama yapmak ve sitelere göz atmak düşündüğünüzden daha kolaydır.]]></string>
     <string name="onboardingLetsDoItButton">Hadi başlayalım!</string>
-    <string name="daxIntroCtaText">Şimdi favori sitelerinizden birini ziyaret etmeyi deneyin! &lt;br/&gt;&lt;br/&gt;İzleyicileri engelleyeceğim, böylece sizi gözetlemeyecekler. Mümkünse bağlantınızın güvenliğini de yükselteceğim. &#128274;</string>
-    <string name="daxEndCtaText">İşte böyle!&lt;br/&gt;&lt;br/&gt;Unutmayın: benimle İnterneti her gezişinizde tüyler ürpertici bir reklam daha kaybolur . &#128077;</string>
-    <string name="daxSerpCtaText">DuckDuckGo aramalarınız anonimdir ve arama geçmişiniz asla saklanmaz. Asla. &#128588;</string>
+    <string name="daxIntroCtaText"><![CDATA[Şimdi favori sitelerinizden birini ziyaret etmeyi deneyin! <br/><br/>İzleyicileri engelleyeceğim, böylece sizi gözetlemeyecekler. Mümkünse bağlantınızın güvenliğini de yükselteceğim. 🔒]]></string>
+    <string name="daxEndCtaText"><![CDATA[İşte böyle!<br/><br/>Unutmayın: benimle İnterneti her gezişinizde tüyler ürpertici bir reklam daha kaybolur . 👍]]></string>
+    <string name="daxSerpCtaText">DuckDuckGo aramalarınız anonimdir ve arama geçmişiniz asla saklanmaz. Asla. 🙌</string>
     <plurals name="daxTrackersBlockedCtaText">
-        <item quantity="one">&#160;ve &lt;b&gt;%d diğer&lt;/b&gt; sizi burada izlemeye çalışıyordu. &lt;br/&gt;&lt;br/&gt;Onları engelledim!&lt;br/&gt;&lt;br/&gt; ☝️Yeni bir siteyi ziyaret ettiğinizde sizi kimin izlemeye çalıştığını görmek için URL çubuğunu kontrol edebilirsiniz.</item>
-        <item quantity="other">&#160;ve &lt;b&gt;%d diğerleri&lt;/b&gt; sizi burada izlemeye çalışıyordu. &lt;br/&gt;&lt;br/&gt;Onları engelledim!&lt;br/&gt;&lt;br/&gt; ☝️Yeni bir siteyi ziyaret ettiğinizde sizi kimin izlemeye çalıştığını görmek için URL çubuğunu kontrol edebilirsiniz.</item>
+        <item quantity="one"><![CDATA[ ve <b>%1$d diğer</b> sizi burada izlemeye çalışıyordu. <br/><br/>Onları engelledim!<br/><br/> ☝️Yeni bir siteyi ziyaret ettiğinizde sizi kimin izlemeye çalıştığını görmek için URL çubuğunu kontrol edebilirsiniz.]]></item>
+        <item quantity="other"><![CDATA[ ve <b>%1$d diğerleri</b> sizi burada izlemeye çalışıyordu. <br/><br/>Onları engelledim!<br/><br/> ☝️Yeni bir siteyi ziyaret ettiğinizde sizi kimin izlemeye çalıştığını görmek için URL çubuğunu kontrol edebilirsiniz.]]></item>
     </plurals>
     <plurals name="daxTrackersBlockedCtaZeroText">
-        <item quantity="one">&#160;sizi burada izlemeye çalışıyordu. &lt;br/&gt;&lt;br/&gt;Onu engelledim!&lt;br/&gt;&lt;br/&gt; ☝️Yeni bir siteyi ziyaret ettiğinizde sizi kimin izlemeye çalıştığını görmek için URL çubuğunu kontrol edebilirsiniz.</item>
-        <item quantity="other">&#160;sizi burada izlemeye çalışıyordu. &lt;br/&gt;&lt;br/&gt;Onu engelledim!&lt;br/&gt;&lt;br/&gt; ☝️Yeni bir siteyi ziyaret ettiğinizde sizi kimin izlemeye çalıştığını görmek için URL çubuğunu kontrol edebilirsiniz.</item>
+        <item quantity="one"><![CDATA[ sizi burada izlemeye çalışıyordu. <br/><br/>Onu engelledim!<br/><br/> ☝️Yeni bir siteyi ziyaret ettiğinizde sizi kimin izlemeye çalıştığını görmek için URL çubuğunu kontrol edebilirsiniz.]]></item>
+        <item quantity="other"><![CDATA[ sizi burada izlemeye çalışıyordu. <br/><br/>Onu engelledim!<br/><br/> ☝️Yeni bir siteyi ziyaret ettiğinizde sizi kimin izlemeye çalıştığını görmek için URL çubuğunu kontrol edebilirsiniz.]]></item>
     </plurals>
-    <string name="daxNonSerpCtaText">Siz gezintinize devam ederken sinir bozucu izleyicileri engelleyeceğim. &lt;br/&gt;&lt;br/&gt;Hadi, gezinmeye devam edin!</string>
-    <string name="daxMainNetworkOwnedCtaText">Dikkat! %s, %s şirketine aittir.&lt;br/&gt;&lt;br/&gt; %s\'ın izleyicileri, en iyi web sitelerinin yaklaşık %s kadarını gizliyor ancak endişelenmeyin! &lt;br/&gt;&lt;br/&gt;%s\'nın bu sitelerdeki etkinliğinizi görmesini engelleyeceğim.</string>
-    <string name="daxMainNetworkCtaText">Dikkat! %s büyük bir izleme ağıdır.&lt;br/&gt;&lt;br/&gt; İzleyicileri, en iyi sitelerin yaklaşık %s kadarını gizliyor &#128561; ancak endişelenmeyin! &lt;br/&gt;&lt;br/&gt;%s \'nin bu sitelerdeki etkinliğinizi görmesini engelleyeceğim.</string>
+    <string name="daxNonSerpCtaText"><![CDATA[Siz gezintinize devam ederken sinir bozucu izleyicileri engelleyeceğim. <br/><br/>Hadi, gezinmeye devam edin!]]></string>
+    <string name="daxMainNetworkCtaText"><![CDATA[Dikkat! %1$s büyük bir izleme ağıdır.<br/><br/> İzleyicileri, en iyi sitelerin yaklaşık %2$s kadarını gizliyor 😱 ancak endişelenmeyin! <br/><br/>%3$s \'nin bu sitelerdeki etkinliğinizi görmesini engelleyeceğim.]]></string>
+    <string name="daxMainNetworkOwnedCtaText">Dikkat! %2$s sitesinin sahibi %1$s olduğundan, onların buradaki etkinliğinizi görmesini engelleyemem.&lt;br/&gt;&lt;br/&gt;Ama benimle gezinirseniz diğer sitelerdeki pek çok izleyicisini engelleyerek sizin hakkınızda %3$s tarafından bilinenleri genel anlamda azaltabilirim.</string>
 
     <!-- Download Confirmation -->
     <string name="downloadConfirmationContinue">Devam et</string>
@@ -437,7 +439,7 @@
     <string name="changeIconDialogMessage">Uygulama, değişiklikleri uygulamak için kapanabilir. Yeni simgenize hayran olduktan sonra tekrar gelin.</string>
 
     <!-- New dashboard / menu buttons -->
-    <string name="manageWhitelist">Beyaz Listeyi Yönet</string>
+    <string name="manageWhitelist">Korumasız Siteler</string>
     <string name="reportBrokenSite">Hatalı Siteyi Bildir</string>
 
     <!-- Dialogs -->
@@ -445,27 +447,41 @@
     <string name="dialogEditTitle">Düzenle</string>
 
     <!-- Whitelist -->
-    <string name="whitelisetActivityTitle">Beyaz Liste</string>
-    <string name="enablePrivacyProtection">Beyaz Listeye Ekle</string>
-    <string name="disablePrivacyProtection">Beyaz Listeden Sil</string>
-    <string name="whitelistEntryOverflowContentDescription">Beyaz liste girişi %s için daha fazla seçenek</string>
-    <string name="whitelistEntryDeleteConfirmMessage">&lt;b&gt;%s&lt;/b&gt; \'ı beyaz listeden silmek istediğinizden emin misiniz?</string>
-    <string name="whitelistExplanation">Beyaz listeye alınan bu siteler Gizlilik Koruması tarafından yeni sürüme geçirilmez</string>
-    <string name="whitelistNoEntries">Henüz beyaz listeye eklenmemiş site yok</string>
+    <string name="whitelisetActivityTitle">Korumasız Siteler</string>
+    <string name="enablePrivacyProtection">Gizlilik Korumasını Etkinleştir</string>
+    <string name="disablePrivacyProtection">Gizlilik Korumasını Devre Dışı Bırak</string>
+    <string name="whitelistEntryOverflowContentDescription">Korumasız %1$s sitesi için diğer seçenekler</string>
+    <string name="whitelistEntryDeleteConfirmMessage">&lt;b&gt;%1$s&lt;/b&gt; sitesini korumasız sitelerden kaldırmak istediğinizden emin misiniz?</string>
+    <string name="whitelistExplanation">Bu siteler için Gizlilik Koruması uygulanamayacaktır.</string>
+    <string name="whitelistNoEntries">Henüz Korumasız Site Yok</string>
     <string name="whitelistDomainHint">www.example.com</string>
     <string name="whitelistFormatError">Kaydedilemedi, <b>example.com</b> gibi bir alan adı girin</string>
 
     <!-- Settings -->
-    <string name="settingsPrivacyProtectionWhitelist">Gizlilik Koruması Beyaz Listesi</string>
+    <string name="settingsPrivacyProtectionWhitelist">Korumasız Siteler</string>
 
     <!-- Fireproof websites -->
     <string name="fireproofWebsitesActivityTitle">Korumalı Web Siteleri</string>
     <string name="settingsFireproofWebsites">Korumalı Web Siteleri</string>
     <string name="fireproofWebsiteMenuTitleAdd">Korumalı Web Sitesi</string>
-    <string name="fireproofWebsiteSnackbarConfirmation">&lt;b&gt;%s&lt;/b&gt; artık koruma altında! Daha fazla bilgi edinmek için Ayarlar\'a gidin.</string>
+    <string name="fireproofWebsiteSnackbarConfirmation">&lt;b&gt;%1$s&lt;/b&gt; artık koruma altında! Daha fazla bilgi edinmek için Ayarlar\'a gidin.</string>
     <string name="fireproofWebsiteSnackbarAction">Geri al</string>
-    <string name="fireproofWebsiteDeleteConfirmMessage">&lt;b&gt;%s&lt;/b&gt; \'ı silmek istediğinizden emin misiniz?</string>
+    <string name="fireproofWebsiteDeleteConfirmMessage">&lt;b&gt;%1$s&lt;/b&gt; \'ı silmek istediğinizden emin misiniz?</string>
     <string name="fireproofWebsiteEmptyListHint">Henüz hiçbir web sitesi koruma altına alınmadı</string>
-    <string name="fireproofWebsiteFeatureDescription">Web siteleri, oturumunuzu açık tutmak için çerezlere ihtiyaç duyar. Bir siteyi Koruma Altına alırsanız, çerezler silinmez ve Fire (Yok et) Düğmesini kullandıktan sonra bile oturumunuz açık kalır.</string>
-    <string name="fireproofWebsiteOverflowContentDescription">Korumalı web sitesi %s için daha fazla seçenek</string>
+    <string name="fireproofWebsiteFeatureDescription">Web siteleri oturumunuzu açık tutmak için çerezler kullanır. Bir siteyi Yanmaya Dayanıklı hâle getirdiğinizde çerezler silinmez ve Yangın Düğmesi\'ni kullandıktan sonra bile oturumunuz açık kalır. Yanmaya Dayanıklı web sitelerinde bulunan üçüncü taraf izleyicileri yine engelleriz.</string>
+    <string name="fireproofWebsiteOverflowContentDescription">Korumalı web sitesi %1$s için daha fazla seçenek</string>
+    <string name="fireproofWebsiteLoginDialogTitle">%1$s sitesini Yanmaya Dayanıklı yapmak ister misiniz?</string>
+    <string name="fireproofWebsiteLoginDialogDescription">Yanmaya Dayanıklı yaptığınızda, Yangın düğmesini kullanıktan sonra da oturumunuz açık kalır.</string>
+    <string name="fireproofWebsiteLoginDialogPositive">Yanmaya Dayanıklı yap</string>
+    <string name="fireproofWebsiteLoginDialogNegative">Şimdi değil</string>
+    <string name="fireproofWebsiteItemsSectionTitle">Web siteleri</string>
+    <string name="fireproofWebsiteToogleText">Oturum Açarken Sor</string>
+
+    <!-- Dos Attack error-->
+    <string name="dosErrorMessage">Bağlantı iptal edildi. Bu web sitesi cihazınıza zarar verebilir.</string>
+
+    <!-- Download Manager problems -->
+    <string name="downloadManagerDisabled">İndirme Yöneticisi devre dışı</string>
+    <string name="downloadManagerIncompatible">İndirme Yöneticisi bu cihazda kullanılamıyor</string>
+    <string name="enable">Etkinleştir</string>
 </resources>
