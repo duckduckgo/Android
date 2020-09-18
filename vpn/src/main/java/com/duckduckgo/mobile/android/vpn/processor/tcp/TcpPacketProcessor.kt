@@ -158,15 +158,6 @@ class TcpPacketProcessor(
         fun TCB.updateState(newStatus: TcbState) {
             this.tcbState = newStatus
         }
-//
-//        fun TCB.sendFinToClient(queues: VpnQueues, packet: Packet, connectionParams: TcpConnectionParams) {
-//            synchronized(this) {
-//                val buffer = ByteBufferPool.acquire()
-//                packet.updateTcpBuffer(buffer, (FIN).toByte(), sequenceNumberToClient, acknowledgementNumberToClient, 0)
-//                sequenceNumberToClient = increaseOrWraparound(sequenceNumberToClient, 1)
-//                queues.networkToDevice.offer(buffer)
-//            }
-//        }
 
         @AddTrace(name = "packet_processor_send_fin", enabled = true)
         fun TCB.sendFinToClient(queues: VpnQueues, packet: Packet) {
