@@ -26,15 +26,13 @@ import retrofit2.http.Query
 
 interface HttpsUpgradeService {
 
-    @GET("https://staticcdn.duckduckgo.com/https/https-mobile-whitelist.json?cache_version=1")
-    fun whitelist(): Call<List<HttpsWhitelistedDomain>>
-
     @GET("https://staticcdn.duckduckgo.com/https/https-mobile-bloom-spec.json?cache_version=1")
     fun httpsBloomFilterSpec(): Observable<HttpsBloomFilterSpec>
 
     @GET("https://staticcdn.duckduckgo.com/https/https-mobile-bloom.bin?cache_version=1")
     fun httpsBloomFilter(): Call<ResponseBody>
 
-    @GET("https://duckduckgo.com/smarter_encryption.js")
-    fun upgradeListForPartialHost(@Query("pv1") partialSha1: String): Call<List<String>>
+    @GET("https://staticcdn.duckduckgo.com/https/https-mobile-whitelist.json?cache_version=1")
+    fun whitelist(): Call<List<HttpsWhitelistedDomain>>
+
 }

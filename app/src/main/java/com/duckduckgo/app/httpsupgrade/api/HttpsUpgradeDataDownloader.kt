@@ -34,7 +34,7 @@ class HttpsUpgradeDataDownloader @Inject constructor(
     private val service: HttpsUpgradeService,
     private val httpsUpgrader: HttpsUpgrader,
     private val httpsBloomSpecDao: HttpsBloomFilterSpecDao,
-    private val whitelistDao: HttpsWhitelistDao,
+    private val bloomFalsePositivesDao: HttpsWhitelistDao,
     private val binaryDataStore: BinaryDataStore,
     private val appDatabase: AppDatabase
 ) {
@@ -91,7 +91,7 @@ class HttpsUpgradeDataDownloader @Inject constructor(
             val call = service.whitelist()
             val response = call.execute()
 
-            if (response.isCached && whitelistDao.count() > 0) {
+            if (response.isCached && bloomFalsePositivesDao.count() > 0) {
                 Timber.d("Https whitelist already cached and stored")
                 return@fromAction
             }
@@ -99,7 +99,7 @@ class HttpsUpgradeDataDownloader @Inject constructor(
             if (response.isSuccessful) {
                 val whitelist = response.body()!!
                 Timber.d("Updating https whitelist with new data")
-                whitelistDao.updateAll(whitelist)
+                bloomFalsePositivesDao.updateAll(whitelist)
             } else {
                 throw IOException("Status: ${response.code()} - ${response.errorBody()?.string()}")
             }
