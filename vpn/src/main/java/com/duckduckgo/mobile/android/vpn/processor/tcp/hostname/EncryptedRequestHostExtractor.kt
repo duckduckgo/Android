@@ -146,7 +146,6 @@ class ServerNameIndicationHeaderHostExtractor : EncryptedRequestHostExtractor {
 
         if (packet.size < handshakeLength + TLS_HEADER_SIZE) {
             Timber.w("TLS packet size unexpected. Handshake size reported %d is greater than total packet size %d", handshakeLength, packet.size)
-            //return false
         }
 
         val handshakeMessageType = packet[TLS_HEADER_SIZE]

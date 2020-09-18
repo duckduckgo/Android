@@ -222,7 +222,6 @@ class TcpDeviceToNetwork(
                 is MoveState -> tcb.updateState(it)
                 ProcessPacket -> processPacket(tcb, packet, payloadBuffer, connectionParams)
                 SendFin -> tcb.sendFinToClient(queues, packet)
-                DelayedSendFin -> handler.postDelayed(3_000) { tcb.sendFinToClient(queues, packet) }
                 CloseConnection -> tcb.closeConnection(responseBuffer)
                 DelayedCloseConnection -> handler.postDelayed(3_000) { tcb.closeConnection(responseBuffer) }
                 SendAck -> tcb.sendAck(queues, packet)
@@ -273,8 +272,7 @@ class TcpDeviceToNetwork(
             val isTracker = determineIfTracker(tcb, packet, payloadBuffer)
 
             if (isTracker) {
-                // TODO - send RESET, DROP packet?
-                //tcb.sendResetPacket(queues, packet, payloadSize)
+                // TODO - validate the best option here: send RESET, FIN or DROP packet?
 
                 tcb.updateState(TcbState(serverState = TCB.TCBStatus.FIN_WAIT_1, clientState = tcb.tcbState.clientState))
                 tcb.sendFinToClient(queues, packet)

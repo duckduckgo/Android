@@ -234,18 +234,6 @@ class TcpStateFlow {
             return listOf(MoveClientToState(SYN_SENT), WaitToConnect)
         }
 
-        //}
-//        }
-//
-//        private fun handlePacketInSynSent(packetType: PacketType): TcpStateAction {
-//            // return when {
-//            //     packetType.isAck -> TcpStateAction(MoveToState(ESTABLISHED))
-//            //     packetType.isSyn -> TcpStateAction(event = ProcessDuplicateSyn)
-//            //     else -> CLOSE_AND_RESET
-//            // }
-//            return TcpStateAction()
-//        }
-//
         @AddTrace(name = "tcp_state_flow_handle_syn_received", enabled = true)
         private fun handlePacketInSynReceived(
             connectionKey: String,
@@ -277,16 +265,11 @@ class TcpStateFlow {
                         if (packetType.hasData) {
                             events.add(ProcessPacket)
                         } else {
+                            // TODO - handle FINs with data
                             //events.add(SendAck)
                             events.add(SendFin)
                         }
                         events.add(MoveServerToState(LAST_ACK))
-
-//                        // client would normally be in FIN_WAIT_1 until it gets the ACK (FIN_WAIT_2). Safe to jump straight to FIN_WAIT_2
-//                        events.add(MoveClientToState(FIN_WAIT_2))
-//
-//                        // server would normally be in CLOSE_WAIT until it sends its FIN. Safe to jump straight to LAST_ACK
-//                        events.add(MoveServerToState(LAST_ACK))
                     }
                 }
                 packetType.isSyn -> listOf(SendReset)
