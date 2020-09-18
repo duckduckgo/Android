@@ -273,9 +273,7 @@ class TcpDeviceToNetwork(
 
             if (isTracker) {
                 // TODO - validate the best option here: send RESET, FIN or DROP packet?
-
-                tcb.updateState(TcbState(serverState = TCB.TCBStatus.FIN_WAIT_1, clientState = tcb.tcbState.clientState))
-                tcb.sendFinToClient(queues, packet)
+                tcb.sendResetPacket(queues, packet, payloadSize)
                 return
             }
 
