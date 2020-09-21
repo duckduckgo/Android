@@ -19,12 +19,12 @@ package com.duckduckgo.mobile.android.vpn.service
 import android.app.Service
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.net.VpnService
 import android.os.Binder
 import android.os.Build
 import android.os.IBinder
 import android.os.ParcelFileDescriptor
-import com.duckduckgo.mobile.android.vpn.processor.QueueMonitor
 import com.duckduckgo.mobile.android.vpn.processor.TunPacketReader
 import com.duckduckgo.mobile.android.vpn.processor.TunPacketWriter
 import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpPacketProcessor
@@ -150,15 +150,34 @@ class PassthroughVpnService : VpnService(), CoroutineScope by MainScope(), Netwo
             addRoute("0.0.0.0", 0)
             setBlocking(true)
             setMtu(Short.MAX_VALUE.toInt())
-            //addDnsServer("8.8.8.8")
-            addAllowedApplication("com.duckduckgo.networkrequestor")
-            addAllowedApplication("meteor.test.and.grade.internet.connection.speed")
-            addAllowedApplication("org.zwanoo.android.speedtest")
-            addAllowedApplication("com.netflix.Speedtest")
-            addAllowedApplication("eu.vspeed.android")
-            addAllowedApplication("net.fireprobe.android")
             configureMeteredConnection()
+            //addDnsServer("8.8.8.8")
+
+            // Can either route all apps through VPN and exclude a few (better for prod), or exclude all apps and include a few (better for dev)
+            val limitingToTestApps = true
+            if (limitingToTestApps) safelyAddAllowedApps(INCLUDED_APPS) else safelyAddDisallowedApps(EXCLUDED_APPS)
+
             establish()
+        }
+    }
+
+    private fun Builder.safelyAddAllowedApps(apps: List<String>) {
+        for (app in apps) {
+            try {
+                addAllowedApplication(app)
+            } catch (e: PackageManager.NameNotFoundException) {
+                Timber.w("Package name not found: %s", app)
+            }
+        }
+    }
+
+    private fun Builder.safelyAddDisallowedApps(apps: List<String>) {
+        for (app in apps) {
+            try {
+                addDisallowedApplication(app)
+            } catch (e: PackageManager.NameNotFoundException) {
+                Timber.w("Package name not found: %s", app)
+            }
         }
     }
 
@@ -215,6 +234,22 @@ class PassthroughVpnService : VpnService(), CoroutineScope by MainScope(), Netwo
         private const val ACTION_STOP_VPN = "ACTION_STOP_VPN"
 
         const val FOREGROUND_VPN_SERVICE_ID = 200
+
+        private val EXCLUDED_APPS = listOf(
+            "com.android.vending",
+            "com.google.android.gsf.login",
+            "com.google.android.googlequicksearchbox",
+            "com.android.providers.downloads.ui"
+        )
+
+        private val INCLUDED_APPS = listOf(
+            "com.duckduckgo.networkrequestor",
+            "meteor.test.and.grade.internet.connection.speed",
+            "org.zwanoo.android.speedtest",
+            "com.netflix.Speedtest",
+            "eu.vspeed.android",
+            "net.fireprobe.android"
+        )
     }
 
     override fun createDatagramChannel(): DatagramChannel {
