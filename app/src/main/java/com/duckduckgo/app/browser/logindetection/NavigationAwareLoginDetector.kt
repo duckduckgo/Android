@@ -20,6 +20,7 @@ import android.net.Uri
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.duckduckgo.app.browser.WebNavigationStateChange
+import kotlinx.coroutines.*
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -44,15 +45,23 @@ sealed class NavigationEvent {
 }
 
 class NextPageLoginDetection @Inject constructor() : NavigationAwareLoginDetector {
-
+    
     override val loginEventLiveData = MutableLiveData<LoginDetected>()
     private var loginAttempt: ValidUrl? = null
+
+    private var urlToCheck: String? = null
+    private var loginDetectionJob: Job? = null
 
     override fun onEvent(navigationEvent: NavigationEvent) {
         Timber.i("LoginDetectionDelegate $navigationEvent")
         return when (navigationEvent) {
             is NavigationEvent.PageFinished -> {
-                discardLoginAttempt()
+                Timber.i("LoginDetectionDelegate execute new Login detection Job for $urlToCheck")
+                loginDetectionJob = GlobalScope.launch(Dispatchers.Main) {
+                    delay(2500)
+                    urlToCheck?.let { detectLogin(it) }
+                    discardLoginAttempt()
+                }
             }
             is NavigationEvent.WebNavigationEvent -> {
                 handleNavigationEvent(navigationEvent)
@@ -71,17 +80,28 @@ class NextPageLoginDetection @Inject constructor() : NavigationAwareLoginDetecto
     }
 
     private fun discardLoginAttempt() {
+        urlToCheck = null
         loginAttempt = null
     }
 
     private fun handleNavigationEvent(navigationEvent: NavigationEvent.WebNavigationEvent) {
         return when (val navigationStateChange = navigationEvent.navigationStateChange) {
             is WebNavigationStateChange.NewPage -> {
-                detectLogin(navigationStateChange.url)
+                cancelLoginJob()
+                if (loginAttempt != null) {
+                    //detectLogin(navigationStateChange.url)
+                    urlToCheck = navigationStateChange.url
+                }
+                return
             }
             is WebNavigationStateChange.PageCleared -> discardLoginAttempt()
             is WebNavigationStateChange.UrlUpdated -> {
-                detectLogin(navigationStateChange.url)
+                cancelLoginJob()
+                if (loginAttempt != null) {
+                    //detectLogin(navigationStateChange.url)
+                    urlToCheck = navigationStateChange.url
+                }
+                return
             }
             is WebNavigationStateChange.PageNavigationCleared -> discardLoginAttempt()
             is WebNavigationStateChange.Unchanged -> {
@@ -91,12 +111,18 @@ class NextPageLoginDetection @Inject constructor() : NavigationAwareLoginDetecto
         }
     }
 
+    private fun cancelLoginJob() {
+        Timber.i("LoginDetectionDelegate cancelled login detection job")
+        loginDetectionJob?.cancel()
+    }
+
     private fun detectLogin(forwardedToUrl: String) {
         val validLoginAttempt = loginAttempt ?: return
         val forwardedToUri = Uri.parse(forwardedToUrl).getValidUrl() ?: return
 
         Timber.i("LoginDetectionDelegate $validLoginAttempt vs $forwardedToUrl")
         if (validLoginAttempt.host != forwardedToUri.host || validLoginAttempt.path != forwardedToUri.path) {
+            Timber.i("LoginDetectionDelegate LoginDetected")
             loginEventLiveData.value = LoginDetected(validLoginAttempt.host, forwardedToUri.host)
             loginAttempt = null
         }

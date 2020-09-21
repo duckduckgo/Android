@@ -23,8 +23,7 @@ import com.duckduckgo.app.browser.WebNavigationStateChange.NewPage
 import com.nhaarman.mockitokotlin2.argumentCaptor
 import com.nhaarman.mockitokotlin2.atLeastOnce
 import com.nhaarman.mockitokotlin2.mock
-import org.junit.Assert.assertNotNull
-import org.junit.Assert.assertNull
+import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -50,23 +49,40 @@ class NextPageLoginDetectionTest {
     fun whenLoginAttemptedAndUserForwardedToNewPageThenLoginDetected() {
         loginDetector.onEvent(NavigationEvent.LoginAttempt("http://example.com/login"))
 
-        loginDetector.onEvent(NavigationEvent.WebNavigationEvent(NewPage(url = "http://example.com", title = "")))
+        fullyLoadSite("http://example.com")
+        Thread.sleep(3000)
 
         assertEvent<LoginDetected>()
+    }
+
+    @Test
+    fun whenLoginAttemptedAndUserForwardedToMultipleNewPagesThenLoginDetectedForLatestOne() {
+        loginDetector.onEvent(NavigationEvent.LoginAttempt("http://example.com/login"))
+
+        fullyLoadSite("http://example.com")
+        fullyLoadSite("http://example2.com")
+        fullyLoadSite("http://example3.com")
+        Thread.sleep(3000)
+
+        assertEvent<LoginDetected> {
+            assertEquals(this.forwardedToDomain, "example3.com")
+        }
     }
 
     @Test
     fun whenLoginAttemptedAndUserForwardedToSamePageThenLoginNotDetected() {
         loginDetector.onEvent(NavigationEvent.LoginAttempt("http://example.com/login"))
 
-        loginDetector.onEvent(NavigationEvent.WebNavigationEvent(NewPage(url = "http://example.com/login", title = "")))
+        fullyLoadSite("http://example.com/login")
+        Thread.sleep(3000)
 
         assertEventNotIssued<LoginDetected>()
     }
 
     @Test
     fun whenNotDetectedLoginAttemptAndForwardedToNewPageThenLoginNotDetected() {
-        loginDetector.onEvent(NavigationEvent.WebNavigationEvent(NewPage(url = "http://example.com", title = "")))
+        fullyLoadSite("http://example.com")
+        Thread.sleep(3000)
 
         assertEventNotIssued<LoginDetected>()
     }
@@ -76,6 +92,8 @@ class NextPageLoginDetectionTest {
         loginDetector.onEvent(NavigationEvent.LoginAttempt("http://example.com/login"))
 
         loginDetector.onEvent(NavigationEvent.WebNavigationEvent(WebNavigationStateChange.UrlUpdated(url = "http://example.com")))
+        loginDetector.onEvent(NavigationEvent.PageFinished)
+        Thread.sleep(3000)
 
         assertEvent<LoginDetected>()
     }
@@ -85,13 +103,17 @@ class NextPageLoginDetectionTest {
         loginDetector.onEvent(NavigationEvent.LoginAttempt("http://example.com/login"))
 
         loginDetector.onEvent(NavigationEvent.WebNavigationEvent(WebNavigationStateChange.UrlUpdated(url = "http://example.com/login")))
+        loginDetector.onEvent(NavigationEvent.PageFinished)
+        Thread.sleep(3000)
 
         assertEventNotIssued<LoginDetected>()
     }
 
     @Test
     fun whenNotDetectedLoginAttemptAndForwardedToNewUrlThenLoginNotDetected() {
-        loginDetector.onEvent(NavigationEvent.WebNavigationEvent(NewPage(url = "http://example.com", title = "")))
+        loginDetector.onEvent(NavigationEvent.WebNavigationEvent(WebNavigationStateChange.UrlUpdated(url = "http://example.com")))
+        loginDetector.onEvent(NavigationEvent.PageFinished)
+        Thread.sleep(3000)
 
         assertEventNotIssued<LoginDetected>()
     }
@@ -102,6 +124,8 @@ class NextPageLoginDetectionTest {
         loginDetector.onEvent(NavigationEvent.PageFinished)
 
         loginDetector.onEvent(NavigationEvent.WebNavigationEvent(NewPage(url = "http://another.example.com", title = "")))
+        loginDetector.onEvent(NavigationEvent.PageFinished)
+        Thread.sleep(3000)
 
         assertEventNotIssued<LoginDetected>()
     }
@@ -111,7 +135,8 @@ class NextPageLoginDetectionTest {
         loginDetector.onEvent(NavigationEvent.LoginAttempt("http://example.com/login"))
         loginDetector.onEvent(NavigationEvent.UserAction.NavigateBack)
 
-        loginDetector.onEvent(NavigationEvent.WebNavigationEvent(NewPage(url = "http://another.example.com", title = "")))
+        fullyLoadSite("http://another.example.com")
+        Thread.sleep(3000)
 
         assertEventNotIssued<LoginDetected>()
     }
@@ -121,7 +146,8 @@ class NextPageLoginDetectionTest {
         loginDetector.onEvent(NavigationEvent.LoginAttempt("http://example.com/login"))
         loginDetector.onEvent(NavigationEvent.UserAction.NavigateForward)
 
-        loginDetector.onEvent(NavigationEvent.WebNavigationEvent(NewPage(url = "http://another.example.com", title = "")))
+        fullyLoadSite("http://another.example.com")
+        Thread.sleep(3000)
 
         assertEventNotIssued<LoginDetected>()
     }
@@ -131,7 +157,8 @@ class NextPageLoginDetectionTest {
         loginDetector.onEvent(NavigationEvent.LoginAttempt("http://example.com/login"))
         loginDetector.onEvent(NavigationEvent.UserAction.Refresh)
 
-        loginDetector.onEvent(NavigationEvent.WebNavigationEvent(NewPage(url = "http://another.example.com", title = "")))
+        fullyLoadSite("http://another.example.com")
+        Thread.sleep(3000)
 
         assertEventNotIssued<LoginDetected>()
     }
@@ -141,7 +168,8 @@ class NextPageLoginDetectionTest {
         loginDetector.onEvent(NavigationEvent.LoginAttempt("http://example.com/login"))
         loginDetector.onEvent(NavigationEvent.UserAction.NewQuerySubmitted)
 
-        loginDetector.onEvent(NavigationEvent.WebNavigationEvent(NewPage(url = "http://another.example.com", title = "")))
+        fullyLoadSite("http://another.example.com")
+        Thread.sleep(3000)
 
         assertEventNotIssued<LoginDetected>()
     }
@@ -150,7 +178,8 @@ class NextPageLoginDetectionTest {
     fun whenLoginAttemptedHasInvalidURLThenNewPageDoesNotDetectLogin() {
         loginDetector.onEvent(NavigationEvent.LoginAttempt(""))
 
-        loginDetector.onEvent(NavigationEvent.WebNavigationEvent(NewPage(url = "http://example.com", title = "")))
+        fullyLoadSite("http://example.com")
+        Thread.sleep(3000)
 
         assertEventNotIssued<LoginDetected>()
     }
@@ -159,7 +188,8 @@ class NextPageLoginDetectionTest {
     fun whenLoginAttemptedAndUserForwardedToInvalidNewPageThenLoginDetected() {
         loginDetector.onEvent(NavigationEvent.LoginAttempt("http://example.com/login"))
 
-        loginDetector.onEvent(NavigationEvent.WebNavigationEvent(NewPage(url = "", title = "")))
+        fullyLoadSite("")
+        Thread.sleep(3000)
 
         assertEventNotIssued<LoginDetected>()
     }
@@ -174,5 +204,10 @@ class NextPageLoginDetectionTest {
     private inline fun <reified T> assertEventNotIssued() {
         val issuedCommand = loginEventCaptor.allValues.find { it is T }
         assertNull(issuedCommand)
+    }
+
+    private fun fullyLoadSite(url: String) {
+        loginDetector.onEvent(NavigationEvent.WebNavigationEvent(NewPage(url = url, title = "")))
+        loginDetector.onEvent(NavigationEvent.PageFinished)
     }
 }
