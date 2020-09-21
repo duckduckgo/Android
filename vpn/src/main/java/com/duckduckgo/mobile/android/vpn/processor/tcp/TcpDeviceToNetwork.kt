@@ -27,6 +27,9 @@ import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpPacketProcessor.Compan
 import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpPacketProcessor.Companion.updateState
 import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpPacketProcessor.PendingWriteData
 import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpStateFlow.Event.*
+import com.duckduckgo.mobile.android.vpn.processor.tcp.hostname.HostnameExtractor
+import com.duckduckgo.mobile.android.vpn.processor.tcp.tracker.RequestTrackerType
+import com.duckduckgo.mobile.android.vpn.processor.tcp.tracker.VpnTrackerDetector
 import com.duckduckgo.mobile.android.vpn.service.VpnQueues
 import com.google.firebase.perf.metrics.AddTrace
 import timber.log.Timber
@@ -46,7 +49,8 @@ class TcpDeviceToNetwork(
     private val selector: Selector,
     private val socketWriter: SocketWriter,
     private val connectionInitializer: ConnectionInitializer,
-    private val handler: Handler
+    private val handler: Handler,
+    private val trackerDetector: VpnTrackerDetector
 ) {
 
     var lastTimePacketConsumed = 0L
@@ -216,11 +220,10 @@ class TcpDeviceToNetwork(
             when (it) {
                 is MoveState -> tcb.updateState(it)
                 ProcessPacket -> processPacket(tcb, packet, payloadBuffer, connectionParams)
-                SendFin -> tcb.sendFinToClient(queues, packet, connectionParams)
-                DelayedSendFin -> handler.postDelayed(3_000) { tcb.sendFinToClient(queues, packet, connectionParams) }
+                SendFin -> tcb.sendFinToClient(queues, packet)
                 CloseConnection -> tcb.closeConnection(responseBuffer)
                 DelayedCloseConnection -> handler.postDelayed(3_000) { tcb.closeConnection(responseBuffer) }
-                SendAck -> tcb.sendAck(queues, packet, connectionParams)
+                SendAck -> tcb.sendAck(queues, packet)
                 else -> Timber.e("Unknown event for how to process device-to-network packet: ${action.events}")
             }
 
@@ -265,6 +268,14 @@ class TcpDeviceToNetwork(
             val payloadSize = payloadBuffer.limit() - payloadBuffer.position()
             if (payloadSize == 0) return
 
+            val isTracker = determineIfTracker(tcb, packet, payloadBuffer)
+
+            if (isTracker) {
+                // TODO - validate the best option here: send RESET, FIN or DROP packet?
+                tcb.sendResetPacket(queues, packet, payloadSize)
+                return
+            }
+
             if (!tcb.waitingForNetworkData) {
                 Timber.v("Not waiting for network data ${tcb.ipAndPort}; register for OP_READ and wait for network data")
                 Timber.i("Registering for OP_READ. Took: %d", measureNanoTime {
@@ -287,12 +298,24 @@ class TcpDeviceToNetwork(
                 val bytesUnwritten = payloadBuffer.remaining()
                 val bytesWritten = payloadSize - bytesUnwritten
                 Timber.w(e, "Network write error for ${tcb.ipAndPort}. Wrote $bytesWritten; $bytesUnwritten unwritten")
-                tcb.sendResetPacket(queues, bytesWritten)
+                tcb.sendResetPacket(queues, packet, bytesWritten)
                 return
             }
         }
         measurePacketProcessingTimes(entryTime)
         queues.networkToDevice.offer(connectionParams.responseBuffer)
+    }
+
+    private fun determineIfTracker(tcb: TCB, packet: Packet, payloadBuffer: ByteBuffer): Boolean {
+        if (tcb.trackerTypeDetermined) {
+            return tcb.isTracker
+        }
+
+        return when (trackerDetector.determinePacketType(tcb, packet, payloadBuffer)) {
+            RequestTrackerType.Tracker -> true
+            RequestTrackerType.NotTracker -> false
+            RequestTrackerType.Undetermined -> false
+        }
     }
 
     private fun processDuplicateSyn(tcb: TCB, params: TcpConnectionParams) {

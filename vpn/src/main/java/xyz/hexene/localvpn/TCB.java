@@ -24,6 +24,7 @@ import java.nio.channels.SocketChannel;
 import java.util.Iterator;
 import java.util.Map;
 
+import androidx.annotation.Nullable;
 import timber.log.Timber;
 
 /**
@@ -38,6 +39,12 @@ public class TCB {
     public long finSequenceNumberToClient = -1;
 
     public TcbState tcbState;
+
+    public boolean isTracker = false;
+    public boolean trackerTypeDetermined = false;
+
+    @Nullable
+    public String hostName = null;
 
     // TCP has more states, but we need only these
     public enum TCBStatus {

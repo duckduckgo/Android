@@ -24,6 +24,8 @@ import com.duckduckgo.mobile.android.vpn.processor.tcp.ConnectionInitializer.Tcp
 import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpStateFlow.Event.MoveState
 import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpStateFlow.Event.MoveState.MoveClientToState
 import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpStateFlow.Event.MoveState.MoveServerToState
+import com.duckduckgo.mobile.android.vpn.processor.tcp.hostname.HostnameExtractor
+import com.duckduckgo.mobile.android.vpn.processor.tcp.tracker.VpnTrackerDetector
 import com.duckduckgo.mobile.android.vpn.service.NetworkChannelCreator
 import com.duckduckgo.mobile.android.vpn.service.VpnQueues
 import com.google.firebase.perf.metrics.AddTrace
@@ -31,18 +33,20 @@ import kotlinx.coroutines.Job
 import timber.log.Timber
 import xyz.hexene.localvpn.ByteBufferPool
 import xyz.hexene.localvpn.Packet
-import xyz.hexene.localvpn.Packet.TCPHeader.ACK
-import xyz.hexene.localvpn.Packet.TCPHeader.FIN
+import xyz.hexene.localvpn.Packet.TCPHeader.*
 import xyz.hexene.localvpn.TCB
-import xyz.hexene.localvpn.TCB.TCBStatus.FIN_WAIT_2
-import xyz.hexene.localvpn.TCB.TCBStatus.LAST_ACK
 import java.nio.ByteBuffer
 import java.nio.channels.Selector
 import java.nio.channels.SocketChannel
 import java.util.concurrent.Executors
 import kotlin.math.pow
 
-class TcpPacketProcessor(queues: VpnQueues, networkChannelCreator: NetworkChannelCreator) : Runnable {
+class TcpPacketProcessor(
+    queues: VpnQueues,
+    networkChannelCreator: NetworkChannelCreator,
+    trackerDetector: VpnTrackerDetector,
+    hostnameExtractor: HostnameExtractor
+) : Runnable {
 
     val selector: Selector = Selector.open()
 
@@ -53,7 +57,15 @@ class TcpPacketProcessor(queues: VpnQueues, networkChannelCreator: NetworkChanne
 
     private val tcpSocketWriter = TcpSocketWriter(selector)
     private val tcpNetworkToDevice = TcpNetworkToDevice(queues, selector, tcpSocketWriter, handler)
-    private val tcpDeviceToNetwork = TcpDeviceToNetwork(queues, selector, tcpSocketWriter, TcpConnectionInitializer(queues, networkChannelCreator), handler)
+    private val tcpDeviceToNetwork =
+        TcpDeviceToNetwork(
+            queues,
+            selector,
+            tcpSocketWriter,
+            TcpConnectionInitializer(queues, networkChannelCreator),
+            handler,
+            trackerDetector
+        )
 
     private val readWriteExecutorService = Executors.newFixedThreadPool(2)
 
@@ -121,9 +133,11 @@ class TcpPacketProcessor(queues: VpnQueues, networkChannelCreator: NetworkChanne
     companion object {
         fun logPacketDetails(packet: Packet, initialSeqNumber: Long, sequenceNumber: Long, acknowledgementNumber: Long): String {
             with(packet.tcpHeader) {
-                return "\tflags:[ ${isSYN.printFlag("SYN")}${isACK.printFlag("ACK")}${isFIN.printFlag("FIN")}${isPSH.printFlag("PSH")}${isRST.printFlag("RST")}${isURG.printFlag(
-                    "URG"
-                )}]. [ackNumber=$acknowledgementNumber, sequenceNumber={ ${sequenceNumber - initialSeqNumber} / $sequenceNumber } ]"
+                return "\tflags:[ ${isSYN.printFlag("SYN")}${isACK.printFlag("ACK")}${isFIN.printFlag("FIN")}${isPSH.printFlag("PSH")}${isRST.printFlag("RST")}${
+                    isURG.printFlag(
+                        "URG"
+                    )
+                }]. [ackNumber=$acknowledgementNumber, sequenceNumber={ ${sequenceNumber - initialSeqNumber} / $sequenceNumber } ]"
             }
         }
 
@@ -140,48 +154,37 @@ class TcpPacketProcessor(queues: VpnQueues, networkChannelCreator: NetworkChanne
             return String(bytesForLogging)
         }
 
-        private fun TCB.updateStatus(newStatus: TcbState) {
+        fun TCB.updateState(newStatus: TcbState) {
             this.tcbState = newStatus
         }
-//
-//        fun TCB.sendFinToClient(queues: VpnQueues, packet: Packet, connectionParams: TcpConnectionParams) {
-//            synchronized(this) {
-//                val buffer = ByteBufferPool.acquire()
-//                packet.updateTcpBuffer(buffer, (FIN).toByte(), sequenceNumberToClient, acknowledgementNumberToClient, 0)
-//                sequenceNumberToClient = increaseOrWraparound(sequenceNumberToClient, 1)
-//                queues.networkToDevice.offer(buffer)
-//            }
-//        }
 
         @AddTrace(name = "packet_processor_send_fin", enabled = true)
-        fun TCB.sendFinToClient(queues: VpnQueues, packet: Packet, connectionParams: TcpConnectionParams) {
+        fun TCB.sendFinToClient(queues: VpnQueues, packet: Packet) {
             val buffer = ByteBufferPool.acquire()
             synchronized(this) {
                 val payloadSize = packet.tcpPayloadSize(true)
 
-                // ackNumber == last seqNumber received, plus payload size received, plus 1 because we received FIN
-                //acknowledgementNumberToClient = increaseOrWraparound(packet.tcpHeader.sequenceNumber, payloadSize.toLong() + 1)
+                var responseAck = acknowledgementNumberToClient + payloadSize
+                val responseSeq = acknowledgementNumberToServer
+
+                if (packet.tcpHeader.isFIN) {
+                    responseAck = increaseOrWraparound(responseAck, 1)
+                }
+
+                this.referencePacket.updateTcpBuffer(buffer, (FIN or ACK).toByte(), responseSeq, responseAck, 0)
 
                 Timber.i(
-                    "%s - Sending FIN, previous seqNum=%d, payloadSize=%d, ackNum =%d",
+                    "%s - Sending FIN/ACK, response=[seqNum=%d, ackNum=%d] - previous=[seqNum=%d, ackNum =%d, payloadSize=%d]",
                     ipAndPort,
-                    sequenceNumberToClient,
-                    payloadSize,
-                    acknowledgementNumberToClient
+                    responseSeq, responseAck,
+                    sequenceNumberToClient, acknowledgementNumberToClient, payloadSize
                 )
 
-                packet.updateTcpBuffer(buffer, (FIN).toByte(), sequenceNumberToClient, acknowledgementNumberToClient, 0)
                 sequenceNumberToClient = increaseOrWraparound(sequenceNumberToClient, 1)
                 finSequenceNumberToClient = sequenceNumberToClient
-
-                Timber.w("%s - FINSequenceNumberToClient is %d", ipAndPort, finSequenceNumberToClient)
             }
-            queues.networkToDevice.offer(buffer)
 
-            // client would normally be in FIN_WAIT_1 until it gets the ACK (FIN_WAIT_2). Safe to jump straight to FIN_WAIT_2
-            // server would normally be in CLOSE_WAIT until it sends its FIN. Safe to jump straight to LAST_ACK
-
-            tcbState = TcbState(clientState = FIN_WAIT_2, serverState = LAST_ACK)
+            queues.networkToDevice.offerFirst(buffer)
 
             try {
                 channel.close()
@@ -191,7 +194,7 @@ class TcpPacketProcessor(queues: VpnQueues, networkChannelCreator: NetworkChanne
         }
 
         @AddTrace(name = "packet_processor_send_ack", enabled = true)
-        fun TCB.sendAck(queues: VpnQueues, packet: Packet, connectionParams: TcpConnectionParams) {
+        fun TCB.sendAck(queues: VpnQueues, packet: Packet) {
             synchronized(this) {
                 val payloadSize = packet.tcpPayloadSize(true)
 
@@ -220,18 +223,25 @@ class TcpPacketProcessor(queues: VpnQueues, networkChannelCreator: NetworkChanne
 
         @Synchronized
         @AddTrace(name = "packet_processor_send_reset", enabled = true)
-        fun TCB.sendResetPacket(queues: VpnQueues, payloadSize: Int) {
+        fun TCB.sendResetPacket(queues: VpnQueues, packet: Packet, payloadSize: Int) {
             val buffer = ByteBufferPool.acquire()
+
+            var responseAck = acknowledgementNumberToClient + payloadSize
+            val responseSeq = acknowledgementNumberToServer
+
+            if (packet.tcpHeader.isFIN) {
+                responseAck = increaseOrWraparound(responseAck, 1)
+            }
+
             synchronized(this) {
                 Timber.i(
-                    "%s - Sending RST, previous seqNum=%d, payloadSize=%d, ackNum =%d",
+                    "%s - Sending RST, response=[seqNum=%d, ackNum=%d] - previous=[seqNum=%d, ackNum =%d, payloadSize=%d]",
                     ipAndPort,
-                    sequenceNumberToClient,
-                    payloadSize,
-                    acknowledgementNumberToClient
+                    responseSeq, responseAck,
+                    sequenceNumberToClient, acknowledgementNumberToClient, payloadSize
                 )
 
-                this.referencePacket.updateTcpBuffer(buffer, Packet.TCPHeader.RST.toByte(), 0, this.acknowledgementNumberToClient + payloadSize, 0)
+                this.referencePacket.updateTcpBuffer(buffer, (RST or ACK).toByte(), responseSeq, responseAck, 0)
             }
             queues.networkToDevice.offerFirst(buffer)
             TCB.closeTCB(this)
@@ -258,12 +268,12 @@ class TcpPacketProcessor(queues: VpnQueues, networkChannelCreator: NetworkChanne
 
         private fun TCB.updateState(newState: MoveServerToState) {
             Timber.v("Updating server state: ${newState.state}")
-            updateStatus(tcbState.copy(serverState = newState.state))
+            updateState(tcbState.copy(serverState = newState.state))
         }
 
         private fun TCB.updateState(newState: MoveClientToState) {
             Timber.v("Updating client state: ${newState.state}")
-            updateStatus(tcbState.copy(clientState = newState.state))
+            updateState(tcbState.copy(clientState = newState.state))
         }
 
         fun increaseOrWraparound(current: Long, increment: Long): Long {

@@ -76,22 +76,4 @@ class TcpConnectionInitializer(private val queues: VpnQueues, private val networ
             return null
         }
     }
-
-//    private fun connect(tcb: TCB, channel: SocketChannel, params: TcpConnectionParams) {
-//        channel.connect(InetSocketAddress(params.destinationAddress, params.destinationPort))
-//        if (channel.finishConnect()) {
-//            Timber.v("Channel finished connecting to ${tcb.ipAndPort}")
-//            tcb.status = TCB.TCBStatus.SYN_RECEIVED
-//            Timber.v("Update TCB ${tcb.ipAndPort} status: ${tcb.status}")
-//            params.packet.updateTcpBuffer(params.responseBuffer, (TCPHeader.SYN or TCPHeader.ACK).toByte(), tcb.mySequenceNum, tcb.myAcknowledgementNum, 0)
-//            tcb.mySequenceNum++
-//            queues.networkToDevice.offer(params.responseBuffer)
-//        } else {
-//            Timber.v("Not finished connecting yet to ${tcb.selectionKey}, will register for OP_CONNECT event")
-//            tcb.status = TCB.TCBStatus.SYN_SENT
-//            Timber.v("Update TCB ${tcb.ipAndPort} status: ${tcb.status}")
-//            selector.wakeup()
-//            tcb.selectionKey = channel.register(selector, SelectionKey.OP_CONNECT, tcb)
-//        }
-//    }
 }

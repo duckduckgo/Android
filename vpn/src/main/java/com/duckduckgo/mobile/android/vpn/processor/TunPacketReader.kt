@@ -50,12 +50,10 @@ class TunPacketReader(private val tunInterface: ParcelFileDescriptor, private va
                 }
             }
 
-        }
-        catch (e: InterruptedException) {
+        } catch (e: InterruptedException) {
             Timber.w(e, "Thread interrupted")
             running = false
-        }
-        catch (e: Throwable) {
+        } catch (e: Throwable) {
             Timber.e(e, "Fatal error encountered")
             running = false
         } finally {
