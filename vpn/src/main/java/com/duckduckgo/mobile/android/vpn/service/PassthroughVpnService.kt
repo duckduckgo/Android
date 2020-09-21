@@ -51,11 +51,11 @@ class PassthroughVpnService : VpnService(), CoroutineScope by MainScope(), Netwo
     private val binder: VpnServiceBinder = VpnServiceBinder()
 
     // TODO: DI all of these
-    private val trackerDetector = DomainBasedTrackerDetector()
     private val hostNameHeaderExtractor = PlaintextHostHeaderExtractor()
     private val encryptedRequestHostExtractor = ServerNameIndicationHeaderHostExtractor()
     private val payloadBytesExtractor = PayloadBytesExtractor()
     private val hostnameExtractor = AndroidHostnameExtractor(hostNameHeaderExtractor, encryptedRequestHostExtractor, payloadBytesExtractor)
+    private val trackerDetector = DomainBasedTrackerDetector(hostnameExtractor)
 
     val udpPacketProcessor = UdpPacketProcessor(queues, this)
     val tcpPacketProcessor = TcpPacketProcessor(queues, this, trackerDetector, hostnameExtractor)

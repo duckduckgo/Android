@@ -44,14 +44,13 @@ class ServerNameIndicationHeaderHostExtractor : EncryptedRequestHostExtractor {
 
     private fun extractHostFromClientHelloSniHeader(packet: ByteArray): String? {
         // this skips the TLS header, time and Client Random - and starts with the session ID length
-        var index = 43
+        var index = SESSION_ID_INDEX
+
         val sessionIdLength = packet[index].toInt() and 0xFF
         index++
         index += sessionIdLength
 
-        val cipherSuitesLength = HigherOrderByte(packet[index]) + LowerOrderByte(
-            packet[index + 1]
-        )
+        val cipherSuitesLength = HigherOrderByte(packet[index]) + LowerOrderByte(packet[index + 1])
         index += 2
         index += cipherSuitesLength
 
@@ -59,9 +58,7 @@ class ServerNameIndicationHeaderHostExtractor : EncryptedRequestHostExtractor {
         index++
         index += compressionMethodLength
 
-        val extensionsLength = HigherOrderByte(packet[index]) + LowerOrderByte(
-            packet[index + 1]
-        )
+        val extensionsLength = HigherOrderByte(packet[index]) + LowerOrderByte(packet[index + 1])
         index += 2
         if (extensionsLength == 0) {
             return null
@@ -75,9 +72,7 @@ class ServerNameIndicationHeaderHostExtractor : EncryptedRequestHostExtractor {
         // skip 5 bytes for data sizes we don't need to know about
         index += 5
 
-        val serverNameLength = HigherOrderByte(packet[index]) + LowerOrderByte(
-            packet[index + 1]
-        )
+        val serverNameLength = HigherOrderByte(packet[index]) + LowerOrderByte(packet[index + 1])
         index += 2
         val serverNameBytes = ByteArray(serverNameLength)
 
@@ -92,22 +87,13 @@ class ServerNameIndicationHeaderHostExtractor : EncryptedRequestHostExtractor {
         while (extensionBytesSearched < extensionsLength && index < packet.size) {
             Timber.i("Extensions length: %d, current index = %d, packet size=%d", extensionsLength, index, packet.size)
 
-            val extensionTypeHigher = HigherOrderByte(packet[index])
-            index++
+            val extensionType = addHigherLowerOrderBytes(HigherOrderByte(packet[index]), LowerOrderByte(packet[index+1]))
+            index += 2
 
-            val extensionTypeLower = LowerOrderByte(packet[index])
-            index++
-
-            val extensionType = addHigherLowerOrderBytes(extensionTypeHigher, extensionTypeLower)
-
-            // Server Name extension has type 00 00
-            if (extensionType == 0) {
-                Timber.i("Found extension type for SNI at index %d", index)
+            if (extensionType == SERVER_NAME_EXTENSION_TYPE) {
                 return index
             } else {
-                val extensionLength = HigherOrderByte(packet[index]) + LowerOrderByte(
-                    packet[index + 1]
-                )
+                val extensionLength = HigherOrderByte(packet[index]) + LowerOrderByte(packet[index + 1])
                 index += 2
 
                 // skip to next extension, if there is a next one
@@ -130,14 +116,14 @@ class ServerNameIndicationHeaderHostExtractor : EncryptedRequestHostExtractor {
         val tlsVersionMajor = packet[1].toInt()
         val tlsVersionMinor = packet[2].toInt()
 
-        Timber.i("Got TLS version, major:%d, minor:%d. Content type=%d. Packet size=%d", tlsVersionMajor, tlsVersionMinor, contentType, packet.size)
+        Timber.v("Got TLS version, major:%d, minor:%d. Content type=%d. Packet size=%d", tlsVersionMajor, tlsVersionMinor, contentType, packet.size)
 
         if (tlsVersionMajor < 0x03) {
             Timber.v("TLS version wouldn't include a SNI header so no point in looking further for it")
             return false
         }
 
-        if (contentType != 22) {
+        if (contentType != TLS_HANDSHAKE_PACKET_TYPE) {
             Timber.v("Not a handshake packet; not going to find SNI header in here")
             return false
         }
@@ -150,7 +136,7 @@ class ServerNameIndicationHeaderHostExtractor : EncryptedRequestHostExtractor {
 
         val handshakeMessageType = packet[TLS_HEADER_SIZE]
         if (handshakeMessageType == 1.toByte()) {
-            Timber.i("This is a ClientHello message")
+            Timber.v("This is a ClientHello message")
             return true
         }
 
@@ -172,6 +158,9 @@ class ServerNameIndicationHeaderHostExtractor : EncryptedRequestHostExtractor {
 
     companion object {
         private const val TLS_HEADER_SIZE = 5
+        private const val TLS_HANDSHAKE_PACKET_TYPE = 22
+        private const val SESSION_ID_INDEX = 43
+        private const val SERVER_NAME_EXTENSION_TYPE = 0
     }
 }
 

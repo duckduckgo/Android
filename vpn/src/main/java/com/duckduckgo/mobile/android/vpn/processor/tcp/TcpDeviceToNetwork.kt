@@ -50,8 +50,7 @@ class TcpDeviceToNetwork(
     private val socketWriter: SocketWriter,
     private val connectionInitializer: ConnectionInitializer,
     private val handler: Handler,
-    private val trackerDetector: VpnTrackerDetector,
-    private val hostnameExtractor: HostnameExtractor
+    private val trackerDetector: VpnTrackerDetector
 ) {
 
     var lastTimePacketConsumed = 0L
@@ -312,24 +311,10 @@ class TcpDeviceToNetwork(
             return tcb.isTracker
         }
 
-        val hostname = hostnameExtractor.extract(tcb, packet, payloadBuffer)
-        when (trackerDetector.determinePacketType(tcb, hostname)) {
-            RequestTrackerType.Tracker -> {
-                Timber.w("Determined that %s is a tracker %s", hostname, tcb.ipAndPort)
-                tcb.trackerTypeDetermined = true
-                tcb.isTracker = true
-                return true
-            }
-            RequestTrackerType.NotTracker -> {
-                Timber.v("Determined that %s is not a tracker %s", hostname, tcb.ipAndPort)
-                tcb.trackerTypeDetermined = true
-                tcb.isTracker = false
-                return false
-            }
-            RequestTrackerType.Undetermined -> {
-                Timber.w("Failed to determine if %s is a tracker %s", hostname, tcb.ipAndPort)
-                return false
-            }
+        return when (trackerDetector.determinePacketType(tcb, packet, payloadBuffer)) {
+            RequestTrackerType.Tracker -> true
+            RequestTrackerType.NotTracker -> false
+            RequestTrackerType.Undetermined -> false
         }
     }
 

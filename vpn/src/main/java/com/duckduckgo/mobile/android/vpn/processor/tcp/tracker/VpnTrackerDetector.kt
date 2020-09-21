@@ -16,22 +16,46 @@
 
 package com.duckduckgo.mobile.android.vpn.processor.tcp.tracker
 
+import com.duckduckgo.mobile.android.vpn.processor.tcp.hostname.HostnameExtractor
 import com.duckduckgo.mobile.android.vpn.processor.tcp.tracker.RequestTrackerType.Tracker
+import timber.log.Timber
+import xyz.hexene.localvpn.Packet
 import xyz.hexene.localvpn.TCB
+import java.nio.ByteBuffer
 
 
 interface VpnTrackerDetector {
 
-    fun determinePacketType(tcb: TCB, hostName: String?): RequestTrackerType
+    fun determinePacketType(tcb: TCB, packet: Packet, payloadBuffer: ByteBuffer): RequestTrackerType
 }
 
 class DomainBasedTrackerDetector(
+    private val hostnameExtractor: HostnameExtractor
 ) : VpnTrackerDetector {
 
-    override fun determinePacketType(tcb: TCB, hostName: String?): RequestTrackerType {
-        if(hostName == "example.com") return Tracker
+    override fun determinePacketType(tcb: TCB, packet: Packet, payloadBuffer: ByteBuffer): RequestTrackerType {
+        val hostname = hostnameExtractor.extract(tcb, packet, payloadBuffer)
+        if (hostname == null) {
+            Timber.w("Failed to determine if packet is a tracker as hostname not extracted %s", tcb.ipAndPort)
+            return RequestTrackerType.Undetermined
+        }
+
+        tcb.trackerTypeDetermined = true
+
+        if (hostname.isTracker()) {
+            tcb.isTracker = true
+            Timber.i("Determined %s to be tracker %s", hostname, tcb.ipAndPort)
+            return Tracker
+        }
+
+        tcb.isTracker = false
+        Timber.v("Determined %s is not a tracker %s", hostname, tcb.ipAndPort)
 
         return RequestTrackerType.NotTracker
+    }
+
+    private fun String.isTracker(): Boolean {
+        return this == "example.com"
     }
 
 }

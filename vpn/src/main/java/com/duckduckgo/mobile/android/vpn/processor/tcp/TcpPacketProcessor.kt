@@ -64,8 +64,7 @@ class TcpPacketProcessor(
             tcpSocketWriter,
             TcpConnectionInitializer(queues, networkChannelCreator),
             handler,
-            trackerDetector,
-            hostnameExtractor
+            trackerDetector
         )
 
     private val readWriteExecutorService = Executors.newFixedThreadPool(2)
