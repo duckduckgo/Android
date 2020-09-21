@@ -56,6 +56,70 @@ class NextPageLoginDetectionTest {
     }
 
     @Test
+    fun whenLoginAttemptedAndUserForwardedToAuthFlowPageThenLoginNotIssuedDetected() {
+        loginDetector.onEvent(NavigationEvent.LoginAttempt("http://example.com/login"))
+
+        fullyLoadSite("https://accounts.google.com/o/oauth2/v2/auth/identifier")
+        Thread.sleep(2000)
+        fullyLoadSite("https://accounts.google.com/signin/v2/challenge/pwd?client_id=28300235456")
+        Thread.sleep(2000)
+        fullyLoadSite("https://accounts.google.com/signin/v2/challenge/az")
+        Thread.sleep(2000)
+
+        assertEventNotIssued<LoginDetected>()
+    }
+
+    @Test
+    fun whenLoginAttemptedAndUserForwardedToAuthFlowPageAndFinallyToOriginalDomainThenLoginDetected() {
+        loginDetector.onEvent(NavigationEvent.LoginAttempt("http://trello.com"))
+
+        fullyLoadSite("https://accounts.google.com/o/oauth2/v2/auth/identifier")
+        Thread.sleep(2000)
+        fullyLoadSite("https://accounts.google.com/signin/v2/challenge/pwd?client_id=28300235456")
+        Thread.sleep(2000)
+        fullyLoadSite("https://accounts.google.com/signin/v2/challenge/az")
+        Thread.sleep(2000)
+        fullyLoadSite("https://trello.com/boards")
+        Thread.sleep(2000)
+
+        assertEvent<LoginDetected> {
+            assertEquals("trello.com", this.forwardedToDomain)
+        }
+    }
+
+    @Test
+    fun whenLoginAttemptedViaFacebookAndUserForwardedToAuthFlowPageAndFinallyToOriginalDomainThenLoginDetected() {
+        loginDetector.onEvent(NavigationEvent.LoginAttempt("https://m.facebook.com/login.php"))
+
+        fullyLoadSite("https://m.facebook.com/v7.0/dialog/oauth")
+        Thread.sleep(2000)
+        fullyLoadSite("https://m.facebook.com/v7.0/dialog/oauth/read/")
+        Thread.sleep(2000)
+        fullyLoadSite("https://www.spotify.com/es/account")
+        Thread.sleep(2000)
+
+        assertEvent<LoginDetected> {
+            assertEquals("www.spotify.com", this.forwardedToDomain)
+        }
+    }
+
+    @Test
+    fun whenLoginAttemptedViaSSOAndUserForwardedToAuthFlowPageAndFinallyToOriginalDomainThenLoginDetected() {
+        loginDetector.onEvent(NavigationEvent.LoginAttempt("https://sso.duckduckgo.com/module.php/core/loginuserpass.php"))
+
+        fullyLoadSite("https://sso.duckduckgo.com/module.php/duosecurity/getduo.php")
+        Thread.sleep(2000)
+        fullyLoadSite("https://sso.duckduckgo.com/module.php/duosecurity/getduo.php")
+        Thread.sleep(2000)
+        fullyLoadSite("https://app.asana.com/?rr=723841")
+        Thread.sleep(2000)
+
+        assertEvent<LoginDetected> {
+            assertEquals("app.asana.com", this.forwardedToDomain)
+        }
+    }
+
+    @Test
     fun whenLoginAttemptedAndUserForwardedToMultipleNewPagesThenLoginDetectedForLatestOne() {
         loginDetector.onEvent(NavigationEvent.LoginAttempt("http://example.com/login"))
 
@@ -65,7 +129,7 @@ class NextPageLoginDetectionTest {
         Thread.sleep(3000)
 
         assertEvent<LoginDetected> {
-            assertEquals(this.forwardedToDomain, "example3.com")
+            assertEquals("example3.com", this.forwardedToDomain)
         }
     }
 
