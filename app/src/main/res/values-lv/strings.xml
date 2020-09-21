@@ -95,7 +95,7 @@
     <string name="privacyProtectionEnabled">VIETNES AIZSARDZĪBA IR IESPĒJOTA</string>
     <string name="privacyProtectionDisabled">VIETAS AIZSARDZĪBA IR ATSPĒJOTA</string>
     <string name="privacyDashboardActivityTitle">Privātuma informācijas panelis</string>
-    <string name="privacyProtectionUpgraded" tools:ignore="TypographyQuotes">UZLABOTS NO &lt;img src="%d" /&gt; UZ &lt;img src="%d" /&gt;</string>
+    <string name="privacyProtectionUpgraded" tools:ignore="TypographyQuotes">UZLABOTS NO &lt;img src=\"%1$d\" /&gt; UZ &lt;img src=\"%2$d\" /&gt;</string>
     <string name="privacyGradeContentDescription">Privātuma līmenis</string>
 
     <string name="httpsGood">Šifrēts savienojums</string>
@@ -107,27 +107,27 @@
     <string name="networksOverview">Izsekotāju tīkli apkopo jūsu tīmekļa vēsturi datu profilā par jums. Lielākie izsekotāju tīkli ir kaitīgāki, jo tie var izsekot un mērķēt jūs internetā plašākā apmērā.</string>
 
     <plurals name="trackersFound">
-        <item quantity="zero">%s Atrasti izsekotāji</item>
-        <item quantity="one">%s Atrasts izsekotājs</item>
-        <item quantity="other">%s Atrasti izsekotāji</item>
+        <item quantity="zero">%1$s Atrasti izsekotāji</item>
+        <item quantity="one">%1$s Atrasts izsekotājs</item>
+        <item quantity="other">%1$s Atrasti izsekotāji</item>
     </plurals>
 
     <plurals name="trackerBlocked">
-        <item quantity="zero">%s Izsekotāji ir bloķēti</item>
-        <item quantity="one">%s Izsekotājs ir bloķēts</item>
-        <item quantity="other">%s Izsekotāji ir bloķēti</item>
+        <item quantity="zero">%1$s Izsekotāji ir bloķēti</item>
+        <item quantity="one">%1$s Izsekotājs ir bloķēts</item>
+        <item quantity="other">%1$s Izsekotāji ir bloķēti</item>
     </plurals>
 
     <plurals name="majorNetworksFound">
-        <item quantity="zero">Atrasti %s lielākie izsekotāju tīkli</item>
-        <item quantity="one">%s Atrasts lielākais izsekotāju tīkls</item>
-        <item quantity="other">Atrasti %s lielākie izsekotāju tīkli</item>
+        <item quantity="zero">Atrasti %1$s lielākie izsekotāju tīkli</item>
+        <item quantity="one">%1$s Atrasts lielākais izsekotāju tīkls</item>
+        <item quantity="other">Atrasti %1$s lielākie izsekotāju tīkli</item>
     </plurals>
 
     <plurals name="majorNetworksBlocked">
-        <item quantity="zero">%s Lielākie izsekotāju tīkli ir bloķēti</item>
-        <item quantity="one">%s Galvenais izsekotāju tīkls ir bloķēts</item>
-        <item quantity="other">%s Lielākie izsekotāju tīkli ir bloķēti</item>
+        <item quantity="zero">%1$s Lielākie izsekotāju tīkli ir bloķēti</item>
+        <item quantity="one">%1$s Galvenais izsekotāju tīkls ir bloķēts</item>
+        <item quantity="other">%1$s Lielākie izsekotāju tīkli ir bloķēti</item>
     </plurals>
 
     <string name="scorecardActivityTitle">Privātuma līmenis</string>
@@ -183,7 +183,10 @@
 
     <!-- About Activity -->
     <string name="aboutActivityTitle">Par mums</string>
-    <string name="aboutDescription">Vietnē DuckDuckGo mēs veidojam jauno tiešsaistes uzticēšanās standartu.\n DuckDuckGo konfidencialitātes pārlūks nodrošina visu nepieciešamo privātumu, lai aizsargātu sevi, meklējot un pārlūkojot tīmekli, ieskaitot izsekotāju bloķēšanu, viedāku šifrēšanu un DuckDuckGo privāto meklēšanu.\n Galu galā internetam nevajadzētu iedvest bailes, un jūsu godam nopelnītā tiešsaistes privātuma iegūšanai vajadzētu būt tikpat vienkāršai kā žalūziju aizvēršanai.</string>
+    <string name="aboutDescription">
+        Vietnē DuckDuckGo mēs veidojam jauno tiešsaistes uzticēšanās standartu.\n\
+        DuckDuckGo konfidencialitātes pārlūks nodrošina visu nepieciešamo privātumu, lai aizsargātu sevi, meklējot un pārlūkojot tīmekli, ieskaitot izsekotāju bloķēšanu, viedāku šifrēšanu un DuckDuckGo privāto meklēšanu.\n\
+        Galu galā internetam nevajadzētu iedvest bailes, un jūsu godam nopelnītā tiešsaistes privātuma iegūšanai vajadzētu būt tikpat vienkāršai kā žalūziju aizvēršanai.</string>
     <string name="aboutMoreLink">Vairāk vietnē duckduckgo.com/about</string>
     <string name="no_suggestions">Nav ieteikumu</string>
 
@@ -209,18 +212,20 @@
     <!-- Bookmarks Activity -->
     <string name="bookmarksMenuTitle">Grāmatzīmes</string>
     <string name="bookmarksActivityTitle">Grāmatzīmes</string>
-    <string name="bookmarkDeleteConfirmMessage">Vai tiešām vēlaties izdzēst grāmatzīmi &lt;b&gt;%s&lt;/b&gt;?</string>
-    <string name="dialogConfirmTitle">Apstiprināt</string>
+    <string name="bookmarkDeleteConfirmMessage">Vai tiešām vēlaties izdzēst grāmatzīmi &lt;b&gt;%1$s&lt;/b&gt;?</string>
     <string name="bookmarkAddedFeedback">Pievienota grāmatzīme</string>
     <string name="bookmarkTitleHint">Grāmatzīmes nosaukums</string>
     <string name="bookmarkUrlHint">Grāmatzīmju URL</string>
-    <string name="dialogSave">Saglabāt</string>
     <string name="bookmarkTitleEdit">Rediģēt grāmatzīmi</string>
     <string name="noBookmarks">Pagaidām nav pievienota neviena grāmatzīme</string>
-    <string name="bookmarkOverflowContentDescription">Vairāk iespēju grāmatzīmei %s</string>
+    <string name="bookmarkOverflowContentDescription">Vairāk iespēju grāmatzīmei %1$s</string>
+    <string name="bookmarkEdited">Pievienota grāmatzīme</string>
+
+    <!-- Dialogs -->
+    <string name="dialogConfirmTitle">Apstiprināt</string>
+    <string name="dialogSave">Saglabāt</string>
     <string name="delete">Dzēst</string>
     <string name="edit">Rediģēt</string>
-    <string name="bookmarkEdited">Pievienota grāmatzīme</string>
 
     <!-- Widget -->
     <string name="searchWidgetTextHint">Meklēt DuckDuckGo</string>
@@ -286,14 +291,14 @@
     <string name="privacyProtectionNotificationDefaultTitle">Mēs aizsargājam jūsu privātumu</string>
     <string name="privacyProtectionNotificationReportTitle">Jūsu privātuma ziņojums</string>
     <string name="privacyProtectionNotificationDefaultDescription">Izmantojot lietotni DuckDuckGo, tiek aizsargāti jūsu dati, bloķējot izsekotājus un šifrējot savienojumus.</string>
-    <string name="privacyProtectionNotificationUpgadeDescription">Jūs aizsargājāt savus datus, izmantojot %d nešifrētus savienojumus, vienlaikus izmantojot DuckDuckGo.</string>
-    <string name="privacyProtectionNotificationTrackerDescription">Jūs aizsargājāt savus datus, bloķējot %d izsekotājus, vienlaikus izmantojot DuckDuckGo.</string>
-    <string name="privacyProtectionNotificationBothDescription">Jūs aizsargājāt savus datus, bloķējot %d izsekotājus un nodrošinot %d nešifrētus savienojumus, vienlaikus izmantojot DuckDuckGo.</string>
+    <string name="privacyProtectionNotificationUpgadeDescription">Jūs aizsargājāt savus datus, izmantojot %1$d nešifrētus savienojumus, vienlaikus izmantojot DuckDuckGo.</string>
+    <string name="privacyProtectionNotificationTrackerDescription">Jūs aizsargājāt savus datus, bloķējot %1$d izsekotājus, vienlaikus izmantojot DuckDuckGo.</string>
+    <string name="privacyProtectionNotificationBothDescription">Jūs aizsargājāt savus datus, bloķējot %1$d izsekotājus un nodrošinot %2$d nešifrētus savienojumus, vienlaikus izmantojot DuckDuckGo.</string>
     <string name="privacyProtectionNotificationLaunchButton">Atsākt pārlūkošanu</string>
-
+    
     <!-- Authentication -->
     <string name="authenticationDialogTitle">Pierakstīties</string>
-    <string name="authenticationDialogMessage">Lai izmantotu %s, ir nepieciešams lietotājvārds un parole.</string>
+    <string name="authenticationDialogMessage">Lai izmantotu %1$s, ir nepieciešams lietotājvārds un parole.</string>
     <string name="authenticationDialogPositiveButton">Pierakstīties</string>
     <string name="authenticationDialogNegativeButton">Atcelt</string>
     <string name="authenticationDialogUsernameHint">Lietotājvārds</string>
@@ -375,8 +380,8 @@
     <string name="feedbackIsImportantToUs">Jūsu anonīmās atsauksmes mums ir svarīgas.</string>
 
     <!-- Webview Recovery -->
-    <string name="crashedWebViewErrorMessage">Vietni nevarēja parādīt.</string>
-    <string name="crashedWebViewErrorAction">Pārlādēt</string>
+    <string name="crashedWebViewErrorMessage">"Vietni nevarēja parādīt."</string>
+    <string name="crashedWebViewErrorAction">"Pārlādēt"</string>
 
     <!-- System Search-->
     <string name="systemSearchDeviceAppLabel">No šīs ierīces</string>
@@ -402,24 +407,25 @@
     <string name="hideTipsButton">Paslēpt padomus uz visiem laikiem</string>
 
     <!-- New Onboarding Experience -->
-    <string name="onboardingWelcomeTitle">Laipni lūdzam DuckDuckGo!</string>
-    <string name="onboardingDaxText">Internets var būt diezgan biedējošs.&lt;br/&gt;&lt;br/&gt;Bet neuztraucieties! Meklēt un pārlūkot privātā režīmā ir vieglāk, nekā jūs domājat.</string>
+    <string name="onboardingWelcomeTitle">"Laipni lūdzam DuckDuckGo!"</string>
+    <string name="onboardingDaxText"><![CDATA[Internets var būt diezgan biedējošs.<br/><br/>Bet neuztraucieties! Meklēt un pārlūkot privātā režīmā ir vieglāk, nekā jūs domājat.]]></string>
     <string name="onboardingLetsDoItButton">Darīsim to!</string>
-    <string name="daxIntroCtaText">Tagad pamēģiniet ieiet kādā no jūsu mīļākajām vietnēm! &lt;br/&gt;&lt;br/&gt;Es nobloķēšu izsekotājus, lai viņi nevarētu jūs izspiegot. Ja iespējams, uzlabošu arī jūsu savienojuma drošību. &#128274;</string>
-    <string name="daxEndCtaText">Tas izdevās! &lt;br/&gt;&lt;br/&gt;Atcerieties – katru reizi, kad jūs pārlūkojat ar mani, jocīgas reklāmas atkāpjas. &#128077;</string>
-    <string name="daxSerpCtaText">Jūsu DuckDuckGo meklējumi ir anonīmi, un es nekad neuzglabāju jūsu meklēšanas vēsturi. Nekad. &#128588;</string>
+    <string name="daxIntroCtaText"><![CDATA[Tagad pamēģiniet ieiet kādā no jūsu mīļākajām vietnēm! <br/><br/>Es nobloķēšu izsekotājus, lai viņi nevarētu jūs izspiegot. Ja iespējams, uzlabošu arī jūsu savienojuma drošību. 🔒]]></string>
+    <string name="daxEndCtaText"><![CDATA[Tas izdevās! <br/><br/>Atcerieties – katru reizi, kad jūs pārlūkojat ar mani, jocīgas reklāmas atkāpjas. 👍]]></string>
+    <string name="daxSerpCtaText">Jūsu DuckDuckGo meklējumi ir anonīmi, un es nekad neuzglabāju jūsu meklēšanas vēsturi. Nekad. 🙌</string>
     <plurals name="daxTrackersBlockedCtaText">
-        <item quantity="zero">&#160;un &lt;b&gt;%d citas&lt;/b&gt; mēģināja jūs izsekot. &lt;br/&gt;&lt;br/&gt;Es tās nobloķēju!&lt;br/&gt;&lt;br/&gt; ☝️Jūs varat pārbaudīt URL joslu, lai redzētu, kas mēģina jūs izsekot, kad apmeklējat jaunu vietni.️</item>
-        <item quantity="one">&#160;un &lt;b&gt;%d citas&lt;/b&gt; mēģināja jūs izsekot. &lt;br/&gt;&lt;br/&gt;Es tās nobloķēju!&lt;br/&gt;&lt;br/&gt; ☝️Jūs varat pārbaudīt URL joslu, lai redzētu, kurš mēģina jūs izsekot, kad apmeklējat jaunu vietni.️</item>
-        <item quantity="other">&#160;un &lt;b&gt;%d citas&lt;/b&gt; mēģināja jūs izsekot. &lt;br/&gt;&lt;br/&gt;Es tās nobloķēju!&lt;br/&gt;&lt;br/&gt; ☝️Jūs varat pārbaudīt URL joslu, lai redzētu, kurš mēģina jūs izsekot, kad apmeklējat jaunu vietni.️</item>
+        <item quantity="zero"><![CDATA[ un <b>%1$d citas</b> mēģināja jūs izsekot. <br/><br/>Es tās nobloķēju!<br/><br/> ☝️Jūs varat pārbaudīt URL joslu, lai redzētu, kas mēģina jūs izsekot, kad apmeklējat jaunu vietni.️]]></item>
+        <item quantity="one"><![CDATA[ un <b>%1$d citas</b> mēģināja jūs izsekot. <br/><br/>Es tās nobloķēju!<br/><br/> ☝️Jūs varat pārbaudīt URL joslu, lai redzētu, kurš mēģina jūs izsekot, kad apmeklējat jaunu vietni.️]]></item>
+        <item quantity="other"><![CDATA[ un <b>%1$d citas</b> mēģināja jūs izsekot. <br/><br/>Es tās nobloķēju!<br/><br/> ☝️Jūs varat pārbaudīt URL joslu, lai redzētu, kurš mēģina jūs izsekot, kad apmeklējat jaunu vietni.️]]></item>
     </plurals>
-    <plurals name="daxTrackersBlockedCtaZeroText" tools:ignore="MissingQuantity">
-        <item quantity="one" tools:ignore="ImpliedQuantity">&#160;mēģināja jūs izsekot. &lt;br/&gt;&lt;br/&gt;Es to nobloķēju!&lt;br/&gt;&lt;br/&gt; ☝️Jūs varat pārbaudīt URL joslu, lai redzētu, kurš mēģina jūs izsekot, kad apmeklējat jaunu vietni.️</item>
-        <item quantity="other">&#160;mēģināja jūs izsekot. &lt;br/&gt;&lt;br/&gt;Es to nobloķēju!&lt;br/&gt;&lt;br/&gt; ☝️Jūs varat pārbaudīt URL joslu, lai redzētu, kurš mēģina jūs izsekot, kad apmeklējat jaunu vietni.️</item>
+    <plurals name="daxTrackersBlockedCtaZeroText">
+        <item quantity="zero" tools:ignore="ImpliedQuantity"><![CDATA[ mēģināja tevi šeit izsekot. <br/><br/>Es tās nobloķēju!<br/><br/> ☝️Tu vari pārbaudīt URL joslu, lai redzētu, kas tevi mēģina izsekot, kad tu apmeklē jaunu vietni.️]]></item>
+        <item quantity="one" tools:ignore="ImpliedQuantity"><![CDATA[ mēģināja tevi šeit izsekot. <br/><br/>Es tās nobloķēju!<br/><br/> ☝️Tu vari pārbaudīt URL joslu, lai redzētu, kas tevi mēģina izsekot, kad tu apmeklē jaunu vietni.️]]></item>
+        <item quantity="other"><![CDATA[ mēģināja tevi šeit izsekot. <br/><br/>Es tās nobloķēju!<br/><br/> ☝️Tu vari pārbaudīt URL joslu, lai redzētu, kas tevi mēģina izsekot, kad tu apmeklē jaunu vietni.️]]></item>
     </plurals>
-    <string name="daxNonSerpCtaText">Kad pieskarsies un ritināsi, es bloķēšu uzmācīgos izsekotājus. &lt;br/&gt;&lt;br/&gt;Aiziet – turpini pārlūkot!</string>
-    <string name="daxMainNetworkOwnedCtaText">Galvu augšā! %s pieder %s.&lt;br/&gt;&lt;br/&gt; %s izsekotāji slēpjas apmēram %s populārākajās vietnēs &#128561;, bet nevajag satraukties! &lt;br/&gt;&lt;br/&gt;Es bloķēšu %s iespēju redzēt tavas darbības šajās vietnēs.</string>
-    <string name="daxMainNetworkCtaText">Galvu augšā! %s ir galvenais izsekošanas tīkls.&lt;br/&gt;&lt;br/&gt; To izsekotāji slēpjas apmēram %s populārākajās vietnēs &#128561;, bet nevajag satraukties! &lt;br/&gt;&lt;br/&gt;Es bloķēšu %s iespēju redzēt tavas darbības šajās vietnēs.</string>
+    <string name="daxNonSerpCtaText"><![CDATA[Kad pieskarsies un ritināsi, es bloķēšu uzmācīgos izsekotājus. <br/><br/>Aiziet – turpini pārlūkot!]]></string>
+    <string name="daxMainNetworkCtaText"><![CDATA[Galvu augšā! %1$s ir galvenais izsekošanas tīkls.<br/><br/> To izsekotāji slēpjas apmēram %2$s populārākajās vietnēs 😱, bet nevajag satraukties! <br/><br/>Es bloķēšu %3$s iespēju redzēt tavas darbības šajās vietnēs.]]></string>
+    <string name="daxMainNetworkOwnedCtaText">Mazs brīdinājums! Tā kā %1$s pieder %2$s, es nevaru viņiem liegt šeit skatīt tavas darbības.&lt;br/&gt;&lt;br/&gt;Taču pārlūko kopā ar mani, jo es varu samazināt to, ko %3$s zina par tevi kopumā, bloķējot viņu izsekotājus daudzās citās vietnēs.</string>
 
     <!-- Download Confirmation -->
     <string name="downloadConfirmationContinue">Turpināt</string>
@@ -439,7 +445,7 @@
     <string name="changeIconDialogMessage">Lietotne var aizvērties, lai veiktu izmaiņas. Atgriezieties pēc tam, kad būsiet apbrīnojis savu jauno, glīto ikonu.</string>
 
     <!-- New dashboard / menu buttons -->
-    <string name="manageWhitelist">Pārvaldīt balto sarakstu</string>
+    <string name="manageWhitelist">Neaizsargātas vietnes</string>
     <string name="reportBrokenSite">Ziņot par bojātu vietni</string>
 
     <!-- Dialogs -->
@@ -447,28 +453,41 @@
     <string name="dialogEditTitle">Rediģēt</string>
 
     <!-- Whitelist -->
-    <string name="whitelisetActivityTitle">Baltais saraksts</string>
-    <string name="enablePrivacyProtection">Pievienot baltajam sarakstam</string>
-    <string name="disablePrivacyProtection">Noņemt no baltā saraksta</string>
-    <string name="whitelistEntryOverflowContentDescription">Papildu iespējas baltā saraksta ierakstam %s</string>
-    <string name="whitelistEntryDeleteConfirmMessage">Vai tiešām vēlaties izdzēst &lt;b&gt;%s&lt;/b&gt; no baltā saraksta?</string>
-    <string name="whitelistExplanation">Šīs baltajā sarakstā iekļautās vietnes netiks atjauninātas, izmantojot privātuma aizsardzību</string>
-    <string name="whitelistNoEntries">Nav baltajā sarakstā iekļautu vietņu</string>
+    <string name="whitelisetActivityTitle">Neaizsargātas vietnes</string>
+    <string name="enablePrivacyProtection">Iespējot privātuma aizsardzību</string>
+    <string name="disablePrivacyProtection">Atspējot privātuma aizsardzību</string>
+    <string name="whitelistEntryOverflowContentDescription">Citas iespējas neaizsargātai vietnei %1$s</string>
+    <string name="whitelistEntryDeleteConfirmMessage">Vai tiešām vēlies noņemt &lt;b&gt;%1$s&lt;/b&gt; no neaizsargātām vietnēm?</string>
+    <string name="whitelistExplanation">Šīs vietnes netiks uzlabotas ar privātuma aizsardzību.</string>
+    <string name="whitelistNoEntries">Pagaidām nav neaizsargātu vietņu</string>
     <string name="whitelistDomainHint">www.piemērs.com</string>
-    <string name="whitelistFormatError">Nevarēja saglabāt, ievadiet domēnu, piemēram, <b>piemērs.com</b>
-  </string>
+    <string name="whitelistFormatError">Nevarēja saglabāt, ievadiet domēnu, piemēram, <b>piemērs.com</b></string>
 
     <!-- Settings -->
-    <string name="settingsPrivacyProtectionWhitelist">Privātuma aizsardzības baltais saraksts</string>
+    <string name="settingsPrivacyProtectionWhitelist">Neaizsargātas vietnes</string>
 
     <!-- Fireproof websites -->
     <string name="fireproofWebsitesActivityTitle">Ugunsdrošas tīmekļa vietnes</string>
     <string name="settingsFireproofWebsites">Ugunsdrošas tīmekļa vietnes</string>
     <string name="fireproofWebsiteMenuTitleAdd">Ugunsdrošā tīmekļa vietne</string>
-    <string name="fireproofWebsiteSnackbarConfirmation">&lt;b&gt;%s&lt;/b&gt; tagad ir ugunsdrošs! Lai uzzinātu vairāk, apmeklējiet iestatījumus.</string>
+    <string name="fireproofWebsiteSnackbarConfirmation">&lt;b&gt;%1$s&lt;/b&gt; tagad ir ugunsdrošs! Lai uzzinātu vairāk, apmeklējiet iestatījumus.</string>
     <string name="fireproofWebsiteSnackbarAction">Atsaukt</string>
-    <string name="fireproofWebsiteDeleteConfirmMessage">Vai tiešām vēlaties izdzēst &lt;b&gt;%s&lt;/b&gt;?</string>
+    <string name="fireproofWebsiteDeleteConfirmMessage">Vai tiešām vēlaties izdzēst &lt;b&gt;%1$s&lt;/b&gt;?</string>
     <string name="fireproofWebsiteEmptyListHint">Pagaidām neviena tīmekļa vietne nav ugunsdroša</string>
-    <string name="fireproofWebsiteFeatureDescription">Vietnes paļaujas uz sīkdatnēm, lai jūs vienmēr būtu pierakstījies. Kad vietne būs ugunsdroša, sīkfaili netiks izdzēsti, un jūs būsiet pierakstījies pat pēc tam, kad lietosiet pogu Uguni.</string>
-    <string name="fireproofWebsiteOverflowContentDescription">Citas iespējas ugunsdrošai tīmekļa vietnei %s</string>
+    <string name="fireproofWebsiteFeatureDescription">Vietnes lieto sīkfailus, lai tu varētu turpināt būt pierakstījies(-usies). Padarot vietni ugunsdrošu, sīkfaili netiek dzēsti, bet tu vari turpināt būt pierakstījies(-usies) arī pēc Uguns pogas lietošanas. Mēs joprojām bloķēsim trešo pušu izsekotājus, kas atrodami ugunsdrošās vietnēs.</string>
+    <string name="fireproofWebsiteOverflowContentDescription">Citas iespējas ugunsdrošai tīmekļa vietnei %1$s</string>
+    <string name="fireproofWebsiteLoginDialogTitle">Vai vēlies padarīt %1$s ugunsdrošu?</string>
+    <string name="fireproofWebsiteLoginDialogDescription">Padarot šo vietni ugunsdrošu, varēsi turpināt būt pierakstījies(-usies) arī pēc Uguns pogas lietošanas.</string>
+    <string name="fireproofWebsiteLoginDialogPositive">Padarīt ugunsdrošu</string>
+    <string name="fireproofWebsiteLoginDialogNegative">Ne tagad</string>
+    <string name="fireproofWebsiteItemsSectionTitle">Tīmekļa vietnes</string>
+    <string name="fireproofWebsiteToogleText">Jautāt, kad pierakstos</string>
+
+    <!-- Dos Attack error-->
+    <string name="dosErrorMessage">Savienojums pārtraukts. Šī vietne var kaitēt tavai ierīcei.</string>
+
+    <!-- Download Manager problems -->
+    <string name="downloadManagerDisabled">Lejupielāžu pārvaldnieks ir atspējots</string>
+    <string name="downloadManagerIncompatible">Lejupielāžu pārvaldnieks šajā ierīcē nav pieejams</string>
+    <string name="enable">Iespējot</string>
 </resources>

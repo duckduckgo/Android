@@ -43,6 +43,7 @@
         app:layout_constraintTop_toBottomOf="@id/vpnRunningButton"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toStartOf="@id/processStop"
+        android:visibility="gone"
         android:text="Start processor" />
 
     <Button
@@ -52,6 +53,7 @@
         app:layout_constraintTop_toBottomOf="@id/vpnRunningButton"
         app:layout_constraintStart_toEndOf="@id/processStart"
         app:layout_constraintEnd_toEndOf="parent"
+        android:visibility="gone"
         android:text="Stop processor" />
 
     <Button
@@ -61,6 +63,7 @@
         app:layout_constraintTop_toBottomOf="@id/processStop"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        android:visibility="gone"
         android:text="Add packet" />
 
 

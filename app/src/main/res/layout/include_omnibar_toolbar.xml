@@ -151,6 +151,19 @@
 
             </androidx.appcompat.widget.Toolbar>
 
+            <ProgressBar
+                android:id="@+id/pageLoadingIndicator"
+                style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="4dp"
+                android:progressDrawable="@drawable/loading_progress"
+                android:visibility="invisible"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                tools:progress="50"
+                tools:visibility="visible" />
+
             <FrameLayout
                 android:id="@+id/fireIconMenu"
                 android:layout_width="wrap_content"
@@ -165,6 +178,7 @@
                 tools:visibility="visible">
 
                 <ImageView
+                    android:id="@+id/fireIconImageView"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
@@ -172,7 +186,6 @@
                     android:contentDescription="@string/browserPopupMenu"
                     android:padding="3dp"
                     android:src="@drawable/ic_fire" />
-
             </FrameLayout>
 
             <com.duckduckgo.app.browser.TabSwitcherButton
@@ -210,19 +223,6 @@
                     android:src="@drawable/ic_overflow_12dp" />
 
             </FrameLayout>
-
-            <ProgressBar
-                android:id="@+id/pageLoadingIndicator"
-                style="@style/Widget.AppCompat.ProgressBar.Horizontal"
-                android:layout_width="match_parent"
-                android:layout_height="4dp"
-                android:progressDrawable="@drawable/loading_progress"
-                android:visibility="invisible"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                tools:progress="50"
-                tools:visibility="visible" />
 
             <include
                 layout="@layout/include_find_in_page"

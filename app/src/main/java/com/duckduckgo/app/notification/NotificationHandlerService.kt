@@ -24,13 +24,14 @@ import android.content.Intent
 import androidx.annotation.VisibleForTesting
 import androidx.core.app.NotificationManagerCompat
 import com.duckduckgo.app.browser.BrowserActivity
-import com.duckduckgo.app.icon.ui.ChangeIconActivity
-import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEvent.CHANGE_ICON_FEATURE
 import com.duckduckgo.app.global.DispatcherProvider
+import com.duckduckgo.app.icon.ui.ChangeIconActivity
 import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEvent.APP_LAUNCH
 import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEvent.CANCEL
+import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEvent.CHANGE_ICON_FEATURE
 import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEvent.CLEAR_DATA_LAUNCH
 import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEvent.USE_OUR_APP
+import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEvent.WEBSITE
 import com.duckduckgo.app.notification.model.NotificationSpec
 import com.duckduckgo.app.notification.model.WebsiteNotificationSpecification
 import com.duckduckgo.app.onboarding.store.AppStage
@@ -40,7 +41,6 @@ import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.NOTIFICATION_CANCELLED
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.NOTIFICATION_LAUNCHED
-import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEvent.WEBSITE
 import dagger.android.AndroidInjection
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -76,8 +76,9 @@ class NotificationHandlerService : IntentService("NotificationHandlerService") {
     }
 
     @VisibleForTesting
-    public override fun onHandleIntent(intent: Intent) {
-        val pixelSuffix = intent.getStringExtra(PIXEL_SUFFIX_EXTRA)
+    public override fun onHandleIntent(intent: Intent?) {
+        val pixelSuffix = intent?.getStringExtra(PIXEL_SUFFIX_EXTRA) ?: return
+
         when (intent.type) {
             APP_LAUNCH -> onAppLaunched(pixelSuffix)
             CLEAR_DATA_LAUNCH -> onClearDataLaunched(pixelSuffix)

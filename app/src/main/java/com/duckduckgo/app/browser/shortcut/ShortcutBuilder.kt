@@ -26,11 +26,11 @@ import androidx.core.graphics.drawable.IconCompat
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.BrowserTabViewModel
 import com.duckduckgo.app.browser.R
-import com.duckduckgo.app.global.useourapp.UseOurAppDetector.Companion.USE_OUR_APP_SHORTCUT_URL
+import com.duckduckgo.app.global.useourapp.UseOurAppDetector
 import java.util.UUID
 import javax.inject.Inject
 
-class ShortcutBuilder @Inject constructor() {
+class ShortcutBuilder @Inject constructor(private val useOurAppDetector: UseOurAppDetector) {
 
     private fun buildPinnedPageShortcut(context: Context, homeShortcut: BrowserTabViewModel.Command.AddHomeShortcut): ShortcutInfoCompat {
         val intent = Intent(context, BrowserActivity::class.java)
@@ -39,7 +39,7 @@ class ShortcutBuilder @Inject constructor() {
         intent.putExtra(SHORTCUT_EXTRA_ARG, true)
 
         val icon = when {
-            homeShortcut.url == USE_OUR_APP_SHORTCUT_URL -> IconCompat.createWithResource(context, R.drawable.ic_fb_favicon)
+            useOurAppDetector.isUseOurAppUrl(homeShortcut.url) -> IconCompat.createWithResource(context, R.drawable.ic_fb_favicon)
             homeShortcut.icon != null -> IconCompat.createWithBitmap(homeShortcut.icon)
             else -> IconCompat.createWithResource(context, R.drawable.logo_mini)
         }

@@ -19,6 +19,7 @@ package com.duckduckgo.app.global.view
 import android.content.Context
 import android.content.res.Resources
 import android.view.View
+import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 
 /*
@@ -81,3 +82,23 @@ fun View.hideKeyboard(): Boolean {
 fun Int.toDp(): Int = (this / Resources.getSystem().displayMetrics.density).toInt()
 fun Int.toPx(): Int = (this * Resources.getSystem().displayMetrics.density).toInt()
 fun Float.toPx(): Float = (this * Resources.getSystem().displayMetrics.density)
+
+fun View.setAndPropagateUpFitsSystemWindows(enabled: Boolean = false) {
+    fitsSystemWindows = enabled
+    var view = this
+    while (view.parent != null) {
+        val parent = view.parent as View
+        parent.fitsSystemWindows = enabled
+        view = parent
+    }
+}
+
+fun View.setAllParentsClip(enabled: Boolean = false) {
+    var view = this
+    while (view.parent != null && view.parent is ViewGroup) {
+        val viewGroup = view.parent as ViewGroup
+        viewGroup.clipChildren = enabled
+        viewGroup.clipToPadding = enabled
+        view = viewGroup
+    }
+}

@@ -77,7 +77,7 @@
     <string name="privacyProtectionEnabled">ZAŠTITA STRANICE UKLJUČENA</string>
     <string name="privacyProtectionDisabled">ZAŠTITA STRANICE JE ISKLJUČENA</string>
     <string name="privacyDashboardActivityTitle">Nadzorna ploča zaštite privatnosti</string>
-    <string name="privacyProtectionUpgraded" tools:ignore="TypographyQuotes">POBOLJŠANO OD &lt;img src="%d" /&gt; DO &lt;img src="%d" /&gt;</string>
+    <string name="privacyProtectionUpgraded" tools:ignore="TypographyQuotes">POBOLJŠANO OD &lt;img src=\"%1$d\" /&gt; DO &lt;img src=\"%2$d\" /&gt;</string>
     <string name="privacyGradeContentDescription">Ocjena zaštite privatnosti</string>
 
     <string name="httpsGood">Šifrirana veza</string>
@@ -88,28 +88,32 @@
     <string name="networksContentDescription">Mreže za praćenje</string>
     <string name="networksOverview">Mreže za praćenje objedinjuju vašu povijest web pregledavanja u podatkovni profil o vama. Glavne mreže za praćenje su štetnije jer vas mogu pratiti i ciljati na većem dijelu interneta.</string>
 
-    <plurals name="trackersFound">
-        <item quantity="one">%s pronađen alat za praćenje</item>
-        <item quantity="few">%s pronađenih alata za praćenje</item>
-        <item quantity="other">%s pronađenih alata za praćenje</item>
+    <plurals name="trackersFound" tools:ignore="UnusedQuantity">
+        <item quantity="one">Pronađen je %1$s alat za praćenje</item>
+        <item quantity="few">Pronađena su %1$s alata za praćenje</item>
+        <item quantity="many">Pronađeno je %1$s alata za praćenje</item>
+        <item quantity="other">Pronađeno je %1$s alata za praćenje</item>
     </plurals>
 
-    <plurals name="trackerBlocked">
-        <item quantity="one">%s blokiranih alata za praćenje</item>
-        <item quantity="few">%s blokiranih alata za praćenje</item>
-        <item quantity="other">%s blokiranih alata za praćenje</item>
+    <plurals name="trackerBlocked" tools:ignore="UnusedQuantity">
+        <item quantity="one">Blokiran je %1$s alat za praćenje</item>
+        <item quantity="few">Blokirana su %1$s alata za praćenje</item>
+        <item quantity="many">Blokirano je %1$s alata za praćenje</item>
+        <item quantity="other">Blokirano je %1$s alata za praćenje</item>
     </plurals>
 
-    <plurals name="majorNetworksFound">
-        <item quantity="one">%s pronađenih glavnih mreža za praćenje</item>
-        <item quantity="few">%s pronađenih glavnih mreža za praćenje</item>
-        <item quantity="other">%s pronađenih glavnih mreža za praćenje</item>
+    <plurals name="majorNetworksFound" tools:ignore="UnusedQuantity">
+        <item quantity="one">Pronađena je %1$s veća mreža za praćenje</item>
+        <item quantity="few">Pronađene su %1$s veće mreže za praćenje</item>
+        <item quantity="many">Pronađeno je %1$s većih mreža za praćenje</item>
+        <item quantity="other">Pronađeno je %1$s većih mreža za praćenje</item>
     </plurals>
 
-    <plurals name="majorNetworksBlocked">
-        <item quantity="one">%s blokiranih glavnih mreža za praćenje</item>
-        <item quantity="few">%s blokiranih glavnih mreža za praćenje</item>
-        <item quantity="other">%s blokiranih glavnih mreža za praćenje</item>
+    <plurals name="majorNetworksBlocked" tools:ignore="UnusedQuantity">
+        <item quantity="one">Blokirana je %1$s veća mreža za praćenje</item>
+        <item quantity="few">Blokirane su %1$s veće mreže za praćenje</item>
+        <item quantity="many">Blokirano je %1$s većih mreža za praćenje</item>
+        <item quantity="other">Blokirano je %1$s većih mreža za praćenje</item>
     </plurals>
 
     <string name="scorecardActivityTitle">Ocjena zaštite privatnosti</string>
@@ -120,7 +124,7 @@
     <string name="privacyTermsActivityTitle">Prakse zaštite privatnosti</string>
     <string name="practicesGood">Dobre prakse zaštite privatnosti</string>
     <string name="practicesMixed">Miješane prakse zaštite privatnosti</string>
-    <string name="practicesBad">"Loše prakse zaštite privatnosti"</string>
+    <string name="practicesBad">Loše prakse zaštite privatnosti</string>
     <string name="practicesUnknown">Nepoznata praksa zaštite privatnosti</string>
     <string name="practicesOverview">Prakse zaštite privatnosti pokazuju koliko su zaštićeni osobni podaci koje dijelite s web-mjestom.</string>
     <string name="practicesTosdrLink">Prakse zaštite privatnosti rezultat su <b><u>ToS;DR</u></b></string>
@@ -166,7 +170,9 @@
     <!-- About Activity -->
     <string name="aboutActivityTitle">O nama</string>
     <string name="aboutDescription">
-        U DuckDuckGo postavljamo novi standard povjerenja na mreži.\n\ DuckDuckGo anonimni preglednik pruža sve što vam je potrebno da se zaštitite dok pretražujete i pregledavate internet, uključujući blokiranje alata za praćenje, pametnije šifriranje i privatno pretraživanje DuckDuckGo.\n\ Uostalom, internet ne bi trebao biti jezivo mjesto, a dobivanje privatnosti koju zaslužujete na internetu trebalo bi biti jednostavno poput spuštanja roleta.</string>
+        U DuckDuckGo postavljamo novi standard povjerenja na mreži.\n\
+        DuckDuckGo anonimni preglednik pruža sve što vam je potrebno da se zaštitite dok pretražujete i pregledavate internet, uključujući blokiranje alata za praćenje, pametnije šifriranje i privatno pretraživanje DuckDuckGo.\n\
+        Uostalom, internet ne bi trebao biti jezivo mjesto, a dobivanje privatnosti koju zaslužujete na internetu trebalo bi biti jednostavno poput spuštanja roleta.</string>
     <string name="aboutMoreLink">Više na duckduckgo.com/about</string>
     <string name="no_suggestions">Nema prijedloga</string>
 
@@ -192,18 +198,20 @@
     <!-- Bookmarks Activity -->
     <string name="bookmarksMenuTitle">Knjižne oznake</string>
     <string name="bookmarksActivityTitle">Knjižne oznake</string>
-    <string name="bookmarkDeleteConfirmMessage">Sigurno želite izbrisati knjižnu oznaku &lt;b&gt;%s&lt;/b&gt;?</string>
-    <string name="dialogConfirmTitle">Potvrdi</string>
+    <string name="bookmarkDeleteConfirmMessage">Sigurno želite izbrisati knjižnu oznaku &lt;b&gt;%1$s&lt;/b&gt;?</string>
     <string name="bookmarkAddedFeedback">Knjižna oznaka je dodana</string>
     <string name="bookmarkTitleHint">Naslov knjižne oznake</string>
     <string name="bookmarkUrlHint">URL knjižne oznake</string>
-    <string name="dialogSave">Spremi</string>
     <string name="bookmarkTitleEdit">Uredi knjižnu oznaku</string>
     <string name="noBookmarks">Još nema dodanih knjižnih oznaka</string>
-    <string name="bookmarkOverflowContentDescription">Više opcija za knjižnu oznaku %s</string>
+    <string name="bookmarkOverflowContentDescription">Više opcija za knjižnu oznaku %1$s</string>
+    <string name="bookmarkEdited">Obilježivač je dodan</string>
+
+    <!-- Dialogs -->
+    <string name="dialogConfirmTitle">Potvrdi</string>
+    <string name="dialogSave">Spremi</string>
     <string name="delete">Izbriši</string>
     <string name="edit">Uredi</string>
-    <string name="bookmarkEdited">Obilježivač je dodan</string>
 
     <!-- Widget -->
     <string name="searchWidgetTextHint">Pretraži DuckDuckGo</string>
@@ -220,7 +228,7 @@
     <string name="surveyTitle">ANKETA DUCKDUCKGO</string>
     <string name="surveyDismissContentDescription">Odbaci anketu</string>
     <string name="surveyLoadingErrorTitle">O, ne!</string>
-    <string name="surveyLoadingErrorText">Anketa se trenutačno ne učitava.\ nPokušajte ponovno kasnije.</string>
+    <string name="surveyLoadingErrorText">Anketa se trenutačno ne učitava.\nPokušajte ponovno kasnije.</string>
 
     <!-- Add widget -->
     <string name="addWidgetCtaTitle">Isprobajte naš widget za pretraživanje!</string>
@@ -267,14 +275,14 @@
     <string name="privacyProtectionNotificationDefaultTitle">Štitimo vašu privatnost</string>
     <string name="privacyProtectionNotificationReportTitle">Vaše Izvješće o zaštiti privatnosti</string>
     <string name="privacyProtectionNotificationDefaultDescription">Korištenje aplikacije DuckDuckGo štiti vaše podatke blokiranjem alata za praćenje i šifriranjem veza.</string>
-    <string name="privacyProtectionNotificationUpgadeDescription">Zaštitili ste svoje podatke osiguravanjem %d nešifriranih veza dok ste koristili DuckDuckGo.</string>
-    <string name="privacyProtectionNotificationTrackerDescription">Zaštitili ste svoje podatke blokiranjem %d alata za praćenje dok ste koristili DuckDuckGo.</string>
-    <string name="privacyProtectionNotificationBothDescription">Zaštitili ste svoje podatke blokiranjem %d alata za praćenje i osiguravanjem %d nešifriranih veza dok ste koristili DuckDuckGo.</string>
+    <string name="privacyProtectionNotificationUpgadeDescription">Zaštitili ste svoje podatke osiguravanjem %1$d nešifriranih veza dok ste koristili DuckDuckGo.</string>
+    <string name="privacyProtectionNotificationTrackerDescription">Zaštitili ste svoje podatke blokiranjem %1$d alata za praćenje dok ste koristili DuckDuckGo.</string>
+    <string name="privacyProtectionNotificationBothDescription">Zaštitili ste svoje podatke blokiranjem %1$d alata za praćenje i osiguravanjem %2$d nešifriranih veza dok ste koristili DuckDuckGo.</string>
     <string name="privacyProtectionNotificationLaunchButton">Nastavi pregledavanje</string>
-
+    
     <!-- Authentication -->
     <string name="authenticationDialogTitle">Prijava</string>
-    <string name="authenticationDialogMessage">%s zahtijeva korisničko ime i lozinku.</string>
+    <string name="authenticationDialogMessage">%1$s zahtijeva korisničko ime i lozinku.</string>
     <string name="authenticationDialogPositiveButton">Prijava</string>
     <string name="authenticationDialogNegativeButton">Odustani</string>
     <string name="authenticationDialogUsernameHint">Korisničko ime</string>
@@ -298,7 +306,7 @@
 
     <string name="websiteNotLoadingTitleLong">Sigurno se web-mjesta ne učitavaju ispravno</string>
     <string name="websiteNotLoadingTitleShort">Problemi s učitavanjem web-mjesta</string>
-    <string name="websiteNotLoadingSubtitle">Koje je web-mjesto neispravno?"</string>
+    <string name="websiteNotLoadingSubtitle">Koje je web-mjesto neispravno?</string>
 
     <string name="searchNotGoodEnoughTitleLong">DuckDuckGo pretraživanje nije dovoljno dobro</string>
     <string name="searchNotGoodEnoughTitleShort">DuckDuckGo problemi s pretraživanjem</string>
@@ -356,12 +364,12 @@
     <string name="feedbackIsImportantToUs">Vaše anonimne povratne informacije su važne za nas.</string>
 
     <!-- Webview Recovery -->
-    <string name="crashedWebViewErrorMessage">Web-stranica nije mogla biti prikazana.</string>
-    <string name="crashedWebViewErrorAction">Ponovno učitaj</string>
+    <string name="crashedWebViewErrorMessage">"Web-stranica nije mogla biti prikazana."</string>
+    <string name="crashedWebViewErrorAction">"Ponovno učitaj"</string>
 
-    <!-- System Search -->
-    <string name="systemSearchOmnibarInputHint"><font size="13">Traži ili upiši URL adresu</font></string>
+    <!-- System Search-->
     <string name="systemSearchDeviceAppLabel">Sa ovog uređaja</string>
+    <string name="systemSearchOmnibarInputHint"><font size="13">Traži ili upiši URL adresu</font></string>
     <string name="systemSearchAppNotFound">Aplikaciju nije bilo moguće pronaći</string>
     <string name="systemSearchOnboardingText">Hvala što ste odabrali DuckDuckGo!\nSada kada koristite našu pretragu ili aplikaciju, vaše pretrage su zaštićene.</string>
     <string name="systemSearchOnboardingFeaturesIntroText">Aplikacija DuckDuckGo također:</string>
@@ -383,25 +391,27 @@
     <string name="hideTipsButton">Sakrij savjete zauvijek</string>
 
     <!-- New Onboarding Experience -->
-    <string name="onboardingWelcomeTitle">Dobro došli u DuckDuckGo!</string>
-    <string name="onboardingDaxText">Internet može biti pomalo jeziv.&lt;br/&gt;&lt;br/&gt;          Ne brinite! Privatno pretraživanje i pregledavanje lakše je nego što mislite.</string>
+    <string name="onboardingWelcomeTitle">"Dobro došli u DuckDuckGo!"</string>
+    <string name="onboardingDaxText"><![CDATA[Internet može biti pomalo jeziv.<br/><br/> Ne brinite! Privatno pretraživanje i pregledavanje lakše je nego što mislite.]]></string>
     <string name="onboardingLetsDoItButton">Učinimo to!</string>
-    <string name="daxIntroCtaText">Zatim pokušajte posjetiti jedno od svojih omiljenih web-mjesta! &lt;br/&gt;&lt;br/&gt;Blokirat ću tragače kako vas ne bi mogli špijunirati. Nadogradit ću i sigurnost vaše veze ako je moguće. &#128274;</string>
-    <string name="daxEndCtaText">&lt;br/&gt;&lt;br/&gt;Shvatili ste ovo! Zapamtite: svaki put kada pregledavate sa mnom jeziva reklama gubi krila. &#128077;</string>
-    <string name="daxSerpCtaText">Vaše pretrage u DuckDuckGo anonimne su i nikad ne pohranjujem vašu povijest pretraga. Nikad. &#128588;</string>
-    <plurals name="daxTrackersBlockedCtaText">
-        <item quantity="one">&#160;i &lt;b&gt;%d ostali&lt;/b&gt; su vas pokušavali pratiti ovdje. &lt;br/&gt;&lt;br/&gt;Blokirao sam ih!&lt;br/&gt;&lt;br/&gt; ☝️Možete provjeriti URL traku kako biste vidjeli tko vas pokušava pratiti kad posjetite novo web-mjesto.️</item>
-        <item quantity="few">&#160;i &lt;b&gt;%d ostali&lt;/b&gt; su vas pokušavali pratiti ovdje. &lt;br/&gt;&lt;br/&gt;Blokirao sam ih!&lt;br/&gt;&lt;br/&gt; ☝️Možete provjeriti URL traku kako biste vidjeli tko vas pokušava pratiti kad posjetite novo web-mjesto.️ </item>
-        <item quantity="other">&#160;i &lt;b&gt;%d ostali&lt;/b&gt; su vas pokušavali pratiti ovdje. &lt;br/&gt;&lt;br/&gt;Blokirao sam ih!&lt;br/&gt;&lt;br/&gt; ☝️Možete provjeriti URL traku kako biste vidjeli tko vas pokušava pratiti kad posjetite novo web-mjesto.️</item>
+    <string name="daxIntroCtaText"><![CDATA[Zatim pokušajte posjetiti jedno od svojih omiljenih web-mjesta! <br/><br/>Blokirat ću tragače kako vas ne bi mogli špijunirati. Nadogradit ću i sigurnost vaše veze ako je moguće. 🔒]]></string>
+    <string name="daxEndCtaText"><![CDATA[<br/><br/>Shvatili ste ovo! Zapamtite: svaki put kada pregledavate sa mnom jeziva reklama gubi krila. 👍]]></string>
+    <string name="daxSerpCtaText">Vaše pretrage u DuckDuckGo anonimne su i nikad ne pohranjujem vašu povijest pretraga. Nikad. 🙌</string>
+    <plurals name="daxTrackersBlockedCtaText" tools:ignore="UnusedQuantity">
+        <item quantity="one"><![CDATA[ i <b>%1$d drugi</b> pokušali su vas pratiti ovdje. <br/><br/>Ja sam ih blokirao!<br/><br/> ☝️Možete pogledati na traku koja sadrži URL-ove da biste vidjeli tko vas pokušava pratiti kad posjetite novo mrežno mjesto.]]></item>
+        <item quantity="few"><![CDATA[ i <b>%1$d druga</b> pokušali su vas pratiti ovdje. <br/><br/>Ja sam ih blokirao!<br/><br/> ☝️Možete pogledati na traku koja sadrži URL-ove da biste vidjeli tko vas pokušava pratiti kad posjetite novo mrežno mjesto.]]></item>
+        <item quantity="many"><![CDATA[ i <b>%1$d drugih</b> pokušali su vas pratiti ovdje. <br/><br/>Ja sam ih blokirao!<br/><br/> ☝️Možete pogledati na traku koja sadrži URL-ove da biste vidjeli tko vas pokušava pratiti kad posjetite novo mrežno mjesto.]]></item>
+        <item quantity="other"><![CDATA[ i <b>%1$d drugih</b> pokušali su vas pratiti ovdje. <br/><br/>Ja sam ih blokirao!<br/><br/> ☝️Možete pogledati na traku koja sadrži URL-ove da biste vidjeli tko vas pokušava pratiti kad posjetite novo mrežno mjesto.]]></item>
     </plurals>
-    <plurals name="daxTrackersBlockedCtaZeroText">
-        <item quantity="one" tools:ignore="ImpliedQuantity">&#160;vas je pokušavao pratiti ovdje. &lt;br/&gt;&lt;br/&gt;Blokirao sam ga!&lt;br/&gt;&lt;br/&gt; ☝️Možete provjeriti URL traku kako biste vidjeli tko vas pokušava pratiti kad posjetite novo web-mjesto.️</item>
-        <item quantity="few">&#160;su vas pokušavali pratiti ovdje. &lt;br/&gt;&lt;br/&gt;Blokirao sam ga!&lt;br/&gt;&lt;br/&gt; ☝️Možete provjeriti URL traku kako biste vidjeli tko vas pokušava pratiti kad posjetite novo web-mjesto.️</item>
-        <item quantity="other">&#160;su vas pokušavali pratiti ovdje. &lt;br/&gt;&lt;br/&gt;Blokirao sam ga!&lt;br/&gt;&lt;br/&gt; ☝️Možete provjeriti URL traku kako biste vidjeli tko vas pokušava pratiti kad posjetite novo web-mjesto.️</item>
+    <plurals name="daxTrackersBlockedCtaZeroText" tools:ignore="UnusedQuantity">
+        <item quantity="one" tools:ignore="ImpliedQuantity"><![CDATA[ pokušao vas je pratiti ovdje. <br/><br/>Ja sam to blokirao!<br/><br/> ☝️Možete pogledati na traku koja sadrži URL-ove da biste vidjeli tko vas pokušava pratiti kad posjetite novo mrežno mjesto.]]></item>
+        <item quantity="few"><![CDATA[ pokušali su vas pratiti ovdje. <br/><br/>Ja sam to blokirao!<br/><br/> ☝️Možete pogledati na traku koja sadrži URL-ove da biste vidjeli tko vas pokušava pratiti kad posjetite novo mrežno mjesto.]]></item>
+        <item quantity="many"><![CDATA[ pokušali su vas pratiti ovdje. <br/><br/>Ja sam to blokirao!<br/><br/> ☝️Možete pogledati na traku koja sadrži URL-ove da biste vidjeli tko vas pokušava pratiti kad posjetite novo mrežno mjesto.]]></item>
+        <item quantity="other"><![CDATA[ pokušalo vas je pratiti ovdje. <br/><br/>Ja sam to blokirao!<br/><br/> ☝️Možete pogledati na traku koja sadrži URL-ove da biste vidjeli tko vas pokušava pratiti kad posjetite novo mrežno mjesto.]]></item>
     </plurals>
-    <string name="daxNonSerpCtaText">Čim dodirnete i pomičete, blokirat ću neugodne tragače. &lt;br/&gt;&lt;br/&gt;Naprijed - nastavite pretraživati!</string>
-    <string name="daxMainNetworkOwnedCtaText">Obratite pozornost! %s je u vlasništvu %s.&lt;br/&gt;&lt;br/&gt; %s tragači vrebaju na oko %s top web-mjesta &#128561;, ali ne brinite! &lt;br/&gt;&lt;br/&gt;Blokirat ću %s da  ne vide vašu aktivnost na tim stranicama.</string>
-    <string name="daxMainNetworkCtaText">Obratite pozornost! %s je glavna mreža za praćenje.&lt;br/&gt;&lt;br/&gt; Njihovi tragači vrebaju na oko %s top web-mjesta &#128561;, ali ne brinite! &lt;br/&gt;&lt;br/&gt;Blokirat ću %s  da ne vide vašu aktivnost na tim stranicama.</string>
+    <string name="daxNonSerpCtaText"><![CDATA[Čim dodirnete i pomičete, blokirat ću neugodne tragače. <br/><br/>Naprijed - nastavite pretraživati!]]></string>
+    <string name="daxMainNetworkCtaText"><![CDATA[Obratite pozornost! %1$s je glavna mreža za praćenje.<br/><br/> Njihovi tragači vrebaju na oko %2$s top web-mjesta 😱, ali ne brinite! <br/><br/>Blokirat ću %3$s da ne vide vašu aktivnost na tim stranicama.]]></string>
+    <string name="daxMainNetworkOwnedCtaText">Pažnja! Budući da je %1$s vlasnik %2$s, ne mogu ga spriječiti da ovdje vidi vašu aktivnost.&lt;br/&gt;Ali pretražujte sa mnom i mogu umanjiti ono što %3$s može saznati o vama tako što ću blokirati alate za praćenje na mnogim drugim mjestima.</string>
 
     <!-- Download Confirmation -->
     <string name="downloadConfirmationContinue">Nastaviti</string>
@@ -421,7 +431,7 @@
     <string name="changeIconDialogMessage">Aplikacija se može zatvoriti radi primjene promjena. Vratite se nakon što ste se divili svojoj lijepoj novoj ikoni.</string>
 
     <!-- New dashboard / menu buttons -->
-    <string name="manageWhitelist">Upravljajte popisom dopuštenih</string>
+    <string name="manageWhitelist">Nezaštićena mrežna mjesta</string>
     <string name="reportBrokenSite">Prijavi neispravnu web stranicu</string>
 
     <!-- Dialogs -->
@@ -429,28 +439,41 @@
     <string name="dialogEditTitle">Uredi</string>
 
     <!-- Whitelist -->
-    <string name="whitelisetActivityTitle">Popis dopuštenih</string>
-    <string name="enablePrivacyProtection">Dodaj u popis dopuštenih</string>
-    <string name="disablePrivacyProtection">Ukloni s popisa dopuštenih</string>
-    <string name="whitelistEntryOverflowContentDescription">Dodatne mogućnosti za unos u popis dopuštenih %s</string>
-    <string name="whitelistEntryDeleteConfirmMessage">Jeste li sigurni da želite izbrisati &lt;b&gt;%s&lt;/b&gt; s popisa dopuštenih?</string>
-    <string name="whitelistExplanation">Web lokacije sa popisa dopuštenih neće biti nadograđene Zaštitom privatnosti</string>
-    <string name="whitelistNoEntries">Još nema lokacija na popisu dopuštenih</string>
+    <string name="whitelisetActivityTitle">Nezaštićena mrežna mjesta</string>
+    <string name="enablePrivacyProtection">Omogući zaštitu privatnosti</string>
+    <string name="disablePrivacyProtection">Onemogući zaštitu privatnosti</string>
+    <string name="whitelistEntryOverflowContentDescription">Dodatne mogućnosti za nezaštićeno mrežno mjesto %1$s</string>
+    <string name="whitelistEntryDeleteConfirmMessage">Jeste li sigurni da želite ukloniti &lt;b&gt;%1$s&lt;/b&gt; iz nezaštićenih mrežnih mjesta?</string>
+    <string name="whitelistExplanation">Zaštita privatnosti neće poboljšati ova mrežna mjesta.</string>
+    <string name="whitelistNoEntries">Još nema nezaštićenih mrežnih mjesta</string>
     <string name="whitelistDomainHint">www.example.com</string>
-    <string name="whitelistFormatError">Nije moguće spremiti, unesite domenu kao <b>example.com</b>
-  </string>
+    <string name="whitelistFormatError">Nije moguće spremiti, unesite domenu kao <b>example.com</b></string>
 
     <!-- Settings -->
-    <string name="settingsPrivacyProtectionWhitelist">Popis dopuštenih za zaštitu privatnosti</string>
+    <string name="settingsPrivacyProtectionWhitelist">Nezaštićena mrežna mjesta</string>
 
     <!-- Fireproof websites -->
     <string name="fireproofWebsitesActivityTitle">Vatrootporne web stranice</string>
     <string name="settingsFireproofWebsites">Vatrootporne web stranice</string>
     <string name="fireproofWebsiteMenuTitleAdd">Vatrootporna web stranica</string>
-    <string name="fireproofWebsiteSnackbarConfirmation">&lt;b&gt;%s&lt;/b&gt; je sada vatrootporan! Posjetite Postavke da biste saznali više.</string>
+    <string name="fireproofWebsiteSnackbarConfirmation">&lt;b&gt;%1$s&lt;/b&gt; je sada vatrootporan! Posjetite Postavke da biste saznali više.</string>
     <string name="fireproofWebsiteSnackbarAction">Poništi</string>
-    <string name="fireproofWebsiteDeleteConfirmMessage">Jeste li sigurni da želite izbrisati &lt;b&gt;%s&lt;/b&gt;?</string>
+    <string name="fireproofWebsiteDeleteConfirmMessage">Jeste li sigurni da želite izbrisati &lt;b&gt;%1$s&lt;/b&gt;?</string>
     <string name="fireproofWebsiteEmptyListHint">Još nema vatrootpornih web lokacija</string>
-    <string name="fireproofWebsiteFeatureDescription">Web stranice se oslanjaju na kolačiće kako biste ostali prijavljeni. Kada web stranicu učinite otpornom na vatru, kolačići se neće izbrisati i ostat ćete prijavljeni, čak i nakon upotrebe gumba Fire.</string>
-    <string name="fireproofWebsiteOverflowContentDescription">Dodatne mogućnosti za vatrootpornu web stranicu %s</string>
+    <string name="fireproofWebsiteFeatureDescription">Mrežna mjesta oslanjaju se na kolačiće kako bi vas zadržala prijavljenim. Kada označite Fireproof za mrežno mjesto, kolačići neće biti izbrisani i ostat ćete prijavljeni, čak i nakon upotrebe gumba Fire. I dalje blokiramo alate za praćenje trećih strana koje pronađemo na mrežnim mjestima označenim kao Fireproof.</string>
+    <string name="fireproofWebsiteOverflowContentDescription">Dodatne mogućnosti za vatrootpornu web stranicu %1$s</string>
+    <string name="fireproofWebsiteLoginDialogTitle">Želite li postaviti Fireproof za %1$s?</string>
+    <string name="fireproofWebsiteLoginDialogDescription">Postavljanjem Fireproof za ovo mrežno mjesto i dalje ćete ostati prijavljeni nakon korištenja gumba Fire.</string>
+    <string name="fireproofWebsiteLoginDialogPositive">Fireproof</string>
+    <string name="fireproofWebsiteLoginDialogNegative">Ne sada</string>
+    <string name="fireproofWebsiteItemsSectionTitle">Mrežna mjesta</string>
+    <string name="fireproofWebsiteToogleText">Pitaj pri prijavi</string>
+
+    <!-- Dos Attack error-->
+    <string name="dosErrorMessage">Veza je prekinuta. Ovo mrežno mjesto može biti štetno za vaš uređaj.</string>
+
+    <!-- Download Manager problems -->
+    <string name="downloadManagerDisabled">Onemogućen je upravitelj preuzimanja</string>
+    <string name="downloadManagerIncompatible">Upravitelj preuzimanja nije dostupan na ovom uređaju</string>
+    <string name="enable">Omogući</string>
 </resources>

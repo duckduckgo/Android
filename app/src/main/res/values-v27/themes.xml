@@ -18,6 +18,11 @@
 
 <resources>
 
+    <style name="BaseAppTheme" parent="Theme.MaterialComponents.Light.Bridge">
+        <item name="android:windowLightNavigationBar">false</item>
+        <item name="android:navigationBarColor">@color/black</item>
+    </style>
+
     <style name="AppTheme.Dark" parent="AppTheme.BaseDark">
         <item name="android:windowLightStatusBar">false</item>
         <item name="android:windowLightNavigationBar">false</item>
@@ -34,6 +39,7 @@
         <item name="android:windowIsFloating">false</item>
         <item name="android:navigationBarColor">?toolbarBgColor</item>
         <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="bottomSheetStyle">@style/FireDialogStyle</item>
     </style>
 
 </resources>

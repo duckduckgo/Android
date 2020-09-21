@@ -19,6 +19,7 @@
 package com.duckduckgo.app.notification.model
 
 import androidx.test.platform.app.InstrumentationRegistry
+import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.notification.db.NotificationDao
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.mock
@@ -38,7 +39,7 @@ class AppFeatureNotificationTest {
 
     @Before
     fun before() {
-        testee = AppFeatureNotification(context, notificationsDao, TITLE, DESCRIPTION, PIXEL)
+        testee = AppFeatureNotification(context, notificationsDao, R.string.yes, R.string.no, PIXEL)
     }
 
     @Test
@@ -61,7 +62,5 @@ class AppFeatureNotificationTest {
 
     companion object {
         private const val PIXEL = "pixel"
-        private const val TITLE = AppFeatureNotification.DRIP_B_1_TITLE
-        private const val DESCRIPTION = AppFeatureNotification.DRIP_B_1_DESCRIPTION
     }
 }

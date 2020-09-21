@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.fire.fireproofwebsite.data
 
+import android.net.Uri
 import androidx.lifecycle.LiveData
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.UriString
@@ -42,6 +43,13 @@ class FireproofWebsiteRepository @Inject constructor(
     }
 
     fun getFireproofWebsites(): LiveData<List<FireproofWebsiteEntity>> = fireproofWebsiteDao.fireproofWebsitesEntities()
+
+    fun isDomainFireproofed(domain: String): Boolean {
+        val uri = Uri.parse(domain)
+        val host = uri.host ?: return false
+
+        return fireproofWebsiteDao.getFireproofWebsiteSync(host) != null
+    }
 
     suspend fun removeFireproofWebsite(fireproofWebsiteEntity: FireproofWebsiteEntity) {
         withContext(dispatchers.io()) {

@@ -32,119 +32,29 @@ class VariantManagerTest {
     @Test
     fun serpControlVariantHasExpectedWeightAndNoFeatures() {
         val variant = variants.first { it.key == "sc" }
-        assertEqualsDouble(0.0, variant.weight)
+        assertEqualsDouble(1.0, variant.weight)
         assertEquals(0, variant.features.size)
     }
 
     @Test
     fun serpExperimentalVariantHasExpectedWeightAndNoFeatures() {
         val variant = variants.first { it.key == "se" }
-        assertEqualsDouble(0.0, variant.weight)
+        assertEqualsDouble(1.0, variant.weight)
         assertEquals(0, variant.features.size)
-    }
-
-    // Notification Drip Experiment
-
-    @Test
-    fun notificationDripTestControlGroupVariantIsNotActive() {
-        val variant = variants.firstOrNull { it.key == "za" }
-        assertEqualsDouble(0.0, variant!!.weight)
-    }
-
-    @Test
-    fun notificationDripTestControlGroupVariantHasDay1PrivacyNotificationAndDay3ClearDataNotificationAndDripNotification() {
-        val variant = variants.firstOrNull { it.key == "za" }
-        assertEquals(3, variant!!.features.size)
-        assertTrue(variant.hasFeature(Day1PrivacyNotification))
-        assertTrue(variant.hasFeature(Day3ClearDataNotification))
-        assertTrue(variant.hasFeature(DripNotification))
-    }
-
-    @Test
-    fun notificationDripTestNullVariantIsNotActive() {
-        val variant = variants.firstOrNull { it.key == "zb" }
-        assertEqualsDouble(0.0, variant!!.weight)
-    }
-
-    @Test
-    fun notificationDripTestNullVariantHasDripNotification() {
-        val variant = variants.firstOrNull { it.key == "zb" }
-        assertEquals(1, variant!!.features.size)
-        assertTrue(variant.hasFeature(DripNotification))
-    }
-
-    @Test
-    fun notificationDripA1TestVariantIsNotActive() {
-        val variant = variants.firstOrNull { it.key == "zc" }
-        assertEqualsDouble(0.0, variant!!.weight)
-    }
-
-    @Test
-    fun notificationDripA1TestVariantHasDay1DripA1NotificationAndDay3ClearDataNotificationAndDripNotification() {
-        val variant = variants.firstOrNull { it.key == "zc" }
-        assertEquals(3, variant!!.features.size)
-        assertTrue(variant.hasFeature(Day1DripA1Notification))
-        assertTrue(variant.hasFeature(Day3ClearDataNotification))
-        assertTrue(variant.hasFeature(DripNotification))
-    }
-
-    @Test
-    fun notificationDripA2TestVariantIsNotActive() {
-        val variant = variants.firstOrNull { it.key == "zd" }
-        assertEqualsDouble(0.0, variant!!.weight)
-    }
-
-    @Test
-    fun notificationDripA2TestVariantHasDay1DripA2NotificationAndDay3ClearDataNotificationAndDripNotification() {
-        val variant = variants.firstOrNull { it.key == "zd" }
-        assertEquals(3, variant!!.features.size)
-        assertTrue(variant.hasFeature(Day1DripA2Notification))
-        assertTrue(variant.hasFeature(Day3ClearDataNotification))
-        assertTrue(variant.hasFeature(DripNotification))
-    }
-
-    @Test
-    fun notificationDripB1TestVariantIsNotActive() {
-        val variant = variants.firstOrNull { it.key == "ze" }
-        assertEqualsDouble(0.0, variant!!.weight)
-    }
-
-    @Test
-    fun notificationDripB1TestVariantHasDay1DripB1NotificationAndDay3ClearDataNotificationAndDripNotification() {
-        val variant = variants.firstOrNull { it.key == "ze" }
-        assertEquals(3, variant!!.features.size)
-        assertTrue(variant.hasFeature(Day1DripB1Notification))
-        assertTrue(variant.hasFeature(Day3ClearDataNotification))
-        assertTrue(variant.hasFeature(DripNotification))
-    }
-
-    @Test
-    fun notificationDripB2TestVariantIsNotActive() {
-        val variant = variants.firstOrNull { it.key == "zf" }
-        assertEqualsDouble(0.0, variant!!.weight)
-    }
-
-    @Test
-    fun notificationDripB2TestVariantHasDay1DripB2NotificationAndDay3ClearDataNotificationAndDripNotification() {
-        val variant = variants.firstOrNull { it.key == "zf" }
-        assertEquals(3, variant!!.features.size)
-        assertTrue(variant.hasFeature(Day1DripB2Notification))
-        assertTrue(variant.hasFeature(Day3ClearDataNotification))
-        assertTrue(variant.hasFeature(DripNotification))
     }
 
     // Single Search Bar Experiments
     @Test
     fun serpHeaderControlVariantHasExpectedWeightAndNoFeatures() {
         val variant = variants.first { it.key == "zg" }
-        assertEqualsDouble(1.0, variant.weight)
+        assertEqualsDouble(0.0, variant.weight)
         assertEquals(0, variant.features.size)
     }
 
     @Test
     fun serpHeaderVariantHasExpectedWeightAndSERPHeaderRemovalFeature() {
         val variant = variants.first { it.key == "zi" }
-        assertEqualsDouble(1.0, variant.weight)
+        assertEqualsDouble(0.0, variant.weight)
         assertEquals(1, variant.features.size)
         assertEquals(SerpHeaderRemoval, variant.features[0])
     }
@@ -152,9 +62,24 @@ class VariantManagerTest {
     @Test
     fun serpHeaderVariantHasExpectedWeightAndSERPHeaderQueryReplacementFeature() {
         val variant = variants.first { it.key == "zh" }
-        assertEqualsDouble(1.0, variant.weight)
+        assertEqualsDouble(0.0, variant.weight)
         assertEquals(1, variant.features.size)
         assertEquals(SerpHeaderQueryReplacement, variant.features[0])
+    }
+
+    // Fire button education
+    @Test
+    fun fireButtonEducationControlGroupVariantIsActive() {
+        val variant = variants.first { it.key == "zm" }
+        assertEqualsDouble(1.0, variant.weight)
+    }
+
+    @Test
+    fun fireButtonEducationVariantHasExpectedWeightAndFeatures() {
+        val variant = variants.first { it.key == "zr" }
+        assertEqualsDouble(1.0, variant.weight)
+        assertEquals(1, variant.features.size)
+        assertTrue(variant.hasFeature(FireButtonEducation))
     }
 
     @Test

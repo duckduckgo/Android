@@ -95,7 +95,7 @@
     <string name="privacyProtectionEnabled">Saidi kaitse on lubatud</string>
     <string name="privacyProtectionDisabled">Saidi kaitse on keelatud</string>
     <string name="privacyDashboardActivityTitle">Privaatsuse juhtpaneel</string>
-    <string name="privacyProtectionUpgraded" tools:ignore="TypographyQuotes">TÄIUSTATUD &lt;img src="%d" /&gt; - &lt;img src="%d" /&gt;</string>
+    <string name="privacyProtectionUpgraded" tools:ignore="TypographyQuotes">TÄIUSTATUD &lt;img src=\"%1$d\" /&gt; - &lt;img src=\"%2$d\" /&gt;</string>
     <string name="privacyGradeContentDescription">Privaatsusaste</string>
 
     <string name="httpsGood">Krüptitud ühendus</string>
@@ -107,23 +107,23 @@
     <string name="networksOverview">Jälgimisvõrgud koondavad teie veebiajaloo teie kohta andmeprofiiliks. Suuremad jälgimisvõrgud on kahjulikumad, kuna need saavad teid jälgida ja sihtida suuremas Internetis.</string>
 
     <plurals name="trackersFound">
-        <item quantity="one">%s jälitaja leitud</item>
-        <item quantity="other">%s jälitajat leitud</item>
+        <item quantity="one">%1$s jälitaja leitud</item>
+        <item quantity="other">%1$s jälitajat leitud</item>
     </plurals>
 
     <plurals name="trackerBlocked">
-        <item quantity="one">%s jälgija on blokeeritud</item>
-        <item quantity="other">%s jälgijat on blokeeritud</item>
+        <item quantity="one">%1$s jälgija on blokeeritud</item>
+        <item quantity="other">%1$s jälgijat on blokeeritud</item>
     </plurals>
 
     <plurals name="majorNetworksFound">
-        <item quantity="one">%s leitud suur jälgimisvõrk</item>
-        <item quantity="other">%s leitud suurt jälgimisvõrku</item>
+        <item quantity="one">%1$s leitud suur jälgimisvõrk</item>
+        <item quantity="other">%1$s leitud suurt jälgimisvõrku</item>
     </plurals>
 
     <plurals name="majorNetworksBlocked">
-        <item quantity="one">%s suur jälgimisvõrk blokeeritud</item>
-        <item quantity="other">%s suurt jälgimisvõrku blokeeritud</item>
+        <item quantity="one">%1$s suur jälgimisvõrk blokeeritud</item>
+        <item quantity="other">%1$s suurt jälgimisvõrku blokeeritud</item>
     </plurals>
 
     <string name="scorecardActivityTitle">Privaatsusaste</string>
@@ -179,7 +179,10 @@
 
     <!-- About Activity -->
     <string name="aboutActivityTitle">Meist</string>
-    <string name="aboutDescription">DuckDuckGo on uus standard veebi usaldusväärsusele.\n DuckDuckGo privaatsusbrauser pakub kõiki privaatsuse põhifunktsioone, mida peate enda kaitsmiseks veebist otsides ja sirvides kasutama, sealhulgas jälgijate blokeerimist, nutikamat krüptimist ja DuckDuckGo privaatset otsingut.\n Lõppude lõpuks ei tohiks Internet nii jube olla ja Internetis väärilise privaatsuse saamine peaks olema sama lihtne kui ruloo alla tõmbamine.</string>
+    <string name="aboutDescription">
+        DuckDuckGo on uus standard veebi usaldusväärsusele.\n\
+        DuckDuckGo privaatsusbrauser pakub kõiki privaatsuse põhifunktsioone, mida peate enda kaitsmiseks veebist otsides ja sirvides kasutama, sealhulgas jälgijate blokeerimist, nutikamat krüptimist ja DuckDuckGo privaatset otsingut.\n\
+        Lõppude lõpuks ei tohiks Internet nii jube olla ja Internetis väärilise privaatsuse saamine peaks olema sama lihtne kui ruloo alla tõmbamine.</string>
     <string name="aboutMoreLink">Lisateave: duckduckgo.com/about</string>
     <string name="no_suggestions">Ettepanekud puuduvad</string>
 
@@ -205,18 +208,20 @@
     <!-- Bookmarks Activity -->
     <string name="bookmarksMenuTitle">Järjehoidjad</string>
     <string name="bookmarksActivityTitle">Järjehoidjad</string>
-    <string name="bookmarkDeleteConfirmMessage">Kas soovite kindlasti kustutada järjehoidja &lt;b&gt;%s&lt;/b&gt;?</string>
-    <string name="dialogConfirmTitle">Kinnitage</string>
+    <string name="bookmarkDeleteConfirmMessage">Kas soovite kindlasti kustutada järjehoidja &lt;b&gt;%1$s&lt;/b&gt;?</string>
     <string name="bookmarkAddedFeedback">Järjehoidja lisatud</string>
     <string name="bookmarkTitleHint">Järjehoidja pealkiri</string>
     <string name="bookmarkUrlHint">Järjehoidja URL</string>
-    <string name="dialogSave">Salvesta</string>
     <string name="bookmarkTitleEdit">Redigeeri järjehoidjat</string>
     <string name="noBookmarks">Järjehoidjaid pole veel lisatud</string>
-    <string name="bookmarkOverflowContentDescription">Veel järjehoidja %s valikuid</string>
+    <string name="bookmarkOverflowContentDescription">Veel järjehoidja %1$s valikuid</string>
+    <string name="bookmarkEdited">Järjehoidja lisatud</string>
+
+    <!-- Dialogs -->
+    <string name="dialogConfirmTitle">Kinnitage</string>
+    <string name="dialogSave">Salvesta</string>
     <string name="delete">Kustuta</string>
     <string name="edit">Redigeeri</string>
-    <string name="bookmarkEdited">Järjehoidja lisatud</string>
 
     <!-- Widget -->
     <string name="searchWidgetTextHint">DuckDuckGo otsing</string>
@@ -282,14 +287,14 @@
     <string name="privacyProtectionNotificationDefaultTitle">Kaitseme teie privaatsust</string>
     <string name="privacyProtectionNotificationReportTitle">Teie privaatsusaruanne</string>
     <string name="privacyProtectionNotificationDefaultDescription">Rakenduse DuckDuckGo kasutamine kaitseb teie andmeid, blokeerides jälgijaid ja krüpteerides ühendusi.</string>
-    <string name="privacyProtectionNotificationUpgadeDescription">Kaitsesite oma andmeid, krüptides DuckDuckGo kasutamise ajal %d krüptimata ühendust.</string>
-    <string name="privacyProtectionNotificationTrackerDescription">Kaitsesite oma andmeid, blokeerides DuckDuckGo kasutamise ajal %d jälitajat.</string>
-    <string name="privacyProtectionNotificationBothDescription">Kaitsesite oma andmeid, blokeerides DuckDuckGo kasutamise ajal %d jälitaja ja turvates %d krüptimata ühendust.</string>
+    <string name="privacyProtectionNotificationUpgadeDescription">Kaitsesite oma andmeid, krüptides DuckDuckGo kasutamise ajal %1$d krüptimata ühendust.</string>
+    <string name="privacyProtectionNotificationTrackerDescription">Kaitsesite oma andmeid, blokeerides DuckDuckGo kasutamise ajal %1$d jälitajat.</string>
+    <string name="privacyProtectionNotificationBothDescription">Kaitsesite oma andmeid, blokeerides DuckDuckGo kasutamise ajal %1$d jälitaja ja turvates %2$d krüptimata ühendust.</string>
     <string name="privacyProtectionNotificationLaunchButton">Jätka sirvimist</string>
-
+    
     <!-- Authentication -->
     <string name="authenticationDialogTitle">Sisselogimine</string>
-    <string name="authenticationDialogMessage">%s nõuab kasutajanime ja parooli.</string>
+    <string name="authenticationDialogMessage">%1$s nõuab kasutajanime ja parooli.</string>
     <string name="authenticationDialogPositiveButton">Sisselogimine</string>
     <string name="authenticationDialogNegativeButton">Tühista</string>
     <string name="authenticationDialogUsernameHint">Kasutajanimi</string>
@@ -371,8 +376,8 @@
     <string name="feedbackIsImportantToUs">Teie anonüümne tagasiside on meile oluline.</string>
 
     <!-- Webview Recovery -->
-    <string name="crashedWebViewErrorMessage">Veebilehte ei saanud kuvada.</string>
-    <string name="crashedWebViewErrorAction">Laadige uuesti</string>
+    <string name="crashedWebViewErrorMessage">"Veebilehte ei saanud kuvada."</string>
+    <string name="crashedWebViewErrorAction">"Laadige uuesti"</string>
 
     <!-- System Search-->
     <string name="systemSearchDeviceAppLabel">Sellest seadmest</string>
@@ -393,29 +398,28 @@
     <string name="daxDialogNext">Järgmine</string>
     <string name="daxDialogHighFive">Viska viis!</string>
     <string name="daxDialogGotIt">Sain aru</string>
-
     <string name="hideTipsTitle">Kas peita allesjäänud näpunäited?</string>
     <string name="hideTipsText">Neid on üsna vähe ja püüdsime muuta need informatiivseks.</string>
     <string name="hideTipsButton">Peida näpunäited igaveseks</string>
 
     <!-- New Onboarding Experience -->
-    <string name="onboardingWelcomeTitle">Tere tulemast DuckDuckGo kasutajaks!</string>
-    <string name="onboardingDaxText">Internet võib olla üsna jube.&lt;br/&gt;&lt;br/&gt;Ärge muretsege! Privaatselt otsimine ja sirvimine on lihtsam kui arvate.</string>
+    <string name="onboardingWelcomeTitle">"Tere tulemast DuckDuckGo kasutajaks!"</string>
+    <string name="onboardingDaxText"><![CDATA[Internet võib olla üsna jube.<br/><br/>Ärge muretsege! Privaatselt otsimine ja sirvimine on lihtsam kui arvate.]]></string>
     <string name="onboardingLetsDoItButton">Teeme ära!</string>
-    <string name="daxIntroCtaText">Järgmisena proovige külastada ühte oma lemmiksaitidest! &lt;br/&gt;&lt;br/&gt;Mina aga blokeerin jälgijaid, et nad ei saaks teid luurata. Täiustan võimalusel ka teie ühenduse turvalisust. &#128274;</string>
-    <string name="daxEndCtaText">Käpas! &lt;br/&gt;&lt;br/&gt;Pidage meeles: iga kord, kui minuga sirvite, kaotab jube reklaam tiivad. &#128077;</string>
-    <string name="daxSerpCtaText">Teie DuckDuckGo otsingud on anonüümsed ja ma ei salvesta kunagi teie otsinguajalugu. Mitte kunagi. &#128588;</string>
+    <string name="daxIntroCtaText"><![CDATA[Järgmisena proovige külastada ühte oma lemmiksaitidest! <br/><br/>Mina aga blokeerin jälgijaid, et nad ei saaks teid luurata. Täiustan võimalusel ka teie ühenduse turvalisust. 🔒]]></string>
+    <string name="daxEndCtaText"><![CDATA[Käpas! <br/><br/>Pidage meeles: iga kord, kui minuga sirvite, kaotab jube reklaam tiivad. 👍]]></string>
+    <string name="daxSerpCtaText">Teie DuckDuckGo otsingud on anonüümsed ja ma ei salvesta kunagi teie otsinguajalugu. Mitte kunagi. 🙌</string>
     <plurals name="daxTrackersBlockedCtaText">
-        <item quantity="one">&#160;ja &lt;b&gt;%d teine&lt;/b&gt; üritasid teid siin jälitada. &lt;br/&gt;&lt;br/&gt;Blokeerisin nad!&lt;br/&gt;&lt;br/&gt; ☝️Võite vaadata URL-i riba, et näha, kes üritab teid jälgida, kui külastate uut saiti.️</item>
-        <item quantity="other">&#160;ja &lt;b&gt;%d teised&lt;/b&gt; üritasid teid siin jälitada. &lt;br/&gt;&lt;br/&gt;Blokeerisin nad!&lt;br/&gt;&lt;br/&gt; ☝️Võite vaadata URL-i riba, et näha, kes üritab teid jälgida, kui külastate uut saiti.️</item>
+        <item quantity="one"><![CDATA[ ja <b>%1$d teine</b> üritasid teid siin jälitada. <br/><br/>Blokeerisin nad!<br/><br/> ☝️Võite vaadata URL-i riba, et näha, kes üritab teid jälgida, kui külastate uut saiti.️]]></item>
+        <item quantity="other"><![CDATA[ ja <b>%1$d teised</b> üritasid teid siin jälitada. <br/><br/>Blokeerisin nad!<br/><br/> ☝️Võite vaadata URL-i riba, et näha, kes üritab teid jälgida, kui külastate uut saiti.️]]></item>
     </plurals>
     <plurals name="daxTrackersBlockedCtaZeroText">
-        <item quantity="one">&#160;üritas teid siin jälitada. &lt;br/&gt;&lt;br/&gt;Blokeerisin selle!&lt;br/&gt;&lt;br/&gt; ☝️Võite vaadata URL-i riba, et näha, kes üritab teid jälgida, kui külastate uut saiti.️</item>
-        <item quantity="other">&#160;üritas teid siin jälitada. &lt;br/&gt;&lt;br/&gt;Blokeerisin selle!&lt;br/&gt;&lt;br/&gt; ☝️Võite vaadata URL-i riba, et näha, kes üritab teid jälgida, kui külastate uut saiti.️</item>
+        <item quantity="one"><![CDATA[ üritas teid siin jälitada. <br/><br/>Blokeerisin selle!<br/><br/> ☝️Võite vaadata URL-i riba, et näha, kes üritab teid jälgida, kui külastate uut saiti.️]]></item>
+        <item quantity="other"><![CDATA[ üritas teid siin jälitada. <br/><br/>Blokeerisin selle!<br/><br/> ☝️Võite vaadata URL-i riba, et näha, kes üritab teid jälgida, kui külastate uut saiti.️]]></item>
     </plurals>
-    <string name="daxNonSerpCtaText">Kui puudutate ja kerite, siis mina blokeerin tüütud jälgijad. &lt;br/&gt;&lt;br/&gt;Edasi — jätkake sirvimist!</string>
-    <string name="daxMainNetworkOwnedCtaText">Ettevaatust! Ettevõtte %s omanik on %s.&lt;br/&gt;&lt;br/&gt; %s jälitajad varitsevad %s populaarseimatest veebisaitidest, &#128561; aga ärge muretsege!&lt;br/&gt;&lt;br/&gt;Hoolitsen selle eest, et %s teid nendel saitidel ei jälgiks.</string>
-    <string name="daxMainNetworkCtaText">Ettevaatust! %s on suur jälgimisvõrgustik.&lt;br/&gt;&lt;br/&gt; Nend jälitajad jälgivad teid %s populaarseimatest saitidest, &#128561; aga ärge muretsege!&lt;br/&gt;&lt;br/&gt;Hoolitsen selle eest, et %s teid nendel saitidel ei jälgiks.</string>
+    <string name="daxNonSerpCtaText"><![CDATA[Kui puudutate ja kerite, siis mina blokeerin tüütud jälgijad. <br/><br/>Edasi — jätkake sirvimist!]]></string>
+    <string name="daxMainNetworkCtaText"><![CDATA[Ettevaatust! %1$s on suur jälgimisvõrgustik.<br/><br/> Nend jälitajad jälgivad teid %2$s populaarseimatest saitidest, 😱 aga ärge muretsege!<br/><br/>Hoolitsen selle eest, et %3$s teid nendel saitidel ei jälgiks.]]></string>
+    <string name="daxMainNetworkOwnedCtaText">Tähelepanu! Kuna %1$s on %2$s omanik, ei saa ma takistada teda jälgimast sinu tegevust siin.&lt;br/&gt;&lt;br/&gt;Kuid sirvi koos minuga ja ma saan vähendada seda, mida %3$s sinust üldiselt teab, blokeerides tema jälgijad paljudel teistel lehtedel.</string>
 
     <!-- Download Confirmation -->
     <string name="downloadConfirmationContinue">Jätka</string>
@@ -435,7 +439,7 @@
     <string name="changeIconDialogMessage">Rakendus võib muudatuste salvestamiseks sulguda. Tule pärast oma kena uue ikooni imetlemist tagasi.</string>
 
     <!-- New dashboard / menu buttons -->
-    <string name="manageWhitelist">Halda valgeloendit</string>
+    <string name="manageWhitelist">Kaitseta saidid</string>
     <string name="reportBrokenSite">Teata mittetoimivast saidist</string>
 
     <!-- Dialogs -->
@@ -443,28 +447,41 @@
     <string name="dialogEditTitle">Redigeeri</string>
 
     <!-- Whitelist -->
-    <string name="whitelisetActivityTitle">Valges nimekirjas</string>
-    <string name="enablePrivacyProtection">Lisa valgesse nimekirja</string>
-    <string name="disablePrivacyProtection">Eemalda lubatud loendist</string>
-    <string name="whitelistEntryOverflowContentDescription">Rohkem valikuid valgesse nimekirja lisamiseks %s</string>
-    <string name="whitelistEntryDeleteConfirmMessage">Kas soovid kindlasti kustutada &lt;b&gt;%s&lt;/b&gt; lubatud loendist?</string>
-    <string name="whitelistExplanation">Neid valgesse nimekirja lisatud saite privaatsuskaitse ei uuenda</string>
-    <string name="whitelistNoEntries">Veel pole valgesse nimekirja lisatud saite</string>
+    <string name="whitelisetActivityTitle">Kaitseta saidid</string>
+    <string name="enablePrivacyProtection">Luba Eraelu puutumatuse kaitse</string>
+    <string name="disablePrivacyProtection">Keela Eraelu puutumatuse kaitse</string>
+    <string name="whitelistEntryOverflowContentDescription">Rohkem võimalusi kaitseta saidi %1$s jaoks</string>
+    <string name="whitelistEntryDeleteConfirmMessage">Oled kindel, et soovite eemaldada &lt;b&gt;%1$s&lt;/b&gt; kaisteta saitide hulgast?</string>
+    <string name="whitelistExplanation">Nendele saitidele ei laiene Eraelu puutumatuse kaitse.</string>
+    <string name="whitelistNoEntries">Kaitseta saite ei ole veel</string>
     <string name="whitelistDomainHint">www.example.com</string>
-    <string name="whitelistFormatError">Salvestamine ebaõnnestus, sisestage domeen kujul <b>example.com</b>
-  </string>
+    <string name="whitelistFormatError">Salvestamine ebaõnnestus, sisestage domeen kujul <b>example.com</b></string>
 
     <!-- Settings -->
-    <string name="settingsPrivacyProtectionWhitelist">Privaatsuse kaitse valge nimekiri</string>
+    <string name="settingsPrivacyProtectionWhitelist">Kaitseta saidid</string>
 
     <!-- Fireproof websites -->
     <string name="fireproofWebsitesActivityTitle">Tulekindlad veebisaidid</string>
     <string name="settingsFireproofWebsites">Tulekindlad veebisaidid</string>
     <string name="fireproofWebsiteMenuTitleAdd">Tulekindel veebisait</string>
-    <string name="fireproofWebsiteSnackbarConfirmation">&lt;b&gt;%s&lt;/b&gt; on nüüd tulekindel! Lisateabe saamiseks vaata üle seaded.</string>
+    <string name="fireproofWebsiteSnackbarConfirmation">&lt;b&gt;%1$s&lt;/b&gt; on nüüd tulekindel! Lisateabe saamiseks vaata üle seaded.</string>
     <string name="fireproofWebsiteSnackbarAction">Võta tagasi</string>
-    <string name="fireproofWebsiteDeleteConfirmMessage">Kas soovite kindlasti kustutada saidi &lt;b&gt;%s&lt;/b&gt;?</string>
+    <string name="fireproofWebsiteDeleteConfirmMessage">Kas soovite kindlasti kustutada saidi &lt;b&gt;%1$s&lt;/b&gt;?</string>
     <string name="fireproofWebsiteEmptyListHint">Ükski veebisait pole veel tulekindel</string>
-    <string name="fireproofWebsiteFeatureDescription">Veebisaidid sõltuvad küpsistest, et hoida teid sisselogituna. Kui sait on tulekindel, ei kustutata küpsiseid, ja te jääte sisselogituks ka pärast Tule nupu kasutamist.</string>
-    <string name="fireproofWebsiteOverflowContentDescription">Veel tulekindla veebisaidi võimalusi %s</string>
+    <string name="fireproofWebsiteFeatureDescription">Veebilehed kasutavad küpsiseid, et hoida sind sisse logitud. Kui teed lehe tulekindlaks, ei kustutata küpsiseid ja sa jääd sisse logituks isegi pärast tulenupu kasutamist. Me blokeerime endiselt kolmanda poole jälitajad, kelle me tulekindlatelt lehtedelt leiame.</string>
+    <string name="fireproofWebsiteOverflowContentDescription">Veel tulekindla veebisaidi võimalusi %1$s</string>
+    <string name="fireproofWebsiteLoginDialogTitle">Kas soovid muuta %1$s tulekindaks?</string>
+    <string name="fireproofWebsiteLoginDialogDescription">Selle lehe muutmine tulekindaks hoiab sind sisse logitud pärast tulenupu kasutamist.</string>
+    <string name="fireproofWebsiteLoginDialogPositive">Tulekindel</string>
+    <string name="fireproofWebsiteLoginDialogNegative">Mitte praegu</string>
+    <string name="fireproofWebsiteItemsSectionTitle">Veebilehed</string>
+    <string name="fireproofWebsiteToogleText">Küsi sisselogimisel</string>
+
+    <!-- Dos Attack error-->
+    <string name="dosErrorMessage">Ühendus on katkestatud. See veebileht võib kahjustada sinu seadet.</string>
+
+    <!-- Download Manager problems -->
+    <string name="downloadManagerDisabled">Download Manager on keelatud</string>
+    <string name="downloadManagerIncompatible">Download Manager ei ole saadaval selles seadmes</string>
+    <string name="enable">Luba</string>
 </resources>

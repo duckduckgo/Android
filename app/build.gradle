@@ -14,12 +14,12 @@ ext {
 }
 
 android {
-    compileSdkVersion 28
+    compileSdkVersion 29
     ndkVersion '21.0.6113669'
     defaultConfig {
         applicationId "com.duckduckgo.mobile.android.nucleus"
         minSdkVersion 21
-        targetSdkVersion 28
+        targetSdkVersion 29
         versionCode buildVersionCode()
         versionName buildVersionName()
         testInstrumentationRunner "com.duckduckgo.app.TestRunner"
@@ -88,7 +88,6 @@ android {
     def propertiesPath = "${staticConfigPath}/ddg_android_build.properties"
     def propertiesFile = new File(propertiesPath)
     if (propertiesFile.exists()) {
-        println "Signing properties found"
         def props = new Properties()
         props.load(new FileInputStream(propertiesFile))
         android.signingConfigs.release.storeFile = file("${staticConfigPath}/${props['key.store']}")
@@ -126,7 +125,7 @@ ext {
     retrofit = "2.8.1"
     ankoVersion = "0.10.4"
     glide = "4.11.0"
-    lottieVersion = "2.6.0-beta19"
+    lottieVersion = "3.4.0"
     okHttp = "3.14.7"
     rxJava = "2.1.10"
     rxAndroid = "2.0.2"
@@ -181,6 +180,7 @@ dependencies {
     // ViewModel and LiveData
     implementation "androidx.lifecycle:lifecycle-extensions:$lifecycle"
     implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycle"
+    implementation "androidx.lifecycle:lifecycle-livedata-ktx:$lifecycle"
 
     implementation "androidx.lifecycle:lifecycle-common-java8:$lifecycle"
     testImplementation "androidx.arch.core:core-testing:$coreTesting"

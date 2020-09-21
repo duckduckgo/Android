@@ -96,7 +96,8 @@ class UserAgentProvider constructor(private val defaultUserAgent: String, privat
 
         val sitesThatOmitApplication = listOf(
             "cvs.com",
-            "chase.com"
+            "chase.com",
+            "tirerack.com"
         )
 
         val sitesThatOmitVersion = listOf(
