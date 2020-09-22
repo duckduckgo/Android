@@ -20,6 +20,7 @@ import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpStateFlow.*
 import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpStateFlow.Event.*
 import org.junit.Assert.*
 import org.junit.Test
+import xyz.hexene.localvpn.TCB
 import xyz.hexene.localvpn.TCB.TCBStatus
 import xyz.hexene.localvpn.TCB.TCBStatus.*
 
@@ -28,140 +29,286 @@ class TcpStateFlowTest {
     companion object {
         private val SYN_PACKET = PacketType(isSyn = true)
         private val ACK_PACKET = PacketType(isAck = true)
+        private val ACK_FOR_OUR_FIN_PACKET = PacketType(isAck = true, ackNum = 1, finSequenceNumberToClient = 1)
         private val FIN_PACKET = PacketType(isFin = true)
+        private val RST_PACKET = PacketType(isRst = true)
+        private val DATA_PACKET = PacketType(isAck = true, hasData = true)
+        private val FIN_PACKET_WITH_DATA = PacketType(isFin = true, hasData = true)
     }
 
-//    @Test
-//    fun whenConnectionClosedAndSynPacketReceivedThenOpenConnection() {
-//        val response = TcpStateFlow.newPacket(CLOSED, SYN_PACKET)
-//        assertNoTransition(response)
-//        assertEvent(OpenConnection, response)
-//    }
-//
-//    @Test
-//    fun whenConnectionClosedAndSocketOpeningAndImmediatelyConnectedThenMoveToSynReceived() {
-//        val response = TcpStateFlow.socketOpening(CLOSED)
-//        assertState(SYN_RECEIVED, response)
-//        assertEvent(SendSynAck, response)
-//    }
-//
-//    @Test
-//    fun whenConnectionClosedAndSocketOpeningAndNotImmediatelyConnectedThenMoveToSynSent() {
-//        val response = TcpStateFlow.socketOpening(CLOSED)
-//        assertState(SYN_SENT, response)
-//        assertEvent(NoEvent, response)
-//    }
-//
-//    @Test
-//    fun whenConnectionNotClosedAndSocketOpeningAndNotImmediatelyConnectedThenResetAndClose() {
-//        val response = TcpStateFlow.socketOpening(SYN_SENT)
-//        assertState(CLOSED, response)
-//        assertEvent(SendReset, response)
-//    }
-//
-//    @Test
-//    fun whenConnectionNotClosedAndSocketOpeningAndImmediatelyConnectedThenResetAndClose() {
-//        val response = TcpStateFlow.socketOpening(SYN_SENT)
-//        assertState(CLOSED, response)
-//        assertEvent(SendReset, response)
-//    }
-//
-//    @Test
-//    fun whenSynSentAndAckReceivedThenMoveToEstablished() {
-//        val response = TcpStateFlow.newPacket(SYN_SENT, ACK_PACKET)
-//        assertState(ESTABLISHED, response)
-//        assertEvent(NoEvent, response)
-//    }
-//
-//    @Test
-//    fun whenSynReceivedAndAckReceivedThenMoveToEstablished() {
-//        val response = TcpStateFlow.newPacket(SYN_RECEIVED, ACK_PACKET)
-//        assertState(ESTABLISHED, response)
-//        assertEvent(WaitToRead, response)
-//    }
-//
-//    @Test
-//    fun whenEstablishedAndFinReceivedThenMoveToCloseWait() {
-//        val response = TcpStateFlow.newPacket(ESTABLISHED, FIN_PACKET)
-//        assertState(LAST_ACK, response)
-//        assertEvent(SendFinAck, response)
-//    }
-//
-//    @Test
-//    fun whenEstablishedAndAckReceivedThenProcessPacket() {
-//        val response = TcpStateFlow.newPacket(ESTABLISHED, ACK_PACKET)
-//        assertNoTransition(response)
-//        assertEvent(ProcessPacket, response)
-//    }
-//
-//    @Test
-//    fun whenLastAckAndAckReceivedThenMoveToClosed() {
-//        val response = TcpStateFlow.newPacket(LAST_ACK, ACK_PACKET)
-//        assertState(CLOSED, response)
-//        assertEvent(NoEvent, response)
-//    }
-//
-//    @Test
-//    fun whenEstablishedAndSocketEndOfStreamHitThenMoveToFinWait1() {
-//        val response = TcpStateFlow.socketEndOfStream()
-//        assertState(FIN_WAIT_1, response)
-//        assertEvent(SendFin, response)
-//    }
-//
-//    @Test
-//    fun whenFinWait1AndAckReceivedThenMoveToFinWait2() {
-//        val response = TcpStateFlow.newPacket(FIN_WAIT_1, ACK_PACKET)
-//        assertState(FIN_WAIT_2, response)
-//        assertEvent(NoEvent, response)
-//    }
-//
-//    @Test
-//    fun whenFinWait1AndFinReceivedThenMoveToClosed() {
-//        val response = TcpStateFlow.newPacket(FIN_WAIT_1, FIN_PACKET)
-//        assertState(CLOSED, response)
-//        assertEvent(SendAck, response)
-//    }
-//
-//    @Test
-//    fun whenFinWait2AndFinReceivedThenMoveToTimeWait() {
-//        val response = TcpStateFlow.newPacket(FIN_WAIT_2, FIN_PACKET)
-//        assertState(TIME_WAIT, response)
-//        assertEvent(SendAck, response)
-//    }
-//
-//    @Test
-//    fun whenClosingAndAckReceivedThenMoveToTimeWait() {
-//        val response = TcpStateFlow.newPacket(CLOSING, ACK_PACKET)
-//        assertState(TIME_WAIT, response)
-//        assertEvent(NoEvent, response)
-//    }
-//
-//    @Test
-//    fun whenTimeWaitAndAnyPacketReceivedThenReset() {
-//        val response = TcpStateFlow.newPacket(TIME_WAIT, ACK_PACKET)
-//        assertNoTransition(response)
-//        assertEvent(NoEvent, response)
-//    }
-//
-//    @Test
-//    fun whenEstablishedAndSynReceivedThenProcessDuplicateSyn() {
-//        val response = TcpStateFlow.newPacket(ESTABLISHED, SYN_PACKET)
-//        assertEvent(ProcessDuplicateSyn, response)
-//    }
-//
-//    private fun assertNoTransition(response: TcpStateAction) {
-//        assertEquals(NoTransition, response.transition)
-//    }
-//
-//    private fun assertState(expected: TCBStatus, response: TcpStateAction) {
-//        assertTrue(response.transition is MoveToState)
-//        val moveState = response.transition as MoveToState
-//        assertEquals(expected, moveState.state)
-//    }
-//
-//    private fun assertEvent(expected: Event, response: TcpStateAction) {
-//        assertNotNull(response.events)
-//        assertEquals(expected, response.events)
-//    }
+    @Test
+    fun whenConnectionClosedAndSocketOpeningAndImmediatelyConnectedThenMoveToSynReceived() {
+        val response = TcpStateFlow.socketOpening(TcbState())
 
+        assertClientStateMove(SYN_SENT, response.events[0])
+        assertTrue(response.events[1] is WaitToConnect)
+    }
+
+    @Test
+    fun whenConnectionClosedAndSocketOpeningAndServerNotListeningThenMoveToSynReceived() {
+        val response = TcpStateFlow.socketOpening(TcbState(CLOSED, CLOSED))
+
+        assertTrue(response.events.isEmpty())
+    }
+
+    @Test
+    fun whenConnectionClosedAndSynPacketReceivedThenOpenConnection() {
+        val tcbState = givenTcbState(serverState = LISTEN, clientState = CLOSED)
+        val response = whenANewPacketArrives(tcbState, SYN_PACKET)
+
+        assertTrue(response.events.size == 1)
+        assertTrue(response.events[0] is OpenConnection)
+    }
+
+    @Test
+    fun whenConnectionClosedAndRstPacketReceivedThenCloseConnection() {
+        val tcbState = givenTcbState(serverState = CLOSED, clientState = CLOSED)
+        val response = whenANewPacketArrives(tcbState, RST_PACKET)
+
+        assertTrue(response.events[0] is CloseConnection)
+    }
+
+    @Test
+    fun whenConnectionClosedAndAckPacketReceivedThenSendReset() {
+        val tcbState = givenTcbState(serverState = CLOSED, clientState = CLOSED)
+        val response = whenANewPacketArrives(tcbState, ACK_PACKET)
+
+        assertTrue(response.events[0] is SendReset)
+    }
+
+    @Test
+    fun whenConnectionClosedAndFinPacketReceivedThenSendReset() {
+        val tcbState = givenTcbState(serverState = CLOSED, clientState = CLOSED)
+        val response = whenANewPacketArrives(tcbState, ACK_PACKET)
+
+        assertTrue(response.events.size == 1)
+        assertTrue(response.events[0] is SendReset)
+    }
+
+    @Test
+    fun whenSynReceivedAndAckReceivedThenMoveToEstablished() {
+        val tcbState = givenTcbState(serverState = SYN_RECEIVED, clientState = SYN_SENT)
+        val response = whenANewPacketArrives(tcbState, ACK_PACKET)
+
+        assertTrue(response.events.size == 3)
+        assertServerStateMove(ESTABLISHED, response.events[0])
+        assertClientStateMove(ESTABLISHED, response.events[1])
+
+        assertTrue(response.events[2] is ProcessPacket)
+    }
+
+    @Test
+    fun whenSynReceivedAndResetReceivedThenConnectionClosed() {
+        val tcbState = givenTcbState(serverState = SYN_RECEIVED, clientState = SYN_SENT)
+        val response = whenANewPacketArrives(tcbState, RST_PACKET)
+
+        assertTrue(response.events.size == 1)
+        assertTrue(response.events[0] is CloseConnection)
+    }
+
+    @Test
+    fun whenEstablishedAndFinWithNoDataReceivedThenMoveToCloseWait() {
+        val tcbState = givenTcbState(serverState = ESTABLISHED, clientState = ESTABLISHED)
+        val response = whenANewPacketArrives(tcbState, FIN_PACKET)
+
+        assertTrue(response.events.size == 3)
+        assertClientStateMove(FIN_WAIT_1, response.events[0])
+        assertTrue(response.events[1] is SendFin)
+        assertServerStateMove(LAST_ACK, response.events[2])
+    }
+
+    @Test
+    fun whenEstablishedAndFinWithDataReceivedThenMoveToCloseWait() {
+        val tcbState = givenTcbState(serverState = ESTABLISHED, clientState = ESTABLISHED)
+        val response = whenANewPacketArrives(tcbState, FIN_PACKET_WITH_DATA)
+
+        assertTrue(response.events.size == 3)
+        assertClientStateMove(FIN_WAIT_1, response.events[0])
+        assertTrue(response.events[1] is ProcessPacket)
+        assertServerStateMove(LAST_ACK, response.events[2])
+    }
+
+    @Test
+    fun whenEstablishedAndSynThenSendReset() {
+        val tcbState = givenTcbState(serverState = ESTABLISHED, clientState = ESTABLISHED)
+        val response = whenANewPacketArrives(tcbState, SYN_PACKET)
+
+        assertTrue(response.events[0] is SendReset)
+    }
+
+    @Test
+    fun whenEstablishedAndRstThenCloseConnection() {
+        val tcbState = givenTcbState(serverState = ESTABLISHED, clientState = ESTABLISHED)
+        val response = whenANewPacketArrives(tcbState, RST_PACKET)
+
+        assertTrue(response.events[0] is CloseConnection)
+    }
+
+    @Test
+    fun whenEstablishedAndAckThenProcessPacket() {
+        val tcbState = givenTcbState(serverState = ESTABLISHED, clientState = ESTABLISHED)
+        val response = whenANewPacketArrives(tcbState, ACK_PACKET)
+
+        assertTrue(response.events[0] is ProcessPacket)
+    }
+
+    @Test
+    fun whenLastAckAndResetThenCloseConnection() {
+        val tcbState = givenTcbState(serverState = LAST_ACK, clientState = ESTABLISHED)
+        val response = whenANewPacketArrives(tcbState, RST_PACKET)
+
+        assertTrue(response.events[0] is CloseConnection)
+    }
+
+    @Test
+    fun whenLastAckAndClosingAckReceivedThenCloseConnection() {
+        val tcbState = givenTcbState(serverState = LAST_ACK, clientState = ESTABLISHED)
+        val response = whenANewPacketArrives(tcbState, ACK_FOR_OUR_FIN_PACKET)
+
+        assertTrue(response.events[0] is CloseConnection)
+    }
+
+    @Test
+    fun whenLastAckAndUnexpectedAckReceivedThenSendReset() {
+        val tcbState = givenTcbState(serverState = LAST_ACK, clientState = ESTABLISHED)
+        val response = whenANewPacketArrives(tcbState, ACK_PACKET)
+
+        assertTrue(response.events[0] is SendReset)
+    }
+
+    @Test
+    fun whenFinWait1AndAckReceivedThenMoveToFinWait2() {
+        val tcbState = givenTcbState(serverState = FIN_WAIT_1, clientState = ESTABLISHED)
+        val response = whenANewPacketArrives(tcbState, ACK_PACKET)
+
+        assertServerStateMove(FIN_WAIT_2, response.events[0])
+    }
+
+    @Test
+    fun whenFinWait1AndRstReceivedThenCloseConnection() {
+        val tcbState = givenTcbState(serverState = FIN_WAIT_1, clientState = ESTABLISHED)
+        val response = whenANewPacketArrives(tcbState, RST_PACKET)
+
+        assertTrue(response.events[0] is CloseConnection)
+    }
+
+    @Test
+    fun whenFinWait1AndFinReceivedThenSendAckAndMovesToClosing() {
+        val tcbState = givenTcbState(serverState = FIN_WAIT_1, clientState = ESTABLISHED)
+        val response = whenANewPacketArrives(tcbState, FIN_PACKET)
+
+        assertTrue(response.events[0] is SendAck)
+        assertServerStateMove(CLOSING, response.events[1])
+    }
+
+    @Test
+    fun whenFinWait1AndPacketWithDataReceivedThenSendsAck() {
+        val tcbState = givenTcbState(serverState = FIN_WAIT_1, clientState = ESTABLISHED)
+        val response = whenANewPacketArrives(tcbState, FIN_PACKET_WITH_DATA)
+
+        assertTrue(response.events[0] is SendAck)
+    }
+
+    @Test
+    fun whenFinWait1AndUnexpectedPacketReceivedThenSendReset() {
+        val tcbState = givenTcbState(serverState = FIN_WAIT_1, clientState = ESTABLISHED)
+        val response = whenANewPacketArrives(tcbState, SYN_PACKET)
+
+        assertTrue(response.events[0] is SendReset)
+    }
+
+    @Test
+    fun whenFinWait2AndPacketWithDataReceivedThenSendsAck() {
+        val tcbState = givenTcbState(serverState = FIN_WAIT_2, clientState = ESTABLISHED)
+        val response = whenANewPacketArrives(tcbState, DATA_PACKET)
+
+        assertTrue(response.events[0] is SendAck)
+    }
+
+    @Test
+    fun whenFinWait2AndWithDataReceivedThenSendsAck() {
+        val tcbState = givenTcbState(serverState = FIN_WAIT_2, clientState = ESTABLISHED)
+        val response = whenANewPacketArrives(tcbState, FIN_PACKET_WITH_DATA)
+
+        assertTrue(response.events[0] is SendAck)
+        assertServerStateMove(CLOSING, response.events[1])
+        assertClientStateMove(TIME_WAIT, response.events[2])
+    }
+
+    @Test
+    fun whenFinWait2AndRstThenCloseConnection() {
+        val tcbState = givenTcbState(serverState = FIN_WAIT_2, clientState = ESTABLISHED)
+        val response = whenANewPacketArrives(tcbState, RST_PACKET)
+
+        assertTrue(response.events[0] is CloseConnection)
+    }
+
+    @Test
+    fun whenFinWait2AndUnexpectedPacketThenSendReset() {
+        val tcbState = givenTcbState(serverState = FIN_WAIT_2, clientState = ESTABLISHED)
+        val response = whenANewPacketArrives(tcbState, SYN_PACKET)
+
+        assertTrue(response.events[0] is SendReset)
+    }
+
+    @Test
+    fun whenClosingAndDataReceivedThenSendsAck() {
+        val tcbState = givenTcbState(serverState = CLOSING, clientState = ESTABLISHED)
+        val response = whenANewPacketArrives(tcbState, DATA_PACKET)
+
+        assertTrue(response.events[0] is SendAck)
+    }
+
+    @Test
+    fun whenClosingAndAckReceivedThenMoveToTimeWaitAndCloseDelayed() {
+        val tcbState = givenTcbState(serverState = CLOSING, clientState = ESTABLISHED)
+        val response = whenANewPacketArrives(tcbState, ACK_PACKET)
+
+        assertServerStateMove(TIME_WAIT, response.events[0])
+        assertTrue(response.events[1] is DelayedCloseConnection)
+    }
+
+    @Test
+    fun whenClosingAndUnexpectedPacketThenSendReset() {
+        val tcbState = givenTcbState(serverState = CLOSING, clientState = ESTABLISHED)
+        val response = whenANewPacketArrives(tcbState, SYN_PACKET)
+
+        assertTrue(response.events[0] is SendReset)
+    }
+
+    @Test
+    fun whenTimeWaitAndRstReceivedThenCloseConnection() {
+        val tcbState = givenTcbState(serverState = TIME_WAIT, clientState = CLOSE_WAIT)
+        val response = whenANewPacketArrives(tcbState, RST_PACKET)
+
+        assertTrue(response.events[0] is CloseConnection)
+    }
+
+    @Test
+    fun whenTimeWaitAndUnexpectedPacketThenSendReset() {
+        val tcbState = givenTcbState(serverState = TIME_WAIT, clientState = CLOSE_WAIT)
+        val response = whenANewPacketArrives(tcbState, SYN_PACKET)
+
+        assertTrue(response.events[0] is SendReset)
+    }
+
+    private fun givenTcbState(serverState: TCBStatus, clientState: TCBStatus): TcbState {
+        return TcbState(serverState = serverState, clientState = clientState)
+    }
+
+    private fun whenANewPacketArrives(tcbState: TcbState, packetType: PacketType): TcpStateFlow.TcpStateAction {
+        val initialSeqNumber = -1L
+        val connectionKey = "someKey"
+        return TcpStateFlow.newPacket(connectionKey, tcbState, packetType, initialSeqNumber)
+    }
+
+    private fun assertClientStateMove(status: TCBStatus, events: TcpStateFlow.Event) {
+        val clientMove = events as MoveState.MoveClientToState
+        assertTrue(clientMove.state == status)
+    }
+
+    private fun assertServerStateMove(status: TCBStatus, events: TcpStateFlow.Event) {
+        val serverMove = events as MoveState.MoveServerToState
+        assertTrue(serverMove.state == status)
+    }
 }
