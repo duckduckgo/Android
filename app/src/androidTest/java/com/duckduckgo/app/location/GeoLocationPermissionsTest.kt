@@ -21,6 +21,7 @@ import androidx.room.Room
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.InstantSchedulersRule
+import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteDao
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepository
@@ -30,6 +31,8 @@ import com.duckduckgo.app.location.data.LocationPermissionType
 import com.duckduckgo.app.location.data.LocationPermissionsDao
 import com.duckduckgo.app.location.data.LocationPermissionsRepository
 import com.duckduckgo.app.runBlocking
+import com.nhaarman.mockitokotlin2.mock
+import dagger.Lazy
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.junit.After
 import org.junit.Assert.*
@@ -58,6 +61,9 @@ class GeoLocationPermissionsTest {
 
     private lateinit var geoLocationPermissions: GeoLocationPermissions
 
+    private val mockFaviconManager: FaviconManager = mock()
+    private val lazyFaviconManager = Lazy<FaviconManager> { mockFaviconManager }
+
     @Before
     fun before() {
         db = Room.inMemoryDatabaseBuilder(InstrumentationRegistry.getInstrumentation().targetContext, AppDatabase::class.java)
@@ -68,8 +74,8 @@ class GeoLocationPermissionsTest {
 
         geoLocationPermissions = GeoLocationPermissionsManager(
             InstrumentationRegistry.getInstrumentation().targetContext,
-            LocationPermissionsRepository(locationPermissionsDao, coroutineRule.testDispatcherProvider),
-            FireproofWebsiteRepository(fireproofWebsiteDao, coroutineRule.testDispatcherProvider),
+            LocationPermissionsRepository(locationPermissionsDao, lazyFaviconManager, coroutineRule.testDispatcherProvider),
+            FireproofWebsiteRepository(fireproofWebsiteDao, coroutineRule.testDispatcherProvider, lazyFaviconManager),
             coroutineRule.testDispatcherProvider
         )
     }

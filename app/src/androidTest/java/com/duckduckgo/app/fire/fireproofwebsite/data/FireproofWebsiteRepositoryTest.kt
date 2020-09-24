@@ -21,8 +21,11 @@ import androidx.room.Room
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.blockingObserve
+import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.runBlocking
+import com.nhaarman.mockitokotlin2.mock
+import dagger.Lazy
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.junit.After
 import org.junit.Assert.assertEquals
@@ -30,7 +33,6 @@ import org.junit.Assert.assertNull
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import org.mockito.MockitoAnnotations
 
 @ExperimentalCoroutinesApi
 class FireproofWebsiteRepositoryTest {
@@ -46,15 +48,16 @@ class FireproofWebsiteRepositoryTest {
     private lateinit var db: AppDatabase
     private lateinit var fireproofWebsiteDao: FireproofWebsiteDao
     private lateinit var fireproofWebsiteRepository: FireproofWebsiteRepository
+    private val mockFaviconManager: FaviconManager = mock()
+    private val lazyFaviconManager = Lazy<FaviconManager> { mockFaviconManager }
 
     @Before
     fun before() {
-        MockitoAnnotations.initMocks(this)
         db = Room.inMemoryDatabaseBuilder(InstrumentationRegistry.getInstrumentation().targetContext, AppDatabase::class.java)
             .allowMainThreadQueries()
             .build()
         fireproofWebsiteDao = db.fireproofWebsiteDao()
-        fireproofWebsiteRepository = FireproofWebsiteRepository(db.fireproofWebsiteDao(), coroutineRule.testDispatcherProvider)
+        fireproofWebsiteRepository = FireproofWebsiteRepository(db.fireproofWebsiteDao(), coroutineRule.testDispatcherProvider, lazyFaviconManager)
     }
 
     @After

@@ -22,6 +22,7 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.Observer
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.session.WebViewSessionInMemoryStorage
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
@@ -57,6 +58,9 @@ class TabSwitcherViewModelTest {
     @Mock
     private lateinit var mockTabRepository: TabRepository
 
+    @Mock
+    private lateinit var mockFaviconManager: FaviconManager
+
     private lateinit var testee: TabSwitcherViewModel
 
     @Before
@@ -64,7 +68,7 @@ class TabSwitcherViewModelTest {
         MockitoAnnotations.initMocks(this)
         runBlocking {
             whenever(mockTabRepository.add()).thenReturn("TAB_ID")
-            testee = TabSwitcherViewModel(mockTabRepository, WebViewSessionInMemoryStorage())
+            testee = TabSwitcherViewModel(mockTabRepository, WebViewSessionInMemoryStorage(), mockFaviconManager)
             testee.command.observeForever(mockCommandObserver)
         }
     }

@@ -25,6 +25,7 @@ import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.InstantSchedulersRule
 import com.duckduckgo.app.blockingObserve
+import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.tabpreview.WebViewPreviewPersister
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.global.events.db.UserEventsStore
@@ -70,17 +71,14 @@ class TabDataRepositoryTest {
 
     private lateinit var testee: TabDataRepository
 
+    private val mockFaviconManager: FaviconManager = mock()
+
     @UiThreadTest
     @Before
     fun before() {
         runBlocking {
             whenever(mockPrivacyPractices.privacyPracticesFor(any())).thenReturn(PrivacyPractices.UNKNOWN)
-            testee = TabDataRepository(
-                mockDao,
-                SiteFactory(mockPrivacyPractices, mockEntityLookup),
-                mockWebViewPreviewPersister,
-                useOurAppDetector
-            )
+            testee = tabDataRepository(mockDao)
         }
     }
 
@@ -216,7 +214,8 @@ class TabDataRepositoryTest {
     fun whenAddDefaultTabToExistingListOfTabsThenTabIsNotCreated() = runBlocking<Unit> {
         val db = createDatabase()
         val dao = db.tabsDao()
-        testee = TabDataRepository(dao, SiteFactory(mockPrivacyPractices, mockEntityLookup), mockWebViewPreviewPersister, useOurAppDetector)
+        testee = tabDataRepository(dao)
+
         testee.add("example.com")
 
         testee.addDefaultTab()
@@ -228,7 +227,7 @@ class TabDataRepositoryTest {
     fun whenAddDefaultTabToEmptyTabsThenTabIsCreated() = runBlocking<Unit> {
         val db = createDatabase()
         val dao = db.tabsDao()
-        testee = TabDataRepository(dao, SiteFactory(mockPrivacyPractices, mockEntityLookup), mockWebViewPreviewPersister, useOurAppDetector)
+        testee = tabDataRepository(dao)
 
         testee.addDefaultTab()
 
@@ -240,7 +239,7 @@ class TabDataRepositoryTest {
         val db = createDatabase()
         val dao = db.tabsDao()
         dao.insertTab(TabEntity(tabId = "id", url = "http://www.example.com", skipHome = false, viewed = true, position = 0))
-        testee = TabDataRepository(dao, SiteFactory(mockPrivacyPractices, mockEntityLookup), mockWebViewPreviewPersister, useOurAppDetector)
+        testee = tabDataRepository(dao)
 
         testee.selectByUrlOrNewTab("http://www.example.com")
 
@@ -253,7 +252,7 @@ class TabDataRepositoryTest {
     fun whenSelectByUrlOrNewTabIfUrlNotExistedInATabThenAddNewTab() = runBlocking<Unit> {
         val db = createDatabase()
         val dao = db.tabsDao()
-        testee = TabDataRepository(dao, SiteFactory(mockPrivacyPractices, mockEntityLookup), mockWebViewPreviewPersister, useOurAppDetector)
+        testee = tabDataRepository(dao)
 
         testee.selectByUrlOrNewTab("http://www.example.com")
 
@@ -267,7 +266,7 @@ class TabDataRepositoryTest {
         val db = createDatabase()
         val dao = db.tabsDao()
         dao.insertTab(TabEntity(tabId = "id", url = "http://www.$USE_OUR_APP_DOMAIN/test", skipHome = false, viewed = true, position = 0))
-        testee = TabDataRepository(dao, SiteFactory(mockPrivacyPractices, mockEntityLookup), mockWebViewPreviewPersister, useOurAppDetector)
+        testee = tabDataRepository(dao)
 
         testee.selectByUrlOrNewTab("http://m.$USE_OUR_APP_DOMAIN")
 
@@ -280,7 +279,7 @@ class TabDataRepositoryTest {
     fun whenSelectByUrlOrNewTabIfUrlNotExistedInATabAndUrlMatchesUseOurAppDomainThenAddNewTabWithCorrectUrl() = runBlocking<Unit> {
         val db = createDatabase()
         val dao = db.tabsDao()
-        testee = TabDataRepository(dao, SiteFactory(mockPrivacyPractices, mockEntityLookup), mockWebViewPreviewPersister, useOurAppDetector)
+        testee = tabDataRepository(dao)
 
         testee.selectByUrlOrNewTab("http://m.$USE_OUR_APP_DOMAIN")
 
@@ -295,7 +294,7 @@ class TabDataRepositoryTest {
         val dao = db.tabsDao()
         val sourceTab = TabEntity(tabId = "sourceId", url = "http://www.example.com", position = 0)
         dao.addAndSelectTab(sourceTab)
-        testee = TabDataRepository(dao, SiteFactory(mockPrivacyPractices, mockEntityLookup), mockWebViewPreviewPersister, useOurAppDetector)
+        testee = tabDataRepository(dao)
 
         val addedTabId = testee.addFromSourceTab("http://www.example.com", skipHome = false, sourceTabId = "sourceId")
 
@@ -312,7 +311,7 @@ class TabDataRepositoryTest {
         val tabToDelete = TabEntity(tabId = "tabToDeleteId", url = "http://www.example.com", position = 1, sourceTabId = "sourceId")
         dao.addAndSelectTab(sourceTab)
         dao.addAndSelectTab(tabToDelete)
-        testee = TabDataRepository(dao, SiteFactory(mockPrivacyPractices, mockEntityLookup), mockWebViewPreviewPersister, useOurAppDetector)
+        testee = tabDataRepository(dao)
         var currentSelectedTabId = testee.liveSelectedTab.blockingObserve()?.tabId
         assertEquals(currentSelectedTabId, tabToDelete.tabId)
 
@@ -320,6 +319,16 @@ class TabDataRepositoryTest {
 
         currentSelectedTabId = testee.liveSelectedTab.blockingObserve()?.tabId
         assertEquals(currentSelectedTabId, sourceTab.tabId)
+    }
+
+    private fun tabDataRepository(dao: TabsDao): TabDataRepository {
+        return TabDataRepository(
+            dao,
+            SiteFactory(mockPrivacyPractices, mockEntityLookup),
+            mockWebViewPreviewPersister,
+            mockFaviconManager,
+            useOurAppDetector
+        )
     }
 
     private fun createDatabase(): AppDatabase {

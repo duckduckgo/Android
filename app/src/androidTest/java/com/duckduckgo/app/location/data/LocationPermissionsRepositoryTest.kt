@@ -21,8 +21,11 @@ import androidx.room.Room
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.blockingObserve
+import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.runBlocking
+import com.nhaarman.mockitokotlin2.mock
+import dagger.Lazy
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.junit.After
 import org.junit.Before
@@ -46,6 +49,8 @@ class LocationPermissionsRepositoryTest {
     private lateinit var db: AppDatabase
     private lateinit var dao: LocationPermissionsDao
     private lateinit var repository: LocationPermissionsRepository
+    private val mockFaviconManager: FaviconManager = mock()
+    private val lazyFaviconManager = Lazy<FaviconManager> { mockFaviconManager }
 
     private val domain = "domain.com"
 
@@ -56,7 +61,7 @@ class LocationPermissionsRepositoryTest {
             .allowMainThreadQueries()
             .build()
         dao = db.locationPermissionsDao()
-        repository = LocationPermissionsRepository(db.locationPermissionsDao(), coroutineRule.testDispatcherProvider)
+        repository = LocationPermissionsRepository(db.locationPermissionsDao(), lazyFaviconManager, coroutineRule.testDispatcherProvider)
     }
 
     @After

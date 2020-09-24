@@ -19,12 +19,15 @@ package com.duckduckgo.app.bookmarks.ui
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
+import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.InstantSchedulersRule
 import com.duckduckgo.app.bookmarks.db.BookmarkEntity
 import com.duckduckgo.app.bookmarks.db.BookmarksDao
+import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.whenever
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.junit.After
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertTrue
@@ -33,6 +36,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.mockito.ArgumentCaptor
 
+@ExperimentalCoroutinesApi
 class BookmarksViewModelTest {
 
     @get:Rule
@@ -43,15 +47,20 @@ class BookmarksViewModelTest {
     @Suppress("unused")
     val schedulers = InstantSchedulersRule()
 
+    @get:Rule
+    @Suppress("unused")
+    val coroutineRule = CoroutineTestRule()
+
     private val liveData = MutableLiveData<List<BookmarkEntity>>()
     private val viewStateObserver: Observer<BookmarksViewModel.ViewState> = mock()
     private val commandObserver: Observer<BookmarksViewModel.Command> = mock()
     private val bookmarksDao: BookmarksDao = mock()
+    private val faviconManager: FaviconManager = mock()
 
     private val bookmark = BookmarkEntity(title = "title", url = "www.example.com")
 
     private val testee: BookmarksViewModel by lazy {
-        val model = BookmarksViewModel(bookmarksDao)
+        val model = BookmarksViewModel(bookmarksDao, faviconManager, coroutineRule.testDispatcherProvider)
         model.viewState.observeForever(viewStateObserver)
         model.command.observeForever(commandObserver)
         model

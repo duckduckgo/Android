@@ -103,6 +103,7 @@ import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import com.duckduckgo.app.usage.search.SearchCountDao
 import com.duckduckgo.app.widget.ui.WidgetCapabilities
 import com.nhaarman.mockitokotlin2.*
+import dagger.Lazy
 import io.reactivex.Observable
 import io.reactivex.Single
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -221,6 +222,8 @@ class BrowserTabViewModelTest {
     @Mock
     private lateinit var geoLocationPermissions: GeoLocationPermissions
 
+    private val lazyFaviconManager = Lazy<FaviconManager> { mockFaviconManager }
+
     private lateinit var mockAutoCompleteApi: AutoCompleteApi
 
     private lateinit var ctaViewModel: CtaViewModel
@@ -301,8 +304,12 @@ class BrowserTabViewModelTest {
             searchCountDao = mockSearchCountDao,
             pixel = mockPixel,
             dispatchers = coroutineRule.testDispatcherProvider,
-            fireproofWebsiteRepository = FireproofWebsiteRepository(fireproofWebsiteDao, coroutineRule.testDispatcherProvider),
-            locationPermissionsRepository = LocationPermissionsRepository(locationPermissionsDao, coroutineRule.testDispatcherProvider),
+            fireproofWebsiteRepository = FireproofWebsiteRepository(fireproofWebsiteDao, coroutineRule.testDispatcherProvider, lazyFaviconManager),
+            locationPermissionsRepository = LocationPermissionsRepository(
+                locationPermissionsDao,
+                lazyFaviconManager,
+                coroutineRule.testDispatcherProvider
+            ),
             geoLocationPermissions = geoLocationPermissions,
             navigationAwareLoginDetector = mockNavigationAwareLoginDetector,
             userEventsStore = mockUserEventsStore,
@@ -2541,7 +2548,7 @@ class BrowserTabViewModelTest {
 
         verify(mockPixel).fire(Pixel.PixelName.PRECISE_LOCATION_SYSTEM_DIALOG_NEVER)
         verify(geoLocationPermissions).clear(domain)
-        Assert.assertEquals(locationPermissionsDao.getPermission(domain)!!.permission, LocationPermissionType.DENY_ALWAYS)
+        assertEquals(locationPermissionsDao.getPermission(domain)!!.permission, LocationPermissionType.DENY_ALWAYS)
     }
 
     @Test
