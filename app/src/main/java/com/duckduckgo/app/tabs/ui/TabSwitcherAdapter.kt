@@ -23,6 +23,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.core.net.toUri
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
@@ -32,6 +33,7 @@ import com.duckduckgo.app.browser.tabpreview.TabEntityDiffCallback.Companion.DIF
 import com.duckduckgo.app.browser.tabpreview.TabEntityDiffCallback.Companion.DIFF_KEY_TITLE
 import com.duckduckgo.app.browser.tabpreview.TabEntityDiffCallback.Companion.DIFF_KEY_VIEWED
 import com.duckduckgo.app.browser.tabpreview.WebViewPreviewPersister
+import com.duckduckgo.app.global.domain
 import com.duckduckgo.app.global.image.GlideApp
 import com.duckduckgo.app.global.image.GlideRequests
 import com.duckduckgo.app.global.view.show
@@ -42,7 +44,11 @@ import kotlinx.android.synthetic.main.item_tab.view.*
 import timber.log.Timber
 import java.io.File
 
-class TabSwitcherAdapter(private val itemClickListener: TabSwitcherListener, private val webViewPreviewPersister: WebViewPreviewPersister) :
+class TabSwitcherAdapter(
+    private val itemClickListener: TabSwitcherListener,
+    private val webViewPreviewPersister: WebViewPreviewPersister,
+    private val viewModel: TabSwitcherViewModel
+) :
     ListAdapter<TabEntity, TabViewHolder>(TabEntityDiffCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TabViewHolder {
@@ -68,11 +74,7 @@ class TabSwitcherAdapter(private val itemClickListener: TabSwitcherListener, pri
         holder.title.text = extractTabTitle(tab, context)
         updateUnreadIndicator(holder, tab)
 
-        glide.load(tab.favicon())
-            .placeholder(R.drawable.ic_globe_gray_16dp)
-            .error(R.drawable.ic_globe_gray_16dp)
-            .into(holder.favicon)
-
+        loadFavicon(tab, holder.favicon)
         loadTabPreviewImage(tab, glide, holder)
 
         attachClickListeners(holder, tab)
@@ -115,6 +117,11 @@ class TabSwitcherAdapter(private val itemClickListener: TabSwitcherListener, pri
                 updateUnreadIndicator(holder, tab)
             }
         }
+    }
+
+    private fun loadFavicon(tab: TabEntity, view: ImageView) {
+        val domain = tab.url?.toUri()?.domain() ?: return
+        viewModel.loadFavicon(tab.tabId, domain, view)
     }
 
     private fun loadTabPreviewImage(tab: TabEntity, glide: GlideRequests, holder: TabViewHolder) {

@@ -16,7 +16,6 @@
 
 package com.duckduckgo.app.location.ui
 
-import android.net.Uri
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -26,8 +25,6 @@ import android.widget.PopupMenu
 import androidx.core.view.isGone
 import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.app.browser.R
-import com.duckduckgo.app.global.faviconLocation
-import com.duckduckgo.app.global.image.GlideApp
 import com.duckduckgo.app.global.view.quietlySetIsChecked
 import com.duckduckgo.app.global.view.websiteFromGeoLocationsApiOrigin
 import com.duckduckgo.app.location.data.LocationPermissionEntity
@@ -246,13 +243,7 @@ sealed class LocationPermissionsViewHolder(itemView: View) : RecyclerView.ViewHo
         }
 
         private fun loadFavicon(domain: String) {
-            val faviconUrl = Uri.parse(domain).faviconLocation()
-
-            GlideApp.with(itemView)
-                .load(faviconUrl)
-                .placeholder(R.drawable.ic_globe_gray_16dp)
-                .error(R.drawable.ic_globe_gray_16dp)
-                .into(itemView.locationPermissionEntryFavicon)
+            viewModel.loadFavicon(domain, itemView.locationPermissionEntryFavicon)
         }
 
         private fun showOverFlowMenu(overflowMenu: ImageView, entity: LocationPermissionEntity) {

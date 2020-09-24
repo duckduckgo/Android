@@ -16,7 +16,6 @@
 
 package com.duckduckgo.app.fire.fireproofwebsite.ui
 
-import android.net.Uri
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -27,8 +26,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
 import com.duckduckgo.app.fire.fireproofwebsite.data.website
-import com.duckduckgo.app.global.faviconLocation
-import com.duckduckgo.app.global.image.GlideApp
 import com.duckduckgo.app.global.view.quietlySetIsChecked
 import kotlinx.android.synthetic.main.view_fireproof_title.view.*
 import kotlinx.android.synthetic.main.view_fireproof_website_entry.view.*
@@ -167,13 +164,7 @@ sealed class FireproofWebSiteViewHolder(itemView: View) : RecyclerView.ViewHolde
         }
 
         private fun loadFavicon(domain: String) {
-            val faviconUrl = Uri.parse("http://$domain").faviconLocation()
-
-            GlideApp.with(itemView)
-                .load(faviconUrl)
-                .placeholder(R.drawable.ic_globe_gray_16dp)
-                .error(R.drawable.ic_globe_gray_16dp)
-                .into(itemView.fireproofWebsiteEntryFavicon)
+            viewModel.loadFavicon(domain, itemView.fireproofWebsiteEntryFavicon)
         }
 
         private fun showOverFlowMenu(overflowMenu: ImageView, entity: FireproofWebsiteEntity) {

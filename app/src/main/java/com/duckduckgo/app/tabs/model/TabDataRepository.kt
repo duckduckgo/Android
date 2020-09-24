@@ -19,6 +19,7 @@ package com.duckduckgo.app.tabs.model
 import android.net.Uri
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.tabpreview.WebViewPreviewPersister
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.global.model.SiteFactory
@@ -38,6 +39,7 @@ class TabDataRepository @Inject constructor(
     private val tabsDao: TabsDao,
     private val siteFactory: SiteFactory,
     private val webViewPreviewPersister: WebViewPreviewPersister,
+    private val faviconManager: FaviconManager,
     private val useOurAppDetector: UseOurAppDetector
 ) : TabRepository {
 
@@ -201,7 +203,10 @@ class TabDataRepository @Inject constructor(
     override fun deleteAll() {
         Timber.i("Deleting tabs right now")
         tabsDao.deleteAllTabs()
-        GlobalScope.launch { webViewPreviewPersister.deleteAll() }
+        GlobalScope.launch {
+            webViewPreviewPersister.deleteAll()
+            faviconManager.deleteAllTemp()
+        }
         siteData.clear()
     }
 
@@ -209,6 +214,18 @@ class TabDataRepository @Inject constructor(
         databaseExecutor().scheduleDirect {
             val selection = TabSelectionEntity(tabId = tabId)
             tabsDao.insertTabSelection(selection)
+        }
+    }
+
+    override fun updateTabFavicon(tabId: String, fileName: String?) {
+        databaseExecutor().scheduleDirect {
+            val tab = tabsDao.tab(tabId)
+            if (tab == null) {
+                Timber.w("Cannot find tab for tab ID")
+                return@scheduleDirect
+            }
+            Timber.i("Updated tab favicon. $tabId now uses $fileName")
+            deleteOldFavicon(tabId, fileName)
         }
     }
 
@@ -225,6 +242,11 @@ class TabDataRepository @Inject constructor(
             Timber.i("Updated tab preview image. $tabId now uses $fileName")
             deleteOldPreviewImages(tabId, fileName)
         }
+    }
+
+    private fun deleteOldFavicon(tabId: String, currentFavicon: String? = null) {
+        Timber.i("Deleting old favicon for $tabId. Current favicon is $currentFavicon")
+        GlobalScope.launch { faviconManager.deleteOldTempFavicon(tabId, currentFavicon) }
     }
 
     private fun deleteOldPreviewImages(tabId: String, currentPreviewImage: String? = null) {

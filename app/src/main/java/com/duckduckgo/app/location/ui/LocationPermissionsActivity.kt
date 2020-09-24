@@ -98,7 +98,7 @@ class LocationPermissionsActivity : DuckDuckGoActivity(), SiteLocationPermission
     }
 
     private fun editSiteLocationPermission(entity: LocationPermissionEntity) {
-        val dialog = SiteLocationPermissionDialog.instance(entity.domain, true)
+        val dialog = SiteLocationPermissionDialog.instance(entity.domain, true, "")
         dialog.show(supportFragmentManager, SiteLocationPermissionDialog.SITE_LOCATION_PERMISSION_TAG)
     }
 

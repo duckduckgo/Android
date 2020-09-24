@@ -30,6 +30,8 @@ import com.duckduckgo.app.browser.downloader.AndroidFileDownloader
 import com.duckduckgo.app.browser.downloader.DataUriDownloader
 import com.duckduckgo.app.browser.downloader.FileDownloader
 import com.duckduckgo.app.browser.downloader.NetworkFileDownloader
+import com.duckduckgo.app.browser.favicon.FaviconPersister
+import com.duckduckgo.app.browser.favicon.FileBasedFaviconPersister
 import com.duckduckgo.app.browser.logindetection.DOMLoginDetector
 import com.duckduckgo.app.browser.logindetection.JsLoginDetector
 import com.duckduckgo.app.browser.logindetection.NavigationAwareLoginDetector
@@ -219,6 +221,12 @@ class BrowserModule {
     @Provides
     fun webViewPreviewPersister(context: Context, fileDeleter: FileDeleter): WebViewPreviewPersister {
         return FileBasedWebViewPreviewPersister(context, fileDeleter)
+    }
+
+    @Singleton
+    @Provides
+    fun faviconPersister(context: Context, fileDeleter: FileDeleter, dispatcherProvider: DispatcherProvider): FaviconPersister {
+        return FileBasedFaviconPersister(context, fileDeleter, dispatcherProvider)
     }
 
     @Provides

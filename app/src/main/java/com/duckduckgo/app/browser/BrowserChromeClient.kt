@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.browser
 
+import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Message
 import android.view.View
@@ -81,6 +82,11 @@ class BrowserChromeClient @Inject constructor(private val uncaughtExceptionRepos
                 throw e
             }
         }
+    }
+
+    override fun onReceivedIcon(view: WebView, icon: Bitmap) {
+        webViewClientListener?.iconReceived(icon)
+        super.onReceivedIcon(view, icon)
     }
 
     override fun onReceivedTitle(view: WebView, title: String) {

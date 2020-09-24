@@ -16,18 +16,29 @@
 
 package com.duckduckgo.app.bookmarks.ui
 
+import android.widget.ImageView
+import androidx.core.net.toUri
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.duckduckgo.app.bookmarks.db.BookmarkEntity
 import com.duckduckgo.app.bookmarks.db.BookmarksDao
 import com.duckduckgo.app.bookmarks.ui.BookmarksViewModel.Command.*
 import com.duckduckgo.app.bookmarks.ui.EditBookmarkDialogFragment.EditBookmarkListener
+import com.duckduckgo.app.browser.favicon.FaviconManager
+import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.SingleLiveEvent
+import com.duckduckgo.app.global.domain
 import io.reactivex.schedulers.Schedulers
+import kotlinx.coroutines.launch
 
-class BookmarksViewModel(val dao: BookmarksDao) : EditBookmarkListener, ViewModel() {
+class BookmarksViewModel(
+    val dao: BookmarksDao,
+    private val faviconManager: FaviconManager,
+    private val dispatcherProvider: DispatcherProvider
+) : EditBookmarkListener, ViewModel() {
 
     data class ViewState(
         val showBookmarks: Boolean = false,
@@ -89,7 +100,22 @@ class BookmarksViewModel(val dao: BookmarksDao) : EditBookmarkListener, ViewMode
         command.value = ShowEditBookmark(bookmark)
     }
 
+    fun loadFavicon(url: String, view: ImageView) {
+        viewModelScope.launch {
+            url.toUri().domain()?.let {
+                faviconManager.loadToViewFromPersisted(it, view)
+            }
+        }
+    }
+
     fun delete(bookmark: BookmarkEntity) {
+        val domain = bookmark.url.toUri().domain()
+        domain?.let {
+            viewModelScope.launch(dispatcherProvider.io()) {
+                faviconManager.deletePersistedFavicon(it)
+            }
+        }
+
         Schedulers.io().scheduleDirect {
             dao.delete(bookmark)
         }

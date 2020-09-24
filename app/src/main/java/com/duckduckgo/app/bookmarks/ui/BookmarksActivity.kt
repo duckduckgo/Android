@@ -37,14 +37,9 @@ import com.duckduckgo.app.browser.R.id.action_search
 import com.duckduckgo.app.browser.R.menu.bookmark_activity_menu
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.baseHost
-import com.duckduckgo.app.global.faviconLocation
-import com.duckduckgo.app.global.image.GlideApp
 import com.duckduckgo.app.global.view.gone
 import com.duckduckgo.app.global.view.html
 import com.duckduckgo.app.global.view.show
-import kotlinx.android.synthetic.main.content_bookmarks.*
-import kotlinx.android.synthetic.main.include_toolbar.*
-import kotlinx.android.synthetic.main.view_bookmark_entry.view.*
 import kotlinx.android.synthetic.main.content_bookmarks.emptyBookmarks
 import kotlinx.android.synthetic.main.content_bookmarks.recycler
 import kotlinx.android.synthetic.main.include_toolbar.toolbar
@@ -108,7 +103,7 @@ class BookmarksActivity : DuckDuckGoActivity() {
     }
 
     private fun showEditBookmarkDialog(bookmark: BookmarkEntity) {
-        val dialog = EditBookmarkDialogFragment.instance(bookmark.id.toLong(), bookmark.title, bookmark.url)
+        val dialog = EditBookmarkDialogFragment.instance(bookmark.id, bookmark.title, bookmark.url)
         dialog.show(supportFragmentManager, EDIT_BOOKMARK_FRAGMENT_TAG)
         dialog.listener = viewModel
     }
@@ -213,13 +208,7 @@ class BookmarksActivity : DuckDuckGoActivity() {
         }
 
         private fun loadFavicon(url: String) {
-            val faviconUrl = Uri.parse(url).faviconLocation()
-
-            GlideApp.with(itemView)
-                .load(faviconUrl)
-                .placeholder(R.drawable.ic_globe_gray_16dp)
-                .error(R.drawable.ic_globe_gray_16dp)
-                .into(itemView.favicon)
+            viewModel.loadFavicon(url, itemView.favicon)
         }
 
         private fun parseDisplayUrl(urlString: String): String {
