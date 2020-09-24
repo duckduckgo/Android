@@ -19,11 +19,14 @@ package com.duckduckgo.mobile.android.vpn.ui.notification
 import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
+import android.app.PendingIntent
 import android.content.Context
+import android.content.Intent
 import android.os.Build
 import androidx.core.app.NotificationCompat
+import androidx.core.app.TaskStackBuilder
 import com.duckduckgo.mobile.android.vpn.R
-
+import dummy.VpnControllerActivity
 
 class VpnNotificationBuilder {
 
@@ -32,11 +35,18 @@ class VpnNotificationBuilder {
         fun build(context: Context): Notification {
             registerChannel(context)
 
+            val vpnControllerIntent = Intent(context, VpnControllerActivity::class.java)
+            val vpnControllerPendingIntent: PendingIntent? = TaskStackBuilder.create(context).run {
+                addNextIntentWithParentStack(vpnControllerIntent)
+                getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT)
+            }
+
             return NotificationCompat.Builder(context,
                 VPN_FOREGROUND_SERVICE_NOTIFICATION_CHANNEL_ID
             )
                 .setContentTitle(context.getString(R.string.vpnNotificationTitle))
                 .setSmallIcon(R.drawable.ic_vpn_notification_24)
+                .setContentIntent(vpnControllerPendingIntent)
                 .setOngoing(true)
                 .setChannelId(VPN_FOREGROUND_SERVICE_NOTIFICATION_CHANNEL_ID)
                 .build()
