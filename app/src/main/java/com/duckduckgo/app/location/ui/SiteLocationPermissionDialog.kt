@@ -23,11 +23,9 @@ import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
-import androidx.core.net.toUri
 import androidx.fragment.app.DialogFragment
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.favicon.FaviconManager
-import com.duckduckgo.app.global.domain
 import com.duckduckgo.app.global.view.gone
 import com.duckduckgo.app.global.view.websiteFromGeoLocationsApiOrigin
 import com.duckduckgo.app.location.data.LocationPermissionType
@@ -112,14 +110,13 @@ class SiteLocationPermissionDialog : DialogFragment() {
             val originUrl = args.getString(KEY_REQUEST_ORIGIN)
             val tabId = args.getString(KEY_TAB_ID, "")
 
-            originUrl?.let {
+            originUrl?.let { url ->
                 faviconJob?.cancel()
                 faviconJob = GlobalScope.launch {
-                    val domain = originUrl.toUri().domain() ?: return@launch
                     if (tabId.isNotBlank()) {
-                        faviconManager.loadToViewFromTemp(tabId, domain, imageView)
+                        faviconManager.loadToViewFromTemp(tabId, url, imageView)
                     } else {
-                        faviconManager.loadToViewFromPersisted(domain, imageView)
+                        faviconManager.loadToViewFromPersisted(url, imageView)
                     }
                 }
             }

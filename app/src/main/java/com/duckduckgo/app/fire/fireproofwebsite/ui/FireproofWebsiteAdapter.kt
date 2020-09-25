@@ -163,8 +163,8 @@ sealed class FireproofWebSiteViewHolder(itemView: View) : RecyclerView.ViewHolde
             }
         }
 
-        private fun loadFavicon(domain: String) {
-            viewModel.loadFavicon(domain, itemView.fireproofWebsiteEntryFavicon)
+        private fun loadFavicon(url: String) {
+            viewModel.loadFavicon(url, itemView.fireproofWebsiteEntryFavicon)
         }
 
         private fun showOverFlowMenu(overflowMenu: ImageView, entity: FireproofWebsiteEntity) {

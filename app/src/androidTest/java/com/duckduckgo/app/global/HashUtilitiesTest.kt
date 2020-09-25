@@ -34,6 +34,12 @@ class HashUtilitiesTest {
     }
 
     @Test
+    fun whenSha256HashCalledOnStringThenResultIsCorrect() {
+        val result = helloWorldText.sha256
+        assertEquals(helloWorldSha256, result)
+    }
+
+    @Test
     fun whenCorrectSha256HashUsedThenVerifyIsTrue() {
         assertTrue(helloWorldText.toByteArray().verifySha256(helloWorldSha256))
     }

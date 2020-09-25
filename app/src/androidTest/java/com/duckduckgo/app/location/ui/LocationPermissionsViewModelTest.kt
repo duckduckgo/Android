@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.location.ui
 
+import android.widget.ImageView
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.Observer
 import androidx.room.Room
@@ -270,6 +271,15 @@ class LocationPermissionsViewModelTest {
 
         verify(mockGeoLocationPermissions).clear(domain)
         assertEquals(locationPermissionsDao.getPermission(domain)!!.permission, LocationPermissionType.DENY_ALWAYS)
+    }
+
+    @Test
+    fun whenLoadFaviconThenCallLoadToViewFromPersisted() = coroutineRule.runBlocking {
+        val view: ImageView = mock()
+
+        viewModel.loadFavicon("example.com", view)
+
+        verify(mockFaviconManager).loadToViewFromPersisted("example.com", view)
     }
 
     private fun givenLocationPermission(permission: LocationPermissionType = LocationPermissionType.ALLOW_ONCE, vararg domain: String) {

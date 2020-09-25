@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.browser
 
+import android.graphics.Bitmap
 import android.net.Uri
 import android.view.MenuItem
 import android.view.View
@@ -111,7 +112,6 @@ import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runBlockingTest
 import org.junit.After
-import org.junit.Assert
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Rule
@@ -120,6 +120,7 @@ import org.mockito.*
 import org.mockito.ArgumentMatchers.anyString
 import org.mockito.Mockito.never
 import org.mockito.Mockito.verify
+import java.io.File
 import java.util.concurrent.TimeUnit
 
 @ExperimentalCoroutinesApi
@@ -2678,6 +2679,163 @@ class BrowserTabViewModelTest {
         testee.onSystemLocationPermissionGranted()
 
         verify(mockSettingsStore).appLocationPermissionDeniedForever = false
+    }
+
+    @Test
+    fun whenPrefetchFaviconThenPrefetchToTemp() = coroutineRule.runBlocking {
+        val url = "https://www.example.com/"
+        givenCurrentSite(url)
+        testee.prefetchFavicon(url)
+
+        verify(mockFaviconManager).prefetchToTemp("TAB_ID", url)
+    }
+
+    @Test
+    fun whenPrefetchFaviconAndFaviconExistsThenUpdateTabFavicon() = coroutineRule.runBlocking {
+        val url = "https://www.example.com/"
+        val file = File("test")
+        givenCurrentSite(url)
+        whenever(mockFaviconManager.prefetchToTemp(any(), any())).thenReturn(file)
+
+        testee.prefetchFavicon(url)
+
+        verify(mockTabsRepository).updateTabFavicon("TAB_ID", file.name)
+    }
+
+    @Test
+    fun whenPrefetchFaviconAndFaviconDoesNotExistThenDoNotCallUpdateTabFavicon() = coroutineRule.runBlocking {
+        whenever(mockFaviconManager.prefetchToTemp(any(), any())).thenReturn(null)
+
+        testee.prefetchFavicon("url")
+
+        verify(mockTabsRepository, never()).updateTabFavicon(any(), any())
+    }
+
+    @Test
+    fun whenIconReceivedThenSaveToTemp() = coroutineRule.runBlocking {
+        givenOneActiveTabSelected()
+        val bitmap: Bitmap = Bitmap.createBitmap(1, 1, Bitmap.Config.RGB_565)
+
+        testee.iconReceived(bitmap)
+
+        verify(mockFaviconManager).saveToTemp("TAB_ID", bitmap, "https://example.com")
+    }
+
+    @Test
+    fun whenIconReceivedIfCorrectlySavedThenUpdateTabFavicon() = coroutineRule.runBlocking {
+        givenOneActiveTabSelected()
+        val bitmap: Bitmap = Bitmap.createBitmap(1, 1, Bitmap.Config.RGB_565)
+        val file = File("test")
+        whenever(mockFaviconManager.saveToTemp(any(), any(), any())).thenReturn(file)
+
+        testee.iconReceived(bitmap)
+
+        verify(mockTabsRepository).updateTabFavicon("TAB_ID", file.name)
+    }
+
+    @Test
+    fun whenIconReceivedIfNotCorrectlySavedThenDoNotUpdateTabFavicon() = coroutineRule.runBlocking {
+        givenOneActiveTabSelected()
+        val bitmap: Bitmap = Bitmap.createBitmap(1, 1, Bitmap.Config.RGB_565)
+        whenever(mockFaviconManager.saveToTemp(any(), any(), any())).thenReturn(null)
+
+        testee.iconReceived(bitmap)
+
+        verify(mockTabsRepository, never()).updateTabFavicon(any(), any())
+    }
+
+    @Test
+    fun whenOnSiteLocationPermissionSelectedAndPermissionIsAllowAlwaysThenPersistFavicon() = coroutineRule.runBlocking {
+        val url = "http://example.com"
+        val permission = LocationPermissionType.ALLOW_ALWAYS
+        givenNewPermissionRequestFromDomain(url)
+
+        testee.onSiteLocationPermissionSelected(url, permission)
+
+        verify(mockFaviconManager).persistFavicon(any(), eq(url))
+    }
+
+    @Test
+    fun whenOnSiteLocationPermissionSelectedAndPermissionIsDenyAlwaysThenPersistFavicon() = coroutineRule.runBlocking {
+        val url = "http://example.com"
+        val permission = LocationPermissionType.DENY_ALWAYS
+        givenNewPermissionRequestFromDomain(url)
+
+        testee.onSiteLocationPermissionSelected(url, permission)
+
+        verify(mockFaviconManager).persistFavicon(any(), eq(url))
+    }
+
+    @Test
+    fun whenOnSystemLocationPermissionNeverAllowedThenPersistFavicon() = coroutineRule.runBlocking {
+        val url = "http://example.com"
+        givenNewPermissionRequestFromDomain(url)
+
+        testee.onSystemLocationPermissionNeverAllowed()
+
+        verify(mockFaviconManager).persistFavicon(any(), eq(url))
+    }
+
+    @Test
+    fun whenBookmarkAddedThenPersistFavicon() = coroutineRule.runBlocking {
+        val url = "http://example.com"
+        loadUrl(url, "A title")
+
+        testee.onBookmarkAddRequested()
+
+        verify(mockFaviconManager).persistFavicon(any(), eq(url))
+    }
+
+    @Test
+    fun whenBookmarkAddedButUrlIsNullThenDoNotPersistFavicon() = coroutineRule.runBlocking {
+        loadUrl(null, "A title")
+
+        testee.onBookmarkAddRequested()
+
+        verify(mockFaviconManager, never()).persistFavicon(any(), any())
+    }
+
+    @Test
+    fun whenFireproofWebsiteAddedThenPersistFavicon() = coroutineRule.runBlocking {
+        val url = "http://example.com"
+        loadUrl(url, isBrowserShowing = true)
+
+        testee.onFireproofWebsiteMenuClicked()
+
+        assertCommandIssued<Command.ShowFireproofWebSiteConfirmation> {
+            verify(mockFaviconManager).persistFavicon(any(), eq(this.fireproofWebsiteEntity.domain))
+        }
+    }
+
+    @Test
+    fun whenOnPinPageToHomeSelectedThenAddHomeShortcutCommandIssuedWithFavicon() = coroutineRule.runBlocking {
+        val url = "http://example.com"
+        val bitmap: Bitmap = Bitmap.createBitmap(1, 1, Bitmap.Config.RGB_565)
+        whenever(mockFaviconManager.loadFromTemp(any(), any())).thenReturn(bitmap)
+        loadUrl(url, "A title")
+
+        testee.onPinPageToHomeSelected()
+
+        assertCommandIssued<Command.AddHomeShortcut> {
+            assertEquals(bitmap, this.icon)
+            assertEquals(url, this.url)
+            assertEquals("example.com", this.title)
+        }
+    }
+
+    @Test
+    fun whenOnPinPageToHomeSelectedAndFaviconDoesNotExistThenAddHomeShortcutCommandIssuedWithoutFavicon() = coroutineRule.runBlocking {
+        val url = "http://example.com"
+        whenever(mockFaviconManager.loadFromTemp(any(), any())).thenReturn(null)
+        loadUrl(url, "A title")
+
+        testee.onPinPageToHomeSelected()
+
+        assertCommandIssued<Command.AddHomeShortcut> {
+            assertNull(this.icon)
+            assertEquals(url, this.url)
+            assertEquals("example.com", this.title)
+        }
     }
 
     private fun givenNewPermissionRequestFromDomain(domain: String) {

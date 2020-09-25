@@ -242,8 +242,8 @@ sealed class LocationPermissionsViewHolder(itemView: View) : RecyclerView.ViewHo
             }
         }
 
-        private fun loadFavicon(domain: String) {
-            viewModel.loadFavicon(domain, itemView.locationPermissionEntryFavicon)
+        private fun loadFavicon(url: String) {
+            viewModel.loadFavicon(url, itemView.locationPermissionEntryFavicon)
         }
 
         private fun showOverFlowMenu(overflowMenu: ImageView, entity: LocationPermissionEntity) {

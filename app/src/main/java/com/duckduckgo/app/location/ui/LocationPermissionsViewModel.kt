@@ -17,13 +17,11 @@
 package com.duckduckgo.app.location.ui
 
 import android.widget.ImageView
-import androidx.core.net.toUri
 import androidx.lifecycle.*
 import androidx.lifecycle.Observer
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.SingleLiveEvent
-import com.duckduckgo.app.global.domain
 import com.duckduckgo.app.location.GeoLocationPermissions
 import com.duckduckgo.app.location.data.LocationPermissionEntity
 import com.duckduckgo.app.location.data.LocationPermissionType
@@ -86,9 +84,7 @@ class LocationPermissionsViewModel(
 
     fun loadFavicon(url: String, view: ImageView) {
         viewModelScope.launch {
-            url.toUri().domain()?.let {
-                faviconManager.loadToViewFromPersisted(it, view)
-            }
+            faviconManager.loadToViewFromPersisted(url, view)
         }
     }
 

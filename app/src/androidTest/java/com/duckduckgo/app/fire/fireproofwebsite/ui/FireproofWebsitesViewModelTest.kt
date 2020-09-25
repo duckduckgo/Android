@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.fire.fireproofwebsite.ui
 
+import android.widget.ImageView
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.Observer
 import androidx.room.Room
@@ -28,6 +29,7 @@ import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepository
 import com.duckduckgo.app.fire.fireproofwebsite.ui.FireproofWebsitesViewModel.Command.ConfirmDeleteFireproofWebsite
 import com.duckduckgo.app.global.db.AppDatabase
+import com.duckduckgo.app.runBlocking
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.FIREPROOF_LOGIN_TOGGLE_ENABLED
@@ -166,6 +168,15 @@ class FireproofWebsitesViewModelTest {
         viewModel.onUserToggleLoginDetection(true)
 
         verify(settingsDataStore).appLoginDetection = true
+    }
+
+    @Test
+    fun whenLoadFaviconThenCallLoadToViewFromPersisted() = coroutineRule.runBlocking {
+        val view: ImageView = mock()
+
+        viewModel.loadFavicon("www.example.com", view)
+
+        verify(mockFaviconManager).loadToViewFromPersisted("www.example.com", view)
     }
 
     private inline fun <reified T : FireproofWebsitesViewModel.Command> assertCommandIssued(instanceAssertions: T.() -> Unit = {}) {

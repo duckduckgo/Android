@@ -27,8 +27,8 @@ import java.io.File
 import java.io.FileOutputStream
 
 interface FaviconPersister {
-    fun faviconFile(directory: String, subFolder: String, domain: String): File
-    suspend fun store(directory: String, subFolder: String, bitmap: Bitmap, domain: String): File
+    fun faviconFile(directory: String, subFolder: String, domain: String): File?
+    suspend fun store(directory: String, subFolder: String, bitmap: Bitmap, domain: String): File?
     suspend fun copyToDirectory(file: File, directory: String, newSubfolder: String, newFilename: String)
     suspend fun deleteAll(directory: String)
     suspend fun deletePersistedFavicon(domain: String)
@@ -45,8 +45,13 @@ class FileBasedFaviconPersister(
         fileDeleter.deleteDirectory(faviconDirectory(directory))
     }
 
-    override fun faviconFile(directory: String, subFolder: String, domain: String): File {
-        return fileForFavicon(directory, subFolder, domain)
+    override fun faviconFile(directory: String, subFolder: String, domain: String): File? {
+        val file = fileForFavicon(directory, subFolder, domain)
+        return if (file.exists()) {
+            file
+        } else {
+            null
+        }
     }
 
     override suspend fun copyToDirectory(file: File, directory: String, newSubfolder: String, newFilename: String) {
@@ -67,7 +72,7 @@ class FileBasedFaviconPersister(
 
                 existingFavicon?.let {
                     if (it.width >= bitmap.width) {
-                        return@withContext faviconFile(directory, subFolder, domain)
+                        return@withContext existingFile
                     }
                 }
             }
@@ -109,14 +114,14 @@ class FileBasedFaviconPersister(
     }
 
     private fun prepareDestinationFile(directory: String, tabId: String, url: String): File {
-        val previewFileDestination = directoryForFavicon(directory, tabId)
-        previewFileDestination.mkdirs()
+        val fileDestination = directoryForFavicon(directory, tabId)
+        fileDestination.mkdirs()
 
-        return File(previewFileDestination, filename(url))
+        return File(fileDestination, filename(url))
     }
 
-    private fun writeBytesToFile(previewFile: File, bitmap: Bitmap) {
-        FileOutputStream(previewFile).use { outputStream ->
+    private fun writeBytesToFile(file: File, bitmap: Bitmap) {
+        FileOutputStream(file).use { outputStream ->
             bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream)
             outputStream.flush()
         }

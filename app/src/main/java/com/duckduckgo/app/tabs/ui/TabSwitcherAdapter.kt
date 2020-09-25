@@ -23,7 +23,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
-import androidx.core.net.toUri
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
@@ -33,7 +32,6 @@ import com.duckduckgo.app.browser.tabpreview.TabEntityDiffCallback.Companion.DIF
 import com.duckduckgo.app.browser.tabpreview.TabEntityDiffCallback.Companion.DIFF_KEY_TITLE
 import com.duckduckgo.app.browser.tabpreview.TabEntityDiffCallback.Companion.DIFF_KEY_VIEWED
 import com.duckduckgo.app.browser.tabpreview.WebViewPreviewPersister
-import com.duckduckgo.app.global.domain
 import com.duckduckgo.app.global.image.GlideApp
 import com.duckduckgo.app.global.image.GlideRequests
 import com.duckduckgo.app.global.view.show
@@ -120,8 +118,8 @@ class TabSwitcherAdapter(
     }
 
     private fun loadFavicon(tab: TabEntity, view: ImageView) {
-        val domain = tab.url?.toUri()?.domain() ?: return
-        viewModel.loadFavicon(tab.tabId, domain, view)
+        val url = tab.url ?: return
+        viewModel.loadFavicon(tab.tabId, url, view)
     }
 
     private fun loadTabPreviewImage(tab: TabEntity, glide: GlideRequests, holder: TabViewHolder) {

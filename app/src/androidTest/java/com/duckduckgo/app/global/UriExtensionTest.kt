@@ -224,4 +224,14 @@ class UriExtensionTest {
         val favicon = "https://192.168.1.0".toUri().faviconLocation()
         assertEquals("https://192.168.1.0/favicon.ico", favicon.toString())
     }
+
+    @Test
+    fun whenUrlDoesNotHaveHostReturnNull() {
+        assertNull("www.example.com".toUri().domain())
+    }
+
+    @Test
+    fun whenUrlHasHostReturnDomain() {
+        assertEquals("www.example.com", "http://www.example.com".toUri().domain())
+    }
 }

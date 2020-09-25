@@ -72,9 +72,9 @@ class FireproofWebsitesViewModel(
         )
     }
 
-    fun loadFavicon(domain: String, view: ImageView) {
+    fun loadFavicon(url: String, view: ImageView) {
         viewModelScope.launch {
-            faviconManager.loadToViewFromPersisted(domain, view)
+            faviconManager.loadToViewFromPersisted(url, view)
         }
     }
 

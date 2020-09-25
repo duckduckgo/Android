@@ -18,18 +18,19 @@
 
 package com.duckduckgo.app.tabs.ui
 
+import android.widget.ImageView
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.Observer
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.session.WebViewSessionInMemoryStorage
+import com.duckduckgo.app.runBlocking
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command
 import com.nhaarman.mockitokotlin2.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Rule
@@ -39,13 +40,13 @@ import org.mockito.Captor
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations
 
+@ExperimentalCoroutinesApi
 class TabSwitcherViewModelTest {
 
     @get:Rule
     @Suppress("unused")
     var instantTaskExecutorRule = InstantTaskExecutorRule()
 
-    @ExperimentalCoroutinesApi
     @get:Rule
     var coroutinesTestRule = CoroutineTestRule()
 
@@ -66,7 +67,7 @@ class TabSwitcherViewModelTest {
     @Before
     fun before() {
         MockitoAnnotations.initMocks(this)
-        runBlocking {
+        coroutinesTestRule.runBlocking {
             whenever(mockTabRepository.add()).thenReturn("TAB_ID")
             testee = TabSwitcherViewModel(mockTabRepository, WebViewSessionInMemoryStorage(), mockFaviconManager)
             testee.command.observeForever(mockCommandObserver)
@@ -74,7 +75,7 @@ class TabSwitcherViewModelTest {
     }
 
     @Test
-    fun whenNewTabRequestedThenRepositoryNotifiedAndSwitcherClosed() = runBlocking<Unit> {
+    fun whenNewTabRequestedThenRepositoryNotifiedAndSwitcherClosed() = coroutinesTestRule.runBlocking {
         testee.onNewTabRequested()
         verify(mockTabRepository).add()
         verify(mockCommandObserver).onChanged(commandCaptor.capture())
@@ -82,7 +83,7 @@ class TabSwitcherViewModelTest {
     }
 
     @Test
-    fun whenTabSelectedThenRepositoryNotifiedAndSwitcherClosed() = runBlocking<Unit> {
+    fun whenTabSelectedThenRepositoryNotifiedAndSwitcherClosed() = coroutinesTestRule.runBlocking {
         testee.onTabSelected(TabEntity("abc", "", "", position = 0))
         verify(mockTabRepository).select(eq("abc"))
         verify(mockCommandObserver).onChanged(commandCaptor.capture())
@@ -90,7 +91,7 @@ class TabSwitcherViewModelTest {
     }
 
     @Test
-    fun whenTabDeletedThenRepositoryNotified() = runBlocking<Unit> {
+    fun whenTabDeletedThenRepositoryNotified() = coroutinesTestRule.runBlocking {
         val entity = TabEntity("abc", "", "", position = 0)
         testee.onTabDeleted(entity)
         verify(mockTabRepository).delete(entity)
@@ -104,4 +105,12 @@ class TabSwitcherViewModelTest {
         assertEquals(Command.Close, commandCaptor.allValues[1])
     }
 
+    @Test
+    fun whenLoadFaviconThenCallLoadToViewFromTemp() = coroutinesTestRule.runBlocking {
+        val view: ImageView = mock()
+
+        testee.loadFavicon("tabId", "example.com", view)
+
+        verify(mockFaviconManager).loadToViewFromTemp("tabId", "example.com", view)
+    }
 }

@@ -551,11 +551,13 @@ class BrowserTabViewModel(
     }
 
     override fun iconReceived(icon: Bitmap) {
-        val currentTab = tabRepository.liveSelectedTab.value
-        val domain = currentTab?.url?.toUri()?.domain() ?: return
+        val currentTab = tabRepository.liveSelectedTab.value ?: return
+        val url = currentTab.url ?: return
         viewModelScope.launch {
-            val faviconFile = faviconManager.saveToTemp(currentTab.tabId, icon, domain)
-            tabRepository.updateTabFavicon(tabId, faviconFile.name)
+            val faviconFile = faviconManager.saveToTemp(currentTab.tabId, icon, url)
+            faviconFile?.let {
+                tabRepository.updateTabFavicon(tabId, faviconFile.name)
+            }
         }
     }
 
@@ -923,9 +925,7 @@ class BrowserTabViewModel(
                     pixel.fire(PixelName.PRECISE_LOCATION_SITE_DIALOG_ALLOW_ALWAYS)
                     viewModelScope.launch {
                         locationPermissionsRepository.savePermission(domain, permission)
-                        domain.toUri().domain()?.let {
-                            faviconManager.persistFavicon(tabId, it)
-                        }
+                        faviconManager.persistFavicon(tabId, domain)
                     }
                 }
                 LocationPermissionType.ALLOW_ONCE -> {
@@ -937,9 +937,7 @@ class BrowserTabViewModel(
                     onSiteLocationPermissionAlwaysDenied()
                     viewModelScope.launch {
                         locationPermissionsRepository.savePermission(domain, permission)
-                        domain.toUri().domain()?.let {
-                            faviconManager.persistFavicon(tabId, it)
-                        }
+                        faviconManager.persistFavicon(tabId, domain)
                     }
                 }
                 LocationPermissionType.DENY_ONCE -> {
@@ -1005,9 +1003,6 @@ class BrowserTabViewModel(
             pixel.fire(PixelName.PRECISE_LOCATION_SYSTEM_DIALOG_NEVER)
             viewModelScope.launch {
                 locationPermissionsRepository.savePermission(locationPermission.origin, neverAllowedPermission)
-                locationPermission.origin.toUri().domain()?.let {
-                    faviconManager.persistFavicon(tabId, it)
-                }
             }
         }
     }
@@ -1187,9 +1182,10 @@ class BrowserTabViewModel(
     suspend fun onBookmarkAddRequested() {
         val url = url ?: ""
         val title = title ?: ""
-        val domain = url.toUri().domain()
         val id = withContext(dispatchers.io()) {
-            domain?.let { faviconManager.persistFavicon(tabId, it) }
+            if (url.isNotBlank()) {
+                faviconManager.persistFavicon(tabId, url)
+            }
             bookmarksDao.insert(BookmarkEntity(title = title, url = url))
         }
         withContext(dispatchers.main()) {
@@ -1452,12 +1448,7 @@ class BrowserTabViewModel(
         }
 
         viewModelScope.launch {
-            val domain = currentPage.toUri().domain()
-            val favicon: Bitmap? = if (domain.isNullOrBlank()) {
-                null
-            } else {
-                faviconManager.loadFromTemp(tabId, domain)
-            }
+            val favicon: Bitmap? = faviconManager.loadFromTemp(tabId, currentPage)
             command.value = AddHomeShortcut(title, currentPage, favicon)
         }
     }

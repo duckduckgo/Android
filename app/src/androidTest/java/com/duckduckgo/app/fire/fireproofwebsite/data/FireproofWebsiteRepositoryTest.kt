@@ -25,6 +25,7 @@ import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.runBlocking
 import com.nhaarman.mockitokotlin2.mock
+import com.nhaarman.mockitokotlin2.verify
 import dagger.Lazy
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.junit.After
@@ -104,6 +105,33 @@ class FireproofWebsiteRepositoryTest {
 
         val fireproofWebsiteEntities = fireproofWebsiteDao.fireproofWebsitesSync()
         assertEquals(fireproofWebsiteEntities.size, 1)
+    }
+
+    @Test
+    fun whenRemoveFireproofWebsiteThenDeletePersistedFavicon() = coroutineRule.runBlocking {
+        givenFireproofWebsiteDomain("example.com")
+
+        fireproofWebsiteRepository.removeFireproofWebsite(FireproofWebsiteEntity("example.com"))
+
+        verify(mockFaviconManager).deletePersistedFavicon("example.com")
+    }
+
+    @Test
+    fun whenFireproofWebsitesCountByDomainAndNoWebsitesMatchThenReturnZero() = coroutineRule.runBlocking {
+        givenFireproofWebsiteDomain("example.com")
+
+        val count = fireproofWebsiteRepository.fireproofWebsitesCountByDomain("test.com")
+
+        assertEquals(0, count)
+    }
+
+    @Test
+    fun whenFireproofWebsitesCountByDomainAndWebsitsMatchThenReturnCount() = coroutineRule.runBlocking {
+        givenFireproofWebsiteDomain("example.com")
+
+        val count = fireproofWebsiteRepository.fireproofWebsitesCountByDomain("example.com")
+
+        assertEquals(1, count)
     }
 
     private fun givenFireproofWebsiteDomain(vararg fireproofWebsitesDomain: String) {

@@ -23,26 +23,34 @@ import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.location.data.LocationPermissionsRepository
 import dagger.Module
 import dagger.Provides
+import javax.inject.Singleton
 
 @Module
 class FaviconModule {
 
     @Provides
-    fun faviconDownloader(
-        context: Context,
+    @Singleton
+    fun faviconManager(
         faviconPersister: FaviconPersister,
         bookmarksDao: BookmarksDao,
         fireproofWebsiteRepository: FireproofWebsiteRepository,
         locationPermissionsRepository: LocationPermissionsRepository,
+        faviconDownloader: FaviconDownloader,
         dispatcherProvider: DispatcherProvider
     ): FaviconManager {
-        return GlideFaviconManager(
-            context,
+        return DuckDuckGoFaviconManager(
             faviconPersister,
             bookmarksDao,
             fireproofWebsiteRepository,
             locationPermissionsRepository,
+            faviconDownloader,
             dispatcherProvider
         )
+    }
+
+    @Provides
+    @Singleton
+    fun faviconDownloader(context: Context): FaviconDownloader {
+        return GlideFaviconDownloader(context)
     }
 }

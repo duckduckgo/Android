@@ -63,9 +63,9 @@ class TabSwitcherViewModel(
         command.value = Command.Close
     }
 
-    fun loadFavicon(tabId: String, domain: String, view: ImageView) {
+    fun loadFavicon(tabId: String, url: String, view: ImageView) {
         viewModelScope.launch {
-            faviconManager.loadToViewFromTemp(tabId, domain, view)
+            faviconManager.loadToViewFromTemp(tabId, url, view)
         }
     }
 }
