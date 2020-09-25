@@ -107,9 +107,6 @@ class BookmarksViewModel(
     fun delete(bookmark: BookmarkEntity) {
         viewModelScope.launch(dispatcherProvider.io()) {
             faviconManager.deletePersistedFavicon(bookmark.url)
-        }
-
-        Schedulers.io().scheduleDirect {
             dao.delete(bookmark)
         }
     }
