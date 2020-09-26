@@ -22,6 +22,8 @@ import android.graphics.BitmapFactory
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.file.FileDeleter
 import com.duckduckgo.app.global.sha256
+import kotlinx.coroutines.NonCancellable
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.FileOutputStream
@@ -61,9 +63,8 @@ class FileBasedFaviconPersister(
         }
     }
 
-    override suspend fun store(directory: String, subFolder: String, bitmap: Bitmap, domain: String): File {
-        return withContext(dispatcherProvider.io()) {
-
+    override suspend fun store(directory: String, subFolder: String, bitmap: Bitmap, domain: String): File? {
+        return runBlocking(dispatcherProvider.io() + NonCancellable) {
             val existingFile = fileForFavicon(directory, subFolder, domain)
 
             if (existingFile.exists()) {
@@ -71,8 +72,8 @@ class FileBasedFaviconPersister(
                 val existingFavicon = BitmapFactory.decodeFile(existingFile.absolutePath)
 
                 existingFavicon?.let {
-                    if (it.width >= bitmap.width) {
-                        return@withContext existingFile
+                    if (it.width > bitmap.width) {
+                        return@runBlocking null // Stored file has better quality
                     }
                 }
             }
@@ -80,27 +81,23 @@ class FileBasedFaviconPersister(
             val faviconFile = prepareDestinationFile(directory, subFolder, domain)
             writeBytesToFile(faviconFile, bitmap)
 
-            return@withContext faviconFile
+            return@runBlocking faviconFile
         }
     }
 
     override suspend fun deletePersistedFavicon(domain: String) {
-        withContext(dispatcherProvider.io()) {
-            val directoryToDelete = directoryForFavicon(FAVICON_PERSISTED_DIR, "")
-            fileDeleter.deleteFilesFromDirectory(directoryToDelete, listOf(filename(domain)))
-        }
+        val directoryToDelete = directoryForFavicon(FAVICON_PERSISTED_DIR, "")
+        fileDeleter.deleteFilesFromDirectory(directoryToDelete, listOf(filename(domain)))
     }
 
     override suspend fun deleteFaviconsForSubfolder(directory: String, subFolder: String, domain: String?) {
-        withContext(dispatcherProvider.io()) {
-            val directoryToDelete = directoryForFavicon(directory, subFolder)
+        val directoryToDelete = directoryForFavicon(directory, subFolder)
 
-            if (domain == null) {
-                fileDeleter.deleteDirectory(directoryToDelete)
-            } else {
-                val exclusionList = listOf(domain)
-                fileDeleter.deleteContents(directoryToDelete, exclusionList)
-            }
+        if (domain == null) {
+            fileDeleter.deleteDirectory(directoryToDelete)
+        } else {
+            val exclusionList = listOf(domain)
+            fileDeleter.deleteContents(directoryToDelete, exclusionList)
         }
     }
 

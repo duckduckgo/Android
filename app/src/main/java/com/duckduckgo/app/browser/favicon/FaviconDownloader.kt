@@ -23,47 +23,56 @@ import android.widget.ImageView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.global.DispatcherProvider
+import kotlinx.coroutines.withContext
 import java.io.File
 import javax.inject.Inject
 
 interface FaviconDownloader {
-    fun getFaviconFromDisk(file: File): Bitmap?
-    fun getFaviconFromUrl(uri: Uri): Bitmap?
+    suspend fun getFaviconFromDisk(file: File): Bitmap?
+    suspend fun getFaviconFromUrl(uri: Uri): Bitmap?
     suspend fun loadFaviconToView(file: File, view: ImageView)
 }
 
 class GlideFaviconDownloader @Inject constructor(
-    private val context: Context
+    private val context: Context,
+    private val dispatcherProvider: DispatcherProvider
 ) : FaviconDownloader {
 
-    override fun getFaviconFromDisk(file: File): Bitmap? {
-        return Glide.with(context)
-            .asBitmap()
-            .load(file)
-            .diskCacheStrategy(DiskCacheStrategy.NONE)
-            .skipMemoryCache(true)
-            .submit()
-            .get()
+    override suspend fun getFaviconFromDisk(file: File): Bitmap? {
+        return withContext(dispatcherProvider.io()) {
+            Glide.with(context)
+                .asBitmap()
+                .load(file)
+                .diskCacheStrategy(DiskCacheStrategy.NONE)
+                .skipMemoryCache(true)
+                .submit()
+                .get()
+        }
     }
 
-    override fun getFaviconFromUrl(uri: Uri): Bitmap? {
-        return Glide.with(context)
-            .asBitmap()
-            .load(uri)
-            .diskCacheStrategy(DiskCacheStrategy.NONE)
-            .skipMemoryCache(true)
-            .submit()
-            .get()
+    override suspend fun getFaviconFromUrl(uri: Uri): Bitmap? {
+        return withContext(dispatcherProvider.io()) {
+            Glide.with(context)
+                .asBitmap()
+                .load(uri)
+                .diskCacheStrategy(DiskCacheStrategy.NONE)
+                .skipMemoryCache(true)
+                .submit()
+                .get()
+        }
     }
 
     override suspend fun loadFaviconToView(file: File, view: ImageView) {
-        Glide.with(context)
-            .load(file)
-            .diskCacheStrategy(DiskCacheStrategy.NONE)
-            .skipMemoryCache(true)
-            .placeholder(R.drawable.ic_globe_gray_16dp)
-            .error(R.drawable.ic_globe_gray_16dp)
-            .into(view)
+        withContext(dispatcherProvider.main()) {
+            Glide.with(context)
+                .load(file)
+                .diskCacheStrategy(DiskCacheStrategy.NONE)
+                .skipMemoryCache(true)
+                .placeholder(R.drawable.ic_globe_gray_16dp)
+                .error(R.drawable.ic_globe_gray_16dp)
+                .into(view)
+        }
     }
 
 }

@@ -155,13 +155,25 @@ class DuckDuckGoFaviconManagerTest {
     }
 
     @Test
-    fun whenSaveToTempThenReplacePersistedFavicons() = coroutineRule.runBlocking {
+    fun whenSaveToTempIfFaviconHasBetterQualityThenReplacePersistedFavicons() = coroutineRule.runBlocking {
         val bitmap: Bitmap = Bitmap.createBitmap(1, 1, Bitmap.Config.RGB_565)
         whenever(mockFireproofWebsiteDao.fireproofWebsitesCountByDomain(any())).thenReturn(1)
+        whenever(mockFaviconPersister.store(FAVICON_TEMP_DIR, "subFolder", bitmap, "example.com")).thenReturn(File("example"))
 
         testee.saveToTemp("subFolder", bitmap, "example.com")
 
         verify(mockFaviconPersister).store(FAVICON_PERSISTED_DIR, NO_SUBFOLDER, bitmap, "example.com")
+    }
+
+    @Test
+    fun whenSaveToTempIfFaviconDoesNotHaveBetterQualityThenDoNotReplacePersistedFavicons() = coroutineRule.runBlocking {
+        val bitmap: Bitmap = Bitmap.createBitmap(1, 1, Bitmap.Config.RGB_565)
+        whenever(mockFireproofWebsiteDao.fireproofWebsitesCountByDomain(any())).thenReturn(1)
+        whenever(mockFaviconPersister.store(FAVICON_TEMP_DIR, "subFolder", bitmap, "example.com")).thenReturn(null)
+
+        testee.saveToTemp("subFolder", bitmap, "example.com")
+
+        verify(mockFaviconPersister, never()).store(FAVICON_PERSISTED_DIR, NO_SUBFOLDER, bitmap, "example.com")
     }
 
     @Test

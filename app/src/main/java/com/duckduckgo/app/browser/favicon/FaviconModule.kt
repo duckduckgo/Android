@@ -50,7 +50,7 @@ class FaviconModule {
 
     @Provides
     @Singleton
-    fun faviconDownloader(context: Context): FaviconDownloader {
-        return GlideFaviconDownloader(context)
+    fun faviconDownloader(context: Context, dispatcherProvider: DispatcherProvider): FaviconDownloader {
+        return GlideFaviconDownloader(context, dispatcherProvider)
     }
 }

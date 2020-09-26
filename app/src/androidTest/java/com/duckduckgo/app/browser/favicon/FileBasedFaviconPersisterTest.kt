@@ -33,6 +33,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
@@ -101,7 +102,7 @@ class FileBasedFaviconPersisterTest {
 
         val file = testee.store(testDirectory, subFolder, bitmap, "filename")
 
-        assertTrue(file.exists())
+        assertTrue(file!!.exists())
         verifySubfolderUsedAsDirectory(subFolder, file)
     }
 
@@ -113,22 +114,31 @@ class FileBasedFaviconPersisterTest {
         testee.store(testDirectory, subFolder, bitmap, "filename")
         val file = testee.store(testDirectory, subFolder, newBitmap, "filename")
 
-        assertTrue(file.exists())
+        assertTrue(file!!.exists())
         val returnedBitmap = BitmapFactory.decodeFile(file.absolutePath)
         assertEquals(2, returnedBitmap.width)
     }
 
     @Test
-    fun whenStoreBitmapAndSizeIsSmallerThanPreviouslySavedThenReturnOldFile() = coroutineRule.runBlocking {
+    fun whenStoreBitmapAndSizeIsSmallerThanPreviouslySavedThenReturnNull() = coroutineRule.runBlocking {
         val bitmap: Bitmap = Bitmap.createBitmap(2, 2, Bitmap.Config.RGB_565)
         val newBitmap: Bitmap = Bitmap.createBitmap(1, 1, Bitmap.Config.RGB_565)
 
         testee.store(testDirectory, subFolder, bitmap, "filename")
         val file = testee.store(testDirectory, subFolder, newBitmap, "filename")
 
-        assertTrue(file.exists())
-        val returnedBitmap = BitmapFactory.decodeFile(file.absolutePath)
-        assertEquals(2, returnedBitmap.width)
+        assertNull(file)
+    }
+
+    @Test
+    fun whenStoreBitmapAndSizeIsEqualsThanPreviouslySavedThenDoesNotReturnNull() = coroutineRule.runBlocking {
+        val bitmap: Bitmap = Bitmap.createBitmap(1, 1, Bitmap.Config.RGB_565)
+        val newBitmap: Bitmap = Bitmap.createBitmap(1, 1, Bitmap.Config.RGB_565)
+
+        testee.store(testDirectory, subFolder, bitmap, "filename")
+        val file = testee.store(testDirectory, subFolder, newBitmap, "filename")
+
+        assertNotNull(file)
     }
 
     @Test
