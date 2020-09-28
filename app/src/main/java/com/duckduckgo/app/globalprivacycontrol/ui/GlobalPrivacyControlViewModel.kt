@@ -46,7 +46,7 @@ class GlobalPrivacyControlViewModel(
     }
 
     fun onUserToggleGlobalPrivacyControl(enabled: Boolean) {
-        val pixelName = if (enabled) FIREPROOF_LOGIN_TOGGLE_ENABLED else FIREPROOF_LOGIN_TOGGLE_DISABLED
+        val pixelName = if (enabled) SETTINGS_DO_NOT_SELL_ON else SETTINGS_DO_NOT_SELL_OFF
         pixel.fire(pixelName)
         settingsDataStore.globalPrivacyControlEnabled = enabled
         _viewState.value = _viewState.value?.copy(globalPrivacyControlEnabled = enabled)

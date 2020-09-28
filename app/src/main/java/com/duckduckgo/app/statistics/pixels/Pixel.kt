@@ -124,6 +124,8 @@ interface Pixel {
         SETTINGS_THEME_TOGGLED_LIGHT("ms_tl"),
         SETTINGS_THEME_TOGGLED_DARK("ms_td"),
         SETTINGS_MANAGE_WHITELIST("ms_mw"),
+        SETTINGS_DO_NOT_SELL_ON("ms_dns_on"),
+        SETTINGS_DO_NOT_SELL_OFF("ms_dns_off"),
 
         SURVEY_CTA_SHOWN(pixelName = "mus_cs"),
         SURVEY_CTA_DISMISSED(pixelName = "mus_cd"),
