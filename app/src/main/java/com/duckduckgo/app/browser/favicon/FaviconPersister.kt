@@ -23,7 +23,6 @@ import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.file.FileDeleter
 import com.duckduckgo.app.global.sha256
 import kotlinx.coroutines.NonCancellable
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.FileOutputStream
@@ -64,24 +63,8 @@ class FileBasedFaviconPersister(
     }
 
     override suspend fun store(directory: String, subFolder: String, bitmap: Bitmap, domain: String): File? {
-        return runBlocking(dispatcherProvider.io() + NonCancellable) {
-            val existingFile = fileForFavicon(directory, subFolder, domain)
-
-            if (existingFile.exists()) {
-
-                val existingFavicon = BitmapFactory.decodeFile(existingFile.absolutePath)
-
-                existingFavicon?.let {
-                    if (it.width > bitmap.width) {
-                        return@runBlocking null // Stored file has better quality
-                    }
-                }
-            }
-
-            val faviconFile = prepareDestinationFile(directory, subFolder, domain)
-            writeBytesToFile(faviconFile, bitmap)
-
-            return@runBlocking faviconFile
+        return withContext(dispatcherProvider.io() + NonCancellable) {
+            writeToDisk(directory, subFolder, bitmap, domain)
         }
     }
 
@@ -115,6 +98,27 @@ class FileBasedFaviconPersister(
         fileDestination.mkdirs()
 
         return File(fileDestination, filename(url))
+    }
+
+    @Synchronized
+    private fun writeToDisk(directory: String, subFolder: String, bitmap: Bitmap, domain: String): File? {
+        val existingFile = fileForFavicon(directory, subFolder, domain)
+
+        if (existingFile.exists()) {
+
+            val existingFavicon = BitmapFactory.decodeFile(existingFile.absolutePath)
+
+            existingFavicon?.let {
+                if (it.width > bitmap.width) {
+                    return null // Stored file has better quality
+                }
+            }
+        }
+
+        val faviconFile = prepareDestinationFile(directory, subFolder, domain)
+        writeBytesToFile(faviconFile, bitmap)
+
+        return faviconFile
     }
 
     private fun writeBytesToFile(file: File, bitmap: Bitmap) {
