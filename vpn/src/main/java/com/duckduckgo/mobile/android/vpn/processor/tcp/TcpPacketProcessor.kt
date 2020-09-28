@@ -159,10 +159,9 @@ class TcpPacketProcessor(
         }
 
         @AddTrace(name = "packet_processor_send_fin", enabled = true)
-        fun TCB.sendFinToClient(queues: VpnQueues, packet: Packet) {
+        fun TCB.sendFinToClient(queues: VpnQueues, packet: Packet, payloadSize: Int) {
             val buffer = ByteBufferPool.acquire()
             synchronized(this) {
-                val payloadSize = packet.tcpPayloadSize(true)
 
                 var responseAck = acknowledgementNumberToClient + payloadSize
                 val responseSeq = acknowledgementNumberToServer
@@ -187,6 +186,7 @@ class TcpPacketProcessor(
             queues.networkToDevice.offerFirst(buffer)
 
             try {
+                selectionKey.cancel()
                 channel.close()
             } catch (e: Exception) {
                 Timber.w(e, "Problem closing socket connection for %s", ipAndPort)

@@ -26,22 +26,3 @@ data class TcbState(
         return "Server: $serverState. Client: $clientState"
     }
 }
-
-class TCPStateReducer(){
-
-//    fun reduce(currentState: TcbState, action: TcpStateFlow.TcpStateAction): TcbState {
-//        return when (action.events){
-//            is TcpStateFlow.Event.OpenConnection -> openConnection(currentState, action.events)
-//            else -> TcbState()
-//        }
-//    }
-//
-//    private fun openConnection(currentState: TcbState, event: TcpStateFlow.Event): TcbState {
-//        if (currentState.clientState == TCB.TCBStatus.SYN_SENT){
-//            // duplicate syn flag sent through, we don't want to do anything
-//            return TcpStateFlow.TcpStateAction()
-//        }
-//        return TcbState(clientState = TCB.TCBStatus.SYN_SENT, serverState = TCB.TCBStatus.LISTEN)
-//    }
-
-}

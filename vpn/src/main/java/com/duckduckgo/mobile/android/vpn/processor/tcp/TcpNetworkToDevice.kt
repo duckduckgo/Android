@@ -19,6 +19,8 @@ package com.duckduckgo.mobile.android.vpn.processor.tcp
 import android.os.Handler
 import android.view.ViewDebug.trace
 import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpPacketProcessor.Companion.logPacketDetails
+import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpPacketProcessor.Companion.sendFinToClient
+import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpPacketProcessor.Companion.sendResetPacket
 import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpPacketProcessor.Companion.updateState
 import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpStateFlow.Event.MoveState
 import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpStateFlow.Event.MoveState.MoveClientToState
@@ -109,6 +111,17 @@ class TcpNetworkToDevice(
                 val readBytes = channel.read(receiveBuffer)
 
                 if (endOfStream(readBytes)) {
+                    Timber.w(
+                        "Network-to-device end of stream ${tcb.ipAndPort}. ${tcb.tcbState} ${
+                            logPacketDetails(
+                                packet,
+                                tcb.sequenceNumberToClientInitial,
+                                tcb.sequenceNumberToClient,
+                                tcb.acknowledgementNumberToClient
+                            )
+                        }"
+                    )
+                    // sendToNetworkToDeviceQueue(packet, receiveBuffer, tcb, 0)
                     handleEndOfStream(tcb, packet, key, channel)
                     return
                 } else {
@@ -124,9 +137,7 @@ class TcpNetworkToDevice(
 
     @AddTrace(name = "network_to_device_send_to_device_queue", enabled = true)
     private fun sendToNetworkToDeviceQueue(packet: Packet, receiveBuffer: ByteBuffer, tcb: TCB, readBytes: Int) {
-        //Timber.i("Network-to-device packet ${tcb.ipAndPort}. $readBytes bytes. ${logPacketDetails(packet, tcb.sequenceNumberToClientInitial, tcb.sequenceNumberToClient, tcb.acknowledgementNumberToClient)}")
         packet.updateTcpBuffer(receiveBuffer, (PSH or ACK).toByte(), tcb.sequenceNumberToClient, tcb.acknowledgementNumberToClient, readBytes)
-
         tcb.sequenceNumberToClient += readBytes
         receiveBuffer.position(HEADER_SIZE + readBytes)
 
@@ -135,25 +146,14 @@ class TcpNetworkToDevice(
 
     @AddTrace(name = "network_to_device_handle_end_of_stream", enabled = true)
     private fun handleEndOfStream(tcb: TCB, packet: Packet, key: SelectionKey, channel: SocketChannel) {
-        Timber.w(
-            "Network-to-device end of stream ${tcb.ipAndPort}. ${tcb.tcbState} ${
-                logPacketDetails(
-                    packet,
-                    tcb.sequenceNumberToClientInitial,
-                    tcb.sequenceNumberToClient,
-                    tcb.acknowledgementNumberToClient
-                )
-            }"
-        )
+        val action = TcpStateFlow.socketEndOfStream(tcb.tcbState)
+        Timber.v("End of Stream Actions: ${action.events} for ${tcb.ipAndPort}")
 
-        // close connection with remote end point as there's no more communication required
-        key.cancel()
-        channel.close()
-        //
-        TcpStateFlow.socketEndOfStream(tcb.tcbState).events.forEach {
+        action.events.forEach {
             when (it) {
                 is MoveState -> tcb.updateState(it)
-                SendReset -> sendReset(packet, tcb)
+                SendReset -> tcb.sendResetPacket(queues, packet, 0)
+                TcpStateFlow.Event.SendFin -> tcb.sendFinToClient(queues, packet, 0)
                 else -> Timber.w("Unhandled event for ${tcb.ipAndPort}. $it")
             }
         }

@@ -25,7 +25,6 @@ import xyz.hexene.localvpn.Packet
 import xyz.hexene.localvpn.TCB
 import xyz.hexene.localvpn.TCB.TCBStatus.*
 
-
 class TcpStateFlow {
 
     companion object {
@@ -41,7 +40,7 @@ class TcpStateFlow {
                 LISTEN -> handlePacketInStateListen(connectionKey, currentState, packetType)
                 SYN_RECEIVED -> handlePacketInSynReceived(connectionKey, currentState, packetType, sequenceNumberToClientInitial)
                 ESTABLISHED -> handlePacketInEstablished(connectionKey, currentState, packetType)
-                LAST_ACK -> handlePacketInLastAck(packetType, connectionKey)
+                LAST_ACK -> handlePacketInLastAck(packetType, connectionKey, currentState)
                 FIN_WAIT_1 -> handlePacketInFinWait1(connectionKey, currentState, packetType)
                 FIN_WAIT_2 -> handlePacketInFinWait2(connectionKey, currentState, packetType)
                 CLOSING -> handlePacketInClosing(connectionKey, currentState, packetType)
@@ -76,30 +75,37 @@ class TcpStateFlow {
         }
 
         @AddTrace(name = "tcp_state_flow_handle_last_ack", enabled = true)
-        private fun handlePacketInLastAck(packetType: PacketType, connectionKey: String): List<Event> {
+        private fun handlePacketInLastAck(packetType: PacketType, connectionKey: String, currentState: TcbState): List<Event> {
             return when {
                 packetType.isRst -> {
-                    Timber.w("Received RESET while in CLOSE_WAIT. Closing connection")
+                    Timber.w("Received RESET while in $currentState. Closing connection")
                     listOf(CloseConnection)
                 }
-                isAckForOurFin(packetType, connectionKey) && (packetType.isAck || packetType.isFin) -> {
+                isAckForOurFin(packetType, connectionKey, currentState) -> {
                     listOf(CloseConnection)
+                }
+                packetType.isAck -> {
+                    listOf(ProcessPacket)
                 }
                 else -> listOf(SendReset)
             }
         }
 
-        private fun isAckForOurFin(packetType: PacketType, connectionKey: String): Boolean {
+        private fun isAckForOurFin(packetType: PacketType, connectionKey: String, currentState: TcbState): Boolean {
+            if (!packetType.isAck && !packetType.isFin) {
+                return false
+            }
+
             val match = packetType.ackNum == packetType.finSequenceNumberToClient
             if (!match) {
                 Timber.w(
-                    "%s - In LAST_ACK, received [fin=%s, ack=%s] but mismatching numbers. Expected=%d, actual=%d",
-                    connectionKey, packetType.isFin, packetType.isAck, packetType.finSequenceNumberToClient, packetType.ackNum
+                    "%s - %s, received [fin=%s, ack=%s] but mismatching numbers. Expected=%d, actual=%d",
+                    connectionKey, currentState, packetType.isFin, packetType.isAck, packetType.finSequenceNumberToClient, packetType.ackNum
                 )
             } else {
                 Timber.d(
-                    "%s - In LAST_ACK, received [fin=%s, ack=%s] with matching numbers. %d",
-                    connectionKey, packetType.isFin, packetType.isAck, packetType.finSequenceNumberToClient
+                    "%s - %s, received [fin=%s, ack=%s] with matching numbers. %d",
+                    connectionKey, currentState, packetType.isFin, packetType.isAck, packetType.finSequenceNumberToClient
                 )
             }
             return match
@@ -109,22 +115,23 @@ class TcpStateFlow {
         private fun handlePacketInFinWait1(connectionKey: String, currentState: TcbState, packetType: PacketType): List<Event> {
             val eventList = mutableListOf<Event>()
 
-            // check if there's data. if so, should ACK it
-            if (packetType.hasData) {
-                eventList.add(SendAck)
-            }
-
             eventList.addAll(
                 when {
                     packetType.isRst -> {
                         Timber.w("Received RESET while in TIME_WAIT. Closing connection")
                         listOf(CloseConnection)
                     }
-                    packetType.isAck -> {
-                        listOf(MoveServerToState(FIN_WAIT_2))
-                    }
                     packetType.isFin -> {
                         listOf(SendAck, MoveServerToState(CLOSING))
+                    }
+                    packetType.isAck -> {
+                        // we can also arrive here if the server ends the stream and we send a FIN to client
+                        // this is the ACK from that FIN so we can now close everything
+                        if (isAckForOurFin(packetType, connectionKey, currentState)) {
+                            listOf(MoveServerToState(FIN_WAIT_2))
+                        } else {
+                            listOf(ProcessPacket, MoveServerToState(FIN_WAIT_2))
+                        }
                     }
                     else -> listOf(SendReset)
                 }
@@ -146,8 +153,9 @@ class TcpStateFlow {
                         listOf(CloseConnection)
                     }
                     packetType.hasData -> {
-                        listOf(SendAck)
+                        listOf(ProcessPacket)
                     }
+
                     else -> listOf(SendReset)
                 }
             )
@@ -231,21 +239,22 @@ class TcpStateFlow {
             return when {
                 packetType.isFin -> {
                     mutableListOf<Event>().also { events ->
-                        events.add(MoveClientToState(FIN_WAIT_1))
                         // FIN might also have data, so ProcessPacket will handle that. if not, still need to send ACK in response to FIN
                         if (packetType.hasData) {
                             events.add(ProcessPacket)
+                            events.add(SendFin)
                         } else {
                             events.add(SendFin)
                         }
+                        events.add(MoveClientToState(FIN_WAIT_1))
                         events.add(MoveServerToState(LAST_ACK))
                     }
                 }
-                packetType.isAck -> listOf(ProcessPacket)
                 packetType.isRst -> {
                     Timber.w("Received RESET while in ESTABLISHED. Closing connection")
                     listOf(CloseConnection)
                 }
+                packetType.isAck -> listOf(ProcessPacket)
                 else -> listOf(SendReset)
             }
         }
@@ -262,7 +271,7 @@ class TcpStateFlow {
         }
 
         fun socketEndOfStream(currentState: TcbState): TcpStateAction {
-            return TcpStateAction(listOf(SendReset))
+            return TcpStateAction(listOf(SendFin, MoveServerToState(FIN_WAIT_1), MoveClientToState(LAST_ACK)))
         }
 
         private fun unhandledEvent(connectionKey: String, currentState: TcbState, packetType: PacketType): List<Event> {
@@ -298,6 +307,7 @@ class TcpStateFlow {
         object ProcessPacket : Event()
         object SendAck : Event()
         object SendFin : Event()
+        object SendFinWithData : Event()
         object SendSynAck : Event()
         object SendReset : Event()
         object CloseConnection : Event()

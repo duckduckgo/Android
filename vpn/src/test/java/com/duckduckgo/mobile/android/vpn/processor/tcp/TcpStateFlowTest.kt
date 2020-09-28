@@ -122,10 +122,11 @@ class TcpStateFlowTest {
         val tcbState = givenTcbState(serverState = ESTABLISHED, clientState = ESTABLISHED)
         val response = whenANewPacketArrives(tcbState, FIN_PACKET_WITH_DATA)
 
-        assertTrue(response.events.size == 3)
+        assertTrue(response.events.size == 4)
         assertClientStateMove(FIN_WAIT_1, response.events[0])
         assertTrue(response.events[1] is ProcessPacket)
-        assertServerStateMove(LAST_ACK, response.events[2])
+        assertTrue(response.events[2] is SendFin)
+        assertServerStateMove(LAST_ACK, response.events[3])
     }
 
     @Test
@@ -169,17 +170,26 @@ class TcpStateFlowTest {
     }
 
     @Test
-    fun whenLastAckAndUnexpectedAckReceivedThenSendReset() {
+    fun whenLastAckAndUnexpectedAckReceivedThenProcessPacket() {
         val tcbState = givenTcbState(serverState = LAST_ACK, clientState = ESTABLISHED)
         val response = whenANewPacketArrives(tcbState, ACK_PACKET)
 
-        assertTrue(response.events[0] is SendReset)
+        assertTrue(response.events[0] is ProcessPacket)
     }
 
     @Test
     fun whenFinWait1AndAckReceivedThenMoveToFinWait2() {
         val tcbState = givenTcbState(serverState = FIN_WAIT_1, clientState = ESTABLISHED)
         val response = whenANewPacketArrives(tcbState, ACK_PACKET)
+
+        assertTrue(response.events[0] is ProcessPacket)
+        assertServerStateMove(FIN_WAIT_2, response.events[1])
+    }
+
+    @Test
+    fun whenFinWait1AndAckForOurFinReceivedThenMoveToFinWait2() {
+        val tcbState = givenTcbState(serverState = FIN_WAIT_1, clientState = ESTABLISHED)
+        val response = whenANewPacketArrives(tcbState, ACK_FOR_OUR_FIN_PACKET)
 
         assertServerStateMove(FIN_WAIT_2, response.events[0])
     }
@@ -218,11 +228,11 @@ class TcpStateFlowTest {
     }
 
     @Test
-    fun whenFinWait2AndPacketWithDataReceivedThenSendsAck() {
+    fun whenFinWait2AndPacketWithDataReceivedThenProcessPacket() {
         val tcbState = givenTcbState(serverState = FIN_WAIT_2, clientState = ESTABLISHED)
         val response = whenANewPacketArrives(tcbState, DATA_PACKET)
 
-        assertTrue(response.events[0] is SendAck)
+        assertTrue(response.events[0] is ProcessPacket)
     }
 
     @Test

@@ -27,7 +27,6 @@ import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpPacketProcessor.Compan
 import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpPacketProcessor.Companion.updateState
 import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpPacketProcessor.PendingWriteData
 import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpStateFlow.Event.*
-import com.duckduckgo.mobile.android.vpn.processor.tcp.hostname.HostnameExtractor
 import com.duckduckgo.mobile.android.vpn.processor.tcp.tracker.RequestTrackerType
 import com.duckduckgo.mobile.android.vpn.processor.tcp.tracker.VpnTrackerDetector
 import com.duckduckgo.mobile.android.vpn.service.VpnQueues
@@ -94,9 +93,9 @@ class TcpDeviceToNetwork(
             //Timber.i("Processed device-to-network packet. Existing connection. Took ${(System.nanoTime() - startTime) / 1_000_000}ms")
         }
 
-//        if (responseBuffer.position() == 0) {
-//            ByteBufferPool.release(responseBuffer)
-//        }
+        //        if (responseBuffer.position() == 0) {
+        //            ByteBufferPool.release(responseBuffer)
+        //        }
         ByteBufferPool.release(payloadBuffer)
     }
 
@@ -155,12 +154,14 @@ class TcpDeviceToNetwork(
     @AddTrace(name = "device_to_network_process_packet_tcb_not_initialized", enabled = true)
     private fun processPacketTcbNotInitialized(connectionKey: String, packet: Packet, totalPacketLength: Int, connectionParams: TcpConnectionParams) {
         Timber.i(
-            "New packet. $connectionKey. TCB not initialized. ${TcpPacketProcessor.logPacketDetails(
-                packet,
-                packet.tcpHeader.sequenceNumber,
-                packet.tcpHeader.sequenceNumber,
-                packet.tcpHeader.acknowledgementNumber
-            )}. Packet length: $totalPacketLength.  Data length: ${packet.tcpPayloadSize(true)}"
+            "New packet. $connectionKey. TCB not initialized. ${
+                TcpPacketProcessor.logPacketDetails(
+                    packet,
+                    packet.tcpHeader.sequenceNumber,
+                    packet.tcpHeader.sequenceNumber,
+                    packet.tcpHeader.acknowledgementNumber
+                )
+            }. Packet length: $totalPacketLength.  Data length: ${packet.tcpPayloadSize(true)}"
         )
         TcpStateFlow.newPacket(connectionKey, TcbState(), packet.asPacketType(), -1).events.forEach {
             when (it) {
@@ -212,14 +213,16 @@ class TcpDeviceToNetwork(
             tcb.acknowledgementNumberToServer = packet.tcpHeader.acknowledgementNumber
         }
 
-        val action = TcpStateFlow.newPacket(connectionKey, tcb.tcbState, packet.asPacketType(tcb.finSequenceNumberToClient), tcb.sequenceNumberToClientInitial)
+        val action =
+            TcpStateFlow.newPacket(connectionKey, tcb.tcbState, packet.asPacketType(tcb.finSequenceNumberToClient), tcb.sequenceNumberToClientInitial)
         Timber.v("Action: ${action.events} for ${tcb.ipAndPort}")
 
         action.events.forEach {
             when (it) {
                 is MoveState -> tcb.updateState(it)
                 ProcessPacket -> processPacket(tcb, packet, payloadBuffer, connectionParams)
-                SendFin -> tcb.sendFinToClient(queues, packet)
+                SendFin -> tcb.sendFinToClient(queues, packet, packet.tcpPayloadSize(true))
+                SendFinWithData -> tcb.sendFinToClient(queues, packet, 0)
                 CloseConnection -> tcb.closeConnection(responseBuffer)
                 DelayedCloseConnection -> handler.postDelayed(3_000) { tcb.closeConnection(responseBuffer) }
                 SendAck -> tcb.sendAck(queues, packet)
@@ -265,8 +268,10 @@ class TcpDeviceToNetwork(
         val entryTime = System.nanoTime()
         synchronized(tcb) {
             val payloadSize = payloadBuffer.limit() - payloadBuffer.position()
-            if (payloadSize == 0) return
-
+            if (payloadSize == 0) {
+                Timber.v(" ${tcb.ipAndPort} Payload Size is 0. There's nothing to Process")
+                return
+            }
             val isTracker = determineIfTracker(tcb, packet, payloadBuffer)
 
             if (isTracker) {
@@ -317,64 +322,6 @@ class TcpDeviceToNetwork(
         }
     }
 
-    private fun processDuplicateSyn(tcb: TCB, params: TcpConnectionParams) {
-        // Timber.v("Processing duplicate SYN")
-        //
-        // synchronized(tcb) {
-        //     if (tcb.clientState == TCB.TCBStatus.SYN_SENT) {
-        //         tcb.myAcknowledgementNum = params.packet.tcpHeader.sequenceNumber + 1
-        //         return
-        //     }
-        // }
-        //
-        // tcb.sendResetPacket(queues, 1, params.responseBuffer)
-    }
-
-    private fun processFin(tcb: TCB, connectionParams: TcpConnectionParams) {
-        // val packet = tcb.referencePacket
-        // tcb.myAcknowledgementNum = connectionParams.packet.tcpHeader.sequenceNumber + 1
-        // tcb.theirAcknowledgementNum = connectionParams.packet.tcpHeader.acknowledgementNumber
-        //
-        // when (tcb.clientState) {
-        //     ESTABLISHED -> {
-        //         Timber.i("FIN packet received in established state; send ACK and move to CLOSE_WAIT")
-        //
-        //         tcb.clientState = LAST_ACK
-        //         Timber.v("Update TCB ${tcb.ipAndPort} status: ${tcb.clientState}")
-        //         tcb.sendFinAck(queues, packet, connectionParams)
-        //     }
-        //     LAST_ACK -> {
-        //         tcb.clientState = LAST_ACK
-        //         Timber.v("Update TCB ${tcb.ipAndPort} status: ${tcb.clientState}")
-        //
-        //         tcb.sendFinAck(queues, packet, connectionParams)
-        //     }
-        //     FIN_WAIT_2 -> {
-        //         packet.updateTcpBuffer(connectionParams.responseBuffer, (ACK).toByte(), tcb.mySequenceNum, tcb.myAcknowledgementNum, 0)
-        //         tcb.mySequenceNum++
-        //         queues.networkToDevice.offer(connectionParams.responseBuffer)
-        //         //TCB.closeTCB(tcb)
-        //     }
-        //     else -> {
-        //         Timber.w("FIN packet received when in state ${tcb.clientState}. Send RST and close connection")
-        //         packet.updateTcpBuffer(connectionParams.responseBuffer, RST.toByte(), 0, tcb.myAcknowledgementNum, 0)
-        //         queues.networkToDevice.offer(connectionParams.responseBuffer)
-        //         //TCB.closeTCB(tcb)
-        //     }
-        // }
-
-//        if (tcb.waitingForNetworkData) {
-//            tcb.status = TCB.TCBStatus.CLOSE_WAIT
-//            Timber.v("Update TCB ${tcb.ipAndPort} status: ${tcb.status}")
-//            packet.updateTCPBuffer(connectionParams.responseBuffer, Packet.TCPHeader.ACK.toByte(), tcb.mySequenceNum, tcb.myAcknowledgementNum, 0)
-//        } else {
-//            tcb.status = TCB.TCBStatus.LAST_ACK
-//            Timber.v("Update TCB ${tcb.ipAndPort} status: ${tcb.status}")
-//            packet.updateTCPBuffer(connectionParams.responseBuffer, (Packet.TCPHeader.FIN or Packet.TCPHeader.ACK).toByte(), tcb.mySequenceNum, tcb.myAcknowledgementNum, 0)
-//            tcb.mySequenceNum++
-//        }
-//        queues.networkToDevice.offer(connectionParams.responseBuffer)
-    }
 }
 
 
