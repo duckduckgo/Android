@@ -25,11 +25,16 @@ import android.os.Binder
 import android.os.Build
 import android.os.IBinder
 import android.os.ParcelFileDescriptor
+import com.duckduckgo.mobile.android.vpn.BuildConfig
 import com.duckduckgo.mobile.android.vpn.processor.TunPacketReader
 import com.duckduckgo.mobile.android.vpn.processor.TunPacketWriter
 import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpPacketProcessor
-import com.duckduckgo.mobile.android.vpn.processor.tcp.hostname.*
+import com.duckduckgo.mobile.android.vpn.processor.tcp.hostname.AndroidHostnameExtractor
+import com.duckduckgo.mobile.android.vpn.processor.tcp.hostname.PayloadBytesExtractor
+import com.duckduckgo.mobile.android.vpn.processor.tcp.hostname.PlaintextHostHeaderExtractor
+import com.duckduckgo.mobile.android.vpn.processor.tcp.hostname.ServerNameIndicationHeaderHostExtractor
 import com.duckduckgo.mobile.android.vpn.processor.tcp.tracker.DomainBasedTrackerDetector
+import com.duckduckgo.mobile.android.vpn.processor.tcp.tracker.TrackerListProvider
 import com.duckduckgo.mobile.android.vpn.processor.udp.UdpPacketProcessor
 import com.duckduckgo.mobile.android.vpn.ui.notification.VpnNotificationBuilder
 import kotlinx.coroutines.CoroutineScope
@@ -54,8 +59,9 @@ class PassthroughVpnService : VpnService(), CoroutineScope by MainScope(), Netwo
     private val hostNameHeaderExtractor = PlaintextHostHeaderExtractor()
     private val encryptedRequestHostExtractor = ServerNameIndicationHeaderHostExtractor()
     private val payloadBytesExtractor = PayloadBytesExtractor()
+    private val trackerListProvider = TrackerListProvider()
     private val hostnameExtractor = AndroidHostnameExtractor(hostNameHeaderExtractor, encryptedRequestHostExtractor, payloadBytesExtractor)
-    private val trackerDetector = DomainBasedTrackerDetector(hostnameExtractor)
+    private val trackerDetector = DomainBasedTrackerDetector(hostnameExtractor, trackerListProvider.trackerList())
 
     val udpPacketProcessor = UdpPacketProcessor(queues, this)
     val tcpPacketProcessor = TcpPacketProcessor(queues, this, trackerDetector, hostnameExtractor)
@@ -244,6 +250,7 @@ class PassthroughVpnService : VpnService(), CoroutineScope by MainScope(), Netwo
         const val FOREGROUND_VPN_SERVICE_ID = 200
 
         private val EXCLUDED_APPS = listOf(
+            BuildConfig.LIBRARY_PACKAGE_NAME,
             "com.android.vending",
             "com.google.android.gsf.login",
             "com.google.android.googlequicksearchbox",

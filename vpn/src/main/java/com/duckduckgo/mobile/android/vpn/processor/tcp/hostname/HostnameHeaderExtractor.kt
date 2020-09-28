@@ -17,13 +17,13 @@
 package com.duckduckgo.mobile.android.vpn.processor.tcp.hostname
 
 
-interface HostNameHeaderExtractor {
+interface HostnameHeaderExtractor {
 
     fun extract(payload: String): String?
 
 }
 
-class PlaintextHostHeaderExtractor : HostNameHeaderExtractor {
+class PlaintextHostHeaderExtractor : HostnameHeaderExtractor {
 
     override fun extract(payload: String): String? {
 

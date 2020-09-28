@@ -30,7 +30,7 @@ interface HostnameExtractor {
 }
 
 class AndroidHostnameExtractor(
-    private val hostNameHeaderExtractor: HostNameHeaderExtractor,
+    private val hostnameHeaderExtractor: HostnameHeaderExtractor,
     private val encryptedRequestHostExtractor: EncryptedRequestHostExtractor,
     private val payloadBytesExtractor: PayloadBytesExtractor
 ) : HostnameExtractor {
@@ -47,7 +47,7 @@ class AndroidHostnameExtractor(
 
         val payloadBytes = payloadBytesExtractor.extract(packet, payloadBuffer)
 
-        var host = hostNameHeaderExtractor.extract(String(payloadBytes, StandardCharsets.US_ASCII))
+        var host = hostnameHeaderExtractor.extract(String(payloadBytes, StandardCharsets.US_ASCII))
         if (host != null) {
             Timber.v("Found domain from plaintext headers: %s", host)
             tcb.hostName = host

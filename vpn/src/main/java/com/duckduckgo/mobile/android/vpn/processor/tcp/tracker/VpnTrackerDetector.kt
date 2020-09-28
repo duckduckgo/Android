@@ -30,7 +30,8 @@ interface VpnTrackerDetector {
 }
 
 class DomainBasedTrackerDetector(
-    private val hostnameExtractor: HostnameExtractor
+    private val hostnameExtractor: HostnameExtractor,
+    private val trackerHostNames: List<String>
 ) : VpnTrackerDetector {
 
     override fun determinePacketType(tcb: TCB, packet: Packet, payloadBuffer: ByteBuffer): RequestTrackerType {
@@ -55,7 +56,10 @@ class DomainBasedTrackerDetector(
     }
 
     private fun String.isTracker(): Boolean {
-        return this == "example.com"
+        trackerHostNames.forEach { tracker ->
+            if (this.endsWith(tracker)) return true
+        }
+        return false
     }
 
 }

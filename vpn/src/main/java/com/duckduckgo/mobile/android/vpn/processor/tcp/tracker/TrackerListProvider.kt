@@ -14,19 +14,29 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.mobile.android.vpn
+package com.duckduckgo.mobile.android.vpn.processor.tcp.tracker
 
-import org.junit.Assert.assertEquals
-import org.junit.Test
 
-/**
- * Example local unit test, which will execute on the development machine (host).
- *
- * See [testing documentation](http://d.android.com/tools/testing).
- */
-class ExampleUnitTest {
-    @Test
-    fun addition_isCorrect() {
-        assertEquals(4, 2 + 2)
+class TrackerListProvider {
+
+    fun trackerList(): List<String> {
+        return TRACKER_HOST_NAMES
+    }
+
+    companion object {
+        val TRACKER_HOST_NAMES = listOf(
+            "example.com",
+
+            // google
+            "doubleclick.net",
+            "googlesyndication.com",
+            "google-analytics.com",
+            "googleadservices.com",
+            "googletagservices.com",
+            "googletagmanager.com",
+
+            // amazon
+            "amazon-adsystem.com"
+        )
     }
 }
