@@ -2541,7 +2541,7 @@ class BrowserTabViewModelTest {
 
         verify(mockPixel).fire(Pixel.PixelName.PRECISE_LOCATION_SYSTEM_DIALOG_NEVER)
         verify(geoLocationPermissions).clear(domain)
-        Assert.assertEquals(locationPermissionsDao.getPermission(domain)!!.permission, LocationPermissionType.DENY_ALWAYS)
+        assertEquals(locationPermissionsDao.getPermission(domain)!!.permission, LocationPermissionType.DENY_ALWAYS)
     }
 
     @Test
@@ -2671,6 +2671,78 @@ class BrowserTabViewModelTest {
         testee.onSystemLocationPermissionGranted()
 
         verify(mockSettingsStore).appLocationPermissionDeniedForever = false
+    }
+
+    @Test
+    fun whenUserSubmittedQueryIfGpcIsEnabledThenAddHeaderToUrl() {
+        whenever(mockOmnibarConverter.convertQueryToUrl("foo", null)).thenReturn("foo.com")
+        whenever(mockSettingsStore.globalPrivacyControlEnabled).thenReturn(true)
+
+        testee.onUserSubmittedQuery("foo")
+        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+
+        val command = commandCaptor.lastValue as Navigate
+        assertEquals(BrowserTabViewModel.GPC_HEADER_VALUE, command.headers[BrowserTabViewModel.GPC_HEADER])
+    }
+
+    @Test
+    fun whenUserSubmittedQueryIfGpcIsEnabledThenDoNotAddHeaderToUrl() {
+        whenever(mockOmnibarConverter.convertQueryToUrl("foo", null)).thenReturn("foo.com")
+        whenever(mockSettingsStore.globalPrivacyControlEnabled).thenReturn(false)
+
+        testee.onUserSubmittedQuery("foo")
+        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+
+        val command = commandCaptor.lastValue as Navigate
+        assertTrue(command.headers.isEmpty())
+    }
+
+    @Test
+    fun whenOnDesktopSiteModeToggledIfGpcIsEnabledThenAddHeaderToUrl() {
+        whenever(mockSettingsStore.globalPrivacyControlEnabled).thenReturn(true)
+        loadUrl("http://m.example.com")
+
+        testee.onDesktopSiteModeToggled(true)
+        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+
+        val command = commandCaptor.lastValue as Navigate
+        assertEquals(BrowserTabViewModel.GPC_HEADER_VALUE, command.headers[BrowserTabViewModel.GPC_HEADER])
+    }
+
+    @Test
+    fun whenOnDesktopSiteModeToggledIfGpcIsEnabledThenDoNotAddHeaderToUrl() {
+        whenever(mockSettingsStore.globalPrivacyControlEnabled).thenReturn(false)
+        loadUrl("http://m.example.com")
+
+        testee.onDesktopSiteModeToggled(true)
+        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+
+        val command = commandCaptor.lastValue as Navigate
+        assertTrue(command.headers.isEmpty())
+    }
+
+    @Test
+    fun whenExternalAppLinkClickedIfGpcIsEnabledThenAddHeaderToUrl() {
+        whenever(mockSettingsStore.globalPrivacyControlEnabled).thenReturn(true)
+        val intentType = SpecialUrlDetector.UrlType.IntentType("query", mock(), null)
+
+        testee.externalAppLinkClicked(intentType)
+        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+
+        val command = commandCaptor.lastValue as Command.HandleExternalAppLink
+        assertEquals(BrowserTabViewModel.GPC_HEADER_VALUE, command.headers[BrowserTabViewModel.GPC_HEADER])
+    }
+
+    @Test
+    fun whenExternalAppLinkClickedIfGpcIsEnabledThenDoNotAddHeaderToUrl() {
+        whenever(mockSettingsStore.globalPrivacyControlEnabled).thenReturn(false)
+        val intentType = SpecialUrlDetector.UrlType.IntentType("query", mock(), null)
+
+        testee.externalAppLinkClicked(intentType)
+        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+
+        val command = commandCaptor.lastValue as Command.HandleExternalAppLink
+        assertTrue(command.headers.isEmpty())
     }
 
     private fun givenNewPermissionRequestFromDomain(domain: String) {

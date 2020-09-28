@@ -504,7 +504,7 @@ class BrowserTabViewModel(
 
     private fun getUrlHeaders(): Map<String, String> {
         return if (appSettingsPreferencesStore.globalPrivacyControlEnabled) {
-            mapOf("Sec-GPC" to "1")
+            mapOf(GPC_HEADER to GPC_HEADER_VALUE)
         } else {
             emptyMap()
         }
@@ -1668,5 +1668,7 @@ class BrowserTabViewModel(
 
     companion object {
         private const val FIXED_PROGRESS = 50
+        const val GPC_HEADER = "Sec-GPC"
+        const val GPC_HEADER_VALUE = "1"
     }
 }
