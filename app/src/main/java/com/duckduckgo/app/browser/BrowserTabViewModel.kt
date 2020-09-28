@@ -998,12 +998,8 @@ class BrowserTabViewModel(
 
     override fun onSystemLocationPermissionNeverAllowed() {
         locationPermission?.let { locationPermission ->
-            val neverAllowedPermission = LocationPermissionType.DENY_ALWAYS
-            onSiteLocationPermissionSelected(locationPermission.origin, neverAllowedPermission)
+            onSiteLocationPermissionSelected(locationPermission.origin, LocationPermissionType.DENY_ALWAYS)
             pixel.fire(PixelName.PRECISE_LOCATION_SYSTEM_DIALOG_NEVER)
-            viewModelScope.launch {
-                locationPermissionsRepository.savePermission(locationPermission.origin, neverAllowedPermission)
-            }
         }
     }
 
