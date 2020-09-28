@@ -68,14 +68,12 @@ class GeoLocationPermissionsManager @Inject constructor(
     }
 
     override suspend fun clearAllButFireproofed() {
-        withContext(dispatchers.io()) {
-            val geolocationPermissions = GeolocationPermissions.getInstance()
-            val permissions = permissionsRepository.getLocationPermissionsSync()
-            permissions.forEach {
-                if (!fireproofWebsiteRepository.isDomainFireproofed(it.domain)) {
-                    geolocationPermissions.clear(it.domain)
-                    permissionsRepository.deletePermission(it.domain)
-                }
+        val geolocationPermissions = GeolocationPermissions.getInstance()
+        val permissions = permissionsRepository.getLocationPermissionsSync()
+        permissions.forEach {
+            if (!fireproofWebsiteRepository.isDomainFireproofed(it.domain)) {
+                geolocationPermissions.clear(it.domain)
+                permissionsRepository.deletePermission(it.domain)
             }
         }
     }
