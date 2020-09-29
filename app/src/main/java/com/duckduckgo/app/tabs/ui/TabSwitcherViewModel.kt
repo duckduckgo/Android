@@ -25,10 +25,7 @@ import com.duckduckgo.app.global.SingleLiveEvent
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
 
-class TabSwitcherViewModel(
-    private val tabRepository: TabRepository,
-    private val webViewSessionStorage: WebViewSessionStorage
-) : ViewModel() {
+class TabSwitcherViewModel(private val tabRepository: TabRepository, private val webViewSessionStorage: WebViewSessionStorage) : ViewModel() {
 
     var tabs: LiveData<List<TabEntity>> = tabRepository.liveTabs
     val command: SingleLiveEvent<Command> = SingleLiveEvent()
