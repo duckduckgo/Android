@@ -31,6 +31,9 @@ interface FireproofWebsiteDao {
     @Query("select * from fireproofWebsites WHERE domain = :domain")
     fun getFireproofWebsiteSync(domain: String): FireproofWebsiteEntity?
 
+    @Query("select count(*) from fireproofWebsites WHERE domain LIKE :domain")
+    fun fireproofWebsitesCountByDomain(domain: String): Int
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insert(fireproofWebsiteEntity: FireproofWebsiteEntity): Long
 

@@ -22,13 +22,18 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.lifecycle.Observer
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.view.html
 import kotlinx.android.synthetic.main.content_fireproof_websites.*
 import kotlinx.android.synthetic.main.include_toolbar.*
+import javax.inject.Inject
 
 class FireproofWebsitesActivity : DuckDuckGoActivity() {
+
+    @Inject
+    lateinit var faviconManager: FaviconManager
 
     lateinit var adapter: FireproofWebsiteAdapter
     private var deleteDialog: AlertDialog? = null
@@ -44,7 +49,7 @@ class FireproofWebsitesActivity : DuckDuckGoActivity() {
     }
 
     private fun setupFireproofWebsiteRecycler() {
-        adapter = FireproofWebsiteAdapter(viewModel)
+        adapter = FireproofWebsiteAdapter(viewModel, this, faviconManager)
         recycler.adapter = adapter
     }
 

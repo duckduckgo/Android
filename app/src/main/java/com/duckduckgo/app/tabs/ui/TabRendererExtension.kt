@@ -20,7 +20,6 @@ import android.content.Context
 import android.net.Uri
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.AppUrl
-import com.duckduckgo.app.global.faviconLocation
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.isBlank
 
@@ -38,8 +37,4 @@ private fun TabEntity.resolvedUrl(): String {
 
 fun TabEntity.displayUrl(): String {
     return resolvedUrl()
-}
-
-fun TabEntity.favicon(): Uri? {
-    return Uri.parse(resolvedUrl())?.faviconLocation()
 }
