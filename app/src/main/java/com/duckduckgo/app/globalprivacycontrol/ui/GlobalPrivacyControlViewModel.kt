@@ -57,6 +57,6 @@ class GlobalPrivacyControlViewModel(
     }
 
     companion object {
-        const val LEARN_MORE_URL = "https://spreadprivacy.com/announcing-global-privacy-control"
+        const val LEARN_MORE_URL = "https://duckduckgo.com/global-privacy-control-learn-more"
     }
 }
