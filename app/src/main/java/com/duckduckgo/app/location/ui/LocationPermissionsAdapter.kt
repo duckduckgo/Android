@@ -23,8 +23,11 @@ import android.widget.CompoundButton
 import android.widget.ImageView
 import android.widget.PopupMenu
 import androidx.core.view.isGone
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.global.view.quietlySetIsChecked
 import com.duckduckgo.app.global.view.websiteFromGeoLocationsApiOrigin
 import com.duckduckgo.app.location.data.LocationPermissionEntity
@@ -34,10 +37,13 @@ import kotlinx.android.synthetic.main.view_location_permissions_entry.view.locat
 import kotlinx.android.synthetic.main.view_location_permissions_entry.view.locationPermissionMenu
 import kotlinx.android.synthetic.main.view_location_permissions_section_title.view.locationPermissionsSectionTitle
 import kotlinx.android.synthetic.main.view_location_permissions_toggle.view.locationPermissionsToggle
+import kotlinx.coroutines.launch
 import timber.log.Timber
 
 class LocationPermissionsAdapter(
-    private val viewModel: LocationPermissionsViewModel
+    private val viewModel: LocationPermissionsViewModel,
+    private val lifecycleOwner: LifecycleOwner,
+    private val faviconManager: FaviconManager
 ) : RecyclerView.Adapter<LocationPermissionsViewHolder>() {
 
     private var allowedLocationPermissions: MutableList<LocationPermissionEntity> = mutableListOf()
@@ -108,7 +114,7 @@ class LocationPermissionsAdapter(
             }
             PRECISE_LOCATION_DOMAIN_TYPE -> {
                 val view = inflater.inflate(R.layout.view_location_permissions_entry, parent, false)
-                LocationPermissionsViewHolder.LocationPermissionsItemViewHolder(view, viewModel)
+                LocationPermissionsViewHolder.LocationPermissionsItemViewHolder(view, viewModel, lifecycleOwner, faviconManager)
             }
             EMPTY_STATE_TYPE -> {
                 val view = inflater.inflate(R.layout.view_location_permissions_empty_hint, parent, false)
@@ -220,7 +226,12 @@ sealed class LocationPermissionsViewHolder(itemView: View) : RecyclerView.ViewHo
 
     class LocationPermissionsSimpleViewViewHolder(itemView: View) : LocationPermissionsViewHolder(itemView)
 
-    class LocationPermissionsItemViewHolder(itemView: View, private val viewModel: LocationPermissionsViewModel) :
+    class LocationPermissionsItemViewHolder(
+        itemView: View,
+        private val viewModel: LocationPermissionsViewModel,
+        private val lifecycleOwner: LifecycleOwner,
+        private val faviconManager: FaviconManager
+    ) :
         LocationPermissionsViewHolder(itemView) {
 
         lateinit var entity: LocationPermissionEntity
@@ -243,7 +254,9 @@ sealed class LocationPermissionsViewHolder(itemView: View) : RecyclerView.ViewHo
         }
 
         private fun loadFavicon(url: String) {
-            viewModel.loadFavicon(url, itemView.locationPermissionEntryFavicon)
+            lifecycleOwner.lifecycleScope.launch {
+                faviconManager.loadToViewFromPersisted(url, itemView.locationPermissionEntryFavicon)
+            }
         }
 
         private fun showOverFlowMenu(overflowMenu: ImageView, entity: LocationPermissionEntity) {

@@ -226,12 +226,12 @@ class UriExtensionTest {
     }
 
     @Test
-    fun whenUrlDoesNotHaveHostReturnNull() {
+    fun whenUrlDoesNotHaveSchemeReturnNull() {
         assertNull("www.example.com".toUri().domain())
     }
 
     @Test
-    fun whenUrlHasHostReturnDomain() {
+    fun whenUrlHasSchemeReturnDomain() {
         assertEquals("www.example.com", "http://www.example.com".toUri().domain())
     }
 }

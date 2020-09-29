@@ -121,6 +121,7 @@ class FileBasedFaviconPersister(
         return faviconFile
     }
 
+    @Synchronized
     private fun writeBytesToFile(file: File, bitmap: Bitmap) {
         FileOutputStream(file).use { outputStream ->
             bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream)

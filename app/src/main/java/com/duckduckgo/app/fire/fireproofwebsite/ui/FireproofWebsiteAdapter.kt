@@ -22,18 +22,24 @@ import android.view.ViewGroup
 import android.widget.CompoundButton
 import android.widget.ImageView
 import android.widget.PopupMenu
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
 import com.duckduckgo.app.fire.fireproofwebsite.data.website
 import com.duckduckgo.app.global.view.quietlySetIsChecked
 import kotlinx.android.synthetic.main.view_fireproof_title.view.*
 import kotlinx.android.synthetic.main.view_fireproof_website_entry.view.*
 import kotlinx.android.synthetic.main.view_fireproof_website_toggle.view.*
+import kotlinx.coroutines.launch
 import timber.log.Timber
 
 class FireproofWebsiteAdapter(
-    private val viewModel: FireproofWebsitesViewModel
+    private val viewModel: FireproofWebsitesViewModel,
+    private val lifecycleOwner: LifecycleOwner,
+    private val faviconManager: FaviconManager
 ) : RecyclerView.Adapter<FireproofWebSiteViewHolder>() {
 
     companion object {
@@ -82,7 +88,7 @@ class FireproofWebsiteAdapter(
             }
             FIREPROOF_WEBSITE_TYPE -> {
                 val view = inflater.inflate(R.layout.view_fireproof_website_entry, parent, false)
-                FireproofWebSiteViewHolder.FireproofWebsiteItemViewHolder(view, viewModel)
+                FireproofWebSiteViewHolder.FireproofWebsiteItemViewHolder(view, viewModel, lifecycleOwner, faviconManager)
             }
             EMPTY_STATE_TYPE -> {
                 val view = inflater.inflate(R.layout.view_fireproof_website_empty_hint, parent, false)
@@ -143,7 +149,12 @@ sealed class FireproofWebSiteViewHolder(itemView: View) : RecyclerView.ViewHolde
 
     class FireproofWebsiteSimpleViewViewHolder(itemView: View) : FireproofWebSiteViewHolder(itemView)
 
-    class FireproofWebsiteItemViewHolder(itemView: View, private val viewModel: FireproofWebsitesViewModel) : FireproofWebSiteViewHolder(itemView) {
+    class FireproofWebsiteItemViewHolder(
+        itemView: View,
+        private val viewModel: FireproofWebsitesViewModel,
+        private val lifecycleOwner: LifecycleOwner,
+        private val faviconManager: FaviconManager
+    ) : FireproofWebSiteViewHolder(itemView) {
 
         lateinit var entity: FireproofWebsiteEntity
 
@@ -164,7 +175,9 @@ sealed class FireproofWebSiteViewHolder(itemView: View) : RecyclerView.ViewHolde
         }
 
         private fun loadFavicon(url: String) {
-            viewModel.loadFavicon(url, itemView.fireproofWebsiteEntryFavicon)
+            lifecycleOwner.lifecycleScope.launch {
+                faviconManager.loadToViewFromPersisted(url, itemView.fireproofWebsiteEntryFavicon)
+            }
         }
 
         private fun showOverFlowMenu(overflowMenu: ImageView, entity: FireproofWebsiteEntity) {

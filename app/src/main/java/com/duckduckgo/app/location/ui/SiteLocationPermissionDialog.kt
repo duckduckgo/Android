@@ -24,13 +24,13 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.DialogFragment
+import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.global.view.gone
 import com.duckduckgo.app.global.view.websiteFromGeoLocationsApiOrigin
 import com.duckduckgo.app.location.data.LocationPermissionType
 import dagger.android.support.AndroidSupportInjection
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import org.jetbrains.anko.find
@@ -112,7 +112,7 @@ class SiteLocationPermissionDialog : DialogFragment() {
 
             originUrl?.let { url ->
                 faviconJob?.cancel()
-                faviconJob = GlobalScope.launch {
+                faviconJob = this.lifecycleScope.launch {
                     if (tabId.isNotBlank()) {
                         faviconManager.loadToViewFromTemp(tabId, url, imageView)
                     } else {

@@ -16,7 +16,6 @@
 
 package com.duckduckgo.app.bookmarks.ui
 
-import android.widget.ImageView
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
@@ -30,6 +29,7 @@ import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.SingleLiveEvent
 import io.reactivex.schedulers.Schedulers
+import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.launch
 
 class BookmarksViewModel(
@@ -98,14 +98,8 @@ class BookmarksViewModel(
         command.value = ShowEditBookmark(bookmark)
     }
 
-    fun loadFavicon(url: String, view: ImageView) {
-        viewModelScope.launch {
-            faviconManager.loadToViewFromPersisted(url, view)
-        }
-    }
-
     fun delete(bookmark: BookmarkEntity) {
-        viewModelScope.launch(dispatcherProvider.io()) {
+        viewModelScope.launch(dispatcherProvider.io() + NonCancellable) {
             faviconManager.deletePersistedFavicon(bookmark.url)
             dao.delete(bookmark)
         }

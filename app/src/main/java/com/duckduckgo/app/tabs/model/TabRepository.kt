@@ -48,7 +48,7 @@ interface TabRepository {
 
     suspend fun deleteCurrentTabAndSelectSource()
 
-    fun deleteAll()
+    suspend fun deleteAll()
 
     suspend fun select(tabId: String)
 

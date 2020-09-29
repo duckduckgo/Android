@@ -128,7 +128,7 @@ class DuckDuckGoFaviconManagerTest {
 
     @Test
     fun whenPrefetchToTempThenGetFaviconFromUrlAndStoreFile() = coroutineRule.runBlocking {
-        val bitmap: Bitmap = Bitmap.createBitmap(1, 1, Bitmap.Config.RGB_565)
+        val bitmap = asBitmap()
         val url = "https://example.com"
         whenever(mockFaviconDownloader.getFaviconFromUrl(url.toUri().faviconLocation()!!)).thenReturn(bitmap)
 
@@ -156,7 +156,7 @@ class DuckDuckGoFaviconManagerTest {
 
     @Test
     fun whenSaveToTempIfFaviconHasBetterQualityThenReplacePersistedFavicons() = coroutineRule.runBlocking {
-        val bitmap: Bitmap = Bitmap.createBitmap(1, 1, Bitmap.Config.RGB_565)
+        val bitmap = asBitmap()
         whenever(mockFireproofWebsiteDao.fireproofWebsitesCountByDomain(any())).thenReturn(1)
         whenever(mockFaviconPersister.store(FAVICON_TEMP_DIR, "subFolder", bitmap, "example.com")).thenReturn(File("example"))
 
@@ -167,7 +167,7 @@ class DuckDuckGoFaviconManagerTest {
 
     @Test
     fun whenSaveToTempIfFaviconDoesNotHaveBetterQualityThenDoNotReplacePersistedFavicons() = coroutineRule.runBlocking {
-        val bitmap: Bitmap = Bitmap.createBitmap(1, 1, Bitmap.Config.RGB_565)
+        val bitmap = asBitmap()
         whenever(mockFireproofWebsiteDao.fireproofWebsitesCountByDomain(any())).thenReturn(1)
         whenever(mockFaviconPersister.store(FAVICON_TEMP_DIR, "subFolder", bitmap, "example.com")).thenReturn(null)
 
@@ -178,7 +178,7 @@ class DuckDuckGoFaviconManagerTest {
 
     @Test
     fun whenSaveToTempThenStoreFile() = coroutineRule.runBlocking {
-        val bitmap: Bitmap = Bitmap.createBitmap(1, 1, Bitmap.Config.RGB_565)
+        val bitmap = asBitmap()
 
         testee.saveToTemp("subFolder", bitmap, "example.com")
 
@@ -203,6 +203,7 @@ class DuckDuckGoFaviconManagerTest {
 
     @Test
     fun whenDeletePersistedFaviconIfNoRemainingFaviconsInDatabaseThenDeleteFavicon() = coroutineRule.runBlocking {
+        whenever(mockFireproofWebsiteDao.fireproofWebsitesCountByDomain(any())).thenReturn(1)
         testee.deletePersistedFavicon("example.com")
 
         verify(mockFaviconPersister).deletePersistedFavicon("example.com")
@@ -230,6 +231,8 @@ class DuckDuckGoFaviconManagerTest {
 
         verify(mockFaviconPersister).deleteAll(FAVICON_TEMP_DIR)
     }
+
+    private fun asBitmap(): Bitmap = Bitmap.createBitmap(1, 1, Bitmap.Config.RGB_565)
 
     private fun givenFaviconExistsInTemp() {
         whenever(mockFaviconPersister.faviconFile(any(), any(), any())).thenReturn(mockFile)

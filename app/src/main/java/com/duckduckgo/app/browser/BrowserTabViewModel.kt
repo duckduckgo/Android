@@ -313,7 +313,7 @@ class BrowserTabViewModel(
     private var webNavigationState: WebNavigationState? = null
     private var httpsUpgraded = false
     private val browserStateModifier = BrowserStateModifier()
-    private var faviconJob: Job? = null
+    private var faviconPrefetchJob: Job? = null
 
     private val fireproofWebsitesObserver = Observer<List<FireproofWebsiteEntity>> {
         browserViewState.value = currentBrowserViewState().copy(isFireproofWebsite = isFireproofWebsite())
@@ -541,8 +541,8 @@ class BrowserTabViewModel(
     }
 
     override fun prefetchFavicon(url: String) {
-        faviconJob?.cancel()
-        faviconJob = viewModelScope.launch {
+        faviconPrefetchJob?.cancel()
+        faviconPrefetchJob = viewModelScope.launch {
             val faviconFile = faviconManager.prefetchToTemp(tabId, url)
             if (faviconFile != null) {
                 tabRepository.updateTabFavicon(tabId, faviconFile.name)
@@ -1199,7 +1199,7 @@ class BrowserTabViewModel(
                 fireproofWebsiteRepository.fireproofWebsite(domain)?.let {
                     pixel.fire(PixelName.FIREPROOF_WEBSITE_ADDED)
                     command.value = ShowFireproofWebSiteConfirmation(fireproofWebsiteEntity = it)
-                    faviconManager.persistFavicon(tabId, domain)
+                    faviconManager.persistFavicon(tabId, url = domain)
                 }
             }
         }

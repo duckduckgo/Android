@@ -16,7 +16,6 @@
 
 package com.duckduckgo.app.bookmarks.ui
 
-import android.widget.ImageView
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
@@ -117,13 +116,5 @@ class BookmarksViewModelTest {
     fun whenBookmarkDeletedThenFaviconDeleted() = coroutineRule.runBlocking {
         testee.delete(bookmark)
         verify(faviconManager).deletePersistedFavicon(bookmark.url)
-    }
-
-    @Test
-    fun whenLoadFaviconThenLoadToViewPersistedCalled() = coroutineRule.runBlocking {
-        val view: ImageView = mock()
-        val url = "url"
-        testee.loadFavicon(url, view)
-        verify(faviconManager).loadToViewFromPersisted(url, view)
     }
 }

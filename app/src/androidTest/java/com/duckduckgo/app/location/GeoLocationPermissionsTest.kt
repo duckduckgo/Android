@@ -62,7 +62,7 @@ class GeoLocationPermissionsTest {
     private lateinit var geoLocationPermissions: GeoLocationPermissions
 
     private val mockFaviconManager: FaviconManager = mock()
-    private val lazyFaviconManager = Lazy<FaviconManager> { mockFaviconManager }
+    private val lazyFaviconManager = Lazy { mockFaviconManager }
 
     @Before
     fun before() {

@@ -50,7 +50,7 @@ class FireproofWebsiteRepositoryTest {
     private lateinit var fireproofWebsiteDao: FireproofWebsiteDao
     private lateinit var fireproofWebsiteRepository: FireproofWebsiteRepository
     private val mockFaviconManager: FaviconManager = mock()
-    private val lazyFaviconManager = Lazy<FaviconManager> { mockFaviconManager }
+    private val lazyFaviconManager = Lazy { mockFaviconManager }
 
     @Before
     fun before() {

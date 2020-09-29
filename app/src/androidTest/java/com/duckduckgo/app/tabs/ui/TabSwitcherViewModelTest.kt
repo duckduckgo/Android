@@ -18,12 +18,10 @@
 
 package com.duckduckgo.app.tabs.ui
 
-import android.widget.ImageView
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.Observer
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.browser.R
-import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.session.WebViewSessionInMemoryStorage
 import com.duckduckgo.app.runBlocking
 import com.duckduckgo.app.tabs.model.TabEntity
@@ -59,9 +57,6 @@ class TabSwitcherViewModelTest {
     @Mock
     private lateinit var mockTabRepository: TabRepository
 
-    @Mock
-    private lateinit var mockFaviconManager: FaviconManager
-
     private lateinit var testee: TabSwitcherViewModel
 
     @Before
@@ -69,7 +64,7 @@ class TabSwitcherViewModelTest {
         MockitoAnnotations.initMocks(this)
         coroutinesTestRule.runBlocking {
             whenever(mockTabRepository.add()).thenReturn("TAB_ID")
-            testee = TabSwitcherViewModel(mockTabRepository, WebViewSessionInMemoryStorage(), mockFaviconManager)
+            testee = TabSwitcherViewModel(mockTabRepository, WebViewSessionInMemoryStorage())
             testee.command.observeForever(mockCommandObserver)
         }
     }
@@ -103,14 +98,5 @@ class TabSwitcherViewModelTest {
         verify(mockCommandObserver, times(2)).onChanged(commandCaptor.capture())
         assertEquals(Command.DisplayMessage(R.string.fireDataCleared), commandCaptor.allValues[0])
         assertEquals(Command.Close, commandCaptor.allValues[1])
-    }
-
-    @Test
-    fun whenLoadFaviconThenCallLoadToViewFromTemp() = coroutinesTestRule.runBlocking {
-        val view: ImageView = mock()
-
-        testee.loadFavicon("tabId", "example.com", view)
-
-        verify(mockFaviconManager).loadToViewFromTemp("tabId", "example.com", view)
     }
 }

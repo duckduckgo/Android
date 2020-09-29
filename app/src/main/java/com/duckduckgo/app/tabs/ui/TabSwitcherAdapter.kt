@@ -23,10 +23,13 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.tabpreview.TabEntityDiffCallback
 import com.duckduckgo.app.browser.tabpreview.TabEntityDiffCallback.Companion.DIFF_KEY_PREVIEW
 import com.duckduckgo.app.browser.tabpreview.TabEntityDiffCallback.Companion.DIFF_KEY_TITLE
@@ -39,13 +42,15 @@ import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.ui.TabSwitcherAdapter.TabViewHolder
 import com.google.android.material.card.MaterialCardView
 import kotlinx.android.synthetic.main.item_tab.view.*
+import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.io.File
 
 class TabSwitcherAdapter(
     private val itemClickListener: TabSwitcherListener,
     private val webViewPreviewPersister: WebViewPreviewPersister,
-    private val viewModel: TabSwitcherViewModel
+    private val lifecycleOwner: LifecycleOwner,
+    private val faviconManager: FaviconManager
 ) :
     ListAdapter<TabEntity, TabViewHolder>(TabEntityDiffCallback()) {
 
@@ -119,7 +124,9 @@ class TabSwitcherAdapter(
 
     private fun loadFavicon(tab: TabEntity, view: ImageView) {
         val url = tab.url ?: return
-        viewModel.loadFavicon(tab.tabId, url, view)
+        lifecycleOwner.lifecycleScope.launch {
+            faviconManager.loadToViewFromTemp(tab.tabId, url, view)
+        }
     }
 
     private fun loadTabPreviewImage(tab: TabEntity, glide: GlideRequests, holder: TabViewHolder) {

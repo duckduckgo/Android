@@ -30,9 +30,7 @@ import com.duckduckgo.app.global.domain
 import com.duckduckgo.app.global.faviconLocation
 import com.duckduckgo.app.location.data.LocationPermissionsRepository
 import kotlinx.coroutines.withContext
-import timber.log.Timber
 import java.io.File
-import java.lang.Exception
 
 interface FaviconManager {
     suspend fun saveToTemp(subFolder: String, icon: Bitmap, url: String): File?
@@ -102,8 +100,8 @@ class DuckDuckGoFaviconManager constructor(
 
     override suspend fun deletePersistedFavicon(url: String) {
         val domain = extractDomain(url)
-        val remainingFavicons = persistedFaviconsForDomain(domain) - 1 // -1 because we are about to delete one
-        if (remainingFavicons <= 0) {
+        val remainingFavicons = persistedFaviconsForDomain(domain)
+        if (remainingFavicons == 1) {
             faviconPersister.deletePersistedFavicon(domain)
         }
     }
@@ -125,20 +123,15 @@ class DuckDuckGoFaviconManager constructor(
     }
 
     private suspend fun downloadFromUrl(url: String): Bitmap? {
-        return try {
-            val faviconUrl = getFaviconUrl(url)
-            faviconDownloader.getFaviconFromUrl(faviconUrl)
-        } catch (e: Exception) {
-            Timber.d(e, "Error downloading favicon")
-            null
-        }
+        val faviconUrl = getFaviconUrl(url) ?: return null
+        return faviconDownloader.getFaviconFromUrl(faviconUrl)
     }
 
-    private fun getFaviconUrl(url: String): Uri {
+    private fun getFaviconUrl(url: String): Uri? {
         return if (url.toUri().host.isNullOrBlank()) {
-            "https://$url".toUri().faviconLocation() ?: throw IllegalArgumentException("Invalid favicon currentPageUrl")
+            "https://$url".toUri().faviconLocation()
         } else {
-            url.toUri().faviconLocation() ?: throw IllegalArgumentException("Invalid favicon currentPageUrl")
+            url.toUri().faviconLocation()
         }
     }
 

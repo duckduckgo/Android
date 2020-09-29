@@ -16,10 +16,8 @@
 
 package com.duckduckgo.app.fire.fireproofwebsite.ui
 
-import android.widget.ImageView
 import androidx.lifecycle.*
 import androidx.lifecycle.Observer
-import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepository
 import com.duckduckgo.app.fire.fireproofwebsite.ui.FireproofWebsitesViewModel.Command.ConfirmDeleteFireproofWebsite
@@ -34,8 +32,7 @@ class FireproofWebsitesViewModel(
     private val fireproofWebsiteRepository: FireproofWebsiteRepository,
     private val dispatcherProvider: DispatcherProvider,
     private val pixel: Pixel,
-    private val settingsDataStore: SettingsDataStore,
-    private val faviconManager: FaviconManager
+    private val settingsDataStore: SettingsDataStore
 ) : ViewModel() {
 
     data class ViewState(
@@ -70,12 +67,6 @@ class FireproofWebsitesViewModel(
         _viewState.value = _viewState.value?.copy(
             fireproofWebsitesEntities = entities
         )
-    }
-
-    fun loadFavicon(url: String, view: ImageView) {
-        viewModelScope.launch {
-            faviconManager.loadToViewFromPersisted(url, view)
-        }
     }
 
     fun onDeleteRequested(entity: FireproofWebsiteEntity) {

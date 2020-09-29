@@ -51,7 +51,7 @@ class LocationPermissionsRepositoryTest {
     private lateinit var dao: LocationPermissionsDao
     private lateinit var repository: LocationPermissionsRepository
     private val mockFaviconManager: FaviconManager = mock()
-    private val lazyFaviconManager = Lazy<FaviconManager> { mockFaviconManager }
+    private val lazyFaviconManager = Lazy { mockFaviconManager }
 
     private val domain = "domain.com"
 

@@ -136,7 +136,7 @@ class ViewModelFactory @Inject constructor(
                 isAssignableFrom(OnboardingViewModel::class.java) -> onboardingViewModel()
                 isAssignableFrom(BrowserViewModel::class.java) -> browserViewModel()
                 isAssignableFrom(BrowserTabViewModel::class.java) -> browserTabViewModel()
-                isAssignableFrom(TabSwitcherViewModel::class.java) -> TabSwitcherViewModel(tabRepository, webViewSessionStorage, faviconManager)
+                isAssignableFrom(TabSwitcherViewModel::class.java) -> TabSwitcherViewModel(tabRepository, webViewSessionStorage)
                 isAssignableFrom(PrivacyDashboardViewModel::class.java) -> privacyDashboardViewModel()
                 isAssignableFrom(ScorecardViewModel::class.java) -> ScorecardViewModel(userWhitelistDao)
                 isAssignableFrom(TrackerNetworksViewModel::class.java) -> TrackerNetworksViewModel()
@@ -232,8 +232,7 @@ class ViewModelFactory @Inject constructor(
             fireproofWebsiteRepository = fireproofWebsiteRepository,
             dispatcherProvider = dispatcherProvider,
             pixel = pixel,
-            settingsDataStore = appSettingsPreferencesStore,
-            faviconManager = faviconManager
+            settingsDataStore = appSettingsPreferencesStore
         )
 
     private fun locationPermissionsViewModel() =
@@ -242,7 +241,6 @@ class ViewModelFactory @Inject constructor(
             geoLocationPermissions = geoLocationPermissions,
             dispatcherProvider = dispatcherProvider,
             settingsDataStore = appSettingsPreferencesStore,
-            pixel = pixel,
-            faviconManager = faviconManager
+            pixel = pixel
         )
 }

@@ -53,13 +53,15 @@ class GlideFaviconDownloader @Inject constructor(
 
     override suspend fun getFaviconFromUrl(uri: Uri): Bitmap? {
         return withContext(dispatcherProvider.io()) {
-            Glide.with(context)
-                .asBitmap()
-                .load(uri)
-                .diskCacheStrategy(DiskCacheStrategy.NONE)
-                .skipMemoryCache(true)
-                .submit()
-                .get()
+            return@withContext runCatching {
+                Glide.with(context)
+                    .asBitmap()
+                    .load(uri)
+                    .diskCacheStrategy(DiskCacheStrategy.NONE)
+                    .skipMemoryCache(true)
+                    .submit()
+                    .get()
+            }.getOrNull()
         }
     }
 

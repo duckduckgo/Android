@@ -16,10 +16,8 @@
 
 package com.duckduckgo.app.location.ui
 
-import android.widget.ImageView
 import androidx.lifecycle.*
 import androidx.lifecycle.Observer
-import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.SingleLiveEvent
 import com.duckduckgo.app.location.GeoLocationPermissions
@@ -35,8 +33,7 @@ class LocationPermissionsViewModel(
     private val geoLocationPermissions: GeoLocationPermissions,
     private val dispatcherProvider: DispatcherProvider,
     private val settingsDataStore: SettingsDataStore,
-    private val pixel: Pixel,
-    private val faviconManager: FaviconManager
+    private val pixel: Pixel
 ) : SiteLocationPermissionDialog.SiteLocationPermissionDialogListener, ViewModel() {
 
     data class ViewState(
@@ -80,12 +77,6 @@ class LocationPermissionsViewModel(
         _viewState.value = _viewState.value?.copy(
             locationPermissionEntities = entities
         )
-    }
-
-    fun loadFavicon(url: String, view: ImageView) {
-        viewModelScope.launch {
-            faviconManager.loadToViewFromPersisted(url, view)
-        }
     }
 
     fun onDeleteRequested(entity: LocationPermissionEntity) {

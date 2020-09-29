@@ -223,7 +223,7 @@ class BrowserTabViewModelTest {
     @Mock
     private lateinit var geoLocationPermissions: GeoLocationPermissions
 
-    private val lazyFaviconManager = Lazy<FaviconManager> { mockFaviconManager }
+    private val lazyFaviconManager = Lazy { mockFaviconManager }
 
     private lateinit var mockAutoCompleteApi: AutoCompleteApi
 
