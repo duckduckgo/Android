@@ -112,8 +112,8 @@ class TcpStateFlowTest {
         val response = whenANewPacketArrives(tcbState, FIN_PACKET)
 
         assertTrue(response.events.size == 3)
-        assertClientStateMove(FIN_WAIT_1, response.events[0])
-        assertTrue(response.events[1] is SendFin)
+        assertTrue(response.events[0] is SendFin)
+        assertClientStateMove(FIN_WAIT_1, response.events[1])
         assertServerStateMove(LAST_ACK, response.events[2])
     }
 
@@ -123,9 +123,9 @@ class TcpStateFlowTest {
         val response = whenANewPacketArrives(tcbState, FIN_PACKET_WITH_DATA)
 
         assertTrue(response.events.size == 4)
-        assertClientStateMove(FIN_WAIT_1, response.events[0])
-        assertTrue(response.events[1] is ProcessPacket)
-        assertTrue(response.events[2] is SendFin)
+        assertTrue(response.events[0] is ProcessPacket)
+        assertTrue(response.events[1] is SendFin)
+        assertClientStateMove(FIN_WAIT_1, response.events[2])
         assertServerStateMove(LAST_ACK, response.events[3])
     }
 
