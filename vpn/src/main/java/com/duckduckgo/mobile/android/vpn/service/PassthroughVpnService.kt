@@ -252,7 +252,6 @@ class PassthroughVpnService : VpnService(), CoroutineScope by MainScope(), Netwo
         fun isRunning(context: Context): Boolean {
             val manager: ActivityManager = context.getSystemService(ACTIVITY_SERVICE) as ActivityManager
             for (service in manager.getRunningServices(Int.MAX_VALUE)) {
-                val serviceName = service.service.className
                 if ("com.duckduckgo.mobile.android.vpn.service.PassthroughVpnService" == service.service.className) {
                     return true
                 }
