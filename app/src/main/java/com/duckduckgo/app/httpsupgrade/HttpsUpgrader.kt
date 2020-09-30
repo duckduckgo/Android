@@ -97,7 +97,7 @@ class HttpsUpgraderImpl(
             } else {
                 pixel.fire(if (serviceUpgradeResult.isCached) HTTPS_SERVICE_CACHE_NO_UPGRADE else HTTPS_SERVICE_REQUEST_NO_UPGRADE)
             }
-        } 
+        }
         Timber.d("$host ${if (serviceUpgradeResult.isUpgradable) "is" else "is not"} service upgradable")
         return serviceUpgradeResult.isUpgradable
     }
