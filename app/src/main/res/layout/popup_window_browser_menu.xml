@@ -26,9 +26,9 @@
         android:layout_height="50dp"
         android:gravity="center"
         android:orientation="horizontal"
-        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent">
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
 
         <ImageButton
             android:id="@+id/backPopupMenuItem"
@@ -79,6 +79,20 @@
             android:paddingTop="13dp"
             android:paddingBottom="20dp">
 
+            <androidx.appcompat.widget.AppCompatCheckBox
+                android:id="@+id/vpnPopupMenuItem"
+                style="@style/BrowserCheckBoxMenuItem"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="20dp"
+                android:button="@null"
+                android:drawableEnd="?android:attr/listChoiceIndicatorMultiple"
+                android:drawablePadding="24dp"
+                android:paddingStart="24dp"
+                android:paddingEnd="0dp"
+                android:text="@string/startVpnMenuItem"
+                android:theme="@style/PopUpMenuSwitchTheme" />
+
             <TextView
                 android:id="@+id/newTabPopupMenuItem"
                 style="@style/BrowserTextMenuItem"
@@ -97,7 +111,6 @@
             <androidx.appcompat.widget.AppCompatCheckBox
                 android:id="@+id/fireproofWebsitePopupMenuItem"
                 style="@style/BrowserCheckBoxMenuItem"
-                android:theme="@style/PopUpMenuSwitchTheme"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="20dp"
@@ -106,7 +119,8 @@
                 android:drawablePadding="24dp"
                 android:paddingStart="24dp"
                 android:paddingEnd="0dp"
-                android:text="@string/fireproofWebsiteMenuTitleAdd" />
+                android:text="@string/fireproofWebsiteMenuTitleAdd"
+                android:theme="@style/PopUpMenuSwitchTheme" />
 
             <TextView
                 android:id="@+id/sharePageMenuItem"
@@ -126,7 +140,6 @@
             <androidx.appcompat.widget.AppCompatCheckBox
                 android:id="@+id/requestDesktopSiteCheckMenuItem"
                 style="@style/BrowserCheckBoxMenuItem"
-                android:theme="@style/PopUpMenuSwitchTheme"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="20dp"
@@ -135,7 +148,8 @@
                 android:drawablePadding="24dp"
                 android:paddingStart="24dp"
                 android:paddingEnd="0dp"
-                android:text="@string/requestDesktopSiteMenuTitle" />
+                android:text="@string/requestDesktopSiteMenuTitle"
+                android:theme="@style/PopUpMenuSwitchTheme" />
 
             <TextView
                 android:id="@+id/whitelistPopupMenuItem"

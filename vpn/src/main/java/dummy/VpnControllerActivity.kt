@@ -182,6 +182,11 @@ class VpnControllerActivity : AppCompatActivity(R.layout.activity_vpn_controller
     }
 
     companion object {
+        fun intent(context: Context): Intent {
+            return Intent(context, VpnControllerActivity::class.java)
+        }
+
         private const val RC_REQUEST_VPN_PERMISSION = 100
     }
+
 }

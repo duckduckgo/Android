@@ -16,6 +16,7 @@
 
 package com.duckduckgo.mobile.android.vpn.service
 
+import android.app.ActivityManager
 import android.app.Service
 import android.content.Context
 import android.content.Intent
@@ -25,6 +26,7 @@ import android.os.Binder
 import android.os.Build
 import android.os.IBinder
 import android.os.ParcelFileDescriptor
+import androidx.core.content.ContextCompat.getSystemService
 import com.duckduckgo.mobile.android.vpn.BuildConfig
 import com.duckduckgo.mobile.android.vpn.processor.TunPacketReader
 import com.duckduckgo.mobile.android.vpn.processor.TunPacketWriter
@@ -45,8 +47,12 @@ import xyz.hexene.localvpn.Packet
 import java.nio.ByteBuffer
 import java.nio.channels.DatagramChannel
 import java.nio.channels.SocketChannel
-import java.util.concurrent.*
-
+import java.util.concurrent.BlockingDeque
+import java.util.concurrent.BlockingQueue
+import java.util.concurrent.ExecutorService
+import java.util.concurrent.Executors
+import java.util.concurrent.LinkedBlockingDeque
+import java.util.concurrent.LinkedBlockingQueue
 
 class PassthroughVpnService : VpnService(), CoroutineScope by MainScope(), NetworkChannelCreator {
 
@@ -139,23 +145,23 @@ class PassthroughVpnService : VpnService(), CoroutineScope by MainScope(), Netwo
 
             //tunPacketProcessor = TunPacketProcessor(vpnInterface, queues).also { executorService.submit(it) }
 
-//            tunPacketProcessor = TunPacketProcessor(vpnInterface, queues).also {
-//                GlobalScope.launch(Executors.newSingleThreadExecutor().asCoroutineDispatcher()) {
-//                    it.run()
-//                }
-//            }
+            //            tunPacketProcessor = TunPacketProcessor(vpnInterface, queues).also {
+            //                GlobalScope.launch(Executors.newSingleThreadExecutor().asCoroutineDispatcher()) {
+            //                    it.run()
+            //                }
+            //            }
         }
     }
 
     private fun startStatTicker() {
-//        tickerJob = launch {
-//            val startTime = System.currentTimeMillis()
-//            while (true) {
+        //        tickerJob = launch {
+        //            val startTime = System.currentTimeMillis()
+        //            while (true) {
 
-//                Timber.v("VPN service running for ${TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis() - startTime)} seconds")
-//                delay(1000)
-//            }
-//        }
+        //                Timber.v("VPN service running for ${TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis() - startTime)} seconds")
+        //                delay(1000)
+        //            }
+        //        }
     }
 
     private fun establishVpnInterface() {
@@ -194,7 +200,6 @@ class PassthroughVpnService : VpnService(), CoroutineScope by MainScope(), Netwo
             }
         }
     }
-
 
     private fun stopVpn() {
         Timber.i("Stopping VPN")
@@ -244,6 +249,17 @@ class PassthroughVpnService : VpnService(), CoroutineScope by MainScope(), Netwo
             }
         }
 
+        fun isRunning(context: Context): Boolean {
+            val manager: ActivityManager = context.getSystemService(ACTIVITY_SERVICE) as ActivityManager
+            for (service in manager.getRunningServices(Int.MAX_VALUE)) {
+                val serviceName = service.service.className
+                if ("com.duckduckgo.mobile.android.vpn.service.PassthroughVpnService" == service.service.className) {
+                    return true
+                }
+            }
+            return false
+        }
+
         private const val ACTION_START_VPN = "ACTION_START_VPN"
         private const val ACTION_STOP_VPN = "ACTION_STOP_VPN"
 
@@ -280,7 +296,6 @@ class PassthroughVpnService : VpnService(), CoroutineScope by MainScope(), Netwo
             protect(channel.socket())
         }
     }
-
 }
 
 interface NetworkChannelCreator {

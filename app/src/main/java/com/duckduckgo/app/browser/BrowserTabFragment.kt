@@ -130,9 +130,11 @@ import com.duckduckgo.app.survey.ui.SurveyActivity
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.ui.TabSwitcherActivity
 import com.duckduckgo.app.widget.ui.AddWidgetInstructionsActivity
+import com.duckduckgo.mobile.android.vpn.service.PassthroughVpnService
 import com.duckduckgo.widget.SearchWidgetLight
 import com.google.android.material.snackbar.Snackbar
 import dagger.android.support.AndroidSupportInjection
+import dummy.VpnControllerActivity
 import kotlinx.android.synthetic.main.fragment_browser_tab.*
 import kotlinx.android.synthetic.main.include_add_widget_instruction_buttons.view.closeButton
 import kotlinx.android.synthetic.main.include_cta_buttons.view.ctaDismissButton
@@ -637,8 +639,11 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
     }
 
     private fun locationPermissionsHaveNotBeenGranted(): Boolean {
-        return ContextCompat.checkSelfPermission(requireActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED ||
-                ContextCompat.checkSelfPermission(requireActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
+        return ContextCompat.checkSelfPermission(
+            requireActivity(),
+            Manifest.permission.ACCESS_COARSE_LOCATION
+        ) != PackageManager.PERMISSION_GRANTED ||
+            ContextCompat.checkSelfPermission(requireActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
     }
 
     private fun checkSystemLocationPermission(domain: String, deniedForever: Boolean) {
@@ -685,7 +690,11 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
 
     private fun showDomainHasLocationPermission(domain: String) {
         val snackbar =
-            Snackbar.make(rootView, getString(R.string.preciseLocationSnackbarMessage, domain.websiteFromGeoLocationsApiOrigin()), Snackbar.LENGTH_SHORT)
+            Snackbar.make(
+                rootView,
+                getString(R.string.preciseLocationSnackbarMessage, domain.websiteFromGeoLocationsApiOrigin()),
+                Snackbar.LENGTH_SHORT
+            )
         snackbar.view.setOnClickListener {
             browserActivity?.launchLocationSettings()
         }
@@ -1420,6 +1429,9 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
             popupMenu.apply {
                 onMenuItemClicked(view.forwardPopupMenuItem) { viewModel.onUserPressedForward() }
                 onMenuItemClicked(view.backPopupMenuItem) { activity?.onBackPressed() }
+                onMenuItemClicked(view.vpnPopupMenuItem) {
+                    startActivity(VpnControllerActivity.intent(activity!!))
+                }
                 onMenuItemClicked(view.refreshPopupMenuItem) {
                     viewModel.onRefreshRequested()
                     pixel.fire(Pixel.PixelName.MENU_ACTION_REFRESH_PRESSED.pixelName)
@@ -1679,6 +1691,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
                 brokenSitePopupMenuItem?.isEnabled = viewState.canReportSite
                 requestDesktopSiteCheckMenuItem?.isEnabled = viewState.canChangeBrowsingMode
                 requestDesktopSiteCheckMenuItem?.isChecked = viewState.isDesktopBrowsingMode
+                vpnPopupMenuItem?.isChecked = PassthroughVpnService.isRunning(activity!!)
 
                 addToHome?.let {
                     it.visibility = if (viewState.addToHomeVisible) VISIBLE else GONE

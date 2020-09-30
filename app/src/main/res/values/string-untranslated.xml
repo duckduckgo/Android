@@ -51,4 +51,7 @@
     <string name="preciseLocationDeniedSitesSectionTitle">Denied</string>
     <string name="preciseLocationSnackbarMessage">You previously granted %s permission to access your device location.</string>
 
+    <!-- App Tracker Blocking -->
+    <string name="startVpnMenuItem">App Tracker Blocking</string>
+
 </resources>
