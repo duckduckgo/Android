@@ -249,6 +249,11 @@ class PassthroughVpnService : VpnService(), CoroutineScope by MainScope(), Netwo
             }
         }
 
+        // This method was deprecated in API level 26. As of Build.VERSION_CODES.O,
+        // this method is no longer available to third party applications.
+        // For backwards compatibility, it will still return the caller's own services.
+        // So for us it's still valid because we don't need to know third party services, just ours.
+        @Suppress("DEPRECATION")
         fun isRunning(context: Context): Boolean {
             val manager: ActivityManager = context.getSystemService(ACTIVITY_SERVICE) as ActivityManager
             for (service in manager.getRunningServices(Int.MAX_VALUE)) {
