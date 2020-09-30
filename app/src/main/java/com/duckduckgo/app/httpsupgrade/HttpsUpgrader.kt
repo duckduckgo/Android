@@ -82,7 +82,8 @@ class HttpsUpgraderImpl(
             return false
         }
 
-        val isLocallyUpgradable = !isLocalListReloading && isInLocalUpgradeList(host)
+        val reloading = isLocalListReloading
+        val isLocallyUpgradable = !reloading && isInLocalUpgradeList(host)
         Timber.d("$host ${if (isLocallyUpgradable) "is" else "is not"} locally upgradable")
         if (isLocallyUpgradable) {
             pixel.fire(HTTPS_LOCAL_UPGRADE)
@@ -90,11 +91,13 @@ class HttpsUpgraderImpl(
         }
 
         val serviceUpgradeResult = isInServiceUpgradeList(host)
-        if (serviceUpgradeResult.isUpgradable) {
-            pixel.fire(if (serviceUpgradeResult.isCached) HTTPS_SERVICE_CACHE_UPGRADE else HTTPS_SERVICE_REQUEST_UPGRADE)
-        } else {
-            pixel.fire(if (serviceUpgradeResult.isCached) HTTPS_SERVICE_CACHE_NO_UPGRADE else HTTPS_SERVICE_REQUEST_NO_UPGRADE)
-        }
+        if (!reloading) {
+            if (serviceUpgradeResult.isUpgradable) {
+                pixel.fire(if (serviceUpgradeResult.isCached) HTTPS_SERVICE_CACHE_UPGRADE else HTTPS_SERVICE_REQUEST_UPGRADE)
+            } else {
+                pixel.fire(if (serviceUpgradeResult.isCached) HTTPS_SERVICE_CACHE_NO_UPGRADE else HTTPS_SERVICE_REQUEST_NO_UPGRADE)
+            }
+        } 
         Timber.d("$host ${if (serviceUpgradeResult.isUpgradable) "is" else "is not"} service upgradable")
         return serviceUpgradeResult.isUpgradable
     }
