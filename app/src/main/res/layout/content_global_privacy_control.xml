@@ -25,6 +25,7 @@
         android:layout_height="wrap_content"
         android:fontFamily="sans-serif"
         android:layout_margin="16dp"
+        android:paddingTop="12dp"
         android:lineSpacingExtra="4sp"
         android:text="@string/globalPrivacyControlDescription"
         android:textColor="?attr/settingsMinorTextColor"
@@ -34,16 +35,14 @@
     <androidx.appcompat.widget.SwitchCompat
         android:id="@+id/globalPrivacyControlToggle"
         style="@style/SettingsSwitch"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
         android:text="@string/globalPrivacyControlToggle"
-        android:theme="@style/SettingsSwitchTheme"
-        android:layout_marginTop="16dp"
-        android:layout_marginBottom="7dp"
-        />
+        android:theme="@style/SettingsSwitchTheme" />
 
     <View
         android:id="@+id/settingsSectionPrivacyBottomDivider"
-        style="@style/SettingsGroupDivider"
-        />
+        style="@style/SettingsGroupDivider" />
 
     <com.google.android.material.textview.MaterialTextView
         android:id="@+id/globalPrivacyControlExplanation"
@@ -52,12 +51,13 @@
         android:fontFamily="sans-serif"
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"
-        android:layout_marginTop="27dp"
+        android:layout_marginTop="40dp"
         android:lineSpacingExtra="4sp"
         android:text="@string/globalPrivacyControlDescriptionLegal"
         android:textColor="?attr/settingsMinorTextColor"
         android:textSize="14sp"
         android:textStyle="normal" />
+
     <com.google.android.material.textview.MaterialTextView
         android:id="@+id/globalPrivacyControlLink"
         android:layout_width="wrap_content"

@@ -19,13 +19,12 @@ package com.duckduckgo.app.globalprivacycontrol
 import android.webkit.WebView
 import androidx.test.annotation.UiThreadTest
 import androidx.test.platform.app.InstrumentationRegistry
+import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.settings.db.SettingsDataStore
-import com.nhaarman.mockitokotlin2.any
-import com.nhaarman.mockitokotlin2.anyOrNull
 import com.nhaarman.mockitokotlin2.mock
+import com.nhaarman.mockitokotlin2.never
 import com.nhaarman.mockitokotlin2.spy
 import com.nhaarman.mockitokotlin2.verify
-import com.nhaarman.mockitokotlin2.verifyZeroInteractions
 import com.nhaarman.mockitokotlin2.whenever
 import org.junit.Before
 import org.junit.Test
@@ -43,22 +42,31 @@ class GlobalPrivacyControlInjectorJsTest {
     @UiThreadTest
     @Test
     fun whenInjectDoNotSellToDomAndGcpIsEnabledThenInjectToDom() {
+        val jsToEvaluate = getJsToEvaluate()
         val webView = spy(WebView(InstrumentationRegistry.getInstrumentation().targetContext))
         whenever(mockSettingsStore.globalPrivacyControlEnabled).thenReturn(true)
 
         testee.injectDoNotSellToDom(webView)
 
-        verify(webView).evaluateJavascript(any(), anyOrNull())
+        verify(webView).evaluateJavascript(jsToEvaluate, null)
     }
 
     @UiThreadTest
     @Test
     fun whenInjectDoNotSellToDomAndGcpIsNotEnabledThenDoNotInjectToDom() {
+        val jsToEvaluate = getJsToEvaluate()
         val webView = spy(WebView(InstrumentationRegistry.getInstrumentation().targetContext))
         whenever(mockSettingsStore.globalPrivacyControlEnabled).thenReturn(false)
 
         testee.injectDoNotSellToDom(webView)
 
-        verifyZeroInteractions(webView)
+        verify(webView, never()).evaluateJavascript(jsToEvaluate, null)
+    }
+
+    private fun getJsToEvaluate(): String {
+        val js = InstrumentationRegistry.getInstrumentation().targetContext.resources.openRawResource(R.raw.donotsell)
+            .bufferedReader()
+            .use { it.readText() }
+        return "javascript:$js"
     }
 }
