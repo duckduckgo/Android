@@ -70,6 +70,11 @@ class GlobalPrivacyControlViewModelTest {
     }
 
     @Test
+    fun whenViewModelCreateThenPixelSent() {
+        verify(mockPixel).fire(Pixel.PixelName.SETTINGS_DO_NOT_SELL_SHOWN)
+    }
+
+    @Test
     fun whenOnLearnMoreSelectedThenOpenLearnMoreCommandIssuedWithCorrectUrl() {
         testee.onLearnMoreSelected()
 

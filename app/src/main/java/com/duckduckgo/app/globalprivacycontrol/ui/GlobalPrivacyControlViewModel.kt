@@ -43,6 +43,7 @@ class GlobalPrivacyControlViewModel(
         _viewState.value = ViewState(
             globalPrivacyControlEnabled = settingsDataStore.globalPrivacyControlEnabled
         )
+        pixel.fire(SETTINGS_DO_NOT_SELL_SHOWN)
     }
 
     fun onUserToggleGlobalPrivacyControl(enabled: Boolean) {
