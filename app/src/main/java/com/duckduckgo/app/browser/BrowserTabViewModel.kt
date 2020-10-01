@@ -693,6 +693,7 @@ class BrowserTabViewModel(
     }
 
     private fun blankSiteIfNewContentDelayed() {
+        deferredBlankSite?.cancel()
         deferredBlankSite = viewModelScope.launch {
             delay(timeMillis = NEW_CONTENT_MAX_DELAY_MS)
             withContext(dispatchers.main()) {
