@@ -27,7 +27,7 @@ import com.duckduckgo.app.browser.*
 import com.duckduckgo.app.browser.addtohome.AddToHomeCapabilityDetector
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.browser.downloader.FileDownloader
-import com.duckduckgo.app.browser.favicon.FaviconDownloader
+import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.logindetection.NavigationAwareLoginDetector
 import com.duckduckgo.app.browser.omnibar.QueryUrlConverter
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
@@ -107,7 +107,7 @@ class ViewModelFactory @Inject constructor(
     private val brokenSiteSender: BrokenSiteSender,
     private val webViewSessionStorage: WebViewSessionStorage,
     private val specialUrlDetector: SpecialUrlDetector,
-    private val faviconDownloader: FaviconDownloader,
+    private val faviconManager: FaviconManager,
     private val addToHomeCapabilityDetector: AddToHomeCapabilityDetector,
     private val pixel: Pixel,
     private val dataClearer: DataClearer,
@@ -147,7 +147,7 @@ class ViewModelFactory @Inject constructor(
                 isAssignableFrom(SurveyViewModel::class.java) -> SurveyViewModel(surveyDao, statisticsStore, appInstallStore)
                 isAssignableFrom(AddWidgetInstructionsViewModel::class.java) -> AddWidgetInstructionsViewModel()
                 isAssignableFrom(SettingsViewModel::class.java) -> settingsViewModel()
-                isAssignableFrom(BookmarksViewModel::class.java) -> BookmarksViewModel(bookmarksDao)
+                isAssignableFrom(BookmarksViewModel::class.java) -> BookmarksViewModel(bookmarksDao, faviconManager, dispatcherProvider)
                 isAssignableFrom(InitialFeedbackFragmentViewModel::class.java) -> InitialFeedbackFragmentViewModel()
                 isAssignableFrom(PositiveFeedbackLandingViewModel::class.java) -> PositiveFeedbackLandingViewModel()
                 isAssignableFrom(ShareOpenEndedNegativeFeedbackViewModel::class.java) -> ShareOpenEndedNegativeFeedbackViewModel()
@@ -212,7 +212,7 @@ class ViewModelFactory @Inject constructor(
         longPressHandler = webViewLongPressHandler,
         webViewSessionStorage = webViewSessionStorage,
         specialUrlDetector = specialUrlDetector,
-        faviconDownloader = faviconDownloader,
+        faviconManager = faviconManager,
         addToHomeCapabilityDetector = addToHomeCapabilityDetector,
         ctaViewModel = ctaViewModel,
         searchCountDao = searchCountDao,
