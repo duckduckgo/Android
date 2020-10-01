@@ -100,11 +100,7 @@ import com.jakewharton.rxrelay2.PublishRelay
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
-import io.reactivex.schedulers.Schedulers.io
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
 import timber.log.Timber
 import java.io.File
 import java.util.*
@@ -314,6 +310,7 @@ class BrowserTabViewModel(
     private var webNavigationState: WebNavigationState? = null
     private var httpsUpgraded = false
     private val browserStateModifier = BrowserStateModifier()
+    private var deferredBlankSite: Job? = null
 
     private val fireproofWebsitesObserver = Observer<List<FireproofWebsiteEntity>> {
         browserViewState.value = currentBrowserViewState().copy(isFireproofWebsite = isFireproofWebsite())
@@ -663,8 +660,23 @@ class BrowserTabViewModel(
             is PageCleared -> pageCleared()
             is UrlUpdated -> urlUpdated(stateChange.url)
             is PageNavigationCleared -> disableUserNavigation()
+            is Redirected -> {
+                val previousSiteStillLoading = currentLoadingViewState().isLoading
+                if (previousSiteStillLoading) {
+                    blankSiteIfNewContentDelayed()
+                }
+            }
         }
         navigationAwareLoginDetector.onEvent(NavigationEvent.WebNavigationEvent(stateChange))
+    }
+
+    private fun blankSiteIfNewContentDelayed() {
+        deferredBlankSite = viewModelScope.launch {
+            delay(timeMillis = NEW_CONTENT_MAX_DELAY_MS)
+            withContext(dispatchers.main()) {
+                command.value = HideWebContent
+            }
+        }
     }
 
     private fun pageChanged(url: String, title: String?) {
@@ -1085,6 +1097,11 @@ class BrowserTabViewModel(
 
             withContext(dispatchers.io()) {
                 tabRepository.update(tabId, site)
+            }
+
+            withContext(dispatchers.main()) {
+                deferredBlankSite?.cancel()
+                command.value = ShowWebContent
             }
         }
     }
@@ -1661,5 +1678,6 @@ class BrowserTabViewModel(
 
     companion object {
         private const val FIXED_PROGRESS = 50
+        private const val NEW_CONTENT_MAX_DELAY_MS = 1000L
     }
 }
