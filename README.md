@@ -1,4 +1,4 @@
-# DuckDuckGo Android
+# DuckDuckGo Android - an amazing project
 
 Welcome to our android application. We are excited to engage the community in development, see [CONTRIBUTING.md](CONTRIBUTING.md).
 
