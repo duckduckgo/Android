@@ -194,7 +194,7 @@
     <!-- Bookmarks Activity -->
     <string name="bookmarksMenuTitle">Bookmarks</string>
     <string name="bookmarksActivityTitle">Bookmarks</string>
-    <string name="bookmarkDeleteConfirmMessage">Are you sure you want to delete bookmark &lt;b>%s&lt;/b>?</string>
+    <string name="bookmarkDeleteConfirmMessage">Deleted &lt;b>%s&lt;/b></string>
     <string name="bookmarkAddedFeedback">Bookmark added</string>
     <string name="bookmarkTitleHint">Bookmark title</string>
     <string name="bookmarkUrlHint">Bookmark URL</string>
@@ -452,7 +452,7 @@
     <string name="fireproofWebsiteMenuTitleAdd">Fireproof Website</string>
     <string name="fireproofWebsiteSnackbarConfirmation">&lt;b>%s&lt;/b> is now fireproof! Visit Settings to learn more.</string>
     <string name="fireproofWebsiteSnackbarAction">Undo</string>
-    <string name="fireproofWebsiteDeleteConfirmMessage">Are you sure you want to delete &lt;b>%s&lt;/b>?</string>
+    <string name="fireproofWebsiteDeleteConfirmMessage">&lt;b>%s&lt;/b> is no longer fireproof! Visit Settings to learn more.</string>
     <string name="fireproofWebsiteEmptyListHint">No websites Fireproofed yet</string>
     <string name="fireproofWebsiteFeatureDescription">Websites rely on cookies to keep you signed in. When you Fireproof a site, cookies won\'t be erased and you\'ll stay signed in, even after using the Fire Button. We still block third-party trackers found on Fireproof websites.</string>
     <string name="fireproofWebsiteOverflowContentDescription">More options for fireproof website %s</string>

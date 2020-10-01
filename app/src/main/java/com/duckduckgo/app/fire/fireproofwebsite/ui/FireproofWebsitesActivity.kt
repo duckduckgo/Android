@@ -20,12 +20,16 @@ import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import androidx.core.text.HtmlCompat
 import androidx.lifecycle.Observer
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
+import com.duckduckgo.app.fire.fireproofwebsite.data.website
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.view.html
+import com.google.android.material.snackbar.Snackbar
+import kotlinx.android.synthetic.main.activity_fireproof_websites.*
 import kotlinx.android.synthetic.main.content_fireproof_websites.*
 import kotlinx.android.synthetic.main.include_toolbar.*
 import javax.inject.Inject
@@ -70,15 +74,15 @@ class FireproofWebsitesActivity : DuckDuckGoActivity() {
 
     @Suppress("deprecation")
     private fun confirmDeleteWebsite(entity: FireproofWebsiteEntity) {
-        val message = getString(R.string.fireproofWebsiteDeleteConfirmMessage, entity.domain).html(this)
-        val title = getString(R.string.dialogConfirmTitle)
-        deleteDialog = AlertDialog.Builder(this)
-            .setTitle(title)
-            .setMessage(message)
-            .setPositiveButton(android.R.string.yes) { _, _ -> viewModel.delete(entity) }
-            .setNegativeButton(android.R.string.no) { _, _ -> }
-            .create()
-        deleteDialog?.show()
+        val message = HtmlCompat.fromHtml(getString(R.string.fireproofWebsiteDeleteConfirmMessage, entity.website()), HtmlCompat.FROM_HTML_MODE_LEGACY)
+        viewModel.delete(entity)
+        Snackbar.make(
+                fireActivityRoot,
+                message,
+                Snackbar.LENGTH_LONG
+        ).setAction(R.string.fireproofWebsiteSnackbarAction){
+            viewModel.onSnackBarUndoFireproof(entity)
+        }.show()
     }
 
     override fun onDestroy() {
