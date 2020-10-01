@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 DuckDuckGo
+ * Copyright (c) 2020 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,37 +19,62 @@ package com.duckduckgo.app.browser.favicon
 import android.content.Context
 import android.graphics.Bitmap
 import android.net.Uri
+import android.widget.ImageView
 import com.bumptech.glide.Glide
-import com.duckduckgo.app.global.faviconLocation
-import com.duckduckgo.app.global.view.toPx
-import io.reactivex.Single
-import java.util.concurrent.TimeUnit
+import com.bumptech.glide.load.engine.DiskCacheStrategy
+import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.global.DispatcherProvider
+import kotlinx.coroutines.withContext
+import java.io.File
 import javax.inject.Inject
 
 interface FaviconDownloader {
-
-    fun download(currentPageUrl: Uri): Single<Bitmap>
+    suspend fun getFaviconFromDisk(file: File): Bitmap?
+    suspend fun getFaviconFromUrl(uri: Uri): Bitmap?
+    suspend fun loadFaviconToView(file: File, view: ImageView)
 }
 
-class GlideFaviconDownloader @Inject constructor(private val context: Context) : FaviconDownloader {
+class GlideFaviconDownloader @Inject constructor(
+    private val context: Context,
+    private val dispatcherProvider: DispatcherProvider
+) : FaviconDownloader {
 
-    override fun download(currentPageUrl: Uri): Single<Bitmap> {
-
-        return Single.fromCallable {
-
-            val faviconUrl = currentPageUrl.faviconLocation() ?: throw IllegalArgumentException("Invalid favicon currentPageUrl")
-            val desiredImageSizePx = DESIRED_IMAGE_SIZE_DP.toPx()
-
+    override suspend fun getFaviconFromDisk(file: File): Bitmap? {
+        return withContext(dispatcherProvider.io()) {
             Glide.with(context)
                 .asBitmap()
-                .load(faviconUrl)
-                .submit(desiredImageSizePx, desiredImageSizePx)
-                .get(TIMEOUT_PERIOD_SECONDS, TimeUnit.SECONDS)
+                .load(file)
+                .diskCacheStrategy(DiskCacheStrategy.NONE)
+                .skipMemoryCache(true)
+                .submit()
+                .get()
         }
     }
 
-    companion object {
-        private const val DESIRED_IMAGE_SIZE_DP = 24
-        private const val TIMEOUT_PERIOD_SECONDS: Long = 3
+    override suspend fun getFaviconFromUrl(uri: Uri): Bitmap? {
+        return withContext(dispatcherProvider.io()) {
+            return@withContext runCatching {
+                Glide.with(context)
+                    .asBitmap()
+                    .load(uri)
+                    .diskCacheStrategy(DiskCacheStrategy.NONE)
+                    .skipMemoryCache(true)
+                    .submit()
+                    .get()
+            }.getOrNull()
+        }
     }
+
+    override suspend fun loadFaviconToView(file: File, view: ImageView) {
+        withContext(dispatcherProvider.main()) {
+            Glide.with(context)
+                .load(file)
+                .diskCacheStrategy(DiskCacheStrategy.NONE)
+                .skipMemoryCache(true)
+                .placeholder(R.drawable.ic_globe_gray_16dp)
+                .error(R.drawable.ic_globe_gray_16dp)
+                .into(view)
+        }
+    }
+
 }

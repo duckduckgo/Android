@@ -80,6 +80,8 @@ fun Uri.toDesktopUri(): Uri {
     return parse(newUrl)
 }
 
+fun Uri.domain(): String? = this.host
+
 // to obtain a favicon for a website, we go directly to the site and look for /favicon.ico
 private const val faviconBaseUrlFormat = "%s://%s/favicon.ico"
 

@@ -60,21 +60,6 @@ class TabRendererExtensionTest {
         assertEquals("", TabEntity("", null, TITLE, position = 0).displayUrl())
     }
 
-    @Test
-    fun whenTabHasUrlThenFaviconIsNotNull() {
-        assertNotNull(TabEntity("", URL, TITLE, position = 0).favicon())
-    }
-
-    @Test
-    fun whenTabDoesNotHaveAUrlThenFaviconIsNull() {
-        assertNull(TabEntity("", null, TITLE, position = 0).favicon())
-    }
-
-    @Test
-    fun whenTabHasInvalidUrlThenFaviconIsNull() {
-        assertNull(TabEntity("", INVALID_URL, TITLE, position = 0).favicon())
-    }
-
     companion object {
         private const val TITLE = "Title"
         private const val URL = "https://example.com"

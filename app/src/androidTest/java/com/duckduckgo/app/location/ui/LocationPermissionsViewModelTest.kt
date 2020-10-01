@@ -22,6 +22,7 @@ import androidx.room.Room
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.InstantSchedulersRule
+import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.location.GeoLocationPermissions
 import com.duckduckgo.app.location.data.LocationPermissionEntity
@@ -35,6 +36,7 @@ import com.nhaarman.mockitokotlin2.atLeastOnce
 import com.nhaarman.mockitokotlin2.lastValue
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.verify
+import dagger.Lazy
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.junit.After
 import org.junit.Assert
@@ -80,6 +82,10 @@ class LocationPermissionsViewModelTest {
 
     private val mockPixel: Pixel = mock()
 
+    private val mockFaviconManager: FaviconManager = mock()
+
+    private val lazyFaviconManager = Lazy { mockFaviconManager }
+
     @Before
     fun before() {
         db = Room.inMemoryDatabaseBuilder(InstrumentationRegistry.getInstrumentation().targetContext, AppDatabase::class.java)
@@ -87,7 +93,7 @@ class LocationPermissionsViewModelTest {
             .build()
         locationPermissionsDao = db.locationPermissionsDao()
         viewModel = LocationPermissionsViewModel(
-            LocationPermissionsRepository(locationPermissionsDao, coroutineRule.testDispatcherProvider),
+            LocationPermissionsRepository(locationPermissionsDao, lazyFaviconManager, coroutineRule.testDispatcherProvider),
             mockGeoLocationPermissions,
             coroutineRule.testDispatcherProvider,
             settingsDataStore,

@@ -19,6 +19,7 @@ package com.duckduckgo.app.global.model
 import android.net.Uri
 import androidx.core.net.toUri
 import com.duckduckgo.app.global.baseHost
+import com.duckduckgo.app.global.domain
 import com.duckduckgo.app.global.model.SiteFactory.SitePrivacyData
 import com.duckduckgo.app.privacy.model.HttpsStatus
 import com.duckduckgo.app.privacy.model.PrivacyGrade
@@ -72,4 +73,4 @@ fun Site.domainMatchesUrl(matchingUrl: String): Boolean {
     return uri?.baseHost == matchingUrl.toUri().baseHost
 }
 
-val Site.domain get() = uri?.host
+val Site.domain get() = uri?.domain()

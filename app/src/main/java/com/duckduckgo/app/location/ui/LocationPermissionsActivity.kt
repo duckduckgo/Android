@@ -25,6 +25,7 @@ import android.os.Bundle
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.view.gone
 import com.duckduckgo.app.global.view.html
@@ -35,8 +36,12 @@ import com.duckduckgo.app.location.data.LocationPermissionType
 import kotlinx.android.synthetic.main.content_location_permissions.locationPermissionsNoSystemPermission
 import kotlinx.android.synthetic.main.content_location_permissions.recycler
 import kotlinx.android.synthetic.main.include_toolbar.toolbar
+import javax.inject.Inject
 
 class LocationPermissionsActivity : DuckDuckGoActivity(), SiteLocationPermissionDialog.SiteLocationPermissionDialogListener {
+
+    @Inject
+    lateinit var faviconManager: FaviconManager
 
     lateinit var adapter: LocationPermissionsAdapter
     private var deleteDialog: AlertDialog? = null
@@ -53,7 +58,7 @@ class LocationPermissionsActivity : DuckDuckGoActivity(), SiteLocationPermission
     }
 
     private fun setupRecyclerView() {
-        adapter = LocationPermissionsAdapter(viewModel)
+        adapter = LocationPermissionsAdapter(viewModel, this, faviconManager)
         recycler.adapter = adapter
     }
 
@@ -98,7 +103,7 @@ class LocationPermissionsActivity : DuckDuckGoActivity(), SiteLocationPermission
     }
 
     private fun editSiteLocationPermission(entity: LocationPermissionEntity) {
-        val dialog = SiteLocationPermissionDialog.instance(entity.domain, true)
+        val dialog = SiteLocationPermissionDialog.instance(origin = entity.domain, isEditingPermission = true, tabId = "")
         dialog.show(supportFragmentManager, SiteLocationPermissionDialog.SITE_LOCATION_PERMISSION_TAG)
     }
 
