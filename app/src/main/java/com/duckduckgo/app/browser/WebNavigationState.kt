@@ -37,6 +37,7 @@ sealed class WebNavigationStateChange {
     object PageCleared : WebNavigationStateChange()
     object Unchanged : WebNavigationStateChange()
     object PageNavigationCleared : WebNavigationStateChange()
+    object Redirected : WebNavigationStateChange()
     object Other : WebNavigationStateChange()
 }
 
@@ -47,6 +48,9 @@ fun WebNavigationState.compare(previous: WebNavigationState?): WebNavigationStat
 
     if (this is EmptyNavigationState)
         return PageNavigationCleared
+
+    if (this is OverrideURL)
+        return Redirected
 
     if (originalUrl == null && previous?.originalUrl != null) {
         return PageCleared
@@ -144,6 +148,26 @@ data class EmptyNavigationState private constructor(
     override val canGoBack: Boolean = false
     override val canGoForward: Boolean = false
     override val hasNavigationHistory: Boolean = false
+}
+
+@Suppress("DataClassPrivateConstructor")
+data class OverrideURL private constructor(
+    val nextUrl: String,
+    val webNavigationState: WebNavigationState
+) : WebNavigationState {
+    companion object {
+        operator fun invoke(nextUrl: String, stack: WebBackForwardList): OverrideURL {
+            return OverrideURL(nextUrl, WebViewNavigationState(stack))
+        }
+    }
+
+    override val originalUrl: String? = webNavigationState.originalUrl
+    override val currentUrl: String? = webNavigationState.currentUrl
+    override val title: String? = webNavigationState.title
+    override val stepsToPreviousPage: Int = webNavigationState.stepsToPreviousPage
+    override val canGoBack: Boolean = webNavigationState.canGoBack
+    override val canGoForward: Boolean = webNavigationState.canGoForward
+    override val hasNavigationHistory: Boolean = webNavigationState.hasNavigationHistory
 }
 
 private val WebBackForwardList.originalUrl: String?

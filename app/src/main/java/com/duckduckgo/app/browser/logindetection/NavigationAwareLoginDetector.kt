@@ -88,6 +88,8 @@ class NextPageLoginDetection @Inject constructor() : NavigationAwareLoginDetecto
             }
             is WebNavigationStateChange.Other -> {
             }
+            is WebNavigationStateChange.Redirected -> {
+            }
         }
     }
 
