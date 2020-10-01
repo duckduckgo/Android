@@ -29,11 +29,9 @@
     <string name="daxEndCtaText"><![CDATA[加油！<br/><br/>記得: 當你每次透過我瀏覽各個網頁，某地某處的噁心廣告正哀號著求饒！👍]]></string>
     <string name="daxSerpCtaText">您的 DuckDuckGo 搜尋紀錄是完全匿名的，而且我也不會保存你任何的搜尋紀錄。永遠不會！🙌</string>
     <plurals name="daxTrackersBlockedCtaText">
-        <item quantity="one"><![CDATA[&#160;及另 <b>%d 個服務</b>企圖於本網站追蹤你的行為。 <br/><br/>我幫你擋掉它們了！<br/><br/> ☝️當你造訪新的網站時，你可以透過搜尋列來檢查哪個服務曾企圖追蹤你的行為。]]></item>
         <item quantity="other"><![CDATA[&#160;及另 <b>%d 個服務</b>企圖於本網站追蹤你的行為。 <br/><br/>我幫你擋掉它們了！<br/><br/> ☝️當你造訪新的網站時，你可以透過搜尋列來檢查哪個服務曾企圖追蹤你的行為。]]></item>
     </plurals>
     <plurals name="daxTrackersBlockedCtaZeroText">
-        <item quantity="one"><![CDATA[&#160;企圖於本網站追蹤你的行為。 <br/><br/>我幫你擋掉它了！<br/><br/> ☝️當你造訪新的網站時，你可以透過搜尋列來檢查哪個服務曾企圖追蹤你的行為。️]]></item>
         <item quantity="other"><![CDATA[&#160;企圖於本網站追蹤你的行為。 <br/><br/>我幫你擋掉它了！<br/><br/> ☝️當你造訪新的網站時，你可以透過搜尋列來檢查哪個服務曾企圖追蹤你的行為。️]]></item>
     </plurals>
     <string name="daxNonSerpCtaText"><![CDATA[當你又滑又按的時候，我會幫你擋掉那些惱人的追蹤元件。<br/><br/>放心繼續瀏覽吧！]]></string>
@@ -123,19 +121,15 @@
     <string name="networksOverview">追蹤網路會透過你的網頁歷史紀錄來建立你的個人檔案。大型的追蹤網路因為能在網頁間追蹤你的行為並針對你進行某些動作，因此這些網路是有害的。</string>
 
     <plurals name="trackersFound">
-        <item quantity="one">發現 %s 個追蹤元件</item>
         <item quantity="other">發現 %s 個追蹤元件</item>
     </plurals>
     <plurals name="trackerBlocked">
-        <item quantity="one">已阻擋 %s 個追蹤元件</item>
         <item quantity="other">已阻擋 %s 個追蹤元件</item>
     </plurals>
     <plurals name="majorNetworksFound">
-        <item quantity="one">發現 %s 個大型追蹤網路</item>
         <item quantity="other">發現 %s 個大型追蹤網路</item>
     </plurals>
     <plurals name="majorNetworksBlocked">
-        <item quantity="one">已阻擋 %s 個大型追蹤網路</item>
         <item quantity="other">已阻擋 %s 個大型追蹤網路</item>
     </plurals>
 
