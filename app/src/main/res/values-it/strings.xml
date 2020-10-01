@@ -443,7 +443,7 @@
     <string name="dialogEditTitle">Modifica</string>
 
     <!-- Whitelist -->
-    <string name="whitelisetActivityTitle">Siti non protetti</string>
+    <string name="whitelistActivityTitle">Siti non protetti</string>
     <string name="enablePrivacyProtection">Attiva la tutela della privacy</string>
     <string name="disablePrivacyProtection">Disattiva la tutela della privacy</string>
     <string name="whitelistEntryOverflowContentDescription">Altre opzioni per il sito non protetto %1$s</string>

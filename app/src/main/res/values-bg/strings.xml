@@ -427,7 +427,7 @@
     <string name="dialogEditTitle">Редактиране</string>
 
     <!-- Whitelist -->
-    <string name="whitelisetActivityTitle">Незащитени сайтове</string>
+    <string name="whitelistActivityTitle">Незащитени сайтове</string>
     <string name="enablePrivacyProtection">Активиране на защита на поверителността</string>
     <string name="disablePrivacyProtection">Деактивиране на защита на поверителността</string>
     <string name="whitelistEntryOverflowContentDescription">Още опции за незащитен сайт %1$s</string>

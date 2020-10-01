@@ -427,7 +427,7 @@
     <string name="dialogEditTitle">Editar</string>
 
     <!-- Whitelist -->
-    <string name="whitelisetActivityTitle">Sitios no protegidos</string>
+    <string name="whitelistActivityTitle">Sitios no protegidos</string>
     <string name="enablePrivacyProtection">Habilitar Protección</string>
     <string name="disablePrivacyProtection">Deshabilitar Protección</string>
     <string name="whitelistEntryOverflowContentDescription">Más opciones para el sitio no protegido %1$s</string>

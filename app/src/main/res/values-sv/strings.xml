@@ -443,7 +443,7 @@
     <string name="dialogEditTitle">Redigera</string>
 
     <!-- Whitelist -->
-    <string name="whitelisetActivityTitle">Oskyddade webbplatser</string>
+    <string name="whitelistActivityTitle">Oskyddade webbplatser</string>
     <string name="enablePrivacyProtection">Aktivera integritetsskydd</string>
     <string name="disablePrivacyProtection">Inaktivera integritetsskydd</string>
     <string name="whitelistEntryOverflowContentDescription">Fler alternativ för den oskyddade webbplatsen %1$s</string>

@@ -447,7 +447,7 @@
     <string name="dialogEditTitle">Düzenle</string>
 
     <!-- Whitelist -->
-    <string name="whitelisetActivityTitle">Korumasız Siteler</string>
+    <string name="whitelistActivityTitle">Korumasız Siteler</string>
     <string name="enablePrivacyProtection">Gizlilik Korumasını Etkinleştir</string>
     <string name="disablePrivacyProtection">Gizlilik Korumasını Devre Dışı Bırak</string>
     <string name="whitelistEntryOverflowContentDescription">Korumasız %1$s sitesi için diğer seçenekler</string>

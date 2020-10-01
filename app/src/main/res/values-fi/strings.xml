@@ -427,7 +427,7 @@
     <string name="dialogEditTitle">Muokkaa</string>
 
     <!-- Whitelist -->
-    <string name="whitelisetActivityTitle">Suojaamattomat sivustot</string>
+    <string name="whitelistActivityTitle">Suojaamattomat sivustot</string>
     <string name="enablePrivacyProtection">Ota yksityisyyden suoja käyttöön</string>
     <string name="disablePrivacyProtection">Poista yksityisyyden suoja käytöstä</string>
     <string name="whitelistEntryOverflowContentDescription">Lisää valintoja suojaamattomalle sivustolle %1$s</string>

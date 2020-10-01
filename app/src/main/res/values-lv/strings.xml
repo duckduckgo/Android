@@ -453,7 +453,7 @@
     <string name="dialogEditTitle">Rediģēt</string>
 
     <!-- Whitelist -->
-    <string name="whitelisetActivityTitle">Neaizsargātas vietnes</string>
+    <string name="whitelistActivityTitle">Neaizsargātas vietnes</string>
     <string name="enablePrivacyProtection">Iespējot privātuma aizsardzību</string>
     <string name="disablePrivacyProtection">Atspējot privātuma aizsardzību</string>
     <string name="whitelistEntryOverflowContentDescription">Citas iespējas neaizsargātai vietnei %1$s</string>

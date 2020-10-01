@@ -437,7 +437,7 @@
     <string name="dialogEditTitle">Upravit</string>
 
     <!-- Whitelist -->
-    <string name="whitelisetActivityTitle">Nechráněné stránky</string>
+    <string name="whitelistActivityTitle">Nechráněné stránky</string>
     <string name="enablePrivacyProtection">Povolit ochranu soukromí</string>
     <string name="disablePrivacyProtection">Zakázat ochranu soukromí</string>
     <string name="whitelistEntryOverflowContentDescription">Další možnosti pro nechráněný web %1$s</string>

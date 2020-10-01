@@ -439,7 +439,7 @@
     <string name="dialogEditTitle">Editovať</string>
 
     <!-- Whitelist -->
-    <string name="whitelisetActivityTitle">Nezabezpečené webové stránky</string>
+    <string name="whitelistActivityTitle">Nezabezpečené webové stránky</string>
     <string name="enablePrivacyProtection">Povoliť ochranu súkromia</string>
     <string name="disablePrivacyProtection">Vypnúť ochranu súkromia</string>
     <string name="whitelistEntryOverflowContentDescription">Viac možností pre nezabezpečené webové stránky %1$s</string>

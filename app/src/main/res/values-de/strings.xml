@@ -432,7 +432,7 @@
     <string name="dialogEditTitle">Bearbeiten</string>
 
     <!-- Whitelist -->
-    <string name="whitelisetActivityTitle">Ungeschützte Websites</string>
+    <string name="whitelistActivityTitle">Ungeschützte Websites</string>
     <string name="enablePrivacyProtection">Datenschutz aktivieren</string>
     <string name="disablePrivacyProtection">Datenschutz deaktivieren</string>
     <string name="whitelistEntryOverflowContentDescription">Weitere Optionen für die ungeschützte Website %1$s</string>

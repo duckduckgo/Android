@@ -439,7 +439,7 @@
     <string name="dialogEditTitle">Uredi</string>
 
     <!-- Whitelist -->
-    <string name="whitelisetActivityTitle">Nezaščitene strani</string>
+    <string name="whitelistActivityTitle">Nezaščitene strani</string>
     <string name="enablePrivacyProtection">Omogoči zaščito zasebnosti</string>
     <string name="disablePrivacyProtection">Onemogoči zaščito zasebnosti</string>
     <string name="whitelistEntryOverflowContentDescription">Več možnosti za nezaščiteno stran %1$s</string>

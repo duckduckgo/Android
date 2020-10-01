@@ -433,7 +433,7 @@
     <string name="dialogEditTitle">Edit</string>
 
     <!-- Whitelist -->
-    <string name="whitelisetActivityTitle">Unprotected Sites</string>
+    <string name="whitelistActivityTitle">Unprotected Sites</string>
     <string name="enablePrivacyProtection">Enable Privacy Protection</string>
     <string name="disablePrivacyProtection">Disable Privacy Protection</string>
     <string name="whitelistEntryOverflowContentDescription">More options for unprotected site %s</string>

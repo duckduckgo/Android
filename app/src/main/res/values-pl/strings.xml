@@ -437,7 +437,7 @@
     <string name="dialogEditTitle">Edytuj</string>
 
     <!-- Whitelist -->
-    <string name="whitelisetActivityTitle">Niezabezpieczone witryny</string>
+    <string name="whitelistActivityTitle">Niezabezpieczone witryny</string>
     <string name="enablePrivacyProtection">Włącz ochronę prywatności</string>
     <string name="disablePrivacyProtection">Wyłącz ochronę prywatności</string>
     <string name="whitelistEntryOverflowContentDescription">Więcej opcji dla niezabezpieczonej witryny %1$s</string>

@@ -427,7 +427,7 @@
     <string name="dialogEditTitle">Rediger</string>
 
     <!-- Whitelist -->
-    <string name="whitelisetActivityTitle">Ubeskyttede websteder</string>
+    <string name="whitelistActivityTitle">Ubeskyttede websteder</string>
     <string name="enablePrivacyProtection">Aktiver Beskyttelse af privatlivet</string>
     <string name="disablePrivacyProtection">Deaktiver Beskyttelse af privatlivet</string>
     <string name="whitelistEntryOverflowContentDescription">Flere indstillinger for ubeskyttet websted %1$s</string>

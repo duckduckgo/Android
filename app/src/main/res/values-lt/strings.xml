@@ -439,7 +439,7 @@
     <string name="dialogEditTitle">Redaguoti</string>
 
     <!-- Whitelist -->
-    <string name="whitelisetActivityTitle">Neapsaugotos svetainės</string>
+    <string name="whitelistActivityTitle">Neapsaugotos svetainės</string>
     <string name="enablePrivacyProtection">Įjungti privatumo apsaugą</string>
     <string name="disablePrivacyProtection">Išjungti privatumo apsaugą</string>
     <string name="whitelistEntryOverflowContentDescription">Daugiau neapsaugotos svetainės %1$s parinkčių</string>

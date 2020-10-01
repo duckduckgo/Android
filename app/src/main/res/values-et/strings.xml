@@ -447,7 +447,7 @@
     <string name="dialogEditTitle">Redigeeri</string>
 
     <!-- Whitelist -->
-    <string name="whitelisetActivityTitle">Kaitseta saidid</string>
+    <string name="whitelistActivityTitle">Kaitseta saidid</string>
     <string name="enablePrivacyProtection">Luba Eraelu puutumatuse kaitse</string>
     <string name="disablePrivacyProtection">Keela Eraelu puutumatuse kaitse</string>
     <string name="whitelistEntryOverflowContentDescription">Rohkem võimalusi kaitseta saidi %1$s jaoks</string>

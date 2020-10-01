@@ -455,7 +455,7 @@
     <string name="dialogEditTitle">Редактировать</string>
 
     <!-- Whitelist -->
-    <string name="whitelisetActivityTitle">Незащищенные сайты</string>
+    <string name="whitelistActivityTitle">Незащищенные сайты</string>
     <string name="enablePrivacyProtection">Включить защиту конфиденциальности</string>
     <string name="disablePrivacyProtection">Отключить защиту конфиденциальности</string>
     <string name="whitelistEntryOverflowContentDescription">Дополнительные опции для незащищенного сайта %1$s</string>

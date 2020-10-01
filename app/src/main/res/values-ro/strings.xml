@@ -433,7 +433,7 @@
     <string name="dialogEditTitle">Editați</string>
 
     <!-- Whitelist -->
-    <string name="whitelisetActivityTitle">Site-uri neprotejate</string>
+    <string name="whitelistActivityTitle">Site-uri neprotejate</string>
     <string name="enablePrivacyProtection">Activează protecția confidențialității</string>
     <string name="disablePrivacyProtection">Dezactivează protecția confidențialității</string>
     <string name="whitelistEntryOverflowContentDescription">Mai multe opțiuni pentru site-ul neprotejat %1$s</string>

@@ -427,7 +427,7 @@
     <string name="dialogEditTitle">Szerkesztés</string>
 
     <!-- Whitelist -->
-    <string name="whitelisetActivityTitle">Védelem nélküli weboldalak</string>
+    <string name="whitelistActivityTitle">Védelem nélküli weboldalak</string>
     <string name="enablePrivacyProtection">Adatvédelem engedélyezése</string>
     <string name="disablePrivacyProtection">Adatvédelem letiltása</string>
     <string name="whitelistEntryOverflowContentDescription">További lehetőségek az %1$s védelem nélküli weboldalhoz</string>

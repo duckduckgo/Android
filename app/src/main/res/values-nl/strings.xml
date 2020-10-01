@@ -427,7 +427,7 @@
     <string name="dialogEditTitle">Bewerken</string>
 
     <!-- Whitelist -->
-    <string name="whitelisetActivityTitle">Onbeschermde sites</string>
+    <string name="whitelistActivityTitle">Onbeschermde sites</string>
     <string name="enablePrivacyProtection">Privacybescherming inschakelen</string>
     <string name="disablePrivacyProtection">Privacybescherming uitschakelen</string>
     <string name="whitelistEntryOverflowContentDescription">Meer opties voor onbeschermde site %1$s</string>
