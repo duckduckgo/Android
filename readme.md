@@ -1,4 +1,4 @@
-# Contributing to DuckDuckGo
+# Secure way of searching: DuckDuckGo
 
 Thank you for taking the time to contribute to DuckDuckGo! :sparkles:
 
