@@ -1,5 +1,5 @@
 ## What's new in this release?
-In this release we fixed an issue that was causing DuckDuckGo settings to be reset when the fire button is used.
+In this release we improved how we fetch favicons. Now you'll see fewer generic icons in your tabs and bookmarks.
 
 ## Have feedback?
 You can always reach us at https://duckduckgo.com/feedback.
