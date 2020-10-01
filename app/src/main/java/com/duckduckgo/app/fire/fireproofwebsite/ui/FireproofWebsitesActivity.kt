@@ -27,7 +27,6 @@ import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
 import com.duckduckgo.app.fire.fireproofwebsite.data.website
 import com.duckduckgo.app.global.DuckDuckGoActivity
-import com.duckduckgo.app.global.view.html
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.activity_fireproof_websites.*
 import kotlinx.android.synthetic.main.content_fireproof_websites.*
@@ -80,7 +79,7 @@ class FireproofWebsitesActivity : DuckDuckGoActivity() {
                 fireActivityRoot,
                 message,
                 Snackbar.LENGTH_LONG
-        ).setAction(R.string.fireproofWebsiteSnackbarAction){
+        ).setAction(R.string.fireproofWebsiteSnackbarAction) {
             viewModel.onSnackBarUndoFireproof(entity)
         }.show()
     }

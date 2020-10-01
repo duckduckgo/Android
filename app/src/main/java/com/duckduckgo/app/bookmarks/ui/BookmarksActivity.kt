@@ -140,7 +140,7 @@ class BookmarksActivity : DuckDuckGoActivity() {
                 bookmarkRootView,
                 message,
                 Snackbar.LENGTH_LONG
-        ).setAction(R.string.fireproofWebsiteSnackbarAction){
+        ).setAction(R.string.fireproofWebsiteSnackbarAction) {
             viewModel.insert(bookmark)
         }.show()
 
