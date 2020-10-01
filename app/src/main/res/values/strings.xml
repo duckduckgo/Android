@@ -302,7 +302,7 @@
     <string name="missingBrowserFeatureSubReasonBookmarks">Creating and managing bookmarks</string>
     <string name="missingBrowserFeatureSubReasonOther">None of these</string>
 
-    <string name="websiteNotLoadingTitleLong">Certainly websites don\'t load correctly</string>
+    <string name="websiteNotLoadingTitleLong">Certain websites don\'t load correctly</string>
     <string name="websiteNotLoadingTitleShort">Website loading Issues</string>
     <string name="websiteNotLoadingSubtitle">Which website is broken?</string>
 
