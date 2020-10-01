@@ -1,2 +1,515 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources></resources>
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright (c) 2020 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<resources>
+    <string name="duckDuckGoLogoDescription">DuckDuckGo 圖示</string>
+    <string name="duckDuckGoPrivacySimplified">隱私，不用等。</string>
+    <string name="yes">是</string>
+    <string name="no">否</string>
+    <string name="search">搜尋</string>
+
+    <!-- New Onboarding Experience -->
+    <string name="onboardingWelcomeTitle">歡迎使用 DuckDuckGo!</string>
+    <string name="onboardingDaxText"><![CDATA[您可能會覺得獨自在網路上漫遊是件很恐怖的事。<br/><br/>別擔心！網路隱私比你想像的易如反掌。]]></string>
+    <string name="onboardingLetsDoItButton">好的！</string>
+    <string name="daxIntroCtaText"><![CDATA[接著，試著瀏覽您最喜歡的網站！<br/><br/>我會把追蹤元件封鎖，這樣這些網站就不能偷窺你了。我也會試著將您的連線安全性提高。🔒]]></string>
+    <string name="daxEndCtaText"><![CDATA[加油！<br/><br/>記得: 當你每次透過我瀏覽各個網頁，某地某處的噁心廣告正哀號著求饒！👍]]></string>
+    <string name="daxSerpCtaText">您的 DuckDuckGo 搜尋紀錄是完全匿名的，而且我也不會保存你任何的搜尋紀錄。永遠不會！🙌</string>
+    <plurals name="daxTrackersBlockedCtaText">
+        <item quantity="one"><![CDATA[&#160;及另 <b>%d 個服務</b>企圖於本網站追蹤你的行為。 <br/><br/>我幫你擋掉它們了！<br/><br/> ☝️當你造訪新的網站時，你可以透過搜尋列來檢查哪個服務曾企圖追蹤你的行為。]]></item>
+        <item quantity="other"><![CDATA[&#160;及另 <b>%d 個服務</b>企圖於本網站追蹤你的行為。 <br/><br/>我幫你擋掉它們了！<br/><br/> ☝️當你造訪新的網站時，你可以透過搜尋列來檢查哪個服務曾企圖追蹤你的行為。]]></item>
+    </plurals>
+    <plurals name="daxTrackersBlockedCtaZeroText">
+        <item quantity="one"><![CDATA[&#160;企圖於本網站追蹤你的行為。 <br/><br/>我幫你擋掉它了！<br/><br/> ☝️當你造訪新的網站時，你可以透過搜尋列來檢查哪個服務曾企圖追蹤你的行為。️]]></item>
+        <item quantity="other"><![CDATA[&#160;企圖於本網站追蹤你的行為。 <br/><br/>我幫你擋掉它了！<br/><br/> ☝️當你造訪新的網站時，你可以透過搜尋列來檢查哪個服務曾企圖追蹤你的行為。️]]></item>
+    </plurals>
+    <string name="daxNonSerpCtaText"><![CDATA[當你又滑又按的時候，我會幫你擋掉那些惱人的追蹤元件。<br/><br/>放心繼續瀏覽吧！]]></string>
+    <string name="daxMainNetworkCtaText"><![CDATA[嘿！注意一下！ %s 是個追蹤用戶的大廠。<br/><br/> 他們家的追蹤元件起碼佔據了 %s 熱門網站 😱，但別擔心！<br/><br/>我會在您所造訪的網站中，把這些追蹤元件弄掉，這樣他們就不知道你在做什麼了。]]></string>
+    <string name="daxMainNetworkOwnedCtaText">嘿！因為 %s 持有 %s，我沒辦法阻止他們在這裡所進行的追蹤行為。&lt;br/&gt;&lt;br/&gt;但如果你繼續用我的話，我能在其他網站上阻擋任何追蹤元件，幫助你減少 %s 對你所知的一切。</string>
+
+    <!-- Find in page -->
+    <string name="findInPageMenuTitle">在網頁中尋找</string>
+    <string name="nextSearchTermDescription">尋找下一個</string>
+    <string name="previousSearchTermDescription">尋找上一個</string>
+    <string name="closeFindInPageButtonDescription">關閉「在網頁中尋找」選單</string>
+    <string name="findInPageHint">在網頁中尋找</string>
+
+    <!-- Onboarding Activity -->
+    <string name="onboardingDefaultBrowserDescription">透過設定將 DuckDuckGo 設為您每次搜尋及網頁瀏覽的應用程式。</string>
+    <string name="onboardingDefaultBrowserTitle">將 DuckDuckGo 設為您的預設瀏覽器</string>
+    
+    <!-- Default Browser -->
+    <string name="cannotLaunchDefaultAppSettings">無法開啟預設應用程式設定</string>
+    <string name="settingsDefaultBrowserEnabled">設為預設瀏覽器</string>
+    <string name="defaultBrowserMaybeLater">晚點再說</string>
+    <string name="defaultBrowserLetsDoIt">好的！</string>
+    <string name="defaultBrowserDescriptionNoDefault">每次都能輕鬆打開連結。</string>
+    <string name="defaultBrowserInstructions">選擇 DuckDuckGo 並點選<font color="#678fff">「一律採用」</font>。</string>
+    
+    <!-- Browser Activity -->
+    <string name="browserPopupMenu">瀏覽器選單</string>
+    <string name="refresh">重新整理</string>
+    <string name="back">上一頁</string>
+    <string name="forward">下一頁</string>
+
+    <string name="omnibarInputHint">搜尋或輸入網址</string>
+    <string name="clearButtonContentDescription">清除搜尋列內容</string>
+    <string name="no_compatible_third_party_app_installed">無相容的應用程式</string>
+    <string name="addBookmarkMenuTitle">新增書籤</string>
+    <string name="requestDesktopSiteMenuTitle">電腦版網站</string>
+
+    <!-- Downloading files -->
+    <string name="downloadImage">下載圖像</string>
+    <string name="permissionRequiredToDownload">下載檔案需啟用檔案權限</string>
+    <string name="downloadComplete">下載完畢。</string>
+    <string name="downloadFailed">下載失敗</string>
+    <string name="downloadInProgress">下載中</string>
+
+    <!-- Sharing options -->
+    <string name="options">選項</string>
+    <string name="shareLink">分享連結</string>
+    <string name="shareMenuTitle">分享…</string>
+    <string name="copyUrl">複製連結</string>
+
+    <!-- AutoComplete Suggestions -->
+    <string name="editQueryBeforeSubmitting">在搜尋前編輯關鍵字</string>
+    <string name="settingsAutocompleteEnabled">自動完成相關搜尋建議</string>
+
+    <!-- Opening external apps -->
+    <string name="openExternalApp">於外部程式開啟</string>
+    <string name="launchingExternalApp">於其他程式開啟</string>
+    <string name="confirmOpenExternalApp">您確定要離開 DuckDuckGo 以檢視此網站？</string>
+    <string name="unableToOpenLink">無法開啟這類連結</string>
+
+    <!-- Tabs -->
+    <string name="tabActivityTitle">分頁</string>
+    <string name="tabsMenuItem">分頁</string>
+    <string name="newTabMenuItem">新分頁</string>
+    <string name="openInNewTab">於新分頁開啟</string>
+    <string name="openInNewBackgroundTab">於背景分頁開啟</string>
+    <string name="openImageInNewTab">於背景分頁開啟圖像</string>
+    <string name="faviconContentDescription">Favicon 圖示</string>
+    <string name="closeContentDescription">關閉</string>
+    <string name="closeAllTabsMenuItem">關閉所有分頁</string>
+    <string name="closeTab">關閉分頁</string>
+
+    <!-- Privacy Dashboard Activities -->
+    <string name="privacyProtectionToggle">隱私保護開關</string>
+    <string name="privacyProtectionEnabled">已啟用安全保護</string>
+    <string name="privacyProtectionDisabled">已關閉安全保護</string>
+    <string name="privacyDashboardActivityTitle">隱私儀表版</string>
+    <string name="privacyProtectionUpgraded">從 &lt;img src=\"%d\" /> 提高至了 &lt;img src=\"%d\"</string>
+    <string name="privacyGradeContentDescription">隱私指數</string>
+
+    <string name="httpsGood">連線已加密</string>
+    <string name="httpsMixed">連線部分加密</string>
+    <string name="httpsBad">連線未加密</string>
+
+    <string name="networksActivityTitle">追蹤網路</string>
+    <string name="networksContentDescription">追蹤網路</string>
+    <string name="networksOverview">追蹤網路會透過你的網頁歷史紀錄來建立你的個人檔案。大型的追蹤網路因為能在網頁間追蹤你的行為並針對你進行某些動作，因此這些網路是有害的。</string>
+
+    <plurals name="trackersFound">
+        <item quantity="one">發現 %s 個追蹤元件</item>
+        <item quantity="other">發現 %s 個追蹤元件</item>
+    </plurals>
+    <plurals name="trackerBlocked">
+        <item quantity="one">已阻擋 %s 個追蹤元件</item>
+        <item quantity="other">已阻擋 %s 個追蹤元件</item>
+    </plurals>
+    <plurals name="majorNetworksFound">
+        <item quantity="one">發現 %s 個大型追蹤網路</item>
+        <item quantity="other">發現 %s 個大型追蹤網路</item>
+    </plurals>
+    <plurals name="majorNetworksBlocked">
+        <item quantity="one">已阻擋 %s 個大型追蹤網路</item>
+        <item quantity="other">已阻擋 %s 個大型追蹤網路</item>
+    </plurals>
+
+    <string name="scorecardActivityTitle">隱私指標</string>
+    <string name="scorecardSiteIsMemberOfMajorNetwork">本站為大型追蹤網路</string>
+    <string name="scorecardPrivacyGrade">隱私指標</string>
+    <string name="scorecardEnhancedGrade">加強隱私後的指標</string>
+
+    <string name="privacyTermsActivityTitle">隱私慣例</string>
+    <string name="practicesGood">良好的隱私慣例</string>
+    <string name="practicesMixed">中等的隱私慣例</string>
+    <string name="practicesBad">差勁的隱私慣例</string>
+    <string name="practicesUnknown">尚知網站隱私慣例</string>
+    <string name="practicesOverview">「隱私慣例」指的是您與網站共享的個資受到了多少保護。</string>
+    <string name="practicesTosdrLink">隱私慣例指標是依據 &#160;<b><u>ToS;DR</u></b> 而來</string>
+    <string name="practicesIconContentGood">良好慣例圖示</string>
+    <string name="practicesIconContentBad">差勁慣例圖示</string>
+
+    <string name="networkTrackerSummaryHeader">最大宗的追蹤網路</string>
+    <string name="networkTrackerSummaryNotReady">我們仍在收集已阻擋之追蹤元件數量。</string>
+
+    <!-- Fire -->
+    <string name="fireMenu">清除資料</string>
+    <string name="fireClearAll">清除所有分頁及資料</string>
+    <string name="fireCancel">取消</string>
+    <string name="fireDataCleared">已清除資料</string>
+
+    <!-- Settings Activity -->
+    <string name="settingsActivityTitle">設定</string>
+    <string name="settingsMenuItemTitle">設定</string>
+    <string name="settingsHeadingGeneral">一般</string>
+    <string name="settingsHeadingOther">其他</string>
+    <string name="settingsHeadingPrivacy">隱私</string>
+    <string name="settingsLightTheme">淺色主題</string>
+    <string name="settingsAboutDuckduckgo">關於 DuckDuckGo</string>
+    <string name="settingsVersion">版本</string>
+    <string name="leaveFeedback">提交意見</string>
+
+    <!-- Settings - Automatically clearing data -->
+    <string name="settingsAutomaticallyClearingDialogSave">儲存</string>
+
+    <string name="settingsAutomaticallyClearWhat">自動清除資料</string>
+    <string name="settingsAutomaticallyClearWhatOptionNone">關閉</string>
+    <string name="settingsAutomaticallyClearWhatOptionTabs">分頁</string>
+    <string name="settingsAutomaticallyClearWhatOptionTabsAndData">分頁及資料</string>
+
+    <string name="settingsAutomaticallyClearWhen">何時自動清除</string>
+    <string name="settingsAutomaticallyClearWhenAppExitOnly">僅退出時</string>
+    <string name="settingsAutomaticallyClearWhenAppExit5Seconds">退出或閒置5秒鐘時</string>
+    <string name="settingsAutomaticallyClearWhenAppExit5Minutes">退出或閒置5分鐘時</string>
+    <string name="settingsAutomaticallyClearWhenAppExit15Minutes">退出或閒置15分鐘時</string>
+    <string name="settingsAutomaticallyClearWhenAppExit30Minutes">退出或閒置30分鐘時</string>
+    <string name="settingsAutomaticallyClearWhenAppExit60Minutes">退出或閒置60分鐘時</string>
+
+    <!-- About Activity -->
+    <string name="aboutActivityTitle">關於我們</string>
+    <string name="aboutDescription">
+        在 DuckDuckGo，我們正努力提高網路上的信任水準。\n
+        DuckDuckGo 隱私瀏覽器提供您在搜索和瀏覽網路時保護自己所需的所有隱私功能，包括追蹤元件封鎖、更聰明的加密、以及 DuckDuckGo 的隱私搜尋引擎。\n
+        網路世界不應讓您感到毛骨悚然，而在網上獲得應有的隱私應像關上窗廉般的簡單。</string>
+    <string name="aboutMoreLink">拜訪 duckduckgo.com/about 以了解更多</string>
+    <string name="no_suggestions">沒有意見</string>
+
+    <!-- Broken Site Activity -->
+    <string name="brokenSiteReportBrokenSiteMenuItem">回報問題網站</string>
+    <string name="brokenSiteHeading">回報問題網站</string>
+    <string name="brokenSiteSubmitted">謝謝！已提交本回饋</string>
+    <string name="brokenSitesCategoriesTitle">發生什麼:</string>
+    <string name="brokenSitesCategoriesHint">發生什麼事了</string>
+    <string name="brokenSiteSubmitButton">提交回報</string>
+    <string name="brokenSiteDescription">您可匿名性的提交無法正常使用的網站，以幫助我們找出問題所在並改善本程式。</string>
+
+    <string name="brokenSiteCategoryImages">圖像無法正常讀取</string>
+    <string name="brokenSiteCategoryPaywall">網站表示需將某元件關閉</string>
+    <string name="brokenSiteCategoryComments">評論無法載入</string>
+    <string name="brokenSiteCategoryVideos">影片無法播放</string>
+    <string name="brokenSiteCategoryLinks">連結或按鈕無法正常使用</string>
+    <string name="brokenSiteCategoryContent">網站無內容</string>
+    <string name="brokenSiteCategoryLogin">無法登入</string>
+    <string name="brokenSiteCategoryUnsupported">此瀏覽器並不相容</string>
+    <string name="brokenSiteCategoryOther">其他</string>
+
+    <!-- Bookmarks Activity -->
+    <string name="bookmarksMenuTitle">書籤</string>
+    <string name="bookmarksActivityTitle">書籤</string>
+    <string name="bookmarkDeleteConfirmMessage">您確定您要刪除書籤 &lt;b>%s&lt;/b>？</string>
+    <string name="bookmarkAddedFeedback">已加入書籤</string>
+    <string name="bookmarkTitleHint">書籤標題</string>
+    <string name="bookmarkUrlHint">書籤網址</string>
+    <string name="bookmarkTitleEdit">編輯書籤</string>
+    <string name="noBookmarks">尚未新增書籤</string>
+    <string name="bookmarkOverflowContentDescription">檢視書籤 %s 的更多選項</string>
+    <string name="bookmarkEdited">已加入書籤</string>
+
+    <!-- Dialogs -->
+    <string name="dialogConfirmTitle">確認</string>
+    <string name="dialogSave">儲存</string>
+    <string name="delete">刪除</string>
+    <string name="edit">編輯</string>
+
+    <!-- Widget -->
+    <string name="searchWidgetTextHint">搜尋 DuckDuckGo</string>
+
+    <!-- Home Screen Shortcuts -->
+    <string name="addToHome">加入至主畫面</string>
+
+    <!-- User Survey -->
+    <string name="surveyCtaTitle">幫助我們改善本程式！</string>
+    <string name="surveyCtaDescription">參加我們簡短的匿名調查，並分享您的意見。</string>
+    <string name="surveyCtaLaunchButton">參加調查</string>
+    <string name="surveyCtaDismissButton">不了</string>
+    <string name="surveyActivityTitle">用戶調查</string>
+    <string name="surveyTitle">DUCKDUCKGO 問卷</string>
+    <string name="surveyDismissContentDescription">略過調查</string>
+    <string name="surveyLoadingErrorTitle">噢不！</string>
+    <string name="surveyLoadingErrorText">我們的問卷暫時打不開。\n請晚點再試！</string>
+
+    <!-- Add widget -->
+    <string name="addWidgetCtaTitle">試試我們的搜尋小工具！</string>
+    <string name="addWidgetCtaDescription">把我們的搜尋小工具加入至你的主螢幕，以便快速存取。</string>
+    <string name="addWidgetCtaAutoLaunchButton">新增小工具</string>
+    <string name="addWidgetCtaInstructionsLaunchButton">教我</string>
+    <string name="addWidgetCtaDismissButton">略過</string>
+    <string name="addWidgetInstructionsActivityTitle">新增小工具</string>
+    <string name="addWidgetInstruction1Label">1</string>
+    <string name="addWidgetInstruction1">在你的主螢幕中，於空白處長按，並點選「小工具」</string>
+    <string name="addWidgetInstruction2Label">2</string>
+    <string name="addWidgetInstruction2">找尋 DuckDuckGo 小工具</string>
+    <string name="addWidgetInstruction3Label">3</string>
+    <string name="addWidgetInstruction3">將小工具拖拉至你的主螢幕</string>
+    <string name="addWidgetInstructionsButtonGoHome">回到主螢幕</string>
+    <string name="addWidgetInstructionsButtonClose">關閉</string>
+
+    <!-- App Enjoyment / Rating / Feedback -->
+    <string name="appEnjoymentDialogTitle">喜歡 DuckDuckGo 嗎？</string>
+    <string name="appEnjoymentDialogMessage">我們想知道你的意見</string>
+    <string name="appEnjoymentDialogPositiveButton">我喜歡</string>
+    <string name="appEnjoymentDialogNegativeButton">有待加強</string>
+
+    <string name="rateAppDialogTitle">程式評價</string>
+    <string name="rateAppDialogMessage">我們希望得到您的寶貴意見，希望您能留個評價。</string>
+    <string name="rateAppDialogPositiveButton">留評價</string>
+
+    <string name="giveFeedbackDialogTitle">非常抱歉</string>
+    <string name="giveFeedbackDialogMessage">希望您能讓我們知道該怎麼改進本程式</string>
+    <string name="giveFeedbackDialogPositiveButton">提供意見</string>
+
+    <string name="noThanks">不了</string>
+
+    <!-- Notification Channel Names -->
+    <string name="notificationChannelFileDownloading">檔案下載</string>
+    <string name="notificationChannelFileDownloaded">已下載檔案</string>
+    <string name="notificationChannelTutorials">教學</string>
+
+    <!-- Clear Notification -->
+    <string name="clearNotificationTitle">目前的資料清除方式為手動</string>
+    <string name="clearNotificationDescription">您可將 DuckDuckGo 設定為每次用完後自動清除資料。</string>
+
+    <!-- Privacy Protection Notification -->
+    <string name="privacyProtectionNotificationDefaultTitle">您的隱私是我們的一切</string>
+    <string name="privacyProtectionNotificationReportTitle">您的隱私報告</string>
+    <string name="privacyProtectionNotificationDefaultDescription">您使用 DuckDuckGo 的應用程式時，我們正幫助您加密連線及阻擋追蹤元件。</string>
+    <string name="privacyProtectionNotificationUpgadeDescription">透過 DuckDuckGo，您加密了 %d 個未加密連線並保護了您的資料。</string>
+    <string name="privacyProtectionNotificationTrackerDescription">透過 DuckDuckGo，您阻擋了 %d 個追蹤元件並保護了您的資料。</string>
+    <string name="privacyProtectionNotificationBothDescription">透過 DuckDuckGo，您加密了 %d 個未加密連線、阻擋了 %d 個追蹤元件並保護了您的資料。</string>
+    <string name="privacyProtectionNotificationLaunchButton">繼續瀏覽</string>
+
+    <!-- Authentication -->
+    <string name="authenticationDialogTitle">登入</string>
+    <string name="authenticationDialogMessage">%s 需要用戶名及密碼以供登入。</string>
+    <string name="authenticationDialogPositiveButton">登入</string>
+    <string name="authenticationDialogNegativeButton">取消</string>
+    <string name="authenticationDialogUsernameHint">用戶名</string>
+    <string name="authenticationDialogPasswordHint">密碼</string>
+
+    <!-- User-facing label for when a user selects text and might want to search for that text -->
+    <string name="systemTextSearchMessage">搜尋 DuckDuckGo</string>
+
+    <!-- App feedback disambiguation -->
+    <string name="feedbackActivityTitle">分享您的意見</string>
+    <string name="missingBrowserFeaturesTitleLong">缺少瀏覽器功能或使用上的問題</string>
+    <string name="missingBrowserFeaturesTitleShort">瀏覽器功能相關問題</string>
+    <string name="missingBrowserFeaturesSubtitle">我們能增進哪項瀏覽器功能？</string>
+    <string name="missingBrowserFeatureSubReasonNavigation">控制上一頁、下一頁、及重新整理</string>
+    <string name="missingBrowserFeatureSubReasonTabManagement">建立及管理分頁</string>
+    <string name="missingBrowserFeatureSubReasonAdPopups">封鎖廣告及彈出視窗</string>
+    <string name="missingBrowserFeatureSubReasonVideos">觀看影片</string>
+    <string name="missingBrowserFeatureSubReasonImages">與圖像的互動</string>
+    <string name="missingBrowserFeatureSubReasonBookmarks">建立及管理書籤</string>
+    <string name="missingBrowserFeatureSubReasonOther">以上皆非</string>
+
+    <string name="websiteNotLoadingTitleLong">某些網站無法正常載入</string>
+    <string name="websiteNotLoadingTitleShort">網站載入問題</string>
+    <string name="websiteNotLoadingSubtitle">哪個網站有問題？</string>
+
+    <string name="searchNotGoodEnoughTitleLong">DuckDuckGo 搜尋結果並不完善</string>
+    <string name="searchNotGoodEnoughTitleShort">DuckDuckGo 搜尋問題</string>
+    <string name="searchNotGoodEnoughSubtitle">我們能增進哪些功能？</string>
+    <string name="searchNotGoodEnoughSubReasonTechnicalSearches">技術性或開發者相關的搜尋</string>
+    <string name="searchNotGoodEnoughSubReasonGoogleLayout">更像 Google 的整體介面</string>
+    <string name="searchNotGoodEnoughSubReasonFasterLoadTimes">更快的載入時間</string>
+    <string name="searchNotGoodEnoughSubReasonSpecificLanguage">於特定區域或語言中的搜尋</string>
+    <string name="searchNotGoodEnoughSubReasonBetterAutocomplete">更好的自動完成</string>
+    <string name="searchNotGoodEnoughSubReasonOther">以上皆非</string>
+
+    <string name="needMoreCustomizationTitleLong">不夠多種個人化的設定</string>
+    <string name="needMoreCustomizationTitleShort">個人化相關問題</string>
+    <string name="needMoreCustomizationSubtitle">我們能增進哪些個人化選項？</string>
+    <string name="needMoreCustomizationSubReasonHomeScreenConfiguration">主畫面設定</string>
+    <string name="needMoreCustomizationSubReasonTabDisplay">分頁排版或顯示</string>
+    <string name="needMoreCustomizationSubReasonAppLooks">整體程式樣貌</string>
+    <string name="needMoreCustomizationSubReasonWhichDataIsCleared">清除哪些資料</string>
+    <string name="needMoreCustomizationSubReasonWhenDataIsCleared">何時清除資料</string>
+    <string name="needMoreCustomizationSubReasonBookmarksDisplay">書籤樣貌</string>
+    <string name="needMoreCustomizationSubReasonOther">以上皆非</string>
+
+    <string name="appIsSlowOrBuggyTitleLong">程式感覺很慢、很多問題、或閃退</string>
+    <string name="appIsSlowOrBuggyTitleShort">性能問題</string>
+    <string name="appIsSlowOrBuggySubtitle">您遇到的是下列何者問題呢？</string>
+    <string name="appIsSlowOrBuggySubReasonSlowResults">網頁或搜尋結果載入緩慢</string>
+    <string name="appIsSlowOrBuggySubReasonAppCrashesOrFreezes">程式死當或閃退</string>
+    <string name="appIsSlowOrBuggySubReasonMediaPlayback">影片或多媒體播放有問題</string>
+    <string name="appIsSlowOrBuggySubReasonOther">以上皆非</string>
+
+    <string name="otherMainReasonTitleLong">以上皆非</string>
+    <string name="otherMainReasonTitleShort">其他問題</string>
+
+    <string name="openEndedInputHint">我們能怎麼改進？(可選)</string>
+    <string name="submitFeedback">提交回饋</string>
+
+    <string name="tellUsHowToImprove">請告訴我們如何改善。</string>
+    <string name="thanksForTheFeedback">謝謝您的意見！</string>
+    <string name="feedbackNegativeMainReasonPageSubtitle">您感到困擾的點是？</string>
+    <string name="feedbackNegativeMainReasonPageTitle">非常抱歉</string>
+    <string name="feedbackShareDetails">分享細節</string>
+    <string name="sharePositiveFeedbackWithTheTeam">您有想與開發團隊補充什麼細節嗎？</string>
+    <string name="whatHaveYouBeenEnjoying">您最喜歡的功能是？</string>
+    <string name="awesomeToHear">真棒！</string>
+    <string name="shareTheLoveWithARating">請於 Play Store 為我們評個分。</string>
+    <string name="rateTheApp">評分</string>
+    <string name="declineFurtherFeedback">不了，謝謝</string>
+    <string name="whichBrokenSites">您在哪裡看到這些問題的呢？</string>
+    <string name="whichBrokenSitesHint">哪些網站有問題？</string>
+    <string name="feedbackSpecificAsPossible">請盡量說得越詳細越好</string>
+    <string name="feedbackInitialDisambiguationTitle">來吧！</string>
+    <string name="feedbackInitialDisambiguationSubtitle">您會如何分類您的意見？</string>
+    <string name="feedbackInitialDisambiguationHappyButtonContentDescription">正面意見按鈕</string>
+    <string name="feedbackInitialDisambiguationSadButtonContentDescription">負面意見按鈕</string>
+    <string name="feedbackIsImportantToUs">您匿名的意見對我們來說是非常重要的。</string>
+
+    <!-- Webview Recovery -->
+    <string name="crashedWebViewErrorMessage">"網頁無法正常顯示。"</string>
+    <string name="crashedWebViewErrorAction">"重新載入"</string>
+
+    <!-- System Search-->
+    <string name="systemSearchDeviceAppLabel">從這個裝置</string>
+    <string name="systemSearchOmnibarInputHint"><font size="13">搜尋或輸入網址</font></string>
+    <string name="systemSearchAppNotFound">無法找尋現有搜尋應用程式</string>
+    <string name="systemSearchOnboardingText">感謝您選擇使用 DuckDuckGo!\n當您使用我們的搜尋引擎或應用程式時，您的搜尋紀錄將被保護。</string>
+    <string name="systemSearchOnboardingFeaturesIntroText">DuckDuckGo 還能:</string>
+    <string name="systemSearchOnboardingFeatureOneText">封鎖不安全的追蹤元件</string>
+    <string name="systemSearchOnboardingFeatureTwoText">強制使用加密連線</string>
+    <string name="systemSearchOnboardingFeatureThreeText">輕指一按就能清除所有資料</string>
+    <string name="systemSearchOnboardingButtonMore">Show more</string>
+    <string name="systemSearchOnboardingButtonLess">隱藏</string>
+    <string name="systemSearchOnboardingButtonOk">知道了</string>
+
+    <!-- Dax Dialog -->
+    <string name="daxDialogHideButton">隱藏</string>
+    <string name="daxDialogPhew">呼！</string>
+    <string name="daxDialogNext">下一個</string>
+    <string name="daxDialogHighFive">真棒！</string>
+    <string name="daxDialogGotIt">知道了</string>
+    <string name="hideTipsTitle">隱藏剩下的小叮嚀嗎？</string>
+    <string name="hideTipsText">只剩一點，而且我們盡量只顯示有幫助的叮嚀。</string>
+    <string name="hideTipsButton">永久隱藏小叮嚀</string>
+
+    <!-- Download Confirmation -->
+    <string name="downloadConfirmationContinue">繼續</string>
+    <string name="downloadConfirmationSaveFileTitle">儲存 %1$s</string>
+    <string name="downloadConfirmationKeepBothFilesText">皆保留</string>
+    <string name="downloadConfirmationReplaceOldFileText">替換</string>
+    <string name="downloadConfirmationOpenFileText">開啟</string>
+    <string name="downloadConfirmationUnableToOpenFileText">無法開啟檔案</string>
+    <string name="downloadConfirmationUnableToDeleteFileText">無法刪除舊檔</string>
+
+    <!-- Change Icon Activity -->
+    <string name="changeIconActivityTitle">應用程式圖示</string>
+    <string name="changeIconCtaLabel">更改應用程式圖示</string>
+    <string name="changeIconCtaAccept">套用</string>
+    <string name="changeIconCtaCancel">取消</string>
+    <string name="changeIconDialogTitle">套用新圖示？</string>
+    <string name="changeIconDialogMessage">本程式可能須退出以套用新的變更。在你觀賞完你新的華麗圖示後再回來吧！</string>
+
+    <!-- New dashboard / menu buttons -->
+    <string name="manageWhitelist">未受保護的網站</string>
+    <string name="reportBrokenSite">回報問題網站</string>
+
+    <!-- Dialogs -->
+    <string name="dialogAddTitle">新增</string>
+    <string name="dialogEditTitle">編輯</string>
+
+    <!-- Whitelist -->
+    <string name="whitelistActivityTitle">未受保護的網站</string>
+    <string name="enablePrivacyProtection">啟用隱私保護</string>
+    <string name="disablePrivacyProtection">關閉隱私保護</string>
+    <string name="whitelistEntryOverflowContentDescription">為 %s 提供更多與未受保護網站相關選項</string>
+    <string name="whitelistEntryDeleteConfirmMessage">您確定要從未受保護的網站中刪除 &lt;b>%s&lt;/b> 嗎？</string>
+    <string name="whitelistExplanation">這些網站不會受到隱私保護功能影響。</string>
+    <string name="whitelistNoEntries">無未保護網站</string>
+    <string name="whitelistDomainHint">www.example.com</string>
+    <string name="whitelistFormatError">無法儲存，試試看像 <b>example.com</b> 這種域名</string>
+
+    <!-- Settings -->
+    <string name="settingsPrivacyProtectionWhitelist">未受保護的網站</string>
+
+    <!-- Fireproof websites -->
+    <string name="fireproofWebsitesActivityTitle">網站擋火</string>
+    <string name="settingsFireproofWebsites">網站擋火</string>
+    <string name="fireproofWebsiteMenuTitleAdd">網站擋火</string>
+    <string name="fireproofWebsiteSnackbarConfirmation">已替 &lt;b>%s&lt;/b> 開啟擋火！開啟設定以進一步了解此選項。</string>
+    <string name="fireproofWebsiteSnackbarAction">還原</string>
+    <string name="fireproofWebsiteDeleteConfirmMessage">您確定您要刪除 &lt;b>%s&lt;/b> 嗎？</string>
+    <string name="fireproofWebsiteEmptyListHint">尚未替任何網站開啟擋火功能</string>
+    <string name="fireproofWebsiteFeatureDescription">網站通常會透過 Cookies 來保持您在該網站的登入狀態。當您替某個網站開啟擋火功能時，該網站的 Cookies 不會被清除，而您也會保持您的登入狀態－即使您按下了焚火按鈕。我們仍會試著在這些被擋火的網站中阻擋第三方追蹤元件。</string>
+    <string name="fireproofWebsiteOverflowContentDescription">More options for fireproof website %s</string>
+    <string name="fireproofWebsiteLoginDialogTitle">您想要替 %s 開啟擋火嗎？</string>
+    <string name="fireproofWebsiteLoginDialogDescription">擋火功能會在您按下焚火按鈕時保留您在本網站的登入狀態。</string>
+    <string name="fireproofWebsiteLoginDialogPositive">擋火</string>
+    <string name="fireproofWebsiteLoginDialogNegative">晚點再說</string>
+    <string name="fireproofWebsiteItemsSectionTitle">網站</string>
+    <string name="fireproofWebsiteToogleText">於登入時詢問</string>
+
+    <!-- Dos Attack error-->
+    <string name="dosErrorMessage">無法連線。該網站可能對您的裝置有害。</string>
+
+    <!-- Download Manager problems -->
+    <string name="downloadManagerDisabled">下載管理員已被關閉</string>
+    <string name="downloadManagerIncompatible">此裝置無法使用下載管理員</string>
+    <string name="enable">啟用</string>
+
+    <!--Fire button education-->
+    <string name="daxClearDataCtaText">點選下面那顆按鈕可焚化你的瀏覽紀錄。試試看吧！ &#128071;</string>
+
+    <!-- Use Our App Flow -->
+    <string name="useOurAppDialogText">你知道 Facebook 的手機應用程式可以在你不知情的情況下跟你的手機調資料嗎？&lt;br/&gt;&lt;br/&gt;您可以把 Facebook 應用程式換成 DuckDuckGo 的捷徑，並把 Facebook 的應用程式移除。</string>
+    <string name="useOurAppDialogButtonText">建立 Facebook 捷徑</string>
+    <string name="useOurAppDialogCancelButtonText">先不要</string>
+    <string name="useOurAppNotificationTitle">擔心 Facebook 追蹤你的一切嗎？</string>
+    <string name="useOurAppNotificationDescription">你可以透過這點來減少他所知的一切。</string>
+    <string name="useOurAppShortcutAddedText">成功！%s 已被加入至您的主螢幕中。</string>
+    <string name="useOurAppDeletionDialogText">透過 DuckDuckGo 檢查您的 Facebook 是個還不錯的選擇！&lt;br/&gt;&lt;br/&gt;但是如果你的手機裝有 Facebook 的官方應用程式，它能在你不知情的狀況下與你的手機調資料。&lt;br/&gt;&lt;br/&gt;現在就把它刪掉，以防這種事情發生！</string>
+
+    <!-- Precise Location -->
+    <string name="preciseLocationSystemDialogTitle">替 DuckDuckGo 啟用裝置定位嗎？</string>
+    <string name="preciseLocationSystemDialogSubtitle">%s 正試著存取您目前的所在位置。您首先得允許本應用程式的定位權限，接著 %s 才能請求定位權限。</string>
+    <string name="preciseLocationSystemDialogAllow">啟用</string>
+    <string name="preciseLocationSystemDialogDeny">晚點再說</string>
+    <string name="preciseLocationSystemDialogNeverAllow">不要再為這個網站詢問</string>
+    <string name="preciseLocationSiteDialogTitle">允許 %s 使用定位權限？</string>
+    <string name="preciseLocationSiteDialogSubtitle">您可以在設定中管理您替各網站設定的定位選項。</string>
+    <string name="preciseLocationSiteDialogAllowAlways">永遠</string>
+    <string name="preciseLocationSiteDialogAllowOnce">僅限本次</string>
+    <string name="preciseLocationSiteDialogDenyAlways">永遠拒絕</string>
+    <string name="preciseLocationSiteDialogDenyOnce">本次拒絕</string>
+    <string name="settingsPreciseLocation">定位</string>
+    <string name="preciseLocationFeatureDescription">某些網站可能會要求使用定位功能，以得知您目前裝置的所在位置。除非您特別准許這些網站使用此功能，否則它們將無法存取您目前的位置。DuckDuckGo 僅會使用您目前的所在位置來提供地方化的搜尋結果。</string>
+    <string name="preciseLocationToggleText">可要求定位之網站</string>
+    <string name="preciseLocationEmptyListHint">尚未允許任何網站使用定位</string>
+    <string name="preciseLocationNoSystemPermission">為替各網站管理定位權限，您首先必須至 Android 設定中允許本程式之定位權限。</string>
+    <string name="preciseLocationActivityTitle">定位</string>
+    <string name="preciseLocationDeleteConfirmMessage">您確定要刪除 &lt;b>%s&lt;/b> 嗎?</string>
+    <string name="preciseLocationDeleteContentDescription">為 %s 設定定位選項</string>
+    <string name="preciseLocationAllowedSitesSectionTitle">已允許</string>
+    <string name="preciseLocationDeniedSitesSectionTitle">已拒絕</string>
+    <string name="preciseLocationSnackbarMessage">您先前已允許 %s 使用定位。</string>
+</resources>
