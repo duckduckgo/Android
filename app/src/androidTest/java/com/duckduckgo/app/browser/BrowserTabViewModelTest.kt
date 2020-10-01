@@ -591,6 +591,40 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenUserRedirectedBeforePreviousSiteLoadedAndNewContentDelayedThenBlankWebContent() = coroutineRule.runBlocking {
+        loadUrl("http://duckduckgo.com")
+        testee.progressChanged(50)
+
+        overrideUrl("http://example.com")
+        advanceTimeBy(2000)
+
+        assertCommandIssued<Command.HideWebContent>()
+    }
+
+    @Test
+    fun whenUserRedirectedAfterSiteLoadedAndNewContentDelayedThenNothing() = coroutineRule.runBlocking {
+        loadUrl("http://duckduckgo.com")
+        testee.progressChanged(100)
+
+        overrideUrl("http://example.com")
+        advanceTimeBy(2000)
+
+        assertCommandNotIssued<Command.HideWebContent>()
+    }
+
+    @Test
+    fun whenNewSiteStartsToLoadThenShowWebContent() = coroutineRule.runBlocking {
+        loadUrl("http://duckduckgo.com")
+        testee.progressChanged(50)
+        overrideUrl("http://example.com")
+        advanceTimeBy(2000)
+
+        loadUrl("http://example.com")
+
+        assertCommandIssued<Command.ShowWebContent>()
+    }
+
+    @Test
     fun whenViewModelNotifiedThatUrlGotFocusThenViewStateIsUpdated() = coroutineRule.runBlocking {
         testee.onOmnibarInputStateChanged("", true, hasQueryChanged = false)
         assertTrue(omnibarViewState().isEditing)
@@ -2954,6 +2988,11 @@ class BrowserTabViewModelTest {
     private fun updateUrl(originalUrl: String?, currentUrl: String?, isBrowserShowing: Boolean) {
         setBrowserShowing(isBrowserShowing)
         testee.navigationStateChanged(buildWebNavigation(originalUrl = originalUrl, currentUrl = currentUrl))
+    }
+
+    private fun overrideUrl(url: String, isBrowserShowing: Boolean = true) {
+        setBrowserShowing(isBrowserShowing)
+        testee.navigationStateChanged(OverrideURL(nextUrl = url, stack = mock()))
     }
 
     private fun setupNavigation(
