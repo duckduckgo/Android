@@ -50,7 +50,7 @@ import com.duckduckgo.app.browser.WebNavigationStateChange.*
 import com.duckduckgo.app.browser.addtohome.AddToHomeCapabilityDetector
 import com.duckduckgo.app.browser.downloader.DownloadFailReason
 import com.duckduckgo.app.browser.downloader.FileDownloader
-import com.duckduckgo.app.browser.favicon.FaviconDownloader
+import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.logindetection.LoginDetected
 import com.duckduckgo.app.browser.logindetection.NavigationAwareLoginDetector
 import com.duckduckgo.app.browser.logindetection.NavigationEvent
@@ -100,7 +100,6 @@ import com.jakewharton.rxrelay2.PublishRelay
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
-import io.reactivex.schedulers.Schedulers.io
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
@@ -128,7 +127,7 @@ class BrowserTabViewModel(
     private val longPressHandler: LongPressHandler,
     private val webViewSessionStorage: WebViewSessionStorage,
     private val specialUrlDetector: SpecialUrlDetector,
-    private val faviconDownloader: FaviconDownloader,
+    private val faviconManager: FaviconManager,
     private val addToHomeCapabilityDetector: AddToHomeCapabilityDetector,
     private val ctaViewModel: CtaViewModel,
     private val searchCountDao: SearchCountDao,
@@ -314,6 +313,7 @@ class BrowserTabViewModel(
     private var webNavigationState: WebNavigationState? = null
     private var httpsUpgraded = false
     private val browserStateModifier = BrowserStateModifier()
+    private var faviconPrefetchJob: Job? = null
 
     private val fireproofWebsitesObserver = Observer<List<FireproofWebsiteEntity>> {
         browserViewState.value = currentBrowserViewState().copy(isFireproofWebsite = isFireproofWebsite())
@@ -544,6 +544,27 @@ class BrowserTabViewModel(
         val currentTab = tabRepository.liveSelectedTab.value
         currentTab?.let {
             tabRepository.delete(currentTab)
+        }
+    }
+
+    override fun prefetchFavicon(url: String) {
+        faviconPrefetchJob?.cancel()
+        faviconPrefetchJob = viewModelScope.launch {
+            val faviconFile = faviconManager.prefetchToTemp(tabId, url)
+            if (faviconFile != null) {
+                tabRepository.updateTabFavicon(tabId, faviconFile.name)
+            }
+        }
+    }
+
+    override fun iconReceived(icon: Bitmap) {
+        val currentTab = tabRepository.liveSelectedTab.value ?: return
+        val url = currentTab.url ?: return
+        viewModelScope.launch {
+            val faviconFile = faviconManager.saveToTemp(currentTab.tabId, icon, url)
+            faviconFile?.let {
+                tabRepository.updateTabFavicon(tabId, faviconFile.name)
+            }
         }
     }
 
@@ -911,6 +932,7 @@ class BrowserTabViewModel(
                     pixel.fire(PixelName.PRECISE_LOCATION_SITE_DIALOG_ALLOW_ALWAYS)
                     viewModelScope.launch {
                         locationPermissionsRepository.savePermission(domain, permission)
+                        faviconManager.persistFavicon(tabId, domain)
                     }
                 }
                 LocationPermissionType.ALLOW_ONCE -> {
@@ -922,6 +944,7 @@ class BrowserTabViewModel(
                     onSiteLocationPermissionAlwaysDenied()
                     viewModelScope.launch {
                         locationPermissionsRepository.savePermission(domain, permission)
+                        faviconManager.persistFavicon(tabId, domain)
                     }
                 }
                 LocationPermissionType.DENY_ONCE -> {
@@ -982,12 +1005,8 @@ class BrowserTabViewModel(
 
     override fun onSystemLocationPermissionNeverAllowed() {
         locationPermission?.let { locationPermission ->
-            val neverAllowedPermission = LocationPermissionType.DENY_ALWAYS
-            onSiteLocationPermissionSelected(locationPermission.origin, neverAllowedPermission)
-            pixel.fire(Pixel.PixelName.PRECISE_LOCATION_SYSTEM_DIALOG_NEVER)
-            viewModelScope.launch {
-                locationPermissionsRepository.savePermission(locationPermission.origin, neverAllowedPermission)
-            }
+            onSiteLocationPermissionSelected(locationPermission.origin, LocationPermissionType.DENY_ALWAYS)
+            pixel.fire(PixelName.PRECISE_LOCATION_SYSTEM_DIALOG_NEVER)
         }
     }
 
@@ -995,7 +1014,7 @@ class BrowserTabViewModel(
         locationPermission?.let { locationPermission ->
             appSettingsPreferencesStore.appLocationPermissionDeniedForever = false
             appSettingsPreferencesStore.appLocationPermission = true
-            pixel.fire(Pixel.PixelName.PRECISE_LOCATION_SETTINGS_LOCATION_PERMISSION_ENABLE)
+            pixel.fire(PixelName.PRECISE_LOCATION_SETTINGS_LOCATION_PERMISSION_ENABLE)
             viewModelScope.launch {
                 val permissionEntity = locationPermissionsRepository.getDomainPermission(locationPermission.origin)
                 if (permissionEntity == null) {
@@ -1008,7 +1027,7 @@ class BrowserTabViewModel(
     }
 
     fun onSystemLocationPermissionDeniedOneTime() {
-        pixel.fire(Pixel.PixelName.PRECISE_LOCATION_SETTINGS_LOCATION_PERMISSION_DISABLE)
+        pixel.fire(PixelName.PRECISE_LOCATION_SETTINGS_LOCATION_PERMISSION_DISABLE)
         onSiteLocationPermissionAlwaysDenied()
     }
 
@@ -1167,6 +1186,9 @@ class BrowserTabViewModel(
         val url = url ?: ""
         val title = title ?: ""
         val id = withContext(dispatchers.io()) {
+            if (url.isNotBlank()) {
+                faviconManager.persistFavicon(tabId, url)
+            }
             bookmarksDao.insert(BookmarkEntity(title = title, url = url))
         }
         withContext(dispatchers.main()) {
@@ -1184,6 +1206,7 @@ class BrowserTabViewModel(
                 fireproofWebsiteRepository.fireproofWebsite(domain)?.let {
                     pixel.fire(PixelName.FIREPROOF_WEBSITE_ADDED)
                     command.value = ShowFireproofWebSiteConfirmation(fireproofWebsiteEntity = it)
+                    faviconManager.persistFavicon(tabId, url = domain)
                 }
             }
         }
@@ -1427,16 +1450,10 @@ class BrowserTabViewModel(
             currentPage.toUri().baseHost ?: currentPage
         }
 
-        faviconDownloader.download(currentPage.toUri())
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe({
-                Timber.i("Successfully got favicon")
-                command.value = AddHomeShortcut(title, currentPage, it)
-            }, { throwable ->
-                Timber.w(throwable, "Failed to obtain favicon")
-                command.value = AddHomeShortcut(title, currentPage)
-            })
+        viewModelScope.launch {
+            val favicon: Bitmap? = faviconManager.loadFromTemp(tabId, currentPage)
+            command.value = AddHomeShortcut(title, currentPage, favicon)
+        }
     }
 
     fun userRequestedOpeningNewTab() {

@@ -22,6 +22,7 @@ import androidx.room.Room
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.InstantSchedulersRule
+import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteDao
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepository
@@ -32,6 +33,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.FIREPROOF_LOGIN_TOGGLE_ENABLED
 import com.nhaarman.mockitokotlin2.atLeastOnce
 import com.nhaarman.mockitokotlin2.mock
+import dagger.Lazy
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.junit.After
 import org.junit.Assert.*
@@ -40,7 +42,6 @@ import org.junit.Rule
 import org.junit.Test
 import org.mockito.ArgumentCaptor
 import org.mockito.Mockito.verify
-import java.util.*
 
 @Suppress("EXPERIMENTAL_API_USAGE")
 class FireproofWebsitesViewModelTest {
@@ -73,6 +74,10 @@ class FireproofWebsitesViewModelTest {
 
     private val settingsDataStore: SettingsDataStore = mock()
 
+    private val mockFaviconManager: FaviconManager = mock()
+
+    private val lazyFaviconManager = Lazy { mockFaviconManager }
+
     @Before
     fun before() {
         db = Room.inMemoryDatabaseBuilder(InstrumentationRegistry.getInstrumentation().targetContext, AppDatabase::class.java)
@@ -80,7 +85,7 @@ class FireproofWebsitesViewModelTest {
             .build()
         fireproofWebsiteDao = db.fireproofWebsiteDao()
         viewModel = FireproofWebsitesViewModel(
-            FireproofWebsiteRepository(fireproofWebsiteDao, coroutineRule.testDispatcherProvider),
+            FireproofWebsiteRepository(fireproofWebsiteDao, coroutineRule.testDispatcherProvider, lazyFaviconManager),
             coroutineRule.testDispatcherProvider,
             mockPixel,
             settingsDataStore

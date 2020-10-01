@@ -151,7 +151,10 @@ class BrowserWebViewClient(
         try {
             Timber.v("onPageFinished webViewUrl: ${webView.url} URL: $url")
             val navigationList = webView.safeCopyBackForwardList() ?: return
-            webViewClientListener?.navigationStateChanged(WebViewNavigationState(navigationList))
+            webViewClientListener?.run {
+                navigationStateChanged(WebViewNavigationState(navigationList))
+                url?.let { prefetchFavicon(url) }
+            }
             flushCookies()
         } catch (e: Throwable) {
             GlobalScope.launch {

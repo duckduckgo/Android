@@ -19,6 +19,7 @@
 package com.duckduckgo.app.browser
 
 import android.content.Context
+import android.graphics.Bitmap
 import android.os.Message
 import android.view.View
 import android.webkit.WebChromeClient
@@ -110,6 +111,13 @@ class BrowserChromeClientTest {
     fun whenOnCreateWindowWithoutUserGestureThenNewTabNotOpened() {
         testee.onCreateWindow(webView, isDialog = false, isUserGesture = false, resultMsg = mockMsg)
         verifyZeroInteractions(mockWebViewClientListener)
+    }
+
+    @Test
+    fun whenOnReceivedIconThenIconReceived() {
+        val bitmap: Bitmap = Bitmap.createBitmap(1, 1, Bitmap.Config.RGB_565)
+        testee.onReceivedIcon(webView, bitmap)
+        verify(mockWebViewClientListener).iconReceived(bitmap)
     }
 
     private val mockMsg = Message().apply {
