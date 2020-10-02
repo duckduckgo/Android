@@ -59,7 +59,7 @@
         &#8226; Limit sharing your personal data to other companies.
     </string>
     <string name="globalPrivacyControlToggle" translatable="false">Global Privacy Control (GPC)</string>
-    <string name="globalPrivacyControlDescriptionLegal" translatable="false"><b>Since Global Privacy Control (GPC) is a new standard, most websites won\'t recognize it yet, but we\'re working hard to ensure it becomes recognized worldwide.</b> However, websites are only required to act on the signal to the extent applicable laws compel them to do so.</string>
+    <string name="globalPrivacyControlDescriptionLegal" translatable="false"><b>Since Global Privacy Control (GPC) is a new standard, most websites won\'t recognize it yet, but we\'re working hard to ensure it becomes accepted worldwide.</b> However, websites are only required to act on the signal to the extent applicable laws compel them to do so.</string>
     <string name="globalPrivacyControlLearnMore" translatable="false"><u>Learn More</u></string>
     <string name="disabled" translatable="false">Disabled</string>
     <string name="enabled" translatable="false">Enabled</string>
