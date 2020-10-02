@@ -538,6 +538,13 @@ class BrowserTabViewModel(
         }
     }
 
+    override fun willOverrideUrl(newUrl: String) {
+        val previousSiteStillLoading = currentLoadingViewState().isLoading
+        if (previousSiteStillLoading) {
+            showBlankContentfNewContentDelayed()
+        }
+    }
+
     override fun prefetchFavicon(url: String) {
         faviconPrefetchJob?.cancel()
         faviconPrefetchJob = viewModelScope.launch {
@@ -686,7 +693,7 @@ class BrowserTabViewModel(
         navigationAwareLoginDetector.onEvent(NavigationEvent.WebNavigationEvent(stateChange))
     }
 
-    private fun blankSiteIfNewContentDelayed() {
+    private fun showBlankContentfNewContentDelayed() {
         deferredBlankSite?.cancel()
         deferredBlankSite = viewModelScope.launch {
             delay(timeMillis = NEW_CONTENT_MAX_DELAY_MS)

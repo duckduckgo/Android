@@ -2992,7 +2992,7 @@ class BrowserTabViewModelTest {
 
     private fun overrideUrl(url: String, isBrowserShowing: Boolean = true) {
         setBrowserShowing(isBrowserShowing)
-        testee.navigationStateChanged(OverrideURL(nextUrl = url, stack = mock()))
+        testee.willOverrideUrl(newUrl = url)
     }
 
     private fun setupNavigation(

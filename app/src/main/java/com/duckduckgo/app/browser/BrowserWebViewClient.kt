@@ -108,8 +108,9 @@ class BrowserWebViewClient(
                         webView.loadUrl(newUri.toString())
                         return true
                     }
-                    val navigationList = webView.safeCopyBackForwardList() ?: return false
-                    webViewClientListener?.navigationStateChanged(OverrideURL(url.toString(), navigationList))
+                    if (isForMainFrame) {
+                        webViewClientListener?.willOverrideUrl(url.toString())
+                    }
                     false
                 }
             }
