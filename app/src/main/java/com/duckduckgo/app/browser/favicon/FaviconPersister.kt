@@ -24,9 +24,7 @@ import com.duckduckgo.app.global.file.FileDeleter
 import com.duckduckgo.app.global.sha256
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.withContext
-import timber.log.Timber
 import java.io.File
-import java.io.FileNotFoundException
 import java.io.FileOutputStream
 
 interface FaviconPersister {
@@ -129,13 +127,11 @@ class FileBasedFaviconPersister(
 
     @Synchronized
     private fun writeBytesToFile(file: File, bitmap: Bitmap) {
-        try {
+        runCatching {
             FileOutputStream(file).use { outputStream ->
                 bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream)
                 outputStream.flush()
             }
-        } catch (e: FileNotFoundException) {
-            Timber.i("Could not write file for favicon because the file does not exist anymore.")
         }
     }
 
