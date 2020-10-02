@@ -682,12 +682,6 @@ class BrowserTabViewModel(
             is PageCleared -> pageCleared()
             is UrlUpdated -> urlUpdated(stateChange.url)
             is PageNavigationCleared -> disableUserNavigation()
-            is Redirected -> {
-                val previousSiteStillLoading = currentLoadingViewState().isLoading
-                if (previousSiteStillLoading) {
-                    blankSiteIfNewContentDelayed()
-                }
-            }
         }
         navigationAwareLoginDetector.onEvent(NavigationEvent.WebNavigationEvent(stateChange))
     }
