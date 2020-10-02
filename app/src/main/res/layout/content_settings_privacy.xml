@@ -33,7 +33,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:subtitle="test test test"
-        app:title="Global Privacy Control"
+        app:title="@string/globalPrivacyControlSetting"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/settingsPrivacyTitle" />
