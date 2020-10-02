@@ -591,7 +591,7 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenUserRedirectedBeforePreviousSiteLoadedAndNewContentDelayedThenBlankWebContent() = coroutineRule.runBlocking {
+    fun whenUserRedirectedBeforePreviousSiteLoadedAndNewContentDelayedThenWebContentIsBlankedOut() = coroutineRule.runBlocking {
         loadUrl("http://duckduckgo.com")
         testee.progressChanged(50)
 
@@ -602,7 +602,7 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenUserRedirectedAfterSiteLoadedAndNewContentDelayedThenNothing() = coroutineRule.runBlocking {
+    fun whenUserRedirectedAfterSiteLoadedAndNewContentDelayedThenWebContentNotBlankedOut() = coroutineRule.runBlocking {
         loadUrl("http://duckduckgo.com")
         testee.progressChanged(100)
 
