@@ -143,7 +143,6 @@ class FileBasedFaviconPersisterTest {
 
     @Test
     fun whenDeletePersistedFaviconThenDeleteTheFile() = coroutineRule.runBlocking {
-
         val captor = argumentCaptor<List<String>>()
 
         testee.deletePersistedFavicon("domain")
