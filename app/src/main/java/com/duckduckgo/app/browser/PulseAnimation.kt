@@ -76,12 +76,12 @@ class PulseAnimation(private val lifecycleOwner: LifecycleOwner) : LifecycleObse
         if (!pulseAnimation.isRunning) {
             val pulse = ObjectAnimator.ofPropertyValuesHolder(
                 view,
-                PropertyValuesHolder.ofFloat("scaleX", 1.4f, 1.8f, 2f, 1.8f, 1.4f),
-                PropertyValuesHolder.ofFloat("scaleY", 1.4f, 1.8f, 2f, 1.8f, 1.4f),
-                PropertyValuesHolder.ofFloat("alpha", 1f, 0.35f, 0.2f, 0.35f, 1f)
+                PropertyValuesHolder.ofFloat("scaleX", 0.95f, 2f),
+                PropertyValuesHolder.ofFloat("scaleY", 0.95f, 2f),
+                PropertyValuesHolder.ofFloat("alpha", 0f, 1f, 1f, 0f)
             )
             pulse.repeatCount = ObjectAnimator.INFINITE
-            pulse.duration = 1400L
+            pulse.duration = 1100L
 
             pulseAnimation = AnimatorSet().apply {
                 play(pulse)
@@ -95,7 +95,7 @@ class PulseAnimation(private val lifecycleOwner: LifecycleOwner) : LifecycleObse
 
         val highlightImageView = ImageView(targetView.context)
         highlightImageView.id = View.generateViewId()
-        highlightImageView.setImageResource(R.drawable.ic_circle_pulse)
+        highlightImageView.setImageResource(R.drawable.ic_circle_pulse_blue)
         val layoutParams = FrameLayout.LayoutParams(targetView.width, targetView.height, Gravity.CENTER)
         (targetView.parent as ViewGroup).addView(highlightImageView, 0, layoutParams)
         return highlightImageView
