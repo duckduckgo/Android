@@ -78,7 +78,7 @@ class PulseAnimation(private val lifecycleOwner: LifecycleOwner) : LifecycleObse
                 view,
                 PropertyValuesHolder.ofFloat("scaleX", 0.95f, 2f),
                 PropertyValuesHolder.ofFloat("scaleY", 0.95f, 2f),
-                PropertyValuesHolder.ofFloat("alpha", 0f, 1f, 1f, 0f)
+                PropertyValuesHolder.ofFloat("alpha", 0f, 1f, 1f, 0.1f)
             )
             pulse.repeatCount = ObjectAnimator.INFINITE
             pulse.duration = 1100L
