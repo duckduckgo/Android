@@ -35,6 +35,8 @@ import com.duckduckgo.app.global.view.setAllParentsClip
 class PulseAnimation(private val lifecycleOwner: LifecycleOwner) : LifecycleObserver {
     private var pulseAnimation: AnimatorSet = AnimatorSet()
     private var highlightImageView: View? = null
+    val isActive: Boolean
+        get() = pulseAnimation.isRunning
 
     @Suppress("unused")
     @OnLifecycleEvent(Lifecycle.Event.ON_START)

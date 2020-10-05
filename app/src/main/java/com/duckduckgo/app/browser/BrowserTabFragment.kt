@@ -125,6 +125,7 @@ import com.duckduckgo.app.location.ui.SystemLocationPermissionDialog
 import com.duckduckgo.app.privacy.renderer.icon
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.FIRE_BUTTON_STATE
 import com.duckduckgo.app.survey.model.Survey
 import com.duckduckgo.app.survey.ui.SurveyActivity
 import com.duckduckgo.app.tabs.model.TabEntity
@@ -1408,7 +1409,10 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
             fireMenuButton?.show()
             fireMenuButton?.setOnClickListener {
                 browserActivity?.launchFire()
-                pixel.fire(Pixel.PixelName.MENU_ACTION_FIRE_PRESSED.pixelName)
+                pixel.fire(
+                    Pixel.PixelName.MENU_ACTION_FIRE_PRESSED.pixelName,
+                    mapOf(FIRE_BUTTON_STATE to pulseAnimation.isActive.toString())
+                )
             }
 
             tabsButton?.show()
