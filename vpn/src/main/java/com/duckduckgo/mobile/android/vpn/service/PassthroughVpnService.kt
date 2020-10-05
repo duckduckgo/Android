@@ -26,7 +26,6 @@ import android.os.Binder
 import android.os.Build
 import android.os.IBinder
 import android.os.ParcelFileDescriptor
-import androidx.core.content.ContextCompat.getSystemService
 import com.duckduckgo.mobile.android.vpn.BuildConfig
 import com.duckduckgo.mobile.android.vpn.processor.TunPacketReader
 import com.duckduckgo.mobile.android.vpn.processor.TunPacketWriter
@@ -269,13 +268,49 @@ class PassthroughVpnService : VpnService(), CoroutineScope by MainScope(), Netwo
 
         const val FOREGROUND_VPN_SERVICE_ID = 200
 
-        private val EXCLUDED_APPS = listOf(
-            BuildConfig.LIBRARY_PACKAGE_NAME,
+        private val EXCLUDED_SYSTEM_APPS = listOf(
             "com.android.vending",
             "com.google.android.gsf.login",
             "com.google.android.googlequicksearchbox",
             "com.android.providers.downloads.ui"
         )
+
+        private val MAJOR_BROWSERS = listOf(
+            "com.android.chrome",
+            "org.mozilla.firefox",
+            "com.opera.browser",
+            "com.microsoft.emmx",
+            "com.brave.browser",
+            "com.UCMobile.intl",
+            "com.android.browser",
+            "com.sec.android.app.sbrowser",
+            "info.guardianproject.orfo",
+            "org.torproject.torbrowser_alpha",
+            "mobi.mgeek.TunnyBrowser",
+            "com.linkbubble.playstore",
+            "org.adblockplus.browser",
+            "arun.com.chromer",
+            "com.flynx",
+            "com.ghostery.android.ghostery",
+            "com.cliqz.browser",
+            "om.opera.mini.native",
+            "com.uc.browser.en",
+            "com.chrome.beta",
+            "org.mozilla.firefox_beta",
+            "com.opera.browser.beta",
+            "com.opera.mini.native.beta",
+            "com.sec.android.app.sbrowser.beta",
+            "org.mozilla.fennec_fdroid",
+            "org.mozilla.rocket",
+            "com.chrome.dev",
+            "com.chrome.canary",
+            "corg.mozilla.fennec_aurora",
+            "oorg.mozilla.fennec",
+            "com.google.android.apps.chrome",
+            "org.chromium.chrome"
+        )
+
+        private val EXCLUDED_APPS = listOf(BuildConfig.LIBRARY_PACKAGE_NAME).plus(EXCLUDED_SYSTEM_APPS).plus(MAJOR_BROWSERS)
 
         private val INCLUDED_APPS = listOf(
             "com.duckduckgo.networkrequestor",
