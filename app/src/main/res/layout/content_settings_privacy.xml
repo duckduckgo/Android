@@ -28,13 +28,23 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"/>
 
+    <com.duckduckgo.app.settings.SettingsOptionWithSubtitle
+        android:id="@+id/globalPrivacyControlSetting"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:subtitle="test test test"
+        app:title="@string/globalPrivacyControlSetting"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/settingsPrivacyTitle" />
+
     <TextView
         android:id="@+id/fireproofWebsites"
         style="@style/SettingsItemClickable"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         android:text="@string/settingsFireproofWebsites"
-        app:layout_constraintTop_toBottomOf="@id/settingsPrivacyTitle" />
+        app:layout_constraintTop_toBottomOf="@id/globalPrivacyControlSetting" />
 
     <TextView
         android:id="@+id/locationPermissions"

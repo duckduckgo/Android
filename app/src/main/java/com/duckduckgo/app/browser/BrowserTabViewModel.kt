@@ -227,7 +227,7 @@ class BrowserTabViewModel(
 
     sealed class Command {
         object Refresh : Command()
-        class Navigate(val url: String) : Command()
+        class Navigate(val url: String, val headers: Map<String, String>) : Command()
         class NavigateBack(val steps: Int) : Command()
         object NavigateForward : Command()
         class OpenInNewTab(val query: String, val sourceTabId: String? = null) : Command()
@@ -251,7 +251,7 @@ class BrowserTabViewModel(
         class BrokenSiteFeedback(val data: BrokenSiteData) : Command()
         object DismissFindInPage : Command()
         class ShowFileChooser(val filePathCallback: ValueCallback<Array<Uri>>, val fileChooserParams: WebChromeClient.FileChooserParams) : Command()
-        class HandleExternalAppLink(val appLink: IntentType) : Command()
+        class HandleExternalAppLink(val appLink: IntentType, val headers: Map<String, String>) : Command()
         class AddHomeShortcut(val title: String, val url: String, val icon: Bitmap? = null) : Command()
         class LaunchSurvey(val survey: Survey) : Command()
         object LaunchAddWidget : Command()
@@ -492,8 +492,7 @@ class BrowserTabViewModel(
             }
 
             fireQueryChangedPixel(omnibarText)
-
-            command.value = Navigate(urlToNavigate)
+            command.value = Navigate(urlToNavigate, getUrlHeaders())
         }
 
         globalLayoutState.value = Browser(isNewTabState = false)
@@ -501,6 +500,14 @@ class BrowserTabViewModel(
         omnibarViewState.value = currentOmnibarViewState().copy(omnibarText = omnibarText, shouldMoveCaretToEnd = false)
         browserViewState.value = currentBrowserViewState().copy(browserShowing = true, showClearButton = false)
         autoCompleteViewState.value = AutoCompleteViewState(false)
+    }
+
+    private fun getUrlHeaders(): Map<String, String> {
+        return if (appSettingsPreferencesStore.globalPrivacyControlEnabled) {
+            mapOf(GPC_HEADER to GPC_HEADER_VALUE)
+        } else {
+            emptyMap()
+        }
     }
 
     private fun extractVerticalParameter(currentUrl: String?): String? {
@@ -1365,7 +1372,7 @@ class BrowserTabViewModel(
         if (desktopSiteRequested && uri.isMobileSite) {
             val desktopUrl = uri.toDesktopUri().toString()
             Timber.i("Original URL $url - attempting $desktopUrl with desktop site UA string")
-            command.value = Navigate(desktopUrl)
+            command.value = Navigate(desktopUrl, getUrlHeaders())
         } else {
             command.value = Refresh
         }
@@ -1560,7 +1567,7 @@ class BrowserTabViewModel(
     }
 
     override fun externalAppLinkClicked(appLink: IntentType) {
-        command.value = HandleExternalAppLink(appLink)
+        command.value = HandleExternalAppLink(appLink, getUrlHeaders())
     }
 
     override fun openMessageInNewTab(message: Message) {
@@ -1678,5 +1685,7 @@ class BrowserTabViewModel(
 
     companion object {
         private const val FIXED_PROGRESS = 50
+        const val GPC_HEADER = "Sec-GPC"
+        const val GPC_HEADER_VALUE = "1"
     }
 }
