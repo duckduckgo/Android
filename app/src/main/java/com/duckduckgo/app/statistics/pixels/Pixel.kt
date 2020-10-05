@@ -219,6 +219,11 @@ interface Pixel {
         PRECISE_LOCATION_SITE_DIALOG_ALLOW_ONCE("m_pc_sd_ao"),
         PRECISE_LOCATION_SITE_DIALOG_DENY_ALWAYS("m_pc_sd_da"),
         PRECISE_LOCATION_SITE_DIALOG_DENY_ONCE("m_pc_sd_do"),
+
+        FIRE_DIALOG_PROMOTED_CLEAR_PRESSED("m_fdp_p"),
+        FIRE_DIALOG_CLEAR_PRESSED("m_fd_p"),
+        FIRE_DIALOG_PROMOTED_CANCEL("m_fdp_c"),
+        FIRE_DIALOG_CANCEL("m_fd_c"),
     }
 
     object PixelParameter {
