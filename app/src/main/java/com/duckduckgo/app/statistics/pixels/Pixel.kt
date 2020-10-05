@@ -236,6 +236,7 @@ interface Pixel {
         const val CTA_SHOWN = "cta"
         const val SERP_QUERY_CHANGED = "1"
         const val SERP_QUERY_NOT_CHANGED = "0"
+        const val FIRE_BUTTON_STATE = "fb"
     }
 
     object PixelValues {
@@ -250,6 +251,7 @@ interface Pixel {
         const val DAX_NETWORK_CTA_1 = "n"
         const val DAX_TRACKERS_BLOCKED_CTA = "t"
         const val DAX_NO_TRACKERS_CTA = "nt"
+        const val DAX_FIRE_DIALOG_CTA = "fd"
     }
 
     fun fire(pixel: PixelName, parameters: Map<String, String> = emptyMap(), encodedParameters: Map<String, String> = emptyMap())

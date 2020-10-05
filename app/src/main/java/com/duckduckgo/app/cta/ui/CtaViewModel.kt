@@ -177,7 +177,7 @@ class CtaViewModel @Inject constructor(
 
         return withContext(dispatchers.io()) {
             if (settingsDataStore.hideTips || daxDialogFireEducationShown()) return@withContext null
-            return@withContext DaxFireDialogCta.TryClearDataCta()
+            return@withContext DaxFireDialogCta.TryClearDataCta(onboardingStore, appInstallStore)
         }
     }
 
