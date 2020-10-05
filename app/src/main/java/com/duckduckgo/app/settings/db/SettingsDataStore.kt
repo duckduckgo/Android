@@ -37,6 +37,7 @@ interface SettingsDataStore {
     var appLoginDetection: Boolean
     var appLocationPermission: Boolean
     var appLocationPermissionDeniedForever: Boolean
+    var globalPrivacyControlEnabled: Boolean
 
     /**
      * This will be checked upon app startup and used to decide whether it should perform a clear or not.
@@ -128,6 +129,10 @@ class SettingsSharedPreferences @Inject constructor(private val context: Context
         get() = preferences.getBoolean(KEY_APP_NOTIFICATIONS_ENABLED, true)
         set(enabled) = preferences.edit { putBoolean(KEY_APP_NOTIFICATIONS_ENABLED, enabled) }
 
+    override var globalPrivacyControlEnabled: Boolean
+        get() = preferences.getBoolean(KEY_DO_NOT_SELL_ENABLED, false)
+        set(enabled) = preferences.edit { putBoolean(KEY_DO_NOT_SELL_ENABLED, enabled) }
+
     override fun hasBackgroundTimestampRecorded(): Boolean = preferences.contains(KEY_APP_BACKGROUNDED_TIMESTAMP)
     override fun clearAppBackgroundTimestamp() = preferences.edit { remove(KEY_APP_BACKGROUNDED_TIMESTAMP) }
 
@@ -170,6 +175,7 @@ class SettingsSharedPreferences @Inject constructor(private val context: Context
         const val KEY_APP_ICON_CHANGED = "APP_ICON_CHANGED"
         const val KEY_SITE_LOCATION_PERMISSION_ENABLED = "KEY_SITE_LOCATION_PERMISSION_ENABLED"
         const val KEY_SYSTEM_LOCATION_PERMISSION_DENIED_FOREVER = "KEY_SYSTEM_LOCATION_PERMISSION_DENIED_FOREVER"
+        const val KEY_DO_NOT_SELL_ENABLED = "KEY_DO_NOT_SELL_ENABLED"
 
         private val DEFAULT_ICON = if (BuildConfig.DEBUG) {
             AppIcon.BLUE

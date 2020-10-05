@@ -233,5 +233,13 @@ class SettingsViewModelTest {
         assertEquals(Command.LaunchAppIcon, commandCaptor.firstValue)
     }
 
+    @Test
+    fun whenOnGlobalPrivacyControlClickedThenCommandIsLaunchGlobalPrivacyControl() {
+        testee.onGlobalPrivacyControlClicked()
+        testee.command.blockingObserve()
+        verify(commandObserver).onChanged(commandCaptor.capture())
+        assertEquals(Command.LaunchGlobalPrivacyControl, commandCaptor.firstValue)
+    }
+
     private fun latestViewState() = testee.viewState.value!!
 }

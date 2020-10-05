@@ -48,6 +48,7 @@ import com.duckduckgo.app.global.rating.AppEnjoymentPromptEmitter
 import com.duckduckgo.app.global.rating.AppEnjoymentUserEventRecorder
 import com.duckduckgo.app.global.events.db.UserEventsStore
 import com.duckduckgo.app.global.useourapp.UseOurAppDetector
+import com.duckduckgo.app.globalprivacycontrol.ui.GlobalPrivacyControlViewModel
 import com.duckduckgo.app.icon.api.IconModifier
 import com.duckduckgo.app.icon.ui.ChangeIconViewModel
 import com.duckduckgo.app.launch.LaunchViewModel
@@ -156,6 +157,7 @@ class ViewModelFactory @Inject constructor(
                 isAssignableFrom(ChangeIconViewModel::class.java) -> changeAppIconViewModel()
                 isAssignableFrom(FireproofWebsitesViewModel::class.java) -> fireproofWebsiteViewModel()
                 isAssignableFrom(LocationPermissionsViewModel::class.java) -> locationPermissionsViewModel()
+                isAssignableFrom(GlobalPrivacyControlViewModel::class.java) -> globalPrivacyControlViewModel()
 
                 else -> throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")
             }
@@ -240,6 +242,12 @@ class ViewModelFactory @Inject constructor(
             locationPermissionsRepository = locationPermissionsRepository,
             geoLocationPermissions = geoLocationPermissions,
             dispatcherProvider = dispatcherProvider,
+            settingsDataStore = appSettingsPreferencesStore,
+            pixel = pixel
+        )
+
+    private fun globalPrivacyControlViewModel() =
+        GlobalPrivacyControlViewModel(
             settingsDataStore = appSettingsPreferencesStore,
             pixel = pixel
         )
