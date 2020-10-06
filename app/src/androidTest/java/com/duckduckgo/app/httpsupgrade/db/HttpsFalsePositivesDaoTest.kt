@@ -19,21 +19,21 @@ package com.duckduckgo.app.httpsupgrade.db
 import androidx.room.Room
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.global.db.AppDatabase
-import com.duckduckgo.app.httpsupgrade.model.HttpsWhitelistedDomain
+import com.duckduckgo.app.httpsupgrade.model.HttpsFalsePositiveDomain
 import org.junit.After
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
 
-class HttpsWhitelistDaoTest {
+class HttpsFalsePositivesDaoTest {
 
     private lateinit var db: AppDatabase
-    private lateinit var dao: HttpsWhitelistDao
+    private lateinit var dao: HttpsFalsePositivesDao
 
     @Before
     fun before() {
         db = Room.inMemoryDatabaseBuilder(InstrumentationRegistry.getInstrumentation().targetContext, AppDatabase::class.java).build()
-        dao = db.httpsWhitelistedDao()
+        dao = db.httpsFalsePositivesDao()
     }
 
     @After
@@ -53,41 +53,41 @@ class HttpsWhitelistDaoTest {
 
     @Test
     fun whenDomainInsertedThenContainsDomainIsTrue() {
-        dao.insertAll(listOf(HttpsWhitelistedDomain(domain)))
+        dao.insertAll(listOf(HttpsFalsePositiveDomain(domain)))
         assertTrue(dao.contains(domain))
     }
 
     @Test
     fun whenDomainInsertedThenCountIsOne() {
-        dao.insertAll(listOf(HttpsWhitelistedDomain(domain)))
+        dao.insertAll(listOf(HttpsFalsePositiveDomain(domain)))
         assertEquals(1, dao.count())
     }
 
     @Test
     fun whenSecondUniqueDomainInsertedThenCountIsTwo() {
-        dao.insertAll(listOf(HttpsWhitelistedDomain(domain)))
-        dao.insertAll(listOf(HttpsWhitelistedDomain(anotherDomain)))
+        dao.insertAll(listOf(HttpsFalsePositiveDomain(domain)))
+        dao.insertAll(listOf(HttpsFalsePositiveDomain(anotherDomain)))
         assertEquals(2, dao.count())
     }
 
     @Test
     fun whenSecondDuplicateDomainInsertedThenCountIsOne() {
-        dao.insertAll(listOf(HttpsWhitelistedDomain(domain)))
-        dao.insertAll(listOf(HttpsWhitelistedDomain(domain)))
+        dao.insertAll(listOf(HttpsFalsePositiveDomain(domain)))
+        dao.insertAll(listOf(HttpsFalsePositiveDomain(domain)))
         assertEquals(1, dao.count())
     }
 
     @Test
     fun whenAllUpdatedThenPreviousValuesAreReplaced() {
-        dao.insertAll(listOf(HttpsWhitelistedDomain(domain)))
-        dao.updateAll(listOf(HttpsWhitelistedDomain(anotherDomain)))
+        dao.insertAll(listOf(HttpsFalsePositiveDomain(domain)))
+        dao.updateAll(listOf(HttpsFalsePositiveDomain(anotherDomain)))
         assertEquals(1, dao.count())
         assertTrue(dao.contains(anotherDomain))
     }
 
     @Test
     fun whenAllDeletedThenContainsDomainIsFalse() {
-        dao.insertAll(listOf(HttpsWhitelistedDomain(domain)))
+        dao.insertAll(listOf(HttpsFalsePositiveDomain(domain)))
         dao.deleteAll()
         assertFalse(dao.contains(domain))
     }

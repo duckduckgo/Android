@@ -18,7 +18,7 @@ package com.duckduckgo.app.httpsupgrade
 
 import android.net.Uri
 import com.duckduckgo.app.httpsupgrade.api.HttpsBloomFilterFactory
-import com.duckduckgo.app.httpsupgrade.db.HttpsWhitelistDao
+import com.duckduckgo.app.httpsupgrade.db.HttpsFalsePositivesDao
 import com.duckduckgo.app.privacy.db.UserWhitelistDao
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.nhaarman.mockitokotlin2.mock
@@ -34,7 +34,7 @@ class HttpsUpgraderTest {
     lateinit var testee: HttpsUpgrader
 
     private var mockHttpsBloomFilterFactory: HttpsBloomFilterFactory = mock()
-    private var mockBloomFalsePositiveListDao: HttpsWhitelistDao = mock()
+    private var mockBloomFalsePositiveListDao: HttpsFalsePositivesDao = mock()
     private var mockUserAllowlistDao: UserWhitelistDao = mock()
     private var mockServiceCall: Call<List<String>> = mock()
 

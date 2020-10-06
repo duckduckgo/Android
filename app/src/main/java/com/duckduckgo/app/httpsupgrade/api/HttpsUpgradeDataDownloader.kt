@@ -21,7 +21,7 @@ import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.global.store.BinaryDataStore
 import com.duckduckgo.app.httpsupgrade.HttpsUpgrader
 import com.duckduckgo.app.httpsupgrade.db.HttpsBloomFilterSpecDao
-import com.duckduckgo.app.httpsupgrade.db.HttpsWhitelistDao
+import com.duckduckgo.app.httpsupgrade.db.HttpsFalsePositivesDao
 import com.duckduckgo.app.httpsupgrade.model.HttpsBloomFilterSpec
 import com.duckduckgo.app.httpsupgrade.model.HttpsBloomFilterSpec.Companion.HTTPS_BINARY_FILE
 import io.reactivex.Completable
@@ -34,7 +34,7 @@ class HttpsUpgradeDataDownloader @Inject constructor(
     private val service: HttpsUpgradeService,
     private val httpsUpgrader: HttpsUpgrader,
     private val httpsBloomSpecDao: HttpsBloomFilterSpecDao,
-    private val bloomFalsePositivesDao: HttpsWhitelistDao,
+    private val bloomFalsePositivesDao: HttpsFalsePositivesDao,
     private val binaryDataStore: BinaryDataStore,
     private val appDatabase: AppDatabase
 ) {
@@ -45,9 +45,9 @@ class HttpsUpgradeDataDownloader @Inject constructor(
             .flatMapCompletable {
                 downloadBloomFilter(it)
             }
-        val whitelist = downloadWhitelist()
+        val falsePositives = downloadFalsePositives()
 
-        return Completable.mergeDelayError(listOf(filter, whitelist))
+        return Completable.mergeDelayError(listOf(filter, falsePositives))
             .doOnComplete {
                 Timber.i("Https download task completed successfully")
             }
@@ -83,23 +83,23 @@ class HttpsUpgradeDataDownloader @Inject constructor(
         }
     }
 
-    private fun downloadWhitelist(): Completable {
+    private fun downloadFalsePositives(): Completable {
 
-        Timber.d("Downloading HTTPS whitelist")
+        Timber.d("Downloading HTTPS false positives")
         return fromAction {
 
-            val call = service.whitelist()
+            val call = service.falsePositives()
             val response = call.execute()
 
             if (response.isCached && bloomFalsePositivesDao.count() > 0) {
-                Timber.d("Https whitelist already cached and stored")
+                Timber.d("Https false positives already cached and stored")
                 return@fromAction
             }
 
             if (response.isSuccessful) {
-                val whitelist = response.body()!!
-                Timber.d("Updating https whitelist with new data")
-                bloomFalsePositivesDao.updateAll(whitelist)
+                val falsePositives = response.body()!!
+                Timber.d("Updating https false positives with new data")
+                bloomFalsePositivesDao.updateAll(falsePositives)
             } else {
                 throw IOException("Status: ${response.code()} - ${response.errorBody()?.string()}")
             }

@@ -17,22 +17,22 @@
 package com.duckduckgo.app.httpsupgrade.api
 
 import com.duckduckgo.app.httpsupgrade.model.HttpsBloomFilterSpec
-import com.duckduckgo.app.httpsupgrade.model.HttpsWhitelistedDomain
+import com.duckduckgo.app.httpsupgrade.model.HttpsFalsePositiveDomain
 import io.reactivex.Observable
 import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.http.GET
-import retrofit2.http.Query
 
 interface HttpsUpgradeService {
 
-    @GET("https://staticcdn.duckduckgo.com/https/https-mobile-bloom-spec.json?cache_version=1")
+    //TODO switch to released update to latest urls
+    @GET("http://ddg-sandbox.s3.amazonaws.com/https/mia/https-mobile-v2-bloom-spec.json")
     fun httpsBloomFilterSpec(): Observable<HttpsBloomFilterSpec>
 
-    @GET("https://staticcdn.duckduckgo.com/https/https-mobile-bloom.bin?cache_version=1")
+    @GET("http://ddg-sandbox.s3.amazonaws.com/https/mia/https-mobile-v2-bloom.bin")
     fun httpsBloomFilter(): Call<ResponseBody>
 
-    @GET("https://staticcdn.duckduckgo.com/https/https-mobile-whitelist.json?cache_version=1")
-    fun whitelist(): Call<List<HttpsWhitelistedDomain>>
+    @GET("http://ddg-sandbox.s3.amazonaws.com/https/mia/https-mobile-v2-false-positives.json")
+    fun falsePositives(): Call<List<HttpsFalsePositiveDomain>>
 
 }

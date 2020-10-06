@@ -21,7 +21,7 @@ import androidx.annotation.WorkerThread
 import com.duckduckgo.app.global.isHttps
 import com.duckduckgo.app.global.toHttps
 import com.duckduckgo.app.httpsupgrade.api.HttpsBloomFilterFactory
-import com.duckduckgo.app.httpsupgrade.db.HttpsWhitelistDao
+import com.duckduckgo.app.httpsupgrade.db.HttpsFalsePositivesDao
 import com.duckduckgo.app.privacy.db.UserWhitelistDao
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.*
@@ -43,7 +43,7 @@ interface HttpsUpgrader {
 
 class HttpsUpgraderImpl(
     private val bloomFactory: HttpsBloomFilterFactory,
-    private val bloomFalsePositiveDao: HttpsWhitelistDao,
+    private val bloomFalsePositiveDao: HttpsFalsePositivesDao,
     private val userAllowListDao: UserWhitelistDao,
     private val pixel: Pixel
 ) : HttpsUpgrader {
@@ -78,7 +78,9 @@ class HttpsUpgraderImpl(
             return false
         }
 
+        val initialTimestamp = System.nanoTime()
         val isUpgradable = isInUpgradeList(host)
+        Timber.v("loookup took ${(System.nanoTime() - initialTimestamp)/1_000_000.0}ms")
         Timber.d("$host ${if (isUpgradable) "is" else "is not"} upgradable")
         pixel.fire(if (isUpgradable) HTTPS_LOCAL_UPGRADE else HTTPS_NO_UPGRADE)
         return isUpgradable
@@ -86,6 +88,7 @@ class HttpsUpgraderImpl(
 
     @WorkerThread
     private fun isInUpgradeList(host: String): Boolean {
+        waitForAnyReloadsToComplete()
         return bloomFilter?.contains(host) == true
     }
 
@@ -95,6 +98,14 @@ class HttpsUpgraderImpl(
         try {
             bloomFilter = bloomFactory.create()
         } finally {
+            bloomReloadLock.unlock()
+        }
+    }
+
+    private fun waitForAnyReloadsToComplete() {
+        // wait for lock (by locking and unlocking) before continuing
+        if (bloomReloadLock.isLocked) {
+            bloomReloadLock.lock()
             bloomReloadLock.unlock()
         }
     }
