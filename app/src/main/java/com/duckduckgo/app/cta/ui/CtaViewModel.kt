@@ -40,7 +40,12 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.survey.db.SurveyDao
 import com.duckduckgo.app.survey.model.Survey
 import com.duckduckgo.app.widget.ui.WidgetCapabilities
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.channels.ConflatedBroadcastChannel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.asFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import timber.log.Timber
@@ -49,6 +54,7 @@ import javax.inject.Inject
 import javax.inject.Singleton
 import kotlin.coroutines.CoroutineContext
 
+@ExperimentalCoroutinesApi
 @Singleton
 class CtaViewModel @Inject constructor(
     private val appInstallStore: AppInstallStore,
@@ -67,9 +73,20 @@ class CtaViewModel @Inject constructor(
 ) {
     val surveyLiveData: LiveData<Survey> = surveyDao.getLiveScheduled()
 
+    private val stateChannel = ConflatedBroadcastChannel(false)
+    private val shouldStopFirePulseAnimationFlow = stateChannel.asFlow().map { pulseAnimationRunning ->
+        var shouldStopAnimation = false
+        if (pulseAnimationRunning) {
+            delay(6000)
+            shouldStopAnimation = true
+        }
+        shouldStopAnimation
+    }
+
     val showFireButtonPulseAnimation: Flow<Boolean> = dismissedCtaDao
-        .dismissedCtas()
-        .shouldShowPulseAnimation()
+        .dismissedCtas().combine(shouldStopFirePulseAnimationFlow) { ctas, forceStopAnimation ->
+            Pair(ctas, forceStopAnimation)
+        }.shouldShowPulseAnimation()
 
     private var activeSurvey: Survey? = null
 
@@ -233,6 +250,13 @@ class CtaViewModel @Inject constructor(
     }
 
     @WorkerThread
+    private suspend fun oneHourSinceFireButtonHighlighted(): Boolean {
+        val timestampKey = userEventsStore.getUserEvent(UserEventKey.FIRE_BUTTON_HIGHLIGHTED) ?: return false
+        val hours = TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis() - timestampKey.timestamp)
+        return (hours >= 10)
+    }
+
+    @WorkerThread
     private suspend fun canShowUseOurAppDialog(): Boolean = !settingsDataStore.hideTips && useOurAppActive() && !useOurAppDialogShown()
 
     @WorkerThread
@@ -325,17 +349,25 @@ class CtaViewModel @Inject constructor(
         }
     }
 
-    private fun Flow<List<DismissedCta>>.shouldShowPulseAnimation(): Flow<Boolean> {
-        return this.map { dismissedCtaDao ->
+    private fun Flow<Pair<List<DismissedCta>, Boolean>>.shouldShowPulseAnimation(): Flow<Boolean> {
+        return this.map { (dismissedCtaDao, forceStopAnimation) ->
             withContext(dispatchers.io()) {
+                if (forceStopAnimation) return@withContext false
                 if (!variantManager.getVariant().hasFeature(FireButtonEducation)) return@withContext false
                 if (!daxOnboardingActive() || daxDialogFireEducationShown() || settingsDataStore.hideTips) return@withContext false
+                //if (oneHourSinceFireButtonHighlighted()) return@withContext false
 
-                return@withContext dismissedCtaDao.any {
+                val showPulseAnimation = dismissedCtaDao.any {
                     it.ctaId == CtaId.DAX_DIALOG_TRACKERS_FOUND ||
                             it.ctaId == CtaId.DAX_DIALOG_OTHER ||
                             it.ctaId == CtaId.DAX_DIALOG_NETWORK
                 }
+
+                if (showPulseAnimation) {
+                    stateChannel.send(true)
+                }
+                Timber.i("shouldShowPulseAnimation returns $showPulseAnimation")
+                return@withContext showPulseAnimation
             }
         }
     }

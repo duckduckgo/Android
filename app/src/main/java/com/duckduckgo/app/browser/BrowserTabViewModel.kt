@@ -100,10 +100,7 @@ import com.jakewharton.rxrelay2.PublishRelay
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
 import timber.log.Timber
 import java.io.File
 import java.util.*
@@ -320,8 +317,18 @@ class BrowserTabViewModel(
     }
 
     private val fireButtonAnimation = Observer<Boolean> { shouldShowAnimation ->
+        Timber.i("shouldShowAnimation $shouldShowAnimation")
         if (currentBrowserViewState().fireButton is FireButton.Visible) {
             browserViewState.value = currentBrowserViewState().copy(fireButton = FireButton.Visible(pulseAnimation = shouldShowAnimation))
+        }
+
+        if (shouldShowAnimation) {
+            viewModelScope.launch(dispatchers.io()) {
+                if (userEventsStore.getUserEvent(UserEventKey.FIRE_BUTTON_HIGHLIGHTED) == null) {
+                    userEventsStore.registerUserEvent(UserEventKey.FIRE_BUTTON_HIGHLIGHTED)
+                }
+            }
+
         }
     }
 
