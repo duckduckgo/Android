@@ -323,12 +323,20 @@ class BrowserTabViewModel(
         }
 
         if (shouldShowAnimation) {
-            viewModelScope.launch(dispatchers.io()) {
-                if (userEventsStore.getUserEvent(UserEventKey.FIRE_BUTTON_HIGHLIGHTED) == null) {
-                    userEventsStore.registerUserEvent(UserEventKey.FIRE_BUTTON_HIGHLIGHTED)
-                }
-            }
+            registerAndScheduleDismissAction()
+        }
+    }
 
+    private fun registerAndScheduleDismissAction() {
+        viewModelScope.launch(dispatchers.io()) {
+            val fireButtonHighlightedEvent = userEventsStore.getUserEvent(UserEventKey.FIRE_BUTTON_HIGHLIGHTED)
+            if (fireButtonHighlightedEvent == null) {
+                userEventsStore.registerUserEvent(UserEventKey.FIRE_BUTTON_HIGHLIGHTED)
+            }
+            val pulseElapsedTime = System.currentTimeMillis() - (fireButtonHighlightedEvent?.timestamp ?: System.currentTimeMillis())
+            val pulseDuration = FIRE_BUTTON_PULSE_ANIMATION_DURATION_MS - pulseElapsedTime
+            delay(pulseDuration)
+            ctaViewModel.dismissPulseAnimation()
         }
     }
 
@@ -1685,5 +1693,6 @@ class BrowserTabViewModel(
 
     companion object {
         private const val FIXED_PROGRESS = 50
+        private const val FIRE_BUTTON_PULSE_ANIMATION_DURATION_MS = 3600000
     }
 }

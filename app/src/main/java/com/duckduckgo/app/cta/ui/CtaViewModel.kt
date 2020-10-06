@@ -40,12 +40,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.survey.db.SurveyDao
 import com.duckduckgo.app.survey.model.Survey
 import com.duckduckgo.app.widget.ui.WidgetCapabilities
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.channels.ConflatedBroadcastChannel
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.asFlow
-import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import timber.log.Timber
@@ -54,7 +49,6 @@ import javax.inject.Inject
 import javax.inject.Singleton
 import kotlin.coroutines.CoroutineContext
 
-@ExperimentalCoroutinesApi
 @Singleton
 class CtaViewModel @Inject constructor(
     private val appInstallStore: AppInstallStore,
@@ -73,20 +67,9 @@ class CtaViewModel @Inject constructor(
 ) {
     val surveyLiveData: LiveData<Survey> = surveyDao.getLiveScheduled()
 
-    private val stateChannel = ConflatedBroadcastChannel(false)
-    private val shouldStopFirePulseAnimationFlow = stateChannel.asFlow().map { pulseAnimationRunning ->
-        var shouldStopAnimation = false
-        if (pulseAnimationRunning) {
-            delay(6000)
-            shouldStopAnimation = true
-        }
-        shouldStopAnimation
-    }
-
     val showFireButtonPulseAnimation: Flow<Boolean> = dismissedCtaDao
-        .dismissedCtas().combine(shouldStopFirePulseAnimationFlow) { ctas, forceStopAnimation ->
-            Pair(ctas, forceStopAnimation)
-        }.shouldShowPulseAnimation()
+        .dismissedCtas()
+        .shouldShowPulseAnimation()
 
     private var activeSurvey: Survey? = null
 
@@ -102,6 +85,12 @@ class CtaViewModel @Inject constructor(
                 return@run this.plus(CtaId.DAX_FIRE_BUTTON)
             }
             return@run this
+        }
+    }
+
+    suspend fun dismissPulseAnimation() {
+        withContext(dispatchers.io()) {
+            dismissedCtaDao.insert(DismissedCta(CtaId.DAX_FIRE_BUTTON_PULSE))
         }
     }
 
@@ -335,6 +324,8 @@ class CtaViewModel @Inject constructor(
 
     private fun daxDialogFireEducationShown(): Boolean = dismissedCtaDao.exists(CtaId.DAX_FIRE_BUTTON)
 
+    private fun pulseFireButtonShown(): Boolean = dismissedCtaDao.exists(CtaId.DAX_FIRE_BUTTON_PULSE)
+
     private fun isSerpUrl(url: String): Boolean = url.contains(DaxDialogCta.SERP)
 
     private suspend fun useOurAppActive(): Boolean = userStageStore.useOurAppOnboarding()
@@ -349,25 +340,17 @@ class CtaViewModel @Inject constructor(
         }
     }
 
-    private fun Flow<Pair<List<DismissedCta>, Boolean>>.shouldShowPulseAnimation(): Flow<Boolean> {
-        return this.map { (dismissedCtaDao, forceStopAnimation) ->
+    private fun Flow<List<DismissedCta>>.shouldShowPulseAnimation(): Flow<Boolean> {
+        return this.map { dismissedCtaDao ->
             withContext(dispatchers.io()) {
-                if (forceStopAnimation) return@withContext false
                 if (!variantManager.getVariant().hasFeature(FireButtonEducation)) return@withContext false
-                if (!daxOnboardingActive() || daxDialogFireEducationShown() || settingsDataStore.hideTips) return@withContext false
-                //if (oneHourSinceFireButtonHighlighted()) return@withContext false
+                if (!daxOnboardingActive() || pulseFireButtonShown() || daxDialogFireEducationShown() || settingsDataStore.hideTips) return@withContext false
 
-                val showPulseAnimation = dismissedCtaDao.any {
+                return@withContext dismissedCtaDao.any {
                     it.ctaId == CtaId.DAX_DIALOG_TRACKERS_FOUND ||
                             it.ctaId == CtaId.DAX_DIALOG_OTHER ||
                             it.ctaId == CtaId.DAX_DIALOG_NETWORK
                 }
-
-                if (showPulseAnimation) {
-                    stateChannel.send(true)
-                }
-                Timber.i("shouldShowPulseAnimation returns $showPulseAnimation")
-                return@withContext showPulseAnimation
             }
         }
     }
