@@ -40,7 +40,12 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.survey.db.SurveyDao
 import com.duckduckgo.app.survey.model.Survey
 import com.duckduckgo.app.widget.ui.WidgetCapabilities
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.channels.ConflatedBroadcastChannel
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.asFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import timber.log.Timber
@@ -67,9 +72,16 @@ class CtaViewModel @Inject constructor(
 ) {
     val surveyLiveData: LiveData<Survey> = surveyDao.getLiveScheduled()
 
+    @ExperimentalCoroutinesApi
+    private val forceStopFireButtonPulseAnimation = ConflatedBroadcastChannel(false)
+
+    @FlowPreview
+    @ExperimentalCoroutinesApi
     val showFireButtonPulseAnimation: Flow<Boolean> = dismissedCtaDao
         .dismissedCtas()
-        .shouldShowPulseAnimation()
+        .combine(forceStopFireButtonPulseAnimation.asFlow()) { ctas, forceStopAnimation ->
+            Pair(ctas, forceStopAnimation)
+        }.shouldShowPulseAnimation()
 
     private var activeSurvey: Survey? = null
 
@@ -88,7 +100,9 @@ class CtaViewModel @Inject constructor(
         }
     }
 
+    @ExperimentalCoroutinesApi
     suspend fun dismissPulseAnimation() {
+        forceStopFireButtonPulseAnimation.send(true)
         withContext(dispatchers.io()) {
             dismissedCtaDao.insert(DismissedCta(CtaId.DAX_FIRE_BUTTON_PULSE))
         }
@@ -239,13 +253,6 @@ class CtaViewModel @Inject constructor(
     }
 
     @WorkerThread
-    private suspend fun oneHourSinceFireButtonHighlighted(): Boolean {
-        val timestampKey = userEventsStore.getUserEvent(UserEventKey.FIRE_BUTTON_HIGHLIGHTED) ?: return false
-        val hours = TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis() - timestampKey.timestamp)
-        return (hours >= 10)
-    }
-
-    @WorkerThread
     private suspend fun canShowUseOurAppDialog(): Boolean = !settingsDataStore.hideTips && useOurAppActive() && !useOurAppDialogShown()
 
     @WorkerThread
@@ -340,9 +347,10 @@ class CtaViewModel @Inject constructor(
         }
     }
 
-    private fun Flow<List<DismissedCta>>.shouldShowPulseAnimation(): Flow<Boolean> {
-        return this.map { dismissedCtaDao ->
+    private fun Flow<Pair<List<DismissedCta>, Boolean>>.shouldShowPulseAnimation(): Flow<Boolean> {
+        return this.map { (dismissedCtaDao, forceStopAnimation) ->
             withContext(dispatchers.io()) {
+                if (forceStopAnimation) return@withContext false
                 if (!variantManager.getVariant().hasFeature(FireButtonEducation)) return@withContext false
                 if (!daxOnboardingActive() || pulseFireButtonShown() || daxDialogFireEducationShown() || settingsDataStore.hideTips) return@withContext false
 
