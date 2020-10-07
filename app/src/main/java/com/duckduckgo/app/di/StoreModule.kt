@@ -34,6 +34,8 @@ import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.app.statistics.store.StatisticsSharedPreferences
 import com.duckduckgo.app.tabs.model.TabDataRepository
 import com.duckduckgo.app.tabs.model.TabRepository
+import com.duckduckgo.mobile.android.vpn.store.VpnSharedPreferences
+import com.duckduckgo.mobile.android.vpn.store.VpnStore
 import dagger.Binds
 import dagger.Module
 
@@ -66,4 +68,7 @@ abstract class StoreModule {
 
     @Binds
     abstract fun bindUserEventsStore(userEventsStore: AppUserEventsStore): UserEventsStore
+
+    @Binds
+    abstract fun bindVpnStore(vpnStore: VpnSharedPreferences): VpnStore
 }

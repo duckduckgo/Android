@@ -17,7 +17,10 @@
 package com.duckduckgo.mobile.android.vpn.service
 
 import android.app.ActivityManager
+import android.app.AlarmManager
+import android.app.PendingIntent
 import android.app.Service
+import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -25,7 +28,9 @@ import android.net.VpnService
 import android.os.Binder
 import android.os.Build
 import android.os.IBinder
+import android.os.Parcel
 import android.os.ParcelFileDescriptor
+import androidx.core.app.NotificationManagerCompat
 import com.duckduckgo.mobile.android.vpn.BuildConfig
 import com.duckduckgo.mobile.android.vpn.processor.TunPacketReader
 import com.duckduckgo.mobile.android.vpn.processor.TunPacketWriter
@@ -37,6 +42,7 @@ import com.duckduckgo.mobile.android.vpn.processor.tcp.hostname.ServerNameIndica
 import com.duckduckgo.mobile.android.vpn.processor.tcp.tracker.DomainBasedTrackerDetector
 import com.duckduckgo.mobile.android.vpn.processor.tcp.tracker.TrackerListProvider
 import com.duckduckgo.mobile.android.vpn.processor.udp.UdpPacketProcessor
+import com.duckduckgo.mobile.android.vpn.store.VpnSharedPreferences
 import com.duckduckgo.mobile.android.vpn.ui.notification.VpnNotificationBuilder
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
@@ -67,6 +73,7 @@ class PassthroughVpnService : VpnService(), CoroutineScope by MainScope(), Netwo
     private val trackerListProvider = TrackerListProvider()
     private val hostnameExtractor = AndroidHostnameExtractor(hostNameHeaderExtractor, encryptedRequestHostExtractor, payloadBytesExtractor)
     private val trackerDetector = DomainBasedTrackerDetector(hostnameExtractor, trackerListProvider.trackerList())
+    private val vpnStore = VpnSharedPreferences(this)
 
     val udpPacketProcessor = UdpPacketProcessor(queues, this)
     val tcpPacketProcessor = TcpPacketProcessor(queues, this, trackerDetector, hostnameExtractor)
@@ -74,6 +81,14 @@ class PassthroughVpnService : VpnService(), CoroutineScope by MainScope(), Netwo
     private var executorService: ExecutorService? = null
 
     inner class VpnServiceBinder : Binder() {
+
+        override fun onTransact(code: Int, data: Parcel, reply: Parcel?, flags: Int): Boolean {
+            if (code == LAST_CALL_TRANSACTION) {
+                onRevoke()
+                return true
+            }
+            return false
+        }
 
         fun getService(): PassthroughVpnService {
             return this@PassthroughVpnService
@@ -84,16 +99,22 @@ class PassthroughVpnService : VpnService(), CoroutineScope by MainScope(), Netwo
 
     override fun onCreate() {
         super.onCreate()
-        Timber.i("onCreate")
+        Timber.i("VPN onCreate")
     }
 
-    override fun onBind(p0: Intent?): IBinder? {
+    override fun onBind(intent: Intent?): IBinder? {
+        Timber.i("VPN onBind invoked")
         return binder
+    }
+
+    override fun onUnbind(p0: Intent?): Boolean {
+        Timber.i("VPN onUnbind invoked")
+        return super.onUnbind(p0)
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        Timber.i("onDestroy")
+        Timber.i("VPN onDestroy")
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -120,13 +141,15 @@ class PassthroughVpnService : VpnService(), CoroutineScope by MainScope(), Netwo
         tickerJob?.cancel()
 
         queues.clearAll()
-
+        vpnStore.isRunning = true
         establishVpnInterface()
+        schedulerReminderAlarm()
 
         tunInterface?.let { vpnInterface ->
-            running = true
-            startForeground(FOREGROUND_VPN_SERVICE_ID, VpnNotificationBuilder.build(this))
+
+            startForeground(FOREGROUND_VPN_SERVICE_ID, VpnNotificationBuilder.buildPersistentNotification(this))
             startStatTicker()
+            hideReminderNotification()
 
             executorService?.shutdownNow()
             val processors = listOf(
@@ -141,15 +164,38 @@ class PassthroughVpnService : VpnService(), CoroutineScope by MainScope(), Netwo
             executorService = Executors.newFixedThreadPool(processors.size).also { executorService ->
                 processors.forEach { executorService.submit(it) }
             }
-
-            //tunPacketProcessor = TunPacketProcessor(vpnInterface, queues).also { executorService.submit(it) }
-
-            //            tunPacketProcessor = TunPacketProcessor(vpnInterface, queues).also {
-            //                GlobalScope.launch(Executors.newSingleThreadExecutor().asCoroutineDispatcher()) {
-            //                    it.run()
-            //                }
-            //            }
         }
+    }
+
+    private fun hideReminderNotification() {
+        // this should be injected with DI and not here
+        val notificationManager = NotificationManagerCompat.from(this)
+        notificationManager.cancel(VPN_REMINDER_NOTIFICATION_ID)
+    }
+
+    private fun schedulerReminderAlarm() {
+        val receiver = ComponentName(this, VpnReminderReceiver::class.java)
+
+        packageManager.setComponentEnabledSetting(
+            receiver,
+            PackageManager.COMPONENT_ENABLED_STATE_ENABLED,
+            PackageManager.DONT_KILL_APP
+        )
+
+        val alarmIntent = Intent(this, VpnReminderReceiver::class.java).let { intent ->
+            intent.action = ACTION_VPN_REMINDER
+            PendingIntent.getBroadcast(this, 0, intent, 0)
+        }
+
+        val alarmManager = getSystemService(Context.ALARM_SERVICE) as? AlarmManager
+
+        alarmManager?.setRepeating(
+            AlarmManager.RTC_WAKEUP,
+            System.currentTimeMillis(),
+            AlarmManager.INTERVAL_FIFTEEN_MINUTES,
+            alarmIntent
+        )
+
     }
 
     private fun startStatTicker() {
@@ -202,6 +248,7 @@ class PassthroughVpnService : VpnService(), CoroutineScope by MainScope(), Netwo
 
     private fun stopVpn() {
         Timber.i("Stopping VPN")
+        vpnStore.isRunning = false
         tickerJob?.cancel()
         queues.clearAll()
         //tunPacketProcessor?.stop()
@@ -210,10 +257,9 @@ class PassthroughVpnService : VpnService(), CoroutineScope by MainScope(), Netwo
         tcpPacketProcessor.stop()
         tunInterface?.close()
         tunInterface = null
-        stopForeground(true)
 
+        stopForeground(true)
         stopSelf()
-        running = false
     }
 
     private fun VpnService.Builder.configureMeteredConnection() {
@@ -223,14 +269,15 @@ class PassthroughVpnService : VpnService(), CoroutineScope by MainScope(), Netwo
     }
 
     override fun onRevoke() {
-        super.onRevoke()
         Timber.w("VPN onRevoke called")
         stopVpn()
+        super.onRevoke()
     }
 
     companion object {
 
-        var running: Boolean = false
+        const val ACTION_VPN_REMINDER = "com.duckduckgo.vpn.internaltesters.reminder"
+        const val VPN_REMINDER_NOTIFICATION_ID = 999
 
         fun serviceIntent(context: Context): Intent {
             return Intent(context, PassthroughVpnService::class.java)
@@ -253,7 +300,7 @@ class PassthroughVpnService : VpnService(), CoroutineScope by MainScope(), Netwo
         // For backwards compatibility, it will still return the caller's own services.
         // So for us it's still valid because we don't need to know third party services, just ours.
         @Suppress("DEPRECATION")
-        fun isRunning(context: Context): Boolean {
+        fun isServiceRunning(context: Context): Boolean {
             val manager: ActivityManager = context.getSystemService(ACTIVITY_SERVICE) as ActivityManager
             for (service in manager.getRunningServices(Int.MAX_VALUE)) {
                 if ("com.duckduckgo.mobile.android.vpn.service.PassthroughVpnService" == service.service.className) {

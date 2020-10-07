@@ -17,4 +17,6 @@
 <resources>
     <string name="title_activity_vpn_controller">DDG Vpn</string>
     <string name="vpnNotificationTitle">App Tracker Protection Active</string>
+    <string name="vpnReminderNotificationTitle">App Tracker Protection is not enabled</string>
+    <string name="vpnReminderNotificationText">Please, tap on this notification and enable it now</string>
 </resources>

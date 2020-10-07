@@ -29,6 +29,7 @@ import android.content.ClipboardManager
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
+import android.content.ServiceConnection
 import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.media.MediaScannerConnection
@@ -37,6 +38,7 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.os.Handler
+import android.os.IBinder
 import android.os.Message
 import android.provider.Settings
 import android.text.Editable
@@ -146,6 +148,7 @@ import kotlinx.android.synthetic.main.include_new_browser_tab.*
 import kotlinx.android.synthetic.main.include_omnibar_toolbar.*
 import kotlinx.android.synthetic.main.include_omnibar_toolbar.view.*
 import kotlinx.android.synthetic.main.popup_window_browser_menu.view.*
+import kotlinx.android.synthetic.main.popup_window_browser_menu.vpnPopupMenuItem
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -296,6 +299,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
     private var loginDetectionDialog: AlertDialog? = null
 
     private val pulseAnimation: PulseAnimation = PulseAnimation(this)
+
 
     override fun onAttach(context: Context) {
         AndroidSupportInjection.inject(this)
@@ -1691,7 +1695,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
                 brokenSitePopupMenuItem?.isEnabled = viewState.canReportSite
                 requestDesktopSiteCheckMenuItem?.isEnabled = viewState.canChangeBrowsingMode
                 requestDesktopSiteCheckMenuItem?.isChecked = viewState.isDesktopBrowsingMode
-                vpnPopupMenuItem?.isChecked = PassthroughVpnService.isRunning(activity!!)
+                vpnPopupMenuItem?.isChecked = PassthroughVpnService.isServiceRunning(activity!!)
 
                 addToHome?.let {
                     it.visibility = if (viewState.addToHomeVisible) VISIBLE else GONE

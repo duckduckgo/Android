@@ -102,4 +102,5 @@ class DaggerWorkerFactory(
         worker.pixel = pixel
         worker.notification = privacyProtectionNotification
     }
+
 }

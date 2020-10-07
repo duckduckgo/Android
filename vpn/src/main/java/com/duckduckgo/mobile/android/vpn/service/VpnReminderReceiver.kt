@@ -1,0 +1,46 @@
+/*
+ * Copyright (c) 2020 DuckDuckGo
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package com.duckduckgo.mobile.android.vpn.service
+
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
+import androidx.core.app.NotificationManagerCompat
+import com.duckduckgo.mobile.android.vpn.store.VpnSharedPreferences
+import com.duckduckgo.mobile.android.vpn.ui.notification.VpnNotificationBuilder
+import timber.log.Timber
+
+class VpnReminderReceiver: BroadcastReceiver() {
+
+    override fun onReceive(context: Context, intent: Intent) {
+        Timber.i("VpnReminderReceiver onReceive ${intent.action}")
+        if (intent.action == "android.intent.action.BOOT_COMPLETED" || intent.action == PassthroughVpnService.ACTION_VPN_REMINDER) {
+            Timber.v("Checking if VPN is running")
+
+            val vpnStore = VpnSharedPreferences(context)
+            if (vpnStore.isRunning) {
+                Timber.v("Vpn is already running, nothing to show")
+            } else {
+                Timber.v("Vpn is not running, showing reminder notification")
+                val reminder = VpnNotificationBuilder.buildReminderNotification(context)
+                val manager = NotificationManagerCompat.from(context)
+                manager.notify(PassthroughVpnService.VPN_REMINDER_NOTIFICATION_ID, reminder)
+            }
+        }
+    }
+
+}

@@ -10,8 +10,8 @@
             android:name="dummy.VpnControllerActivity"
             android:exported="true"
             android:label="@string/title_activity_vpn_controller"
-            android:theme="@style/Theme.AndroidVpn.NoActionBar"
-            android:process=":vpn">
+            android:process=":vpn"
+            android:theme="@style/Theme.AndroidVpn.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -26,6 +26,16 @@
                 <action android:name="android.net.VpnService" />
             </intent-filter>
         </service>
+
+        <receiver
+            android:name=".service.VpnReminderReceiver"
+            android:enabled="false"
+            android:process=":vpn">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="com.duckduckgo.vpn.internaltesters.reminder" />
+            </intent-filter>
+        </receiver>
 
     </application>
 

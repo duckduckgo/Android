@@ -24,14 +24,20 @@ import android.content.ServiceConnection
 import android.net.VpnService
 import android.os.Bundle
 import android.os.IBinder
-import android.widget.*
+import android.widget.Button
+import android.widget.CompoundButton
+import android.widget.TextView
+import android.widget.Toast
+import android.widget.ToggleButton
 import androidx.appcompat.app.AppCompatActivity
-import com.duckduckgo.mobile.android.vpn.service.PassthroughVpnService
+import androidx.fragment.app.FragmentActivity
 import com.duckduckgo.mobile.android.vpn.R
-import kotlinx.coroutines.*
+import com.duckduckgo.mobile.android.vpn.service.PassthroughVpnService
+import com.duckduckgo.mobile.android.vpn.store.VpnSharedPreferences
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.MainScope
 import timber.log.Timber
 import xyz.hexene.localvpn.Packet
-import java.lang.RuntimeException
 import java.nio.ByteBuffer
 
 class VpnControllerActivity : AppCompatActivity(R.layout.activity_vpn_controller), CoroutineScope by MainScope() {
@@ -44,17 +50,25 @@ class VpnControllerActivity : AppCompatActivity(R.layout.activity_vpn_controller
 
     private var vpnService: PassthroughVpnService? = null
 
+    private lateinit var vpnStore: VpnSharedPreferences
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setSupportActionBar(findViewById(R.id.toolbar))
         bindService(PassthroughVpnService.serviceIntent(this), serviceConnection, Context.BIND_AUTO_CREATE)
         setViewReferences()
         configureUiHandlers()
+        poorManDi()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        updateRunningToggleButtonState()
     }
 
     override fun onDestroy() {
-        super.onDestroy()
         unbindService(serviceConnection)
+        super.onDestroy()
     }
 
     private fun setViewReferences() {
@@ -63,6 +77,10 @@ class VpnControllerActivity : AppCompatActivity(R.layout.activity_vpn_controller
         processorStartButton = findViewById(R.id.processStart)
         processorStopButton = findViewById(R.id.processStop)
         addPacketButton = findViewById(R.id.addPacket)
+    }
+
+    private fun poorManDi() {
+        vpnStore = VpnSharedPreferences(this)
     }
 
     private fun configureUiHandlers() {
@@ -86,15 +104,7 @@ class VpnControllerActivity : AppCompatActivity(R.layout.activity_vpn_controller
             vpnService?.queues?.tcpDeviceToNetwork?.offer(Packet(ByteBuffer.allocate(Short.MAX_VALUE.toInt())))
             true
         }
-        //addPacketButton.setOnLongClickListener { bulkAddPackets(); true }
-
     }
-
-//    private fun bulkAddPackets() {
-//        for (i in 0 until 100) {
-//            vpnService?.deviceToNetworkPacketProcessor?.addPacket(Packet(ByteBuffer.allocate(0)))
-//        }
-//    }
 
     private fun startVpnIfAllowed() {
         when (val permissionStatus = checkVpnPermission()) {
@@ -152,8 +162,8 @@ class VpnControllerActivity : AppCompatActivity(R.layout.activity_vpn_controller
     private val serviceConnection: ServiceConnection = object : ServiceConnection {
 
         override fun onServiceConnected(component: ComponentName, binder: IBinder) {
-            vpnService = (binder as PassthroughVpnService.VpnServiceBinder).getService()
             Timber.i("Bound to VPN service")
+            vpnService = (binder as PassthroughVpnService.VpnServiceBinder).getService()
             updateRunningToggleButtonState()
         }
 
@@ -173,7 +183,7 @@ class VpnControllerActivity : AppCompatActivity(R.layout.activity_vpn_controller
     }
 
     private fun updateRunningToggleButtonState() {
-        vpnRunningToggleButton.quietlySetIsChecked(PassthroughVpnService.running, runningButtonChangeListener)
+        vpnRunningToggleButton.quietlySetIsChecked(vpnStore.isRunning, runningButtonChangeListener)
     }
 
     private sealed class VpnPermissionStatus {
@@ -188,5 +198,4 @@ class VpnControllerActivity : AppCompatActivity(R.layout.activity_vpn_controller
 
         private const val RC_REQUEST_VPN_PERMISSION = 100
     }
-
 }

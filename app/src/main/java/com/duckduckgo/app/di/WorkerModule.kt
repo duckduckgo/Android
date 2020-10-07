@@ -30,6 +30,7 @@ import com.duckduckgo.app.notification.model.PrivacyProtectionNotification
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.api.OfflinePixelSender
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.mobile.android.vpn.store.VpnStore
 import dagger.Module
 import dagger.Provides
 import javax.inject.Singleton

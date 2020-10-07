@@ -32,7 +32,7 @@ class VpnNotificationBuilder {
 
     companion object {
 
-        fun build(context: Context): Notification {
+        fun buildPersistentNotification(context: Context): Notification {
             registerChannel(context)
 
             val vpnControllerIntent = Intent(context, VpnControllerActivity::class.java)
@@ -59,8 +59,29 @@ class VpnNotificationBuilder {
                 //NotificationManagerCompat.from(context).createNotificationChannel(channel)
                 val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
                 notificationManager.createNotificationChannel(channel)
-
             }
+        }
+
+        fun buildReminderNotification(context: Context): Notification{
+            registerChannel(context)
+
+            val vpnControllerIntent = Intent(context, VpnControllerActivity::class.java)
+            val vpnControllerPendingIntent: PendingIntent? = TaskStackBuilder.create(context).run {
+                addNextIntentWithParentStack(vpnControllerIntent)
+                getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT)
+            }
+
+            return NotificationCompat.Builder(context,
+                VPN_FOREGROUND_SERVICE_NOTIFICATION_CHANNEL_ID
+            )
+                .setContentTitle(context.getString(R.string.vpnReminderNotificationTitle))
+                .setContentText(context.getString(R.string.vpnReminderNotificationText))
+                .setSmallIcon(R.drawable.ic_vpn_notification_24)
+                .setContentIntent(vpnControllerPendingIntent)
+                .setOngoing(false)
+                .setAutoCancel(true)
+                .setChannelId(VPN_FOREGROUND_SERVICE_NOTIFICATION_CHANNEL_ID)
+                .build()
         }
 
         private const val VPN_FOREGROUND_SERVICE_NOTIFICATION_CHANNEL_ID = "TrackerProtectionVPN"
