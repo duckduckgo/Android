@@ -330,8 +330,7 @@ sealed class DaxFireDialogCta(
         view.dialogTextCta.startTypingAnimation(daxText, true)
     }
 
-    // TODO: check if this is necessary
-    override fun pixelCancelParameters(): Map<String, String> = mapOf(Pixel.PixelParameter.CTA_SHOWN to ctaPixelParam)
+    override fun pixelCancelParameters(): Map<String, String> = emptyMap()
 
     override fun pixelOkParameters(): Map<String, String> = emptyMap()
 
