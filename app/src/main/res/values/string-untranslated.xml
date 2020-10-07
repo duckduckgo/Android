@@ -50,11 +50,7 @@
     <string name="preciseLocationAllowedSitesSectionTitle">Granted</string>
     <string name="preciseLocationDeniedSitesSectionTitle">Denied</string>
     <string name="preciseLocationSnackbarMessage">You previously granted %s permission to access your device location.</string>
-
-    <!-- Fireproof websites -->
     <string name="fireproofWebsiteDeleteSnackbarMessage">&lt;b>%s&lt;/b> is no longer fireproof! Visit Settings to learn more.</string>
-
-    <!-- Bookmark Activity -->
     <string name="bookmarkDeleteSnackbarMessage">Deleted &lt;b>%s&lt;/b></string>
 
 </resources>
