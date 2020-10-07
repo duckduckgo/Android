@@ -39,7 +39,6 @@ import kotlinx.android.synthetic.main.include_cta_buttons.view.*
 import kotlinx.android.synthetic.main.include_cta_content.view.*
 import kotlinx.android.synthetic.main.include_dax_dialog_cta.view.*
 import kotlinx.android.synthetic.main.include_top_cta.view.*
-import java.util.*
 
 interface DialogCta {
     fun createCta(activity: FragmentActivity): DaxDialog
@@ -222,24 +221,12 @@ sealed class DaxDialogCta(
             return if (isFromSameNetworkDomain()) {
                 context.resources.getString(R.string.daxMainNetworkCtaText, network, percentage, network)
             } else {
-                val locale = Locale.getDefault()
-                if (locale != null && locale.language == "en") {
-                    context.resources.getString(
-                        R.string.daxMainNetworkOwnedCtaText,
-                        network,
-                        Uri.parse(siteHost).baseHost?.removePrefix("m."),
-                        network
-                    )
-                } else {
-                    context.resources.getString(
-                        R.string.daxMainNetworkOwnedCtaText,
-                        Uri.parse(siteHost).baseHost?.removePrefix("m.")?.capitalize(Locale.getDefault()),
-                        network,
-                        network,
-                        percentage,
-                        network
-                    )
-                }
+                context.resources.getString(
+                    R.string.daxMainNetworkOwnedCtaText,
+                    network,
+                    Uri.parse(siteHost).baseHost?.removePrefix("m."),
+                    network
+                )
             }
         }
 

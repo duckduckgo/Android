@@ -51,4 +51,17 @@
     <string name="preciseLocationDeniedSitesSectionTitle">Denied</string>
     <string name="preciseLocationSnackbarMessage">You previously granted %s permission to access your device location.</string>
 
+    <!--  Global Privacy Control-->
+    <string name="globalPrivacyControlActivityTitle">Global Privacy Control (GPC)</string>
+    <string name="globalPrivacyControlDescription">
+        Your data shouldn\'t be for sale. At DuckDuckGo, we agree. Activate the \"Global Privacy Control\" (GPC) setting and we\'ll signal to websites your preference to:&lt;br/&gt;&lt;br/&gt;
+        &#8226; Not sell your personal data.&lt;br/&gt;
+        &#8226; Limit sharing of your personal data to other companies.
+    </string>
+    <string name="globalPrivacyControlSetting">Global Privacy Control (GPC)</string>
+    <string name="globalPrivacyControlToggle">Global Privacy Control (GPC)</string>
+    <string name="globalPrivacyControlDescriptionLegal"><b>Since Global Privacy Control (GPC) is a new standard, most websites won\'t recognize it yet, but we\'re working hard to ensure it becomes accepted worldwide.</b> However, websites are only required to act on the signal to the extent applicable laws compel them to do so.</string>
+    <string name="globalPrivacyControlLearnMore"><u>Learn More</u></string>
+    <string name="disabled">Disabled</string>
+    <string name="enabled">Enabled</string>
 </resources>
