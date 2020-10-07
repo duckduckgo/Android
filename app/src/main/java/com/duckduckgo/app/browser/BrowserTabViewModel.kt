@@ -106,8 +106,6 @@ import java.io.File
 import java.util.*
 import java.util.concurrent.TimeUnit
 
-@FlowPreview
-@ExperimentalCoroutinesApi
 class BrowserTabViewModel(
     private val statisticsUpdater: StatisticsUpdater,
     private val queryUrlConverter: OmnibarEntryConverter,
@@ -306,6 +304,7 @@ class BrowserTabViewModel(
     private val autoCompletePublishSubject = PublishRelay.create<String>()
     private val fireproofWebsiteState: LiveData<List<FireproofWebsiteEntity>> = fireproofWebsiteRepository.getFireproofWebsites()
 
+    @ExperimentalCoroutinesApi
     @FlowPreview
     private val showPulseAnimation: LiveData<Boolean> = ctaViewModel.showFireButtonPulseAnimation.asLiveData(context = viewModelScope.coroutineContext)
 
