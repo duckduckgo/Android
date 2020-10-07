@@ -57,9 +57,7 @@ import com.duckduckgo.app.widget.ui.WidgetCapabilities
 import com.nhaarman.mockitokotlin2.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.consumeAsFlow
-import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runBlockingTest
 import org.junit.After
@@ -598,6 +596,27 @@ class CtaViewModelTest {
             dismissedCtaDaoChannel.send(listOf(DismissedCta(it)))
         }
 
+        launch.cancel()
+    }
+
+    @Test
+    fun whenFireButtonAnimationShowingAndCallDismissThenFireButtonAnimationShouldNotShow() = coroutineRule.runBlocking {
+        var lastValueCollected: Boolean? = null
+        givenFireButtonEducationActive()
+        givenOnboardingActive()
+        val willTriggerFirePulseAnimationCtas = listOf(CtaId.DAX_DIALOG_TRACKERS_FOUND, CtaId.DAX_DIALOG_NETWORK, CtaId.DAX_DIALOG_OTHER)
+        val launch = launch {
+            testee.showFireButtonPulseAnimation.collect {
+                lastValueCollected = it
+            }
+        }
+        willTriggerFirePulseAnimationCtas.forEach {
+            dismissedCtaDaoChannel.send(listOf(DismissedCta(it)))
+        }
+
+        testee.dismissPulseAnimation()
+
+        assertFalse(lastValueCollected!!)
         launch.cancel()
     }
 
