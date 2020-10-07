@@ -341,8 +341,8 @@ class BrowserTabViewModel(
                 userEventsStore.registerUserEvent(UserEventKey.FIRE_BUTTON_HIGHLIGHTED)
             }
             val pulseElapsedTime = System.currentTimeMillis() - (fireButtonHighlightedEvent?.timestamp ?: System.currentTimeMillis())
-            val pulseDuration = FIRE_BUTTON_PULSE_ANIMATION_DURATION_MS - pulseElapsedTime
-            delay(pulseDuration)
+            val pulsePendingTime = ONE_HOUR_IN_MS - pulseElapsedTime
+            delay(pulsePendingTime)
             ctaViewModel.dismissPulseAnimation()
         }
     }
@@ -1709,6 +1709,6 @@ class BrowserTabViewModel(
         private const val FIXED_PROGRESS = 50
         const val GPC_HEADER = "Sec-GPC"
         const val GPC_HEADER_VALUE = "1"
-        private const val FIRE_BUTTON_PULSE_ANIMATION_DURATION_MS = 3600000
+        private const val ONE_HOUR_IN_MS = 3600000
     }
 }
