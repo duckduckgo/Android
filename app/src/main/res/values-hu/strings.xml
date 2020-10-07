@@ -190,7 +190,6 @@
     <!-- Bookmarks Activity -->
     <string name="bookmarksMenuTitle">Könyvjelzők</string>
     <string name="bookmarksActivityTitle">Könyvjelzők</string>
-    <string name="bookmarkDeleteConfirmMessage">Biztos, hogy törlöd a(z) &lt;b&gt;%1$s&lt;/b&gt; könyvjelzőt?</string>
     <string name="bookmarkAddedFeedback">Könyvjelző hozzáadva</string>
     <string name="bookmarkTitleHint">Könyvjelző címe</string>
     <string name="bookmarkUrlHint">Könyvjelző URL</string>
@@ -446,7 +445,6 @@
     <string name="fireproofWebsiteMenuTitleAdd">Tűzálló weboldal</string>
     <string name="fireproofWebsiteSnackbarConfirmation">A &lt;b&gt;%1$s&lt;/b&gt; most már tűzálló! További információkért nézd meg a Beállításokat.</string>
     <string name="fireproofWebsiteSnackbarAction">Visszavonás</string>
-    <string name="fireproofWebsiteDeleteConfirmMessage">Biztos, hogy törölni akarod a (z) &lt;b&gt;%1$s&lt;/b&gt; fájlt?</string>
     <string name="fireproofWebsiteEmptyListHint">Még nem lett tűzállóvá téve egy weboldal sem</string>
     <string name="fireproofWebsiteFeatureDescription">A webhelyek sütik segítségével teszik lehetővé, hogy bejelentkezve maradhass. Ha tűzállóvá teszel egy weboldalt, a sütik nem törlődnek, és még a Fire gomb használata után is bejelentkezve maradsz. A tűzálló webhelyeken a külső felek nyomkövetőit azonban blokkoljuk.</string>
     <string name="fireproofWebsiteOverflowContentDescription">További lehetőségek a %1$s tűzálló weboldalhoz</string>

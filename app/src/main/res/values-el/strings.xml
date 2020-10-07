@@ -193,7 +193,6 @@
     <!-- Bookmarks Activity -->
     <string name="bookmarksMenuTitle">Σελιδοδείκτες</string>
     <string name="bookmarksActivityTitle">Σελιδοδείκτες</string>
-    <string name="bookmarkDeleteConfirmMessage">Θέλετε σίγουρα να διαγράψετε τον σελιδοδείκτη &lt;b&gt;%1$s&lt;/b&gt;;</string>
     <string name="bookmarkAddedFeedback">Ο σελιδοδείκτης προστέθηκε</string>
     <string name="bookmarkTitleHint">Τίτλος σελιδοδείκτη</string>
     <string name="bookmarkUrlHint">Διεύθυνση URL σελιδοδείκτη</string>
@@ -451,7 +450,6 @@
     <string name="fireproofWebsiteMenuTitleAdd">Ασφαλής ιστότοπος</string>
     <string name="fireproofWebsiteSnackbarConfirmation">Το &lt;b&gt;%1$s&lt;/b&gt; είναι πλέον ασφαλές! Επισκεφτείτε τις Ρυθμίσεις για να μάθετε περισσότερα.</string>
     <string name="fireproofWebsiteSnackbarAction">Αναίρεση</string>
-    <string name="fireproofWebsiteDeleteConfirmMessage">Είστε βέβαιοι ότι θέλετε να διαγράψετε το &lt;b&gt;%1$s&lt;/b&gt;;</string>
     <string name="fireproofWebsiteEmptyListHint">Δεν υπάρχουν ασφαλείς ιστιότοποι ακόμα</string>
     <string name="fireproofWebsiteFeatureDescription">Οι ιστότοποι βασίζονται σε cookies για να σας διατηρούν συνδεδεμένους. Όταν ενεργοποιείτε τη διαγραφή δραστηριότητας για έναν ιστότοπο, τα cookies δεν διαγράφονται και παραμένετε συνδεδεμένοι, ακόμα και μετά τη χρήση του Κουμπιού διαγραφής δραστηριότητας. Εξακολουθούμε να αποκλείουμε εφαρμογές παρακολούθησης από τρίτους που υπάρχουν σε ιστότοπους με διαγραφή δραστηριότητας.</string>
     <string name="fireproofWebsiteOverflowContentDescription">Περισσότερες επιλογές για ασφαλή ιστότοπο %1$s</string>

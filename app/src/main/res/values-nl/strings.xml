@@ -190,7 +190,6 @@
     <!-- Bookmarks Activity -->
     <string name="bookmarksMenuTitle">Bladwijzers</string>
     <string name="bookmarksActivityTitle">Bladwijzers</string>
-    <string name="bookmarkDeleteConfirmMessage">Weet je zeker dat je bladwijzer &lt;b&gt;%1$s&lt;/b&gt; wilt verwijderen?</string>
     <string name="bookmarkAddedFeedback">Bladwijzer toegevoegd</string>
     <string name="bookmarkTitleHint">Naam bladwijzer</string>
     <string name="bookmarkUrlHint">URL bladwijzer</string>
@@ -446,7 +445,6 @@
     <string name="fireproofWebsiteMenuTitleAdd">Brandveilige website</string>
     <string name="fireproofWebsiteSnackbarConfirmation">&lt;b&gt;%1$s&lt;/b&gt; is nu brandveilig! Ga naar Instellingen voor meer informatie.</string>
     <string name="fireproofWebsiteSnackbarAction">Ongedaan maken</string>
-    <string name="fireproofWebsiteDeleteConfirmMessage">Weet je zeker dat je &lt;b&gt;%1$s&lt;/b&gt; wilt verwijderen?</string>
     <string name="fireproofWebsiteEmptyListHint">Nog geen websites brandveilig gemaakt</string>
     <string name="fireproofWebsiteFeatureDescription">Websites gebruiken cookies om te zorgen dat je ingelogd blijft. Als je een site brandveilig maakt, worden de cookies niet gewist en blijf je ingelogd, zelfs nadat je de vuurknop hebt gebruikt. Trackers van derden worden ook op brandveilige websites geblokkeerd.</string>
     <string name="fireproofWebsiteOverflowContentDescription">Meer opties voor een vuurvaste website %1$s</string>

@@ -206,7 +206,6 @@
     <!-- Bookmarks Activity -->
     <string name="bookmarksMenuTitle">Bokmärken</string>
     <string name="bookmarksActivityTitle">Bokmärken</string>
-    <string name="bookmarkDeleteConfirmMessage">Är du säker på att du vill radera bokmärket &lt;b&gt;%1$s&lt;/b&gt;?</string>
     <string name="bookmarkAddedFeedback">Bokmärket har lagts till</string>
     <string name="bookmarkTitleHint">Bokmärkesrubrik</string>
     <string name="bookmarkUrlHint">Bokmärkets URL</string>
@@ -462,7 +461,6 @@
     <string name="fireproofWebsiteMenuTitleAdd">Brandsäker webbplats</string>
     <string name="fireproofWebsiteSnackbarConfirmation">&lt;b&gt;%1$s&lt;/b&gt; är nu brandsäker! Besök Inställningar för att lära dig mer.</string>
     <string name="fireproofWebsiteSnackbarAction">Återställ</string>
-    <string name="fireproofWebsiteDeleteConfirmMessage">Är du säker på att du vill ta bort &lt;b&gt;%1$s&lt;/b&gt;?</string>
     <string name="fireproofWebsiteEmptyListHint">Inga webbplatser är brandsäkra än</string>
     <string name="fireproofWebsiteFeatureDescription">Webbplatser använder kakor för att hålla dig inloggad. Om du brandsäkrar en webbplats kommer kakor inte att raderas och du förblir inloggad även efter att du har använt brännarknappen. Vi blockerar fortfarande tredje parters spårare som finns på brandsäkrade webbplatser.</string>
     <string name="fireproofWebsiteOverflowContentDescription">Fler alternativ för brandsäker webbplats %1$s</string>

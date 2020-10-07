@@ -194,7 +194,6 @@
     <!-- Bookmarks Activity -->
     <string name="bookmarksMenuTitle">Semne de carte</string>
     <string name="bookmarksActivityTitle">Semne de carte</string>
-    <string name="bookmarkDeleteConfirmMessage">Sunteți sigur că doriți să ștergeți semnul de carte &lt;b&gt;%1$s&lt;/b&gt;?</string>
     <string name="bookmarkAddedFeedback">Semn de carte adăugat</string>
     <string name="bookmarkTitleHint">Titlu semn de carte</string>
     <string name="bookmarkUrlHint">Adresă URL semn de carte</string>
@@ -452,7 +451,6 @@
     <string name="fireproofWebsiteMenuTitleAdd">Website ignifug</string>
     <string name="fireproofWebsiteSnackbarConfirmation">&lt;b&gt;%1$s&lt;/b&gt; este acum ignifugat! Accesați Setări pentru a afla mai multe.</string>
     <string name="fireproofWebsiteSnackbarAction">Anulați</string>
-    <string name="fireproofWebsiteDeleteConfirmMessage">Sigur doriți să ștergeți &lt;b&gt;%1$s&lt;/b&gt;?</string>
     <string name="fireproofWebsiteEmptyListHint">Niciun site web nu a fost ignorat încă</string>
     <string name="fireproofWebsiteFeatureDescription">Site-urile web se bazează pe cookie-uri pentru a te menține conectat. Atunci când ștergi activitatea și istoricul unui site, cookie-urile nu vor fi șterse și vei rămâne conectat, chiar și după utilizarea butonului Ștergere activitate și istoric. Blocăm totuși instrumentele de urmărire terțe găsite pe site-urile web la care la ieșire se șterge activitatea și istoricul din browser.</string>
     <string name="fireproofWebsiteOverflowContentDescription">Mai multe opțiuni pentru site-ul ignifug %1$s</string>

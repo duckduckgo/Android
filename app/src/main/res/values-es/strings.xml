@@ -190,7 +190,6 @@
     <!-- Bookmarks Activity -->
     <string name="bookmarksMenuTitle">Marcadores</string>
     <string name="bookmarksActivityTitle">Marcadores</string>
-    <string name="bookmarkDeleteConfirmMessage">¿Estás seguro de que quieres eliminar el marcador &lt;b&gt;%1$s&lt;/b&gt;?</string>
     <string name="bookmarkAddedFeedback">Marcador añadido</string>
     <string name="bookmarkTitleHint">Título del marcador</string>
     <string name="bookmarkUrlHint">URL del marcador</string>
@@ -446,7 +445,6 @@
     <string name="fireproofWebsiteMenuTitleAdd">Sitio web a prueba de fuego</string>
     <string name="fireproofWebsiteSnackbarConfirmation">¡&lt;b&gt;%1$s&lt;/b&gt; es ahora a prueba de fuego! Visita Ajustes para obtener más información.</string>
     <string name="fireproofWebsiteSnackbarAction">Deshacer</string>
-    <string name="fireproofWebsiteDeleteConfirmMessage">¿Está seguro de que desea eliminar &lt;b&gt;%1$s&lt;/b&gt;?</string>
     <string name="fireproofWebsiteEmptyListHint">Todavía no hay sitios web a prueba de fuego</string>
     <string name="fireproofWebsiteFeatureDescription">Los sitios web dependen de cookies para mantener tu sesión iniciada. Cuando marcas una web como «a prueba de fuego» no se borrarán las cookies y tu sesión permanecerá iniciada, incluso después de utilizar el botón Fuego. Seguiremos bloqueando rastreadores de terceros que se encuentren en sitios web a prueba de fuego.</string>
     <string name="fireproofWebsiteOverflowContentDescription">Más opciones para el sitio web a prueba de fuego %1$s</string>

@@ -214,7 +214,6 @@
     <!-- Bookmarks Activity -->
     <string name="bookmarksMenuTitle">Закладки</string>
     <string name="bookmarksActivityTitle">Закладки</string>
-    <string name="bookmarkDeleteConfirmMessage">Вы действительно хотите удалить закладку &lt;b&gt;%1$s&lt;/b&gt;?</string>
     <string name="bookmarkAddedFeedback">Закладка добавлена</string>
     <string name="bookmarkTitleHint">Название закладки</string>
     <string name="bookmarkUrlHint">URL закладки</string>
@@ -474,7 +473,6 @@
     <string name="fireproofWebsiteMenuTitleAdd">Обезопасить сайт</string>
     <string name="fireproofWebsiteSnackbarConfirmation">&lt;b&gt;%1$s&lt;/b&gt; теперь безопасен! Зайдите в Настройки, чтобы узнать больше.</string>
     <string name="fireproofWebsiteSnackbarAction">Отменить действие</string>
-    <string name="fireproofWebsiteDeleteConfirmMessage">Вы уверены, что хотите удалить &lt;b&gt;%1$s&lt;/b&gt;?</string>
     <string name="fireproofWebsiteEmptyListHint">Ни один сайт пока не защищен</string>
     <string name="fireproofWebsiteFeatureDescription">Чтобы вам не приходилось каждый раз входить в свою учетную запись, сайты используют куки-файлы. Если сделать сайт «огнеупорным», мы не будем стирать его куки-файлы, даже если вы воспользуетесь кнопкой «Огонь». Но мы по-прежнему будем блокировать сторонние трекеры, в том числе на огнеупорных сайтах.</string>
     <string name="fireproofWebsiteOverflowContentDescription">Дополнительные параметры для безопасного сайта %1$s</string>

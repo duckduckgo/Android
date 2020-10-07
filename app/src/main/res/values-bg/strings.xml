@@ -190,7 +190,6 @@
     <!-- Bookmarks Activity -->
     <string name="bookmarksMenuTitle">Отметки</string>
     <string name="bookmarksActivityTitle">Отметки</string>
-    <string name="bookmarkDeleteConfirmMessage">Наистина ли искате да изтриете отметка &lt;b&gt;%1$s&lt;/b&gt;?</string>
     <string name="bookmarkAddedFeedback">Добавена е отметка</string>
     <string name="bookmarkTitleHint">Заглавие на отметката</string>
     <string name="bookmarkUrlHint">URL адрес на отметката</string>
@@ -446,7 +445,6 @@
     <string name="fireproofWebsiteMenuTitleAdd">Огнеустойчив уебсайт</string>
     <string name="fireproofWebsiteSnackbarConfirmation">&lt;b&gt;%1$s&lt;/b&gt; вече е огнеустойчив! Посетете Настройки, за да научите повече.</string>
     <string name="fireproofWebsiteSnackbarAction">Отмяна</string>
-    <string name="fireproofWebsiteDeleteConfirmMessage">Сигурни ли сте, че искате да изтриете &lt;b&gt;%1$s&lt;/b&gt;?</string>
     <string name="fireproofWebsiteEmptyListHint">Все още няма огнеустойчиви уебсайтове</string>
     <string name="fireproofWebsiteFeatureDescription">Уеб сайтовете разчитат на бисквитките, за да поддържат сесията ви активна. Когато направите сайта огнеустойчив, бисквитките няма да бъдат изтрити и ще останете вписани, дори след като използвате огнения бутон. Ние все пак блокираме тракери на трети страни, които се намират на огнеустойчиви сайтове.</string>
     <string name="fireproofWebsiteOverflowContentDescription">Още опции за огнеустойчивост на уебсайт %1$s</string>

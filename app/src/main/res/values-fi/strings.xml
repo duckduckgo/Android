@@ -190,7 +190,6 @@
     <!-- Bookmarks Activity -->
     <string name="bookmarksMenuTitle">Kirjanmerkit</string>
     <string name="bookmarksActivityTitle">Kirjanmerkit</string>
-    <string name="bookmarkDeleteConfirmMessage">Haluatko varmasti poistaa kirjanmerkin &lt;b&gt;%1$s&lt;/b&gt;?</string>
     <string name="bookmarkAddedFeedback">Kirjanmerkki lisätty</string>
     <string name="bookmarkTitleHint">Kirjanmerkin otsikko</string>
     <string name="bookmarkUrlHint">Kirjanmerkin URL-osoite</string>
@@ -446,7 +445,6 @@
     <string name="fireproofWebsiteMenuTitleAdd">Palonkestävä verkkosivusto</string>
     <string name="fireproofWebsiteSnackbarConfirmation">&lt;b&gt;%1$s&lt;/b&gt; on nyt palonkestävä! Siirry asetuksiin oppiaksesi lisää.</string>
     <string name="fireproofWebsiteSnackbarAction">Kumoa</string>
-    <string name="fireproofWebsiteDeleteConfirmMessage">Haluatko varmasti poistaa &lt;b&gt;%1$s&lt;/b&gt;?</string>
     <string name="fireproofWebsiteEmptyListHint">Yhtään verkkosivustoa ei ole vielä merkitty palokestäväksi</string>
     <string name="fireproofWebsiteFeatureDescription">Verkkosivustot käyttävät evästeitä, joilla pysyt kirjautuneena sisään. Kun teet sivustosta palovarman, evästeitä ei poisteta ja pysyt kirjautuneena sisään, vaikka käytät Liekki-painiketta. Estämme edelleen kolmannen osapuolen seurannan palovarmoilla sivustoilla.</string>
     <string name="fireproofWebsiteOverflowContentDescription">Lisää vaihtoehtoja palonkestävälle verkkosivustolle %1$s</string>

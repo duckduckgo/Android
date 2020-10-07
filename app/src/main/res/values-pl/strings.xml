@@ -196,7 +196,6 @@
     <!-- Bookmarks Activity -->
     <string name="bookmarksMenuTitle">Zakładki</string>
     <string name="bookmarksActivityTitle">Zakładki</string>
-    <string name="bookmarkDeleteConfirmMessage">Czy na pewno chcesz usunąć zakładkę &lt;b&gt;%1$s&lt;/b&gt;?</string>
     <string name="bookmarkAddedFeedback">Zakładka została dodana</string>
     <string name="bookmarkTitleHint">Tytuł zakładki</string>
     <string name="bookmarkUrlHint">Adres URL zakładki</string>
@@ -456,7 +455,6 @@
     <string name="fireproofWebsiteMenuTitleAdd">Bezpieczna strona internetowa</string>
     <string name="fireproofWebsiteSnackbarConfirmation">&lt;b&gt;%1$s&lt;/b&gt; jest teraz bezpieczna! Odwiedź Ustawienia, aby dowiedzieć się więcej.</string>
     <string name="fireproofWebsiteSnackbarAction">Cofnij</string>
-    <string name="fireproofWebsiteDeleteConfirmMessage">Czy na pewno chcesz usunąć &lt;b&gt;%1$s&lt;/b&gt;?</string>
     <string name="fireproofWebsiteEmptyListHint">Żadne strony nie są jeszcze zabezpieczone</string>
     <string name="fireproofWebsiteFeatureDescription">W witrynach internetowych są wykorzystywane pliki cookie. Kiedy użyjesz w witrynie funkcji zabezpieczenia, pliki cookie nie zostaną usunięte i pozostaniesz zalogowany(-a) nawet po użyciu przycisku Zabezpiecz. Nadal blokujemy narzędzia śledzące innych firm znalezione w zabezpieczonych witrynach.</string>
     <string name="fireproofWebsiteOverflowContentDescription">Więcej opcji dla bezpiecznej strony internetowej %1$s</string>

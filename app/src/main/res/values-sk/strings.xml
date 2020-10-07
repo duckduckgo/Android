@@ -198,7 +198,6 @@
     <!-- Bookmarks Activity -->
     <string name="bookmarksMenuTitle">Záložky</string>
     <string name="bookmarksActivityTitle">Záložky</string>
-    <string name="bookmarkDeleteConfirmMessage">Naozaj chcete odstrániť záložku &lt;b&gt;%1$s&lt;/b&gt;?</string>
     <string name="bookmarkAddedFeedback">Záložka je pridaná</string>
     <string name="bookmarkTitleHint">Názov záložky</string>
     <string name="bookmarkUrlHint">Webová adresa záložky</string>
@@ -458,7 +457,6 @@
     <string name="fireproofWebsiteMenuTitleAdd">Zabezpečiť webovú stránku</string>
     <string name="fireproofWebsiteSnackbarConfirmation">&lt;b&gt;%1$s&lt;/b&gt; je teraz zabezpečená! Viac informácií nájdete na stránke Nastavenia.</string>
     <string name="fireproofWebsiteSnackbarAction">Vrátenie späť</string>
-    <string name="fireproofWebsiteDeleteConfirmMessage">Naozaj chcete odstrániť &lt;b&gt;%1$s&lt;/b&gt;?</string>
     <string name="fireproofWebsiteEmptyListHint">Zatiaľ nie sú k dispozícii žiadne webové stránky</string>
     <string name="fireproofWebsiteFeatureDescription">Webové stránky sa spoliehajú na súbory cookie, aby ste zostali prihlásení. Keď webovú stránku zabezpečíte funkciou ohňovzdornosti, súbory cookie nebudú zmazané a zostanete prihlásení aj po použití tlačidla Oheň. Stále budeme blokovať sledovacie zariadenia tretích strán, ktoré sa nachádzajú na webových stránkach zabezpečených funkciou ohňovzdornosti.</string>
     <string name="fireproofWebsiteOverflowContentDescription">Ďalšie možnosti pre zabezpečenú webovú stránku %1$s</string>

@@ -198,7 +198,6 @@
     <!-- Bookmarks Activity -->
     <string name="bookmarksMenuTitle">Záložky</string>
     <string name="bookmarksActivityTitle">Záložky</string>
-    <string name="bookmarkDeleteConfirmMessage">Opravdu chcete smazat záložku &lt;b&gt;%1$s&lt;/b&gt;?</string>
     <string name="bookmarkAddedFeedback">Záložka přidána</string>
     <string name="bookmarkTitleHint">Název záložky</string>
     <string name="bookmarkUrlHint">URL záložky</string>
@@ -456,7 +455,6 @@
     <string name="fireproofWebsiteMenuTitleAdd">Webová stránka pro ochranu souborů</string>
     <string name="fireproofWebsiteSnackbarConfirmation">&lt;b&gt;%1$s&lt;/b&gt; je nyní chráněný! Další informace naleznete v části Nastavení.</string>
     <string name="fireproofWebsiteSnackbarAction">Vrátit</string>
-    <string name="fireproofWebsiteDeleteConfirmMessage">Opravdu chcete smazat &lt;b&gt;%1$s&lt;/b&gt;?</string>
     <string name="fireproofWebsiteEmptyListHint">Žádné webové stránky zatím nejsou chráněny</string>
     <string name="fireproofWebsiteFeatureDescription">Webové stránky spoléhají na soubory cookie, aby vás udržely přihlášené. Když na webu zapnete ochranu, soubory cookie se nevymažou a zůstanete přihlášeni, a to i po použití tlačítka pro mazání. Stále přitom blokujeme sledovací programy třetích stran nalezené na webových stránkách s ochranou.</string>
     <string name="fireproofWebsiteOverflowContentDescription">Další možnosti pro chráněné webové stránky %1$s</string>
