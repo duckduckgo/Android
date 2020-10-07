@@ -108,7 +108,8 @@ import dagger.Lazy
 import io.reactivex.Observable
 import io.reactivex.Single
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runBlockingTest
 import org.junit.After
@@ -244,6 +245,8 @@ class BrowserTabViewModelTest {
 
     private val loginEventLiveData = MutableLiveData<LoginDetected>()
 
+    private val dismissedCtaDaoChannel = Channel<List<DismissedCta>>()
+
     @Before
     fun before() {
         MockitoAnnotations.initMocks(this)
@@ -256,7 +259,7 @@ class BrowserTabViewModelTest {
 
         mockAutoCompleteApi = AutoCompleteApi(mockAutoCompleteService, mockBookmarksDao)
 
-        whenever(mockDismissedCtaDao.dismissedCtas()).thenReturn(emptyFlow())
+        whenever(mockDismissedCtaDao.dismissedCtas()).thenReturn(dismissedCtaDaoChannel.consumeAsFlow())
 
         ctaViewModel = CtaViewModel(
             mockAppInstallStore,
@@ -327,6 +330,8 @@ class BrowserTabViewModelTest {
     @ExperimentalCoroutinesApi
     @After
     fun after() {
+        ctaViewModel.forceStopFireButtonPulseAnimation.close()
+        dismissedCtaDaoChannel.close()
         testee.onCleared()
         db.close()
         testee.command.removeObserver(mockCommandObserver)

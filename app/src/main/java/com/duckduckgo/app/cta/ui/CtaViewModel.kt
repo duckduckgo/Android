@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.cta.ui
 
+import androidx.annotation.VisibleForTesting
 import androidx.annotation.WorkerThread
 import androidx.lifecycle.LiveData
 import com.duckduckgo.app.cta.db.DismissedCtaDao
@@ -73,7 +74,8 @@ class CtaViewModel @Inject constructor(
     val surveyLiveData: LiveData<Survey> = surveyDao.getLiveScheduled()
 
     @ExperimentalCoroutinesApi
-    private val forceStopFireButtonPulseAnimation = ConflatedBroadcastChannel(false)
+    @VisibleForTesting
+    val forceStopFireButtonPulseAnimation = ConflatedBroadcastChannel(false)
 
     @FlowPreview
     @ExperimentalCoroutinesApi
