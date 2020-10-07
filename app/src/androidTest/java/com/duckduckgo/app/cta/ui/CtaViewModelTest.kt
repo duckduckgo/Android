@@ -582,6 +582,24 @@ class CtaViewModelTest {
     }
 
     @Test
+    fun whenUserHasAlreadySeenFireButtonPulseAnimationThenFireButtonAnimationShouldNotShow() = coroutineRule.runBlocking {
+        givenFireButtonEducationActive()
+        givenOnboardingActive()
+        val willTriggerFirePulseAnimationCtas = listOf(CtaId.DAX_DIALOG_TRACKERS_FOUND, CtaId.DAX_DIALOG_NETWORK, CtaId.DAX_DIALOG_OTHER)
+        whenever(mockDismissedCtaDao.exists(CtaId.DAX_FIRE_BUTTON_PULSE)).thenReturn(true)
+        val launch = launch {
+            testee.showFireButtonPulseAnimation.collect {
+                assertFalse(it)
+            }
+        }
+        willTriggerFirePulseAnimationCtas.forEach {
+            dismissedCtaDaoChannel.send(listOf(DismissedCta(it)))
+        }
+
+        launch.cancel()
+    }
+
+    @Test
     fun whenTipsAndFireOnboardingActiveAndUserSeesAnyTriggerFirePulseAnimationCtaThenFireButtonAnimationShouldShow() = coroutineRule.runBlocking {
         givenFireButtonEducationActive()
         givenOnboardingActive()
