@@ -690,6 +690,13 @@ class BrowserTabViewModel(
             is UrlUpdated -> urlUpdated(stateChange.url)
             is PageNavigationCleared -> disableUserNavigation()
         }
+
+        if (stateChange is Progress) {
+            if (stateChange.newProgress ?: 0 > SHOW_CONTENT_MIN_PROGRESS) {
+                showWebContent()
+            }
+        }
+
         navigationAwareLoginDetector.onEvent(NavigationEvent.WebNavigationEvent(stateChange))
     }
 
@@ -701,6 +708,12 @@ class BrowserTabViewModel(
                 command.value = HideWebContent
             }
         }
+    }
+
+    private fun showWebContent() {
+        Timber.i("Blank: onsite changed cancel $deferredBlankSite")
+        deferredBlankSite?.cancel()
+        command.value = ShowWebContent
     }
 
     private fun pageChanged(url: String, title: String?) {
@@ -1119,11 +1132,6 @@ class BrowserTabViewModel(
 
             withContext(dispatchers.io()) {
                 tabRepository.update(tabId, site)
-            }
-
-            withContext(dispatchers.main()) {
-                deferredBlankSite?.cancel()
-                command.value = ShowWebContent
             }
         }
     }
@@ -1698,6 +1706,10 @@ class BrowserTabViewModel(
 
     companion object {
         private const val FIXED_PROGRESS = 50
+
+        // Minimum progress to show web content again after decided to hide web content (possible spoofing attack).
+        // We think that progress is enough to assume next site has already loaded new content.
+        private const val SHOW_CONTENT_MIN_PROGRESS = 50
         private const val NEW_CONTENT_MAX_DELAY_MS = 1000L
     }
 }
