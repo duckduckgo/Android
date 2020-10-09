@@ -494,11 +494,11 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
         viewModel.onUserSubmittedQuery(query)
     }
 
-    private fun navigate(url: String) {
+    private fun navigate(url: String, headers: Map<String, String>) {
         hideKeyboard()
         renderer.hideFindInPage()
         viewModel.registerDaxBubbleCtaDismissed()
-        webView?.loadUrl(url)
+        webView?.loadUrl(url, headers)
     }
 
     fun onRefreshRequested() {
@@ -528,7 +528,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
             is Command.ShowBookmarkAddedConfirmation -> bookmarkAdded(it.bookmarkId, it.title, it.url)
             is Command.ShowFireproofWebSiteConfirmation -> fireproofWebsiteConfirmation(it.fireproofWebsiteEntity)
             is Command.Navigate -> {
-                navigate(it.url)
+                navigate(it.url, it.headers)
             }
             is Command.NavigateBack -> {
                 webView?.goBackOrForward(-it.steps)
@@ -584,7 +584,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
                 }
             }
             is Command.HandleExternalAppLink -> {
-                openExternalDialog(it.appLink.intent, it.appLink.fallbackUrl, false)
+                openExternalDialog(it.appLink.intent, it.appLink.fallbackUrl, false, it.headers)
             }
             is Command.LaunchSurvey -> launchSurvey(it.survey)
             is Command.LaunchAddWidget -> launchAddWidget()
@@ -718,14 +718,19 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
         decorator.incrementTabs()
     }
 
-    private fun openExternalDialog(intent: Intent, fallbackUrl: String? = null, useFirstActivityFound: Boolean = true) {
+    private fun openExternalDialog(
+        intent: Intent,
+        fallbackUrl: String? = null,
+        useFirstActivityFound: Boolean = true,
+        headers: Map<String, String> = emptyMap()
+    ) {
         context?.let {
             val pm = it.packageManager
             val activities = pm.queryIntentActivities(intent, 0)
 
             if (activities.isEmpty()) {
                 if (fallbackUrl != null) {
-                    webView?.loadUrl(fallbackUrl)
+                    webView?.loadUrl(fallbackUrl, headers)
                 } else {
                     showToast(R.string.unableToOpenLink)
                 }
