@@ -32,17 +32,12 @@ interface WebNavigationState {
     val progress: Int?
 }
 
-interface Progress {
-    val newProgress: Int?
-}
-
 sealed class WebNavigationStateChange {
-    data class NewPage(val url: String, val title: String?, override val newProgress: Int?) : WebNavigationStateChange(), Progress
-    data class UrlUpdated(val url: String, override val newProgress: Int?) : WebNavigationStateChange(), Progress
+    data class NewPage(val url: String, val title: String?) : WebNavigationStateChange()
+    data class UrlUpdated(val url: String) : WebNavigationStateChange()
     object PageCleared : WebNavigationStateChange()
     object Unchanged : WebNavigationStateChange()
     object PageNavigationCleared : WebNavigationStateChange()
-    data class ProgressChanged(override val newProgress: Int) : WebNavigationStateChange(), Progress
     object Other : WebNavigationStateChange()
 }
 
@@ -58,34 +53,25 @@ fun WebNavigationState.compare(previous: WebNavigationState?): WebNavigationStat
         return PageCleared
     }
 
-    val latestUrl = currentUrl ?: return tryProgressChangedOr(webNavigationState = this, default = Other)
-
-    val lastKnownProgress = progress ?: previous?.progress
+    val latestUrl = currentUrl ?: return Other
 
     // A new page load is identified by the original url changing
     if (originalUrl != previous?.originalUrl) {
-        return NewPage(latestUrl, title, lastKnownProgress)
+        return NewPage(latestUrl, title)
     }
 
     // The most up-to-date record of the url is the current one, this may change many times during a page load
     // If the host changes too, we class it as a new page load
     if (currentUrl != previous?.currentUrl) {
-        if (currentUrl?.toUri()?.host != previous?.currentUrl?.toUri()?.host) {
-            return NewPage(latestUrl, title, lastKnownProgress)
-        }
-        return UrlUpdated(latestUrl, lastKnownProgress)
-    }
 
-    if (lastKnownProgress != null && lastKnownProgress != previous?.progress) {
-        return ProgressChanged(lastKnownProgress)
+        if (currentUrl?.toUri()?.host != previous?.currentUrl?.toUri()?.host) {
+            return NewPage(latestUrl, title)
+        }
+
+        return UrlUpdated(latestUrl)
     }
 
     return Other
-}
-
-private fun tryProgressChangedOr(webNavigationState: WebNavigationState, default: WebNavigationStateChange): WebNavigationStateChange {
-    val progress: Int = webNavigationState.progress ?: return default
-    return ProgressChanged(progress)
 }
 
 data class WebViewNavigationState(private val stack: WebBackForwardList, override val progress: Int? = null) : WebNavigationState {

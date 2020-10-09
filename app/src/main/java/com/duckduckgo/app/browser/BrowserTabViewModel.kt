@@ -691,16 +691,14 @@ class BrowserTabViewModel(
             is PageNavigationCleared -> disableUserNavigation()
         }
 
-        if (stateChange is Progress) {
-            if (stateChange.newProgress ?: 0 > SHOW_CONTENT_MIN_PROGRESS) {
-                showWebContent()
-            }
+        if (newWebNavigationState.progress ?: 0 > SHOW_CONTENT_MIN_PROGRESS) {
+            showWebContent()
         }
-
         navigationAwareLoginDetector.onEvent(NavigationEvent.WebNavigationEvent(stateChange))
     }
 
     private fun showBlankContentfNewContentDelayed() {
+        Timber.i("Blank: cancel job $deferredBlankSite")
         deferredBlankSite?.cancel()
         deferredBlankSite = viewModelScope.launch {
             delay(timeMillis = NEW_CONTENT_MAX_DELAY_MS)
@@ -708,6 +706,7 @@ class BrowserTabViewModel(
                 command.value = HideWebContent
             }
         }
+        Timber.i("Blank: schedule new blank $deferredBlankSite")
     }
 
     private fun showWebContent() {
