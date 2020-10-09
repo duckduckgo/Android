@@ -125,7 +125,7 @@ class WebNavigationStateComparisonTest {
         val latestState = buildState("http://latest.com", null)
         assertEquals(Other, latestState.compare(previousState))
     }
-    
+
     private fun buildState(originalUrl: String?, currentUrl: String?, title: String? = null, newProgress: Int? = null): WebNavigationState {
         return TestNavigationState(
             originalUrl = originalUrl,
