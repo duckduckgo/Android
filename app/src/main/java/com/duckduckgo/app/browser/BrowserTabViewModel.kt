@@ -698,7 +698,7 @@ class BrowserTabViewModel(
             is PageNavigationCleared -> disableUserNavigation()
         }
 
-        if (newWebNavigationState.progress ?: 0 > SHOW_CONTENT_MIN_PROGRESS) {
+        if (newWebNavigationState.progress ?: 0 >= SHOW_CONTENT_MIN_PROGRESS) {
             showWebContent()
         }
         navigationAwareLoginDetector.onEvent(NavigationEvent.WebNavigationEvent(stateChange))
