@@ -1708,6 +1708,6 @@ class BrowserTabViewModel(
         private const val FIXED_PROGRESS = 50
         const val GPC_HEADER = "Sec-GPC"
         const val GPC_HEADER_VALUE = "1"
-        private const val ONE_HOUR_IN_MS = 3600000
+        private const val ONE_HOUR_IN_MS = 3_600_000
     }
 }
