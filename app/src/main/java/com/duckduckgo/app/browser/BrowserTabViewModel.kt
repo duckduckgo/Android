@@ -306,7 +306,9 @@ class BrowserTabViewModel(
 
     @ExperimentalCoroutinesApi
     @FlowPreview
-    private val showPulseAnimation: LiveData<Boolean> = ctaViewModel.showFireButtonPulseAnimation.asLiveData(context = viewModelScope.coroutineContext)
+    private val showPulseAnimation: LiveData<Boolean> = ctaViewModel.showFireButtonPulseAnimation.asLiveData(
+        context = viewModelScope.coroutineContext
+    )
 
     private var autoCompleteDisposable: Disposable? = null
     private var site: Site? = null
