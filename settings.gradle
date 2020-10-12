@@ -1,1 +1,9 @@
+include ':vpn'
 include ':app'
+
+rootProject.children.each { subproject ->
+
+    if (subproject.name == "vpn") {
+        subproject.buildFileName = "${subproject.name}-build.gradle"
+    }
+}

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.duckduckgo.mobile.android.vpn">
+
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+
+    <application>
+
+        <activity
+            android:name="dummy.VpnControllerActivity"
+            android:exported="true"
+            android:label="@string/title_activity_vpn_controller"
+            android:theme="@style/Theme.AndroidVpn.NoActionBar">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <service
+            android:name=".service.PassthroughVpnService"
+            android:permission="android.permission.BIND_VPN_SERVICE">
+            <intent-filter>
+                <action android:name="android.net.VpnService" />
+            </intent-filter>
+        </service>
+
+    </application>
+
+</manifest>
