@@ -673,7 +673,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
     }
 
     private fun askSiteLocationPermission(domain: String) {
-        val dialog = SiteLocationPermissionDialog.instance(domain, false)
+        val dialog = SiteLocationPermissionDialog.instance(domain, false, tabId)
         dialog.show(childFragmentManager, SiteLocationPermissionDialog.SITE_LOCATION_PERMISSION_TAG)
     }
 

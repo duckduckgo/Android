@@ -92,4 +92,20 @@ class BookmarksDaoTest {
         assertFalse(dao.hasBookmarks())
     }
 
+    @Test
+    fun whenBookmarksCountByUrlAndNoBookmarksMatchThenReturnZero() {
+        val bookmark = BookmarkEntity(id = 1, title = "title", url = "www.example.com")
+        dao.insert(bookmark)
+        val count = dao.bookmarksCountByUrl("test")
+        assertEquals(0, count)
+    }
+
+    @Test
+    fun whenBookmarksCountByUrlAndBookmarksMatchThenReturnCount() {
+        val query = "%example%"
+        val bookmark = BookmarkEntity(id = 1, title = "title", url = "www.example.com")
+        dao.insert(bookmark)
+        val count = dao.bookmarksCountByUrl(query)
+        assertEquals(1, count)
+    }
 }

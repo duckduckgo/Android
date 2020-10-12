@@ -21,8 +21,12 @@ import androidx.room.Room
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.blockingObserve
+import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.runBlocking
+import com.nhaarman.mockitokotlin2.mock
+import com.nhaarman.mockitokotlin2.verify
+import dagger.Lazy
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.junit.After
 import org.junit.Before
@@ -46,6 +50,8 @@ class LocationPermissionsRepositoryTest {
     private lateinit var db: AppDatabase
     private lateinit var dao: LocationPermissionsDao
     private lateinit var repository: LocationPermissionsRepository
+    private val mockFaviconManager: FaviconManager = mock()
+    private val lazyFaviconManager = Lazy { mockFaviconManager }
 
     private val domain = "domain.com"
 
@@ -56,7 +62,7 @@ class LocationPermissionsRepositoryTest {
             .allowMainThreadQueries()
             .build()
         dao = db.locationPermissionsDao()
-        repository = LocationPermissionsRepository(db.locationPermissionsDao(), coroutineRule.testDispatcherProvider)
+        repository = LocationPermissionsRepository(db.locationPermissionsDao(), lazyFaviconManager, coroutineRule.testDispatcherProvider)
     }
 
     @After
@@ -131,6 +137,34 @@ class LocationPermissionsRepositoryTest {
         val retrieved = repository.getDomainPermission("exampl3.com")
 
         assertNull(retrieved)
+    }
+
+    @Test
+    fun whenDeletePermissionStoredThenDeletePersistedFavicon() = coroutineRule.runBlocking {
+        givenPermissionStored("example.com")
+
+        repository.deletePermission("example.com")
+
+        verify(mockFaviconManager).deletePersistedFavicon("example.com")
+    }
+
+    @Test
+    fun whenPermissionEntitiesCountByDomainAndNoWebsitesMatchThenReturnZero() = coroutineRule.runBlocking {
+        givenPermissionStored("example.com")
+
+        val count = repository.permissionEntitiesCountByDomain("test.com")
+
+        assertEquals(0, count)
+    }
+
+    @Test
+    fun whenPermissionEntitiesCountByDomainAndWebsitsMatchThenReturnCount() = coroutineRule.runBlocking {
+        val query = "%example%"
+        givenPermissionStored("example.com")
+
+        val count = repository.permissionEntitiesCountByDomain(query)
+
+        assertEquals(1, count)
     }
 
     private fun givenPermissionStored(vararg domains: String) {

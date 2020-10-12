@@ -152,6 +152,20 @@ class BrowserWebViewClientTest {
         verify(listener, times(1)).recoverFromRenderProcessGone()
     }
 
+    @UiThreadTest
+    @Test
+    fun whenOnPageFinishedCalledThenPrefetchIconCalled() {
+        testee.onPageFinished(webView, EXAMPLE_URL)
+        verify(listener).prefetchFavicon(EXAMPLE_URL)
+    }
+
+    @UiThreadTest
+    @Test
+    fun whenOnPageFinishedCalledIfUrlIsNullThenDoNotCallPrefetchIcon() {
+        testee.onPageFinished(webView, null)
+        verify(listener, never()).prefetchFavicon(any())
+    }
+
     private class TestWebView(context: Context) : WebView(context)
 
     companion object {
