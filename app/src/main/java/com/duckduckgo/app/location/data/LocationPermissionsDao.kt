@@ -35,6 +35,9 @@ interface LocationPermissionsDao {
     @Query("select * from locationPermissions WHERE domain = :domain")
     fun getPermission(domain: String): LocationPermissionEntity?
 
+    @Query("select count(*) from locationPermissions WHERE domain LIKE :domain")
+    fun permissionEntitiesCountByDomain(domain: String): Int
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insert(locationPermissionEntity: LocationPermissionEntity): Long
 

@@ -34,10 +34,12 @@ import com.duckduckgo.app.feedback.ui.negative.subreason.SubReasonNegativeFeedba
 import com.duckduckgo.app.feedback.ui.positive.initial.PositiveFeedbackLandingFragment
 import com.duckduckgo.app.fire.FireActivity
 import com.duckduckgo.app.fire.fireproofwebsite.ui.FireproofWebsitesActivity
+import com.duckduckgo.app.globalprivacycontrol.ui.GlobalPrivacyControlActivity
 import com.duckduckgo.app.icon.ui.ChangeIconActivity
 import com.duckduckgo.app.job.AppConfigurationJobService
 import com.duckduckgo.app.launch.LaunchBridgeActivity
 import com.duckduckgo.app.location.ui.LocationPermissionsActivity
+import com.duckduckgo.app.location.ui.SiteLocationPermissionDialog
 import com.duckduckgo.app.notification.NotificationHandlerService
 import com.duckduckgo.app.onboarding.ui.OnboardingActivity
 import com.duckduckgo.app.onboarding.ui.page.DefaultBrowserPage
@@ -139,6 +141,10 @@ abstract class AndroidBindingModule {
     @ContributesAndroidInjector
     abstract fun locationPermissionsActivity(): LocationPermissionsActivity
 
+    @ActivityScoped
+    @ContributesAndroidInjector
+    abstract fun globalPrivacyControlActivity(): GlobalPrivacyControlActivity
+
     /* Fragments */
 
     @ContributesAndroidInjector
@@ -176,6 +182,9 @@ abstract class AndroidBindingModule {
 
     @ContributesAndroidInjector
     abstract fun brokenSiteNegativeFeedbackFragment(): BrokenSiteNegativeFeedbackFragment
+
+    @ContributesAndroidInjector
+    abstract fun siteLocationPermissionDialog(): SiteLocationPermissionDialog
 
     /* Services */
 

@@ -48,7 +48,8 @@ class SettingsViewModel @Inject constructor(
         val showDefaultBrowserSetting: Boolean = false,
         val isAppDefaultBrowser: Boolean = false,
         val automaticallyClearData: AutomaticallyClearData = AutomaticallyClearData(ClearWhatOption.CLEAR_NONE, ClearWhenOption.APP_EXIT_ONLY),
-        val appIcon: AppIcon = AppIcon.DEFAULT
+        val appIcon: AppIcon = AppIcon.DEFAULT,
+        val globalPrivacyControlEnabled: Boolean = false
     )
 
     data class AutomaticallyClearData(
@@ -63,6 +64,7 @@ class SettingsViewModel @Inject constructor(
         object LaunchLocation : Command()
         object LaunchWhitelist : Command()
         object LaunchAppIcon : Command()
+        object LaunchGlobalPrivacyControl : Command()
         object UpdateTheme : Command()
     }
 
@@ -92,7 +94,8 @@ class SettingsViewModel @Inject constructor(
             showDefaultBrowserSetting = defaultWebBrowserCapability.deviceSupportsDefaultBrowserConfiguration(),
             version = obtainVersion(variant.key),
             automaticallyClearData = AutomaticallyClearData(automaticallyClearWhat, automaticallyClearWhen, automaticallyClearWhenEnabled),
-            appIcon = settingsDataStore.appIcon
+            appIcon = settingsDataStore.appIcon,
+            globalPrivacyControlEnabled = settingsDataStore.globalPrivacyControlEnabled
         )
     }
 
@@ -110,6 +113,10 @@ class SettingsViewModel @Inject constructor(
 
     fun onLocationClicked() {
         command.value = Command.LaunchLocation
+    }
+
+    fun onGlobalPrivacyControlClicked() {
+        command.value = Command.LaunchGlobalPrivacyControl
     }
 
     fun onLightThemeToggled(enabled: Boolean) {

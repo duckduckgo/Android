@@ -17,14 +17,40 @@
 package com.duckduckgo.app.browser.favicon
 
 import android.content.Context
+import com.duckduckgo.app.bookmarks.db.BookmarksDao
+import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepository
+import com.duckduckgo.app.global.DispatcherProvider
+import com.duckduckgo.app.location.data.LocationPermissionsRepository
 import dagger.Module
 import dagger.Provides
+import javax.inject.Singleton
 
 @Module
 class FaviconModule {
 
     @Provides
-    fun faviconDownloader(context: Context): FaviconDownloader {
-        return GlideFaviconDownloader(context)
+    @Singleton
+    fun faviconManager(
+        faviconPersister: FaviconPersister,
+        bookmarksDao: BookmarksDao,
+        fireproofWebsiteRepository: FireproofWebsiteRepository,
+        locationPermissionsRepository: LocationPermissionsRepository,
+        faviconDownloader: FaviconDownloader,
+        dispatcherProvider: DispatcherProvider
+    ): FaviconManager {
+        return DuckDuckGoFaviconManager(
+            faviconPersister,
+            bookmarksDao,
+            fireproofWebsiteRepository,
+            locationPermissionsRepository,
+            faviconDownloader,
+            dispatcherProvider
+        )
+    }
+
+    @Provides
+    @Singleton
+    fun faviconDownloader(context: Context, dispatcherProvider: DispatcherProvider): FaviconDownloader {
+        return GlideFaviconDownloader(context, dispatcherProvider)
     }
 }

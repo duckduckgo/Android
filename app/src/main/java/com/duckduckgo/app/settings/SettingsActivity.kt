@@ -35,6 +35,7 @@ import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.sendThemeChangedBroadcast
 import com.duckduckgo.app.global.view.launchDefaultAppActivity
 import com.duckduckgo.app.global.view.quietlySetIsChecked
+import com.duckduckgo.app.globalprivacycontrol.ui.GlobalPrivacyControlActivity
 import com.duckduckgo.app.icon.ui.ChangeIconActivity
 import com.duckduckgo.app.location.ui.LocationPermissionsActivity
 import com.duckduckgo.app.privacy.ui.WhitelistActivity
@@ -87,6 +88,7 @@ class SettingsActivity : DuckDuckGoActivity(), SettingsAutomaticallyClearWhatFra
         provideFeedback.setOnClickListener { viewModel.userRequestedToSendFeedback() }
         fireproofWebsites.setOnClickListener { viewModel.onFireproofWebsitesClicked() }
         locationPermissions.setOnClickListener { viewModel.onLocationClicked() }
+        globalPrivacyControlSetting.setOnClickListener { viewModel.onGlobalPrivacyControlClicked() }
 
         lightThemeToggle.setOnCheckedChangeListener(lightThemeToggleListener)
         autocompleteToggle.setOnCheckedChangeListener(autocompleteToggleListener)
@@ -97,13 +99,14 @@ class SettingsActivity : DuckDuckGoActivity(), SettingsAutomaticallyClearWhatFra
     }
 
     private fun observeViewModel() {
-        viewModel.viewState.observe(this, Observer<SettingsViewModel.ViewState> { viewState ->
+        viewModel.viewState.observe(this, Observer { viewState ->
             viewState?.let {
                 version.setSubtitle(it.version)
                 lightThemeToggle.quietlySetIsChecked(it.lightThemeEnabled, lightThemeToggleListener)
                 autocompleteToggle.quietlySetIsChecked(it.autoCompleteSuggestionsEnabled, autocompleteToggleListener)
                 updateDefaultBrowserViewVisibility(it)
                 updateAutomaticClearDataOptions(it.automaticallyClearData)
+                setGlobalPrivacyControlSetting(it.globalPrivacyControlEnabled)
                 changeAppIcon.setImageResource(it.appIcon.icon)
             }
         })
@@ -111,6 +114,15 @@ class SettingsActivity : DuckDuckGoActivity(), SettingsAutomaticallyClearWhatFra
         viewModel.command.observe(this, Observer {
             processCommand(it)
         })
+    }
+
+    private fun setGlobalPrivacyControlSetting(enabled: Boolean) {
+        val stateText = if (enabled) {
+            getString(R.string.enabled)
+        } else {
+            getString(R.string.disabled)
+        }
+        globalPrivacyControlSetting.setSubtitle(stateText)
     }
 
     private fun updateAutomaticClearDataOptions(automaticallyClearData: AutomaticallyClearData) {
@@ -143,6 +155,7 @@ class SettingsActivity : DuckDuckGoActivity(), SettingsAutomaticallyClearWhatFra
             is Command.LaunchLocation -> launchLocation()
             is Command.LaunchWhitelist -> launchWhitelist()
             is Command.LaunchAppIcon -> launchAppIconChange()
+            is Command.LaunchGlobalPrivacyControl -> launchGlobalPrivacyControl()
             is Command.UpdateTheme -> sendThemeChangedBroadcast()
         }
     }
@@ -187,6 +200,11 @@ class SettingsActivity : DuckDuckGoActivity(), SettingsAutomaticallyClearWhatFra
     private fun launchAppIconChange() {
         val options = ActivityOptions.makeSceneTransitionAnimation(this).toBundle()
         startActivityForResult(Intent(ChangeIconActivity.intent(this)), CHANGE_APP_ICON_REQUEST_CODE, options)
+    }
+
+    private fun launchGlobalPrivacyControl() {
+        val options = ActivityOptions.makeSceneTransitionAnimation(this).toBundle()
+        startActivity(GlobalPrivacyControlActivity.intent(this), options)
     }
 
     override fun onAutomaticallyClearWhatOptionSelected(clearWhatSetting: ClearWhatOption) {

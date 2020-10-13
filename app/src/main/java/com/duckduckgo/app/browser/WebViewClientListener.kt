@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.browser
 
+import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Message
 import android.view.View
@@ -55,4 +56,6 @@ interface WebViewClientListener {
 
     fun loginDetected()
     fun dosAttackDetected()
+    fun iconReceived(icon: Bitmap)
+    fun prefetchFavicon(url: String)
 }
