@@ -1398,8 +1398,11 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
             menuButton?.isVisible = viewState.showMenuButton
 
             if (viewState.fireButton.playPulseAnimation()) {
+                appBarLayout.setExpanded(true, true)
+                omnibarScrolling.disableOmnibarScrolling(toolbarContainer)
                 playPulseAnimation()
             } else {
+                omnibarScrolling.enableOmnibarScrolling(toolbarContainer)
                 pulseAnimation.stop()
             }
         }
