@@ -29,6 +29,7 @@ import com.duckduckgo.app.bookmarks.ui.BookmarksActivity
 import com.duckduckgo.app.browser.BrowserViewModel.Command
 import com.duckduckgo.app.browser.BrowserViewModel.Command.Query
 import com.duckduckgo.app.browser.BrowserViewModel.Command.Refresh
+import com.duckduckgo.app.browser.intent.ContextUtils
 import com.duckduckgo.app.browser.rating.ui.AppEnjoymentDialogFragment
 import com.duckduckgo.app.browser.rating.ui.GiveFeedbackDialogFragment
 import com.duckduckgo.app.browser.rating.ui.RateAppDialogFragment
@@ -188,14 +189,13 @@ class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope() {
             return
         }
 
-        if (intent.getBooleanExtra(LAUNCH_FROM_DEFAULT_BROWSER_DIALOG, false)) {
+        if (ContextUtils.getBooleanExtra(intent, LAUNCH_FROM_DEFAULT_BROWSER_DIALOG, false)) {
             setResult(DefaultBrowserPage.DEFAULT_BROWSER_RESULT_CODE_DIALOG_INTERNAL)
             finish()
             return
         }
 
-        if (intent.getBooleanExtra(PERFORM_FIRE_ON_ENTRY_EXTRA, false)) {
-
+        if (ContextUtils.getBooleanExtra(intent, PERFORM_FIRE_ON_ENTRY_EXTRA, false)) {
             Timber.i("Clearing everything as a result of $PERFORM_FIRE_ON_ENTRY_EXTRA flag being set")
             GlobalScope.launch {
                 clearPersonalDataAction.clearTabsAndAllDataAsync(appInForeground = true, shouldFireDataClearPixel = true)
@@ -206,7 +206,7 @@ class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope() {
             return
         }
 
-        if (intent.getBooleanExtra(LAUNCHED_FROM_FIRE_EXTRA, false)) {
+        if (ContextUtils.getBooleanExtra(intent, LAUNCHED_FROM_FIRE_EXTRA, false)) {
             Timber.i("Launched from fire")
             Toast.makeText(applicationContext, R.string.fireDataCleared, Toast.LENGTH_LONG).show()
         }
@@ -219,7 +219,7 @@ class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope() {
 
         val sharedText = intent.intentText
         if (sharedText != null) {
-            if (intent.getBooleanExtra(ShortcutBuilder.SHORTCUT_EXTRA_ARG, false)) {
+            if (ContextUtils.getBooleanExtra(intent, ShortcutBuilder.SHORTCUT_EXTRA_ARG, false)) {
                 Timber.d("Shortcut opened with url $sharedText")
                 launch { viewModel.onOpenShortcut(sharedText) }
             } else {
@@ -279,7 +279,7 @@ class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope() {
     }
 
     private fun launchNewSearch(intent: Intent): Boolean {
-        return intent.getBooleanExtra(NEW_SEARCH_EXTRA, false)
+        return ContextUtils.getBooleanExtra(intent, NEW_SEARCH_EXTRA, false)
     }
 
     fun launchPrivacyDashboard() {
