@@ -50,7 +50,8 @@ class EmptyNavigationStateTest {
             stepsToPreviousPage = 1,
             canGoBack = true,
             canGoForward = true,
-            hasNavigationHistory = true
+            hasNavigationHistory = true,
+            progress = null
         )
     }
 }

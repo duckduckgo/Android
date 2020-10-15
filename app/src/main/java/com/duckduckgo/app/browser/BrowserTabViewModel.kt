@@ -317,6 +317,7 @@ class BrowserTabViewModel(
     private var httpsUpgraded = false
     private val browserStateModifier = BrowserStateModifier()
     private var faviconPrefetchJob: Job? = null
+    private var deferredBlankSite: Job? = null
 
     private val fireproofWebsitesObserver = Observer<List<FireproofWebsiteEntity>> {
         browserViewState.value = currentBrowserViewState().copy(isFireproofWebsite = isFireproofWebsite())
@@ -570,6 +571,13 @@ class BrowserTabViewModel(
         }
     }
 
+    override fun willOverrideUrl(newUrl: String) {
+        val previousSiteStillLoading = currentLoadingViewState().isLoading
+        if (previousSiteStillLoading) {
+            showBlankContentfNewContentDelayed()
+        }
+    }
+
     override fun prefetchFavicon(url: String) {
         faviconPrefetchJob?.cancel()
         faviconPrefetchJob = viewModelScope.launch {
@@ -715,7 +723,29 @@ class BrowserTabViewModel(
             is UrlUpdated -> urlUpdated(stateChange.url)
             is PageNavigationCleared -> disableUserNavigation()
         }
+
+        if (newWebNavigationState.progress ?: 0 >= SHOW_CONTENT_MIN_PROGRESS) {
+            showWebContent()
+        }
         navigationAwareLoginDetector.onEvent(NavigationEvent.WebNavigationEvent(stateChange))
+    }
+
+    private fun showBlankContentfNewContentDelayed() {
+        Timber.i("Blank: cancel job $deferredBlankSite")
+        deferredBlankSite?.cancel()
+        deferredBlankSite = viewModelScope.launch {
+            delay(timeMillis = NEW_CONTENT_MAX_DELAY_MS)
+            withContext(dispatchers.main()) {
+                command.value = HideWebContent
+            }
+        }
+        Timber.i("Blank: schedule new blank $deferredBlankSite")
+    }
+
+    private fun showWebContent() {
+        Timber.i("Blank: onsite changed cancel $deferredBlankSite")
+        deferredBlankSite?.cancel()
+        command.value = ShowWebContent
     }
 
     private fun pageChanged(url: String, title: String?) {
@@ -1710,6 +1740,11 @@ class BrowserTabViewModel(
         private const val FIXED_PROGRESS = 50
         const val GPC_HEADER = "Sec-GPC"
         const val GPC_HEADER_VALUE = "1"
+
+        // Minimum progress to show web content again after decided to hide web content (possible spoofing attack).
+        // We think that progress is enough to assume next site has already loaded new content.
+        private const val SHOW_CONTENT_MIN_PROGRESS = 50
+        private const val NEW_CONTENT_MAX_DELAY_MS = 1000L
         private const val ONE_HOUR_IN_MS = 3_600_000
     }
 }
