@@ -591,6 +591,40 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenUserRedirectedBeforePreviousSiteLoadedAndNewContentDelayedThenWebContentIsBlankedOut() = coroutineRule.runBlocking {
+        loadUrl("http://duckduckgo.com")
+        testee.progressChanged(50)
+
+        overrideUrl("http://example.com")
+        advanceTimeBy(2000)
+
+        assertCommandIssued<Command.HideWebContent>()
+    }
+
+    @Test
+    fun whenUserRedirectedAfterSiteLoadedAndNewContentDelayedThenWebContentNotBlankedOut() = coroutineRule.runBlocking {
+        loadUrl("http://duckduckgo.com")
+        testee.progressChanged(100)
+
+        overrideUrl("http://example.com")
+        advanceTimeBy(2000)
+
+        assertCommandNotIssued<Command.HideWebContent>()
+    }
+
+    @Test
+    fun whenLoadingProgressReaches50ThenShowWebContent() = coroutineRule.runBlocking {
+        loadUrl("http://duckduckgo.com")
+        testee.progressChanged(50)
+        overrideUrl("http://example.com")
+        advanceTimeBy(2000)
+
+        onProgressChanged(url = "http://example.com", newProgress = 50)
+
+        assertCommandIssued<Command.ShowWebContent>()
+    }
+
+    @Test
     fun whenViewModelNotifiedThatUrlGotFocusThenViewStateIsUpdated() = coroutineRule.runBlocking {
         testee.onOmnibarInputStateChanged("", true, hasQueryChanged = false)
         assertTrue(omnibarViewState().isEditing)
@@ -3028,6 +3062,16 @@ class BrowserTabViewModelTest {
         testee.navigationStateChanged(buildWebNavigation(originalUrl = originalUrl, currentUrl = currentUrl))
     }
 
+    @Suppress("SameParameterValue")
+    private fun onProgressChanged(url: String?, newProgress: Int) {
+        testee.navigationStateChanged(buildWebNavigation(originalUrl = url, currentUrl = url, progress = newProgress))
+    }
+
+    private fun overrideUrl(url: String, isBrowserShowing: Boolean = true) {
+        setBrowserShowing(isBrowserShowing)
+        testee.willOverrideUrl(newUrl = url)
+    }
+
     private fun setupNavigation(
         skipHome: Boolean = false,
         isBrowsing: Boolean,
@@ -3052,7 +3096,8 @@ class BrowserTabViewModelTest {
         title: String? = null,
         canGoForward: Boolean = false,
         canGoBack: Boolean = false,
-        stepsToPreviousPage: Int = 0
+        stepsToPreviousPage: Int = 0,
+        progress: Int? = null
     ): WebNavigationState {
         val nav: WebNavigationState = mock()
         whenever(nav.originalUrl).thenReturn(originalUrl)
@@ -3061,6 +3106,7 @@ class BrowserTabViewModelTest {
         whenever(nav.canGoForward).thenReturn(canGoForward)
         whenever(nav.canGoBack).thenReturn(canGoBack)
         whenever(nav.stepsToPreviousPage).thenReturn(stepsToPreviousPage)
+        whenever(nav.progress).thenReturn(progress)
         return nav
     }
 
