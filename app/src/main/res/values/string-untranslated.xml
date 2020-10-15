@@ -16,7 +16,7 @@
 
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
     <!--Fire button education-->
-    <string name="daxClearDataCtaText">Now tap below to burn your browsing history. Give it a try! &#128071;</string>
+    <string name="daxClearDataCtaText">Personal data can build up in your browser. Yuck. Use the Fire Button to burn it all away. Give it a try now! &#128071;</string>
 
     <!-- Use Our App Flow -->
     <string name="useOurAppDialogText">Did you know the Facebook app can make requests for data even when you\'re not using it?&lt;br/&gt;&lt;br/&gt;Replace the app with a home screen shortcut that opens Facebook in DuckDuckGo. Then delete the Facebook app.</string>

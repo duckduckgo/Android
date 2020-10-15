@@ -74,13 +74,13 @@ import com.duckduckgo.app.global.useourapp.UseOurAppDetector
 import com.duckduckgo.app.global.useourapp.UseOurAppDetector.Companion.USE_OUR_APP_SHORTCUT_TITLE
 import com.duckduckgo.app.global.useourapp.UseOurAppDetector.Companion.USE_OUR_APP_SHORTCUT_URL
 import com.duckduckgo.app.global.view.asLocationPermissionOrigin
-import com.duckduckgo.app.notification.db.NotificationDao
-import com.duckduckgo.app.notification.model.UseOurAppNotification
 import com.duckduckgo.app.location.GeoLocationPermissions
 import com.duckduckgo.app.location.data.LocationPermissionType
 import com.duckduckgo.app.location.data.LocationPermissionsRepository
 import com.duckduckgo.app.location.ui.SiteLocationPermissionDialog
 import com.duckduckgo.app.location.ui.SystemLocationPermissionDialog
+import com.duckduckgo.app.notification.db.NotificationDao
+import com.duckduckgo.app.notification.model.UseOurAppNotification
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao
 import com.duckduckgo.app.privacy.db.UserWhitelistDao
 import com.duckduckgo.app.privacy.model.PrivacyGrade
@@ -303,7 +303,13 @@ class BrowserTabViewModel(
 
     private val autoCompletePublishSubject = PublishRelay.create<String>()
     private val fireproofWebsiteState: LiveData<List<FireproofWebsiteEntity>> = fireproofWebsiteRepository.getFireproofWebsites()
-    private val showPulseAnimation: LiveData<Boolean> = ctaViewModel.showFireButtonPulseAnimation.asLiveData(context = viewModelScope.coroutineContext)
+
+    @ExperimentalCoroutinesApi
+    @FlowPreview
+    private val showPulseAnimation: LiveData<Boolean> = ctaViewModel.showFireButtonPulseAnimation.asLiveData(
+        context = viewModelScope.coroutineContext
+    )
+
     private var autoCompleteDisposable: Disposable? = null
     private var site: Site? = null
     private lateinit var tabId: String
@@ -317,9 +323,29 @@ class BrowserTabViewModel(
         browserViewState.value = currentBrowserViewState().copy(isFireproofWebsite = isFireproofWebsite())
     }
 
+    @ExperimentalCoroutinesApi
     private val fireButtonAnimation = Observer<Boolean> { shouldShowAnimation ->
+        Timber.i("shouldShowAnimation $shouldShowAnimation")
         if (currentBrowserViewState().fireButton is FireButton.Visible) {
             browserViewState.value = currentBrowserViewState().copy(fireButton = FireButton.Visible(pulseAnimation = shouldShowAnimation))
+        }
+
+        if (shouldShowAnimation) {
+            registerAndScheduleDismissAction()
+        }
+    }
+
+    @ExperimentalCoroutinesApi
+    private fun registerAndScheduleDismissAction() {
+        viewModelScope.launch(dispatchers.io()) {
+            val fireButtonHighlightedEvent = userEventsStore.getUserEvent(UserEventKey.FIRE_BUTTON_HIGHLIGHTED)
+            if (fireButtonHighlightedEvent == null) {
+                userEventsStore.registerUserEvent(UserEventKey.FIRE_BUTTON_HIGHLIGHTED)
+            }
+            val pulseElapsedTime = System.currentTimeMillis() - (fireButtonHighlightedEvent?.timestamp ?: System.currentTimeMillis())
+            val pulsePendingTime = ONE_HOUR_IN_MS - pulseElapsedTime
+            delay(pulsePendingTime)
+            ctaViewModel.dismissPulseAnimation()
         }
     }
 
@@ -1719,5 +1745,6 @@ class BrowserTabViewModel(
         // We think that progress is enough to assume next site has already loaded new content.
         private const val SHOW_CONTENT_MIN_PROGRESS = 50
         private const val NEW_CONTENT_MAX_DELAY_MS = 1000L
+        private const val ONE_HOUR_IN_MS = 3_600_000
     }
 }

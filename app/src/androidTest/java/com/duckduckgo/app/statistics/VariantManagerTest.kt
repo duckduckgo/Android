@@ -70,13 +70,13 @@ class VariantManagerTest {
     // Fire button education
     @Test
     fun fireButtonEducationControlGroupVariantIsActive() {
-        val variant = variants.first { it.key == "zm" }
+        val variant = variants.first { it.key == "zn" }
         assertEqualsDouble(1.0, variant.weight)
     }
 
     @Test
     fun fireButtonEducationVariantHasExpectedWeightAndFeatures() {
-        val variant = variants.first { it.key == "zr" }
+        val variant = variants.first { it.key == "zs" }
         assertEqualsDouble(1.0, variant.weight)
         assertEquals(1, variant.features.size)
         assertTrue(variant.hasFeature(FireButtonEducation))
