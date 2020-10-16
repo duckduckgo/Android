@@ -56,10 +56,9 @@ import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import com.duckduckgo.app.widget.ui.WidgetCapabilities
 import com.nhaarman.mockitokotlin2.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.consumeAsFlow
-import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runBlockingTest
 import org.junit.After
@@ -71,6 +70,7 @@ import org.mockito.Mock
 import org.mockito.MockitoAnnotations
 import java.util.concurrent.TimeUnit
 
+@FlowPreview
 @ExperimentalCoroutinesApi
 class CtaViewModelTest {
 
@@ -584,6 +584,22 @@ class CtaViewModelTest {
     }
 
     @Test
+    fun whenUserHasAlreadySeenFireButtonPulseAnimationThenFireButtonAnimationShouldNotShow() = coroutineRule.runBlocking {
+        givenFireButtonEducationActive()
+        givenOnboardingActive()
+        whenever(mockDismissedCtaDao.exists(CtaId.DAX_FIRE_BUTTON_PULSE)).thenReturn(true)
+
+        val launch = launch {
+            testee.showFireButtonPulseAnimation.collect {
+                assertFalse(it)
+            }
+        }
+        dismissedCtaDaoChannel.send(emptyList())
+
+        launch.cancel()
+    }
+
+    @Test
     fun whenTipsAndFireOnboardingActiveAndUserSeesAnyTriggerFirePulseAnimationCtaThenFireButtonAnimationShouldShow() = coroutineRule.runBlocking {
         givenFireButtonEducationActive()
         givenOnboardingActive()
@@ -598,6 +614,27 @@ class CtaViewModelTest {
             dismissedCtaDaoChannel.send(listOf(DismissedCta(it)))
         }
 
+        launch.cancel()
+    }
+
+    @Test
+    fun whenFireButtonAnimationShowingAndCallDismissThenFireButtonAnimationShouldNotShow() = coroutineRule.runBlocking {
+        var lastValueCollected: Boolean? = null
+        givenFireButtonEducationActive()
+        givenOnboardingActive()
+        val willTriggerFirePulseAnimationCtas = listOf(CtaId.DAX_DIALOG_TRACKERS_FOUND, CtaId.DAX_DIALOG_NETWORK, CtaId.DAX_DIALOG_OTHER)
+        val launch = launch {
+            testee.showFireButtonPulseAnimation.collect {
+                lastValueCollected = it
+            }
+        }
+        willTriggerFirePulseAnimationCtas.forEach {
+            dismissedCtaDaoChannel.send(listOf(DismissedCta(it)))
+        }
+
+        testee.dismissPulseAnimation()
+
+        assertFalse(lastValueCollected!!)
         launch.cancel()
     }
 

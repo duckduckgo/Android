@@ -49,6 +49,8 @@ import com.duckduckgo.app.privacy.ui.PrivacyDashboardActivity
 import com.duckduckgo.app.settings.SettingsActivity
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.FIRE_DIALOG_CANCEL
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.FIRE_DIALOG_PROMOTED_CANCEL
 import com.duckduckgo.app.tabs.model.TabEntity
 import kotlinx.android.synthetic.main.activity_browser.*
 import kotlinx.coroutines.*
@@ -290,13 +292,22 @@ class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope() {
 
     fun launchFire() {
         pixel.fire(Pixel.PixelName.FORGET_ALL_PRESSED_BROWSING)
-        val dialog = FireDialog(context = this, clearPersonalDataAction = clearPersonalDataAction, ctaViewModel = ctaViewModel, variantManager = variantManager)
+        val dialog = FireDialog(
+            context = this,
+            clearPersonalDataAction = clearPersonalDataAction,
+            ctaViewModel = ctaViewModel,
+            variantManager = variantManager,
+            pixel = pixel
+        )
         dialog.clearStarted = {
             removeObservers()
         }
         dialog.clearComplete = { viewModel.onClearComplete() }
         dialog.setOnShowListener { currentTab?.onFireDialogVisibilityChanged(isVisible = true) }
-        dialog.setOnCancelListener { currentTab?.onFireDialogVisibilityChanged(isVisible = false) }
+        dialog.setOnCancelListener {
+            pixel.fire(if (dialog.ctaVisible) FIRE_DIALOG_PROMOTED_CANCEL else FIRE_DIALOG_CANCEL)
+            currentTab?.onFireDialogVisibilityChanged(isVisible = false)
+        }
         dialog.show()
     }
 
