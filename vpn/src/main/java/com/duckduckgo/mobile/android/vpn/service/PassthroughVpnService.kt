@@ -195,7 +195,6 @@ class PassthroughVpnService : VpnService(), CoroutineScope by MainScope(), Netwo
             AlarmManager.INTERVAL_FIFTEEN_MINUTES,
             alarmIntent
         )
-
     }
 
     private fun startStatTicker() {
@@ -322,6 +321,14 @@ class PassthroughVpnService : VpnService(), CoroutineScope by MainScope(), Netwo
             "com.android.providers.downloads.ui"
         )
 
+        private val EXCLUDED_PROBLEMATIC_APPS = listOf(
+            "com.facebook.katana",
+            "com.facebook.lite",
+            "com.facebook.orca",
+            "com.facebook.mlite",
+            "com.instagram.android"
+        )
+
         private val MAJOR_BROWSERS = listOf(
             "com.android.chrome",
             "org.mozilla.firefox",
@@ -357,7 +364,8 @@ class PassthroughVpnService : VpnService(), CoroutineScope by MainScope(), Netwo
             "org.chromium.chrome"
         )
 
-        private val EXCLUDED_APPS = listOf(BuildConfig.LIBRARY_PACKAGE_NAME).plus(EXCLUDED_SYSTEM_APPS).plus(MAJOR_BROWSERS)
+        private val EXCLUDED_APPS =
+            listOf(BuildConfig.LIBRARY_PACKAGE_NAME).plus(EXCLUDED_SYSTEM_APPS).plus(EXCLUDED_PROBLEMATIC_APPS).plus(MAJOR_BROWSERS)
 
         private val INCLUDED_APPS = listOf(
             "com.duckduckgo.networkrequestor",
