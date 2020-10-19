@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.cta.ui
 
+import androidx.annotation.VisibleForTesting
 import androidx.annotation.WorkerThread
 import androidx.lifecycle.LiveData
 import com.duckduckgo.app.cta.db.DismissedCtaDao
@@ -40,7 +41,12 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.survey.db.SurveyDao
 import com.duckduckgo.app.survey.model.Survey
 import com.duckduckgo.app.widget.ui.WidgetCapabilities
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.channels.ConflatedBroadcastChannel
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.asFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import timber.log.Timber
@@ -67,9 +73,17 @@ class CtaViewModel @Inject constructor(
 ) {
     val surveyLiveData: LiveData<Survey> = surveyDao.getLiveScheduled()
 
+    @ExperimentalCoroutinesApi
+    @VisibleForTesting
+    val forceStopFireButtonPulseAnimation = ConflatedBroadcastChannel(false)
+
+    @FlowPreview
+    @ExperimentalCoroutinesApi
     val showFireButtonPulseAnimation: Flow<Boolean> = dismissedCtaDao
         .dismissedCtas()
-        .shouldShowPulseAnimation()
+        .combine(forceStopFireButtonPulseAnimation.asFlow()) { ctas, forceStopAnimation ->
+            Pair(ctas, forceStopAnimation)
+        }.shouldShowPulseAnimation()
 
     private var activeSurvey: Survey? = null
 
@@ -85,6 +99,14 @@ class CtaViewModel @Inject constructor(
                 return@run this.plus(CtaId.DAX_FIRE_BUTTON)
             }
             return@run this
+        }
+    }
+
+    @ExperimentalCoroutinesApi
+    suspend fun dismissPulseAnimation() {
+        forceStopFireButtonPulseAnimation.send(true)
+        withContext(dispatchers.io()) {
+            dismissedCtaDao.insert(DismissedCta(CtaId.DAX_FIRE_BUTTON_PULSE))
         }
     }
 
@@ -177,7 +199,7 @@ class CtaViewModel @Inject constructor(
 
         return withContext(dispatchers.io()) {
             if (settingsDataStore.hideTips || daxDialogFireEducationShown()) return@withContext null
-            return@withContext DaxFireDialogCta.TryClearDataCta()
+            return@withContext DaxFireDialogCta.TryClearDataCta(onboardingStore, appInstallStore)
         }
     }
 
@@ -311,6 +333,8 @@ class CtaViewModel @Inject constructor(
 
     private fun daxDialogFireEducationShown(): Boolean = dismissedCtaDao.exists(CtaId.DAX_FIRE_BUTTON)
 
+    private fun pulseFireButtonShown(): Boolean = dismissedCtaDao.exists(CtaId.DAX_FIRE_BUTTON_PULSE)
+
     private fun isSerpUrl(url: String): Boolean = url.contains(DaxDialogCta.SERP)
 
     private suspend fun useOurAppActive(): Boolean = userStageStore.useOurAppOnboarding()
@@ -325,11 +349,12 @@ class CtaViewModel @Inject constructor(
         }
     }
 
-    private fun Flow<List<DismissedCta>>.shouldShowPulseAnimation(): Flow<Boolean> {
-        return this.map { dismissedCtaDao ->
+    private fun Flow<Pair<List<DismissedCta>, Boolean>>.shouldShowPulseAnimation(): Flow<Boolean> {
+        return this.map { (dismissedCtaDao, forceStopAnimation) ->
             withContext(dispatchers.io()) {
+                if (forceStopAnimation) return@withContext false
                 if (!variantManager.getVariant().hasFeature(FireButtonEducation)) return@withContext false
-                if (!daxOnboardingActive() || daxDialogFireEducationShown() || settingsDataStore.hideTips) return@withContext false
+                if (!daxOnboardingActive() || pulseFireButtonShown() || daxDialogFireEducationShown() || settingsDataStore.hideTips) return@withContext false
 
                 return@withContext dismissedCtaDao.any {
                     it.ctaId == CtaId.DAX_DIALOG_TRACKERS_FOUND ||
