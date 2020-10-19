@@ -28,7 +28,8 @@ data class UserEventEntity(
 
 enum class UserEventKey {
     USE_OUR_APP_SHORTCUT_ADDED,
-    USE_OUR_APP_FIREPROOF_DIALOG_SEEN
+    USE_OUR_APP_FIREPROOF_DIALOG_SEEN,
+    FIRE_BUTTON_HIGHLIGHTED
 }
 
 class UserEventTypeConverter {

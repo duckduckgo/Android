@@ -118,14 +118,20 @@ class FileBasedFaviconPersister(
         val faviconFile = prepareDestinationFile(directory, subFolder, domain)
         writeBytesToFile(faviconFile, bitmap)
 
-        return faviconFile
+        return if (faviconFile.exists()) {
+            faviconFile
+        } else {
+            null
+        }
     }
 
     @Synchronized
     private fun writeBytesToFile(file: File, bitmap: Bitmap) {
-        FileOutputStream(file).use { outputStream ->
-            bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream)
-            outputStream.flush()
+        runCatching {
+            FileOutputStream(file).use { outputStream ->
+                bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream)
+                outputStream.flush()
+            }
         }
     }
 

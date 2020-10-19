@@ -124,6 +124,9 @@ interface Pixel {
         SETTINGS_THEME_TOGGLED_LIGHT("ms_tl"),
         SETTINGS_THEME_TOGGLED_DARK("ms_td"),
         SETTINGS_MANAGE_WHITELIST("ms_mw"),
+        SETTINGS_DO_NOT_SELL_SHOWN("ms_dns"),
+        SETTINGS_DO_NOT_SELL_ON("ms_dns_on"),
+        SETTINGS_DO_NOT_SELL_OFF("ms_dns_off"),
 
         SURVEY_CTA_SHOWN(pixelName = "mus_cs"),
         SURVEY_CTA_DISMISSED(pixelName = "mus_cd"),
@@ -219,6 +222,11 @@ interface Pixel {
         PRECISE_LOCATION_SITE_DIALOG_ALLOW_ONCE("m_pc_sd_ao"),
         PRECISE_LOCATION_SITE_DIALOG_DENY_ALWAYS("m_pc_sd_da"),
         PRECISE_LOCATION_SITE_DIALOG_DENY_ONCE("m_pc_sd_do"),
+
+        FIRE_DIALOG_PROMOTED_CLEAR_PRESSED("m_fdp_p"),
+        FIRE_DIALOG_CLEAR_PRESSED("m_fd_p"),
+        FIRE_DIALOG_PROMOTED_CANCEL("m_fdp_c"),
+        FIRE_DIALOG_CANCEL("m_fd_c"),
     }
 
     object PixelParameter {
@@ -236,6 +244,7 @@ interface Pixel {
         const val CTA_SHOWN = "cta"
         const val SERP_QUERY_CHANGED = "1"
         const val SERP_QUERY_NOT_CHANGED = "0"
+        const val FIRE_BUTTON_STATE = "fb"
     }
 
     object PixelValues {
@@ -250,6 +259,7 @@ interface Pixel {
         const val DAX_NETWORK_CTA_1 = "n"
         const val DAX_TRACKERS_BLOCKED_CTA = "t"
         const val DAX_NO_TRACKERS_CTA = "nt"
+        const val DAX_FIRE_DIALOG_CTA = "fd"
     }
 
     fun fire(pixel: PixelName, parameters: Map<String, String> = emptyMap(), encodedParameters: Map<String, String> = emptyMap())

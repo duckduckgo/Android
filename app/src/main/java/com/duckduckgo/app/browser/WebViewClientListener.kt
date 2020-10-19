@@ -32,6 +32,7 @@ interface WebViewClientListener {
     fun navigationStateChanged(newWebNavigationState: WebNavigationState)
     fun pageRefreshed(refreshedUrl: String)
     fun progressChanged(newProgress: Int)
+    fun willOverrideUrl(newUrl: String)
 
     fun onSiteLocationPermissionRequested(origin: String, callback: GeolocationPermissions.Callback)
 
