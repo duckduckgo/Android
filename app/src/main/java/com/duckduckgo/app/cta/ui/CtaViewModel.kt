@@ -24,6 +24,7 @@ import com.duckduckgo.app.cta.model.CtaId
 import com.duckduckgo.app.cta.model.DismissedCta
 import com.duckduckgo.app.cta.ui.HomePanelCta.*
 import com.duckduckgo.app.global.DispatcherProvider
+import com.duckduckgo.app.global.device.ContextDeviceInfo
 import com.duckduckgo.app.global.events.db.UserEventKey
 import com.duckduckgo.app.global.events.db.UserEventsStore
 import com.duckduckgo.app.global.install.AppInstallStore
@@ -50,6 +51,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import timber.log.Timber
+import java.util.*
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -233,12 +235,19 @@ class CtaViewModel @Inject constructor(
 
     private fun surveyCta(): HomePanelCta.Survey? {
         val survey = activeSurvey
-        if (survey?.url != null) {
-            val showOnDay = survey.daysInstalled?.toLong()
-            val daysInstalled = appInstallStore.daysInstalled()
-            if (showOnDay == null || showOnDay == daysInstalled) {
-                return Survey(survey)
-            }
+
+        if(survey == null || survey.url == null) {
+            return null
+        }
+
+        if (Locale.getDefault() != Locale.US) {
+            return null
+        }
+
+        val showOnDay = survey.daysInstalled?.toLong()
+        val daysInstalled = appInstallStore.daysInstalled()
+        if ((showOnDay == null && daysInstalled >= SURVEY_DEFAULT_MIN_DAYS_INSTALLED) || showOnDay == daysInstalled) {
+            return Survey(survey)
         }
         return null
     }
@@ -363,5 +372,9 @@ class CtaViewModel @Inject constructor(
                 }
             }
         }
+    }
+
+    companion object {
+        private const val SURVEY_DEFAULT_MIN_DAYS_INSTALLED = 30
     }
 }
