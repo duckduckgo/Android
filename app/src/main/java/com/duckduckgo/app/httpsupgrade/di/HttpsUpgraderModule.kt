@@ -19,10 +19,11 @@ package com.duckduckgo.app.httpsupgrade.di
 import com.duckduckgo.app.global.store.BinaryDataStore
 import com.duckduckgo.app.httpsupgrade.HttpsUpgrader
 import com.duckduckgo.app.httpsupgrade.HttpsUpgraderImpl
-import com.duckduckgo.app.httpsupgrade.api.HttpsBloomFilterFactory
-import com.duckduckgo.app.httpsupgrade.api.HttpsBloomFilterFactoryImpl
-import com.duckduckgo.app.httpsupgrade.db.HttpsBloomFilterSpecDao
-import com.duckduckgo.app.httpsupgrade.db.HttpsFalsePositivesDao
+import com.duckduckgo.app.httpsupgrade.HttpsBloomFilterFactory
+import com.duckduckgo.app.httpsupgrade.HttpsBloomFilterFactoryImpl
+import com.duckduckgo.app.httpsupgrade.store.HttpsBloomFilterSpecDao
+import com.duckduckgo.app.httpsupgrade.store.HttpsDataPersister
+import com.duckduckgo.app.httpsupgrade.store.HttpsFalsePositivesDao
 import com.duckduckgo.app.privacy.db.UserWhitelistDao
 import com.duckduckgo.app.statistics.pixels.Pixel
 import dagger.Module
@@ -44,7 +45,11 @@ class HttpsUpgraderModule {
     }
 
     @Provides
-    fun bloomFilterFactory(specificationDao: HttpsBloomFilterSpecDao, binaryDataStore: BinaryDataStore): HttpsBloomFilterFactory {
-        return HttpsBloomFilterFactoryImpl(specificationDao, binaryDataStore)
+    fun bloomFilterFactory(
+        specificationDao: HttpsBloomFilterSpecDao,
+        binaryDataStore: BinaryDataStore,
+        persister: HttpsDataPersister
+    ): HttpsBloomFilterFactory {
+        return HttpsBloomFilterFactoryImpl(specificationDao, binaryDataStore, persister)
     }
 }

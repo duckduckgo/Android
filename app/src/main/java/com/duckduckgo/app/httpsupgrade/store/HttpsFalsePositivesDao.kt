@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.httpsupgrade.db
+package com.duckduckgo.app.httpsupgrade.store
 
 import androidx.room.*
 import com.duckduckgo.app.httpsupgrade.model.HttpsFalsePositiveDomain

@@ -25,14 +25,13 @@ import retrofit2.http.GET
 
 interface HttpsUpgradeService {
 
-    //TODO switch to released update to latest urls
-    @GET("http://ddg-sandbox.s3.amazonaws.com/https/mia/https-mobile-v2-bloom-spec.json")
+    @GET("https://staticcdn.duckduckgo.com/https/https-mobile-v2-bloom-spec.json")
     fun httpsBloomFilterSpec(): Observable<HttpsBloomFilterSpec>
 
-    @GET("http://ddg-sandbox.s3.amazonaws.com/https/mia/https-mobile-v2-bloom.bin")
+    @GET("https://staticcdn.duckduckgo.com/https/https-mobile-v2-bloom.bin")
     fun httpsBloomFilter(): Call<ResponseBody>
 
-    @GET("http://ddg-sandbox.s3.amazonaws.com/https/mia/https-mobile-v2-false-positives.json")
+    @GET("https://staticcdn.duckduckgo.com/https/https-mobile-v2-false-positives.json")
     fun falsePositives(): Call<List<HttpsFalsePositiveDomain>>
 
 }

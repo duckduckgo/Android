@@ -40,8 +40,8 @@ import com.duckduckgo.app.global.events.db.UserEventsDao
 import com.duckduckgo.app.global.exception.UncaughtExceptionDao
 import com.duckduckgo.app.global.exception.UncaughtExceptionEntity
 import com.duckduckgo.app.global.exception.UncaughtExceptionSourceConverter
-import com.duckduckgo.app.httpsupgrade.db.HttpsBloomFilterSpecDao
-import com.duckduckgo.app.httpsupgrade.db.HttpsFalsePositivesDao
+import com.duckduckgo.app.httpsupgrade.store.HttpsBloomFilterSpecDao
+import com.duckduckgo.app.httpsupgrade.store.HttpsFalsePositivesDao
 import com.duckduckgo.app.httpsupgrade.model.HttpsBloomFilterSpec
 import com.duckduckgo.app.httpsupgrade.model.HttpsFalsePositiveDomain
 import com.duckduckgo.app.location.data.LocationPermissionEntity

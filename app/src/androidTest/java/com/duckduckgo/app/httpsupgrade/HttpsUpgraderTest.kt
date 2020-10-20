@@ -17,8 +17,7 @@
 package com.duckduckgo.app.httpsupgrade
 
 import android.net.Uri
-import com.duckduckgo.app.httpsupgrade.api.HttpsBloomFilterFactory
-import com.duckduckgo.app.httpsupgrade.db.HttpsFalsePositivesDao
+import com.duckduckgo.app.httpsupgrade.store.HttpsFalsePositivesDao
 import com.duckduckgo.app.privacy.db.UserWhitelistDao
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.nhaarman.mockitokotlin2.mock
