@@ -22,6 +22,7 @@ import android.content.Context
 import android.os.Bundle
 import androidx.core.content.ContextCompat
 import androidx.core.view.doOnDetach
+import androidx.core.view.isVisible
 import com.airbnb.lottie.RenderMode
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.cta.ui.CtaViewModel
@@ -30,6 +31,9 @@ import com.duckduckgo.app.global.view.FireDialog.FireDialogClearAllEvent.Animati
 import com.duckduckgo.app.global.view.FireDialog.FireDialogClearAllEvent.ClearAllDataFinished
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.VariantManager.VariantFeature.FireButtonEducation
+import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.FIRE_DIALOG_CLEAR_PRESSED
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.FIRE_DIALOG_PROMOTED_CLEAR_PRESSED
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import kotlinx.android.synthetic.main.include_dax_dialog_cta.*
@@ -46,11 +50,14 @@ class FireDialog(
     context: Context,
     private val ctaViewModel: CtaViewModel,
     private val clearPersonalDataAction: ClearPersonalDataAction,
-    private val variantManager: VariantManager
+    private val variantManager: VariantManager,
+    private val pixel: Pixel
 ) : BottomSheetDialog(context, R.style.FireDialog), CoroutineScope by MainScope() {
 
     var clearStarted: (() -> Unit) = {}
     var clearComplete: (() -> Unit) = {}
+    val ctaVisible: Boolean
+        get() = daxCtaContainer?.isVisible == true
 
     private val accelerateAnimatorUpdateListener = object : ValueAnimator.AnimatorUpdateListener {
         override fun onAnimationUpdate(animation: ValueAnimator?) {
@@ -107,6 +114,7 @@ class FireDialog(
     }
 
     private fun onClearOptionClicked() {
+        pixel.fire(if (ctaVisible) FIRE_DIALOG_PROMOTED_CLEAR_PRESSED else FIRE_DIALOG_CLEAR_PRESSED)
         hideClearDataOptions()
         if (animationEnabled()) {
             playAnimation()

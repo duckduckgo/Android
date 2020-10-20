@@ -374,6 +374,19 @@ class CtaTest {
         assertTrue(testee.pixelShownParameters().isEmpty())
     }
 
+    @Test
+    fun whenTryClearDataCtaShownThenConcatenateJourneyStoredValueInPixel() {
+        val existingJourney = "s:0-t:1"
+        whenever(mockOnboardingStore.onboardingDialogJourney).thenReturn(existingJourney)
+        whenever(mockAppInstallStore.installTimestamp).thenReturn(System.currentTimeMillis() - TimeUnit.DAYS.toMillis(1))
+        val testee = DaxFireDialogCta.TryClearDataCta(mockOnboardingStore, mockAppInstallStore)
+        val expectedValue = "$existingJourney-${testee.ctaPixelParam}:1"
+
+        val value = testee.pixelShownParameters()
+
+        assertEquals(expectedValue, value[CTA_SHOWN])
+    }
+
     private fun site(
         url: String = "http://www.test.com",
         uri: Uri? = Uri.parse(url),

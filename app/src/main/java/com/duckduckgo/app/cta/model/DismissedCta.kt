@@ -32,6 +32,7 @@ enum class CtaId {
     DAX_END,
     USE_OUR_APP,
     USE_OUR_APP_DELETION,
+    DAX_FIRE_BUTTON_PULSE,
     UNKNOWN
 }
 
