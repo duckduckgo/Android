@@ -48,11 +48,13 @@ interface TabRepository {
 
     suspend fun deleteCurrentTabAndSelectSource()
 
-    fun deleteAll()
+    suspend fun deleteAll()
 
     suspend fun select(tabId: String)
 
     fun updateTabPreviewImage(tabId: String, fileName: String?)
+
+    fun updateTabFavicon(tabId: String, fileName: String?)
 
     suspend fun selectByUrlOrNewTab(url: String)
 }

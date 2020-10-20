@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.browser
 
+import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Message
 import android.view.View
@@ -73,7 +74,7 @@ class BrowserChromeClient @Inject constructor(private val uncaughtExceptionRepos
         try {
             Timber.d("onProgressChanged ${webView.url}, $newProgress")
             val navigationList = webView.safeCopyBackForwardList() ?: return
-            webViewClientListener?.navigationStateChanged(WebViewNavigationState(navigationList))
+            webViewClientListener?.navigationStateChanged(WebViewNavigationState(navigationList, newProgress))
             webViewClientListener?.progressChanged(newProgress)
         } catch (e: Throwable) {
             GlobalScope.launch {
@@ -81,6 +82,10 @@ class BrowserChromeClient @Inject constructor(private val uncaughtExceptionRepos
                 throw e
             }
         }
+    }
+
+    override fun onReceivedIcon(webView: WebView, icon: Bitmap) {
+        webViewClientListener?.iconReceived(icon)
     }
 
     override fun onReceivedTitle(view: WebView, title: String) {

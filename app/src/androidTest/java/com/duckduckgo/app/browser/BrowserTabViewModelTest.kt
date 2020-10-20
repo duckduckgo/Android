@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.browser
 
+import android.graphics.Bitmap
 import android.net.Uri
 import android.view.MenuItem
 import android.view.View
@@ -44,7 +45,7 @@ import com.duckduckgo.app.browser.LongPressHandler.RequiredAction.DownloadFile
 import com.duckduckgo.app.browser.LongPressHandler.RequiredAction.OpenInNewTab
 import com.duckduckgo.app.browser.addtohome.AddToHomeCapabilityDetector
 import com.duckduckgo.app.browser.downloader.FileDownloader
-import com.duckduckgo.app.browser.favicon.FaviconDownloader
+import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.logindetection.LoginDetected
 import com.duckduckgo.app.browser.logindetection.NavigationAwareLoginDetector
 import com.duckduckgo.app.browser.logindetection.NavigationEvent.LoginAttempt
@@ -103,14 +104,15 @@ import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import com.duckduckgo.app.usage.search.SearchCountDao
 import com.duckduckgo.app.widget.ui.WidgetCapabilities
 import com.nhaarman.mockitokotlin2.*
+import dagger.Lazy
 import io.reactivex.Observable
 import io.reactivex.Single
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runBlockingTest
 import org.junit.After
-import org.junit.Assert
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Rule
@@ -119,6 +121,7 @@ import org.mockito.*
 import org.mockito.ArgumentMatchers.anyString
 import org.mockito.Mockito.never
 import org.mockito.Mockito.verify
+import java.io.File
 import java.util.concurrent.TimeUnit
 
 @ExperimentalCoroutinesApi
@@ -168,7 +171,7 @@ class BrowserTabViewModelTest {
     private lateinit var webViewSessionStorage: WebViewSessionStorage
 
     @Mock
-    private lateinit var mockFaviconDownloader: FaviconDownloader
+    private lateinit var mockFaviconManager: FaviconManager
 
     @Mock
     private lateinit var mockAddToHomeCapabilityDetector: AddToHomeCapabilityDetector
@@ -221,6 +224,8 @@ class BrowserTabViewModelTest {
     @Mock
     private lateinit var geoLocationPermissions: GeoLocationPermissions
 
+    private val lazyFaviconManager = Lazy { mockFaviconManager }
+
     private lateinit var mockAutoCompleteApi: AutoCompleteApi
 
     private lateinit var ctaViewModel: CtaViewModel
@@ -240,6 +245,8 @@ class BrowserTabViewModelTest {
 
     private val loginEventLiveData = MutableLiveData<LoginDetected>()
 
+    private val dismissedCtaDaoChannel = Channel<List<DismissedCta>>()
+
     @Before
     fun before() {
         MockitoAnnotations.initMocks(this)
@@ -252,7 +259,7 @@ class BrowserTabViewModelTest {
 
         mockAutoCompleteApi = AutoCompleteApi(mockAutoCompleteService, mockBookmarksDao)
 
-        whenever(mockDismissedCtaDao.dismissedCtas()).thenReturn(emptyFlow())
+        whenever(mockDismissedCtaDao.dismissedCtas()).thenReturn(dismissedCtaDaoChannel.consumeAsFlow())
 
         ctaViewModel = CtaViewModel(
             mockAppInstallStore,
@@ -295,14 +302,18 @@ class BrowserTabViewModelTest {
             longPressHandler = mockLongPressHandler,
             webViewSessionStorage = webViewSessionStorage,
             specialUrlDetector = SpecialUrlDetectorImpl(),
-            faviconDownloader = mockFaviconDownloader,
+            faviconManager = mockFaviconManager,
             addToHomeCapabilityDetector = mockAddToHomeCapabilityDetector,
             ctaViewModel = ctaViewModel,
             searchCountDao = mockSearchCountDao,
             pixel = mockPixel,
             dispatchers = coroutineRule.testDispatcherProvider,
-            fireproofWebsiteRepository = FireproofWebsiteRepository(fireproofWebsiteDao, coroutineRule.testDispatcherProvider),
-            locationPermissionsRepository = LocationPermissionsRepository(locationPermissionsDao, coroutineRule.testDispatcherProvider),
+            fireproofWebsiteRepository = FireproofWebsiteRepository(fireproofWebsiteDao, coroutineRule.testDispatcherProvider, lazyFaviconManager),
+            locationPermissionsRepository = LocationPermissionsRepository(
+                locationPermissionsDao,
+                lazyFaviconManager,
+                coroutineRule.testDispatcherProvider
+            ),
             geoLocationPermissions = geoLocationPermissions,
             navigationAwareLoginDetector = mockNavigationAwareLoginDetector,
             userEventsStore = mockUserEventsStore,
@@ -319,6 +330,8 @@ class BrowserTabViewModelTest {
     @ExperimentalCoroutinesApi
     @After
     fun after() {
+        ctaViewModel.forceStopFireButtonPulseAnimation.close()
+        dismissedCtaDaoChannel.close()
         testee.onCleared()
         db.close()
         testee.command.removeObserver(mockCommandObserver)
@@ -580,6 +593,40 @@ class BrowserTabViewModelTest {
     fun whenNotBrowsingAndUrlLoadedWithQueryUrlThenOmnibarTextextRemainsBlank() {
         loadUrl("http://duckduckgo.com?q=test", isBrowserShowing = false)
         assertEquals("", omnibarViewState().omnibarText)
+    }
+
+    @Test
+    fun whenUserRedirectedBeforePreviousSiteLoadedAndNewContentDelayedThenWebContentIsBlankedOut() = coroutineRule.runBlocking {
+        loadUrl("http://duckduckgo.com")
+        testee.progressChanged(50)
+
+        overrideUrl("http://example.com")
+        advanceTimeBy(2000)
+
+        assertCommandIssued<Command.HideWebContent>()
+    }
+
+    @Test
+    fun whenUserRedirectedAfterSiteLoadedAndNewContentDelayedThenWebContentNotBlankedOut() = coroutineRule.runBlocking {
+        loadUrl("http://duckduckgo.com")
+        testee.progressChanged(100)
+
+        overrideUrl("http://example.com")
+        advanceTimeBy(2000)
+
+        assertCommandNotIssued<Command.HideWebContent>()
+    }
+
+    @Test
+    fun whenLoadingProgressReaches50ThenShowWebContent() = coroutineRule.runBlocking {
+        loadUrl("http://duckduckgo.com")
+        testee.progressChanged(50)
+        overrideUrl("http://example.com")
+        advanceTimeBy(2000)
+
+        onProgressChanged(url = "http://example.com", newProgress = 50)
+
+        assertCommandIssued<Command.ShowWebContent>()
     }
 
     @Test
@@ -2541,7 +2588,7 @@ class BrowserTabViewModelTest {
 
         verify(mockPixel).fire(Pixel.PixelName.PRECISE_LOCATION_SYSTEM_DIALOG_NEVER)
         verify(geoLocationPermissions).clear(domain)
-        Assert.assertEquals(locationPermissionsDao.getPermission(domain)!!.permission, LocationPermissionType.DENY_ALWAYS)
+        assertEquals(locationPermissionsDao.getPermission(domain)!!.permission, LocationPermissionType.DENY_ALWAYS)
     }
 
     @Test
@@ -2673,6 +2720,235 @@ class BrowserTabViewModelTest {
         verify(mockSettingsStore).appLocationPermissionDeniedForever = false
     }
 
+    @Test
+    fun whenPrefetchFaviconThenPrefetchToTemp() = coroutineRule.runBlocking {
+        val url = "https://www.example.com/"
+        givenCurrentSite(url)
+        testee.prefetchFavicon(url)
+
+        verify(mockFaviconManager).prefetchToTemp("TAB_ID", url)
+    }
+
+    @Test
+    fun whenPrefetchFaviconAndFaviconExistsThenUpdateTabFavicon() = coroutineRule.runBlocking {
+        val url = "https://www.example.com/"
+        val file = File("test")
+        givenCurrentSite(url)
+        whenever(mockFaviconManager.prefetchToTemp(any(), any())).thenReturn(file)
+
+        testee.prefetchFavicon(url)
+
+        verify(mockTabsRepository).updateTabFavicon("TAB_ID", file.name)
+    }
+
+    @Test
+    fun whenPrefetchFaviconAndFaviconDoesNotExistThenDoNotCallUpdateTabFavicon() = coroutineRule.runBlocking {
+        whenever(mockFaviconManager.prefetchToTemp(any(), any())).thenReturn(null)
+
+        testee.prefetchFavicon("url")
+
+        verify(mockTabsRepository, never()).updateTabFavicon(any(), any())
+    }
+
+    @Test
+    fun whenIconReceivedThenSaveToTemp() = coroutineRule.runBlocking {
+        givenOneActiveTabSelected()
+        val bitmap: Bitmap = Bitmap.createBitmap(1, 1, Bitmap.Config.RGB_565)
+
+        testee.iconReceived(bitmap)
+
+        verify(mockFaviconManager).saveToTemp("TAB_ID", bitmap, "https://example.com")
+    }
+
+    @Test
+    fun whenIconReceivedIfCorrectlySavedThenUpdateTabFavicon() = coroutineRule.runBlocking {
+        givenOneActiveTabSelected()
+        val bitmap: Bitmap = Bitmap.createBitmap(1, 1, Bitmap.Config.RGB_565)
+        val file = File("test")
+        whenever(mockFaviconManager.saveToTemp(any(), any(), any())).thenReturn(file)
+
+        testee.iconReceived(bitmap)
+
+        verify(mockTabsRepository).updateTabFavicon("TAB_ID", file.name)
+    }
+
+    @Test
+    fun whenIconReceivedIfNotCorrectlySavedThenDoNotUpdateTabFavicon() = coroutineRule.runBlocking {
+        givenOneActiveTabSelected()
+        val bitmap: Bitmap = Bitmap.createBitmap(1, 1, Bitmap.Config.RGB_565)
+        whenever(mockFaviconManager.saveToTemp(any(), any(), any())).thenReturn(null)
+
+        testee.iconReceived(bitmap)
+
+        verify(mockTabsRepository, never()).updateTabFavicon(any(), any())
+    }
+
+    @Test
+    fun whenOnSiteLocationPermissionSelectedAndPermissionIsAllowAlwaysThenPersistFavicon() = coroutineRule.runBlocking {
+        val url = "http://example.com"
+        val permission = LocationPermissionType.ALLOW_ALWAYS
+        givenNewPermissionRequestFromDomain(url)
+
+        testee.onSiteLocationPermissionSelected(url, permission)
+
+        verify(mockFaviconManager).persistFavicon(any(), eq(url))
+    }
+
+    @Test
+    fun whenOnSiteLocationPermissionSelectedAndPermissionIsDenyAlwaysThenPersistFavicon() = coroutineRule.runBlocking {
+        val url = "http://example.com"
+        val permission = LocationPermissionType.DENY_ALWAYS
+        givenNewPermissionRequestFromDomain(url)
+
+        testee.onSiteLocationPermissionSelected(url, permission)
+
+        verify(mockFaviconManager).persistFavicon(any(), eq(url))
+    }
+
+    @Test
+    fun whenOnSystemLocationPermissionNeverAllowedThenPersistFavicon() = coroutineRule.runBlocking {
+        val url = "http://example.com"
+        givenNewPermissionRequestFromDomain(url)
+
+        testee.onSystemLocationPermissionNeverAllowed()
+
+        verify(mockFaviconManager).persistFavicon(any(), eq(url))
+    }
+
+    @Test
+    fun whenBookmarkAddedThenPersistFavicon() = coroutineRule.runBlocking {
+        val url = "http://example.com"
+        loadUrl(url, "A title")
+
+        testee.onBookmarkAddRequested()
+
+        verify(mockFaviconManager).persistFavicon(any(), eq(url))
+    }
+
+    @Test
+    fun whenBookmarkAddedButUrlIsNullThenDoNotPersistFavicon() = coroutineRule.runBlocking {
+        loadUrl(null, "A title")
+
+        testee.onBookmarkAddRequested()
+
+        verify(mockFaviconManager, never()).persistFavicon(any(), any())
+    }
+
+    @Test
+    fun whenFireproofWebsiteAddedThenPersistFavicon() = coroutineRule.runBlocking {
+        val url = "http://example.com"
+        loadUrl(url, isBrowserShowing = true)
+
+        testee.onFireproofWebsiteMenuClicked()
+
+        assertCommandIssued<Command.ShowFireproofWebSiteConfirmation> {
+            verify(mockFaviconManager).persistFavicon(any(), eq(this.fireproofWebsiteEntity.domain))
+        }
+    }
+
+    @Test
+    fun whenOnPinPageToHomeSelectedThenAddHomeShortcutCommandIssuedWithFavicon() = coroutineRule.runBlocking {
+        val url = "http://example.com"
+        val bitmap: Bitmap = Bitmap.createBitmap(1, 1, Bitmap.Config.RGB_565)
+        whenever(mockFaviconManager.loadFromTemp(any(), any())).thenReturn(bitmap)
+        loadUrl(url, "A title")
+
+        testee.onPinPageToHomeSelected()
+
+        assertCommandIssued<Command.AddHomeShortcut> {
+            assertEquals(bitmap, this.icon)
+            assertEquals(url, this.url)
+            assertEquals("example.com", this.title)
+        }
+    }
+
+    @Test
+    fun whenOnPinPageToHomeSelectedAndFaviconDoesNotExistThenAddHomeShortcutCommandIssuedWithoutFavicon() = coroutineRule.runBlocking {
+        val url = "http://example.com"
+        whenever(mockFaviconManager.loadFromTemp(any(), any())).thenReturn(null)
+        loadUrl(url, "A title")
+
+        testee.onPinPageToHomeSelected()
+
+        assertCommandIssued<Command.AddHomeShortcut> {
+            assertNull(this.icon)
+            assertEquals(url, this.url)
+            assertEquals("example.com", this.title)
+        }
+    }
+
+    @Test
+    fun whenUserSubmittedQueryIfGpcIsEnabledThenAddHeaderToUrl() {
+        whenever(mockOmnibarConverter.convertQueryToUrl("foo", null)).thenReturn("foo.com")
+        whenever(mockSettingsStore.globalPrivacyControlEnabled).thenReturn(true)
+
+        testee.onUserSubmittedQuery("foo")
+        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+
+        val command = commandCaptor.lastValue as Navigate
+        assertEquals(BrowserTabViewModel.GPC_HEADER_VALUE, command.headers[BrowserTabViewModel.GPC_HEADER])
+    }
+
+    @Test
+    fun whenUserSubmittedQueryIfGpcIsDisabledThenDoNotAddHeaderToUrl() {
+        whenever(mockOmnibarConverter.convertQueryToUrl("foo", null)).thenReturn("foo.com")
+        whenever(mockSettingsStore.globalPrivacyControlEnabled).thenReturn(false)
+
+        testee.onUserSubmittedQuery("foo")
+        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+
+        val command = commandCaptor.lastValue as Navigate
+        assertTrue(command.headers.isEmpty())
+    }
+
+    @Test
+    fun whenOnDesktopSiteModeToggledIfGpcIsEnabledThenAddHeaderToUrl() {
+        whenever(mockSettingsStore.globalPrivacyControlEnabled).thenReturn(true)
+        loadUrl("http://m.example.com")
+
+        testee.onDesktopSiteModeToggled(true)
+        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+
+        val command = commandCaptor.lastValue as Navigate
+        assertEquals(BrowserTabViewModel.GPC_HEADER_VALUE, command.headers[BrowserTabViewModel.GPC_HEADER])
+    }
+
+    @Test
+    fun whenOnDesktopSiteModeToggledIfGpcIsDisabledThenDoNotAddHeaderToUrl() {
+        whenever(mockSettingsStore.globalPrivacyControlEnabled).thenReturn(false)
+        loadUrl("http://m.example.com")
+
+        testee.onDesktopSiteModeToggled(true)
+        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+
+        val command = commandCaptor.lastValue as Navigate
+        assertTrue(command.headers.isEmpty())
+    }
+
+    @Test
+    fun whenExternalAppLinkClickedIfGpcIsEnabledThenAddHeaderToUrl() {
+        whenever(mockSettingsStore.globalPrivacyControlEnabled).thenReturn(true)
+        val intentType = SpecialUrlDetector.UrlType.IntentType("query", mock(), null)
+
+        testee.externalAppLinkClicked(intentType)
+        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+
+        val command = commandCaptor.lastValue as Command.HandleExternalAppLink
+        assertEquals(BrowserTabViewModel.GPC_HEADER_VALUE, command.headers[BrowserTabViewModel.GPC_HEADER])
+    }
+
+    @Test
+    fun whenExternalAppLinkClickedIfGpcIsDisabledThenDoNotAddHeaderToUrl() {
+        whenever(mockSettingsStore.globalPrivacyControlEnabled).thenReturn(false)
+        val intentType = SpecialUrlDetector.UrlType.IntentType("query", mock(), null)
+
+        testee.externalAppLinkClicked(intentType)
+        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+
+        val command = commandCaptor.lastValue as Command.HandleExternalAppLink
+        assertTrue(command.headers.isEmpty())
+    }
+
     private fun givenNewPermissionRequestFromDomain(domain: String) {
         testee.onSiteLocationPermissionRequested(domain, StubPermissionCallback())
     }
@@ -2791,6 +3067,16 @@ class BrowserTabViewModelTest {
         testee.navigationStateChanged(buildWebNavigation(originalUrl = originalUrl, currentUrl = currentUrl))
     }
 
+    @Suppress("SameParameterValue")
+    private fun onProgressChanged(url: String?, newProgress: Int) {
+        testee.navigationStateChanged(buildWebNavigation(originalUrl = url, currentUrl = url, progress = newProgress))
+    }
+
+    private fun overrideUrl(url: String, isBrowserShowing: Boolean = true) {
+        setBrowserShowing(isBrowserShowing)
+        testee.willOverrideUrl(newUrl = url)
+    }
+
     private fun setupNavigation(
         skipHome: Boolean = false,
         isBrowsing: Boolean,
@@ -2815,7 +3101,8 @@ class BrowserTabViewModelTest {
         title: String? = null,
         canGoForward: Boolean = false,
         canGoBack: Boolean = false,
-        stepsToPreviousPage: Int = 0
+        stepsToPreviousPage: Int = 0,
+        progress: Int? = null
     ): WebNavigationState {
         val nav: WebNavigationState = mock()
         whenever(nav.originalUrl).thenReturn(originalUrl)
@@ -2824,6 +3111,7 @@ class BrowserTabViewModelTest {
         whenever(nav.canGoForward).thenReturn(canGoForward)
         whenever(nav.canGoBack).thenReturn(canGoBack)
         whenever(nav.stepsToPreviousPage).thenReturn(stepsToPreviousPage)
+        whenever(nav.progress).thenReturn(progress)
         return nav
     }
 

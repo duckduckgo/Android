@@ -29,13 +29,16 @@ interface BookmarksDao {
     @Query("select * from bookmarks")
     fun bookmarks(): LiveData<List<BookmarkEntity>>
 
+    @Query("select count(*) from bookmarks WHERE url LIKE :url")
+    fun bookmarksCountByUrl(url: String): Int
+
     @Delete
     fun delete(bookmark: BookmarkEntity)
 
     @Update(onConflict = OnConflictStrategy.REPLACE)
     fun update(bookmarkEntity: BookmarkEntity)
 
-    @Query("select * from bookmarks WHERE title LIKE :query OR url LIKE :query ")
+    @Query("select * from bookmarks WHERE title LIKE :query OR url LIKE :query")
     fun bookmarksByQuery(query: String): Single<List<BookmarkEntity>>
 
     @Query("select CAST(COUNT(*) AS BIT) from bookmarks")
