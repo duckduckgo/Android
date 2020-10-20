@@ -24,7 +24,6 @@ import com.duckduckgo.app.cta.model.CtaId
 import com.duckduckgo.app.cta.model.DismissedCta
 import com.duckduckgo.app.cta.ui.HomePanelCta.*
 import com.duckduckgo.app.global.DispatcherProvider
-import com.duckduckgo.app.global.device.ContextDeviceInfo
 import com.duckduckgo.app.global.events.db.UserEventKey
 import com.duckduckgo.app.global.events.db.UserEventsStore
 import com.duckduckgo.app.global.install.AppInstallStore
@@ -236,7 +235,7 @@ class CtaViewModel @Inject constructor(
     private fun surveyCta(): HomePanelCta.Survey? {
         val survey = activeSurvey
 
-        if(survey == null || survey.url == null) {
+        if (survey == null || survey.url == null) {
             return null
         }
 

@@ -23,7 +23,6 @@ import androidx.lifecycle.Observer
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.browser.BuildConfig
 import com.duckduckgo.app.global.install.AppInstallStore
-import com.duckduckgo.app.runBlocking
 import com.duckduckgo.app.statistics.model.Atb
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.app.survey.db.SurveyDao
