@@ -110,6 +110,9 @@ class BrowserWebViewClient(
                         webView.loadUrl(newUri.toString())
                         return true
                     }
+                    if (isForMainFrame) {
+                        webViewClientListener?.willOverrideUrl(url.toString())
+                    }
                     false
                 }
             }

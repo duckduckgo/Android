@@ -33,6 +33,7 @@ import com.duckduckgo.app.global.install.daysInstalled
 import com.duckduckgo.app.global.view.*
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelValues.DAX_FIRE_DIALOG_CTA
 import com.duckduckgo.app.trackerdetection.model.Entity
 import kotlinx.android.synthetic.main.include_cta_buttons.view.*
 import kotlinx.android.synthetic.main.include_cta_content.view.*
@@ -314,8 +315,11 @@ sealed class DaxFireDialogCta(
     @StringRes open val description: Int,
     override val shownPixel: Pixel.PixelName?,
     override val okPixel: Pixel.PixelName?,
-    override val cancelPixel: Pixel.PixelName?
-) : Cta, ViewCta {
+    override val cancelPixel: Pixel.PixelName?,
+    override var ctaPixelParam: String,
+    override val onboardingStore: OnboardingStore,
+    override val appInstallStore: AppInstallStore
+) : Cta, ViewCta, DaxCta {
 
     override fun showCta(view: View) {
         val daxText = view.context.getString(description)
@@ -330,14 +334,17 @@ sealed class DaxFireDialogCta(
 
     override fun pixelOkParameters(): Map<String, String> = emptyMap()
 
-    override fun pixelShownParameters(): Map<String, String> = emptyMap()
+    override fun pixelShownParameters(): Map<String, String> = mapOf(Pixel.PixelParameter.CTA_SHOWN to addCtaToHistory(ctaPixelParam))
 
-    class TryClearDataCta : DaxFireDialogCta(
+    class TryClearDataCta(override val onboardingStore: OnboardingStore, override val appInstallStore: AppInstallStore) : DaxFireDialogCta(
         ctaId = CtaId.DAX_FIRE_BUTTON,
         description = R.string.daxClearDataCtaText,
         shownPixel = Pixel.PixelName.ONBOARDING_DAX_CTA_SHOWN,
         okPixel = null,
-        cancelPixel = null
+        cancelPixel = null,
+        ctaPixelParam = DAX_FIRE_DIALOG_CTA,
+        onboardingStore = onboardingStore,
+        appInstallStore = appInstallStore
     )
 }
 

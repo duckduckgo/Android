@@ -74,13 +74,13 @@ import com.duckduckgo.app.global.useourapp.UseOurAppDetector
 import com.duckduckgo.app.global.useourapp.UseOurAppDetector.Companion.USE_OUR_APP_SHORTCUT_TITLE
 import com.duckduckgo.app.global.useourapp.UseOurAppDetector.Companion.USE_OUR_APP_SHORTCUT_URL
 import com.duckduckgo.app.global.view.asLocationPermissionOrigin
-import com.duckduckgo.app.notification.db.NotificationDao
-import com.duckduckgo.app.notification.model.UseOurAppNotification
 import com.duckduckgo.app.location.GeoLocationPermissions
 import com.duckduckgo.app.location.data.LocationPermissionType
 import com.duckduckgo.app.location.data.LocationPermissionsRepository
 import com.duckduckgo.app.location.ui.SiteLocationPermissionDialog
 import com.duckduckgo.app.location.ui.SystemLocationPermissionDialog
+import com.duckduckgo.app.notification.db.NotificationDao
+import com.duckduckgo.app.notification.model.UseOurAppNotification
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao
 import com.duckduckgo.app.privacy.db.UserWhitelistDao
 import com.duckduckgo.app.privacy.model.PrivacyGrade
@@ -100,10 +100,7 @@ import com.jakewharton.rxrelay2.PublishRelay
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
 import timber.log.Timber
 import java.io.File
 import java.util.*
@@ -306,7 +303,13 @@ class BrowserTabViewModel(
 
     private val autoCompletePublishSubject = PublishRelay.create<String>()
     private val fireproofWebsiteState: LiveData<List<FireproofWebsiteEntity>> = fireproofWebsiteRepository.getFireproofWebsites()
-    private val showPulseAnimation: LiveData<Boolean> = ctaViewModel.showFireButtonPulseAnimation.asLiveData(context = viewModelScope.coroutineContext)
+
+    @ExperimentalCoroutinesApi
+    @FlowPreview
+    private val showPulseAnimation: LiveData<Boolean> = ctaViewModel.showFireButtonPulseAnimation.asLiveData(
+        context = viewModelScope.coroutineContext
+    )
+
     private var autoCompleteDisposable: Disposable? = null
     private var site: Site? = null
     private lateinit var tabId: String
@@ -314,14 +317,35 @@ class BrowserTabViewModel(
     private var httpsUpgraded = false
     private val browserStateModifier = BrowserStateModifier()
     private var faviconPrefetchJob: Job? = null
+    private var deferredBlankSite: Job? = null
 
     private val fireproofWebsitesObserver = Observer<List<FireproofWebsiteEntity>> {
         browserViewState.value = currentBrowserViewState().copy(isFireproofWebsite = isFireproofWebsite())
     }
 
+    @ExperimentalCoroutinesApi
     private val fireButtonAnimation = Observer<Boolean> { shouldShowAnimation ->
+        Timber.i("shouldShowAnimation $shouldShowAnimation")
         if (currentBrowserViewState().fireButton is FireButton.Visible) {
             browserViewState.value = currentBrowserViewState().copy(fireButton = FireButton.Visible(pulseAnimation = shouldShowAnimation))
+        }
+
+        if (shouldShowAnimation) {
+            registerAndScheduleDismissAction()
+        }
+    }
+
+    @ExperimentalCoroutinesApi
+    private fun registerAndScheduleDismissAction() {
+        viewModelScope.launch(dispatchers.io()) {
+            val fireButtonHighlightedEvent = userEventsStore.getUserEvent(UserEventKey.FIRE_BUTTON_HIGHLIGHTED)
+            if (fireButtonHighlightedEvent == null) {
+                userEventsStore.registerUserEvent(UserEventKey.FIRE_BUTTON_HIGHLIGHTED)
+            }
+            val pulseElapsedTime = System.currentTimeMillis() - (fireButtonHighlightedEvent?.timestamp ?: System.currentTimeMillis())
+            val pulsePendingTime = ONE_HOUR_IN_MS - pulseElapsedTime
+            delay(pulsePendingTime)
+            ctaViewModel.dismissPulseAnimation()
         }
     }
 
@@ -538,6 +562,13 @@ class BrowserTabViewModel(
         }
     }
 
+    override fun willOverrideUrl(newUrl: String) {
+        val previousSiteStillLoading = currentLoadingViewState().isLoading
+        if (previousSiteStillLoading) {
+            showBlankContentfNewContentDelayed()
+        }
+    }
+
     override fun prefetchFavicon(url: String) {
         faviconPrefetchJob?.cancel()
         faviconPrefetchJob = viewModelScope.launch {
@@ -683,7 +714,29 @@ class BrowserTabViewModel(
             is UrlUpdated -> urlUpdated(stateChange.url)
             is PageNavigationCleared -> disableUserNavigation()
         }
+
+        if (newWebNavigationState.progress ?: 0 >= SHOW_CONTENT_MIN_PROGRESS) {
+            showWebContent()
+        }
         navigationAwareLoginDetector.onEvent(NavigationEvent.WebNavigationEvent(stateChange))
+    }
+
+    private fun showBlankContentfNewContentDelayed() {
+        Timber.i("Blank: cancel job $deferredBlankSite")
+        deferredBlankSite?.cancel()
+        deferredBlankSite = viewModelScope.launch {
+            delay(timeMillis = NEW_CONTENT_MAX_DELAY_MS)
+            withContext(dispatchers.main()) {
+                command.value = HideWebContent
+            }
+        }
+        Timber.i("Blank: schedule new blank $deferredBlankSite")
+    }
+
+    private fun showWebContent() {
+        Timber.i("Blank: onsite changed cancel $deferredBlankSite")
+        deferredBlankSite?.cancel()
+        command.value = ShowWebContent
     }
 
     private fun pageChanged(url: String, title: String?) {
@@ -1669,5 +1722,11 @@ class BrowserTabViewModel(
         private const val FIXED_PROGRESS = 50
         const val GPC_HEADER = "Sec-GPC"
         const val GPC_HEADER_VALUE = "1"
+
+        // Minimum progress to show web content again after decided to hide web content (possible spoofing attack).
+        // We think that progress is enough to assume next site has already loaded new content.
+        private const val SHOW_CONTENT_MIN_PROGRESS = 50
+        private const val NEW_CONTENT_MAX_DELAY_MS = 1000L
+        private const val ONE_HOUR_IN_MS = 3_600_000
     }
 }
