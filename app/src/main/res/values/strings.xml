@@ -37,7 +37,7 @@
     <!-- Downloading files -->
     <string name="downloadImage">Download Image</string>
     <string name="permissionRequiredToDownload">Downloading requires storage permission</string>
-    <string name="downloadComplete">Download complete.</string>
+    <string name="downloadComplete">Download complete</string>
     <string name="downloadFailed">Failed to download</string>
     <string name="downloadInProgress">Downloading</string>
 
@@ -177,7 +177,7 @@
     <!-- Broken Site Activity -->
     <string name="brokenSiteReportBrokenSiteMenuItem">Report Broken Site</string>
     <string name="brokenSiteHeading">Report Broken Site</string>
-    <string name="brokenSiteSubmitted">Thank you! Feedback submitted</string>
+    <string name="brokenSiteSubmitted">Thank you! Feedback submitted.</string>
     <string name="brokenSitesCategoriesTitle">Describe what happened</string>
     <string name="brokenSitesCategoriesHint">Describe what happened</string>
     <string name="brokenSiteSubmitButton">Send Report</string>
@@ -442,9 +442,9 @@
     <string name="whitelistEntryOverflowContentDescription">More options for unprotected site %s</string>
     <string name="whitelistEntryDeleteConfirmMessage">Are you sure you want to remove &lt;b>%s&lt;/b> from Unprotected Sites?</string>
     <string name="whitelistExplanation">These sites will not be enhanced by Privacy Protection.</string>
-    <string name="whitelistNoEntries">No Unprotected Sites Yet</string>
+    <string name="whitelistNoEntries">Privacy Protection enabled for all sites</string>
     <string name="whitelistDomainHint">www.example.com</string>
-    <string name="whitelistFormatError">Could not save, enter a domain like <b>example.com</b></string>
+    <string name="whitelistFormatError">Please enter a domain like <b>example.com</b> and try again</string>
 
     <!-- Settings -->
     <string name="settingsPrivacyProtectionWhitelist">Unprotected Sites</string>
@@ -453,10 +453,10 @@
     <string name="fireproofWebsitesActivityTitle">Fireproof Sites</string>
     <string name="settingsFireproofWebsites">Fireproof Sites</string>
     <string name="fireproofWebsiteMenuTitleAdd">Fireproof Site</string>
-    <string name="fireproofWebsiteSnackbarConfirmation">&lt;b>%s&lt;/b> is now fireproof! Visit Settings to learn more.</string>
+    <string name="fireproofWebsiteSnackbarConfirmation">&lt;b>%s&lt;/b> is now Fireproof! Visit Settings to manage.</string>
     <string name="fireproofWebsiteSnackbarAction">Undo</string>
     <string name="fireproofWebsiteDeleteConfirmMessage">Are you sure you want to delete &lt;b>%s&lt;/b>?</string>
-    <string name="fireproofWebsiteEmptyListHint">No websites Fireproofed yet</string>
+    <string name="fireproofWebsiteEmptyListHint">No Fireproof websites</string>
     <string name="fireproofWebsiteFeatureDescription">Websites rely on cookies to keep you signed in. When you Fireproof a site, cookies won\'t be erased and you\'ll stay signed in, even after using the Fire Button. We still block third-party trackers found on Fireproof websites.</string>
     <string name="fireproofWebsiteOverflowContentDescription">More options for fireproof website %s</string>
     <string name="fireproofWebsiteLoginDialogTitle">Would you like to Fireproof %s?</string>
