@@ -1515,8 +1515,12 @@ class BrowserTabViewModel(
     }
 
     fun onSurveyChanged(survey: Survey?) {
-        val activeSurvey = ctaViewModel.onSurveyChanged(survey)
-        if (activeSurvey != null) {
+        val surveyCleared = ctaViewModel.onSurveyChanged(survey)
+        if (surveyCleared) {
+            ctaViewState.value = currentCtaViewState().copy(cta = null)
+            return
+        }
+        if (survey != null) {
             viewModelScope.launch {
                 refreshCta()
             }

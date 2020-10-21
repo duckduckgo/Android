@@ -111,9 +111,10 @@ class CtaViewModel @Inject constructor(
         }
     }
 
-    fun onSurveyChanged(survey: Survey?): Survey? {
+    fun onSurveyChanged(survey: Survey?): Boolean {
+        val wasCleared = activeSurvey != null && survey == null
         activeSurvey = survey
-        return activeSurvey
+        return wasCleared
     }
 
     suspend fun hideTipsForever(cta: Cta) {

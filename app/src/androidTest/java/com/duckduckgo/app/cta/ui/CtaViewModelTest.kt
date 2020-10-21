@@ -180,16 +180,36 @@ class CtaViewModelTest {
     }
 
     @Test
-    fun whenScheduledSurveyChangesAndInstalledDaysMatchThenCtaIsSurvey() {
-        val survey = Survey("abc", "http://example.com", 1, SCHEDULED)
-        val value = testee.onSurveyChanged(Survey("abc", "http://example.com", 1, SCHEDULED))
-        assertEquals(survey, value)
+    fun whenScheduledSurveyChangesAndInstalledDaysMatchThenCtaIsSurvey() = coroutineRule.runBlocking {
+        testee.onSurveyChanged(Survey("abc", "http://example.com", 1, SCHEDULED))
+        val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = false, site = null)
+        assertTrue(value is HomePanelCta.Survey)
     }
 
     @Test
-    fun whenScheduledSurveyIsNullThenCtaIsNotSurvey() {
+    fun whenScheduledSurveyIsNullThenCtaIsNotSurvey() = coroutineRule.runBlocking {
+        val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = false, site = null)
+        assertFalse(value is HomePanelCta.Survey)
+    }
+
+    @Test
+    fun whenScheduledSurveyChangesFromNullToNullThenClearedIsFalse() {
         val value = testee.onSurveyChanged(null)
-        assertNull(value)
+        assertFalse(value)
+    }
+
+    @Test
+    fun whenScheduledSurveyChangesFromNullToASurveyThenClearedIsFalse() {
+        testee.onSurveyChanged(null)
+        val value = testee.onSurveyChanged(Survey("abc", "http://example.com", 1, SCHEDULED))
+        assertFalse(value)
+    }
+
+    @Test
+    fun whenScheduledSurveyChangesFromASurveyToNullThenClearedIsTrue() {
+        testee.onSurveyChanged(Survey("abc", "http://example.com", 1, SCHEDULED))
+        val value = testee.onSurveyChanged(null)
+        assertTrue(value)
     }
 
     @Test

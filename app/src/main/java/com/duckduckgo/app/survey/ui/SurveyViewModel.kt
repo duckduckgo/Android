@@ -29,6 +29,7 @@ import com.duckduckgo.app.global.install.daysInstalled
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.app.survey.db.SurveyDao
 import com.duckduckgo.app.survey.model.Survey
+import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -83,8 +84,8 @@ class SurveyViewModel(
 
     fun onSurveyCompleted() {
         survey.status = Survey.Status.DONE
-        viewModelScope.launch {
-            withContext(dispatchers.io()) {
+        viewModelScope.launch() {
+            withContext(dispatchers.io() + NonCancellable) {
                 surveyDao.update(survey)
             }
             withContext(dispatchers.main()) {
