@@ -92,7 +92,7 @@
 
     <string name="networksActivityTitle">Tracker Networks</string>
     <string name="networksContentDescription">Tracker Networks</string>
-    <string name="networksOverview">Tracker networks aggregate your web history into a data profile about you. Major tracker networks are more harmful because they can track and target you across more of the internet.</string>
+    <string name="networksOverview">Tracker networks aggregate your web history into a data profile about you. Major tracker networks are more harmful because they can track and target you across more of the Internet.</string>
 
     <plurals name="trackersFound">
         <item quantity="one">%s Tracker Found</item>
@@ -236,11 +236,11 @@
     <string name="addWidgetCtaDismissButton">Dismiss</string>
     <string name="addWidgetInstructionsActivityTitle">Add widget</string>
     <string name="addWidgetInstruction1Label">1</string>
-    <string name="addWidgetInstruction1">Long press your home screen then open the widgets menu</string>
+    <string name="addWidgetInstruction1">Long-press your home screen, then open the widgets menu.</string>
     <string name="addWidgetInstruction2Label">2</string>
-    <string name="addWidgetInstruction2">Find the DuckDuckGo widget</string>
+    <string name="addWidgetInstruction2">Find the DuckDuckGo widget.</string>
     <string name="addWidgetInstruction3Label">3</string>
-    <string name="addWidgetInstruction3">Drag the widget to your home screen</string>
+    <string name="addWidgetInstruction3">Drag the widget to your home screen.</string>
     <string name="addWidgetInstructionsButtonGoHome">Go to Home Screen</string>
     <string name="addWidgetInstructionsButtonClose">Close</string>
 
@@ -256,7 +256,7 @@
     <string name="rateAppDialogNegativeButton" translatable="false">@string/noThanks</string>
 
     <string name="giveFeedbackDialogTitle">We\'re Sorry To Hear That</string>
-    <string name="giveFeedbackDialogMessage">Let us know how we can improve the app for you</string>
+    <string name="giveFeedbackDialogMessage">Let us know how we can improve the app for you.</string>
     <string name="giveFeedbackDialogPositiveButton">Share Feedback</string>
     <string name="giveFeedbackDialogNegativeButton" translatable="false">@string/noThanks</string>
 
