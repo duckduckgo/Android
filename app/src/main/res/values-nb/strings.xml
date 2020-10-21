@@ -183,7 +183,7 @@
     <!-- About Activity -->
     <string name="aboutActivityTitle">Om oss</string>
     <string name="aboutDescription">
-        Hos DucDuckGo setter vi den nye standarden for pålitelighet på nettet.\n\\ DuckDuckGos private nettleser gir deg alle de grunnleggende personvernfunksjonene du trenger for å beskytte deg selv mens du søker og surfer på nettet, inkludert sporingsblokkering, smartere kryptering og DuckDuckGos private søk.\n\\ Når det kommer til stykket, burde det ikke være så guffent å bruke Internett. Det skal ikke være vanskeligere å få det personvernet du fortjener på nett enn å velge gardiner.</string>
+        Hos DucDuckGo setter vi den nye standarden for pålitelighet på nettet.\n\n DuckDuckGos private nettleser gir deg alle de grunnleggende personvernfunksjonene du trenger for å beskytte deg selv mens du søker og surfer på nettet, inkludert sporingsblokkering, smartere kryptering og DuckDuckGos private søk.\n\n Når det kommer til stykket, burde det ikke være så guffent å bruke Internett. Det skal ikke være vanskeligere å få det personvernet du fortjener på nett enn å velge gardiner.</string>
     <string name="aboutMoreLink">Mer på duckduckgo.com/about</string>
     <string name="no_suggestions">Ingen forslag</string>
 

@@ -183,7 +183,7 @@
     <!-- About Activity -->
     <string name="aboutActivityTitle">Hakkımızda</string>
     <string name="aboutDescription">
-        DuckDuckGo\'da, yeni çevrimiçi güven standardını belirliyoruz.\n\\ DuckDuckGo Gizlilik Tarayıcısı, izleyici engelleme, akıllı şifreleme ve DuckDuckGo özel araması da dahil olmak üzere web\'de arama ve göz atma sırasında kendinizi korumak için ihtiyacınız olan tüm gizlilik özelliklerini sağlar.\n\\ Sonuçta, internet sizi korkutmamalı ve çevrimiçiyken hak ettiğiniz gizliliği elde etmek, panjurları kapatmak kadar basit olmalı.</string>
+        DuckDuckGo\'da, yeni çevrimiçi güven standardını belirliyoruz.\n\n DuckDuckGo Gizlilik Tarayıcısı, izleyici engelleme, akıllı şifreleme ve DuckDuckGo özel araması da dahil olmak üzere web\'de arama ve göz atma sırasında kendinizi korumak için ihtiyacınız olan tüm gizlilik özelliklerini sağlar.\n\n Sonuçta, internet sizi korkutmamalı ve çevrimiçiyken hak ettiğiniz gizliliği elde etmek, panjurları kapatmak kadar basit olmalı.</string>
     <string name="aboutMoreLink">Duckduckgo.com/about adresinde daha fazla bilgi edinin</string>
     <string name="no_suggestions">Öneri yok</string>
 

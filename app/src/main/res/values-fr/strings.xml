@@ -183,7 +183,7 @@
     <!-- About Activity -->
     <string name="aboutActivityTitle">À propos de nous</string>
     <string name="aboutDescription">
-        Chez DuckDuckGo, nous établissons la nouvelle norme de confiance en ligne. \n\\ Le navigateur de confidentialité DuckDuckGo fournit tous les éléments de confidentialité essentiels dont vous avez besoin pour vous protéger lorsque vous faites des recherches et naviguez sur le Web, notamment le blocage des trackers, le chiffrement plus intelligent et la recherche privée DuckDuckGo.\n\\ Après tout, Internet ne devrait pas être aussi effrayant, et obtenir la confidentialité que vous méritez en ligne devrait être aussi simple que de fermer les stores.</string>
+        Chez DuckDuckGo, nous établissons la nouvelle norme de confiance en ligne. \n\n Le navigateur de confidentialité DuckDuckGo fournit tous les éléments de confidentialité essentiels dont vous avez besoin pour vous protéger lorsque vous faites des recherches et naviguez sur le Web, notamment le blocage des trackers, le chiffrement plus intelligent et la recherche privée DuckDuckGo.\n\n Après tout, Internet ne devrait pas être aussi effrayant, et obtenir la confidentialité que vous méritez en ligne devrait être aussi simple que de fermer les stores.</string>
     <string name="aboutMoreLink">Pour en savoir plus, visitez duckduckgo.com/about</string>
     <string name="no_suggestions">Aucune suggestion</string>
 

@@ -191,7 +191,7 @@
     <!-- About Activity -->
     <string name="aboutActivityTitle">O nás</string>
     <string name="aboutDescription">
-        V DuckDuckGo nastavujeme nový štandard dôvery online.\n\\ DuckDuckGo, prehliadač s dôrazom na súkromie, ponúka všetky dôležité základné prvky ochrany súkromia na ochranu pri vyhľadávaní a prehliadaní webu, vrátane blokovania sledovacích zariadení, inteligentnejšieho šifrovania a súkromného vyhľadávania DuckDuckGo.\n\\ Pri používaní internetu by sme predsa nemali mať zlý pocit a dopriať si zaslúžené online súkromie by nemalo byť o nič ťažšie ako jednoduché zatiahnutie rolety.</string>
+        V DuckDuckGo nastavujeme nový štandard dôvery online.\n\n DuckDuckGo, prehliadač s dôrazom na súkromie, ponúka všetky dôležité základné prvky ochrany súkromia na ochranu pri vyhľadávaní a prehliadaní webu, vrátane blokovania sledovacích zariadení, inteligentnejšieho šifrovania a súkromného vyhľadávania DuckDuckGo.\n\n Pri používaní internetu by sme predsa nemali mať zlý pocit a dopriať si zaslúžené online súkromie by nemalo byť o nič ťažšie ako jednoduché zatiahnutie rolety.</string>
     <string name="aboutMoreLink">Viac informácií na stránke duckduckgo.com/about</string>
     <string name="no_suggestions">Žiadne návrhy</string>
 

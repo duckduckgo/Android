@@ -191,7 +191,7 @@
     <!-- About Activity -->
     <string name="aboutActivityTitle">O nama</string>
     <string name="aboutDescription">
-        U DuckDuckGo postavljamo novi standard povjerenja na mreži.\n\\ DuckDuckGo anonimni preglednik pruža sve što vam je potrebno da se zaštitite dok pretražujete i pregledavate internet, uključujući blokiranje alata za praćenje, pametnije šifriranje i privatno pretraživanje DuckDuckGo.\n\\ Uostalom, internet ne bi trebao biti jezivo mjesto, a dobivanje privatnosti koju zaslužujete na internetu trebalo bi biti jednostavno poput spuštanja roleta.</string>
+        U DuckDuckGo postavljamo novi standard povjerenja na mreži.\n\n DuckDuckGo anonimni preglednik pruža sve što vam je potrebno da se zaštitite dok pretražujete i pregledavate internet, uključujući blokiranje alata za praćenje, pametnije šifriranje i privatno pretraživanje DuckDuckGo.\n\n Uostalom, internet ne bi trebao biti jezivo mjesto, a dobivanje privatnosti koju zaslužujete na internetu trebalo bi biti jednostavno poput spuštanja roleta.</string>
     <string name="aboutMoreLink">Više na duckduckgo.com/about</string>
     <string name="no_suggestions">Nema prijedloga</string>
 

@@ -191,7 +191,7 @@
     <!-- About Activity -->
     <string name="aboutActivityTitle">O nas</string>
     <string name="aboutDescription">
-        Pri DuckDuckGo vzpostavljamo nov standard zaupanja na spletu.\n\\ Zasebni brskalnik DuckDuckGo zagotavlja vse bistvene sestavine zasebnosti, ki jih potrebujete za svojo zaščito, kadar iščete in brskate po spletu, vključno z blokiranjem sledilnikov, pametnejšim šifriranjem in zasebnim iskanjem DuckDuckGo.\n\\ Navsezadnje nam internet ne bi smel vzbujati strahu. Doseganje zasebnosti na spletu, ki si jo zaslužimo, bi moralo biti tako preprosto kot zagrinjanje zaves.</string>
+        Pri DuckDuckGo vzpostavljamo nov standard zaupanja na spletu.\n\n Zasebni brskalnik DuckDuckGo zagotavlja vse bistvene sestavine zasebnosti, ki jih potrebujete za svojo zaščito, kadar iščete in brskate po spletu, vključno z blokiranjem sledilnikov, pametnejšim šifriranjem in zasebnim iskanjem DuckDuckGo.\n\n Navsezadnje nam internet ne bi smel vzbujati strahu. Doseganje zasebnosti na spletu, ki si jo zaslužimo, bi moralo biti tako preprosto kot zagrinjanje zaves.</string>
     <string name="aboutMoreLink">Več na duckduckgo.com/about</string>
     <string name="no_suggestions">Ni predlogov</string>
 

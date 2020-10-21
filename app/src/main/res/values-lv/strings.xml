@@ -187,7 +187,7 @@
     <!-- About Activity -->
     <string name="aboutActivityTitle">Par mums</string>
     <string name="aboutDescription">
-        Vietnē DuckDuckGo mēs veidojam jauno tiešsaistes uzticēšanās standartu.\n\\ DuckDuckGo konfidencialitātes pārlūks nodrošina visu nepieciešamo privātumu, lai aizsargātu sevi, meklējot un pārlūkojot tīmekli, ieskaitot izsekotāju bloķēšanu, viedāku šifrēšanu un DuckDuckGo privāto meklēšanu.\n\\ Galu galā internetam nevajadzētu iedvest bailes, un jūsu godam nopelnītā tiešsaistes privātuma iegūšanai vajadzētu būt tikpat vienkāršai kā žalūziju aizvēršanai.</string>
+        Vietnē DuckDuckGo mēs veidojam jauno tiešsaistes uzticēšanās standartu.\n\n DuckDuckGo konfidencialitātes pārlūks nodrošina visu nepieciešamo privātumu, lai aizsargātu sevi, meklējot un pārlūkojot tīmekli, ieskaitot izsekotāju bloķēšanu, viedāku šifrēšanu un DuckDuckGo privāto meklēšanu.\n\n Galu galā internetam nevajadzētu iedvest bailes, un jūsu godam nopelnītā tiešsaistes privātuma iegūšanai vajadzētu būt tikpat vienkāršai kā žalūziju aizvēršanai.</string>
     <string name="aboutMoreLink">Vairāk vietnē duckduckgo.com/about</string>
     <string name="no_suggestions">Nav ieteikumu</string>
 

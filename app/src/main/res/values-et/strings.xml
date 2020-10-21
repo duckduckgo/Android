@@ -183,7 +183,7 @@
     <!-- About Activity -->
     <string name="aboutActivityTitle">Meist</string>
     <string name="aboutDescription">
-        DuckDuckGo on uus standard veebi usaldusväärsusele.\n\\ DuckDuckGo privaatsusbrauser pakub kõiki privaatsuse põhifunktsioone, mida peate enda kaitsmiseks veebist otsides ja sirvides kasutama, sealhulgas jälgijate blokeerimist, nutikamat krüptimist ja DuckDuckGo privaatset otsingut.\n\\ Lõppude lõpuks ei tohiks Internet nii jube olla ja Internetis väärilise privaatsuse saamine peaks olema sama lihtne kui ruloo alla tõmbamine.</string>
+        DuckDuckGo on uus standard veebi usaldusväärsusele.\n\n DuckDuckGo privaatsusbrauser pakub kõiki privaatsuse põhifunktsioone, mida peate enda kaitsmiseks veebist otsides ja sirvides kasutama, sealhulgas jälgijate blokeerimist, nutikamat krüptimist ja DuckDuckGo privaatset otsingut.\n\n Lõppude lõpuks ei tohiks Internet nii jube olla ja Internetis väärilise privaatsuse saamine peaks olema sama lihtne kui ruloo alla tõmbamine.</string>
     <string name="aboutMoreLink">Lisateave: duckduckgo.com/about</string>
     <string name="no_suggestions">Ettepanekud puuduvad</string>
 

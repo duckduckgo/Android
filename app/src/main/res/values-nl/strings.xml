@@ -183,7 +183,7 @@
     <!-- About Activity -->
     <string name="aboutActivityTitle">Over ons</string>
     <string name="aboutDescription">
-        Bij DuckDuckGo zetten we de nieuwe standaard voor vertrouwen online.\n\\ DuckDuckGo Privacy Browser biedt alle privacy-essentials die je nodig hebt om jezelf te beschermen tijdens het zoeken en browsen op het internet, inclusief trackerblokkering, slimmere codering en DuckDuckGo privé-zoekopdrachten.\n\\ Het internet zou namelijk helemaal niet zo griezelig moeten zijn en de privacy die je online verdient, moet net zo eenvoudig zijn als het sluiten van de gordijnen.</string>
+        Bij DuckDuckGo zetten we de nieuwe standaard voor vertrouwen online.\n\n DuckDuckGo Privacy Browser biedt alle privacy-essentials die je nodig hebt om jezelf te beschermen tijdens het zoeken en browsen op het internet, inclusief trackerblokkering, slimmere codering en DuckDuckGo privé-zoekopdrachten.\n\n Het internet zou namelijk helemaal niet zo griezelig moeten zijn en de privacy die je online verdient, moet net zo eenvoudig zijn als het sluiten van de gordijnen.</string>
     <string name="aboutMoreLink">Meer informatie op duckduckgo.com/about</string>
     <string name="no_suggestions">Geen suggesties</string>
 

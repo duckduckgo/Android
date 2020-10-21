@@ -183,7 +183,7 @@
     <!-- About Activity -->
     <string name="aboutActivityTitle">Om oss</string>
     <string name="aboutDescription">
-        På DuckDuckGo höjer vi kraven för förtroende online.\n\\ DuckDuckGo Privacy Browser tillhandahåller alla nödvändiga sekretessvillkor som du behöver för att skydda dig själv när du söker och surfar på nätet, inklusive blockering av spårare, smartare kryptering och DuckDuckGo privat sökning.\n\\ Internet borde ju trots allt inte kännas obehagligt och att få den sekretess du förtjänar online bör vara lika enkelt som att stänga persiennerna.</string>
+        På DuckDuckGo höjer vi kraven för förtroende online.\n\n DuckDuckGo Privacy Browser tillhandahåller alla nödvändiga sekretessvillkor som du behöver för att skydda dig själv när du söker och surfar på nätet, inklusive blockering av spårare, smartare kryptering och DuckDuckGo privat sökning.\n\n Internet borde ju trots allt inte kännas obehagligt och att få den sekretess du förtjänar online bör vara lika enkelt som att stänga persiennerna.</string>
     <string name="aboutMoreLink">Mer på duckduckgo.com/about</string>
     <string name="no_suggestions">Inga förslag</string>
 
