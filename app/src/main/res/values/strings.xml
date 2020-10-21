@@ -87,7 +87,7 @@
     <string name="privacyGradeContentDescription">Privacy Grade</string>
 
     <string name="httpsGood">Encrypted Connection</string>
-    <string name="httpsMixed">Mixed Encryption connection</string>
+    <string name="httpsMixed">Mixed Encryption Connection</string>
     <string name="httpsBad">Unencrypted Connection</string>
 
     <string name="networksActivityTitle">Tracker Networks</string>
@@ -115,7 +115,7 @@
     </plurals>
 
     <string name="scorecardActivityTitle">Privacy Grade</string>
-    <string name="scorecardSiteIsMemberOfMajorNetwork">Site is Major Tracker Network</string>
+    <string name="scorecardSiteIsMemberOfMajorNetwork">Site Is a Major Tracker Network</string>
     <string name="scorecardPrivacyGrade">Privacy Grade</string>
     <string name="scorecardEnhancedGrade">Enhanced Grade</string>
 
@@ -263,8 +263,8 @@
     <string name="noThanks">No Thanks</string>
 
     <!-- Notification Channel Names -->
-    <string name="notificationChannelFileDownloading">File Downloading</string>
-    <string name="notificationChannelFileDownloaded">File Downloaded</string>
+    <string name="notificationChannelFileDownloading">File downloading</string>
+    <string name="notificationChannelFileDownloaded">File downloaded</string>
     <string name="notificationChannelTutorials">Tutorials</string>
 
     <!-- Clear Notification -->
