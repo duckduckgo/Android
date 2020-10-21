@@ -431,6 +431,7 @@
     <!-- Dialogs -->
     <string name="dialogAddTitle">Add</string>
     <string name="dialogEditTitle">Edit</string>
+    <string name="dialogSaveAction">Save</string>
 
     <!-- Whitelist -->
     <string name="whitelisetActivityTitle">Unprotected Sites</string>
