@@ -59,7 +59,7 @@
 
     <!-- Opening external apps -->
     <string name="openExternalApp">Open External App</string>
-    <string name="launchingExternalApp">Open in Another App</string>
+    <string name="launchingExternalApp">Open in another app</string>
     <string name="confirmOpenExternalApp">Would you like to leave DuckDuckGo to view this content?</string>
     <string name="unableToOpenLink">Unable to open this type of link</string>
 
@@ -69,8 +69,8 @@
     <string name="tabsMenuItem">Tabs</string>
     <string name="newTabMenuItem">New Tab</string>
     <string name="openInNewTab">Open in New Tab</string>
-    <string name="openInNewBackgroundTab">Open In Background Tab</string>
-    <string name="openImageInNewTab">Open Image In Background Tab</string>
+    <string name="openInNewBackgroundTab">Open in Background Tab</string>
+    <string name="openImageInNewTab">Open Image in Background Tab</string>
     <string name="faviconContentDescription">Favicon</string>
     <string name="closeContentDescription">Close</string>
     <string name="closeAllTabsMenuItem">Close All Tabs</string>
@@ -132,7 +132,7 @@
 
     <!-- Fire -->
     <string name="fireMenu">Clear Data</string>
-    <string name="fireClearAll">Clear All Tabs and Data</string>
+    <string name="fireClearAll">Clear all tabs and data</string>
     <string name="fireCancel">Cancel</string>
     <string name="fireDataCleared">Data cleared</string>
 
@@ -198,7 +198,7 @@
     <string name="bookmarkAddedFeedback">Bookmark added</string>
     <string name="bookmarkTitleHint">Bookmark title</string>
     <string name="bookmarkUrlHint">Bookmark URL</string>
-    <string name="bookmarkTitleEdit">Edit Bookmark</string>
+    <string name="bookmarkTitleEdit">Edit bookmark</string>
     <string name="noBookmarks">No bookmarks added yet</string>
     <string name="bookmarkOverflowContentDescription">More options for bookmark %s</string>
     <string name="bookmarkEdited">Bookmark added</string>
@@ -279,7 +279,7 @@
     <string name="privacyProtectionNotificationLaunchButton">Resume Browsing</string>
     
     <!-- Authentication -->
-    <string name="authenticationDialogTitle">Sign In</string>
+    <string name="authenticationDialogTitle">Sign in</string>
     <string name="authenticationDialogMessage">%s requires a username and password.</string>
     <string name="authenticationDialogPositiveButton">Sign In</string>
     <string name="authenticationDialogNegativeButton">Cancel</string>
@@ -421,7 +421,7 @@
     <string name="changeIconCtaLabel">App Icon</string>
     <string name="changeIconCtaAccept">Apply</string>
     <string name="changeIconCtaCancel">Cancel</string>
-    <string name="changeIconDialogTitle">Apply New Icon?</string>
+    <string name="changeIconDialogTitle">Apply new icon?</string>
     <string name="changeIconDialogMessage">The app may close to apply changes. Come on back after you\'ve admired your handsome new icon.</string>
 
     <!-- New dashboard / menu buttons -->
