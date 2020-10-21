@@ -246,7 +246,7 @@
 
     <!-- App Enjoyment / Rating / Feedback -->
     <string name="appEnjoymentDialogTitle">Enjoying DuckDuckGo?</string>
-    <string name="appEnjoymentDialogMessage">We\'d love to know what you think</string>
+    <string name="appEnjoymentDialogMessage">We\'d love to know what you think.</string>
     <string name="appEnjoymentDialogPositiveButton">I like it</string>
     <string name="appEnjoymentDialogNegativeButton">It needs work</string>
 
@@ -440,7 +440,7 @@
     <string name="enablePrivacyProtection">Enable Privacy Protection</string>
     <string name="disablePrivacyProtection">Disable Privacy Protection</string>
     <string name="whitelistEntryOverflowContentDescription">More options for unprotected site %s</string>
-    <string name="whitelistEntryDeleteConfirmMessage">Are you sure you want to remove &lt;b>%s&lt;/b> from unprotected sites?</string>
+    <string name="whitelistEntryDeleteConfirmMessage">Are you sure you want to remove &lt;b>%s&lt;/b> from Unprotected Sites?</string>
     <string name="whitelistExplanation">These sites will not be enhanced by Privacy Protection.</string>
     <string name="whitelistNoEntries">No Unprotected Sites Yet</string>
     <string name="whitelistDomainHint">www.example.com</string>
