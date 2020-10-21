@@ -199,7 +199,7 @@
         <item name="layout_constraintWidth_max">400dp</item>
         <item name="layout_constraintWidth_percent">0.8</item>
         <item name="android:background">@drawable/onboarding_secondary_cta_button_rounded_bg</item>
-        <item name="android:textAllCaps">false</item>
+        <item name="android:textAllCaps">true</item>
     </style>
 
     <style name="AlertDialogTheme" parent="Theme.AppCompat.Light.Dialog.Alert">
