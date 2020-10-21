@@ -125,7 +125,7 @@
     <string name="practicesBad">Poor Privacy Practices</string>
     <string name="practicesUnknown">Unknown Privacy Practices</string>
     <string name="practicesOverview">Privacy practices indicate how much the personal information that you share with a website is protected.</string>
-    <string name="practicesTosdrLink">Privacy Practices results from&#160;<b><u>ToS;DR</u></b></string>
+    <string name="practicesTosdrLink">Privacy Practices from&#160;<b><u>ToS;DR</u></b>.</string>
     <string name="practicesIconContentGood">Good Practice Icon</string>
     <string name="practicesIconContentBad">Bad Practice Icon</string>
 
@@ -373,9 +373,9 @@
     <string name="systemSearchAppNotFound">Application could not be found</string>
     <string name="systemSearchOnboardingText">Thanks for choosing DuckDuckGo!\nNow, when using our search or app, your searches are protected.</string>
     <string name="systemSearchOnboardingFeaturesIntroText">The DuckDuckGo app also:</string>
-    <string name="systemSearchOnboardingFeatureOneText">Blocks unsafe trackers</string>
-    <string name="systemSearchOnboardingFeatureTwoText">Forces encryption on websites</string>
-    <string name="systemSearchOnboardingFeatureThreeText">Clears data with one tap</string>
+    <string name="systemSearchOnboardingFeatureOneText">Blocks unsafe trackers.</string>
+    <string name="systemSearchOnboardingFeatureTwoText">Forces encryption on websites.</string>
+    <string name="systemSearchOnboardingFeatureThreeText">Clears data with one tap.</string>
     <string name="systemSearchOnboardingButtonMore">Show more</string>
     <string name="systemSearchOnboardingButtonLess">Hide</string>
     <string name="systemSearchOnboardingButtonOk">Got it</string>
