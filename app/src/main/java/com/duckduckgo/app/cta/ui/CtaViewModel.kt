@@ -182,8 +182,8 @@ class CtaViewModel @Inject constructor(
         }
     }
 
-    suspend fun refreshCta(dispatcher: CoroutineContext, isBrowserShowing: Boolean, site: Site? = null): Cta? {
-        surveyCta()?.let {
+    suspend fun refreshCta(dispatcher: CoroutineContext, isBrowserShowing: Boolean, site: Site? = null, locale: Locale = Locale.getDefault()): Cta? {
+        surveyCta(locale)?.let {
             return it
         }
 
@@ -233,14 +233,14 @@ class CtaViewModel @Inject constructor(
         }
     }
 
-    private fun surveyCta(): HomePanelCta.Survey? {
+    private fun surveyCta(locale: Locale): HomePanelCta.Survey? {
         val survey = activeSurvey
 
         if (survey == null || survey.url == null) {
             return null
         }
 
-        if (Locale.getDefault() != Locale.US) {
+        if (locale != Locale.US) {
             return null
         }
 

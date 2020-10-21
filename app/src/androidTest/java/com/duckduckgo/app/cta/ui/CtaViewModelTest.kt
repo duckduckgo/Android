@@ -68,6 +68,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations
+import java.util.*
 import java.util.concurrent.TimeUnit
 
 @FlowPreview
@@ -145,7 +146,6 @@ class CtaViewModelTest {
     @Before
     fun before() {
         MockitoAnnotations.initMocks(this)
-
         val context = InstrumentationRegistry.getInstrumentation().targetContext
         db = Room.inMemoryDatabaseBuilder(context, AppDatabase::class.java)
             .allowMainThreadQueries()
@@ -180,15 +180,22 @@ class CtaViewModelTest {
     }
 
     @Test
-    fun whenScheduledSurveyChangesAndInstalledDaysMatchThenCtaIsSurvey() = coroutineRule.runBlocking {
+    fun whenScheduledSurveyChangesAndInstalledDaysMatchAndLocleIsUsThenCtaIsSurvey() = coroutineRule.runBlocking {
         testee.onSurveyChanged(Survey("abc", "http://example.com", 1, SCHEDULED))
-        val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = false, site = null)
+        val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = false, site = null, locale = Locale.US)
         assertTrue(value is HomePanelCta.Survey)
     }
 
     @Test
+    fun whenScheduledSurveyChangesAndInstalledDaysMatchButLocleIsNotUsThenCtaIsNotSurvey() = coroutineRule.runBlocking {
+        testee.onSurveyChanged(Survey("abc", "http://example.com", 1, SCHEDULED))
+        val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = false, site = null, locale = Locale.CANADA)
+        assertFalse(value is HomePanelCta.Survey)
+    }
+
+    @Test
     fun whenScheduledSurveyIsNullThenCtaIsNotSurvey() = coroutineRule.runBlocking {
-        val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = false, site = null)
+        val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = false, site = null, locale = Locale.US)
         assertFalse(value is HomePanelCta.Survey)
     }
 

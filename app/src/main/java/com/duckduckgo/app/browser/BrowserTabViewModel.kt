@@ -1514,7 +1514,7 @@ class BrowserTabViewModel(
         command.value = LaunchNewTab
     }
 
-    fun onSurveyChanged(survey: Survey?) {
+    fun onSurveyChanged(survey: Survey?, locale: Locale = Locale.getDefault()) {
         val surveyCleared = ctaViewModel.onSurveyChanged(survey)
         if (surveyCleared) {
             ctaViewState.value = currentCtaViewState().copy(cta = null)
@@ -1522,7 +1522,7 @@ class BrowserTabViewModel(
         }
         if (survey != null) {
             viewModelScope.launch {
-                refreshCta()
+                refreshCta(locale)
             }
         }
     }
@@ -1536,10 +1536,10 @@ class BrowserTabViewModel(
         ctaViewModel.onCtaShown(cta)
     }
 
-    suspend fun refreshCta(): Cta? {
+    suspend fun refreshCta(locale: Locale = Locale.getDefault()): Cta? {
         if (currentGlobalLayoutState() is Browser) {
             val cta = withContext(dispatchers.io()) {
-                ctaViewModel.refreshCta(dispatchers.io(), currentBrowserViewState().browserShowing, siteLiveData.value)
+                ctaViewModel.refreshCta(dispatchers.io(), currentBrowserViewState().browserShowing, siteLiveData.value, locale)
             }
             ctaViewState.value = currentCtaViewState().copy(cta = cta)
             return cta
