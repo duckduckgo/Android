@@ -1,5 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2020 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
 <resources xmlns:tools="http://schemas.android.com/tools">
 
+    <string name="appName" translatable="false">DuckDuckGo</string>
+    <string name="appDescription" translatable="false">DuckDuckGo </string>
     <string name="duckDuckGoLogoDescription">Logoul DuckDuckGo</string>
     <string name="duckDuckGoPrivacySimplified">Despre confidențialitate, pe scurt.</string>
     <string name="yes">Da</string>
@@ -49,6 +68,7 @@
     <string name="previousSearchTermDescription">Găsirea rezultatului anterior</string>
     <string name="closeFindInPageButtonDescription">Închideți vizualizarea „găsire în pagină”</string>
     <string name="findInPageHint">Găsire în pagină</string>
+    <string name="findInPageMatches" translatable="false">%d/%d</string>
 
     <!-- AutoComplete Suggestions -->
     <string name="editQueryBeforeSubmitting">Editare interogare înainte de căutare</string>
@@ -61,6 +81,7 @@
     <string name="unableToOpenLink">Imposibil de deschis acest tip de link</string>
 
     <!-- Tabs -->
+    <string name="homeTab" translatable="false">DuckDuckGo</string>
     <string name="tabActivityTitle">File</string>
     <string name="tabsMenuItem">File</string>
     <string name="newTabMenuItem">Filă nouă</string>
@@ -166,9 +187,7 @@
     <!-- About Activity -->
     <string name="aboutActivityTitle">Despre noi</string>
     <string name="aboutDescription">
-        Aici, la DuckDuckGo, stabilim noul standard de încredere online.\n\
-        DuckDuckGo Privacy Browser oferă toate elementele esențiale de confidențialitate de care aveți nevoie pentru a vă proteja în timp ce căutați și navigați pe web, inclusiv blocarea cookie-urilor de urmărire, criptare mai inteligentă și căutare privată DuckDuckGo.\n\
-        La urma urmei, internetul nu ar trebui să fie perceput atât de ciudat, iar obținerea confidențialității pe care o meritați online ar trebui să fie la fel de simplă ca a trage perdeaua.</string>
+        Aici, la DuckDuckGo, stabilim noul standard de încredere online.\n\\ DuckDuckGo Privacy Browser oferă toate elementele esențiale de confidențialitate de care aveți nevoie pentru a vă proteja în timp ce căutați și navigați pe web, inclusiv blocarea cookie-urilor de urmărire, criptare mai inteligentă și căutare privată DuckDuckGo.\n\\ La urma urmei, internetul nu ar trebui să fie perceput atât de ciudat, iar obținerea confidențialității pe care o meritați online ar trebui să fie la fel de simplă ca a trage perdeaua.</string>
     <string name="aboutMoreLink">Aflați mai multe la duckduckgo.com/about</string>
     <string name="no_suggestions">Fără sugestii</string>
 
@@ -251,10 +270,12 @@
     <string name="rateAppDialogTitle">Evaluați aplicația</string>
     <string name="rateAppDialogMessage">Feedback-ul dvs. contează. Vă rugăm să vă partajați preferința printr-o recenzie.</string>
     <string name="rateAppDialogPositiveButton">Evaluați aplicația</string>
+    <string name="rateAppDialogNegativeButton" translatable="false">@string/noThanks</string>
 
     <string name="giveFeedbackDialogTitle">Ne pare rău să auzim aceasta</string>
     <string name="giveFeedbackDialogMessage">Spuneți-ne cum putem îmbunătăți aplicația pentru dvs.</string>
     <string name="giveFeedbackDialogPositiveButton">Trimiteți feedback</string>
+    <string name="giveFeedbackDialogNegativeButton" translatable="false">@string/noThanks</string>
 
     <string name="noThanks">Nu, mulțumesc</string>
 
@@ -470,4 +491,43 @@
     <string name="downloadManagerDisabled">Managerul descărcărilor este dezactivat</string>
     <string name="downloadManagerIncompatible">Managerul descărcărilor nu este disponibil pe acest dispozitiv</string>
     <string name="enable">Activare</string>
+
+    <!--Fire button education-->
+    <string name="daxClearDataCtaText">Acum atinge mai jos pentru a șterge istoricul de navigare. Încearcă! 👇</string>
+
+    <!-- Precise Location -->
+    <string name="preciseLocationSystemDialogTitle">Activezi locația dispozitivului pentru browserul de confidențialitate DuckDuckGo?</string>
+    <string name="preciseLocationSystemDialogSubtitle">%1$s solicită locația dispozitivului tău. Mai întâi va trebui să permiți aplicației să trimită locația dispozitivului, apoi %2$s poate cere permisiunea.</string>
+    <string name="preciseLocationSystemDialogAllow">Activare</string>
+    <string name="preciseLocationSystemDialogDeny">Poate mai târziu</string>
+    <string name="preciseLocationSystemDialogNeverAllow">Nu întreba din nou pentru acest site</string>
+    <string name="preciseLocationSiteDialogTitle">Acorzi %1$s permisiunea de a accesa locația?</string>
+    <string name="preciseLocationSiteDialogSubtitle">Poți gestiona permisiunile de acces la locație pe care le-ai acordat site-urilor individuale în Setări.</string>
+    <string name="preciseLocationSiteDialogAllowAlways">Întotdeauna</string>
+    <string name="preciseLocationSiteDialogAllowOnce">Numai pentru această sesiune</string>
+    <string name="preciseLocationSiteDialogDenyAlways">Respinge întotdeauna</string>
+    <string name="preciseLocationSiteDialogDenyOnce">Respinge pentru această sesiune</string>
+    <string name="settingsPreciseLocation">Locație</string>
+    <string name="preciseLocationFeatureDescription">Site-urile pe care le vizitezi pot solicita să îți cunoască locația dispozitivului. Acestea nu vor putea să-l acceseze până când nu acorzi în mod explicit permisiunea. DuckDuckGo utilizează locația ta doar în mod anonim pentru a furniza rezultate de căutare locale.</string>
+    <string name="preciseLocationToggleText">Site-urile îmi pot cere locația</string>
+    <string name="preciseLocationEmptyListHint">Niciun site web nu a acordat permisiunea de a accesa locația</string>
+    <string name="preciseLocationNoSystemPermission">Pentru a gestiona permisiunile de acces la locație pe care le-ai acordat site-urilor individuale, activează locația pentru această aplicație în Setări Android.</string>
+    <string name="preciseLocationActivityTitle">Locație</string>
+    <string name="preciseLocationDeleteConfirmMessage">Sigur doriți să ștergeți &lt;b&gt;%1$s&lt;/b&gt;?</string>
+    <string name="preciseLocationDeleteContentDescription">Mai multe opțiuni pentru permisiunile de locație din domeniul %1$s</string>
+    <string name="preciseLocationAllowedSitesSectionTitle">Acordat</string>
+    <string name="preciseLocationDeniedSitesSectionTitle">Respins</string>
+    <string name="preciseLocationSnackbarMessage">Anterior ai acordat %1$s permisiunea de a accesa locația dispozitivului.</string>
+
+    <!--  Global Privacy Control-->
+    <string name="globalPrivacyControlActivityTitle">Global Privacy Control (GPC)</string>
+    <string name="globalPrivacyControlDescription">
+        Datele tale nu ar trebui să fie de vânzare. La DuckDuckGo, suntem de acord cu acest lucru. Activează setarea „Global Privacy Control” (GPC) și vom semnaliza site-urilor web preferința ta de a:\n\n• Nu vinde datele tale personale.\n • Limita distribuirea datelor tale personale către alte companii.
+    </string>
+    <string name="globalPrivacyControlSetting">Global Privacy Control (GPC)</string>
+    <string name="globalPrivacyControlToggle">Global Privacy Control (GPC)</string>
+    <string name="globalPrivacyControlDescriptionLegal"><b>Întrucât Global Privacy Control (GPC) este un nou standard, majoritatea site-urilor web nu îl vor recunoaște încă, dar lucrăm din greu pentru a ne asigura că acesta va fi acceptat în întreaga lume.</b> Cu toate acestea, site-urile web sunt obligate să acționeze la semnal numai în măsura în care legile aplicabile le obligă să facă acest lucru.</string>
+    <string name="globalPrivacyControlLearnMore"><u>Află mai multe</u></string>
+    <string name="disabled">Dezactivat</string>
+    <string name="enabled">Activat</string>
 </resources>

@@ -1,5 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2020 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
 <resources xmlns:tools="http://schemas.android.com/tools">
 
+    <string name="appName" translatable="false">DuckDuckGo</string>
+    <string name="appDescription" translatable="false">DuckDuckGo </string>
     <string name="duckDuckGoLogoDescription">DuckDuckGo-logo</string>
     <string name="duckDuckGoPrivacySimplified">Tietosuojaa, yksinkertaisesti.</string>
     <string name="yes">Joo</string>
@@ -49,6 +68,7 @@
     <string name="previousSearchTermDescription">Etsi edellinen</string>
     <string name="closeFindInPageButtonDescription">Sulje etsi sivulta -näkymä</string>
     <string name="findInPageHint">Etsi sivulta</string>
+    <string name="findInPageMatches" translatable="false">%d/%d</string>
 
     <!-- AutoComplete Suggestions -->
     <string name="editQueryBeforeSubmitting">Muokkaa kyselyä ennen hakua</string>
@@ -61,6 +81,7 @@
     <string name="unableToOpenLink">Tämäntyyppisen linkin avaaminen ei onnistu</string>
 
     <!-- Tabs -->
+    <string name="homeTab" translatable="false">DuckDuckGo</string>
     <string name="tabActivityTitle">Välilehdet</string>
     <string name="tabsMenuItem">Välilehdet</string>
     <string name="newTabMenuItem">Uusi välilehti</string>
@@ -162,9 +183,7 @@
     <!-- About Activity -->
     <string name="aboutActivityTitle">Tietoa meistä</string>
     <string name="aboutDescription">
-        DuckDuckGo asettaa uudet standardit luottamukselle verkossa.\n\
-        DuckDuckGo-tietosuojaselain tarjoaa kaikki keskeiset tietosuojaominaisuudet nettihakujesi ja -selailusi turvaksi, kuten seurantapalvelinten eston, älykkäämmän salauksen ja yksityisen DuckDuckGo-haun.\n\
-        Internetin ei pitäisi tuntua karmivalta paikalta ja haluamasi nettiyksityisyyden pitäisi järjestyä sulkemalla verhot.</string>
+        DuckDuckGo asettaa uudet standardit luottamukselle verkossa.\n\\ DuckDuckGo-tietosuojaselain tarjoaa kaikki keskeiset tietosuojaominaisuudet nettihakujesi ja -selailusi turvaksi, kuten seurantapalvelinten eston, älykkäämmän salauksen ja yksityisen DuckDuckGo-haun.\n\\ Internetin ei pitäisi tuntua karmivalta paikalta ja haluamasi nettiyksityisyyden pitäisi järjestyä sulkemalla verhot.</string>
     <string name="aboutMoreLink">Lisätietoa: duckduckgo.com/about</string>
     <string name="no_suggestions">Ei ehdotuksia</string>
 
@@ -247,10 +266,12 @@
     <string name="rateAppDialogTitle">Arvioi sovellus</string>
     <string name="rateAppDialogMessage">Palautteellasi on väliä. Kerro kehusi arvostelun muodossa.</string>
     <string name="rateAppDialogPositiveButton">Arvioi sovellus</string>
+    <string name="rateAppDialogNegativeButton" translatable="false">@string/noThanks</string>
 
     <string name="giveFeedbackDialogTitle">Ikävä kuulla</string>
     <string name="giveFeedbackDialogMessage">Kerro, miten voisimme mielestäsi parantaa sovellusta</string>
     <string name="giveFeedbackDialogPositiveButton">Anna palautetta</string>
+    <string name="giveFeedbackDialogNegativeButton" translatable="false">@string/noThanks</string>
 
     <string name="noThanks">Ei kiitos</string>
 
@@ -464,4 +485,43 @@
     <string name="downloadManagerDisabled">Lataustenhallinta ei ole käytössä</string>
     <string name="downloadManagerIncompatible">Lataustenhallintaa ei ole saatavilla tällä laitteella</string>
     <string name="enable">Ota käyttöön</string>
+
+    <!--Fire button education-->
+    <string name="daxClearDataCtaText">Poista selainhistoriasi napauttamalla alta. Kokeile nyt! 👇</string>
+
+    <!-- Precise Location -->
+    <string name="preciseLocationSystemDialogTitle">Otetaanko laitteen sijainti käyttöön DuckDuckGon yksityiselle selaimelle?</string>
+    <string name="preciseLocationSystemDialogSubtitle">%1$s pyytää saada tietää laitteesi sijainnin. Sinun on ensin annettava sovellukselle lupa lähettää laitteesi sijainti, jonka jälkeen %2$s voi pyytää lupaa.</string>
+    <string name="preciseLocationSystemDialogAllow">Ota käyttöön</string>
+    <string name="preciseLocationSystemDialogDeny">Ehkä myöhemmin</string>
+    <string name="preciseLocationSystemDialogNeverAllow">Älä kysy uudelleen tälle sivustolle</string>
+    <string name="preciseLocationSiteDialogTitle">Annetaanko palvelulle %1$s lupa nähdä sijaintisi?</string>
+    <string name="preciseLocationSiteDialogSubtitle">Voit hallita yksittäisille sivustoille antamiasi sijaintilupia asetuksista.</string>
+    <string name="preciseLocationSiteDialogAllowAlways">Aina</string>
+    <string name="preciseLocationSiteDialogAllowOnce">Vain tässä istunnossa</string>
+    <string name="preciseLocationSiteDialogDenyAlways">Kiellä aina</string>
+    <string name="preciseLocationSiteDialogDenyOnce">Kiellä tässä istunnossa</string>
+    <string name="settingsPreciseLocation">Sijainti</string>
+    <string name="preciseLocationFeatureDescription">Sivustot, joilla käyt, voivat pyytää saada tietää sijaintisi. Ne eivät saa tietää sijaintiasi ennen kuin annat siihen erikseen luvan. DuckDuckGo käyttää sijaintiasi pelkästään anonyymisti antaakseen sinulle paikallisia hakutuloksia.</string>
+    <string name="preciseLocationToggleText">Sivustot voivat pyytää nähdä sijaintini</string>
+    <string name="preciseLocationEmptyListHint">Millekään sivustolle ei ole annettu lupaa käyttää sijaintiasi</string>
+    <string name="preciseLocationNoSystemPermission">Hallitse yksittäisille sivustoille antamiasi sijaintilupia ottamalla asetuksista sijainti käyttöön tälle sovellukselle.</string>
+    <string name="preciseLocationActivityTitle">Sijainti</string>
+    <string name="preciseLocationDeleteConfirmMessage">Haluatko varmasti poistaa &lt;b&gt;%1$s&lt;/b&gt;?</string>
+    <string name="preciseLocationDeleteContentDescription">Lisää vaihtoehtoja sijaintiasetuksille toimialueella %1$s</string>
+    <string name="preciseLocationAllowedSitesSectionTitle">Myönnetty</string>
+    <string name="preciseLocationDeniedSitesSectionTitle">Kielletty</string>
+    <string name="preciseLocationSnackbarMessage">Annoit aiemmin palvelulle %1$s luvan nähdä laitteesi sijainnin.</string>
+
+    <!--  Global Privacy Control-->
+    <string name="globalPrivacyControlActivityTitle">Global Privacy Control (GPC)</string>
+    <string name="globalPrivacyControlDescription">
+        Tietojesi ei pitäisi olla myynnissä. DuckDuckGo on samaa mieltä. Ota \"Global Privacy Control\" (GPC) -asetus käyttöön, niin me kerromme verkkosivustoille, että:\n\n• ne eivät voi myydä tietojasi.\n • niiden täytyy rajoittaa henkilötietojesi jakamista muille yrityksille.
+    </string>
+    <string name="globalPrivacyControlSetting">Global Privacy Control (GPC)</string>
+    <string name="globalPrivacyControlToggle">Global Privacy Control (GPC)</string>
+    <string name="globalPrivacyControlDescriptionLegal"><b>Koska Global Privacy Control (GPC) on uusi standardi, useimmat verkkosivustot eivät vielä tunnista sitä, mutta teemme parhaamme, että standardi hyväksyttäisiin kaikkialla maailmassa.</b> Verkkosivujen täytyy kuitenkin noudattaa kehotusta vain siinä laajuudessa kuin sovellettavat lait määräävät.</string>
+    <string name="globalPrivacyControlLearnMore"><u>Lue Lisää</u></string>
+    <string name="disabled">Pois käytöstä</string>
+    <string name="enabled">Käytössä</string>
 </resources>

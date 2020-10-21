@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <!--
   ~ Copyright (c) 2020 DuckDuckGo
   ~
@@ -16,6 +17,8 @@
 
 <resources xmlns:tools="http://schemas.android.com/tools">
 
+    <string name="appName" translatable="false">DuckDuckGo</string>
+    <string name="appDescription" translatable="false">DuckDuckGo </string>
     <string name="duckDuckGoLogoDescription">DuckDuckGo logotips</string>
     <string name="duckDuckGoPrivacySimplified">Privātums, vienkāršots.</string>
     <string name="yes">Jā</string>
@@ -184,9 +187,7 @@
     <!-- About Activity -->
     <string name="aboutActivityTitle">Par mums</string>
     <string name="aboutDescription">
-        Vietnē DuckDuckGo mēs veidojam jauno tiešsaistes uzticēšanās standartu.\n\
-        DuckDuckGo konfidencialitātes pārlūks nodrošina visu nepieciešamo privātumu, lai aizsargātu sevi, meklējot un pārlūkojot tīmekli, ieskaitot izsekotāju bloķēšanu, viedāku šifrēšanu un DuckDuckGo privāto meklēšanu.\n\
-        Galu galā internetam nevajadzētu iedvest bailes, un jūsu godam nopelnītā tiešsaistes privātuma iegūšanai vajadzētu būt tikpat vienkāršai kā žalūziju aizvēršanai.</string>
+        Vietnē DuckDuckGo mēs veidojam jauno tiešsaistes uzticēšanās standartu.\n\\ DuckDuckGo konfidencialitātes pārlūks nodrošina visu nepieciešamo privātumu, lai aizsargātu sevi, meklējot un pārlūkojot tīmekli, ieskaitot izsekotāju bloķēšanu, viedāku šifrēšanu un DuckDuckGo privāto meklēšanu.\n\\ Galu galā internetam nevajadzētu iedvest bailes, un jūsu godam nopelnītā tiešsaistes privātuma iegūšanai vajadzētu būt tikpat vienkāršai kā žalūziju aizvēršanai.</string>
     <string name="aboutMoreLink">Vairāk vietnē duckduckgo.com/about</string>
     <string name="no_suggestions">Nav ieteikumu</string>
 
@@ -419,8 +420,8 @@
         <item quantity="other"><![CDATA[ un <b>%1$d citas</b> mēģināja jūs izsekot. <br/><br/>Es tās nobloķēju!<br/><br/> ☝️Jūs varat pārbaudīt URL joslu, lai redzētu, kurš mēģina jūs izsekot, kad apmeklējat jaunu vietni.️]]></item>
     </plurals>
     <plurals name="daxTrackersBlockedCtaZeroText">
-        <item quantity="zero" tools:ignore="ImpliedQuantity"><![CDATA[ mēģināja tevi šeit izsekot. <br/><br/>Es tās nobloķēju!<br/><br/> ☝️Tu vari pārbaudīt URL joslu, lai redzētu, kas tevi mēģina izsekot, kad tu apmeklē jaunu vietni.️]]></item>
-        <item quantity="one" tools:ignore="ImpliedQuantity"><![CDATA[ mēģināja tevi šeit izsekot. <br/><br/>Es tās nobloķēju!<br/><br/> ☝️Tu vari pārbaudīt URL joslu, lai redzētu, kas tevi mēģina izsekot, kad tu apmeklē jaunu vietni.️]]></item>
+        <item quantity="zero"><![CDATA[ mēģināja tevi šeit izsekot. <br/><br/>Es tās nobloķēju!<br/><br/> ☝️Tu vari pārbaudīt URL joslu, lai redzētu, kas tevi mēģina izsekot, kad tu apmeklē jaunu vietni.️]]></item>
+        <item quantity="one"><![CDATA[ mēģināja tevi šeit izsekot. <br/><br/>Es tās nobloķēju!<br/><br/> ☝️Tu vari pārbaudīt URL joslu, lai redzētu, kas tevi mēģina izsekot, kad tu apmeklē jaunu vietni.️]]></item>
         <item quantity="other"><![CDATA[ mēģināja tevi šeit izsekot. <br/><br/>Es tās nobloķēju!<br/><br/> ☝️Tu vari pārbaudīt URL joslu, lai redzētu, kas tevi mēģina izsekot, kad tu apmeklē jaunu vietni.️]]></item>
     </plurals>
     <string name="daxNonSerpCtaText"><![CDATA[Kad pieskarsies un ritināsi, es bloķēšu uzmācīgos izsekotājus. <br/><br/>Aiziet – turpini pārlūkot!]]></string>
@@ -490,4 +491,43 @@
     <string name="downloadManagerDisabled">Lejupielāžu pārvaldnieks ir atspējots</string>
     <string name="downloadManagerIncompatible">Lejupielāžu pārvaldnieks šajā ierīcē nav pieejams</string>
     <string name="enable">Iespējot</string>
+
+    <!--Fire button education-->
+    <string name="daxClearDataCtaText">Tagad pieskaries zemāk, lai izsvēpētu savu pārlūkošanas vēsturi. Pamēģini! 👇</string>
+
+    <!-- Precise Location -->
+    <string name="preciseLocationSystemDialogTitle">Vai iespējot ierīces atrašanās vietu DuckDuckGo privātuma pārlūkprogrammai?</string>
+    <string name="preciseLocationSystemDialogSubtitle">%1$s pieprasa tavas ierīces atrašanās vietu. Vispirms tev ir jāatļauj lietotnei nosūtīt tavas ierīces atrašanās vietu, pēc tam %2$s var pieprasīt atļauju.</string>
+    <string name="preciseLocationSystemDialogAllow">Iespējot</string>
+    <string name="preciseLocationSystemDialogDeny">Varbūt vēlāk</string>
+    <string name="preciseLocationSystemDialogNeverAllow">Vairs nejautāt par šo vietni</string>
+    <string name="preciseLocationSiteDialogTitle">Vai piešķirt %1$s atļauju piekļūt atrašanās vietai?</string>
+    <string name="preciseLocationSiteDialogSubtitle">Iestatījumos vari pārvaldīt atrašanās vietas piekļuves atļaujas, ko piešķīri atsevišķām vietnēm.</string>
+    <string name="preciseLocationSiteDialogAllowAlways">Vienmēr</string>
+    <string name="preciseLocationSiteDialogAllowOnce">Tikai šai sesijai</string>
+    <string name="preciseLocationSiteDialogDenyAlways">Vienmēr aizliegt</string>
+    <string name="preciseLocationSiteDialogDenyOnce">Aizliegt šai sesijai</string>
+    <string name="settingsPreciseLocation">Atrašanās vieta</string>
+    <string name="preciseLocationFeatureDescription">Apmeklētās vietnes var prasīt atklāt tavas ierīces atrašanās vietu. Tās nevarēs tai piekļūt, ja tu skaidri nepiešķirsi atļauju. DuckDuckGo izmanto tavu atrašanās vietu tikai anonīmi, lai nodrošinātu lokālās meklēšanas rezultātus.</string>
+    <string name="preciseLocationToggleText">Vietnes var pieprasīt manu atrašanās vietu</string>
+    <string name="preciseLocationEmptyListHint">Nevienai vietnei nav piešķirta atļauja piekļūt atrašanās vietai</string>
+    <string name="preciseLocationNoSystemPermission">Lai pārvaldītu savas atsevišķām vietnēm piešķirtās atrašanās vietas piekļuves atļaujas, šai lietotnei iespējo atrašanās vietu Android iestatījumos.</string>
+    <string name="preciseLocationActivityTitle">Atrašanās vieta</string>
+    <string name="preciseLocationDeleteConfirmMessage">Vai tiešām vēlaties dzēst &lt;b&gt;%1$s&lt;/b&gt;?</string>
+    <string name="preciseLocationDeleteContentDescription">Vairāk iespēju atrašanās vietas atļaujām domēnā %1$s</string>
+    <string name="preciseLocationAllowedSitesSectionTitle">Piešķirts</string>
+    <string name="preciseLocationDeniedSitesSectionTitle">Aizliegts</string>
+    <string name="preciseLocationSnackbarMessage">Tu iepriekš piešķīri %1$s atļauju piekļūt savas ierīces atrašanās vietai.</string>
+
+    <!--  Global Privacy Control-->
+    <string name="globalPrivacyControlActivityTitle">Globālā privātuma kontrole (GPC)</string>
+    <string name="globalPrivacyControlDescription">
+        Tavi dati nav paredzēti pārdošanai. DuckDuckGo tam piekrīt. Aktivizē iestatījumu “Globālā privātuma kontrole” (GPC), un mēs vietnēm paziņosim, ka tu izvēlies:\n\n • Nepārdot savus personas datus.\n • Ierobežot savu personas datu koplietošanu ar citiem uzņēmumiem.
+    </string>
+    <string name="globalPrivacyControlSetting">Globālā privātuma kontrole (GPC)</string>
+    <string name="globalPrivacyControlToggle">Globālā privātuma kontrole (GPC)</string>
+    <string name="globalPrivacyControlDescriptionLegal"><b>Globālā privātuma kontrole (GPC) ir jauns standarts. Lielākā daļa vietņu to vēl neatpazīst, taču mēs cītīgi strādājam pie tā, lai tas tiktu ievērots visā pasaulē.</b> Tomēr vietnēm ir obligāti jārīkojas tikai uz tām attiecināmo piemērojamo tiesību aktu ietvaros.</string>
+    <string name="globalPrivacyControlLearnMore"><u>Uzzināt vairāk</u></string>
+    <string name="disabled">Atspējots</string>
+    <string name="enabled">Iespējots</string>
 </resources>

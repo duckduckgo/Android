@@ -1,5 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2020 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
 <resources xmlns:tools="http://schemas.android.com/tools">
 
+    <string name="appName" translatable="false">DuckDuckGo</string>
+    <string name="appDescription" translatable="false">DuckDuckGo </string>
     <string name="duckDuckGoLogoDescription">Logo DuckDuckGo</string>
     <string name="duckDuckGoPrivacySimplified">Privacy, vereenvoudigd.</string>
     <string name="yes">Ja</string>
@@ -49,6 +68,7 @@
     <string name="previousSearchTermDescription">Vorige zoeken</string>
     <string name="closeFindInPageButtonDescription">Zoeken in paginaweergave sluiten</string>
     <string name="findInPageHint">Zoek op pagina</string>
+    <string name="findInPageMatches" translatable="false">%d/%d</string>
 
     <!-- AutoComplete Suggestions -->
     <string name="editQueryBeforeSubmitting">Bewerk query alvorens te zoeken</string>
@@ -61,6 +81,7 @@
     <string name="unableToOpenLink">Kan dit type link niet openen</string>
 
     <!-- Tabs -->
+    <string name="homeTab" translatable="false">DuckDuckGo</string>
     <string name="tabActivityTitle">Tabbladen</string>
     <string name="tabsMenuItem">Tabbladen</string>
     <string name="newTabMenuItem">Nieuw tabblad</string>
@@ -162,9 +183,7 @@
     <!-- About Activity -->
     <string name="aboutActivityTitle">Over ons</string>
     <string name="aboutDescription">
-        Bij DuckDuckGo zetten we de nieuwe standaard voor vertrouwen online.\n\
-        DuckDuckGo Privacy Browser biedt alle privacy-essentials die je nodig hebt om jezelf te beschermen tijdens het zoeken en browsen op het internet, inclusief trackerblokkering, slimmere codering en DuckDuckGo privé-zoekopdrachten.\n\
-        Het internet zou namelijk helemaal niet zo griezelig moeten zijn en de privacy die je online verdient, moet net zo eenvoudig zijn als het sluiten van de gordijnen.</string>
+        Bij DuckDuckGo zetten we de nieuwe standaard voor vertrouwen online.\n\\ DuckDuckGo Privacy Browser biedt alle privacy-essentials die je nodig hebt om jezelf te beschermen tijdens het zoeken en browsen op het internet, inclusief trackerblokkering, slimmere codering en DuckDuckGo privé-zoekopdrachten.\n\\ Het internet zou namelijk helemaal niet zo griezelig moeten zijn en de privacy die je online verdient, moet net zo eenvoudig zijn als het sluiten van de gordijnen.</string>
     <string name="aboutMoreLink">Meer informatie op duckduckgo.com/about</string>
     <string name="no_suggestions">Geen suggesties</string>
 
@@ -247,10 +266,12 @@
     <string name="rateAppDialogTitle">Beoordeel de app</string>
     <string name="rateAppDialogMessage">Jouw feedback is belangrijk. Laat zien hoe blij je ermee bent met een beoordeling.</string>
     <string name="rateAppDialogPositiveButton">Beoordeel app</string>
+    <string name="rateAppDialogNegativeButton" translatable="false">@string/noThanks</string>
 
     <string name="giveFeedbackDialogTitle">Dat vinden we jammer om te horen</string>
     <string name="giveFeedbackDialogMessage">Laat ons weten hoe we de app voor jou kunnen verbeteren</string>
     <string name="giveFeedbackDialogPositiveButton">Geef feedback</string>
+    <string name="giveFeedbackDialogNegativeButton" translatable="false">@string/noThanks</string>
 
     <string name="noThanks">Nee, bedankt</string>
 
@@ -464,4 +485,43 @@
     <string name="downloadManagerDisabled">Downloadbeheerder is uitgeschakeld</string>
     <string name="downloadManagerIncompatible">Downloadbeheerder is niet beschikbaar op dit apparaat</string>
     <string name="enable">Inschakelen</string>
+
+    <!--Fire button education-->
+    <string name="daxClearDataCtaText">Tik nu hieronder om je browsegeschiedenis te verbranden. Probeer het maar! 👇</string>
+
+    <!-- Precise Location -->
+    <string name="preciseLocationSystemDialogTitle">Apparaatlocatie inschakelen voor DuckDuckGo Privacy Browser?</string>
+    <string name="preciseLocationSystemDialogSubtitle">%1$s vraagt om de locatie van je apparaat. Je moet eerst de app toestemming geven om je apparaatlocatie te versturen, waarna %2$s toestemming kan vragen.</string>
+    <string name="preciseLocationSystemDialogAllow">Inschakelen</string>
+    <string name="preciseLocationSystemDialogDeny">Later misschien</string>
+    <string name="preciseLocationSystemDialogNeverAllow">Niet opnieuw vragen voor deze site</string>
+    <string name="preciseLocationSiteDialogTitle">%1$s toestemming geven om je locatie te gebruiken?</string>
+    <string name="preciseLocationSiteDialogSubtitle">De locatietoegangsmachtigingen die je aan individuele sites hebt gegeven, kun je beheren in Instellingen.</string>
+    <string name="preciseLocationSiteDialogAllowAlways">Altijd</string>
+    <string name="preciseLocationSiteDialogAllowOnce">Alleen voor deze sessie</string>
+    <string name="preciseLocationSiteDialogDenyAlways">Altijd weigeren</string>
+    <string name="preciseLocationSiteDialogDenyOnce">Weigeren voor deze sessie</string>
+    <string name="settingsPreciseLocation">Locatie</string>
+    <string name="preciseLocationFeatureDescription">Sites die je bezoekt, kunnen om je apparaatlocatie vragen. Ze kunnen deze pas gebruiken als je hiervoor expliciet toestemming geeft. DuckDuckGo gebruikt je locatie alleen anoniem om lokale zoekresultaten te leveren.</string>
+    <string name="preciseLocationToggleText">Sites mogen om mijn locatie vragen</string>
+    <string name="preciseLocationEmptyListHint">Geen websites hebben toestemming om je locatie te gebruiken</string>
+    <string name="preciseLocationNoSystemPermission">De locatietoegangsmachtigingen die je aan individuele sites hebt gegeven, kun je beheren door locatie voor deze app in te schakelen in de instellingen van Android.</string>
+    <string name="preciseLocationActivityTitle">Locatie</string>
+    <string name="preciseLocationDeleteConfirmMessage">Weet je zeker dat je &lt;b&gt;%1$s&lt;/b&gt; wilt verwijderen?</string>
+    <string name="preciseLocationDeleteContentDescription">Meer opties voor locatiemachtigingen in domein %1$s</string>
+    <string name="preciseLocationAllowedSitesSectionTitle">Verleend</string>
+    <string name="preciseLocationDeniedSitesSectionTitle">Geweigerd</string>
+    <string name="preciseLocationSnackbarMessage">Je hebt eerder %1$s toestemming gegeven om je apparaatlocatie te gebruiken.</string>
+
+    <!--  Global Privacy Control-->
+    <string name="globalPrivacyControlActivityTitle">Global Privacy Control (GPC)</string>
+    <string name="globalPrivacyControlDescription">
+        Je gegevens zouden niet te koop moeten zijn. Bij DuckDuckGo zijn we het daarmee eens. Activeer de instelling \'Global Privacy Control\' (GCP) en we laten websites weten om:&lt;br/&gt;&lt;br/&gt; • Je persoonsgegevens niet te verkopen.&lt;br/&gt; • Het delen van je persoonsgegevens met andere bedrijven te beperken.
+    </string>
+    <string name="globalPrivacyControlSetting">Global Privacy Control (GPC)</string>
+    <string name="globalPrivacyControlToggle">Global Privacy Control (GPC)</string>
+    <string name="globalPrivacyControlDescriptionLegal"><b>Doordat Global Privacy Control (GPC) een nieuwe standaard is, herkennen de meeste websites deze nog niet. We werken er hard aan om ervoor te zorgen dat GCP wereldwijd wordt geaccepteerd.</b> Maar websites zijn alleen verplicht om op dit signaal te reageren voor zover de toepasselijke wetgeving dat vereist.</string>
+    <string name="globalPrivacyControlLearnMore"><u>Meer informatie</u></string>
+    <string name="disabled">Uitgeschakeld</string>
+    <string name="enabled">Ingeschakeld</string>
 </resources>

@@ -1,5 +1,6 @@
-﻿<!--
-  ~ Copyright (c) 2019 DuckDuckGo
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2020 DuckDuckGo
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -16,6 +17,8 @@
 
 <resources xmlns:tools="http://schemas.android.com/tools">
 
+    <string name="appName" translatable="false">DuckDuckGo</string>
+    <string name="appDescription" translatable="false">DuckDuckGo </string>
     <string name="duckDuckGoLogoDescription">DuckDuckGos logotyp</string>
     <string name="duckDuckGoPrivacySimplified">Förenklad sekretessförklaring.</string>
     <string name="yes">Ja</string>
@@ -23,7 +26,7 @@
     <string name="search">Sökning</string>
 
     <!-- Onboarding Activity -->
-    <string name="onboardingDefaultBrowserDescription">Gå till "Inställningar" för att söka och bläddra med DuckDuckGo varje gång.</string>
+    <string name="onboardingDefaultBrowserDescription">Gå till Inställningar för att söka och bläddra med DuckDuckGo varje gång.</string>
     <string name="onboardingDefaultBrowserTitle">Ställ in DuckDuckGo som standard</string>
 
     <!-- Default Browser -->
@@ -65,6 +68,7 @@
     <string name="previousSearchTermDescription">Hitta föregående</string>
     <string name="closeFindInPageButtonDescription">Stäng sökning i sidvy</string>
     <string name="findInPageHint">Hitta på sidan</string>
+    <string name="findInPageMatches" translatable="false">%d/%d</string>
 
     <!-- AutoComplete Suggestions -->
     <string name="editQueryBeforeSubmitting">Redigera förfrågan innan sökning</string>
@@ -77,6 +81,7 @@
     <string name="unableToOpenLink">Kunde inte öppna den här länktypen</string>
 
     <!-- Tabs -->
+    <string name="homeTab" translatable="false">DuckDuckGo</string>
     <string name="tabActivityTitle">Flikar</string>
     <string name="tabsMenuItem">Flikar</string>
     <string name="newTabMenuItem">Ny flik</string>
@@ -178,9 +183,7 @@
     <!-- About Activity -->
     <string name="aboutActivityTitle">Om oss</string>
     <string name="aboutDescription">
-        På DuckDuckGo höjer vi kraven för förtroende online.\n\
-        DuckDuckGo Privacy Browser tillhandahåller alla nödvändiga sekretessvillkor som du behöver för att skydda dig själv när du söker och surfar på nätet, inklusive blockering av spårare, smartare kryptering och DuckDuckGo privat sökning.\n\
-        Internet borde ju trots allt inte kännas obehagligt och att få den sekretess du förtjänar online bör vara lika enkelt som att stänga persiennerna.</string>
+        På DuckDuckGo höjer vi kraven för förtroende online.\n\\ DuckDuckGo Privacy Browser tillhandahåller alla nödvändiga sekretessvillkor som du behöver för att skydda dig själv när du söker och surfar på nätet, inklusive blockering av spårare, smartare kryptering och DuckDuckGo privat sökning.\n\\ Internet borde ju trots allt inte kännas obehagligt och att få den sekretess du förtjänar online bör vara lika enkelt som att stänga persiennerna.</string>
     <string name="aboutMoreLink">Mer på duckduckgo.com/about</string>
     <string name="no_suggestions">Inga förslag</string>
 
@@ -263,10 +266,12 @@
     <string name="rateAppDialogTitle">Betygsätt appen</string>
     <string name="rateAppDialogMessage">Dina åsikter är viktiga. Dela med dig av det du gillar, skriv en recension!</string>
     <string name="rateAppDialogPositiveButton">Betygsätt appen</string>
+    <string name="rateAppDialogNegativeButton" translatable="false">@string/noThanks</string>
 
     <string name="giveFeedbackDialogTitle">Det var tråkigt att höra</string>
     <string name="giveFeedbackDialogMessage">Berätta hur vi kan förbättra appen för dig</string>
     <string name="giveFeedbackDialogPositiveButton">Berätta vad du tycker</string>
+    <string name="giveFeedbackDialogNegativeButton" translatable="false">@string/noThanks</string>
 
     <string name="noThanks">Nej tack</string>
 
@@ -480,4 +485,43 @@
     <string name="downloadManagerDisabled">Nerladdningshanteraren är inaktiverad</string>
     <string name="downloadManagerIncompatible">Nerladdningshanteraren är inte tillgänglig på denna enhet</string>
     <string name="enable">Aktivera</string>
+
+    <!--Fire button education-->
+    <string name="daxClearDataCtaText">Tryck här nedanför nu för att bränna din webbhistorik. Prova! 👇</string>
+
+    <!-- Precise Location -->
+    <string name="preciseLocationSystemDialogTitle">Aktivera åtkomst till enhetsplats för DuckDuckGo Privacy Browser?</string>
+    <string name="preciseLocationSystemDialogSubtitle">%1$s begär åtkomst till din enhetsplats. Du måste tillåta att appen skickar din enhetsplats innan %2$s kan be om åtkomst.</string>
+    <string name="preciseLocationSystemDialogAllow">Aktivera</string>
+    <string name="preciseLocationSystemDialogDeny">Kanske senare</string>
+    <string name="preciseLocationSystemDialogNeverAllow">Fråga inte igen för denna webbplats</string>
+    <string name="preciseLocationSiteDialogTitle">Bevilja åtkomst till enhetsplats för %1$s?</string>
+    <string name="preciseLocationSiteDialogSubtitle">Du kan gå till Inställningar för att hantera åtkomster till enhetsplats som du har beviljat för enskilda webbplatser.</string>
+    <string name="preciseLocationSiteDialogAllowAlways">Alltid</string>
+    <string name="preciseLocationSiteDialogAllowOnce">Endast för denna session</string>
+    <string name="preciseLocationSiteDialogDenyAlways">Neka alltid</string>
+    <string name="preciseLocationSiteDialogDenyOnce">Neka för denna session</string>
+    <string name="settingsPreciseLocation">Position</string>
+    <string name="preciseLocationFeatureDescription">Webbplatser du besöker kan begära åtkomst till din enhetsplats. De får inte åtkomst till din enhetsplats innan du uttryckligen beviljat detta. DuckDuckGo använder bara din enhetsplats anonymt för att tillhandahålla lokala sökresultat.</string>
+    <string name="preciseLocationToggleText">Webbplatser kan be om åtkomst till min enhetsplats</string>
+    <string name="preciseLocationEmptyListHint">Inga webbplatser har fått åtkomst till enhetsplats</string>
+    <string name="preciseLocationNoSystemPermission">Aktivera åtkomst till enhetsplats för denna app i Androids Inställningar för att hantera åtkomst till enhetsplats som du har beviljat för enskilda webbplatser.</string>
+    <string name="preciseLocationActivityTitle">Position</string>
+    <string name="preciseLocationDeleteConfirmMessage">Är du säker på att du vill ta bort &lt;b&gt;%1$s&lt;/b&gt;?</string>
+    <string name="preciseLocationDeleteContentDescription">Fler alternativ för åtkomst till enhetsplats i domänen %1$s</string>
+    <string name="preciseLocationAllowedSitesSectionTitle">Beviljas</string>
+    <string name="preciseLocationDeniedSitesSectionTitle">Nekas</string>
+    <string name="preciseLocationSnackbarMessage">Du har tidigare beviljat åtkomst till din enhetsplats för %1$s.</string>
+
+    <!--  Global Privacy Control-->
+    <string name="globalPrivacyControlActivityTitle">Global Privacy Control (GPC)</string>
+    <string name="globalPrivacyControlDescription">
+        Dina uppgifter ska inte vara till salu. På DuckDuckGo är vi överens. Aktivera inställningen \"Global Privacy Control\" (GPC) så meddelar vi webbplatser att du föredrar att:&lt;br/&gt;&lt;br/&gt; • Dina personuppgifter inte ska säljas.&lt;br/&gt; • Delning av dina personuppgifter med andra företag ska begränsas.
+    </string>
+    <string name="globalPrivacyControlSetting">Global Privacy Control (GPC)</string>
+    <string name="globalPrivacyControlToggle">Global Privacy Control (GPC)</string>
+    <string name="globalPrivacyControlDescriptionLegal"><b>Eftersom Global Privacy Control (GPC) är en ny standard erkänns den ännu inte av de flesta webbplatser, men vi arbetar hårt på att få den accepterad i hela världen.</b> Däremot är webbplatser endast tvungna att rätta sig efter signalen i den mån de är skyldiga att göra det enligt gällande lag.</string>
+    <string name="globalPrivacyControlLearnMore"><u>Läs mer</u></string>
+    <string name="disabled">Inaktiverad</string>
+    <string name="enabled">Aktiverad</string>
 </resources>

@@ -1,5 +1,24 @@
-﻿<resources xmlns:tools="http://schemas.android.com/tools">
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2020 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
 
+<resources xmlns:tools="http://schemas.android.com/tools">
+
+    <string name="appName" translatable="false">DuckDuckGo</string>
+    <string name="appDescription" translatable="false">DuckDuckGo </string>
     <string name="duckDuckGoLogoDescription">Logotipo de DuckDuckGo</string>
     <string name="duckDuckGoPrivacySimplified">La privacidad, simplificada.</string>
     <string name="yes">Sí</string>
@@ -49,6 +68,7 @@
     <string name="previousSearchTermDescription">Buscar anterior</string>
     <string name="closeFindInPageButtonDescription">Cerrar búsqueda en la vista de página</string>
     <string name="findInPageHint">Buscar en la página</string>
+    <string name="findInPageMatches" translatable="false">%d/%d</string>
 
     <!-- AutoComplete Suggestions -->
     <string name="editQueryBeforeSubmitting">Editar consulta antes de buscar</string>
@@ -61,6 +81,7 @@
     <string name="unableToOpenLink">No se puede abrir este tipo de enlace</string>
 
     <!-- Tabs -->
+    <string name="homeTab" translatable="false">DuckDuckGo</string>
     <string name="tabActivityTitle">Pestañas</string>
     <string name="tabsMenuItem">Pestañas</string>
     <string name="newTabMenuItem">Nueva pestaña</string>
@@ -162,9 +183,7 @@
     <!-- About Activity -->
     <string name="aboutActivityTitle">Acerca de nosotros</string>
     <string name="aboutDescription">
-        En DuckDuckGo, estamos sentando un precedente en la confianza en línea.\n\
-        El navegador privado de DuckDuckGo ofrece todas las funciones de privacidad esenciales que necesitas para protegerte mientras realizas búsquedas y navegas en Internet, lo que incluye el bloqueo de rastreadores, cifrado inteligente y búsqueda privada de DuckDuckGo.\n\
-        Después de todo, Internet no debería percibirse como una amenaza y disfrutar de la privacidad en línea que mereces debería ser lo más fácil posible.</string>
+        En DuckDuckGo, estamos sentando un precedente en la confianza en línea.\n\\ El navegador privado de DuckDuckGo ofrece todas las funciones de privacidad esenciales que necesitas para protegerte mientras realizas búsquedas y navegas en Internet, lo que incluye el bloqueo de rastreadores, cifrado inteligente y búsqueda privada de DuckDuckGo.\n\\ Después de todo, Internet no debería percibirse como una amenaza y disfrutar de la privacidad en línea que mereces debería ser lo más fácil posible.</string>
     <string name="aboutMoreLink">Más información en duckduckgo.com/about</string>
     <string name="no_suggestions">No hay sugerencias</string>
 
@@ -247,10 +266,12 @@
     <string name="rateAppDialogTitle">Calificar la aplicación</string>
     <string name="rateAppDialogMessage">Tu opinión nos importa. Comparte tu amor con una reseña.</string>
     <string name="rateAppDialogPositiveButton">Calificar la aplicación</string>
+    <string name="rateAppDialogNegativeButton" translatable="false">@string/noThanks</string>
 
     <string name="giveFeedbackDialogTitle">Sentimos que opines así</string>
     <string name="giveFeedbackDialogMessage">Dinos cómo podemos mejorar la aplicación</string>
     <string name="giveFeedbackDialogPositiveButton">Dar mi opinión</string>
+    <string name="giveFeedbackDialogNegativeButton" translatable="false">@string/noThanks</string>
 
     <string name="noThanks">No, gracias</string>
 
@@ -464,4 +485,43 @@
     <string name="downloadManagerDisabled">El gestor de descargas está desactivado</string>
     <string name="downloadManagerIncompatible">El gestor de descargas no está disponible para este dispositivo</string>
     <string name="enable">Activar</string>
+
+    <!--Fire button education-->
+    <string name="daxClearDataCtaText">Pulsa a continuación para quemar tu historial de navegación. ¡Pruébalo! 👇</string>
+
+    <!-- Precise Location -->
+    <string name="preciseLocationSystemDialogTitle">¿Habilitar la ubicación del dispositivo para el navegador privado de DuckDuckGo?</string>
+    <string name="preciseLocationSystemDialogSubtitle">%1$s está solicitando la ubicación de tu dispositivo. Primero tendrás que permitir que la aplicación envíe la ubicación de tu dispositivo y luego %2$s podrá solicitar el permiso.</string>
+    <string name="preciseLocationSystemDialogAllow">Activar</string>
+    <string name="preciseLocationSystemDialogDeny">Quizás más tarde</string>
+    <string name="preciseLocationSystemDialogNeverAllow">No volver a preguntar para este sitio</string>
+    <string name="preciseLocationSiteDialogTitle">¿Permitir a %1$s acceder a la ubicación?</string>
+    <string name="preciseLocationSiteDialogSubtitle">Puedes gestionar los permisos de acceso a la ubicación que has concedido a sitios específicos en Configuración.</string>
+    <string name="preciseLocationSiteDialogAllowAlways">Siempre</string>
+    <string name="preciseLocationSiteDialogAllowOnce">Solo para esta sesión</string>
+    <string name="preciseLocationSiteDialogDenyAlways">Rechazar siempre</string>
+    <string name="preciseLocationSiteDialogDenyOnce">Rechazar para esta sesión</string>
+    <string name="settingsPreciseLocation">Ubicación</string>
+    <string name="preciseLocationFeatureDescription">Puede que los sitios que visites pidan acceder a la ubicación de tu dispositivo. No podrán acceder a ella hasta que les concedas permiso específicamente. DuckDuckGo solo utiliza tu ubicación de forma anónima para mostrar resultados de búsqueda locales.</string>
+    <string name="preciseLocationToggleText">Los sitios pueden solicitar mi ubicación</string>
+    <string name="preciseLocationEmptyListHint">No se ha concedido permiso para acceder a la ubicación a ningún sitio web</string>
+    <string name="preciseLocationNoSystemPermission">Para gestionar los permisos de acceso a la ubicación concedidos a sitios específicos, activa la ubicación para esta aplicación en Configuración de Android.</string>
+    <string name="preciseLocationActivityTitle">Ubicación</string>
+    <string name="preciseLocationDeleteConfirmMessage">¿Seguro que deseas eliminar &lt;b&gt;%1$s&lt;/b&gt;?</string>
+    <string name="preciseLocationDeleteContentDescription">Más opciones para permisos de ubicación en el dominio %1$s</string>
+    <string name="preciseLocationAllowedSitesSectionTitle">Concedido</string>
+    <string name="preciseLocationDeniedSitesSectionTitle">Rechazado</string>
+    <string name="preciseLocationSnackbarMessage">Has permitido previamente a %1$s acceder a la ubicación de tu dispositivo.</string>
+
+    <!--  Global Privacy Control-->
+    <string name="globalPrivacyControlActivityTitle">Control Global de Privacidad (GPC)</string>
+    <string name="globalPrivacyControlDescription">
+        Tus datos no deberían estar a la venta. En DuckDuckGo, estamos de acuerdo. Activa la opción «Control Global de Privacidad» (GPC) e indicaremos a los sitios web tu preferencia de:&lt;br/&gt;&lt;br/&gt; • No vender tus datos personales.&lt;br/&gt; • Limitar el uso compartido de tus datos personales con otras empresas.
+    </string>
+    <string name="globalPrivacyControlSetting">Control Global de Privacidad (GPC)</string>
+    <string name="globalPrivacyControlToggle">Control Global de Privacidad (GPC)</string>
+    <string name="globalPrivacyControlDescriptionLegal"><b>Dado que el Control Global de Privacidad (GPC) es un nuevo estándar, la mayoría de los sitios web no lo reconoce todavía, pero estamos trabajando para garantizar que se acepte en todo el mundo.</b> Sin embargo, solo se exige a los sitios web que actúen conforme a esta indicación en la medida en que lo dictamine la normativa vigente.</string>
+    <string name="globalPrivacyControlLearnMore"><u>Más información</u></string>
+    <string name="disabled">Desactivado</string>
+    <string name="enabled">Activado</string>
 </resources>

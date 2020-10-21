@@ -1,5 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2020 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
 <resources xmlns:tools="http://schemas.android.com/tools">
 
+    <string name="appName" translatable="false">DuckDuckGo</string>
+    <string name="appDescription" translatable="false">DuckDuckGo </string>
     <string name="duckDuckGoLogoDescription">„DuckDuckGo“ logotipas</string>
     <string name="duckDuckGoPrivacySimplified">Supaprastintas privatumas.</string>
     <string name="yes">Taip</string>
@@ -49,6 +68,7 @@
     <string name="previousSearchTermDescription">Rasti ankstesnį</string>
     <string name="closeFindInPageButtonDescription">Uždaryti paiešką puslapio peržiūroje</string>
     <string name="findInPageHint">Rasti puslapyje</string>
+    <string name="findInPageMatches" translatable="false">%d/%d</string>
 
     <!-- AutoComplete Suggestions -->
     <string name="editQueryBeforeSubmitting">Redaguoti užklausą prieš ieškant</string>
@@ -61,6 +81,7 @@
     <string name="unableToOpenLink">Nepavyko atverti šio tipo nuorodos</string>
 
     <!-- Tabs -->
+    <string name="homeTab" translatable="false">DuckDuckGo</string>
     <string name="tabActivityTitle">Kortelės</string>
     <string name="tabsMenuItem">Kortelės</string>
     <string name="newTabMenuItem">Nauja kortelė</string>
@@ -88,28 +109,28 @@
     <string name="networksContentDescription">Sekiklių tinklai</string>
     <string name="networksOverview">Sekiklių tinklai stebi jūsų naršymo tinkle istoriją ir iš jos sudaro jūsų duomenų profilį. Daugelis sekiklių tinklų yra pavojingesni, nes jie gali sekti ir rasti jus didesnėje interneto erdvėje.</string>
 
-    <plurals name="trackersFound" tools:ignore="UnusedQuantity">
+    <plurals name="trackersFound">
         <item quantity="one">Rasta %1$s stebėjimo priemonė</item>
         <item quantity="few">Rastos %1$s stebėjimo priemonės</item>
         <item quantity="many">Rasta %1$s stebėjimo priemonės</item>
         <item quantity="other">Rasta %1$s stebėjimo priemonių</item>
     </plurals>
 
-    <plurals name="trackerBlocked" tools:ignore="UnusedQuantity">
+    <plurals name="trackerBlocked">
         <item quantity="one">Užblokuota %1$s stebėjimo priemonė</item>
         <item quantity="few">Užblokuotos %1$s stebėjimo priemonės</item>
         <item quantity="many">Užblokuota %1$s stebėjimo priemonė</item>
         <item quantity="other">Užblokuota %1$s stebėjimo priemonių</item>
     </plurals>
 
-    <plurals name="majorNetworksFound" tools:ignore="UnusedQuantity">
+    <plurals name="majorNetworksFound">
         <item quantity="one">Rastas %1$s pagrindinis stebėjimo priemonės tinklas</item>
         <item quantity="few">Rasti %1$s pagrindiniai stebėjimo priemonės tinklai</item>
         <item quantity="many">Rasta %1$s pagrindinio stebėjimo priemonės tinklo</item>
         <item quantity="other">Rasta %1$s pagrindinių stebėjimo priemonės tinklų</item>
     </plurals>
 
-    <plurals name="majorNetworksBlocked" tools:ignore="UnusedQuantity">
+    <plurals name="majorNetworksBlocked">
         <item quantity="one">Užblokuotas %1$s pagrindinis stebėjimo priemonės tinklas</item>
         <item quantity="few">Užblokuoti %1$s pagrindiniai stebėjimo priemonės tinklai</item>
         <item quantity="many">Užblokuota %1$s pagrindinio stebėjimo priemonės tinklo</item>
@@ -170,9 +191,7 @@
     <!-- About Activity -->
     <string name="aboutActivityTitle">Apie mus</string>
     <string name="aboutDescription">
-        „DuckDuckGo“ nustatome naują patikimumo tinkle standartą.\n\
-        „DuckDuckGo“ privatumo naršyklė užtikrina visus svarbiausius įrankius, kurie padės apsaugoti savo privatumą ieškant ir naršant tinkle, įskaitant sekiklių blokavimą, išmanųjį šifravimą ir „DuckDuckGo“ privačias paieškas.\n\
-        Mūsų komanda tiki, kad internetas neturėtų būti toks baisus, o privatumas, kurio nusipelnėte internete, turėtų būti ranka pasiekiamas.</string>
+        „DuckDuckGo“ nustatome naują patikimumo tinkle standartą.\n\\ „DuckDuckGo“ privatumo naršyklė užtikrina visus svarbiausius įrankius, kurie padės apsaugoti savo privatumą ieškant ir naršant tinkle, įskaitant sekiklių blokavimą, išmanųjį šifravimą ir „DuckDuckGo“ privačias paieškas.\n\\ Mūsų komanda tiki, kad internetas neturėtų būti toks baisus, o privatumas, kurio nusipelnėte internete, turėtų būti ranka pasiekiamas.</string>
     <string name="aboutMoreLink">Daugiau informacijos rasite duckdukgo.com/about</string>
     <string name="no_suggestions">Pasiūlymų nėra</string>
 
@@ -255,10 +274,12 @@
     <string name="rateAppDialogTitle">Įvertinkite programą</string>
     <string name="rateAppDialogMessage">Jūsų atsiliepimai mums labai svarbūs. Palikite mums atsiliepimą.</string>
     <string name="rateAppDialogPositiveButton">Įvertinkite programą</string>
+    <string name="rateAppDialogNegativeButton" translatable="false">@string/noThanks</string>
 
     <string name="giveFeedbackDialogTitle">Apgailestaujame</string>
     <string name="giveFeedbackDialogMessage">Pasakykite savo nuomonę, kaip galėtumėme patobulinti programą</string>
     <string name="giveFeedbackDialogPositiveButton">Pateikite atsiliepimą</string>
+    <string name="giveFeedbackDialogNegativeButton" translatable="false">@string/noThanks</string>
 
     <string name="noThanks">Ne, dėkoju</string>
 
@@ -397,16 +418,16 @@
     <string name="daxIntroCtaText"><![CDATA[Toliau pabandykite apsilankyti viename mėgstamiausių tinklapių! <br/><br/>Užblokuosiu sekimo įrenginius, kad jie negalėtų jūsų šnipinėti. Jei įmanoma, atnaujinsiu jūsų ryšio saugumą. 🔒]]></string>
     <string name="daxEndCtaText"><![CDATA[Atliktai! <br/><br/>Įsidėmėkite: kiekvieną kartą, kai naršote su manimi, bauginantis skelbimas praranda galią. 👍]]></string>
     <string name="daxSerpCtaText">„DuckDuckGo“ paieškos yra anoniminės ir niekada nekaupiu jūsų paieškos istorijos. Niekada. 🙌</string>
-    <plurals name="daxTrackersBlockedCtaText" tools:ignore="UnusedQuantity">
+    <plurals name="daxTrackersBlockedCtaText">
         <item quantity="one"><![CDATA[ ir <b>%1$d kitas</b> bandė tave stebėti. <br/><br/>Užblokavau juos!<br/><br/> ☝️Patikrink URL juostą ir pamatyk, kas bando tave stebėti, kai lankaisi naujoje svetainėje.️]]></item>
         <item quantity="few"><![CDATA[ ir <b>%1$d kiti</b> bandė tave stebėti. <br/><br/>Užblokavau juos!<br/><br/> ☝️Patikrink URL juostą ir pamatyk, kas bando tave stebėti, kai lankaisi naujoje svetainėje.️]]></item>
         <item quantity="many"><![CDATA[ ir <b>%1$d kitų</b> bandė tave stebėti. <br/><br/>Užblokavau juos!<br/><br/> ☝️Patikrink URL juostą ir pamatyk, kas bando tave stebėti, kai lankaisi naujoje svetainėje.️]]></item>
         <item quantity="other"><![CDATA[ ir <b>%1$d kitų</b> bandė tave stebėti. <br/><br/>Užblokavau juos!<br/><br/> ☝️Patikrink URL juostą ir pamatyk, kas bando tave stebėti, kai lankaisi naujoje svetainėje.️]]></item>
     </plurals>
-    <plurals name="daxTrackersBlockedCtaZeroText" tools:ignore="UnusedQuantity">
-        <item quantity="one" tools:ignore="ImpliedQuantity"><![CDATA[ bandė tave stebėti. <br/><br/>Užblokavau!<br/><br/>  ☝️Patikrink URL juostą ir pamatyk, kas bando tave stebėti, kai lankaisi naujoje svetainėje.️]]></item>
-        <item quantity="few"><![CDATA[ bandė tave stebėti. <br/><br/>Užblokavau!<br/><br/>  ☝️Patikrink URL juostą ir pamatyk, kas bando tave stebėti, kai lankaisi naujoje svetainėje.️]]></item>
-        <item quantity="many"><![CDATA[ bandė tave stebėti. <br/><br/>Užblokavau!<br/><br/>  ☝️Patikrink URL juostą ir pamatyk, kas bando tave stebėti, kai lankaisi naujoje svetainėje.️]]></item>
+    <plurals name="daxTrackersBlockedCtaZeroText">
+        <item quantity="one"><![CDATA[ bandė tave stebėti. <br/><br/>Užblokavau!<br/><br/> ☝️Patikrink URL juostą ir pamatyk, kas bando tave stebėti, kai lankaisi naujoje svetainėje.️]]></item>
+        <item quantity="few"><![CDATA[ bandė tave stebėti. <br/><br/>Užblokavau!<br/><br/> ☝️Patikrink URL juostą ir pamatyk, kas bando tave stebėti, kai lankaisi naujoje svetainėje.️]]></item>
+        <item quantity="many"><![CDATA[ bandė tave stebėti. <br/><br/>Užblokavau!<br/><br/> ☝️Patikrink URL juostą ir pamatyk, kas bando tave stebėti, kai lankaisi naujoje svetainėje.️]]></item>
         <item quantity="other"><![CDATA[ bandė tave stebėti. <br/><br/>Užblokavau!<br/><br/> ☝️Patikrink URL juostą ir pamatyk, kas bando tave stebėti, kai lankaisi naujoje svetainėje.️]]></item>
     </plurals>
     <string name="daxNonSerpCtaText"><![CDATA[Bakstelėjus ir slenkant, bus blokuojami įkyrūs sekimo įrenginiai. <br/><br/>Pirmyn - naršykite toliau!]]></string>
@@ -476,4 +497,43 @@
     <string name="downloadManagerDisabled">Parinktis „Download Manager“ išjungta</string>
     <string name="downloadManagerIncompatible">Parinktis „Download Manager“ nepasiekiama šiame įrenginyje</string>
     <string name="enable">Įjungti</string>
+
+    <!--Fire button education-->
+    <string name="daxClearDataCtaText">Bakstelėkite žemiau norėdami įrašyti savo naršymo istoriją. Išbandykite! 👇</string>
+
+    <!-- Precise Location -->
+    <string name="preciseLocationSystemDialogTitle">Įgalinti įrenginio vietą „DuckDuckGo“ privatumo naršyklėje?</string>
+    <string name="preciseLocationSystemDialogSubtitle">%1$s prašo jūsų įrenginio vietos. Pirmiausia turėsite leisti programai siųsti jūsų įrenginio vietą, tuomet %2$s gali prašyti leidimo.</string>
+    <string name="preciseLocationSystemDialogAllow">Įjungti</string>
+    <string name="preciseLocationSystemDialogDeny">Galbūt vėliau</string>
+    <string name="preciseLocationSystemDialogNeverAllow">Nebeprašykite šioje svetainėje</string>
+    <string name="preciseLocationSiteDialogTitle">Suteikti %1$s leidimą pasiekti vietą?</string>
+    <string name="preciseLocationSiteDialogSubtitle">Galite tvarkyti vietos prieigos leidimus, kuriuos nustatymuose suteikėte pavienėms svetainėms.</string>
+    <string name="preciseLocationSiteDialogAllowAlways">Visada</string>
+    <string name="preciseLocationSiteDialogAllowOnce">Tik šiam seansui</string>
+    <string name="preciseLocationSiteDialogDenyAlways">Visada atsisakyti</string>
+    <string name="preciseLocationSiteDialogDenyOnce">Atsisakyti šiam seansui</string>
+    <string name="settingsPreciseLocation">Vieta</string>
+    <string name="preciseLocationFeatureDescription">Svetainės, kuriose lankotės, gali prašyti jūsų įrenginio vietos. Jos negalės jo pasiekti, kol duosite leidimą. „DuckDuckGo“ jūsų vietą naudoja tik anonimiškai, kad pateiktų vietinės paieškos rezultatus.</string>
+    <string name="preciseLocationToggleText">Svetainės gali prašyti mano vietos</string>
+    <string name="preciseLocationEmptyListHint">Jokios svetainės nesuteikė leidimo pasiekti vietą</string>
+    <string name="preciseLocationNoSystemPermission">Norėdami tvarkyti vietos prieigos leidimus, kuriuos suteikėte atskiroms svetainėms, „Android“ nustatymuose šiai programai įjunkite vietą.</string>
+    <string name="preciseLocationActivityTitle">Vieta</string>
+    <string name="preciseLocationDeleteConfirmMessage">Ar tikrai norite ištrinti &lt;b&gt;%1$s&lt;/b&gt;?</string>
+    <string name="preciseLocationDeleteContentDescription">Daugiau vietos leidimų %1$s domene parinkčių</string>
+    <string name="preciseLocationAllowedSitesSectionTitle">Suteiktas</string>
+    <string name="preciseLocationDeniedSitesSectionTitle">Atmestas</string>
+    <string name="preciseLocationSnackbarMessage">Anksčiau %1$s suteikėte leidimą pasiekti jūsų įrenginio vietą.</string>
+
+    <!--  Global Privacy Control-->
+    <string name="globalPrivacyControlActivityTitle">Visuotinė privatumo kontrolė (VPK)</string>
+    <string name="globalPrivacyControlDescription">
+        Jūsų duomenys neturi būti pardavinėjami. Svetainėje „DuckDuckGo“ su tuo sutinkame. Aktyvinkite „Visuotinės privatumo kontrolės (VPK)“ nustatymą ir pranešime svetainėms:\n\n• Nepardavinėti jūsų asmens duomenų.\n • Apriboti jūsų asmens duomenų dalijimąsi su kitomis įmonėmis.
+    </string>
+    <string name="globalPrivacyControlSetting">Visuotinė privatumo kontrolė (VPK)</string>
+    <string name="globalPrivacyControlToggle">Visuotinė privatumo kontrolė (VPK)</string>
+    <string name="globalPrivacyControlDescriptionLegal"><b>Kadangi visuotinė privatumo kontrolė (VPK) yra naujas standartas, daugelis svetainių jo neatpažįsta, tačiau mes stengiamės užtikrinti, kad jis būtų priimtas visame pasaulyje.</b> Tačiau svetainės turi veikti tik remiantis signalu tiek, kiek taikoma pagal taikytiną teisę.</string>
+    <string name="globalPrivacyControlLearnMore"><u>Sužinokite daugiau</u></string>
+    <string name="disabled">Išjungta</string>
+    <string name="enabled">Įjungta</string>
 </resources>

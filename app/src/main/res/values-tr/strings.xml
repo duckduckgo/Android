@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <!--
   ~ Copyright (c) 2020 DuckDuckGo
   ~
@@ -16,6 +17,8 @@
 
 <resources xmlns:tools="http://schemas.android.com/tools">
 
+    <string name="appName" translatable="false">DuckDuckGo</string>
+    <string name="appDescription" translatable="false">DuckDuckGo </string>
     <string name="duckDuckGoLogoDescription">DuckDuckGo logo</string>
     <string name="duckDuckGoPrivacySimplified">Gizlilik, basitleştirildi.</string>
     <string name="yes">Evet</string>
@@ -180,9 +183,7 @@
     <!-- About Activity -->
     <string name="aboutActivityTitle">Hakkımızda</string>
     <string name="aboutDescription">
-        DuckDuckGo\'da, yeni çevrimiçi güven standardını belirliyoruz.\n\
-        DuckDuckGo Gizlilik Tarayıcısı, izleyici engelleme, akıllı şifreleme ve DuckDuckGo özel araması da dahil olmak üzere web\'de arama ve göz atma sırasında kendinizi korumak için ihtiyacınız olan tüm gizlilik özelliklerini sağlar.\n\
-        Sonuçta, internet sizi korkutmamalı ve çevrimiçiyken hak ettiğiniz gizliliği elde etmek, panjurları kapatmak kadar basit olmalı.</string>
+        DuckDuckGo\'da, yeni çevrimiçi güven standardını belirliyoruz.\n\\ DuckDuckGo Gizlilik Tarayıcısı, izleyici engelleme, akıllı şifreleme ve DuckDuckGo özel araması da dahil olmak üzere web\'de arama ve göz atma sırasında kendinizi korumak için ihtiyacınız olan tüm gizlilik özelliklerini sağlar.\n\\ Sonuçta, internet sizi korkutmamalı ve çevrimiçiyken hak ettiğiniz gizliliği elde etmek, panjurları kapatmak kadar basit olmalı.</string>
     <string name="aboutMoreLink">Duckduckgo.com/about adresinde daha fazla bilgi edinin</string>
     <string name="no_suggestions">Öneri yok</string>
 
@@ -484,4 +485,43 @@
     <string name="downloadManagerDisabled">İndirme Yöneticisi devre dışı</string>
     <string name="downloadManagerIncompatible">İndirme Yöneticisi bu cihazda kullanılamıyor</string>
     <string name="enable">Etkinleştir</string>
+
+    <!--Fire button education-->
+    <string name="daxClearDataCtaText">Şimdi göz atma geçmişinizi yakmak için aşağıya dokunun. Hemen deneyin! 👇</string>
+
+    <!-- Precise Location -->
+    <string name="preciseLocationSystemDialogTitle">DuckDuckGo Gizlilik Tarayıcısı için cihaz konumu etkinleştirilsin mi?</string>
+    <string name="preciseLocationSystemDialogSubtitle">%1$s cihazınızın konumunu öğrenmek istiyor. %2$s tarafından izin istenebilmesi için ilk olarak uygulamanın cihazınızın konumunu göndermesine izin vermeniz gerekir.</string>
+    <string name="preciseLocationSystemDialogAllow">Etkinleştir</string>
+    <string name="preciseLocationSystemDialogDeny">Belki Sonra</string>
+    <string name="preciseLocationSystemDialogNeverAllow">Bu Site için Bir Daha Sorma</string>
+    <string name="preciseLocationSiteDialogTitle">%1$s için konuma erişim izni verilsin mi?</string>
+    <string name="preciseLocationSiteDialogSubtitle">Sitelere verdiğiniz konuma erişim izinlerini Ayarlar bölümünden yönetebilirsiniz.</string>
+    <string name="preciseLocationSiteDialogAllowAlways">Her zaman</string>
+    <string name="preciseLocationSiteDialogAllowOnce">Yalnızca bu oturum için</string>
+    <string name="preciseLocationSiteDialogDenyAlways">Her zaman reddet</string>
+    <string name="preciseLocationSiteDialogDenyOnce">Bu oturum için reddet</string>
+    <string name="settingsPreciseLocation">Konum</string>
+    <string name="preciseLocationFeatureDescription">Ziyaret ettiğiniz siteler cihazınızın konumunu öğrenmek isteyebilir. Ancak siz açıkça izin vermediğiniz takdirde konumunuza erişemezler. DuckDuckGo, konumunuzu yalnızca yerel arama sonuçları sunmak için anonim olarak kullanır.</string>
+    <string name="preciseLocationToggleText">Siteler konumumu sorabilir</string>
+    <string name="preciseLocationEmptyListHint">Hiçbir web sitesine konuma erişim izni verilmedi</string>
+    <string name="preciseLocationNoSystemPermission">Web sitelerine verdiğiniz konuma erişim izinlerini yönetmek üzere Android Ayarları\'ndan bu uygulama için konumu etkinleştirin.</string>
+    <string name="preciseLocationActivityTitle">Konum</string>
+    <string name="preciseLocationDeleteConfirmMessage">&lt;b&gt;%1$s&lt;/b&gt;\'ı silmek istediğinizden emin misiniz?</string>
+    <string name="preciseLocationDeleteContentDescription">%1$s alanında konum izinleri için daha fazla seçenek</string>
+    <string name="preciseLocationAllowedSitesSectionTitle">Verildi</string>
+    <string name="preciseLocationDeniedSitesSectionTitle">Reddedildi</string>
+    <string name="preciseLocationSnackbarMessage">%1$s için daha önce konumunuza erişim izni vermiştiniz.</string>
+
+    <!--  Global Privacy Control-->
+    <string name="globalPrivacyControlActivityTitle">Küresel Gizlilik Kontrolü (GPC)</string>
+    <string name="globalPrivacyControlDescription">
+        Verileriniz satılık olmamalı. DuckDuckGo\'da aynı fikirdeyiz. \"Küresel Gizlilik Kontrolü\" (GPC) ayarını etkinleştirirseniz web sitelerine şu tercihleri yaptığınızı bildiririz:&lt;br/&gt;&lt;br/&gt; • Kişisel verilerinizin satılmasını istemediğinizi.&lt;br/&gt; • Kişisel verilerinizin diğer şirketlerle paylaşımının sınırlandırılmasını istediğinizi.
+    </string>
+    <string name="globalPrivacyControlSetting">Küresel Gizlilik Kontrolü (GPC)</string>
+    <string name="globalPrivacyControlToggle">Küresel Gizlilik Kontrolü (GPC)</string>
+    <string name="globalPrivacyControlDescriptionLegal"><b>Küresel Gizlilik Kontrolü (GPC) yeni bir standart olduğundan, çoğu web sitesi tarafından henüz tanınmayacaktır. Ancak, dünya çapında benimsenmesini sağlamak için elimizden geleni yapıyoruz.</b> Bununla birlikte, web sitelerinin onlara bildirilen tercihleri yalnızca geçerli yasaların zorunlu kıldığı ölçüde dikkate almaları gerekmektedir.</string>
+    <string name="globalPrivacyControlLearnMore"><u>Daha Fazla Bilgi</u></string>
+    <string name="disabled">Devre Dışı</string>
+    <string name="enabled">Etkin</string>
 </resources>

@@ -1,4 +1,20 @@
-﻿<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2020 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
 <resources xmlns:tools="http://schemas.android.com/tools">
 
     <string name="appName" translatable="false">DuckDuckGo</string>
@@ -52,7 +68,7 @@
     <string name="previousSearchTermDescription">Vorheriges Ergebnis</string>
     <string name="closeFindInPageButtonDescription">Seitensuchansicht schließen</string>
     <string name="findInPageHint">Auf Seite suchen</string>
-    <string name="findInPageMatches" translatable="false">%1$d/%2$d</string>
+    <string name="findInPageMatches" translatable="false">%d/%d</string>
 
     <!-- AutoComplete Suggestions -->
     <string name="editQueryBeforeSubmitting">Anfrage vor der Suche bearbeiten</string>
@@ -469,4 +485,43 @@
     <string name="downloadManagerDisabled">Der Download-Manager ist deaktiviert</string>
     <string name="downloadManagerIncompatible">Der Download-Manager ist auf diesem Gerät nicht verfügbar</string>
     <string name="enable">Aktivieren</string>
+
+    <!--Fire button education-->
+    <string name="daxClearDataCtaText">Schaltfläche unten antippen und die Browser-Chronik löst sich in Luft auf. Probieren Sie es aus! 👇</string>
+
+    <!-- Precise Location -->
+    <string name="preciseLocationSystemDialogTitle">Gerätestandort für DuckDuckGo Privacy Browser freigeben?</string>
+    <string name="preciseLocationSystemDialogSubtitle">%1$s erfragt Ihren Gerätestandort. Zuerst müssen Sie der App die Befugnis geben, den Standort Ihres Geräts weiterzugeben, erst dann kann %2$s um Erlaubnis bitten.</string>
+    <string name="preciseLocationSystemDialogAllow">Aktivieren</string>
+    <string name="preciseLocationSystemDialogDeny">Vielleicht später</string>
+    <string name="preciseLocationSystemDialogNeverAllow">Für diese Website nicht erneut fragen</string>
+    <string name="preciseLocationSiteDialogTitle">%1$s Zugriffsberechtigung auf den Gerätestandort erteilen?</string>
+    <string name="preciseLocationSiteDialogSubtitle">Sie können die Berechtigungen in den Einstellungen verwalten. Dort sehen Sie, welchen Websites Sie Zugriffsberechtigungen auf den Gerätestandort gewährt haben.</string>
+    <string name="preciseLocationSiteDialogAllowAlways">Immer</string>
+    <string name="preciseLocationSiteDialogAllowOnce">Nur für diese Sitzung</string>
+    <string name="preciseLocationSiteDialogDenyAlways">Immer ablehnen</string>
+    <string name="preciseLocationSiteDialogDenyOnce">Für diese Sitzung ablehnen</string>
+    <string name="settingsPreciseLocation">Standort</string>
+    <string name="preciseLocationFeatureDescription">Von Ihnen besuchte Websites können nach Ihrem Gerätestandort fragen. Ohne Ihre ausdrückliche Erlaubnis, können diese aber nicht auf diese Information zugreifen. Um für Ihre Region relevante Suchergebnisse zu liefern, nutzt DuckDuckGo Ihren anonymisierten Standort.</string>
+    <string name="preciseLocationToggleText">Websites dürfen meinen Standort erfragen</string>
+    <string name="preciseLocationEmptyListHint">Keinen Websites wurde Zugriff auf Ihren Gerätestandort gewährt</string>
+    <string name="preciseLocationNoSystemPermission">Aktivieren Sie den Standort für diese App in den Android-Einstellungen, um die Zugriffsberechtigungen für einzelne Websites verwalten zu können.</string>
+    <string name="preciseLocationActivityTitle">Standort</string>
+    <string name="preciseLocationDeleteConfirmMessage">Möchten Sie &lt;b&gt;%1$s&lt;/b&gt; wirklich löschen?</string>
+    <string name="preciseLocationDeleteContentDescription">Weitere Optionen für Standortberechtigungen in der Domain: %1$s</string>
+    <string name="preciseLocationAllowedSitesSectionTitle">Gewährt</string>
+    <string name="preciseLocationDeniedSitesSectionTitle">Abgelehnt</string>
+    <string name="preciseLocationSnackbarMessage">Sie haben %1$s in der Vergangenheit den Zugriff auf Ihren Gerätestandort gewährt.</string>
+
+    <!--  Global Privacy Control-->
+    <string name="globalPrivacyControlActivityTitle">Global Privacy Control (GPC)</string>
+    <string name="globalPrivacyControlDescription">
+        Ihre Daten sollten nicht zum Verkauf stehen. Und bei DuckDuckGo vertreten wir eben diese Meinung. Aktivieren Sie die Einstellung „Global Privacy Control“ (GPC) und wir teilen Websites Folgendes mit:\n\n• Persönliche Daten nicht verkaufen.\n • Persönliche Daten wenn möglich nicht an andere Unternehmen weiterleiten.
+    </string>
+    <string name="globalPrivacyControlSetting">Global Privacy Control (GPC)</string>
+    <string name="globalPrivacyControlToggle">Global Privacy Control (GPC)</string>
+    <string name="globalPrivacyControlDescriptionLegal"><b>Global Privacy Control (GPC) ist noch ganz neu und die meisten Websites werden den Standard nicht sofort erkennen. Wir arbeiten aber darauf hin, dass der GPC-Standard bald weltweit akzeptiert wird.</b> Websites sind jedoch nur dann verpflichtet, den Aufruf zu beherzigen und umzusetzen, wenn die geltenden Gesetze sie dazu verpflichten.</string>
+    <string name="globalPrivacyControlLearnMore"><u>Mehr erfahren</u></string>
+    <string name="disabled">Deaktiviert</string>
+    <string name="enabled">Aktiviert</string>
 </resources>

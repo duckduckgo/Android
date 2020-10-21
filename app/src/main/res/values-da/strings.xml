@@ -1,5 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2020 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
 <resources xmlns:tools="http://schemas.android.com/tools">
 
+    <string name="appName" translatable="false">DuckDuckGo</string>
+    <string name="appDescription" translatable="false">DuckDuckGo </string>
     <string name="duckDuckGoLogoDescription">DuckDuckGo-logo</string>
     <string name="duckDuckGoPrivacySimplified">Privatlivets fred, forenklet.</string>
     <string name="yes">Ja</string>
@@ -49,6 +68,7 @@
     <string name="previousSearchTermDescription">Find tidligere</string>
     <string name="closeFindInPageButtonDescription">Luk visningen find på side</string>
     <string name="findInPageHint">Find på side</string>
+    <string name="findInPageMatches" translatable="false">%d/%d</string>
 
     <!-- AutoComplete Suggestions -->
     <string name="editQueryBeforeSubmitting">Redigér forespørgsel før søgning</string>
@@ -61,6 +81,7 @@
     <string name="unableToOpenLink">Det er ikke muligt at åbne denne type link</string>
 
     <!-- Tabs -->
+    <string name="homeTab" translatable="false">DuckDuckGo</string>
     <string name="tabActivityTitle">Faner</string>
     <string name="tabsMenuItem">Faner</string>
     <string name="newTabMenuItem">Ny fane</string>
@@ -162,9 +183,7 @@
     <!-- About Activity -->
     <string name="aboutActivityTitle">Om os</string>
     <string name="aboutDescription">
-        Hos DuckDuckGo sætter vi den nye standard for tiltro online .\n\
-        DuckDuckGo Privacy Browser giver dig alle de nødvendige værktøjer til at værne over privatlivets fred, så du kan beskytte dig selv, når du søger og surfer på nettet, herunder tracker-blokering, smartere kryptering og DuckDuckGo-privat søgning.\n\
-        Internettet bør trods alt ikke føles så skummelt, og det bør være lige så enkelt at få det privatliv, du fortjener online, som at lukke dine persienner ned.</string>
+        Hos DuckDuckGo sætter vi den nye standard for tiltro online .\n\\ DuckDuckGo Privacy Browser giver dig alle de nødvendige værktøjer til at værne over privatlivets fred, så du kan beskytte dig selv, når du søger og surfer på nettet, herunder tracker-blokering, smartere kryptering og DuckDuckGo-privat søgning.\n\\ Internettet bør trods alt ikke føles så skummelt, og det bør være lige så enkelt at få det privatliv, du fortjener online, som at lukke dine persienner ned.</string>
     <string name="aboutMoreLink">Mere på duckduckgo.com/about</string>
     <string name="no_suggestions">Ingen forslag</string>
 
@@ -247,10 +266,12 @@
     <string name="rateAppDialogTitle">Bedøm appen</string>
     <string name="rateAppDialogMessage">Din feedback betyder noget. Del din kærlighed med en bedømmelse.</string>
     <string name="rateAppDialogPositiveButton">Bedøm appen</string>
+    <string name="rateAppDialogNegativeButton" translatable="false">@string/noThanks</string>
 
     <string name="giveFeedbackDialogTitle">Det er vi kede af at høre</string>
     <string name="giveFeedbackDialogMessage">Fortæl os, hvordan vi kan forbedre appen for dig</string>
     <string name="giveFeedbackDialogPositiveButton">Giv feedback</string>
+    <string name="giveFeedbackDialogNegativeButton" translatable="false">@string/noThanks</string>
 
     <string name="noThanks">Nej tak.</string>
 
@@ -464,4 +485,43 @@
     <string name="downloadManagerDisabled">Download Manager er deaktiveret</string>
     <string name="downloadManagerIncompatible">Download Manager er ikke tilgængelig på denne enhed</string>
     <string name="enable">Aktiver</string>
+
+    <!--Fire button education-->
+    <string name="daxClearDataCtaText">Tryk nu nedenfor for at brænde din browsinghistorik. Prøv det! 👇</string>
+
+    <!-- Precise Location -->
+    <string name="preciseLocationSystemDialogTitle">Vil du aktivere enhedsplacering for DuckDuckGo-databeskyttelsesbrowser?</string>
+    <string name="preciseLocationSystemDialogSubtitle">%1$s anmoder om din enhedsplacering. Du skal først give tilladelse til, at appen kan sende din enhedsplacering, hvorefter %2$s kan bede om tilladelse.</string>
+    <string name="preciseLocationSystemDialogAllow">Aktiver</string>
+    <string name="preciseLocationSystemDialogDeny">Måske senere</string>
+    <string name="preciseLocationSystemDialogNeverAllow">Spørg ikke igen for dette websted</string>
+    <string name="preciseLocationSiteDialogTitle">Vil du give %1$s tilladelse til at få adgang til placering?</string>
+    <string name="preciseLocationSiteDialogSubtitle">Du kan administrere de tilladelser til placeringsadgang, du har givet til individuelle websteder under Indstillinger.</string>
+    <string name="preciseLocationSiteDialogAllowAlways">Altid</string>
+    <string name="preciseLocationSiteDialogAllowOnce">Kun for denne session</string>
+    <string name="preciseLocationSiteDialogDenyAlways">Afvis altid</string>
+    <string name="preciseLocationSiteDialogDenyOnce">Afvis for denne session</string>
+    <string name="settingsPreciseLocation">Placering</string>
+    <string name="preciseLocationFeatureDescription">Websteder, du besøger, kan bede om at få kendskab til din enhedsplacering. De kan ikke få adgang til den, før du udtrykkeligt giver tilladelse. DuckDuckGo bruger kun din placering anonymt til at levere lokale søgeresultater.</string>
+    <string name="preciseLocationToggleText">Websteder kan bede om min placering</string>
+    <string name="preciseLocationEmptyListHint">Ingen websteder har tilladelse til at få adgang til placering</string>
+    <string name="preciseLocationNoSystemPermission">For at administrere de tilladelser til placeringsadgang, du har givet til individuelle websteder, skal du aktivere placering for denne app under Android-indstillinger.</string>
+    <string name="preciseLocationActivityTitle">Placering</string>
+    <string name="preciseLocationDeleteConfirmMessage">Er du sikker på, at du vil slette &lt;b&gt;%1$s&lt;/b&gt;?</string>
+    <string name="preciseLocationDeleteContentDescription">Flere valgmuligheder for placeringstilladelser i domæne %1$s</string>
+    <string name="preciseLocationAllowedSitesSectionTitle">Tilladt</string>
+    <string name="preciseLocationDeniedSitesSectionTitle">Afvist</string>
+    <string name="preciseLocationSnackbarMessage">Du har tidligere givet %1$s tilladelse til at få adgang til din enhedsplacering.</string>
+
+    <!--  Global Privacy Control-->
+    <string name="globalPrivacyControlActivityTitle">Global Privacy Control (GPC)</string>
+    <string name="globalPrivacyControlDescription">
+        Dine data burde ikke være til salg. Det er vi enige i hos DuckDuckGo. Aktivér indstillingen \"Global Privacy Control\" (GPC), så signalerer vi til websteder, at du foretrækker: \n\n• Ikke at sælge dine persondata.\n • Begræns deling af dine persondata til andre virksomheder.
+    </string>
+    <string name="globalPrivacyControlSetting">Global Privacy Control (GPC)</string>
+    <string name="globalPrivacyControlToggle">Global Privacy Control (GPC)</string>
+    <string name="globalPrivacyControlDescriptionLegal"><b>Da Global Privacy Control (GPC) er en ny standard, genkender de fleste websteder den endnu ikke, men vi arbejder hårdt på at sikre, at den bliver accepteret over hele verden.</b> Websteder er dog kun forpligtede til at reagere på signalet i det omfang, de er forpligtede til at gøre det ved gældende lov.</string>
+    <string name="globalPrivacyControlLearnMore"><u>Få mere at vide</u></string>
+    <string name="disabled">Deaktiveret</string>
+    <string name="enabled">Aktiveret</string>
 </resources>
