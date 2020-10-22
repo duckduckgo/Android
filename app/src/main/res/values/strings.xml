@@ -153,11 +153,13 @@
     <string name="settingsAutomaticallyClearingDialogSave">Save</string>
 
     <string name="settingsAutomaticallyClearWhat">Automatically Clear…</string>
+    <string name="settingsAutomaticallyClearWhatDialogTitle">Automatically clear…</string>
     <string name="settingsAutomaticallyClearWhatOptionNone">None</string>
     <string name="settingsAutomaticallyClearWhatOptionTabs">Tabs</string>
     <string name="settingsAutomaticallyClearWhatOptionTabsAndData">Tabs and data</string>
 
     <string name="settingsAutomaticallyClearWhen">Clear On…</string>
+    <string name="settingsAutomaticallyClearWhenDialogTitle">Clear on…</string>
     <string name="settingsAutomaticallyClearWhenAppExitOnly">App exit only</string>
     <string name="settingsAutomaticallyClearWhenAppExit5Seconds">App exit, inactive for 5 seconds</string>
     <string name="settingsAutomaticallyClearWhenAppExit5Minutes">App exit, inactive for 5 minutes</string>
