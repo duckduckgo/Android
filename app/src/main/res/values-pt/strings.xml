@@ -1,5 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2020 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
 <resources xmlns:tools="http://schemas.android.com/tools">
 
+    <string name="appName" translatable="false">DuckDuckGo</string>
+    <string name="appDescription" translatable="false">DuckDuckGo </string>
     <string name="duckDuckGoLogoDescription">Logótipo do DuckDuckGo</string>
     <string name="duckDuckGoPrivacySimplified">Privacidade, simplificada.</string>
     <string name="yes">Sim</string>
@@ -49,6 +68,7 @@
     <string name="previousSearchTermDescription">Encontrar anterior</string>
     <string name="closeFindInPageButtonDescription">Fechar a vista de encontrar na página</string>
     <string name="findInPageHint">Encontrar na página</string>
+    <string name="findInPageMatches" translatable="false">%d/%d</string>
 
     <!-- AutoComplete Suggestions -->
     <string name="editQueryBeforeSubmitting">Editar consulta antes de pesquisar</string>
@@ -61,6 +81,7 @@
     <string name="unableToOpenLink">Não é possível abrir este tipo de ligação</string>
 
     <!-- Tabs -->
+    <string name="homeTab" translatable="false">DuckDuckGo</string>
     <string name="tabActivityTitle">Separadores</string>
     <string name="tabsMenuItem">Separadores</string>
     <string name="newTabMenuItem">Novo separador</string>
@@ -162,9 +183,7 @@
     <!-- About Activity -->
     <string name="aboutActivityTitle">Sobre nós</string>
     <string name="aboutDescription">
-        No DuckDuckGo, estamos a definir o novo padrão de confiança online.\n\
-        O Navegador de Privacidade DuckDuckGo fornece todos os elementos essenciais de privacidade de que necessita para se proteger enquanto pesquisa e navega na Web, incluindo bloqueio de rastreadores, encriptação mais inteligente e pesquisa privada DuckDuckGo.\n\
-        Afinal de contas, a Internet não deve ser tão assustadora, e obter a privacidade que merece online deve ser tão simples como fechar as persianas.</string>
+        No DuckDuckGo, estamos a definir o novo padrão de confiança online.\n\n O Navegador de Privacidade DuckDuckGo fornece todos os elementos essenciais de privacidade de que necessita para se proteger enquanto pesquisa e navega na Web, incluindo bloqueio de rastreadores, encriptação mais inteligente e pesquisa privada DuckDuckGo.\n\n Afinal de contas, a Internet não deve ser tão assustadora, e obter a privacidade que merece online deve ser tão simples como fechar as persianas.</string>
     <string name="aboutMoreLink">Mais em duckduckgo.com/about</string>
     <string name="no_suggestions">Sem sugestões</string>
 
@@ -247,10 +266,12 @@
     <string name="rateAppDialogTitle">Classifique a aplicação</string>
     <string name="rateAppDialogMessage">Os seus comentários são importantes. Partilhe o que gosta com uma análise.</string>
     <string name="rateAppDialogPositiveButton">Classificar a aplicação</string>
+    <string name="rateAppDialogNegativeButton" translatable="false">@string/noThanks</string>
 
     <string name="giveFeedbackDialogTitle">Lamentamos saber isso</string>
     <string name="giveFeedbackDialogMessage">Diga-nos como podemos melhorar a aplicação para si</string>
     <string name="giveFeedbackDialogPositiveButton">Deixar comentário</string>
+    <string name="giveFeedbackDialogNegativeButton" translatable="false">@string/noThanks</string>
 
     <string name="noThanks">Não, obrigado</string>
 
@@ -394,7 +415,7 @@
         <item quantity="other"><![CDATA[ e mais <b>%1$d outros</b> estavam a tentar rastrear aqui. <br/><br/>Eu bloqueei-os!<br/><br/> ☝️Pode verificar a barra de URL para ver quem está a tentar rastrear quando visita um novo site.️]]></item>
     </plurals>
     <plurals name="daxTrackersBlockedCtaZeroText">
-        <item quantity="one" tools:ignore="ImpliedQuantity"><![CDATA[ estava a tentar rastrear aqui. <br/><br/>Eu bloqueei-o!<br/><br/> ☝️Pode verificar a barra de URL para ver quem está a tentar rastrear quando visita um novo site.️]]></item>
+        <item quantity="one"><![CDATA[ estava a tentar rastrear aqui. <br/><br/>Eu bloqueei-o!<br/><br/> ☝️Pode verificar a barra de URL para ver quem está a tentar rastrear quando visita um novo site.️]]></item>
         <item quantity="other"><![CDATA[ estavam a tentar rastrear aqui. <br/><br/>Eu bloqueei-o!<br/><br/> ☝️Pode verificar a barra de URL para ver quem está a tentar rastrear quando visita um novo site.️]]></item>
     </plurals>
     <string name="daxNonSerpCtaText"><![CDATA[Enquanto toca e desliza, eu bloqueio rastreadores irritantes. <br/><br/>Prossiga - continue a navegar!]]></string>
@@ -464,4 +485,43 @@
     <string name="downloadManagerDisabled">Gestor de transferências desativado</string>
     <string name="downloadManagerIncompatible">Gestor de transferências não disponível neste dispositivo</string>
     <string name="enable">Permitir</string>
+
+    <!--Fire button education-->
+    <string name="daxClearDataCtaText">Agora toque abaixo para queimar o seu histórico de navegação. Experimente! 👇</string>
+
+    <!-- Precise Location -->
+    <string name="preciseLocationSystemDialogTitle">Ativar a localização do dispositivo para o Navegador de Privacidade DuckDuckGo?</string>
+    <string name="preciseLocationSystemDialogSubtitle">%1$s está a pedir a localização do seu dispositivo. Primeiro, precisa permitir que a aplicação envie a localização do dispositivo e, em seguida, %2$s pode pedir permissão.</string>
+    <string name="preciseLocationSystemDialogAllow">Permitir</string>
+    <string name="preciseLocationSystemDialogDeny">Talvez mais tarde</string>
+    <string name="preciseLocationSystemDialogNeverAllow">Não pedir novamente por este site</string>
+    <string name="preciseLocationSiteDialogTitle">Conceder %1$s permissão para aceder a localização?</string>
+    <string name="preciseLocationSiteDialogSubtitle">Pode gerir as permissões de acesso à localização concedidas a sites individuais nas Definições.</string>
+    <string name="preciseLocationSiteDialogAllowAlways">Sempre</string>
+    <string name="preciseLocationSiteDialogAllowOnce">Apenas para esta sessão</string>
+    <string name="preciseLocationSiteDialogDenyAlways">Negar sempre</string>
+    <string name="preciseLocationSiteDialogDenyOnce">Negar para esta sessão</string>
+    <string name="settingsPreciseLocation">Localização</string>
+    <string name="preciseLocationFeatureDescription">Os sites que visita podem pedir para saber a localização do dispositivo. Eles não poderão aceder a ele até lhes conceder permissão explicitamente. DuckDuckGo apenas utiliza a sua localização anonimamente para entregar resultados de pesquisas locais.</string>
+    <string name="preciseLocationToggleText">Os sites podem solicitar a minha localização</string>
+    <string name="preciseLocationEmptyListHint">Nenhum site tem garantia de permissão para aceder à localização</string>
+    <string name="preciseLocationNoSystemPermission">Para gerir as permissões de acesso à localização que concedeu a sites individuais, ative a localização para esta aplicação, nas definições do Android.</string>
+    <string name="preciseLocationActivityTitle">Localização</string>
+    <string name="preciseLocationDeleteConfirmMessage">Tem a certeza de que deseja eliminar &lt;b&gt;%1$s&lt;/b&gt;?</string>
+    <string name="preciseLocationDeleteContentDescription">Mais opções para as permissões da localização no domínio %1$s</string>
+    <string name="preciseLocationAllowedSitesSectionTitle">Concedido</string>
+    <string name="preciseLocationDeniedSitesSectionTitle">Negado</string>
+    <string name="preciseLocationSnackbarMessage">Anteriormente concedeu %1$s permissão para aceder a localização do seu dispositivo.</string>
+
+    <!--  Global Privacy Control-->
+    <string name="globalPrivacyControlActivityTitle">Controlo Global de Privacidade (CGP)</string>
+    <string name="globalPrivacyControlDescription">
+        Os seus dados não devem estar à venda. Na DuckDuckGo, concordamos. Ative a configuração de \'\'Controlo Global de Privacidade\'\' (CGP) e enviaremos um sinal aos sites da sua preferência para:&lt;br/&gt;&lt;br/&gt; • Não vender os seus dados pessoais.&lt;br/&gt; • Limite a partilha dos seus dados pessoais com outras empresas.
+    </string>
+    <string name="globalPrivacyControlSetting">Controlo Global de Privacidade (CGP)</string>
+    <string name="globalPrivacyControlToggle">Controlo Global de Privacidade (CGP)</string>
+    <string name="globalPrivacyControlDescriptionLegal"><b>Como o Controlo Global de Privacidade (CGP) é um novo padrão, a maioria dos websites ainda não o reconhecem, mas estamos a trabalhar arduamente para garantir que seja aceite em todo o mundo.</b> Contudo, os websites só são obrigados a agir ao sinal na medida em que as leis aplicáveis os obrigam a fazê-lo.</string>
+    <string name="globalPrivacyControlLearnMore"><u>Saiba mais</u></string>
+    <string name="disabled">Desativado</string>
+    <string name="enabled">Ativado</string>
 </resources>

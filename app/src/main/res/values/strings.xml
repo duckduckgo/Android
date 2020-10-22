@@ -168,8 +168,8 @@
     <!-- About Activity -->
     <string name="aboutActivityTitle">About DuckDuckGo</string>
     <string name="aboutDescription">
-        At DuckDuckGo, we\'re setting the new standard of trust online.\n\
-        DuckDuckGo Privacy Browser provides all the privacy essentials you need to protect yourself as you search and browse the web, including tracker blocking, smarter encryption, and DuckDuckGo private search.\n\
+        At DuckDuckGo, we\'re setting the new standard of trust online.\n\n
+        DuckDuckGo Privacy Browser provides all the privacy essentials you need to protect yourself as you search and browse the web, including tracker blocking, smarter encryption, and DuckDuckGo private search.\n\n
         After all, the internet shouldn\'t feel so creepy, and getting the privacy you deserve online should be as simple as closing the blinds.</string>
     <string name="aboutMoreLink">More at duckduckgo.com/about</string>
     <string name="no_suggestions">No Suggestions</string>
@@ -473,4 +473,45 @@
     <string name="downloadManagerDisabled">Download Manager is disabled</string>
     <string name="downloadManagerIncompatible">Download Manager not available on this device</string>
     <string name="enable">Enable</string>
+
+    <!-- Precise Location -->
+    <string name="preciseLocationSystemDialogTitle">Enable device location for DuckDuckGo Privacy Browser?</string>
+    <string name="preciseLocationSystemDialogSubtitle">%s is requesting your device location. You\'ll first need to allow the app to send your device location, then %s can ask permission.</string>
+    <string name="preciseLocationSystemDialogAllow">Enable</string>
+    <string name="preciseLocationSystemDialogDeny">Maybe Later</string>
+    <string name="preciseLocationSystemDialogNeverAllow">Don\'t Ask Again for this Site</string>
+    <string name="preciseLocationSiteDialogTitle">Grant %s permission to access location?</string>
+    <string name="preciseLocationSiteDialogSubtitle">You can manage the location access permissions you’ve granted to individual sites in Settings.</string>
+    <string name="preciseLocationSiteDialogAllowAlways">Always</string>
+    <string name="preciseLocationSiteDialogAllowOnce">Only for this session</string>
+    <string name="preciseLocationSiteDialogDenyAlways">Deny always</string>
+    <string name="preciseLocationSiteDialogDenyOnce">Deny for this session</string>
+    <string name="settingsPreciseLocation">Location</string>
+    <string name="preciseLocationFeatureDescription">Sites you visit may ask to know your device location. They won\'t be able to access it until you explicitly grant permission. DuckDuckGo only uses your location anonymously to deliver local search results.</string>
+    <string name="preciseLocationToggleText">Sites can ask for my location</string>
+    <string name="preciseLocationEmptyListHint">No websites granted permission to access location</string>
+    <string name="preciseLocationNoSystemPermission">To manage the location access permissions you\’ve granted to individual sites, enable location for this app in Android Settings.</string>
+    <string name="preciseLocationActivityTitle">Location</string>
+    <string name="preciseLocationDeleteConfirmMessage">Are you sure you want to delete &lt;b>%s&lt;/b>?</string>
+    <string name="preciseLocationDeleteContentDescription">More options for location permissions in domain %s</string>
+    <string name="preciseLocationAllowedSitesSectionTitle">Granted</string>
+    <string name="preciseLocationDeniedSitesSectionTitle">Denied</string>
+    <string name="preciseLocationSnackbarMessage">You previously granted %s permission to access your device location.</string>
+
+    <!--Fire button education-->
+    <string name="daxClearDataCtaText">Personal data can build up in your browser. Yuck. Use the Fire Button to burn it all away. Give it a try now! &#128071;</string>
+
+    <!--  Global Privacy Control-->
+    <string name="globalPrivacyControlActivityTitle">Global Privacy Control (GPC)</string>
+    <string name="globalPrivacyControlDescription">
+        Your data shouldn\'t be for sale. At DuckDuckGo, we agree. Activate the \"Global Privacy Control\" (GPC) setting and we\'ll signal to websites your preference to:&lt;br/&gt;&lt;br/&gt;
+        &#8226; Not sell your personal data.&lt;br/&gt;
+        &#8226; Limit sharing of your personal data to other companies.
+    </string>
+    <string name="globalPrivacyControlSetting">Global Privacy Control (GPC)</string>
+    <string name="globalPrivacyControlToggle">Global Privacy Control (GPC)</string>
+    <string name="globalPrivacyControlDescriptionLegal"><b>Since Global Privacy Control (GPC) is a new standard, most websites won\'t recognize it yet, but we\'re working hard to ensure it becomes accepted worldwide.</b> However, websites are only required to act on the signal to the extent applicable laws compel them to do so.</string>
+    <string name="globalPrivacyControlLearnMore"><u>Learn More</u></string>
+    <string name="disabled">Disabled</string>
+    <string name="enabled">Enabled</string>
 </resources>
