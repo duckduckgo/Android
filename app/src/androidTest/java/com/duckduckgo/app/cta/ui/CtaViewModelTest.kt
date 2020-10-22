@@ -180,14 +180,14 @@ class CtaViewModelTest {
     }
 
     @Test
-    fun whenScheduledSurveyChangesAndInstalledDaysMatchAndLocleIsUsThenCtaIsSurvey() = coroutineRule.runBlocking {
+    fun whenScheduledSurveyChangesAndInstalledDaysMatchAndLocaleIsUsThenCtaIsSurvey() = coroutineRule.runBlocking {
         testee.onSurveyChanged(Survey("abc", "http://example.com", 1, SCHEDULED))
         val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = false, site = null, locale = Locale.US)
         assertTrue(value is HomePanelCta.Survey)
     }
 
     @Test
-    fun whenScheduledSurveyChangesAndInstalledDaysMatchButLocleIsNotUsThenCtaIsNotSurvey() = coroutineRule.runBlocking {
+    fun whenScheduledSurveyChangesAndInstalledDaysMatchButLocaleIsNotUsThenCtaIsNotSurvey() = coroutineRule.runBlocking {
         testee.onSurveyChanged(Survey("abc", "http://example.com", 1, SCHEDULED))
         val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = false, site = null, locale = Locale.CANADA)
         assertFalse(value is HomePanelCta.Survey)
