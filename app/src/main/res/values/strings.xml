@@ -255,7 +255,7 @@
     <string name="rateAppDialogPositiveButton">Rate App</string>
     <string name="rateAppDialogNegativeButton" translatable="false">@string/noThanks</string>
 
-    <string name="giveFeedbackDialogTitle">We\'re Sorry To Hear That</string>
+    <string name="giveFeedbackDialogTitle">We\'re sorry to hear that</string>
     <string name="giveFeedbackDialogMessage">Let us know how we can improve the app for you.</string>
     <string name="giveFeedbackDialogPositiveButton">Share Feedback</string>
     <string name="giveFeedbackDialogNegativeButton" translatable="false">@string/noThanks</string>
@@ -347,7 +347,7 @@
     <string name="thanksForTheFeedback">Thanks for the feedback!</string>
     <string name="feedbackNegativeMainReasonPageSubtitle">What is your frustration most related to?</string>
     <string name="feedbackNegativeMainReasonPageTitle">We\'re Sorry To Hear That</string>
-    <string name="feedbackShareDetails">Share details</string>
+    <string name="feedbackShareDetails">Share Details</string>
     <string name="sharePositiveFeedbackWithTheTeam">Are there any details you\'d like to share with the team?</string>
     <string name="whatHaveYouBeenEnjoying">What have you been enjoying?</string>
     <string name="awesomeToHear">Awesome to Hear!</string>
