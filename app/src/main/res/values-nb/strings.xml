@@ -1,5 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2020 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
 <resources xmlns:tools="http://schemas.android.com/tools">
 
+    <string name="appName" translatable="false">DuckDuckGo</string>
+    <string name="appDescription" translatable="false">DuckDuckGo </string>
     <string name="duckDuckGoLogoDescription">DuckDuckGo logo</string>
     <string name="duckDuckGoPrivacySimplified">Personvern gjort enkelt.</string>
     <string name="yes">Ja</string>
@@ -49,6 +68,7 @@
     <string name="previousSearchTermDescription">Finn forrige</string>
     <string name="closeFindInPageButtonDescription">Lukk finn-på-side-visning</string>
     <string name="findInPageHint">Finn på side</string>
+    <string name="findInPageMatches" translatable="false">%d/%d</string>
 
     <!-- AutoComplete Suggestions -->
     <string name="editQueryBeforeSubmitting">Rediger spørringen før du søker</string>
@@ -61,6 +81,7 @@
     <string name="unableToOpenLink">Kan ikke åpne denne typen lenke</string>
 
     <!-- Tabs -->
+    <string name="homeTab" translatable="false">DuckDuckGo</string>
     <string name="tabActivityTitle">Faner</string>
     <string name="tabsMenuItem">Faner</string>
     <string name="newTabMenuItem">Ny fane</string>
@@ -162,9 +183,7 @@
     <!-- About Activity -->
     <string name="aboutActivityTitle">Om oss</string>
     <string name="aboutDescription">
-        Hos DucDuckGo setter vi den nye standarden for pålitelighet på nettet.\n\
-        DuckDuckGos private nettleser gir deg alle de grunnleggende personvernfunksjonene du trenger for å beskytte deg selv mens du søker og surfer på nettet, inkludert sporingsblokkering, smartere kryptering og DuckDuckGos private søk.\n\
-        Når det kommer til stykket, burde det ikke være så guffent å bruke Internett. Det skal ikke være vanskeligere å få det personvernet du fortjener på nett enn å velge gardiner.</string>
+        Hos DucDuckGo setter vi den nye standarden for pålitelighet på nettet.\n\n DuckDuckGos private nettleser gir deg alle de grunnleggende personvernfunksjonene du trenger for å beskytte deg selv mens du søker og surfer på nettet, inkludert sporingsblokkering, smartere kryptering og DuckDuckGos private søk.\n\n Når det kommer til stykket, burde det ikke være så guffent å bruke Internett. Det skal ikke være vanskeligere å få det personvernet du fortjener på nett enn å velge gardiner.</string>
     <string name="aboutMoreLink">Mer på duckduckgo.com/about</string>
     <string name="no_suggestions">Ingen forslag</string>
 
@@ -247,10 +266,12 @@
     <string name="rateAppDialogTitle">Vurder appen</string>
     <string name="rateAppDialogMessage">Tilbakemeldingen din er viktig. Del kjærligheten med en anmeldelse.</string>
     <string name="rateAppDialogPositiveButton">Vurder app</string>
+    <string name="rateAppDialogNegativeButton" translatable="false">@string/noThanks</string>
 
     <string name="giveFeedbackDialogTitle">Det var leit å høre</string>
     <string name="giveFeedbackDialogMessage">Fortell oss hvordan vi kan forbedre appen for deg</string>
     <string name="giveFeedbackDialogPositiveButton">Gi tilbakemelding</string>
+    <string name="giveFeedbackDialogNegativeButton" translatable="false">@string/noThanks</string>
 
     <string name="noThanks">Nei takk</string>
 
@@ -464,4 +485,43 @@
     <string name="downloadManagerDisabled">Nedlastingsbehandler er deaktivert</string>
     <string name="downloadManagerIncompatible">Nedlastingsbehandler er ikke tilgjengelig på denne enheten</string>
     <string name="enable">Aktiver</string>
+
+    <!--Fire button education-->
+    <string name="daxClearDataCtaText">Trykk nedenfor for å brenne nettleserhistorikken. Prøv! 👇</string>
+
+    <!-- Precise Location -->
+    <string name="preciseLocationSystemDialogTitle">Vil du aktivere posisjonstjenester for DuckDuckGo privatnettleser?</string>
+    <string name="preciseLocationSystemDialogSubtitle">%1$s ber om tillatelse til å se posisjonen til enheten din. Først må du gi appen tillatelse til å sende enhetens posisjon, deretter kan %2$s be om tillatelse.</string>
+    <string name="preciseLocationSystemDialogAllow">Aktiver</string>
+    <string name="preciseLocationSystemDialogDeny">Kanskje senere</string>
+    <string name="preciseLocationSystemDialogNeverAllow">Ikke spør igjen for dette nettstedet</string>
+    <string name="preciseLocationSiteDialogTitle">Vil du gi %1$s tillatelse til å se posisjonen din?</string>
+    <string name="preciseLocationSiteDialogSubtitle">Du kan administrere posisjonstillatelser du har gitt til enkeltsider under Innstillinger.</string>
+    <string name="preciseLocationSiteDialogAllowAlways">Alltid</string>
+    <string name="preciseLocationSiteDialogAllowOnce">Kun for denne økten</string>
+    <string name="preciseLocationSiteDialogDenyAlways">Aldri tillat</string>
+    <string name="preciseLocationSiteDialogDenyOnce">Ikke tillat for denne økten</string>
+    <string name="settingsPreciseLocation">Posisjon</string>
+    <string name="preciseLocationFeatureDescription">Nettstedene du besøker kan be om å få tilgang til posisjonen til enheten din. De får ikke tilgang før du eksplisitt gir dem tillatelse. DuckDuckGo bruker kun posisjoner anonymt for å kunne gi deg lokale søkeresultater.</string>
+    <string name="preciseLocationToggleText">Nettsteder kan be om posisjonen min</string>
+    <string name="preciseLocationEmptyListHint">Ingen nettsider har fått tilgang til posisjon</string>
+    <string name="preciseLocationNoSystemPermission">Du må gi denne appen tilgang til posisjon for å administrere posisjonstilgangene du har gitt til enkeltsider.</string>
+    <string name="preciseLocationActivityTitle">Posisjon</string>
+    <string name="preciseLocationDeleteConfirmMessage">Er du sikker på at du vil slette &lt;b&gt;%1$s&lt;/b&gt;?</string>
+    <string name="preciseLocationDeleteContentDescription">Flere alternativer for posisjonstillateleser i domenet %1$s</string>
+    <string name="preciseLocationAllowedSitesSectionTitle">Tillatelse gitt</string>
+    <string name="preciseLocationDeniedSitesSectionTitle">Tillatelse avslått</string>
+    <string name="preciseLocationSnackbarMessage">Du har tidligere gitt %1$s tillatelse til å se enhetens posisjon.</string>
+
+    <!--  Global Privacy Control-->
+    <string name="globalPrivacyControlActivityTitle">Global Privacy Control (GPC)</string>
+    <string name="globalPrivacyControlDescription">
+        Informasjonen din bør ikke være til salgs. Hos DuckDuckGo deler vi denne oppfatningen. Aktiver innstillingen \"Global Privacy Control\" (GPC), så opplyser vi nettsteder om at du foretrekker å:&lt;br/&gt;&lt;br/&gt; • ikke selge dine personlige data.&lt;br/&gt; • begrense deling av personopplysninger med andre selskaper.
+    </string>
+    <string name="globalPrivacyControlSetting">Global Privacy Control (GPC)</string>
+    <string name="globalPrivacyControlToggle">Global Privacy Control (GPC)</string>
+    <string name="globalPrivacyControlDescriptionLegal"><b>Siden Global Privacy Control (GPC) er en ny standard, gjenkjennes den nok ennå ikke av nettsteder flest, men vi jobber hardt for å sikre at den blir anerkjent verden over.</b> Nettsteder er imidlertid kun pålagt å ta til følge denne opplysningsmeldingen når gjeldende lover pålegger dem å gjøre det.</string>
+    <string name="globalPrivacyControlLearnMore"><u>Les mer</u></string>
+    <string name="disabled">Deaktivert</string>
+    <string name="enabled">Aktivert</string>
 </resources>

@@ -1,5 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2020 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
 <resources xmlns:tools="http://schemas.android.com/tools">
 
+    <string name="appName" translatable="false">DuckDuckGo</string>
+    <string name="appDescription" translatable="false">DuckDuckGo </string>
     <string name="duckDuckGoLogoDescription">DuckDuckGo logó</string>
     <string name="duckDuckGoPrivacySimplified">Adatvédelem, egyszerűsítve.</string>
     <string name="yes">Igen</string>
@@ -49,6 +68,7 @@
     <string name="previousSearchTermDescription">Előző keresése</string>
     <string name="closeFindInPageButtonDescription">Keresés az oldalon nézet bezárása</string>
     <string name="findInPageHint">Keresés az oldalon</string>
+    <string name="findInPageMatches" translatable="false">%d/%d</string>
 
     <!-- AutoComplete Suggestions -->
     <string name="editQueryBeforeSubmitting">Lekérdezés szerkesztése keresés előtt</string>
@@ -61,6 +81,7 @@
     <string name="unableToOpenLink">Az ilyen típusú hivatkozás megnyitása nem sikerült</string>
 
     <!-- Tabs -->
+    <string name="homeTab" translatable="false">DuckDuckGo</string>
     <string name="tabActivityTitle">Lapok</string>
     <string name="tabsMenuItem">Lapok</string>
     <string name="newTabMenuItem">Új lap</string>
@@ -162,9 +183,7 @@
     <!-- About Activity -->
     <string name="aboutActivityTitle">Rólunk</string>
     <string name="aboutDescription">
-        A DuckDuckGo célja egy új online bizalmi szint megteremtése. \n\
-        A DuckDuckGo Adatvédelmi Böngésző minden olyan alapvető adatvédelmi elemet tartalmaz, amelyre szükséged lehet ahhoz, hogy megvédd magad az internetes keresés és böngészés során, beleértve a nyomkövető letiltását, az intelligensebb titkosítást és a DuckDuckGo privát keresést.\n\
-        Az internet végső soron nem feltétlenül kell, hogy ellenséges közeg legyen, és hisszük, hogy az általad megérdemelt adatvédelem olyan egyszerű is lehet, mint a redőny lehúzása.</string>
+        A DuckDuckGo célja egy új online bizalmi szint megteremtése. \n\n A DuckDuckGo Adatvédelmi Böngésző minden olyan alapvető adatvédelmi elemet tartalmaz, amelyre szükséged lehet ahhoz, hogy megvédd magad az internetes keresés és böngészés során, beleértve a nyomkövető letiltását, az intelligensebb titkosítást és a DuckDuckGo privát keresést.\n\n Az internet végső soron nem feltétlenül kell, hogy ellenséges közeg legyen, és hisszük, hogy az általad megérdemelt adatvédelem olyan egyszerű is lehet, mint a redőny lehúzása.</string>
     <string name="aboutMoreLink">További információk a duckduckgo.com/about oldalon</string>
     <string name="no_suggestions">Nincs javaslat</string>
 
@@ -247,10 +266,12 @@
     <string name="rateAppDialogTitle">Alkalmazás értékelése</string>
     <string name="rateAppDialogMessage">Számunkra fontos a visszajelzésed. Ha tetszik az alkalmazás, kérjük, ossz meg róla egy pozitív véleményt.</string>
     <string name="rateAppDialogPositiveButton">Alkalmazás értékelése</string>
+    <string name="rateAppDialogNegativeButton" translatable="false">@string/noThanks</string>
 
     <string name="giveFeedbackDialogTitle">Sajnálattal halljuk</string>
     <string name="giveFeedbackDialogMessage">Mondd el, hogyan javíthatunk számodra az alkalmazáson</string>
     <string name="giveFeedbackDialogPositiveButton">Visszajelzés küldése</string>
+    <string name="giveFeedbackDialogNegativeButton" translatable="false">@string/noThanks</string>
 
     <string name="noThanks">Nem, köszönöm</string>
 
@@ -464,4 +485,43 @@
     <string name="downloadManagerDisabled">Letöltéskezelő letiltva</string>
     <string name="downloadManagerIncompatible">A letöltéskezelő nem érhető el ezen az eszközön.</string>
     <string name="enable">Engedélyezés</string>
+
+    <!--Fire button education-->
+    <string name="daxClearDataCtaText">Az alábbiakban koppints a böngészési előzményeid törléséhez. Próbáld ki! 👇</string>
+
+    <!-- Precise Location -->
+    <string name="preciseLocationSystemDialogTitle">Engedélyezed az eszköz helyének elérését a DuckDuckGo adatvédelmi böngésző számára?</string>
+    <string name="preciseLocationSystemDialogSubtitle">%1$s az eszközöd helyét kéri. Először engedélyezned kell az alkalmazás számára, hogy elküldje az eszközöd helyét, majd a %2$s engedélyt kérhet.</string>
+    <string name="preciseLocationSystemDialogAllow">Engedélyezés</string>
+    <string name="preciseLocationSystemDialogDeny">Talán később</string>
+    <string name="preciseLocationSystemDialogNeverAllow">Ehhez a webhelyhez ne kérje újra</string>
+    <string name="preciseLocationSiteDialogTitle">Megadod %1$s számára a helyhozzáférési engedélyt?</string>
+    <string name="preciseLocationSiteDialogSubtitle">Az egyes webhelyeknek megadott helyhozzáférési engedélyeket a Beállításokban kezelheted.</string>
+    <string name="preciseLocationSiteDialogAllowAlways">Mindig</string>
+    <string name="preciseLocationSiteDialogAllowOnce">Csak erre a munkamenetre</string>
+    <string name="preciseLocationSiteDialogDenyAlways">Mindig megtagad</string>
+    <string name="preciseLocationSiteDialogDenyOnce">Megtagad erre a munkamenetre</string>
+    <string name="settingsPreciseLocation">Hely</string>
+    <string name="preciseLocationFeatureDescription">A felkeresett webhelyek hozzáférést kérhetnek az eszközöd helyadataihoz. Addig nem férhetnek hozzá, amíg kifejezetten nem adsz engedélyt. A DuckDuckGo csak névtelenül használja a helyadataidat a helyi keresési eredmények megadásához.</string>
+    <string name="preciseLocationToggleText">A webhelyek kérhetik a tartózkodási helyemet</string>
+    <string name="preciseLocationEmptyListHint">Egyetlen webhely sem kapott helyhozzáférési engedélyt</string>
+    <string name="preciseLocationNoSystemPermission">Az egyes webhelyek számára megadott helyhozzáférési engedélyek kezeléséhez engedélyezd a helyet az alkalmazás számára az Android beállításokban.</string>
+    <string name="preciseLocationActivityTitle">Hely</string>
+    <string name="preciseLocationDeleteConfirmMessage">Biztos, hogy törölni akarod ezt: &lt;b&gt;%1$s&lt;/b&gt;?</string>
+    <string name="preciseLocationDeleteContentDescription">További lehetőségek a helyhozzáférési engedélyekhez a(z) %1$s tartományban</string>
+    <string name="preciseLocationAllowedSitesSectionTitle">Megadva</string>
+    <string name="preciseLocationDeniedSitesSectionTitle">Megtagadva</string>
+    <string name="preciseLocationSnackbarMessage">%1$s számára korábban megadtad az engedélyt az eszközöd helyadatainak hozzáférésére.</string>
+
+    <!--  Global Privacy Control-->
+    <string name="globalPrivacyControlActivityTitle">Nemzetközi adatvédelmi szabályozás (Global Privacy Control, GPC)</string>
+    <string name="globalPrivacyControlDescription">
+        Az adataidnak nem lenne szabad eladónak lenniük. A DuckDuckGo-nál mi egyetértünk ezzel. Aktiváld a „Globális adatvédelmi szabályozás” (GPC) beállítást, és mi jelezzük a webhelyeknek, hogy te a következőket szeretnéd:\n\n• Ne adják el a személyes adataidat.\n • Korlátozzák a személyes adataid megosztását más vállalatokkal.
+    </string>
+    <string name="globalPrivacyControlSetting">Nemzetközi adatvédelmi szabályozás (Global Privacy Control, GPC)</string>
+    <string name="globalPrivacyControlToggle">Nemzetközi adatvédelmi szabályozás (Global Privacy Control, GPC)</string>
+    <string name="globalPrivacyControlDescriptionLegal"><b>Mivel a Nemzetközi Adatvédelmi Szabályozás (Global Privacy Control, GPC) új szabvány, a legtöbb weboldal még nem fogja felismerni, de keményen dolgozunk azon, hogy világszerte elfogadottá váljon.</b> A weboldalaknak azonban csak olyan mértékben kell eleget tenniük a kérésnek, amennyire a hatályos törvények ezt megkövetelik tőlük.</string>
+    <string name="globalPrivacyControlLearnMore"><u>További tudnivalók</u></string>
+    <string name="disabled">Letiltva</string>
+    <string name="enabled">Engedélyezve</string>
 </resources>

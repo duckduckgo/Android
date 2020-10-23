@@ -19,19 +19,25 @@ package com.duckduckgo.app.survey.ui
 import android.os.Build
 import androidx.core.net.toUri
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.duckduckgo.app.browser.BuildConfig
+import com.duckduckgo.app.global.DefaultDispatcherProvider
+import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.SingleLiveEvent
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.install.daysInstalled
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.app.survey.db.SurveyDao
 import com.duckduckgo.app.survey.model.Survey
-import io.reactivex.schedulers.Schedulers
+import kotlinx.coroutines.NonCancellable
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class SurveyViewModel(
     private val surveyDao: SurveyDao,
     private val statisticsStore: StatisticsDataStore,
-    private val appInstallStore: AppInstallStore
+    private val appInstallStore: AppInstallStore,
+    private val dispatchers: DispatcherProvider = DefaultDispatcherProvider()
 ) : ViewModel() {
 
     sealed class Command {
@@ -78,10 +84,14 @@ class SurveyViewModel(
 
     fun onSurveyCompleted() {
         survey.status = Survey.Status.DONE
-        Schedulers.io().scheduleDirect {
-            surveyDao.update(survey)
+        viewModelScope.launch() {
+            withContext(dispatchers.io() + NonCancellable) {
+                surveyDao.update(survey)
+            }
+            withContext(dispatchers.main()) {
+                command.value = Command.Close
+            }
         }
-        command.value = Command.Close
     }
 
     fun onSurveyDismissed() {
