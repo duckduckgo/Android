@@ -1,5 +1,6 @@
-﻿<!--
-  ~ Copyright (c) 2019 DuckDuckGo
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2020 DuckDuckGo
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -16,6 +17,8 @@
 
 <resources xmlns:tools="http://schemas.android.com/tools">
 
+    <string name="appName" translatable="false">DuckDuckGo</string>
+    <string name="appDescription" translatable="false">DuckDuckGo </string>
     <string name="duckDuckGoLogoDescription">Logo DuckDuckGo</string>
     <string name="duckDuckGoPrivacySimplified">La privacy, semplificata.</string>
     <string name="yes">Sì</string>
@@ -65,6 +68,7 @@
     <string name="previousSearchTermDescription">Trova precedente</string>
     <string name="closeFindInPageButtonDescription">Esci dalla vista Trova nella pagina</string>
     <string name="findInPageHint">Trova nella pagina</string>
+    <string name="findInPageMatches" translatable="false">%d/%d</string>
 
     <!-- AutoComplete Suggestions -->
     <string name="editQueryBeforeSubmitting">Modifica query prima di iniziare la ricerca</string>
@@ -77,6 +81,7 @@
     <string name="unableToOpenLink">Impossibile aprire questo tipo di link</string>
 
     <!-- Tabs -->
+    <string name="homeTab" translatable="false">DuckDuckGo</string>
     <string name="tabActivityTitle">Schede</string>
     <string name="tabsMenuItem">Schede</string>
     <string name="newTabMenuItem">Nuova scheda</string>
@@ -178,9 +183,7 @@
     <!-- About Activity -->
     <string name="aboutActivityTitle">Chi siamo</string>
     <string name="aboutDescription">
-        DuckDuckGo è il nuovo standard di sicurezza online.\n\
-        Il browser per la navigazione anonima DuckDuckGo ti fornisce tutti gli strumenti di privacy di cui hai bisogno per proteggerti mentre navighi ed effettui ricerche online. Inoltre, blocca i sistemi di tracciamento, offre una crittografia intelligente e ti permette di effettuare ricerche private.\n\
-        Dopotutto, Internet non deve essere un luogo da temere e avere online la privacy che meriti dovrebbe essere davvero facile.</string>
+        DuckDuckGo è il nuovo standard di sicurezza online.\n\n Il browser per la navigazione anonima DuckDuckGo ti fornisce tutti gli strumenti di privacy di cui hai bisogno per proteggerti mentre navighi ed effettui ricerche online. Inoltre, blocca i sistemi di tracciamento, offre una crittografia intelligente e ti permette di effettuare ricerche private.\n\n Dopotutto, Internet non deve essere un luogo da temere e avere online la privacy che meriti dovrebbe essere davvero facile.</string>
     <string name="aboutMoreLink">Scopri di più su duckduckgo.com/about</string>
     <string name="no_suggestions">Nessun suggerimento</string>
 
@@ -263,10 +266,12 @@
     <string name="rateAppDialogTitle">Valuta l\'app</string>
     <string name="rateAppDialogMessage">Il tuo feedback ci interessa. Condividi il tuo parere positivo con una recensione.</string>
     <string name="rateAppDialogPositiveButton">Valuta l\'App</string>
+    <string name="rateAppDialogNegativeButton" translatable="false">@string/noThanks</string>
 
     <string name="giveFeedbackDialogTitle">Ci dispiace</string>
     <string name="giveFeedbackDialogMessage">Facci sapere come pensi che potremmo migliorare l\'app</string>
     <string name="giveFeedbackDialogPositiveButton">Lascia il tuo feedback</string>
+    <string name="giveFeedbackDialogNegativeButton" translatable="false">@string/noThanks</string>
 
     <string name="noThanks">No, grazie</string>
 
@@ -480,4 +485,43 @@
     <string name="downloadManagerDisabled">Il Gestore di download è disattivato</string>
     <string name="downloadManagerIncompatible">Il Gestore di download non è disponibile su questo dispositivo</string>
     <string name="enable">Attiva</string>
+
+    <!--Fire button education-->
+    <string name="daxClearDataCtaText">Ora tocca qui sotto per incenerire la tua cronologia di navigazione. Prova! 👇</string>
+
+    <!-- Precise Location -->
+    <string name="preciseLocationSystemDialogTitle">Consentire la localizzazione del dispositivo per DuckDuckGo Privacy Browser?</string>
+    <string name="preciseLocationSystemDialogSubtitle">%1$s sta richiedendo la posizione del tuo dispositivo. Prima di tutto devi consentire all\'app di inviare la posizione del tuo dispositivo, poi %2$s potrà chiedere l\'autorizzazione.</string>
+    <string name="preciseLocationSystemDialogAllow">Attiva</string>
+    <string name="preciseLocationSystemDialogDeny">Forse più tardi</string>
+    <string name="preciseLocationSystemDialogNeverAllow">Non chiedere più per questo sito</string>
+    <string name="preciseLocationSiteDialogTitle">Consenti a %1$s di accedere alla tua posizione?</string>
+    <string name="preciseLocationSiteDialogSubtitle">Puoi gestire le autorizzazioni di accesso alla posizione concesse ai singoli siti in Impostazioni.</string>
+    <string name="preciseLocationSiteDialogAllowAlways">Sempre</string>
+    <string name="preciseLocationSiteDialogAllowOnce">Solo per questa sessione</string>
+    <string name="preciseLocationSiteDialogDenyAlways">Nega sempre</string>
+    <string name="preciseLocationSiteDialogDenyOnce">Nega per questa sessione</string>
+    <string name="settingsPreciseLocation">Località</string>
+    <string name="preciseLocationFeatureDescription">I siti che visiti possono chiedere di conoscere la posizione del tuo dispositivo. Non potranno accedervi finché non darai il consenso esplicito. DuckDuckGo usa la tua posizione in forma anonima solo per offrire risultati di ricerca locali.</string>
+    <string name="preciseLocationToggleText">I siti possono chiedere la mia posizione</string>
+    <string name="preciseLocationEmptyListHint">L\'autorizzazione di accesso alla posizione non è stata concessa a nessun sito Web</string>
+    <string name="preciseLocationNoSystemPermission">Per gestire le autorizzazioni di accesso alla posizione concesse ai singoli siti, attiva la localizzazione per questa app in Impostazioni Android.</string>
+    <string name="preciseLocationActivityTitle">Località</string>
+    <string name="preciseLocationDeleteConfirmMessage">Vuoi davvero eliminare &lt;b&gt;%1$s&lt;/b&gt;?</string>
+    <string name="preciseLocationDeleteContentDescription">Altre opzioni per le autorizzazioni di localizzazione nel dominio %1$s</string>
+    <string name="preciseLocationAllowedSitesSectionTitle">Concesse</string>
+    <string name="preciseLocationDeniedSitesSectionTitle">Negata</string>
+    <string name="preciseLocationSnackbarMessage">In precedenza, hai concesso a %1$s l\'autorizzazione ad accedere alla posizione del tuo dispositivo.</string>
+
+    <!--  Global Privacy Control-->
+    <string name="globalPrivacyControlActivityTitle">Global Privacy Control (GPC)</string>
+    <string name="globalPrivacyControlDescription">
+        I tuoi dati non dovrebbero mai essere messi in vendita. Noi di DuckDuckGo siamo d\'accordo. Attiva l\'impostazione \"Global Privacy Control\" (GPC) e segnaleremo ai siti Web di:\n\n• Non vendere i tuoi dati personali.\n • Limitare la condivisione dei tuoi dati personali con altre aziende.
+    </string>
+    <string name="globalPrivacyControlSetting">Global Privacy Control (GPC)</string>
+    <string name="globalPrivacyControlToggle">Global Privacy Control (GPC)</string>
+    <string name="globalPrivacyControlDescriptionLegal"><b>Dal momento che il Global Privacy Control (GPC) rappresenta un nuovo standard, la maggior parte dei siti Web non lo riconosce ancora, ma ci stiamo impegnando al massimo per assicurarci che venga accettato in tutto il mondo.</b> Tuttavia, i siti Web sono tenuti a rispondere alla segnalazione esclusivamente nei limiti delle leggi pertinenti che li obbligano ad agire in tal senso.</string>
+    <string name="globalPrivacyControlLearnMore"><u>Maggiori Informazioni</u></string>
+    <string name="disabled">Disattivato</string>
+    <string name="enabled">Attivato</string>
 </resources>

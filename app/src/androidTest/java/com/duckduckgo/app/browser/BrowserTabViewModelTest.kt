@@ -122,6 +122,7 @@ import org.mockito.ArgumentMatchers.anyString
 import org.mockito.Mockito.never
 import org.mockito.Mockito.verify
 import java.io.File
+import java.util.*
 import java.util.concurrent.TimeUnit
 
 @ExperimentalCoroutinesApi
@@ -250,7 +251,6 @@ class BrowserTabViewModelTest {
     @Before
     fun before() {
         MockitoAnnotations.initMocks(this)
-
         db = Room.inMemoryDatabaseBuilder(getInstrumentation().targetContext, AppDatabase::class.java)
             .allowMainThreadQueries()
             .build()
@@ -1634,13 +1634,13 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenScheduledSurveyChangesAndInstalledDaysMatchThenCtaIsSurvey() {
-        testee.onSurveyChanged(Survey("abc", "http://example.com", daysInstalled = 1, status = Survey.Status.SCHEDULED))
+        testee.onSurveyChanged(Survey("abc", "http://example.com", daysInstalled = 1, status = Survey.Status.SCHEDULED), Locale.US)
         assertTrue(testee.ctaViewState.value!!.cta is HomePanelCta.Survey)
     }
 
     @Test
     fun whenScheduledSurveyChangesAndInstalledDaysDontMatchThenCtaIsNull() {
-        testee.onSurveyChanged(Survey("abc", "http://example.com", daysInstalled = 2, status = Survey.Status.SCHEDULED))
+        testee.onSurveyChanged(Survey("abc", "http://example.com", daysInstalled = 2, status = Survey.Status.SCHEDULED), Locale.US)
         assertNull(testee.ctaViewState.value!!.cta)
     }
 
