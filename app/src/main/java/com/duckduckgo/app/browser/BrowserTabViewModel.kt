@@ -866,7 +866,7 @@ class BrowserTabViewModel(
         val permissionEntity = locationPermissionsRepository.getDomainPermission(domain)
         permissionEntity?.let {
             if (it.permission == LocationPermissionType.ALLOW_ALWAYS) {
-                if (!locationPermissionMessages.containsKey(domain)){
+                if (!locationPermissionMessages.containsKey(domain)) {
                     setDomainHasLocationPermissionShown(domain)
                     command.postValue(ShowDomainHasPermissionMessage(domain))
                 }
@@ -875,7 +875,7 @@ class BrowserTabViewModel(
     }
 
     @VisibleForTesting
-    fun setDomainHasLocationPermissionShown(domain: String){
+    fun setDomainHasLocationPermissionShown(domain: String) {
         locationPermissionMessages[domain] = true
     }
 
