@@ -24,6 +24,7 @@ import com.duckduckgo.app.global.DuckDuckGoTheme
 import com.duckduckgo.app.icon.api.AppIcon
 import com.duckduckgo.app.settings.clear.ClearWhatOption
 import com.duckduckgo.app.settings.clear.ClearWhenOption
+import com.duckduckgo.app.settings.clear.FireAnimation
 import javax.inject.Inject
 
 interface SettingsDataStore {
@@ -33,6 +34,7 @@ interface SettingsDataStore {
     var hideTips: Boolean
     var autoCompleteSuggestionsEnabled: Boolean
     var appIcon: AppIcon
+    var selectedFireAnimation: FireAnimation
     var appIconChanged: Boolean
     var appLoginDetection: Boolean
     var appLocationPermission: Boolean
@@ -53,6 +55,7 @@ interface SettingsDataStore {
     var appNotificationsEnabled: Boolean
     fun isCurrentlySelected(clearWhatOption: ClearWhatOption): Boolean
     fun isCurrentlySelected(clearWhenOption: ClearWhenOption): Boolean
+    fun isCurrentlySelected(fireAnimation: FireAnimation): Boolean
     fun hasBackgroundTimestampRecorded(): Boolean
     fun clearAppBackgroundTimestamp()
 }
@@ -102,6 +105,10 @@ class SettingsSharedPreferences @Inject constructor(private val context: Context
         }
         set(appIcon) = preferences.edit(commit = true) { putString(KEY_APP_ICON, appIcon.componentName) }
 
+    override var selectedFireAnimation: FireAnimation
+        get() = selectedFireAnimationSavedValue()
+        set(value) = preferences.edit { putString(KEY_SELECTED_FIRE_ANIMATION, value.name) }
+
     // Changing the app icon makes the app close in some devices / OS versions. This is a problem if the user has
     // selected automatic data / tabs clear. We will use this flag to track if the user has changed the icon
     // and prevent the tabs / data from be cleared {check AutomaticDataClearer}
@@ -146,6 +153,10 @@ class SettingsSharedPreferences @Inject constructor(private val context: Context
         return currentlySelected == clearWhenOption
     }
 
+    override fun isCurrentlySelected(fireAnimation: FireAnimation): Boolean {
+        return selectedFireAnimationSavedValue() == fireAnimation
+    }
+
     private fun automaticallyClearWhatSavedValue(): ClearWhatOption? {
         val savedValue = preferences.getString(KEY_AUTOMATICALLY_CLEAR_WHAT_OPTION, null) ?: return null
         return ClearWhatOption.valueOf(savedValue)
@@ -154,6 +165,11 @@ class SettingsSharedPreferences @Inject constructor(private val context: Context
     private fun automaticallyClearWhenSavedValue(): ClearWhenOption? {
         val savedValue = preferences.getString(KEY_AUTOMATICALLY_CLEAR_WHEN_OPTION, null) ?: return null
         return ClearWhenOption.valueOf(savedValue)
+    }
+
+    private fun selectedFireAnimationSavedValue(): FireAnimation {
+        val savedValue = preferences.getString(KEY_SELECTED_FIRE_ANIMATION, FireAnimation.HERO_FIRE_RISING.name) ?: FireAnimation.HERO_FIRE_RISING.name
+        return FireAnimation.valueOf(savedValue)
     }
 
     private val preferences: SharedPreferences
@@ -172,6 +188,7 @@ class SettingsSharedPreferences @Inject constructor(private val context: Context
         const val KEY_APP_USED_SINCE_LAST_CLEAR = "APP_USED_SINCE_LAST_CLEAR"
         const val KEY_HIDE_TIPS = "HIDE_TIPS"
         const val KEY_APP_ICON = "APP_ICON"
+        const val KEY_SELECTED_FIRE_ANIMATION = "SELECTED_FIRE_ANIMATION"
         const val KEY_APP_ICON_CHANGED = "APP_ICON_CHANGED"
         const val KEY_SITE_LOCATION_PERMISSION_ENABLED = "KEY_SITE_LOCATION_PERMISSION_ENABLED"
         const val KEY_SYSTEM_LOCATION_PERMISSION_DENIED_FOREVER = "KEY_SYSTEM_LOCATION_PERMISSION_DENIED_FOREVER"
