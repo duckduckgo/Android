@@ -176,7 +176,8 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
             clearPersonalDataAction = clearPersonalDataAction,
             ctaViewModel = ctaViewModel,
             variantManager = variantManager,
-            pixel = pixel
+            pixel = pixel,
+            settingsDataStore = settingsDataStore
         )
         dialog.clearComplete = { viewModel.onClearComplete() }
         dialog.show()

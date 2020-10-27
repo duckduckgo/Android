@@ -297,7 +297,8 @@ class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope() {
             clearPersonalDataAction = clearPersonalDataAction,
             ctaViewModel = ctaViewModel,
             variantManager = variantManager,
-            pixel = pixel
+            pixel = pixel,
+            settingsDataStore = settingsDataStore
         )
         dialog.clearStarted = {
             removeObservers()

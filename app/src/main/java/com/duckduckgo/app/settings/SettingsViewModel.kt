@@ -20,11 +20,13 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.duckduckgo.app.browser.BuildConfig
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
+import com.duckduckgo.app.fire.FireAnimationLoader
 import com.duckduckgo.app.global.DuckDuckGoTheme
 import com.duckduckgo.app.global.SingleLiveEvent
 import com.duckduckgo.app.icon.api.AppIcon
 import com.duckduckgo.app.settings.clear.ClearWhatOption
 import com.duckduckgo.app.settings.clear.ClearWhenOption
+import com.duckduckgo.app.settings.clear.FireAnimation
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -37,6 +39,7 @@ class SettingsViewModel @Inject constructor(
     private val settingsDataStore: SettingsDataStore,
     private val defaultWebBrowserCapability: DefaultBrowserDetector,
     private val variantManager: VariantManager,
+    private val fireAnimationLoader: FireAnimationLoader,
     private val pixel: Pixel
 ) : ViewModel() {
 
@@ -47,6 +50,7 @@ class SettingsViewModel @Inject constructor(
         val autoCompleteSuggestionsEnabled: Boolean = true,
         val showDefaultBrowserSetting: Boolean = false,
         val isAppDefaultBrowser: Boolean = false,
+        val selectedFireAnimation: FireAnimation = FireAnimation.HERO_FIRE_RISING,
         val automaticallyClearData: AutomaticallyClearData = AutomaticallyClearData(ClearWhatOption.CLEAR_NONE, ClearWhenOption.APP_EXIT_ONLY),
         val appIcon: AppIcon = AppIcon.DEFAULT,
         val globalPrivacyControlEnabled: Boolean = false
@@ -64,6 +68,7 @@ class SettingsViewModel @Inject constructor(
         object LaunchLocation : Command()
         object LaunchWhitelist : Command()
         object LaunchAppIcon : Command()
+        object LaunchFireAnimationSettings : Command()
         object LaunchGlobalPrivacyControl : Command()
         object UpdateTheme : Command()
     }
@@ -95,6 +100,7 @@ class SettingsViewModel @Inject constructor(
             version = obtainVersion(variant.key),
             automaticallyClearData = AutomaticallyClearData(automaticallyClearWhat, automaticallyClearWhen, automaticallyClearWhenEnabled),
             appIcon = settingsDataStore.appIcon,
+            selectedFireAnimation = settingsDataStore.selectedFireAnimation,
             globalPrivacyControlEnabled = settingsDataStore.globalPrivacyControlEnabled
         )
     }
@@ -105,6 +111,10 @@ class SettingsViewModel @Inject constructor(
 
     fun userRequestedToChangeIcon() {
         command.value = Command.LaunchAppIcon
+    }
+
+    fun userRequestedToChangeFireAnimation() {
+        command.value = Command.LaunchFireAnimationSettings
     }
 
     fun onFireproofWebsitesClicked() {
@@ -179,6 +189,18 @@ class SettingsViewModel @Inject constructor(
                 settingsDataStore.automaticallyClearWhatOption,
                 clearWhenNewSetting
             )
+        )
+    }
+
+    fun onFireAnimationSelected(selectedFireAnimation: FireAnimation) {
+        if (settingsDataStore.isCurrentlySelected(selectedFireAnimation)) {
+            Timber.v("User selected same thing they already have set: $selectedFireAnimation; no need to do anything else")
+            return
+        }
+        settingsDataStore.selectedFireAnimation = selectedFireAnimation
+        fireAnimationLoader.refreshAnimation()
+        viewState.value = currentViewState().copy(
+            selectedFireAnimation = selectedFireAnimation
         )
     }
 
