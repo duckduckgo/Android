@@ -29,6 +29,7 @@ import com.duckduckgo.app.cta.ui.CtaViewModel
 import com.duckduckgo.app.cta.ui.DaxFireDialogCta
 import com.duckduckgo.app.global.view.FireDialog.FireDialogClearAllEvent.AnimationFinished
 import com.duckduckgo.app.global.view.FireDialog.FireDialogClearAllEvent.ClearAllDataFinished
+import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.VariantManager.VariantFeature.FireButtonEducation
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -51,7 +52,8 @@ class FireDialog(
     private val ctaViewModel: CtaViewModel,
     private val clearPersonalDataAction: ClearPersonalDataAction,
     private val variantManager: VariantManager,
-    private val pixel: Pixel
+    private val pixel: Pixel,
+    private val settingsDataStore: SettingsDataStore
 ) : BottomSheetDialog(context, R.style.FireDialog), CoroutineScope by MainScope() {
 
     var clearStarted: (() -> Unit) = {}
@@ -93,6 +95,7 @@ class FireDialog(
          * BottomSheetDialog wraps provided Layout into a CoordinatorLayout.
          * We need to set FitsSystemWindows false programmatically to all parents in order to render layout and animation full screen
          */
+        fireAnimationView.setAnimation(settingsDataStore.selectedFireAnimation.resId)
         fireAnimationView.setAndPropagateUpFitsSystemWindows(false)
         fireAnimationView.setRenderMode(RenderMode.SOFTWARE)
         fireAnimationView.enableMergePathsForKitKatAndAbove(true)
