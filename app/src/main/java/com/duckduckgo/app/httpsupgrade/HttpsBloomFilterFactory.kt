@@ -42,8 +42,8 @@ class HttpsBloomFilterFactoryImpl @Inject constructor(
             persister.persistEmbeddedData()
         }
 
-        var specification = dao.get()
-        var dataPath = binaryDataStore.dataFilePath(HTTPS_BINARY_FILE)
+        val specification = dao.get()
+        val dataPath = binaryDataStore.dataFilePath(HTTPS_BINARY_FILE)
         if (dataPath == null || specification == null || !persister.isPersisted(specification)) {
             Timber.d("Embedded https update data failed to load")
             return null

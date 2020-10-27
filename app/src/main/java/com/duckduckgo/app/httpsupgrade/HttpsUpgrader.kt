@@ -49,7 +49,6 @@ class HttpsUpgraderImpl(
 
     private var bloomFilter: BloomFilter? = null
     private val bloomReloadLock = ReentrantLock()
-    private val isBloomReloading get() = bloomReloadLock.isLocked
 
     @WorkerThread
     override fun shouldUpgrade(uri: Uri): Boolean {
