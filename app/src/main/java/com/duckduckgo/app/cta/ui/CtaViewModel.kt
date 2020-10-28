@@ -50,6 +50,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import timber.log.Timber
+import java.util.*
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -110,9 +111,10 @@ class CtaViewModel @Inject constructor(
         }
     }
 
-    fun onSurveyChanged(survey: Survey?): Survey? {
+    fun onSurveyChanged(survey: Survey?): Boolean {
+        val wasCleared = activeSurvey != null && survey == null
         activeSurvey = survey
-        return activeSurvey
+        return wasCleared
     }
 
     suspend fun hideTipsForever(cta: Cta) {
@@ -180,8 +182,8 @@ class CtaViewModel @Inject constructor(
         }
     }
 
-    suspend fun refreshCta(dispatcher: CoroutineContext, isBrowserShowing: Boolean, site: Site? = null): Cta? {
-        surveyCta()?.let {
+    suspend fun refreshCta(dispatcher: CoroutineContext, isBrowserShowing: Boolean, site: Site? = null, locale: Locale = Locale.getDefault()): Cta? {
+        surveyCta(locale)?.let {
             return it
         }
 
@@ -231,14 +233,21 @@ class CtaViewModel @Inject constructor(
         }
     }
 
-    private fun surveyCta(): HomePanelCta.Survey? {
+    private fun surveyCta(locale: Locale): HomePanelCta.Survey? {
         val survey = activeSurvey
-        if (survey?.url != null) {
-            val showOnDay = survey.daysInstalled?.toLong()
-            val daysInstalled = appInstallStore.daysInstalled()
-            if (showOnDay == null || showOnDay == daysInstalled) {
-                return Survey(survey)
-            }
+
+        if (survey == null || survey.url == null) {
+            return null
+        }
+
+        if (locale != Locale.US) {
+            return null
+        }
+
+        val showOnDay = survey.daysInstalled?.toLong()
+        val daysInstalled = appInstallStore.daysInstalled()
+        if ((showOnDay == null && daysInstalled >= SURVEY_DEFAULT_MIN_DAYS_INSTALLED) || showOnDay == daysInstalled) {
+            return Survey(survey)
         }
         return null
     }
@@ -363,5 +372,9 @@ class CtaViewModel @Inject constructor(
                 }
             }
         }
+    }
+
+    companion object {
+        private const val SURVEY_DEFAULT_MIN_DAYS_INSTALLED = 30
     }
 }
