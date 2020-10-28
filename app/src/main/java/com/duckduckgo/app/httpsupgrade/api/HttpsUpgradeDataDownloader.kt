@@ -17,13 +17,10 @@
 package com.duckduckgo.app.httpsupgrade.api
 
 import com.duckduckgo.app.global.api.isCached
-import com.duckduckgo.app.global.db.AppDatabase
-import com.duckduckgo.app.global.store.BinaryDataStore
 import com.duckduckgo.app.httpsupgrade.HttpsUpgrader
-import com.duckduckgo.app.httpsupgrade.db.HttpsBloomFilterSpecDao
-import com.duckduckgo.app.httpsupgrade.db.HttpsWhitelistDao
+import com.duckduckgo.app.httpsupgrade.store.HttpsFalsePositivesDao
 import com.duckduckgo.app.httpsupgrade.model.HttpsBloomFilterSpec
-import com.duckduckgo.app.httpsupgrade.model.HttpsBloomFilterSpec.Companion.HTTPS_BINARY_FILE
+import com.duckduckgo.app.httpsupgrade.store.HttpsDataPersister
 import io.reactivex.Completable
 import io.reactivex.Completable.fromAction
 import timber.log.Timber
@@ -33,10 +30,8 @@ import javax.inject.Inject
 class HttpsUpgradeDataDownloader @Inject constructor(
     private val service: HttpsUpgradeService,
     private val httpsUpgrader: HttpsUpgrader,
-    private val httpsBloomSpecDao: HttpsBloomFilterSpecDao,
-    private val whitelistDao: HttpsWhitelistDao,
-    private val binaryDataStore: BinaryDataStore,
-    private val appDatabase: AppDatabase
+    private val dataPersister: HttpsDataPersister,
+    private val bloomFalsePositivesDao: HttpsFalsePositivesDao
 ) {
 
     fun download(): Completable {
@@ -45,9 +40,9 @@ class HttpsUpgradeDataDownloader @Inject constructor(
             .flatMapCompletable {
                 downloadBloomFilter(it)
             }
-        val whitelist = downloadWhitelist()
+        val falsePositives = downloadFalsePositives()
 
-        return Completable.mergeDelayError(listOf(filter, whitelist))
+        return Completable.mergeDelayError(listOf(filter, falsePositives))
             .doOnComplete {
                 Timber.i("Https download task completed successfully")
             }
@@ -58,7 +53,7 @@ class HttpsUpgradeDataDownloader @Inject constructor(
 
             Timber.d("Downloading https bloom filter binary")
 
-            if (specification == httpsBloomSpecDao.get() && binaryDataStore.verifyCheckSum(HTTPS_BINARY_FILE, specification.sha256)) {
+            if (dataPersister.isPersisted(specification)) {
                 Timber.d("Https bloom data already stored for this spec")
                 return@fromAction
             }
@@ -70,36 +65,28 @@ class HttpsUpgradeDataDownloader @Inject constructor(
             }
 
             val bytes = response.body()!!.bytes()
-            if (!binaryDataStore.verifyCheckSum(bytes, specification.sha256)) {
-                throw IOException("Https binary has incorrect sha, throwing away file")
-            }
-
-            Timber.d("Updating https bloom data store with new data")
-            appDatabase.runInTransaction {
-                httpsBloomSpecDao.insert(specification)
-                binaryDataStore.saveData(HTTPS_BINARY_FILE, bytes)
-            }
+            dataPersister.persistBloomFilter(specification, bytes)
             httpsUpgrader.reloadData()
         }
     }
 
-    private fun downloadWhitelist(): Completable {
+    private fun downloadFalsePositives(): Completable {
 
-        Timber.d("Downloading HTTPS whitelist")
+        Timber.d("Downloading HTTPS false positives")
         return fromAction {
 
-            val call = service.whitelist()
+            val call = service.falsePositives()
             val response = call.execute()
 
-            if (response.isCached && whitelistDao.count() > 0) {
-                Timber.d("Https whitelist already cached and stored")
+            if (response.isCached && bloomFalsePositivesDao.count() > 0) {
+                Timber.d("Https false positives already cached and stored")
                 return@fromAction
             }
 
             if (response.isSuccessful) {
-                val whitelist = response.body()!!
-                Timber.d("Updating https whitelist with new data")
-                whitelistDao.updateAll(whitelist)
+                val falsePositives = response.body()!!
+                Timber.d("Updating https false positives with new data")
+                dataPersister.persistFalsePositives(falsePositives)
             } else {
                 throw IOException("Status: ${response.code()} - ${response.errorBody()?.string()}")
             }

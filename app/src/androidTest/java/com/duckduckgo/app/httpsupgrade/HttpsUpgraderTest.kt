@@ -17,30 +17,24 @@
 package com.duckduckgo.app.httpsupgrade
 
 import android.net.Uri
-import com.duckduckgo.app.httpsupgrade.api.HttpsBloomFilterFactory
-import com.duckduckgo.app.httpsupgrade.api.HttpsUpgradeService
-import com.duckduckgo.app.httpsupgrade.db.HttpsWhitelistDao
+import com.duckduckgo.app.httpsupgrade.store.HttpsFalsePositivesDao
 import com.duckduckgo.app.privacy.db.UserWhitelistDao
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.whenever
-import okhttp3.ResponseBody
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import retrofit2.Call
-import retrofit2.Response
 
 class HttpsUpgraderTest {
 
     lateinit var testee: HttpsUpgrader
 
     private var mockHttpsBloomFilterFactory: HttpsBloomFilterFactory = mock()
-    private var mockWhitelistDao: HttpsWhitelistDao = mock()
-    private var mockUserWhitelistDao: UserWhitelistDao = mock()
-    private var mockUpgradeService: HttpsUpgradeService = mock()
+    private var mockBloomFalsePositiveListDao: HttpsFalsePositivesDao = mock()
+    private var mockUserAllowlistDao: UserWhitelistDao = mock()
     private var mockServiceCall: Call<List<String>> = mock()
 
     private var mockPixel: Pixel = mock()
@@ -49,84 +43,43 @@ class HttpsUpgraderTest {
     @Before
     fun before() {
         whenever(mockHttpsBloomFilterFactory.create()).thenReturn(bloomFilter)
-        testee = HttpsUpgraderImpl(mockWhitelistDao, mockUserWhitelistDao, mockHttpsBloomFilterFactory, mockUpgradeService, mockPixel)
+        testee = HttpsUpgraderImpl(mockHttpsBloomFilterFactory, mockBloomFalsePositiveListDao, mockUserAllowlistDao, mockPixel)
         testee.reloadData()
     }
 
     @Test
-    fun whenHttpUriIsInLocalListThenShouldUpgrade() {
+    fun whenHttpUriIsInBloomThenShouldUpgrade() {
         bloomFilter.add("www.local.url")
         assertTrue(testee.shouldUpgrade(Uri.parse("http://www.local.url")))
+        mockPixel.fire(Pixel.PixelName.HTTPS_LOCAL_UPGRADE)
+    }
+
+    @Test
+    fun whenHttpUriIsNotInBloomThenShouldNotUpgrade() {
+        bloomFilter.add("www.local.url")
+        assertFalse(testee.shouldUpgrade(Uri.parse("http://www.differentlocal.url")))
+        mockPixel.fire(Pixel.PixelName.HTTPS_NO_UPGRADE)
     }
 
     @Test
     fun whenHttpsUriThenShouldNotUpgrade() {
+        bloomFilter.add("www.local.url")
         assertFalse(testee.shouldUpgrade(Uri.parse("https://www.local.url")))
+        mockPixel.fire(Pixel.PixelName.HTTPS_NO_UPGRADE)
     }
 
     @Test
     fun whenHttpUriHasOnlyPartDomainInLocalListThenShouldNotUpgrade() {
         bloomFilter.add("local.url")
         assertFalse(testee.shouldUpgrade(Uri.parse("http://www.local.url")))
-    }
-
-    @Test
-    fun whenHttpDomainIsUserWhitelistedThenShouldNotUpgradeAndNoLookupPixelIsSet() {
-        whenever(mockUserWhitelistDao.contains("www.local.url")).thenReturn(true)
-        bloomFilter.add("www.local.url")
-        assertFalse(testee.shouldUpgrade(Uri.parse("http://www.local.url")))
         mockPixel.fire(Pixel.PixelName.HTTPS_NO_LOOKUP)
     }
 
     @Test
-    fun whenHttpUriIsInLocalListAndInWhitelistThenShouldNotUpgrade() {
+    fun whenHttpDomainIsUserWhitelistedThenShouldNotUpgrade() {
         bloomFilter.add("www.local.url")
-        whenever(mockWhitelistDao.contains("www.local.url")).thenReturn(true)
+        whenever(mockUserAllowlistDao.contains("www.local.url")).thenReturn(true)
         assertFalse(testee.shouldUpgrade(Uri.parse("http://www.local.url")))
-    }
-
-    @Test
-    fun whenHttpUriIsNotInLocalListButCanBeUpgradedByServiceThenShouldUpgrade() {
-        whenever(mockServiceCall.execute()).thenReturn(Response.success(serviceResponse()))
-        whenever(mockUpgradeService.upgradeListForPartialHost(any())).thenReturn(mockServiceCall)
-        assertTrue(testee.shouldUpgrade(Uri.parse("http://service.url")))
-    }
-
-    @Test
-    fun whenHttpUriIsNotInLocalListAndCannotBeUpgradedByServiceThenShouldNotUpgrade() {
-        whenever(mockServiceCall.execute()).thenReturn(Response.success(serviceResponse()))
-        whenever(mockUpgradeService.upgradeListForPartialHost(any())).thenReturn(mockServiceCall)
-        assertFalse(testee.shouldUpgrade(Uri.parse("http://unknown.com")))
-    }
-
-    @Test
-    fun whenHttpUriIsNotInLocalListAndServiceRequestFailsThenShouldNotUpgrade() {
-        whenever(mockServiceCall.execute()).thenReturn(Response.error(500, ResponseBody.create(null, "")))
-        whenever(mockUpgradeService.upgradeListForPartialHost(any())).thenReturn(mockServiceCall)
-        assertFalse(testee.shouldUpgrade(Uri.parse("http://service.url")))
-    }
-
-    @Test
-    fun whenBloomFilterIsNotLoadedAndUrlIsInServiceListThenShouldUpgrade() {
-        whenever(mockHttpsBloomFilterFactory.create()).thenReturn(null)
-        whenever(mockServiceCall.execute()).thenReturn(Response.success(serviceResponse()))
-        whenever(mockUpgradeService.upgradeListForPartialHost(any())).thenReturn(mockServiceCall)
-        assertTrue(testee.shouldUpgrade(Uri.parse("http://service.url")))
-    }
-
-    @Test
-    fun testWhenBloomFilterIsNotLoadedAndUrlNotInServiceListThenShouldNotUpgrade() {
-        whenever(mockHttpsBloomFilterFactory.create()).thenReturn(null)
-        whenever(mockServiceCall.execute()).thenReturn(Response.success(serviceResponse()))
-        whenever(mockUpgradeService.upgradeListForPartialHost(any())).thenReturn(mockServiceCall)
-        assertFalse(testee.shouldUpgrade(Uri.parse("http://unknown.com")))
-    }
-
-    private fun serviceResponse(): List<String> {
-        return arrayListOf(
-            "cfb1a171724ad0b8f108526d6a201667f74691e4",
-            "cfb10e3da9ae3bc2ba7e4641c911987da63aa0a7",
-            "cfb18efe21acd63556dd75bcae7003a2fff90752"
-        )
+        mockPixel.fire(Pixel.PixelName.HTTPS_NO_LOOKUP)
     }
 }
