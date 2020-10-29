@@ -874,8 +874,7 @@ class BrowserTabViewModel(
         }
     }
 
-    @VisibleForTesting
-    fun setDomainHasLocationPermissionShown(domain: String) {
+    private fun setDomainHasLocationPermissionShown(domain: String) {
         locationPermissionMessages[domain] = true
     }
 
@@ -991,6 +990,7 @@ class BrowserTabViewModel(
             when (permission) {
                 LocationPermissionType.ALLOW_ALWAYS -> {
                     onSiteLocationPermissionAlwaysAllowed()
+                    setDomainHasLocationPermissionShown(domain)
                     pixel.fire(PixelName.PRECISE_LOCATION_SITE_DIALOG_ALLOW_ALWAYS)
                     viewModelScope.launch {
                         locationPermissionsRepository.savePermission(domain, permission)

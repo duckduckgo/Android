@@ -2677,9 +2677,26 @@ class BrowserTabViewModelTest {
         givenDeviceLocationSharingIsEnabled(true)
         givenLocationPermissionIsEnabled(true)
 
-        testee.setDomainHasLocationPermissionShown(domain)
+        loadUrl("https://www.example.com", isBrowserShowing = true)
+
+        assertCommandIssued<Command.ShowDomainHasPermissionMessage>()
 
         loadUrl("https://www.example.com", isBrowserShowing = true)
+
+        assertCommandIssuedTimes<Command.ShowDomainHasPermissionMessage>(1)
+    }
+
+    @Test
+    fun bla() = coroutineRule.runBlocking {
+        val domain = "http://example.com"
+
+        givenCurrentSite(domain)
+        givenDeviceLocationSharingIsEnabled(true)
+        givenLocationPermissionIsEnabled(true)
+
+        testee.onSiteLocationPermissionSelected(domain, LocationPermissionType.ALLOW_ALWAYS)
+
+        loadUrl(domain, isBrowserShowing = true)
 
         assertCommandNotIssued<Command.ShowDomainHasPermissionMessage>()
     }
@@ -2997,6 +3014,11 @@ class BrowserTabViewModelTest {
     private inline fun <reified T : Command> assertCommandNotIssued() {
         val issuedCommand = commandCaptor.allValues.find { it is T }
         assertNull(issuedCommand)
+    }
+
+    private inline fun <reified T : Command> assertCommandIssuedTimes(times: Int) {
+        val timesIssued = commandCaptor.allValues.count { it is T }
+        assertEquals(times, timesIssued)
     }
 
     private fun pixelParams(showedBookmarks: Boolean, bookmarkCapable: Boolean) = mapOf(
