@@ -19,7 +19,7 @@ package com.duckduckgo.app.httpsupgrade.model
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
-@Entity(tableName = "https_whitelisted_domain")
-data class HttpsWhitelistedDomain(
+@Entity(tableName = "https_false_positive_domain")
+data class HttpsFalsePositiveDomain(
     @PrimaryKey var domain: String
 )

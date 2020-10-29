@@ -153,7 +153,7 @@ class SurveyActivity : DuckDuckGoActivity() {
         }
 
         override fun shouldInterceptRequest(view: WebView, request: WebResourceRequest): WebResourceResponse? {
-            if (request.isForMainFrame && request.url.host == "www.duckduckgo.com") {
+            if (request.url.host == "duckduckgo.com") {
                 runOnUiThread {
                     viewModel.onSurveyCompleted()
                 }

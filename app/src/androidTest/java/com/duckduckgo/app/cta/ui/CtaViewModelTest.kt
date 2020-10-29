@@ -68,6 +68,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations
+import java.util.*
 import java.util.concurrent.TimeUnit
 
 @FlowPreview
@@ -145,7 +146,6 @@ class CtaViewModelTest {
     @Before
     fun before() {
         MockitoAnnotations.initMocks(this)
-
         val context = InstrumentationRegistry.getInstrumentation().targetContext
         db = Room.inMemoryDatabaseBuilder(context, AppDatabase::class.java)
             .allowMainThreadQueries()
@@ -180,16 +180,43 @@ class CtaViewModelTest {
     }
 
     @Test
-    fun whenScheduledSurveyChangesAndInstalledDaysMatchThenCtaIsSurvey() {
-        val survey = Survey("abc", "http://example.com", 1, SCHEDULED)
-        val value = testee.onSurveyChanged(Survey("abc", "http://example.com", 1, SCHEDULED))
-        assertEquals(survey, value)
+    fun whenScheduledSurveyChangesAndInstalledDaysMatchAndLocaleIsUsThenCtaIsSurvey() = coroutineRule.runBlocking {
+        testee.onSurveyChanged(Survey("abc", "http://example.com", 1, SCHEDULED))
+        val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = false, site = null, locale = Locale.US)
+        assertTrue(value is HomePanelCta.Survey)
     }
 
     @Test
-    fun whenScheduledSurveyIsNullThenCtaIsNotSurvey() {
+    fun whenScheduledSurveyChangesAndInstalledDaysMatchButLocaleIsNotUsThenCtaIsNotSurvey() = coroutineRule.runBlocking {
+        testee.onSurveyChanged(Survey("abc", "http://example.com", 1, SCHEDULED))
+        val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = false, site = null, locale = Locale.CANADA)
+        assertFalse(value is HomePanelCta.Survey)
+    }
+
+    @Test
+    fun whenScheduledSurveyIsNullThenCtaIsNotSurvey() = coroutineRule.runBlocking {
+        val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = false, site = null, locale = Locale.US)
+        assertFalse(value is HomePanelCta.Survey)
+    }
+
+    @Test
+    fun whenScheduledSurveyChangesFromNullToNullThenClearedIsFalse() {
         val value = testee.onSurveyChanged(null)
-        assertNull(value)
+        assertFalse(value)
+    }
+
+    @Test
+    fun whenScheduledSurveyChangesFromNullToASurveyThenClearedIsFalse() {
+        testee.onSurveyChanged(null)
+        val value = testee.onSurveyChanged(Survey("abc", "http://example.com", 1, SCHEDULED))
+        assertFalse(value)
+    }
+
+    @Test
+    fun whenScheduledSurveyChangesFromASurveyToNullThenClearedIsTrue() {
+        testee.onSurveyChanged(Survey("abc", "http://example.com", 1, SCHEDULED))
+        val value = testee.onSurveyChanged(null)
+        assertTrue(value)
     }
 
     @Test
