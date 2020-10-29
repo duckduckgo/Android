@@ -43,7 +43,7 @@ class SettingsFireAnimationSelectorFragment : DialogFragment() {
 
         val alertBuilder = AlertDialog.Builder(requireActivity())
             .setView(rootView)
-            .setTitle(R.string.settingsAutomaticallyClearWhat)
+            .setTitle("Fire button animation")
             .setPositiveButton(R.string.settingsAutomaticallyClearingDialogSave) { _, _ ->
                 dialog?.let {
                     val radioGroup = it.findViewById(R.id.fireAnimationSelectorGroup) as RadioGroup

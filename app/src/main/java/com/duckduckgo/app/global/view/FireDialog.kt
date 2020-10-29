@@ -95,7 +95,9 @@ class FireDialog(
          * BottomSheetDialog wraps provided Layout into a CoordinatorLayout.
          * We need to set FitsSystemWindows false programmatically to all parents in order to render layout and animation full screen
          */
-        fireAnimationView.setAnimation(settingsDataStore.selectedFireAnimation.resId)
+        if (animationEnabled()) {
+            fireAnimationView.setAnimation(settingsDataStore.selectedFireAnimation.resId)
+        }
         fireAnimationView.setAndPropagateUpFitsSystemWindows(false)
         fireAnimationView.setRenderMode(RenderMode.SOFTWARE)
         fireAnimationView.enableMergePathsForKitKatAndAbove(true)
@@ -131,7 +133,7 @@ class FireDialog(
         }
     }
 
-    private fun animationEnabled() = variantManager.getVariant().hasFeature(FireButtonEducation)
+    private fun animationEnabled() = settingsDataStore.selectedFireAnimation.resId != -1
 
     private fun playAnimation() {
         window?.navigationBarColor = ContextCompat.getColor(context, R.color.black)

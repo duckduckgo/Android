@@ -21,7 +21,6 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.OnLifecycleEvent
 import com.airbnb.lottie.LottieCompositionFactory
-import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.VariantManager
 import javax.inject.Inject
@@ -36,14 +35,18 @@ class FireAnimationLoader @Inject constructor(
     fun onCreate() {
         // Currently, we are observing Activity lifecycle instead of Application to avoid conflicts with installation referrer.
         // if we remove variantManager check, we can observe Application lifecycle instead of Activity's.
-        if (variantManager.getVariant().hasFeature(VariantManager.VariantFeature.FireButtonEducation)) {
+        if (animationEnabled()) {
             val selectedFireAnimation = settingsDataStore.selectedFireAnimation
             LottieCompositionFactory.fromRawRes(context, selectedFireAnimation.resId)
         }
     }
 
+    private fun animationEnabled() = settingsDataStore.selectedFireAnimation.resId != -1
+
     fun refreshAnimation() {
-        val selectedFireAnimation = settingsDataStore.selectedFireAnimation
-        LottieCompositionFactory.fromRawRes(context, selectedFireAnimation.resId)
+        if (animationEnabled()) {
+            val selectedFireAnimation = settingsDataStore.selectedFireAnimation
+            LottieCompositionFactory.fromRawRes(context, selectedFireAnimation.resId)
+        }
     }
 }
