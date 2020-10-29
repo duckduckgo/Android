@@ -2687,21 +2687,6 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun bla() = coroutineRule.runBlocking {
-        val domain = "http://example.com"
-
-        givenCurrentSite(domain)
-        givenDeviceLocationSharingIsEnabled(true)
-        givenLocationPermissionIsEnabled(true)
-
-        testee.onSiteLocationPermissionSelected(domain, LocationPermissionType.ALLOW_ALWAYS)
-
-        loadUrl(domain, isBrowserShowing = true)
-
-        assertCommandNotIssued<Command.ShowDomainHasPermissionMessage>()
-    }
-
-    @Test
     fun whenSystemLocationPermissionIsDeniedThenSiteLocationPermissionIsAlwaysDenied() = coroutineRule.runBlocking {
         val domain = "https://www.example.com/"
         givenDeviceLocationSharingIsEnabled(true)
