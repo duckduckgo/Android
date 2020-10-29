@@ -82,10 +82,7 @@ interface Pixel {
 
         HTTPS_NO_LOOKUP("m_https_nl"),
         HTTPS_LOCAL_UPGRADE("m_https_lu"),
-        HTTPS_SERVICE_REQUEST_UPGRADE("m_https_sru"),
-        HTTPS_SERVICE_CACHE_UPGRADE("m_https_scu"),
-        HTTPS_SERVICE_REQUEST_NO_UPGRADE("m_https_srn"),
-        HTTPS_SERVICE_CACHE_NO_UPGRADE("m_https_scn"),
+        HTTPS_NO_UPGRADE("m_https_nu"),
 
         DEFAULT_BROWSER_SET("m_db_s"),
         DEFAULT_BROWSER_NOT_SET("m_db_ns"),

@@ -16,14 +16,14 @@
 
 package com.duckduckgo.app.httpsupgrade.api
 
-import com.duckduckgo.app.httpsupgrade.model.HttpsWhitelistedDomain
+import com.duckduckgo.app.httpsupgrade.model.HttpsFalsePositiveDomain
 import com.squareup.moshi.FromJson
 
-class HttpsWhitelistJsonAdapter {
+class HttpsFalsePositivesJsonAdapter {
 
     @FromJson
-    fun adapt(data: Map<String, List<String>>): List<HttpsWhitelistedDomain> {
-        return data.getValue("data").map { HttpsWhitelistedDomain(it) }
+    fun adapt(data: Map<String, List<String>>): List<HttpsFalsePositiveDomain> {
+        return data.getValue("data").map { HttpsFalsePositiveDomain(it) }
     }
 
 }

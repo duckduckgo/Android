@@ -16,21 +16,21 @@
 
 package com.duckduckgo.app.httpsupgrade.api
 
-import com.duckduckgo.app.httpsupgrade.model.HttpsWhitelistedDomain
+import com.duckduckgo.app.httpsupgrade.model.HttpsFalsePositiveDomain
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.Types
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
-class HttpsWhitelistJsonTest {
+class HttpsFalsePositivesJsonTest {
 
     @Test
     fun whenGivenValidJsonThenParsesCorrectly() {
 
-        val moshi = Moshi.Builder().add(HttpsWhitelistJsonAdapter()).build()
-        val type = Types.newParameterizedType(List::class.java, HttpsWhitelistedDomain::class.java)
-        val jsonAdapter: JsonAdapter<List<HttpsWhitelistedDomain>> = moshi.adapter(type)
+        val moshi = Moshi.Builder().add(HttpsFalsePositivesJsonAdapter()).build()
+        val type = Types.newParameterizedType(List::class.java, HttpsFalsePositiveDomain::class.java)
+        val jsonAdapter: JsonAdapter<List<HttpsFalsePositiveDomain>> = moshi.adapter(type)
 
         val list = jsonAdapter.fromJson(json())!!
         assertEquals(7, list.count())

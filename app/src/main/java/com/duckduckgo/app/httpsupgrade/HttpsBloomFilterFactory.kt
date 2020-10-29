@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 DuckDuckGo
+ * Copyright (c) 2020 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.httpsupgrade.api
+package com.duckduckgo.app.httpsupgrade
 
 import androidx.annotation.WorkerThread
 import com.duckduckgo.app.global.store.BinaryDataStore
-import com.duckduckgo.app.httpsupgrade.BloomFilter
-import com.duckduckgo.app.httpsupgrade.db.HttpsBloomFilterSpecDao
 import com.duckduckgo.app.httpsupgrade.model.HttpsBloomFilterSpec.Companion.HTTPS_BINARY_FILE
+import com.duckduckgo.app.httpsupgrade.store.HttpsBloomFilterSpecDao
+import com.duckduckgo.app.httpsupgrade.store.HttpsDataPersister
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -28,29 +28,30 @@ interface HttpsBloomFilterFactory {
     fun create(): BloomFilter?
 }
 
-class HttpsBloomFilterFactoryImpl @Inject constructor(private val dao: HttpsBloomFilterSpecDao, private val binaryDataStore: BinaryDataStore) :
-    HttpsBloomFilterFactory {
+class HttpsBloomFilterFactoryImpl @Inject constructor(
+    private val dao: HttpsBloomFilterSpecDao,
+    private val binaryDataStore: BinaryDataStore,
+    private val persister: HttpsDataPersister
+) : HttpsBloomFilterFactory {
 
     @WorkerThread
     override fun create(): BloomFilter? {
 
-        val specification = dao.get()
-        val dataPath = binaryDataStore.dataFilePath(HTTPS_BINARY_FILE)
-
-        if (dataPath == null || specification == null) {
-            Timber.d("Https update data not found")
-            return null
+        if (!persister.isPersisted()) {
+            Timber.d("Https update data not found, loading embedded data")
+            persister.persistEmbeddedData()
         }
 
-        if (!binaryDataStore.verifyCheckSum(HTTPS_BINARY_FILE, specification.sha256)) {
-            Timber.d("Https update data failed checksum, clearing")
-            binaryDataStore.clearData(HTTPS_BINARY_FILE)
+        val specification = dao.get()
+        val dataPath = binaryDataStore.dataFilePath(HTTPS_BINARY_FILE)
+        if (dataPath == null || specification == null || !persister.isPersisted(specification)) {
+            Timber.d("Embedded https update data failed to load")
             return null
         }
 
         val initialTimestamp = System.currentTimeMillis()
         Timber.d("Found https data at $dataPath, building filter")
-        val bloomFilter = BloomFilter(dataPath, specification.totalEntries)
+        val bloomFilter = BloomFilter(dataPath, specification.bitCount, specification.totalEntries)
         Timber.v("Loading took ${System.currentTimeMillis() - initialTimestamp}ms")
 
         return bloomFilter
