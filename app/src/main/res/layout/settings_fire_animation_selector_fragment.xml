@@ -39,7 +39,7 @@
             android:padding="10dp"
             android:paddingStart="10dp"
             android:paddingEnd="10dp"
-            android:text="Fire" />
+            android:text="@string/settingsHeroFireAnimation" />
 
         <RadioButton
             android:id="@+id/fireAnimationWater"
@@ -49,7 +49,7 @@
             android:padding="10dp"
             android:paddingStart="10dp"
             android:paddingEnd="10dp"
-            android:text="Water"
+            android:text="@string/settingsHeroWaterAnimation"
             tools:visibility="visible" />
 
         <RadioButton
@@ -60,7 +60,7 @@
             android:padding="10dp"
             android:paddingStart="10dp"
             android:paddingEnd="10dp"
-            android:text="Abstract" />
+            android:text="@string/settingsHeroAbstractAnimation" />
 
         <RadioButton
             android:id="@+id/fireAnimationDisabled"
@@ -70,7 +70,7 @@
             android:padding="10dp"
             android:paddingStart="10dp"
             android:paddingEnd="10dp"
-            android:text="No animation" />
+            android:text="@string/settingsNoneAnimation" />
 
     </RadioGroup>
 

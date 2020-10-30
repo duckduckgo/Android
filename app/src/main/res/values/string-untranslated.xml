@@ -24,4 +24,12 @@
     <string name="useOurAppNotificationDescription">Here\'s a simple way to reduce its reach.</string>
     <string name="useOurAppShortcutAddedText">Success! %s has been added to your home screen.</string>
     <string name="useOurAppDeletionDialogText">Checking your feed in DuckDuckGo is a great alternative to using the Facebook app!&lt;br/&gt;&lt;br/&gt;But if the Facebook app is on your phone, it can make requests for data even when you\'re not using it.&lt;br/&gt;&lt;br/&gt;Prevent this by deleting it now!</string>
+
+    <!-- Fire Animation settings -->
+    <string name="settingsFireAnimation">Fire Button Animation</string>
+    <string name="settingsHeroFireAnimation">Inferno</string>
+    <string name="settingsHeroWaterAnimation">Whirlpool</string>
+    <string name="settingsHeroAbstractAnimation">Airstream</string>
+    <string name="settingsNoneAnimation">None</string>
+    <string name="settingsSelectFireAnimationDialog">Fire button animation</string>
 </resources>
