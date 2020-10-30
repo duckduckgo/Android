@@ -109,7 +109,7 @@ import io.reactivex.Observable
 import io.reactivex.Single
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.consumeAsFlow
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runBlockingTest
 import org.junit.After
@@ -2679,11 +2679,7 @@ class BrowserTabViewModelTest {
         givenLocationPermissionIsEnabled(true)
 
         loadUrl("https://www.example.com", isBrowserShowing = true)
-
-        assertCommandIssued<Command.ShowDomainHasPermissionMessage>()
-
         loadUrl("https://www.example.com", isBrowserShowing = true)
-
         assertCommandIssuedTimes<Command.ShowDomainHasPermissionMessage>(1)
     }
 
@@ -3024,8 +3020,13 @@ class BrowserTabViewModelTest {
     }
 
     private inline fun <reified T : Command> assertCommandIssuedTimes(times: Int) {
-        val timesIssued = commandCaptor.allValues.count { it is T }
-        assertEquals(times, timesIssued)
+        if (times == 0) {
+            assertCommandNotIssued<T>()
+        } else {
+            verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+            val timesIssued = commandCaptor.allValues.count { it is T }
+            assertEquals(times, timesIssued)
+        }
     }
 
     private fun pixelParams(showedBookmarks: Boolean, bookmarkCapable: Boolean) = mapOf(
