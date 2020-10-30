@@ -162,7 +162,7 @@
     <string name="settingsLightTheme">Helles Design</string>
     <string name="settingsAboutDuckduckgo">Über DuckDuckGo</string>
     <string name="settingsVersion">Version</string>
-    <string name="leaveFeedback">Feedback hinterlassen</string>
+    <string name="leaveFeedback">Feedback abgeben</string>
 
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Speichern</string>
@@ -183,7 +183,7 @@
     <!-- About Activity -->
     <string name="aboutActivityTitle">Über uns</string>
     <string name="aboutDescription">
-        Wir bei DuckDuckGo setzen den neuen Standard für Vertrauen im Internet.\n\n Der DuckDuckGo Privacy Browser bietet alle Datenschutzgrundlagen, die du benötigst, um dich beim Suchen und Browsen im Internet zu schützen, einschließlich Tracker-Blockierung, intelligentere Verschlüsselung und DuckDuckGo-Privatmodussuche.\n\n Schließlich muss das Internet kein unheimlicher Ort sein und die Online-Privatsphäre zu bekommen, die du verdienst, sollte so einfach sein wie das Zuziehen deiner Vorhänge.</string>
+        Wir bei DuckDuckGo setzen den neuen Standard für Vertrauen im Internet.\n\n Der DuckDuckGo Privacy Browser bietet alle Datenschutzgrundlagen, die du benötigst, um dich beim Suchen und Browsen im Internet zu schützen, einschließlich Tracker-Blockierung, intelligenterer Verschlüsselung und DuckDuckGo-Privatmodussuche.\n\n Schließlich muss das Internet kein unheimlicher Ort sein und die Online-Privatsphäre zu bekommen, die du verdienst, sollte so einfach sein wie das Zuziehen deiner Vorhänge.</string>
     <string name="aboutMoreLink">Mehr auf duckduckgo.com/about</string>
     <string name="no_suggestions">Keine Vorschläge</string>
 
@@ -407,8 +407,8 @@
     <string name="onboardingWelcomeTitle">"WILLKOMMEN BEI DUCKDUCKGO!"</string>
     <string name="onboardingDaxText"><![CDATA[Das Internet kann ein bisschen gruselig sein.<br/><br/>Keine Sorge! Privat zu suchen und zu surfen ist einfacher als Sie denken.]]></string>
     <string name="onboardingLetsDoItButton">Fangen wir an!</string>
-    <string name="daxIntroCtaText"><![CDATA[Versuchen Sie als nächstes, eine Ihrer Lieblingsseiten zu besuchen! <br/><br/>Ich blockiere Tracker, damit sie Sie nicht ausspionieren können. Ich werde auch die Sicherheit Ihrer Verbindung verbessern, wenn das möglich ist. 🔒]]></string>
-    <string name="daxEndCtaText"><![CDATA[Gut gemacht! <br/><br/>Hinweis Jedes Mal, wenn Sie mit mir surfen, verliert eine gruselige Anzeige ihre Flügel. 👍]]></string>
+    <string name="daxIntroCtaText"><![CDATA[Versuchen Sie als nächstes, eine Ihrer Lieblingsseiten zu besuchen! <br/><br/>Ich blockiere Tracker, damit diese Sie nicht ausspionieren können. Ich werde auch die Sicherheit Ihrer Verbindung verbessern, wenn das möglich ist. 🔒]]></string>
+    <string name="daxEndCtaText"><![CDATA[Gut gemacht! <br/><br/>Hinweis: Jedes Mal, wenn Sie mit mir surfen, verliert eine gruselige Anzeige ihre Flügel. 👍]]></string>
     <string name="daxSerpCtaText">Ihre DuckDuckGo-Suchanfragen sind anonym und ich speichere niemals Ihren Suchverlauf. Nie. 🙌</string>
     <plurals name="daxTrackersBlockedCtaText">
         <item quantity="one"><![CDATA[ und <b>%1$d andere</b> haben versucht, Sie hier zu tracken. <br/><br/>Ich habe sie blockiert!<br/><br/> ☝️Sie können in der URL-Leiste überprüfen, wer versucht, Sie zu tracken, wenn Sie eine neue Website besuchen.]]></item>

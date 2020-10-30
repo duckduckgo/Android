@@ -24,7 +24,7 @@ import dagger.Provides
 class DaoModule {
 
     @Provides
-    fun providesHttpsWhitelistDao(database: AppDatabase) = database.httpsWhitelistedDao()
+    fun providesHttpsFalsePositivesDao(database: AppDatabase) = database.httpsFalsePositivesDao()
 
     @Provides
     fun provideHttpsBloomFilterSpecDao(database: AppDatabase) = database.httpsBloomFilterSpecDao()
