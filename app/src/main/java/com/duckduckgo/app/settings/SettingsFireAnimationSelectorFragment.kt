@@ -35,7 +35,7 @@ class SettingsFireAnimationSelectorFragment : DialogFragment() {
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
 
-        val currentOption: FireAnimation = arguments?.getSerializable(DEFAULT_OPTION_EXTRA) as FireAnimation? ?: HERO_FIRE_RISING
+        val currentOption: FireAnimation = arguments?.getSerializable(DEFAULT_OPTION_EXTRA) as FireAnimation? ?: HeroFire
 
         val rootView = View.inflate(activity, R.layout.settings_fire_animation_selector_fragment, null)
 
@@ -43,16 +43,16 @@ class SettingsFireAnimationSelectorFragment : DialogFragment() {
 
         val alertBuilder = AlertDialog.Builder(requireActivity())
             .setView(rootView)
-            .setTitle("Fire button animation")
+            .setTitle(R.string.settingsSelectFireAnimationDialog)
             .setPositiveButton(R.string.settingsAutomaticallyClearingDialogSave) { _, _ ->
                 dialog?.let {
                     val radioGroup = it.findViewById(R.id.fireAnimationSelectorGroup) as RadioGroup
                     val selectedOption = when (radioGroup.checkedRadioButtonId) {
-                        R.id.fireAnimationFire -> HERO_FIRE_RISING
-                        R.id.fireAnimationWater -> HERO_WATER_SWIRL
-                        R.id.fireAnimationAbstract -> HERO_ABSTRACT_SQUEEGEE
-                        R.id.fireAnimationDisabled -> DISABLED
-                        else -> HERO_FIRE_RISING
+                        R.id.fireAnimationFire -> HeroFire
+                        R.id.fireAnimationWater -> HeroWater
+                        R.id.fireAnimationAbstract -> HeroAbstract
+                        R.id.fireAnimationDisabled -> Nonen
+                        else -> HeroFire
                     }
                     val listener = activity as Listener?
                     listener?.onFireAnimationSelected(selectedOption)
@@ -71,10 +71,10 @@ class SettingsFireAnimationSelectorFragment : DialogFragment() {
     @IdRes
     private fun FireAnimation.radioButtonId(): Int {
         return when (this) {
-            HERO_FIRE_RISING -> R.id.fireAnimationFire
-            HERO_WATER_SWIRL -> R.id.fireAnimationWater
-            HERO_ABSTRACT_SQUEEGEE -> R.id.fireAnimationAbstract
-            DISABLED -> R.id.fireAnimationDisabled
+            HeroFire -> R.id.fireAnimationFire
+            HeroWater -> R.id.fireAnimationWater
+            HeroAbstract -> R.id.fireAnimationAbstract
+            Nonen -> R.id.fireAnimationDisabled
         }
     }
 

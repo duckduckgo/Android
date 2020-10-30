@@ -130,7 +130,8 @@ class SettingsActivity : DuckDuckGoActivity(), SettingsAutomaticallyClearWhatFra
     }
 
     private fun updateSelectedFireAnimation(fireAnimation: FireAnimation) {
-        selectedFireAnimationSetting.setSubtitle(fireAnimation.name)
+        val subtitle = getString(fireAnimation.nameResId)
+        selectedFireAnimationSetting.setSubtitle(subtitle)
     }
 
     private fun updateAutomaticClearDataOptions(automaticallyClearData: AutomaticallyClearData) {

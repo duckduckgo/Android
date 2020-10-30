@@ -62,6 +62,8 @@ interface SettingsDataStore {
 
 class SettingsSharedPreferences @Inject constructor(private val context: Context) : SettingsDataStore {
 
+    private val fireAnimationMapper = FireAnimationPrefsMapper()
+
     override var lastExecutedJobId: String?
         get() = preferences.getString(KEY_BACKGROUND_JOB_ID, null)
         set(value) {
@@ -107,7 +109,7 @@ class SettingsSharedPreferences @Inject constructor(private val context: Context
 
     override var selectedFireAnimation: FireAnimation
         get() = selectedFireAnimationSavedValue()
-        set(value) = preferences.edit { putString(KEY_SELECTED_FIRE_ANIMATION, value.name) }
+        set(value) = preferences.edit { putString(KEY_SELECTED_FIRE_ANIMATION, fireAnimationMapper.prefValue(value)) }
 
     // Changing the app icon makes the app close in some devices / OS versions. This is a problem if the user has
     // selected automatic data / tabs clear. We will use this flag to track if the user has changed the icon
@@ -168,8 +170,8 @@ class SettingsSharedPreferences @Inject constructor(private val context: Context
     }
 
     private fun selectedFireAnimationSavedValue(): FireAnimation {
-        val savedValue = preferences.getString(KEY_SELECTED_FIRE_ANIMATION, FireAnimation.HERO_FIRE_RISING.name) ?: FireAnimation.HERO_FIRE_RISING.name
-        return FireAnimation.valueOf(savedValue)
+        val selectedFireAnimationValue = preferences.getString(KEY_SELECTED_FIRE_ANIMATION, null)
+        return fireAnimationMapper.fireAnimationFrom(selectedFireAnimationValue, FireAnimation.HeroFire)
     }
 
     private val preferences: SharedPreferences
@@ -200,5 +202,29 @@ class SettingsSharedPreferences @Inject constructor(private val context: Context
             AppIcon.DEFAULT
         }
         const val KEY_SEARCH_NOTIFICATION = "SEARCH_NOTIFICATION"
+    }
+
+    private class FireAnimationPrefsMapper {
+        companion object {
+            private const val HERO_FIRE = "HERO_FIRE"
+            private const val HERO_WATER = "HERO_WATER"
+            private const val HERO_ABSTRACT = "HERO_ABSTRACT"
+            private const val NONE = "NONE"
+        }
+
+        fun prefValue(fireAnimation: FireAnimation) = when (fireAnimation) {
+            FireAnimation.HeroFire -> HERO_FIRE
+            FireAnimation.HeroWater -> HERO_WATER
+            FireAnimation.HeroAbstract -> HERO_ABSTRACT
+            FireAnimation.Nonen -> NONE
+        }
+
+        fun fireAnimationFrom(value: String?, defValue: FireAnimation) = when (value) {
+            HERO_FIRE -> FireAnimation.HeroFire
+            HERO_WATER -> FireAnimation.HeroWater
+            HERO_ABSTRACT -> FireAnimation.HeroAbstract
+            NONE -> FireAnimation.Nonen
+            else -> defValue
+        }
     }
 }

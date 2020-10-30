@@ -17,10 +17,11 @@
 package com.duckduckgo.app.settings.clear
 
 import com.duckduckgo.app.browser.R
+import java.io.Serializable
 
-enum class FireAnimation(val resId: Int) {
-    HERO_FIRE_RISING(R.raw.hero_fire_inferno),
-    HERO_WATER_SWIRL(R.raw.hero_water_whirlpool),
-    HERO_ABSTRACT_SQUEEGEE(R.raw.hero_abstract_airstream),
-    DISABLED(-1)
+sealed class FireAnimation(val resId: Int, val nameResId: Int) : Serializable {
+    object HeroFire : FireAnimation(R.raw.hero_fire_inferno, R.string.settingsHeroFireAnimation)
+    object HeroWater : FireAnimation(R.raw.hero_water_whirlpool, R.string.settingsHeroWaterAnimation)
+    object HeroAbstract : FireAnimation(R.raw.hero_abstract_airstream, R.string.settingsHeroAbstractAnimation)
+    object Nonen : FireAnimation(-1, R.string.settingsNoneAnimation)
 }
