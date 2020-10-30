@@ -300,6 +300,7 @@ class BrowserTabViewModel(
         get() = site?.title
 
     private var locationPermission: LocationPermission? = null
+    private val locationPermissionMessages: MutableMap<String, Boolean> = mutableMapOf()
 
     private val autoCompletePublishSubject = PublishRelay.create<String>()
     private val fireproofWebsiteState: LiveData<List<FireproofWebsiteEntity>> = fireproofWebsiteRepository.getFireproofWebsites()
@@ -851,9 +852,16 @@ class BrowserTabViewModel(
         val permissionEntity = locationPermissionsRepository.getDomainPermission(domain)
         permissionEntity?.let {
             if (it.permission == LocationPermissionType.ALLOW_ALWAYS) {
-                command.postValue(ShowDomainHasPermissionMessage(domain))
+                if (!locationPermissionMessages.containsKey(domain)) {
+                    setDomainHasLocationPermissionShown(domain)
+                    command.postValue(ShowDomainHasPermissionMessage(domain))
+                }
             }
         }
+    }
+
+    private fun setDomainHasLocationPermissionShown(domain: String) {
+        locationPermissionMessages[domain] = true
     }
 
     private fun urlUpdated(url: String) {
@@ -964,6 +972,7 @@ class BrowserTabViewModel(
             when (permission) {
                 LocationPermissionType.ALLOW_ALWAYS -> {
                     onSiteLocationPermissionAlwaysAllowed()
+                    setDomainHasLocationPermissionShown(domain)
                     pixel.fire(PixelName.PRECISE_LOCATION_SITE_DIALOG_ALLOW_ALWAYS)
                     viewModelScope.launch {
                         locationPermissionsRepository.savePermission(domain, permission)
