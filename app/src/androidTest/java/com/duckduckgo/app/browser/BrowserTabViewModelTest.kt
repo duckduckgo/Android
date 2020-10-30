@@ -121,6 +121,7 @@ import org.mockito.*
 import org.mockito.ArgumentMatchers.anyString
 import org.mockito.Mockito.never
 import org.mockito.Mockito.verify
+import org.mockito.internal.util.DefaultMockingDetails
 import java.io.File
 import java.util.*
 import java.util.concurrent.TimeUnit
@@ -3012,8 +3013,14 @@ class BrowserTabViewModelTest {
     }
 
     private inline fun <reified T : Command> assertCommandNotIssued() {
-        val issuedCommand = commandCaptor.allValues.find { it is T }
-        assertNull(issuedCommand)
+        val defaultMockingDetails = DefaultMockingDetails(mockCommandObserver)
+        if (defaultMockingDetails.invocations.isNotEmpty()) {
+            verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+            val issuedCommand = commandCaptor.allValues.find { it is T }
+            assertNull(issuedCommand)
+        } else {
+            assertTrue(true)
+        }
     }
 
     private inline fun <reified T : Command> assertCommandIssuedTimes(times: Int) {
