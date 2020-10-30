@@ -26,8 +26,7 @@
         android:importantForAccessibility="no"
         android:scaleType="centerCrop"
         android:visibility="gone"
-        app:lottie_loop="false"
-        app:lottie_rawRes="@raw/abstract_hero_squeegee" />
+        app:lottie_loop="false" />
 
     <LinearLayout
         android:id="@+id/fireDialogRootView"

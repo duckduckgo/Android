@@ -19,8 +19,8 @@ package com.duckduckgo.app.settings.clear
 import com.duckduckgo.app.browser.R
 
 enum class FireAnimation(val resId: Int) {
-    HERO_FIRE_RISING(R.raw.fire_hero_rising),
-    HERO_WATER_SWIRL(R.raw.water_swirl),
-    HERO_ABSTRACT_SQUEEGEE(R.raw.abstract_hero_squeegee),
+    HERO_FIRE_RISING(R.raw.hero_fire_inferno),
+    HERO_WATER_SWIRL(R.raw.hero_water_whirlpool),
+    HERO_ABSTRACT_SQUEEGEE(R.raw.hero_abstract_airstream),
     DISABLED(-1)
 }
