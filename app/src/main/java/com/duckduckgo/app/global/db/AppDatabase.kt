@@ -25,11 +25,7 @@ import androidx.sqlite.db.SupportSQLiteDatabase
 import com.duckduckgo.app.bookmarks.db.BookmarkEntity
 import com.duckduckgo.app.bookmarks.db.BookmarksDao
 import com.duckduckgo.app.browser.addtohome.AddToHomeCapabilityDetector
-import com.duckduckgo.app.browser.rating.db.AppEnjoymentDao
-import com.duckduckgo.app.browser.rating.db.AppEnjoymentEntity
-import com.duckduckgo.app.browser.rating.db.AppEnjoymentTypeConverter
-import com.duckduckgo.app.browser.rating.db.LocationPermissionTypeConverter
-import com.duckduckgo.app.browser.rating.db.PromptCountConverter
+import com.duckduckgo.app.browser.rating.db.*
 import com.duckduckgo.app.cta.db.DismissedCtaDao
 import com.duckduckgo.app.cta.model.DismissedCta
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteDao
@@ -40,10 +36,10 @@ import com.duckduckgo.app.global.events.db.UserEventsDao
 import com.duckduckgo.app.global.exception.UncaughtExceptionDao
 import com.duckduckgo.app.global.exception.UncaughtExceptionEntity
 import com.duckduckgo.app.global.exception.UncaughtExceptionSourceConverter
-import com.duckduckgo.app.httpsupgrade.store.HttpsBloomFilterSpecDao
-import com.duckduckgo.app.httpsupgrade.store.HttpsFalsePositivesDao
 import com.duckduckgo.app.httpsupgrade.model.HttpsBloomFilterSpec
 import com.duckduckgo.app.httpsupgrade.model.HttpsFalsePositiveDomain
+import com.duckduckgo.app.httpsupgrade.store.HttpsBloomFilterSpecDao
+import com.duckduckgo.app.httpsupgrade.store.HttpsFalsePositivesDao
 import com.duckduckgo.app.location.data.LocationPermissionEntity
 import com.duckduckgo.app.location.data.LocationPermissionsDao
 import com.duckduckgo.app.notification.db.NotificationDao
@@ -53,6 +49,8 @@ import com.duckduckgo.app.privacy.db.*
 import com.duckduckgo.app.privacy.model.PrivacyProtectionCountsEntity
 import com.duckduckgo.app.privacy.model.UserWhitelistedDomain
 import com.duckduckgo.app.settings.db.SettingsDataStore
+import com.duckduckgo.app.statistics.model.PixelEntity
+import com.duckduckgo.app.statistics.store.PixelDao
 import com.duckduckgo.app.survey.db.SurveyDao
 import com.duckduckgo.app.survey.model.Survey
 import com.duckduckgo.app.tabs.db.TabsDao
@@ -66,7 +64,7 @@ import com.duckduckgo.app.usage.search.SearchCountDao
 import com.duckduckgo.app.usage.search.SearchCountEntity
 
 @Database(
-    exportSchema = true, version = 26, entities = [
+    exportSchema = true, version = 27, entities = [
         TdsTracker::class,
         TdsEntity::class,
         TdsDomainEntity::class,
@@ -91,7 +89,8 @@ import com.duckduckgo.app.usage.search.SearchCountEntity
         UserStage::class,
         FireproofWebsiteEntity::class,
         UserEventEntity::class,
-        LocationPermissionEntity::class
+        LocationPermissionEntity::class,
+        PixelEntity::class
     ]
 )
 
@@ -133,6 +132,7 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun fireproofWebsiteDao(): FireproofWebsiteDao
     abstract fun locationPermissionsDao(): LocationPermissionsDao
     abstract fun userEventsDao(): UserEventsDao
+    abstract fun pixelDao(): PixelDao
 }
 
 @Suppress("PropertyName")
@@ -282,7 +282,7 @@ class MigrationsProvider(
             val userStage = UserStage(appStage = appStage)
             database.execSQL(
                 "CREATE TABLE IF NOT EXISTS `$USER_STAGE_TABLE_NAME` " +
-                    "(`key` INTEGER NOT NULL, `appStage` TEXT NOT NULL, PRIMARY KEY(`key`))"
+                        "(`key` INTEGER NOT NULL, `appStage` TEXT NOT NULL, PRIMARY KEY(`key`))"
             )
             database.execSQL(
                 "INSERT INTO $USER_STAGE_TABLE_NAME VALUES (${userStage.key}, \"${userStage.appStage}\") "
@@ -327,14 +327,14 @@ class MigrationsProvider(
             // SQLite does not support Alter table operations like Foreign keys
             database.execSQL(
                 "CREATE TABLE IF NOT EXISTS tabs_new " +
-                    "(tabId TEXT NOT NULL, url TEXT, title TEXT, skipHome INTEGER NOT NULL, viewed INTEGER NOT NULL, position INTEGER NOT NULL, tabPreviewFile TEXT, sourceTabId TEXT," +
-                    " PRIMARY KEY(tabId)," +
-                    " FOREIGN KEY(sourceTabId) REFERENCES tabs(tabId) ON UPDATE SET NULL ON DELETE SET NULL )"
+                        "(tabId TEXT NOT NULL, url TEXT, title TEXT, skipHome INTEGER NOT NULL, viewed INTEGER NOT NULL, position INTEGER NOT NULL, tabPreviewFile TEXT, sourceTabId TEXT," +
+                        " PRIMARY KEY(tabId)," +
+                        " FOREIGN KEY(sourceTabId) REFERENCES tabs(tabId) ON UPDATE SET NULL ON DELETE SET NULL )"
             )
             database.execSQL(
                 "INSERT INTO tabs_new (tabId, url, title, skipHome, viewed, position, tabPreviewFile) " +
-                    "SELECT tabId, url, title, skipHome, viewed, position, tabPreviewFile " +
-                    "FROM tabs"
+                        "SELECT tabId, url, title, skipHome, viewed, position, tabPreviewFile " +
+                        "FROM tabs"
             )
             database.execSQL("DROP TABLE tabs")
             database.execSQL("ALTER TABLE tabs_new RENAME TO tabs")
@@ -354,6 +354,12 @@ class MigrationsProvider(
             database.execSQL("DROP TABLE `https_whitelisted_domain`")
             database.execSQL("CREATE TABLE `https_bloom_filter_spec` (`id` INTEGER NOT NULL, `bitCount` INTEGER NOT NULL, `errorRate` REAL NOT NULL, `totalEntries` INTEGER NOT NULL, `sha256` TEXT NOT NULL, PRIMARY KEY(`id`))")
             database.execSQL("CREATE TABLE `https_false_positive_domain` (`domain` TEXT NOT NULL, PRIMARY KEY(`domain`))")
+        }
+    }
+
+    val MIGRATION_26_TO_27: Migration = object : Migration(26, 27) {
+        override fun migrate(database: SupportSQLiteDatabase) {
+            database.execSQL("CREATE TABLE IF NOT EXISTS `pixel_store` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `pixelName` TEXT NOT NULL, `atb` TEXT NOT NULL)")
         }
     }
 
@@ -383,8 +389,9 @@ class MigrationsProvider(
             MIGRATION_22_TO_23,
             MIGRATION_23_TO_24,
             MIGRATION_24_TO_25,
-            MIGRATION_25_TO_26
-            )
+            MIGRATION_25_TO_26,
+            MIGRATION_26_TO_27
+        )
 
     @Deprecated(
         message = "This class should be only used by database migrations.",
