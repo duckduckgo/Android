@@ -227,4 +227,6 @@ dependencies {
 
     kapt "com.android.tools.build.jetifier:jetifier-core:$jetifier"
     annotationProcessor "com.android.tools.build.jetifier:jetifier-core:$jetifier"
+
+    debugImplementation "com.squareup.okhttp3:logging-interceptor:4.9.0"
 }

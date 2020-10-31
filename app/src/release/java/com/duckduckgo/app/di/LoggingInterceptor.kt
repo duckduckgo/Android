@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 DuckDuckGo
+ * Copyright (c) 2020 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,10 +14,15 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.global.api
+package com.duckduckgo.app.di
 
-import retrofit2.Response
-import java.net.HttpURLConnection.HTTP_NOT_MODIFIED
+import okhttp3.Interceptor
+import okhttp3.Response
 
-val <T> Response<T>.isCached: Boolean
-    get() = raw().cacheResponse != null && (raw().networkResponse?.code == null || raw().networkResponse?.code == HTTP_NOT_MODIFIED)
+class LoggingInterceptor : Interceptor {
+
+    override fun intercept(chain: Interceptor.Chain): Response {
+        //no op - disabled for release variants
+        return chain.proceed(chain.request())
+    }
+}

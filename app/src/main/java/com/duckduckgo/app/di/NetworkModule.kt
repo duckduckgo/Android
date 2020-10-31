@@ -64,6 +64,7 @@ class NetworkModule {
         val cache = Cache(cacheLocation, CACHE_SIZE)
         return OkHttpClient.Builder()
             .addInterceptor(apiRequestInterceptor)
+            .addInterceptor(LoggingInterceptor())
             .cache(cache)
             .build()
     }
@@ -74,6 +75,7 @@ class NetworkModule {
     fun pixelOkHttpClient(apiRequestInterceptor: ApiRequestInterceptor): OkHttpClient {
         return OkHttpClient.Builder()
             .addInterceptor(apiRequestInterceptor)
+            .addInterceptor(LoggingInterceptor())
             .build()
     }
 
