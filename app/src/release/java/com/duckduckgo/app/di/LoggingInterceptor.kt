@@ -22,7 +22,7 @@ import okhttp3.Response
 class LoggingInterceptor : Interceptor {
 
     override fun intercept(chain: Interceptor.Chain): Response {
-        //no op - disabled for release variants
+        // no op - disabled for release variants
         return chain.proceed(chain.request())
     }
 }
