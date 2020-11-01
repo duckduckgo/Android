@@ -42,11 +42,15 @@ internal class ListExtensionKtTest {
         Arguments.of(listOf("foo.bar", "ddg.com"), listOf("foo.bar", "ddg.com")),
         Arguments.of(listOf("foo.bar", ""), listOf("foo.bar")),
         Arguments.of(listOf("foo.bar", " "), listOf("foo.bar")),
+        Arguments.of(listOf("", "foo.bar"), listOf("foo.bar")),
+        Arguments.of(listOf(" ", "foo.bar"), listOf("foo.bar")),
         Arguments.of(listOf("foo.bar", "ddg.com"), listOf("foo.bar", "ddg.com")),
         Arguments.of(listOf("foo.bar", "", "ddg.com"), listOf("foo.bar", "ddg.com")),
         Arguments.of(listOf("foo.bar", " ", "ddg.com"), listOf("foo.bar", "ddg.com")),
         Arguments.of(listOf("foo.bar", "ddg.com", " "), listOf("foo.bar", "ddg.com")),
         Arguments.of(listOf("foo.bar", "ddg.com", ""), listOf("foo.bar", "ddg.com")),
-        Arguments.of(listOf("foo.bar", "ddg.com"), listOf("foo.bar", "ddg.com"))
+        Arguments.of(listOf("foo.bar", "ddg.com"), listOf("foo.bar", "ddg.com")),
+        Arguments.of(listOf("", "foo.bar", "ddg.com"), listOf("foo.bar", "ddg.com")),
+        Arguments.of(listOf(" ", "foo.bar", "ddg.com"), listOf("foo.bar", "ddg.com"))
     )
 }
