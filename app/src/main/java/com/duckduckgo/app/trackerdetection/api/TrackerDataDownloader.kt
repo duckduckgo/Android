@@ -18,6 +18,7 @@ package com.duckduckgo.app.trackerdetection.api
 
 import com.duckduckgo.app.global.api.isCached
 import com.duckduckgo.app.global.db.AppDatabase
+import com.duckduckgo.app.global.filterBlankItems
 import com.duckduckgo.app.global.store.BinaryDataStore
 import com.duckduckgo.app.trackerdetection.Client.ClientName.*
 import com.duckduckgo.app.trackerdetection.TrackerDataLoader
@@ -86,7 +87,7 @@ class TrackerDataDownloader @Inject constructor(
             val body = response.body()!!
 
             appDatabase.runInTransaction {
-                temporaryTrackingWhitelistDao.updateAll(body.lines().filter { it.isNotBlank() }
+                temporaryTrackingWhitelistDao.updateAll(body.lines().filterBlankItems()
                     .map { TemporaryTrackingWhitelistedDomain(it) })
                 trackerDataLoader.loadTemporaryWhitelist()
             }
