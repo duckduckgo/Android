@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.httpsupgrade.db
+package com.duckduckgo.app.httpsupgrade.store
 
 import androidx.room.Room
 import androidx.test.platform.app.InstrumentationRegistry
@@ -48,17 +48,18 @@ class HttpsBloomFilterSpecDaoTest {
 
     @Test
     fun whenModelIsInsertedThenGetIsNotNull() {
-        dao.insert(HttpsBloomFilterSpec(errorRate = 0.1, totalEntries = 55, sha256 = "abc"))
+        dao.insert(HttpsBloomFilterSpec(errorRate = 0.1, bitCount = 1000, totalEntries = 55, sha256 = "abc"))
         assertNotNull(dao.get())
     }
 
     @Test
     fun whenNewModelIsInsertedThenGetIsNotNullAndDetailsUpdates() {
-        dao.insert(HttpsBloomFilterSpec(errorRate = 0.1, totalEntries = 55, sha256 = "abc"))
-        dao.insert(HttpsBloomFilterSpec(errorRate = 0.2, totalEntries = 60, sha256 = "xyz"))
+        dao.insert(HttpsBloomFilterSpec(bitCount = 1000, errorRate = 0.1, totalEntries = 55, sha256 = "abc"))
+        dao.insert(HttpsBloomFilterSpec(bitCount = 2000, errorRate = 0.2, totalEntries = 60, sha256 = "xyz"))
 
         val specification = dao.get()
         assertNotNull(specification)
+        assertEquals(2000, specification!!.bitCount)
         assertEquals(0.2, specification!!.errorRate, 0.01)
         assertEquals(60, specification.totalEntries)
         assertEquals("xyz", specification.sha256)

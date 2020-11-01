@@ -40,10 +40,10 @@ import com.duckduckgo.app.global.events.db.UserEventsDao
 import com.duckduckgo.app.global.exception.UncaughtExceptionDao
 import com.duckduckgo.app.global.exception.UncaughtExceptionEntity
 import com.duckduckgo.app.global.exception.UncaughtExceptionSourceConverter
-import com.duckduckgo.app.httpsupgrade.db.HttpsBloomFilterSpecDao
-import com.duckduckgo.app.httpsupgrade.db.HttpsWhitelistDao
+import com.duckduckgo.app.httpsupgrade.store.HttpsBloomFilterSpecDao
+import com.duckduckgo.app.httpsupgrade.store.HttpsFalsePositivesDao
 import com.duckduckgo.app.httpsupgrade.model.HttpsBloomFilterSpec
-import com.duckduckgo.app.httpsupgrade.model.HttpsWhitelistedDomain
+import com.duckduckgo.app.httpsupgrade.model.HttpsFalsePositiveDomain
 import com.duckduckgo.app.location.data.LocationPermissionEntity
 import com.duckduckgo.app.location.data.LocationPermissionsDao
 import com.duckduckgo.app.notification.db.NotificationDao
@@ -66,14 +66,14 @@ import com.duckduckgo.app.usage.search.SearchCountDao
 import com.duckduckgo.app.usage.search.SearchCountEntity
 
 @Database(
-    exportSchema = true, version = 25, entities = [
+    exportSchema = true, version = 26, entities = [
         TdsTracker::class,
         TdsEntity::class,
         TdsDomainEntity::class,
         TemporaryTrackingWhitelistedDomain::class,
         UserWhitelistedDomain::class,
         HttpsBloomFilterSpec::class,
-        HttpsWhitelistedDomain::class,
+        HttpsFalsePositiveDomain::class,
         NetworkLeaderboardEntry::class,
         SitesVisitedEntity::class,
         TabEntity::class,
@@ -115,7 +115,7 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun tdsDomainEntityDao(): TdsDomainEntityDao
     abstract fun temporaryTrackingWhitelistDao(): TemporaryTrackingWhitelistDao
     abstract fun userWhitelistDao(): UserWhitelistDao
-    abstract fun httpsWhitelistedDao(): HttpsWhitelistDao
+    abstract fun httpsFalsePositivesDao(): HttpsFalsePositivesDao
     abstract fun httpsBloomFilterSpecDao(): HttpsBloomFilterSpecDao
     abstract fun networkLeaderboardDao(): NetworkLeaderboardDao
     abstract fun tabsDao(): TabsDao
@@ -348,6 +348,15 @@ class MigrationsProvider(
         }
     }
 
+    val MIGRATION_25_TO_26: Migration = object : Migration(25, 26) {
+        override fun migrate(database: SupportSQLiteDatabase) {
+            database.execSQL("DROP TABLE `https_bloom_filter_spec`")
+            database.execSQL("DROP TABLE `https_whitelisted_domain`")
+            database.execSQL("CREATE TABLE `https_bloom_filter_spec` (`id` INTEGER NOT NULL, `bitCount` INTEGER NOT NULL, `errorRate` REAL NOT NULL, `totalEntries` INTEGER NOT NULL, `sha256` TEXT NOT NULL, PRIMARY KEY(`id`))")
+            database.execSQL("CREATE TABLE `https_false_positive_domain` (`domain` TEXT NOT NULL, PRIMARY KEY(`domain`))")
+        }
+    }
+
     val ALL_MIGRATIONS: List<Migration>
         get() = listOf(
             MIGRATION_1_TO_2,
@@ -373,8 +382,9 @@ class MigrationsProvider(
             MIGRATION_21_TO_22,
             MIGRATION_22_TO_23,
             MIGRATION_23_TO_24,
-            MIGRATION_24_TO_25
-        )
+            MIGRATION_24_TO_25,
+            MIGRATION_25_TO_26
+            )
 
     @Deprecated(
         message = "This class should be only used by database migrations.",
