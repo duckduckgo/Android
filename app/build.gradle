@@ -215,10 +215,6 @@ dependencies {
     implementation("com.android.installreferrer:installreferrer:$referrerLibrary")
 
     // Testing dependencies
-//    testImplementation "org.mockito:mockito-core:$mockito"
-//    testImplementation "com.nhaarman.mockitokotlin2:mockito-kotlin:$mockitoKotlin"
-//    testImplementation "junit:junit:$junit"
-
     testImplementation "org.junit.jupiter:junit-jupiter-api:$junit5"
     testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:$junit5"
     testImplementation "org.junit.jupiter:junit-jupiter-params:$junit5"
