@@ -301,7 +301,7 @@ class StatisticsRequesterJsonTest {
      *
      * However, it has been observed that the request could stall indefinitely when working with a device with Charles proxy configured.
      */
-    private fun takeRequestImmediately(): RecordedRequest = server.takeRequest(100, TimeUnit.MILLISECONDS)!!
+    private fun takeRequestImmediately() = server.takeRequest(100, TimeUnit.MILLISECONDS)
 
     private fun assertTestParameterSent(testParam: String?) {
         assertNotNull(testParam)
