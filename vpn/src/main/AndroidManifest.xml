@@ -7,7 +7,7 @@
     <application>
 
         <activity
-            android:name="dummy.VpnControllerActivity"
+            android:name="dummy.ui.VpnControllerActivity"
             android:exported="true"
             android:label="@string/title_activity_vpn_controller"
             android:process=":vpn"

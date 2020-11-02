@@ -25,6 +25,7 @@ import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpStateFlow.Event.MoveSt
 import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpStateFlow.Event.MoveState.MoveServerToState
 import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpStateFlow.Event.SendReset
 import com.duckduckgo.mobile.android.vpn.service.VpnQueues
+import com.duckduckgo.mobile.android.vpn.store.PacketPersister
 import com.google.firebase.perf.FirebasePerformance
 import com.google.firebase.perf.metrics.AddTrace
 import timber.log.Timber
@@ -46,7 +47,7 @@ class TcpNetworkToDevice(
     private val queues: VpnQueues,
     private val selector: Selector,
     private val tcpSocketWriter: TcpSocketWriter,
-    private val handler: Handler
+    private val packetPersister: PacketPersister
 ) {
 
     /**
@@ -106,6 +107,8 @@ class TcpNetworkToDevice(
             val channel = key.channel() as SocketChannel
             try {
                 val readBytes = channel.read(receiveBuffer)
+
+                packetPersister.persistDataReceived(readBytes)
 
                 if (endOfStream(readBytes)) {
                     handleEndOfStream(tcb, packet, key, channel)

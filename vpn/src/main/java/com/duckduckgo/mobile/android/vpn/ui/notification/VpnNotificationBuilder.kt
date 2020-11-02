@@ -26,13 +26,17 @@ import android.os.Build
 import androidx.core.app.NotificationCompat
 import androidx.core.app.TaskStackBuilder
 import com.duckduckgo.mobile.android.vpn.R
-import dummy.VpnControllerActivity
+import com.duckduckgo.mobile.android.vpn.model.TimePassed
+import com.duckduckgo.mobile.android.vpn.model.VpnTrackerAndCompany
+import dummy.ui.VpnControllerActivity
+import org.threeten.bp.OffsetDateTime
+import org.threeten.bp.temporal.ChronoUnit
 
 class VpnNotificationBuilder {
 
     companion object {
 
-        fun buildPersistentNotification(context: Context): Notification {
+        fun buildPersistentNotification(context: Context, trackersBlocked: List<VpnTrackerAndCompany>): Notification {
             registerChannel(context)
 
             val vpnControllerIntent = Intent(context, VpnControllerActivity::class.java)
@@ -45,6 +49,9 @@ class VpnNotificationBuilder {
                 VPN_FOREGROUND_SERVICE_NOTIFICATION_CHANNEL_ID
             )
                 .setContentTitle(context.getString(R.string.vpnNotificationTitle))
+                .setContentText(generateNotificationText(trackersBlocked))
+                .setStyle(NotificationCompat.BigTextStyle()
+                    .bigText(generateNotificationText(trackersBlocked)))
                 .setSmallIcon(R.drawable.ic_vpn_notification_24)
                 .setContentIntent(vpnControllerPendingIntent)
                 .setOngoing(true)
@@ -52,11 +59,23 @@ class VpnNotificationBuilder {
                 .build()
         }
 
+        private fun generateNotificationText(trackersBlocked: List<VpnTrackerAndCompany>): String {
+            return if (trackersBlocked.isEmpty()) {
+                "No trackers blocked yet"
+            } else {
+                // Today, so far we blocked 12 companies from tracking you, 3 of which in the past hour
+                val lastTrackerBlocked = trackersBlocked.first()
+                val timeDifference = lastTrackerBlocked.tracker.timestamp.until(OffsetDateTime.now(), ChronoUnit.MILLIS)
+                val timeRunning = TimePassed.fromMilliseconds(timeDifference)
+                "Today, so far we blocked ${trackersBlocked.size} companies from tracking you, " +
+                    "the last one was ${lastTrackerBlocked.trackerCompany.company} $timeRunning ago"
+            }
+        }
+
         private fun registerChannel(context: Context) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 val channel =
-                    NotificationChannel(VPN_FOREGROUND_SERVICE_NOTIFICATION_CHANNEL_ID, "Tracker Protection Running", NotificationManager.IMPORTANCE_LOW)
-                //NotificationManagerCompat.from(context).createNotificationChannel(channel)
+                    NotificationChannel(VPN_FOREGROUND_SERVICE_NOTIFICATION_CHANNEL_ID, "Tracker Protection Running", NotificationManager.IMPORTANCE_MIN)
                 val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
                 notificationManager.createNotificationChannel(channel)
             }

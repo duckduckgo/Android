@@ -55,15 +55,20 @@ import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.app.surrogates.ResourceSurrogateLoader
 import com.duckduckgo.app.trackerdetection.TrackerDataLoader
 import com.duckduckgo.app.usage.app.AppDaysUsedRecorder
+import com.duckduckgo.mobile.android.vpn.di.DaggerAppTrackerBlockingComponent
+import com.duckduckgo.mobile.android.vpn.di.AppTrackerBlockingComponent
+import com.jakewharton.threetenabp.AndroidThreeTen
 import dagger.android.AndroidInjector
 import dagger.android.DispatchingAndroidInjector
 import dagger.android.HasAndroidInjector
 import io.reactivex.exceptions.UndeliverableException
 import io.reactivex.plugins.RxJavaPlugins
 import io.reactivex.schedulers.Schedulers
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import org.jetbrains.anko.doAsync
+import org.threeten.bp.zone.ZoneRulesProvider
 import timber.log.Timber
 import javax.inject.Inject
 import kotlin.concurrent.thread
@@ -194,6 +199,7 @@ open class DuckDuckGoApplication : HasAndroidInjector, Application(), LifecycleO
         loadTrackerData()
         configureDataDownloader()
         scheduleOfflinePixels()
+        initializeDateLibrary()
 
         notificationRegistrar.registerApp()
         registerReceiver(shortcutReceiver, IntentFilter(ShortcutBuilder.USE_OUR_APP_SHORTCUT_ADDED_ACTION))
@@ -246,8 +252,15 @@ open class DuckDuckGoApplication : HasAndroidInjector, Application(), LifecycleO
     protected open fun configureDependencyInjection() {
         daggerAppComponent = DaggerAppComponent.builder()
             .application(this)
+            .trackerBlockingStatsComponent(getTrackerBlockingComponent())
             .build()
         daggerAppComponent.inject(this)
+    }
+
+    private fun getTrackerBlockingComponent(): AppTrackerBlockingComponent {
+        return DaggerAppTrackerBlockingComponent.builder()
+            .application(this)
+            .build()
     }
 
     private fun initializeHttpsUpgrader() {
@@ -291,6 +304,14 @@ open class DuckDuckGoApplication : HasAndroidInjector, Application(), LifecycleO
         offlinePixelScheduler.scheduleOfflinePixels()
     }
 
+    private fun initializeDateLibrary() {
+        AndroidThreeTen.init(this)
+        // Query the ZoneRulesProvider so that it is loaded on a background coroutine
+        GlobalScope.launch(Dispatchers.IO) {
+            ZoneRulesProvider.getAvailableZoneIds()
+        }
+    }
+
     override fun androidInjector(): AndroidInjector<Any> {
         return androidInjector
     }
@@ -317,5 +338,4 @@ open class DuckDuckGoApplication : HasAndroidInjector, Application(), LifecycleO
     companion object {
         private const val APP_RESTART_CAUSED_BY_FIRE_GRACE_PERIOD: Long = 10_000L
     }
-
 }

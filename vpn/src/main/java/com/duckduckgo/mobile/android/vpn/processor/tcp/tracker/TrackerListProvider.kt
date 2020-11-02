@@ -16,27 +16,34 @@
 
 package com.duckduckgo.mobile.android.vpn.processor.tcp.tracker
 
+import com.duckduckgo.mobile.android.vpn.model.VpnTrackerCompany
 
 class TrackerListProvider {
 
-    fun trackerList(): List<String> {
+    data class Tracker(val id: Int, val trackerCompanyId: Int, val hostname: String)
+
+    fun trackerList(): List<Tracker> {
         return TRACKER_HOST_NAMES
     }
 
     companion object {
         val TRACKER_HOST_NAMES = listOf(
-            "example.com",
+            Tracker(0, 0, "example.com"),
+            Tracker(1, 1, "doubleclick.net"),
+            Tracker(2, 1, "googlesyndication.com"),
+            Tracker(3, 1, "google-analytics.com"),
+            Tracker(4, 1, "googleadservices.com"),
+            Tracker(5, 1, "googletagservices.com"),
+            Tracker(6, 1, "googletagmanager.com"),
+            Tracker(7, 2, "amazon-adsystem.com")
+        )
 
-            // google
-            "doubleclick.net",
-            "googlesyndication.com",
-            "google-analytics.com",
-            "googleadservices.com",
-            "googletagservices.com",
-            "googletagmanager.com",
+        val UNDEFINED_TRACKER_COMPANY = VpnTrackerCompany(0, "Tracking LLC")
 
-            // amazon
-            "amazon-adsystem.com"
+        val TRACKER_GROUP_COMPANIES = listOf(
+            UNDEFINED_TRACKER_COMPANY,
+            VpnTrackerCompany(1, "Google"),
+            VpnTrackerCompany(2, "Amazon")
         )
     }
 }

@@ -33,4 +33,5 @@ class TestApplication : DuckDuckGoApplication() {
             .build()
         daggerAppComponent.inject(this)
     }
+
 }

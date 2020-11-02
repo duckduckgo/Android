@@ -14,9 +14,11 @@
  * limitations under the License.
  */
 
-package dummy
+package dummy.ui
 
 import android.app.Activity
+import android.content.ClipData
+import android.content.ClipboardManager
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
@@ -24,46 +26,66 @@ import android.content.ServiceConnection
 import android.net.VpnService
 import android.os.Bundle
 import android.os.IBinder
-import android.widget.Button
 import android.widget.CompoundButton
 import android.widget.TextView
-import android.widget.Toast
 import android.widget.ToggleButton
 import androidx.appcompat.app.AppCompatActivity
-import androidx.fragment.app.FragmentActivity
+import androidx.lifecycle.Observer
 import com.duckduckgo.mobile.android.vpn.R
+import com.duckduckgo.mobile.android.vpn.model.TimePassed
 import com.duckduckgo.mobile.android.vpn.service.PassthroughVpnService
-import com.duckduckgo.mobile.android.vpn.store.VpnSharedPreferences
+import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
+import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
+import com.google.android.material.snackbar.Snackbar
+import dagger.android.AndroidInjection
+import dummy.quietlySetIsChecked
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.MainScope
+import org.threeten.bp.OffsetDateTime
+import org.threeten.bp.temporal.ChronoUnit
 import timber.log.Timber
-import xyz.hexene.localvpn.Packet
-import java.nio.ByteBuffer
+import javax.inject.Inject
 
 class VpnControllerActivity : AppCompatActivity(R.layout.activity_vpn_controller), CoroutineScope by MainScope() {
 
+    private lateinit var lastTrackerDomainTextView: TextView
+    private lateinit var timeRunningTodayTextView: TextView
+    private lateinit var trackersBlockedTextView: TextView
+    private lateinit var dataSentTextView: TextView
+    private lateinit var dataReceivedTextView: TextView
     private lateinit var vpnRunningToggleButton: ToggleButton
-    private lateinit var vpnPermissionTextView: TextView
-    private lateinit var processorStartButton: Button
-    private lateinit var processorStopButton: Button
-    private lateinit var addPacketButton: Button
+    private lateinit var uuidTextView: TextView
 
     private var vpnService: PassthroughVpnService? = null
 
-    private lateinit var vpnStore: VpnSharedPreferences
+    @Inject
+    lateinit var appTrackerBlockerStatsRepository: AppTrackerBlockingStatsRepository
+
+    @Inject
+    lateinit var vpnDatabase: VpnDatabase
+
+    private lateinit var viewModel: VpnControllerViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setSupportActionBar(findViewById(R.id.toolbar))
+
+        AndroidInjection.inject(this)
+
         bindService(PassthroughVpnService.serviceIntent(this), serviceConnection, Context.BIND_AUTO_CREATE)
         setViewReferences()
         configureUiHandlers()
-        poorManDi()
+
+        viewModel = VpnControllerViewModel(appTrackerBlockerStatsRepository)
+        viewModel.viewState.observe(this, Observer {
+            it?.let { render(it) }
+        })
+        viewModel.onCreate()
     }
 
     override fun onResume() {
         super.onResume()
-        updateRunningToggleButtonState()
+        viewModel.loadData()
     }
 
     override fun onDestroy() {
@@ -72,37 +94,53 @@ class VpnControllerActivity : AppCompatActivity(R.layout.activity_vpn_controller
     }
 
     private fun setViewReferences() {
+        trackersBlockedTextView = findViewById(R.id.vpnTrackersBlocked)
+        lastTrackerDomainTextView = findViewById(R.id.vpnLastTrackerDomain)
+        timeRunningTodayTextView = findViewById(R.id.vpnTodayRunningTime)
+        dataSentTextView = findViewById(R.id.vpnSentStats)
+        dataReceivedTextView = findViewById(R.id.vpnReceivedStats)
         vpnRunningToggleButton = findViewById(R.id.vpnRunningButton)
-        vpnPermissionTextView = findViewById(R.id.vpnPermissionStatus)
-        processorStartButton = findViewById(R.id.processStart)
-        processorStopButton = findViewById(R.id.processStop)
-        addPacketButton = findViewById(R.id.addPacket)
-    }
-
-    private fun poorManDi() {
-        vpnStore = VpnSharedPreferences(this)
+        uuidTextView = findViewById(R.id.vpnUUID)
     }
 
     private fun configureUiHandlers() {
         vpnRunningToggleButton.setOnCheckedChangeListener(runningButtonChangeListener)
-        processorStartButton.setOnClickListener {
-            if (vpnService == null) {
-                Toast.makeText(this, "VPN Service not bound yet", Toast.LENGTH_SHORT).show()
+    }
+
+    private fun render(viewState: VpnControllerViewModel.ViewState) {
+        uuidTextView.text = viewState.uuid
+        uuidTextView.setOnClickListener {
+            val manager: ClipboardManager = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+            val clipData: ClipData = ClipData.newPlainText("VPN UUID", viewState.uuid)
+            manager.setPrimaryClip(clipData)
+            Snackbar.make(uuidTextView, "UUID is now copied to the Clipboard", Snackbar.LENGTH_SHORT).show()
+        }
+        trackersBlockedTextView.text = viewState.trackersBlocked
+        lastTrackerDomainTextView.text = viewState.lastTrackerBlocked
+        vpnRunningToggleButton.quietlySetIsChecked(viewState.isVpnRunning, runningButtonChangeListener)
+        timeRunningTodayTextView.text = generateTimeRunningMessage(viewState)
+        dataSentTextView.text = viewState.dataSent
+        dataReceivedTextView.text = viewState.dataReceived
+    }
+
+    private fun generateTimeRunningMessage(viewState: VpnControllerViewModel.ViewState): String {
+        return if (viewState.connectionStats == null) {
+            "VPN hasn't been running yet"
+        } else {
+            if (viewState.isVpnRunning) {
+                if (viewState.connectionStats.timeRunning == 0L) {
+                    // first time running the vpn in this block, time running = time last updated - now()
+                    val timeDifference = viewState.connectionStats.lastUpdated.until(OffsetDateTime.now(), ChronoUnit.MILLIS)
+                    val timeRunning = TimePassed.fromMilliseconds(timeDifference)
+                    "Today, the VPN has been running for $timeRunning"
+                } else {
+                    val timePassed = TimePassed.fromMilliseconds(viewState.connectionStats.timeRunning)
+                    "Today, the VPN has been running for $timePassed"
+                }
             } else {
-                //vpnService?.udpPacketProcessor?.start()
-                //vpnService?.tcpPacketProcessor?.start()
+                val timePassed = TimePassed.fromMilliseconds(viewState.connectionStats.timeRunning)
+                "Today, the VPN ran for $timePassed"
             }
-        }
-        processorStopButton.setOnClickListener {
-            vpnService?.udpPacketProcessor?.stop()
-            vpnService?.tcpPacketProcessor?.stop()
-        }
-        addPacketButton.setOnClickListener {
-            vpnService?.queues?.udpDeviceToNetwork?.offer(Packet(ByteBuffer.allocate(Short.MAX_VALUE.toInt())))
-        }
-        addPacketButton.setOnLongClickListener {
-            vpnService?.queues?.tcpDeviceToNetwork?.offer(Packet(ByteBuffer.allocate(Short.MAX_VALUE.toInt())))
-            true
         }
     }
 
@@ -164,7 +202,6 @@ class VpnControllerActivity : AppCompatActivity(R.layout.activity_vpn_controller
         override fun onServiceConnected(component: ComponentName, binder: IBinder) {
             Timber.i("Bound to VPN service")
             vpnService = (binder as PassthroughVpnService.VpnServiceBinder).getService()
-            updateRunningToggleButtonState()
         }
 
         override fun onServiceDisconnected(component: ComponentName) {
@@ -180,10 +217,6 @@ class VpnControllerActivity : AppCompatActivity(R.layout.activity_vpn_controller
         } else {
             stopVpn()
         }
-    }
-
-    private fun updateRunningToggleButtonState() {
-        vpnRunningToggleButton.quietlySetIsChecked(vpnStore.isRunning, runningButtonChangeListener)
     }
 
     private sealed class VpnPermissionStatus {

@@ -16,14 +16,23 @@
 
 package com.duckduckgo.mobile.android.vpn.processor.tcp.tracker
 
+import androidx.room.Room
+import androidx.test.platform.app.InstrumentationRegistry
+import com.duckduckgo.mobile.android.vpn.dao.VpnTrackerDao
 import com.duckduckgo.mobile.android.vpn.processor.tcp.hostname.HostnameExtractor
 import com.duckduckgo.mobile.android.vpn.processor.tcp.tracker.RequestTrackerType.*
+import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
+import com.jakewharton.threetenabp.AndroidThreeTen
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.whenever
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
+import org.threeten.bp.zone.ZoneRulesProvider
 import xyz.hexene.localvpn.Packet
 import xyz.hexene.localvpn.TCB
 import java.nio.ByteBuffer
@@ -33,11 +42,25 @@ class DomainBasedTrackerDetectorTest {
     private lateinit var testee: DomainBasedTrackerDetector
 
     private val hostnameExtractor: HostnameExtractor = mock()
+    private lateinit var vpnDatabase: VpnDatabase
+    private lateinit var trackerDao: VpnTrackerDao
     private val tcb: TCB = mock()
 
     @Before
     fun setup() {
-        testee = DomainBasedTrackerDetector(hostnameExtractor, TrackerListProvider().trackerList())
+
+        val appContext = InstrumentationRegistry.getInstrumentation().targetContext.applicationContext
+        AndroidThreeTen.init(appContext)
+        GlobalScope.launch(Dispatchers.Main) {
+            ZoneRulesProvider.getAvailableZoneIds()
+        }
+
+        vpnDatabase = Room.inMemoryDatabaseBuilder(InstrumentationRegistry.getInstrumentation().targetContext, VpnDatabase::class.java)
+            .allowMainThreadQueries()
+            .build()
+        trackerDao = vpnDatabase.vpnTrackerDao()
+
+        testee = DomainBasedTrackerDetector(hostnameExtractor, TrackerListProvider(), vpnDatabase)
     }
 
     @Test

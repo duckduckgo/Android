@@ -30,7 +30,7 @@ import com.duckduckgo.app.notification.model.PrivacyProtectionNotification
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.api.OfflinePixelSender
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.mobile.android.vpn.store.VpnStore
+import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
 import dagger.Module
 import dagger.Provides
 import javax.inject.Singleton
@@ -60,6 +60,7 @@ class WorkerModule {
         clearDataNotification: ClearDataNotification,
         privacyProtectionNotification: PrivacyProtectionNotification,
         configurationDownloader: ConfigurationDownloader,
+        vpnDatabase: VpnDatabase,
         pixel: Pixel
     ): WorkerFactory {
         return DaggerWorkerFactory(
@@ -72,6 +73,7 @@ class WorkerModule {
             clearDataNotification,
             privacyProtectionNotification,
             configurationDownloader,
+            vpnDatabase,
             pixel
         )
     }

@@ -17,6 +17,7 @@
 plugins {
     id 'com.android.library'
     id 'kotlin-android'
+    id 'kotlin-kapt'
 }
 
 android {
@@ -46,21 +47,36 @@ android {
     kotlinOptions {
         jvmTarget = '1.8'
     }
+
+    packagingOptions {
+        exclude "**/attach_hotspot_windows.dll"
+        exclude "META-INF/licenses/**"
+        exclude "META-INF/AL2.0"
+        exclude "META-INF/LGPL2.1"
+    }
 }
 
 ext {
-    androidX = "1.2.0-beta01"
-    androidKtxCore = "1.2.0"
-    coroutines = "1.3.5"
+    androidX = "1.3.0-alpha02"
+    androidKtxCore = "1.3.2"
+    coroutines = "1.4.0"
     materialDesign = "1.2.0-alpha05"
     constraintLayout = "2.0.0-beta4"
     lifecycle = "2.2.0"
-    androidXTest = "1.2.0"
+    androidXTest = "1.3.0"
+    room = "2.2.5"
+    dagger = "2.27"
+    workManager = "2.5.0-beta01"
 
-    firebasePerf = "19.0.8"
-    firebaseCrash = "17.2.1"
+    threetenabp = "1.3.0"
+    threetenbp = "1.4.5"
 
+    firebasePerf = "19.0.9"
+    firebaseCrash = "17.2.2"
+
+    junit = "4.12"
     mockitoAndroid = "3.5.2"
+    mockito = "2.18.3"
     mockitoKotlin = "2.0.0"
 
 }
@@ -69,7 +85,7 @@ dependencies {
 
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
 
-    implementation "androidx.core:core-ktx:1.3.1"
+    implementation "androidx.core:core-ktx:$androidKtxCore"
 
     implementation "androidx.appcompat:appcompat:$androidX"
     implementation "androidx.core:core-ktx:$androidKtxCore"
@@ -83,18 +99,45 @@ dependencies {
     implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycle"
     implementation "androidx.lifecycle:lifecycle-common-java8:$lifecycle"
 
+    // Dagger
+    implementation "com.google.dagger:dagger-android:$dagger"
+    implementation "com.google.dagger:dagger-android-support:$dagger"
+    kapt "com.google.dagger:dagger-android-processor:$dagger"
+    kapt "com.google.dagger:dagger-compiler:$dagger"
+    kaptAndroidTest "com.google.dagger:dagger-android-processor:$dagger"
+    kaptAndroidTest "com.google.dagger:dagger-compiler:$dagger"
+
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutines"
     androidTestImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutines"
 
+    implementation "com.jakewharton.threetenabp:threetenabp:$threetenabp"
+    testImplementation "org.threeten:threetenbp:$threetenabp"
+
+    implementation 'com.jakewharton.timber:timber:4.7.1'
+
+    // Room
+    implementation "androidx.room:room-runtime:$room"
+    implementation "androidx.room:room-rxjava2:$room"
+    implementation "androidx.room:room-ktx:$room"
+    kapt "androidx.room:room-compiler:$room"
+    testImplementation "androidx.room:room-testing:$room"
+    androidTestImplementation "androidx.room:room-testing:$room"
+
+    // WorkManager
+    implementation "androidx.work:work-runtime-ktx:$workManager"
+    implementation "androidx.work:work-multiprocess:$workManager"
+    androidTestImplementation "androidx.work:work-testing:$workManager"
+    implementation "androidx.work:work-rxjava2:$workManager"
+
+    // Testing dependencies
+    testImplementation "org.mockito:mockito-core:$mockito"
+    testImplementation "com.nhaarman.mockitokotlin2:mockito-kotlin:$mockitoKotlin"
     testImplementation 'junit:junit:4.13'
 
     androidTestImplementation "androidx.test:runner:$androidXTest"
     androidTestImplementation "androidx.test:rules:$androidXTest"
-    androidTestImplementation 'androidx.test.ext:junit:1.1.1'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.2'
 
     androidTestImplementation "org.mockito:mockito-android:$mockitoAndroid"
     androidTestImplementation "com.nhaarman.mockitokotlin2:mockito-kotlin:$mockitoKotlin"
-
-    implementation 'com.jakewharton.timber:timber:4.7.1'
 }

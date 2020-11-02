@@ -35,6 +35,8 @@ import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.api.OfflinePixelScheduler
 import com.duckduckgo.app.statistics.api.OfflinePixelSender
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.mobile.android.vpn.stats.VpnStatsReportingWorker
+import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
 import timber.log.Timber
 
 class DaggerWorkerFactory(
@@ -47,6 +49,7 @@ class DaggerWorkerFactory(
     private val clearDataNotification: ClearDataNotification,
     private val privacyProtectionNotification: PrivacyProtectionNotification,
     private val configurationDownloader: ConfigurationDownloader,
+    private val vpnDatabase: VpnDatabase,
     private val pixel: Pixel
 ) : WorkerFactory() {
 
@@ -63,6 +66,7 @@ class DaggerWorkerFactory(
                 is ClearDataNotificationWorker -> injectClearDataNotificationWorker(instance)
                 is PrivacyNotificationWorker -> injectPrivacyNotificationWorker(instance)
                 is AppConfigurationWorker -> injectAppConfigurationWorker(instance)
+                is VpnStatsReportingWorker -> injectVpnStatsPixelSendingWorker(instance)
                 else -> Timber.i("No injection required for worker $workerClassName")
             }
 
@@ -101,6 +105,10 @@ class DaggerWorkerFactory(
         worker.factory = notificationFactory
         worker.pixel = pixel
         worker.notification = privacyProtectionNotification
+    }
+
+    private fun injectVpnStatsPixelSendingWorker(worker: VpnStatsReportingWorker) {
+        worker.vpnDatabase = vpnDatabase
     }
 
 }

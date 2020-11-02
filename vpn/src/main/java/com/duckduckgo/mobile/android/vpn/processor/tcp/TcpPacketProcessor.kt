@@ -24,10 +24,10 @@ import com.duckduckgo.mobile.android.vpn.processor.tcp.ConnectionInitializer.Tcp
 import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpStateFlow.Event.MoveState
 import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpStateFlow.Event.MoveState.MoveClientToState
 import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpStateFlow.Event.MoveState.MoveServerToState
-import com.duckduckgo.mobile.android.vpn.processor.tcp.hostname.HostnameExtractor
 import com.duckduckgo.mobile.android.vpn.processor.tcp.tracker.VpnTrackerDetector
 import com.duckduckgo.mobile.android.vpn.service.NetworkChannelCreator
 import com.duckduckgo.mobile.android.vpn.service.VpnQueues
+import com.duckduckgo.mobile.android.vpn.store.PacketPersister
 import com.google.firebase.perf.metrics.AddTrace
 import kotlinx.coroutines.Job
 import timber.log.Timber
@@ -45,7 +45,7 @@ class TcpPacketProcessor(
     queues: VpnQueues,
     networkChannelCreator: NetworkChannelCreator,
     trackerDetector: VpnTrackerDetector,
-    hostnameExtractor: HostnameExtractor
+    packetPersister: PacketPersister
 ) : Runnable {
 
     val selector: Selector = Selector.open()
@@ -56,7 +56,7 @@ class TcpPacketProcessor(
     private val handler: Handler = Handler(Looper.getMainLooper())
 
     private val tcpSocketWriter = TcpSocketWriter(selector)
-    private val tcpNetworkToDevice = TcpNetworkToDevice(queues, selector, tcpSocketWriter, handler)
+    private val tcpNetworkToDevice = TcpNetworkToDevice(queues, selector, tcpSocketWriter, packetPersister)
     private val tcpDeviceToNetwork =
         TcpDeviceToNetwork(
             queues,
@@ -64,7 +64,8 @@ class TcpPacketProcessor(
             tcpSocketWriter,
             TcpConnectionInitializer(queues, networkChannelCreator),
             handler,
-            trackerDetector
+            trackerDetector,
+            packetPersister
         )
 
     private val readWriteExecutorService = Executors.newFixedThreadPool(2)
@@ -72,13 +73,13 @@ class TcpPacketProcessor(
     override fun run() {
         Timber.i("Starting ${this::class.simpleName}")
 
-//        if (pollJobDeviceToNetwork == null) {
-//            pollJobDeviceToNetwork = GlobalScope.launch(Executors.newSingleThreadExecutor().asCoroutineDispatcher()) { pollForDeviceToNetworkWork() }
-//        }
-//
-//        if (pollJobNetworkToDevice == null) {
-//            pollJobNetworkToDevice = GlobalScope.launch(Executors.newSingleThreadExecutor().asCoroutineDispatcher()) { pollForNetworkToDeviceWork() }
-//        }
+        //        if (pollJobDeviceToNetwork == null) {
+        //            pollJobDeviceToNetwork = GlobalScope.launch(Executors.newSingleThreadExecutor().asCoroutineDispatcher()) { pollForDeviceToNetworkWork() }
+        //        }
+        //
+        //        if (pollJobNetworkToDevice == null) {
+        //            pollJobNetworkToDevice = GlobalScope.launch(Executors.newSingleThreadExecutor().asCoroutineDispatcher()) { pollForNetworkToDeviceWork() }
+        //        }
 
         readWriteExecutorService.submit { pollForDeviceToNetworkWork() }
         readWriteExecutorService.submit { pollForNetworkToDeviceWork() }

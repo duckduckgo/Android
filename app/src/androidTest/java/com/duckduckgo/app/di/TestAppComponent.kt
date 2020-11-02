@@ -44,6 +44,10 @@ import javax.inject.Singleton
         StubAppConfigurationDownloadModule::class,
         StubStatisticsModule::class,
 
+        /* vpn module */
+        TestVpnDatabaseModule::class,
+        TestTrackerDetectorModule::class,
+
         /* real modules */
         ApplicationModule::class,
         WorkerModule::class,

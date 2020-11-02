@@ -31,22 +31,31 @@ import android.os.IBinder
 import android.os.Parcel
 import android.os.ParcelFileDescriptor
 import androidx.core.app.NotificationManagerCompat
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.Observer
 import com.duckduckgo.mobile.android.vpn.BuildConfig
+import com.duckduckgo.mobile.android.vpn.model.VpnStateUpdate
+import com.duckduckgo.mobile.android.vpn.model.VpnStats
+import com.duckduckgo.mobile.android.vpn.model.VpnTrackerAndCompany
 import com.duckduckgo.mobile.android.vpn.processor.TunPacketReader
 import com.duckduckgo.mobile.android.vpn.processor.TunPacketWriter
 import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpPacketProcessor
-import com.duckduckgo.mobile.android.vpn.processor.tcp.hostname.AndroidHostnameExtractor
-import com.duckduckgo.mobile.android.vpn.processor.tcp.hostname.PayloadBytesExtractor
-import com.duckduckgo.mobile.android.vpn.processor.tcp.hostname.PlaintextHostHeaderExtractor
-import com.duckduckgo.mobile.android.vpn.processor.tcp.hostname.ServerNameIndicationHeaderHostExtractor
-import com.duckduckgo.mobile.android.vpn.processor.tcp.tracker.DomainBasedTrackerDetector
-import com.duckduckgo.mobile.android.vpn.processor.tcp.tracker.TrackerListProvider
+import com.duckduckgo.mobile.android.vpn.processor.tcp.tracker.VpnTrackerDetector
 import com.duckduckgo.mobile.android.vpn.processor.udp.UdpPacketProcessor
-import com.duckduckgo.mobile.android.vpn.store.VpnSharedPreferences
+import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
+import com.duckduckgo.mobile.android.vpn.stats.VpnStatsReportingScheduler
+import com.duckduckgo.mobile.android.vpn.store.PacketPersister
+import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
 import com.duckduckgo.mobile.android.vpn.ui.notification.VpnNotificationBuilder
+import dagger.android.AndroidInjection
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import org.threeten.bp.OffsetDateTime
+import org.threeten.bp.temporal.ChronoUnit
 import timber.log.Timber
 import xyz.hexene.localvpn.Packet
 import java.nio.ByteBuffer
@@ -58,27 +67,40 @@ import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import java.util.concurrent.LinkedBlockingDeque
 import java.util.concurrent.LinkedBlockingQueue
+import javax.inject.Inject
 
 class PassthroughVpnService : VpnService(), CoroutineScope by MainScope(), NetworkChannelCreator {
 
-    val queues = VpnQueues()
+    @Inject
+    lateinit var packetPersister: PacketPersister
+
+    @Inject
+    lateinit var trackerDetector: VpnTrackerDetector
+
+    @Inject
+    lateinit var vpnStatsReportingScheduler: VpnStatsReportingScheduler
+
+    @Inject
+    lateinit var vpnDatabase: VpnDatabase
+
+    @Inject
+    lateinit var repository: AppTrackerBlockingStatsRepository
+
+    @Inject
+    lateinit var notificationManager: NotificationManagerCompat
+
+    private val queues = VpnQueues()
 
     private var tunInterface: ParcelFileDescriptor? = null
     private val binder: VpnServiceBinder = VpnServiceBinder()
 
-    // TODO: DI all of these
-    private val hostNameHeaderExtractor = PlaintextHostHeaderExtractor()
-    private val encryptedRequestHostExtractor = ServerNameIndicationHeaderHostExtractor()
-    private val payloadBytesExtractor = PayloadBytesExtractor()
-    private val trackerListProvider = TrackerListProvider()
-    private val hostnameExtractor = AndroidHostnameExtractor(hostNameHeaderExtractor, encryptedRequestHostExtractor, payloadBytesExtractor)
-    private val trackerDetector = DomainBasedTrackerDetector(hostnameExtractor, trackerListProvider.trackerList())
-    private val vpnStore = VpnSharedPreferences(this)
-
-    val udpPacketProcessor = UdpPacketProcessor(queues, this)
-    val tcpPacketProcessor = TcpPacketProcessor(queues, this, trackerDetector, hostnameExtractor)
+    lateinit var udpPacketProcessor: UdpPacketProcessor
+    lateinit var tcpPacketProcessor: TcpPacketProcessor
 
     private var executorService: ExecutorService? = null
+
+    private lateinit var trackersBlocked: LiveData<List<VpnTrackerAndCompany>>
+    private val trackersBlockedObserver = Observer<List<VpnTrackerAndCompany>> { onNewTrackerBlocked(it) }
 
     inner class VpnServiceBinder : Binder() {
 
@@ -99,6 +121,11 @@ class PassthroughVpnService : VpnService(), CoroutineScope by MainScope(), Netwo
 
     override fun onCreate() {
         super.onCreate()
+        AndroidInjection.inject(this)
+
+        udpPacketProcessor = UdpPacketProcessor(queues, this)
+        tcpPacketProcessor = TcpPacketProcessor(queues, this, trackerDetector, packetPersister)
+
         Timber.i("VPN onCreate")
     }
 
@@ -113,8 +140,12 @@ class PassthroughVpnService : VpnService(), CoroutineScope by MainScope(), Netwo
     }
 
     override fun onDestroy() {
-        super.onDestroy()
         Timber.i("VPN onDestroy")
+        if (trackersBlocked.hasActiveObservers()) {
+            trackersBlocked.removeObserver(trackersBlockedObserver)
+        }
+        notifyVpnStopped()
+        super.onDestroy()
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -138,24 +169,18 @@ class PassthroughVpnService : VpnService(), CoroutineScope by MainScope(), Netwo
 
     private fun startVpn() {
         Timber.i("Starting VPN")
-        tickerJob?.cancel()
+        notifyVpnStart()
 
+        tickerJob?.cancel()
         queues.clearAll()
-        vpnStore.isRunning = true
+
         establishVpnInterface()
         schedulerReminderAlarm()
+        hideReminderNotification()
 
         tunInterface?.let { vpnInterface ->
-
-            startForeground(FOREGROUND_VPN_SERVICE_ID, VpnNotificationBuilder.buildPersistentNotification(this))
-            startStatTicker()
-            hideReminderNotification()
-
             executorService?.shutdownNow()
             val processors = listOf(
-                //QueueMonitor(queues),
-                //tcpInput,
-                //tcpOutput,
                 tcpPacketProcessor,
                 udpPacketProcessor,
                 TunPacketReader(vpnInterface, queues),
@@ -167,9 +192,12 @@ class PassthroughVpnService : VpnService(), CoroutineScope by MainScope(), Netwo
         }
     }
 
+    private fun onNewTrackerBlocked(trackersBlocked: List<VpnTrackerAndCompany>) {
+        val notification = VpnNotificationBuilder.buildPersistentNotification(this, trackersBlocked)
+        notificationManager.notify(FOREGROUND_VPN_SERVICE_ID, notification)
+    }
+
     private fun hideReminderNotification() {
-        // this should be injected with DI and not here
-        val notificationManager = NotificationManagerCompat.from(this)
         notificationManager.cancel(VPN_REMINDER_NOTIFICATION_ID)
     }
 
@@ -197,17 +225,6 @@ class PassthroughVpnService : VpnService(), CoroutineScope by MainScope(), Netwo
         )
     }
 
-    private fun startStatTicker() {
-        //        tickerJob = launch {
-        //            val startTime = System.currentTimeMillis()
-        //            while (true) {
-
-        //                Timber.v("VPN service running for ${TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis() - startTime)} seconds")
-        //                delay(1000)
-        //            }
-        //        }
-    }
-
     private fun establishVpnInterface() {
         tunInterface = Builder().run {
             addAddress("10.0.0.2", 32)
@@ -218,7 +235,7 @@ class PassthroughVpnService : VpnService(), CoroutineScope by MainScope(), Netwo
             //addDnsServer("8.8.8.8")
 
             // Can either route all apps through VPN and exclude a few (better for prod), or exclude all apps and include a few (better for dev)
-            val limitingToTestApps = true
+            val limitingToTestApps = false
             if (limitingToTestApps) safelyAddAllowedApps(INCLUDED_APPS) else safelyAddDisallowedApps(EXCLUDED_APPS)
 
             establish()
@@ -247,10 +264,14 @@ class PassthroughVpnService : VpnService(), CoroutineScope by MainScope(), Netwo
 
     private fun stopVpn() {
         Timber.i("Stopping VPN")
-        vpnStore.isRunning = false
+        notifyVpnStopped()
+
+        if (trackersBlocked.hasActiveObservers()) {
+            trackersBlocked.removeObserver(trackersBlockedObserver)
+        }
+
         tickerJob?.cancel()
         queues.clearAll()
-        //tunPacketProcessor?.stop()
         executorService?.shutdownNow()
         udpPacketProcessor.stop()
         tcpPacketProcessor.stop()
@@ -271,6 +292,52 @@ class PassthroughVpnService : VpnService(), CoroutineScope by MainScope(), Netwo
         Timber.w("VPN onRevoke called")
         stopVpn()
         super.onRevoke()
+    }
+
+    private fun notifyVpnStart() {
+        launch {
+            withContext(Dispatchers.IO) {
+                val currentStats = vpnDatabase.vpnStatsDao().getCurrent()
+                if (currentStats == null) {
+                    vpnDatabase.vpnStatsDao().insert(
+                        VpnStats(
+                            id = 0,
+                            startedAt = OffsetDateTime.now(),
+                            lastUpdated = OffsetDateTime.now(),
+                            timeRunning = 0,
+                            dataSent = 0,
+                            dataReceived = 0,
+                            packetsSent = 0,
+                            packetsReceived = 0
+                        )
+                    )
+                    Timber.w("VPN: First ever start at ${OffsetDateTime.now()}")
+                } else {
+                    vpnDatabase.vpnStatsDao().updateLastUpdated(OffsetDateTime.now(), currentStats.id)
+                    Timber.w("VPN: started at ${OffsetDateTime.now()}")
+                }
+                vpnDatabase.vpnStateDao().update(VpnStateUpdate(isRunning = true))
+            }
+
+            trackersBlocked = withContext(Dispatchers.IO) { repository.getTodaysTrackersBlocked() }
+            trackersBlocked.observeForever(trackersBlockedObserver)
+
+            val trackersBlocked = withContext(Dispatchers.IO) { repository.getTodaysTrackersBlockedSync() }
+            startForeground(FOREGROUND_VPN_SERVICE_ID, VpnNotificationBuilder.buildPersistentNotification(applicationContext, trackersBlocked))
+        }
+    }
+
+    private fun notifyVpnStopped() {
+        launch(Dispatchers.IO) {
+            vpnDatabase.vpnStateDao().update(VpnStateUpdate(isRunning = false))
+            val currentStats = vpnDatabase.vpnStatsDao().getCurrent()
+            currentStats?.let {
+                val lastStart = currentStats.lastUpdated
+                val timeRunning = lastStart.until(OffsetDateTime.now(), ChronoUnit.MILLIS)
+                vpnDatabase.vpnStatsDao().updateTimeRunning(timeRunning, OffsetDateTime.now(), currentStats.id)
+                Timber.w("VPN: stopped after $timeRunning millis running")
+            }
+        }
     }
 
     companion object {

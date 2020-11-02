@@ -30,6 +30,7 @@ import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpStateFlow.Event.*
 import com.duckduckgo.mobile.android.vpn.processor.tcp.tracker.RequestTrackerType
 import com.duckduckgo.mobile.android.vpn.processor.tcp.tracker.VpnTrackerDetector
 import com.duckduckgo.mobile.android.vpn.service.VpnQueues
+import com.duckduckgo.mobile.android.vpn.store.PacketPersister
 import com.google.firebase.perf.metrics.AddTrace
 import timber.log.Timber
 import xyz.hexene.localvpn.ByteBufferPool
@@ -49,7 +50,8 @@ class TcpDeviceToNetwork(
     private val socketWriter: SocketWriter,
     private val connectionInitializer: ConnectionInitializer,
     private val handler: Handler,
-    private val trackerDetector: VpnTrackerDetector
+    private val trackerDetector: VpnTrackerDetector,
+    private val packetPersister: PacketPersister
 ) {
 
     var lastTimePacketConsumed = 0L
@@ -81,6 +83,8 @@ class TcpDeviceToNetwork(
         val connectionKey = connectionParams.key()
 
         val totalPacketLength = payloadBuffer.limit()
+
+        packetPersister.persistDataSent(totalPacketLength)
 
         val tcb = TCB.getTCB(connectionKey)
         //Timber.i("Device to network packet; got new response buffer and checked for TCB. Took ${(System.nanoTime() - startTime) / 1_000_000}ms")
@@ -323,5 +327,4 @@ class TcpDeviceToNetwork(
     }
 
 }
-
 

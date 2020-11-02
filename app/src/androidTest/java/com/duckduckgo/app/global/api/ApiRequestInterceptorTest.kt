@@ -30,6 +30,7 @@ import org.junit.Test
 import org.mockito.ArgumentCaptor
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations
+import timber.log.Timber
 
 class ApiRequestInterceptorTest {
 
@@ -49,12 +50,16 @@ class ApiRequestInterceptorTest {
         whenever(mockChain.request()).thenReturn(request())
         whenever(mockChain.proceed(any())).thenReturn(response())
 
+        val packageName = InstrumentationRegistry.getInstrumentation().context.packageName
+
         val captor = ArgumentCaptor.forClass(Request::class.java)
         testee.intercept(mockChain)
         verify(mockChain).proceed(captor.capture())
 
-        val regex = "ddg_android/.*\\(com.duckduckgo.mobile.android.debug.test; Android API .*\\)".toRegex()
+        val regex = "ddg_android/.*\\($packageName; Android API .*\\)".toRegex()
+
         val result = captor.value.header(Header.USER_AGENT)!!
+        Timber.v("$result")
         assertTrue(result.matches(regex))
     }
 

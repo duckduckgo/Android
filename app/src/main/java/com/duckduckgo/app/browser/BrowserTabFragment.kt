@@ -29,7 +29,6 @@ import android.content.ClipboardManager
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
-import android.content.ServiceConnection
 import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.media.MediaScannerConnection
@@ -38,7 +37,6 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.os.Handler
-import android.os.IBinder
 import android.os.Message
 import android.provider.Settings
 import android.text.Editable
@@ -137,7 +135,7 @@ import com.duckduckgo.mobile.android.vpn.service.PassthroughVpnService
 import com.duckduckgo.widget.SearchWidgetLight
 import com.google.android.material.snackbar.Snackbar
 import dagger.android.support.AndroidSupportInjection
-import dummy.VpnControllerActivity
+import dummy.ui.VpnControllerActivity
 import kotlinx.android.synthetic.main.fragment_browser_tab.*
 import kotlinx.android.synthetic.main.include_add_widget_instruction_buttons.view.closeButton
 import kotlinx.android.synthetic.main.include_cta_buttons.view.ctaDismissButton
@@ -300,7 +298,6 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
     private var loginDetectionDialog: AlertDialog? = null
 
     private val pulseAnimation: PulseAnimation = PulseAnimation(this)
-
 
     override fun onAttach(context: Context) {
         AndroidSupportInjection.inject(this)

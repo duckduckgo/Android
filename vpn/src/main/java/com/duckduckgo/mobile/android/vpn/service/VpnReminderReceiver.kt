@@ -20,8 +20,11 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import androidx.core.app.NotificationManagerCompat
-import com.duckduckgo.mobile.android.vpn.store.VpnSharedPreferences
+import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
 import com.duckduckgo.mobile.android.vpn.ui.notification.VpnNotificationBuilder
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import timber.log.Timber
 
 class VpnReminderReceiver: BroadcastReceiver() {
@@ -31,16 +34,33 @@ class VpnReminderReceiver: BroadcastReceiver() {
         if (intent.action == "android.intent.action.BOOT_COMPLETED" || intent.action == PassthroughVpnService.ACTION_VPN_REMINDER) {
             Timber.v("Checking if VPN is running")
 
-            val vpnStore = VpnSharedPreferences(context)
-            if (vpnStore.isRunning) {
-                Timber.v("Vpn is already running, nothing to show")
-            } else {
-                Timber.v("Vpn is not running, showing reminder notification")
-                val reminder = VpnNotificationBuilder.buildReminderNotification(context)
-                val manager = NotificationManagerCompat.from(context)
-                manager.notify(PassthroughVpnService.VPN_REMINDER_NOTIFICATION_ID, reminder)
+            goAsync {
+                val vpnDatabase = VpnDatabase.getInstance(context)
+                if (vpnDatabase.vpnStateDao().getOneOff().isRunning) {
+                    Timber.v("Vpn is already running, nothing to show")
+                } else {
+                    Timber.v("Vpn is not running, showing reminder notification")
+                    val reminder = VpnNotificationBuilder.buildReminderNotification(context)
+                    val manager = NotificationManagerCompat.from(context)
+                    manager.notify(PassthroughVpnService.VPN_REMINDER_NOTIFICATION_ID, reminder)
+                }
             }
         }
     }
 
+}
+
+fun BroadcastReceiver.goAsync(
+    coroutineScope: CoroutineScope = GlobalScope,
+    block: suspend () -> Unit
+) {
+    val result = goAsync()
+    coroutineScope.launch {
+        try {
+            block()
+        } finally {
+            // Always call finish(), even if the coroutineScope was cancelled
+            result.finish()
+        }
+    }
 }

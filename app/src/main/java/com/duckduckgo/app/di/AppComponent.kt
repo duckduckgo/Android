@@ -28,6 +28,7 @@ import com.duckduckgo.app.onboarding.di.OnboardingModule
 import com.duckduckgo.app.surrogates.di.ResourceSurrogateModule
 import com.duckduckgo.app.trackerdetection.di.TrackerDetectionModule
 import com.duckduckgo.app.usage.di.AppUsageModule
+import com.duckduckgo.mobile.android.vpn.di.AppTrackerBlockingComponent
 import com.duckduckgo.widget.SearchWidget
 import dagger.BindsInstance
 import dagger.Component
@@ -68,7 +69,8 @@ import javax.inject.Singleton
         UncaughtExceptionModule::class,
         PlayStoreReferralModule::class,
         CoroutinesModule::class
-    ]
+    ],
+    dependencies = [AppTrackerBlockingComponent::class]
 )
 interface AppComponent : AndroidInjector<DuckDuckGoApplication> {
 
@@ -77,6 +79,8 @@ interface AppComponent : AndroidInjector<DuckDuckGoApplication> {
 
         @BindsInstance
         fun application(application: Application): Builder
+
+        fun trackerBlockingStatsComponent(componentApp: AppTrackerBlockingComponent): Builder
 
         fun build(): AppComponent
     }

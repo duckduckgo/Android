@@ -16,23 +16,28 @@
 
 package com.duckduckgo.mobile.android.vpn.processor.tcp.tracker
 
+import com.duckduckgo.mobile.android.vpn.model.VpnTracker
 import com.duckduckgo.mobile.android.vpn.processor.tcp.hostname.HostnameExtractor
 import com.duckduckgo.mobile.android.vpn.processor.tcp.tracker.RequestTrackerType.Tracker
+import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
+import org.threeten.bp.OffsetDateTime
 import timber.log.Timber
 import xyz.hexene.localvpn.Packet
 import xyz.hexene.localvpn.TCB
 import java.nio.ByteBuffer
-
+import javax.inject.Inject
 
 interface VpnTrackerDetector {
 
     fun determinePacketType(tcb: TCB, packet: Packet, payloadBuffer: ByteBuffer): RequestTrackerType
 }
 
-class DomainBasedTrackerDetector(
+class DomainBasedTrackerDetector @Inject constructor(
     private val hostnameExtractor: HostnameExtractor,
-    private val trackerHostNames: List<String>
+    private val trackerListProvider: TrackerListProvider,
+    private val vpnDatabase: VpnDatabase
 ) : VpnTrackerDetector {
+
 
     override fun determinePacketType(tcb: TCB, packet: Packet, payloadBuffer: ByteBuffer): RequestTrackerType {
         val hostname = hostnameExtractor.extract(tcb, packet, payloadBuffer)
@@ -43,10 +48,13 @@ class DomainBasedTrackerDetector(
 
         tcb.trackerTypeDetermined = true
 
-        if (hostname.isTracker()) {
-            tcb.isTracker = true
-            Timber.i("Determined %s to be tracker %s", hostname, tcb.ipAndPort)
-            return Tracker
+        trackerListProvider.trackerList().forEach { tracker ->
+            if (hostname.endsWith(tracker.hostname)){
+                tcb.isTracker = true
+                Timber.i("Determined %s to be tracker %s", hostname, tcb.ipAndPort)
+                insertTracker(tracker)
+                return Tracker
+            }
         }
 
         tcb.isTracker = false
@@ -55,11 +63,10 @@ class DomainBasedTrackerDetector(
         return RequestTrackerType.NotTracker
     }
 
-    private fun String.isTracker(): Boolean {
-        trackerHostNames.forEach { tracker ->
-            if (this.endsWith(tracker)) return true
-        }
-        return false
+    private fun insertTracker(tracker: TrackerListProvider.Tracker){
+        val trackerCompany = TrackerListProvider.TRACKER_GROUP_COMPANIES.find { it.trackerCompanyId == tracker.trackerCompanyId } ?: TrackerListProvider.UNDEFINED_TRACKER_COMPANY
+        val vpnTracker = VpnTracker(trackerId = 0, trackerCompanyId = trackerCompany.trackerCompanyId, domain = tracker.hostname, timestamp = OffsetDateTime.now())
+        Timber.i("Inserting $tracker as tracker")
+        vpnDatabase.vpnTrackerDao().insert(vpnTracker)
     }
-
 }
