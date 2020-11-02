@@ -271,11 +271,19 @@ class ApiBasedPixel @Inject constructor(
     private val deviceInfo: DeviceInfo
 ) : Pixel {
 
+    companion object {
+        const val VPN_PREFIX = "m_vpn"
+    }
+
     override fun fire(pixel: PixelName, parameters: Map<String, String>, encodedParameters: Map<String, String>) {
         fire(pixel.pixelName, parameters, encodedParameters)
     }
 
     override fun fire(pixelName: String, parameters: Map<String, String>, encodedParameters: Map<String, String>) {
+        if (!pixelName.startsWith(VPN_PREFIX)) {
+            Timber.v("Pixel won't be sent, it doesn't come from the VPN")
+            return
+        }
         fireCompletable(pixelName, parameters, encodedParameters)
             .subscribeOn(Schedulers.io())
             .subscribe({
