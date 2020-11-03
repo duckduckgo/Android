@@ -183,6 +183,10 @@ open class DuckDuckGoApplication : HasAndroidInjector, Application(), LifecycleO
             it.addObserver(appEnjoymentLifecycleObserver)
             it.addObserver(dataClearerForegroundAppRestartPixel)
             it.addObserver(userStageStore)
+            val lifecycleObserver = pixel as? LifecycleObserver
+            if (lifecycleObserver != null) {
+                it.addObserver(lifecycleObserver)
+            }
         }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1) {

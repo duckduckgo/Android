@@ -17,6 +17,8 @@
 package com.duckduckgo.app.di
 
 import android.content.Context
+import com.duckduckgo.app.browser.rating.db.AppEnjoymentDao
+import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.global.device.ContextDeviceInfo
 import com.duckduckgo.app.global.device.DeviceInfo
 import com.duckduckgo.app.global.exception.UncaughtExceptionRepository
@@ -27,6 +29,7 @@ import com.duckduckgo.app.statistics.api.*
 import com.duckduckgo.app.statistics.pixels.ApiBasedPixel
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.store.OfflinePixelCountDataStore
+import com.duckduckgo.app.statistics.store.PixelDao
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import dagger.Module
 import dagger.Provides
@@ -54,8 +57,14 @@ class StatisticsModule {
     }
 
     @Provides
-    fun pixel(pixelService: PixelService, statisticsDataStore: StatisticsDataStore, variantManager: VariantManager, deviceInfo: DeviceInfo): Pixel =
-        ApiBasedPixel(pixelService, statisticsDataStore, variantManager, deviceInfo)
+    fun pixel(
+        pixelService: PixelService,
+        statisticsDataStore: StatisticsDataStore,
+        variantManager: VariantManager,
+        deviceInfo: DeviceInfo,
+        pixelDao: PixelDao
+    ): Pixel =
+        ApiBasedPixel(pixelService, statisticsDataStore, variantManager, deviceInfo, pixelDao)
 
     @Provides
     fun offlinePixelSender(
@@ -75,5 +84,11 @@ class StatisticsModule {
         appReferrerStateListener: AppInstallationReferrerStateListener
     ): AtbInitializer {
         return AtbInitializer(statisticsDataStore, statisticsUpdater, appReferrerStateListener)
+    }
+
+    @Singleton
+    @Provides
+    fun pixelDao(database: AppDatabase): PixelDao {
+        return database.pixelDao()
     }
 }

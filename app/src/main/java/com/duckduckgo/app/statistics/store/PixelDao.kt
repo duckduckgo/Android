@@ -16,14 +16,18 @@
 
 package com.duckduckgo.app.statistics.store
 
-import androidx.room.Dao
-import androidx.room.Query
-import com.duckduckgo.app.cta.model.DismissedCta
+import androidx.room.*
 import com.duckduckgo.app.statistics.model.PixelEntity
 import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface PixelDao {
     @Query("select * from pixel_store")
-    fun pixels(): Flow<PixelEntity>
+    fun pixels(): Flow<List<PixelEntity>>
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun insert(pixel: PixelEntity): Long
+
+    @Delete
+    fun delete(pixel: PixelEntity)
 }
