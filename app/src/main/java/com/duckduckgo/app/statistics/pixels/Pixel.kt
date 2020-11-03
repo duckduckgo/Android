@@ -299,9 +299,8 @@ class ApiBasedPixel @Inject constructor(
                 Timber.i("Pixel sending: $list")
                 list.forEach { pixelEntity ->
                     compositeDisposable.add(
-                        fireApi(pixelEntity.pixelName, emptyMap(), emptyMap())
+                        fireApi(pixelEntity.pixelName, pixelEntity.atb, pixelEntity.additionalQueryParams, pixelEntity.encodedQueryParams)
                             .subscribeOn(Schedulers.io())
-                            .onErrorComplete()
                             .subscribe({
                                 pixelDao.delete(pixelEntity)
                                 Timber.v("Pixel sent: ${pixelEntity.pixelName} with params: temp temp)")
@@ -326,17 +325,18 @@ class ApiBasedPixel @Inject constructor(
     }
 
     override fun fire(pixelName: String, parameters: Map<String, String>, encodedParameters: Map<String, String>) {
-        fireCompletable2(pixelName, parameters, encodedParameters)
-            .subscribeOn(Schedulers.io())
-            .subscribe({
-                Timber.v("Pixel registered: $pixelName with params: $parameters $encodedParameters")
-            }, {
-                Timber.w(it, "Pixel failed: $pixelName with params: $parameters $encodedParameters")
-            })
-        //corFire(pixelName, parameters, encodedParameters)
+        compositeDisposable.add(
+            fireCompletable(pixelName, parameters, encodedParameters)
+                .subscribeOn(Schedulers.io())
+                .subscribe({
+                    Timber.v("Pixel registered: $pixelName with params: $parameters $encodedParameters")
+                }, {
+                    Timber.w(it, "Pixel failed: $pixelName with params: $parameters $encodedParameters")
+                })
+        )
     }
 
-    override fun fireCompletable(pixelName: String, parameters: Map<String, String>, encodedParameters: Map<String, String>): Completable {
+    override fun fireCompletable2(pixelName: String, parameters: Map<String, String>, encodedParameters: Map<String, String>): Completable {
         val defaultParameters = mapOf(PixelParameter.APP_VERSION to deviceInfo.appVersion)
         val fullParameters = defaultParameters.plus(parameters)
         val atb = statisticsDataStore.atb?.formatWithVariant(variantManager.getVariant()) ?: ""
@@ -351,15 +351,24 @@ class ApiBasedPixel @Inject constructor(
         }
     }
 
-    override fun fireCompletable2(pixelName: String, parameters: Map<String, String>, encodedParameters: Map<String, String>): Completable {
+    override fun fireCompletable(pixelName: String, parameters: Map<String, String>, encodedParameters: Map<String, String>): Completable {
         val defaultParameters = mapOf(PixelParameter.APP_VERSION to deviceInfo.appVersion)
         val fullParameters = defaultParameters.plus(parameters)
         val atb = statisticsDataStore.atb?.formatWithVariant(variantManager.getVariant()) ?: ""
         return Completable.fromCallable {
-            val pixelEntity = PixelEntity(pixelName = pixelName, atb = statisticsDataStore.atb?.formatWithVariant(variantManager.getVariant()) ?: "")
+            val pixelEntity = PixelEntity(
+                pixelName = pixelName,
+                atb = atb,
+                additionalQueryParams = fullParameters,
+                encodedQueryParams = encodedParameters
+            )
             pixelDao.insert(pixelEntity)
             Timber.v("Pixel inserted $pixelName")
         }
+    }
+
+    private fun fireApi(pixelName: String, atb: String, fullParameters: Map<String, String>, encodedParameters: Map<String, String>): Completable {
+        return api.fire(pixelName, deviceInfo.formFactor().description, atb, fullParameters, encodedParameters)
     }
 
     private fun fireApi(pixelName: String, parameters: Map<String, String>, encodedParameters: Map<String, String>): Completable {
