@@ -50,6 +50,7 @@ import com.duckduckgo.app.privacy.model.PrivacyProtectionCountsEntity
 import com.duckduckgo.app.privacy.model.UserWhitelistedDomain
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.model.PixelEntity
+import com.duckduckgo.app.statistics.model.QueryParamsTypeConverter
 import com.duckduckgo.app.statistics.store.PixelDao
 import com.duckduckgo.app.survey.db.SurveyDao
 import com.duckduckgo.app.survey.model.Survey
@@ -105,7 +106,8 @@ import com.duckduckgo.app.usage.search.SearchCountEntity
     UncaughtExceptionSourceConverter::class,
     StageTypeConverter::class,
     UserEventTypeConverter::class,
-    LocationPermissionTypeConverter::class
+    LocationPermissionTypeConverter::class,
+    QueryParamsTypeConverter::class
 )
 abstract class AppDatabase : RoomDatabase() {
 

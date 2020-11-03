@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 27,
-    "identityHash": "cd25f579ecbd78c09f52532de2f0bf6c",
+    "identityHash": "af458ad4aba160698c0686c552ea1e82",
     "entities": [
       {
         "tableName": "tds_tracker",
@@ -788,7 +788,7 @@
       },
       {
         "tableName": "pixel_store",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `pixelName` TEXT NOT NULL, `atb` TEXT NOT NULL)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `pixelName` TEXT NOT NULL, `atb` TEXT NOT NULL, `additionalQueryParams` TEXT NOT NULL, `encodedQueryParams` TEXT NOT NULL)",
         "fields": [
           {
             "fieldPath": "id",
@@ -807,6 +807,18 @@
             "columnName": "atb",
             "affinity": "TEXT",
             "notNull": true
+          },
+          {
+            "fieldPath": "additionalQueryParams",
+            "columnName": "additionalQueryParams",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "encodedQueryParams",
+            "columnName": "encodedQueryParams",
+            "affinity": "TEXT",
+            "notNull": true
           }
         ],
         "primaryKey": {
@@ -822,7 +834,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'cd25f579ecbd78c09f52532de2f0bf6c')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'af458ad4aba160698c0686c552ea1e82')"
     ]
   }
 }
