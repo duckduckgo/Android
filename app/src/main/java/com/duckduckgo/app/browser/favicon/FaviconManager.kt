@@ -19,8 +19,10 @@ package com.duckduckgo.app.browser.favicon
 import android.graphics.Bitmap
 import android.net.Uri
 import android.widget.ImageView
+import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
 import com.duckduckgo.app.bookmarks.db.BookmarksDao
+import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.favicon.FileBasedFaviconPersister.Companion.FAVICON_PERSISTED_DIR
 import com.duckduckgo.app.browser.favicon.FileBasedFaviconPersister.Companion.FAVICON_TEMP_DIR
 import com.duckduckgo.app.browser.favicon.FileBasedFaviconPersister.Companion.NO_SUBFOLDER
@@ -64,11 +66,21 @@ class DuckDuckGoFaviconManager constructor(
     }
 
     override suspend fun loadToViewFromPersisted(url: String, view: ImageView) {
+        // avoid displaying the previous favicon when the holder is recycled
+        preloadDefaultImageIntoView(view)
         loadToViewFromDirectory(url, FAVICON_PERSISTED_DIR, NO_SUBFOLDER, view)
     }
 
     override suspend fun loadToViewFromTemp(subFolder: String, url: String, view: ImageView) {
+        // avoid displaying the previous favicon when the holder is recycled
+        preloadDefaultImageIntoView(view)
         loadToViewFromDirectory(url, FAVICON_TEMP_DIR, subFolder, view)
+    }
+
+    private suspend fun preloadDefaultImageIntoView(view: ImageView) {
+        withContext(dispatcherProvider.main()) {
+            view.setImageDrawable(ContextCompat.getDrawable(view.context, R.drawable.ic_globe_gray_16dp))
+        }
     }
 
     override suspend fun prefetchToTemp(subFolder: String, url: String): File? {

@@ -19,6 +19,7 @@ package com.duckduckgo.app.browser.favicon
 import android.graphics.Bitmap
 import android.widget.ImageView
 import androidx.core.net.toUri
+import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.bookmarks.db.BookmarksDao
 import com.duckduckgo.app.browser.favicon.FileBasedFaviconPersister.Companion.FAVICON_PERSISTED_DIR
@@ -37,6 +38,7 @@ import com.nhaarman.mockitokotlin2.never
 import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.whenever
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
 import org.junit.Before
 import org.junit.Rule
@@ -89,7 +91,7 @@ class DuckDuckGoFaviconManagerTest {
     @Test
     fun whenLoadToViewFromPersistedThenLoadView() = coroutineRule.runBlocking {
         givenFaviconExistsInDirectory(FAVICON_PERSISTED_DIR)
-        val view: ImageView = mock()
+        val view = ImageView(InstrumentationRegistry.getInstrumentation().targetContext)
 
         testee.loadToViewFromPersisted("example.com", view)
 
@@ -98,7 +100,7 @@ class DuckDuckGoFaviconManagerTest {
 
     @Test
     fun whenLoadToViewFromPersistedIfCannotFindFaviconThenDownloadFromUrl() = coroutineRule.runBlocking {
-        val view: ImageView = mock()
+        val view = ImageView(InstrumentationRegistry.getInstrumentation().targetContext)
         val url = "https://example.com"
 
         testee.loadToViewFromPersisted(url, view)
@@ -107,9 +109,19 @@ class DuckDuckGoFaviconManagerTest {
     }
 
     @Test
+    fun whenLoadToViewFromPersistedIfCannotFindFaviconThenLoadDefaultFaviconIntoView() = coroutineRule.runBlocking {
+        val view = ImageView(InstrumentationRegistry.getInstrumentation().targetContext)
+        val url = "https://example.com"
+
+        testee.loadToViewFromPersisted(url, view)
+
+        assertNotNull(view.drawable)
+    }
+
+    @Test
     fun whenLoadToViewFromTempThenLoadView() = coroutineRule.runBlocking {
         givenFaviconExistsInDirectory(FAVICON_TEMP_DIR)
-        val view: ImageView = mock()
+        val view = ImageView(InstrumentationRegistry.getInstrumentation().targetContext)
 
         testee.loadToViewFromTemp("subFolder", "example.com", view)
 
@@ -118,12 +130,21 @@ class DuckDuckGoFaviconManagerTest {
 
     @Test
     fun whenLoadToViewFromTempIfCannotFindFaviconThenDownloadFromUrl() = coroutineRule.runBlocking {
-        val view: ImageView = mock()
+        val view = ImageView(InstrumentationRegistry.getInstrumentation().targetContext)
         val url = "https://example.com"
 
         testee.loadToViewFromTemp("subFolder", url, view)
 
         verify(mockFaviconDownloader).getFaviconFromUrl(url.toUri().faviconLocation()!!)
+    }
+
+    @Test
+    fun whenLoadToViewFromTempIfCannotFindFaviconThenLoadDefaultFaviconIntoView() = coroutineRule.runBlocking {
+        val view = ImageView(InstrumentationRegistry.getInstrumentation().targetContext)
+
+        testee.loadToViewFromTemp("subFolder", "example.com", view)
+
+        assertNotNull(view.drawable)
     }
 
     @Test
