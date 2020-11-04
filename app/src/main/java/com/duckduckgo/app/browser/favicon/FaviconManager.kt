@@ -67,20 +67,14 @@ class DuckDuckGoFaviconManager constructor(
 
     override suspend fun loadToViewFromPersisted(url: String, view: ImageView) {
         // avoid displaying the previous favicon when the holder is recycled
-        preloadDefaultImageIntoView(view)
+        faviconDownloader.loadDefaultFaviconToView(view)
         loadToViewFromDirectory(url, FAVICON_PERSISTED_DIR, NO_SUBFOLDER, view)
     }
 
     override suspend fun loadToViewFromTemp(subFolder: String, url: String, view: ImageView) {
         // avoid displaying the previous favicon when the holder is recycled
-        preloadDefaultImageIntoView(view)
+        faviconDownloader.loadDefaultFaviconToView(view)
         loadToViewFromDirectory(url, FAVICON_TEMP_DIR, subFolder, view)
-    }
-
-    private suspend fun preloadDefaultImageIntoView(view: ImageView) {
-        withContext(dispatcherProvider.main()) {
-            view.setImageDrawable(ContextCompat.getDrawable(view.context, R.drawable.ic_globe_gray_16dp))
-        }
     }
 
     override suspend fun prefetchToTemp(subFolder: String, url: String): File? {
