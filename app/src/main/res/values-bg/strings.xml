@@ -292,7 +292,7 @@
     <string name="privacyProtectionNotificationTrackerDescription">Вие защитихте своите данни, като блокирахте %1$d проследяващи елемента, докато използвахте DuckDuckGo.</string>
     <string name="privacyProtectionNotificationBothDescription">Вие защитихте своите данни, като блокирахте %1$d проследяващи елемента и осигурихте %2$d нешифровани връзки, докато използвахте DuckDuckGo.</string>
     <string name="privacyProtectionNotificationLaunchButton">Подновете сърфирането</string>
-    
+
     <!-- Authentication -->
     <string name="authenticationDialogTitle">Влизане</string>
     <string name="authenticationDialogMessage">%1$s изисква потребителско име и парола.</string>

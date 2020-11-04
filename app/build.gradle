@@ -5,7 +5,6 @@ apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
 apply from: '../versioning.gradle'
 
-//apply from: "$rootDir/ktlint.gradle"
 apply from: "$rootDir/spotless.gradle"
 
 ext {
