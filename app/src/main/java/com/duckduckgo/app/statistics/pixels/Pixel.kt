@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.statistics.pixels
 
+import android.annotation.SuppressLint
 import androidx.annotation.UiThread
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleObserver
@@ -31,8 +32,10 @@ import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import io.reactivex.Completable
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
-import kotlinx.coroutines.*
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -273,34 +276,27 @@ interface Pixel {
     fun ensureFire(pixel: PixelName, parameters: Map<String, String> = emptyMap(), encodedParameters: Map<String, String> = emptyMap())
     fun ensureFire(pixelName: String, parameters: Map<String, String> = emptyMap(), encodedParameters: Map<String, String> = emptyMap())
     fun fireCompletable(pixelName: String, parameters: Map<String, String>, encodedParameters: Map<String, String> = emptyMap()): Completable
+    fun fireCompletable(pixelEntity: PixelEntity): Completable
 }
 
-class ApiBasedPixel @Inject constructor(
-    private val api: PixelService,
-    private val statisticsDataStore: StatisticsDataStore,
-    private val variantManager: VariantManager,
-    private val deviceInfo: DeviceInfo,
-    private val pixelDao: PixelDao
-) : Pixel, LifecycleObserver {
+class PixelObserver @Inject constructor(
+    private val pixelDao: PixelDao,
+    private val pixel: Pixel
+) : LifecycleObserver {
 
     private val compositeDisposable = CompositeDisposable()
     private var syncJob: Job? = null
 
-    private val exceptionHandler: CoroutineExceptionHandler = CoroutineExceptionHandler { _, _ ->
-        Timber.i("pixel job failed exceptionHandler")
-    }
-
-    @InternalCoroutinesApi
     @UiThread
     @OnLifecycleEvent(Lifecycle.Event.ON_START)
     fun onAppForegrounded() {
-        syncJob = GlobalScope.launch(exceptionHandler) {
+        syncJob = GlobalScope.launch {
             pixelDao.pixels().collect { list ->
                 compositeDisposable.clear()
                 Timber.i("Pixel sending: $list")
                 list.forEach { pixelEntity ->
                     compositeDisposable.add(
-                        fireToRemote(pixelEntity)
+                        pixel.fireCompletable(pixelEntity)
                             .subscribeOn(Schedulers.io())
                             .subscribe({
                                 pixelDao.delete(pixelEntity)
@@ -320,44 +316,63 @@ class ApiBasedPixel @Inject constructor(
         syncJob?.cancel()
         compositeDisposable.clear()
     }
+}
+
+class ApiBasedPixel @Inject constructor(
+    private val api: PixelService,
+    private val statisticsDataStore: StatisticsDataStore,
+    private val variantManager: VariantManager,
+    private val deviceInfo: DeviceInfo,
+    private val pixelDao: PixelDao
+) : Pixel {
 
     override fun fire(pixel: PixelName, parameters: Map<String, String>, encodedParameters: Map<String, String>) {
         fire(pixel.pixelName, parameters, encodedParameters)
     }
 
+    @SuppressLint("CheckResult")
     override fun fire(pixelName: String, parameters: Map<String, String>, encodedParameters: Map<String, String>) {
-        compositeDisposable.add(
-            fireToRemote(pixelName, parameters, encodedParameters)
-                .subscribeOn(Schedulers.io())
-                .subscribe({
-                    Timber.v("Pixel registered: $pixelName with params: $parameters $encodedParameters")
-                }, {
-                    Timber.w(it, "Pixel failed: $pixelName with params: $parameters $encodedParameters")
-                })
-        )
+        fireToRemote(pixelName, parameters, encodedParameters)
+            .subscribeOn(Schedulers.io())
+            .subscribe({
+                Timber.v("Pixel registered: $pixelName with params: $parameters $encodedParameters")
+            }, {
+                Timber.w(it, "Pixel failed: $pixelName with params: $parameters $encodedParameters")
+            })
     }
 
     override fun ensureFire(pixel: PixelName, parameters: Map<String, String>, encodedParameters: Map<String, String>) {
         ensureFire(pixel.pixelName, parameters, encodedParameters)
     }
 
+    @SuppressLint("CheckResult")
     override fun ensureFire(pixelName: String, parameters: Map<String, String>, encodedParameters: Map<String, String>) {
-        compositeDisposable.add(
-            enqueePixel(pixelName, parameters, encodedParameters)
-                .subscribeOn(Schedulers.io())
-                .subscribe({
-                    Timber.v("Pixel registered: $pixelName with params: $parameters $encodedParameters")
-                }, {
-                    Timber.w(it, "Pixel failed: $pixelName with params: $parameters $encodedParameters")
-                })
-        )
+        enqueuePixel(pixelName, parameters, encodedParameters)
+            .subscribeOn(Schedulers.io())
+            .subscribe({
+                Timber.v("Pixel registered: $pixelName with params: $parameters $encodedParameters")
+            }, {
+                Timber.w(it, "Pixel failed: $pixelName with params: $parameters $encodedParameters")
+            })
     }
 
     override fun fireCompletable(pixelName: String, parameters: Map<String, String>, encodedParameters: Map<String, String>): Completable {
         return api.fire(pixelName, getDeviceFactor(), getAtbInfo(), addDeviceParametersTo(parameters), encodedParameters)
     }
 
-    private fun enqueePixel(pixelName: String, parameters: Map<String, String>, encodedParameters: Map<String, String>): Completable {
+    override fun fireCompletable(pixelEntity: PixelEntity): Completable {
+        with(pixelEntity) {
+            return api.fire(
+                this.pixelName,
+                getDeviceFactor(),
+                this.atb,
+                addDeviceParametersTo(this.additionalQueryParams),
+                this.encodedQueryParams
+            )
+        }
+    }
+
+    private fun enqueuePixel(pixelName: String, parameters: Map<String, String>, encodedParameters: Map<String, String>): Completable {
         return Completable.fromCallable {
             val pixelEntity = PixelEntity(
                 pixelName = pixelName,
@@ -367,18 +382,6 @@ class ApiBasedPixel @Inject constructor(
             )
             pixelDao.insert(pixelEntity)
             Timber.v("Pixel inserted $pixelName")
-        }
-    }
-
-    private fun fireToRemote(pixelEntity: PixelEntity): Completable {
-        with(pixelEntity) {
-            return api.fire(
-                this.pixelName,
-                getDeviceFactor(),
-                this.atb,
-                addDeviceParametersTo(this.additionalQueryParams),
-                this.encodedQueryParams
-            )
         }
     }
 
