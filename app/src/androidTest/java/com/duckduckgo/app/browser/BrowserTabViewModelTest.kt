@@ -2443,6 +2443,23 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenDomainRequestsSitePermissionAndUserAllowedSessionPermissionAndThenPermissionIsAllowed() = coroutineRule.runBlocking {
+        val domain = "https://www.example.com/"
+
+        givenDeviceLocationSharingIsEnabled(true)
+        givenLocationPermissionIsEnabled(true)
+        givenCurrentSite(domain)
+
+        testee.onSiteLocationPermissionSelected(domain, LocationPermissionType.ALLOW_ONCE)
+
+        givenNewPermissionRequestFromDomain(domain)
+
+        verify(mockPixel).fire(Pixel.PixelName.PRECISE_LOCATION_SITE_DIALOG_ALLOW_ONCE)
+
+        // how can we test that the locationPermissionCallback is invoked?
+    }
+
+    @Test
     fun whenAppLocationPermissionIsDeniedThenSitePermissionIsDenied() = coroutineRule.runBlocking {
         val domain = "https://www.example.com/"
         givenDeviceLocationSharingIsEnabled(true)
