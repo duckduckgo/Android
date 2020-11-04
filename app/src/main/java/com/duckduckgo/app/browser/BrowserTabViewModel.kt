@@ -975,7 +975,7 @@ class BrowserTabViewModel(
             val previouslyDeniedForever = appSettingsPreferencesStore.appLocationPermissionDeniedForever
             val permissionEntity = locationPermissionsRepository.getDomainPermission(origin)
             if (permissionEntity == null) {
-                if (locationPermissionSession.containsKey(origin)){
+                if (locationPermissionSession.containsKey(origin)) {
                     reactToSiteSessionPermission(locationPermissionSession[origin]!!)
                 } else {
                     command.postValue(CheckSystemLocationPermission(origin, previouslyDeniedForever))
@@ -1062,9 +1062,9 @@ class BrowserTabViewModel(
         }
     }
 
-    private fun reactToSiteSessionPermission(permission: LocationPermissionType){
+    private fun reactToSiteSessionPermission(permission: LocationPermissionType) {
         locationPermission?.let { locationPermission ->
-            if (permission == LocationPermissionType.ALLOW_ONCE){
+            if (permission == LocationPermissionType.ALLOW_ONCE) {
                 locationPermission.callback.invoke(locationPermission.origin, true, false)
             } else {
                 locationPermission.callback.invoke(locationPermission.origin, false, false)
