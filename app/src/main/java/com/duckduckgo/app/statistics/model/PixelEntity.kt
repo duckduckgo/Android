@@ -51,4 +51,3 @@ class Adapters {
         val queryParamsAdapter: JsonAdapter<Map<String, String>> = moshi.adapter(mapStringStringType)
     }
 }
-

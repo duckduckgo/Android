@@ -17,7 +17,6 @@
 package com.duckduckgo.app.di
 
 import android.content.Context
-import com.duckduckgo.app.browser.rating.db.AppEnjoymentDao
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.global.device.ContextDeviceInfo
 import com.duckduckgo.app.global.device.DeviceInfo
