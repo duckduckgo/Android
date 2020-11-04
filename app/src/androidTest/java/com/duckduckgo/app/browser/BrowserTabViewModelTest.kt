@@ -2454,9 +2454,7 @@ class BrowserTabViewModelTest {
 
         givenNewPermissionRequestFromDomain(domain)
 
-        verify(mockPixel).fire(Pixel.PixelName.PRECISE_LOCATION_SITE_DIALOG_ALLOW_ONCE)
-
-        // how can we test that the locationPermissionCallback is invoked?
+        assertCommandNotIssued<Command.CheckSystemLocationPermission>()
     }
 
     @Test
