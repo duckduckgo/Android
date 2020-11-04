@@ -4,7 +4,9 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
 apply from: '../versioning.gradle'
-apply from: "$rootDir/ktlint.gradle"
+
+//apply from: "$rootDir/ktlint.gradle"
+apply from: "$rootDir/spotless.gradle"
 
 ext {
     USE_ORCHESTRATOR = project.hasProperty('orchestrator') ? project.property('orchestrator') : false

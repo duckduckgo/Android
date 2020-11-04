@@ -1,31 +1,28 @@
-/*
- * Copyright © 2020 NHSX. All rights reserved.
- */
+apply plugin: 'com.diffplug.spotless'
 
-configurations.create("ktlint")
+spotless {
+    java {
+        target '**/*.java'
+        googleJavaFormat().aosp()
+        removeUnusedImports()
+        trimTrailingWhitespace()
+        indentWithSpaces()
+    }
+    kotlin {
+        target '**/*.kt'
+        ktlint('0.36.0').userData(['disabled_rules': 'no-wildcard-imports, import-ordering, no-blank-line-before-rbrace'])
+        trimTrailingWhitespace()
+        indentWithSpaces()
+    }
+    format 'misc', {
+        target '**/*.gradle', '**/*.md', '**/.gitignore'
+        indentWithSpaces()
+        trimTrailingWhitespace()
+    }
 
-dependencies {
-    ktlint "com.pinterest:ktlint:0.36.0"
-}
-
-ext.exclusions = "import-ordering, no-wildcard-imports, no-blank-line-before-rbrace"
-
-task("ktlint", type: JavaExec) {
-    group = "verification"
-    description = "Check Kotlin code style."
-    main = "com.pinterest.ktlint.Main"
-    classpath = configurations["ktlint"]
-    args = ["--disabled_rules=$exclusions", "src/**/*.kt"]
-}
-
-task("ktlintFormat", type: JavaExec) {
-    group = "formatting"
-    description = "Fix Kotlin code style deviations."
-    main = "com.pinterest.ktlint.Main"
-    classpath = configurations["ktlint"]
-    args = ["--disabled_rules=$exclusions", "-F", "src/**/*.kt"]
-}
-
-afterEvaluate {
-    tasks["check"].dependsOn("ktlint")
+    format 'xml', {
+        target '**/*.xml'
+        indentWithSpaces()
+        trimTrailingWhitespace()
+    }
 }
