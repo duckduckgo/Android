@@ -65,7 +65,7 @@ class StubStatisticsModule {
 
             }
 
-            override fun enqueePixel(pixelName: String, parameters: Map<String, String>, encodedParameters: Map<String, String>): Completable {
+            override fun fireCompletable(pixelName: String, parameters: Map<String, String>, encodedParameters: Map<String, String>): Completable {
                 return Completable.fromAction {}
             }
         }

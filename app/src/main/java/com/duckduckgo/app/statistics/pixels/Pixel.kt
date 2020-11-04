@@ -17,25 +17,9 @@
 package com.duckduckgo.app.statistics.pixels
 
 import android.annotation.SuppressLint
-import androidx.annotation.UiThread
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleObserver
-import androidx.lifecycle.OnLifecycleEvent
-import com.duckduckgo.app.global.device.DeviceInfo
-import com.duckduckgo.app.statistics.VariantManager
-import com.duckduckgo.app.statistics.api.PixelService
-import com.duckduckgo.app.statistics.model.PixelEntity
+import com.duckduckgo.app.statistics.api.PixelSender
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelName
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter
-import com.duckduckgo.app.statistics.store.PixelDao
-import com.duckduckgo.app.statistics.store.StatisticsDataStore
-import io.reactivex.Completable
-import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -275,55 +259,10 @@ interface Pixel {
     fun fire(pixelName: String, parameters: Map<String, String> = emptyMap(), encodedParameters: Map<String, String> = emptyMap())
     fun ensureFire(pixel: PixelName, parameters: Map<String, String> = emptyMap(), encodedParameters: Map<String, String> = emptyMap())
     fun ensureFire(pixelName: String, parameters: Map<String, String> = emptyMap(), encodedParameters: Map<String, String> = emptyMap())
-    fun fireCompletable(pixelName: String, parameters: Map<String, String>, encodedParameters: Map<String, String> = emptyMap()): Completable
-    fun fireCompletable(pixelEntity: PixelEntity): Completable
 }
 
-class PixelObserver @Inject constructor(
-    private val pixelDao: PixelDao,
-    private val pixel: Pixel
-) : LifecycleObserver {
-
-    private val compositeDisposable = CompositeDisposable()
-    private var syncJob: Job? = null
-
-    @UiThread
-    @OnLifecycleEvent(Lifecycle.Event.ON_START)
-    fun onAppForegrounded() {
-        syncJob = GlobalScope.launch {
-            pixelDao.pixels().collect { list ->
-                compositeDisposable.clear()
-                Timber.i("Pixel sending: $list")
-                list.forEach { pixelEntity ->
-                    compositeDisposable.add(
-                        pixel.fireCompletable(pixelEntity)
-                            .subscribeOn(Schedulers.io())
-                            .subscribe({
-                                pixelDao.delete(pixelEntity)
-                                Timber.v("Pixel sent: ${pixelEntity.pixelName} with params: temp temp)")
-                            }, {
-                                Timber.w(it, "Pixel failed: ${pixelEntity.pixelName} with params:  temp temp)")
-                            })
-                    )
-                }
-
-            }
-        }
-    }
-
-    @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
-    fun onAppBackgrounded() {
-        syncJob?.cancel()
-        compositeDisposable.clear()
-    }
-}
-
-class ApiBasedPixel @Inject constructor(
-    private val api: PixelService,
-    private val statisticsDataStore: StatisticsDataStore,
-    private val variantManager: VariantManager,
-    private val deviceInfo: DeviceInfo,
-    private val pixelDao: PixelDao
+class RxBasedPixel @Inject constructor(
+    private val pixelSender: PixelSender
 ) : Pixel {
 
     override fun fire(pixel: PixelName, parameters: Map<String, String>, encodedParameters: Map<String, String>) {
@@ -332,10 +271,10 @@ class ApiBasedPixel @Inject constructor(
 
     @SuppressLint("CheckResult")
     override fun fire(pixelName: String, parameters: Map<String, String>, encodedParameters: Map<String, String>) {
-        fireToRemote(pixelName, parameters, encodedParameters)
+        pixelSender.sendPixel(pixelName, parameters, encodedParameters)
             .subscribeOn(Schedulers.io())
             .subscribe({
-                Timber.v("Pixel registered: $pixelName with params: $parameters $encodedParameters")
+                Timber.v("Pixel sent: $pixelName with params: $parameters $encodedParameters")
             }, {
                 Timber.w(it, "Pixel failed: $pixelName with params: $parameters $encodedParameters")
             })
@@ -347,55 +286,12 @@ class ApiBasedPixel @Inject constructor(
 
     @SuppressLint("CheckResult")
     override fun ensureFire(pixelName: String, parameters: Map<String, String>, encodedParameters: Map<String, String>) {
-        enqueuePixel(pixelName, parameters, encodedParameters)
+        pixelSender.enqueuePixel(pixelName, parameters, encodedParameters)
             .subscribeOn(Schedulers.io())
             .subscribe({
-                Timber.v("Pixel registered: $pixelName with params: $parameters $encodedParameters")
+                Timber.v("Pixel enqueued: $pixelName with params: $parameters $encodedParameters")
             }, {
                 Timber.w(it, "Pixel failed: $pixelName with params: $parameters $encodedParameters")
             })
     }
-
-    override fun fireCompletable(pixelName: String, parameters: Map<String, String>, encodedParameters: Map<String, String>): Completable {
-        return api.fire(pixelName, getDeviceFactor(), getAtbInfo(), addDeviceParametersTo(parameters), encodedParameters)
-    }
-
-    override fun fireCompletable(pixelEntity: PixelEntity): Completable {
-        with(pixelEntity) {
-            return api.fire(
-                this.pixelName,
-                getDeviceFactor(),
-                this.atb,
-                addDeviceParametersTo(this.additionalQueryParams),
-                this.encodedQueryParams
-            )
-        }
-    }
-
-    private fun enqueuePixel(pixelName: String, parameters: Map<String, String>, encodedParameters: Map<String, String>): Completable {
-        return Completable.fromCallable {
-            val pixelEntity = PixelEntity(
-                pixelName = pixelName,
-                atb = getAtbInfo(),
-                additionalQueryParams = parameters,
-                encodedQueryParams = encodedParameters
-            )
-            pixelDao.insert(pixelEntity)
-            Timber.v("Pixel inserted $pixelName")
-        }
-    }
-
-    private fun fireToRemote(pixelName: String, parameters: Map<String, String>, encodedParameters: Map<String, String>): Completable {
-        val fullParameters = addDeviceParametersTo(parameters)
-        return api.fire(pixelName, deviceInfo.formFactor().description, getAtbInfo(), fullParameters, encodedParameters)
-    }
-
-    private fun addDeviceParametersTo(parameters: Map<String, String>): Map<String, String> {
-        val defaultParameters = mapOf(PixelParameter.APP_VERSION to deviceInfo.appVersion)
-        return defaultParameters.plus(parameters)
-    }
-
-    private fun getAtbInfo() = statisticsDataStore.atb?.formatWithVariant(variantManager.getVariant()) ?: ""
-
-    private fun getDeviceFactor() = deviceInfo.formFactor().description
 }

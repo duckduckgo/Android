@@ -25,7 +25,7 @@ import com.duckduckgo.app.referral.AppInstallationReferrerStateListener
 import com.duckduckgo.app.statistics.AtbInitializer
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.api.*
-import com.duckduckgo.app.statistics.pixels.ApiBasedPixel
+import com.duckduckgo.app.statistics.pixels.RxBasedPixel
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.store.OfflinePixelCountDataStore
 import com.duckduckgo.app.statistics.store.PixelDao
@@ -57,20 +57,26 @@ class StatisticsModule {
 
     @Provides
     fun pixel(
+        pixelSender: PixelSender
+    ): Pixel =
+        RxBasedPixel(pixelSender)
+
+    @Provides
+    fun pixelSender(
         pixelService: PixelService,
         statisticsDataStore: StatisticsDataStore,
         variantManager: VariantManager,
         deviceInfo: DeviceInfo,
         pixelDao: PixelDao
-    ): Pixel =
-        ApiBasedPixel(pixelService, statisticsDataStore, variantManager, deviceInfo, pixelDao)
+    ): PixelSender =
+        PixelSender(pixelService, pixelDao, statisticsDataStore, variantManager, deviceInfo)
 
     @Provides
     fun offlinePixelSender(
         offlinePixelCountDataStore: OfflinePixelCountDataStore,
         uncaughtExceptionRepository: UncaughtExceptionRepository,
-        pixel: Pixel
-    ): OfflinePixelSender = OfflinePixelSender(offlinePixelCountDataStore, uncaughtExceptionRepository, pixel)
+        pixelSender: PixelSender
+    ): OfflinePixelSender = OfflinePixelSender(offlinePixelCountDataStore, uncaughtExceptionRepository, pixelSender)
 
     @Provides
     fun deviceInfo(context: Context): DeviceInfo = ContextDeviceInfo(context)
