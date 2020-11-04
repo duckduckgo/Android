@@ -104,8 +104,7 @@ class PixelSender @Inject constructor(
             )
         }
     }
-
-
+    
     private fun addDeviceParametersTo(parameters: Map<String, String>): Map<String, String> {
         val defaultParameters = mapOf(Pixel.PixelParameter.APP_VERSION to deviceInfo.appVersion)
         return defaultParameters.plus(parameters)
