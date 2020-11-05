@@ -224,3 +224,10 @@ dependencies {
     kapt "com.android.tools.build.jetifier:jetifier-core:$jetifier"
     annotationProcessor "com.android.tools.build.jetifier:jetifier-core:$jetifier"
 }
+
+// Fixes https://github.com/mockito/mockito/issues/2007
+allprojects {
+    configurations.all {
+        resolutionStrategy.force 'org.objenesis:objenesis:2.6'
+    }
+}
