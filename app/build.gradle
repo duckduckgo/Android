@@ -96,9 +96,9 @@ android {
 }
 
 ext {
-    androidX = "1.2.0-beta01"
     materialDesign = "1.2.0-alpha05"
     swipeRefreshLayout = "1.0.0"
+    androidX = "1.2.0"
     architectureComponents = "1.1.1"
     architectureComponentsExtensions = "1.1.1"
     androidKtxCore = "1.2.0"
