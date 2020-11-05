@@ -292,7 +292,7 @@
     <string name="privacyProtectionNotificationTrackerDescription">Du beskyttet dataene dine ved å blokkere %1$d sporinger mens du brukte DuckDuckGo.</string>
     <string name="privacyProtectionNotificationBothDescription">Du beskyttet dataene dine ved å blokkere %1$d sporinger og sikre %2$d ukrypterte tilkoblinger mens du brukte DuckDuckGo.</string>
     <string name="privacyProtectionNotificationLaunchButton">Fortsett å bruke nettleseren</string>
-    
+
     <!-- Authentication -->
     <string name="authenticationDialogTitle">Logg inn</string>
     <string name="authenticationDialogMessage">%1$s krever brukernavn og passord</string>

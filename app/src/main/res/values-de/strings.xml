@@ -292,7 +292,7 @@
     <string name="privacyProtectionNotificationTrackerDescription">Du hast deine Daten geschützt, indem du %1$d Tracker bei der Verwendung von DuckDuckGo blockiert hast.</string>
     <string name="privacyProtectionNotificationBothDescription">Du hast deine Daten geschützt, indem du %1$d Tracker blockiert und %2$d unverschlüsselte Verbindungen bei der Verwendung von DuckDuckGo gesichert hast.</string>
     <string name="privacyProtectionNotificationLaunchButton">Weiter browsen</string>
-    
+
     <!-- Authentication -->
     <string name="authenticationDialogTitle">Anmelden</string>
     <string name="authenticationDialogMessage">%1$s erfordert einen Benutzernamen und ein Passwort.</string>
