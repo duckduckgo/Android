@@ -25,7 +25,7 @@ interface FeedbackService {
 
     @FormUrlEncoded
     @POST("/feedback.js?type=app-feedback")
-    fun submitFeedback(
+    suspend fun submitFeedback(
         @Field("reason") reason: String = REASON_GENERAL,
         @Field("rating") rating: String,
         @Field("category") category: String?,
@@ -38,7 +38,7 @@ interface FeedbackService {
         @Field("manufacturer") manufacturer: String,
         @Field("model") model: String,
         @Field("atb") atb: String
-    ): Call<Void>
+    )
 
     companion object {
         const val REASON_GENERAL = "general"
