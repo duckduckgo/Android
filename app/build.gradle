@@ -126,7 +126,7 @@ ext {
     rxAndroid = "2.0.2"
     timber = "4.7.1"
     rxRelay = "2.0.0"
-    leakCanary = "2.0"
+    leakCanary = "2.5"
     mockito = "2.18.3"
     mockitoKotlin = "2.0.0"
     commonsMath = "3.6.1"
