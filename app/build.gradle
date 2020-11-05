@@ -128,7 +128,7 @@ ext {
     rxRelay = "2.0.0"
     leakCanary = "2.5"
     mockito = "3.6.0"
-    mockitoKotlin = "2.0.0"
+    mockitoKotlin = "2.2.0"
     commonsMath = "3.6.1"
 }
 
