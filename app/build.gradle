@@ -216,18 +216,13 @@ dependencies {
     androidTestImplementation "androidx.test:runner:$testRunner"
     androidTestImplementation "androidx.test:rules:$testRunner"
     androidTestUtil "androidx.test:orchestrator:$testRunner"
-    androidTestImplementation "org.mockito:mockito-android:$mockito"
+    androidTestImplementation ("org.mockito:mockito-android:$mockito") { // Fixes https://github.com/mockito/mockito/issues/2007
+        exclude group: "org.mockito", module: "mockito-core"
+    }
     androidTestImplementation "com.squareup.okhttp3:mockwebserver:$okHttp"
     androidTestImplementation "com.nhaarman.mockitokotlin2:mockito-kotlin:$mockitoKotlin"
     androidTestImplementation "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
 
     kapt "com.android.tools.build.jetifier:jetifier-core:$jetifier"
     annotationProcessor "com.android.tools.build.jetifier:jetifier-core:$jetifier"
-}
-
-// Fixes https://github.com/mockito/mockito/issues/2007
-allprojects {
-    configurations.all {
-        resolutionStrategy.force 'org.objenesis:objenesis:2.6'
-    }
 }
