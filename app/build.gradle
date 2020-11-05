@@ -225,3 +225,10 @@ dependencies {
     androidTestImplementation "com.nhaarman.mockitokotlin2:mockito-kotlin:$mockitoKotlin"
     androidTestImplementation "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
 }
+
+// Fixes https://github.com/mockito/mockito/issues/2007
+allprojects {
+    configurations.all {
+        resolutionStrategy.force 'org.objenesis:objenesis:2.6'
+    }
+}
