@@ -129,7 +129,7 @@ class DuckDuckGoFaviconManagerTest {
 
     @Test
     fun whenLoadToViewFromTempIfCannotFindFaviconThenDownloadFromUrl() = coroutineRule.runBlocking {
-        val view = ImageView(InstrumentationRegistry.getInstrumentation().targetContext)
+        val view: ImageView = mock()
         val url = "https://example.com"
 
         testee.loadToViewFromTemp("subFolder", url, view)
