@@ -103,7 +103,7 @@ ext {
     architectureComponentsExtensions = "1.1.1"
     androidKtxCore = "1.2.0"
     fragmentKtx = "1.2.3"
-    constraintLayout = "2.0.0-beta4"
+    constraintLayout = "2.0.4"
     lifecycle = "2.2.0"
     room = "2.2.5"
     workManager = "2.4.0"
