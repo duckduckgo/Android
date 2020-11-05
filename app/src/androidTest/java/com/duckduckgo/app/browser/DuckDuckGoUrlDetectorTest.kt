@@ -104,7 +104,7 @@ class DuckDuckGoUrlDetectorTest {
     }
 
     @Test
-    fun whenDDGIsParamsPageThenStaticPageItsDetected() {
+    fun whenDDGIsParamsPageThenStaticPageIsDetected() {
         assertTrue(testee.isDuckDuckGoStaticUrl("https://duckduckgo.com/params"))
     }
 
