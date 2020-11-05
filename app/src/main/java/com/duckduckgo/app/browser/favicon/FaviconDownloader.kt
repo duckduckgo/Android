@@ -20,6 +20,7 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.net.Uri
 import android.widget.ImageView
+import androidx.core.content.ContextCompat
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.duckduckgo.app.browser.R
@@ -32,6 +33,7 @@ interface FaviconDownloader {
     suspend fun getFaviconFromDisk(file: File): Bitmap?
     suspend fun getFaviconFromUrl(uri: Uri): Bitmap?
     suspend fun loadFaviconToView(file: File, view: ImageView)
+    suspend fun loadDefaultFaviconToView(view: ImageView)
 }
 
 class GlideFaviconDownloader @Inject constructor(
@@ -77,4 +79,9 @@ class GlideFaviconDownloader @Inject constructor(
         }
     }
 
+    override suspend fun loadDefaultFaviconToView(view: ImageView) {
+        withContext(dispatcherProvider.main()) {
+            view.setImageDrawable(ContextCompat.getDrawable(view.context, R.drawable.ic_globe_gray_16dp))
+        }
+    }
 }
