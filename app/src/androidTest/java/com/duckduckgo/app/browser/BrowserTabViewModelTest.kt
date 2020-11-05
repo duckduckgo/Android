@@ -2443,7 +2443,7 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenDomainRequestsSitePermissionAndUserAllowedSessionPermissionAndThenPermissionIsAllowed() = coroutineRule.runBlocking {
+    fun whenDomainRequestsSitePermissionAndUserAllowedSessionPermissionThenPermissionIsAllowed() = coroutineRule.runBlocking {
         val domain = "https://www.example.com/"
 
         givenDeviceLocationSharingIsEnabled(true)
