@@ -300,7 +300,7 @@
     <string name="privacyProtectionNotificationTrackerDescription">Svoje podatke ste med uporabo DuckDuckGo zaščitili z blokiranjem %1$d sledilnikov.</string>
     <string name="privacyProtectionNotificationBothDescription">Svoje podatke ste med uporabo DuckDuckGo zaščitili z blokiranjem %1$d sledilnikov in zavarovanjem %2$d nešifriranih povezav.</string>
     <string name="privacyProtectionNotificationLaunchButton">Nadaljuj brskanje</string>
-    
+
     <!-- Authentication -->
     <string name="authenticationDialogTitle">Prijavite se</string>
     <string name="authenticationDialogMessage">%1$s zahteva uporabniško ime in geslo.</string>
