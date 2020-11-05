@@ -301,6 +301,7 @@ class BrowserTabViewModel(
 
     private var locationPermission: LocationPermission? = null
     private val locationPermissionMessages: MutableMap<String, Boolean> = mutableMapOf()
+    private val locationPermissionSession: MutableMap<String, LocationPermissionType> = mutableMapOf()
 
     private val autoCompletePublishSubject = PublishRelay.create<String>()
     private val fireproofWebsiteState: LiveData<List<FireproofWebsiteEntity>> = fireproofWebsiteRepository.getFireproofWebsites()
@@ -974,7 +975,11 @@ class BrowserTabViewModel(
             val previouslyDeniedForever = appSettingsPreferencesStore.appLocationPermissionDeniedForever
             val permissionEntity = locationPermissionsRepository.getDomainPermission(origin)
             if (permissionEntity == null) {
-                command.postValue(CheckSystemLocationPermission(origin, previouslyDeniedForever))
+                if (locationPermissionSession.containsKey(origin)) {
+                    reactToSiteSessionPermission(locationPermissionSession[origin]!!)
+                } else {
+                    command.postValue(CheckSystemLocationPermission(origin, previouslyDeniedForever))
+                }
             } else {
                 if (permissionEntity.permission == LocationPermissionType.DENY_ALWAYS) {
                     onSiteLocationPermissionAlwaysDenied()
@@ -999,6 +1004,7 @@ class BrowserTabViewModel(
                 }
                 LocationPermissionType.ALLOW_ONCE -> {
                     pixel.fire(PixelName.PRECISE_LOCATION_SITE_DIALOG_ALLOW_ONCE)
+                    locationPermissionSession[domain] = permission
                     locationPermission.callback.invoke(locationPermission.origin, true, false)
                 }
                 LocationPermissionType.DENY_ALWAYS -> {
@@ -1011,6 +1017,7 @@ class BrowserTabViewModel(
                 }
                 LocationPermissionType.DENY_ONCE -> {
                     pixel.fire(PixelName.PRECISE_LOCATION_SITE_DIALOG_DENY_ONCE)
+                    locationPermissionSession[domain] = permission
                     locationPermission.callback.invoke(locationPermission.origin, false, false)
                 }
             }
@@ -1053,6 +1060,17 @@ class BrowserTabViewModel(
             }
 
         }
+    }
+
+    private fun reactToSiteSessionPermission(permission: LocationPermissionType) {
+        locationPermission?.let { locationPermission ->
+            if (permission == LocationPermissionType.ALLOW_ONCE) {
+                locationPermission.callback.invoke(locationPermission.origin, true, false)
+            } else {
+                locationPermission.callback.invoke(locationPermission.origin, false, false)
+            }
+        }
+
     }
 
     override fun onSystemLocationPermissionAllowed() {
