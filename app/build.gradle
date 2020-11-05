@@ -213,10 +213,6 @@ dependencies {
     implementation("com.android.installreferrer:installreferrer:$referrerLibrary")
 
     // Testing dependencies
-    testImplementation "org.mockito:mockito-core:$mockito"
-    testImplementation "com.nhaarman.mockitokotlin2:mockito-kotlin:$mockitoKotlin"
-    testImplementation "junit:junit:$junit"
-
     androidTestImplementation "androidx.test:runner:$testRunner"
     androidTestImplementation "androidx.test:rules:$testRunner"
     androidTestUtil "androidx.test:orchestrator:$testRunner"
