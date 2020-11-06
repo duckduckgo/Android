@@ -361,7 +361,7 @@ class MigrationsProvider(
 
     val MIGRATION_26_TO_27: Migration = object : Migration(26, 27) {
         override fun migrate(database: SupportSQLiteDatabase) {
-            database.execSQL("CREATE TABLE IF NOT EXISTS `pixel_store` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `pixelName` TEXT NOT NULL, `atb` TEXT NOT NULL)")
+            database.execSQL("CREATE TABLE IF NOT EXISTS `pixel_store` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `pixelName` TEXT NOT NULL, `atb` TEXT NOT NULL, `additionalQueryParams` TEXT NOT NULL, `encodedQueryParams` TEXT NOT NULL)")
         }
     }
 
