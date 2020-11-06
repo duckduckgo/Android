@@ -101,7 +101,7 @@ class OfflinePixelSender @Inject constructor(
                     EXCEPTION_TIMESTAMP to exception.formattedTimestamp()
                 )
 
-                val pixel = pixelSender.sendPixel(pixelName, params)
+                val pixel = pixelSender.sendPixel(pixelName, params, emptyMap())
                     .doOnComplete {
                         Timber.d("Sent pixel with params: $params containing exception; deleting exception with id=${exception.id}")
                         runBlocking { uncaughtExceptionRepository.deleteException(exception.id) }
@@ -137,7 +137,7 @@ class OfflinePixelSender @Inject constructor(
                 return@defer complete()
             }
             val params = mapOf(COUNT to count.toString())
-            pixelSender.sendPixel(pixelName.pixelName, params).andThen {
+            pixelSender.sendPixel(pixelName.pixelName, params, emptyMap()).andThen {
                 Timber.v("Offline pixel sent ${pixelName.pixelName} count: $count")
                 counter.set(0)
             }
