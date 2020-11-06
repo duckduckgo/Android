@@ -14,22 +14,28 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.mobile.android.vpn.stats
+package com.duckduckgo.app.job
 
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.WorkManager
-import com.duckduckgo.mobile.android.vpn.stats.VpnStatsReportingRequestBuilder.Companion.DAILY_PIXEL_WORK_TAG
+import com.duckduckgo.app.job.VpnStatsReportingRequestBuilder.Companion.VPN_STATS_REPORTING_WORK_TAG
+import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
 import timber.log.Timber
 import javax.inject.Inject
 
 class VpnStatsReportingScheduler @Inject constructor(
-    private val databaseCleanerRequestBuilder: VpnStatsReportingRequestBuilder,
-    private val workManager: WorkManager
+    private val vpnStatsReportingScheduler: VpnStatsReportingRequestBuilder,
+    private val workManager: WorkManager,
+    private val vpnDatabase: VpnDatabase
 ) {
 
     fun schedule() {
-        Timber.i("Scheduling daily pixel sender")
-        val workRequest = databaseCleanerRequestBuilder.buildWorkRequest()
-        workManager.enqueueUniquePeriodicWork(DAILY_PIXEL_WORK_TAG, ExistingPeriodicWorkPolicy.KEEP, workRequest)
+        if (vpnDatabase.vpnStatsDao().getCurrent() != null) {
+            Timber.i("Scheduling daily pixel sender")
+            val workRequest = vpnStatsReportingScheduler.buildWorkRequest()
+            workManager.enqueueUniquePeriodicWork(VPN_STATS_REPORTING_WORK_TAG, ExistingPeriodicWorkPolicy.KEEP, workRequest)
+        } else {
+            Timber.i("VPN hasn't been enabled yet, we don't need to schedule the daily pixel")
+        }
     }
 }

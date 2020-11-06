@@ -21,6 +21,7 @@ import androidx.core.app.NotificationManagerCompat
 import androidx.work.Configuration
 import androidx.work.WorkManager
 import androidx.work.WorkerFactory
+import com.duckduckgo.app.browser.BuildConfig
 import com.duckduckgo.app.global.view.ClearDataAction
 import com.duckduckgo.app.job.ConfigurationDownloader
 import com.duckduckgo.app.notification.NotificationFactory
@@ -43,6 +44,7 @@ class WorkerModule {
     fun workManager(context: Context, workerFactory: WorkerFactory): WorkManager {
         val config = Configuration.Builder()
             .setWorkerFactory(workerFactory)
+            .setDefaultProcessName(BuildConfig.APPLICATION_ID)
             .build()
         WorkManager.initialize(context, config)
         return WorkManager.getInstance(context)

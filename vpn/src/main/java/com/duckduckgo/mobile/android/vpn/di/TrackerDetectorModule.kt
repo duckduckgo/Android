@@ -27,8 +27,6 @@ import com.duckduckgo.mobile.android.vpn.processor.tcp.hostname.PayloadBytesExtr
 import com.duckduckgo.mobile.android.vpn.processor.tcp.hostname.PlaintextHostHeaderExtractor
 import com.duckduckgo.mobile.android.vpn.processor.tcp.hostname.ServerNameIndicationHeaderHostExtractor
 import com.duckduckgo.mobile.android.vpn.processor.tcp.tracker.TrackerListProvider
-import com.duckduckgo.mobile.android.vpn.stats.VpnStatsReportingScheduler
-import com.duckduckgo.mobile.android.vpn.stats.VpnStatsReportingRequestBuilder
 import dagger.Module
 import dagger.Provides
 import javax.inject.Singleton
@@ -45,14 +43,6 @@ class TrackerDetectorModule {
     @Singleton
     fun providesNotificationManager(context: Context): NotificationManagerCompat {
         return NotificationManagerCompat.from(context)
-    }
-
-    @Provides
-    fun provideDailyPixelSender(
-        vpnStatsReportingRequestBuilder: VpnStatsReportingRequestBuilder,
-        workManager: WorkManager
-    ): VpnStatsReportingScheduler {
-        return VpnStatsReportingScheduler(vpnStatsReportingRequestBuilder, workManager)
     }
 
     @Provides

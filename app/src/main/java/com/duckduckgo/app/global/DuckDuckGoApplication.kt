@@ -38,6 +38,7 @@ import com.duckduckgo.app.global.rating.AppEnjoymentLifecycleObserver
 import com.duckduckgo.app.global.shortcut.AppShortcutCreator
 import com.duckduckgo.app.httpsupgrade.HttpsUpgrader
 import com.duckduckgo.app.job.AppConfigurationSyncer
+import com.duckduckgo.app.job.VpnStatsReportingScheduler
 import com.duckduckgo.app.job.WorkScheduler
 import com.duckduckgo.app.notification.NotificationRegistrar
 import com.duckduckgo.app.onboarding.store.UserStageStore
@@ -165,6 +166,9 @@ open class DuckDuckGoApplication : HasAndroidInjector, Application(), LifecycleO
     @Inject
     lateinit var userStageStore: UserStageStore
 
+    @Inject
+    lateinit var vpnStatsReporting: VpnStatsReportingScheduler
+
     private var launchedByFireAction: Boolean = false
 
     open lateinit var daggerAppComponent: AppComponent
@@ -199,6 +203,7 @@ open class DuckDuckGoApplication : HasAndroidInjector, Application(), LifecycleO
         loadTrackerData()
         configureDataDownloader()
         scheduleOfflinePixels()
+        scheduleVpnStatsReporting()
         initializeDateLibrary()
 
         notificationRegistrar.registerApp()
@@ -302,6 +307,12 @@ open class DuckDuckGoApplication : HasAndroidInjector, Application(), LifecycleO
 
     private fun scheduleOfflinePixels() {
         offlinePixelScheduler.scheduleOfflinePixels()
+    }
+
+    private fun scheduleVpnStatsReporting() {
+        GlobalScope.launch(Dispatchers.IO) {
+            vpnStatsReporting.schedule()
+        }
     }
 
     private fun initializeDateLibrary() {

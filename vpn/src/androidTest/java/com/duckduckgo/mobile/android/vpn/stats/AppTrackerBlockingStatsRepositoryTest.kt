@@ -23,7 +23,6 @@ import com.duckduckgo.mobile.android.vpn.dao.VpnStatsDao
 import com.duckduckgo.mobile.android.vpn.model.VpnStats
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
 import com.jakewharton.threetenabp.AndroidThreeTen
-import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertTrue
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.junit.After
@@ -32,9 +31,9 @@ import org.junit.Rule
 import org.junit.Test
 import org.threeten.bp.OffsetDateTime
 import org.threeten.bp.temporal.ChronoUnit
+
 @ExperimentalCoroutinesApi
 class AppTrackerBlockingStatsRepositoryTest {
-
 
     @get:Rule
     @Suppress("unused")
@@ -47,7 +46,6 @@ class AppTrackerBlockingStatsRepositoryTest {
     @Before
     fun before() {
         AndroidThreeTen.init(InstrumentationRegistry.getInstrumentation().targetContext)
-
         db = Room.inMemoryDatabaseBuilder(InstrumentationRegistry.getInstrumentation().targetContext, VpnDatabase::class.java)
             .allowMainThreadQueries()
             .build()

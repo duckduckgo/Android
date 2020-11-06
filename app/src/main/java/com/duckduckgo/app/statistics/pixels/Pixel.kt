@@ -224,6 +224,8 @@ interface Pixel {
         FIRE_DIALOG_CLEAR_PRESSED("m_fd_p"),
         FIRE_DIALOG_PROMOTED_CANCEL("m_fdp_c"),
         FIRE_DIALOG_CANCEL("m_fd_c"),
+
+        VPN_TESTERS_DAILY_REPORT("m_vpn_internal_report_dp"),
     }
 
     object PixelParameter {
@@ -242,6 +244,11 @@ interface Pixel {
         const val SERP_QUERY_CHANGED = "1"
         const val SERP_QUERY_NOT_CHANGED = "0"
         const val FIRE_BUTTON_STATE = "fb"
+        const val VPN_TIME_RUNNING = "tr"
+        const val VPN_DATA_RECEIVED = "dr"
+        const val VPN_DATA_SENT = "ds"
+        const val VPN_UUID = "id"
+        const val VPN_TRACKERS_BLOCKED = "tb"
     }
 
     object PixelValues {
@@ -272,7 +279,7 @@ class ApiBasedPixel @Inject constructor(
 ) : Pixel {
 
     companion object {
-        const val VPN_PREFIX = "m_vpn"
+        const val VPN_PREFIX = "m_vpn_internal_report"
     }
 
     override fun fire(pixel: PixelName, parameters: Map<String, String>, encodedParameters: Map<String, String>) {
@@ -280,10 +287,6 @@ class ApiBasedPixel @Inject constructor(
     }
 
     override fun fire(pixelName: String, parameters: Map<String, String>, encodedParameters: Map<String, String>) {
-        if (!pixelName.startsWith(VPN_PREFIX)) {
-            Timber.v("Pixel won't be sent, it doesn't come from the VPN")
-            return
-        }
         fireCompletable(pixelName, parameters, encodedParameters)
             .subscribeOn(Schedulers.io())
             .subscribe({
@@ -294,6 +297,11 @@ class ApiBasedPixel @Inject constructor(
     }
 
     override fun fireCompletable(pixelName: String, parameters: Map<String, String>, encodedParameters: Map<String, String>): Completable {
+        // Remove this once the vpn is no longer a private fork
+        if (!pixelName.startsWith(VPN_PREFIX)) {
+            Timber.v("Pixel $pixelName won't be sent, it doesn't come from the VPN")
+            return Completable.complete()
+        }
         val defaultParameters = mapOf(PixelParameter.APP_VERSION to deviceInfo.appVersion)
         val fullParameters = defaultParameters.plus(parameters)
         val atb = statisticsDataStore.atb?.formatWithVariant(variantManager.getVariant()) ?: ""

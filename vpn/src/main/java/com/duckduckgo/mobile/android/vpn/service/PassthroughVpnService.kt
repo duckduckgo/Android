@@ -43,7 +43,6 @@ import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpPacketProcessor
 import com.duckduckgo.mobile.android.vpn.processor.tcp.tracker.VpnTrackerDetector
 import com.duckduckgo.mobile.android.vpn.processor.udp.UdpPacketProcessor
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
-import com.duckduckgo.mobile.android.vpn.stats.VpnStatsReportingScheduler
 import com.duckduckgo.mobile.android.vpn.store.PacketPersister
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
 import com.duckduckgo.mobile.android.vpn.ui.notification.VpnNotificationBuilder
@@ -76,9 +75,6 @@ class PassthroughVpnService : VpnService(), CoroutineScope by MainScope(), Netwo
 
     @Inject
     lateinit var trackerDetector: VpnTrackerDetector
-
-    @Inject
-    lateinit var vpnStatsReportingScheduler: VpnStatsReportingScheduler
 
     @Inject
     lateinit var vpnDatabase: VpnDatabase
@@ -265,10 +261,7 @@ class PassthroughVpnService : VpnService(), CoroutineScope by MainScope(), Netwo
     private fun stopVpn() {
         Timber.i("Stopping VPN")
         notifyVpnStopped()
-
-        if (trackersBlocked.hasActiveObservers()) {
-            trackersBlocked.removeObserver(trackersBlockedObserver)
-        }
+        safelyRemoveTrackersObserver()
 
         tickerJob?.cancel()
         queues.clearAll()
@@ -280,6 +273,14 @@ class PassthroughVpnService : VpnService(), CoroutineScope by MainScope(), Netwo
 
         stopForeground(true)
         stopSelf()
+    }
+
+    private fun safelyRemoveTrackersObserver(){
+        if (::trackersBlocked.isInitialized){
+            if (trackersBlocked.hasActiveObservers()) {
+                trackersBlocked.removeObserver(trackersBlockedObserver)
+            }
+        }
     }
 
     private fun VpnService.Builder.configureMeteredConnection() {

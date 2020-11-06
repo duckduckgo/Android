@@ -68,7 +68,7 @@ class VpnNotificationBuilder {
                 val timeDifference = lastTrackerBlocked.tracker.timestamp.until(OffsetDateTime.now(), ChronoUnit.MILLIS)
                 val timeRunning = TimePassed.fromMilliseconds(timeDifference)
                 "Today, so far we blocked ${trackersBlocked.size} companies from tracking you, " +
-                    "the last one was ${lastTrackerBlocked.trackerCompany.company} $timeRunning ago"
+                    "the last one was ${lastTrackerBlocked.trackerCompany.company}"
             }
         }
 
