@@ -28,7 +28,6 @@ import com.duckduckgo.app.statistics.store.PixelDao
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import io.reactivex.Completable
 import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import timber.log.Timber
 import javax.inject.Inject
@@ -41,39 +40,39 @@ class PixelSender @Inject constructor(
     private val deviceInfo: DeviceInfo
 ) : LifecycleObserver {
 
-    private var parentDisposable: Disposable? = null
-    private val sendPixelsDisposable = CompositeDisposable()
+    private val compositeDisposable = CompositeDisposable()
 
     @UiThread
     @OnLifecycleEvent(Lifecycle.Event.ON_START)
     fun onAppForegrounded() {
-        parentDisposable = pixelDao.pixelsObs()
-            .doOnEach { sendPixelsDisposable.clear() }
-            .map {
-                Timber.i("Pixel sending: $it")
-                it.forEach { pixelEntity ->
-                    sendPixelToRemote(pixelEntity)
-                }
-            }.subscribe()
-    }
-
-    private fun sendPixelToRemote(pixelEntity: PixelEntity) {
-        sendPixelsDisposable.add(
-            sendPixel(pixelEntity)
-                .subscribeOn(Schedulers.io())
-                .subscribe({
-                    pixelDao.delete(pixelEntity)
-                    Timber.v("Pixel sent: ${pixelEntity.id} ${pixelEntity.pixelName} with params: temp temp)")
-                }, {
-                    Timber.w(it, "Pixel failed: ${pixelEntity.id} ${pixelEntity.pixelName} with params:  temp temp)")
-                })
-        )
+        compositeDisposable.add(pixelDao.unsentPixels()
+            .flatMapIterable { it }
+            .switchMapCompletable(this::sendAndDeletePixel)
+            .subscribeOn(Schedulers.io())
+            .subscribe(
+                { Timber.v("Pixel finished sync") },
+                { Timber.w(it, "Pixel failed to sync") }
+            ))
     }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
     fun onAppBackgrounded() {
-        sendPixelsDisposable.clear()
-        parentDisposable?.dispose()
+        compositeDisposable.clear()
+    }
+
+    private fun sendAndDeletePixel(pixel: PixelEntity): Completable {
+        return sendPixel(pixel)
+            .andThen(deletePixel(pixel))
+            .andThen {
+                with(pixel) {
+                    Timber.i("Pixel sent: $id $pixelName with params: $additionalQueryParams $encodedQueryParams")
+                }
+            }
+            .doOnError {
+                with(pixel) {
+                    Timber.i("Pixel failed: $id $pixelName with params: $additionalQueryParams $encodedQueryParams")
+                }
+            }.onErrorComplete()
     }
 
     fun sendPixel(pixelName: String, parameters: Map<String, String> = emptyMap(), encodedParameters: Map<String, String> = emptyMap()): Completable {
@@ -101,6 +100,12 @@ class PixelSender @Inject constructor(
                 addDeviceParametersTo(this.additionalQueryParams),
                 this.encodedQueryParams
             )
+        }
+    }
+
+    private fun deletePixel(pixel: PixelEntity): Completable {
+        return Completable.fromAction {
+            pixelDao.delete(pixel)
         }
     }
 
