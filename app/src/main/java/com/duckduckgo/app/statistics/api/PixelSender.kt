@@ -16,7 +16,6 @@
 
 package com.duckduckgo.app.statistics.api
 
-import androidx.annotation.UiThread
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.OnLifecycleEvent
@@ -47,7 +46,6 @@ class RxPixelSender @Inject constructor(
 
     private val compositeDisposable = CompositeDisposable()
 
-    @UiThread
     @OnLifecycleEvent(Lifecycle.Event.ON_START)
     fun onAppForegrounded() {
         compositeDisposable.add(pixelDao.unsentPixels()
@@ -60,6 +58,7 @@ class RxPixelSender @Inject constructor(
             ))
     }
 
+    @Suppress("unused")
     @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
     fun onAppBackgrounded() {
         compositeDisposable.clear()
