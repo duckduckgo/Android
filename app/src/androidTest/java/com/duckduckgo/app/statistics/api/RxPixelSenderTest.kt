@@ -150,20 +150,21 @@ class RxPixelSenderTest {
         givenAppVersion("1.0.0")
         val params = mapOf("param1" to "value1", "param2" to "value2")
 
-        testee.enqueuePixel(PRIVACY_DASHBOARD_OPENED.pixelName, params, emptyMap())
+        testee.enqueuePixel(PRIVACY_DASHBOARD_OPENED.pixelName, params, emptyMap()).test()
 
-        pixelDao.unsentPixels().subscribe {
-            assertEquals(1, it.size)
-            assertPixelEntity(
-                PixelEntity(
-                    pixelName = "mp",
-                    atb = "atbvariant",
-                    additionalQueryParams = params + mapOf("appVersion" to "1.0.0"),
-                    encodedQueryParams = emptyMap()
-                ),
-                it.first()
-            )
-        }
+        val testObserver = pixelDao.unsentPixels().test()
+        val pixels = testObserver.assertNoErrors().values().last()
+
+        assertEquals(1, pixels.size)
+        assertPixelEntity(
+            PixelEntity(
+                pixelName = "mp",
+                atb = "atbvariant",
+                additionalQueryParams = params + mapOf("appVersion" to "1.0.0"),
+                encodedQueryParams = emptyMap()
+            ),
+            pixels.first()
+        )
     }
 
     @Test
@@ -175,21 +176,20 @@ class RxPixelSenderTest {
 
         testee.enqueuePixel(PRIVACY_DASHBOARD_OPENED.pixelName, emptyMap(), emptyMap()).test()
 
-        pixelDao.unsentPixels().subscribe {
-            assertEquals(1, it.size)
-            assertPixelEntity(
-                PixelEntity(
-                    pixelName = "mp",
-                    atb = "atbvariant",
-                    additionalQueryParams = mapOf("appVersion" to "1.0.0"),
-                    encodedQueryParams = emptyMap()
-                ),
-                it.first()
-            )
-        }
+        val pixels = pixelDao.unsentPixels().test().assertNoErrors().values().last()
+        assertEquals(1, pixels.size)
+        assertPixelEntity(
+            PixelEntity(
+                pixelName = "mp",
+                atb = "atbvariant",
+                additionalQueryParams = mapOf("appVersion" to "1.0.0"),
+                encodedQueryParams = emptyMap()
+            ),
+            pixels.first()
+        )
     }
 
-    /*@Test
+    @Test
     fun whenAppForegroundedThenPixelSent() {
         givenPixelApiSucceeds()
         val pixelEntity = PixelEntity(
@@ -206,7 +206,7 @@ class RxPixelSenderTest {
         verify(api).fire(
             pixelEntity.pixelName, "phone", pixelEntity.atb, pixelEntity.additionalQueryParams, pixelEntity.encodedQueryParams
         )
-    }*/
+    }
 
     @Test
     fun whenAppForegroundedAndPixelSentThenPixelRemoved() {
@@ -222,9 +222,8 @@ class RxPixelSenderTest {
 
         testee.onAppForegrounded()
 
-        pixelDao.unsentPixels().subscribe {
-            assertTrue(it.isEmpty())
-        }
+        val pixels = pixelDao.unsentPixels().test().assertNoErrors().values().last()
+        assertTrue(pixels.isEmpty())
     }
 
     @Test
@@ -241,9 +240,9 @@ class RxPixelSenderTest {
 
         testee.onAppForegrounded()
 
-        pixelDao.unsentPixels().subscribe {
-            assertTrue(it.isNotEmpty())
-        }
+        val testObserver = pixelDao.unsentPixels().test()
+        val pixels = testObserver.assertNoErrors().values().last()
+        assertTrue(pixels.isNotEmpty())
     }
 
     @Test
@@ -302,7 +301,7 @@ class RxPixelSenderTest {
     }
 
     private fun PixelDao.insert(pixel: PixelEntity, times: Int) {
-        for (x in 0..times) {
+        for (x in 1..times) {
             this.insert(pixel)
         }
     }

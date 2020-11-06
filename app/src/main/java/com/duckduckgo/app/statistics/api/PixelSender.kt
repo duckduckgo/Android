@@ -88,7 +88,7 @@ class RxPixelSender @Inject constructor(
             val pixelEntity = PixelEntity(
                 pixelName = pixelName,
                 atb = getAtbInfo(),
-                additionalQueryParams = parameters,
+                additionalQueryParams = addDeviceParametersTo(parameters),
                 encodedQueryParams = encodedParameters
             )
             pixelDao.insert(pixelEntity)
@@ -101,7 +101,7 @@ class RxPixelSender @Inject constructor(
                 this.pixelName,
                 getDeviceFactor(),
                 this.atb,
-                addDeviceParametersTo(this.additionalQueryParams),
+                this.additionalQueryParams,
                 this.encodedQueryParams
             )
         }
