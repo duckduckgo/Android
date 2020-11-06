@@ -32,13 +32,18 @@ import io.reactivex.schedulers.Schedulers
 import timber.log.Timber
 import javax.inject.Inject
 
-class PixelSender @Inject constructor(
+interface PixelSender : LifecycleObserver {
+    fun sendPixel(pixelName: String, parameters: Map<String, String>, encodedParameters: Map<String, String>): Completable
+    fun enqueuePixel(pixelName: String, parameters: Map<String, String>, encodedParameters: Map<String, String>): Completable
+}
+
+class RxPixelSender @Inject constructor(
     private val api: PixelService,
     private val pixelDao: PixelDao,
     private val statisticsDataStore: StatisticsDataStore,
     private val variantManager: VariantManager,
     private val deviceInfo: DeviceInfo
-) : LifecycleObserver {
+) : PixelSender {
 
     private val compositeDisposable = CompositeDisposable()
 
@@ -75,11 +80,11 @@ class PixelSender @Inject constructor(
             }.onErrorComplete()
     }
 
-    fun sendPixel(pixelName: String, parameters: Map<String, String> = emptyMap(), encodedParameters: Map<String, String> = emptyMap()): Completable {
+    override fun sendPixel(pixelName: String, parameters: Map<String, String>, encodedParameters: Map<String, String>): Completable {
         return api.fire(pixelName, getDeviceFactor(), getAtbInfo(), addDeviceParametersTo(parameters), encodedParameters)
     }
 
-    fun enqueuePixel(pixelName: String, parameters: Map<String, String>, encodedParameters: Map<String, String>): Completable {
+    override fun enqueuePixel(pixelName: String, parameters: Map<String, String>, encodedParameters: Map<String, String>): Completable {
         return Completable.fromCallable {
             val pixelEntity = PixelEntity(
                 pixelName = pixelName,

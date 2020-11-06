@@ -69,7 +69,7 @@ class StatisticsModule {
         deviceInfo: DeviceInfo,
         pixelDao: PixelDao
     ): PixelSender =
-        PixelSender(pixelService, pixelDao, statisticsDataStore, variantManager, deviceInfo)
+        RxPixelSender(pixelService, pixelDao, statisticsDataStore, variantManager, deviceInfo)
 
     @Provides
     fun offlinePixelSender(

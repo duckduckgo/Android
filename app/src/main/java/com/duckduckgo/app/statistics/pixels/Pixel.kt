@@ -257,8 +257,8 @@ interface Pixel {
 
     fun fire(pixel: PixelName, parameters: Map<String, String> = emptyMap(), encodedParameters: Map<String, String> = emptyMap())
     fun fire(pixelName: String, parameters: Map<String, String> = emptyMap(), encodedParameters: Map<String, String> = emptyMap())
-    fun ensureFire(pixel: PixelName, parameters: Map<String, String> = emptyMap(), encodedParameters: Map<String, String> = emptyMap())
-    fun ensureFire(pixelName: String, parameters: Map<String, String> = emptyMap(), encodedParameters: Map<String, String> = emptyMap())
+    fun enqueueFire(pixel: PixelName, parameters: Map<String, String> = emptyMap(), encodedParameters: Map<String, String> = emptyMap())
+    fun enqueueFire(pixelName: String, parameters: Map<String, String> = emptyMap(), encodedParameters: Map<String, String> = emptyMap())
 }
 
 class RxBasedPixel @Inject constructor(
@@ -280,12 +280,12 @@ class RxBasedPixel @Inject constructor(
             })
     }
 
-    override fun ensureFire(pixel: PixelName, parameters: Map<String, String>, encodedParameters: Map<String, String>) {
-        ensureFire(pixel.pixelName, parameters, encodedParameters)
+    override fun enqueueFire(pixel: PixelName, parameters: Map<String, String>, encodedParameters: Map<String, String>) {
+        enqueueFire(pixel.pixelName, parameters, encodedParameters)
     }
 
     @SuppressLint("CheckResult")
-    override fun ensureFire(pixelName: String, parameters: Map<String, String>, encodedParameters: Map<String, String>) {
+    override fun enqueueFire(pixelName: String, parameters: Map<String, String>, encodedParameters: Map<String, String>) {
         pixelSender.enqueuePixel(pixelName, parameters, encodedParameters)
             .subscribeOn(Schedulers.io())
             .subscribe({
