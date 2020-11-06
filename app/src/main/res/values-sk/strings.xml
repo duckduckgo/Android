@@ -300,7 +300,7 @@
     <string name="privacyProtectionNotificationTrackerDescription">Počas používania DuckDuckGo ste si údaje chránili zablokovaním %1$d sledovacích zariadení.</string>
     <string name="privacyProtectionNotificationBothDescription">Počas používania DuckDuckGo ste si údaje chránili zablokovaním %1$d sledovacích zariadení a zabezpečením %2$d nešifrovaných pripojení.</string>
     <string name="privacyProtectionNotificationLaunchButton">Pokračovať v prehliadaní</string>
-    
+
     <!-- Authentication -->
     <string name="authenticationDialogTitle">Prihlásiť sa</string>
     <string name="authenticationDialogMessage">%1$s vyžaduje používateľské meno a heslo.</string>

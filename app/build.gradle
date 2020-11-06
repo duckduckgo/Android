@@ -4,7 +4,7 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
 apply from: '../versioning.gradle'
-apply from: "$rootDir/ktlint.gradle"
+apply from: "$rootDir/spotless.gradle"
 
 ext {
     USE_ORCHESTRATOR = project.hasProperty('orchestrator') ? project.property('orchestrator') : false
@@ -216,13 +216,10 @@ dependencies {
     androidTestImplementation "androidx.test:runner:$testRunner"
     androidTestImplementation "androidx.test:rules:$testRunner"
     androidTestUtil "androidx.test:orchestrator:$testRunner"
-    androidTestImplementation ("org.mockito:mockito-android:$mockito") { // Fixes https://github.com/mockito/mockito/issues/2007
-        exclude group: "org.mockito", module: "mockito-core"
+    androidTestImplementation ("org.mockito:mockito-android:$mockito") {
+        exclude group: 'org.mockito', module: 'mockito-core' // Fixes https://github.com/mockito/mockito/issues/2007
     }
     androidTestImplementation "com.squareup.okhttp3:mockwebserver:$okHttp"
     androidTestImplementation "com.nhaarman.mockitokotlin2:mockito-kotlin:$mockitoKotlin"
     androidTestImplementation "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
-
-    kapt "com.android.tools.build.jetifier:jetifier-core:$jetifier"
-    annotationProcessor "com.android.tools.build.jetifier:jetifier-core:$jetifier"
 }
