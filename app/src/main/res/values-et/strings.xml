@@ -292,7 +292,7 @@
     <string name="privacyProtectionNotificationTrackerDescription">Kaitsesite oma andmeid, blokeerides DuckDuckGo kasutamise ajal %1$d jälitajat.</string>
     <string name="privacyProtectionNotificationBothDescription">Kaitsesite oma andmeid, blokeerides DuckDuckGo kasutamise ajal %1$d jälitaja ja turvates %2$d krüptimata ühendust.</string>
     <string name="privacyProtectionNotificationLaunchButton">Jätka sirvimist</string>
-    
+
     <!-- Authentication -->
     <string name="authenticationDialogTitle">Sisselogimine</string>
     <string name="authenticationDialogMessage">%1$s nõuab kasutajanime ja parooli.</string>
