@@ -17,6 +17,7 @@
 package com.duckduckgo.app.di
 
 import android.content.Context
+import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.global.device.ContextDeviceInfo
 import com.duckduckgo.app.global.device.DeviceInfo
 import com.duckduckgo.app.global.exception.UncaughtExceptionRepository
@@ -24,9 +25,10 @@ import com.duckduckgo.app.referral.AppInstallationReferrerStateListener
 import com.duckduckgo.app.statistics.AtbInitializer
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.api.*
-import com.duckduckgo.app.statistics.pixels.ApiBasedPixel
+import com.duckduckgo.app.statistics.pixels.RxBasedPixel
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.store.OfflinePixelCountDataStore
+import com.duckduckgo.app.statistics.store.PendingPixelDao
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import dagger.Module
 import dagger.Provides
@@ -54,15 +56,27 @@ class StatisticsModule {
     }
 
     @Provides
-    fun pixel(pixelService: PixelService, statisticsDataStore: StatisticsDataStore, variantManager: VariantManager, deviceInfo: DeviceInfo): Pixel =
-        ApiBasedPixel(pixelService, statisticsDataStore, variantManager, deviceInfo)
+    fun pixel(
+        pixelSender: PixelSender
+    ): Pixel =
+        RxBasedPixel(pixelSender)
+
+    @Provides
+    fun pixelSender(
+        pixelService: PixelService,
+        statisticsDataStore: StatisticsDataStore,
+        variantManager: VariantManager,
+        deviceInfo: DeviceInfo,
+        pendingPixelDao: PendingPixelDao
+    ): PixelSender =
+        RxPixelSender(pixelService, pendingPixelDao, statisticsDataStore, variantManager, deviceInfo)
 
     @Provides
     fun offlinePixelSender(
         offlinePixelCountDataStore: OfflinePixelCountDataStore,
         uncaughtExceptionRepository: UncaughtExceptionRepository,
-        pixel: Pixel
-    ): OfflinePixelSender = OfflinePixelSender(offlinePixelCountDataStore, uncaughtExceptionRepository, pixel)
+        pixelSender: PixelSender
+    ): OfflinePixelSender = OfflinePixelSender(offlinePixelCountDataStore, uncaughtExceptionRepository, pixelSender)
 
     @Provides
     fun deviceInfo(context: Context): DeviceInfo = ContextDeviceInfo(context)
@@ -75,5 +89,11 @@ class StatisticsModule {
         appReferrerStateListener: AppInstallationReferrerStateListener
     ): AtbInitializer {
         return AtbInitializer(statisticsDataStore, statisticsUpdater, appReferrerStateListener)
+    }
+
+    @Singleton
+    @Provides
+    fun pixelDao(database: AppDatabase): PendingPixelDao {
+        return database.pixelDao()
     }
 }
