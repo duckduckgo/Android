@@ -27,7 +27,7 @@ import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.model.Atb
 import com.duckduckgo.app.statistics.model.PixelEntity
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.PRIVACY_DASHBOARD_OPENED
-import com.duckduckgo.app.statistics.store.PixelDao
+import com.duckduckgo.app.statistics.store.PendingPixelDao
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.nhaarman.mockitokotlin2.*
 import io.reactivex.Completable
@@ -63,7 +63,7 @@ class RxPixelSenderTest {
     val mockDeviceInfo: DeviceInfo = mock()
 
     private lateinit var db: AppDatabase
-    private lateinit var pixelDao: PixelDao
+    private lateinit var pendingPixelDao: PendingPixelDao
     private lateinit var testee: RxPixelSender
 
     @Before
@@ -71,9 +71,9 @@ class RxPixelSenderTest {
         db = Room.inMemoryDatabaseBuilder(InstrumentationRegistry.getInstrumentation().targetContext, AppDatabase::class.java)
             .allowMainThreadQueries()
             .build()
-        pixelDao = db.pixelDao()
+        pendingPixelDao = db.pixelDao()
 
-        testee = RxPixelSender(api, pixelDao, mockStatisticsDataStore, mockVariantManager, mockDeviceInfo)
+        testee = RxPixelSender(api, pendingPixelDao, mockStatisticsDataStore, mockVariantManager, mockDeviceInfo)
     }
 
     @After
@@ -152,7 +152,7 @@ class RxPixelSenderTest {
 
         testee.enqueuePixel(PRIVACY_DASHBOARD_OPENED.pixelName, params, emptyMap()).test()
 
-        val testObserver = pixelDao.unsentPixels().test()
+        val testObserver = pendingPixelDao.pixels().test()
         val pixels = testObserver.assertNoErrors().values().last()
 
         assertEquals(1, pixels.size)
@@ -176,7 +176,7 @@ class RxPixelSenderTest {
 
         testee.enqueuePixel(PRIVACY_DASHBOARD_OPENED.pixelName, emptyMap(), emptyMap()).test()
 
-        val pixels = pixelDao.unsentPixels().test().assertNoErrors().values().last()
+        val pixels = pendingPixelDao.pixels().test().assertNoErrors().values().last()
         assertEquals(1, pixels.size)
         assertPixelEntity(
             PixelEntity(
@@ -198,7 +198,7 @@ class RxPixelSenderTest {
             additionalQueryParams = mapOf("appVersion" to "1.0.0"),
             encodedQueryParams = emptyMap()
         )
-        pixelDao.insert(pixelEntity)
+        pendingPixelDao.insert(pixelEntity)
         givenFormFactor(DeviceInfo.FormFactor.PHONE)
 
         testee.onAppForegrounded()
@@ -217,12 +217,12 @@ class RxPixelSenderTest {
             additionalQueryParams = mapOf("appVersion" to "1.0.0"),
             encodedQueryParams = emptyMap()
         )
-        pixelDao.insert(pixelEntity)
+        pendingPixelDao.insert(pixelEntity)
         givenFormFactor(DeviceInfo.FormFactor.PHONE)
 
         testee.onAppForegrounded()
 
-        val pixels = pixelDao.unsentPixels().test().assertNoErrors().values().last()
+        val pixels = pendingPixelDao.pixels().test().assertNoErrors().values().last()
         assertTrue(pixels.isEmpty())
     }
 
@@ -235,12 +235,12 @@ class RxPixelSenderTest {
             additionalQueryParams = mapOf("appVersion" to "1.0.0"),
             encodedQueryParams = emptyMap()
         )
-        pixelDao.insert(pixelEntity)
+        pendingPixelDao.insert(pixelEntity)
         givenFormFactor(DeviceInfo.FormFactor.PHONE)
 
         testee.onAppForegrounded()
 
-        val testObserver = pixelDao.unsentPixels().test()
+        val testObserver = pendingPixelDao.pixels().test()
         val pixels = testObserver.assertNoErrors().values().last()
         assertTrue(pixels.isNotEmpty())
     }
@@ -254,7 +254,7 @@ class RxPixelSenderTest {
             additionalQueryParams = mapOf("appVersion" to "1.0.0"),
             encodedQueryParams = emptyMap()
         )
-        pixelDao.insert(pixelEntity, times = 5)
+        pendingPixelDao.insert(pixelEntity, times = 5)
         givenFormFactor(DeviceInfo.FormFactor.PHONE)
 
         testee.onAppForegrounded()
@@ -300,7 +300,7 @@ class RxPixelSenderTest {
         whenever(api.fire(any(), any(), any(), anyOrNull(), any(), any())).thenReturn(Completable.error(TimeoutException()))
     }
 
-    private fun PixelDao.insert(pixel: PixelEntity, times: Int) {
+    private fun PendingPixelDao.insert(pixel: PixelEntity, times: Int) {
         for (x in 1..times) {
             this.insert(pixel)
         }

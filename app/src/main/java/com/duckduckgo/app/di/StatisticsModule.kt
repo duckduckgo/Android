@@ -28,7 +28,7 @@ import com.duckduckgo.app.statistics.api.*
 import com.duckduckgo.app.statistics.pixels.RxBasedPixel
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.store.OfflinePixelCountDataStore
-import com.duckduckgo.app.statistics.store.PixelDao
+import com.duckduckgo.app.statistics.store.PendingPixelDao
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import dagger.Module
 import dagger.Provides
@@ -67,9 +67,9 @@ class StatisticsModule {
         statisticsDataStore: StatisticsDataStore,
         variantManager: VariantManager,
         deviceInfo: DeviceInfo,
-        pixelDao: PixelDao
+        pendingPixelDao: PendingPixelDao
     ): PixelSender =
-        RxPixelSender(pixelService, pixelDao, statisticsDataStore, variantManager, deviceInfo)
+        RxPixelSender(pixelService, pendingPixelDao, statisticsDataStore, variantManager, deviceInfo)
 
     @Provides
     fun offlinePixelSender(
@@ -93,7 +93,7 @@ class StatisticsModule {
 
     @Singleton
     @Provides
-    fun pixelDao(database: AppDatabase): PixelDao {
+    fun pixelDao(database: AppDatabase): PendingPixelDao {
         return database.pixelDao()
     }
 }

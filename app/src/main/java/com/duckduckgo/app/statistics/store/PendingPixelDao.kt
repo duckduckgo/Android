@@ -21,10 +21,10 @@ import com.duckduckgo.app.statistics.model.PixelEntity
 import io.reactivex.Observable
 
 @Dao
-interface PixelDao {
+interface PendingPixelDao {
 
     @Query("select * from pixel_store")
-    fun unsentPixels(): Observable<List<PixelEntity>>
+    fun pixels(): Observable<List<PixelEntity>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insert(pixel: PixelEntity): Long

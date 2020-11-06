@@ -51,7 +51,7 @@ import com.duckduckgo.app.privacy.model.UserWhitelistedDomain
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.model.PixelEntity
 import com.duckduckgo.app.statistics.model.QueryParamsTypeConverter
-import com.duckduckgo.app.statistics.store.PixelDao
+import com.duckduckgo.app.statistics.store.PendingPixelDao
 import com.duckduckgo.app.survey.db.SurveyDao
 import com.duckduckgo.app.survey.model.Survey
 import com.duckduckgo.app.tabs.db.TabsDao
@@ -134,7 +134,7 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun fireproofWebsiteDao(): FireproofWebsiteDao
     abstract fun locationPermissionsDao(): LocationPermissionsDao
     abstract fun userEventsDao(): UserEventsDao
-    abstract fun pixelDao(): PixelDao
+    abstract fun pixelDao(): PendingPixelDao
 }
 
 @Suppress("PropertyName")

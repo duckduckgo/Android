@@ -23,7 +23,7 @@ import com.duckduckgo.app.global.device.DeviceInfo
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.model.PixelEntity
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.app.statistics.store.PixelDao
+import com.duckduckgo.app.statistics.store.PendingPixelDao
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import io.reactivex.Completable
 import io.reactivex.disposables.CompositeDisposable
@@ -38,7 +38,7 @@ interface PixelSender : LifecycleObserver {
 
 class RxPixelSender @Inject constructor(
     private val api: PixelService,
-    private val pixelDao: PixelDao,
+    private val pendingPixelDao: PendingPixelDao,
     private val statisticsDataStore: StatisticsDataStore,
     private val variantManager: VariantManager,
     private val deviceInfo: DeviceInfo
@@ -48,7 +48,7 @@ class RxPixelSender @Inject constructor(
 
     @OnLifecycleEvent(Lifecycle.Event.ON_START)
     fun onAppForegrounded() {
-        compositeDisposable.add(pixelDao.unsentPixels()
+        compositeDisposable.add(pendingPixelDao.pixels()
             .flatMapIterable { it }
             .switchMapCompletable(this::sendAndDeletePixel)
             .subscribeOn(Schedulers.io())
@@ -91,7 +91,7 @@ class RxPixelSender @Inject constructor(
                 additionalQueryParams = addDeviceParametersTo(parameters),
                 encodedQueryParams = encodedParameters
             )
-            pixelDao.insert(pixelEntity)
+            pendingPixelDao.insert(pixelEntity)
         }
     }
 
@@ -109,7 +109,7 @@ class RxPixelSender @Inject constructor(
 
     private fun deletePixel(pixel: PixelEntity): Completable {
         return Completable.fromAction {
-            pixelDao.delete(pixel)
+            pendingPixelDao.delete(pixel)
         }
     }
 
