@@ -127,8 +127,8 @@ ext {
     timber = "4.7.1"
     rxRelay = "2.0.0"
     leakCanary = "2.0"
-    mockito = "2.18.3"
-    mockitoKotlin = "2.0.0"
+    mockito = "3.6.0"
+    mockitoKotlin = "2.2.0"
     commonsMath = "3.6.1"
 }
 
@@ -213,18 +213,15 @@ dependencies {
     implementation("com.android.installreferrer:installreferrer:$referrerLibrary")
 
     // Testing dependencies
-    testImplementation "org.mockito:mockito-core:$mockito"
-    testImplementation "com.nhaarman.mockitokotlin2:mockito-kotlin:$mockitoKotlin"
     testImplementation "junit:junit:$junit"
 
     androidTestImplementation "androidx.test:runner:$testRunner"
     androidTestImplementation "androidx.test:rules:$testRunner"
     androidTestUtil "androidx.test:orchestrator:$testRunner"
-    androidTestImplementation "org.mockito:mockito-android:$mockito"
+    androidTestImplementation ("org.mockito:mockito-android:$mockito") {
+        exclude group: 'org.mockito', module: 'mockito-core' // Fixes https://github.com/mockito/mockito/issues/2007
+    }
     androidTestImplementation "com.squareup.okhttp3:mockwebserver:$okHttp"
     androidTestImplementation "com.nhaarman.mockitokotlin2:mockito-kotlin:$mockitoKotlin"
     androidTestImplementation "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
-
-    kapt "com.android.tools.build.jetifier:jetifier-core:$jetifier"
-    annotationProcessor "com.android.tools.build.jetifier:jetifier-core:$jetifier"
 }
