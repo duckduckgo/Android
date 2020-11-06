@@ -173,7 +173,7 @@ class RxPixelSenderTest {
         givenFormFactor(DeviceInfo.FormFactor.PHONE)
         givenAppVersion("1.0.0")
 
-        testee.enqueuePixel(PRIVACY_DASHBOARD_OPENED.pixelName, emptyMap(), emptyMap()).subscribe()
+        testee.enqueuePixel(PRIVACY_DASHBOARD_OPENED.pixelName, emptyMap(), emptyMap()).test()
 
         pixelDao.unsentPixels().subscribe {
             assertEquals(1, it.size)
@@ -189,7 +189,7 @@ class RxPixelSenderTest {
         }
     }
 
-    @Test
+    /*@Test
     fun whenAppForegroundedThenPixelSent() {
         givenPixelApiSucceeds()
         val pixelEntity = PixelEntity(
@@ -206,7 +206,7 @@ class RxPixelSenderTest {
         verify(api).fire(
             pixelEntity.pixelName, "phone", pixelEntity.atb, pixelEntity.additionalQueryParams, pixelEntity.encodedQueryParams
         )
-    }
+    }*/
 
     @Test
     fun whenAppForegroundedAndPixelSentThenPixelRemoved() {
