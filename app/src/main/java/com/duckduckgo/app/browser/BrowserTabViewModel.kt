@@ -503,11 +503,6 @@ class BrowserTabViewModel(
 
         val verticalParameter = extractVerticalParameter(url)
         val urlToNavigate = queryUrlConverter.convertQueryToUrl(trimmedInput, verticalParameter)
-        val omnibarText = if (variantManager.getVariant().hasFeature(VariantManager.VariantFeature.SerpHeaderQueryReplacement)) {
-            urlToNavigate
-        } else {
-            trimmedInput
-        }
 
         val type = specialUrlDetector.determineType(trimmedInput)
         if (type is IntentType) {
@@ -517,13 +512,13 @@ class BrowserTabViewModel(
                 command.value = ResetHistory
             }
 
-            fireQueryChangedPixel(omnibarText)
+            fireQueryChangedPixel(trimmedInput)
             command.value = Navigate(urlToNavigate, getUrlHeaders())
         }
 
         globalLayoutState.value = Browser(isNewTabState = false)
         findInPageViewState.value = FindInPageViewState(visible = false, canFindInPage = true)
-        omnibarViewState.value = currentOmnibarViewState().copy(omnibarText = omnibarText, shouldMoveCaretToEnd = false)
+        omnibarViewState.value = currentOmnibarViewState().copy(omnibarText = trimmedInput, shouldMoveCaretToEnd = false)
         browserViewState.value = currentBrowserViewState().copy(browserShowing = true, showClearButton = false)
         autoCompleteViewState.value = AutoCompleteViewState(false)
     }
@@ -547,10 +542,6 @@ class BrowserTabViewModel(
     }
 
     private fun fireQueryChangedPixel(omnibarText: String) {
-        if (!variantManager.getVariant().hasFeature(VariantManager.VariantFeature.SerpHeaderRemoval)) {
-            return
-        }
-
         val oldQuery = currentOmnibarViewState().omnibarText.toUri()
         val newQuery = omnibarText.toUri()
 
@@ -825,12 +816,7 @@ class BrowserTabViewModel(
     }
 
     private fun shouldShowDaxIcon(currentUrl: String?, showPrivacyGrade: Boolean): Boolean {
-        if (!variantManager.getVariant().hasFeature(VariantManager.VariantFeature.SerpHeaderRemoval)) {
-            return false
-        }
-
         val url = currentUrl ?: return false
-
         return showPrivacyGrade && duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(url)
     }
 
@@ -890,10 +876,6 @@ class BrowserTabViewModel(
 
     private fun omnibarTextForUrl(url: String?): String {
         if (url == null) return ""
-
-        if (variantManager.getVariant().hasFeature(VariantManager.VariantFeature.SerpHeaderQueryReplacement)) {
-            return url
-        }
 
         return if (duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(url)) {
             duckDuckGoUrlDetector.extractQuery(url) ?: url
