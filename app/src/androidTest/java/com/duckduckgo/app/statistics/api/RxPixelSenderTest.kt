@@ -173,7 +173,7 @@ class RxPixelSenderTest {
         givenFormFactor(DeviceInfo.FormFactor.PHONE)
         givenAppVersion("1.0.0")
 
-        testee.enqueuePixel(PRIVACY_DASHBOARD_OPENED.pixelName, emptyMap(), emptyMap())
+        testee.enqueuePixel(PRIVACY_DASHBOARD_OPENED.pixelName, emptyMap(), emptyMap()).subscribe()
 
         pixelDao.unsentPixels().subscribe {
             assertEquals(1, it.size)
