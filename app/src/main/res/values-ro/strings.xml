@@ -296,7 +296,7 @@
     <string name="privacyProtectionNotificationTrackerDescription">V-ați protejat datele, blocând %1$d cookie-uri de urmărire, în timpul utilizării DuckDuckGo.</string>
     <string name="privacyProtectionNotificationBothDescription">V-ați protejat datele blocând %1$d cookie-uri de urmărire și securizând %2$d conexiuni necriptate în timpul utilizării DuckDuckGo.</string>
     <string name="privacyProtectionNotificationLaunchButton">Reluare navigare</string>
-    
+
     <!-- Authentication -->
     <string name="authenticationDialogTitle">Autentificare</string>
     <string name="authenticationDialogMessage">%1$s necesită un nume de utilizator și o parolă.</string>

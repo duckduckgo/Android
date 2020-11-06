@@ -292,7 +292,7 @@
     <string name="privacyProtectionNotificationTrackerDescription">Has protegido tus datos bloqueando %1$d rastreadores mientras usabas DuckDuckGo.</string>
     <string name="privacyProtectionNotificationBothDescription">Tus datos están seguros gracias a que has bloqueado %1$d rastreadores y protegido %2$d conexiones no cifradas mientras usabas DuckDuckGo.</string>
     <string name="privacyProtectionNotificationLaunchButton">Continuar navegando</string>
-    
+
     <!-- Authentication -->
     <string name="authenticationDialogTitle">Iniciar sesión</string>
     <string name="authenticationDialogMessage">%1$s requiere un nombre de usuario y contraseña.</string>
