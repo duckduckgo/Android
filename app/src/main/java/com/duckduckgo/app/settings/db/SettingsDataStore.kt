@@ -174,8 +174,8 @@ class SettingsSharedPreferences @Inject constructor(private val context: Context
     }
 
     private fun selectedFireAnimationSavedValue(): FireAnimation {
-        val selectedFireAnimationValue = preferences.getString(KEY_SELECTED_FIRE_ANIMATION, null)
-        return fireAnimationMapper.fireAnimationFrom(selectedFireAnimationValue, FireAnimation.HeroFire)
+        val selectedFireAnimationSavedValue = preferences.getString(KEY_SELECTED_FIRE_ANIMATION, null)
+        return fireAnimationMapper.fireAnimationFrom(selectedFireAnimationSavedValue, FireAnimation.HeroFire)
     }
 
     private val preferences: SharedPreferences
@@ -210,24 +210,24 @@ class SettingsSharedPreferences @Inject constructor(private val context: Context
 
     private class FireAnimationPrefsMapper {
         companion object {
-            private const val HERO_FIRE = "HERO_FIRE"
-            private const val HERO_WATER = "HERO_WATER"
-            private const val HERO_ABSTRACT = "HERO_ABSTRACT"
-            private const val NONE = "NONE"
+            private const val HERO_FIRE_PREFS_VALUE = "HERO_FIRE"
+            private const val HERO_WATER_PREFS_VALUE = "HERO_WATER"
+            private const val HERO_ABSTRACT_PREFS_VALUE = "HERO_ABSTRACT"
+            private const val NONE_PREFS_VALUE = "NONE"
         }
 
         fun prefValue(fireAnimation: FireAnimation) = when (fireAnimation) {
-            FireAnimation.HeroFire -> HERO_FIRE
-            FireAnimation.HeroWater -> HERO_WATER
-            FireAnimation.HeroAbstract -> HERO_ABSTRACT
-            FireAnimation.None -> NONE
+            FireAnimation.HeroFire -> HERO_FIRE_PREFS_VALUE
+            FireAnimation.HeroWater -> HERO_WATER_PREFS_VALUE
+            FireAnimation.HeroAbstract -> HERO_ABSTRACT_PREFS_VALUE
+            FireAnimation.None -> NONE_PREFS_VALUE
         }
 
         fun fireAnimationFrom(value: String?, defValue: FireAnimation) = when (value) {
-            HERO_FIRE -> FireAnimation.HeroFire
-            HERO_WATER -> FireAnimation.HeroWater
-            HERO_ABSTRACT -> FireAnimation.HeroAbstract
-            NONE -> FireAnimation.None
+            HERO_FIRE_PREFS_VALUE -> FireAnimation.HeroFire
+            HERO_WATER_PREFS_VALUE -> FireAnimation.HeroWater
+            HERO_ABSTRACT_PREFS_VALUE -> FireAnimation.HeroAbstract
+            NONE_PREFS_VALUE -> FireAnimation.None
             else -> defValue
         }
     }
