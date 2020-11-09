@@ -321,6 +321,37 @@ class TabDataRepositoryTest {
         assertEquals(currentSelectedTabId, sourceTab.tabId)
     }
 
+    @Test
+    fun markDeletableTrueThenMarksTabAsDeletable() = runBlocking {
+        val tab = TabEntity(
+            tabId = "tabid",
+            position = 0,
+            deletable = false)
+
+        testee.markDeletable(tab, true)
+
+        verify(mockDao).updateTab(tab.copy(deletable = true))
+    }
+
+    @Test
+    fun markDeletableFalseThenMarksTabAsNonDeletable() = runBlocking {
+        val tab = TabEntity(
+            tabId = "tabid",
+            position = 0,
+            deletable = true)
+
+        testee.markDeletable(tab, false)
+
+        verify(mockDao).updateTab(tab.copy(deletable = false))
+    }
+
+    @Test
+    fun purgeDeletableTabsThenPurgeDeletableTabsAndUpdateSelection() = runBlocking {
+        testee.purgeDeletableTabs()
+
+        verify(mockDao).purgeDeletableTabsAndUpdateSelection()
+    }
+
     private fun tabDataRepository(dao: TabsDao): TabDataRepository {
         return TabDataRepository(
             dao,

@@ -100,4 +100,26 @@ class TabSwitcherViewModelTest {
         assertEquals(Command.Close, commandCaptor.allValues[1])
     }
 
+    @Test
+    fun whenOnMarkTabAsDeletableThenCallMarkDeletable() = runBlocking {
+        val entity = TabEntity("abc", "", "", position = 0)
+        testee.onMarkTabAsDeletable(entity, true)
+
+        verify(mockTabRepository).markDeletable(entity, true)
+    }
+
+    @Test
+    fun whenOnMarkTabAsNotDeletableThenCallMarkDeletable() = runBlocking {
+        val entity = TabEntity("abc", "", "", position = 0)
+        testee.onMarkTabAsDeletable(entity, false)
+
+        verify(mockTabRepository).markDeletable(entity, false)
+    }
+
+    @Test
+    fun whenPurgeDeletableTabsThenCallRepositoryPurgeDeletableTabs() = runBlocking {
+        testee.purgeDeletableTabs()
+
+        verify(mockTabRepository).purgeDeletableTabs()
+    }
 }

@@ -20,6 +20,7 @@ import androidx.lifecycle.LiveData
 import androidx.room.*
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabSelectionEntity
+import io.reactivex.Observable
 import javax.inject.Singleton
 
 @Dao
@@ -35,11 +36,14 @@ abstract class TabsDao {
     @Query("select * from tabs inner join tab_selection on tabs.tabId = tab_selection.tabId order by position limit 1")
     abstract fun liveSelectedTab(): LiveData<TabEntity>
 
-    @Query("select * from tabs order by position")
+    @Query("select * from tabs where deletable is 0 order by position")
     abstract fun tabs(): List<TabEntity>
 
-    @Query("select * from tabs order by position")
+    @Query("select * from tabs where deletable is 0 order by position")
     abstract fun liveTabs(): LiveData<List<TabEntity>>
+
+    @Query("select * from tabs where deletable is 1 order by position")
+    abstract fun deletableLiveTabs(): Observable<List<TabEntity>>
 
     @Query("select * from tabs where tabId = :tabId")
     abstract fun tab(tabId: String): TabEntity?
@@ -55,6 +59,20 @@ abstract class TabsDao {
 
     @Delete
     abstract fun deleteTab(tab: TabEntity)
+
+    @Query("delete from tabs where deletable is 1")
+    abstract fun deleteTabsMarkedAsDeletable()
+
+    @Transaction
+    open fun purgeDeletableTabsAndUpdateSelection() {
+        deleteTabsMarkedAsDeletable()
+        if (selectedTab() != null) {
+            return
+        }
+        firstTab()?.let {
+            insertTabSelection(TabSelectionEntity(tabId = it.tabId))
+        }
+    }
 
     @Query("delete from tabs")
     abstract fun deleteAllTabs()

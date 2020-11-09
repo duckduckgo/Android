@@ -24,10 +24,12 @@ import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.global.SingleLiveEvent
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
+import io.reactivex.Observable
 
 class TabSwitcherViewModel(private val tabRepository: TabRepository, private val webViewSessionStorage: WebViewSessionStorage) : ViewModel() {
 
     var tabs: LiveData<List<TabEntity>> = tabRepository.liveTabs
+    var deletableTabs: Observable<List<TabEntity>> = tabRepository.deletableLiveTabs
     val command: SingleLiveEvent<Command> = SingleLiveEvent()
 
     sealed class Command {
@@ -48,6 +50,14 @@ class TabSwitcherViewModel(private val tabRepository: TabRepository, private val
     suspend fun onTabDeleted(tab: TabEntity) {
         tabRepository.delete(tab)
         webViewSessionStorage.deleteSession(tab.tabId)
+    }
+
+    suspend fun onMarkTabAsDeletable(tab: TabEntity, deletable: Boolean = true) {
+        tabRepository.markDeletable(tab, deletable)
+    }
+
+    suspend fun purgeDeletableTabs() {
+        tabRepository.purgeDeletableTabs()
     }
 
     fun onClearComplete() {

@@ -21,6 +21,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
+import android.widget.TextView
 import androidx.appcompat.widget.Toolbar
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.GridLayoutManager
@@ -39,10 +40,14 @@ import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.Close
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.DisplayMessage
+import com.google.android.material.snackbar.Snackbar
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.CompositeDisposable
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
+import org.jetbrains.anko.contentView
 import org.jetbrains.anko.longToast
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
@@ -73,6 +78,8 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
     private val viewModel: TabSwitcherViewModel by bindViewModel()
 
     private val tabsAdapter: TabSwitcherAdapter by lazy { TabSwitcherAdapter(this, webViewPreviewPersister, this, faviconManager) }
+
+    private val disposable = CompositeDisposable()
 
     // we need to scroll to show selected tab, but only if it is the first time loading the tabs.
     private var firstTimeLoadingTabsList = true
@@ -123,6 +130,12 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
         viewModel.tabs.observe(this, Observer<List<TabEntity>> {
             render(it)
         })
+        disposable.add(
+            viewModel.deletableTabs
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe { tabs ->
+                    tabs.takeIf { it.isNotEmpty() }?.let { onDeletableTab(it.last()) }
+                })
         viewModel.command.observe(this, Observer {
             processCommand(it)
         })
@@ -195,7 +208,32 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
     }
 
     override fun onTabDeleted(tab: TabEntity) {
-        launch { viewModel.onTabDeleted(tab) }
+        launch { viewModel.onMarkTabAsDeletable(tab) }
+    }
+
+    private fun onDeletableTab(tab: TabEntity) {
+        Snackbar.make(
+            contentView!!,
+            getString(R.string.closedTab, tab.title.orEmpty()),
+            Snackbar.LENGTH_LONG)
+            .setAction(R.string.closeTabUndo) {
+                launch {
+                    viewModel.onMarkTabAsDeletable(tab, false)
+                }
+            }
+            .addCallback(object :
+                Snackbar.Callback() {
+                override fun onDismissed(transientBottomBar: Snackbar?, event: Int) {
+                    // skip: snackbar is dismissed because we click on the UNDO action or dismiss() is called (this happens on device rotation)
+                    if (event != DISMISS_EVENT_ACTION && event != DISMISS_EVENT_MANUAL) {
+                        launch {
+                            viewModel.purgeDeletableTabs()
+                        }
+                    }
+                }
+            })
+            .apply { view.findViewById<TextView>(com.google.android.material.R.id.snackbar_text).maxLines = 1 }
+            .show()
     }
 
     private fun closeAllTabs() {
@@ -216,8 +254,14 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
         overridePendingTransition(R.anim.slide_from_bottom, R.anim.tab_anim_fade_out)
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        disposable.clear()
+    }
+
     private fun clearObserversEarlyToStopViewUpdates() {
         viewModel.tabs.removeObservers(this)
+        disposable.clear()
     }
 
     companion object {

@@ -25,6 +25,7 @@ import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.global.model.SiteFactory
 import com.duckduckgo.app.global.useourapp.UseOurAppDetector
 import com.duckduckgo.app.tabs.db.TabsDao
+import io.reactivex.Observable
 import io.reactivex.Scheduler
 import io.reactivex.schedulers.Schedulers
 import kotlinx.coroutines.GlobalScope
@@ -44,6 +45,8 @@ class TabDataRepository @Inject constructor(
 ) : TabRepository {
 
     override val liveTabs: LiveData<List<TabEntity>> = tabsDao.liveTabs()
+
+    override val deletableLiveTabs: Observable<List<TabEntity>> = tabsDao.deletableLiveTabs()
 
     override val liveSelectedTab: LiveData<TabEntity> = tabsDao.liveSelectedTab()
 
@@ -183,6 +186,20 @@ class TabDataRepository @Inject constructor(
             tabsDao.deleteTabAndUpdateSelection(tab)
         }
         siteData.remove(tab.tabId)
+    }
+
+    override suspend fun markDeletable(tab: TabEntity, deletable: Boolean) {
+        databaseExecutor().scheduleDirect {
+            tabsDao.updateTab(
+                tab.copy(deletable = deletable)
+            )
+        }
+    }
+
+    override suspend fun purgeDeletableTabs() {
+        databaseExecutor().scheduleDirect {
+            tabsDao.purgeDeletableTabsAndUpdateSelection()
+        }
     }
 
     override suspend fun deleteCurrentTabAndSelectSource() {
