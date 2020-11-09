@@ -31,5 +31,5 @@
     <string name="settingsHeroWaterAnimation">Whirlpool</string>
     <string name="settingsHeroAbstractAnimation">Airstream</string>
     <string name="settingsNoneAnimation">None</string>
-    <string name="settingsSelectFireAnimationDialog">Fire button animation</string>
+    <string name="settingsSelectFireAnimationDialog">Fire Button animation</string>
 </resources>
