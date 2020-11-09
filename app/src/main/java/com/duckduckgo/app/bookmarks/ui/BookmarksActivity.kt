@@ -80,21 +80,27 @@ class BookmarksActivity : DuckDuckGoActivity() {
     }
 
     private fun observeViewModel() {
-        viewModel.viewState.observe(this, Observer { viewState ->
-            viewState?.let {
-                if (it.showBookmarks) showBookmarks() else hideBookmarks()
-                adapter.bookmarks = it.bookmarks
-                invalidateOptionsMenu()
+        viewModel.viewState.observe(
+            this,
+            Observer { viewState ->
+                viewState?.let {
+                    if (it.showBookmarks) showBookmarks() else hideBookmarks()
+                    adapter.bookmarks = it.bookmarks
+                    invalidateOptionsMenu()
+                }
             }
-        })
+        )
 
-        viewModel.command.observe(this, Observer {
-            when (it) {
-                is BookmarksViewModel.Command.ConfirmDeleteBookmark -> confirmDeleteBookmark(it.bookmark)
-                is BookmarksViewModel.Command.OpenBookmark -> openBookmark(it.bookmark)
-                is BookmarksViewModel.Command.ShowEditBookmark -> showEditBookmarkDialog(it.bookmark)
+        viewModel.command.observe(
+            this,
+            Observer {
+                when (it) {
+                    is BookmarksViewModel.Command.ConfirmDeleteBookmark -> confirmDeleteBookmark(it.bookmark)
+                    is BookmarksViewModel.Command.OpenBookmark -> openBookmark(it.bookmark)
+                    is BookmarksViewModel.Command.ShowEditBookmark -> showEditBookmarkDialog(it.bookmark)
+                }
             }
-        })
+        )
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {

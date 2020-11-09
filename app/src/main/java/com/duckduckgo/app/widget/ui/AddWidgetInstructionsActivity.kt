@@ -47,12 +47,15 @@ class AddWidgetInstructionsActivity : DuckDuckGoActivity() {
     }
 
     private fun configureCommandObserver() {
-        viewModel.command.observe(this, Observer {
-            when (it) {
-                ShowHome -> showHome()
-                Close -> close()
+        viewModel.command.observe(
+            this,
+            Observer {
+                when (it) {
+                    ShowHome -> showHome()
+                    Close -> close()
+                }
             }
-        })
+        )
     }
 
     override fun onBackPressed() {

@@ -23,14 +23,15 @@ import androidx.room.PrimaryKey
 
 @Entity(
     tableName = "tabs",
-        foreignKeys = [
-            ForeignKey(
-                    entity = TabEntity::class,
-                    parentColumns = ["tabId"],
-                    childColumns = ["sourceTabId"],
-                    onDelete = ForeignKey.SET_NULL,
-                    onUpdate = ForeignKey.SET_NULL
-            )],
+    foreignKeys = [
+        ForeignKey(
+            entity = TabEntity::class,
+            parentColumns = ["tabId"],
+            childColumns = ["sourceTabId"],
+            onDelete = ForeignKey.SET_NULL,
+            onUpdate = ForeignKey.SET_NULL
+        )
+    ],
     indices = [
         Index("tabId")
     ]

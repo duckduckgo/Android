@@ -105,8 +105,10 @@ class LocationPermissionsAdapter(
             }
             TOGGLE_TYPE -> {
                 val view = inflater.inflate(R.layout.view_location_permissions_toggle, parent, false)
-                LocationPermissionsViewHolder.LocationPermissionsToggleViewHolder(view,
-                    CompoundButton.OnCheckedChangeListener { _, isChecked -> viewModel.onLocationPermissionToggled(isChecked) })
+                LocationPermissionsViewHolder.LocationPermissionsToggleViewHolder(
+                    view,
+                    CompoundButton.OnCheckedChangeListener { _, isChecked -> viewModel.onLocationPermissionToggled(isChecked) }
+                )
             }
             DIVIDER_TYPE -> {
                 val view = inflater.inflate(R.layout.view_location_permissions_divider, parent, false)

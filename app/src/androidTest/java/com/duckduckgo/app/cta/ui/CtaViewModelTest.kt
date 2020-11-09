@@ -777,7 +777,8 @@ class CtaViewModelTest {
                 features = listOf(
                     VariantManager.VariantFeature.FireButtonEducation
                 ),
-                filterBy = { true })
+                filterBy = { true }
+            )
         )
     }
 

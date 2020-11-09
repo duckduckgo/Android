@@ -415,9 +415,12 @@ class BrowserTabViewModel(
             .switchMap { autoComplete.autoComplete(it) }
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
-            .subscribe({ result ->
-                onAutoCompleteResultReceived(result)
-            }, { t: Throwable? -> Timber.w(t, "Failed to get search results") })
+            .subscribe(
+                { result ->
+                    onAutoCompleteResultReceived(result)
+                },
+                { t: Throwable? -> Timber.w(t, "Failed to get search results") }
+            )
     }
 
     private fun onAutoCompleteResultReceived(result: AutoCompleteResult) {
@@ -1709,43 +1712,46 @@ class BrowserTabViewModel(
 
     fun download(pendingFileDownload: FileDownloader.PendingFileDownload) {
         viewModelScope.launch(dispatchers.io()) {
-            fileDownloader.download(pendingFileDownload, object : FileDownloader.FileDownloadListener {
+            fileDownloader.download(
+                pendingFileDownload,
+                object : FileDownloader.FileDownloadListener {
 
-                override fun downloadStartedNetworkFile() {
-                    Timber.d("download started: network file")
-                    closeAndReturnToSourceIfBlankTab()
-                }
+                    override fun downloadStartedNetworkFile() {
+                        Timber.d("download started: network file")
+                        closeAndReturnToSourceIfBlankTab()
+                    }
 
-                override fun downloadFinishedNetworkFile(file: File, mimeType: String?) {
-                    Timber.i("downloadFinished network file")
-                }
+                    override fun downloadFinishedNetworkFile(file: File, mimeType: String?) {
+                        Timber.i("downloadFinished network file")
+                    }
 
-                override fun downloadStartedDataUri() {
-                    Timber.i("downloadStarted data uri")
-                    command.postValue(DownloadCommand.ShowDownloadInProgressNotification)
-                    closeAndReturnToSourceIfBlankTab()
-                }
+                    override fun downloadStartedDataUri() {
+                        Timber.i("downloadStarted data uri")
+                        command.postValue(DownloadCommand.ShowDownloadInProgressNotification)
+                        closeAndReturnToSourceIfBlankTab()
+                    }
 
-                override fun downloadFinishedDataUri(file: File, mimeType: String?) {
-                    Timber.i("downloadFinished data uri")
-                    command.postValue(DownloadCommand.ScanMediaFiles(file))
-                    command.postValue(DownloadCommand.ShowDownloadFinishedNotification(file, mimeType))
-                }
+                    override fun downloadFinishedDataUri(file: File, mimeType: String?) {
+                        Timber.i("downloadFinished data uri")
+                        command.postValue(DownloadCommand.ScanMediaFiles(file))
+                        command.postValue(DownloadCommand.ShowDownloadFinishedNotification(file, mimeType))
+                    }
 
-                override fun downloadFailed(message: String, downloadFailReason: DownloadFailReason) {
-                    Timber.w("Failed to download file [$message]")
-                    command.postValue(DownloadCommand.ShowDownloadFailedNotification(message, downloadFailReason))
-                }
+                    override fun downloadFailed(message: String, downloadFailReason: DownloadFailReason) {
+                        Timber.w("Failed to download file [$message]")
+                        command.postValue(DownloadCommand.ShowDownloadFailedNotification(message, downloadFailReason))
+                    }
 
-                override fun downloadCancelled() {
-                    Timber.i("Download cancelled")
-                    closeAndReturnToSourceIfBlankTab()
-                }
+                    override fun downloadCancelled() {
+                        Timber.i("Download cancelled")
+                        closeAndReturnToSourceIfBlankTab()
+                    }
 
-                override fun downloadOpened() {
-                    closeAndReturnToSourceIfBlankTab()
+                    override fun downloadOpened() {
+                        closeAndReturnToSourceIfBlankTab()
+                    }
                 }
-            })
+            )
         }
     }
 

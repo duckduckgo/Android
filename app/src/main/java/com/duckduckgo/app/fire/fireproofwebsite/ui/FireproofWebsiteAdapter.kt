@@ -74,8 +74,10 @@ class FireproofWebsiteAdapter(
             }
             TOGGLE_TYPE -> {
                 val view = inflater.inflate(R.layout.view_fireproof_website_toggle, parent, false)
-                FireproofWebSiteViewHolder.FireproofWebsiteToggleViewHolder(view,
-                    CompoundButton.OnCheckedChangeListener { _, isChecked -> viewModel.onUserToggleLoginDetection(isChecked) })
+                FireproofWebSiteViewHolder.FireproofWebsiteToggleViewHolder(
+                    view,
+                    CompoundButton.OnCheckedChangeListener { _, isChecked -> viewModel.onUserToggleLoginDetection(isChecked) }
+                )
             }
             DIVIDER_TYPE -> {
                 val view = inflater.inflate(R.layout.view_fireproof_divider, parent, false)
