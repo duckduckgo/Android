@@ -26,22 +26,17 @@ import com.duckduckgo.app.statistics.VariantManager
 import javax.inject.Inject
 
 class FireAnimationLoader @Inject constructor(
-    private val variantManager: VariantManager,
     private val context: Context,
     private val settingsDataStore: SettingsDataStore
 ) : LifecycleObserver {
 
     @OnLifecycleEvent(Lifecycle.Event.ON_CREATE)
     fun onCreate() {
-        // Currently, we are observing Activity lifecycle instead of Application to avoid conflicts with installation referrer.
-        // if we remove variantManager check, we can observe Application lifecycle instead of Activity's.
         if (animationEnabled()) {
             val selectedFireAnimation = settingsDataStore.selectedFireAnimation
             LottieCompositionFactory.fromRawRes(context, selectedFireAnimation.resId)
         }
     }
-
-    private fun animationEnabled() = settingsDataStore.selectedFireAnimation.resId != -1
 
     fun refreshAnimation() {
         if (animationEnabled()) {
@@ -49,4 +44,6 @@ class FireAnimationLoader @Inject constructor(
             LottieCompositionFactory.fromRawRes(context, selectedFireAnimation.resId)
         }
     }
+
+    private fun animationEnabled() = settingsDataStore.selectedFireAnimation.resId != -1
 }
