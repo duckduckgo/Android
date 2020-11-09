@@ -27,6 +27,7 @@ import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpPacketProcessor.Compan
 import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpPacketProcessor.Companion.updateState
 import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpPacketProcessor.PendingWriteData
 import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpStateFlow.Event.*
+import com.duckduckgo.mobile.android.vpn.processor.tcp.tracker.LocalIpAddressDetector
 import com.duckduckgo.mobile.android.vpn.processor.tcp.tracker.RequestTrackerType
 import com.duckduckgo.mobile.android.vpn.processor.tcp.tracker.VpnTrackerDetector
 import com.duckduckgo.mobile.android.vpn.service.VpnQueues
@@ -51,7 +52,8 @@ class TcpDeviceToNetwork(
     private val connectionInitializer: ConnectionInitializer,
     private val handler: Handler,
     private val trackerDetector: VpnTrackerDetector,
-    private val packetPersister: PacketPersister
+    private val packetPersister: PacketPersister,
+    private val localAddressDetector: LocalIpAddressDetector
 ) {
 
     var lastTimePacketConsumed = 0L
@@ -276,7 +278,8 @@ class TcpDeviceToNetwork(
                 Timber.v(" ${tcb.ipAndPort} Payload Size is 0. There's nothing to Process")
                 return
             }
-            val isTracker = determineIfTracker(tcb, packet, payloadBuffer)
+            val isLocalAddress = determineIfLocalIpAddress(packet)
+            val isTracker = determineIfTracker(tcb, packet, payloadBuffer, isLocalAddress)
 
             if (isTracker) {
                 // TODO - validate the best option here: send RESET, FIN or DROP packet?
@@ -314,16 +317,20 @@ class TcpDeviceToNetwork(
         queues.networkToDevice.offer(connectionParams.responseBuffer)
     }
 
-    private fun determineIfTracker(tcb: TCB, packet: Packet, payloadBuffer: ByteBuffer): Boolean {
+    private fun determineIfTracker(tcb: TCB, packet: Packet, payloadBuffer: ByteBuffer, isLocalAddress: Boolean): Boolean {
         if (tcb.trackerTypeDetermined) {
             return tcb.isTracker
         }
 
-        return when (trackerDetector.determinePacketType(tcb, packet, payloadBuffer)) {
+        return when (trackerDetector.determinePacketType(tcb, packet, payloadBuffer, isLocalAddress)) {
             RequestTrackerType.Tracker -> true
             RequestTrackerType.NotTracker -> false
             RequestTrackerType.Undetermined -> false
         }
+    }
+
+    private fun determineIfLocalIpAddress(packet: Packet): Boolean {
+        return localAddressDetector.isLocalAddress(packet.ip4Header.destinationAddress)
     }
 
 }

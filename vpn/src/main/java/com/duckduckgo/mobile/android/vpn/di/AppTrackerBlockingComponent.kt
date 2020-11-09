@@ -23,7 +23,7 @@ import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
 import dagger.BindsInstance
 import dagger.Component
 
-@Component(modules = [VpnDatabaseModule::class, TrackerDetectorModule::class])
+@Component(modules = [VpnDatabaseModule::class, VpnTrackerDetectorModule::class])
 interface AppTrackerBlockingComponent {
 
     fun getVpnDatabase(): VpnDatabase

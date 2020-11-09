@@ -66,35 +66,41 @@ class DomainBasedTrackerDetectorTest {
     @Test
     fun whenHostnameIsNullThenTrackerTypeUndetermined() {
         givenExtractedHostname(null)
-        val type = testee.determinePacketType(tcb, aPacket(), aPayload())
+        val type = testee.determinePacketType(tcb, aPacket(), aPayload(), aRemoteAddress())
         assertTrue(type == Undetermined)
     }
 
     @Test
     fun whenHostnameIsNotInTrackerListThenTrackerTypeNotTracker() {
         givenExtractedHostname("duckduckgo.com")
-        val type = testee.determinePacketType(tcb, aPacket(), aPayload())
+        val type = testee.determinePacketType(tcb, aPacket(), aPayload(), aRemoteAddress())
         assertTrue(type == NotTracker)
     }
 
     @Test
     fun whenHostnameInTrackerListExactMatchThenTrackerTypeTracker() {
         givenExtractedHostname("doubleclick.net")
-        val type = testee.determinePacketType(tcb, aPacket(), aPayload())
+        val type = testee.determinePacketType(tcb, aPacket(), aPayload(), aRemoteAddress())
         assertTrue(type == Tracker)
     }
 
     @Test
     fun whenHostnameSuffixMatchesThenTrackerTypeTracker() {
         givenExtractedHostname("foo.bar.doubleclick.net")
-        val type = testee.determinePacketType(tcb, aPacket(), aPayload())
+        val type = testee.determinePacketType(tcb, aPacket(), aPayload(), aRemoteAddress())
         assertTrue(type == Tracker)
     }
 
     @Test
-    fun whenHostnameSuffixDoesNotMatchThenTrackerTypeTracker() {
+    fun whenHostnameSuffixDoesNotMatchThenTrackerTypeNotTracker() {
         givenExtractedHostname("doubleclick.net.unmatched")
-        val type = testee.determinePacketType(tcb, aPacket(), aPayload())
+        val type = testee.determinePacketType(tcb, aPacket(), aPayload(), aRemoteAddress())
+        assertTrue(type == NotTracker)
+    }
+
+    @Test
+    fun whenIsLocalAddressThenTrackerTypeNotTracker() {
+        val type = testee.determinePacketType(tcb, aPacket(), aPayload(), aLocalAddress())
         assertTrue(type == NotTracker)
     }
 
@@ -104,4 +110,6 @@ class DomainBasedTrackerDetectorTest {
 
     private fun aPacket() = Packet(ByteBuffer.allocate(24))
     private fun aPayload() = ByteBuffer.allocate(0)
+    private fun aLocalAddress() = true
+    private fun aRemoteAddress() = false
 }

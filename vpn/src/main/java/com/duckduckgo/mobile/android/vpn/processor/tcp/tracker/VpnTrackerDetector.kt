@@ -25,11 +25,12 @@ import timber.log.Timber
 import xyz.hexene.localvpn.Packet
 import xyz.hexene.localvpn.TCB
 import java.nio.ByteBuffer
+import java.util.*
 import javax.inject.Inject
 
 interface VpnTrackerDetector {
 
-    fun determinePacketType(tcb: TCB, packet: Packet, payloadBuffer: ByteBuffer): RequestTrackerType
+    fun determinePacketType(tcb: TCB, packet: Packet, payloadBuffer: ByteBuffer, isLocalAddress: Boolean): RequestTrackerType
 }
 
 class DomainBasedTrackerDetector @Inject constructor(
@@ -39,7 +40,14 @@ class DomainBasedTrackerDetector @Inject constructor(
 ) : VpnTrackerDetector {
 
 
-    override fun determinePacketType(tcb: TCB, packet: Packet, payloadBuffer: ByteBuffer): RequestTrackerType {
+    override fun determinePacketType(tcb: TCB, packet: Packet, payloadBuffer: ByteBuffer, isLocalAddress: Boolean): RequestTrackerType {
+        if (isLocalAddress) {
+            Timber.v("%s is a local address; not looking for trackers", packet.ip4Header.destinationAddress)
+            tcb.trackerTypeDetermined = true
+            tcb.isTracker = false
+            return RequestTrackerType.NotTracker
+        }
+
         val hostname = hostnameExtractor.extract(tcb, packet, payloadBuffer)
         if (hostname == null) {
             Timber.w("Failed to determine if packet is a tracker as hostname not extracted %s", tcb.ipAndPort)
@@ -49,7 +57,7 @@ class DomainBasedTrackerDetector @Inject constructor(
         tcb.trackerTypeDetermined = true
 
         trackerListProvider.trackerList().forEach { tracker ->
-            if (hostname.endsWith(tracker.hostname)){
+            if (hostname.endsWith(tracker.hostname)) {
                 tcb.isTracker = true
                 Timber.i("Determined %s to be tracker %s", hostname, tcb.ipAndPort)
                 insertTracker(tracker)

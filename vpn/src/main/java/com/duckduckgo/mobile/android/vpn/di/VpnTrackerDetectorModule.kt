@@ -18,21 +18,14 @@ package com.duckduckgo.mobile.android.vpn.di
 
 import android.content.Context
 import androidx.core.app.NotificationManagerCompat
-import androidx.work.WorkManager
-import com.duckduckgo.mobile.android.vpn.processor.tcp.hostname.AndroidHostnameExtractor
-import com.duckduckgo.mobile.android.vpn.processor.tcp.hostname.EncryptedRequestHostExtractor
-import com.duckduckgo.mobile.android.vpn.processor.tcp.hostname.HostnameExtractor
-import com.duckduckgo.mobile.android.vpn.processor.tcp.hostname.HostnameHeaderExtractor
-import com.duckduckgo.mobile.android.vpn.processor.tcp.hostname.PayloadBytesExtractor
-import com.duckduckgo.mobile.android.vpn.processor.tcp.hostname.PlaintextHostHeaderExtractor
-import com.duckduckgo.mobile.android.vpn.processor.tcp.hostname.ServerNameIndicationHeaderHostExtractor
+import com.duckduckgo.mobile.android.vpn.processor.tcp.hostname.*
 import com.duckduckgo.mobile.android.vpn.processor.tcp.tracker.TrackerListProvider
 import dagger.Module
 import dagger.Provides
 import javax.inject.Singleton
 
 @Module
-class TrackerDetectorModule {
+class VpnTrackerDetectorModule {
 
     @Provides
     fun providesDispatcherProvider(): VpnDispatcherProvider {
@@ -46,24 +39,16 @@ class TrackerDetectorModule {
     }
 
     @Provides
-    fun provideNameHeaderExtractor(): HostnameHeaderExtractor {
-        return PlaintextHostHeaderExtractor()
-    }
+    fun provideNameHeaderExtractor(): HostnameHeaderExtractor = PlaintextHostHeaderExtractor()
 
     @Provides
-    fun provideEncryptedRequestHostExtractor(): EncryptedRequestHostExtractor {
-        return ServerNameIndicationHeaderHostExtractor()
-    }
+    fun provideEncryptedRequestHostExtractor(): EncryptedRequestHostExtractor = ServerNameIndicationHeaderHostExtractor()
 
     @Provides
-    fun providePayloadBytesExtractor(): PayloadBytesExtractor {
-        return PayloadBytesExtractor()
-    }
+    fun providePayloadBytesExtractor(): PayloadBytesExtractor = PayloadBytesExtractor()
 
     @Provides
-    fun provideTrackerListProvider(): TrackerListProvider {
-        return TrackerListProvider()
-    }
+    fun provideTrackerListProvider(): TrackerListProvider = TrackerListProvider()
 
     @Provides
     fun provideAndroidHostnameExtractor(

@@ -40,6 +40,7 @@ import com.duckduckgo.mobile.android.vpn.model.VpnTrackerAndCompany
 import com.duckduckgo.mobile.android.vpn.processor.TunPacketReader
 import com.duckduckgo.mobile.android.vpn.processor.TunPacketWriter
 import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpPacketProcessor
+import com.duckduckgo.mobile.android.vpn.processor.tcp.tracker.LocalIpAddressDetector
 import com.duckduckgo.mobile.android.vpn.processor.tcp.tracker.VpnTrackerDetector
 import com.duckduckgo.mobile.android.vpn.processor.udp.UdpPacketProcessor
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
@@ -85,6 +86,9 @@ class PassthroughVpnService : VpnService(), CoroutineScope by MainScope(), Netwo
     @Inject
     lateinit var notificationManager: NotificationManagerCompat
 
+    @Inject
+    lateinit var localAddressDetector: LocalIpAddressDetector
+
     private val queues = VpnQueues()
 
     private var tunInterface: ParcelFileDescriptor? = null
@@ -120,7 +124,7 @@ class PassthroughVpnService : VpnService(), CoroutineScope by MainScope(), Netwo
         AndroidInjection.inject(this)
 
         udpPacketProcessor = UdpPacketProcessor(queues, this)
-        tcpPacketProcessor = TcpPacketProcessor(queues, this, trackerDetector, packetPersister)
+        tcpPacketProcessor = TcpPacketProcessor(queues, this, trackerDetector, packetPersister, localAddressDetector)
 
         Timber.i("VPN onCreate")
     }
