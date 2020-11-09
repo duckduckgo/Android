@@ -27,11 +27,13 @@ import com.duckduckgo.app.icon.api.AppIcon
 import com.duckduckgo.app.settings.clear.ClearWhatOption
 import com.duckduckgo.app.settings.clear.ClearWhenOption
 import com.duckduckgo.app.settings.clear.FireAnimation
+import com.duckduckgo.app.settings.clear.getPixelValue
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelName
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.*
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.FIRE_ANIMATION
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -115,6 +117,7 @@ class SettingsViewModel @Inject constructor(
 
     fun userRequestedToChangeFireAnimation() {
         command.value = Command.LaunchFireAnimationSettings
+        pixel.fire(FIRE_ANIMATION_SETTINGS_OPENED)
     }
 
     fun onFireproofWebsitesClicked() {
@@ -202,6 +205,7 @@ class SettingsViewModel @Inject constructor(
         viewState.value = currentViewState().copy(
             selectedFireAnimation = selectedFireAnimation
         )
+        pixel.fire(FIRE_ANIMATION_NEW_SELECTED, mapOf(FIRE_ANIMATION to selectedFireAnimation.getPixelValue()))
     }
 
     fun onManageWhitelistSelected() {
