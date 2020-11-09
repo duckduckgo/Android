@@ -51,7 +51,7 @@ class SettingsFireAnimationSelectorFragment : DialogFragment() {
                         R.id.fireAnimationFire -> HeroFire
                         R.id.fireAnimationWater -> HeroWater
                         R.id.fireAnimationAbstract -> HeroAbstract
-                        R.id.fireAnimationDisabled -> Nonen
+                        R.id.fireAnimationDisabled -> None
                         else -> HeroFire
                     }
                     val listener = activity as Listener?
@@ -74,7 +74,7 @@ class SettingsFireAnimationSelectorFragment : DialogFragment() {
             HeroFire -> R.id.fireAnimationFire
             HeroWater -> R.id.fireAnimationWater
             HeroAbstract -> R.id.fireAnimationAbstract
-            Nonen -> R.id.fireAnimationDisabled
+            None -> R.id.fireAnimationDisabled
         }
     }
 

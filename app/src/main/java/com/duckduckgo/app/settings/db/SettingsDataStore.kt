@@ -216,14 +216,14 @@ class SettingsSharedPreferences @Inject constructor(private val context: Context
             FireAnimation.HeroFire -> HERO_FIRE
             FireAnimation.HeroWater -> HERO_WATER
             FireAnimation.HeroAbstract -> HERO_ABSTRACT
-            FireAnimation.Nonen -> NONE
+            FireAnimation.None -> NONE
         }
 
         fun fireAnimationFrom(value: String?, defValue: FireAnimation) = when (value) {
             HERO_FIRE -> FireAnimation.HeroFire
             HERO_WATER -> FireAnimation.HeroWater
             HERO_ABSTRACT -> FireAnimation.HeroAbstract
-            NONE -> FireAnimation.Nonen
+            NONE -> FireAnimation.None
             else -> defValue
         }
     }

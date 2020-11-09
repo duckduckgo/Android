@@ -23,5 +23,5 @@ sealed class FireAnimation(val resId: Int, val nameResId: Int) : Serializable {
     object HeroFire : FireAnimation(R.raw.hero_fire_inferno, R.string.settingsHeroFireAnimation)
     object HeroWater : FireAnimation(R.raw.hero_water_whirlpool, R.string.settingsHeroWaterAnimation)
     object HeroAbstract : FireAnimation(R.raw.hero_abstract_airstream, R.string.settingsHeroAbstractAnimation)
-    object Nonen : FireAnimation(-1, R.string.settingsNoneAnimation)
+    object None : FireAnimation(-1, R.string.settingsNoneAnimation)
 }
