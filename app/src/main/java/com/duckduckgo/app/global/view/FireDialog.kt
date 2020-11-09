@@ -92,17 +92,21 @@ class FireDialog(
             cancel()
         }
 
+        if (animationEnabled()) {
+            configureFireAnimationView()
+        }
+        behavior.state = BottomSheetBehavior.STATE_EXPANDED
+    }
+
+    private fun configureFireAnimationView() {
+        fireAnimationView.setAnimation(settingsDataStore.selectedFireAnimation.resId)
         /**
          * BottomSheetDialog wraps provided Layout into a CoordinatorLayout.
          * We need to set FitsSystemWindows false programmatically to all parents in order to render layout and animation full screen
          */
-        if (animationEnabled()) {
-            fireAnimationView.setAnimation(settingsDataStore.selectedFireAnimation.resId)
-        }
         fireAnimationView.setAndPropagateUpFitsSystemWindows(false)
         fireAnimationView.setRenderMode(RenderMode.SOFTWARE)
         fireAnimationView.enableMergePathsForKitKatAndAbove(true)
-        behavior.state = BottomSheetBehavior.STATE_EXPANDED
     }
 
     private fun configureFireDialogCta(cta: DaxFireDialogCta) {
