@@ -291,7 +291,6 @@ class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope() {
             context = this,
             clearPersonalDataAction = clearPersonalDataAction,
             ctaViewModel = ctaViewModel,
-            variantManager = variantManager,
             pixel = pixel,
             settingsDataStore = settingsDataStore
         )

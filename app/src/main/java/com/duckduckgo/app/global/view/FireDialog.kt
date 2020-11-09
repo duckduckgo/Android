@@ -29,14 +29,11 @@ import com.duckduckgo.app.cta.ui.CtaViewModel
 import com.duckduckgo.app.cta.ui.DaxFireDialogCta
 import com.duckduckgo.app.global.view.FireDialog.FireDialogClearAllEvent.AnimationFinished
 import com.duckduckgo.app.global.view.FireDialog.FireDialogClearAllEvent.ClearAllDataFinished
-import com.duckduckgo.app.settings.clear.FireAnimation
 import com.duckduckgo.app.settings.clear.getPixelValue
 import com.duckduckgo.app.settings.db.SettingsDataStore
-import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.*
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.FIRE_ANIMATION
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelValues
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import kotlinx.android.synthetic.main.include_dax_dialog_cta.*
@@ -53,7 +50,6 @@ class FireDialog(
     context: Context,
     private val ctaViewModel: CtaViewModel,
     private val clearPersonalDataAction: ClearPersonalDataAction,
-    private val variantManager: VariantManager,
     private val pixel: Pixel,
     private val settingsDataStore: SettingsDataStore
 ) : BottomSheetDialog(context, R.style.FireDialog), CoroutineScope by MainScope() {
