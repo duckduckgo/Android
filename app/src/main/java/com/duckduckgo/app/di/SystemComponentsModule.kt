@@ -18,9 +18,12 @@ package com.duckduckgo.app.di
 
 import android.content.Context
 import android.content.pm.PackageManager
+import com.duckduckgo.app.fire.AnimationLoader
+import com.duckduckgo.app.fire.LottieAnimationLoader
 import com.duckduckgo.app.global.shortcut.AppShortcutCreator
 import com.duckduckgo.app.icon.api.AppIconModifier
 import com.duckduckgo.app.icon.api.IconModifier
+import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.systemsearch.DeviceAppListProvider
 import com.duckduckgo.app.systemsearch.DeviceAppLookup
 import com.duckduckgo.app.systemsearch.InstalledDeviceAppListProvider
@@ -47,4 +50,9 @@ open class SystemComponentsModule {
     @Provides
     fun appIconModifier(context: Context, appShortcutCreator: AppShortcutCreator): IconModifier =
         AppIconModifier(context, appShortcutCreator)
+
+    @Provides
+    fun animatorLoader(context: Context, settingsDataStore: SettingsDataStore): AnimationLoader {
+        return LottieAnimationLoader(context, settingsDataStore)
+    }
 }

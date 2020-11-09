@@ -39,8 +39,8 @@ import com.duckduckgo.app.feedback.ui.initial.InitialFeedbackFragmentViewModel
 import com.duckduckgo.app.feedback.ui.negative.brokensite.BrokenSiteNegativeFeedbackViewModel
 import com.duckduckgo.app.feedback.ui.negative.openended.ShareOpenEndedNegativeFeedbackViewModel
 import com.duckduckgo.app.feedback.ui.positive.initial.PositiveFeedbackLandingViewModel
+import com.duckduckgo.app.fire.AnimationLoader
 import com.duckduckgo.app.fire.DataClearer
-import com.duckduckgo.app.fire.FireAnimationLoader
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepository
 import com.duckduckgo.app.fire.fireproofwebsite.ui.FireproofWebsitesViewModel
 import com.duckduckgo.app.global.install.AppInstallStore
@@ -128,7 +128,7 @@ class ViewModelFactory @Inject constructor(
     private val dismissedCtaDao: DismissedCtaDao,
     private val fileDownloader: FileDownloader,
     private val dispatcherProvider: DispatcherProvider,
-    private val fireAnimationLoader: FireAnimationLoader
+    private val animatorLoader: AnimationLoader
 ) : ViewModelProvider.NewInstanceFactory() {
 
     override fun <T : ViewModel> create(modelClass: Class<T>) =
@@ -174,7 +174,7 @@ class ViewModelFactory @Inject constructor(
             appSettingsPreferencesStore,
             defaultBrowserDetector,
             variantManager,
-            fireAnimationLoader,
+            animatorLoader,
             pixel
         )
     }

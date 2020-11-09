@@ -165,7 +165,7 @@ open class DuckDuckGoApplication : HasAndroidInjector, Application(), LifecycleO
     lateinit var userStageStore: UserStageStore
 
     @Inject
-    lateinit var fireAnimationLoader: FireAnimationLoader
+    lateinit var fireAnimationLoader: AnimationLoader
 
     private var launchedByFireAction: Boolean = false
 

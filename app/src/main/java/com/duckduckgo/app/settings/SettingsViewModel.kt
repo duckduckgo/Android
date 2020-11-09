@@ -20,7 +20,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.duckduckgo.app.browser.BuildConfig
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
-import com.duckduckgo.app.fire.FireAnimationLoader
+import com.duckduckgo.app.fire.AnimationLoader
 import com.duckduckgo.app.global.DuckDuckGoTheme
 import com.duckduckgo.app.global.SingleLiveEvent
 import com.duckduckgo.app.icon.api.AppIcon
@@ -41,7 +41,7 @@ class SettingsViewModel @Inject constructor(
     private val settingsDataStore: SettingsDataStore,
     private val defaultWebBrowserCapability: DefaultBrowserDetector,
     private val variantManager: VariantManager,
-    private val fireAnimationLoader: FireAnimationLoader,
+    private val animationLoader: AnimationLoader,
     private val pixel: Pixel
 ) : ViewModel() {
 
@@ -201,7 +201,7 @@ class SettingsViewModel @Inject constructor(
             return
         }
         settingsDataStore.selectedFireAnimation = selectedFireAnimation
-        fireAnimationLoader.refreshAnimation()
+        animationLoader.preloadSelectedAnimation()
         viewState.value = currentViewState().copy(
             selectedFireAnimation = selectedFireAnimation
         )
