@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.settings
 
+import android.animation.Animator
 import android.content.Context
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.Observer
@@ -23,11 +24,13 @@ import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.blockingObserve
 import com.duckduckgo.app.browser.BuildConfig
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
+import com.duckduckgo.app.fire.AnimationLoader
 import com.duckduckgo.app.global.DuckDuckGoTheme
 import com.duckduckgo.app.icon.api.AppIcon
 import com.duckduckgo.app.settings.SettingsViewModel.Command
 import com.duckduckgo.app.settings.clear.ClearWhatOption.CLEAR_NONE
 import com.duckduckgo.app.settings.clear.ClearWhenOption.APP_EXIT_ONLY
+import com.duckduckgo.app.settings.clear.FireAnimation
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.Variant
 import com.duckduckgo.app.statistics.VariantManager
@@ -69,6 +72,9 @@ class SettingsViewModelTest {
     @Mock
     private lateinit var mockPixel: Pixel
 
+    @Mock
+    private lateinit var mockAnimationLoader: AnimationLoader
+
     private lateinit var commandCaptor: KArgumentCaptor<Command>
 
     @Before
@@ -78,12 +84,13 @@ class SettingsViewModelTest {
         context = InstrumentationRegistry.getInstrumentation().targetContext
         commandCaptor = argumentCaptor()
 
-        testee = SettingsViewModel(mockAppSettingsDataStore, mockDefaultBrowserDetector, mockVariantManager, mockPixel)
+        testee = SettingsViewModel(mockAppSettingsDataStore, mockDefaultBrowserDetector, mockVariantManager, mockAnimationLoader, mockPixel)
         testee.command.observeForever(commandObserver)
 
         whenever(mockAppSettingsDataStore.automaticallyClearWhenOption).thenReturn(APP_EXIT_ONLY)
         whenever(mockAppSettingsDataStore.automaticallyClearWhatOption).thenReturn(CLEAR_NONE)
         whenever(mockAppSettingsDataStore.appIcon).thenReturn(AppIcon.DEFAULT)
+        whenever(mockAppSettingsDataStore.selectedFireAnimation).thenReturn(FireAnimation.HeroFire)
 
         whenever(mockVariantManager.getVariant()).thenReturn(VariantManager.DEFAULT_VARIANT)
     }
@@ -231,6 +238,52 @@ class SettingsViewModelTest {
         testee.command.blockingObserve()
         verify(commandObserver).onChanged(commandCaptor.capture())
         assertEquals(Command.LaunchAppIcon, commandCaptor.firstValue)
+    }
+
+    @Test
+    fun whenFireAnimationSettingClickedThenCommandIsLaunchFireAnimationSettings() {
+        testee.userRequestedToChangeFireAnimation()
+        testee.command.blockingObserve()
+        verify(commandObserver).onChanged(commandCaptor.capture())
+        assertEquals(Command.LaunchFireAnimationSettings, commandCaptor.firstValue)
+    }
+
+    @Test
+    fun whenFireAnimationSettingClickedThenPixelSent() {
+        testee.userRequestedToChangeFireAnimation()
+
+        verify(mockPixel).fire(Pixel.PixelName.FIRE_ANIMATION_SETTINGS_OPENED)
+    }
+
+    @Test
+    fun whenNewFireAnimationSelectedThenUpdateViewState() {
+        testee.onFireAnimationSelected(FireAnimation.HeroWater)
+
+        assertEquals(FireAnimation.HeroWater, latestViewState().selectedFireAnimation)
+    }
+
+    @Test
+    fun whenNewFireAnimationSelectedThenStoreNewSelectedAnimation() {
+        testee.onFireAnimationSelected(FireAnimation.HeroWater)
+
+        verify(mockAppSettingsDataStore).selectedFireAnimation = FireAnimation.HeroWater
+    }
+
+    @Test
+    fun whenNewFireAnimationSelectedThenPreLoadAnimation() {
+        testee.onFireAnimationSelected(FireAnimation.HeroWater)
+
+        verify(mockAnimationLoader).preloadSelectedAnimation()
+    }
+
+    @Test
+    fun whenNewFireAnimationSelectedThenPixelSent() {
+        testee.onFireAnimationSelected(FireAnimation.HeroWater)
+
+        verify(mockPixel).fire(
+            Pixel.PixelName.FIRE_ANIMATION_NEW_SELECTED,
+            mapOf(Pixel.PixelParameter.FIRE_ANIMATION to Pixel.PixelValues.FIRE_ANIMATION_WHIRLPOOL)
+        )
     }
 
     @Test
