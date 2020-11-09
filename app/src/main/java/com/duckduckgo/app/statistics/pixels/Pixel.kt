@@ -220,6 +220,7 @@ interface Pixel {
         FIRE_DIALOG_CLEAR_PRESSED("m_fd_p"),
         FIRE_DIALOG_PROMOTED_CANCEL("m_fdp_c"),
         FIRE_DIALOG_CANCEL("m_fd_c"),
+        FIRE_DIALOG_ANIMATION("m_fd_a"),
     }
 
     object PixelParameter {
@@ -238,6 +239,7 @@ interface Pixel {
         const val SERP_QUERY_CHANGED = "1"
         const val SERP_QUERY_NOT_CHANGED = "0"
         const val FIRE_BUTTON_STATE = "fb"
+        const val FIRE_ANIMATION = "fa"
     }
 
     object PixelValues {
@@ -253,6 +255,12 @@ interface Pixel {
         const val DAX_TRACKERS_BLOCKED_CTA = "t"
         const val DAX_NO_TRACKERS_CTA = "nt"
         const val DAX_FIRE_DIALOG_CTA = "fd"
+
+        const val FIRE_ANIMATION_INFERNO = "fai"
+        const val FIRE_ANIMATION_AIRSTREAM = "faas"
+        const val FIRE_ANIMATION_WHIRLPOOL = "fawp"
+        const val FIRE_ANIMATION_NONE = "fann"
+
     }
 
     fun fire(pixel: PixelName, parameters: Map<String, String> = emptyMap(), encodedParameters: Map<String, String> = emptyMap())

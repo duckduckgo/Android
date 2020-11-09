@@ -29,12 +29,13 @@ import com.duckduckgo.app.cta.ui.CtaViewModel
 import com.duckduckgo.app.cta.ui.DaxFireDialogCta
 import com.duckduckgo.app.global.view.FireDialog.FireDialogClearAllEvent.AnimationFinished
 import com.duckduckgo.app.global.view.FireDialog.FireDialogClearAllEvent.ClearAllDataFinished
+import com.duckduckgo.app.settings.clear.FireAnimation
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.VariantManager
-import com.duckduckgo.app.statistics.VariantManager.VariantFeature.FireButtonEducation
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.FIRE_DIALOG_CLEAR_PRESSED
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.FIRE_DIALOG_PROMOTED_CLEAR_PRESSED
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.*
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.FIRE_ANIMATION
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelValues
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import kotlinx.android.synthetic.main.include_dax_dialog_cta.*
@@ -119,7 +120,8 @@ class FireDialog(
     }
 
     private fun onClearOptionClicked() {
-        pixel.fire(if (ctaVisible) FIRE_DIALOG_PROMOTED_CLEAR_PRESSED else FIRE_DIALOG_CLEAR_PRESSED)
+        pixel.enqueueFire(if (ctaVisible) FIRE_DIALOG_PROMOTED_CLEAR_PRESSED else FIRE_DIALOG_CLEAR_PRESSED)
+        pixel.enqueueFire(pixel = FIRE_DIALOG_ANIMATION, parameters = mapOf(FIRE_ANIMATION to getPixelValue(settingsDataStore.selectedFireAnimation)))
         hideClearDataOptions()
         if (animationEnabled()) {
             playAnimation()
@@ -131,6 +133,13 @@ class FireDialog(
             clearPersonalDataAction.setAppUsedSinceLastClearFlag(false)
             onFireDialogClearAllEvent(ClearAllDataFinished)
         }
+    }
+
+    private fun getPixelValue(fireAnimation: FireAnimation) = when (fireAnimation) {
+        FireAnimation.HeroFire -> PixelValues.FIRE_ANIMATION_INFERNO
+        FireAnimation.HeroWater -> PixelValues.FIRE_ANIMATION_WHIRLPOOL
+        FireAnimation.HeroAbstract -> PixelValues.FIRE_ANIMATION_AIRSTREAM
+        FireAnimation.None -> PixelValues.FIRE_ANIMATION_NONE
     }
 
     private fun animationEnabled() = settingsDataStore.selectedFireAnimation.resId != -1
