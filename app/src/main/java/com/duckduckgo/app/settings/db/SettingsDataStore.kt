@@ -35,6 +35,7 @@ interface SettingsDataStore {
     var autoCompleteSuggestionsEnabled: Boolean
     var appIcon: AppIcon
     var selectedFireAnimation: FireAnimation
+    val fireAnimationEnabled: Boolean
     var appIconChanged: Boolean
     var appLoginDetection: Boolean
     var appLocationPermission: Boolean
@@ -110,6 +111,9 @@ class SettingsSharedPreferences @Inject constructor(private val context: Context
     override var selectedFireAnimation: FireAnimation
         get() = selectedFireAnimationSavedValue()
         set(value) = preferences.edit { putString(KEY_SELECTED_FIRE_ANIMATION, fireAnimationMapper.prefValue(value)) }
+
+    override val fireAnimationEnabled: Boolean
+        get() = selectedFireAnimation.resId != -1
 
     // Changing the app icon makes the app close in some devices / OS versions. This is a problem if the user has
     // selected automatic data / tabs clear. We will use this flag to track if the user has changed the icon

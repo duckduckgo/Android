@@ -140,7 +140,7 @@ class FireDialog(
         }
     }
 
-    private fun animationEnabled() = settingsDataStore.selectedFireAnimation.resId != -1
+    private fun animationEnabled() = settingsDataStore.fireAnimationEnabled
 
     private fun playAnimation() {
         window?.navigationBarColor = ContextCompat.getColor(context, R.color.black)

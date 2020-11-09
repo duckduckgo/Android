@@ -45,5 +45,5 @@ class FireAnimationLoader @Inject constructor(
         }
     }
 
-    private fun animationEnabled() = settingsDataStore.selectedFireAnimation.resId != -1
+    private fun animationEnabled() = settingsDataStore.fireAnimationEnabled
 }
