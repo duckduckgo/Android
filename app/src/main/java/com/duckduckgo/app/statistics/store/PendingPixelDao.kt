@@ -14,19 +14,21 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.global.events.db
+package com.duckduckgo.app.statistics.store
 
-import androidx.room.Dao
-import androidx.room.Insert
-import androidx.room.OnConflictStrategy
-import androidx.room.Query
+import androidx.room.*
+import com.duckduckgo.app.statistics.model.PixelEntity
+import io.reactivex.Observable
 
 @Dao
-interface UserEventsDao {
+interface PendingPixelDao {
 
-    @Query("select * from user_events where id=:userEventKey")
-    suspend fun getUserEvent(userEventKey: UserEventKey): UserEventEntity?
+    @Query("select * from pixel_store")
+    fun pixels(): Observable<List<PixelEntity>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insert(userEventEntity: UserEventEntity)
+    fun insert(pixel: PixelEntity): Long
+
+    @Delete
+    fun delete(pixel: PixelEntity)
 }

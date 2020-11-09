@@ -14,19 +14,6 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.global.events.db
+package com.duckduckgo.app.global
 
-import androidx.room.Dao
-import androidx.room.Insert
-import androidx.room.OnConflictStrategy
-import androidx.room.Query
-
-@Dao
-interface UserEventsDao {
-
-    @Query("select * from user_events where id=:userEventKey")
-    suspend fun getUserEvent(userEventKey: UserEventKey): UserEventEntity?
-
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insert(userEventEntity: UserEventEntity)
-}
+fun <T : CharSequence> List<T>.filterBlankItems() = filter { it.isNotBlank() }
