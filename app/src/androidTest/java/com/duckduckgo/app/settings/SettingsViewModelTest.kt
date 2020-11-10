@@ -16,7 +16,6 @@
 
 package com.duckduckgo.app.settings
 
-import android.animation.Animator
 import android.content.Context
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.Observer
