@@ -95,14 +95,15 @@
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/primaryCta"
-        style="@style/Widget.AppCompat.Button.Colored"
+        style="@style/Widget.MaterialComponents.Button.TextButton"
         android:layout_width="0dp"
         android:layout_height="60dp"
         android:layout_marginTop="24dp"
-        android:backgroundTint="@color/cornflowerBlue"
+        app:backgroundTint="@color/cornflowerBlue"
         android:text="@string/onboardingLetsDoItButton"
         android:textAllCaps="false"
         android:textColor="@color/white"
+        android:letterSpacing="0.0"
         app:cornerRadius="22dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="@id/cardView"
