@@ -20,6 +20,7 @@ import android.content.ClipboardManager
 import android.content.Context
 import android.webkit.CookieManager
 import android.webkit.WebSettings
+import androidx.lifecycle.LifecycleObserver
 import com.duckduckgo.app.browser.*
 import com.duckduckgo.app.browser.addtohome.AddToHomeCapabilityDetector
 import com.duckduckgo.app.browser.addtohome.AddToHomeSystemCapabilityDetector
@@ -71,6 +72,7 @@ import com.duckduckgo.app.tabs.ui.GridViewColumnCalculator
 import com.duckduckgo.app.trackerdetection.TrackerDetector
 import dagger.Module
 import dagger.Provides
+import dagger.multibindings.IntoSet
 import kotlinx.coroutines.CoroutineScope
 import javax.inject.Named
 import javax.inject.Singleton
@@ -136,11 +138,13 @@ class BrowserModule {
     }
 
     @Provides
+    @Singleton
+    @IntoSet
     fun defaultBrowserObserver(
         defaultBrowserDetector: DefaultBrowserDetector,
         appInstallStore: AppInstallStore,
         pixel: Pixel
-    ): DefaultBrowserObserver {
+    ): LifecycleObserver {
         return DefaultBrowserObserver(defaultBrowserDetector, appInstallStore, pixel)
     }
 

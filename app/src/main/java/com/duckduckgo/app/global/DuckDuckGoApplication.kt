@@ -24,35 +24,31 @@ import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.OnLifecycleEvent
 import androidx.lifecycle.ProcessLifecycleOwner
 import com.duckduckgo.app.browser.BuildConfig
-import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserObserver
 import com.duckduckgo.app.browser.httpauth.WebViewHttpAuthStore
 import com.duckduckgo.app.browser.shortcut.ShortcutBuilder
 import com.duckduckgo.app.browser.shortcut.ShortcutReceiver
 import com.duckduckgo.app.di.AppComponent
 import com.duckduckgo.app.di.DaggerAppComponent
-import com.duckduckgo.app.fire.*
+import com.duckduckgo.app.fire.FireActivity
+import com.duckduckgo.app.fire.UnsentForgetAllPixelStore
 import com.duckduckgo.app.global.Theming.initializeTheme
 import com.duckduckgo.app.global.initialization.AppDataLoader
 import com.duckduckgo.app.global.install.AppInstallStore
-import com.duckduckgo.app.global.rating.AppEnjoymentLifecycleObserver
+import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.app.global.shortcut.AppShortcutCreator
 import com.duckduckgo.app.httpsupgrade.HttpsUpgrader
 import com.duckduckgo.app.job.AppConfigurationSyncer
 import com.duckduckgo.app.job.WorkScheduler
 import com.duckduckgo.app.notification.NotificationRegistrar
-import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.referral.AppInstallationReferrerStateListener
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.AtbInitializer
 import com.duckduckgo.app.statistics.api.OfflinePixelScheduler
-import com.duckduckgo.app.statistics.api.PixelSender
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.pixels.AppPixelName.APP_LAUNCH
 import com.duckduckgo.app.surrogates.ResourceSurrogateLoader
-import com.duckduckgo.app.tabs.db.TabsDbSanitizer
 import com.duckduckgo.app.trackerdetection.TrackerDataLoader
-import com.duckduckgo.app.usage.app.AppDaysUsedRecorder
 import dagger.android.AndroidInjector
 import dagger.android.DispatchingAndroidInjector
 import dagger.android.HasAndroidInjector
@@ -83,9 +79,6 @@ open class DuckDuckGoApplication : HasAndroidInjector, Application(), LifecycleO
     lateinit var appConfigurationSyncer: AppConfigurationSyncer
 
     @Inject
-    lateinit var defaultBrowserObserver: DefaultBrowserObserver
-
-    @Inject
     lateinit var appInstallStore: AppInstallStore
 
     @Inject
@@ -107,28 +100,13 @@ open class DuckDuckGoApplication : HasAndroidInjector, Application(), LifecycleO
     lateinit var unsentForgetAllPixelStore: UnsentForgetAllPixelStore
 
     @Inject
-    lateinit var dataClearerForegroundAppRestartPixel: DataClearerForegroundAppRestartPixel
-
-    @Inject
     lateinit var offlinePixelScheduler: OfflinePixelScheduler
-
-    @Inject
-    lateinit var dataClearer: DataClearer
 
     @Inject
     lateinit var workScheduler: WorkScheduler
 
     @Inject
-    lateinit var appEnjoymentLifecycleObserver: AppEnjoymentLifecycleObserver
-
-    @Inject
-    lateinit var appDaysUsedRecorder: AppDaysUsedRecorder
-
-    @Inject
     lateinit var appDataLoader: AppDataLoader
-
-    @Inject
-    lateinit var pixelSender: PixelSender
 
     @Inject
     lateinit var alertingUncaughtExceptionHandler: AlertingUncaughtExceptionHandler
@@ -143,13 +121,7 @@ open class DuckDuckGoApplication : HasAndroidInjector, Application(), LifecycleO
     lateinit var shortcutReceiver: ShortcutReceiver
 
     @Inject
-    lateinit var userStageStore: UserStageStore
-
-    @Inject
-    lateinit var fireFireAnimationLoader: FireAnimationLoader
-
-    @Inject
-    lateinit var tabsDbSanitizer: TabsDbSanitizer
+    lateinit var lifecycleObserverPluginPoint: PluginPoint<LifecycleObserver>
 
     @Inject
     lateinit var webViewHttpAuthStore: WebViewHttpAuthStore
@@ -171,18 +143,13 @@ open class DuckDuckGoApplication : HasAndroidInjector, Application(), LifecycleO
         configureDependencyInjection()
         configureUncaughtExceptionHandler()
 
-        ProcessLifecycleOwner.get().lifecycle.also {
-            it.addObserver(this)
-            it.addObserver(dataClearer)
-            it.addObserver(appDaysUsedRecorder)
-            it.addObserver(defaultBrowserObserver)
-            it.addObserver(appEnjoymentLifecycleObserver)
-            it.addObserver(dataClearerForegroundAppRestartPixel)
-            it.addObserver(userStageStore)
-            it.addObserver(pixelSender)
-            it.addObserver(fireFireAnimationLoader)
-            it.addObserver(tabsDbSanitizer)
-            it.addObserver(webViewHttpAuthStore)
+        ProcessLifecycleOwner.get().lifecycle.apply {
+            addObserver(this@DuckDuckGoApplication)
+            lifecycleObserverPluginPoint.getPlugins().forEach {
+                addObserver(it)
+                Need to add this here
+                it.addObserver(webViewHttpAuthStore)
+            }
         }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1) {
@@ -269,8 +236,6 @@ open class DuckDuckGoApplication : HasAndroidInjector, Application(), LifecycleO
             }
             unsentForgetAllPixelStore.resetCount()
         }
-
-        dataClearerForegroundAppRestartPixel.firePendingPixels()
     }
 
     /**

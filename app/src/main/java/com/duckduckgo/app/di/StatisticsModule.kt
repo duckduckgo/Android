@@ -17,6 +17,7 @@
 package com.duckduckgo.app.di
 
 import android.content.Context
+import androidx.lifecycle.LifecycleObserver
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.global.device.ContextDeviceInfo
 import com.duckduckgo.app.global.device.DeviceInfo
@@ -32,6 +33,7 @@ import com.duckduckgo.app.statistics.store.PendingPixelDao
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import dagger.Module
 import dagger.Provides
+import dagger.multibindings.IntoSet
 import retrofit2.Retrofit
 import javax.inject.Named
 import javax.inject.Singleton
@@ -62,6 +64,7 @@ class StatisticsModule {
         RxBasedPixel(pixelSender)
 
     @Provides
+    @Singleton
     fun pixelSender(
         pixelService: PixelService,
         statisticsDataStore: StatisticsDataStore,
@@ -70,6 +73,11 @@ class StatisticsModule {
         pendingPixelDao: PendingPixelDao
     ): PixelSender =
         RxPixelSender(pixelService, pendingPixelDao, statisticsDataStore, variantManager, deviceInfo)
+
+    @Provides
+    @Singleton
+    @IntoSet
+    fun pixelSenderObserver(pixelSender: PixelSender): LifecycleObserver = pixelSender
 
     @Provides
     fun offlinePixelSender(
