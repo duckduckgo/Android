@@ -39,7 +39,7 @@ class OfflinePixelSenderTest {
 
     private var mockOfflinePixelCountDataStore: OfflinePixelCountDataStore = mock()
     private var mockUncaughtExceptionRepository: UncaughtExceptionRepository = mock()
-    private var mockPixel: Pixel = mock()
+    private var mockPixel: PixelSender = mock()
 
     private var testee: OfflinePixelSender = OfflinePixelSender(mockOfflinePixelCountDataStore, mockUncaughtExceptionRepository, mockPixel)
 
@@ -55,7 +55,7 @@ class OfflinePixelSenderTest {
         val exceptionEntity = UncaughtExceptionEntity(1, UncaughtExceptionSource.GLOBAL, "test", 1588167165000, "version")
 
         runBlocking<Unit> {
-            whenever(mockPixel.fireCompletable(any(), any(), any())).thenReturn(Completable.complete())
+            whenever(mockPixel.sendPixel(any(), any(), any())).thenReturn(Completable.complete())
             whenever(mockUncaughtExceptionRepository.getExceptions()).thenReturn(listOf(exceptionEntity))
         }
     }
@@ -70,6 +70,6 @@ class OfflinePixelSenderTest {
 
         testee.sendOfflinePixels().blockingAwait()
 
-        verify(mockPixel).fireCompletable(Pixel.PixelName.APPLICATION_CRASH_GLOBAL.pixelName, params)
+        verify(mockPixel).sendPixel(Pixel.PixelName.APPLICATION_CRASH_GLOBAL.pixelName, params, emptyMap())
     }
 }
