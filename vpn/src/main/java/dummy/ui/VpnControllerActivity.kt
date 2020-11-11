@@ -28,15 +28,18 @@ import android.os.Bundle
 import android.os.IBinder
 import android.widget.CompoundButton
 import android.widget.TextView
+import android.widget.Toast
 import android.widget.ToggleButton
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
+import com.duckduckgo.mobile.android.vpn.BuildConfig
 import com.duckduckgo.mobile.android.vpn.R
 import com.duckduckgo.mobile.android.vpn.model.TimePassed
 import com.duckduckgo.mobile.android.vpn.service.PassthroughVpnService
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
 import com.google.android.material.snackbar.Snackbar
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import dagger.android.AndroidInjection
 import dummy.quietlySetIsChecked
 import kotlinx.coroutines.CoroutineScope
@@ -44,7 +47,9 @@ import kotlinx.coroutines.MainScope
 import org.threeten.bp.OffsetDateTime
 import org.threeten.bp.temporal.ChronoUnit
 import timber.log.Timber
+import java.lang.RuntimeException
 import javax.inject.Inject
+import kotlin.random.Random
 
 class VpnControllerActivity : AppCompatActivity(R.layout.activity_vpn_controller), CoroutineScope by MainScope() {
 
@@ -55,8 +60,6 @@ class VpnControllerActivity : AppCompatActivity(R.layout.activity_vpn_controller
     private lateinit var dataReceivedTextView: TextView
     private lateinit var vpnRunningToggleButton: ToggleButton
     private lateinit var uuidTextView: TextView
-
-    private var vpnService: PassthroughVpnService? = null
 
     @Inject
     lateinit var appTrackerBlockerStatsRepository: AppTrackerBlockingStatsRepository
@@ -72,7 +75,6 @@ class VpnControllerActivity : AppCompatActivity(R.layout.activity_vpn_controller
 
         AndroidInjection.inject(this)
 
-        bindService(PassthroughVpnService.serviceIntent(this), serviceConnection, Context.BIND_AUTO_CREATE)
         setViewReferences()
         configureUiHandlers()
 
@@ -88,10 +90,6 @@ class VpnControllerActivity : AppCompatActivity(R.layout.activity_vpn_controller
         viewModel.loadData()
     }
 
-    override fun onDestroy() {
-        unbindService(serviceConnection)
-        super.onDestroy()
-    }
 
     private fun setViewReferences() {
         trackersBlockedTextView = findViewById(R.id.vpnTrackersBlocked)
@@ -195,19 +193,6 @@ class VpnControllerActivity : AppCompatActivity(R.layout.activity_vpn_controller
 
     private fun stopVpn() {
         startService(PassthroughVpnService.stopIntent(this))
-    }
-
-    private val serviceConnection: ServiceConnection = object : ServiceConnection {
-
-        override fun onServiceConnected(component: ComponentName, binder: IBinder) {
-            Timber.i("Bound to VPN service")
-            vpnService = (binder as PassthroughVpnService.VpnServiceBinder).getService()
-        }
-
-        override fun onServiceDisconnected(component: ComponentName) {
-            vpnService = null
-            Timber.i("Unbound from VPN service")
-        }
     }
 
     private val runningButtonChangeListener = CompoundButton.OnCheckedChangeListener { _, checked ->

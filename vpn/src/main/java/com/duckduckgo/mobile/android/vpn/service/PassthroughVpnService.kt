@@ -141,9 +141,7 @@ class PassthroughVpnService : VpnService(), CoroutineScope by MainScope(), Netwo
 
     override fun onDestroy() {
         Timber.i("VPN onDestroy")
-        if (trackersBlocked.hasActiveObservers()) {
-            trackersBlocked.removeObserver(trackersBlockedObserver)
-        }
+        safelyRemoveTrackersObserver()
         notifyVpnStopped()
         super.onDestroy()
     }
@@ -402,6 +400,8 @@ class PassthroughVpnService : VpnService(), CoroutineScope by MainScope(), Netwo
         )
 
         private val MAJOR_BROWSERS = listOf(
+            "com.duckduckgo.mobile.android",
+            "com.duckduckgo.mobile.android.debug",
             "com.android.chrome",
             "org.mozilla.firefox",
             "com.opera.browser",

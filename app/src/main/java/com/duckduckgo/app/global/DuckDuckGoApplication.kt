@@ -56,8 +56,11 @@ import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.app.surrogates.ResourceSurrogateLoader
 import com.duckduckgo.app.trackerdetection.TrackerDataLoader
 import com.duckduckgo.app.usage.app.AppDaysUsedRecorder
-import com.duckduckgo.mobile.android.vpn.di.DaggerAppTrackerBlockingComponent
 import com.duckduckgo.mobile.android.vpn.di.AppTrackerBlockingComponent
+import com.duckduckgo.mobile.android.vpn.di.DaggerAppTrackerBlockingComponent
+import com.google.firebase.FirebaseApp
+import com.google.firebase.crashlytics.FirebaseCrashlytics
+import com.google.firebase.perf.FirebasePerformance
 import com.jakewharton.threetenabp.AndroidThreeTen
 import dagger.android.AndroidInjector
 import dagger.android.DispatchingAndroidInjector
@@ -216,6 +219,11 @@ open class DuckDuckGoApplication : HasAndroidInjector, Application(), LifecycleO
             referralStateListener.initialiseReferralRetrieval()
             appDataLoader.loadData()
         }
+
+        // vtodo Temporary inclusion of Firebase while in internal testing
+        FirebaseApp.initializeApp(this)
+        FirebaseCrashlytics.getInstance().setCrashlyticsCollectionEnabled(!BuildConfig.DEBUG)
+        FirebasePerformance.getInstance().isPerformanceCollectionEnabled = !BuildConfig.DEBUG
     }
 
     private fun configureUncaughtExceptionHandler() {

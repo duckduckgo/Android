@@ -2,12 +2,14 @@ apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
-apply plugin: 'com.google.gms.google-services'
-apply plugin: 'com.google.firebase.firebase-perf'
-apply plugin: 'com.google.firebase.crashlytics'
 
 apply from: '../versioning.gradle'
 apply from: "$rootDir/spotless.gradle"
+
+// vtodo VPN - temporaraily included for VPN
+apply plugin: 'com.google.gms.google-services'
+apply plugin: 'com.google.firebase.crashlytics'
+apply plugin: 'com.google.firebase.firebase-perf'
 
 ext {
     USE_ORCHESTRATOR = project.hasProperty('orchestrator') ? project.property('orchestrator') : false
@@ -17,7 +19,7 @@ android {
     compileSdkVersion 29
     ndkVersion '21.0.6113669'
     defaultConfig {
-        applicationId "com.duckduckgo.mobile.android.nucleus"
+        applicationId "com.duckduckgo.mobile.android.vpn"
         minSdkVersion 21
         targetSdkVersion 29
         versionCode buildVersionCode()
@@ -143,6 +145,8 @@ ext {
     mockito = "3.6.0"
     mockitoKotlin = "2.2.0"
     commonsMath = "3.6.1"
+
+    firebase = "26.0.0"
 }
 
 
@@ -242,4 +246,8 @@ dependencies {
     androidTestImplementation "com.squareup.okhttp3:mockwebserver:$okHttp"
     androidTestImplementation "com.nhaarman.mockitokotlin2:mockito-kotlin:$mockitoKotlin"
     androidTestImplementation "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
+
+    implementation platform("com.google.firebase:firebase-bom:$firebase")
+    implementation "com.google.firebase:firebase-perf"
+    implementation "com.google.firebase:firebase-crashlytics-ktx"
 }

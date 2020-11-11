@@ -8,9 +8,9 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:545736167954:android:e377f593f13f2a29f9fecb",
+        "mobilesdk_app_id": "1:545736167954:android:0d8f752d7e1d2887f9fecb",
         "android_client_info": {
-          "package_name": "com.duckduckgo.mobile.android.nucleus"
+          "package_name": "com.duckduckgo.mobile.android.vpn"
         }
       },
       "oauth_client": [
