@@ -25,7 +25,6 @@ import timber.log.Timber
 import xyz.hexene.localvpn.Packet
 import xyz.hexene.localvpn.TCB
 import java.nio.ByteBuffer
-import java.util.*
 import javax.inject.Inject
 
 interface VpnTrackerDetector {
@@ -38,7 +37,6 @@ class DomainBasedTrackerDetector @Inject constructor(
     private val trackerListProvider: TrackerListProvider,
     private val vpnDatabase: VpnDatabase
 ) : VpnTrackerDetector {
-
 
     override fun determinePacketType(tcb: TCB, packet: Packet, payloadBuffer: ByteBuffer, isLocalAddress: Boolean): RequestTrackerType {
         if (isLocalAddress) {
@@ -71,9 +69,11 @@ class DomainBasedTrackerDetector @Inject constructor(
         return RequestTrackerType.NotTracker
     }
 
-    private fun insertTracker(tracker: TrackerListProvider.Tracker){
-        val trackerCompany = TrackerListProvider.TRACKER_GROUP_COMPANIES.find { it.trackerCompanyId == tracker.trackerCompanyId } ?: TrackerListProvider.UNDEFINED_TRACKER_COMPANY
-        val vpnTracker = VpnTracker(trackerId = 0, trackerCompanyId = trackerCompany.trackerCompanyId, domain = tracker.hostname, timestamp = OffsetDateTime.now())
+    private fun insertTracker(tracker: TrackerListProvider.Tracker) {
+        val trackerCompany = TrackerListProvider.TRACKER_GROUP_COMPANIES.find { it.trackerCompanyId == tracker.trackerCompanyId }
+            ?: TrackerListProvider.UNDEFINED_TRACKER_COMPANY
+        val vpnTracker =
+            VpnTracker(trackerId = 0, trackerCompanyId = trackerCompany.trackerCompanyId, domain = tracker.hostname, timestamp = OffsetDateTime.now())
         Timber.i("Inserting $tracker as tracker")
         vpnDatabase.vpnTrackerDao().insert(vpnTracker)
     }

@@ -25,15 +25,10 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.VpnService
-import android.os.Binder
-import android.os.Build
-import android.os.IBinder
-import android.os.Parcel
-import android.os.ParcelFileDescriptor
+import android.os.*
 import androidx.core.app.NotificationManagerCompat
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
-import com.duckduckgo.mobile.android.vpn.BuildConfig
 import com.duckduckgo.mobile.android.vpn.model.VpnStateUpdate
 import com.duckduckgo.mobile.android.vpn.model.VpnStats
 import com.duckduckgo.mobile.android.vpn.model.VpnTrackerAndCompany
@@ -48,12 +43,7 @@ import com.duckduckgo.mobile.android.vpn.store.PacketPersister
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
 import com.duckduckgo.mobile.android.vpn.ui.notification.VpnNotificationBuilder
 import dagger.android.AndroidInjection
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.MainScope
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
 import org.threeten.bp.OffsetDateTime
 import org.threeten.bp.temporal.ChronoUnit
 import timber.log.Timber
@@ -61,15 +51,10 @@ import xyz.hexene.localvpn.Packet
 import java.nio.ByteBuffer
 import java.nio.channels.DatagramChannel
 import java.nio.channels.SocketChannel
-import java.util.concurrent.BlockingDeque
-import java.util.concurrent.BlockingQueue
-import java.util.concurrent.ExecutorService
-import java.util.concurrent.Executors
-import java.util.concurrent.LinkedBlockingDeque
-import java.util.concurrent.LinkedBlockingQueue
+import java.util.concurrent.*
 import javax.inject.Inject
 
-class PassthroughVpnService : VpnService(), CoroutineScope by MainScope(), NetworkChannelCreator {
+class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), NetworkChannelCreator {
 
     @Inject
     lateinit var packetPersister: PacketPersister
@@ -112,8 +97,8 @@ class PassthroughVpnService : VpnService(), CoroutineScope by MainScope(), Netwo
             return false
         }
 
-        fun getService(): PassthroughVpnService {
-            return this@PassthroughVpnService
+        fun getService(): TrackerBlockingVpnService {
+            return this@TrackerBlockingVpnService
         }
     }
 
@@ -129,7 +114,7 @@ class PassthroughVpnService : VpnService(), CoroutineScope by MainScope(), Netwo
         Timber.i("VPN onCreate")
     }
 
-    override fun onBind(intent: Intent?): IBinder? {
+    override fun onBind(intent: Intent?): IBinder {
         Timber.i("VPN onBind invoked")
         return binder
     }
@@ -230,11 +215,11 @@ class PassthroughVpnService : VpnService(), CoroutineScope by MainScope(), Netwo
             setBlocking(true)
             setMtu(Short.MAX_VALUE.toInt())
             configureMeteredConnection()
-            //addDnsServer("8.8.8.8")
+            // addDnsServer("8.8.8.8")
 
             // Can either route all apps through VPN and exclude a few (better for prod), or exclude all apps and include a few (better for dev)
             val limitingToTestApps = false
-            if (limitingToTestApps) safelyAddAllowedApps(INCLUDED_APPS) else safelyAddDisallowedApps(EXCLUDED_APPS)
+            if (limitingToTestApps) safelyAddAllowedApps(INCLUDED_APPS_FOR_TESTING) else safelyAddDisallowedApps(EXCLUDED_APPS)
 
             establish()
         }
@@ -277,8 +262,8 @@ class PassthroughVpnService : VpnService(), CoroutineScope by MainScope(), Netwo
         stopSelf()
     }
 
-    private fun safelyRemoveTrackersObserver(){
-        if (::trackersBlocked.isInitialized){
+    private fun safelyRemoveTrackersObserver() {
+        if (::trackersBlocked.isInitialized) {
             if (trackersBlocked.hasActiveObservers()) {
                 trackersBlocked.removeObserver(trackersBlockedObserver)
             }
@@ -349,7 +334,7 @@ class PassthroughVpnService : VpnService(), CoroutineScope by MainScope(), Netwo
         const val VPN_REMINDER_NOTIFICATION_ID = 999
 
         fun serviceIntent(context: Context): Intent {
-            return Intent(context, PassthroughVpnService::class.java)
+            return Intent(context, TrackerBlockingVpnService::class.java)
         }
 
         fun startIntent(context: Context): Intent {
@@ -383,70 +368,6 @@ class PassthroughVpnService : VpnService(), CoroutineScope by MainScope(), Netwo
         private const val ACTION_STOP_VPN = "ACTION_STOP_VPN"
 
         const val FOREGROUND_VPN_SERVICE_ID = 200
-
-        private val EXCLUDED_SYSTEM_APPS = listOf(
-            "com.android.vending",
-            "com.google.android.gsf.login",
-            "com.google.android.googlequicksearchbox",
-            "com.android.providers.downloads.ui"
-        )
-
-        private val EXCLUDED_PROBLEMATIC_APPS = listOf(
-            "com.facebook.katana",
-            "com.facebook.lite",
-            "com.facebook.orca",
-            "com.facebook.mlite",
-            "com.instagram.android"
-        )
-
-        private val MAJOR_BROWSERS = listOf(
-            "com.duckduckgo.mobile.android",
-            "com.duckduckgo.mobile.android.debug",
-            "com.android.chrome",
-            "org.mozilla.firefox",
-            "com.opera.browser",
-            "com.microsoft.emmx",
-            "com.brave.browser",
-            "com.UCMobile.intl",
-            "com.android.browser",
-            "com.sec.android.app.sbrowser",
-            "info.guardianproject.orfo",
-            "org.torproject.torbrowser_alpha",
-            "mobi.mgeek.TunnyBrowser",
-            "com.linkbubble.playstore",
-            "org.adblockplus.browser",
-            "arun.com.chromer",
-            "com.flynx",
-            "com.ghostery.android.ghostery",
-            "com.cliqz.browser",
-            "om.opera.mini.native",
-            "com.uc.browser.en",
-            "com.chrome.beta",
-            "org.mozilla.firefox_beta",
-            "com.opera.browser.beta",
-            "com.opera.mini.native.beta",
-            "com.sec.android.app.sbrowser.beta",
-            "org.mozilla.fennec_fdroid",
-            "org.mozilla.rocket",
-            "com.chrome.dev",
-            "com.chrome.canary",
-            "corg.mozilla.fennec_aurora",
-            "oorg.mozilla.fennec",
-            "com.google.android.apps.chrome",
-            "org.chromium.chrome"
-        )
-
-        private val EXCLUDED_APPS =
-            listOf(BuildConfig.LIBRARY_PACKAGE_NAME).plus(EXCLUDED_SYSTEM_APPS).plus(EXCLUDED_PROBLEMATIC_APPS).plus(MAJOR_BROWSERS)
-
-        private val INCLUDED_APPS = listOf(
-            "com.duckduckgo.networkrequestor",
-            "meteor.test.and.grade.internet.connection.speed",
-            "org.zwanoo.android.speedtest",
-            "com.netflix.Speedtest",
-            "eu.vspeed.android",
-            "net.fireprobe.android"
-        )
     }
 
     override fun createDatagramChannel(): DatagramChannel {
@@ -462,6 +383,15 @@ class PassthroughVpnService : VpnService(), CoroutineScope by MainScope(), Netwo
             protect(channel.socket())
         }
     }
+
+    private val INCLUDED_APPS_FOR_TESTING = listOf(
+        "com.duckduckgo.networkrequestor",
+        "meteor.test.and.grade.internet.connection.speed",
+        "org.zwanoo.android.speedtest",
+        "com.netflix.Speedtest",
+        "eu.vspeed.android",
+        "net.fireprobe.android"
+    )
 }
 
 interface NetworkChannelCreator {
@@ -474,7 +404,7 @@ class VpnQueues {
     val udpDeviceToNetwork: BlockingQueue<Packet> = LinkedBlockingQueue()
 
     val networkToDevice: BlockingDeque<ByteBuffer> = LinkedBlockingDeque<ByteBuffer>()
-    //val networkToDevice: ConcurrentLinkedQueue<ByteBuffer> = ConcurrentLinkedQueue()
+    // val networkToDevice: ConcurrentLinkedQueue<ByteBuffer> = ConcurrentLinkedQueue()
 
     fun clearAll() {
         tcpDeviceToNetwork.clear()

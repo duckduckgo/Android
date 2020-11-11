@@ -82,7 +82,7 @@ class AppTrackerBlockingStatsRepositoryTest {
         assertTrue(connections.timeRunning in 7200000..7200099)
     }
 
-    private fun whenConnectionStatsAreReturned(): VpnStats{
+    private fun whenConnectionStatsAreReturned(): VpnStats {
         return repository.getConnectionStats()!!
     }
 

@@ -19,7 +19,6 @@ package com.duckduckgo.mobile.android.vpn.processor.tcp.hostname
 import xyz.hexene.localvpn.Packet
 import java.nio.ByteBuffer
 
-
 class PayloadBytesExtractor {
 
     fun extract(packet: Packet, payloadBuffer: ByteBuffer): ByteArray {

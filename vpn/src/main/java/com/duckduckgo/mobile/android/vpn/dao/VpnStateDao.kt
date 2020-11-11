@@ -17,11 +17,7 @@
 package com.duckduckgo.mobile.android.vpn.dao
 
 import androidx.lifecycle.LiveData
-import androidx.room.Dao
-import androidx.room.Insert
-import androidx.room.OnConflictStrategy
-import androidx.room.Query
-import androidx.room.Update
+import androidx.room.*
 import com.duckduckgo.mobile.android.vpn.model.VpnState
 import com.duckduckgo.mobile.android.vpn.model.VpnStateUpdate
 

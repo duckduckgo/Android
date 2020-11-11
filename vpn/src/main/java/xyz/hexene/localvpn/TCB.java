@@ -16,20 +16,16 @@
 
 package xyz.hexene.localvpn;
 
+import androidx.annotation.Nullable;
 import com.duckduckgo.mobile.android.vpn.processor.tcp.TcbState;
-
 import java.io.IOException;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.SocketChannel;
 import java.util.Iterator;
 import java.util.Map;
-
-import androidx.annotation.Nullable;
 import timber.log.Timber;
 
-/**
- * Transmission Control Block
- */
+/** Transmission Control Block */
 public class TCB {
     public String ipAndPort;
 
@@ -43,8 +39,7 @@ public class TCB {
     public boolean isTracker = false;
     public boolean trackerTypeDetermined = false;
 
-    @Nullable
-    public String hostName = null;
+    @Nullable public String hostName = null;
 
     // TCP has more states, but we need only these
     public enum TCBStatus {
@@ -69,13 +64,15 @@ public class TCB {
 
     private static final int MAX_CACHE_SIZE = 50; // XXX: Is this ideal?
     public static LRUCache<String, TCB> tcbCache =
-            new LRUCache<>(MAX_CACHE_SIZE, new LRUCache.CleanupCallback<String, TCB>() {
-                @Override
-                public void cleanup(Map.Entry<String, TCB> eldest) {
-                    Timber.w("Closing old TCB: %s", eldest.getKey());
-                    eldest.getValue().closeChannel();
-                }
-            });
+            new LRUCache<>(
+                    MAX_CACHE_SIZE,
+                    new LRUCache.CleanupCallback<String, TCB>() {
+                        @Override
+                        public void cleanup(Map.Entry<String, TCB> eldest) {
+                            Timber.w("Closing old TCB: %s", eldest.getKey());
+                            eldest.getValue().closeChannel();
+                        }
+                    });
 
     public static TCB getTCB(String ipAndPort) {
         synchronized (tcbCache) {
@@ -89,13 +86,14 @@ public class TCB {
         }
     }
 
-    public TCB(String ipAndPort,
-               long sequenceNumberToClient,
-               long sequenceNumberToServer,
-               long acknowledgementNumberToClient,
-               long acknowledgementNumberToServer,
-               SocketChannel channel,
-               Packet referencePacket) {
+    public TCB(
+            String ipAndPort,
+            long sequenceNumberToClient,
+            long sequenceNumberToServer,
+            long acknowledgementNumberToClient,
+            long acknowledgementNumberToServer,
+            SocketChannel channel,
+            Packet referencePacket) {
 
         this.tcbState = new TcbState();
         this.ipAndPort = ipAndPort;

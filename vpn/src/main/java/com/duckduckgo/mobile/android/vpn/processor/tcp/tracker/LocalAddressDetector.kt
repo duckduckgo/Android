@@ -19,7 +19,6 @@ package com.duckduckgo.mobile.android.vpn.processor.tcp.tracker
 import java.net.InetAddress
 import javax.inject.Inject
 
-
 class LocalIpAddressDetector @Inject constructor() {
 
     fun isLocalAddress(destinationAddress: InetAddress): Boolean {

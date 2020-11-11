@@ -45,13 +45,16 @@ class VpnNotificationBuilder {
                 getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT)
             }
 
-            return NotificationCompat.Builder(context,
+            return NotificationCompat.Builder(
+                context,
                 VPN_FOREGROUND_SERVICE_NOTIFICATION_CHANNEL_ID
             )
                 .setContentTitle(context.getString(R.string.vpnNotificationTitle))
                 .setContentText(generateNotificationText(trackersBlocked))
-                .setStyle(NotificationCompat.BigTextStyle()
-                    .bigText(generateNotificationText(trackersBlocked)))
+                .setStyle(
+                    NotificationCompat.BigTextStyle()
+                        .bigText(generateNotificationText(trackersBlocked))
+                )
                 .setSmallIcon(R.drawable.ic_vpn_notification_24)
                 .setContentIntent(vpnControllerPendingIntent)
                 .setOngoing(true)
@@ -68,7 +71,7 @@ class VpnNotificationBuilder {
                 val timeDifference = lastTrackerBlocked.tracker.timestamp.until(OffsetDateTime.now(), ChronoUnit.MILLIS)
                 val timeRunning = TimePassed.fromMilliseconds(timeDifference)
                 "Today, so far we blocked ${trackersBlocked.size} companies from tracking you, " +
-                    "the last one was ${lastTrackerBlocked.trackerCompany.company}"
+                        "the last one was ${lastTrackerBlocked.trackerCompany.company}"
             }
         }
 
@@ -81,7 +84,7 @@ class VpnNotificationBuilder {
             }
         }
 
-        fun buildReminderNotification(context: Context): Notification{
+        fun buildReminderNotification(context: Context): Notification {
             registerChannel(context)
 
             val vpnControllerIntent = Intent(context, VpnControllerActivity::class.java)
@@ -90,7 +93,8 @@ class VpnNotificationBuilder {
                 getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT)
             }
 
-            return NotificationCompat.Builder(context,
+            return NotificationCompat.Builder(
+                context,
                 VPN_FOREGROUND_SERVICE_NOTIFICATION_CHANNEL_ID
             )
                 .setContentTitle(context.getString(R.string.vpnReminderNotificationTitle))

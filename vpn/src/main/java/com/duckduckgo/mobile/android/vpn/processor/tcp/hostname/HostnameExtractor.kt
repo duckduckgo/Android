@@ -22,7 +22,6 @@ import xyz.hexene.localvpn.TCB
 import java.nio.ByteBuffer
 import java.nio.charset.StandardCharsets
 
-
 interface HostnameExtractor {
 
     fun extract(tcb: TCB, packet: Packet, payloadBuffer: ByteBuffer): String?
@@ -65,4 +64,3 @@ class AndroidHostnameExtractor(
     }
 
 }
-

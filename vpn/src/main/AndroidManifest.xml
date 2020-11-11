@@ -19,7 +19,7 @@
         </activity>
 
         <service
-            android:name=".service.PassthroughVpnService"
+            android:name=".service.TrackerBlockingVpnService"
             android:permission="android.permission.BIND_VPN_SERVICE"
             android:process=":vpn">
             <intent-filter>

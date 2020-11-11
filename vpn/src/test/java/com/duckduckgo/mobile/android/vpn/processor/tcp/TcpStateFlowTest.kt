@@ -20,7 +20,6 @@ import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpStateFlow.*
 import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpStateFlow.Event.*
 import org.junit.Assert.*
 import org.junit.Test
-import xyz.hexene.localvpn.TCB
 import xyz.hexene.localvpn.TCB.TCBStatus
 import xyz.hexene.localvpn.TCB.TCBStatus.*
 

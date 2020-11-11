@@ -27,7 +27,6 @@ import timber.log.Timber
 import xyz.hexene.localvpn.ByteBufferPool
 import xyz.hexene.localvpn.Packet
 import java.io.IOException
-import java.lang.Runnable
 import java.net.InetSocketAddress
 import java.nio.channels.DatagramChannel
 import java.nio.channels.SelectionKey
@@ -35,7 +34,7 @@ import java.nio.channels.Selector
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 
-class UdpPacketProcessor(private val queues: VpnQueues, private val networkChannelCreator: NetworkChannelCreator) : Runnable{
+class UdpPacketProcessor(private val queues: VpnQueues, private val networkChannelCreator: NetworkChannelCreator) : Runnable {
 
     private var pollJobDeviceToNetwork: Job? = null
     private var pollJobNetworkToDevice: Job? = null

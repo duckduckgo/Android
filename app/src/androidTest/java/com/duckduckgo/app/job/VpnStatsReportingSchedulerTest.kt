@@ -33,7 +33,6 @@ import org.threeten.bp.temporal.ChronoUnit
 
 class VpnStatsReportingSchedulerTest {
 
-
     private lateinit var testee: VpnStatsReportingScheduler
 
     private lateinit var db: VpnDatabase

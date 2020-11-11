@@ -20,6 +20,8 @@ plugins {
     id 'kotlin-kapt'
 }
 
+apply from: "$rootDir/spotless.gradle"
+
 android {
     compileSdkVersion 30
     buildToolsVersion "30.0.0"

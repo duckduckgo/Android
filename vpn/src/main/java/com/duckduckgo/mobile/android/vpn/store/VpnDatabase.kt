@@ -17,11 +17,7 @@
 package com.duckduckgo.mobile.android.vpn.store
 
 import android.content.Context
-import androidx.room.Database
-import androidx.room.Room
-import androidx.room.RoomDatabase
-import androidx.room.TypeConverter
-import androidx.room.TypeConverters
+import androidx.room.*
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.duckduckgo.mobile.android.vpn.dao.VpnStateDao
 import com.duckduckgo.mobile.android.vpn.dao.VpnStatsDao
@@ -35,7 +31,7 @@ import com.duckduckgo.mobile.android.vpn.processor.tcp.tracker.TrackerListProvid
 import org.threeten.bp.OffsetDateTime
 import org.threeten.bp.format.DateTimeFormatter
 import timber.log.Timber
-import java.util.UUID
+import java.util.*
 import java.util.concurrent.Executors
 
 @Database(

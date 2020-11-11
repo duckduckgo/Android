@@ -71,7 +71,7 @@ class TcpDeviceToNetwork(
     fun deviceToNetworkProcessing() {
         val packet = queues.tcpDeviceToNetwork.take() ?: return
         val startTime = System.nanoTime()
-        //measurePacketConsumptionTimes(startTime)
+        // measurePacketConsumptionTimes(startTime)
 
         val destinationAddress = packet.ip4Header.destinationAddress
         val destinationPort = packet.tcpHeader.destinationPort
@@ -89,14 +89,14 @@ class TcpDeviceToNetwork(
         packetPersister.persistDataSent(totalPacketLength)
 
         val tcb = TCB.getTCB(connectionKey)
-        //Timber.i("Device to network packet; got new response buffer and checked for TCB. Took ${(System.nanoTime() - startTime) / 1_000_000}ms")
+        // Timber.i("Device to network packet; got new response buffer and checked for TCB. Took ${(System.nanoTime() - startTime) / 1_000_000}ms")
 
         if (tcb == null) {
             processPacketTcbNotInitialized(connectionKey, packet, totalPacketLength, connectionParams)
-            //Timber.i("Processed device-to-network packet. New connection. Took ${(System.nanoTime() - startTime) / 1_000_000}ms")
+            // Timber.i("Processed device-to-network packet. New connection. Took ${(System.nanoTime() - startTime) / 1_000_000}ms")
         } else {
             processPacketTcbExists(connectionKey, tcb, packet, totalPacketLength, connectionParams, responseBuffer, payloadBuffer)
-            //Timber.i("Processed device-to-network packet. Existing connection. Took ${(System.nanoTime() - startTime) / 1_000_000}ms")
+            // Timber.i("Processed device-to-network packet. Existing connection. Took ${(System.nanoTime() - startTime) / 1_000_000}ms")
         }
 
         //        if (responseBuffer.position() == 0) {
@@ -334,4 +334,3 @@ class TcpDeviceToNetwork(
     }
 
 }
-

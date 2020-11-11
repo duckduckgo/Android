@@ -16,8 +16,6 @@
 
 package com.duckduckgo.mobile.android.vpn.processor.tcp
 
-import android.os.Handler
-import android.view.ViewDebug.trace
 import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpPacketProcessor.Companion.logPacketDetails
 import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpPacketProcessor.Companion.updateState
 import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpStateFlow.Event.MoveState
@@ -26,7 +24,6 @@ import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpStateFlow.Event.MoveSt
 import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpStateFlow.Event.SendReset
 import com.duckduckgo.mobile.android.vpn.service.VpnQueues
 import com.duckduckgo.mobile.android.vpn.store.PacketPersister
-import com.google.firebase.perf.FirebasePerformance
 import com.google.firebase.perf.metrics.AddTrace
 import timber.log.Timber
 import xyz.hexene.localvpn.ByteBufferPool
@@ -126,7 +123,7 @@ class TcpNetworkToDevice(
 
     @AddTrace(name = "network_to_device_send_to_device_queue", enabled = true)
     private fun sendToNetworkToDeviceQueue(packet: Packet, receiveBuffer: ByteBuffer, tcb: TCB, readBytes: Int) {
-        //Timber.i("Network-to-device packet ${tcb.ipAndPort}. $readBytes bytes. ${logPacketDetails(packet, tcb.sequenceNumberToClientInitial, tcb.sequenceNumberToClient, tcb.acknowledgementNumberToClient)}")
+        // Timber.i("Network-to-device packet ${tcb.ipAndPort}. $readBytes bytes. ${logPacketDetails(packet, tcb.sequenceNumberToClientInitial, tcb.sequenceNumberToClient, tcb.acknowledgementNumberToClient)}")
         packet.updateTcpBuffer(receiveBuffer, (PSH or ACK).toByte(), tcb.sequenceNumberToClient, tcb.acknowledgementNumberToClient, readBytes)
 
         tcb.sequenceNumberToClient += readBytes

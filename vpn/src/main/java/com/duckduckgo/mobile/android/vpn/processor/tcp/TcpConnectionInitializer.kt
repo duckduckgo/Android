@@ -71,7 +71,13 @@ class TcpConnectionInitializer(private val queues: VpnQueues, private val networ
             return Pair(tcb, channel)
         } else {
             Timber.i("Trying to initialize a connection but is not a SYN packet; sending RST")
-            params.packet.updateTcpBuffer(params.responseBuffer, TCPHeader.RST.toByte(), 0, params.packet.tcpHeader.sequenceNumber + 1, params.packet.tcpPayloadSize(true))
+            params.packet.updateTcpBuffer(
+                params.responseBuffer,
+                TCPHeader.RST.toByte(),
+                0,
+                params.packet.tcpHeader.sequenceNumber + 1,
+                params.packet.tcpPayloadSize(true)
+            )
             queues.networkToDevice.offer(params.responseBuffer)
             return null
         }

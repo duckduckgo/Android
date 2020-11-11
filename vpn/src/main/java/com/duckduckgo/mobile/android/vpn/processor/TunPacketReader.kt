@@ -26,7 +26,6 @@ import java.io.FileInputStream
 import java.nio.ByteBuffer
 import java.nio.channels.FileChannel
 
-
 class TunPacketReader(private val tunInterface: ParcelFileDescriptor, private val queues: VpnQueues) : Runnable {
 
     private var running = false

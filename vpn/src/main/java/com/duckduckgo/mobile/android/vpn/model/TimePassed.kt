@@ -20,40 +20,40 @@ import timber.log.Timber
 
 data class TimePassed(val hours: Long, val minutes: Long, val seconds: Long) {
 
-        override fun toString(): String {
-            Timber.i("Time passed $hours hr, $minutes min $seconds sec")
+    override fun toString(): String {
+        Timber.i("Time passed $hours hr, $minutes min $seconds sec")
 
-            if (hours > 0) {
-                return if (minutes > 0) {
-                    "$hours hr $minutes min"
-                } else {
-                    "$hours hr"
-                }
-            }
-
-            if (minutes > 0) {
-                return "$minutes min"
-            }
-
-            if (seconds > 0){
-                return "$seconds sec"
-            }
-
-            return "1 sec"
-        }
-
-        companion object {
-
-            fun between(currentMillis: Long, oldMillis: Long): TimePassed {
-                return fromMilliseconds(currentMillis - oldMillis)
-            }
-
-            fun fromMilliseconds(millis: Long): TimePassed {
-                val seconds = (millis / 1000)  % 60
-                val minutes = (millis / (1000 * 60) % 60)
-                val hours = (millis / (1000) / 3600)
-
-                return TimePassed(hours, minutes, seconds)
+        if (hours > 0) {
+            return if (minutes > 0) {
+                "$hours hr $minutes min"
+            } else {
+                "$hours hr"
             }
         }
-    } 
+
+        if (minutes > 0) {
+            return "$minutes min"
+        }
+
+        if (seconds > 0) {
+            return "$seconds sec"
+        }
+
+        return "1 sec"
+    }
+
+    companion object {
+
+        fun between(currentMillis: Long, oldMillis: Long): TimePassed {
+            return fromMilliseconds(currentMillis - oldMillis)
+        }
+
+        fun fromMilliseconds(millis: Long): TimePassed {
+            val seconds = (millis / 1000) % 60
+            val minutes = (millis / (1000 * 60) % 60)
+            val hours = (millis / (1000) / 3600)
+
+            return TimePassed(hours, minutes, seconds)
+        }
+    }
+}

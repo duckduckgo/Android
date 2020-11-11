@@ -19,7 +19,6 @@ package com.duckduckgo.mobile.android.vpn.processor.tcp.hostname
 import timber.log.Timber
 import kotlin.text.Charsets.US_ASCII
 
-
 interface EncryptedRequestHostExtractor {
     fun extract(packet: ByteArray): String?
 }
@@ -87,7 +86,7 @@ class ServerNameIndicationHeaderHostExtractor : EncryptedRequestHostExtractor {
         while (extensionBytesSearched < extensionsLength && index < packet.size) {
             Timber.i("Extensions length: %d, current index = %d, packet size=%d", extensionsLength, index, packet.size)
 
-            val extensionType = addHigherLowerOrderBytes(HigherOrderByte(packet[index]), LowerOrderByte(packet[index+1]))
+            val extensionType = addHigherLowerOrderBytes(HigherOrderByte(packet[index]), LowerOrderByte(packet[index + 1]))
             index += 2
 
             if (extensionType == SERVER_NAME_EXTENSION_TYPE) {

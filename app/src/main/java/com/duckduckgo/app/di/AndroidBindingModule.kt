@@ -49,7 +49,7 @@ import com.duckduckgo.app.survey.ui.SurveyActivity
 import com.duckduckgo.app.systemsearch.SystemSearchActivity
 import com.duckduckgo.app.tabs.ui.TabSwitcherActivity
 import com.duckduckgo.app.widget.ui.AddWidgetInstructionsActivity
-import com.duckduckgo.mobile.android.vpn.service.PassthroughVpnService
+import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
 import dagger.Module
 import dagger.android.ContributesAndroidInjector
 import dummy.ui.VpnControllerActivity
@@ -202,6 +202,6 @@ abstract class AndroidBindingModule {
     abstract fun notificationHandlerService(): NotificationHandlerService
 
     @ContributesAndroidInjector
-    abstract fun vpnService(): PassthroughVpnService
+    abstract fun vpnService(): TrackerBlockingVpnService
 
 }

@@ -19,27 +19,21 @@ package dummy.ui
 import android.app.Activity
 import android.content.ClipData
 import android.content.ClipboardManager
-import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
-import android.content.ServiceConnection
 import android.net.VpnService
 import android.os.Bundle
-import android.os.IBinder
 import android.widget.CompoundButton
 import android.widget.TextView
-import android.widget.Toast
 import android.widget.ToggleButton
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
-import com.duckduckgo.mobile.android.vpn.BuildConfig
 import com.duckduckgo.mobile.android.vpn.R
 import com.duckduckgo.mobile.android.vpn.model.TimePassed
-import com.duckduckgo.mobile.android.vpn.service.PassthroughVpnService
+import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
 import com.google.android.material.snackbar.Snackbar
-import com.google.firebase.crashlytics.FirebaseCrashlytics
 import dagger.android.AndroidInjection
 import dummy.quietlySetIsChecked
 import kotlinx.coroutines.CoroutineScope
@@ -47,9 +41,7 @@ import kotlinx.coroutines.MainScope
 import org.threeten.bp.OffsetDateTime
 import org.threeten.bp.temporal.ChronoUnit
 import timber.log.Timber
-import java.lang.RuntimeException
 import javax.inject.Inject
-import kotlin.random.Random
 
 class VpnControllerActivity : AppCompatActivity(R.layout.activity_vpn_controller), CoroutineScope by MainScope() {
 
@@ -89,7 +81,6 @@ class VpnControllerActivity : AppCompatActivity(R.layout.activity_vpn_controller
         super.onResume()
         viewModel.loadData()
     }
-
 
     private fun setViewReferences() {
         trackersBlockedTextView = findViewById(R.id.vpnTrackersBlocked)
@@ -188,11 +179,11 @@ class VpnControllerActivity : AppCompatActivity(R.layout.activity_vpn_controller
     }
 
     private fun startVpn() {
-        startService(PassthroughVpnService.startIntent(this))
+        startService(TrackerBlockingVpnService.startIntent(this))
     }
 
     private fun stopVpn() {
-        startService(PassthroughVpnService.stopIntent(this))
+        startService(TrackerBlockingVpnService.stopIntent(this))
     }
 
     private val runningButtonChangeListener = CompoundButton.OnCheckedChangeListener { _, checked ->

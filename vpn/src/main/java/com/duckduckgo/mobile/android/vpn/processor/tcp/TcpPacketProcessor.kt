@@ -47,7 +47,7 @@ class TcpPacketProcessor(
     networkChannelCreator: NetworkChannelCreator,
     trackerDetector: VpnTrackerDetector,
     packetPersister: PacketPersister,
-    localAddressDetector: LocalIpAddressDetector,
+    localAddressDetector: LocalIpAddressDetector
 ) : Runnable {
 
     val selector: Selector = Selector.open()
@@ -101,7 +101,7 @@ class TcpPacketProcessor(
     private fun pollForDeviceToNetworkWork() {
         setThreadPriority(THREAD_PRIORITY_URGENT_DISPLAY)
 
-        //while (pollJobDeviceToNetwork?.isActive == true) {
+        // while (pollJobDeviceToNetwork?.isActive == true) {
         while (!Thread.interrupted() && !readWriteExecutorService.isShutdown) {
             kotlin.runCatching {
                 tcpDeviceToNetwork.deviceToNetworkProcessing()
@@ -114,7 +114,7 @@ class TcpPacketProcessor(
     private fun pollForNetworkToDeviceWork() {
         setThreadPriority(THREAD_PRIORITY_URGENT_DISPLAY)
 
-        //while (pollJobNetworkToDevice?.isActive == true) {
+        // while (pollJobNetworkToDevice?.isActive == true) {
         while (!Thread.interrupted() && !readWriteExecutorService.isShutdown) {
             kotlin.runCatching {
                 tcpNetworkToDevice.networkToDeviceProcessing()
@@ -220,7 +220,7 @@ class TcpPacketProcessor(
 
                 val buffer = ByteBufferPool.acquire()
                 packet.updateTcpBuffer(buffer, (ACK).toByte(), sequenceNumberToClient, acknowledgementNumberToClient, 0)
-                //sequenceNumberToClient = increaseOrWraparound(sequenceNumberToClient, 1)
+                // sequenceNumberToClient = increaseOrWraparound(sequenceNumberToClient, 1)
                 queues.networkToDevice.offer(buffer)
             }
         }

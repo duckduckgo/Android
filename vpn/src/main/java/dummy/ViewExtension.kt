@@ -19,7 +19,6 @@ package dummy
 import android.widget.CompoundButton
 import android.widget.ToggleButton
 import androidx.appcompat.widget.SwitchCompat
-import com.google.firebase.perf.FirebasePerformance
 
 fun SwitchCompat.quietlySetIsChecked(newCheckedState: Boolean, changeListener: CompoundButton.OnCheckedChangeListener?) {
     setOnCheckedChangeListener(null)

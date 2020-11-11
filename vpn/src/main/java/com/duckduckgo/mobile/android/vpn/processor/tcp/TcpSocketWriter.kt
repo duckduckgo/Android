@@ -19,7 +19,6 @@ package com.duckduckgo.mobile.android.vpn.processor.tcp
 import com.google.firebase.perf.metrics.AddTrace
 import timber.log.Timber
 import xyz.hexene.localvpn.Packet
-import java.nio.ByteBuffer
 import java.nio.channels.SelectionKey
 import java.nio.channels.Selector
 
@@ -27,7 +26,7 @@ interface SocketWriter {
     fun writeToSocket(writeData: TcpPacketProcessor.PendingWriteData): Boolean
 }
 
-class TcpSocketWriter(private val selector:Selector) : SocketWriter{
+class TcpSocketWriter(private val selector: Selector) : SocketWriter {
 
     @Synchronized
     @AddTrace(name = "socket_writer_write_to_socket", enabled = true)
@@ -56,13 +55,19 @@ class TcpSocketWriter(private val selector:Selector) : SocketWriter{
             tcb.acknowledgementNumberToClient = writeData.ackNumber
             tcb.acknowledgementNumberToServer = writeData.seqNumber
 
-            //tcb.acknowledgementNumberToClient = connectionParams.packet.tcpHeader.sequenceNumber + payloadSize
-            //tcb.acknowledgementNumberToServer = connectionParams.packet.tcpHeader.acknowledgementNumber
+            // tcb.acknowledgementNumberToClient = connectionParams.packet.tcpHeader.sequenceNumber + payloadSize
+            // tcb.acknowledgementNumberToServer = connectionParams.packet.tcpHeader.acknowledgementNumber
             val seqToClient = tcb.sequenceNumberToClient
             val ackToServer = tcb.acknowledgementNumberToServer
-            val seqAckDiff = seqToClient-ackToServer
+            val seqAckDiff = seqToClient - ackToServer
             Timber.i("${writeData.tcb.ipAndPort} - seqToClient=$seqToClient, ackToClient=${tcb.acknowledgementNumberToClient}, ackToServer=$ackToServer, diff=$seqAckDiff")
-            tcb.referencePacket.updateTcpBuffer(connectionParams.responseBuffer, Packet.TCPHeader.ACK.toByte(), tcb.sequenceNumberToClient, tcb.acknowledgementNumberToClient, 0)
+            tcb.referencePacket.updateTcpBuffer(
+                connectionParams.responseBuffer,
+                Packet.TCPHeader.ACK.toByte(),
+                tcb.sequenceNumberToClient,
+                tcb.acknowledgementNumberToClient,
+                0
+            )
             return true
         }
     }

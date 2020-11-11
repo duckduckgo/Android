@@ -131,7 +131,7 @@ import com.duckduckgo.app.survey.ui.SurveyActivity
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.ui.TabSwitcherActivity
 import com.duckduckgo.app.widget.ui.AddWidgetInstructionsActivity
-import com.duckduckgo.mobile.android.vpn.service.PassthroughVpnService
+import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
 import com.duckduckgo.widget.SearchWidgetLight
 import com.google.android.material.snackbar.Snackbar
 import dagger.android.support.AndroidSupportInjection
@@ -1704,7 +1704,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
                 brokenSitePopupMenuItem?.isEnabled = viewState.canReportSite
                 requestDesktopSiteCheckMenuItem?.isEnabled = viewState.canChangeBrowsingMode
                 requestDesktopSiteCheckMenuItem?.isChecked = viewState.isDesktopBrowsingMode
-                vpnPopupMenuItem?.isChecked = PassthroughVpnService.isServiceRunning(activity!!)
+                vpnPopupMenuItem?.isChecked = TrackerBlockingVpnService.isServiceRunning(activity!!)
 
                 addToHome?.let {
                     it.visibility = if (viewState.addToHomeVisible) VISIBLE else GONE

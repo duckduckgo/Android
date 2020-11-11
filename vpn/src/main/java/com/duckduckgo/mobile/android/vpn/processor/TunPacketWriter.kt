@@ -25,7 +25,6 @@ import java.io.FileOutputStream
 import java.io.IOException
 import java.nio.channels.FileChannel
 
-
 class TunPacketWriter(private val tunInterface: ParcelFileDescriptor, private val queues: VpnQueues) : Runnable {
 
     private var running = false
@@ -43,12 +42,10 @@ class TunPacketWriter(private val tunInterface: ParcelFileDescriptor, private va
             while (running && !Thread.interrupted()) {
                 try {
                     executeWriteLoop(vpnOutput)
-                }
-                catch (e: InterruptedException) {
+                } catch (e: InterruptedException) {
                     Timber.w(e, "Thread interrupted")
                     running = false
-                }
-                catch (e: Throwable) {
+                } catch (e: Throwable) {
                     Timber.w(e, "Failed while writing to TUN")
                 }
             }

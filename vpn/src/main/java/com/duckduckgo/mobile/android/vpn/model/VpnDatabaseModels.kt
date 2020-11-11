@@ -16,7 +16,6 @@
 
 package com.duckduckgo.mobile.android.vpn.model
 
-
 import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.PrimaryKey
@@ -60,7 +59,6 @@ data class VpnStateUpdate(
     val id: Long = 1,
     val isRunning: Boolean
 )
-
 
 @Entity(tableName = "vpn_stats")
 data class VpnStats(

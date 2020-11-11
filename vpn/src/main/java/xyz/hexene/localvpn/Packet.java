@@ -20,9 +20,7 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
 
-/**
- * Representation of an IP Packet
- */
+/** Representation of an IP Packet */
 // TODO: Reduce public mutability
 public class Packet {
 
@@ -95,7 +93,8 @@ public class Packet {
         return totalLength - (tcpHeaderLength + ipHeaderLength);
     }
 
-    public void updateTcpBuffer(ByteBuffer buffer, byte flags, long sequenceNum, long ackNum, int payloadSize) {
+    public void updateTcpBuffer(
+            ByteBuffer buffer, byte flags, long sequenceNum, long ackNum, int payloadSize) {
         buffer.position(0);
         fillHeader(buffer);
         backingBuffer = buffer;
@@ -156,8 +155,7 @@ public class Packet {
             sum += BitUtils.getUnsignedShort(buffer.getShort());
             ipLength -= 2;
         }
-        while (sum >> 16 > 0)
-            sum = (sum & 0xFFFF) + (sum >> 16);
+        while (sum >> 16 > 0) sum = (sum & 0xFFFF) + (sum >> 16);
 
         sum = ~sum;
         ip4Header.headerChecksum = sum;
@@ -170,10 +168,14 @@ public class Packet {
 
         // Calculate pseudo-header checksum
         ByteBuffer buffer = ByteBuffer.wrap(ip4Header.sourceAddress.getAddress());
-        sum = BitUtils.getUnsignedShort(buffer.getShort()) + BitUtils.getUnsignedShort(buffer.getShort());
+        sum =
+                BitUtils.getUnsignedShort(buffer.getShort())
+                        + BitUtils.getUnsignedShort(buffer.getShort());
 
         buffer = ByteBuffer.wrap(ip4Header.destinationAddress.getAddress());
-        sum += BitUtils.getUnsignedShort(buffer.getShort()) + BitUtils.getUnsignedShort(buffer.getShort());
+        sum +=
+                BitUtils.getUnsignedShort(buffer.getShort())
+                        + BitUtils.getUnsignedShort(buffer.getShort());
 
         sum += IP4Header.TransportProtocol.TCP.getNumber() + tcpLength;
 
@@ -187,11 +189,9 @@ public class Packet {
             sum += BitUtils.getUnsignedShort(buffer.getShort());
             tcpLength -= 2;
         }
-        if (tcpLength > 0)
-            sum += BitUtils.getUnsignedByte(buffer.get()) << 8;
+        if (tcpLength > 0) sum += BitUtils.getUnsignedByte(buffer.get()) << 8;
 
-        while (sum >> 16 > 0)
-            sum = (sum & 0xFFFF) + (sum >> 16);
+        while (sum >> 16 > 0) sum = (sum & 0xFFFF) + (sum >> 16);
 
         sum = ~sum;
         tcpHeader.checksum = sum;
@@ -200,10 +200,8 @@ public class Packet {
 
     private void fillHeader(ByteBuffer buffer) {
         ip4Header.fillHeader(buffer);
-        if (isUDP)
-            udpHeader.fillHeader(buffer);
-        else if (isTCP)
-            tcpHeader.fillHeader(buffer);
+        if (isUDP) udpHeader.fillHeader(buffer);
+        else if (isTCP) tcpHeader.fillHeader(buffer);
     }
 
     public static class IP4Header {
@@ -237,12 +235,9 @@ public class Packet {
             }
 
             private static TransportProtocol numberToEnum(int protocolNumber) {
-                if (protocolNumber == 6)
-                    return TCP;
-                else if (protocolNumber == 17)
-                    return UDP;
-                else
-                    return Other;
+                if (protocolNumber == 6) return TCP;
+                else if (protocolNumber == 17) return UDP;
+                else return Other;
             }
 
             public int getNumber() {
@@ -273,7 +268,7 @@ public class Packet {
             buffer.get(addressBytes, 0, 4);
             this.destinationAddress = InetAddress.getByAddress(addressBytes);
 
-            //this.optionsAndPadding = buffer.getInt();
+            // this.optionsAndPadding = buffer.getInt();
         }
 
         public void fillHeader(ByteBuffer buffer) {
@@ -298,7 +293,8 @@ public class Packet {
             sb.append(", IHL=").append(IHL);
             sb.append(", typeOfService=").append(typeOfService);
             sb.append(", totalLength=").append(totalLength);
-            sb.append(", identificationAndFlagsAndFragmentOffset=").append(identificationAndFlagsAndFragmentOffset);
+            sb.append(", identificationAndFlagsAndFragmentOffset=")
+                    .append(identificationAndFlagsAndFragmentOffset);
             sb.append(", TTL=").append(TTL);
             sb.append(", protocol=").append(protocolNum).append(":").append(protocol);
             sb.append(", headerChecksum=").append(headerChecksum);

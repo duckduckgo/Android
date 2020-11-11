@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2020 DuckDuckGo
- *  
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,11 +16,10 @@
 
 package com.duckduckgo.mobile.android.vpn.processor.tcp.tracker
 
-
 sealed class RequestTrackerType {
-    
+
     object Tracker : RequestTrackerType()
     object NotTracker : RequestTrackerType()
-    object Undetermined: RequestTrackerType()
-    
+    object Undetermined : RequestTrackerType()
+
 }
