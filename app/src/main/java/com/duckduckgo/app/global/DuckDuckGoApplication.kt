@@ -54,6 +54,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.APP_LAUNCH
 import com.duckduckgo.app.statistics.store.OfflinePixelCountDataStore
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.app.surrogates.ResourceSurrogateLoader
+import com.duckduckgo.app.tabs.db.TabsDbSanitizer
 import com.duckduckgo.app.trackerdetection.TrackerDataLoader
 import com.duckduckgo.app.usage.app.AppDaysUsedRecorder
 import dagger.android.AndroidInjector
@@ -167,6 +168,9 @@ open class DuckDuckGoApplication : HasAndroidInjector, Application(), LifecycleO
     @Inject
     lateinit var fireFireAnimationLoader: FireAnimationLoader
 
+    @Inject
+    lateinit var tabsDbSanitizer: TabsDbSanitizer
+
     private var launchedByFireAction: Boolean = false
 
     open lateinit var daggerAppComponent: AppComponent
@@ -192,6 +196,7 @@ open class DuckDuckGoApplication : HasAndroidInjector, Application(), LifecycleO
             it.addObserver(userStageStore)
             it.addObserver(pixelSender)
             it.addObserver(fireFireAnimationLoader)
+            it.addObserver(tabsDbSanitizer)
         }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1) {
