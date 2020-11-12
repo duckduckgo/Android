@@ -453,7 +453,7 @@ class BrowserTabViewModel(
         if (!currentBrowserViewState().browserShowing) {
             viewModelScope.launch {
                 val cta = refreshCta()
-                showOrHideKeyboard(cta) // we hide the keyboard when showing a DialogCta and HomeCTA type in the home screen otherwise we show it
+                showOrHideKeyboard(cta) // we hide the keyboard when showing a DialogCta and HomeCta type in the home screen otherwise we show it
             }
         } else {
             command.value = HideKeyboard
