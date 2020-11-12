@@ -23,7 +23,7 @@ import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.blockingObserve
 import com.duckduckgo.app.browser.BuildConfig
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
-import com.duckduckgo.app.fire.AnimationLoader
+import com.duckduckgo.app.fire.FireAnimationLoader
 import com.duckduckgo.app.global.DuckDuckGoTheme
 import com.duckduckgo.app.icon.api.AppIcon
 import com.duckduckgo.app.settings.SettingsViewModel.Command
@@ -68,7 +68,7 @@ class SettingsViewModelTest {
     private lateinit var mockPixel: Pixel
 
     @Mock
-    private lateinit var mockAnimationLoader: AnimationLoader
+    private lateinit var mockFireAnimationLoader: FireAnimationLoader
 
     private lateinit var commandCaptor: KArgumentCaptor<Command>
 
@@ -79,7 +79,7 @@ class SettingsViewModelTest {
         context = InstrumentationRegistry.getInstrumentation().targetContext
         commandCaptor = argumentCaptor()
 
-        testee = SettingsViewModel(mockAppSettingsDataStore, mockDefaultBrowserDetector, mockVariantManager, mockAnimationLoader, mockPixel)
+        testee = SettingsViewModel(mockAppSettingsDataStore, mockDefaultBrowserDetector, mockVariantManager, mockFireAnimationLoader, mockPixel)
         testee.command.observeForever(commandObserver)
 
         whenever(mockAppSettingsDataStore.automaticallyClearWhenOption).thenReturn(APP_EXIT_ONLY)
@@ -268,7 +268,7 @@ class SettingsViewModelTest {
     fun whenNewFireAnimationSelectedThenPreLoadAnimation() {
         testee.onFireAnimationSelected(FireAnimation.HeroWater)
 
-        verify(mockAnimationLoader).preloadSelectedAnimation()
+        verify(mockFireAnimationLoader).preloadSelectedAnimation()
     }
 
     @Test

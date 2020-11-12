@@ -24,14 +24,14 @@ import com.airbnb.lottie.LottieCompositionFactory
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import javax.inject.Inject
 
-interface AnimationLoader : LifecycleObserver {
+interface FireAnimationLoader : LifecycleObserver {
     fun preloadSelectedAnimation()
 }
 
-class LottieAnimationLoader @Inject constructor(
+class LottieFireAnimationLoader @Inject constructor(
     private val context: Context,
     private val settingsDataStore: SettingsDataStore
-) : AnimationLoader {
+) : FireAnimationLoader {
 
     @OnLifecycleEvent(Lifecycle.Event.ON_CREATE)
     override fun preloadSelectedAnimation() {
