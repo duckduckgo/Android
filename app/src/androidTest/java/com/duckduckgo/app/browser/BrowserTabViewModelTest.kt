@@ -396,8 +396,7 @@ class BrowserTabViewModelTest {
 
         testee.onViewVisible()
 
-        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
-        assertTrue(commandCaptor.allValues.contains(Command.HideKeyboard))
+        assertCommandIssued<Command.HideKeyboard>()
         assertEquals(HomePanelCta.AddWidgetInstructions, testee.ctaViewState.value!!.cta)
     }
 
