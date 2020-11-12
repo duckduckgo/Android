@@ -34,11 +34,7 @@ import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.Variant
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.nhaarman.mockitokotlin2.KArgumentCaptor
-import com.nhaarman.mockitokotlin2.argumentCaptor
-import com.nhaarman.mockitokotlin2.atLeastOnce
-import com.nhaarman.mockitokotlin2.verify
-import com.nhaarman.mockitokotlin2.whenever
+import com.nhaarman.mockitokotlin2.*
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Rule
@@ -286,6 +282,18 @@ class SettingsViewModelTest {
     }
 
     @Test
+    fun whenSameFireAnimationSelectedThenDoNotSendPixel() {
+        givenSelectedFireAnimation(FireAnimation.HeroFire)
+
+        testee.onFireAnimationSelected(FireAnimation.HeroFire)
+
+        verify(mockPixel, times(0)).fire(
+            Pixel.PixelName.FIRE_ANIMATION_NEW_SELECTED,
+            mapOf(Pixel.PixelParameter.FIRE_ANIMATION to Pixel.PixelValues.FIRE_ANIMATION_INFERNO)
+        )
+    }
+
+    @Test
     fun whenOnGlobalPrivacyControlClickedThenCommandIsLaunchGlobalPrivacyControl() {
         testee.onGlobalPrivacyControlClicked()
         testee.command.blockingObserve()
@@ -294,4 +302,9 @@ class SettingsViewModelTest {
     }
 
     private fun latestViewState() = testee.viewState.value!!
+
+    private fun givenSelectedFireAnimation(fireAnimation: FireAnimation) {
+        whenever(mockAppSettingsDataStore.selectedFireAnimation).thenReturn(fireAnimation)
+        whenever(mockAppSettingsDataStore.isCurrentlySelected(fireAnimation)).thenReturn(true)
+    }
 }
