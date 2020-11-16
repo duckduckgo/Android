@@ -59,7 +59,7 @@ class JobsModule {
         workManager: WorkManager,
         vpnDatabase: VpnDatabase
     ): VpnStatsReportingScheduler {
-        return VpnStatsReportingScheduler(vpnStatsReportingRequestBuilder, workManager, vpnDatabase)
+        return VpnStatsReportingScheduler(vpnStatsReportingRequestBuilder, workManager)
     }
 
 }

@@ -17,9 +17,16 @@
 package com.duckduckgo.app.job
 
 import android.content.Context
+import android.util.Log
 import androidx.work.*
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelName
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.VPN_TESTERS_DAILY_REPORT
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.VPN_DATA_RECEIVED
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.VPN_DATA_SENT
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.VPN_TIME_RUNNING
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.VPN_TRACKERS_BLOCKED
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.VPN_UUID
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
@@ -53,16 +60,17 @@ class VpnStatsReportingWorker(context: Context, workerParams: WorkerParameters) 
     lateinit var pixel: Pixel
 
     override suspend fun doWork(): Result {
+        Timber.i("VpnStatsReportingWorker running")
         val current = vpnDatabase.vpnStatsDao().getCurrent()
         return if (current != null) {
             val params = mapOf(
-                Pixel.PixelParameter.VPN_TIME_RUNNING to current.timeRunning.toString(),
-                Pixel.PixelParameter.VPN_DATA_RECEIVED to current.dataReceived.toString(),
-                Pixel.PixelParameter.VPN_DATA_SENT to current.dataSent.toString(),
-                Pixel.PixelParameter.VPN_UUID to vpnDatabase.vpnStateDao().getOneOff().uuid,
-                Pixel.PixelParameter.VPN_TRACKERS_BLOCKED to vpnDatabase.vpnTrackerDao().getTrackersAfterSync(current.startedAt).size.toString()
+                VPN_TIME_RUNNING to current.timeRunning.toString(),
+                VPN_DATA_RECEIVED to current.dataReceived.toString(),
+                VPN_DATA_SENT to current.dataSent.toString(),
+                VPN_UUID to vpnDatabase.vpnStateDao().getOneOff().uuid,
+                VPN_TRACKERS_BLOCKED to vpnDatabase.vpnTrackerDao().getTrackersAfterSync(current.startedAt).size.toString()
             )
-            pixel.fire(PixelName.VPN_TESTERS_DAILY_REPORT, params)
+            pixel.fire(VPN_TESTERS_DAILY_REPORT, params)
             Timber.i("Sending daily pixel report $params")
             Result.success()
         } else {

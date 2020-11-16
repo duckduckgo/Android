@@ -50,7 +50,7 @@ class VpnStatsReportingSchedulerTest {
         vpnStatsDao = db.vpnStatsDao()
 
         initializeWorkManager()
-        testee = VpnStatsReportingScheduler(VpnStatsReportingRequestBuilder(), workManager, db)
+        testee = VpnStatsReportingScheduler(VpnStatsReportingRequestBuilder(), workManager)
     }
 
     @After
