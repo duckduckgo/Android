@@ -55,7 +55,9 @@ interface TabRepository {
 
     suspend fun delete(tab: TabEntity)
 
-    suspend fun markDeletable(tab: TabEntity, deletable: Boolean)
+    suspend fun markDeletable(tab: TabEntity)
+
+    suspend fun undoDeletable(tab: TabEntity)
 
     /**
      * Deletes from the DB all tabs that are marked as "deletable"

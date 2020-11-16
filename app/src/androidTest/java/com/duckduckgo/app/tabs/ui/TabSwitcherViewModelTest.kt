@@ -103,17 +103,17 @@ class TabSwitcherViewModelTest {
     @Test
     fun whenOnMarkTabAsDeletableThenCallMarkDeletable() = runBlocking {
         val entity = TabEntity("abc", "", "", position = 0)
-        testee.onMarkTabAsDeletable(entity, true)
+        testee.onMarkTabAsDeletable(entity)
 
-        verify(mockTabRepository).markDeletable(entity, true)
+        verify(mockTabRepository).markDeletable(entity)
     }
 
     @Test
-    fun whenOnMarkTabAsNotDeletableThenCallMarkDeletable() = runBlocking {
+    fun whenUndoDeletableTabThenUndoDeletable() = runBlocking {
         val entity = TabEntity("abc", "", "", position = 0)
-        testee.onMarkTabAsDeletable(entity, false)
+        testee.undoDeletableTab(entity)
 
-        verify(mockTabRepository).markDeletable(entity, false)
+        verify(mockTabRepository).undoDeletable(entity)
     }
 
     @Test

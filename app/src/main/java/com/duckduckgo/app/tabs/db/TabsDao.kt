@@ -64,6 +64,18 @@ abstract class TabsDao {
     abstract fun deleteTabsMarkedAsDeletable()
 
     @Transaction
+    open fun markTabAsDeletable(tab: TabEntity) {
+        // requirement: only one tab can be marked as deletable
+        deleteTabsMarkedAsDeletable()
+        updateTab(tab.copy(deletable = true))
+    }
+
+    @Transaction
+    open fun undoDeletableTab(tab: TabEntity) {
+        updateTab(tab.copy(deletable = false))
+    }
+
+    @Transaction
     open fun purgeDeletableTabsAndUpdateSelection() {
         deleteTabsMarkedAsDeletable()
         if (selectedTab() != null) {

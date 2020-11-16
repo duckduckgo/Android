@@ -188,11 +188,15 @@ class TabDataRepository @Inject constructor(
         siteData.remove(tab.tabId)
     }
 
-    override suspend fun markDeletable(tab: TabEntity, deletable: Boolean) {
+    override suspend fun markDeletable(tab: TabEntity) {
         databaseExecutor().scheduleDirect {
-            tabsDao.updateTab(
-                tab.copy(deletable = deletable)
-            )
+            tabsDao.markTabAsDeletable(tab)
+        }
+    }
+
+    override suspend fun undoDeletable(tab: TabEntity) {
+        databaseExecutor().scheduleDirect {
+            tabsDao.undoDeletableTab(tab)
         }
     }
 

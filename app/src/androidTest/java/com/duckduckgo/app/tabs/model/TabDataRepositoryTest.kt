@@ -328,9 +328,9 @@ class TabDataRepositoryTest {
             position = 0,
             deletable = false)
 
-        testee.markDeletable(tab, true)
+        testee.markDeletable(tab)
 
-        verify(mockDao).updateTab(tab.copy(deletable = true))
+        verify(mockDao).markTabAsDeletable(tab)
     }
 
     @Test
@@ -340,9 +340,9 @@ class TabDataRepositoryTest {
             position = 0,
             deletable = true)
 
-        testee.markDeletable(tab, false)
+        testee.undoDeletable(tab)
 
-        verify(mockDao).updateTab(tab.copy(deletable = false))
+        verify(mockDao).undoDeletableTab(tab)
     }
 
     @Test

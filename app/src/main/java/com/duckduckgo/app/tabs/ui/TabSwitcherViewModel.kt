@@ -52,8 +52,12 @@ class TabSwitcherViewModel(private val tabRepository: TabRepository, private val
         webViewSessionStorage.deleteSession(tab.tabId)
     }
 
-    suspend fun onMarkTabAsDeletable(tab: TabEntity, deletable: Boolean = true) {
-        tabRepository.markDeletable(tab, deletable)
+    suspend fun onMarkTabAsDeletable(tab: TabEntity) {
+        tabRepository.markDeletable(tab)
+    }
+
+    suspend fun undoDeletableTab(tab: TabEntity) {
+        tabRepository.undoDeletable(tab)
     }
 
     suspend fun purgeDeletableTabs() {
