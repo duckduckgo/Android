@@ -20,14 +20,16 @@
     <string name="appName" translatable="false">DuckDuckGo</string>
     <string name="appDescription" translatable="false">DuckDuckGo </string>
     <string name="duckDuckGoLogoDescription">DuckDuckGo logotips</string>
-    <string name="duckDuckGoPrivacySimplified">Privātums, vienkāršots.</string>
+    <string name="duckDuckGoPrivacySimplified">Privātums – vienkāršots</string>
     <string name="yes">Jā</string>
     <string name="no">Nē</string>
+    <string name="open">Atvērt</string>
+    <string name="cancel">Atcelt</string>
     <string name="search">Meklēt</string>
 
     <!-- Onboarding Activity -->
     <string name="onboardingDefaultBrowserDescription">Dodieties uz Iestatījumiem, lai meklētu un pārlūkotu ar DuckDuckGo katru reizi.</string>
-    <string name="onboardingDefaultBrowserTitle">Izvēlieties DuckDuckGo par jūsu Noklusējumu</string>
+    <string name="onboardingDefaultBrowserTitle">Padarīt DuckDuckGo par noklusējumu</string>
 
     <!-- Default Browser -->
     <string name="cannotLaunchDefaultAppSettings">Nevar palaist lietotnes noklusējuma iestatījumu ekrānu</string>
@@ -52,7 +54,7 @@
     <!-- Downloading files -->
     <string name="downloadImage">Lejupielādēt attēlu</string>
     <string name="permissionRequiredToDownload">Lai lejupielādētu, ir nepieciešama krātuves atļauja</string>
-    <string name="downloadComplete">Lejupielāde pabeigta.</string>
+    <string name="downloadComplete">Lejupielāde pabeigta</string>
     <string name="downloadFailed">Neizdevās lejupielādēt</string>
     <string name="downloadInProgress">Lejupielāde</string>
 
@@ -107,7 +109,7 @@
 
     <string name="networksActivityTitle">Izsekotāju tīkli</string>
     <string name="networksContentDescription">Izsekotāju tīkli</string>
-    <string name="networksOverview">Izsekotāju tīkli apkopo jūsu tīmekļa vēsturi datu profilā par jums. Lielākie izsekotāju tīkli ir kaitīgāki, jo tie var izsekot un mērķēt jūs internetā plašākā apmērā.</string>
+    <string name="networksOverview">Izsekotāju tīkli apkopo jūsu tīmekļa vēsturi datu profilā par jums. Lielākie izsekotāju tīkli ir kaitīgāki, jo tie var izsekot un atlasīt jūs kā mērķauditoriju internetā plašākā mērogā.</string>
 
     <plurals name="trackersFound">
         <item quantity="zero">%1$s Atrasti izsekotāji</item>
@@ -134,7 +136,7 @@
     </plurals>
 
     <string name="scorecardActivityTitle">Privātuma līmenis</string>
-    <string name="scorecardSiteIsMemberOfMajorNetwork">Vietne ir galvenais izsekotāju tīkls</string>
+    <string name="scorecardSiteIsMemberOfMajorNetwork">Vietne ir lielākais izsekotāju tīkls</string>
     <string name="scorecardPrivacyGrade">Privātuma līmenis</string>
     <string name="scorecardEnhancedGrade">Uzlabots līmenis</string>
 
@@ -144,7 +146,7 @@
     <string name="practicesBad">Slikta privātuma prakse</string>
     <string name="practicesUnknown">Nezināma privātuma prakse</string>
     <string name="practicesOverview">Privātuma prakse norāda, cik aizsargāta ir personiskā informācija, kuru kopīgojat ar vietni.</string>
-    <string name="practicesTosdrLink">Privātuma prakses rezultāti rodas no <b><u>ToS;DR</u></b></string>
+    <string name="practicesTosdrLink">Privātuma prakse no <b><u>ToS;DR</u></b>.</string>
     <string name="practicesIconContentGood">Labas prakses ikona</string>
     <string name="practicesIconContentBad">Sliktas prakses ikona</string>
 
@@ -153,7 +155,7 @@
 
     <!-- Fire -->
     <string name="fireMenu">Izdzēst datus</string>
-    <string name="fireClearAll">Izdzēst visas cilnes un datus</string>
+    <string name="fireClearAll">Notīrīt visas cilnes un datus</string>
     <string name="fireCancel">Atcelt</string>
     <string name="fireDataCleared">Dati ir nodzēsti</string>
 
@@ -166,36 +168,38 @@
     <string name="settingsLightTheme">Gaišs dizains</string>
     <string name="settingsAboutDuckduckgo">Par DuckDuckGo</string>
     <string name="settingsVersion">Versija</string>
-    <string name="leaveFeedback">Atstāt atsauksmi</string>
+    <string name="leaveFeedback">Kopīgot atsauksmi</string>
 
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Saglabāt</string>
 
-    <string name="settingsAutomaticallyClearWhat">Automātiski nodzēst…</string>
+    <string name="settingsAutomaticallyClearWhat">Automātiski notīrīt…</string>
+    <string name="settingsAutomaticallyClearWhatDialogTitle">Automātiski notīrīt…</string>
     <string name="settingsAutomaticallyClearWhatOptionNone">Neko</string>
     <string name="settingsAutomaticallyClearWhatOptionTabs">Cilnes</string>
     <string name="settingsAutomaticallyClearWhatOptionTabsAndData">Cilnes un datus</string>
 
-    <string name="settingsAutomaticallyClearWhen">Nodzēst…</string>
+    <string name="settingsAutomaticallyClearWhen">Notīrīt…</string>
+    <string name="settingsAutomaticallyClearWhenDialogTitle">Notīrīt…</string>
     <string name="settingsAutomaticallyClearWhenAppExitOnly">Tikai iziešana no lietotnes</string>
-    <string name="settingsAutomaticallyClearWhenAppExit5Seconds">Iziešana no lietotnes, 5 sekundes nav aktīva</string>
-    <string name="settingsAutomaticallyClearWhenAppExit5Minutes">Iziešana no lietotnes, 5 minūtes nav aktīva</string>
-    <string name="settingsAutomaticallyClearWhenAppExit15Minutes">Iziešana no lietotnes, 15 minūtes nav aktīva</string>
-    <string name="settingsAutomaticallyClearWhenAppExit30Minutes">Iziešana no lietotnes, 30 minūtes nav aktīva</string>
-    <string name="settingsAutomaticallyClearWhenAppExit60Minutes">Iziešana no lietotnes, 60 minūtes nav aktīva</string>
+    <string name="settingsAutomaticallyClearWhenAppExit5Seconds">Iziešana no lietotnes, neaktīva 5 sekundes</string>
+    <string name="settingsAutomaticallyClearWhenAppExit5Minutes">Iziešana no lietotnes, neaktīva 5 minūtes</string>
+    <string name="settingsAutomaticallyClearWhenAppExit15Minutes">Iziešana no lietotnes, neaktīva 15 minūtes</string>
+    <string name="settingsAutomaticallyClearWhenAppExit30Minutes">Iziešana no lietotnes, neaktīva 30 minūtes</string>
+    <string name="settingsAutomaticallyClearWhenAppExit60Minutes">Iziešana no lietotnes, neaktīva 1 stundu</string>
 
     <!-- About Activity -->
-    <string name="aboutActivityTitle">Par mums</string>
+    <string name="aboutActivityTitle">Par DuckDuckGo</string>
     <string name="aboutDescription">
-        Vietnē DuckDuckGo mēs veidojam jauno tiešsaistes uzticēšanās standartu.\n\n DuckDuckGo konfidencialitātes pārlūks nodrošina visu nepieciešamo privātumu, lai aizsargātu sevi, meklējot un pārlūkojot tīmekli, ieskaitot izsekotāju bloķēšanu, viedāku šifrēšanu un DuckDuckGo privāto meklēšanu.\n\n Galu galā internetam nevajadzētu iedvest bailes, un jūsu godam nopelnītā tiešsaistes privātuma iegūšanai vajadzētu būt tikpat vienkāršai kā žalūziju aizvēršanai.</string>
+        DuckDuckGo mērķis ir veidot jaunu tiešsaistes uzticēšanās standartu.\n\nDuckDuckGo konfidencialitātes pārlūks nodrošina visu nepieciešamo privātumu, lai aizsargātu tevi, meklējot un pārlūkojot informāciju tīmeklī, ieskaitot izsekotāju bloķēšanu, viedāku šifrēšanu un DuckDuckGo privāto meklēšanu.\n\nGalu galā – internetam nevajadzētu iedvest bailes, un tava godam nopelnītā tiešsaistes privātuma iegūšanai vajadzētu būt tikpat vienkāršai kā žalūziju aizvēršanai.</string>
     <string name="aboutMoreLink">Vairāk vietnē duckduckgo.com/about</string>
     <string name="no_suggestions">Nav ieteikumu</string>
 
     <!-- Broken Site Activity -->
     <string name="brokenSiteReportBrokenSiteMenuItem">Ziņot par bojātu vietni</string>
     <string name="brokenSiteHeading">Ziņot par bojātu vietni</string>
-    <string name="brokenSiteSubmitted">Paldies! Atsauksme iesniegta</string>
-    <string name="brokenSitesCategoriesTitle">Aprakstiet notikušo:</string>
+    <string name="brokenSiteSubmitted">Paldies! Atsauksme ir iesniegta.</string>
+    <string name="brokenSitesCategoriesTitle">Aprakstiet notikušo</string>
     <string name="brokenSitesCategoriesHint">Aprakstiet notikušo</string>
     <string name="brokenSiteSubmitButton">Nosūtīt ziņojumu</string>
     <string name="brokenSiteDescription">Ja iesniegsiet anonīmu ziņojumu par bojātu vietni, mēs varēsim atkļūdot šīs problēmas un uzlabot lietotni.</string>
@@ -206,7 +210,7 @@
     <string name="brokenSiteCategoryVideos">Video netika atskaņots</string>
     <string name="brokenSiteCategoryLinks">Saites vai pogas nedarbojas</string>
     <string name="brokenSiteCategoryContent">Trūkst satura</string>
-    <string name="brokenSiteCategoryLogin">Es nevaru pieteikties</string>
+    <string name="brokenSiteCategoryLogin">Es nevaru pierakstīties</string>
     <string name="brokenSiteCategoryUnsupported">Pārlūks nav saderīgs</string>
     <string name="brokenSiteCategoryOther">Kaut kas cits</string>
 
@@ -253,17 +257,17 @@
     <string name="addWidgetCtaDismissButton">Nerādīt</string>
     <string name="addWidgetInstructionsActivityTitle">Pievienot logrīku</string>
     <string name="addWidgetInstruction1Label">1</string>
-    <string name="addWidgetInstruction1">Ilgi nospiediet uz sākuma ekrāna, pēc tam atveriet logrīku izvēlni</string>
+    <string name="addWidgetInstruction1">Ilgi nospied sākuma ekrānā, pēc tam atver logrīku izvēlni.</string>
     <string name="addWidgetInstruction2Label">2</string>
-    <string name="addWidgetInstruction2">Atrast DuckDuckGo logrīku</string>
+    <string name="addWidgetInstruction2">Atrodi DuckDuckGo logrīku.</string>
     <string name="addWidgetInstruction3Label">3</string>
-    <string name="addWidgetInstruction3">Velciet logrīku uz sākuma ekrānu</string>
+    <string name="addWidgetInstruction3">Velc logrīku uz sākuma ekrānu.</string>
     <string name="addWidgetInstructionsButtonGoHome">Doties uz Sākuma ekrānu</string>
     <string name="addWidgetInstructionsButtonClose">Aizvērt</string>
 
     <!-- App Enjoyment / Rating / Feedback -->
     <string name="appEnjoymentDialogTitle">Patīk DuckDuckGo?</string>
-    <string name="appEnjoymentDialogMessage">Mēs labprāt uzzinātu, ko jūs par to domājat</string>
+    <string name="appEnjoymentDialogMessage">Mēs labprāt uzzinātu tavas domas.</string>
     <string name="appEnjoymentDialogPositiveButton">Man patīk</string>
     <string name="appEnjoymentDialogNegativeButton">Nepieciešami uzlabojumi</string>
 
@@ -273,8 +277,8 @@
     <string name="rateAppDialogNegativeButton" translatable="false">@string/noThanks</string>
 
     <string name="giveFeedbackDialogTitle">Mums žēl to dzirdēt</string>
-    <string name="giveFeedbackDialogMessage">Norādiet mums, kā mēs varam uzlabot lietotni jūsu vajadzībām</string>
-    <string name="giveFeedbackDialogPositiveButton">Sniegt atsauksmi</string>
+    <string name="giveFeedbackDialogMessage">Dari mums zināmu, kā varam uzlabot lietotni atbilstoši tavām vajadzībām.</string>
+    <string name="giveFeedbackDialogPositiveButton">Kopīgot atsauksmi</string>
     <string name="giveFeedbackDialogNegativeButton" translatable="false">@string/noThanks</string>
 
     <string name="noThanks">Nē, paldies</string>
@@ -309,11 +313,11 @@
     <string name="systemTextSearchMessage">Meklēt DuckDuckGo</string>
 
     <!-- App feedback disambiguation -->
-    <string name="feedbackActivityTitle">Dalieties ar jūsu atsauksmi</string>
+    <string name="feedbackActivityTitle">Kopīgot atsauksmi</string>
     <string name="missingBrowserFeaturesTitleLong">Pārlūka funkcijas trūkst vai nedarbojas</string>
     <string name="missingBrowserFeaturesTitleShort">Pārlūka funkciju problēmas</string>
     <string name="missingBrowserFeaturesSubtitle">Kuru pārlūkošanas funkciju mēs varam pievienot vai uzlabot?</string>
-    <string name="missingBrowserFeatureSubReasonNavigation">Virzīties uz priekšu, atpakaļ, atsvaidzināt</string>
+    <string name="missingBrowserFeatureSubReasonNavigation">Navigācija uz priekšu, atpakaļ un/vai atsvaidzināšana</string>
     <string name="missingBrowserFeatureSubReasonTabManagement">Cilņu izveidošana un pārvaldīšana</string>
     <string name="missingBrowserFeatureSubReasonAdPopups">Reklāmu un uznirstošo logu bloķēšana</string>
     <string name="missingBrowserFeatureSubReasonVideos">Video skatīšanās</string>
@@ -321,7 +325,7 @@
     <string name="missingBrowserFeatureSubReasonBookmarks">Grāmatzīmju izveidošana un pārvaldīšana</string>
     <string name="missingBrowserFeatureSubReasonOther">Neviens no šiem</string>
 
-    <string name="websiteNotLoadingTitleLong">Vietnes netiek ielādētas pareizi</string>
+    <string name="websiteNotLoadingTitleLong">Vietņu ielādes problēmas</string>
     <string name="websiteNotLoadingTitleShort">Vietņu ielādes problēmas</string>
     <string name="websiteNotLoadingSubtitle">Kura vietne ir bojāta?</string>
 
@@ -357,14 +361,14 @@
     <string name="otherMainReasonTitleLong">Neviens no šiem</string>
     <string name="otherMainReasonTitleShort">Citas problēmas</string>
 
-    <string name="openEndedInputHint">Kā mēs varam to uzlabot? (Neobligāti)</string>
-    <string name="submitFeedback">IESNIEGT ATSAUKSMI</string>
+    <string name="openEndedInputHint">Lūdzu, norādiet pēc iespējas precīzāk</string>
+    <string name="submitFeedback">IESNIEGT</string>
 
     <string name="tellUsHowToImprove">Lūdzu, pastāstiet mums, ko mēs varam to uzlabot.</string>
     <string name="thanksForTheFeedback">Paldies par atsauksmēm!</string>
     <string name="feedbackNegativeMainReasonPageSubtitle">Ar ko jūsu vilšanās ir visvairāk saistīta?</string>
-    <string name="feedbackNegativeMainReasonPageTitle">Mums žēl to dzirdēt.</string>
-    <string name="feedbackShareDetails">Kopīgojiet informāciju</string>
+    <string name="feedbackNegativeMainReasonPageTitle">Mums žēl to dzirdēt</string>
+    <string name="feedbackShareDetails">Kopīgot informāciju</string>
     <string name="sharePositiveFeedbackWithTheTeam">Vai ir kāda informācija, ar kuru vēlaties dalīties ar komandu?</string>
     <string name="whatHaveYouBeenEnjoying">Kas jums patika?</string>
     <string name="awesomeToHear">Prieks dzirdēt!</string>
@@ -390,9 +394,9 @@
     <string name="systemSearchAppNotFound">Lietojumprogrammu nevarēja atrast</string>
     <string name="systemSearchOnboardingText">Paldies, ka izvēlējāties DuckDuckGo!\nTagad, izmantojot mūsu meklētāju vai lietotni, jūsu meklējumi tiks aizsargāti.</string>
     <string name="systemSearchOnboardingFeaturesIntroText">Tāpat DuckDuckGo lietotne:</string>
-    <string name="systemSearchOnboardingFeatureOneText">Bloķē nedrošus izsekotājus</string>
-    <string name="systemSearchOnboardingFeatureTwoText">Veic piespiedu šifrēšanu vietnēs</string>
-    <string name="systemSearchOnboardingFeatureThreeText">Nodzēš datus ar vienu skārienu</string>
+    <string name="systemSearchOnboardingFeatureOneText">Bloķē nedrošus izsekotājus.</string>
+    <string name="systemSearchOnboardingFeatureTwoText">Veic piespiedu šifrēšanu vietnēs.</string>
+    <string name="systemSearchOnboardingFeatureThreeText">Notīra datus ar vienu pieskārienu.</string>
     <string name="systemSearchOnboardingButtonMore">Parādīt vairāk</string>
     <string name="systemSearchOnboardingButtonLess">Paslēpt</string>
     <string name="systemSearchOnboardingButtonOk">Sapratu</string>
@@ -412,17 +416,17 @@
     <string name="onboardingDaxText"><![CDATA[Internets var būt diezgan biedējošs.<br/><br/>Bet neuztraucieties! Meklēt un pārlūkot privātā režīmā ir vieglāk, nekā jūs domājat.]]></string>
     <string name="onboardingLetsDoItButton">Darīsim to!</string>
     <string name="daxIntroCtaText"><![CDATA[Tagad pamēģiniet ieiet kādā no jūsu mīļākajām vietnēm! <br/><br/>Es nobloķēšu izsekotājus, lai viņi nevarētu jūs izspiegot. Ja iespējams, uzlabošu arī jūsu savienojuma drošību. 🔒]]></string>
-    <string name="daxEndCtaText"><![CDATA[Tas izdevās! <br/><br/>Atcerieties – katru reizi, kad jūs pārlūkojat ar mani, jocīgas reklāmas atkāpjas. 👍]]></string>
+    <string name="daxEndCtaText"><![CDATA[Izdevās!<br/><br/>Atceries: katru reizi, kad pārlūkosi kopā ar mani, kaitinošās reklāmas zaudēs savu spēku! 👍]]></string>
     <string name="daxSerpCtaText">Jūsu DuckDuckGo meklējumi ir anonīmi, un es nekad neuzglabāju jūsu meklēšanas vēsturi. Nekad. 🙌</string>
     <plurals name="daxTrackersBlockedCtaText">
-        <item quantity="zero"><![CDATA[ un <b>%1$d citas</b> mēģināja jūs izsekot. <br/><br/>Es tās nobloķēju!<br/><br/> ☝️Jūs varat pārbaudīt URL joslu, lai redzētu, kas mēģina jūs izsekot, kad apmeklējat jaunu vietni.️]]></item>
-        <item quantity="one"><![CDATA[ un <b>%1$d citas</b> mēģināja jūs izsekot. <br/><br/>Es tās nobloķēju!<br/><br/> ☝️Jūs varat pārbaudīt URL joslu, lai redzētu, kurš mēģina jūs izsekot, kad apmeklējat jaunu vietni.️]]></item>
-        <item quantity="other"><![CDATA[ un <b>%1$d citas</b> mēģināja jūs izsekot. <br/><br/>Es tās nobloķēju!<br/><br/> ☝️Jūs varat pārbaudīt URL joslu, lai redzētu, kurš mēģina jūs izsekot, kad apmeklējat jaunu vietni.️]]></item>
+        <item quantity="zero"><![CDATA[ un <b>%1$d citas vietnes</b> mēģināja tevi šeit izsekot. <br/><br/>Es tās nobloķēju!<br/><br/> ☝️ Vari pārbaudīt adreses joslu, lai redzētu, kas tevi mēģina izsekot, kad tu apmeklē jaunu vietni.️]]></item>
+        <item quantity="one"><![CDATA[ un <b>%1$d cita vietne</b> mēģināja tevi šeit izsekot. <br/><br/>Es tās nobloķēju!<br/><br/> ☝️ Vari pārbaudīt adreses joslu, lai redzētu, kas tevi mēģina izsekot, kad tu apmeklē jaunu vietni.️]]></item>
+        <item quantity="other"><![CDATA[ un <b>%1$d citas vietnes</b> mēģināja tevi šeit izsekot. <br/><br/>Es tās nobloķēju!<br/><br/> ☝️ Vari pārbaudīt adreses joslu, lai redzētu, kas tevi mēģina izsekot, kad tu apmeklē jaunu vietni.️]]></item>
     </plurals>
     <plurals name="daxTrackersBlockedCtaZeroText">
-        <item quantity="zero"><![CDATA[ mēģināja tevi šeit izsekot. <br/><br/>Es tās nobloķēju!<br/><br/> ☝️Tu vari pārbaudīt URL joslu, lai redzētu, kas tevi mēģina izsekot, kad tu apmeklē jaunu vietni.️]]></item>
-        <item quantity="one"><![CDATA[ mēģināja tevi šeit izsekot. <br/><br/>Es tās nobloķēju!<br/><br/> ☝️Tu vari pārbaudīt URL joslu, lai redzētu, kas tevi mēģina izsekot, kad tu apmeklē jaunu vietni.️]]></item>
-        <item quantity="other"><![CDATA[ mēģināja tevi šeit izsekot. <br/><br/>Es tās nobloķēju!<br/><br/> ☝️Tu vari pārbaudīt URL joslu, lai redzētu, kas tevi mēģina izsekot, kad tu apmeklē jaunu vietni.️]]></item>
+        <item quantity="zero"><![CDATA[ mēģināja tevi šeit izsekot. <br/><br/>Es tās nobloķēju!<br/><br/> ☝️ Vari pārbaudīt URL joslu, lai redzētu, kas tevi mēģina izsekot, kad tu apmeklē jaunu vietni.️]]></item>
+        <item quantity="one"><![CDATA[ mēģināja tevi šeit izsekot. <br/><br/>Es tās nobloķēju!<br/><br/> ☝️ Vari pārbaudīt URL joslu, lai redzētu, kas tevi mēģina izsekot, kad tu apmeklē jaunu vietni.️]]></item>
+        <item quantity="other"><![CDATA[ mēģināja tevi šeit izsekot. <br/><br/>Es tās nobloķēju!<br/><br/> ☝️ Vari pārbaudīt URL joslu, lai redzētu, kas tevi mēģina izsekot, kad tu apmeklē jaunu vietni.️]]></item>
     </plurals>
     <string name="daxNonSerpCtaText"><![CDATA[Kad pieskarsies un ritināsi, es bloķēšu uzmācīgos izsekotājus. <br/><br/>Aiziet – turpini pārlūkot!]]></string>
     <string name="daxMainNetworkCtaText"><![CDATA[Galvu augšā! %1$s ir galvenais izsekošanas tīkls.<br/><br/> To izsekotāji slēpjas apmēram %2$s populārākajās vietnēs 😱, bet nevajag satraukties! <br/><br/>Es bloķēšu %3$s iespēju redzēt tavas darbības šajās vietnēs.]]></string>
@@ -439,7 +443,7 @@
 
     <!-- Change Icon Activity -->
     <string name="changeIconActivityTitle">Lietotnes ikona</string>
-    <string name="changeIconCtaLabel">Mainīt lietotnes ikonu</string>
+    <string name="changeIconCtaLabel">Lietotnes ikona</string>
     <string name="changeIconCtaAccept">Apstiprināt</string>
     <string name="changeIconCtaCancel">Atcelt</string>
     <string name="changeIconDialogTitle">Vai lietot jauno ikonu?</string>
@@ -452,6 +456,7 @@
     <!-- Dialogs -->
     <string name="dialogAddTitle">Pievienot</string>
     <string name="dialogEditTitle">Rediģēt</string>
+    <string name="dialogSaveAction">Saglabāt</string>
 
     <!-- Whitelist -->
     <string name="whitelisetActivityTitle">Neaizsargātas vietnes</string>
@@ -460,21 +465,21 @@
     <string name="whitelistEntryOverflowContentDescription">Citas iespējas neaizsargātai vietnei %1$s</string>
     <string name="whitelistEntryDeleteConfirmMessage">Vai tiešām vēlies noņemt &lt;b&gt;%1$s&lt;/b&gt; no neaizsargātām vietnēm?</string>
     <string name="whitelistExplanation">Šīs vietnes netiks uzlabotas ar privātuma aizsardzību.</string>
-    <string name="whitelistNoEntries">Pagaidām nav neaizsargātu vietņu</string>
+    <string name="whitelistNoEntries">Privātuma aizsardzība ir iespējota visām vietnēm</string>
     <string name="whitelistDomainHint">www.piemērs.com</string>
-    <string name="whitelistFormatError">Nevarēja saglabāt, ievadiet domēnu, piemēram, <b>piemērs.com</b></string>
+    <string name="whitelistFormatError">Lūdzu, ievadi tādu domēnu kā, piemēram, <b>example.com</b>, un mēģini vēlreiz</string>
 
     <!-- Settings -->
     <string name="settingsPrivacyProtectionWhitelist">Neaizsargātas vietnes</string>
 
     <!-- Fireproof websites -->
-    <string name="fireproofWebsitesActivityTitle">Ugunsdrošas tīmekļa vietnes</string>
-    <string name="settingsFireproofWebsites">Ugunsdrošas tīmekļa vietnes</string>
-    <string name="fireproofWebsiteMenuTitleAdd">Ugunsdrošā tīmekļa vietne</string>
-    <string name="fireproofWebsiteSnackbarConfirmation">&lt;b&gt;%1$s&lt;/b&gt; tagad ir ugunsdrošs! Lai uzzinātu vairāk, apmeklējiet iestatījumus.</string>
+    <string name="fireproofWebsitesActivityTitle">Ugunsdrošas vietnes</string>
+    <string name="settingsFireproofWebsites">Ugunsdrošas vietnes</string>
+    <string name="fireproofWebsiteMenuTitleAdd">Ugunsdroša vietne</string>
+    <string name="fireproofWebsiteSnackbarConfirmation">&lt;b&gt;%1$s&lt;/b&gt; tagad ir ugunsdrošs! Atver iestatījumu sadaļu, lai to pārvaldītu.</string>
     <string name="fireproofWebsiteSnackbarAction">Atsaukt</string>
     <string name="fireproofWebsiteDeleteConfirmMessage">Vai tiešām vēlaties izdzēst &lt;b&gt;%1$s&lt;/b&gt;?</string>
-    <string name="fireproofWebsiteEmptyListHint">Pagaidām neviena tīmekļa vietne nav ugunsdroša</string>
+    <string name="fireproofWebsiteEmptyListHint">Nav ugunsdrošu vietņu</string>
     <string name="fireproofWebsiteFeatureDescription">Vietnes lieto sīkfailus, lai tu varētu turpināt būt pierakstījies(-usies). Padarot vietni ugunsdrošu, sīkfaili netiek dzēsti, bet tu vari turpināt būt pierakstījies(-usies) arī pēc Uguns pogas lietošanas. Mēs joprojām bloķēsim trešo pušu izsekotājus, kas atrodami ugunsdrošās vietnēs.</string>
     <string name="fireproofWebsiteOverflowContentDescription">Citas iespējas ugunsdrošai tīmekļa vietnei %1$s</string>
     <string name="fireproofWebsiteLoginDialogTitle">Vai vēlies padarīt %1$s ugunsdrošu?</string>
@@ -491,9 +496,6 @@
     <string name="downloadManagerDisabled">Lejupielāžu pārvaldnieks ir atspējots</string>
     <string name="downloadManagerIncompatible">Lejupielāžu pārvaldnieks šajā ierīcē nav pieejams</string>
     <string name="enable">Iespējot</string>
-
-    <!--Fire button education-->
-    <string name="daxClearDataCtaText">Tagad pieskaries zemāk, lai izsvēpētu savu pārlūkošanas vēsturi. Pamēģini! 👇</string>
 
     <!-- Precise Location -->
     <string name="preciseLocationSystemDialogTitle">Vai iespējot ierīces atrašanās vietu DuckDuckGo privātuma pārlūkprogrammai?</string>
@@ -518,6 +520,9 @@
     <string name="preciseLocationAllowedSitesSectionTitle">Piešķirts</string>
     <string name="preciseLocationDeniedSitesSectionTitle">Aizliegts</string>
     <string name="preciseLocationSnackbarMessage">Tu iepriekš piešķīri %1$s atļauju piekļūt savas ierīces atrašanās vietai.</string>
+
+    <!--Fire button education-->
+    <string name="daxClearDataCtaText">Personas dati var uzkrāties tavā pārlūkā. Pē! Izmanto Uguns pogu, lai tos visus nodedzinātu. Pamēģini tagad! 👇</string>
 
     <!--  Global Privacy Control-->
     <string name="globalPrivacyControlActivityTitle">Globālā privātuma kontrole (GPC)</string>
