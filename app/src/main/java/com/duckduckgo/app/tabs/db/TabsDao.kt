@@ -27,7 +27,7 @@ import javax.inject.Singleton
 @Singleton
 abstract class TabsDao {
 
-    @Query("select * from tabs order by position limit 1")
+    @Query("select * from tabs where deletable is 0 order by position limit 1")
     abstract fun firstTab(): TabEntity?
 
     @Query("select * from tabs inner join tab_selection on tabs.tabId = tab_selection.tabId order by position limit 1")

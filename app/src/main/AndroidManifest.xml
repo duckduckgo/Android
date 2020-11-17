@@ -243,10 +243,8 @@
             </intent-filter>
         </activity>
 
-        <!-- we handle orientation configChanges to ensure proper tab UNDO functionality -->
         <activity
             android:name="com.duckduckgo.app.tabs.ui.TabSwitcherActivity"
-            android:configChanges="orientation"
             android:label="@string/tabActivityTitle" />
 
         <activity

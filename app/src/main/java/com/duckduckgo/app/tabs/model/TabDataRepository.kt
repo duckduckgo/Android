@@ -28,8 +28,7 @@ import com.duckduckgo.app.tabs.db.TabsDao
 import io.reactivex.Observable
 import io.reactivex.Scheduler
 import io.reactivex.schedulers.Schedulers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import timber.log.Timber
 import java.util.*
 import javax.inject.Inject
@@ -200,10 +199,8 @@ class TabDataRepository @Inject constructor(
         }
     }
 
-    override suspend fun purgeDeletableTabs() {
-        databaseExecutor().scheduleDirect {
-            tabsDao.purgeDeletableTabsAndUpdateSelection()
-        }
+    override suspend fun purgeDeletableTabs() = withContext(Dispatchers.IO + NonCancellable) {
+        tabsDao.purgeDeletableTabsAndUpdateSelection()
     }
 
     override suspend fun deleteCurrentTabAndSelectSource() {
