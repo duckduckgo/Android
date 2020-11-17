@@ -15,8 +15,14 @@
   -->
 
 <resources>
-    <string name="title_activity_vpn_controller">DDG Vpn</string>
+    <string name="title_activity_vpn_controller">DDG Vpn - Today\'s Stats</string>
     <string name="vpnNotificationTitle">App Tracker Protection Active</string>
     <string name="vpnReminderNotificationTitle">App Tracker Protection is not enabled</string>
     <string name="vpnReminderNotificationText">Please, tap on this notification and enable it now</string>
+    <string name="refresh">Refresh</string>
+    <string name="vpnTimeRunning">Time running: %s</string>
+    <string name="vpnTrackerCompaniesBlocked">Tracker companies blocked: %d</string>
+    <string name="vpnTrackerCompaniesNone">"No tracker companies blocked yet"</string>
+    <string name="vpnTrackersBlocked">Trackers blocked: %d</string>
+    <string name="vpnTrackersNone">"No trackers blocked yet"</string>
 </resources>

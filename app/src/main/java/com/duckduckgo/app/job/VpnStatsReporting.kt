@@ -17,10 +17,8 @@
 package com.duckduckgo.app.job
 
 import android.content.Context
-import android.util.Log
 import androidx.work.*
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelName
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.VPN_TESTERS_DAILY_REPORT
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.VPN_DATA_RECEIVED
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.VPN_DATA_SENT
@@ -67,8 +65,8 @@ class VpnStatsReportingWorker(context: Context, workerParams: WorkerParameters) 
                 VPN_TIME_RUNNING to current.timeRunning.toString(),
                 VPN_DATA_RECEIVED to current.dataReceived.toString(),
                 VPN_DATA_SENT to current.dataSent.toString(),
-                VPN_UUID to vpnDatabase.vpnStateDao().getOneOff().uuid,
-                VPN_TRACKERS_BLOCKED to vpnDatabase.vpnTrackerDao().getTrackersAfterSync(current.startedAt).size.toString()
+                VPN_UUID to (vpnDatabase.vpnStateDao().getOneOff()?.uuid ?: "unknown"),
+                VPN_TRACKERS_BLOCKED to vpnDatabase.vpnTrackerDao().getTrackersByCompanyAfterSync(current.startedAt).size.toString()
             )
             pixel.fire(VPN_TESTERS_DAILY_REPORT, params)
             Timber.i("Sending daily pixel report $params")

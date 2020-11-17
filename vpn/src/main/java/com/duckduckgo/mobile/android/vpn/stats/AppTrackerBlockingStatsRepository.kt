@@ -33,6 +33,15 @@ class AppTrackerBlockingStatsRepository @Inject constructor(private val vpnDatab
         return vpnDatabase.vpnStateDao().get()
     }
 
+    fun getTodaysCompaniesBlockedSync(): List<VpnTrackerAndCompany> {
+        val vpnStats = getConnectionStats()
+        return if (vpnStats != null) {
+            vpnDatabase.vpnTrackerDao().getTrackersByCompanyAfterSync(vpnStats.startedAt)
+        } else {
+            emptyList()
+        }
+    }
+
     fun getTodaysTrackersBlockedSync(): List<VpnTrackerAndCompany> {
         val vpnStats = getConnectionStats()
         return if (vpnStats != null) {
@@ -44,11 +53,15 @@ class AppTrackerBlockingStatsRepository @Inject constructor(private val vpnDatab
 
     fun getTodaysTrackersBlocked(): LiveData<List<VpnTrackerAndCompany>> {
         val vpnStats = vpnDatabase.vpnStatsDao().getCurrent()!!
-        return vpnDatabase.vpnTrackerDao().getTrackersAfter(vpnStats.startedAt)
+        return vpnDatabase.vpnTrackerDao().getTrackersByCompanyAfter(vpnStats.startedAt)
     }
 
     fun getConnectionStats(): VpnStats? {
         return vpnDatabase.vpnStatsDao().getCurrent()
+    }
+
+    fun getConnectionStatsAsync(): LiveData<VpnStats> {
+        return vpnDatabase.vpnStatsDao().observeCurrent()
     }
 
 }

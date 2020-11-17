@@ -28,7 +28,6 @@ class TrackerListProvider {
 
     companion object {
         val TRACKER_HOST_NAMES = listOf(
-            Tracker(0, 0, "example.com"),
             Tracker(1, 1, "doubleclick.net"),
             Tracker(2, 1, "googlesyndication.com"),
             Tracker(3, 1, "google-analytics.com"),

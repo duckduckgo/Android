@@ -23,11 +23,14 @@ import android.content.Context
 import android.content.Intent
 import android.net.VpnService
 import android.os.Bundle
+import android.view.Menu
+import android.view.MenuItem
 import android.widget.CompoundButton
 import android.widget.TextView
 import android.widget.ToggleButton
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import com.duckduckgo.mobile.android.vpn.R
 import com.duckduckgo.mobile.android.vpn.model.TimePassed
 import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
@@ -35,6 +38,7 @@ import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
 import com.google.android.material.snackbar.Snackbar
 import dagger.android.AndroidInjection
+import dummy.VpnViewModelFactory
 import dummy.quietlySetIsChecked
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.MainScope
@@ -47,6 +51,7 @@ class VpnControllerActivity : AppCompatActivity(R.layout.activity_vpn_controller
 
     private lateinit var lastTrackerDomainTextView: TextView
     private lateinit var timeRunningTodayTextView: TextView
+    private lateinit var trackerCompaniesBlockedTextView: TextView
     private lateinit var trackersBlockedTextView: TextView
     private lateinit var dataSentTextView: TextView
     private lateinit var dataReceivedTextView: TextView
@@ -59,7 +64,11 @@ class VpnControllerActivity : AppCompatActivity(R.layout.activity_vpn_controller
     @Inject
     lateinit var vpnDatabase: VpnDatabase
 
-    private lateinit var viewModel: VpnControllerViewModel
+    @Inject
+    lateinit var viewModelFactory: VpnViewModelFactory
+
+    private inline fun <reified V : ViewModel> bindViewModel() = lazy { ViewModelProvider(this, viewModelFactory).get(V::class.java) }
+    private val viewModel: VpnControllerViewModel by bindViewModel()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -70,8 +79,7 @@ class VpnControllerActivity : AppCompatActivity(R.layout.activity_vpn_controller
         setViewReferences()
         configureUiHandlers()
 
-        viewModel = VpnControllerViewModel(appTrackerBlockerStatsRepository)
-        viewModel.viewState.observe(this, Observer {
+        viewModel.viewState.observe(this, {
             it?.let { render(it) }
         })
         viewModel.onCreate()
@@ -79,10 +87,11 @@ class VpnControllerActivity : AppCompatActivity(R.layout.activity_vpn_controller
 
     override fun onResume() {
         super.onResume()
-        viewModel.loadData()
+        viewModel.refreshData()
     }
 
     private fun setViewReferences() {
+        trackerCompaniesBlockedTextView = findViewById(R.id.vpnTrackerCompaniesBlocked)
         trackersBlockedTextView = findViewById(R.id.vpnTrackersBlocked)
         lastTrackerDomainTextView = findViewById(R.id.vpnLastTrackerDomain)
         timeRunningTodayTextView = findViewById(R.id.vpnTodayRunningTime)
@@ -96,6 +105,21 @@ class VpnControllerActivity : AppCompatActivity(R.layout.activity_vpn_controller
         vpnRunningToggleButton.setOnCheckedChangeListener(runningButtonChangeListener)
     }
 
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        menuInflater.inflate(R.menu.vpn_controller_menu, menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.vpnRefreshMenu -> {
+                viewModel.refreshData()
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
+    }
+
     private fun render(viewState: VpnControllerViewModel.ViewState) {
         uuidTextView.text = viewState.uuid
         uuidTextView.setOnClickListener {
@@ -104,31 +128,30 @@ class VpnControllerActivity : AppCompatActivity(R.layout.activity_vpn_controller
             manager.setPrimaryClip(clipData)
             Snackbar.make(uuidTextView, "UUID is now copied to the Clipboard", Snackbar.LENGTH_SHORT).show()
         }
+        trackerCompaniesBlockedTextView.text = viewState.trackerCompaniesBlocked
         trackersBlockedTextView.text = viewState.trackersBlocked
         lastTrackerDomainTextView.text = viewState.lastTrackerBlocked
         vpnRunningToggleButton.quietlySetIsChecked(viewState.isVpnRunning, runningButtonChangeListener)
-        timeRunningTodayTextView.text = generateTimeRunningMessage(viewState)
+        timeRunningTodayTextView.text = getString(R.string.vpnTimeRunning, generateTimeRunningMessage(viewState))
         dataSentTextView.text = viewState.dataSent
         dataReceivedTextView.text = viewState.dataReceived
     }
 
     private fun generateTimeRunningMessage(viewState: VpnControllerViewModel.ViewState): String {
         return if (viewState.connectionStats == null) {
-            "VPN hasn't been running yet"
+            "VPN hasn't been run yet"
         } else {
             if (viewState.isVpnRunning) {
                 if (viewState.connectionStats.timeRunning == 0L) {
                     // first time running the vpn in this block, time running = time last updated - now()
                     val timeDifference = viewState.connectionStats.lastUpdated.until(OffsetDateTime.now(), ChronoUnit.MILLIS)
                     val timeRunning = TimePassed.fromMilliseconds(timeDifference)
-                    "Today, the VPN has been running for $timeRunning"
+                    timeRunning.toString()
                 } else {
-                    val timePassed = TimePassed.fromMilliseconds(viewState.connectionStats.timeRunning)
-                    "Today, the VPN has been running for $timePassed"
+                    TimePassed.fromMilliseconds(viewState.connectionStats.timeRunning).toString()
                 }
             } else {
-                val timePassed = TimePassed.fromMilliseconds(viewState.connectionStats.timeRunning)
-                "Today, the VPN ran for $timePassed"
+                TimePassed.fromMilliseconds(viewState.connectionStats.timeRunning).toString()
             }
         }
     }

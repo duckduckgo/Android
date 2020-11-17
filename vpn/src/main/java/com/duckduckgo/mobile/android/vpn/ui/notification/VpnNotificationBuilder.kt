@@ -26,11 +26,8 @@ import android.os.Build
 import androidx.core.app.NotificationCompat
 import androidx.core.app.TaskStackBuilder
 import com.duckduckgo.mobile.android.vpn.R
-import com.duckduckgo.mobile.android.vpn.model.TimePassed
 import com.duckduckgo.mobile.android.vpn.model.VpnTrackerAndCompany
 import dummy.ui.VpnControllerActivity
-import org.threeten.bp.OffsetDateTime
-import org.threeten.bp.temporal.ChronoUnit
 
 class VpnNotificationBuilder {
 
@@ -66,12 +63,8 @@ class VpnNotificationBuilder {
             return if (trackersBlocked.isEmpty()) {
                 "No trackers blocked yet"
             } else {
-                // Today, so far we blocked 12 companies from tracking you, 3 of which in the past hour
                 val lastTrackerBlocked = trackersBlocked.first()
-                val timeDifference = lastTrackerBlocked.tracker.timestamp.until(OffsetDateTime.now(), ChronoUnit.MILLIS)
-                val timeRunning = TimePassed.fromMilliseconds(timeDifference)
-                "Today, so far we blocked ${trackersBlocked.size} companies from tracking you, " +
-                        "the last one was ${lastTrackerBlocked.trackerCompany.company}"
+                "Today, so far we blocked ${trackersBlocked.size} companies from tracking you, the last one was ${lastTrackerBlocked.trackerCompany.company}"
             }
         }
 

@@ -57,7 +57,7 @@ class DomainBasedTrackerDetector @Inject constructor(
         trackerListProvider.trackerList().forEach { tracker ->
             if (hostname.endsWith(tracker.hostname)) {
                 tcb.isTracker = true
-                Timber.i("Determined %s to be tracker %s", hostname, tcb.ipAndPort)
+                Timber.w("Determined %s to be a tracker %s", hostname, tcb.ipAndPort)
                 insertTracker(tracker)
                 return Tracker
             }
@@ -73,7 +73,7 @@ class DomainBasedTrackerDetector @Inject constructor(
         val trackerCompany = TrackerListProvider.TRACKER_GROUP_COMPANIES.find { it.trackerCompanyId == tracker.trackerCompanyId }
             ?: TrackerListProvider.UNDEFINED_TRACKER_COMPANY
         val vpnTracker =
-            VpnTracker(trackerId = 0, trackerCompanyId = trackerCompany.trackerCompanyId, domain = tracker.hostname, timestamp = OffsetDateTime.now())
+            VpnTracker(trackerCompanyId = trackerCompany.trackerCompanyId, domain = tracker.hostname, timestamp = OffsetDateTime.now())
         Timber.i("Inserting $tracker as tracker")
         vpnDatabase.vpnTrackerDao().insert(vpnTracker)
     }

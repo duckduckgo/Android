@@ -34,5 +34,5 @@ interface VpnStateDao {
     fun get(): LiveData<VpnState>
 
     @Query("select * from vpn_state")
-    fun getOneOff(): VpnState
+    fun getOneOff(): VpnState?
 }

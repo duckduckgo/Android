@@ -36,7 +36,7 @@ class VpnReminderReceiver : BroadcastReceiver() {
 
             goAsync {
                 val vpnDatabase = VpnDatabase.getInstance(context)
-                if (vpnDatabase.vpnStateDao().getOneOff().isRunning) {
+                if (vpnDatabase.vpnStateDao().getOneOff()?.isRunning == true) {
                     Timber.v("Vpn is already running, nothing to show")
                 } else {
                     Timber.v("Vpn is not running, showing reminder notification")

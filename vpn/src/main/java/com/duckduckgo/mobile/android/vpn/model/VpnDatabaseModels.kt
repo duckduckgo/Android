@@ -24,7 +24,7 @@ import org.threeten.bp.OffsetDateTime
 
 @Entity(tableName = "vpn_tracker")
 data class VpnTracker(
-    @PrimaryKey(autoGenerate = true) val trackerId: Int,
+    @PrimaryKey(autoGenerate = true) val trackerId: Int = 0,
     val trackerCompanyId: Int,
     val domain: String,
     val timestamp: OffsetDateTime

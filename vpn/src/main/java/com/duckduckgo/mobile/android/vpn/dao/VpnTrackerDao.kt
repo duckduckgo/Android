@@ -38,9 +38,13 @@ interface VpnTrackerDao {
 
     @Transaction
     @Query("select * from vpn_tracker where timestamp > :startedAt group by trackerCompanyId order by timestamp desc")
+    fun getTrackersByCompanyAfterSync(startedAt: OffsetDateTime): List<VpnTrackerAndCompany>
+
+    @Transaction
+    @Query("select * from vpn_tracker where timestamp > :startedAt order by timestamp desc")
     fun getTrackersAfterSync(startedAt: OffsetDateTime): List<VpnTrackerAndCompany>
 
     @Transaction
     @Query("select * from vpn_tracker where timestamp > :startedAt group by trackerCompanyId order by timestamp desc")
-    fun getTrackersAfter(startedAt: OffsetDateTime): LiveData<List<VpnTrackerAndCompany>>
+    fun getTrackersByCompanyAfter(startedAt: OffsetDateTime): LiveData<List<VpnTrackerAndCompany>>
 }

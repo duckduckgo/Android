@@ -357,7 +357,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
         fun isServiceRunning(context: Context): Boolean {
             val manager: ActivityManager = context.getSystemService(ACTIVITY_SERVICE) as ActivityManager
             for (service in manager.getRunningServices(Int.MAX_VALUE)) {
-                if ("com.duckduckgo.mobile.android.vpn.service.PassthroughVpnService" == service.service.className) {
+                if (TrackerBlockingVpnService::class.java.name == service.service.className) {
                     return true
                 }
             }

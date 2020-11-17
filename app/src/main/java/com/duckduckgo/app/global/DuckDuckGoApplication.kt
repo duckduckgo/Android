@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.global
 
+import android.annotation.SuppressLint
 import android.app.Application
 import android.content.IntentFilter
 import android.os.Build
@@ -23,14 +24,17 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.OnLifecycleEvent
 import androidx.lifecycle.ProcessLifecycleOwner
-import androidx.work.WorkerFactory
+import androidx.work.WorkManager
 import com.duckduckgo.app.browser.BuildConfig
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserObserver
 import com.duckduckgo.app.browser.shortcut.ShortcutBuilder
 import com.duckduckgo.app.browser.shortcut.ShortcutReceiver
 import com.duckduckgo.app.di.AppComponent
 import com.duckduckgo.app.di.DaggerAppComponent
-import com.duckduckgo.app.fire.*
+import com.duckduckgo.app.fire.DataClearer
+import com.duckduckgo.app.fire.DataClearerForegroundAppRestartPixel
+import com.duckduckgo.app.fire.FireActivity
+import com.duckduckgo.app.fire.UnsentForgetAllPixelStore
 import com.duckduckgo.app.global.Theming.initializeTheme
 import com.duckduckgo.app.global.initialization.AppDataLoader
 import com.duckduckgo.app.global.install.AppInstallStore
@@ -74,6 +78,7 @@ import kotlinx.coroutines.launch
 import org.jetbrains.anko.doAsync
 import org.threeten.bp.zone.ZoneRulesProvider
 import timber.log.Timber
+import java.lang.reflect.Method
 import javax.inject.Inject
 import kotlin.concurrent.thread
 
@@ -137,9 +142,6 @@ open class DuckDuckGoApplication : HasAndroidInjector, Application(), LifecycleO
     lateinit var workScheduler: WorkScheduler
 
     @Inject
-    lateinit var workerFactory: WorkerFactory
-
-    @Inject
     lateinit var appEnjoymentLifecycleObserver: AppEnjoymentLifecycleObserver
 
     @Inject
@@ -182,10 +184,16 @@ open class DuckDuckGoApplication : HasAndroidInjector, Application(), LifecycleO
         configureLogging()
         configureDependencyInjection()
         configureUncaughtExceptionHandler()
+        initializeDateLibrary()
 
-        Timber.i("Creating DuckDuckGoApplication")
+        val processName = processName()
+        Timber.i("Creating DuckDuckGo Application. Process name: $processName")
 
         if (appIsRestarting()) return
+        if (processName.isVpnProcess()) {
+            Timber.i("VPN process, no further logic executed in application onCreate()")
+            return
+        }
 
         ProcessLifecycleOwner.get().lifecycle.also {
             it.addObserver(this)
@@ -207,7 +215,6 @@ open class DuckDuckGoApplication : HasAndroidInjector, Application(), LifecycleO
         configureDataDownloader()
         scheduleOfflinePixels()
         scheduleVpnStatsReporting()
-        initializeDateLibrary()
 
         notificationRegistrar.registerApp()
         registerReceiver(shortcutReceiver, IntentFilter(ShortcutBuilder.USE_OUR_APP_SHORTCUT_ADDED_ACTION))
@@ -224,6 +231,26 @@ open class DuckDuckGoApplication : HasAndroidInjector, Application(), LifecycleO
         FirebaseApp.initializeApp(this)
         FirebaseCrashlytics.getInstance().setCrashlyticsCollectionEnabled(!BuildConfig.DEBUG)
         FirebasePerformance.getInstance().isPerformanceCollectionEnabled = !BuildConfig.DEBUG
+    }
+
+    private fun String.isVpnProcess(): Boolean {
+        return this.endsWith(":vpn")
+    }
+
+    // vtodo Temporary inclusion of Firebase while in internal testing
+    @SuppressLint("DiscouragedPrivateApi", "PrivateApi")
+    private fun processName(): String {
+        if (Build.VERSION.SDK_INT >= 28) {
+            return getProcessName()
+        }
+
+        return try {
+            val activityThread = Class.forName("android.app.ActivityThread")
+            val getProcessName: Method = activityThread.getDeclaredMethod("currentProcessName")
+            (getProcessName.invoke(null) as String)
+        } catch (e: Throwable) {
+            ""
+        }
     }
 
     private fun configureUncaughtExceptionHandler() {
@@ -318,9 +345,7 @@ open class DuckDuckGoApplication : HasAndroidInjector, Application(), LifecycleO
     }
 
     private fun scheduleVpnStatsReporting() {
-        GlobalScope.launch(Dispatchers.IO) {
-            vpnStatsReporting.schedule()
-        }
+        vpnStatsReporting.schedule()
     }
 
     private fun initializeDateLibrary() {
