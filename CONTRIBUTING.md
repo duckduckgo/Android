@@ -33,7 +33,20 @@ If you have a great idea you really want to implement, start by logging an issue
 
 We care about clean code. Refer to our [style guide](styleguide/STYLEGUIDE.md).
 
-
 ### Commit Messages
+
+See Chris Beams' guide to writing good commit messages https://chris.beams.io/posts/git-commit/
+
+### Why is a build failing?
+
+Bitrise as a our CI environment, [all builds can be seen here](https://app.bitrise.io/app/dc22e377b9a9ccbf#/builds).
+We use [Spotless](https://github.com/diffplug/spotless) as a code formatter, and every build in Bitrise will trigger a check for several rules.
+If your PR is failing because of that, please make sure that you have our [style guide](styleguide/STYLEGUIDE.md) imported and the code formatted.
+You can also trigger an automatic code formatting of the code by executing:
+
+```
+./gradleW app:spotlessApply
+```
+
 
 See Chris Beams' guide to writing good commit messages https://chris.beams.io/posts/git-commit/

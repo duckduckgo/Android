@@ -296,7 +296,7 @@
     <string name="privacyProtectionNotificationTrackerDescription">Con DuckDuckGo hai protetto i tuoi dati bloccando %1$d sistemi di tracciamento.</string>
     <string name="privacyProtectionNotificationBothDescription">Con DuckDuckGo hai protetto i tuoi dati bloccando %1$d sistemi di tracciamento e rendendo sicure %2$d connessioni non crittografate.</string>
     <string name="privacyProtectionNotificationLaunchButton">Riprendi la navigazione</string>
-    
+
     <!-- Authentication -->
     <string name="authenticationDialogTitle">Accedi</string>
     <string name="authenticationDialogMessage">%1$s richiede un nome utente e una password.</string>

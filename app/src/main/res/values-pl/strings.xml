@@ -304,7 +304,7 @@
     <string name="privacyProtectionNotificationTrackerDescription">Zapewniłeś(-aś) swoim danym ochronę, blokując dzięki DuckDuckGo %1$d skryptów śledzących.</string>
     <string name="privacyProtectionNotificationBothDescription">Zapewniłeś(-aś) swoim danym ochronę, blokując dzięki DuckDuckGo %1$d skryptów śledzących i zabezpieczając %2$d niezaszyfrowanych połączeń.</string>
     <string name="privacyProtectionNotificationLaunchButton">Powróć do przeglądania</string>
-    
+
     <!-- Authentication -->
     <string name="authenticationDialogTitle">Zaloguj się</string>
     <string name="authenticationDialogMessage">%1$s wymaga nazwy użytkownika i hasła.</string>

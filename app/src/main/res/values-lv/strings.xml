@@ -300,7 +300,7 @@
     <string name="privacyProtectionNotificationTrackerDescription">Jūs aizsargājāt savus datus, bloķējot %1$d izsekotājus, vienlaikus izmantojot DuckDuckGo.</string>
     <string name="privacyProtectionNotificationBothDescription">Jūs aizsargājāt savus datus, bloķējot %1$d izsekotājus un nodrošinot %2$d nešifrētus savienojumus, vienlaikus izmantojot DuckDuckGo.</string>
     <string name="privacyProtectionNotificationLaunchButton">Atsākt pārlūkošanu</string>
-    
+
     <!-- Authentication -->
     <string name="authenticationDialogTitle">Pierakstīties</string>
     <string name="authenticationDialogMessage">Lai izmantotu %1$s, ir nepieciešams lietotājvārds un parole.</string>

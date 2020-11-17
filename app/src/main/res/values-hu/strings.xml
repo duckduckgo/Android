@@ -296,7 +296,7 @@
     <string name="privacyProtectionNotificationTrackerDescription">A DuckDuckGo használata során %1$d nyomkövető letiltásával védted az adataidat.</string>
     <string name="privacyProtectionNotificationBothDescription">A DuckDuckGo használata során %1$d nyomkövető letiltásával és %2$d titkosítatlan kapcsolat biztosításával védted az adataidat.</string>
     <string name="privacyProtectionNotificationLaunchButton">Böngészés folytatása</string>
-    
+
     <!-- Authentication -->
     <string name="authenticationDialogTitle">Bejelentkezés</string>
     <string name="authenticationDialogMessage">%1$s felhasználónevet és jelszót igényel.</string>

@@ -296,7 +296,7 @@
     <string name="privacyProtectionNotificationTrackerDescription">Suojelit tietojasi estämällä %1$d seurantapalvelinta DuckDuckGota käyttäessäsi.</string>
     <string name="privacyProtectionNotificationBothDescription">Suojelit tietojasi estämällä %1$d seurantapalvelinta ja turvaamalla %2$d salaamatonta yhteyttä DuckDuckGota käyttäessäsi.</string>
     <string name="privacyProtectionNotificationLaunchButton">Jatka selailua</string>
-    
+
     <!-- Authentication -->
     <string name="authenticationDialogTitle">Kirjaudu sisään</string>
     <string name="authenticationDialogMessage">%1$s vaatii käyttäjätunnuksen ja salasanan.</string>

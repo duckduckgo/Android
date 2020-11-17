@@ -304,7 +304,7 @@
     <string name="privacyProtectionNotificationTrackerDescription">Вы защитили свои данные, заблокировав %1$d трекеров во время использования DuckDuckGo.</string>
     <string name="privacyProtectionNotificationBothDescription">Вы защитили свои данные, заблокировав %1$d трекеров и защитив %2$d незашифрованных соединений во время использования DuckDuckGo.</string>
     <string name="privacyProtectionNotificationLaunchButton">Продолжить навигацию</string>
-    
+
     <!-- Authentication -->
     <string name="authenticationDialogTitle">Войти</string>
     <string name="authenticationDialogMessage">Для входа на %1$s требуются имя пользователя и пароль.</string>

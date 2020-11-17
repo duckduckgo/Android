@@ -14,12 +14,16 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.httpsupgrade.model
+package com.duckduckgo.app.httpsupgrade.api
 
-import androidx.room.Entity
-import androidx.room.PrimaryKey
+import com.duckduckgo.app.httpsupgrade.model.HttpsFalsePositiveDomain
+import com.squareup.moshi.FromJson
 
-@Entity(tableName = "https_whitelisted_domain")
-data class HttpsWhitelistedDomain(
-    @PrimaryKey var domain: String
-)
+class HttpsFalsePositivesJsonAdapter {
+
+    @FromJson
+    fun adapt(data: Map<String, List<String>>): List<HttpsFalsePositiveDomain> {
+        return data.getValue("data").map { HttpsFalsePositiveDomain(it) }
+    }
+
+}

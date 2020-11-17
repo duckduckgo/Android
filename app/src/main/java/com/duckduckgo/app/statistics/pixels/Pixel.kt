@@ -16,13 +16,9 @@
 
 package com.duckduckgo.app.statistics.pixels
 
-import com.duckduckgo.app.global.device.DeviceInfo
-import com.duckduckgo.app.statistics.VariantManager
-import com.duckduckgo.app.statistics.api.PixelService
+import android.annotation.SuppressLint
+import com.duckduckgo.app.statistics.api.PixelSender
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelName
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter
-import com.duckduckgo.app.statistics.store.StatisticsDataStore
-import io.reactivex.Completable
 import io.reactivex.schedulers.Schedulers
 import timber.log.Timber
 import javax.inject.Inject
@@ -82,10 +78,7 @@ interface Pixel {
 
         HTTPS_NO_LOOKUP("m_https_nl"),
         HTTPS_LOCAL_UPGRADE("m_https_lu"),
-        HTTPS_SERVICE_REQUEST_UPGRADE("m_https_sru"),
-        HTTPS_SERVICE_CACHE_UPGRADE("m_https_scu"),
-        HTTPS_SERVICE_REQUEST_NO_UPGRADE("m_https_srn"),
-        HTTPS_SERVICE_CACHE_NO_UPGRADE("m_https_scn"),
+        HTTPS_NO_UPGRADE("m_https_nu"),
 
         DEFAULT_BROWSER_SET("m_db_s"),
         DEFAULT_BROWSER_NOT_SET("m_db_ns"),
@@ -264,22 +257,21 @@ interface Pixel {
 
     fun fire(pixel: PixelName, parameters: Map<String, String> = emptyMap(), encodedParameters: Map<String, String> = emptyMap())
     fun fire(pixelName: String, parameters: Map<String, String> = emptyMap(), encodedParameters: Map<String, String> = emptyMap())
-    fun fireCompletable(pixelName: String, parameters: Map<String, String>, encodedParameters: Map<String, String> = emptyMap()): Completable
+    fun enqueueFire(pixel: PixelName, parameters: Map<String, String> = emptyMap(), encodedParameters: Map<String, String> = emptyMap())
+    fun enqueueFire(pixelName: String, parameters: Map<String, String> = emptyMap(), encodedParameters: Map<String, String> = emptyMap())
 }
 
-class ApiBasedPixel @Inject constructor(
-    private val api: PixelService,
-    private val statisticsDataStore: StatisticsDataStore,
-    private val variantManager: VariantManager,
-    private val deviceInfo: DeviceInfo
+class RxBasedPixel @Inject constructor(
+    private val pixelSender: PixelSender
 ) : Pixel {
 
     override fun fire(pixel: PixelName, parameters: Map<String, String>, encodedParameters: Map<String, String>) {
         fire(pixel.pixelName, parameters, encodedParameters)
     }
 
+    @SuppressLint("CheckResult")
     override fun fire(pixelName: String, parameters: Map<String, String>, encodedParameters: Map<String, String>) {
-        fireCompletable(pixelName, parameters, encodedParameters)
+        pixelSender.sendPixel(pixelName, parameters, encodedParameters)
             .subscribeOn(Schedulers.io())
             .subscribe({
                 Timber.v("Pixel sent: $pixelName with params: $parameters $encodedParameters")
@@ -288,10 +280,18 @@ class ApiBasedPixel @Inject constructor(
             })
     }
 
-    override fun fireCompletable(pixelName: String, parameters: Map<String, String>, encodedParameters: Map<String, String>): Completable {
-        val defaultParameters = mapOf(PixelParameter.APP_VERSION to deviceInfo.appVersion)
-        val fullParameters = defaultParameters.plus(parameters)
-        val atb = statisticsDataStore.atb?.formatWithVariant(variantManager.getVariant()) ?: ""
-        return api.fire(pixelName, deviceInfo.formFactor().description, atb, fullParameters, encodedParameters)
+    override fun enqueueFire(pixel: PixelName, parameters: Map<String, String>, encodedParameters: Map<String, String>) {
+        enqueueFire(pixel.pixelName, parameters, encodedParameters)
+    }
+
+    @SuppressLint("CheckResult")
+    override fun enqueueFire(pixelName: String, parameters: Map<String, String>, encodedParameters: Map<String, String>) {
+        pixelSender.enqueuePixel(pixelName, parameters, encodedParameters)
+            .subscribeOn(Schedulers.io())
+            .subscribe({
+                Timber.v("Pixel enqueued: $pixelName with params: $parameters $encodedParameters")
+            }, {
+                Timber.w(it, "Pixel failed: $pixelName with params: $parameters $encodedParameters")
+            })
     }
 }

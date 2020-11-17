@@ -300,6 +300,8 @@ class BrowserTabViewModel(
         get() = site?.title
 
     private var locationPermission: LocationPermission? = null
+    private val locationPermissionMessages: MutableMap<String, Boolean> = mutableMapOf()
+    private val locationPermissionSession: MutableMap<String, LocationPermissionType> = mutableMapOf()
 
     private val autoCompletePublishSubject = PublishRelay.create<String>()
     private val fireproofWebsiteState: LiveData<List<FireproofWebsiteEntity>> = fireproofWebsiteRepository.getFireproofWebsites()
@@ -501,11 +503,6 @@ class BrowserTabViewModel(
 
         val verticalParameter = extractVerticalParameter(url)
         val urlToNavigate = queryUrlConverter.convertQueryToUrl(trimmedInput, verticalParameter)
-        val omnibarText = if (variantManager.getVariant().hasFeature(VariantManager.VariantFeature.SerpHeaderQueryReplacement)) {
-            urlToNavigate
-        } else {
-            trimmedInput
-        }
 
         val type = specialUrlDetector.determineType(trimmedInput)
         if (type is IntentType) {
@@ -515,13 +512,13 @@ class BrowserTabViewModel(
                 command.value = ResetHistory
             }
 
-            fireQueryChangedPixel(omnibarText)
+            fireQueryChangedPixel(trimmedInput)
             command.value = Navigate(urlToNavigate, getUrlHeaders())
         }
 
         globalLayoutState.value = Browser(isNewTabState = false)
         findInPageViewState.value = FindInPageViewState(visible = false, canFindInPage = true)
-        omnibarViewState.value = currentOmnibarViewState().copy(omnibarText = omnibarText, shouldMoveCaretToEnd = false)
+        omnibarViewState.value = currentOmnibarViewState().copy(omnibarText = trimmedInput, shouldMoveCaretToEnd = false)
         browserViewState.value = currentBrowserViewState().copy(browserShowing = true, showClearButton = false)
         autoCompleteViewState.value = AutoCompleteViewState(false)
     }
@@ -545,10 +542,6 @@ class BrowserTabViewModel(
     }
 
     private fun fireQueryChangedPixel(omnibarText: String) {
-        if (!variantManager.getVariant().hasFeature(VariantManager.VariantFeature.SerpHeaderRemoval)) {
-            return
-        }
-
         val oldQuery = currentOmnibarViewState().omnibarText.toUri()
         val newQuery = omnibarText.toUri()
 
@@ -823,12 +816,7 @@ class BrowserTabViewModel(
     }
 
     private fun shouldShowDaxIcon(currentUrl: String?, showPrivacyGrade: Boolean): Boolean {
-        if (!variantManager.getVariant().hasFeature(VariantManager.VariantFeature.SerpHeaderRemoval)) {
-            return false
-        }
-
         val url = currentUrl ?: return false
-
         return showPrivacyGrade && duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(url)
     }
 
@@ -865,9 +853,16 @@ class BrowserTabViewModel(
         val permissionEntity = locationPermissionsRepository.getDomainPermission(domain)
         permissionEntity?.let {
             if (it.permission == LocationPermissionType.ALLOW_ALWAYS) {
-                command.postValue(ShowDomainHasPermissionMessage(domain))
+                if (!locationPermissionMessages.containsKey(domain)) {
+                    setDomainHasLocationPermissionShown(domain)
+                    command.postValue(ShowDomainHasPermissionMessage(domain))
+                }
             }
         }
+    }
+
+    private fun setDomainHasLocationPermissionShown(domain: String) {
+        locationPermissionMessages[domain] = true
     }
 
     private fun urlUpdated(url: String) {
@@ -881,10 +876,6 @@ class BrowserTabViewModel(
 
     private fun omnibarTextForUrl(url: String?): String {
         if (url == null) return ""
-
-        if (variantManager.getVariant().hasFeature(VariantManager.VariantFeature.SerpHeaderQueryReplacement)) {
-            return url
-        }
 
         return if (duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(url)) {
             duckDuckGoUrlDetector.extractQuery(url) ?: url
@@ -966,7 +957,11 @@ class BrowserTabViewModel(
             val previouslyDeniedForever = appSettingsPreferencesStore.appLocationPermissionDeniedForever
             val permissionEntity = locationPermissionsRepository.getDomainPermission(origin)
             if (permissionEntity == null) {
-                command.postValue(CheckSystemLocationPermission(origin, previouslyDeniedForever))
+                if (locationPermissionSession.containsKey(origin)) {
+                    reactToSiteSessionPermission(locationPermissionSession[origin]!!)
+                } else {
+                    command.postValue(CheckSystemLocationPermission(origin, previouslyDeniedForever))
+                }
             } else {
                 if (permissionEntity.permission == LocationPermissionType.DENY_ALWAYS) {
                     onSiteLocationPermissionAlwaysDenied()
@@ -982,6 +977,7 @@ class BrowserTabViewModel(
             when (permission) {
                 LocationPermissionType.ALLOW_ALWAYS -> {
                     onSiteLocationPermissionAlwaysAllowed()
+                    setDomainHasLocationPermissionShown(domain)
                     pixel.fire(PixelName.PRECISE_LOCATION_SITE_DIALOG_ALLOW_ALWAYS)
                     viewModelScope.launch {
                         locationPermissionsRepository.savePermission(domain, permission)
@@ -990,6 +986,7 @@ class BrowserTabViewModel(
                 }
                 LocationPermissionType.ALLOW_ONCE -> {
                     pixel.fire(PixelName.PRECISE_LOCATION_SITE_DIALOG_ALLOW_ONCE)
+                    locationPermissionSession[domain] = permission
                     locationPermission.callback.invoke(locationPermission.origin, true, false)
                 }
                 LocationPermissionType.DENY_ALWAYS -> {
@@ -1002,6 +999,7 @@ class BrowserTabViewModel(
                 }
                 LocationPermissionType.DENY_ONCE -> {
                     pixel.fire(PixelName.PRECISE_LOCATION_SITE_DIALOG_DENY_ONCE)
+                    locationPermissionSession[domain] = permission
                     locationPermission.callback.invoke(locationPermission.origin, false, false)
                 }
             }
@@ -1044,6 +1042,17 @@ class BrowserTabViewModel(
             }
 
         }
+    }
+
+    private fun reactToSiteSessionPermission(permission: LocationPermissionType) {
+        locationPermission?.let { locationPermission ->
+            if (permission == LocationPermissionType.ALLOW_ONCE) {
+                locationPermission.callback.invoke(locationPermission.origin, true, false)
+            } else {
+                locationPermission.callback.invoke(locationPermission.origin, false, false)
+            }
+        }
+
     }
 
     override fun onSystemLocationPermissionAllowed() {
@@ -1514,11 +1523,15 @@ class BrowserTabViewModel(
         command.value = LaunchNewTab
     }
 
-    fun onSurveyChanged(survey: Survey?) {
-        val activeSurvey = ctaViewModel.onSurveyChanged(survey)
-        if (activeSurvey != null) {
+    fun onSurveyChanged(survey: Survey?, locale: Locale = Locale.getDefault()) {
+        val surveyCleared = ctaViewModel.onSurveyChanged(survey)
+        if (surveyCleared) {
+            ctaViewState.value = currentCtaViewState().copy(cta = null)
+            return
+        }
+        if (survey != null) {
             viewModelScope.launch {
-                refreshCta()
+                refreshCta(locale)
             }
         }
     }
@@ -1532,10 +1545,10 @@ class BrowserTabViewModel(
         ctaViewModel.onCtaShown(cta)
     }
 
-    suspend fun refreshCta(): Cta? {
+    suspend fun refreshCta(locale: Locale = Locale.getDefault()): Cta? {
         if (currentGlobalLayoutState() is Browser) {
             val cta = withContext(dispatchers.io()) {
-                ctaViewModel.refreshCta(dispatchers.io(), currentBrowserViewState().browserShowing, siteLiveData.value)
+                ctaViewModel.refreshCta(dispatchers.io(), currentBrowserViewState().browserShowing, siteLiveData.value, locale)
             }
             ctaViewState.value = currentCtaViewState().copy(cta = cta)
             return cta

@@ -296,7 +296,7 @@
     <string name="privacyProtectionNotificationTrackerDescription">Du skyddade dina data genom att blockera %1$d spårare när du använde DuckDuckGo.</string>
     <string name="privacyProtectionNotificationBothDescription">Du skyddade dina data genom att blockera %1$d spårare och säkra %2$d okrypterade anslutningar medan du använde DuckDuckGo.</string>
     <string name="privacyProtectionNotificationLaunchButton">Återuppta bläddring</string>
-    
+
     <!-- Authentication -->
     <string name="authenticationDialogTitle">Logga in</string>
     <string name="authenticationDialogMessage">%1$s kräver ett användarnamn och ett lösenord.</string>

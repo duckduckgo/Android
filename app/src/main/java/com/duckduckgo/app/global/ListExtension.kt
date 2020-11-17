@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 DuckDuckGo
+ * Copyright (c) 2020 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,22 +14,6 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.httpsupgrade.db
+package com.duckduckgo.app.global
 
-import androidx.room.Dao
-import androidx.room.Insert
-import androidx.room.OnConflictStrategy
-import androidx.room.Query
-import com.duckduckgo.app.httpsupgrade.model.HttpsBloomFilterSpec
-import javax.inject.Singleton
-
-@Dao
-@Singleton
-interface HttpsBloomFilterSpecDao {
-
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insert(specification: HttpsBloomFilterSpec)
-
-    @Query("select * from https_bloom_filter_spec limit 1")
-    fun get(): HttpsBloomFilterSpec?
-}
+fun <T : CharSequence> List<T>.filterBlankItems() = filter { it.isNotBlank() }

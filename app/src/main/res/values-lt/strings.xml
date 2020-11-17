@@ -304,7 +304,7 @@
     <string name="privacyProtectionNotificationTrackerDescription">Naudojant „DuckDuckGo“ apsaugojote duomenis blokuodami %1$d sekiklius (-ių).</string>
     <string name="privacyProtectionNotificationBothDescription">Naudojant „DuckDuckGo“ apsaugojote duomenis blokuodami %1$d sekiklius (-ių) ir apsaugodami %2$d nešifruotus (-ų) ryšius (-ių).</string>
     <string name="privacyProtectionNotificationLaunchButton">Tęsti naršymą</string>
-    
+
     <!-- Authentication -->
     <string name="authenticationDialogTitle">Prisijungti</string>
     <string name="authenticationDialogMessage">%1$s reikia naudotojo vardo ir slaptažodžio.</string>

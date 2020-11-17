@@ -304,7 +304,7 @@
     <string name="privacyProtectionNotificationTrackerDescription">Chránili jste svá data blokováním %1$d sledovacích zařízení při používání DuckDuckGo.</string>
     <string name="privacyProtectionNotificationBothDescription">Chránili jste svá data blokováním %1$d sledovacích zařízení a zabezpečením %2$d nešifrovaných připojení při používání DuckDuckGo.</string>
     <string name="privacyProtectionNotificationLaunchButton">Znovu začít prohlížení</string>
-    
+
     <!-- Authentication -->
     <string name="authenticationDialogTitle">Přihlásit</string>
     <string name="authenticationDialogMessage">%1$s vyžaduje uživatelské jméno a heslo.</string>

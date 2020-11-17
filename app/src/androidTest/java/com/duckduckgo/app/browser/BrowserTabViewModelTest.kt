@@ -89,7 +89,6 @@ import com.duckduckgo.app.privacy.model.TestEntity
 import com.duckduckgo.app.privacy.model.UserWhitelistedDomain
 import com.duckduckgo.app.runBlocking
 import com.duckduckgo.app.settings.db.SettingsDataStore
-import com.duckduckgo.app.statistics.Variant
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.VariantManager.Companion.DEFAULT_VARIANT
 import com.duckduckgo.app.statistics.api.StatisticsUpdater
@@ -122,6 +121,7 @@ import org.mockito.ArgumentMatchers.anyString
 import org.mockito.Mockito.never
 import org.mockito.Mockito.verify
 import java.io.File
+import java.util.*
 import java.util.concurrent.TimeUnit
 
 @ExperimentalCoroutinesApi
@@ -250,7 +250,6 @@ class BrowserTabViewModelTest {
     @Before
     fun before() {
         MockitoAnnotations.initMocks(this)
-
         db = Room.inMemoryDatabaseBuilder(getInstrumentation().targetContext, AppDatabase::class.java)
             .allowMainThreadQueries()
             .build()
@@ -1634,13 +1633,13 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenScheduledSurveyChangesAndInstalledDaysMatchThenCtaIsSurvey() {
-        testee.onSurveyChanged(Survey("abc", "http://example.com", daysInstalled = 1, status = Survey.Status.SCHEDULED))
+        testee.onSurveyChanged(Survey("abc", "http://example.com", daysInstalled = 1, status = Survey.Status.SCHEDULED), Locale.US)
         assertTrue(testee.ctaViewState.value!!.cta is HomePanelCta.Survey)
     }
 
     @Test
     fun whenScheduledSurveyChangesAndInstalledDaysDontMatchThenCtaIsNull() {
-        testee.onSurveyChanged(Survey("abc", "http://example.com", daysInstalled = 2, status = Survey.Status.SCHEDULED))
+        testee.onSurveyChanged(Survey("abc", "http://example.com", daysInstalled = 2, status = Survey.Status.SCHEDULED), Locale.US)
         assertNull(testee.ctaViewState.value!!.cta)
     }
 
@@ -2182,34 +2181,24 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenSERPRemovalFeatureIsActiveAndBrowsingDDGSiteAndPrivacyGradeIsVisibleThenShowDaxIconIsTrue() {
-        val serpRemovalVariant = Variant("foo", 100.0, features = listOf(VariantManager.VariantFeature.SerpHeaderRemoval), filterBy = { true })
-        whenever(mockVariantManager.getVariant()).thenReturn(serpRemovalVariant)
+    fun whenBrowsingDDGSiteAndPrivacyGradeIsVisibleThenDaxIconIsVisible() {
         val url = "https://duckduckgo.com?q=test%20search"
         loadUrl(url, isBrowserShowing = true)
         assertTrue(browserViewState().showDaxIcon)
+        assertFalse(browserViewState().showSearchIcon)
     }
 
     @Test
-    fun whenSERPRemovalFeatureIsActiveAndBrowsingNonDDGSiteAndPrivacyGradeIsVisibleThenShowDaxIconIsFalse() {
-        val serpRemovalVariant = Variant("foo", 100.0, features = listOf(VariantManager.VariantFeature.SerpHeaderRemoval), filterBy = { true })
-        whenever(mockVariantManager.getVariant()).thenReturn(serpRemovalVariant)
+    fun whenBrowsingNonDDGSiteAndPrivacyGradeIsVisibleThenDaxIconIsNotVisible() {
         val url = "https://example.com"
         loadUrl(url, isBrowserShowing = true)
         assertFalse(browserViewState().showDaxIcon)
+        assertTrue(browserViewState().showPrivacyGrade)
     }
 
     @Test
-    fun whenSERPRemovalFeatureIsInactiveAndBrowsingDDGSiteAndPrivacyGradeIsVisibleThenShowDaxIconIsFalse() {
-        val url = "https://duckduckgo.com?q=test%20search"
-        loadUrl(url, isBrowserShowing = true)
-        assertFalse(browserViewState().showDaxIcon)
-    }
-
-    @Test
-    fun whenSERPRemovalFeatureIsInactiveAndBrowsingNonDDGSiteAndPrivacyGradeIsVisibleThenShowDaxIconIsFalse() {
-        val url = "https://example.com"
-        loadUrl(url, isBrowserShowing = true)
+    fun whenNotBrowsingAndDDGUrlPresentThenDaxIconIsNotVisible() {
+        loadUrl("https://duckduckgo.com?q=test%20search", isBrowserShowing = false)
         assertFalse(browserViewState().showDaxIcon)
     }
 
@@ -2443,6 +2432,21 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenDomainRequestsSitePermissionAndUserAllowedSessionPermissionThenPermissionIsAllowed() = coroutineRule.runBlocking {
+        val domain = "https://www.example.com/"
+
+        givenDeviceLocationSharingIsEnabled(true)
+        givenLocationPermissionIsEnabled(true)
+        givenCurrentSite(domain)
+
+        testee.onSiteLocationPermissionSelected(domain, LocationPermissionType.ALLOW_ONCE)
+
+        givenNewPermissionRequestFromDomain(domain)
+
+        assertCommandNotIssued<Command.CheckSystemLocationPermission>()
+    }
+
+    @Test
     fun whenAppLocationPermissionIsDeniedThenSitePermissionIsDenied() = coroutineRule.runBlocking {
         val domain = "https://www.example.com/"
         givenDeviceLocationSharingIsEnabled(true)
@@ -2664,6 +2668,39 @@ class BrowserTabViewModelTest {
         givenCurrentSite(domain)
 
         loadUrl("https://www.example.com", isBrowserShowing = true)
+
+        assertCommandNotIssued<Command.ShowDomainHasPermissionMessage>()
+    }
+
+    @Test
+    fun whenUserRefreshesASiteLocationMessageIsNotShownAgain() = coroutineRule.runBlocking {
+        val domain = "https://www.example.com/"
+
+        givenUserAlreadySelectedPermissionForDomain(domain, LocationPermissionType.ALLOW_ALWAYS)
+        givenCurrentSite(domain)
+        givenDeviceLocationSharingIsEnabled(true)
+        givenLocationPermissionIsEnabled(true)
+
+        loadUrl("https://www.example.com", isBrowserShowing = true)
+
+        assertCommandIssued<Command.ShowDomainHasPermissionMessage>()
+
+        loadUrl("https://www.example.com", isBrowserShowing = true)
+
+        assertCommandIssuedTimes<Command.ShowDomainHasPermissionMessage>(1)
+    }
+
+    @Test
+    fun whenUserSelectsPermissionAndRefreshesPageThenLocationMessageIsNotShown() = coroutineRule.runBlocking {
+        val domain = "http://example.com"
+
+        givenCurrentSite(domain)
+        givenDeviceLocationSharingIsEnabled(true)
+        givenLocationPermissionIsEnabled(true)
+
+        testee.onSiteLocationPermissionSelected(domain, LocationPermissionType.ALLOW_ALWAYS)
+
+        loadUrl(domain, isBrowserShowing = true)
 
         assertCommandNotIssued<Command.ShowDomainHasPermissionMessage>()
     }
@@ -2981,6 +3018,11 @@ class BrowserTabViewModelTest {
     private inline fun <reified T : Command> assertCommandNotIssued() {
         val issuedCommand = commandCaptor.allValues.find { it is T }
         assertNull(issuedCommand)
+    }
+
+    private inline fun <reified T : Command> assertCommandIssuedTimes(times: Int) {
+        val timesIssued = commandCaptor.allValues.count { it is T }
+        assertEquals(times, timesIssued)
     }
 
     private fun pixelParams(showedBookmarks: Boolean, bookmarkCapable: Boolean) = mapOf(

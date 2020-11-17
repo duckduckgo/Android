@@ -16,7 +16,7 @@
 
 package com.duckduckgo.app.di
 
-import com.duckduckgo.app.httpsupgrade.api.HttpsWhitelistJsonAdapter
+import com.duckduckgo.app.httpsupgrade.api.HttpsFalsePositivesJsonAdapter
 import com.duckduckgo.app.privacy.api.TermsOfServiceListAdapter
 import com.duckduckgo.app.trackerdetection.api.ActionJsonAdapter
 import com.squareup.moshi.Moshi
@@ -31,7 +31,7 @@ class JsonModule {
     @Singleton
     fun moshi(): Moshi = Moshi.Builder()
         .add(ActionJsonAdapter())
-        .add(HttpsWhitelistJsonAdapter())
+        .add(HttpsFalsePositivesJsonAdapter())
         .add(TermsOfServiceListAdapter())
         .build()
 }

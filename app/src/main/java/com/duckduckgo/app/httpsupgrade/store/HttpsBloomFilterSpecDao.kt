@@ -14,16 +14,22 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.httpsupgrade.api
+package com.duckduckgo.app.httpsupgrade.store
 
-import com.duckduckgo.app.httpsupgrade.model.HttpsWhitelistedDomain
-import com.squareup.moshi.FromJson
+import androidx.room.Dao
+import androidx.room.Insert
+import androidx.room.OnConflictStrategy
+import androidx.room.Query
+import com.duckduckgo.app.httpsupgrade.model.HttpsBloomFilterSpec
+import javax.inject.Singleton
 
-class HttpsWhitelistJsonAdapter {
+@Dao
+@Singleton
+interface HttpsBloomFilterSpecDao {
 
-    @FromJson
-    fun adapt(data: Map<String, List<String>>): List<HttpsWhitelistedDomain> {
-        return data.getValue("data").map { HttpsWhitelistedDomain(it) }
-    }
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun insert(specification: HttpsBloomFilterSpec)
 
+    @Query("select * from https_bloom_filter_spec limit 1")
+    fun get(): HttpsBloomFilterSpec?
 }

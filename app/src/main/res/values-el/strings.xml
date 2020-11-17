@@ -296,7 +296,7 @@
     <string name="privacyProtectionNotificationTrackerDescription">Προστατεύσατε τα δεδομένα σας αποκλείοντας %1$d παρακολουθήσεις κατά τη χρήση του DuckDuckGo.</string>
     <string name="privacyProtectionNotificationBothDescription">Προστατεύσατε τα δεδομένα σας αποκλείοντας %1$d παρακολουθήσεις και διασφαλίζοντας %2$d μη κρυπτογραφημένες συνδέσεις κατά τη χρήση του DuckDuckGo.</string>
     <string name="privacyProtectionNotificationLaunchButton">Συνέχιση περιήγησης</string>
-    
+
     <!-- Authentication -->
     <string name="authenticationDialogTitle">Είσοδος</string>
     <string name="authenticationDialogMessage">Το %1$s απαιτεί ένα όνομα χρήστη και κωδικό πρόσβασης.</string>
