@@ -37,6 +37,7 @@ import com.duckduckgo.app.tabs.db.TabsDao
 import com.duckduckgo.app.trackerdetection.EntityLookup
 import com.nhaarman.mockitokotlin2.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.*
 import org.junit.Before
@@ -322,7 +323,7 @@ class TabDataRepositoryTest {
     }
 
     @Test
-    fun markDeletableTrueThenMarksTabAsDeletable() = runBlocking {
+    fun whenMarkDeletableTrueThenMarksTabAsDeletable() = runBlocking {
         val tab = TabEntity(
             tabId = "tabid",
             position = 0,
@@ -334,7 +335,7 @@ class TabDataRepositoryTest {
     }
 
     @Test
-    fun markDeletableFalseThenMarksTabAsNonDeletable() = runBlocking {
+    fun whenMarkDeletableFalseThenMarksTabAsNonDeletable() = runBlocking {
         val tab = TabEntity(
             tabId = "tabid",
             position = 0,
@@ -346,7 +347,7 @@ class TabDataRepositoryTest {
     }
 
     @Test
-    fun purgeDeletableTabsThenPurgeDeletableTabsAndUpdateSelection() = runBlocking {
+    fun whenPurgeDeletableTabsThenPurgeDeletableTabsAndUpdateSelection() = runBlocking {
         testee.purgeDeletableTabs()
 
         verify(mockDao).purgeDeletableTabsAndUpdateSelection()
@@ -358,7 +359,8 @@ class TabDataRepositoryTest {
             SiteFactory(mockPrivacyPractices, mockEntityLookup),
             mockWebViewPreviewPersister,
             mockFaviconManager,
-            useOurAppDetector
+            useOurAppDetector,
+            GlobalScope
         )
     }
 

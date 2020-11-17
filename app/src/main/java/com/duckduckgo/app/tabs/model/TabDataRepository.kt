@@ -21,6 +21,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.tabpreview.WebViewPreviewPersister
+import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.global.model.SiteFactory
 import com.duckduckgo.app.global.useourapp.UseOurAppDetector
@@ -40,7 +41,8 @@ class TabDataRepository @Inject constructor(
     private val siteFactory: SiteFactory,
     private val webViewPreviewPersister: WebViewPreviewPersister,
     private val faviconManager: FaviconManager,
-    private val useOurAppDetector: UseOurAppDetector
+    private val useOurAppDetector: UseOurAppDetector,
+    @AppCoroutineScope private val appCoroutineScope: CoroutineScope
 ) : TabRepository {
 
     override val liveTabs: LiveData<List<TabEntity>> = tabsDao.liveTabs()
@@ -199,8 +201,10 @@ class TabDataRepository @Inject constructor(
         }
     }
 
-    override suspend fun purgeDeletableTabs() = withContext(Dispatchers.IO + NonCancellable) {
-        tabsDao.purgeDeletableTabsAndUpdateSelection()
+    override suspend fun purgeDeletableTabs() = withContext(Dispatchers.IO) {
+        appCoroutineScope.launch {
+            tabsDao.purgeDeletableTabsAndUpdateSelection()
+        }.join()
     }
 
     override suspend fun deleteCurrentTabAndSelectSource() {

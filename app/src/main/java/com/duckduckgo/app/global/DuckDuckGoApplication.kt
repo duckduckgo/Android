@@ -63,7 +63,9 @@ import dagger.android.HasAndroidInjector
 import io.reactivex.exceptions.UndeliverableException
 import io.reactivex.plugins.RxJavaPlugins
 import io.reactivex.schedulers.Schedulers
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 import org.jetbrains.anko.doAsync
 import timber.log.Timber
@@ -173,6 +175,8 @@ open class DuckDuckGoApplication : HasAndroidInjector, Application(), LifecycleO
 
     private var launchedByFireAction: Boolean = false
 
+    private val applicationCoroutineScope = CoroutineScope(SupervisorJob())
+
     open lateinit var daggerAppComponent: AppComponent
 
     override fun onCreate() {
@@ -260,6 +264,7 @@ open class DuckDuckGoApplication : HasAndroidInjector, Application(), LifecycleO
     protected open fun configureDependencyInjection() {
         daggerAppComponent = DaggerAppComponent.builder()
             .application(this)
+            .applicationCoroutineScope(applicationCoroutineScope)
             .build()
         daggerAppComponent.inject(this)
     }
