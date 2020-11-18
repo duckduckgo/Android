@@ -210,9 +210,10 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
     private fun onDeletableTab(tab: TabEntity) {
         Snackbar.make(
             contentView!!,
-            getString(R.string.closedTab, tab.title.orEmpty()),
+            getString(R.string.tabClosed),
             Snackbar.LENGTH_LONG)
-            .setAction(R.string.closeTabUndo) {
+            .setDuration(3500) // 3.5 seconds
+            .setAction(R.string.tabClosedUndo) {
                 // noop, handled in onDismissed callback
             }
             .addCallback(object :

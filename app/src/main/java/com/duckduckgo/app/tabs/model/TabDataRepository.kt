@@ -30,6 +30,7 @@ import io.reactivex.Scheduler
 import io.reactivex.schedulers.Schedulers
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.drop
 import timber.log.Timber
 import java.util.*
@@ -48,10 +49,12 @@ class TabDataRepository @Inject constructor(
 
     override val liveTabs: LiveData<List<TabEntity>> = tabsDao.liveTabs()
 
-    // We only one the new emissions when subscribing, however Room does not honour that contract so we
+    // We only want the new emissions when subscribing, however Room does not honour that contract so we
     // need to drop the first emission always (this is equivalent to the Observable semantics)
     @ExperimentalCoroutinesApi
-    override val flowDeletableTabs: Flow<List<TabEntity>> = tabsDao.flowDeletableTabs().drop(1)
+    override val flowDeletableTabs: Flow<List<TabEntity>> = tabsDao.flowDeletableTabs()
+        .drop(1)
+        .distinctUntilChanged()
 
     override val liveSelectedTab: LiveData<TabEntity> = tabsDao.liveSelectedTab()
 

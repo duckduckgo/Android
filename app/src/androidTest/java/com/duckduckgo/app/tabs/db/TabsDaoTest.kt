@@ -294,4 +294,31 @@ class TabsDaoTest {
 
         assertEquals(tab, testee.selectedTab())
     }
+
+    @Test
+    fun whenMarkTabAsDeletableThenModifyOnlyDeletableColumn() {
+        val tab = TabEntity(
+            tabId = "TAB_ID",
+            url = "www.duckduckgo.com",
+            position = 0)
+
+        testee.insertTab(tab)
+        testee.markTabAsDeletable(tab.copy(url = "www.other.com"))
+
+        assertEquals(tab.copy(deletable = true), testee.tab(tab.tabId))
+    }
+
+    @Test
+    fun whenUndoDeletableTabThenModifyOnlyDeletableColumn() {
+        val tab = TabEntity(
+            tabId = "TAB_ID",
+            url = "www.duckduckgo.com",
+            position = 0,
+            deletable = true)
+
+        testee.insertTab(tab)
+        testee.undoDeletableTab(tab.copy(url = "www.other.com"))
+
+        assertEquals(tab.copy(deletable = false), testee.tab(tab.tabId))
+    }
 }

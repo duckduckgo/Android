@@ -395,8 +395,29 @@ class TabDataRepositoryTest {
             }
         }
 
-        daoDeletableTabs.send(listOf(tab))
+        daoDeletableTabs.send(listOf(tab)) // dropped
         daoDeletableTabs.send(listOf(expectedTab))
+        job.cancel()
+    }
+
+    @Test
+    @ExperimentalCoroutinesApi
+    fun whenDaoFLowDeletableTabsDoubleEmitsThenDistinctUntilChanged() = runBlocking {
+        val tab = TabEntity("ID1", position = 0)
+
+        var count = 0
+        val job = launch {
+            testee.flowDeletableTabs.collect {
+                ++count
+                assertEquals(1, count)
+            }
+        }
+
+        daoDeletableTabs.send(listOf(tab, tab, tab)) // dropped
+        daoDeletableTabs.send(listOf(tab, tab, tab))
+        daoDeletableTabs.send(listOf(tab, tab, tab))
+        daoDeletableTabs.send(listOf(tab, tab, tab))
+        daoDeletableTabs.send(listOf(tab, tab, tab))
         job.cancel()
     }
 
