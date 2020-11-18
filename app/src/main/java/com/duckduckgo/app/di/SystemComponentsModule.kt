@@ -20,6 +20,7 @@ import android.content.Context
 import android.content.pm.PackageManager
 import com.duckduckgo.app.fire.FireAnimationLoader
 import com.duckduckgo.app.fire.LottieFireAnimationLoader
+import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.shortcut.AppShortcutCreator
 import com.duckduckgo.app.icon.api.AppIconModifier
 import com.duckduckgo.app.icon.api.IconModifier
@@ -52,7 +53,7 @@ open class SystemComponentsModule {
         AppIconModifier(context, appShortcutCreator)
 
     @Provides
-    fun animatorLoader(context: Context, settingsDataStore: SettingsDataStore): FireAnimationLoader {
-        return LottieFireAnimationLoader(context, settingsDataStore)
+    fun animatorLoader(context: Context, settingsDataStore: SettingsDataStore, dispatcherProvider: DispatcherProvider): FireAnimationLoader {
+        return LottieFireAnimationLoader(context, settingsDataStore, dispatcherProvider)
     }
 }
