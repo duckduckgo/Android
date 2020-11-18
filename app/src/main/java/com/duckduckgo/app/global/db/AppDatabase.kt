@@ -64,8 +64,9 @@ import com.duckduckgo.app.usage.app.AppDaysUsedEntity
 import com.duckduckgo.app.usage.search.SearchCountDao
 import com.duckduckgo.app.usage.search.SearchCountEntity
 
+//TODO: update database version
 @Database(
-    exportSchema = true, version = 27, entities = [
+    exportSchema = true, version = 28, entities = [
         TdsTracker::class,
         TdsEntity::class,
         TdsDomainEntity::class,
@@ -365,6 +366,13 @@ class MigrationsProvider(
         }
     }
 
+    //TODO: update values
+    val MIGRATION_XX_TO_YY: Migration = object : Migration(27, 28) {
+        override fun migrate(database: SupportSQLiteDatabase) {
+            database.execSQL("UPDATE $USER_STAGE_TABLE_NAME SET appStage = \"${AppStage.ESTABLISHED}\" WHERE appStage = \"${AppStage.DAX_ONBOARDING}\"")
+        }
+    }
+
     val ALL_MIGRATIONS: List<Migration>
         get() = listOf(
             MIGRATION_1_TO_2,
@@ -392,7 +400,8 @@ class MigrationsProvider(
             MIGRATION_23_TO_24,
             MIGRATION_24_TO_25,
             MIGRATION_25_TO_26,
-            MIGRATION_26_TO_27
+            MIGRATION_26_TO_27,
+            MIGRATION_XX_TO_YY
         )
 
     @Deprecated(
