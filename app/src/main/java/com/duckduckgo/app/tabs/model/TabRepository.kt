@@ -19,7 +19,7 @@ package com.duckduckgo.app.tabs.model
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.duckduckgo.app.global.model.Site
-import io.reactivex.Observable
+import kotlinx.coroutines.flow.Flow
 
 interface TabRepository {
 
@@ -31,7 +31,7 @@ interface TabRepository {
     /**
      * @return the tabs that are marked as "deletable" in the DB
      */
-    val deletableLiveTabs: Observable<List<TabEntity>>
+    val flowDeletableTabs: Flow<List<TabEntity>>
 
     val liveSelectedTab: LiveData<TabEntity>
 

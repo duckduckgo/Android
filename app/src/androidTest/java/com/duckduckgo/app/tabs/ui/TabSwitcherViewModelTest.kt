@@ -26,10 +26,12 @@ import com.duckduckgo.app.browser.session.WebViewSessionInMemoryStorage
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command
-import com.jakewharton.rxrelay2.PublishRelay
 import com.nhaarman.mockitokotlin2.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.consumeAsFlow
 import kotlinx.coroutines.runBlocking
+import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Rule
@@ -60,17 +62,24 @@ class TabSwitcherViewModelTest {
 
     private lateinit var testee: TabSwitcherViewModel
 
-    private val repoDeletableTabs = PublishRelay.create<List<TabEntity>>()
+    private val repoDeletableTabs = Channel<List<TabEntity>>()
 
+    @ExperimentalCoroutinesApi
     @Before
     fun before() {
         MockitoAnnotations.initMocks(this)
         runBlocking {
-            whenever(mockTabRepository.deletableLiveTabs).thenReturn(repoDeletableTabs)
+            whenever(mockTabRepository.flowDeletableTabs)
+                .thenReturn(repoDeletableTabs.consumeAsFlow())
             whenever(mockTabRepository.add()).thenReturn("TAB_ID")
             testee = TabSwitcherViewModel(mockTabRepository, WebViewSessionInMemoryStorage())
             testee.command.observeForever(mockCommandObserver)
         }
+    }
+
+    @After
+    fun after() {
+        repoDeletableTabs.close()
     }
 
     @Test
@@ -128,31 +137,28 @@ class TabSwitcherViewModelTest {
     }
 
     @Test
-    fun whenRepositoryDeletableTabsUpdatesThenDeletableTabsEmits() {
-        val observer = testee.deletableTabs.test()
-
+    fun whenRepositoryDeletableTabsUpdatesThenDeletableTabsEmits() = runBlocking {
         val tab = TabEntity("ID", position = 0)
-        repoDeletableTabs.accept(listOf())
-        repoDeletableTabs.accept(listOf(tab))
-        observer.assertValues(listOf(), listOf(tab))
+
+        val expectedTabs = listOf(listOf(), listOf(tab))
+        var index = 0
+        testee.deletableTabs.observeForever {
+            assertEquals(expectedTabs[index++], it)
+        }
+
+        repoDeletableTabs.send(listOf())
+        repoDeletableTabs.send(listOf(tab))
     }
 
     @Test
-    fun whenRepositoryDeletableTabsEmitsSameValueThenDeletableTabsEmitsAll() {
-        val observer = testee.deletableTabs.test()
-
+    fun whenRepositoryDeletableTabsEmitsSameValueThenDeletableTabsEmitsAll() = runBlocking {
         val tab = TabEntity("ID", position = 0)
-        repoDeletableTabs.accept(listOf(tab))
-        repoDeletableTabs.accept(listOf(tab))
-        observer.assertValues(listOf(tab), listOf(tab))
-    }
 
-    @Test
-    fun whenObserverSubscribesToDeletableTabsThenLastValueIsNotEmitted() {
-        repoDeletableTabs.accept(listOf(TabEntity("ID", position = 0)))
+        testee.deletableTabs.observeForever {
+            assertEquals(listOf(tab), it)
+        }
 
-        val observer = testee.deletableTabs.test()
-
-        observer.assertNoValues()
+        repoDeletableTabs.send(listOf(tab))
+        repoDeletableTabs.send(listOf(tab))
     }
 }

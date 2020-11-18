@@ -26,10 +26,11 @@ import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.global.model.SiteFactory
 import com.duckduckgo.app.global.useourapp.UseOurAppDetector
 import com.duckduckgo.app.tabs.db.TabsDao
-import io.reactivex.Observable
 import io.reactivex.Scheduler
 import io.reactivex.schedulers.Schedulers
 import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.drop
 import timber.log.Timber
 import java.util.*
 import javax.inject.Inject
@@ -47,7 +48,10 @@ class TabDataRepository @Inject constructor(
 
     override val liveTabs: LiveData<List<TabEntity>> = tabsDao.liveTabs()
 
-    override val deletableLiveTabs: Observable<List<TabEntity>> = tabsDao.deletableLiveTabs()
+    // We only one the new emissions when subscribing, however Room does not honour that contract so we
+    // need to drop the first emission always (this is equivalent to the Observable semantics)
+    @ExperimentalCoroutinesApi
+    override val flowDeletableTabs: Flow<List<TabEntity>> = tabsDao.flowDeletableTabs().drop(1)
 
     override val liveSelectedTab: LiveData<TabEntity> = tabsDao.liveSelectedTab()
 

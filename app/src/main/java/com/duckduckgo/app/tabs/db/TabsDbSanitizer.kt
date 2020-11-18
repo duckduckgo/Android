@@ -19,6 +19,7 @@ package com.duckduckgo.app.tabs.db
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.OnLifecycleEvent
+import com.duckduckgo.app.tabs.model.TabRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -26,7 +27,7 @@ import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 class TabsDbSanitizer @Inject constructor(
-    private val tabsDao: TabsDao
+    private val tabRepository: TabRepository
 ) : LifecycleObserver {
 
     @OnLifecycleEvent(Lifecycle.Event.ON_START)
@@ -37,6 +38,6 @@ class TabsDbSanitizer @Inject constructor(
     }
 
     private suspend fun purgeTabsDatabaseAsync() = withContext(Dispatchers.IO) {
-        tabsDao.purgeDeletableTabsAndUpdateSelection()
+        tabRepository.purgeDeletableTabs()
     }
 }

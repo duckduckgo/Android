@@ -367,7 +367,7 @@ class MigrationsProvider(
 
     val MIGRATION_27_TO_28: Migration = object : Migration(27, 28) {
         override fun migrate(database: SupportSQLiteDatabase) {
-            database.execSQL("ALTER TABLE `tabs` ADD COLUMN `deletable` INTEGER DEFAULT 0 NOT NULL")
+            database.execSQL("ALTER TABLE `tabs` ADD COLUMN `deletable` INTEGER NOT NULL DEFAULT 0")
         }
     }
 

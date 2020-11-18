@@ -42,8 +42,6 @@ import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.Close
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.DisplayMessage
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.disposables.CompositeDisposable
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -79,8 +77,6 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
     private val viewModel: TabSwitcherViewModel by bindViewModel()
 
     private val tabsAdapter: TabSwitcherAdapter by lazy { TabSwitcherAdapter(this, webViewPreviewPersister, this, faviconManager) }
-
-    private val disposable = CompositeDisposable()
 
     // we need to scroll to show selected tab, but only if it is the first time loading the tabs.
     private var firstTimeLoadingTabsList = true
@@ -131,12 +127,11 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
         viewModel.tabs.observe(this, Observer<List<TabEntity>> {
             render(it)
         })
-        disposable.add(
-            viewModel.deletableTabs
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe { tabs ->
-                    tabs.takeIf { it.isNotEmpty() }?.let { onDeletableTab(it.last()) }
-                })
+        viewModel.deletableTabs.observe(this, {
+            if (it.isNotEmpty()) {
+                onDeletableTab(it.last())
+            }
+        })
         viewModel.command.observe(this, Observer {
             processCommand(it)
         })
@@ -257,7 +252,7 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
 
     override fun onDestroy() {
         super.onDestroy()
-        disposable.clear()
+        viewModel.deletableTabs.removeObservers(this)
         // we don't want to purge during device rotation
         if (isFinishing) {
             launch { viewModel.purgeDeletableTabs() }
@@ -266,7 +261,7 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
 
     private fun clearObserversEarlyToStopViewUpdates() {
         viewModel.tabs.removeObservers(this)
-        disposable.clear()
+        viewModel.deletableTabs.removeObservers(this)
     }
 
     companion object {

@@ -20,7 +20,7 @@ import androidx.lifecycle.LiveData
 import androidx.room.*
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabSelectionEntity
-import io.reactivex.Observable
+import kotlinx.coroutines.flow.Flow
 import javax.inject.Singleton
 
 @Dao
@@ -43,7 +43,7 @@ abstract class TabsDao {
     abstract fun liveTabs(): LiveData<List<TabEntity>>
 
     @Query("select * from tabs where deletable is 1 order by position")
-    abstract fun deletableLiveTabs(): Observable<List<TabEntity>>
+    abstract fun flowDeletableTabs(): Flow<List<TabEntity>>
 
     @Query("select * from tabs where tabId = :tabId")
     abstract fun tab(tabId: String): TabEntity?

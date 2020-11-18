@@ -38,7 +38,12 @@ import com.duckduckgo.app.trackerdetection.EntityLookup
 import com.nhaarman.mockitokotlin2.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.consumeAsFlow
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import org.junit.After
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Rule
@@ -74,13 +79,23 @@ class TabDataRepositoryTest {
 
     private val mockFaviconManager: FaviconManager = mock()
 
+    private val daoDeletableTabs = Channel<List<TabEntity>>()
+
+    @ExperimentalCoroutinesApi
     @UiThreadTest
     @Before
     fun before() {
         runBlocking {
+            whenever(mockDao.flowDeletableTabs())
+                .thenReturn(daoDeletableTabs.consumeAsFlow())
             whenever(mockPrivacyPractices.privacyPracticesFor(any())).thenReturn(PrivacyPractices.UNKNOWN)
             testee = tabDataRepository(mockDao)
         }
+    }
+
+    @After
+    fun after() {
+        daoDeletableTabs.close()
     }
 
     @Test
@@ -351,6 +366,38 @@ class TabDataRepositoryTest {
         testee.purgeDeletableTabs()
 
         verify(mockDao).purgeDeletableTabsAndUpdateSelection()
+    }
+
+    @Test
+    @ExperimentalCoroutinesApi
+    fun whenDaoFLowDeletableTabsEmitsThenDropFirstEmission() = runBlocking {
+        val tab = TabEntity("ID", position = 0)
+
+        val job = launch {
+            testee.flowDeletableTabs.collect {
+                assert(false) { "First value should be skipped" }
+            }
+        }
+
+        daoDeletableTabs.send(listOf(tab))
+        job.cancel()
+    }
+
+    @Test
+    @ExperimentalCoroutinesApi
+    fun whenDaoFLowDeletableTabsEmitsThenEmit() = runBlocking {
+        val tab = TabEntity("ID1", position = 0)
+        val expectedTab = TabEntity("ID2", position = 0)
+
+        val job = launch {
+            testee.flowDeletableTabs.collect {
+                assertEquals(listOf(expectedTab), it)
+            }
+        }
+
+        daoDeletableTabs.send(listOf(tab))
+        daoDeletableTabs.send(listOf(expectedTab))
+        job.cancel()
     }
 
     private fun tabDataRepository(dao: TabsDao): TabDataRepository {
