@@ -280,11 +280,17 @@ class RxBasedPixel @Inject constructor(
             })
     }
 
+    /**
+     * Sends a pixel. If delivery fails, the pixel will be retried again in the future.
+     * As this method stores the pixel to disk until successful delivery, check with privacy triage if the pixel has additional parameters
+     * that they would want to validate.
+     */
     override fun enqueueFire(pixel: PixelName, parameters: Map<String, String>, encodedParameters: Map<String, String>) {
         enqueueFire(pixel.pixelName, parameters, encodedParameters)
     }
 
     @SuppressLint("CheckResult")
+    /** See comment in {@link #enqueueFire(PixelName, Map<String, String>, Map<String, String>)}. */
     override fun enqueueFire(pixelName: String, parameters: Map<String, String>, encodedParameters: Map<String, String>) {
         pixelSender.enqueuePixel(pixelName, parameters, encodedParameters)
             .subscribeOn(Schedulers.io())
