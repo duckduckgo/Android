@@ -94,13 +94,9 @@ class CtaViewModel @Inject constructor(
             CtaId.DAX_DIALOG_SERP,
             CtaId.DAX_DIALOG_TRACKERS_FOUND,
             CtaId.DAX_DIALOG_NETWORK,
+            CtaId.DAX_FIRE_BUTTON,
             CtaId.DAX_END
-        ).run {
-            if (variantManager.getVariant().hasFeature(FireButtonEducation)) {
-                return@run this.plus(CtaId.DAX_FIRE_BUTTON)
-            }
-            return@run this
-        }
+        )
     }
 
     @ExperimentalCoroutinesApi
@@ -197,7 +193,7 @@ class CtaViewModel @Inject constructor(
     }
 
     suspend fun getFireDialogCta(): DaxFireDialogCta? {
-        if (!variantManager.getVariant().hasFeature(FireButtonEducation) || !daxOnboardingActive()) return null
+        if (!daxOnboardingActive()) return null
 
         return withContext(dispatchers.io()) {
             if (settingsDataStore.hideTips || daxDialogFireEducationShown()) return@withContext null
@@ -362,7 +358,6 @@ class CtaViewModel @Inject constructor(
         return this.map { (dismissedCtaDao, forceStopAnimation) ->
             withContext(dispatchers.io()) {
                 if (forceStopAnimation) return@withContext false
-                if (!variantManager.getVariant().hasFeature(FireButtonEducation)) return@withContext false
                 if (!daxOnboardingActive() || pulseFireButtonShown() || daxDialogFireEducationShown() || settingsDataStore.hideTips) return@withContext false
 
                 return@withContext dismissedCtaDao.any {
