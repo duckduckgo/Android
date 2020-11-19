@@ -301,6 +301,7 @@ class BrowserTabViewModel(
 
     private var locationPermission: LocationPermission? = null
     private val locationPermissionMessages: MutableMap<String, Boolean> = mutableMapOf()
+    private val locationPermissionSession: MutableMap<String, LocationPermissionType> = mutableMapOf()
 
     private val autoCompletePublishSubject = PublishRelay.create<String>()
     private val fireproofWebsiteState: LiveData<List<FireproofWebsiteEntity>> = fireproofWebsiteRepository.getFireproofWebsites()
@@ -452,7 +453,7 @@ class BrowserTabViewModel(
         if (!currentBrowserViewState().browserShowing) {
             viewModelScope.launch {
                 val cta = refreshCta()
-                showOrHideKeyboard(cta) // we hide the keyboard when showing a DialogCta type in the home screen otherwise we show it
+                showOrHideKeyboard(cta) // we hide the keyboard when showing a DialogCta and HomeCta type in the home screen otherwise we show it
             }
         } else {
             command.value = HideKeyboard
@@ -502,11 +503,6 @@ class BrowserTabViewModel(
 
         val verticalParameter = extractVerticalParameter(url)
         val urlToNavigate = queryUrlConverter.convertQueryToUrl(trimmedInput, verticalParameter)
-        val omnibarText = if (variantManager.getVariant().hasFeature(VariantManager.VariantFeature.SerpHeaderQueryReplacement)) {
-            urlToNavigate
-        } else {
-            trimmedInput
-        }
 
         val type = specialUrlDetector.determineType(trimmedInput)
         if (type is IntentType) {
@@ -516,13 +512,13 @@ class BrowserTabViewModel(
                 command.value = ResetHistory
             }
 
-            fireQueryChangedPixel(omnibarText)
+            fireQueryChangedPixel(trimmedInput)
             command.value = Navigate(urlToNavigate, getUrlHeaders())
         }
 
         globalLayoutState.value = Browser(isNewTabState = false)
         findInPageViewState.value = FindInPageViewState(visible = false, canFindInPage = true)
-        omnibarViewState.value = currentOmnibarViewState().copy(omnibarText = omnibarText, shouldMoveCaretToEnd = false)
+        omnibarViewState.value = currentOmnibarViewState().copy(omnibarText = trimmedInput, shouldMoveCaretToEnd = false)
         browserViewState.value = currentBrowserViewState().copy(browserShowing = true, showClearButton = false)
         autoCompleteViewState.value = AutoCompleteViewState(false)
     }
@@ -546,10 +542,6 @@ class BrowserTabViewModel(
     }
 
     private fun fireQueryChangedPixel(omnibarText: String) {
-        if (!variantManager.getVariant().hasFeature(VariantManager.VariantFeature.SerpHeaderRemoval)) {
-            return
-        }
-
         val oldQuery = currentOmnibarViewState().omnibarText.toUri()
         val newQuery = omnibarText.toUri()
 
@@ -824,12 +816,7 @@ class BrowserTabViewModel(
     }
 
     private fun shouldShowDaxIcon(currentUrl: String?, showPrivacyGrade: Boolean): Boolean {
-        if (!variantManager.getVariant().hasFeature(VariantManager.VariantFeature.SerpHeaderRemoval)) {
-            return false
-        }
-
         val url = currentUrl ?: return false
-
         return showPrivacyGrade && duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(url)
     }
 
@@ -889,10 +876,6 @@ class BrowserTabViewModel(
 
     private fun omnibarTextForUrl(url: String?): String {
         if (url == null) return ""
-
-        if (variantManager.getVariant().hasFeature(VariantManager.VariantFeature.SerpHeaderQueryReplacement)) {
-            return url
-        }
 
         return if (duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(url)) {
             duckDuckGoUrlDetector.extractQuery(url) ?: url
@@ -974,7 +957,11 @@ class BrowserTabViewModel(
             val previouslyDeniedForever = appSettingsPreferencesStore.appLocationPermissionDeniedForever
             val permissionEntity = locationPermissionsRepository.getDomainPermission(origin)
             if (permissionEntity == null) {
-                command.postValue(CheckSystemLocationPermission(origin, previouslyDeniedForever))
+                if (locationPermissionSession.containsKey(origin)) {
+                    reactToSiteSessionPermission(locationPermissionSession[origin]!!)
+                } else {
+                    command.postValue(CheckSystemLocationPermission(origin, previouslyDeniedForever))
+                }
             } else {
                 if (permissionEntity.permission == LocationPermissionType.DENY_ALWAYS) {
                     onSiteLocationPermissionAlwaysDenied()
@@ -999,6 +986,7 @@ class BrowserTabViewModel(
                 }
                 LocationPermissionType.ALLOW_ONCE -> {
                     pixel.fire(PixelName.PRECISE_LOCATION_SITE_DIALOG_ALLOW_ONCE)
+                    locationPermissionSession[domain] = permission
                     locationPermission.callback.invoke(locationPermission.origin, true, false)
                 }
                 LocationPermissionType.DENY_ALWAYS -> {
@@ -1011,6 +999,7 @@ class BrowserTabViewModel(
                 }
                 LocationPermissionType.DENY_ONCE -> {
                     pixel.fire(PixelName.PRECISE_LOCATION_SITE_DIALOG_DENY_ONCE)
+                    locationPermissionSession[domain] = permission
                     locationPermission.callback.invoke(locationPermission.origin, false, false)
                 }
             }
@@ -1053,6 +1042,17 @@ class BrowserTabViewModel(
             }
 
         }
+    }
+
+    private fun reactToSiteSessionPermission(permission: LocationPermissionType) {
+        locationPermission?.let { locationPermission ->
+            if (permission == LocationPermissionType.ALLOW_ONCE) {
+                locationPermission.callback.invoke(locationPermission.origin, true, false)
+            } else {
+                locationPermission.callback.invoke(locationPermission.origin, false, false)
+            }
+        }
+
     }
 
     override fun onSystemLocationPermissionAllowed() {
@@ -1557,7 +1557,7 @@ class BrowserTabViewModel(
     }
 
     private fun showOrHideKeyboard(cta: Cta?) {
-        command.value = if (cta is DialogCta) HideKeyboard else ShowKeyboard
+        command.value = if (cta is DialogCta || cta is HomePanelCta) HideKeyboard else ShowKeyboard
     }
 
     fun registerDaxBubbleCtaDismissed() {

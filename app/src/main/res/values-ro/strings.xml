@@ -296,7 +296,7 @@
     <string name="privacyProtectionNotificationTrackerDescription">V-ați protejat datele, blocând %1$d cookie-uri de urmărire, în timpul utilizării DuckDuckGo.</string>
     <string name="privacyProtectionNotificationBothDescription">V-ați protejat datele blocând %1$d cookie-uri de urmărire și securizând %2$d conexiuni necriptate în timpul utilizării DuckDuckGo.</string>
     <string name="privacyProtectionNotificationLaunchButton">Reluare navigare</string>
-    
+
     <!-- Authentication -->
     <string name="authenticationDialogTitle">Autentificare</string>
     <string name="authenticationDialogMessage">%1$s necesită un nume de utilizator și o parolă.</string>
@@ -483,6 +483,15 @@
     <string name="fireproofWebsiteLoginDialogNegative">Nu acum</string>
     <string name="fireproofWebsiteItemsSectionTitle">Site-uri web</string>
     <string name="fireproofWebsiteToogleText">Întreabă la conectare</string>
+
+    <!-- Fire Animation settings -->
+    <string name="settingsFireAnimation">Animație buton foc</string>
+    <string name="settingsHeroFireAnimation">Infern</string>
+    <string name="settingsHeroWaterAnimation">Vârtej de apă</string>
+    <string name="settingsHeroAbstractAnimation">Curent de aer</string>
+    <string name="settingsNoneAnimation">Niciuna</string>
+    <string name="settingsSelectFireAnimationDialog">Animație buton foc</string>
+    <string name="settingsSelectFireAnimationDialogSave">Salvare</string>
 
     <!-- Dos Attack error-->
     <string name="dosErrorMessage">Conexiunea a fost anulată. Acest site web ar putea dăuna dispozitivului tău.</string>

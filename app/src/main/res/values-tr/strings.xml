@@ -292,7 +292,7 @@
     <string name="privacyProtectionNotificationTrackerDescription">DuckDuckGo kullanırken %1$d izleyiciyi engelleyerek verilerinizi korudunuz.</string>
     <string name="privacyProtectionNotificationBothDescription">DuckDuckGo kullanırken %1$d izleyiciyi engelleyerek ve %2$d şifrelenmemiş bağlantıyı güvenceye alarak verilerinizi korudunuz.</string>
     <string name="privacyProtectionNotificationLaunchButton">Taramayı Sürdür</string>
-    
+
     <!-- Authentication -->
     <string name="authenticationDialogTitle">Oturum aç</string>
     <string name="authenticationDialogMessage">%1$s için bir kullanıcı adı ve şifre gerekiyor.</string>
@@ -477,6 +477,15 @@
     <string name="fireproofWebsiteLoginDialogNegative">Şimdi değil</string>
     <string name="fireproofWebsiteItemsSectionTitle">Web siteleri</string>
     <string name="fireproofWebsiteToogleText">Oturum Açarken Sor</string>
+
+    <!-- Fire Animation settings -->
+    <string name="settingsFireAnimation">Yangın Düğmesi Animasyonu</string>
+    <string name="settingsHeroFireAnimation">Ateş</string>
+    <string name="settingsHeroWaterAnimation">Girdap</string>
+    <string name="settingsHeroAbstractAnimation">Hava</string>
+    <string name="settingsNoneAnimation">Yok</string>
+    <string name="settingsSelectFireAnimationDialog">Yangın Düğmesi animasyonu</string>
+    <string name="settingsSelectFireAnimationDialogSave">Kaydet</string>
 
     <!-- Dos Attack error-->
     <string name="dosErrorMessage">Bağlantı iptal edildi. Bu web sitesi cihazınıza zarar verebilir.</string>

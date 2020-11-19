@@ -20,11 +20,15 @@ import com.duckduckgo.app.global.AppUrl
 import io.reactivex.Observable
 import retrofit2.http.GET
 import retrofit2.http.Query
+import java.util.*
 
 interface AutoCompleteService {
 
     @GET("${AppUrl.Url.API}/ac/")
-    fun autoComplete(@Query("q") query: String): Observable<List<AutoCompleteServiceRawResult>>
+    fun autoComplete(
+        @Query("q") query: String,
+        @Query("kl") languageCode: String = Locale.getDefault().language
+    ): Observable<List<AutoCompleteServiceRawResult>>
 }
 
 data class AutoCompleteServiceRawResult(val phrase: String)

@@ -292,7 +292,7 @@
     <string name="privacyProtectionNotificationTrackerDescription">Has protegido tus datos bloqueando %1$d rastreadores mientras usabas DuckDuckGo.</string>
     <string name="privacyProtectionNotificationBothDescription">Tus datos están seguros gracias a que has bloqueado %1$d rastreadores y protegido %2$d conexiones no cifradas mientras usabas DuckDuckGo.</string>
     <string name="privacyProtectionNotificationLaunchButton">Continuar navegando</string>
-    
+
     <!-- Authentication -->
     <string name="authenticationDialogTitle">Iniciar sesión</string>
     <string name="authenticationDialogMessage">%1$s requiere un nombre de usuario y contraseña.</string>
@@ -477,6 +477,15 @@
     <string name="fireproofWebsiteLoginDialogNegative">Ahora no</string>
     <string name="fireproofWebsiteItemsSectionTitle">Sitios web</string>
     <string name="fireproofWebsiteToogleText">Preguntar al iniciar sesión</string>
+
+    <!-- Fire Animation settings -->
+    <string name="settingsFireAnimation">Animación del botón Fuego</string>
+    <string name="settingsHeroFireAnimation">Infierno</string>
+    <string name="settingsHeroWaterAnimation">Remolino</string>
+    <string name="settingsHeroAbstractAnimation">Corriente de aire</string>
+    <string name="settingsNoneAnimation">Ninguna</string>
+    <string name="settingsSelectFireAnimationDialog">Animación del botón Fuego</string>
+    <string name="settingsSelectFireAnimationDialogSave">Guardar</string>
 
     <!-- Dos Attack error-->
     <string name="dosErrorMessage">Conexión abortada. Esta web puede ser dañina para tu dispositivo.</string>

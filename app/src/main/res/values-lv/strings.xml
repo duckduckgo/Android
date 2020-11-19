@@ -296,7 +296,7 @@
     <string name="privacyProtectionNotificationTrackerDescription">Jūs aizsargājāt savus datus, bloķējot %1$d izsekotājus, vienlaikus izmantojot DuckDuckGo.</string>
     <string name="privacyProtectionNotificationBothDescription">Jūs aizsargājāt savus datus, bloķējot %1$d izsekotājus un nodrošinot %2$d nešifrētus savienojumus, vienlaikus izmantojot DuckDuckGo.</string>
     <string name="privacyProtectionNotificationLaunchButton">Atsākt pārlūkošanu</string>
-    
+
     <!-- Authentication -->
     <string name="authenticationDialogTitle">Pierakstīties</string>
     <string name="authenticationDialogMessage">Lai izmantotu %1$s, ir nepieciešams lietotājvārds un parole.</string>
@@ -483,6 +483,15 @@
     <string name="fireproofWebsiteLoginDialogNegative">Ne tagad</string>
     <string name="fireproofWebsiteItemsSectionTitle">Tīmekļa vietnes</string>
     <string name="fireproofWebsiteToogleText">Jautāt, kad pierakstos</string>
+
+    <!-- Fire Animation settings -->
+    <string name="settingsFireAnimation">Uguns pogas animācija</string>
+    <string name="settingsHeroFireAnimation">Liesmas</string>
+    <string name="settingsHeroWaterAnimation">Atvars</string>
+    <string name="settingsHeroAbstractAnimation">Gaisa plūsma</string>
+    <string name="settingsNoneAnimation">Nav</string>
+    <string name="settingsSelectFireAnimationDialog">Uguns pogas animācija</string>
+    <string name="settingsSelectFireAnimationDialogSave">Saglabāt</string>
 
     <!-- Dos Attack error-->
     <string name="dosErrorMessage">Savienojums pārtraukts. Šī vietne var kaitēt tavai ierīcei.</string>

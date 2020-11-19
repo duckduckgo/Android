@@ -16,13 +16,9 @@
 
 package com.duckduckgo.app.statistics.pixels
 
-import com.duckduckgo.app.global.device.DeviceInfo
-import com.duckduckgo.app.statistics.VariantManager
-import com.duckduckgo.app.statistics.api.PixelService
+import android.annotation.SuppressLint
+import com.duckduckgo.app.statistics.api.PixelSender
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelName
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter
-import com.duckduckgo.app.statistics.store.StatisticsDataStore
-import io.reactivex.Completable
 import io.reactivex.schedulers.Schedulers
 import timber.log.Timber
 import javax.inject.Inject
@@ -224,6 +220,10 @@ interface Pixel {
         FIRE_DIALOG_CLEAR_PRESSED("m_fd_p"),
         FIRE_DIALOG_PROMOTED_CANCEL("m_fdp_c"),
         FIRE_DIALOG_CANCEL("m_fd_c"),
+        FIRE_DIALOG_ANIMATION("m_fd_a"),
+
+        FIRE_ANIMATION_SETTINGS_OPENED("m_fas_o"),
+        FIRE_ANIMATION_NEW_SELECTED("m_fas_s"),
     }
 
     object PixelParameter {
@@ -242,6 +242,7 @@ interface Pixel {
         const val SERP_QUERY_CHANGED = "1"
         const val SERP_QUERY_NOT_CHANGED = "0"
         const val FIRE_BUTTON_STATE = "fb"
+        const val FIRE_ANIMATION = "fa"
     }
 
     object PixelValues {
@@ -257,26 +258,31 @@ interface Pixel {
         const val DAX_TRACKERS_BLOCKED_CTA = "t"
         const val DAX_NO_TRACKERS_CTA = "nt"
         const val DAX_FIRE_DIALOG_CTA = "fd"
+
+        const val FIRE_ANIMATION_INFERNO = "fai"
+        const val FIRE_ANIMATION_AIRSTREAM = "faas"
+        const val FIRE_ANIMATION_WHIRLPOOL = "fawp"
+        const val FIRE_ANIMATION_NONE = "fann"
+
     }
 
     fun fire(pixel: PixelName, parameters: Map<String, String> = emptyMap(), encodedParameters: Map<String, String> = emptyMap())
     fun fire(pixelName: String, parameters: Map<String, String> = emptyMap(), encodedParameters: Map<String, String> = emptyMap())
-    fun fireCompletable(pixelName: String, parameters: Map<String, String>, encodedParameters: Map<String, String> = emptyMap()): Completable
+    fun enqueueFire(pixel: PixelName, parameters: Map<String, String> = emptyMap(), encodedParameters: Map<String, String> = emptyMap())
+    fun enqueueFire(pixelName: String, parameters: Map<String, String> = emptyMap(), encodedParameters: Map<String, String> = emptyMap())
 }
 
-class ApiBasedPixel @Inject constructor(
-    private val api: PixelService,
-    private val statisticsDataStore: StatisticsDataStore,
-    private val variantManager: VariantManager,
-    private val deviceInfo: DeviceInfo
+class RxBasedPixel @Inject constructor(
+    private val pixelSender: PixelSender
 ) : Pixel {
 
     override fun fire(pixel: PixelName, parameters: Map<String, String>, encodedParameters: Map<String, String>) {
         fire(pixel.pixelName, parameters, encodedParameters)
     }
 
+    @SuppressLint("CheckResult")
     override fun fire(pixelName: String, parameters: Map<String, String>, encodedParameters: Map<String, String>) {
-        fireCompletable(pixelName, parameters, encodedParameters)
+        pixelSender.sendPixel(pixelName, parameters, encodedParameters)
             .subscribeOn(Schedulers.io())
             .subscribe({
                 Timber.v("Pixel sent: $pixelName with params: $parameters $encodedParameters")
@@ -285,10 +291,24 @@ class ApiBasedPixel @Inject constructor(
             })
     }
 
-    override fun fireCompletable(pixelName: String, parameters: Map<String, String>, encodedParameters: Map<String, String>): Completable {
-        val defaultParameters = mapOf(PixelParameter.APP_VERSION to deviceInfo.appVersion)
-        val fullParameters = defaultParameters.plus(parameters)
-        val atb = statisticsDataStore.atb?.formatWithVariant(variantManager.getVariant()) ?: ""
-        return api.fire(pixelName, deviceInfo.formFactor().description, atb, fullParameters, encodedParameters)
+    /**
+     * Sends a pixel. If delivery fails, the pixel will be retried again in the future.
+     * As this method stores the pixel to disk until successful delivery, check with privacy triage if the pixel has additional parameters
+     * that they would want to validate.
+     */
+    override fun enqueueFire(pixel: PixelName, parameters: Map<String, String>, encodedParameters: Map<String, String>) {
+        enqueueFire(pixel.pixelName, parameters, encodedParameters)
+    }
+
+    @SuppressLint("CheckResult")
+    /** See comment in {@link #enqueueFire(PixelName, Map<String, String>, Map<String, String>)}. */
+    override fun enqueueFire(pixelName: String, parameters: Map<String, String>, encodedParameters: Map<String, String>) {
+        pixelSender.enqueuePixel(pixelName, parameters, encodedParameters)
+            .subscribeOn(Schedulers.io())
+            .subscribe({
+                Timber.v("Pixel enqueued: $pixelName with params: $parameters $encodedParameters")
+            }, {
+                Timber.w(it, "Pixel failed: $pixelName with params: $parameters $encodedParameters")
+            })
     }
 }

@@ -292,7 +292,7 @@
     <string name="privacyProtectionNotificationTrackerDescription">Protegeu os seus dados bloqueando %1$d rastreadores durante a utilização do DuckDuckGo.</string>
     <string name="privacyProtectionNotificationBothDescription">Protegeu os seus dados bloqueando %1$d rastreadores e tornando seguras %2$d ligações não encriptadas durante a utilização do DuckDuckGo.</string>
     <string name="privacyProtectionNotificationLaunchButton">Retomar navegação</string>
-    
+
     <!-- Authentication -->
     <string name="authenticationDialogTitle">Iniciar sessão</string>
     <string name="authenticationDialogMessage">%1$s requer um nome de utilizador e palavra-passe.</string>
@@ -477,6 +477,15 @@
     <string name="fireproofWebsiteLoginDialogNegative">Agora não</string>
     <string name="fireproofWebsiteItemsSectionTitle">Websites</string>
     <string name="fireproofWebsiteToogleText">Perguntar ao iniciar sessão</string>
+
+    <!-- Fire Animation settings -->
+    <string name="settingsFireAnimation">Animação do Botão de Fogo</string>
+    <string name="settingsHeroFireAnimation">Inferno</string>
+    <string name="settingsHeroWaterAnimation">Remoinho</string>
+    <string name="settingsHeroAbstractAnimation">Corrente de ar</string>
+    <string name="settingsNoneAnimation">Nenhum</string>
+    <string name="settingsSelectFireAnimationDialog">Animação do botão de fogo</string>
+    <string name="settingsSelectFireAnimationDialogSave">Guardar</string>
 
     <!-- Dos Attack error-->
     <string name="dosErrorMessage">Ligação abortada. Este website poderá ser prejudicial ao seu dispositivo.</string>

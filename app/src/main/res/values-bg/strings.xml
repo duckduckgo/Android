@@ -292,7 +292,7 @@
     <string name="privacyProtectionNotificationTrackerDescription">Вие защитихте своите данни, като блокирахте %1$d проследяващи елемента, докато използвахте DuckDuckGo.</string>
     <string name="privacyProtectionNotificationBothDescription">Вие защитихте своите данни, като блокирахте %1$d проследяващи елемента и осигурихте %2$d нешифровани връзки, докато използвахте DuckDuckGo.</string>
     <string name="privacyProtectionNotificationLaunchButton">Подновете сърфирането</string>
-    
+
     <!-- Authentication -->
     <string name="authenticationDialogTitle">Влизане</string>
     <string name="authenticationDialogMessage">%1$s изисква потребителско име и парола.</string>
@@ -477,6 +477,15 @@
     <string name="fireproofWebsiteLoginDialogNegative">Не сега</string>
     <string name="fireproofWebsiteItemsSectionTitle">Уеб сайтове</string>
     <string name="fireproofWebsiteToogleText">Питай при влизане</string>
+
+    <!-- Fire Animation settings -->
+    <string name="settingsFireAnimation">Анимация на огнения бутон</string>
+    <string name="settingsHeroFireAnimation">Адски огън</string>
+    <string name="settingsHeroWaterAnimation">Водовъртеж</string>
+    <string name="settingsHeroAbstractAnimation">Въздушна струя</string>
+    <string name="settingsNoneAnimation">Няма</string>
+    <string name="settingsSelectFireAnimationDialog">Анимация на огнения бутон</string>
+    <string name="settingsSelectFireAnimationDialogSave">Запази</string>
 
     <!-- Dos Attack error-->
     <string name="dosErrorMessage">Връзката е прекъсната. Този уеб сайт може да навреди на вашето устройство.</string>

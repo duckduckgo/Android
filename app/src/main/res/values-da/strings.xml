@@ -292,7 +292,7 @@
     <string name="privacyProtectionNotificationTrackerDescription">Du beskyttede dine data ved at blokere %1$d trackere, mens du bruger DuckDuckGo.</string>
     <string name="privacyProtectionNotificationBothDescription">Du beskyttede dine data ved at blokere %1$d trackere og sikre %2$d ukrypterede forbindelser, mens du bruger DuckDuckGo.</string>
     <string name="privacyProtectionNotificationLaunchButton">Genoptag surfing</string>
-    
+
     <!-- Authentication -->
     <string name="authenticationDialogTitle">Log ind</string>
     <string name="authenticationDialogMessage">%1$s kræver et brugernavn og adgangskode.</string>
@@ -477,6 +477,15 @@
     <string name="fireproofWebsiteLoginDialogNegative">Ikke nu</string>
     <string name="fireproofWebsiteItemsSectionTitle">Websider</string>
     <string name="fireproofWebsiteToogleText">Spørg, når der logges ind</string>
+
+    <!-- Fire Animation settings -->
+    <string name="settingsFireAnimation">Ildknap-animation</string>
+    <string name="settingsHeroFireAnimation">Inferno</string>
+    <string name="settingsHeroWaterAnimation">Whirlpool</string>
+    <string name="settingsHeroAbstractAnimation">Airstream</string>
+    <string name="settingsNoneAnimation">Ingen</string>
+    <string name="settingsSelectFireAnimationDialog">Ildknap-animation</string>
+    <string name="settingsSelectFireAnimationDialogSave">Gem</string>
 
     <!-- Dos Attack error-->
     <string name="dosErrorMessage">Forbindelse blev afbrudt. Dette websted kan være skadeligt for din enhed.</string>

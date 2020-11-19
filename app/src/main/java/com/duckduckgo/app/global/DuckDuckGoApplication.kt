@@ -47,6 +47,7 @@ import com.duckduckgo.app.statistics.AtbInitializer
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.api.OfflinePixelScheduler
 import com.duckduckgo.app.statistics.api.OfflinePixelSender
+import com.duckduckgo.app.statistics.api.PixelSender
 import com.duckduckgo.app.statistics.api.StatisticsUpdater
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.APP_LAUNCH
@@ -143,6 +144,9 @@ open class DuckDuckGoApplication : HasAndroidInjector, Application(), LifecycleO
     lateinit var offlinePixelSender: OfflinePixelSender
 
     @Inject
+    lateinit var pixelSender: PixelSender
+
+    @Inject
     lateinit var alertingUncaughtExceptionHandler: AlertingUncaughtExceptionHandler
 
     @Inject
@@ -159,6 +163,9 @@ open class DuckDuckGoApplication : HasAndroidInjector, Application(), LifecycleO
 
     @Inject
     lateinit var userStageStore: UserStageStore
+
+    @Inject
+    lateinit var fireFireAnimationLoader: FireAnimationLoader
 
     private var launchedByFireAction: Boolean = false
 
@@ -183,6 +190,8 @@ open class DuckDuckGoApplication : HasAndroidInjector, Application(), LifecycleO
             it.addObserver(appEnjoymentLifecycleObserver)
             it.addObserver(dataClearerForegroundAppRestartPixel)
             it.addObserver(userStageStore)
+            it.addObserver(pixelSender)
+            it.addObserver(fireFireAnimationLoader)
         }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1) {

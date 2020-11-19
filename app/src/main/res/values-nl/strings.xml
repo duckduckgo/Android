@@ -292,7 +292,7 @@
     <string name="privacyProtectionNotificationTrackerDescription">Je hebt je gegevens beschermd door %1$d trackers te blokkeren terwijl je DuckDuckGo gebruikt.</string>
     <string name="privacyProtectionNotificationBothDescription">Je hebt je gegevens beschermd door %1$d trackers te blokkeren en %2$d niet-gecodeerde verbindingen te beveiligen terwijl je DuckDuckGo gebruikt.</string>
     <string name="privacyProtectionNotificationLaunchButton">Ga verder met browsen</string>
-    
+
     <!-- Authentication -->
     <string name="authenticationDialogTitle">Aanmelden</string>
     <string name="authenticationDialogMessage">%1$s vereist een gebruikersnaam en wachtwoord.</string>
@@ -477,6 +477,15 @@
     <string name="fireproofWebsiteLoginDialogNegative">Niet nu</string>
     <string name="fireproofWebsiteItemsSectionTitle">Websites</string>
     <string name="fireproofWebsiteToogleText">Vragen bij inloggen</string>
+
+    <!-- Fire Animation settings -->
+    <string name="settingsFireAnimation">Animatie vuurknop</string>
+    <string name="settingsHeroFireAnimation">Vuurzee</string>
+    <string name="settingsHeroWaterAnimation">Draaikolk</string>
+    <string name="settingsHeroAbstractAnimation">Luchtstroom</string>
+    <string name="settingsNoneAnimation">Geen</string>
+    <string name="settingsSelectFireAnimationDialog">Animatie vuurknop</string>
+    <string name="settingsSelectFireAnimationDialogSave">Opslaan</string>
 
     <!-- Dos Attack error-->
     <string name="dosErrorMessage">Verbinding verbroken. Deze website kan schadelijk zijn voor je apparaat.</string>

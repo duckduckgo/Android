@@ -292,7 +292,7 @@
     <string name="privacyProtectionNotificationTrackerDescription">Con DuckDuckGo hai protetto i tuoi dati bloccando %1$d sistemi di tracciamento.</string>
     <string name="privacyProtectionNotificationBothDescription">Con DuckDuckGo hai protetto i tuoi dati bloccando %1$d sistemi di tracciamento e rendendo sicure %2$d connessioni non crittografate.</string>
     <string name="privacyProtectionNotificationLaunchButton">Riprendi la navigazione</string>
-    
+
     <!-- Authentication -->
     <string name="authenticationDialogTitle">Accedi</string>
     <string name="authenticationDialogMessage">%1$s richiede un nome utente e una password.</string>
@@ -477,6 +477,15 @@
     <string name="fireproofWebsiteLoginDialogNegative">Non adesso</string>
     <string name="fireproofWebsiteItemsSectionTitle">Siti Web</string>
     <string name="fireproofWebsiteToogleText">Chiedi al momento dell\'accesso</string>
+
+    <!-- Fire Animation settings -->
+    <string name="settingsFireAnimation">Animazione pulsante fuoco</string>
+    <string name="settingsHeroFireAnimation">Inferno</string>
+    <string name="settingsHeroWaterAnimation">Mulinello</string>
+    <string name="settingsHeroAbstractAnimation">Aria</string>
+    <string name="settingsNoneAnimation">Niente</string>
+    <string name="settingsSelectFireAnimationDialog">Animazione pulsante fuoco</string>
+    <string name="settingsSelectFireAnimationDialogSave">Salva</string>
 
     <!-- Dos Attack error-->
     <string name="dosErrorMessage">Connessione interrotta. Questo sito Web potrebbe essere pericoloso per il tuo dispositivo.</string>

@@ -300,7 +300,7 @@
     <string name="privacyProtectionNotificationTrackerDescription">Вы защитили свои данные, заблокировав %1$d трекеров во время использования DuckDuckGo.</string>
     <string name="privacyProtectionNotificationBothDescription">Вы защитили свои данные, заблокировав %1$d трекеров и защитив %2$d незашифрованных соединений во время использования DuckDuckGo.</string>
     <string name="privacyProtectionNotificationLaunchButton">Продолжить навигацию</string>
-    
+
     <!-- Authentication -->
     <string name="authenticationDialogTitle">Вход</string>
     <string name="authenticationDialogMessage">Для входа на %1$s требуются имя пользователя и пароль.</string>
@@ -489,6 +489,15 @@
     <string name="fireproofWebsiteLoginDialogNegative">Не сейчас</string>
     <string name="fireproofWebsiteItemsSectionTitle">Сайты</string>
     <string name="fireproofWebsiteToogleText">Спрашивать при входе</string>
+
+    <!-- Fire Animation settings -->
+    <string name="settingsFireAnimation">Анимация кнопки «Пожар»</string>
+    <string name="settingsHeroFireAnimation">Инферно</string>
+    <string name="settingsHeroWaterAnimation">Водоворот</string>
+    <string name="settingsHeroAbstractAnimation">Воздушный поток</string>
+    <string name="settingsNoneAnimation">Ничего</string>
+    <string name="settingsSelectFireAnimationDialog">Анимация кнопки «Пожар»</string>
+    <string name="settingsSelectFireAnimationDialogSave">Сохранить</string>
 
     <!-- Dos Attack error-->
     <string name="dosErrorMessage">Соединение прервано. Этот сайт может навредить вашему устройству.</string>

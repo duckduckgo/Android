@@ -34,7 +34,6 @@ import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.view.ClearPersonalDataAction
 import com.duckduckgo.app.global.view.FireDialog
 import com.duckduckgo.app.settings.SettingsActivity
-import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command
@@ -55,9 +54,6 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
 
     @Inject
     lateinit var clearPersonalDataAction: ClearPersonalDataAction
-
-    @Inject
-    lateinit var variantManager: VariantManager
 
     @Inject
     lateinit var gridViewColumnCalculator: GridViewColumnCalculator
@@ -175,8 +171,8 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
             context = this,
             clearPersonalDataAction = clearPersonalDataAction,
             ctaViewModel = ctaViewModel,
-            variantManager = variantManager,
-            pixel = pixel
+            pixel = pixel,
+            settingsDataStore = settingsDataStore
         )
         dialog.clearComplete = { viewModel.onClearComplete() }
         dialog.show()

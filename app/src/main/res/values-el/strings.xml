@@ -292,7 +292,7 @@
     <string name="privacyProtectionNotificationTrackerDescription">Προστατεύσατε τα δεδομένα σας αποκλείοντας %1$d παρακολουθήσεις κατά τη χρήση του DuckDuckGo.</string>
     <string name="privacyProtectionNotificationBothDescription">Προστατεύσατε τα δεδομένα σας αποκλείοντας %1$d παρακολουθήσεις και διασφαλίζοντας %2$d μη κρυπτογραφημένες συνδέσεις κατά τη χρήση του DuckDuckGo.</string>
     <string name="privacyProtectionNotificationLaunchButton">Συνέχιση περιήγησης</string>
-    
+
     <!-- Authentication -->
     <string name="authenticationDialogTitle">Είσοδος</string>
     <string name="authenticationDialogMessage">Το %1$s απαιτεί ένα όνομα χρήστη και κωδικό πρόσβασης.</string>
@@ -477,6 +477,15 @@
     <string name="fireproofWebsiteLoginDialogNegative">Όχι τώρα</string>
     <string name="fireproofWebsiteItemsSectionTitle">Ιστότοποι</string>
     <string name="fireproofWebsiteToogleText">Ερώτηση κατά τη σύνδεση</string>
+
+    <!-- Fire Animation settings -->
+    <string name="settingsFireAnimation">Κινούμενο κουμπί φωτιάς</string>
+    <string name="settingsHeroFireAnimation">Πύρινη κόλαση</string>
+    <string name="settingsHeroWaterAnimation">Δίνη νερού</string>
+    <string name="settingsHeroAbstractAnimation">Ρεύμα αέρα</string>
+    <string name="settingsNoneAnimation">Κανένα</string>
+    <string name="settingsSelectFireAnimationDialog">Κινούμενο κουμπί φωτιάς</string>
+    <string name="settingsSelectFireAnimationDialogSave">Αποθήκευση</string>
 
     <!-- Dos Attack error-->
     <string name="dosErrorMessage">Η σύνδεση ματαιώθηκε. Ο ιστότοπος αυτός μπορεί να είναι επιβλαβής για τη συσκευή σας.</string>

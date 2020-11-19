@@ -292,7 +292,7 @@
     <string name="privacyProtectionNotificationTrackerDescription">Du beskyttet dataene dine ved å blokkere %1$d sporinger mens du brukte DuckDuckGo.</string>
     <string name="privacyProtectionNotificationBothDescription">Du beskyttet dataene dine ved å blokkere %1$d sporinger og sikre %2$d ukrypterte tilkoblinger mens du brukte DuckDuckGo.</string>
     <string name="privacyProtectionNotificationLaunchButton">Fortsett å bruke nettleseren</string>
-    
+
     <!-- Authentication -->
     <string name="authenticationDialogTitle">Logg inn</string>
     <string name="authenticationDialogMessage">%1$s krever brukernavn og passord</string>
@@ -477,6 +477,15 @@
     <string name="fireproofWebsiteLoginDialogNegative">Ikke nå</string>
     <string name="fireproofWebsiteItemsSectionTitle">Nettsteder</string>
     <string name="fireproofWebsiteToogleText">Spør ved innlogging</string>
+
+    <!-- Fire Animation settings -->
+    <string name="settingsFireAnimation">Animasjon for brannknappen</string>
+    <string name="settingsHeroFireAnimation">Inferno</string>
+    <string name="settingsHeroWaterAnimation">Malstrøm</string>
+    <string name="settingsHeroAbstractAnimation">Luftstrøm</string>
+    <string name="settingsNoneAnimation">Ingen</string>
+    <string name="settingsSelectFireAnimationDialog">Animasjon for brannknappen</string>
+    <string name="settingsSelectFireAnimationDialogSave">Lagre</string>
 
     <!-- Dos Attack error-->
     <string name="dosErrorMessage">Tilkobling avbrutt. Dette nettstedet kan skade enheten din.</string>
