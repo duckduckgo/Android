@@ -478,6 +478,15 @@
     <string name="fireproofWebsiteItemsSectionTitle">Siti Web</string>
     <string name="fireproofWebsiteToogleText">Chiedi al momento dell\'accesso</string>
 
+    <!-- Fire Animation settings -->
+    <string name="settingsFireAnimation">Animazione pulsante fuoco</string>
+    <string name="settingsHeroFireAnimation">Inferno</string>
+    <string name="settingsHeroWaterAnimation">Mulinello</string>
+    <string name="settingsHeroAbstractAnimation">Aria</string>
+    <string name="settingsNoneAnimation">Niente</string>
+    <string name="settingsSelectFireAnimationDialog">Animazione pulsante fuoco</string>
+    <string name="settingsSelectFireAnimationDialogSave">Salva</string>
+
     <!-- Dos Attack error-->
     <string name="dosErrorMessage">Connessione interrotta. Questo sito Web potrebbe essere pericoloso per il tuo dispositivo.</string>
 

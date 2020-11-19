@@ -490,6 +490,15 @@
     <string name="fireproofWebsiteItemsSectionTitle">Spletna mesta</string>
     <string name="fireproofWebsiteToogleText">Vprašajte ob prijavi</string>
 
+    <!-- Fire Animation settings -->
+    <string name="settingsFireAnimation">Animacija za gumb ogenj</string>
+    <string name="settingsHeroFireAnimation">Pekel</string>
+    <string name="settingsHeroWaterAnimation">Vodni mehurčki</string>
+    <string name="settingsHeroAbstractAnimation">Zračni tok</string>
+    <string name="settingsNoneAnimation">Brez</string>
+    <string name="settingsSelectFireAnimationDialog">Animacija za gumb ogenj</string>
+    <string name="settingsSelectFireAnimationDialogSave">Shrani</string>
+
     <!-- Dos Attack error-->
     <string name="dosErrorMessage">Povezava prekinjena. To spletno mesto lahko škoduje vaši napravi.</string>
 

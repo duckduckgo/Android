@@ -490,6 +490,15 @@
     <string name="fireproofWebsiteItemsSectionTitle">Webové stránky</string>
     <string name="fireproofWebsiteToogleText">Opýtať sa pri prihlásení</string>
 
+    <!-- Fire Animation settings -->
+    <string name="settingsFireAnimation">Animácia tlačidla ohňa</string>
+    <string name="settingsHeroFireAnimation">Peklo</string>
+    <string name="settingsHeroWaterAnimation">Vodný vír</string>
+    <string name="settingsHeroAbstractAnimation">Prúd vzduchu</string>
+    <string name="settingsNoneAnimation">Žiadne</string>
+    <string name="settingsSelectFireAnimationDialog">Animácia tlačidla ohňa</string>
+    <string name="settingsSelectFireAnimationDialogSave">Uložiť</string>
+
     <!-- Dos Attack error-->
     <string name="dosErrorMessage">Spojenie bolo prerušené. Táto webová stránka môže byť pre vaše zariadenie škodlivá.</string>
 

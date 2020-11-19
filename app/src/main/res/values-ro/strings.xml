@@ -484,6 +484,15 @@
     <string name="fireproofWebsiteItemsSectionTitle">Site-uri web</string>
     <string name="fireproofWebsiteToogleText">Întreabă la conectare</string>
 
+    <!-- Fire Animation settings -->
+    <string name="settingsFireAnimation">Animație buton foc</string>
+    <string name="settingsHeroFireAnimation">Infern</string>
+    <string name="settingsHeroWaterAnimation">Vârtej de apă</string>
+    <string name="settingsHeroAbstractAnimation">Curent de aer</string>
+    <string name="settingsNoneAnimation">Niciuna</string>
+    <string name="settingsSelectFireAnimationDialog">Animație buton foc</string>
+    <string name="settingsSelectFireAnimationDialogSave">Salvare</string>
+
     <!-- Dos Attack error-->
     <string name="dosErrorMessage">Conexiunea a fost anulată. Acest site web ar putea dăuna dispozitivului tău.</string>
 

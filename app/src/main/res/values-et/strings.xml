@@ -478,6 +478,15 @@
     <string name="fireproofWebsiteItemsSectionTitle">Veebilehed</string>
     <string name="fireproofWebsiteToogleText">Küsi sisselogimisel</string>
 
+    <!-- Fire Animation settings -->
+    <string name="settingsFireAnimation">Tulenupu animatsioon</string>
+    <string name="settingsHeroFireAnimation">Inferno</string>
+    <string name="settingsHeroWaterAnimation">Whirlpool</string>
+    <string name="settingsHeroAbstractAnimation">Airstream</string>
+    <string name="settingsNoneAnimation">Puudub</string>
+    <string name="settingsSelectFireAnimationDialog">Tulenupu animatsioon</string>
+    <string name="settingsSelectFireAnimationDialogSave">Salvesta</string>
+
     <!-- Dos Attack error-->
     <string name="dosErrorMessage">Ühendus on katkestatud. See veebileht võib kahjustada sinu seadet.</string>
 

@@ -478,6 +478,15 @@
     <string name="fireproofWebsiteItemsSectionTitle">Websites</string>
     <string name="fireproofWebsiteToogleText">Beim Anmelden fragen</string>
 
+    <!-- Fire Animation settings -->
+    <string name="settingsFireAnimation">Animation der Schaltfläche „Feuer“</string>
+    <string name="settingsHeroFireAnimation">Inferno</string>
+    <string name="settingsHeroWaterAnimation">Whirlpool</string>
+    <string name="settingsHeroAbstractAnimation">Luftstrom</string>
+    <string name="settingsNoneAnimation">Gar nichts</string>
+    <string name="settingsSelectFireAnimationDialog">Animation der Schaltfläche „Feuer“</string>
+    <string name="settingsSelectFireAnimationDialogSave">Speichern</string>
+
     <!-- Dos Attack error-->
     <string name="dosErrorMessage">Verbindung getrennt. Diese Website könnte schädlich für dein Gerät sein.</string>
 
