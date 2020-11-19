@@ -37,7 +37,6 @@ import com.duckduckgo.app.cta.ui.CtaViewModel
 import com.duckduckgo.app.feedback.ui.common.FeedbackActivity
 import com.duckduckgo.app.fire.DataClearer
 import com.duckduckgo.app.fire.DataClearerForegroundAppRestartPixel
-import com.duckduckgo.app.fire.FireAnimationLoader
 import com.duckduckgo.app.global.ApplicationClearDataState
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.intentText
@@ -80,9 +79,6 @@ class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope() {
 
     @Inject
     lateinit var variantManager: VariantManager
-
-    @Inject
-    lateinit var fireAnimationLoader: FireAnimationLoader
 
     private var currentTab: BrowserTabFragment? = null
 
@@ -233,7 +229,6 @@ class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope() {
     }
 
     private fun configureObservers() {
-        lifecycle.addObserver(fireAnimationLoader)
         viewModel.command.observe(this, Observer {
             processCommand(it)
         })
@@ -296,8 +291,8 @@ class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope() {
             context = this,
             clearPersonalDataAction = clearPersonalDataAction,
             ctaViewModel = ctaViewModel,
-            variantManager = variantManager,
-            pixel = pixel
+            pixel = pixel,
+            settingsDataStore = settingsDataStore
         )
         dialog.clearStarted = {
             removeObservers()

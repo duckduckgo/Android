@@ -478,6 +478,15 @@
     <string name="fireproofWebsiteItemsSectionTitle">Уеб сайтове</string>
     <string name="fireproofWebsiteToogleText">Питай при влизане</string>
 
+    <!-- Fire Animation settings -->
+    <string name="settingsFireAnimation">Анимация на огнения бутон</string>
+    <string name="settingsHeroFireAnimation">Адски огън</string>
+    <string name="settingsHeroWaterAnimation">Водовъртеж</string>
+    <string name="settingsHeroAbstractAnimation">Въздушна струя</string>
+    <string name="settingsNoneAnimation">Няма</string>
+    <string name="settingsSelectFireAnimationDialog">Анимация на огнения бутон</string>
+    <string name="settingsSelectFireAnimationDialogSave">Запази</string>
+
     <!-- Dos Attack error-->
     <string name="dosErrorMessage">Връзката е прекъсната. Този уеб сайт може да навреди на вашето устройство.</string>
 

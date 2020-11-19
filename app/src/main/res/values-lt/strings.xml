@@ -490,6 +490,15 @@
     <string name="fireproofWebsiteItemsSectionTitle">Svetainės</string>
     <string name="fireproofWebsiteToogleText">Klausti prisijungiant</string>
 
+    <!-- Fire Animation settings -->
+    <string name="settingsFireAnimation">Mygtuko „Fire“ animacija</string>
+    <string name="settingsHeroFireAnimation">„Inferno“</string>
+    <string name="settingsHeroWaterAnimation">„Whirlpool“</string>
+    <string name="settingsHeroAbstractAnimation">„Airstream“</string>
+    <string name="settingsNoneAnimation">Jokie</string>
+    <string name="settingsSelectFireAnimationDialog">Mygtuko „Fire“ animacija</string>
+    <string name="settingsSelectFireAnimationDialogSave">Išsaugoti</string>
+
     <!-- Dos Attack error-->
     <string name="dosErrorMessage">Prisijungimas nutrauktas. Ši svetainė gali pakenkti jūsų įrenginiui.</string>
 

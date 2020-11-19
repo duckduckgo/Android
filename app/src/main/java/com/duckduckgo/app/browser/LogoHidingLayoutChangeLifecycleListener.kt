@@ -100,8 +100,8 @@ class LogoHidingLayoutChangeLifecycleListener(private var ddgLogoView: View) : V
 
     companion object {
         private const val MINIMUM_AVAILABLE_HEIGHT_REQUIRED_TO_SHOW_LOGO = 220
-        private const val FADE_IN_DURATION = 1000L
-        private const val FADE_OUT_DURATION = 100L
+        private const val FADE_IN_DURATION = 300L
+        private const val FADE_OUT_DURATION = 300L
     }
 
 }

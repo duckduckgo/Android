@@ -478,6 +478,15 @@
     <string name="fireproofWebsiteItemsSectionTitle">Webbplatser</string>
     <string name="fireproofWebsiteToogleText">Fråga när du loggar in</string>
 
+    <!-- Fire Animation settings -->
+    <string name="settingsFireAnimation">Animation för brännarknapp</string>
+    <string name="settingsHeroFireAnimation">Inferno</string>
+    <string name="settingsHeroWaterAnimation">Virvel</string>
+    <string name="settingsHeroAbstractAnimation">Luftström</string>
+    <string name="settingsNoneAnimation">Inga</string>
+    <string name="settingsSelectFireAnimationDialog">Animation för brännarknapp</string>
+    <string name="settingsSelectFireAnimationDialogSave">Spara</string>
+
     <!-- Dos Attack error-->
     <string name="dosErrorMessage">Anslutningen avbröts. Denna webbplats kan vara skadlig för din enhet.</string>
 

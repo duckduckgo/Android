@@ -391,6 +391,16 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenViewBecomesVisibleAndHomeCtaPresentThenKeyboardHidden() = coroutineRule.runBlocking {
+        givenExpectedCtaAddWidgetInstructions()
+
+        testee.onViewVisible()
+
+        assertCommandIssued<Command.HideKeyboard>()
+        assertEquals(HomePanelCta.AddWidgetInstructions, testee.ctaViewState.value!!.cta)
+    }
+
+    @Test
     fun whenViewBecomesVisibleAndBrowserShowingThenKeyboardHidden() {
         setBrowserShowing(true)
         testee.onViewVisible()

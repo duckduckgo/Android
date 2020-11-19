@@ -17,25 +17,37 @@
 package com.duckduckgo.app.fire
 
 import android.content.Context
+import androidx.annotation.UiThread
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.OnLifecycleEvent
 import com.airbnb.lottie.LottieCompositionFactory
-import com.duckduckgo.app.browser.R
-import com.duckduckgo.app.statistics.VariantManager
+import com.duckduckgo.app.global.DispatcherProvider
+import com.duckduckgo.app.settings.db.SettingsDataStore
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-class FireAnimationLoader @Inject constructor(
-    private val variantManager: VariantManager,
-    private val context: Context
-) : LifecycleObserver {
+interface FireAnimationLoader : LifecycleObserver {
+    fun preloadSelectedAnimation()
+}
 
+class LottieFireAnimationLoader @Inject constructor(
+    private val context: Context,
+    private val settingsDataStore: SettingsDataStore,
+    private val dispatchers: DispatcherProvider
+) : FireAnimationLoader {
+
+    @UiThread
     @OnLifecycleEvent(Lifecycle.Event.ON_CREATE)
-    fun onCreate() {
-        // Currently, we are observing Activity lifecycle instead of Application to avoid conflicts with installation referrer.
-        // if we remove variantManager check, we can observe Application lifecycle instead of Activity's.
-        if (variantManager.getVariant().hasFeature(VariantManager.VariantFeature.FireButtonEducation)) {
-            LottieCompositionFactory.fromRawRes(context, R.raw.fire_hero_rising)
+    override fun preloadSelectedAnimation() {
+        GlobalScope.launch(dispatchers.io()) {
+            if (animationEnabled()) {
+                val selectedFireAnimation = settingsDataStore.selectedFireAnimation
+                LottieCompositionFactory.fromRawRes(context, selectedFireAnimation.resId)
+            }
         }
     }
+
+    private fun animationEnabled() = settingsDataStore.fireAnimationEnabled
 }
