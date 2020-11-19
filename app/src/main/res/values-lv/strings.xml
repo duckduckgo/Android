@@ -501,9 +501,6 @@
     <string name="downloadManagerIncompatible">Lejupielāžu pārvaldnieks šajā ierīcē nav pieejams</string>
     <string name="enable">Iespējot</string>
 
-    <!--Fire button education-->
-    <string name="daxClearDataCtaText">Tagad pieskaries zemāk, lai izsvēpētu savu pārlūkošanas vēsturi. Pamēģini! 👇</string>
-
     <!-- Precise Location -->
     <string name="preciseLocationSystemDialogTitle">Vai iespējot ierīces atrašanās vietu DuckDuckGo privātuma pārlūkprogrammai?</string>
     <string name="preciseLocationSystemDialogSubtitle">%1$s pieprasa tavas ierīces atrašanās vietu. Vispirms tev ir jāatļauj lietotnei nosūtīt tavas ierīces atrašanās vietu, pēc tam %2$s var pieprasīt atļauju.</string>
@@ -527,6 +524,9 @@
     <string name="preciseLocationAllowedSitesSectionTitle">Piešķirts</string>
     <string name="preciseLocationDeniedSitesSectionTitle">Aizliegts</string>
     <string name="preciseLocationSnackbarMessage">Tu iepriekš piešķīri %1$s atļauju piekļūt savas ierīces atrašanās vietai.</string>
+
+    <!--Fire button education-->
+    <string name="daxClearDataCtaText">Personas dati var uzkrāties tavā pārlūkā. Pē! Izmanto Uguns pogu, lai tos visus nodedzinātu. Pamēģini tagad! 👇</string>
 
     <!--  Global Privacy Control-->
     <string name="globalPrivacyControlActivityTitle">Globālā privātuma kontrole (GPC)</string>

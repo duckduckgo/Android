@@ -501,9 +501,6 @@
     <string name="downloadManagerIncompatible">Managerul descărcărilor nu este disponibil pe acest dispozitiv</string>
     <string name="enable">Activare</string>
 
-    <!--Fire button education-->
-    <string name="daxClearDataCtaText">Acum atinge mai jos pentru a șterge istoricul de navigare. Încearcă! 👇</string>
-
     <!-- Precise Location -->
     <string name="preciseLocationSystemDialogTitle">Activezi locația dispozitivului pentru browserul de confidențialitate DuckDuckGo?</string>
     <string name="preciseLocationSystemDialogSubtitle">%1$s solicită locația dispozitivului tău. Mai întâi va trebui să permiți aplicației să trimită locația dispozitivului, apoi %2$s poate cere permisiunea.</string>
@@ -527,6 +524,9 @@
     <string name="preciseLocationAllowedSitesSectionTitle">Acordat</string>
     <string name="preciseLocationDeniedSitesSectionTitle">Respins</string>
     <string name="preciseLocationSnackbarMessage">Anterior ai acordat %1$s permisiunea de a accesa locația dispozitivului.</string>
+
+    <!--Fire button education-->
+    <string name="daxClearDataCtaText">În browserul tău se pot acumula date personale. Bleah. Utilizează butonul Ștergere activitate și istoric pentru a șterge totul. Încearcă acum! 👇</string>
 
     <!--  Global Privacy Control-->
     <string name="globalPrivacyControlActivityTitle">Global Privacy Control (GPC)</string>

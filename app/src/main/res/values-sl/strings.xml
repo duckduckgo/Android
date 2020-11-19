@@ -507,9 +507,6 @@
     <string name="downloadManagerIncompatible">Upravitelj prenosov ni na voljo v tej napravi</string>
     <string name="enable">Omogoči</string>
 
-    <!--Fire button education-->
-    <string name="daxClearDataCtaText">Tapnite spodaj, da zapišete zgodovino brskanja. Poskusite! 👇</string>
-
     <!-- Precise Location -->
     <string name="preciseLocationSystemDialogTitle">Želite omogočiti lokacijo naprave za zasebnost brskalnika DuckDuckGo?</string>
     <string name="preciseLocationSystemDialogSubtitle">%1$s zahteva lokacijo vaše naprave. Najprej boste morali aplikaciji dovoliti, da pošlje lokacijo vaše naprave, nato lahko %2$s zahteva dovoljenje.</string>
@@ -533,6 +530,9 @@
     <string name="preciseLocationAllowedSitesSectionTitle">Odobreno</string>
     <string name="preciseLocationDeniedSitesSectionTitle">Zavrnjeno</string>
     <string name="preciseLocationSnackbarMessage">Predhodno ste podelili dovoljenje %1$s za dostop do lokacije vaše naprave.</string>
+
+    <!--Fire button education-->
+    <string name="daxClearDataCtaText">Osebni podatki se lahko naberejo v vašem brskalniku. Fuj. Uporabite gumb ogenj, da jih zažgete. Poskusite sedaj! 👇</string>
 
     <!--  Global Privacy Control-->
     <string name="globalPrivacyControlActivityTitle">Globalni nadzor zasebnosti (GPC)</string>

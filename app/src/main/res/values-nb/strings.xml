@@ -495,9 +495,6 @@
     <string name="downloadManagerIncompatible">Nedlastingsbehandler er ikke tilgjengelig på denne enheten</string>
     <string name="enable">Aktiver</string>
 
-    <!--Fire button education-->
-    <string name="daxClearDataCtaText">Trykk nedenfor for å brenne nettleserhistorikken. Prøv! 👇</string>
-
     <!-- Precise Location -->
     <string name="preciseLocationSystemDialogTitle">Vil du aktivere posisjonstjenester for DuckDuckGo privatnettleser?</string>
     <string name="preciseLocationSystemDialogSubtitle">%1$s ber om tillatelse til å se posisjonen til enheten din. Først må du gi appen tillatelse til å sende enhetens posisjon, deretter kan %2$s be om tillatelse.</string>
@@ -521,6 +518,9 @@
     <string name="preciseLocationAllowedSitesSectionTitle">Tillatelse gitt</string>
     <string name="preciseLocationDeniedSitesSectionTitle">Tillatelse avslått</string>
     <string name="preciseLocationSnackbarMessage">Du har tidligere gitt %1$s tillatelse til å se enhetens posisjon.</string>
+
+    <!--Fire button education-->
+    <string name="daxClearDataCtaText">Det kan samles opp personopplysninger i nettleseren din. Fysj. Bruk brannknappen til å sette fyr på alt sammen. Prøv det nå! 👇</string>
 
     <!--  Global Privacy Control-->
     <string name="globalPrivacyControlActivityTitle">Global Privacy Control (GPC)</string>

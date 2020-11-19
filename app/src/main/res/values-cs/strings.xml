@@ -507,9 +507,6 @@
     <string name="downloadManagerIncompatible">Správce stahování není v tomto zařízení k dispozici</string>
     <string name="enable">Povolit</string>
 
-    <!--Fire button education-->
-    <string name="daxClearDataCtaText">Nyní klepnutím níže smažete svou historii procházení. Zkuste to! 👇</string>
-
     <!-- Precise Location -->
     <string name="preciseLocationSystemDialogTitle">Povolit polohu zařízení pro prohlížeč DuckDuckGo Privacy?</string>
     <string name="preciseLocationSystemDialogSubtitle">%1$s požaduje polohu vašeho zařízení. Nejprve musíte aplikaci povolit, aby odesílala polohu vašeho zařízení, a pak %2$s může požádat o povolení.</string>
@@ -533,6 +530,9 @@
     <string name="preciseLocationAllowedSitesSectionTitle">Uděleno</string>
     <string name="preciseLocationDeniedSitesSectionTitle">Zamítnuto</string>
     <string name="preciseLocationSnackbarMessage">Dříve jste udělili %1$s oprávnění k přístupu k poloze vašeho zařízení.</string>
+
+    <!--Fire button education-->
+    <string name="daxClearDataCtaText">Osobní údaje se mohou vytvářet ve vašem prohlížeči. Fuj. Použijte tlačítko pro mazání a všechno smažte. Vyzkoušejte to hned teď! 👇</string>
 
     <!--  Global Privacy Control-->
     <string name="globalPrivacyControlActivityTitle">Globální kontrola ochrany osobních údajů (GPC)</string>

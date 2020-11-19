@@ -495,9 +495,6 @@
     <string name="downloadManagerIncompatible">El gestor de descargas no está disponible para este dispositivo</string>
     <string name="enable">Activar</string>
 
-    <!--Fire button education-->
-    <string name="daxClearDataCtaText">Pulsa a continuación para quemar tu historial de navegación. ¡Pruébalo! 👇</string>
-
     <!-- Precise Location -->
     <string name="preciseLocationSystemDialogTitle">¿Habilitar la ubicación del dispositivo para el navegador privado de DuckDuckGo?</string>
     <string name="preciseLocationSystemDialogSubtitle">%1$s está solicitando la ubicación de tu dispositivo. Primero tendrás que permitir que la aplicación envíe la ubicación de tu dispositivo y luego %2$s podrá solicitar el permiso.</string>
@@ -521,6 +518,9 @@
     <string name="preciseLocationAllowedSitesSectionTitle">Concedido</string>
     <string name="preciseLocationDeniedSitesSectionTitle">Rechazado</string>
     <string name="preciseLocationSnackbarMessage">Has permitido previamente a %1$s acceder a la ubicación de tu dispositivo.</string>
+
+    <!--Fire button education-->
+    <string name="daxClearDataCtaText">Los datos personales se pueden acumular en tu navegador. ¡Puaj! Utiliza el botón Fuego para quemarlos. ¡Pruébalo! 👇</string>
 
     <!--  Global Privacy Control-->
     <string name="globalPrivacyControlActivityTitle">Control Global de Privacidad (GPC)</string>

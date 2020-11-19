@@ -507,9 +507,6 @@
     <string name="downloadManagerIncompatible">Parinktis „Download Manager“ nepasiekiama šiame įrenginyje</string>
     <string name="enable">Įjungti</string>
 
-    <!--Fire button education-->
-    <string name="daxClearDataCtaText">Bakstelėkite žemiau norėdami įrašyti savo naršymo istoriją. Išbandykite! 👇</string>
-
     <!-- Precise Location -->
     <string name="preciseLocationSystemDialogTitle">Įgalinti įrenginio vietą „DuckDuckGo“ privatumo naršyklėje?</string>
     <string name="preciseLocationSystemDialogSubtitle">%1$s prašo jūsų įrenginio vietos. Pirmiausia turėsite leisti programai siųsti jūsų įrenginio vietą, tuomet %2$s gali prašyti leidimo.</string>
@@ -533,6 +530,9 @@
     <string name="preciseLocationAllowedSitesSectionTitle">Suteiktas</string>
     <string name="preciseLocationDeniedSitesSectionTitle">Atmestas</string>
     <string name="preciseLocationSnackbarMessage">Anksčiau %1$s suteikėte leidimą pasiekti jūsų įrenginio vietą.</string>
+
+    <!--Fire button education-->
+    <string name="daxClearDataCtaText">Asmeniniai duomenys gali kauptis jūsų naršyklėje. Fui. Naudokite mygtuką „Fire“, kad juos panaikintumėte. Išbandykite dabar! 👇</string>
 
     <!--  Global Privacy Control-->
     <string name="globalPrivacyControlActivityTitle">Visuotinė privatumo kontrolė (VPK)</string>

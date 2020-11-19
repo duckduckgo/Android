@@ -495,9 +495,6 @@
     <string name="downloadManagerIncompatible">Lataustenhallintaa ei ole saatavilla tällä laitteella</string>
     <string name="enable">Ota käyttöön</string>
 
-    <!--Fire button education-->
-    <string name="daxClearDataCtaText">Poista selainhistoriasi napauttamalla alta. Kokeile nyt! 👇</string>
-
     <!-- Precise Location -->
     <string name="preciseLocationSystemDialogTitle">Otetaanko laitteen sijainti käyttöön DuckDuckGon yksityiselle selaimelle?</string>
     <string name="preciseLocationSystemDialogSubtitle">%1$s pyytää saada tietää laitteesi sijainnin. Sinun on ensin annettava sovellukselle lupa lähettää laitteesi sijainti, jonka jälkeen %2$s voi pyytää lupaa.</string>
@@ -521,6 +518,9 @@
     <string name="preciseLocationAllowedSitesSectionTitle">Myönnetty</string>
     <string name="preciseLocationDeniedSitesSectionTitle">Kielletty</string>
     <string name="preciseLocationSnackbarMessage">Annoit aiemmin palvelulle %1$s luvan nähdä laitteesi sijainnin.</string>
+
+    <!--Fire button education-->
+    <string name="daxClearDataCtaText">Henkilökohtaisia tietoja voi tallentua selaimeesi. Hyi. Hävitä ne kaikki Liekki-painikkeella. Kokeile nyt! 👇</string>
 
     <!--  Global Privacy Control-->
     <string name="globalPrivacyControlActivityTitle">Global Privacy Control (GPC)</string>

@@ -495,9 +495,6 @@
     <string name="downloadManagerIncompatible">A letöltéskezelő nem érhető el ezen az eszközön.</string>
     <string name="enable">Engedélyezés</string>
 
-    <!--Fire button education-->
-    <string name="daxClearDataCtaText">Az alábbiakban koppints a böngészési előzményeid törléséhez. Próbáld ki! 👇</string>
-
     <!-- Precise Location -->
     <string name="preciseLocationSystemDialogTitle">Engedélyezed az eszköz helyének elérését a DuckDuckGo adatvédelmi böngésző számára?</string>
     <string name="preciseLocationSystemDialogSubtitle">%1$s az eszközöd helyét kéri. Először engedélyezned kell az alkalmazás számára, hogy elküldje az eszközöd helyét, majd a %2$s engedélyt kérhet.</string>
@@ -521,6 +518,9 @@
     <string name="preciseLocationAllowedSitesSectionTitle">Megadva</string>
     <string name="preciseLocationDeniedSitesSectionTitle">Megtagadva</string>
     <string name="preciseLocationSnackbarMessage">%1$s számára korábban megadtad az engedélyt az eszközöd helyadatainak hozzáférésére.</string>
+
+    <!--Fire button education-->
+    <string name="daxClearDataCtaText">Személyes adatok halmozódhatnak fel a böngésződben. Fúj. A Tűz gombbal mindet elégetheted. Próbáld ki most! 👇</string>
 
     <!--  Global Privacy Control-->
     <string name="globalPrivacyControlActivityTitle">Nemzetközi adatvédelmi szabályozás (Global Privacy Control, GPC)</string>

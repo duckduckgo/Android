@@ -495,9 +495,6 @@
     <string name="downloadManagerIncompatible">İndirme Yöneticisi bu cihazda kullanılamıyor</string>
     <string name="enable">Etkinleştir</string>
 
-    <!--Fire button education-->
-    <string name="daxClearDataCtaText">Şimdi göz atma geçmişinizi yakmak için aşağıya dokunun. Hemen deneyin! 👇</string>
-
     <!-- Precise Location -->
     <string name="preciseLocationSystemDialogTitle">DuckDuckGo Gizlilik Tarayıcısı için cihaz konumu etkinleştirilsin mi?</string>
     <string name="preciseLocationSystemDialogSubtitle">%1$s cihazınızın konumunu öğrenmek istiyor. %2$s tarafından izin istenebilmesi için ilk olarak uygulamanın cihazınızın konumunu göndermesine izin vermeniz gerekir.</string>
@@ -521,6 +518,9 @@
     <string name="preciseLocationAllowedSitesSectionTitle">Verildi</string>
     <string name="preciseLocationDeniedSitesSectionTitle">Reddedildi</string>
     <string name="preciseLocationSnackbarMessage">%1$s için daha önce konumunuza erişim izni vermiştiniz.</string>
+
+    <!--Fire button education-->
+    <string name="daxClearDataCtaText">Kişisel veriler tarayıcınızda birikebilir. İğrenç. Bunların hepsini yakmak için Yangın Düğmesi\'ni kullanın. Hemen deneyin! 👇</string>
 
     <!--  Global Privacy Control-->
     <string name="globalPrivacyControlActivityTitle">Küresel Gizlilik Kontrolü (GPC)</string>

@@ -495,9 +495,6 @@
     <string name="downloadManagerIncompatible">Το Πρόγραμμα διαχείρισης λήψεων δεν είναι διαθέσιμο σε αυτήν τη συσκευή</string>
     <string name="enable">Ενεργοποίηση</string>
 
-    <!--Fire button education-->
-    <string name="daxClearDataCtaText">Τώρα, πατήστε παρακάτω για να κάψετε το ιστορικό περιήγησής σας. Δοκιμάστε το! 👇</string>
-
     <!-- Precise Location -->
     <string name="preciseLocationSystemDialogTitle">Ενεργοποίηση της τοποθεσίας συσκευής για το DuckDuckGo Privacy Browser;</string>
     <string name="preciseLocationSystemDialogSubtitle">Η εφαρμογή %1$s ζητάει την τοποθεσία της συσκευής σας. Αρχικά, θα πρέπει να επιτρέψετε στην εφαρμογή να στείλει την τοποθεσία της συσκευής σας και έπειτα η εφαρμογή %2$s μπορεί να ζητήσει άδεια.</string>
@@ -521,6 +518,9 @@
     <string name="preciseLocationAllowedSitesSectionTitle">Εκχωρήθηκε</string>
     <string name="preciseLocationDeniedSitesSectionTitle">Απορρίφθηκε</string>
     <string name="preciseLocationSnackbarMessage">Προηγουμένως εκχωρήσατε δικαίωμα στην εφαρμογή %1$s για πρόσβαση στην τοποθεσία της συσκευής σας.</string>
+
+    <!--Fire button education-->
+    <string name="daxClearDataCtaText">Τα προσωπικά δεδομένα μπορούν να αυξηθούν σταδιακά στο πρόγραμμα περιήγησής σας. Απαίσιο. Χρησιμοποιήστε το κουμπί φωτιάς για να τα κάψετε όλα. Δοκιμάστε το τώρα! 👇</string>
 
     <!--  Global Privacy Control-->
     <string name="globalPrivacyControlActivityTitle">Παγκόσμιος έλεγχος απορρήτου (GPC)</string>

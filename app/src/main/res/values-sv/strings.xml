@@ -495,9 +495,6 @@
     <string name="downloadManagerIncompatible">Nerladdningshanteraren är inte tillgänglig på denna enhet</string>
     <string name="enable">Aktivera</string>
 
-    <!--Fire button education-->
-    <string name="daxClearDataCtaText">Tryck här nedanför nu för att bränna din webbhistorik. Prova! 👇</string>
-
     <!-- Precise Location -->
     <string name="preciseLocationSystemDialogTitle">Aktivera åtkomst till enhetsplats för DuckDuckGo Privacy Browser?</string>
     <string name="preciseLocationSystemDialogSubtitle">%1$s begär åtkomst till din enhetsplats. Du måste tillåta att appen skickar din enhetsplats innan %2$s kan be om åtkomst.</string>
@@ -521,6 +518,9 @@
     <string name="preciseLocationAllowedSitesSectionTitle">Beviljas</string>
     <string name="preciseLocationDeniedSitesSectionTitle">Nekas</string>
     <string name="preciseLocationSnackbarMessage">Du har tidigare beviljat åtkomst till din enhetsplats för %1$s.</string>
+
+    <!--Fire button education-->
+    <string name="daxClearDataCtaText">Personuppgifter kan samlas i din webbläsare. Usch. Använd brännarknappen för att bränna alltihopa. Prova nu! 👇</string>
 
     <!--  Global Privacy Control-->
     <string name="globalPrivacyControlActivityTitle">Global Privacy Control (GPC)</string>
