@@ -478,6 +478,15 @@
     <string name="fireproofWebsiteItemsSectionTitle">Weboldalak</string>
     <string name="fireproofWebsiteToogleText">Kérdezze meg bejelentkezéskor</string>
 
+    <!-- Fire Animation settings -->
+    <string name="settingsFireAnimation">Tűz gomb animáció</string>
+    <string name="settingsHeroFireAnimation">Lángnyelvek</string>
+    <string name="settingsHeroWaterAnimation">Örvény</string>
+    <string name="settingsHeroAbstractAnimation">Levegő</string>
+    <string name="settingsNoneAnimation">Nincs</string>
+    <string name="settingsSelectFireAnimationDialog">Tűz gomb animáció</string>
+    <string name="settingsSelectFireAnimationDialogSave">Mentés</string>
+
     <!-- Dos Attack error-->
     <string name="dosErrorMessage">Kapcsolat megszakadt. Ez a weboldal káros lehet az eszközödre.</string>
 

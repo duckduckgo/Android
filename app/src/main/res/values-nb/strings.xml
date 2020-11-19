@@ -478,6 +478,15 @@
     <string name="fireproofWebsiteItemsSectionTitle">Nettsteder</string>
     <string name="fireproofWebsiteToogleText">Spør ved innlogging</string>
 
+    <!-- Fire Animation settings -->
+    <string name="settingsFireAnimation">Animasjon for brannknappen</string>
+    <string name="settingsHeroFireAnimation">Inferno</string>
+    <string name="settingsHeroWaterAnimation">Malstrøm</string>
+    <string name="settingsHeroAbstractAnimation">Luftstrøm</string>
+    <string name="settingsNoneAnimation">Ingen</string>
+    <string name="settingsSelectFireAnimationDialog">Animasjon for brannknappen</string>
+    <string name="settingsSelectFireAnimationDialogSave">Lagre</string>
+
     <!-- Dos Attack error-->
     <string name="dosErrorMessage">Tilkobling avbrutt. Dette nettstedet kan skade enheten din.</string>
 

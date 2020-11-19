@@ -490,6 +490,15 @@
     <string name="fireproofWebsiteItemsSectionTitle">Witryny internetowe</string>
     <string name="fireproofWebsiteToogleText">Zapytaj przy logowaniu</string>
 
+    <!-- Fire Animation settings -->
+    <string name="settingsFireAnimation">Animacja przycisku ognia</string>
+    <string name="settingsHeroFireAnimation">Ogień</string>
+    <string name="settingsHeroWaterAnimation">Wir wodny</string>
+    <string name="settingsHeroAbstractAnimation">Strumień powietrza</string>
+    <string name="settingsNoneAnimation">Brak</string>
+    <string name="settingsSelectFireAnimationDialog">Animacja przycisku ognia</string>
+    <string name="settingsSelectFireAnimationDialogSave">Zapisz</string>
+
     <!-- Dos Attack error-->
     <string name="dosErrorMessage">Połączenie nie powiodło się. Ta strona może być szkodliwa dla Twojego urządzenia.</string>
 

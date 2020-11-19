@@ -490,6 +490,15 @@
     <string name="fireproofWebsiteItemsSectionTitle">Mrežna mjesta</string>
     <string name="fireproofWebsiteToogleText">Pitaj pri prijavi</string>
 
+    <!-- Fire Animation settings -->
+    <string name="settingsFireAnimation">Animacija gumba Vatre</string>
+    <string name="settingsHeroFireAnimation">Pakao</string>
+    <string name="settingsHeroWaterAnimation">Vrtlog</string>
+    <string name="settingsHeroAbstractAnimation">Zračna struja</string>
+    <string name="settingsNoneAnimation">Nijedno</string>
+    <string name="settingsSelectFireAnimationDialog">Animacija gumba Vatre</string>
+    <string name="settingsSelectFireAnimationDialogSave">Spremi</string>
+
     <!-- Dos Attack error-->
     <string name="dosErrorMessage">Veza je prekinuta. Ovo mrežno mjesto može biti štetno za vaš uređaj.</string>
 

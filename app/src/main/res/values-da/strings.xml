@@ -478,6 +478,15 @@
     <string name="fireproofWebsiteItemsSectionTitle">Websider</string>
     <string name="fireproofWebsiteToogleText">Spørg, når der logges ind</string>
 
+    <!-- Fire Animation settings -->
+    <string name="settingsFireAnimation">Ildknap-animation</string>
+    <string name="settingsHeroFireAnimation">Inferno</string>
+    <string name="settingsHeroWaterAnimation">Whirlpool</string>
+    <string name="settingsHeroAbstractAnimation">Airstream</string>
+    <string name="settingsNoneAnimation">Ingen</string>
+    <string name="settingsSelectFireAnimationDialog">Ildknap-animation</string>
+    <string name="settingsSelectFireAnimationDialogSave">Gem</string>
+
     <!-- Dos Attack error-->
     <string name="dosErrorMessage">Forbindelse blev afbrudt. Dette websted kan være skadeligt for din enhed.</string>
 

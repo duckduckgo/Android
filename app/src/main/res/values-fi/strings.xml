@@ -478,6 +478,15 @@
     <string name="fireproofWebsiteItemsSectionTitle">Verkkosivustot</string>
     <string name="fireproofWebsiteToogleText">Kysy kirjautuessa sisään</string>
 
+    <!-- Fire Animation settings -->
+    <string name="settingsFireAnimation">Liekki-painikkeen animaatio</string>
+    <string name="settingsHeroFireAnimation">Tulimyrsky</string>
+    <string name="settingsHeroWaterAnimation">Pyörre</string>
+    <string name="settingsHeroAbstractAnimation">Ilmavirta</string>
+    <string name="settingsNoneAnimation">Ei mitään</string>
+    <string name="settingsSelectFireAnimationDialog">Liekki-painikkeen animaatio</string>
+    <string name="settingsSelectFireAnimationDialogSave">Tallenna</string>
+
     <!-- Dos Attack error-->
     <string name="dosErrorMessage">Yhteys keskeytetty. Verkkosivusto voi vahingoittaa laitettasi.</string>
 

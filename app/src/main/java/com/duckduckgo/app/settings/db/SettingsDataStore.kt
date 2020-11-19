@@ -25,7 +25,6 @@ import com.duckduckgo.app.icon.api.AppIcon
 import com.duckduckgo.app.settings.clear.ClearWhatOption
 import com.duckduckgo.app.settings.clear.ClearWhenOption
 import com.duckduckgo.app.settings.clear.FireAnimation
-import javax.inject.Inject
 
 interface SettingsDataStore {
 
@@ -61,7 +60,7 @@ interface SettingsDataStore {
     fun clearAppBackgroundTimestamp()
 }
 
-class SettingsSharedPreferences @Inject constructor(private val context: Context) : SettingsDataStore {
+class SettingsSharedPreferences constructor(private val context: Context) : SettingsDataStore {
 
     private val fireAnimationMapper = FireAnimationPrefsMapper()
 

@@ -490,6 +490,15 @@
     <string name="fireproofWebsiteItemsSectionTitle">Сайты</string>
     <string name="fireproofWebsiteToogleText">Спрашивать при входе</string>
 
+    <!-- Fire Animation settings -->
+    <string name="settingsFireAnimation">Анимация кнопки «Пожар»</string>
+    <string name="settingsHeroFireAnimation">Инферно</string>
+    <string name="settingsHeroWaterAnimation">Водоворот</string>
+    <string name="settingsHeroAbstractAnimation">Воздушный поток</string>
+    <string name="settingsNoneAnimation">Ничего</string>
+    <string name="settingsSelectFireAnimationDialog">Анимация кнопки «Пожар»</string>
+    <string name="settingsSelectFireAnimationDialogSave">Сохранить</string>
+
     <!-- Dos Attack error-->
     <string name="dosErrorMessage">Соединение прервано. Этот сайт может навредить вашему устройству.</string>
 
