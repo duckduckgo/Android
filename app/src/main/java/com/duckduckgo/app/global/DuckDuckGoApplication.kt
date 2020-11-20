@@ -54,6 +54,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.APP_LAUNCH
 import com.duckduckgo.app.statistics.store.OfflinePixelCountDataStore
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.app.surrogates.ResourceSurrogateLoader
+import com.duckduckgo.app.tabs.db.TabsDbSanitizer
 import com.duckduckgo.app.trackerdetection.TrackerDataLoader
 import com.duckduckgo.app.usage.app.AppDaysUsedRecorder
 import dagger.android.AndroidInjector
@@ -62,7 +63,9 @@ import dagger.android.HasAndroidInjector
 import io.reactivex.exceptions.UndeliverableException
 import io.reactivex.plugins.RxJavaPlugins
 import io.reactivex.schedulers.Schedulers
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 import org.jetbrains.anko.doAsync
 import timber.log.Timber
@@ -167,7 +170,12 @@ open class DuckDuckGoApplication : HasAndroidInjector, Application(), LifecycleO
     @Inject
     lateinit var fireFireAnimationLoader: FireAnimationLoader
 
+    @Inject
+    lateinit var tabsDbSanitizer: TabsDbSanitizer
+
     private var launchedByFireAction: Boolean = false
+
+    private val applicationCoroutineScope = CoroutineScope(SupervisorJob())
 
     open lateinit var daggerAppComponent: AppComponent
 
@@ -192,6 +200,7 @@ open class DuckDuckGoApplication : HasAndroidInjector, Application(), LifecycleO
             it.addObserver(userStageStore)
             it.addObserver(pixelSender)
             it.addObserver(fireFireAnimationLoader)
+            it.addObserver(tabsDbSanitizer)
         }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1) {
@@ -255,6 +264,7 @@ open class DuckDuckGoApplication : HasAndroidInjector, Application(), LifecycleO
     protected open fun configureDependencyInjection() {
         daggerAppComponent = DaggerAppComponent.builder()
             .application(this)
+            .applicationCoroutineScope(applicationCoroutineScope)
             .build()
         daggerAppComponent.inject(this)
     }
