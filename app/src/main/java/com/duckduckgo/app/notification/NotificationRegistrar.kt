@@ -71,13 +71,11 @@ class NotificationRegistrar @Inject constructor(
         )
     }
 
-    private val channels = (
-        listOf(
-            ChannelType.FILE_DOWNLOADING,
-            ChannelType.FILE_DOWNLOADED,
-            ChannelType.TUTORIALS
-        )
-        )
+    private val channels = listOf(
+        ChannelType.FILE_DOWNLOADING,
+        ChannelType.FILE_DOWNLOADED,
+        ChannelType.TUTORIALS
+    )
 
     fun registerApp() {
         if (SDK_INT < O) {
