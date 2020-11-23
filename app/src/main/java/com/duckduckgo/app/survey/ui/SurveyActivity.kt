@@ -74,9 +74,12 @@ class SurveyActivity : DuckDuckGoActivity() {
     }
 
     private fun configureObservers() {
-        viewModel.command.observe(this, Observer {
-            it?.let { command -> processCommand(command) }
-        })
+        viewModel.command.observe(
+            this,
+            Observer {
+                it?.let { command -> processCommand(command) }
+            }
+        )
     }
 
     private fun processCommand(command: Command) {

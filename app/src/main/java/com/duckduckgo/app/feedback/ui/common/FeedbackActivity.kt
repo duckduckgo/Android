@@ -40,7 +40,8 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
-class FeedbackActivity : DuckDuckGoActivity(),
+class FeedbackActivity :
+    DuckDuckGoActivity(),
     InitialFeedbackFragment.InitialFeedbackListener,
     PositiveFeedbackLandingFragment.PositiveFeedbackLandingListener,
     ShareOpenEndedFeedbackFragment.OpenEndedFeedbackListener,
@@ -58,12 +59,18 @@ class FeedbackActivity : DuckDuckGoActivity(),
     }
 
     private fun configureObservers() {
-        viewModel.command.observe(this, Observer {
-            it?.let { command -> processCommand(command) }
-        })
-        viewModel.updateViewCommand.observe(this, Observer {
-            it?.let { viewState -> render(viewState) }
-        })
+        viewModel.command.observe(
+            this,
+            Observer {
+                it?.let { command -> processCommand(command) }
+            }
+        )
+        viewModel.updateViewCommand.observe(
+            this,
+            Observer {
+                it?.let { viewState -> render(viewState) }
+            }
+        )
     }
 
     private fun processCommand(command: Command) {

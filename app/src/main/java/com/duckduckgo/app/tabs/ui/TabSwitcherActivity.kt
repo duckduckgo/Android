@@ -112,11 +112,16 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
         tabsRecycler.layoutManager = layoutManager
         tabsRecycler.adapter = tabsAdapter
 
-        val swipeListener = ItemTouchHelper(SwipeToCloseTabListener(tabsAdapter, numberColumns, object : SwipeToCloseTabListener.OnTabSwipedListener {
-            override fun onSwiped(tab: TabEntity) {
-                onTabDeleted(tab)
-            }
-        }))
+        val swipeListener = ItemTouchHelper(
+            SwipeToCloseTabListener(
+                tabsAdapter, numberColumns,
+                object : SwipeToCloseTabListener.OnTabSwipedListener {
+                    override fun onSwiped(tab: TabEntity) {
+                        onTabDeleted(tab)
+                    }
+                }
+            )
+        )
         swipeListener.attachToRecyclerView(tabsRecycler)
 
         tabGridItemDecorator = TabGridItemDecorator(this, selectedTabId)
@@ -124,17 +129,26 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
     }
 
     private fun configureObservers() {
-        viewModel.tabs.observe(this, Observer<List<TabEntity>> {
-            render(it)
-        })
-        viewModel.deletableTabs.observe(this, {
-            if (it.isNotEmpty()) {
-                onDeletableTab(it.last())
+        viewModel.tabs.observe(
+            this,
+            Observer<List<TabEntity>> {
+                render(it)
             }
-        })
-        viewModel.command.observe(this, Observer {
-            processCommand(it)
-        })
+        )
+        viewModel.deletableTabs.observe(
+            this,
+            {
+                if (it.isNotEmpty()) {
+                    onDeletableTab(it.last())
+                }
+            }
+        )
+        viewModel.command.observe(
+            this,
+            Observer {
+                processCommand(it)
+            }
+        )
     }
 
     private fun render(tabs: List<TabEntity>) {
@@ -211,13 +225,13 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
         Snackbar.make(
             contentView!!,
             getString(R.string.tabClosed),
-            Snackbar.LENGTH_LONG)
+            Snackbar.LENGTH_LONG
+        )
             .setDuration(3500) // 3.5 seconds
             .setAction(R.string.tabClosedUndo) {
                 // noop, handled in onDismissed callback
             }
-            .addCallback(object :
-                Snackbar.Callback() {
+            .addCallback(object : Snackbar.Callback() {
                 override fun onDismissed(transientBottomBar: Snackbar?, event: Int) {
                     when (event) {
                         // handle the UNDO action here as we only have one

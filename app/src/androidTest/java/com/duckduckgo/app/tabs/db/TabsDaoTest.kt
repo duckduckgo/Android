@@ -281,12 +281,14 @@ class TabsDaoTest {
         val tab = TabEntity(
             tabId = "TAB_ID",
             url = "www.duckduckgo.com",
-            position = 0)
+            position = 0
+        )
         val deletableTab = TabEntity(
             tabId = "TAB_ID_1",
             url = "www.duckduckgo.com",
             position = 1,
-            deletable = true)
+            deletable = true
+        )
 
         testee.insertTab(tab)
         testee.addAndSelectTab(deletableTab)
@@ -300,7 +302,8 @@ class TabsDaoTest {
         val tab = TabEntity(
             tabId = "TAB_ID",
             url = "www.duckduckgo.com",
-            position = 0)
+            position = 0
+        )
 
         testee.insertTab(tab)
         testee.markTabAsDeletable(tab.copy(url = "www.other.com"))
@@ -314,7 +317,8 @@ class TabsDaoTest {
             tabId = "TAB_ID",
             url = "www.duckduckgo.com",
             position = 0,
-            deletable = true)
+            deletable = true
+        )
 
         testee.insertTab(tab)
         testee.undoDeletableTab(tab.copy(url = "www.other.com"))

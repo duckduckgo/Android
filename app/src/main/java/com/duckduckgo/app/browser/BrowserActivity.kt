@@ -105,9 +105,12 @@ class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope() {
 
         super.onCreate(savedInstanceState = newInstanceState, daggerInject = false)
         setContentView(R.layout.activity_browser)
-        viewModel.viewState.observe(this, Observer {
-            renderer.renderBrowserViewState(it)
-        })
+        viewModel.viewState.observe(
+            this,
+            Observer {
+                renderer.renderBrowserViewState(it)
+            }
+        )
         viewModel.awaitClearDataFinishedNotification()
     }
 
@@ -229,16 +232,25 @@ class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope() {
     }
 
     private fun configureObservers() {
-        viewModel.command.observe(this, Observer {
-            processCommand(it)
-        })
-        viewModel.selectedTab.observe(this, Observer {
-            if (it != null) selectTab(it)
-        })
-        viewModel.tabs.observe(this, Observer {
-            clearStaleTabs(it)
-            launch { viewModel.onTabsUpdated(it) }
-        })
+        viewModel.command.observe(
+            this,
+            Observer {
+                processCommand(it)
+            }
+        )
+        viewModel.selectedTab.observe(
+            this,
+            Observer {
+                if (it != null) selectTab(it)
+            }
+        )
+        viewModel.tabs.observe(
+            this,
+            Observer {
+                clearStaleTabs(it)
+                launch { viewModel.onTabsUpdated(it) }
+            }
+        )
     }
 
     private fun removeObservers() {

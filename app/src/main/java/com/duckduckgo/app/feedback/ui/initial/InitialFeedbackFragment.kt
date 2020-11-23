@@ -62,13 +62,16 @@ class InitialFeedbackFragment : FeedbackFragment() {
     }
 
     override fun configureViewModelObservers() {
-        viewModel.command.observe(this, Observer {
-            when (it) {
-                PositiveFeedbackSelected -> listener?.userSelectedPositiveFeedback()
-                NegativeFeedbackSelected -> listener?.userSelectedNegativeFeedback()
-                UserCancelled -> listener?.userCancelled()
+        viewModel.command.observe(
+            this,
+            Observer {
+                when (it) {
+                    PositiveFeedbackSelected -> listener?.userSelectedPositiveFeedback()
+                    NegativeFeedbackSelected -> listener?.userSelectedNegativeFeedback()
+                    UserCancelled -> listener?.userCancelled()
+                }
             }
-        })
+        )
     }
 
     override fun configureListeners() {
