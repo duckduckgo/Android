@@ -28,6 +28,8 @@ interface TabRepository {
      */
     val liveTabs: LiveData<List<TabEntity>>
 
+    val flowTabs: Flow<List<TabEntity>>
+
     /**
      * @return the tabs that are marked as "deletable" in the DB
      */

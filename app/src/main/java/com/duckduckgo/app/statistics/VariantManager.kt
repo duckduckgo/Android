@@ -48,7 +48,7 @@ interface VariantManager {
             // Single Search Bar Experiments
             Variant(key = "zg", weight = 0.0, features = emptyList(), filterBy = { noFilter() }),
             Variant(key = "zh", weight = 0.0, features = listOf(VariantFeature.SerpHeaderQueryReplacement), filterBy = { noFilter() }),
-            Variant(key = "zi", weight = 0.0, features = listOf(VariantFeature.SerpHeaderRemoval), filterBy = { noFilter() }),
+            Variant(key = "zi", weight = 0.0, features = listOf(VariantFeature.SerpHeaderRemoval), filterBy = { noFilter() })
 
             // All groups in an experiment (control and variants) MUST use the same filters
         )

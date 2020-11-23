@@ -39,6 +39,7 @@ import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.survey.db.SurveyDao
 import com.duckduckgo.app.survey.model.Survey
+import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.widget.ui.WidgetCapabilities
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
@@ -69,6 +70,7 @@ class CtaViewModel @Inject constructor(
     private val userStageStore: UserStageStore,
     private val userEventsStore: UserEventsStore,
     private val useOurAppDetector: UseOurAppDetector,
+    private val tabRepository: TabRepository,
     private val dispatchers: DispatcherProvider
 ) {
     val surveyLiveData: LiveData<Survey> = surveyDao.getLiveScheduled()
@@ -77,11 +79,21 @@ class CtaViewModel @Inject constructor(
     @VisibleForTesting
     val forceStopFireButtonPulseAnimation = ConflatedBroadcastChannel(false)
 
+    @ExperimentalCoroutinesApi
+    private val forceStopFireButtonPulseAnimationFlow = forceStopFireButtonPulseAnimation.asFlow()
+        .combine(tabRepository.flowTabs) { forceStop, tabs ->
+            if (tabs.size >= MAX_TABS_OPEN_FIRE_EDUCATION) return@combine true
+            forceStop
+        }
+
     @FlowPreview
     @ExperimentalCoroutinesApi
     val showFireButtonPulseAnimation: Flow<Boolean> = dismissedCtaDao
         .dismissedCtas()
-        .combine(forceStopFireButtonPulseAnimation.asFlow()) { ctas, forceStopAnimation ->
+        .combine(forceStopFireButtonPulseAnimationFlow) { ctas, forceStopAnimation ->
+            if (forceStopAnimation) {
+                dismissPulseAnimation()
+            }
             Pair(ctas, forceStopAnimation)
         }.shouldShowPulseAnimation()
 
@@ -102,6 +114,7 @@ class CtaViewModel @Inject constructor(
     suspend fun dismissPulseAnimation() {
         forceStopFireButtonPulseAnimation.send(true)
         withContext(dispatchers.io()) {
+            dismissedCtaDao.insert(DismissedCta(CtaId.DAX_FIRE_BUTTON))
             dismissedCtaDao.insert(DismissedCta(CtaId.DAX_FIRE_BUTTON_PULSE))
         }
     }
@@ -353,6 +366,7 @@ class CtaViewModel @Inject constructor(
         }
     }
 
+    @ExperimentalCoroutinesApi
     private fun Flow<Pair<List<DismissedCta>, Boolean>>.shouldShowPulseAnimation(): Flow<Boolean> {
         return this.map { (dismissedCtaDao, forceStopAnimation) ->
             withContext(dispatchers.io()) {
@@ -370,5 +384,6 @@ class CtaViewModel @Inject constructor(
 
     companion object {
         private const val SURVEY_DEFAULT_MIN_DAYS_INSTALLED = 30
+        private const val MAX_TABS_OPEN_FIRE_EDUCATION = 2
     }
 }
