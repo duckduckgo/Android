@@ -75,6 +75,8 @@
     <string name="closeContentDescription">Close</string>
     <string name="closeAllTabsMenuItem">Close All Tabs</string>
     <string name="closeTab">Close tab</string>
+    <string name="tabClosed">Tab closed</string>
+    <string name="tabClosedUndo">Undo</string>
 
     <!-- Privacy Dashboard Activities -->
     <string name="privacyProtectionToggle">Site Privacy Protection</string>

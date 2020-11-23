@@ -298,8 +298,23 @@ class AppDatabaseTest {
     }
 
     @Test
+    fun whenMigratingFromVersion25To26ThenValidationSucceeds() {
+        createDatabaseAndMigrate(25, 26, migrationsProvider.MIGRATION_25_TO_26)
+    }
+
+    @Test
+    fun whenMigratingFromVersion26To27ThenValidationSucceeds() {
+        createDatabaseAndMigrate(26, 27, migrationsProvider.MIGRATION_26_TO_27)
+    }
+
+    @Test
     fun whenMigratingFromVersion27To28ThenValidationSucceeds() {
         createDatabaseAndMigrate(27, 28, migrationsProvider.MIGRATION_27_TO_28)
+    }
+
+    @Test
+    fun whenMigratingFromVersion28To29ThenValidationSucceeds() {
+        createDatabaseAndMigrate(28, 29, migrationsProvider.MIGRATION_28_TO_29)
     }
 
     private fun givenUserStageIs(database: SupportSQLiteDatabase, appStage: AppStage) {

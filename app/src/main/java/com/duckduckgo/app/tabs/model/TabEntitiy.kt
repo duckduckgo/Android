@@ -43,7 +43,8 @@ data class TabEntity(
     var viewed: Boolean = true,
     var position: Int,
     var tabPreviewFile: String? = null,
-    var sourceTabId: String? = null
+    var sourceTabId: String? = null,
+    var deletable: Boolean = false
 )
 
 val TabEntity.isBlank: Boolean

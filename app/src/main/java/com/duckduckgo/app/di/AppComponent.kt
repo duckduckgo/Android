@@ -33,6 +33,7 @@ import dagger.BindsInstance
 import dagger.Component
 import dagger.android.AndroidInjector
 import dagger.android.support.AndroidSupportInjectionModule
+import kotlinx.coroutines.CoroutineScope
 import javax.inject.Singleton
 
 @Singleton
@@ -77,6 +78,9 @@ interface AppComponent : AndroidInjector<DuckDuckGoApplication> {
 
         @BindsInstance
         fun application(application: Application): Builder
+
+        @BindsInstance
+        fun applicationCoroutineScope(@AppCoroutineScope applicationCoroutineScope: CoroutineScope): Builder
 
         fun build(): AppComponent
     }

@@ -21,6 +21,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
+import android.widget.TextView
 import androidx.appcompat.widget.Toolbar
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.GridLayoutManager
@@ -39,10 +40,13 @@ import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.Close
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.DisplayMessage
+import com.google.android.material.snackbar.BaseTransientBottomBar
+import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
+import org.jetbrains.anko.contentView
 import org.jetbrains.anko.longToast
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
@@ -123,6 +127,11 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
         viewModel.tabs.observe(this, Observer<List<TabEntity>> {
             render(it)
         })
+        viewModel.deletableTabs.observe(this, {
+            if (it.isNotEmpty()) {
+                onDeletableTab(it.last())
+            }
+        })
         viewModel.command.observe(this, Observer {
             processCommand(it)
         })
@@ -195,7 +204,33 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
     }
 
     override fun onTabDeleted(tab: TabEntity) {
-        launch { viewModel.onTabDeleted(tab) }
+        launch { viewModel.onMarkTabAsDeletable(tab) }
+    }
+
+    private fun onDeletableTab(tab: TabEntity) {
+        Snackbar.make(
+            contentView!!,
+            getString(R.string.tabClosed),
+            Snackbar.LENGTH_LONG)
+            .setDuration(3500) // 3.5 seconds
+            .setAction(R.string.tabClosedUndo) {
+                // noop, handled in onDismissed callback
+            }
+            .addCallback(object :
+                Snackbar.Callback() {
+                override fun onDismissed(transientBottomBar: Snackbar?, event: Int) {
+                    when (event) {
+                        // handle the UNDO action here as we only have one
+                        BaseTransientBottomBar.BaseCallback.DISMISS_EVENT_ACTION -> launch { viewModel.undoDeletableTab(tab) }
+                        BaseTransientBottomBar.BaseCallback.DISMISS_EVENT_SWIPE,
+                        BaseTransientBottomBar.BaseCallback.DISMISS_EVENT_TIMEOUT -> launch { viewModel.purgeDeletableTabs() }
+                        BaseTransientBottomBar.BaseCallback.DISMISS_EVENT_CONSECUTIVE,
+                        BaseTransientBottomBar.BaseCallback.DISMISS_EVENT_MANUAL -> { /* noop */ }
+                    }
+                }
+            })
+            .apply { view.findViewById<TextView>(com.google.android.material.R.id.snackbar_text).maxLines = 1 }
+            .show()
     }
 
     private fun closeAllTabs() {
@@ -216,8 +251,18 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
         overridePendingTransition(R.anim.slide_from_bottom, R.anim.tab_anim_fade_out)
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        viewModel.deletableTabs.removeObservers(this)
+        // we don't want to purge during device rotation
+        if (isFinishing) {
+            launch { viewModel.purgeDeletableTabs() }
+        }
+    }
+
     private fun clearObserversEarlyToStopViewUpdates() {
         viewModel.tabs.removeObservers(this)
+        viewModel.deletableTabs.removeObservers(this)
     }
 
     companion object {
