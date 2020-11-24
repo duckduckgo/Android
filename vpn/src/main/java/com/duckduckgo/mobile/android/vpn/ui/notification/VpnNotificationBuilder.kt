@@ -33,7 +33,7 @@ class VpnNotificationBuilder {
 
     companion object {
 
-        fun buildPersistentNotification(context: Context, trackersBlocked: List<VpnTrackerAndCompany>): Notification {
+        fun buildPersistentNotification(context: Context, trackersBlocked: List<VpnTrackerAndCompany>, trackerCompanies: Int): Notification {
             registerChannel(context)
 
             val vpnControllerIntent = Intent(context, VpnControllerActivity::class.java)
@@ -42,16 +42,11 @@ class VpnNotificationBuilder {
                 getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT)
             }
 
-            return NotificationCompat.Builder(
-                context,
-                VPN_FOREGROUND_SERVICE_NOTIFICATION_CHANNEL_ID
-            )
+            val notificationText = generateNotificationText(trackersBlocked, trackerCompanies, context)
+            return NotificationCompat.Builder(context, VPN_FOREGROUND_SERVICE_NOTIFICATION_CHANNEL_ID)
                 .setContentTitle(context.getString(R.string.vpnNotificationTitle))
-                .setContentText(generateNotificationText(trackersBlocked))
-                .setStyle(
-                    NotificationCompat.BigTextStyle()
-                        .bigText(generateNotificationText(trackersBlocked))
-                )
+                .setContentText(notificationText)
+                .setStyle(NotificationCompat.BigTextStyle().bigText(notificationText))
                 .setSmallIcon(R.drawable.ic_vpn_notification_24)
                 .setContentIntent(vpnControllerPendingIntent)
                 .setOngoing(true)
@@ -59,12 +54,13 @@ class VpnNotificationBuilder {
                 .build()
         }
 
-        private fun generateNotificationText(trackersBlocked: List<VpnTrackerAndCompany>): String {
+        private fun generateNotificationText(trackersBlocked: List<VpnTrackerAndCompany>, trackerCompanies: Int, context: Context): String {
             return if (trackersBlocked.isEmpty()) {
-                "No trackers blocked yet"
+                context.getString(R.string.vpnTrackersNone)
             } else {
-                val lastTrackerBlocked = trackersBlocked.first()
-                "Today, so far we blocked ${trackersBlocked.size} companies from tracking you, the last one was ${lastTrackerBlocked.trackerCompany.company}"
+                val trackerCompaniesFormatted = context.resources.getQuantityString(R.plurals.company, trackerCompanies, trackerCompanies)
+                val trackersFormatted = context.resources.getQuantityString(R.plurals.tracker, trackersBlocked.size, trackersBlocked.size)
+                context.getString(R.string.vpnNotificationTrackersFoundUpdate, trackerCompaniesFormatted, trackersBlocked.first().trackerCompany.company, trackersFormatted)
             }
         }
 
@@ -75,6 +71,7 @@ class VpnNotificationBuilder {
                 val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
                 notificationManager.createNotificationChannel(channel)
             }
+
         }
 
         fun buildReminderNotification(context: Context): Notification {

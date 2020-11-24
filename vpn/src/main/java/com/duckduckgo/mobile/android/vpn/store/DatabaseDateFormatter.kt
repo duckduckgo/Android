@@ -16,22 +16,22 @@
 
 package com.duckduckgo.mobile.android.vpn.store
 
+import org.threeten.bp.LocalDateTime
+import org.threeten.bp.format.DateTimeFormatter
 import javax.inject.Inject
 
-interface PacketPersister {
-    fun persistDataSent(packetLength: Int)
-    fun persistDataReceived(packetLength: Int)
-}
+class DatabaseDateFormatter @Inject constructor() {
 
-class RoomPacketPersister @Inject constructor(
-    val vpnDatabase: VpnDatabase
-) : PacketPersister {
+    companion object {
+        private val FORMATTER_HOURS: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH")
+        private val FORMATTER_SECONDS: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss")
 
-    override fun persistDataSent(packetLength: Int) {
-        vpnDatabase.vpnDataStatsDao().upsertDataSent(packetLength)
-    }
+        fun bucketByHour(date: LocalDateTime = LocalDateTime.now()): String {
+            return FORMATTER_HOURS.format(date)
+        }
 
-    override fun persistDataReceived(packetLength: Int) {
-        vpnDatabase.vpnDataStatsDao().upsertDataReceived(packetLength)
+        fun timestamp(date: LocalDateTime = LocalDateTime.now()): String {
+            return FORMATTER_SECONDS.format(date)
+        }
     }
 }

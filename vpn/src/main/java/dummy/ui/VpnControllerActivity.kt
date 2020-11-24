@@ -32,6 +32,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.duckduckgo.mobile.android.vpn.R
+import com.duckduckgo.mobile.android.vpn.model.DataSizeFormatter
 import com.duckduckgo.mobile.android.vpn.model.TimePassed
 import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
@@ -42,9 +43,8 @@ import dummy.VpnViewModelFactory
 import dummy.quietlySetIsChecked
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.MainScope
-import org.threeten.bp.OffsetDateTime
-import org.threeten.bp.temporal.ChronoUnit
 import timber.log.Timber
+import java.text.NumberFormat
 import javax.inject.Inject
 
 class VpnControllerActivity : AppCompatActivity(R.layout.activity_vpn_controller), CoroutineScope by MainScope() {
@@ -67,8 +67,12 @@ class VpnControllerActivity : AppCompatActivity(R.layout.activity_vpn_controller
     @Inject
     lateinit var viewModelFactory: VpnViewModelFactory
 
+    @Inject
+    lateinit var dataSizeFormatter: DataSizeFormatter
+
     private inline fun <reified V : ViewModel> bindViewModel() = lazy { ViewModelProvider(this, viewModelFactory).get(V::class.java) }
     private val viewModel: VpnControllerViewModel by bindViewModel()
+    private val packetsFormatter = NumberFormat.getInstance()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -132,27 +136,16 @@ class VpnControllerActivity : AppCompatActivity(R.layout.activity_vpn_controller
         trackersBlockedTextView.text = viewState.trackersBlocked
         lastTrackerDomainTextView.text = viewState.lastTrackerBlocked
         vpnRunningToggleButton.quietlySetIsChecked(viewState.isVpnRunning, runningButtonChangeListener)
-        timeRunningTodayTextView.text = getString(R.string.vpnTimeRunning, generateTimeRunningMessage(viewState))
-        dataSentTextView.text = viewState.dataSent
-        dataReceivedTextView.text = viewState.dataReceived
+        timeRunningTodayTextView.text = generateTimeRunningMessage(viewState.timeRunningMillis)
+        dataSentTextView.text = getString(R.string.vpnDataTransferred, dataSizeFormatter.format(viewState.dataSent.dataSize), packetsFormatter.format(viewState.dataSent.numberPackets))
+        dataReceivedTextView.text = getString(R.string.vpnDataTransferred, dataSizeFormatter.format(viewState.dataReceived.dataSize), packetsFormatter.format(viewState.dataReceived.numberPackets))
     }
 
-    private fun generateTimeRunningMessage(viewState: VpnControllerViewModel.ViewState): String {
-        return if (viewState.connectionStats == null) {
-            "VPN hasn't been run yet"
+    private fun generateTimeRunningMessage(timeRunningMillis: Long): String {
+        return if (timeRunningMillis == 0L) {
+            getString(R.string.vpnNotRunYet)
         } else {
-            if (viewState.isVpnRunning) {
-                if (viewState.connectionStats.timeRunning == 0L) {
-                    // first time running the vpn in this block, time running = time last updated - now()
-                    val timeDifference = viewState.connectionStats.lastUpdated.until(OffsetDateTime.now(), ChronoUnit.MILLIS)
-                    val timeRunning = TimePassed.fromMilliseconds(timeDifference)
-                    timeRunning.toString()
-                } else {
-                    TimePassed.fromMilliseconds(viewState.connectionStats.timeRunning).toString()
-                }
-            } else {
-                TimePassed.fromMilliseconds(viewState.connectionStats.timeRunning).toString()
-            }
+            return getString(R.string.vpnTimeRunning, TimePassed.fromMilliseconds(timeRunningMillis).format())
         }
     }
 

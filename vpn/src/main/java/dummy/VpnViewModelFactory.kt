@@ -24,8 +24,7 @@ import dummy.ui.VpnControllerViewModel
 import javax.inject.Inject
 
 @Suppress("UNCHECKED_CAST")
-class VpnViewModelFactory @Inject constructor(
-) : ViewModelProvider.NewInstanceFactory() {
+class VpnViewModelFactory @Inject constructor() : ViewModelProvider.NewInstanceFactory() {
 
     @Inject
     lateinit var appTrackerBlockingStatsRepository: AppTrackerBlockingStatsRepository

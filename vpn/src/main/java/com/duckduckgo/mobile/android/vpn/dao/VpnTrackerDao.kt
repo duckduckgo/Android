@@ -20,7 +20,7 @@ import androidx.lifecycle.LiveData
 import androidx.room.*
 import com.duckduckgo.mobile.android.vpn.model.VpnTracker
 import com.duckduckgo.mobile.android.vpn.model.VpnTrackerAndCompany
-import org.threeten.bp.OffsetDateTime
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface VpnTrackerDao {
@@ -38,13 +38,13 @@ interface VpnTrackerDao {
 
     @Transaction
     @Query("select * from vpn_tracker where timestamp > :startedAt group by trackerCompanyId order by timestamp desc")
-    fun getTrackersByCompanyAfterSync(startedAt: OffsetDateTime): List<VpnTrackerAndCompany>
+    fun getTrackersByCompanyAfterSync(startedAt: String): List<VpnTrackerAndCompany>
 
     @Transaction
-    @Query("select * from vpn_tracker where timestamp > :startedAt order by timestamp desc")
-    fun getTrackersAfterSync(startedAt: OffsetDateTime): List<VpnTrackerAndCompany>
+    @Query("select * from vpn_tracker where timestamp >= :startedAt order by timestamp desc")
+    fun getTrackersAfterSync(startedAt: String): Flow<List<VpnTrackerAndCompany>>
 
     @Transaction
     @Query("select * from vpn_tracker where timestamp > :startedAt group by trackerCompanyId order by timestamp desc")
-    fun getTrackersByCompanyAfter(startedAt: OffsetDateTime): LiveData<List<VpnTrackerAndCompany>>
+    fun getTrackersByCompanyAfter(startedAt: String): LiveData<List<VpnTrackerAndCompany>>
 }

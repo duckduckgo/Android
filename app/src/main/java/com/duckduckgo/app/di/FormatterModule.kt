@@ -14,21 +14,21 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.mobile.android.vpn.dao
+package com.duckduckgo.app.di
 
-import androidx.lifecycle.LiveData
-import androidx.room.*
-import com.duckduckgo.mobile.android.vpn.model.VpnState
+import dagger.Module
+import dagger.Provides
+import java.text.NumberFormat
+import javax.inject.Named
 
-@Dao
-interface VpnStateDao {
+@Module
+class FormatterModule {
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insert(state: VpnState)
-
-    @Query("select * from vpn_state")
-    fun get(): LiveData<VpnState>
-
-    @Query("select * from vpn_state")
-    fun getOneOff(): VpnState?
+    @Provides
+    @Named("numberFormatterWithSeparator")
+    fun providesNumberFormatter(): NumberFormat {
+        return NumberFormat.getInstance().also {
+            it.maximumFractionDigits = 1
+        }
+    }
 }

@@ -16,30 +16,40 @@
 
 package com.duckduckgo.mobile.android.vpn.model
 
+import com.duckduckgo.mobile.android.vpn.store.DatabaseDateFormatter
+import org.threeten.bp.LocalDateTime
 import timber.log.Timber
+
+fun dateOfPreviousMidnight(): String {
+    val midnight = LocalDateTime.now().toLocalDate().atStartOfDay()
+    return DatabaseDateFormatter.timestamp(midnight)
+}
 
 data class TimePassed(val hours: Long, val minutes: Long, val seconds: Long) {
 
-    override fun toString(): String {
+    fun format(alwaysShowHours: Boolean = true, alwaysShowMinutes: Boolean = true, alwaysShowSeconds: Boolean = true): String {
         Timber.i("Time passed $hours hr, $minutes min $seconds sec")
 
-        if (hours > 0) {
-            return if (minutes > 0) {
-                "$hours hr $minutes min"
-            } else {
-                "$hours hr"
-            }
+        val sb = StringBuilder()
+
+        if (hours > 0 || alwaysShowHours) {
+            sb.append(hours)
+            sb.append(" hr")
         }
 
-        if (minutes > 0) {
-            return "$minutes min"
+        if (minutes > 0 || alwaysShowMinutes) {
+            sb.append(" ")
+            sb.append(minutes)
+            sb.append(" min")
         }
 
-        if (seconds > 0) {
-            return "$seconds sec"
+        if (alwaysShowSeconds) {
+            sb.append(" ")
+            sb.append(seconds)
+            sb.append(" sec")
         }
 
-        return "1 sec"
+        return sb.toString()
     }
 
     companion object {

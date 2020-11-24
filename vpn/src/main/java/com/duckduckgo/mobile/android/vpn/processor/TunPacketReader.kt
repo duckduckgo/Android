@@ -18,7 +18,6 @@ package com.duckduckgo.mobile.android.vpn.processor
 
 import android.os.ParcelFileDescriptor
 import com.duckduckgo.mobile.android.vpn.service.VpnQueues
-import com.google.firebase.perf.metrics.AddTrace
 import timber.log.Timber
 import xyz.hexene.localvpn.ByteBufferPool
 import xyz.hexene.localvpn.Packet
@@ -31,7 +30,6 @@ class TunPacketReader(private val tunInterface: ParcelFileDescriptor, private va
     private var running = false
     var bufferToNetwork = byteBuffer()
 
-    @AddTrace(name = "tun_reader_read", enabled = true)
     override fun run() {
         Timber.w("TunPacketReader started")
 

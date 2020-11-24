@@ -20,7 +20,6 @@ import com.duckduckgo.mobile.android.vpn.model.VpnTracker
 import com.duckduckgo.mobile.android.vpn.processor.tcp.hostname.HostnameExtractor
 import com.duckduckgo.mobile.android.vpn.processor.tcp.tracker.RequestTrackerType.Tracker
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
-import org.threeten.bp.OffsetDateTime
 import timber.log.Timber
 import xyz.hexene.localvpn.Packet
 import xyz.hexene.localvpn.TCB
@@ -72,8 +71,7 @@ class DomainBasedTrackerDetector @Inject constructor(
     private fun insertTracker(tracker: TrackerListProvider.Tracker) {
         val trackerCompany = TrackerListProvider.TRACKER_GROUP_COMPANIES.find { it.trackerCompanyId == tracker.trackerCompanyId }
             ?: TrackerListProvider.UNDEFINED_TRACKER_COMPANY
-        val vpnTracker =
-            VpnTracker(trackerCompanyId = trackerCompany.trackerCompanyId, domain = tracker.hostname, timestamp = OffsetDateTime.now())
+        val vpnTracker = VpnTracker(trackerCompanyId = trackerCompany.trackerCompanyId, domain = tracker.hostname)
         Timber.i("Inserting $tracker as tracker")
         vpnDatabase.vpnTrackerDao().insert(vpnTracker)
     }

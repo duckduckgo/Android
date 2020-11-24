@@ -17,51 +17,63 @@
 package com.duckduckgo.mobile.android.vpn.stats
 
 import androidx.lifecycle.LiveData
+import com.duckduckgo.mobile.android.vpn.model.VpnDataStats
+import com.duckduckgo.mobile.android.vpn.model.VpnRunningStats
 import com.duckduckgo.mobile.android.vpn.model.VpnState
-import com.duckduckgo.mobile.android.vpn.model.VpnStats
 import com.duckduckgo.mobile.android.vpn.model.VpnTrackerAndCompany
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.firstOrNull
 import javax.inject.Inject
 
 class AppTrackerBlockingStatsRepository @Inject constructor(private val vpnDatabase: VpnDatabase) {
 
-    fun getVpnState(): VpnState? {
-        return vpnDatabase.vpnStateDao().getOneOff()
+    fun getVpnState(): VpnState {
+        return vpnDatabase.vpnStateDao().getOneOff() ?: VpnState(uuid = "unknown")
     }
 
     fun getVpnStateAsync(): LiveData<VpnState> {
         return vpnDatabase.vpnStateDao().get()
     }
 
-    fun getTodaysCompaniesBlockedSync(): List<VpnTrackerAndCompany> {
-        val vpnStats = getConnectionStats()
-        return if (vpnStats != null) {
-            vpnDatabase.vpnTrackerDao().getTrackersByCompanyAfterSync(vpnStats.startedAt)
-        } else {
-            emptyList()
+    suspend fun getRunningTimeMillis(startTime: String): Long {
+        return getVpnRunningStats(startTime).firstOrNull()
+            ?.sumOf { it.timeRunningMillis }
+            ?: 0L
+    }
+
+    private fun getVpnRunningStats(startTime: String): Flow<List<VpnRunningStats>> {
+        return vpnDatabase.vpnRunningStatsDao().get(startTime)
+    }
+
+    private fun getVpnDataStats(startTime: String): Flow<List<VpnDataStats>> {
+        return vpnDatabase.vpnDataStatsDao().get(startTime)
+    }
+
+    fun getVpnTrackers(startTime: String): Flow<List<VpnTrackerAndCompany>> {
+        return vpnDatabase.vpnTrackerDao().getTrackersAfterSync(startTime)
+    }
+
+    suspend fun getDataStats(midnight: String): DataStats {
+        var dataSent = 0L
+        var packetsSent = 0L
+        var dataReceived = 0L
+        var packetsReceived = 0L
+        val dataStats = getVpnDataStats(midnight).firstOrNull() ?: emptyList()
+
+        dataStats.forEach {
+            dataReceived += it.dataReceived
+            dataSent += it.dataSent
+            packetsReceived += it.packetsReceived
+            packetsSent += it.packetsSent
         }
+
+        return DataStats(
+            sent = DataTransfer(dataSent, packetsSent),
+            received = DataTransfer(dataReceived, packetsReceived)
+        )
     }
 
-    fun getTodaysTrackersBlockedSync(): List<VpnTrackerAndCompany> {
-        val vpnStats = getConnectionStats()
-        return if (vpnStats != null) {
-            vpnDatabase.vpnTrackerDao().getTrackersAfterSync(vpnStats.startedAt)
-        } else {
-            emptyList()
-        }
-    }
-
-    fun getTodaysTrackersBlocked(): LiveData<List<VpnTrackerAndCompany>> {
-        val vpnStats = vpnDatabase.vpnStatsDao().getCurrent()!!
-        return vpnDatabase.vpnTrackerDao().getTrackersByCompanyAfter(vpnStats.startedAt)
-    }
-
-    fun getConnectionStats(): VpnStats? {
-        return vpnDatabase.vpnStatsDao().getCurrent()
-    }
-
-    fun getConnectionStatsAsync(): LiveData<VpnStats> {
-        return vpnDatabase.vpnStatsDao().observeCurrent()
-    }
-
+    data class DataStats(val sent: DataTransfer, val received: DataTransfer)
+    data class DataTransfer(val dataSize: Long, val numberPackets: Long)
 }

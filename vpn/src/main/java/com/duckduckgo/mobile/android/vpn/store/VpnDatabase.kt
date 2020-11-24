@@ -19,14 +19,8 @@ package com.duckduckgo.mobile.android.vpn.store
 import android.content.Context
 import androidx.room.*
 import androidx.sqlite.db.SupportSQLiteDatabase
-import com.duckduckgo.mobile.android.vpn.dao.VpnStateDao
-import com.duckduckgo.mobile.android.vpn.dao.VpnStatsDao
-import com.duckduckgo.mobile.android.vpn.dao.VpnTrackerCompanyDao
-import com.duckduckgo.mobile.android.vpn.dao.VpnTrackerDao
-import com.duckduckgo.mobile.android.vpn.model.VpnState
-import com.duckduckgo.mobile.android.vpn.model.VpnStats
-import com.duckduckgo.mobile.android.vpn.model.VpnTracker
-import com.duckduckgo.mobile.android.vpn.model.VpnTrackerCompany
+import com.duckduckgo.mobile.android.vpn.dao.*
+import com.duckduckgo.mobile.android.vpn.model.*
 import com.duckduckgo.mobile.android.vpn.processor.tcp.tracker.TrackerListProvider
 import org.threeten.bp.OffsetDateTime
 import org.threeten.bp.format.DateTimeFormatter
@@ -39,7 +33,8 @@ import java.util.concurrent.Executors
         VpnState::class,
         VpnTracker::class,
         VpnTrackerCompany::class,
-        VpnStats::class
+        VpnRunningStats::class,
+        VpnDataStats::class
     ]
 )
 
@@ -49,7 +44,8 @@ abstract class VpnDatabase : RoomDatabase() {
     abstract fun vpnStateDao(): VpnStateDao
     abstract fun vpnTrackerDao(): VpnTrackerDao
     abstract fun vpnTrackerCompanyDao(): VpnTrackerCompanyDao
-    abstract fun vpnStatsDao(): VpnStatsDao
+    abstract fun vpnRunningStatsDao(): VpnRunningStatsDao
+    abstract fun vpnDataStatsDao(): VpnDataStatsDao
 
     companion object {
 
@@ -84,8 +80,8 @@ abstract class VpnDatabase : RoomDatabase() {
 
         private fun prepopulateUUID(context: Context) {
             val uuid = UUID.randomUUID().toString()
-            getInstance(context).vpnStateDao().insert(VpnState(uuid = uuid, isRunning = false))
-            Timber.w("VPNDatabase: UUID prepopulated as $uuid")
+            getInstance(context).vpnStateDao().insert(VpnState(uuid = uuid))
+            Timber.w("VPNDatabase: UUID pre-populated as $uuid")
         }
     }
 }

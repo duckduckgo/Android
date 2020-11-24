@@ -19,7 +19,6 @@ package com.duckduckgo.app.job
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.WorkManager
 import com.duckduckgo.app.job.VpnStatsReportingRequestBuilder.Companion.VPN_STATS_REPORTING_WORK_TAG
-import timber.log.Timber
 import javax.inject.Inject
 
 class VpnStatsReportingScheduler @Inject constructor(

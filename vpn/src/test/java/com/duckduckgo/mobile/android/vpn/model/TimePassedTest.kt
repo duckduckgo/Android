@@ -24,37 +24,37 @@ class TimePassedTest {
     @Test
     fun whenOnlyHoursPassedThenPrintsProperTime() {
         val timePassed = TimePassed(1, 0, 0)
-        assertEquals("1 hr", timePassed.toString())
+        assertEquals("1 hr 0 min 0 sec", timePassed.format())
     }
 
     @Test
     fun whenOnlyMinutesPassedThenPrintsProperTime() {
         val timePassed = TimePassed(0, 10, 0)
-        assertEquals("10 min", timePassed.toString())
+        assertEquals("0 hr 10 min 0 sec", timePassed.format())
     }
 
     @Test
     fun whenOnlySecondsPassedThenPrintsProperTime() {
         val timePassed = TimePassed(0, 0, 25)
-        assertEquals("25 sec", timePassed.toString())
+        assertEquals("0 hr 0 min 25 sec", timePassed.format())
     }
 
     @Test
     fun whenHoursAndMinutesPassedThenPrintsProperTime() {
         val timePassed = TimePassed(1, 10, 0)
-        assertEquals("1 hr 10 min", timePassed.toString())
+        assertEquals("1 hr 10 min 0 sec", timePassed.format())
     }
 
     @Test
     fun whenHoursAndSecondsPassedThenPrintsProperTime() {
         val timePassed = TimePassed(1, 0, 30)
-        assertEquals("1 hr", timePassed.toString())
+        assertEquals("1 hr 0 min 30 sec", timePassed.format())
     }
 
     @Test
     fun whenMinutesAndSecondsPassedThenPrintsProperTime() {
         val timePassed = TimePassed(0, 10, 10)
-        assertEquals("10 min", timePassed.toString())
+        assertEquals("0 hr 10 min 10 sec", timePassed.format())
     }
 
 }

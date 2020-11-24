@@ -24,8 +24,12 @@ import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.VPN_DATA_RECEIV
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.VPN_DATA_SENT
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.VPN_TIME_RUNNING
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.VPN_TRACKERS_BLOCKED
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.VPN_TRACKER_COMPANIES_BLOCKED
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.VPN_UUID
+import com.duckduckgo.mobile.android.vpn.model.dateOfPreviousMidnight
+import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
+import kotlinx.coroutines.flow.firstOrNull
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
@@ -55,26 +59,32 @@ class VpnStatsReportingWorker(context: Context, workerParams: WorkerParameters) 
     lateinit var vpnDatabase: VpnDatabase
 
     @Inject
+    lateinit var vpnRepository: AppTrackerBlockingStatsRepository
+
+    @Inject
     lateinit var pixel: Pixel
 
     override suspend fun doWork(): Result {
         Timber.i("VpnStatsReportingWorker running")
-        val current = vpnDatabase.vpnStatsDao().getCurrent()
-        return if (current != null) {
-            val params = mapOf(
-                VPN_TIME_RUNNING to current.timeRunning.toString(),
-                VPN_DATA_RECEIVED to current.dataReceived.toString(),
-                VPN_DATA_SENT to current.dataSent.toString(),
-                VPN_UUID to (vpnDatabase.vpnStateDao().getOneOff()?.uuid ?: "unknown"),
-                VPN_TRACKERS_BLOCKED to vpnDatabase.vpnTrackerDao().getTrackersByCompanyAfterSync(current.startedAt).size.toString()
-            )
-            pixel.fire(VPN_TESTERS_DAILY_REPORT, params)
-            Timber.i("Sending daily pixel report $params")
-            Result.success()
-        } else {
-            Timber.i("Daily pixel could not be sent, waiting for next schedule")
-            Result.success()
-        }
+        val midnight = dateOfPreviousMidnight()
+
+        val runningTimeMillis = vpnRepository.getRunningTimeMillis(midnight)
+        val trackers = vpnRepository.getVpnTrackers(midnight).firstOrNull() ?: emptyList()
+        val uuid = vpnRepository.getVpnState().uuid
+        val trackersByCompany = trackers.groupBy { it.trackerCompany.trackerCompanyId }
+        val dataTransferredStats = vpnRepository.getDataStats(midnight)
+
+        val params = mapOf(
+            VPN_UUID to uuid,
+            VPN_TIME_RUNNING to TimeUnit.MILLISECONDS.toSeconds(runningTimeMillis).toString(),
+            VPN_DATA_RECEIVED to dataTransferredStats.received.dataSize.toString(),
+            VPN_DATA_SENT to dataTransferredStats.sent.dataSize.toString(),
+            VPN_TRACKERS_BLOCKED to trackers.size.toString(),
+            VPN_TRACKER_COMPANIES_BLOCKED to trackersByCompany.size.toString()
+        )
+        pixel.fire(VPN_TESTERS_DAILY_REPORT, params)
+        Timber.i("Sending daily pixel report $params")
+        return Result.success()
     }
 
 }

@@ -19,18 +19,26 @@ package com.duckduckgo.mobile.android.vpn.stats
 import androidx.room.Room
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.mobile.android.vpn.VpnCoroutineTestRule
-import com.duckduckgo.mobile.android.vpn.dao.VpnStatsDao
-import com.duckduckgo.mobile.android.vpn.model.VpnStats
+import com.duckduckgo.mobile.android.vpn.dao.VpnRunningStatsDao
+import com.duckduckgo.mobile.android.vpn.dao.VpnTrackerCompanyDao
+import com.duckduckgo.mobile.android.vpn.dao.VpnTrackerDao
+import com.duckduckgo.mobile.android.vpn.model.VpnTracker
+import com.duckduckgo.mobile.android.vpn.model.VpnTrackerAndCompany
+import com.duckduckgo.mobile.android.vpn.model.VpnTrackerCompany
+import com.duckduckgo.mobile.android.vpn.model.dateOfPreviousMidnight
+import com.duckduckgo.mobile.android.vpn.processor.tcp.tracker.TrackerListProvider.Companion.UNDEFINED_TRACKER_COMPANY
+import com.duckduckgo.mobile.android.vpn.store.DatabaseDateFormatter.Companion.bucketByHour
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
 import com.jakewharton.threetenabp.AndroidThreeTen
-import junit.framework.TestCase.assertTrue
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.runBlocking
 import org.junit.After
+import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import org.threeten.bp.OffsetDateTime
-import org.threeten.bp.temporal.ChronoUnit
+import org.threeten.bp.LocalDateTime
 
 @ExperimentalCoroutinesApi
 class AppTrackerBlockingStatsRepositoryTest {
@@ -40,7 +48,9 @@ class AppTrackerBlockingStatsRepositoryTest {
     val coroutineRule = VpnCoroutineTestRule()
 
     private lateinit var db: VpnDatabase
-    private lateinit var vpnStatsDao: VpnStatsDao
+    private lateinit var vpnRunningStatsDao: VpnRunningStatsDao
+    private lateinit var vpnTrackerDao: VpnTrackerDao
+    private lateinit var vpnTrackerCompanyDao: VpnTrackerCompanyDao
     private lateinit var repository: AppTrackerBlockingStatsRepository
 
     @Before
@@ -49,8 +59,12 @@ class AppTrackerBlockingStatsRepositoryTest {
         db = Room.inMemoryDatabaseBuilder(InstrumentationRegistry.getInstrumentation().targetContext, VpnDatabase::class.java)
             .allowMainThreadQueries()
             .build()
-        vpnStatsDao = db.vpnStatsDao()
+        vpnRunningStatsDao = db.vpnRunningStatsDao()
+        vpnTrackerDao = db.vpnTrackerDao()
+        vpnTrackerCompanyDao = db.vpnTrackerCompanyDao()
         repository = AppTrackerBlockingStatsRepository(db)
+
+        vpnTrackerCompanyDao.insert(VpnTrackerCompany(UNDEFINED_TRACKER_COMPANY.trackerCompanyId, UNDEFINED_TRACKER_COMPANY.company))
     }
 
     @After
@@ -59,37 +73,101 @@ class AppTrackerBlockingStatsRepositoryTest {
     }
 
     @Test
-    fun whenCompletedConnectionThenTotalTimeRunningIsCalculated() {
-        givenConnection(OffsetDateTime.now().minusHours(3), OffsetDateTime.now().minusHours(2))
-
-        val connections = whenConnectionStatsAreReturned()
-        assertTrue(connections.timeRunning in 3600000..3600999)
+    fun whenSingleTrackerEntryAddedForTodayBucketThenBlockerReturned() = runBlocking {
+        val trackerDomain = "example.com"
+        trackerFound(trackerDomain)
+        val vpnTrackers = repository.getVpnTrackers(dateOfPreviousMidnightAsString()).firstOrNull()
+        assertTrackerFound(vpnTrackers, trackerDomain)
+        assertEquals(1, vpnTrackers!!.size)
     }
 
     @Test
-    fun whenConnectionNotCompletedYetThenTimeRunningIsCalculated() {
-        givenConnection(OffsetDateTime.now().minusHours(3), OffsetDateTime.now().plusHours(2))
-
-        val connections = whenConnectionStatsAreReturned()
-        assertTrue(connections.timeRunning in 18000000..18000999)
+    fun whenSameTrackerFoundMultipleTimesTodayThenAllInstancesOfBlockerReturned() = runBlocking {
+        val trackerDomain = "example.com"
+        trackerFound(trackerDomain)
+        trackerFound(trackerDomain)
+        val vpnTrackers = repository.getVpnTrackers(dateOfPreviousMidnightAsString()).firstOrNull()
+        assertTrackerFound(vpnTrackers, trackerDomain)
+        assertEquals(2, vpnTrackers!!.size)
     }
 
     @Test
-    fun whenConnectionsCompletedAndVpnStillRunningThenTimeRunningIsCalculated() {
-        givenConnection(OffsetDateTime.now().minusHours(6), OffsetDateTime.now().minusHours(4))
-
-        val connections = whenConnectionStatsAreReturned()
-        assertTrue(connections.timeRunning in 7200000..7200099)
+    fun whenTrackerFoundBeforeTodayThenNotReturned() = runBlocking {
+        trackerFoundYesterday()
+        val vpnTrackers = repository.getVpnTrackers(dateOfPreviousMidnightAsString()).firstOrNull()
+        assertNoTrackers(vpnTrackers)
     }
 
-    private fun whenConnectionStatsAreReturned(): VpnStats {
-        return repository.getConnectionStats()!!
+    @Test
+    fun whenSingleRunningTimeRecordedTodayThenThatTimeIsReturned() = runBlocking {
+        val midnight = dateOfPreviousMidnightAsString()
+        vpnRunningStatsDao.upsert(timeRunningMillis = 10, midnight)
+        assertEquals(10, repository.getRunningTimeMillis(midnight))
     }
 
-    private fun givenConnection(startedAt: OffsetDateTime, finishedAt: OffsetDateTime) {
-        val timeRunning = startedAt.until(finishedAt, ChronoUnit.MILLIS)
-        val vpnStats = VpnStats(0, startedAt, finishedAt, timeRunning, 0, 0, 0, 0)
-        vpnStatsDao.insert(vpnStats)
+    @Test
+    fun whenMultipleRunningTimesRecordedTodayThenTotalTimeIsReturned() = runBlocking {
+        val midnight = dateOfPreviousMidnight()
+        vpnRunningStatsDao.upsert(timeRunningMillis = 10, bucketByHour(midnight))
+        vpnRunningStatsDao.upsert(timeRunningMillis = 20, bucketByHour(midnight.plusMinutes(5)))
+        vpnRunningStatsDao.upsert(timeRunningMillis = 30, bucketByHour(midnight.plusMinutes(10)))
+        assertEquals(60, repository.getRunningTimeMillis(bucketByHour(midnight)))
     }
 
+    @Test
+    fun whenRunningTimeRecordedYesterdayThenPreviousEventNoCounted() = runBlocking {
+        val midnight = dateOfPreviousMidnight()
+        vpnRunningStatsDao.upsert(timeRunningMillis = 10, bucketByHour(midnight))
+        vpnRunningStatsDao.upsert(timeRunningMillis = 20, bucketByHour(midnight.plusMinutes(5)))
+        vpnRunningStatsDao.upsert(timeRunningMillis = 30, bucketByHour(midnight.plusMinutes(10)))
+        vpnRunningStatsDao.upsert(timeRunningMillis = 30, bucketByHour(midnight.minusMinutes(5)))
+        assertEquals(60, repository.getRunningTimeMillis(bucketByHour(midnight)))
+    }
+
+    private fun dateOfPreviousMidnight(): LocalDateTime {
+        return LocalDateTime.now().toLocalDate().atStartOfDay()
+    }
+
+    private fun dateOfPreviousMidnightAsString(): String {
+        val midnight = LocalDateTime.now().toLocalDate().atStartOfDay()
+        return bucketByHour(midnight)
+    }
+
+    private fun trackerFoundYesterday(trackerDomain: String = "example.com") {
+        trackerFound(trackerDomain, timestamp = yesterday())
+    }
+
+    private fun trackerFound(
+        domain: String = "example.com",
+        trackerCompanyId: Int = UNDEFINED_TRACKER_COMPANY.trackerCompanyId,
+        timestamp: String = bucketByHour()
+    ) {
+        val tracker = VpnTracker(trackerCompanyId = trackerCompanyId, domain = domain, timestamp = timestamp)
+        vpnTrackerDao.insert(tracker)
+    }
+
+    private fun assertNoTrackers(vpnTrackers: List<VpnTrackerAndCompany>?) {
+        assertNotNull(vpnTrackers)
+        assertTrue(vpnTrackers!!.isEmpty())
+    }
+
+    private fun yesterday(): String {
+        val now = LocalDateTime.now()
+        val yesterday = now.minusDays(1)
+        return bucketByHour(yesterday)
+    }
+
+    private fun assertTrackerFound(vpnTrackers: List<VpnTrackerAndCompany>?, trackerDomain: String) {
+        assertFalse(vpnTrackers.isNullOrEmpty())
+        assertTrue(isTrackerInList(vpnTrackers, trackerDomain))
+    }
+
+    private fun isTrackerInList(vpnTrackers: List<VpnTrackerAndCompany>?, trackerDomain: String): Boolean {
+        vpnTrackers!!.forEach {
+            if (it.tracker.domain == trackerDomain) {
+                return true
+            }
+        }
+        return false
+    }
 }

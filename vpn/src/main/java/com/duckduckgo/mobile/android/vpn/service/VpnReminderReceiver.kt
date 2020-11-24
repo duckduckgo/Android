@@ -20,7 +20,6 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import androidx.core.app.NotificationManagerCompat
-import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
 import com.duckduckgo.mobile.android.vpn.ui.notification.VpnNotificationBuilder
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.GlobalScope
@@ -35,8 +34,8 @@ class VpnReminderReceiver : BroadcastReceiver() {
             Timber.v("Checking if VPN is running")
 
             goAsync {
-                val vpnDatabase = VpnDatabase.getInstance(context)
-                if (vpnDatabase.vpnStateDao().getOneOff()?.isRunning == true) {
+
+                if (TrackerBlockingVpnService.isServiceRunning(context)) {
                     Timber.v("Vpn is already running, nothing to show")
                 } else {
                     Timber.v("Vpn is not running, showing reminder notification")

@@ -16,22 +16,25 @@
 
 package com.duckduckgo.mobile.android.vpn.store
 
-import javax.inject.Inject
+import org.junit.Assert.assertEquals
+import org.junit.Test
+import org.threeten.bp.LocalDateTime
 
-interface PacketPersister {
-    fun persistDataSent(packetLength: Int)
-    fun persistDataReceived(packetLength: Int)
-}
+class DatabaseDateFormatterTest {
 
-class RoomPacketPersister @Inject constructor(
-    val vpnDatabase: VpnDatabase
-) : PacketPersister {
-
-    override fun persistDataSent(packetLength: Int) {
-        vpnDatabase.vpnDataStatsDao().upsertDataSent(packetLength)
+    @Test
+    fun whenBucketingByHourOnlyHourlyPrecisionIsUsed() {
+        val formatted = DatabaseDateFormatter.bucketByHour(fixedTime())
+        assertEquals("2020-12-25T13", formatted)
     }
 
-    override fun persistDataReceived(packetLength: Int) {
-        vpnDatabase.vpnDataStatsDao().upsertDataReceived(packetLength)
+    @Test
+    fun whenBucketingByTimestampOnlySecondsPrecisionIsUsed() {
+        val formatted = DatabaseDateFormatter.timestamp(fixedTime())
+        assertEquals("2020-12-25T13:14:15", formatted)
+    }
+
+    private fun fixedTime(): LocalDateTime {
+        return LocalDateTime.of(2020, 12, 25, 13, 14, 15, 16)
     }
 }

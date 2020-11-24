@@ -25,4 +25,17 @@
     <string name="vpnTrackerCompaniesNone">"No tracker companies blocked yet"</string>
     <string name="vpnTrackersBlocked">Trackers blocked: %d</string>
     <string name="vpnTrackersNone">"No trackers blocked yet"</string>
+    <string name="vpnNotRunYet">"VPN hasn't been run yet"</string>
+    <string name="vpnDataTransferred">"%s\n%s packets"</string>
+
+    <plurals name="company">
+        <item quantity="one">%d company</item>
+        <item quantity="other">%d companies</item>
+    </plurals>
+
+    <plurals name="tracker">
+        <item quantity="one">%d tracker</item>
+        <item quantity="other">%d trackers</item>
+    </plurals>
+    <string name="vpnNotificationTrackersFoundUpdate">"Today, so far we blocked %s from tracking you; the last one was %s. %s in total."</string>
 </resources>

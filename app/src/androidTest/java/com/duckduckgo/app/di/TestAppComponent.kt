@@ -73,7 +73,8 @@ import javax.inject.Singleton
         FileModule::class,
         UncaughtExceptionModule::class,
         PlayStoreReferralModule::class,
-        CoroutinesModule::class
+        CoroutinesModule::class,
+        FormatterModule::class
     ]
 )
 interface TestAppComponent : AppComponent {

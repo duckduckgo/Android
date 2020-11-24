@@ -24,7 +24,6 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.OnLifecycleEvent
 import androidx.lifecycle.ProcessLifecycleOwner
-import androidx.work.WorkManager
 import com.duckduckgo.app.browser.BuildConfig
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserObserver
 import com.duckduckgo.app.browser.shortcut.ShortcutBuilder
@@ -237,7 +236,7 @@ open class DuckDuckGoApplication : HasAndroidInjector, Application(), LifecycleO
         return this.endsWith(":vpn")
     }
 
-    // vtodo Temporary inclusion of Firebase while in internal testing
+    // vtodo Revisit this strategy of detecting if the current process is the VPN as it is hacky
     @SuppressLint("DiscouragedPrivateApi", "PrivateApi")
     private fun processName(): String {
         if (Build.VERSION.SDK_INT >= 28) {

@@ -31,6 +31,7 @@ import com.duckduckgo.app.notification.model.PrivacyProtectionNotification
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.api.OfflinePixelSender
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
 import dagger.Module
 import dagger.Provides
@@ -63,20 +64,22 @@ class WorkerModule {
         privacyProtectionNotification: PrivacyProtectionNotification,
         configurationDownloader: ConfigurationDownloader,
         vpnDatabase: VpnDatabase,
+        vpnRepository: AppTrackerBlockingStatsRepository,
         pixel: Pixel
     ): WorkerFactory {
         return DaggerWorkerFactory(
-            offlinePixelSender,
-            settingsDataStore,
-            clearDataAction,
-            notificationManager,
-            notificationDao,
-            notificationFactory,
-            clearDataNotification,
-            privacyProtectionNotification,
-            configurationDownloader,
-            vpnDatabase,
-            pixel
+            offlinePixelSender = offlinePixelSender,
+            settingsDataStore = settingsDataStore,
+            clearDataAction = clearDataAction,
+            notificationManager = notificationManager,
+            notificationDao = notificationDao,
+            notificationFactory = notificationFactory,
+            clearDataNotification = clearDataNotification,
+            privacyProtectionNotification = privacyProtectionNotification,
+            configurationDownloader = configurationDownloader,
+            vpnDatabase = vpnDatabase,
+            vpnRepository = vpnRepository,
+            pixel = pixel
         )
     }
 }

@@ -14,20 +14,22 @@
  * limitations under the License.
  */
 
+@file:Suppress("EXPERIMENTAL_FEATURE_WARNING")
+
 package com.duckduckgo.mobile.android.vpn.model
 
 import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import androidx.room.Relation
-import org.threeten.bp.OffsetDateTime
+import com.duckduckgo.mobile.android.vpn.store.DatabaseDateFormatter
 
 @Entity(tableName = "vpn_tracker")
 data class VpnTracker(
     @PrimaryKey(autoGenerate = true) val trackerId: Int = 0,
     val trackerCompanyId: Int,
     val domain: String,
-    val timestamp: OffsetDateTime
+    val timestamp: String = DatabaseDateFormatter.timestamp()
 )
 
 @Entity(tableName = "vpn_tracker_company")
@@ -47,28 +49,21 @@ data class VpnTrackerAndCompany(
 
 @Entity(tableName = "vpn_state")
 data class VpnState(
-    @PrimaryKey
-    val id: Long = 1,
-    val uuid: String,
-    val isRunning: Boolean
+    @PrimaryKey val id: Long = 1,
+    val uuid: String
 )
 
-@Entity
-data class VpnStateUpdate(
-    @PrimaryKey
-    val id: Long = 1,
-    val isRunning: Boolean
+@Entity(tableName = "vpn_data_stats")
+data class VpnDataStats(
+    @PrimaryKey val id: String = DatabaseDateFormatter.bucketByHour(),
+    val dataSent: Long = 0,
+    val dataReceived: Long = 0,
+    val packetsSent: Int = 0,
+    val packetsReceived: Int = 0
 )
 
-@Entity(tableName = "vpn_stats")
-data class VpnStats(
-    @PrimaryKey
-    val id: Long,
-    val startedAt: OffsetDateTime,
-    val lastUpdated: OffsetDateTime,
-    val timeRunning: Long,
-    val dataSent: Long,
-    val dataReceived: Long,
-    val packetsSent: Int,
-    val packetsReceived: Int
+@Entity(tableName = "vpn_running_stats")
+data class VpnRunningStats(
+    @PrimaryKey val id: String,
+    val timeRunningMillis: Long
 )

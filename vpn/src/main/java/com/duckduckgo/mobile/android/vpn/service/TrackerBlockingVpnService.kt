@@ -27,11 +27,8 @@ import android.content.pm.PackageManager
 import android.net.VpnService
 import android.os.*
 import androidx.core.app.NotificationManagerCompat
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.Observer
-import com.duckduckgo.mobile.android.vpn.model.VpnStateUpdate
-import com.duckduckgo.mobile.android.vpn.model.VpnStats
 import com.duckduckgo.mobile.android.vpn.model.VpnTrackerAndCompany
+import com.duckduckgo.mobile.android.vpn.model.dateOfPreviousMidnight
 import com.duckduckgo.mobile.android.vpn.processor.TunPacketReader
 import com.duckduckgo.mobile.android.vpn.processor.TunPacketWriter
 import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpPacketProcessor
@@ -41,16 +38,17 @@ import com.duckduckgo.mobile.android.vpn.processor.udp.UdpPacketProcessor
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
 import com.duckduckgo.mobile.android.vpn.store.PacketPersister
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
-import com.duckduckgo.mobile.android.vpn.ui.notification.VpnNotificationBuilder
+import com.duckduckgo.mobile.android.vpn.ui.notification.VpnNotificationBuilder.Companion.buildPersistentNotification
 import dagger.android.AndroidInjection
 import kotlinx.coroutines.*
-import org.threeten.bp.OffsetDateTime
-import org.threeten.bp.temporal.ChronoUnit
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.firstOrNull
 import timber.log.Timber
 import xyz.hexene.localvpn.Packet
 import java.nio.ByteBuffer
 import java.nio.channels.DatagramChannel
 import java.nio.channels.SocketChannel
+import java.util.*
 import java.util.concurrent.*
 import javax.inject.Inject
 
@@ -77,15 +75,18 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
     private val queues = VpnQueues()
 
     private var tunInterface: ParcelFileDescriptor? = null
+
     private val binder: VpnServiceBinder = VpnServiceBinder()
 
     lateinit var udpPacketProcessor: UdpPacketProcessor
-    lateinit var tcpPacketProcessor: TcpPacketProcessor
 
+    lateinit var tcpPacketProcessor: TcpPacketProcessor
     private var executorService: ExecutorService? = null
 
-    private lateinit var trackersBlocked: LiveData<List<VpnTrackerAndCompany>>
-    private val trackersBlockedObserver = Observer<List<VpnTrackerAndCompany>> { onNewTrackerBlocked(it) }
+    private var newTrackerObserverJob: Job? = null
+    private var timeRunningTrackerJob: Job? = null
+
+    private var lastSavedTimestamp = 0L
 
     inner class VpnServiceBinder : Binder() {
 
@@ -126,7 +127,6 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
 
     override fun onDestroy() {
         Timber.i("VPN onDestroy")
-        safelyRemoveTrackersObserver()
         notifyVpnStopped()
         super.onDestroy()
     }
@@ -175,8 +175,9 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
         }
     }
 
-    private fun onNewTrackerBlocked(trackersBlocked: List<VpnTrackerAndCompany>) {
-        val notification = VpnNotificationBuilder.buildPersistentNotification(this, trackersBlocked)
+    private fun updateNotificationForNewTrackerFound(trackersBlocked: List<VpnTrackerAndCompany>) {
+        val trackerCompanies = trackersBlocked.groupBy { it.trackerCompany.trackerCompanyId }.size
+        val notification = buildPersistentNotification(this, trackersBlocked, trackerCompanies)
         notificationManager.notify(FOREGROUND_VPN_SERVICE_ID, notification)
     }
 
@@ -248,7 +249,6 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
     private fun stopVpn() {
         Timber.i("Stopping VPN")
         notifyVpnStopped()
-        safelyRemoveTrackersObserver()
 
         tickerJob?.cancel()
         queues.clearAll()
@@ -260,14 +260,6 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
 
         stopForeground(true)
         stopSelf()
-    }
-
-    private fun safelyRemoveTrackersObserver() {
-        if (::trackersBlocked.isInitialized) {
-            if (trackersBlocked.hasActiveObservers()) {
-                trackersBlocked.removeObserver(trackersBlockedObserver)
-            }
-        }
     }
 
     private fun VpnService.Builder.configureMeteredConnection() {
@@ -283,48 +275,48 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
     }
 
     private fun notifyVpnStart() {
-        launch {
-            withContext(Dispatchers.IO) {
-                val currentStats = vpnDatabase.vpnStatsDao().getCurrent()
-                if (currentStats == null) {
-                    vpnDatabase.vpnStatsDao().insert(
-                        VpnStats(
-                            id = 0,
-                            startedAt = OffsetDateTime.now(),
-                            lastUpdated = OffsetDateTime.now(),
-                            timeRunning = 0,
-                            dataSent = 0,
-                            dataReceived = 0,
-                            packetsSent = 0,
-                            packetsReceived = 0
-                        )
-                    )
-                    Timber.w("VPN: First ever start at ${OffsetDateTime.now()}")
-                } else {
-                    vpnDatabase.vpnStatsDao().updateLastUpdated(OffsetDateTime.now(), currentStats.id)
-                    Timber.w("VPN: started at ${OffsetDateTime.now()}")
-                }
-                vpnDatabase.vpnStateDao().update(VpnStateUpdate(isRunning = true))
+        timeRunningTrackerJob?.cancel()
+        timeRunningTrackerJob = launch(Dispatchers.Default) {
+            // write initial time immediately once
+            writeRunningTimeToDatabase(timeSinceLastRunningTimeSave())
+
+            // update running time regularly with specified intervals
+            while (isActive) {
+                delay(1_000)
+                writeRunningTimeToDatabase(timeSinceLastRunningTimeSave())
             }
-
-            trackersBlocked = withContext(Dispatchers.IO) { repository.getTodaysTrackersBlocked() }
-            trackersBlocked.observeForever(trackersBlockedObserver)
-
-            val trackersBlocked = withContext(Dispatchers.IO) { repository.getTodaysTrackersBlockedSync() }
-            startForeground(FOREGROUND_VPN_SERVICE_ID, VpnNotificationBuilder.buildPersistentNotification(applicationContext, trackersBlocked))
         }
+
+        launch(Dispatchers.IO) {
+            val trackers = repository.getVpnTrackers(dateOfPreviousMidnight()).firstOrNull() ?: emptyList()
+            val trackersByCompany = trackers.groupBy { it.trackerCompany.trackerCompanyId }.size
+            startForeground(FOREGROUND_VPN_SERVICE_ID, buildPersistentNotification(applicationContext, trackers, trackersByCompany))
+        }
+
+        newTrackerObserverJob = launch {
+            repository.getVpnTrackers(dateOfPreviousMidnight()).collectLatest {
+                Timber.i("Got new tracker. Now have blocked ${it.size} trackers")
+                updateNotificationForNewTrackerFound(it)
+            }
+        }
+
+    }
+
+    private fun timeSinceLastRunningTimeSave(): Long {
+        val timeNow = SystemClock.elapsedRealtime()
+        return if (lastSavedTimestamp == 0L) 0 else timeNow - lastSavedTimestamp
     }
 
     private fun notifyVpnStopped() {
-        launch(Dispatchers.IO) {
-            vpnDatabase.vpnStateDao().update(VpnStateUpdate(isRunning = false))
-            val currentStats = vpnDatabase.vpnStatsDao().getCurrent()
-            currentStats?.let {
-                val lastStart = currentStats.lastUpdated
-                val timeRunning = lastStart.until(OffsetDateTime.now(), ChronoUnit.MILLIS)
-                vpnDatabase.vpnStatsDao().updateTimeRunning(timeRunning, OffsetDateTime.now(), currentStats.id)
-                Timber.w("VPN: stopped after $timeRunning millis running")
-            }
+        timeRunningTrackerJob?.cancel()
+        newTrackerObserverJob?.cancel()
+        launch { writeRunningTimeToDatabase(timeSinceLastRunningTimeSave()) }
+    }
+
+    private suspend fun writeRunningTimeToDatabase(runningTimeSinceLastSaveMillis: Long) {
+        withContext(Dispatchers.IO) {
+            vpnDatabase.vpnRunningStatsDao().upsert(runningTimeSinceLastSaveMillis)
+            lastSavedTimestamp = SystemClock.elapsedRealtime()
         }
     }
 
@@ -333,7 +325,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
         const val ACTION_VPN_REMINDER = "com.duckduckgo.vpn.internaltesters.reminder"
         const val VPN_REMINDER_NOTIFICATION_ID = 999
 
-        fun serviceIntent(context: Context): Intent {
+        private fun serviceIntent(context: Context): Intent {
             return Intent(context, TrackerBlockingVpnService::class.java)
         }
 

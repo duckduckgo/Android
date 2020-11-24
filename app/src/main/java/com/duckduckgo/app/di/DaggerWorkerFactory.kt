@@ -36,6 +36,7 @@ import com.duckduckgo.app.statistics.api.OfflinePixelScheduler
 import com.duckduckgo.app.statistics.api.OfflinePixelSender
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.job.VpnStatsReportingWorker
+import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
 import timber.log.Timber
 
@@ -50,6 +51,7 @@ class DaggerWorkerFactory(
     private val privacyProtectionNotification: PrivacyProtectionNotification,
     private val configurationDownloader: ConfigurationDownloader,
     private val vpnDatabase: VpnDatabase,
+    private val vpnRepository: AppTrackerBlockingStatsRepository,
     private val pixel: Pixel
 ) : WorkerFactory() {
 
@@ -109,6 +111,7 @@ class DaggerWorkerFactory(
 
     private fun injectVpnStatsPixelSendingWorker(worker: VpnStatsReportingWorker) {
         worker.vpnDatabase = vpnDatabase
+        worker.vpnRepository = vpnRepository
         worker.pixel = pixel
     }
 

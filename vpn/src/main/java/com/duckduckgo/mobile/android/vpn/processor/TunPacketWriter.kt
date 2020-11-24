@@ -18,7 +18,6 @@ package com.duckduckgo.mobile.android.vpn.processor
 
 import android.os.ParcelFileDescriptor
 import com.duckduckgo.mobile.android.vpn.service.VpnQueues
-import com.google.firebase.perf.metrics.AddTrace
 import timber.log.Timber
 import xyz.hexene.localvpn.ByteBufferPool
 import java.io.FileOutputStream
@@ -29,7 +28,6 @@ class TunPacketWriter(private val tunInterface: ParcelFileDescriptor, private va
 
     private var running = false
 
-    @AddTrace(name = "tun_writer_write", enabled = true)
     override fun run() {
         Timber.w("TunPacketWriter started")
 

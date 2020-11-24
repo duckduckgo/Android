@@ -249,6 +249,7 @@ interface Pixel {
         const val VPN_DATA_SENT = "ds"
         const val VPN_UUID = "id"
         const val VPN_TRACKERS_BLOCKED = "tb"
+        const val VPN_TRACKER_COMPANIES_BLOCKED = "tc"
     }
 
     object PixelValues {
