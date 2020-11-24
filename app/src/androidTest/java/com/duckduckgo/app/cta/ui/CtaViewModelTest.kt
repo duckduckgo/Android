@@ -418,7 +418,7 @@ class CtaViewModelTest {
         givenDaxOnboardingActive()
         val site = site(url = "http://www.facebook.com", entity = TestEntity("Facebook", "Facebook", 9.0))
         val expectedCtaText = context.resources.getString(
-            R.string.daxMainNetworkOwnedCtaText,
+            R.string.daxMainNetworkCtaText,
             "Facebook",
             "facebook.com",
             "Facebook"
