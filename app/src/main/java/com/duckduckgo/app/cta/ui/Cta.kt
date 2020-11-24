@@ -16,7 +16,6 @@
 
 package com.duckduckgo.app.cta.ui
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.net.Uri
 import android.view.View
