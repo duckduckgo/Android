@@ -16,15 +16,18 @@
 
 package com.duckduckgo.app.cta.ui
 
+import android.content.Context
 import android.net.Uri
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.room.Room
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.InstantSchedulersRule
+import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.cta.db.DismissedCtaDao
 import com.duckduckgo.app.cta.model.CtaId
 import com.duckduckgo.app.cta.model.DismissedCta
+import com.duckduckgo.app.global.baseHost
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.global.events.db.UserEventEntity
 import com.duckduckgo.app.global.events.db.UserEventKey
@@ -143,10 +146,11 @@ class CtaViewModelTest {
 
     private lateinit var testee: CtaViewModel
 
+    val context: Context = InstrumentationRegistry.getInstrumentation().targetContext
+
     @Before
     fun before() {
         MockitoAnnotations.initMocks(this)
-        val context = InstrumentationRegistry.getInstrumentation().targetContext
         db = Room.inMemoryDatabaseBuilder(context, AppDatabase::class.java)
             .allowMainThreadQueries()
             .build()
@@ -410,12 +414,36 @@ class CtaViewModelTest {
     }
 
     @Test
-    fun whenRefreshCtaWhileBrowsingThenReturnNetworkCta() = coroutineRule.runBlocking {
+    fun whenRefreshCtaWhileBrowsingMajorTrackerSiteThenReturnNetworkCta() = coroutineRule.runBlocking {
         givenDaxOnboardingActive()
         val site = site(url = "http://www.facebook.com", entity = TestEntity("Facebook", "Facebook", 9.0))
-        val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = true, site = site)
+        val expectedCtaText = context.resources.getString(
+            R.string.daxMainNetworkOwnedCtaText,
+            "Facebook",
+            "facebook.com",
+            "Facebook"
+        )
+
+        val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = true, site = site) as DaxDialogCta
 
         assertTrue(value is DaxDialogCta.DaxMainNetworkCta)
+        assertEquals(expectedCtaText, value.getDaxText(context))
+    }
+
+    @Test
+    fun whenRefreshCtaWhileBrowsingOnSiteOwnedByMajorTrackerThenReturnNetworkCta() = coroutineRule.runBlocking {
+        givenDaxOnboardingActive()
+        val site = site(url = "http://m.instagram.com", entity = TestEntity("Facebook", "Facebook", 9.0))
+        val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = true, site = site) as DaxDialogCta
+        val expectedCtaText = context.resources.getString(
+            R.string.daxMainNetworkOwnedCtaText,
+            "Facebook",
+            "instagram.com",
+            "Facebook"
+        )
+
+        assertTrue(value is DaxDialogCta.DaxMainNetworkCta)
+        assertEquals(expectedCtaText, value.getDaxText(context))
     }
 
     @Test

@@ -203,7 +203,7 @@ sealed class DaxDialogCta(
         private val siteHost: String
     ) : DaxDialogCta(
         CtaId.DAX_DIALOG_NETWORK,
-        R.string.daxMainNetworkCtaText,
+        R.string.daxMainNetworkOwnedCtaText,
         R.string.daxDialogGotIt,
         Pixel.PixelName.ONBOARDING_DAX_CTA_SHOWN,
         Pixel.PixelName.ONBOARDING_DAX_CTA_OK_BUTTON,
@@ -212,29 +212,17 @@ sealed class DaxDialogCta(
         onboardingStore,
         appInstallStore
     ) {
-
-        @SuppressLint("StringFormatMatches")
-        @ExperimentalStdlibApi
         override fun getDaxText(context: Context): String {
-            val percentage = networkPropertyPercentages[network]
-
-            return if (isFromSameNetworkDomain()) {
-                context.resources.getString(R.string.daxMainNetworkCtaText, network, percentage, network)
-            } else {
-                context.resources.getString(
-                    R.string.daxMainNetworkOwnedCtaText,
-                    network,
-                    Uri.parse(siteHost).baseHost?.removePrefix("m."),
-                    network
-                )
-            }
+            return context.resources.getString(
+                description,
+                network,
+                Uri.parse(siteHost).baseHost?.removePrefix("m."),
+                network
+            )
         }
 
-        @ExperimentalStdlibApi
         override fun createCta(activity: FragmentActivity): DaxDialog =
             TypewriterDaxDialog.newInstance(daxText = getDaxText(activity), primaryButtonText = activity.resources.getString(okButton))
-
-        private fun isFromSameNetworkDomain(): Boolean = mainTrackerDomains.any { siteHost.contains(it) }
     }
 
     class DaxNoSerpCta(override val onboardingStore: OnboardingStore, override val appInstallStore: AppInstallStore) : DaxDialogCta(
