@@ -118,6 +118,13 @@ class UserAgentProviderTest {
         assertTrue("$actual does not match expected regex", ValidationRegex.converted.matches(actual))
     }
 
+    @Test
+    fun whenUserAgentIsForASiteThatShouldUseDesktopAgentThenReturnDesktopUserAgent() {
+        testee = UserAgentProvider(Agent.DEFAULT, deviceInfo)
+        val actual = testee.userAgent("m.facebook.com")
+        assertTrue("$actual does not match expected regex", ValidationRegex.desktop.matches(actual))
+    }
+
     companion object {
         const val DOMAIN = "example.com"
         const val NO_APPLICATION_DOMAIN = "cvs.com"

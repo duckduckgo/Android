@@ -41,7 +41,7 @@ class UserAgentProvider constructor(private val defaultUserAgent: String, privat
     }
 
     /**
-     * Returns, our custom UA, including our application componet before Safari
+     * Returns, our custom UA, including our application component before Safari
      *
      * Modifies UA string to omits the user's device make and model and drops components that may casue breakages
      * If the user is requesting a desktop site, we add generic X11 Linux indicator, but include the real architecture
@@ -54,8 +54,9 @@ class UserAgentProvider constructor(private val defaultUserAgent: String, privat
 
         val omitApplicationComponent = if (host != null) sitesThatOmitApplication.any { UriString.sameOrSubdomain(host, it) } else false
         val omitVersionComponent = if (host != null) sitesThatOmitVersion.any { UriString.sameOrSubdomain(host, it) } else false
+        val shouldUseDesktopAgent = if (host != null) sitesThatShouldUseDesktopAgent.any { UriString.sameOrSubdomain(host, it) } else false
 
-        var prefix = if (isDesktop) baseDesktopAgent else baseAgent
+        var prefix = if (isDesktop || shouldUseDesktopAgent) baseDesktopAgent else baseAgent
         if (omitVersionComponent) {
             prefix = prefix.replace(AgentRegex.version, "")
         }
@@ -105,6 +106,10 @@ class UserAgentProvider constructor(private val defaultUserAgent: String, privat
         val sitesThatOmitVersion = listOf(
             "ing.nl",
             "chase.com"
+        )
+
+        val sitesThatShouldUseDesktopAgent = listOf(
+            "m.facebook.com"
         )
     }
 }
