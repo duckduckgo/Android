@@ -62,11 +62,8 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runBlockingTest
-import org.junit.After
+import org.junit.*
 import org.junit.Assert.*
-import org.junit.Before
-import org.junit.Rule
-import org.junit.Test
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations
 import java.util.*
@@ -126,8 +123,6 @@ class CtaViewModelTest {
     @Mock
     private lateinit var mockTabRepository: TabRepository
 
-    private val dismissedCtaDaoChannel = Channel<List<DismissedCta>>()
-
     private val requiredDaxOnboardingCtas: List<CtaId> = listOf(
         CtaId.DAX_INTRO,
         CtaId.DAX_DIALOG_SERP,
@@ -149,7 +144,7 @@ class CtaViewModelTest {
 
         whenever(mockAppInstallStore.installTimestamp).thenReturn(System.currentTimeMillis() - TimeUnit.DAYS.toMillis(1))
         whenever(mockUserWhitelistDao.contains(any())).thenReturn(false)
-        whenever(mockDismissedCtaDao.dismissedCtas()).thenReturn(dismissedCtaDaoChannel.consumeAsFlow())
+        whenever(mockDismissedCtaDao.dismissedCtas()).thenReturn(db.dismissedCtaDao().dismissedCtas())
         whenever(mockTabRepository.flowTabs).thenReturn(db.tabsDao().flowTabs())
         givenControlGroup()
 
@@ -173,7 +168,6 @@ class CtaViewModelTest {
 
     @After
     fun after() {
-        dismissedCtaDaoChannel.close()
         db.close()
     }
 
@@ -564,10 +558,8 @@ class CtaViewModelTest {
     @Test
     fun whenUserHidesAllTipsThenFireButtonAnimationShouldNotShow() = coroutineRule.runBlocking {
         givenControlGroup()
+        givenOnboardingActive()
         whenever(mockSettingsDataStore.hideTips).thenReturn(true)
-        launch {
-            dismissedCtaDaoChannel.send(emptyList())
-        }
 
         assertFalse(testee.showFireButtonPulseAnimation.first())
     }
@@ -575,11 +567,9 @@ class CtaViewModelTest {
     @Test
     fun whenUserHasTwoOrMoreTabsThenFireButtonAnimationShouldNotShow() = coroutineRule.runBlocking {
         givenControlGroup()
+        givenOnboardingActive()
         db.tabsDao().insertTab(TabEntity(tabId = "0", position = 0))
         db.tabsDao().insertTab(TabEntity(tabId = "1", position = 1))
-        launch {
-            dismissedCtaDaoChannel.send(emptyList())
-        }
 
         assertFalse(testee.showFireButtonPulseAnimation.first())
     }
@@ -588,10 +578,9 @@ class CtaViewModelTest {
     fun whenFireButtonAnimationActiveAndUserOpensANewTabThenFireButtonAnimationStops() = coroutineRule.runBlocking {
         val values = mutableListOf<Boolean>()
         givenControlGroup()
+        givenOnboardingActive()
         db.tabsDao().insertTab(TabEntity(tabId = "0", position = 0))
-        launch {
-            dismissedCtaDaoChannel.send(listOf(DismissedCta(CtaId.DAX_DIALOG_TRACKERS_FOUND)))
-        }
+        db.dismissedCtaDao().insert(DismissedCta(CtaId.DAX_DIALOG_TRACKERS_FOUND))
         val collector = launch {
             testee.showFireButtonPulseAnimation.collect {
                 values.add(it)
@@ -606,10 +595,8 @@ class CtaViewModelTest {
     @Test
     fun whenUserHasAlreadySeenFireButtonCtaThenFireButtonAnimationShouldNotShow() = coroutineRule.runBlocking {
         givenControlGroup()
+        givenOnboardingActive()
         whenever(mockDismissedCtaDao.exists(CtaId.DAX_FIRE_BUTTON)).thenReturn(true)
-        launch {
-            dismissedCtaDaoChannel.send(emptyList())
-        }
 
         assertFalse(testee.showFireButtonPulseAnimation.first())
     }
@@ -620,14 +607,7 @@ class CtaViewModelTest {
         givenOnboardingActive()
         whenever(mockDismissedCtaDao.exists(CtaId.DAX_FIRE_BUTTON_PULSE)).thenReturn(true)
 
-        val launch = launch {
-            testee.showFireButtonPulseAnimation.collect {
-                assertFalse(it)
-            }
-        }
-        dismissedCtaDaoChannel.send(emptyList())
-
-        launch.cancel()
+        assertFalse(testee.showFireButtonPulseAnimation.first())
     }
 
     @Test
@@ -635,14 +615,13 @@ class CtaViewModelTest {
         givenControlGroup()
         givenOnboardingActive()
         val willTriggerFirePulseAnimationCtas = listOf(CtaId.DAX_DIALOG_TRACKERS_FOUND, CtaId.DAX_DIALOG_NETWORK, CtaId.DAX_DIALOG_OTHER)
-
         val launch = launch {
-            testee.showFireButtonPulseAnimation.collect {
+            testee.showFireButtonPulseAnimation.drop(1).collect {
                 assertTrue(it)
             }
         }
         willTriggerFirePulseAnimationCtas.forEach {
-            dismissedCtaDaoChannel.send(listOf(DismissedCta(it)))
+            db.dismissedCtaDao().insert(DismissedCta(it))
         }
 
         launch.cancel()
@@ -660,8 +639,9 @@ class CtaViewModelTest {
             }
         }
         willTriggerFirePulseAnimationCtas.forEach {
-            dismissedCtaDaoChannel.send(listOf(DismissedCta(it)))
+            db.dismissedCtaDao().insert(DismissedCta(it))
         }
+        assertTrue(lastValueCollected!!)
 
         testee.dismissPulseAnimation()
 
@@ -682,7 +662,7 @@ class CtaViewModelTest {
             }
         }
         willNotTriggerFirePulseAnimationCtas.forEach {
-            dismissedCtaDaoChannel.send(listOf(DismissedCta(it)))
+            db.dismissedCtaDao().insert(DismissedCta(it))
         }
 
         launch.cancel()
