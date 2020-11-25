@@ -42,7 +42,7 @@ interface VpnTrackerDao {
 
     @Transaction
     @Query("select * from vpn_tracker where timestamp >= :startedAt order by timestamp desc")
-    fun getTrackersAfterSync(startedAt: String): Flow<List<VpnTrackerAndCompany>>
+    fun getTrackersAfter(startedAt: String): Flow<List<VpnTrackerAndCompany>>
 
     @Transaction
     @Query("select * from vpn_tracker where timestamp > :startedAt group by trackerCompanyId order by timestamp desc")

@@ -31,6 +31,7 @@ import com.duckduckgo.mobile.android.vpn.store.DatabaseDateFormatter.Companion.b
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
 import com.jakewharton.threetenabp.AndroidThreeTen
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.runBlocking
 import org.junit.After
@@ -102,7 +103,7 @@ class AppTrackerBlockingStatsRepositoryTest {
     fun whenSingleRunningTimeRecordedTodayThenThatTimeIsReturned() = runBlocking {
         val midnight = dateOfPreviousMidnightAsString()
         vpnRunningStatsDao.upsert(timeRunningMillis = 10, midnight)
-        assertEquals(10, repository.getRunningTimeMillis(midnight))
+        assertEquals(10L, repository.getRunningTimeMillis(midnight).first())
     }
 
     @Test
@@ -111,7 +112,7 @@ class AppTrackerBlockingStatsRepositoryTest {
         vpnRunningStatsDao.upsert(timeRunningMillis = 10, bucketByHour(midnight))
         vpnRunningStatsDao.upsert(timeRunningMillis = 20, bucketByHour(midnight.plusMinutes(5)))
         vpnRunningStatsDao.upsert(timeRunningMillis = 30, bucketByHour(midnight.plusMinutes(10)))
-        assertEquals(60, repository.getRunningTimeMillis(bucketByHour(midnight)))
+        assertEquals(60L, repository.getRunningTimeMillis(bucketByHour(midnight)).first())
     }
 
     @Test
@@ -121,7 +122,7 @@ class AppTrackerBlockingStatsRepositoryTest {
         vpnRunningStatsDao.upsert(timeRunningMillis = 20, bucketByHour(midnight.plusMinutes(5)))
         vpnRunningStatsDao.upsert(timeRunningMillis = 30, bucketByHour(midnight.plusMinutes(10)))
         vpnRunningStatsDao.upsert(timeRunningMillis = 30, bucketByHour(midnight.minusMinutes(5)))
-        assertEquals(60, repository.getRunningTimeMillis(bucketByHour(midnight)))
+        assertEquals(60L, repository.getRunningTimeMillis(bucketByHour(midnight)).first())
     }
 
     private fun dateOfPreviousMidnight(): LocalDateTime {

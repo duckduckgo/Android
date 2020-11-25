@@ -31,18 +31,25 @@ import android.widget.ToggleButton
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.mobile.android.vpn.R
 import com.duckduckgo.mobile.android.vpn.model.DataSizeFormatter
 import com.duckduckgo.mobile.android.vpn.model.TimePassed
+import com.duckduckgo.mobile.android.vpn.model.VpnTrackerAndCompany
+import com.duckduckgo.mobile.android.vpn.model.dateOfPreviousMidnight
 import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
+import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository.DataTransfer
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
 import com.google.android.material.snackbar.Snackbar
 import dagger.android.AndroidInjection
 import dummy.VpnViewModelFactory
 import dummy.quietlySetIsChecked
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.MainScope
+import dummy.ui.VpnControllerViewModel.TrackersBlocked
+import kotlinx.coroutines.*
+import org.threeten.bp.LocalDateTime
+import org.threeten.bp.OffsetDateTime
+import org.threeten.bp.temporal.ChronoUnit
 import timber.log.Timber
 import java.text.NumberFormat
 import javax.inject.Inject
@@ -57,7 +64,6 @@ class VpnControllerActivity : AppCompatActivity(R.layout.activity_vpn_controller
     private lateinit var dataReceivedTextView: TextView
     private lateinit var vpnRunningToggleButton: ToggleButton
     private lateinit var uuidTextView: TextView
-
     @Inject
     lateinit var appTrackerBlockerStatsRepository: AppTrackerBlockingStatsRepository
 
@@ -71,8 +77,12 @@ class VpnControllerActivity : AppCompatActivity(R.layout.activity_vpn_controller
     lateinit var dataSizeFormatter: DataSizeFormatter
 
     private inline fun <reified V : ViewModel> bindViewModel() = lazy { ViewModelProvider(this, viewModelFactory).get(V::class.java) }
+
     private val viewModel: VpnControllerViewModel by bindViewModel()
     private val packetsFormatter = NumberFormat.getInstance()
+
+    private var lastTrackerBlocked: VpnTrackerAndCompany? = null
+    private var timerUpdateJob: Job? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -83,15 +93,49 @@ class VpnControllerActivity : AppCompatActivity(R.layout.activity_vpn_controller
         setViewReferences()
         configureUiHandlers()
 
-        viewModel.viewState.observe(this, {
-            it?.let { render(it) }
-        })
-        viewModel.onCreate()
+        subscribeForViewUpdates()
     }
 
-    override fun onResume() {
-        super.onResume()
-        viewModel.refreshData()
+    private fun subscribeForViewUpdates() {
+        val midnight = dateOfPreviousMidnight()
+
+        viewModel.getRunningTimeUpdates(midnight).observe(this) {
+            renderTimeRunning(it.runningTimeMillis)
+            renderVpnEnabledState(it.isRunning)
+        }
+
+        viewModel.getDataTransferredUpdates(midnight).observe(this) {
+            renderDataStats(dataSent = it.sent, dataReceived = it.received)
+        }
+
+        viewModel.getTrackerBlockedUpdates(midnight).observe(this) {
+            renderTrackerData(it)
+        }
+
+        viewModel.getVpnState().observe(this) {
+            renderUuid(it.uuid)
+        }
+    }
+
+    override fun onStart() {
+        super.onStart()
+
+        timerUpdateJob?.cancel()
+        timerUpdateJob = lifecycleScope.launch {
+            while (isActive) {
+                updateRelativeTimes()
+                delay(1_000)
+            }
+        }
+    }
+
+    override fun onStop() {
+        super.onStop()
+        timerUpdateJob?.cancel()
+    }
+
+    private fun updateRelativeTimes() {
+        lastTrackerDomainTextView.text = generateLastTrackerBlocked(lastTrackerBlocked)
     }
 
     private fun setViewReferences() {
@@ -107,6 +151,12 @@ class VpnControllerActivity : AppCompatActivity(R.layout.activity_vpn_controller
 
     private fun configureUiHandlers() {
         vpnRunningToggleButton.setOnCheckedChangeListener(runningButtonChangeListener)
+        uuidTextView.setOnClickListener {
+            val manager: ClipboardManager = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+            val clipData: ClipData = ClipData.newPlainText("VPN UUID", uuidTextView.text)
+            manager.setPrimaryClip(clipData)
+            Snackbar.make(uuidTextView, "UUID is now copied to the Clipboard", Snackbar.LENGTH_SHORT).show()
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -116,52 +166,50 @@ class VpnControllerActivity : AppCompatActivity(R.layout.activity_vpn_controller
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
-            R.id.vpnRefreshMenu -> {
-                viewModel.refreshData()
-                true
-            }
             else -> super.onOptionsItemSelected(item)
         }
     }
 
-    private fun render(viewState: VpnControllerViewModel.ViewState) {
-        uuidTextView.text = viewState.uuid
-        uuidTextView.setOnClickListener {
-            val manager: ClipboardManager = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-            val clipData: ClipData = ClipData.newPlainText("VPN UUID", viewState.uuid)
-            manager.setPrimaryClip(clipData)
-            Snackbar.make(uuidTextView, "UUID is now copied to the Clipboard", Snackbar.LENGTH_SHORT).show()
-        }
-        trackerCompaniesBlockedTextView.text = viewState.trackerCompaniesBlocked
-        trackersBlockedTextView.text = viewState.trackersBlocked
-        lastTrackerDomainTextView.text = viewState.lastTrackerBlocked
-        vpnRunningToggleButton.quietlySetIsChecked(viewState.isVpnRunning, runningButtonChangeListener)
-        timeRunningTodayTextView.text = generateTimeRunningMessage(viewState.timeRunningMillis)
-        dataSentTextView.text = getString(R.string.vpnDataTransferred, dataSizeFormatter.format(viewState.dataSent.dataSize), packetsFormatter.format(viewState.dataSent.numberPackets))
-        dataReceivedTextView.text = getString(R.string.vpnDataTransferred, dataSizeFormatter.format(viewState.dataReceived.dataSize), packetsFormatter.format(viewState.dataReceived.numberPackets))
+    private fun renderTimeRunning(timeRunningMillis: Long) {
+        timeRunningTodayTextView.text = generateTimeRunningMessage(timeRunningMillis)
     }
 
-    private fun generateTimeRunningMessage(timeRunningMillis: Long): String {
-        return if (timeRunningMillis == 0L) {
-            getString(R.string.vpnNotRunYet)
-        } else {
-            return getString(R.string.vpnTimeRunning, TimePassed.fromMilliseconds(timeRunningMillis).format())
-        }
+    private fun renderDataStats(dataSent: DataTransfer, dataReceived: DataTransfer) {
+        dataSentTextView.text = getString(
+            R.string.vpnDataTransferred,
+            dataSizeFormatter.format(dataSent.dataSize),
+            packetsFormatter.format(dataSent.numberPackets)
+        )
+        dataReceivedTextView.text = getString(
+            R.string.vpnDataTransferred,
+            dataSizeFormatter.format(dataReceived.dataSize),
+            packetsFormatter.format(dataReceived.numberPackets)
+        )
+    }
+
+    private fun renderVpnEnabledState(running: Boolean) {
+        vpnRunningToggleButton.quietlySetIsChecked(running, runningButtonChangeListener)
+    }
+
+    private fun renderUuid(uuid: String) {
+        uuidTextView.text = uuid
+    }
+
+    private fun renderTrackerData(trackerData: TrackersBlocked) {
+        trackerCompaniesBlockedTextView.text = generateTrackerCompaniesBlocked(trackerData.byCompany().size)
+        trackersBlockedTextView.text = generateTrackersBlocked(trackerData.trackerList.size)
+        lastTrackerBlocked = trackerData.trackerList.firstOrNull()
+        updateRelativeTimes()
     }
 
     private fun startVpnIfAllowed() {
         when (val permissionStatus = checkVpnPermission()) {
-            is VpnPermissionStatus.Granted -> {
-                Timber.v("This app already has permissions to be VPN app")
-                startVpn()
-            }
-            is VpnPermissionStatus.Denied -> {
-                Timber.v("VPN permission not granted")
-                obtainVpnRequestPermission(permissionStatus.intent)
-            }
+            is VpnPermissionStatus.Granted -> startVpn()
+            is VpnPermissionStatus.Denied -> obtainVpnRequestPermission(permissionStatus.intent)
         }
     }
 
+    @Suppress("DEPRECATION")
     private fun obtainVpnRequestPermission(intent: Intent) {
         startActivityForResult(intent, RC_REQUEST_VPN_PERMISSION)
     }
@@ -175,18 +223,20 @@ class VpnControllerActivity : AppCompatActivity(R.layout.activity_vpn_controller
         }
     }
 
+    @Suppress("DEPRECATION")
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         when (requestCode) {
-            RC_REQUEST_VPN_PERMISSION -> {
-                handleVpnPermissionResult(resultCode)
-            }
+            RC_REQUEST_VPN_PERMISSION -> handleVpnPermissionResult(resultCode)
             else -> super.onActivityResult(requestCode, resultCode, data)
         }
     }
 
     private fun handleVpnPermissionResult(resultCode: Int) {
         when (resultCode) {
-            Activity.RESULT_CANCELED -> Timber.i("User cancelled and refused VPN permission")
+            Activity.RESULT_CANCELED -> {
+                Timber.i("User cancelled and refused VPN permission")
+                vpnRunningToggleButton.quietlySetIsChecked(false, runningButtonChangeListener)
+            }
             Activity.RESULT_OK -> {
                 Timber.i("User granted VPN permission")
                 startVpn()
@@ -208,6 +258,39 @@ class VpnControllerActivity : AppCompatActivity(R.layout.activity_vpn_controller
             startVpnIfAllowed()
         } else {
             stopVpn()
+        }
+    }
+
+    private fun generateTimeRunningMessage(timeRunningMillis: Long): String {
+        return if (timeRunningMillis == 0L) {
+            getString(R.string.vpnNotRunYet)
+        } else {
+            return getString(R.string.vpnTimeRunning, TimePassed.fromMilliseconds(timeRunningMillis).format())
+        }
+    }
+
+    private fun generateLastTrackerBlocked(lastTracker: VpnTrackerAndCompany?): String {
+        if (lastTracker == null) return ""
+
+        val timestamp = LocalDateTime.parse(lastTracker.tracker.timestamp)
+        val timeDifference = timestamp.until(OffsetDateTime.now(), ChronoUnit.MILLIS)
+        val timeRunning = TimePassed.fromMilliseconds(timeDifference)
+        return "Latest tracker blocked ${timeRunning.format()} ago\n${lastTracker.tracker.domain}\n(owned by ${lastTracker.trackerCompany.company})"
+    }
+
+    private fun generateTrackerCompaniesBlocked(totalTrackerCompanies: Int): String {
+        return if (totalTrackerCompanies == 0) {
+            applicationContext.getString(R.string.vpnTrackerCompaniesNone)
+        } else {
+            return applicationContext.getString(R.string.vpnTrackerCompaniesBlocked, totalTrackerCompanies)
+        }
+    }
+
+    private fun generateTrackersBlocked(totalTrackers: Int): String {
+        return if (totalTrackers == 0) {
+            applicationContext.getString(R.string.vpnTrackersNone)
+        } else {
+            return applicationContext.getString(R.string.vpnTrackersBlocked, totalTrackers)
         }
     }
 

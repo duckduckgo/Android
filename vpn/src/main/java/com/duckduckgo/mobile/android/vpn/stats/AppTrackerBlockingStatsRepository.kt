@@ -16,50 +16,53 @@
 
 package com.duckduckgo.mobile.android.vpn.stats
 
-import androidx.lifecycle.LiveData
 import com.duckduckgo.mobile.android.vpn.model.VpnDataStats
-import com.duckduckgo.mobile.android.vpn.model.VpnRunningStats
 import com.duckduckgo.mobile.android.vpn.model.VpnState
 import com.duckduckgo.mobile.android.vpn.model.VpnTrackerAndCompany
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.*
+import timber.log.Timber
 import javax.inject.Inject
 
 class AppTrackerBlockingStatsRepository @Inject constructor(private val vpnDatabase: VpnDatabase) {
 
-    fun getVpnState(): VpnState {
-        return vpnDatabase.vpnStateDao().getOneOff() ?: VpnState(uuid = "unknown")
-    }
-
-    fun getVpnStateAsync(): LiveData<VpnState> {
-        return vpnDatabase.vpnStateDao().get()
-    }
-
-    suspend fun getRunningTimeMillis(startTime: String): Long {
-        return getVpnRunningStats(startTime).firstOrNull()
-            ?.sumOf { it.timeRunningMillis }
-            ?: 0L
-    }
-
-    private fun getVpnRunningStats(startTime: String): Flow<List<VpnRunningStats>> {
-        return vpnDatabase.vpnRunningStatsDao().get(startTime)
-    }
-
-    private fun getVpnDataStats(startTime: String): Flow<List<VpnDataStats>> {
-        return vpnDatabase.vpnDataStatsDao().get(startTime)
+    fun getVpnState(): Flow<VpnState> {
+        return vpnDatabase.vpnStateDao().get().distinctUntilChanged()
     }
 
     fun getVpnTrackers(startTime: String): Flow<List<VpnTrackerAndCompany>> {
-        return vpnDatabase.vpnTrackerDao().getTrackersAfterSync(startTime)
+        return vpnDatabase.vpnTrackerDao().getTrackersAfter(startTime)
+            .distinctUntilChanged()
+            .map { list -> list.filter { it.tracker.timestamp >= startTime } }
     }
 
-    suspend fun getDataStats(midnight: String): DataStats {
+    fun getRunningTimeMillis(startTime: String): Flow<Long> {
+        Timber.i("Getting running time since $startTime")
+        return vpnDatabase.vpnRunningStatsDao().get(startTime)
+            .distinctUntilChanged()
+            .map { list -> list.filter { it.id >= startTime } }
+            .transform { runningTimes ->
+                emit(runningTimes.sumOf { it.timeRunningMillis })
+            }
+            .flowOn(Dispatchers.Default)
+    }
+
+    fun getVpnDataStats(startTime: String): Flow<DataStats> {
+        return vpnDatabase.vpnDataStatsDao().get(startTime)
+            .distinctUntilChanged()
+            .map { list -> list.filter { it.id >= startTime } }
+            .transform {
+                emit(calculateDataTotals(it))
+            }.flowOn(Dispatchers.Default)
+    }
+
+    private fun calculateDataTotals(dataStats: List<VpnDataStats>): DataStats {
+
         var dataSent = 0L
         var packetsSent = 0L
         var dataReceived = 0L
         var packetsReceived = 0L
-        val dataStats = getVpnDataStats(midnight).firstOrNull() ?: emptyList()
 
         dataStats.forEach {
             dataReceived += it.dataReceived
@@ -74,6 +77,6 @@ class AppTrackerBlockingStatsRepository @Inject constructor(private val vpnDatab
         )
     }
 
-    data class DataStats(val sent: DataTransfer, val received: DataTransfer)
-    data class DataTransfer(val dataSize: Long, val numberPackets: Long)
+    data class DataStats(val sent: DataTransfer = DataTransfer(), val received: DataTransfer = DataTransfer())
+    data class DataTransfer(val dataSize: Long = 0, val numberPackets: Long = 0)
 }

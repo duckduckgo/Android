@@ -33,7 +33,7 @@
             android:layout_marginStart="32dp"
             android:layout_marginTop="6dp"
             android:layout_marginEnd="32dp"
-            android:text="Today, the VPN has been running for 45 min"
+            tools:text="Today, the VPN has been running for 45 min"
             android:textSize="18sp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />

@@ -28,6 +28,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.VPN_TRACKER_COM
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.VPN_UUID
 import com.duckduckgo.mobile.android.vpn.model.dateOfPreviousMidnight
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
+import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository.DataStats
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
 import kotlinx.coroutines.flow.firstOrNull
 import timber.log.Timber
@@ -68,14 +69,19 @@ class VpnStatsReportingWorker(context: Context, workerParams: WorkerParameters) 
         Timber.i("VpnStatsReportingWorker running")
         val midnight = dateOfPreviousMidnight()
 
-        val runningTimeMillis = vpnRepository.getRunningTimeMillis(midnight)
+        val uuid = vpnRepository.getVpnState().firstOrNull()
+        if (uuid == null) {
+            Timber.e("UUID has not been populated")
+            return Result.failure()
+        }
+
+        val runningTimeMillis = vpnRepository.getRunningTimeMillis(midnight).firstOrNull() ?: 0L
         val trackers = vpnRepository.getVpnTrackers(midnight).firstOrNull() ?: emptyList()
-        val uuid = vpnRepository.getVpnState().uuid
         val trackersByCompany = trackers.groupBy { it.trackerCompany.trackerCompanyId }
-        val dataTransferredStats = vpnRepository.getDataStats(midnight)
+        val dataTransferredStats = vpnRepository.getVpnDataStats(midnight).firstOrNull() ?: DataStats()
 
         val params = mapOf(
-            VPN_UUID to uuid,
+            VPN_UUID to uuid.uuid,
             VPN_TIME_RUNNING to TimeUnit.MILLISECONDS.toSeconds(runningTimeMillis).toString(),
             VPN_DATA_RECEIVED to dataTransferredStats.received.dataSize.toString(),
             VPN_DATA_SENT to dataTransferredStats.sent.dataSize.toString(),

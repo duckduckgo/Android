@@ -17,24 +17,18 @@
 package dummy.ui
 
 import android.content.Context
-import androidx.annotation.VisibleForTesting
-import androidx.lifecycle.*
-import com.duckduckgo.mobile.android.vpn.R
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.asLiveData
 import com.duckduckgo.mobile.android.vpn.di.DefaultVpnDispatcherProvider
 import com.duckduckgo.mobile.android.vpn.di.VpnDispatcherProvider
-import com.duckduckgo.mobile.android.vpn.model.TimePassed
 import com.duckduckgo.mobile.android.vpn.model.VpnState
 import com.duckduckgo.mobile.android.vpn.model.VpnTrackerAndCompany
-import com.duckduckgo.mobile.android.vpn.model.dateOfPreviousMidnight
 import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
+import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository.DataStats
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository.DataTransfer
-import kotlinx.coroutines.flow.firstOrNull
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import org.threeten.bp.LocalDateTime
-import org.threeten.bp.OffsetDateTime
-import org.threeten.bp.temporal.ChronoUnit
+import kotlinx.coroutines.flow.map
 
 class VpnControllerViewModel(
     private val repository: AppTrackerBlockingStatsRepository,
@@ -53,77 +47,33 @@ class VpnControllerViewModel(
         val dataReceived: DataTransfer
     )
 
-    private val vpnStateObserver = Observer<VpnState> { onStateUpdate() }
-    private val lastState: LiveData<VpnState> = repository.getVpnStateAsync()
-
-    val viewState: MutableLiveData<ViewState> = MutableLiveData()
-
-    @VisibleForTesting
-    public override fun onCleared() {
-        super.onCleared()
-        lastState.removeObserver(vpnStateObserver)
+    fun getRunningTimeUpdates(startTime: String): LiveData<VpnRunningStatus> {
+        return repository.getRunningTimeMillis(startTime)
+            .map { timeRunning -> VpnRunningStatus(timeRunning, TrackerBlockingVpnService.isServiceRunning(applicationContext)) }
+            .asLiveData()
     }
 
-    fun onCreate() {
-        lastState.observeForever(vpnStateObserver)
+    fun getDataTransferredUpdates(startTime: String): LiveData<DataStats> {
+        return repository.getVpnDataStats(startTime).asLiveData()
     }
 
-    fun refreshData() {
-        val midnight = dateOfPreviousMidnight()
+    fun getTrackerBlockedUpdates(startTime: String): LiveData<TrackersBlocked> {
+        return repository.getVpnTrackers(startTime).map {
+            TrackersBlocked(it)
+        }.asLiveData()
+    }
 
-        viewModelScope.launch(dispatchers.io()) {
-            val runtime = repository.getRunningTimeMillis(midnight)
-            val vpnState = repository.getVpnState()
-            val serviceRunning = TrackerBlockingVpnService.isServiceRunning(applicationContext)
+    fun getVpnState(): LiveData<VpnState> {
+        return repository.getVpnState().asLiveData()
+    }
 
-            val trackers = repository.getVpnTrackers(midnight).firstOrNull() ?: emptyList()
-            val trackersByCompany = trackers.groupBy { it.trackerCompany.trackerCompanyId }
-            val dataTransferredStats = repository.getDataStats(midnight)
+    data class VpnRunningStatus(val runningTimeMillis: Long, val isRunning: Boolean)
 
-            withContext(dispatchers.main()) {
-                viewState.value = ViewState(
-                    uuid = vpnState.uuid,
-                    isVpnRunning = serviceRunning,
-                    trackerCompaniesBlocked = generateTrackerCompaniesBlocked(trackersByCompany.size),
-                    trackersBlocked = generateTrackersBlocked(trackers.size),
-                    lastTrackerBlocked = generateLastTrackerBlocked(trackers),
-                    timeRunningMillis = runtime,
-                    dataSent = dataTransferredStats.sent,
-                    dataReceived = dataTransferredStats.received
-                )
-            }
+    data class TrackersBlocked(val trackerList: List<VpnTrackerAndCompany>) {
+
+        fun byCompany(): Map<Int, List<VpnTrackerAndCompany>> {
+            return trackerList.groupBy { it.trackerCompany.trackerCompanyId }
         }
-    }
 
-    private fun onStateUpdate() {
-        refreshData()
-    }
-
-    private fun generateTrackerCompaniesBlocked(totalTrackerCompanies: Int): String {
-        return if (totalTrackerCompanies == 0) {
-            applicationContext.getString(R.string.vpnTrackerCompaniesNone)
-        } else {
-            return applicationContext.getString(R.string.vpnTrackerCompaniesBlocked, totalTrackerCompanies)
-        }
-    }
-
-    private fun generateTrackersBlocked(totalTrackers: Int): String {
-        return if (totalTrackers == 0) {
-            applicationContext.getString(R.string.vpnTrackersNone)
-        } else {
-            return applicationContext.getString(R.string.vpnTrackersBlocked, totalTrackers)
-        }
-    }
-
-    private fun generateLastTrackerBlocked(trackersBlocked: List<VpnTrackerAndCompany>): String {
-        return if (trackersBlocked.isEmpty()) {
-            ""
-        } else {
-            val lastTrackerBlocked = trackersBlocked.first()
-            val timestamp = LocalDateTime.parse(lastTrackerBlocked.tracker.timestamp)
-            val timeDifference = timestamp.until(OffsetDateTime.now(), ChronoUnit.MILLIS)
-            val timeRunning = TimePassed.fromMilliseconds(timeDifference)
-            "Latest tracker blocked ${timeRunning.format()} ago\n${lastTrackerBlocked.tracker.domain}\n(owned by ${lastTrackerBlocked.trackerCompany.company})"
-        }
     }
 }

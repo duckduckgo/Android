@@ -16,9 +16,12 @@
 
 package com.duckduckgo.mobile.android.vpn.dao
 
-import androidx.lifecycle.LiveData
-import androidx.room.*
+import androidx.room.Dao
+import androidx.room.Insert
+import androidx.room.OnConflictStrategy
+import androidx.room.Query
 import com.duckduckgo.mobile.android.vpn.model.VpnState
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface VpnStateDao {
@@ -27,7 +30,7 @@ interface VpnStateDao {
     fun insert(state: VpnState)
 
     @Query("select * from vpn_state")
-    fun get(): LiveData<VpnState>
+    fun get(): Flow<VpnState>
 
     @Query("select * from vpn_state")
     fun getOneOff(): VpnState?

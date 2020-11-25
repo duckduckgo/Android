@@ -313,11 +313,9 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
         launch { writeRunningTimeToDatabase(timeSinceLastRunningTimeSave()) }
     }
 
-    private suspend fun writeRunningTimeToDatabase(runningTimeSinceLastSaveMillis: Long) {
-        withContext(Dispatchers.IO) {
-            vpnDatabase.vpnRunningStatsDao().upsert(runningTimeSinceLastSaveMillis)
-            lastSavedTimestamp = SystemClock.elapsedRealtime()
-        }
+    private fun writeRunningTimeToDatabase(runningTimeSinceLastSaveMillis: Long) {
+        vpnDatabase.vpnRunningStatsDao().upsert(runningTimeSinceLastSaveMillis)
+        lastSavedTimestamp = SystemClock.elapsedRealtime()
     }
 
     companion object {
