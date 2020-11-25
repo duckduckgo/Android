@@ -188,6 +188,11 @@ open class DuckDuckGoApplication : HasAndroidInjector, Application(), LifecycleO
         val processName = processName()
         Timber.i("Creating DuckDuckGo Application. Process name: $processName")
 
+        // vtodo Temporary inclusion of Firebase while in internal testing
+        FirebaseApp.initializeApp(this)
+        FirebaseCrashlytics.getInstance().setCrashlyticsCollectionEnabled(!BuildConfig.DEBUG)
+        FirebasePerformance.getInstance().isPerformanceCollectionEnabled = !BuildConfig.DEBUG
+
         if (appIsRestarting()) return
         if (processName.isVpnProcess()) {
             Timber.i("VPN process, no further logic executed in application onCreate()")
@@ -225,11 +230,6 @@ open class DuckDuckGoApplication : HasAndroidInjector, Application(), LifecycleO
             referralStateListener.initialiseReferralRetrieval()
             appDataLoader.loadData()
         }
-
-        // vtodo Temporary inclusion of Firebase while in internal testing
-        FirebaseApp.initializeApp(this)
-        FirebaseCrashlytics.getInstance().setCrashlyticsCollectionEnabled(!BuildConfig.DEBUG)
-        FirebasePerformance.getInstance().isPerformanceCollectionEnabled = !BuildConfig.DEBUG
     }
 
     private fun String.isVpnProcess(): Boolean {
