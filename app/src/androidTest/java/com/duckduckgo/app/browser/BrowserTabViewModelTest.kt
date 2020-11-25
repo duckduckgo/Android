@@ -3001,6 +3001,24 @@ class BrowserTabViewModelTest {
         assertTrue(command.headers.isEmpty())
     }
 
+    @Test
+    fun whenFirePulsingAnimationStartsThenItStopsAfterOneHour() = coroutineRule.runBlocking {
+        givenFireButtonPulsing()
+        val observer = ValueCaptorObserver<BrowserTabViewModel.BrowserViewState>(false)
+        testee.browserViewState.observeForever(observer)
+
+        testee.onViewVisible()
+
+        assertEquals(FireButton.Visible(pulseAnimation = true), observer.lastValueReceived!!.fireButton)
+        advanceTimeBy(3_600_000)
+        assertEquals(FireButton.Visible(pulseAnimation = false), observer.lastValueReceived!!.fireButton)
+    }
+
+    private suspend fun givenFireButtonPulsing() {
+        whenever(mockUserStageStore.getUserAppStage()).thenReturn(AppStage.DAX_ONBOARDING)
+        dismissedCtaDaoChannel.send(listOf(DismissedCta(CtaId.DAX_DIALOG_TRACKERS_FOUND)))
+    }
+
     private fun givenNewPermissionRequestFromDomain(domain: String) {
         testee.onSiteLocationPermissionRequested(domain, StubPermissionCallback())
     }
