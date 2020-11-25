@@ -18,6 +18,7 @@ package com.duckduckgo.app.statistics.api
 
 import android.content.Context
 import androidx.work.*
+import com.duckduckgo.app.global.plugins.worker.WorkerInjectorPlugin
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
@@ -64,5 +65,18 @@ class OfflinePixelScheduler @Inject constructor(private val workManager: WorkMan
         private val SERVICE_TIME_UNIT = TimeUnit.HOURS
         private const val BACKOFF_INTERVAL = 10L
         private val BACKOFF_TIME_UNIT = TimeUnit.MINUTES
+    }
+}
+
+class OfflinePixelWorkerInjectorPlugin(
+    private val offlinePixelSender: OfflinePixelSender
+) : WorkerInjectorPlugin {
+
+    override fun inject(worker: ListenableWorker): Boolean {
+        if (worker is OfflinePixelScheduler.OfflinePixelWorker) {
+            worker.offlinePixelSender = offlinePixelSender
+            return true
+        }
+        return false
     }
 }
