@@ -277,8 +277,8 @@ class CtaViewModel @Inject constructor(
     @WorkerThread
     private fun canShowWidgetCta(): Boolean {
         return widgetCapabilities.supportsStandardWidgetAdd &&
-                !widgetCapabilities.hasInstalledWidgets &&
-                !dismissedCtaDao.exists(CtaId.ADD_WIDGET)
+            !widgetCapabilities.hasInstalledWidgets &&
+            !dismissedCtaDao.exists(CtaId.ADD_WIDGET)
     }
 
     @WorkerThread
@@ -286,10 +286,10 @@ class CtaViewModel @Inject constructor(
 
     @WorkerThread
     private suspend fun canShowDaxCtaEndOfJourney(): Boolean = daxOnboardingActive() &&
-            !daxDialogEndShown() &&
-            daxDialogIntroShown() &&
-            !settingsDataStore.hideTips &&
-            (daxDialogNetworkShown() || daxDialogOtherShown() || daxDialogSerpShown() || daxDialogTrackersFoundShown())
+        !daxDialogEndShown() &&
+        daxDialogIntroShown() &&
+        !settingsDataStore.hideTips &&
+        (daxDialogNetworkShown() || daxDialogOtherShown() || daxDialogSerpShown() || daxDialogTrackersFoundShown())
 
     private suspend fun canShowDaxDialogCta(): Boolean {
         if (!daxOnboardingActive() || settingsDataStore.hideTips) {
@@ -375,8 +375,8 @@ class CtaViewModel @Inject constructor(
 
                 return@withContext dismissedCtaDao.any {
                     it.ctaId == CtaId.DAX_DIALOG_TRACKERS_FOUND ||
-                            it.ctaId == CtaId.DAX_DIALOG_OTHER ||
-                            it.ctaId == CtaId.DAX_DIALOG_NETWORK
+                        it.ctaId == CtaId.DAX_DIALOG_OTHER ||
+                        it.ctaId == CtaId.DAX_DIALOG_NETWORK
                 }
             }
         }

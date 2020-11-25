@@ -342,7 +342,8 @@ class TabDataRepositoryTest {
         val tab = TabEntity(
             tabId = "tabid",
             position = 0,
-            deletable = false)
+            deletable = false
+        )
 
         testee.markDeletable(tab)
 
@@ -354,7 +355,8 @@ class TabDataRepositoryTest {
         val tab = TabEntity(
             tabId = "tabid",
             position = 0,
-            deletable = true)
+            deletable = true
+        )
 
         testee.undoDeletable(tab)
 

@@ -46,13 +46,19 @@ class TrackerNetworksActivity : DuckDuckGoActivity() {
         setupToolbar(toolbar)
         configureRecycler()
 
-        viewModel.viewState.observe(this, Observer<TrackerNetworksViewModel.ViewState> {
-            it?.let { render(it) }
-        })
+        viewModel.viewState.observe(
+            this,
+            Observer<TrackerNetworksViewModel.ViewState> {
+                it?.let { render(it) }
+            }
+        )
 
-        repository.retrieveSiteData(intent.tabId!!).observe(this, Observer<Site> {
-            viewModel.onSiteChanged(it)
-        })
+        repository.retrieveSiteData(intent.tabId!!).observe(
+            this,
+            Observer<Site> {
+                viewModel.onSiteChanged(it)
+            }
+        )
     }
 
     private fun configureRecycler() {

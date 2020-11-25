@@ -52,7 +52,10 @@ import kotlinx.android.synthetic.main.content_settings_privacy.*
 import kotlinx.android.synthetic.main.include_toolbar.*
 import javax.inject.Inject
 
-class SettingsActivity : DuckDuckGoActivity(), SettingsAutomaticallyClearWhatFragment.Listener, SettingsAutomaticallyClearWhenFragment.Listener,
+class SettingsActivity :
+    DuckDuckGoActivity(),
+    SettingsAutomaticallyClearWhatFragment.Listener,
+    SettingsAutomaticallyClearWhenFragment.Listener,
     SettingsFireAnimationSelectorFragment.Listener {
 
     @Inject
@@ -102,22 +105,28 @@ class SettingsActivity : DuckDuckGoActivity(), SettingsAutomaticallyClearWhatFra
     }
 
     private fun observeViewModel() {
-        viewModel.viewState.observe(this, Observer { viewState ->
-            viewState?.let {
-                version.setSubtitle(it.version)
-                lightThemeToggle.quietlySetIsChecked(it.lightThemeEnabled, lightThemeToggleListener)
-                autocompleteToggle.quietlySetIsChecked(it.autoCompleteSuggestionsEnabled, autocompleteToggleListener)
-                updateDefaultBrowserViewVisibility(it)
-                updateAutomaticClearDataOptions(it.automaticallyClearData)
-                setGlobalPrivacyControlSetting(it.globalPrivacyControlEnabled)
-                changeAppIcon.setImageResource(it.appIcon.icon)
-                updateSelectedFireAnimation(it.selectedFireAnimation)
+        viewModel.viewState.observe(
+            this,
+            Observer { viewState ->
+                viewState?.let {
+                    version.setSubtitle(it.version)
+                    lightThemeToggle.quietlySetIsChecked(it.lightThemeEnabled, lightThemeToggleListener)
+                    autocompleteToggle.quietlySetIsChecked(it.autoCompleteSuggestionsEnabled, autocompleteToggleListener)
+                    updateDefaultBrowserViewVisibility(it)
+                    updateAutomaticClearDataOptions(it.automaticallyClearData)
+                    setGlobalPrivacyControlSetting(it.globalPrivacyControlEnabled)
+                    changeAppIcon.setImageResource(it.appIcon.icon)
+                    updateSelectedFireAnimation(it.selectedFireAnimation)
+                }
             }
-        })
+        )
 
-        viewModel.command.observe(this, Observer {
-            processCommand(it)
-        })
+        viewModel.command.observe(
+            this,
+            Observer {
+                processCommand(it)
+            }
+        )
     }
 
     private fun setGlobalPrivacyControlSetting(enabled: Boolean) {

@@ -57,19 +57,25 @@ class GlobalPrivacyControlActivity : DuckDuckGoActivity() {
     }
 
     private fun observeViewModel() {
-        viewModel.viewState.observe(this, Observer { viewState ->
-            viewState?.let {
-                globalPrivacyControlToggle.quietlySetIsChecked(it.globalPrivacyControlEnabled, globalPrivacyControlToggleListener)
-            }
-        })
-
-        viewModel.command.observe(this, Observer { command ->
-            command?.let {
-                when (it) {
-                    is GlobalPrivacyControlViewModel.Command.OpenLearnMore -> openLearnMoreSite(it.url)
+        viewModel.viewState.observe(
+            this,
+            Observer { viewState ->
+                viewState?.let {
+                    globalPrivacyControlToggle.quietlySetIsChecked(it.globalPrivacyControlEnabled, globalPrivacyControlToggleListener)
                 }
             }
-        })
+        )
+
+        viewModel.command.observe(
+            this,
+            Observer { command ->
+                command?.let {
+                    when (it) {
+                        is GlobalPrivacyControlViewModel.Command.OpenLearnMore -> openLearnMoreSite(it.url)
+                    }
+                }
+            }
+        )
     }
 
     private fun openLearnMoreSite(url: String) {

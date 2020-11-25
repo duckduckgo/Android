@@ -65,7 +65,8 @@ import com.duckduckgo.app.usage.search.SearchCountDao
 import com.duckduckgo.app.usage.search.SearchCountEntity
 
 @Database(
-    exportSchema = true, version = 29, entities = [
+    exportSchema = true, version = 29,
+    entities = [
         TdsTracker::class,
         TdsEntity::class,
         TdsDomainEntity::class,
@@ -284,7 +285,7 @@ class MigrationsProvider(
             val userStage = UserStage(appStage = appStage)
             database.execSQL(
                 "CREATE TABLE IF NOT EXISTS `$USER_STAGE_TABLE_NAME` " +
-                        "(`key` INTEGER NOT NULL, `appStage` TEXT NOT NULL, PRIMARY KEY(`key`))"
+                    "(`key` INTEGER NOT NULL, `appStage` TEXT NOT NULL, PRIMARY KEY(`key`))"
             )
             database.execSQL(
                 "INSERT INTO $USER_STAGE_TABLE_NAME VALUES (${userStage.key}, \"${userStage.appStage}\") "
@@ -329,14 +330,14 @@ class MigrationsProvider(
             // SQLite does not support Alter table operations like Foreign keys
             database.execSQL(
                 "CREATE TABLE IF NOT EXISTS tabs_new " +
-                        "(tabId TEXT NOT NULL, url TEXT, title TEXT, skipHome INTEGER NOT NULL, viewed INTEGER NOT NULL, position INTEGER NOT NULL, tabPreviewFile TEXT, sourceTabId TEXT," +
-                        " PRIMARY KEY(tabId)," +
-                        " FOREIGN KEY(sourceTabId) REFERENCES tabs(tabId) ON UPDATE SET NULL ON DELETE SET NULL )"
+                    "(tabId TEXT NOT NULL, url TEXT, title TEXT, skipHome INTEGER NOT NULL, viewed INTEGER NOT NULL, position INTEGER NOT NULL, tabPreviewFile TEXT, sourceTabId TEXT," +
+                    " PRIMARY KEY(tabId)," +
+                    " FOREIGN KEY(sourceTabId) REFERENCES tabs(tabId) ON UPDATE SET NULL ON DELETE SET NULL )"
             )
             database.execSQL(
                 "INSERT INTO tabs_new (tabId, url, title, skipHome, viewed, position, tabPreviewFile) " +
-                        "SELECT tabId, url, title, skipHome, viewed, position, tabPreviewFile " +
-                        "FROM tabs"
+                    "SELECT tabId, url, title, skipHome, viewed, position, tabPreviewFile " +
+                    "FROM tabs"
             )
             database.execSQL("DROP TABLE tabs")
             database.execSQL("ALTER TABLE tabs_new RENAME TO tabs")

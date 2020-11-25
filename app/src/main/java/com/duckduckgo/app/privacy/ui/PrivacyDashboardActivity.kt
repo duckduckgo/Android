@@ -67,15 +67,24 @@ class PrivacyDashboardActivity : DuckDuckGoActivity() {
     }
 
     private fun setupObservers() {
-        viewModel.viewState.observe(this, Observer {
-            it?.let { render(it) }
-        })
-        viewModel.command.observe(this, Observer {
-            it?.let { processCommand(it) }
-        })
-        repository.retrieveSiteData(intent.tabId!!).observe(this, Observer<Site> {
-            viewModel.onSiteChanged(it)
-        })
+        viewModel.viewState.observe(
+            this,
+            Observer {
+                it?.let { render(it) }
+            }
+        )
+        viewModel.command.observe(
+            this,
+            Observer {
+                it?.let { processCommand(it) }
+            }
+        )
+        repository.retrieveSiteData(intent.tabId!!).observe(
+            this,
+            Observer<Site> {
+                viewModel.onSiteChanged(it)
+            }
+        )
     }
 
     private fun setupClickListeners() {

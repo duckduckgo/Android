@@ -65,12 +65,15 @@ class StatisticsRequester(
                 Timber.i("Initialized ATB: $atbWithVariant")
                 service.exti(atbWithVariant)
             }
-            .subscribe({
-                Timber.d("Atb initialization succeeded")
-            }, {
-                store.clearAtb()
-                Timber.w("Atb initialization failed ${it.localizedMessage}")
-            })
+            .subscribe(
+                {
+                    Timber.d("Atb initialization succeeded")
+                },
+                {
+                    store.clearAtb()
+                    Timber.w("Atb initialization failed ${it.localizedMessage}")
+                }
+            )
     }
 
     private fun storedAtbFormatNeedsCorrecting(storedAtb: Atb): Boolean = storedAtb.version.endsWith(LEGACY_ATB_FORMAT_SUFFIX)
@@ -90,13 +93,16 @@ class StatisticsRequester(
 
         service.updateSearchAtb(fullAtb, retentionAtb)
             .subscribeOn(Schedulers.io())
-            .subscribe({
-                Timber.v("Search atb refresh succeeded, latest atb is ${it.version}")
-                store.searchRetentionAtb = it.version
-                storeUpdateVersionIfPresent(it)
-            }, {
-                Timber.v("Search atb refresh failed with error ${it.localizedMessage}")
-            })
+            .subscribe(
+                {
+                    Timber.v("Search atb refresh succeeded, latest atb is ${it.version}")
+                    store.searchRetentionAtb = it.version
+                    storeUpdateVersionIfPresent(it)
+                },
+                {
+                    Timber.v("Search atb refresh failed with error ${it.localizedMessage}")
+                }
+            )
     }
 
     @SuppressLint("CheckResult")
@@ -113,13 +119,16 @@ class StatisticsRequester(
 
         service.updateAppAtb(fullAtb, retentionAtb)
             .subscribeOn(Schedulers.io())
-            .subscribe({
-                Timber.v("App atb refresh succeeded, latest atb is ${it.version}")
-                store.appRetentionAtb = it.version
-                storeUpdateVersionIfPresent(it)
-            }, {
-                Timber.v("App atb refresh failed with error ${it.localizedMessage}")
-            })
+            .subscribe(
+                {
+                    Timber.v("App atb refresh succeeded, latest atb is ${it.version}")
+                    store.appRetentionAtb = it.version
+                    storeUpdateVersionIfPresent(it)
+                },
+                {
+                    Timber.v("App atb refresh failed with error ${it.localizedMessage}")
+                }
+            )
 
     }
 

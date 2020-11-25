@@ -160,8 +160,15 @@ import java.io.File
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 
-class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogListener, TrackersAnimatorListener, DownloadConfirmationDialogListener,
-    SiteLocationPermissionDialog.SiteLocationPermissionDialogListener, SystemLocationPermissionDialog.SystemLocationPermissionDialogListener {
+class BrowserTabFragment :
+    Fragment(),
+    FindListener,
+    CoroutineScope,
+    DaxDialogListener,
+    TrackersAnimatorListener,
+    DownloadConfirmationDialogListener,
+    SiteLocationPermissionDialog.SiteLocationPermissionDialogListener,
+    SystemLocationPermissionDialog.SystemLocationPermissionDialogListener {
 
     private val supervisorJob = SupervisorJob()
 
@@ -419,53 +426,83 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
     }
 
     private fun configureObservers() {
-        viewModel.autoCompleteViewState.observe(viewLifecycleOwner, Observer<AutoCompleteViewState> {
-            it?.let { renderer.renderAutocomplete(it) }
-        })
+        viewModel.autoCompleteViewState.observe(
+            viewLifecycleOwner,
+            Observer<AutoCompleteViewState> {
+                it?.let { renderer.renderAutocomplete(it) }
+            }
+        )
 
-        viewModel.globalLayoutState.observe(viewLifecycleOwner, Observer<GlobalLayoutViewState> {
-            it?.let { renderer.renderGlobalViewState(it) }
-        })
+        viewModel.globalLayoutState.observe(
+            viewLifecycleOwner,
+            Observer<GlobalLayoutViewState> {
+                it?.let { renderer.renderGlobalViewState(it) }
+            }
+        )
 
-        viewModel.browserViewState.observe(viewLifecycleOwner, Observer<BrowserViewState> {
-            it?.let { renderer.renderBrowserViewState(it) }
-        })
+        viewModel.browserViewState.observe(
+            viewLifecycleOwner,
+            Observer<BrowserViewState> {
+                it?.let { renderer.renderBrowserViewState(it) }
+            }
+        )
 
-        viewModel.loadingViewState.observe(viewLifecycleOwner, Observer<LoadingViewState> {
-            it?.let { renderer.renderLoadingIndicator(it) }
-        })
+        viewModel.loadingViewState.observe(
+            viewLifecycleOwner,
+            Observer<LoadingViewState> {
+                it?.let { renderer.renderLoadingIndicator(it) }
+            }
+        )
 
-        viewModel.omnibarViewState.observe(viewLifecycleOwner, Observer<OmnibarViewState> {
-            it?.let { renderer.renderOmnibar(it) }
-        })
+        viewModel.omnibarViewState.observe(
+            viewLifecycleOwner,
+            Observer<OmnibarViewState> {
+                it?.let { renderer.renderOmnibar(it) }
+            }
+        )
 
-        viewModel.findInPageViewState.observe(viewLifecycleOwner, Observer<FindInPageViewState> {
-            it?.let { renderer.renderFindInPageState(it) }
-        })
+        viewModel.findInPageViewState.observe(
+            viewLifecycleOwner,
+            Observer<FindInPageViewState> {
+                it?.let { renderer.renderFindInPageState(it) }
+            }
+        )
 
         viewModel.ctaViewState.observe(viewLifecycleOwner, ctaViewStateObserver)
 
-        viewModel.command.observe(viewLifecycleOwner, Observer {
-            processCommand(it)
-        })
+        viewModel.command.observe(
+            viewLifecycleOwner,
+            Observer {
+                processCommand(it)
+            }
+        )
 
-        viewModel.survey.observe(viewLifecycleOwner, Observer<Survey> {
-            it.let { viewModel.onSurveyChanged(it) }
-        })
+        viewModel.survey.observe(
+            viewLifecycleOwner,
+            Observer<Survey> {
+                it.let { viewModel.onSurveyChanged(it) }
+            }
+        )
 
-        viewModel.privacyGradeViewState.observe(viewLifecycleOwner, Observer {
-            it.let { renderer.renderPrivacyGrade(it) }
-        })
+        viewModel.privacyGradeViewState.observe(
+            viewLifecycleOwner,
+            Observer {
+                it.let { renderer.renderPrivacyGrade(it) }
+            }
+        )
 
         addTabsObserver()
     }
 
     private fun addTabsObserver() {
-        viewModel.tabs.observe(viewLifecycleOwner, Observer<List<TabEntity>> {
-            it?.let {
-                decorator.renderTabIcon(it)
+        viewModel.tabs.observe(
+            viewLifecycleOwner,
+            Observer<List<TabEntity>> {
+                it?.let {
+                    decorator.renderTabIcon(it)
+                }
             }
-        })
+        )
     }
 
     private fun fragmentIsVisible(): Boolean {
@@ -565,7 +602,8 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
             }
             is Command.ShowFullScreen -> {
                 webViewFullScreenContainer.addView(
-                    it.view, ViewGroup.LayoutParams(
+                    it.view,
+                    ViewGroup.LayoutParams(
                         ViewGroup.LayoutParams.MATCH_PARENT,
                         ViewGroup.LayoutParams.MATCH_PARENT
                     )
@@ -639,7 +677,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
 
     private fun locationPermissionsHaveNotBeenGranted(): Boolean {
         return ContextCompat.checkSelfPermission(requireActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED ||
-                ContextCompat.checkSelfPermission(requireActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
+            ContextCompat.checkSelfPermission(requireActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
     }
 
     private fun checkSystemLocationPermission(domain: String, deniedForever: Boolean) {
@@ -660,7 +698,8 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
             arrayOf(
                 Manifest.permission.ACCESS_FINE_LOCATION,
                 Manifest.permission.ACCESS_COARSE_LOCATION
-            ), PERMISSION_REQUEST_GEO_LOCATION
+            ),
+            PERMISSION_REQUEST_GEO_LOCATION
         )
     }
 
@@ -883,13 +922,15 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
             }
         }
 
-        omnibarTextInput.setOnEditorActionListener(TextView.OnEditorActionListener { _, actionId, keyEvent ->
-            if (actionId == EditorInfo.IME_ACTION_GO || keyEvent?.keyCode == KeyEvent.KEYCODE_ENTER) {
-                userEnteredQuery(omnibarTextInput.text.toString())
-                return@OnEditorActionListener true
+        omnibarTextInput.setOnEditorActionListener(
+            TextView.OnEditorActionListener { _, actionId, keyEvent ->
+                if (actionId == EditorInfo.IME_ACTION_GO || keyEvent?.keyCode == KeyEvent.KEYCODE_ENTER) {
+                    userEnteredQuery(omnibarTextInput.text.toString())
+                    return@OnEditorActionListener true
+                }
+                false
             }
-            false
-        })
+        )
 
         clearTextButton.setOnClickListener { omnibarTextInput.setText("") }
     }
