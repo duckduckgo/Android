@@ -222,6 +222,9 @@ class BrowserTabViewModelTest {
     private lateinit var mockFileDownloader: FileDownloader
 
     @Mock
+    private lateinit var mockTabRepository: TabRepository
+
+    @Mock
     private lateinit var geoLocationPermissions: GeoLocationPermissions
 
     private val lazyFaviconManager = Lazy { mockFaviconManager }
@@ -259,6 +262,7 @@ class BrowserTabViewModelTest {
         mockAutoCompleteApi = AutoCompleteApi(mockAutoCompleteService, mockBookmarksDao)
 
         whenever(mockDismissedCtaDao.dismissedCtas()).thenReturn(dismissedCtaDaoChannel.consumeAsFlow())
+        whenever(mockTabRepository.flowTabs).thenReturn(flowOf(emptyList()))
 
         ctaViewModel = CtaViewModel(
             mockAppInstallStore,
@@ -273,6 +277,7 @@ class BrowserTabViewModelTest {
             mockUserStageStore,
             mockUserEventsStore,
             UseOurAppDetector(mockUserEventsStore),
+            mockTabRepository,
             coroutineRule.testDispatcherProvider
         )
 

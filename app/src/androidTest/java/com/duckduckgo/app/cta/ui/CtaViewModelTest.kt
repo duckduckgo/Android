@@ -50,6 +50,8 @@ import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.*
 import com.duckduckgo.app.survey.db.SurveyDao
 import com.duckduckgo.app.survey.model.Survey
 import com.duckduckgo.app.survey.model.Survey.Status.SCHEDULED
+import com.duckduckgo.app.tabs.model.TabEntity
+import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import com.duckduckgo.app.widget.ui.WidgetCapabilities
@@ -121,6 +123,9 @@ class CtaViewModelTest {
     @Mock
     private lateinit var mockUserEventsStore: UserEventsStore
 
+    @Mock
+    private lateinit var mockTabRepository: TabRepository
+
     private val dismissedCtaDaoChannel = Channel<List<DismissedCta>>()
 
     private val requiredDaxOnboardingCtas: List<CtaId> = listOf(
@@ -145,6 +150,7 @@ class CtaViewModelTest {
         whenever(mockAppInstallStore.installTimestamp).thenReturn(System.currentTimeMillis() - TimeUnit.DAYS.toMillis(1))
         whenever(mockUserWhitelistDao.contains(any())).thenReturn(false)
         whenever(mockDismissedCtaDao.dismissedCtas()).thenReturn(dismissedCtaDaoChannel.consumeAsFlow())
+        whenever(mockTabRepository.flowTabs).thenReturn(db.tabsDao().flowTabs())
         givenControlGroup()
 
         testee = CtaViewModel(
@@ -160,6 +166,7 @@ class CtaViewModelTest {
             mockUserStageStore,
             mockUserEventsStore,
             UseOurAppDetector(mockUserEventsStore),
+            mockTabRepository,
             coroutineRule.testDispatcherProvider
         )
     }
@@ -563,6 +570,37 @@ class CtaViewModelTest {
         }
 
         assertFalse(testee.showFireButtonPulseAnimation.first())
+    }
+
+    @Test
+    fun whenUserHasTwoOrMoreTabsThenFireButtonAnimationShouldNotShow() = coroutineRule.runBlocking {
+        givenControlGroup()
+        db.tabsDao().insertTab(TabEntity(tabId = "0", position = 0))
+        db.tabsDao().insertTab(TabEntity(tabId = "1", position = 1))
+        launch {
+            dismissedCtaDaoChannel.send(emptyList())
+        }
+
+        assertFalse(testee.showFireButtonPulseAnimation.first())
+    }
+
+    @Test
+    fun whenFireButtonAnimationActiveAndUserOpensANewTabThenFireButtonAnimationStops() = coroutineRule.runBlocking {
+        val values = mutableListOf<Boolean>()
+        givenControlGroup()
+        db.tabsDao().insertTab(TabEntity(tabId = "0", position = 0))
+        launch {
+            dismissedCtaDaoChannel.send(listOf(DismissedCta(CtaId.DAX_DIALOG_TRACKERS_FOUND)))
+        }
+        val collector = launch {
+            testee.showFireButtonPulseAnimation.collect {
+                values.add(it)
+            }
+        }
+        db.tabsDao().insertTab(TabEntity(tabId = "1", position = 1))
+
+        assertEquals(listOf(true, false), values)
+        collector.cancel()
     }
 
     @Test
