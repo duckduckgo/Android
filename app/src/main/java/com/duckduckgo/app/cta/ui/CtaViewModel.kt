@@ -44,10 +44,7 @@ import com.duckduckgo.app.widget.ui.WidgetCapabilities
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.channels.ConflatedBroadcastChannel
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.asFlow
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 import java.util.*
@@ -91,11 +88,14 @@ class CtaViewModel @Inject constructor(
     val showFireButtonPulseAnimation: Flow<Boolean> = dismissedCtaDao
         .dismissedCtas()
         .combine(forceStopFireButtonPulseAnimationFlow) { ctas, forceStopAnimation ->
+            Pair(ctas, forceStopAnimation)
+        }
+        .onEach { (_, forceStopAnimation) ->
             if (forceStopAnimation) {
                 dismissPulseAnimation()
             }
-            Pair(ctas, forceStopAnimation)
-        }.shouldShowPulseAnimation()
+        }
+        .shouldShowPulseAnimation()
 
     private var activeSurvey: Survey? = null
 

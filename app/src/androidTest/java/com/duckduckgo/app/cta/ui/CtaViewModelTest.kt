@@ -58,7 +58,6 @@ import com.duckduckgo.app.widget.ui.WidgetCapabilities
 import com.nhaarman.mockitokotlin2.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
-import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runBlockingTest
@@ -572,6 +571,18 @@ class CtaViewModelTest {
         db.tabsDao().insertTab(TabEntity(tabId = "1", position = 1))
 
         assertFalse(testee.showFireButtonPulseAnimation.first())
+    }
+
+    @Test
+    fun whenFireAnimationStopsThenDaxFireButtonDisabled() = coroutineRule.runBlocking {
+        givenControlGroup()
+        givenOnboardingActive()
+        db.tabsDao().insertTab(TabEntity(tabId = "0", position = 0))
+        db.tabsDao().insertTab(TabEntity(tabId = "1", position = 1))
+
+        testee.showFireButtonPulseAnimation.first()
+
+        verify(mockDismissedCtaDao).insert(DismissedCta(CtaId.DAX_FIRE_BUTTON))
     }
 
     @Test
