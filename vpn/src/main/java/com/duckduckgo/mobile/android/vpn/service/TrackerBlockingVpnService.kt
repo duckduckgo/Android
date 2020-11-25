@@ -42,7 +42,6 @@ import com.duckduckgo.mobile.android.vpn.ui.notification.VpnNotificationBuilder.
 import dagger.android.AndroidInjection
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.firstOrNull
 import timber.log.Timber
 import xyz.hexene.localvpn.Packet
 import java.nio.ByteBuffer
@@ -287,15 +286,10 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
             }
         }
 
-        launch(Dispatchers.IO) {
-            val trackers = repository.getVpnTrackers(dateOfPreviousMidnight()).firstOrNull() ?: emptyList()
-            val trackersByCompany = trackers.groupBy { it.trackerCompany.trackerCompanyId }.size
-            startForeground(FOREGROUND_VPN_SERVICE_ID, buildPersistentNotification(applicationContext, trackers, trackersByCompany))
-        }
+        startForeground(FOREGROUND_VPN_SERVICE_ID, buildPersistentNotification(applicationContext, emptyList(), 0))
 
         newTrackerObserverJob = launch {
             repository.getVpnTrackers(dateOfPreviousMidnight()).collectLatest {
-                Timber.i("Got new tracker. Now have blocked ${it.size} trackers")
                 updateNotificationForNewTrackerFound(it)
             }
         }

@@ -64,6 +64,7 @@ class VpnControllerActivity : AppCompatActivity(R.layout.activity_vpn_controller
     private lateinit var dataReceivedTextView: TextView
     private lateinit var vpnRunningToggleButton: ToggleButton
     private lateinit var uuidTextView: TextView
+
     @Inject
     lateinit var appTrackerBlockerStatsRepository: AppTrackerBlockingStatsRepository
 
@@ -113,7 +114,7 @@ class VpnControllerActivity : AppCompatActivity(R.layout.activity_vpn_controller
         }
 
         viewModel.getVpnState().observe(this) {
-            renderUuid(it.uuid)
+            renderUuid(it?.uuid ?: "initializing")
         }
     }
 

@@ -16,8 +16,10 @@
 
 package com.duckduckgo.mobile.android.vpn.dao
 
-import androidx.lifecycle.LiveData
-import androidx.room.*
+import androidx.room.Dao
+import androidx.room.Insert
+import androidx.room.OnConflictStrategy
+import androidx.room.Query
 import com.duckduckgo.mobile.android.vpn.model.VpnTracker
 import com.duckduckgo.mobile.android.vpn.model.VpnTrackerAndCompany
 import kotlinx.coroutines.flow.Flow
@@ -28,23 +30,6 @@ interface VpnTrackerDao {
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     fun insert(tracker: VpnTracker)
 
-    @Transaction
-    @Query("select * from vpn_tracker order by timestamp desc limit 1")
-    fun getLastTrackerBlockedSync(): VpnTrackerAndCompany?
-
-    @Transaction
-    @Query("select * from vpn_tracker order by timestamp desc limit 1")
-    fun getLastTrackerBlocked(): LiveData<VpnTrackerAndCompany>
-
-    @Transaction
-    @Query("select * from vpn_tracker where timestamp > :startedAt group by trackerCompanyId order by timestamp desc")
-    fun getTrackersByCompanyAfterSync(startedAt: String): List<VpnTrackerAndCompany>
-
-    @Transaction
-    @Query("select * from vpn_tracker where timestamp >= :startedAt order by timestamp desc")
-    fun getTrackersAfter(startedAt: String): Flow<List<VpnTrackerAndCompany>>
-
-    @Transaction
-    @Query("select * from vpn_tracker where timestamp > :startedAt group by trackerCompanyId order by timestamp desc")
-    fun getTrackersByCompanyAfter(startedAt: String): LiveData<List<VpnTrackerAndCompany>>
+    @Query("SELECT * FROM vpn_tracker WHERE timestamp >= :startTime AND timestamp < :endTime ORDER BY timestamp DESC")
+    fun getTrackersBetween(startTime: String, endTime: String): Flow<List<VpnTrackerAndCompany>>
 }

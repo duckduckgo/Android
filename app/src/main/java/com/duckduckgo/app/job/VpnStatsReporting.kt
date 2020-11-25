@@ -29,8 +29,10 @@ import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.VPN_UUID
 import com.duckduckgo.mobile.android.vpn.model.dateOfPreviousMidnight
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository.DataStats
+import com.duckduckgo.mobile.android.vpn.store.DatabaseDateFormatter
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
 import kotlinx.coroutines.flow.firstOrNull
+import org.threeten.bp.LocalDateTime
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
@@ -66,8 +68,9 @@ class VpnStatsReportingWorker(context: Context, workerParams: WorkerParameters) 
     lateinit var pixel: Pixel
 
     override suspend fun doWork(): Result {
-        Timber.i("VpnStatsReportingWorker running")
-        val midnight = dateOfPreviousMidnight()
+        val queryStartTime = DatabaseDateFormatter.timestamp(LocalDateTime.now().minusDays(1).toLocalDate().atStartOfDay())
+        val queryEndTime = dateOfPreviousMidnight()
+        Timber.i("VpnStatsReportingWorker running. Finding stats between $queryStartTime and $queryEndTime")
 
         val uuid = vpnRepository.getVpnState().firstOrNull()
         if (uuid == null) {
@@ -75,10 +78,10 @@ class VpnStatsReportingWorker(context: Context, workerParams: WorkerParameters) 
             return Result.failure()
         }
 
-        val runningTimeMillis = vpnRepository.getRunningTimeMillis(midnight).firstOrNull() ?: 0L
-        val trackers = vpnRepository.getVpnTrackers(midnight).firstOrNull() ?: emptyList()
+        val runningTimeMillis = vpnRepository.getRunningTimeMillis(queryStartTime, queryEndTime).firstOrNull() ?: 0L
+        val trackers = vpnRepository.getVpnTrackers(queryStartTime, queryEndTime).firstOrNull() ?: emptyList()
         val trackersByCompany = trackers.groupBy { it.trackerCompany.trackerCompanyId }
-        val dataTransferredStats = vpnRepository.getVpnDataStats(midnight).firstOrNull() ?: DataStats()
+        val dataTransferredStats = vpnRepository.getVpnDataStats(queryStartTime, queryEndTime).firstOrNull() ?: DataStats()
 
         val params = mapOf(
             VPN_UUID to uuid.uuid,

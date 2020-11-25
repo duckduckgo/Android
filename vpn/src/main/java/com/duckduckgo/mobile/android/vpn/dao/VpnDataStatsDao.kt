@@ -52,8 +52,8 @@ interface VpnDataStatsDao {
         }
     }
 
-    @Query("select * from vpn_data_stats where id >= :startTime")
-    fun get(startTime: String): Flow<List<VpnDataStats>>
+    @Query("SELECT * FROM vpn_data_stats WHERE id >= :startTime AND id < :endTime")
+    fun getDataStatsBetween(startTime: String, endTime: String): Flow<List<VpnDataStats>>
 
     private fun bucket() = DatabaseDateFormatter.bucketByHour()
 }

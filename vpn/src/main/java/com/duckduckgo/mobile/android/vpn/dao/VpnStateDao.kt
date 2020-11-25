@@ -32,6 +32,4 @@ interface VpnStateDao {
     @Query("select * from vpn_state")
     fun get(): Flow<VpnState>
 
-    @Query("select * from vpn_state")
-    fun getOneOff(): VpnState?
 }

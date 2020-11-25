@@ -27,7 +27,6 @@ import com.duckduckgo.mobile.android.vpn.model.VpnTrackerAndCompany
 import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository.DataStats
-import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository.DataTransfer
 import kotlinx.coroutines.flow.map
 
 class VpnControllerViewModel(
@@ -35,17 +34,6 @@ class VpnControllerViewModel(
     private val dispatchers: VpnDispatcherProvider = DefaultVpnDispatcherProvider(),
     private val applicationContext: Context
 ) : ViewModel() {
-
-    data class ViewState(
-        val uuid: String,
-        val isVpnRunning: Boolean,
-        val trackerCompaniesBlocked: String,
-        val trackersBlocked: String,
-        val lastTrackerBlocked: String,
-        val timeRunningMillis: Long,
-        val dataSent: DataTransfer,
-        val dataReceived: DataTransfer
-    )
 
     fun getRunningTimeUpdates(startTime: String): LiveData<VpnRunningStatus> {
         return repository.getRunningTimeMillis(startTime)

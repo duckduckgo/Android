@@ -18,18 +18,20 @@ package com.duckduckgo.mobile.android.vpn.model
 
 import com.duckduckgo.mobile.android.vpn.store.DatabaseDateFormatter
 import org.threeten.bp.LocalDateTime
-import timber.log.Timber
 
 fun dateOfPreviousMidnight(): String {
     val midnight = LocalDateTime.now().toLocalDate().atStartOfDay()
     return DatabaseDateFormatter.timestamp(midnight)
 }
 
+fun dateOfNextMidnight(): String {
+    val midnight = LocalDateTime.now().plusDays(1).toLocalDate().atStartOfDay()
+    return DatabaseDateFormatter.timestamp(midnight)
+}
+
 data class TimePassed(val hours: Long, val minutes: Long, val seconds: Long) {
 
     fun format(alwaysShowHours: Boolean = true, alwaysShowMinutes: Boolean = true, alwaysShowSeconds: Boolean = true): String {
-        Timber.i("Time passed $hours hr, $minutes min $seconds sec")
-
         val sb = StringBuilder()
 
         if (hours > 0 || alwaysShowHours) {
