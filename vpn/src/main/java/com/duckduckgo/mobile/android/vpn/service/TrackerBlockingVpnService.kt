@@ -289,7 +289,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
         startForeground(FOREGROUND_VPN_SERVICE_ID, buildPersistentNotification(applicationContext, emptyList(), 0))
 
         newTrackerObserverJob = launch {
-            repository.getVpnTrackers(dateOfPreviousMidnight()).collectLatest {
+            repository.getVpnTrackers({ dateOfPreviousMidnight() }).collectLatest {
                 updateNotificationForNewTrackerFound(it)
             }
         }

@@ -72,7 +72,7 @@ class DomainBasedTrackerDetector @Inject constructor(
         val trackerCompany = TrackerListProvider.TRACKER_GROUP_COMPANIES.find { it.trackerCompanyId == tracker.trackerCompanyId }
             ?: TrackerListProvider.UNDEFINED_TRACKER_COMPANY
         val vpnTracker = VpnTracker(trackerCompanyId = trackerCompany.trackerCompanyId, domain = tracker.hostname)
-        Timber.i("Inserting $tracker as tracker")
+        Timber.i("Inserting $vpnTracker as tracker")
         vpnDatabase.vpnTrackerDao().insert(vpnTracker)
     }
 }

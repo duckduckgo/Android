@@ -37,26 +37,26 @@ class AppTrackerBlockingStatsRepository @Inject constructor(vpnDatabase: VpnData
         return stateDao.get().distinctUntilChanged()
     }
 
-    fun getVpnTrackers(startTime: String, endTime: String = noEndDate()): Flow<List<VpnTrackerAndCompany>> {
-        return trackerDao.getTrackersBetween(startTime, endTime)
+    fun getVpnTrackers(startTime: () -> String, endTime: String = noEndDate()): Flow<List<VpnTrackerAndCompany>> {
+        return trackerDao.getTrackersBetween(startTime(), endTime)
             .distinctUntilChanged()
-            .map { list -> list.filter { it.tracker.timestamp >= startTime } }
+            .map { it.filter { tracker -> tracker.tracker.timestamp >= startTime() } }
     }
 
-    fun getRunningTimeMillis(startTime: String, endTime: String = noEndDate()): Flow<Long> {
-        return runningTimeDao.getRunningStatsBetween(startTime, endTime)
+    fun getRunningTimeMillis(startTime: () -> String, endTime: String = noEndDate()): Flow<Long> {
+        return runningTimeDao.getRunningStatsBetween(startTime(), endTime)
             .distinctUntilChanged()
-            .map { list -> list.filter { it.id >= startTime } }
+            .map { list -> list.filter { it.id >= startTime() } }
             .transform { runningTimes ->
                 emit(runningTimes.sumOf { it.timeRunningMillis })
             }
             .flowOn(Dispatchers.Default)
     }
 
-    fun getVpnDataStats(startTime: String, endTime: String = noEndDate()): Flow<DataStats> {
-        return statsDao.getDataStatsBetween(startTime, endTime)
+    fun getVpnDataStats(startTime: () -> String, endTime: String = noEndDate()): Flow<DataStats> {
+        return statsDao.getDataStatsBetween(startTime(), endTime)
             .distinctUntilChanged()
-            .map { list -> list.filter { it.id >= startTime } }
+            .map { list -> list.filter { it.id >= startTime() } }
             .transform {
                 emit(calculateDataTotals(it))
             }.flowOn(Dispatchers.Default)

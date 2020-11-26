@@ -25,7 +25,6 @@ import com.duckduckgo.mobile.android.vpn.dao.VpnTrackerDao
 import com.duckduckgo.mobile.android.vpn.model.VpnTracker
 import com.duckduckgo.mobile.android.vpn.model.VpnTrackerAndCompany
 import com.duckduckgo.mobile.android.vpn.model.VpnTrackerCompany
-import com.duckduckgo.mobile.android.vpn.model.dateOfPreviousMidnight
 import com.duckduckgo.mobile.android.vpn.processor.tcp.tracker.TrackerListProvider.Companion.UNDEFINED_TRACKER_COMPANY
 import com.duckduckgo.mobile.android.vpn.store.DatabaseDateFormatter.Companion.bucketByHour
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
@@ -77,7 +76,7 @@ class AppTrackerBlockingStatsRepositoryTest {
     fun whenSingleTrackerEntryAddedForTodayBucketThenBlockerReturned() = runBlocking {
         val trackerDomain = "example.com"
         trackerFound(trackerDomain)
-        val vpnTrackers = repository.getVpnTrackers(dateOfPreviousMidnightAsString()).firstOrNull()
+        val vpnTrackers = repository.getVpnTrackers({ dateOfPreviousMidnightAsString() }).firstOrNull()
         assertTrackerFound(vpnTrackers, trackerDomain)
         assertEquals(1, vpnTrackers!!.size)
     }
@@ -87,7 +86,7 @@ class AppTrackerBlockingStatsRepositoryTest {
         val trackerDomain = "example.com"
         trackerFound(trackerDomain)
         trackerFound(trackerDomain)
-        val vpnTrackers = repository.getVpnTrackers(dateOfPreviousMidnightAsString()).firstOrNull()
+        val vpnTrackers = repository.getVpnTrackers({ dateOfPreviousMidnightAsString() }).firstOrNull()
         assertTrackerFound(vpnTrackers, trackerDomain)
         assertEquals(2, vpnTrackers!!.size)
     }
@@ -95,7 +94,7 @@ class AppTrackerBlockingStatsRepositoryTest {
     @Test
     fun whenTrackerFoundBeforeTodayThenNotReturned() = runBlocking {
         trackerFoundYesterday()
-        val vpnTrackers = repository.getVpnTrackers(dateOfPreviousMidnightAsString()).firstOrNull()
+        val vpnTrackers = repository.getVpnTrackers({ dateOfPreviousMidnightAsString() }).firstOrNull()
         assertNoTrackers(vpnTrackers)
     }
 
@@ -103,7 +102,7 @@ class AppTrackerBlockingStatsRepositoryTest {
     fun whenSingleRunningTimeRecordedTodayThenThatTimeIsReturned() = runBlocking {
         val midnight = dateOfPreviousMidnightAsString()
         vpnRunningStatsDao.upsert(timeRunningMillis = 10, midnight)
-        assertEquals(10L, repository.getRunningTimeMillis(midnight).first())
+        assertEquals(10L, repository.getRunningTimeMillis({ midnight }).first())
     }
 
     @Test
@@ -112,7 +111,7 @@ class AppTrackerBlockingStatsRepositoryTest {
         vpnRunningStatsDao.upsert(timeRunningMillis = 10, bucketByHour(midnight))
         vpnRunningStatsDao.upsert(timeRunningMillis = 20, bucketByHour(midnight.plusMinutes(5)))
         vpnRunningStatsDao.upsert(timeRunningMillis = 30, bucketByHour(midnight.plusMinutes(10)))
-        assertEquals(60L, repository.getRunningTimeMillis(bucketByHour(midnight)).first())
+        assertEquals(60L, repository.getRunningTimeMillis({ bucketByHour(midnight) }).first())
     }
 
     @Test
@@ -122,7 +121,7 @@ class AppTrackerBlockingStatsRepositoryTest {
         vpnRunningStatsDao.upsert(timeRunningMillis = 20, bucketByHour(midnight.plusMinutes(5)))
         vpnRunningStatsDao.upsert(timeRunningMillis = 30, bucketByHour(midnight.plusMinutes(10)))
         vpnRunningStatsDao.upsert(timeRunningMillis = 30, bucketByHour(midnight.minusMinutes(5)))
-        assertEquals(60L, repository.getRunningTimeMillis(bucketByHour(midnight)).first())
+        assertEquals(60L, repository.getRunningTimeMillis({ bucketByHour(midnight) }).first())
     }
 
     private fun dateOfPreviousMidnight(): LocalDateTime {

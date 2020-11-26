@@ -98,18 +98,17 @@ class VpnControllerActivity : AppCompatActivity(R.layout.activity_vpn_controller
     }
 
     private fun subscribeForViewUpdates() {
-        val midnight = dateOfPreviousMidnight()
 
-        viewModel.getRunningTimeUpdates(midnight).observe(this) {
+        viewModel.getRunningTimeUpdates { dateOfPreviousMidnight() }.observe(this) {
             renderTimeRunning(it.runningTimeMillis)
             renderVpnEnabledState(it.isRunning)
         }
 
-        viewModel.getDataTransferredUpdates(midnight).observe(this) {
+        viewModel.getDataTransferredUpdates { dateOfPreviousMidnight() }.observe(this) {
             renderDataStats(dataSent = it.sent, dataReceived = it.received)
         }
 
-        viewModel.getTrackerBlockedUpdates(midnight).observe(this) {
+        viewModel.getTrackerBlockedUpdates { dateOfPreviousMidnight() }.observe(this) {
             renderTrackerData(it)
         }
 

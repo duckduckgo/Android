@@ -24,11 +24,6 @@ fun dateOfPreviousMidnight(): String {
     return DatabaseDateFormatter.timestamp(midnight)
 }
 
-fun dateOfNextMidnight(): String {
-    val midnight = LocalDateTime.now().plusDays(1).toLocalDate().atStartOfDay()
-    return DatabaseDateFormatter.timestamp(midnight)
-}
-
 data class TimePassed(val hours: Long, val minutes: Long, val seconds: Long) {
 
     fun format(alwaysShowHours: Boolean = true, alwaysShowMinutes: Boolean = true, alwaysShowSeconds: Boolean = true): String {

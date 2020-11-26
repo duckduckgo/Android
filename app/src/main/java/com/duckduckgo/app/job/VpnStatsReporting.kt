@@ -78,10 +78,10 @@ class VpnStatsReportingWorker(context: Context, workerParams: WorkerParameters) 
             return Result.failure()
         }
 
-        val runningTimeMillis = vpnRepository.getRunningTimeMillis(queryStartTime, queryEndTime).firstOrNull() ?: 0L
-        val trackers = vpnRepository.getVpnTrackers(queryStartTime, queryEndTime).firstOrNull() ?: emptyList()
+        val runningTimeMillis = vpnRepository.getRunningTimeMillis({ queryStartTime }, queryEndTime).firstOrNull() ?: 0L
+        val trackers = vpnRepository.getVpnTrackers({ queryStartTime }, queryEndTime).firstOrNull() ?: emptyList()
         val trackersByCompany = trackers.groupBy { it.trackerCompany.trackerCompanyId }
-        val dataTransferredStats = vpnRepository.getVpnDataStats(queryStartTime, queryEndTime).firstOrNull() ?: DataStats()
+        val dataTransferredStats = vpnRepository.getVpnDataStats({ queryStartTime }, queryEndTime).firstOrNull() ?: DataStats()
 
         val params = mapOf(
             VPN_UUID to uuid.uuid,

@@ -35,17 +35,17 @@ class VpnControllerViewModel(
     private val applicationContext: Context
 ) : ViewModel() {
 
-    fun getRunningTimeUpdates(startTime: String): LiveData<VpnRunningStatus> {
+    fun getRunningTimeUpdates(startTime: () -> String): LiveData<VpnRunningStatus> {
         return repository.getRunningTimeMillis(startTime)
             .map { timeRunning -> VpnRunningStatus(timeRunning, TrackerBlockingVpnService.isServiceRunning(applicationContext)) }
             .asLiveData()
     }
 
-    fun getDataTransferredUpdates(startTime: String): LiveData<DataStats> {
+    fun getDataTransferredUpdates(startTime: () -> String): LiveData<DataStats> {
         return repository.getVpnDataStats(startTime).asLiveData()
     }
 
-    fun getTrackerBlockedUpdates(startTime: String): LiveData<TrackersBlocked> {
+    fun getTrackerBlockedUpdates(startTime: () -> String): LiveData<TrackersBlocked> {
         return repository.getVpnTrackers(startTime).map {
             TrackersBlocked(it)
         }.asLiveData()
