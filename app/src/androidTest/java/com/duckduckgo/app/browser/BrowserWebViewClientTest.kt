@@ -19,6 +19,7 @@ package com.duckduckgo.app.browser
 import android.content.Context
 import android.os.Build
 import android.webkit.*
+import androidx.core.net.toUri
 import androidx.test.annotation.UiThreadTest
 import androidx.test.filters.SdkSuppress
 import androidx.test.platform.app.InstrumentationRegistry
@@ -27,7 +28,7 @@ import com.duckduckgo.app.browser.logindetection.DOMLoginDetector
 import com.duckduckgo.app.browser.logindetection.WebNavigationEvent
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.global.exception.UncaughtExceptionRepository
-import com.duckduckgo.app.globalprivacycontrol.GlobalPrivacyControlInjector
+import com.duckduckgo.app.globalprivacycontrol.GlobalPrivacyControl
 import com.duckduckgo.app.runBlocking
 import com.duckduckgo.app.statistics.store.OfflinePixelCountDataStore
 import com.nhaarman.mockitokotlin2.*
@@ -54,7 +55,8 @@ class BrowserWebViewClientTest {
     private val offlinePixelCountDataStore: OfflinePixelCountDataStore = mock()
     private val uncaughtExceptionRepository: UncaughtExceptionRepository = mock()
     private val dosDetector: DosDetector = DosDetector()
-    private val globalPrivacyControlInjector: GlobalPrivacyControlInjector = mock()
+    private val globalPrivacyControl: GlobalPrivacyControl = mock()
+    private val request: WebResourceRequest = mock()
 
     @UiThreadTest
     @Before
@@ -69,7 +71,7 @@ class BrowserWebViewClientTest {
             cookieManager,
             loginDetector,
             dosDetector,
-            globalPrivacyControlInjector
+            globalPrivacyControl
         )
         testee.webViewClientListener = listener
     }
@@ -108,7 +110,7 @@ class BrowserWebViewClientTest {
     @Test
     fun whenOnPageStartedCalledThenInjectDoNotSellToDom() = coroutinesTestRule.runBlocking {
         testee.onPageStarted(webView, EXAMPLE_URL, null)
-        verify(globalPrivacyControlInjector).injectDoNotSellToDom(webView)
+        verify(globalPrivacyControl).injectDoNotSellToDom(webView)
     }
 
     @UiThreadTest
@@ -176,9 +178,52 @@ class BrowserWebViewClientTest {
         verify(listener, never()).prefetchFavicon(any())
     }
 
+    @Test
+    fun whenShouldOverrideUrlCalledOnMainFrameAndTypeIsWebAndGpcActiveThenLoadUrlWithGpcHeaders() {
+        givenRequestIsFromMainFrame()
+        givenUrlIsTypeWeb()
+        whenever(globalPrivacyControl.isGpcActive()).thenReturn(true)
+        whenever(globalPrivacyControl.getHeaders()).thenReturn(mapOf())
+
+        val mockWebView: WebView = mock()
+        if (Build.VERSION.SDK_INT <= 23) {
+            testee.shouldOverrideUrlLoading(mockWebView, EXAMPLE_URL)
+        } else {
+            testee.shouldOverrideUrlLoading(mockWebView, request)
+        }
+        verify(mockWebView).loadUrl(EXAMPLE_URL, globalPrivacyControl.getHeaders())
+    }
+
+    @Test
+    fun whenShouldOverrideUrlCalledOnMainFrameAndTypeIsWebAndGpcIsNotActiveThenLoadUrlNotCalled() {
+        givenRequestIsFromMainFrame()
+        givenUrlIsTypeWeb()
+        whenever(globalPrivacyControl.isGpcActive()).thenReturn(false)
+        whenever(globalPrivacyControl.getHeaders()).thenReturn(mapOf())
+
+        val mockWebView: WebView = mock()
+        if (Build.VERSION.SDK_INT <= 23) {
+            testee.shouldOverrideUrlLoading(mockWebView, EXAMPLE_URL)
+        } else {
+            testee.shouldOverrideUrlLoading(mockWebView, request)
+        }
+        verify(mockWebView, never()).loadUrl(any(), any())
+    }
+
+    private fun givenUrlIsTypeWeb() {
+        whenever(specialUrlDetector.determineType(EXAMPLE_URI)).thenReturn(SpecialUrlDetector.UrlType.Web(EXAMPLE_URL))
+        whenever(requestRewriter.shouldRewriteRequest(EXAMPLE_URI)).thenReturn(false)
+    }
+
+    private fun givenRequestIsFromMainFrame() {
+        whenever(request.isForMainFrame).thenReturn(true)
+        whenever(request.url).thenReturn(EXAMPLE_URI)
+    }
+
     private class TestWebView(context: Context) : WebView(context)
 
     companion object {
         const val EXAMPLE_URL = "example.com"
+        val EXAMPLE_URI = EXAMPLE_URL.toUri()
     }
 }

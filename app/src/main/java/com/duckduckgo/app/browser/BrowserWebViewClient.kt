@@ -23,13 +23,13 @@ import android.webkit.*
 import androidx.annotation.RequiresApi
 import androidx.annotation.UiThread
 import androidx.annotation.WorkerThread
-import com.duckduckgo.app.globalprivacycontrol.GlobalPrivacyControlInjector
 import com.duckduckgo.app.browser.logindetection.DOMLoginDetector
 import com.duckduckgo.app.browser.logindetection.WebNavigationEvent
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.browser.navigation.safeCopyBackForwardList
 import com.duckduckgo.app.global.exception.UncaughtExceptionRepository
 import com.duckduckgo.app.global.exception.UncaughtExceptionSource.*
+import com.duckduckgo.app.globalprivacycontrol.GlobalPrivacyControl
 import com.duckduckgo.app.statistics.store.OfflinePixelCountDataStore
 import kotlinx.coroutines.*
 import timber.log.Timber
@@ -44,7 +44,7 @@ class BrowserWebViewClient(
     private val cookieManager: CookieManager,
     private val loginDetector: DOMLoginDetector,
     private val dosDetector: DosDetector,
-    private val globalPrivacyControlInjector: GlobalPrivacyControlInjector
+    private val globalPrivacyControl: GlobalPrivacyControl
 ) : WebViewClient() {
 
     var webViewClientListener: WebViewClientListener? = null
@@ -100,18 +100,23 @@ class BrowserWebViewClient(
                 }
                 is SpecialUrlDetector.UrlType.Unknown -> {
                     Timber.w("Unable to process link type for ${urlType.url}")
-                    webView.loadUrl(webView.originalUrl)
+                    webView.loadUrl(webView.originalUrl, globalPrivacyControl.getHeaders())
                     false
                 }
                 is SpecialUrlDetector.UrlType.SearchQuery -> false
                 is SpecialUrlDetector.UrlType.Web -> {
                     if (requestRewriter.shouldRewriteRequest(url)) {
                         val newUri = requestRewriter.rewriteRequestWithCustomQueryParams(url)
-                        webView.loadUrl(newUri.toString())
+                        webView.loadUrl(newUri.toString(), globalPrivacyControl.getHeaders())
                         return true
                     }
                     if (isForMainFrame) {
-                        webViewClientListener?.willOverrideUrl(url.toString())
+                        if (globalPrivacyControl.isGpcActive()) {
+                            webView.loadUrl(url.toString(), globalPrivacyControl.getHeaders())
+                            return true
+                        } else {
+                            webViewClientListener?.willOverrideUrl(url.toString())
+                        }
                     }
                     false
                 }
@@ -139,7 +144,7 @@ class BrowserWebViewClient(
                 webViewClientListener?.pageRefreshed(url)
             }
             lastPageStarted = url
-            globalPrivacyControlInjector.injectDoNotSellToDom(webView)
+            globalPrivacyControl.injectDoNotSellToDom(webView)
             loginDetector.onEvent(WebNavigationEvent.OnPageStarted(webView))
         } catch (e: Throwable) {
             GlobalScope.launch {

@@ -26,8 +26,6 @@ import com.duckduckgo.app.browser.addtohome.AddToHomeSystemCapabilityDetector
 import com.duckduckgo.app.browser.defaultbrowsing.AndroidDefaultBrowserDetector
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserObserver
-import com.duckduckgo.app.globalprivacycontrol.GlobalPrivacyControlInjector
-import com.duckduckgo.app.globalprivacycontrol.GlobalPrivacyControlInjectorJs
 import com.duckduckgo.app.browser.downloader.AndroidFileDownloader
 import com.duckduckgo.app.browser.downloader.DataUriDownloader
 import com.duckduckgo.app.browser.downloader.FileDownloader
@@ -54,6 +52,8 @@ import com.duckduckgo.app.global.exception.UncaughtExceptionRepository
 import com.duckduckgo.app.global.file.FileDeleter
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.useourapp.UseOurAppDetector
+import com.duckduckgo.app.globalprivacycontrol.GlobalPrivacyControl
+import com.duckduckgo.app.globalprivacycontrol.GlobalPrivacyControlManager
 import com.duckduckgo.app.httpsupgrade.HttpsUpgrader
 import com.duckduckgo.app.privacy.db.PrivacyProtectionCountDao
 import com.duckduckgo.app.referral.AppReferrerDataStore
@@ -93,7 +93,7 @@ class BrowserModule {
         cookieManager: CookieManager,
         loginDetector: DOMLoginDetector,
         dosDetector: DosDetector,
-        globalPrivacyControlInjector: GlobalPrivacyControlInjector
+        globalPrivacyControl: GlobalPrivacyControl
     ): BrowserWebViewClient {
         return BrowserWebViewClient(
             requestRewriter,
@@ -104,7 +104,7 @@ class BrowserModule {
             cookieManager,
             loginDetector,
             dosDetector,
-            globalPrivacyControlInjector
+            globalPrivacyControl
         )
     }
 
@@ -254,7 +254,7 @@ class BrowserModule {
     }
 
     @Provides
-    fun doNotSell(appSettingsPreferencesStore: SettingsDataStore): GlobalPrivacyControlInjector {
-        return GlobalPrivacyControlInjectorJs(appSettingsPreferencesStore)
+    fun doNotSell(appSettingsPreferencesStore: SettingsDataStore): GlobalPrivacyControl {
+        return GlobalPrivacyControlManager(appSettingsPreferencesStore)
     }
 }
