@@ -33,7 +33,7 @@
     <string name="cannotLaunchDefaultAppSettings">Rakenduse vaikeseadete ekraani ei saa käivitada</string>
     <string name="settingsDefaultBrowserEnabled">Määrake vaikebrauseriks</string>
     <string name="defaultBrowserMaybeLater">Võib-olla hiljem</string>
-    <string name="defaultBrowserLetsDoIt">Teeme ära!</string>
+    <string name="defaultBrowserLetsDoIt">Määrake vaikebrauseriks</string>
     <string name="defaultBrowserDescriptionNoDefault">Avage linke igal ajal, rahuliku meelega.</string>
     <string name="defaultBrowserInstructions">Valige DuckDuckGo ja koputage valikut <font color="#678fff">Alati</font>.</string>
 

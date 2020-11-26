@@ -33,7 +33,7 @@
     <string name="cannotLaunchDefaultAppSettings">Kan ikke åpne skjermen for appens standardinnstillinger</string>
     <string name="settingsDefaultBrowserEnabled">Gjør til standard nettleser</string>
     <string name="defaultBrowserMaybeLater">Kanskje senere</string>
-    <string name="defaultBrowserLetsDoIt">La oss gjøre det!</string>
+    <string name="defaultBrowserLetsDoIt">Gjør til standardnettleser</string>
     <string name="defaultBrowserDescriptionNoDefault">Åpne lenker med ro i sinnet, hver gang.</string>
     <string name="defaultBrowserInstructions">Velg DuckDuckGo og trykk på <font color="#678fff"> Alltid </font>.</string>
 

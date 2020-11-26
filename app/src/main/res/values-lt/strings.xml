@@ -33,7 +33,7 @@
     <string name="cannotLaunchDefaultAppSettings">Nepavyko paleisti numatytųjų programos nustatymų ekrano</string>
     <string name="settingsDefaultBrowserEnabled">Nustatyti kaip numatytąją naršyklę</string>
     <string name="defaultBrowserMaybeLater">Galbūt vėliau</string>
-    <string name="defaultBrowserLetsDoIt">Padarykime tai!</string>
+    <string name="defaultBrowserLetsDoIt">Nustatyti kaip numatytąją naršyklę</string>
     <string name="defaultBrowserDescriptionNoDefault">Kiekvieną kartą be jaudulio atverkite nuorodas.</string>
     <string name="defaultBrowserInstructions">Pasirinkite „DuckDuckGo“ ir bakstelėkite <font color="#678fff"> „Always“ (visada) </font>.</string>
 

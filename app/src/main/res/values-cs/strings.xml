@@ -33,7 +33,7 @@
     <string name="cannotLaunchDefaultAppSettings">Nelze spustit výchozí obrazovku nastavení aplikace.</string>
     <string name="settingsDefaultBrowserEnabled">Nastavit jako výchozí prohlížeč</string>
     <string name="defaultBrowserMaybeLater">Možná později</string>
-    <string name="defaultBrowserLetsDoIt">Pojďme na to!</string>
+    <string name="defaultBrowserLetsDoIt">Nastavit jako výchozí prohlížeč</string>
     <string name="defaultBrowserDescriptionNoDefault">Otevírejte odkazy s klidem mysli, pokaždé.</string>
     <string name="defaultBrowserInstructions">Vyberte DuckDuckGo a klepněte na <font color="#678fff">Vždy</font>.</string>
 

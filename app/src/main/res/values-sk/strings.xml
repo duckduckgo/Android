@@ -33,7 +33,7 @@
     <string name="cannotLaunchDefaultAppSettings">Nedá sa spustiť obrazovka predvolených nastavení aplikácie</string>
     <string name="settingsDefaultBrowserEnabled">Nastaviť ako predvolený prehliadač</string>
     <string name="defaultBrowserMaybeLater">Možno neskôr</string>
-    <string name="defaultBrowserLetsDoIt">Poďme na to!</string>
+    <string name="defaultBrowserLetsDoIt">Nastaviť ako predvolený prehliadač</string>
     <string name="defaultBrowserDescriptionNoDefault">Vždy otvor odkazy s pokojom mysle.</string>
     <string name="defaultBrowserInstructions">Zvoľ DuckDuckGo a ťukni <font color="#678fff">vždy</font>.</string>
 

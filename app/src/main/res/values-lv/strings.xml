@@ -33,9 +33,9 @@
     <string name="cannotLaunchDefaultAppSettings">Nevar palaist lietotnes noklusējuma iestatījumu ekrānu</string>
     <string name="settingsDefaultBrowserEnabled">Iestatīt kā noklusējuma pārlūku</string>
     <string name="defaultBrowserMaybeLater">Varbūt vēlāk</string>
-    <string name="defaultBrowserLetsDoIt">Aiziet!</string>
     <string name="defaultBrowserDescriptionNoDefault">Katru reizi atveriet saites bez raizēm.</string>
     <string name="defaultBrowserInstructions">Atlasiet DuckDuckGo un pieskarieties <font color="#678fff">Vienmēr</font>.</string>
+    <string name="defaultBrowserLetsDoIt">Iestatīt kā noklusējuma pārlūku</string>
 
     <!-- Browser Activity -->
     <string name="browserPopupMenu">Pārlūka izvēlne</string>

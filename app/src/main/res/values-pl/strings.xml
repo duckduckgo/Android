@@ -33,7 +33,7 @@
     <string name="cannotLaunchDefaultAppSettings">Nie mogę otworzyć domyślnego ekranu ustawień aplikacji</string>
     <string name="settingsDefaultBrowserEnabled">Ustaw jako domyślną przeglądarkę</string>
     <string name="defaultBrowserMaybeLater">Może później</string>
-    <string name="defaultBrowserLetsDoIt">Zróbmy to!</string>
+    <string name="defaultBrowserLetsDoIt">Ustaw jako domyślną przeglądarkę</string>
     <string name="defaultBrowserDescriptionNoDefault">Zawsze otwieraj linki ze spokojem.</string>
     <string name="defaultBrowserInstructions">Wybierz DuckDuckGo i dotknij <font color="#678fff"> Zawsze </font>.</string>
 

@@ -33,8 +33,8 @@
     <string name="cannotLaunchDefaultAppSettings">Nu se poate lansa ecranul de setări implicite ale aplicației</string>
     <string name="settingsDefaultBrowserEnabled">Setare ca browser implicit</string>
     <string name="defaultBrowserMaybeLater">Poate Mai Târziu</string>
-    <string name="defaultBrowserLetsDoIt">Hai să o facem!</string>
     <string name="defaultBrowserDescriptionNoDefault">Deschide link-urile cu liniște sufletească, de fiecare dată.</string>
+    <string name="defaultBrowserLetsDoIt">Setare ca browser implicit</string>
     <string name="defaultBrowserInstructions">Selectează DuckDuckGo și atinge <font color="#678fff"> Întotdeauna </font>.</string>
 
     <!-- Browser Activity -->
