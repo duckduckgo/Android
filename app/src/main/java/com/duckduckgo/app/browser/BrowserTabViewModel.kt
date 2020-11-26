@@ -262,7 +262,7 @@ class BrowserTabViewModel(
         class CheckSystemLocationPermission(val domain: String, val deniedForever: Boolean) : Command()
         class AskDomainPermission(val domain: String) : Command()
         object RequestSystemLocationPermission : Command()
-        class RefreshUserAgent(val host: String?, val isDesktop: Boolean) : Command()
+        class RefreshUserAgent(val url: String?, val isDesktop: Boolean) : Command()
         class ShowErrorWithAction(val textResId: Int, val action: () -> Unit) : Command()
         class ShowDomainHasPermissionMessage(val domain: String) : Command()
         sealed class DaxCommand : Command() {
@@ -755,7 +755,7 @@ class BrowserTabViewModel(
             sendPixelIfUseOurAppSiteVisitedFirstTime(url)
         }
 
-        command.value = RefreshUserAgent(site?.uri?.host, currentBrowserViewState().isDesktopBrowsingMode)
+        command.value = RefreshUserAgent(site?.uri.toString(), currentBrowserViewState().isDesktopBrowsingMode)
 
         val currentOmnibarViewState = currentOmnibarViewState()
         omnibarViewState.value = currentOmnibarViewState.copy(omnibarText = omnibarTextForUrl(url), shouldMoveCaretToEnd = false)
@@ -1430,7 +1430,7 @@ class BrowserTabViewModel(
     fun onDesktopSiteModeToggled(desktopSiteRequested: Boolean) {
         val currentBrowserViewState = currentBrowserViewState()
         browserViewState.value = currentBrowserViewState.copy(isDesktopBrowsingMode = desktopSiteRequested)
-        command.value = RefreshUserAgent(site?.uri?.host, desktopSiteRequested)
+        command.value = RefreshUserAgent(site?.uri?.toString(), desktopSiteRequested)
 
         val uri = site?.uri ?: return
 

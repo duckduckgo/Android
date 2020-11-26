@@ -640,7 +640,7 @@ class BrowserTabFragment :
             is Command.CheckSystemLocationPermission -> checkSystemLocationPermission(it.domain, it.deniedForever)
             is Command.RequestSystemLocationPermission -> requestLocationPermissions()
             is Command.AskDomainPermission -> askSiteLocationPermission(it.domain)
-            is Command.RefreshUserAgent -> refreshUserAgent(it.host, it.isDesktop)
+            is Command.RefreshUserAgent -> refreshUserAgent(it.url, it.isDesktop)
             is Command.AskToFireproofWebsite -> askToFireproofWebsite(requireContext(), it.fireproofWebsite)
             is Command.ShowDomainHasPermissionMessage -> showDomainHasLocationPermission(it.domain)
             is DownloadCommand -> processDownloadCommand(it)
@@ -1154,9 +1154,9 @@ class BrowserTabFragment :
         }
     }
 
-    private fun refreshUserAgent(host: String?, isDesktop: Boolean) {
+    private fun refreshUserAgent(url: String?, isDesktop: Boolean) {
         val currentAgent = webView?.settings?.userAgentString
-        val newAgent = userAgentProvider.userAgent(host, isDesktop)
+        val newAgent = userAgentProvider.userAgent(url, isDesktop)
         if (newAgent != currentAgent) {
             Timber.d("User Agent Changed, new ${if (isDesktop) "Desktop" else "Mobile"} UA is $newAgent")
             webView?.settings?.userAgentString = newAgent

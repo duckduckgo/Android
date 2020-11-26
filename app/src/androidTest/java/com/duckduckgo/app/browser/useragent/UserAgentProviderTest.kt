@@ -121,16 +121,25 @@ class UserAgentProviderTest {
     @Test
     fun whenUserAgentIsForASiteThatShouldUseDesktopAgentThenReturnDesktopUserAgent() {
         testee = UserAgentProvider(Agent.DEFAULT, deviceInfo)
-        val actual = testee.userAgent("m.facebook.com")
+        val actual = testee.userAgent(DESKTOP_ONLY_SITE)
         assertTrue("$actual does not match expected regex", ValidationRegex.desktop.matches(actual))
     }
 
+    @Test
+    fun whenUserAgentIsForASiteThatShouldUseDesktopAgentButContainsAnExclusionThenDoNotReturnConvertedUserAgent() {
+        testee = UserAgentProvider(Agent.DEFAULT, deviceInfo)
+        val actual = testee.userAgent(DESKTOP_ONLY_SITE_EXCEPTION)
+        assertTrue("$actual does not match expected regex", ValidationRegex.converted.matches(actual))
+    }
+
     companion object {
-        const val DOMAIN = "example.com"
-        const val NO_APPLICATION_DOMAIN = "cvs.com"
-        const val NO_APPLICATION_SUBDOMAIN = "subdomain.cvs.com"
-        const val NO_VERSION_DOMAIN = "ing.nl"
-        const val NO_VERSION_SUBDOMAIN = "subdomain.ing.nl"
+        const val DOMAIN = "http://example.com"
+        const val NO_APPLICATION_DOMAIN = "http://cvs.com"
+        const val NO_APPLICATION_SUBDOMAIN = "http://subdomain.cvs.com"
+        const val NO_VERSION_DOMAIN = "http://ing.nl"
+        const val NO_VERSION_SUBDOMAIN = "http://subdomain.ing.nl"
+        const val DESKTOP_ONLY_SITE = "http://m.facebook.com"
+        const val DESKTOP_ONLY_SITE_EXCEPTION = "http://m.facebook.com/dialog/"
     }
 
     private object Agent {
