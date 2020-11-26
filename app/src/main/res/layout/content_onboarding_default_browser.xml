@@ -24,25 +24,7 @@
     tools:background="@color/white"
     tools:context="com.duckduckgo.app.onboarding.ui.OnboardingActivity">
 
-    <Button
-        android:id="@+id/continueButton"
-        style="@style/OnboardingButtonSecondaryRoundedCta"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:text="@string/defaultBrowserMaybeLater"
-        app:layout_constraintBottom_toTopOf="@+id/launchSettingsButton"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
-
-    <Button
-        android:id="@+id/launchSettingsButton"
-        style="@style/OnboardingButtonPrimaryRoundedCta"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:text="@string/defaultBrowserLetsDoIt"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+    <include layout="@layout/include_default_browser_buttons"/>
 
     <ImageView
         android:id="@+id/defaultBrowserImage"
