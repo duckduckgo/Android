@@ -27,14 +27,14 @@
 
     <!-- Onboarding Activity -->
     <string name="onboardingDefaultBrowserDescription">Accesați „Setări” pentru a căuta și naviga cu DuckDuckGo de fiecare dată.</string>
-    <string name="onboardingDefaultBrowserTitle">Fă DuckDuckGo Aplicația Ta Implicită</string>
+    <string name="onboardingDefaultBrowserTitle">Fă DuckDuckGo aplicația ta implicită</string>
 
     <!-- Default Browser -->
     <string name="cannotLaunchDefaultAppSettings">Nu se poate lansa ecranul de setări implicite ale aplicației</string>
     <string name="settingsDefaultBrowserEnabled">Setare ca browser implicit</string>
-    <string name="defaultBrowserMaybeLater">Poate Mai Târziu</string>
+    <string name="defaultBrowserMaybeLater">Poate mai târziu</string>
     <string name="defaultBrowserLetsDoIt">Hai să o facem!</string>
-    <string name="defaultBrowserDescriptionNoDefault">Deschide link-urile cu liniște sufletească, de fiecare dată.</string>
+    <string name="defaultBrowserDescriptionNoDefault">Deschide link-urile liniștit, de fiecare dată.</string>
     <string name="defaultBrowserInstructions">Selectează DuckDuckGo și atinge <font color="#678fff"> Întotdeauna </font>.</string>
 
     <!-- Browser Activity -->
@@ -91,7 +91,9 @@
     <string name="faviconContentDescription">Favicon</string>
     <string name="closeContentDescription">Închidere</string>
     <string name="closeAllTabsMenuItem">Închidere toate filele</string>
-    <string name="closeTab">Închidere nouă</string>
+    <string name="closeTab">Închidere filă</string>
+    <string name="tabClosed">Filă închisă</string>
+    <string name="tabClosedUndo">Anulați</string>
 
     <!-- Privacy Dashboard Activities -->
     <string name="privacyProtectionToggle">Protecția confidențialității site-ului</string>
@@ -110,27 +112,27 @@
     <string name="networksOverview">Rețelele de cookie-uri de urmărire vă adună istoricul web într-un profil de date despre dvs. Rețelele mari de cookie-uri de urmărire sunt mai dăunătoare, deoarece vă pot urmări și vă pot viza pe mai multe site-uri de pe internet.</string>
 
     <plurals name="trackersFound">
-        <item quantity="one">%1$s Urmăritor Găsit</item>
-        <item quantity="few">%1$s Urmăritori Găsiți</item>
-        <item quantity="other">%1$s Urmăritori Găsiți</item>
+        <item quantity="one">%1$s urmăritor găsit</item>
+        <item quantity="few">%1$s urmăritori găsiți</item>
+        <item quantity="other">%1$s de urmăritori găsiți</item>
     </plurals>
 
     <plurals name="trackerBlocked">
-        <item quantity="one">%1$s Urmăritor Blocat</item>
-        <item quantity="few">%1$s Urmăritori Blocați</item>
-        <item quantity="other">%1$s Urmăritori Blocați</item>
+        <item quantity="one">%1$s urmăritor blocat</item>
+        <item quantity="few">%1$s urmăritori blocați</item>
+        <item quantity="other">%1$s de urmăritori blocați</item>
     </plurals>
 
     <plurals name="majorNetworksFound">
-        <item quantity="one">%1$s Rețea Principală Urmăritoare Găsită</item>
-        <item quantity="few">%1$s Rețele Principale Urmăritoare Găsite</item>
-        <item quantity="other">%1$s Rețele Principale Urmăritoare Găsite</item>
+        <item quantity="one">%1$s rețea principală urmăritoare găsită</item>
+        <item quantity="few">%1$s rețele principale urmăritoare găsite</item>
+        <item quantity="other">%1$s de rețele principale urmăritoare găsite</item>
     </plurals>
 
     <plurals name="majorNetworksBlocked">
-        <item quantity="one">%1$s Rețea Principală Urmăritoare Blocată</item>
-        <item quantity="few">%1$s Rețele Principale Urmpritoare Blocate</item>
-        <item quantity="other">%1$s Rețele Principale Urmpritoare Blocate</item>
+        <item quantity="one">%1$s rețea principală urmăritoare blocată</item>
+        <item quantity="few">%1$s rețele principale urmăritoare blocate</item>
+        <item quantity="other">%1$s de rețele principale urmăritoare blocate</item>
     </plurals>
 
     <string name="scorecardActivityTitle">Grad de confidențialitate</string>
@@ -187,7 +189,7 @@
     <!-- About Activity -->
     <string name="aboutActivityTitle">Despre noi</string>
     <string name="aboutDescription">
-        Aici, la DuckDuckGo, stabilim noul standard de încredere online.\n\n DuckDuckGo Privacy Browser oferă toate elementele esențiale de confidențialitate de care aveți nevoie pentru a vă proteja în timp ce căutați și navigați pe web, inclusiv blocarea cookie-urilor de urmărire, criptare mai inteligentă și căutare privată DuckDuckGo.\n\n La urma urmei, internetul nu ar trebui să fie perceput atât de ciudat, iar obținerea confidențialității pe care o meritați online ar trebui să fie la fel de simplă ca a trage perdeaua.</string>
+        Aici, la DuckDuckGo, stabilim noul standard de încredere online.\n\nDuckDuckGo Privacy Browser oferă toate elementele esențiale de confidențialitate de care aveți nevoie pentru a vă proteja în timp ce căutați și navigați pe web, inclusiv blocarea cookie-urilor de urmărire, criptare mai inteligentă și căutare privată DuckDuckGo.\n\nLa urma urmei, internetul nu ar trebui să fie perceput atât de ciudat, iar obținerea confidențialității pe care o meritați online ar trebui să fie la fel de simplă ca a trage perdeaua.</string>
     <string name="aboutMoreLink">Aflați mai multe la duckduckgo.com/about</string>
     <string name="no_suggestions">Fără sugestii</string>
 
@@ -197,8 +199,8 @@
     <string name="brokenSiteSubmitted">Vă mulțumim! Feedback trimis</string>
     <string name="brokenSitesCategoriesTitle">Descrie ce s-a întâmplat:</string>
     <string name="brokenSitesCategoriesHint">Descrie ce s-a întâmplat</string>
-    <string name="brokenSiteSubmitButton">Trimite Raportul</string>
-    <string name="brokenSiteDescription">Trimiterea unui raport anonim al unui site care nu funcționează ne ajută să corectăm aceste probleme și să îmbunătățim aplicația.</string>
+    <string name="brokenSiteSubmitButton">Trimite raportul</string>
+    <string name="brokenSiteDescription">Trimiterea unui raport anonim despre un site care nu funcționează ne ajută să corectăm aceste probleme și să îmbunătățim aplicația.</string>
 
     <string name="brokenSiteCategoryImages">Imaginile nu s-au încărcat</string>
     <string name="brokenSiteCategoryPaywall">Site-ul mi-a cerut să dezactivez</string>
@@ -246,7 +248,7 @@
     <string name="surveyLoadingErrorText">Sondajul nostru nu se încarcă.\nVă rugăm să încercați din nou, mai târziu.</string>
 
     <!-- Add widget -->
-    <string name="addWidgetCtaTitle">Încercați-ne widget-ul de căutare!</string>
+    <string name="addWidgetCtaTitle">Încearcă widget-ul nostru de căutare!</string>
     <string name="addWidgetCtaDescription">Adăugați widget-ul de căutare la ecranul dvs. de pornire, pentru acces rapid și ușor.</string>
     <string name="addWidgetCtaAutoLaunchButton">Adăugare widget</string>
     <string name="addWidgetCtaInstructionsLaunchButton">Afișare</string>
@@ -265,7 +267,7 @@
     <string name="appEnjoymentDialogTitle">Vă place DuckDuckGo?</string>
     <string name="appEnjoymentDialogMessage">Ne-ar plăcea să știm ce credeți</string>
     <string name="appEnjoymentDialogPositiveButton">Îmi place</string>
-    <string name="appEnjoymentDialogNegativeButton">Mai trebuie lucrată</string>
+    <string name="appEnjoymentDialogNegativeButton">Mai trebuie lucrat</string>
 
     <string name="rateAppDialogTitle">Evaluați aplicația</string>
     <string name="rateAppDialogMessage">Feedback-ul dvs. contează. Vă rugăm să vă partajați preferința printr-o recenzie.</string>
@@ -369,7 +371,7 @@
     <string name="whatHaveYouBeenEnjoying">Ce v-a plăcut?</string>
     <string name="awesomeToHear">Ne bucurăm să auzim aceasta!</string>
     <string name="shareTheLoveWithARating">Vă rugăm să vă partajați preferința, evaluând aplicația în Play Store.</string>
-    <string name="rateTheApp">Evaluați aplicația</string>
+    <string name="rateTheApp">EVALUAȚI APLICAȚIA</string>
     <string name="declineFurtherFeedback">NU, MULȚUMESC, AM TERMINAT</string>
     <string name="whichBrokenSites">Unde vedeți aceste probleme?</string>
     <string name="whichBrokenSitesHint">Ce site web are probleme?</string>
@@ -388,9 +390,9 @@
     <string name="systemSearchDeviceAppLabel">De pe acest dispozitiv</string>
     <string name="systemSearchOmnibarInputHint"><font size="13">Căutare sau tastare URL</font></string>
     <string name="systemSearchAppNotFound">Aplicația nu a fost găsită</string>
-    <string name="systemSearchOnboardingText">Mulțumim pentru că ai ales DuckDuckGo!\nAcum, atunci când utilizezi căutarea sau aplicația noastră, căutările tale sunt protejate.</string>
-    <string name="systemSearchOnboardingFeaturesIntroText">De asemenea aplicația DuckDuckGo:</string>
-    <string name="systemSearchOnboardingFeatureOneText">Blochează urmăritoriinesiguri</string>
+    <string name="systemSearchOnboardingText">Mulțumim pentru că ai ales DuckDuckGo!\nAcum, când utilizezi căutarea sau aplicația noastră, căutările tale sunt protejate.</string>
+    <string name="systemSearchOnboardingFeaturesIntroText">De asemenea, aplicația DuckDuckGo:</string>
+    <string name="systemSearchOnboardingFeatureOneText">Blochează urmăritorii nesiguri</string>
     <string name="systemSearchOnboardingFeatureTwoText">Forțează criptarea pe site-uri web</string>
     <string name="systemSearchOnboardingFeatureThreeText">Șterge datele cu o singură atingere</string>
     <string name="systemSearchOnboardingButtonMore">Arată mai multe</string>
@@ -401,7 +403,7 @@
     <string name="daxDialogHideButton">ASCUNDE</string>
     <string name="daxDialogPhew">Pfiu!</string>
     <string name="daxDialogNext">Următorul</string>
-    <string name="daxDialogHighFive">Bate Palma!</string>
+    <string name="daxDialogHighFive">Bate palma!</string>
     <string name="daxDialogGotIt">Am înțeles</string>
     <string name="hideTipsTitle">Ascunzi sfaturile rămase?</string>
     <string name="hideTipsText">Sunt doar câteva, iar noi am încercat să le facem informative.</string>
@@ -410,22 +412,22 @@
     <!-- New Onboarding Experience -->
     <string name="onboardingWelcomeTitle">"Bine ai venit la DuckDuckGo!"</string>
     <string name="onboardingDaxText"><![CDATA[Internetul poate fi cam terifiant.<br/><br/>Nu te îngrijora! Căutarea și navigarea în mod confidențial sunt mai ușoare decât crezi.]]></string>
-    <string name="onboardingLetsDoItButton">Hai Să O Facem!</string>
+    <string name="onboardingLetsDoItButton">Hai să o facem!</string>
     <string name="daxIntroCtaText"><![CDATA[Apoi, încearcă să vizitezi unul din site-urile tale preferate! <br/><br/>Voi bloca urmăritorii ca să nu te mai spioneze. Voi îmbunătăți, de asemenea, securitatea conexiunii tale, dacă este posibil. 🔒]]></string>
     <string name="daxEndCtaText"><![CDATA[Ai ghicit! <br/><br/>Reține: de fiecare dată când navighezi cu mine, o reclamă terifiantă își pierde aripile. 👍]]></string>
     <string name="daxSerpCtaText">Căutările tale DuckDuckGo sunt anonime și nu îți voi stoca niciodată istoricul căutării. Niciodată. 🙌</string>
     <plurals name="daxTrackersBlockedCtaText">
         <item quantity="one"><![CDATA[ și <b>%1$d altul</b> încercau să te urmărească aici. <br/><br/>I-am blocat!<br/><br/> ☝️ Poți verifica bara URL pentru a vedea cine încearcă să te urmărească atunci când vizitezi un nou site.️]]></item>
         <item quantity="few"><![CDATA[ și <b>%1$d alții</b> încercau să te urmărească aici. <br/><br/>I-am blocat!<br/><br/> ☝️ Poți verifica bara URL pentru a vedea cine încearcă să te urmărească atunci când vizitezi un nou site.️]]></item>
-        <item quantity="other"><![CDATA[ și <b>%1$d alții</b> încercau să te urmărească aici. <br/><br/>I-am blocat!<br/><br/> ☝️ Puteți verifica bara URL pentru a vedea cine încearcă să vă urmărească atunci când vizitați un nou site.️]]></item>
+        <item quantity="other"><![CDATA[ și <b>%1$d alții</b> încercau să te urmărească aici. <br/><br/>I-am blocat!<br/><br/> ☝️ Poți verifica bara URL pentru a vedea cine încearcă să te urmărească atunci când vizitați un nou site.️]]></item>
     </plurals>
     <plurals name="daxTrackersBlockedCtaZeroText">
-        <item quantity="one"><![CDATA[ încerca să te urmărească aici. <br/><br/>Am blocat-o!<br/><br/> ☝️ Poți verifica bara URL pentru a vedea cine încearcă să te urmărească atunci când vizitezi un nou site.]]></item>
-        <item quantity="few"><![CDATA[ încercau să te urmărească aici. <br/><br/>Am blocat-o!<br/><br/> ☝️ Poți verifica bara URL pentru a vedea cine încearcă să te urmărească atunci când vizitezi un nou site.]]></item>
-        <item quantity="other"><![CDATA[ încercau să te urmărească aici. <br/><br/>Am blocat-o!<br/><br/> ☝️ Poți verifica bara URL pentru a vedea cine încearcă să te urmărească atunci când vizitezi un nou site.]]></item>
+        <item quantity="one"><![CDATA[ încerca să te urmărească aici. <br/><br/>L-am blocat!<br/><br/> ☝️ Poți verifica bara URL pentru a vedea cine încearcă să te urmărească atunci când vizitezi un nou site.]]></item>
+        <item quantity="few"><![CDATA[ încercau să te urmărească aici. <br/><br/>I-am blocat!<br/><br/> ☝️ Poți verifica bara URL pentru a vedea cine încearcă să te urmărească atunci când vizitezi un nou site.]]></item>
+        <item quantity="other"><![CDATA[ încercau să te urmărească aici. <br/><br/>I-am blocat!<br/><br/> ☝️ Poți verifica bara URL pentru a vedea cine încearcă să te urmărească atunci când vizitezi un nou site.]]></item>
     </plurals>
-    <string name="daxNonSerpCtaText"><![CDATA[În timp ce atingi și derulezi, voi bloca urmăritorii pisălogi. <br/><br/>Dă-i bătaie- continuă să navighezi!]]></string>
-    <string name="daxMainNetworkCtaText"><![CDATA[Atenție! %1$s este o rețea semnificativă de urmărire.<br/><br/> Urmăritorii lor spionează %2$s site-uri de top, 😱 dar nu îți face griji! <br/><br/>Îi voi bloca %3$s să nu vadă activitatea ta pe acele site-uri.]]></string>
+    <string name="daxNonSerpCtaText"><![CDATA[În timp ce atingi și derulezi, voi bloca urmăritorii pisălogi. <br/><br/>Dă-i bătaie — continuă să navighezi!]]></string>
+    <string name="daxMainNetworkCtaText"><![CDATA[Atenție! %1$s este o rețea semnificativă de urmărire.<br/><br/> Urmăritorii lor spionează %2$s site-uri de top, 😱 dar nu îți face griji! <br/><br/> Voi împiedica %3$s să îți vadă activitatea pe acele site-uri.]]></string>
     <string name="daxMainNetworkOwnedCtaText">Atenție! Deoarece %1$s deține %2$s, nu îi pot împiedica să îți vadă activitatea aici.&lt;br/&gt;&lt;br/&gt;Dar navighează cu mine și pot reduce ceea ce %3$s cunoaște despre tine în general, blocând instrumentele lor de urmărire pe o mulțime de alte site-uri.</string>
 
     <!-- Download Confirmation -->
@@ -438,20 +440,20 @@
     <string name="downloadConfirmationUnableToDeleteFileText">Nu s-a putut șterge fișierul vechi</string>
 
     <!-- Change Icon Activity -->
-    <string name="changeIconActivityTitle">Pictograma Aplicației</string>
-    <string name="changeIconCtaLabel">Schimbați Pictograma Aplicației</string>
+    <string name="changeIconActivityTitle">Pictograma aplicației</string>
+    <string name="changeIconCtaLabel">Schimbați pictograma aplicației</string>
     <string name="changeIconCtaAccept">Aplicați</string>
-    <string name="changeIconCtaCancel">Anulați</string>
-    <string name="changeIconDialogTitle">Aplicați Noua Pictogramă?</string>
+    <string name="changeIconCtaCancel">Anulare</string>
+    <string name="changeIconDialogTitle">Aplicați noua pictogramă?</string>
     <string name="changeIconDialogMessage">Aplicația se poate închide pentru aplicarea modificărilor. Reveniți după ce ați admirat noua dvs. splendidă pictogramă.</string>
 
     <!-- New dashboard / menu buttons -->
     <string name="manageWhitelist">Site-uri neprotejate</string>
-    <string name="reportBrokenSite">Raportați Site-ul Distrus</string>
+    <string name="reportBrokenSite">Raportare site defect</string>
 
     <!-- Dialogs -->
     <string name="dialogAddTitle">Adăugați</string>
-    <string name="dialogEditTitle">Editați</string>
+    <string name="dialogEditTitle">Editare</string>
 
     <!-- Whitelist -->
     <string name="whitelisetActivityTitle">Site-uri neprotejate</string>
@@ -468,15 +470,15 @@
     <string name="settingsPrivacyProtectionWhitelist">Site-uri neprotejate</string>
 
     <!-- Fireproof websites -->
-    <string name="fireproofWebsitesActivityTitle">Site-uri ignifuge</string>
-    <string name="settingsFireproofWebsites">Site-uri ignifuge</string>
-    <string name="fireproofWebsiteMenuTitleAdd">Website ignifug</string>
-    <string name="fireproofWebsiteSnackbarConfirmation">&lt;b&gt;%1$s&lt;/b&gt; este acum ignifugat! Accesați Setări pentru a afla mai multe.</string>
+    <string name="fireproofWebsitesActivityTitle">Site-uri cu ștergerea activității și istoricului din browser la ieșire</string>
+    <string name="settingsFireproofWebsites">Site-uri cu ștergerea activității și istoricului din browser la ieșire</string>
+    <string name="fireproofWebsiteMenuTitleAdd">Site cu ștergerea activității și istoricului din browser la ieșire</string>
+    <string name="fireproofWebsiteSnackbarConfirmation">&lt;b&gt;%1$s&lt;/b&gt; nu mai păstrează acum activitatea și istoricul! Accesează setările pentru a gestiona.</string>
     <string name="fireproofWebsiteSnackbarAction">Anulați</string>
     <string name="fireproofWebsiteDeleteConfirmMessage">Sigur doriți să ștergeți &lt;b&gt;%1$s&lt;/b&gt;?</string>
     <string name="fireproofWebsiteEmptyListHint">Niciun site web nu a fost ignorat încă</string>
-    <string name="fireproofWebsiteFeatureDescription">Site-urile web se bazează pe cookie-uri pentru a te menține conectat. Atunci când ștergi activitatea și istoricul unui site, cookie-urile nu vor fi șterse și vei rămâne conectat, chiar și după utilizarea butonului Ștergere activitate și istoric. Blocăm totuși instrumentele de urmărire terțe găsite pe site-urile web la care la ieșire se șterge activitatea și istoricul din browser.</string>
-    <string name="fireproofWebsiteOverflowContentDescription">Mai multe opțiuni pentru site-ul ignifug %1$s</string>
+    <string name="fireproofWebsiteFeatureDescription">Site-urile web se bazează pe cookie-uri pentru a te menține conectat. Atunci când ștergi activitatea și istoricul unui site, cookie-urile nu vor fi șterse și vei rămâne conectat, chiar și după utilizarea butonului Ștergere activitate și istoric. Blocăm totuși instrumentele de urmărire terțe găsite pe site-urile web cu ștergerea activității și istoricului din browser la ieșire.</string>
+    <string name="fireproofWebsiteOverflowContentDescription">Mai multe opțiuni pentru site-ul cu ștergerea activității și istoricului din browser la ieșire %1$s</string>
     <string name="fireproofWebsiteLoginDialogTitle">Dorești să ștergi activitatea și istoricul pentru %1$s?</string>
     <string name="fireproofWebsiteLoginDialogDescription">Ștergerea activității și istoricului din browser pentru acest site te va menține conectat după utilizarea butonului Ștergere activitate și istoric.</string>
     <string name="fireproofWebsiteLoginDialogPositive">Ștergerea activității și istoricului din browser</string>
@@ -485,12 +487,12 @@
     <string name="fireproofWebsiteToogleText">Întreabă la conectare</string>
 
     <!-- Fire Animation settings -->
-    <string name="settingsFireAnimation">Animație buton foc</string>
+    <string name="settingsFireAnimation">Animație buton Ștergere activitate și istoric</string>
     <string name="settingsHeroFireAnimation">Infern</string>
     <string name="settingsHeroWaterAnimation">Vârtej de apă</string>
     <string name="settingsHeroAbstractAnimation">Curent de aer</string>
     <string name="settingsNoneAnimation">Niciuna</string>
-    <string name="settingsSelectFireAnimationDialog">Animație buton foc</string>
+    <string name="settingsSelectFireAnimationDialog">Animație buton Ștergere activitate și istoric</string>
     <string name="settingsSelectFireAnimationDialogSave">Salvare</string>
 
     <!-- Dos Attack error-->
