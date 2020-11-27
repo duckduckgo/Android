@@ -19,7 +19,7 @@
     <Button
         android:id="@+id/continueButton"
         style="@style/OnboardingButtonSecondaryRoundedCta"
-        android:layout_width="0dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/defaultBrowserMaybeLater"
         app:layout_constraintBottom_toBottomOf="parent"
