@@ -44,7 +44,6 @@ import com.duckduckgo.app.privacy.model.TestEntity
 import com.duckduckgo.app.runBlocking
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.VariantManager
-import com.duckduckgo.app.statistics.VariantManager.Companion.DEFAULT_VARIANT
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.*
 import com.duckduckgo.app.survey.db.SurveyDao
@@ -58,11 +57,16 @@ import com.duckduckgo.app.widget.ui.WidgetCapabilities
 import com.nhaarman.mockitokotlin2.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.drop
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runBlockingTest
-import org.junit.*
+import org.junit.After
 import org.junit.Assert.*
+import org.junit.Before
+import org.junit.Rule
+import org.junit.Test
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations
 import java.util.*
@@ -629,24 +633,26 @@ class CtaViewModelTest {
     }
 
     @Test
-    fun whenFirePulseAnimationShowingAndCallDismissThenFireButtonAnimationShouldNotShow() = coroutineRule.runBlocking {
-        var lastValueCollected: Boolean? = null
-        givenControlGroup()
-        givenOnboardingActive()
-        val willTriggerFirePulseAnimationCtas = listOf(CtaId.DAX_DIALOG_TRACKERS_FOUND, CtaId.DAX_DIALOG_NETWORK, CtaId.DAX_DIALOG_OTHER)
-        val launch = launch {
-            testee.showFireButtonPulseAnimation.collect {
-                lastValueCollected = it
-            }
-        }
-        willTriggerFirePulseAnimationCtas.forEach {
-            db.dismissedCtaDao().insert(DismissedCta(it))
-        }
-        assertTrue(lastValueCollected!!)
-
+    fun whenFirePulseAnimationDismissedThenCtaInsertedInDatabase() = coroutineRule.runBlocking {
         testee.dismissPulseAnimation()
 
-        assertFalse(lastValueCollected!!)
+        verify(mockDismissedCtaDao).insert(DismissedCta(CtaId.DAX_FIRE_BUTTON))
+        verify(mockDismissedCtaDao).insert(DismissedCta(CtaId.DAX_FIRE_BUTTON_PULSE))
+    }
+
+    @Test
+    fun whenOnboardingCompletedThenNewDismissedCtasDoNotEmitValues() = coroutineRule.runBlocking {
+        givenDaxOnboardingCompleted()
+        val launch = launch {
+            testee.showFireButtonPulseAnimation.collect { /* noop */ }
+        }
+        clearInvocations(mockDismissedCtaDao)
+
+        requiredDaxOnboardingCtas.forEach {
+            db.dismissedCtaDao().insert(DismissedCta(it))
+        }
+
+        verifyNoMoreInteractions(mockDismissedCtaDao)
         launch.cancel()
     }
 
@@ -699,6 +705,10 @@ class CtaViewModelTest {
 
     private suspend fun givenDaxOnboardingActive() {
         whenever(mockUserStageStore.getUserAppStage()).thenReturn(AppStage.DAX_ONBOARDING)
+    }
+
+    private suspend fun givenDaxOnboardingCompleted() {
+        whenever(mockUserStageStore.getUserAppStage()).thenReturn(AppStage.ESTABLISHED)
     }
 
     private suspend fun givenUserIsEstablished() {

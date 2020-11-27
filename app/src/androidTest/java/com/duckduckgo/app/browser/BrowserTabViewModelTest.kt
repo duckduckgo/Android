@@ -334,7 +334,7 @@ class BrowserTabViewModelTest {
     @ExperimentalCoroutinesApi
     @After
     fun after() {
-        ctaViewModel.forceStopFireButtonPulseAnimation.close()
+        ctaViewModel.isFireButtonPulseAnimationFlowEnabled.close()
         dismissedCtaDaoChannel.close()
         testee.onCleared()
         db.close()
@@ -3009,9 +3009,9 @@ class BrowserTabViewModelTest {
 
         testee.onViewVisible()
 
-        assertEquals(FireButton.Visible(pulseAnimation = true), observer.lastValueReceived!!.fireButton)
         advanceTimeBy(3_600_000)
-        assertEquals(FireButton.Visible(pulseAnimation = false), observer.lastValueReceived!!.fireButton)
+        verify(mockDismissedCtaDao).insert(DismissedCta(CtaId.DAX_FIRE_BUTTON))
+        verify(mockDismissedCtaDao).insert(DismissedCta(CtaId.DAX_FIRE_BUTTON_PULSE))
     }
 
     private suspend fun givenFireButtonPulsing() {
