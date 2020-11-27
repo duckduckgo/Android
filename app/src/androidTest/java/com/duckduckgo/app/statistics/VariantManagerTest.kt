@@ -68,6 +68,20 @@ class VariantManagerTest {
     }
 
     @Test
+    fun roleManagerDefaultBrowserDialogControlHasExpectedWeightAndFeatures() {
+        val variant = variants.first { it.key == "zt" }
+        assertEqualsDouble(1.0, variant.weight)
+        assertTrue(variant.features.isEmpty())
+    }
+
+    @Test
+    fun roleManagerDefaultBrowserDialogTreatmentHasExpectedWeightAndFeatures() {
+        val variant = variants.first { it.key == "zu" }
+        assertEqualsDouble(1.0, variant.weight)
+        assertTrue(variant.features == listOf(SetDefaultBrowserDialog))
+    }
+
+    @Test
     fun verifyNoDuplicateVariantNames() {
         val existingNames = mutableSetOf<String>()
         variants.forEach {

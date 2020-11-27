@@ -23,17 +23,22 @@ import android.os.Build
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.statistics.VariantManager
 import timber.log.Timber
-import javax.inject.Inject
 
-class DefaultRoleBrowserDialogExperiment @Inject constructor(
+interface DefaultRoleBrowserDialogExperiment {
+    fun createIntent(context: Context): Intent?
+    fun shouldShowExperiment(): Boolean
+    fun experimentShown()
+}
+
+class RealDefaultRoleBrowserDialogExperiment(
     private val appInstallStore: AppInstallStore,
     private val variantManager: VariantManager
-) {
+) : DefaultRoleBrowserDialogExperiment {
 
     /**
      * @return an Intent to launch the role browser dialog
      */
-    fun createIntent(context: Context): Intent? {
+    override fun createIntent(context: Context): Intent? {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             val roleManager = context.getSystemService(RoleManager::class.java) ?: return null
 
@@ -51,12 +56,18 @@ class DefaultRoleBrowserDialogExperiment @Inject constructor(
         return null
     }
 
-    fun shouldShowExperiment(): Boolean {
+    override fun shouldShowExperiment(): Boolean {
+        // The second and subsequent times the dialog is shown, the system allows the user to click on "don't show again"
+        // we will get the same result as if the dialog was just dismissed.
         return variantManager.getVariant().hasFeature(VariantManager.VariantFeature.SetDefaultBrowserDialog) &&
-            appInstallStore.newDefaultBrowserDialogCount < 2
+            appInstallStore.newDefaultBrowserDialogCount < DEFAULT_BROWSER_DIALOG_MAX_ATTEMPTS
     }
 
-    fun experimentShown() {
+    override fun experimentShown() {
         appInstallStore.newDefaultBrowserDialogCount++
+    }
+
+    companion object {
+        private const val DEFAULT_BROWSER_DIALOG_MAX_ATTEMPTS = 2
     }
 }

@@ -26,48 +26,77 @@ import android.view.WindowManager
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.ViewPropertyAnimatorCompat
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.app.browser.R
-import com.duckduckgo.app.global.DefaultRoleBrowserDialogExperiment
 import com.duckduckgo.app.global.view.html
-import com.duckduckgo.app.statistics.pixels.Pixel
 import kotlinx.android.synthetic.main.content_onboarding_welcome.*
 import kotlinx.android.synthetic.main.include_dax_dialog_cta.*
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.channels.ConflatedBroadcastChannel
+import kotlinx.coroutines.flow.asFlow
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+@ExperimentalCoroutinesApi
 class WelcomePage : OnboardingPageFragment() {
 
     @Inject
-    lateinit var defaultRoleBrowserDialogExperiment: DefaultRoleBrowserDialogExperiment
-
-    @Inject
-    lateinit var pixel: Pixel
+    lateinit var viewModelFactory: WelcomePageViewModelFactory
 
     private var ctaText: String = ""
     private var welcomeAnimation: ViewPropertyAnimatorCompat? = null
     private var typingAnimation: ViewPropertyAnimatorCompat? = null
+
+    private val events = ConflatedBroadcastChannel<WelcomePageView.Event>()
+
+    private val welcomePageViewModel: WelcomePageViewModel by lazy {
+        ViewModelProvider(this, viewModelFactory).get(WelcomePageViewModel::class.java)
+    }
 
     override fun layoutResource(): Int = R.layout.content_onboarding_welcome
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
 
-        primaryCta.setOnClickListener { launchDefaultBrowserDialogOrContinue() }
+        primaryCta.setOnClickListener { event(WelcomePageView.Event.OnPrimaryCtaClicked) }
 
         configureDaxCta()
         beginWelcomeAnimation(ctaText)
     }
 
-    private fun launchDefaultBrowserDialogOrContinue() {
-        if (defaultRoleBrowserDialogExperiment.shouldShowExperiment()) {
-            val intent = defaultRoleBrowserDialogExperiment.createIntent(requireContext())
-            if (intent != null) {
-                startActivityForResult(intent, DEFAULT_BROWSER_ROLE_MANAGER_DIALOG)
-            } else {
+    override fun onStart() {
+        super.onStart()
+
+        lifecycleScope.launch {
+            events.asFlow()
+                .flatMapLatest { welcomePageViewModel.reduce(it) }
+                .collect(::render)
+        }
+    }
+
+    private fun render(state: WelcomePageView.State) {
+        when (state) {
+            WelcomePageView.State.Idle -> {}
+            is WelcomePageView.State.ShowDefaultBrowserDialog -> {
+                showDefaultBrowserDialog(state.intent)
+            }
+            WelcomePageView.State.Finish -> {
                 onContinuePressed()
             }
-        } else {
-            onContinuePressed()
         }
+    }
+
+    private fun event(event: WelcomePageView.Event) {
+        lifecycleScope.launch {
+            events.send(event)
+        }
+    }
+
+    private fun showDefaultBrowserDialog(intent: Intent) {
+        startActivityForResult(intent, DEFAULT_BROWSER_ROLE_MANAGER_DIALOG)
     }
 
     override fun onResume() {
@@ -83,16 +112,11 @@ class WelcomePage : OnboardingPageFragment() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (requestCode == DEFAULT_BROWSER_ROLE_MANAGER_DIALOG) {
-            defaultRoleBrowserDialogExperiment.experimentShown()
-
-            val pixelParam = mapOf(Pixel.PixelParameter.DEFAULT_BROWSER_SET_FROM_ONBOARDING to true.toString())
-            val pixelName = if (resultCode == RESULT_OK) {
-                Pixel.PixelName.DEFAULT_BROWSER_SET
+            if (resultCode == RESULT_OK) {
+                event(WelcomePageView.Event.OnDefaultBrowserSet)
             } else {
-                Pixel.PixelName.DEFAULT_BROWSER_NOT_SET
+                event(WelcomePageView.Event.OnDefaultBrowserNotSet)
             }
-            pixel.fire(pixelName, pixelParam)
-            onContinuePressed()
         } else {
             super.onActivityResult(requestCode, resultCode, data)
         }
