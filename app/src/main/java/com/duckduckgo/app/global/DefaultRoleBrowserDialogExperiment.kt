@@ -19,24 +19,16 @@ package com.duckduckgo.app.global
 import android.app.role.RoleManager
 import android.content.Context
 import android.content.Intent
-import android.content.SharedPreferences
 import android.os.Build
-import androidx.core.content.edit
+import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.statistics.VariantManager
 import timber.log.Timber
 import javax.inject.Inject
 
 class DefaultRoleBrowserDialogExperiment @Inject constructor(
-    private val appContext: Context,
+    private val appInstallStore: AppInstallStore,
     private val variantManager: VariantManager
 ) {
-
-    private val preferences: SharedPreferences
-        get() = appContext.getSharedPreferences(FILENAME, Context.MODE_PRIVATE)
-
-    private var dialogCount: Int
-        get() = preferences.getInt(ROLE_MANAGER_DIALOG_KEY, 0)
-        set(value) = preferences.edit { putInt(ROLE_MANAGER_DIALOG_KEY, value) }
 
     /**
      * @return an Intent to launch the role browser dialog
@@ -60,15 +52,11 @@ class DefaultRoleBrowserDialogExperiment @Inject constructor(
     }
 
     fun shouldShowExperiment(): Boolean {
-        return variantManager.getVariant().hasFeature(VariantManager.VariantFeature.SetDefaultBrowserDialog) && dialogCount < 2
+        return variantManager.getVariant().hasFeature(VariantManager.VariantFeature.SetDefaultBrowserDialog) &&
+            appInstallStore.newDefaultBrowserDialogCount < 2
     }
 
     fun experimentShown() {
-        dialogCount++
-    }
-
-    companion object {
-        private const val FILENAME = "com.duckduckgo.app.role.browser.dialog"
-        private const val ROLE_MANAGER_DIALOG_KEY = "ROLE_MANAGER_DIALOG_KEY"
+        appInstallStore.newDefaultBrowserDialogCount++
     }
 }
