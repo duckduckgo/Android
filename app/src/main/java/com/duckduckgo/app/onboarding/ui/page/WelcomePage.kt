@@ -16,6 +16,8 @@
 
 package com.duckduckgo.app.onboarding.ui.page
 
+import android.app.Activity.RESULT_OK
+import android.content.Intent
 import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
@@ -25,11 +27,20 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.ViewPropertyAnimatorCompat
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.global.DefaultRoleBrowserDialogExperiment
 import com.duckduckgo.app.global.view.html
+import com.duckduckgo.app.statistics.pixels.Pixel
 import kotlinx.android.synthetic.main.content_onboarding_welcome.*
 import kotlinx.android.synthetic.main.include_dax_dialog_cta.*
+import javax.inject.Inject
 
 class WelcomePage : OnboardingPageFragment() {
+
+    @Inject
+    lateinit var defaultRoleBrowserDialogExperiment: DefaultRoleBrowserDialogExperiment
+
+    @Inject
+    lateinit var pixel: Pixel
 
     private var ctaText: String = ""
     private var welcomeAnimation: ViewPropertyAnimatorCompat? = null
@@ -40,10 +51,23 @@ class WelcomePage : OnboardingPageFragment() {
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
 
-        primaryCta.setOnClickListener { onContinuePressed() }
+        primaryCta.setOnClickListener { launchDefaultBrowserDialogOrContinue() }
 
         configureDaxCta()
         beginWelcomeAnimation(ctaText)
+    }
+
+    private fun launchDefaultBrowserDialogOrContinue() {
+        if (defaultRoleBrowserDialogExperiment.shouldShowExperiment()) {
+            val intent = defaultRoleBrowserDialogExperiment.createIntent(requireContext())
+            if (intent != null) {
+                startActivityForResult(intent, DEFAULT_BROWSER_ROLE_MANAGER_DIALOG)
+            } else {
+                onContinuePressed()
+            }
+        } else {
+            onContinuePressed()
+        }
     }
 
     override fun onResume() {
@@ -55,6 +79,21 @@ class WelcomePage : OnboardingPageFragment() {
         super.onDestroy()
         welcomeAnimation?.cancel()
         typingAnimation?.cancel()
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        if (requestCode == DEFAULT_BROWSER_ROLE_MANAGER_DIALOG) {
+            val pixelParam = mapOf(Pixel.PixelParameter.DEFAULT_BROWSER_SET_FROM_ONBOARDING to true.toString())
+            val pixelName = if (resultCode == RESULT_OK) {
+                Pixel.PixelName.DEFAULT_BROWSER_SET
+            } else {
+                Pixel.PixelName.DEFAULT_BROWSER_NOT_SET
+            }
+            pixel.fire(pixelName, pixelParam)
+            onContinuePressed()
+        } else {
+            super.onActivityResult(requestCode, resultCode, data)
+        }
     }
 
     private fun applyFullScreenFlags() {
@@ -100,5 +139,7 @@ class WelcomePage : OnboardingPageFragment() {
         private const val MAX_ALPHA = 1f
         private const val ANIMATION_DURATION = 400L
         private const val ANIMATION_DELAY = 1400L
+
+        private const val DEFAULT_BROWSER_ROLE_MANAGER_DIALOG = 101
     }
 }
