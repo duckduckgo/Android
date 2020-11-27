@@ -145,7 +145,6 @@ class CtaViewModelTest {
         whenever(mockUserWhitelistDao.contains(any())).thenReturn(false)
         whenever(mockDismissedCtaDao.dismissedCtas()).thenReturn(db.dismissedCtaDao().dismissedCtas())
         whenever(mockTabRepository.flowTabs).thenReturn(db.tabsDao().flowTabs())
-        givenControlGroup()
 
         testee = CtaViewModel(
             mockAppInstallStore,
@@ -256,7 +255,6 @@ class CtaViewModelTest {
 
     @Test
     fun whenCtaDismissedAndUserHasPendingOnboardingCtasThenStageNotCompleted() = coroutineRule.runBlocking {
-        givenControlGroup()
         givenOnboardingActive()
         givenShownDaxOnboardingCtas(emptyList())
         testee.onUserDismissedCta(DaxBubbleCta.DaxEndCta(mockOnboardingStore, mockAppInstallStore))
@@ -265,7 +263,6 @@ class CtaViewModelTest {
 
     @Test
     fun whenCtaDismissedAndAllDaxOnboardingCtasShownThenStageCompleted() = coroutineRule.runBlocking {
-        givenControlGroup()
         givenOnboardingActive()
         givenShownDaxOnboardingCtas(requiredDaxOnboardingCtas)
         testee.onUserDismissedCta(DaxDialogCta.DaxSerpCta(mockOnboardingStore, mockAppInstallStore))
@@ -556,7 +553,6 @@ class CtaViewModelTest {
 
     @Test
     fun whenUserHidesAllTipsThenFireButtonAnimationShouldNotShow() = coroutineRule.runBlocking {
-        givenControlGroup()
         givenOnboardingActive()
         whenever(mockSettingsDataStore.hideTips).thenReturn(true)
 
@@ -565,7 +561,6 @@ class CtaViewModelTest {
 
     @Test
     fun whenUserHasTwoOrMoreTabsThenFireButtonAnimationShouldNotShow() = coroutineRule.runBlocking {
-        givenControlGroup()
         givenOnboardingActive()
         db.tabsDao().insertTab(TabEntity(tabId = "0", position = 0))
         db.tabsDao().insertTab(TabEntity(tabId = "1", position = 1))
@@ -575,7 +570,6 @@ class CtaViewModelTest {
 
     @Test
     fun whenFireAnimationStopsThenDaxFireButtonDisabled() = coroutineRule.runBlocking {
-        givenControlGroup()
         givenOnboardingActive()
         db.tabsDao().insertTab(TabEntity(tabId = "0", position = 0))
         db.tabsDao().insertTab(TabEntity(tabId = "1", position = 1))
@@ -588,7 +582,6 @@ class CtaViewModelTest {
     @Test
     fun whenFireButtonAnimationActiveAndUserOpensANewTabThenFireButtonAnimationStops() = coroutineRule.runBlocking {
         val values = mutableListOf<Boolean>()
-        givenControlGroup()
         givenOnboardingActive()
         db.tabsDao().insertTab(TabEntity(tabId = "0", position = 0))
         db.dismissedCtaDao().insert(DismissedCta(CtaId.DAX_DIALOG_TRACKERS_FOUND))
@@ -605,7 +598,6 @@ class CtaViewModelTest {
 
     @Test
     fun whenUserHasAlreadySeenFireButtonCtaThenFireButtonAnimationShouldNotShow() = coroutineRule.runBlocking {
-        givenControlGroup()
         givenOnboardingActive()
         whenever(mockDismissedCtaDao.exists(CtaId.DAX_FIRE_BUTTON)).thenReturn(true)
 
@@ -614,7 +606,6 @@ class CtaViewModelTest {
 
     @Test
     fun whenUserHasAlreadySeenFireButtonPulseAnimationThenFireButtonAnimationShouldNotShow() = coroutineRule.runBlocking {
-        givenControlGroup()
         givenOnboardingActive()
         whenever(mockDismissedCtaDao.exists(CtaId.DAX_FIRE_BUTTON_PULSE)).thenReturn(true)
 
@@ -623,7 +614,6 @@ class CtaViewModelTest {
 
     @Test
     fun whenTipsActiveAndUserSeesAnyTriggerFirePulseAnimationCtaThenFireButtonAnimationShouldShow() = coroutineRule.runBlocking {
-        givenControlGroup()
         givenOnboardingActive()
         val willTriggerFirePulseAnimationCtas = listOf(CtaId.DAX_DIALOG_TRACKERS_FOUND, CtaId.DAX_DIALOG_NETWORK, CtaId.DAX_DIALOG_OTHER)
         val launch = launch {
@@ -662,7 +652,6 @@ class CtaViewModelTest {
 
     @Test
     fun whenTipsActiveAndUserSeesAnyNonTriggerFirePulseAnimationCtaThenFireButtonAnimationShouldNotShow() = coroutineRule.runBlocking {
-        givenControlGroup()
         givenOnboardingActive()
         val willTriggerFirePulseAnimationCtas = listOf(CtaId.DAX_DIALOG_TRACKERS_FOUND, CtaId.DAX_DIALOG_NETWORK, CtaId.DAX_DIALOG_OTHER)
         val willNotTriggerFirePulseAnimationCtas = CtaId.values().toList() - willTriggerFirePulseAnimationCtas
@@ -681,7 +670,6 @@ class CtaViewModelTest {
 
     @Test
     fun whenFirstTimeUserClicksOnFireButtonThenFireDialogCtaReturned() = coroutineRule.runBlocking {
-        givenControlGroup()
         givenOnboardingActive()
 
         val fireDialogCta = testee.getFireDialogCta()
@@ -691,7 +679,6 @@ class CtaViewModelTest {
 
     @Test
     fun whenFirstTimeUserClicksOnFireButtonButUserHidAllTipsThenFireDialogCtaIsNull() = coroutineRule.runBlocking {
-        givenControlGroup()
         givenOnboardingActive()
         whenever(mockSettingsDataStore.hideTips).thenReturn(true)
 
@@ -702,7 +689,6 @@ class CtaViewModelTest {
 
     @Test
     fun whenFireCtaDismissedThenFireDialogCtaIsNull() = coroutineRule.runBlocking {
-        givenControlGroup()
         givenOnboardingActive()
         whenever(mockDismissedCtaDao.exists(CtaId.DAX_FIRE_BUTTON)).thenReturn(true)
 
@@ -735,10 +721,6 @@ class CtaViewModelTest {
 
     private suspend fun givenUseOurAppActive() {
         whenever(mockUserStageStore.getUserAppStage()).thenReturn(AppStage.USE_OUR_APP_ONBOARDING)
-    }
-
-    private fun givenControlGroup() {
-        whenever(mockVariantManager.getVariant()).thenReturn(DEFAULT_VARIANT)
     }
 
     private fun site(
