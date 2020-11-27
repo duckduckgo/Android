@@ -83,6 +83,8 @@ class WelcomePage : OnboardingPageFragment() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (requestCode == DEFAULT_BROWSER_ROLE_MANAGER_DIALOG) {
+            defaultRoleBrowserDialogExperiment.experimentShown()
+
             val pixelParam = mapOf(Pixel.PixelParameter.DEFAULT_BROWSER_SET_FROM_ONBOARDING to true.toString())
             val pixelName = if (resultCode == RESULT_OK) {
                 Pixel.PixelName.DEFAULT_BROWSER_SET

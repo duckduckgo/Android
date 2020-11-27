@@ -60,13 +60,11 @@ class DefaultRoleBrowserDialogExperiment @Inject constructor(
     }
 
     fun shouldShowExperiment(): Boolean {
-        return variantManager.getVariant().hasFeature(VariantManager.VariantFeature.SetDefaultBrowserDialog) && getAndUpdateCount() < 2
+        return variantManager.getVariant().hasFeature(VariantManager.VariantFeature.SetDefaultBrowserDialog) && dialogCount < 2
     }
 
-    private fun getAndUpdateCount(): Int {
-        val count = dialogCount
+    fun experimentShown() {
         dialogCount++
-        return count
     }
 
     companion object {
