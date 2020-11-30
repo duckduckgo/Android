@@ -507,9 +507,6 @@
     <string name="downloadManagerIncompatible">Menedżer pobierania nie jest dostępny na tym urządzeniu</string>
     <string name="enable">Włącz</string>
 
-    <!--Fire button education-->
-    <string name="daxClearDataCtaText">Teraz dotknij poniżej, aby „spalić” swoją historię przeglądania. Spróbuj! 👇</string>
-
     <!-- Precise Location -->
     <string name="preciseLocationSystemDialogTitle">Udostępnić lokalizację urządzenia przeglądarce prywatności DuckDuckGo?</string>
     <string name="preciseLocationSystemDialogSubtitle">%1$s prosi o dostęp do lokalizacji Twojego urządzenia. Najpierw musisz zezwolić aplikacji na wysyłanie lokalizacji urządzenia, a następnie %2$s może poprosić o pozwolenie.</string>
@@ -533,6 +530,9 @@
     <string name="preciseLocationAllowedSitesSectionTitle">Zgoda</string>
     <string name="preciseLocationDeniedSitesSectionTitle">Odmowa</string>
     <string name="preciseLocationSnackbarMessage">Witryna %1$s ma już przyznane uprawnienia dostępu do lokalizacji urządzenia.</string>
+
+    <!--Fire button education-->
+    <string name="daxClearDataCtaText">Dane osobowe mogą gromadzić się w Twojej przeglądarce. Fuj. Użyj przycisku Zabezpiecz, aby to wszystko zniszczyć. Spróbuj teraz! 👇</string>
 
     <!--  Global Privacy Control-->
     <string name="globalPrivacyControlActivityTitle">Globalna Kontrola Prywatności (GPC)</string>

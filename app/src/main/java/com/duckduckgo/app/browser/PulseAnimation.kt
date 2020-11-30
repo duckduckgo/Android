@@ -78,8 +78,8 @@ class PulseAnimation(private val lifecycleOwner: LifecycleOwner) : LifecycleObse
         if (!pulseAnimation.isRunning) {
             val pulse = ObjectAnimator.ofPropertyValuesHolder(
                 view,
-                PropertyValuesHolder.ofFloat("scaleX", 0.95f, 2f),
-                PropertyValuesHolder.ofFloat("scaleY", 0.95f, 2f),
+                PropertyValuesHolder.ofFloat("scaleX", 0.95f, 1.9f),
+                PropertyValuesHolder.ofFloat("scaleY", 0.95f, 1.9f),
                 PropertyValuesHolder.ofFloat("alpha", 0f, 1f, 1f, 0.1f)
             )
             pulse.repeatCount = ObjectAnimator.INFINITE

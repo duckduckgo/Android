@@ -495,9 +495,6 @@
     <string name="downloadManagerIncompatible">Downloadbeheerder is niet beschikbaar op dit apparaat</string>
     <string name="enable">Inschakelen</string>
 
-    <!--Fire button education-->
-    <string name="daxClearDataCtaText">Tik nu hieronder om je browsegeschiedenis te verbranden. Probeer het maar! 👇</string>
-
     <!-- Precise Location -->
     <string name="preciseLocationSystemDialogTitle">Apparaatlocatie inschakelen voor DuckDuckGo Privacy Browser?</string>
     <string name="preciseLocationSystemDialogSubtitle">%1$s vraagt om de locatie van je apparaat. Je moet eerst de app toestemming geven om je apparaatlocatie te versturen, waarna %2$s toestemming kan vragen.</string>
@@ -521,6 +518,9 @@
     <string name="preciseLocationAllowedSitesSectionTitle">Verleend</string>
     <string name="preciseLocationDeniedSitesSectionTitle">Geweigerd</string>
     <string name="preciseLocationSnackbarMessage">Je hebt eerder %1$s toestemming gegeven om je apparaatlocatie te gebruiken.</string>
+
+    <!--Fire button education-->
+    <string name="daxClearDataCtaText">Persoonlijke gegevens kunnen zich ophopen in je browser. Bah. Gebruik de vuurknop om alles te verbranden. Probeer het maar! 👇</string>
 
     <!--  Global Privacy Control-->
     <string name="globalPrivacyControlActivityTitle">Global Privacy Control (GPC)</string>

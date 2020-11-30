@@ -495,9 +495,6 @@
     <string name="downloadManagerIncompatible">Il Gestore di download non è disponibile su questo dispositivo</string>
     <string name="enable">Attiva</string>
 
-    <!--Fire button education-->
-    <string name="daxClearDataCtaText">Ora tocca qui sotto per incenerire la tua cronologia di navigazione. Prova! 👇</string>
-
     <!-- Precise Location -->
     <string name="preciseLocationSystemDialogTitle">Consentire la localizzazione del dispositivo per DuckDuckGo Privacy Browser?</string>
     <string name="preciseLocationSystemDialogSubtitle">%1$s sta richiedendo la posizione del tuo dispositivo. Prima di tutto devi consentire all\'app di inviare la posizione del tuo dispositivo, poi %2$s potrà chiedere l\'autorizzazione.</string>
@@ -521,6 +518,9 @@
     <string name="preciseLocationAllowedSitesSectionTitle">Concesse</string>
     <string name="preciseLocationDeniedSitesSectionTitle">Negata</string>
     <string name="preciseLocationSnackbarMessage">In precedenza, hai concesso a %1$s l\'autorizzazione ad accedere alla posizione del tuo dispositivo.</string>
+
+    <!--Fire button education-->
+    <string name="daxClearDataCtaText">I dati personali possono accumularsi nel tuo browser. Non va bene! Usa il pulsante Proteggi per sbarazzarti di tutto. Prova subito! 👇</string>
 
     <!--  Global Privacy Control-->
     <string name="globalPrivacyControlActivityTitle">Global Privacy Control (GPC)</string>

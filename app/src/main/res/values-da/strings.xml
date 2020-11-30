@@ -495,9 +495,6 @@
     <string name="downloadManagerIncompatible">Download Manager er ikke tilgængelig på denne enhed</string>
     <string name="enable">Aktiver</string>
 
-    <!--Fire button education-->
-    <string name="daxClearDataCtaText">Tryk nu nedenfor for at brænde din browsinghistorik. Prøv det! 👇</string>
-
     <!-- Precise Location -->
     <string name="preciseLocationSystemDialogTitle">Vil du aktivere enhedsplacering for DuckDuckGo-databeskyttelsesbrowser?</string>
     <string name="preciseLocationSystemDialogSubtitle">%1$s anmoder om din enhedsplacering. Du skal først give tilladelse til, at appen kan sende din enhedsplacering, hvorefter %2$s kan bede om tilladelse.</string>
@@ -521,6 +518,9 @@
     <string name="preciseLocationAllowedSitesSectionTitle">Tilladt</string>
     <string name="preciseLocationDeniedSitesSectionTitle">Afvist</string>
     <string name="preciseLocationSnackbarMessage">Du har tidligere givet %1$s tilladelse til at få adgang til din enhedsplacering.</string>
+
+    <!--Fire button education-->
+    <string name="daxClearDataCtaText">Personoplysninger kan opbygges i din browser. Adr. Brug Ildknappen til at brænde det hele væk. Prøv det nu! 👇</string>
 
     <!--  Global Privacy Control-->
     <string name="globalPrivacyControlActivityTitle">Global Privacy Control (GPC)</string>
