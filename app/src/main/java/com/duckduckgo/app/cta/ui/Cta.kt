@@ -16,7 +16,6 @@
 
 package com.duckduckgo.app.cta.ui
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.net.Uri
 import android.view.View
@@ -39,6 +38,7 @@ import kotlinx.android.synthetic.main.include_cta_buttons.view.*
 import kotlinx.android.synthetic.main.include_cta_content.view.*
 import kotlinx.android.synthetic.main.include_dax_dialog_cta.view.*
 import kotlinx.android.synthetic.main.include_top_cta.view.*
+import java.util.*
 
 interface DialogCta {
     fun createCta(activity: FragmentActivity): DaxDialog
@@ -212,14 +212,19 @@ sealed class DaxDialogCta(
         onboardingStore,
         appInstallStore
     ) {
-
-        @SuppressLint("StringFormatMatches")
-        @ExperimentalStdlibApi
         override fun getDaxText(context: Context): String {
-            val percentage = networkPropertyPercentages[network]
-
             return if (isFromSameNetworkDomain()) {
-                context.resources.getString(R.string.daxMainNetworkCtaText, network, percentage, network)
+                if (isEnglishLocale()) {
+                    context.resources.getString(
+                        R.string.daxMainNetworkCtaText,
+                        network,
+                        Uri.parse(siteHost).baseHost?.removePrefix("m."),
+                        network
+                    )
+                } else {
+                    // Remove this branch once Translations are ready
+                    nonEnglishText(context)
+                }
             } else {
                 context.resources.getString(
                     R.string.daxMainNetworkOwnedCtaText,
@@ -230,7 +235,17 @@ sealed class DaxDialogCta(
             }
         }
 
-        @ExperimentalStdlibApi
+        @Suppress("SENSELESS_COMPARISON")
+        private fun isEnglishLocale(): Boolean {
+            val locale = Locale.getDefault()
+            return locale != null && locale.language == "en"
+        }
+
+        private fun nonEnglishText(context: Context): String {
+            val percentage = networkPropertyPercentages[network]
+            return context.resources.getString(R.string.daxMainNetworkCtaText, network, percentage, network)
+        }
+
         override fun createCta(activity: FragmentActivity): DaxDialog =
             TypewriterDaxDialog.newInstance(daxText = getDaxText(activity), primaryButtonText = activity.resources.getString(okButton))
 

@@ -16,12 +16,16 @@
 
 package com.duckduckgo.app.browser.downloader
 
+import com.duckduckgo.app.statistics.pixels.Pixel
+import com.nhaarman.mockitokotlin2.mock
+import com.nhaarman.mockitokotlin2.verify
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
 class UriUtilsFilenameExtractorTest {
 
-    private val testee: FilenameExtractor = FilenameExtractor()
+    private val mockedPixel: Pixel = mock()
+    private val testee: FilenameExtractor = FilenameExtractor(mockedPixel)
 
     @Test
     fun whenUrlEndsWithFilenameAsJpgNoMimeOrContentDispositionThenFilenameShouldBeExtracted() {
@@ -138,6 +142,24 @@ class UriUtilsFilenameExtractorTest {
         val contentDisposition: String? = null
         val extracted = testee.extract(buildPendingDownload(url, contentDisposition, mimeType))
         assertEquals("example.com", extracted)
+    }
+
+    @Test
+    fun whenNoFilenameAndPathSegmentsThenPathNameBinFileIsReturned() {
+        val url = "http://example.com/cat/600/400"
+        val mimeType: String? = null
+        val contentDisposition: String? = null
+        val extracted = testee.extract(buildPendingDownload(url, contentDisposition, mimeType))
+        assertEquals("cat.bin", extracted)
+    }
+
+    @Test
+    fun whenNoFilenameAndPathSegmentsThenFirePixel() {
+        val url = "http://example.com/cat/600/400"
+        val mimeType: String? = null
+        val contentDisposition: String? = null
+        val extracted = testee.extract(buildPendingDownload(url, contentDisposition, mimeType))
+        verify(mockedPixel).fire(Pixel.PixelName.DOWNLOAD_FILE_DEFAULT_GUESSED_NAME)
     }
 
     private fun buildPendingDownload(url: String, contentDisposition: String?, mimeType: String?): FileDownloader.PendingFileDownload {
