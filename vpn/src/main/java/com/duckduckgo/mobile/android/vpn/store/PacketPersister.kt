@@ -16,22 +16,25 @@
 
 package com.duckduckgo.mobile.android.vpn.store
 
+import timber.log.Timber
 import javax.inject.Inject
 
 interface PacketPersister {
-    fun persistDataSent(packetLength: Int)
-    fun persistDataReceived(packetLength: Int)
+    fun persistDataSent(packetLength: Int, packetType: String)
+    fun persistDataReceived(packetLength: Int, packetType: String)
 }
 
 class RoomPacketPersister @Inject constructor(
     val vpnDatabase: VpnDatabase
 ) : PacketPersister {
 
-    override fun persistDataSent(packetLength: Int) {
+    override fun persistDataSent(packetLength: Int, packetType: String) {
+        Timber.v("[%s] Updating data sent: %d bytes of data", packetType, packetLength)
         vpnDatabase.vpnDataStatsDao().upsertDataSent(packetLength)
     }
 
-    override fun persistDataReceived(packetLength: Int) {
+    override fun persistDataReceived(packetLength: Int, packetType: String) {
+        Timber.v("[%s] Updating data received: %d bytes of data", packetType, packetLength)
         vpnDatabase.vpnDataStatsDao().upsertDataReceived(packetLength)
     }
 }

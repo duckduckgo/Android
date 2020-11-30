@@ -105,12 +105,11 @@ class TcpNetworkToDevice(
             try {
                 val readBytes = channel.read(receiveBuffer)
 
-                packetPersister.persistDataReceived(readBytes)
-
                 if (endOfStream(readBytes)) {
                     handleEndOfStream(tcb, packet, key, channel)
                     return
                 } else {
+                    packetPersister.persistDataReceived(readBytes, "TCP")
                     sendToNetworkToDeviceQueue(packet, receiveBuffer, tcb, readBytes)
                 }
             } catch (e: IOException) {

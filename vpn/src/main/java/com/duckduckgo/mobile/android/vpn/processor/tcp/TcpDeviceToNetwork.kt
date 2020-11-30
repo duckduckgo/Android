@@ -86,7 +86,7 @@ class TcpDeviceToNetwork(
 
         val totalPacketLength = payloadBuffer.limit()
 
-        packetPersister.persistDataSent(totalPacketLength)
+        packetPersister.persistDataSent(totalPacketLength, "TCP")
 
         val tcb = TCB.getTCB(connectionKey)
         // Timber.i("Device to network packet; got new response buffer and checked for TCB. Took ${(System.nanoTime() - startTime) / 1_000_000}ms")

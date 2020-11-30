@@ -22,6 +22,7 @@ import android.os.SystemClock
 import android.util.LruCache
 import com.duckduckgo.mobile.android.vpn.service.NetworkChannelCreator
 import com.duckduckgo.mobile.android.vpn.service.VpnQueues
+import com.duckduckgo.mobile.android.vpn.store.PacketPersister
 import kotlinx.coroutines.*
 import timber.log.Timber
 import xyz.hexene.localvpn.ByteBufferPool
@@ -34,7 +35,11 @@ import java.nio.channels.Selector
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 
-class UdpPacketProcessor(private val queues: VpnQueues, private val networkChannelCreator: NetworkChannelCreator) : Runnable {
+class UdpPacketProcessor(
+    private val queues: VpnQueues,
+    private val networkChannelCreator: NetworkChannelCreator,
+    private val packetPersister: PacketPersister
+) : Runnable {
 
     private var pollJobDeviceToNetwork: Job? = null
     private var pollJobNetworkToDevice: Job? = null
@@ -133,7 +138,7 @@ class UdpPacketProcessor(private val queues: VpnQueues, private val networkChann
             val payloadBuffer = packet.backingBuffer ?: return
             while (payloadBuffer.hasRemaining()) {
                 val bytesWritten = channel.write(payloadBuffer)
-                Timber.v("Wrote %d bytes to network (%s:%d)", bytesWritten, destinationAddress, destinationPort)
+                packetPersister.persistDataSent(bytesWritten, "UDP")
             }
         } catch (e: IOException) {
             Timber.w("Network write error")
@@ -184,7 +189,7 @@ class UdpPacketProcessor(private val queues: VpnQueues, private val networkChann
 
                     val inputChannel = (key.channel() as DatagramChannel)
                     val readBytes = inputChannel.read(receiveBuffer)
-                    Timber.i("Read %d bytes from datagram channel %s", readBytes, inputChannel)
+                    packetPersister.persistDataReceived(readBytes, "UDP")
 
                     val referencePacket = key.attachment() as Packet
                     referencePacket.updateUdpBuffer(receiveBuffer, readBytes)

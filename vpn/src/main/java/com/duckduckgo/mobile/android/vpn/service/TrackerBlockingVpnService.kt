@@ -108,7 +108,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
         super.onCreate()
         AndroidInjection.inject(this)
 
-        udpPacketProcessor = UdpPacketProcessor(queues, this)
+        udpPacketProcessor = UdpPacketProcessor(queues, this, packetPersister)
         tcpPacketProcessor = TcpPacketProcessor(queues, this, trackerDetector, packetPersister, localAddressDetector)
 
         Timber.i("VPN onCreate")
