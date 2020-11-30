@@ -370,7 +370,6 @@ class CtaViewModel @Inject constructor(
         .onEach { (_, forceStopAnimation) ->
             withContext(dispatchers.io()) {
                 if (pulseAnimationDisabled()) {
-                    println("pulseAnimationDisabled")
                     isFireButtonPulseAnimationFlowEnabled.send(false)
                 }
                 if (forceStopAnimation) {
@@ -383,7 +382,6 @@ class CtaViewModel @Inject constructor(
     private fun Flow<Pair<List<DismissedCta>, Boolean>>.shouldShowPulseAnimation(): Flow<Boolean> {
         return this.map { (dismissedCtaDao, forceStopAnimation) ->
             withContext(dispatchers.io()) {
-                println("collectedcta $dismissedCtaDao")
                 if (forceStopAnimation) return@withContext false
                 if (pulseAnimationDisabled()) return@withContext false
 
