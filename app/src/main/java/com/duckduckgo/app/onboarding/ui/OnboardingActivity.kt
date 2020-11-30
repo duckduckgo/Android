@@ -22,13 +22,9 @@ import android.os.Bundle
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.DuckDuckGoActivity
-import com.duckduckgo.app.statistics.VariantManager
 import kotlinx.android.synthetic.main.activity_onboarding.*
-import javax.inject.Inject
 
 class OnboardingActivity : DuckDuckGoActivity() {
-
-    @Inject lateinit var variantManager: VariantManager
 
     private lateinit var viewPageAdapter: PagerAdapter
 
@@ -42,9 +38,7 @@ class OnboardingActivity : DuckDuckGoActivity() {
 
     fun onContinueClicked() {
         val next = viewPager.currentItem + 1
-        if (next < viewPager.adapter!!.count &&
-            !variantManager.getVariant().hasFeature(VariantManager.VariantFeature.SetDefaultBrowserDialog)
-        ) {
+        if (next < viewPager.adapter!!.count) {
             viewPager.setCurrentItem(next, true)
         } else {
             viewModel.onOnboardingDone()

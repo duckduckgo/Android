@@ -17,6 +17,8 @@
 package com.duckduckgo.app.onboarding.ui
 
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
+import com.duckduckgo.app.statistics.Variant
+import com.duckduckgo.app.statistics.VariantManager
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.whenever
 import org.junit.Assert.assertEquals
@@ -28,16 +30,24 @@ class OnboardingPageManagerTest {
     private lateinit var testee: OnboardingPageManager
     private val onboardingPageBuilder: OnboardingPageBuilder = mock()
     private val mockDefaultBrowserDetector: DefaultBrowserDetector = mock()
+    private val variantManager: VariantManager = mock()
+    private val defaultBrowserVariant = Variant(
+        key = "variant",
+        features = listOf(VariantManager.VariantFeature.SetDefaultBrowserDialog),
+        filterBy = { true }
+    )
+    private val otherVariant = Variant(key = "variant", features = listOf(), filterBy = { true })
 
     @Before
     fun setup() {
-        testee = OnboardingPageManagerWithTrackerBlocking(onboardingPageBuilder, mockDefaultBrowserDetector)
+        testee = OnboardingPageManagerWithTrackerBlocking(variantManager, onboardingPageBuilder, mockDefaultBrowserDetector)
     }
 
     @Test
     fun whenDDGIsNotDefaultBrowserThenExpectedOnboardingPagesAreTwo() {
         configureDeviceSupportsDefaultBrowser()
         whenever(mockDefaultBrowserDetector.isDefaultBrowser()).thenReturn(false)
+        whenever(variantManager.getVariant()).thenReturn(otherVariant)
 
         testee.buildPageBlueprints()
 
@@ -45,9 +55,32 @@ class OnboardingPageManagerTest {
     }
 
     @Test
+    fun whenDDGIsNotDefaultBrowserAndBrowserDialogVariantThenExpectedOnboardingPagesAre1() {
+        configureDeviceSupportsDefaultBrowser()
+        whenever(mockDefaultBrowserDetector.isDefaultBrowser()).thenReturn(false)
+        whenever(variantManager.getVariant()).thenReturn(defaultBrowserVariant)
+
+        testee.buildPageBlueprints()
+
+        assertEquals(1, testee.pageCount())
+    }
+
+    @Test
     fun whenDDGAsDefaultBrowserThenSinglePageOnBoarding() {
         configureDeviceSupportsDefaultBrowser()
         whenever(mockDefaultBrowserDetector.isDefaultBrowser()).thenReturn(true)
+        whenever(variantManager.getVariant()).thenReturn(otherVariant)
+
+        testee.buildPageBlueprints()
+
+        assertEquals(1, testee.pageCount())
+    }
+
+    @Test
+    fun whenDDGAsDefaultBrowserAndBrowserDialogVariantThenSinglePageOnBoarding() {
+        configureDeviceSupportsDefaultBrowser()
+        whenever(mockDefaultBrowserDetector.isDefaultBrowser()).thenReturn(true)
+        whenever(variantManager.getVariant()).thenReturn(defaultBrowserVariant)
 
         testee.buildPageBlueprints()
 
@@ -57,6 +90,17 @@ class OnboardingPageManagerTest {
     @Test
     fun whenDeviceDoesNotSupportDefaultBrowserThenSinglePageOnBoarding() {
         configureDeviceDoesNotSupportDefaultBrowser()
+        whenever(variantManager.getVariant()).thenReturn(otherVariant)
+
+        testee.buildPageBlueprints()
+
+        assertEquals(1, testee.pageCount())
+    }
+
+    @Test
+    fun whenDeviceDoesNotSupportDefaultBrowserAndBrowserDialogVariantThenSinglePageOnBoarding() {
+        configureDeviceDoesNotSupportDefaultBrowser()
+        whenever(variantManager.getVariant()).thenReturn(defaultBrowserVariant)
 
         testee.buildPageBlueprints()
 

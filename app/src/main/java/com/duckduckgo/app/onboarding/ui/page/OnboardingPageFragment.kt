@@ -16,7 +16,6 @@
 
 package com.duckduckgo.app.onboarding.ui.page
 
-import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -24,7 +23,6 @@ import android.view.ViewGroup
 import androidx.annotation.LayoutRes
 import androidx.fragment.app.Fragment
 import com.duckduckgo.app.onboarding.ui.OnboardingActivity
-import dagger.android.support.AndroidSupportInjection
 
 abstract class OnboardingPageFragment : Fragment() {
 
@@ -33,11 +31,6 @@ abstract class OnboardingPageFragment : Fragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? =
         inflater.inflate(layoutResource(), container, false)
-
-    override fun onAttach(context: Context) {
-        AndroidSupportInjection.inject(this)
-        super.onAttach(context)
-    }
 
     fun onContinuePressed() {
         when (activity) {

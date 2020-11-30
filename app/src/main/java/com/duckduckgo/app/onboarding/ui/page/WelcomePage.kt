@@ -17,6 +17,7 @@
 package com.duckduckgo.app.onboarding.ui.page
 
 import android.app.Activity.RESULT_OK
+import android.content.Context
 import android.content.Intent
 import android.graphics.Color
 import android.os.Build
@@ -30,10 +31,11 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.view.html
+import dagger.android.support.AndroidSupportInjection
 import kotlinx.android.synthetic.main.content_onboarding_welcome.*
 import kotlinx.android.synthetic.main.include_dax_dialog_cta.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.channels.ConflatedBroadcastChannel
+import kotlinx.coroutines.channels.BroadcastChannel
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.flatMapLatest
@@ -50,7 +52,8 @@ class WelcomePage : OnboardingPageFragment() {
     private var welcomeAnimation: ViewPropertyAnimatorCompat? = null
     private var typingAnimation: ViewPropertyAnimatorCompat? = null
 
-    private val events = ConflatedBroadcastChannel<WelcomePageView.Event>()
+    // we use a BroadcastChannel because we don't want to emit the last value upon subscription
+    private val events = BroadcastChannel<WelcomePageView.Event>(1)
 
     private val welcomePageViewModel: WelcomePageViewModel by lazy {
         ViewModelProvider(this, viewModelFactory).get(WelcomePageViewModel::class.java)
@@ -65,6 +68,11 @@ class WelcomePage : OnboardingPageFragment() {
 
         configureDaxCta()
         beginWelcomeAnimation(ctaText)
+    }
+
+    override fun onAttach(context: Context) {
+        AndroidSupportInjection.inject(this)
+        super.onAttach(context)
     }
 
     override fun onStart() {
