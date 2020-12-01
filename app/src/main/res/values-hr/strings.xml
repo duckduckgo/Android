@@ -418,7 +418,7 @@
     <string name="onboardingDaxText"><![CDATA[Internet može biti pomalo neugodan.<br/><br/> Ne brini! Privatno pretraživanje i pregledavanje lakše je nego što misliš.]]></string>
     <string name="onboardingLetsDoItButton">Učinimo to!</string>
     <string name="daxIntroCtaText"><![CDATA[Zatim pokušaj posjetiti jedno od svojih omiljenih web-mjesta! <br/><br/>Blokirat ću tragače kako te ne bi mogli špijunirati. Nadogradit ću i sigurnost tvoje veze ako je moguće. 🔒]]></string>
-    <string name="daxEndCtaText"><![CDATA[Možeš ti to!\n\nZapamti: svaki put kada pregledavaš sa mnom grozna reklama gubi krila. 👍]]></string>
+    <string name="daxEndCtaText"><![CDATA[Možeš ti to!<br/><br/>Zapamti: svaki put kada pregledavaš sa mnom grozna reklama gubi krila. 👍]]></string>
     <string name="daxSerpCtaText">Tvoje pretrage u DuckDuckGou anonimne su i nikad ne pohranjujem tvoju povijest pretraga. Nikad. 🙌</string>
     <plurals name="daxTrackersBlockedCtaText">
         <item quantity="one"><![CDATA[ i <b>%1$d drugi</b> pokušali su te pratiti ovdje. <br/><br/>Ja sam ih blokirao!<br/><br/> ☝️Na traci URL-a možeš vidjeti tko te pokušava pratiti kad posjetiš novo web-mjesto.]]></item>
@@ -532,9 +532,6 @@
     <string name="preciseLocationAllowedSitesSectionTitle">Odobreno</string>
     <string name="preciseLocationDeniedSitesSectionTitle">Odbijeno</string>
     <string name="preciseLocationSnackbarMessage">Prethodno si odobrio/la %1$s dozvolu za pristup lokaciji tvojeg uređaja.</string>
-
-    <!--Fire button education-->
-    <string name="daxClearDataCtaText">Osobni podaci mogu se nakupljati u tvojem pregledniku. Fuj. Koristite gumb Vatre da bi ih sve spalio/la. Pokušaj sada! 👇</string>
 
     <!--Fire button education-->
     <string name="daxClearDataCtaText">Osobni podaci mogu se nakupljati u tvojem pregledniku. Fuj. Koristite gumb Vatre da bi ih sve spalio/la. Pokušaj sada! 👇</string>
