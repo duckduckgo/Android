@@ -48,10 +48,12 @@ class RateAppDialogFragment : EnjoymentDialog() {
                 firePixelWithPromptCount(APP_RATING_DIALOG_USER_DECLINED_RATING)
                 listener.onUserDeclinedToRateApp(promptCount)
             }
-            .setOnKeyListener(BackKeyListener {
-                firePixelWithPromptCount(APP_RATING_DIALOG_USER_CANCELLED)
-                listener.onUserCancelledRateAppDialog(promptCount)
-            })
+            .setOnKeyListener(
+                BackKeyListener {
+                    firePixelWithPromptCount(APP_RATING_DIALOG_USER_CANCELLED)
+                    listener.onUserCancelledRateAppDialog(promptCount)
+                }
+            )
             .create()
     }
 

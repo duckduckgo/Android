@@ -478,6 +478,15 @@
     <string name="fireproofWebsiteItemsSectionTitle">Nettsteder</string>
     <string name="fireproofWebsiteToogleText">Spør ved innlogging</string>
 
+    <!-- Fire Animation settings -->
+    <string name="settingsFireAnimation">Animasjon for brannknappen</string>
+    <string name="settingsHeroFireAnimation">Inferno</string>
+    <string name="settingsHeroWaterAnimation">Malstrøm</string>
+    <string name="settingsHeroAbstractAnimation">Luftstrøm</string>
+    <string name="settingsNoneAnimation">Ingen</string>
+    <string name="settingsSelectFireAnimationDialog">Animasjon for brannknappen</string>
+    <string name="settingsSelectFireAnimationDialogSave">Lagre</string>
+
     <!-- Dos Attack error-->
     <string name="dosErrorMessage">Tilkobling avbrutt. Dette nettstedet kan skade enheten din.</string>
 
@@ -485,9 +494,6 @@
     <string name="downloadManagerDisabled">Nedlastingsbehandler er deaktivert</string>
     <string name="downloadManagerIncompatible">Nedlastingsbehandler er ikke tilgjengelig på denne enheten</string>
     <string name="enable">Aktiver</string>
-
-    <!--Fire button education-->
-    <string name="daxClearDataCtaText">Trykk nedenfor for å brenne nettleserhistorikken. Prøv! 👇</string>
 
     <!-- Precise Location -->
     <string name="preciseLocationSystemDialogTitle">Vil du aktivere posisjonstjenester for DuckDuckGo privatnettleser?</string>
@@ -512,6 +518,9 @@
     <string name="preciseLocationAllowedSitesSectionTitle">Tillatelse gitt</string>
     <string name="preciseLocationDeniedSitesSectionTitle">Tillatelse avslått</string>
     <string name="preciseLocationSnackbarMessage">Du har tidligere gitt %1$s tillatelse til å se enhetens posisjon.</string>
+
+    <!--Fire button education-->
+    <string name="daxClearDataCtaText">Det kan samles opp personopplysninger i nettleseren din. Fysj. Bruk brannknappen til å sette fyr på alt sammen. Prøv det nå! 👇</string>
 
     <!--  Global Privacy Control-->
     <string name="globalPrivacyControlActivityTitle">Global Privacy Control (GPC)</string>

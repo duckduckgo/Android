@@ -135,12 +135,12 @@ class TcpNetworkToDevice(
     private fun handleEndOfStream(tcb: TCB, packet: Packet, key: SelectionKey, channel: SocketChannel) {
         Timber.w(
             "Network-to-device end of stream ${tcb.ipAndPort}. ${tcb.tcbState} ${
-                logPacketDetails(
-                    packet,
-                    tcb.sequenceNumberToClientInitial,
-                    tcb.sequenceNumberToClient,
-                    tcb.acknowledgementNumberToClient
-                )
+            logPacketDetails(
+                packet,
+                tcb.sequenceNumberToClientInitial,
+                tcb.sequenceNumberToClient,
+                tcb.acknowledgementNumberToClient
+            )
             }"
         )
 

@@ -478,6 +478,15 @@
     <string name="fireproofWebsiteItemsSectionTitle">Уеб сайтове</string>
     <string name="fireproofWebsiteToogleText">Питай при влизане</string>
 
+    <!-- Fire Animation settings -->
+    <string name="settingsFireAnimation">Анимация на огнения бутон</string>
+    <string name="settingsHeroFireAnimation">Адски огън</string>
+    <string name="settingsHeroWaterAnimation">Водовъртеж</string>
+    <string name="settingsHeroAbstractAnimation">Въздушна струя</string>
+    <string name="settingsNoneAnimation">Няма</string>
+    <string name="settingsSelectFireAnimationDialog">Анимация на огнения бутон</string>
+    <string name="settingsSelectFireAnimationDialogSave">Запази</string>
+
     <!-- Dos Attack error-->
     <string name="dosErrorMessage">Връзката е прекъсната. Този уеб сайт може да навреди на вашето устройство.</string>
 
@@ -485,9 +494,6 @@
     <string name="downloadManagerDisabled">Управлението на изтеглени файлове е деактивирано</string>
     <string name="downloadManagerIncompatible">Управлението на изтеглени файлове не е налично на това устройство</string>
     <string name="enable">Активиране</string>
-
-    <!--Fire button education-->
-    <string name="daxClearDataCtaText">Сега докоснете бутона по-долу, за да изгорите историята на сърфирането. Опитайте! 👇</string>
 
     <!-- Precise Location -->
     <string name="preciseLocationSystemDialogTitle">Да се активира ли местоположение на устройството за поверителния браузър на DuckDuckGo?</string>
@@ -512,6 +518,9 @@
     <string name="preciseLocationAllowedSitesSectionTitle">Даден</string>
     <string name="preciseLocationDeniedSitesSectionTitle">Отказан</string>
     <string name="preciseLocationSnackbarMessage">Дали сте разрешение на %1$s за достъп до местоположението на устройството.</string>
+
+    <!--Fire button education-->
+    <string name="daxClearDataCtaText">Личните данни могат да се натрупват в браузъра. Много неприятно. Използвайте огнения бутон, за да изгорите всичко. Опитайте сега! 👇</string>
 
     <!--  Global Privacy Control-->
     <string name="globalPrivacyControlActivityTitle">Глобален контрол на поверителността (GPC)</string>

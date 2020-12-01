@@ -478,6 +478,15 @@
     <string name="fireproofWebsiteItemsSectionTitle">Websites</string>
     <string name="fireproofWebsiteToogleText">Beim Anmelden fragen</string>
 
+    <!-- Fire Animation settings -->
+    <string name="settingsFireAnimation">Animation der Schaltfläche „Feuer“</string>
+    <string name="settingsHeroFireAnimation">Inferno</string>
+    <string name="settingsHeroWaterAnimation">Whirlpool</string>
+    <string name="settingsHeroAbstractAnimation">Luftstrom</string>
+    <string name="settingsNoneAnimation">Gar nichts</string>
+    <string name="settingsSelectFireAnimationDialog">Animation der Schaltfläche „Feuer“</string>
+    <string name="settingsSelectFireAnimationDialogSave">Speichern</string>
+
     <!-- Dos Attack error-->
     <string name="dosErrorMessage">Verbindung getrennt. Diese Website könnte schädlich für dein Gerät sein.</string>
 
@@ -485,9 +494,6 @@
     <string name="downloadManagerDisabled">Der Download-Manager ist deaktiviert</string>
     <string name="downloadManagerIncompatible">Der Download-Manager ist auf diesem Gerät nicht verfügbar</string>
     <string name="enable">Aktivieren</string>
-
-    <!--Fire button education-->
-    <string name="daxClearDataCtaText">Schaltfläche unten antippen und die Browser-Chronik löst sich in Luft auf. Probieren Sie es aus! 👇</string>
 
     <!-- Precise Location -->
     <string name="preciseLocationSystemDialogTitle">Gerätestandort für DuckDuckGo Privacy Browser freigeben?</string>
@@ -512,6 +518,8 @@
     <string name="preciseLocationAllowedSitesSectionTitle">Gewährt</string>
     <string name="preciseLocationDeniedSitesSectionTitle">Abgelehnt</string>
     <string name="preciseLocationSnackbarMessage">Sie haben %1$s in der Vergangenheit den Zugriff auf Ihren Gerätestandort gewährt.</string>
+    <!--Fire button education-->
+    <string name="daxClearDataCtaText">In deinem Browser können sich personenbezogene Daten ablagern. Igitt. Mit der Schaltfläche „Feuer“ brennst du alles weg. Probier’s gleich aus! 👇</string>
 
     <!--  Global Privacy Control-->
     <string name="globalPrivacyControlActivityTitle">Global Privacy Control (GPC)</string>

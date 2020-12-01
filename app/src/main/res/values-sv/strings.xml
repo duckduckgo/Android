@@ -478,6 +478,15 @@
     <string name="fireproofWebsiteItemsSectionTitle">Webbplatser</string>
     <string name="fireproofWebsiteToogleText">Fråga när du loggar in</string>
 
+    <!-- Fire Animation settings -->
+    <string name="settingsFireAnimation">Animation för brännarknapp</string>
+    <string name="settingsHeroFireAnimation">Inferno</string>
+    <string name="settingsHeroWaterAnimation">Virvel</string>
+    <string name="settingsHeroAbstractAnimation">Luftström</string>
+    <string name="settingsNoneAnimation">Inga</string>
+    <string name="settingsSelectFireAnimationDialog">Animation för brännarknapp</string>
+    <string name="settingsSelectFireAnimationDialogSave">Spara</string>
+
     <!-- Dos Attack error-->
     <string name="dosErrorMessage">Anslutningen avbröts. Denna webbplats kan vara skadlig för din enhet.</string>
 
@@ -485,9 +494,6 @@
     <string name="downloadManagerDisabled">Nerladdningshanteraren är inaktiverad</string>
     <string name="downloadManagerIncompatible">Nerladdningshanteraren är inte tillgänglig på denna enhet</string>
     <string name="enable">Aktivera</string>
-
-    <!--Fire button education-->
-    <string name="daxClearDataCtaText">Tryck här nedanför nu för att bränna din webbhistorik. Prova! 👇</string>
 
     <!-- Precise Location -->
     <string name="preciseLocationSystemDialogTitle">Aktivera åtkomst till enhetsplats för DuckDuckGo Privacy Browser?</string>
@@ -512,6 +518,9 @@
     <string name="preciseLocationAllowedSitesSectionTitle">Beviljas</string>
     <string name="preciseLocationDeniedSitesSectionTitle">Nekas</string>
     <string name="preciseLocationSnackbarMessage">Du har tidigare beviljat åtkomst till din enhetsplats för %1$s.</string>
+
+    <!--Fire button education-->
+    <string name="daxClearDataCtaText">Personuppgifter kan samlas i din webbläsare. Usch. Använd brännarknappen för att bränna alltihopa. Prova nu! 👇</string>
 
     <!--  Global Privacy Control-->
     <string name="globalPrivacyControlActivityTitle">Global Privacy Control (GPC)</string>

@@ -24,8 +24,8 @@ import org.junit.Test
 class VariantManagerTest {
 
     private val variants = VariantManager.ACTIVE_VARIANTS +
-            VariantManager.REFERRER_VARIANTS +
-            DEFAULT_VARIANT
+        VariantManager.REFERRER_VARIANTS +
+        DEFAULT_VARIANT
 
     // SERP Experiment(s)
 
@@ -65,21 +65,6 @@ class VariantManagerTest {
         assertEqualsDouble(0.0, variant.weight)
         assertEquals(1, variant.features.size)
         assertEquals(SerpHeaderQueryReplacement, variant.features[0])
-    }
-
-    // Fire button education
-    @Test
-    fun fireButtonEducationControlGroupVariantIsActive() {
-        val variant = variants.first { it.key == "zn" }
-        assertEqualsDouble(1.0, variant.weight)
-    }
-
-    @Test
-    fun fireButtonEducationVariantHasExpectedWeightAndFeatures() {
-        val variant = variants.first { it.key == "zs" }
-        assertEqualsDouble(1.0, variant.weight)
-        assertEquals(1, variant.features.size)
-        assertTrue(variant.hasFeature(FireButtonEducation))
     }
 
     @Test

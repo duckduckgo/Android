@@ -484,6 +484,15 @@
     <string name="fireproofWebsiteItemsSectionTitle">Tīmekļa vietnes</string>
     <string name="fireproofWebsiteToogleText">Jautāt, kad pierakstos</string>
 
+    <!-- Fire Animation settings -->
+    <string name="settingsFireAnimation">Uguns pogas animācija</string>
+    <string name="settingsHeroFireAnimation">Liesmas</string>
+    <string name="settingsHeroWaterAnimation">Atvars</string>
+    <string name="settingsHeroAbstractAnimation">Gaisa plūsma</string>
+    <string name="settingsNoneAnimation">Nav</string>
+    <string name="settingsSelectFireAnimationDialog">Uguns pogas animācija</string>
+    <string name="settingsSelectFireAnimationDialogSave">Saglabāt</string>
+
     <!-- Dos Attack error-->
     <string name="dosErrorMessage">Savienojums pārtraukts. Šī vietne var kaitēt tavai ierīcei.</string>
 
@@ -491,9 +500,6 @@
     <string name="downloadManagerDisabled">Lejupielāžu pārvaldnieks ir atspējots</string>
     <string name="downloadManagerIncompatible">Lejupielāžu pārvaldnieks šajā ierīcē nav pieejams</string>
     <string name="enable">Iespējot</string>
-
-    <!--Fire button education-->
-    <string name="daxClearDataCtaText">Tagad pieskaries zemāk, lai izsvēpētu savu pārlūkošanas vēsturi. Pamēģini! 👇</string>
 
     <!-- Precise Location -->
     <string name="preciseLocationSystemDialogTitle">Vai iespējot ierīces atrašanās vietu DuckDuckGo privātuma pārlūkprogrammai?</string>
@@ -518,6 +524,9 @@
     <string name="preciseLocationAllowedSitesSectionTitle">Piešķirts</string>
     <string name="preciseLocationDeniedSitesSectionTitle">Aizliegts</string>
     <string name="preciseLocationSnackbarMessage">Tu iepriekš piešķīri %1$s atļauju piekļūt savas ierīces atrašanās vietai.</string>
+
+    <!--Fire button education-->
+    <string name="daxClearDataCtaText">Personas dati var uzkrāties tavā pārlūkā. Pē! Izmanto Uguns pogu, lai tos visus nodedzinātu. Pamēģini tagad! 👇</string>
 
     <!--  Global Privacy Control-->
     <string name="globalPrivacyControlActivityTitle">Globālā privātuma kontrole (GPC)</string>

@@ -478,6 +478,15 @@
     <string name="fireproofWebsiteItemsSectionTitle">Websider</string>
     <string name="fireproofWebsiteToogleText">Spørg, når der logges ind</string>
 
+    <!-- Fire Animation settings -->
+    <string name="settingsFireAnimation">Ildknap-animation</string>
+    <string name="settingsHeroFireAnimation">Inferno</string>
+    <string name="settingsHeroWaterAnimation">Whirlpool</string>
+    <string name="settingsHeroAbstractAnimation">Airstream</string>
+    <string name="settingsNoneAnimation">Ingen</string>
+    <string name="settingsSelectFireAnimationDialog">Ildknap-animation</string>
+    <string name="settingsSelectFireAnimationDialogSave">Gem</string>
+
     <!-- Dos Attack error-->
     <string name="dosErrorMessage">Forbindelse blev afbrudt. Dette websted kan være skadeligt for din enhed.</string>
 
@@ -485,9 +494,6 @@
     <string name="downloadManagerDisabled">Download Manager er deaktiveret</string>
     <string name="downloadManagerIncompatible">Download Manager er ikke tilgængelig på denne enhed</string>
     <string name="enable">Aktiver</string>
-
-    <!--Fire button education-->
-    <string name="daxClearDataCtaText">Tryk nu nedenfor for at brænde din browsinghistorik. Prøv det! 👇</string>
 
     <!-- Precise Location -->
     <string name="preciseLocationSystemDialogTitle">Vil du aktivere enhedsplacering for DuckDuckGo-databeskyttelsesbrowser?</string>
@@ -512,6 +518,9 @@
     <string name="preciseLocationAllowedSitesSectionTitle">Tilladt</string>
     <string name="preciseLocationDeniedSitesSectionTitle">Afvist</string>
     <string name="preciseLocationSnackbarMessage">Du har tidligere givet %1$s tilladelse til at få adgang til din enhedsplacering.</string>
+
+    <!--Fire button education-->
+    <string name="daxClearDataCtaText">Personoplysninger kan opbygges i din browser. Adr. Brug Ildknappen til at brænde det hele væk. Prøv det nu! 👇</string>
 
     <!--  Global Privacy Control-->
     <string name="globalPrivacyControlActivityTitle">Global Privacy Control (GPC)</string>

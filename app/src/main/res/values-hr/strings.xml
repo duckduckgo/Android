@@ -490,6 +490,15 @@
     <string name="fireproofWebsiteItemsSectionTitle">Mrežna mjesta</string>
     <string name="fireproofWebsiteToogleText">Pitaj pri prijavi</string>
 
+    <!-- Fire Animation settings -->
+    <string name="settingsFireAnimation">Animacija gumba Vatre</string>
+    <string name="settingsHeroFireAnimation">Pakao</string>
+    <string name="settingsHeroWaterAnimation">Vrtlog</string>
+    <string name="settingsHeroAbstractAnimation">Zračna struja</string>
+    <string name="settingsNoneAnimation">Nijedno</string>
+    <string name="settingsSelectFireAnimationDialog">Animacija gumba Vatre</string>
+    <string name="settingsSelectFireAnimationDialogSave">Spremi</string>
+
     <!-- Dos Attack error-->
     <string name="dosErrorMessage">Veza je prekinuta. Ovo mrežno mjesto može biti štetno za vaš uređaj.</string>
 
@@ -497,9 +506,6 @@
     <string name="downloadManagerDisabled">Onemogućen je upravitelj preuzimanja</string>
     <string name="downloadManagerIncompatible">Upravitelj preuzimanja nije dostupan na ovom uređaju</string>
     <string name="enable">Omogući</string>
-
-    <!--Fire button education-->
-    <string name="daxClearDataCtaText">Sada dodirnite dolje da biste uništili povijest pregledavanja. Pokušajte! 👇</string>
 
     <!-- Precise Location -->
     <string name="preciseLocationSystemDialogTitle">Omogućiti lokaciju uređaja za preglednik privatnosti DuckDuckGo?</string>
@@ -524,6 +530,9 @@
     <string name="preciseLocationAllowedSitesSectionTitle">Odobreno</string>
     <string name="preciseLocationDeniedSitesSectionTitle">Odbijeno</string>
     <string name="preciseLocationSnackbarMessage">Prethodno ste odobrili %1$s dozvolu za pristup lokaciji vašeg uređaja.</string>
+
+    <!--Fire button education-->
+    <string name="daxClearDataCtaText">Osobni podaci mogu se nakupljati u tvojem pregledniku. Fuj. Koristite gumb Vatre da bi ih sve spalio/la. Pokušaj sada! 👇</string>
 
     <!--  Global Privacy Control-->
     <string name="globalPrivacyControlActivityTitle">Globalna kontrola privatnosti (GPC)</string>

@@ -478,6 +478,15 @@
     <string name="fireproofWebsiteItemsSectionTitle">Sites Web</string>
     <string name="fireproofWebsiteToogleText">Choisir à la connexion</string>
 
+    <!-- Fire Animation settings -->
+    <string name="settingsFireAnimation">Animation du bouton en forme de flamme</string>
+    <string name="settingsHeroFireAnimation">Flammes</string>
+    <string name="settingsHeroWaterAnimation">Tourbillon</string>
+    <string name="settingsHeroAbstractAnimation">Courant d\'air</string>
+    <string name="settingsNoneAnimation">Aucune</string>
+    <string name="settingsSelectFireAnimationDialog">Animation du bouton en forme de flamme</string>
+    <string name="settingsSelectFireAnimationDialogSave">Enregistrer</string>
+
     <!-- Dos Attack error-->
     <string name="dosErrorMessage">Connexion interrompue. Ce site Web pourrait nuire à votre appareil.</string>
 
@@ -485,9 +494,6 @@
     <string name="downloadManagerDisabled">Le gestionnaire de téléchargement est désactivé</string>
     <string name="downloadManagerIncompatible">Le gestionnaire de téléchargement est indisponible sur cet appareil</string>
     <string name="enable">Activer</string>
-
-    <!--Fire button education-->
-    <string name="daxClearDataCtaText">Maintenant, appuyez ci-dessous pour brûler votre historique de navigation. Essayez par vous-même ! 👇</string>
 
     <!-- Precise Location -->
     <string name="preciseLocationSystemDialogTitle">Voulez-vous activer la localisation de l\'appareil pour le navigateur de confidentialité DuckDuckGo ?</string>
@@ -512,6 +518,9 @@
     <string name="preciseLocationAllowedSitesSectionTitle">Accordées</string>
     <string name="preciseLocationDeniedSitesSectionTitle">Refusées</string>
     <string name="preciseLocationSnackbarMessage">Vous avez déjà autorisé %1$s à accéder à la localisation de votre appareil.</string>
+
+    <!--Fire button education-->
+    <string name="daxClearDataCtaText">Les données personnelles peuvent s\'accumuler dans votre navigateur. Oh non ! Utilisez le bouton en forme de flamme pour les supprimer. Essayez par vous-même !👇</string>
 
     <!--  Global Privacy Control-->
     <string name="globalPrivacyControlActivityTitle">Global Privacy Control (GPC)</string>

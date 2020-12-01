@@ -116,35 +116,41 @@ class DefaultBrowserPage : OnboardingPageFragment() {
     }
 
     private fun observeViewModel() {
-        viewModel.viewState.observe(viewLifecycleOwner, Observer { viewState ->
-            viewState?.let {
+        viewModel.viewState.observe(
+            viewLifecycleOwner,
+            Observer { viewState ->
+                viewState?.let {
+                    when (it) {
+                        is DefaultBrowserPageViewModel.ViewState.DefaultBrowserSettingsUI -> {
+                            setUiForSettings()
+                            hideInstructionsCard()
+                        }
+                        is DefaultBrowserPageViewModel.ViewState.DefaultBrowserDialogUI -> {
+                            setUiForDialog()
+                            if (it.showInstructionsCard) showInstructionsCard() else hideInstructionsCard()
+                        }
+                        is DefaultBrowserPageViewModel.ViewState.ContinueToBrowser -> {
+                            hideInstructionsCard()
+                            onContinuePressed()
+                        }
+                    }
+                }
+            }
+        )
+
+        viewModel.command.observe(
+            this,
+            Observer {
                 when (it) {
-                    is DefaultBrowserPageViewModel.ViewState.DefaultBrowserSettingsUI -> {
-                        setUiForSettings()
-                        hideInstructionsCard()
-                    }
-                    is DefaultBrowserPageViewModel.ViewState.DefaultBrowserDialogUI -> {
-                        setUiForDialog()
-                        if (it.showInstructionsCard) showInstructionsCard() else hideInstructionsCard()
-                    }
-                    is DefaultBrowserPageViewModel.ViewState.ContinueToBrowser -> {
+                    is DefaultBrowserPageViewModel.Command.OpenDialog -> onLaunchDefaultBrowserWithDialogClicked(it.url)
+                    is DefaultBrowserPageViewModel.Command.OpenSettings -> onLaunchDefaultBrowserSettingsClicked()
+                    is DefaultBrowserPageViewModel.Command.ContinueToBrowser -> {
                         hideInstructionsCard()
                         onContinuePressed()
                     }
                 }
             }
-        })
-
-        viewModel.command.observe(this, Observer {
-            when (it) {
-                is DefaultBrowserPageViewModel.Command.OpenDialog -> onLaunchDefaultBrowserWithDialogClicked(it.url)
-                is DefaultBrowserPageViewModel.Command.OpenSettings -> onLaunchDefaultBrowserSettingsClicked()
-                is DefaultBrowserPageViewModel.Command.ContinueToBrowser -> {
-                    hideInstructionsCard()
-                    onContinuePressed()
-                }
-            }
-        })
+        )
     }
 
     private fun setUiForDialog() {

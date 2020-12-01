@@ -478,6 +478,15 @@
     <string name="fireproofWebsiteItemsSectionTitle">Web siteleri</string>
     <string name="fireproofWebsiteToogleText">Oturum Açarken Sor</string>
 
+    <!-- Fire Animation settings -->
+    <string name="settingsFireAnimation">Yangın Düğmesi Animasyonu</string>
+    <string name="settingsHeroFireAnimation">Ateş</string>
+    <string name="settingsHeroWaterAnimation">Girdap</string>
+    <string name="settingsHeroAbstractAnimation">Hava</string>
+    <string name="settingsNoneAnimation">Yok</string>
+    <string name="settingsSelectFireAnimationDialog">Yangın Düğmesi animasyonu</string>
+    <string name="settingsSelectFireAnimationDialogSave">Kaydet</string>
+
     <!-- Dos Attack error-->
     <string name="dosErrorMessage">Bağlantı iptal edildi. Bu web sitesi cihazınıza zarar verebilir.</string>
 
@@ -485,9 +494,6 @@
     <string name="downloadManagerDisabled">İndirme Yöneticisi devre dışı</string>
     <string name="downloadManagerIncompatible">İndirme Yöneticisi bu cihazda kullanılamıyor</string>
     <string name="enable">Etkinleştir</string>
-
-    <!--Fire button education-->
-    <string name="daxClearDataCtaText">Şimdi göz atma geçmişinizi yakmak için aşağıya dokunun. Hemen deneyin! 👇</string>
 
     <!-- Precise Location -->
     <string name="preciseLocationSystemDialogTitle">DuckDuckGo Gizlilik Tarayıcısı için cihaz konumu etkinleştirilsin mi?</string>
@@ -512,6 +518,9 @@
     <string name="preciseLocationAllowedSitesSectionTitle">Verildi</string>
     <string name="preciseLocationDeniedSitesSectionTitle">Reddedildi</string>
     <string name="preciseLocationSnackbarMessage">%1$s için daha önce konumunuza erişim izni vermiştiniz.</string>
+
+    <!--Fire button education-->
+    <string name="daxClearDataCtaText">Kişisel veriler tarayıcınızda birikebilir. İğrenç. Bunların hepsini yakmak için Yangın Düğmesi\'ni kullanın. Hemen deneyin! 👇</string>
 
     <!--  Global Privacy Control-->
     <string name="globalPrivacyControlActivityTitle">Küresel Gizlilik Kontrolü (GPC)</string>

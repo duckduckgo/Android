@@ -55,19 +55,22 @@ class ShareOpenEndedFeedbackFragment : FeedbackFragment() {
     }
 
     override fun configureViewModelObservers() {
-        viewModel.command.observe(this, Observer { command ->
-            when (command) {
-                is Command.Exit -> {
-                    listener?.userCancelled()
-                }
-                is Command.ExitAndSubmitNegativeFeedback -> {
-                    listener?.userProvidedNegativeOpenEndedFeedback(command.mainReason, command.subReason, command.feedback)
-                }
-                is Command.ExitAndSubmitPositiveFeedback -> {
-                    listener?.userProvidedPositiveOpenEndedFeedback(command.feedback)
+        viewModel.command.observe(
+            this,
+            Observer { command ->
+                when (command) {
+                    is Command.Exit -> {
+                        listener?.userCancelled()
+                    }
+                    is Command.ExitAndSubmitNegativeFeedback -> {
+                        listener?.userProvidedNegativeOpenEndedFeedback(command.mainReason, command.subReason, command.feedback)
+                    }
+                    is Command.ExitAndSubmitPositiveFeedback -> {
+                        listener?.userProvidedPositiveOpenEndedFeedback(command.feedback)
+                    }
                 }
             }
-        })
+        )
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {

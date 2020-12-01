@@ -490,6 +490,15 @@
     <string name="fireproofWebsiteItemsSectionTitle">Webové stránky</string>
     <string name="fireproofWebsiteToogleText">Opýtať sa pri prihlásení</string>
 
+    <!-- Fire Animation settings -->
+    <string name="settingsFireAnimation">Animácia tlačidla ohňa</string>
+    <string name="settingsHeroFireAnimation">Peklo</string>
+    <string name="settingsHeroWaterAnimation">Vodný vír</string>
+    <string name="settingsHeroAbstractAnimation">Prúd vzduchu</string>
+    <string name="settingsNoneAnimation">Žiadne</string>
+    <string name="settingsSelectFireAnimationDialog">Animácia tlačidla ohňa</string>
+    <string name="settingsSelectFireAnimationDialogSave">Uložiť</string>
+
     <!-- Dos Attack error-->
     <string name="dosErrorMessage">Spojenie bolo prerušené. Táto webová stránka môže byť pre vaše zariadenie škodlivá.</string>
 
@@ -497,9 +506,6 @@
     <string name="downloadManagerDisabled">Správca sťahovania je zakázaný</string>
     <string name="downloadManagerIncompatible">Správca sťahovania nie je na tomto zariadení k dispozícií</string>
     <string name="enable">Povoliť</string>
-
-    <!--Fire button education-->
-    <string name="daxClearDataCtaText">Teraz kliknite nižšie a spáľte svoju históriu prehliadania. Vyskúšajte to! 👇</string>
 
     <!-- Precise Location -->
     <string name="preciseLocationSystemDialogTitle">Povoliť polohu zariadenia pre súkromný prehliadač DuckDuckGo?</string>
@@ -524,6 +530,9 @@
     <string name="preciseLocationAllowedSitesSectionTitle">Povolené</string>
     <string name="preciseLocationDeniedSitesSectionTitle">Zamietnuté</string>
     <string name="preciseLocationSnackbarMessage">Už ste udelili %1$s povolenie na prístup k polohe svojho zariadenia.</string>
+
+    <!--Fire button education-->
+    <string name="daxClearDataCtaText">Vo vašom prehliadači sa môžu zhromažďovať osobné údaje. Fuj. Pomocou tlačidla na vymazanie ich môžete všetky odstrániť. Vyskúšajte to! 👇</string>
 
     <!--  Global Privacy Control-->
     <string name="globalPrivacyControlActivityTitle">Globálna kontrola súkromia (GPC)</string>

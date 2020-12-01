@@ -37,7 +37,6 @@ import com.duckduckgo.app.cta.ui.CtaViewModel
 import com.duckduckgo.app.feedback.ui.common.FeedbackActivity
 import com.duckduckgo.app.fire.DataClearer
 import com.duckduckgo.app.fire.DataClearerForegroundAppRestartPixel
-import com.duckduckgo.app.fire.FireAnimationLoader
 import com.duckduckgo.app.global.ApplicationClearDataState
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.intentText
@@ -81,9 +80,6 @@ class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope() {
     @Inject
     lateinit var variantManager: VariantManager
 
-    @Inject
-    lateinit var fireAnimationLoader: FireAnimationLoader
-
     private var currentTab: BrowserTabFragment? = null
 
     private val viewModel: BrowserViewModel by bindViewModel()
@@ -100,6 +96,7 @@ class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope() {
 
     @SuppressLint("MissingSuperCall")
     override fun onCreate(savedInstanceState: Bundle?) {
+        // vtodo
         Toast.makeText(this, "Browser disabled during early VPN builds", Toast.LENGTH_LONG).show()
         super.onCreate(savedInstanceState)
         finish()
@@ -114,9 +111,12 @@ class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope() {
 
         super.onCreate(savedInstanceState = newInstanceState, daggerInject = false)
         setContentView(R.layout.activity_browser)
-        viewModel.viewState.observe(this, Observer {
-            renderer.renderBrowserViewState(it)
-        })
+        viewModel.viewState.observe(
+            this,
+            Observer {
+                renderer.renderBrowserViewState(it)
+            }
+        )
         viewModel.awaitClearDataFinishedNotification()
     }
 
@@ -238,17 +238,25 @@ class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope() {
     }
 
     private fun configureObservers() {
-        lifecycle.addObserver(fireAnimationLoader)
-        viewModel.command.observe(this, Observer {
-            processCommand(it)
-        })
-        viewModel.selectedTab.observe(this, Observer {
-            if (it != null) selectTab(it)
-        })
-        viewModel.tabs.observe(this, Observer {
-            clearStaleTabs(it)
-            launch { viewModel.onTabsUpdated(it) }
-        })
+        viewModel.command.observe(
+            this,
+            Observer {
+                processCommand(it)
+            }
+        )
+        viewModel.selectedTab.observe(
+            this,
+            Observer {
+                if (it != null) selectTab(it)
+            }
+        )
+        viewModel.tabs.observe(
+            this,
+            Observer {
+                clearStaleTabs(it)
+                launch { viewModel.onTabsUpdated(it) }
+            }
+        )
     }
 
     private fun removeObservers() {
@@ -301,8 +309,8 @@ class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope() {
             context = this,
             clearPersonalDataAction = clearPersonalDataAction,
             ctaViewModel = ctaViewModel,
-            variantManager = variantManager,
-            pixel = pixel
+            pixel = pixel,
+            settingsDataStore = settingsDataStore
         )
         dialog.clearStarted = {
             removeObservers()

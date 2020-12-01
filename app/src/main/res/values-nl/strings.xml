@@ -478,6 +478,15 @@
     <string name="fireproofWebsiteItemsSectionTitle">Websites</string>
     <string name="fireproofWebsiteToogleText">Vragen bij inloggen</string>
 
+    <!-- Fire Animation settings -->
+    <string name="settingsFireAnimation">Animatie vuurknop</string>
+    <string name="settingsHeroFireAnimation">Vuurzee</string>
+    <string name="settingsHeroWaterAnimation">Draaikolk</string>
+    <string name="settingsHeroAbstractAnimation">Luchtstroom</string>
+    <string name="settingsNoneAnimation">Geen</string>
+    <string name="settingsSelectFireAnimationDialog">Animatie vuurknop</string>
+    <string name="settingsSelectFireAnimationDialogSave">Opslaan</string>
+
     <!-- Dos Attack error-->
     <string name="dosErrorMessage">Verbinding verbroken. Deze website kan schadelijk zijn voor je apparaat.</string>
 
@@ -485,9 +494,6 @@
     <string name="downloadManagerDisabled">Downloadbeheerder is uitgeschakeld</string>
     <string name="downloadManagerIncompatible">Downloadbeheerder is niet beschikbaar op dit apparaat</string>
     <string name="enable">Inschakelen</string>
-
-    <!--Fire button education-->
-    <string name="daxClearDataCtaText">Tik nu hieronder om je browsegeschiedenis te verbranden. Probeer het maar! 👇</string>
 
     <!-- Precise Location -->
     <string name="preciseLocationSystemDialogTitle">Apparaatlocatie inschakelen voor DuckDuckGo Privacy Browser?</string>
@@ -512,6 +518,9 @@
     <string name="preciseLocationAllowedSitesSectionTitle">Verleend</string>
     <string name="preciseLocationDeniedSitesSectionTitle">Geweigerd</string>
     <string name="preciseLocationSnackbarMessage">Je hebt eerder %1$s toestemming gegeven om je apparaatlocatie te gebruiken.</string>
+
+    <!--Fire button education-->
+    <string name="daxClearDataCtaText">Persoonlijke gegevens kunnen zich ophopen in je browser. Bah. Gebruik de vuurknop om alles te verbranden. Probeer het maar! 👇</string>
 
     <!--  Global Privacy Control-->
     <string name="globalPrivacyControlActivityTitle">Global Privacy Control (GPC)</string>

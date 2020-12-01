@@ -131,11 +131,9 @@ import com.duckduckgo.app.survey.ui.SurveyActivity
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.ui.TabSwitcherActivity
 import com.duckduckgo.app.widget.ui.AddWidgetInstructionsActivity
-import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
 import com.duckduckgo.widget.SearchWidgetLight
 import com.google.android.material.snackbar.Snackbar
 import dagger.android.support.AndroidSupportInjection
-import dummy.ui.VpnControllerActivity
 import kotlinx.android.synthetic.main.fragment_browser_tab.*
 import kotlinx.android.synthetic.main.include_add_widget_instruction_buttons.view.closeButton
 import kotlinx.android.synthetic.main.include_cta_buttons.view.ctaDismissButton
@@ -147,7 +145,6 @@ import kotlinx.android.synthetic.main.include_new_browser_tab.*
 import kotlinx.android.synthetic.main.include_omnibar_toolbar.*
 import kotlinx.android.synthetic.main.include_omnibar_toolbar.view.*
 import kotlinx.android.synthetic.main.popup_window_browser_menu.view.*
-import kotlinx.android.synthetic.main.popup_window_browser_menu.vpnPopupMenuItem
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -163,8 +160,15 @@ import java.io.File
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 
-class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogListener, TrackersAnimatorListener, DownloadConfirmationDialogListener,
-    SiteLocationPermissionDialog.SiteLocationPermissionDialogListener, SystemLocationPermissionDialog.SystemLocationPermissionDialogListener {
+class BrowserTabFragment :
+    Fragment(),
+    FindListener,
+    CoroutineScope,
+    DaxDialogListener,
+    TrackersAnimatorListener,
+    DownloadConfirmationDialogListener,
+    SiteLocationPermissionDialog.SiteLocationPermissionDialogListener,
+    SystemLocationPermissionDialog.SystemLocationPermissionDialogListener {
 
     private val supervisorJob = SupervisorJob()
 
@@ -422,53 +426,83 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
     }
 
     private fun configureObservers() {
-        viewModel.autoCompleteViewState.observe(viewLifecycleOwner, Observer<AutoCompleteViewState> {
-            it?.let { renderer.renderAutocomplete(it) }
-        })
+        viewModel.autoCompleteViewState.observe(
+            viewLifecycleOwner,
+            Observer<AutoCompleteViewState> {
+                it?.let { renderer.renderAutocomplete(it) }
+            }
+        )
 
-        viewModel.globalLayoutState.observe(viewLifecycleOwner, Observer<GlobalLayoutViewState> {
-            it?.let { renderer.renderGlobalViewState(it) }
-        })
+        viewModel.globalLayoutState.observe(
+            viewLifecycleOwner,
+            Observer<GlobalLayoutViewState> {
+                it?.let { renderer.renderGlobalViewState(it) }
+            }
+        )
 
-        viewModel.browserViewState.observe(viewLifecycleOwner, Observer<BrowserViewState> {
-            it?.let { renderer.renderBrowserViewState(it) }
-        })
+        viewModel.browserViewState.observe(
+            viewLifecycleOwner,
+            Observer<BrowserViewState> {
+                it?.let { renderer.renderBrowserViewState(it) }
+            }
+        )
 
-        viewModel.loadingViewState.observe(viewLifecycleOwner, Observer<LoadingViewState> {
-            it?.let { renderer.renderLoadingIndicator(it) }
-        })
+        viewModel.loadingViewState.observe(
+            viewLifecycleOwner,
+            Observer<LoadingViewState> {
+                it?.let { renderer.renderLoadingIndicator(it) }
+            }
+        )
 
-        viewModel.omnibarViewState.observe(viewLifecycleOwner, Observer<OmnibarViewState> {
-            it?.let { renderer.renderOmnibar(it) }
-        })
+        viewModel.omnibarViewState.observe(
+            viewLifecycleOwner,
+            Observer<OmnibarViewState> {
+                it?.let { renderer.renderOmnibar(it) }
+            }
+        )
 
-        viewModel.findInPageViewState.observe(viewLifecycleOwner, Observer<FindInPageViewState> {
-            it?.let { renderer.renderFindInPageState(it) }
-        })
+        viewModel.findInPageViewState.observe(
+            viewLifecycleOwner,
+            Observer<FindInPageViewState> {
+                it?.let { renderer.renderFindInPageState(it) }
+            }
+        )
 
         viewModel.ctaViewState.observe(viewLifecycleOwner, ctaViewStateObserver)
 
-        viewModel.command.observe(viewLifecycleOwner, Observer {
-            processCommand(it)
-        })
+        viewModel.command.observe(
+            viewLifecycleOwner,
+            Observer {
+                processCommand(it)
+            }
+        )
 
-        viewModel.survey.observe(viewLifecycleOwner, Observer<Survey> {
-            it.let { viewModel.onSurveyChanged(it) }
-        })
+        viewModel.survey.observe(
+            viewLifecycleOwner,
+            Observer<Survey> {
+                it.let { viewModel.onSurveyChanged(it) }
+            }
+        )
 
-        viewModel.privacyGradeViewState.observe(viewLifecycleOwner, Observer {
-            it.let { renderer.renderPrivacyGrade(it) }
-        })
+        viewModel.privacyGradeViewState.observe(
+            viewLifecycleOwner,
+            Observer {
+                it.let { renderer.renderPrivacyGrade(it) }
+            }
+        )
 
         addTabsObserver()
     }
 
     private fun addTabsObserver() {
-        viewModel.tabs.observe(viewLifecycleOwner, Observer<List<TabEntity>> {
-            it?.let {
-                decorator.renderTabIcon(it)
+        viewModel.tabs.observe(
+            viewLifecycleOwner,
+            Observer<List<TabEntity>> {
+                it?.let {
+                    decorator.renderTabIcon(it)
+                }
             }
-        })
+        )
     }
 
     private fun fragmentIsVisible(): Boolean {
@@ -568,7 +602,8 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
             }
             is Command.ShowFullScreen -> {
                 webViewFullScreenContainer.addView(
-                    it.view, ViewGroup.LayoutParams(
+                    it.view,
+                    ViewGroup.LayoutParams(
                         ViewGroup.LayoutParams.MATCH_PARENT,
                         ViewGroup.LayoutParams.MATCH_PARENT
                     )
@@ -641,10 +676,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
     }
 
     private fun locationPermissionsHaveNotBeenGranted(): Boolean {
-        return ContextCompat.checkSelfPermission(
-            requireActivity(),
-            Manifest.permission.ACCESS_COARSE_LOCATION
-        ) != PackageManager.PERMISSION_GRANTED ||
+        return ContextCompat.checkSelfPermission(requireActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED ||
             ContextCompat.checkSelfPermission(requireActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
     }
 
@@ -666,7 +698,8 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
             arrayOf(
                 Manifest.permission.ACCESS_FINE_LOCATION,
                 Manifest.permission.ACCESS_COARSE_LOCATION
-            ), PERMISSION_REQUEST_GEO_LOCATION
+            ),
+            PERMISSION_REQUEST_GEO_LOCATION
         )
     }
 
@@ -692,11 +725,7 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
 
     private fun showDomainHasLocationPermission(domain: String) {
         val snackbar =
-            Snackbar.make(
-                rootView,
-                getString(R.string.preciseLocationSnackbarMessage, domain.websiteFromGeoLocationsApiOrigin()),
-                Snackbar.LENGTH_SHORT
-            )
+            Snackbar.make(rootView, getString(R.string.preciseLocationSnackbarMessage, domain.websiteFromGeoLocationsApiOrigin()), Snackbar.LENGTH_SHORT)
         snackbar.view.setOnClickListener {
             browserActivity?.launchLocationSettings()
         }
@@ -893,13 +922,15 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
             }
         }
 
-        omnibarTextInput.setOnEditorActionListener(TextView.OnEditorActionListener { _, actionId, keyEvent ->
-            if (actionId == EditorInfo.IME_ACTION_GO || keyEvent?.keyCode == KeyEvent.KEYCODE_ENTER) {
-                userEnteredQuery(omnibarTextInput.text.toString())
-                return@OnEditorActionListener true
+        omnibarTextInput.setOnEditorActionListener(
+            TextView.OnEditorActionListener { _, actionId, keyEvent ->
+                if (actionId == EditorInfo.IME_ACTION_GO || keyEvent?.keyCode == KeyEvent.KEYCODE_ENTER) {
+                    userEnteredQuery(omnibarTextInput.text.toString())
+                    return@OnEditorActionListener true
+                }
+                false
             }
-            false
-        })
+        )
 
         clearTextButton.setOnClickListener { omnibarTextInput.setText("") }
     }
@@ -1442,9 +1473,6 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
             popupMenu.apply {
                 onMenuItemClicked(view.forwardPopupMenuItem) { viewModel.onUserPressedForward() }
                 onMenuItemClicked(view.backPopupMenuItem) { activity?.onBackPressed() }
-                onMenuItemClicked(view.vpnPopupMenuItem) {
-                    startActivity(VpnControllerActivity.intent(activity!!))
-                }
                 onMenuItemClicked(view.refreshPopupMenuItem) {
                     viewModel.onRefreshRequested()
                     pixel.fire(Pixel.PixelName.MENU_ACTION_REFRESH_PRESSED.pixelName)
@@ -1704,7 +1732,6 @@ class BrowserTabFragment : Fragment(), FindListener, CoroutineScope, DaxDialogLi
                 brokenSitePopupMenuItem?.isEnabled = viewState.canReportSite
                 requestDesktopSiteCheckMenuItem?.isEnabled = viewState.canChangeBrowsingMode
                 requestDesktopSiteCheckMenuItem?.isChecked = viewState.isDesktopBrowsingMode
-                vpnPopupMenuItem?.isChecked = TrackerBlockingVpnService.isServiceRunning(activity!!)
 
                 addToHome?.let {
                     it.visibility = if (viewState.addToHomeVisible) VISIBLE else GONE

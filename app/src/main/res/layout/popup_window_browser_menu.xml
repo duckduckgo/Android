@@ -79,20 +79,6 @@
             android:paddingTop="13dp"
             android:paddingBottom="20dp">
 
-            <androidx.appcompat.widget.AppCompatCheckBox
-                android:id="@+id/vpnPopupMenuItem"
-                style="@style/BrowserCheckBoxMenuItem"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="20dp"
-                android:button="@null"
-                android:drawableEnd="?android:attr/listChoiceIndicatorMultiple"
-                android:drawablePadding="24dp"
-                android:paddingStart="24dp"
-                android:paddingEnd="0dp"
-                android:text="@string/startVpnMenuItem"
-                android:theme="@style/PopUpMenuSwitchTheme" />
-
             <TextView
                 android:id="@+id/newTabPopupMenuItem"
                 style="@style/BrowserTextMenuItem"

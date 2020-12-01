@@ -490,6 +490,15 @@
     <string name="fireproofWebsiteItemsSectionTitle">Witryny internetowe</string>
     <string name="fireproofWebsiteToogleText">Zapytaj przy logowaniu</string>
 
+    <!-- Fire Animation settings -->
+    <string name="settingsFireAnimation">Animacja przycisku ognia</string>
+    <string name="settingsHeroFireAnimation">Ogień</string>
+    <string name="settingsHeroWaterAnimation">Wir wodny</string>
+    <string name="settingsHeroAbstractAnimation">Strumień powietrza</string>
+    <string name="settingsNoneAnimation">Brak</string>
+    <string name="settingsSelectFireAnimationDialog">Animacja przycisku ognia</string>
+    <string name="settingsSelectFireAnimationDialogSave">Zapisz</string>
+
     <!-- Dos Attack error-->
     <string name="dosErrorMessage">Połączenie nie powiodło się. Ta strona może być szkodliwa dla Twojego urządzenia.</string>
 
@@ -497,9 +506,6 @@
     <string name="downloadManagerDisabled">Wyłączono Menedżera pobierania</string>
     <string name="downloadManagerIncompatible">Menedżer pobierania nie jest dostępny na tym urządzeniu</string>
     <string name="enable">Włącz</string>
-
-    <!--Fire button education-->
-    <string name="daxClearDataCtaText">Teraz dotknij poniżej, aby „spalić” swoją historię przeglądania. Spróbuj! 👇</string>
 
     <!-- Precise Location -->
     <string name="preciseLocationSystemDialogTitle">Udostępnić lokalizację urządzenia przeglądarce prywatności DuckDuckGo?</string>
@@ -524,6 +530,9 @@
     <string name="preciseLocationAllowedSitesSectionTitle">Zgoda</string>
     <string name="preciseLocationDeniedSitesSectionTitle">Odmowa</string>
     <string name="preciseLocationSnackbarMessage">Witryna %1$s ma już przyznane uprawnienia dostępu do lokalizacji urządzenia.</string>
+
+    <!--Fire button education-->
+    <string name="daxClearDataCtaText">Dane osobowe mogą gromadzić się w Twojej przeglądarce. Fuj. Użyj przycisku Zabezpiecz, aby to wszystko zniszczyć. Spróbuj teraz! 👇</string>
 
     <!--  Global Privacy Control-->
     <string name="globalPrivacyControlActivityTitle">Globalna Kontrola Prywatności (GPC)</string>

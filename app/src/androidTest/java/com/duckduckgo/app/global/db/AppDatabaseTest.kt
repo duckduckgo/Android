@@ -297,6 +297,38 @@ class AppDatabaseTest {
         createDatabaseAndMigrate(24, 25, migrationsProvider.MIGRATION_24_TO_25)
     }
 
+    @Test
+    fun whenMigratingFromVersion25To26ThenValidationSucceeds() {
+        createDatabaseAndMigrate(25, 26, migrationsProvider.MIGRATION_25_TO_26)
+    }
+
+    @Test
+    fun whenMigratingFromVersion26To27ThenValidationSucceeds() {
+        createDatabaseAndMigrate(26, 27, migrationsProvider.MIGRATION_26_TO_27)
+    }
+
+    @Test
+    fun whenMigratingFromVersion27To28ThenValidationSucceeds() {
+        createDatabaseAndMigrate(27, 28, migrationsProvider.MIGRATION_27_TO_28)
+    }
+
+    @Test
+    fun whenMigratingFromVersion28To29ThenValidationSucceeds() {
+        createDatabaseAndMigrate(28, 29, migrationsProvider.MIGRATION_28_TO_29)
+    }
+
+    @Test
+    fun whenMigratingFromVersion28To29IfUserStageIsDaxOnboardingThenMigrateToEstablished() {
+        testHelper.createDatabase(TEST_DB_NAME, 28).use {
+            givenUserStageIs(it, AppStage.DAX_ONBOARDING)
+
+            testHelper.runMigrationsAndValidate(TEST_DB_NAME, 29, true, migrationsProvider.MIGRATION_28_TO_29)
+            val stage = getUserStage(it)
+
+            assertEquals(AppStage.ESTABLISHED.name, stage)
+        }
+    }
+
     private fun givenUserStageIs(database: SupportSQLiteDatabase, appStage: AppStage) {
         database.execSQL("INSERT INTO `userStage` values (1, '${appStage.name}') ")
     }

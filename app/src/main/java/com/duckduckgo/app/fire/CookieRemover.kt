@@ -101,13 +101,16 @@ class SQLCookieRemover(
         if (excludedSites.isEmpty()) {
             return ""
         }
-        return excludedSites.foldIndexed("", { pos, acc, _ ->
-            if (pos == 0) {
-                "host_key NOT LIKE ?"
-            } else {
-                "$acc AND host_key NOT LIKE ?"
+        return excludedSites.foldIndexed(
+            "",
+            { pos, acc, _ ->
+                if (pos == 0) {
+                    "host_key NOT LIKE ?"
+                } else {
+                    "$acc AND host_key NOT LIKE ?"
+                }
             }
-        })
+        )
     }
 
     companion object {

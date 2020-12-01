@@ -478,6 +478,15 @@
     <string name="fireproofWebsiteItemsSectionTitle">Veebilehed</string>
     <string name="fireproofWebsiteToogleText">Küsi sisselogimisel</string>
 
+    <!-- Fire Animation settings -->
+    <string name="settingsFireAnimation">Tulenupu animatsioon</string>
+    <string name="settingsHeroFireAnimation">Inferno</string>
+    <string name="settingsHeroWaterAnimation">Whirlpool</string>
+    <string name="settingsHeroAbstractAnimation">Airstream</string>
+    <string name="settingsNoneAnimation">Puudub</string>
+    <string name="settingsSelectFireAnimationDialog">Tulenupu animatsioon</string>
+    <string name="settingsSelectFireAnimationDialogSave">Salvesta</string>
+
     <!-- Dos Attack error-->
     <string name="dosErrorMessage">Ühendus on katkestatud. See veebileht võib kahjustada sinu seadet.</string>
 
@@ -485,9 +494,6 @@
     <string name="downloadManagerDisabled">Download Manager on keelatud</string>
     <string name="downloadManagerIncompatible">Download Manager ei ole saadaval selles seadmes</string>
     <string name="enable">Luba</string>
-
-    <!--Fire button education-->
-    <string name="daxClearDataCtaText">Nüüd puutuda allpool, et kustutada oma sirvimise ajalugu. Proovi! 👇</string>
 
     <!-- Precise Location -->
     <string name="preciseLocationSystemDialogTitle">Kas lubada seadme asukoht DuckDuckGo privaatses brauseris?</string>
@@ -512,6 +518,9 @@
     <string name="preciseLocationAllowedSitesSectionTitle">Antud</string>
     <string name="preciseLocationDeniedSitesSectionTitle">Keelatud</string>
     <string name="preciseLocationSnackbarMessage">Andsid eelnevalt %1$s loa juurdepääsuks oma seadme asukohale.</string>
+
+    <!--Fire button education-->
+    <string name="daxClearDataCtaText">Sinu brauserisse võivad koguneda isikuandmed. Õudne. Kasuta tulenuppu, et see kõik ära põletada. Proovi kohe! 👇</string>
 
     <!--  Global Privacy Control-->
     <string name="globalPrivacyControlActivityTitle">Üleilmne privaatsuskontroll (Global Privacy Control (GPC))</string>

@@ -161,12 +161,12 @@ class TcpDeviceToNetwork(
     private fun processPacketTcbNotInitialized(connectionKey: String, packet: Packet, totalPacketLength: Int, connectionParams: TcpConnectionParams) {
         Timber.i(
             "New packet. $connectionKey. TCB not initialized. ${
-                TcpPacketProcessor.logPacketDetails(
-                    packet,
-                    packet.tcpHeader.sequenceNumber,
-                    packet.tcpHeader.sequenceNumber,
-                    packet.tcpHeader.acknowledgementNumber
-                )
+            TcpPacketProcessor.logPacketDetails(
+                packet,
+                packet.tcpHeader.sequenceNumber,
+                packet.tcpHeader.sequenceNumber,
+                packet.tcpHeader.acknowledgementNumber
+            )
             }. Packet length: $totalPacketLength.  Data length: ${packet.tcpPayloadSize(true)}"
         )
         TcpStateFlow.newPacket(connectionKey, TcbState(), packet.asPacketType(), -1).events.forEach {
@@ -289,11 +289,14 @@ class TcpDeviceToNetwork(
 
             if (!tcb.waitingForNetworkData) {
                 Timber.v("Not waiting for network data ${tcb.ipAndPort}; register for OP_READ and wait for network data")
-                Timber.i("Registering for OP_READ. Took: %d", measureNanoTime {
-                    selector.wakeup()
-                    tcb.selectionKey.interestOps(SelectionKey.OP_READ)
-                    tcb.waitingForNetworkData = true
-                })
+                Timber.i(
+                    "Registering for OP_READ. Took: %d",
+                    measureNanoTime {
+                        selector.wakeup()
+                        tcb.selectionKey.interestOps(SelectionKey.OP_READ)
+                        tcb.waitingForNetworkData = true
+                    }
+                )
             }
 
             try {

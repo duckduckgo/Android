@@ -30,6 +30,7 @@ import com.duckduckgo.app.usage.di.AppUsageModule
 import dagger.BindsInstance
 import dagger.Component
 import dagger.android.support.AndroidSupportInjectionModule
+import kotlinx.coroutines.CoroutineScope
 import retrofit2.Retrofit
 import javax.inject.Named
 import javax.inject.Singleton
@@ -84,6 +85,9 @@ interface TestAppComponent : AppComponent {
 
         @BindsInstance
         fun application(application: Application): Builder
+
+        @BindsInstance
+        fun applicationCoroutineScope(@AppCoroutineScope applicationCoroutineScope: CoroutineScope): Builder
 
         fun build(): TestAppComponent
     }

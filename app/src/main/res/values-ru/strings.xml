@@ -490,6 +490,15 @@
     <string name="fireproofWebsiteItemsSectionTitle">Сайты</string>
     <string name="fireproofWebsiteToogleText">Спрашивать при входе</string>
 
+    <!-- Fire Animation settings -->
+    <string name="settingsFireAnimation">Анимация кнопки «Пожар»</string>
+    <string name="settingsHeroFireAnimation">Инферно</string>
+    <string name="settingsHeroWaterAnimation">Водоворот</string>
+    <string name="settingsHeroAbstractAnimation">Воздушный поток</string>
+    <string name="settingsNoneAnimation">Ничего</string>
+    <string name="settingsSelectFireAnimationDialog">Анимация кнопки «Пожар»</string>
+    <string name="settingsSelectFireAnimationDialogSave">Сохранить</string>
+
     <!-- Dos Attack error-->
     <string name="dosErrorMessage">Соединение прервано. Этот сайт может навредить вашему устройству.</string>
 
@@ -497,9 +506,6 @@
     <string name="downloadManagerDisabled">Диспетчер загрузок отключен</string>
     <string name="downloadManagerIncompatible">Диспетчер загрузок недоступен на этом устройстве</string>
     <string name="enable">Включить</string>
-
-    <!--Fire button education-->
-    <string name="daxClearDataCtaText">Теперь нажмите ниже, чтобы записать историю просмотров. Попробуйте! 👇</string>
 
     <!-- Precise Location -->
     <string name="preciseLocationSystemDialogTitle">Включить определение местоположения устройства для браузера DuckDuckGo с защитой данных?</string>
@@ -524,6 +530,9 @@
     <string name="preciseLocationAllowedSitesSectionTitle">Предоставлено</string>
     <string name="preciseLocationDeniedSitesSectionTitle">Отказано</string>
     <string name="preciseLocationSnackbarMessage">Ранее вы предоставили %1$s разрешение на доступ к местоположению вашего устройства.</string>
+
+    <!--Fire button education-->
+    <string name="daxClearDataCtaText">В браузере могут скапливаться личные данные. Фу! Пользуйтесь кнопкой «Пожар», чтобы сжечь весь лишний мусор. Попробуйте сами! 👇</string>
 
     <!--  Global Privacy Control-->
     <string name="globalPrivacyControlActivityTitle">Глобальный контроль конфиденциальности (GPC)</string>

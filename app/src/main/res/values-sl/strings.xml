@@ -490,6 +490,15 @@
     <string name="fireproofWebsiteItemsSectionTitle">Spletna mesta</string>
     <string name="fireproofWebsiteToogleText">Vprašajte ob prijavi</string>
 
+    <!-- Fire Animation settings -->
+    <string name="settingsFireAnimation">Animacija za gumb ogenj</string>
+    <string name="settingsHeroFireAnimation">Pekel</string>
+    <string name="settingsHeroWaterAnimation">Vodni mehurčki</string>
+    <string name="settingsHeroAbstractAnimation">Zračni tok</string>
+    <string name="settingsNoneAnimation">Brez</string>
+    <string name="settingsSelectFireAnimationDialog">Animacija za gumb ogenj</string>
+    <string name="settingsSelectFireAnimationDialogSave">Shrani</string>
+
     <!-- Dos Attack error-->
     <string name="dosErrorMessage">Povezava prekinjena. To spletno mesto lahko škoduje vaši napravi.</string>
 
@@ -497,9 +506,6 @@
     <string name="downloadManagerDisabled">Upravitelj prenosov je onemogočen</string>
     <string name="downloadManagerIncompatible">Upravitelj prenosov ni na voljo v tej napravi</string>
     <string name="enable">Omogoči</string>
-
-    <!--Fire button education-->
-    <string name="daxClearDataCtaText">Tapnite spodaj, da zapišete zgodovino brskanja. Poskusite! 👇</string>
 
     <!-- Precise Location -->
     <string name="preciseLocationSystemDialogTitle">Želite omogočiti lokacijo naprave za zasebnost brskalnika DuckDuckGo?</string>
@@ -524,6 +530,9 @@
     <string name="preciseLocationAllowedSitesSectionTitle">Odobreno</string>
     <string name="preciseLocationDeniedSitesSectionTitle">Zavrnjeno</string>
     <string name="preciseLocationSnackbarMessage">Predhodno ste podelili dovoljenje %1$s za dostop do lokacije vaše naprave.</string>
+
+    <!--Fire button education-->
+    <string name="daxClearDataCtaText">Osebni podatki se lahko naberejo v vašem brskalniku. Fuj. Uporabite gumb ogenj, da jih zažgete. Poskusite sedaj! 👇</string>
 
     <!--  Global Privacy Control-->
     <string name="globalPrivacyControlActivityTitle">Globalni nadzor zasebnosti (GPC)</string>

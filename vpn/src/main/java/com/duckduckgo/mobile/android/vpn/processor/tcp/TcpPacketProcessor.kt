@@ -138,9 +138,9 @@ class TcpPacketProcessor(
         fun logPacketDetails(packet: Packet, initialSeqNumber: Long, sequenceNumber: Long, acknowledgementNumber: Long): String {
             with(packet.tcpHeader) {
                 return "\tflags:[ ${isSYN.printFlag("SYN")}${isACK.printFlag("ACK")}${isFIN.printFlag("FIN")}${isPSH.printFlag("PSH")}${isRST.printFlag("RST")}${
-                    isURG.printFlag(
-                        "URG"
-                    )
+                isURG.printFlag(
+                    "URG"
+                )
                 }]. [ackNumber=$acknowledgementNumber, sequenceNumber={ ${sequenceNumber - initialSeqNumber} / $sequenceNumber } ]"
             }
         }

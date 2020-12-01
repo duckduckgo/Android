@@ -490,6 +490,15 @@
     <string name="fireproofWebsiteItemsSectionTitle">Svetainės</string>
     <string name="fireproofWebsiteToogleText">Klausti prisijungiant</string>
 
+    <!-- Fire Animation settings -->
+    <string name="settingsFireAnimation">Mygtuko „Fire“ animacija</string>
+    <string name="settingsHeroFireAnimation">„Inferno“</string>
+    <string name="settingsHeroWaterAnimation">„Whirlpool“</string>
+    <string name="settingsHeroAbstractAnimation">„Airstream“</string>
+    <string name="settingsNoneAnimation">Jokie</string>
+    <string name="settingsSelectFireAnimationDialog">Mygtuko „Fire“ animacija</string>
+    <string name="settingsSelectFireAnimationDialogSave">Išsaugoti</string>
+
     <!-- Dos Attack error-->
     <string name="dosErrorMessage">Prisijungimas nutrauktas. Ši svetainė gali pakenkti jūsų įrenginiui.</string>
 
@@ -497,9 +506,6 @@
     <string name="downloadManagerDisabled">Parinktis „Download Manager“ išjungta</string>
     <string name="downloadManagerIncompatible">Parinktis „Download Manager“ nepasiekiama šiame įrenginyje</string>
     <string name="enable">Įjungti</string>
-
-    <!--Fire button education-->
-    <string name="daxClearDataCtaText">Bakstelėkite žemiau norėdami įrašyti savo naršymo istoriją. Išbandykite! 👇</string>
 
     <!-- Precise Location -->
     <string name="preciseLocationSystemDialogTitle">Įgalinti įrenginio vietą „DuckDuckGo“ privatumo naršyklėje?</string>
@@ -524,6 +530,9 @@
     <string name="preciseLocationAllowedSitesSectionTitle">Suteiktas</string>
     <string name="preciseLocationDeniedSitesSectionTitle">Atmestas</string>
     <string name="preciseLocationSnackbarMessage">Anksčiau %1$s suteikėte leidimą pasiekti jūsų įrenginio vietą.</string>
+
+    <!--Fire button education-->
+    <string name="daxClearDataCtaText">Asmeniniai duomenys gali kauptis jūsų naršyklėje. Fui. Naudokite mygtuką „Fire“, kad juos panaikintumėte. Išbandykite dabar! 👇</string>
 
     <!--  Global Privacy Control-->
     <string name="globalPrivacyControlActivityTitle">Visuotinė privatumo kontrolė (VPK)</string>

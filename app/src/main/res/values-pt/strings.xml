@@ -478,6 +478,15 @@
     <string name="fireproofWebsiteItemsSectionTitle">Websites</string>
     <string name="fireproofWebsiteToogleText">Perguntar ao iniciar sessão</string>
 
+    <!-- Fire Animation settings -->
+    <string name="settingsFireAnimation">Animação do Botão de Fogo</string>
+    <string name="settingsHeroFireAnimation">Inferno</string>
+    <string name="settingsHeroWaterAnimation">Remoinho</string>
+    <string name="settingsHeroAbstractAnimation">Corrente de ar</string>
+    <string name="settingsNoneAnimation">Nenhum</string>
+    <string name="settingsSelectFireAnimationDialog">Animação do botão de fogo</string>
+    <string name="settingsSelectFireAnimationDialogSave">Guardar</string>
+
     <!-- Dos Attack error-->
     <string name="dosErrorMessage">Ligação abortada. Este website poderá ser prejudicial ao seu dispositivo.</string>
 
@@ -485,9 +494,6 @@
     <string name="downloadManagerDisabled">Gestor de transferências desativado</string>
     <string name="downloadManagerIncompatible">Gestor de transferências não disponível neste dispositivo</string>
     <string name="enable">Permitir</string>
-
-    <!--Fire button education-->
-    <string name="daxClearDataCtaText">Agora toque abaixo para queimar o seu histórico de navegação. Experimente! 👇</string>
 
     <!-- Precise Location -->
     <string name="preciseLocationSystemDialogTitle">Ativar a localização do dispositivo para o Navegador de Privacidade DuckDuckGo?</string>
@@ -512,6 +518,9 @@
     <string name="preciseLocationAllowedSitesSectionTitle">Concedido</string>
     <string name="preciseLocationDeniedSitesSectionTitle">Negado</string>
     <string name="preciseLocationSnackbarMessage">Anteriormente concedeu %1$s permissão para aceder a localização do seu dispositivo.</string>
+
+    <!--Fire button education-->
+    <string name="daxClearDataCtaText">Os dados pessoais podem ser acumulados no seu navegador. Que nojo. Use o botão de fogo para queimar tudo. Experimente agora! 👇</string>
 
     <!--  Global Privacy Control-->
     <string name="globalPrivacyControlActivityTitle">Controlo Global de Privacidade (CGP)</string>
