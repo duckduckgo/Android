@@ -421,7 +421,7 @@
         <item quantity="other"><![CDATA[ probeerden je hier te volgen. <br/><br/>Ik heb het geblokkeerd!<br/><br/> ☝️Je kunt de URL-balk bekijken om te zien wie je probeert te volgen wanneer je een nieuwe site bezoekt.️]]></item>
     </plurals>
     <string name="daxNonSerpCtaText"><![CDATA[Terwijl je tikt en scrolt, blokkeer ik vervelende trackers.<br/><br/>Ga je gang, blijf browsen!]]></string>
-    <string name="daxMainNetworkCtaText"><![CDATA[Opgelet! %1$s is een groot trackernetwerk.<br/><br/>Hun trackers liggen op de loer op ongeveer %2$s van de beste sites 😱 maar maak je geen zorgen!\n\nIk blokkeer %3$s, zodat jouw activiteit op die websites niet zichtbaar is.]]></string>
+    <string name="daxMainNetworkCtaText"><![CDATA[Opgelet! %1$s is een groot trackernetwerk.<br/><br/>Hun trackers liggen op de loer op ongeveer %2$s van de beste sites 😱 maar maak je geen zorgen!<br/><br/>Ik blokkeer %3$s, zodat jouw activiteit op die websites niet zichtbaar is.]]></string>
     <string name="daxMainNetworkOwnedCtaText">Opgelet! Omdat %1$s eigenaar is van %2$s, kan ik niet voorkomen dat ze jouw activiteit hier kunnen zien.&lt;br/&gt;&lt;br/&gt;Maar als je met mij surft, kan ik ervoor zorgen dat %3$s minder over je te weten komt door hun trackers op andere sites te blokkeren.</string>
 
     <!-- Download Confirmation -->

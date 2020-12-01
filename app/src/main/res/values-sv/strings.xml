@@ -498,25 +498,25 @@
     <string name="enable">Aktivera</string>
 
     <!-- Precise Location -->
-    <string name="preciseLocationSystemDialogTitle">Aktivera åtkomst till enhetens platsinf\\bormation för DuckDuckGo Privacy Browser?</string>
-    <string name="preciseLocationSystemDialogSubtitle">%1$s begär åtkomst till din enhets platsinf\\bormation. Du måste tillåta att appen skickar din enhets platsinf\\bormation innan %2$s kan be om åtkomst.</string>
+    <string name="preciseLocationSystemDialogTitle">Aktivera åtkomst till enhetens platsinformation för DuckDuckGo Privacy Browser?</string>
+    <string name="preciseLocationSystemDialogSubtitle">%1$s begär åtkomst till din enhets platsinformation. Du måste tillåta att appen skickar din enhets platsinformation innan %2$s kan be om åtkomst.</string>
     <string name="preciseLocationSystemDialogAllow">Aktivera</string>
     <string name="preciseLocationSystemDialogDeny">Kanske senare</string>
     <string name="preciseLocationSystemDialogNeverAllow">Fråga inte igen för denna webbplats</string>
-    <string name="preciseLocationSiteDialogTitle">Bevilja åtkomst till enhetens platsinf\\bormation för %1$s?</string>
-    <string name="preciseLocationSiteDialogSubtitle">Du kan gå till Inställningar för att hantera åtkomster till din enhets platsinf\\bormation som du har beviljat för enskilda webbplatser.</string>
+    <string name="preciseLocationSiteDialogTitle">Bevilja åtkomst till enhetens platsinformation för %1$s?</string>
+    <string name="preciseLocationSiteDialogSubtitle">Du kan gå till Inställningar för att hantera åtkomster till din enhets platsinformation som du har beviljat för enskilda webbplatser.</string>
     <string name="preciseLocationSiteDialogAllowAlways">Alltid</string>
     <string name="preciseLocationSiteDialogAllowOnce">Endast för denna session</string>
     <string name="preciseLocationSiteDialogDenyAlways">Neka alltid</string>
     <string name="preciseLocationSiteDialogDenyOnce">Neka för denna session</string>
     <string name="settingsPreciseLocation">Plats</string>
-    <string name="preciseLocationFeatureDescription">Webbplatser du besöker kan begära åtkomst till din enhets platsinf\\bormation. De får inte åtkomst till din enhets platsinf\\bormation förrän du uttryckligen beviljat detta. DuckDuckGo använder enbart din enhets platsinf\bormation anonymt för att tillhandahålla lokala sökresultat.</string>
-    <string name="preciseLocationToggleText">Webbplatser kan be om åtkomst till min platsinf\\bormation</string>
-    <string name="preciseLocationEmptyListHint">Inga webbplatser har fått åtkomst till platsinf\\bormationen</string>
+    <string name="preciseLocationFeatureDescription">Webbplatser du besöker kan begära åtkomst till din enhets platsinformation. De får inte åtkomst till din enhets platsinformation förrän du uttryckligen beviljat detta. DuckDuckGo använder enbart din enhets platsinf\bormation anonymt för att tillhandahålla lokala sökresultat.</string>
+    <string name="preciseLocationToggleText">Webbplatser kan be om åtkomst till min platsinformation</string>
+    <string name="preciseLocationEmptyListHint">Inga webbplatser har fått åtkomst till platsinformationen</string>
     <string name="preciseLocationNoSystemPermission">Aktivera åtkomst till platsinformation för denna app i Android-inställningarna för att hantera enskilda webbplatsers åtkomst till platsinformation.</string>
     <string name="preciseLocationActivityTitle">Plats</string>
     <string name="preciseLocationDeleteConfirmMessage">Är du säker på att du vill ta bort &lt;b&gt;%1$s&lt;/b&gt;?</string>
-    <string name="preciseLocationDeleteContentDescription">Fler alternativ för åtkomst till enhetens platsinf\\bormation i domänen %1$s</string>
+    <string name="preciseLocationDeleteContentDescription">Fler alternativ för åtkomst till enhetens platsinformation i domänen %1$s</string>
     <string name="preciseLocationAllowedSitesSectionTitle">Beviljad</string>
     <string name="preciseLocationDeniedSitesSectionTitle">Nekad</string>
     <string name="preciseLocationSnackbarMessage">Du har tidigare beviljat åtkomst till din enhets platsinformation för %1$s.</string>

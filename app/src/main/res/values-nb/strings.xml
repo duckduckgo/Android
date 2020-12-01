@@ -409,7 +409,7 @@
     <string name="onboardingWelcomeTitle">"Velkommen til DuckDuckGo!"</string>
     <string name="onboardingDaxText"><![CDATA[Internettet kan være ganske skummelt.<br/><br/>Men ikke vær redd! Det er enklere enn du tror å søke og surfe privat.]]></string>
     <string name="onboardingLetsDoItButton">Sett i gang!</string>
-    <string name="daxIntroCtaText"><![CDATA[Deretter kan du besøke et av favorittnettstedene dine!\n\nJeg blokkerer sporingsforsøk slik at de ikke kan spionere på deg. Hvis det er mulig, oppgraderer jeg også sikkerheten på forbindelsen din. 🔒]]></string>
+    <string name="daxIntroCtaText"><![CDATA[Deretter kan du besøke et av favorittnettstedene dine!<br/><br/>Jeg blokkerer sporingsforsøk slik at de ikke kan spionere på deg. Hvis det er mulig, oppgraderer jeg også sikkerheten på forbindelsen din. 🔒]]></string>
     <string name="daxEndCtaText"><![CDATA[Dette går bra!<br/><br/>Husk: Hver gang du surfer med meg, klippes vingene på en uhyggelig annonse. 👍]]></string>
     <string name="daxSerpCtaText">DuckDuckGo-søkene dine er anonyme, jeg lagrer aldri søkehistorikken din. Noensinne. 🙌</string>
     <plurals name="daxTrackersBlockedCtaText">
