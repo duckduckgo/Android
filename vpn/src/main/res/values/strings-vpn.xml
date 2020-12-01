@@ -38,4 +38,5 @@
         <item quantity="other">%d trackers</item>
     </plurals>
     <string name="vpnNotificationTrackersFoundUpdate">"Today, so far we blocked %s from tracking you; the last one was %s. %s in total."</string>
+    <string name="vpnReportFeedback">Send feedback</string>
 </resources>

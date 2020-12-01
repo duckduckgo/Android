@@ -21,6 +21,7 @@ import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
+import android.content.Intent.ACTION_VIEW
 import android.net.VpnService
 import android.os.Bundle
 import android.view.Menu
@@ -29,6 +30,7 @@ import android.widget.CompoundButton
 import android.widget.TextView
 import android.widget.ToggleButton
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.net.toUri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
@@ -166,8 +168,13 @@ class VpnControllerActivity : AppCompatActivity(R.layout.activity_vpn_controller
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
+            R.id.reportFeedback -> { launchFeedback(); true }
             else -> super.onOptionsItemSelected(item)
         }
+    }
+
+    private fun launchFeedback() {
+        startActivity(Intent(ACTION_VIEW, FEEDBACK_URL))
     }
 
     private fun renderTimeRunning(timeRunningMillis: Long) {
@@ -305,5 +312,6 @@ class VpnControllerActivity : AppCompatActivity(R.layout.activity_vpn_controller
         }
 
         private const val RC_REQUEST_VPN_PERMISSION = 100
+        val FEEDBACK_URL = "https://form.asana.com?k=j2t0mHOc9nMVTDqg5OHPJw&d=137249556945".toUri()
     }
 }

@@ -22,6 +22,7 @@ import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.content.Intent.ACTION_VIEW
 import android.os.Build
 import androidx.core.app.NotificationCompat
 import androidx.core.app.TaskStackBuilder
@@ -37,10 +38,13 @@ class VpnNotificationBuilder {
             registerChannel(context)
 
             val vpnControllerIntent = Intent(context, VpnControllerActivity::class.java)
-            val vpnControllerPendingIntent: PendingIntent? = TaskStackBuilder.create(context).run {
+            val vpnShowDashboardPendingIntent: PendingIntent? = TaskStackBuilder.create(context).run {
                 addNextIntentWithParentStack(vpnControllerIntent)
                 getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT)
             }
+
+            val browserIntent = Intent(ACTION_VIEW, VpnControllerActivity.FEEDBACK_URL)
+            val vpnReportFeedbackPendingIntent: PendingIntent = PendingIntent.getActivity(context, 0, browserIntent, PendingIntent.FLAG_CANCEL_CURRENT)
 
             val notificationText = generateNotificationText(trackersBlocked, trackerCompanies, context)
             return NotificationCompat.Builder(context, VPN_FOREGROUND_SERVICE_NOTIFICATION_CHANNEL_ID)
@@ -48,9 +52,10 @@ class VpnNotificationBuilder {
                 .setContentText(notificationText)
                 .setStyle(NotificationCompat.BigTextStyle().bigText(notificationText))
                 .setSmallIcon(R.drawable.ic_vpn_notification_24)
-                .setContentIntent(vpnControllerPendingIntent)
+                .setContentIntent(vpnShowDashboardPendingIntent)
                 .setOngoing(true)
                 .setChannelId(VPN_FOREGROUND_SERVICE_NOTIFICATION_CHANNEL_ID)
+                .addAction(R.drawable.ic_baseline_feedback_24, context.getString(R.string.vpnReportFeedback), vpnReportFeedbackPendingIntent)
                 .build()
         }
 
