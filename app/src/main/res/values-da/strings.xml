@@ -92,6 +92,8 @@
     <string name="closeContentDescription">Luk</string>
     <string name="closeAllTabsMenuItem">Luk alle faner</string>
     <string name="closeTab">Luk fane</string>
+    <string name="tabClosed">Fanen er lukket</string>
+    <string name="tabClosedUndo">Fortryd</string>
 
     <!-- Privacy Dashboard Activities -->
     <string name="privacyProtectionToggle">Webstedets beskyttelse af personlige oplysninger</string>
@@ -183,7 +185,7 @@
     <!-- About Activity -->
     <string name="aboutActivityTitle">Om os</string>
     <string name="aboutDescription">
-        Hos DuckDuckGo sætter vi den nye standard for tiltro online .\n\n DuckDuckGo Privacy Browser giver dig alle de nødvendige værktøjer til at værne over privatlivets fred, så du kan beskytte dig selv, når du søger og surfer på nettet, herunder tracker-blokering, smartere kryptering og DuckDuckGo-privat søgning.\n\n Internettet bør trods alt ikke føles så skummelt, og det bør være lige så enkelt at få det privatliv, du fortjener online, som at lukke dine persienner ned.</string>
+        Hos DuckDuckGo sætter vi den nye standard for tiltro online.\n\\ \n\\DuckDuckGo Privacy Browser giver dig alle de nødvendige værktøjer til at værne over privatlivets fred, så du kan beskytte dig selv, når du søger og surfer på nettet, herunder tracker-blokering, smartere kryptering og DuckDuckGo-privat søgning.\n\nInternettet bør trods alt ikke føles så skummelt, og det bør være lige så enkelt at få det privatliv, du fortjener online, som at lukke dine persienner ned.</string>
     <string name="aboutMoreLink">Mere på duckduckgo.com/about</string>
     <string name="no_suggestions">Ingen forslag</string>
 
