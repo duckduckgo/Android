@@ -111,14 +111,13 @@ class BrowserWebViewClient(
                         return true
                     }
                     if (isForMainFrame) {
+                        webViewClientListener?.willOverrideUrl(url.toString())
                         if (globalPrivacyControl.isGpcActive()) {
                             webView.loadUrl(url.toString(), globalPrivacyControl.getHeaders())
                             return true
-                        } else {
-                            webViewClientListener?.willOverrideUrl(url.toString())
                         }
                     }
-                    false
+                    return false
                 }
             }
         } catch (e: Throwable) {
