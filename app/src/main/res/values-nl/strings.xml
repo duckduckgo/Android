@@ -33,9 +33,9 @@
     <string name="cannotLaunchDefaultAppSettings">Kan het instellingenscherm voor standaard-apps niet openen</string>
     <string name="settingsDefaultBrowserEnabled">Instellen als standaard browser</string>
     <string name="defaultBrowserMaybeLater">Later misschien</string>
-    <string name="defaultBrowserLetsDoIt">Laten we het doen!</string>
     <string name="defaultBrowserDescriptionNoDefault">Open links altijd met een gerust hart.</string>
     <string name="defaultBrowserInstructions">Selecteer DuckDuckGo en tik op <font color="#678fff">Altijd </font>.</string>
+    <string name="defaultBrowserLetsDoIt">Instellen als standaard browser</string>
 
     <!-- Browser Activity -->
     <string name="browserPopupMenu">Browsermenu</string>

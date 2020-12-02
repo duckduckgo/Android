@@ -33,8 +33,8 @@
     <string name="cannotLaunchDefaultAppSettings">Kan inte starta standardinställningssidan för appar</string>
     <string name="settingsDefaultBrowserEnabled">Ställ in som standardwebbläsare</string>
     <string name="defaultBrowserMaybeLater">Kanske senare</string>
-    <string name="defaultBrowserLetsDoIt">Vi gör det!</string>
     <string name="defaultBrowserDescriptionNoDefault">Sluta oroa dig varje gång du öppnar länkar.</string>
+    <string name="defaultBrowserLetsDoIt">Ställ in som standardwebbläsare</string>
     <string name="defaultBrowserInstructions">Välj DuckDuckGo och tryck på <font color="#678fff">Alltid</font>.</string>
 
     <!-- Browser Activity -->

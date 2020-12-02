@@ -33,7 +33,7 @@
     <string name="cannotLaunchDefaultAppSettings">Zaslona privzetih nastavitev aplikacije ni mogoče zagnati</string>
     <string name="settingsDefaultBrowserEnabled">Nastavite za privzeti brskalnik</string>
     <string name="defaultBrowserMaybeLater">Mogoče kasneje</string>
-    <string name="defaultBrowserLetsDoIt">Pa se lotimo!</string>
+    <string name="defaultBrowserLetsDoIt">Nastavite za privzeti brskalnik</string>
     <string name="defaultBrowserDescriptionNoDefault">Bodite pomirjeni, ko odpirate povezave.</string>
     <string name="defaultBrowserInstructions">Izberite aplikacijo DuckDuckGo in tapnite <font color="#678fff">Vedno</font>.</string>
 

@@ -33,7 +33,7 @@
     <string name="cannotLaunchDefaultAppSettings">Det var ikke muligt at starte standard app-indstillingsskærmen</string>
     <string name="settingsDefaultBrowserEnabled">Angiv som standardbrowser</string>
     <string name="defaultBrowserMaybeLater">Måske senere</string>
-    <string name="defaultBrowserLetsDoIt">Lad os gøre det!</string>
+    <string name="defaultBrowserLetsDoIt">Angiv som standardbrowser</string>
     <string name="defaultBrowserDescriptionNoDefault">Åbne link med ro i sindet, hver gang.</string>
     <string name="defaultBrowserInstructions">Vælg DuckDuckGo, og tryk på <font color="#678fff"> Altid </font>.</string>
 

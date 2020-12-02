@@ -33,9 +33,9 @@
     <string name="cannotLaunchDefaultAppSettings">Standardmäßiger App-Einstellungsbildschirm kann nicht gestartet werden</string>
     <string name="settingsDefaultBrowserEnabled">Als Standard-Browser festlegen</string>
     <string name="defaultBrowserMaybeLater">Vielleicht später</string>
-    <string name="defaultBrowserLetsDoIt">Machen wir das!</string>
     <string name="defaultBrowserDescriptionNoDefault">Öffne Links jederzeit sicher und ohne Sorge.</string>
     <string name="defaultBrowserInstructions">Wähle DuckDuckGo aus und tippe auf <font color="#678fff">Immer</font>.</string>
+    <string name="defaultBrowserLetsDoIt">Als Standard-Browser festlegen</string>
 
     <!-- Browser Activity -->
     <string name="browserPopupMenu">Browsermenü</string>

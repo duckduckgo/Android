@@ -33,8 +33,8 @@
     <string name="cannotLaunchDefaultAppSettings">Екранът за настройки на приложения по подразбиране не може да бъде стартиран</string>
     <string name="settingsDefaultBrowserEnabled">Задаване като браузър по подразбиране</string>
     <string name="defaultBrowserMaybeLater">Може би по-късно</string>
-    <string name="defaultBrowserLetsDoIt">Да го направим!</string>
     <string name="defaultBrowserDescriptionNoDefault">Отваряйте връзки без притеснения, всеки път.</string>
+    <string name="defaultBrowserLetsDoIt">Задаване като браузър по подразбиране</string>
     <string name="defaultBrowserInstructions">Изберете DuckDuckGo и докоснете <font color="#678fff">Винаги</font>.</string>
 
     <!-- Browser Activity -->

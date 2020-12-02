@@ -33,7 +33,7 @@
     <string name="cannotLaunchDefaultAppSettings">Αδυναμία εκκίνησης προεπιλεγμένης οθόνης ρυθμίσεων εφαρμογής</string>
     <string name="settingsDefaultBrowserEnabled">Ορισμός ως προεπιλεγμένο πρόγραμμα περιήγησης</string>
     <string name="defaultBrowserMaybeLater">Ίσως αργότερα</string>
-    <string name="defaultBrowserLetsDoIt">Ας το κάνουμε!</string>
+    <string name="defaultBrowserLetsDoIt">Ορισμός ως προεπιλεγμένο πρόγραμμα περιήγησης</string>
     <string name="defaultBrowserDescriptionNoDefault">Ανοίξτε συνδέσμους με ηρεμία και ασφάλεια, κάθε φορά.</string>
     <string name="defaultBrowserInstructions">Επιλέξτε DuckDuckGo και πιέστε <font color="#678fff"> Always </font>.</string>
 

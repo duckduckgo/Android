@@ -33,7 +33,7 @@
     <string name="cannotLaunchDefaultAppSettings">Az alkalmazás alapértelmezett beállítású képernyője nem indítható el</string>
     <string name="settingsDefaultBrowserEnabled">Beállítás alapértelmezett böngészőként</string>
     <string name="defaultBrowserMaybeLater">Talán később</string>
-    <string name="defaultBrowserLetsDoIt">Csináljuk!</string>
+    <string name="defaultBrowserLetsDoIt">Beállítás alapértelmezett böngészőként</string>
     <string name="defaultBrowserDescriptionNoDefault">Nyugodtan kattints a linkekre, mindig.</string>
     <string name="defaultBrowserInstructions">Válaszd ki a DuckDuckGót, majd koppints a <font color="#678fff"> Mindig </font> elemre.</string>
 

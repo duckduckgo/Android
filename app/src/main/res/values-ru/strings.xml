@@ -33,8 +33,8 @@
     <string name="cannotLaunchDefaultAppSettings">Не удаётся открыть настройки приложения по умолчанию</string>
     <string name="settingsDefaultBrowserEnabled">Сделать браузером по умолчанию</string>
     <string name="defaultBrowserMaybeLater">Позже</string>
-    <string name="defaultBrowserLetsDoIt">Поехали!</string>
     <string name="defaultBrowserDescriptionNoDefault">Открывайте ссылки, ни о чем не беспокоясь.</string>
+    <string name="defaultBrowserLetsDoIt">Сделать браузером по умолчанию</string>
     <string name="defaultBrowserInstructions">Выберите DuckDuckGo и нажмите <font color="#678fff">Всегда</font>.</string>
 
     <!-- Browser Activity -->

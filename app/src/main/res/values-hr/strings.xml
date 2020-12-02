@@ -33,9 +33,9 @@
     <string name="cannotLaunchDefaultAppSettings">Ne mogu pokrenuti zaslon zadanih postavki u aplikaciji</string>
     <string name="settingsDefaultBrowserEnabled">Postavi kao zadani preglednik</string>
     <string name="defaultBrowserMaybeLater">Možda kasnije</string>
-    <string name="defaultBrowserLetsDoIt">Učinimo to!</string>
     <string name="defaultBrowserDescriptionNoDefault">Svaki put poveznice otvori spokojno.</string>
     <string name="defaultBrowserInstructions">Odaberi DuckDuckGo i dodirni <font color="#678fff">Uvijek </font>.</string>
+    <string name="defaultBrowserLetsDoIt">Postavi kao zadani preglednik</string>
 
     <!-- Browser Activity -->
     <string name="browserPopupMenu">Izbornik preglednika</string>

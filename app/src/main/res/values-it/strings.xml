@@ -33,7 +33,7 @@
     <string name="cannotLaunchDefaultAppSettings">Impossibile aprire la schermata delle impostazioni predefinite dell\'app</string>
     <string name="settingsDefaultBrowserEnabled">Imposta come Browser predefinito</string>
     <string name="defaultBrowserMaybeLater">Forse più tardi</string>
-    <string name="defaultBrowserLetsDoIt">Facciamolo!</string>
+    <string name="defaultBrowserLetsDoIt">Imposta come Browser predefinito</string>
     <string name="defaultBrowserDescriptionNoDefault">Apri i collegamenti con la massima tranquillità, ogni volta.</string>
     <string name="defaultBrowserInstructions">Seleziona DuckDuckGo e clicca su <font color="#678fff">Sempre</font>.</string>
 
