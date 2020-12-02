@@ -980,7 +980,9 @@ class BrowserTabFragment :
                 builtInZoomControls = true
                 displayZoomControls = false
                 mixedContentMode = WebSettings.MIXED_CONTENT_COMPATIBILITY_MODE
-                setSupportMultipleWindows(true)
+                // There's an issue when overriding urls (GPC) and supporting blank links.
+                // Disabled until we fix the issue.
+                setSupportMultipleWindows(false)
                 disableWebSql(this)
                 setSupportZoom(true)
             }
