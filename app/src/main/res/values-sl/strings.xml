@@ -33,7 +33,7 @@
     <string name="cannotLaunchDefaultAppSettings">Zaslona privzetih nastavitev aplikacije ni mogoče zagnati</string>
     <string name="settingsDefaultBrowserEnabled">Nastavite za privzeti brskalnik</string>
     <string name="defaultBrowserMaybeLater">Mogoče kasneje</string>
-    <string name="defaultBrowserLetsDoIt">Zanima me!</string>
+    <string name="defaultBrowserLetsDoIt">Nastavite za privzeti brskalnik</string>
     <string name="defaultBrowserDescriptionNoDefault">Bodite pomirjeni, ko odpirate povezave.</string>
     <string name="defaultBrowserInstructions">Izberite aplikacijo DuckDuckGo in tapnite <font color="#678fff">Vedno</font>.</string>
 
@@ -92,6 +92,8 @@
     <string name="closeContentDescription">Zapri</string>
     <string name="closeAllTabsMenuItem">Zapri vse zavihke</string>
     <string name="closeTab">Zapri zavihek</string>
+    <string name="tabClosed">Zavihek zaprt</string>
+    <string name="tabClosedUndo">Prekliči spremembe</string>
 
     <!-- Privacy Dashboard Activities -->
     <string name="privacyProtectionToggle">Zaščita zasebnosti na strani</string>
@@ -167,7 +169,7 @@
     <string name="settingsHeadingGeneral">Splošno</string>
     <string name="settingsHeadingOther">Drugo</string>
     <string name="settingsHeadingPrivacy">Zasebnost</string>
-    <string name="settingsLightTheme">Lahkotna tema</string>
+    <string name="settingsLightTheme">Svetli način</string>
     <string name="settingsAboutDuckduckgo">O DuckDuckGo</string>
     <string name="settingsVersion">Različica</string>
     <string name="leaveFeedback">Pustite povratne informacije</string>
@@ -191,7 +193,7 @@
     <!-- About Activity -->
     <string name="aboutActivityTitle">O nas</string>
     <string name="aboutDescription">
-        Pri DuckDuckGo vzpostavljamo nov standard zaupanja na spletu.\n\n Zasebni brskalnik DuckDuckGo zagotavlja vse bistvene sestavine zasebnosti, ki jih potrebujete za svojo zaščito, kadar iščete in brskate po spletu, vključno z blokiranjem sledilnikov, pametnejšim šifriranjem in zasebnim iskanjem DuckDuckGo.\n\n Navsezadnje nam internet ne bi smel vzbujati strahu. Doseganje zasebnosti na spletu, ki si jo zaslužimo, bi moralo biti tako preprosto kot zagrinjanje zaves.</string>
+        Pri DuckDuckGo vzpostavljamo nov standard zaupanja na spletu.\n\\ .\n\\ Navsezadnje nam internet ne bi smel vzbujati strahu.\n\nZasebni brskalnik DuckDuckGo zagotavlja vse bistvene sestavine zasebnosti, ki jih potrebujete za svojo zaščito, kadar iščete in brskate po spletu, vključno z blokiranjem sledilnikov, pametnejšim šifriranjem in zasebnim iskanjem DuckDuckGo.\n\nDoseganje zasebnosti na spletu, ki si jo zaslužimo, bi moralo biti tako preprosto kot zagrinjanje zaves.</string>
     <string name="aboutMoreLink">Več na duckduckgo.com/about</string>
     <string name="no_suggestions">Ni predlogov</string>
 
@@ -402,7 +404,7 @@
     <string name="systemSearchOnboardingButtonOk">Razumem</string>
 
     <!-- Dax Dialog -->
-    <string name="daxDialogHideButton">Skrij</string>
+    <string name="daxDialogHideButton">SKRIJ</string>
     <string name="daxDialogPhew">Fuj!</string>
     <string name="daxDialogNext">Naslednji</string>
     <string name="daxDialogHighFive">Petka!</string>
@@ -440,8 +442,8 @@
     <string name="downloadConfirmationKeepBothFilesText">Ohrani oba</string>
     <string name="downloadConfirmationReplaceOldFileText">Zamenjaj</string>
     <string name="downloadConfirmationOpenFileText">Odpri</string>
-    <string name="downloadConfirmationUnableToOpenFileText">Datoteke ni mogoče odpreti</string>
-    <string name="downloadConfirmationUnableToDeleteFileText">Stare datoteke ni mogoče izbrisati</string>
+    <string name="downloadConfirmationUnableToOpenFileText">Datoteke ni možno odpreti</string>
+    <string name="downloadConfirmationUnableToDeleteFileText">Stare datoteke ni možno izbrisati</string>
 
     <!-- Change Icon Activity -->
     <string name="changeIconActivityTitle">Ikona aplikacije</string>
@@ -453,7 +455,7 @@
 
     <!-- New dashboard / menu buttons -->
     <string name="manageWhitelist">Nezaščitene strani</string>
-    <string name="reportBrokenSite">Prijavi nedelujočo stran</string>
+    <string name="reportBrokenSite">Prijavite poškodovano spletno mesto</string>
 
     <!-- Dialogs -->
     <string name="dialogAddTitle">Dodaj</string>
@@ -464,22 +466,22 @@
     <string name="enablePrivacyProtection">Omogoči zaščito zasebnosti</string>
     <string name="disablePrivacyProtection">Onemogoči zaščito zasebnosti</string>
     <string name="whitelistEntryOverflowContentDescription">Več možnosti za nezaščiteno stran %1$s</string>
-    <string name="whitelistEntryDeleteConfirmMessage">Ali si prepričan/​a, da želite odstraniti &lt;b&gt;%1$s&lt;/b&gt; z nezaščitenih spletnih strani?</string>
+    <string name="whitelistEntryDeleteConfirmMessage">Ali si prepričan/​a, da želiš odstraniti &lt;b&gt;%1$s&lt;/b&gt; z nezaščitenih spletnih strani?</string>
     <string name="whitelistExplanation">Varnost teh strani se z zaščito zasebnosti ne bo izboljšala.</string>
     <string name="whitelistNoEntries">Zaenkrat ni nezaščitenih strani</string>
     <string name="whitelistDomainHint">www.example.com</string>
-    <string name="whitelistFormatError">Shranjevanje ni bilo mogoče, vnesite domeno, kot na primer <b>example.com</b></string>
+    <string name="whitelistFormatError">Shranjevanje ni bilo možno, vnesite domeno, kot na primer <b>example.com</b></string>
 
     <!-- Settings -->
     <string name="settingsPrivacyProtectionWhitelist">Nezaščitene strani</string>
 
     <!-- Fireproof websites -->
-    <string name="fireproofWebsitesActivityTitle">Spletne stran s požarno zaščito</string>
+    <string name="fireproofWebsitesActivityTitle">Spletna stran s požarno zaščito</string>
     <string name="settingsFireproofWebsites">Spletna stran s požarno zaščito</string>
     <string name="fireproofWebsiteMenuTitleAdd">Spletna stran s požarno zaščito</string>
     <string name="fireproofWebsiteSnackbarConfirmation">&lt;b&gt;%1$s&lt;/b&gt; ima sedaj požarno zaščito! Za več informacij obiščite Nastavitve.</string>
     <string name="fireproofWebsiteSnackbarAction">Prekliči spremembe</string>
-    <string name="fireproofWebsiteDeleteConfirmMessage">Ste prepričani, da želite izbrisati &lt;b&gt;%1$s&lt;/b&gt;?</string>
+    <string name="fireproofWebsiteDeleteConfirmMessage">Si prepričan, da želiš izbrisati &lt;b&gt;%1$s&lt;/b&gt;?</string>
     <string name="fireproofWebsiteEmptyListHint">Nobena spletna stran še nima požarne zaščite</string>
     <string name="fireproofWebsiteFeatureDescription">Spletne strani se zanašajo na piškotke, da boš vedno prijavljen. Ko spletno mesto požarno zaščitiš, piškotki ne bodo izbrisani in ostal boš prijavljen, tudi po uporabi gumba Fire. Še vedno blokiramo zunanje sledilce, ki jih najdemo na požarno izoliranih spletnih mestih.</string>
     <string name="fireproofWebsiteOverflowContentDescription">Več možnosti za stran s požarno zaščito %1$s</string>
@@ -490,6 +492,15 @@
     <string name="fireproofWebsiteItemsSectionTitle">Spletna mesta</string>
     <string name="fireproofWebsiteToogleText">Vprašajte ob prijavi</string>
 
+    <!-- Fire Animation settings -->
+    <string name="settingsFireAnimation">Animacija za gumb ogenj</string>
+    <string name="settingsHeroFireAnimation">Pekel</string>
+    <string name="settingsHeroWaterAnimation">Vodni mehurčki</string>
+    <string name="settingsHeroAbstractAnimation">Zračni tok</string>
+    <string name="settingsNoneAnimation">Brez</string>
+    <string name="settingsSelectFireAnimationDialog">Animacija za gumb ogenj</string>
+    <string name="settingsSelectFireAnimationDialogSave">Shrani</string>
+
     <!-- Dos Attack error-->
     <string name="dosErrorMessage">Povezava prekinjena. To spletno mesto lahko škoduje vaši napravi.</string>
 
@@ -497,9 +508,6 @@
     <string name="downloadManagerDisabled">Upravitelj prenosov je onemogočen</string>
     <string name="downloadManagerIncompatible">Upravitelj prenosov ni na voljo v tej napravi</string>
     <string name="enable">Omogoči</string>
-
-    <!--Fire button education-->
-    <string name="daxClearDataCtaText">Tapnite spodaj, da zapišete zgodovino brskanja. Poskusite! 👇</string>
 
     <!-- Precise Location -->
     <string name="preciseLocationSystemDialogTitle">Želite omogočiti lokacijo naprave za zasebnost brskalnika DuckDuckGo?</string>
@@ -514,16 +522,19 @@
     <string name="preciseLocationSiteDialogDenyAlways">Vedno zavrni</string>
     <string name="preciseLocationSiteDialogDenyOnce">Zavrni za to sejo</string>
     <string name="settingsPreciseLocation">Lokacija</string>
-    <string name="preciseLocationFeatureDescription">Obiskana spletna mesta bodo morda želela vedeti lokacijo vaše naprave. Do nje ne bodo mogli dostopati, dokler ne podelite izrecnega dovoljenja. DuckDuckGo uporablja vašo lokacijo samo anonimno za prikaz rezultatov lokalnega iskanja.</string>
+    <string name="preciseLocationFeatureDescription">Obiskana spletna mesta bodo morda želela vedeti lokacijo tvoje naprave. Do nje ne bodo mogli dostopati, dokler ne podeliš izrecnega dovoljenja. DuckDuckGo uporablja tvojo lokacijo samo anonimno za prikaz rezultatov lokalnega iskanja.</string>
     <string name="preciseLocationToggleText">Spletna mesta lahko zahtevajo mojo lokacijo</string>
     <string name="preciseLocationEmptyListHint">Nobeno spletno mesto nima dovoljenja za dostop do lokacije</string>
     <string name="preciseLocationNoSystemPermission">Če želite upravljati dovoljenja za dostop do lokacije, ki ste jih podelili posameznim spletnim mestom, omogočite lokacijo za to aplikacijo v nastavitvah za Android.</string>
     <string name="preciseLocationActivityTitle">Lokacija</string>
-    <string name="preciseLocationDeleteConfirmMessage">Ste prepričani, da želite izbrisati &lt;b&gt;%1$s&lt;/b&gt;?</string>
+    <string name="preciseLocationDeleteConfirmMessage">Si prepričan, da želiš izbrisati &lt;b&gt;%1$s&lt;/b&gt;?</string>
     <string name="preciseLocationDeleteContentDescription">Več možnosti za dovoljenja za lokacijo v domeni %1$s</string>
     <string name="preciseLocationAllowedSitesSectionTitle">Odobreno</string>
     <string name="preciseLocationDeniedSitesSectionTitle">Zavrnjeno</string>
     <string name="preciseLocationSnackbarMessage">Predhodno ste podelili dovoljenje %1$s za dostop do lokacije vaše naprave.</string>
+
+    <!--Fire button education-->
+    <string name="daxClearDataCtaText">Osebni podatki se lahko naberejo v vašem brskalniku. Fuj. Uporabite gumb ogenj, da jih zažgete. Poskusite sedaj! 👇</string>
 
     <!--  Global Privacy Control-->
     <string name="globalPrivacyControlActivityTitle">Globalni nadzor zasebnosti (GPC)</string>

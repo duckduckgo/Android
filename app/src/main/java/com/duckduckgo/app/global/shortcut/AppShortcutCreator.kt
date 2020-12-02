@@ -49,10 +49,12 @@ class AppShortcutCreator @Inject constructor() {
         return ShortcutInfoCompat.Builder(context, SHORTCUT_ID_NEW_TAB)
             .setShortLabel(context.getString(R.string.newTabMenuItem))
             .setIcon(IconCompat.createWithResource(context, R.drawable.ic_app_shortcut_new_tab))
-            .setIntent(Intent(context, BrowserActivity::class.java).also {
-                it.action = Intent.ACTION_VIEW
-                it.putExtra(BrowserActivity.NEW_SEARCH_EXTRA, true)
-            })
+            .setIntent(
+                Intent(context, BrowserActivity::class.java).also {
+                    it.action = Intent.ACTION_VIEW
+                    it.putExtra(BrowserActivity.NEW_SEARCH_EXTRA, true)
+                }
+            )
             .build().toShortcutInfo()
     }
 
@@ -61,10 +63,12 @@ class AppShortcutCreator @Inject constructor() {
         return ShortcutInfoCompat.Builder(context, SHORTCUT_ID_CLEAR_DATA)
             .setShortLabel(context.getString(R.string.fireMenu))
             .setIcon(IconCompat.createWithResource(context, R.drawable.ic_app_shortcut_fire))
-            .setIntent(Intent(context, BrowserActivity::class.java).also {
-                it.action = Intent.ACTION_VIEW
-                it.putExtra(BrowserActivity.PERFORM_FIRE_ON_ENTRY_EXTRA, true)
-            })
+            .setIntent(
+                Intent(context, BrowserActivity::class.java).also {
+                    it.action = Intent.ACTION_VIEW
+                    it.putExtra(BrowserActivity.PERFORM_FIRE_ON_ENTRY_EXTRA, true)
+                }
+            )
             .build().toShortcutInfo()
     }
 

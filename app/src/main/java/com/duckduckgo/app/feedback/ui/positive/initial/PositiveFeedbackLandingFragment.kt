@@ -48,20 +48,23 @@ class PositiveFeedbackLandingFragment : FeedbackFragment() {
     }
 
     override fun configureViewModelObservers() {
-        viewModel.command.observe(this, Observer { command ->
-            when (command) {
-                Command.LaunchPlayStore -> {
-                    launchPlayStore()
-                    listener?.userSelectedToRateApp()
-                }
-                Command.Exit -> {
-                    listener?.userGavePositiveFeedbackNoDetails()
-                }
-                Command.LaunchShareFeedbackPage -> {
-                    listener?.userSelectedToGiveFeedback()
+        viewModel.command.observe(
+            this,
+            Observer { command ->
+                when (command) {
+                    Command.LaunchPlayStore -> {
+                        launchPlayStore()
+                        listener?.userSelectedToRateApp()
+                    }
+                    Command.Exit -> {
+                        listener?.userGavePositiveFeedbackNoDetails()
+                    }
+                    Command.LaunchShareFeedbackPage -> {
+                        listener?.userSelectedToGiveFeedback()
+                    }
                 }
             }
-        })
+        )
     }
 
     override fun configureListeners() {

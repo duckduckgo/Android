@@ -48,10 +48,12 @@ class GiveFeedbackDialogFragment : EnjoymentDialog() {
                 firePixelWithPromptCount(APP_FEEDBACK_DIALOG_USER_DECLINED_FEEDBACK)
                 listener.onUserDeclinedToGiveFeedback(promptCount)
             }
-            .setOnKeyListener(BackKeyListener {
-                firePixelWithPromptCount(APP_FEEDBACK_DIALOG_USER_CANCELLED)
-                listener.onUserCancelledGiveFeedbackDialog(promptCount)
-            })
+            .setOnKeyListener(
+                BackKeyListener {
+                    firePixelWithPromptCount(APP_FEEDBACK_DIALOG_USER_CANCELLED)
+                    listener.onUserCancelledGiveFeedbackDialog(promptCount)
+                }
+            )
             .create()
     }
 

@@ -26,14 +26,14 @@
     <string name="search">Pesquisar</string>
 
     <!-- Onboarding Activity -->
-    <string name="onboardingDefaultBrowserDescription">Visite as Definições para pesquisar e navegar sempre com DuckDuckGo.</string>
-    <string name="onboardingDefaultBrowserTitle">Faça do DuckDuckGo o seu predefinido</string>
+    <string name="onboardingDefaultBrowserDescription">Visite as Definições para pesquisar e navegar sempre com o DuckDuckGo.</string>
+    <string name="onboardingDefaultBrowserTitle">Faça do DuckDuckGo o seu navegador predefinido</string>
 
     <!-- Default Browser -->
     <string name="cannotLaunchDefaultAppSettings">Não é possível iniciar o ecrã predefinido de definições da aplicação</string>
     <string name="settingsDefaultBrowserEnabled">Definir como navegador padrão</string>
     <string name="defaultBrowserMaybeLater">Talvez mais tarde</string>
-    <string name="defaultBrowserLetsDoIt">Vamos lá!</string>
+    <string name="defaultBrowserLetsDoIt">Definir como navegador padrão</string>
     <string name="defaultBrowserDescriptionNoDefault">Abra links com tranquilidade, sempre.</string>
     <string name="defaultBrowserInstructions">Selecione DuckDuckGo e toque em <font color="#678fff">Sempre</font>.</string>
 
@@ -92,6 +92,8 @@
     <string name="closeContentDescription">Fechar</string>
     <string name="closeAllTabsMenuItem">Fechar todos os separadores</string>
     <string name="closeTab">Fechar separador</string>
+    <string name="tabClosed">Separador fechado</string>
+    <string name="tabClosedUndo">Anular</string>
 
     <!-- Privacy Dashboard Activities -->
     <string name="privacyProtectionToggle">Proteção de Privacidade do Site</string>
@@ -183,7 +185,7 @@
     <!-- About Activity -->
     <string name="aboutActivityTitle">Sobre nós</string>
     <string name="aboutDescription">
-        No DuckDuckGo, estamos a definir o novo padrão de confiança online.\n\n O Navegador de Privacidade DuckDuckGo fornece todos os elementos essenciais de privacidade de que necessita para se proteger enquanto pesquisa e navega na Web, incluindo bloqueio de rastreadores, encriptação mais inteligente e pesquisa privada DuckDuckGo.\n\n Afinal de contas, a Internet não deve ser tão assustadora, e obter a privacidade que merece online deve ser tão simples como fechar as persianas.</string>
+        No DuckDuckGo, estamos a definir o novo padrão de confiança online.\n\nO Navegador de Privacidade DuckDuckGo fornece todos os elementos essenciais de privacidade de que necessita para se proteger enquanto pesquisa e navega na Web, incluindo bloqueio de rastreadores, encriptação mais inteligente e pesquisa privada DuckDuckGo.\n\nApesar de tudo, a Internet não deve ser tão assustadora, e obter a privacidade que merece online deve ser tão simples como fechar as cortinas.</string>
     <string name="aboutMoreLink">Mais em duckduckgo.com/about</string>
     <string name="no_suggestions">Sem sugestões</string>
 
@@ -404,19 +406,19 @@
     <string name="hideTipsButton">Ocultar dicas para sempre</string>
 
     <!-- New Onboarding Experience -->
-    <string name="onboardingWelcomeTitle">"Bem-vindo(a) ao DuckDuckGo!"</string>
+    <string name="onboardingWelcomeTitle">"Damos-lhe as boas-vindas ao DuckDuckGo!"</string>
     <string name="onboardingDaxText"><![CDATA[A Internet pode ser um pouco assustadora.<br/><br/>Mas não se preocupe! Pesquisar e navegar em privado é mais fácil do que pensa.]]></string>
     <string name="onboardingLetsDoItButton">Vamos lá!</string>
     <string name="daxIntroCtaText"><![CDATA[A seguir, experimente visitar um dos seus sites favoritos! <br/><br/>Irei bloquear os rastreadores para que eles não possam espiar o que faz. Também irei atualizar a segurança da sua ligação, se possível. 🔒]]></string>
     <string name="daxEndCtaText"><![CDATA[Conseguiu! <br/><br/>Lembre-se: sempre que navega comigo, um anúncio estranho perde as suas asas. 👍]]></string>
     <string name="daxSerpCtaText">A suas pesquisas no DuckDuckGo são anónimas e eu nunca guardo o seu histórico de pesquisas. Nunca. 🙌</string>
     <plurals name="daxTrackersBlockedCtaText">
-        <item quantity="one"><![CDATA[ e mais <b>%1$d outro</b> estava tentar rastrear aqui. <br/><br/>Eu bloqueei-os!<br/><br/> ☝️Pode verificar a barra de URL para ver quem está a tentar rastrear quando visita um novo site.️]]></item>
+        <item quantity="one"><![CDATA[ e mais <b>%1$d</b> estavam tentar rastrear aqui. <br/><br/>Eu bloqueei-os!<br/><br/> ☝️Pode verificar a barra de URL para ver quem está a tentar rastrear quando visita um novo site.️]]></item>
         <item quantity="other"><![CDATA[ e mais <b>%1$d outros</b> estavam a tentar rastrear aqui. <br/><br/>Eu bloqueei-os!<br/><br/> ☝️Pode verificar a barra de URL para ver quem está a tentar rastrear quando visita um novo site.️]]></item>
     </plurals>
     <plurals name="daxTrackersBlockedCtaZeroText">
         <item quantity="one"><![CDATA[ estava a tentar rastrear aqui. <br/><br/>Eu bloqueei-o!<br/><br/> ☝️Pode verificar a barra de URL para ver quem está a tentar rastrear quando visita um novo site.️]]></item>
-        <item quantity="other"><![CDATA[ estavam a tentar rastrear aqui. <br/><br/>Eu bloqueei-o!<br/><br/> ☝️Pode verificar a barra de URL para ver quem está a tentar rastrear quando visita um novo site.️]]></item>
+        <item quantity="other"><![CDATA[ estavam a tentar rastrear aqui. <br/><br/>Eu bloqueei-os!<br/><br/> ☝️Pode verificar a barra de URL para ver quem está a tentar rastrear quando visita um novo site.️]]></item>
     </plurals>
     <string name="daxNonSerpCtaText"><![CDATA[Enquanto toca e desliza, eu bloqueio rastreadores irritantes. <br/><br/>Prossiga - continue a navegar!]]></string>
     <string name="daxMainNetworkCtaText"><![CDATA[Atenção! %1$s é uma grande rede de rastreamento.<br/><br/> Os seus rastreadores estão à espreita em cerca de %2$s dos principais sites 😱, mas não se preocupe! <br/><br/>Eu impeço %3$s de ver a sua atividade nesses sites.]]></string>
@@ -455,8 +457,8 @@
     <string name="whitelistEntryDeleteConfirmMessage">Quer mesmo remover &lt;b&gt;%1$s&lt;/b&gt; da lista de sites desprotegidos?</string>
     <string name="whitelistExplanation">Estes sites não serão aprimorados pela Proteção de Privacidade.</string>
     <string name="whitelistNoEntries">Ainda não há sites desprotegidos</string>
-    <string name="whitelistDomainHint">www.example.com</string>
-    <string name="whitelistFormatError">Não foi possível guardar, insira um domínio como <b>example.com</b></string>
+    <string name="whitelistDomainHint">www.exemplo.com</string>
+    <string name="whitelistFormatError">Não foi possível guardar, insira um domínio como <b>exemplo.com</b></string>
 
     <!-- Settings -->
     <string name="settingsPrivacyProtectionWhitelist">Sites desprotegidos</string>
@@ -465,7 +467,7 @@
     <string name="fireproofWebsitesActivityTitle">Sites à prova de fogo</string>
     <string name="settingsFireproofWebsites">Sites à prova de fogo</string>
     <string name="fireproofWebsiteMenuTitleAdd">Site à prova de fogo</string>
-    <string name="fireproofWebsiteSnackbarConfirmation">&lt;b&gt;%1$s&lt;/b&gt; já é à prova de fogo! Aceda a Configurações para saber mais.</string>
+    <string name="fireproofWebsiteSnackbarConfirmation">&lt;b&gt;%1$s&lt;/b&gt; já é à prova de fogo! Aceda às Definições para saber mais.</string>
     <string name="fireproofWebsiteSnackbarAction">Anular</string>
     <string name="fireproofWebsiteDeleteConfirmMessage">Tem a certeza de que deseja eliminar &lt;b&gt;%1$s&lt;/b&gt;?</string>
     <string name="fireproofWebsiteEmptyListHint">Ainda não há sites à prova de fogo</string>
@@ -478,6 +480,15 @@
     <string name="fireproofWebsiteItemsSectionTitle">Websites</string>
     <string name="fireproofWebsiteToogleText">Perguntar ao iniciar sessão</string>
 
+    <!-- Fire Animation settings -->
+    <string name="settingsFireAnimation">Animação do Botão de Fogo</string>
+    <string name="settingsHeroFireAnimation">Inferno</string>
+    <string name="settingsHeroWaterAnimation">Remoinho</string>
+    <string name="settingsHeroAbstractAnimation">Corrente de ar</string>
+    <string name="settingsNoneAnimation">Nenhum</string>
+    <string name="settingsSelectFireAnimationDialog">Animação do botão de fogo</string>
+    <string name="settingsSelectFireAnimationDialogSave">Guardar</string>
+
     <!-- Dos Attack error-->
     <string name="dosErrorMessage">Ligação abortada. Este website poderá ser prejudicial ao seu dispositivo.</string>
 
@@ -485,9 +496,6 @@
     <string name="downloadManagerDisabled">Gestor de transferências desativado</string>
     <string name="downloadManagerIncompatible">Gestor de transferências não disponível neste dispositivo</string>
     <string name="enable">Permitir</string>
-
-    <!--Fire button education-->
-    <string name="daxClearDataCtaText">Agora toque abaixo para queimar o seu histórico de navegação. Experimente! 👇</string>
 
     <!-- Precise Location -->
     <string name="preciseLocationSystemDialogTitle">Ativar a localização do dispositivo para o Navegador de Privacidade DuckDuckGo?</string>
@@ -512,6 +520,9 @@
     <string name="preciseLocationAllowedSitesSectionTitle">Concedido</string>
     <string name="preciseLocationDeniedSitesSectionTitle">Negado</string>
     <string name="preciseLocationSnackbarMessage">Anteriormente concedeu %1$s permissão para aceder a localização do seu dispositivo.</string>
+
+    <!--Fire button education-->
+    <string name="daxClearDataCtaText">Os dados pessoais podem ser acumulados no seu navegador. Que nojo. Use o botão de fogo para queimar tudo. Experimente agora! 👇</string>
 
     <!--  Global Privacy Control-->
     <string name="globalPrivacyControlActivityTitle">Controlo Global de Privacidade (CGP)</string>

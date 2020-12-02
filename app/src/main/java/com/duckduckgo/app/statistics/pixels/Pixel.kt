@@ -113,6 +113,8 @@ interface Pixel {
         LONG_PRESS_COPY_URL("mlp_c"),
         LONG_PRESS_OPEN_IMAGE_IN_BACKGROUND_TAB("mlp_ibt"),
 
+        DOWNLOAD_FILE_DEFAULT_GUESSED_NAME("m_df_dgn"),
+
         SETTINGS_OPENED("ms"),
         SETTINGS_THEME_TOGGLED_LIGHT("ms_tl"),
         SETTINGS_THEME_TOGGLED_DARK("ms_td"),
@@ -220,6 +222,10 @@ interface Pixel {
         FIRE_DIALOG_CLEAR_PRESSED("m_fd_p"),
         FIRE_DIALOG_PROMOTED_CANCEL("m_fdp_c"),
         FIRE_DIALOG_CANCEL("m_fd_c"),
+        FIRE_DIALOG_ANIMATION("m_fd_a"),
+
+        FIRE_ANIMATION_SETTINGS_OPENED("m_fas_o"),
+        FIRE_ANIMATION_NEW_SELECTED("m_fas_s"),
     }
 
     object PixelParameter {
@@ -238,6 +244,7 @@ interface Pixel {
         const val SERP_QUERY_CHANGED = "1"
         const val SERP_QUERY_NOT_CHANGED = "0"
         const val FIRE_BUTTON_STATE = "fb"
+        const val FIRE_ANIMATION = "fa"
     }
 
     object PixelValues {
@@ -253,6 +260,12 @@ interface Pixel {
         const val DAX_TRACKERS_BLOCKED_CTA = "t"
         const val DAX_NO_TRACKERS_CTA = "nt"
         const val DAX_FIRE_DIALOG_CTA = "fd"
+
+        const val FIRE_ANIMATION_INFERNO = "fai"
+        const val FIRE_ANIMATION_AIRSTREAM = "faas"
+        const val FIRE_ANIMATION_WHIRLPOOL = "fawp"
+        const val FIRE_ANIMATION_NONE = "fann"
+
     }
 
     fun fire(pixel: PixelName, parameters: Map<String, String> = emptyMap(), encodedParameters: Map<String, String> = emptyMap())
@@ -273,25 +286,37 @@ class RxBasedPixel @Inject constructor(
     override fun fire(pixelName: String, parameters: Map<String, String>, encodedParameters: Map<String, String>) {
         pixelSender.sendPixel(pixelName, parameters, encodedParameters)
             .subscribeOn(Schedulers.io())
-            .subscribe({
-                Timber.v("Pixel sent: $pixelName with params: $parameters $encodedParameters")
-            }, {
-                Timber.w(it, "Pixel failed: $pixelName with params: $parameters $encodedParameters")
-            })
+            .subscribe(
+                {
+                    Timber.v("Pixel sent: $pixelName with params: $parameters $encodedParameters")
+                },
+                {
+                    Timber.w(it, "Pixel failed: $pixelName with params: $parameters $encodedParameters")
+                }
+            )
     }
 
+    /**
+     * Sends a pixel. If delivery fails, the pixel will be retried again in the future.
+     * As this method stores the pixel to disk until successful delivery, check with privacy triage if the pixel has additional parameters
+     * that they would want to validate.
+     */
     override fun enqueueFire(pixel: PixelName, parameters: Map<String, String>, encodedParameters: Map<String, String>) {
         enqueueFire(pixel.pixelName, parameters, encodedParameters)
     }
 
     @SuppressLint("CheckResult")
+    /** See comment in {@link #enqueueFire(PixelName, Map<String, String>, Map<String, String>)}. */
     override fun enqueueFire(pixelName: String, parameters: Map<String, String>, encodedParameters: Map<String, String>) {
         pixelSender.enqueuePixel(pixelName, parameters, encodedParameters)
             .subscribeOn(Schedulers.io())
-            .subscribe({
-                Timber.v("Pixel enqueued: $pixelName with params: $parameters $encodedParameters")
-            }, {
-                Timber.w(it, "Pixel failed: $pixelName with params: $parameters $encodedParameters")
-            })
+            .subscribe(
+                {
+                    Timber.v("Pixel enqueued: $pixelName with params: $parameters $encodedParameters")
+                },
+                {
+                    Timber.w(it, "Pixel failed: $pixelName with params: $parameters $encodedParameters")
+                }
+            )
     }
 }

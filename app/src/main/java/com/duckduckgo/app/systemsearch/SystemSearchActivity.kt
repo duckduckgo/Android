@@ -102,15 +102,24 @@ class SystemSearchActivity : DuckDuckGoActivity() {
     }
 
     private fun configureObservers() {
-        viewModel.onboardingViewState.observe(this, Observer<SystemSearchViewModel.OnboardingViewState> {
-            it?.let { renderOnboardingViewState(it) }
-        })
-        viewModel.resultsViewState.observe(this, Observer<SystemSearchResultsViewState> {
-            it?.let { renderResultsViewState(it) }
-        })
-        viewModel.command.observe(this, Observer {
-            processCommand(it)
-        })
+        viewModel.onboardingViewState.observe(
+            this,
+            Observer<SystemSearchViewModel.OnboardingViewState> {
+                it?.let { renderOnboardingViewState(it) }
+            }
+        )
+        viewModel.resultsViewState.observe(
+            this,
+            Observer<SystemSearchResultsViewState> {
+                it?.let { renderResultsViewState(it) }
+            }
+        )
+        viewModel.command.observe(
+            this,
+            Observer {
+                processCommand(it)
+            }
+        )
     }
 
     private fun configureOnboarding() {
@@ -164,13 +173,15 @@ class SystemSearchActivity : DuckDuckGoActivity() {
     }
 
     private fun configureTextInput() {
-        omnibarTextInput.setOnEditorActionListener(TextView.OnEditorActionListener { _, actionId, keyEvent ->
-            if (actionId == EditorInfo.IME_ACTION_GO || keyEvent?.keyCode == KeyEvent.KEYCODE_ENTER) {
-                viewModel.userSubmittedQuery(omnibarTextInput.text.toString())
-                return@OnEditorActionListener true
+        omnibarTextInput.setOnEditorActionListener(
+            TextView.OnEditorActionListener { _, actionId, keyEvent ->
+                if (actionId == EditorInfo.IME_ACTION_GO || keyEvent?.keyCode == KeyEvent.KEYCODE_ENTER) {
+                    viewModel.userSubmittedQuery(omnibarTextInput.text.toString())
+                    return@OnEditorActionListener true
+                }
+                false
             }
-            false
-        })
+        )
 
         omnibarTextInput.removeTextChangedListener(textChangeWatcher)
         omnibarTextInput.addTextChangedListener(textChangeWatcher)

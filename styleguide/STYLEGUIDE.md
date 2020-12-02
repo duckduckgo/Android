@@ -3,23 +3,18 @@
 * We primarily use Kotlin and follow coding conventions based on the [Android Kotlin Style Guide](https://developer.android.com/kotlin/style-guide)
 * There may be instances of code that pre-dates our use of this style guide, these can be refactored as we encounter them.
 
-###  Android Studio Setup
+###  Code formatting
 
-We've provided a coding style that can be imported into Android Studio.
-The file can be found [here](ddg-settings.zip).
+To adhere to codestyle, please run `./gradlew spotlessApply` to autoformat in order to fix any CI issues.
 
-* From Android Studio click on File -> Import Settings
+If you want to do this automatically upon commit we recommend the following `pre-commit` hook.
 
-![Setting kotlin style screenshot](import_settings_one.png)
-
-* Select the file you just downloaded
-* Import all components required (AndroidEditors, Code Style and Code Style (schemes))
-* 
-![Setting kotlin style screenshot](import_settings_three.png)
-
-* Select the new scheme on Android Studio -> Preferences... -> Code style -> Schemes: DDG
-
-![Setting kotlin style screenshot](import_settings_four.png)
+```bash
+❯ cat .git/hooks/pre-commit
+./gradlew :app:spotlessApply
+git add `git diff --name-only`
+exit 0
+```
 
 ##  Code conventions
 

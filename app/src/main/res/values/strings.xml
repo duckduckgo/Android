@@ -16,7 +16,7 @@
     <string name="cannotLaunchDefaultAppSettings">Can\'t launch default app settings screen</string>
     <string name="settingsDefaultBrowserEnabled">Set as Default Browser</string>
     <string name="defaultBrowserMaybeLater">Maybe Later</string>
-    <string name="defaultBrowserLetsDoIt">Let\'s do it!</string>
+    <string name="defaultBrowserLetsDoIt">Set as Default Browser</string>
     <string name="defaultBrowserDescriptionNoDefault">Open links with peace of mind, every time.</string>
     <string name="defaultBrowserInstructions">Select DuckDuckGo and tap <font color='#678fff'>Always</font>.</string>
 
@@ -75,6 +75,8 @@
     <string name="closeContentDescription">Close</string>
     <string name="closeAllTabsMenuItem">Close All Tabs</string>
     <string name="closeTab">Close tab</string>
+    <string name="tabClosed">Tab closed</string>
+    <string name="tabClosedUndo">Undo</string>
 
     <!-- Privacy Dashboard Activities -->
     <string name="privacyProtectionToggle">Site Privacy Protection</string>
@@ -404,7 +406,7 @@
         <item quantity="other"><![CDATA[&#160;were trying to track you here. <br/><br/>I blocked it!<br/><br/> ☝️You can check the URL bar to see who is trying to track you when you visit a new site.️]]></item>
     </plurals>
     <string name="daxNonSerpCtaText"><![CDATA[As you tap and scroll, I\'ll block pesky trackers. <br/><br/>Go ahead — keep browsing!]]></string>
-    <string name="daxMainNetworkCtaText"><![CDATA[Heads up! %s is a major tracking network.<br/><br/> Their trackers lurk on about %s of top sites 😱 but don\'t worry!<br/><br/>I\'ll block %s from seeing your activity on those sites.]]></string>
+    <string name="daxMainNetworkCtaText">Heads up! I can\'t stop %s from seeing your activity on %s &lt;br/&gt;&lt;br/&gt;But browse with me, and I can reduce what %s knows about you overall by blocking their trackers on lots of other sites.</string>
     <string name="daxMainNetworkOwnedCtaText">Heads up! Since %s owns %s, I can\'t stop them from seeing your activity here.&lt;br/&gt;&lt;br/&gt;But browse with me, and I can reduce what %s knows about you overall by blocking their trackers on lots of other sites.</string>
 
     <!-- Download Confirmation -->
@@ -462,6 +464,15 @@
     <string name="fireproofWebsiteLoginDialogNegative">Not now</string>
     <string name="fireproofWebsiteItemsSectionTitle">Websites</string>
     <string name="fireproofWebsiteToogleText">Ask When Signing In</string>
+
+    <!-- Fire Animation settings -->
+    <string name="settingsFireAnimation">Fire Button Animation</string>
+    <string name="settingsHeroFireAnimation">Inferno</string>
+    <string name="settingsHeroWaterAnimation">Whirlpool</string>
+    <string name="settingsHeroAbstractAnimation">Airstream</string>
+    <string name="settingsNoneAnimation">None</string>
+    <string name="settingsSelectFireAnimationDialog">Fire Button animation</string>
+    <string name="settingsSelectFireAnimationDialogSave">Save</string>
 
     <!-- Dos Attack error-->
     <string name="dosErrorMessage">Connection aborted. This website could be harmful to your device.</string>

@@ -44,16 +44,19 @@ class BrokenSiteNegativeFeedbackFragment : FeedbackFragment() {
     }
 
     override fun configureViewModelObservers() {
-        viewModel.command.observe(this, Observer { command ->
-            when (command) {
-                is BrokenSiteNegativeFeedbackViewModel.Command.Exit -> {
-                    listener?.userCancelled()
-                }
-                is BrokenSiteNegativeFeedbackViewModel.Command.ExitAndSubmitFeedback -> {
-                    listener?.onProvidedBrokenSiteFeedback(command.feedback, command.brokenSite)
+        viewModel.command.observe(
+            this,
+            Observer { command ->
+                when (command) {
+                    is BrokenSiteNegativeFeedbackViewModel.Command.Exit -> {
+                        listener?.userCancelled()
+                    }
+                    is BrokenSiteNegativeFeedbackViewModel.Command.ExitAndSubmitFeedback -> {
+                        listener?.onProvidedBrokenSiteFeedback(command.feedback, command.brokenSite)
+                    }
                 }
             }
-        })
+        )
     }
 
     override fun configureListeners() {

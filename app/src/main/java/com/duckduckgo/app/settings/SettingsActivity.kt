@@ -43,6 +43,7 @@ import com.duckduckgo.app.settings.SettingsViewModel.AutomaticallyClearData
 import com.duckduckgo.app.settings.SettingsViewModel.Command
 import com.duckduckgo.app.settings.clear.ClearWhatOption
 import com.duckduckgo.app.settings.clear.ClearWhenOption
+import com.duckduckgo.app.settings.clear.FireAnimation
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelName
 import kotlinx.android.synthetic.main.content_settings_general.*
@@ -51,7 +52,11 @@ import kotlinx.android.synthetic.main.content_settings_privacy.*
 import kotlinx.android.synthetic.main.include_toolbar.*
 import javax.inject.Inject
 
-class SettingsActivity : DuckDuckGoActivity(), SettingsAutomaticallyClearWhatFragment.Listener, SettingsAutomaticallyClearWhenFragment.Listener {
+class SettingsActivity :
+    DuckDuckGoActivity(),
+    SettingsAutomaticallyClearWhatFragment.Listener,
+    SettingsAutomaticallyClearWhenFragment.Listener,
+    SettingsFireAnimationSelectorFragment.Listener {
 
     @Inject
     lateinit var pixel: Pixel
@@ -84,6 +89,7 @@ class SettingsActivity : DuckDuckGoActivity(), SettingsAutomaticallyClearWhatFra
 
     private fun configureUiEventHandlers() {
         changeAppIconLabel.setOnClickListener { viewModel.userRequestedToChangeIcon() }
+        selectedFireAnimationSetting.setOnClickListener { viewModel.userRequestedToChangeFireAnimation() }
         about.setOnClickListener { startActivity(AboutDuckDuckGoActivity.intent(this)) }
         provideFeedback.setOnClickListener { viewModel.userRequestedToSendFeedback() }
         fireproofWebsites.setOnClickListener { viewModel.onFireproofWebsitesClicked() }
@@ -99,21 +105,28 @@ class SettingsActivity : DuckDuckGoActivity(), SettingsAutomaticallyClearWhatFra
     }
 
     private fun observeViewModel() {
-        viewModel.viewState.observe(this, Observer { viewState ->
-            viewState?.let {
-                version.setSubtitle(it.version)
-                lightThemeToggle.quietlySetIsChecked(it.lightThemeEnabled, lightThemeToggleListener)
-                autocompleteToggle.quietlySetIsChecked(it.autoCompleteSuggestionsEnabled, autocompleteToggleListener)
-                updateDefaultBrowserViewVisibility(it)
-                updateAutomaticClearDataOptions(it.automaticallyClearData)
-                setGlobalPrivacyControlSetting(it.globalPrivacyControlEnabled)
-                changeAppIcon.setImageResource(it.appIcon.icon)
+        viewModel.viewState.observe(
+            this,
+            Observer { viewState ->
+                viewState?.let {
+                    version.setSubtitle(it.version)
+                    lightThemeToggle.quietlySetIsChecked(it.lightThemeEnabled, lightThemeToggleListener)
+                    autocompleteToggle.quietlySetIsChecked(it.autoCompleteSuggestionsEnabled, autocompleteToggleListener)
+                    updateDefaultBrowserViewVisibility(it)
+                    updateAutomaticClearDataOptions(it.automaticallyClearData)
+                    setGlobalPrivacyControlSetting(it.globalPrivacyControlEnabled)
+                    changeAppIcon.setImageResource(it.appIcon.icon)
+                    updateSelectedFireAnimation(it.selectedFireAnimation)
+                }
             }
-        })
+        )
 
-        viewModel.command.observe(this, Observer {
-            processCommand(it)
-        })
+        viewModel.command.observe(
+            this,
+            Observer {
+                processCommand(it)
+            }
+        )
     }
 
     private fun setGlobalPrivacyControlSetting(enabled: Boolean) {
@@ -123,6 +136,11 @@ class SettingsActivity : DuckDuckGoActivity(), SettingsAutomaticallyClearWhatFra
             getString(R.string.disabled)
         }
         globalPrivacyControlSetting.setSubtitle(stateText)
+    }
+
+    private fun updateSelectedFireAnimation(fireAnimation: FireAnimation) {
+        val subtitle = getString(fireAnimation.nameResId)
+        selectedFireAnimationSetting.setSubtitle(subtitle)
     }
 
     private fun updateAutomaticClearDataOptions(automaticallyClearData: AutomaticallyClearData) {
@@ -157,6 +175,7 @@ class SettingsActivity : DuckDuckGoActivity(), SettingsAutomaticallyClearWhatFra
             is Command.LaunchAppIcon -> launchAppIconChange()
             is Command.LaunchGlobalPrivacyControl -> launchGlobalPrivacyControl()
             is Command.UpdateTheme -> sendThemeChangedBroadcast()
+            is Command.LaunchFireAnimationSettings -> launchFireAnimationSelector()
         }
     }
 
@@ -202,6 +221,11 @@ class SettingsActivity : DuckDuckGoActivity(), SettingsAutomaticallyClearWhatFra
         startActivityForResult(Intent(ChangeIconActivity.intent(this)), CHANGE_APP_ICON_REQUEST_CODE, options)
     }
 
+    private fun launchFireAnimationSelector() {
+        val dialog = SettingsFireAnimationSelectorFragment.create(viewModel.viewState.value?.selectedFireAnimation)
+        dialog.show(supportFragmentManager, FIRE_ANIMATION_SELECTOR_TAG)
+    }
+
     private fun launchGlobalPrivacyControl() {
         val options = ActivityOptions.makeSceneTransitionAnimation(this).toBundle()
         startActivity(GlobalPrivacyControlActivity.intent(this), options)
@@ -213,6 +237,10 @@ class SettingsActivity : DuckDuckGoActivity(), SettingsAutomaticallyClearWhatFra
 
     override fun onAutomaticallyClearWhenOptionSelected(clearWhenSetting: ClearWhenOption) {
         viewModel.onAutomaticallyWhenOptionSelected(clearWhenSetting)
+    }
+
+    override fun onFireAnimationSelected(selectedFireAnimation: FireAnimation) {
+        viewModel.onFireAnimationSelected(selectedFireAnimation)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -250,6 +278,7 @@ class SettingsActivity : DuckDuckGoActivity(), SettingsAutomaticallyClearWhatFra
     }
 
     companion object {
+        private const val FIRE_ANIMATION_SELECTOR_TAG = "FIRE_ANIMATION_SELECTOR_DIALOG_FRAGMENT"
         private const val CLEAR_WHAT_DIALOG_TAG = "CLEAR_WHAT_DIALOG_FRAGMENT"
         private const val CLEAR_WHEN_DIALOG_TAG = "CLEAR_WHEN_DIALOG_FRAGMENT"
         private const val FEEDBACK_REQUEST_CODE = 100
