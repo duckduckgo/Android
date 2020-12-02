@@ -325,7 +325,6 @@ class BrowserTabViewModel(
         browserViewState.value = currentBrowserViewState().copy(isFireproofWebsite = isFireproofWebsite())
     }
 
-    @ExperimentalCoroutinesApi
     private val fireButtonAnimation = Observer<Boolean> { shouldShowAnimation ->
         Timber.i("shouldShowAnimation $shouldShowAnimation")
         if (currentBrowserViewState().fireButton is FireButton.Visible) {
@@ -337,7 +336,6 @@ class BrowserTabViewModel(
         }
     }
 
-    @ExperimentalCoroutinesApi
     private fun registerAndScheduleDismissAction() {
         viewModelScope.launch(dispatchers.io()) {
             val fireButtonHighlightedEvent = userEventsStore.getUserEvent(UserEventKey.FIRE_BUTTON_HIGHLIGHTED)
