@@ -49,6 +49,8 @@ class TabDataRepository @Inject constructor(
 
     override val liveTabs: LiveData<List<TabEntity>> = tabsDao.liveTabs()
 
+    override val flowTabs: Flow<List<TabEntity>> = tabsDao.flowTabs()
+
     // We only want the new emissions when subscribing, however Room does not honour that contract so we
     // need to drop the first emission always (this is equivalent to the Observable semantics)
     @ExperimentalCoroutinesApi

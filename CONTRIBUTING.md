@@ -47,6 +47,3 @@ You can also trigger an automatic code formatting of the code by executing:
 ```
 ./gradleW app:spotlessApply
 ```
-
-
-See Chris Beams' guide to writing good commit messages https://chris.beams.io/posts/git-commit/

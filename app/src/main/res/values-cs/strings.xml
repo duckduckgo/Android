@@ -92,6 +92,8 @@
     <string name="closeContentDescription">Zavřít</string>
     <string name="closeAllTabsMenuItem">Zavřít všechny karty</string>
     <string name="closeTab">Zavřít karta</string>
+    <string name="tabClosed">Karta zavřená</string>
+    <string name="tabClosedUndo">Vrátit</string>
 
     <!-- Privacy Dashboard Activities -->
     <string name="privacyProtectionToggle">Ochrana osobních údajů na webových stránkách</string>
@@ -191,7 +193,7 @@
     <!-- About Activity -->
     <string name="aboutActivityTitle">O nás</string>
     <string name="aboutDescription">
-        V DuckDuckGo přinášíme nový standard důvěry online.\n\n DuckDuckGo Privacy Browser poskytuje všechny základní prvky soukromí, které potřebujete k ochraně při vyhledávání a prohlížení webu, včetně blokování sledovacích zařízení, chytřejšího šifrování a soukromého vyhledávání DuckDuckGo.\n\n Internet by v konečném důsledku neměl být tak nebezpečný a získat soukromí, které si zasloužíte online, by mělo být stejně jednoduché jako zatáhnout žaluzie.</string>
+        V DuckDuckGo přinášíme nový standard důvěry online.\n\nDuckDuckGo Privacy Browser poskytuje všechny základní prvky ochrany osobních údajů, které potřebujete k ochraně při vyhledávání a prohlížení webu, včetně blokování sledovacích zařízení, chytřejšího šifrování a soukromého vyhledávání DuckDuckGo.\n\nInternet by v konečném důsledku neměl být tak nebezpečný a získat ochranu osobních údajů, kterou si zasloužíte online, by mělo být stejně jednoduché jako zatáhnout žaluzie.</string>
     <string name="aboutMoreLink">Více na duckduckgo.com/about</string>
     <string name="no_suggestions">Žádné návrhy</string>
 
@@ -392,9 +394,9 @@
     <string name="systemSearchDeviceAppLabel">Z tohoto zařízení</string>
     <string name="systemSearchOmnibarInputHint"><font size="13">Vyhledat nebo zadat URL</font></string>
     <string name="systemSearchAppNotFound">Aplikace nebyla nalezena</string>
-    <string name="systemSearchOnboardingText">Děkujeme, že jste si vybrali DuckDuckGo!\nPři použití našeho vyhledávání nebo aplikace jsou od teď Vaše vyhledávání chráněna.</string>
+    <string name="systemSearchOnboardingText">Děkujeme, že jste si vybrali DuckDuckGo!\nPři použití našeho vyhledávání nebo aplikace jsou od tohoto okamžiku Vaše vyhledávání chráněna.</string>
     <string name="systemSearchOnboardingFeaturesIntroText">Aplikace DuckDuckGo také:</string>
-    <string name="systemSearchOnboardingFeatureOneText">Blokuje nebezpečné sledovače</string>
+    <string name="systemSearchOnboardingFeatureOneText">Blokuje nebezpečné trackery</string>
     <string name="systemSearchOnboardingFeatureTwoText">Vynutí šifrování na webových stránkách</string>
     <string name="systemSearchOnboardingFeatureThreeText">Vymaže data jedním klepnutím</string>
     <string name="systemSearchOnboardingButtonMore">Zobrazit více</string>
@@ -415,7 +417,7 @@
     <string name="onboardingWelcomeTitle">"Vítejte v DuckDuckGo!"</string>
     <string name="onboardingDaxText"><![CDATA[Internet může být někdy trochu strašidelný.<br/><br/>Nebojte se! Anonymní vyhledávání a procházení je jednodušší, než si myslíte.]]></string>
     <string name="onboardingLetsDoItButton">Pojďme na to!</string>
-    <string name="daxIntroCtaText"><![CDATA[Dále zkuste navštívit některý z Vašich oblíbených webů! <br/><br/>Zablokujeme sledovače, aby Vás nemohli špehovat. Pokud to bude možné, upgraduji také zabezpečení Vašeho připojení. 🔒]]></string>
+    <string name="daxIntroCtaText"><![CDATA[Dále zkuste navštívit některý z Vašich oblíbených webů! <br/><br/>Zablokujeme trackery, aby Vás nemohli špehovat. Pokud to bude možné, upgraduji také zabezpečení Vašeho připojení. 🔒]]></string>
     <string name="daxEndCtaText"><![CDATA[Máte to! <br/><br/>Pamatujte: pokaždé, když internet procházíte se mnou, hrozným reklamám jsou přistřižena křídla. 👍]]></string>
     <string name="daxSerpCtaText">Vaše vyhledávání DuckDuckGo jsou anonymní a historii Vašeho vyhledávání nikdy nikam neukládáme. Vůbec nikdy. 🙌</string>
     <plurals name="daxTrackersBlockedCtaText">
@@ -507,9 +509,6 @@
     <string name="downloadManagerIncompatible">Správce stahování není v tomto zařízení k dispozici</string>
     <string name="enable">Povolit</string>
 
-    <!--Fire button education-->
-    <string name="daxClearDataCtaText">Nyní klepnutím níže smažete svou historii procházení. Zkuste to! 👇</string>
-
     <!-- Precise Location -->
     <string name="preciseLocationSystemDialogTitle">Povolit polohu zařízení pro prohlížeč DuckDuckGo Privacy?</string>
     <string name="preciseLocationSystemDialogSubtitle">%1$s požaduje polohu vašeho zařízení. Nejprve musíte aplikaci povolit, aby odesílala polohu vašeho zařízení, a pak %2$s může požádat o povolení.</string>
@@ -533,6 +532,9 @@
     <string name="preciseLocationAllowedSitesSectionTitle">Uděleno</string>
     <string name="preciseLocationDeniedSitesSectionTitle">Zamítnuto</string>
     <string name="preciseLocationSnackbarMessage">Dříve jste udělili %1$s oprávnění k přístupu k poloze vašeho zařízení.</string>
+
+    <!--Fire button education-->
+    <string name="daxClearDataCtaText">Osobní údaje se mohou vytvářet ve vašem prohlížeči. Fuj. Použijte tlačítko pro mazání a všechno smažte. Vyzkoušejte to hned teď! 👇</string>
 
     <!--  Global Privacy Control-->
     <string name="globalPrivacyControlActivityTitle">Globální kontrola ochrany osobních údajů (GPC)</string>
