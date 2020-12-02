@@ -52,6 +52,7 @@ interface Pixel {
         WEB_RENDERER_GONE_KILLED("m_d_wrg_k"),
         BROKEN_SITE_REPORTED("m_bsr"),
         BROKEN_SITE_REPORT("epbf"),
+        WEB_VIEW_REDIRECT_HEADERS("m_wb_rh"),
 
         ONBOARDING_DEFAULT_BROWSER_VISUALIZED("m_odb_v"),
         ONBOARDING_DEFAULT_BROWSER_LAUNCHED("m_odb_l"),

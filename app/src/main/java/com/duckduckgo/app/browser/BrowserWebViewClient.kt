@@ -30,6 +30,7 @@ import com.duckduckgo.app.browser.navigation.safeCopyBackForwardList
 import com.duckduckgo.app.global.exception.UncaughtExceptionRepository
 import com.duckduckgo.app.global.exception.UncaughtExceptionSource.*
 import com.duckduckgo.app.globalprivacycontrol.GlobalPrivacyControl
+import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.store.OfflinePixelCountDataStore
 import kotlinx.coroutines.*
 import timber.log.Timber
@@ -44,17 +45,21 @@ class BrowserWebViewClient(
     private val cookieManager: CookieManager,
     private val loginDetector: DOMLoginDetector,
     private val dosDetector: DosDetector,
-    private val globalPrivacyControl: GlobalPrivacyControl
+    private val globalPrivacyControl: GlobalPrivacyControl,
+    private val pixel: Pixel
 ) : WebViewClient() {
 
     var webViewClientListener: WebViewClientListener? = null
     private var lastPageStarted: String? = null
-
     /**
      * This is the new method of url overriding available from API 24 onwards
      */
     override fun shouldOverrideUrlLoading(view: WebView, request: WebResourceRequest): Boolean {
         val url = request.url
+        // Temp: we want to know if request can have headers when user is redirected via WebView.
+        if(request.requestHeaders.isNotEmpty() && request.isForMainFrame) {
+            pixel.fire(Pixel.PixelName.WEB_VIEW_REDIRECT_HEADERS)
+        }
         return shouldOverride(view, url, request.isForMainFrame)
     }
 

@@ -93,7 +93,8 @@ class BrowserModule {
         cookieManager: CookieManager,
         loginDetector: DOMLoginDetector,
         dosDetector: DosDetector,
-        globalPrivacyControl: GlobalPrivacyControl
+        globalPrivacyControl: GlobalPrivacyControl,
+        pixel: Pixel
     ): BrowserWebViewClient {
         return BrowserWebViewClient(
             requestRewriter,
@@ -104,7 +105,8 @@ class BrowserModule {
             cookieManager,
             loginDetector,
             dosDetector,
-            globalPrivacyControl
+            globalPrivacyControl,
+            pixel
         )
     }
 
