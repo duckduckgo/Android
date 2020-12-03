@@ -64,8 +64,6 @@ class WelcomePage : OnboardingPageFragment() {
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
 
-        primaryCta.setOnClickListener { event(WelcomePageView.Event.OnPrimaryCtaClicked) }
-
         configureDaxCta()
         beginWelcomeAnimation(ctaText)
     }
@@ -164,8 +162,13 @@ class WelcomePage : OnboardingPageFragment() {
                     .setDuration(ANIMATION_DURATION)
                     .withEndAction {
                         dialogTextCta.startTypingAnimation(ctaText)
+                        setPrimaryCtaListenerAfterWelcomeAlphaAnimation()
                     }
             }
+    }
+
+    private fun setPrimaryCtaListenerAfterWelcomeAlphaAnimation() {
+        primaryCta.setOnClickListener { event(WelcomePageView.Event.OnPrimaryCtaClicked) }
     }
 
     companion object {
