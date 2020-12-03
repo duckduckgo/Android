@@ -54,18 +54,24 @@ class FireproofWebsitesActivity : DuckDuckGoActivity() {
     }
 
     private fun observeViewModel() {
-        viewModel.viewState.observe(this, Observer { viewState ->
-            viewState?.let {
-                adapter.loginDetectionEnabled = it.loginDetectionEnabled
-                adapter.fireproofWebsites = it.fireproofWebsitesEntities
+        viewModel.viewState.observe(
+            this,
+            Observer { viewState ->
+                viewState?.let {
+                    adapter.loginDetectionEnabled = it.loginDetectionEnabled
+                    adapter.fireproofWebsites = it.fireproofWebsitesEntities
+                }
             }
-        })
+        )
 
-        viewModel.command.observe(this, Observer {
-            when (it) {
-                is FireproofWebsitesViewModel.Command.ConfirmDeleteFireproofWebsite -> confirmDeleteWebsite(it.entity)
+        viewModel.command.observe(
+            this,
+            Observer {
+                when (it) {
+                    is FireproofWebsitesViewModel.Command.ConfirmDeleteFireproofWebsite -> confirmDeleteWebsite(it.entity)
+                }
             }
-        })
+        )
     }
 
     @Suppress("deprecation")

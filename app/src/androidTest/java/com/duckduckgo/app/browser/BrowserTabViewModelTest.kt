@@ -222,6 +222,9 @@ class BrowserTabViewModelTest {
     private lateinit var mockFileDownloader: FileDownloader
 
     @Mock
+    private lateinit var mockTabRepository: TabRepository
+
+    @Mock
     private lateinit var geoLocationPermissions: GeoLocationPermissions
 
     private val lazyFaviconManager = Lazy { mockFaviconManager }
@@ -259,6 +262,7 @@ class BrowserTabViewModelTest {
         mockAutoCompleteApi = AutoCompleteApi(mockAutoCompleteService, mockBookmarksDao)
 
         whenever(mockDismissedCtaDao.dismissedCtas()).thenReturn(dismissedCtaDaoChannel.consumeAsFlow())
+        whenever(mockTabRepository.flowTabs).thenReturn(flowOf(emptyList()))
 
         ctaViewModel = CtaViewModel(
             mockAppInstallStore,
@@ -273,6 +277,7 @@ class BrowserTabViewModelTest {
             mockUserStageStore,
             mockUserEventsStore,
             UseOurAppDetector(mockUserEventsStore),
+            mockTabRepository,
             coroutineRule.testDispatcherProvider
         )
 
@@ -329,7 +334,7 @@ class BrowserTabViewModelTest {
     @ExperimentalCoroutinesApi
     @After
     fun after() {
-        ctaViewModel.forceStopFireButtonPulseAnimation.close()
+        ctaViewModel.isFireButtonPulseAnimationFlowEnabled.close()
         dismissedCtaDaoChannel.close()
         testee.onCleared()
         db.close()
@@ -2994,6 +2999,24 @@ class BrowserTabViewModelTest {
 
         val command = commandCaptor.lastValue as Command.HandleExternalAppLink
         assertTrue(command.headers.isEmpty())
+    }
+
+    @Test
+    fun whenFirePulsingAnimationStartsThenItStopsAfterOneHour() = coroutineRule.runBlocking {
+        givenFireButtonPulsing()
+        val observer = ValueCaptorObserver<BrowserTabViewModel.BrowserViewState>(false)
+        testee.browserViewState.observeForever(observer)
+
+        testee.onViewVisible()
+
+        advanceTimeBy(3_600_000)
+        verify(mockDismissedCtaDao).insert(DismissedCta(CtaId.DAX_FIRE_BUTTON))
+        verify(mockDismissedCtaDao).insert(DismissedCta(CtaId.DAX_FIRE_BUTTON_PULSE))
+    }
+
+    private suspend fun givenFireButtonPulsing() {
+        whenever(mockUserStageStore.getUserAppStage()).thenReturn(AppStage.DAX_ONBOARDING)
+        dismissedCtaDaoChannel.send(listOf(DismissedCta(CtaId.DAX_DIALOG_TRACKERS_FOUND)))
     }
 
     private fun givenNewPermissionRequestFromDomain(domain: String) {

@@ -87,8 +87,10 @@ class TrackerDataDownloader @Inject constructor(
             val body = response.body()!!
 
             appDatabase.runInTransaction {
-                temporaryTrackingWhitelistDao.updateAll(body.lines().filterBlankItems()
-                    .map { TemporaryTrackingWhitelistedDomain(it) })
+                temporaryTrackingWhitelistDao.updateAll(
+                    body.lines().filterBlankItems()
+                        .map { TemporaryTrackingWhitelistedDomain(it) }
+                )
                 trackerDataLoader.loadTemporaryWhitelist()
             }
         }

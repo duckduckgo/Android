@@ -19,6 +19,8 @@ package com.duckduckgo.app.tabs.ui
 import androidx.annotation.StringRes
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.asLiveData
+import androidx.lifecycle.viewModelScope
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.global.SingleLiveEvent
@@ -28,6 +30,9 @@ import com.duckduckgo.app.tabs.model.TabRepository
 class TabSwitcherViewModel(private val tabRepository: TabRepository, private val webViewSessionStorage: WebViewSessionStorage) : ViewModel() {
 
     var tabs: LiveData<List<TabEntity>> = tabRepository.liveTabs
+    var deletableTabs: LiveData<List<TabEntity>> = tabRepository.flowDeletableTabs.asLiveData(
+        context = viewModelScope.coroutineContext
+    )
     val command: SingleLiveEvent<Command> = SingleLiveEvent()
 
     sealed class Command {
@@ -48,6 +53,18 @@ class TabSwitcherViewModel(private val tabRepository: TabRepository, private val
     suspend fun onTabDeleted(tab: TabEntity) {
         tabRepository.delete(tab)
         webViewSessionStorage.deleteSession(tab.tabId)
+    }
+
+    suspend fun onMarkTabAsDeletable(tab: TabEntity) {
+        tabRepository.markDeletable(tab)
+    }
+
+    suspend fun undoDeletableTab(tab: TabEntity) {
+        tabRepository.undoDeletable(tab)
+    }
+
+    suspend fun purgeDeletableTabs() {
+        tabRepository.purgeDeletableTabs()
     }
 
     fun onClearComplete() {

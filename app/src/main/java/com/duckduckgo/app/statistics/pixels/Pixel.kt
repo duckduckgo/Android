@@ -113,6 +113,8 @@ interface Pixel {
         LONG_PRESS_COPY_URL("mlp_c"),
         LONG_PRESS_OPEN_IMAGE_IN_BACKGROUND_TAB("mlp_ibt"),
 
+        DOWNLOAD_FILE_DEFAULT_GUESSED_NAME("m_df_dgn"),
+
         SETTINGS_OPENED("ms"),
         SETTINGS_THEME_TOGGLED_LIGHT("ms_tl"),
         SETTINGS_THEME_TOGGLED_DARK("ms_td"),
@@ -284,11 +286,14 @@ class RxBasedPixel @Inject constructor(
     override fun fire(pixelName: String, parameters: Map<String, String>, encodedParameters: Map<String, String>) {
         pixelSender.sendPixel(pixelName, parameters, encodedParameters)
             .subscribeOn(Schedulers.io())
-            .subscribe({
-                Timber.v("Pixel sent: $pixelName with params: $parameters $encodedParameters")
-            }, {
-                Timber.w(it, "Pixel failed: $pixelName with params: $parameters $encodedParameters")
-            })
+            .subscribe(
+                {
+                    Timber.v("Pixel sent: $pixelName with params: $parameters $encodedParameters")
+                },
+                {
+                    Timber.w(it, "Pixel failed: $pixelName with params: $parameters $encodedParameters")
+                }
+            )
     }
 
     /**
@@ -305,10 +310,13 @@ class RxBasedPixel @Inject constructor(
     override fun enqueueFire(pixelName: String, parameters: Map<String, String>, encodedParameters: Map<String, String>) {
         pixelSender.enqueuePixel(pixelName, parameters, encodedParameters)
             .subscribeOn(Schedulers.io())
-            .subscribe({
-                Timber.v("Pixel enqueued: $pixelName with params: $parameters $encodedParameters")
-            }, {
-                Timber.w(it, "Pixel failed: $pixelName with params: $parameters $encodedParameters")
-            })
+            .subscribe(
+                {
+                    Timber.v("Pixel enqueued: $pixelName with params: $parameters $encodedParameters")
+                },
+                {
+                    Timber.w(it, "Pixel failed: $pixelName with params: $parameters $encodedParameters")
+                }
+            )
     }
 }

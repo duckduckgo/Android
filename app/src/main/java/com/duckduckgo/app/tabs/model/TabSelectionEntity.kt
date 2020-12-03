@@ -29,7 +29,8 @@ import androidx.room.PrimaryKey
             parentColumns = ["tabId"],
             childColumns = ["tabId"],
             onDelete = ForeignKey.SET_NULL
-        )],
+        )
+    ],
     indices = [
         Index("tabId")
     ]

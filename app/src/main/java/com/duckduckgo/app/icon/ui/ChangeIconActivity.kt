@@ -59,15 +59,21 @@ class ChangeIconActivity : DuckDuckGoActivity() {
 
     private fun observeViewModel() {
 
-        viewModel.viewState.observe(this, Observer<ChangeIconViewModel.ViewState> { viewState ->
-            viewState?.let {
-                render(it)
+        viewModel.viewState.observe(
+            this,
+            Observer<ChangeIconViewModel.ViewState> { viewState ->
+                viewState?.let {
+                    render(it)
+                }
             }
-        })
+        )
 
-        viewModel.command.observe(this, Observer {
-            processCommand(it)
-        })
+        viewModel.command.observe(
+            this,
+            Observer {
+                processCommand(it)
+            }
+        )
 
         viewModel.start()
     }

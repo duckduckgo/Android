@@ -18,7 +18,6 @@
     <item android:id="@android:id/background">
         <shape android:shape="rectangle">
             <solid android:color="@color/white" />
-            <stroke android:width="1.5dp" android:color="@color/cornflowerBlue"/>
             <corners android:radius="22dp" />
         </shape>
     </item>
