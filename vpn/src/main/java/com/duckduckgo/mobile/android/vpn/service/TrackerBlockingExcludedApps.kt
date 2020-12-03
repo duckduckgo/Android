@@ -33,6 +33,10 @@ private val EXCLUDED_PROBLEMATIC_APPS = listOf(
     "com.instagram.android"
 )
 
+private val FIRST_PARTY_TRACKERS_ONLY_APPS = listOf(
+    "com.google.android.youtube"
+)
+
 private val MAJOR_BROWSERS = listOf(
     "com.duckduckgo.mobile.android",
     "com.duckduckgo.mobile.android.debug",
@@ -71,4 +75,8 @@ private val MAJOR_BROWSERS = listOf(
 )
 
 val EXCLUDED_APPS =
-    listOf(BuildConfig.LIBRARY_PACKAGE_NAME).plus(EXCLUDED_SYSTEM_APPS).plus(EXCLUDED_PROBLEMATIC_APPS).plus(MAJOR_BROWSERS)
+    listOf(BuildConfig.LIBRARY_PACKAGE_NAME)
+        .plus(EXCLUDED_SYSTEM_APPS)
+        .plus(EXCLUDED_PROBLEMATIC_APPS)
+        .plus(FIRST_PARTY_TRACKERS_ONLY_APPS)
+        .plus(MAJOR_BROWSERS)

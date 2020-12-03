@@ -238,6 +238,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
     private fun Builder.safelyAddDisallowedApps(apps: List<String>) {
         for (app in apps) {
             try {
+                Timber.v("Excluding app from VPN: $app")
                 addDisallowedApplication(app)
             } catch (e: PackageManager.NameNotFoundException) {
                 Timber.w("Package name not found: %s", app)
