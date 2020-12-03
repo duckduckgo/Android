@@ -194,6 +194,7 @@
     <style name="OnboardingButtonSecondaryRoundedCta" parent="Widget.AppCompat.Button.Borderless">
         <item name="android:layout_marginBottom">20dp</item>
         <item name="android:textSize">15sp</item>
+        <item name="android:padding">10dp</item>
         <item name="android:textColor">@color/cornflowerDark</item>
         <item name="layout_constraintBottom_toBottomOf">parent</item>
         <item name="layout_constraintWidth_max">400dp</item>

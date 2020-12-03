@@ -33,7 +33,7 @@
     <string name="cannotLaunchDefaultAppSettings">Nepavyko paleisti numatytųjų programos nustatymų ekrano</string>
     <string name="settingsDefaultBrowserEnabled">Nustatyti kaip numatytąją naršyklę</string>
     <string name="defaultBrowserMaybeLater">Galbūt vėliau</string>
-    <string name="defaultBrowserLetsDoIt">Padarykime tai!</string>
+    <string name="defaultBrowserLetsDoIt">Nustatyti kaip numatytąją naršyklę</string>
     <string name="defaultBrowserDescriptionNoDefault">Kiekvieną kartą be jaudulio atverkite nuorodas.</string>
     <string name="defaultBrowserInstructions">Pasirinkite „DuckDuckGo“ ir bakstelėkite <font color="#678fff"> „Always“ (visada) </font>.</string>
 
@@ -46,12 +46,12 @@
     <string name="omnibarInputHint">Ieškoti arba įvesti URL</string>
     <string name="clearButtonContentDescription">Išvalyti paieškos įvestį</string>
     <string name="no_compatible_third_party_app_installed">Neįdiegta suderinama programa</string>
-    <string name="addBookmarkMenuTitle">Pridėti žymelę</string>
+    <string name="addBookmarkMenuTitle">Pridėti žymę</string>
     <string name="requestDesktopSiteMenuTitle">Darbalaukio svetainė</string>
 
     <!-- Downloading files -->
     <string name="downloadImage">Atsisiųsti paveikslėlį</string>
-    <string name="permissionRequiredToDownload">Norint atsisiųsti reikia leidimo išsaugoti</string>
+    <string name="permissionRequiredToDownload">Norint atsisiųsti, reikia leidimo išsaugoti</string>
     <string name="downloadComplete">Atsisiuntimas baigtas.</string>
     <string name="downloadFailed">Atsisiųsti nepavyko</string>
     <string name="downloadInProgress">Atsisiunčiama</string>
@@ -91,7 +91,9 @@
     <string name="faviconContentDescription">Parankinio piktograma</string>
     <string name="closeContentDescription">Uždaryti</string>
     <string name="closeAllTabsMenuItem">Uždaryti visas korteles</string>
-    <string name="closeTab">Uždaryti kortelė</string>
+    <string name="closeTab">Uždaryti kortelę</string>
+    <string name="tabClosed">Skirtukas uždarytas</string>
+    <string name="tabClosedUndo">Anuliuoti</string>
 
     <!-- Privacy Dashboard Activities -->
     <string name="privacyProtectionToggle">Svetainės privatumo apsauga</string>
@@ -191,7 +193,7 @@
     <!-- About Activity -->
     <string name="aboutActivityTitle">Apie mus</string>
     <string name="aboutDescription">
-        „DuckDuckGo“ nustatome naują patikimumo tinkle standartą.\n\n „DuckDuckGo“ privatumo naršyklė užtikrina visus svarbiausius įrankius, kurie padės apsaugoti savo privatumą ieškant ir naršant tinkle, įskaitant sekiklių blokavimą, išmanųjį šifravimą ir „DuckDuckGo“ privačias paieškas.\n\n Mūsų komanda tiki, kad internetas neturėtų būti toks baisus, o privatumas, kurio nusipelnėte internete, turėtų būti ranka pasiekiamas.</string>
+        „DuckDuckGo“ nustatome naują patikimumo tinkle standartą.\n\n„DuckDuckGo“ privatumo naršyklė užtikrina visus svarbiausius įrankius, kurie padės apsaugoti savo privatumą ieškant ir naršant tinkle, įskaitant sekiklių blokavimą, išmanųjį šifravimą ir „DuckDuckGo“ privačias paieškas.\n\nMūsų komanda tiki, kad internetas neturėtų būti toks baisus, o privatumas, kurio nusipelnėte internete, turėtų būti ranka pasiekiamas.</string>
     <string name="aboutMoreLink">Daugiau informacijos rasite duckdukgo.com/about</string>
     <string name="no_suggestions">Pasiūlymų nėra</string>
 
@@ -215,16 +217,16 @@
     <string name="brokenSiteCategoryOther">Kažkas kito</string>
 
     <!-- Bookmarks Activity -->
-    <string name="bookmarksMenuTitle">Žymelės</string>
-    <string name="bookmarksActivityTitle">Žymelės</string>
-    <string name="bookmarkDeleteConfirmMessage">Ar tikrai norite ištrinti žymelę &lt;b&gt;%1$s&lt;/b&gt;?</string>
-    <string name="bookmarkAddedFeedback">Žymelė pridėta</string>
-    <string name="bookmarkTitleHint">Žymelės antraštė</string>
-    <string name="bookmarkUrlHint">Žymelės URL</string>
-    <string name="bookmarkTitleEdit">Redaguoti žymelę</string>
-    <string name="noBookmarks">Žymelių dar nepridėta</string>
-    <string name="bookmarkOverflowContentDescription">Daugiau parinkčių žymelei %1$s</string>
-    <string name="bookmarkEdited">Žymelė pridėta</string>
+    <string name="bookmarksMenuTitle">Žymės</string>
+    <string name="bookmarksActivityTitle">Žymės</string>
+    <string name="bookmarkDeleteConfirmMessage">Ar tikrai norite ištrinti žymę &lt;b&gt;%1$s&lt;/b&gt;?</string>
+    <string name="bookmarkAddedFeedback">Žymė pridėta</string>
+    <string name="bookmarkTitleHint">Žymės antraštė</string>
+    <string name="bookmarkUrlHint">Žymės URL</string>
+    <string name="bookmarkTitleEdit">Redaguoti žymę</string>
+    <string name="noBookmarks">Žymių dar nepridėta</string>
+    <string name="bookmarkOverflowContentDescription">Daugiau parinkčių žymei %1$s</string>
+    <string name="bookmarkEdited">Žymė pridėta</string>
 
     <!-- Dialogs -->
     <string name="dialogConfirmTitle">Patvirtinti</string>
@@ -257,7 +259,7 @@
     <string name="addWidgetCtaDismissButton">Atmesti</string>
     <string name="addWidgetInstructionsActivityTitle">Pridėti valdiklį</string>
     <string name="addWidgetInstruction1Label">1</string>
-    <string name="addWidgetInstruction1">Ilgai spauskite ant pagrindinio ekrano, po to atidarykite valdiklių meniu</string>
+    <string name="addWidgetInstruction1">Ilgai spauskite ant pagrindinio ekrano, paskui atidarykite valdiklių meniu</string>
     <string name="addWidgetInstruction2Label">2</string>
     <string name="addWidgetInstruction2">Raskite „DuckDuckGo“ valdiklį</string>
     <string name="addWidgetInstruction3Label">3</string>
@@ -319,10 +321,10 @@
     <string name="missingBrowserFeaturesSubtitle">Kokią naršymo funkciją galime pridėti arba patobulinti?</string>
     <string name="missingBrowserFeatureSubReasonNavigation">Naršymas pirmyn, atgal, atnaujinimas</string>
     <string name="missingBrowserFeatureSubReasonTabManagement">Kortelių kūrimas ir tvarkymas</string>
-    <string name="missingBrowserFeatureSubReasonAdPopups">Reklamų ir iššokančių langų blokavimas</string>
+    <string name="missingBrowserFeatureSubReasonAdPopups">Reklamų ir iššokančiųjų langų blokavimas</string>
     <string name="missingBrowserFeatureSubReasonVideos">Vaizdo įrašų peržiūra</string>
     <string name="missingBrowserFeatureSubReasonImages">Paveikslėlių naudojimas</string>
-    <string name="missingBrowserFeatureSubReasonBookmarks">Žymelių kūrimas ir tvarkymas</string>
+    <string name="missingBrowserFeatureSubReasonBookmarks">Žymių kūrimas ir tvarkymas</string>
     <string name="missingBrowserFeatureSubReasonOther">Nei vienas iš šių</string>
 
     <string name="websiteNotLoadingTitleLong">Kai kurios svetainės įkeliamos neteisingai</string>
@@ -347,7 +349,7 @@
     <string name="needMoreCustomizationSubReasonAppLooks">Kaip atrodo programa</string>
     <string name="needMoreCustomizationSubReasonWhichDataIsCleared">Kurie duomenys yra išvalomi</string>
     <string name="needMoreCustomizationSubReasonWhenDataIsCleared">Kada duomenys yra išvalomi</string>
-    <string name="needMoreCustomizationSubReasonBookmarksDisplay">Kaip rodomos žymelės</string>
+    <string name="needMoreCustomizationSubReasonBookmarksDisplay">Kaip rodomos žymės</string>
     <string name="needMoreCustomizationSubReasonOther">Nei vienas iš šių</string>
 
     <string name="appIsSlowOrBuggyTitleLong">Programa veikia lėtai, genda ar stringa</string>
@@ -369,7 +371,7 @@
     <string name="feedbackNegativeMainReasonPageSubtitle">Kas jums kelia didžiausią susierzinimą?</string>
     <string name="feedbackNegativeMainReasonPageTitle">Apgailestaujame.</string>
     <string name="feedbackShareDetails">Dalintis informacija</string>
-    <string name="sharePositiveFeedbackWithTheTeam">Ar norėtumėte papasakoti plačiau?</string>
+    <string name="sharePositiveFeedbackWithTheTeam">Ar norėtumėte papasakoti išsamiau?</string>
     <string name="whatHaveYouBeenEnjoying">Kas jums patiko?</string>
     <string name="awesomeToHear">Nuostabu tai girdėti!</string>
     <string name="shareTheLoveWithARating">Įvertinkite mus „Play Store“ parduotuvėje.</string>
@@ -412,11 +414,11 @@
     <string name="hideTipsButton">Slėpti patarimus visam laikui</string>
 
     <!-- New Onboarding Experience -->
-    <string name="onboardingWelcomeTitle">"Sveiki atvykę į „DUCKDUCKGO“"</string>
+    <string name="onboardingWelcomeTitle">"Sveiki atvykę į „DuckDuckGo“!"</string>
     <string name="onboardingDaxText"><![CDATA[Internetas gali būti bauginantis.<br/><br/>Nesijaudinkite! Ieškoti ir naršyti privačiai yra lengviau, nei manote.]]></string>
     <string name="onboardingLetsDoItButton">Pasiekime tai!</string>
-    <string name="daxIntroCtaText"><![CDATA[Toliau pabandykite apsilankyti viename mėgstamiausių tinklapių! <br/><br/>Užblokuosiu sekimo įrenginius, kad jie negalėtų jūsų šnipinėti. Jei įmanoma, atnaujinsiu jūsų ryšio saugumą. 🔒]]></string>
-    <string name="daxEndCtaText"><![CDATA[Atliktai! <br/><br/>Įsidėmėkite: kiekvieną kartą, kai naršote su manimi, bauginantis skelbimas praranda galią. 👍]]></string>
+    <string name="daxIntroCtaText"><![CDATA[Toliau pabandykite apsilankyti viename mėgstamiausių tinklalapių! <br/><br/>Užblokuosiu sekimo įrenginius, kad jie negalėtų jūsų šnipinėti. Jei įmanoma, atnaujinsiu jūsų ryšio saugumą. 🔒]]></string>
+    <string name="daxEndCtaText"><![CDATA[Atlikta! <br/><br/>Įsidėmėkite: kiekvieną kartą, kai naršote su manimi, bauginantis skelbimas praranda galią. 👍]]></string>
     <string name="daxSerpCtaText">„DuckDuckGo“ paieškos yra anoniminės ir niekada nekaupiu jūsų paieškos istorijos. Niekada. 🙌</string>
     <plurals name="daxTrackersBlockedCtaText">
         <item quantity="one"><![CDATA[ ir <b>%1$d kitas</b> bandė tave stebėti. <br/><br/>Užblokavau juos!<br/><br/> ☝️Patikrink URL juostą ir pamatyk, kas bando tave stebėti, kai lankaisi naujoje svetainėje.️]]></item>
@@ -430,8 +432,8 @@
         <item quantity="many"><![CDATA[ bandė tave stebėti. <br/><br/>Užblokavau!<br/><br/> ☝️Patikrink URL juostą ir pamatyk, kas bando tave stebėti, kai lankaisi naujoje svetainėje.️]]></item>
         <item quantity="other"><![CDATA[ bandė tave stebėti. <br/><br/>Užblokavau!<br/><br/> ☝️Patikrink URL juostą ir pamatyk, kas bando tave stebėti, kai lankaisi naujoje svetainėje.️]]></item>
     </plurals>
-    <string name="daxNonSerpCtaText"><![CDATA[Bakstelėjus ir slenkant, bus blokuojami įkyrūs sekimo įrenginiai. <br/><br/>Pirmyn - naršykite toliau!]]></string>
-    <string name="daxMainNetworkCtaText"><![CDATA[Būkite atidus! %1$s yra pagrindinis sekimo tinklas.<br/><br/> stebėtojai tyko %2$s populiariausiuose tinklapiuose 😱, bet nesijaudinkite! <br/><br/>Blokuosiu %3$s sekimą tuose tinklapiuose.]]></string>
+    <string name="daxNonSerpCtaText"><![CDATA[Bakstelėjus ir slenkant, bus blokuojami įkyrūs sekimo įrenginiai. <br/><br/>Pirmyn – naršykite toliau!]]></string>
+    <string name="daxMainNetworkCtaText"><![CDATA[Būkite atidus! %1$s yra pagrindinis sekimo tinklas.<br/><br/> stebėtojai tyko %2$s populiariausiuose tinklalapiuose 😱, bet nesijaudinkite! <br/><br/>Blokuosiu %3$s sekimą tuose tinklalapiuose.]]></string>
     <string name="daxMainNetworkOwnedCtaText">Įspėjimas! Kadangi %1$s priklauso %2$s, negaliu neleisti jiems matyti tavo veiklos.&lt;br/&gt;&lt;br/&gt;Tačiau naršyk kartu su manimi ir aš sumažinsiu informacijos, kurią %3$s žino apie tave, kiekį užblokuodamas stebėjimo priemones kitose svetainėse.</string>
 
     <!-- Download Confirmation -->
@@ -507,9 +509,6 @@
     <string name="downloadManagerIncompatible">Parinktis „Download Manager“ nepasiekiama šiame įrenginyje</string>
     <string name="enable">Įjungti</string>
 
-    <!--Fire button education-->
-    <string name="daxClearDataCtaText">Bakstelėkite žemiau norėdami įrašyti savo naršymo istoriją. Išbandykite! 👇</string>
-
     <!-- Precise Location -->
     <string name="preciseLocationSystemDialogTitle">Įgalinti įrenginio vietą „DuckDuckGo“ privatumo naršyklėje?</string>
     <string name="preciseLocationSystemDialogSubtitle">%1$s prašo jūsų įrenginio vietos. Pirmiausia turėsite leisti programai siųsti jūsų įrenginio vietą, tuomet %2$s gali prašyti leidimo.</string>
@@ -533,6 +532,9 @@
     <string name="preciseLocationAllowedSitesSectionTitle">Suteiktas</string>
     <string name="preciseLocationDeniedSitesSectionTitle">Atmestas</string>
     <string name="preciseLocationSnackbarMessage">Anksčiau %1$s suteikėte leidimą pasiekti jūsų įrenginio vietą.</string>
+
+    <!--Fire button education-->
+    <string name="daxClearDataCtaText">Asmeniniai duomenys gali kauptis jūsų naršyklėje. Fui. Naudokite mygtuką „Fire“, kad juos panaikintumėte. Išbandykite dabar! 👇</string>
 
     <!--  Global Privacy Control-->
     <string name="globalPrivacyControlActivityTitle">Visuotinė privatumo kontrolė (VPK)</string>

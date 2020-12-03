@@ -40,6 +40,7 @@ import com.duckduckgo.app.global.view.show
 import com.duckduckgo.app.statistics.VariantManager
 import dagger.android.support.AndroidSupportInjection
 import kotlinx.android.synthetic.main.content_onboarding_default_browser.*
+import kotlinx.android.synthetic.main.include_default_browser_buttons.*
 import timber.log.Timber
 import javax.inject.Inject
 

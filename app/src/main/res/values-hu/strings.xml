@@ -33,7 +33,7 @@
     <string name="cannotLaunchDefaultAppSettings">Az alkalmazás alapértelmezett beállítású képernyője nem indítható el</string>
     <string name="settingsDefaultBrowserEnabled">Beállítás alapértelmezett böngészőként</string>
     <string name="defaultBrowserMaybeLater">Talán később</string>
-    <string name="defaultBrowserLetsDoIt">Csináljuk!</string>
+    <string name="defaultBrowserLetsDoIt">Beállítás alapértelmezett böngészőként</string>
     <string name="defaultBrowserDescriptionNoDefault">Nyugodtan kattints a linkekre, mindig.</string>
     <string name="defaultBrowserInstructions">Válaszd ki a DuckDuckGót, majd koppints a <font color="#678fff"> Mindig </font> elemre.</string>
 
@@ -45,7 +45,7 @@
 
     <string name="omnibarInputHint">Keresés vagy URL beírása</string>
     <string name="clearButtonContentDescription">Megadott keresés törlése</string>
-    <string name="no_compatible_third_party_app_installed">Nincs kompatibilis alkalmazás telepítve</string>
+    <string name="no_compatible_third_party_app_installed">Nincs telepítve kompatibilis alkalmazás</string>
     <string name="addBookmarkMenuTitle">Könyvjelző mentése</string>
     <string name="requestDesktopSiteMenuTitle">Weboldal asztali nézete</string>
 
@@ -53,7 +53,7 @@
     <string name="downloadImage">Kép letöltése</string>
     <string name="permissionRequiredToDownload">A letöltéshez tárolási engedély szükséges</string>
     <string name="downloadComplete">Letöltés kész.</string>
-    <string name="downloadFailed">A letöltés sikertelen volt</string>
+    <string name="downloadFailed">A letöltés sikertelen</string>
     <string name="downloadInProgress">Letöltés</string>
 
     <!-- Sharing options -->
@@ -92,13 +92,15 @@
     <string name="closeContentDescription">Bezárás</string>
     <string name="closeAllTabsMenuItem">Összes lap bezárása</string>
     <string name="closeTab">Lap bezárása</string>
+    <string name="tabClosed">Lap bezárva</string>
+    <string name="tabClosedUndo">Visszavonás</string>
 
     <!-- Privacy Dashboard Activities -->
     <string name="privacyProtectionToggle">A weboldal adatvédelme</string>
     <string name="privacyProtectionEnabled">WEBOLDAL VÉDELME ENGEDÉLYEZVE</string>
     <string name="privacyProtectionDisabled">WEBOLDAL VÉDELME LETILTVA</string>
     <string name="privacyDashboardActivityTitle">Adatvédelmi műszerfal</string>
-    <string name="privacyProtectionUpgraded" tools:ignore="TypographyQuotes">TOVÁBBFEJLESZTETT ETTŐL: &lt;img src=\"%1$d\" /&gt; EDDIG: &lt;img src=\"%2$d\" /&gt;</string>
+    <string name="privacyProtectionUpgraded" tools:ignore="TypographyQuotes">TOVÁBBFEJLESZTVE ERRŐL: &lt;img src=\"%1$d\" /&gt; ERRE: &lt;img src=\"%2$d\" /&gt;</string>
     <string name="privacyGradeContentDescription">Adatvédelmi fokozat</string>
 
     <string name="httpsGood">Titkosított kapcsolat</string>
@@ -183,7 +185,7 @@
     <!-- About Activity -->
     <string name="aboutActivityTitle">Rólunk</string>
     <string name="aboutDescription">
-        A DuckDuckGo célja egy új online bizalmi szint megteremtése. \n\n A DuckDuckGo Adatvédelmi Böngésző minden olyan alapvető adatvédelmi elemet tartalmaz, amelyre szükséged lehet ahhoz, hogy megvédd magad az internetes keresés és böngészés során, beleértve a nyomkövető letiltását, az intelligensebb titkosítást és a DuckDuckGo privát keresést.\n\n Az internet végső soron nem feltétlenül kell, hogy ellenséges közeg legyen, és hisszük, hogy az általad megérdemelt adatvédelem olyan egyszerű is lehet, mint a redőny lehúzása.</string>
+        A DuckDuckGo célja egy új online bizalmi szint megteremtése.A DuckDuckGo Adatvédelmi Böngésző minden olyan alapvető adatvédelmi elemet tartalmaz, amelyre szükséged lehet ahhoz, hogy megvédd magad az internetes keresés és böngészés során, beleértve a nyomkövetők letiltását, az intelligensebb titkosítást és a DuckDuckGo privát keresést.\n\nAz internet végső soron nem feltétlenül kell, hogy ellenséges közeg legyen, és hisszük, hogy az általad megérdemelt adatvédelem olyan egyszerű is lehet, mint a redőny lehúzása.</string>
     <string name="aboutMoreLink">További információk a duckduckgo.com/about oldalon</string>
     <string name="no_suggestions">Nincs javaslat</string>
 
@@ -191,7 +193,7 @@
     <string name="brokenSiteReportBrokenSiteMenuItem">Hibás weboldal bejelentése</string>
     <string name="brokenSiteHeading">Hibás weboldal bejelentése</string>
     <string name="brokenSiteSubmitted">Köszönjük! Visszajelzés elküldve</string>
-    <string name="brokenSitesCategoriesTitle">Írja le, mi történt:</string>
+    <string name="brokenSitesCategoriesTitle">Írd le, mi történt:</string>
     <string name="brokenSitesCategoriesHint">Az esemény leírása</string>
     <string name="brokenSiteSubmitButton">Jelentés küldése</string>
     <string name="brokenSiteDescription">Egy megsérült webhelyről szóló névtelen bejelentés segít a hibakeresésben és az alkalmazás fejlesztésében.</string>
@@ -364,7 +366,7 @@
     <string name="sharePositiveFeedbackWithTheTeam">Szeretnél valamit megosztani a csapattal?</string>
     <string name="whatHaveYouBeenEnjoying">Mi tetszett?</string>
     <string name="awesomeToHear">Örömmel halljuk!</string>
-    <string name="shareTheLoveWithARating">Ha tetszik az alkalmazás, kérjük, oszd meg véleményed a Play Store -on.</string>
+    <string name="shareTheLoveWithARating">Ha tetszik az alkalmazás, kérjük, oszd meg véleményed a Play Áruházban.</string>
     <string name="rateTheApp">ALKALMAZÁS ÉRTÉKELÉSE</string>
     <string name="declineFurtherFeedback">NEM, KÖSZÖNÖM, VÉGEZTEM.</string>
     <string name="whichBrokenSites">Hol látod ezeket a problémákat?</string>
@@ -384,42 +386,42 @@
     <string name="systemSearchDeviceAppLabel">Ebből az eszközből</string>
     <string name="systemSearchOmnibarInputHint"><font size="13">Keresés vagy URL beírása</font></string>
     <string name="systemSearchAppNotFound">Az alkalmazás nem található</string>
-    <string name="systemSearchOnboardingText">Köszönjük, hogy a DuckDuckGo-t választotta!\nMost, amikor a mi keresésünket vagy az alkalmazásunkat használja, a keresései védettek.</string>
+    <string name="systemSearchOnboardingText">Köszönjük, hogy a DuckDuckGo-t választottad!\nMost, amikor a mi keresésünket vagy az alkalmazásunkat használod, a kereséseid védettek.</string>
     <string name="systemSearchOnboardingFeaturesIntroText">A DuckDuckGo alkalmazás is:</string>
     <string name="systemSearchOnboardingFeatureOneText">Blokkolja a nem biztonságos nyomkövetőket</string>
     <string name="systemSearchOnboardingFeatureTwoText">Kikényszeríti a webhelyek titkosítását</string>
     <string name="systemSearchOnboardingFeatureThreeText">Egyetlen érintéssel törli az adatokat</string>
-    <string name="systemSearchOnboardingButtonMore">Többet mutat</string>
+    <string name="systemSearchOnboardingButtonMore">Mutass többet</string>
     <string name="systemSearchOnboardingButtonLess">Elrejtés</string>
-    <string name="systemSearchOnboardingButtonOk">Megvan</string>
+    <string name="systemSearchOnboardingButtonOk">Értem</string>
 
     <!-- Dax Dialog -->
     <string name="daxDialogHideButton">ELREJTÉS</string>
-    <string name="daxDialogPhew">Pfuj!</string>
+    <string name="daxDialogPhew">Hűűű!</string>
     <string name="daxDialogNext">Következő</string>
     <string name="daxDialogHighFive">Pacsi!</string>
     <string name="daxDialogGotIt">Megvan</string>
-    <string name="hideTipsTitle">Elrejti a többi tippet?</string>
+    <string name="hideTipsTitle">Elrejted a többi tippet?</string>
     <string name="hideTipsText">Csak néhány van, és megpróbáltuk őket informatívvá tenni.</string>
     <string name="hideTipsButton">Ötletek elrejtése örökre</string>
 
     <!-- New Onboarding Experience -->
     <string name="onboardingWelcomeTitle">"Üdvözlünk a DuckDuckGo-ban!"</string>
-    <string name="onboardingDaxText"><![CDATA[Az internet lehet hátborzongató.<br/><br/>Ne aggódjon! A magánjellegű keresés és böngészés könnyebb, mint gondolná.]]></string>
+    <string name="onboardingDaxText"><![CDATA[Az internet néha hátborzongató.<br/><br/>Ne aggódj! A magánjellegű keresés és böngészés könnyebb, mint gondolnád.]]></string>
     <string name="onboardingLetsDoItButton">Rajta, csináljuk!</string>
-    <string name="daxIntroCtaText"><![CDATA[A következő lépésben látogassa meg az egyik kedvenc webhelyét! <br/><br/>Én blokkolom a nyomkövetőket, hogy ne tudjanak kémkedni. Ha lehet, a kapcsolat biztonságát is javítom. 🔒]]></string>
-    <string name="daxEndCtaText"><![CDATA[Megvan, ez az! <br/><br/>Ne feledje: minden alkalommal, amikor velem végzi a böngészést, a hátborzongató hirdetés elveszíti az erejét. 👍]]></string>
+    <string name="daxIntroCtaText"><![CDATA[A következő lépésben látogasd meg az egyik kedvenc webhelyed! <br/><br/>Én blokkolom a nyomkövetőket, hogy ne tudjanak kémkedni. Ha lehet, a kapcsolat biztonságát is javítom. 🔒]]></string>
+    <string name="daxEndCtaText"><![CDATA[Megvan, ez az! <br/><br/>Ne feledd: minden alkalommal, amikor velem végzed a böngészést, a hátborzongató hirdetés elveszíti az erejét. 👍]]></string>
     <string name="daxSerpCtaText">A DuckDuckGo keresések névtelenek, és én soha nem tárolom el a keresési előzményeket. Soha. 🙌</string>
     <plurals name="daxTrackersBlockedCtaText">
-        <item quantity="one"><![CDATA[ és <b>%1$d másik</b> itt próbálta meg követni. <br/><br/>blokkoltam őket!<br/><br/> ☝️Ellenőrizheti az URL-sávot, hogy megtudja, ki próbálja meg követni, amikor új webhelyre látogat.]]></item>
-        <item quantity="other"><![CDATA[ és <b>%1$d másik</b> itt próbálta meg követni. <br/><br/>blokkoltam őket!<br/><br/> ☝️Ellenőrizheti az URL-sávot, hogy megtudja, ki próbálja meg követni, amikor új webhelyre látogat.]]></item>
+        <item quantity="one"><![CDATA[ és <b>%1$d másik</b> itt próbált meg követni. <br/><br/>blokkoltam őket!<br/><br/> ☝️Ellenőrizheted az URL-sávot, hogy megtudd, ki próbál meg követni, amikor új webhelyre látogatsz.]]></item>
+        <item quantity="other"><![CDATA[ és <b>%1$d másik</b> itt próbált meg követni. <br/><br/>blokkoltam őket!<br/><br/> ☝️Ellenőrizheted az URL-sávot, hogy megtudd, ki próbál meg követni, amikor új webhelyre látogatsz.]]></item>
     </plurals>
     <plurals name="daxTrackersBlockedCtaZeroText">
         <item quantity="one"><![CDATA[ itt próbálta meg követni. <br/><br/>blokkoltam!<br/><br/> ☝️Ellenőrizheti az URL-sávot, hogy megtudja, ki próbálja meg követni, amikor új webhelyre látogat.]]></item>
-        <item quantity="other"><![CDATA[ itt próbálta meg követni. <br/><br/>blokkoltam!<br/><br/> ☝️Ellenőrizheti az URL-sávot, hogy megtudja, ki próbálja meg követni, amikor új webhelyre látogat.]]></item>
+        <item quantity="other"><![CDATA[ itt próbált meg követni. <br/><br/>blokkoltam!<br/><br/> ☝️Ellenőrizheted az URL-sávot, hogy megtudd, ki próbál meg követni, amikor új webhelyre látogatsz.]]></item>
     </plurals>
-    <string name="daxNonSerpCtaText"><![CDATA[Ahogy megérinti és görgeti, én blokkolni fogom a bosszantó nyomkövetőket. <br/><br/>Menjen tovább - folytassa a böngészést!]]></string>
-    <string name="daxMainNetworkCtaText"><![CDATA[Fel a fejjel! A(z) %1$s egy nagy nyomkövető hálózat.<br/><br/> A nyomkövetői ott leselkednek a legfontosabb webhelyek %2$s oldalán 😱, de ne aggódjon! <br/><br/>meg fogom akadályozni, hogy a(z) %3$s láthassa az Ön tevékenységét azokon a webhelyeken.]]></string>
+    <string name="daxNonSerpCtaText"><![CDATA[Ahogy megérinted és görgeted, én blokkolni fogom a bosszantó nyomkövetőket. <br/><br/>Menj tovább - folytasd a böngészést!]]></string>
+    <string name="daxMainNetworkCtaText"><![CDATA[Fel a fejjel! A(z) %1$s egy nagy nyomkövető hálózat.<br/><br/> A nyomkövetői ott leselkednek a legfontosabb webhelyek %2$s oldalán 😱, de ne aggódj! <br/><br/>meg fogom akadályozni, hogy a(z) %3$s láthassa a tevékenységedet azokon a webhelyeken.]]></string>
     <string name="daxMainNetworkOwnedCtaText">Figyelem! Mivel %1$s tulajdonában van a(z) %2$s, nem tudom megakadályozni, hogy lássák az itteni tevékenységedet.&lt;br/&gt;&lt;br/&gt;Ha azonban velem böngészel, a sok más weboldalon is használt nyomkövetőjük blokkolásával korlátozni tudom azt, amit %3$s tud rólad.</string>
 
     <!-- Download Confirmation -->
@@ -495,9 +497,6 @@
     <string name="downloadManagerIncompatible">A letöltéskezelő nem érhető el ezen az eszközön.</string>
     <string name="enable">Engedélyezés</string>
 
-    <!--Fire button education-->
-    <string name="daxClearDataCtaText">Az alábbiakban koppints a böngészési előzményeid törléséhez. Próbáld ki! 👇</string>
-
     <!-- Precise Location -->
     <string name="preciseLocationSystemDialogTitle">Engedélyezed az eszköz helyének elérését a DuckDuckGo adatvédelmi böngésző számára?</string>
     <string name="preciseLocationSystemDialogSubtitle">%1$s az eszközöd helyét kéri. Először engedélyezned kell az alkalmazás számára, hogy elküldje az eszközöd helyét, majd a %2$s engedélyt kérhet.</string>
@@ -521,6 +520,9 @@
     <string name="preciseLocationAllowedSitesSectionTitle">Megadva</string>
     <string name="preciseLocationDeniedSitesSectionTitle">Megtagadva</string>
     <string name="preciseLocationSnackbarMessage">%1$s számára korábban megadtad az engedélyt az eszközöd helyadatainak hozzáférésére.</string>
+
+    <!--Fire button education-->
+    <string name="daxClearDataCtaText">Személyes adatok halmozódhatnak fel a böngésződben. Fúj. A Tűz gombbal mindet elégetheted. Próbáld ki most! 👇</string>
 
     <!--  Global Privacy Control-->
     <string name="globalPrivacyControlActivityTitle">Nemzetközi adatvédelmi szabályozás (Global Privacy Control, GPC)</string>

@@ -114,6 +114,8 @@ interface Pixel {
         LONG_PRESS_COPY_URL("mlp_c"),
         LONG_PRESS_OPEN_IMAGE_IN_BACKGROUND_TAB("mlp_ibt"),
 
+        DOWNLOAD_FILE_DEFAULT_GUESSED_NAME("m_df_dgn"),
+
         SETTINGS_OPENED("ms"),
         SETTINGS_THEME_TOGGLED_LIGHT("ms_tl"),
         SETTINGS_THEME_TOGGLED_DARK("ms_td"),
