@@ -25,7 +25,7 @@ class DatabaseDateFormatterTest {
     @Test
     fun whenBucketingByHourOnlyHourlyPrecisionIsUsed() {
         val formatted = DatabaseDateFormatter.bucketByHour(fixedTime())
-        assertEquals("2020-12-25T13", formatted)
+        assertEquals("2020-12-25T13:00:00", formatted)
     }
 
     @Test

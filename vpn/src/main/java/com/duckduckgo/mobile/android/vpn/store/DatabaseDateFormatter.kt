@@ -23,11 +23,14 @@ import javax.inject.Inject
 class DatabaseDateFormatter @Inject constructor() {
 
     companion object {
-        private val FORMATTER_HOURS: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH")
         private val FORMATTER_SECONDS: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss")
 
         fun bucketByHour(date: LocalDateTime = LocalDateTime.now()): String {
-            return FORMATTER_HOURS.format(date)
+            val byHour = date
+                .withMinute(0)
+                .withSecond(0)
+                .withNano(0)
+            return FORMATTER_SECONDS.format(byHour)
         }
 
         fun timestamp(date: LocalDateTime = LocalDateTime.now()): String {
