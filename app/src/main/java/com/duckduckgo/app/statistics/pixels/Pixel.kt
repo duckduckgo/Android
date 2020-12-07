@@ -83,6 +83,7 @@ interface Pixel {
         DEFAULT_BROWSER_SET("m_db_s"),
         DEFAULT_BROWSER_NOT_SET("m_db_ns"),
         DEFAULT_BROWSER_UNSET("m_db_u"),
+        DEFAULT_BROWSER_DIALOG_NOT_SHOWN("m_dbd_ns"),
 
         WIDGET_CTA_SHOWN("m_wc_s"),
         WIDGET_CTA_LAUNCHED("m_wc_l"),
