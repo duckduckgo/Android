@@ -83,6 +83,7 @@ interface Pixel {
         DEFAULT_BROWSER_SET("m_db_s"),
         DEFAULT_BROWSER_NOT_SET("m_db_ns"),
         DEFAULT_BROWSER_UNSET("m_db_u"),
+        DEFAULT_BROWSER_DIALOG_NOT_SHOWN("m_dbd_ns"),
 
         WIDGET_CTA_SHOWN("m_wc_s"),
         WIDGET_CTA_LAUNCHED("m_wc_l"),
@@ -112,6 +113,8 @@ interface Pixel {
         LONG_PRESS_SHARE("mlp_s"),
         LONG_PRESS_COPY_URL("mlp_c"),
         LONG_PRESS_OPEN_IMAGE_IN_BACKGROUND_TAB("mlp_ibt"),
+
+        DOWNLOAD_FILE_DEFAULT_GUESSED_NAME("m_df_dgn"),
 
         SETTINGS_OPENED("ms"),
         SETTINGS_THEME_TOGGLED_LIGHT("ms_tl"),

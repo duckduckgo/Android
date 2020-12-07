@@ -36,18 +36,15 @@ import com.duckduckgo.app.onboarding.store.*
 import com.duckduckgo.app.privacy.db.UserWhitelistDao
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.VariantManager
-import com.duckduckgo.app.statistics.VariantManager.VariantFeature.FireButtonEducation
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.survey.db.SurveyDao
 import com.duckduckgo.app.survey.model.Survey
+import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.widget.ui.WidgetCapabilities
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.channels.ConflatedBroadcastChannel
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.asFlow
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 import java.util.*
@@ -70,21 +67,25 @@ class CtaViewModel @Inject constructor(
     private val userStageStore: UserStageStore,
     private val userEventsStore: UserEventsStore,
     private val useOurAppDetector: UseOurAppDetector,
+    private val tabRepository: TabRepository,
     private val dispatchers: DispatcherProvider
 ) {
     val surveyLiveData: LiveData<Survey> = surveyDao.getLiveScheduled()
 
     @ExperimentalCoroutinesApi
     @VisibleForTesting
-    val forceStopFireButtonPulseAnimation = ConflatedBroadcastChannel(false)
+    val isFireButtonPulseAnimationFlowEnabled = ConflatedBroadcastChannel(true)
 
     @FlowPreview
     @ExperimentalCoroutinesApi
-    val showFireButtonPulseAnimation: Flow<Boolean> = dismissedCtaDao
-        .dismissedCtas()
-        .combine(forceStopFireButtonPulseAnimation.asFlow()) { ctas, forceStopAnimation ->
-            Pair(ctas, forceStopAnimation)
-        }.shouldShowPulseAnimation()
+    val showFireButtonPulseAnimation: Flow<Boolean> =
+        isFireButtonPulseAnimationFlowEnabled.asFlow()
+            .flatMapLatest {
+                when (it) {
+                    true -> getShowFireButtonPulseAnimationFlow()
+                    false -> flowOf(false)
+                }
+            }
 
     private var activeSurvey: Survey? = null
 
@@ -94,19 +95,15 @@ class CtaViewModel @Inject constructor(
             CtaId.DAX_DIALOG_SERP,
             CtaId.DAX_DIALOG_TRACKERS_FOUND,
             CtaId.DAX_DIALOG_NETWORK,
+            CtaId.DAX_FIRE_BUTTON,
             CtaId.DAX_END
-        ).run {
-            if (variantManager.getVariant().hasFeature(FireButtonEducation)) {
-                return@run this.plus(CtaId.DAX_FIRE_BUTTON)
-            }
-            return@run this
-        }
+        )
     }
 
     @ExperimentalCoroutinesApi
     suspend fun dismissPulseAnimation() {
-        forceStopFireButtonPulseAnimation.send(true)
         withContext(dispatchers.io()) {
+            dismissedCtaDao.insert(DismissedCta(CtaId.DAX_FIRE_BUTTON))
             dismissedCtaDao.insert(DismissedCta(CtaId.DAX_FIRE_BUTTON_PULSE))
         }
     }
@@ -197,7 +194,7 @@ class CtaViewModel @Inject constructor(
     }
 
     suspend fun getFireDialogCta(): DaxFireDialogCta? {
-        if (!variantManager.getVariant().hasFeature(FireButtonEducation) || !daxOnboardingActive()) return null
+        if (!daxOnboardingActive()) return null
 
         return withContext(dispatchers.io()) {
             if (settingsDataStore.hideTips || daxDialogFireEducationShown()) return@withContext null
@@ -350,6 +347,8 @@ class CtaViewModel @Inject constructor(
 
     private suspend fun daxOnboardingActive(): Boolean = userStageStore.daxOnboardingActive()
 
+    private suspend fun pulseAnimationDisabled(): Boolean = !daxOnboardingActive() || pulseFireButtonShown() || daxDialogFireEducationShown() || settingsDataStore.hideTips
+
     private suspend fun allOnboardingCtasShown(): Boolean {
         return withContext(dispatchers.io()) {
             requiredDaxOnboardingCtas.all {
@@ -358,12 +357,33 @@ class CtaViewModel @Inject constructor(
         }
     }
 
+    @ExperimentalCoroutinesApi
+    private fun forceStopFireButtonPulseAnimationFlow() = tabRepository.flowTabs.distinctUntilChanged()
+        .map { tabs ->
+            if (tabs.size >= MAX_TABS_OPEN_FIRE_EDUCATION) return@map true
+            return@map false
+        }
+
+    @ExperimentalCoroutinesApi
+    private fun getShowFireButtonPulseAnimationFlow(): Flow<Boolean> = dismissedCtaDao.dismissedCtas()
+        .combine(forceStopFireButtonPulseAnimationFlow(), ::Pair)
+        .onEach { (_, forceStopAnimation) ->
+            withContext(dispatchers.io()) {
+                if (pulseAnimationDisabled()) {
+                    isFireButtonPulseAnimationFlowEnabled.send(false)
+                }
+                if (forceStopAnimation) {
+                    dismissPulseAnimation()
+                }
+            }
+        }.shouldShowPulseAnimation()
+
+    @ExperimentalCoroutinesApi
     private fun Flow<Pair<List<DismissedCta>, Boolean>>.shouldShowPulseAnimation(): Flow<Boolean> {
         return this.map { (dismissedCtaDao, forceStopAnimation) ->
             withContext(dispatchers.io()) {
                 if (forceStopAnimation) return@withContext false
-                if (!variantManager.getVariant().hasFeature(FireButtonEducation)) return@withContext false
-                if (!daxOnboardingActive() || pulseFireButtonShown() || daxDialogFireEducationShown() || settingsDataStore.hideTips) return@withContext false
+                if (pulseAnimationDisabled()) return@withContext false
 
                 return@withContext dismissedCtaDao.any {
                     it.ctaId == CtaId.DAX_DIALOG_TRACKERS_FOUND ||
@@ -376,5 +396,6 @@ class CtaViewModel @Inject constructor(
 
     companion object {
         private const val SURVEY_DEFAULT_MIN_DAYS_INSTALLED = 30
+        private const val MAX_TABS_OPEN_FIRE_EDUCATION = 2
     }
 }
