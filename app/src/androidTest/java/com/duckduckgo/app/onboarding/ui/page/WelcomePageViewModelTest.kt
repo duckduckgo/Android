@@ -80,19 +80,7 @@ class WelcomePageViewModelTest {
     }
 
     @Test
-    fun whenOnPrimaryCtaClickedAndControlXpThenFinish() = coroutineRule.runBlocking {
-        val launch = launch {
-            viewEvents.collect { state ->
-                assertTrue(state == WelcomePageView.State.Finish)
-            }
-        }
-        events.send(WelcomePageView.Event.OnPrimaryCtaClicked)
-
-        launch.cancel()
-    }
-
-    @Test
-    fun whenOnPrimaryCtaClickedAndTreatedXpAndNoShowThenFinish() = coroutineRule.runBlocking {
+    fun whenOnPrimaryCtaClickedAndShouldNotShowXpThenFinish() = coroutineRule.runBlocking {
         whenever(defaultRoleBrowserDialogExperiment.shouldShowExperiment())
             .thenReturn(false)
 
@@ -107,7 +95,7 @@ class WelcomePageViewModelTest {
     }
 
     @Test
-    fun whenOnPrimaryCtaClickedAndTreatedXpAndShowThenEmitShowDialog() = coroutineRule.runBlocking {
+    fun whenOnPrimaryCtaClickedAndShouldShowXpAndShowThenEmitShowDialog() = coroutineRule.runBlocking {
         whenever(defaultRoleBrowserDialogExperiment.shouldShowExperiment())
             .thenReturn(true)
         val intent = Intent()
@@ -125,9 +113,11 @@ class WelcomePageViewModelTest {
     }
 
     @Test
-    fun whenOnPrimaryCtaClickedAndTreatedXpNullIntentThenFireAndFinish() = coroutineRule.runBlocking {
+    fun whenOnPrimaryCtaClickedAndShouldShowXpNullIntentThenFireAndFinish() = coroutineRule.runBlocking {
         whenever(defaultRoleBrowserDialogExperiment.shouldShowExperiment())
             .thenReturn(true)
+        whenever(defaultRoleBrowserDialogExperiment.createIntent(any()))
+            .thenReturn(null)
 
         val launch = launch {
             viewEvents.collect { state ->
