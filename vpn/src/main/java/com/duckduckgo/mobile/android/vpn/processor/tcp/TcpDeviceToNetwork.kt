@@ -164,7 +164,6 @@ class TcpDeviceToNetwork(
             TcpPacketProcessor.logPacketDetails(
                 packet,
                 packet.tcpHeader.sequenceNumber,
-                packet.tcpHeader.sequenceNumber,
                 packet.tcpHeader.acknowledgementNumber
             )
             }. Packet length: $totalPacketLength.  Data length: ${packet.tcpPayloadSize(true)}"
@@ -188,7 +187,7 @@ class TcpDeviceToNetwork(
                         queues.networkToDevice.offer(connectionParams.responseBuffer)
                     }
                 }
-                else -> Timber.w("No connection open and won't open one to $connectionKey. Dropping packet. (action=$it)")
+                else -> Timber.e("No connection open and won't open one to $connectionKey. Dropping packet. (action=$it)")
             }
         }
     }
@@ -208,7 +207,6 @@ class TcpDeviceToNetwork(
             connectionKey, tcb.tcbState,
             TcpPacketProcessor.logPacketDetails(
                 packet,
-                tcb.sequenceNumberToServerInitial,
                 packet.tcpHeader.sequenceNumber,
                 packet.tcpHeader.acknowledgementNumber
             ),
@@ -227,8 +225,8 @@ class TcpDeviceToNetwork(
             when (it) {
                 is MoveState -> tcb.updateState(it)
                 ProcessPacket -> processPacket(tcb, packet, payloadBuffer, connectionParams)
-                SendFin -> tcb.sendFinToClient(queues, packet, packet.tcpPayloadSize(true))
-                SendFinWithData -> tcb.sendFinToClient(queues, packet, 0)
+                SendFin -> tcb.sendFinToClient(queues, packet, packet.tcpPayloadSize(true), triggeredByServerEndOfStream = false)
+                SendFinWithData -> tcb.sendFinToClient(queues, packet, 0, triggeredByServerEndOfStream = false)
                 CloseConnection -> tcb.closeConnection(responseBuffer)
                 DelayedCloseConnection -> handler.postDelayed(3_000) { tcb.closeConnection(responseBuffer) }
                 SendAck -> tcb.sendAck(queues, packet)
@@ -240,7 +238,7 @@ class TcpDeviceToNetwork(
 
     @AddTrace(name = "device_to_network_open_connection", enabled = true)
     private fun openConnection(params: TcpConnectionParams) {
-        Timber.i("Opening connection to %s:%s", params.destinationAddress, params.destinationPort)
+        Timber.v("Opening connection to %s:%s", params.destinationAddress, params.destinationPort)
         val (tcb, channel) = connectionInitializer.initializeConnection(params) ?: return
         TcpStateFlow.socketOpening(TcbState()).events.forEach {
             when (it) {

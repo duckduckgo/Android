@@ -58,17 +58,23 @@ class TcpPacketProcessor(
     private val handler: Handler = Handler(Looper.getMainLooper())
 
     private val tcpSocketWriter = TcpSocketWriter(selector)
-    private val tcpNetworkToDevice = TcpNetworkToDevice(queues, selector, tcpSocketWriter, packetPersister)
+    private val tcpNetworkToDevice = TcpNetworkToDevice(
+        queues = queues,
+        selector = selector,
+        tcpSocketWriter = tcpSocketWriter,
+        packetPersister = packetPersister,
+        handler = handler
+    )
     private val tcpDeviceToNetwork =
         TcpDeviceToNetwork(
-            queues,
-            selector,
-            tcpSocketWriter,
-            TcpConnectionInitializer(queues, networkChannelCreator),
-            handler,
-            trackerDetector,
-            packetPersister,
-            localAddressDetector
+            queues = queues,
+            selector = selector,
+            socketWriter = tcpSocketWriter,
+            connectionInitializer = TcpConnectionInitializer(queues, networkChannelCreator),
+            handler = handler,
+            trackerDetector = trackerDetector,
+            packetPersister = packetPersister,
+            localAddressDetector = localAddressDetector
         )
 
     private val readWriteExecutorService = Executors.newFixedThreadPool(2)
@@ -135,13 +141,13 @@ class TcpPacketProcessor(
     )
 
     companion object {
-        fun logPacketDetails(packet: Packet, initialSeqNumber: Long, sequenceNumber: Long, acknowledgementNumber: Long): String {
+        fun logPacketDetails(packet: Packet, sequenceNumber: Long, acknowledgementNumber: Long): String {
             with(packet.tcpHeader) {
                 return "\tflags:[ ${isSYN.printFlag("SYN")}${isACK.printFlag("ACK")}${isFIN.printFlag("FIN")}${isPSH.printFlag("PSH")}${isRST.printFlag("RST")}${
                 isURG.printFlag(
                     "URG"
                 )
-                }]. [ackNumber=$acknowledgementNumber, sequenceNumber={ ${sequenceNumber - initialSeqNumber} / $sequenceNumber } ]"
+                }]. [sequenceNumber=$sequenceNumber, ackNumber=$acknowledgementNumber]"
             }
         }
 
@@ -163,7 +169,7 @@ class TcpPacketProcessor(
         }
 
         @AddTrace(name = "packet_processor_send_fin", enabled = true)
-        fun TCB.sendFinToClient(queues: VpnQueues, packet: Packet, payloadSize: Int) {
+        fun TCB.sendFinToClient(queues: VpnQueues, packet: Packet, payloadSize: Int, triggeredByServerEndOfStream: Boolean) {
             val buffer = ByteBufferPool.acquire()
             synchronized(this) {
 
@@ -176,6 +182,13 @@ class TcpPacketProcessor(
 
                 this.referencePacket.updateTcpBuffer(buffer, (FIN or ACK).toByte(), responseSeq, responseAck, 0)
 
+                if (triggeredByServerEndOfStream) {
+                    finSequenceNumberToClient = sequenceNumberToClient
+                } else {
+                    sequenceNumberToClient = increaseOrWraparound(sequenceNumberToClient, 1)
+                    finSequenceNumberToClient = sequenceNumberToClient
+                }
+
                 Timber.i(
                     "%s - Sending FIN/ACK, response=[seqNum=%d, ackNum=%d] - previous=[seqNum=%d, ackNum =%d, payloadSize=%d]",
                     ipAndPort,
@@ -183,8 +196,6 @@ class TcpPacketProcessor(
                     sequenceNumberToClient, acknowledgementNumberToClient, payloadSize
                 )
 
-                sequenceNumberToClient = increaseOrWraparound(sequenceNumberToClient, 1)
-                finSequenceNumberToClient = sequenceNumberToClient
             }
 
             queues.networkToDevice.offerFirst(buffer)
@@ -207,15 +218,15 @@ class TcpPacketProcessor(
 
                 if (packet.tcpHeader.isRST || packet.tcpHeader.isSYN || packet.tcpHeader.isFIN) {
                     acknowledgementNumberToClient = increaseOrWraparound(acknowledgementNumberToClient, 1)
+                    Timber.v("$ipAndPort - Sending ACK from network to device. Flags contain RST, SYN or FIN so incremented acknowledge number to $acknowledgementNumberToClient")
                 }
 
                 Timber.i(
-                    "%s - Sending ACK, previous seqNum=%d, payloadSize=%d, ackNum =%d (ackFromPacket: %d)",
+                    "%s - Sending ACK, payloadSize=%d, seqNumber=%d ackNumber= %d)",
                     ipAndPort,
-                    sequenceNumberToClient,
                     payloadSize,
                     acknowledgementNumberToClient,
-                    packet.tcpHeader.acknowledgementNumber
+                    sequenceNumberToClient
                 )
 
                 val buffer = ByteBufferPool.acquire()
@@ -254,7 +265,7 @@ class TcpPacketProcessor(
         @Synchronized
         @AddTrace(name = "packet_processor_close_connection", enabled = true)
         fun TCB.closeConnection(buffer: ByteBuffer) {
-            Timber.v("Closing TCB connection $ipAndPort}")
+            Timber.v("Closing TCB connection $ipAndPort")
             ByteBufferPool.release(buffer)
             TCB.closeTCB(this)
         }

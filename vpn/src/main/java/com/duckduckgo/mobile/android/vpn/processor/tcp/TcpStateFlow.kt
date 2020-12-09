@@ -42,7 +42,7 @@ class TcpStateFlow {
                 ESTABLISHED -> handlePacketInEstablished(connectionKey, currentState, packetType)
                 LAST_ACK -> handlePacketInLastAck(packetType, connectionKey, currentState)
                 FIN_WAIT_1 -> handlePacketInFinWait1(connectionKey, currentState, packetType)
-                FIN_WAIT_2 -> handlePacketInFinWait2(connectionKey, currentState, packetType)
+                FIN_WAIT_2 -> handlePacketInFinWait2(connectionKey, packetType)
                 CLOSING -> handlePacketInClosing(connectionKey, currentState, packetType)
                 TIME_WAIT -> handlePacketInTimeWait(packetType)
                 CLOSED -> handlePacketInClosed(packetType)
@@ -140,7 +140,7 @@ class TcpStateFlow {
         }
 
         @AddTrace(name = "tcp_state_flow_handle_fin_wait_2", enabled = true)
-        private fun handlePacketInFinWait2(connectionKey: String, currentState: TcbState, packetType: PacketType): List<Event> {
+        private fun handlePacketInFinWait2(connectionKey: String, packetType: PacketType): List<Event> {
             val eventList = mutableListOf<Event>()
 
             eventList.addAll(
@@ -149,14 +149,17 @@ class TcpStateFlow {
                         listOf(SendAck, MoveServerToState(CLOSING), MoveClientToState(TIME_WAIT), DelayedCloseConnection)
                     }
                     packetType.isRst -> {
-                        Timber.w("Received RESET while in FIN_WAIT_2. Closing connection")
+                        Timber.w("%s - Received RESET while in FIN_WAIT_2. Closing connection", connectionKey)
                         listOf(CloseConnection)
                     }
                     packetType.hasData -> {
                         listOf(ProcessPacket)
                     }
 
-                    else -> listOf(SendReset)
+                    else -> {
+                        Timber.w("%s - Received packet while in FIN_WAIT_2 - ignoring", connectionKey)
+                        emptyList()
+                    }
                 }
             )
 
@@ -203,7 +206,10 @@ class TcpStateFlow {
                     listOf(OpenConnection)
                 }
                 packetType.hasData -> listOf(SendAck)
-                else -> listOf(SendReset)
+                else -> {
+                    Timber.w("%s - Received packet in LISTEN state, but not a SYN or RST.", connectionKey)
+                    listOf(SendReset)
+                }
             }
         }
 
@@ -270,8 +276,9 @@ class TcpStateFlow {
             return TcpStateAction(eventList)
         }
 
-        fun socketEndOfStream(currentState: TcbState): TcpStateAction {
-            return TcpStateAction(listOf(SendFin, MoveServerToState(FIN_WAIT_1), MoveClientToState(LAST_ACK)))
+        fun socketEndOfStream(): TcpStateAction {
+            val deferredStateMoves = listOf(MoveServerToState(FIN_WAIT_1), MoveClientToState(LAST_ACK))
+            return TcpStateAction(listOf(SendDelayedFin(deferredStateMoves)))
         }
 
         private fun unhandledEvent(connectionKey: String, currentState: TcbState, packetType: PacketType): List<Event> {
@@ -307,6 +314,7 @@ class TcpStateFlow {
         object ProcessPacket : Event()
         object SendAck : Event()
         object SendFin : Event()
+        data class SendDelayedFin(val events: List<MoveState>) : Event()
         object SendFinWithData : Event()
         object SendSynAck : Event()
         object SendReset : Event()

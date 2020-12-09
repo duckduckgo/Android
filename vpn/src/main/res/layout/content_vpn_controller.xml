@@ -19,8 +19,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    android:fillViewport="true">
+    android:fillViewport="true"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
@@ -33,21 +33,21 @@
             android:layout_marginStart="32dp"
             android:layout_marginTop="6dp"
             android:layout_marginEnd="32dp"
-            tools:text="Today, the VPN has been running for 45 min"
             android:textSize="18sp"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="Today, the VPN has been running for 45 min" />
 
         <TextView
             android:id="@+id/vpnDataSentLabel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="32dp"
+            android:layout_marginTop="20dp"
             android:layout_marginEnd="32dp"
+            android:text="Data Sent:"
             android:textSize="20sp"
             android:textStyle="bold"
-            android:layout_marginTop="20dp"
-            android:text="Data Sent:"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/vpnTodayRunningTime" />
 
@@ -68,11 +68,11 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="32dp"
+            android:layout_marginTop="20dp"
             android:layout_marginEnd="32dp"
+            android:text="Data Received:"
             android:textSize="20sp"
             android:textStyle="bold"
-            android:layout_marginTop="20dp"
-            android:text="Data Received:"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/vpnSentStats" />
 
@@ -94,11 +94,11 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="32dp"
+            android:layout_marginTop="20dp"
             android:layout_marginEnd="32dp"
+            android:text="Trackers:"
             android:textSize="20sp"
             android:textStyle="bold"
-            android:layout_marginTop="20dp"
-            android:text="Trackers:"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/vpnReceivedStats" />
 
@@ -162,13 +162,24 @@
             android:layout_marginStart="8dp"
             android:layout_marginEnd="8dp"
             android:layout_marginBottom="24dp"
+            android:padding="10dp"
             android:textAlignment="center"
             android:textSize="16sp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/vpnRunningButton"
             app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/vpnRunningButton"
             tools:text="UUID is: XXXXXXXXXXXXXXXXXXX" />
+
+        <TextView
+            android:id="@+id/appVersionText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            app:layout_constraintEnd_toEndOf="@id/vpnUUID"
+            app:layout_constraintStart_toStartOf="@id/vpnUUID"
+            app:layout_constraintTop_toBottomOf="@id/vpnUUID"
+            tools:text="1.23.4" />
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>

@@ -60,6 +60,7 @@ class VpnControllerActivity : AppCompatActivity(R.layout.activity_vpn_controller
 
     private lateinit var lastTrackerDomainTextView: TextView
     private lateinit var timeRunningTodayTextView: TextView
+    private lateinit var appVersionText: TextView
     private lateinit var trackerCompaniesBlockedTextView: TextView
     private lateinit var trackersBlockedTextView: TextView
     private lateinit var dataSentTextView: TextView
@@ -149,6 +150,7 @@ class VpnControllerActivity : AppCompatActivity(R.layout.activity_vpn_controller
         dataReceivedTextView = findViewById(R.id.vpnReceivedStats)
         vpnRunningToggleButton = findViewById(R.id.vpnRunningButton)
         uuidTextView = findViewById(R.id.vpnUUID)
+        appVersionText = findViewById<TextView>(R.id.appVersionText).also { it.text = packageManager.getPackageInfo(packageName, 0).versionName }
     }
 
     private fun configureUiHandlers() {
@@ -168,7 +170,9 @@ class VpnControllerActivity : AppCompatActivity(R.layout.activity_vpn_controller
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
-            R.id.reportFeedback -> { launchFeedback(); true }
+            R.id.reportFeedback -> {
+                launchFeedback(); true
+            }
             else -> super.onOptionsItemSelected(item)
         }
     }

@@ -377,7 +377,8 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
         "org.zwanoo.android.speedtest",
         "com.netflix.Speedtest",
         "eu.vspeed.android",
-        "net.fireprobe.android"
+        "net.fireprobe.android",
+        "com.philips.lighting.hue2"
     )
 }
 

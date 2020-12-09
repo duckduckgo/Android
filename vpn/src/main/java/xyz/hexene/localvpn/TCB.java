@@ -27,6 +27,7 @@ import timber.log.Timber;
 
 /** Transmission Control Block */
 public class TCB {
+    public final long creationTime;
     public String ipAndPort;
 
     public long sequenceNumberToClient, sequenceNumberToClientInitial;
@@ -62,7 +63,7 @@ public class TCB {
     public boolean waitingForNetworkData;
     public SelectionKey selectionKey;
 
-    private static final int MAX_CACHE_SIZE = 50; // XXX: Is this ideal?
+    private static final int MAX_CACHE_SIZE = 500; // XXX: Is this ideal?
     public static LRUCache<String, TCB> tcbCache =
             new LRUCache<>(
                     MAX_CACHE_SIZE,
@@ -107,12 +108,16 @@ public class TCB {
 
         this.channel = channel;
         this.referencePacket = referencePacket;
+        this.creationTime = System.nanoTime();
     }
 
     public static void closeTCB(TCB tcb) {
         tcb.closeChannel();
         synchronized (tcbCache) {
             tcbCache.remove(tcb.ipAndPort);
+            Timber.v(
+                    "Closed %s. There are now %d connections in the TCB cache",
+                    tcb.ipAndPort, tcbCache.size());
         }
     }
 

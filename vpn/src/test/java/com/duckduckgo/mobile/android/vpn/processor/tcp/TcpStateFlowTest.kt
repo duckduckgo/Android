@@ -253,11 +253,11 @@ class TcpStateFlowTest {
     }
 
     @Test
-    fun whenFinWait2AndUnexpectedPacketThenSendReset() {
+    fun whenFinWait2AndUnexpectedPacketThenIgnore() {
         val tcbState = givenTcbState(serverState = FIN_WAIT_2, clientState = ESTABLISHED)
         val response = whenANewPacketArrives(tcbState, SYN_PACKET)
 
-        assertTrue(response.events[0] is SendReset)
+        assertTrue(response.events.isEmpty())
     }
 
     @Test
