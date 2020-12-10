@@ -24,6 +24,7 @@ import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpStateFlow.Event.*
 import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpStateFlow.Event.MoveState.MoveClientToState
 import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpStateFlow.Event.MoveState.MoveServerToState
 import com.duckduckgo.mobile.android.vpn.service.VpnQueues
+import com.duckduckgo.mobile.android.vpn.store.PACKET_TYPE_TCP
 import com.duckduckgo.mobile.android.vpn.store.PacketPersister
 import com.google.firebase.perf.metrics.AddTrace
 import timber.log.Timber
@@ -111,7 +112,7 @@ class TcpNetworkToDevice(
                     handleEndOfStream(tcb, packet, key, channel)
                     return
                 } else {
-                    packetPersister.persistDataReceived(readBytes, "TCP")
+                    packetPersister.persistDataReceived(readBytes, PACKET_TYPE_TCP)
                     sendToNetworkToDeviceQueue(packet, receiveBuffer, tcb, readBytes)
                 }
             } catch (e: IOException) {

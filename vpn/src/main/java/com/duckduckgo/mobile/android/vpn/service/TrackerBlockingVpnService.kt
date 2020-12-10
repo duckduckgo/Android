@@ -108,7 +108,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
         super.onCreate()
         AndroidInjection.inject(this)
 
-        udpPacketProcessor = UdpPacketProcessor(queues, this, packetPersister)
+        udpPacketProcessor = UdpPacketProcessor(queues, packetPersister, this)
         tcpPacketProcessor = TcpPacketProcessor(queues, this, trackerDetector, packetPersister, localAddressDetector)
 
         Timber.i("VPN onCreate")
@@ -219,7 +219,12 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
 
             // Can either route all apps through VPN and exclude a few (better for prod), or exclude all apps and include a few (better for dev)
             val limitingToTestApps = false
-            if (limitingToTestApps) safelyAddAllowedApps(INCLUDED_APPS_FOR_TESTING) else safelyAddDisallowedApps(EXCLUDED_APPS)
+            if (limitingToTestApps) {
+                safelyAddAllowedApps(INCLUDED_APPS_FOR_TESTING)
+                Timber.w("Limiting VPN to test apps only:\n${INCLUDED_APPS_FOR_TESTING.joinToString(separator = "\n") { it }}")
+            } else {
+                safelyAddDisallowedApps(EXCLUDED_APPS)
+            }
 
             establish()
         }
@@ -355,12 +360,17 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
         private const val ACTION_STOP_VPN = "ACTION_STOP_VPN"
 
         const val FOREGROUND_VPN_SERVICE_ID = 200
+
     }
 
     override fun createDatagramChannel(): DatagramChannel {
         return DatagramChannel.open().also { channel ->
-            protect(channel.socket())
             channel.configureBlocking(false)
+            channel.socket().let {
+                it.bind(null)
+                it.broadcast = true
+                protect(it)
+            }
         }
     }
 

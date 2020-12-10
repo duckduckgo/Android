@@ -19,6 +19,9 @@ package com.duckduckgo.mobile.android.vpn.store
 import timber.log.Timber
 import javax.inject.Inject
 
+const val PACKET_TYPE_UDP = "UDP"
+const val PACKET_TYPE_TCP = "TCP"
+
 interface PacketPersister {
     fun persistDataSent(packetLength: Int, packetType: String)
     fun persistDataReceived(packetLength: Int, packetType: String)
