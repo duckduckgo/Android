@@ -23,5 +23,11 @@
             <certificates src="user" />
         </trust-anchors>
     </debug-overrides>
-    <base-config cleartextTrafficPermitted="true" />
+    <base-config cleartextTrafficPermitted="true" >
+        <trust-anchors>
+            <certificates src="@raw/isrg_root_x1" />
+            <certificates src="@raw/isrg_root_x2" />
+            <certificates src="system" />
+        </trust-anchors>
+    </base-config>
 </network-security-config>
