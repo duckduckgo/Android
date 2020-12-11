@@ -718,7 +718,8 @@ class BrowserTabViewModel(
             is PageNavigationCleared -> disableUserNavigation()
         }
 
-        if (!isRedirecting && newWebNavigationState.progress ?: 0 >= SHOW_CONTENT_MIN_PROGRESS) {
+        //if (!isRedirecting && newWebNavigationState.progress ?: 0 >= SHOW_CONTENT_MIN_PROGRESS) {
+        if (newWebNavigationState.progress ?: 0 >= SHOW_CONTENT_MIN_PROGRESS) {
             showWebContent()
         }
         navigationAwareLoginDetector.onEvent(NavigationEvent.WebNavigationEvent(stateChange))
@@ -932,7 +933,8 @@ class BrowserTabViewModel(
         val showLoadingGrade = progress.privacyOn || isLoading
         privacyGradeViewState.value = currentPrivacyGradeState().copy(shouldAnimate = isLoading, showEmptyGrade = showLoadingGrade)
 
-        if (newProgress == 100 && !isRedirecting) {
+        //if (newProgress == 100 && !isRedirecting) {
+        if (newProgress == 100) {
             navigationAwareLoginDetector.onEvent(NavigationEvent.PageFinished)
         }
     }
@@ -1706,6 +1708,10 @@ class BrowserTabViewModel(
     private fun recoverTabWithQuery(query: String) {
         closeCurrentTab()
         command.value = OpenInNewTab(query)
+    }
+
+    override fun redirectTriggeredByGpc() {
+        navigationAwareLoginDetector.onEvent(NavigationEvent.GpcRedirect)
     }
 
     override fun loginDetected() {

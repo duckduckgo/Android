@@ -21,6 +21,7 @@ import android.webkit.WebResourceResponse
 import android.webkit.WebView
 import androidx.annotation.WorkerThread
 import com.duckduckgo.app.global.isHttp
+import com.duckduckgo.app.globalprivacycontrol.GlobalPrivacyControl
 import com.duckduckgo.app.httpsupgrade.HttpsUpgrader
 import com.duckduckgo.app.privacy.db.PrivacyProtectionCountDao
 import com.duckduckgo.app.privacy.model.TrustedSites
@@ -45,8 +46,8 @@ class WebViewRequestInterceptor(
     private val resourceSurrogates: ResourceSurrogates,
     private val trackerDetector: TrackerDetector,
     private val httpsUpgrader: HttpsUpgrader,
-    private val privacyProtectionCountDao: PrivacyProtectionCountDao
-
+    private val privacyProtectionCountDao: PrivacyProtectionCountDao,
+    private val globalPrivacyControl: GlobalPrivacyControl
 ) : RequestInterceptor {
 
     /**
@@ -72,11 +73,29 @@ class WebViewRequestInterceptor(
             val newUri = httpsUpgrader.upgrade(url)
 
             withContext(Dispatchers.Main) {
-                webView.loadUrl(newUri.toString())
+                val headers = request.requestHeaders
+                headers.putAll(globalPrivacyControl.getHeaders())
+                webView.loadUrl(newUri.toString(), headers)
             }
 
             webViewClientListener?.upgradedToHttps()
             privacyProtectionCountDao.incrementUpgradeCount()
+            return WebResourceResponse(null, null, null)
+        }
+
+        val headers = request.requestHeaders
+        if (globalPrivacyControl.isGpcActive() && request.isForMainFrame && request.hasGesture() && request.method == "GET" && !headers.containsKey("sec-gpc")) {
+
+            headers.putAll(globalPrivacyControl.getHeaders())
+
+            Timber.d("MARCOS add headers ${documentUrl} ${request.hasGesture()} ${request.method} ${request.url}")
+            headers.keys.map {
+                Timber.d("MARCOS key $it value ${headers[it]}")
+            }
+            withContext(Dispatchers.Main) {
+                webViewClientListener?.redirectTriggeredByGpc()
+                webView.loadUrl(url.toString(), headers)
+            }
             return WebResourceResponse(null, null, null)
         }
 

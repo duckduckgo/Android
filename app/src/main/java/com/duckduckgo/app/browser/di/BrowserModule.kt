@@ -167,8 +167,9 @@ class BrowserModule {
         resourceSurrogates: ResourceSurrogates,
         trackerDetector: TrackerDetector,
         httpsUpgrader: HttpsUpgrader,
-        privacyProtectionCountDao: PrivacyProtectionCountDao
-    ): RequestInterceptor = WebViewRequestInterceptor(resourceSurrogates, trackerDetector, httpsUpgrader, privacyProtectionCountDao)
+        privacyProtectionCountDao: PrivacyProtectionCountDao,
+        globalPrivacyControl: GlobalPrivacyControl
+    ): RequestInterceptor = WebViewRequestInterceptor(resourceSurrogates, trackerDetector, httpsUpgrader, privacyProtectionCountDao, globalPrivacyControl)
 
     @Provides
     fun cookieManager(

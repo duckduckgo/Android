@@ -51,6 +51,7 @@ class BrowserWebViewClient(
 
     var webViewClientListener: WebViewClientListener? = null
     private var lastPageStarted: String? = null
+
     /**
      * This is the new method of url overriding available from API 24 onwards
      */
@@ -105,22 +106,18 @@ class BrowserWebViewClient(
                 }
                 is SpecialUrlDetector.UrlType.Unknown -> {
                     Timber.w("Unable to process link type for ${urlType.url}")
-                    webView.loadUrl(webView.originalUrl, globalPrivacyControl.getHeaders())
+                    webView.loadUrl(webView.originalUrl)
                     false
                 }
                 is SpecialUrlDetector.UrlType.SearchQuery -> false
                 is SpecialUrlDetector.UrlType.Web -> {
                     if (requestRewriter.shouldRewriteRequest(url)) {
                         val newUri = requestRewriter.rewriteRequestWithCustomQueryParams(url)
-                        webView.loadUrl(newUri.toString(), globalPrivacyControl.getHeaders())
+                        webView.loadUrl(newUri.toString())
                         return true
                     }
                     if (isForMainFrame) {
                         webViewClientListener?.willOverrideUrl(url.toString())
-                        if (globalPrivacyControl.isGpcActive()) {
-                            webView.loadUrl(url.toString(), globalPrivacyControl.getHeaders())
-                            return true
-                        }
                     }
                     return false
                 }
