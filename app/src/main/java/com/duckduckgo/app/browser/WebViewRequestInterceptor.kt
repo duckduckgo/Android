@@ -22,6 +22,7 @@ import android.webkit.WebView
 import androidx.annotation.WorkerThread
 import com.duckduckgo.app.global.isHttp
 import com.duckduckgo.app.globalprivacycontrol.GlobalPrivacyControl
+import com.duckduckgo.app.globalprivacycontrol.GlobalPrivacyControlManager
 import com.duckduckgo.app.httpsupgrade.HttpsUpgrader
 import com.duckduckgo.app.privacy.db.PrivacyProtectionCountDao
 import com.duckduckgo.app.privacy.model.TrustedSites
@@ -30,6 +31,7 @@ import com.duckduckgo.app.trackerdetection.TrackerDetector
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import timber.log.Timber
+import java.util.Locale
 
 interface RequestInterceptor {
 
@@ -83,15 +85,9 @@ class WebViewRequestInterceptor(
             return WebResourceResponse(null, null, null)
         }
 
-        val headers = request.requestHeaders
-        if (globalPrivacyControl.isGpcActive() && request.isForMainFrame && request.hasGesture() && request.method == "GET" && !headers.containsKey("sec-gpc")) {
-
+        if (shouldAddGcpHeaders(request)) {
+            val headers = request.requestHeaders
             headers.putAll(globalPrivacyControl.getHeaders())
-
-            Timber.d("MARCOS add headers ${documentUrl} ${request.hasGesture()} ${request.method} ${request.url}")
-            headers.keys.map {
-                Timber.d("MARCOS key $it value ${headers[it]}")
-            }
             withContext(Dispatchers.Main) {
                 webViewClientListener?.redirectTriggeredByGpc()
                 webView.loadUrl(url.toString(), headers)
@@ -123,6 +119,15 @@ class WebViewRequestInterceptor(
         }
 
         return null
+    }
+
+    private fun shouldAddGcpHeaders(request: WebResourceRequest): Boolean {
+        val headers = request.requestHeaders
+        return (globalPrivacyControl.isGpcActive() &&
+                !headers.containsKey(GlobalPrivacyControlManager.GPC_HEADER.toLowerCase(Locale.ROOT)) &&
+                request.isForMainFrame &&
+                request.hasGesture() &&
+                request.method == "GET")
     }
 
     private fun shouldUpgrade(request: WebResourceRequest) =

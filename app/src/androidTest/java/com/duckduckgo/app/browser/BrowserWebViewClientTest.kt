@@ -182,38 +182,6 @@ class BrowserWebViewClientTest {
     }
 
     @Test
-    fun whenShouldOverrideUrlCalledOnMainFrameAndTypeIsWebAndGpcActiveThenLoadUrlWithGpcHeaders() {
-        givenRequestIsFromMainFrame()
-        givenUrlIsTypeWeb()
-        whenever(globalPrivacyControl.isGpcActive()).thenReturn(true)
-        whenever(globalPrivacyControl.getHeaders()).thenReturn(mapOf())
-
-        val mockWebView: WebView = mock()
-        if (Build.VERSION.SDK_INT <= 23) {
-            testee.shouldOverrideUrlLoading(mockWebView, EXAMPLE_URL)
-        } else {
-            testee.shouldOverrideUrlLoading(mockWebView, request)
-        }
-        verify(mockWebView).loadUrl(EXAMPLE_URL, globalPrivacyControl.getHeaders())
-    }
-
-    @Test
-    fun whenShouldOverrideUrlCalledOnMainFrameAndTypeIsWebAndGpcIsNotActiveThenLoadUrlNotCalled() {
-        givenRequestIsFromMainFrame()
-        givenUrlIsTypeWeb()
-        whenever(globalPrivacyControl.isGpcActive()).thenReturn(false)
-        whenever(globalPrivacyControl.getHeaders()).thenReturn(mapOf())
-
-        val mockWebView: WebView = mock()
-        if (Build.VERSION.SDK_INT <= 23) {
-            testee.shouldOverrideUrlLoading(mockWebView, EXAMPLE_URL)
-        } else {
-            testee.shouldOverrideUrlLoading(mockWebView, request)
-        }
-        verify(mockWebView, never()).loadUrl(any(), any())
-    }
-
-    @Test
     fun whenShouldOverrideUrlCalledForMainFrameAndRequestContainsHeadersThenPixelSent() {
         givenRequestIsFromMainFrame(mapOf("test" to "test"))
         givenUrlIsTypeWeb()

@@ -19,11 +19,14 @@
 package com.duckduckgo.app.browser
 
 import android.net.Uri
+import android.os.Build
 import android.webkit.WebResourceRequest
 import android.webkit.WebResourceResponse
 import android.webkit.WebView
 import androidx.test.annotation.UiThreadTest
 import com.duckduckgo.app.CoroutineTestRule
+import com.duckduckgo.app.globalprivacycontrol.GlobalPrivacyControl
+import com.duckduckgo.app.globalprivacycontrol.GlobalPrivacyControlManager
 import com.duckduckgo.app.httpsupgrade.HttpsUpgrader
 import com.duckduckgo.app.privacy.db.PrivacyProtectionCountDao
 import com.duckduckgo.app.surrogates.ResourceSurrogates
@@ -53,19 +56,21 @@ class WebViewRequestInterceptorTest {
     private var mockResourceSurrogates: ResourceSurrogates = mock()
     private var mockRequest: WebResourceRequest = mock()
     private val mockPrivacyProtectionCountDao: PrivacyProtectionCountDao = mock()
+    private val mockGlobalPrivacyControl: GlobalPrivacyControl = mock()
 
     private var webView: WebView = mock()
 
     @UiThreadTest
     @Before
     fun setup() {
-        MockitoAnnotations.initMocks(this)
+        MockitoAnnotations.openMocks(this)
 
         testee = WebViewRequestInterceptor(
             trackerDetector = mockTrackerDetector,
             httpsUpgrader = mockHttpsUpgrader,
             resourceSurrogates = mockResourceSurrogates,
-            privacyProtectionCountDao = mockPrivacyProtectionCountDao
+            privacyProtectionCountDao = mockPrivacyProtectionCountDao,
+            globalPrivacyControl = mockGlobalPrivacyControl
         )
     }
 
@@ -333,6 +338,93 @@ class WebViewRequestInterceptorTest {
         verify(mockWebViewClientListener).upgradedToHttps()
     }
 
+    @Test
+    fun whenUrlShouldBeUpgradedAndGcpActiveThenLoadUrlWithGpcHeaders() = runBlocking<Unit> {
+        configureShouldUpgrade()
+        configureShouldAddGpcHeader()
+        val mockWebView: WebView = mock()
+        val mockWebViewClientListener: WebViewClientListener = mock()
+
+        testee.shouldIntercept(
+            request = mockRequest,
+            documentUrl = null,
+            webView = mockWebView,
+            webViewClientListener = mockWebViewClientListener
+        )
+
+        verify(mockWebView).loadUrl(validHttpsUri().toString(), mockGlobalPrivacyControl.getHeaders())
+    }
+
+
+    @Test
+    fun whenRequestShouldAddGcpHeadersThenRedirectTriggeredByGpcCalled() = runBlocking<Unit> {
+        configureShouldNotUpgrade()
+        configureShouldAddGpcHeader()
+        val mockWebView: WebView = mock()
+        val mockWebViewClientListener: WebViewClientListener = mock()
+
+        testee.shouldIntercept(
+            request = mockRequest,
+            documentUrl = null,
+            webView = mockWebView,
+            webViewClientListener = mockWebViewClientListener
+        )
+
+        verify(mockWebViewClientListener).redirectTriggeredByGpc()
+    }
+
+    @Test
+    fun whenRequestShouldAddGcpHeadersThenLoadUrlWithGpcHeaders() = runBlocking<Unit> {
+        configureShouldNotUpgrade()
+        configureShouldAddGpcHeader()
+        val mockWebView: WebView = mock()
+        val mockWebViewClientListener: WebViewClientListener = mock()
+
+        testee.shouldIntercept(
+            request = mockRequest,
+            documentUrl = null,
+            webView = mockWebView,
+            webViewClientListener = mockWebViewClientListener
+        )
+
+        verify(mockWebView).loadUrl(validUri().toString(), mockGlobalPrivacyControl.getHeaders())
+    }
+
+    @Test
+    fun whenRequestShouldAddGcpHeadersButAlreadyContainsHeadersThenLoadUrlNotCalled() = runBlocking<Unit> {
+        configureShouldNotUpgrade()
+        configureRequestContainsGcpHeader()
+
+        val mockWebView: WebView = mock()
+        val mockWebViewClientListener: WebViewClientListener = mock()
+
+        testee.shouldIntercept(
+            request = mockRequest,
+            documentUrl = null,
+            webView = mockWebView,
+            webViewClientListener = mockWebViewClientListener
+        )
+
+        verify(mockWebView, never()).loadUrl(any(), any())
+    }
+
+    @Test
+    fun whenRequestShouldNotAddGcpHeadersThenLoadUrlNotCalled() = runBlocking<Unit> {
+        configureShouldNotUpgrade()
+        configureShouldNotAddGpcHeader()
+        val mockWebView: WebView = mock()
+        val mockWebViewClientListener: WebViewClientListener = mock()
+
+        testee.shouldIntercept(
+            request = mockRequest,
+            documentUrl = null,
+            webView = mockWebView,
+            webViewClientListener = mockWebViewClientListener
+        )
+
+        verify(mockWebView, never()).loadUrl(any(), any())
+    }
+
     private fun assertRequestCanContinueToLoad(response: WebResourceResponse?) {
         assertNull(response)
     }
@@ -347,6 +439,28 @@ class WebViewRequestInterceptorTest {
         )
         whenever(mockRequest.isForMainFrame).thenReturn(false)
         whenever(mockTrackerDetector.evaluate(any(), any())).thenReturn(blockTrackingEvent)
+    }
+
+    private fun configureRequestContainsGcpHeader() = runBlocking<Unit> {
+        whenever(mockGlobalPrivacyControl.isGpcActive()).thenReturn(true)
+        whenever(mockRequest.method).thenReturn("GET")
+        whenever(mockRequest.hasGesture()).thenReturn(true)
+        whenever(mockRequest.requestHeaders).thenReturn(mapOf(GlobalPrivacyControlManager.GPC_HEADER.toLowerCase() to "test"))
+
+    }
+
+    private fun configureShouldAddGpcHeader() = runBlocking<Unit> {
+        whenever(mockGlobalPrivacyControl.isGpcActive()).thenReturn(true)
+        whenever(mockGlobalPrivacyControl.getHeaders()).thenReturn(mapOf("test" to "test"))
+        whenever(mockRequest.method).thenReturn("GET")
+        whenever(mockRequest.hasGesture()).thenReturn(true)
+    }
+
+    private fun configureShouldNotAddGpcHeader() = runBlocking<Unit> {
+        whenever(mockGlobalPrivacyControl.isGpcActive()).thenReturn(false)
+        whenever(mockGlobalPrivacyControl.getHeaders()).thenReturn(mapOf("test" to "test"))
+        whenever(mockRequest.method).thenReturn("GET")
+        whenever(mockRequest.hasGesture()).thenReturn(true)
     }
 
     private fun configureShouldUpgrade() = runBlocking<Unit> {
