@@ -136,7 +136,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
         var returnCode: Int = Service.START_NOT_STICKY
 
         when (val action = intent?.action) {
-            ACTION_START_VPN -> {
+            ACTION_START_VPN, ACTION_ALWAYS_ON_START -> {
                 startVpn()
                 returnCode = Service.START_REDELIVER_INTENT
             }
@@ -358,6 +358,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
 
         private const val ACTION_START_VPN = "ACTION_START_VPN"
         private const val ACTION_STOP_VPN = "ACTION_STOP_VPN"
+        private const val ACTION_ALWAYS_ON_START = "android.net.VpnService"
 
         const val FOREGROUND_VPN_SERVICE_ID = 200
 
