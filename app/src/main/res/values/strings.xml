@@ -496,7 +496,7 @@
     <string name="preciseLocationSiteDialogDenyOnce">Deny for this session</string>
     <string name="settingsPreciseLocation">Location</string>
     <string name="preciseLocationFeatureDescription">Sites you visit may ask to know your device location. They won\'t be able to access it until you explicitly grant permission. DuckDuckGo only uses your location anonymously to deliver local search results.</string>
-    <string name="preciseLocationToggleText">Sites can ask for my location</string>
+    <string name="preciseLocationToggleText">Sites Can Ask for My Location</string>
     <string name="preciseLocationEmptyListHint">No websites granted permission to access location</string>
     <string name="preciseLocationNoSystemPermission">To manage the location access permissions you\’ve granted to individual sites, enable location for this app in Android Settings.</string>
     <string name="preciseLocationActivityTitle">Location</string>
