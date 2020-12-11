@@ -108,7 +108,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
         super.onCreate()
         AndroidInjection.inject(this)
 
-        udpPacketProcessor = UdpPacketProcessor(queues, packetPersister, this)
+        udpPacketProcessor = UdpPacketProcessor(queues, this, packetPersister)
         tcpPacketProcessor = TcpPacketProcessor(queues, this, trackerDetector, packetPersister, localAddressDetector)
 
         Timber.i("VPN onCreate")
@@ -361,17 +361,12 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
         private const val ACTION_ALWAYS_ON_START = "android.net.VpnService"
 
         const val FOREGROUND_VPN_SERVICE_ID = 200
-
     }
 
     override fun createDatagramChannel(): DatagramChannel {
         return DatagramChannel.open().also { channel ->
+            protect(channel.socket())
             channel.configureBlocking(false)
-            channel.socket().let {
-                it.bind(null)
-                it.broadcast = true
-                protect(it)
-            }
         }
     }
 
