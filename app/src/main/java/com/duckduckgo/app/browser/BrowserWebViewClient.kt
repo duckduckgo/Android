@@ -119,7 +119,7 @@ class BrowserWebViewClient(
                     if (isForMainFrame) {
                         webViewClientListener?.willOverrideUrl(url.toString())
                     }
-                    return false
+                    false
                 }
             }
         } catch (e: Throwable) {

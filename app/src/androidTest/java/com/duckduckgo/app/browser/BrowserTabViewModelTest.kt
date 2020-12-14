@@ -48,6 +48,7 @@ import com.duckduckgo.app.browser.downloader.FileDownloader
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.logindetection.LoginDetected
 import com.duckduckgo.app.browser.logindetection.NavigationAwareLoginDetector
+import com.duckduckgo.app.browser.logindetection.NavigationEvent
 import com.duckduckgo.app.browser.logindetection.NavigationEvent.LoginAttempt
 import com.duckduckgo.app.browser.model.BasicAuthenticationCredentials
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
@@ -3016,6 +3017,12 @@ class BrowserTabViewModelTest {
         advanceTimeBy(3_600_000)
         verify(mockDismissedCtaDao).insert(DismissedCta(CtaId.DAX_FIRE_BUTTON))
         verify(mockDismissedCtaDao).insert(DismissedCta(CtaId.DAX_FIRE_BUTTON_PULSE))
+    }
+
+    @Test
+    fun whenRedirectTriggeredByGpcThenGpcRedirectEventSent() {
+        testee.redirectTriggeredByGpc()
+        verify(mockNavigationAwareLoginDetector).onEvent(NavigationEvent.GpcRedirect)
     }
 
     private suspend fun givenFireButtonPulsing() {
