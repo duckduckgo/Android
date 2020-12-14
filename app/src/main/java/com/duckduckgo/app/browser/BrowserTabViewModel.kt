@@ -319,6 +319,7 @@ class BrowserTabViewModel(
     private lateinit var tabId: String
     private var webNavigationState: WebNavigationState? = null
     private var httpsUpgraded = false
+    private var shouldShoudNewProgress = true
     private val browserStateModifier = BrowserStateModifier()
     private var faviconPrefetchJob: Job? = null
     private var deferredBlankSite: Job? = null
@@ -922,12 +923,13 @@ class BrowserTabViewModel(
         } else {
             newProgress
         }
-        loadingViewState.value = progress.copy(isLoading = isLoading, progress = visualProgress)
+        if (shouldShoudNewProgress) loadingViewState.value = progress.copy(isLoading = isLoading, progress = visualProgress)
 
         val showLoadingGrade = progress.privacyOn || isLoading
         privacyGradeViewState.value = currentPrivacyGradeState().copy(shouldAnimate = isLoading, showEmptyGrade = showLoadingGrade)
         if (newProgress == 100) {
             navigationAwareLoginDetector.onEvent(NavigationEvent.PageFinished)
+            shouldShoudNewProgress = true
         }
     }
 
@@ -1707,6 +1709,7 @@ class BrowserTabViewModel(
     }
 
     override fun redirectTriggeredByGpc() {
+        shouldShoudNewProgress = false
         navigationAwareLoginDetector.onEvent(NavigationEvent.GpcRedirect)
     }
 
