@@ -322,7 +322,6 @@ class BrowserTabViewModel(
     private val browserStateModifier = BrowserStateModifier()
     private var faviconPrefetchJob: Job? = null
     private var deferredBlankSite: Job? = null
-    private var isRedirecting: Boolean = false
 
     private val fireproofWebsitesObserver = Observer<List<FireproofWebsiteEntity>> {
         browserViewState.value = currentBrowserViewState().copy(isFireproofWebsite = isFireproofWebsite())
@@ -565,7 +564,6 @@ class BrowserTabViewModel(
     }
 
     override fun willOverrideUrl(newUrl: String) {
-        isRedirecting = true
         val previousSiteStillLoading = currentLoadingViewState().isLoading
         if (previousSiteStillLoading) {
             showBlankContentfNewContentDelayed()
@@ -718,7 +716,6 @@ class BrowserTabViewModel(
             is PageNavigationCleared -> disableUserNavigation()
         }
 
-        //if (!isRedirecting && newWebNavigationState.progress ?: 0 >= SHOW_CONTENT_MIN_PROGRESS) {
         if (newWebNavigationState.progress ?: 0 >= SHOW_CONTENT_MIN_PROGRESS) {
             showWebContent()
         }
@@ -746,7 +743,6 @@ class BrowserTabViewModel(
     private fun pageChanged(url: String, title: String?) {
         Timber.v("Page changed: $url")
         val previousUrl = site?.url
-        isRedirecting = false
 
         buildSiteFactory(url, title)
 
@@ -871,7 +867,6 @@ class BrowserTabViewModel(
     private fun urlUpdated(url: String) {
         Timber.v("Page url updated: $url")
         site?.url = url
-        isRedirecting = false
         onSiteChanged()
         val currentOmnibarViewState = currentOmnibarViewState()
         omnibarViewState.postValue(currentOmnibarViewState.copy(omnibarText = omnibarTextForUrl(url), shouldMoveCaretToEnd = false))
@@ -891,7 +886,6 @@ class BrowserTabViewModel(
     private fun pageCleared() {
         Timber.v("Page cleared: $url")
         site = null
-        isRedirecting = false
         onSiteChanged()
 
         val currentBrowserViewState = currentBrowserViewState()
@@ -933,7 +927,6 @@ class BrowserTabViewModel(
         val showLoadingGrade = progress.privacyOn || isLoading
         privacyGradeViewState.value = currentPrivacyGradeState().copy(shouldAnimate = isLoading, showEmptyGrade = showLoadingGrade)
 
-        //if (newProgress == 100 && !isRedirecting) {
         if (newProgress == 100) {
             navigationAwareLoginDetector.onEvent(NavigationEvent.PageFinished)
         }
@@ -1691,7 +1684,6 @@ class BrowserTabViewModel(
     }
 
     private fun disableUserNavigation() {
-        isRedirecting = false
         browserViewState.value = currentBrowserViewState().copy(
             canGoBack = false,
             canGoForward = false,

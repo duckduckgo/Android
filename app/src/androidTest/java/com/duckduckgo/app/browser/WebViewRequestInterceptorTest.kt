@@ -19,7 +19,6 @@
 package com.duckduckgo.app.browser
 
 import android.net.Uri
-import android.os.Build
 import android.webkit.WebResourceRequest
 import android.webkit.WebResourceResponse
 import android.webkit.WebView
@@ -355,7 +354,6 @@ class WebViewRequestInterceptorTest {
         verify(mockWebView).loadUrl(validHttpsUri().toString(), mockGlobalPrivacyControl.getHeaders())
     }
 
-
     @Test
     fun whenRequestShouldAddGcpHeadersThenRedirectTriggeredByGpcCalled() = runBlocking<Unit> {
         configureShouldNotUpgrade()
@@ -444,7 +442,6 @@ class WebViewRequestInterceptorTest {
     private fun configureRequestContainsGcpHeader() = runBlocking<Unit> {
         whenever(mockGlobalPrivacyControl.isGpcActive()).thenReturn(true)
         whenever(mockRequest.method).thenReturn("GET")
-        whenever(mockRequest.hasGesture()).thenReturn(true)
         whenever(mockRequest.requestHeaders).thenReturn(mapOf(GlobalPrivacyControlManager.GPC_HEADER.toLowerCase() to "test"))
 
     }
@@ -453,14 +450,12 @@ class WebViewRequestInterceptorTest {
         whenever(mockGlobalPrivacyControl.isGpcActive()).thenReturn(true)
         whenever(mockGlobalPrivacyControl.getHeaders()).thenReturn(mapOf("test" to "test"))
         whenever(mockRequest.method).thenReturn("GET")
-        whenever(mockRequest.hasGesture()).thenReturn(true)
     }
 
     private fun configureShouldNotAddGpcHeader() = runBlocking<Unit> {
         whenever(mockGlobalPrivacyControl.isGpcActive()).thenReturn(false)
         whenever(mockGlobalPrivacyControl.getHeaders()).thenReturn(mapOf("test" to "test"))
         whenever(mockRequest.method).thenReturn("GET")
-        whenever(mockRequest.hasGesture()).thenReturn(true)
     }
 
     private fun configureShouldUpgrade() = runBlocking<Unit> {

@@ -123,11 +123,12 @@ class WebViewRequestInterceptor(
 
     private fun shouldAddGcpHeaders(request: WebResourceRequest): Boolean {
         val headers = request.requestHeaders
-        return (globalPrivacyControl.isGpcActive() &&
+        return (
+            globalPrivacyControl.isGpcActive() &&
                 !headers.containsKey(GlobalPrivacyControlManager.GPC_HEADER.toLowerCase(Locale.ROOT)) &&
                 request.isForMainFrame &&
-                request.hasGesture() &&
-                request.method == "GET")
+                request.method == "GET"
+            )
     }
 
     private fun shouldUpgrade(request: WebResourceRequest) =
