@@ -23,6 +23,7 @@ import android.webkit.WebSettings
 import com.duckduckgo.app.browser.*
 import com.duckduckgo.app.browser.addtohome.AddToHomeCapabilityDetector
 import com.duckduckgo.app.browser.addtohome.AddToHomeSystemCapabilityDetector
+import com.duckduckgo.app.browser.certificates.rootstore.TrustedCertificateStore
 import com.duckduckgo.app.browser.defaultbrowsing.AndroidDefaultBrowserDetector
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserObserver
@@ -85,6 +86,7 @@ class BrowserModule {
 
     @Provides
     fun browserWebViewClient(
+        trustedCertificateStore: TrustedCertificateStore,
         requestRewriter: RequestRewriter,
         specialUrlDetector: SpecialUrlDetector,
         requestInterceptor: RequestInterceptor,
@@ -97,6 +99,7 @@ class BrowserModule {
         pixel: Pixel
     ): BrowserWebViewClient {
         return BrowserWebViewClient(
+            trustedCertificateStore,
             requestRewriter,
             specialUrlDetector,
             requestInterceptor,

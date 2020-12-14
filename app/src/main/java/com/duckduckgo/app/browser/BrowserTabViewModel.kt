@@ -1430,6 +1430,11 @@ class BrowserTabViewModel(
 
         val uri = site?.uri ?: return
 
+        pixel.fire(
+            if (desktopSiteRequested) PixelName.MENU_ACTION_DESKTOP_SITE_ENABLE_PRESSED
+            else PixelName.MENU_ACTION_DESKTOP_SITE_DISABLE_PRESSED
+        )
+
         if (desktopSiteRequested && uri.isMobileSite) {
             val desktopUrl = uri.toDesktopUri().toString()
             Timber.i("Original URL $url - attempting $desktopUrl with desktop site UA string")
