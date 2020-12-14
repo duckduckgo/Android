@@ -25,6 +25,7 @@ import android.webkit.*
 import androidx.annotation.RequiresApi
 import androidx.annotation.UiThread
 import androidx.annotation.WorkerThread
+import com.duckduckgo.app.browser.certificates.rootstore.CertificateValidationState
 import com.duckduckgo.app.browser.certificates.rootstore.TrustedCertificateStore
 import com.duckduckgo.app.globalprivacycontrol.GlobalPrivacyControlInjector
 import com.duckduckgo.app.browser.logindetection.DOMLoginDetector
@@ -236,21 +237,17 @@ class BrowserWebViewClient(
     }
 
     override fun onReceivedSslError(view: WebView?, handler: SslErrorHandler, error: SslError) {
-        var trusted = false
+        var trusted: CertificateValidationState = CertificateValidationState.UntrustedChain
         when (error.primaryError) {
             SSL_UNTRUSTED -> {
-                try {
-                    trustedCertificateStore.validateSslCertificateChain(error.certificate)
-
-                    trusted = true
-                } catch (t: Throwable) {
-                    Timber.d("The certificate authority ${error.certificate.issuedBy.dName} is not trusted")
-                }
+                Timber.d("The certificate authority ${error.certificate.issuedBy.dName} is not trusted")
+                trusted = trustedCertificateStore.validateSslCertificateChain(error.certificate)
             }
             else -> Timber.d("SSL error ${error.primaryError}")
         }
 
-        if (trusted) handler.proceed() else super.onReceivedSslError(view, handler, error)
+        Timber.d("The certificate authority validation result is $trusted")
+        if (trusted is CertificateValidationState.TrustedChain) handler.proceed() else super.onReceivedSslError(view, handler, error)
     }
 
     private fun buildAuthenticationCredentials(

@@ -20,6 +20,7 @@ import android.content.Context
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.certificates.LetsEncryptCertificate
 import com.duckduckgo.app.browser.certificates.CertificateType
+import com.duckduckgo.app.browser.certificates.CertificateTypes
 import java.security.cert.Certificate
 import java.security.cert.CertificateFactory
 
@@ -32,7 +33,7 @@ class LetsEncryptAuthorityX3(
 ) : LetsEncryptCertificate {
 
     private val certificate: Certificate by lazy {
-        val certificateFactory = CertificateFactory.getInstance("X.509")
+        val certificateFactory = CertificateFactory.getInstance(CertificateTypes.X509)
         val certificate = certificateFactory.generateCertificate(context.resources.openRawResource(R.raw.lets_encrypt_x3))
         certificate
     }

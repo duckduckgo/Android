@@ -17,6 +17,7 @@
 package com.duckduckgo.app.browser.certificates.rootstore
 
 import android.net.http.SslCertificate
+import com.duckduckgo.app.browser.certificates.CertificateTypes.Companion.X509
 import okio.ByteString
 import okio.ByteString.Companion.decodeBase64
 import java.security.cert.CertificateFactory
@@ -30,7 +31,7 @@ fun String.parsePemCertificate(): ByteString? {
 }
 
 fun ByteString.toX509Certificate(): X509Certificate {
-    val certificateFactory = CertificateFactory.getInstance("X.509")
+    val certificateFactory = CertificateFactory.getInstance(X509)
     return certificateFactory.generateCertificate(this.toByteArray().inputStream()) as X509Certificate
 }
 

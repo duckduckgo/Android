@@ -19,12 +19,20 @@ package com.duckduckgo.app.browser.certificates.rootstore
 import android.net.http.SslCertificate
 import com.duckduckgo.app.browser.certificates.toX509Certificate
 import com.duckduckgo.app.browser.certificates.CertificateType
+import com.duckduckgo.app.browser.certificates.CertificateTypes
 import com.duckduckgo.app.browser.certificates.LetsEncryptCertificateProvider
 import timber.log.Timber
 import java.security.cert.*
 
 interface TrustedCertificateStore {
-    fun validateSslCertificateChain(sslCertificate: SslCertificate)
+    fun validateSslCertificateChain(sslCertificate: SslCertificate): CertificateValidationState
+}
+
+sealed class CertificateValidationState {
+    object IssuerExpired : CertificateValidationState()
+    object IssuerNotYetValid : CertificateValidationState()
+    object UntrustedChain : CertificateValidationState()
+    object TrustedChain : CertificateValidationState()
 }
 
 class TrustedCertificateStoreImpl(
@@ -32,14 +40,28 @@ class TrustedCertificateStoreImpl(
 ) : TrustedCertificateStore {
 
     /**
-     * Validates the given SSL certificate chaing
+     * Validates the given SSL certificate chain
      * @param sslCertificate the SSL certificate to be validated
      *
-     * @throws CertificateExpiredException when any issuer in the [sslCertificate] chain is expired
-     * @throws CertificateNotYetValidException when any issuer in the [sslCertificate] chain is not yet valid
-     * @throws CertificateException when we could not validate the [sslCertificate] certificate chain
+     * @return [IssuerExpired] when any issuer in the [sslCertificate] chain is expired
+     * @return [IssuerNotYetValid] when any issuer in the [sslCertificate] chain is not yet valid
+     * @return [UntrustedChain] when we could not validate the [sslCertificate] certificate chain
+     * @return [TrustedChain] when SSL certificated chain is valiadted
      */
-    override fun validateSslCertificateChain(sslCertificate: SslCertificate) {
+    override fun validateSslCertificateChain(sslCertificate: SslCertificate): CertificateValidationState {
+        return try {
+            validateSslCertificateChainInternal(sslCertificate)
+            CertificateValidationState.TrustedChain
+        } catch (t: Throwable) {
+            when (t) {
+                is CertificateExpiredException -> CertificateValidationState.IssuerExpired
+                is CertificateNotYetValidException -> CertificateValidationState.IssuerNotYetValid
+                else -> CertificateValidationState.UntrustedChain
+            }
+        }
+    }
+
+    private fun validateSslCertificateChainInternal(sslCertificate: SslCertificate) {
         val issuer = letsEncryptCertificateProvider.findByCname(sslCertificate.issuedBy.cName)
         issuer?.let {
             // first validate
@@ -50,7 +72,7 @@ class TrustedCertificateStoreImpl(
                 return
             }
             Timber.d("Intermediate certificated validated!")
-            validateSslCertificateChain(SslCertificate(it.certificate() as X509Certificate))
+            validateSslCertificateChainInternal(SslCertificate(it.certificate() as X509Certificate))
 
             // certificate chain validated
             return
@@ -61,7 +83,7 @@ class TrustedCertificateStoreImpl(
 
     @Throws(CertificateExpiredException::class, CertificateNotYetValidException::class)
     private fun validate(cert: Certificate, issuerCertificate: Certificate) {
-        if (issuerCertificate.type == "X.509") {
+        if (issuerCertificate.type == CertificateTypes.X509) {
             (issuerCertificate as X509Certificate).checkValidity()
         }
 

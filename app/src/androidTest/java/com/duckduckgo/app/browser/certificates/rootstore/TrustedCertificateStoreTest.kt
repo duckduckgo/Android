@@ -19,8 +19,8 @@ package com.duckduckgo.app.browser.certificates.rootstore
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.browser.certificates.LetsEncryptCertificateProvider
 import com.duckduckgo.app.browser.certificates.LetsEncryptCertificateProviderImpl
+import org.junit.Assert.assertEquals
 import org.junit.Test
-import java.security.cert.CertificateException
 
 class TrustedCertificateStoreTest {
 
@@ -97,17 +97,23 @@ class TrustedCertificateStoreTest {
         )
         val trustedCertificateStore = TrustedCertificateStoreImpl(letsEncryptCertificateProvider)
 
-        trustedCertificateStore.validateSslCertificateChain(subscriberCertificateX3!!)
+        assertEquals(
+            CertificateValidationState.TrustedChain,
+            trustedCertificateStore.validateSslCertificateChain(subscriberCertificateX3!!)
+        )
     }
 
-    @Test(expected = CertificateException::class)
+    @Test
     fun whenValidateSslCertificateChainWithX3UnTrustedChainThenError() {
         val letsEncryptCertificateProvider: LetsEncryptCertificateProvider = LetsEncryptCertificateProviderImpl(
             setOf(isrgRootX1, letsEncryptR3)
         )
         val trustedCertificateStore = TrustedCertificateStoreImpl(letsEncryptCertificateProvider)
 
-        trustedCertificateStore.validateSslCertificateChain(subscriberCertificateX3!!)
+        assertEquals(
+            CertificateValidationState.UntrustedChain,
+            trustedCertificateStore.validateSslCertificateChain(subscriberCertificateX3!!)
+        )
     }
 
     @Test
@@ -117,26 +123,35 @@ class TrustedCertificateStoreTest {
         )
         val trustedCertificateStore = TrustedCertificateStoreImpl(letsEncryptCertificateProvider)
 
-        trustedCertificateStore.validateSslCertificateChain(subscriberCertificateR3!!)
+        assertEquals(
+            CertificateValidationState.TrustedChain,
+            trustedCertificateStore.validateSslCertificateChain(subscriberCertificateR3!!)
+        )
     }
 
-    @Test(expected = CertificateException::class)
+    @Test
     fun whenValidateSslCertificateChainWithR3UnTrustedChainThenError() {
         val letsEncryptCertificateProvider: LetsEncryptCertificateProvider = LetsEncryptCertificateProviderImpl(
             setOf(isrgRootX1, letsEncryptAuthorityX3)
         )
         val trustedCertificateStore = TrustedCertificateStoreImpl(letsEncryptCertificateProvider)
 
-        trustedCertificateStore.validateSslCertificateChain(subscriberCertificateR3!!)
+        assertEquals(
+            CertificateValidationState.UntrustedChain,
+            trustedCertificateStore.validateSslCertificateChain(subscriberCertificateR3!!)
+        )
     }
 
-    @Test(expected = CertificateException::class)
+    @Test
     fun whenValidateSslCertificateChainWithMissingRootThenError() {
         val letsEncryptCertificateProvider: LetsEncryptCertificateProvider = LetsEncryptCertificateProviderImpl(
             setOf(letsEncryptAuthorityX3, letsEncryptR3)
         )
         val trustedCertificateStore = TrustedCertificateStoreImpl(letsEncryptCertificateProvider)
 
-        trustedCertificateStore.validateSslCertificateChain(subscriberCertificateR3!!)
+        assertEquals(
+            CertificateValidationState.UntrustedChain,
+            trustedCertificateStore.validateSslCertificateChain(subscriberCertificateR3!!)
+        )
     }
 }
