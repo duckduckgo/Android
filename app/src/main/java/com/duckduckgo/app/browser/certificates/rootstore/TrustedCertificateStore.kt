@@ -46,7 +46,7 @@ class TrustedCertificateStoreImpl(
      * @return [IssuerExpired] when any issuer in the [sslCertificate] chain is expired
      * @return [IssuerNotYetValid] when any issuer in the [sslCertificate] chain is not yet valid
      * @return [UntrustedChain] when we could not validate the [sslCertificate] certificate chain
-     * @return [TrustedChain] when SSL certificated chain is valiadted
+     * @return [TrustedChain] when SSL certificated chain is validated
      */
     override fun validateSslCertificateChain(sslCertificate: SslCertificate): CertificateValidationState {
         return try {
@@ -61,6 +61,7 @@ class TrustedCertificateStoreImpl(
         }
     }
 
+    @Throws(CertificateException::class, CertificateExpiredException::class, CertificateNotYetValidException::class)
     private fun validateSslCertificateChainInternal(sslCertificate: SslCertificate) {
         val issuer = letsEncryptCertificateProvider.findByCname(sslCertificate.issuedBy.cName)
         issuer?.let {
@@ -71,7 +72,7 @@ class TrustedCertificateStoreImpl(
                 Timber.d("Certificate Trusted anchor validated!")
                 return
             }
-            Timber.d("Intermediate certificated validated!")
+            Timber.d("Intermediate certificate validated!")
             validateSslCertificateChainInternal(SslCertificate(it.certificate() as X509Certificate))
 
             // certificate chain validated
