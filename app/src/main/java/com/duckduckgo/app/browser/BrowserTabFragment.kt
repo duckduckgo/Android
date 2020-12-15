@@ -1158,9 +1158,9 @@ class BrowserTabFragment :
         val currentAgent = webView?.settings?.userAgentString
         val newAgent = userAgentProvider.userAgent(url, isDesktop)
         if (newAgent != currentAgent) {
-            Timber.d("User Agent Changed, new ${if (isDesktop) "Desktop" else "Mobile"} UA is $newAgent")
             webView?.settings?.userAgentString = newAgent
         }
+        Timber.d("User Agent is $newAgent")
     }
 
     /**

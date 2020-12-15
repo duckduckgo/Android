@@ -123,7 +123,7 @@ class UserAgentProvider constructor(private val defaultUserAgent: String, privat
         )
 
         val sitesThatShouldUseDesktopAgent = listOf(
-            DesktopAgentSiteOnly("m.facebook.com", listOf("dialog"))
+            DesktopAgentSiteOnly("m.facebook.com", listOf("dialog", "sharer"))
         )
     }
 

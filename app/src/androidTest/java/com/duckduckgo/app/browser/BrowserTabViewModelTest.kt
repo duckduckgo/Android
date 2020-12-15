@@ -54,6 +54,7 @@ import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.browser.model.LongPressTarget
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
+import com.duckduckgo.app.browser.useragent.MobileUrlReWriter
 import com.duckduckgo.app.cta.db.DismissedCtaDao
 import com.duckduckgo.app.cta.model.CtaId
 import com.duckduckgo.app.cta.model.DismissedCta
@@ -324,7 +325,8 @@ class BrowserTabViewModelTest {
             notificationDao = mockNotificationDao,
             useOurAppDetector = UseOurAppDetector(mockUserEventsStore),
             variantManager = mockVariantManager,
-            fileDownloader = mockFileDownloader
+            fileDownloader = mockFileDownloader,
+            mobileUrlReWriter = MobileUrlReWriter()
         )
 
         testee.loadData("abc", null, false)

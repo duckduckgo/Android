@@ -24,6 +24,8 @@ import android.webkit.WebResourceResponse
 import android.webkit.WebView
 import androidx.test.annotation.UiThreadTest
 import com.duckduckgo.app.CoroutineTestRule
+import com.duckduckgo.app.browser.useragent.MobileUrlReWriter
+import com.duckduckgo.app.browser.useragent.UserAgentProvider
 import com.duckduckgo.app.httpsupgrade.HttpsUpgrader
 import com.duckduckgo.app.privacy.db.PrivacyProtectionCountDao
 import com.duckduckgo.app.surrogates.ResourceSurrogates
@@ -53,6 +55,7 @@ class WebViewRequestInterceptorTest {
     private var mockResourceSurrogates: ResourceSurrogates = mock()
     private var mockRequest: WebResourceRequest = mock()
     private val mockPrivacyProtectionCountDao: PrivacyProtectionCountDao = mock()
+    private val userAgentProvider: UserAgentProvider = UserAgentProvider("test", mock())
 
     private var webView: WebView = mock()
 
@@ -65,7 +68,9 @@ class WebViewRequestInterceptorTest {
             trackerDetector = mockTrackerDetector,
             httpsUpgrader = mockHttpsUpgrader,
             resourceSurrogates = mockResourceSurrogates,
-            privacyProtectionCountDao = mockPrivacyProtectionCountDao
+            privacyProtectionCountDao = mockPrivacyProtectionCountDao,
+            userAgentProvider = userAgentProvider,
+            mobileUrlReWriter = MobileUrlReWriter()
         )
     }
 

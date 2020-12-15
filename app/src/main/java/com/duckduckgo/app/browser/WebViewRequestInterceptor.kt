@@ -20,6 +20,8 @@ import android.webkit.WebResourceRequest
 import android.webkit.WebResourceResponse
 import android.webkit.WebView
 import androidx.annotation.WorkerThread
+import com.duckduckgo.app.browser.useragent.UserAgentProvider
+import com.duckduckgo.app.browser.useragent.MobileUrlReWriter
 import com.duckduckgo.app.global.isHttp
 import com.duckduckgo.app.httpsupgrade.HttpsUpgrader
 import com.duckduckgo.app.privacy.db.PrivacyProtectionCountDao
@@ -45,8 +47,9 @@ class WebViewRequestInterceptor(
     private val resourceSurrogates: ResourceSurrogates,
     private val trackerDetector: TrackerDetector,
     private val httpsUpgrader: HttpsUpgrader,
-    private val privacyProtectionCountDao: PrivacyProtectionCountDao
-
+    private val privacyProtectionCountDao: PrivacyProtectionCountDao,
+    private val userAgentProvider: UserAgentProvider,
+    private val mobileUrlReWriter: MobileUrlReWriter
 ) : RequestInterceptor {
 
     /**
@@ -67,6 +70,23 @@ class WebViewRequestInterceptor(
     ): WebResourceResponse? {
 
         val url = request.url
+
+        if (shouldLoadAsMobileUrl(request)) {
+            mobileUrlReWriter.getMobileSite(url)?.let {
+                withContext(Dispatchers.Main) {
+                    webView.loadUrl(it)
+                }
+                return WebResourceResponse(null, null, null)
+            }
+        }
+
+        newUserAgent(request, webView, webViewClientListener)?.let {
+            withContext(Dispatchers.Main) {
+                webView.settings?.userAgentString = it
+                webView.loadUrl(url.toString())
+            }
+            return WebResourceResponse(null, null, null)
+        }
 
         if (shouldUpgrade(request)) {
             val newUri = httpsUpgrader.upgrade(url)
@@ -105,6 +125,31 @@ class WebViewRequestInterceptor(
 
         return null
     }
+
+    private suspend fun newUserAgent(
+        request: WebResourceRequest,
+        webView: WebView,
+        webViewClientListener: WebViewClientListener?
+    ): String? {
+        return if (request.isForMainFrame && request.method == "GET") {
+            val url = request.url ?: return null
+            val isOldPage = withContext(Dispatchers.Main) { (webView.copyBackForwardList().currentIndex < webView.copyBackForwardList().size - 1) }
+            if (isOldPage) return null
+            val desktopSiteEnabled = webViewClientListener?.isDesktopSiteEnabled() == true
+            val currentAgent = withContext(Dispatchers.Main) { webView.settings?.userAgentString }
+            val newAgent = userAgentProvider.userAgent(url.toString(), desktopSiteEnabled)
+            return if (currentAgent != newAgent) {
+                newAgent
+            } else {
+                null
+            }
+        } else {
+            null
+        }
+    }
+
+    private fun shouldLoadAsMobileUrl(request: WebResourceRequest) =
+        request.isForMainFrame && request.url != null && request.method == "GET" && mobileUrlReWriter.isStrictlyMobileSite(request.url)
 
     private fun shouldUpgrade(request: WebResourceRequest) =
         request.isForMainFrame && request.url != null && httpsUpgrader.shouldUpgrade(request.url)
