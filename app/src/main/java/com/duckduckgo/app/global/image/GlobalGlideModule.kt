@@ -48,6 +48,7 @@ class GlobalGlideModule : AppGlideModule() {
                     .addPlatformTrustedCertificates()
                     .build()
 
+                @Suppress("DEPRECATION")
                 val okHttpClient = OkHttpClient.Builder()
                     .sslSocketFactory(handshakeCertificates.sslSocketFactory())
                     .build()
