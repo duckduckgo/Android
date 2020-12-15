@@ -30,6 +30,8 @@ interface AppInstallStore {
 
     var defaultBrowser: Boolean
 
+    var newDefaultBrowserDialogCount: Int
+
     fun hasInstallTimestampRecorded(): Boolean
 }
 
@@ -50,6 +52,10 @@ class AppInstallSharedPreferences @Inject constructor(private val context: Conte
         get() = preferences.getBoolean(KEY_DEFAULT_BROWSER, false)
         set(defaultBrowser) = preferences.edit { putBoolean(KEY_DEFAULT_BROWSER, defaultBrowser) }
 
+    override var newDefaultBrowserDialogCount: Int
+        get() = preferences.getInt(ROLE_MANAGER_BROWSER_DIALOG_KEY, 0)
+        set(defaultBrowser) = preferences.edit { putInt(ROLE_MANAGER_BROWSER_DIALOG_KEY, defaultBrowser) }
+
     override fun hasInstallTimestampRecorded(): Boolean = preferences.contains(KEY_TIMESTAMP_UTC)
 
     private val preferences: SharedPreferences
@@ -61,5 +67,6 @@ class AppInstallSharedPreferences @Inject constructor(private val context: Conte
         const val KEY_TIMESTAMP_UTC = "INSTALL_TIMESTAMP_UTC"
         const val KEY_WIDGET_INSTALLED = "KEY_WIDGET_INSTALLED"
         const val KEY_DEFAULT_BROWSER = "KEY_DEFAULT_BROWSER"
+        private const val ROLE_MANAGER_BROWSER_DIALOG_KEY = "ROLE_MANAGER_BROWSER_DIALOG_KEY"
     }
 }

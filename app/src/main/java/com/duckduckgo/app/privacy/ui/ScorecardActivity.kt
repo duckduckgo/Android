@@ -49,13 +49,19 @@ class ScorecardActivity : DuckDuckGoActivity() {
         setContentView(R.layout.activity_privacy_scorecard)
         setupToolbar(toolbar)
 
-        viewModel.viewState.observe(this, Observer<ScorecardViewModel.ViewState> {
-            it?.let { render(it) }
-        })
+        viewModel.viewState.observe(
+            this,
+            Observer<ScorecardViewModel.ViewState> {
+                it?.let { render(it) }
+            }
+        )
 
-        repository.retrieveSiteData(intent.tabId!!).observe(this, Observer<Site> {
-            viewModel.onSiteChanged(it)
-        })
+        repository.retrieveSiteData(intent.tabId!!).observe(
+            this,
+            Observer<Site> {
+                viewModel.onSiteChanged(it)
+            }
+        )
     }
 
     private fun render(viewState: ScorecardViewModel.ViewState) {

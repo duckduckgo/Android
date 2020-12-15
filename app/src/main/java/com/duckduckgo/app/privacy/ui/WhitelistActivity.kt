@@ -78,13 +78,19 @@ class WhitelistActivity : DuckDuckGoActivity() {
     }
 
     private fun observeViewModel() {
-        viewModel.viewState.observe(this, Observer { viewState ->
-            viewState?.let { renderViewState(it) }
-        })
+        viewModel.viewState.observe(
+            this,
+            Observer { viewState ->
+                viewState?.let { renderViewState(it) }
+            }
+        )
 
-        viewModel.command.observe(this, Observer {
-            processCommand(it)
-        })
+        viewModel.command.observe(
+            this,
+            Observer {
+                processCommand(it)
+            }
+        )
     }
 
     private fun renderViewState(viewState: WhitelistViewModel.ViewState) {

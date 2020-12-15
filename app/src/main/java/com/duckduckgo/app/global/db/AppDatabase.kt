@@ -65,7 +65,8 @@ import com.duckduckgo.app.usage.search.SearchCountDao
 import com.duckduckgo.app.usage.search.SearchCountEntity
 
 @Database(
-    exportSchema = true, version = 27, entities = [
+    exportSchema = true, version = 29,
+    entities = [
         TdsTracker::class,
         TdsEntity::class,
         TdsDomainEntity::class,
@@ -284,7 +285,7 @@ class MigrationsProvider(
             val userStage = UserStage(appStage = appStage)
             database.execSQL(
                 "CREATE TABLE IF NOT EXISTS `$USER_STAGE_TABLE_NAME` " +
-                        "(`key` INTEGER NOT NULL, `appStage` TEXT NOT NULL, PRIMARY KEY(`key`))"
+                    "(`key` INTEGER NOT NULL, `appStage` TEXT NOT NULL, PRIMARY KEY(`key`))"
             )
             database.execSQL(
                 "INSERT INTO $USER_STAGE_TABLE_NAME VALUES (${userStage.key}, \"${userStage.appStage}\") "
@@ -329,14 +330,14 @@ class MigrationsProvider(
             // SQLite does not support Alter table operations like Foreign keys
             database.execSQL(
                 "CREATE TABLE IF NOT EXISTS tabs_new " +
-                        "(tabId TEXT NOT NULL, url TEXT, title TEXT, skipHome INTEGER NOT NULL, viewed INTEGER NOT NULL, position INTEGER NOT NULL, tabPreviewFile TEXT, sourceTabId TEXT," +
-                        " PRIMARY KEY(tabId)," +
-                        " FOREIGN KEY(sourceTabId) REFERENCES tabs(tabId) ON UPDATE SET NULL ON DELETE SET NULL )"
+                    "(tabId TEXT NOT NULL, url TEXT, title TEXT, skipHome INTEGER NOT NULL, viewed INTEGER NOT NULL, position INTEGER NOT NULL, tabPreviewFile TEXT, sourceTabId TEXT," +
+                    " PRIMARY KEY(tabId)," +
+                    " FOREIGN KEY(sourceTabId) REFERENCES tabs(tabId) ON UPDATE SET NULL ON DELETE SET NULL )"
             )
             database.execSQL(
                 "INSERT INTO tabs_new (tabId, url, title, skipHome, viewed, position, tabPreviewFile) " +
-                        "SELECT tabId, url, title, skipHome, viewed, position, tabPreviewFile " +
-                        "FROM tabs"
+                    "SELECT tabId, url, title, skipHome, viewed, position, tabPreviewFile " +
+                    "FROM tabs"
             )
             database.execSQL("DROP TABLE tabs")
             database.execSQL("ALTER TABLE tabs_new RENAME TO tabs")
@@ -362,6 +363,18 @@ class MigrationsProvider(
     val MIGRATION_26_TO_27: Migration = object : Migration(26, 27) {
         override fun migrate(database: SupportSQLiteDatabase) {
             database.execSQL("CREATE TABLE IF NOT EXISTS `pixel_store` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `pixelName` TEXT NOT NULL, `atb` TEXT NOT NULL, `additionalQueryParams` TEXT NOT NULL, `encodedQueryParams` TEXT NOT NULL)")
+        }
+    }
+
+    val MIGRATION_27_TO_28: Migration = object : Migration(27, 28) {
+        override fun migrate(database: SupportSQLiteDatabase) {
+            database.execSQL("ALTER TABLE `tabs` ADD COLUMN `deletable` INTEGER NOT NULL DEFAULT 0")
+        }
+    }
+
+    val MIGRATION_28_TO_29: Migration = object : Migration(28, 29) {
+        override fun migrate(database: SupportSQLiteDatabase) {
+            database.execSQL("UPDATE $USER_STAGE_TABLE_NAME SET appStage = \"${AppStage.ESTABLISHED}\" WHERE appStage = \"${AppStage.DAX_ONBOARDING}\"")
         }
     }
 
@@ -392,7 +405,9 @@ class MigrationsProvider(
             MIGRATION_23_TO_24,
             MIGRATION_24_TO_25,
             MIGRATION_25_TO_26,
-            MIGRATION_26_TO_27
+            MIGRATION_26_TO_27,
+            MIGRATION_27_TO_28,
+            MIGRATION_28_TO_29
         )
 
     @Deprecated(

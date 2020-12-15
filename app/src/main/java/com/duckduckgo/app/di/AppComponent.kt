@@ -18,6 +18,7 @@ package com.duckduckgo.app.di
 
 import android.app.Application
 import com.duckduckgo.app.browser.autocomplete.BrowserAutoCompleteModule
+import com.duckduckgo.app.browser.certificates.CertificateTrustedStoreModule
 import com.duckduckgo.app.browser.di.BrowserModule
 import com.duckduckgo.app.browser.favicon.FaviconModule
 import com.duckduckgo.app.browser.rating.di.RatingModule
@@ -33,6 +34,7 @@ import dagger.BindsInstance
 import dagger.Component
 import dagger.android.AndroidInjector
 import dagger.android.support.AndroidSupportInjectionModule
+import kotlinx.coroutines.CoroutineScope
 import javax.inject.Singleton
 
 @Singleton
@@ -67,7 +69,8 @@ import javax.inject.Singleton
         FileModule::class,
         UncaughtExceptionModule::class,
         PlayStoreReferralModule::class,
-        CoroutinesModule::class
+        CoroutinesModule::class,
+        CertificateTrustedStoreModule::class
     ]
 )
 interface AppComponent : AndroidInjector<DuckDuckGoApplication> {
@@ -77,6 +80,9 @@ interface AppComponent : AndroidInjector<DuckDuckGoApplication> {
 
         @BindsInstance
         fun application(application: Application): Builder
+
+        @BindsInstance
+        fun applicationCoroutineScope(@AppCoroutineScope applicationCoroutineScope: CoroutineScope): Builder
 
         fun build(): AppComponent
     }

@@ -26,8 +26,7 @@
         android:importantForAccessibility="no"
         android:scaleType="centerCrop"
         android:visibility="gone"
-        app:lottie_loop="false"
-        app:lottie_rawRes="@raw/fire_hero_rising" />
+        app:lottie_loop="false" />
 
     <LinearLayout
         android:id="@+id/fireDialogRootView"
@@ -52,7 +51,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:background="?attr/selectableItemBackground"
-                android:drawableStart="@drawable/icon_fire_glyph_24dp"
+                app:drawableStartCompat="@drawable/icon_fire_glyph_24dp"
                 android:drawablePadding="24dp"
                 android:fontFamily="sans-serif"
                 android:paddingStart="24dp"
@@ -73,7 +72,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:background="?attr/selectableItemBackground"
-                android:drawableStart="@drawable/ic_cancel_brownish_24dp"
+                app:drawableStartCompat="@drawable/ic_cancel_brownish_24dp"
                 android:drawablePadding="24dp"
                 android:fontFamily="sans-serif"
                 android:paddingStart="24dp"

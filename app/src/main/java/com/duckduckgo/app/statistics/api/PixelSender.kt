@@ -48,14 +48,16 @@ class RxPixelSender @Inject constructor(
 
     @OnLifecycleEvent(Lifecycle.Event.ON_START)
     fun onAppForegrounded() {
-        compositeDisposable.add(pendingPixelDao.pixels()
-            .flatMapIterable { it }
-            .switchMapCompletable(this::sendAndDeletePixel)
-            .subscribeOn(Schedulers.io())
-            .subscribe(
-                { Timber.v("Pixel finished sync") },
-                { Timber.w(it, "Pixel failed to sync") }
-            ))
+        compositeDisposable.add(
+            pendingPixelDao.pixels()
+                .flatMapIterable { it }
+                .switchMapCompletable(this::sendAndDeletePixel)
+                .subscribeOn(Schedulers.io())
+                .subscribe(
+                    { Timber.v("Pixel finished sync") },
+                    { Timber.w(it, "Pixel failed to sync") }
+                )
+        )
     }
 
     @Suppress("unused")

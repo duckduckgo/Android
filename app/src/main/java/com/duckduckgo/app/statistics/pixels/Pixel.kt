@@ -83,6 +83,7 @@ interface Pixel {
         DEFAULT_BROWSER_SET("m_db_s"),
         DEFAULT_BROWSER_NOT_SET("m_db_ns"),
         DEFAULT_BROWSER_UNSET("m_db_u"),
+        DEFAULT_BROWSER_DIALOG_NOT_SHOWN("m_dbd_ns"),
 
         WIDGET_CTA_SHOWN("m_wc_s"),
         WIDGET_CTA_LAUNCHED("m_wc_l"),
@@ -112,6 +113,8 @@ interface Pixel {
         LONG_PRESS_SHARE("mlp_s"),
         LONG_PRESS_COPY_URL("mlp_c"),
         LONG_PRESS_OPEN_IMAGE_IN_BACKGROUND_TAB("mlp_ibt"),
+
+        DOWNLOAD_FILE_DEFAULT_GUESSED_NAME("m_df_dgn"),
 
         SETTINGS_OPENED("ms"),
         SETTINGS_THEME_TOGGLED_LIGHT("ms_tl"),
@@ -174,6 +177,16 @@ interface Pixel {
         MENU_ACTION_REFRESH_PRESSED("m_nav_r_p"),
         MENU_ACTION_NEW_TAB_PRESSED("m_nav_nt_p"),
         MENU_ACTION_BOOKMARKS_PRESSED("m_nav_b_p"),
+        MENU_ACTION_NAVIGATE_FORWARD_PRESSED("m_nav_nf_p"),
+        MENU_ACTION_NAVIGATE_BACK_PRESSED("m_nav_nb_p"),
+        MENU_ACTION_ADD_BOOKMARK_PRESSED("m_nav_ab_p"),
+        MENU_ACTION_SHARE_PRESSED("m_nav_sh_p"),
+        MENU_ACTION_FIND_IN_PAGE_PRESSED("m_nav_fip_p"),
+        MENU_ACTION_ADD_TO_HOME_PRESSED("m_nav_ath_p"),
+        MENU_ACTION_DESKTOP_SITE_ENABLE_PRESSED("m_nav_dse_p"),
+        MENU_ACTION_DESKTOP_SITE_DISABLE_PRESSED("m_nav_dsd_p"),
+        MENU_ACTION_REPORT_BROKEN_SITE_PRESSED("m_nav_rbs_p"),
+        MENU_ACTION_SETTINGS_PRESSED("m_nav_s_p"),
 
         COOKIE_DATABASE_NOT_FOUND("m_cdb_nf"),
         COOKIE_DATABASE_OPEN_ERROR("m_cdb_oe"),
@@ -220,6 +233,10 @@ interface Pixel {
         FIRE_DIALOG_CLEAR_PRESSED("m_fd_p"),
         FIRE_DIALOG_PROMOTED_CANCEL("m_fdp_c"),
         FIRE_DIALOG_CANCEL("m_fd_c"),
+        FIRE_DIALOG_ANIMATION("m_fd_a"),
+
+        FIRE_ANIMATION_SETTINGS_OPENED("m_fas_o"),
+        FIRE_ANIMATION_NEW_SELECTED("m_fas_s"),
     }
 
     object PixelParameter {
@@ -238,6 +255,7 @@ interface Pixel {
         const val SERP_QUERY_CHANGED = "1"
         const val SERP_QUERY_NOT_CHANGED = "0"
         const val FIRE_BUTTON_STATE = "fb"
+        const val FIRE_ANIMATION = "fa"
     }
 
     object PixelValues {
@@ -253,6 +271,12 @@ interface Pixel {
         const val DAX_TRACKERS_BLOCKED_CTA = "t"
         const val DAX_NO_TRACKERS_CTA = "nt"
         const val DAX_FIRE_DIALOG_CTA = "fd"
+
+        const val FIRE_ANIMATION_INFERNO = "fai"
+        const val FIRE_ANIMATION_AIRSTREAM = "faas"
+        const val FIRE_ANIMATION_WHIRLPOOL = "fawp"
+        const val FIRE_ANIMATION_NONE = "fann"
+
     }
 
     fun fire(pixel: PixelName, parameters: Map<String, String> = emptyMap(), encodedParameters: Map<String, String> = emptyMap())
@@ -273,25 +297,37 @@ class RxBasedPixel @Inject constructor(
     override fun fire(pixelName: String, parameters: Map<String, String>, encodedParameters: Map<String, String>) {
         pixelSender.sendPixel(pixelName, parameters, encodedParameters)
             .subscribeOn(Schedulers.io())
-            .subscribe({
-                Timber.v("Pixel sent: $pixelName with params: $parameters $encodedParameters")
-            }, {
-                Timber.w(it, "Pixel failed: $pixelName with params: $parameters $encodedParameters")
-            })
+            .subscribe(
+                {
+                    Timber.v("Pixel sent: $pixelName with params: $parameters $encodedParameters")
+                },
+                {
+                    Timber.w(it, "Pixel failed: $pixelName with params: $parameters $encodedParameters")
+                }
+            )
     }
 
+    /**
+     * Sends a pixel. If delivery fails, the pixel will be retried again in the future.
+     * As this method stores the pixel to disk until successful delivery, check with privacy triage if the pixel has additional parameters
+     * that they would want to validate.
+     */
     override fun enqueueFire(pixel: PixelName, parameters: Map<String, String>, encodedParameters: Map<String, String>) {
         enqueueFire(pixel.pixelName, parameters, encodedParameters)
     }
 
     @SuppressLint("CheckResult")
+    /** See comment in {@link #enqueueFire(PixelName, Map<String, String>, Map<String, String>)}. */
     override fun enqueueFire(pixelName: String, parameters: Map<String, String>, encodedParameters: Map<String, String>) {
         pixelSender.enqueuePixel(pixelName, parameters, encodedParameters)
             .subscribeOn(Schedulers.io())
-            .subscribe({
-                Timber.v("Pixel enqueued: $pixelName with params: $parameters $encodedParameters")
-            }, {
-                Timber.w(it, "Pixel failed: $pixelName with params: $parameters $encodedParameters")
-            })
+            .subscribe(
+                {
+                    Timber.v("Pixel enqueued: $pixelName with params: $parameters $encodedParameters")
+                },
+                {
+                    Timber.w(it, "Pixel failed: $pixelName with params: $parameters $encodedParameters")
+                }
+            )
     }
 }

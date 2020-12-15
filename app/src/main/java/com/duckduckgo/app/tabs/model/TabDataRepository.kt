@@ -21,14 +21,17 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.tabpreview.WebViewPreviewPersister
+import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.global.model.SiteFactory
 import com.duckduckgo.app.global.useourapp.UseOurAppDetector
 import com.duckduckgo.app.tabs.db.TabsDao
 import io.reactivex.Scheduler
 import io.reactivex.schedulers.Schedulers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.drop
 import timber.log.Timber
 import java.util.*
 import javax.inject.Inject
@@ -40,10 +43,20 @@ class TabDataRepository @Inject constructor(
     private val siteFactory: SiteFactory,
     private val webViewPreviewPersister: WebViewPreviewPersister,
     private val faviconManager: FaviconManager,
-    private val useOurAppDetector: UseOurAppDetector
+    private val useOurAppDetector: UseOurAppDetector,
+    @AppCoroutineScope private val appCoroutineScope: CoroutineScope
 ) : TabRepository {
 
     override val liveTabs: LiveData<List<TabEntity>> = tabsDao.liveTabs()
+
+    override val flowTabs: Flow<List<TabEntity>> = tabsDao.flowTabs()
+
+    // We only want the new emissions when subscribing, however Room does not honour that contract so we
+    // need to drop the first emission always (this is equivalent to the Observable semantics)
+    @ExperimentalCoroutinesApi
+    override val flowDeletableTabs: Flow<List<TabEntity>> = tabsDao.flowDeletableTabs()
+        .drop(1)
+        .distinctUntilChanged()
 
     override val liveSelectedTab: LiveData<TabEntity> = tabsDao.liveSelectedTab()
 
@@ -183,6 +196,24 @@ class TabDataRepository @Inject constructor(
             tabsDao.deleteTabAndUpdateSelection(tab)
         }
         siteData.remove(tab.tabId)
+    }
+
+    override suspend fun markDeletable(tab: TabEntity) {
+        databaseExecutor().scheduleDirect {
+            tabsDao.markTabAsDeletable(tab)
+        }
+    }
+
+    override suspend fun undoDeletable(tab: TabEntity) {
+        databaseExecutor().scheduleDirect {
+            tabsDao.undoDeletableTab(tab)
+        }
+    }
+
+    override suspend fun purgeDeletableTabs() = withContext(Dispatchers.IO) {
+        appCoroutineScope.launch {
+            tabsDao.purgeDeletableTabsAndUpdateSelection()
+        }.join()
     }
 
     override suspend fun deleteCurrentTabAndSelectSource() {

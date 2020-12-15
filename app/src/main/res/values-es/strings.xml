@@ -392,7 +392,7 @@
     <string name="systemSearchAppNotFound">No se pudo encontrar la aplicación</string>
     <string name="systemSearchOnboardingText">¡Gracias por elegir DuckDuckGo!\nAhora, cuando uses nuestra búsqueda o aplicación, tus búsquedas estarán protegidas.</string>
     <string name="systemSearchOnboardingFeaturesIntroText">La aplicación de DuckDuckGo también:</string>
-    <string name="systemSearchOnboardingFeatureOneText">Bloquea rastreadores poco seguros.</string>
+    <string name="systemSearchOnboardingFeatureOneText">Bloquea rastreadores inseguros.</string>
     <string name="systemSearchOnboardingFeatureTwoText">Fuerza el cifrado en sitios web.</string>
     <string name="systemSearchOnboardingFeatureThreeText">Borra datos con un solo toque.</string>
     <string name="systemSearchOnboardingButtonMore">Mostrar más</string>
