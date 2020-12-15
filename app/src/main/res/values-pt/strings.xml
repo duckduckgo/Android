@@ -28,14 +28,14 @@
     <string name="search">Pesquisar</string>
 
     <!-- Onboarding Activity -->
-    <string name="onboardingDefaultBrowserDescription">Visite as Definições para pesquisar e navegar sempre com DuckDuckGo.</string>
+    <string name="onboardingDefaultBrowserDescription">Visite as Definições para pesquisar e navegar sempre com o DuckDuckGo.</string>
     <string name="onboardingDefaultBrowserTitle">Faça do DuckDuckGo o seu predefinido</string>
 
     <!-- Default Browser -->
     <string name="cannotLaunchDefaultAppSettings">Não é possível iniciar o ecrã predefinido de definições da aplicação</string>
     <string name="settingsDefaultBrowserEnabled">Definir como navegador padrão</string>
     <string name="defaultBrowserMaybeLater">Talvez mais tarde</string>
-    <string name="defaultBrowserLetsDoIt">Vamos lá!</string>
+    <string name="defaultBrowserLetsDoIt">Definir como navegador padrão</string>
     <string name="defaultBrowserDescriptionNoDefault">Abra links com tranquilidade, sempre.</string>
     <string name="defaultBrowserInstructions">Selecione DuckDuckGo e toque em <font color="#678fff">Sempre</font>.</string>
 
@@ -94,6 +94,8 @@
     <string name="closeContentDescription">Fechar</string>
     <string name="closeAllTabsMenuItem">Fechar todos os separadores</string>
     <string name="closeTab">Fechar separador</string>
+    <string name="tabClosed">Separador fechado</string>
+    <string name="tabClosedUndo">Anular</string>
 
     <!-- Privacy Dashboard Activities -->
     <string name="privacyProtectionToggle">Proteção de Privacidade do Site</string>
@@ -408,7 +410,7 @@
     <string name="hideTipsButton">Ocultar dicas para sempre</string>
 
     <!-- New Onboarding Experience -->
-    <string name="onboardingWelcomeTitle">"Bem-vindo(a) ao DuckDuckGo!"</string>
+    <string name="onboardingWelcomeTitle">"Damos-lhe as boas-vindas ao DuckDuckGo!"</string>
     <string name="onboardingDaxText"><![CDATA[A Internet pode ser um pouco assustadora.<br/><br/>Mas não se preocupe! Pesquisar e navegar em privado é mais fácil do que pensa.]]></string>
     <string name="onboardingLetsDoItButton">Vamos lá!</string>
     <string name="daxIntroCtaText"><![CDATA[A seguir, experimente visitar um dos seus sites favoritos! <br/><br/>Irei bloquear os rastreadores para que eles não possam espiar o que faz. Também irei atualizar a segurança da sua ligação, se possível. 🔒]]></string>
@@ -423,7 +425,7 @@
         <item quantity="other"><![CDATA[ estavam a tentar rastreá-lo aqui.<br/><br/>Eu bloqueei-os!<br/><br/>☝️Pode verificar a barra de endereços para ver quem está a tentar rastreá-lo quando visita um novo site.]]></item>
     </plurals>
     <string name="daxNonSerpCtaText"><![CDATA[Enquanto toca e desliza, eu bloqueio rastreadores irritantes. <br/><br/>Prossiga - continue a navegar!]]></string>
-    <string name="daxMainNetworkCtaText"><![CDATA[Atenção! %1$s é uma grande rede de rastreamento.<br/><br/> Os seus rastreadores estão à espreita em cerca de %2$s dos principais sites 😱, mas não se preocupe! <br/><br/>Eu impeço %3$s de ver a sua atividade nesses sites.]]></string>
+    <string name="daxMainNetworkCtaText">Alerta! Não consigo que %1$s veja a sua atividade em %2$s &lt;br/&gt;&lt;br/&gt; Mas navegue comigo, e posso reduzir o que %3$s sabe sobre si de forma geral ao bloquear os seus rastreadores em muitos outros sites.</string>
     <string name="daxMainNetworkOwnedCtaText">Alerta! Desde que %1$s possui %2$s, não consigo impedi-los de ver a sua atividade. &lt;br/&gt;&lt;br/&gt;Mas navegue comigo e posso reduzir que %3$s saiba sobre si ao bloquear os seus rastreadores em muitos outros sites.</string>
 
     <!-- Download Confirmation -->
@@ -460,7 +462,7 @@
     <string name="whitelistEntryDeleteConfirmMessage">Quer mesmo remover &lt;b&gt;%1$s&lt;/b&gt; da lista de sites desprotegidos?</string>
     <string name="whitelistExplanation">Estes sites não serão aprimorados pela Proteção de Privacidade.</string>
     <string name="whitelistNoEntries">Proteção de Privacidade ativa para todos os sites</string>
-    <string name="whitelistDomainHint">www.example.com</string>
+    <string name="whitelistDomainHint">www.exemplo.com</string>
     <string name="whitelistFormatError">Digite um domínio como <b>exemplo.com</b> e tente de novo</string>
 
     <!-- Settings -->
@@ -482,6 +484,15 @@
     <string name="fireproofWebsiteLoginDialogNegative">Agora não</string>
     <string name="fireproofWebsiteItemsSectionTitle">Websites</string>
     <string name="fireproofWebsiteToogleText">Perguntar ao iniciar sessão</string>
+
+    <!-- Fire Animation settings -->
+    <string name="settingsFireAnimation">Animação do Botão de Fogo</string>
+    <string name="settingsHeroFireAnimation">Inferno</string>
+    <string name="settingsHeroWaterAnimation">Remoinho</string>
+    <string name="settingsHeroAbstractAnimation">Corrente de ar</string>
+    <string name="settingsNoneAnimation">Nenhum</string>
+    <string name="settingsSelectFireAnimationDialog">Animação do botão de fogo</string>
+    <string name="settingsSelectFireAnimationDialogSave">Guardar</string>
 
     <!-- Dos Attack error-->
     <string name="dosErrorMessage">Ligação abortada. Este website poderá ser prejudicial ao seu dispositivo.</string>
@@ -516,7 +527,7 @@
     <string name="preciseLocationSnackbarMessage">Anteriormente concedeu %1$s permissão para aceder a localização do seu dispositivo.</string>
 
     <!--Fire button education-->
-    <string name="daxClearDataCtaText">Os dados pessoais podem ser acumulados no seu navegador. Que nojo. Use o Botão de Fogo para queimar tudo. Tente agora! 👇</string>
+    <string name="daxClearDataCtaText">Os dados pessoais podem ser acumulados no seu navegador. Que nojo. Use o botão de fogo para queimar tudo. Experimente agora! 👇</string>
 
     <!--  Global Privacy Control-->
     <string name="globalPrivacyControlActivityTitle">Controlo Global de Privacidade (CGP)</string>

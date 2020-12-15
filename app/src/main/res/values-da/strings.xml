@@ -35,7 +35,7 @@
     <string name="cannotLaunchDefaultAppSettings">Det var ikke muligt at starte standard app-indstillingsskærmen</string>
     <string name="settingsDefaultBrowserEnabled">Angiv som standardbrowser</string>
     <string name="defaultBrowserMaybeLater">Måske senere</string>
-    <string name="defaultBrowserLetsDoIt">Lad os gøre det!</string>
+    <string name="defaultBrowserLetsDoIt">Angiv som standardbrowser</string>
     <string name="defaultBrowserDescriptionNoDefault">Åbne link med ro i sindet, hver gang.</string>
     <string name="defaultBrowserInstructions">Vælg DuckDuckGo, og tryk på <font color="#678fff"> Altid </font>.</string>
 
@@ -94,6 +94,8 @@
     <string name="closeContentDescription">Luk</string>
     <string name="closeAllTabsMenuItem">Luk alle faner</string>
     <string name="closeTab">Luk fane</string>
+    <string name="tabClosed">Fanen er lukket</string>
+    <string name="tabClosedUndo">Fortryd</string>
 
     <!-- Privacy Dashboard Activities -->
     <string name="privacyProtectionToggle">Webstedets beskyttelse af personlige oplysninger</string>
@@ -423,7 +425,7 @@
         <item quantity="other"><![CDATA[ prøvede at spore dig her. <br/><br/>Jeg blokerede dem!<br/><br/> ☝️Du kan kontrollere URL-linjen for at se, hvem der prøver at spore dig, når du besøger et nyt websted.️]]></item>
     </plurals>
     <string name="daxNonSerpCtaText"><![CDATA[Når du trykker og ruller, blokerer jeg irriterende trackere. <br/><br/>Gå videre - fortsæt med at browse!]]></string>
-    <string name="daxMainNetworkCtaText"><![CDATA[Pas på! %1$s er et stort sporingsnetværk.<br/><br/> Deres trackere lurer på omkring %2$s af de mest populære websteder 😱 men bare rolig! <br/><br/>Jeg blokerer for %3$s så de ikke kan se din aktivitet på disse websteder.]]></string>
+    <string name="daxMainNetworkCtaText">Bemærk! Jeg kan ikke forhindre %1$s i at se din aktivitet på %2$s.&lt;br/&gt;&lt;br/&gt;Men gennemsøg sammen med mig, så kan jeg reducere det, som %3$s kender til dig samlet set ved at blokere vedkommendes trackere på mange andre sider.</string>
     <string name="daxMainNetworkOwnedCtaText">Bemærk! Da %1$s ejer %2$s, kan jeg ikke forhindre dem i at se din aktivitet her. &lt;br/&gt;&lt;br/&gt;Men gennemsøg sammen med mig, så kan jeg reducere det, som %3$s kender til dig samlet set ved at blokere deres trackere på mange andre sider.</string>
 
     <!-- Download Confirmation -->
@@ -482,6 +484,15 @@
     <string name="fireproofWebsiteLoginDialogNegative">Ikke nu</string>
     <string name="fireproofWebsiteItemsSectionTitle">Websider</string>
     <string name="fireproofWebsiteToogleText">Spørg, når der logges ind</string>
+
+    <!-- Fire Animation settings -->
+    <string name="settingsFireAnimation">Ildknap-animation</string>
+    <string name="settingsHeroFireAnimation">Inferno</string>
+    <string name="settingsHeroWaterAnimation">Whirlpool</string>
+    <string name="settingsHeroAbstractAnimation">Airstream</string>
+    <string name="settingsNoneAnimation">Ingen</string>
+    <string name="settingsSelectFireAnimationDialog">Ildknap-animation</string>
+    <string name="settingsSelectFireAnimationDialogSave">Gem</string>
 
     <!-- Dos Attack error-->
     <string name="dosErrorMessage">Forbindelse blev afbrudt. Dette websted kan være skadeligt for din enhed.</string>

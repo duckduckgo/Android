@@ -35,7 +35,7 @@
     <string name="cannotLaunchDefaultAppSettings">Nelze spustit výchozí obrazovku nastavení aplikace.</string>
     <string name="settingsDefaultBrowserEnabled">Nastavit jako výchozí prohlížeč</string>
     <string name="defaultBrowserMaybeLater">Možná později</string>
-    <string name="defaultBrowserLetsDoIt">Pojďme na to!</string>
+    <string name="defaultBrowserLetsDoIt">Nastavit jako výchozí prohlížeč</string>
     <string name="defaultBrowserDescriptionNoDefault">Otevírejte odkazy s klidem mysli, pokaždé.</string>
     <string name="defaultBrowserInstructions">Vyberte DuckDuckGo a klepněte na <font color="#678fff">Vždy</font>.</string>
 
@@ -94,6 +94,8 @@
     <string name="closeContentDescription">Zavřít</string>
     <string name="closeAllTabsMenuItem">Zavřít všechny karty</string>
     <string name="closeTab">Zavřít karta</string>
+    <string name="tabClosed">Karta zavřená</string>
+    <string name="tabClosedUndo">Vrátit</string>
 
     <!-- Privacy Dashboard Activities -->
     <string name="privacyProtectionToggle">Ochrana osobních údajů na webových stránkách</string>
@@ -396,7 +398,7 @@
     <string name="systemSearchDeviceAppLabel">Z tohoto zařízení</string>
     <string name="systemSearchOmnibarInputHint"><font size="13">Vyhledat nebo zadat URL</font></string>
     <string name="systemSearchAppNotFound">Aplikace nebyla nalezena</string>
-    <string name="systemSearchOnboardingText">Děkujeme, že jste si vybrali DuckDuckGo!\nPři použití našeho vyhledávání nebo aplikace jsou od teď Vaše vyhledávání chráněna.</string>
+    <string name="systemSearchOnboardingText">Děkujeme, že jste si vybrali DuckDuckGo!\nPři použití našeho vyhledávání nebo aplikace jsou od tohoto okamžiku Vaše vyhledávání chráněna.</string>
     <string name="systemSearchOnboardingFeaturesIntroText">Aplikace DuckDuckGo také:</string>
     <string name="systemSearchOnboardingFeatureOneText">Blokuje nebezpečná sledovací zařízení.</string>
     <string name="systemSearchOnboardingFeatureTwoText">Vynucuje šifrování na webových stránkách.</string>
@@ -419,7 +421,7 @@
     <string name="onboardingWelcomeTitle">"Vítejte v DuckDuckGo!"</string>
     <string name="onboardingDaxText"><![CDATA[Internet může být někdy trochu strašidelný.<br/><br/>Nebojte se! Anonymní vyhledávání a procházení je jednodušší, než si myslíte.]]></string>
     <string name="onboardingLetsDoItButton">Pojďme na to!</string>
-    <string name="daxIntroCtaText"><![CDATA[Dále zkuste navštívit některý z Vašich oblíbených webů! <br/><br/>Zablokujeme sledovače, aby Vás nemohli špehovat. Pokud to bude možné, upgraduji také zabezpečení Vašeho připojení. 🔒]]></string>
+    <string name="daxIntroCtaText"><![CDATA[Dále zkuste navštívit některý z Vašich oblíbených webů! <br/><br/>Zablokujeme trackery, aby Vás nemohli špehovat. Pokud to bude možné, upgraduji také zabezpečení Vašeho připojení. 🔒]]></string>
     <string name="daxEndCtaText"><![CDATA[Máte to!\n\nPamatujte: Pokaždé, když internet procházíte s námi, příšerným reklamám přistřihneme křídla. 👍]]></string>
     <string name="daxSerpCtaText">Vaše vyhledávání DuckDuckGo jsou anonymní a historii Vašeho vyhledávání nikdy nikam neukládáme. Vůbec nikdy. 🙌</string>
     <plurals name="daxTrackersBlockedCtaText">
@@ -435,7 +437,7 @@
         <item quantity="other"><![CDATA[ se vás snažil tady vysledovat. <br/><br/>Zablokovali jsme je!<br/><br/>☝️Můžete zkontrolovat panel URL a zjistit, kdo se vás snaží sledovat, když navštívíte nový web. ️]]></item>
     </plurals>
     <string name="daxNonSerpCtaText"><![CDATA[Zatímco Vy budete klepat a přejíždět, já budu blokovat zlovolné sledovače. <br/><br/>Nenechejte se rušit — pokračujte v prohlížení!]]></string>
-    <string name="daxMainNetworkCtaText"><![CDATA[Hlavy vzhůru! %1$s je významná sledovací síť.<br/><br/> Jejich sledovatelé číhají na přibližně %2$s významných webů 😱, ale netrapte se!<br/><br/>Já %3$s zablokuji, aby Vaši aktivitu na těchto webech neviděl.]]></string>
+    <string name="daxMainNetworkCtaText">Upozornění! Nemůžeme zabránit, aby %1$s viděli vaši aktivitu na stránkách %2$s &lt;br/&gt;&lt;br/&gt;Ale procházejte s námi a budete moci omezit, co o vás %3$s celkově ví zablokováním jejich trackerů na mnoha jiných stránkách.</string>
     <string name="daxMainNetworkOwnedCtaText">Upozornění! Vzhledem k tomu, že %2$s vlastní %1$s, nemůžeme jim zabránit, aby viděli vaši aktivitu tady.&lt;br/&gt;&lt;br/&gt;Ale procházejte s námi a budeme moci redukovat, co o vás celkově %3$s ví zablokováním jejich trackerů na mnoha jiných stránkách.</string>
 
     <!-- Download Confirmation -->
@@ -494,6 +496,15 @@
     <string name="fireproofWebsiteLoginDialogNegative">Teď ne</string>
     <string name="fireproofWebsiteItemsSectionTitle">Webové stránky</string>
     <string name="fireproofWebsiteToogleText">Zeptat se při přihlašování</string>
+
+    <!-- Fire Animation settings -->
+    <string name="settingsFireAnimation">Animace tlačítka pro mazání</string>
+    <string name="settingsHeroFireAnimation">Inferno</string>
+    <string name="settingsHeroWaterAnimation">Vodní vír</string>
+    <string name="settingsHeroAbstractAnimation">Vzdušný proud</string>
+    <string name="settingsNoneAnimation">Žádný</string>
+    <string name="settingsSelectFireAnimationDialog">Animace tlačítka pro mazání</string>
+    <string name="settingsSelectFireAnimationDialogSave">Uložit</string>
 
     <!-- Dos Attack error-->
     <string name="dosErrorMessage">Spojení přerušeno. Tato webová stránka může poškodit vaše zařízení.</string>

@@ -19,7 +19,7 @@
 
     <string name="appName" translatable="false">DuckDuckGo</string>
     <string name="appDescription" translatable="false">DuckDuckGo </string>
-    <string name="duckDuckGoLogoDescription">DuckDuckGo logo</string>
+    <string name="duckDuckGoLogoDescription">DuckDuckGo logosu</string>
     <string name="duckDuckGoPrivacySimplified">Gizlilik, basitleştirildi</string>
     <string name="yes">Evet</string>
     <string name="no">Hayır</string>
@@ -34,10 +34,10 @@
     <!-- Default Browser -->
     <string name="cannotLaunchDefaultAppSettings">Varsayılan uygulama ayarları ekranı başlatılamıyor</string>
     <string name="settingsDefaultBrowserEnabled">Varsayılan tarayıcı olarak ayarla</string>
-    <string name="defaultBrowserMaybeLater">Belki sonra</string>
-    <string name="defaultBrowserLetsDoIt">Hadi başlayalım!</string>
+    <string name="defaultBrowserMaybeLater">Belki Sonra</string>
+    <string name="defaultBrowserLetsDoIt">Varsayılan tarayıcı olarak ayarla</string>
     <string name="defaultBrowserDescriptionNoDefault">Her zaman gönül rahatlığıyla açık bağlantılar.</string>
-    <string name="defaultBrowserInstructions">DuckDuckGo\'yu seçin ve <font color="#678fff">Her zaman</font> öğesine dokunun.</string>
+    <string name="defaultBrowserInstructions">DuckDuckGo\'yu seçin ve <font color="#678fff">Her zaman</font> ögesine dokunun.</string>
 
     <!-- Browser Activity -->
     <string name="browserPopupMenu">Tarayıcı menüsü</string>
@@ -48,7 +48,7 @@
     <string name="omnibarInputHint">URL\'yi arayın veya bir URL yazın</string>
     <string name="clearButtonContentDescription">Arama girişini temizle</string>
     <string name="no_compatible_third_party_app_installed">Yüklü uyumlu uygulama yok</string>
-    <string name="addBookmarkMenuTitle">Yer imi ekle</string>
+    <string name="addBookmarkMenuTitle">Yer İmi ekle</string>
     <string name="requestDesktopSiteMenuTitle">Masaüstü Sitesi</string>
 
     <!-- Downloading files -->
@@ -60,13 +60,13 @@
 
     <!-- Sharing options -->
     <string name="options">Seçenekler</string>
-    <string name="shareLink">Linki paylaş</string>
+    <string name="shareLink">Bağlantıyı paylaş</string>
     <string name="shareMenuTitle">Paylaş…</string>
     <string name="copyUrl">Bağlantı Adresini Kopyala</string>
 
     <!-- Find in page -->
     <string name="findInPageMenuTitle">Sayfada bul</string>
-    <string name="nextSearchTermDescription">Sonraki bul</string>
+    <string name="nextSearchTermDescription">Sonrakini bul</string>
     <string name="previousSearchTermDescription">Öncekini bul</string>
     <string name="closeFindInPageButtonDescription">Sayfa görünümünde bul özelliğini kapat</string>
     <string name="findInPageHint">Sayfada bul</string>
@@ -77,7 +77,7 @@
     <string name="settingsAutocompleteEnabled">Otomatik Tamamlama Önerileri</string>
 
     <!-- Opening external apps -->
-    <string name="openExternalApp">Harici Uygulamayı Aç</string>
+    <string name="openExternalApp">Haricî Uygulamayı Aç</string>
     <string name="launchingExternalApp">Başka uygulamada aç</string>
     <string name="confirmOpenExternalApp">Bu içeriği görüntülemek için DuckDuckGo\'dan ayrılmak ister misiniz?</string>
     <string name="unableToOpenLink">Bu tür bağlantı açılamıyor</string>
@@ -86,14 +86,16 @@
     <string name="homeTab" translatable="false">DuckDuckGo</string>
     <string name="tabActivityTitle">Sekmeler</string>
     <string name="tabsMenuItem">Sekmeler</string>
-    <string name="newTabMenuItem">Yeni sekme</string>
-    <string name="openInNewTab">Yeni sekmede aç</string>
+    <string name="newTabMenuItem">Yeni Sekme</string>
+    <string name="openInNewTab">Yeni Sekmede Aç</string>
     <string name="openInNewBackgroundTab">Arka Plan Sekmesinde Aç</string>
     <string name="openImageInNewTab">Görüntüyü Arka Plan Sekmesinde Aç</string>
     <string name="faviconContentDescription">Favicon</string>
     <string name="closeContentDescription">Kapat</string>
     <string name="closeAllTabsMenuItem">Tüm Sekmeleri Kapat</string>
     <string name="closeTab">Sekmeyi kapat</string>
+    <string name="tabClosed">Sekme kapatıldı</string>
+    <string name="tabClosedUndo">Geri al</string>
 
     <!-- Privacy Dashboard Activities -->
     <string name="privacyProtectionToggle">Site Gizlilik Koruması</string>
@@ -146,8 +148,8 @@
     <string name="practicesIconContentGood">İyi Uygulama Simgesi</string>
     <string name="practicesIconContentBad">Kötü Uygulama Simgesi</string>
 
-    <string name="networkTrackerSummaryHeader">İZLEYİCİ AĞ ÜSTÜ TEKLİFLER</string>
-    <string name="networkTrackerSummaryNotReady">Kaç izleyiciyi engellediğimizi göstermek için hala veri topluyoruz.</string>
+    <string name="networkTrackerSummaryHeader">İZLEYİCİ AĞ İLK SIRADAKİ SUÇLULARI</string>
+    <string name="networkTrackerSummaryNotReady">Kaç izleyiciyi engellediğimizi göstermek için hâlâ veri topluyoruz.</string>
 
     <!-- Fire -->
     <string name="fireMenu">Verileri Temizle</string>
@@ -211,8 +213,8 @@
     <string name="brokenSiteCategoryOther">Başka bir şey</string>
 
     <!-- Bookmarks Activity -->
-    <string name="bookmarksMenuTitle">Yer imleri</string>
-    <string name="bookmarksActivityTitle">Yer imleri</string>
+    <string name="bookmarksMenuTitle">Yer İmleri</string>
+    <string name="bookmarksActivityTitle">Yer İmleri</string>
     <string name="bookmarkDeleteConfirmMessage">&lt;b&gt;%1$s&lt;/b&gt; yer imini silmek istediğinizden emin misiniz?</string>
     <string name="bookmarkAddedFeedback">Yer imi eklendi</string>
     <string name="bookmarkTitleHint">Yer imi başlığı</string>
@@ -243,7 +245,7 @@
     <string name="surveyTitle">DUCKDUCKGO ANKETİ</string>
     <string name="surveyDismissContentDescription">Anketi kapat</string>
     <string name="surveyLoadingErrorTitle">Olamaz!</string>
-    <string name="surveyLoadingErrorText">Anketimiz şu anda yüklenemiyor.\nLütfen daha sonra tekrar deneyiniz.</string>
+    <string name="surveyLoadingErrorText">Anketimiz şu anda yüklenemiyor.\nLütfen daha sonra tekrar deneyin.</string>
 
     <!-- Add widget -->
     <string name="addWidgetCtaTitle">Arama Widget\'ımızı deneyin!</string>
@@ -264,12 +266,12 @@
     <!-- App Enjoyment / Rating / Feedback -->
     <string name="appEnjoymentDialogTitle">DuckDuckGo\'yu sevdiniz mi?</string>
     <string name="appEnjoymentDialogMessage">Düşüncelerinizi öğrenmek isteriz.</string>
-    <string name="appEnjoymentDialogPositiveButton">Sevdim.</string>
-    <string name="appEnjoymentDialogNegativeButton">Üzerinde çalışılmalı.</string>
+    <string name="appEnjoymentDialogPositiveButton">Sevdim</string>
+    <string name="appEnjoymentDialogNegativeButton">Üzerinde çalışılmalı</string>
 
     <string name="rateAppDialogTitle">Uygulamayı değerlendir</string>
     <string name="rateAppDialogMessage">Görüşleriniz önemli. Lütfen bir inceleme yazın.</string>
-    <string name="rateAppDialogPositiveButton">Uygulamayı Değerlendir.</string>
+    <string name="rateAppDialogPositiveButton">Uygulamayı Değerlendir</string>
     <string name="rateAppDialogNegativeButton" translatable="false">@string/noThanks</string>
 
     <string name="giveFeedbackDialogTitle">Bunu duyduğumuza üzüldük</string>
@@ -277,7 +279,7 @@
     <string name="giveFeedbackDialogPositiveButton">Geri Bildirim Paylaş</string>
     <string name="giveFeedbackDialogNegativeButton" translatable="false">@string/noThanks</string>
 
-    <string name="noThanks">Hayır teşekkürler</string>
+    <string name="noThanks">Hayır Teşekkürler</string>
 
     <!-- Notification Channel Names -->
     <string name="notificationChannelFileDownloading">Dosya İndiriliyor</string>
@@ -292,7 +294,7 @@
     <string name="privacyProtectionNotificationDefaultTitle">Gizliliğinizi koruyoruz</string>
     <string name="privacyProtectionNotificationReportTitle">Gizlilik Raporunuz</string>
     <string name="privacyProtectionNotificationDefaultDescription">DuckDuckGo uygulamasını kullanmak, izleyicileri engelleyerek ve bağlantıları şifreleyerek verilerinizi korur.</string>
-    <string name="privacyProtectionNotificationUpgadeDescription">DuckDuckGo kullanırken %1$d şifrelenmemiş bağlantıyı güvenli hale getirerek verilerinizi korudunuz.</string>
+    <string name="privacyProtectionNotificationUpgadeDescription">DuckDuckGo kullanırken %1$d şifrelenmemiş bağlantıyı güvenli hâle getirerek verilerinizi korudunuz.</string>
     <string name="privacyProtectionNotificationTrackerDescription">DuckDuckGo kullanırken %1$d izleyiciyi engelleyerek verilerinizi korudunuz.</string>
     <string name="privacyProtectionNotificationBothDescription">DuckDuckGo kullanırken %1$d izleyiciyi engelleyerek ve %2$d şifrelenmemiş bağlantıyı güvenceye alarak verilerinizi korudunuz.</string>
     <string name="privacyProtectionNotificationLaunchButton">Taramayı Sürdür</string>
@@ -300,7 +302,7 @@
     <!-- Authentication -->
     <string name="authenticationDialogTitle">Oturum aç</string>
     <string name="authenticationDialogMessage">%1$s için bir kullanıcı adı ve şifre gerekiyor.</string>
-    <string name="authenticationDialogPositiveButton">Oturum aç</string>
+    <string name="authenticationDialogPositiveButton">Oturum Aç</string>
     <string name="authenticationDialogNegativeButton">İptal</string>
     <string name="authenticationDialogUsernameHint">Kullanıcı adı</string>
     <string name="authenticationDialogPasswordHint">Parola</string>
@@ -341,13 +343,13 @@
     <string name="needMoreCustomizationSubReasonHomeScreenConfiguration">Ana ekran yapılandırması</string>
     <string name="needMoreCustomizationSubReasonTabDisplay">Sekmelerin görüntülenme şekli</string>
     <string name="needMoreCustomizationSubReasonAppLooks">Uygulamanın görünüşü</string>
-    <string name="needMoreCustomizationSubReasonWhichDataIsCleared">Silinen veri</string>
+    <string name="needMoreCustomizationSubReasonWhichDataIsCleared">Hangi veriler temizlenir</string>
     <string name="needMoreCustomizationSubReasonWhenDataIsCleared">Veriler temizlendiğinde</string>
     <string name="needMoreCustomizationSubReasonBookmarksDisplay">Yer imlerinin görünüşü</string>
     <string name="needMoreCustomizationSubReasonOther">Bunların hiçbiri</string>
 
     <string name="appIsSlowOrBuggyTitleLong">Uygulama yavaş, hatalı veya kilitleniyor</string>
-    <string name="appIsSlowOrBuggyTitleShort">Performans sorunları</string>
+    <string name="appIsSlowOrBuggyTitleShort">Performans Sorunları</string>
     <string name="appIsSlowOrBuggySubtitle">Hangi sorunu yaşıyorsunuz?</string>
     <string name="appIsSlowOrBuggySubReasonSlowResults">Web sayfaları veya arama sonuçları yavaş yükleniyor</string>
     <string name="appIsSlowOrBuggySubReasonAppCrashesOrFreezes">Uygulama çöküyor veya donuyor</string>
@@ -355,7 +357,7 @@
     <string name="appIsSlowOrBuggySubReasonOther">Bunların hiçbiri</string>
 
     <string name="otherMainReasonTitleLong">Bunların hiçbiri</string>
-    <string name="otherMainReasonTitleShort">Diğer sorunlar</string>
+    <string name="otherMainReasonTitleShort">Diğer Sorunlar</string>
 
     <string name="openEndedInputHint">Lütfen mümkün olduğunca spesifik olun</string>
     <string name="submitFeedback">GÖNDER</string>
@@ -376,7 +378,7 @@
     <string name="feedbackSpecificAsPossible">Lütfen mümkün olduğunca spesifik olun</string>
     <string name="feedbackInitialDisambiguationTitle">Başlayalım!</string>
     <string name="feedbackInitialDisambiguationSubtitle">Geri bildirimlerinizi nasıl sınıflandırırsınız?</string>
-    <string name="feedbackInitialDisambiguationHappyButtonContentDescription">Olumlu geribildirim düğmesi</string>
+    <string name="feedbackInitialDisambiguationHappyButtonContentDescription">Olumlu geri bildirim düğmesi</string>
     <string name="feedbackInitialDisambiguationSadButtonContentDescription">Olumsuz geri bildirim düğmesi</string>
     <string name="feedbackIsImportantToUs">İsimsiz geri bildiriminiz bizim için önemlidir.</string>
 
@@ -401,16 +403,16 @@
     <string name="daxDialogHideButton">GİZLE</string>
     <string name="daxDialogPhew">Uf!</string>
     <string name="daxDialogNext">Sonraki</string>
-    <string name="daxDialogHighFive">Çak bir beşlik!</string>
+    <string name="daxDialogHighFive">Çak Bir Beşlik!</string>
     <string name="daxDialogGotIt">Anladım</string>
     <string name="hideTipsTitle">Kalan ipuçları gizlensin mi?</string>
-    <string name="hideTipsText">Sadece birkaç tane var ve onları da bilgilendirici hale getirmeye çalıştık.</string>
+    <string name="hideTipsText">Sadece birkaç tane var ve onları da bilgilendirici hâle getirmeye çalıştık.</string>
     <string name="hideTipsButton">İpuçlarını sonsuza kadar gizle</string>
 
     <!-- New Onboarding Experience -->
-    <string name="onboardingWelcomeTitle">"DuckDuckGo'ya hoş geldiniz!"</string>
+    <string name="onboardingWelcomeTitle">"DuckDuckGo'ya Hoş Geldiniz!"</string>
     <string name="onboardingDaxText"><![CDATA[İnternet biraz ürkütücü olabilir.<br/><br/>Endişelenmeyin! Özel olarak arama yapmak ve sitelere göz atmak düşündüğünüzden daha kolaydır.]]></string>
-    <string name="onboardingLetsDoItButton">Hadi başlayalım!</string>
+    <string name="onboardingLetsDoItButton">Hadi Başlayalım!</string>
     <string name="daxIntroCtaText"><![CDATA[Şimdi favori sitelerinizden birini ziyaret etmeyi deneyin! <br/><br/>İzleyicileri engelleyeceğim, böylece sizi gözetlemeyecekler. Mümkünse bağlantınızın güvenliğini de yükselteceğim. 🔒]]></string>
     <string name="daxEndCtaText"><![CDATA[İşte bu kadar!\n\nUnutmayın: İnterneti benimle ne kadar çok gezerseniz rahatsız edici reklamları da o kadar az görürsünüz. 👍]]></string>
     <string name="daxSerpCtaText">DuckDuckGo aramalarınız anonimdir ve arama geçmişiniz asla saklanmaz. Asla. 🙌</string>
@@ -423,7 +425,7 @@
         <item quantity="other"><![CDATA[ sizi burada izlemeye çalışıyordu. <br/><br/>Onları engelledim!<br/><br/> ☝️Yeni bir siteyi ziyaret ettiğinizde sizi kimin izlemeye çalıştığını görmek için URL çubuğunu kontrol edebilirsiniz.]]></item>
     </plurals>
     <string name="daxNonSerpCtaText"><![CDATA[Siz gezintinize devam ederken sinir bozucu izleyicileri engelleyeceğim. <br/><br/>Hadi, gezinmeye devam edin!]]></string>
-    <string name="daxMainNetworkCtaText"><![CDATA[Dikkat! %1$s büyük bir izleme ağıdır.<br/><br/> İzleyicileri, en iyi sitelerin yaklaşık %2$s kadarını gizliyor 😱 ancak endişelenmeyin! <br/><br/>%3$s \'nin bu sitelerdeki etkinliğinizi görmesini engelleyeceğim.]]></string>
+    <string name="daxMainNetworkCtaText">Dikkat! %2$s üzerindeki etkinliğinizin %1$s tarafından görülmesini önleyemiyorum&lt;br/&gt;&lt;br/&gt;Ama benimle gezinirseniz diğer birçok sitedeki izleyicisini engelleyerek %3$s tarafından sizinle ilgili olarak toplanan bilgilerin miktarını genel anlamda azaltabilirim.</string>
     <string name="daxMainNetworkOwnedCtaText">Dikkat! %2$s sitesinin sahibi %1$s olduğundan, onların buradaki etkinliğinizi görmesini engelleyemem.&lt;br/&gt;&lt;br/&gt;Ama benimle gezinirseniz diğer sitelerdeki pek çok izleyicisini engelleyerek sizin hakkınızda %3$s tarafından bilinenleri genel anlamda azaltabilirim.</string>
 
     <!-- Download Confirmation -->
@@ -445,7 +447,7 @@
 
     <!-- New dashboard / menu buttons -->
     <string name="manageWhitelist">Korumasız Siteler</string>
-    <string name="reportBrokenSite">Hatalı Siteyi Bildir</string>
+    <string name="reportBrokenSite">Hatalı Siteyi Bildirin</string>
 
     <!-- Dialogs -->
     <string name="dialogAddTitle">Ekle</string>
@@ -458,7 +460,7 @@
     <string name="disablePrivacyProtection">Gizlilik Korumasını Devre Dışı Bırak</string>
     <string name="whitelistEntryOverflowContentDescription">Korumasız %1$s sitesi için diğer seçenekler</string>
     <string name="whitelistEntryDeleteConfirmMessage">&lt;b&gt;%1$s&lt;/b&gt; sitesini korumasız sitelerden kaldırmak istediğinizden emin misiniz?</string>
-    <string name="whitelistExplanation">Bu siteler için Gizlilik Koruması uygulanamayacaktır.</string>
+    <string name="whitelistExplanation">Bu siteler için Gizlilik Koruması uygulanmayacaktır.</string>
     <string name="whitelistNoEntries">Gizlilik Koruması tüm siteler için etkin</string>
     <string name="whitelistDomainHint">www.example.com</string>
     <string name="whitelistFormatError">Lütfen <b>example.com</b> gibi bir alan adı girip tekrar deneyin</string>
@@ -472,16 +474,25 @@
     <string name="fireproofWebsiteMenuTitleAdd">Korumalı Site</string>
     <string name="fireproofWebsiteSnackbarConfirmation">&lt;b&gt;%1$s&lt;/b&gt; artık Korumalı! Yönetmek için Ayarlar bölümünü ziyaret edin.</string>
     <string name="fireproofWebsiteSnackbarAction">Geri al</string>
-    <string name="fireproofWebsiteDeleteConfirmMessage">&lt;b&gt;%1$s&lt;/b&gt; \'ı silmek istediğinizden emin misiniz?</string>
+    <string name="fireproofWebsiteDeleteConfirmMessage">&lt;b&gt;%1$s&lt;/b&gt;\'ı silmek istediğinizden emin misiniz?</string>
     <string name="fireproofWebsiteEmptyListHint">Korumalı web sitesi yok</string>
-    <string name="fireproofWebsiteFeatureDescription">Web siteleri oturumunuzu açık tutmak için çerezler kullanır. Bir siteyi Yanmaya Dayanıklı hâle getirdiğinizde çerezler silinmez ve Yangın Düğmesi\'ni kullandıktan sonra bile oturumunuz açık kalır. Yanmaya Dayanıklı web sitelerinde bulunan üçüncü taraf izleyicileri yine engelleriz.</string>
+    <string name="fireproofWebsiteFeatureDescription">Web siteleri oturumunuzu açık tutmak için çerezler kullanır. Bir siteyi Korumalı hâle getirdiğinizde çerezler silinmez ve Yangın Düğmesi\'ni kullandıktan sonra bile oturumunuz açık kalır. Korumalı web sitelerinde bulunan üçüncü taraf izleyicileri yine engelleriz.</string>
     <string name="fireproofWebsiteOverflowContentDescription">Korumalı web sitesi %1$s için daha fazla seçenek</string>
-    <string name="fireproofWebsiteLoginDialogTitle">%1$s sitesini Yanmaya Dayanıklı yapmak ister misiniz?</string>
-    <string name="fireproofWebsiteLoginDialogDescription">Yanmaya Dayanıklı yaptığınızda, Yangın düğmesini kullanıktan sonra da oturumunuz açık kalır.</string>
-    <string name="fireproofWebsiteLoginDialogPositive">Yanmaya Dayanıklı yap</string>
+    <string name="fireproofWebsiteLoginDialogTitle">%1$s sitesini Korumalı yapmak ister misiniz?</string>
+    <string name="fireproofWebsiteLoginDialogDescription">Korumalı yaptığınızda, Yangın düğmesini kullanıktan sonra da oturumunuz açık kalır.</string>
+    <string name="fireproofWebsiteLoginDialogPositive">Korumalı yap</string>
     <string name="fireproofWebsiteLoginDialogNegative">Şimdi değil</string>
     <string name="fireproofWebsiteItemsSectionTitle">Web siteleri</string>
     <string name="fireproofWebsiteToogleText">Oturum Açarken Sor</string>
+
+    <!-- Fire Animation settings -->
+    <string name="settingsFireAnimation">Yangın Düğmesi Animasyonu</string>
+    <string name="settingsHeroFireAnimation">Ateş</string>
+    <string name="settingsHeroWaterAnimation">Girdap</string>
+    <string name="settingsHeroAbstractAnimation">Hava</string>
+    <string name="settingsNoneAnimation">Yok</string>
+    <string name="settingsSelectFireAnimationDialog">Yangın Düğmesi animasyonu</string>
+    <string name="settingsSelectFireAnimationDialogSave">Kaydet</string>
 
     <!-- Dos Attack error-->
     <string name="dosErrorMessage">Bağlantı iptal edildi. Bu web sitesi cihazınıza zarar verebilir.</string>
