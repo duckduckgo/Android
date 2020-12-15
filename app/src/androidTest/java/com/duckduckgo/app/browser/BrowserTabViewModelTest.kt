@@ -1071,6 +1071,7 @@ class BrowserTabViewModelTest {
         loadUrl("http://example.com")
         testee.onDesktopSiteModeToggled(true)
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+        verify(mockPixel).fire(Pixel.PixelName.MENU_ACTION_DESKTOP_SITE_ENABLE_PRESSED)
         assertTrue(browserViewState().isDesktopBrowsingMode)
     }
 
@@ -1078,6 +1079,7 @@ class BrowserTabViewModelTest {
     fun whenUserSelectsMobileSiteThenMobileModeStateUpdated() {
         loadUrl("http://example.com")
         testee.onDesktopSiteModeToggled(false)
+        verify(mockPixel).fire(Pixel.PixelName.MENU_ACTION_DESKTOP_SITE_DISABLE_PRESSED)
         assertFalse(browserViewState().isDesktopBrowsingMode)
     }
 
