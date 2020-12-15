@@ -3026,6 +3026,24 @@ class BrowserTabViewModelTest {
         assertCommandNotIssued<Command.RefreshUserAgent>()
     }
 
+    @Test
+    fun whenPageChangesAndNewPageCanChangeBrowsingModeThenCanChangeBrowsingModeIsTrue() {
+        givenCurrentSite("https://www.example.com/")
+
+        loadUrl("https://www.example2.com", isBrowserShowing = true)
+
+        assertTrue(browserViewState().canChangeBrowsingMode)
+    }
+
+    @Test
+    fun whenPageChangesAndNewPageCannotChangeBrowsingModeThenCanChangeBrowsingModeIsFalse() {
+        givenCurrentSite("https://www.example.com/")
+
+        loadUrl("https://www.facebook.com", isBrowserShowing = true)
+
+        assertFalse(browserViewState().canChangeBrowsingMode)
+    }
+
     private suspend fun givenFireButtonPulsing() {
         whenever(mockUserStageStore.getUserAppStage()).thenReturn(AppStage.DAX_ONBOARDING)
         dismissedCtaDaoChannel.send(listOf(DismissedCta(CtaId.DAX_DIALOG_TRACKERS_FOUND)))
