@@ -48,9 +48,8 @@ class GlobalGlideModule : AppGlideModule() {
                     .addPlatformTrustedCertificates()
                     .build()
 
-                @Suppress("DEPRECATION")
                 val okHttpClient = OkHttpClient.Builder()
-                    .sslSocketFactory(handshakeCertificates.sslSocketFactory())
+                    .sslSocketFactory(handshakeCertificates.sslSocketFactory(), handshakeCertificates.trustManager())
                     .build()
 
                 // use our custom okHttp instead of default HTTPUrlConnection
