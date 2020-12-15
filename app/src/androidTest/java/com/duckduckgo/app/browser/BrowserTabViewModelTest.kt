@@ -3018,6 +3018,14 @@ class BrowserTabViewModelTest {
         verify(mockDismissedCtaDao).insert(DismissedCta(CtaId.DAX_FIRE_BUTTON_PULSE))
     }
 
+    @Test
+    fun whenProgressIs100ThenRefreshUserAgentCommandSent() {
+        loadUrl("http://duckduckgo.com")
+        testee.progressChanged(100)
+
+        assertCommandNotIssued<Command.RefreshUserAgent>()
+    }
+
     private suspend fun givenFireButtonPulsing() {
         whenever(mockUserStageStore.getUserAppStage()).thenReturn(AppStage.DAX_ONBOARDING)
         dismissedCtaDaoChannel.send(listOf(DismissedCta(CtaId.DAX_DIALOG_TRACKERS_FOUND)))
