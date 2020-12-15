@@ -532,7 +532,7 @@
     <!--  Global Privacy Control-->
     <string name="globalPrivacyControlActivityTitle">Global Privacy Control (GPC)</string>
     <string name="globalPrivacyControlDescription">
-        Tietojesi ei pitäisi olla myynnissä. DuckDuckGo on samaa mieltä. Ota \"Global Privacy Control\" (GPC) -asetus käyttöön, niin me kerromme verkkosivustoille, että:\n\n• ne eivät voi myydä tietojasi.\n • niiden täytyy rajoittaa henkilötietojesi jakamista muille yrityksille.
+        Tietojesi ei pitäisi olla myynnissä. DuckDuckGo on samaa mieltä. Ota \"Global Privacy Control\" (GPC) -asetus käyttöön, niin me kerromme verkkosivustoille, että:&lt;br/&gt;&lt;br/&gt;• ne eivät voi myydä tietojasi.&lt;br/&gt; • niiden täytyy rajoittaa henkilötietojesi jakamista muille yrityksille.
     </string>
     <string name="globalPrivacyControlSetting">Global Privacy Control (GPC)</string>
     <string name="globalPrivacyControlToggle">Global Privacy Control (GPC)</string>

@@ -532,7 +532,7 @@
     <!--  Global Privacy Control-->
     <string name="globalPrivacyControlActivityTitle">Global Privacy Control (GPC)</string>
     <string name="globalPrivacyControlDescription">
-        Dine data burde ikke være til salg. Det er vi enige i hos DuckDuckGo. Aktivér indstillingen \"Global Privacy Control\" (GPC), så signalerer vi til websteder, at du foretrækker: \n\n• Ikke at sælge dine persondata.\n • Begræns deling af dine persondata til andre virksomheder.
+        Dine data burde ikke være til salg. Det er vi enige i hos DuckDuckGo. Aktivér indstillingen \"Global Privacy Control\" (GPC), så signalerer vi til websteder, at du foretrækker: &lt;br/&gt;&lt;br/&gt;• Ikke at sælge dine persondata.&lt;br/&gt;• Begræns deling af dine persondata til andre virksomheder.
     </string>
     <string name="globalPrivacyControlSetting">Global Privacy Control (GPC)</string>
     <string name="globalPrivacyControlToggle">Global Privacy Control (GPC)</string>

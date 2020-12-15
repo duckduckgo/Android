@@ -532,7 +532,7 @@
     <!--  Global Privacy Control-->
     <string name="globalPrivacyControlActivityTitle">Üleilmne privaatsuskontroll (Global Privacy Control (GPC))</string>
     <string name="globalPrivacyControlDescription">
-        Sinu andmeid ei tohiks müüa. DuckDuckGo on nõus. Aktiveeri seadistus „Üleilmne privaatsuskontroll“ (GPC) ja me anname veebisaitidele märku sinu eelistustest: \n\n • Mitte müüa sinu isikuandmeid. \n • Piirata sinu isikuandmete jagamist teiste ettevõtetega.
+        Sinu andmeid ei tohiks müüa. DuckDuckGo on nõus. Aktiveeri seadistus „Üleilmne privaatsuskontroll“ (GPC) ja me anname veebisaitidele märku sinu eelistustest: &lt;br/&gt;&lt;br/&gt;• Mitte müüa sinu isikuandmeid. &lt;br/&gt; • Piirata sinu isikuandmete jagamist teiste ettevõtetega.
     </string>
     <string name="globalPrivacyControlSetting">Üleilmne privaatsuskontroll (Global Privacy Control (GPC))</string>
     <string name="globalPrivacyControlToggle">Üleilmne privaatsuskontroll (Global Privacy Control (GPC))</string>

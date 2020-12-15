@@ -532,7 +532,7 @@
     <!--  Global Privacy Control-->
     <string name="globalPrivacyControlActivityTitle">Global Privacy Control (GPC)</string>
     <string name="globalPrivacyControlDescription">
-        I tuoi dati non dovrebbero mai essere messi in vendita. Noi di DuckDuckGo ne siamo convinti. Attiva l\'impostazione \"Global Privacy Control\" (GPC) e segnaleremo ai siti web di:\n\n• Non vendere i tuoi dati personali.\n• Limitare la condivisione dei tuoi dati personali con altre aziende.
+        I tuoi dati non dovrebbero mai essere messi in vendita. Noi di DuckDuckGo ne siamo convinti. Attiva l\'impostazione \"Global Privacy Control\" (GPC) e segnaleremo ai siti web di:&lt;br/&gt;&lt;br/&gt;• Non vendere i tuoi dati personali.&lt;br/&gt;• Limitare la condivisione dei tuoi dati personali con altre aziende.
     </string>
     <string name="globalPrivacyControlSetting">Global Privacy Control (GPC)</string>
     <string name="globalPrivacyControlToggle">Global Privacy Control (GPC)</string>

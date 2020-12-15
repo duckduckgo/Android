@@ -544,7 +544,7 @@
     <!--  Global Privacy Control-->
     <string name="globalPrivacyControlActivityTitle">Globalna Kontrola Prywatności (GPC)</string>
     <string name="globalPrivacyControlDescription">
-        Twoje dane nie są na sprzedaż. W DuckDuckGo w pełni się z tym zgadzamy. Aktywuj ustawienie „Globalna Kontrola Prywatności” (GPC), a my przekażemy witrynom Twoje preferencje:\n\n• Nie sprzedawać Twoich danych osobowych.\n• Ograniczać udostępnianie posiadanych przez te witryny Twoich danych osobowych innym firmom.
+        Twoje dane nie są na sprzedaż. W DuckDuckGo w pełni się z tym zgadzamy. Aktywuj ustawienie „Globalna Kontrola Prywatności” (GPC), a my przekażemy witrynom Twoje preferencje:&lt;br/&gt;&lt;br/&gt;• Nie sprzedawać Twoich danych osobowych.&lt;br/&gt;• Ograniczać udostępnianie posiadanych przez te witryny Twoich danych osobowych innym firmom.
     </string>
     <string name="globalPrivacyControlSetting">Globalna Kontrola Prywatności (GPC)</string>
     <string name="globalPrivacyControlToggle">Globalna Kontrola Prywatności (GPC)</string>

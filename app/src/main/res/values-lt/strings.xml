@@ -544,7 +544,7 @@
     <!--  Global Privacy Control-->
     <string name="globalPrivacyControlActivityTitle">Visuotinė privatumo kontrolė (VPK)</string>
     <string name="globalPrivacyControlDescription">
-        Jūsų duomenys neturi būti pardavinėjami. Svetainėje „DuckDuckGo“ su tuo sutinkame. Aktyvinkite „Visuotinės privatumo kontrolės (VPK)“ nustatymą ir pranešime svetainėms:\n\n• Nepardavinėti jūsų asmens duomenų.\n • Apriboti jūsų asmens duomenų dalijimąsi su kitomis įmonėmis.
+        Jūsų duomenys neturi būti pardavinėjami. Svetainėje „DuckDuckGo“ su tuo sutinkame. Aktyvinkite „Visuotinės privatumo kontrolės (VPK)“ nustatymą ir pranešime svetainėms:&lt;br/&gt;&lt;br/&gt;• Nepardavinėti jūsų asmens duomenų.&lt;br/&gt; • Apriboti jūsų asmens duomenų dalijimąsi su kitomis įmonėmis.
     </string>
     <string name="globalPrivacyControlSetting">Visuotinė privatumo kontrolė (VPK)</string>
     <string name="globalPrivacyControlToggle">Visuotinė privatumo kontrolė (VPK)</string>

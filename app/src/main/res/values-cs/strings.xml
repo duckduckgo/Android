@@ -544,7 +544,7 @@
     <!--  Global Privacy Control-->
     <string name="globalPrivacyControlActivityTitle">Globální kontrola ochrany osobních údajů (GPC)</string>
     <string name="globalPrivacyControlDescription">
-        Vaše osobní údaje nesmí být na prodej. Na tom se ve společnosti DuckDuckGo shodneme. Aktivujte nastavení „Globální kontrola ochrany osobních údajů“ (GPC) a my upozorníme webové stránky na vaše preference:\n\n• Neprodávat vaše osobní údaje.\n • Omezit sdílení vašich osobních údajů s jinými společnosti.
+        Vaše osobní údaje nesmí být na prodej. Na tom se ve společnosti DuckDuckGo shodneme. Aktivujte nastavení „Globální kontrola ochrany osobních údajů“ (GPC) a my upozorníme webové stránky na vaše preference:&lt;br/&gt;&lt;br/&gt;• Neprodávat vaše osobní údaje.&lt;br/&gt;• Omezit sdílení vašich osobních údajů s jinými společnosti.
     </string>
     <string name="globalPrivacyControlSetting">Globální kontrola ochrany osobních údajů (GPC)</string>
     <string name="globalPrivacyControlToggle">Globální kontrola ochrany osobních údajů (GPC)</string>
