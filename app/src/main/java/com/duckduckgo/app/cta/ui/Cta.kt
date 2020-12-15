@@ -214,17 +214,12 @@ sealed class DaxDialogCta(
     ) {
         override fun getDaxText(context: Context): String {
             return if (isFromSameNetworkDomain()) {
-                if (isEnglishLocale()) {
-                    context.resources.getString(
-                        R.string.daxMainNetworkCtaText,
-                        network,
-                        Uri.parse(siteHost).baseHost?.removePrefix("m."),
-                        network
-                    )
-                } else {
-                    // Remove this branch once Translations are ready
-                    nonEnglishText(context)
-                }
+                context.resources.getString(
+                    R.string.daxMainNetworkCtaText,
+                    network,
+                    Uri.parse(siteHost).baseHost?.removePrefix("m."),
+                    network
+                )
             } else {
                 context.resources.getString(
                     R.string.daxMainNetworkOwnedCtaText,
@@ -233,17 +228,6 @@ sealed class DaxDialogCta(
                     network
                 )
             }
-        }
-
-        @Suppress("SENSELESS_COMPARISON")
-        private fun isEnglishLocale(): Boolean {
-            val locale = Locale.getDefault()
-            return locale != null && locale.language == "en"
-        }
-
-        private fun nonEnglishText(context: Context): String {
-            val percentage = networkPropertyPercentages[network]
-            return context.resources.getString(R.string.daxMainNetworkCtaText, network, percentage, network)
         }
 
         override fun createCta(activity: FragmentActivity): DaxDialog =
