@@ -35,9 +35,10 @@ class MobileUrlReWriter @Inject constructor() {
     }
 
     fun getMobileSite(uri: Uri): String? {
+        val host = uri.host ?: return null
         val baseHost = uri.baseHost ?: return null
         val newHost = "m.$baseHost"
-        return uri.toString().replace(baseHost, newHost)
+        return uri.toString().replace(host, newHost)
     }
 
     companion object {
