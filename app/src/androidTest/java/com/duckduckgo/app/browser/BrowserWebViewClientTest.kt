@@ -19,7 +19,6 @@ package com.duckduckgo.app.browser
 import android.content.Context
 import android.os.Build
 import android.webkit.*
-import androidx.core.net.toUri
 import androidx.test.annotation.UiThreadTest
 import androidx.test.filters.SdkSuppress
 import androidx.test.platform.app.InstrumentationRegistry
@@ -184,6 +183,5 @@ class BrowserWebViewClientTest {
 
     companion object {
         const val EXAMPLE_URL = "example.com"
-        val EXAMPLE_URI = EXAMPLE_URL.toUri()
     }
 }
