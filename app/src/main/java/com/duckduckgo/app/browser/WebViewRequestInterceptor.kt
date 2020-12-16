@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.browser
 
+import android.net.Uri
 import android.webkit.WebResourceRequest
 import android.webkit.WebResourceResponse
 import android.webkit.WebView
@@ -84,7 +85,7 @@ class WebViewRequestInterceptor(
             return WebResourceResponse(null, null, null)
         }
 
-        if (shouldAddGcpHeaders(request)) {
+        if (shouldAddGcpHeaders(request) && !requestWasInTheStack(url, webView)) {
             val headers = request.requestHeaders
             headers.putAll(globalPrivacyControl.getHeaders())
             withContext(Dispatchers.Main) {
@@ -128,6 +129,13 @@ class WebViewRequestInterceptor(
                 request.isForMainFrame &&
                 request.method == "GET"
             )
+    }
+
+    private suspend fun requestWasInTheStack(url: Uri, webView: WebView): Boolean {
+        return withContext(Dispatchers.Main) {
+            val webBackForwardList = webView.copyBackForwardList()
+            webBackForwardList.currentItem?.url == url.toString()
+        }
     }
 
     private fun shouldUpgrade(request: WebResourceRequest) =
