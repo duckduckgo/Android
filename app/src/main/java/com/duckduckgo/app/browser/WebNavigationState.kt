@@ -38,6 +38,7 @@ sealed class WebNavigationStateChange {
     object PageCleared : WebNavigationStateChange()
     object Unchanged : WebNavigationStateChange()
     object PageNavigationCleared : WebNavigationStateChange()
+    data class ProgressChanged(val newProgress: Int) : WebNavigationStateChange()
     object Other : WebNavigationStateChange()
 }
 
@@ -51,6 +52,12 @@ fun WebNavigationState.compare(previous: WebNavigationState?): WebNavigationStat
 
     if (originalUrl == null && previous?.originalUrl != null) {
         return PageCleared
+    }
+
+    progress?.let{
+        if (it != previous?.progress) {
+            return ProgressChanged(it)
+        }
     }
 
     val latestUrl = currentUrl ?: return Other

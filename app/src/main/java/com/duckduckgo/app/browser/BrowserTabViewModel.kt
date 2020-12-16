@@ -565,7 +565,8 @@ class BrowserTabViewModel(
     }
 
     override fun willOverrideUrl(newUrl: String) {
-        val previousSiteStillLoading = currentLoadingViewState().isLoading
+        val previousSiteStillLoading = currentLoadingViewState().isLoading //|| !shouldShowNewProgress
+        Timber.d("willoverride for $newUrl and $previousSiteStillLoading")
         if (previousSiteStillLoading) {
             showBlankContentfNewContentDelayed()
         }
@@ -715,11 +716,9 @@ class BrowserTabViewModel(
             is PageCleared -> pageCleared()
             is UrlUpdated -> urlUpdated(stateChange.url)
             is PageNavigationCleared -> disableUserNavigation()
+            is ProgressChanged -> progressChanged(stateChange.newProgress)
         }
 
-        if (newWebNavigationState.progress ?: 0 >= SHOW_CONTENT_MIN_PROGRESS) {
-            showWebContent()
-        }
         navigationAwareLoginDetector.onEvent(NavigationEvent.WebNavigationEvent(stateChange))
     }
 
@@ -913,9 +912,16 @@ class BrowserTabViewModel(
     }
 
     override fun progressChanged(newProgress: Int) {
-        Timber.v("Loading in progress $newProgress")
         if (!currentBrowserViewState().browserShowing) return
+
+        if (newProgress >= SHOW_CONTENT_MIN_PROGRESS && shouldShowNewProgress) {
+            showWebContent()
+        }
+
         val isLoading = newProgress < 100
+
+        Timber.v("Loading in progress $newProgress and $isLoading")
+
         val progress = currentLoadingViewState()
         if (progress.progress == newProgress) return
         val visualProgress = if (newProgress < FIXED_PROGRESS) {
@@ -923,7 +929,9 @@ class BrowserTabViewModel(
         } else {
             newProgress
         }
-        if (shouldShowNewProgress) loadingViewState.value = progress.copy(isLoading = isLoading, progress = visualProgress)
+        if (shouldShowNewProgress) {
+            loadingViewState.value = progress.copy(isLoading = isLoading, progress = visualProgress)
+        }
 
         val showLoadingGrade = progress.privacyOn || isLoading
         privacyGradeViewState.value = currentPrivacyGradeState().copy(shouldAnimate = isLoading, showEmptyGrade = showLoadingGrade)
@@ -1709,6 +1717,7 @@ class BrowserTabViewModel(
     }
 
     override fun redirectTriggeredByGpc() {
+        Timber.d("redirect gpc")
         shouldShowNewProgress = false
         navigationAwareLoginDetector.onEvent(NavigationEvent.GpcRedirect)
     }

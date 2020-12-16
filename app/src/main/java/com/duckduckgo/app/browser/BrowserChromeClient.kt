@@ -75,7 +75,6 @@ class BrowserChromeClient @Inject constructor(private val uncaughtExceptionRepos
             Timber.d("onProgressChanged ${webView.url}, $newProgress")
             val navigationList = webView.safeCopyBackForwardList() ?: return
             webViewClientListener?.navigationStateChanged(WebViewNavigationState(navigationList, newProgress))
-            webViewClientListener?.progressChanged(newProgress)
         } catch (e: Throwable) {
             GlobalScope.launch {
                 uncaughtExceptionRepository.recordUncaughtException(e, ON_PROGRESS_CHANGED)
