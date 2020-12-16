@@ -442,7 +442,7 @@ class WebViewRequestInterceptorTest {
     private fun configureRequestContainsGcpHeader() = runBlocking<Unit> {
         whenever(mockGlobalPrivacyControl.isGpcActive()).thenReturn(true)
         whenever(mockRequest.method).thenReturn("GET")
-        whenever(mockRequest.requestHeaders).thenReturn(mapOf(GlobalPrivacyControlManager.GPC_HEADER.toLowerCase() to "test"))
+        whenever(mockRequest.requestHeaders).thenReturn(mapOf(GlobalPrivacyControlManager.GPC_HEADER to "test"))
 
     }
 

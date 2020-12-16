@@ -184,28 +184,6 @@ class BrowserWebViewClientTest {
         verify(listener, never()).prefetchFavicon(any())
     }
 
-    @Test
-    fun whenShouldOverrideUrlCalledForMainFrameAndRequestContainsHeadersThenPixelSent() {
-        givenRequestIsFromMainFrame(mapOf("test" to "test"))
-        givenUrlIsTypeWeb()
-        val mockWebView: WebView = mock()
-
-        testee.shouldOverrideUrlLoading(mockWebView, request)
-
-        verify(pixel).fire(Pixel.PixelName.WEB_VIEW_REDIRECT_HEADERS)
-    }
-
-    private fun givenUrlIsTypeWeb() {
-        whenever(specialUrlDetector.determineType(EXAMPLE_URI)).thenReturn(SpecialUrlDetector.UrlType.Web(EXAMPLE_URL))
-        whenever(requestRewriter.shouldRewriteRequest(EXAMPLE_URI)).thenReturn(false)
-    }
-
-    private fun givenRequestIsFromMainFrame(params: Map<String, String> = emptyMap()) {
-        whenever(request.isForMainFrame).thenReturn(true)
-        whenever(request.url).thenReturn(EXAMPLE_URI)
-        whenever(request.requestHeaders).thenReturn(params)
-    }
-
     private class TestWebView(context: Context) : WebView(context)
 
     companion object {

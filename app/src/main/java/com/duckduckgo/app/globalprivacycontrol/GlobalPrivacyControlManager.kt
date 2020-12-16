@@ -49,7 +49,7 @@ class GlobalPrivacyControlManager(private val appSettingsPreferencesStore: Setti
     }
 
     companion object {
-        const val GPC_HEADER = "Sec-GPC"
+        const val GPC_HEADER = "sec-gpc"
         const val GPC_HEADER_VALUE = "1"
     }
 

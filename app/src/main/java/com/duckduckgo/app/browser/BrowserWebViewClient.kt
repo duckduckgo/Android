@@ -62,10 +62,6 @@ class BrowserWebViewClient(
      */
     override fun shouldOverrideUrlLoading(view: WebView, request: WebResourceRequest): Boolean {
         val url = request.url
-        // Temp: we want to know if request can have headers when user is redirected via WebView.
-        if (request.requestHeaders?.isNotEmpty() == true && request.isForMainFrame) {
-            pixel.fire(Pixel.PixelName.WEB_VIEW_REDIRECT_HEADERS)
-        }
         return shouldOverride(view, url, request.isForMainFrame)
     }
 

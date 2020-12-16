@@ -31,7 +31,6 @@ import com.duckduckgo.app.trackerdetection.TrackerDetector
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import timber.log.Timber
-import java.util.Locale
 
 interface RequestInterceptor {
 
@@ -125,7 +124,7 @@ class WebViewRequestInterceptor(
         val headers = request.requestHeaders
         return (
             globalPrivacyControl.isGpcActive() &&
-                !headers.containsKey(GlobalPrivacyControlManager.GPC_HEADER.toLowerCase(Locale.ROOT)) &&
+                !headers.containsKey(GlobalPrivacyControlManager.GPC_HEADER) &&
                 request.isForMainFrame &&
                 request.method == "GET"
             )
