@@ -54,28 +54,28 @@ fun WebNavigationState.compare(previous: WebNavigationState?): WebNavigationStat
         return PageCleared
     }
 
+    currentUrl?.let {latestUrl ->
+        // A new page load is identified by the original url changing
+        if (originalUrl != previous?.originalUrl) {
+            return NewPage(latestUrl, title)
+        }
+
+        // The most up-to-date record of the url is the current one, this may change many times during a page load
+        // If the host changes too, we class it as a new page load
+        if (currentUrl != previous?.currentUrl) {
+
+            if (currentUrl?.toUri()?.host != previous?.currentUrl?.toUri()?.host) {
+                return NewPage(latestUrl, title)
+            }
+
+            return UrlUpdated(latestUrl)
+        }
+    }
+
     progress?.let{
         if (it != previous?.progress) {
             return ProgressChanged(it)
         }
-    }
-
-    val latestUrl = currentUrl ?: return Other
-
-    // A new page load is identified by the original url changing
-    if (originalUrl != previous?.originalUrl) {
-        return NewPage(latestUrl, title)
-    }
-
-    // The most up-to-date record of the url is the current one, this may change many times during a page load
-    // If the host changes too, we class it as a new page load
-    if (currentUrl != previous?.currentUrl) {
-
-        if (currentUrl?.toUri()?.host != previous?.currentUrl?.toUri()?.host) {
-            return NewPage(latestUrl, title)
-        }
-
-        return UrlUpdated(latestUrl)
     }
 
     return Other
