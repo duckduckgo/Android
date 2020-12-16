@@ -19,6 +19,8 @@
 package com.duckduckgo.app.browser
 
 import android.net.Uri
+import android.webkit.WebBackForwardList
+import android.webkit.WebHistoryItem
 import android.webkit.WebResourceRequest
 import android.webkit.WebResourceResponse
 import android.webkit.WebView
@@ -56,6 +58,7 @@ class WebViewRequestInterceptorTest {
     private var mockRequest: WebResourceRequest = mock()
     private val mockPrivacyProtectionCountDao: PrivacyProtectionCountDao = mock()
     private val mockGlobalPrivacyControl: GlobalPrivacyControl = mock()
+    private val mockWebBackForwardList: WebBackForwardList = mock()
 
     private var webView: WebView = mock()
 
@@ -341,30 +344,29 @@ class WebViewRequestInterceptorTest {
     fun whenUrlShouldBeUpgradedAndGcpActiveThenLoadUrlWithGpcHeaders() = runBlocking<Unit> {
         configureShouldUpgrade()
         configureShouldAddGpcHeader()
-        val mockWebView: WebView = mock()
         val mockWebViewClientListener: WebViewClientListener = mock()
 
         testee.shouldIntercept(
             request = mockRequest,
             documentUrl = null,
-            webView = mockWebView,
+            webView = webView,
             webViewClientListener = mockWebViewClientListener
         )
 
-        verify(mockWebView).loadUrl(validHttpsUri().toString(), mockGlobalPrivacyControl.getHeaders())
+        verify(webView).loadUrl(validHttpsUri().toString(), mockGlobalPrivacyControl.getHeaders())
     }
 
     @Test
     fun whenRequestShouldAddGcpHeadersThenRedirectTriggeredByGpcCalled() = runBlocking<Unit> {
         configureShouldNotUpgrade()
         configureShouldAddGpcHeader()
-        val mockWebView: WebView = mock()
+        configureUrlDoesNotExistInTheStack()
         val mockWebViewClientListener: WebViewClientListener = mock()
 
         testee.shouldIntercept(
             request = mockRequest,
             documentUrl = null,
-            webView = mockWebView,
+            webView = webView,
             webViewClientListener = mockWebViewClientListener
         )
 
@@ -375,17 +377,34 @@ class WebViewRequestInterceptorTest {
     fun whenRequestShouldAddGcpHeadersThenLoadUrlWithGpcHeaders() = runBlocking<Unit> {
         configureShouldNotUpgrade()
         configureShouldAddGpcHeader()
-        val mockWebView: WebView = mock()
+        configureUrlDoesNotExistInTheStack()
         val mockWebViewClientListener: WebViewClientListener = mock()
 
         testee.shouldIntercept(
             request = mockRequest,
             documentUrl = null,
-            webView = mockWebView,
+            webView = webView,
             webViewClientListener = mockWebViewClientListener
         )
 
-        verify(mockWebView).loadUrl(validUri().toString(), mockGlobalPrivacyControl.getHeaders())
+        verify(webView).loadUrl(validUri().toString(), mockGlobalPrivacyControl.getHeaders())
+    }
+
+    @Test
+    fun whenRequestShouldAddGcpHeadersButUrlExistsInTheStackThenLoadUrlNotCalled() = runBlocking<Unit> {
+        configureShouldNotUpgrade()
+        configureShouldAddGpcHeader()
+        configureUrlExistsInTheStack()
+        val mockWebViewClientListener: WebViewClientListener = mock()
+
+        testee.shouldIntercept(
+            request = mockRequest,
+            documentUrl = null,
+            webView = webView,
+            webViewClientListener = mockWebViewClientListener
+        )
+
+        verify(webView, never()).loadUrl(any())
     }
 
     @Test
@@ -393,34 +412,32 @@ class WebViewRequestInterceptorTest {
         configureShouldNotUpgrade()
         configureRequestContainsGcpHeader()
 
-        val mockWebView: WebView = mock()
         val mockWebViewClientListener: WebViewClientListener = mock()
 
         testee.shouldIntercept(
             request = mockRequest,
             documentUrl = null,
-            webView = mockWebView,
+            webView = webView,
             webViewClientListener = mockWebViewClientListener
         )
 
-        verify(mockWebView, never()).loadUrl(any(), any())
+        verify(webView, never()).loadUrl(any(), any())
     }
 
     @Test
     fun whenRequestShouldNotAddGcpHeadersThenLoadUrlNotCalled() = runBlocking<Unit> {
         configureShouldNotUpgrade()
         configureShouldNotAddGpcHeader()
-        val mockWebView: WebView = mock()
         val mockWebViewClientListener: WebViewClientListener = mock()
 
         testee.shouldIntercept(
             request = mockRequest,
             documentUrl = null,
-            webView = mockWebView,
+            webView = webView,
             webViewClientListener = mockWebViewClientListener
         )
 
-        verify(mockWebView, never()).loadUrl(any(), any())
+        verify(webView, never()).loadUrl(any(), any())
     }
 
     private fun assertRequestCanContinueToLoad(response: WebResourceResponse?) {
@@ -437,6 +454,20 @@ class WebViewRequestInterceptorTest {
         )
         whenever(mockRequest.isForMainFrame).thenReturn(false)
         whenever(mockTrackerDetector.evaluate(any(), any())).thenReturn(blockTrackingEvent)
+    }
+
+    private fun configureUrlExistsInTheStack() {
+        val mockWebHistoryItem: WebHistoryItem = mock()
+        whenever(mockWebHistoryItem.url).thenReturn(validUri().toString())
+        whenever(mockWebBackForwardList.currentItem).thenReturn(mockWebHistoryItem)
+        whenever(webView.copyBackForwardList()).thenReturn(mockWebBackForwardList)
+    }
+
+    private fun configureUrlDoesNotExistInTheStack() {
+        val mockWebHistoryItem: WebHistoryItem = mock()
+        whenever(mockWebHistoryItem.url).thenReturn("www.test.com")
+        whenever(mockWebBackForwardList.currentItem).thenReturn(mockWebHistoryItem)
+        whenever(webView.copyBackForwardList()).thenReturn(mockWebBackForwardList)
     }
 
     private fun configureRequestContainsGcpHeader() = runBlocking<Unit> {
