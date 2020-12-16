@@ -31,7 +31,6 @@ import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.global.exception.UncaughtExceptionRepository
 import com.duckduckgo.app.globalprivacycontrol.GlobalPrivacyControl
 import com.duckduckgo.app.runBlocking
-import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.store.OfflinePixelCountDataStore
 import com.nhaarman.mockitokotlin2.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -58,8 +57,6 @@ class BrowserWebViewClientTest {
     private val uncaughtExceptionRepository: UncaughtExceptionRepository = mock()
     private val dosDetector: DosDetector = DosDetector()
     private val globalPrivacyControl: GlobalPrivacyControl = mock()
-    private val request: WebResourceRequest = mock()
-    private val pixel: Pixel = mock()
     private val trustedCertificateStore: TrustedCertificateStore = mock()
 
     @UiThreadTest
@@ -76,8 +73,7 @@ class BrowserWebViewClientTest {
             cookieManager,
             loginDetector,
             dosDetector,
-            globalPrivacyControl,
-            pixel
+            globalPrivacyControl
         )
         testee.webViewClientListener = listener
     }

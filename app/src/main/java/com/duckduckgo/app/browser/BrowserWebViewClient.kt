@@ -34,7 +34,6 @@ import com.duckduckgo.app.browser.navigation.safeCopyBackForwardList
 import com.duckduckgo.app.global.exception.UncaughtExceptionRepository
 import com.duckduckgo.app.global.exception.UncaughtExceptionSource.*
 import com.duckduckgo.app.globalprivacycontrol.GlobalPrivacyControl
-import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.store.OfflinePixelCountDataStore
 import kotlinx.coroutines.*
 import timber.log.Timber
@@ -50,8 +49,7 @@ class BrowserWebViewClient(
     private val cookieManager: CookieManager,
     private val loginDetector: DOMLoginDetector,
     private val dosDetector: DosDetector,
-    private val globalPrivacyControl: GlobalPrivacyControl,
-    private val pixel: Pixel
+    private val globalPrivacyControl: GlobalPrivacyControl
 ) : WebViewClient() {
 
     var webViewClientListener: WebViewClientListener? = null

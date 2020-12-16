@@ -108,8 +108,7 @@ class BrowserModule {
             cookieManager,
             loginDetector,
             dosDetector,
-            globalPrivacyControl,
-            pixel
+            globalPrivacyControl
         )
     }
 
