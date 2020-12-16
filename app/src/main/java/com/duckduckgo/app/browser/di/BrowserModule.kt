@@ -35,6 +35,7 @@ import com.duckduckgo.app.browser.downloader.FileDownloader
 import com.duckduckgo.app.browser.downloader.NetworkFileDownloader
 import com.duckduckgo.app.browser.favicon.FaviconPersister
 import com.duckduckgo.app.browser.favicon.FileBasedFaviconPersister
+import com.duckduckgo.app.browser.httpauth.WebViewHttpAuthStore
 import com.duckduckgo.app.browser.logindetection.DOMLoginDetector
 import com.duckduckgo.app.browser.logindetection.JsLoginDetector
 import com.duckduckgo.app.browser.logindetection.NavigationAwareLoginDetector
@@ -89,6 +90,7 @@ class BrowserModule {
 
     @Provides
     fun browserWebViewClient(
+        webViewHttpAuthStore: WebViewHttpAuthStore,
         trustedCertificateStore: TrustedCertificateStore,
         requestRewriter: RequestRewriter,
         specialUrlDetector: SpecialUrlDetector,
@@ -102,6 +104,7 @@ class BrowserModule {
         pixel: Pixel
     ): BrowserWebViewClient {
         return BrowserWebViewClient(
+            webViewHttpAuthStore,
             trustedCertificateStore,
             requestRewriter,
             specialUrlDetector,
@@ -144,9 +147,10 @@ class BrowserModule {
         context: Context,
         webViewSessionStorage: WebViewSessionStorage,
         cookieManager: DuckDuckGoCookieManager,
-        fileDeleter: FileDeleter
+        fileDeleter: FileDeleter,
+        webViewHttpAuthStore: WebViewHttpAuthStore
     ): WebDataManager =
-        WebViewDataManager(context, webViewSessionStorage, cookieManager, fileDeleter)
+        WebViewDataManager(context, webViewSessionStorage, cookieManager, fileDeleter, webViewHttpAuthStore)
 
     @Provides
     fun clipboardManager(context: Context): ClipboardManager {

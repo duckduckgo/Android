@@ -17,8 +17,15 @@
 package com.duckduckgo.app.di
 
 import android.content.Context
+import android.os.Build
 import androidx.room.Room
+import androidx.room.RoomDatabase
 import com.duckduckgo.app.browser.addtohome.AddToHomeCapabilityDetector
+import com.duckduckgo.app.browser.httpauth.RealWebViewHttpAuthStore
+import com.duckduckgo.app.browser.httpauth.WebViewHttpAuthStore
+import com.duckduckgo.app.browser.httpauth.db.HttpAuthDatabase
+import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteDao
+import com.duckduckgo.app.global.DefaultDispatcherProvider
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.global.db.MigrationsProvider
 import com.duckduckgo.app.settings.db.SettingsDataStore
@@ -28,6 +35,23 @@ import javax.inject.Singleton
 
 @Module(includes = [DaoModule::class])
 class DatabaseModule {
+
+    @Provides
+    @Singleton
+    fun provideWebViewHttpAuthStore(
+        context: Context,
+        fireproofWebsiteDao: FireproofWebsiteDao
+    ): WebViewHttpAuthStore {
+        val httpAuthDb = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            // This database is a Room wrapper around the http_auth convenience database
+            Room.databaseBuilder(context, HttpAuthDatabase::class.java, "http_auth.db")
+                .setJournalMode(RoomDatabase.JournalMode.TRUNCATE)
+                .addMigrations(HttpAuthDatabase.MIGRATION_1_2)
+                .build()
+        } else null
+
+        return RealWebViewHttpAuthStore(DefaultDispatcherProvider(), fireproofWebsiteDao, httpAuthDb?.httpAuthDao())
+    }
 
     @Provides
     @Singleton
