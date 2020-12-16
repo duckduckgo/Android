@@ -23,9 +23,7 @@ private val EXCLUDED_SYSTEM_APPS = listOf(
     "com.google.android.gsf.login",
     "com.google.android.googlequicksearchbox",
     "com.google.android.gms",
-    "com.google.android.backuptransport",
-    "com.android.providers.downloads",
-    "com.android.providers.downloads.ui"
+    "com.google.android.backuptransport"
 )
 
 private val EXCLUDED_PROBLEMATIC_APPS = listOf(
