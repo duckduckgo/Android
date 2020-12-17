@@ -45,6 +45,48 @@ sealed class NavigationEvent {
     data class LoginAttempt(val url: String) : NavigationEvent()
 }
 
+class AuthUrlDetector {
+    private var authenticationDetector = mapOf<String, Set<Pattern>>(
+        Pair(
+            "accounts.google.com", setOf(Pattern.compile("oauth2/v\\d.*/"), Pattern.compile("signin/v\\d.*/challenge"))
+        ),
+        Pair(
+            "appleid.apple.com", setOf(Pattern.compile("auth/auhtorize"))
+        ),
+        Pair(
+            "facebook.com", setOf(Pattern.compile("/v\\d.*\\/oauth"))
+        ),
+        Pair(
+            "sso", setOf(Pattern.compile("duosecurity/getduo"))
+        ),
+        Pair(
+            "auth.atlassian.com", setOf(Pattern.compile("login"))
+        ),
+        Pair(
+            "id.atlassian.com", setOf(Pattern.compile("login/callback"))
+        ),
+        Pair(
+            "login.microsoftonline.com", setOf(Pattern.compile("common/login"))
+        ),
+        Pair(
+            "linkedin.com", setOf(Pattern.compile("oauth/v\\d.*/"))
+        )
+    )
+
+    fun isAuthUrl(forwardedToUri: ValidUrl): Boolean {
+        authenticationDetector.keys
+            .firstOrNull { forwardedToUri.host.contains(it) }
+            ?.let { authenticationDetector[it] }
+            ?.forEach {
+                if (it.matcher(forwardedToUri.path.orEmpty()).find()) {
+                    return true
+                }
+            }
+
+        return false
+    }
+}
+
 class NextPageLoginDetection @Inject constructor() : NavigationAwareLoginDetector {
 
     override val loginEventLiveData = MutableLiveData<LoginDetected>()
@@ -52,29 +94,18 @@ class NextPageLoginDetection @Inject constructor() : NavigationAwareLoginDetecto
 
     private var urlToCheck: String? = null
     private var loginDetectionJob: Job? = null
-    private var authenticationDetector = mapOf<String, Set<Pattern>>(
-        Pair(
-            "accounts.google.com", setOf(Pattern.compile("oauth2/v\\d/"), Pattern.compile("signin/v\\d/challenge"))
-        ),
-        Pair(
-            "appleid.apple.com", setOf(Pattern.compile("auth/auhtorize"))
-        ),
-        Pair(
-            "facebook.com", setOf(Pattern.compile("\\/v\\d.*\\/oauth"))
-        ),
-        Pair(
-            "sso", setOf(Pattern.compile("duosecurity/getduo"))
-        )
-    )
+    private val authDetector: AuthUrlDetector = AuthUrlDetector()
+
 
     override fun onEvent(navigationEvent: NavigationEvent) {
         Timber.i("LoginDetectionDelegate $navigationEvent")
         return when (navigationEvent) {
             is NavigationEvent.PageFinished -> {
-                Timber.i("LoginDetectionDelegate execute new Login detection Job for $urlToCheck")
-
+                Timber.i("LoginDetectionDelegate schedule Login detection Job for $urlToCheck")
+                loginDetectionJob?.cancel()
                 loginDetectionJob = GlobalScope.launch(Dispatchers.Main) {
                     delay(1000)
+                    Timber.i("LoginDetectionDelegate execute Login detection Job for $urlToCheck")
                     if (urlToCheck.isNullOrBlank()) {
                         discardLoginAttempt()
                     } else {
@@ -83,6 +114,7 @@ class NextPageLoginDetection @Inject constructor() : NavigationAwareLoginDetecto
                                 discardLoginAttempt()
                             }
                             is LoginResult.AuthFlow -> {
+                                Timber.i("LoginDetectionDelegate AuthFlow")
                             }
                             is LoginResult.LoginDetected -> {
                                 loginEventLiveData.value = LoginDetected(detectLogin.authLoginDomain, detectLogin.forwardedToDomain)
@@ -105,10 +137,12 @@ class NextPageLoginDetection @Inject constructor() : NavigationAwareLoginDetecto
     }
 
     private fun saveLoginAttempt(navigationEvent: NavigationEvent.LoginAttempt) {
+        Timber.i("LoginDetectionDelegate saveLoginAttempt $navigationEvent")
         loginAttempt = Uri.parse(navigationEvent.url).getValidUrl() ?: return
     }
 
     private fun discardLoginAttempt() {
+        Timber.i("LoginDetectionDelegate discardLoginAttempt")
         urlToCheck = null
         loginAttempt = null
     }
@@ -154,19 +188,11 @@ class NextPageLoginDetection @Inject constructor() : NavigationAwareLoginDetecto
     private fun detectLogin(forwardedToUrl: String): LoginResult {
         val validLoginAttempt = loginAttempt ?: return LoginResult.Unknown
         val forwardedToUri = Uri.parse(forwardedToUrl).getValidUrl() ?: return LoginResult.Unknown
-
-        authenticationDetector.keys
-            .firstOrNull { forwardedToUri.host.contains(it) }
-            ?.let { authenticationDetector[it] }
-            ?.forEach {
-                if (it.matcher(forwardedToUri.path.orEmpty()).find()) {
-                    return LoginResult.AuthFlow
-                }
-            }
+        if (authDetector.isAuthUrl(forwardedToUri)) return LoginResult.AuthFlow
 
         Timber.i("LoginDetectionDelegate $validLoginAttempt vs $forwardedToUrl")
         if (validLoginAttempt.host != forwardedToUri.host || validLoginAttempt.path != forwardedToUri.path) {
-            Timber.i("LoginDetectionDelegate LoginDetected")
+            Timber.i("LoginDetectionDelegate LoginDetected*************************")
             return LoginResult.LoginDetected(validLoginAttempt.host, forwardedToUri.host)
         }
 
@@ -177,9 +203,9 @@ class NextPageLoginDetection @Inject constructor() : NavigationAwareLoginDetecto
         val validHost = host ?: return null
         return ValidUrl(validHost, path)
     }
-
-    private data class ValidUrl(
-        val host: String,
-        val path: String?
-    )
 }
+
+data class ValidUrl(
+    val host: String,
+    val path: String?
+)
