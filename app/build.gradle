@@ -149,6 +149,7 @@ dependencies {
     implementation "androidx.swiperefreshlayout:swiperefreshlayout:$swipeRefreshLayout"
     implementation "androidx.webkit:webkit:$webkit"
     implementation "com.squareup.okhttp3:okhttp:$okHttp"
+    implementation "com.squareup.okhttp3:okhttp-tls:$okHttp"
     implementation "com.squareup.retrofit2:retrofit:$retrofit"
     implementation "com.squareup.retrofit2:converter-moshi:$retrofit"
     implementation "com.squareup.retrofit2:adapter-rxjava2:$retrofit"
@@ -201,6 +202,7 @@ dependencies {
 
     // Glide
     implementation "com.github.bumptech.glide:glide:$glide"
+    implementation "com.github.bumptech.glide:okhttp3-integration:$glide"
     kapt "com.github.bumptech.glide:compiler:$glide"
 
     // Lottie

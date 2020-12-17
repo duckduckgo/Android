@@ -1471,8 +1471,14 @@ class BrowserTabFragment :
             popupMenu = BrowserPopupMenu(layoutInflater, variantManager.getVariant())
             val view = popupMenu.contentView
             popupMenu.apply {
-                onMenuItemClicked(view.forwardPopupMenuItem) { viewModel.onUserPressedForward() }
-                onMenuItemClicked(view.backPopupMenuItem) { activity?.onBackPressed() }
+                onMenuItemClicked(view.forwardPopupMenuItem) {
+                    pixel.fire(Pixel.PixelName.MENU_ACTION_NAVIGATE_FORWARD_PRESSED)
+                    viewModel.onUserPressedForward()
+                }
+                onMenuItemClicked(view.backPopupMenuItem) {
+                    pixel.fire(Pixel.PixelName.MENU_ACTION_NAVIGATE_BACK_PRESSED)
+                    activity?.onBackPressed()
+                }
                 onMenuItemClicked(view.refreshPopupMenuItem) {
                     viewModel.onRefreshRequested()
                     pixel.fire(Pixel.PixelName.MENU_ACTION_REFRESH_PRESSED.pixelName)
@@ -1486,14 +1492,36 @@ class BrowserTabFragment :
                     pixel.fire(Pixel.PixelName.MENU_ACTION_BOOKMARKS_PRESSED.pixelName)
                 }
                 onMenuItemClicked(view.fireproofWebsitePopupMenuItem) { launch { viewModel.onFireproofWebsiteMenuClicked() } }
-                onMenuItemClicked(view.addBookmarksPopupMenuItem) { launch { viewModel.onBookmarkAddRequested() } }
-                onMenuItemClicked(view.findInPageMenuItem) { viewModel.onFindInPageSelected() }
+                onMenuItemClicked(view.addBookmarksPopupMenuItem) {
+                    launch {
+                        pixel.fire(Pixel.PixelName.MENU_ACTION_ADD_BOOKMARK_PRESSED.pixelName)
+                        viewModel.onBookmarkAddRequested()
+                    }
+                }
+                onMenuItemClicked(view.findInPageMenuItem) {
+                    pixel.fire(Pixel.PixelName.MENU_ACTION_FIND_IN_PAGE_PRESSED)
+                    viewModel.onFindInPageSelected()
+                }
                 onMenuItemClicked(view.whitelistPopupMenuItem) { viewModel.onWhitelistSelected() }
-                onMenuItemClicked(view.brokenSitePopupMenuItem) { viewModel.onBrokenSiteSelected() }
-                onMenuItemClicked(view.settingsPopupMenuItem) { browserActivity?.launchSettings() }
-                onMenuItemClicked(view.requestDesktopSiteCheckMenuItem) { viewModel.onDesktopSiteModeToggled(view.requestDesktopSiteCheckMenuItem.isChecked) }
-                onMenuItemClicked(view.sharePageMenuItem) { viewModel.onShareSelected() }
-                onMenuItemClicked(view.addToHome) { viewModel.onPinPageToHomeSelected() }
+                onMenuItemClicked(view.brokenSitePopupMenuItem) {
+                    pixel.fire(Pixel.PixelName.MENU_ACTION_REPORT_BROKEN_SITE_PRESSED)
+                    viewModel.onBrokenSiteSelected()
+                }
+                onMenuItemClicked(view.settingsPopupMenuItem) {
+                    pixel.fire(Pixel.PixelName.MENU_ACTION_SETTINGS_PRESSED)
+                    browserActivity?.launchSettings()
+                }
+                onMenuItemClicked(view.requestDesktopSiteCheckMenuItem) {
+                    viewModel.onDesktopSiteModeToggled(view.requestDesktopSiteCheckMenuItem.isChecked)
+                }
+                onMenuItemClicked(view.sharePageMenuItem) {
+                    pixel.fire(Pixel.PixelName.MENU_ACTION_SHARE_PRESSED)
+                    viewModel.onShareSelected()
+                }
+                onMenuItemClicked(view.addToHome) {
+                    pixel.fire(Pixel.PixelName.MENU_ACTION_ADD_TO_HOME_PRESSED)
+                    viewModel.onPinPageToHomeSelected()
+                }
             }
             browserMenu.setOnClickListener {
                 hideKeyboardImmediately()

@@ -23,6 +23,7 @@ import androidx.test.annotation.UiThreadTest
 import androidx.test.filters.SdkSuppress
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.CoroutineTestRule
+import com.duckduckgo.app.browser.certificates.rootstore.TrustedCertificateStore
 import com.duckduckgo.app.browser.logindetection.DOMLoginDetector
 import com.duckduckgo.app.browser.logindetection.WebNavigationEvent
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
@@ -55,12 +56,14 @@ class BrowserWebViewClientTest {
     private val uncaughtExceptionRepository: UncaughtExceptionRepository = mock()
     private val dosDetector: DosDetector = DosDetector()
     private val globalPrivacyControlInjector: GlobalPrivacyControlInjector = mock()
+    private val trustedCertificateStore: TrustedCertificateStore = mock()
 
     @UiThreadTest
     @Before
     fun setup() {
         webView = TestWebView(InstrumentationRegistry.getInstrumentation().targetContext)
         testee = BrowserWebViewClient(
+            trustedCertificateStore,
             requestRewriter,
             specialUrlDetector,
             requestInterceptor,

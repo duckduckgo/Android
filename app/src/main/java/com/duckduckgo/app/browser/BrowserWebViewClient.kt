@@ -18,11 +18,15 @@ package com.duckduckgo.app.browser
 
 import android.graphics.Bitmap
 import android.net.Uri
+import android.net.http.SslError
+import android.net.http.SslError.*
 import android.os.Build
 import android.webkit.*
 import androidx.annotation.RequiresApi
 import androidx.annotation.UiThread
 import androidx.annotation.WorkerThread
+import com.duckduckgo.app.browser.certificates.rootstore.CertificateValidationState
+import com.duckduckgo.app.browser.certificates.rootstore.TrustedCertificateStore
 import com.duckduckgo.app.globalprivacycontrol.GlobalPrivacyControlInjector
 import com.duckduckgo.app.browser.logindetection.DOMLoginDetector
 import com.duckduckgo.app.browser.logindetection.WebNavigationEvent
@@ -36,6 +40,7 @@ import timber.log.Timber
 import java.net.URI
 
 class BrowserWebViewClient(
+    private val trustedCertificateStore: TrustedCertificateStore,
     private val requestRewriter: RequestRewriter,
     private val specialUrlDetector: SpecialUrlDetector,
     private val requestInterceptor: RequestInterceptor,
@@ -229,6 +234,20 @@ class BrowserWebViewClient(
                 throw e
             }
         }
+    }
+
+    override fun onReceivedSslError(view: WebView?, handler: SslErrorHandler, error: SslError) {
+        var trusted: CertificateValidationState = CertificateValidationState.UntrustedChain
+        when (error.primaryError) {
+            SSL_UNTRUSTED -> {
+                Timber.d("The certificate authority ${error.certificate.issuedBy.dName} is not trusted")
+                trusted = trustedCertificateStore.validateSslCertificateChain(error.certificate)
+            }
+            else -> Timber.d("SSL error ${error.primaryError}")
+        }
+
+        Timber.d("The certificate authority validation result is $trusted")
+        if (trusted is CertificateValidationState.TrustedChain) handler.proceed() else super.onReceivedSslError(view, handler, error)
     }
 
     private fun buildAuthenticationCredentials(

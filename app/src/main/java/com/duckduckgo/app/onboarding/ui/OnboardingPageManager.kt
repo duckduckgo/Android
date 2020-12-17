@@ -23,6 +23,7 @@ import com.duckduckgo.app.onboarding.ui.OnboardingPageBuilder.OnboardingPageBlue
 import com.duckduckgo.app.onboarding.ui.page.DefaultBrowserPage
 import com.duckduckgo.app.onboarding.ui.page.OnboardingPageFragment
 import com.duckduckgo.app.onboarding.ui.page.WelcomePage
+import com.duckduckgo.app.statistics.VariantManager
 
 interface OnboardingPageManager {
     fun pageCount(): Int
@@ -31,6 +32,7 @@ interface OnboardingPageManager {
 }
 
 class OnboardingPageManagerWithTrackerBlocking(
+    private val variantManager: VariantManager,
     private val onboardingPageBuilder: OnboardingPageBuilder,
     private val defaultWebBrowserCapability: DefaultBrowserDetector
 ) : OnboardingPageManager {
@@ -59,7 +61,8 @@ class OnboardingPageManagerWithTrackerBlocking(
 
     private fun shouldShowDefaultBrowserPage(): Boolean {
         return defaultWebBrowserCapability.deviceSupportsDefaultBrowserConfiguration() &&
-            !defaultWebBrowserCapability.isDefaultBrowser()
+            !defaultWebBrowserCapability.isDefaultBrowser() &&
+            !variantManager.getVariant().hasFeature(VariantManager.VariantFeature.SetDefaultBrowserDialog)
     }
 
     private fun buildDefaultBrowserPage(): DefaultBrowserPage {
