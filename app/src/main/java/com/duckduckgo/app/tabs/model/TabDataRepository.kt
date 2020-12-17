@@ -19,15 +19,19 @@ package com.duckduckgo.app.tabs.model
 import android.net.Uri
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.tabpreview.WebViewPreviewPersister
+import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.global.model.SiteFactory
 import com.duckduckgo.app.global.useourapp.UseOurAppDetector
 import com.duckduckgo.app.tabs.db.TabsDao
 import io.reactivex.Scheduler
 import io.reactivex.schedulers.Schedulers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.drop
 import timber.log.Timber
 import java.util.*
 import javax.inject.Inject
@@ -38,10 +42,21 @@ class TabDataRepository @Inject constructor(
     private val tabsDao: TabsDao,
     private val siteFactory: SiteFactory,
     private val webViewPreviewPersister: WebViewPreviewPersister,
-    private val useOurAppDetector: UseOurAppDetector
+    private val faviconManager: FaviconManager,
+    private val useOurAppDetector: UseOurAppDetector,
+    @AppCoroutineScope private val appCoroutineScope: CoroutineScope
 ) : TabRepository {
 
     override val liveTabs: LiveData<List<TabEntity>> = tabsDao.liveTabs()
+
+    override val flowTabs: Flow<List<TabEntity>> = tabsDao.flowTabs()
+
+    // We only want the new emissions when subscribing, however Room does not honour that contract so we
+    // need to drop the first emission always (this is equivalent to the Observable semantics)
+    @ExperimentalCoroutinesApi
+    override val flowDeletableTabs: Flow<List<TabEntity>> = tabsDao.flowDeletableTabs()
+        .drop(1)
+        .distinctUntilChanged()
 
     override val liveSelectedTab: LiveData<TabEntity> = tabsDao.liveSelectedTab()
 
@@ -177,10 +192,28 @@ class TabDataRepository @Inject constructor(
     override suspend fun delete(tab: TabEntity) {
         databaseExecutor().scheduleDirect {
             deleteOldPreviewImages(tab.tabId)
-
+            deleteOldFavicon(tab.tabId)
             tabsDao.deleteTabAndUpdateSelection(tab)
         }
         siteData.remove(tab.tabId)
+    }
+
+    override suspend fun markDeletable(tab: TabEntity) {
+        databaseExecutor().scheduleDirect {
+            tabsDao.markTabAsDeletable(tab)
+        }
+    }
+
+    override suspend fun undoDeletable(tab: TabEntity) {
+        databaseExecutor().scheduleDirect {
+            tabsDao.undoDeletableTab(tab)
+        }
+    }
+
+    override suspend fun purgeDeletableTabs() = withContext(Dispatchers.IO) {
+        appCoroutineScope.launch {
+            tabsDao.purgeDeletableTabsAndUpdateSelection()
+        }.join()
     }
 
     override suspend fun deleteCurrentTabAndSelectSource() {
@@ -198,10 +231,11 @@ class TabDataRepository @Inject constructor(
         }
     }
 
-    override fun deleteAll() {
+    override suspend fun deleteAll() {
         Timber.i("Deleting tabs right now")
         tabsDao.deleteAllTabs()
-        GlobalScope.launch { webViewPreviewPersister.deleteAll() }
+        webViewPreviewPersister.deleteAll()
+        faviconManager.deleteAllTemp()
         siteData.clear()
     }
 
@@ -209,6 +243,18 @@ class TabDataRepository @Inject constructor(
         databaseExecutor().scheduleDirect {
             val selection = TabSelectionEntity(tabId = tabId)
             tabsDao.insertTabSelection(selection)
+        }
+    }
+
+    override fun updateTabFavicon(tabId: String, fileName: String?) {
+        databaseExecutor().scheduleDirect {
+            val tab = tabsDao.tab(tabId)
+            if (tab == null) {
+                Timber.w("Cannot find tab for tab ID")
+                return@scheduleDirect
+            }
+            Timber.i("Updated tab favicon. $tabId now uses $fileName")
+            deleteOldFavicon(tabId, fileName)
         }
     }
 
@@ -225,6 +271,11 @@ class TabDataRepository @Inject constructor(
             Timber.i("Updated tab preview image. $tabId now uses $fileName")
             deleteOldPreviewImages(tabId, fileName)
         }
+    }
+
+    private fun deleteOldFavicon(tabId: String, currentFavicon: String? = null) {
+        Timber.i("Deleting old favicon for $tabId. Current favicon is $currentFavicon")
+        GlobalScope.launch { faviconManager.deleteOldTempFavicon(tabId, currentFavicon) }
     }
 
     private fun deleteOldPreviewImages(tabId: String, currentPreviewImage: String? = null) {

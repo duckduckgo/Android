@@ -56,8 +56,8 @@ class DuckDuckGoRequestRewriter(
     }
 
     override fun shouldRewriteRequest(uri: Uri): Boolean {
-        return duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(uri.toString()) &&
-                !uri.queryParameterNames.containsAll(arrayListOf(ParamKey.SOURCE, ParamKey.ATB))
+        return (duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(uri.toString()) || duckDuckGoUrlDetector.isDuckDuckGoStaticUrl(uri.toString())) &&
+            !uri.queryParameterNames.containsAll(arrayListOf(ParamKey.SOURCE, ParamKey.ATB))
     }
 
     /**
@@ -72,10 +72,7 @@ class DuckDuckGoRequestRewriter(
 
         val sourceValue = if (appReferrerDataStore.installedFromEuAuction) ParamValue.SOURCE_EU_AUCTION else ParamValue.SOURCE
 
-        if (variantManager.getVariant().hasFeature(VariantManager.VariantFeature.SerpHeaderRemoval)) {
-            builder.appendQueryParameter(ParamKey.HIDE_SERP, ParamValue.HIDE_SERP)
-        }
-
+        builder.appendQueryParameter(ParamKey.HIDE_SERP, ParamValue.HIDE_SERP)
         builder.appendQueryParameter(ParamKey.SOURCE, sourceValue)
     }
 }

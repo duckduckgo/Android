@@ -37,7 +37,6 @@ import com.duckduckgo.app.cta.ui.CtaViewModel
 import com.duckduckgo.app.feedback.ui.common.FeedbackActivity
 import com.duckduckgo.app.fire.DataClearer
 import com.duckduckgo.app.fire.DataClearerForegroundAppRestartPixel
-import com.duckduckgo.app.fire.FireAnimationLoader
 import com.duckduckgo.app.global.ApplicationClearDataState
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.intentText
@@ -49,6 +48,8 @@ import com.duckduckgo.app.privacy.ui.PrivacyDashboardActivity
 import com.duckduckgo.app.settings.SettingsActivity
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.FIRE_DIALOG_CANCEL
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.FIRE_DIALOG_PROMOTED_CANCEL
 import com.duckduckgo.app.tabs.model.TabEntity
 import kotlinx.android.synthetic.main.activity_browser.*
 import kotlinx.coroutines.*
@@ -79,9 +80,6 @@ class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope() {
     @Inject
     lateinit var variantManager: VariantManager
 
-    @Inject
-    lateinit var fireAnimationLoader: FireAnimationLoader
-
     private var currentTab: BrowserTabFragment? = null
 
     private val viewModel: BrowserViewModel by bindViewModel()
@@ -107,9 +105,12 @@ class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope() {
 
         super.onCreate(savedInstanceState = newInstanceState, daggerInject = false)
         setContentView(R.layout.activity_browser)
-        viewModel.viewState.observe(this, Observer {
-            renderer.renderBrowserViewState(it)
-        })
+        viewModel.viewState.observe(
+            this,
+            Observer {
+                renderer.renderBrowserViewState(it)
+            }
+        )
         viewModel.awaitClearDataFinishedNotification()
     }
 
@@ -231,17 +232,25 @@ class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope() {
     }
 
     private fun configureObservers() {
-        lifecycle.addObserver(fireAnimationLoader)
-        viewModel.command.observe(this, Observer {
-            processCommand(it)
-        })
-        viewModel.selectedTab.observe(this, Observer {
-            if (it != null) selectTab(it)
-        })
-        viewModel.tabs.observe(this, Observer {
-            clearStaleTabs(it)
-            launch { viewModel.onTabsUpdated(it) }
-        })
+        viewModel.command.observe(
+            this,
+            Observer {
+                processCommand(it)
+            }
+        )
+        viewModel.selectedTab.observe(
+            this,
+            Observer {
+                if (it != null) selectTab(it)
+            }
+        )
+        viewModel.tabs.observe(
+            this,
+            Observer {
+                clearStaleTabs(it)
+                launch { viewModel.onTabsUpdated(it) }
+            }
+        )
     }
 
     private fun removeObservers() {
@@ -290,13 +299,22 @@ class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope() {
 
     fun launchFire() {
         pixel.fire(Pixel.PixelName.FORGET_ALL_PRESSED_BROWSING)
-        val dialog = FireDialog(context = this, clearPersonalDataAction = clearPersonalDataAction, ctaViewModel = ctaViewModel, variantManager = variantManager)
+        val dialog = FireDialog(
+            context = this,
+            clearPersonalDataAction = clearPersonalDataAction,
+            ctaViewModel = ctaViewModel,
+            pixel = pixel,
+            settingsDataStore = settingsDataStore
+        )
         dialog.clearStarted = {
             removeObservers()
         }
         dialog.clearComplete = { viewModel.onClearComplete() }
         dialog.setOnShowListener { currentTab?.onFireDialogVisibilityChanged(isVisible = true) }
-        dialog.setOnCancelListener { currentTab?.onFireDialogVisibilityChanged(isVisible = false) }
+        dialog.setOnCancelListener {
+            pixel.fire(if (dialog.ctaVisible) FIRE_DIALOG_PROMOTED_CANCEL else FIRE_DIALOG_CANCEL)
+            currentTab?.onFireDialogVisibilityChanged(isVisible = false)
+        }
         dialog.show()
     }
 

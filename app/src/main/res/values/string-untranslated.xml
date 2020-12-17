@@ -15,8 +15,6 @@
   -->
 
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
-    <!--Fire button education-->
-    <string name="daxClearDataCtaText">Now tap below to burn your browsing history. Give it a try! &#128071;</string>
 
     <!-- Use Our App Flow -->
     <string name="useOurAppDialogText">Did you know the Facebook app can make requests for data even when you\'re not using it?&lt;br/&gt;&lt;br/&gt;Replace the app with a home screen shortcut that opens Facebook in DuckDuckGo. Then delete the Facebook app.</string>
@@ -26,29 +24,5 @@
     <string name="useOurAppNotificationDescription">Here\'s a simple way to reduce its reach.</string>
     <string name="useOurAppShortcutAddedText">Success! %s has been added to your home screen.</string>
     <string name="useOurAppDeletionDialogText">Checking your feed in DuckDuckGo is a great alternative to using the Facebook app!&lt;br/&gt;&lt;br/&gt;But if the Facebook app is on your phone, it can make requests for data even when you\'re not using it.&lt;br/&gt;&lt;br/&gt;Prevent this by deleting it now!</string>
-
-    <!-- Precise Location -->
-    <string name="preciseLocationSystemDialogTitle">Enable device location for DuckDuckGo Privacy Browser?</string>
-    <string name="preciseLocationSystemDialogSubtitle">%s is requesting your device location. You\'ll first need to allow the app to send your device location, then %s can ask permission.</string>
-    <string name="preciseLocationSystemDialogAllow">Enable</string>
-    <string name="preciseLocationSystemDialogDeny">Maybe Later</string>
-    <string name="preciseLocationSystemDialogNeverAllow">Don\'t Ask Again for this Site</string>
-    <string name="preciseLocationSiteDialogTitle">Grant %s permission to access location?</string>
-    <string name="preciseLocationSiteDialogSubtitle">You can manage the location access permissions you’ve granted to individual sites in Settings.</string>
-    <string name="preciseLocationSiteDialogAllowAlways">Always</string>
-    <string name="preciseLocationSiteDialogAllowOnce">Only for this session</string>
-    <string name="preciseLocationSiteDialogDenyAlways">Deny always</string>
-    <string name="preciseLocationSiteDialogDenyOnce">Deny for this session</string>
-    <string name="settingsPreciseLocation">Location</string>
-    <string name="preciseLocationFeatureDescription">Sites you visit may ask to know your device location. They won\'t be able to access it until you explicitly grant permission. DuckDuckGo only uses your location anonymously to deliver local search results.</string>
-    <string name="preciseLocationToggleText">Sites can ask for my location</string>
-    <string name="preciseLocationEmptyListHint">No websites granted permission to access location</string>
-    <string name="preciseLocationNoSystemPermission">To manage the location access permissions you\’ve granted to individual sites, enable location for this app in Android Settings.</string>
-    <string name="preciseLocationActivityTitle">Location</string>
-    <string name="preciseLocationDeleteConfirmMessage">Are you sure you want to delete &lt;b>%s&lt;/b>?</string>
-    <string name="preciseLocationDeleteContentDescription">More options for location permissions in domain %s</string>
-    <string name="preciseLocationAllowedSitesSectionTitle">Granted</string>
-    <string name="preciseLocationDeniedSitesSectionTitle">Denied</string>
-    <string name="preciseLocationSnackbarMessage">You previously granted %s permission to access your device location.</string>
 
 </resources>

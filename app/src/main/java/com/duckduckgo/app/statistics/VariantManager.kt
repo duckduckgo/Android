@@ -16,6 +16,8 @@
 
 package com.duckduckgo.app.statistics
 
+import android.os.Build
+import android.os.Build.VERSION_CODES.Q
 import androidx.annotation.WorkerThread
 import com.duckduckgo.app.statistics.VariantManager.Companion.DEFAULT_VARIANT
 import com.duckduckgo.app.statistics.VariantManager.Companion.referrerVariant
@@ -30,7 +32,7 @@ interface VariantManager {
     sealed class VariantFeature {
         object SerpHeaderQueryReplacement : VariantFeature()
         object SerpHeaderRemoval : VariantFeature()
-        object FireButtonEducation : VariantFeature()
+        object SetDefaultBrowserDialog : VariantFeature()
     }
 
     companion object {
@@ -43,21 +45,22 @@ interface VariantManager {
         val ACTIVE_VARIANTS = listOf(
             // SERP variants. "sc" may also be used as a shared control for mobile experiments in
             // the future if we can filter by app version
-            Variant(key = "sc", weight = 1.0, features = emptyList(), filterBy = { isSerpRegionToggleCountry() }),
-            Variant(key = "se", weight = 1.0, features = emptyList(), filterBy = { isSerpRegionToggleCountry() }),
+            Variant(key = "sc", weight = 0.0, features = emptyList(), filterBy = { isSerpRegionToggleCountry() }),
+            Variant(key = "se", weight = 0.0, features = emptyList(), filterBy = { isSerpRegionToggleCountry() }),
 
             // Single Search Bar Experiments
             Variant(key = "zg", weight = 0.0, features = emptyList(), filterBy = { noFilter() }),
             Variant(key = "zh", weight = 0.0, features = listOf(VariantFeature.SerpHeaderQueryReplacement), filterBy = { noFilter() }),
             Variant(key = "zi", weight = 0.0, features = listOf(VariantFeature.SerpHeaderRemoval), filterBy = { noFilter() }),
 
-            // Fire Education Experiments
-            Variant(key = "zm", weight = 1.0, features = emptyList(), filterBy = { isEnglishLocale() }),
+            // Role manager default browser dialog
+            Variant(key = "zt", weight = 1.0, features = emptyList(), filterBy = { isAtLeastApiVersion(Q) }),
             Variant(
-                key = "zr",
+                key = "zu",
                 weight = 1.0,
-                features = listOf(VariantFeature.FireButtonEducation),
-                filterBy = { isEnglishLocale() })
+                features = listOf(VariantFeature.SetDefaultBrowserDialog),
+                filterBy = { isAtLeastApiVersion(Q) }
+            )
             // All groups in an experiment (control and variants) MUST use the same filters
         )
 
@@ -92,6 +95,8 @@ interface VariantManager {
             val locale = Locale.getDefault()
             return locale != null && locale.language == "en"
         }
+
+        private fun isAtLeastApiVersion(version: Int) = Build.VERSION.SDK_INT >= version
 
         private fun isSerpRegionToggleCountry(): Boolean {
             val locale = Locale.getDefault()

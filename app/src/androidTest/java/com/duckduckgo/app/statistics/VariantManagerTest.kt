@@ -24,22 +24,22 @@ import org.junit.Test
 class VariantManagerTest {
 
     private val variants = VariantManager.ACTIVE_VARIANTS +
-            VariantManager.REFERRER_VARIANTS +
-            DEFAULT_VARIANT
+        VariantManager.REFERRER_VARIANTS +
+        DEFAULT_VARIANT
 
     // SERP Experiment(s)
 
     @Test
     fun serpControlVariantHasExpectedWeightAndNoFeatures() {
         val variant = variants.first { it.key == "sc" }
-        assertEqualsDouble(1.0, variant.weight)
+        assertEqualsDouble(0.0, variant.weight)
         assertEquals(0, variant.features.size)
     }
 
     @Test
     fun serpExperimentalVariantHasExpectedWeightAndNoFeatures() {
         val variant = variants.first { it.key == "se" }
-        assertEqualsDouble(1.0, variant.weight)
+        assertEqualsDouble(0.0, variant.weight)
         assertEquals(0, variant.features.size)
     }
 
@@ -67,19 +67,18 @@ class VariantManagerTest {
         assertEquals(SerpHeaderQueryReplacement, variant.features[0])
     }
 
-    // Fire button education
     @Test
-    fun fireButtonEducationControlGroupVariantIsActive() {
-        val variant = variants.first { it.key == "zm" }
+    fun roleManagerDefaultBrowserDialogControlHasExpectedWeightAndFeatures() {
+        val variant = variants.first { it.key == "zt" }
         assertEqualsDouble(1.0, variant.weight)
+        assertTrue(variant.features.isEmpty())
     }
 
     @Test
-    fun fireButtonEducationVariantHasExpectedWeightAndFeatures() {
-        val variant = variants.first { it.key == "zr" }
+    fun roleManagerDefaultBrowserDialogTreatmentHasExpectedWeightAndFeatures() {
+        val variant = variants.first { it.key == "zu" }
         assertEqualsDouble(1.0, variant.weight)
-        assertEquals(1, variant.features.size)
-        assertTrue(variant.hasFeature(FireButtonEducation))
+        assertTrue(variant.features == listOf(SetDefaultBrowserDialog))
     }
 
     @Test

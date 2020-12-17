@@ -26,6 +26,9 @@ fun ByteArray.verifySha256(sha256: String): Boolean {
     return this.sha256 == sha256
 }
 
+val String.sha256: String
+    get() = sha("SHA-256", this.toByteArray())
+
 val String.sha1: String
     get() = sha("SHA-1", this.toByteArray())
 

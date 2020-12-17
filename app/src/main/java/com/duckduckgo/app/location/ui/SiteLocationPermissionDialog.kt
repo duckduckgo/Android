@@ -17,22 +17,31 @@
 package com.duckduckgo.app.location.ui
 
 import android.app.Dialog
-import android.net.Uri
+import android.content.Context
 import android.os.Bundle
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.DialogFragment
+import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.app.browser.R
-import com.duckduckgo.app.global.faviconLocation
-import com.duckduckgo.app.global.image.GlideApp
+import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.global.view.gone
 import com.duckduckgo.app.global.view.websiteFromGeoLocationsApiOrigin
 import com.duckduckgo.app.location.data.LocationPermissionType
+import dagger.android.support.AndroidSupportInjection
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
 import org.jetbrains.anko.find
+import javax.inject.Inject
 
 class SiteLocationPermissionDialog : DialogFragment() {
+
+    @Inject
+    lateinit var faviconManager: FaviconManager
+
+    var faviconJob: Job? = null
 
     interface SiteLocationPermissionDialogListener {
         fun onSiteLocationPermissionSelected(domain: String, permission: LocationPermissionType)
@@ -46,6 +55,11 @@ class SiteLocationPermissionDialog : DialogFragment() {
                 activity as SiteLocationPermissionDialogListener
             }
         }
+
+    override fun onAttach(context: Context) {
+        AndroidSupportInjection.inject(this)
+        super.onAttach(context)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -78,6 +92,11 @@ class SiteLocationPermissionDialog : DialogFragment() {
         return alertDialog.create()
     }
 
+    override fun onDetach() {
+        faviconJob?.cancel()
+        super.onDetach()
+    }
+
     private fun populateTitle(title: TextView) {
         arguments?.let { args ->
             val originUrl = args.getString(KEY_REQUEST_ORIGIN)!!
@@ -89,12 +108,18 @@ class SiteLocationPermissionDialog : DialogFragment() {
     private fun populateFavicon(imageView: ImageView) {
         arguments?.let { args ->
             val originUrl = args.getString(KEY_REQUEST_ORIGIN)
-            val faviconUrl = Uri.parse(originUrl).faviconLocation()
+            val tabId = args.getString(KEY_TAB_ID, "")
 
-            GlideApp.with(requireContext())
-                .load(faviconUrl)
-                .error(R.drawable.ic_globe_gray_16dp)
-                .into(imageView)
+            originUrl?.let { url ->
+                faviconJob?.cancel()
+                faviconJob = this.lifecycleScope.launch {
+                    if (tabId.isNotBlank()) {
+                        faviconManager.loadToViewFromTemp(tabId, url, imageView)
+                    } else {
+                        faviconManager.loadToViewFromPersisted(url, imageView)
+                    }
+                }
+            }
         }
     }
 
@@ -163,11 +188,13 @@ class SiteLocationPermissionDialog : DialogFragment() {
         const val SITE_LOCATION_PERMISSION_TAG = "SiteLocationPermission"
         private const val KEY_REQUEST_ORIGIN = "KEY_REQUEST_ORIGIN"
         private const val KEY_EDITING_PERMISSION = "KEY_SCREEN_FROM"
+        private const val KEY_TAB_ID = "TAB_ID"
 
-        fun instance(origin: String, isEditingPermission: Boolean): SiteLocationPermissionDialog {
+        fun instance(origin: String, isEditingPermission: Boolean, tabId: String): SiteLocationPermissionDialog {
             return SiteLocationPermissionDialog().also { fragment ->
                 val bundle = Bundle()
                 bundle.putString(KEY_REQUEST_ORIGIN, origin)
+                bundle.putString(KEY_TAB_ID, tabId)
                 bundle.putBoolean(KEY_EDITING_PERMISSION, isEditingPermission)
                 fragment.arguments = bundle
             }

@@ -27,7 +27,7 @@ import com.duckduckgo.app.browser.*
 import com.duckduckgo.app.browser.addtohome.AddToHomeCapabilityDetector
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.browser.downloader.FileDownloader
-import com.duckduckgo.app.browser.favicon.FaviconDownloader
+import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.logindetection.NavigationAwareLoginDetector
 import com.duckduckgo.app.browser.omnibar.QueryUrlConverter
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
@@ -39,6 +39,7 @@ import com.duckduckgo.app.feedback.ui.initial.InitialFeedbackFragmentViewModel
 import com.duckduckgo.app.feedback.ui.negative.brokensite.BrokenSiteNegativeFeedbackViewModel
 import com.duckduckgo.app.feedback.ui.negative.openended.ShareOpenEndedNegativeFeedbackViewModel
 import com.duckduckgo.app.feedback.ui.positive.initial.PositiveFeedbackLandingViewModel
+import com.duckduckgo.app.fire.FireAnimationLoader
 import com.duckduckgo.app.fire.DataClearer
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepository
 import com.duckduckgo.app.fire.fireproofwebsite.ui.FireproofWebsitesViewModel
@@ -48,6 +49,7 @@ import com.duckduckgo.app.global.rating.AppEnjoymentPromptEmitter
 import com.duckduckgo.app.global.rating.AppEnjoymentUserEventRecorder
 import com.duckduckgo.app.global.events.db.UserEventsStore
 import com.duckduckgo.app.global.useourapp.UseOurAppDetector
+import com.duckduckgo.app.globalprivacycontrol.ui.GlobalPrivacyControlViewModel
 import com.duckduckgo.app.icon.api.IconModifier
 import com.duckduckgo.app.icon.ui.ChangeIconViewModel
 import com.duckduckgo.app.launch.LaunchViewModel
@@ -107,7 +109,7 @@ class ViewModelFactory @Inject constructor(
     private val brokenSiteSender: BrokenSiteSender,
     private val webViewSessionStorage: WebViewSessionStorage,
     private val specialUrlDetector: SpecialUrlDetector,
-    private val faviconDownloader: FaviconDownloader,
+    private val faviconManager: FaviconManager,
     private val addToHomeCapabilityDetector: AddToHomeCapabilityDetector,
     private val pixel: Pixel,
     private val dataClearer: DataClearer,
@@ -125,7 +127,8 @@ class ViewModelFactory @Inject constructor(
     private val userOurAppDetector: UseOurAppDetector,
     private val dismissedCtaDao: DismissedCtaDao,
     private val fileDownloader: FileDownloader,
-    private val dispatcherProvider: DispatcherProvider
+    private val dispatcherProvider: DispatcherProvider,
+    private val fireAnimationLoader: FireAnimationLoader
 ) : ViewModelProvider.NewInstanceFactory() {
 
     override fun <T : ViewModel> create(modelClass: Class<T>) =
@@ -147,7 +150,7 @@ class ViewModelFactory @Inject constructor(
                 isAssignableFrom(SurveyViewModel::class.java) -> SurveyViewModel(surveyDao, statisticsStore, appInstallStore)
                 isAssignableFrom(AddWidgetInstructionsViewModel::class.java) -> AddWidgetInstructionsViewModel()
                 isAssignableFrom(SettingsViewModel::class.java) -> settingsViewModel()
-                isAssignableFrom(BookmarksViewModel::class.java) -> BookmarksViewModel(bookmarksDao)
+                isAssignableFrom(BookmarksViewModel::class.java) -> BookmarksViewModel(bookmarksDao, faviconManager, dispatcherProvider)
                 isAssignableFrom(InitialFeedbackFragmentViewModel::class.java) -> InitialFeedbackFragmentViewModel()
                 isAssignableFrom(PositiveFeedbackLandingViewModel::class.java) -> PositiveFeedbackLandingViewModel()
                 isAssignableFrom(ShareOpenEndedNegativeFeedbackViewModel::class.java) -> ShareOpenEndedNegativeFeedbackViewModel()
@@ -156,6 +159,7 @@ class ViewModelFactory @Inject constructor(
                 isAssignableFrom(ChangeIconViewModel::class.java) -> changeAppIconViewModel()
                 isAssignableFrom(FireproofWebsitesViewModel::class.java) -> fireproofWebsiteViewModel()
                 isAssignableFrom(LocationPermissionsViewModel::class.java) -> locationPermissionsViewModel()
+                isAssignableFrom(GlobalPrivacyControlViewModel::class.java) -> globalPrivacyControlViewModel()
 
                 else -> throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")
             }
@@ -170,6 +174,7 @@ class ViewModelFactory @Inject constructor(
             appSettingsPreferencesStore,
             defaultBrowserDetector,
             variantManager,
+            fireAnimationLoader,
             pixel
         )
     }
@@ -212,7 +217,7 @@ class ViewModelFactory @Inject constructor(
         longPressHandler = webViewLongPressHandler,
         webViewSessionStorage = webViewSessionStorage,
         specialUrlDetector = specialUrlDetector,
-        faviconDownloader = faviconDownloader,
+        faviconManager = faviconManager,
         addToHomeCapabilityDetector = addToHomeCapabilityDetector,
         ctaViewModel = ctaViewModel,
         searchCountDao = searchCountDao,
@@ -240,6 +245,12 @@ class ViewModelFactory @Inject constructor(
             locationPermissionsRepository = locationPermissionsRepository,
             geoLocationPermissions = geoLocationPermissions,
             dispatcherProvider = dispatcherProvider,
+            settingsDataStore = appSettingsPreferencesStore,
+            pixel = pixel
+        )
+
+    private fun globalPrivacyControlViewModel() =
+        GlobalPrivacyControlViewModel(
             settingsDataStore = appSettingsPreferencesStore,
             pixel = pixel
         )

@@ -20,13 +20,14 @@ import androidx.lifecycle.LiveData
 import androidx.room.*
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabSelectionEntity
+import kotlinx.coroutines.flow.Flow
 import javax.inject.Singleton
 
 @Dao
 @Singleton
 abstract class TabsDao {
 
-    @Query("select * from tabs order by position limit 1")
+    @Query("select * from tabs where deletable is 0 order by position limit 1")
     abstract fun firstTab(): TabEntity?
 
     @Query("select * from tabs inner join tab_selection on tabs.tabId = tab_selection.tabId order by position limit 1")
@@ -35,11 +36,17 @@ abstract class TabsDao {
     @Query("select * from tabs inner join tab_selection on tabs.tabId = tab_selection.tabId order by position limit 1")
     abstract fun liveSelectedTab(): LiveData<TabEntity>
 
-    @Query("select * from tabs order by position")
+    @Query("select * from tabs where deletable is 0 order by position")
     abstract fun tabs(): List<TabEntity>
 
-    @Query("select * from tabs order by position")
+    @Query("select * from tabs where deletable is 0 order by position")
+    abstract fun flowTabs(): Flow<List<TabEntity>>
+
+    @Query("select * from tabs where deletable is 0 order by position")
     abstract fun liveTabs(): LiveData<List<TabEntity>>
+
+    @Query("select * from tabs where deletable is 1 order by position")
+    abstract fun flowDeletableTabs(): Flow<List<TabEntity>>
 
     @Query("select * from tabs where tabId = :tabId")
     abstract fun tab(tabId: String): TabEntity?
@@ -55,6 +62,40 @@ abstract class TabsDao {
 
     @Delete
     abstract fun deleteTab(tab: TabEntity)
+
+    @Query("delete from tabs where deletable is 1")
+    abstract fun deleteTabsMarkedAsDeletable()
+
+    @Transaction
+    open fun markTabAsDeletable(tab: TabEntity) {
+        // requirement: only one tab can be marked as deletable
+        deleteTabsMarkedAsDeletable()
+        // ensure the tab is in the DB
+        val dbTab = tab(tab.tabId)
+        dbTab?.let {
+            updateTab(dbTab.copy(deletable = true))
+        }
+    }
+
+    @Transaction
+    open fun undoDeletableTab(tab: TabEntity) {
+        // ensure the tab is in the DB
+        val dbTab = tab(tab.tabId)
+        dbTab?.let {
+            updateTab(dbTab.copy(deletable = false))
+        }
+    }
+
+    @Transaction
+    open fun purgeDeletableTabsAndUpdateSelection() {
+        deleteTabsMarkedAsDeletable()
+        if (selectedTab() != null) {
+            return
+        }
+        firstTab()?.let {
+            insertTabSelection(TabSelectionEntity(tabId = it.tabId))
+        }
+    }
 
     @Query("delete from tabs")
     abstract fun deleteAllTabs()

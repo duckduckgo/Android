@@ -23,10 +23,12 @@ import androidx.test.annotation.UiThreadTest
 import androidx.test.filters.SdkSuppress
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.CoroutineTestRule
+import com.duckduckgo.app.browser.certificates.rootstore.TrustedCertificateStore
 import com.duckduckgo.app.browser.logindetection.DOMLoginDetector
 import com.duckduckgo.app.browser.logindetection.WebNavigationEvent
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.global.exception.UncaughtExceptionRepository
+import com.duckduckgo.app.globalprivacycontrol.GlobalPrivacyControlInjector
 import com.duckduckgo.app.runBlocking
 import com.duckduckgo.app.statistics.store.OfflinePixelCountDataStore
 import com.nhaarman.mockitokotlin2.*
@@ -53,12 +55,15 @@ class BrowserWebViewClientTest {
     private val offlinePixelCountDataStore: OfflinePixelCountDataStore = mock()
     private val uncaughtExceptionRepository: UncaughtExceptionRepository = mock()
     private val dosDetector: DosDetector = DosDetector()
+    private val globalPrivacyControlInjector: GlobalPrivacyControlInjector = mock()
+    private val trustedCertificateStore: TrustedCertificateStore = mock()
 
     @UiThreadTest
     @Before
     fun setup() {
         webView = TestWebView(InstrumentationRegistry.getInstrumentation().targetContext)
         testee = BrowserWebViewClient(
+            trustedCertificateStore,
             requestRewriter,
             specialUrlDetector,
             requestInterceptor,
@@ -66,7 +71,8 @@ class BrowserWebViewClientTest {
             uncaughtExceptionRepository,
             cookieManager,
             loginDetector,
-            dosDetector
+            dosDetector,
+            globalPrivacyControlInjector
         )
         testee.webViewClientListener = listener
     }
@@ -99,6 +105,13 @@ class BrowserWebViewClientTest {
     fun whenOnPageStartedCalledThenEventSentToLoginDetector() = coroutinesTestRule.runBlocking {
         testee.onPageStarted(webView, EXAMPLE_URL, null)
         verify(loginDetector).onEvent(WebNavigationEvent.OnPageStarted(webView))
+    }
+
+    @UiThreadTest
+    @Test
+    fun whenOnPageStartedCalledThenInjectDoNotSellToDom() = coroutinesTestRule.runBlocking {
+        testee.onPageStarted(webView, EXAMPLE_URL, null)
+        verify(globalPrivacyControlInjector).injectDoNotSellToDom(webView)
     }
 
     @UiThreadTest
@@ -150,6 +163,20 @@ class BrowserWebViewClientTest {
         whenever(detail.didCrash()).thenReturn(true)
         testee.onRenderProcessGone(webView, detail)
         verify(listener, times(1)).recoverFromRenderProcessGone()
+    }
+
+    @UiThreadTest
+    @Test
+    fun whenOnPageFinishedCalledThenPrefetchIconCalled() {
+        testee.onPageFinished(webView, EXAMPLE_URL)
+        verify(listener).prefetchFavicon(EXAMPLE_URL)
+    }
+
+    @UiThreadTest
+    @Test
+    fun whenOnPageFinishedCalledIfUrlIsNullThenDoNotCallPrefetchIcon() {
+        testee.onPageFinished(webView, null)
+        verify(listener, never()).prefetchFavicon(any())
     }
 
     private class TestWebView(context: Context) : WebView(context)

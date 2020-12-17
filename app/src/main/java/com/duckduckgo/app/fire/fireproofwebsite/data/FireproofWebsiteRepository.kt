@@ -18,14 +18,17 @@ package com.duckduckgo.app.fire.fireproofwebsite.data
 
 import android.net.Uri
 import androidx.lifecycle.LiveData
+import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.UriString
+import dagger.Lazy
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 class FireproofWebsiteRepository @Inject constructor(
     private val fireproofWebsiteDao: FireproofWebsiteDao,
-    private val dispatchers: DispatcherProvider
+    private val dispatchers: DispatcherProvider,
+    private val faviconManager: Lazy<FaviconManager>
 ) {
     suspend fun fireproofWebsite(domain: String): FireproofWebsiteEntity? {
         if (!UriString.isValidDomain(domain)) return null
@@ -53,7 +56,14 @@ class FireproofWebsiteRepository @Inject constructor(
 
     suspend fun removeFireproofWebsite(fireproofWebsiteEntity: FireproofWebsiteEntity) {
         withContext(dispatchers.io()) {
+            faviconManager.get().deletePersistedFavicon(fireproofWebsiteEntity.domain)
             fireproofWebsiteDao.delete(fireproofWebsiteEntity)
+        }
+    }
+
+    suspend fun fireproofWebsitesCountByDomain(domain: String): Int {
+        return withContext(dispatchers.io()) {
+            fireproofWebsiteDao.fireproofWebsitesCountByDomain(domain)
         }
     }
 }

@@ -20,16 +20,20 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.duckduckgo.app.browser.BuildConfig
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
+import com.duckduckgo.app.fire.FireAnimationLoader
 import com.duckduckgo.app.global.DuckDuckGoTheme
 import com.duckduckgo.app.global.SingleLiveEvent
 import com.duckduckgo.app.icon.api.AppIcon
 import com.duckduckgo.app.settings.clear.ClearWhatOption
 import com.duckduckgo.app.settings.clear.ClearWhenOption
+import com.duckduckgo.app.settings.clear.FireAnimation
+import com.duckduckgo.app.settings.clear.getPixelValue
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelName
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.*
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.FIRE_ANIMATION
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -37,6 +41,7 @@ class SettingsViewModel @Inject constructor(
     private val settingsDataStore: SettingsDataStore,
     private val defaultWebBrowserCapability: DefaultBrowserDetector,
     private val variantManager: VariantManager,
+    private val fireAnimationLoader: FireAnimationLoader,
     private val pixel: Pixel
 ) : ViewModel() {
 
@@ -47,8 +52,10 @@ class SettingsViewModel @Inject constructor(
         val autoCompleteSuggestionsEnabled: Boolean = true,
         val showDefaultBrowserSetting: Boolean = false,
         val isAppDefaultBrowser: Boolean = false,
+        val selectedFireAnimation: FireAnimation = FireAnimation.HeroFire,
         val automaticallyClearData: AutomaticallyClearData = AutomaticallyClearData(ClearWhatOption.CLEAR_NONE, ClearWhenOption.APP_EXIT_ONLY),
-        val appIcon: AppIcon = AppIcon.DEFAULT
+        val appIcon: AppIcon = AppIcon.DEFAULT,
+        val globalPrivacyControlEnabled: Boolean = false
     )
 
     data class AutomaticallyClearData(
@@ -63,6 +70,8 @@ class SettingsViewModel @Inject constructor(
         object LaunchLocation : Command()
         object LaunchWhitelist : Command()
         object LaunchAppIcon : Command()
+        object LaunchFireAnimationSettings : Command()
+        object LaunchGlobalPrivacyControl : Command()
         object UpdateTheme : Command()
     }
 
@@ -92,7 +101,9 @@ class SettingsViewModel @Inject constructor(
             showDefaultBrowserSetting = defaultWebBrowserCapability.deviceSupportsDefaultBrowserConfiguration(),
             version = obtainVersion(variant.key),
             automaticallyClearData = AutomaticallyClearData(automaticallyClearWhat, automaticallyClearWhen, automaticallyClearWhenEnabled),
-            appIcon = settingsDataStore.appIcon
+            appIcon = settingsDataStore.appIcon,
+            selectedFireAnimation = settingsDataStore.selectedFireAnimation,
+            globalPrivacyControlEnabled = settingsDataStore.globalPrivacyControlEnabled
         )
     }
 
@@ -104,12 +115,21 @@ class SettingsViewModel @Inject constructor(
         command.value = Command.LaunchAppIcon
     }
 
+    fun userRequestedToChangeFireAnimation() {
+        command.value = Command.LaunchFireAnimationSettings
+        pixel.fire(FIRE_ANIMATION_SETTINGS_OPENED)
+    }
+
     fun onFireproofWebsitesClicked() {
         command.value = Command.LaunchFireproofWebsites
     }
 
     fun onLocationClicked() {
         command.value = Command.LaunchLocation
+    }
+
+    fun onGlobalPrivacyControlClicked() {
+        command.value = Command.LaunchGlobalPrivacyControl
     }
 
     fun onLightThemeToggled(enabled: Boolean) {
@@ -173,6 +193,19 @@ class SettingsViewModel @Inject constructor(
                 clearWhenNewSetting
             )
         )
+    }
+
+    fun onFireAnimationSelected(selectedFireAnimation: FireAnimation) {
+        if (settingsDataStore.isCurrentlySelected(selectedFireAnimation)) {
+            Timber.v("User selected same thing they already have set: $selectedFireAnimation; no need to do anything else")
+            return
+        }
+        settingsDataStore.selectedFireAnimation = selectedFireAnimation
+        fireAnimationLoader.preloadSelectedAnimation()
+        viewState.value = currentViewState().copy(
+            selectedFireAnimation = selectedFireAnimation
+        )
+        pixel.fire(FIRE_ANIMATION_NEW_SELECTED, mapOf(FIRE_ANIMATION to selectedFireAnimation.getPixelValue()))
     }
 
     fun onManageWhitelistSelected() {

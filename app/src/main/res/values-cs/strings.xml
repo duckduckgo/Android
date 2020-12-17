@@ -1,5 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2020 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
 <resources xmlns:tools="http://schemas.android.com/tools">
 
+    <string name="appName" translatable="false">DuckDuckGo</string>
+    <string name="appDescription" translatable="false">DuckDuckGo </string>
     <string name="duckDuckGoLogoDescription">Logo DuckDuckGo</string>
     <string name="duckDuckGoPrivacySimplified">Ochrana soukromí, zjednodušená.</string>
     <string name="yes">Ano</string>
@@ -14,7 +33,7 @@
     <string name="cannotLaunchDefaultAppSettings">Nelze spustit výchozí obrazovku nastavení aplikace.</string>
     <string name="settingsDefaultBrowserEnabled">Nastavit jako výchozí prohlížeč</string>
     <string name="defaultBrowserMaybeLater">Možná později</string>
-    <string name="defaultBrowserLetsDoIt">Pojďme na to!</string>
+    <string name="defaultBrowserLetsDoIt">Nastavit jako výchozí prohlížeč</string>
     <string name="defaultBrowserDescriptionNoDefault">Otevírejte odkazy s klidem mysli, pokaždé.</string>
     <string name="defaultBrowserInstructions">Vyberte DuckDuckGo a klepněte na <font color="#678fff">Vždy</font>.</string>
 
@@ -49,6 +68,7 @@
     <string name="previousSearchTermDescription">Najít předchozí</string>
     <string name="closeFindInPageButtonDescription">Zavřít vyhledání v zobrazení stránky</string>
     <string name="findInPageHint">Vyhledávání na stránce</string>
+    <string name="findInPageMatches" translatable="false">%d/%d</string>
 
     <!-- AutoComplete Suggestions -->
     <string name="editQueryBeforeSubmitting">Upravit dotaz před vyhledáváním</string>
@@ -61,6 +81,7 @@
     <string name="unableToOpenLink">Tento typ odkazu nelze otevřít.</string>
 
     <!-- Tabs -->
+    <string name="homeTab" translatable="false">DuckDuckGo</string>
     <string name="tabActivityTitle">Karty</string>
     <string name="tabsMenuItem">Karty</string>
     <string name="newTabMenuItem">Nová karta</string>
@@ -71,6 +92,8 @@
     <string name="closeContentDescription">Zavřít</string>
     <string name="closeAllTabsMenuItem">Zavřít všechny karty</string>
     <string name="closeTab">Zavřít karta</string>
+    <string name="tabClosed">Karta zavřená</string>
+    <string name="tabClosedUndo">Vrátit</string>
 
     <!-- Privacy Dashboard Activities -->
     <string name="privacyProtectionToggle">Ochrana osobních údajů na webových stránkách</string>
@@ -88,28 +111,28 @@
     <string name="networksContentDescription">Sledovací sítě</string>
     <string name="networksOverview">Sledovací sítě agregují vaši webovou historii do datového profilu o vás. Hlavní sledovací sítě jsou nebezpečnější, protože vás mohou sledovat a zaměřit přes více internetových stránek.</string>
 
-    <plurals name="trackersFound" tools:ignore="UnusedQuantity">
+    <plurals name="trackersFound">
         <item quantity="one">Nalezen %1$s tracker</item>
         <item quantity="few">Nalezeny %1$s trackery</item>
         <item quantity="many">Nalezeno %1$s trackerů</item>
         <item quantity="other">Nalezeno %1$s trackerů</item>
     </plurals>
 
-    <plurals name="trackerBlocked" tools:ignore="UnusedQuantity">
+    <plurals name="trackerBlocked">
         <item quantity="one">Zablokován %1$s tracker</item>
         <item quantity="few">Zablokovány %1$s trackery</item>
         <item quantity="many">Zablokováno %1$s trackerů</item>
         <item quantity="other">Zablokováno %1$s trackerů</item>
     </plurals>
 
-    <plurals name="majorNetworksFound" tools:ignore="UnusedQuantity">
+    <plurals name="majorNetworksFound">
         <item quantity="one">Nalezena %1$s hlavní sledovací síť</item>
         <item quantity="few">Nalezeny %1$s hlavní sledovací sítě</item>
         <item quantity="many">Nalezeno %1$s hlavních sledovacích sítí</item>
         <item quantity="other">Nalezeno %1$s hlavních sledovacích sítí</item>
     </plurals>
 
-    <plurals name="majorNetworksBlocked" tools:ignore="UnusedQuantity">
+    <plurals name="majorNetworksBlocked">
         <item quantity="one">Zablokována %1$s hlavní sledovací síť</item>
         <item quantity="few">Zablokovány %1$s hlavní sledovací sítě</item>
         <item quantity="many">Zablokováno %1$s hlavních sledovacích sítí</item>
@@ -170,9 +193,7 @@
     <!-- About Activity -->
     <string name="aboutActivityTitle">O nás</string>
     <string name="aboutDescription">
-        V DuckDuckGo přinášíme nový standard důvěry online.\n\
-        DuckDuckGo Privacy Browser poskytuje všechny základní prvky soukromí, které potřebujete k ochraně při vyhledávání a prohlížení webu, včetně blokování sledovacích zařízení, chytřejšího šifrování a soukromého vyhledávání DuckDuckGo.\n\
-        Internet by v konečném důsledku neměl být tak nebezpečný a získat soukromí, které si zasloužíte online, by mělo být stejně jednoduché jako zatáhnout žaluzie.</string>
+        V DuckDuckGo přinášíme nový standard důvěry online.\n\nDuckDuckGo Privacy Browser poskytuje všechny základní prvky ochrany osobních údajů, které potřebujete k ochraně při vyhledávání a prohlížení webu, včetně blokování sledovacích zařízení, chytřejšího šifrování a soukromého vyhledávání DuckDuckGo.\n\nInternet by v konečném důsledku neměl být tak nebezpečný a získat ochranu osobních údajů, kterou si zasloužíte online, by mělo být stejně jednoduché jako zatáhnout žaluzie.</string>
     <string name="aboutMoreLink">Více na duckduckgo.com/about</string>
     <string name="no_suggestions">Žádné návrhy</string>
 
@@ -255,10 +276,12 @@
     <string name="rateAppDialogTitle">Ohodnoťte aplikaci</string>
     <string name="rateAppDialogMessage">Na vaší zpětné vazbě záleží. Podělte se o pozitiva v hodnocení.</string>
     <string name="rateAppDialogPositiveButton">Ohodnoťte aplikaci</string>
+    <string name="rateAppDialogNegativeButton" translatable="false">@string/noThanks</string>
 
     <string name="giveFeedbackDialogTitle">Je nám líto, že nejste spokojení.</string>
     <string name="giveFeedbackDialogMessage">Dejte nám vědět, jak pro vás můžeme aplikaci vylepšit.</string>
     <string name="giveFeedbackDialogPositiveButton">Poskytněte zpětnou vazbu.</string>
+    <string name="giveFeedbackDialogNegativeButton" translatable="false">@string/noThanks</string>
 
     <string name="noThanks">Ne, děkuji</string>
 
@@ -279,7 +302,7 @@
     <string name="privacyProtectionNotificationTrackerDescription">Chránili jste svá data blokováním %1$d sledovacích zařízení při používání DuckDuckGo.</string>
     <string name="privacyProtectionNotificationBothDescription">Chránili jste svá data blokováním %1$d sledovacích zařízení a zabezpečením %2$d nešifrovaných připojení při používání DuckDuckGo.</string>
     <string name="privacyProtectionNotificationLaunchButton">Znovu začít prohlížení</string>
-    
+
     <!-- Authentication -->
     <string name="authenticationDialogTitle">Přihlásit</string>
     <string name="authenticationDialogMessage">%1$s vyžaduje uživatelské jméno a heslo.</string>
@@ -371,9 +394,9 @@
     <string name="systemSearchDeviceAppLabel">Z tohoto zařízení</string>
     <string name="systemSearchOmnibarInputHint"><font size="13">Vyhledat nebo zadat URL</font></string>
     <string name="systemSearchAppNotFound">Aplikace nebyla nalezena</string>
-    <string name="systemSearchOnboardingText">Děkujeme, že jste si vybrali DuckDuckGo!\nPři použití našeho vyhledávání nebo aplikace jsou od teď Vaše vyhledávání chráněna.</string>
+    <string name="systemSearchOnboardingText">Děkujeme, že jste si vybrali DuckDuckGo!\nPři použití našeho vyhledávání nebo aplikace jsou od tohoto okamžiku Vaše vyhledávání chráněna.</string>
     <string name="systemSearchOnboardingFeaturesIntroText">Aplikace DuckDuckGo také:</string>
-    <string name="systemSearchOnboardingFeatureOneText">Blokuje nebezpečné sledovače</string>
+    <string name="systemSearchOnboardingFeatureOneText">Blokuje nebezpečné trackery</string>
     <string name="systemSearchOnboardingFeatureTwoText">Vynutí šifrování na webových stránkách</string>
     <string name="systemSearchOnboardingFeatureThreeText">Vymaže data jedním klepnutím</string>
     <string name="systemSearchOnboardingButtonMore">Zobrazit více</string>
@@ -391,21 +414,23 @@
     <string name="hideTipsButton">Navždy skrýt tipy</string>
 
     <!-- New Onboarding Experience -->
-    <string name="onboardingWelcomeTitle">Vítejte v DuckDuckGo!</string>
+    <string name="onboardingWelcomeTitle">"Vítejte v DuckDuckGo!"</string>
     <string name="onboardingDaxText"><![CDATA[Internet může být někdy trochu strašidelný.<br/><br/>Nebojte se! Anonymní vyhledávání a procházení je jednodušší, než si myslíte.]]></string>
     <string name="onboardingLetsDoItButton">Pojďme na to!</string>
-    <string name="daxIntroCtaText"><![CDATA[Dále zkuste navštívit některý z Vašich oblíbených webů! <br/><br/>Zablokujeme sledovače, aby Vás nemohli špehovat. Pokud to bude možné, upgraduji také zabezpečení Vašeho připojení. 🔒]]></string>
+    <string name="daxIntroCtaText"><![CDATA[Dále zkuste navštívit některý z Vašich oblíbených webů! <br/><br/>Zablokujeme trackery, aby Vás nemohli špehovat. Pokud to bude možné, upgraduji také zabezpečení Vašeho připojení. 🔒]]></string>
     <string name="daxEndCtaText"><![CDATA[Máte to! <br/><br/>Pamatujte: pokaždé, když internet procházíte se mnou, hrozným reklamám jsou přistřižena křídla. 👍]]></string>
     <string name="daxSerpCtaText">Vaše vyhledávání DuckDuckGo jsou anonymní a historii Vašeho vyhledávání nikdy nikam neukládáme. Vůbec nikdy. 🙌</string>
     <plurals name="daxTrackersBlockedCtaText">
-        <item quantity="one"><![CDATA[  a <b>%1$d další</b> se vás snažili tady vysledovat. <br/><br/>Zablokovali jsme je!<br/><br/>☝️Můžete zkontrolovat panel URL a zjistit, kdo se vás snaží sledovat, když navštívíte nový web.]]></item>
-        <item quantity="few"><![CDATA[ a <b>%1$d další</b> se vás snažili tady vysledovat. <br/><br/>Zablokovali jsme je!<br/><br/>☝️Můžete zkontrolovat panel URL a zjistit, kdo se vás snaží sledovat, když navštívíte nový web.️]]></item>
-        <item quantity="other"><![CDATA[ a <b>%1$d dalších</b> se vás snažilo tady vysledovat. <br/><br/>Zablokovali jsme je!<br/><br/>☝️Můžete zkontrolovat panel URL a zjistit, kdo se vás snaží sledovat, když navštívíte nový web.️]]></item>
+        <item quantity="one"><![CDATA[  a <b>%1$d další</b> se vás snažili tady vysledovat. <br/><br/>Zablokovali jsme je!<br/><br/>☝️Můžete zkontrolovat panel URL a zjistit, kdo se vás snaží sledovat, když navštívíte nový web. ️]]></item>
+        <item quantity="few"><![CDATA[ a <b>%1$d další</b> se vás snažili tady vysledovat. <br/><br/>Zablokovali jsme je!<br/><br/>☝️Můžete zkontrolovat panel URL a zjistit, kdo se vás snaží sledovat, když navštívíte nový web. ️]]></item>
+        <item quantity="many"><![CDATA[ a <b>%1$d dalších</b> se vás snažilo tady vysledovat. <br/><br/>Zablokovali jsme je!<br/><br/>☝️Můžete zkontrolovat panel URL a zjistit, kdo se vás snaží sledovat, když navštívíte nový web. ️]]></item>
+        <item quantity="other"><![CDATA[ a <b>%1$d dalších</b> se vás snažilo tady vysledovat. <br/><br/>Zablokovali jsme je!<br/><br/>☝️Můžete zkontrolovat panel URL a zjistit, kdo se vás snaží sledovat, když navštívíte nový web. ️]]></item>
     </plurals>
     <plurals name="daxTrackersBlockedCtaZeroText">
-        <item quantity="one"><![CDATA[ se vás snažil tady vysledovat. <br/><br/>Zablokovali jsme ho!<br/><br/>☝️Můžete zkontrolovat panel URL a zjistit, kdo se vás snaží sledovat, když navštívíte nový web.️]]></item>
-        <item quantity="few"><![CDATA[ se vás snažili tady vysledovat. <br/><br/>Zablokovali jsme je!<br/><br/>☝️Můžete zkontrolovat panel URL a zjistit, kdo se vás snaží sledovat, když navštívíte nový web.️]]></item>
-        <item quantity="other"><![CDATA[ se vás snažilo tady vysledovat. <br/><br/>Zablokovali jsme je!<br/><br/>☝️Můžete zkontrolovat panel URL a zjistit, kdo se vás snaží sledovat, když navštívíte nový web.️]]></item>
+        <item quantity="one"><![CDATA[ se vás snažil tady vysledovat. <br/><br/>Zablokovali jsme ho!<br/><br/>☝️Můžete zkontrolovat panel URL a zjistit, kdo se vás snaží sledovat, když navštívíte nový web. ️]]></item>
+        <item quantity="few"><![CDATA[ se vás snažili tady vysledovat. <br/><br/>Zablokovali jsme je!<br/><br/>☝️Můžete zkontrolovat panel URL a zjistit, kdo se vás snaží sledovat, když navštívíte nový web. ️]]></item>
+        <item quantity="many"><![CDATA[ se vás snažilo tady vysledovat. <br/><br/>Zablokovali jsme je!<br/><br/>☝️Můžete zkontrolovat panel URL a zjistit, kdo se vás snaží sledovat, když navštívíte nový web. ️]]></item>
+        <item quantity="other"><![CDATA[ se vás snažilo tady vysledovat. <br/><br/>Zablokovali jsme je!<br/><br/>☝️Můžete zkontrolovat panel URL a zjistit, kdo se vás snaží sledovat, když navštívíte nový web. ️]]></item>
     </plurals>
     <string name="daxNonSerpCtaText"><![CDATA[Zatímco Vy budete klepat a přejíždět, já budu blokovat zlovolné sledovače. <br/><br/>Nenechejte se rušit — pokračujte v prohlížení!]]></string>
     <string name="daxMainNetworkCtaText"><![CDATA[Hlavy vzhůru! %1$s je významná sledovací síť.<br/><br/> Jejich sledovatelé číhají na přibližně %2$s významných webů 😱, ale netrapte se!<br/><br/>Já %3$s zablokuji, aby Vaši aktivitu na těchto webech neviděl.]]></string>
@@ -467,6 +492,15 @@
     <string name="fireproofWebsiteItemsSectionTitle">Webové stránky</string>
     <string name="fireproofWebsiteToogleText">Zeptat se při přihlašování</string>
 
+    <!-- Fire Animation settings -->
+    <string name="settingsFireAnimation">Animace tlačítka pro mazání</string>
+    <string name="settingsHeroFireAnimation">Inferno</string>
+    <string name="settingsHeroWaterAnimation">Vodní vír</string>
+    <string name="settingsHeroAbstractAnimation">Vzdušný proud</string>
+    <string name="settingsNoneAnimation">Žádný</string>
+    <string name="settingsSelectFireAnimationDialog">Animace tlačítka pro mazání</string>
+    <string name="settingsSelectFireAnimationDialogSave">Uložit</string>
+
     <!-- Dos Attack error-->
     <string name="dosErrorMessage">Spojení přerušeno. Tato webová stránka může poškodit vaše zařízení.</string>
 
@@ -474,4 +508,43 @@
     <string name="downloadManagerDisabled">Správce stahování je zakázán</string>
     <string name="downloadManagerIncompatible">Správce stahování není v tomto zařízení k dispozici</string>
     <string name="enable">Povolit</string>
+
+    <!-- Precise Location -->
+    <string name="preciseLocationSystemDialogTitle">Povolit polohu zařízení pro prohlížeč DuckDuckGo Privacy?</string>
+    <string name="preciseLocationSystemDialogSubtitle">%1$s požaduje polohu vašeho zařízení. Nejprve musíte aplikaci povolit, aby odesílala polohu vašeho zařízení, a pak %2$s může požádat o povolení.</string>
+    <string name="preciseLocationSystemDialogAllow">Povolit</string>
+    <string name="preciseLocationSystemDialogDeny">Možná později</string>
+    <string name="preciseLocationSystemDialogNeverAllow">Neptat se znovu u těchto stránek</string>
+    <string name="preciseLocationSiteDialogTitle">Udělit %1$s povolení k přístupu k poloze?</string>
+    <string name="preciseLocationSiteDialogSubtitle">Oprávnění k přístupu k poloze, která jste udělili jednotlivým webovým stránkám, můžete spravovat v Nastavení.</string>
+    <string name="preciseLocationSiteDialogAllowAlways">Vždy</string>
+    <string name="preciseLocationSiteDialogAllowOnce">Pouze pro tuto relaci</string>
+    <string name="preciseLocationSiteDialogDenyAlways">Vždy odmítnout</string>
+    <string name="preciseLocationSiteDialogDenyOnce">Odmítnout pro tuto relaci</string>
+    <string name="settingsPreciseLocation">Poloha</string>
+    <string name="preciseLocationFeatureDescription">Navštívené webové stránky mohou žádat o informace o poloze vašeho zařízení. Dokud výslovně neudělíte oprávnění, nebudou mít k poloze přístup. Platforma DuckDuckGo používá vaši polohu pouze anonymně k zobrazení výsledků místního vyhledávání.</string>
+    <string name="preciseLocationToggleText">Stránky mohou požádat o mou polohu</string>
+    <string name="preciseLocationEmptyListHint">Žádným webovým stránkám nebylo uděleno oprávnění k přístupu k poloze</string>
+    <string name="preciseLocationNoSystemPermission">Chcete-li spravovat oprávnění k přístupu k poloze, která jste udělili jednotlivým webovým stránkám, povolte v Nastavení systému Android polohu pro tuto aplikaci.</string>
+    <string name="preciseLocationActivityTitle">Poloha</string>
+    <string name="preciseLocationDeleteConfirmMessage">Opravdu chcete smazat &lt;b&gt;%1$s&lt;/b&gt;?</string>
+    <string name="preciseLocationDeleteContentDescription">Další možnosti pro oprávnění k informacím o poloze v doméně %1$s</string>
+    <string name="preciseLocationAllowedSitesSectionTitle">Uděleno</string>
+    <string name="preciseLocationDeniedSitesSectionTitle">Zamítnuto</string>
+    <string name="preciseLocationSnackbarMessage">Dříve jste udělili %1$s oprávnění k přístupu k poloze vašeho zařízení.</string>
+
+    <!--Fire button education-->
+    <string name="daxClearDataCtaText">Osobní údaje se mohou vytvářet ve vašem prohlížeči. Fuj. Použijte tlačítko pro mazání a všechno smažte. Vyzkoušejte to hned teď! 👇</string>
+
+    <!--  Global Privacy Control-->
+    <string name="globalPrivacyControlActivityTitle">Globální kontrola ochrany osobních údajů (GPC)</string>
+    <string name="globalPrivacyControlDescription">
+        Vaše osobní údaje nesmí být na prodej. Na tom se ve společnosti DuckDuckGo shodneme. Aktivujte nastavení „Globální kontrola ochrany osobních údajů“ (GPC) a my upozorníme webové stránky na vaše preference:\n\n• Neprodávat vaše osobní údaje.\n • Omezit sdílení vašich osobních údajů s jinými společnosti.
+    </string>
+    <string name="globalPrivacyControlSetting">Globální kontrola ochrany osobních údajů (GPC)</string>
+    <string name="globalPrivacyControlToggle">Globální kontrola ochrany osobních údajů (GPC)</string>
+    <string name="globalPrivacyControlDescriptionLegal"><b>Vzhledem k tomu, že Globální kontrola ochrany osobních údajů (GPC) je nový standard, většina webových stránek ho zatím nerozpozná, nicméně usilovně pracujeme na tom, abychom zajistili, že bude akceptován po celém světě.</b> Webové stránky jsou nicméně povinny řešit podněty pouze v rozsahu, v jakém je k tomu donutí příslušné zákony.</string>
+    <string name="globalPrivacyControlLearnMore"><u>Zjistěte více</u></string>
+    <string name="disabled">Zakázáno</string>
+    <string name="enabled">Povoleno</string>
 </resources>

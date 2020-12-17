@@ -56,6 +56,30 @@ class TabsDaoTest {
     }
 
     @Test
+    fun whenOnlyDeletableTabsExistTabsReturnsEmpty() {
+        val deletableTab = TabEntity(
+            tabId = "ID",
+            position = 0,
+            deletable = true
+        )
+        testee.insertTab(deletableTab)
+
+        assertTrue(testee.tabs().isEmpty())
+    }
+
+    @Test
+    fun whenOnlyDeletableTabsExistTabReturnsMatch() {
+        val deletableTab = TabEntity(
+            tabId = "ID",
+            position = 0,
+            deletable = true
+        )
+        testee.insertTab(deletableTab)
+
+        assertEquals(deletableTab, testee.tab("ID"))
+    }
+
+    @Test
     fun whenNoTabsThenFirstReturnsNull() {
         assertNull(testee.firstTab())
     }
@@ -238,5 +262,67 @@ class TabsDaoTest {
 
         assertNotNull(testee.tab("TAB_ID_1"))
         assertNull(testee.tab("TAB_ID_1")?.sourceTabId)
+    }
+
+    @Test
+    fun deleteTabsMarkedAsDeletableDeletesOnlyDeletableTabs() {
+        testee.insertTab(TabEntity("TAB_ID1", position = 0, deletable = true))
+        val tab = TabEntity("TAB_ID2", position = 1)
+        testee.insertTab(tab)
+
+        testee.deleteTabsMarkedAsDeletable()
+
+        assertNull(testee.tab("TAB_ID1"))
+        assertEquals(tab, testee.tab("TAB_ID2"))
+    }
+
+    @Test
+    fun whenSelectedTabMarkedAsDeletableAndPurgedThenUpdateSelection() {
+        val tab = TabEntity(
+            tabId = "TAB_ID",
+            url = "www.duckduckgo.com",
+            position = 0
+        )
+        val deletableTab = TabEntity(
+            tabId = "TAB_ID_1",
+            url = "www.duckduckgo.com",
+            position = 1,
+            deletable = true
+        )
+
+        testee.insertTab(tab)
+        testee.addAndSelectTab(deletableTab)
+        testee.purgeDeletableTabsAndUpdateSelection()
+
+        assertEquals(tab, testee.selectedTab())
+    }
+
+    @Test
+    fun whenMarkTabAsDeletableThenModifyOnlyDeletableColumn() {
+        val tab = TabEntity(
+            tabId = "TAB_ID",
+            url = "www.duckduckgo.com",
+            position = 0
+        )
+
+        testee.insertTab(tab)
+        testee.markTabAsDeletable(tab.copy(url = "www.other.com"))
+
+        assertEquals(tab.copy(deletable = true), testee.tab(tab.tabId))
+    }
+
+    @Test
+    fun whenUndoDeletableTabThenModifyOnlyDeletableColumn() {
+        val tab = TabEntity(
+            tabId = "TAB_ID",
+            url = "www.duckduckgo.com",
+            position = 0,
+            deletable = true
+        )
+
+        testee.insertTab(tab)
+        testee.undoDeletableTab(tab.copy(url = "www.other.com"))
+
+        assertEquals(tab.copy(deletable = false), testee.tab(tab.tabId))
     }
 }

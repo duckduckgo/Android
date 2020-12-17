@@ -31,6 +31,18 @@ class DuckDuckGoUrlDetector @Inject constructor() {
         return isDuckDuckGoUrl(uri) && hasQuery(uri)
     }
 
+    fun isDuckDuckGoStaticUrl(uri: String): Boolean {
+        return isDuckDuckGoUrl(uri) && matchesStaticPage(uri)
+    }
+
+    private fun matchesStaticPage(uri: String): Boolean {
+        return when (uri.toUri().path) {
+            AppUrl.StaticUrl.SETTINGS -> true
+            AppUrl.StaticUrl.PARAMS -> true
+            else -> false
+        }
+    }
+
     private fun hasQuery(uri: String): Boolean {
         return uri.toUri().queryParameterNames.contains(ParamKey.QUERY)
     }

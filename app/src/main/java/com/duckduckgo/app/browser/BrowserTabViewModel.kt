@@ -50,7 +50,7 @@ import com.duckduckgo.app.browser.WebNavigationStateChange.*
 import com.duckduckgo.app.browser.addtohome.AddToHomeCapabilityDetector
 import com.duckduckgo.app.browser.downloader.DownloadFailReason
 import com.duckduckgo.app.browser.downloader.FileDownloader
-import com.duckduckgo.app.browser.favicon.FaviconDownloader
+import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.logindetection.LoginDetected
 import com.duckduckgo.app.browser.logindetection.NavigationAwareLoginDetector
 import com.duckduckgo.app.browser.logindetection.NavigationEvent
@@ -74,13 +74,13 @@ import com.duckduckgo.app.global.useourapp.UseOurAppDetector
 import com.duckduckgo.app.global.useourapp.UseOurAppDetector.Companion.USE_OUR_APP_SHORTCUT_TITLE
 import com.duckduckgo.app.global.useourapp.UseOurAppDetector.Companion.USE_OUR_APP_SHORTCUT_URL
 import com.duckduckgo.app.global.view.asLocationPermissionOrigin
-import com.duckduckgo.app.notification.db.NotificationDao
-import com.duckduckgo.app.notification.model.UseOurAppNotification
 import com.duckduckgo.app.location.GeoLocationPermissions
 import com.duckduckgo.app.location.data.LocationPermissionType
 import com.duckduckgo.app.location.data.LocationPermissionsRepository
 import com.duckduckgo.app.location.ui.SiteLocationPermissionDialog
 import com.duckduckgo.app.location.ui.SystemLocationPermissionDialog
+import com.duckduckgo.app.notification.db.NotificationDao
+import com.duckduckgo.app.notification.model.UseOurAppNotification
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao
 import com.duckduckgo.app.privacy.db.UserWhitelistDao
 import com.duckduckgo.app.privacy.model.PrivacyGrade
@@ -100,11 +100,7 @@ import com.jakewharton.rxrelay2.PublishRelay
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
-import io.reactivex.schedulers.Schedulers.io
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
 import timber.log.Timber
 import java.io.File
 import java.util.*
@@ -128,7 +124,7 @@ class BrowserTabViewModel(
     private val longPressHandler: LongPressHandler,
     private val webViewSessionStorage: WebViewSessionStorage,
     private val specialUrlDetector: SpecialUrlDetector,
-    private val faviconDownloader: FaviconDownloader,
+    private val faviconManager: FaviconManager,
     private val addToHomeCapabilityDetector: AddToHomeCapabilityDetector,
     private val ctaViewModel: CtaViewModel,
     private val searchCountDao: SearchCountDao,
@@ -228,7 +224,7 @@ class BrowserTabViewModel(
 
     sealed class Command {
         object Refresh : Command()
-        class Navigate(val url: String) : Command()
+        class Navigate(val url: String, val headers: Map<String, String>) : Command()
         class NavigateBack(val steps: Int) : Command()
         object NavigateForward : Command()
         class OpenInNewTab(val query: String, val sourceTabId: String? = null) : Command()
@@ -252,7 +248,7 @@ class BrowserTabViewModel(
         class BrokenSiteFeedback(val data: BrokenSiteData) : Command()
         object DismissFindInPage : Command()
         class ShowFileChooser(val filePathCallback: ValueCallback<Array<Uri>>, val fileChooserParams: WebChromeClient.FileChooserParams) : Command()
-        class HandleExternalAppLink(val appLink: IntentType) : Command()
+        class HandleExternalAppLink(val appLink: IntentType, val headers: Map<String, String>) : Command()
         class AddHomeShortcut(val title: String, val url: String, val icon: Bitmap? = null) : Command()
         class LaunchSurvey(val survey: Survey) : Command()
         object LaunchAddWidget : Command()
@@ -304,24 +300,54 @@ class BrowserTabViewModel(
         get() = site?.title
 
     private var locationPermission: LocationPermission? = null
+    private val locationPermissionMessages: MutableMap<String, Boolean> = mutableMapOf()
+    private val locationPermissionSession: MutableMap<String, LocationPermissionType> = mutableMapOf()
 
     private val autoCompletePublishSubject = PublishRelay.create<String>()
     private val fireproofWebsiteState: LiveData<List<FireproofWebsiteEntity>> = fireproofWebsiteRepository.getFireproofWebsites()
-    private val showPulseAnimation: LiveData<Boolean> = ctaViewModel.showFireButtonPulseAnimation.asLiveData(context = viewModelScope.coroutineContext)
+
+    @ExperimentalCoroutinesApi
+    @FlowPreview
+    private val showPulseAnimation: LiveData<Boolean> = ctaViewModel.showFireButtonPulseAnimation.asLiveData(
+        context = viewModelScope.coroutineContext
+    )
+
     private var autoCompleteDisposable: Disposable? = null
     private var site: Site? = null
     private lateinit var tabId: String
     private var webNavigationState: WebNavigationState? = null
     private var httpsUpgraded = false
     private val browserStateModifier = BrowserStateModifier()
+    private var faviconPrefetchJob: Job? = null
+    private var deferredBlankSite: Job? = null
 
     private val fireproofWebsitesObserver = Observer<List<FireproofWebsiteEntity>> {
         browserViewState.value = currentBrowserViewState().copy(isFireproofWebsite = isFireproofWebsite())
     }
 
+    @ExperimentalCoroutinesApi
     private val fireButtonAnimation = Observer<Boolean> { shouldShowAnimation ->
+        Timber.i("shouldShowAnimation $shouldShowAnimation")
         if (currentBrowserViewState().fireButton is FireButton.Visible) {
             browserViewState.value = currentBrowserViewState().copy(fireButton = FireButton.Visible(pulseAnimation = shouldShowAnimation))
+        }
+
+        if (shouldShowAnimation) {
+            registerAndScheduleDismissAction()
+        }
+    }
+
+    @ExperimentalCoroutinesApi
+    private fun registerAndScheduleDismissAction() {
+        viewModelScope.launch(dispatchers.io()) {
+            val fireButtonHighlightedEvent = userEventsStore.getUserEvent(UserEventKey.FIRE_BUTTON_HIGHLIGHTED)
+            if (fireButtonHighlightedEvent == null) {
+                userEventsStore.registerUserEvent(UserEventKey.FIRE_BUTTON_HIGHLIGHTED)
+            }
+            val pulseElapsedTime = System.currentTimeMillis() - (fireButtonHighlightedEvent?.timestamp ?: System.currentTimeMillis())
+            val pulsePendingTime = ONE_HOUR_IN_MS - pulseElapsedTime
+            delay(pulsePendingTime)
+            ctaViewModel.dismissPulseAnimation()
         }
     }
 
@@ -389,9 +415,12 @@ class BrowserTabViewModel(
             .switchMap { autoComplete.autoComplete(it) }
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
-            .subscribe({ result ->
-                onAutoCompleteResultReceived(result)
-            }, { t: Throwable? -> Timber.w(t, "Failed to get search results") })
+            .subscribe(
+                { result ->
+                    onAutoCompleteResultReceived(result)
+                },
+                { t: Throwable? -> Timber.w(t, "Failed to get search results") }
+            )
     }
 
     private fun onAutoCompleteResultReceived(result: AutoCompleteResult) {
@@ -427,7 +456,7 @@ class BrowserTabViewModel(
         if (!currentBrowserViewState().browserShowing) {
             viewModelScope.launch {
                 val cta = refreshCta()
-                showOrHideKeyboard(cta) // we hide the keyboard when showing a DialogCta type in the home screen otherwise we show it
+                showOrHideKeyboard(cta) // we hide the keyboard when showing a DialogCta and HomeCta type in the home screen otherwise we show it
             }
         } else {
             command.value = HideKeyboard
@@ -477,11 +506,6 @@ class BrowserTabViewModel(
 
         val verticalParameter = extractVerticalParameter(url)
         val urlToNavigate = queryUrlConverter.convertQueryToUrl(trimmedInput, verticalParameter)
-        val omnibarText = if (variantManager.getVariant().hasFeature(VariantManager.VariantFeature.SerpHeaderQueryReplacement)) {
-            urlToNavigate
-        } else {
-            trimmedInput
-        }
 
         val type = specialUrlDetector.determineType(trimmedInput)
         if (type is IntentType) {
@@ -491,16 +515,23 @@ class BrowserTabViewModel(
                 command.value = ResetHistory
             }
 
-            fireQueryChangedPixel(omnibarText)
-
-            command.value = Navigate(urlToNavigate)
+            fireQueryChangedPixel(trimmedInput)
+            command.value = Navigate(urlToNavigate, getUrlHeaders())
         }
 
         globalLayoutState.value = Browser(isNewTabState = false)
         findInPageViewState.value = FindInPageViewState(visible = false, canFindInPage = true)
-        omnibarViewState.value = currentOmnibarViewState().copy(omnibarText = omnibarText, shouldMoveCaretToEnd = false)
+        omnibarViewState.value = currentOmnibarViewState().copy(omnibarText = trimmedInput, shouldMoveCaretToEnd = false)
         browserViewState.value = currentBrowserViewState().copy(browserShowing = true, showClearButton = false)
         autoCompleteViewState.value = AutoCompleteViewState(false)
+    }
+
+    private fun getUrlHeaders(): Map<String, String> {
+        return if (appSettingsPreferencesStore.globalPrivacyControlEnabled) {
+            mapOf(GPC_HEADER to GPC_HEADER_VALUE)
+        } else {
+            emptyMap()
+        }
     }
 
     private fun extractVerticalParameter(currentUrl: String?): String? {
@@ -514,10 +545,6 @@ class BrowserTabViewModel(
     }
 
     private fun fireQueryChangedPixel(omnibarText: String) {
-        if (!variantManager.getVariant().hasFeature(VariantManager.VariantFeature.SerpHeaderRemoval)) {
-            return
-        }
-
         val oldQuery = currentOmnibarViewState().omnibarText.toUri()
         val newQuery = omnibarText.toUri()
 
@@ -537,6 +564,34 @@ class BrowserTabViewModel(
         val currentTab = tabRepository.liveSelectedTab.value
         currentTab?.let {
             tabRepository.delete(currentTab)
+        }
+    }
+
+    override fun willOverrideUrl(newUrl: String) {
+        val previousSiteStillLoading = currentLoadingViewState().isLoading
+        if (previousSiteStillLoading) {
+            showBlankContentfNewContentDelayed()
+        }
+    }
+
+    override fun prefetchFavicon(url: String) {
+        faviconPrefetchJob?.cancel()
+        faviconPrefetchJob = viewModelScope.launch {
+            val faviconFile = faviconManager.prefetchToTemp(tabId, url)
+            if (faviconFile != null) {
+                tabRepository.updateTabFavicon(tabId, faviconFile.name)
+            }
+        }
+    }
+
+    override fun iconReceived(icon: Bitmap) {
+        val currentTab = tabRepository.liveSelectedTab.value ?: return
+        val url = currentTab.url ?: return
+        viewModelScope.launch {
+            val faviconFile = faviconManager.saveToTemp(currentTab.tabId, icon, url)
+            faviconFile?.let {
+                tabRepository.updateTabFavicon(tabId, faviconFile.name)
+            }
         }
     }
 
@@ -664,7 +719,29 @@ class BrowserTabViewModel(
             is UrlUpdated -> urlUpdated(stateChange.url)
             is PageNavigationCleared -> disableUserNavigation()
         }
+
+        if (newWebNavigationState.progress ?: 0 >= SHOW_CONTENT_MIN_PROGRESS) {
+            showWebContent()
+        }
         navigationAwareLoginDetector.onEvent(NavigationEvent.WebNavigationEvent(stateChange))
+    }
+
+    private fun showBlankContentfNewContentDelayed() {
+        Timber.i("Blank: cancel job $deferredBlankSite")
+        deferredBlankSite?.cancel()
+        deferredBlankSite = viewModelScope.launch {
+            delay(timeMillis = NEW_CONTENT_MAX_DELAY_MS)
+            withContext(dispatchers.main()) {
+                command.value = HideWebContent
+            }
+        }
+        Timber.i("Blank: schedule new blank $deferredBlankSite")
+    }
+
+    private fun showWebContent() {
+        Timber.i("Blank: onsite changed cancel $deferredBlankSite")
+        deferredBlankSite?.cancel()
+        command.value = ShowWebContent
     }
 
     private fun pageChanged(url: String, title: String?) {
@@ -742,12 +819,7 @@ class BrowserTabViewModel(
     }
 
     private fun shouldShowDaxIcon(currentUrl: String?, showPrivacyGrade: Boolean): Boolean {
-        if (!variantManager.getVariant().hasFeature(VariantManager.VariantFeature.SerpHeaderRemoval)) {
-            return false
-        }
-
         val url = currentUrl ?: return false
-
         return showPrivacyGrade && duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(url)
     }
 
@@ -784,9 +856,16 @@ class BrowserTabViewModel(
         val permissionEntity = locationPermissionsRepository.getDomainPermission(domain)
         permissionEntity?.let {
             if (it.permission == LocationPermissionType.ALLOW_ALWAYS) {
-                command.postValue(ShowDomainHasPermissionMessage(domain))
+                if (!locationPermissionMessages.containsKey(domain)) {
+                    setDomainHasLocationPermissionShown(domain)
+                    command.postValue(ShowDomainHasPermissionMessage(domain))
+                }
             }
         }
+    }
+
+    private fun setDomainHasLocationPermissionShown(domain: String) {
+        locationPermissionMessages[domain] = true
     }
 
     private fun urlUpdated(url: String) {
@@ -800,10 +879,6 @@ class BrowserTabViewModel(
 
     private fun omnibarTextForUrl(url: String?): String {
         if (url == null) return ""
-
-        if (variantManager.getVariant().hasFeature(VariantManager.VariantFeature.SerpHeaderQueryReplacement)) {
-            return url
-        }
 
         return if (duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(url)) {
             duckDuckGoUrlDetector.extractQuery(url) ?: url
@@ -887,7 +962,11 @@ class BrowserTabViewModel(
             val previouslyDeniedForever = appSettingsPreferencesStore.appLocationPermissionDeniedForever
             val permissionEntity = locationPermissionsRepository.getDomainPermission(origin)
             if (permissionEntity == null) {
-                command.postValue(CheckSystemLocationPermission(origin, previouslyDeniedForever))
+                if (locationPermissionSession.containsKey(origin)) {
+                    reactToSiteSessionPermission(locationPermissionSession[origin]!!)
+                } else {
+                    command.postValue(CheckSystemLocationPermission(origin, previouslyDeniedForever))
+                }
             } else {
                 if (permissionEntity.permission == LocationPermissionType.DENY_ALWAYS) {
                     onSiteLocationPermissionAlwaysDenied()
@@ -903,13 +982,16 @@ class BrowserTabViewModel(
             when (permission) {
                 LocationPermissionType.ALLOW_ALWAYS -> {
                     onSiteLocationPermissionAlwaysAllowed()
+                    setDomainHasLocationPermissionShown(domain)
                     pixel.fire(PixelName.PRECISE_LOCATION_SITE_DIALOG_ALLOW_ALWAYS)
                     viewModelScope.launch {
                         locationPermissionsRepository.savePermission(domain, permission)
+                        faviconManager.persistFavicon(tabId, domain)
                     }
                 }
                 LocationPermissionType.ALLOW_ONCE -> {
                     pixel.fire(PixelName.PRECISE_LOCATION_SITE_DIALOG_ALLOW_ONCE)
+                    locationPermissionSession[domain] = permission
                     locationPermission.callback.invoke(locationPermission.origin, true, false)
                 }
                 LocationPermissionType.DENY_ALWAYS -> {
@@ -917,10 +999,12 @@ class BrowserTabViewModel(
                     onSiteLocationPermissionAlwaysDenied()
                     viewModelScope.launch {
                         locationPermissionsRepository.savePermission(domain, permission)
+                        faviconManager.persistFavicon(tabId, domain)
                     }
                 }
                 LocationPermissionType.DENY_ONCE -> {
                     pixel.fire(PixelName.PRECISE_LOCATION_SITE_DIALOG_DENY_ONCE)
+                    locationPermissionSession[domain] = permission
                     locationPermission.callback.invoke(locationPermission.origin, false, false)
                 }
             }
@@ -965,6 +1049,17 @@ class BrowserTabViewModel(
         }
     }
 
+    private fun reactToSiteSessionPermission(permission: LocationPermissionType) {
+        locationPermission?.let { locationPermission ->
+            if (permission == LocationPermissionType.ALLOW_ONCE) {
+                locationPermission.callback.invoke(locationPermission.origin, true, false)
+            } else {
+                locationPermission.callback.invoke(locationPermission.origin, false, false)
+            }
+        }
+
+    }
+
     override fun onSystemLocationPermissionAllowed() {
         pixel.fire(PixelName.PRECISE_LOCATION_SYSTEM_DIALOG_ENABLE)
         command.postValue(RequestSystemLocationPermission)
@@ -977,12 +1072,8 @@ class BrowserTabViewModel(
 
     override fun onSystemLocationPermissionNeverAllowed() {
         locationPermission?.let { locationPermission ->
-            val neverAllowedPermission = LocationPermissionType.DENY_ALWAYS
-            onSiteLocationPermissionSelected(locationPermission.origin, neverAllowedPermission)
-            pixel.fire(Pixel.PixelName.PRECISE_LOCATION_SYSTEM_DIALOG_NEVER)
-            viewModelScope.launch {
-                locationPermissionsRepository.savePermission(locationPermission.origin, neverAllowedPermission)
-            }
+            onSiteLocationPermissionSelected(locationPermission.origin, LocationPermissionType.DENY_ALWAYS)
+            pixel.fire(PixelName.PRECISE_LOCATION_SYSTEM_DIALOG_NEVER)
         }
     }
 
@@ -990,7 +1081,7 @@ class BrowserTabViewModel(
         locationPermission?.let { locationPermission ->
             appSettingsPreferencesStore.appLocationPermissionDeniedForever = false
             appSettingsPreferencesStore.appLocationPermission = true
-            pixel.fire(Pixel.PixelName.PRECISE_LOCATION_SETTINGS_LOCATION_PERMISSION_ENABLE)
+            pixel.fire(PixelName.PRECISE_LOCATION_SETTINGS_LOCATION_PERMISSION_ENABLE)
             viewModelScope.launch {
                 val permissionEntity = locationPermissionsRepository.getDomainPermission(locationPermission.origin)
                 if (permissionEntity == null) {
@@ -1003,7 +1094,7 @@ class BrowserTabViewModel(
     }
 
     fun onSystemLocationPermissionDeniedOneTime() {
-        pixel.fire(Pixel.PixelName.PRECISE_LOCATION_SETTINGS_LOCATION_PERMISSION_DISABLE)
+        pixel.fire(PixelName.PRECISE_LOCATION_SETTINGS_LOCATION_PERMISSION_DISABLE)
         onSiteLocationPermissionAlwaysDenied()
     }
 
@@ -1162,6 +1253,9 @@ class BrowserTabViewModel(
         val url = url ?: ""
         val title = title ?: ""
         val id = withContext(dispatchers.io()) {
+            if (url.isNotBlank()) {
+                faviconManager.persistFavicon(tabId, url)
+            }
             bookmarksDao.insert(BookmarkEntity(title = title, url = url))
         }
         withContext(dispatchers.main()) {
@@ -1179,6 +1273,7 @@ class BrowserTabViewModel(
                 fireproofWebsiteRepository.fireproofWebsite(domain)?.let {
                     pixel.fire(PixelName.FIREPROOF_WEBSITE_ADDED)
                     command.value = ShowFireproofWebSiteConfirmation(fireproofWebsiteEntity = it)
+                    faviconManager.persistFavicon(tabId, url = domain)
                 }
             }
         }
@@ -1341,10 +1436,15 @@ class BrowserTabViewModel(
 
         val uri = site?.uri ?: return
 
+        pixel.fire(
+            if (desktopSiteRequested) PixelName.MENU_ACTION_DESKTOP_SITE_ENABLE_PRESSED
+            else PixelName.MENU_ACTION_DESKTOP_SITE_DISABLE_PRESSED
+        )
+
         if (desktopSiteRequested && uri.isMobileSite) {
             val desktopUrl = uri.toDesktopUri().toString()
             Timber.i("Original URL $url - attempting $desktopUrl with desktop site UA string")
-            command.value = Navigate(desktopUrl)
+            command.value = Navigate(desktopUrl, getUrlHeaders())
         } else {
             command.value = Refresh
         }
@@ -1422,16 +1522,10 @@ class BrowserTabViewModel(
             currentPage.toUri().baseHost ?: currentPage
         }
 
-        faviconDownloader.download(currentPage.toUri())
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe({
-                Timber.i("Successfully got favicon")
-                command.value = AddHomeShortcut(title, currentPage, it)
-            }, { throwable ->
-                Timber.w(throwable, "Failed to obtain favicon")
-                command.value = AddHomeShortcut(title, currentPage)
-            })
+        viewModelScope.launch {
+            val favicon: Bitmap? = faviconManager.loadFromTemp(tabId, currentPage)
+            command.value = AddHomeShortcut(title, currentPage, favicon)
+        }
     }
 
     fun userRequestedOpeningNewTab() {
@@ -1439,11 +1533,15 @@ class BrowserTabViewModel(
         command.value = LaunchNewTab
     }
 
-    fun onSurveyChanged(survey: Survey?) {
-        val activeSurvey = ctaViewModel.onSurveyChanged(survey)
-        if (activeSurvey != null) {
+    fun onSurveyChanged(survey: Survey?, locale: Locale = Locale.getDefault()) {
+        val surveyCleared = ctaViewModel.onSurveyChanged(survey)
+        if (surveyCleared) {
+            ctaViewState.value = currentCtaViewState().copy(cta = null)
+            return
+        }
+        if (survey != null) {
             viewModelScope.launch {
-                refreshCta()
+                refreshCta(locale)
             }
         }
     }
@@ -1457,10 +1555,10 @@ class BrowserTabViewModel(
         ctaViewModel.onCtaShown(cta)
     }
 
-    suspend fun refreshCta(): Cta? {
+    suspend fun refreshCta(locale: Locale = Locale.getDefault()): Cta? {
         if (currentGlobalLayoutState() is Browser) {
             val cta = withContext(dispatchers.io()) {
-                ctaViewModel.refreshCta(dispatchers.io(), currentBrowserViewState().browserShowing, siteLiveData.value)
+                ctaViewModel.refreshCta(dispatchers.io(), currentBrowserViewState().browserShowing, siteLiveData.value, locale)
             }
             ctaViewState.value = currentCtaViewState().copy(cta = cta)
             return cta
@@ -1469,7 +1567,7 @@ class BrowserTabViewModel(
     }
 
     private fun showOrHideKeyboard(cta: Cta?) {
-        command.value = if (cta is DialogCta) HideKeyboard else ShowKeyboard
+        command.value = if (cta is DialogCta || cta is HomePanelCta) HideKeyboard else ShowKeyboard
     }
 
     fun registerDaxBubbleCtaDismissed() {
@@ -1545,7 +1643,7 @@ class BrowserTabViewModel(
     }
 
     override fun externalAppLinkClicked(appLink: IntentType) {
-        command.value = HandleExternalAppLink(appLink)
+        command.value = HandleExternalAppLink(appLink, getUrlHeaders())
     }
 
     override fun openMessageInNewTab(message: Message) {
@@ -1621,47 +1719,58 @@ class BrowserTabViewModel(
 
     fun download(pendingFileDownload: FileDownloader.PendingFileDownload) {
         viewModelScope.launch(dispatchers.io()) {
-            fileDownloader.download(pendingFileDownload, object : FileDownloader.FileDownloadListener {
+            fileDownloader.download(
+                pendingFileDownload,
+                object : FileDownloader.FileDownloadListener {
 
-                override fun downloadStartedNetworkFile() {
-                    Timber.d("download started: network file")
-                    closeAndReturnToSourceIfBlankTab()
-                }
+                    override fun downloadStartedNetworkFile() {
+                        Timber.d("download started: network file")
+                        closeAndReturnToSourceIfBlankTab()
+                    }
 
-                override fun downloadFinishedNetworkFile(file: File, mimeType: String?) {
-                    Timber.i("downloadFinished network file")
-                }
+                    override fun downloadFinishedNetworkFile(file: File, mimeType: String?) {
+                        Timber.i("downloadFinished network file")
+                    }
 
-                override fun downloadStartedDataUri() {
-                    Timber.i("downloadStarted data uri")
-                    command.postValue(DownloadCommand.ShowDownloadInProgressNotification)
-                    closeAndReturnToSourceIfBlankTab()
-                }
+                    override fun downloadStartedDataUri() {
+                        Timber.i("downloadStarted data uri")
+                        command.postValue(DownloadCommand.ShowDownloadInProgressNotification)
+                        closeAndReturnToSourceIfBlankTab()
+                    }
 
-                override fun downloadFinishedDataUri(file: File, mimeType: String?) {
-                    Timber.i("downloadFinished data uri")
-                    command.postValue(DownloadCommand.ScanMediaFiles(file))
-                    command.postValue(DownloadCommand.ShowDownloadFinishedNotification(file, mimeType))
-                }
+                    override fun downloadFinishedDataUri(file: File, mimeType: String?) {
+                        Timber.i("downloadFinished data uri")
+                        command.postValue(DownloadCommand.ScanMediaFiles(file))
+                        command.postValue(DownloadCommand.ShowDownloadFinishedNotification(file, mimeType))
+                    }
 
-                override fun downloadFailed(message: String, downloadFailReason: DownloadFailReason) {
-                    Timber.w("Failed to download file [$message]")
-                    command.postValue(DownloadCommand.ShowDownloadFailedNotification(message, downloadFailReason))
-                }
+                    override fun downloadFailed(message: String, downloadFailReason: DownloadFailReason) {
+                        Timber.w("Failed to download file [$message]")
+                        command.postValue(DownloadCommand.ShowDownloadFailedNotification(message, downloadFailReason))
+                    }
 
-                override fun downloadCancelled() {
-                    Timber.i("Download cancelled")
-                    closeAndReturnToSourceIfBlankTab()
-                }
+                    override fun downloadCancelled() {
+                        Timber.i("Download cancelled")
+                        closeAndReturnToSourceIfBlankTab()
+                    }
 
-                override fun downloadOpened() {
-                    closeAndReturnToSourceIfBlankTab()
+                    override fun downloadOpened() {
+                        closeAndReturnToSourceIfBlankTab()
+                    }
                 }
-            })
+            )
         }
     }
 
     companion object {
         private const val FIXED_PROGRESS = 50
+        const val GPC_HEADER = "Sec-GPC"
+        const val GPC_HEADER_VALUE = "1"
+
+        // Minimum progress to show web content again after decided to hide web content (possible spoofing attack).
+        // We think that progress is enough to assume next site has already loaded new content.
+        private const val SHOW_CONTENT_MIN_PROGRESS = 50
+        private const val NEW_CONTENT_MAX_DELAY_MS = 1000L
+        private const val ONE_HOUR_IN_MS = 3_600_000
     }
 }

@@ -18,11 +18,16 @@ package com.duckduckgo.app.browser
 
 import android.graphics.Bitmap
 import android.net.Uri
+import android.net.http.SslError
+import android.net.http.SslError.*
 import android.os.Build
 import android.webkit.*
 import androidx.annotation.RequiresApi
 import androidx.annotation.UiThread
 import androidx.annotation.WorkerThread
+import com.duckduckgo.app.browser.certificates.rootstore.CertificateValidationState
+import com.duckduckgo.app.browser.certificates.rootstore.TrustedCertificateStore
+import com.duckduckgo.app.globalprivacycontrol.GlobalPrivacyControlInjector
 import com.duckduckgo.app.browser.logindetection.DOMLoginDetector
 import com.duckduckgo.app.browser.logindetection.WebNavigationEvent
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
@@ -35,6 +40,7 @@ import timber.log.Timber
 import java.net.URI
 
 class BrowserWebViewClient(
+    private val trustedCertificateStore: TrustedCertificateStore,
     private val requestRewriter: RequestRewriter,
     private val specialUrlDetector: SpecialUrlDetector,
     private val requestInterceptor: RequestInterceptor,
@@ -42,7 +48,8 @@ class BrowserWebViewClient(
     private val uncaughtExceptionRepository: UncaughtExceptionRepository,
     private val cookieManager: CookieManager,
     private val loginDetector: DOMLoginDetector,
-    private val dosDetector: DosDetector
+    private val dosDetector: DosDetector,
+    private val globalPrivacyControlInjector: GlobalPrivacyControlInjector
 ) : WebViewClient() {
 
     var webViewClientListener: WebViewClientListener? = null
@@ -108,6 +115,9 @@ class BrowserWebViewClient(
                         webView.loadUrl(newUri.toString())
                         return true
                     }
+                    if (isForMainFrame) {
+                        webViewClientListener?.willOverrideUrl(url.toString())
+                    }
                     false
                 }
             }
@@ -134,6 +144,7 @@ class BrowserWebViewClient(
                 webViewClientListener?.pageRefreshed(url)
             }
             lastPageStarted = url
+            globalPrivacyControlInjector.injectDoNotSellToDom(webView)
             loginDetector.onEvent(WebNavigationEvent.OnPageStarted(webView))
         } catch (e: Throwable) {
             GlobalScope.launch {
@@ -148,7 +159,10 @@ class BrowserWebViewClient(
         try {
             Timber.v("onPageFinished webViewUrl: ${webView.url} URL: $url")
             val navigationList = webView.safeCopyBackForwardList() ?: return
-            webViewClientListener?.navigationStateChanged(WebViewNavigationState(navigationList))
+            webViewClientListener?.run {
+                navigationStateChanged(WebViewNavigationState(navigationList))
+                url?.let { prefetchFavicon(url) }
+            }
             flushCookies()
         } catch (e: Throwable) {
             GlobalScope.launch {
@@ -220,6 +234,20 @@ class BrowserWebViewClient(
                 throw e
             }
         }
+    }
+
+    override fun onReceivedSslError(view: WebView?, handler: SslErrorHandler, error: SslError) {
+        var trusted: CertificateValidationState = CertificateValidationState.UntrustedChain
+        when (error.primaryError) {
+            SSL_UNTRUSTED -> {
+                Timber.d("The certificate authority ${error.certificate.issuedBy.dName} is not trusted")
+                trusted = trustedCertificateStore.validateSslCertificateChain(error.certificate)
+            }
+            else -> Timber.d("SSL error ${error.primaryError}")
+        }
+
+        Timber.d("The certificate authority validation result is $trusted")
+        if (trusted is CertificateValidationState.TrustedChain) handler.proceed() else super.onReceivedSslError(view, handler, error)
     }
 
     private fun buildAuthenticationCredentials(

@@ -23,13 +23,18 @@ import android.webkit.WebSettings
 import com.duckduckgo.app.browser.*
 import com.duckduckgo.app.browser.addtohome.AddToHomeCapabilityDetector
 import com.duckduckgo.app.browser.addtohome.AddToHomeSystemCapabilityDetector
+import com.duckduckgo.app.browser.certificates.rootstore.TrustedCertificateStore
 import com.duckduckgo.app.browser.defaultbrowsing.AndroidDefaultBrowserDetector
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserObserver
+import com.duckduckgo.app.globalprivacycontrol.GlobalPrivacyControlInjector
+import com.duckduckgo.app.globalprivacycontrol.GlobalPrivacyControlInjectorJs
 import com.duckduckgo.app.browser.downloader.AndroidFileDownloader
 import com.duckduckgo.app.browser.downloader.DataUriDownloader
 import com.duckduckgo.app.browser.downloader.FileDownloader
 import com.duckduckgo.app.browser.downloader.NetworkFileDownloader
+import com.duckduckgo.app.browser.favicon.FaviconPersister
+import com.duckduckgo.app.browser.favicon.FileBasedFaviconPersister
 import com.duckduckgo.app.browser.logindetection.DOMLoginDetector
 import com.duckduckgo.app.browser.logindetection.JsLoginDetector
 import com.duckduckgo.app.browser.logindetection.NavigationAwareLoginDetector
@@ -81,6 +86,7 @@ class BrowserModule {
 
     @Provides
     fun browserWebViewClient(
+        trustedCertificateStore: TrustedCertificateStore,
         requestRewriter: RequestRewriter,
         specialUrlDetector: SpecialUrlDetector,
         requestInterceptor: RequestInterceptor,
@@ -88,9 +94,11 @@ class BrowserModule {
         uncaughtExceptionRepository: UncaughtExceptionRepository,
         cookieManager: CookieManager,
         loginDetector: DOMLoginDetector,
-        dosDetector: DosDetector
+        dosDetector: DosDetector,
+        globalPrivacyControlInjector: GlobalPrivacyControlInjector
     ): BrowserWebViewClient {
         return BrowserWebViewClient(
+            trustedCertificateStore,
             requestRewriter,
             specialUrlDetector,
             requestInterceptor,
@@ -98,7 +106,8 @@ class BrowserModule {
             uncaughtExceptionRepository,
             cookieManager,
             loginDetector,
-            dosDetector
+            dosDetector,
+            globalPrivacyControlInjector
         )
     }
 
@@ -168,7 +177,7 @@ class BrowserModule {
         removeCookies: RemoveCookies,
         dispatcherProvider: DispatcherProvider
     ): DuckDuckGoCookieManager {
-        return WebViewCookieManager(cookieManager, AppUrl.Url.HOST, removeCookies, dispatcherProvider)
+        return WebViewCookieManager(cookieManager, AppUrl.Url.COOKIES, removeCookies, dispatcherProvider)
     }
 
     @Provides
@@ -221,6 +230,12 @@ class BrowserModule {
         return FileBasedWebViewPreviewPersister(context, fileDeleter)
     }
 
+    @Singleton
+    @Provides
+    fun faviconPersister(context: Context, fileDeleter: FileDeleter, dispatcherProvider: DispatcherProvider): FaviconPersister {
+        return FileBasedFaviconPersister(context, fileDeleter, dispatcherProvider)
+    }
+
     @Provides
     fun webViewPreviewGenerator(): WebViewPreviewGenerator {
         return FileBasedWebViewPreviewGenerator()
@@ -239,5 +254,10 @@ class BrowserModule {
     @Provides
     fun fileDownloader(dataUriDownloader: DataUriDownloader, networkFileDownloader: NetworkFileDownloader): FileDownloader {
         return AndroidFileDownloader(dataUriDownloader, networkFileDownloader)
+    }
+
+    @Provides
+    fun doNotSell(appSettingsPreferencesStore: SettingsDataStore): GlobalPrivacyControlInjector {
+        return GlobalPrivacyControlInjectorJs(appSettingsPreferencesStore)
     }
 }

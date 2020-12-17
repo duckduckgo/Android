@@ -74,9 +74,12 @@ class SurveyActivity : DuckDuckGoActivity() {
     }
 
     private fun configureObservers() {
-        viewModel.command.observe(this, Observer {
-            it?.let { command -> processCommand(command) }
-        })
+        viewModel.command.observe(
+            this,
+            Observer {
+                it?.let { command -> processCommand(command) }
+            }
+        )
     }
 
     private fun processCommand(command: Command) {
@@ -153,7 +156,7 @@ class SurveyActivity : DuckDuckGoActivity() {
         }
 
         override fun shouldInterceptRequest(view: WebView, request: WebResourceRequest): WebResourceResponse? {
-            if (request.isForMainFrame && request.url.host == "www.duckduckgo.com") {
+            if (request.url.host == "duckduckgo.com") {
                 runOnUiThread {
                     viewModel.onSurveyCompleted()
                 }

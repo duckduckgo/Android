@@ -16,7 +16,6 @@
 
 package com.duckduckgo.app.cta.ui
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.net.Uri
 import android.view.View
@@ -33,6 +32,7 @@ import com.duckduckgo.app.global.install.daysInstalled
 import com.duckduckgo.app.global.view.*
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelValues.DAX_FIRE_DIALOG_CTA
 import com.duckduckgo.app.trackerdetection.model.Entity
 import kotlinx.android.synthetic.main.include_cta_buttons.view.*
 import kotlinx.android.synthetic.main.include_cta_content.view.*
@@ -212,37 +212,40 @@ sealed class DaxDialogCta(
         onboardingStore,
         appInstallStore
     ) {
-
-        @SuppressLint("StringFormatMatches")
-        @ExperimentalStdlibApi
         override fun getDaxText(context: Context): String {
-            val percentage = networkPropertyPercentages[network]
-
             return if (isFromSameNetworkDomain()) {
-                context.resources.getString(R.string.daxMainNetworkCtaText, network, percentage, network)
-            } else {
-                val locale = Locale.getDefault()
-                if (locale != null && locale.language == "en") {
+                if (isEnglishLocale()) {
                     context.resources.getString(
-                        R.string.daxMainNetworkOwnedCtaText,
+                        R.string.daxMainNetworkCtaText,
                         network,
                         Uri.parse(siteHost).baseHost?.removePrefix("m."),
                         network
                     )
                 } else {
-                    context.resources.getString(
-                        R.string.daxMainNetworkOwnedCtaText,
-                        Uri.parse(siteHost).baseHost?.removePrefix("m.")?.capitalize(Locale.getDefault()),
-                        network,
-                        network,
-                        percentage,
-                        network
-                    )
+                    // Remove this branch once Translations are ready
+                    nonEnglishText(context)
                 }
+            } else {
+                context.resources.getString(
+                    R.string.daxMainNetworkOwnedCtaText,
+                    network,
+                    Uri.parse(siteHost).baseHost?.removePrefix("m."),
+                    network
+                )
             }
         }
 
-        @ExperimentalStdlibApi
+        @Suppress("SENSELESS_COMPARISON")
+        private fun isEnglishLocale(): Boolean {
+            val locale = Locale.getDefault()
+            return locale != null && locale.language == "en"
+        }
+
+        private fun nonEnglishText(context: Context): String {
+            val percentage = networkPropertyPercentages[network]
+            return context.resources.getString(R.string.daxMainNetworkCtaText, network, percentage, network)
+        }
+
         override fun createCta(activity: FragmentActivity): DaxDialog =
             TypewriterDaxDialog.newInstance(daxText = getDaxText(activity), primaryButtonText = activity.resources.getString(okButton))
 
@@ -327,8 +330,11 @@ sealed class DaxFireDialogCta(
     @StringRes open val description: Int,
     override val shownPixel: Pixel.PixelName?,
     override val okPixel: Pixel.PixelName?,
-    override val cancelPixel: Pixel.PixelName?
-) : Cta, ViewCta {
+    override val cancelPixel: Pixel.PixelName?,
+    override var ctaPixelParam: String,
+    override val onboardingStore: OnboardingStore,
+    override val appInstallStore: AppInstallStore
+) : Cta, ViewCta, DaxCta {
 
     override fun showCta(view: View) {
         val daxText = view.context.getString(description)
@@ -343,14 +349,17 @@ sealed class DaxFireDialogCta(
 
     override fun pixelOkParameters(): Map<String, String> = emptyMap()
 
-    override fun pixelShownParameters(): Map<String, String> = emptyMap()
+    override fun pixelShownParameters(): Map<String, String> = mapOf(Pixel.PixelParameter.CTA_SHOWN to addCtaToHistory(ctaPixelParam))
 
-    class TryClearDataCta : DaxFireDialogCta(
+    class TryClearDataCta(override val onboardingStore: OnboardingStore, override val appInstallStore: AppInstallStore) : DaxFireDialogCta(
         ctaId = CtaId.DAX_FIRE_BUTTON,
         description = R.string.daxClearDataCtaText,
         shownPixel = Pixel.PixelName.ONBOARDING_DAX_CTA_SHOWN,
         okPixel = null,
-        cancelPixel = null
+        cancelPixel = null,
+        ctaPixelParam = DAX_FIRE_DIALOG_CTA,
+        onboardingStore = onboardingStore,
+        appInstallStore = appInstallStore
     )
 }
 
