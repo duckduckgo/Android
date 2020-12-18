@@ -52,6 +52,7 @@ import com.duckduckgo.app.widget.ui.AddWidgetInstructionsActivity
 import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
 import dagger.Module
 import dagger.android.ContributesAndroidInjector
+import dummy.ui.NetworkInfoActivity
 import dummy.ui.VpnControllerActivity
 
 @Module
@@ -150,6 +151,10 @@ abstract class AndroidBindingModule {
     @ActivityScoped
     @ContributesAndroidInjector
     abstract fun vpnControllerActivity(): VpnControllerActivity
+
+    @ActivityScoped
+    @ContributesAndroidInjector
+    abstract fun networkInfoActivity(): NetworkInfoActivity
 
     /* Fragments */
 

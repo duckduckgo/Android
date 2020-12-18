@@ -82,6 +82,10 @@ class AppTrackerBlockingStatsRepository @Inject constructor(vpnDatabase: VpnData
         )
     }
 
+    fun noStartDate(): String {
+        return DatabaseDateFormatter.timestamp(LocalDateTime.of(2000, 1, 1, 0, 0))
+    }
+
     private fun noEndDate(): String {
         return DatabaseDateFormatter.timestamp(LocalDateTime.of(9999, 1, 1, 0, 0))
     }

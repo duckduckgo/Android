@@ -18,13 +18,9 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
-        android:id="@+id/reportFeedback"
-        android:icon="@drawable/ic_baseline_feedback_24"
-        android:title="@string/vpnReportFeedback"
+        android:id="@+id/refresh"
+        android:icon="@drawable/ic_baseline_refresh_24"
+        android:title="@string/refresh"
         app:showAsAction="always" />
-    <item
-        android:id="@+id/networkInfo"
-        android:title="@string/networkInfo"
-        app:showAsAction="never" />
 
 </menu>

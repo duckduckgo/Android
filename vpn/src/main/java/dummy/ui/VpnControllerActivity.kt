@@ -173,6 +173,9 @@ class VpnControllerActivity : AppCompatActivity(R.layout.activity_vpn_controller
             R.id.reportFeedback -> {
                 launchFeedback(); true
             }
+            R.id.networkInfo -> {
+                startActivity(NetworkInfoActivity.intent(this)); true
+            }
             else -> super.onOptionsItemSelected(item)
         }
     }
