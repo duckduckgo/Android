@@ -427,9 +427,8 @@ class BrowserTabViewModel(
     }
 
     private fun onAutoCompleteResultReceived(result: AutoCompleteResult) {
-        val results = result.suggestions.take(6)
         val currentViewState = currentAutoCompleteViewState()
-        autoCompleteViewState.value = currentViewState.copy(searchResults = AutoCompleteResult(result.query, results))
+        autoCompleteViewState.value = currentViewState.copy(searchResults = AutoCompleteResult(result.query, result.suggestions))
     }
 
     @VisibleForTesting

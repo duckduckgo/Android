@@ -19,15 +19,12 @@ package com.duckduckgo.app.autocomplete.api
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteResult
 import com.duckduckgo.app.bookmarks.db.BookmarkEntity
 import com.duckduckgo.app.bookmarks.db.BookmarksDao
-import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.whenever
 import io.reactivex.Observable
 import io.reactivex.Single
-import org.junit.Assert.assertSame
-import org.junit.Assert.assertTrue
+import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
-import org.mockito.ArgumentMatchers.anyString
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations
 
@@ -48,16 +45,6 @@ class AutoCompleteApiTest {
     }
 
     @Test
-    fun whenQueryIsNotBlankThenTryToGetBookmarksFromDAO() {
-        whenever(mockAutoCompleteService.autoComplete("foo")).thenReturn(Observable.just(emptyList()))
-        whenever(mockBookmarksDao.bookmarksByQuery(anyString())).thenReturn(Single.just(emptyList()))
-
-        testee.autoComplete("foo")
-
-        verify(mockBookmarksDao).bookmarksByQuery("%foo%")
-    }
-
-    @Test
     fun whenQueryIsBlankThenReturnAnEmptyList() {
         val result = testee.autoComplete("").test()
         val value = result.values()[0] as AutoCompleteResult
@@ -66,13 +53,86 @@ class AutoCompleteApiTest {
     }
 
     @Test
-    fun whenReturnBookmarkSuggestionsThenPhraseIsSameAsURL() {
-        whenever(mockAutoCompleteService.autoComplete("foo")).thenReturn(Observable.just(emptyList()))
-        whenever(mockBookmarksDao.bookmarksByQuery(anyString())).thenReturn(Single.just(listOf(BookmarkEntity(0, "title", "https://example.com"))))
+    fun whenReturnBookmarkSuggestionsThenPhraseIsURLBaseHost() {
+        whenever(mockAutoCompleteService.autoComplete("title")).thenReturn(Observable.just(emptyList()))
+        whenever(mockBookmarksDao.bookmarksObservable()).thenReturn(Single.just(listOf(BookmarkEntity(0, "title", "https://example.com"))))
 
-        val result = testee.autoComplete("foo").test()
+        val result = testee.autoComplete("title").test()
         val value = result.values()[0] as AutoCompleteResult
 
-        assertSame("https://example.com", value.suggestions[0].phrase)
+        assertEquals("example.com", value.suggestions[0].phrase)
+    }
+
+    @Test
+    fun whenAutoCompleteDoesNotMatchBookmarksReturnEmptyBookmarkList() {
+        whenever(mockAutoCompleteService.autoComplete("wrong")).thenReturn(Observable.just(emptyList()))
+        whenever(mockBookmarksDao.bookmarksObservable()).thenReturn(Single.just(listOf(BookmarkEntity(0, "title", "https://example.com"))))
+
+        val result = testee.autoComplete("wrong").test()
+        val value = result.values()[0] as AutoCompleteResult
+
+        assertTrue(value.suggestions.isEmpty())
+    }
+
+    @Test
+    fun whenAutoCompleteReturnsMultipleBookmarkHitsThenLimitToMaxOfTwo() {
+        whenever(mockAutoCompleteService.autoComplete("title")).thenReturn(Observable.just(emptyList()))
+        whenever(mockBookmarksDao.bookmarksObservable()).thenReturn(
+            Single.just(
+                listOf(
+                    BookmarkEntity(0, "title", "https://example.com"),
+                    BookmarkEntity(0, "title", "https://foo.com"),
+                    BookmarkEntity(0, "title", "https://bar.com"),
+                    BookmarkEntity(0, "title", "https://baz.com")
+                )
+            )
+        )
+
+        val result = testee.autoComplete("title").test()
+        val value = result.values()[0] as AutoCompleteResult
+
+        assertEquals(
+            listOf(
+                AutoComplete.AutoCompleteSuggestion.AutoCompleteBookmarkSuggestion(phrase = "example.com", "title", "https://example.com"),
+                AutoComplete.AutoCompleteSuggestion.AutoCompleteBookmarkSuggestion(phrase = "foo.com", "title", "https://foo.com"),
+            ),
+            value.suggestions
+        )
+    }
+
+    @Test
+    fun whenAutoCompleteReturnsDuplicatedItemsThenDedup() {
+        whenever(mockAutoCompleteService.autoComplete("title")).thenReturn(
+            Observable.just(
+                listOf(
+                    AutoCompleteServiceRawResult("example.com"),
+                    AutoCompleteServiceRawResult("foo.com"),
+                    AutoCompleteServiceRawResult("bar.com"),
+                    AutoCompleteServiceRawResult("baz.com")
+                )
+            )
+        )
+        whenever(mockBookmarksDao.bookmarksObservable()).thenReturn(
+            Single.just(
+                listOf(
+                    BookmarkEntity(0, "title example", "https://example.com"),
+                    BookmarkEntity(0, "title foo", "https://foo.com"),
+                    BookmarkEntity(0, "title bar", "https://bar.com")
+                )
+            )
+        )
+
+        val result = testee.autoComplete("title").test()
+        val value = result.values()[0] as AutoCompleteResult
+
+        assertEquals(
+            listOf(
+                AutoComplete.AutoCompleteSuggestion.AutoCompleteBookmarkSuggestion(phrase = "example.com", "title example", "https://example.com"),
+                AutoComplete.AutoCompleteSuggestion.AutoCompleteBookmarkSuggestion(phrase = "foo.com", "title foo", "https://foo.com"),
+                AutoComplete.AutoCompleteSuggestion.AutoCompleteSearchSuggestion(phrase = "bar.com", true),
+                AutoComplete.AutoCompleteSuggestion.AutoCompleteSearchSuggestion(phrase = "baz.com", true)
+            ),
+            value.suggestions
+        )
     }
 }
