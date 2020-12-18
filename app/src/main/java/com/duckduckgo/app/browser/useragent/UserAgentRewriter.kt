@@ -18,19 +18,18 @@ package com.duckduckgo.app.browser.useragent
 
 import android.net.Uri
 import com.duckduckgo.app.global.UriString
-import com.duckduckgo.app.global.baseHost
 import com.duckduckgo.app.global.isMobileSite
 import javax.inject.Inject
 
 class MobileUrlReWriter @Inject constructor() {
 
-    fun isStrictlyMobileSite(uri: Uri?): Boolean {
-        if (uri == null) return false
+    fun mobileSiteOnlyForUri(uri: Uri?): MobileSiteOnly? {
+        if (uri == null) return null
         val host = uri.host
         return if (!uri.isMobileSite && host != null) {
-            strictlyMobileSiteHosts.any { UriString.sameOrSubdomain(host, it.host) && !containsExcludedPath(uri, it) }
+            strictlyMobileSiteHosts.firstOrNull { UriString.sameOrSubdomain(host, it.host) && !containsExcludedPath(uri, it) }
         } else {
-            false
+            null
         }
     }
 
@@ -39,19 +38,16 @@ class MobileUrlReWriter @Inject constructor() {
         return site.excludedPaths.any { segments.contains(it) }
     }
 
-    fun getMobileSite(uri: Uri): String? {
-        val host = uri.host ?: return null
-        val baseHost = uri.baseHost ?: return null
-        val newHost = "m.$baseHost"
-        return uri.toString().replace(host, newHost)
-    }
-
     companion object {
         val strictlyMobileSiteHosts = listOf(
-            MobileSiteOnly("facebook.com", listOf("dialog", "sharer"))
+            MobileSiteOnly("facebook.com", "m.facebook.com", listOf("dialog", "sharer"))
         )
     }
 
-    data class MobileSiteOnly(val host: String, val excludedPaths: List<String> = emptyList())
-
+    data class MobileSiteOnly(val host: String, val mobileHost: String, val excludedPaths: List<String> = emptyList()) {
+        fun getMobileSite(uri: Uri): String? {
+            val host = uri.host ?: return null
+            return uri.toString().replace(host, mobileHost)
+        }
+    }
 }

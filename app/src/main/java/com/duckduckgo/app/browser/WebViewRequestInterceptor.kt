@@ -71,10 +71,10 @@ class WebViewRequestInterceptor(
 
         val url = request.url
 
-        if (shouldLoadAsMobileUrl(request)) {
-            mobileUrlReWriter.getMobileSite(url)?.let {
+        shouldChangeToMobileUrl(request)?.let {
+            it.getMobileSite(url)?.let { newUrl ->
                 withContext(Dispatchers.Main) {
-                    webView.loadUrl(it)
+                    webView.loadUrl(newUrl)
                 }
                 return WebResourceResponse(null, null, null)
             }
@@ -148,8 +148,13 @@ class WebViewRequestInterceptor(
         }
     }
 
-    private fun shouldLoadAsMobileUrl(request: WebResourceRequest) =
-        request.isForMainFrame && request.url != null && request.method == "GET" && mobileUrlReWriter.isStrictlyMobileSite(request.url)
+    private fun shouldChangeToMobileUrl(request: WebResourceRequest): MobileUrlReWriter.MobileSiteOnly? {
+        return if (request.isForMainFrame && request.url != null && request.method == "GET") {
+            return mobileUrlReWriter.mobileSiteOnlyForUri(request.url)
+        } else {
+            null
+        }
+    }
 
     private fun shouldUpgrade(request: WebResourceRequest) =
         request.isForMainFrame && request.url != null && httpsUpgrader.shouldUpgrade(request.url)

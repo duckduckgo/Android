@@ -341,8 +341,8 @@ class WebViewRequestInterceptorTest {
     }
 
     @Test
-    fun whenUrlShouldLoadAsMobileUrlThenLoadUrlWithMobileSubdomain() = runBlocking<Unit> {
-        configureShouldLoadAsMobileUrl()
+    fun whenUrlShouldChangeToMobileUrlThenLoadUrlWithMobileSubdomain() = runBlocking<Unit> {
+        configureShouldChangeToMobileUrl()
 
         val mockWebViewClientListener: WebViewClientListener = mock()
         testee.shouldIntercept(
@@ -439,7 +439,7 @@ class WebViewRequestInterceptorTest {
         whenever(webView.copyBackForwardList()).thenReturn(mockWebBackForwardList)
     }
 
-    private fun configureShouldLoadAsMobileUrl() = runBlocking<Unit> {
+    private fun configureShouldChangeToMobileUrl() = runBlocking<Unit> {
         whenever(mockRequest.url).thenReturn((Uri.parse("https://facebook.com")))
         whenever(mockRequest.isForMainFrame).thenReturn(true)
         whenever(mockRequest.method).thenReturn("GET")

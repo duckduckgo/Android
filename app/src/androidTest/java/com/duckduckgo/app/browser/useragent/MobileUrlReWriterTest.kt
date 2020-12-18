@@ -25,34 +25,34 @@ class MobileUrlReWriterTest {
     private val testee = MobileUrlReWriter()
 
     @Test
-    fun whenIsStrictlyMobileSiteAndSiteBelongsToMobileSiteHostsThenReturnTrue() {
+    fun whenMobileSiteOnlyForUriAndSiteBelongsToMobileSiteHostsThenReturnObject() {
         val domain = MobileUrlReWriter.strictlyMobileSiteHosts.first().host
         val url = "https://$domain".toUri()
 
-        assertTrue(testee.isStrictlyMobileSite(url))
+        assertNotNull(testee.mobileSiteOnlyForUri(url))
     }
 
     @Test
-    fun whenIsStrictlyMobileSiteAndSiteBelongsToMobileSiteHostsWithExclusionPathThenReturnFalse() {
+    fun whenMobileSiteOnlyForUriAndSiteBelongsToMobileSiteHostsWithExclusionPathThenReturnNull() {
         val domain = MobileUrlReWriter.strictlyMobileSiteHosts.first().host
         val path = MobileUrlReWriter.strictlyMobileSiteHosts.first().excludedPaths.first()
         val url = "https://$domain/$path".toUri()
 
-        assertFalse(testee.isStrictlyMobileSite(url))
+        assertNull(testee.mobileSiteOnlyForUri(url))
     }
 
     @Test
-    fun whenIsStrictlyMobileSiteAndSiteDoesNotBelongsToMobileSiteHostsThenReturnFalse() {
-        assertFalse(testee.isStrictlyMobileSite("https://example.com".toUri()))
+    fun whenMobileSiteOnlyForUriAndSiteDoesNotBelongsToMobileSiteHostsThenReturnNull() {
+        assertNull(testee.mobileSiteOnlyForUri("https://example.com".toUri()))
     }
 
     @Test
-    fun whenGetMobileSiteThenReturnAMobileUrl() {
-        val url = "https://example.com"
+    fun whenGetMobileSiteThenReturnTheMobileHostUrl() {
+        val testee = MobileUrlReWriter.MobileSiteOnly("example.com", "m.example.com", emptyList())
+        val uri = "https://${testee.host}/test".toUri()
 
-        val value = testee.getMobileSite(url.toUri())
+        val value = testee.getMobileSite(uri)
 
-        assertEquals("https://m.example.com", value)
+        assertEquals("https://${testee.mobileHost}/test", value)
     }
-
 }
