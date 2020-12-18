@@ -26,10 +26,19 @@ class MobileUrlReWriterTest {
 
     @Test
     fun whenIsStrictlyMobileSiteAndSiteBelongsToMobileSiteHostsThenReturnTrue() {
-        val domain = MobileUrlReWriter.strictlyMobileSiteHosts.first()
+        val domain = MobileUrlReWriter.strictlyMobileSiteHosts.first().host
         val url = "https://$domain".toUri()
 
         assertTrue(testee.isStrictlyMobileSite(url))
+    }
+
+    @Test
+    fun whenIsStrictlyMobileSiteAndSiteBelongsToMobileSiteHostsWithExclusionPathThenReturnFalse() {
+        val domain = MobileUrlReWriter.strictlyMobileSiteHosts.first().host
+        val path = MobileUrlReWriter.strictlyMobileSiteHosts.first().excludedPaths.first()
+        val url = "https://$domain/$path".toUri()
+
+        assertFalse(testee.isStrictlyMobileSite(url))
     }
 
     @Test

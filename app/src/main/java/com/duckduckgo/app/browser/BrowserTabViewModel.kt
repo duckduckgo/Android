@@ -771,7 +771,7 @@ class BrowserTabViewModel(
             browserShowing = true,
             canAddBookmarks = true,
             addToHomeEnabled = true,
-            canChangeBrowsingMode = canChangeBrowsingMode(site?.domain),
+            canChangeBrowsingMode = canChangeBrowsingMode(site?.uri),
             addToHomeVisible = addToHomeCapabilityDetector.isAddToHomeSupported(),
             canSharePage = true,
             showPrivacyGrade = true,
@@ -800,9 +800,7 @@ class BrowserTabViewModel(
         registerSiteVisit()
     }
 
-    private fun canChangeBrowsingMode(domain: String?): Boolean {
-        return !MobileUrlReWriter.strictlyMobileSiteHosts.any { domain?.contains(it) == true }
-    }
+    private fun canChangeBrowsingMode(uri: Uri?): Boolean = !mobileUrlReWriter.isStrictlyMobileSite(uri)
 
     private fun sendPixelIfUseOurAppSiteVisitedFirstTime(url: String) {
         if (useOurAppDetector.isUseOurAppUrl(url)) {

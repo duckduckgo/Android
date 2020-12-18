@@ -28,10 +28,15 @@ class MobileUrlReWriter @Inject constructor() {
         if (uri == null) return false
         val host = uri.host
         return if (!uri.isMobileSite && host != null) {
-            strictlyMobileSiteHosts.any { UriString.sameOrSubdomain(host, it) }
+            strictlyMobileSiteHosts.any { UriString.sameOrSubdomain(host, it.host) && !containsExcludedPath(uri, it) }
         } else {
             false
         }
+    }
+
+    private fun containsExcludedPath(uri: Uri, site: MobileSiteOnly): Boolean {
+        val segments = uri.pathSegments
+        return site.excludedPaths.any { segments.contains(it) }
     }
 
     fun getMobileSite(uri: Uri): String? {
@@ -42,6 +47,11 @@ class MobileUrlReWriter @Inject constructor() {
     }
 
     companion object {
-        val strictlyMobileSiteHosts = listOf("facebook.com")
+        val strictlyMobileSiteHosts = listOf(
+            MobileSiteOnly("facebook.com", listOf("dialog", "sharer"))
+        )
     }
+
+    data class MobileSiteOnly(val host: String, val excludedPaths: List<String> = emptyList())
+
 }
