@@ -139,10 +139,11 @@ class UdpPacketProcessor(
             val payloadBuffer = packet.backingBuffer ?: return
             while (payloadBuffer.hasRemaining()) {
                 val bytesWritten = channel.write(payloadBuffer)
+                Timber.v("UDP packet. Sent $bytesWritten bytes to $cacheKey")
                 packetPersister.persistDataSent(bytesWritten, PACKET_TYPE_UDP)
             }
         } catch (e: IOException) {
-            Timber.w("Network write error")
+            Timber.w("Network write error writing to $cacheKey")
             channelCache.remove(cacheKey)
         }
     }
@@ -158,6 +159,7 @@ class UdpPacketProcessor(
         }
 
         channelCache.put(cacheKey, channel)
+        Timber.v("UDP cache size now ${channelCache.size()}")
         return channel
     }
 

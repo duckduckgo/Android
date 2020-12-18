@@ -365,12 +365,15 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
 
     override fun createDatagramChannel(): DatagramChannel {
         return DatagramChannel.open().also { channel ->
-            protect(channel.socket())
             channel.configureBlocking(false)
+            channel.socket().let { socket ->
+                protect(socket)
+                socket.broadcast = true
+            }
         }
     }
 
-    override fun createSocket(): SocketChannel {
+    override fun createSocketChannel(): SocketChannel {
         return SocketChannel.open().also { channel ->
             channel.configureBlocking(false)
             protect(channel.socket())
@@ -390,7 +393,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
 
 interface NetworkChannelCreator {
     fun createDatagramChannel(): DatagramChannel
-    fun createSocket(): SocketChannel
+    fun createSocketChannel(): SocketChannel
 }
 
 class VpnQueues {

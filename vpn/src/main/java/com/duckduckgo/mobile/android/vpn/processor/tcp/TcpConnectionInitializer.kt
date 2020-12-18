@@ -59,7 +59,7 @@ class TcpConnectionInitializer(private val queues: VpnQueues, private val networ
         Timber.d("Initializing connection $key")
 
         if (header.isSYN) {
-            val channel = networkChannelCreator.createSocket()
+            val channel = networkChannelCreator.createSocketChannel()
             val sequenceNumberToClient = Random.nextLong(Short.MAX_VALUE.toLong() + 1)
             val sequenceToServer = header.sequenceNumber
             val ackNumberToClient = header.sequenceNumber + 1
