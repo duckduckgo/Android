@@ -31,7 +31,6 @@ import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.logindetection.NavigationAwareLoginDetector
 import com.duckduckgo.app.browser.omnibar.QueryUrlConverter
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
-import com.duckduckgo.app.browser.useragent.MobileUrlReWriter
 import com.duckduckgo.app.cta.db.DismissedCtaDao
 import com.duckduckgo.app.cta.ui.CtaViewModel
 import com.duckduckgo.app.feedback.api.FeedbackSubmitter
@@ -129,8 +128,7 @@ class ViewModelFactory @Inject constructor(
     private val dismissedCtaDao: DismissedCtaDao,
     private val fileDownloader: FileDownloader,
     private val dispatcherProvider: DispatcherProvider,
-    private val fireAnimationLoader: FireAnimationLoader,
-    private val mobileUrlReWriter: MobileUrlReWriter
+    private val fireAnimationLoader: FireAnimationLoader
 ) : ViewModelProvider.NewInstanceFactory() {
 
     override fun <T : ViewModel> create(modelClass: Class<T>) =
@@ -228,8 +226,7 @@ class ViewModelFactory @Inject constructor(
         notificationDao = notificationDao,
         useOurAppDetector = userOurAppDetector,
         variantManager = variantManager,
-        fileDownloader = fileDownloader,
-        mobileUrlReWriter = mobileUrlReWriter
+        fileDownloader = fileDownloader
     )
 
     private fun changeAppIconViewModel() =

@@ -54,7 +54,6 @@ import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.browser.model.LongPressTarget
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
-import com.duckduckgo.app.browser.useragent.MobileUrlReWriter
 import com.duckduckgo.app.cta.db.DismissedCtaDao
 import com.duckduckgo.app.cta.model.CtaId
 import com.duckduckgo.app.cta.model.DismissedCta
@@ -325,8 +324,7 @@ class BrowserTabViewModelTest {
             notificationDao = mockNotificationDao,
             useOurAppDetector = UseOurAppDetector(mockUserEventsStore),
             variantManager = mockVariantManager,
-            fileDownloader = mockFileDownloader,
-            mobileUrlReWriter = MobileUrlReWriter()
+            fileDownloader = mockFileDownloader
         )
 
         testee.loadData("abc", null, false)
@@ -3040,6 +3038,15 @@ class BrowserTabViewModelTest {
         givenCurrentSite("https://www.example.com/")
 
         loadUrl("https://www.facebook.com", isBrowserShowing = true)
+
+        assertFalse(browserViewState().canChangeBrowsingMode)
+    }
+
+    @Test
+    fun whenPageChangesAndNewPageCanChangeBrowsingModeButContainsExcludedPathThenCanChangeBrowsingModeIsFalse() {
+        givenCurrentSite("https://www.example.com/")
+
+        loadUrl("https://www.facebook.com/dialog", isBrowserShowing = true)
 
         assertFalse(browserViewState().canChangeBrowsingMode)
     }

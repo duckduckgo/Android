@@ -135,8 +135,7 @@ class BrowserTabViewModel(
     private val notificationDao: NotificationDao,
     private val useOurAppDetector: UseOurAppDetector,
     private val variantManager: VariantManager,
-    private val fileDownloader: FileDownloader,
-    private val mobileUrlReWriter: MobileUrlReWriter
+    private val fileDownloader: FileDownloader
 ) : WebViewClientListener, EditBookmarkListener, HttpAuthenticationListener, SiteLocationPermissionDialog.SiteLocationPermissionDialogListener,
     SystemLocationPermissionDialog.SystemLocationPermissionDialogListener, ViewModel() {
 
@@ -771,7 +770,7 @@ class BrowserTabViewModel(
             browserShowing = true,
             canAddBookmarks = true,
             addToHomeEnabled = true,
-            canChangeBrowsingMode = canChangeBrowsingMode(site?.uri),
+            canChangeBrowsingMode = canChangeBrowsingMode(site?.domain),
             addToHomeVisible = addToHomeCapabilityDetector.isAddToHomeSupported(),
             canSharePage = true,
             showPrivacyGrade = true,
@@ -800,7 +799,9 @@ class BrowserTabViewModel(
         registerSiteVisit()
     }
 
-    private fun canChangeBrowsingMode(uri: Uri?): Boolean = !mobileUrlReWriter.isStrictlyMobileSite(uri)
+    private fun canChangeBrowsingMode(domain: String?): Boolean {
+        return !MobileUrlReWriter.strictlyMobileSiteHosts.any { domain?.contains(it.host) == true }
+    }
 
     private fun sendPixelIfUseOurAppSiteVisitedFirstTime(url: String) {
         if (useOurAppDetector.isUseOurAppUrl(url)) {
