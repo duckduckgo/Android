@@ -5,6 +5,9 @@ Welcome to our android application. We are excited to engage the community in de
 ## We are hiring!
 DuckDuckGo is growing fast and we continue to expand our fully distributed team. We embrace diverse perspectives, and seek out passionate, self-motivated people, committed to our shared vision of raising the standard of trust online. If you are a senior software engineer capable in either iOS or Android, visit our [careers](https://duckduckgo.com/hiring/#open) page to find out more about our openings!
 
+## About
+DuckDuckGo is a privacy browser designed specially to provide more privacy to its users apart from other salient features like smarter encryption etc. This is very useful in protecting personal data across the web. [Click here](https://en.wikipedia.org/wiki/DuckDuckGo) to get more information. 
+
 ## Building the Project
 We use git submodules and so when you are checking out the app, you'll need to ensure the submodules are initialized properly. You can use the `--recursive` flag when cloning the project to do this.
 
