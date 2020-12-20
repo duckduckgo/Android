@@ -1,7 +1,7 @@
 # Improve Language Translations
 Thank you for taking the time to contribute to DuckDuckGo! :sparkles:
 
-If you know any of the following languages and would like to help us improve the translations for them, please follow the instructions below.
+If you know any of the following languages and would like to help us improve the translations for them, please follow the instructions given below.
 
 ## List of languages
 1. Bulgarian (bg)
@@ -31,13 +31,13 @@ If you know any of the following languages and would like to help us improve the
 
 ## How to help
 
-1. Each language has a [`values`](https://github.com/duckduckgo/Android/tree/develop/app/src/main/res) directory containing the language code, and the `strings.xml` file contains the translations. Examples:
+1. Each language has a [`values`](https://github.com/duckduckgo/Android/tree/develop/app/src/main/res) directory containing the language code, and the `strings.xml` file which contains the translations. Examples:
     - Italian translation files are located within `app/src/main/res/values-it/strings.xml`  
     - Spanish translation files are located within `app/src/main/res/values-es/strings.xml`
-1. If you notice anything which could be improved, you should create a PR containing the improved language suggestions.
-    1. Make the changes to the relevant `strings.xml` file
-    1. Test the app in the language you've improved, and ensure the changed strings look good
+1. If you notice anything which could be improved, you should create a PR containing the improved language suggestions. Please follow the below given steps.
+    1. Make the changes to the relevant `strings.xml` file.
+    1. Test the app in the language you've improved, and ensure that the changed strings look good.
     1. Create a PR. As well as the changes themselves, explaining _why_ the changes are an improvement helps a lot.
              
 
-ℹ️ Please note we are not looking for help with other languages at this time; only the languages listed above. We may open up requests in future for additional languages.
+ℹ️ Please note that we are not looking for help with other languages currently; only the languages listed above. We may open up requests in future for additional languages.
