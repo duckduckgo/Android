@@ -54,7 +54,7 @@ fun WebNavigationState.compare(previous: WebNavigationState?): WebNavigationStat
         return PageCleared
     }
 
-    currentUrl?.let {latestUrl ->
+    currentUrl?.let { latestUrl ->
         // A new page load is identified by the original url changing
         if (originalUrl != previous?.originalUrl) {
             return NewPage(latestUrl, title)
@@ -72,7 +72,7 @@ fun WebNavigationState.compare(previous: WebNavigationState?): WebNavigationStat
         }
     }
 
-    progress?.let{
+    progress?.let {
         if (it != previous?.progress) {
             return ProgressChanged(it)
         }

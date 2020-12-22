@@ -565,7 +565,7 @@ class BrowserTabViewModel(
     }
 
     override fun willOverrideUrl(newUrl: String) {
-        val previousSiteStillLoading = currentLoadingViewState().isLoading //|| !shouldShowNewProgress
+        val previousSiteStillLoading = currentLoadingViewState().isLoading // || !shouldShowNewProgress
         Timber.d("willoverride for $newUrl and $previousSiteStillLoading")
         if (previousSiteStillLoading) {
             showBlankContentfNewContentDelayed()
