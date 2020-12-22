@@ -24,6 +24,7 @@ import com.duckduckgo.mobile.android.vpn.processor.tcp.ConnectionInitializer.Tcp
 import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpStateFlow.Event.MoveState
 import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpStateFlow.Event.MoveState.MoveClientToState
 import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpStateFlow.Event.MoveState.MoveServerToState
+import com.duckduckgo.mobile.android.vpn.processor.tcp.requestingapp.OriginatingAppResolver
 import com.duckduckgo.mobile.android.vpn.processor.tcp.tracker.LocalIpAddressDetector
 import com.duckduckgo.mobile.android.vpn.processor.tcp.tracker.VpnTrackerDetector
 import com.duckduckgo.mobile.android.vpn.service.NetworkChannelCreator
@@ -47,7 +48,8 @@ class TcpPacketProcessor(
     networkChannelCreator: NetworkChannelCreator,
     trackerDetector: VpnTrackerDetector,
     packetPersister: PacketPersister,
-    localAddressDetector: LocalIpAddressDetector
+    localAddressDetector: LocalIpAddressDetector,
+    originatingAppResolver: OriginatingAppResolver
 ) : Runnable {
 
     val selector: Selector = Selector.open()
@@ -74,7 +76,8 @@ class TcpPacketProcessor(
             handler = handler,
             trackerDetector = trackerDetector,
             packetPersister = packetPersister,
-            localAddressDetector = localAddressDetector
+            localAddressDetector = localAddressDetector,
+            originatingAppResolver = originatingAppResolver
         )
 
     private val readWriteExecutorService = Executors.newFixedThreadPool(2)

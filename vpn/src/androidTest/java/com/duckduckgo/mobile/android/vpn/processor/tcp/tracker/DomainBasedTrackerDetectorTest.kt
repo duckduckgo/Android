@@ -29,6 +29,7 @@ import com.nhaarman.mockitokotlin2.whenever
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
@@ -72,40 +73,49 @@ class DomainBasedTrackerDetectorTest {
 
     @Test
     fun whenHostnameIsNotInTrackerListThenTrackerTypeNotTracker() {
-        givenExtractedHostname("duckduckgo.com")
+        "duckduckgo.com".also { givenExtractedHostname(it) }
         val type = testee.determinePacketType(tcb, aPacket(), aPayload(), aRemoteAddress())
-        assertTrue(type == NotTracker)
+        type.assertNotTracker()
     }
 
     @Test
     fun whenHostnameInTrackerListExactMatchThenTrackerTypeTracker() {
-        givenExtractedHostname("doubleclick.net")
+        val trackerDomain = "doubleclick.net".also { givenExtractedHostname(it) }
         val type = testee.determinePacketType(tcb, aPacket(), aPayload(), aRemoteAddress())
-        assertTrue(type == Tracker)
+        type.assertIsTracker(trackerDomain)
     }
 
     @Test
     fun whenHostnameSuffixMatchesThenTrackerTypeTracker() {
         givenExtractedHostname("foo.bar.doubleclick.net")
         val type = testee.determinePacketType(tcb, aPacket(), aPayload(), aRemoteAddress())
-        assertTrue(type == Tracker)
+        type.assertIsTracker("doubleclick.net")
     }
 
     @Test
     fun whenHostnameSuffixDoesNotMatchThenTrackerTypeNotTracker() {
         givenExtractedHostname("doubleclick.net.unmatched")
         val type = testee.determinePacketType(tcb, aPacket(), aPayload(), aRemoteAddress())
-        assertTrue(type == NotTracker)
+        type.assertNotTracker()
     }
 
     @Test
     fun whenIsLocalAddressThenTrackerTypeNotTracker() {
         val type = testee.determinePacketType(tcb, aPacket(), aPayload(), aLocalAddress())
-        assertTrue(type == NotTracker)
+        type.assertNotTracker()
     }
 
     private fun givenExtractedHostname(desiredHostname: String?) {
         whenever(hostnameExtractor.extract(any(), any(), any())).thenReturn(desiredHostname)
+    }
+
+    private fun RequestTrackerType.assertNotTracker() {
+        assertTrue(this is NotTracker)
+    }
+
+    private fun RequestTrackerType.assertIsTracker(trackerHostName: String) {
+        assertTrue(this is Tracker)
+        assertEquals(trackerHostName, (this as Tracker).hostName)
     }
 
     private fun aPacket() = Packet(ByteBuffer.allocate(24))

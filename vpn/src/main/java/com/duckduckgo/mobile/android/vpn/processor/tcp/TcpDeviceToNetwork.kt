@@ -27,6 +27,8 @@ import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpPacketProcessor.Compan
 import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpPacketProcessor.Companion.updateState
 import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpPacketProcessor.PendingWriteData
 import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpStateFlow.Event.*
+import com.duckduckgo.mobile.android.vpn.processor.tcp.requestingapp.OriginatingAppResolver
+import com.duckduckgo.mobile.android.vpn.processor.tcp.requestingapp.RequestingApp
 import com.duckduckgo.mobile.android.vpn.processor.tcp.tracker.LocalIpAddressDetector
 import com.duckduckgo.mobile.android.vpn.processor.tcp.tracker.RequestTrackerType
 import com.duckduckgo.mobile.android.vpn.processor.tcp.tracker.VpnTrackerDetector
@@ -54,7 +56,8 @@ class TcpDeviceToNetwork(
     private val handler: Handler,
     private val trackerDetector: VpnTrackerDetector,
     private val packetPersister: PacketPersister,
-    private val localAddressDetector: LocalIpAddressDetector
+    private val localAddressDetector: LocalIpAddressDetector,
+    private val originatingAppResolver: OriginatingAppResolver
 ) {
 
     var lastTimePacketConsumed = 0L
@@ -94,6 +97,7 @@ class TcpDeviceToNetwork(
 
         if (tcb == null) {
             processPacketTcbNotInitialized(connectionKey, packet, totalPacketLength, connectionParams)
+
             // Timber.i("Processed device-to-network packet. New connection. Took ${(System.nanoTime() - startTime) / 1_000_000}ms")
         } else {
             processPacketTcbExists(connectionKey, tcb, packet, totalPacketLength, connectionParams, responseBuffer, payloadBuffer)
@@ -277,10 +281,13 @@ class TcpDeviceToNetwork(
                 Timber.v(" ${tcb.ipAndPort} Payload Size is 0. There's nothing to Process")
                 return
             }
-            val isLocalAddress = determineIfLocalIpAddress(packet)
-            val isTracker = determineIfTracker(tcb, packet, payloadBuffer, isLocalAddress)
 
-            if (isTracker) {
+            val isLocalAddress = determineIfLocalIpAddress(packet)
+            val requestType = determineIfTracker(tcb, packet, payloadBuffer, isLocalAddress)
+            val requestingApp = determineRequestingApp(tcb, packet)
+            Timber.i("App ${requestingApp.appName} (${requestingApp.packageId}) attempting to send $payloadSize bytes to ${tcb.ipAndPort}. $requestType")
+
+            if (requestType is RequestTrackerType.Tracker) {
                 // TODO - validate the best option here: send RESET, FIN or DROP packet?
                 tcb.sendResetPacket(queues, packet, payloadSize)
                 return
@@ -319,20 +326,29 @@ class TcpDeviceToNetwork(
         queues.networkToDevice.offer(connectionParams.responseBuffer)
     }
 
-    private fun determineIfTracker(tcb: TCB, packet: Packet, payloadBuffer: ByteBuffer, isLocalAddress: Boolean): Boolean {
+    private fun determineIfTracker(tcb: TCB, packet: Packet, payloadBuffer: ByteBuffer, isLocalAddress: Boolean): RequestTrackerType {
         if (tcb.trackerTypeDetermined) {
-            return tcb.isTracker
+            return if (tcb.isTracker) (RequestTrackerType.Tracker(tcb.trackerHostName)) else RequestTrackerType.NotTracker(tcb.hostName ?: packet.ip4Header.destinationAddress.hostName)
         }
 
-        return when (trackerDetector.determinePacketType(tcb, packet, payloadBuffer, isLocalAddress)) {
-            RequestTrackerType.Tracker -> true
-            RequestTrackerType.NotTracker -> false
-            RequestTrackerType.Undetermined -> false
-        }
+        return trackerDetector.determinePacketType(tcb, packet, payloadBuffer, isLocalAddress)
     }
 
     private fun determineIfLocalIpAddress(packet: Packet): Boolean {
         return localAddressDetector.isLocalAddress(packet.ip4Header.destinationAddress)
+    }
+
+    private fun determineRequestingApp(tcb: TCB, packet: Packet): RequestingApp {
+        if (tcb.requestingAppDetermined) {
+            return RequestingApp(tcb.requestingAppPackage ?: "unknown package", tcb.requestingAppName ?: "unknown app")
+        }
+
+        val requestingApp = originatingAppResolver.resolveAppId(packet)
+        tcb.requestingAppDetermined = true
+        tcb.requestingAppName = requestingApp.appName
+        tcb.requestingAppPackage = requestingApp.packageId
+
+        return requestingApp
     }
 
 }

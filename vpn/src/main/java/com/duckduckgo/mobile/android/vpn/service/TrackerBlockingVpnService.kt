@@ -32,6 +32,7 @@ import com.duckduckgo.mobile.android.vpn.model.dateOfPreviousMidnight
 import com.duckduckgo.mobile.android.vpn.processor.TunPacketReader
 import com.duckduckgo.mobile.android.vpn.processor.TunPacketWriter
 import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpPacketProcessor
+import com.duckduckgo.mobile.android.vpn.processor.tcp.requestingapp.OriginatingAppResolver
 import com.duckduckgo.mobile.android.vpn.processor.tcp.tracker.LocalIpAddressDetector
 import com.duckduckgo.mobile.android.vpn.processor.tcp.tracker.VpnTrackerDetector
 import com.duckduckgo.mobile.android.vpn.processor.udp.UdpPacketProcessor
@@ -71,6 +72,9 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
     @Inject
     lateinit var localAddressDetector: LocalIpAddressDetector
 
+    @Inject
+    lateinit var originatingAppResolver: OriginatingAppResolver
+
     private val queues = VpnQueues()
 
     private var tunInterface: ParcelFileDescriptor? = null
@@ -109,7 +113,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
         AndroidInjection.inject(this)
 
         udpPacketProcessor = UdpPacketProcessor(queues, this, packetPersister)
-        tcpPacketProcessor = TcpPacketProcessor(queues, this, trackerDetector, packetPersister, localAddressDetector)
+        tcpPacketProcessor = TcpPacketProcessor(queues, this, trackerDetector, packetPersister, localAddressDetector, originatingAppResolver)
 
         Timber.i("VPN onCreate")
     }

@@ -16,8 +16,11 @@
 
 package com.duckduckgo.mobile.android.vpn.di
 
+import android.content.pm.PackageManager
+import android.net.ConnectivityManager
 import com.duckduckgo.di.scopes.VpnObjectGraph
 import com.duckduckgo.mobile.android.vpn.processor.tcp.hostname.*
+import com.duckduckgo.mobile.android.vpn.processor.tcp.requestingapp.OriginatingAppResolver
 import com.duckduckgo.mobile.android.vpn.processor.tcp.tracker.DomainBasedTrackerDetector
 import com.duckduckgo.mobile.android.vpn.processor.tcp.tracker.TrackerListProvider
 import com.duckduckgo.mobile.android.vpn.processor.tcp.tracker.VpnTrackerDetector
@@ -31,6 +34,12 @@ import dagger.Provides
 @Module
 @ContributesTo(VpnObjectGraph::class)
 class VpnModule {
+
+    @Provides
+    fun providesOriginatingAppResolver(connectivityManager: ConnectivityManager, packageManager: PackageManager): OriginatingAppResolver {
+        return OriginatingAppResolver(connectivityManager, packageManager)
+    }
+
     @Provides
     fun providesDispatcherProvider(): VpnDispatcherProvider {
         return DefaultVpnDispatcherProvider()

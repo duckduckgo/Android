@@ -39,6 +39,11 @@ public class TCB {
 
     public boolean isTracker = false;
     public boolean trackerTypeDetermined = false;
+    public String trackerHostName = null;
+
+    public Boolean requestingAppDetermined = false;
+    public String requestingAppPackage = null;
+    public String requestingAppName = null;
 
     @Nullable public String hostName = null;
 

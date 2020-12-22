@@ -14,20 +14,6 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.mobile.android.vpn.processor.tcp.tracker
+package com.duckduckgo.mobile.android.vpn.processor.tcp.requestingapp
 
-sealed class RequestTrackerType {
-
-    data class Tracker(val hostName: String) : RequestTrackerType() {
-        override fun toString(): String = "Tracker: $hostName"
-    }
-
-    data class NotTracker(val hostName: String) : RequestTrackerType() {
-        override fun toString(): String = "Not a tracker: $hostName"
-    }
-
-    object Undetermined : RequestTrackerType() {
-        override fun toString(): String = "Undetermined"
-    }
-
-}
+data class RequestingApp(val packageId: String, val appName: String)

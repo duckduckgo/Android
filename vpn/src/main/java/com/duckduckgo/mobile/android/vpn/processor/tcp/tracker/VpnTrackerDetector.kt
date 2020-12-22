@@ -41,7 +41,7 @@ class DomainBasedTrackerDetector(
             Timber.v("%s is a local address; not looking for trackers", packet.ip4Header.destinationAddress)
             tcb.trackerTypeDetermined = true
             tcb.isTracker = false
-            return RequestTrackerType.NotTracker
+            return RequestTrackerType.NotTracker(packet.ip4Header.destinationAddress.hostName)
         }
 
         val hostname = hostnameExtractor.extract(tcb, packet, payloadBuffer)
@@ -55,16 +55,17 @@ class DomainBasedTrackerDetector(
         trackerListProvider.trackerList().forEach { tracker ->
             if (hostname.endsWith(tracker.hostname)) {
                 tcb.isTracker = true
+                tcb.trackerHostName = tracker.hostname
                 Timber.w("Determined %s to be a tracker %s", hostname, tcb.ipAndPort)
                 insertTracker(tracker)
-                return Tracker
+                return Tracker(tracker.hostname)
             }
         }
 
         tcb.isTracker = false
         Timber.v("Determined %s is not a tracker %s", hostname, tcb.ipAndPort)
 
-        return RequestTrackerType.NotTracker
+        return RequestTrackerType.NotTracker(hostname)
     }
 
     private fun insertTracker(tracker: TrackerListProvider.Tracker) {
