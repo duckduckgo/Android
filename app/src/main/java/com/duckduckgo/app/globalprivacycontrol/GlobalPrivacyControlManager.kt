@@ -17,19 +17,33 @@
 package com.duckduckgo.app.globalprivacycontrol
 
 import android.content.Context
+import android.net.Uri
 import android.webkit.WebView
 import androidx.annotation.UiThread
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.global.UriString
+import com.duckduckgo.app.global.domain
 import com.duckduckgo.app.settings.db.SettingsDataStore
 
 interface GlobalPrivacyControl {
     fun injectDoNotSellToDom(webView: WebView)
     fun isGpcActive(): Boolean
     fun getHeaders(): Map<String, String>
+    fun shouldAddHeaders(url: Uri): Boolean
 }
 
 class GlobalPrivacyControlManager(private val appSettingsPreferencesStore: SettingsDataStore) : GlobalPrivacyControl {
     private val javaScriptInjector = JavaScriptInjector()
+    private val headerConsumers = listOf(
+        "nytimes.com",
+        "globalprivacycontrol.org",
+        "global-privacy-control.glitch.me"
+    )
+
+    override fun shouldAddHeaders(url: Uri): Boolean {
+        val domain = url.domain() ?: return false
+        return headerConsumers.any { UriString.sameOrSubdomain(domain, it) }
+    }
 
     override fun isGpcActive(): Boolean = appSettingsPreferencesStore.globalPrivacyControlEnabled
 

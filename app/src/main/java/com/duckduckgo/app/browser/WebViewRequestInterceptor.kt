@@ -127,7 +127,8 @@ class WebViewRequestInterceptor(
             globalPrivacyControl.isGpcActive() &&
                 !headers.containsKey(GlobalPrivacyControlManager.GPC_HEADER) &&
                 request.isForMainFrame &&
-                request.method == "GET"
+                request.method == "GET" &&
+                globalPrivacyControl.shouldAddHeaders(request.url)
             )
     }
 
