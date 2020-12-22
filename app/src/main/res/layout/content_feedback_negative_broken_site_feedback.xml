@@ -41,7 +41,7 @@
             android:id="@+id/title"
             style="@style/FeedbackTitle"
             android:layout_marginTop="12dp"
-            android:text="@string/websiteNotLoadingTitleShort"
+            android:text="@string/websiteNotLoadingTitleLong"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/emoticonImage" />
