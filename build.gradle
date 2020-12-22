@@ -3,6 +3,7 @@
 buildscript {
     ext.kotlin_version = '1.4.10'
     ext.spotless = "5.7.0"
+    ext.anvil_version = "2.0.0"
 
     // vtodo VPN
     ext.google_services = "4.3.4"
@@ -21,6 +22,7 @@ buildscript {
         classpath "com.google.gms:google-services:$google_services"
         classpath "com.google.firebase:perf-plugin:$google_perf_plugin"
         classpath "com.google.firebase:firebase-crashlytics-gradle:$google_crashlytics_plugin"
+        classpath "com.squareup.anvil:gradle-plugin:$anvil_version"
 
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files

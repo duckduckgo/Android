@@ -1,3 +1,4 @@
+include ':di'
 include ':vpn'
 include ':app'
 

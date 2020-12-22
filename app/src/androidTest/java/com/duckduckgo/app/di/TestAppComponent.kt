@@ -27,6 +27,8 @@ import com.duckduckgo.app.onboarding.di.OnboardingModule
 import com.duckduckgo.app.surrogates.di.ResourceSurrogateModule
 import com.duckduckgo.app.trackerdetection.di.TrackerDetectionModule
 import com.duckduckgo.app.usage.di.AppUsageModule
+import com.duckduckgo.di.scopes.AppObjectGraph
+import com.squareup.anvil.annotations.MergeComponent
 import dagger.BindsInstance
 import dagger.Component
 import dagger.android.support.AndroidSupportInjectionModule
@@ -36,7 +38,8 @@ import javax.inject.Named
 import javax.inject.Singleton
 
 @Singleton
-@Component(
+@MergeComponent(
+    scope = AppObjectGraph::class,
     modules = [
 
         /* test doubled modules */
@@ -44,10 +47,6 @@ import javax.inject.Singleton
         StubJobSchedulerModule::class,
         StubAppConfigurationDownloadModule::class,
         StubStatisticsModule::class,
-
-        /* vpn module */
-        TestVpnDatabaseModule::class,
-        TestTrackerDetectorModule::class,
 
         /* real modules */
         ApplicationModule::class,

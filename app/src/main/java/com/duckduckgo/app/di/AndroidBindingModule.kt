@@ -49,11 +49,8 @@ import com.duckduckgo.app.survey.ui.SurveyActivity
 import com.duckduckgo.app.systemsearch.SystemSearchActivity
 import com.duckduckgo.app.tabs.ui.TabSwitcherActivity
 import com.duckduckgo.app.widget.ui.AddWidgetInstructionsActivity
-import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
 import dagger.Module
 import dagger.android.ContributesAndroidInjector
-import dummy.ui.NetworkInfoActivity
-import dummy.ui.VpnControllerActivity
 
 @Module
 abstract class AndroidBindingModule {
@@ -148,14 +145,6 @@ abstract class AndroidBindingModule {
     @ContributesAndroidInjector
     abstract fun globalPrivacyControlActivity(): GlobalPrivacyControlActivity
 
-    @ActivityScoped
-    @ContributesAndroidInjector
-    abstract fun vpnControllerActivity(): VpnControllerActivity
-
-    @ActivityScoped
-    @ContributesAndroidInjector
-    abstract fun networkInfoActivity(): NetworkInfoActivity
-
     /* Fragments */
 
     @ContributesAndroidInjector
@@ -205,8 +194,4 @@ abstract class AndroidBindingModule {
 
     @ContributesAndroidInjector
     abstract fun notificationHandlerService(): NotificationHandlerService
-
-    @ContributesAndroidInjector
-    abstract fun vpnService(): TrackerBlockingVpnService
-
 }

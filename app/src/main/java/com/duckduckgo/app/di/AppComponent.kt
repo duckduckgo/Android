@@ -28,8 +28,9 @@ import com.duckduckgo.app.onboarding.di.OnboardingModule
 import com.duckduckgo.app.surrogates.di.ResourceSurrogateModule
 import com.duckduckgo.app.trackerdetection.di.TrackerDetectionModule
 import com.duckduckgo.app.usage.di.AppUsageModule
-import com.duckduckgo.mobile.android.vpn.di.AppTrackerBlockingComponent
+import com.duckduckgo.di.scopes.AppObjectGraph
 import com.duckduckgo.widget.SearchWidget
+import com.squareup.anvil.annotations.MergeComponent
 import dagger.BindsInstance
 import dagger.Component
 import dagger.android.AndroidInjector
@@ -38,7 +39,8 @@ import kotlinx.coroutines.CoroutineScope
 import javax.inject.Singleton
 
 @Singleton
-@Component(
+@MergeComponent(
+    scope = AppObjectGraph::class,
     modules = [
         ApplicationModule::class,
         JobsModule::class,
@@ -71,8 +73,7 @@ import javax.inject.Singleton
         PlayStoreReferralModule::class,
         CoroutinesModule::class,
         FormatterModule::class
-    ],
-    dependencies = [AppTrackerBlockingComponent::class]
+    ]
 )
 interface AppComponent : AndroidInjector<DuckDuckGoApplication> {
 
@@ -84,8 +85,6 @@ interface AppComponent : AndroidInjector<DuckDuckGoApplication> {
 
         @BindsInstance
         fun applicationCoroutineScope(@AppCoroutineScope applicationCoroutineScope: CoroutineScope): Builder
-
-        fun trackerBlockingStatsComponent(componentApp: AppTrackerBlockingComponent): Builder
 
         fun build(): AppComponent
     }

@@ -58,8 +58,6 @@ import com.duckduckgo.app.surrogates.ResourceSurrogateLoader
 import com.duckduckgo.app.tabs.db.TabsDbSanitizer
 import com.duckduckgo.app.trackerdetection.TrackerDataLoader
 import com.duckduckgo.app.usage.app.AppDaysUsedRecorder
-import com.duckduckgo.mobile.android.vpn.di.AppTrackerBlockingComponent
-import com.duckduckgo.mobile.android.vpn.di.DaggerAppTrackerBlockingComponent
 import com.google.firebase.FirebaseApp
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.google.firebase.perf.FirebasePerformance
@@ -303,15 +301,8 @@ open class DuckDuckGoApplication : HasAndroidInjector, Application(), LifecycleO
         daggerAppComponent = DaggerAppComponent.builder()
             .application(this)
             .applicationCoroutineScope(applicationCoroutineScope)
-            .trackerBlockingStatsComponent(getTrackerBlockingComponent())
             .build()
         daggerAppComponent.inject(this)
-    }
-
-    private fun getTrackerBlockingComponent(): AppTrackerBlockingComponent {
-        return DaggerAppTrackerBlockingComponent.builder()
-            .application(this)
-            .build()
     }
 
     private fun initializeHttpsUpgrader() {

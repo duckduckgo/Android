@@ -26,7 +26,6 @@ import com.duckduckgo.app.job.VpnStatsReportingRequestBuilder
 import com.duckduckgo.app.job.VpnStatsReportingScheduler
 import com.duckduckgo.app.job.WorkScheduler
 import com.duckduckgo.app.notification.AndroidNotificationScheduler
-import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
 import dagger.Module
 import dagger.Provides
 import javax.inject.Singleton
@@ -56,8 +55,7 @@ class JobsModule {
     @Singleton
     fun provideVpnStatsReportingScheduler(
         vpnStatsReportingRequestBuilder: VpnStatsReportingRequestBuilder,
-        workManager: WorkManager,
-        vpnDatabase: VpnDatabase
+        workManager: WorkManager
     ): VpnStatsReportingScheduler {
         return VpnStatsReportingScheduler(vpnStatsReportingRequestBuilder, workManager)
     }

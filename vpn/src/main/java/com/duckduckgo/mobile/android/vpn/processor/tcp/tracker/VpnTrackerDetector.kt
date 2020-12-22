@@ -24,14 +24,13 @@ import timber.log.Timber
 import xyz.hexene.localvpn.Packet
 import xyz.hexene.localvpn.TCB
 import java.nio.ByteBuffer
-import javax.inject.Inject
 
 interface VpnTrackerDetector {
 
     fun determinePacketType(tcb: TCB, packet: Packet, payloadBuffer: ByteBuffer, isLocalAddress: Boolean): RequestTrackerType
 }
 
-class DomainBasedTrackerDetector @Inject constructor(
+class DomainBasedTrackerDetector(
     private val hostnameExtractor: HostnameExtractor,
     private val trackerListProvider: TrackerListProvider,
     private val vpnDatabase: VpnDatabase

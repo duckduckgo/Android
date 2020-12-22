@@ -16,26 +16,24 @@
 
 package com.duckduckgo.mobile.android.vpn.di
 
-import android.content.Context
-import androidx.core.app.NotificationManagerCompat
+import com.duckduckgo.di.scopes.VpnObjectGraph
 import com.duckduckgo.mobile.android.vpn.processor.tcp.hostname.*
+import com.duckduckgo.mobile.android.vpn.processor.tcp.tracker.DomainBasedTrackerDetector
 import com.duckduckgo.mobile.android.vpn.processor.tcp.tracker.TrackerListProvider
+import com.duckduckgo.mobile.android.vpn.processor.tcp.tracker.VpnTrackerDetector
+import com.duckduckgo.mobile.android.vpn.store.PacketPersister
+import com.duckduckgo.mobile.android.vpn.store.RoomPacketPersister
+import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
+import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
-import javax.inject.Singleton
 
 @Module
-class VpnTrackerDetectorModule {
-
+@ContributesTo(VpnObjectGraph::class)
+class VpnModule {
     @Provides
     fun providesDispatcherProvider(): VpnDispatcherProvider {
         return DefaultVpnDispatcherProvider()
-    }
-
-    @Provides
-    @Singleton
-    fun providesNotificationManager(context: Context): NotificationManagerCompat {
-        return NotificationManagerCompat.from(context)
     }
 
     @Provides
@@ -59,4 +57,19 @@ class VpnTrackerDetectorModule {
         return AndroidHostnameExtractor(hostnameHeaderExtractor, encryptedRequestHostExtractor, payloadBytesExtractor)
     }
 
+    @VpnScope
+    @Provides
+    fun providesPacketPersister(vpnDatabase: VpnDatabase): PacketPersister {
+        return RoomPacketPersister(vpnDatabase)
+    }
+
+    @VpnScope
+    @Provides
+    fun providesVpnTrackerDetector(
+        hostnameExtractor: HostnameExtractor,
+        trackerListProvider: TrackerListProvider,
+        vpnDatabase: VpnDatabase
+    ): VpnTrackerDetector {
+        return DomainBasedTrackerDetector(hostnameExtractor, trackerListProvider, vpnDatabase)
+    }
 }
