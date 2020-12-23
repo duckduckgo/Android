@@ -19,6 +19,7 @@ package dummy.ui
 import android.content.Context
 import android.content.SharedPreferences
 import androidx.core.content.edit
+import com.duckduckgo.mobile.android.vpn.BuildConfig
 
 class VpnPreferences(private val applicationContext: Context) {
 
@@ -26,7 +27,7 @@ class VpnPreferences(private val applicationContext: Context) {
         prefs().edit { putBoolean(PREFS_KEY_DEBUG_LOGGING, enabled) }
     }
 
-    fun getDebugLoggingPreference(): Boolean = prefs().getBoolean(PREFS_KEY_DEBUG_LOGGING, false)
+    fun getDebugLoggingPreference(): Boolean = prefs().getBoolean(PREFS_KEY_DEBUG_LOGGING, BuildConfig.DEBUG)
 
     fun useCustomDnsServer(dnsServer: Boolean) {
         prefs().edit { putBoolean(PREFS_KEY_DNS_SERVER, dnsServer) }
