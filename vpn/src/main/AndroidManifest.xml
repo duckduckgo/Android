@@ -24,11 +24,6 @@
             android:theme="@style/Theme.AndroidVpn.NoActionBar"
             android:parentActivityName="dummy.ui.VpnControllerActivity"
             android:process=":vpn" >
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-
         </activity>
 
         <service
