@@ -568,6 +568,7 @@ class BrowserTabViewModel(
     }
 
     override fun willOverrideUrl(newUrl: String) {
+        navigationAwareLoginDetector.onEvent(NavigationEvent.Redirect(newUrl))
         val previousSiteStillLoading = currentLoadingViewState().isLoading
         if (previousSiteStillLoading) {
             showBlankContentfNewContentDelayed()

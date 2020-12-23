@@ -17,9 +17,11 @@
 package com.duckduckgo.app.browser.logindetection
 
 import android.net.Uri
+import androidx.core.net.toUri
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.duckduckgo.app.browser.WebNavigationStateChange
+import com.duckduckgo.app.global.baseHost
 import kotlinx.coroutines.*
 import timber.log.Timber
 import java.util.regex.Pattern
@@ -43,33 +45,58 @@ sealed class NavigationEvent {
     data class WebNavigationEvent(val navigationStateChange: WebNavigationStateChange) : NavigationEvent()
     object PageFinished : NavigationEvent()
     data class LoginAttempt(val url: String) : NavigationEvent()
+    data class Redirect(val url: String): NavigationEvent()
 }
 
 class AuthUrlDetector {
-    private var authenticationDetector = mapOf<String, Set<Pattern>>(
+    private var signinPages = mapOf<String, Set<Pattern>>(
         Pair(
-            "accounts.google.com", setOf(Pattern.compile("oauth2/v\\d.*/"), Pattern.compile("signin/v\\d.*/challenge"))
-        ),
-        Pair(
-            "appleid.apple.com", setOf(Pattern.compile("auth/auhtorize"))
-        ),
-        Pair(
-            "facebook.com", setOf(Pattern.compile("/v\\d.*\\/oauth"))
+            "accounts.google.com", setOf(Pattern.compile("signin/v\\d.*/challenge"))
         ),
         Pair(
             "sso", setOf(Pattern.compile("duosecurity/getduo"))
         ),
         Pair(
-            "auth.atlassian.com", setOf(Pattern.compile("login"))
+            "amazon.com", setOf(Pattern.compile("ap/challenge"))
+        )
+    )
+
+    private var ssoProvider = mapOf<String, Set<Pattern>>(
+        Pair(
+            "sso", setOf(Pattern.compile("saml2/idp/SSOService"))
+        )
+    )
+
+    private var authenticationDetector = mapOf<String, Set<Pattern>>(
+        Pair(
+            "accounts.google.com", setOf(Pattern.compile("o/oauth2/auth"), Pattern.compile("o/oauth2/v\\d.*/auth"))
         ),
         Pair(
-            "id.atlassian.com", setOf(Pattern.compile("login/callback"))
+            "appleid.apple.com", setOf(Pattern.compile("auth/authorize"))
         ),
         Pair(
-            "login.microsoftonline.com", setOf(Pattern.compile("common/login"))
+            "amazon.com", setOf(Pattern.compile("ap/oa"))
         ),
         Pair(
-            "linkedin.com", setOf(Pattern.compile("oauth/v\\d.*/"))
+            "auth.atlassian.com", setOf(Pattern.compile("authorize"))
+        ),
+        Pair(
+            "facebook.com", setOf(Pattern.compile("/v\\d.*\\/dialog/oauth"))
+        ),
+        Pair(
+            "login.microsoftonline.com", setOf(Pattern.compile("common/oauth2/authorize"), Pattern.compile("common/oauth2/v2.0/authorize"))
+        ),
+        Pair(
+            "linkedin.com", setOf(Pattern.compile("oauth/v\\d.*/authorization"))
+        ),
+        Pair(
+            "github.com", setOf(Pattern.compile("login/oauth/authorize"))
+        ),
+        Pair(
+            "api.twitter.com", setOf(Pattern.compile("oauth/authenticate"), Pattern.compile("oauth/authorize"))
+        ),
+        Pair(
+            "duosecurity.com", setOf(Pattern.compile("oauth/v\\d.*/authorize"))
         )
     )
 
@@ -77,6 +104,32 @@ class AuthUrlDetector {
         authenticationDetector.keys
             .firstOrNull { forwardedToUri.host.contains(it) }
             ?.let { authenticationDetector[it] }
+            ?.forEach {
+                if (it.matcher(forwardedToUri.path.orEmpty()).find()) {
+                    return true
+                }
+            }
+
+        return false
+    }
+
+    fun is2FAStep(forwardedToUri: ValidUrl): Boolean {
+        signinPages.keys
+            .firstOrNull { forwardedToUri.host.contains(it) }
+            ?.let { signinPages[it] }
+            ?.forEach {
+                if (it.matcher(forwardedToUri.path.orEmpty()).find()) {
+                    return true
+                }
+            }
+
+        return false
+    }
+
+    fun isSSOPage(forwardedToUri: ValidUrl): Boolean {
+        ssoProvider.keys
+            .firstOrNull { forwardedToUri.host.contains(it) }
+            ?.let { ssoProvider[it] }
             ?.forEach {
                 if (it.matcher(forwardedToUri.path.orEmpty()).find()) {
                     return true
@@ -93,9 +146,9 @@ class NextPageLoginDetection @Inject constructor() : NavigationAwareLoginDetecto
     private var loginAttempt: ValidUrl? = null
 
     private var urlToCheck: String? = null
+    private var authDetectedHosts = mutableListOf<String>()
     private var loginDetectionJob: Job? = null
     private val authDetector: AuthUrlDetector = AuthUrlDetector()
-
 
     override fun onEvent(navigationEvent: NavigationEvent) {
         Timber.i("LoginDetectionDelegate $navigationEvent")
@@ -111,14 +164,21 @@ class NextPageLoginDetection @Inject constructor() : NavigationAwareLoginDetecto
                     } else {
                         when (val detectLogin = detectLogin(urlToCheck!!)) {
                             is LoginResult.Unknown -> {
+                                Timber.i("LoginDetectionDelegate Unknown")
                                 discardLoginAttempt()
                             }
                             is LoginResult.AuthFlow -> {
                                 Timber.i("LoginDetectionDelegate AuthFlow")
+                                authDetectedHosts.add(detectLogin.authLoginDomain)
+                                Timber.i("LoginDetectionDelegate Auth domain added $authDetectedHosts")
                             }
                             is LoginResult.LoginDetected -> {
                                 loginEventLiveData.value = LoginDetected(detectLogin.authLoginDomain, detectLogin.forwardedToDomain)
                                 loginAttempt = null
+                            }
+                            is LoginResult.TwoFactorAuthFlow -> {
+                                authDetectedHosts.add(detectLogin.loginDomain)
+                                Timber.i("LoginDetectionDelegate Auth domain added $authDetectedHosts")
                             }
                         }
                     }
@@ -132,6 +192,15 @@ class NextPageLoginDetection @Inject constructor() : NavigationAwareLoginDetecto
             }
             is NavigationEvent.UserAction -> {
                 discardLoginAttempt()
+            }
+            is NavigationEvent.Redirect -> {
+                loginDetectionJob?.cancel()
+                val validUrl = Uri.parse(navigationEvent.url).getValidUrl() ?: return
+                if (authDetector.isAuthUrl(validUrl) || authDetector.isSSOPage(validUrl)) {
+                    authDetectedHosts.add(validUrl.host.removePrefix("www."))
+                    Timber.i("LoginDetectionDelegate Auth domain added $authDetectedHosts")
+                }
+                return
             }
         }
     }
@@ -150,10 +219,18 @@ class NextPageLoginDetection @Inject constructor() : NavigationAwareLoginDetecto
     private fun handleNavigationEvent(navigationEvent: NavigationEvent.WebNavigationEvent) {
         return when (val navigationStateChange = navigationEvent.navigationStateChange) {
             is WebNavigationStateChange.NewPage -> {
+                val baseHost = navigationStateChange.url.toUri().baseHost
+                if(authDetectedHosts.firstOrNull { baseHost?.contains(it) == true } == null) {
+                    Timber.i("LoginDetectionDelegate AuthFlow Cleared")
+                    authDetectedHosts.clear()
+                } else {
+                    authDetectedHosts.add(baseHost!!)
+                }
                 cancelLoginJob()
                 if (loginAttempt != null) {
                     //detectLogin(navigationStateChange.url)
                     urlToCheck = navigationStateChange.url
+                    Timber.i("LoginDetectionDelegate urlToCheck $urlToCheck")
                 }
                 return
             }
@@ -163,6 +240,7 @@ class NextPageLoginDetection @Inject constructor() : NavigationAwareLoginDetecto
                 if (loginAttempt != null) {
                     //detectLogin(navigationStateChange.url)
                     urlToCheck = navigationStateChange.url
+                    Timber.i("LoginDetectionDelegate urlToCheck $urlToCheck")
                 }
                 return
             }
@@ -180,7 +258,8 @@ class NextPageLoginDetection @Inject constructor() : NavigationAwareLoginDetecto
     }
 
     sealed class LoginResult {
-        object AuthFlow : LoginResult()
+        data class AuthFlow(val authLoginDomain: String) : LoginResult()
+        data class TwoFactorAuthFlow(val loginDomain: String) : LoginResult()
         data class LoginDetected(val authLoginDomain: String, val forwardedToDomain: String) : LoginResult()
         object Unknown : LoginResult()
     }
@@ -188,9 +267,16 @@ class NextPageLoginDetection @Inject constructor() : NavigationAwareLoginDetecto
     private fun detectLogin(forwardedToUrl: String): LoginResult {
         val validLoginAttempt = loginAttempt ?: return LoginResult.Unknown
         val forwardedToUri = Uri.parse(forwardedToUrl).getValidUrl() ?: return LoginResult.Unknown
-        if (authDetector.isAuthUrl(forwardedToUri)) return LoginResult.AuthFlow
 
-        Timber.i("LoginDetectionDelegate $validLoginAttempt vs $forwardedToUrl")
+        if(authDetectedHosts.firstOrNull { forwardedToUri.host.contains(it) } != null) return  LoginResult.AuthFlow(forwardedToUri.host)
+
+        if (authDetector.isAuthUrl(forwardedToUri) || authDetectedHosts.contains(forwardedToUri.host)){
+            return LoginResult.AuthFlow(forwardedToUri.host)
+        }
+
+        if(authDetector.is2FAStep(forwardedToUri)) return LoginResult.TwoFactorAuthFlow(forwardedToUri.host)
+
+        Timber.i("LoginDetectionDelegate $validLoginAttempt vs $forwardedToUrl // $authDetectedHosts")
         if (validLoginAttempt.host != forwardedToUri.host || validLoginAttempt.path != forwardedToUri.path) {
             Timber.i("LoginDetectionDelegate LoginDetected*************************")
             return LoginResult.LoginDetected(validLoginAttempt.host, forwardedToUri.host)
@@ -198,11 +284,11 @@ class NextPageLoginDetection @Inject constructor() : NavigationAwareLoginDetecto
 
         return LoginResult.Unknown
     }
+}
 
-    private fun Uri.getValidUrl(): ValidUrl? {
-        val validHost = host ?: return null
-        return ValidUrl(validHost, path)
-    }
+fun Uri.getValidUrl(): ValidUrl? {
+    val validHost = host ?: return null
+    return ValidUrl(validHost, path)
 }
 
 data class ValidUrl(

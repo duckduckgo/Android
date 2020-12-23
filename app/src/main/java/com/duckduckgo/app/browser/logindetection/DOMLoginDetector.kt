@@ -17,6 +17,7 @@
 package com.duckduckgo.app.browser.logindetection
 
 import android.content.Context
+import android.net.Uri
 import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import androidx.annotation.UiThread
@@ -40,7 +41,9 @@ sealed class WebNavigationEvent {
 class JsLoginDetector @Inject constructor(private val settingsDataStore: SettingsDataStore, private val useOurAppDetector: UseOurAppDetector) :
     DOMLoginDetector {
     private val javaScriptDetector = JavaScriptDetector()
-    private val loginPathRegex = Regex("login|sign-in|signin|sessions")
+    private val loginPathRegex = Regex("login|sign-in|signin|sessions|session")
+
+    private val authUrlDetector = AuthUrlDetector()
 
     override fun addLoginDetection(webView: WebView, onLoginDetected: () -> Unit) {
         webView.addJavascriptInterface(LoginDetectionJavascriptInterface { onLoginDetected() }, JAVASCRIPT_INTERFACE_NAME)
@@ -63,7 +66,8 @@ class JsLoginDetector @Inject constructor(private val settingsDataStore: Setting
     private fun evaluateIfLoginPostRequest(request: WebResourceRequest): Boolean {
         if (request.method == HTTP_POST) {
             Timber.i("LoginDetector: evaluate ${request.url}")
-            if (request.url?.path?.contains(loginPathRegex) == true) {
+            val validUrl = request.url.getValidUrl() ?: return false
+            if (validUrl.path?.contains(loginPathRegex) == true || authUrlDetector.isAuthUrl(validUrl)) {
                 Timber.v("LoginDetector: post login DETECTED")
                 return true
             }
