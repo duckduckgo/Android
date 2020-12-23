@@ -177,8 +177,7 @@ class NextPageLoginDetection @Inject constructor() : NavigationAwareLoginDetecto
                                 loginAttempt = null
                             }
                             is LoginResult.TwoFactorAuthFlow -> {
-                                authDetectedHosts.add(detectLogin.loginDomain)
-                                Timber.i("LoginDetectionDelegate Auth domain added $authDetectedHosts")
+                                Timber.i("LoginDetectionDelegate TwoFactorAuthFlow")
                             }
                         }
                     }
