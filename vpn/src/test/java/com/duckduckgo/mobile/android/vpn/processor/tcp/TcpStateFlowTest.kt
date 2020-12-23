@@ -305,18 +305,18 @@ class TcpStateFlowTest {
         return TcbState(serverState = serverState, clientState = clientState)
     }
 
-    private fun whenANewPacketArrives(tcbState: TcbState, packetType: PacketType): TcpStateFlow.TcpStateAction {
+    private fun whenANewPacketArrives(tcbState: TcbState, packetType: PacketType): TcpStateAction {
         val initialSeqNumber = -1L
         val connectionKey = "someKey"
         return TcpStateFlow.newPacket(connectionKey, tcbState, packetType, initialSeqNumber)
     }
 
-    private fun assertClientStateMove(status: TCBStatus, events: TcpStateFlow.Event) {
+    private fun assertClientStateMove(status: TCBStatus, events: Event) {
         val clientMove = events as MoveState.MoveClientToState
         assertTrue(clientMove.state == status)
     }
 
-    private fun assertServerStateMove(status: TCBStatus, events: TcpStateFlow.Event) {
+    private fun assertServerStateMove(status: TCBStatus, events: Event) {
         val serverMove = events as MoveState.MoveServerToState
         assertTrue(serverMove.state == status)
     }

@@ -24,6 +24,7 @@ import timber.log.Timber
 import xyz.hexene.localvpn.Packet
 import xyz.hexene.localvpn.TCB
 import xyz.hexene.localvpn.TCB.TCBStatus.*
+import kotlin.math.absoluteValue
 
 class TcpStateFlow {
 
@@ -96,7 +97,7 @@ class TcpStateFlow {
                 return false
             }
 
-            val match = packetType.ackNum == packetType.finSequenceNumberToClient
+            val match = isMatchingAckForOurFin(packetType)
             if (!match) {
                 Timber.w(
                     "%s - %s, received [fin=%s, ack=%s] but mismatching numbers. Expected=%d, actual=%d",
@@ -104,11 +105,17 @@ class TcpStateFlow {
                 )
             } else {
                 Timber.d(
-                    "%s - %s, received [fin=%s, ack=%s] with matching numbers. %d",
-                    connectionKey, currentState, packetType.isFin, packetType.isAck, packetType.finSequenceNumberToClient
+                    "%s - %s, received [fin=%s, ack=%s] with matching numbers. Expected=%d, actual=%d",
+                    connectionKey, currentState, packetType.isFin, packetType.isAck, packetType.finSequenceNumberToClient, packetType.ackNum
                 )
             }
             return match
+        }
+
+        private fun isMatchingAckForOurFin(packetType: PacketType): Boolean {
+            if (packetType.finSequenceNumberToClient < 0) return false
+            val difference = (packetType.ackNum - packetType.finSequenceNumberToClient).absoluteValue
+            return (difference <= 1)
         }
 
         @AddTrace(name = "tcp_state_flow_handle_fin_wait_1", enabled = true)

@@ -109,7 +109,7 @@ class TcpNetworkToDevice(
                 val readBytes = channel.read(receiveBuffer)
 
                 if (endOfStream(readBytes)) {
-                    handleEndOfStream(tcb, packet, key, channel)
+                    handleEndOfStream(tcb, packet, key)
                     return
                 } else {
                     packetPersister.persistDataReceived(readBytes, PACKET_TYPE_TCP)
@@ -143,7 +143,7 @@ class TcpNetworkToDevice(
     }
 
     @AddTrace(name = "network_to_device_handle_end_of_stream", enabled = true)
-    private fun handleEndOfStream(tcb: TCB, packet: Packet, key: SelectionKey, channel: SocketChannel) {
+    private fun handleEndOfStream(tcb: TCB, packet: Packet, key: SelectionKey) {
         Timber.w(
             "Network-to-device end of stream ${tcb.ipAndPort}. ${tcb.tcbState} ${TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - tcb.creationTime)}ms after creation ${
             logPacketDetails(
@@ -154,9 +154,7 @@ class TcpNetworkToDevice(
             }"
         )
 
-        // close connection with remote end point as there's no more communication required
         key.cancel()
-        channel.close()
 
         TcpStateFlow.socketEndOfStream().events.forEach { event ->
             when (event) {
