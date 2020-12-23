@@ -20,8 +20,6 @@ import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
-import com.duckduckgo.mobile.android.vpn.di.DefaultVpnDispatcherProvider
-import com.duckduckgo.mobile.android.vpn.di.VpnDispatcherProvider
 import com.duckduckgo.mobile.android.vpn.model.VpnState
 import com.duckduckgo.mobile.android.vpn.model.VpnTrackerAndCompany
 import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
@@ -31,8 +29,8 @@ import kotlinx.coroutines.flow.map
 
 class VpnControllerViewModel(
     private val repository: AppTrackerBlockingStatsRepository,
-    private val dispatchers: VpnDispatcherProvider = DefaultVpnDispatcherProvider(),
-    private val applicationContext: Context
+    private val applicationContext: Context,
+    private val vpnPreferences: VpnPreferences
 ) : ViewModel() {
 
     fun getRunningTimeUpdates(startTime: () -> String): LiveData<VpnRunningStatus> {
@@ -54,6 +52,11 @@ class VpnControllerViewModel(
     fun getVpnState(): LiveData<VpnState> {
         return repository.getVpnState().asLiveData()
     }
+
+    fun getDebugLoggingPreference(): Boolean = vpnPreferences.getDebugLoggingPreference()
+    fun useDebugLogging(debugLoggingEnabled: Boolean) = vpnPreferences.updateDebugLoggingPreference(debugLoggingEnabled)
+    fun isCustomDnsServerSet(): Boolean = vpnPreferences.isCustomDnsServerSet()
+    fun useCustomDnsServer(enabled: Boolean) = vpnPreferences.useCustomDnsServer(enabled)
 
     data class VpnRunningStatus(val runningTimeMillis: Long, val isRunning: Boolean)
 

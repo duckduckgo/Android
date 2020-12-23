@@ -41,6 +41,7 @@ import com.duckduckgo.mobile.android.vpn.store.PacketPersister
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
 import com.duckduckgo.mobile.android.vpn.ui.notification.VpnNotificationBuilder.Companion.buildPersistentNotification
 import dagger.android.AndroidInjection
+import dummy.ui.VpnPreferences
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.collectLatest
 import timber.log.Timber
@@ -74,6 +75,9 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
 
     @Inject
     lateinit var originatingAppResolver: OriginatingAppResolver
+
+    @Inject
+    lateinit var vpnPreferences: VpnPreferences
 
     private val queues = VpnQueues()
 
@@ -219,7 +223,10 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
             setBlocking(true)
             setMtu(Short.MAX_VALUE.toInt())
             configureMeteredConnection()
-            // addDnsServer("8.8.8.8")
+
+            if (vpnPreferences.isCustomDnsServerSet()) {
+                addDnsServer("1.1.1.1").also { Timber.i("Using custom DNS server (1.1.1.1)") }
+            }
 
             // Can either route all apps through VPN and exclude a few (better for prod), or exclude all apps and include a few (better for dev)
             val limitingToTestApps = false

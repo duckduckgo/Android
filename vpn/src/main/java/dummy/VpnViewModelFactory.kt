@@ -21,16 +21,20 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
 import dummy.ui.VpnControllerViewModel
+import dummy.ui.VpnPreferences
 import javax.inject.Inject
 
 @Suppress("UNCHECKED_CAST")
 class VpnViewModelFactory @Inject constructor() : ViewModelProvider.NewInstanceFactory() {
 
     @Inject
+    lateinit var applicationContext: Context
+
+    @Inject
     lateinit var appTrackerBlockingStatsRepository: AppTrackerBlockingStatsRepository
 
     @Inject
-    lateinit var applicationContext: Context
+    lateinit var vpnPreferences: VpnPreferences
 
     override fun <T : ViewModel> create(modelClass: Class<T>) =
         with(modelClass) {
@@ -41,7 +45,11 @@ class VpnViewModelFactory @Inject constructor() : ViewModelProvider.NewInstanceF
         } as T
 
     private fun vpnControllerViewModel(): VpnControllerViewModel {
-        return VpnControllerViewModel(repository = appTrackerBlockingStatsRepository, applicationContext = applicationContext)
+        return VpnControllerViewModel(
+            applicationContext = applicationContext,
+            repository = appTrackerBlockingStatsRepository,
+            vpnPreferences = vpnPreferences
+        )
     }
 
 }

@@ -98,6 +98,8 @@ class VpnControllerActivity : AppCompatActivity(R.layout.activity_vpn_controller
         configureUiHandlers()
 
         subscribeForViewUpdates()
+
+        reconfigureTimber(viewModel.getDebugLoggingPreference())
     }
 
     private fun subscribeForViewUpdates() {
@@ -168,6 +170,16 @@ class VpnControllerActivity : AppCompatActivity(R.layout.activity_vpn_controller
         return true
     }
 
+    override fun onPrepareOptionsMenu(menu: Menu): Boolean {
+        super.onPrepareOptionsMenu(menu)
+        menu.findItem(R.id.debugLogging).isChecked = viewModel.getDebugLoggingPreference()
+        menu.findItem(R.id.customDnsServer)?.let {
+            it.isChecked = viewModel.isCustomDnsServerSet()
+            it.isEnabled = !TrackerBlockingVpnService.isServiceRunning(this)
+        }
+        return true
+    }
+
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.reportFeedback -> {
@@ -176,7 +188,29 @@ class VpnControllerActivity : AppCompatActivity(R.layout.activity_vpn_controller
             R.id.networkInfo -> {
                 startActivity(NetworkInfoActivity.intent(this)); true
             }
+            R.id.debugLogging -> {
+                val enabled = !item.isChecked
+                viewModel.useDebugLogging(enabled)
+                reconfigureTimber(enabled)
+                true
+            }
+            R.id.customDnsServer -> {
+                val enabled = !item.isChecked
+                viewModel.useCustomDnsServer(enabled)
+                true
+            }
             else -> super.onOptionsItemSelected(item)
+        }
+    }
+
+    private fun reconfigureTimber(debugLoggingEnabled: Boolean) {
+        if (debugLoggingEnabled) {
+            Timber.uprootAll()
+            Timber.plant(Timber.DebugTree())
+            Timber.w("Logging Started")
+        } else {
+            Timber.w("Logging Ended")
+            Timber.uprootAll()
         }
     }
 
