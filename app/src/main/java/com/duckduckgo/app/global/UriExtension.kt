@@ -58,8 +58,8 @@ val Uri.absoluteString: String
         return "$scheme://$host$path"
     }
 
-fun Uri.resourceNameAndPath(): String {
-    return "$host$path"
+fun Uri.toStringDropScheme(): String {
+    return if (scheme != null) this.toString().substringAfter("$scheme://") else this.toString()
 }
 
 fun Uri.isHttpsVersionOfUri(other: Uri): Boolean {

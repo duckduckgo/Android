@@ -236,14 +236,20 @@ class UriExtensionTest {
     }
 
     @Test
-    fun whenUriHasResourceNameThenReturnResourceName() {
-        assertEquals("www.foo.com", "https://www.foo.com".toUri().resourceNameAndPath())
-        assertEquals("www.foo.com", "http://www.foo.com".toUri().resourceNameAndPath())
+    fun whenUriHasResourceNameThenDropSchemeReturnResourceName() {
+        assertEquals("www.foo.com", "https://www.foo.com".toUri().toStringDropScheme())
+        assertEquals("www.foo.com", "http://www.foo.com".toUri().toStringDropScheme())
     }
 
     @Test
-    fun whenUriHasResourceNameAndPathThenReturnResourceNameAndPath() {
-        assertEquals("www.foo.com/path/to/foo", "https://www.foo.com/path/to/foo".toUri().resourceNameAndPath())
-        assertEquals("www.foo.com/path/to/foo", "http://www.foo.com/path/to/foo".toUri().resourceNameAndPath())
+    fun whenUriHasResourceNameAndPathThenDropSchemeReturnResourceNameAndPath() {
+        assertEquals("www.foo.com/path/to/foo", "https://www.foo.com/path/to/foo".toUri().toStringDropScheme())
+        assertEquals("www.foo.com/path/to/foo", "http://www.foo.com/path/to/foo".toUri().toStringDropScheme())
+    }
+
+    @Test
+    fun whenUriHasResourceNamePathAndParamsThenDropSchemeReturnResourceNamePathAndParams() {
+        assertEquals("www.foo.com/path/to/foo?key=value", "https://www.foo.com/path/to/foo?key=value".toUri().toStringDropScheme())
+        assertEquals("www.foo.com/path/to/foo?key=value", "http://www.foo.com/path/to/foo?key=value".toUri().toStringDropScheme())
     }
 }

@@ -137,6 +137,43 @@ class AutoCompleteApiTest {
             value.suggestions
         )
     }
+    @Test
+
+    fun whenAutoCompleteReturnsDuplicatedItemsThenDedupConsideringQueryParams() {
+        whenever(mockAutoCompleteService.autoComplete("title")).thenReturn(
+            Observable.just(
+                listOf(
+                    AutoCompleteServiceRawResult("example.com"),
+                    AutoCompleteServiceRawResult("foo.com"),
+                    AutoCompleteServiceRawResult("bar.com"),
+                    AutoCompleteServiceRawResult("baz.com")
+                )
+            )
+        )
+        whenever(mockBookmarksDao.bookmarksObservable()).thenReturn(
+            Single.just(
+                listOf(
+                    BookmarkEntity(0, "title foo", "https://foo.com?key=value"),
+                    BookmarkEntity(0, "title foo", "https://foo.com"),
+                    BookmarkEntity(0, "title bar", "https://bar.com")
+                )
+            )
+        )
+
+        val result = testee.autoComplete("title").test()
+        val value = result.values()[0] as AutoCompleteResult
+
+        assertEquals(
+            listOf(
+                AutoComplete.AutoCompleteSuggestion.AutoCompleteBookmarkSuggestion(phrase = "foo.com?key=value", "title foo", "https://foo.com?key=value"),
+                AutoComplete.AutoCompleteSuggestion.AutoCompleteBookmarkSuggestion(phrase = "foo.com", "title foo", "https://foo.com"),
+                AutoComplete.AutoCompleteSuggestion.AutoCompleteSearchSuggestion(phrase = "example.com", true),
+                AutoComplete.AutoCompleteSuggestion.AutoCompleteSearchSuggestion(phrase = "bar.com", true),
+                AutoComplete.AutoCompleteSuggestion.AutoCompleteSearchSuggestion(phrase = "baz.com", true)
+            ),
+            value.suggestions
+        )
+    }
 
     @Test
     fun whenBookmarkTitleStartsWithQueryThenScoresHigher() {
