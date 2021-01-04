@@ -17,54 +17,74 @@
 package com.duckduckgo.app.global.api
 
 import androidx.test.platform.app.InstrumentationRegistry
-import com.nhaarman.mockitokotlin2.any
-import com.nhaarman.mockitokotlin2.verify
-import com.nhaarman.mockitokotlin2.whenever
-import okhttp3.Interceptor
-import okhttp3.Protocol
-import okhttp3.Request
-import okhttp3.Response
+import okhttp3.*
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
-import org.mockito.ArgumentCaptor
-import org.mockito.Mock
-import org.mockito.MockitoAnnotations
+import java.util.concurrent.TimeUnit
 
 class ApiRequestInterceptorTest {
 
     private lateinit var testee: ApiRequestInterceptor
 
-    @Mock
-    private lateinit var mockChain: Interceptor.Chain
+    private val fakeChain: Interceptor.Chain = FakeChain()
 
     @Before
     fun before() {
-        MockitoAnnotations.openMocks(this)
         testee = ApiRequestInterceptor(InstrumentationRegistry.getInstrumentation().context)
     }
 
     @Test
     fun whenAPIRequestIsMadeThenUserAgentIsAdded() {
-        whenever(mockChain.request()).thenReturn(request())
-        whenever(mockChain.proceed(any())).thenReturn(response())
-
         val packageName = InstrumentationRegistry.getInstrumentation().context.applicationInfo.packageName
 
-        val captor = ArgumentCaptor.forClass(Request::class.java)
-        testee.intercept(mockChain)
-        verify(mockChain).proceed(captor.capture())
+        val response = testee.intercept(fakeChain)
 
         val regex = "ddg_android/.*\\($packageName; Android API .*\\)".toRegex()
-        val result = captor.value.header(Header.USER_AGENT)!!
+        val result = response.request.header(Header.USER_AGENT)!!
         assertTrue(result.matches(regex))
     }
 
-    private fun request(): Request {
-        return Request.Builder().url("http://example.com").build()
-    }
+    // implement just request and proceed methods
+    private class FakeChain : Interceptor.Chain {
+        override fun call(): Call {
+            TODO("Not yet implemented")
+        }
 
-    private fun response(): Response {
-        return Response.Builder().request(request()).protocol(Protocol.HTTP_2).code(200).message("").build()
+        override fun connectTimeoutMillis(): Int {
+            TODO("Not yet implemented")
+        }
+
+        override fun connection(): Connection? {
+            TODO("Not yet implemented")
+        }
+
+        override fun proceed(request: Request): Response {
+            return Response.Builder().request(request).protocol(Protocol.HTTP_2).code(200).message("").build()
+        }
+
+        override fun readTimeoutMillis(): Int {
+            TODO("Not yet implemented")
+        }
+
+        override fun request(): Request {
+            return Request.Builder().url("http://example.com").build()
+        }
+
+        override fun withConnectTimeout(timeout: Int, unit: TimeUnit): Interceptor.Chain {
+            TODO("Not yet implemented")
+        }
+
+        override fun withReadTimeout(timeout: Int, unit: TimeUnit): Interceptor.Chain {
+            TODO("Not yet implemented")
+        }
+
+        override fun withWriteTimeout(timeout: Int, unit: TimeUnit): Interceptor.Chain {
+            TODO("Not yet implemented")
+        }
+
+        override fun writeTimeoutMillis(): Int {
+            TODO("Not yet implemented")
+        }
     }
 }
