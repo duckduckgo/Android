@@ -58,6 +58,10 @@ val Uri.absoluteString: String
         return "$scheme://$host$path"
     }
 
+fun Uri.resourceNameAndPath(): String {
+    return "$host$path"
+}
+
 fun Uri.isHttpsVersionOfUri(other: Uri): Boolean {
     return isHttps && other.isHttp && other.toHttps == this
 }

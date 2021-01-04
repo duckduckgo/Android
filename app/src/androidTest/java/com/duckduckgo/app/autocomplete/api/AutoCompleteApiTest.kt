@@ -116,6 +116,7 @@ class AutoCompleteApiTest {
             Single.just(
                 listOf(
                     BookmarkEntity(0, "title example", "https://example.com"),
+                    BookmarkEntity(0, "title foo", "https://foo.com/path/to/foo"),
                     BookmarkEntity(0, "title foo", "https://foo.com"),
                     BookmarkEntity(0, "title bar", "https://bar.com")
                 )
@@ -128,7 +129,8 @@ class AutoCompleteApiTest {
         assertEquals(
             listOf(
                 AutoComplete.AutoCompleteSuggestion.AutoCompleteBookmarkSuggestion(phrase = "example.com", "title example", "https://example.com"),
-                AutoComplete.AutoCompleteSuggestion.AutoCompleteBookmarkSuggestion(phrase = "foo.com", "title foo", "https://foo.com"),
+                AutoComplete.AutoCompleteSuggestion.AutoCompleteBookmarkSuggestion(phrase = "foo.com/path/to/foo", "title foo", "https://foo.com/path/to/foo"),
+                AutoComplete.AutoCompleteSuggestion.AutoCompleteSearchSuggestion(phrase = "foo.com", true),
                 AutoComplete.AutoCompleteSuggestion.AutoCompleteSearchSuggestion(phrase = "bar.com", true),
                 AutoComplete.AutoCompleteSuggestion.AutoCompleteSearchSuggestion(phrase = "baz.com", true)
             ),

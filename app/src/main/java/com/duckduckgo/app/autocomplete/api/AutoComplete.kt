@@ -24,6 +24,7 @@ import com.duckduckgo.app.bookmarks.db.BookmarkEntity
 import com.duckduckgo.app.bookmarks.db.BookmarksDao
 import com.duckduckgo.app.global.UriString
 import com.duckduckgo.app.global.baseHost
+import com.duckduckgo.app.global.resourceNameAndPath
 import io.reactivex.Observable
 import io.reactivex.functions.BiFunction
 import javax.inject.Inject
@@ -82,7 +83,7 @@ class AutoCompleteApi @Inject constructor(
             .map { rankBookmarks(query, it) }
             .flattenAsObservable { it }
             .map {
-                AutoCompleteBookmarkSuggestion(phrase = it.url.toUri().baseHost.orEmpty(), title = it.title.orEmpty(), url = it.url)
+                AutoCompleteBookmarkSuggestion(phrase = it.url.toUri().resourceNameAndPath(), title = it.title.orEmpty(), url = it.url)
             }
             .take(2)
             .toList()
