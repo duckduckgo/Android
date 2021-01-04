@@ -33,6 +33,7 @@ interface WebViewClientListener {
     fun pageRefreshed(refreshedUrl: String)
     fun progressChanged(newProgress: Int)
     fun willOverrideUrl(newUrl: String)
+    fun redirectTriggeredByGpc()
 
     fun onSiteLocationPermissionRequested(origin: String, callback: GeolocationPermissions.Callback)
 

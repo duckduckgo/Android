@@ -17,26 +17,32 @@
 package com.duckduckgo.app.globalprivacycontrol
 
 import android.webkit.WebView
+import androidx.core.net.toUri
 import androidx.test.annotation.UiThreadTest
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.globalprivacycontrol.GlobalPrivacyControlManager.Companion.GPC_HEADER
+import com.duckduckgo.app.globalprivacycontrol.GlobalPrivacyControlManager.Companion.GPC_HEADER_VALUE
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.never
 import com.nhaarman.mockitokotlin2.spy
 import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.whenever
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 
-class GlobalPrivacyControlInjectorJsTest {
+class GlobalPrivacyControlManagerTest {
 
     private val mockSettingsStore: SettingsDataStore = mock()
-    lateinit var testee: GlobalPrivacyControlInjectorJs
+    lateinit var testee: GlobalPrivacyControlManager
 
     @Before
     fun setup() {
-        testee = GlobalPrivacyControlInjectorJs(mockSettingsStore)
+        testee = GlobalPrivacyControlManager(mockSettingsStore)
     }
 
     @UiThreadTest
@@ -61,6 +67,48 @@ class GlobalPrivacyControlInjectorJsTest {
         testee.injectDoNotSellToDom(webView)
 
         verify(webView, never()).evaluateJavascript(jsToEvaluate, null)
+    }
+
+    @Test
+    fun whenIsGpcActiveAndSettingEnabledThenReturnTrue() {
+        whenever(mockSettingsStore.globalPrivacyControlEnabled).thenReturn(true)
+
+        assertTrue(testee.isGpcActive())
+    }
+
+    @Test
+    fun whenIsGpcActiveAndSettingDisabledThenReturnFalse() {
+        whenever(mockSettingsStore.globalPrivacyControlEnabled).thenReturn(false)
+
+        assertFalse(testee.isGpcActive())
+    }
+
+    @Test
+    fun whenGetHeadersIfGpcIsEnabledThenReturnHeaders() {
+        whenever(mockSettingsStore.globalPrivacyControlEnabled).thenReturn(true)
+
+        val headers = testee.getHeaders()
+
+        assertEquals(GPC_HEADER_VALUE, headers[GPC_HEADER])
+    }
+
+    @Test
+    fun whenGetHeadersIfGpcIsDisabledThenReturnEmptyMap() {
+        whenever(mockSettingsStore.globalPrivacyControlEnabled).thenReturn(false)
+
+        val headers = testee.getHeaders()
+
+        assertTrue(headers.isEmpty())
+    }
+
+    @Test
+    fun whenShouldAddHeadersAndUrlIsFromTheHeadersConsumersListThenReturnTrue() {
+        assertTrue(testee.shouldAddHeaders("http://nytimes.com".toUri()))
+    }
+
+    @Test
+    fun whenShouldAddHeadersAndUrlIsNotFromTheHeadersConsumersListThenReturnFalse() {
+        assertFalse(testee.shouldAddHeaders("http://example.com".toUri()))
     }
 
     private fun getJsToEvaluate(): String {

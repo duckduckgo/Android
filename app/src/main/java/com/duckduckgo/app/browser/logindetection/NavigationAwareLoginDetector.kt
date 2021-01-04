@@ -40,6 +40,7 @@ sealed class NavigationEvent {
 
     data class WebNavigationEvent(val navigationStateChange: WebNavigationStateChange) : NavigationEvent()
     object PageFinished : NavigationEvent()
+    object GpcRedirect : NavigationEvent()
     data class LoginAttempt(val url: String) : NavigationEvent()
 }
 
@@ -47,6 +48,7 @@ class NextPageLoginDetection @Inject constructor() : NavigationAwareLoginDetecto
 
     override val loginEventLiveData = MutableLiveData<LoginDetected>()
     private var loginAttempt: ValidUrl? = null
+    private var gpcRefreshed = false
 
     override fun onEvent(navigationEvent: NavigationEvent) {
         Timber.i("LoginDetectionDelegate $navigationEvent")
@@ -63,6 +65,9 @@ class NextPageLoginDetection @Inject constructor() : NavigationAwareLoginDetecto
             is NavigationEvent.UserAction -> {
                 discardLoginAttempt()
             }
+            is NavigationEvent.GpcRedirect -> {
+                gpcRefreshed = true
+            }
         }
     }
 
@@ -71,7 +76,10 @@ class NextPageLoginDetection @Inject constructor() : NavigationAwareLoginDetecto
     }
 
     private fun discardLoginAttempt() {
-        loginAttempt = null
+        if (!gpcRefreshed) {
+            gpcRefreshed = false
+            loginAttempt = null
+        }
     }
 
     private fun handleNavigationEvent(navigationEvent: NavigationEvent.WebNavigationEvent) {
