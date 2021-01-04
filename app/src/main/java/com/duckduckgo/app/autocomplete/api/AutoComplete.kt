@@ -141,6 +141,10 @@ class AutoCompleteApi @Inject constructor(
 
     private data class RankedBookmark(
         val bookmarkEntity: BookmarkEntity,
-        var score: Int = -1
+        var score: Int = BOOKMARK_SCORE
     )
+
+    companion object {
+        private const val BOOKMARK_SCORE = -1
+    }
 }
