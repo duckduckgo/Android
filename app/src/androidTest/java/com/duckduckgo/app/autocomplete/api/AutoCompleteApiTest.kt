@@ -137,4 +137,103 @@ class AutoCompleteApiTest {
             value.suggestions
         )
     }
+
+    @Test
+    fun whenBookmarkTitleStartsWithQueryThenScoresHigher() {
+        whenever(mockAutoCompleteService.autoComplete("title")).thenReturn(Observable.just(listOf()))
+        whenever(mockBookmarksDao.bookmarksObservable()).thenReturn(
+            Single.just(
+                listOf(
+                    BookmarkEntity(0, "the title example", "https://example.com"),
+                    BookmarkEntity(0, "the title foo", "https://foo.com/path/to/foo"),
+                    BookmarkEntity(0, "title bar", "https://bar.com"),
+                    BookmarkEntity(0, "the title foo", "https://foo.com"),
+                )
+            )
+        )
+
+        val result = testee.autoComplete("title").test()
+        val value = result.values()[0] as AutoCompleteResult
+
+        assertEquals(
+            listOf(
+                AutoComplete.AutoCompleteSuggestion.AutoCompleteBookmarkSuggestion(phrase = "bar.com", "title bar", "https://bar.com"),
+                AutoComplete.AutoCompleteSuggestion.AutoCompleteBookmarkSuggestion(phrase = "example.com", "the title example", "https://example.com"),
+            ),
+            value.suggestions
+        )
+    }
+
+    @Test
+    fun whenSingleTokenQueryAndBookmarkDomainStartsWithItThenScoreHigher() {
+        whenever(mockAutoCompleteService.autoComplete("foo")).thenReturn(Observable.just(listOf()))
+        whenever(mockBookmarksDao.bookmarksObservable()).thenReturn(
+            Single.just(
+                listOf(
+                    BookmarkEntity(0, "title example", "https://example.com"),
+                    BookmarkEntity(0, "title bar", "https://bar.com"),
+                    BookmarkEntity(0, "title foo", "https://foo.com"),
+                    BookmarkEntity(0, "title baz", "https://baz.com"),
+                )
+            )
+        )
+
+        val result = testee.autoComplete("foo").test()
+        val value = result.values()[0] as AutoCompleteResult
+
+        assertEquals(
+            listOf(
+                AutoComplete.AutoCompleteSuggestion.AutoCompleteBookmarkSuggestion(phrase = "foo.com", "title foo", "https://foo.com"),
+            ),
+            value.suggestions
+        )
+    }
+
+    @Test
+    fun whenMultipleTokenQueryAndNoTokenMatchThenReturnEmpty() {
+        val query = "example title foo"
+        whenever(mockAutoCompleteService.autoComplete(query)).thenReturn(Observable.just(listOf()))
+        whenever(mockBookmarksDao.bookmarksObservable()).thenReturn(
+            Single.just(
+                listOf(
+                    BookmarkEntity(0, "title example", "https://example.com"),
+                    BookmarkEntity(0, "title bar", "https://bar.com"),
+                    BookmarkEntity(0, "the title foo", "https://foo.com"),
+                    BookmarkEntity(0, "title baz", "https://baz.com"),
+                )
+            )
+        )
+
+        val result = testee.autoComplete(query).test()
+        val value = result.values()[0] as AutoCompleteResult
+
+        assertEquals(listOf<AutoComplete.AutoCompleteSuggestion>(), value.suggestions)
+    }
+
+    @Test
+    fun whenMultipleTokenQueryAndMultipleMatchesThenReturnCorrectScore() {
+        val query = "title foo"
+        whenever(mockAutoCompleteService.autoComplete(query)).thenReturn(Observable.just(listOf()))
+        whenever(mockBookmarksDao.bookmarksObservable()).thenReturn(
+            Single.just(
+                listOf(
+                    BookmarkEntity(0, "title example", "https://example.com"),
+                    BookmarkEntity(0, "title bar", "https://bar.com"),
+                    BookmarkEntity(0, "the title foo", "https://foo.com"),
+                    BookmarkEntity(0, "title foo baz", "https://baz.com"),
+                )
+            )
+        )
+
+        val result = testee.autoComplete(query).test()
+        val value = result.values()[0] as AutoCompleteResult
+
+        assertEquals(
+            listOf(
+                AutoComplete.AutoCompleteSuggestion.AutoCompleteBookmarkSuggestion(phrase = "baz.com", "title foo baz", "https://baz.com"),
+                AutoComplete.AutoCompleteSuggestion.AutoCompleteBookmarkSuggestion(phrase = "foo.com", "the title foo", "https://foo.com"),
+            ),
+            value.suggestions
+        )
+    }
 }

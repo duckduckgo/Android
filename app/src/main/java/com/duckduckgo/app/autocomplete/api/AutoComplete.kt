@@ -96,7 +96,7 @@ class AutoCompleteApi @Inject constructor(
             .map { scoreTitle(it, query) }
             .map { scoreTokens(it, query) }
             .filter { it.score >= 0 }
-            .sortedBy { it.score }
+            .sortedByDescending { it.score }
             .map { it.bookmarkEntity }
             .toList()
     }
