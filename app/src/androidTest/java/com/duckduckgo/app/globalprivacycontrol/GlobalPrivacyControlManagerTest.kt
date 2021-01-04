@@ -17,6 +17,7 @@
 package com.duckduckgo.app.globalprivacycontrol
 
 import android.webkit.WebView
+import androidx.core.net.toUri
 import androidx.test.annotation.UiThreadTest
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.browser.R
@@ -98,6 +99,16 @@ class GlobalPrivacyControlManagerTest {
         val headers = testee.getHeaders()
 
         assertTrue(headers.isEmpty())
+    }
+
+    @Test
+    fun whenShouldAddHeadersAndUrlIsFromTheHeadersConsumersListThenReturnTrue() {
+        assertTrue(testee.shouldAddHeaders("http://nytimes.com".toUri()))
+    }
+
+    @Test
+    fun whenShouldAddHeadersAndUrlIsNotFromTheHeadersConsumersListThenReturnFalse() {
+        assertFalse(testee.shouldAddHeaders("http://example.com".toUri()))
     }
 
     private fun getJsToEvaluate(): String {
