@@ -150,7 +150,7 @@ class StatisticsRequesterJsonTest {
         queueResponseFromString("", 200)
         testee.initializeAtb()
         val request = takeRequestImmediately()
-        assertEquals("/atb.js", request.encodedPath())
+        assertEquals("/atb.js", request?.encodedPath())
     }
 
     @Test
@@ -159,7 +159,7 @@ class StatisticsRequesterJsonTest {
         queueResponseFromString("", 200)
         testee.initializeAtb()
         val atbRequest = takeRequestImmediately()
-        val testParam = atbRequest.extractQueryParam(ParamKey.DEV_MODE)
+        val testParam = atbRequest?.extractQueryParam(ParamKey.DEV_MODE)
         assertTestParameterSent(testParam)
     }
 
@@ -170,7 +170,7 @@ class StatisticsRequesterJsonTest {
         testee.initializeAtb()
         takeRequestImmediately()
         val extiRequest = takeRequestImmediately()
-        assertEquals("/exti/", extiRequest.encodedPath())
+        assertEquals("/exti/", extiRequest?.encodedPath())
     }
 
     @Test
@@ -180,7 +180,7 @@ class StatisticsRequesterJsonTest {
         testee.initializeAtb()
         takeRequestImmediately()
         val extiRequest = takeRequestImmediately()
-        val testParam = extiRequest.extractQueryParam(ParamKey.DEV_MODE)
+        val testParam = extiRequest?.extractQueryParam(ParamKey.DEV_MODE)
         assertTestParameterSent(testParam)
     }
 
@@ -191,7 +191,7 @@ class StatisticsRequesterJsonTest {
         testee.initializeAtb()
         takeRequestImmediately()
         val extiRequest = takeRequestImmediately()
-        val atbQueryParam = extiRequest.extractQueryParam("atb")
+        val atbQueryParam = extiRequest?.extractQueryParam("atb")
         assertNotNull(atbQueryParam)
         assertEquals("v105-3ma", atbQueryParam)
     }
@@ -202,8 +202,8 @@ class StatisticsRequesterJsonTest {
         queueResponseFromFile(VALID_REFRESH_RESPONSE_JSON)
         testee.refreshSearchRetentionAtb()
         val refreshRequest = takeRequestImmediately()
-        assertEquals("/atb.js", refreshRequest.encodedPath())
-        assertNull(refreshRequest.extractQueryParam("at"))
+        assertEquals("/atb.js", refreshRequest?.encodedPath())
+        assertNull(refreshRequest?.extractQueryParam("at"))
     }
 
     @Test
@@ -212,8 +212,8 @@ class StatisticsRequesterJsonTest {
         queueResponseFromFile(VALID_REFRESH_RESPONSE_JSON)
         testee.refreshAppRetentionAtb()
         val refreshRequest = takeRequestImmediately()
-        assertEquals("/atb.js", refreshRequest.encodedPath())
-        assertEquals("app_use", refreshRequest.extractQueryParam("at"))
+        assertEquals("/atb.js", refreshRequest?.encodedPath())
+        assertEquals("app_use", refreshRequest?.extractQueryParam("at"))
     }
 
     @Test
@@ -238,7 +238,7 @@ class StatisticsRequesterJsonTest {
         queueResponseFromFile(VALID_REFRESH_RESPONSE_JSON)
         testee.refreshSearchRetentionAtb()
         val refreshRequest = takeRequestImmediately()
-        val testParam = refreshRequest.extractQueryParam(ParamKey.DEV_MODE)
+        val testParam = refreshRequest?.extractQueryParam(ParamKey.DEV_MODE)
         assertTestParameterSent(testParam)
     }
 
@@ -248,7 +248,7 @@ class StatisticsRequesterJsonTest {
         queueResponseFromFile(VALID_REFRESH_RESPONSE_JSON)
         testee.refreshAppRetentionAtb()
         val refreshRequest = takeRequestImmediately()
-        val testParam = refreshRequest.extractQueryParam(ParamKey.DEV_MODE)
+        val testParam = refreshRequest?.extractQueryParam(ParamKey.DEV_MODE)
         assertTestParameterSent(testParam)
     }
 
@@ -258,7 +258,7 @@ class StatisticsRequesterJsonTest {
         queueResponseFromFile(VALID_REFRESH_RESPONSE_JSON)
         testee.refreshSearchRetentionAtb()
         val refreshRequest = takeRequestImmediately()
-        val atbParam = refreshRequest.extractQueryParam(ParamKey.ATB)
+        val atbParam = refreshRequest?.extractQueryParam(ParamKey.ATB)
         assertEquals("100-1ma", atbParam)
     }
 
@@ -268,7 +268,7 @@ class StatisticsRequesterJsonTest {
         queueResponseFromFile(VALID_REFRESH_RESPONSE_JSON)
         testee.refreshAppRetentionAtb()
         val refreshRequest = takeRequestImmediately()
-        val atbParam = refreshRequest.extractQueryParam(ParamKey.ATB)
+        val atbParam = refreshRequest?.extractQueryParam(ParamKey.ATB)
         assertEquals("100-1ma", atbParam)
     }
 
@@ -279,7 +279,7 @@ class StatisticsRequesterJsonTest {
         queueResponseFromFile(VALID_REFRESH_RESPONSE_JSON)
         testee.refreshSearchRetentionAtb()
         val refreshRequest = takeRequestImmediately()
-        val atbParam = refreshRequest.extractQueryParam(ParamKey.RETENTION_ATB)
+        val atbParam = refreshRequest?.extractQueryParam(ParamKey.RETENTION_ATB)
         assertEquals("101-3", atbParam)
     }
 
@@ -290,7 +290,7 @@ class StatisticsRequesterJsonTest {
         queueResponseFromFile(VALID_REFRESH_RESPONSE_JSON)
         testee.refreshAppRetentionAtb()
         val refreshRequest = takeRequestImmediately()
-        val atbParam = refreshRequest.extractQueryParam(ParamKey.RETENTION_ATB)
+        val atbParam = refreshRequest?.extractQueryParam(ParamKey.RETENTION_ATB)
         assertEquals("101-3", atbParam)
     }
 
