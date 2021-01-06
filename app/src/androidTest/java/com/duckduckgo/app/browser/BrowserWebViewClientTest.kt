@@ -28,7 +28,7 @@ import com.duckduckgo.app.browser.logindetection.DOMLoginDetector
 import com.duckduckgo.app.browser.logindetection.WebNavigationEvent
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.global.exception.UncaughtExceptionRepository
-import com.duckduckgo.app.globalprivacycontrol.GlobalPrivacyControlInjector
+import com.duckduckgo.app.globalprivacycontrol.GlobalPrivacyControl
 import com.duckduckgo.app.runBlocking
 import com.duckduckgo.app.statistics.store.OfflinePixelCountDataStore
 import com.nhaarman.mockitokotlin2.*
@@ -55,7 +55,7 @@ class BrowserWebViewClientTest {
     private val offlinePixelCountDataStore: OfflinePixelCountDataStore = mock()
     private val uncaughtExceptionRepository: UncaughtExceptionRepository = mock()
     private val dosDetector: DosDetector = DosDetector()
-    private val globalPrivacyControlInjector: GlobalPrivacyControlInjector = mock()
+    private val globalPrivacyControl: GlobalPrivacyControl = mock()
     private val trustedCertificateStore: TrustedCertificateStore = mock()
 
     @UiThreadTest
@@ -72,7 +72,7 @@ class BrowserWebViewClientTest {
             cookieManager,
             loginDetector,
             dosDetector,
-            globalPrivacyControlInjector
+            globalPrivacyControl
         )
         testee.webViewClientListener = listener
     }
@@ -111,7 +111,7 @@ class BrowserWebViewClientTest {
     @Test
     fun whenOnPageStartedCalledThenInjectDoNotSellToDom() = coroutinesTestRule.runBlocking {
         testee.onPageStarted(webView, EXAMPLE_URL, null)
-        verify(globalPrivacyControlInjector).injectDoNotSellToDom(webView)
+        verify(globalPrivacyControl).injectDoNotSellToDom(webView)
     }
 
     @UiThreadTest

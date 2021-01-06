@@ -19,6 +19,7 @@ package com.duckduckgo.app.brokensite.api
 import android.os.Build
 import com.duckduckgo.app.brokensite.model.BrokenSite
 import com.duckduckgo.app.browser.BuildConfig
+import com.duckduckgo.app.globalprivacycontrol.GlobalPrivacyControl
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
@@ -36,7 +37,8 @@ class BrokenSiteSubmitter(
     private val statisticsStore: StatisticsDataStore,
     private val variantManager: VariantManager,
     private val tdsMetadataDao: TdsMetadataDao,
-    private val pixel: Pixel
+    private val globalPrivacyControl: GlobalPrivacyControl,
+    private val pixel: Pixel,
 ) : BrokenSiteSender {
 
     override fun submitBrokenSiteFeedback(brokenSite: BrokenSite) {
@@ -52,7 +54,8 @@ class BrokenSiteSubmitter(
                 MANUFACTURER_KEY to Build.MANUFACTURER,
                 MODEL_KEY to Build.MODEL,
                 WEBVIEW_VERSION_KEY to brokenSite.webViewVersion,
-                SITE_TYPE_KEY to brokenSite.siteType
+                SITE_TYPE_KEY to brokenSite.siteType,
+                GPC to globalPrivacyControl.isGpcActive().toString()
             )
             val encodedParams = mapOf(
                 BLOCKED_TRACKERS_KEY to brokenSite.blockedTrackers,
@@ -84,5 +87,6 @@ class BrokenSiteSubmitter(
         private const val MODEL_KEY = "model"
         private const val WEBVIEW_VERSION_KEY = "wvVersion"
         private const val SITE_TYPE_KEY = "siteType"
+        private const val GPC = "gpc"
     }
 }

@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.browser
 
+import android.net.Uri
 import android.webkit.WebResourceRequest
 import android.webkit.WebResourceResponse
 import android.webkit.WebView
@@ -23,6 +24,8 @@ import androidx.annotation.WorkerThread
 import com.duckduckgo.app.browser.useragent.UserAgentProvider
 import com.duckduckgo.app.browser.useragent.MobileUrlReWriter
 import com.duckduckgo.app.global.isHttp
+import com.duckduckgo.app.globalprivacycontrol.GlobalPrivacyControl
+import com.duckduckgo.app.globalprivacycontrol.GlobalPrivacyControlManager
 import com.duckduckgo.app.httpsupgrade.HttpsUpgrader
 import com.duckduckgo.app.privacy.db.PrivacyProtectionCountDao
 import com.duckduckgo.app.privacy.model.TrustedSites
@@ -48,6 +51,7 @@ class WebViewRequestInterceptor(
     private val trackerDetector: TrackerDetector,
     private val httpsUpgrader: HttpsUpgrader,
     private val privacyProtectionCountDao: PrivacyProtectionCountDao,
+    private val globalPrivacyControl: GlobalPrivacyControl,
     private val userAgentProvider: UserAgentProvider,
     private val mobileUrlReWriter: MobileUrlReWriter
 ) : RequestInterceptor {
@@ -92,11 +96,23 @@ class WebViewRequestInterceptor(
             val newUri = httpsUpgrader.upgrade(url)
 
             withContext(Dispatchers.Main) {
-                webView.loadUrl(newUri.toString())
+                val headers = request.requestHeaders
+                headers.putAll(globalPrivacyControl.getHeaders())
+                webView.loadUrl(newUri.toString(), headers)
             }
 
             webViewClientListener?.upgradedToHttps()
             privacyProtectionCountDao.incrementUpgradeCount()
+            return WebResourceResponse(null, null, null)
+        }
+
+        if (shouldAddGcpHeaders(request) && !requestWasInTheStack(url, webView)) {
+            val headers = request.requestHeaders
+            headers.putAll(globalPrivacyControl.getHeaders())
+            withContext(Dispatchers.Main) {
+                webViewClientListener?.redirectTriggeredByGpc()
+                webView.loadUrl(url.toString(), headers)
+            }
             return WebResourceResponse(null, null, null)
         }
 
@@ -124,6 +140,24 @@ class WebViewRequestInterceptor(
         }
 
         return null
+    }
+
+    private fun shouldAddGcpHeaders(request: WebResourceRequest): Boolean {
+        val headers = request.requestHeaders
+        return (
+            globalPrivacyControl.isGpcActive() &&
+                !headers.containsKey(GlobalPrivacyControlManager.GPC_HEADER) &&
+                request.isForMainFrame &&
+                request.method == "GET" &&
+                globalPrivacyControl.shouldAddHeaders(request.url)
+            )
+    }
+
+    private suspend fun requestWasInTheStack(url: Uri, webView: WebView): Boolean {
+        return withContext(Dispatchers.Main) {
+            val webBackForwardList = webView.copyBackForwardList()
+            webBackForwardList.currentItem?.url == url.toString()
+        }
     }
 
     private suspend fun newUserAgent(

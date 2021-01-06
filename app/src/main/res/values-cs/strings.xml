@@ -20,9 +20,11 @@
     <string name="appName" translatable="false">DuckDuckGo</string>
     <string name="appDescription" translatable="false">DuckDuckGo </string>
     <string name="duckDuckGoLogoDescription">Logo DuckDuckGo</string>
-    <string name="duckDuckGoPrivacySimplified">Ochrana soukromí, zjednodušená.</string>
+    <string name="duckDuckGoPrivacySimplified">Ochrana soukromí, zjednodušená</string>
     <string name="yes">Ano</string>
     <string name="no">Ne</string>
+    <string name="open">Otevřít</string>
+    <string name="cancel">Zrušit</string>
     <string name="search">Vyhledávání</string>
 
     <!-- Onboarding Activity -->
@@ -52,7 +54,7 @@
     <!-- Downloading files -->
     <string name="downloadImage">Stáhnout obrázek</string>
     <string name="permissionRequiredToDownload">Stahování vyžaduje povolení k ukládání.</string>
-    <string name="downloadComplete">Stahování dokončeno.</string>
+    <string name="downloadComplete">Stahování dokončeno</string>
     <string name="downloadFailed">Stahování se nezdařilo.</string>
     <string name="downloadInProgress">Stahování</string>
 
@@ -150,7 +152,7 @@
     <string name="practicesBad">Nesprávné postupy ochrany soukromí</string>
     <string name="practicesUnknown">Neznámé postupy ochrany soukromí</string>
     <string name="practicesOverview">Postupy ochrany soukromí ukazují, do jaké míry jsou osobní údaje, které sdílíte s webovými stránkami, chráněny.</string>
-    <string name="practicesTosdrLink">Postupy ochrany soukromí jsou výsledkem <b><u>ToS;DR</u></b></string>
+    <string name="practicesTosdrLink">Zásady ochrany osobních údajů z <b><u>ToS;DR</u></b>.</string>
     <string name="practicesIconContentGood">Ikona správného postupu</string>
     <string name="practicesIconContentBad">Ikona nesprávného postupu</string>
 
@@ -172,26 +174,28 @@
     <string name="settingsLightTheme">Lehký motiv</string>
     <string name="settingsAboutDuckduckgo">O DuckDuckGo</string>
     <string name="settingsVersion">Verze</string>
-    <string name="leaveFeedback">Zanechat zpětnou vazbu</string>
+    <string name="leaveFeedback">Podělte se o zpětnou vazbu</string>
 
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Uložit</string>
 
     <string name="settingsAutomaticallyClearWhat">Automatické vymazání…</string>
+    <string name="settingsAutomaticallyClearWhatDialogTitle">Automatické vymazání…</string>
     <string name="settingsAutomaticallyClearWhatOptionNone">Žádný</string>
     <string name="settingsAutomaticallyClearWhatOptionTabs">Karty</string>
     <string name="settingsAutomaticallyClearWhatOptionTabsAndData">Karty a data</string>
 
     <string name="settingsAutomaticallyClearWhen">Vymazat dne…</string>
+    <string name="settingsAutomaticallyClearWhenDialogTitle">Vymazat dne…</string>
     <string name="settingsAutomaticallyClearWhenAppExitOnly">Pouze ukončení aplikace</string>
     <string name="settingsAutomaticallyClearWhenAppExit5Seconds">Ukončení aplikace, neaktivní po dobu 5 sekund</string>
     <string name="settingsAutomaticallyClearWhenAppExit5Minutes">Ukončení aplikace, neaktivní po dobu 5 minut</string>
     <string name="settingsAutomaticallyClearWhenAppExit15Minutes">Ukončení aplikace, neaktivní po dobu 15 minut</string>
     <string name="settingsAutomaticallyClearWhenAppExit30Minutes">Ukončení aplikace, neaktivní po dobu 30 minut</string>
-    <string name="settingsAutomaticallyClearWhenAppExit60Minutes">Ukončení aplikace, neaktivní po dobu 60 minut</string>
+    <string name="settingsAutomaticallyClearWhenAppExit60Minutes">Ukončení aplikace, neaktivní po dobu 1 hodiny</string>
 
     <!-- About Activity -->
-    <string name="aboutActivityTitle">O nás</string>
+    <string name="aboutActivityTitle">O DuckDuckGo</string>
     <string name="aboutDescription">
         V DuckDuckGo přinášíme nový standard důvěry online.\n\nDuckDuckGo Privacy Browser poskytuje všechny základní prvky ochrany osobních údajů, které potřebujete k ochraně při vyhledávání a prohlížení webu, včetně blokování sledovacích zařízení, chytřejšího šifrování a soukromého vyhledávání DuckDuckGo.\n\nInternet by v konečném důsledku neměl být tak nebezpečný a získat ochranu osobních údajů, kterou si zasloužíte online, by mělo být stejně jednoduché jako zatáhnout žaluzie.</string>
     <string name="aboutMoreLink">Více na duckduckgo.com/about</string>
@@ -199,9 +203,9 @@
 
     <!-- Broken Site Activity -->
     <string name="brokenSiteReportBrokenSiteMenuItem">Nahlásit poškozené stránky</string>
-    <string name="brokenSiteHeading">Nahlásit poškozenou stránku</string>
-    <string name="brokenSiteSubmitted">Děkujeme! Zpětná vazba odeslána</string>
-    <string name="brokenSitesCategoriesTitle">Popište, co se stalo:</string>
+    <string name="brokenSiteHeading">Nahlásit nefunkční webové stránky</string>
+    <string name="brokenSiteSubmitted">Děkujeme! Zpětná vazba odeslána.</string>
+    <string name="brokenSitesCategoriesTitle">Popište, co se stalo</string>
     <string name="brokenSitesCategoriesHint">Popište, co se stalo</string>
     <string name="brokenSiteSubmitButton">Poslat zprávu</string>
     <string name="brokenSiteDescription">Odeslání anonymní zprávy o nefunkčním webu nám pomůže tyto problémy řešit a vylepšovat aplikaci.</string>
@@ -259,17 +263,17 @@
     <string name="addWidgetCtaDismissButton">Odmítnout</string>
     <string name="addWidgetInstructionsActivityTitle">Přidat widget</string>
     <string name="addWidgetInstruction1Label">1.</string>
-    <string name="addWidgetInstruction1">Dlouhým stiskem domovské obrazovky otevřete nabídku widgetů</string>
+    <string name="addWidgetInstruction1">Dlouze stiskněte domovskou obrazovku a poté otevřete nabídku widgetů.</string>
     <string name="addWidgetInstruction2Label">2.</string>
-    <string name="addWidgetInstruction2">Najděte widget DuckDuckGo</string>
+    <string name="addWidgetInstruction2">Najděte widget DuckDuckGo.</string>
     <string name="addWidgetInstruction3Label">3.</string>
-    <string name="addWidgetInstruction3">Přetáhněte widget na domovskou obrazovku</string>
+    <string name="addWidgetInstruction3">Přetáhněte widget na domovskou obrazovku.</string>
     <string name="addWidgetInstructionsButtonGoHome">Přejít na domovskou obrazovku</string>
     <string name="addWidgetInstructionsButtonClose">Zavřít</string>
 
     <!-- App Enjoyment / Rating / Feedback -->
     <string name="appEnjoymentDialogTitle">Líbí se vám DuckDuckGo?</string>
-    <string name="appEnjoymentDialogMessage">Rádi bychom věděli, co si o tom myslíte.</string>
+    <string name="appEnjoymentDialogMessage">Rádi bychom věděli, co si myslíte.</string>
     <string name="appEnjoymentDialogPositiveButton">Líbí se mi.</string>
     <string name="appEnjoymentDialogNegativeButton">Je co zlepšovat.</string>
 
@@ -280,7 +284,7 @@
 
     <string name="giveFeedbackDialogTitle">Je nám líto, že nejste spokojení.</string>
     <string name="giveFeedbackDialogMessage">Dejte nám vědět, jak pro vás můžeme aplikaci vylepšit.</string>
-    <string name="giveFeedbackDialogPositiveButton">Poskytněte zpětnou vazbu.</string>
+    <string name="giveFeedbackDialogPositiveButton">Podělte se o zpětnou vazbu</string>
     <string name="giveFeedbackDialogNegativeButton" translatable="false">@string/noThanks</string>
 
     <string name="noThanks">Ne, děkuji</string>
@@ -315,11 +319,11 @@
     <string name="systemTextSearchMessage">Hledat DuckDuckGo</string>
 
     <!-- App feedback disambiguation -->
-    <string name="feedbackActivityTitle">Podělte se o svou zpětnou vazbu.</string>
+    <string name="feedbackActivityTitle">Podělte se o zpětnou vazbu</string>
     <string name="missingBrowserFeaturesTitleLong">Funkce prohlížeče chybí nebo jsou frustrující.</string>
     <string name="missingBrowserFeaturesTitleShort">Problémy s funkcemi prohlížeče</string>
     <string name="missingBrowserFeaturesSubtitle">Kterou funkci prohlížení můžeme přidat nebo vylepšit?</string>
-    <string name="missingBrowserFeatureSubReasonNavigation">Navigace dopředu, dozadu, obnovení</string>
+    <string name="missingBrowserFeatureSubReasonNavigation">Navigace dopředu, dozadu nebo obnovení</string>
     <string name="missingBrowserFeatureSubReasonTabManagement">Tvorba a správa karet</string>
     <string name="missingBrowserFeatureSubReasonAdPopups">Blokování reklam a vyskakovacích oken</string>
     <string name="missingBrowserFeatureSubReasonVideos">Při přehrávání videí</string>
@@ -327,7 +331,7 @@
     <string name="missingBrowserFeatureSubReasonBookmarks">Tvorba a správa záložek</string>
     <string name="missingBrowserFeatureSubReasonOther">Žádné z výše uvedených</string>
 
-    <string name="websiteNotLoadingTitleLong">Určité webové stránky se nenačítají správně.</string>
+    <string name="websiteNotLoadingTitleLong">Potíže při načítání webu</string>
     <string name="websiteNotLoadingTitleShort">Potíže při načítání webu</string>
     <string name="websiteNotLoadingSubtitle">Které webové stránky jsou poškozené?</string>
 
@@ -363,8 +367,8 @@
     <string name="otherMainReasonTitleLong">Žádné z výše uvedených</string>
     <string name="otherMainReasonTitleShort">Další problémy</string>
 
-    <string name="openEndedInputHint">Jak se můžeme zlepšit? (Volitelné)</string>
-    <string name="submitFeedback">ODESLAT ZPĚTNOU VAZBU</string>
+    <string name="openEndedInputHint">Buďte co nejkonkrétnější.</string>
+    <string name="submitFeedback">ODESLAT</string>
 
     <string name="tellUsHowToImprove">Řekněte nám prosím, co můžeme zlepšit.</string>
     <string name="thanksForTheFeedback">Děkujeme za zpětnou vazbu!</string>
@@ -396,9 +400,9 @@
     <string name="systemSearchAppNotFound">Aplikace nebyla nalezena</string>
     <string name="systemSearchOnboardingText">Děkujeme, že jste si vybrali DuckDuckGo!\nPři použití našeho vyhledávání nebo aplikace jsou od tohoto okamžiku Vaše vyhledávání chráněna.</string>
     <string name="systemSearchOnboardingFeaturesIntroText">Aplikace DuckDuckGo také:</string>
-    <string name="systemSearchOnboardingFeatureOneText">Blokuje nebezpečné trackery</string>
-    <string name="systemSearchOnboardingFeatureTwoText">Vynutí šifrování na webových stránkách</string>
-    <string name="systemSearchOnboardingFeatureThreeText">Vymaže data jedním klepnutím</string>
+    <string name="systemSearchOnboardingFeatureOneText">Blokuje nebezpečná sledovací zařízení.</string>
+    <string name="systemSearchOnboardingFeatureTwoText">Vynucuje šifrování na webových stránkách.</string>
+    <string name="systemSearchOnboardingFeatureThreeText">Vymaže data jedním klepnutím.</string>
     <string name="systemSearchOnboardingButtonMore">Zobrazit více</string>
     <string name="systemSearchOnboardingButtonLess">Skrýt</string>
     <string name="systemSearchOnboardingButtonOk">Mám to</string>
@@ -418,22 +422,22 @@
     <string name="onboardingDaxText"><![CDATA[Internet může být někdy trochu strašidelný.<br/><br/>Nebojte se! Anonymní vyhledávání a procházení je jednodušší, než si myslíte.]]></string>
     <string name="onboardingLetsDoItButton">Pojďme na to!</string>
     <string name="daxIntroCtaText"><![CDATA[Dále zkuste navštívit některý z Vašich oblíbených webů! <br/><br/>Zablokujeme trackery, aby Vás nemohli špehovat. Pokud to bude možné, upgraduji také zabezpečení Vašeho připojení. 🔒]]></string>
-    <string name="daxEndCtaText"><![CDATA[Máte to! <br/><br/>Pamatujte: pokaždé, když internet procházíte se mnou, hrozným reklamám jsou přistřižena křídla. 👍]]></string>
+    <string name="daxEndCtaText"><![CDATA[Máte to!<br/><br/>Pamatujte: Pokaždé, když internet procházíte s námi, příšerným reklamám přistřihneme křídla. 👍]]></string>
     <string name="daxSerpCtaText">Vaše vyhledávání DuckDuckGo jsou anonymní a historii Vašeho vyhledávání nikdy nikam neukládáme. Vůbec nikdy. 🙌</string>
     <plurals name="daxTrackersBlockedCtaText">
-        <item quantity="one"><![CDATA[  a <b>%1$d další</b> se vás snažili tady vysledovat. <br/><br/>Zablokovali jsme je!<br/><br/>☝️Můžete zkontrolovat panel URL a zjistit, kdo se vás snaží sledovat, když navštívíte nový web. ️]]></item>
-        <item quantity="few"><![CDATA[ a <b>%1$d další</b> se vás snažili tady vysledovat. <br/><br/>Zablokovali jsme je!<br/><br/>☝️Můžete zkontrolovat panel URL a zjistit, kdo se vás snaží sledovat, když navštívíte nový web. ️]]></item>
-        <item quantity="many"><![CDATA[ a <b>%1$d dalších</b> se vás snažilo tady vysledovat. <br/><br/>Zablokovali jsme je!<br/><br/>☝️Můžete zkontrolovat panel URL a zjistit, kdo se vás snaží sledovat, když navštívíte nový web. ️]]></item>
-        <item quantity="other"><![CDATA[ a <b>%1$d dalších</b> se vás snažilo tady vysledovat. <br/><br/>Zablokovali jsme je!<br/><br/>☝️Můžete zkontrolovat panel URL a zjistit, kdo se vás snaží sledovat, když navštívíte nový web. ️]]></item>
+        <item quantity="one"><![CDATA[  a <b>%1$d další</b> se vás snažili tady vysledovat. <br/><br/>Zablokovali jsme je!<br/><br/>☝️Můžete zkontrolovat panel s adresou a zjistit, kdo se vás snaží sledovat, když navštívíte nový web. ️]]></item>
+        <item quantity="few"><![CDATA[  a <b>%1$d další</b> se vás snažili tady vysledovat. <br/><br/>Zablokovali jsme je!<br/><br/>☝️Můžete zkontrolovat panel s adresou a zjistit, kdo se vás snaží sledovat, když navštívíte nový web. ️]]></item>
+        <item quantity="many"><![CDATA[  a <b>%1$d další</b> se vás snažili tady vysledovat. <br/><br/>Zablokovali jsme je!<br/><br/>☝️Můžete zkontrolovat panel s adresou a zjistit, kdo se vás snaží sledovat, když navštívíte nový web.]]></item>
+        <item quantity="other"><![CDATA[  a <b>%1$d další</b> se vás snažili tady vysledovat. <br/><br/>Zablokovali jsme je!<br/><br/>☝️Můžete zkontrolovat panel s adresou a zjistit, kdo se vás snaží sledovat, když navštívíte nový web. ️]]></item>
     </plurals>
     <plurals name="daxTrackersBlockedCtaZeroText">
         <item quantity="one"><![CDATA[ se vás snažil tady vysledovat. <br/><br/>Zablokovali jsme ho!<br/><br/>☝️Můžete zkontrolovat panel URL a zjistit, kdo se vás snaží sledovat, když navštívíte nový web. ️]]></item>
-        <item quantity="few"><![CDATA[ se vás snažili tady vysledovat. <br/><br/>Zablokovali jsme je!<br/><br/>☝️Můžete zkontrolovat panel URL a zjistit, kdo se vás snaží sledovat, když navštívíte nový web. ️]]></item>
-        <item quantity="many"><![CDATA[ se vás snažilo tady vysledovat. <br/><br/>Zablokovali jsme je!<br/><br/>☝️Můžete zkontrolovat panel URL a zjistit, kdo se vás snaží sledovat, když navštívíte nový web. ️]]></item>
-        <item quantity="other"><![CDATA[ se vás snažilo tady vysledovat. <br/><br/>Zablokovali jsme je!<br/><br/>☝️Můžete zkontrolovat panel URL a zjistit, kdo se vás snaží sledovat, když navštívíte nový web. ️]]></item>
+        <item quantity="few"><![CDATA[ se vás snažil tady vysledovat. <br/><br/>Zablokovali jsme je!<br/><br/>☝️Můžete zkontrolovat panel URL a zjistit, kdo se vás snaží sledovat, když navštívíte nový web. ️]]></item>
+        <item quantity="many"><![CDATA[ se vás snažil tady vysledovat. <br/><br/>Zablokovali jsme je!<br/><br/>☝️Můžete zkontrolovat panel URL a zjistit, kdo se vás snaží sledovat, když navštívíte nový web. ️]]></item>
+        <item quantity="other"><![CDATA[ se vás snažil tady vysledovat. <br/><br/>Zablokovali jsme je!<br/><br/>☝️Můžete zkontrolovat panel URL a zjistit, kdo se vás snaží sledovat, když navštívíte nový web. ️]]></item>
     </plurals>
     <string name="daxNonSerpCtaText"><![CDATA[Zatímco Vy budete klepat a přejíždět, já budu blokovat zlovolné sledovače. <br/><br/>Nenechejte se rušit — pokračujte v prohlížení!]]></string>
-    <string name="daxMainNetworkCtaText"><![CDATA[Hlavy vzhůru! %1$s je významná sledovací síť.<br/><br/> Jejich sledovatelé číhají na přibližně %2$s významných webů 😱, ale netrapte se!<br/><br/>Já %3$s zablokuji, aby Vaši aktivitu na těchto webech neviděl.]]></string>
+    <string name="daxMainNetworkCtaText">Upozornění! Nemůžeme zabránit, aby %1$s viděli vaši aktivitu na stránkách %2$s &lt;br/&gt;&lt;br/&gt;Ale procházejte s námi a budete moci omezit, co o vás %3$s celkově ví zablokováním jejich trackerů na mnoha jiných stránkách.</string>
     <string name="daxMainNetworkOwnedCtaText">Upozornění! Vzhledem k tomu, že %2$s vlastní %1$s, nemůžeme jim zabránit, aby viděli vaši aktivitu tady.&lt;br/&gt;&lt;br/&gt;Ale procházejte s námi a budeme moci redukovat, co o vás celkově %3$s ví zablokováním jejich trackerů na mnoha jiných stránkách.</string>
 
     <!-- Download Confirmation -->
@@ -447,7 +451,7 @@
 
     <!-- Change Icon Activity -->
     <string name="changeIconActivityTitle">Ikona aplikace</string>
-    <string name="changeIconCtaLabel">Změnit ikonu aplikace</string>
+    <string name="changeIconCtaLabel">Ikona aplikace</string>
     <string name="changeIconCtaAccept">Aplikovat</string>
     <string name="changeIconCtaCancel">Zrušit</string>
     <string name="changeIconDialogTitle">Použít novou ikonu?</string>
@@ -460,6 +464,7 @@
     <!-- Dialogs -->
     <string name="dialogAddTitle">Přidat</string>
     <string name="dialogEditTitle">Upravit</string>
+    <string name="dialogSaveAction">Uložit</string>
 
     <!-- Whitelist -->
     <string name="whitelisetActivityTitle">Nechráněné stránky</string>
@@ -468,21 +473,21 @@
     <string name="whitelistEntryOverflowContentDescription">Další možnosti pro nechráněný web %1$s</string>
     <string name="whitelistEntryDeleteConfirmMessage">Opravdu chcete odstranit &lt;b&gt;%1$s&lt;/b&gt; z nechráněných stránek?</string>
     <string name="whitelistExplanation">Tyto stránky nebudou vylepšeny ochranou soukromí.</string>
-    <string name="whitelistNoEntries">Zatím žádné nechráněné stránky</string>
+    <string name="whitelistNoEntries">Ochrana osobních údajů povolena pro všechny weby</string>
     <string name="whitelistDomainHint">www.example.com</string>
-    <string name="whitelistFormatError">Nelze uložit, doménu zadejte jako <b>example.com</b></string>
+    <string name="whitelistFormatError">Zadejte doménu jako <b>example.com</b> a zkuste to znovu</string>
 
     <!-- Settings -->
     <string name="settingsPrivacyProtectionWhitelist">Nechráněné stránky</string>
 
     <!-- Fireproof websites -->
-    <string name="fireproofWebsitesActivityTitle">Webové stránky pro ochranu souborů</string>
-    <string name="settingsFireproofWebsites">Webové stránky pro ochranu souborů</string>
-    <string name="fireproofWebsiteMenuTitleAdd">Webová stránka pro ochranu souborů</string>
-    <string name="fireproofWebsiteSnackbarConfirmation">&lt;b&gt;%1$s&lt;/b&gt; je nyní chráněný! Další informace naleznete v části Nastavení.</string>
+    <string name="fireproofWebsitesActivityTitle">Weby s ochranou</string>
+    <string name="settingsFireproofWebsites">Weby s ochranou</string>
+    <string name="fireproofWebsiteMenuTitleAdd">Web s ochranou</string>
+    <string name="fireproofWebsiteSnackbarConfirmation">&lt;b&gt;%1$s&lt;/b&gt;je nyní chráněný! Pro správu navštivte Nastavení.</string>
     <string name="fireproofWebsiteSnackbarAction">Vrátit</string>
     <string name="fireproofWebsiteDeleteConfirmMessage">Opravdu chcete smazat &lt;b&gt;%1$s&lt;/b&gt;?</string>
-    <string name="fireproofWebsiteEmptyListHint">Žádné webové stránky zatím nejsou chráněny</string>
+    <string name="fireproofWebsiteEmptyListHint">Žádné webové stránky s ochranou</string>
     <string name="fireproofWebsiteFeatureDescription">Webové stránky spoléhají na soubory cookie, aby vás udržely přihlášené. Když na webu zapnete ochranu, soubory cookie se nevymažou a zůstanete přihlášeni, a to i po použití tlačítka pro mazání. Stále přitom blokujeme sledovací programy třetích stran nalezené na webových stránkách s ochranou.</string>
     <string name="fireproofWebsiteOverflowContentDescription">Další možnosti pro chráněné webové stránky %1$s</string>
     <string name="fireproofWebsiteLoginDialogTitle">Chtěli byste u %1$s ochranu?</string>
@@ -539,7 +544,7 @@
     <!--  Global Privacy Control-->
     <string name="globalPrivacyControlActivityTitle">Globální kontrola ochrany osobních údajů (GPC)</string>
     <string name="globalPrivacyControlDescription">
-        Vaše osobní údaje nesmí být na prodej. Na tom se ve společnosti DuckDuckGo shodneme. Aktivujte nastavení „Globální kontrola ochrany osobních údajů“ (GPC) a my upozorníme webové stránky na vaše preference:\n\n• Neprodávat vaše osobní údaje.\n • Omezit sdílení vašich osobních údajů s jinými společnosti.
+        Vaše osobní údaje nesmí být na prodej. Na tom se ve společnosti DuckDuckGo shodneme. Aktivujte nastavení „Globální kontrola ochrany osobních údajů“ (GPC) a my upozorníme webové stránky na vaše preference:&lt;br/&gt;&lt;br/&gt;• Neprodávat vaše osobní údaje.&lt;br/&gt;• Omezit sdílení vašich osobních údajů s jinými společnosti.
     </string>
     <string name="globalPrivacyControlSetting">Globální kontrola ochrany osobních údajů (GPC)</string>
     <string name="globalPrivacyControlToggle">Globální kontrola ochrany osobních údajů (GPC)</string>

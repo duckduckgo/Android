@@ -75,6 +75,7 @@ import com.duckduckgo.app.global.useourapp.UseOurAppDetector
 import com.duckduckgo.app.global.useourapp.UseOurAppDetector.Companion.USE_OUR_APP_SHORTCUT_TITLE
 import com.duckduckgo.app.global.useourapp.UseOurAppDetector.Companion.USE_OUR_APP_SHORTCUT_URL
 import com.duckduckgo.app.global.view.asLocationPermissionOrigin
+import com.duckduckgo.app.globalprivacycontrol.GlobalPrivacyControl
 import com.duckduckgo.app.location.GeoLocationPermissions
 import com.duckduckgo.app.location.data.LocationPermissionType
 import com.duckduckgo.app.location.data.LocationPermissionsRepository
@@ -135,7 +136,8 @@ class BrowserTabViewModel(
     private val notificationDao: NotificationDao,
     private val useOurAppDetector: UseOurAppDetector,
     private val variantManager: VariantManager,
-    private val fileDownloader: FileDownloader
+    private val fileDownloader: FileDownloader,
+    private val globalPrivacyControl: GlobalPrivacyControl
 ) : WebViewClientListener, EditBookmarkListener, HttpAuthenticationListener, SiteLocationPermissionDialog.SiteLocationPermissionDialogListener,
     SystemLocationPermissionDialog.SystemLocationPermissionDialogListener, ViewModel() {
 
@@ -527,13 +529,7 @@ class BrowserTabViewModel(
         autoCompleteViewState.value = AutoCompleteViewState(false)
     }
 
-    private fun getUrlHeaders(): Map<String, String> {
-        return if (appSettingsPreferencesStore.globalPrivacyControlEnabled) {
-            mapOf(GPC_HEADER to GPC_HEADER_VALUE)
-        } else {
-            emptyMap()
-        }
-    }
+    private fun getUrlHeaders(): Map<String, String> = globalPrivacyControl.getHeaders()
 
     private fun extractVerticalParameter(currentUrl: String?): String? {
         val url = currentUrl ?: return null
@@ -932,6 +928,7 @@ class BrowserTabViewModel(
         } else {
             newProgress
         }
+
         loadingViewState.value = progress.copy(isLoading = isLoading, progress = visualProgress)
 
         val showLoadingGrade = progress.privacyOn || isLoading
@@ -1717,6 +1714,10 @@ class BrowserTabViewModel(
         command.value = OpenInNewTab(query)
     }
 
+    override fun redirectTriggeredByGpc() {
+        navigationAwareLoginDetector.onEvent(NavigationEvent.GpcRedirect)
+    }
+
     override fun loginDetected() {
         val currentUrl = site?.url ?: return
         navigationAwareLoginDetector.onEvent(NavigationEvent.LoginAttempt(currentUrl))
@@ -1769,8 +1770,6 @@ class BrowserTabViewModel(
 
     companion object {
         private const val FIXED_PROGRESS = 50
-        const val GPC_HEADER = "Sec-GPC"
-        const val GPC_HEADER_VALUE = "1"
 
         // Minimum progress to show web content again after decided to hide web content (possible spoofing attack).
         // We think that progress is enough to assume next site has already loaded new content.
