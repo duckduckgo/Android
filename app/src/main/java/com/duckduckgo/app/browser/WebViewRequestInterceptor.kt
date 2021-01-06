@@ -78,7 +78,7 @@ class WebViewRequestInterceptor(
         shouldChangeToMobileUrl(request)?.let {
             it.getMobileSite(url)?.let { newUrl ->
                 withContext(Dispatchers.Main) {
-                    webView.loadUrl(newUrl)
+                    webView.loadUrl(newUrl, getHeaders(request))
                 }
                 return WebResourceResponse(null, null, null)
             }
@@ -87,7 +87,7 @@ class WebViewRequestInterceptor(
         newUserAgent(request, webView, webViewClientListener)?.let {
             withContext(Dispatchers.Main) {
                 webView.settings?.userAgentString = it
-                webView.loadUrl(url.toString())
+                webView.loadUrl(url.toString(), getHeaders(request))
             }
             return WebResourceResponse(null, null, null)
         }
@@ -96,9 +96,7 @@ class WebViewRequestInterceptor(
             val newUri = httpsUpgrader.upgrade(url)
 
             withContext(Dispatchers.Main) {
-                val headers = request.requestHeaders
-                headers.putAll(globalPrivacyControl.getHeaders())
-                webView.loadUrl(newUri.toString(), headers)
+                webView.loadUrl(newUri.toString(), getHeaders(request))
             }
 
             webViewClientListener?.upgradedToHttps()
@@ -107,11 +105,9 @@ class WebViewRequestInterceptor(
         }
 
         if (shouldAddGcpHeaders(request) && !requestWasInTheStack(url, webView)) {
-            val headers = request.requestHeaders
-            headers.putAll(globalPrivacyControl.getHeaders())
             withContext(Dispatchers.Main) {
                 webViewClientListener?.redirectTriggeredByGpc()
-                webView.loadUrl(url.toString(), headers)
+                webView.loadUrl(url.toString(), getHeaders(request))
             }
             return WebResourceResponse(null, null, null)
         }
@@ -142,6 +138,12 @@ class WebViewRequestInterceptor(
         return null
     }
 
+    private fun getHeaders(request: WebResourceRequest): Map<String, String> {
+        return request.requestHeaders.apply {
+            putAll(globalPrivacyControl.getHeaders())
+        }
+    }
+
     private fun shouldAddGcpHeaders(request: WebResourceRequest): Boolean {
         val headers = request.requestHeaders
         return (
@@ -167,8 +169,7 @@ class WebViewRequestInterceptor(
     ): String? {
         return if (request.isForMainFrame && request.method == "GET") {
             val url = request.url ?: return null
-            val isOldPage = withContext(Dispatchers.Main) { (webView.copyBackForwardList().currentIndex < webView.copyBackForwardList().size - 1) }
-            if (isOldPage) return null
+            if (requestWasInTheStack(url, webView)) return null
             val desktopSiteEnabled = webViewClientListener?.isDesktopSiteEnabled() == true
             val currentAgent = withContext(Dispatchers.Main) { webView.settings?.userAgentString }
             val newAgent = userAgentProvider.userAgent(url.toString(), desktopSiteEnabled)

@@ -19,11 +19,7 @@
 package com.duckduckgo.app.browser
 
 import android.net.Uri
-import android.webkit.WebBackForwardList
-import android.webkit.WebHistoryItem
-import android.webkit.WebResourceRequest
-import android.webkit.WebResourceResponse
-import android.webkit.WebView
+import android.webkit.*
 import androidx.test.annotation.UiThreadTest
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.globalprivacycontrol.GlobalPrivacyControl
@@ -70,6 +66,8 @@ class WebViewRequestInterceptorTest {
     @Before
     fun setup() {
         MockitoAnnotations.openMocks(this)
+        configureUserAgent()
+        configureStack()
 
         testee = WebViewRequestInterceptor(
             trackerDetector = mockTrackerDetector,
@@ -447,7 +445,7 @@ class WebViewRequestInterceptorTest {
     }
 
     @Test
-    fun whenUrlShouldChangeToMobileUrlThenLoadUrlWithMobileSubdomain() = runBlocking<Unit> {
+    fun whenUrlShouldChangeToMobileUrlThenLoadUrlWithMobileSubDomain() = runBlocking<Unit> {
         configureShouldChangeToMobileUrl()
 
         val mockWebViewClientListener: WebViewClientListener = mock()
@@ -458,13 +456,13 @@ class WebViewRequestInterceptorTest {
             webViewClientListener = mockWebViewClientListener
         )
 
-        verify(webView).loadUrl("https://m.facebook.com")
+        verify(webView).loadUrl("https://m.facebook.com", emptyMap())
     }
 
     @Test
     fun whenUserAgentShouldChangeThenReloadUrl() = runBlocking<Unit> {
         configureUserAgentShouldChange()
-        configureWebBackForwardListHasOneElement()
+        configureUrlDoesNotExistInTheStack()
 
         val mockWebViewClientListener: WebViewClientListener = mock()
         testee.shouldIntercept(
@@ -474,13 +472,13 @@ class WebViewRequestInterceptorTest {
             webViewClientListener = mockWebViewClientListener
         )
 
-        verify(webView).loadUrl(any())
+        verify(webView).loadUrl(any(), any())
     }
 
     @Test
     fun whenUserAgentShouldChangeAndUrlAlreadyWasInTheStackButIsNotTheLastElementThenDoNotReloadUrl() = runBlocking<Unit> {
         configureUserAgentShouldChange()
-        configureWebBackForwardListIsOldElement()
+        configureUrlExistsInTheStack()
 
         val mockWebViewClientListener: WebViewClientListener = mock()
         testee.shouldIntercept(
@@ -496,7 +494,7 @@ class WebViewRequestInterceptorTest {
     @Test
     fun whenUserAgentHasNotChangedThenDoNotReloadUrl() = runBlocking<Unit> {
         configureShouldNotUpgrade()
-        configureWebBackForwardListHasOneElement()
+        configureUrlDoesNotExistInTheStack()
 
         val mockWebViewClientListener: WebViewClientListener = mock()
         testee.shouldIntercept(
@@ -539,6 +537,10 @@ class WebViewRequestInterceptorTest {
         whenever(webView.copyBackForwardList()).thenReturn(mockWebBackForwardList)
     }
 
+    private fun configureStack() {
+        configureUrlExistsInTheStack()
+    }
+
     private fun configureRequestContainsGcpHeader() = runBlocking<Unit> {
         whenever(mockGlobalPrivacyControl.isGpcActive()).thenReturn(true)
         whenever(mockRequest.method).thenReturn("GET")
@@ -564,20 +566,6 @@ class WebViewRequestInterceptorTest {
         whenever(mockRequest.url).thenReturn(Uri.parse("https://m.facebook.com"))
         whenever(mockRequest.isForMainFrame).thenReturn(true)
         whenever(mockRequest.method).thenReturn("GET")
-    }
-
-    private fun configureWebBackForwardListHasOneElement() {
-        val mockWebBackForwardList: WebBackForwardList = mock()
-        whenever(mockWebBackForwardList.currentIndex).thenReturn(0)
-        whenever(mockWebBackForwardList.size).thenReturn(1)
-        whenever(webView.copyBackForwardList()).thenReturn(mockWebBackForwardList)
-    }
-
-    private fun configureWebBackForwardListIsOldElement() {
-        val mockWebBackForwardList: WebBackForwardList = mock()
-        whenever(mockWebBackForwardList.currentIndex).thenReturn(0)
-        whenever(mockWebBackForwardList.size).thenReturn(2)
-        whenever(webView.copyBackForwardList()).thenReturn(mockWebBackForwardList)
     }
 
     private fun configureShouldChangeToMobileUrl() = runBlocking<Unit> {
@@ -608,6 +596,12 @@ class WebViewRequestInterceptorTest {
         assertNull(response!!.data)
         assertNull(response.mimeType)
         assertNull(response.encoding)
+    }
+
+    private fun configureUserAgent() {
+        val settings: WebSettings = mock()
+        whenever(webView.settings).thenReturn(settings)
+        whenever(settings.userAgentString).thenReturn(userAgentProvider.userAgent())
     }
 
     companion object {
