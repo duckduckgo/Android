@@ -42,7 +42,7 @@ class SettingsAutomaticallyClearWhatFragment : DialogFragment() {
 
         val alertBuilder = AlertDialog.Builder(requireActivity())
             .setView(rootView)
-            .setTitle(R.string.settingsAutomaticallyClearWhat)
+            .setTitle(R.string.settingsAutomaticallyClearWhatDialogTitle)
             .setPositiveButton(R.string.settingsAutomaticallyClearingDialogSave) { _, _ ->
                 dialog?.let {
                     val radioGroup = it.findViewById(R.id.settingsClearWhatGroup) as RadioGroup

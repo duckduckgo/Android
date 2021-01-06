@@ -17,24 +17,54 @@
 package com.duckduckgo.app.globalprivacycontrol
 
 import android.content.Context
+import android.net.Uri
 import android.webkit.WebView
 import androidx.annotation.UiThread
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.global.UriString
+import com.duckduckgo.app.global.domain
 import com.duckduckgo.app.settings.db.SettingsDataStore
-import javax.inject.Inject
 
-interface GlobalPrivacyControlInjector {
+interface GlobalPrivacyControl {
     fun injectDoNotSellToDom(webView: WebView)
+    fun isGpcActive(): Boolean
+    fun getHeaders(): Map<String, String>
+    fun shouldAddHeaders(url: Uri): Boolean
 }
 
-class GlobalPrivacyControlInjectorJs @Inject constructor(private val appSettingsPreferencesStore: SettingsDataStore) : GlobalPrivacyControlInjector {
+class GlobalPrivacyControlManager(private val appSettingsPreferencesStore: SettingsDataStore) : GlobalPrivacyControl {
     private val javaScriptInjector = JavaScriptInjector()
+    private val headerConsumers = listOf(
+        "nytimes.com",
+        "globalprivacycontrol.org",
+        "global-privacy-control.glitch.me"
+    )
+
+    override fun shouldAddHeaders(url: Uri): Boolean {
+        val domain = url.domain() ?: return false
+        return headerConsumers.any { UriString.sameOrSubdomain(domain, it) }
+    }
+
+    override fun isGpcActive(): Boolean = appSettingsPreferencesStore.globalPrivacyControlEnabled
+
+    override fun getHeaders(): Map<String, String> {
+        return if (appSettingsPreferencesStore.globalPrivacyControlEnabled) {
+            mapOf(GPC_HEADER to GPC_HEADER_VALUE)
+        } else {
+            emptyMap()
+        }
+    }
 
     @UiThread
     override fun injectDoNotSellToDom(webView: WebView) {
         if (appSettingsPreferencesStore.globalPrivacyControlEnabled) {
             webView.evaluateJavascript("javascript:${javaScriptInjector.getFunctionsJS(webView.context)}", null)
         }
+    }
+
+    companion object {
+        const val GPC_HEADER = "sec-gpc"
+        const val GPC_HEADER_VALUE = "1"
     }
 
     private class JavaScriptInjector {

@@ -813,7 +813,7 @@ class BrowserTabFragment :
             alertDialog = AlertDialog.Builder(context)
                 .setTitle(R.string.launchingExternalApp)
                 .setMessage(getString(R.string.confirmOpenExternalApp))
-                .setPositiveButton(R.string.yes) { _, _ ->
+                .setPositiveButton(R.string.open) { _, _ ->
                     onClick()
                 }
                 .setNeutralButton(R.string.closeTab) { dialog, _ ->
@@ -823,7 +823,7 @@ class BrowserTabFragment :
                         destroyWebView()
                     }
                 }
-                .setNegativeButton(R.string.no) { dialog, _ ->
+                .setNegativeButton(R.string.cancel) { dialog, _ ->
                     dialog.dismiss()
                 }
                 .show()
