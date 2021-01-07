@@ -45,14 +45,4 @@ class MobileUrlReWriterTest {
     fun whenMobileSiteOnlyForUriAndSiteDoesNotBelongsToMobileSiteHostsThenReturnNull() {
         assertNull(testee.mobileSiteOnlyForUri("https://example.com".toUri()))
     }
-
-    @Test
-    fun whenGetMobileSiteThenReturnTheMobileHostUrl() {
-        val testee = MobileUrlReWriter.MobileSiteOnly("example.com", "m.example.com", emptyList())
-        val uri = "https://${testee.host}/test".toUri()
-
-        val value = testee.getMobileSite(uri)
-
-        assertEquals("https://${testee.mobileHost}/test", value)
-    }
 }

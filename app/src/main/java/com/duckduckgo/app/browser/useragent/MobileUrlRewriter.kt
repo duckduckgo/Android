@@ -23,11 +23,13 @@ import javax.inject.Inject
 
 class MobileUrlReWriter @Inject constructor() {
 
-    fun mobileSiteOnlyForUri(uri: Uri?): MobileSiteOnly? {
+    fun mobileSiteOnlyForUri(uri: Uri?): String? {
         if (uri == null) return null
         val host = uri.host
         return if (!uri.isMobileSite && host != null) {
-            strictlyMobileSiteHosts.firstOrNull { UriString.sameOrSubdomain(host, it.host) && !containsExcludedPath(uri, it) }
+            strictlyMobileSiteHosts.firstOrNull {
+                UriString.sameOrSubdomain(host, it.host) && !containsExcludedPath(uri, it)
+            }?.getMobileSite(uri, host)
         } else {
             null
         }
@@ -44,10 +46,9 @@ class MobileUrlReWriter @Inject constructor() {
         )
     }
 
-    data class MobileSiteOnly(val host: String, val mobileHost: String, val excludedPaths: List<String> = emptyList()) {
-        fun getMobileSite(uri: Uri): String? {
-            val host = uri.host ?: return null
-            return uri.toString().replace(host, mobileHost)
-        }
+    data class MobileSiteOnly(val host: String, val mobileHost: String, val excludedPaths: List<String> = emptyList())
+
+    private fun MobileSiteOnly.getMobileSite(uri: Uri, host: String): String {
+        return uri.toString().replace(host, mobileHost)
     }
 }

@@ -75,13 +75,11 @@ class WebViewRequestInterceptor(
 
         val url = request.url
 
-        shouldChangeToMobileUrl(request)?.let {
-            it.getMobileSite(url)?.let { newUrl ->
-                withContext(Dispatchers.Main) {
-                    webView.loadUrl(newUrl, getHeaders(request))
-                }
-                return WebResourceResponse(null, null, null)
+        shouldChangeToMobileUrl(request)?.let { newUrl ->
+            withContext(Dispatchers.Main) {
+                webView.loadUrl(newUrl, getHeaders(request))
             }
+            return WebResourceResponse(null, null, null)
         }
 
         newUserAgent(request, webView, webViewClientListener)?.let {
@@ -183,7 +181,7 @@ class WebViewRequestInterceptor(
         }
     }
 
-    private fun shouldChangeToMobileUrl(request: WebResourceRequest): MobileUrlReWriter.MobileSiteOnly? {
+    private fun shouldChangeToMobileUrl(request: WebResourceRequest): String? {
         return if (request.isForMainFrame && request.url != null && request.method == "GET") {
             return mobileUrlReWriter.mobileSiteOnlyForUri(request.url)
         } else {
@@ -205,5 +203,4 @@ class WebViewRequestInterceptor(
         webViewClientListener?.trackerDetected(trackingEvent)
         return trackingEvent.blocked
     }
-
 }
