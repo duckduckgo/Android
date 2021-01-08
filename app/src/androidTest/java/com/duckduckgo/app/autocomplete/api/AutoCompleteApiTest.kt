@@ -227,6 +227,55 @@ class AutoCompleteApiTest {
     }
 
     @Test
+    fun whenSingleTokenQueryAndBookmarkReturnsDuplicatedItemsThenDedup() {
+        whenever(mockAutoCompleteService.autoComplete("cnn")).thenReturn(Observable.just(listOf()))
+        whenever(mockBookmarksDao.bookmarksObservable()).thenReturn(
+            Single.just(
+                listOf(
+                    BookmarkEntity(0, "CNN international", "https://cnn.com"),
+                    BookmarkEntity(0, "CNN international", "https://cnn.com"),
+                    BookmarkEntity(0, "CNN international - world", "https://cnn.com/world"),
+                )
+            )
+        )
+
+        val result = testee.autoComplete("cnn").test()
+        val value = result.values()[0] as AutoCompleteResult
+
+        assertEquals(
+            listOf(
+                AutoComplete.AutoCompleteSuggestion.AutoCompleteBookmarkSuggestion(phrase = "cnn.com", "CNN international", "https://cnn.com"),
+                AutoComplete.AutoCompleteSuggestion.AutoCompleteBookmarkSuggestion(phrase = "cnn.com/world", "CNN international - world", "https://cnn.com/world"),
+            ),
+            value.suggestions
+        )
+    }
+
+    @Test
+    fun whenSingleTokenQueryContainsSlashThenIgnoreItWhileMatching() {
+        whenever(mockAutoCompleteService.autoComplete("reddit.com/")).thenReturn(Observable.just(listOf()))
+        whenever(mockBookmarksDao.bookmarksObservable()).thenReturn(
+            Single.just(
+                listOf(
+                    BookmarkEntity(0, "Reddit", "https://reddit.com"),
+                    BookmarkEntity(0, "Reddit - duckduckgo", "https://reddit.com/r/duckduckgo"),
+                )
+            )
+        )
+
+        val result = testee.autoComplete("reddit.com/").test()
+        val value = result.values()[0] as AutoCompleteResult
+
+        assertEquals(
+            listOf(
+                AutoComplete.AutoCompleteSuggestion.AutoCompleteBookmarkSuggestion(phrase = "reddit.com", "Reddit", "https://reddit.com"),
+                AutoComplete.AutoCompleteSuggestion.AutoCompleteBookmarkSuggestion(phrase = "reddit.com/r/duckduckgo", "Reddit - duckduckgo", "https://reddit.com/r/duckduckgo"),
+            ),
+            value.suggestions
+        )
+    }
+
+    @Test
     fun whenMultipleTokenQueryAndNoTokenMatchThenReturnEmpty() {
         val query = "example title foo"
         whenever(mockAutoCompleteService.autoComplete(query)).thenReturn(Observable.just(listOf()))

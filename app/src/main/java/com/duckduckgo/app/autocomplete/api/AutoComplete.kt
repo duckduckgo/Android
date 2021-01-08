@@ -85,6 +85,7 @@ class AutoCompleteApi @Inject constructor(
             .map {
                 AutoCompleteBookmarkSuggestion(phrase = it.url.toUri().toStringDropScheme(), title = it.title.orEmpty(), url = it.url)
             }
+            .distinctUntilChanged()
             .take(2)
             .toList()
             .onErrorReturn { emptyList() }
@@ -133,7 +134,7 @@ class AutoCompleteApi @Inject constructor(
                 rankedBookmark.score += 50
             }
 
-        } else if (domain?.startsWith(tokens.first(), ignoreCase = true) == true) {
+        } else if (domain?.startsWith(tokens.first().split("/").first(), ignoreCase = true) == true) {
             rankedBookmark.score += 300
         }
 
