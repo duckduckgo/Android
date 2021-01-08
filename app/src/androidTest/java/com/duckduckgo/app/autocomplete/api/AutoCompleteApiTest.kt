@@ -252,7 +252,7 @@ class AutoCompleteApiTest {
     }
 
     @Test
-    fun whenSingleTokenQueryContainsSlashThenIgnoreItWhileMatching() {
+    fun whenSingleTokenQueryEndsWithSlashThenIgnoreItWhileMatching() {
         whenever(mockAutoCompleteService.autoComplete("reddit.com/")).thenReturn(Observable.just(listOf()))
         whenever(mockBookmarksDao.bookmarksObservable()).thenReturn(
             Single.just(
@@ -269,6 +269,53 @@ class AutoCompleteApiTest {
         assertEquals(
             listOf(
                 AutoComplete.AutoCompleteSuggestion.AutoCompleteBookmarkSuggestion(phrase = "reddit.com", "Reddit", "https://reddit.com"),
+                AutoComplete.AutoCompleteSuggestion.AutoCompleteBookmarkSuggestion(phrase = "reddit.com/r/duckduckgo", "Reddit - duckduckgo", "https://reddit.com/r/duckduckgo"),
+            ),
+            value.suggestions
+        )
+    }
+
+    @Test
+    fun whenSingleTokenQueryEndsWithMultipleSlashThenIgnoreThemWhileMatching() {
+        whenever(mockAutoCompleteService.autoComplete("reddit.com///")).thenReturn(Observable.just(listOf()))
+        whenever(mockBookmarksDao.bookmarksObservable()).thenReturn(
+            Single.just(
+                listOf(
+                    BookmarkEntity(0, "Reddit", "https://reddit.com"),
+                    BookmarkEntity(0, "Reddit - duckduckgo", "https://reddit.com/r/duckduckgo"),
+                )
+            )
+        )
+
+        val result = testee.autoComplete("reddit.com///").test()
+        val value = result.values()[0] as AutoCompleteResult
+
+        assertEquals(
+            listOf(
+                AutoComplete.AutoCompleteSuggestion.AutoCompleteBookmarkSuggestion(phrase = "reddit.com", "Reddit", "https://reddit.com"),
+                AutoComplete.AutoCompleteSuggestion.AutoCompleteBookmarkSuggestion(phrase = "reddit.com/r/duckduckgo", "Reddit - duckduckgo", "https://reddit.com/r/duckduckgo"),
+            ),
+            value.suggestions
+        )
+    }
+
+    @Test
+    fun whenSingleTokenQueryContainsMultipleSlashThenIgnoreThemWhileMatching() {
+        whenever(mockAutoCompleteService.autoComplete("reddit.com/r//")).thenReturn(Observable.just(listOf()))
+        whenever(mockBookmarksDao.bookmarksObservable()).thenReturn(
+            Single.just(
+                listOf(
+                    BookmarkEntity(0, "Reddit", "https://reddit.com"),
+                    BookmarkEntity(0, "Reddit - duckduckgo", "https://reddit.com/r/duckduckgo"),
+                )
+            )
+        )
+
+        val result = testee.autoComplete("reddit.com/r//").test()
+        val value = result.values()[0] as AutoCompleteResult
+
+        assertEquals(
+            listOf(
                 AutoComplete.AutoCompleteSuggestion.AutoCompleteBookmarkSuggestion(phrase = "reddit.com/r/duckduckgo", "Reddit - duckduckgo", "https://reddit.com/r/duckduckgo"),
             ),
             value.suggestions
