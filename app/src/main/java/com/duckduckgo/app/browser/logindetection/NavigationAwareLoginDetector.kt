@@ -81,7 +81,7 @@ class AuthUrlDetector {
             "auth.atlassian.com", setOf(Pattern.compile("authorize"))
         ),
         Pair(
-            "facebook.com", setOf(Pattern.compile("/v\\d.*\\/dialog/oauth"))
+            "facebook.com", setOf(Pattern.compile("/v\\d.*\\/dialog/oauth"), Pattern.compile("dialog/oauth"))
         ),
         Pair(
             "login.microsoftonline.com", setOf(Pattern.compile("common/oauth2/authorize"), Pattern.compile("common/oauth2/v2.0/authorize"))
