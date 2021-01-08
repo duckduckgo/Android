@@ -104,6 +104,7 @@ class BookmarksViewModel(
             dao.delete(bookmark)
         }
     }
+
     fun insert(bookmark: BookmarkEntity) {
         viewModelScope.launch(dispatcherProvider.io()) {
             dao.insert(BookmarkEntity(title = bookmark.title, url = bookmark.url))

@@ -79,12 +79,12 @@ class FireproofWebsitesActivity : DuckDuckGoActivity() {
 
     @Suppress("deprecation")
     private fun confirmDeleteWebsite(entity: FireproofWebsiteEntity) {
-        val message = HtmlCompat.fromHtml(getString(R.string.fireproofWebsiteDeleteSnackbarMessage, entity.website()), HtmlCompat.FROM_HTML_MODE_LEGACY)
+        val message = HtmlCompat.fromHtml(getString(R.string.fireproofWebsiteRemovalConfirmation, entity.website()), HtmlCompat.FROM_HTML_MODE_LEGACY)
         viewModel.delete(entity)
         Snackbar.make(
-                fireActivityRoot,
-                message,
-                Snackbar.LENGTH_LONG
+            fireActivityRoot,
+            message,
+            Snackbar.LENGTH_LONG
         ).setAction(R.string.fireproofWebsiteSnackbarAction) {
             viewModel.onSnackBarUndoFireproof(entity)
         }.show()

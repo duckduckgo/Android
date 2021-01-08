@@ -140,12 +140,12 @@ class BookmarksActivity : DuckDuckGoActivity() {
     }
 
     private fun confirmDeleteBookmark(bookmark: BookmarkEntity) {
-        val message = getString(R.string.bookmarkDeleteSnackbarMessage, bookmark.title).html(this)
+        val message = getString(R.string.bookmarkDeleteConfirmationMessage, bookmark.title).html(this)
         viewModel.delete(bookmark)
         Snackbar.make(
-                bookmarkRootView,
-                message,
-                Snackbar.LENGTH_LONG
+            bookmarkRootView,
+            message,
+            Snackbar.LENGTH_LONG
         ).setAction(R.string.fireproofWebsiteSnackbarAction) {
             viewModel.insert(bookmark)
         }.show()

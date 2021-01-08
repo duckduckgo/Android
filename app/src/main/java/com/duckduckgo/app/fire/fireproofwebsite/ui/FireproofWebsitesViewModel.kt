@@ -72,6 +72,7 @@ class FireproofWebsitesViewModel(
     fun onDeleteRequested(entity: FireproofWebsiteEntity) {
         command.value = ConfirmDeleteFireproofWebsite(entity)
     }
+
     fun onSnackBarUndoFireproof(entity: FireproofWebsiteEntity) {
         val domain = entity.domain
         viewModelScope.launch(dispatcherProvider.io()) {
