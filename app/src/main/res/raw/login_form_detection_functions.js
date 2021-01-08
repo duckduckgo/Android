@@ -7,19 +7,21 @@ function loginFormDetected() {
 }
 
 function inputVisible(input) {
-    return !(input.offsetWidth === 0 && input.offsetHeight === 0) && !input.ariaHidden && !input.hidden && input.value !== "";
+    return !(input.offsetWidth === 0 && input.offsetHeight === 0) && input.ariaHidden === "false" && !input.hidden && input.value !== "";
 }
 
 function checkIsLoginForm(form) {
     LoginDetection.log("checking form " + form);
 
     var inputs = form.getElementsByTagName("input");
+    LoginDetection.log("checking input " + inputs);
     if (!inputs) {
         return;
     }
 
     for (var i = 0; i < inputs.length; i++) {
         var input = inputs.item(i);
+        LoginDetection.log("checking input " + input.type);
         if (input.type == "password" && inputVisible(input)) {
             LoginDetection.log("found password in form " + form);
             loginFormDetected();
