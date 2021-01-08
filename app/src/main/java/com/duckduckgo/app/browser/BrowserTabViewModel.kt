@@ -60,6 +60,7 @@ import com.duckduckgo.app.browser.model.LongPressTarget
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.browser.ui.HttpAuthenticationDialogFragment.HttpAuthenticationListener
+import com.duckduckgo.app.browser.useragent.MobileUrlReWriter
 import com.duckduckgo.app.cta.ui.*
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepository
@@ -264,7 +265,7 @@ class BrowserTabViewModel(
         class CheckSystemLocationPermission(val domain: String, val deniedForever: Boolean) : Command()
         class AskDomainPermission(val domain: String) : Command()
         object RequestSystemLocationPermission : Command()
-        class RefreshUserAgent(val host: String?, val isDesktop: Boolean) : Command()
+        class RefreshUserAgent(val url: String?, val isDesktop: Boolean) : Command()
         class ShowErrorWithAction(val textResId: Int, val action: () -> Unit) : Command()
         class ShowDomainHasPermissionMessage(val domain: String) : Command()
         sealed class DaxCommand : Command() {
@@ -591,6 +592,8 @@ class BrowserTabViewModel(
         }
     }
 
+    override fun isDesktopSiteEnabled(): Boolean = currentBrowserViewState().isDesktopBrowsingMode
+
     override fun closeCurrentTab() {
         viewModelScope.launch { removeCurrentTabFromRepository() }
     }
@@ -751,8 +754,6 @@ class BrowserTabViewModel(
             sendPixelIfUseOurAppSiteVisitedFirstTime(url)
         }
 
-        command.value = RefreshUserAgent(site?.uri?.host, currentBrowserViewState().isDesktopBrowsingMode)
-
         val currentOmnibarViewState = currentOmnibarViewState()
         omnibarViewState.value = currentOmnibarViewState.copy(omnibarText = omnibarTextForUrl(url), shouldMoveCaretToEnd = false)
         val currentBrowserViewState = currentBrowserViewState()
@@ -765,6 +766,7 @@ class BrowserTabViewModel(
             browserShowing = true,
             canAddBookmarks = true,
             addToHomeEnabled = true,
+            canChangeBrowsingMode = canChangeBrowsingMode(site?.domain),
             addToHomeVisible = addToHomeCapabilityDetector.isAddToHomeSupported(),
             canSharePage = true,
             showPrivacyGrade = true,
@@ -791,6 +793,10 @@ class BrowserTabViewModel(
         permissionOrigin?.let { viewModelScope.launch { notifyPermanentLocationPermission(permissionOrigin) } }
 
         registerSiteVisit()
+    }
+
+    private fun canChangeBrowsingMode(domain: String?): Boolean {
+        return !MobileUrlReWriter.strictlyMobileSiteHosts.any { domain?.contains(it.host) == true }
     }
 
     private fun sendPixelIfUseOurAppSiteVisitedFirstTime(url: String) {
@@ -928,6 +934,7 @@ class BrowserTabViewModel(
         val showLoadingGrade = progress.privacyOn || isLoading
         privacyGradeViewState.value = currentPrivacyGradeState().copy(shouldAnimate = isLoading, showEmptyGrade = showLoadingGrade)
         if (newProgress == 100) {
+            command.value = RefreshUserAgent(url, currentBrowserViewState().isDesktopBrowsingMode)
             navigationAwareLoginDetector.onEvent(NavigationEvent.PageFinished)
         }
     }
@@ -1427,7 +1434,7 @@ class BrowserTabViewModel(
     fun onDesktopSiteModeToggled(desktopSiteRequested: Boolean) {
         val currentBrowserViewState = currentBrowserViewState()
         browserViewState.value = currentBrowserViewState.copy(isDesktopBrowsingMode = desktopSiteRequested)
-        command.value = RefreshUserAgent(site?.uri?.host, desktopSiteRequested)
+        command.value = RefreshUserAgent(site?.uri?.toString(), desktopSiteRequested)
 
         val uri = site?.uri ?: return
 

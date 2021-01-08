@@ -44,6 +44,7 @@ import com.duckduckgo.app.browser.tabpreview.FileBasedWebViewPreviewPersister
 import com.duckduckgo.app.browser.tabpreview.WebViewPreviewGenerator
 import com.duckduckgo.app.browser.tabpreview.WebViewPreviewPersister
 import com.duckduckgo.app.browser.useragent.UserAgentProvider
+import com.duckduckgo.app.browser.useragent.MobileUrlReWriter
 import com.duckduckgo.app.fire.*
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteDao
 import com.duckduckgo.app.global.AppUrl
@@ -170,8 +171,10 @@ class BrowserModule {
         trackerDetector: TrackerDetector,
         httpsUpgrader: HttpsUpgrader,
         privacyProtectionCountDao: PrivacyProtectionCountDao,
-        globalPrivacyControl: GlobalPrivacyControl
-    ): RequestInterceptor = WebViewRequestInterceptor(resourceSurrogates, trackerDetector, httpsUpgrader, privacyProtectionCountDao, globalPrivacyControl)
+        globalPrivacyControl: GlobalPrivacyControl,
+        userAgentProvider: UserAgentProvider,
+        mobileUrlReWriter: MobileUrlReWriter
+    ): RequestInterceptor = WebViewRequestInterceptor(resourceSurrogates, trackerDetector, httpsUpgrader, privacyProtectionCountDao, globalPrivacyControl, userAgentProvider, mobileUrlReWriter)
 
     @Provides
     fun cookieManager(

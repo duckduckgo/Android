@@ -19,15 +19,13 @@
 package com.duckduckgo.app.browser
 
 import android.net.Uri
-import android.webkit.WebBackForwardList
-import android.webkit.WebHistoryItem
-import android.webkit.WebResourceRequest
-import android.webkit.WebResourceResponse
-import android.webkit.WebView
+import android.webkit.*
 import androidx.test.annotation.UiThreadTest
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.globalprivacycontrol.GlobalPrivacyControl
 import com.duckduckgo.app.globalprivacycontrol.GlobalPrivacyControlManager
+import com.duckduckgo.app.browser.useragent.MobileUrlReWriter
+import com.duckduckgo.app.browser.useragent.UserAgentProvider
 import com.duckduckgo.app.httpsupgrade.HttpsUpgrader
 import com.duckduckgo.app.privacy.db.PrivacyProtectionCountDao
 import com.duckduckgo.app.surrogates.ResourceSurrogates
@@ -59,6 +57,8 @@ class WebViewRequestInterceptorTest {
     private val mockPrivacyProtectionCountDao: PrivacyProtectionCountDao = mock()
     private val mockGlobalPrivacyControl: GlobalPrivacyControl = mock()
     private val mockWebBackForwardList: WebBackForwardList = mock()
+    private val userAgentProvider: UserAgentProvider = UserAgentProvider(DEFAULT, mock())
+    private val mobileUrlReWriter = MobileUrlReWriter()
 
     private var webView: WebView = mock()
 
@@ -66,13 +66,17 @@ class WebViewRequestInterceptorTest {
     @Before
     fun setup() {
         MockitoAnnotations.openMocks(this)
+        configureUserAgent()
+        configureStack()
 
         testee = WebViewRequestInterceptor(
             trackerDetector = mockTrackerDetector,
             httpsUpgrader = mockHttpsUpgrader,
             resourceSurrogates = mockResourceSurrogates,
             privacyProtectionCountDao = mockPrivacyProtectionCountDao,
-            globalPrivacyControl = mockGlobalPrivacyControl
+            globalPrivacyControl = mockGlobalPrivacyControl,
+            userAgentProvider = userAgentProvider,
+            mobileUrlReWriter = mobileUrlReWriter
         )
     }
 
@@ -440,6 +444,69 @@ class WebViewRequestInterceptorTest {
         verify(webView, never()).loadUrl(any(), any())
     }
 
+    @Test
+    fun whenUrlShouldChangeToMobileUrlThenLoadUrlWithMobileSubDomain() = runBlocking<Unit> {
+        configureShouldChangeToMobileUrl()
+
+        val mockWebViewClientListener: WebViewClientListener = mock()
+        testee.shouldIntercept(
+            request = mockRequest,
+            documentUrl = null,
+            webView = webView,
+            webViewClientListener = mockWebViewClientListener
+        )
+
+        verify(webView).loadUrl("https://m.facebook.com", emptyMap())
+    }
+
+    @Test
+    fun whenUserAgentShouldChangeThenReloadUrl() = runBlocking<Unit> {
+        configureUserAgentShouldChange()
+        configureUrlDoesNotExistInTheStack()
+
+        val mockWebViewClientListener: WebViewClientListener = mock()
+        testee.shouldIntercept(
+            request = mockRequest,
+            documentUrl = null,
+            webView = webView,
+            webViewClientListener = mockWebViewClientListener
+        )
+
+        verify(webView).loadUrl(any(), any())
+    }
+
+    @Test
+    fun whenUserAgentShouldChangeAndUrlAlreadyWasInTheStackButIsNotTheLastElementThenDoNotReloadUrl() = runBlocking<Unit> {
+        configureUserAgentShouldChange()
+        configureUrlExistsInTheStack()
+
+        val mockWebViewClientListener: WebViewClientListener = mock()
+        testee.shouldIntercept(
+            request = mockRequest,
+            documentUrl = null,
+            webView = webView,
+            webViewClientListener = mockWebViewClientListener
+        )
+
+        verify(webView, never()).loadUrl(any())
+    }
+
+    @Test
+    fun whenUserAgentHasNotChangedThenDoNotReloadUrl() = runBlocking<Unit> {
+        configureShouldNotUpgrade()
+        configureUrlDoesNotExistInTheStack()
+
+        val mockWebViewClientListener: WebViewClientListener = mock()
+        testee.shouldIntercept(
+            request = mockRequest,
+            documentUrl = null,
+            webView = webView,
+            webViewClientListener = mockWebViewClientListener
+        )
+
+        verify(webView, never()).loadUrl(any())
+    }
+
     private fun assertRequestCanContinueToLoad(response: WebResourceResponse?) {
         assertNull(response)
     }
@@ -470,6 +537,10 @@ class WebViewRequestInterceptorTest {
         whenever(webView.copyBackForwardList()).thenReturn(mockWebBackForwardList)
     }
 
+    private fun configureStack() {
+        configureUrlExistsInTheStack()
+    }
+
     private fun configureRequestContainsGcpHeader() = runBlocking<Unit> {
         whenever(mockGlobalPrivacyControl.isGpcActive()).thenReturn(true)
         whenever(mockRequest.method).thenReturn("GET")
@@ -488,6 +559,18 @@ class WebViewRequestInterceptorTest {
         whenever(mockGlobalPrivacyControl.isGpcActive()).thenReturn(false)
         whenever(mockGlobalPrivacyControl.getHeaders()).thenReturn(mapOf("test" to "test"))
         whenever(mockGlobalPrivacyControl.shouldAddHeaders(any())).thenReturn(false)
+        whenever(mockRequest.method).thenReturn("GET")
+    }
+
+    private fun configureUserAgentShouldChange() = runBlocking<Unit> {
+        whenever(mockRequest.url).thenReturn(Uri.parse("https://m.facebook.com"))
+        whenever(mockRequest.isForMainFrame).thenReturn(true)
+        whenever(mockRequest.method).thenReturn("GET")
+    }
+
+    private fun configureShouldChangeToMobileUrl() = runBlocking<Unit> {
+        whenever(mockRequest.url).thenReturn((Uri.parse("https://facebook.com")))
+        whenever(mockRequest.isForMainFrame).thenReturn(true)
         whenever(mockRequest.method).thenReturn("GET")
     }
 
@@ -515,4 +598,14 @@ class WebViewRequestInterceptorTest {
         assertNull(response.encoding)
     }
 
+    private fun configureUserAgent() {
+        val settings: WebSettings = mock()
+        whenever(webView.settings).thenReturn(settings)
+        whenever(settings.userAgentString).thenReturn(userAgentProvider.userAgent())
+    }
+
+    companion object {
+        const val DEFAULT =
+            "Mozilla/5.0 (Linux; Android 8.1.0; Nexus 6P Build/OPM3.171019.014) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/64.0.3282.137 Mobile Safari/537.36"
+    }
 }
