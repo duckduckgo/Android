@@ -18,6 +18,7 @@ package com.duckduckgo.app.di
 
 import android.app.Application
 import com.duckduckgo.app.browser.autocomplete.BrowserAutoCompleteModule
+import com.duckduckgo.app.browser.certificates.CertificateTrustedStoreModule
 import com.duckduckgo.app.browser.di.BrowserModule
 import com.duckduckgo.app.browser.favicon.FaviconModule
 import com.duckduckgo.app.browser.rating.di.RatingModule
@@ -27,8 +28,6 @@ import com.duckduckgo.app.onboarding.di.OnboardingModule
 import com.duckduckgo.app.surrogates.di.ResourceSurrogateModule
 import com.duckduckgo.app.trackerdetection.di.TrackerDetectionModule
 import com.duckduckgo.app.usage.di.AppUsageModule
-import com.duckduckgo.di.scopes.AppObjectGraph
-import com.squareup.anvil.annotations.MergeComponent
 import dagger.BindsInstance
 import dagger.Component
 import dagger.android.support.AndroidSupportInjectionModule
@@ -38,8 +37,7 @@ import javax.inject.Named
 import javax.inject.Singleton
 
 @Singleton
-@MergeComponent(
-    scope = AppObjectGraph::class,
+@Component(
     modules = [
 
         /* test doubled modules */
@@ -74,7 +72,7 @@ import javax.inject.Singleton
         UncaughtExceptionModule::class,
         PlayStoreReferralModule::class,
         CoroutinesModule::class,
-        FormatterModule::class
+        CertificateTrustedStoreModule::class
     ]
 )
 interface TestAppComponent : AppComponent {

@@ -18,6 +18,7 @@ package com.duckduckgo.app.di
 
 import android.app.Application
 import com.duckduckgo.app.browser.autocomplete.BrowserAutoCompleteModule
+import com.duckduckgo.app.browser.certificates.CertificateTrustedStoreModule
 import com.duckduckgo.app.browser.di.BrowserModule
 import com.duckduckgo.app.browser.favicon.FaviconModule
 import com.duckduckgo.app.browser.rating.di.RatingModule
@@ -72,6 +73,7 @@ import javax.inject.Singleton
         UncaughtExceptionModule::class,
         PlayStoreReferralModule::class,
         CoroutinesModule::class,
+        CertificateTrustedStoreModule::class,
         FormatterModule::class
     ]
 )

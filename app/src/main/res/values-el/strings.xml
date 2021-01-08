@@ -20,9 +20,11 @@
     <string name="appName" translatable="false">DuckDuckGo</string>
     <string name="appDescription" translatable="false">DuckDuckGo </string>
     <string name="duckDuckGoLogoDescription">Λογότυπο DuckDuckGo</string>
-    <string name="duckDuckGoPrivacySimplified">Ιδιωτικότητα, απλοποιημένη.</string>
+    <string name="duckDuckGoPrivacySimplified">Η ιδιωτικότητα απλοποιημένη</string>
     <string name="yes">Ναι</string>
-    <string name="no">Οχι</string>
+    <string name="no">Όχι</string>
+    <string name="open">Άνοιγμα</string>
+    <string name="cancel">Ακύρωση</string>
     <string name="search">Αναζήτηση</string>
 
     <!-- Onboarding Activity -->
@@ -32,8 +34,8 @@
     <!-- Default Browser -->
     <string name="cannotLaunchDefaultAppSettings">Αδυναμία εκκίνησης προεπιλεγμένης οθόνης ρυθμίσεων εφαρμογής</string>
     <string name="settingsDefaultBrowserEnabled">Ορισμός ως προεπιλεγμένο πρόγραμμα περιήγησης</string>
-    <string name="defaultBrowserMaybeLater">Ισως αργότερα</string>
-    <string name="defaultBrowserLetsDoIt">Ας το κάνουμε!</string>
+    <string name="defaultBrowserMaybeLater">Ίσως αργότερα</string>
+    <string name="defaultBrowserLetsDoIt">Ορισμός ως προεπιλεγμένο πρόγραμμα περιήγησης</string>
     <string name="defaultBrowserDescriptionNoDefault">Ανοίξτε συνδέσμους με ηρεμία και ασφάλεια, κάθε φορά.</string>
     <string name="defaultBrowserInstructions">Επιλέξτε DuckDuckGo και πιέστε <font color="#678fff"> Always </font>.</string>
 
@@ -52,7 +54,7 @@
     <!-- Downloading files -->
     <string name="downloadImage">Λήψη εικόνας</string>
     <string name="permissionRequiredToDownload">Η λήψη απαιτεί άδεια αποθήκευσης</string>
-    <string name="downloadComplete">Η λήψη ολοκληρώθηκε.</string>
+    <string name="downloadComplete">Η λήψη ολοκληρώθηκε</string>
     <string name="downloadFailed">Αποτυχία λήψης</string>
     <string name="downloadInProgress">Λήψη…</string>
 
@@ -91,7 +93,9 @@
     <string name="faviconContentDescription">Favicon</string>
     <string name="closeContentDescription">Κλείσιμο</string>
     <string name="closeAllTabsMenuItem">Κλείσιμο όλων των καρτελών</string>
-    <string name="closeTab">Κλείσιμο καρτέλα</string>
+    <string name="closeTab">Κλείσιμο καρτέλας</string>
+    <string name="tabClosed">Η καρτέλα έκλεισε</string>
+    <string name="tabClosedUndo">Αναίρεση</string>
 
     <!-- Privacy Dashboard Activities -->
     <string name="privacyProtectionToggle">Προστασία της ιδιωτικότητας του ιστότοπου</string>
@@ -130,7 +134,7 @@
     </plurals>
 
     <string name="scorecardActivityTitle">Βαθμολογία ιδιωτικότητας</string>
-    <string name="scorecardSiteIsMemberOfMajorNetwork">Ο ιστότοπος είναι ένα κύριο δίκτυο παρακολούθησης</string>
+    <string name="scorecardSiteIsMemberOfMajorNetwork">Ο ιστότοπος είναι κύριο δίκτυο παρακολούθησης</string>
     <string name="scorecardPrivacyGrade">Βαθμολογία ιδιωτικότητας</string>
     <string name="scorecardEnhancedGrade">Βελτιωμένη βαθμολογία</string>
 
@@ -140,7 +144,7 @@
     <string name="practicesBad">Ακατάλληλες πρακτικές ιδιωτικότητας</string>
     <string name="practicesUnknown">Άγνωστες πρακτικές ιδιωτικότητας</string>
     <string name="practicesOverview">Οι πρακτικές ιδιωτικότητας υποδεικνύουν τον βαθμό προστασίας των προσωπικών πληροφοριών που μοιράζεστε με έναν ιστότοπο.</string>
-    <string name="practicesTosdrLink">Αποτελέσματα πρακτικών ιδιωτικότητας από <b><u>ToS;DR</u></b></string>
+    <string name="practicesTosdrLink">Αποτελέσματα πρακτικών ιδιωτικότητας από <b><u>ToS;DR</u></b>.</string>
     <string name="practicesIconContentGood">Εικονίδιο ορθής πρακτικής</string>
     <string name="practicesIconContentBad">Εικονίδιο ακατάλληλης πρακτικής</string>
 
@@ -162,39 +166,41 @@
     <string name="settingsLightTheme">Ανοιχτόχρωμο θέμα</string>
     <string name="settingsAboutDuckduckgo">Πληροφορίες για το DuckDuckGo</string>
     <string name="settingsVersion">Έκδοση</string>
-    <string name="leaveFeedback">Αφήστε σχόλια</string>
+    <string name="leaveFeedback">Κοινοποίηση σχολίου</string>
 
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Αποθήκευση</string>
 
     <string name="settingsAutomaticallyClearWhat">Αυτόματη εκκαθάριση…</string>
+    <string name="settingsAutomaticallyClearWhatDialogTitle">Αυτόματη εκκαθάριση…</string>
     <string name="settingsAutomaticallyClearWhatOptionNone">Κανένα</string>
     <string name="settingsAutomaticallyClearWhatOptionTabs">Καρτέλες</string>
     <string name="settingsAutomaticallyClearWhatOptionTabsAndData">Καρτέλες και δεδομένα</string>
 
     <string name="settingsAutomaticallyClearWhen">Εκκαθάριση στις…</string>
+    <string name="settingsAutomaticallyClearWhenDialogTitle">Εκκαθάριση στις…</string>
     <string name="settingsAutomaticallyClearWhenAppExitOnly">Μόνο έξοδος εφαρμογής</string>
     <string name="settingsAutomaticallyClearWhenAppExit5Seconds">Έξοδος εφαρμογής, ανενεργή για 5 δευτερόλεπτα</string>
     <string name="settingsAutomaticallyClearWhenAppExit5Minutes">Έξοδος εφαρμογής, ανενεργή για 5 λεπτά</string>
     <string name="settingsAutomaticallyClearWhenAppExit15Minutes">Έξοδος εφαρμογής, ανενεργή για 15 λεπτά</string>
     <string name="settingsAutomaticallyClearWhenAppExit30Minutes">Έξοδος εφαρμογής, ανενεργή για 30 λεπτά</string>
-    <string name="settingsAutomaticallyClearWhenAppExit60Minutes">Έξοδος εφαρμογής, ανενεργή για 60 λεπτά</string>
+    <string name="settingsAutomaticallyClearWhenAppExit60Minutes">Έξοδος εφαρμογής, ανενεργή για 1 ώρα</string>
 
     <!-- About Activity -->
-    <string name="aboutActivityTitle">Πληροφορίες για εμάς</string>
+    <string name="aboutActivityTitle">Σχετικά με το DuckDuckGo</string>
     <string name="aboutDescription">
-        Στην DuckDuckGo θέτουμε το νέο πρότυπο εμπιστοσύνης στο διαδίκτυο.\n\nΤο πρόγραμμα περιήγησης ιδιωτικότητας DuckDuckGo παρέχει όλα τα απαραίτητα στοιχεία ιδιωτικότητας που χρειάζεστε για να προστατεύσετε τον εαυτό σας κατά την αναζήτηση και περιήγηση στο διαδίκτυο, συμπεριλαμβανομένου του αποκλεισμού παρακολούθησης, πιο έξυπνης κρυπτογράφησης και ιδιωτικής αναζήτησης DuckDuckGo.\n\n Άλλωστε, στο διαδίκτυο δεν θα πρέπει να αισθάνεστε άβολα και το να απολαμβάνετε την ιδιωτικότητα που σας αξίζει στο διαδίκτυο θα πρέπει να είναι τόσο απλό όσο το κλείσιμο μιας πόρτας.</string>
+        Στην DuckDuckGo θέτουμε τα νέα πρότυπα αξιοπιστίας του διαδικτύου.\n\n Το πρόγραμμα περιήγησης Προστασίας προσωπικών δεδομένων DuckDuckGo παρέχει όλα όσα χρειάζεστε για να προστατεύετε τον εαυτό σας όταν πραγματοποιείτε αναζήτηση και περιήγηση στο διαδίκτυο, συμπεριλαμβανομένου του αποκλεισμού παρακολούθησης, πιο έξυπνης κρυπτογράφησης και ιδιωτικής αναζήτησης DuckDuckGo.\n\n Άλλωστε, στο διαδίκτυο δεν θα πρέπει να αισθάνεστε άβολα, ενώ το να απολαμβάνετε την ιδιωτικότητα που σας αξίζει στο διαδίκτυο θα πρέπει να είναι τόσο απλό όσο το κλείσιμο μιας πόρτας.</string>
     <string name="aboutMoreLink">Περισσότερα στη διεύθυνση duckduckgo.com/about</string>
     <string name="no_suggestions">Δεν υπάρχουν προτάσεις</string>
 
     <!-- Broken Site Activity -->
     <string name="brokenSiteReportBrokenSiteMenuItem">Αναφορά κατεστραμμένου ιστότοπου</string>
-    <string name="brokenSiteHeading">Αναφορά ενός κατεστραμμένου ιστότοπου</string>
-    <string name="brokenSiteSubmitted">Ευχαριστούμε! Τα σχόλια υποβλήθηκαν</string>
-    <string name="brokenSitesCategoriesTitle">Περιγράψτε τι συνέβη:</string>
+    <string name="brokenSiteHeading">Αναφορά ιστότοπου που δεν λειτουργεί</string>
+    <string name="brokenSiteSubmitted">Σας ευχαριστούμε! Το σχόλιο υποβλήθηκε.</string>
+    <string name="brokenSitesCategoriesTitle">Περιγράψτε τι συνέβη</string>
     <string name="brokenSitesCategoriesHint">Περιγράψτε τι συνέβη</string>
     <string name="brokenSiteSubmitButton">Αποστολή Αναφοράς</string>
-    <string name="brokenSiteDescription">Η υποβολή μιας ανώνυμης αναφοράς για σπασμένους συνδεσμους μασ βοηθά να πραγματοποιήσουμε επανόρθωση των εντοπισμένων σφαλμάτων και προβλημάτων αυτών των ζητημάτων και να βελτιώσουμε την εφαρμογή.</string>
+    <string name="brokenSiteDescription">Η υποβολή μιας ανώνυμης αναφοράς για σπασμένους συνδεσμους μας βοηθά να πραγματοποιήσουμε επανόρθωση των εντοπισμένων σφαλμάτων και προβλημάτων αυτών των ζητημάτων και να βελτιώσουμε την εφαρμογή.</string>
 
     <string name="brokenSiteCategoryImages">Οι εικόνες δεν φορτώθηκαν</string>
     <string name="brokenSiteCategoryPaywall">Ο ιστότοπος μου ζήτησε να απενεργοποιήσω</string>
@@ -249,17 +255,17 @@
     <string name="addWidgetCtaDismissButton">Απόρριψη</string>
     <string name="addWidgetInstructionsActivityTitle">Προσθήκη γραφικού στοιχείου</string>
     <string name="addWidgetInstruction1Label">1</string>
-    <string name="addWidgetInstruction1">Πατήστε παρατεταμένα στην αρχική οθόνη και ανοίξτε το μενού γραφικών στοιχείων</string>
+    <string name="addWidgetInstruction1">Πατήστε παρατεταμένα στην αρχική οθόνη και ανοίξτε το μενού γραφικών στοιχείων.</string>
     <string name="addWidgetInstruction2Label">2</string>
-    <string name="addWidgetInstruction2">Εύρεση του γραφικού στοιχείου DuckDuckGo</string>
+    <string name="addWidgetInstruction2">Εύρεση του γραφικού στοιχείου DuckDuckGo.</string>
     <string name="addWidgetInstruction3Label">3</string>
-    <string name="addWidgetInstruction3">Σύρετε το γραφικό στοιχείο στην αρχική οθόνη σας</string>
+    <string name="addWidgetInstruction3">Σύρετε το γραφικό στοιχείο στην αρχική οθόνη σας.</string>
     <string name="addWidgetInstructionsButtonGoHome">Μετάβαση στην αρχική οθόνη</string>
     <string name="addWidgetInstructionsButtonClose">Κλείσιμο</string>
 
     <!-- App Enjoyment / Rating / Feedback -->
     <string name="appEnjoymentDialogTitle">Απολαμβάνετε το DuckDuckGo;</string>
-    <string name="appEnjoymentDialogMessage">Θα θέλαμε να μάθουμε τη γνώμη σας</string>
+    <string name="appEnjoymentDialogMessage">Θα θέλαμε να μάθουμε τη γνώμη σας.</string>
     <string name="appEnjoymentDialogPositiveButton">Μου αρέσει</string>
     <string name="appEnjoymentDialogNegativeButton">Χρειάζεται βελτιώσεις</string>
 
@@ -269,8 +275,8 @@
     <string name="rateAppDialogNegativeButton" translatable="false">@string/noThanks</string>
 
     <string name="giveFeedbackDialogTitle">Λυπούμαστε πολύ για αυτό</string>
-    <string name="giveFeedbackDialogMessage">Πείτε μας πώς μπορούμε να βελτιώσουμε την εφαρμογή για εσάς</string>
-    <string name="giveFeedbackDialogPositiveButton">Υποβολή σχολίων</string>
+    <string name="giveFeedbackDialogMessage">Πείτε μας πώς μπορούμε να βελτιώσουμε την εφαρμογή για εσάς.</string>
+    <string name="giveFeedbackDialogPositiveButton">Κοινοποίηση σχολίου</string>
     <string name="giveFeedbackDialogNegativeButton" translatable="false">@string/noThanks</string>
 
     <string name="noThanks">Όχι, ευχαριστώ</string>
@@ -305,11 +311,11 @@
     <string name="systemTextSearchMessage">Αναζήτηση DuckDuckGo</string>
 
     <!-- App feedback disambiguation -->
-    <string name="feedbackActivityTitle">Μοιραστείτε τα σχόλιά σας</string>
+    <string name="feedbackActivityTitle">Κοινοποίηση σχολίου</string>
     <string name="missingBrowserFeaturesTitleLong">Δυνατότητες του προγράμματος περιήγησης που απουσιάζουν ή προκαλούν προβλήματα</string>
     <string name="missingBrowserFeaturesTitleShort">Προβλήματα με δυνατότητες του προγράμματος περιήγησης</string>
     <string name="missingBrowserFeaturesSubtitle">Ποιες δυνατότητες περιήγησης μπορούμε να προσθέσουμε ή να βελτιώσουμε;</string>
-    <string name="missingBrowserFeatureSubReasonNavigation">Πλοήγηση προς τα εμπρός, προς τα πίσω, ανανέωση</string>
+    <string name="missingBrowserFeatureSubReasonNavigation">Πλοήγηση προς τα εμπρός, προς τα πίσω, ή/και ανανέωση</string>
     <string name="missingBrowserFeatureSubReasonTabManagement">Δημιουργία και διαχείριση καρτελών</string>
     <string name="missingBrowserFeatureSubReasonAdPopups">Αποκλεισμός διαφημίσεων και αναδυόμενων παραθύρων</string>
     <string name="missingBrowserFeatureSubReasonVideos">Παρακολούθηση βίντεο</string>
@@ -317,7 +323,7 @@
     <string name="missingBrowserFeatureSubReasonBookmarks">Δημιουργία και διαχείριση σελιδοδεικτών</string>
     <string name="missingBrowserFeatureSubReasonOther">Τίποτα από τα παραπάνω</string>
 
-    <string name="websiteNotLoadingTitleLong">Σίγουρα ορισμένοι ιστότοποι δεν φορτώνουν σωστά</string>
+    <string name="websiteNotLoadingTitleLong">Προβλήματα φόρτωσης ιστότοπων</string>
     <string name="websiteNotLoadingTitleShort">Προβλήματα φόρτωσης ιστότοπων</string>
     <string name="websiteNotLoadingSubtitle">Ποιος ιστότοπος είναι κατεστραμμένος;</string>
 
@@ -353,19 +359,19 @@
     <string name="otherMainReasonTitleLong">Τίποτα από τα παραπάνω</string>
     <string name="otherMainReasonTitleShort">Άλλα προβλήματα</string>
 
-    <string name="openEndedInputHint">Πώς μπορούμε να βελτιωθούμε; (Προαιρετικό)</string>
-    <string name="submitFeedback">ΥΠΟΒΟΛΗ ΣΧΟΛΙΩΝ</string>
+    <string name="openEndedInputHint">Να είστε όσο το δυνατόν πιο συγκεκριμένοι</string>
+    <string name="submitFeedback">ΥΠΟΒΟΛΗ</string>
 
     <string name="tellUsHowToImprove">Πείτε μας πού μπορούμε να βελτιωθούμε.</string>
     <string name="thanksForTheFeedback">Ευχαριστούμε για τα σχόλιά σας!</string>
     <string name="feedbackNegativeMainReasonPageSubtitle">Με τι σχετίζεται περισσότερο το πρόβλημά σας;</string>
-    <string name="feedbackNegativeMainReasonPageTitle">Λυπούμαστε πολύ για αυτό.</string>
+    <string name="feedbackNegativeMainReasonPageTitle">Λυπούμαστε πολύ για αυτό</string>
     <string name="feedbackShareDetails">Μοιραστείτε τις λεπτομέρειες</string>
     <string name="sharePositiveFeedbackWithTheTeam">Υπάρχουν λεπτομέρειες που θα θέλατε να μοιραστείτε με την ομάδα;</string>
     <string name="whatHaveYouBeenEnjoying">Ποια στοιχεία απολαμβάνετε;</string>
     <string name="awesomeToHear">Αυτό μας κάνει πολύ χαρούμενους!</string>
     <string name="shareTheLoveWithARating">Δείξτε την αγάπη σας αξιολογώντας μας στο Play Store.</string>
-    <string name="rateTheApp">ΑΞΙΟΛΟΓΗΣΤΕ ΤΗΝ ΕΦΑΡΜΟΓΗ</string>
+    <string name="rateTheApp">ΑΞΙΟΛΟΓΗΣΗ ΕΦΑΡΜΟΓΗΣ</string>
     <string name="declineFurtherFeedback">ΟΧΙ ΕΥΧΑΡΙΣΤΩ, ΤΕΛΕΙΩΣΑ</string>
     <string name="whichBrokenSites">Πού βλέπετε τα προβλήματα αυτά;</string>
     <string name="whichBrokenSitesHint">Ποιος ιστότοπος παρουσιάζει προβλήματα;</string>
@@ -386,9 +392,9 @@
     <string name="systemSearchAppNotFound">Η εφαρμογή δεν βρέθηκε</string>
     <string name="systemSearchOnboardingText">Ευχαριστώ που επιλέξατε το DuckDuckGo!\nΤώρα, όταν χρησιμοποιείτε την αναζήτηση ή την εφαρμογή μας, οι αναζητήσεις σας προστατεύονται.</string>
     <string name="systemSearchOnboardingFeaturesIntroText">Η εφαρμογή DuckDuckGo επίσης:</string>
-    <string name="systemSearchOnboardingFeatureOneText">Αποκλείει μη ασφαλείς ιχνηλάτες</string>
-    <string name="systemSearchOnboardingFeatureTwoText">Επιβάλλει την κρυπτογράφηση στους ιστότοπους</string>
-    <string name="systemSearchOnboardingFeatureThreeText">Καθαρίζει τα δεδομένα με ένα άγγιγμα</string>
+    <string name="systemSearchOnboardingFeatureOneText">Αποκλείει μη ασφαλείς παρακολουθήσεις.</string>
+    <string name="systemSearchOnboardingFeatureTwoText">Επιβάλλει την κρυπτογράφηση στους ιστότοπους.</string>
+    <string name="systemSearchOnboardingFeatureThreeText">Καθαρίζει τα δεδομένα με ένα άγγιγμα.</string>
     <string name="systemSearchOnboardingButtonMore">Εμφάνιση περισσοτέρων</string>
     <string name="systemSearchOnboardingButtonLess">Αποκρυψη</string>
     <string name="systemSearchOnboardingButtonOk">Το έπιασα</string>
@@ -408,18 +414,18 @@
     <string name="onboardingDaxText"><![CDATA[Το Διαδίκτυο μπορεί να είναι κάπως ανατριχιαστικό.<br/><br/>Μην ανησυχείτε! Η ιδιωτική έρευνα και φυλλομέτρηση είναι ευκολότερες από όσο νομίζετε.]]></string>
     <string name="onboardingLetsDoItButton">Ας ξεκινήσουμε!</string>
     <string name="daxIntroCtaText"><![CDATA[Στη συνέχεια, δοκιμάστε να επισκεφτείτε έναν από τους αγαπημένους σας ιστότοπους! <br/><br/>Θα εμποδίσω τους ιχνηλάτες ώστε να μην μπορούν να σας κατασκοπεύουν. Επίσης, θα αναβαθμίσω την ασφάλεια της σύνδεσής σας αν είναι δυνατόν. 🔒]]></string>
-    <string name="daxEndCtaText"><![CDATA[Έχετε αυτό! <br/><br/>Να θυμάστε: κάθε φορά που περιηγείστε μαζί μου μια ανατριχιαστική διαφήμιση χάνει τα φτερά της. 👍]]></string>
+    <string name="daxEndCtaText"><![CDATA[Το έχετε! <br/><br/>Να θυμάστε: κάθε φορά που περιηγείστε μαζί μου μια ανατριχιαστική διαφήμιση χάνει τα φτερά της. 👍]]></string>
     <string name="daxSerpCtaText">Οι αναζητήσεις σας στο DuckDuckGo είναι ανώνυμες και ποτέ δεν αποθηκεύω το ιστορικό αναζήτησης. Ποτέ. 🙌</string>
     <plurals name="daxTrackersBlockedCtaText">
-        <item quantity="one"><![CDATA[ και <b>%1$d άλλος</b> προσπαθούσε να σας ιχνηλατήσει εδώ. <br/><br/>Τον μπλοκάρισα!<br/><br/> ☝️Μπορείτε να ελέγξετε τη γραμμή διευθύνσεων URL για να δείτε ποιος προσπαθεί να σας παρακολουθήσει όταν επισκέπτεστε έναν νέο ιστότοπο.️]]></item>
-        <item quantity="other"><![CDATA[ και <b>%1$d άλλοι</b> προσπαθούσαν να σας εντοπίσουν εδώ. <br/><br/>Τους εμπόδισα!<br/><br/> ☝️Μπορείτε να ελέγξετε τη γραμμή διευθύνσεων URL για να δείτε ποιος προσπαθεί να σας παρακολουθήσει όταν επισκέπτεστε έναν νέο ιστότοπο.️]]></item>
+        <item quantity="one"><![CDATA[ και <b>%1$d άλλος</b> προσπαθούσαν να σας παρακολουθήσουν εδώ. <br/><br/>Τους εμπόδισα!<br/><br/> ☝️Μπορείτε να ελέγξετε τη γραμμή διευθύνσεων για να δείτε ποιος προσπαθεί να σας παρακολουθήσει όταν επισκέπτεστε έναν νέο ιστότοπο.️]]></item>
+        <item quantity="other"><![CDATA[ και <b>%1$d άλλοι</b> προσπαθούσαν να σας παρακολουθήσουν εδώ. <br/><br/>Τους εμπόδισα!<br/><br/> ☝️Μπορείτε να ελέγξετε τη γραμμή διευθύνσεων URL για να δείτε ποιος προσπαθεί να σας παρακολουθήσει όταν επισκέπτεστε έναν νέο ιστότοπο.️]]></item>
     </plurals>
     <plurals name="daxTrackersBlockedCtaZeroText">
-        <item quantity="one"><![CDATA[ προσπαθούσε να σας εντοπίσει εδώ. <br/><br/>Το εμπόδισα!<br/><br/> ☝️Μπορείτε να ελέγξετε τη γραμμή διευθύνσεων URL για να δείτε ποιος προσπαθεί να σας παρακολουθήσει όταν επισκέπτεστε έναν νέο ιστότοπο.️]]></item>
-        <item quantity="other"><![CDATA[ προσπαθούσαν να σας εντοπίσει εδώ. <br/><br/>Το εμπόδισα!<br/><br/> ☝️Μπορείτε να ελέγξετε τη γραμμή διευθύνσεων URL για να δείτε ποιος προσπαθεί να σας παρακολουθήσει όταν επισκέπτεστε έναν νέο ιστότοπο.️]]></item>
+        <item quantity="one"><![CDATA[ προσπαθούσε να σας παρακολουθήσει εδώ. <br/><br/>Τους εμπόδισα!<br/><br/> ☝️Μπορείτε να ελέγξετε τη γραμμή διευθύνσεων URL για να δείτε ποιος προσπαθεί να σας παρακολουθήσει όταν επισκέπτεστε έναν νέο ιστότοπο.️]]></item>
+        <item quantity="other"><![CDATA[ προσπαθούσαν να σας παρακολουθήσει εδώ. <br/><br/>Τους εμπόδισα!<br/><br/> ☝️Μπορείτε να ελέγξετε τη γραμμή διευθύνσεων URL για να δείτε ποιος προσπαθεί να σας παρακολουθήσει όταν επισκέπτεστε έναν νέο ιστότοπο.️]]></item>
     </plurals>
     <string name="daxNonSerpCtaText"><![CDATA[Καθώς πιέζετε και μετακινείτε τον δρομέα, θα μπλοκάρω ενοχλητικούς ιχνηλάτες. <br/><br/> Εμπρός - συνεχίστε την περιήγηση!]]></string>
-    <string name="daxMainNetworkCtaText"><![CDATA[Ενημέρωση εκ των προτέρων! Το %1$s είναι ένα σημαντικό δίκτυο παρακολούθησης.<br/><br/> Οι ιχνηλάτες τους παραμονεύουν σε περίπου %2$s κορυφαίων ιστότοπων 😱 αλλά μην ανησυχείτε! <br/><br/>Θα μπλοκάρω %3$s σε αυτούς τους ιστότοπους την θέαση της δραστηριότητά σας.]]></string>
+    <string name="daxMainNetworkCtaText">Προσοχή! Δεν μπορώ να εμποδίσω το δίκτυο %1$s από το να δει τη δραστηριότητά σας στο %2$s.&lt;br/&gt;&lt;br/&gt;Αλλά περιηγηθείτε μαζί μου και θα μπορώ να περιορίσω το τι θα γνωρίζει το δίκτυο %3$s για σας συνολικά, αποκλείοντας τις εφαρμογές παρακολούθησης σε πλήθος άλλων ιστότοπων.</string>
     <string name="daxMainNetworkOwnedCtaText">Προσοχή! Επειδή το %1$s κατέχει %2$s, δεν μπορώ να τους εμποδίσω από το να δουν τη δραστηριότητά σας εδώ.&lt;br/&gt;&lt;br/&gt;Αλλά περιηγηθείτε μαζί μου και μπορώ να περιορίσω τι θα γνωρίζει το %3$s για εσάς συνολικά, αποκλείοντας τις εφαρμογές παρακολούθησής τους σε πλήθος άλλων ιστότοπων.</string>
 
     <!-- Download Confirmation -->
@@ -433,10 +439,10 @@
 
     <!-- Change Icon Activity -->
     <string name="changeIconActivityTitle">Εικονίδιο Εφαρμογής</string>
-    <string name="changeIconCtaLabel">Αλλαγή εικονιδίου Εφαρμογής</string>
+    <string name="changeIconCtaLabel">Εικονίδιο Εφαρμογής</string>
     <string name="changeIconCtaAccept">Εφαρμογή</string>
     <string name="changeIconCtaCancel">Ακύρωση</string>
-    <string name="changeIconDialogTitle">Εφαρμογή Νέου Εικονιδίου;</string>
+    <string name="changeIconDialogTitle">Εφαρμογή νέου εικονιδίου;</string>
     <string name="changeIconDialogMessage">Η εφαρμογή μπορεί να κλείσει για να εφαρμοστούν οι αλλαγές. Επιστρέψτε αφού θαυμάσετε το νέο σας όμορφο εικονίδιο.</string>
 
     <!-- New dashboard / menu buttons -->
@@ -446,17 +452,18 @@
     <!-- Dialogs -->
     <string name="dialogAddTitle">Προσθήκη</string>
     <string name="dialogEditTitle">Επεξεργασία</string>
+    <string name="dialogSaveAction">Αποθήκευση</string>
 
     <!-- Whitelist -->
     <string name="whitelisetActivityTitle">Μη προστατευόμενοι ιστότοποι</string>
     <string name="enablePrivacyProtection">Ενεργοποίηση Προστασίας προσωπικών δεδομένων</string>
     <string name="disablePrivacyProtection">Απενεργοποίηση Προστασίας προσωπικών δεδομένων</string>
     <string name="whitelistEntryOverflowContentDescription">Περισσότερες επιλογές για τον μη προστατευόμενο ιστότοπο %1$s</string>
-    <string name="whitelistEntryDeleteConfirmMessage">Είστε βέβαιοι ότι θέλετε να καταργήσετε το &lt;b&gt;%1$s&lt;/b&gt; από τους μη προστατευόμενους ιστότοπους;</string>
+    <string name="whitelistEntryDeleteConfirmMessage">Είστε βέβαιοι ότι θέλετε να καταργήσετε το &lt;b&gt;%1$s&lt;/b&gt; από τους Μη προστατευόμενους ιστότοπους;</string>
     <string name="whitelistExplanation">Οι ιστότοποι αυτοί δεν θα ενισχυθούν από την Προστασία προσωπικών δεδομένων.</string>
-    <string name="whitelistNoEntries">Δεν υπάρχουν ακόμα μη προστατευόμενοι ιστότοποι</string>
+    <string name="whitelistNoEntries">Η προστασία προσωπικών δεδομένων είναι ενεργοποιημένη για όλους τους ιστότοπους</string>
     <string name="whitelistDomainHint">www.example.com</string>
-    <string name="whitelistFormatError">Δεν ήταν δυνατή η αποθήκευση, εισαγάγετε ένα πεδίο όπως το <b>example.com</b></string>
+    <string name="whitelistFormatError">Εισαγάγετε ένα πεδίο τομέα όπως το <b>example.com</b> και προσπαθήστε ξανά</string>
 
     <!-- Settings -->
     <string name="settingsPrivacyProtectionWhitelist">Μη προστατευόμενοι ιστότοποι</string>
@@ -465,14 +472,14 @@
     <string name="fireproofWebsitesActivityTitle">Ασφαλείς ιστότοποι</string>
     <string name="settingsFireproofWebsites">Ασφαλείς ιστότοποι</string>
     <string name="fireproofWebsiteMenuTitleAdd">Ασφαλής ιστότοπος</string>
-    <string name="fireproofWebsiteSnackbarConfirmation">Το &lt;b&gt;%1$s&lt;/b&gt; είναι πλέον ασφαλές! Επισκεφτείτε τις Ρυθμίσεις για να μάθετε περισσότερα.</string>
+    <string name="fireproofWebsiteSnackbarConfirmation">Το &lt;b&gt;%1$s&lt;/b&gt; είναι πλέον ασφαλές! Επισκεφτείτε τις Ρυθμίσεις για να το διαχειριστείτε.</string>
     <string name="fireproofWebsiteSnackbarAction">Αναίρεση</string>
     <string name="fireproofWebsiteDeleteConfirmMessage">Είστε βέβαιοι ότι θέλετε να διαγράψετε το &lt;b&gt;%1$s&lt;/b&gt;;</string>
-    <string name="fireproofWebsiteEmptyListHint">Δεν υπάρχουν ασφαλείς ιστιότοποι ακόμα</string>
+    <string name="fireproofWebsiteEmptyListHint">Δεν υπάρχουν ασφαλείς ιστότοποι</string>
     <string name="fireproofWebsiteFeatureDescription">Οι ιστότοποι βασίζονται σε cookies για να σας διατηρούν συνδεδεμένους. Όταν ενεργοποιείτε τη διαγραφή δραστηριότητας για έναν ιστότοπο, τα cookies δεν διαγράφονται και παραμένετε συνδεδεμένοι, ακόμα και μετά τη χρήση του Κουμπιού διαγραφής δραστηριότητας. Εξακολουθούμε να αποκλείουμε εφαρμογές παρακολούθησης από τρίτους που υπάρχουν σε ιστότοπους με διαγραφή δραστηριότητας.</string>
     <string name="fireproofWebsiteOverflowContentDescription">Περισσότερες επιλογές για ασφαλή ιστότοπο %1$s</string>
     <string name="fireproofWebsiteLoginDialogTitle">Θα θέλατε να ενεργοποιήσετε τη διαγραφή δραστηριότητας για το %1$s;</string>
-    <string name="fireproofWebsiteLoginDialogDescription">Ενεργοποιώντας τη διαγραφή δραστηριότητας αυτόν τον ιστότοπο, θα παραμείνετε συνδεδεμένοι μετά τη χρήση του Κουμπιού διαγραφής δραστηριότητας.</string>
+    <string name="fireproofWebsiteLoginDialogDescription">Ενεργοποιώντας τη διαγραφή δραστηριότητας για αυτόν τον ιστότοπο, θα παραμείνετε συνδεδεμένοι μετά τη χρήση του Κουμπιού διαγραφής δραστηριότητας.</string>
     <string name="fireproofWebsiteLoginDialogPositive">Διαγραφή δραστηριότητας</string>
     <string name="fireproofWebsiteLoginDialogNegative">Όχι τώρα</string>
     <string name="fireproofWebsiteItemsSectionTitle">Ιστότοποι</string>
@@ -525,7 +532,7 @@
     <!--  Global Privacy Control-->
     <string name="globalPrivacyControlActivityTitle">Παγκόσμιος έλεγχος απορρήτου (GPC)</string>
     <string name="globalPrivacyControlDescription">
-        Τα δεδομένα σας δεν πρέπει να πωλούνται. Στην DuckDuckGo συμφωνούμε. Ενεργοποιήστε τη ρύθμιση \"Παγκόσμιος έλεγχος απορρήτου\" (GPC) και θα ενημερώσουμε τους ιστότοπους για την προτίμησή σας:\n\n• Να μην πωλούν τα προσωπικά δεδομένα σας.\n • Να περιορίσουν την κοινοποίηση των προσωπικών δεδομένων σας σε άλλες εταιρείες.
+        Τα δεδομένα σας δεν πρέπει να πωλούνται. Στην DuckDuckGo συμφωνούμε. Ενεργοποιήστε τη ρύθμιση \"Παγκόσμιος έλεγχος απορρήτου\" (GPC) και θα ενημερώσουμε τους ιστότοπους για την προτίμησή σας:&lt;br/&gt;&lt;br/&gt;• Να μην πωλούν τα προσωπικά δεδομένα σας.&lt;br/&gt;• Να περιορίσουν την κοινοποίηση των προσωπικών δεδομένων σας σε άλλες εταιρείες.
     </string>
     <string name="globalPrivacyControlSetting">Παγκόσμιος έλεγχος απορρήτου (GPC)</string>
     <string name="globalPrivacyControlToggle">Παγκόσμιος έλεγχος απορρήτου (GPC)</string>

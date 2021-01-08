@@ -49,6 +49,7 @@ import com.duckduckgo.app.global.rating.AppEnjoymentPromptEmitter
 import com.duckduckgo.app.global.rating.AppEnjoymentUserEventRecorder
 import com.duckduckgo.app.global.events.db.UserEventsStore
 import com.duckduckgo.app.global.useourapp.UseOurAppDetector
+import com.duckduckgo.app.globalprivacycontrol.GlobalPrivacyControl
 import com.duckduckgo.app.globalprivacycontrol.ui.GlobalPrivacyControlViewModel
 import com.duckduckgo.app.icon.api.IconModifier
 import com.duckduckgo.app.icon.ui.ChangeIconViewModel
@@ -128,7 +129,8 @@ class ViewModelFactory @Inject constructor(
     private val dismissedCtaDao: DismissedCtaDao,
     private val fileDownloader: FileDownloader,
     private val dispatcherProvider: DispatcherProvider,
-    private val fireAnimationLoader: FireAnimationLoader
+    private val fireAnimationLoader: FireAnimationLoader,
+    private val globalPrivacyControl: GlobalPrivacyControl
 ) : ViewModelProvider.NewInstanceFactory() {
 
     override fun <T : ViewModel> create(modelClass: Class<T>) =
@@ -226,7 +228,8 @@ class ViewModelFactory @Inject constructor(
         notificationDao = notificationDao,
         useOurAppDetector = userOurAppDetector,
         variantManager = variantManager,
-        fileDownloader = fileDownloader
+        fileDownloader = fileDownloader,
+        globalPrivacyControl = globalPrivacyControl
     )
 
     private fun changeAppIconViewModel() =

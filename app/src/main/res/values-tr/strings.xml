@@ -19,23 +19,25 @@
 
     <string name="appName" translatable="false">DuckDuckGo</string>
     <string name="appDescription" translatable="false">DuckDuckGo </string>
-    <string name="duckDuckGoLogoDescription">DuckDuckGo logo</string>
-    <string name="duckDuckGoPrivacySimplified">Gizlilik, basitleştirildi.</string>
+    <string name="duckDuckGoLogoDescription">DuckDuckGo logosu</string>
+    <string name="duckDuckGoPrivacySimplified">Gizlilik, basitleştirildi</string>
     <string name="yes">Evet</string>
     <string name="no">Hayır</string>
+    <string name="open">Aç</string>
+    <string name="cancel">Vazgeç</string>
     <string name="search">Arama yap</string>
 
     <!-- Onboarding Activity -->
     <string name="onboardingDefaultBrowserDescription">Her seferinde DuckDuckGo ile arama yapmak ve göz atmak için Ayarlar\'ı ziyaret edin.</string>
-    <string name="onboardingDefaultBrowserTitle">DuckDuckGo\'yu Varsayılan Yap</string>
+    <string name="onboardingDefaultBrowserTitle">DuckDuckGo\'yu varsayılan yap</string>
 
     <!-- Default Browser -->
     <string name="cannotLaunchDefaultAppSettings">Varsayılan uygulama ayarları ekranı başlatılamıyor</string>
     <string name="settingsDefaultBrowserEnabled">Varsayılan tarayıcı olarak ayarla</string>
-    <string name="defaultBrowserMaybeLater">Belki sonra</string>
-    <string name="defaultBrowserLetsDoIt">Hadi başlayalım!</string>
+    <string name="defaultBrowserMaybeLater">Belki Sonra</string>
+    <string name="defaultBrowserLetsDoIt">Varsayılan tarayıcı olarak ayarla</string>
     <string name="defaultBrowserDescriptionNoDefault">Her zaman gönül rahatlığıyla açık bağlantılar.</string>
-    <string name="defaultBrowserInstructions">DuckDuckGo\'yu seçin ve <font color="#678fff">Her zaman</font> öğesine dokunun.</string>
+    <string name="defaultBrowserInstructions">DuckDuckGo\'yu seçin ve <font color="#678fff">Her zaman</font> ögesine dokunun.</string>
 
     <!-- Browser Activity -->
     <string name="browserPopupMenu">Tarayıcı menüsü</string>
@@ -46,25 +48,25 @@
     <string name="omnibarInputHint">URL\'yi arayın veya bir URL yazın</string>
     <string name="clearButtonContentDescription">Arama girişini temizle</string>
     <string name="no_compatible_third_party_app_installed">Yüklü uyumlu uygulama yok</string>
-    <string name="addBookmarkMenuTitle">Yer imi ekle</string>
+    <string name="addBookmarkMenuTitle">Yer İmi ekle</string>
     <string name="requestDesktopSiteMenuTitle">Masaüstü Sitesi</string>
 
     <!-- Downloading files -->
     <string name="downloadImage">Resmi İndir</string>
     <string name="permissionRequiredToDownload">İndirme için depolama izni gerekiyor</string>
-    <string name="downloadComplete">İndirme tamamlandı.</string>
+    <string name="downloadComplete">İndirme tamamlandı</string>
     <string name="downloadFailed">İndirme başarısız</string>
     <string name="downloadInProgress">İndiriliyor</string>
 
     <!-- Sharing options -->
     <string name="options">Seçenekler</string>
-    <string name="shareLink">Linki paylaş</string>
+    <string name="shareLink">Bağlantıyı paylaş</string>
     <string name="shareMenuTitle">Paylaş…</string>
     <string name="copyUrl">Bağlantı Adresini Kopyala</string>
 
     <!-- Find in page -->
     <string name="findInPageMenuTitle">Sayfada bul</string>
-    <string name="nextSearchTermDescription">Sonraki bul</string>
+    <string name="nextSearchTermDescription">Sonrakini bul</string>
     <string name="previousSearchTermDescription">Öncekini bul</string>
     <string name="closeFindInPageButtonDescription">Sayfa görünümünde bul özelliğini kapat</string>
     <string name="findInPageHint">Sayfada bul</string>
@@ -75,8 +77,8 @@
     <string name="settingsAutocompleteEnabled">Otomatik Tamamlama Önerileri</string>
 
     <!-- Opening external apps -->
-    <string name="openExternalApp">Harici Uygulamayı Aç</string>
-    <string name="launchingExternalApp">Başka Bir Uygulamada Aç</string>
+    <string name="openExternalApp">Haricî Uygulamayı Aç</string>
+    <string name="launchingExternalApp">Başka uygulamada aç</string>
     <string name="confirmOpenExternalApp">Bu içeriği görüntülemek için DuckDuckGo\'dan ayrılmak ister misiniz?</string>
     <string name="unableToOpenLink">Bu tür bağlantı açılamıyor</string>
 
@@ -84,14 +86,16 @@
     <string name="homeTab" translatable="false">DuckDuckGo</string>
     <string name="tabActivityTitle">Sekmeler</string>
     <string name="tabsMenuItem">Sekmeler</string>
-    <string name="newTabMenuItem">Yeni sekme</string>
-    <string name="openInNewTab">Yeni sekmede aç</string>
+    <string name="newTabMenuItem">Yeni Sekme</string>
+    <string name="openInNewTab">Yeni Sekmede Aç</string>
     <string name="openInNewBackgroundTab">Arka Plan Sekmesinde Aç</string>
     <string name="openImageInNewTab">Görüntüyü Arka Plan Sekmesinde Aç</string>
     <string name="faviconContentDescription">Favicon</string>
     <string name="closeContentDescription">Kapat</string>
     <string name="closeAllTabsMenuItem">Tüm Sekmeleri Kapat</string>
     <string name="closeTab">Sekmeyi kapat</string>
+    <string name="tabClosed">Sekme kapatıldı</string>
+    <string name="tabClosedUndo">Geri al</string>
 
     <!-- Privacy Dashboard Activities -->
     <string name="privacyProtectionToggle">Site Gizlilik Koruması</string>
@@ -102,7 +106,7 @@
     <string name="privacyGradeContentDescription">Gizlilik Derecesi</string>
 
     <string name="httpsGood">Şifreli Bağlantı</string>
-    <string name="httpsMixed">Karma Şifreleme bağlantısı</string>
+    <string name="httpsMixed">Karma Şifreleme Bağlantısı</string>
     <string name="httpsBad">Şifrelenmemiş Bağlantı</string>
 
     <string name="networksActivityTitle">İzleyici Ağları</string>
@@ -130,7 +134,7 @@
     </plurals>
 
     <string name="scorecardActivityTitle">Gizlilik Derecesi</string>
-    <string name="scorecardSiteIsMemberOfMajorNetwork">Site Önemli İzleyici Ağlarından</string>
+    <string name="scorecardSiteIsMemberOfMajorNetwork">Site Önemli İzleyici Ağlarından Biri</string>
     <string name="scorecardPrivacyGrade">Gizlilik Derecesi</string>
     <string name="scorecardEnhancedGrade">Geliştirilmiş Sınıf</string>
 
@@ -140,16 +144,16 @@
     <string name="practicesBad">Kötü Gizlilik Uygulamaları</string>
     <string name="practicesUnknown">Bilinmeyen Gizlilik Uygulamaları</string>
     <string name="practicesOverview">Gizlilik uygulamaları, bir web sitesiyle paylaştığınız kişisel bilgilerin ne kadar korunduğunu gösterir.</string>
-    <string name="practicesTosdrLink">Gizlilik Uygulamaları <b> <u>ToS;DR</u> </b></string>
+    <string name="practicesTosdrLink">Gizlilik Uygulamaları: <b><u>ToS;DR</u></b>.</string>
     <string name="practicesIconContentGood">İyi Uygulama Simgesi</string>
     <string name="practicesIconContentBad">Kötü Uygulama Simgesi</string>
 
-    <string name="networkTrackerSummaryHeader">İZLEYİCİ AĞ ÜSTÜ TEKLİFLER</string>
-    <string name="networkTrackerSummaryNotReady">Kaç izleyiciyi engellediğimizi göstermek için hala veri topluyoruz.</string>
+    <string name="networkTrackerSummaryHeader">İZLEYİCİ AĞ İLK SIRADAKİ SUÇLULARI</string>
+    <string name="networkTrackerSummaryNotReady">Kaç izleyiciyi engellediğimizi göstermek için hâlâ veri topluyoruz.</string>
 
     <!-- Fire -->
     <string name="fireMenu">Verileri Temizle</string>
-    <string name="fireClearAll">Tüm Sekmeleri ve Verileri Temizle</string>
+    <string name="fireClearAll">Tüm sekmeleri ve verileri temizle</string>
     <string name="fireCancel">İptal</string>
     <string name="fireDataCleared">Veri silindi</string>
 
@@ -162,36 +166,38 @@
     <string name="settingsLightTheme">Açık Tema</string>
     <string name="settingsAboutDuckduckgo">DuckDuckGo Hakkında</string>
     <string name="settingsVersion">Versiyon</string>
-    <string name="leaveFeedback">Geri bildirim bırakın</string>
+    <string name="leaveFeedback">Geri Bildirim Paylaş</string>
 
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Kaydet</string>
 
-    <string name="settingsAutomaticallyClearWhat">Otomatik olarak siliniyor…</string>
+    <string name="settingsAutomaticallyClearWhat">Otomatik Olarak Temizle...</string>
+    <string name="settingsAutomaticallyClearWhatDialogTitle">Otomatik olarak temizle...</string>
     <string name="settingsAutomaticallyClearWhatOptionNone">Yok</string>
     <string name="settingsAutomaticallyClearWhatOptionTabs">Sekmeler</string>
     <string name="settingsAutomaticallyClearWhatOptionTabsAndData">Sekmeler ve veriler</string>
 
     <string name="settingsAutomaticallyClearWhen">Temizle…</string>
+    <string name="settingsAutomaticallyClearWhenDialogTitle">Temizle…</string>
     <string name="settingsAutomaticallyClearWhenAppExitOnly">Uygulamadan çık</string>
     <string name="settingsAutomaticallyClearWhenAppExit5Seconds">Uygulamadan çık, 5 saniye boyunca inaktif</string>
     <string name="settingsAutomaticallyClearWhenAppExit5Minutes">Uygulamadan çık, 5 dakika boyunca inaktif</string>
     <string name="settingsAutomaticallyClearWhenAppExit15Minutes">Uygulamadan çık, 15 dakika boyunca inaktif</string>
     <string name="settingsAutomaticallyClearWhenAppExit30Minutes">Uygulamadan çık, 30 dakika boyunca inaktif</string>
-    <string name="settingsAutomaticallyClearWhenAppExit60Minutes">Uygulamadan çık, 60 dakika boyunca inaktif</string>
+    <string name="settingsAutomaticallyClearWhenAppExit60Minutes">1 saat boyunca hareket yoksa uygulamadan çık</string>
 
     <!-- About Activity -->
-    <string name="aboutActivityTitle">Hakkımızda</string>
+    <string name="aboutActivityTitle">DuckDuckGo Hakkında</string>
     <string name="aboutDescription">
-        DuckDuckGo\'da, yeni çevrimiçi güven standardını belirliyoruz.\n\n DuckDuckGo Gizlilik Tarayıcısı, izleyici engelleme, akıllı şifreleme ve DuckDuckGo özel araması da dahil olmak üzere web\'de arama ve göz atma sırasında kendinizi korumak için ihtiyacınız olan tüm gizlilik özelliklerini sağlar.\n\n Sonuçta, internet sizi korkutmamalı ve çevrimiçiyken hak ettiğiniz gizliliği elde etmek, panjurları kapatmak kadar basit olmalı.</string>
+        DuckDuckGo\'da, internet için yeni güven standardını belirliyoruz.\n\nDuckDuckGo Gizlilik Tarayıcısı, izleyici engelleme, akıllı şifreleme ve DuckDuckGo özel araması da dâhil olmak üzere web\'de arama ve göz atma sırasında kendinizi korumak için ihtiyacınız olan tüm gizlilik özelliklerini sağlar.\n\nNe de olsa, internet sizi korkutmamalı ve internette hakkınız olan gizliliği elde etmek panjurları kapatmak kadar basit olmalı.</string>
     <string name="aboutMoreLink">Duckduckgo.com/about adresinde daha fazla bilgi edinin</string>
     <string name="no_suggestions">Öneri yok</string>
 
     <!-- Broken Site Activity -->
     <string name="brokenSiteReportBrokenSiteMenuItem">Hatalı Siteyi Bildirin</string>
-    <string name="brokenSiteHeading">Hatalı Bir Siteyi Bildirin</string>
-    <string name="brokenSiteSubmitted">Teşekkür ederiz! Geri bildirim gönderildi</string>
-    <string name="brokenSitesCategoriesTitle">Ne olduğunu açıklayın:</string>
+    <string name="brokenSiteHeading">Hatalı Siteyi Bildir</string>
+    <string name="brokenSiteSubmitted">Teşekkürler! Geri bildirim gönderildi.</string>
+    <string name="brokenSitesCategoriesTitle">Ne olduğunu açıklayın</string>
     <string name="brokenSitesCategoriesHint">Ne olduğunu açıklayın</string>
     <string name="brokenSiteSubmitButton">Rapor gönder</string>
     <string name="brokenSiteDescription">Anonim olarak hatalı site raporu göndermeniz, bu sorunları ayıklamamıza ve uygulamayı geliştirmemize yardımcı olur.</string>
@@ -202,18 +208,18 @@
     <string name="brokenSiteCategoryVideos">Video oynatılamadı</string>
     <string name="brokenSiteCategoryLinks">Bağlantılar veya düğmeler çalışmıyor</string>
     <string name="brokenSiteCategoryContent">İçerik eksik</string>
-    <string name="brokenSiteCategoryLogin">Giriş yapamıyorum</string>
+    <string name="brokenSiteCategoryLogin">Oturum açamıyorum</string>
     <string name="brokenSiteCategoryUnsupported">Tarayıcı uyumsuz</string>
     <string name="brokenSiteCategoryOther">Başka bir şey</string>
 
     <!-- Bookmarks Activity -->
-    <string name="bookmarksMenuTitle">Yer imleri</string>
-    <string name="bookmarksActivityTitle">Yer imleri</string>
+    <string name="bookmarksMenuTitle">Yer İmleri</string>
+    <string name="bookmarksActivityTitle">Yer İmleri</string>
     <string name="bookmarkDeleteConfirmMessage">&lt;b&gt;%1$s&lt;/b&gt; yer imini silmek istediğinizden emin misiniz?</string>
     <string name="bookmarkAddedFeedback">Yer imi eklendi</string>
     <string name="bookmarkTitleHint">Yer imi başlığı</string>
     <string name="bookmarkUrlHint">Yer imi URL\'si</string>
-    <string name="bookmarkTitleEdit">Yer İşaretini Düzenle</string>
+    <string name="bookmarkTitleEdit">Yer işaretini düzenle</string>
     <string name="noBookmarks">Henüz yer işareti eklenmedi</string>
     <string name="bookmarkOverflowContentDescription">%1$s yer imi için diğer seçenekler</string>
     <string name="bookmarkEdited">Yer imi eklendi</string>
@@ -239,7 +245,7 @@
     <string name="surveyTitle">DUCKDUCKGO ANKETİ</string>
     <string name="surveyDismissContentDescription">Anketi kapat</string>
     <string name="surveyLoadingErrorTitle">Olamaz!</string>
-    <string name="surveyLoadingErrorText">Anketimiz şu anda yüklenemiyor.\nLütfen daha sonra tekrar deneyiniz.</string>
+    <string name="surveyLoadingErrorText">Anketimiz şu anda yüklenemiyor.\nLütfen daha sonra tekrar deneyin.</string>
 
     <!-- Add widget -->
     <string name="addWidgetCtaTitle">Arama Widget\'ımızı deneyin!</string>
@@ -249,35 +255,35 @@
     <string name="addWidgetCtaDismissButton">Reddet</string>
     <string name="addWidgetInstructionsActivityTitle">Widget ekle</string>
     <string name="addWidgetInstruction1Label">1</string>
-    <string name="addWidgetInstruction1">Ana ekranınıza uzun basın, ardından widgetlar menüsünü açın</string>
+    <string name="addWidgetInstruction1">Ana ekranınıza uzun basıp widget\'lar menüsünü açın.</string>
     <string name="addWidgetInstruction2Label">2</string>
-    <string name="addWidgetInstruction2">DuckDuckGo widget\'ını bulun</string>
+    <string name="addWidgetInstruction2">DuckDuckGo widget\'ını bulun.</string>
     <string name="addWidgetInstruction3Label">3</string>
-    <string name="addWidgetInstruction3">Widget\'ı ana ekranınıza sürükleyin</string>
+    <string name="addWidgetInstruction3">Widget\'ı ana ekranınıza sürükleyin.</string>
     <string name="addWidgetInstructionsButtonGoHome">Ana Ekrana Git</string>
     <string name="addWidgetInstructionsButtonClose">Kapat</string>
 
     <!-- App Enjoyment / Rating / Feedback -->
     <string name="appEnjoymentDialogTitle">DuckDuckGo\'yu sevdiniz mi?</string>
-    <string name="appEnjoymentDialogMessage">Ne düşündüğünüzü bilmek istiyoruz</string>
-    <string name="appEnjoymentDialogPositiveButton">Sevdim.</string>
-    <string name="appEnjoymentDialogNegativeButton">Üzerinde çalışılmalı.</string>
+    <string name="appEnjoymentDialogMessage">Düşüncelerinizi öğrenmek isteriz.</string>
+    <string name="appEnjoymentDialogPositiveButton">Sevdim</string>
+    <string name="appEnjoymentDialogNegativeButton">Üzerinde çalışılmalı</string>
 
     <string name="rateAppDialogTitle">Uygulamayı değerlendir</string>
     <string name="rateAppDialogMessage">Görüşleriniz önemli. Lütfen bir inceleme yazın.</string>
-    <string name="rateAppDialogPositiveButton">Uygulamayı Değerlendir.</string>
+    <string name="rateAppDialogPositiveButton">Uygulamayı Değerlendir</string>
     <string name="rateAppDialogNegativeButton" translatable="false">@string/noThanks</string>
 
     <string name="giveFeedbackDialogTitle">Bunu duyduğumuza üzüldük</string>
-    <string name="giveFeedbackDialogMessage">Uygulamayı sizin için nasıl geliştirebileceğimizi bize bildirin</string>
-    <string name="giveFeedbackDialogPositiveButton">Geri Bildirim Ver</string>
+    <string name="giveFeedbackDialogMessage">Uygulamayı sizin için nasıl geliştirebileceğimizi bize bildirin.</string>
+    <string name="giveFeedbackDialogPositiveButton">Geri Bildirim Paylaş</string>
     <string name="giveFeedbackDialogNegativeButton" translatable="false">@string/noThanks</string>
 
-    <string name="noThanks">Hayır teşekkürler</string>
+    <string name="noThanks">Hayır Teşekkürler</string>
 
     <!-- Notification Channel Names -->
     <string name="notificationChannelFileDownloading">Dosya İndiriliyor</string>
-    <string name="notificationChannelFileDownloaded">İndirilen Dosya</string>
+    <string name="notificationChannelFileDownloaded">Dosya indirildi</string>
     <string name="notificationChannelTutorials">Öğreticiler</string>
 
     <!-- Clear Notification -->
@@ -288,7 +294,7 @@
     <string name="privacyProtectionNotificationDefaultTitle">Gizliliğinizi koruyoruz</string>
     <string name="privacyProtectionNotificationReportTitle">Gizlilik Raporunuz</string>
     <string name="privacyProtectionNotificationDefaultDescription">DuckDuckGo uygulamasını kullanmak, izleyicileri engelleyerek ve bağlantıları şifreleyerek verilerinizi korur.</string>
-    <string name="privacyProtectionNotificationUpgadeDescription">DuckDuckGo kullanırken %1$d şifrelenmemiş bağlantıyı güvenli hale getirerek verilerinizi korudunuz.</string>
+    <string name="privacyProtectionNotificationUpgadeDescription">DuckDuckGo kullanırken %1$d şifrelenmemiş bağlantıyı güvenli hâle getirerek verilerinizi korudunuz.</string>
     <string name="privacyProtectionNotificationTrackerDescription">DuckDuckGo kullanırken %1$d izleyiciyi engelleyerek verilerinizi korudunuz.</string>
     <string name="privacyProtectionNotificationBothDescription">DuckDuckGo kullanırken %1$d izleyiciyi engelleyerek ve %2$d şifrelenmemiş bağlantıyı güvenceye alarak verilerinizi korudunuz.</string>
     <string name="privacyProtectionNotificationLaunchButton">Taramayı Sürdür</string>
@@ -296,7 +302,7 @@
     <!-- Authentication -->
     <string name="authenticationDialogTitle">Oturum aç</string>
     <string name="authenticationDialogMessage">%1$s için bir kullanıcı adı ve şifre gerekiyor.</string>
-    <string name="authenticationDialogPositiveButton">Oturum aç</string>
+    <string name="authenticationDialogPositiveButton">Oturum Aç</string>
     <string name="authenticationDialogNegativeButton">İptal</string>
     <string name="authenticationDialogUsernameHint">Kullanıcı adı</string>
     <string name="authenticationDialogPasswordHint">Parola</string>
@@ -305,11 +311,11 @@
     <string name="systemTextSearchMessage">DuckDuckGo\'da Ara</string>
 
     <!-- App feedback disambiguation -->
-    <string name="feedbackActivityTitle">Görüşlerinizi Paylaşın</string>
+    <string name="feedbackActivityTitle">Geri Bildirim Paylaş</string>
     <string name="missingBrowserFeaturesTitleLong">Tarayıcı özellikleri eksik veya sinir bozucu</string>
     <string name="missingBrowserFeaturesTitleShort">Tarayıcı Özelliği Sorunları</string>
     <string name="missingBrowserFeaturesSubtitle">Hangi tarama özelliğini ekleyebilir veya geliştirebiliriz?</string>
-    <string name="missingBrowserFeatureSubReasonNavigation">İleri gitme, geri gitme, yenileme</string>
+    <string name="missingBrowserFeatureSubReasonNavigation">İleri geri gitme ve/veya yenileme</string>
     <string name="missingBrowserFeatureSubReasonTabManagement">Sekmeler oluşturma ve yönetme</string>
     <string name="missingBrowserFeatureSubReasonAdPopups">Reklam ve pop-up engelleme</string>
     <string name="missingBrowserFeatureSubReasonVideos">Videoları izleme</string>
@@ -317,7 +323,7 @@
     <string name="missingBrowserFeatureSubReasonBookmarks">Yer imleri oluşturma ve yönetme</string>
     <string name="missingBrowserFeatureSubReasonOther">Bunların hiçbiri</string>
 
-    <string name="websiteNotLoadingTitleLong">Web siteleri doğru yüklenmiyor</string>
+    <string name="websiteNotLoadingTitleLong">Web Sitesi Yükleme Sorunları</string>
     <string name="websiteNotLoadingTitleShort">Web sitesi yükleme Sorunları</string>
     <string name="websiteNotLoadingSubtitle">Hangi web sitesi hatalı?</string>
 
@@ -337,13 +343,13 @@
     <string name="needMoreCustomizationSubReasonHomeScreenConfiguration">Ana ekran yapılandırması</string>
     <string name="needMoreCustomizationSubReasonTabDisplay">Sekmelerin görüntülenme şekli</string>
     <string name="needMoreCustomizationSubReasonAppLooks">Uygulamanın görünüşü</string>
-    <string name="needMoreCustomizationSubReasonWhichDataIsCleared">Silinen veri</string>
+    <string name="needMoreCustomizationSubReasonWhichDataIsCleared">Hangi veriler temizlenir</string>
     <string name="needMoreCustomizationSubReasonWhenDataIsCleared">Veriler temizlendiğinde</string>
     <string name="needMoreCustomizationSubReasonBookmarksDisplay">Yer imlerinin görünüşü</string>
     <string name="needMoreCustomizationSubReasonOther">Bunların hiçbiri</string>
 
     <string name="appIsSlowOrBuggyTitleLong">Uygulama yavaş, hatalı veya kilitleniyor</string>
-    <string name="appIsSlowOrBuggyTitleShort">Performans sorunları</string>
+    <string name="appIsSlowOrBuggyTitleShort">Performans Sorunları</string>
     <string name="appIsSlowOrBuggySubtitle">Hangi sorunu yaşıyorsunuz?</string>
     <string name="appIsSlowOrBuggySubReasonSlowResults">Web sayfaları veya arama sonuçları yavaş yükleniyor</string>
     <string name="appIsSlowOrBuggySubReasonAppCrashesOrFreezes">Uygulama çöküyor veya donuyor</string>
@@ -351,19 +357,19 @@
     <string name="appIsSlowOrBuggySubReasonOther">Bunların hiçbiri</string>
 
     <string name="otherMainReasonTitleLong">Bunların hiçbiri</string>
-    <string name="otherMainReasonTitleShort">Diğer sorunlar</string>
+    <string name="otherMainReasonTitleShort">Diğer Sorunlar</string>
 
-    <string name="openEndedInputHint">Nasıl gelişebiliriz? (İsteğe bağlı)</string>
-    <string name="submitFeedback">GERİ BİLDİRİM GÖNDER</string>
+    <string name="openEndedInputHint">Lütfen mümkün olduğunca spesifik olun</string>
+    <string name="submitFeedback">GÖNDER</string>
 
     <string name="tellUsHowToImprove">Lütfen neyi geliştirebileceğimizi bize bildirin.</string>
     <string name="thanksForTheFeedback">Geri dönüşünüz için teşekkür ederiz!</string>
     <string name="feedbackNegativeMainReasonPageSubtitle">En çok ne ile ilgili sıkıntı yaşadınız?</string>
-    <string name="feedbackNegativeMainReasonPageTitle">Bunu duyduğumuz için üzgünüz.</string>
-    <string name="feedbackShareDetails">Ayrıntıları paylaşın</string>
+    <string name="feedbackNegativeMainReasonPageTitle">Bunu Duyduğumuza Üzüldük</string>
+    <string name="feedbackShareDetails">Ayrıntıları Paylaşın</string>
     <string name="sharePositiveFeedbackWithTheTeam">Ekiple paylaşmak istediğiniz ayrıntılar var mı?</string>
     <string name="whatHaveYouBeenEnjoying">Nelerden hoşlandınız?</string>
-    <string name="awesomeToHear">Bunu duymak harika!</string>
+    <string name="awesomeToHear">Bunu Duymak Harika!</string>
     <string name="shareTheLoveWithARating">Lütfen Play Store\'da değerlendirin.</string>
     <string name="rateTheApp">UYGULAMAYI DEĞERLENDİR</string>
     <string name="declineFurtherFeedback">HAYIR TEŞEKKÜR EDERİM</string>
@@ -372,7 +378,7 @@
     <string name="feedbackSpecificAsPossible">Lütfen mümkün olduğunca spesifik olun</string>
     <string name="feedbackInitialDisambiguationTitle">Başlayalım!</string>
     <string name="feedbackInitialDisambiguationSubtitle">Geri bildirimlerinizi nasıl sınıflandırırsınız?</string>
-    <string name="feedbackInitialDisambiguationHappyButtonContentDescription">Olumlu geribildirim düğmesi</string>
+    <string name="feedbackInitialDisambiguationHappyButtonContentDescription">Olumlu geri bildirim düğmesi</string>
     <string name="feedbackInitialDisambiguationSadButtonContentDescription">Olumsuz geri bildirim düğmesi</string>
     <string name="feedbackIsImportantToUs">İsimsiz geri bildiriminiz bizim için önemlidir.</string>
 
@@ -386,9 +392,9 @@
     <string name="systemSearchAppNotFound">Uygulama bulunamadı</string>
     <string name="systemSearchOnboardingText">DuckDuckGo\'yu seçtiğiniz için teşekkürler!\nArama motorumuzu veya uygulamamızı kullanırken tüm aramalarınız güvende.</string>
     <string name="systemSearchOnboardingFeaturesIntroText">DuckDuckGo uygulaması ayrıca:</string>
-    <string name="systemSearchOnboardingFeatureOneText">Güvenli olmayan izleyicileri engeller</string>
-    <string name="systemSearchOnboardingFeatureTwoText">Web sitelerinde şifrelemeyi zorlar</string>
-    <string name="systemSearchOnboardingFeatureThreeText">Tek dokunuşla verileri temizler</string>
+    <string name="systemSearchOnboardingFeatureOneText">Güvenli olmayan izleyicileri engeller.</string>
+    <string name="systemSearchOnboardingFeatureTwoText">Web sitelerinde şifrelemeyi zorunlu kılar.</string>
+    <string name="systemSearchOnboardingFeatureThreeText">Tek dokunuşla verileri temizler.</string>
     <string name="systemSearchOnboardingButtonMore">Daha fazla göster</string>
     <string name="systemSearchOnboardingButtonLess">Gizle</string>
     <string name="systemSearchOnboardingButtonOk">Anladım</string>
@@ -397,29 +403,29 @@
     <string name="daxDialogHideButton">GİZLE</string>
     <string name="daxDialogPhew">Uf!</string>
     <string name="daxDialogNext">Sonraki</string>
-    <string name="daxDialogHighFive">Çak bir beşlik!</string>
+    <string name="daxDialogHighFive">Çak Bir Beşlik!</string>
     <string name="daxDialogGotIt">Anladım</string>
     <string name="hideTipsTitle">Kalan ipuçları gizlensin mi?</string>
-    <string name="hideTipsText">Sadece birkaç tane var ve onları da bilgilendirici hale getirmeye çalıştık.</string>
+    <string name="hideTipsText">Sadece birkaç tane var ve onları da bilgilendirici hâle getirmeye çalıştık.</string>
     <string name="hideTipsButton">İpuçlarını sonsuza kadar gizle</string>
 
     <!-- New Onboarding Experience -->
-    <string name="onboardingWelcomeTitle">"DuckDuckGo'ya hoş geldiniz!"</string>
+    <string name="onboardingWelcomeTitle">"DuckDuckGo'ya Hoş Geldiniz!"</string>
     <string name="onboardingDaxText"><![CDATA[İnternet biraz ürkütücü olabilir.<br/><br/>Endişelenmeyin! Özel olarak arama yapmak ve sitelere göz atmak düşündüğünüzden daha kolaydır.]]></string>
-    <string name="onboardingLetsDoItButton">Hadi başlayalım!</string>
+    <string name="onboardingLetsDoItButton">Hadi Başlayalım!</string>
     <string name="daxIntroCtaText"><![CDATA[Şimdi favori sitelerinizden birini ziyaret etmeyi deneyin! <br/><br/>İzleyicileri engelleyeceğim, böylece sizi gözetlemeyecekler. Mümkünse bağlantınızın güvenliğini de yükselteceğim. 🔒]]></string>
-    <string name="daxEndCtaText"><![CDATA[İşte böyle!<br/><br/>Unutmayın: benimle İnterneti her gezişinizde tüyler ürpertici bir reklam daha kaybolur . 👍]]></string>
+    <string name="daxEndCtaText"><![CDATA[İşte bu kadar!<br/><br/>Unutmayın: İnterneti benimle ne kadar çok gezerseniz rahatsız edici reklamları da o kadar az görürsünüz. 👍]]></string>
     <string name="daxSerpCtaText">DuckDuckGo aramalarınız anonimdir ve arama geçmişiniz asla saklanmaz. Asla. 🙌</string>
     <plurals name="daxTrackersBlockedCtaText">
-        <item quantity="one"><![CDATA[ ve <b>%1$d diğer</b> sizi burada izlemeye çalışıyordu. <br/><br/>Onları engelledim!<br/><br/> ☝️Yeni bir siteyi ziyaret ettiğinizde sizi kimin izlemeye çalıştığını görmek için URL çubuğunu kontrol edebilirsiniz.]]></item>
-        <item quantity="other"><![CDATA[ ve <b>%1$d diğerleri</b> sizi burada izlemeye çalışıyordu. <br/><br/>Onları engelledim!<br/><br/> ☝️Yeni bir siteyi ziyaret ettiğinizde sizi kimin izlemeye çalıştığını görmek için URL çubuğunu kontrol edebilirsiniz.]]></item>
+        <item quantity="one"><![CDATA[ ve <b>%1$d diğer</b> site sizi burada izlemeye çalışıyordu.<br/><br/>Onları engelledim!<br/><br/>☝️ Yeni bir siteyi ziyaret ettiğinizde sizi kimin izlemeye çalıştığını görmek için URL çubuğunu kontrol edebilirsiniz.]]></item>
+        <item quantity="other"><![CDATA[ ve <b>%1$d diğer</b> site sizi burada izlemeye çalışıyordu.<br/><br/>Onları engelledim!<br/><br/>☝️ Yeni bir siteyi ziyaret ettiğinizde sizi kimin izlemeye çalıştığını görmek için URL çubuğunu kontrol edebilirsiniz.]]></item>
     </plurals>
     <plurals name="daxTrackersBlockedCtaZeroText">
-        <item quantity="one"><![CDATA[ sizi burada izlemeye çalışıyordu. <br/><br/>Onu engelledim!<br/><br/> ☝️Yeni bir siteyi ziyaret ettiğinizde sizi kimin izlemeye çalıştığını görmek için URL çubuğunu kontrol edebilirsiniz.]]></item>
-        <item quantity="other"><![CDATA[ sizi burada izlemeye çalışıyordu. <br/><br/>Onu engelledim!<br/><br/> ☝️Yeni bir siteyi ziyaret ettiğinizde sizi kimin izlemeye çalıştığını görmek için URL çubuğunu kontrol edebilirsiniz.]]></item>
+        <item quantity="one"><![CDATA[ sizi burada izlemeye çalışıyordu. <br/><br/>Onları engelledim!<br/><br/> ☝️Yeni bir siteyi ziyaret ettiğinizde sizi kimin izlemeye çalıştığını görmek için URL çubuğunu kontrol edebilirsiniz.]]></item>
+        <item quantity="other"><![CDATA[ sizi burada izlemeye çalışıyordu. <br/><br/>Onları engelledim!<br/><br/> ☝️Yeni bir siteyi ziyaret ettiğinizde sizi kimin izlemeye çalıştığını görmek için URL çubuğunu kontrol edebilirsiniz.]]></item>
     </plurals>
     <string name="daxNonSerpCtaText"><![CDATA[Siz gezintinize devam ederken sinir bozucu izleyicileri engelleyeceğim. <br/><br/>Hadi, gezinmeye devam edin!]]></string>
-    <string name="daxMainNetworkCtaText"><![CDATA[Dikkat! %1$s büyük bir izleme ağıdır.<br/><br/> İzleyicileri, en iyi sitelerin yaklaşık %2$s kadarını gizliyor 😱 ancak endişelenmeyin! <br/><br/>%3$s \'nin bu sitelerdeki etkinliğinizi görmesini engelleyeceğim.]]></string>
+    <string name="daxMainNetworkCtaText">Dikkat! %2$s üzerindeki etkinliğinizin %1$s tarafından görülmesini önleyemiyorum&lt;br/&gt;&lt;br/&gt;Ama benimle gezinirseniz diğer birçok sitedeki izleyicisini engelleyerek %3$s tarafından sizinle ilgili olarak toplanan bilgilerin miktarını genel anlamda azaltabilirim.</string>
     <string name="daxMainNetworkOwnedCtaText">Dikkat! %2$s sitesinin sahibi %1$s olduğundan, onların buradaki etkinliğinizi görmesini engelleyemem.&lt;br/&gt;&lt;br/&gt;Ama benimle gezinirseniz diğer sitelerdeki pek çok izleyicisini engelleyerek sizin hakkınızda %3$s tarafından bilinenleri genel anlamda azaltabilirim.</string>
 
     <!-- Download Confirmation -->
@@ -433,7 +439,7 @@
 
     <!-- Change Icon Activity -->
     <string name="changeIconActivityTitle">Uygulama Simgesi</string>
-    <string name="changeIconCtaLabel">Uygulama Simgesini Değiştir</string>
+    <string name="changeIconCtaLabel">Uygulama Simgesi</string>
     <string name="changeIconCtaAccept">Uygula</string>
     <string name="changeIconCtaCancel">İptal</string>
     <string name="changeIconDialogTitle">Yeni simge uygulansın mı?</string>
@@ -441,11 +447,12 @@
 
     <!-- New dashboard / menu buttons -->
     <string name="manageWhitelist">Korumasız Siteler</string>
-    <string name="reportBrokenSite">Hatalı Siteyi Bildir</string>
+    <string name="reportBrokenSite">Hatalı Siteyi Bildirin</string>
 
     <!-- Dialogs -->
     <string name="dialogAddTitle">Ekle</string>
     <string name="dialogEditTitle">Düzenle</string>
+    <string name="dialogSaveAction">Kaydet</string>
 
     <!-- Whitelist -->
     <string name="whitelisetActivityTitle">Korumasız Siteler</string>
@@ -453,27 +460,27 @@
     <string name="disablePrivacyProtection">Gizlilik Korumasını Devre Dışı Bırak</string>
     <string name="whitelistEntryOverflowContentDescription">Korumasız %1$s sitesi için diğer seçenekler</string>
     <string name="whitelistEntryDeleteConfirmMessage">&lt;b&gt;%1$s&lt;/b&gt; sitesini korumasız sitelerden kaldırmak istediğinizden emin misiniz?</string>
-    <string name="whitelistExplanation">Bu siteler için Gizlilik Koruması uygulanamayacaktır.</string>
-    <string name="whitelistNoEntries">Henüz Korumasız Site Yok</string>
+    <string name="whitelistExplanation">Bu siteler için Gizlilik Koruması uygulanmayacaktır.</string>
+    <string name="whitelistNoEntries">Gizlilik Koruması tüm siteler için etkin</string>
     <string name="whitelistDomainHint">www.example.com</string>
-    <string name="whitelistFormatError">Kaydedilemedi, <b>example.com</b> gibi bir alan adı girin</string>
+    <string name="whitelistFormatError">Lütfen <b>example.com</b> gibi bir alan adı girip tekrar deneyin</string>
 
     <!-- Settings -->
     <string name="settingsPrivacyProtectionWhitelist">Korumasız Siteler</string>
 
     <!-- Fireproof websites -->
-    <string name="fireproofWebsitesActivityTitle">Korumalı Web Siteleri</string>
-    <string name="settingsFireproofWebsites">Korumalı Web Siteleri</string>
-    <string name="fireproofWebsiteMenuTitleAdd">Korumalı Web Sitesi</string>
-    <string name="fireproofWebsiteSnackbarConfirmation">&lt;b&gt;%1$s&lt;/b&gt; artık koruma altında! Daha fazla bilgi edinmek için Ayarlar\'a gidin.</string>
+    <string name="fireproofWebsitesActivityTitle">Korumalı Siteler</string>
+    <string name="settingsFireproofWebsites">Korumalı Siteler</string>
+    <string name="fireproofWebsiteMenuTitleAdd">Korumalı Site</string>
+    <string name="fireproofWebsiteSnackbarConfirmation">&lt;b&gt;%1$s&lt;/b&gt; artık Korumalı! Yönetmek için Ayarlar bölümünü ziyaret edin.</string>
     <string name="fireproofWebsiteSnackbarAction">Geri al</string>
-    <string name="fireproofWebsiteDeleteConfirmMessage">&lt;b&gt;%1$s&lt;/b&gt; \'ı silmek istediğinizden emin misiniz?</string>
-    <string name="fireproofWebsiteEmptyListHint">Henüz hiçbir web sitesi koruma altına alınmadı</string>
-    <string name="fireproofWebsiteFeatureDescription">Web siteleri oturumunuzu açık tutmak için çerezler kullanır. Bir siteyi Yanmaya Dayanıklı hâle getirdiğinizde çerezler silinmez ve Yangın Düğmesi\'ni kullandıktan sonra bile oturumunuz açık kalır. Yanmaya Dayanıklı web sitelerinde bulunan üçüncü taraf izleyicileri yine engelleriz.</string>
+    <string name="fireproofWebsiteDeleteConfirmMessage">&lt;b&gt;%1$s&lt;/b&gt;\'ı silmek istediğinizden emin misiniz?</string>
+    <string name="fireproofWebsiteEmptyListHint">Korumalı web sitesi yok</string>
+    <string name="fireproofWebsiteFeatureDescription">Web siteleri oturumunuzu açık tutmak için çerezler kullanır. Bir siteyi Korumalı hâle getirdiğinizde çerezler silinmez ve Yangın Düğmesi\'ni kullandıktan sonra bile oturumunuz açık kalır. Korumalı web sitelerinde bulunan üçüncü taraf izleyicileri yine engelleriz.</string>
     <string name="fireproofWebsiteOverflowContentDescription">Korumalı web sitesi %1$s için daha fazla seçenek</string>
-    <string name="fireproofWebsiteLoginDialogTitle">%1$s sitesini Yanmaya Dayanıklı yapmak ister misiniz?</string>
-    <string name="fireproofWebsiteLoginDialogDescription">Yanmaya Dayanıklı yaptığınızda, Yangın düğmesini kullanıktan sonra da oturumunuz açık kalır.</string>
-    <string name="fireproofWebsiteLoginDialogPositive">Yanmaya Dayanıklı yap</string>
+    <string name="fireproofWebsiteLoginDialogTitle">%1$s sitesini Korumalı yapmak ister misiniz?</string>
+    <string name="fireproofWebsiteLoginDialogDescription">Korumalı yaptığınızda, Yangın düğmesini kullanıktan sonra da oturumunuz açık kalır.</string>
+    <string name="fireproofWebsiteLoginDialogPositive">Korumalı yap</string>
     <string name="fireproofWebsiteLoginDialogNegative">Şimdi değil</string>
     <string name="fireproofWebsiteItemsSectionTitle">Web siteleri</string>
     <string name="fireproofWebsiteToogleText">Oturum Açarken Sor</string>
@@ -504,9 +511,9 @@
     <string name="preciseLocationSiteDialogTitle">%1$s için konuma erişim izni verilsin mi?</string>
     <string name="preciseLocationSiteDialogSubtitle">Sitelere verdiğiniz konuma erişim izinlerini Ayarlar bölümünden yönetebilirsiniz.</string>
     <string name="preciseLocationSiteDialogAllowAlways">Her zaman</string>
-    <string name="preciseLocationSiteDialogAllowOnce">Yalnızca bu oturum için</string>
-    <string name="preciseLocationSiteDialogDenyAlways">Her zaman reddet</string>
-    <string name="preciseLocationSiteDialogDenyOnce">Bu oturum için reddet</string>
+    <string name="preciseLocationSiteDialogAllowOnce">Yalnızca Bu Oturum için</string>
+    <string name="preciseLocationSiteDialogDenyAlways">Her Zaman Reddet</string>
+    <string name="preciseLocationSiteDialogDenyOnce">Bu Oturum için Reddet</string>
     <string name="settingsPreciseLocation">Konum</string>
     <string name="preciseLocationFeatureDescription">Ziyaret ettiğiniz siteler cihazınızın konumunu öğrenmek isteyebilir. Ancak siz açıkça izin vermediğiniz takdirde konumunuza erişemezler. DuckDuckGo, konumunuzu yalnızca yerel arama sonuçları sunmak için anonim olarak kullanır.</string>
     <string name="preciseLocationToggleText">Siteler konumumu sorabilir</string>

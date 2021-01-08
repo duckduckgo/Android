@@ -48,6 +48,7 @@ import com.duckduckgo.app.browser.downloader.FileDownloader
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.logindetection.LoginDetected
 import com.duckduckgo.app.browser.logindetection.NavigationAwareLoginDetector
+import com.duckduckgo.app.browser.logindetection.NavigationEvent
 import com.duckduckgo.app.browser.logindetection.NavigationEvent.LoginAttempt
 import com.duckduckgo.app.browser.model.BasicAuthenticationCredentials
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
@@ -71,6 +72,9 @@ import com.duckduckgo.app.global.model.SiteFactory
 import com.duckduckgo.app.global.useourapp.UseOurAppDetector
 import com.duckduckgo.app.global.useourapp.UseOurAppDetector.Companion.USE_OUR_APP_DOMAIN
 import com.duckduckgo.app.global.useourapp.UseOurAppDetector.Companion.USE_OUR_APP_SHORTCUT_URL
+import com.duckduckgo.app.globalprivacycontrol.GlobalPrivacyControlManager
+import com.duckduckgo.app.globalprivacycontrol.GlobalPrivacyControlManager.Companion.GPC_HEADER
+import com.duckduckgo.app.globalprivacycontrol.GlobalPrivacyControlManager.Companion.GPC_HEADER_VALUE
 import com.duckduckgo.app.location.GeoLocationPermissions
 import com.duckduckgo.app.location.data.LocationPermissionEntity
 import com.duckduckgo.app.location.data.LocationPermissionType
@@ -324,7 +328,8 @@ class BrowserTabViewModelTest {
             notificationDao = mockNotificationDao,
             useOurAppDetector = UseOurAppDetector(mockUserEventsStore),
             variantManager = mockVariantManager,
-            fileDownloader = mockFileDownloader
+            fileDownloader = mockFileDownloader,
+            globalPrivacyControl = GlobalPrivacyControlManager(mockSettingsStore)
         )
 
         testee.loadData("abc", null, false)
@@ -1069,6 +1074,7 @@ class BrowserTabViewModelTest {
         loadUrl("http://example.com")
         testee.onDesktopSiteModeToggled(true)
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+        verify(mockPixel).fire(Pixel.PixelName.MENU_ACTION_DESKTOP_SITE_ENABLE_PRESSED)
         assertTrue(browserViewState().isDesktopBrowsingMode)
     }
 
@@ -1076,6 +1082,7 @@ class BrowserTabViewModelTest {
     fun whenUserSelectsMobileSiteThenMobileModeStateUpdated() {
         loadUrl("http://example.com")
         testee.onDesktopSiteModeToggled(false)
+        verify(mockPixel).fire(Pixel.PixelName.MENU_ACTION_DESKTOP_SITE_DISABLE_PRESSED)
         assertFalse(browserViewState().isDesktopBrowsingMode)
     }
 
@@ -2938,7 +2945,7 @@ class BrowserTabViewModelTest {
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
 
         val command = commandCaptor.lastValue as Navigate
-        assertEquals(BrowserTabViewModel.GPC_HEADER_VALUE, command.headers[BrowserTabViewModel.GPC_HEADER])
+        assertEquals(GPC_HEADER_VALUE, command.headers[GPC_HEADER])
     }
 
     @Test
@@ -2962,7 +2969,7 @@ class BrowserTabViewModelTest {
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
 
         val command = commandCaptor.lastValue as Navigate
-        assertEquals(BrowserTabViewModel.GPC_HEADER_VALUE, command.headers[BrowserTabViewModel.GPC_HEADER])
+        assertEquals(GPC_HEADER_VALUE, command.headers[GPC_HEADER])
     }
 
     @Test
@@ -2986,7 +2993,7 @@ class BrowserTabViewModelTest {
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
 
         val command = commandCaptor.lastValue as Command.HandleExternalAppLink
-        assertEquals(BrowserTabViewModel.GPC_HEADER_VALUE, command.headers[BrowserTabViewModel.GPC_HEADER])
+        assertEquals(GPC_HEADER_VALUE, command.headers[GPC_HEADER])
     }
 
     @Test
@@ -3012,6 +3019,12 @@ class BrowserTabViewModelTest {
         advanceTimeBy(3_600_000)
         verify(mockDismissedCtaDao).insert(DismissedCta(CtaId.DAX_FIRE_BUTTON))
         verify(mockDismissedCtaDao).insert(DismissedCta(CtaId.DAX_FIRE_BUTTON_PULSE))
+    }
+
+    @Test
+    fun whenRedirectTriggeredByGpcThenGpcRedirectEventSent() {
+        testee.redirectTriggeredByGpc()
+        verify(mockNavigationAwareLoginDetector).onEvent(NavigationEvent.GpcRedirect)
     }
 
     private suspend fun givenFireButtonPulsing() {
