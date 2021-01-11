@@ -3027,6 +3027,41 @@ class BrowserTabViewModelTest {
         verify(mockNavigationAwareLoginDetector).onEvent(NavigationEvent.GpcRedirect)
     }
 
+    @Test
+    fun whenProgressIs100ThenRefreshUserAgentCommandSent() {
+        loadUrl("http://duckduckgo.com")
+        testee.progressChanged(100)
+
+        assertCommandNotIssued<Command.RefreshUserAgent>()
+    }
+
+    @Test
+    fun whenPageChangesAndNewPageCanChangeBrowsingModeThenCanChangeBrowsingModeIsTrue() {
+        givenCurrentSite("https://www.example.com/")
+
+        loadUrl("https://www.example2.com", isBrowserShowing = true)
+
+        assertTrue(browserViewState().canChangeBrowsingMode)
+    }
+
+    @Test
+    fun whenPageChangesAndNewPageCannotChangeBrowsingModeThenCanChangeBrowsingModeIsFalse() {
+        givenCurrentSite("https://www.example.com/")
+
+        loadUrl("https://www.facebook.com", isBrowserShowing = true)
+
+        assertFalse(browserViewState().canChangeBrowsingMode)
+    }
+
+    @Test
+    fun whenPageChangesAndNewPageCanChangeBrowsingModeButContainsExcludedPathThenCanChangeBrowsingModeIsFalse() {
+        givenCurrentSite("https://www.example.com/")
+
+        loadUrl("https://www.facebook.com/dialog", isBrowserShowing = true)
+
+        assertFalse(browserViewState().canChangeBrowsingMode)
+    }
+
     private suspend fun givenFireButtonPulsing() {
         whenever(mockUserStageStore.getUserAppStage()).thenReturn(AppStage.DAX_ONBOARDING)
         dismissedCtaDaoChannel.send(listOf(DismissedCta(CtaId.DAX_DIALOG_TRACKERS_FOUND)))
