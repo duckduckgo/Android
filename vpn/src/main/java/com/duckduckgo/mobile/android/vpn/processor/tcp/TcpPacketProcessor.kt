@@ -30,7 +30,7 @@ import com.duckduckgo.mobile.android.vpn.processor.tcp.tracker.VpnTrackerDetecto
 import com.duckduckgo.mobile.android.vpn.service.NetworkChannelCreator
 import com.duckduckgo.mobile.android.vpn.service.VpnQueues
 import com.duckduckgo.mobile.android.vpn.store.PacketPersister
-import com.google.firebase.perf.metrics.AddTrace
+import com.google.firebase.perf.FirebasePerformance
 import kotlinx.coroutines.Job
 import timber.log.Timber
 import xyz.hexene.localvpn.ByteBufferPool
@@ -171,8 +171,9 @@ class TcpPacketProcessor(
             this.tcbState = newStatus
         }
 
-        @AddTrace(name = "packet_processor_send_fin", enabled = true)
         fun TCB.sendFinToClient(queues: VpnQueues, packet: Packet, payloadSize: Int, triggeredByServerEndOfStream: Boolean) {
+            val trace = FirebasePerformance.startTrace("packet_processor_send_fin")
+
             val buffer = ByteBufferPool.acquire()
             synchronized(this) {
 
@@ -209,10 +210,13 @@ class TcpPacketProcessor(
             } catch (e: Exception) {
                 Timber.w(e, "Problem closing socket connection for %s", ipAndPort)
             }
+
+            trace.stop()
         }
 
-        @AddTrace(name = "packet_processor_send_ack", enabled = true)
         fun TCB.sendAck(queues: VpnQueues, packet: Packet) {
+            val trace = FirebasePerformance.startTrace("packet_processor_send_ack")
+
             synchronized(this) {
                 val payloadSize = packet.tcpPayloadSize(true)
 
@@ -237,11 +241,13 @@ class TcpPacketProcessor(
                 // sequenceNumberToClient = increaseOrWraparound(sequenceNumberToClient, 1)
                 queues.networkToDevice.offer(buffer)
             }
+
+            trace.stop()
         }
 
         @Synchronized
-        @AddTrace(name = "packet_processor_send_reset", enabled = true)
         fun TCB.sendResetPacket(queues: VpnQueues, packet: Packet, payloadSize: Int) {
+            val trace = FirebasePerformance.startTrace("packet_processor_send_reset")
             val buffer = ByteBufferPool.acquire()
 
             var responseAck = acknowledgementNumberToClient + payloadSize
@@ -263,14 +269,17 @@ class TcpPacketProcessor(
             }
             queues.networkToDevice.offerFirst(buffer)
             TCB.closeTCB(this)
+
+            trace.stop()
         }
 
         @Synchronized
-        @AddTrace(name = "packet_processor_close_connection", enabled = true)
         fun TCB.closeConnection(buffer: ByteBuffer) {
+            val trace = FirebasePerformance.startTrace("packet_processor_close_connection")
             Timber.v("Closing TCB connection $ipAndPort")
             ByteBufferPool.release(buffer)
             TCB.closeTCB(this)
+            trace.stop()
         }
 
         fun TCB.logAckSeqDetails(): String {

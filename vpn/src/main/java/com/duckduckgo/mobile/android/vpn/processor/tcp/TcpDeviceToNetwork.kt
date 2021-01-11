@@ -35,7 +35,7 @@ import com.duckduckgo.mobile.android.vpn.processor.tcp.tracker.VpnTrackerDetecto
 import com.duckduckgo.mobile.android.vpn.service.VpnQueues
 import com.duckduckgo.mobile.android.vpn.store.PACKET_TYPE_TCP
 import com.duckduckgo.mobile.android.vpn.store.PacketPersister
-import com.google.firebase.perf.metrics.AddTrace
+import com.google.firebase.perf.FirebasePerformance
 import timber.log.Timber
 import xyz.hexene.localvpn.ByteBufferPool
 import xyz.hexene.localvpn.Packet
@@ -162,8 +162,9 @@ class TcpDeviceToNetwork(
         }
     }
 
-    @AddTrace(name = "device_to_network_process_packet_tcb_not_initialized", enabled = true)
     private fun processPacketTcbNotInitialized(connectionKey: String, packet: Packet, totalPacketLength: Int, connectionParams: TcpConnectionParams) {
+        val trace = FirebasePerformance.startTrace("device_to_network_process_packet_tcb_not_initialized")
+
         Timber.i(
             "New packet. $connectionKey. TCB not initialized. ${
             TcpPacketProcessor.logPacketDetails(
@@ -195,9 +196,10 @@ class TcpDeviceToNetwork(
                 else -> Timber.e("No connection open and won't open one to $connectionKey. Dropping packet. (action=$it)")
             }
         }
+
+        trace.stop()
     }
 
-    @AddTrace(name = "device_to_network_process_packet_tcb_exists", enabled = true)
     private fun processPacketTcbExists(
         connectionKey: String,
         tcb: TCB,
@@ -207,6 +209,8 @@ class TcpDeviceToNetwork(
         responseBuffer: ByteBuffer,
         payloadBuffer: ByteBuffer
     ) {
+        val trace = FirebasePerformance.startTrace("device_to_network_process_packet_tcb_exists")
+
         Timber.i(
             "New packet. %s. %s. %s. Packet length: %d.  Data length: %d",
             connectionKey, tcb.tcbState,
@@ -239,10 +243,13 @@ class TcpDeviceToNetwork(
             }
 
         }
+
+        trace.stop()
     }
 
-    @AddTrace(name = "device_to_network_open_connection", enabled = true)
     private fun openConnection(params: TcpConnectionParams) {
+        val trace = FirebasePerformance.startTrace("device_to_network_open_connection")
+
         Timber.v("Opening connection to %s:%s", params.destinationAddress, params.destinationPort)
         val (tcb, channel) = connectionInitializer.initializeConnection(params) ?: return
         TcpStateFlow.socketOpening(TcbState()).events.forEach {
@@ -270,10 +277,13 @@ class TcpDeviceToNetwork(
                 else -> Timber.w("Unexpected action: $it")
             }
         }
+
+        trace.stop()
     }
 
-    @AddTrace(name = "device_to_network_process_packet", enabled = true)
     private fun processPacket(tcb: TCB, packet: Packet, payloadBuffer: ByteBuffer, connectionParams: TcpConnectionParams) {
+        val trace = FirebasePerformance.startTrace("device_to_network_process_packet")
+
         val entryTime = System.nanoTime()
         synchronized(tcb) {
             val payloadSize = payloadBuffer.limit() - payloadBuffer.position()
@@ -324,6 +334,8 @@ class TcpDeviceToNetwork(
         }
         measurePacketProcessingTimes(entryTime)
         queues.networkToDevice.offer(connectionParams.responseBuffer)
+
+        trace.stop()
     }
 
     private fun determineIfTracker(tcb: TCB, packet: Packet, payloadBuffer: ByteBuffer, isLocalAddress: Boolean): RequestTrackerType {

@@ -19,7 +19,7 @@ package com.duckduckgo.mobile.android.vpn.processor.tcp
 import com.duckduckgo.mobile.android.vpn.processor.tcp.ConnectionInitializer.TcpConnectionParams
 import com.duckduckgo.mobile.android.vpn.service.NetworkChannelCreator
 import com.duckduckgo.mobile.android.vpn.service.VpnQueues
-import com.google.firebase.perf.metrics.AddTrace
+import com.google.firebase.perf.FirebasePerformance
 import timber.log.Timber
 import xyz.hexene.localvpn.Packet
 import xyz.hexene.localvpn.Packet.TCPHeader
@@ -49,8 +49,9 @@ interface ConnectionInitializer {
 
 class TcpConnectionInitializer(private val queues: VpnQueues, private val networkChannelCreator: NetworkChannelCreator) : ConnectionInitializer {
 
-    @AddTrace(name = "initialize_tcp_connection", enabled = true)
     override fun initializeConnection(params: TcpConnectionParams): Pair<TCB, SocketChannel>? {
+        val trace = FirebasePerformance.startTrace("initialize_tcp_connection")
+
         val key = params.key()
 
         val header = params.packet.tcpHeader
@@ -58,7 +59,7 @@ class TcpConnectionInitializer(private val queues: VpnQueues, private val networ
 
         Timber.d("Initializing connection $key")
 
-        if (header.isSYN) {
+        val pair = if (header.isSYN) {
             val channel = networkChannelCreator.createSocketChannel()
             val sequenceNumberToClient = Random.nextLong(Short.MAX_VALUE.toLong() + 1)
             val sequenceToServer = header.sequenceNumber
@@ -68,7 +69,7 @@ class TcpConnectionInitializer(private val queues: VpnQueues, private val networ
             val tcb = TCB(key, sequenceNumberToClient, sequenceToServer, ackNumberToClient, ackNumberToServer, channel, params.packet)
             TCB.putTCB(params.key(), tcb)
             channel.connect(InetSocketAddress(params.destinationAddress, params.destinationPort))
-            return Pair(tcb, channel)
+            Pair(tcb, channel)
         } else {
             Timber.i("Trying to initialize a connection but is not a SYN packet; sending RST")
             params.packet.updateTcpBuffer(
@@ -79,7 +80,11 @@ class TcpConnectionInitializer(private val queues: VpnQueues, private val networ
                 params.packet.tcpPayloadSize(true)
             )
             queues.networkToDevice.offer(params.responseBuffer)
-            return null
+            null
         }
+
+        trace.stop()
+
+        return pair
     }
 }

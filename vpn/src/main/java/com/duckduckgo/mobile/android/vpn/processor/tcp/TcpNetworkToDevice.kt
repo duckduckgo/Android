@@ -26,7 +26,7 @@ import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpStateFlow.Event.MoveSt
 import com.duckduckgo.mobile.android.vpn.service.VpnQueues
 import com.duckduckgo.mobile.android.vpn.store.PACKET_TYPE_TCP
 import com.duckduckgo.mobile.android.vpn.store.PacketPersister
-import com.google.firebase.perf.metrics.AddTrace
+import com.google.firebase.perf.FirebasePerformance
 import timber.log.Timber
 import xyz.hexene.localvpn.ByteBufferPool
 import xyz.hexene.localvpn.Packet
@@ -94,8 +94,9 @@ class TcpNetworkToDevice(
         }
     }
 
-    @AddTrace(name = "network_to_device_process_read", enabled = true)
     private fun processRead(key: SelectionKey) {
+        val trace = FirebasePerformance.startTrace("network_to_device_process_read")
+
         val receiveBuffer = ByteBufferPool.acquire()
         receiveBuffer.position(HEADER_SIZE)
 
@@ -121,10 +122,12 @@ class TcpNetworkToDevice(
                 return
             }
         }
+        trace.stop()
     }
 
-    @AddTrace(name = "network_to_device_send_to_device_queue", enabled = true)
     private fun sendToNetworkToDeviceQueue(packet: Packet, receiveBuffer: ByteBuffer, tcb: TCB, readBytes: Int) {
+        val trace = FirebasePerformance.startTrace("network_to_device_send_to_device_queue")
+
         Timber.i(
             "Network-to-device packet ${tcb.ipAndPort}. $readBytes bytes. ${
             logPacketDetails(
@@ -140,10 +143,12 @@ class TcpNetworkToDevice(
         receiveBuffer.position(HEADER_SIZE + readBytes)
 
         offerToNetworkToDeviceQueue(receiveBuffer, tcb, packet)
+
+        trace.stop()
     }
 
-    @AddTrace(name = "network_to_device_handle_end_of_stream", enabled = true)
     private fun handleEndOfStream(tcb: TCB, packet: Packet, key: SelectionKey) {
+        val trace = FirebasePerformance.startTrace("network_to_device_handle_end_of_stream")
         Timber.w(
             "Network-to-device end of stream ${tcb.ipAndPort}. ${tcb.tcbState} ${TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - tcb.creationTime)}ms after creation ${
             logPacketDetails(
@@ -171,19 +176,25 @@ class TcpNetworkToDevice(
                 else -> Timber.w("Unhandled event for ${tcb.ipAndPort} for socket end of stream. $event")
             }
         }
+
+        trace.stop()
     }
 
-    @AddTrace(name = "network_to_device_send_reset", enabled = true)
     private fun sendReset(packet: Packet, tcb: TCB) {
+        val trace = FirebasePerformance.startTrace("network_to_device_send_reset")
+
         val buffer = ByteBufferPool.acquire()
         packet.updateTcpBuffer(buffer, (RST or ACK).toByte(), tcb.sequenceNumberToClient, tcb.acknowledgementNumberToClient, 0)
         tcb.sequenceNumberToClient++
         offerToNetworkToDeviceQueue(buffer, tcb, packet)
         TCB.closeTCB(tcb)
+
+        trace.stop()
     }
 
-    @AddTrace(name = "network_to_device_process_connect", enabled = true)
     private fun processConnect(key: SelectionKey) {
+        val trace = FirebasePerformance.startTrace("network_to_device_process_connect")
+
         val tcb = key.attachment() as TCB
         val packet = tcb.referencePacket
         runCatching {
@@ -213,16 +224,19 @@ class TcpNetworkToDevice(
             offerToNetworkToDeviceQueue(responseBuffer, tcb, packet)
             TCB.closeTCB(tcb)
         }
+        trace.stop()
     }
 
-    @AddTrace(name = "network_to_device_offer_to_device_queue", enabled = true)
     private fun offerToNetworkToDeviceQueue(buffer: ByteBuffer, tcb: TCB, packet: Packet) {
+        val trace = FirebasePerformance.startTrace("network_to_device_offer_to_device_queue")
+        trace.start()
         logPacket(tcb, packet)
         queues.networkToDevice.offer(buffer)
+        trace.stop()
     }
 
-    @AddTrace(name = "network_to_device_log_packet", enabled = true)
     private fun logPacket(tcb: TCB, packet: Packet) {
+        val trace = FirebasePerformance.startTrace("network_to_device_log_packet")
         Timber.i(
             "New packet. %s. %s. %s. Packet length: %d. Data length: %d",
             tcb.ipAndPort,
@@ -231,6 +245,8 @@ class TcpNetworkToDevice(
             packet.ip4Header.totalLength,
             packet.tcpPayloadSize(false)
         )
+
+        trace.stop()
     }
 
     private fun endOfStream(readBytes: Int) = readBytes == -1

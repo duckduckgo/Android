@@ -20,7 +20,7 @@ import android.content.pm.PackageManager
 import android.net.ConnectivityManager
 import android.os.Build
 import androidx.annotation.RequiresApi
-import com.google.firebase.perf.metrics.AddTrace
+import com.google.firebase.perf.FirebasePerformance
 import timber.log.Timber
 import xyz.hexene.localvpn.Packet
 import java.net.InetAddress
@@ -38,7 +38,6 @@ class OriginatingAppResolver(private val connectivityManager: ConnectivityManage
         }
     }
 
-    @AddTrace(name = "AppResolutionModern")
     @RequiresApi(Build.VERSION_CODES.Q)
     private fun resolveModern(
         destinationAddress: InetAddress,
@@ -47,12 +46,17 @@ class OriginatingAppResolver(private val connectivityManager: ConnectivityManage
         sourcePort: Int,
         protocolNumber: Int
     ): RequestingApp {
+        val trace = FirebasePerformance.startTrace("AppResolutionModern")
         val destination = InetSocketAddress(destinationAddress, destinationPort)
         val source = InetSocketAddress(sourceAddress, sourcePort)
         val connectionOwnerUid: Int = connectivityManager.getConnectionOwnerUid(protocolNumber, source, destination)
         val packageName = getPackageIdForUid(connectionOwnerUid)
         val appName = getAppNameForPackageId(packageName)
-        return RequestingApp(packageName, appName)
+        val requestingApp = RequestingApp(packageName, appName)
+        trace.stop()
+
+        return requestingApp
+
     }
 
     private fun getPackageIdForUid(uid: Int): String {

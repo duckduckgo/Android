@@ -16,7 +16,7 @@
 
 package com.duckduckgo.mobile.android.vpn.processor.tcp
 
-import com.google.firebase.perf.metrics.AddTrace
+import com.google.firebase.perf.FirebasePerformance
 import timber.log.Timber
 import xyz.hexene.localvpn.Packet
 import java.nio.channels.SelectionKey
@@ -29,8 +29,9 @@ interface SocketWriter {
 class TcpSocketWriter(private val selector: Selector) : SocketWriter {
 
     @Synchronized
-    @AddTrace(name = "socket_writer_write_to_socket", enabled = true)
     override fun writeToSocket(writeData: TcpPacketProcessor.PendingWriteData): Boolean {
+        val trace = FirebasePerformance.startTrace("socket_writer_write_to_socket")
+
         Timber.v("Writing data to socket ${writeData.tcb.ipAndPort}: ${writeData.payloadSize} bytes")
         val payloadBuffer = writeData.payloadBuffer
         val payloadSize = writeData.payloadSize
@@ -39,7 +40,7 @@ class TcpSocketWriter(private val selector: Selector) : SocketWriter {
         val tcb = writeData.tcb
 
         val bytesWritten = socket.write(payloadBuffer)
-        if (payloadBuffer.remaining() > 0) {
+        val write = if (payloadBuffer.remaining() > 0) {
             Timber.e("Hey hey, hey. now what? %d bytes written. %d bytes remain out of %d", bytesWritten, payloadBuffer.remaining(), payloadSize)
 
 //            selector.wakeup()
@@ -47,7 +48,7 @@ class TcpSocketWriter(private val selector: Selector) : SocketWriter {
 //                SelectionKey.OP_WRITE,
 //                TcpPacketProcessor.PendingWriteData(ByteBuffer.wrap(remainingData), socket, payloadSize, tcb, connectionParams)
 //            )
-            return false
+            false
         } else {
             selector.wakeup()
             socket.register(selector, SelectionKey.OP_READ, tcb)
@@ -68,8 +69,12 @@ class TcpSocketWriter(private val selector: Selector) : SocketWriter {
                 tcb.acknowledgementNumberToClient,
                 0
             )
-            return true
+            true
         }
+
+        trace.stop()
+
+        return write
     }
 
 }

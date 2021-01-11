@@ -19,7 +19,7 @@ package com.duckduckgo.mobile.android.vpn.processor.tcp
 import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpStateFlow.Event.*
 import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpStateFlow.Event.MoveState.MoveClientToState
 import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpStateFlow.Event.MoveState.MoveServerToState
-import com.google.firebase.perf.metrics.AddTrace
+import com.google.firebase.perf.FirebasePerformance
 import timber.log.Timber
 import xyz.hexene.localvpn.Packet
 import xyz.hexene.localvpn.TCB
@@ -29,14 +29,15 @@ import kotlin.math.absoluteValue
 class TcpStateFlow {
 
     companion object {
-
-        @AddTrace(name = "tcp_state_flow_new_packet", enabled = true)
         fun newPacket(
             connectionKey: String,
             currentState: TcbState,
             packetType: PacketType,
             sequenceNumberToClientInitial: Long
         ): TcpStateAction {
+
+            val trace = FirebasePerformance.startTrace("tcp_state_flow_new_packet")
+
             val newActions = when (currentState.serverState) {
                 LISTEN -> handlePacketInStateListen(connectionKey, currentState, packetType)
                 SYN_RECEIVED -> handlePacketInSynReceived(connectionKey, currentState, packetType, sequenceNumberToClientInitial)
@@ -50,34 +51,42 @@ class TcpStateFlow {
                 else -> unhandledEvent(connectionKey, currentState, packetType)
             }
             Timber.d("$connectionKey. [$currentState]. New actions are [${newActions.ifEmpty { listOf("No Actions") }.joinToString()}]")
+            trace.stop()
+
             return TcpStateAction(newActions)
         }
 
-        @AddTrace(name = "tcp_state_flow_handle_time_wait", enabled = true)
         private fun handlePacketInTimeWait(packetType: PacketType): List<Event> {
-            return when {
+            val trace = FirebasePerformance.startTrace("tcp_state_flow_handle_time_wait")
+            val events = when {
                 packetType.isRst -> {
                     Timber.w("Received RESET while in TIME_WAIT. Closing connection")
                     listOf(CloseConnection)
                 }
                 else -> listOf(SendReset)
             }
+            trace.stop()
+            return events
         }
 
-        @AddTrace(name = "tcp_state_flow_handle_closed", enabled = true)
         private fun handlePacketInClosed(packetType: PacketType): List<Event> {
-            return when {
+            val trace = FirebasePerformance.startTrace("tcp_state_flow_handle_closed")
+
+            val events = when {
                 packetType.isRst -> {
                     Timber.w("Received RESET while in CLOSED. Closing connection")
                     listOf(CloseConnection)
                 }
                 else -> listOf(SendReset)
             }
+
+            trace.stop()
+            return events
         }
 
-        @AddTrace(name = "tcp_state_flow_handle_last_ack", enabled = true)
         private fun handlePacketInLastAck(packetType: PacketType, connectionKey: String, currentState: TcbState): List<Event> {
-            return when {
+            val trace = FirebasePerformance.startTrace("tcp_state_flow_handle_last_ack")
+            val events = when {
                 packetType.isRst -> {
                     Timber.w("Received RESET while in $currentState. Closing connection")
                     listOf(CloseConnection)
@@ -90,6 +99,9 @@ class TcpStateFlow {
                 }
                 else -> listOf(SendReset)
             }
+
+            trace.stop()
+            return events
         }
 
         private fun isAckForOurFin(packetType: PacketType, connectionKey: String, currentState: TcbState): Boolean {
@@ -118,8 +130,9 @@ class TcpStateFlow {
             return (difference <= 1)
         }
 
-        @AddTrace(name = "tcp_state_flow_handle_fin_wait_1", enabled = true)
         private fun handlePacketInFinWait1(connectionKey: String, currentState: TcbState, packetType: PacketType): List<Event> {
+            val trace = FirebasePerformance.startTrace("tcp_state_flow_handle_fin_wait_1")
+
             val eventList = mutableListOf<Event>()
 
             eventList.addAll(
@@ -143,11 +156,14 @@ class TcpStateFlow {
                     else -> listOf(SendReset)
                 }
             )
+
+            trace.stop()
+
             return eventList
         }
 
-        @AddTrace(name = "tcp_state_flow_handle_fin_wait_2", enabled = true)
         private fun handlePacketInFinWait2(connectionKey: String, packetType: PacketType): List<Event> {
+            val trace = FirebasePerformance.startTrace("tcp_state_flow_handle_fin_wait_2")
             val eventList = mutableListOf<Event>()
 
             eventList.addAll(
@@ -169,12 +185,13 @@ class TcpStateFlow {
                     }
                 }
             )
+            trace.stop()
 
             return eventList
         }
 
-        @AddTrace(name = "tcp_state_flow_handle_closing", enabled = true)
         private fun handlePacketInClosing(connectionKey: String, currentState: TcbState, packetType: PacketType): List<Event> {
+            val trace = FirebasePerformance.startTrace("tcp_state_flow_handle_closing")
             val eventList = mutableListOf<Event>()
 
             // check if there's data. if so, should ACK it
@@ -195,12 +212,14 @@ class TcpStateFlow {
                 }
             )
 
+            trace.stop()
+
             return eventList
         }
 
-        @AddTrace(name = "tcp_state_flow_handle_listen", enabled = true)
         private fun handlePacketInStateListen(connectionKey: String, currentState: TcbState, packetType: PacketType): List<Event> {
-            return when {
+            val trace = FirebasePerformance.startTrace("tcp_state_flow_handle_listen")
+            val events = when {
                 packetType.isRst -> {
                     Timber.w("Received RESET while in LISTEN. Nothing to do")
                     listOf(CloseConnection)
@@ -218,20 +237,25 @@ class TcpStateFlow {
                     listOf(SendReset)
                 }
             }
+
+            trace.stop()
+            return events
         }
 
         private fun socketOpeningInListenState(): List<Event> {
             return listOf(MoveClientToState(SYN_SENT), WaitToConnect)
         }
 
-        @AddTrace(name = "tcp_state_flow_handle_syn_received", enabled = true)
         private fun handlePacketInSynReceived(
             connectionKey: String,
             currentState: TcbState,
             packetType: PacketType,
             initialSequenceNumberToClient: Long
         ): List<Event> {
-            return when {
+
+            val trace = FirebasePerformance.startTrace("tcp_state_flow_handle_syn_received")
+
+            val events = when {
                 packetType.isRst -> {
                     Timber.w("Received RESET while in SYN_RECEIVED. Closing connection")
                     listOf(CloseConnection)
@@ -245,11 +269,15 @@ class TcpStateFlow {
                 }
                 else -> listOf(SendReset)
             }
+
+            trace.stop()
+            return events
         }
 
-        @AddTrace(name = "tcp_state_flow_handle_established", enabled = true)
         private fun handlePacketInEstablished(connectionKey: String, currentState: TcbState, packetType: PacketType): List<Event> {
-            return when {
+            val trace = FirebasePerformance.startTrace("tcp_state_flow_handle_established")
+
+            val events = when {
                 packetType.isFin -> {
                     mutableListOf<Event>().also { events ->
                         // FIN might also have data, so ProcessPacket will handle that. if not, still need to send ACK in response to FIN
@@ -270,6 +298,9 @@ class TcpStateFlow {
                 packetType.isAck -> listOf(ProcessPacket)
                 else -> listOf(SendReset)
             }
+
+            trace.stop()
+            return events
         }
 
         fun socketOpening(currentState: TcbState): TcpStateAction {

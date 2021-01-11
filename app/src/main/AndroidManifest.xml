@@ -348,6 +348,10 @@
                 android:resource="@xml/search_widget_info_light" />
         </receiver>
 
+        <meta-data
+            android:name="firebase_performance_collection_enabled"
+            android:value="false" />
+
     </application>
 
 </manifest>
