@@ -18,9 +18,8 @@ package com.duckduckgo.mobile.android.vpn.store
 
 import org.threeten.bp.LocalDateTime
 import org.threeten.bp.format.DateTimeFormatter
-import javax.inject.Inject
 
-class DatabaseDateFormatter @Inject constructor() {
+class DatabaseDateFormatter {
 
     companion object {
         private val FORMATTER_SECONDS: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss")

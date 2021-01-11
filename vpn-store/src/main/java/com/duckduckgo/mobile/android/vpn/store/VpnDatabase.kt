@@ -21,7 +21,7 @@ import androidx.room.*
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.duckduckgo.mobile.android.vpn.dao.*
 import com.duckduckgo.mobile.android.vpn.model.*
-import com.duckduckgo.mobile.android.vpn.processor.tcp.tracker.TrackerListProvider
+import com.duckduckgo.mobile.android.vpn.trackers.TrackerListProvider
 import org.threeten.bp.OffsetDateTime
 import org.threeten.bp.format.DateTimeFormatter
 import timber.log.Timber

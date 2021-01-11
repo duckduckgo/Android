@@ -25,7 +25,7 @@ import com.duckduckgo.mobile.android.vpn.dao.VpnTrackerDao
 import com.duckduckgo.mobile.android.vpn.model.VpnTracker
 import com.duckduckgo.mobile.android.vpn.model.VpnTrackerAndCompany
 import com.duckduckgo.mobile.android.vpn.model.VpnTrackerCompany
-import com.duckduckgo.mobile.android.vpn.processor.tcp.tracker.TrackerListProvider.Companion.UNDEFINED_TRACKER_COMPANY
+import com.duckduckgo.mobile.android.vpn.trackers.TrackerListProvider.Companion.UNDEFINED_TRACKER_COMPANY
 import com.duckduckgo.mobile.android.vpn.store.DatabaseDateFormatter.Companion.bucketByHour
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
 import com.jakewharton.threetenabp.AndroidThreeTen

@@ -23,7 +23,7 @@ import com.duckduckgo.di.scopes.VpnObjectGraph
 import com.duckduckgo.mobile.android.vpn.processor.tcp.hostname.*
 import com.duckduckgo.mobile.android.vpn.processor.tcp.requestingapp.OriginatingAppResolver
 import com.duckduckgo.mobile.android.vpn.processor.tcp.tracker.DomainBasedTrackerDetector
-import com.duckduckgo.mobile.android.vpn.processor.tcp.tracker.TrackerListProvider
+import com.duckduckgo.mobile.android.vpn.trackers.TrackerListProvider
 import com.duckduckgo.mobile.android.vpn.processor.tcp.tracker.VpnTrackerDetector
 import com.duckduckgo.mobile.android.vpn.store.PacketPersister
 import com.duckduckgo.mobile.android.vpn.store.RoomPacketPersister

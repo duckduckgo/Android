@@ -17,7 +17,6 @@
 plugins {
     id 'com.android.library'
     id 'kotlin-android'
-    id 'kotlin-kapt'
     id 'com.squareup.anvil'
 }
 
@@ -57,6 +56,9 @@ android {
         exclude "META-INF/AL2.0"
         exclude "META-INF/LGPL2.1"
     }
+    anvil {
+        generateDaggerFactories = true // default is false
+    }
 }
 
 ext {
@@ -77,13 +79,14 @@ ext {
     firebase = "26.0.0"
 
     junit = "4.12"
-    mockitoAndroid = "3.5.2"
+    mockitoAndroid = "3.4.6"
     mockito = "2.18.3"
-    mockitoKotlin = "2.0.0"
+    mockitoKotlin = "2.2.0"
 
 }
 
 dependencies {
+    implementation project(path: ':vpn-store')
     implementation project(path: ':di')
 
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
@@ -106,12 +109,9 @@ dependencies {
     implementation "androidx.lifecycle:lifecycle-livedata-ktx:$lifecycle"
 
     // Dagger
+    compileOnly "org.glassfish:javax.annotation:10.0-b28"
     implementation "com.google.dagger:dagger-android:$dagger"
     implementation "com.google.dagger:dagger-android-support:$dagger"
-    kapt "com.google.dagger:dagger-android-processor:$dagger"
-    kapt "com.google.dagger:dagger-compiler:$dagger"
-    kaptAndroidTest "com.google.dagger:dagger-android-processor:$dagger"
-    kaptAndroidTest "com.google.dagger:dagger-compiler:$dagger"
 
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutines"
     androidTestImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutines"
@@ -125,7 +125,6 @@ dependencies {
     implementation "androidx.room:room-runtime:$room"
     implementation "androidx.room:room-rxjava2:$room"
     implementation "androidx.room:room-ktx:$room"
-    kapt "androidx.room:room-compiler:$room"
     testImplementation "androidx.room:room-testing:$room"
     androidTestImplementation "androidx.room:room-testing:$room"
 

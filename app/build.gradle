@@ -150,7 +150,9 @@ ext {
 
 dependencies {
     implementation project(path: ':di')
-    implementation project(path: ':vpn')
+    implementation project(path: ':vpn-main')
+    implementation project(path: ':vpn-store')
+
     implementation "androidx.legacy:legacy-support-v4:$legacySupport"
     debugImplementation "com.squareup.leakcanary:leakcanary-android:$leakCanary"
 
@@ -241,9 +243,7 @@ dependencies {
     androidTestImplementation "androidx.test:runner:$testRunner"
     androidTestImplementation "androidx.test:rules:$testRunner"
     androidTestUtil "androidx.test:orchestrator:$testRunner"
-    androidTestImplementation ("org.mockito:mockito-android:$mockito") {
-        exclude group: 'org.mockito', module: 'mockito-core' // Fixes https://github.com/mockito/mockito/issues/2007
-    }
+    androidTestImplementation "org.mockito:mockito-android:$mockito"
     androidTestImplementation "com.squareup.okhttp3:mockwebserver:$okHttp"
     androidTestImplementation "com.nhaarman.mockitokotlin2:mockito-kotlin:$mockitoKotlin"
     androidTestImplementation "com.squareup.okhttp3:mockwebserver:$okHttp"

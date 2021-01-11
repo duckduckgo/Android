@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.mobile.android.vpn.processor.tcp.tracker
+package com.duckduckgo.mobile.android.vpn.trackers
 
 import com.duckduckgo.mobile.android.vpn.model.VpnTrackerCompany
 

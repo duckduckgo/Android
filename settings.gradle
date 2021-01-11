@@ -1,3 +1,5 @@
+include ':vpn-store'
+include ':vpn-main'
 include ':di'
 include ':vpn'
 include ':app'

@@ -22,6 +22,7 @@ import com.duckduckgo.mobile.android.vpn.dao.VpnTrackerDao
 import com.duckduckgo.mobile.android.vpn.processor.tcp.hostname.HostnameExtractor
 import com.duckduckgo.mobile.android.vpn.processor.tcp.tracker.RequestTrackerType.*
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
+import com.duckduckgo.mobile.android.vpn.trackers.TrackerListProvider
 import com.jakewharton.threetenabp.AndroidThreeTen
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.mock
