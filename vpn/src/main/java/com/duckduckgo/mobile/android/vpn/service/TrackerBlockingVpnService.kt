@@ -49,7 +49,6 @@ import xyz.hexene.localvpn.Packet
 import java.nio.ByteBuffer
 import java.nio.channels.DatagramChannel
 import java.nio.channels.SocketChannel
-import java.util.*
 import java.util.concurrent.*
 import javax.inject.Inject
 
@@ -238,6 +237,11 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
             }
 
             establish()
+        }
+
+        if (tunInterface == null) {
+            Timber.e("Failed to establish VPN tunnel")
+            stopVpn()
         }
     }
 

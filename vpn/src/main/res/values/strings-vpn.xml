@@ -43,4 +43,5 @@
     <string name="meteredConnection">"Metered: %s"</string>
     <string name="vpnConnectionStatus">"VPN connected: %s"</string>
     <string name="networkAvailable">"Connected to internet: %s"</string>
+    <string name="dnsServers">"DNS servers: %s"</string>
 </resources>

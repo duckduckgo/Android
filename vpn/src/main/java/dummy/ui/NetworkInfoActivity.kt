@@ -19,8 +19,7 @@ package dummy.ui
 import android.content.Context
 import android.content.Intent
 import android.net.ConnectivityManager
-import android.net.NetworkCapabilities
-import android.net.NetworkCapabilities.TRANSPORT_VPN
+import android.net.NetworkCapabilities.*
 import android.os.Build
 import android.os.Bundle
 import android.view.Menu
@@ -49,6 +48,7 @@ class NetworkInfoActivity : AppCompatActivity(R.layout.activity_network_info), C
     private lateinit var networkAvailable: TextView
     private lateinit var runningTime: TextView
     private lateinit var trackersTextView: TextView
+    private lateinit var dnsServersText: TextView
 
     private lateinit var connectivityManager: ConnectivityManager
 
@@ -72,6 +72,7 @@ class NetworkInfoActivity : AppCompatActivity(R.layout.activity_network_info), C
     private fun updateNetworkStatus() {
         lifecycleScope.launch(Dispatchers.IO) {
             val networkInfo = retrieveNetworkInfo()
+            val dnsInfo = retrieveDnsInfo()
             val addresses = if (networkInfo.networks.isEmpty()) {
                 "no addresses"
             } else {
@@ -89,6 +90,7 @@ class NetworkInfoActivity : AppCompatActivity(R.layout.activity_network_info), C
                 networkAvailable.text = getString(R.string.networkAvailable, networkInfo.connectedToInternet.toString())
                 runningTime.text = runningTimeFormatted
                 trackersTextView.text = trackersBlockedFormatted
+                dnsServersText.text = getString(R.string.dnsServers, dnsInfo)
             }
         }
 
@@ -114,14 +116,46 @@ class NetworkInfoActivity : AppCompatActivity(R.layout.activity_network_info), C
         val networks = getCurrentNetworkAddresses()
         val metered = connectivityManager.isActiveNetworkMetered
         val vpn = isVpnEnabled()
+        val connectedToInternet = isConnectedToInternet()
 
-        val connectedToInternet = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+        return NetworkInfo(networks, metered = metered, vpn = vpn, connectedToInternet = connectedToInternet)
+    }
+
+    private fun retrieveDnsInfo(): String {
+        val dnsServerAddresses = mutableListOf<String>()
+
+        runCatching {
+            connectivityManager.allNetworks
+                .filter { it.isConnected() }
+                .mapNotNull { connectivityManager.getLinkProperties(it) }
+                .map { it.dnsServers }
+                .flatten()
+                .forEach { dnsServerAddresses.add(it.hostAddress) }
+        }
+
+        return if (dnsServerAddresses.isEmpty()) return "none" else dnsServerAddresses.joinToString(", ") { it }
+    }
+
+    private fun android.net.Network.isConnected(): Boolean {
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            connectivityManager.getNetworkCapabilities(this)?.hasCapability(NET_CAPABILITY_INTERNET) == true &&
+                connectivityManager.getNetworkCapabilities(this)?.hasCapability(NET_CAPABILITY_VALIDATED) == true
+        } else {
+            isConnectedLegacy(this)
+        }
+    }
+
+    @Suppress("DEPRECATION")
+    private fun isConnectedLegacy(network: android.net.Network): Boolean {
+        return connectivityManager.getNetworkInfo(network)?.isConnectedOrConnecting == true
+    }
+
+    private fun isConnectedToInternet(): Boolean {
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             isConnectedToInternetMarshmallowAndNewer()
         } else {
             isConnectedToInternetLegacy()
         }
-
-        return NetworkInfo(networks, metered = metered, vpn = vpn, connectedToInternet = connectedToInternet)
     }
 
     @RequiresApi(Build.VERSION_CODES.M)
@@ -130,7 +164,7 @@ class NetworkInfoActivity : AppCompatActivity(R.layout.activity_network_info), C
         val capabilities = connectivityManager.getNetworkCapabilities(connectivityManager.activeNetwork)
             ?: return false
 
-        return capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED)
+        return capabilities.hasCapability(NET_CAPABILITY_VALIDATED)
     }
 
     @Suppress("DEPRECATION")
@@ -188,6 +222,7 @@ class NetworkInfoActivity : AppCompatActivity(R.layout.activity_network_info), C
         networkAvailable = findViewById(R.id.networkAvailable)
         runningTime = findViewById(R.id.runningTime)
         trackersTextView = findViewById(R.id.trackersBlockedText)
+        dnsServersText = findViewById(R.id.dnsServersText)
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
