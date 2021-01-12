@@ -57,7 +57,7 @@ class AuthUrlDetector {
             "sso", setOf(Pattern.compile("duosecurity/getduo"))
         ),
         Pair(
-            "amazon.com", setOf(Pattern.compile("ap/challenge"))
+            "amazon.com", setOf(Pattern.compile("ap/challenge"), Pattern.compile("ap/cvf/approval"))
         )
     )
 
