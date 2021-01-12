@@ -7,7 +7,19 @@ function loginFormDetected() {
 }
 
 function inputVisible(input) {
-    return !(input.offsetWidth === 0 && input.offsetHeight === 0) && input.ariaHidden === "false" && !input.hidden && input.value !== "";
+    return !(input.offsetWidth === 0 && input.offsetHeight === 0) && !input.hidden && input.value !== "";
+}
+
+function validatePasswordField(passwords) {
+    for (var i = 0; i < passwords.length; i++) {
+        var password = passwords[i];
+        var found = inputVisible(password);
+        if (found) {
+            LoginDetection.log("password found!");
+            loginFormDetected();
+            return found;
+        }
+    }
 }
 
 function checkIsLoginForm(form) {
@@ -30,6 +42,20 @@ function checkIsLoginForm(form) {
     }
 
     LoginDetection.log("no password field in form " + form);
+    return false;
+}
+
+function scanPasswordFieldsInIFrame() {
+    LoginDetection.log("scanning iframes");
+    var iframes = document.querySelectorAll('iframe');
+    for (var i = 0; i < iframes.length; i++) {
+        var iframeDoc = iframes[i].contentWindow.document;
+        passwords = iframeDoc.querySelectorAll('input[type=password]');
+        var found = validatePasswordField(passwords);
+        if (found) {
+            return found;
+        }
+    }
     return false;
 }
 
@@ -56,18 +82,13 @@ function scanForForms() {
 
 function scanForPasswordField() {
     LoginDetection.log("Scanning for password");
-
-    var forms = document.forms;
-    if (!forms || forms.length === 0) {
-        LoginDetection.log("No forms found");
-        return;
-    }
-
-    for (var i = 0; i < forms.length; i++) {
-        var form = forms[i];
-        var found = checkIsLoginForm(form);
-        if (found) {
-            return found;
+    var passwords = document.querySelectorAll('input[type=password]');
+    if (passwords.length === 0) {
+        var found = scanPasswordFieldsInIFrame()
+        if (!found) {
+            LoginDetection.log("No password found");
         }
+        return found;
     }
+    return validatePasswordField(passwords);
 }
