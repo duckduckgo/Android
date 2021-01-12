@@ -26,8 +26,7 @@ import com.duckduckgo.app.feedback.api.FeedbackSubmitter
 import com.duckduckgo.app.feedback.api.FireAndForgetFeedbackSubmitter
 import com.duckduckgo.app.feedback.api.SubReasonApiMapper
 import com.duckduckgo.app.global.AppUrl.Url
-import com.duckduckgo.app.global.api.ApiRequestInterceptor
-import com.duckduckgo.app.global.api.NetworkApiCache
+import com.duckduckgo.app.global.api.*
 import com.duckduckgo.app.global.job.AppConfigurationSyncWorkRequestBuilder
 import com.duckduckgo.app.globalprivacycontrol.GlobalPrivacyControl
 import com.duckduckgo.app.httpsupgrade.api.HttpsUpgradeService
@@ -72,9 +71,13 @@ class NetworkModule {
     @Provides
     @Singleton
     @Named("nonCaching")
-    fun pixelOkHttpClient(apiRequestInterceptor: ApiRequestInterceptor): OkHttpClient {
+    fun pixelOkHttpClient(
+        apiRequestInterceptor: ApiRequestInterceptor,
+        pixelReQueryInterceptor: PixelReQueryInterceptor,
+    ): OkHttpClient {
         return OkHttpClient.Builder()
             .addInterceptor(apiRequestInterceptor)
+            .addInterceptor(pixelReQueryInterceptor)
             .build()
     }
 
@@ -107,6 +110,11 @@ class NetworkModule {
     @Provides
     fun apiRequestInterceptor(context: Context): ApiRequestInterceptor {
         return ApiRequestInterceptor(context)
+    }
+
+    @Provides
+    fun pixelReQueryInterceptor(): PixelReQueryInterceptor {
+        return PixelReQueryInterceptor()
     }
 
     @Provides
