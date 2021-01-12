@@ -256,7 +256,7 @@ class BrowserTabViewModelTest {
 
     @Before
     fun before() {
-        MockitoAnnotations.initMocks(this)
+        MockitoAnnotations.openMocks(this)
         db = Room.inMemoryDatabaseBuilder(getInstrumentation().targetContext, AppDatabase::class.java)
             .allowMainThreadQueries()
             .build()
@@ -3060,6 +3060,34 @@ class BrowserTabViewModelTest {
         loadUrl("https://www.facebook.com/dialog", isBrowserShowing = true)
 
         assertFalse(browserViewState().canChangeBrowsingMode)
+    }
+
+    @Test
+    fun whenRequestFileDownloadAndUrlIsBlobThenConvertBlobToDataUriCommandSent() {
+        val blobUrl = "blob:https://example.com/283nasdho23jkasdAjd"
+        val mime = "application/plain"
+
+        testee.requestFileDownload(blobUrl, null, mime, true)
+
+        assertCommandIssued<Command.ConvertBlobToDataUri> {
+            assertEquals(blobUrl, url)
+            assertEquals(mime, mimeType)
+        }
+    }
+
+    @Test
+    fun whenRequestFileDownloadAndUrlIsNotBlobThenRquestFileDownloadCommandSent() {
+        val normalUrl = "https://example.com/283nasdho23jkasdAjd"
+        val mime = "application/plain"
+
+        testee.requestFileDownload(normalUrl, null, mime, true)
+
+        assertCommandIssued<Command.RequestFileDownload> {
+            assertEquals(normalUrl, url)
+            assertEquals(mime, mimeType)
+            assertNull(contentDisposition)
+            assertTrue(requestUserConfirmation)
+        }
     }
 
     private suspend fun givenFireButtonPulsing() {

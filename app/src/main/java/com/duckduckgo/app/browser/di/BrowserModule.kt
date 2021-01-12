@@ -28,6 +28,8 @@ import com.duckduckgo.app.browser.defaultbrowsing.AndroidDefaultBrowserDetector
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserObserver
 import com.duckduckgo.app.browser.downloader.AndroidFileDownloader
+import com.duckduckgo.app.browser.downloader.BlobConverterInjector
+import com.duckduckgo.app.browser.downloader.BlobConverterInjectorJs
 import com.duckduckgo.app.browser.downloader.DataUriDownloader
 import com.duckduckgo.app.browser.downloader.FileDownloader
 import com.duckduckgo.app.browser.downloader.NetworkFileDownloader
@@ -249,6 +251,11 @@ class BrowserModule {
     @Provides
     fun domLoginDetector(settingsDataStore: SettingsDataStore, useOurAppDetector: UseOurAppDetector): DOMLoginDetector {
         return JsLoginDetector(settingsDataStore, useOurAppDetector)
+    }
+
+    @Provides
+    fun blobConverterInjector(): BlobConverterInjector {
+        return BlobConverterInjectorJs()
     }
 
     @Provides
