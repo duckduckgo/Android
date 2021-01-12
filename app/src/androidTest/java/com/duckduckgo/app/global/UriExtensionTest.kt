@@ -234,4 +234,22 @@ class UriExtensionTest {
     fun whenUrlHasSchemeReturnDomain() {
         assertEquals("www.example.com", "http://www.example.com".toUri().domain())
     }
+
+    @Test
+    fun whenUriHasResourceNameThenDropSchemeReturnResourceName() {
+        assertEquals("www.foo.com", "https://www.foo.com".toUri().toStringDropScheme())
+        assertEquals("www.foo.com", "http://www.foo.com".toUri().toStringDropScheme())
+    }
+
+    @Test
+    fun whenUriHasResourceNameAndPathThenDropSchemeReturnResourceNameAndPath() {
+        assertEquals("www.foo.com/path/to/foo", "https://www.foo.com/path/to/foo".toUri().toStringDropScheme())
+        assertEquals("www.foo.com/path/to/foo", "http://www.foo.com/path/to/foo".toUri().toStringDropScheme())
+    }
+
+    @Test
+    fun whenUriHasResourceNamePathAndParamsThenDropSchemeReturnResourceNamePathAndParams() {
+        assertEquals("www.foo.com/path/to/foo?key=value", "https://www.foo.com/path/to/foo?key=value".toUri().toStringDropScheme())
+        assertEquals("www.foo.com/path/to/foo?key=value", "http://www.foo.com/path/to/foo?key=value".toUri().toStringDropScheme())
+    }
 }
