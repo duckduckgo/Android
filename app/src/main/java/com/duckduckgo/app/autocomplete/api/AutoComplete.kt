@@ -134,7 +134,7 @@ class AutoCompleteApi @Inject constructor(
                 rankedBookmark.score += 50
             }
 
-        } else if (bookmark.url.toUri().toStringDropScheme().startsWith(tokens.first().trimEnd { it == '/' }, ignoreCase = true)) {
+        } else if (bookmark.url.toUri().toStringDropScheme().removePrefix("www.").startsWith(tokens.first().trimEnd { it == '/' }, ignoreCase = true)) {
             rankedBookmark.score += 300
         }
 
