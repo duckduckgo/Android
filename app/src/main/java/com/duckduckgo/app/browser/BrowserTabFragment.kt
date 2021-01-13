@@ -1235,7 +1235,9 @@ class BrowserTabFragment :
     }
 
     private fun convertBlobToDataUri(blob: Command.ConvertBlobToDataUri) {
-        blobConverterInjector.convertBlobIntoDataUriAndDownload(webView as WebView, blob.url, blob.mimeType)
+        webView?.let {
+            blobConverterInjector.convertBlobIntoDataUriAndDownload(it, blob.url, blob.mimeType)
+        }
     }
 
     private fun requestFileDownload(url: String, contentDisposition: String?, mimeType: String, requestUserConfirmation: Boolean) {
