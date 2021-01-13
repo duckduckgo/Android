@@ -60,6 +60,7 @@ import com.duckduckgo.app.browser.model.LongPressTarget
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.browser.ui.HttpAuthenticationDialogFragment.HttpAuthenticationListener
+import com.duckduckgo.app.browser.useragent.MobileUrlReWriter
 import com.duckduckgo.app.cta.ui.*
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepository
@@ -74,6 +75,7 @@ import com.duckduckgo.app.global.useourapp.UseOurAppDetector
 import com.duckduckgo.app.global.useourapp.UseOurAppDetector.Companion.USE_OUR_APP_SHORTCUT_TITLE
 import com.duckduckgo.app.global.useourapp.UseOurAppDetector.Companion.USE_OUR_APP_SHORTCUT_URL
 import com.duckduckgo.app.global.view.asLocationPermissionOrigin
+import com.duckduckgo.app.globalprivacycontrol.GlobalPrivacyControl
 import com.duckduckgo.app.location.GeoLocationPermissions
 import com.duckduckgo.app.location.data.LocationPermissionType
 import com.duckduckgo.app.location.data.LocationPermissionsRepository
@@ -134,7 +136,8 @@ class BrowserTabViewModel(
     private val notificationDao: NotificationDao,
     private val useOurAppDetector: UseOurAppDetector,
     private val variantManager: VariantManager,
-    private val fileDownloader: FileDownloader
+    private val fileDownloader: FileDownloader,
+    private val globalPrivacyControl: GlobalPrivacyControl
 ) : WebViewClientListener, EditBookmarkListener, HttpAuthenticationListener, SiteLocationPermissionDialog.SiteLocationPermissionDialogListener,
     SystemLocationPermissionDialog.SystemLocationPermissionDialogListener, ViewModel() {
 
@@ -262,9 +265,11 @@ class BrowserTabViewModel(
         class CheckSystemLocationPermission(val domain: String, val deniedForever: Boolean) : Command()
         class AskDomainPermission(val domain: String) : Command()
         object RequestSystemLocationPermission : Command()
-        class RefreshUserAgent(val host: String?, val isDesktop: Boolean) : Command()
+        class RefreshUserAgent(val url: String?, val isDesktop: Boolean) : Command()
         class ShowErrorWithAction(val textResId: Int, val action: () -> Unit) : Command()
         class ShowDomainHasPermissionMessage(val domain: String) : Command()
+        class ConvertBlobToDataUri(val url: String, val mimeType: String) : Command()
+        class RequestFileDownload(val url: String, val contentDisposition: String?, val mimeType: String, val requestUserConfirmation: Boolean) : Command()
         sealed class DaxCommand : Command() {
             object FinishTrackerAnimation : DaxCommand()
             class HideDaxDialog(val cta: Cta) : DaxCommand()
@@ -424,9 +429,8 @@ class BrowserTabViewModel(
     }
 
     private fun onAutoCompleteResultReceived(result: AutoCompleteResult) {
-        val results = result.suggestions.take(6)
         val currentViewState = currentAutoCompleteViewState()
-        autoCompleteViewState.value = currentViewState.copy(searchResults = AutoCompleteResult(result.query, results))
+        autoCompleteViewState.value = currentViewState.copy(searchResults = AutoCompleteResult(result.query, result.suggestions))
     }
 
     @VisibleForTesting
@@ -526,13 +530,7 @@ class BrowserTabViewModel(
         autoCompleteViewState.value = AutoCompleteViewState(false)
     }
 
-    private fun getUrlHeaders(): Map<String, String> {
-        return if (appSettingsPreferencesStore.globalPrivacyControlEnabled) {
-            mapOf(GPC_HEADER to GPC_HEADER_VALUE)
-        } else {
-            emptyMap()
-        }
-    }
+    private fun getUrlHeaders(): Map<String, String> = globalPrivacyControl.getHeaders()
 
     private fun extractVerticalParameter(currentUrl: String?): String? {
         val url = currentUrl ?: return null
@@ -595,6 +593,8 @@ class BrowserTabViewModel(
             }
         }
     }
+
+    override fun isDesktopSiteEnabled(): Boolean = currentBrowserViewState().isDesktopBrowsingMode
 
     override fun closeCurrentTab() {
         viewModelScope.launch { removeCurrentTabFromRepository() }
@@ -756,8 +756,6 @@ class BrowserTabViewModel(
             sendPixelIfUseOurAppSiteVisitedFirstTime(url)
         }
 
-        command.value = RefreshUserAgent(site?.uri?.host, currentBrowserViewState().isDesktopBrowsingMode)
-
         val currentOmnibarViewState = currentOmnibarViewState()
         omnibarViewState.value = currentOmnibarViewState.copy(omnibarText = omnibarTextForUrl(url), shouldMoveCaretToEnd = false)
         val currentBrowserViewState = currentBrowserViewState()
@@ -770,6 +768,7 @@ class BrowserTabViewModel(
             browserShowing = true,
             canAddBookmarks = true,
             addToHomeEnabled = true,
+            canChangeBrowsingMode = canChangeBrowsingMode(site?.domain),
             addToHomeVisible = addToHomeCapabilityDetector.isAddToHomeSupported(),
             canSharePage = true,
             showPrivacyGrade = true,
@@ -796,6 +795,10 @@ class BrowserTabViewModel(
         permissionOrigin?.let { viewModelScope.launch { notifyPermanentLocationPermission(permissionOrigin) } }
 
         registerSiteVisit()
+    }
+
+    private fun canChangeBrowsingMode(domain: String?): Boolean {
+        return !MobileUrlReWriter.strictlyMobileSiteHosts.any { domain?.contains(it.host) == true }
     }
 
     private fun sendPixelIfUseOurAppSiteVisitedFirstTime(url: String) {
@@ -932,10 +935,16 @@ class BrowserTabViewModel(
         } else {
             newProgress
         }
+
         loadingViewState.value = progress.copy(isLoading = isLoading, progress = visualProgress)
 
         val showLoadingGrade = progress.privacyOn || isLoading
         privacyGradeViewState.value = currentPrivacyGradeState().copy(shouldAnimate = isLoading, showEmptyGrade = showLoadingGrade)
+
+        //TODO: check if we can unify this with logic above
+        if (newProgress == 100) {
+            command.value = RefreshUserAgent(url, currentBrowserViewState().isDesktopBrowsingMode)
+        }
     }
 
     override fun onSiteLocationPermissionRequested(origin: String, callback: GeolocationPermissions.Callback) {
@@ -1433,7 +1442,7 @@ class BrowserTabViewModel(
     fun onDesktopSiteModeToggled(desktopSiteRequested: Boolean) {
         val currentBrowserViewState = currentBrowserViewState()
         browserViewState.value = currentBrowserViewState.copy(isDesktopBrowsingMode = desktopSiteRequested)
-        command.value = RefreshUserAgent(site?.uri?.host, desktopSiteRequested)
+        command.value = RefreshUserAgent(site?.uri?.toString(), desktopSiteRequested)
 
         val uri = site?.uri ?: return
 
@@ -1713,9 +1722,25 @@ class BrowserTabViewModel(
         command.value = OpenInNewTab(query)
     }
 
+    override fun redirectTriggeredByGpc() {
+        navigationAwareLoginDetector.onEvent(NavigationEvent.GpcRedirect)
+    }
+
     override fun loginDetected() {
         val currentUrl = site?.url ?: return
         navigationAwareLoginDetector.onEvent(NavigationEvent.LoginAttempt(currentUrl))
+    }
+
+    fun requestFileDownload(url: String, contentDisposition: String?, mimeType: String, requestUserConfirmation: Boolean) {
+        if (url.startsWith("blob:")) {
+            command.value = ConvertBlobToDataUri(url, mimeType)
+        } else {
+            sendRequestFileDownloadCommand(url, contentDisposition, mimeType, requestUserConfirmation)
+        }
+    }
+
+    private fun sendRequestFileDownloadCommand(url: String, contentDisposition: String?, mimeType: String, requestUserConfirmation: Boolean) {
+        command.postValue(RequestFileDownload(url, contentDisposition, mimeType, requestUserConfirmation))
     }
 
     fun download(pendingFileDownload: FileDownloader.PendingFileDownload) {
@@ -1765,8 +1790,6 @@ class BrowserTabViewModel(
 
     companion object {
         private const val FIXED_PROGRESS = 50
-        const val GPC_HEADER = "Sec-GPC"
-        const val GPC_HEADER_VALUE = "1"
 
         // Minimum progress to show web content again after decided to hide web content (possible spoofing attack).
         // We think that progress is enough to assume next site has already loaded new content.

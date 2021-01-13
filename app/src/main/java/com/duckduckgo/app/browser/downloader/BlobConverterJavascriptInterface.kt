@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 DuckDuckGo
+ * Copyright (c) 2021 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,10 +14,18 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.global.api
+package com.duckduckgo.app.browser.downloader
 
-import retrofit2.Response
-import java.net.HttpURLConnection.HTTP_NOT_MODIFIED
+import android.webkit.JavascriptInterface
 
-val <T> Response<T>.isCached: Boolean
-    get() = raw().cacheResponse != null && (raw().networkResponse?.code == null || raw().networkResponse?.code == HTTP_NOT_MODIFIED)
+class BlobConverterJavascriptInterface(private val onBlobConverted: (url: String, mimeType: String) -> Unit) {
+
+    @JavascriptInterface
+    fun convertBlobToDataUri(dataUrl: String, contentType: String) {
+        onBlobConverted(dataUrl, contentType)
+    }
+
+    companion object {
+        const val JAVASCRIPT_INTERFACE_NAME = "BlobConverter"
+    }
+}
