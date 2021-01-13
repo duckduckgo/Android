@@ -134,11 +134,15 @@ class AutoCompleteApi @Inject constructor(
                 rankedBookmark.score += 50
             }
 
-        } else if (bookmark.url.toUri().toStringDropScheme().removePrefix("www.").startsWith(tokens.first().trimEnd { it == '/' }, ignoreCase = true)) {
+        } else if (bookmark.url.redactSchemeAndWwwSubDomain().startsWith(tokens.first().trimEnd { it == '/' }, ignoreCase = true)) {
             rankedBookmark.score += 300
         }
 
         return rankedBookmark
+    }
+
+    private fun String.redactSchemeAndWwwSubDomain(): String {
+        return this.toUri().toStringDropScheme().removePrefix("www.")
     }
 
     private data class RankedBookmark(
