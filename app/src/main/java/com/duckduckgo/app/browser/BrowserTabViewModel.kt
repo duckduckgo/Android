@@ -20,6 +20,7 @@ import android.annotation.SuppressLint
 import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Message
+import android.util.Patterns
 import android.view.ContextMenu
 import android.view.MenuItem
 import android.view.View
@@ -626,6 +627,10 @@ class BrowserTabViewModel(
     }
 
     fun onRefreshRequested() {
+        val omnibarContent = currentOmnibarViewState().omnibarText
+        if (!Patterns.WEB_URL.matcher(omnibarContent).matches()) {
+            fireQueryChangedPixel(currentOmnibarViewState().omnibarText)
+        }
         navigationAwareLoginDetector.onEvent(NavigationEvent.UserAction.Refresh)
         if (currentGlobalLayoutState() is Invalidated) {
             recoverTabWithQuery(url.orEmpty())

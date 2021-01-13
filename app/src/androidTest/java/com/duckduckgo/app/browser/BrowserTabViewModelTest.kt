@@ -1219,6 +1219,24 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenRefreshRequestedWithQuerySearchThenFireQueryChangePixelZero() {
+        loadUrl("query")
+
+        testee.onRefreshRequested()
+
+        verify(mockPixel).fire("rq_0")
+    }
+
+    @Test
+    fun whenRefreshRequestedWithUrlThenDoNotFireQueryChangePixel() {
+        loadUrl("https://example.com")
+
+        testee.onRefreshRequested()
+
+        verify(mockPixel, never()).fire("rq_0")
+    }
+
+    @Test
     fun whenUserBrowsingPressesBackAndBrowserCanGoBackThenNavigatesToPreviousPageAndHandledTrue() {
         setupNavigation(isBrowsing = true, canGoBack = true, stepsToPreviousPage = 2)
         assertTrue(testee.onUserPressedBack())
