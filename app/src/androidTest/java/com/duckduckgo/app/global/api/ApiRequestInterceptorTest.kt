@@ -16,75 +16,51 @@
 
 package com.duckduckgo.app.global.api
 
+import android.webkit.WebSettings
 import androidx.test.platform.app.InstrumentationRegistry
-import okhttp3.*
+import com.duckduckgo.app.browser.useragent.UserAgentProvider
+import com.duckduckgo.app.global.device.ContextDeviceInfo
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
-import java.util.concurrent.TimeUnit
 
 class ApiRequestInterceptorTest {
 
     private lateinit var testee: ApiRequestInterceptor
 
-    private val fakeChain: Interceptor.Chain = FakeChain()
+    private lateinit var userAgentProvider: UserAgentProvider
 
     @Before
     fun before() {
-        testee = ApiRequestInterceptor(InstrumentationRegistry.getInstrumentation().context)
+        userAgentProvider = UserAgentProvider(
+            WebSettings.getDefaultUserAgent(InstrumentationRegistry.getInstrumentation().context),
+            ContextDeviceInfo(InstrumentationRegistry.getInstrumentation().context)
+        )
+
+        testee = ApiRequestInterceptor(
+            InstrumentationRegistry.getInstrumentation().context,
+            userAgentProvider
+        )
     }
 
     @Test
     fun whenAPIRequestIsMadeThenUserAgentIsAdded() {
         val packageName = InstrumentationRegistry.getInstrumentation().context.applicationInfo.packageName
 
-        val response = testee.intercept(fakeChain)
+        val response = testee.intercept(FakeChain("http://example.com"))
 
         val regex = "ddg_android/.*\\($packageName; Android API .*\\)".toRegex()
         val result = response.request.header(Header.USER_AGENT)!!
         assertTrue(result.matches(regex))
     }
 
-    // implement just request and proceed methods
-    private class FakeChain : Interceptor.Chain {
-        override fun call(): Call {
-            TODO("Not yet implemented")
-        }
+    @Test
+    fun whenAPIRequestIsRqPixelThenOverrideHeader() {
+        val fakeChain = FakeChain("https://improving.duckduckgo.com/t/rq_0")
 
-        override fun connectTimeoutMillis(): Int {
-            TODO("Not yet implemented")
-        }
-
-        override fun connection(): Connection? {
-            TODO("Not yet implemented")
-        }
-
-        override fun proceed(request: Request): Response {
-            return Response.Builder().request(request).protocol(Protocol.HTTP_2).code(200).message("").build()
-        }
-
-        override fun readTimeoutMillis(): Int {
-            TODO("Not yet implemented")
-        }
-
-        override fun request(): Request {
-            return Request.Builder().url("http://example.com").build()
-        }
-
-        override fun withConnectTimeout(timeout: Int, unit: TimeUnit): Interceptor.Chain {
-            TODO("Not yet implemented")
-        }
-
-        override fun withReadTimeout(timeout: Int, unit: TimeUnit): Interceptor.Chain {
-            TODO("Not yet implemented")
-        }
-
-        override fun withWriteTimeout(timeout: Int, unit: TimeUnit): Interceptor.Chain {
-            TODO("Not yet implemented")
-        }
-
-        override fun writeTimeoutMillis(): Int {
-            TODO("Not yet implemented")
-        }
+        val response = testee.intercept(fakeChain)
+        val header = response.request.header(Header.USER_AGENT)!!
+        val regex = "Mozilla/.* \\(Linux; Android.*\\) AppleWebKit/.* \\(KHTML, like Gecko\\) Version/.* Chrome/.* Mobile DuckDuckGo/.* Safari/.*".toRegex()
+        assertTrue(header.matches(regex))
     }
 }

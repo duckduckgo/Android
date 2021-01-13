@@ -16,12 +16,10 @@
 
 package com.duckduckgo.app.global.api
 
-import okhttp3.*
 import okhttp3.HttpUrl.Companion.toHttpUrl
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
-import java.util.concurrent.TimeUnit
 
 class PixelReQueryInterceptorTest {
 
@@ -84,49 +82,5 @@ class PixelReQueryInterceptorTest {
         private const val EXPECTED_RQ_1_URL = "https://improving.duckduckgo.com/t/rq_1?atb=v255-7zu&appVersion=5.74.0&test=1"
         private const val EXPECTED_OTHER_PIXEL_PHONE_URL = "https://improving.duckduckgo.com/t/my_pixel_android_phone?atb=v255-7zu&appVersion=5.74.0&test=1"
         private const val EXPECTED_OTHER_PIXEL_TABLET_URL = "https://improving.duckduckgo.com/t/my_pixel_android_tablet?atb=v255-7zu&appVersion=5.74.0&test=1"
-    }
-
-    // implement just request and proceed methods
-    private class FakeChain(private val url: String) : Interceptor.Chain {
-        override fun call(): Call {
-            TODO("Not yet implemented")
-        }
-
-        override fun connectTimeoutMillis(): Int {
-            TODO("Not yet implemented")
-        }
-
-        override fun connection(): Connection? {
-            TODO("Not yet implemented")
-        }
-
-        override fun proceed(request: Request): Response {
-            return Response.Builder().request(request).protocol(Protocol.HTTP_2).code(200).message("").build()
-        }
-
-        override fun readTimeoutMillis(): Int {
-            TODO("Not yet implemented")
-        }
-
-        override fun request(): Request {
-            return Request.Builder().url(url).build()
-        }
-
-        override fun withConnectTimeout(timeout: Int, unit: TimeUnit): Interceptor.Chain {
-            TODO("Not yet implemented")
-        }
-
-        override fun withReadTimeout(timeout: Int, unit: TimeUnit): Interceptor.Chain {
-            TODO("Not yet implemented")
-        }
-
-        override fun withWriteTimeout(timeout: Int, unit: TimeUnit): Interceptor.Chain {
-            TODO("Not yet implemented")
-        }
-
-        override fun writeTimeoutMillis(): Int {
-            TODO("Not yet implemented")
-        }
-
     }
 }
