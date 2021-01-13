@@ -323,6 +323,30 @@ class AutoCompleteApiTest {
     }
 
     @Test
+    fun whenSingleTokenQueryDomainContainsWwwThenResultMathUrl() {
+        whenever(mockAutoCompleteService.autoComplete("reddit")).thenReturn(Observable.just(listOf()))
+        whenever(mockBookmarksDao.bookmarksObservable()).thenReturn(
+            Single.just(
+                listOf(
+                    BookmarkEntity(0, "Reddit", "https://www.reddit.com"),
+                    BookmarkEntity(0, "duckduckgo", "https://www.reddit.com/r/duckduckgo"),
+                )
+            )
+        )
+
+        val result = testee.autoComplete("reddit").test()
+        val value = result.values()[0] as AutoCompleteResult
+
+        assertEquals(
+            listOf(
+                AutoComplete.AutoCompleteSuggestion.AutoCompleteBookmarkSuggestion(phrase = "www.reddit.com", "Reddit", "https://www.reddit.com"),
+                AutoComplete.AutoCompleteSuggestion.AutoCompleteBookmarkSuggestion(phrase = "www.reddit.com/r/duckduckgo", "duckduckgo", "https://www.reddit.com/r/duckduckgo"),
+            ),
+            value.suggestions
+        )
+    }
+
+    @Test
     fun whenMultipleTokenQueryAndNoTokenMatchThenReturnEmpty() {
         val query = "example title foo"
         whenever(mockAutoCompleteService.autoComplete(query)).thenReturn(Observable.just(listOf()))
