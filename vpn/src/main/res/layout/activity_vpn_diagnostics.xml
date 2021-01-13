@@ -36,6 +36,6 @@
 
     </com.google.android.material.appbar.AppBarLayout>
 
-    <include layout="@layout/content_network_info" />
+    <include layout="@layout/content_vpn_diagnostics" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

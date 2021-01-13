@@ -50,7 +50,7 @@ class BrokenSiteActivity : DuckDuckGoActivity() {
         val blockedTrackers = intent.getStringExtra(BLOCKED_TRACKERS_EXTRA)
         val upgradedHttps = intent.getBooleanExtra(UPGRADED_TO_HTTPS_EXTRA, false)
         val surrogates = intent.getStringExtra(SURROGATES_EXTRA)
-        viewModel.setInitialBrokenSite(url, blockedTrackers, surrogates, upgradedHttps)
+        viewModel.setInitialBrokenSite(url ?: "", blockedTrackers ?: "", surrogates ?: "", upgradedHttps)
     }
 
     private fun configureListeners() {

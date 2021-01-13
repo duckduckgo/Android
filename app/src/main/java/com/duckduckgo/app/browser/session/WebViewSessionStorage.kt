@@ -85,9 +85,11 @@ class WebViewSessionInMemoryStorage : WebViewSessionStorage {
             return false
         }
 
-        val webViewBundle = bundle.getBundle(CACHE_KEY_WEBVIEW)
-        webView.restoreState(webViewBundle)
-        webView.scrollY = bundle.getInt(CACHE_KEY_SCROLL_POSITION)
+        bundle.getBundle(CACHE_KEY_WEBVIEW)?.let {
+            webView.restoreState(it)
+            webView.scrollY = bundle.getInt(CACHE_KEY_SCROLL_POSITION)
+        }
+
         cache.remove(tabId)
 
         logCacheSize()

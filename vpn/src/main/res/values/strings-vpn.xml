@@ -39,9 +39,10 @@
     </plurals>
     <string name="vpnNotificationTrackersFoundUpdate">"Today, so far we blocked %s from tracking you; the last one was %s. %s in total."</string>
     <string name="vpnReportFeedback">Send feedback</string>
-    <string name="networkInfo">Network info</string>
+    <string name="diagnosticsMenuLabel">Diagnostics</string>
     <string name="meteredConnection">"Metered: %s"</string>
     <string name="vpnConnectionStatus">"VPN connected: %s"</string>
     <string name="networkAvailable">"Connected to internet: %s"</string>
     <string name="dnsServers">"DNS servers: %s"</string>
+    <string name="appExitsReasonsTitle">App exit reasons</string>
 </resources>

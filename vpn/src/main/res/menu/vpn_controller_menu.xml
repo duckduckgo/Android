@@ -23,8 +23,8 @@
         android:title="@string/vpnReportFeedback"
         app:showAsAction="always" />
     <item
-        android:id="@+id/networkInfo"
-        android:title="@string/networkInfo"
+        android:id="@+id/diagnosticsScreen"
+        android:title="@string/diagnosticsMenuLabel"
         app:showAsAction="never" />
 
     <item

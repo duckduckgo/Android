@@ -185,8 +185,8 @@ class VpnControllerActivity : AppCompatActivity(R.layout.activity_vpn_controller
             R.id.reportFeedback -> {
                 launchFeedback(); true
             }
-            R.id.networkInfo -> {
-                startActivity(NetworkInfoActivity.intent(this)); true
+            R.id.diagnosticsScreen -> {
+                startActivity(VpnDiagnosticsActivity.intent(this)); true
             }
             R.id.debugLogging -> {
                 val enabled = !item.isChecked

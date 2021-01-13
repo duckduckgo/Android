@@ -20,7 +20,7 @@
         </activity>
 
         <activity
-            android:name="dummy.ui.NetworkInfoActivity"
+            android:name="dummy.ui.VpnDiagnosticsActivity"
             android:theme="@style/Theme.AndroidVpn.NoActionBar"
             android:parentActivityName="dummy.ui.VpnControllerActivity"
             android:process=":vpn" >

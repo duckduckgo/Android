@@ -23,4 +23,10 @@
         android:title="@string/refresh"
         app:showAsAction="always" />
 
+    <item
+        android:id="@+id/appExitHistory"
+        android:icon="@drawable/ic_baseline_history_24"
+        android:title="@string/appExitsReasonsTitle"
+        app:showAsAction="never" />
+
 </menu>

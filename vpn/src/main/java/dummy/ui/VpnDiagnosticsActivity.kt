@@ -16,6 +16,7 @@
 
 package dummy.ui
 
+import android.app.ActivityManager
 import android.content.Context
 import android.content.Intent
 import android.net.ConnectivityManager
@@ -26,6 +27,7 @@ import android.view.Menu
 import android.view.MenuItem
 import android.widget.TextView
 import androidx.annotation.RequiresApi
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.mobile.android.vpn.R
@@ -38,9 +40,10 @@ import java.net.Inet4Address
 import java.net.Inet6Address
 import java.net.InetAddress
 import java.net.NetworkInterface
+import java.util.*
 import javax.inject.Inject
 
-class NetworkInfoActivity : AppCompatActivity(R.layout.activity_network_info), CoroutineScope by MainScope() {
+class VpnDiagnosticsActivity : AppCompatActivity(R.layout.activity_vpn_diagnostics), CoroutineScope by MainScope() {
 
     private lateinit var networkAddresses: TextView
     private lateinit var meteredConnectionText: TextView
@@ -71,16 +74,11 @@ class NetworkInfoActivity : AppCompatActivity(R.layout.activity_network_info), C
 
     private fun updateNetworkStatus() {
         lifecycleScope.launch(Dispatchers.IO) {
-            val networkInfo = retrieveNetworkInfo()
+            val networkInfo = retrieveNetworkStatusInfo()
             val dnsInfo = retrieveDnsInfo()
-            val addresses = if (networkInfo.networks.isEmpty()) {
-                "no addresses"
-            } else {
-                networkInfo.networks.joinToString("\n\n", transform = { "${it.type.type}:\n${it.address}" })
-            }
-
-            val totalTrackers = (repository.getVpnTrackers({ repository.noStartDate() }).firstOrNull() ?: emptyList()).size
-            val runningTimeFormatted = generateTimeRunningMessage(repository.getRunningTimeMillis({ repository.noStartDate() }).firstOrNull() ?: 0L)
+            val addresses = retrieveIpAddressesInfo(networkInfo)
+            val totalTrackers = retrieveTrackersBlockedInfo()
+            val runningTimeFormatted = retrieveRunningTimeInfo()
             val trackersBlockedFormatted = generateTrackersBlocked(totalTrackers)
 
             withContext(Dispatchers.Main) {
@@ -94,6 +92,34 @@ class NetworkInfoActivity : AppCompatActivity(R.layout.activity_network_info), C
             }
         }
 
+    }
+
+    private fun retrieveHistoricalCrashInfo(): AppExitHistory {
+        if (Build.VERSION.SDK_INT < 30) {
+            return AppExitHistory()
+        }
+
+        val activityManager = getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
+
+        val exitReasons = activityManager.getHistoricalProcessExitReasons(null, 0, 0)
+            .filter { it.processName == "com.duckduckgo.mobile.android.vpn:vpn" }
+            .take(10)
+            .map { "[${Date(it.timestamp)}\nReason: ${it.reason}: ${it.description}" }
+
+        return AppExitHistory(exitReasons)
+    }
+
+    private suspend fun retrieveRunningTimeInfo() =
+        generateTimeRunningMessage(repository.getRunningTimeMillis({ repository.noStartDate() }).firstOrNull() ?: 0L)
+
+    private suspend fun retrieveTrackersBlockedInfo() = (repository.getVpnTrackers({ repository.noStartDate() }).firstOrNull() ?: emptyList()).size
+
+    private fun retrieveIpAddressesInfo(networkInfo: NetworkInfo): String {
+        return if (networkInfo.networks.isEmpty()) {
+            "no addresses"
+        } else {
+            networkInfo.networks.joinToString("\n\n", transform = { "${it.type.type}:\n${it.address}" })
+        }
     }
 
     private fun generateTimeRunningMessage(timeRunningMillis: Long): String {
@@ -112,7 +138,7 @@ class NetworkInfoActivity : AppCompatActivity(R.layout.activity_network_info), C
         }
     }
 
-    private fun retrieveNetworkInfo(): NetworkInfo {
+    private fun retrieveNetworkStatusInfo(): NetworkInfo {
         val networks = getCurrentNetworkAddresses()
         val metered = connectivityManager.isActiveNetworkMetered
         val vpn = isVpnEnabled()
@@ -236,13 +262,43 @@ class NetworkInfoActivity : AppCompatActivity(R.layout.activity_network_info), C
                 updateNetworkStatus()
                 true
             }
+            R.id.appExitHistory -> {
+                val history = retrieveHistoricalCrashInfo()
+
+                AlertDialog.Builder(this)
+                    .setTitle(R.string.appExitsReasonsTitle)
+                    .setMessage(history.toString())
+                    .setPositiveButton("OK") { _, _ -> }
+                    .setNeutralButton("Share") { _, _ ->
+                        val intent = Intent(Intent.ACTION_SEND).also {
+                            it.type = "text/plain"
+                            it.putExtra(Intent.EXTRA_TEXT, history.toString())
+                            it.putExtra(Intent.EXTRA_SUBJECT, "Share VPN exit reasons")
+                        }
+                        startActivity(Intent.createChooser(intent, "Share"))
+                    }
+                    .show()
+                true
+            }
             else -> super.onOptionsItemSelected(item)
         }
     }
 
     companion object {
         fun intent(context: Context): Intent {
-            return Intent(context, NetworkInfoActivity::class.java)
+            return Intent(context, VpnDiagnosticsActivity::class.java)
+        }
+    }
+}
+
+data class AppExitHistory(
+    val history: List<String> = emptyList()
+) {
+    override fun toString(): String {
+        return if (history.isEmpty()) {
+            "No exit history available"
+        } else {
+            history.joinToString(separator = "\n\n") { it }
         }
     }
 }

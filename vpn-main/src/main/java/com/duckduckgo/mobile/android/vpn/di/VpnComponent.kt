@@ -27,7 +27,7 @@ import dagger.Subcomponent
 import dagger.android.AndroidInjector
 import dagger.multibindings.ClassKey
 import dagger.multibindings.IntoMap
-import dummy.ui.NetworkInfoActivity
+import dummy.ui.VpnDiagnosticsActivity
 import dummy.ui.VpnControllerActivity
 
 /**
@@ -109,9 +109,9 @@ interface VpnControllerActivityComponent : AndroidInjector<VpnControllerActivity
 @MergeSubcomponent(
     scope = VpnObjectGraph::class
 )
-interface NetworkInfoActivityComponent : AndroidInjector<NetworkInfoActivity> {
+interface VpnDiagnosticsActivityComponent : AndroidInjector<VpnDiagnosticsActivity> {
     @Subcomponent.Factory
-    interface Factory : AndroidInjector.Factory<NetworkInfoActivity>
+    interface Factory : AndroidInjector.Factory<VpnDiagnosticsActivity>
 }
 
 @VpnScope
@@ -130,7 +130,7 @@ interface TrackerBlockingVpnServiceComponent : AndroidInjector<TrackerBlockingVp
 interface VpnComponentProvider {
     fun vpnControllerActivityComponentFactory(): VpnControllerActivityComponent.Factory
     fun trackerBlockingVpnServiceComponentFactory(): TrackerBlockingVpnServiceComponent.Factory
-    fun networkInfoActivityComponentFactory(): NetworkInfoActivityComponent.Factory
+    fun vpnDiagnosticsActivityComponentFactory(): VpnDiagnosticsActivityComponent.Factory
 }
 
 /* ============================================================================
@@ -146,8 +146,8 @@ abstract class VpnBindingModule {
 
     @Binds
     @IntoMap
-    @ClassKey(NetworkInfoActivity::class)
-    abstract fun bindNetworkInfoActivityComponentFactory(factory: NetworkInfoActivityComponent.Factory): AndroidInjector.Factory<*>
+    @ClassKey(VpnDiagnosticsActivity::class)
+    abstract fun bindVpnDiagnosticsActivityComponentFactory(factory: VpnDiagnosticsActivityComponent.Factory): AndroidInjector.Factory<*>
 
     @Binds
     @IntoMap
