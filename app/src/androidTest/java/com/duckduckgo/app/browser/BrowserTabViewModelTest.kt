@@ -637,6 +637,16 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenUserRedirectedThenNotifyLoginDetector() = coroutineRule.runBlocking {
+        loadUrl("http://duckduckgo.com")
+        testee.progressChanged(100)
+
+        overrideUrl("http://example.com")
+
+        verify(mockNavigationAwareLoginDetector).onEvent(NavigationEvent.Redirect("http://example.com"))
+    }
+
+    @Test
     fun whenLoadingProgressReaches50ThenShowWebContent() = coroutineRule.runBlocking {
         loadUrl("http://duckduckgo.com")
         testee.progressChanged(50)

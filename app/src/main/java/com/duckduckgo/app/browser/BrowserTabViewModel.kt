@@ -923,10 +923,6 @@ class BrowserTabViewModel(
         Timber.v("Loading in progress $newProgress")
         if (!currentBrowserViewState().browserShowing) return
 
-        if (newProgress == 100) {
-            navigationAwareLoginDetector.onEvent(NavigationEvent.PageFinished)
-        }
-
         val isLoading = newProgress < 100
         val progress = currentLoadingViewState()
         if (progress.progress == newProgress) return
@@ -940,10 +936,10 @@ class BrowserTabViewModel(
 
         val showLoadingGrade = progress.privacyOn || isLoading
         privacyGradeViewState.value = currentPrivacyGradeState().copy(shouldAnimate = isLoading, showEmptyGrade = showLoadingGrade)
-
-        //TODO: check if we can unify this with logic above
+        
         if (newProgress == 100) {
             command.value = RefreshUserAgent(url, currentBrowserViewState().isDesktopBrowsingMode)
+            navigationAwareLoginDetector.onEvent(NavigationEvent.PageFinished)
         }
     }
 
