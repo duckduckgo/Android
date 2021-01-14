@@ -936,7 +936,7 @@ class BrowserTabViewModel(
 
         val showLoadingGrade = progress.privacyOn || isLoading
         privacyGradeViewState.value = currentPrivacyGradeState().copy(shouldAnimate = isLoading, showEmptyGrade = showLoadingGrade)
-        
+
         if (newProgress == 100) {
             command.value = RefreshUserAgent(url, currentBrowserViewState().isDesktopBrowsingMode)
             navigationAwareLoginDetector.onEvent(NavigationEvent.PageFinished)
