@@ -70,32 +70,16 @@ private var oAuthUrlPatterns = mapOf<String, Set<Pattern>>(
     )
 )
 
-fun ValidUrl.isOAuthUrl(): Boolean {
-    oAuthUrlPatterns.keys
-        .firstOrNull { host.contains(it) }
-        ?.let { oAuthUrlPatterns[it] }
-        ?.forEach {
-            if (it.matcher(path.orEmpty()).find()) {
-                return true
-            }
-        }.let { return false }
-}
+fun ValidUrl.isOAuthUrl(): Boolean = this.findMatchIn(oAuthUrlPatterns)
 
-fun ValidUrl.is2FAUrl(): Boolean {
-    twoFactorAuthUrlPatterns.keys
-        .firstOrNull { host.contains(it) }
-        ?.let { twoFactorAuthUrlPatterns[it] }
-        ?.forEach {
-            if (it.matcher(path.orEmpty()).find()) {
-                return true
-            }
-        }.let { return false }
-}
+fun ValidUrl.is2FAUrl(): Boolean = this.findMatchIn(twoFactorAuthUrlPatterns)
 
-fun ValidUrl.isSSOUrl(): Boolean {
-    ssoUrlPatterns.keys
+fun ValidUrl.isSSOUrl(): Boolean = this.findMatchIn(ssoUrlPatterns)
+
+private fun ValidUrl.findMatchIn(urlPatterns: Map<String, Set<Pattern>>): Boolean {
+    urlPatterns.keys
         .firstOrNull { host.contains(it) }
-        ?.let { ssoUrlPatterns[it] }
+        ?.let { urlPatterns[it] }
         ?.forEach {
             if (it.matcher(path.orEmpty()).find()) {
                 return true
