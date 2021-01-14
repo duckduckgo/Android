@@ -24,9 +24,9 @@ import com.duckduckgo.app.browser.WebNavigationStateChange
 import com.duckduckgo.app.global.ValidUrl
 import com.duckduckgo.app.global.baseHost
 import com.duckduckgo.app.global.getValidUrl
+import com.duckduckgo.app.settings.db.SettingsDataStore
 import kotlinx.coroutines.*
 import timber.log.Timber
-import javax.inject.Inject
 
 interface NavigationAwareLoginDetector {
     val loginEventLiveData: LiveData<LoginDetected>
@@ -50,7 +50,7 @@ sealed class NavigationEvent {
     data class Redirect(val url: String) : NavigationEvent()
 }
 
-class NextPageLoginDetection @Inject constructor() : NavigationAwareLoginDetector {
+class NextPageLoginDetection constructor(private val settingsDataStore: SettingsDataStore) : NavigationAwareLoginDetector {
 
     override val loginEventLiveData = MutableLiveData<LoginDetected>()
     private var loginAttempt: ValidUrl? = null
@@ -61,6 +61,8 @@ class NextPageLoginDetection @Inject constructor() : NavigationAwareLoginDetecto
     private var loginDetectionJob: Job? = null
 
     override fun onEvent(navigationEvent: NavigationEvent) {
+        if (!settingsDataStore.appLoginDetection) return
+
         Timber.v("LoginDetectionDelegate $navigationEvent")
         return when (navigationEvent) {
             is NavigationEvent.PageFinished -> {
