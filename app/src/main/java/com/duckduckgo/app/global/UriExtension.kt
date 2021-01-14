@@ -99,10 +99,12 @@ fun Uri?.faviconLocation(): Uri? {
 
 fun Uri.getValidUrl(): ValidUrl? {
     val validHost = host ?: return null
-    return ValidUrl(validHost, path)
+    val validBaseHost = baseHost ?: return null
+    return ValidUrl(validBaseHost, validHost, path)
 }
 
 data class ValidUrl(
+    val baseHost: String,
     val host: String,
     val path: String?
 )
