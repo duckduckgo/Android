@@ -71,7 +71,6 @@ private var oAuthUrlPatterns = mapOf<String, Set<Pattern>>(
     )
 )
 
-
 fun ValidUrl.isOAuthUrl(): Boolean {
     oAuthUrlPatterns.keys
         .firstOrNull { host.contains(it) }
