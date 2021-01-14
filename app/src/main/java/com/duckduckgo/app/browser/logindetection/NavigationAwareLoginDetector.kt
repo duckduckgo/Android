@@ -21,7 +21,9 @@ import androidx.core.net.toUri
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.duckduckgo.app.browser.WebNavigationStateChange
+import com.duckduckgo.app.global.ValidUrl
 import com.duckduckgo.app.global.baseHost
+import com.duckduckgo.app.global.getValidUrl
 import kotlinx.coroutines.*
 import timber.log.Timber
 import java.util.regex.Pattern
@@ -49,98 +51,6 @@ sealed class NavigationEvent {
     data class Redirect(val url: String): NavigationEvent()
 }
 
-class AuthUrlDetector {
-    private var signinPages = mapOf<String, Set<Pattern>>(
-        Pair(
-            "accounts.google.com", setOf(Pattern.compile("signin/v\\d.*/challenge"))
-        ),
-        Pair(
-            "sso", setOf(Pattern.compile("duosecurity/getduo"))
-        ),
-        Pair(
-            "amazon.com", setOf(Pattern.compile("ap/challenge"), Pattern.compile("ap/cvf/approval"))
-        )
-    )
-
-    private var ssoProvider = mapOf<String, Set<Pattern>>(
-        Pair(
-            "sso", setOf(Pattern.compile("saml2/idp/SSOService"))
-        )
-    )
-
-    private var authenticationDetector = mapOf<String, Set<Pattern>>(
-        Pair(
-            "accounts.google.com", setOf(Pattern.compile("o/oauth2/auth"), Pattern.compile("o/oauth2/v\\d.*/auth"))
-        ),
-        Pair(
-            "appleid.apple.com", setOf(Pattern.compile("auth/authorize"))
-        ),
-        Pair(
-            "amazon.com", setOf(Pattern.compile("ap/oa"))
-        ),
-        Pair(
-            "auth.atlassian.com", setOf(Pattern.compile("authorize"))
-        ),
-        Pair(
-            "facebook.com", setOf(Pattern.compile("/v\\d.*\\/dialog/oauth"), Pattern.compile("dialog/oauth"))
-        ),
-        Pair(
-            "login.microsoftonline.com", setOf(Pattern.compile("common/oauth2/authorize"), Pattern.compile("common/oauth2/v2.0/authorize"))
-        ),
-        Pair(
-            "linkedin.com", setOf(Pattern.compile("oauth/v\\d.*/authorization"))
-        ),
-        Pair(
-            "github.com", setOf(Pattern.compile("login/oauth/authorize"))
-        ),
-        Pair(
-            "api.twitter.com", setOf(Pattern.compile("oauth/authenticate"), Pattern.compile("oauth/authorize"))
-        ),
-        Pair(
-            "duosecurity.com", setOf(Pattern.compile("oauth/v\\d.*/authorize"))
-        )
-    )
-
-    fun isAuthUrl(forwardedToUri: ValidUrl): Boolean {
-        authenticationDetector.keys
-            .firstOrNull { forwardedToUri.host.contains(it) }
-            ?.let { authenticationDetector[it] }
-            ?.forEach {
-                if (it.matcher(forwardedToUri.path.orEmpty()).find()) {
-                    return true
-                }
-            }
-
-        return false
-    }
-
-    fun is2FAStep(forwardedToUri: ValidUrl): Boolean {
-        signinPages.keys
-            .firstOrNull { forwardedToUri.host.contains(it) }
-            ?.let { signinPages[it] }
-            ?.forEach {
-                if (it.matcher(forwardedToUri.path.orEmpty()).find()) {
-                    return true
-                }
-            }
-
-        return false
-    }
-
-    fun isSSOPage(forwardedToUri: ValidUrl): Boolean {
-        ssoProvider.keys
-            .firstOrNull { forwardedToUri.host.contains(it) }
-            ?.let { ssoProvider[it] }
-            ?.forEach {
-                if (it.matcher(forwardedToUri.path.orEmpty()).find()) {
-                    return true
-                }
-            }
-
-        return false
-    }
-}
-
 class NextPageLoginDetection @Inject constructor() : NavigationAwareLoginDetector {
 
     override val loginEventLiveData = MutableLiveData<LoginDetected>()
@@ -150,7 +60,6 @@ class NextPageLoginDetection @Inject constructor() : NavigationAwareLoginDetecto
     private var urlToCheck: String? = null
     private var authDetectedHosts = mutableListOf<String>()
     private var loginDetectionJob: Job? = null
-    private val authDetector: AuthUrlDetector = AuthUrlDetector()
 
     override fun onEvent(navigationEvent: NavigationEvent) {
         Timber.i("LoginDetectionDelegate $navigationEvent")
@@ -197,7 +106,7 @@ class NextPageLoginDetection @Inject constructor() : NavigationAwareLoginDetecto
             is NavigationEvent.Redirect -> {
                 loginDetectionJob?.cancel()
                 val validUrl = Uri.parse(navigationEvent.url).getValidUrl() ?: return
-                if (authDetector.isAuthUrl(validUrl) || authDetector.isSSOPage(validUrl)) {
+                if (validUrl.isOAuthUrl() || validUrl.isSSOUrl()) {
                     authDetectedHosts.add(validUrl.host.removePrefix("www."))
                     Timber.i("LoginDetectionDelegate Auth domain added $authDetectedHosts")
                 }
@@ -277,11 +186,11 @@ class NextPageLoginDetection @Inject constructor() : NavigationAwareLoginDetecto
 
         if(authDetectedHosts.firstOrNull { forwardedToUri.host.contains(it) } != null) return  LoginResult.AuthFlow(forwardedToUri.host)
 
-        if (authDetector.isAuthUrl(forwardedToUri) || authDetectedHosts.contains(forwardedToUri.host)){
+        if (forwardedToUri.isOAuthUrl() || authDetectedHosts.contains(forwardedToUri.host)){
             return LoginResult.AuthFlow(forwardedToUri.host)
         }
 
-        if(authDetector.is2FAStep(forwardedToUri)) return LoginResult.TwoFactorAuthFlow(forwardedToUri.host)
+        if(forwardedToUri.is2FAUrl()) return LoginResult.TwoFactorAuthFlow(forwardedToUri.host)
 
         Timber.i("LoginDetectionDelegate $validLoginAttempt vs $forwardedToUrl // $authDetectedHosts")
         if (validLoginAttempt.host != forwardedToUri.host || validLoginAttempt.path != forwardedToUri.path) {
@@ -292,13 +201,3 @@ class NextPageLoginDetection @Inject constructor() : NavigationAwareLoginDetecto
         return LoginResult.Unknown
     }
 }
-
-fun Uri.getValidUrl(): ValidUrl? {
-    val validHost = host ?: return null
-    return ValidUrl(validHost, path)
-}
-
-data class ValidUrl(
-    val host: String,
-    val path: String?
-)

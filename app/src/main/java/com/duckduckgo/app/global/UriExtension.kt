@@ -96,3 +96,13 @@ fun Uri?.faviconLocation(): Uri? {
     val isHttps = this.isHttps
     return parse(String.format(faviconBaseUrlFormat, if (isHttps) "https" else "http", host))
 }
+
+fun Uri.getValidUrl(): ValidUrl? {
+    val validHost = host ?: return null
+    return ValidUrl(validHost, path)
+}
+
+data class ValidUrl(
+    val host: String,
+    val path: String?
+)
