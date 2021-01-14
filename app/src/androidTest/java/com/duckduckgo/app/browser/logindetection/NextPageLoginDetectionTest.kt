@@ -279,7 +279,7 @@ class NextPageLoginDetectionTest {
         loginDetector.onEvent(NavigationEvent.WebNavigationEvent(NewPage(url = url, title = "")))
         loginDetector.onEvent(NavigationEvent.PageFinished)
     }
-    
+
     companion object {
         const val LOGIN_DETECTOR_JOB_DELAY = 1000L
     }

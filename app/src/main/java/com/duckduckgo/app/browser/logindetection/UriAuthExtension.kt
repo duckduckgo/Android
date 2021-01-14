@@ -16,7 +16,6 @@
 
 package com.duckduckgo.app.browser.logindetection
 
-import android.net.Uri
 import com.duckduckgo.app.global.ValidUrl
 import java.util.regex.Pattern
 
