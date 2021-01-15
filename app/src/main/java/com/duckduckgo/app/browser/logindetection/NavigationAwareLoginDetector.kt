@@ -197,6 +197,6 @@ class NextPageLoginDetection constructor(private val settingsDataStore: Settings
     }
 
     companion object {
-        const val NAVIGATION_EVENT_GRACE_PERIOD = 1000L
+        private const val NAVIGATION_EVENT_GRACE_PERIOD = 1000L
     }
 }
