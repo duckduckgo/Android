@@ -37,6 +37,7 @@ private var ssoUrlPatterns = mapOf<String, Set<Pattern>>(
     )
 )
 
+// Following patterns have been extracted from each domain oauth official docs
 private var oAuthUrlPatterns = mapOf<String, Set<Pattern>>(
     Pair(
         "accounts.google.com", setOf(Pattern.compile("o/oauth2/auth"), Pattern.compile("o/oauth2/v\\d.*/auth"))
