@@ -96,7 +96,7 @@ class NextPageLoginDetection constructor(private val settingsDataStore: Settings
 
     private fun scheduleLoginDetection(): Job {
         return GlobalScope.launch(Dispatchers.Main) {
-            delay(1000)
+            delay(NAVIGATION_EVENT_GRACE_PERIOD)
             Timber.v("LoginDetectionDelegate execute Login detection Job for $urlToCheck")
             val loginUrlCandidate = urlToCheck
             if (loginUrlCandidate.isNullOrBlank()) {
@@ -194,5 +194,9 @@ class NextPageLoginDetection constructor(private val settingsDataStore: Settings
         data class TwoFactorAuthFlow(val loginDomain: String) : LoginResult()
         data class LoginDetected(val authLoginDomain: String, val forwardedToDomain: String) : LoginResult()
         object Unknown : LoginResult()
+    }
+
+    companion object {
+        const val NAVIGATION_EVENT_GRACE_PERIOD = 1000L
     }
 }
