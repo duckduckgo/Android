@@ -62,7 +62,7 @@ class NextPageLoginDetectionTest {
         loginDetector.onEvent(NavigationEvent.LoginAttempt("http://example.com/login"))
 
         redirectTo("http://example.com")
-        delay(LOGIN_DETECTOR_JOB_DELAY)
+        giveLoginDetectorChanceToExecute()
 
         assertEvent<LoginDetected>()
     }
@@ -71,16 +71,16 @@ class NextPageLoginDetectionTest {
     fun whenLoginAttemptedInsideOAuthFlowThenLoginDetectedWhenUserForwardedToDifferentDomain() = coroutineRule.runBlocking {
         givenLoginDetector(enabled = true)
         redirectTo("https://accounts.google.com/o/oauth2/v2/auth")
-        delay(LOGIN_DETECTOR_JOB_DELAY)
+        giveLoginDetectorChanceToExecute()
         redirectTo("https://accounts.google.com/signin/v2/challenge/pwd")
-        delay(LOGIN_DETECTOR_JOB_DELAY)
+        giveLoginDetectorChanceToExecute()
         loginDetector.onEvent(NavigationEvent.LoginAttempt("https://accounts.google.com/signin/v2/challenge"))
         redirectTo("https://accounts.google.com/signin/v2/challenge/az?client_id")
-        delay(LOGIN_DETECTOR_JOB_DELAY)
+        giveLoginDetectorChanceToExecute()
         redirectTo("https://accounts.google.com/randomPath")
-        delay(LOGIN_DETECTOR_JOB_DELAY)
+        giveLoginDetectorChanceToExecute()
         redirectTo("http://example.com")
-        delay(LOGIN_DETECTOR_JOB_DELAY)
+        giveLoginDetectorChanceToExecute()
 
         assertEvent<LoginDetected> {
             assertEquals("example.com", this.forwardedToDomain)
@@ -91,16 +91,16 @@ class NextPageLoginDetectionTest {
     fun whenLoginAttemptedInsideSSOFlowThenLoginDetectedWhenUserForwardedToDifferentDomain() = coroutineRule.runBlocking {
         givenLoginDetector(enabled = true)
         fullyLoadSite("https://app.asana.com/-/login")
-        delay(LOGIN_DETECTOR_JOB_DELAY)
+        giveLoginDetectorChanceToExecute()
         redirectTo("https://sso.host.com/saml2/idp/SSOService.php")
-        delay(LOGIN_DETECTOR_JOB_DELAY)
+        giveLoginDetectorChanceToExecute()
         fullyLoadSite("https://sso.host.com/module.php/core/loginuserpass.php")
-        delay(LOGIN_DETECTOR_JOB_DELAY)
+        giveLoginDetectorChanceToExecute()
         loginDetector.onEvent(NavigationEvent.LoginAttempt("https://sso.host.com/module.php/core/loginuserpass.php"))
         redirectTo("https://sso.host.com/module.php/duosecurity/getduo.php")
-        delay(LOGIN_DETECTOR_JOB_DELAY)
+        giveLoginDetectorChanceToExecute()
         redirectTo("https://app.asana.com/")
-        delay(LOGIN_DETECTOR_JOB_DELAY)
+        giveLoginDetectorChanceToExecute()
 
         assertEvent<LoginDetected> {
             assertEquals("app.asana.com", this.forwardedToDomain)
@@ -111,14 +111,14 @@ class NextPageLoginDetectionTest {
     fun whenLoginAttemptedSkip2FAUrlsThenLoginDetectedForLatestOne() = coroutineRule.runBlocking {
         givenLoginDetector(enabled = true)
         fullyLoadSite("https://accounts.google.com/ServiceLogin")
-        delay(LOGIN_DETECTOR_JOB_DELAY)
+        giveLoginDetectorChanceToExecute()
         fullyLoadSite("https://accounts.google.com/signin/v2/challenge/pwd")
-        delay(LOGIN_DETECTOR_JOB_DELAY)
+        giveLoginDetectorChanceToExecute()
         loginDetector.onEvent(NavigationEvent.LoginAttempt("https://accounts.google.com/signin/v2/challenge/pwd"))
         redirectTo("https://accounts.google.com/signin/v2/challenge/az")
-        delay(LOGIN_DETECTOR_JOB_DELAY)
+        giveLoginDetectorChanceToExecute()
         redirectTo("https://mail.google.com/mail")
-        delay(LOGIN_DETECTOR_JOB_DELAY)
+        giveLoginDetectorChanceToExecute()
 
         assertEvent<LoginDetected> {
             assertEquals("mail.google.com", this.forwardedToDomain)
@@ -133,7 +133,7 @@ class NextPageLoginDetectionTest {
         fullyLoadSite("http://example.com")
         fullyLoadSite("http://example2.com")
         fullyLoadSite("http://example3.com")
-        delay(LOGIN_DETECTOR_JOB_DELAY)
+        giveLoginDetectorChanceToExecute()
 
         assertEvent<LoginDetected> {
             assertEquals("example3.com", this.forwardedToDomain)
@@ -146,7 +146,7 @@ class NextPageLoginDetectionTest {
         loginDetector.onEvent(NavigationEvent.LoginAttempt("http://example.com/login"))
 
         fullyLoadSite("http://example.com/login")
-        delay(LOGIN_DETECTOR_JOB_DELAY)
+        giveLoginDetectorChanceToExecute()
 
         assertEventNotIssued<LoginDetected>()
     }
@@ -155,7 +155,7 @@ class NextPageLoginDetectionTest {
     fun whenNotDetectedLoginAttemptAndForwardedToNewPageThenLoginNotDetected() = coroutineRule.runBlocking {
         givenLoginDetector(enabled = true)
         fullyLoadSite("http://example.com")
-        delay(LOGIN_DETECTOR_JOB_DELAY)
+        giveLoginDetectorChanceToExecute()
 
         assertEventNotIssued<LoginDetected>()
     }
@@ -167,7 +167,7 @@ class NextPageLoginDetectionTest {
 
         loginDetector.onEvent(NavigationEvent.WebNavigationEvent(WebNavigationStateChange.UrlUpdated(url = "http://example.com")))
         loginDetector.onEvent(NavigationEvent.PageFinished)
-        delay(LOGIN_DETECTOR_JOB_DELAY)
+        giveLoginDetectorChanceToExecute()
 
         assertEvent<LoginDetected>()
     }
@@ -179,7 +179,7 @@ class NextPageLoginDetectionTest {
 
         loginDetector.onEvent(NavigationEvent.WebNavigationEvent(WebNavigationStateChange.UrlUpdated(url = "http://example.com/login")))
         loginDetector.onEvent(NavigationEvent.PageFinished)
-        delay(LOGIN_DETECTOR_JOB_DELAY)
+        giveLoginDetectorChanceToExecute()
 
         assertEventNotIssued<LoginDetected>()
     }
@@ -189,7 +189,7 @@ class NextPageLoginDetectionTest {
         givenLoginDetector(enabled = true)
         loginDetector.onEvent(NavigationEvent.WebNavigationEvent(WebNavigationStateChange.UrlUpdated(url = "http://example.com")))
         loginDetector.onEvent(NavigationEvent.PageFinished)
-        delay(LOGIN_DETECTOR_JOB_DELAY)
+        giveLoginDetectorChanceToExecute()
 
         assertEventNotIssued<LoginDetected>()
     }
@@ -202,7 +202,7 @@ class NextPageLoginDetectionTest {
 
         loginDetector.onEvent(NavigationEvent.WebNavigationEvent(NewPage(url = "http://another.example.com", title = "")))
         loginDetector.onEvent(NavigationEvent.PageFinished)
-        delay(LOGIN_DETECTOR_JOB_DELAY)
+        giveLoginDetectorChanceToExecute()
 
         assertEventNotIssued<LoginDetected>()
     }
@@ -214,7 +214,7 @@ class NextPageLoginDetectionTest {
         loginDetector.onEvent(NavigationEvent.UserAction.NavigateBack)
 
         fullyLoadSite("http://another.example.com")
-        delay(LOGIN_DETECTOR_JOB_DELAY)
+        giveLoginDetectorChanceToExecute()
 
         assertEventNotIssued<LoginDetected>()
     }
@@ -226,7 +226,7 @@ class NextPageLoginDetectionTest {
         loginDetector.onEvent(NavigationEvent.UserAction.NavigateForward)
 
         fullyLoadSite("http://another.example.com")
-        delay(LOGIN_DETECTOR_JOB_DELAY)
+        giveLoginDetectorChanceToExecute()
 
         assertEventNotIssued<LoginDetected>()
     }
@@ -238,7 +238,7 @@ class NextPageLoginDetectionTest {
         loginDetector.onEvent(NavigationEvent.UserAction.Refresh)
 
         fullyLoadSite("http://another.example.com")
-        delay(LOGIN_DETECTOR_JOB_DELAY)
+        giveLoginDetectorChanceToExecute()
 
         assertEventNotIssued<LoginDetected>()
     }
@@ -250,7 +250,7 @@ class NextPageLoginDetectionTest {
         loginDetector.onEvent(NavigationEvent.UserAction.NewQuerySubmitted)
 
         fullyLoadSite("http://another.example.com")
-        delay(LOGIN_DETECTOR_JOB_DELAY)
+        giveLoginDetectorChanceToExecute()
 
         assertEventNotIssued<LoginDetected>()
     }
@@ -261,7 +261,7 @@ class NextPageLoginDetectionTest {
         loginDetector.onEvent(NavigationEvent.LoginAttempt(""))
 
         fullyLoadSite("http://example.com")
-        delay(LOGIN_DETECTOR_JOB_DELAY)
+        giveLoginDetectorChanceToExecute()
 
         assertEventNotIssued<LoginDetected>()
     }
@@ -272,9 +272,13 @@ class NextPageLoginDetectionTest {
         loginDetector.onEvent(NavigationEvent.LoginAttempt("http://example.com/login"))
 
         fullyLoadSite("")
-        delay(LOGIN_DETECTOR_JOB_DELAY)
+        giveLoginDetectorChanceToExecute()
 
         assertEventNotIssued<LoginDetected>()
+    }
+
+    private suspend fun giveLoginDetectorChanceToExecute() {
+        delay(LOGIN_DETECTOR_JOB_DELAY)
     }
 
     private inline fun <reified T> assertEvent(instanceAssertions: T.() -> Unit = {}) {
