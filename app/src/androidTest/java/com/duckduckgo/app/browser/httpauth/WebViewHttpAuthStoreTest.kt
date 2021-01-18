@@ -77,7 +77,7 @@ class WebViewHttpAuthStoreTest {
             password = "pass",
         )
 
-        verify(webView).setHttpAuthUsernamePassword("host", "realm", "name", "pass",)
+        verify(webView).setHttpAuthUsernamePassword("host", "realm", "name", "pass")
     }
 
     @Test
