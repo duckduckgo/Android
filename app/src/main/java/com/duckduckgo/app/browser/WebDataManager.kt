@@ -24,9 +24,6 @@ import com.duckduckgo.app.browser.httpauth.db.clearFormDataCompat
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.fire.DuckDuckGoCookieManager
 import com.duckduckgo.app.global.file.FileDeleter
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
 import java.io.File
 import javax.inject.Inject
 
@@ -84,9 +81,7 @@ class WebViewDataManager @Inject constructor(
     }
 
     private fun clearAuthentication(webView: WebView) {
-        GlobalScope.launch(Dispatchers.IO) {
-            webViewHttpAuthStore.clearHttpAuthUsernamePassword(webView)
-        }
+        webViewHttpAuthStore.clearHttpAuthUsernamePassword(webView)
     }
 
     private suspend fun clearExternalCookies() {

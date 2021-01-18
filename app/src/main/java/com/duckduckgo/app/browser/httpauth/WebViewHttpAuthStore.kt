@@ -26,7 +26,6 @@ import com.duckduckgo.app.browser.httpauth.db.HttpAuthEntity
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteDao
 import com.duckduckgo.app.fire.fireproofwebsite.data.website
 import com.duckduckgo.app.global.DispatcherProvider
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 
@@ -80,7 +79,7 @@ interface WebViewHttpAuthStore {
 class RealWebViewHttpAuthStore(
     private val dispatcherProvider: DispatcherProvider,
     private val fireproofWebsiteDao: FireproofWebsiteDao,
-    private val httpAuthDao: HttpAuthDao? = null
+    private val httpAuthDao: HttpAuthDao?
 ) : WebViewHttpAuthStore {
     override fun setHttpAuthUsernamePassword(webView: WebView, host: String, realm: String, username: String, password: String) {
         if (httpAuthDao == null) {
@@ -89,7 +88,7 @@ class RealWebViewHttpAuthStore(
             )
         } else {
             runBlocking {
-                withContext(Dispatchers.IO) {
+                withContext(dispatcherProvider.io()) {
                     httpAuthDao.insert(
                         HttpAuthEntity(
                             host = host,
@@ -108,7 +107,7 @@ class RealWebViewHttpAuthStore(
             return webView.getHttpAuthUsernamePasswordCompat(host = host, realm = realm)
         } else {
             return runBlocking {
-                withContext(Dispatchers.IO) {
+                withContext(dispatcherProvider.io()) {
                     val credentials = httpAuthDao.getAuthCredentials(host = host, realm = realm) ?: return@withContext null
                     if (credentials.username == null || credentials.password == null) return@withContext null
                     return@withContext WebViewHttpAuthCredentials(credentials.username!!, credentials.password!!)
@@ -121,8 +120,12 @@ class RealWebViewHttpAuthStore(
         if (httpAuthDao == null) {
             webView.clearAuthentication()
         } else {
-            val exclusions = fireproofWebsiteDao.fireproofWebsitesSync().map { it.website() }
-            httpAuthDao.deleteAll(exclusions)
+            runBlocking {
+                withContext(dispatcherProvider.io()) {
+                    val exclusions = fireproofWebsiteDao.fireproofWebsitesSync().map { it.website() }
+                    httpAuthDao.deleteAll(exclusions)
+                }
+            }
         }
     }
 }

@@ -20,6 +20,7 @@ import android.os.Build
 import android.webkit.WebView
 import android.webkit.WebViewDatabase
 
+@Suppress("DEPRECATION")
 fun WebView.clearFormDataCompat() {
     clearFormData()
     if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {

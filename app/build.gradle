@@ -148,7 +148,6 @@ dependencies {
     implementation "androidx.constraintlayout:constraintlayout:$constraintLayout"
     implementation "androidx.swiperefreshlayout:swiperefreshlayout:$swipeRefreshLayout"
     implementation "androidx.webkit:webkit:$webkit"
-    implementation "androidx.security:security-crypto:1.1.0-alpha03"
     implementation "com.squareup.okhttp3:okhttp:$okHttp"
     implementation "com.squareup.okhttp3:okhttp-tls:$okHttp"
     implementation "com.squareup.retrofit2:retrofit:$retrofit"

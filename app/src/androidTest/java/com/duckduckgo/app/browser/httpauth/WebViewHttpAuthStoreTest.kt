@@ -67,6 +67,7 @@ class WebViewHttpAuthStoreTest {
     }
 
     @Test
+    @Suppress("DEPRECATION")
     @SdkSuppress(maxSdkVersion = Build.VERSION_CODES.N_MR1)
     fun whenSetHttpAuthUsernamePasswordAndNullHttpAuthDaoThenCallWebViewSetHttpAuth() {
         webViewHttpAuthStoreWithNullHttpAuthDao.setHttpAuthUsernamePassword(
@@ -90,6 +91,7 @@ class WebViewHttpAuthStoreTest {
     }
 
     @Test
+    @Suppress("DEPRECATION")
     @SdkSuppress(maxSdkVersion = Build.VERSION_CODES.N_MR1)
     fun whenGetHttpAuthUsernamePasswordAndNullHttpAuthDaoReturnWebViewHttpAuthCredentials() {
         whenever(webView.getHttpAuthUsernamePassword("host", "realm"))

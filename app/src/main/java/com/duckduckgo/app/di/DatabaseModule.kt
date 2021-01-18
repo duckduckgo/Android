@@ -25,7 +25,7 @@ import com.duckduckgo.app.browser.httpauth.RealWebViewHttpAuthStore
 import com.duckduckgo.app.browser.httpauth.WebViewHttpAuthStore
 import com.duckduckgo.app.browser.httpauth.db.HttpAuthDatabase
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteDao
-import com.duckduckgo.app.global.DefaultDispatcherProvider
+import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.global.db.MigrationsProvider
 import com.duckduckgo.app.settings.db.SettingsDataStore
@@ -40,7 +40,8 @@ class DatabaseModule {
     @Singleton
     fun provideWebViewHttpAuthStore(
         context: Context,
-        fireproofWebsiteDao: FireproofWebsiteDao
+        fireproofWebsiteDao: FireproofWebsiteDao,
+        dispatcherProvider: DispatcherProvider
     ): WebViewHttpAuthStore {
         val httpAuthDb = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             // This database is a Room wrapper around the http_auth convenience database
@@ -50,7 +51,7 @@ class DatabaseModule {
                 .build()
         } else null
 
-        return RealWebViewHttpAuthStore(DefaultDispatcherProvider(), fireproofWebsiteDao, httpAuthDb?.httpAuthDao())
+        return RealWebViewHttpAuthStore(dispatcherProvider, fireproofWebsiteDao, httpAuthDb?.httpAuthDao())
     }
 
     @Provides
