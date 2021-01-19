@@ -31,8 +31,7 @@ import kotlinx.coroutines.withContext
 
 data class WebViewHttpAuthCredentials(val username: String, val password: String)
 
-@VisibleForTesting
-fun WebView.setHttpAuthUsernamePasswordCompat(host: String, realm: String, username: String, password: String) {
+private fun WebView.setHttpAuthUsernamePasswordCompat(host: String, realm: String, username: String, password: String) {
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
         val webViewDatabase = WebViewDatabase.getInstance(this.context)
         webViewDatabase.setHttpAuthUsernamePassword(host, realm, username, password)
@@ -43,8 +42,7 @@ fun WebView.setHttpAuthUsernamePasswordCompat(host: String, realm: String, usern
 
 }
 
-@VisibleForTesting
-fun WebView.getHttpAuthUsernamePasswordCompat(host: String, realm: String): WebViewHttpAuthCredentials? {
+private fun WebView.getHttpAuthUsernamePasswordCompat(host: String, realm: String): WebViewHttpAuthCredentials? {
     val credentials = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
         val webViewDatabase = WebViewDatabase.getInstance(this.context)
         webViewDatabase.getHttpAuthUsernamePassword(host, realm)
