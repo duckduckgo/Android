@@ -16,10 +16,7 @@
 
 package com.duckduckgo.app.browser.httpauth
 
-import android.os.Build
 import android.webkit.WebView
-import android.webkit.WebViewDatabase
-import androidx.test.filters.SdkSuppress
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.browser.httpauth.db.HttpAuthDao
 import com.duckduckgo.app.browser.httpauth.db.HttpAuthEntity
@@ -43,10 +40,8 @@ class WebViewHttpAuthStoreTest {
     private val fireproofWebsiteDao: FireproofWebsiteDao = mock()
     private val httpAuthDao: HttpAuthDao = mock()
     private val webView: WebView = mock()
-    private val webViewDatabase: WebViewDatabase = mock()
 
-    private val webViewHttpAuthStore = RealWebViewHttpAuthStore(coroutineRule.testDispatcherProvider, fireproofWebsiteDao, webViewDatabase, httpAuthDao)
-    private val webViewHttpAuthStoreWithNullHttpAuthDao = RealWebViewHttpAuthStore(coroutineRule.testDispatcherProvider, fireproofWebsiteDao, webViewDatabase, null)
+    private val webViewHttpAuthStore = RealWebViewHttpAuthStore(coroutineRule.testDispatcherProvider, fireproofWebsiteDao, httpAuthDao)
 
     @Test
     fun whenSetHttpAuthUsernamePasswordThenInsertHttpAuthEntity() {
@@ -69,36 +64,10 @@ class WebViewHttpAuthStoreTest {
     }
 
     @Test
-    @Suppress("DEPRECATION")
-    @SdkSuppress(maxSdkVersion = Build.VERSION_CODES.N_MR1)
-    fun whenSetHttpAuthUsernamePasswordAndNullHttpAuthDaoThenCallWebViewSetHttpAuth() {
-        webViewHttpAuthStoreWithNullHttpAuthDao.setHttpAuthUsernamePassword(
-            webView = webView,
-            host = "host",
-            realm = "realm",
-            username = "name",
-            password = "pass",
-        )
-
-        verify(webView).setHttpAuthUsernamePassword("host", "realm", "name", "pass")
-    }
-
-    @Test
     fun whenGetHttpAuthUsernamePasswordThenReturnWebViewHttpAuthCredentials() {
         whenever(httpAuthDao.getAuthCredentials("host", "realm"))
             .thenReturn(HttpAuthEntity(1, "host", "realm", "name", "pass"))
         val credentials = webViewHttpAuthStore.getHttpAuthUsernamePassword(webView, "host", "realm")
-
-        assertEquals(WebViewHttpAuthCredentials("name", "pass"), credentials)
-    }
-
-    @Test
-    @Suppress("DEPRECATION")
-    @SdkSuppress(maxSdkVersion = Build.VERSION_CODES.N_MR1)
-    fun whenGetHttpAuthUsernamePasswordAndNullHttpAuthDaoReturnWebViewHttpAuthCredentials() {
-        whenever(webView.getHttpAuthUsernamePassword("host", "realm"))
-            .thenReturn(arrayOf("name", "pass"))
-        val credentials = webViewHttpAuthStoreWithNullHttpAuthDao.getHttpAuthUsernamePassword(webView, "host", "realm")
 
         assertEquals(WebViewHttpAuthCredentials("name", "pass"), credentials)
     }
@@ -111,13 +80,5 @@ class WebViewHttpAuthStoreTest {
         webViewHttpAuthStore.clearHttpAuthUsernamePassword(webView)
 
         verify(httpAuthDao).deleteAll(listOf("http://fireproofed.me"))
-    }
-
-    @Test
-    @SdkSuppress(maxSdkVersion = Build.VERSION_CODES.N_MR1)
-    fun whenClearHttpAuthUsernamePasswordAndNullHttpAuthDaoThenClearWebViewAuthCredentials() {
-        webViewHttpAuthStoreWithNullHttpAuthDao.clearHttpAuthUsernamePassword(webView)
-
-        verify(webViewDatabase).clearHttpAuthUsernamePassword()
     }
 }

@@ -17,7 +17,6 @@
 package com.duckduckgo.app.di
 
 import android.content.Context
-import android.webkit.WebViewDatabase
 import androidx.room.Room
 import com.duckduckgo.app.browser.httpauth.RealWebViewHttpAuthStore
 import com.duckduckgo.app.browser.httpauth.WebViewHttpAuthStore
@@ -50,6 +49,6 @@ class StubDatabaseModule {
             .allowMainThreadQueries()
             .build()
 
-        return RealWebViewHttpAuthStore(DefaultDispatcherProvider(), fireproofWebsiteDao, WebViewDatabase.getInstance(context), db.httpAuthDao())
+        return RealWebViewHttpAuthStore(DefaultDispatcherProvider(), fireproofWebsiteDao, db.httpAuthDao())
     }
 }
