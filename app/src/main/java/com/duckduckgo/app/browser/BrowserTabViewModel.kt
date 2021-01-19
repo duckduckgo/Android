@@ -1259,7 +1259,7 @@ class BrowserTabViewModel(
             if (url.isNotBlank()) {
                 faviconManager.persistFavicon(tabId, url)
             }
-            bookmarksDao.updateOrInsert(BookmarkEntity(title = title, url = url))
+            bookmarksDao.insert(BookmarkEntity(title = title, url = url))
         }
         withContext(dispatchers.main()) {
             command.value = ShowBookmarkAddedConfirmation(id, title, url)
