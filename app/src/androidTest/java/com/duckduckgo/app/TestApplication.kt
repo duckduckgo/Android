@@ -18,6 +18,9 @@ package com.duckduckgo.app
 
 import com.duckduckgo.app.di.DaggerTestAppComponent
 import com.duckduckgo.app.global.DuckDuckGoApplication
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.test.TestCoroutineScope
 
 class TestApplication : DuckDuckGoApplication() {
 
@@ -27,9 +30,14 @@ class TestApplication : DuckDuckGoApplication() {
      * See [com.duckduckgo.app.di.TestAppComponent]
      */
 
+    @ExperimentalCoroutinesApi
+    private val applicationCoroutineScope = TestCoroutineScope(SupervisorJob())
+
+    @ExperimentalCoroutinesApi
     override fun configureDependencyInjection() {
         daggerAppComponent = DaggerTestAppComponent.builder()
             .application(this)
+            .applicationCoroutineScope(applicationCoroutineScope)
             .build()
         daggerAppComponent.inject(this)
     }

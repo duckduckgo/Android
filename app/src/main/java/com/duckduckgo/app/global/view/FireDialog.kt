@@ -29,11 +29,11 @@ import com.duckduckgo.app.cta.ui.CtaViewModel
 import com.duckduckgo.app.cta.ui.DaxFireDialogCta
 import com.duckduckgo.app.global.view.FireDialog.FireDialogClearAllEvent.AnimationFinished
 import com.duckduckgo.app.global.view.FireDialog.FireDialogClearAllEvent.ClearAllDataFinished
-import com.duckduckgo.app.statistics.VariantManager
-import com.duckduckgo.app.statistics.VariantManager.VariantFeature.FireButtonEducation
+import com.duckduckgo.app.settings.clear.getPixelValue
+import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.FIRE_DIALOG_CLEAR_PRESSED
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.FIRE_DIALOG_PROMOTED_CLEAR_PRESSED
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.*
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.FIRE_ANIMATION
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import kotlinx.android.synthetic.main.include_dax_dialog_cta.*
@@ -50,8 +50,8 @@ class FireDialog(
     context: Context,
     private val ctaViewModel: CtaViewModel,
     private val clearPersonalDataAction: ClearPersonalDataAction,
-    private val variantManager: VariantManager,
-    private val pixel: Pixel
+    private val pixel: Pixel,
+    private val settingsDataStore: SettingsDataStore
 ) : BottomSheetDialog(context, R.style.FireDialog), CoroutineScope by MainScope() {
 
     var clearStarted: (() -> Unit) = {}
@@ -89,6 +89,14 @@ class FireDialog(
             cancel()
         }
 
+        if (animationEnabled()) {
+            configureFireAnimationView()
+        }
+        behavior.state = BottomSheetBehavior.STATE_EXPANDED
+    }
+
+    private fun configureFireAnimationView() {
+        fireAnimationView.setAnimation(settingsDataStore.selectedFireAnimation.resId)
         /**
          * BottomSheetDialog wraps provided Layout into a CoordinatorLayout.
          * We need to set FitsSystemWindows false programmatically to all parents in order to render layout and animation full screen
@@ -96,7 +104,6 @@ class FireDialog(
         fireAnimationView.setAndPropagateUpFitsSystemWindows(false)
         fireAnimationView.setRenderMode(RenderMode.SOFTWARE)
         fireAnimationView.enableMergePathsForKitKatAndAbove(true)
-        behavior.state = BottomSheetBehavior.STATE_EXPANDED
     }
 
     private fun configureFireDialogCta(cta: DaxFireDialogCta) {
@@ -114,7 +121,8 @@ class FireDialog(
     }
 
     private fun onClearOptionClicked() {
-        pixel.fire(if (ctaVisible) FIRE_DIALOG_PROMOTED_CLEAR_PRESSED else FIRE_DIALOG_CLEAR_PRESSED)
+        pixel.enqueueFire(if (ctaVisible) FIRE_DIALOG_PROMOTED_CLEAR_PRESSED else FIRE_DIALOG_CLEAR_PRESSED)
+        pixel.enqueueFire(pixel = FIRE_DIALOG_ANIMATION, parameters = mapOf(FIRE_ANIMATION to settingsDataStore.selectedFireAnimation.getPixelValue()))
         hideClearDataOptions()
         if (animationEnabled()) {
             playAnimation()
@@ -128,7 +136,7 @@ class FireDialog(
         }
     }
 
-    private fun animationEnabled() = variantManager.getVariant().hasFeature(FireButtonEducation)
+    private fun animationEnabled() = settingsDataStore.fireAnimationEnabled
 
     private fun playAnimation() {
         window?.navigationBarColor = ContextCompat.getColor(context, R.color.black)

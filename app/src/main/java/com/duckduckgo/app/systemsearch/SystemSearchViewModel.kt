@@ -117,9 +117,12 @@ class SystemSearchViewModel(
             .switchMap { buildResultsObservable(query = it) }
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
-            .subscribe({ result ->
-                updateResults(result)
-            }, { t: Throwable? -> Timber.w(t, "Failed to get search results") })
+            .subscribe(
+                { result ->
+                    updateResults(result)
+                },
+                { t: Throwable? -> Timber.w(t, "Failed to get search results") }
+            )
     }
 
     private fun buildResultsObservable(query: String): Observable<SystemSearchResult>? {

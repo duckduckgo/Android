@@ -21,6 +21,7 @@ import com.duckduckgo.app.global.device.ContextDeviceInfo
 import com.duckduckgo.app.global.device.DeviceInfo
 import com.duckduckgo.app.referral.AppInstallationReferrerStateListener
 import com.duckduckgo.app.statistics.AtbInitializer
+import com.duckduckgo.app.statistics.api.PixelSender
 import com.duckduckgo.app.statistics.api.StatisticsService
 import com.duckduckgo.app.statistics.api.StatisticsUpdater
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -65,8 +66,12 @@ class StubStatisticsModule {
 
             }
 
-            override fun fireCompletable(pixelName: String, parameters: Map<String, String>, encodedParameters: Map<String, String>): Completable {
-                return Completable.fromAction {}
+            override fun enqueueFire(pixel: Pixel.PixelName, parameters: Map<String, String>, encodedParameters: Map<String, String>) {
+
+            }
+
+            override fun enqueueFire(pixelName: String, parameters: Map<String, String>, encodedParameters: Map<String, String>) {
+
             }
         }
     }
@@ -82,5 +87,19 @@ class StubStatisticsModule {
         appReferrerStateListener: AppInstallationReferrerStateListener
     ): AtbInitializer {
         return AtbInitializer(statisticsDataStore, statisticsUpdater, appReferrerStateListener)
+    }
+
+    @Provides
+    fun pixelSender(): PixelSender {
+        return object : PixelSender {
+            override fun sendPixel(pixelName: String, parameters: Map<String, String>, encodedParameters: Map<String, String>): Completable {
+                return Completable.fromAction {}
+            }
+
+            override fun enqueuePixel(pixelName: String, parameters: Map<String, String>, encodedParameters: Map<String, String>): Completable {
+                return Completable.fromAction {}
+            }
+
+        }
     }
 }

@@ -78,13 +78,19 @@ class WhitelistActivity : DuckDuckGoActivity() {
     }
 
     private fun observeViewModel() {
-        viewModel.viewState.observe(this, Observer { viewState ->
-            viewState?.let { renderViewState(it) }
-        })
+        viewModel.viewState.observe(
+            this,
+            Observer { viewState ->
+                viewState?.let { renderViewState(it) }
+            }
+        )
 
-        viewModel.command.observe(this, Observer {
-            processCommand(it)
-        })
+        viewModel.command.observe(
+            this,
+            Observer {
+                processCommand(it)
+            }
+        )
     }
 
     private fun renderViewState(viewState: WhitelistViewModel.ViewState) {
@@ -120,7 +126,7 @@ class WhitelistActivity : DuckDuckGoActivity() {
         val addDialog = AlertDialog.Builder(this).apply {
             setTitle(R.string.dialogAddTitle)
             setView(R.layout.edit_whitelist)
-            setPositiveButton(android.R.string.yes) { _, _ ->
+            setPositiveButton(R.string.dialogSaveAction) { _, _ ->
                 val newText = dialog?.textInput?.text.toString()
                 viewModel.onEntryAdded(UserWhitelistedDomain(newText))
             }
@@ -136,7 +142,7 @@ class WhitelistActivity : DuckDuckGoActivity() {
         val editDialog = AlertDialog.Builder(this).apply {
             setTitle(R.string.dialogEditTitle)
             setView(R.layout.edit_whitelist)
-            setPositiveButton(android.R.string.yes) { _, _ ->
+            setPositiveButton(R.string.dialogSaveAction) { _, _ ->
                 val newText = dialog?.textInput?.text.toString()
                 viewModel.onEntryEdited(entry, UserWhitelistedDomain(newText))
             }

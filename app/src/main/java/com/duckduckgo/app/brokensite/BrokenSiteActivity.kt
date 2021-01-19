@@ -80,12 +80,18 @@ class BrokenSiteActivity : DuckDuckGoActivity() {
     }
 
     private fun configureObservers() {
-        viewModel.command.observe(this, Observer {
-            it?.let { processCommand(it) }
-        })
-        viewModel.viewState.observe(this, Observer {
-            it?.let { render(it) }
-        })
+        viewModel.command.observe(
+            this,
+            Observer {
+                it?.let { processCommand(it) }
+            }
+        )
+        viewModel.viewState.observe(
+            this,
+            Observer {
+                it?.let { render(it) }
+            }
+        )
     }
 
     private fun processCommand(command: Command) {

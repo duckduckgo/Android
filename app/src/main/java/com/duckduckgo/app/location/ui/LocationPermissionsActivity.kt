@@ -63,26 +63,32 @@ class LocationPermissionsActivity : DuckDuckGoActivity(), SiteLocationPermission
     }
 
     private fun observeViewModel() {
-        viewModel.viewState.observe(this, Observer { viewState ->
-            viewState?.let {
-                if (!it.systemLocationPermissionGranted) {
-                    recycler.gone()
-                    locationPermissionsNoSystemPermission.text = getString(R.string.preciseLocationNoSystemPermission).html(this)
-                    locationPermissionsNoSystemPermission.show()
-                } else {
-                    recycler.show()
-                    locationPermissionsNoSystemPermission.gone()
-                    adapter.updatePermissions(it.locationPermissionEnabled, it.locationPermissionEntities)
+        viewModel.viewState.observe(
+            this,
+            Observer { viewState ->
+                viewState?.let {
+                    if (!it.systemLocationPermissionGranted) {
+                        recycler.gone()
+                        locationPermissionsNoSystemPermission.text = getString(R.string.preciseLocationNoSystemPermission).html(this)
+                        locationPermissionsNoSystemPermission.show()
+                    } else {
+                        recycler.show()
+                        locationPermissionsNoSystemPermission.gone()
+                        adapter.updatePermissions(it.locationPermissionEnabled, it.locationPermissionEntities)
+                    }
                 }
             }
-        })
+        )
 
-        viewModel.command.observe(this, Observer {
-            when (it) {
-                is LocationPermissionsViewModel.Command.ConfirmDeleteLocationPermission -> confirmDeleteWebsite(it.entity)
-                is LocationPermissionsViewModel.Command.EditLocationPermissions -> editSiteLocationPermission(it.entity)
+        viewModel.command.observe(
+            this,
+            Observer {
+                when (it) {
+                    is LocationPermissionsViewModel.Command.ConfirmDeleteLocationPermission -> confirmDeleteWebsite(it.entity)
+                    is LocationPermissionsViewModel.Command.EditLocationPermissions -> editSiteLocationPermission(it.entity)
+                }
             }
-        })
+        )
     }
 
     private fun loadSystemPermission() {

@@ -25,7 +25,6 @@ import android.net.Uri
 import android.os.Build
 import com.duckduckgo.app.browser.BuildConfig
 import timber.log.Timber
-import javax.inject.Inject
 
 interface DefaultBrowserDetector {
     fun deviceSupportsDefaultBrowserConfiguration(): Boolean
@@ -33,7 +32,9 @@ interface DefaultBrowserDetector {
     fun hasDefaultBrowser(): Boolean
 }
 
-class AndroidDefaultBrowserDetector @Inject constructor(private val context: Context) : DefaultBrowserDetector {
+class AndroidDefaultBrowserDetector(
+    private val context: Context
+) : DefaultBrowserDetector {
 
     override fun deviceSupportsDefaultBrowserConfiguration(): Boolean {
         return Build.VERSION.SDK_INT >= Build.VERSION_CODES.N

@@ -39,6 +39,7 @@ import com.duckduckgo.app.feedback.ui.initial.InitialFeedbackFragmentViewModel
 import com.duckduckgo.app.feedback.ui.negative.brokensite.BrokenSiteNegativeFeedbackViewModel
 import com.duckduckgo.app.feedback.ui.negative.openended.ShareOpenEndedNegativeFeedbackViewModel
 import com.duckduckgo.app.feedback.ui.positive.initial.PositiveFeedbackLandingViewModel
+import com.duckduckgo.app.fire.FireAnimationLoader
 import com.duckduckgo.app.fire.DataClearer
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepository
 import com.duckduckgo.app.fire.fireproofwebsite.ui.FireproofWebsitesViewModel
@@ -48,6 +49,7 @@ import com.duckduckgo.app.global.rating.AppEnjoymentPromptEmitter
 import com.duckduckgo.app.global.rating.AppEnjoymentUserEventRecorder
 import com.duckduckgo.app.global.events.db.UserEventsStore
 import com.duckduckgo.app.global.useourapp.UseOurAppDetector
+import com.duckduckgo.app.globalprivacycontrol.GlobalPrivacyControl
 import com.duckduckgo.app.globalprivacycontrol.ui.GlobalPrivacyControlViewModel
 import com.duckduckgo.app.icon.api.IconModifier
 import com.duckduckgo.app.icon.ui.ChangeIconViewModel
@@ -126,7 +128,9 @@ class ViewModelFactory @Inject constructor(
     private val userOurAppDetector: UseOurAppDetector,
     private val dismissedCtaDao: DismissedCtaDao,
     private val fileDownloader: FileDownloader,
-    private val dispatcherProvider: DispatcherProvider
+    private val dispatcherProvider: DispatcherProvider,
+    private val fireAnimationLoader: FireAnimationLoader,
+    private val globalPrivacyControl: GlobalPrivacyControl
 ) : ViewModelProvider.NewInstanceFactory() {
 
     override fun <T : ViewModel> create(modelClass: Class<T>) =
@@ -172,6 +176,7 @@ class ViewModelFactory @Inject constructor(
             appSettingsPreferencesStore,
             defaultBrowserDetector,
             variantManager,
+            fireAnimationLoader,
             pixel
         )
     }
@@ -223,7 +228,8 @@ class ViewModelFactory @Inject constructor(
         notificationDao = notificationDao,
         useOurAppDetector = userOurAppDetector,
         variantManager = variantManager,
-        fileDownloader = fileDownloader
+        fileDownloader = fileDownloader,
+        globalPrivacyControl = globalPrivacyControl
     )
 
     private fun changeAppIconViewModel() =

@@ -21,6 +21,7 @@ import com.duckduckgo.app.onboarding.ui.OnboardingFragmentPageBuilder
 import com.duckduckgo.app.onboarding.ui.OnboardingPageBuilder
 import com.duckduckgo.app.onboarding.ui.OnboardingPageManager
 import com.duckduckgo.app.onboarding.ui.OnboardingPageManagerWithTrackerBlocking
+import com.duckduckgo.app.statistics.VariantManager
 import dagger.Module
 import dagger.Provides
 import javax.inject.Singleton
@@ -30,10 +31,11 @@ class OnboardingModule {
 
     @Provides
     fun onboardingPageManger(
+        variantManager: VariantManager,
         onboardingPageBuilder: OnboardingPageBuilder,
         defaultBrowserDetector: DefaultBrowserDetector
     ): OnboardingPageManager {
-        return OnboardingPageManagerWithTrackerBlocking(onboardingPageBuilder, defaultBrowserDetector)
+        return OnboardingPageManagerWithTrackerBlocking(variantManager, onboardingPageBuilder, defaultBrowserDetector)
     }
 
     @Provides

@@ -20,20 +20,22 @@
     <string name="appName" translatable="false">DuckDuckGo</string>
     <string name="appDescription" translatable="false">DuckDuckGo </string>
     <string name="duckDuckGoLogoDescription">DuckDuckGo logo</string>
-    <string name="duckDuckGoPrivacySimplified">Privaatsus lihtsustatud kujul.</string>
+    <string name="duckDuckGoPrivacySimplified">Privaatsus, lihtsustatud</string>
     <string name="yes">Jah</string>
     <string name="no">Ei</string>
+    <string name="open">Avatud</string>
+    <string name="cancel">Tühista</string>
     <string name="search">Otsing</string>
 
     <!-- Onboarding Activity -->
     <string name="onboardingDefaultBrowserDescription">Avage sätted, et DuckDuckGo abil iga kord otsida ja sirvida.</string>
-    <string name="onboardingDefaultBrowserTitle">Muutke DuckDuckGo teie vaikimisi</string>
+    <string name="onboardingDefaultBrowserTitle">Muuda DuckDuckGo oma vaikimisi brauseriks</string>
 
     <!-- Default Browser -->
     <string name="cannotLaunchDefaultAppSettings">Rakenduse vaikeseadete ekraani ei saa käivitada</string>
     <string name="settingsDefaultBrowserEnabled">Määrake vaikebrauseriks</string>
     <string name="defaultBrowserMaybeLater">Võib-olla hiljem</string>
-    <string name="defaultBrowserLetsDoIt">Teeme ära!</string>
+    <string name="defaultBrowserLetsDoIt">Määrake vaikebrauseriks</string>
     <string name="defaultBrowserDescriptionNoDefault">Avage linke igal ajal, rahuliku meelega.</string>
     <string name="defaultBrowserInstructions">Valige DuckDuckGo ja koputage valikut <font color="#678fff">Alati</font>.</string>
 
@@ -47,12 +49,12 @@
     <string name="clearButtonContentDescription">Tühjenda otsingusisend</string>
     <string name="no_compatible_third_party_app_installed">Ühtegi ühilduvat rakendust pole installitud</string>
     <string name="addBookmarkMenuTitle">Lisa järjehoidja</string>
-    <string name="requestDesktopSiteMenuTitle">Arvuti sait</string>
+    <string name="requestDesktopSiteMenuTitle">Töölaua sait</string>
 
     <!-- Downloading files -->
-    <string name="downloadImage">Laadige pilt alla</string>
+    <string name="downloadImage">Laadi pilt alla</string>
     <string name="permissionRequiredToDownload">Allalaadimiseks on vaja salvestusluba</string>
-    <string name="downloadComplete">Allalaadimine lõpetatud.</string>
+    <string name="downloadComplete">Allalaadimine lõpetatud</string>
     <string name="downloadFailed">Allalaadimine ebaõnnestus</string>
     <string name="downloadInProgress">Allalaadimine</string>
 
@@ -75,8 +77,8 @@
     <string name="settingsAutocompleteEnabled">Automaatselt täidetavad ettepanekud</string>
 
     <!-- Opening external apps -->
-    <string name="openExternalApp">Avage väline rakendus</string>
-    <string name="launchingExternalApp">Avage teises rakenduses</string>
+    <string name="openExternalApp">Ava väline rakendus</string>
+    <string name="launchingExternalApp">Ava teises rakenduses</string>
     <string name="confirmOpenExternalApp">Kas soovite selle sisu vaatamiseks lahkuda DuckDuckGo\'st?</string>
     <string name="unableToOpenLink">Seda tüüpi linki ei saa avada</string>
 
@@ -92,11 +94,13 @@
     <string name="closeContentDescription">Sulge</string>
     <string name="closeAllTabsMenuItem">Sule kõik vahelehed</string>
     <string name="closeTab">Sulge vaheleht</string>
+    <string name="tabClosed">Vaheleht on suletud</string>
+    <string name="tabClosedUndo">Võta tagasi</string>
 
     <!-- Privacy Dashboard Activities -->
     <string name="privacyProtectionToggle">Saidi privaatsuse kaitse</string>
-    <string name="privacyProtectionEnabled">Saidi kaitse on lubatud</string>
-    <string name="privacyProtectionDisabled">Saidi kaitse on keelatud</string>
+    <string name="privacyProtectionEnabled">SAIDI KAITSE ON LUBATUD</string>
+    <string name="privacyProtectionDisabled">SAIDI KAITSE ON KEELATUD</string>
     <string name="privacyDashboardActivityTitle">Privaatsuse juhtpaneel</string>
     <string name="privacyProtectionUpgraded" tools:ignore="TypographyQuotes">TÄIUSTATUD &lt;img src=\"%1$d\" /&gt; - &lt;img src=\"%2$d\" /&gt;</string>
     <string name="privacyGradeContentDescription">Privaatsusaste</string>
@@ -107,30 +111,30 @@
 
     <string name="networksActivityTitle">Jälgimisvõrgud</string>
     <string name="networksContentDescription">Jälgimisvõrgud</string>
-    <string name="networksOverview">Jälgimisvõrgud koondavad teie veebiajaloo teie kohta andmeprofiiliks. Suuremad jälgimisvõrgud on kahjulikumad, kuna need saavad teid jälgida ja sihtida suuremas Internetis.</string>
+    <string name="networksOverview">Jälgimisvõrgud koondavad teie veebiajaloo teie kohta käivaks andmeprofiiliks. Suured jälgimisvõrgud on kahjulikumad, kuna nad saavad teid jälgida ja sihtida kogu Internetis.</string>
 
     <plurals name="trackersFound">
         <item quantity="one">%1$s jälitaja leitud</item>
-        <item quantity="other">%1$s jälitajat leitud</item>
+        <item quantity="other">%1$s jälitajad leitud</item>
     </plurals>
 
     <plurals name="trackerBlocked">
         <item quantity="one">%1$s jälgija on blokeeritud</item>
-        <item quantity="other">%1$s jälgijat on blokeeritud</item>
+        <item quantity="other">%1$s jälgijad on blokeeritud</item>
     </plurals>
 
     <plurals name="majorNetworksFound">
-        <item quantity="one">%1$s leitud suur jälgimisvõrk</item>
-        <item quantity="other">%1$s leitud suurt jälgimisvõrku</item>
+        <item quantity="one">%1$s Leitud peamine jälgimisvõrk</item>
+        <item quantity="other">%1$s Leitud peamine jälgimisvõrk</item>
     </plurals>
 
     <plurals name="majorNetworksBlocked">
-        <item quantity="one">%1$s suur jälgimisvõrk blokeeritud</item>
-        <item quantity="other">%1$s suurt jälgimisvõrku blokeeritud</item>
+        <item quantity="one">%1$s Peamine jälgimisvõrk on blokeeritud</item>
+        <item quantity="other">%1$s Peamine jälgimisvõrk on blokeeritud</item>
     </plurals>
 
     <string name="scorecardActivityTitle">Privaatsusaste</string>
-    <string name="scorecardSiteIsMemberOfMajorNetwork">Sait on suur jälgimisvõrk</string>
+    <string name="scorecardSiteIsMemberOfMajorNetwork">Sait on peamine jälgimisvõrk</string>
     <string name="scorecardPrivacyGrade">Privaatsusaste</string>
     <string name="scorecardEnhancedGrade">Täiustatud aste</string>
 
@@ -140,7 +144,7 @@
     <string name="practicesBad">Kehv privaatsustava</string>
     <string name="practicesUnknown">Teadmata privaatsustava</string>
     <string name="practicesOverview">Privaatsustavad näitavad, kui palju on veebisaidiga jagatav isiklik teave kaitstud.</string>
-    <string name="practicesTosdrLink">Privaatsustava tuleneb <b><u>ToS;DR</u></b></string>
+    <string name="practicesTosdrLink">Privaatsustava tuleneb <b><u>ToS;DR</u></b>.</string>
     <string name="practicesIconContentGood">Hea tava ikoon</string>
     <string name="practicesIconContentBad">Halva tava ikoon</string>
 
@@ -159,39 +163,41 @@
     <string name="settingsHeadingGeneral">Üldine</string>
     <string name="settingsHeadingOther">Muu</string>
     <string name="settingsHeadingPrivacy">Privaatsus</string>
-    <string name="settingsLightTheme">Hele teema</string>
+    <string name="settingsLightTheme">Kerge teema</string>
     <string name="settingsAboutDuckduckgo">DuckDuckGo teave</string>
     <string name="settingsVersion">Versioon</string>
-    <string name="leaveFeedback">Tagasiside jätmine</string>
+    <string name="leaveFeedback">Jaga tagasisidet</string>
 
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Salvesta</string>
 
     <string name="settingsAutomaticallyClearWhat">Kustuta automaatselt…</string>
+    <string name="settingsAutomaticallyClearWhatDialogTitle">Kustuta automaatselt…</string>
     <string name="settingsAutomaticallyClearWhatOptionNone">Puudub</string>
     <string name="settingsAutomaticallyClearWhatOptionTabs">Vahelehed</string>
     <string name="settingsAutomaticallyClearWhatOptionTabsAndData">Vahelehed ja andmed</string>
 
     <string name="settingsAutomaticallyClearWhen">Kustuta…</string>
+    <string name="settingsAutomaticallyClearWhenDialogTitle">Kustuta…</string>
     <string name="settingsAutomaticallyClearWhenAppExitOnly">Ainult rakendusest väljumisel</string>
     <string name="settingsAutomaticallyClearWhenAppExit5Seconds">Rakendusest väljumisel, 5-sekundilise passiivsuse järel</string>
     <string name="settingsAutomaticallyClearWhenAppExit5Minutes">Rakendusest väljumisel, 5-minutilise passiivsuse järel</string>
     <string name="settingsAutomaticallyClearWhenAppExit15Minutes">Rakendusest väljumisel, 15-minutilise passiivsuse järel</string>
     <string name="settingsAutomaticallyClearWhenAppExit30Minutes">Rakendusest väljumisel, 30-minutilise passiivsuse järel</string>
-    <string name="settingsAutomaticallyClearWhenAppExit60Minutes">Rakendusest väljumisel, 60-minutilise passiivsuse järel</string>
+    <string name="settingsAutomaticallyClearWhenAppExit60Minutes">Rakendusest väljumisel, 1-tunnise passiivsuse järel</string>
 
     <!-- About Activity -->
-    <string name="aboutActivityTitle">Meist</string>
+    <string name="aboutActivityTitle">DuckDuckGo\'st</string>
     <string name="aboutDescription">
-        DuckDuckGo on uus standard veebi usaldusväärsusele.\n\n DuckDuckGo privaatsusbrauser pakub kõiki privaatsuse põhifunktsioone, mida peate enda kaitsmiseks veebist otsides ja sirvides kasutama, sealhulgas jälgijate blokeerimist, nutikamat krüptimist ja DuckDuckGo privaatset otsingut.\n\n Lõppude lõpuks ei tohiks Internet nii jube olla ja Internetis väärilise privaatsuse saamine peaks olema sama lihtne kui ruloo alla tõmbamine.</string>
+        DuckDuckGo on veebi usaldusväärsuse uus standard.\n \nDuckDuckGo privaatsusbrauser pakub kõiki privaatsuse põhifunktsioone, mida peate enda kaitsmiseks veebist otsides ja sirvides kasutama, sealhulgas jälgijate blokeerimist, nutikamat krüptimist ja DuckDuckGo privaatset otsingut.\n\nLõppude lõpuks ei tohiks Internet nii jube olla ja Internetis väärilise privaatsuse saavutamine peaks olema sama lihtne kui ruloo alla tõmbamine.</string>
     <string name="aboutMoreLink">Lisateave: duckduckgo.com/about</string>
     <string name="no_suggestions">Ettepanekud puuduvad</string>
 
     <!-- Broken Site Activity -->
     <string name="brokenSiteReportBrokenSiteMenuItem">Teatage katkisest saidist</string>
-    <string name="brokenSiteHeading">Teatage katkisest saidist</string>
-    <string name="brokenSiteSubmitted">Aitäh! Tagasiside on esitatud</string>
-    <string name="brokenSitesCategoriesTitle">Kirjeldage toimunut:</string>
+    <string name="brokenSiteHeading">Teata mittetoimivast saidist</string>
+    <string name="brokenSiteSubmitted">Aitäh! Tagasiside on esitatud.</string>
+    <string name="brokenSitesCategoriesTitle">Kirjelda toimunut</string>
     <string name="brokenSitesCategoriesHint">Kirjeldage toimunut</string>
     <string name="brokenSiteSubmitButton">Saada aruanne</string>
     <string name="brokenSiteDescription">Anonüümse katkise saidi aruande esitamine aitab meil neid probleeme siluda ja rakendust täiustada.</string>
@@ -219,7 +225,7 @@
     <string name="bookmarkEdited">Järjehoidja lisatud</string>
 
     <!-- Dialogs -->
-    <string name="dialogConfirmTitle">Kinnitage</string>
+    <string name="dialogConfirmTitle">Kinnita</string>
     <string name="dialogSave">Salvesta</string>
     <string name="delete">Kustuta</string>
     <string name="edit">Redigeeri</string>
@@ -228,7 +234,7 @@
     <string name="searchWidgetTextHint">DuckDuckGo otsing</string>
 
     <!-- Home Screen Shortcuts -->
-    <string name="addToHome">Lisage avalehele</string>
+    <string name="addToHome">Lisa avalehele</string>
 
     <!-- User Survey -->
     <string name="surveyCtaTitle">Aidake meil rakendust täiustada!</string>
@@ -242,24 +248,24 @@
     <string name="surveyLoadingErrorText">Meie küsitlust praegu laadida ei õnnestunud.\nPalun proovige hiljem uuesti.</string>
 
     <!-- Add widget -->
-    <string name="addWidgetCtaTitle">Proovige meie otsinguvidinat!</string>
+    <string name="addWidgetCtaTitle">Proovi meie otsinguvidinat!</string>
     <string name="addWidgetCtaDescription">Kiire ja hõlpsa juurdepääsu tagamiseks lisage meie meie otsinguvidin avakuvale.</string>
     <string name="addWidgetCtaAutoLaunchButton">Lisage vidin</string>
     <string name="addWidgetCtaInstructionsLaunchButton">Näita mulle</string>
     <string name="addWidgetCtaDismissButton">Loobu</string>
     <string name="addWidgetInstructionsActivityTitle">Lisage vidin</string>
     <string name="addWidgetInstruction1Label">1</string>
-    <string name="addWidgetInstruction1">Vajutage pikalt avakuval ja avage vidinate menüü</string>
+    <string name="addWidgetInstruction1">Vajuta pikalt avakuval ja ava vidinate menüü.</string>
     <string name="addWidgetInstruction2Label">2</string>
-    <string name="addWidgetInstruction2">Leidke vidin DuckDuckGo</string>
+    <string name="addWidgetInstruction2">Leia vidin DuckDuckGo.</string>
     <string name="addWidgetInstruction3Label">3</string>
-    <string name="addWidgetInstruction3">Lohistage vidin oma avakuvale</string>
+    <string name="addWidgetInstruction3">Lohista vidin oma avakuvale.</string>
     <string name="addWidgetInstructionsButtonGoHome">Minge avakuvale</string>
     <string name="addWidgetInstructionsButtonClose">Sulge</string>
 
     <!-- App Enjoyment / Rating / Feedback -->
     <string name="appEnjoymentDialogTitle">Kas teile meeldib DuckDuckGo?</string>
-    <string name="appEnjoymentDialogMessage">Meile meeldiks teada, mida te arvate</string>
+    <string name="appEnjoymentDialogMessage">Meile meeldiks teada, mida sa arvad.</string>
     <string name="appEnjoymentDialogPositiveButton">Mulle meeldib see</string>
     <string name="appEnjoymentDialogNegativeButton">See vajab tööd</string>
 
@@ -269,8 +275,8 @@
     <string name="rateAppDialogNegativeButton" translatable="false">@string/noThanks</string>
 
     <string name="giveFeedbackDialogTitle">Meil on kahju seda kuulda</string>
-    <string name="giveFeedbackDialogMessage">Andke meile teada, kuidas saaksime teie jaoks rakendust täiustada</string>
-    <string name="giveFeedbackDialogPositiveButton">Andke tagasisidet</string>
+    <string name="giveFeedbackDialogMessage">Anna meile teada, kuidas saaksime sinu jaoks rakendust täiustada.</string>
+    <string name="giveFeedbackDialogPositiveButton">Jaga tagasisidet</string>
     <string name="giveFeedbackDialogNegativeButton" translatable="false">@string/noThanks</string>
 
     <string name="noThanks">Ei aitäh</string>
@@ -305,11 +311,11 @@
     <string name="systemTextSearchMessage">DuckDuckGo otsing</string>
 
     <!-- App feedback disambiguation -->
-    <string name="feedbackActivityTitle">Jagage tagasisidet</string>
+    <string name="feedbackActivityTitle">Jaga tagasisidet</string>
     <string name="missingBrowserFeaturesTitleLong">Brauseri funktsioonid puuduvad või on pettumust valmistavad</string>
     <string name="missingBrowserFeaturesTitleShort">Brauseri funktsioonide probleemid</string>
     <string name="missingBrowserFeaturesSubtitle">Millist brauseri funktsiooni saame lisada või täiustada?</string>
-    <string name="missingBrowserFeatureSubReasonNavigation">Edasi, tagasi liikumine, värskendamine</string>
+    <string name="missingBrowserFeatureSubReasonNavigation">Edasi, tagasi liikumine ja/või värskendamine</string>
     <string name="missingBrowserFeatureSubReasonTabManagement">Vahelehtede loomine ja haldamine</string>
     <string name="missingBrowserFeatureSubReasonAdPopups">Reklaami ja hüpikakende blokeerimine</string>
     <string name="missingBrowserFeatureSubReasonVideos">Videote vaatamine</string>
@@ -317,7 +323,7 @@
     <string name="missingBrowserFeatureSubReasonBookmarks">Järjehoidjate loomine ja haldamine</string>
     <string name="missingBrowserFeatureSubReasonOther">Mitte ükski neist</string>
 
-    <string name="websiteNotLoadingTitleLong">Kindlasti ei laadita veebisaite õigesti</string>
+    <string name="websiteNotLoadingTitleLong">Veebisaidi laadimisega seotud probleemid</string>
     <string name="websiteNotLoadingTitleShort">Veebisaidi laadimisega seotud probleemid</string>
     <string name="websiteNotLoadingSubtitle">Milline veebisait on katki?</string>
 
@@ -353,19 +359,19 @@
     <string name="otherMainReasonTitleLong">Mitte ükski neist</string>
     <string name="otherMainReasonTitleShort">Teised probleemid</string>
 
-    <string name="openEndedInputHint">Kuidas saaksime end täiustada? (Valikuline)</string>
-    <string name="submitFeedback">SAADA TAGASISIDE</string>
+    <string name="openEndedInputHint">Palun ole võimalikult konkreetne</string>
+    <string name="submitFeedback">ESITA</string>
 
     <string name="tellUsHowToImprove">Palun öelge meile, mida saaksime täiustada.</string>
     <string name="thanksForTheFeedback">Aitäh tagasiside eest!</string>
     <string name="feedbackNegativeMainReasonPageSubtitle">Mis on teie pettumusega kõige rohkem seotud?</string>
-    <string name="feedbackNegativeMainReasonPageTitle">Meil on kahju seda kuulda.</string>
-    <string name="feedbackShareDetails">Jagage üksikasju</string>
+    <string name="feedbackNegativeMainReasonPageTitle">Meil on kahju seda kuulda</string>
+    <string name="feedbackShareDetails">Jaga üksikasju</string>
     <string name="sharePositiveFeedbackWithTheTeam">Kas on mingeid üksikasju, mida soovite meeskonnaga jagada?</string>
     <string name="whatHaveYouBeenEnjoying">Mida olete nautinud?</string>
     <string name="awesomeToHear">Vinge kuulda!</string>
     <string name="shareTheLoveWithARating">Jagage armastust Play Store\'i hinnanguga.</string>
-    <string name="rateTheApp">HINNAKE RAKENDUST</string>
+    <string name="rateTheApp">HINDA RAKENDUST</string>
     <string name="declineFurtherFeedback">EI, AITÄH, OLEN VALMIS</string>
     <string name="whichBrokenSites">Kus te neid probleeme näete?</string>
     <string name="whichBrokenSitesHint">Millisel veebisaidil on probleeme?</string>
@@ -386,9 +392,9 @@
     <string name="systemSearchAppNotFound">Rakendust ei leitud</string>
     <string name="systemSearchOnboardingText">Täname, et valisite DuckDuckGo!\nNüüd, kui kasutate meie otsingut või rakendust, on teie otsingud kaitstud.</string>
     <string name="systemSearchOnboardingFeaturesIntroText">Peale selle DuckDuckGo rakendus:</string>
-    <string name="systemSearchOnboardingFeatureOneText">Blokeerib ebaturvalised jälgijad</string>
-    <string name="systemSearchOnboardingFeatureTwoText">Sunnib krüpteerima veebisaite</string>
-    <string name="systemSearchOnboardingFeatureThreeText">Kustutab andmed ühe puudutusega</string>
+    <string name="systemSearchOnboardingFeatureOneText">Blokeerib ebaturvalised jälgijad.</string>
+    <string name="systemSearchOnboardingFeatureTwoText">Sunnib krüpteerima veebisaite.</string>
+    <string name="systemSearchOnboardingFeatureThreeText">Kustutab andmed ühe puudutusega.</string>
     <string name="systemSearchOnboardingButtonMore">Näita rohkem</string>
     <string name="systemSearchOnboardingButtonLess">Peida</string>
     <string name="systemSearchOnboardingButtonOk">Sain aru</string>
@@ -408,18 +414,18 @@
     <string name="onboardingDaxText"><![CDATA[Internet võib olla üsna jube.<br/><br/>Ärge muretsege! Privaatselt otsimine ja sirvimine on lihtsam kui arvate.]]></string>
     <string name="onboardingLetsDoItButton">Teeme ära!</string>
     <string name="daxIntroCtaText"><![CDATA[Järgmisena proovige külastada ühte oma lemmiksaitidest! <br/><br/>Mina aga blokeerin jälgijaid, et nad ei saaks teid luurata. Täiustan võimalusel ka teie ühenduse turvalisust. 🔒]]></string>
-    <string name="daxEndCtaText"><![CDATA[Käpas! <br/><br/>Pidage meeles: iga kord, kui minuga sirvite, kaotab jube reklaam tiivad. 👍]]></string>
+    <string name="daxEndCtaText"><![CDATA[Käpas! <br/><br/>Pea meeles: iga kord, kui minuga sirvid, kaotab jube reklaam tiivad. 👍]]></string>
     <string name="daxSerpCtaText">Teie DuckDuckGo otsingud on anonüümsed ja ma ei salvesta kunagi teie otsinguajalugu. Mitte kunagi. 🙌</string>
     <plurals name="daxTrackersBlockedCtaText">
-        <item quantity="one"><![CDATA[ ja <b>%1$d teine</b> üritasid teid siin jälitada. <br/><br/>Blokeerisin nad!<br/><br/> ☝️Võite vaadata URL-i riba, et näha, kes üritab teid jälgida, kui külastate uut saiti.️]]></item>
-        <item quantity="other"><![CDATA[ ja <b>%1$d teised</b> üritasid teid siin jälitada. <br/><br/>Blokeerisin nad!<br/><br/> ☝️Võite vaadata URL-i riba, et näha, kes üritab teid jälgida, kui külastate uut saiti.️]]></item>
+        <item quantity="one"><![CDATA[ ja <b>%1$d teine</b> üritasid sind siin jälitada. <br/><br/>Blokeerisin tema!<br/><br/> ☝️Võid vaadata aadressiriba, et näha, kes üritab sind jälgida, kui külastad uut saiti.️]]></item>
+        <item quantity="other"><![CDATA[ ja <b>%1$d teised</b> üritasid sind siin jälitada. <br/><br/>Blokeerisin nad!<br/><br/> ☝️Võid vaadata aadressiriba, et näha, kes üritab sind jälgida, kui külastad uut saiti.️]]></item>
     </plurals>
     <plurals name="daxTrackersBlockedCtaZeroText">
-        <item quantity="one"><![CDATA[ üritas teid siin jälitada. <br/><br/>Blokeerisin selle!<br/><br/> ☝️Võite vaadata URL-i riba, et näha, kes üritab teid jälgida, kui külastate uut saiti.️]]></item>
-        <item quantity="other"><![CDATA[ üritas teid siin jälitada. <br/><br/>Blokeerisin selle!<br/><br/> ☝️Võite vaadata URL-i riba, et näha, kes üritab teid jälgida, kui külastate uut saiti.️]]></item>
+        <item quantity="one"><![CDATA[ üritas sind siin jälitada. <br/><br/>Blokeerisin tema!<br/><br/> ☝️Võid vaadata URL-i riba, et näha, kes üritab sind jälgida, kui külastad uut saiti.️]]></item>
+        <item quantity="other"><![CDATA[ üritas sind siin jälitada. <br/><br/>Blokeerisin nad!<br/><br/> ☝️Võid vaadata URL-i riba, et näha, kes üritab sind jälgida, kui külastad uut saiti.️]]></item>
     </plurals>
     <string name="daxNonSerpCtaText"><![CDATA[Kui puudutate ja kerite, siis mina blokeerin tüütud jälgijad. <br/><br/>Edasi — jätkake sirvimist!]]></string>
-    <string name="daxMainNetworkCtaText"><![CDATA[Ettevaatust! %1$s on suur jälgimisvõrgustik.<br/><br/> Nend jälitajad jälgivad teid %2$s populaarseimatest saitidest, 😱 aga ärge muretsege!<br/><br/>Hoolitsen selle eest, et %3$s teid nendel saitidel ei jälgiks.]]></string>
+    <string name="daxMainNetworkCtaText">Ettevaatust! Ma ei saa takistada %1$s nägemast sinu tegevust %2$s&lt;br/&gt;&lt;br/&gt;Kuid sirvi koos minuga ja ma saan vähendada seda, mida %3$s sinust üldiselt teab, blokeerides tema jälitajad paljudel teistel lehtedel.</string>
     <string name="daxMainNetworkOwnedCtaText">Tähelepanu! Kuna %1$s on %2$s omanik, ei saa ma takistada teda jälgimast sinu tegevust siin.&lt;br/&gt;&lt;br/&gt;Kuid sirvi koos minuga ja ma saan vähendada seda, mida %3$s sinust üldiselt teab, blokeerides tema jälgijad paljudel teistel lehtedel.</string>
 
     <!-- Download Confirmation -->
@@ -433,7 +439,7 @@
 
     <!-- Change Icon Activity -->
     <string name="changeIconActivityTitle">Rakenduse ikoon</string>
-    <string name="changeIconCtaLabel">Rakenduse ikooni muutmine</string>
+    <string name="changeIconCtaLabel">Rakenduse ikoon</string>
     <string name="changeIconCtaAccept">Rakenda</string>
     <string name="changeIconCtaCancel">Tühista</string>
     <string name="changeIconDialogTitle">Kas rakendada uus ikoon?</string>
@@ -446,17 +452,18 @@
     <!-- Dialogs -->
     <string name="dialogAddTitle">Lisa</string>
     <string name="dialogEditTitle">Redigeeri</string>
+    <string name="dialogSaveAction">Salvesta</string>
 
     <!-- Whitelist -->
     <string name="whitelisetActivityTitle">Kaitseta saidid</string>
-    <string name="enablePrivacyProtection">Luba Eraelu puutumatuse kaitse</string>
-    <string name="disablePrivacyProtection">Keela Eraelu puutumatuse kaitse</string>
+    <string name="enablePrivacyProtection">Luba privaatsuse kaitse</string>
+    <string name="disablePrivacyProtection">Keela privaatsuse kaitse</string>
     <string name="whitelistEntryOverflowContentDescription">Rohkem võimalusi kaitseta saidi %1$s jaoks</string>
-    <string name="whitelistEntryDeleteConfirmMessage">Oled kindel, et soovite eemaldada &lt;b&gt;%1$s&lt;/b&gt; kaisteta saitide hulgast?</string>
-    <string name="whitelistExplanation">Nendele saitidele ei laiene Eraelu puutumatuse kaitse.</string>
-    <string name="whitelistNoEntries">Kaitseta saite ei ole veel</string>
+    <string name="whitelistEntryDeleteConfirmMessage">Oled kindel, et soovid eemaldada &lt;b&gt;%1$s&lt;/b&gt; kaisteta saitide hulgast?</string>
+    <string name="whitelistExplanation">Nendele saitidele ei laiene privaatsuse kaitse.</string>
+    <string name="whitelistNoEntries">Privaatsuse kaitse on lubatud kõigil saitidel</string>
     <string name="whitelistDomainHint">www.example.com</string>
-    <string name="whitelistFormatError">Salvestamine ebaõnnestus, sisestage domeen kujul <b>example.com</b></string>
+    <string name="whitelistFormatError">Sisesta domeen <b>example.com</b> kujul ja proovi uuesti</string>
 
     <!-- Settings -->
     <string name="settingsPrivacyProtectionWhitelist">Kaitseta saidid</string>
@@ -467,8 +474,8 @@
     <string name="fireproofWebsiteMenuTitleAdd">Tulekindel veebisait</string>
     <string name="fireproofWebsiteSnackbarConfirmation">&lt;b&gt;%1$s&lt;/b&gt; on nüüd tulekindel! Lisateabe saamiseks vaata üle seaded.</string>
     <string name="fireproofWebsiteSnackbarAction">Võta tagasi</string>
-    <string name="fireproofWebsiteDeleteConfirmMessage">Kas soovite kindlasti kustutada saidi &lt;b&gt;%1$s&lt;/b&gt;?</string>
-    <string name="fireproofWebsiteEmptyListHint">Ükski veebisait pole veel tulekindel</string>
+    <string name="fireproofWebsiteDeleteConfirmMessage">Kas soovid kindlasti kustutada saidi &lt;b&gt;%1$s&lt;/b&gt;?</string>
+    <string name="fireproofWebsiteEmptyListHint">Tulekindlaid veebisaite ei ole</string>
     <string name="fireproofWebsiteFeatureDescription">Veebilehed kasutavad küpsiseid, et hoida sind sisse logitud. Kui teed lehe tulekindlaks, ei kustutata küpsiseid ja sa jääd sisse logituks isegi pärast tulenupu kasutamist. Me blokeerime endiselt kolmanda poole jälitajad, kelle me tulekindlatelt lehtedelt leiame.</string>
     <string name="fireproofWebsiteOverflowContentDescription">Veel tulekindla veebisaidi võimalusi %1$s</string>
     <string name="fireproofWebsiteLoginDialogTitle">Kas soovid muuta %1$s tulekindaks?</string>
@@ -478,6 +485,15 @@
     <string name="fireproofWebsiteItemsSectionTitle">Veebilehed</string>
     <string name="fireproofWebsiteToogleText">Küsi sisselogimisel</string>
 
+    <!-- Fire Animation settings -->
+    <string name="settingsFireAnimation">Tulenupu animatsioon</string>
+    <string name="settingsHeroFireAnimation">Inferno</string>
+    <string name="settingsHeroWaterAnimation">Whirlpool</string>
+    <string name="settingsHeroAbstractAnimation">Airstream</string>
+    <string name="settingsNoneAnimation">Puudub</string>
+    <string name="settingsSelectFireAnimationDialog">Tulenupu animatsioon</string>
+    <string name="settingsSelectFireAnimationDialogSave">Salvesta</string>
+
     <!-- Dos Attack error-->
     <string name="dosErrorMessage">Ühendus on katkestatud. See veebileht võib kahjustada sinu seadet.</string>
 
@@ -485,9 +501,6 @@
     <string name="downloadManagerDisabled">Download Manager on keelatud</string>
     <string name="downloadManagerIncompatible">Download Manager ei ole saadaval selles seadmes</string>
     <string name="enable">Luba</string>
-
-    <!--Fire button education-->
-    <string name="daxClearDataCtaText">Nüüd puutuda allpool, et kustutada oma sirvimise ajalugu. Proovi! 👇</string>
 
     <!-- Precise Location -->
     <string name="preciseLocationSystemDialogTitle">Kas lubada seadme asukoht DuckDuckGo privaatses brauseris?</string>
@@ -502,21 +515,24 @@
     <string name="preciseLocationSiteDialogDenyAlways">Keela alati</string>
     <string name="preciseLocationSiteDialogDenyOnce">Keela selle seansi jaoks</string>
     <string name="settingsPreciseLocation">Asukoht</string>
-    <string name="preciseLocationFeatureDescription">Saidid, mida sa külastad, võivad küsida sinu seadme asukohta. Nad ei saa sellele juurde enne, kui oled andnud selgesõnalise loa. DuckDuckGo kasutab sinu asukohta alati anonüümselt, et edastada kohaliku otsingu tulemused.</string>
+    <string name="preciseLocationFeatureDescription">Saidid, mida sa külastad, võivad küsida sinu seadme asukohta. Nad ei saa sellele ligipääsu enne, kui oled andnud selgesõnalise loa. DuckDuckGo kasutab sinu asukohta alati anonüümselt, et edastada kohaliku otsingu tulemused.</string>
     <string name="preciseLocationToggleText">Saidid võivad küsida minu asukohta</string>
     <string name="preciseLocationEmptyListHint">Ühelegi veebisaidile ei ole antud luba asukohale juurdepääsuks</string>
     <string name="preciseLocationNoSystemPermission">Haldamaks asukohale juurdepääsu lubasid, mille sa oled üksikutele saitidele andnud, luba asukoht selle rakenduse jaoks Androidi seadetes.</string>
     <string name="preciseLocationActivityTitle">Asukoht</string>
-    <string name="preciseLocationDeleteConfirmMessage">Kas soovite kindlasti kustutada saidi &lt;b&gt;%1$s&lt;/b&gt;?</string>
-    <string name="preciseLocationDeleteContentDescription">Rohkem võimalusi asukoha lubade jaoks domeenis %1$s</string>
+    <string name="preciseLocationDeleteConfirmMessage">Kas soovid kindlasti saidi kustutada &lt;b&gt;%1$s&lt;/b&gt;?</string>
+    <string name="preciseLocationDeleteContentDescription">Rohkem võimalusi domeenis asukoha lubade jaoks %1$s</string>
     <string name="preciseLocationAllowedSitesSectionTitle">Antud</string>
     <string name="preciseLocationDeniedSitesSectionTitle">Keelatud</string>
     <string name="preciseLocationSnackbarMessage">Andsid eelnevalt %1$s loa juurdepääsuks oma seadme asukohale.</string>
 
+    <!--Fire button education-->
+    <string name="daxClearDataCtaText">Sinu brauserisse võivad koguneda isikuandmed. Õudne. Kasuta tule nuppu, et see kõik ära põletada. Proovi kohe! 👇</string>
+
     <!--  Global Privacy Control-->
     <string name="globalPrivacyControlActivityTitle">Üleilmne privaatsuskontroll (Global Privacy Control (GPC))</string>
     <string name="globalPrivacyControlDescription">
-        Sinu andmeid ei tohiks müüa. DuckDuckGo nõustub. Aktiveeri seadistus „Üleilmne privaatsuskontroll“ (GPC) ja me anname veebisaitidele märku sinu eelistustest: \n\n • Mitte müüa sinu isikuandmeid. \n • Piirata sinu isikuandmete jagamist teiste ettevõtetega.
+        Sinu andmeid ei tohiks müüa. DuckDuckGo on nõus. Aktiveeri seadistus „Üleilmne privaatsuskontroll“ (GPC) ja me anname veebisaitidele märku sinu eelistustest: &lt;br/&gt;&lt;br/&gt;• Mitte müüa sinu isikuandmeid. &lt;br/&gt; • Piirata sinu isikuandmete jagamist teiste ettevõtetega.
     </string>
     <string name="globalPrivacyControlSetting">Üleilmne privaatsuskontroll (Global Privacy Control (GPC))</string>
     <string name="globalPrivacyControlToggle">Üleilmne privaatsuskontroll (Global Privacy Control (GPC))</string>

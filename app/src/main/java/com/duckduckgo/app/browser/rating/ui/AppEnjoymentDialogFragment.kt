@@ -48,10 +48,12 @@ class AppEnjoymentDialogFragment : EnjoymentDialog() {
                 firePixelWithPromptCount(APP_ENJOYMENT_DIALOG_USER_NOT_ENJOYING)
                 listener.onUserSelectedAppIsNotEnjoyed(promptCount)
             }
-            .setOnKeyListener(BackKeyListener {
-                firePixelWithPromptCount(APP_ENJOYMENT_DIALOG_USER_CANCELLED)
-                listener.onUserCancelledAppEnjoymentDialog(promptCount)
-            })
+            .setOnKeyListener(
+                BackKeyListener {
+                    firePixelWithPromptCount(APP_ENJOYMENT_DIALOG_USER_CANCELLED)
+                    listener.onUserCancelledAppEnjoymentDialog(promptCount)
+                }
+            )
             .create()
     }
 

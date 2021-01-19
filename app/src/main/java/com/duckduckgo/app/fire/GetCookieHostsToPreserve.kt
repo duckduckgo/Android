@@ -26,11 +26,14 @@ class GetCookieHostsToPreserve(private val fireproofWebsiteDao: FireproofWebsite
             val host = entity.domain
             acceptedHosts.add(host)
             host.split(".")
-                .foldRight("", { next, acc ->
-                    val acceptedHost = ".$next$acc"
-                    acceptedHosts.add(acceptedHost)
-                    acceptedHost
-                })
+                .foldRight(
+                    "",
+                    { next, acc ->
+                        val acceptedHost = ".$next$acc"
+                        acceptedHosts.add(acceptedHost)
+                        acceptedHost
+                    }
+                )
             acceptedHosts
         }.distinct()
     }
