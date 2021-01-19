@@ -18,6 +18,7 @@ package com.duckduckgo.app.browser.httpauth
 
 import android.os.Build
 import android.webkit.WebView
+import android.webkit.WebViewDatabase
 import androidx.test.filters.SdkSuppress
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.browser.httpauth.db.HttpAuthDao
@@ -42,9 +43,10 @@ class WebViewHttpAuthStoreTest {
     private val fireproofWebsiteDao: FireproofWebsiteDao = mock()
     private val httpAuthDao: HttpAuthDao = mock()
     private val webView: WebView = mock()
+    private val webViewDatabase: WebViewDatabase = mock()
 
-    private val webViewHttpAuthStore = RealWebViewHttpAuthStore(coroutineRule.testDispatcherProvider, fireproofWebsiteDao, httpAuthDao)
-    private val webViewHttpAuthStoreWithNullHttpAuthDao = RealWebViewHttpAuthStore(coroutineRule.testDispatcherProvider, fireproofWebsiteDao, null)
+    private val webViewHttpAuthStore = RealWebViewHttpAuthStore(coroutineRule.testDispatcherProvider, fireproofWebsiteDao, webViewDatabase, httpAuthDao)
+    private val webViewHttpAuthStoreWithNullHttpAuthDao = RealWebViewHttpAuthStore(coroutineRule.testDispatcherProvider, fireproofWebsiteDao, webViewDatabase, null)
 
     @Test
     fun whenSetHttpAuthUsernamePasswordThenInsertHttpAuthEntity() {
@@ -116,6 +118,6 @@ class WebViewHttpAuthStoreTest {
     fun whenClearHttpAuthUsernamePasswordAndNullHttpAuthDaoThenClearWebViewAuthCredentials() {
         webViewHttpAuthStoreWithNullHttpAuthDao.clearHttpAuthUsernamePassword(webView)
 
-        verify(webView).clearAuthentication()
+        verify(webViewDatabase).clearHttpAuthUsernamePassword()
     }
 }

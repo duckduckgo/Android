@@ -20,7 +20,6 @@ import android.os.Build
 import android.webkit.WebView
 import android.webkit.WebViewDatabase
 import androidx.annotation.UiThread
-import androidx.annotation.VisibleForTesting
 import com.duckduckgo.app.browser.httpauth.db.HttpAuthDao
 import com.duckduckgo.app.browser.httpauth.db.HttpAuthEntity
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteDao
@@ -57,12 +56,6 @@ private fun WebView.getHttpAuthUsernamePasswordCompat(host: String, realm: Strin
     )
 }
 
-@VisibleForTesting
-fun WebView.clearAuthentication() {
-    val webViewDatabase = WebViewDatabase.getInstance(this.context)
-    webViewDatabase.clearHttpAuthUsernamePassword()
-}
-
 // Methods are marked to run in the UiThread because it is the thread of webview
 // if necessary the method impls will change thread to access the http auth dao
 interface WebViewHttpAuthStore {
@@ -77,6 +70,7 @@ interface WebViewHttpAuthStore {
 class RealWebViewHttpAuthStore(
     private val dispatcherProvider: DispatcherProvider,
     private val fireproofWebsiteDao: FireproofWebsiteDao,
+    private val webViewDatabase: WebViewDatabase,
     private val httpAuthDao: HttpAuthDao?
 ) : WebViewHttpAuthStore {
     override fun setHttpAuthUsernamePassword(webView: WebView, host: String, realm: String, username: String, password: String) {
@@ -116,7 +110,7 @@ class RealWebViewHttpAuthStore(
 
     override fun clearHttpAuthUsernamePassword(webView: WebView) {
         if (httpAuthDao == null) {
-            webView.clearAuthentication()
+            webViewDatabase.clearHttpAuthUsernamePassword()
         } else {
             runBlocking {
                 withContext(dispatcherProvider.io()) {

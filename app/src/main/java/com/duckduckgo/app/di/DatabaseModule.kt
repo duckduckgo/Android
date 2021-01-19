@@ -18,6 +18,7 @@ package com.duckduckgo.app.di
 
 import android.content.Context
 import android.os.Build
+import android.webkit.WebViewDatabase
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import com.duckduckgo.app.browser.addtohome.AddToHomeCapabilityDetector
@@ -47,11 +48,10 @@ class DatabaseModule {
             // This database is a Room wrapper around the http_auth convenience database
             Room.databaseBuilder(context, HttpAuthDatabase::class.java, "http_auth.db")
                 .setJournalMode(RoomDatabase.JournalMode.TRUNCATE)
-                .addMigrations(HttpAuthDatabase.MIGRATION_1_2)
                 .build()
         } else null
 
-        return RealWebViewHttpAuthStore(dispatcherProvider, fireproofWebsiteDao, httpAuthDb?.httpAuthDao())
+        return RealWebViewHttpAuthStore(dispatcherProvider, fireproofWebsiteDao, WebViewDatabase.getInstance(context), httpAuthDb?.httpAuthDao())
     }
 
     @Provides
