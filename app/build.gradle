@@ -110,7 +110,7 @@ ext {
     legacySupport = "1.0.0"
     coreTesting = "2.1.0"
     testRunner = "1.3.0"
-    coroutines = "1.4.1"
+    coroutines = "1.4.2"
     webkit = "1.3.0"
     referrerLibrary = "1.1.2"
 
