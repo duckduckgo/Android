@@ -113,6 +113,7 @@ import io.reactivex.Single
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.consumeAsFlow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runBlockingTest
 import org.junit.After
@@ -2461,7 +2462,6 @@ class BrowserTabViewModelTest {
         givenDeviceLocationSharingIsEnabled(true)
         givenLocationPermissionIsEnabled(true)
         givenCurrentSite(domain)
-
         testee.onSiteLocationPermissionSelected(domain, LocationPermissionType.ALLOW_ONCE)
 
         givenNewPermissionRequestFromDomain(domain)
@@ -3029,7 +3029,7 @@ class BrowserTabViewModelTest {
         loadUrl("http://duckduckgo.com")
         testee.progressChanged(100)
 
-        assertCommandNotIssued<Command.RefreshUserAgent>()
+        assertCommandIssued<Command.RefreshUserAgent>()
     }
 
     @Test
