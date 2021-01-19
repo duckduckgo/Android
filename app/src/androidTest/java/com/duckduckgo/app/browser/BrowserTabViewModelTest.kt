@@ -3127,8 +3127,6 @@ class BrowserTabViewModelTest {
             verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
             val issuedCommand = commandCaptor.allValues.find { it is T }
             assertNull(issuedCommand)
-        } else {
-            assertTrue(true)
         }
     }
 
