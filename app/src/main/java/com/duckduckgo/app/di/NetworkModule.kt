@@ -29,6 +29,7 @@ import com.duckduckgo.app.global.AppUrl.Url
 import com.duckduckgo.app.global.api.ApiRequestInterceptor
 import com.duckduckgo.app.global.api.NetworkApiCache
 import com.duckduckgo.app.global.job.AppConfigurationSyncWorkRequestBuilder
+import com.duckduckgo.app.globalprivacycontrol.GlobalPrivacyControl
 import com.duckduckgo.app.httpsupgrade.api.HttpsUpgradeService
 import com.duckduckgo.app.job.AppConfigurationSyncer
 import com.duckduckgo.app.job.ConfigurationDownloader
@@ -127,9 +128,10 @@ class NetworkModule {
         statisticsStore: StatisticsDataStore,
         variantManager: VariantManager,
         tdsMetadataDao: TdsMetadataDao,
-        pixel: Pixel
+        pixel: Pixel,
+        globalPrivacyControl: GlobalPrivacyControl
     ): BrokenSiteSender =
-        BrokenSiteSubmitter(statisticsStore, variantManager, tdsMetadataDao, pixel)
+        BrokenSiteSubmitter(statisticsStore, variantManager, tdsMetadataDao, globalPrivacyControl, pixel)
 
     @Provides
     fun surveyService(@Named("api") retrofit: Retrofit): SurveyService =

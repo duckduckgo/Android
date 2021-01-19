@@ -142,7 +142,7 @@ class SettingsSharedPreferences constructor(private val context: Context) : Sett
         set(enabled) = preferences.edit { putBoolean(KEY_APP_NOTIFICATIONS_ENABLED, enabled) }
 
     override var globalPrivacyControlEnabled: Boolean
-        get() = preferences.getBoolean(KEY_DO_NOT_SELL_ENABLED, false)
+        get() = preferences.getBoolean(KEY_DO_NOT_SELL_ENABLED, true)
         set(enabled) = preferences.edit { putBoolean(KEY_DO_NOT_SELL_ENABLED, enabled) }
 
     override fun hasBackgroundTimestampRecorded(): Boolean = preferences.contains(KEY_APP_BACKGROUNDED_TIMESTAMP)

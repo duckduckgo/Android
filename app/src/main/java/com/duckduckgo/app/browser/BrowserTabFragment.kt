@@ -91,6 +91,7 @@ import com.duckduckgo.app.browser.BrowserTabViewModel.*
 import com.duckduckgo.app.browser.BrowserTabViewModel.Command.DownloadCommand
 import com.duckduckgo.app.browser.DownloadConfirmationFragment.DownloadConfirmationDialogListener
 import com.duckduckgo.app.browser.autocomplete.BrowserAutoCompleteSuggestionsAdapter
+import com.duckduckgo.app.browser.downloader.BlobConverterInjector
 import com.duckduckgo.app.browser.downloader.DownloadFailReason
 import com.duckduckgo.app.browser.downloader.FileDownloadNotificationManager
 import com.duckduckgo.app.browser.downloader.FileDownloader
@@ -222,6 +223,9 @@ class BrowserTabFragment :
 
     @Inject
     lateinit var loginDetector: DOMLoginDetector
+
+    @Inject
+    lateinit var blobConverterInjector: BlobConverterInjector
 
     val tabId get() = requireArguments()[TAB_ID_ARG] as String
 
@@ -640,10 +644,12 @@ class BrowserTabFragment :
             is Command.CheckSystemLocationPermission -> checkSystemLocationPermission(it.domain, it.deniedForever)
             is Command.RequestSystemLocationPermission -> requestLocationPermissions()
             is Command.AskDomainPermission -> askSiteLocationPermission(it.domain)
-            is Command.RefreshUserAgent -> refreshUserAgent(it.host, it.isDesktop)
+            is Command.RefreshUserAgent -> refreshUserAgent(it.url, it.isDesktop)
             is Command.AskToFireproofWebsite -> askToFireproofWebsite(requireContext(), it.fireproofWebsite)
             is Command.ShowDomainHasPermissionMessage -> showDomainHasLocationPermission(it.domain)
             is DownloadCommand -> processDownloadCommand(it)
+            is Command.ConvertBlobToDataUri -> convertBlobToDataUri(it)
+            is Command.RequestFileDownload -> requestFileDownload(it.url, it.contentDisposition, it.mimeType, it.requestUserConfirmation)
         }
     }
 
@@ -813,7 +819,7 @@ class BrowserTabFragment :
             alertDialog = AlertDialog.Builder(context)
                 .setTitle(R.string.launchingExternalApp)
                 .setMessage(getString(R.string.confirmOpenExternalApp))
-                .setPositiveButton(R.string.yes) { _, _ ->
+                .setPositiveButton(R.string.open) { _, _ ->
                     onClick()
                 }
                 .setNeutralButton(R.string.closeTab) { dialog, _ ->
@@ -823,7 +829,7 @@ class BrowserTabFragment :
                         destroyWebView()
                     }
                 }
-                .setNegativeButton(R.string.no) { dialog, _ ->
+                .setNegativeButton(R.string.cancel) { dialog, _ ->
                     dialog.dismiss()
                 }
                 .show()
@@ -986,7 +992,7 @@ class BrowserTabFragment :
             }
 
             it.setDownloadListener { url, _, contentDisposition, mimeType, _ ->
-                requestFileDownload(url, contentDisposition, mimeType, true)
+                viewModel.requestFileDownload(url, contentDisposition, mimeType, true)
             }
 
             it.setOnTouchListener { _, _ ->
@@ -1004,6 +1010,7 @@ class BrowserTabFragment :
 
             it.setFindListener(this)
             loginDetector.addLoginDetection(it) { viewModel.loginDetected() }
+            blobConverterInjector.addJsInterface(it) { url, mimeType -> viewModel.requestFileDownload(url, null, mimeType, true) }
         }
 
         if (BuildConfig.DEBUG) {
@@ -1154,13 +1161,13 @@ class BrowserTabFragment :
         }
     }
 
-    private fun refreshUserAgent(host: String?, isDesktop: Boolean) {
+    private fun refreshUserAgent(url: String?, isDesktop: Boolean) {
         val currentAgent = webView?.settings?.userAgentString
-        val newAgent = userAgentProvider.userAgent(host, isDesktop)
+        val newAgent = userAgentProvider.userAgent(url, isDesktop)
         if (newAgent != currentAgent) {
-            Timber.d("User Agent Changed, new ${if (isDesktop) "Desktop" else "Mobile"} UA is $newAgent")
             webView?.settings?.userAgentString = newAgent
         }
+        Timber.d("User Agent is $newAgent")
     }
 
     /**
@@ -1227,7 +1234,13 @@ class BrowserTabFragment :
         webView = null
     }
 
-    private fun requestFileDownload(url: String, contentDisposition: String, mimeType: String, requestUserConfirmation: Boolean) {
+    private fun convertBlobToDataUri(blob: Command.ConvertBlobToDataUri) {
+        webView?.let {
+            blobConverterInjector.convertBlobIntoDataUriAndDownload(it, blob.url, blob.mimeType)
+        }
+    }
+
+    private fun requestFileDownload(url: String, contentDisposition: String?, mimeType: String, requestUserConfirmation: Boolean) {
         pendingFileDownload = PendingFileDownload(
             url = url,
             contentDisposition = contentDisposition,
@@ -1471,8 +1484,14 @@ class BrowserTabFragment :
             popupMenu = BrowserPopupMenu(layoutInflater, variantManager.getVariant())
             val view = popupMenu.contentView
             popupMenu.apply {
-                onMenuItemClicked(view.forwardPopupMenuItem) { viewModel.onUserPressedForward() }
-                onMenuItemClicked(view.backPopupMenuItem) { activity?.onBackPressed() }
+                onMenuItemClicked(view.forwardPopupMenuItem) {
+                    pixel.fire(Pixel.PixelName.MENU_ACTION_NAVIGATE_FORWARD_PRESSED)
+                    viewModel.onUserPressedForward()
+                }
+                onMenuItemClicked(view.backPopupMenuItem) {
+                    pixel.fire(Pixel.PixelName.MENU_ACTION_NAVIGATE_BACK_PRESSED)
+                    activity?.onBackPressed()
+                }
                 onMenuItemClicked(view.refreshPopupMenuItem) {
                     viewModel.onRefreshRequested()
                     pixel.fire(Pixel.PixelName.MENU_ACTION_REFRESH_PRESSED.pixelName)
@@ -1486,14 +1505,36 @@ class BrowserTabFragment :
                     pixel.fire(Pixel.PixelName.MENU_ACTION_BOOKMARKS_PRESSED.pixelName)
                 }
                 onMenuItemClicked(view.fireproofWebsitePopupMenuItem) { launch { viewModel.onFireproofWebsiteMenuClicked() } }
-                onMenuItemClicked(view.addBookmarksPopupMenuItem) { launch { viewModel.onBookmarkAddRequested() } }
-                onMenuItemClicked(view.findInPageMenuItem) { viewModel.onFindInPageSelected() }
+                onMenuItemClicked(view.addBookmarksPopupMenuItem) {
+                    launch {
+                        pixel.fire(Pixel.PixelName.MENU_ACTION_ADD_BOOKMARK_PRESSED.pixelName)
+                        viewModel.onBookmarkAddRequested()
+                    }
+                }
+                onMenuItemClicked(view.findInPageMenuItem) {
+                    pixel.fire(Pixel.PixelName.MENU_ACTION_FIND_IN_PAGE_PRESSED)
+                    viewModel.onFindInPageSelected()
+                }
                 onMenuItemClicked(view.whitelistPopupMenuItem) { viewModel.onWhitelistSelected() }
-                onMenuItemClicked(view.brokenSitePopupMenuItem) { viewModel.onBrokenSiteSelected() }
-                onMenuItemClicked(view.settingsPopupMenuItem) { browserActivity?.launchSettings() }
-                onMenuItemClicked(view.requestDesktopSiteCheckMenuItem) { viewModel.onDesktopSiteModeToggled(view.requestDesktopSiteCheckMenuItem.isChecked) }
-                onMenuItemClicked(view.sharePageMenuItem) { viewModel.onShareSelected() }
-                onMenuItemClicked(view.addToHome) { viewModel.onPinPageToHomeSelected() }
+                onMenuItemClicked(view.brokenSitePopupMenuItem) {
+                    pixel.fire(Pixel.PixelName.MENU_ACTION_REPORT_BROKEN_SITE_PRESSED)
+                    viewModel.onBrokenSiteSelected()
+                }
+                onMenuItemClicked(view.settingsPopupMenuItem) {
+                    pixel.fire(Pixel.PixelName.MENU_ACTION_SETTINGS_PRESSED)
+                    browserActivity?.launchSettings()
+                }
+                onMenuItemClicked(view.requestDesktopSiteCheckMenuItem) {
+                    viewModel.onDesktopSiteModeToggled(view.requestDesktopSiteCheckMenuItem.isChecked)
+                }
+                onMenuItemClicked(view.sharePageMenuItem) {
+                    pixel.fire(Pixel.PixelName.MENU_ACTION_SHARE_PRESSED)
+                    viewModel.onShareSelected()
+                }
+                onMenuItemClicked(view.addToHome) {
+                    pixel.fire(Pixel.PixelName.MENU_ACTION_ADD_TO_HOME_PRESSED)
+                    viewModel.onPinPageToHomeSelected()
+                }
             }
             browserMenu.setOnClickListener {
                 hideKeyboardImmediately()
