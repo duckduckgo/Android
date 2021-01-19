@@ -616,14 +616,13 @@ class CtaViewModelTest {
         givenOnboardingActive()
         db.tabsDao().insertTab(TabEntity(tabId = "0", position = 0))
         db.dismissedCtaDao().insert(DismissedCta(CtaId.DAX_DIALOG_TRACKERS_FOUND))
-        val collector = launch {
-            testee.showFireButtonPulseAnimation.collect {
-                values.add(it)
-            }
-        }
         db.tabsDao().insertTab(TabEntity(tabId = "1", position = 1))
 
-        assertEquals(listOf(true, false), values)
+        val collector = launch {
+            testee.showFireButtonPulseAnimation.collect {
+                assertFalse(it)
+            }
+        }
         collector.cancel()
     }
 
