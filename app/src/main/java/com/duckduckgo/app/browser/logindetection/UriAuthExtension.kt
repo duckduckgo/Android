@@ -35,7 +35,7 @@ private var oAuthUrlPatterns = mapOf<String, Set<Pattern>>(
     Pair("appleid.apple.com", setOf(Pattern.compile("auth/authorize"))),
     Pair("amazon.com", setOf(Pattern.compile("ap/oa"))),
     Pair("auth.atlassian.com", setOf(Pattern.compile("authorize"))),
-    Pair("facebook.com", setOf(Pattern.compile("/v\\d.*\\/dialog/oauth"), Pattern.compile("dialog/oauth"))),
+    Pair("facebook.com", setOf(Pattern.compile("/v\\d.*/dialog/oauth"), Pattern.compile("dialog/oauth"))),
     Pair("login.microsoftonline.com", setOf(Pattern.compile("common/oauth2/authorize"), Pattern.compile("common/oauth2/v2.0/authorize"))),
     Pair("linkedin.com", setOf(Pattern.compile("oauth/v\\d.*/authorization"))),
     Pair("github.com", setOf(Pattern.compile("login/oauth/authorize"))),

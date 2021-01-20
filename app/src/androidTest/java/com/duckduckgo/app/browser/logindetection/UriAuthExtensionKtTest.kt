@@ -32,6 +32,7 @@ class UriAuthExtensionKtTest {
         assertTrue(getValidUrl("https://www.amazon.com/ap/oa?client_id=amzn1.application-oa2-client&scope=profile").isOAuthUrl())
         assertTrue(getValidUrl("https://auth.atlassian.com/authorize").isOAuthUrl())
         assertTrue(getValidUrl("https://www.facebook.com/dialog/oauth?display=touch&response_type=code").isOAuthUrl())
+        assertTrue(getValidUrl("https://www.facebook.com/v2.0/dialog/oauth?display=touch&response_type=code").isOAuthUrl())
         assertTrue(getValidUrl("https://login.microsoftonline.com/common/oauth2/v2.0/authorize").isOAuthUrl())
         assertTrue(getValidUrl("https://www.linkedin.com/oauth/v2/authorization").isOAuthUrl())
         assertTrue(getValidUrl("https://github.com/login/oauth/authorize").isOAuthUrl())
