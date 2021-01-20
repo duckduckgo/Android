@@ -1,7 +1,9 @@
 // This code must be wrapped in an anonymous function which is done in JavaScriptDetector.kt to allow for dynamic changes before wrapping.
+// JS utility functions used by JsLoginDetector in order to detect login attempts and to ask users to fireproof a website
 
-function loginFormDetected() {
+function loginAttemptDetected() {
     try {
+        LoginDetection.log("Possible login attempt detected");
         LoginDetection.loginDetected();
     } catch (error) {}
 }
@@ -15,8 +17,7 @@ function validatePasswordField(passwords) {
         var password = passwords[i];
         var found = inputVisible(password);
         if (found) {
-            LoginDetection.log("password found!");
-            loginFormDetected();
+            loginAttemptDetected();
             return found;
         }
     }
@@ -26,27 +27,24 @@ function checkIsLoginForm(form) {
     LoginDetection.log("checking form " + form);
 
     var inputs = form.getElementsByTagName("input");
-    LoginDetection.log("checking input " + inputs);
     if (!inputs) {
         return;
     }
 
     for (var i = 0; i < inputs.length; i++) {
         var input = inputs.item(i);
-        LoginDetection.log("checking input " + input.type);
         if (input.type == "password" && inputVisible(input)) {
-            LoginDetection.log("found password in form " + form);
-            loginFormDetected();
+            loginAttemptDetected();
             return true;
         }
     }
 
-    LoginDetection.log("no password field in form " + form);
+    LoginDetection.log("No password field in form " + form);
     return false;
 }
 
 function scanPasswordFieldsInIFrame() {
-    LoginDetection.log("scanning iframes");
+    LoginDetection.log("Scanning for iframes");
     var iframes = document.querySelectorAll('iframe');
     for (var i = 0; i < iframes.length; i++) {
         var iframeDoc = iframes[i].contentWindow.document;
@@ -81,12 +79,12 @@ function scanForForms() {
 }
 
 function scanForPasswordField() {
-    LoginDetection.log("Scanning for password");
+    LoginDetection.log("Scanning DOM for password fields");
     var passwords = document.querySelectorAll('input[type=password]');
     if (passwords.length === 0) {
         var found = scanPasswordFieldsInIFrame()
         if (!found) {
-            LoginDetection.log("No password found");
+            LoginDetection.log("No password fields found");
         }
         return found;
     }
