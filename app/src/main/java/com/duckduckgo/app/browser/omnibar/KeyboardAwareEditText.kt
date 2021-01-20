@@ -43,7 +43,6 @@ class KeyboardAwareEditText : AppCompatEditText {
 
     override fun onFocusChanged(focused: Boolean, direction: Int, previouslyFocusedRect: Rect?) {
         super.onFocusChanged(focused, direction, previouslyFocusedRect)
-        // stop the auto-selection of text after the first focus
         setSelectAllOnFocus(!didFocusAlready)
         if (focused) {
             if (didFocusAlready && text != null && text?.isWebUrl() == false) {
