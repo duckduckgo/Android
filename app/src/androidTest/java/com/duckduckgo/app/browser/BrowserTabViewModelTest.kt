@@ -2462,11 +2462,12 @@ class BrowserTabViewModelTest {
         givenDeviceLocationSharingIsEnabled(true)
         givenLocationPermissionIsEnabled(true)
         givenCurrentSite(domain)
+        givenNewPermissionRequestFromDomain(domain)
         testee.onSiteLocationPermissionSelected(domain, LocationPermissionType.ALLOW_ONCE)
 
         givenNewPermissionRequestFromDomain(domain)
 
-        assertCommandNotIssued<Command.CheckSystemLocationPermission>()
+        assertCommandIssuedTimes<Command.CheckSystemLocationPermission>(times = 1)
     }
 
     @Test
