@@ -89,6 +89,8 @@ class NextPageLoginDetection constructor(private val settingsDataStore: Settings
     }
 
     private fun scheduleLoginDetection(): Job {
+        // Ideally, we should be using a scope tied to the Activity/Fragment lifecycle instead of GlobalScope.
+        // AToW, it's not possible to inject such scope as dependency due to our single Component Dagger setup.
         return GlobalScope.launch(Dispatchers.Main) {
             delay(NAVIGATION_EVENT_GRACE_PERIOD)
             Timber.v("LoginDetectionDelegate execute Login detection Job for $urlToCheck")
