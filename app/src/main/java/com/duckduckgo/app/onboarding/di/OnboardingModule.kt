@@ -17,11 +17,11 @@
 package com.duckduckgo.app.onboarding.di
 
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
+import com.duckduckgo.app.global.DefaultRoleBrowserDialogExperiment
 import com.duckduckgo.app.onboarding.ui.OnboardingFragmentPageBuilder
 import com.duckduckgo.app.onboarding.ui.OnboardingPageBuilder
 import com.duckduckgo.app.onboarding.ui.OnboardingPageManager
 import com.duckduckgo.app.onboarding.ui.OnboardingPageManagerWithTrackerBlocking
-import com.duckduckgo.app.statistics.VariantManager
 import dagger.Module
 import dagger.Provides
 import javax.inject.Singleton
@@ -31,11 +31,11 @@ class OnboardingModule {
 
     @Provides
     fun onboardingPageManger(
-        variantManager: VariantManager,
+        defaultRoleBrowserDialogExperiment: DefaultRoleBrowserDialogExperiment,
         onboardingPageBuilder: OnboardingPageBuilder,
         defaultBrowserDetector: DefaultBrowserDetector
     ): OnboardingPageManager {
-        return OnboardingPageManagerWithTrackerBlocking(variantManager, onboardingPageBuilder, defaultBrowserDetector)
+        return OnboardingPageManagerWithTrackerBlocking(defaultRoleBrowserDialogExperiment, onboardingPageBuilder, defaultBrowserDetector)
     }
 
     @Provides

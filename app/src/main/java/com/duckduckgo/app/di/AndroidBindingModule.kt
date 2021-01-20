@@ -41,7 +41,6 @@ import com.duckduckgo.app.launch.LaunchBridgeActivity
 import com.duckduckgo.app.location.ui.LocationPermissionsActivity
 import com.duckduckgo.app.location.ui.SiteLocationPermissionDialog
 import com.duckduckgo.app.notification.NotificationHandlerService
-import com.duckduckgo.app.onboarding.di.WelcomePageModule
 import com.duckduckgo.app.onboarding.ui.OnboardingActivity
 import com.duckduckgo.app.onboarding.ui.page.DefaultBrowserPage
 import com.duckduckgo.app.onboarding.ui.page.WelcomePage
@@ -185,9 +184,7 @@ abstract class AndroidBindingModule {
     @ContributesAndroidInjector
     abstract fun brokenSiteNegativeFeedbackFragment(): BrokenSiteNegativeFeedbackFragment
 
-    @ContributesAndroidInjector(
-        modules = [WelcomePageModule::class]
-    )
+    @ContributesAndroidInjector
     abstract fun welcomePage(): WelcomePage
 
     @ContributesAndroidInjector

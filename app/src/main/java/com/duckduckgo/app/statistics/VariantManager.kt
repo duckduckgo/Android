@@ -17,7 +17,6 @@
 package com.duckduckgo.app.statistics
 
 import android.os.Build
-import android.os.Build.VERSION_CODES.Q
 import androidx.annotation.WorkerThread
 import com.duckduckgo.app.statistics.VariantManager.Companion.DEFAULT_VARIANT
 import com.duckduckgo.app.statistics.VariantManager.Companion.referrerVariant
@@ -32,7 +31,6 @@ interface VariantManager {
     sealed class VariantFeature {
         object SerpHeaderQueryReplacement : VariantFeature()
         object SerpHeaderRemoval : VariantFeature()
-        object SetDefaultBrowserDialog : VariantFeature()
     }
 
     companion object {
@@ -53,14 +51,6 @@ interface VariantManager {
             Variant(key = "zh", weight = 0.0, features = listOf(VariantFeature.SerpHeaderQueryReplacement), filterBy = { noFilter() }),
             Variant(key = "zi", weight = 0.0, features = listOf(VariantFeature.SerpHeaderRemoval), filterBy = { noFilter() }),
 
-            // Role manager default browser dialog
-            Variant(key = "zt", weight = 1.0, features = emptyList(), filterBy = { isAtLeastApiVersion(Q) }),
-            Variant(
-                key = "zu",
-                weight = 1.0,
-                features = listOf(VariantFeature.SetDefaultBrowserDialog),
-                filterBy = { isAtLeastApiVersion(Q) }
-            )
             // All groups in an experiment (control and variants) MUST use the same filters
         )
 
