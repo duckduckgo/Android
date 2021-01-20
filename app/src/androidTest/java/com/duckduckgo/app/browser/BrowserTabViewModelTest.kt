@@ -112,7 +112,8 @@ import io.reactivex.Observable
 import io.reactivex.Single
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.consumeAsFlow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runBlockingTest
 import org.junit.After
@@ -124,6 +125,7 @@ import org.mockito.*
 import org.mockito.ArgumentMatchers.anyString
 import org.mockito.Mockito.never
 import org.mockito.Mockito.verify
+import org.mockito.internal.util.DefaultMockingDetails
 import java.io.File
 import java.util.*
 import java.util.concurrent.TimeUnit
@@ -2460,12 +2462,12 @@ class BrowserTabViewModelTest {
         givenDeviceLocationSharingIsEnabled(true)
         givenLocationPermissionIsEnabled(true)
         givenCurrentSite(domain)
-
+        givenNewPermissionRequestFromDomain(domain)
         testee.onSiteLocationPermissionSelected(domain, LocationPermissionType.ALLOW_ONCE)
 
         givenNewPermissionRequestFromDomain(domain)
 
-        assertCommandNotIssued<Command.CheckSystemLocationPermission>()
+        assertCommandIssuedTimes<Command.CheckSystemLocationPermission>(times = 1)
     }
 
     @Test
@@ -2704,11 +2706,7 @@ class BrowserTabViewModelTest {
         givenLocationPermissionIsEnabled(true)
 
         loadUrl("https://www.example.com", isBrowserShowing = true)
-
-        assertCommandIssued<Command.ShowDomainHasPermissionMessage>()
-
         loadUrl("https://www.example.com", isBrowserShowing = true)
-
         assertCommandIssuedTimes<Command.ShowDomainHasPermissionMessage>(1)
     }
 
@@ -3032,7 +3030,7 @@ class BrowserTabViewModelTest {
         loadUrl("http://duckduckgo.com")
         testee.progressChanged(100)
 
-        assertCommandNotIssued<Command.RefreshUserAgent>()
+        assertCommandIssued<Command.RefreshUserAgent>()
     }
 
     @Test
@@ -3125,13 +3123,22 @@ class BrowserTabViewModelTest {
     }
 
     private inline fun <reified T : Command> assertCommandNotIssued() {
-        val issuedCommand = commandCaptor.allValues.find { it is T }
-        assertNull(issuedCommand)
+        val defaultMockingDetails = DefaultMockingDetails(mockCommandObserver)
+        if (defaultMockingDetails.invocations.isNotEmpty()) {
+            verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+            val issuedCommand = commandCaptor.allValues.find { it is T }
+            assertNull(issuedCommand)
+        }
     }
 
     private inline fun <reified T : Command> assertCommandIssuedTimes(times: Int) {
-        val timesIssued = commandCaptor.allValues.count { it is T }
-        assertEquals(times, timesIssued)
+        if (times == 0) {
+            assertCommandNotIssued<T>()
+        } else {
+            verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+            val timesIssued = commandCaptor.allValues.count { it is T }
+            assertEquals(times, timesIssued)
+        }
     }
 
     private fun pixelParams(showedBookmarks: Boolean, bookmarkCapable: Boolean) = mapOf(
