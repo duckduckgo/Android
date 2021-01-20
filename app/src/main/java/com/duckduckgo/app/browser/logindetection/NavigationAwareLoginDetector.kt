@@ -105,10 +105,12 @@ class NextPageLoginDetection constructor(private val settingsDataStore: Settings
                         Timber.v("LoginDetectionDelegate TwoFactorAuthFlow")
                     }
                     is LoginResult.LoginDetected -> {
+                        Timber.d("LoginDetectionDelegate LoginDetected")
                         loginEventLiveData.value = LoginDetected(loginResult.authLoginDomain, loginResult.forwardedToDomain)
                         loginAttempt = null
                     }
                     is LoginResult.Unknown -> {
+                        Timber.v("LoginDetectionDelegate Unknown")
                         discardLoginAttempt()
                     }
                 }
@@ -190,7 +192,6 @@ class NextPageLoginDetection constructor(private val settingsDataStore: Settings
 
         Timber.d("LoginDetectionDelegate $validLoginAttempt vs $forwardedToUrl // $authDetectedHosts")
         if (validLoginAttempt.host != forwardedToUri.host || validLoginAttempt.path != forwardedToUri.path) {
-            Timber.i("LoginDetectionDelegate LoginDetected")
             return LoginResult.LoginDetected(validLoginAttempt.host, forwardedToUri.host)
         }
 
