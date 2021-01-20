@@ -80,18 +80,7 @@ class NextPageLoginDetection constructor(private val settingsDataStore: Settings
                 discardLoginAttempt()
             }
             is NavigationEvent.Redirect -> {
-                loginDetectionJob?.cancel()
-
-                val validUrl = Uri.parse(navigationEvent.url).getValidUrl() ?: return
-                if (validUrl.isOAuthUrl() || validUrl.isSSOUrl() || authDetectedHosts.any { validUrl.baseHost.contains(it) }) {
-                    authDetectedHosts.add(validUrl.baseHost)
-                    Timber.d("LoginDetectionDelegate Auth domain added $authDetectedHosts")
-                }
-
-                if (loginAttempt != null) {
-                    urlToCheck = navigationEvent.url
-                }
-                return
+                handleRedirect(navigationEvent)
             }
             is NavigationEvent.GpcRedirect -> {
                 gpcRefreshed = true
@@ -170,6 +159,20 @@ class NextPageLoginDetection constructor(private val settingsDataStore: Settings
             }
             is WebNavigationStateChange.Other -> {
             }
+        }
+    }
+
+    private fun handleRedirect(navigationEvent: NavigationEvent.Redirect) {
+        loginDetectionJob?.cancel()
+
+        val validUrl = Uri.parse(navigationEvent.url).getValidUrl() ?: return
+        if (validUrl.isOAuthUrl() || validUrl.isSSOUrl() || authDetectedHosts.any { validUrl.baseHost.contains(it) }) {
+            authDetectedHosts.add(validUrl.baseHost)
+            Timber.d("LoginDetectionDelegate Auth domain added $authDetectedHosts")
+        }
+
+        if (loginAttempt != null) {
+            urlToCheck = navigationEvent.url
         }
     }
 
