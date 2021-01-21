@@ -259,8 +259,8 @@ class BrowserModule {
     }
 
     @Provides
-    fun navigationAwareLoginDetector(): NavigationAwareLoginDetector {
-        return NextPageLoginDetection()
+    fun navigationAwareLoginDetector(settingsDataStore: SettingsDataStore): NavigationAwareLoginDetector {
+        return NextPageLoginDetection(settingsDataStore)
     }
 
     @Provides
