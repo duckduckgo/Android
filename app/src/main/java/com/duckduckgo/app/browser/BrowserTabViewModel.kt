@@ -268,6 +268,8 @@ class BrowserTabViewModel(
         class RefreshUserAgent(val url: String?, val isDesktop: Boolean) : Command()
         class ShowErrorWithAction(val textResId: Int, val action: () -> Unit) : Command()
         class ShowDomainHasPermissionMessage(val domain: String) : Command()
+        class ConvertBlobToDataUri(val url: String, val mimeType: String) : Command()
+        class RequestFileDownload(val url: String, val contentDisposition: String?, val mimeType: String, val requestUserConfirmation: Boolean) : Command()
         sealed class DaxCommand : Command() {
             object FinishTrackerAnimation : DaxCommand()
             class HideDaxDialog(val cta: Cta) : DaxCommand()
@@ -427,9 +429,8 @@ class BrowserTabViewModel(
     }
 
     private fun onAutoCompleteResultReceived(result: AutoCompleteResult) {
-        val results = result.suggestions.take(6)
         val currentViewState = currentAutoCompleteViewState()
-        autoCompleteViewState.value = currentViewState.copy(searchResults = AutoCompleteResult(result.query, results))
+        autoCompleteViewState.value = currentViewState.copy(searchResults = AutoCompleteResult(result.query, result.suggestions))
     }
 
     @VisibleForTesting
@@ -560,11 +561,12 @@ class BrowserTabViewModel(
     private suspend fun removeCurrentTabFromRepository() {
         val currentTab = tabRepository.liveSelectedTab.value
         currentTab?.let {
-            tabRepository.delete(currentTab)
+            tabRepository.deleteCurrentTabAndSelectSource()
         }
     }
 
     override fun willOverrideUrl(newUrl: String) {
+        navigationAwareLoginDetector.onEvent(NavigationEvent.Redirect(newUrl))
         val previousSiteStillLoading = currentLoadingViewState().isLoading
         if (previousSiteStillLoading) {
             showBlankContentfNewContentDelayed()
@@ -920,6 +922,7 @@ class BrowserTabViewModel(
     override fun progressChanged(newProgress: Int) {
         Timber.v("Loading in progress $newProgress")
         if (!currentBrowserViewState().browserShowing) return
+
         val isLoading = newProgress < 100
         val progress = currentLoadingViewState()
         if (progress.progress == newProgress) return
@@ -933,6 +936,7 @@ class BrowserTabViewModel(
 
         val showLoadingGrade = progress.privacyOn || isLoading
         privacyGradeViewState.value = currentPrivacyGradeState().copy(shouldAnimate = isLoading, showEmptyGrade = showLoadingGrade)
+
         if (newProgress == 100) {
             command.value = RefreshUserAgent(url, currentBrowserViewState().isDesktopBrowsingMode)
             navigationAwareLoginDetector.onEvent(NavigationEvent.PageFinished)
@@ -1721,6 +1725,18 @@ class BrowserTabViewModel(
     override fun loginDetected() {
         val currentUrl = site?.url ?: return
         navigationAwareLoginDetector.onEvent(NavigationEvent.LoginAttempt(currentUrl))
+    }
+
+    fun requestFileDownload(url: String, contentDisposition: String?, mimeType: String, requestUserConfirmation: Boolean) {
+        if (url.startsWith("blob:")) {
+            command.value = ConvertBlobToDataUri(url, mimeType)
+        } else {
+            sendRequestFileDownloadCommand(url, contentDisposition, mimeType, requestUserConfirmation)
+        }
+    }
+
+    private fun sendRequestFileDownloadCommand(url: String, contentDisposition: String?, mimeType: String, requestUserConfirmation: Boolean) {
+        command.postValue(RequestFileDownload(url, contentDisposition, mimeType, requestUserConfirmation))
     }
 
     fun download(pendingFileDownload: FileDownloader.PendingFileDownload) {

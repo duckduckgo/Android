@@ -1,13 +1,26 @@
 // This code must be wrapped in an anonymous function which is done in JavaScriptDetector.kt to allow for dynamic changes before wrapping.
+// JS utility functions used by JsLoginDetector in order to detect login attempts and to ask users to fireproof a website
 
-function loginFormDetected() {
+function loginAttemptDetected() {
     try {
+        LoginDetection.log("Possible login attempt detected");
         LoginDetection.loginDetected();
     } catch (error) {}
 }
 
 function inputVisible(input) {
-    return !(input.offsetWidth === 0 && input.offsetHeight === 0) && !input.ariaHidden && !input.hidden && input.value !== "";
+    return !(input.offsetWidth === 0 && input.offsetHeight === 0) && !input.hidden && input.value !== "";
+}
+
+function validatePasswordField(passwords) {
+    for (var i = 0; i < passwords.length; i++) {
+        var password = passwords[i];
+        var found = inputVisible(password);
+        if (found) {
+            loginAttemptDetected();
+            return found;
+        }
+    }
 }
 
 function checkIsLoginForm(form) {
@@ -21,13 +34,26 @@ function checkIsLoginForm(form) {
     for (var i = 0; i < inputs.length; i++) {
         var input = inputs.item(i);
         if (input.type == "password" && inputVisible(input)) {
-            LoginDetection.log("found password in form " + form);
-            loginFormDetected();
+            loginAttemptDetected();
             return true;
         }
     }
 
-    LoginDetection.log("no password field in form " + form);
+    LoginDetection.log("No password field in form " + form);
+    return false;
+}
+
+function scanPasswordFieldsInIFrame() {
+    LoginDetection.log("Scanning for iframes");
+    var iframes = document.querySelectorAll('iframe');
+    for (var i = 0; i < iframes.length; i++) {
+        var iframeDoc = iframes[i].contentWindow.document;
+        passwords = iframeDoc.querySelectorAll('input[type=password]');
+        var found = validatePasswordField(passwords);
+        if (found) {
+            return found;
+        }
+    }
     return false;
 }
 
@@ -53,19 +79,14 @@ function scanForForms() {
 }
 
 function scanForPasswordField() {
-    LoginDetection.log("Scanning for password");
-
-    var forms = document.forms;
-    if (!forms || forms.length === 0) {
-        LoginDetection.log("No forms found");
-        return;
-    }
-
-    for (var i = 0; i < forms.length; i++) {
-        var form = forms[i];
-        var found = checkIsLoginForm(form);
-        if (found) {
-            return found;
+    LoginDetection.log("Scanning DOM for password fields");
+    var passwords = document.querySelectorAll('input[type=password]');
+    if (passwords.length === 0) {
+        var found = scanPasswordFieldsInIFrame()
+        if (!found) {
+            LoginDetection.log("No password fields found");
         }
+        return found;
     }
+    return validatePasswordField(passwords);
 }

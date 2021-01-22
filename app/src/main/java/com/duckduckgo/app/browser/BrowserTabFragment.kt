@@ -91,6 +91,7 @@ import com.duckduckgo.app.browser.BrowserTabViewModel.*
 import com.duckduckgo.app.browser.BrowserTabViewModel.Command.DownloadCommand
 import com.duckduckgo.app.browser.DownloadConfirmationFragment.DownloadConfirmationDialogListener
 import com.duckduckgo.app.browser.autocomplete.BrowserAutoCompleteSuggestionsAdapter
+import com.duckduckgo.app.browser.downloader.BlobConverterInjector
 import com.duckduckgo.app.browser.downloader.DownloadFailReason
 import com.duckduckgo.app.browser.downloader.FileDownloadNotificationManager
 import com.duckduckgo.app.browser.downloader.FileDownloader
@@ -222,6 +223,9 @@ class BrowserTabFragment :
 
     @Inject
     lateinit var loginDetector: DOMLoginDetector
+
+    @Inject
+    lateinit var blobConverterInjector: BlobConverterInjector
 
     val tabId get() = requireArguments()[TAB_ID_ARG] as String
 
@@ -644,6 +648,8 @@ class BrowserTabFragment :
             is Command.AskToFireproofWebsite -> askToFireproofWebsite(requireContext(), it.fireproofWebsite)
             is Command.ShowDomainHasPermissionMessage -> showDomainHasLocationPermission(it.domain)
             is DownloadCommand -> processDownloadCommand(it)
+            is Command.ConvertBlobToDataUri -> convertBlobToDataUri(it)
+            is Command.RequestFileDownload -> requestFileDownload(it.url, it.contentDisposition, it.mimeType, it.requestUserConfirmation)
         }
     }
 
@@ -986,7 +992,7 @@ class BrowserTabFragment :
             }
 
             it.setDownloadListener { url, _, contentDisposition, mimeType, _ ->
-                requestFileDownload(url, contentDisposition, mimeType, true)
+                viewModel.requestFileDownload(url, contentDisposition, mimeType, true)
             }
 
             it.setOnTouchListener { _, _ ->
@@ -1004,6 +1010,7 @@ class BrowserTabFragment :
 
             it.setFindListener(this)
             loginDetector.addLoginDetection(it) { viewModel.loginDetected() }
+            blobConverterInjector.addJsInterface(it) { url, mimeType -> viewModel.requestFileDownload(url, null, mimeType, true) }
         }
 
         if (BuildConfig.DEBUG) {
@@ -1227,7 +1234,13 @@ class BrowserTabFragment :
         webView = null
     }
 
-    private fun requestFileDownload(url: String, contentDisposition: String, mimeType: String, requestUserConfirmation: Boolean) {
+    private fun convertBlobToDataUri(blob: Command.ConvertBlobToDataUri) {
+        webView?.let {
+            blobConverterInjector.convertBlobIntoDataUriAndDownload(it, blob.url, blob.mimeType)
+        }
+    }
+
+    private fun requestFileDownload(url: String, contentDisposition: String?, mimeType: String, requestUserConfirmation: Boolean) {
         pendingFileDownload = PendingFileDownload(
             url = url,
             contentDisposition = contentDisposition,
