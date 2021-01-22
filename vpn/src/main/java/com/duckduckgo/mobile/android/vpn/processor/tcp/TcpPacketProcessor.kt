@@ -16,8 +16,6 @@
 
 package com.duckduckgo.mobile.android.vpn.processor.tcp
 
-import android.os.Handler
-import android.os.Looper
 import android.os.Process.THREAD_PRIORITY_URGENT_DISPLAY
 import android.os.Process.setThreadPriority
 import com.duckduckgo.mobile.android.vpn.processor.tcp.ConnectionInitializer.TcpConnectionParams
@@ -31,7 +29,10 @@ import com.duckduckgo.mobile.android.vpn.service.NetworkChannelCreator
 import com.duckduckgo.mobile.android.vpn.service.VpnQueues
 import com.duckduckgo.mobile.android.vpn.store.PacketPersister
 import com.google.firebase.perf.FirebasePerformance
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.asCoroutineDispatcher
+import kotlinx.coroutines.launch
 import timber.log.Timber
 import xyz.hexene.localvpn.ByteBufferPool
 import xyz.hexene.localvpn.Packet
@@ -49,7 +50,8 @@ class TcpPacketProcessor(
     trackerDetector: VpnTrackerDetector,
     packetPersister: PacketPersister,
     localAddressDetector: LocalIpAddressDetector,
-    originatingAppResolver: OriginatingAppResolver
+    originatingAppResolver: OriginatingAppResolver,
+    private val vpnCoroutineScope: CoroutineScope
 ) : Runnable {
 
     val selector: Selector = Selector.open()
@@ -57,15 +59,13 @@ class TcpPacketProcessor(
     private var pollJobDeviceToNetwork: Job? = null
     private var pollJobNetworkToDevice: Job? = null
 
-    private val handler: Handler = Handler(Looper.getMainLooper())
-
     private val tcpSocketWriter = TcpSocketWriter(selector)
     private val tcpNetworkToDevice = TcpNetworkToDevice(
         queues = queues,
         selector = selector,
         tcpSocketWriter = tcpSocketWriter,
         packetPersister = packetPersister,
-        handler = handler
+        vpnCoroutineScope = vpnCoroutineScope
     )
     private val tcpDeviceToNetwork =
         TcpDeviceToNetwork(
@@ -73,28 +73,24 @@ class TcpPacketProcessor(
             selector = selector,
             socketWriter = tcpSocketWriter,
             connectionInitializer = TcpConnectionInitializer(queues, networkChannelCreator),
-            handler = handler,
             trackerDetector = trackerDetector,
             packetPersister = packetPersister,
             localAddressDetector = localAddressDetector,
-            originatingAppResolver = originatingAppResolver
+            originatingAppResolver = originatingAppResolver,
+            vpnCoroutineScope = vpnCoroutineScope
         )
-
-    private val readWriteExecutorService = Executors.newFixedThreadPool(2)
 
     override fun run() {
         Timber.i("Starting ${this::class.simpleName}")
 
-        //        if (pollJobDeviceToNetwork == null) {
-        //            pollJobDeviceToNetwork = GlobalScope.launch(Executors.newSingleThreadExecutor().asCoroutineDispatcher()) { pollForDeviceToNetworkWork() }
-        //        }
-        //
-        //        if (pollJobNetworkToDevice == null) {
-        //            pollJobNetworkToDevice = GlobalScope.launch(Executors.newSingleThreadExecutor().asCoroutineDispatcher()) { pollForNetworkToDeviceWork() }
-        //        }
+        if (pollJobDeviceToNetwork == null) {
+            pollJobDeviceToNetwork = vpnCoroutineScope.launch(Executors.newSingleThreadExecutor().asCoroutineDispatcher()) { pollForDeviceToNetworkWork() }
+        }
 
-        readWriteExecutorService.submit { pollForDeviceToNetworkWork() }
-        readWriteExecutorService.submit { pollForNetworkToDeviceWork() }
+        if (pollJobNetworkToDevice == null) {
+            pollJobNetworkToDevice = vpnCoroutineScope.launch(Executors.newSingleThreadExecutor().asCoroutineDispatcher()) { pollForNetworkToDeviceWork() }
+        }
+
     }
 
     fun stop() {
@@ -107,11 +103,10 @@ class TcpPacketProcessor(
         pollJobNetworkToDevice = null
     }
 
-    private fun pollForDeviceToNetworkWork() {
+    private suspend fun pollForDeviceToNetworkWork() {
         setThreadPriority(THREAD_PRIORITY_URGENT_DISPLAY)
 
-        // while (pollJobDeviceToNetwork?.isActive == true) {
-        while (!Thread.interrupted() && !readWriteExecutorService.isShutdown) {
+        while (pollJobDeviceToNetwork?.isActive == true) {
             kotlin.runCatching {
                 tcpDeviceToNetwork.deviceToNetworkProcessing()
             }.onFailure {
@@ -120,11 +115,10 @@ class TcpPacketProcessor(
         }
     }
 
-    private fun pollForNetworkToDeviceWork() {
+    private suspend fun pollForNetworkToDeviceWork() {
         setThreadPriority(THREAD_PRIORITY_URGENT_DISPLAY)
 
-        // while (pollJobNetworkToDevice?.isActive == true) {
-        while (!Thread.interrupted() && !readWriteExecutorService.isShutdown) {
+        while (pollJobNetworkToDevice?.isActive == true) {
             kotlin.runCatching {
                 tcpNetworkToDevice.networkToDeviceProcessing()
             }.onFailure {

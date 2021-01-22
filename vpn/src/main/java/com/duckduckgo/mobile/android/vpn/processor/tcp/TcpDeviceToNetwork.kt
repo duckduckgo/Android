@@ -16,8 +16,6 @@
 
 package com.duckduckgo.mobile.android.vpn.processor.tcp
 
-import android.os.Handler
-import androidx.core.os.postDelayed
 import com.duckduckgo.mobile.android.vpn.processor.tcp.ConnectionInitializer.TcpConnectionParams
 import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpPacketProcessor.Companion.closeConnection
 import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpPacketProcessor.Companion.increaseOrWraparound
@@ -36,6 +34,9 @@ import com.duckduckgo.mobile.android.vpn.service.VpnQueues
 import com.duckduckgo.mobile.android.vpn.store.PACKET_TYPE_TCP
 import com.duckduckgo.mobile.android.vpn.store.PacketPersister
 import com.google.firebase.perf.FirebasePerformance
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import timber.log.Timber
 import xyz.hexene.localvpn.ByteBufferPool
 import xyz.hexene.localvpn.Packet
@@ -53,11 +54,11 @@ class TcpDeviceToNetwork(
     private val selector: Selector,
     private val socketWriter: SocketWriter,
     private val connectionInitializer: ConnectionInitializer,
-    private val handler: Handler,
     private val trackerDetector: VpnTrackerDetector,
     private val packetPersister: PacketPersister,
     private val localAddressDetector: LocalIpAddressDetector,
-    private val originatingAppResolver: OriginatingAppResolver
+    private val originatingAppResolver: OriginatingAppResolver,
+    private val vpnCoroutineScope: CoroutineScope
 ) {
 
     var lastTimePacketConsumed = 0L
@@ -237,7 +238,12 @@ class TcpDeviceToNetwork(
                 SendFin -> tcb.sendFinToClient(queues, packet, packet.tcpPayloadSize(true), triggeredByServerEndOfStream = false)
                 SendFinWithData -> tcb.sendFinToClient(queues, packet, 0, triggeredByServerEndOfStream = false)
                 CloseConnection -> tcb.closeConnection(responseBuffer)
-                DelayedCloseConnection -> handler.postDelayed(3_000) { tcb.closeConnection(responseBuffer) }
+                DelayedCloseConnection -> {
+                    vpnCoroutineScope.launch {
+                        delay(3_000)
+                        tcb.closeConnection(responseBuffer)
+                    }
+                }
                 SendAck -> tcb.sendAck(queues, packet)
                 else -> Timber.e("Unknown event for how to process device-to-network packet: ${action.events}")
             }
@@ -340,7 +346,9 @@ class TcpDeviceToNetwork(
 
     private fun determineIfTracker(tcb: TCB, packet: Packet, payloadBuffer: ByteBuffer, isLocalAddress: Boolean): RequestTrackerType {
         if (tcb.trackerTypeDetermined) {
-            return if (tcb.isTracker) (RequestTrackerType.Tracker(tcb.trackerHostName)) else RequestTrackerType.NotTracker(tcb.hostName ?: packet.ip4Header.destinationAddress.hostName)
+            return if (tcb.isTracker) (RequestTrackerType.Tracker(tcb.trackerHostName)) else RequestTrackerType.NotTracker(
+                tcb.hostName ?: packet.ip4Header.destinationAddress.hostName
+            )
         }
 
         return trackerDetector.determinePacketType(tcb, packet, payloadBuffer, isLocalAddress)

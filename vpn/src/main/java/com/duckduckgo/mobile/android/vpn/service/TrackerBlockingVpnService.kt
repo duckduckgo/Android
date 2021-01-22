@@ -27,6 +27,7 @@ import android.content.pm.PackageManager
 import android.net.VpnService
 import android.os.*
 import androidx.core.app.NotificationManagerCompat
+import com.duckduckgo.mobile.android.vpn.di.VpnCoroutineScope
 import com.duckduckgo.mobile.android.vpn.model.VpnTrackerAndCompany
 import com.duckduckgo.mobile.android.vpn.model.dateOfPreviousMidnight
 import com.duckduckgo.mobile.android.vpn.processor.TunPacketReader
@@ -78,6 +79,10 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
     @Inject
     lateinit var vpnPreferences: VpnPreferences
 
+    @Inject
+    @VpnCoroutineScope
+    lateinit var vpnCoroutineScope: CoroutineScope
+
     private val queues = VpnQueues()
 
     private var tunInterface: ParcelFileDescriptor? = null
@@ -116,7 +121,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
         AndroidInjection.inject(this)
 
         udpPacketProcessor = UdpPacketProcessor(queues, this, packetPersister)
-        tcpPacketProcessor = TcpPacketProcessor(queues, this, trackerDetector, packetPersister, localAddressDetector, originatingAppResolver)
+        tcpPacketProcessor = TcpPacketProcessor(queues, this, trackerDetector, packetPersister, localAddressDetector, originatingAppResolver, vpnCoroutineScope)
 
         Timber.i("VPN onCreate")
     }

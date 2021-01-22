@@ -16,7 +16,6 @@
 
 package com.duckduckgo.mobile.android.vpn.processor.tcp
 
-import android.os.Handler
 import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpPacketProcessor.Companion.logPacketDetails
 import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpPacketProcessor.Companion.sendFinToClient
 import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpPacketProcessor.Companion.updateState
@@ -27,6 +26,9 @@ import com.duckduckgo.mobile.android.vpn.service.VpnQueues
 import com.duckduckgo.mobile.android.vpn.store.PACKET_TYPE_TCP
 import com.duckduckgo.mobile.android.vpn.store.PacketPersister
 import com.google.firebase.perf.FirebasePerformance
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import timber.log.Timber
 import xyz.hexene.localvpn.ByteBufferPool
 import xyz.hexene.localvpn.Packet
@@ -47,7 +49,7 @@ class TcpNetworkToDevice(
     private val selector: Selector,
     private val tcpSocketWriter: TcpSocketWriter,
     private val packetPersister: PacketPersister,
-    private val handler: Handler
+    private val vpnCoroutineScope: CoroutineScope
 ) {
 
     /**
@@ -166,13 +168,13 @@ class TcpNetworkToDevice(
                 is MoveState -> tcb.updateState(event)
                 SendFin -> tcb.sendFinToClient(queues, packet, 0, triggeredByServerEndOfStream = true)
                 SendReset -> sendReset(packet, tcb)
-                is SendDelayedFin -> handler.postDelayed(
-                    {
+                is SendDelayedFin -> {
+                    vpnCoroutineScope.launch {
+                        delay(100)
                         tcb.sendFinToClient(queues, packet, 0, triggeredByServerEndOfStream = true)
                         event.events.forEach { tcb.updateState(it) }
-                    },
-                    100
-                )
+                    }
+                }
                 else -> Timber.w("Unhandled event for ${tcb.ipAndPort} for socket end of stream. $event")
             }
         }
