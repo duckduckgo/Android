@@ -387,6 +387,12 @@ class MigrationsProvider(
         }
     }
 
+    val BOOKMARKS_DB_ON_CREATE = object : RoomDatabase.Callback() {
+        override fun onCreate(database: SupportSQLiteDatabase) {
+            MIGRATION_29_TO_30.migrate(database)
+        }
+    }
+
     val ALL_MIGRATIONS: List<Migration>
         get() = listOf(
             MIGRATION_1_TO_2,
