@@ -65,7 +65,7 @@ import com.duckduckgo.app.usage.search.SearchCountDao
 import com.duckduckgo.app.usage.search.SearchCountEntity
 
 @Database(
-    exportSchema = true, version = 29,
+    exportSchema = true, version = 30,
     entities = [
         TdsTracker::class,
         TdsEntity::class,
@@ -378,6 +378,21 @@ class MigrationsProvider(
         }
     }
 
+    val MIGRATION_29_TO_30: Migration = object : Migration(29, 30) {
+        override fun migrate(database: SupportSQLiteDatabase) {
+            database.execSQL("CREATE TABLE IF NOT EXISTS `bookmarks_temp` (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, title TEXT, url TEXT NOT NULL, UNIQUE (url) ON CONFLICT REPLACE)")
+            database.execSQL("INSERT INTO `bookmarks_temp` (id, title, url) SELECT * FROM `bookmarks`")
+            database.execSQL("DROP TABLE `bookmarks`")
+            database.execSQL("ALTER TABLE `bookmarks_temp` RENAME TO `bookmarks`")
+        }
+    }
+
+    val BOOKMARKS_DB_ON_CREATE = object : RoomDatabase.Callback() {
+        override fun onCreate(database: SupportSQLiteDatabase) {
+            MIGRATION_29_TO_30.migrate(database)
+        }
+    }
+
     val ALL_MIGRATIONS: List<Migration>
         get() = listOf(
             MIGRATION_1_TO_2,
@@ -407,7 +422,8 @@ class MigrationsProvider(
             MIGRATION_25_TO_26,
             MIGRATION_26_TO_27,
             MIGRATION_27_TO_28,
-            MIGRATION_28_TO_29
+            MIGRATION_28_TO_29,
+            MIGRATION_29_TO_30
         )
 
     @Deprecated(
