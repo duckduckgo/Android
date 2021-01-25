@@ -16,7 +16,6 @@
 
 package com.duckduckgo.app.statistics
 
-import android.os.Build
 import androidx.annotation.WorkerThread
 import com.duckduckgo.app.statistics.VariantManager.Companion.DEFAULT_VARIANT
 import com.duckduckgo.app.statistics.VariantManager.Companion.referrerVariant
@@ -85,8 +84,6 @@ interface VariantManager {
             val locale = Locale.getDefault()
             return locale != null && locale.language == "en"
         }
-
-        private fun isAtLeastApiVersion(version: Int) = Build.VERSION.SDK_INT >= version
 
         private fun isSerpRegionToggleCountry(): Boolean {
             val locale = Locale.getDefault()

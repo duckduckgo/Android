@@ -17,8 +17,8 @@
 package com.duckduckgo.app.onboarding.di
 
 import android.content.Context
-import com.duckduckgo.app.global.DefaultRoleBrowserDialogExperiment
-import com.duckduckgo.app.global.RealDefaultRoleBrowserDialogExperiment
+import com.duckduckgo.app.global.DefaultRoleBrowserDialog
+import com.duckduckgo.app.global.RealDefaultRoleBrowserDialog
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModelFactory
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -33,11 +33,11 @@ class WelcomePageModule {
         appInstallStore: AppInstallStore,
         context: Context,
         pixel: Pixel,
-        defaultRoleBrowserDialogExperiment: DefaultRoleBrowserDialogExperiment
-    ) = WelcomePageViewModelFactory(appInstallStore, context, pixel, defaultRoleBrowserDialogExperiment)
+        defaultRoleBrowserDialog: DefaultRoleBrowserDialog
+    ) = WelcomePageViewModelFactory(appInstallStore, context, pixel, defaultRoleBrowserDialog)
 
     @Provides
-    fun defaultRoleBrowserDialogExperiment(
+    fun defaultRoleBrowserDialog(
         appInstallStore: AppInstallStore
-    ): DefaultRoleBrowserDialogExperiment = RealDefaultRoleBrowserDialogExperiment(appInstallStore)
+    ): DefaultRoleBrowserDialog = RealDefaultRoleBrowserDialog(appInstallStore)
 }

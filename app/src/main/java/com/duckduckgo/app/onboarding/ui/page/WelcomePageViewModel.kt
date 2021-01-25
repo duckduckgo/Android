@@ -19,7 +19,7 @@ package com.duckduckgo.app.onboarding.ui.page
 import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import com.duckduckgo.app.global.DefaultRoleBrowserDialogExperiment
+import com.duckduckgo.app.global.DefaultRoleBrowserDialog
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import kotlinx.coroutines.flow.Flow
@@ -29,7 +29,7 @@ class WelcomePageViewModel(
     private val appInstallStore: AppInstallStore,
     private val context: Context,
     private val pixel: Pixel,
-    private val defaultRoleBrowserDialogExperiment: DefaultRoleBrowserDialogExperiment
+    private val defaultRoleBrowserDialog: DefaultRoleBrowserDialog
 ) : ViewModel() {
 
     fun reduce(event: WelcomePageView.Event): Flow<WelcomePageView.State> {
@@ -41,8 +41,8 @@ class WelcomePageViewModel(
     }
 
     private fun onPrimaryCtaClicked(): Flow<WelcomePageView.State> = flow {
-        if (defaultRoleBrowserDialogExperiment.shouldShowExperiment()) {
-            val intent = defaultRoleBrowserDialogExperiment.createIntent(context)
+        if (defaultRoleBrowserDialog.shouldShowDialog()) {
+            val intent = defaultRoleBrowserDialog.createIntent(context)
             if (intent != null) {
                 emit(WelcomePageView.State.ShowDefaultBrowserDialog(intent))
             } else {
@@ -55,7 +55,7 @@ class WelcomePageViewModel(
     }
 
     private fun onDefaultBrowserSet(): Flow<WelcomePageView.State> = flow {
-        defaultRoleBrowserDialogExperiment.experimentShown()
+        defaultRoleBrowserDialog.dialogShown()
 
         appInstallStore.defaultBrowser = true
 
@@ -68,7 +68,7 @@ class WelcomePageViewModel(
     }
 
     private fun onDefaultBrowserNotSet(): Flow<WelcomePageView.State> = flow {
-        defaultRoleBrowserDialogExperiment.experimentShown()
+        defaultRoleBrowserDialog.dialogShown()
 
         appInstallStore.defaultBrowser = false
 
@@ -86,14 +86,14 @@ class WelcomePageViewModelFactory(
     private val appInstallStore: AppInstallStore,
     private val context: Context,
     private val pixel: Pixel,
-    private val defaultRoleBrowserDialogExperiment: DefaultRoleBrowserDialogExperiment
+    private val defaultRoleBrowserDialog: DefaultRoleBrowserDialog
 ) : ViewModelProvider.NewInstanceFactory() {
 
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
         return with(modelClass) {
             when {
                 isAssignableFrom(WelcomePageViewModel::class.java) -> WelcomePageViewModel(
-                    appInstallStore, context, pixel, defaultRoleBrowserDialogExperiment
+                    appInstallStore, context, pixel, defaultRoleBrowserDialog
                 )
                 else -> throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")
             }

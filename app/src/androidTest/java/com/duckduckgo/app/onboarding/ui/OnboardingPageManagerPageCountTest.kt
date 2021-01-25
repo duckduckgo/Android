@@ -17,7 +17,7 @@
 package com.duckduckgo.app.onboarding.ui
 
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
-import com.duckduckgo.app.global.DefaultRoleBrowserDialogExperiment
+import com.duckduckgo.app.global.DefaultRoleBrowserDialog
 import com.duckduckgo.app.statistics.Variant
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.whenever
@@ -33,11 +33,11 @@ class OnboardingPageManagerPageCountTest(private val testCase: TestCase) {
     private lateinit var testee: OnboardingPageManager
     private val onboardingPageBuilder: OnboardingPageBuilder = mock()
     private val mockDefaultBrowserDetector: DefaultBrowserDetector = mock()
-    private val defaultRoleBrowserDialogExperiment: DefaultRoleBrowserDialogExperiment = mock()
+    private val defaultRoleBrowserDialog: DefaultRoleBrowserDialog = mock()
 
     @Before
     fun setup() {
-        testee = OnboardingPageManagerWithTrackerBlocking(defaultRoleBrowserDialogExperiment, onboardingPageBuilder, mockDefaultBrowserDetector)
+        testee = OnboardingPageManagerWithTrackerBlocking(defaultRoleBrowserDialog, onboardingPageBuilder, mockDefaultBrowserDetector)
     }
 
     @Test
