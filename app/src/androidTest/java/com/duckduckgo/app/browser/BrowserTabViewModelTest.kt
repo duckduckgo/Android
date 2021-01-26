@@ -1237,6 +1237,28 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenUserSubmittedQueryWithPreviousBlankQueryThenDoNotSendQueryChangePixel() {
+        whenever(mockOmnibarConverter.convertQueryToUrl("another query", null)).thenReturn("another query")
+        loadUrl("")
+
+        testee.onUserSubmittedQuery("another query")
+
+        verify(mockPixel, never()).fire("rq_0")
+        verify(mockPixel, never()).fire("rq_1")
+    }
+
+    @Test
+    fun whenUserSubmittedQueryWithDifferentPreviousQueryThenSendQueryChangePixel() {
+        whenever(mockOmnibarConverter.convertQueryToUrl("another query", null)).thenReturn("another query")
+        loadUrl("query")
+
+        testee.onUserSubmittedQuery("another query")
+
+        verify(mockPixel, never()).fire("rq_0")
+        verify(mockPixel).fire("rq_1")
+    }
+
+    @Test
     fun whenUserBrowsingPressesBackAndBrowserCanGoBackThenNavigatesToPreviousPageAndHandledTrue() {
         setupNavigation(isBrowsing = true, canGoBack = true, stepsToPreviousPage = 2)
         assertTrue(testee.onUserPressedBack())

@@ -549,7 +549,7 @@ class BrowserTabViewModel(
 
         if (oldQuery == newQuery) {
             pixel.fire(String.format(Locale.US, PixelName.SERP_REQUERY.pixelName, PixelParameter.SERP_QUERY_NOT_CHANGED))
-        } else {
+        } else if (oldQuery.toString().isNotBlank()) { // blank means no previous search, don't send pixel
             pixel.fire(String.format(Locale.US, PixelName.SERP_REQUERY.pixelName, PixelParameter.SERP_QUERY_CHANGED))
         }
     }
