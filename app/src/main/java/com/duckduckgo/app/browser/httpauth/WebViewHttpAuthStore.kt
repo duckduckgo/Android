@@ -60,21 +60,17 @@ class RealWebViewHttpAuthStore(
     }
 
     override fun getHttpAuthUsernamePassword(webView: WebView, host: String, realm: String): WebViewHttpAuthCredentials? {
-        return runBlocking {
-            withContext(dispatcherProvider.io()) {
-                val credentials = httpAuthDao.getAuthCredentials(host = host, realm = realm) ?: return@withContext null
-                if (credentials.username == null || credentials.password == null) return@withContext null
-                return@withContext WebViewHttpAuthCredentials(credentials.username!!, credentials.password!!)
-            }
+        return runBlocking(dispatcherProvider.io()) {
+            val credentials = httpAuthDao.getAuthCredentials(host = host, realm = realm) ?: return@runBlocking null
+            if (credentials.username == null || credentials.password == null) return@runBlocking null
+            return@runBlocking WebViewHttpAuthCredentials(credentials.username!!, credentials.password!!)
         }
     }
 
     override fun clearHttpAuthUsernamePassword(webView: WebView) {
-        runBlocking {
-            withContext(dispatcherProvider.io()) {
-                val exclusions = fireproofWebsiteDao.fireproofWebsitesSync().map { it.website() }
-                httpAuthDao.deleteAll(exclusions)
-            }
+        runBlocking(dispatcherProvider.io()) {
+            val exclusions = fireproofWebsiteDao.fireproofWebsitesSync().map { it.website() }
+            httpAuthDao.deleteAll(exclusions)
         }
     }
 }
