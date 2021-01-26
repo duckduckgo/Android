@@ -561,7 +561,7 @@ class BrowserTabViewModel(
     private suspend fun removeCurrentTabFromRepository() {
         val currentTab = tabRepository.liveSelectedTab.value
         currentTab?.let {
-            tabRepository.deleteCurrentTabAndSelectSource()
+            tabRepository.delete(currentTab)
         }
     }
 
