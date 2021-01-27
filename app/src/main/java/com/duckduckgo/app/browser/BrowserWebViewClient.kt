@@ -16,11 +16,14 @@
 
 package com.duckduckgo.app.browser
 
+import android.app.Activity
 import android.graphics.Bitmap
 import android.net.Uri
 import android.net.http.SslError
 import android.net.http.SslError.*
 import android.os.Build
+import android.security.KeyChain
+import android.security.KeyChainException
 import android.webkit.*
 import androidx.annotation.RequiresApi
 import androidx.annotation.UiThread
@@ -32,6 +35,7 @@ import com.duckduckgo.app.browser.logindetection.DOMLoginDetector
 import com.duckduckgo.app.browser.logindetection.WebNavigationEvent
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.browser.navigation.safeCopyBackForwardList
+import com.duckduckgo.app.global.DuckDuckGoApplication
 import com.duckduckgo.app.global.exception.UncaughtExceptionRepository
 import com.duckduckgo.app.global.exception.UncaughtExceptionSource.*
 import com.duckduckgo.app.globalprivacycontrol.GlobalPrivacyControl
@@ -39,19 +43,22 @@ import com.duckduckgo.app.statistics.store.OfflinePixelCountDataStore
 import kotlinx.coroutines.*
 import timber.log.Timber
 import java.net.URI
+import java.security.PrivateKey
+import java.security.cert.X509Certificate
+
 
 class BrowserWebViewClient(
-    private val webViewHttpAuthStore: WebViewHttpAuthStore,
-    private val trustedCertificateStore: TrustedCertificateStore,
-    private val requestRewriter: RequestRewriter,
-    private val specialUrlDetector: SpecialUrlDetector,
-    private val requestInterceptor: RequestInterceptor,
-    private val offlinePixelCountDataStore: OfflinePixelCountDataStore,
-    private val uncaughtExceptionRepository: UncaughtExceptionRepository,
-    private val cookieManager: CookieManager,
-    private val loginDetector: DOMLoginDetector,
-    private val dosDetector: DosDetector,
-    private val globalPrivacyControl: GlobalPrivacyControl
+        private val webViewHttpAuthStore: WebViewHttpAuthStore,
+        private val trustedCertificateStore: TrustedCertificateStore,
+        private val requestRewriter: RequestRewriter,
+        private val specialUrlDetector: SpecialUrlDetector,
+        private val requestInterceptor: RequestInterceptor,
+        private val offlinePixelCountDataStore: OfflinePixelCountDataStore,
+        private val uncaughtExceptionRepository: UncaughtExceptionRepository,
+        private val cookieManager: CookieManager,
+        private val loginDetector: DOMLoginDetector,
+        private val dosDetector: DosDetector,
+        private val globalPrivacyControl: GlobalPrivacyControl
 ) : WebViewClient() {
 
     var webViewClientListener: WebViewClientListener? = null
@@ -63,6 +70,19 @@ class BrowserWebViewClient(
     override fun shouldOverrideUrlLoading(view: WebView, request: WebResourceRequest): Boolean {
         val url = request.url
         return shouldOverride(view, url, request.isForMainFrame)
+    }
+
+    override fun onReceivedClientCertRequest(view: WebView?, request: ClientCertRequest?) {
+        val context = view!!.context as Activity
+        KeyChain.choosePrivateKeyAlias(context, { alias ->
+            try {
+                val changPrivateKey: PrivateKey? = KeyChain.getPrivateKey(context, alias!!)
+                val certificates: Array<X509Certificate>? = KeyChain.getCertificateChain(context, alias!!)
+                request!!.proceed(changPrivateKey, certificates)
+            } catch (e: KeyChainException) {
+            } catch (e: InterruptedException) {
+            }
+        }, arrayOf("RSA"), null, null, -1, null)
     }
 
     /**
@@ -255,10 +275,10 @@ class BrowserWebViewClient(
     }
 
     private fun requestAuthentication(
-        view: WebView?,
-        handler: HttpAuthHandler,
-        host: String?,
-        realm: String?
+            view: WebView?,
+            handler: HttpAuthHandler,
+            host: String?,
+            realm: String?
     ) {
         webViewClientListener?.let {
             Timber.v("showAuthenticationDialog - $host, $realm")
@@ -266,10 +286,10 @@ class BrowserWebViewClient(
             val siteURL = if (view?.url != null) "${URI(view.url).scheme}://$host" else host.orEmpty()
 
             val request = BasicAuthenticationRequest(
-                handler = handler,
-                host = host.orEmpty(),
-                realm = realm.orEmpty(),
-                site = siteURL
+                    handler = handler,
+                    host = host.orEmpty(),
+                    realm = realm.orEmpty(),
+                    site = siteURL
             )
 
             it.requiresAuthentication(request)
