@@ -17,6 +17,7 @@
 package com.duckduckgo.app.browser.useragent
 
 import android.os.Build
+import androidx.core.net.toUri
 import com.duckduckgo.app.global.UriString
 import com.duckduckgo.app.global.device.DeviceInfo
 
@@ -41,7 +42,7 @@ class UserAgentProvider constructor(private val defaultUserAgent: String, privat
     }
 
     /**
-     * Returns, our custom UA, including our application componet before Safari
+     * Returns, our custom UA, including our application component before Safari
      *
      * Modifies UA string to omits the user's device make and model and drops components that may casue breakages
      * If the user is requesting a desktop site, we add generic X11 Linux indicator, but include the real architecture
@@ -50,18 +51,32 @@ class UserAgentProvider constructor(private val defaultUserAgent: String, privat
      *
      * We include everything from the original UA string from AppleWebKit onwards (omitting if missing)
      */
-    fun userAgent(host: String? = null, isDesktop: Boolean = false): String {
-
+    fun userAgent(url: String? = null, isDesktop: Boolean = false): String {
+        val host = url?.toUri()?.host
         val omitApplicationComponent = if (host != null) sitesThatOmitApplication.any { UriString.sameOrSubdomain(host, it) } else false
         val omitVersionComponent = if (host != null) sitesThatOmitVersion.any { UriString.sameOrSubdomain(host, it) } else false
-
-        var prefix = if (isDesktop) baseDesktopAgent else baseAgent
+        val shouldUseDesktopAgent =
+            if (url != null && host != null) {
+                sitesThatShouldUseDesktopAgent.any { UriString.sameOrSubdomain(host, it.host) && !containsExcludedPath(url, it) }
+            } else {
+                false
+            }
+        var prefix = if (isDesktop || shouldUseDesktopAgent) baseDesktopAgent else baseAgent
         if (omitVersionComponent) {
             prefix = prefix.replace(AgentRegex.version, "")
         }
 
         val application = if (!omitApplicationComponent) applicationComponent else null
         return concatWithSpaces(prefix, application, safariComponent)
+    }
+
+    private fun containsExcludedPath(url: String?, site: DesktopAgentSiteOnly): Boolean {
+        return if (url != null) {
+            val segments = url.toUri().pathSegments
+            site.excludedPaths.any { segments.contains(it) }
+        } else {
+            false
+        }
     }
 
     private fun getWebKitVersionOnwards(forDesktop: Boolean): String? {
@@ -106,5 +121,11 @@ class UserAgentProvider constructor(private val defaultUserAgent: String, privat
             "ing.nl",
             "chase.com"
         )
+
+        val sitesThatShouldUseDesktopAgent = listOf(
+            DesktopAgentSiteOnly("m.facebook.com", listOf("dialog", "sharer"))
+        )
     }
+
+    data class DesktopAgentSiteOnly(val host: String, val excludedPaths: List<String> = emptyList())
 }

@@ -55,6 +55,7 @@ interface WebViewClientListener {
     fun closeAndSelectSourceTab()
     fun upgradedToHttps()
     fun surrogateDetected(surrogate: SurrogateResponse)
+    fun isDesktopSiteEnabled(): Boolean
 
     fun loginDetected()
     fun dosAttackDetected()

@@ -18,7 +18,9 @@ package com.duckduckgo.app.browser.omnibar
 
 import android.content.Context
 import android.graphics.Rect
+import android.text.Editable
 import android.util.AttributeSet
+import android.util.Patterns
 import android.view.KeyEvent
 import androidx.appcompat.widget.AppCompatEditText
 import com.duckduckgo.app.global.view.showKeyboard
@@ -33,10 +35,24 @@ class KeyboardAwareEditText : AppCompatEditText {
     constructor(context: Context, attrs: AttributeSet?) : this(context, attrs, 0)
     constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr)
 
+    private var didFocusAlready = false
+
+    private fun Editable.isWebUrl(): Boolean {
+        return Patterns.WEB_URL.matcher(this.toString()).matches()
+    }
+
     override fun onFocusChanged(focused: Boolean, direction: Int, previouslyFocusedRect: Rect?) {
         super.onFocusChanged(focused, direction, previouslyFocusedRect)
+        setSelectAllOnFocus(!didFocusAlready)
         if (focused) {
+            if (didFocusAlready && text != null && text?.isWebUrl() == false) {
+                // trigger the text change listener so that we can show autocomplete
+                text = text
+                // cursor at the end of the word
+                setSelection(text!!.length)
+            }
             showKeyboard()
+            didFocusAlready = true
         }
     }
 

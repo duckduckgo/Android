@@ -80,7 +80,7 @@ class ClearPersonalDataActionTest {
     @Test
     fun whenClearCalledThenDataManagerClearsData() = runBlocking<Unit> {
         testee.clearTabsAndAllDataAsync(appInForeground = false, shouldFireDataClearPixel = false)
-        verify(mockDataManager).clearData(any(), any(), any())
+        verify(mockDataManager).clearData(any(), any())
     }
 
     @Test
