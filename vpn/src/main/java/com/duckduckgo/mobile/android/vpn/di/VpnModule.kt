@@ -57,9 +57,6 @@ class VpnModule {
     fun providePayloadBytesExtractor(): PayloadBytesExtractor = PayloadBytesExtractor()
 
     @Provides
-    fun provideTrackerListProvider(): TrackerListProvider = TrackerListProvider()
-
-    @Provides
     fun provideAndroidHostnameExtractor(
         hostnameHeaderExtractor: HostnameHeaderExtractor,
         encryptedRequestHostExtractor: EncryptedRequestHostExtractor,

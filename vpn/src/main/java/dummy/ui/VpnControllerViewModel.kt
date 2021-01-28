@@ -54,9 +54,11 @@ class VpnControllerViewModel(
     }
 
     fun getDebugLoggingPreference(): Boolean = vpnPreferences.getDebugLoggingPreference()
+    fun getBlockFacebookDomainsPreference(): Boolean = vpnPreferences.getBlockFacebookDomainsPreference()
     fun useDebugLogging(debugLoggingEnabled: Boolean) = vpnPreferences.updateDebugLoggingPreference(debugLoggingEnabled)
     fun isCustomDnsServerSet(): Boolean = vpnPreferences.isCustomDnsServerSet()
     fun useCustomDnsServer(enabled: Boolean) = vpnPreferences.useCustomDnsServer(enabled)
+    fun blockFacebookDomains(enabled: Boolean) = vpnPreferences.blockFacebookDomains(enabled)
 
     data class VpnRunningStatus(val runningTimeMillis: Long, val isRunning: Boolean)
 

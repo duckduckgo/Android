@@ -43,6 +43,7 @@ import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository.DataTransfer
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
+import com.duckduckgo.mobile.android.vpn.trackers.TrackerListProvider
 import com.google.android.material.snackbar.Snackbar
 import dagger.android.AndroidInjection
 import dummy.VpnViewModelFactory
@@ -79,6 +80,9 @@ class VpnControllerActivity : AppCompatActivity(R.layout.activity_vpn_controller
 
     @Inject
     lateinit var dataSizeFormatter: DataSizeFormatter
+
+    @Inject
+    lateinit var trackerListProvider: TrackerListProvider
 
     private inline fun <reified V : ViewModel> bindViewModel() = lazy { ViewModelProvider(this, viewModelFactory).get(V::class.java) }
 
@@ -177,6 +181,10 @@ class VpnControllerActivity : AppCompatActivity(R.layout.activity_vpn_controller
             it.isChecked = viewModel.isCustomDnsServerSet()
             it.isEnabled = !TrackerBlockingVpnService.isServiceRunning(this)
         }
+        menu.findItem(R.id.blockFacebookDomains)?.let {
+            it.isChecked = viewModel.getBlockFacebookDomainsPreference()
+            trackerListProvider.includeFacebookDomains = it.isChecked
+        }
         return true
     }
 
@@ -197,6 +205,12 @@ class VpnControllerActivity : AppCompatActivity(R.layout.activity_vpn_controller
             R.id.customDnsServer -> {
                 val enabled = !item.isChecked
                 viewModel.useCustomDnsServer(enabled)
+                true
+            }
+            R.id.blockFacebookDomains -> {
+                val enabled = !item.isChecked
+                viewModel.blockFacebookDomains(enabled)
+                trackerListProvider.includeFacebookDomains = enabled
                 true
             }
             else -> super.onOptionsItemSelected(item)

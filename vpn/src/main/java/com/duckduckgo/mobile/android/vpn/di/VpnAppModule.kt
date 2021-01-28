@@ -20,6 +20,7 @@ import android.content.Context
 import android.net.ConnectivityManager
 import com.duckduckgo.di.scopes.AppObjectGraph
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
+import com.duckduckgo.mobile.android.vpn.trackers.TrackerListProvider
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
@@ -44,4 +45,8 @@ class VpnAppModule {
     fun bindVpnDatabase(context: Context): VpnDatabase {
         return VpnDatabase.getInstance(context)
     }
+
+    @Provides
+    @Singleton
+    fun provideTrackerListProvider(): TrackerListProvider = TrackerListProvider()
 }

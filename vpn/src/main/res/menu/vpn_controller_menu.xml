@@ -41,5 +41,12 @@
         app:actionViewClass="android.widget.CheckBox"
         app:showAsAction="never" />
 
+    <item
+        android:id="@+id/blockFacebookDomains"
+        android:checkable="true"
+        android:title="Block Facebook domains"
+        app:actionViewClass="android.widget.CheckBox"
+        app:showAsAction="never" />
+
 
 </menu>

@@ -27,11 +27,24 @@ private val EXCLUDED_SYSTEM_APPS = listOf(
 )
 
 private val EXCLUDED_PROBLEMATIC_APPS = listOf(
+    "com.facebook.talk",
+    "com.facebook.bishop",
+    "com.facebook.games",
+    "com.whatsapp",
     "com.facebook.katana",
     "com.facebook.lite",
     "com.facebook.orca",
     "com.facebook.mlite",
-    "com.instagram.android"
+    "com.instagram.android",
+    "com.facebook.pages.app",
+    "com.facebook.work",
+    "com.facebook.workchat",
+    "com.facebook.creatorstudio",
+    "com.facebook.Socal",
+    "com.facebook.arstudio.player",
+    "com.facebook.adsmanager",
+    "com.facebook.analytics",
+    "com.facebook.Origami",
 )
 
 private val FIRST_PARTY_TRACKERS_ONLY_APPS = listOf(
