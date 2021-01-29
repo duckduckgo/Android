@@ -48,17 +48,17 @@ import java.security.cert.X509Certificate
 
 
 class BrowserWebViewClient(
-        private val webViewHttpAuthStore: WebViewHttpAuthStore,
-        private val trustedCertificateStore: TrustedCertificateStore,
-        private val requestRewriter: RequestRewriter,
-        private val specialUrlDetector: SpecialUrlDetector,
-        private val requestInterceptor: RequestInterceptor,
-        private val offlinePixelCountDataStore: OfflinePixelCountDataStore,
-        private val uncaughtExceptionRepository: UncaughtExceptionRepository,
-        private val cookieManager: CookieManager,
-        private val loginDetector: DOMLoginDetector,
-        private val dosDetector: DosDetector,
-        private val globalPrivacyControl: GlobalPrivacyControl
+    private val webViewHttpAuthStore: WebViewHttpAuthStore,
+    private val trustedCertificateStore: TrustedCertificateStore,
+    private val requestRewriter: RequestRewriter,
+    private val specialUrlDetector: SpecialUrlDetector,
+    private val requestInterceptor: RequestInterceptor,
+    private val offlinePixelCountDataStore: OfflinePixelCountDataStore,
+    private val uncaughtExceptionRepository: UncaughtExceptionRepository,
+    private val cookieManager: CookieManager,
+    private val loginDetector: DOMLoginDetector,
+    private val dosDetector: DosDetector,
+    private val globalPrivacyControl: GlobalPrivacyControl
 ) : WebViewClient() {
 
     var webViewClientListener: WebViewClientListener? = null
@@ -286,10 +286,10 @@ class BrowserWebViewClient(
             val siteURL = if (view?.url != null) "${URI(view.url).scheme}://$host" else host.orEmpty()
 
             val request = BasicAuthenticationRequest(
-                    handler = handler,
-                    host = host.orEmpty(),
-                    realm = realm.orEmpty(),
-                    site = siteURL
+                handler = handler,
+                host = host.orEmpty(),
+                realm = realm.orEmpty(),
+                site = siteURL
             )
 
             it.requiresAuthentication(request)
