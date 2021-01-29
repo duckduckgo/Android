@@ -18,6 +18,7 @@ package dummy.ui
 
 import android.content.Context
 import android.content.SharedPreferences
+import androidx.annotation.VisibleForTesting
 import androidx.core.content.edit
 import com.duckduckgo.mobile.android.vpn.BuildConfig
 
@@ -46,7 +47,9 @@ class VpnPreferences(private val applicationContext: Context) {
     }
 
     companion object {
-        private const val PREFS_FILENAME = "VpnDummySettings"
+
+        @VisibleForTesting
+        const val PREFS_FILENAME = "VpnDummySettings"
 
         private const val PREFS_KEY_DEBUG_LOGGING = "PREFS_KEY_DEBUG_LOGGING"
         private const val PREFS_KEY_BLOCK_FACEBOOK_DOMAINS = "PREFS_KEY_BLOCK_FACEBOOK_DOMAINS"

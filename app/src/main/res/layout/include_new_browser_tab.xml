@@ -36,21 +36,6 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
-    <ImageView
-        android:id="@+id/ddgLogo"
-        android:layout_width="0dp"
-        android:alpha="0"
-        android:layout_height="wrap_content"
-        android:contentDescription="@string/duckDuckGoLogoDescription"
-        android:src="@drawable/logo_full"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintBottom_toTopOf="@+id/ctaContainer"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHeight_max="180dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/ctaTopContainer"
-        app:layout_constraintWidth_max="180dp" />
-
     <include
         layout="@layout/include_dax_dialog_cta"
         android:layout_width="0dp"
@@ -72,5 +57,15 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
+
+    <androidx.fragment.app.FragmentContainerView
+        android:id="@+id/fragment_device_shield_container"
+        android:visibility="gone"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:name="com.duckduckgo.mobile.android.vpn.ui.report.DeviceShieldFragment"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"  />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

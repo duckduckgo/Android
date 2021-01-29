@@ -92,7 +92,7 @@ class VpnStatsReportingWorker(context: Context, workerParams: WorkerParameters) 
             VPN_TRACKER_COMPANIES_BLOCKED to trackersByCompany.size.toString()
         )
         pixel.fire(VPN_TESTERS_DAILY_REPORT, params)
-        Timber.i("Sending daily pixel report $params")
+        Timber.w("Sending daily pixel report $params")
         return Result.success()
     }
 

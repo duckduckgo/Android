@@ -8,21 +8,25 @@
     <application>
 
         <activity
+            android:name=".ui.report.PrivacyReportActivity"
+            android:label="@string/privacyReportToolbarTitle"
+            android:process=":vpn"
+            android:theme="@style/Theme.AndroidVpn"
+            android:parentActivityName="com.duckduckgo.app.browser.BrowserActivity" />
+
+        <activity
             android:name="dummy.ui.VpnControllerActivity"
             android:exported="true"
             android:label="@string/title_activity_vpn_controller"
             android:process=":vpn"
+            android:parentActivityName=".ui.report.PrivacyReportActivity"
             android:theme="@style/Theme.AndroidVpn.NoActionBar">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
         </activity>
 
         <activity
             android:name="dummy.ui.VpnDiagnosticsActivity"
             android:theme="@style/Theme.AndroidVpn.NoActionBar"
-            android:parentActivityName="dummy.ui.VpnControllerActivity"
+            android:parentActivityName=".ui.report.PrivacyReportActivity"
             android:process=":vpn" >
         </activity>
 

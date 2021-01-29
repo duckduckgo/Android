@@ -24,8 +24,6 @@ import android.content.Intent
 import android.content.Intent.ACTION_VIEW
 import android.net.VpnService
 import android.os.Bundle
-import android.view.Menu
-import android.view.MenuItem
 import android.widget.CompoundButton
 import android.widget.TextView
 import android.widget.ToggleButton
@@ -40,10 +38,8 @@ import com.duckduckgo.mobile.android.vpn.model.TimePassed
 import com.duckduckgo.mobile.android.vpn.model.VpnTrackerAndCompany
 import com.duckduckgo.mobile.android.vpn.model.dateOfPreviousMidnight
 import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
-import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository.DataTransfer
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
-import com.duckduckgo.mobile.android.vpn.trackers.TrackerListProvider
 import com.google.android.material.snackbar.Snackbar
 import dagger.android.AndroidInjection
 import dummy.VpnViewModelFactory
@@ -70,9 +66,6 @@ class VpnControllerActivity : AppCompatActivity(R.layout.activity_vpn_controller
     private lateinit var uuidTextView: TextView
 
     @Inject
-    lateinit var appTrackerBlockerStatsRepository: AppTrackerBlockingStatsRepository
-
-    @Inject
     lateinit var vpnDatabase: VpnDatabase
 
     @Inject
@@ -80,9 +73,6 @@ class VpnControllerActivity : AppCompatActivity(R.layout.activity_vpn_controller
 
     @Inject
     lateinit var dataSizeFormatter: DataSizeFormatter
-
-    @Inject
-    lateinit var trackerListProvider: TrackerListProvider
 
     private inline fun <reified V : ViewModel> bindViewModel() = lazy { ViewModelProvider(this, viewModelFactory).get(V::class.java) }
 
@@ -166,54 +156,6 @@ class VpnControllerActivity : AppCompatActivity(R.layout.activity_vpn_controller
             val clipData: ClipData = ClipData.newPlainText("VPN UUID", uuidTextView.text)
             manager.setPrimaryClip(clipData)
             Snackbar.make(uuidTextView, "UUID is now copied to the Clipboard", Snackbar.LENGTH_SHORT).show()
-        }
-    }
-
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        menuInflater.inflate(R.menu.vpn_controller_menu, menu)
-        return true
-    }
-
-    override fun onPrepareOptionsMenu(menu: Menu): Boolean {
-        super.onPrepareOptionsMenu(menu)
-        menu.findItem(R.id.debugLogging).isChecked = viewModel.getDebugLoggingPreference()
-        menu.findItem(R.id.customDnsServer)?.let {
-            it.isChecked = viewModel.isCustomDnsServerSet()
-            it.isEnabled = !TrackerBlockingVpnService.isServiceRunning(this)
-        }
-        menu.findItem(R.id.blockFacebookDomains)?.let {
-            it.isChecked = viewModel.getBlockFacebookDomainsPreference()
-            trackerListProvider.includeFacebookDomains = it.isChecked
-        }
-        return true
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return when (item.itemId) {
-            R.id.reportFeedback -> {
-                launchFeedback(); true
-            }
-            R.id.diagnosticsScreen -> {
-                startActivity(VpnDiagnosticsActivity.intent(this)); true
-            }
-            R.id.debugLogging -> {
-                val enabled = !item.isChecked
-                viewModel.useDebugLogging(enabled)
-                reconfigureTimber(enabled)
-                true
-            }
-            R.id.customDnsServer -> {
-                val enabled = !item.isChecked
-                viewModel.useCustomDnsServer(enabled)
-                true
-            }
-            R.id.blockFacebookDomains -> {
-                val enabled = !item.isChecked
-                viewModel.blockFacebookDomains(enabled)
-                trackerListProvider.includeFacebookDomains = enabled
-                true
-            }
-            else -> super.onOptionsItemSelected(item)
         }
     }
 

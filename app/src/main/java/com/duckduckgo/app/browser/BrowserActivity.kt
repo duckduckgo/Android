@@ -96,12 +96,6 @@ class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope() {
 
     @SuppressLint("MissingSuperCall")
     override fun onCreate(savedInstanceState: Bundle?) {
-        // vtodo
-        Toast.makeText(this, "Browser disabled during early VPN builds", Toast.LENGTH_LONG).show()
-        super.onCreate(savedInstanceState)
-        finish()
-        return
-
         super.daggerInject()
         Timber.i("onCreate called. freshAppLaunch: ${dataClearer.isFreshAppLaunch}, savedInstanceState: $savedInstanceState")
         dataClearerForegroundAppRestartPixel.registerIntent(intent)

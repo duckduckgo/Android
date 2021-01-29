@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.global
 
+import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.duckduckgo.app.autocomplete.api.AutoCompleteApi
@@ -81,6 +82,7 @@ import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel
 import com.duckduckgo.app.usage.search.SearchCountDao
 import com.duckduckgo.app.widget.ui.AddWidgetInstructionsViewModel
+import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
 import javax.inject.Inject
 
 @Suppress("UNCHECKED_CAST")
@@ -126,7 +128,6 @@ class ViewModelFactory @Inject constructor(
     private val userEventsStore: UserEventsStore,
     private val notificationDao: NotificationDao,
     private val userOurAppDetector: UseOurAppDetector,
-    private val dismissedCtaDao: DismissedCtaDao,
     private val fileDownloader: FileDownloader,
     private val dispatcherProvider: DispatcherProvider,
     private val fireAnimationLoader: FireAnimationLoader,
@@ -257,4 +258,5 @@ class ViewModelFactory @Inject constructor(
             settingsDataStore = appSettingsPreferencesStore,
             pixel = pixel
         )
+
 }

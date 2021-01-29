@@ -57,6 +57,7 @@
     <color name="warGreyTwo">#888888</color>
     <color name="warmerGray">#777777</color>
     <color name="silver">#c0c2c9</color>
+    <color name="silverGray">#E5E5E5</color>
     <color name="paleBrownishGray">#d0d0d0</color>
     <color name="brownishGray">#5c5c5c</color>
     <color name="brownishGrayTwo">#666666</color>
@@ -77,6 +78,7 @@
     <color name="carolinaBlue">#94b0ff</color>
 
     <color name="midGreen">#3fa140</color>
+    <color name="lightGreen">#161DB954</color>
 
     <color name="translucentDark">#b000</color>
     <color name="gunmetal">#494d56</color>

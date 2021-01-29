@@ -16,6 +16,14 @@
 
 <resources>
 
+    <style name="Theme.AndroidVpn" parent="Theme.Design.Light">
+        <item name="colorPrimary">@color/whiteFive</item>
+        <item name="colorPrimaryDark">@color/whiteFive</item>
+        <item name="colorAccent">@color/warmBlue</item>
+        <item name="android:windowBackground">?attr/colorPrimaryDark</item>
+        <item name="android:windowLightStatusBar">true</item>
+    </style>
+
     <style name="Theme.AndroidVpn.NoActionBar" parent="Theme.Design.NoActionBar">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>

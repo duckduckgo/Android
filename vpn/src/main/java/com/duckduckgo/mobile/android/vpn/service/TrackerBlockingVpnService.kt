@@ -29,7 +29,7 @@ import android.os.*
 import androidx.core.app.NotificationManagerCompat
 import com.duckduckgo.mobile.android.vpn.di.VpnCoroutineScope
 import com.duckduckgo.mobile.android.vpn.model.VpnTrackerAndCompany
-import com.duckduckgo.mobile.android.vpn.model.dateOfPreviousMidnight
+import com.duckduckgo.mobile.android.vpn.model.dateOfLastHour
 import com.duckduckgo.mobile.android.vpn.processor.TunPacketReader
 import com.duckduckgo.mobile.android.vpn.processor.TunPacketWriter
 import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpPacketProcessor
@@ -40,7 +40,7 @@ import com.duckduckgo.mobile.android.vpn.processor.udp.UdpPacketProcessor
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
 import com.duckduckgo.mobile.android.vpn.store.PacketPersister
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
-import com.duckduckgo.mobile.android.vpn.ui.notification.VpnNotificationBuilder.Companion.buildPersistentNotification
+import com.duckduckgo.mobile.android.vpn.ui.notification.VpnNotificationBuilder.Companion.buildDeviceShieldEnabled
 import dagger.android.AndroidInjection
 import dummy.ui.VpnPreferences
 import kotlinx.coroutines.*
@@ -123,27 +123,27 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
         udpPacketProcessor = UdpPacketProcessor(queues, this, packetPersister)
         tcpPacketProcessor = TcpPacketProcessor(queues, this, trackerDetector, packetPersister, localAddressDetector, originatingAppResolver, vpnCoroutineScope)
 
-        Timber.i("VPN onCreate")
+        Timber.e("VPN log onCreate")
     }
 
     override fun onBind(intent: Intent?): IBinder {
-        Timber.i("VPN onBind invoked")
+        Timber.i("VPN log onBind invoked")
         return binder
     }
 
     override fun onUnbind(p0: Intent?): Boolean {
-        Timber.i("VPN onUnbind invoked")
+        Timber.i("VPN log onUnbind invoked")
         return super.onUnbind(p0)
     }
 
     override fun onDestroy() {
-        Timber.i("VPN onDestroy")
+        Timber.e("VPN log onDestroy")
         notifyVpnStopped()
         super.onDestroy()
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        Timber.i("onStartCommand: ${intent?.action}")
+        Timber.e("VPN log onStartCommand: ${intent?.action}")
 
         var returnCode: Int = Service.START_NOT_STICKY
 
@@ -162,7 +162,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
     }
 
     private fun startVpn() {
-        Timber.i("Starting VPN")
+        Timber.i("VPN log: Starting VPN")
         notifyVpnStart()
 
         tickerJob?.cancel()
@@ -187,9 +187,10 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
     }
 
     private fun updateNotificationForNewTrackerFound(trackersBlocked: List<VpnTrackerAndCompany>) {
-        val trackerCompanies = trackersBlocked.groupBy { it.trackerCompany.trackerCompanyId }.size
-        val notification = buildPersistentNotification(this, trackersBlocked, trackerCompanies)
-        notificationManager.notify(FOREGROUND_VPN_SERVICE_ID, notification)
+        val trackerCompaniesTotal = trackersBlocked.groupBy { it.trackerCompany.trackerCompanyId }.size
+        val trackerCompanies = trackersBlocked.distinctBy { it.trackerCompany.trackerCompanyId }
+        val notification = buildDeviceShieldEnabled(this, trackersBlocked, trackerCompaniesTotal, trackerCompanies)
+        notificationManager.notify(VPN_FOREGROUND_SERVICE_ID, notification)
     }
 
     private fun hideReminderNotification() {
@@ -215,7 +216,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
         alarmManager?.setRepeating(
             AlarmManager.RTC_WAKEUP,
             System.currentTimeMillis(),
-            AlarmManager.INTERVAL_FIFTEEN_MINUTES,
+            FIVE_MINUTES,
             alarmIntent
         )
     }
@@ -245,7 +246,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
         }
 
         if (tunInterface == null) {
-            Timber.e("Failed to establish VPN tunnel")
+            Timber.e("VPN log: Failed to establish VPN tunnel")
             stopVpn()
         }
     }
@@ -272,8 +273,9 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
     }
 
     private fun stopVpn() {
-        Timber.i("Stopping VPN")
+        Timber.i("VPN log: Stopping VPN")
         notifyVpnStopped()
+        schedulerReminderAlarm()
 
         tickerJob?.cancel()
         queues.clearAll()
@@ -294,9 +296,17 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
     }
 
     override fun onRevoke() {
-        Timber.w("VPN onRevoke called")
+        Timber.e("VPN log onRevoke called")
         stopVpn()
-        super.onRevoke()
+    }
+
+    override fun onLowMemory() {
+        Timber.e("VPN log onLowMemory called")
+    }
+
+    // https://developer.android.com/reference/android/app/Service.html#onTrimMemory(int)
+    override fun onTrimMemory(level: Int) {
+        Timber.e("VPN log onTrimMemory level $level called")
     }
 
     private fun notifyVpnStart() {
@@ -312,10 +322,10 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
             }
         }
 
-        startForeground(FOREGROUND_VPN_SERVICE_ID, buildPersistentNotification(applicationContext, emptyList(), 0))
+        startForeground(VPN_FOREGROUND_SERVICE_ID, buildDeviceShieldEnabled(applicationContext, emptyList(), 0, emptyList()))
 
         newTrackerObserverJob = launch {
-            repository.getVpnTrackers({ dateOfPreviousMidnight() }).collectLatest {
+            repository.getVpnTrackers({ dateOfLastHour() }).collectLatest {
                 updateNotificationForNewTrackerFound(it)
             }
         }
@@ -343,7 +353,11 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
     companion object {
 
         const val ACTION_VPN_REMINDER = "com.duckduckgo.vpn.internaltesters.reminder"
+
         const val VPN_REMINDER_NOTIFICATION_ID = 999
+        const val VPN_FOREGROUND_SERVICE_ID = 200
+
+        const val FIVE_MINUTES = 300000L
 
         private fun serviceIntent(context: Context): Intent {
             return Intent(context, TrackerBlockingVpnService::class.java)
@@ -380,7 +394,6 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
         private const val ACTION_STOP_VPN = "ACTION_STOP_VPN"
         private const val ACTION_ALWAYS_ON_START = "android.net.VpnService"
 
-        const val FOREGROUND_VPN_SERVICE_ID = 200
     }
 
     override fun createDatagramChannel(): DatagramChannel {

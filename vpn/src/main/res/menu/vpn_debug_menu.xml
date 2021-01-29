@@ -28,6 +28,11 @@
         app:showAsAction="never" />
 
     <item
+        android:id="@+id/dataScreen"
+        android:title="@string/dataMenuLabel"
+        app:showAsAction="never" />
+
+    <item
         android:id="@+id/debugLogging"
         android:checkable="true"
         android:title="Verbose Logging"

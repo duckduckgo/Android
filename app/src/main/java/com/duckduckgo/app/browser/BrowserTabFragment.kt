@@ -291,8 +291,6 @@ class BrowserTabFragment :
         }
     }
 
-    private val logoHidingListener by lazy { LogoHidingLayoutChangeLifecycleListener(ddgLogo) }
-
     private val ctaViewStateObserver = Observer<CtaViewState> {
         it?.let { renderer.renderCtaViewState(it) }
     }
@@ -392,7 +390,6 @@ class BrowserTabFragment :
 
         appBarLayout.setExpanded(true)
         viewModel.onViewResumed()
-        logoHidingListener.onResume()
 
         // onResume can be called for a hidden/backgrounded fragment, ensure this tab is visible.
         if (fragmentIsVisible()) {
@@ -403,7 +400,6 @@ class BrowserTabFragment :
     }
 
     override fun onPause() {
-        logoHidingListener.onPause()
         dismissDownloadFragment()
         dismissAuthenticationDialog()
         super.onPause()
@@ -518,7 +514,6 @@ class BrowserTabFragment :
         webView?.onPause()
         webView?.hide()
         omnibarScrolling.disableOmnibarScrolling(toolbarContainer)
-        logoHidingListener.onReadyToShowLogo()
     }
 
     private fun showBrowser() {
@@ -910,14 +905,14 @@ class BrowserTabFragment :
                 viewModel.onOmnibarInputStateChanged(omnibarTextInput.text.toString(), hasFocus, false)
                 if (!hasFocus) {
                     omnibarTextInput.hideKeyboard()
-                    focusDummy.requestFocus()
+                    fragment_device_shield_container.requestFocus()
                 }
             }
 
         omnibarTextInput.onBackKeyListener = object : KeyboardAwareEditText.OnBackKeyListener {
             override fun onBackKey(): Boolean {
                 omnibarTextInput.hideKeyboard()
-                focusDummy.requestFocus()
+                fragment_device_shield_container.requestFocus()
                 return true
             }
         }
@@ -942,7 +937,6 @@ class BrowserTabFragment :
             disableTransitionType(DISAPPEARING)
             setDuration(LAYOUT_TRANSITION_MS)
         }
-        rootView.addOnLayoutChangeListener(logoHidingListener)
     }
 
     private fun userSelectedAutocomplete(suggestion: AutoCompleteSuggestion) {
@@ -991,7 +985,7 @@ class BrowserTabFragment :
 
             it.setOnTouchListener { _, _ ->
                 if (omnibarTextInput.isFocused) {
-                    focusDummy.requestFocus()
+                    fragment_device_shield_container.requestFocus()
                 }
                 false
             }
@@ -1019,7 +1013,11 @@ class BrowserTabFragment :
         }
 
         swipeRefreshContainer.setCanChildScrollUpCallback {
-            webView?.canScrollVertically(-1) ?: false
+             if (fragment_device_shield_container.isVisible){
+                false
+            } else{
+                webView?.canScrollVertically(-1) ?: false
+            }
         }
 
         // avoids progressView from showing under toolbar
@@ -1128,7 +1126,7 @@ class BrowserTabFragment :
         if (!isHidden) {
             Timber.v("Keyboard now hiding")
             omnibarTextInput.hideKeyboard()
-            focusDummy.requestFocus()
+            fragment_device_shield_container.requestFocus()
         }
     }
 
@@ -1136,7 +1134,7 @@ class BrowserTabFragment :
         if (!isHidden) {
             Timber.v("Keyboard now hiding")
             omnibarTextInput.postDelayed(KEYBOARD_DELAY) { omnibarTextInput?.hideKeyboard() }
-            focusDummy.requestFocus()
+            fragment_device_shield_container.requestFocus()
         }
     }
 
@@ -1195,7 +1193,6 @@ class BrowserTabFragment :
      */
     override fun onConfigurationChanged(newConfig: Configuration) {
         super.onConfigurationChanged(newConfig)
-        ddgLogo.setImageResource(R.drawable.logo_full)
         if (ctaContainer.isNotEmpty()) {
             renderer.renderHomeCta()
         }
@@ -1806,8 +1803,7 @@ class BrowserTabFragment :
             }
 
             renderIfChanged(viewState, lastSeenCtaViewState) {
-
-                ddgLogo.show()
+                fragment_device_shield_container.show()
                 lastSeenCtaViewState = viewState
                 if (viewState.cta != null) {
                     showCta(viewState.cta)
@@ -1847,7 +1843,7 @@ class BrowserTabFragment :
         }
 
         private fun showDaxCta(configuration: DaxBubbleCta) {
-            ddgLogo.hide()
+            fragment_device_shield_container.hide()
             hideHomeCta()
             hideHomeTopCta()
             configuration.showCta(daxCtaContainer)
@@ -1856,8 +1852,6 @@ class BrowserTabFragment :
         private fun showHomeTopCta(configuration: HomeTopPanelCta) {
             hideDaxCta()
             hideHomeCta()
-
-            logoHidingListener.callToActionView = ctaTopContainer
 
             configuration.showCta(ctaTopContainer)
             ctaTopContainer.setOnClickListener {
@@ -1899,7 +1893,6 @@ class BrowserTabFragment :
             ctaContainer.removeAllViews()
 
             inflate(context, R.layout.include_cta, ctaContainer)
-            logoHidingListener.callToActionView = ctaContainer
 
             configuration.showCta(ctaContainer)
             ctaContainer.ctaOkButton.setOnClickListener {
@@ -1913,7 +1906,7 @@ class BrowserTabFragment :
 
         fun hideFindInPage() {
             if (findInPageContainer.visibility != GONE) {
-                focusDummy.requestFocus()
+                fragment_device_shield_container.requestFocus()
                 findInPageContainer.gone()
                 findInPageInput.hideKeyboard()
             }

@@ -39,7 +39,9 @@ class LaunchViewModel(
     }
 
     suspend fun determineViewToShow() {
-        waitForReferrerData()
+
+        // vtodo - is this related to package name?
+//        waitForReferrerData()
 
         if (userStageStore.isNewUser()) {
             command.value = Command.Onboarding

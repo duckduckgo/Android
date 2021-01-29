@@ -142,12 +142,12 @@
             app:layout_constraintTop_toBottomOf="@id/vpnTrackersBlocked"
             tools:text="Last tracker blocked 8h 34 min ago\ngoogle-analytics.com\n(owned by Google)" />
 
-
         <ToggleButton
             android:id="@+id/vpnRunningButton"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginBottom="10dp"
+            android:visibility="invisible"
             app:layout_constraintBottom_toTopOf="@id/vpnUUID"
             app:layout_constraintEnd_toEndOf="@id/vpnUUID"
             app:layout_constraintStart_toStartOf="@id/vpnUUID"

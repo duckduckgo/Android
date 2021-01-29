@@ -24,7 +24,41 @@ fun dateOfPreviousMidnight(): String {
     return DatabaseDateFormatter.timestamp(midnight)
 }
 
+fun dateOfLastHour(): String {
+    val midnight = LocalDateTime.now().minusHours(1)
+    return DatabaseDateFormatter.timestamp(midnight)
+}
+
+fun dateOfLastWeek(): String {
+    val midnight = LocalDateTime.now().minusDays(7)
+    return DatabaseDateFormatter.timestamp(midnight)
+}
+
 data class TimePassed(val hours: Long, val minutes: Long, val seconds: Long) {
+
+    fun shortFormat(): String {
+        val sb = StringBuilder()
+
+        if (hours > 0) {
+            sb.append(hours)
+            sb.append("h ago")
+            return sb.toString()
+        }
+
+        if (minutes > 0) {
+            sb.append(minutes)
+            sb.append("m ago")
+            return sb.toString()
+        }
+
+        if (seconds > 30) {
+            sb.append("a minute ago")
+            return sb.toString()
+        }
+
+        sb.append("just now")
+        return sb.toString()
+    }
 
     fun format(alwaysShowHours: Boolean = true, alwaysShowMinutes: Boolean = true, alwaysShowSeconds: Boolean = true): String {
         val sb = StringBuilder()

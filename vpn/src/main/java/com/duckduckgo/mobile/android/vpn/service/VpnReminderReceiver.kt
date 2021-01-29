@@ -29,12 +29,12 @@ import timber.log.Timber
 class VpnReminderReceiver : BroadcastReceiver() {
 
     override fun onReceive(context: Context, intent: Intent) {
+
         Timber.i("VpnReminderReceiver onReceive ${intent.action}")
         if (intent.action == "android.intent.action.BOOT_COMPLETED" || intent.action == TrackerBlockingVpnService.ACTION_VPN_REMINDER) {
             Timber.v("Checking if VPN is running")
 
             goAsync {
-
                 if (TrackerBlockingVpnService.isServiceRunning(context)) {
                     Timber.v("Vpn is already running, nothing to show")
                 } else {

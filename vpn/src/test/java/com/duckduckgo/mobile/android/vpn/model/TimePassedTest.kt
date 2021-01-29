@@ -22,39 +22,81 @@ import org.junit.Test
 class TimePassedTest {
 
     @Test
-    fun whenOnlyHoursPassedThenPrintsProperTime() {
+    fun whenOnlyHoursPassedThenFormatsProperTime() {
         val timePassed = TimePassed(1, 0, 0)
         assertEquals("1 hr 0 min 0 sec", timePassed.format())
     }
 
     @Test
-    fun whenOnlyMinutesPassedThenPrintsProperTime() {
+    fun whenOnlyMinutesPassedThenFormatsProperTime() {
         val timePassed = TimePassed(0, 10, 0)
         assertEquals("0 hr 10 min 0 sec", timePassed.format())
     }
 
     @Test
-    fun whenOnlySecondsPassedThenPrintsProperTime() {
+    fun whenOnlySecondsPassedThenFormatsProperTime() {
         val timePassed = TimePassed(0, 0, 25)
         assertEquals("0 hr 0 min 25 sec", timePassed.format())
     }
 
     @Test
-    fun whenHoursAndMinutesPassedThenPrintsProperTime() {
+    fun whenHoursAndMinutesPassedThenFormatsProperTime() {
         val timePassed = TimePassed(1, 10, 0)
         assertEquals("1 hr 10 min 0 sec", timePassed.format())
     }
 
     @Test
-    fun whenHoursAndSecondsPassedThenPrintsProperTime() {
+    fun whenHoursAndSecondsPassedThenFormatsProperTime() {
         val timePassed = TimePassed(1, 0, 30)
         assertEquals("1 hr 0 min 30 sec", timePassed.format())
     }
 
     @Test
-    fun whenMinutesAndSecondsPassedThenPrintsProperTime() {
+    fun whenMinutesAndSecondsPassedThenFormatsProperTime() {
         val timePassed = TimePassed(0, 10, 10)
         assertEquals("0 hr 10 min 10 sec", timePassed.format())
+    }
+
+    @Test
+    fun whenOnlyHoursPassedThenShortFormatsProperTime() {
+        val timePassed = TimePassed(1, 0, 0)
+        assertEquals("1h ago", timePassed.shortFormat())
+    }
+
+    @Test
+    fun whenOnlyMinutesPassedThenShortFormatsProperTime() {
+        val timePassed = TimePassed(0, 10, 0)
+        assertEquals("10m ago", timePassed.shortFormat())
+    }
+
+    @Test
+    fun whenOnlySecondsPassedThenShortFormatsProperTime() {
+        val timePassed = TimePassed(0, 0, 45)
+        assertEquals("a minute ago", timePassed.shortFormat())
+    }
+
+    @Test
+    fun whenOnlyFewSecondsPassedThenShortFormatsProperTime() {
+        val timePassed = TimePassed(0, 0, 25)
+        assertEquals("just now", timePassed.shortFormat())
+    }
+
+    @Test
+    fun whenHoursAndMinutesPassedThenShortFormatsProperTime() {
+        val timePassed = TimePassed(1, 10, 0)
+        assertEquals("1h ago", timePassed.shortFormat())
+    }
+
+    @Test
+    fun whenHoursAndSecondsPassedThenShortFormatsProperTime() {
+        val timePassed = TimePassed(1, 0, 30)
+        assertEquals("1h ago", timePassed.shortFormat())
+    }
+
+    @Test
+    fun whenMinutesAndSecondsPassedShortThenFormatsProperTime() {
+        val timePassed = TimePassed(0, 10, 10)
+        assertEquals("10m ago", timePassed.shortFormat())
     }
 
 }

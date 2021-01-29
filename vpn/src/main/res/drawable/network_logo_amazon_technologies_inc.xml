@@ -1,0 +1,34 @@
+<!--
+  ~ Copyright (c) 2020 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="22dp"
+    android:height="22dp"
+    android:viewportWidth="22"
+    android:viewportHeight="22">
+  <path
+      android:pathData="M9.4096,11.334C9.4096,12.9243 12.0337,13.2901 12.0337,10.8039L12.0337,9.5422C10.9841,9.566 9.4096,9.8629 9.4096,11.334Z"
+      android:strokeWidth="1"
+      android:fillColor="@color/grayishTwo"
+      android:fillType="nonZero"
+      android:strokeColor="#00000000"/>
+  <path
+      android:pathData="M11,0C4.9249,0 0,4.9249 0,11C0,17.0751 4.9249,22 11,22C17.0751,22 22,17.0751 22,11C22,8.0826 20.8411,5.2847 18.7782,3.2218C16.7153,1.1589 13.9174,0 11,0ZM10.9284,5.9373C10.9284,5.9373 9.7463,5.9373 9.24,7.48L6.9472,7.268C6.9472,5.7333 8.4051,4.0183 11.1458,4.0183C13.8865,4.0183 14.6472,5.7942 14.6472,6.5841L14.6472,11.1696C14.6472,12.0258 15.6545,12.813 15.6545,12.813L13.8839,14.5598C13.3795,14.1074 12.9074,13.6202 12.4711,13.1019C11.0636,15.3072 6.7511,15.1667 6.7511,11.7554C6.7511,8.5747 10.5176,8.148 12.0337,8.0923C12.0337,6.8677 12.1928,5.9347 10.9284,5.9373ZM16.2747,15.9036C16.0335,16.2164 14.0906,17.9923 10.8357,17.9923C7.5807,17.9923 5.0839,15.7525 4.3205,14.8434C4.1084,14.6048 4.3523,14.4908 4.4928,14.5783C6.7776,15.9646 10.3453,18.2494 16.1024,15.5219C16.3357,15.4053 16.5159,15.5829 16.2747,15.9036ZM17.5152,15.9725C17.3693,16.3404 17.1429,16.671 16.8525,16.94C16.6829,17.0778 16.5583,17.0222 16.6511,16.8207C16.7439,16.6193 17.2528,15.3735 17.046,15.1084C16.8393,14.8434 15.893,14.9759 15.5511,15.0077C15.2092,15.0395 15.1455,15.0713 15.1137,15.0077C15.0422,14.8301 15.7896,14.5253 16.2826,14.4617C16.7757,14.3981 17.5602,14.4378 17.7166,14.6393C17.8333,14.7771 17.7166,15.4636 17.5152,15.9619L17.5152,15.9725Z"
+      android:strokeWidth="1"
+      android:fillColor="@color/grayishTwo"
+      android:fillType="nonZero"
+      android:strokeColor="#00000000"/>
+</vector>

@@ -28,21 +28,72 @@
     <string name="vpnNotRunYet">"VPN hasn't been run yet"</string>
     <string name="vpnDataTransferred">"%s\n%s packets"</string>
 
+    <!-- Device Shield Notification -->
+    <string name="deviceShieldNotificationInitialStateHeader">"Device Shield is working… beep… boop."</string>
+    <string name="deviceShieldNotificationInitialStateMessage">"But no trackers were blocked in the last hour."</string>
+    <string name="deviceShieldNotificationDisabledMessage">"Device Shield paused. Tap here to continue blocking trackers in apps."</string>
+    <string name="deviceShieldNotificationFourCompaniesBlocked">"%s, %s and d% more companies"</string>
+    <string name="deviceShieldNotificationThreeCompaniesBlocked">"%s, %s and %s"</string>
+    <string name="deviceShieldNotificationTwoCompaniesBlocked">"%s and %s"</string>
+    <string name="deviceShieldNotificationOneCompanyBlocked">"from %s"</string>
+
+    <plurals name="deviceShieldNotificationTrackers">
+        <item quantity="one">%d tracker blocked (last hour)</item>
+        <item quantity="other">%d trackers blocked (last hour)</item>
+    </plurals>
+
     <plurals name="company">
         <item quantity="one">%d company</item>
         <item quantity="other">%d companies</item>
     </plurals>
 
-    <plurals name="tracker">
-        <item quantity="one">%d tracker</item>
-        <item quantity="other">%d trackers</item>
-    </plurals>
     <string name="vpnNotificationTrackersFoundUpdate">"Today, so far we blocked %s from tracking you; the last one was %s. %s in total."</string>
     <string name="vpnReportFeedback">Send feedback</string>
     <string name="diagnosticsMenuLabel">Diagnostics</string>
+    <string name="dataMenuLabel">Data Stats</string>
     <string name="meteredConnection">"Metered: %s"</string>
     <string name="vpnConnectionStatus">"VPN connected: %s"</string>
     <string name="networkAvailable">"Connected to internet: %s"</string>
     <string name="dnsServers">"DNS servers: %s"</string>
     <string name="appExitsReasonsTitle">App exit reasons</string>
+
+    <!-- Device Shield Privacy Report -->
+    <string name="deviceShieldEnabledTooltip">We block companies from tracking you as you browse</string>
+    <string name="privacyReportToggleMore">Show More</string>
+    <string name="privacyReportToggleLess">Show Less</string>
+    <string name="privacyReportToolbarTitle">Privacy Report</string>
+    <string name="privacyReportEnabledTooltip">Device Shield is enabled and blocking trackers across your whole device</string>
+    <string name="privacyReportDisabledTooltip">Enable Device Shield for a summary</string>
+    <string name="privacyReportDeviceShieldEnableLabel">Enable Device Shield</string>
+    <string name="privacyReportDeviceShieldEnableMessage">With your permission, we can block trackers in other apps, too</string>
+    <string name="privacyReportEnable">Enable</string>
+    <string name="privacyReportAppTrackerTime">%s in an app</string>
+    <string name="privacyReportWebsiteTrackerTime">%s on a website</string>
+
+    <string name="privacyReportCompanyBlocked">blocked</string>
+
+    <plurals name="privacyReportCompaniesBlocked">
+        <item quantity="one">%d company</item>
+        <item quantity="other">%d companies</item>
+    </plurals>
+
+    <plurals name="privacyReportTrackersBlocked">
+        <item quantity="one">In the past week, we blocked %d tracker from %s</item>
+        <item quantity="other">In the past week, we blocked %d trackers from %s</item>
+    </plurals>
+
+    <!-- New Tab Integration -->
+    <string name="deviceShieldMenuItemTitle">Device Shield</string>
+    <string name="deviceShieldDisabledHeader">Web trackers blocked</string>
+    <string name="deviceShieldDisabledSubheader">Enable Device Shield for a summary</string>
+    <string name="deviceShieldEnabledSwitchHeader">Device Shield</string>
+    <string name="deviceShieldDisabledSwitchHeader">Device Shield</string>
+    <string name="deviceShieldDisabledSwitchSubheader">Block trackers in other apps</string>
+    <string name="deviceShieldEnabledSnackbar">Success! 🎉 You\’ve enabled Device Shield. Manage this feature in Settings.</string>
+    <string name="deviceShieldLastTrackerBlocked">%s blocked %s</string>
+
+    <plurals name="deviceShieldCtaTrackersBlocked">
+        <item quantity="one">%d tracker blocked this week</item>
+        <item quantity="other">%d trackers blocked this week</item>
+    </plurals>
 </resources>

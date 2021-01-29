@@ -19,6 +19,8 @@ package com.duckduckgo.mobile.android.vpn.di
 import com.duckduckgo.di.scopes.AppObjectGraph
 import com.duckduckgo.di.scopes.VpnObjectGraph
 import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
+import com.duckduckgo.mobile.android.vpn.ui.report.DeviceShieldFragment
+import com.duckduckgo.mobile.android.vpn.ui.report.PrivacyReportActivity
 import com.squareup.anvil.annotations.ContributesTo
 import com.squareup.anvil.annotations.MergeSubcomponent
 import dagger.Binds
@@ -109,6 +111,24 @@ interface VpnControllerActivityComponent : AndroidInjector<VpnControllerActivity
 @MergeSubcomponent(
     scope = VpnObjectGraph::class
 )
+interface PrivacyReportActivityComponent : AndroidInjector<PrivacyReportActivity> {
+    @Subcomponent.Factory
+    interface Factory : AndroidInjector.Factory<PrivacyReportActivity>
+}
+
+@VpnScope
+@MergeSubcomponent(
+    scope = VpnObjectGraph::class
+)
+interface DeviceShieldFragmentComponent : AndroidInjector<DeviceShieldFragment> {
+    @Subcomponent.Factory
+    interface Factory : AndroidInjector.Factory<DeviceShieldFragment>
+}
+
+@VpnScope
+@MergeSubcomponent(
+    scope = VpnObjectGraph::class
+)
 interface VpnDiagnosticsActivityComponent : AndroidInjector<VpnDiagnosticsActivity> {
     @Subcomponent.Factory
     interface Factory : AndroidInjector.Factory<VpnDiagnosticsActivity>
@@ -129,6 +149,8 @@ interface TrackerBlockingVpnServiceComponent : AndroidInjector<TrackerBlockingVp
 @ContributesTo(AppObjectGraph::class)
 interface VpnComponentProvider {
     fun vpnControllerActivityComponentFactory(): VpnControllerActivityComponent.Factory
+    fun privacyReportActivityComponentFactory(): PrivacyReportActivityComponent.Factory
+    fun deviceShieldFragmentComponentFactory(): DeviceShieldFragmentComponent.Factory
     fun trackerBlockingVpnServiceComponentFactory(): TrackerBlockingVpnServiceComponent.Factory
     fun vpnDiagnosticsActivityComponentFactory(): VpnDiagnosticsActivityComponent.Factory
 }
@@ -143,6 +165,16 @@ abstract class VpnBindingModule {
     @IntoMap
     @ClassKey(VpnControllerActivity::class)
     abstract fun bindVpnControllerActivityComponentFactory(factory: VpnControllerActivityComponent.Factory): AndroidInjector.Factory<*>
+
+    @Binds
+    @IntoMap
+    @ClassKey(PrivacyReportActivity::class)
+    abstract fun bindPrivacyReportActivityComponentFactory(factory: PrivacyReportActivityComponent.Factory): AndroidInjector.Factory<*>
+
+    @Binds
+    @IntoMap
+    @ClassKey(DeviceShieldFragment::class)
+    abstract fun bindDeviceShieldFragmentComponentFactory(factory: DeviceShieldFragmentComponent.Factory): AndroidInjector.Factory<*>
 
     @Binds
     @IntoMap

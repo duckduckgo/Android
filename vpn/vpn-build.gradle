@@ -72,6 +72,7 @@ ext {
     room = "2.2.5"
     dagger = "2.27"
     workManager = "2.5.0-beta01"
+    coreTesting = "2.1.0"
 
     threetenabp = "1.3.0"
     threetenbp = "1.4.5"
@@ -121,6 +122,8 @@ dependencies {
 
     implementation 'com.jakewharton.timber:timber:4.7.1'
 
+    implementation 'nl.dionsegijn:konfetti:1.2.5'
+
     // Room
     implementation "androidx.room:room-runtime:$room"
     implementation "androidx.room:room-rxjava2:$room"
@@ -138,6 +141,8 @@ dependencies {
     testImplementation "org.mockito:mockito-core:$mockito"
     testImplementation "com.nhaarman.mockitokotlin2:mockito-kotlin:$mockitoKotlin"
     testImplementation 'junit:junit:4.13'
+    testImplementation "androidx.arch.core:core-testing:$coreTesting"
+    androidTestImplementation "androidx.arch.core:core-testing:$coreTesting"
 
     androidTestImplementation "androidx.test:runner:$androidXTest"
     androidTestImplementation "androidx.test:rules:$androidXTest"
