@@ -35,7 +35,6 @@ import com.duckduckgo.app.browser.logindetection.DOMLoginDetector
 import com.duckduckgo.app.browser.logindetection.WebNavigationEvent
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.browser.navigation.safeCopyBackForwardList
-import com.duckduckgo.app.global.DuckDuckGoApplication
 import com.duckduckgo.app.global.exception.UncaughtExceptionRepository
 import com.duckduckgo.app.global.exception.UncaughtExceptionSource.*
 import com.duckduckgo.app.globalprivacycontrol.GlobalPrivacyControl
@@ -45,7 +44,6 @@ import timber.log.Timber
 import java.net.URI
 import java.security.PrivateKey
 import java.security.cert.X509Certificate
-
 
 class BrowserWebViewClient(
     private val webViewHttpAuthStore: WebViewHttpAuthStore,
@@ -74,15 +72,19 @@ class BrowserWebViewClient(
 
     override fun onReceivedClientCertRequest(view: WebView?, request: ClientCertRequest?) {
         val context = view!!.context as Activity
-        KeyChain.choosePrivateKeyAlias(context, { alias ->
-            try {
-                val changPrivateKey: PrivateKey? = KeyChain.getPrivateKey(context, alias!!)
-                val certificates: Array<X509Certificate>? = KeyChain.getCertificateChain(context, alias!!)
-                request!!.proceed(changPrivateKey, certificates)
-            } catch (e: KeyChainException) {
-            } catch (e: InterruptedException) {
-            }
-        }, arrayOf("RSA"), null, null, -1, null)
+        KeyChain.choosePrivateKeyAlias(
+            context,
+            { alias ->
+                try {
+                    val changPrivateKey: PrivateKey? = KeyChain.getPrivateKey(context, alias!!)
+                    val certificates: Array<X509Certificate>? = KeyChain.getCertificateChain(context, alias!!)
+                    request!!.proceed(changPrivateKey, certificates)
+                } catch (e: KeyChainException) {
+                } catch (e: InterruptedException) {
+                }
+            },
+            arrayOf("RSA"), null, null, -1, null
+        )
     }
 
     /**
