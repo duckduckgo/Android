@@ -275,10 +275,10 @@ class BrowserWebViewClient(
     }
 
     private fun requestAuthentication(
-            view: WebView?,
-            handler: HttpAuthHandler,
-            host: String?,
-            realm: String?
+        view: WebView?,
+        handler: HttpAuthHandler,
+        host: String?,
+        realm: String?
     ) {
         webViewClientListener?.let {
             Timber.v("showAuthenticationDialog - $host, $realm")
