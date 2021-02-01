@@ -23,7 +23,7 @@ import io.reactivex.Single
 @Dao
 interface BookmarksDao {
 
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insert(bookmark: BookmarkEntity): Long
 
     @Query("select * from bookmarks")

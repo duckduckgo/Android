@@ -17,8 +17,7 @@
 package com.duckduckgo.app.onboarding.ui
 
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
-import com.duckduckgo.app.statistics.Variant
-import com.duckduckgo.app.statistics.VariantManager
+import com.duckduckgo.app.global.DefaultRoleBrowserDialog
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.whenever
 import org.junit.Assert.assertEquals
@@ -30,24 +29,18 @@ class OnboardingPageManagerTest {
     private lateinit var testee: OnboardingPageManager
     private val onboardingPageBuilder: OnboardingPageBuilder = mock()
     private val mockDefaultBrowserDetector: DefaultBrowserDetector = mock()
-    private val variantManager: VariantManager = mock()
-    private val defaultBrowserVariant = Variant(
-        key = "variant",
-        features = listOf(VariantManager.VariantFeature.SetDefaultBrowserDialog),
-        filterBy = { true }
-    )
-    private val otherVariant = Variant(key = "variant", features = listOf(), filterBy = { true })
+    private val defaultRoleBrowserDialog: DefaultRoleBrowserDialog = mock()
 
     @Before
     fun setup() {
-        testee = OnboardingPageManagerWithTrackerBlocking(variantManager, onboardingPageBuilder, mockDefaultBrowserDetector)
+        testee = OnboardingPageManagerWithTrackerBlocking(defaultRoleBrowserDialog, onboardingPageBuilder, mockDefaultBrowserDetector)
     }
 
     @Test
     fun whenDDGIsNotDefaultBrowserThenExpectedOnboardingPagesAreTwo() {
         configureDeviceSupportsDefaultBrowser()
         whenever(mockDefaultBrowserDetector.isDefaultBrowser()).thenReturn(false)
-        whenever(variantManager.getVariant()).thenReturn(otherVariant)
+        whenever(defaultRoleBrowserDialog.shouldShowDialog()).thenReturn(false)
 
         testee.buildPageBlueprints()
 
@@ -55,10 +48,10 @@ class OnboardingPageManagerTest {
     }
 
     @Test
-    fun whenDDGIsNotDefaultBrowserAndBrowserDialogVariantThenExpectedOnboardingPagesAre1() {
+    fun whenDDGIsNotDefaultBrowserAndShouldShowBrowserDialogThenExpectedOnboardingPagesAre1() {
         configureDeviceSupportsDefaultBrowser()
         whenever(mockDefaultBrowserDetector.isDefaultBrowser()).thenReturn(false)
-        whenever(variantManager.getVariant()).thenReturn(defaultBrowserVariant)
+        whenever(defaultRoleBrowserDialog.shouldShowDialog()).thenReturn(true)
 
         testee.buildPageBlueprints()
 
@@ -69,7 +62,7 @@ class OnboardingPageManagerTest {
     fun whenDDGAsDefaultBrowserThenSinglePageOnBoarding() {
         configureDeviceSupportsDefaultBrowser()
         whenever(mockDefaultBrowserDetector.isDefaultBrowser()).thenReturn(true)
-        whenever(variantManager.getVariant()).thenReturn(otherVariant)
+        whenever(defaultRoleBrowserDialog.shouldShowDialog()).thenReturn(false)
 
         testee.buildPageBlueprints()
 
@@ -77,10 +70,10 @@ class OnboardingPageManagerTest {
     }
 
     @Test
-    fun whenDDGAsDefaultBrowserAndBrowserDialogVariantThenSinglePageOnBoarding() {
+    fun whenDDGAsDefaultBrowserAndShouldShowBrowserDialogThenSinglePageOnBoarding() {
         configureDeviceSupportsDefaultBrowser()
         whenever(mockDefaultBrowserDetector.isDefaultBrowser()).thenReturn(true)
-        whenever(variantManager.getVariant()).thenReturn(defaultBrowserVariant)
+        whenever(defaultRoleBrowserDialog.shouldShowDialog()).thenReturn(true)
 
         testee.buildPageBlueprints()
 
@@ -90,7 +83,7 @@ class OnboardingPageManagerTest {
     @Test
     fun whenDeviceDoesNotSupportDefaultBrowserThenSinglePageOnBoarding() {
         configureDeviceDoesNotSupportDefaultBrowser()
-        whenever(variantManager.getVariant()).thenReturn(otherVariant)
+        whenever(defaultRoleBrowserDialog.shouldShowDialog()).thenReturn(false)
 
         testee.buildPageBlueprints()
 
@@ -98,9 +91,9 @@ class OnboardingPageManagerTest {
     }
 
     @Test
-    fun whenDeviceDoesNotSupportDefaultBrowserAndBrowserDialogVariantThenSinglePageOnBoarding() {
+    fun whenDeviceDoesNotSupportDefaultBrowserAndShouldShowBrowserDialogThenSinglePageOnBoarding() {
         configureDeviceDoesNotSupportDefaultBrowser()
-        whenever(variantManager.getVariant()).thenReturn(defaultBrowserVariant)
+        whenever(defaultRoleBrowserDialog.shouldShowDialog()).thenReturn(true)
 
         testee.buildPageBlueprints()
 
