@@ -508,17 +508,23 @@ class BrowserTabFragment :
     }
 
     private fun showHome() {
-        errorSnackbar.dismiss()
-        newTabLayout.show()
         appBarLayout.setExpanded(true)
+        errorSnackbar.dismiss()
+
+        focusDummy.hide()
+        browserLayout.hide()
+        newTabLayout.show()
+
         webView?.onPause()
-        webView?.hide()
+
         omnibarScrolling.disableOmnibarScrolling(toolbarContainer)
     }
 
     private fun showBrowser() {
+        focusDummy.show()
         newTabLayout.gone()
-        webView?.show()
+        browserLayout.show()
+
         webView?.onResume()
         omnibarScrolling.enableOmnibarScrolling(toolbarContainer)
     }
@@ -905,14 +911,14 @@ class BrowserTabFragment :
                 viewModel.onOmnibarInputStateChanged(omnibarTextInput.text.toString(), hasFocus, false)
                 if (!hasFocus) {
                     omnibarTextInput.hideKeyboard()
-                    fragment_device_shield_container.requestFocus()
+                    focusDummy.requestFocus()
                 }
             }
 
         omnibarTextInput.onBackKeyListener = object : KeyboardAwareEditText.OnBackKeyListener {
             override fun onBackKey(): Boolean {
                 omnibarTextInput.hideKeyboard()
-                fragment_device_shield_container.requestFocus()
+                focusDummy.requestFocus()
                 return true
             }
         }
@@ -985,7 +991,7 @@ class BrowserTabFragment :
 
             it.setOnTouchListener { _, _ ->
                 if (omnibarTextInput.isFocused) {
-                    fragment_device_shield_container.requestFocus()
+                    focusDummy.requestFocus()
                 }
                 false
             }
@@ -1126,7 +1132,7 @@ class BrowserTabFragment :
         if (!isHidden) {
             Timber.v("Keyboard now hiding")
             omnibarTextInput.hideKeyboard()
-            fragment_device_shield_container.requestFocus()
+            focusDummy.requestFocus()
         }
     }
 
@@ -1134,7 +1140,7 @@ class BrowserTabFragment :
         if (!isHidden) {
             Timber.v("Keyboard now hiding")
             omnibarTextInput.postDelayed(KEYBOARD_DELAY) { omnibarTextInput?.hideKeyboard() }
-            fragment_device_shield_container.requestFocus()
+            focusDummy.requestFocus()
         }
     }
 
@@ -1906,7 +1912,7 @@ class BrowserTabFragment :
 
         fun hideFindInPage() {
             if (findInPageContainer.visibility != GONE) {
-                fragment_device_shield_container.requestFocus()
+                focusDummy.requestFocus()
                 findInPageContainer.gone()
                 findInPageInput.hideKeyboard()
             }
