@@ -1019,11 +1019,7 @@ class BrowserTabFragment :
         }
 
         swipeRefreshContainer.setCanChildScrollUpCallback {
-             if (fragment_device_shield_container.isVisible){
-                false
-            } else{
-                webView?.canScrollVertically(-1) ?: false
-            }
+            webView?.canScrollVertically(-1) ?: false
         }
 
         // avoids progressView from showing under toolbar
