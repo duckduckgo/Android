@@ -17,14 +17,8 @@
 package com.duckduckgo.app.browser.httpauth
 
 import android.webkit.WebView
+import android.webkit.WebViewDatabase
 import androidx.annotation.UiThread
-import com.duckduckgo.app.browser.httpauth.db.HttpAuthDao
-import com.duckduckgo.app.browser.httpauth.db.HttpAuthEntity
-import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteDao
-import com.duckduckgo.app.fire.fireproofwebsite.data.website
-import com.duckduckgo.app.global.DispatcherProvider
-import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.withContext
 
 data class WebViewHttpAuthCredentials(val username: String, val password: String)
 
@@ -40,37 +34,28 @@ interface WebViewHttpAuthStore {
 }
 
 class RealWebViewHttpAuthStore(
-    private val dispatcherProvider: DispatcherProvider,
-    private val fireproofWebsiteDao: FireproofWebsiteDao,
-    private val httpAuthDao: HttpAuthDao
+    private val webViewDatabase: WebViewDatabase
 ) : WebViewHttpAuthStore {
     override fun setHttpAuthUsernamePassword(webView: WebView, host: String, realm: String, username: String, password: String) {
-        runBlocking {
-            withContext(dispatcherProvider.io()) {
-                httpAuthDao.insert(
-                    HttpAuthEntity(
-                        host = host,
-                        realm = realm,
-                        username = username,
-                        password = password
-                    )
-                )
-            }
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            webViewDatabase.setHttpAuthUsernamePassword(host, realm, username, password)
+        } else {
+            webView.setHttpAuthUsernamePassword(host, realm, username, password)
         }
     }
 
     override fun getHttpAuthUsernamePassword(webView: WebView, host: String, realm: String): WebViewHttpAuthCredentials? {
-        return runBlocking(dispatcherProvider.io()) {
-            val credentials = httpAuthDao.getAuthCredentials(host = host, realm = realm) ?: return@runBlocking null
-            if (credentials.username == null || credentials.password == null) return@runBlocking null
-            return@runBlocking WebViewHttpAuthCredentials(credentials.username!!, credentials.password!!)
-        }
+        val credentials = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            webViewDatabase.getHttpAuthUsernamePassword(host, realm)
+        } else {
+            @Suppress("DEPRECATION")
+            webView.getHttpAuthUsernamePassword(host, realm)
+        } ?: return null
+
+        return WebViewHttpAuthCredentials(username = credentials[0], password = credentials[1])
     }
 
     override fun clearHttpAuthUsernamePassword(webView: WebView) {
-        runBlocking(dispatcherProvider.io()) {
-            val exclusions = fireproofWebsiteDao.fireproofWebsitesSync().map { it.website() }
-            httpAuthDao.deleteAll(exclusions)
-        }
+        webViewDatabase.clearHttpAuthUsernamePassword()
     }
 }
