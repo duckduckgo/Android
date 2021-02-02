@@ -25,6 +25,7 @@ import com.duckduckgo.app.browser.DownloadConfirmationFragment
 import com.duckduckgo.app.browser.rating.ui.AppEnjoymentDialogFragment
 import com.duckduckgo.app.browser.rating.ui.GiveFeedbackDialogFragment
 import com.duckduckgo.app.browser.rating.ui.RateAppDialogFragment
+import com.duckduckgo.app.device_shield.DeviceShieldExclusionListActivity
 import com.duckduckgo.app.feedback.ui.common.FeedbackActivity
 import com.duckduckgo.app.feedback.ui.initial.InitialFeedbackFragment
 import com.duckduckgo.app.feedback.ui.negative.brokensite.BrokenSiteNegativeFeedbackFragment
@@ -146,6 +147,10 @@ abstract class AndroidBindingModule {
     @ActivityScoped
     @ContributesAndroidInjector
     abstract fun globalPrivacyControlActivity(): GlobalPrivacyControlActivity
+
+    @ActivityScoped
+    @ContributesAndroidInjector
+    abstract fun deviceShieldExclusionListActivity(): DeviceShieldExclusionListActivity
 
     /* Fragments */
 

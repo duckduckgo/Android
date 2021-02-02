@@ -32,7 +32,6 @@ import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.logindetection.NavigationAwareLoginDetector
 import com.duckduckgo.app.browser.omnibar.QueryUrlConverter
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
-import com.duckduckgo.app.cta.db.DismissedCtaDao
 import com.duckduckgo.app.cta.ui.CtaViewModel
 import com.duckduckgo.app.feedback.api.FeedbackSubmitter
 import com.duckduckgo.app.feedback.ui.common.FeedbackViewModel
@@ -40,25 +39,25 @@ import com.duckduckgo.app.feedback.ui.initial.InitialFeedbackFragmentViewModel
 import com.duckduckgo.app.feedback.ui.negative.brokensite.BrokenSiteNegativeFeedbackViewModel
 import com.duckduckgo.app.feedback.ui.negative.openended.ShareOpenEndedNegativeFeedbackViewModel
 import com.duckduckgo.app.feedback.ui.positive.initial.PositiveFeedbackLandingViewModel
-import com.duckduckgo.app.fire.FireAnimationLoader
 import com.duckduckgo.app.fire.DataClearer
+import com.duckduckgo.app.fire.FireAnimationLoader
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepository
 import com.duckduckgo.app.fire.fireproofwebsite.ui.FireproofWebsitesViewModel
+import com.duckduckgo.app.global.events.db.UserEventsStore
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.model.SiteFactory
 import com.duckduckgo.app.global.rating.AppEnjoymentPromptEmitter
 import com.duckduckgo.app.global.rating.AppEnjoymentUserEventRecorder
-import com.duckduckgo.app.global.events.db.UserEventsStore
 import com.duckduckgo.app.global.useourapp.UseOurAppDetector
 import com.duckduckgo.app.globalprivacycontrol.GlobalPrivacyControl
 import com.duckduckgo.app.globalprivacycontrol.ui.GlobalPrivacyControlViewModel
 import com.duckduckgo.app.icon.api.IconModifier
 import com.duckduckgo.app.icon.ui.ChangeIconViewModel
 import com.duckduckgo.app.launch.LaunchViewModel
-import com.duckduckgo.app.notification.db.NotificationDao
 import com.duckduckgo.app.location.GeoLocationPermissions
 import com.duckduckgo.app.location.data.LocationPermissionsRepository
 import com.duckduckgo.app.location.ui.LocationPermissionsViewModel
+import com.duckduckgo.app.notification.db.NotificationDao
 import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.onboarding.ui.OnboardingPageManager
 import com.duckduckgo.app.onboarding.ui.OnboardingViewModel
@@ -82,7 +81,7 @@ import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel
 import com.duckduckgo.app.usage.search.SearchCountDao
 import com.duckduckgo.app.widget.ui.AddWidgetInstructionsViewModel
-import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
+import com.duckduckgo.mobile.android.vpn.exclusions.DeviceShieldExcludedApps
 import javax.inject.Inject
 
 @Suppress("UNCHECKED_CAST")
@@ -131,7 +130,9 @@ class ViewModelFactory @Inject constructor(
     private val fileDownloader: FileDownloader,
     private val dispatcherProvider: DispatcherProvider,
     private val fireAnimationLoader: FireAnimationLoader,
-    private val globalPrivacyControl: GlobalPrivacyControl
+    private val globalPrivacyControl: GlobalPrivacyControl,
+    private val context: Context,
+    private val deviceShieldExcludedApps: DeviceShieldExcludedApps
 ) : ViewModelProvider.NewInstanceFactory() {
 
     override fun <T : ViewModel> create(modelClass: Class<T>) =
@@ -174,11 +175,13 @@ class ViewModelFactory @Inject constructor(
 
     private fun settingsViewModel(): SettingsViewModel {
         return SettingsViewModel(
+            context,
             appSettingsPreferencesStore,
             defaultBrowserDetector,
             variantManager,
             fireAnimationLoader,
-            pixel
+            pixel,
+            deviceShieldExcludedApps
         )
     }
 

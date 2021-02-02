@@ -16,8 +16,8 @@
 
 package com.duckduckgo.app.settings
 
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
+import android.content.Context
+import androidx.lifecycle.*
 import com.duckduckgo.app.browser.BuildConfig
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.fire.FireAnimationLoader
@@ -34,16 +34,26 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelName
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.*
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.FIRE_ANIMATION
+import com.duckduckgo.mobile.android.vpn.exclusions.DeviceShieldExcludedApps
+import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
 
 class SettingsViewModel @Inject constructor(
+    private val appContext: Context,
     private val settingsDataStore: SettingsDataStore,
     private val defaultWebBrowserCapability: DefaultBrowserDetector,
     private val variantManager: VariantManager,
     private val fireAnimationLoader: FireAnimationLoader,
-    private val pixel: Pixel
-) : ViewModel() {
+    private val pixel: Pixel,
+    private val deviceShieldExcludedApps: DeviceShieldExcludedApps
+) : ViewModel(), LifecycleObserver {
+
+    private var deviceShieldStatePollingJob: Job? = null
 
     data class ViewState(
         val loading: Boolean = true,
@@ -55,7 +65,9 @@ class SettingsViewModel @Inject constructor(
         val selectedFireAnimation: FireAnimation = FireAnimation.HeroFire,
         val automaticallyClearData: AutomaticallyClearData = AutomaticallyClearData(ClearWhatOption.CLEAR_NONE, ClearWhenOption.APP_EXIT_ONLY),
         val appIcon: AppIcon = AppIcon.DEFAULT,
-        val globalPrivacyControlEnabled: Boolean = false
+        val globalPrivacyControlEnabled: Boolean = false,
+        val deviceShieldEnabled: Boolean = false,
+        val excludedAppsInfo: String = ""
     )
 
     data class AutomaticallyClearData(
@@ -72,7 +84,10 @@ class SettingsViewModel @Inject constructor(
         object LaunchAppIcon : Command()
         object LaunchFireAnimationSettings : Command()
         object LaunchGlobalPrivacyControl : Command()
+        object LaunchExcludedAppList : Command()
         object UpdateTheme : Command()
+        object StartDeviceShield : Command()
+        object StopDeviceShield : Command()
     }
 
     val viewState: MutableLiveData<ViewState> = MutableLiveData<ViewState>().apply {
@@ -103,8 +118,40 @@ class SettingsViewModel @Inject constructor(
             automaticallyClearData = AutomaticallyClearData(automaticallyClearWhat, automaticallyClearWhen, automaticallyClearWhenEnabled),
             appIcon = settingsDataStore.appIcon,
             selectedFireAnimation = settingsDataStore.selectedFireAnimation,
-            globalPrivacyControlEnabled = settingsDataStore.globalPrivacyControlEnabled
+            globalPrivacyControlEnabled = settingsDataStore.globalPrivacyControlEnabled,
+            deviceShieldEnabled = TrackerBlockingVpnService.isServiceRunning(appContext),
+            excludedAppsInfo = getExcludedAppsInfo()
         )
+    }
+
+    @OnLifecycleEvent(Lifecycle.Event.ON_START)
+    fun pollDeviceShieldState() {
+        deviceShieldStatePollingJob = viewModelScope.launch {
+            while (isActive) {
+                val isDeviceShieldEnabled = TrackerBlockingVpnService.isServiceRunning(appContext)
+                if (currentViewState().deviceShieldEnabled != isDeviceShieldEnabled) {
+                    viewState.value = currentViewState().copy(
+                        deviceShieldEnabled = isDeviceShieldEnabled
+                    )
+                }
+                delay(1_000)
+            }
+        }
+    }
+
+    @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
+    fun stopPollingDeviceShieldState() {
+        deviceShieldStatePollingJob?.cancel()
+    }
+
+    private fun getExcludedAppsInfo(): String {
+        val apps = deviceShieldExcludedApps.getExcludedApps()
+        return when(apps.size) {
+            0 -> "None"
+            1 -> apps.first().name
+            2 -> "${apps.first().name} and ${apps.take(2)[1].name}"
+            else -> "${apps.first().name}, ${apps.take(2)[1].name} and more"
+        }
     }
 
     fun userRequestedToSendFeedback() {
@@ -122,6 +169,10 @@ class SettingsViewModel @Inject constructor(
 
     fun onFireproofWebsitesClicked() {
         command.value = Command.LaunchFireproofWebsites
+    }
+
+    fun onExcludedAppsClicked() {
+        command.value = Command.LaunchExcludedAppList
     }
 
     fun onLocationClicked() {
@@ -146,6 +197,11 @@ class SettingsViewModel @Inject constructor(
         Timber.i("User changed autocomplete setting, is now enabled: $enabled")
         settingsDataStore.autoCompleteSuggestionsEnabled = enabled
         viewState.value = currentViewState().copy(autoCompleteSuggestionsEnabled = enabled)
+    }
+
+    fun onDeviceShieldSettingChanged(enabled: Boolean) {
+        Timber.i("Device Shield, is now enabled: $enabled")
+        command.value = if (enabled) Command.StartDeviceShield else Command.StopDeviceShield
     }
 
     private fun obtainVersion(variantKey: String): String {

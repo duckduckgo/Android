@@ -28,6 +28,7 @@ import android.net.VpnService
 import android.os.*
 import androidx.core.app.NotificationManagerCompat
 import com.duckduckgo.mobile.android.vpn.di.VpnCoroutineScope
+import com.duckduckgo.mobile.android.vpn.exclusions.DeviceShieldExcludedApps
 import com.duckduckgo.mobile.android.vpn.model.VpnTrackerAndCompany
 import com.duckduckgo.mobile.android.vpn.model.dateOfLastHour
 import com.duckduckgo.mobile.android.vpn.processor.TunPacketReader
@@ -78,6 +79,9 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
 
     @Inject
     lateinit var vpnPreferences: VpnPreferences
+
+    @Inject
+    lateinit var deviceShieldExcludedApps: DeviceShieldExcludedApps
 
     @Inject
     @VpnCoroutineScope
@@ -239,7 +243,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
                 safelyAddAllowedApps(INCLUDED_APPS_FOR_TESTING)
                 Timber.w("Limiting VPN to test apps only:\n${INCLUDED_APPS_FOR_TESTING.joinToString(separator = "\n") { it }}")
             } else {
-                safelyAddDisallowedApps(EXCLUDED_APPS)
+                safelyAddDisallowedApps(deviceShieldExcludedApps.getExclusionList())
             }
 
             establish()

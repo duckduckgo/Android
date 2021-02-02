@@ -66,6 +66,7 @@
         <item name="websiteListFaviconBackground">@color/almostBlack</item>
         <item name="bookmarkTitleTextColor">@color/white</item>
         <item name="fireproofWebsiteTitleTextColor">@color/white</item>
+        <item name="deviceShieldExcludedAppNameTextColor">@color/white</item>
         <item name="bookmarkSubtitleTextColor">@color/grayishTwo</item>
         <item name="settingsItemTextColor">@color/white</item>
         <item name="settingsItemTextColorDisabled">@color/warGreyTwo</item>
@@ -145,6 +146,7 @@
         <item name="whitelistTextColor">@color/almostBlack</item>
         <item name="websiteListFaviconBackground">@color/whiteSix</item>
         <item name="fireproofWebsiteTitleTextColor">@color/almostBlack</item>
+        <item name="deviceShieldExcludedAppNameTextColor">@color/almostBlack</item>
         <item name="bookmarkSubtitleTextColor">@color/warmerGray</item>
         <item name="settingsItemTextColor">@color/almostBlackDark</item>
         <item name="settingsItemTextColorDisabled">@color/pinkish_grey_two</item>

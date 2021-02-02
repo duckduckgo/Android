@@ -20,6 +20,7 @@ import android.app.Activity
 import android.app.ActivityOptions
 import android.content.Context
 import android.content.Intent
+import android.net.VpnService
 import android.os.Build
 import android.os.Bundle
 import android.view.View
@@ -29,6 +30,7 @@ import androidx.annotation.StringRes
 import androidx.lifecycle.Observer
 import com.duckduckgo.app.about.AboutDuckDuckGoActivity
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.device_shield.DeviceShieldExclusionListActivity
 import com.duckduckgo.app.feedback.ui.common.FeedbackActivity
 import com.duckduckgo.app.fire.fireproofwebsite.ui.FireproofWebsitesActivity
 import com.duckduckgo.app.global.DuckDuckGoActivity
@@ -46,10 +48,14 @@ import com.duckduckgo.app.settings.clear.ClearWhenOption
 import com.duckduckgo.app.settings.clear.FireAnimation
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelName
+import com.duckduckgo.mobile.android.vpn.exclusions.DeviceShieldExcludedApps
+import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
+import kotlinx.android.synthetic.main.content_settings_device_shield.*
 import kotlinx.android.synthetic.main.content_settings_general.*
 import kotlinx.android.synthetic.main.content_settings_other.*
 import kotlinx.android.synthetic.main.content_settings_privacy.*
 import kotlinx.android.synthetic.main.include_toolbar.*
+import timber.log.Timber
 import javax.inject.Inject
 
 class SettingsActivity :
@@ -61,6 +67,9 @@ class SettingsActivity :
     @Inject
     lateinit var pixel: Pixel
 
+    @Inject
+    lateinit var deviceShieldExcludedApps: DeviceShieldExcludedApps
+
     private val viewModel: SettingsViewModel by bindViewModel()
 
     private val defaultBrowserChangeListener = OnCheckedChangeListener { _, _ -> launchDefaultAppScreen() }
@@ -71,6 +80,10 @@ class SettingsActivity :
 
     private val autocompleteToggleListener = OnCheckedChangeListener { _, isChecked ->
         viewModel.onAutocompleteSettingChanged(isChecked)
+    }
+
+    private val deviceShieldToggleListener = OnCheckedChangeListener { _, isChecked ->
+        viewModel.onDeviceShieldSettingChanged(isChecked)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -102,6 +115,9 @@ class SettingsActivity :
         automaticallyClearWhatSetting.setOnClickListener { launchAutomaticallyClearWhatDialog() }
         automaticallyClearWhenSetting.setOnClickListener { launchAutomaticallyClearWhenDialog() }
         whitelist.setOnClickListener { viewModel.onManageWhitelistSelected() }
+
+        deviceShieldToggle.setOnCheckedChangeListener(deviceShieldToggleListener)
+        deviceShieldExcludedAppsText.setOnClickListener { viewModel.onExcludedAppsClicked() }
     }
 
     private fun observeViewModel() {
@@ -117,6 +133,8 @@ class SettingsActivity :
                     setGlobalPrivacyControlSetting(it.globalPrivacyControlEnabled)
                     changeAppIcon.setImageResource(it.appIcon.icon)
                     updateSelectedFireAnimation(it.selectedFireAnimation)
+                    deviceShieldToggle.quietlySetIsChecked(it.deviceShieldEnabled, deviceShieldToggleListener)
+                    deviceShieldExcludedAppsText.setSubtitle(it.excludedAppsInfo)
                 }
             }
         )
@@ -127,6 +145,8 @@ class SettingsActivity :
                 processCommand(it)
             }
         )
+
+        lifecycle.addObserver(viewModel)
     }
 
     private fun setGlobalPrivacyControlSetting(enabled: Boolean) {
@@ -174,9 +194,41 @@ class SettingsActivity :
             is Command.LaunchWhitelist -> launchWhitelist()
             is Command.LaunchAppIcon -> launchAppIconChange()
             is Command.LaunchGlobalPrivacyControl -> launchGlobalPrivacyControl()
+            is Command.LaunchExcludedAppList -> launchExcludedAppList()
             is Command.UpdateTheme -> sendThemeChangedBroadcast()
             is Command.LaunchFireAnimationSettings -> launchFireAnimationSelector()
+            is Command.StartDeviceShield -> startVpnIfAllowed()
+            is Command.StopDeviceShield -> stopDeviceShield()
         }
+    }
+
+    private fun checkVpnPermission(): VpnPermissionStatus {
+        val intent = VpnService.prepare(this)
+        return if (intent == null) {
+            VpnPermissionStatus.Granted
+        } else {
+            VpnPermissionStatus.Denied(intent)
+        }
+    }
+
+    private fun startVpnIfAllowed() {
+        when (val permissionStatus = checkVpnPermission()) {
+            is VpnPermissionStatus.Granted -> startDeviceShield()
+            is VpnPermissionStatus.Denied -> obtainVpnRequestPermission(permissionStatus.intent)
+        }
+    }
+
+    @Suppress("DEPRECATION")
+    private fun obtainVpnRequestPermission(intent: Intent) {
+        startActivityForResult(intent, RC_REQUEST_VPN_PERMISSION)
+    }
+
+    private fun startDeviceShield() {
+        startService(TrackerBlockingVpnService.startIntent(this))
+    }
+
+    private fun stopDeviceShield() {
+        startService(TrackerBlockingVpnService.stopIntent(this))
     }
 
     private fun updateDefaultBrowserViewVisibility(it: SettingsViewModel.ViewState) {
@@ -231,6 +283,11 @@ class SettingsActivity :
         startActivity(GlobalPrivacyControlActivity.intent(this), options)
     }
 
+    private fun launchExcludedAppList() {
+        val options = ActivityOptions.makeSceneTransitionAnimation(this).toBundle()
+        startActivity(DeviceShieldExclusionListActivity.intent(this), options)
+    }
+
     override fun onAutomaticallyClearWhatOptionSelected(clearWhatSetting: ClearWhatOption) {
         viewModel.onAutomaticallyWhatOptionSelected(clearWhatSetting)
     }
@@ -243,11 +300,26 @@ class SettingsActivity :
         viewModel.onFireAnimationSelected(selectedFireAnimation)
     }
 
+    @Suppress("DEPRECATION")
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        if (requestCode == FEEDBACK_REQUEST_CODE) {
-            handleFeedbackResult(resultCode)
+        when (requestCode) {
+            RC_REQUEST_VPN_PERMISSION -> handleVpnPermissionResult(resultCode)
+            FEEDBACK_REQUEST_CODE -> handleFeedbackResult(resultCode)
+            else -> super.onActivityResult(requestCode, resultCode, data)
         }
-        super.onActivityResult(requestCode, resultCode, data)
+    }
+
+    private fun handleVpnPermissionResult(resultCode: Int) {
+        when (resultCode) {
+            Activity.RESULT_CANCELED -> {
+                Timber.i("User cancelled and refused VPN permission")
+                deviceShieldToggle.quietlySetIsChecked(false, deviceShieldToggleListener)
+            }
+            Activity.RESULT_OK -> {
+                Timber.i("User granted VPN permission")
+                startDeviceShield()
+            }
+        }
     }
 
     private fun handleFeedbackResult(resultCode: Int) {
@@ -277,12 +349,18 @@ class SettingsActivity :
         }
     }
 
+    private sealed class VpnPermissionStatus {
+        object Granted : VpnPermissionStatus()
+        data class Denied(val intent: Intent) : VpnPermissionStatus()
+    }
+
     companion object {
         private const val FIRE_ANIMATION_SELECTOR_TAG = "FIRE_ANIMATION_SELECTOR_DIALOG_FRAGMENT"
         private const val CLEAR_WHAT_DIALOG_TAG = "CLEAR_WHAT_DIALOG_FRAGMENT"
         private const val CLEAR_WHEN_DIALOG_TAG = "CLEAR_WHEN_DIALOG_FRAGMENT"
         private const val FEEDBACK_REQUEST_CODE = 100
         private const val CHANGE_APP_ICON_REQUEST_CODE = 101
+        private const val RC_REQUEST_VPN_PERMISSION = 102
 
         fun intent(context: Context): Intent {
             return Intent(context, SettingsActivity::class.java)

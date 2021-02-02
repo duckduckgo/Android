@@ -34,6 +34,8 @@ import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.Variant
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.mobile.android.vpn.exclusions.DeviceShieldApp
+import com.duckduckgo.mobile.android.vpn.exclusions.DeviceShieldExcludedApps
 import com.nhaarman.mockitokotlin2.*
 import org.junit.Assert.*
 import org.junit.Before
@@ -70,6 +72,9 @@ class SettingsViewModelTest {
     @Mock
     private lateinit var mockFireAnimationLoader: FireAnimationLoader
 
+    @Mock
+    private lateinit var mockDeviceShieldExcludedApps: DeviceShieldExcludedApps
+
     private lateinit var commandCaptor: KArgumentCaptor<Command>
 
     @Before
@@ -79,7 +84,14 @@ class SettingsViewModelTest {
         context = InstrumentationRegistry.getInstrumentation().targetContext
         commandCaptor = argumentCaptor()
 
-        testee = SettingsViewModel(mockAppSettingsDataStore, mockDefaultBrowserDetector, mockVariantManager, mockFireAnimationLoader, mockPixel)
+        testee = SettingsViewModel(
+            context,
+            mockAppSettingsDataStore,
+            mockDefaultBrowserDetector,
+            mockVariantManager,
+            mockFireAnimationLoader,
+            mockPixel,
+            mockDeviceShieldExcludedApps)
         testee.command.observeForever(commandObserver)
 
         whenever(mockAppSettingsDataStore.automaticallyClearWhenOption).thenReturn(APP_EXIT_ONLY)
@@ -124,6 +136,70 @@ class SettingsViewModelTest {
     }
 
     @Test
+    fun whenStartCalledAndZeroExcludedAppsThenExcludedAppsInfoIsCorrect() {
+        whenever(mockDeviceShieldExcludedApps.getExcludedApps()).thenReturn(listOf())
+        testee.start()
+        assertEquals("None", latestViewState().excludedAppsInfo)
+    }
+
+    @Test
+    fun whenStartCalledAndOneExcludedAppsThenExcludedAppsInfoIsCorrect() {
+        whenever(mockDeviceShieldExcludedApps.getExcludedApps())
+            .thenReturn(listOf(
+                DeviceShieldApp(
+                    name = "foo",
+                    packageName = "foo.com",
+                    type = null
+                )
+            ))
+        testee.start()
+        assertEquals("foo", latestViewState().excludedAppsInfo)
+    }
+
+    @Test
+    fun whenStartCalledAndTwoExcludedAppsThenExcludedAppsInfoIsCorrect() {
+        whenever(mockDeviceShieldExcludedApps.getExcludedApps())
+            .thenReturn(listOf(
+                DeviceShieldApp(
+                    name = "foo",
+                    packageName = "foo.com",
+                    type = null
+                ),
+                DeviceShieldApp(
+                    name = "bar",
+                    packageName = "bar.com",
+                    type = null
+                )
+            ))
+        testee.start()
+        assertEquals("foo and bar", latestViewState().excludedAppsInfo)
+    }
+
+    @Test
+    fun whenStartCalledAndThreeOrMoreExcludedAppsThenExcludedAppsInfoIsCorrect() {
+        whenever(mockDeviceShieldExcludedApps.getExcludedApps())
+            .thenReturn(listOf(
+                DeviceShieldApp(
+                    name = "foo",
+                    packageName = "foo.com",
+                    type = null
+                ),
+                DeviceShieldApp(
+                    name = "bar",
+                    packageName = "bar.com",
+                    type = null
+                ),
+                DeviceShieldApp(
+                    name = "baz",
+                    packageName = "baz.com",
+                    type = null
+                )
+            ))
+        testee.start()
+        assertEquals("foo, bar and more", latestViewState().excludedAppsInfo)
+    }
+
+    @Test
     fun whenLightThemeToggledOnThenDataStoreIsUpdatedAndUpdateThemeCommandIsSent() {
         testee.onLightThemeToggled(true)
         verify(mockAppSettingsDataStore).theme = DuckDuckGoTheme.LIGHT
@@ -165,6 +241,30 @@ class SettingsViewModelTest {
     fun whenAutocompleteSwitchedOffThenDataStoreIsUpdated() {
         testee.onAutocompleteSettingChanged(false)
         verify(mockAppSettingsDataStore).autoCompleteSuggestionsEnabled = false
+    }
+
+    @Test
+    fun whenDeviceShieldIsOffThenCommandIsStopDeviceShield() {
+        testee.onDeviceShieldSettingChanged(false)
+        testee.command.blockingObserve()
+        verify(commandObserver).onChanged(commandCaptor.capture())
+        assertEquals(Command.StopDeviceShield, commandCaptor.firstValue)
+    }
+
+    @Test
+    fun whenExcludedAppClickedThenCommandIsLaunchExcludedAppList() {
+        testee.onExcludedAppsClicked()
+        testee.command.blockingObserve()
+        verify(commandObserver).onChanged(commandCaptor.capture())
+        assertEquals(Command.LaunchExcludedAppList, commandCaptor.firstValue)
+    }
+
+    @Test
+    fun whenDeviceShieldIsOnThenCommandIsStopDeviceShield() {
+        testee.onDeviceShieldSettingChanged(true)
+        testee.command.blockingObserve()
+        verify(commandObserver).onChanged(commandCaptor.capture())
+        assertEquals(Command.StartDeviceShield, commandCaptor.firstValue)
     }
 
     @Test

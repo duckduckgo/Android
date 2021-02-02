@@ -33,7 +33,7 @@ class PrivacyReportViewModel(
     private val repository: AppTrackerBlockingStatsRepository,
     private val vpnPreferences: VpnPreferences,
     private val applicationContext: Context
-) : ViewModel() {
+) : ViewModel(), LifecycleObserver {
 
     private var vpnUpdateJob: Job? = null
     private val _vpnRunning = MutableLiveData<Boolean>()
@@ -41,7 +41,8 @@ class PrivacyReportViewModel(
     val vpnRunning: LiveData<Boolean>
         get() = _vpnRunning
 
-    fun onCreate() {
+    @OnLifecycleEvent(Lifecycle.Event.ON_START)
+    fun pollDeviceShieldState() {
         vpnUpdateJob?.cancel()
         vpnUpdateJob = viewModelScope.launch {
             while (isActive) {
@@ -51,7 +52,8 @@ class PrivacyReportViewModel(
         }
     }
 
-    fun onStop() {
+    @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
+    fun stopPollingDeviceShieldState() {
         vpnUpdateJob?.cancel()
     }
 

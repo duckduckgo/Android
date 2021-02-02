@@ -117,13 +117,13 @@ class DeviceShieldFragment : Fragment() {
     }
 
     private fun observeViewModel() {
-        viewModel.onCreate()
         viewModel.vpnRunning.observe(this) {
             renderVpnEnabledState(it)
         }
         viewModel.getReport().observe(this) {
             renderTrackersBlocked(it.trackerList)
         }
+        lifecycle.addObserver(viewModel)
     }
 
     private val deviceShieldSwitchListener = CompoundButton.OnCheckedChangeListener { _, checked ->

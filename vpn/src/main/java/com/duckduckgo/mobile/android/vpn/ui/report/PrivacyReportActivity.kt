@@ -86,11 +86,6 @@ class PrivacyReportActivity : AppCompatActivity(R.layout.activity_vpn_privacy_re
         observeViewModel()
     }
 
-    override fun onStop() {
-        viewModel.onStop()
-        super.onStop()
-    }
-
     @Suppress("DEPRECATION")
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         when (requestCode) {
@@ -166,13 +161,13 @@ class PrivacyReportActivity : AppCompatActivity(R.layout.activity_vpn_privacy_re
     }
 
     private fun observeViewModel() {
-        viewModel.onCreate()
         viewModel.getReport().observe(this) {
             renderTrackersBlocked(it.totalCompanies, it.trackerList)
         }
         viewModel.vpnRunning.observe(this) {
             renderVpnEnabledState(it)
         }
+        lifecycle.addObserver(viewModel)
     }
 
     private fun handleVpnPermissionResult(resultCode: Int) {
