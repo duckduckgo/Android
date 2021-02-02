@@ -318,6 +318,22 @@ class AppDatabaseTest {
     }
 
     @Test
+    fun whenMigratingFromVersion29To30ThenValidationSucceeds() {
+        createDatabaseAndMigrate(29, 30, migrationsProvider.MIGRATION_29_TO_30).use {
+            it.execSQL("INSERT INTO `bookmarks` values (1,'duckduckgo','https://duckduckgo.com/') ")
+            it.execSQL("INSERT INTO `bookmarks` values (2,'duckduckgo','https://duckduckgo.com/') ")
+            it.execSQL("INSERT INTO `bookmarks` values (3,'opensource','https://opensource.com/') ")
+
+            val bookmarkCount = it.query("select count(*) from bookmarks").run {
+                moveToFirst()
+                getInt(0)
+            }
+
+            assertEquals(2, bookmarkCount)
+        }
+    }
+
+    @Test
     fun whenMigratingFromVersion28To29IfUserStageIsDaxOnboardingThenMigrateToEstablished() {
         testHelper.createDatabase(TEST_DB_NAME, 28).use {
             givenUserStageIs(it, AppStage.DAX_ONBOARDING)

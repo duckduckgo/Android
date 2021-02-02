@@ -20,6 +20,7 @@ import android.annotation.SuppressLint
 import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Message
+import android.util.Patterns
 import android.view.ContextMenu
 import android.view.MenuItem
 import android.view.View
@@ -548,7 +549,7 @@ class BrowserTabViewModel(
 
         if (oldQuery == newQuery) {
             pixel.fire(String.format(Locale.US, PixelName.SERP_REQUERY.pixelName, PixelParameter.SERP_QUERY_NOT_CHANGED))
-        } else {
+        } else if (oldQuery.toString().isNotBlank()) { // blank means no previous search, don't send pixel
             pixel.fire(String.format(Locale.US, PixelName.SERP_REQUERY.pixelName, PixelParameter.SERP_QUERY_CHANGED))
         }
     }
@@ -561,11 +562,12 @@ class BrowserTabViewModel(
     private suspend fun removeCurrentTabFromRepository() {
         val currentTab = tabRepository.liveSelectedTab.value
         currentTab?.let {
-            tabRepository.deleteCurrentTabAndSelectSource()
+            tabRepository.delete(currentTab)
         }
     }
 
     override fun willOverrideUrl(newUrl: String) {
+        navigationAwareLoginDetector.onEvent(NavigationEvent.Redirect(newUrl))
         val previousSiteStillLoading = currentLoadingViewState().isLoading
         if (previousSiteStillLoading) {
             showBlankContentfNewContentDelayed()
@@ -625,6 +627,10 @@ class BrowserTabViewModel(
     }
 
     fun onRefreshRequested() {
+        val omnibarContent = currentOmnibarViewState().omnibarText
+        if (!Patterns.WEB_URL.matcher(omnibarContent).matches()) {
+            fireQueryChangedPixel(currentOmnibarViewState().omnibarText)
+        }
         navigationAwareLoginDetector.onEvent(NavigationEvent.UserAction.Refresh)
         if (currentGlobalLayoutState() is Invalidated) {
             recoverTabWithQuery(url.orEmpty())
@@ -921,6 +927,7 @@ class BrowserTabViewModel(
     override fun progressChanged(newProgress: Int) {
         Timber.v("Loading in progress $newProgress")
         if (!currentBrowserViewState().browserShowing) return
+
         val isLoading = newProgress < 100
         val progress = currentLoadingViewState()
         if (progress.progress == newProgress) return
@@ -934,6 +941,7 @@ class BrowserTabViewModel(
 
         val showLoadingGrade = progress.privacyOn || isLoading
         privacyGradeViewState.value = currentPrivacyGradeState().copy(shouldAnimate = isLoading, showEmptyGrade = showLoadingGrade)
+
         if (newProgress == 100) {
             command.value = RefreshUserAgent(url, currentBrowserViewState().isDesktopBrowsingMode)
             navigationAwareLoginDetector.onEvent(NavigationEvent.PageFinished)

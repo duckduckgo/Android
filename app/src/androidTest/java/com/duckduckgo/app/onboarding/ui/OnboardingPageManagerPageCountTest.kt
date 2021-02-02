@@ -17,8 +17,8 @@
 package com.duckduckgo.app.onboarding.ui
 
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
+import com.duckduckgo.app.global.DefaultRoleBrowserDialog
 import com.duckduckgo.app.statistics.Variant
-import com.duckduckgo.app.statistics.VariantManager
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.whenever
 import org.junit.Assert.assertEquals
@@ -33,11 +33,11 @@ class OnboardingPageManagerPageCountTest(private val testCase: TestCase) {
     private lateinit var testee: OnboardingPageManager
     private val onboardingPageBuilder: OnboardingPageBuilder = mock()
     private val mockDefaultBrowserDetector: DefaultBrowserDetector = mock()
-    private val variantManager: VariantManager = mock()
+    private val defaultRoleBrowserDialog: DefaultRoleBrowserDialog = mock()
 
     @Before
     fun setup() {
-        testee = OnboardingPageManagerWithTrackerBlocking(variantManager, onboardingPageBuilder, mockDefaultBrowserDetector)
+        testee = OnboardingPageManagerWithTrackerBlocking(defaultRoleBrowserDialog, onboardingPageBuilder, mockDefaultBrowserDetector)
     }
 
     @Test
@@ -49,7 +49,6 @@ class OnboardingPageManagerPageCountTest(private val testCase: TestCase) {
     }
 
     private fun configureDefaultBrowserPageConfig() {
-        whenever(variantManager.getVariant()).thenReturn(testCase.variant)
         if (testCase.defaultBrowserPage) {
             configureDeviceSupportsDefaultBrowser()
         } else {
@@ -60,20 +59,13 @@ class OnboardingPageManagerPageCountTest(private val testCase: TestCase) {
     companion object {
 
         private val otherVariant = Variant(key = "variant", features = listOf(), filterBy = { true })
-        private val defaultBrowserVariant = Variant(
-            key = "variant",
-            features = listOf(VariantManager.VariantFeature.SetDefaultBrowserDialog),
-            filterBy = { true }
-        )
 
         @JvmStatic
         @Parameterized.Parameters(name = "Test case: {index} - {0}")
         fun testData(): Array<TestCase> {
             return arrayOf(
                 TestCase(false, 1, otherVariant),
-                TestCase(true, 2, otherVariant),
-                TestCase(false, 1, defaultBrowserVariant),
-                TestCase(true, 1, defaultBrowserVariant)
+                TestCase(true, 2, otherVariant)
             )
         }
     }

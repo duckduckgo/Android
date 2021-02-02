@@ -19,7 +19,6 @@ package com.duckduckgo.app.global.view
 import android.content.Context
 import android.webkit.WebStorage
 import android.webkit.WebView
-import android.webkit.WebViewDatabase
 import androidx.annotation.UiThread
 import androidx.annotation.WorkerThread
 import com.duckduckgo.app.browser.WebDataManager
@@ -98,7 +97,7 @@ class ClearPersonalDataAction @Inject constructor(
             clearingStore.incrementCount()
         }
 
-        dataManager.clearData(createWebView(), createWebStorage(), WebViewDatabase.getInstance(context))
+        dataManager.clearData(createWebView(), createWebStorage())
         appCacheClearer.clearCache()
 
         Timber.i("Finished clearing data")

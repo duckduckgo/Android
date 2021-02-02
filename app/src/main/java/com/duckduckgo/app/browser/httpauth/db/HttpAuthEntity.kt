@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 DuckDuckGo
+ * Copyright (c) 2020 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,21 +14,17 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.bookmarks.db
+package com.duckduckgo.app.browser.httpauth.db
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
-/**
- * If modify please consider following instructions carefully
- *
- * Every time  we change BookmarkEntity we also need to change check (and probably change)
- * @property com.duckduckgo.app.global.db.MigrationsProvider.BOOKMARKS_DB_ON_CREATE
- * which is located AppDatabase.kt
- */
-@Entity(tableName = "bookmarks")
-data class BookmarkEntity(
-    @PrimaryKey(autoGenerate = true) var id: Long = 0,
-    var title: String?,
-    var url: String
+// CREATE TABLE httpauth (_id INTEGER PRIMARY KEY, host TEXT, realm TEXT, username TEXT, password TEXT, UNIQUE (host, realm) ON CONFLICT REPLACE);
+@Entity(tableName = "httpauth")
+data class HttpAuthEntity(
+    @PrimaryKey(autoGenerate = true) var _id: Long? = null,
+    var host: String?,
+    var realm: String?,
+    var username: String?,
+    var password: String?,
 )

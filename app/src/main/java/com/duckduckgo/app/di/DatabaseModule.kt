@@ -18,7 +18,13 @@ package com.duckduckgo.app.di
 
 import android.content.Context
 import androidx.room.Room
+import androidx.room.RoomDatabase
 import com.duckduckgo.app.browser.addtohome.AddToHomeCapabilityDetector
+import com.duckduckgo.app.browser.httpauth.RealWebViewHttpAuthStore
+import com.duckduckgo.app.browser.httpauth.WebViewHttpAuthStore
+import com.duckduckgo.app.browser.httpauth.db.HttpAuthDatabase
+import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteDao
+import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.global.db.MigrationsProvider
 import com.duckduckgo.app.settings.db.SettingsDataStore
@@ -31,9 +37,24 @@ class DatabaseModule {
 
     @Provides
     @Singleton
+    fun provideWebViewHttpAuthStore(
+        context: Context,
+        fireproofWebsiteDao: FireproofWebsiteDao,
+        dispatcherProvider: DispatcherProvider
+    ): WebViewHttpAuthStore {
+        val httpAuthDb = Room.databaseBuilder(context, HttpAuthDatabase::class.java, "http_auth.db")
+            .setJournalMode(RoomDatabase.JournalMode.TRUNCATE)
+            .build()
+
+        return RealWebViewHttpAuthStore(dispatcherProvider, fireproofWebsiteDao, httpAuthDb.httpAuthDao())
+    }
+
+    @Provides
+    @Singleton
     fun provideDatabase(context: Context, migrationsProvider: MigrationsProvider): AppDatabase {
         return Room.databaseBuilder(context, AppDatabase::class.java, "app.db")
             .addMigrations(*migrationsProvider.ALL_MIGRATIONS.toTypedArray())
+            .addCallback(migrationsProvider.BOOKMARKS_DB_ON_CREATE)
             .build()
     }
 

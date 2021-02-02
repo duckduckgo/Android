@@ -26,6 +26,7 @@ import com.duckduckgo.app.global.DuckDuckGoApplication
 import com.duckduckgo.app.global.exception.UncaughtExceptionModule
 import com.duckduckgo.app.httpsupgrade.di.HttpsUpgraderModule
 import com.duckduckgo.app.onboarding.di.OnboardingModule
+import com.duckduckgo.app.onboarding.di.WelcomePageModule
 import com.duckduckgo.app.surrogates.di.ResourceSurrogateModule
 import com.duckduckgo.app.trackerdetection.di.TrackerDetectionModule
 import com.duckduckgo.app.usage.di.AppUsageModule
@@ -70,7 +71,8 @@ import javax.inject.Singleton
         UncaughtExceptionModule::class,
         PlayStoreReferralModule::class,
         CoroutinesModule::class,
-        CertificateTrustedStoreModule::class
+        CertificateTrustedStoreModule::class,
+        WelcomePageModule::class
     ]
 )
 interface AppComponent : AndroidInjector<DuckDuckGoApplication> {
