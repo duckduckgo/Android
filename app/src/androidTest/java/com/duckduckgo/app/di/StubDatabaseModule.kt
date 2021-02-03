@@ -17,12 +17,10 @@
 package com.duckduckgo.app.di
 
 import android.content.Context
+import android.webkit.WebViewDatabase
 import androidx.room.Room
 import com.duckduckgo.app.browser.httpauth.RealWebViewHttpAuthStore
 import com.duckduckgo.app.browser.httpauth.WebViewHttpAuthStore
-import com.duckduckgo.app.browser.httpauth.db.HttpAuthDatabase
-import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteDao
-import com.duckduckgo.app.global.DefaultDispatcherProvider
 import com.duckduckgo.app.global.db.AppDatabase
 import dagger.Module
 import dagger.Provides
@@ -43,12 +41,7 @@ class StubDatabaseModule {
     @Singleton
     fun provideWebViewHttpAuthStore(
         context: Context,
-        fireproofWebsiteDao: FireproofWebsiteDao
     ): WebViewHttpAuthStore {
-        val db = Room.inMemoryDatabaseBuilder(context, HttpAuthDatabase::class.java)
-            .allowMainThreadQueries()
-            .build()
-
-        return RealWebViewHttpAuthStore(DefaultDispatcherProvider(), fireproofWebsiteDao, db.httpAuthDao())
+        return RealWebViewHttpAuthStore(WebViewDatabase.getInstance(context))
     }
 }
