@@ -29,7 +29,9 @@ import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
 import kotlinx.android.synthetic.main.view_device_shield_excluded_app_entry.view.*
 
 class DeviceShieldExcludedAppView @JvmOverloads constructor(
-    context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
+    context: Context,
+    attrs: AttributeSet? = null,
+    defStyleAttr: Int = 0
 ) : FrameLayout(context, attrs, defStyleAttr) {
 
     private val root: View by lazy {

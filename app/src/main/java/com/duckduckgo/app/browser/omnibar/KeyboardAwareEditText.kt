@@ -21,8 +21,6 @@ import android.graphics.Rect
 import android.util.AttributeSet
 import android.view.KeyEvent
 import androidx.appcompat.widget.AppCompatEditText
-import com.duckduckgo.app.global.view.showKeyboard
-import timber.log.Timber
 
 /**
  * Variant of EditText which detects when the user has dismissed the soft keyboard

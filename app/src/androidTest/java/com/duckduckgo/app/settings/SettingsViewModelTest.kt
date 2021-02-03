@@ -91,7 +91,8 @@ class SettingsViewModelTest {
             mockVariantManager,
             mockFireAnimationLoader,
             mockPixel,
-            mockDeviceShieldExcludedApps)
+            mockDeviceShieldExcludedApps
+        )
         testee.command.observeForever(commandObserver)
 
         whenever(mockAppSettingsDataStore.automaticallyClearWhenOption).thenReturn(APP_EXIT_ONLY)
@@ -145,13 +146,15 @@ class SettingsViewModelTest {
     @Test
     fun whenStartCalledAndOneExcludedAppsThenExcludedAppsInfoIsCorrect() {
         whenever(mockDeviceShieldExcludedApps.getExcludedApps())
-            .thenReturn(listOf(
-                DeviceShieldApp(
-                    name = "foo",
-                    packageName = "foo.com",
-                    type = null
+            .thenReturn(
+                listOf(
+                    DeviceShieldApp(
+                        name = "foo",
+                        packageName = "foo.com",
+                        type = null
+                    )
                 )
-            ))
+            )
         testee.start()
         assertEquals("foo", latestViewState().excludedAppsInfo)
     }
@@ -159,18 +162,20 @@ class SettingsViewModelTest {
     @Test
     fun whenStartCalledAndTwoExcludedAppsThenExcludedAppsInfoIsCorrect() {
         whenever(mockDeviceShieldExcludedApps.getExcludedApps())
-            .thenReturn(listOf(
-                DeviceShieldApp(
-                    name = "foo",
-                    packageName = "foo.com",
-                    type = null
-                ),
-                DeviceShieldApp(
-                    name = "bar",
-                    packageName = "bar.com",
-                    type = null
+            .thenReturn(
+                listOf(
+                    DeviceShieldApp(
+                        name = "foo",
+                        packageName = "foo.com",
+                        type = null
+                    ),
+                    DeviceShieldApp(
+                        name = "bar",
+                        packageName = "bar.com",
+                        type = null
+                    )
                 )
-            ))
+            )
         testee.start()
         assertEquals("foo and bar", latestViewState().excludedAppsInfo)
     }
@@ -178,23 +183,25 @@ class SettingsViewModelTest {
     @Test
     fun whenStartCalledAndThreeOrMoreExcludedAppsThenExcludedAppsInfoIsCorrect() {
         whenever(mockDeviceShieldExcludedApps.getExcludedApps())
-            .thenReturn(listOf(
-                DeviceShieldApp(
-                    name = "foo",
-                    packageName = "foo.com",
-                    type = null
-                ),
-                DeviceShieldApp(
-                    name = "bar",
-                    packageName = "bar.com",
-                    type = null
-                ),
-                DeviceShieldApp(
-                    name = "baz",
-                    packageName = "baz.com",
-                    type = null
+            .thenReturn(
+                listOf(
+                    DeviceShieldApp(
+                        name = "foo",
+                        packageName = "foo.com",
+                        type = null
+                    ),
+                    DeviceShieldApp(
+                        name = "bar",
+                        packageName = "bar.com",
+                        type = null
+                    ),
+                    DeviceShieldApp(
+                        name = "baz",
+                        packageName = "baz.com",
+                        type = null
+                    )
                 )
-            ))
+            )
         testee.start()
         assertEquals("foo, bar and more", latestViewState().excludedAppsInfo)
     }

@@ -146,7 +146,7 @@ class SettingsViewModel @Inject constructor(
 
     private fun getExcludedAppsInfo(): String {
         val apps = deviceShieldExcludedApps.getExcludedApps()
-        return when(apps.size) {
+        return when (apps.size) {
             0 -> "None"
             1 -> apps.first().name
             2 -> "${apps.first().name} and ${apps.take(2)[1].name}"
