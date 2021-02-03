@@ -17,11 +17,9 @@
 package com.duckduckgo.app.browser.httpauth
 
 import android.webkit.WebView
+import android.webkit.WebViewDatabase
+import androidx.test.filters.SdkSuppress
 import com.duckduckgo.app.CoroutineTestRule
-import com.duckduckgo.app.browser.httpauth.db.HttpAuthDao
-import com.duckduckgo.app.browser.httpauth.db.HttpAuthEntity
-import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteDao
-import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.whenever
@@ -37,14 +35,14 @@ class WebViewHttpAuthStoreTest {
     @Suppress("unused")
     val coroutineRule = CoroutineTestRule()
 
-    private val fireproofWebsiteDao: FireproofWebsiteDao = mock()
-    private val httpAuthDao: HttpAuthDao = mock()
+    private val webViewDatabase: WebViewDatabase = mock()
     private val webView: WebView = mock()
 
-    private val webViewHttpAuthStore = RealWebViewHttpAuthStore(coroutineRule.testDispatcherProvider, fireproofWebsiteDao, httpAuthDao)
+    private val webViewHttpAuthStore = RealWebViewHttpAuthStore(webViewDatabase)
 
     @Test
-    fun whenSetHttpAuthUsernamePasswordThenInsertHttpAuthEntity() {
+    @SdkSuppress(minSdkVersion = android.os.Build.VERSION_CODES.O)
+    fun whenSetHttpAuthUsernamePasswordApi26AndAboveThenInsertHttpAuthEntity() {
         webViewHttpAuthStore.setHttpAuthUsernamePassword(
             webView = webView,
             host = "host",
@@ -53,32 +51,42 @@ class WebViewHttpAuthStoreTest {
             password = "pass",
         )
 
-        verify(httpAuthDao).insert(
-            HttpAuthEntity(
-                host = "host",
-                realm = "realm",
-                username = "name",
-                password = "pass"
-            )
-        )
+        verify(webViewDatabase).setHttpAuthUsernamePassword("host", "realm", "name", "pass")
     }
 
     @Test
-    fun whenGetHttpAuthUsernamePasswordThenReturnWebViewHttpAuthCredentials() {
-        whenever(httpAuthDao.getAuthCredentials("host", "realm"))
-            .thenReturn(HttpAuthEntity(1, "host", "realm", "name", "pass"))
+    @SdkSuppress(minSdkVersion = android.os.Build.VERSION_CODES.O)
+    fun whenGetHttpAuthUsernamePasswordApi26AndAboveThenReturnWebViewHttpAuthCredentials() {
+        whenever(webViewDatabase.getHttpAuthUsernamePassword("host", "realm"))
+            .thenReturn(arrayOf("name", "pass"))
         val credentials = webViewHttpAuthStore.getHttpAuthUsernamePassword(webView, "host", "realm")
 
         assertEquals(WebViewHttpAuthCredentials("name", "pass"), credentials)
     }
 
     @Test
-    fun whenClearHttpAuthUsernamePasswordThenDeleteAllCredentialsExceptExclusions() {
-        whenever(fireproofWebsiteDao.fireproofWebsitesSync())
-            .thenReturn(listOf(FireproofWebsiteEntity("http://fireproofed.me")))
+    @SdkSuppress(maxSdkVersion = android.os.Build.VERSION_CODES.N_MR1)
+    @Suppress("DEPRECATION")
+    fun whenSetHttpAuthUsernamePasswordApiBelow26ThenInsertHttpAuthEntity() {
+        webViewHttpAuthStore.setHttpAuthUsernamePassword(
+            webView = webView,
+            host = "host",
+            realm = "realm",
+            username = "name",
+            password = "pass",
+        )
 
-        webViewHttpAuthStore.clearHttpAuthUsernamePassword(webView)
+        verify(webView).setHttpAuthUsernamePassword("host", "realm", "name", "pass")
+    }
 
-        verify(httpAuthDao).deleteAll(listOf("http://fireproofed.me"))
+    @Test
+    @SdkSuppress(maxSdkVersion = android.os.Build.VERSION_CODES.N_MR1)
+    @Suppress("DEPRECATION")
+    fun whenGetHttpAuthUsernamePasswordApiBelow26ThenReturnWebViewHttpAuthCredentials() {
+        whenever(webView.getHttpAuthUsernamePassword("host", "realm"))
+            .thenReturn(arrayOf("name", "pass"))
+        val credentials = webViewHttpAuthStore.getHttpAuthUsernamePassword(webView, "host", "realm")
+
+        assertEquals(WebViewHttpAuthCredentials("name", "pass"), credentials)
     }
 }
