@@ -917,6 +917,7 @@ class BrowserTabFragment :
 
         omnibarTextInput.onBackKeyListener = object : KeyboardAwareEditText.OnBackKeyListener {
             override fun onBackKey(): Boolean {
+                viewModel.onOmnibarInputStateChanged(omnibarTextInput.text.toString(), false, false)
                 omnibarTextInput.hideKeyboard()
                 focusDummy.requestFocus()
                 return true
@@ -1126,7 +1127,6 @@ class BrowserTabFragment :
 
     private fun hideKeyboardImmediately() {
         if (!isHidden) {
-            Timber.v("Keyboard now hiding")
             omnibarTextInput.hideKeyboard()
             focusDummy.requestFocus()
         }
@@ -1134,7 +1134,6 @@ class BrowserTabFragment :
 
     private fun hideKeyboard() {
         if (!isHidden) {
-            Timber.v("Keyboard now hiding")
             omnibarTextInput.postDelayed(KEYBOARD_DELAY) { omnibarTextInput?.hideKeyboard() }
             focusDummy.requestFocus()
         }
@@ -1142,14 +1141,12 @@ class BrowserTabFragment :
 
     private fun showKeyboardImmediately() {
         if (!isHidden) {
-            Timber.v("Keyboard now showing")
             omnibarTextInput?.showKeyboard()
         }
     }
 
     private fun showKeyboard() {
         if (!isHidden) {
-            Timber.v("Keyboard now showing")
             omnibarTextInput.postDelayed(KEYBOARD_DELAY) { omnibarTextInput?.showKeyboard() }
         }
     }
