@@ -32,7 +32,7 @@ After our team has investigated each issue, we will label them as:
 
 We welcome pull requests aimed at fixing bugs and security issues.
 
-If you have a great idea or a feature request that can help improving our browser, start by opening a Discussion (add link to Discussions page). Discussions is the right place to have an open conversation about an idea with our devs and maintainers. Proposals that fit our product direction and timeline will be added to our backlog and labelled accordingly
+If you have a great idea or a feature request that can help improving our browser, start by opening a [Discussion](https://github.com/duckduckgo/Android/discussions). Discussions is the right place to have an open conversation about an idea with our devs and maintainers. Proposals that fit our product direction and timeline will be added to our backlog and labelled accordingly.
 
 We have also labeled tasks you can help with as [help wanted](https://github.com/duckduckgo/Android/issues?q=is%3Aissue+is%3Aopen+label%3A%22help+wanted%22). Those tasks a great places to start contributing to DuckDuckGo and we'll support you through the process.
 
