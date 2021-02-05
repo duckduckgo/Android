@@ -17,7 +17,10 @@
 package com.duckduckgo.app.di
 
 import android.content.Context
+import android.webkit.WebViewDatabase
 import androidx.room.Room
+import com.duckduckgo.app.browser.httpauth.RealWebViewHttpAuthStore
+import com.duckduckgo.app.browser.httpauth.WebViewHttpAuthStore
 import com.duckduckgo.app.global.db.AppDatabase
 import dagger.Module
 import dagger.Provides
@@ -32,5 +35,13 @@ class StubDatabaseModule {
         return Room.inMemoryDatabaseBuilder(context, AppDatabase::class.java)
             .allowMainThreadQueries()
             .build()
+    }
+
+    @Provides
+    @Singleton
+    fun provideWebViewHttpAuthStore(
+        context: Context,
+    ): WebViewHttpAuthStore {
+        return RealWebViewHttpAuthStore(WebViewDatabase.getInstance(context))
     }
 }

@@ -17,10 +17,10 @@
 package com.duckduckgo.app.browser
 
 import android.content.Context
-import android.os.Build
 import android.webkit.WebStorage
 import android.webkit.WebView
-import android.webkit.WebViewDatabase
+import com.duckduckgo.app.browser.httpauth.WebViewHttpAuthStore
+import com.duckduckgo.app.browser.httpauth.db.clearFormDataCompat
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.fire.DuckDuckGoCookieManager
 import com.duckduckgo.app.global.file.FileDeleter
@@ -28,7 +28,7 @@ import java.io.File
 import javax.inject.Inject
 
 interface WebDataManager {
-    suspend fun clearData(webView: WebView, webStorage: WebStorage, webViewDatabase: WebViewDatabase)
+    suspend fun clearData(webView: WebView, webStorage: WebStorage)
     fun clearWebViewSessions()
 }
 
@@ -36,15 +36,16 @@ class WebViewDataManager @Inject constructor(
     private val context: Context,
     private val webViewSessionStorage: WebViewSessionStorage,
     private val cookieManager: DuckDuckGoCookieManager,
-    private val fileDeleter: FileDeleter
+    private val fileDeleter: FileDeleter,
+    private val webViewHttpAuthStore: WebViewHttpAuthStore
 ) : WebDataManager {
 
-    override suspend fun clearData(webView: WebView, webStorage: WebStorage, webViewDatabase: WebViewDatabase) {
+    override suspend fun clearData(webView: WebView, webStorage: WebStorage) {
         clearWebViewCache(webView)
         clearHistory(webView)
         clearWebStorage(webStorage)
-        clearFormData(webView, webViewDatabase)
-        clearAuthentication(webViewDatabase)
+        clearFormData(webView)
+        clearAuthentication(webView)
         clearExternalCookies()
         clearWebViewDirectories(exclusions = WEBVIEW_FILES_EXCLUDED_FROM_DELETION)
     }
@@ -61,12 +62,8 @@ class WebViewDataManager @Inject constructor(
         webStorage.deleteAllData()
     }
 
-    private fun clearFormData(webView: WebView, webViewDatabase: WebViewDatabase) {
-        webView.clearFormData()
-
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
-            clearFormData(webViewDatabase)
-        }
+    private fun clearFormData(webView: WebView) {
+        webView.clearFormDataCompat()
     }
 
     /**
@@ -83,16 +80,8 @@ class WebViewDataManager @Inject constructor(
         fileDeleter.deleteContents(File(dataDir, WEBVIEW_DEFAULT_DIRECTORY_NAME), exclusions)
     }
 
-    /**
-     * Deprecated and not needed on Oreo or later
-     */
-    @Suppress("DEPRECATION")
-    private fun clearFormData(webViewDatabase: WebViewDatabase) {
-        webViewDatabase.clearFormData()
-    }
-
-    private fun clearAuthentication(webViewDatabase: WebViewDatabase) {
-        webViewDatabase.clearHttpAuthUsernamePassword()
+    private fun clearAuthentication(webView: WebView) {
+        webViewHttpAuthStore.clearHttpAuthUsernamePassword(webView)
     }
 
     private suspend fun clearExternalCookies() {

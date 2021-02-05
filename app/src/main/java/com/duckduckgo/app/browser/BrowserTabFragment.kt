@@ -23,33 +23,19 @@ import android.annotation.SuppressLint
 import android.app.Activity.RESULT_OK
 import android.app.ActivityOptions
 import android.appwidget.AppWidgetManager
-import android.content.ActivityNotFoundException
-import android.content.ClipData
-import android.content.ClipboardManager
-import android.content.ComponentName
-import android.content.Context
-import android.content.Intent
+import android.content.*
 import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.media.MediaScannerConnection
 import android.net.Uri
-import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.os.Handler
 import android.os.Message
 import android.provider.Settings
 import android.text.Editable
-import android.view.ContextMenu
-import android.view.KeyEvent
-import android.view.LayoutInflater
-import android.view.MenuItem
-import android.view.View
-import android.view.View.GONE
-import android.view.View.OnFocusChangeListener
-import android.view.View.VISIBLE
-import android.view.View.inflate
-import android.view.ViewGroup
+import android.view.*
+import android.view.View.*
 import android.view.inputmethod.EditorInfo
 import android.webkit.ValueCallback
 import android.webkit.WebChromeClient
@@ -57,10 +43,7 @@ import android.webkit.WebSettings
 import android.webkit.WebView
 import android.webkit.WebView.FindListener
 import android.webkit.WebView.HitTestResult
-import android.webkit.WebView.HitTestResult.IMAGE_TYPE
-import android.webkit.WebView.HitTestResult.SRC_IMAGE_ANCHOR_TYPE
-import android.webkit.WebView.HitTestResult.UNKNOWN_TYPE
-import android.webkit.WebViewDatabase
+import android.webkit.WebView.HitTestResult.*
 import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
@@ -77,11 +60,7 @@ import androidx.core.view.*
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.commitNow
 import androidx.fragment.app.transaction
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleObserver
-import androidx.lifecycle.Observer
-import androidx.lifecycle.OnLifecycleEvent
-import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.*
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion
 import com.duckduckgo.app.bookmarks.ui.EditBookmarkDialogFragment
@@ -97,6 +76,7 @@ import com.duckduckgo.app.browser.downloader.FileDownloadNotificationManager
 import com.duckduckgo.app.browser.downloader.FileDownloader
 import com.duckduckgo.app.browser.downloader.FileDownloader.PendingFileDownload
 import com.duckduckgo.app.browser.filechooser.FileChooserIntentBuilder
+import com.duckduckgo.app.browser.httpauth.WebViewHttpAuthStore
 import com.duckduckgo.app.browser.logindetection.DOMLoginDetector
 import com.duckduckgo.app.browser.model.BasicAuthenticationCredentials
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
@@ -109,12 +89,7 @@ import com.duckduckgo.app.browser.tabpreview.WebViewPreviewGenerator
 import com.duckduckgo.app.browser.tabpreview.WebViewPreviewPersister
 import com.duckduckgo.app.browser.ui.HttpAuthenticationDialogFragment
 import com.duckduckgo.app.browser.useragent.UserAgentProvider
-import com.duckduckgo.app.cta.ui.Cta
-import com.duckduckgo.app.cta.ui.CtaViewModel
-import com.duckduckgo.app.cta.ui.DaxBubbleCta
-import com.duckduckgo.app.cta.ui.DialogCta
-import com.duckduckgo.app.cta.ui.HomePanelCta
-import com.duckduckgo.app.cta.ui.HomeTopPanelCta
+import com.duckduckgo.app.cta.ui.*
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
 import com.duckduckgo.app.fire.fireproofwebsite.data.website
 import com.duckduckgo.app.global.ViewModelFactory
@@ -136,24 +111,15 @@ import com.duckduckgo.widget.SearchWidgetLight
 import com.google.android.material.snackbar.Snackbar
 import dagger.android.support.AndroidSupportInjection
 import kotlinx.android.synthetic.main.fragment_browser_tab.*
-import kotlinx.android.synthetic.main.include_add_widget_instruction_buttons.view.closeButton
-import kotlinx.android.synthetic.main.include_cta_buttons.view.ctaDismissButton
-import kotlinx.android.synthetic.main.include_cta_buttons.view.ctaOkButton
-import kotlinx.android.synthetic.main.include_dax_dialog_cta.daxCtaContainer
-import kotlinx.android.synthetic.main.include_dax_dialog_cta.dialogTextCta
+import kotlinx.android.synthetic.main.include_add_widget_instruction_buttons.view.*
+import kotlinx.android.synthetic.main.include_cta_buttons.view.*
+import kotlinx.android.synthetic.main.include_dax_dialog_cta.*
 import kotlinx.android.synthetic.main.include_find_in_page.*
 import kotlinx.android.synthetic.main.include_new_browser_tab.*
 import kotlinx.android.synthetic.main.include_omnibar_toolbar.*
 import kotlinx.android.synthetic.main.include_omnibar_toolbar.view.*
 import kotlinx.android.synthetic.main.popup_window_browser_menu.view.*
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
 import org.jetbrains.anko.longToast
 import org.jetbrains.anko.share
 import timber.log.Timber
@@ -231,6 +197,9 @@ class BrowserTabFragment :
 
     @Inject
     lateinit var userAgentProvider: UserAgentProvider
+
+    @Inject
+    lateinit var webViewHttpAuthStore: WebViewHttpAuthStore
 
     var messageFromPreviousTab: Message? = null
 
@@ -867,12 +836,14 @@ class BrowserTabFragment :
     }
 
     private fun saveBasicAuthCredentials(request: BasicAuthenticationRequest, credentials: BasicAuthenticationCredentials) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val webViewDatabase = WebViewDatabase.getInstance(context)
-            webViewDatabase.setHttpAuthUsernamePassword(request.host, request.realm, credentials.username, credentials.password)
-        } else {
-            @Suppress("DEPRECATION")
-            webView?.setHttpAuthUsernamePassword(request.host, request.realm, credentials.username, credentials.password)
+        webView?.let {
+            webViewHttpAuthStore.setHttpAuthUsernamePassword(
+                it,
+                host = request.host,
+                realm = request.realm,
+                username = credentials.username,
+                password = credentials.password
+            )
         }
     }
 

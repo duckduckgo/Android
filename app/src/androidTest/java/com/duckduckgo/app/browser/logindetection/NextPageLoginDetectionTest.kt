@@ -18,25 +18,35 @@ package com.duckduckgo.app.browser.logindetection
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.Observer
+import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.browser.WebNavigationStateChange
 import com.duckduckgo.app.browser.WebNavigationStateChange.NewPage
+import com.duckduckgo.app.runBlocking
+import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.nhaarman.mockitokotlin2.argumentCaptor
 import com.nhaarman.mockitokotlin2.atLeastOnce
 import com.nhaarman.mockitokotlin2.mock
-import org.junit.Assert.assertNotNull
-import org.junit.Assert.assertNull
+import com.nhaarman.mockitokotlin2.whenever
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.delay
+import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.Mockito.verify
 
+@ExperimentalCoroutinesApi
 class NextPageLoginDetectionTest {
+
+    @get:Rule
+    var coroutineRule = CoroutineTestRule()
 
     @get:Rule
     @Suppress("unused")
     var instantTaskExecutorRule = InstantTaskExecutorRule()
 
-    private val loginDetector = NextPageLoginDetection()
+    private val mockSettingsDataStore: SettingsDataStore = mock()
+    private val loginDetector = NextPageLoginDetection(mockSettingsDataStore)
 
     private val loginObserver = mock<Observer<LoginDetected>>()
     private val loginEventCaptor = argumentCaptor<LoginDetected>()
@@ -47,121 +57,228 @@ class NextPageLoginDetectionTest {
     }
 
     @Test
-    fun whenLoginAttemptedAndUserForwardedToNewPageThenLoginDetected() {
+    fun whenLoginAttemptedAndUserForwardedToNewPageThenLoginDetected() = coroutineRule.runBlocking {
+        givenLoginDetector(enabled = true)
         loginDetector.onEvent(NavigationEvent.LoginAttempt("http://example.com/login"))
 
-        loginDetector.onEvent(NavigationEvent.WebNavigationEvent(NewPage(url = "http://example.com", title = "")))
+        redirectTo("http://example.com")
+        giveLoginDetectorChanceToExecute()
 
         assertEvent<LoginDetected>()
     }
 
     @Test
-    fun whenLoginAttemptedAndUserForwardedToSamePageThenLoginNotDetected() {
+    fun whenLoginAttemptedInsideOAuthFlowThenLoginDetectedWhenUserForwardedToDifferentDomain() = coroutineRule.runBlocking {
+        givenLoginDetector(enabled = true)
+        redirectTo("https://accounts.google.com/o/oauth2/v2/auth")
+        giveLoginDetectorChanceToExecute()
+        redirectTo("https://accounts.google.com/signin/v2/challenge/pwd")
+        giveLoginDetectorChanceToExecute()
+        loginDetector.onEvent(NavigationEvent.LoginAttempt("https://accounts.google.com/signin/v2/challenge"))
+        redirectTo("https://accounts.google.com/signin/v2/challenge/az?client_id")
+        giveLoginDetectorChanceToExecute()
+        redirectTo("https://accounts.google.com/randomPath")
+        giveLoginDetectorChanceToExecute()
+        redirectTo("http://example.com")
+        giveLoginDetectorChanceToExecute()
+
+        assertEvent<LoginDetected> {
+            assertEquals("example.com", this.forwardedToDomain)
+        }
+    }
+
+    @Test
+    fun whenLoginAttemptedInsideSSOFlowThenLoginDetectedWhenUserForwardedToDifferentDomain() = coroutineRule.runBlocking {
+        givenLoginDetector(enabled = true)
+        fullyLoadSite("https://app.asana.com/-/login")
+        giveLoginDetectorChanceToExecute()
+        redirectTo("https://sso.host.com/saml2/idp/SSOService.php")
+        giveLoginDetectorChanceToExecute()
+        fullyLoadSite("https://sso.host.com/module.php/core/loginuserpass.php")
+        giveLoginDetectorChanceToExecute()
+        loginDetector.onEvent(NavigationEvent.LoginAttempt("https://sso.host.com/module.php/core/loginuserpass.php"))
+        redirectTo("https://sso.host.com/module.php/duosecurity/getduo.php")
+        giveLoginDetectorChanceToExecute()
+        redirectTo("https://app.asana.com/")
+        giveLoginDetectorChanceToExecute()
+
+        assertEvent<LoginDetected> {
+            assertEquals("app.asana.com", this.forwardedToDomain)
+        }
+    }
+
+    @Test
+    fun whenLoginAttemptedSkip2FAUrlsThenLoginDetectedForLatestOne() = coroutineRule.runBlocking {
+        givenLoginDetector(enabled = true)
+        fullyLoadSite("https://accounts.google.com/ServiceLogin")
+        giveLoginDetectorChanceToExecute()
+        fullyLoadSite("https://accounts.google.com/signin/v2/challenge/pwd")
+        giveLoginDetectorChanceToExecute()
+        loginDetector.onEvent(NavigationEvent.LoginAttempt("https://accounts.google.com/signin/v2/challenge/pwd"))
+        redirectTo("https://accounts.google.com/signin/v2/challenge/az")
+        giveLoginDetectorChanceToExecute()
+        redirectTo("https://mail.google.com/mail")
+        giveLoginDetectorChanceToExecute()
+
+        assertEvent<LoginDetected> {
+            assertEquals("mail.google.com", this.forwardedToDomain)
+        }
+    }
+
+    @Test
+    fun whenLoginAttemptedAndUserForwardedToMultipleNewPagesThenLoginDetectedForLatestOne() = coroutineRule.runBlocking {
+        givenLoginDetector(enabled = true)
         loginDetector.onEvent(NavigationEvent.LoginAttempt("http://example.com/login"))
 
-        loginDetector.onEvent(NavigationEvent.WebNavigationEvent(NewPage(url = "http://example.com/login", title = "")))
+        fullyLoadSite("http://example.com")
+        fullyLoadSite("http://example2.com")
+        fullyLoadSite("http://example3.com")
+        giveLoginDetectorChanceToExecute()
+
+        assertEvent<LoginDetected> {
+            assertEquals("example3.com", this.forwardedToDomain)
+        }
+    }
+
+    @Test
+    fun whenLoginAttemptedAndUserForwardedToSamePageThenLoginNotDetected() = coroutineRule.runBlocking {
+        givenLoginDetector(enabled = true)
+        loginDetector.onEvent(NavigationEvent.LoginAttempt("http://example.com/login"))
+
+        fullyLoadSite("http://example.com/login")
+        giveLoginDetectorChanceToExecute()
 
         assertEventNotIssued<LoginDetected>()
     }
 
     @Test
-    fun whenNotDetectedLoginAttemptAndForwardedToNewPageThenLoginNotDetected() {
-        loginDetector.onEvent(NavigationEvent.WebNavigationEvent(NewPage(url = "http://example.com", title = "")))
+    fun whenNotDetectedLoginAttemptAndForwardedToNewPageThenLoginNotDetected() = coroutineRule.runBlocking {
+        givenLoginDetector(enabled = true)
+        fullyLoadSite("http://example.com")
+        giveLoginDetectorChanceToExecute()
 
         assertEventNotIssued<LoginDetected>()
     }
 
     @Test
-    fun whenLoginAttemptedAndUserForwardedToNewUrlThenLoginDetected() {
+    fun whenLoginAttemptedAndUserForwardedToNewUrlThenLoginDetected() = coroutineRule.runBlocking {
+        givenLoginDetector(enabled = true)
         loginDetector.onEvent(NavigationEvent.LoginAttempt("http://example.com/login"))
 
         loginDetector.onEvent(NavigationEvent.WebNavigationEvent(WebNavigationStateChange.UrlUpdated(url = "http://example.com")))
+        loginDetector.onEvent(NavigationEvent.PageFinished)
+        giveLoginDetectorChanceToExecute()
 
         assertEvent<LoginDetected>()
     }
 
     @Test
-    fun whenLoginAttemptedAndUserForwardedToSameUrlThenLoginNotDetected() {
+    fun whenLoginAttemptedAndUserForwardedToSameUrlThenLoginNotDetected() = coroutineRule.runBlocking {
+        givenLoginDetector(enabled = true)
         loginDetector.onEvent(NavigationEvent.LoginAttempt("http://example.com/login"))
 
         loginDetector.onEvent(NavigationEvent.WebNavigationEvent(WebNavigationStateChange.UrlUpdated(url = "http://example.com/login")))
+        loginDetector.onEvent(NavigationEvent.PageFinished)
+        giveLoginDetectorChanceToExecute()
 
         assertEventNotIssued<LoginDetected>()
     }
 
     @Test
-    fun whenNotDetectedLoginAttemptAndForwardedToNewUrlThenLoginNotDetected() {
-        loginDetector.onEvent(NavigationEvent.WebNavigationEvent(NewPage(url = "http://example.com", title = "")))
+    fun whenNotDetectedLoginAttemptAndForwardedToNewUrlThenLoginNotDetected() = coroutineRule.runBlocking {
+        givenLoginDetector(enabled = true)
+        loginDetector.onEvent(NavigationEvent.WebNavigationEvent(WebNavigationStateChange.UrlUpdated(url = "http://example.com")))
+        loginDetector.onEvent(NavigationEvent.PageFinished)
+        giveLoginDetectorChanceToExecute()
 
         assertEventNotIssued<LoginDetected>()
     }
 
     @Test
-    fun whenLoginAttemptedAndNextPageFinishedThenLoadingNewPageDoesNotDetectLogin() {
+    fun whenLoginAttemptedAndNextPageFinishedThenLoadingNewPageDoesNotDetectLogin() = coroutineRule.runBlocking {
+        givenLoginDetector(enabled = true)
         loginDetector.onEvent(NavigationEvent.LoginAttempt("http://example.com/login"))
         loginDetector.onEvent(NavigationEvent.PageFinished)
 
         loginDetector.onEvent(NavigationEvent.WebNavigationEvent(NewPage(url = "http://another.example.com", title = "")))
+        loginDetector.onEvent(NavigationEvent.PageFinished)
+        giveLoginDetectorChanceToExecute()
 
         assertEventNotIssued<LoginDetected>()
     }
 
     @Test
-    fun whenLoginAttemptedAndUserNavigatesBackThenNewPageDoesNotDetectLogin() {
+    fun whenLoginAttemptedAndUserNavigatesBackThenNewPageDoesNotDetectLogin() = coroutineRule.runBlocking {
+        givenLoginDetector(enabled = true)
         loginDetector.onEvent(NavigationEvent.LoginAttempt("http://example.com/login"))
         loginDetector.onEvent(NavigationEvent.UserAction.NavigateBack)
 
-        loginDetector.onEvent(NavigationEvent.WebNavigationEvent(NewPage(url = "http://another.example.com", title = "")))
+        fullyLoadSite("http://another.example.com")
+        giveLoginDetectorChanceToExecute()
 
         assertEventNotIssued<LoginDetected>()
     }
 
     @Test
-    fun whenLoginAttemptedAndUserNavigatesForwardThenNewPageDoesNotDetectLogin() {
+    fun whenLoginAttemptedAndUserNavigatesForwardThenNewPageDoesNotDetectLogin() = coroutineRule.runBlocking {
+        givenLoginDetector(enabled = true)
         loginDetector.onEvent(NavigationEvent.LoginAttempt("http://example.com/login"))
         loginDetector.onEvent(NavigationEvent.UserAction.NavigateForward)
 
-        loginDetector.onEvent(NavigationEvent.WebNavigationEvent(NewPage(url = "http://another.example.com", title = "")))
+        fullyLoadSite("http://another.example.com")
+        giveLoginDetectorChanceToExecute()
 
         assertEventNotIssued<LoginDetected>()
     }
 
     @Test
-    fun whenLoginAttemptedAndUserReloadsWebsiteThenNewPageDoesNotDetectLogin() {
+    fun whenLoginAttemptedAndUserReloadsWebsiteThenNewPageDoesNotDetectLogin() = coroutineRule.runBlocking {
+        givenLoginDetector(enabled = true)
         loginDetector.onEvent(NavigationEvent.LoginAttempt("http://example.com/login"))
         loginDetector.onEvent(NavigationEvent.UserAction.Refresh)
 
-        loginDetector.onEvent(NavigationEvent.WebNavigationEvent(NewPage(url = "http://another.example.com", title = "")))
+        fullyLoadSite("http://another.example.com")
+        giveLoginDetectorChanceToExecute()
 
         assertEventNotIssued<LoginDetected>()
     }
 
     @Test
-    fun whenLoginAttemptedAndUserSubmitsNewQueryThenNewPageDoesNotDetectLogin() {
+    fun whenLoginAttemptedAndUserSubmitsNewQueryThenNewPageDoesNotDetectLogin() = coroutineRule.runBlocking {
+        givenLoginDetector(enabled = true)
         loginDetector.onEvent(NavigationEvent.LoginAttempt("http://example.com/login"))
         loginDetector.onEvent(NavigationEvent.UserAction.NewQuerySubmitted)
 
-        loginDetector.onEvent(NavigationEvent.WebNavigationEvent(NewPage(url = "http://another.example.com", title = "")))
+        fullyLoadSite("http://another.example.com")
+        giveLoginDetectorChanceToExecute()
 
         assertEventNotIssued<LoginDetected>()
     }
 
     @Test
-    fun whenLoginAttemptedHasInvalidURLThenNewPageDoesNotDetectLogin() {
+    fun whenLoginAttemptedHasInvalidURLThenNewPageDoesNotDetectLogin() = coroutineRule.runBlocking {
+        givenLoginDetector(enabled = true)
         loginDetector.onEvent(NavigationEvent.LoginAttempt(""))
 
-        loginDetector.onEvent(NavigationEvent.WebNavigationEvent(NewPage(url = "http://example.com", title = "")))
+        fullyLoadSite("http://example.com")
+        giveLoginDetectorChanceToExecute()
 
         assertEventNotIssued<LoginDetected>()
     }
 
     @Test
-    fun whenLoginAttemptedAndUserForwardedToInvalidNewPageThenLoginDetected() {
+    fun whenLoginAttemptedAndUserForwardedToInvalidNewPageThenLoginDetected() = coroutineRule.runBlocking {
+        givenLoginDetector(enabled = true)
         loginDetector.onEvent(NavigationEvent.LoginAttempt("http://example.com/login"))
 
-        loginDetector.onEvent(NavigationEvent.WebNavigationEvent(NewPage(url = "", title = "")))
+        fullyLoadSite("")
+        giveLoginDetectorChanceToExecute()
 
         assertEventNotIssued<LoginDetected>()
+    }
+
+    private suspend fun giveLoginDetectorChanceToExecute() {
+        delay(LOGIN_DETECTOR_JOB_DELAY)
     }
 
     private inline fun <reified T> assertEvent(instanceAssertions: T.() -> Unit = {}) {
@@ -174,5 +291,24 @@ class NextPageLoginDetectionTest {
     private inline fun <reified T> assertEventNotIssued() {
         val issuedCommand = loginEventCaptor.allValues.find { it is T }
         assertNull(issuedCommand)
+    }
+
+    private fun fullyLoadSite(url: String) {
+        loginDetector.onEvent(NavigationEvent.WebNavigationEvent(NewPage(url = url, title = "")))
+        loginDetector.onEvent(NavigationEvent.PageFinished)
+    }
+
+    private fun redirectTo(url: String) {
+        loginDetector.onEvent(NavigationEvent.Redirect(url = url))
+        loginDetector.onEvent(NavigationEvent.WebNavigationEvent(NewPage(url = url, title = "")))
+        loginDetector.onEvent(NavigationEvent.PageFinished)
+    }
+
+    private fun givenLoginDetector(enabled: Boolean) {
+        whenever(mockSettingsDataStore.appLoginDetection).thenReturn(enabled)
+    }
+
+    companion object {
+        const val LOGIN_DETECTOR_JOB_DELAY = 1000L
     }
 }

@@ -13,21 +13,28 @@ Contact us at https://duckduckgo.com/feedback if you have feedback, questions or
 ## Report an issue
 A great way to contribute to the project is to report an issue when you encounter a problem.
 
-We want our app to be as stable as possible thus your bug reports are immensely valuable. When reporting bugs let us know the:
-* App version
-* Device model
-* Android version
-* Steps to reproduce the bug
-* Expected behavior
-* Actual behavior
+We want our app to be as stable as possible thus your bug reports are immensely valuable. When reporting bug, please follow the bug template.
 
 If you have encountered a security issue, please reach us through https://hackerone.com/duckduckgo.
 
+## What to expect
+
+When a new issue is opened, we will label it as:
+* Needs triage: needs a triage from a member of our team
+* under investigation: our team will investigate the issue
+
+After our team has investigated each issue, we will label them as:
+* Will fix: issue will be fixed internally by DuckDuckGo
+* [help wanted](https://github.com/duckduckgo/Android/issues?q=is%3Aissue+is%3Aopen+label%3A%22help+wanted%22): community contributions are welcome
+* Won't fix: issue will be closed without a fix
+
 ## Contribute Code
 
-We welcome pull requests aimed at fixing bugs and security issues. We have also labeled tasks you can help with as [help wanted](https://github.com/duckduckgo/Android/issues?q=is%3Aissue+is%3Aopen+label%3A%22help+wanted%22).
+We welcome pull requests aimed at fixing bugs and security issues.
 
-If you have a great idea you really want to implement, start by logging an issue for us and mention that you are interested in helping. If it fits with our product direction and is a good candidate for community development we may be able to bend the rules and work with you to develop it.
+If you have a great idea or a feature request that can help improving our browser, start by opening a [Discussion](https://github.com/duckduckgo/Android/discussions). Discussions is the right place to have an open conversation about an idea with our devs and maintainers. Proposals that fit our product direction and timeline will be added to our backlog and labelled accordingly.
+
+We have also labeled tasks you can help with as [help wanted](https://github.com/duckduckgo/Android/issues?q=is%3Aissue+is%3Aopen+label%3A%22help+wanted%22). Those tasks a great places to start contributing to DuckDuckGo and we'll support you through the process.
 
 ### Style Guide
 
