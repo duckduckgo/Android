@@ -161,10 +161,12 @@ class TypewriterDaxDialog : DialogFragment(), DaxDialog {
             dismiss()
         }
 
-        if (dismissible) {
-            dialogContainer.setOnClickListener {
+        dialogContainer.setOnClickListener {
+            if (dismissible) {
                 dialogText.cancelAnimation()
                 dismiss()
+            } else {
+                dialogText.finishAnimation(daxText)
             }
         }
     }

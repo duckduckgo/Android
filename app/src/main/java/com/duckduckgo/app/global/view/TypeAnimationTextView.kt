@@ -40,8 +40,7 @@ class TypeAnimationTextView @JvmOverloads constructor(
         if (isCancellable) {
             setOnClickListener {
                 if (typingAnimationJob?.isActive == true) {
-                    cancelAnimation()
-                    text = inputText
+                    finishAnimation(textDialog)
                     afterAnimation()
                 }
             }
@@ -55,6 +54,11 @@ class TypeAnimationTextView @JvmOverloads constructor(
             delay(delayAfterAnimationInMs)
             afterAnimation()
         }
+    }
+
+    fun finishAnimation(textDialog: String) {
+        typingAnimationJob?.cancel()
+        text = textDialog.html(context)
     }
 
     fun cancelAnimation() = typingAnimationJob?.cancel()

@@ -132,7 +132,7 @@ sealed class DaxDialogCta(
 ) : Cta, DialogCta, DaxCta {
 
     override fun createCta(activity: FragmentActivity): DaxDialog =
-        TypewriterDaxDialog.newInstance(getDaxText(activity), activity.resources.getString(okButton))
+        TypewriterDaxDialog.newInstance(daxText = getDaxText(activity), primaryButtonText = activity.resources.getString(okButton), dismissible = false)
 
     override fun pixelCancelParameters(): Map<String, String> = mapOf(Pixel.PixelParameter.CTA_SHOWN to ctaPixelParam)
 
@@ -175,7 +175,8 @@ sealed class DaxDialogCta(
             TypewriterDaxDialog.newInstance(
                 daxText = getDaxText(activity),
                 primaryButtonText = activity.resources.getString(okButton),
-                toolbarDimmed = false
+                toolbarDimmed = false,
+                dismissible = false
             )
 
         override fun getDaxText(context: Context): String {
@@ -231,7 +232,7 @@ sealed class DaxDialogCta(
         }
 
         override fun createCta(activity: FragmentActivity): DaxDialog =
-            TypewriterDaxDialog.newInstance(daxText = getDaxText(activity), primaryButtonText = activity.resources.getString(okButton))
+            TypewriterDaxDialog.newInstance(daxText = getDaxText(activity), primaryButtonText = activity.resources.getString(okButton), dismissible = false)
 
         private fun isFromSameNetworkDomain(): Boolean = mainTrackerDomains.any { siteHost.contains(it) }
     }
@@ -248,14 +249,13 @@ sealed class DaxDialogCta(
         appInstallStore
     ) {
         override fun createCta(activity: FragmentActivity): DaxDialog =
-            TypewriterDaxDialog.newInstance(daxText = getDaxText(activity), primaryButtonText = activity.resources.getString(okButton))
+            TypewriterDaxDialog.newInstance(daxText = getDaxText(activity), primaryButtonText = activity.resources.getString(okButton), dismissible = false)
     }
 
     companion object {
         private const val MAX_TRACKERS_SHOWS = 2
         const val SERP = "duckduckgo"
         private val mainTrackerDomains = listOf("facebook", "google")
-        private val networkPropertyPercentages = mapOf(Pair("Google", "90%"), Pair("Facebook", "40%"))
         val mainTrackerNetworks = listOf("Facebook", "Google")
     }
 }
@@ -343,7 +343,7 @@ sealed class DaxFireDialogCta(
         cancelPixel = null,
         ctaPixelParam = DAX_FIRE_DIALOG_CTA,
         onboardingStore = onboardingStore,
-        appInstallStore = appInstallStore
+        appInstallStore = appInstallStore,
     )
 }
 
