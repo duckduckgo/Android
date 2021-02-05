@@ -37,10 +37,6 @@ class AtbInitializerTest {
     private val statisticsUpdater: StatisticsUpdater = mock()
     private lateinit var appReferrerStateListener: AppInstallationReferrerStateListener
 
-    @Before
-    fun setup() {
-    }
-
     @Test
     fun whenReferrerInformationInstantlyAvailableThenAtbInitialized() = runBlockingTest {
         whenever(statisticsDataStore.hasInstallationStatistics).thenReturn(false)
