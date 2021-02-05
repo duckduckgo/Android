@@ -167,6 +167,7 @@ class TypewriterDaxDialog : DialogFragment(), DaxDialog {
                 dismiss()
             } else {
                 dialogText.finishAnimation(daxText)
+                dismissible = true
             }
         }
     }
