@@ -23,13 +23,11 @@ import com.duckduckgo.app.launch.LaunchViewModel.Command.Home
 import com.duckduckgo.app.launch.LaunchViewModel.Command.Onboarding
 import com.duckduckgo.app.onboarding.store.AppStage
 import com.duckduckgo.app.onboarding.store.UserStageStore
-import com.duckduckgo.app.referral.AppInstallationReferrerStateListener
-import com.duckduckgo.app.referral.ParsedReferrerResult
+import com.duckduckgo.app.referral.StubAppReferrerFoundStateListener
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.whenever
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.test.runBlockingTest
 import org.junit.After
 import org.junit.Rule
@@ -114,16 +112,5 @@ class LaunchViewModelTest {
         testee.command.observeForever(mockCommandObserver)
         testee.determineViewToShow()
         verify(mockCommandObserver).onChanged(any(Home::class.java))
-    }
-
-    class StubAppReferrerFoundStateListener(private val referrer: String, private val mockDelayMs: Long = 0) : AppInstallationReferrerStateListener {
-        override suspend fun waitForReferrerCode(): ParsedReferrerResult {
-            if (mockDelayMs > 0) delay(mockDelayMs)
-
-            return ParsedReferrerResult.CampaignReferrerFound(referrer)
-        }
-
-        override fun initialiseReferralRetrieval() {
-        }
     }
 }
