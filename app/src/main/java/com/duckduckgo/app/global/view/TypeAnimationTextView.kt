@@ -56,6 +56,8 @@ class TypeAnimationTextView @JvmOverloads constructor(
         }
     }
 
+    fun isAnimationFinished() = typingAnimationJob?.isActive == false
+
     fun finishAnimation(textDialog: String) {
         typingAnimationJob?.cancel()
         text = textDialog.html(context)
