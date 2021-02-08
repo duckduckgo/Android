@@ -113,7 +113,7 @@ class VpnNotificationBuilder {
 
         private fun registerOngoingNotificationChannel(context: Context) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                val channel = NotificationChannel(VPN_FOREGROUND_SERVICE_NOTIFICATION_CHANNEL_ID, "Tracker Protection Running", NotificationManager.IMPORTANCE_LOW)
+                val channel = NotificationChannel(VPN_FOREGROUND_SERVICE_NOTIFICATION_CHANNEL_ID, "Tracker Protection Running", NotificationManager.IMPORTANCE_MIN)
                 val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
                 notificationManager.createNotificationChannel(channel)
             }
@@ -138,13 +138,13 @@ class VpnNotificationBuilder {
 
             val notificationLayout = RemoteViews(context.packageName, R.layout.notification_device_shield_disabled)
 
-            return NotificationCompat.Builder(context, VPN_FOREGROUND_SERVICE_NOTIFICATION_CHANNEL_ID)
+            return NotificationCompat.Builder(context, VPN_ALERTS_CHANNEL_ID)
                 .setSmallIcon(R.drawable.ic_device_shield_notification_logo)
                 .setStyle(NotificationCompat.DecoratedCustomViewStyle())
                 .setContentIntent(vpnControllerPendingIntent)
                 .setCustomContentView(notificationLayout)
                 .setOngoing(true)
-                .setChannelId(VPN_FOREGROUND_SERVICE_NOTIFICATION_CHANNEL_ID)
+                .setChannelId(VPN_ALERTS_CHANNEL_ID)
                 .build()
         }
 

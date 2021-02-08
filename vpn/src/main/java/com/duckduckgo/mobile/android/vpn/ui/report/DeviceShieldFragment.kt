@@ -28,6 +28,7 @@ import android.widget.CompoundButton
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.widget.SwitchCompat
+import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModel
@@ -178,6 +179,7 @@ class DeviceShieldFragment : Fragment() {
     private fun renderTrackersBlocked(trackers: List<VpnTrackerAndCompany>) {
         if (trackers.isEmpty()) {
             deviceShieldCtaHeaderTextView.text = getString(R.string.deviceShieldDisabledHeader)
+            deviceShieldCtaSubHeaderTextView.isVisible = deviceShieldSwitch.isChecked
             deviceShieldCtaSubHeaderTextView.text = getString(R.string.deviceShieldDisabledSubheader)
         } else {
             deviceShieldCtaHeaderTextView.text = resources.getQuantityString(R.plurals.deviceShieldCtaTrackersBlocked, trackers.size, trackers.size)
@@ -185,6 +187,7 @@ class DeviceShieldFragment : Fragment() {
             val timestamp = LocalDateTime.parse(lastTracker.tracker.timestamp)
             val timeDifference = timestamp.until(OffsetDateTime.now(), ChronoUnit.MILLIS)
             val timeRunning = TimePassed.fromMilliseconds(timeDifference)
+            deviceShieldCtaSubHeaderTextView.isVisible = true
             deviceShieldCtaSubHeaderTextView.text =
                 getString(R.string.deviceShieldLastTrackerBlocked, lastTracker.trackerCompany.company, timeRunning.shortFormat())
         }

@@ -11,12 +11,13 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
 
+    <!-- Change back android:label to @string/appName after VPN merge -->
     <application
         android:name="com.duckduckgo.app.global.DuckDuckGoApplication"
         android:allowBackup="false"
         android:icon="${appIcon}"
         android:roundIcon="${appIconRound}"
-        android:label="@string/appName"
+        android:label="@string/deviceShieldAppName"
         android:networkSecurityConfig="@xml/network_security_config"
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
@@ -56,7 +57,7 @@
             android:name="com.duckduckgo.app.launch.LaunchBridgeActivity"
             android:icon="${appIcon}"
             android:roundIcon="${appIconRound}"
-            android:label="@string/appName">
+            android:label="@string/deviceShieldAppName">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
             </intent-filter>
@@ -145,7 +146,6 @@
             android:enabled="false"
             android:icon="@mipmap/ic_launcher_silhouette"
             android:roundIcon="@mipmap/ic_launcher_silhouette_round"
-            android:label="@string/appName"
             android:targetActivity="com.duckduckgo.app.launch.LaunchBridgeActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
