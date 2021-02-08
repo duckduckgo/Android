@@ -68,6 +68,7 @@ private class DeviceShieldExcludedAppsImpl(private val context: Context, private
     override fun getExcludedApps(): List<DeviceShieldApp> {
         return EXCLUDED_APPS
             .filter { isInstalled(it) }
+            .filter { isNotDdgApp(it) }
             .map {
                 DeviceShieldApp(
                     name = getAppName(it),
@@ -137,7 +138,13 @@ private class DeviceShieldExcludedAppsImpl(private val context: Context, private
         }
     }
 
+    private fun isNotDdgApp(packageName: String): Boolean {
+        return !packageName.startsWith(DDG_PACKAGE_PREFIX)
+    }
+
     private companion object {
+        private const val DDG_PACKAGE_PREFIX = "com.duckduckgo.mobile"
+
         private val EXCLUDED_SYSTEM_APPS = listOf(
             "com.android.vending",
             "com.google.android.gsf.login",
@@ -174,6 +181,8 @@ private class DeviceShieldExcludedAppsImpl(private val context: Context, private
         private val MAJOR_BROWSERS = listOf(
             "com.duckduckgo.mobile.android",
             "com.duckduckgo.mobile.android.debug",
+            "com.duckduckgo.mobile.android.vpn",
+            "com.duckduckgo.mobile.android.vpn.debug",
             "com.android.chrome",
             "org.mozilla.firefox",
             "com.opera.browser",
@@ -209,7 +218,7 @@ private class DeviceShieldExcludedAppsImpl(private val context: Context, private
         )
 
         private val EXCLUDED_APPS =
-            listOf(BuildConfig.LIBRARY_PACKAGE_NAME)
+            setOf(BuildConfig.LIBRARY_PACKAGE_NAME)
                 .plus(EXCLUDED_SYSTEM_APPS)
                 .plus(EXCLUDED_PROBLEMATIC_APPS)
                 .plus(FIRST_PARTY_TRACKERS_ONLY_APPS)
