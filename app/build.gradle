@@ -141,7 +141,12 @@ dependencies {
 
     implementation Kotlin.stdlib.jdk7
     implementation KotlinX.coroutines.core
-    androidTestImplementation KotlinX.coroutines.test
+    implementation KotlinX.coroutines.android
+    androidTestImplementation (KotlinX.coroutines.test) {
+        // https://github.com/Kotlin/kotlinx.coroutines/issues/2023
+        // conflicts with mockito due to direct inclusion of byte buddy
+        exclude group: "org.jetbrains.kotlinx", module: "kotlinx-coroutines-debug"
+    }
 
     implementation AndroidX.appCompat
     implementation Google.android.material
@@ -154,7 +159,6 @@ dependencies {
     implementation Square.retrofit2.converter.moshi
     implementation Square.retrofit2.adapter.rxJava2
     implementation Square.retrofit2.converter.scalars
-    implementation "com.jakewharton.retrofit:retrofit2-kotlin-coroutines-adapter:_"
     implementation "io.reactivex.rxjava2:rxjava:_"
     implementation "io.reactivex.rxjava2:rxandroid:_"
     implementation JakeWharton.timber

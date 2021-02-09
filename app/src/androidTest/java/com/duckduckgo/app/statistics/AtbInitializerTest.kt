@@ -17,18 +17,15 @@
 package com.duckduckgo.app.statistics
 
 import com.duckduckgo.app.referral.AppInstallationReferrerStateListener
-import com.duckduckgo.app.referral.ParsedReferrerResult
+import com.duckduckgo.app.referral.StubAppReferrerFoundStateListener
 import com.duckduckgo.app.statistics.api.StatisticsUpdater
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.whenever
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.test.runBlockingTest
-import org.junit.Before
 import org.junit.Test
-import org.mockito.stubbing.Answer
 
 @ExperimentalCoroutinesApi
 class AtbInitializerTest {
@@ -37,17 +34,13 @@ class AtbInitializerTest {
 
     private val statisticsDataStore: StatisticsDataStore = mock()
     private val statisticsUpdater: StatisticsUpdater = mock()
-    private val appReferrerStateListener: AppInstallationReferrerStateListener = mock()
-
-    @Before
-    fun setup() {
-        testee = AtbInitializer(statisticsDataStore, statisticsUpdater, appReferrerStateListener)
-    }
+    private lateinit var appReferrerStateListener: AppInstallationReferrerStateListener
 
     @Test
     fun whenReferrerInformationInstantlyAvailableThenAtbInitialized() = runBlockingTest {
         whenever(statisticsDataStore.hasInstallationStatistics).thenReturn(false)
-        whenever(appReferrerStateListener.waitForReferrerCode()).thenAnswer(referrerAnswer(0))
+        appReferrerStateListener = StubAppReferrerFoundStateListener(referrer = "xx")
+        testee = AtbInitializer(statisticsDataStore, statisticsUpdater, appReferrerStateListener)
 
         testee.initializeAfterReferrerAvailable()
 
@@ -57,7 +50,8 @@ class AtbInitializerTest {
     @Test
     fun whenReferrerInformationQuicklyAvailableThenAtbInitialized() = runBlockingTest {
         whenever(statisticsDataStore.hasInstallationStatistics).thenReturn(false)
-        whenever(appReferrerStateListener.waitForReferrerCode()).thenAnswer(referrerAnswer(1000))
+        appReferrerStateListener = StubAppReferrerFoundStateListener(referrer = "xx", mockDelayMs = 1000L)
+        testee = AtbInitializer(statisticsDataStore, statisticsUpdater, appReferrerStateListener)
 
         testee.initializeAfterReferrerAvailable()
 
@@ -67,7 +61,8 @@ class AtbInitializerTest {
     @Test
     fun whenReferrerInformationTimesOutThenAtbInitialized() = runBlockingTest {
         whenever(statisticsDataStore.hasInstallationStatistics).thenReturn(false)
-        whenever(appReferrerStateListener.waitForReferrerCode()).thenAnswer(referrerAnswer(Long.MAX_VALUE))
+        appReferrerStateListener = StubAppReferrerFoundStateListener(referrer = "xx", mockDelayMs = Long.MAX_VALUE)
+        testee = AtbInitializer(statisticsDataStore, statisticsUpdater, appReferrerStateListener)
 
         testee.initializeAfterReferrerAvailable()
 
@@ -77,17 +72,14 @@ class AtbInitializerTest {
     @Test
     fun whenAlreadyInitializedThenRefreshCalled() = runBlockingTest {
         configureAlreadyInitialized()
+        testee = AtbInitializer(statisticsDataStore, statisticsUpdater, appReferrerStateListener)
+
         testee.initializeAfterReferrerAvailable()
         verify(statisticsUpdater).refreshAppRetentionAtb()
     }
 
-    private suspend fun configureAlreadyInitialized() {
+    private fun configureAlreadyInitialized() {
         whenever(statisticsDataStore.hasInstallationStatistics).thenReturn(true)
-        whenever(appReferrerStateListener.waitForReferrerCode()).thenAnswer(referrerAnswer(0))
-    }
-
-    private suspend fun referrerAnswer(delayMs: Long): Answer<ParsedReferrerResult> {
-        delay(delayMs)
-        return Answer { ParsedReferrerResult.CampaignReferrerFound("") }
+        appReferrerStateListener = StubAppReferrerFoundStateListener(referrer = "xx")
     }
 }
