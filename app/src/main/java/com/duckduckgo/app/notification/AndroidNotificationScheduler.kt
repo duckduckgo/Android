@@ -22,6 +22,7 @@ import androidx.core.app.NotificationManagerCompat
 import androidx.work.*
 import com.duckduckgo.app.global.plugins.worker.WorkerInjectorPlugin
 import com.duckduckgo.app.notification.db.NotificationDao
+import com.duckduckgo.app.notification.model.ClearDataNotification
 import com.duckduckgo.app.notification.model.Notification
 import com.duckduckgo.app.notification.model.PrivacyProtectionNotification
 import com.duckduckgo.app.notification.model.SchedulableNotification
@@ -115,7 +116,7 @@ class ClearDataNotificationWorkerInjectorPlugin(
     private val notificationDao: NotificationDao,
     private val notificationFactory: NotificationFactory,
     private val pixel: Pixel,
-    private val privacyProtectionNotification: PrivacyProtectionNotification
+    private val clearDataNotification: ClearDataNotification
 ) : WorkerInjectorPlugin {
 
     override fun inject(worker: ListenableWorker): Boolean {
@@ -124,7 +125,7 @@ class ClearDataNotificationWorkerInjectorPlugin(
             worker.notificationDao = notificationDao
             worker.factory = notificationFactory
             worker.pixel = pixel
-            worker.notification = privacyProtectionNotification
+            worker.notification = clearDataNotification
             return true
         }
         return false

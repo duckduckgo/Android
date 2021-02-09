@@ -25,6 +25,7 @@ import com.duckduckgo.app.notification.ClearDataNotificationWorkerInjectorPlugin
 import com.duckduckgo.app.notification.NotificationFactory
 import com.duckduckgo.app.notification.PrivacyNotificationWorkerInjectorPlugin
 import com.duckduckgo.app.notification.db.NotificationDao
+import com.duckduckgo.app.notification.model.ClearDataNotification
 import com.duckduckgo.app.notification.model.PrivacyProtectionNotification
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.api.OfflinePixelSender
@@ -51,13 +52,13 @@ class WorkerPluginsModule {
         notificationDao: NotificationDao,
         notificationFactory: NotificationFactory,
         pixel: Pixel,
-        privacyProtectionNotification: PrivacyProtectionNotification
+        clearDataNotification: ClearDataNotification
     ): WorkerInjectorPlugin = ClearDataNotificationWorkerInjectorPlugin(
         notificationManagerCompat,
         notificationDao,
         notificationFactory,
         pixel,
-        privacyProtectionNotification
+        clearDataNotification
     )
 
     @Provides
