@@ -66,6 +66,7 @@ class WelcomePage : OnboardingPageFragment() {
 
         configureDaxCta()
         beginWelcomeAnimation(ctaText)
+        setSkipAnimationListener()
     }
 
     override fun onAttach(context: Context) {
@@ -145,6 +146,7 @@ class WelcomePage : OnboardingPageFragment() {
         context?.let {
             ctaText = it.getString(R.string.onboardingDaxText)
             hiddenTextCta.text = ctaText.html(it)
+            dialogTextCta.textInDialog = ctaText.html(it)
             dialogTextCta.setTextColor(ContextCompat.getColor(it, R.color.grayishBrown))
             cardView.backgroundTintList = ContextCompat.getColorStateList(it, R.color.white)
         }
@@ -165,6 +167,18 @@ class WelcomePage : OnboardingPageFragment() {
                         setPrimaryCtaListenerAfterWelcomeAlphaAnimation()
                     }
             }
+    }
+
+    private fun setSkipAnimationListener() {
+        longDescriptionContainer.setOnClickListener {
+            if (!dialogTextCta.isAnimationFinished()) {
+                welcomeAnimation?.cancel()
+                dialogTextCta.finishAnimation()
+                welcomeContent.alpha = 0f
+                daxCtaContainer.alpha = 1f
+                setPrimaryCtaListenerAfterWelcomeAlphaAnimation()
+            }
+        }
     }
 
     private fun setPrimaryCtaListenerAfterWelcomeAlphaAnimation() {

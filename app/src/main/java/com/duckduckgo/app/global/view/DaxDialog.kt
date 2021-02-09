@@ -162,12 +162,13 @@ class TypewriterDaxDialog : DialogFragment(), DaxDialog {
         }
 
         dialogContainer.setOnClickListener {
-            if (dismissible || dialogText.isAnimationFinished()) {
+            if (dismissible) {
                 dialogText.cancelAnimation()
                 dismiss()
             } else {
-                dialogText.finishAnimation(daxText)
-                dismissible = true
+                if (!dialogText.isAnimationFinished()) {
+                    dialogText.finishAnimation()
+                }
             }
         }
     }
