@@ -18,6 +18,7 @@ package com.duckduckgo.app.global.job
 
 import android.content.Context
 import androidx.work.*
+import com.duckduckgo.app.global.plugins.worker.WorkerInjectorPlugin
 import com.duckduckgo.app.job.ConfigurationDownloader
 import io.reactivex.Single
 import timber.log.Timber
@@ -57,5 +58,18 @@ class AppConfigurationWorker(context: Context, workerParams: WorkerParameters) :
                 Timber.w(it, "App configuration sync work failed")
                 Result.retry()
             }
+    }
+}
+
+class AppConfigurationWorkerInjectorPlugin(
+    private val configurationDownloader: ConfigurationDownloader
+) : WorkerInjectorPlugin {
+
+    override fun inject(worker: ListenableWorker): Boolean {
+        if (worker is AppConfigurationWorker) {
+            worker.appConfigurationDownloader = configurationDownloader
+            return true
+        }
+        return false
     }
 }

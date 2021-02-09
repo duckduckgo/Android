@@ -17,19 +17,10 @@
 package com.duckduckgo.app.di
 
 import android.content.Context
-import androidx.core.app.NotificationManagerCompat
 import androidx.work.Configuration
 import androidx.work.WorkManager
 import androidx.work.WorkerFactory
-import com.duckduckgo.app.global.view.ClearDataAction
-import com.duckduckgo.app.job.ConfigurationDownloader
-import com.duckduckgo.app.notification.NotificationFactory
-import com.duckduckgo.app.notification.db.NotificationDao
-import com.duckduckgo.app.notification.model.ClearDataNotification
-import com.duckduckgo.app.notification.model.PrivacyProtectionNotification
-import com.duckduckgo.app.settings.db.SettingsDataStore
-import com.duckduckgo.app.statistics.api.OfflinePixelSender
-import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.global.plugins.worker.WorkerInjectorPluginPoint
 import dagger.Module
 import dagger.Provides
 import javax.inject.Singleton
@@ -50,28 +41,8 @@ class WorkerModule {
     @Provides
     @Singleton
     fun workerFactory(
-        offlinePixelSender: OfflinePixelSender,
-        settingsDataStore: SettingsDataStore,
-        clearDataAction: ClearDataAction,
-        notificationManager: NotificationManagerCompat,
-        notificationDao: NotificationDao,
-        notificationFactory: NotificationFactory,
-        clearDataNotification: ClearDataNotification,
-        privacyProtectionNotification: PrivacyProtectionNotification,
-        configurationDownloader: ConfigurationDownloader,
-        pixel: Pixel
+        workerInjectorPluginPoint: WorkerInjectorPluginPoint,
     ): WorkerFactory {
-        return DaggerWorkerFactory(
-            offlinePixelSender,
-            settingsDataStore,
-            clearDataAction,
-            notificationManager,
-            notificationDao,
-            notificationFactory,
-            clearDataNotification,
-            privacyProtectionNotification,
-            configurationDownloader,
-            pixel
-        )
+        return DaggerWorkerFactory(workerInjectorPluginPoint)
     }
 }
