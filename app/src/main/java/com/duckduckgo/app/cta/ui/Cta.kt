@@ -343,7 +343,7 @@ sealed class DaxFireDialogCta(
         cancelPixel = null,
         ctaPixelParam = DAX_FIRE_DIALOG_CTA,
         onboardingStore = onboardingStore,
-        appInstallStore = appInstallStore,
+        appInstallStore = appInstallStore
     )
 }
 
