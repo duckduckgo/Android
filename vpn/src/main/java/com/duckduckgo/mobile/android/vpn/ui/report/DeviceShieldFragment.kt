@@ -36,6 +36,7 @@ import androidx.lifecycle.ViewModelProvider
 import com.duckduckgo.mobile.android.vpn.R
 import com.duckduckgo.mobile.android.vpn.model.TimePassed
 import com.duckduckgo.mobile.android.vpn.model.VpnTrackerAndCompany
+import com.duckduckgo.mobile.android.vpn.onboarding.DeviceShieldOnboarding
 import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
 import com.google.android.material.snackbar.Snackbar
 import dagger.android.support.AndroidSupportInjection
@@ -51,6 +52,9 @@ class DeviceShieldFragment : Fragment() {
 
     @Inject
     lateinit var viewModelFactory: VpnViewModelFactory
+
+    @Inject
+    lateinit var deviceShieldOnboarding: DeviceShieldOnboarding
 
     private lateinit var deviceShieldCtaHeaderTextView: TextView
     private lateinit var deviceShieldCtaSubHeaderTextView: TextView
@@ -96,6 +100,7 @@ class DeviceShieldFragment : Fragment() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         when (requestCode) {
             RC_REQUEST_VPN_PERMISSION -> handleVpnPermissionResult(resultCode)
+            REQUEST_DEVICE_SHIELD_ONBOARDING -> handleDeviceShieldOnboarding(resultCode)
             else -> super.onActivityResult(requestCode, resultCode, data)
         }
     }
@@ -108,6 +113,18 @@ class DeviceShieldFragment : Fragment() {
             Activity.RESULT_OK -> {
                 Timber.i("User granted VPN permission")
                 startVpn()
+            }
+        }
+    }
+
+    private fun handleDeviceShieldOnboarding(resultCode: Int) {
+        when (resultCode) {
+            Activity.RESULT_OK -> {
+                Timber.i("User enabled VPN during onboarding")
+                startActivity(PrivacyReportActivity.intent(requireActivity(), celebrate = true))
+            }
+            else -> {
+                Timber.i("User cancelled onboarding and refused VPN permission")
             }
         }
     }
@@ -130,7 +147,7 @@ class DeviceShieldFragment : Fragment() {
     private val deviceShieldSwitchListener = CompoundButton.OnCheckedChangeListener { _, checked ->
         Timber.i("Toggle changed. enabled=$checked")
         if (checked) {
-            startVpnIfAllowed()
+            enableDeviceShield()
         } else {
             stopVpn()
         }
@@ -141,6 +158,16 @@ class DeviceShieldFragment : Fragment() {
     private fun bindListeners(view: View) {
         deviceShieldInfoLayout.setOnClickListener {
             startActivity(PrivacyReportActivity.intent(requireActivity()))
+        }
+    }
+
+    @Suppress("DEPRECATION")
+    private fun enableDeviceShield() {
+        val deviceShieldOnboardingIntent = deviceShieldOnboarding.prepare(requireActivity())
+        if (deviceShieldOnboardingIntent == null) {
+            startVpnIfAllowed()
+        } else {
+            startActivityForResult(deviceShieldOnboardingIntent, REQUEST_DEVICE_SHIELD_ONBOARDING)
         }
     }
 
@@ -213,6 +240,7 @@ class DeviceShieldFragment : Fragment() {
     companion object {
 
         private const val RC_REQUEST_VPN_PERMISSION = 100
+        private const val REQUEST_DEVICE_SHIELD_ONBOARDING = 101
 
     }
 

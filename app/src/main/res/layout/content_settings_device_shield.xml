@@ -29,11 +29,12 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <androidx.appcompat.widget.SwitchCompat
+    <com.duckduckgo.app.settings.SettingsToggleOptionWithSubtitle
         android:id="@+id/deviceShieldToggle"
-        style="@style/SettingsSwitch"
-        android:text="@string/deviceShieldBlockTrackers"
-        android:theme="@style/SettingsSwitchTheme"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:toggleTitle="@string/deviceShield"
+        app:toggleSubTitle="@string/deviceShieldBlockTrackers"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/deviceShieldTitle" />

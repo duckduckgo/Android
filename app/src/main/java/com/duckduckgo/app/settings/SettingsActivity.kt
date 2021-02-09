@@ -49,7 +49,9 @@ import com.duckduckgo.app.settings.clear.FireAnimation
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelName
 import com.duckduckgo.mobile.android.vpn.exclusions.DeviceShieldExcludedApps
+import com.duckduckgo.mobile.android.vpn.onboarding.DeviceShieldOnboarding
 import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
+import com.duckduckgo.mobile.android.vpn.ui.report.PrivacyReportActivity
 import kotlinx.android.synthetic.main.content_settings_device_shield.*
 import kotlinx.android.synthetic.main.content_settings_general.*
 import kotlinx.android.synthetic.main.content_settings_other.*
@@ -69,6 +71,9 @@ class SettingsActivity :
 
     @Inject
     lateinit var deviceShieldExcludedApps: DeviceShieldExcludedApps
+
+    @Inject
+    lateinit var deviceShieldOnboarding: DeviceShieldOnboarding
 
     private val viewModel: SettingsViewModel by bindViewModel()
 
@@ -197,6 +202,7 @@ class SettingsActivity :
             is Command.LaunchExcludedAppList -> launchExcludedAppList()
             is Command.UpdateTheme -> sendThemeChangedBroadcast()
             is Command.LaunchFireAnimationSettings -> launchFireAnimationSelector()
+            is Command.LaunchDeviceShieldOnboarding -> launchDeviceShieldOnboarding()
             is Command.StartDeviceShield -> startVpnIfAllowed()
             is Command.StopDeviceShield -> stopDeviceShield()
         }
@@ -209,6 +215,11 @@ class SettingsActivity :
         } else {
             VpnPermissionStatus.Denied(intent)
         }
+    }
+
+    @Suppress("DEPRECATION")
+    private fun launchDeviceShieldOnboarding() {
+        startActivityForResult(deviceShieldOnboarding.prepare(this), REQUEST_DEVICE_SHIELD_ONBOARDING)
     }
 
     private fun startVpnIfAllowed() {
@@ -305,6 +316,7 @@ class SettingsActivity :
         when (requestCode) {
             RC_REQUEST_VPN_PERMISSION -> handleVpnPermissionResult(resultCode)
             FEEDBACK_REQUEST_CODE -> handleFeedbackResult(resultCode)
+            REQUEST_DEVICE_SHIELD_ONBOARDING -> handleDeviceShieldOnboardingResult(resultCode)
             else -> super.onActivityResult(requestCode, resultCode, data)
         }
     }
@@ -325,6 +337,15 @@ class SettingsActivity :
     private fun handleFeedbackResult(resultCode: Int) {
         if (resultCode == Activity.RESULT_OK) {
             Toast.makeText(this, R.string.thanksForTheFeedback, Toast.LENGTH_LONG).show()
+        }
+    }
+
+    private fun handleDeviceShieldOnboardingResult(resultCode: Int) {
+        if (resultCode == Activity.RESULT_OK) {
+            Timber.i("VPN enabled during device shield onboarding")
+            startActivity(PrivacyReportActivity.intent(this, celebrate = true))
+        } else {
+            Timber.i("VPN NOT enabled during device shield onboarding")
         }
     }
 
@@ -361,6 +382,7 @@ class SettingsActivity :
         private const val FEEDBACK_REQUEST_CODE = 100
         private const val CHANGE_APP_ICON_REQUEST_CODE = 101
         private const val RC_REQUEST_VPN_PERMISSION = 102
+        private const val REQUEST_DEVICE_SHIELD_ONBOARDING = 103
 
         fun intent(context: Context): Intent {
             return Intent(context, SettingsActivity::class.java)

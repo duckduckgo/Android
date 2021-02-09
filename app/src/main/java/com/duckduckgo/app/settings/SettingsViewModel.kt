@@ -35,6 +35,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel.PixelName
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.*
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.FIRE_ANIMATION
 import com.duckduckgo.mobile.android.vpn.exclusions.DeviceShieldExcludedApps
+import com.duckduckgo.mobile.android.vpn.onboarding.DeviceShieldOnboarding
 import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -50,7 +51,8 @@ class SettingsViewModel @Inject constructor(
     private val variantManager: VariantManager,
     private val fireAnimationLoader: FireAnimationLoader,
     private val pixel: Pixel,
-    private val deviceShieldExcludedApps: DeviceShieldExcludedApps
+    private val deviceShieldExcludedApps: DeviceShieldExcludedApps,
+    private val deviceShieldOnboarding: DeviceShieldOnboarding
 ) : ViewModel(), LifecycleObserver {
 
     private var deviceShieldStatePollingJob: Job? = null
@@ -86,6 +88,7 @@ class SettingsViewModel @Inject constructor(
         object LaunchGlobalPrivacyControl : Command()
         object LaunchExcludedAppList : Command()
         object UpdateTheme : Command()
+        object LaunchDeviceShieldOnboarding : Command()
         object StartDeviceShield : Command()
         object StopDeviceShield : Command()
     }
@@ -201,7 +204,12 @@ class SettingsViewModel @Inject constructor(
 
     fun onDeviceShieldSettingChanged(enabled: Boolean) {
         Timber.i("Device Shield, is now enabled: $enabled")
-        command.value = if (enabled) Command.StartDeviceShield else Command.StopDeviceShield
+        val deviceShieldOnboardingIntent = deviceShieldOnboarding.prepare(appContext)
+        command.value = when {
+            enabled && deviceShieldOnboardingIntent != null -> Command.LaunchDeviceShieldOnboarding
+            enabled -> Command.StartDeviceShield
+            else -> Command.StopDeviceShield
+        }
     }
 
     private fun obtainVersion(variantKey: String): String {

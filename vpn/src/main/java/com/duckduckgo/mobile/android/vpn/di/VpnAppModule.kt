@@ -48,5 +48,7 @@ class VpnAppModule {
 
     @Provides
     @Singleton
-    fun provideTrackerListProvider(): TrackerListProvider = TrackerListProvider()
+    fun provideTrackerListProvider(
+        vpnDatabase: VpnDatabase
+    ): TrackerListProvider = TrackerListProvider(vpnDatabase.vpnPreferencesDao())
 }

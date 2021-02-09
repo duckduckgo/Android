@@ -35,6 +35,7 @@ import androidx.lifecycle.ViewModelProvider
 import com.duckduckgo.mobile.android.vpn.R
 import com.duckduckgo.mobile.android.vpn.model.TimePassed
 import com.duckduckgo.mobile.android.vpn.model.VpnTrackerAndCompany
+import com.duckduckgo.mobile.android.vpn.onboarding.DeviceShieldOnboarding
 import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
 import com.duckduckgo.mobile.android.vpn.trackers.TrackerListProvider
 import com.google.android.material.snackbar.Snackbar
@@ -58,6 +59,9 @@ class PrivacyReportActivity : AppCompatActivity(R.layout.activity_vpn_privacy_re
 
     @Inject
     lateinit var trackerListProvider: TrackerListProvider
+
+    @Inject
+    lateinit var deviceShieldOnboarding: DeviceShieldOnboarding
 
     private lateinit var reportSummaryTextView: TextView
     private lateinit var reportSummaryEnabledTooltip: TextView
@@ -84,12 +88,16 @@ class PrivacyReportActivity : AppCompatActivity(R.layout.activity_vpn_privacy_re
 
         bindViewReferences()
         observeViewModel()
+
+        val celebrate = intent.getBooleanExtra(CELEBRATION_EXTRA, false)
+        if (celebrate) launchKonfetti()
     }
 
     @Suppress("DEPRECATION")
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         when (requestCode) {
             RC_REQUEST_VPN_PERMISSION -> handleVpnPermissionResult(resultCode)
+            REQUEST_DEVICE_SHIELD_ONBOARDING -> handleDeviceShieldOnboarding(resultCode)
             else -> super.onActivityResult(requestCode, resultCode, data)
         }
     }
@@ -108,7 +116,7 @@ class PrivacyReportActivity : AppCompatActivity(R.layout.activity_vpn_privacy_re
         }
         menu.findItem(R.id.blockFacebookDomains)?.let {
             it.isChecked = viewModel.getBlockFacebookDomainsPreference()
-            trackerListProvider.includeFacebookDomains = it.isChecked
+            trackerListProvider.setIncludeFacebookDomains(it.isChecked)
         }
         return true
     }
@@ -138,7 +146,7 @@ class PrivacyReportActivity : AppCompatActivity(R.layout.activity_vpn_privacy_re
             R.id.blockFacebookDomains -> {
                 val enabled = !item.isChecked
                 viewModel.blockFacebookDomains(enabled)
-                trackerListProvider.includeFacebookDomains = enabled
+                trackerListProvider.setIncludeFacebookDomains(enabled)
                 true
             }
             else -> super.onOptionsItemSelected(item)
@@ -182,6 +190,18 @@ class PrivacyReportActivity : AppCompatActivity(R.layout.activity_vpn_privacy_re
         }
     }
 
+    private fun handleDeviceShieldOnboarding(resultCode: Int) {
+        when (resultCode) {
+            Activity.RESULT_OK -> {
+                Timber.i("User enabled VPN during onboarding")
+                launchKonfetti()
+            }
+            else -> {
+                Timber.i("User cancelled onboarding and refused VPN permission")
+            }
+        }
+    }
+
     private fun bindViewReferences() {
         reportCardView = findViewById(R.id.deviceShieldReportEntries)
         reportSummaryTextView = findViewById(R.id.privacyReportTrackersBlocked)
@@ -195,7 +215,17 @@ class PrivacyReportActivity : AppCompatActivity(R.layout.activity_vpn_privacy_re
         viewKonfetti = findViewById(R.id.deviceShieldKonfetti)
 
         vpnRunningToggleButton.setOnClickListener {
+            enableDeviceShield()
+        }
+    }
+
+    @Suppress("DEPRECATION")
+    private fun enableDeviceShield() {
+        val deviceShieldOnboardingIntent = deviceShieldOnboarding.prepare(this)
+        if (deviceShieldOnboardingIntent == null) {
             startVpnIfAllowed()
+        } else {
+            startActivityForResult(deviceShieldOnboardingIntent, REQUEST_DEVICE_SHIELD_ONBOARDING)
         }
     }
 
@@ -339,12 +369,16 @@ class PrivacyReportActivity : AppCompatActivity(R.layout.activity_vpn_privacy_re
     companion object {
 
         private const val RC_REQUEST_VPN_PERMISSION = 100
+        private const val REQUEST_DEVICE_SHIELD_ONBOARDING = 101
 
         private const val TRACKERS_COLLAPSED = 5
         private const val MAX_TRACKERS = 15
+        private const val CELEBRATION_EXTRA = "CELEBRATION_EXTRA"
 
-        fun intent(context: Context): Intent {
-            return Intent(context, PrivacyReportActivity::class.java)
+        fun intent(context: Context, celebrate: Boolean = false): Intent {
+            return Intent(context, PrivacyReportActivity::class.java).apply {
+                putExtra(CELEBRATION_EXTRA, celebrate)
+            }
         }
     }
 }

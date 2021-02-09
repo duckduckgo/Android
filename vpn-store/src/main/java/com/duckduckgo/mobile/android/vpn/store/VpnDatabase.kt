@@ -35,7 +35,8 @@ import java.util.concurrent.Executors
         VpnTracker::class,
         VpnTrackerCompany::class,
         VpnRunningStats::class,
-        VpnDataStats::class
+        VpnDataStats::class,
+        VpnPreferences::class
     ]
 )
 
@@ -47,6 +48,7 @@ abstract class VpnDatabase : RoomDatabase() {
     abstract fun vpnTrackerCompanyDao(): VpnTrackerCompanyDao
     abstract fun vpnRunningStatsDao(): VpnRunningStatsDao
     abstract fun vpnDataStatsDao(): VpnDataStatsDao
+    abstract fun vpnPreferencesDao(): VpnPreferencesDao
 
     companion object {
 

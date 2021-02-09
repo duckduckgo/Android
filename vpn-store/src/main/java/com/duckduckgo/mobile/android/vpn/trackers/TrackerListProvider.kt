@@ -17,21 +17,36 @@
 package com.duckduckgo.mobile.android.vpn.trackers
 
 import androidx.annotation.VisibleForTesting
+import com.duckduckgo.mobile.android.vpn.dao.VpnPreferencesDao
+import com.duckduckgo.mobile.android.vpn.model.VpnPreferences
 import com.duckduckgo.mobile.android.vpn.model.VpnTrackerCompany
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 
-class TrackerListProvider {
-
-    var includeFacebookDomains = false
+class TrackerListProvider(
+    private val vpnPreferencesDao: VpnPreferencesDao
+) {
 
     data class Tracker(val id: Int, val trackerCompanyId: Int, val hostname: String)
 
     fun trackerList(): List<Tracker> {
         val facebookCompanyId = TRACKER_GROUP_COMPANIES.firstOrNull { it.company.equals("facebook", true) }?.trackerCompanyId ?: -1
 
-        return TRACKER_HOST_NAMES.filter { it.trackerCompanyId != facebookCompanyId || includeFacebookDomains }
+        return TRACKER_HOST_NAMES.filter { it.trackerCompanyId != facebookCompanyId || getIncludeFacebookDomains() }
+    }
+
+    fun setIncludeFacebookDomains(included: Boolean) = runBlocking(Dispatchers.IO) {
+        launch { vpnPreferencesDao.insert(VpnPreferences(VPN_PREFERENCE_INCLUDE_FB_DOMAINS, included)) }
+    }
+
+    private fun getIncludeFacebookDomains(): Boolean = runBlocking(Dispatchers.IO) {
+        return@runBlocking vpnPreferencesDao.get(VPN_PREFERENCE_INCLUDE_FB_DOMAINS).value
     }
 
     companion object {
+        private const val VPN_PREFERENCE_INCLUDE_FB_DOMAINS = "VPN_PREFERENCE_INCLUDE_FB_DOMAINS"
+
         @VisibleForTesting
         val TRACKER_HOST_NAMES = listOf(
             // Google

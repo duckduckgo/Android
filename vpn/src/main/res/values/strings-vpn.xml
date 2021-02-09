@@ -84,6 +84,13 @@
         <item quantity="other">In the past week, we blocked %d trackers from %s</item>
     </plurals>
 
+    <!-- Device Shield Onboarding -->
+    <string name="deviceShieldOnboardingLogoDescription">Enable Device Shield</string>
+    <string name="deviceShieldOnboardingTitle">Enable Device Shield</string>
+    <string name="deviceShieldOnboardingSubtitle">Apps can hide trackers that send your data to companies you don’t trust.</string>
+    <string name="deviceShieldOnboardingDescription">Device Shield uses a virtual private network (VPN) permission to block many hidden trackers in other apps you’ve installed.\n\nUnlike a regular VPN, Device Shield doesn’t send any personal information off your device to DuckDuckGo.</string>
+    <string name="deviceShieldOnboardingCta">Ask My Permission</string>
+
     <!-- New Tab Integration -->
     <string name="deviceShieldMenuItemTitle">Device Shield</string>
     <string name="deviceShieldDisabledHeader">Web trackers blocked</string>

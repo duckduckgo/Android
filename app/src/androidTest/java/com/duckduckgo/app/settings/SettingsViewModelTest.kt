@@ -17,6 +17,7 @@
 package com.duckduckgo.app.settings
 
 import android.content.Context
+import android.content.Intent
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.Observer
 import androidx.test.platform.app.InstrumentationRegistry
@@ -36,6 +37,7 @@ import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.mobile.android.vpn.exclusions.DeviceShieldApp
 import com.duckduckgo.mobile.android.vpn.exclusions.DeviceShieldExcludedApps
+import com.duckduckgo.mobile.android.vpn.onboarding.DeviceShieldOnboarding
 import com.nhaarman.mockitokotlin2.*
 import org.junit.Assert.*
 import org.junit.Before
@@ -75,6 +77,9 @@ class SettingsViewModelTest {
     @Mock
     private lateinit var mockDeviceShieldExcludedApps: DeviceShieldExcludedApps
 
+    @Mock
+    private lateinit var mockDeviceShieldOnboarding: DeviceShieldOnboarding
+
     private lateinit var commandCaptor: KArgumentCaptor<Command>
 
     @Before
@@ -91,7 +96,8 @@ class SettingsViewModelTest {
             mockVariantManager,
             mockFireAnimationLoader,
             mockPixel,
-            mockDeviceShieldExcludedApps
+            mockDeviceShieldExcludedApps,
+            mockDeviceShieldOnboarding
         )
         testee.command.observeForever(commandObserver)
 
@@ -259,6 +265,16 @@ class SettingsViewModelTest {
     }
 
     @Test
+    fun whenDeviceShieldIsOffAndDidNotShowOnboardingThenCommandIsStopDeviceShield() {
+        whenever(mockDeviceShieldOnboarding.prepare(context)).thenReturn(Intent())
+        
+        testee.onDeviceShieldSettingChanged(false)
+        testee.command.blockingObserve()
+        verify(commandObserver).onChanged(commandCaptor.capture())
+        assertEquals(Command.StopDeviceShield, commandCaptor.firstValue)
+    }
+
+    @Test
     fun whenExcludedAppClickedThenCommandIsLaunchExcludedAppList() {
         testee.onExcludedAppsClicked()
         testee.command.blockingObserve()
@@ -272,6 +288,16 @@ class SettingsViewModelTest {
         testee.command.blockingObserve()
         verify(commandObserver).onChanged(commandCaptor.capture())
         assertEquals(Command.StartDeviceShield, commandCaptor.firstValue)
+    }
+
+    @Test
+    fun whenDeviceShieldIsOnAndDidNotShowOnboardingThenCommandIsLaunchDeviceShieldOnboarding() {
+        whenever(mockDeviceShieldOnboarding.prepare(context)).thenReturn(Intent())
+
+        testee.onDeviceShieldSettingChanged(true)
+        testee.command.blockingObserve()
+        verify(commandObserver).onChanged(commandCaptor.capture())
+        assertEquals(Command.LaunchDeviceShieldOnboarding, commandCaptor.firstValue)
     }
 
     @Test

@@ -67,3 +67,9 @@ data class VpnRunningStats(
     @PrimaryKey val id: String,
     val timeRunningMillis: Long
 )
+
+@Entity(tableName = "vpn_preferences")
+data class VpnPreferences(
+    @PrimaryKey val preference: String,
+    val value: Boolean
+)

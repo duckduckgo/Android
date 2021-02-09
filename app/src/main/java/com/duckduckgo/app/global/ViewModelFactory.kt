@@ -82,6 +82,7 @@ import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel
 import com.duckduckgo.app.usage.search.SearchCountDao
 import com.duckduckgo.app.widget.ui.AddWidgetInstructionsViewModel
 import com.duckduckgo.mobile.android.vpn.exclusions.DeviceShieldExcludedApps
+import com.duckduckgo.mobile.android.vpn.onboarding.DeviceShieldOnboarding
 import javax.inject.Inject
 
 @Suppress("UNCHECKED_CAST")
@@ -132,7 +133,8 @@ class ViewModelFactory @Inject constructor(
     private val fireAnimationLoader: FireAnimationLoader,
     private val globalPrivacyControl: GlobalPrivacyControl,
     private val context: Context,
-    private val deviceShieldExcludedApps: DeviceShieldExcludedApps
+    private val deviceShieldExcludedApps: DeviceShieldExcludedApps,
+    private val deviceShieldOnboarding: DeviceShieldOnboarding
 ) : ViewModelProvider.NewInstanceFactory() {
 
     override fun <T : ViewModel> create(modelClass: Class<T>) =
@@ -181,7 +183,8 @@ class ViewModelFactory @Inject constructor(
             variantManager,
             fireAnimationLoader,
             pixel,
-            deviceShieldExcludedApps
+            deviceShieldExcludedApps,
+            deviceShieldOnboarding
         )
     }
 

@@ -16,21 +16,30 @@
 
 package com.duckduckgo.mobile.android.vpn.trackers
 
+import androidx.room.Room
+import androidx.test.platform.app.InstrumentationRegistry
+import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
 
 class TrackerListProviderTest {
     private lateinit var trackerListProvider: TrackerListProvider
+    private lateinit var vpnDatabase: VpnDatabase
 
     @Before
     fun setup() {
-        trackerListProvider = TrackerListProvider()
+        vpnDatabase = Room.inMemoryDatabaseBuilder(
+            InstrumentationRegistry.getInstrumentation().targetContext,
+            VpnDatabase::class.java
+        ).allowMainThreadQueries().build()
+        
+        trackerListProvider = TrackerListProvider(vpnDatabase.vpnPreferencesDao())
     }
 
     @Test
     fun whenIncludeFacebookDomainsIsTrueThenReturnAllTrackers() {
-        trackerListProvider.includeFacebookDomains = true
+        trackerListProvider.setIncludeFacebookDomains(true)
 
         val totalTrackers = TrackerListProvider.TRACKER_HOST_NAMES.size
 
@@ -41,7 +50,7 @@ class TrackerListProviderTest {
 
     @Test
     fun whenIncludeFacebookDomainsIsFalseThenReturnNonFacebookTrackers() {
-        trackerListProvider.includeFacebookDomains = false
+        trackerListProvider.setIncludeFacebookDomains(false)
 
         val facebookCompanyId = TrackerListProvider.TRACKER_GROUP_COMPANIES.firstOrNull { it.company.equals("facebook", true) }?.trackerCompanyId ?: -1
         val totalTrackers = TrackerListProvider.TRACKER_HOST_NAMES.size

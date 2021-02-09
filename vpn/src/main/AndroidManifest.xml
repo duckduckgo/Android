@@ -10,7 +10,6 @@
         <activity
             android:name=".ui.report.PrivacyReportActivity"
             android:label="@string/privacyReportToolbarTitle"
-            android:process=":vpn"
             android:theme="@style/Theme.AndroidVpn"
             android:parentActivityName="com.duckduckgo.app.browser.BrowserActivity" />
 
@@ -31,6 +30,12 @@
         </activity>
 
         <activity android:name=".service.VpnPermissionRequesterActivity" />
+
+        <activity
+            android:name=".onboarding.DeviceShieldOnboardingActivity"
+            android:theme="@style/Theme.AndroidVpn"
+            android:label=""
+            />
 
         <service
             android:name=".service.TrackerBlockingVpnService"
