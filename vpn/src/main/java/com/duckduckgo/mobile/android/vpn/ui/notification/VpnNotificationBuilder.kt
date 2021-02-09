@@ -45,9 +45,9 @@ class VpnNotificationBuilder {
         ): Notification {
             registerOngoingNotificationChannel(context)
 
-            val vpnControllerIntent = Intent(context, PrivacyReportActivity::class.java)
+            val privacyReportIntent = Intent(context, PrivacyReportActivity::class.java)
             val vpnShowDashboardPendingIntent: PendingIntent? = TaskStackBuilder.create(context).run {
-                addNextIntentWithParentStack(vpnControllerIntent)
+                addNextIntentWithParentStack(privacyReportIntent)
                 getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT)
             }
 

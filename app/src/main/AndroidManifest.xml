@@ -273,7 +273,11 @@
         <activity
             android:name="com.duckduckgo.app.settings.SettingsActivity"
             android:label="@string/settingsActivityTitle"
-            android:parentActivityName=".BrowserActivity" />
+            android:parentActivityName=".BrowserActivity" >
+            <intent-filter>
+                <action android:name="android.service.quicksettings.action.QS_TILE_PREFERENCES" />
+            </intent-filter>
+        </activity>
         <activity
             android:name="com.duckduckgo.app.feedback.ui.common.FeedbackActivity"
             android:label="@string/feedbackActivityTitle"
