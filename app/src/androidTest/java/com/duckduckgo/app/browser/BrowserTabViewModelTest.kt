@@ -823,9 +823,9 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenShowEmptyGradeIsTrueThenIsEnableIsFalse() {
+    fun whenShowEmptyGradeIsTrueThenIsEnableIsTrue() {
         val testee = BrowserTabViewModel.PrivacyGradeViewState(PrivacyGrade.A, shouldAnimate = false, showEmptyGrade = true)
-        assertFalse(testee.isEnabled)
+        assertTrue(testee.isEnabled)
     }
 
     @Test

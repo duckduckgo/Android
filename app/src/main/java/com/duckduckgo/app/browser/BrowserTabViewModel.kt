@@ -218,7 +218,7 @@ class BrowserTabViewModel(
         val shouldAnimate: Boolean = false,
         val showEmptyGrade: Boolean = true
     ) {
-        val isEnabled: Boolean = !showEmptyGrade && privacyGrade != PrivacyGrade.UNKNOWN
+        val isEnabled: Boolean = privacyGrade != PrivacyGrade.UNKNOWN
     }
 
     data class AutoCompleteViewState(
