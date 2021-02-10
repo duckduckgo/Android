@@ -158,7 +158,7 @@ class WelcomePage : OnboardingPageFragment() {
         longDescriptionContainer.setOnClickListener {
             if (dialogTextCta.hasAnimationStarted()) {
                 finishTypingAnimation()
-            } else if (!welcomeAnimationFinished){
+            } else if (!welcomeAnimationFinished) {
                 welcomeAnimation?.cancel()
                 scheduleWelcomeAnimation(0L)
             }
