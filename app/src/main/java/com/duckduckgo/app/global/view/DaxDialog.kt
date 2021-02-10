@@ -166,7 +166,7 @@ class TypewriterDaxDialog : DialogFragment(), DaxDialog {
                 dialogText.cancelAnimation()
                 dismiss()
             } else {
-                if (!dialogText.isAnimationFinished()) {
+                if (!dialogText.hasAnimationFinished()) {
                     dialogText.finishAnimation()
                 }
             }

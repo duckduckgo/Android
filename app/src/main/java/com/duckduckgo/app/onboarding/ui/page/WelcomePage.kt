@@ -51,6 +51,7 @@ class WelcomePage : OnboardingPageFragment() {
     private var ctaText: String = ""
     private var welcomeAnimation: ViewPropertyAnimatorCompat? = null
     private var typingAnimation: ViewPropertyAnimatorCompat? = null
+    private var welcomeAnimationSkipped = false
 
     // we use a BroadcastChannel because we don't want to emit the last value upon subscription
     private val events = BroadcastChannel<WelcomePageView.Event>(1)
@@ -65,7 +66,7 @@ class WelcomePage : OnboardingPageFragment() {
         super.onActivityCreated(savedInstanceState)
 
         configureDaxCta()
-        beginWelcomeAnimation(ctaText)
+        scheduleWelcomeAnimation()
         setSkipAnimationListener()
     }
 
@@ -153,11 +154,23 @@ class WelcomePage : OnboardingPageFragment() {
         triangle.setImageResource(R.drawable.ic_triangle_bubble_white)
     }
 
-    private fun beginWelcomeAnimation(ctaText: String) {
+    private fun setSkipAnimationListener() {
+        longDescriptionContainer.setOnClickListener {
+            if (dialogTextCta.hasAnimationStarted()) {
+                finishTypingAnimation()
+            } else if (!welcomeAnimationSkipped){
+                welcomeAnimation?.cancel()
+                scheduleWelcomeAnimation(0L)
+            }
+            welcomeAnimationSkipped = true
+        }
+    }
+
+    private fun scheduleWelcomeAnimation(startDelay: Long = ANIMATION_DELAY) {
         welcomeAnimation = ViewCompat.animate(welcomeContent as View)
             .alpha(MIN_ALPHA)
             .setDuration(ANIMATION_DURATION)
-            .setStartDelay(ANIMATION_DELAY)
+            .setStartDelay(startDelay)
             .withEndAction {
                 typingAnimation = ViewCompat.animate(daxCtaContainer)
                     .alpha(MAX_ALPHA)
@@ -169,16 +182,10 @@ class WelcomePage : OnboardingPageFragment() {
             }
     }
 
-    private fun setSkipAnimationListener() {
-        longDescriptionContainer.setOnClickListener {
-            if (!dialogTextCta.isAnimationFinished()) {
-                welcomeAnimation?.cancel()
-                dialogTextCta.finishAnimation()
-                welcomeContent.alpha = 0f
-                daxCtaContainer.alpha = 1f
-                setPrimaryCtaListenerAfterWelcomeAlphaAnimation()
-            }
-        }
+    private fun finishTypingAnimation() {
+        welcomeAnimation?.cancel()
+        dialogTextCta.finishAnimation()
+        setPrimaryCtaListenerAfterWelcomeAlphaAnimation()
     }
 
     private fun setPrimaryCtaListenerAfterWelcomeAlphaAnimation() {
