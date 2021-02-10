@@ -40,6 +40,7 @@ import com.duckduckgo.app.fire.DataClearerForegroundAppRestartPixel
 import com.duckduckgo.app.global.ApplicationClearDataState
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.intentText
+import com.duckduckgo.app.global.sanitize
 import com.duckduckgo.app.global.view.*
 import com.duckduckgo.app.location.ui.LocationPermissionsActivity
 import com.duckduckgo.app.onboarding.ui.page.DefaultBrowserPage
@@ -127,6 +128,9 @@ class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope() {
     override fun onNewIntent(intent: Intent?) {
         super.onNewIntent(intent)
         Timber.i("onNewIntent: $intent")
+
+        intent?.sanitize()
+
         dataClearerForegroundAppRestartPixel.registerIntent(intent)
 
         if (dataClearer.dataClearerState.value == ApplicationClearDataState.FINISHED) {
