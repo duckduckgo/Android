@@ -27,7 +27,6 @@ import com.airbnb.lottie.RenderMode
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.cta.ui.CtaViewModel
 import com.duckduckgo.app.cta.ui.DaxFireDialogCta
-import com.duckduckgo.app.global.events.db.AppUserEventsStore
 import com.duckduckgo.app.global.events.db.UserEventKey
 import com.duckduckgo.app.global.events.db.UserEventsStore
 import com.duckduckgo.app.global.view.FireDialog.FireDialogClearAllEvent.AnimationFinished
