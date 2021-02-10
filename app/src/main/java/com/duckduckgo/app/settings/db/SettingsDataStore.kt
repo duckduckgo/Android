@@ -25,6 +25,8 @@ import com.duckduckgo.app.icon.api.AppIcon
 import com.duckduckgo.app.settings.clear.ClearWhatOption
 import com.duckduckgo.app.settings.clear.ClearWhenOption
 import com.duckduckgo.app.settings.clear.FireAnimation
+import com.duckduckgo.app.statistics.VariantManager
+import com.duckduckgo.app.statistics.loginDetectionEnabled
 
 interface SettingsDataStore {
 
@@ -60,7 +62,7 @@ interface SettingsDataStore {
     fun clearAppBackgroundTimestamp()
 }
 
-class SettingsSharedPreferences constructor(private val context: Context) : SettingsDataStore {
+class SettingsSharedPreferences constructor(private val context: Context, private val variantManager: VariantManager) : SettingsDataStore {
 
     private val fireAnimationMapper = FireAnimationPrefsMapper()
 
@@ -89,7 +91,7 @@ class SettingsSharedPreferences constructor(private val context: Context) : Sett
         set(enabled) = preferences.edit { putBoolean(KEY_AUTOCOMPLETE_ENABLED, enabled) }
 
     override var appLoginDetection: Boolean
-        get() = preferences.getBoolean(KEY_LOGIN_DETECTION_ENABLED, false)
+        get() = preferences.getBoolean(KEY_LOGIN_DETECTION_ENABLED, variantManager.loginDetectionEnabled())
         set(enabled) = preferences.edit { putBoolean(KEY_LOGIN_DETECTION_ENABLED, enabled) }
 
     override var appLocationPermission: Boolean
