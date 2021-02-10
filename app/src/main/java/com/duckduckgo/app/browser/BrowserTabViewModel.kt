@@ -94,6 +94,7 @@ import com.duckduckgo.app.statistics.loginDetectionExperimentEnabled
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelName
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.FIRE_EXECUTED
 import com.duckduckgo.app.surrogates.SurrogateResponse
 import com.duckduckgo.app.survey.model.Survey
 import com.duckduckgo.app.tabs.model.TabEntity
@@ -359,11 +360,16 @@ class BrowserTabViewModel(
 
     private val loginDetectionObserver = Observer<LoginDetected> { loginEvent ->
         Timber.i("LoginDetection for $loginEvent")
-        viewModelScope.launch { useOurAppDetector.registerIfFireproofSeenForTheFirstTime(loginEvent.forwardedToDomain) }
+        viewModelScope.launch(dispatchers.io()) {
+            useOurAppDetector.registerIfFireproofSeenForTheFirstTime(loginEvent.forwardedToDomain)
 
-        if (!isFireproofWebsite(loginEvent.forwardedToDomain)) {
-            pixel.fire(PixelName.FIREPROOF_LOGIN_DIALOG_SHOWN)
-            command.value = AskToFireproofWebsite(FireproofWebsiteEntity(loginEvent.forwardedToDomain))
+            if (!isFireproofWebsite(loginEvent.forwardedToDomain)) {
+                val didUserTriedFireButton = userEventsStore.getUserEvent(UserEventKey.FIRE_BUTTON_EXECUTED) != null
+                pixel.fire(pixel = PixelName.FIREPROOF_LOGIN_DIALOG_SHOWN, parameters = mapOf(FIRE_EXECUTED to didUserTriedFireButton.toString()))
+                withContext(dispatchers.main()) {
+                    command.value = AskToFireproofWebsite(FireproofWebsiteEntity(loginEvent.forwardedToDomain))
+                }
+            }
         }
     }
 
@@ -1294,7 +1300,8 @@ class BrowserTabViewModel(
         viewModelScope.launch {
             userEventsStore.removeUserEvent(UserEventKey.FIREPROOF_LOGIN_PROMPT_DISMISSED)
             fireproofWebsiteRepository.fireproofWebsite(domain)?.let {
-                pixel.fire(PixelName.FIREPROOF_WEBSITE_LOGIN_ADDED)
+                val didUserTriedFireButton = userEventsStore.getUserEvent(UserEventKey.FIRE_BUTTON_EXECUTED) != null
+                pixel.fire(PixelName.FIREPROOF_WEBSITE_LOGIN_ADDED, mapOf(FIRE_EXECUTED to didUserTriedFireButton.toString()))
                 command.value = ShowFireproofWebSiteConfirmation(fireproofWebsiteEntity = it)
             }
         }
@@ -1302,11 +1309,12 @@ class BrowserTabViewModel(
 
     fun onUserDismissedFireproofLoginDialog() {
         viewModelScope.launch {
-            pixel.fire(PixelName.FIREPROOF_WEBSITE_LOGIN_DISMISS)
+            val didUserTriedFireButton = userEventsStore.getUserEvent(UserEventKey.FIRE_BUTTON_EXECUTED) != null
+            pixel.fire(PixelName.FIREPROOF_WEBSITE_LOGIN_DISMISS, mapOf(FIRE_EXECUTED to didUserTriedFireButton.toString()))
             if (variantManager.loginDetectionExperimentEnabled() && userEventsStore.getUserEvent(UserEventKey.FIREPROOF_DISABLE_PROMPT_DISMISSED) == null) {
                 val userDismissedDialogBefore = userEventsStore.getUserEvent(UserEventKey.FIREPROOF_LOGIN_PROMPT_DISMISSED) != null
                 if (userDismissedDialogBefore) {
-                    pixel.enqueueFire(PixelName.FIREPROOF_LOGIN_DISABLE_DIALOG_SHOWN)
+                    pixel.enqueueFire(PixelName.FIREPROOF_LOGIN_DISABLE_DIALOG_SHOWN, mapOf(FIRE_EXECUTED to didUserTriedFireButton.toString()))
                     command.value = AskToDisableLoginDetection
                 } else {
                     userEventsStore.registerUserEvent(UserEventKey.FIREPROOF_LOGIN_PROMPT_DISMISSED)
@@ -1317,17 +1325,19 @@ class BrowserTabViewModel(
 
     fun onUserConfirmedDisableLoginDetectionDialog() {
         viewModelScope.launch(dispatchers.io()) {
+            val didUserTriedFireButton = userEventsStore.getUserEvent(UserEventKey.FIRE_BUTTON_EXECUTED) != null
             appSettingsPreferencesStore.appLoginDetection = false
-            pixel.enqueueFire(PixelName.FIREPROOF_LOGIN_DISABLE_DIALOG_DISABLE)
+            pixel.enqueueFire(PixelName.FIREPROOF_LOGIN_DISABLE_DIALOG_DISABLE, mapOf(FIRE_EXECUTED to didUserTriedFireButton.toString()))
         }
     }
 
     fun onUserDismissedDisableLoginDetectionDialog() {
         viewModelScope.launch(dispatchers.io()) {
+            val didUserTriedFireButton = userEventsStore.getUserEvent(UserEventKey.FIRE_BUTTON_EXECUTED) != null
             appSettingsPreferencesStore.appLoginDetection = true
             userEventsStore.removeUserEvent(UserEventKey.FIREPROOF_LOGIN_PROMPT_DISMISSED)
             userEventsStore.registerUserEvent(UserEventKey.FIREPROOF_DISABLE_PROMPT_DISMISSED)
-            pixel.enqueueFire(PixelName.FIREPROOF_LOGIN_DISABLE_DIALOG_CANCEL)
+            pixel.enqueueFire(PixelName.FIREPROOF_LOGIN_DISABLE_DIALOG_CANCEL, mapOf(FIRE_EXECUTED to didUserTriedFireButton.toString()))
         }
     }
 

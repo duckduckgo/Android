@@ -259,6 +259,7 @@ interface Pixel {
         const val SERP_QUERY_NOT_CHANGED = "0"
         const val FIRE_BUTTON_STATE = "fb"
         const val FIRE_ANIMATION = "fa"
+        const val FIRE_EXECUTED = "fe"
     }
 
     object PixelValues {
