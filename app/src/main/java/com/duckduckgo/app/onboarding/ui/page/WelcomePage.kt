@@ -51,7 +51,7 @@ class WelcomePage : OnboardingPageFragment() {
     private var ctaText: String = ""
     private var welcomeAnimation: ViewPropertyAnimatorCompat? = null
     private var typingAnimation: ViewPropertyAnimatorCompat? = null
-    private var welcomeAnimationSkipped = false
+    private var welcomeAnimationFinished = false
 
     // we use a BroadcastChannel because we don't want to emit the last value upon subscription
     private val events = BroadcastChannel<WelcomePageView.Event>(1)
@@ -158,11 +158,11 @@ class WelcomePage : OnboardingPageFragment() {
         longDescriptionContainer.setOnClickListener {
             if (dialogTextCta.hasAnimationStarted()) {
                 finishTypingAnimation()
-            } else if (!welcomeAnimationSkipped){
+            } else if (!welcomeAnimationFinished){
                 welcomeAnimation?.cancel()
                 scheduleWelcomeAnimation(0L)
             }
-            welcomeAnimationSkipped = true
+            welcomeAnimationFinished = true
         }
     }
 
@@ -176,6 +176,7 @@ class WelcomePage : OnboardingPageFragment() {
                     .alpha(MAX_ALPHA)
                     .setDuration(ANIMATION_DURATION)
                     .withEndAction {
+                        welcomeAnimationFinished = true
                         dialogTextCta.startTypingAnimation(ctaText)
                         setPrimaryCtaListenerAfterWelcomeAlphaAnimation()
                     }
