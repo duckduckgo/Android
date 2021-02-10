@@ -1291,6 +1291,7 @@ class BrowserTabViewModel(
 
     fun onUserConfirmedFireproofDialog(domain: String) {
         viewModelScope.launch {
+            userEventsStore.removeUserEvent(UserEventKey.LOGIN_PROMPT_DISMISSED)
             fireproofWebsiteRepository.fireproofWebsite(domain)?.let {
                 pixel.fire(PixelName.FIREPROOF_WEBSITE_LOGIN_ADDED)
                 command.value = ShowFireproofWebSiteConfirmation(fireproofWebsiteEntity = it)
@@ -1299,7 +1300,28 @@ class BrowserTabViewModel(
     }
 
     fun onUserDismissedFireproofLoginDialog() {
-        pixel.fire(PixelName.FIREPROOF_WEBSITE_LOGIN_DISMISS)
+        viewModelScope.launch {
+            pixel.fire(PixelName.FIREPROOF_WEBSITE_LOGIN_DISMISS)
+            val userDismissedDialogBefore = userEventsStore.getUserEvent(UserEventKey.LOGIN_PROMPT_DISMISSED) != null
+            if (userDismissedDialogBefore) {
+                command.value = AskToDisableLoginDetection
+            } else {
+                userEventsStore.registerUserEvent(UserEventKey.LOGIN_PROMPT_DISMISSED)
+            }
+        }
+    }
+
+    fun onUserConfirmedDisableLoginDetectionDialog() {
+        viewModelScope.launch(dispatchers.io()) {
+            appSettingsPreferencesStore.appLoginDetection = false
+        }
+    }
+
+    fun onUserDismissedDisableLoginDetectionDialog() {
+        viewModelScope.launch(dispatchers.io()) {
+            appSettingsPreferencesStore.appLoginDetection = true
+            userEventsStore.removeUserEvent(UserEventKey.LOGIN_PROMPT_DISMISSED)
+        }
     }
 
     fun onFireproofWebsiteSnackbarUndoClicked(fireproofWebsiteEntity: FireproofWebsiteEntity) {
