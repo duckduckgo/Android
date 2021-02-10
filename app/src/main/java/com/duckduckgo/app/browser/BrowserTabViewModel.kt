@@ -245,6 +245,7 @@ class BrowserTabViewModel(
         class DownloadImage(val url: String, val requestUserConfirmation: Boolean) : Command()
         class ShowBookmarkAddedConfirmation(val bookmarkId: Long, val title: String?, val url: String?) : Command()
         class ShowFireproofWebSiteConfirmation(val fireproofWebsiteEntity: FireproofWebsiteEntity) : Command()
+        object AskToDisableLoginDetection : Command()
         class AskToFireproofWebsite(val fireproofWebsite: FireproofWebsiteEntity) : Command()
         class ShareLink(val url: String) : Command()
         class CopyLink(val url: String) : Command()
