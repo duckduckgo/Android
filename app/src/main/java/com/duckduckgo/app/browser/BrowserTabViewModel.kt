@@ -1304,6 +1304,7 @@ class BrowserTabViewModel(
             pixel.fire(PixelName.FIREPROOF_WEBSITE_LOGIN_DISMISS)
             val userDismissedDialogBefore = userEventsStore.getUserEvent(UserEventKey.LOGIN_PROMPT_DISMISSED) != null
             if (userDismissedDialogBefore) {
+                pixel.enqueueFire(PixelName.FIREPROOF_LOGIN_DISABLE_DIALOG_SHOWN)
                 command.value = AskToDisableLoginDetection
             } else {
                 userEventsStore.registerUserEvent(UserEventKey.LOGIN_PROMPT_DISMISSED)
@@ -1314,6 +1315,7 @@ class BrowserTabViewModel(
     fun onUserConfirmedDisableLoginDetectionDialog() {
         viewModelScope.launch(dispatchers.io()) {
             appSettingsPreferencesStore.appLoginDetection = false
+            pixel.enqueueFire(PixelName.FIREPROOF_LOGIN_DISABLE_DIALOG_DISABLE)
         }
     }
 
@@ -1321,6 +1323,7 @@ class BrowserTabViewModel(
         viewModelScope.launch(dispatchers.io()) {
             appSettingsPreferencesStore.appLoginDetection = true
             userEventsStore.removeUserEvent(UserEventKey.LOGIN_PROMPT_DISMISSED)
+            pixel.enqueueFire(PixelName.FIREPROOF_LOGIN_DISABLE_DIALOG_CANCEL)
         }
     }
 
