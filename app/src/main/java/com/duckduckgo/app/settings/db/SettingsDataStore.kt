@@ -26,7 +26,7 @@ import com.duckduckgo.app.settings.clear.ClearWhatOption
 import com.duckduckgo.app.settings.clear.ClearWhenOption
 import com.duckduckgo.app.settings.clear.FireAnimation
 import com.duckduckgo.app.statistics.VariantManager
-import com.duckduckgo.app.statistics.loginDetectionEnabled
+import com.duckduckgo.app.statistics.loginDetectionExperimentEnabled
 
 interface SettingsDataStore {
 
@@ -91,7 +91,7 @@ class SettingsSharedPreferences constructor(private val context: Context, privat
         set(enabled) = preferences.edit { putBoolean(KEY_AUTOCOMPLETE_ENABLED, enabled) }
 
     override var appLoginDetection: Boolean
-        get() = preferences.getBoolean(KEY_LOGIN_DETECTION_ENABLED, variantManager.loginDetectionEnabled())
+        get() = preferences.getBoolean(KEY_LOGIN_DETECTION_ENABLED, variantManager.loginDetectionExperimentEnabled())
         set(enabled) = preferences.edit { putBoolean(KEY_LOGIN_DETECTION_ENABLED, enabled) }
 
     override var appLocationPermission: Boolean

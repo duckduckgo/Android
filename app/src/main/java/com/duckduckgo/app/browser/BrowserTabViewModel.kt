@@ -90,6 +90,7 @@ import com.duckduckgo.app.privacy.model.PrivacyGrade
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.api.StatisticsUpdater
+import com.duckduckgo.app.statistics.loginDetectionExperimentEnabled
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelName
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter
@@ -1291,7 +1292,7 @@ class BrowserTabViewModel(
 
     fun onUserConfirmedFireproofDialog(domain: String) {
         viewModelScope.launch {
-            userEventsStore.removeUserEvent(UserEventKey.LOGIN_PROMPT_DISMISSED)
+            userEventsStore.removeUserEvent(UserEventKey.FIREPROOF_LOGIN_PROMPT_DISMISSED)
             fireproofWebsiteRepository.fireproofWebsite(domain)?.let {
                 pixel.fire(PixelName.FIREPROOF_WEBSITE_LOGIN_ADDED)
                 command.value = ShowFireproofWebSiteConfirmation(fireproofWebsiteEntity = it)
@@ -1302,12 +1303,14 @@ class BrowserTabViewModel(
     fun onUserDismissedFireproofLoginDialog() {
         viewModelScope.launch {
             pixel.fire(PixelName.FIREPROOF_WEBSITE_LOGIN_DISMISS)
-            val userDismissedDialogBefore = userEventsStore.getUserEvent(UserEventKey.LOGIN_PROMPT_DISMISSED) != null
-            if (userDismissedDialogBefore) {
-                pixel.enqueueFire(PixelName.FIREPROOF_LOGIN_DISABLE_DIALOG_SHOWN)
-                command.value = AskToDisableLoginDetection
-            } else {
-                userEventsStore.registerUserEvent(UserEventKey.LOGIN_PROMPT_DISMISSED)
+            if (variantManager.loginDetectionExperimentEnabled() && userEventsStore.getUserEvent(UserEventKey.FIREPROOF_DISABLE_PROMPT_DISMISSED) == null) {
+                val userDismissedDialogBefore = userEventsStore.getUserEvent(UserEventKey.FIREPROOF_LOGIN_PROMPT_DISMISSED) != null
+                if (userDismissedDialogBefore) {
+                    pixel.enqueueFire(PixelName.FIREPROOF_LOGIN_DISABLE_DIALOG_SHOWN)
+                    command.value = AskToDisableLoginDetection
+                } else {
+                    userEventsStore.registerUserEvent(UserEventKey.FIREPROOF_LOGIN_PROMPT_DISMISSED)
+                }
             }
         }
     }
@@ -1322,7 +1325,8 @@ class BrowserTabViewModel(
     fun onUserDismissedDisableLoginDetectionDialog() {
         viewModelScope.launch(dispatchers.io()) {
             appSettingsPreferencesStore.appLoginDetection = true
-            userEventsStore.removeUserEvent(UserEventKey.LOGIN_PROMPT_DISMISSED)
+            userEventsStore.removeUserEvent(UserEventKey.FIREPROOF_LOGIN_PROMPT_DISMISSED)
+            userEventsStore.registerUserEvent(UserEventKey.FIREPROOF_DISABLE_PROMPT_DISMISSED)
             pixel.enqueueFire(PixelName.FIREPROOF_LOGIN_DISABLE_DIALOG_CANCEL)
         }
     }

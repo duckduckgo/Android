@@ -99,7 +99,7 @@ interface VariantManager {
     fun updateAppReferrerVariant(variant: String)
 }
 
-fun VariantManager.loginDetectionEnabled() = this.getVariant().hasFeature(VariantManager.VariantFeature.LoginDetectionEnabled)
+fun VariantManager.loginDetectionExperimentEnabled() = this.getVariant().hasFeature(VariantManager.VariantFeature.LoginDetectionEnabled)
 
 class ExperimentationVariantManager(
     private val store: StatisticsDataStore,
