@@ -469,10 +469,6 @@
     <string name="fireproofWebsiteLoginDialogNegative">Not now</string>
     <string name="fireproofWebsiteItemsSectionTitle">Websites</string>
     <string name="fireproofWebsiteToogleText">Ask When Signing In</string>
-    <string name="disableLoginDetectionDialogTitle">Don\'t ask to fireproof websites again</string>
-    <string name="disableLoginDetectionDialogDescription">You can always enable it again by going into Settings</string>
-    <string name="disableLoginDetectionDialogPositive">Don\'t ask again</string>
-    <string name="disableLoginDetectionDialogNegative">Cancel</string>
 
     <!-- Fire Animation settings -->
     <string name="settingsFireAnimation">Fire Button Animation</string>
