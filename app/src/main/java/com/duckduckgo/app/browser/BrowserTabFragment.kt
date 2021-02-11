@@ -780,6 +780,8 @@ class BrowserTabFragment :
                 }.setOnCancelListener {
                     viewModel.onUserDismissedFireproofLoginDialog()
                 }.show()
+
+            viewModel.onFireproofLoginDialogShown()
         }
     }
 
@@ -796,6 +798,8 @@ class BrowserTabFragment :
             }.setOnCancelListener {
                 viewModel.onUserDismissedDisableLoginDetectionDialog()
             }.show()
+
+        viewModel.onDisableLoginDetectionDialogShown()
     }
 
     private fun launchExternalAppDialog(context: Context, onClick: () -> Unit) {

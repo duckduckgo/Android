@@ -27,32 +27,26 @@ import com.duckduckgo.app.browser.certificates.rootstore.TrustedCertificateStore
 import com.duckduckgo.app.browser.defaultbrowsing.AndroidDefaultBrowserDetector
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserObserver
-import com.duckduckgo.app.browser.downloader.AndroidFileDownloader
-import com.duckduckgo.app.browser.downloader.BlobConverterInjector
-import com.duckduckgo.app.browser.downloader.BlobConverterInjectorJs
-import com.duckduckgo.app.browser.downloader.DataUriDownloader
-import com.duckduckgo.app.browser.downloader.FileDownloader
-import com.duckduckgo.app.browser.downloader.NetworkFileDownloader
+import com.duckduckgo.app.browser.downloader.*
 import com.duckduckgo.app.browser.favicon.FaviconPersister
 import com.duckduckgo.app.browser.favicon.FileBasedFaviconPersister
 import com.duckduckgo.app.browser.httpauth.WebViewHttpAuthStore
-import com.duckduckgo.app.browser.logindetection.DOMLoginDetector
-import com.duckduckgo.app.browser.logindetection.JsLoginDetector
-import com.duckduckgo.app.browser.logindetection.NavigationAwareLoginDetector
-import com.duckduckgo.app.browser.logindetection.NextPageLoginDetection
+import com.duckduckgo.app.browser.logindetection.*
 import com.duckduckgo.app.browser.session.WebViewSessionInMemoryStorage
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.browser.tabpreview.FileBasedWebViewPreviewGenerator
 import com.duckduckgo.app.browser.tabpreview.FileBasedWebViewPreviewPersister
 import com.duckduckgo.app.browser.tabpreview.WebViewPreviewGenerator
 import com.duckduckgo.app.browser.tabpreview.WebViewPreviewPersister
-import com.duckduckgo.app.browser.useragent.UserAgentProvider
 import com.duckduckgo.app.browser.useragent.MobileUrlReWriter
+import com.duckduckgo.app.browser.useragent.UserAgentProvider
 import com.duckduckgo.app.fire.*
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteDao
+import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepository
 import com.duckduckgo.app.global.AppUrl
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.device.DeviceInfo
+import com.duckduckgo.app.global.events.db.UserEventsStore
 import com.duckduckgo.app.global.exception.UncaughtExceptionRepository
 import com.duckduckgo.app.global.file.FileDeleter
 import com.duckduckgo.app.global.install.AppInstallStore
@@ -180,7 +174,15 @@ class BrowserModule {
         globalPrivacyControl: GlobalPrivacyControl,
         userAgentProvider: UserAgentProvider,
         mobileUrlReWriter: MobileUrlReWriter
-    ): RequestInterceptor = WebViewRequestInterceptor(resourceSurrogates, trackerDetector, httpsUpgrader, privacyProtectionCountDao, globalPrivacyControl, userAgentProvider, mobileUrlReWriter)
+    ): RequestInterceptor = WebViewRequestInterceptor(
+        resourceSurrogates,
+        trackerDetector,
+        httpsUpgrader,
+        privacyProtectionCountDao,
+        globalPrivacyControl,
+        userAgentProvider,
+        mobileUrlReWriter
+    )
 
     @Provides
     fun cookieManager(
@@ -275,5 +277,16 @@ class BrowserModule {
     @Provides
     fun doNotSell(appSettingsPreferencesStore: SettingsDataStore): GlobalPrivacyControl {
         return GlobalPrivacyControlManager(appSettingsPreferencesStore)
+    }
+
+    @Provides
+    fun fireproofLoginDialogEventHandler(
+        userEventsStore: UserEventsStore,
+        pixel: Pixel,
+        fireproofWebsiteRepository: FireproofWebsiteRepository,
+        appSettingsPreferencesStore: SettingsDataStore,
+        variantManager: VariantManager
+    ): FireproofDialogsEventHandler {
+        return FireproofDialogsEventHandler(userEventsStore, pixel, fireproofWebsiteRepository, appSettingsPreferencesStore, variantManager)
     }
 }
