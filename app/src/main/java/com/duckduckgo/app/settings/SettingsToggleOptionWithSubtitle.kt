@@ -51,18 +51,17 @@ class SettingsToggleOptionWithSubtitle : FrameLayout {
         }
     }
 
-
     var title: String
         get() { return root.title.text.toString() }
-        set(value) { root.title.text = value}
+        set(value) { root.title.text = value }
 
     var subtitle: String
         get() { return root.subtitle.text.toString() }
-        set(value) { root.subtitle.text = value}
+        set(value) { root.subtitle.text = value }
 
     var isChecked: Boolean
         get() { return root.toggle.isChecked }
-        set(value) { root.toggle.isChecked = value}
+        set(value) { root.toggle.isChecked = value }
 
     override fun setEnabled(enabled: Boolean) {
         root.childrenRecursiveSequence().forEach { it.isEnabled = enabled }

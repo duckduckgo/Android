@@ -220,7 +220,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
         alarmManager?.setRepeating(
             AlarmManager.RTC_WAKEUP,
             System.currentTimeMillis(),
-            FIVE_MINUTES,
+            FIVE_HOURS,
             alarmIntent
         )
     }
@@ -361,7 +361,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
         const val VPN_REMINDER_NOTIFICATION_ID = 999
         const val VPN_FOREGROUND_SERVICE_ID = 200
 
-        const val FIVE_MINUTES = 300000L
+        const val FIVE_HOURS = 18000000L
 
         private fun serviceIntent(context: Context): Intent {
             return Intent(context, TrackerBlockingVpnService::class.java)

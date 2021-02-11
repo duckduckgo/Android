@@ -267,7 +267,7 @@ class SettingsViewModelTest {
     @Test
     fun whenDeviceShieldIsOffAndDidNotShowOnboardingThenCommandIsStopDeviceShield() {
         whenever(mockDeviceShieldOnboarding.prepare(context)).thenReturn(Intent())
-        
+
         testee.onDeviceShieldSettingChanged(false)
         testee.command.blockingObserve()
         verify(commandObserver).onChanged(commandCaptor.capture())

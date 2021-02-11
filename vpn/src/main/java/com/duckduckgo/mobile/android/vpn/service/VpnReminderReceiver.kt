@@ -16,15 +16,21 @@
 
 package com.duckduckgo.mobile.android.vpn.service
 
+import android.app.PendingIntent
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import androidx.core.app.NotificationManagerCompat
+import androidx.core.content.edit
+import com.duckduckgo.mobile.android.vpn.BuildConfig
 import com.duckduckgo.mobile.android.vpn.ui.notification.VpnNotificationBuilder
+import dummy.ui.VpnPreferences
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import timber.log.Timber
+
 
 class VpnReminderReceiver : BroadcastReceiver() {
 
@@ -35,16 +41,34 @@ class VpnReminderReceiver : BroadcastReceiver() {
             Timber.v("Checking if VPN is running")
 
             goAsync {
+                val manager = NotificationManagerCompat.from(context)
                 if (TrackerBlockingVpnService.isServiceRunning(context)) {
                     Timber.v("Vpn is already running, nothing to show")
                 } else {
                     Timber.v("Vpn is not running, showing reminder notification")
-                    val reminder = VpnNotificationBuilder.buildReminderNotification(context)
-                    val manager = NotificationManagerCompat.from(context)
-                    manager.notify(TrackerBlockingVpnService.VPN_REMINDER_NOTIFICATION_ID, reminder)
+                    val notification = if (wasReminderNotificationShown(context)){
+                        VpnNotificationBuilder.buildReminderNotification(context)
+                    } else {
+                        notificationWasShown(context)
+                        VpnNotificationBuilder.buildReminderNotification(context, false)
+                    }
+
+                    manager.notify(TrackerBlockingVpnService.VPN_REMINDER_NOTIFICATION_ID, notification)
                 }
             }
         }
+    }
+
+    private fun wasReminderNotificationShown(context: Context): Boolean {
+        return prefs(context).getBoolean(VpnPreferences.PREFS_KEY_REMINDER_NOTIFICATION_SHOWN, false)
+    }
+
+    private fun notificationWasShown(context: Context) {
+        prefs(context).edit { putBoolean(VpnPreferences.PREFS_KEY_REMINDER_NOTIFICATION_SHOWN, true) }
+    }
+
+    private fun prefs(context: Context): SharedPreferences {
+        return context.getSharedPreferences(VpnPreferences.PREFS_FILENAME, Context.MODE_PRIVATE)
     }
 
 }

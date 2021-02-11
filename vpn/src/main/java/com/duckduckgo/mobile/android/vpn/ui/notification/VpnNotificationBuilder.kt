@@ -127,7 +127,7 @@ class VpnNotificationBuilder {
             }
         }
 
-        fun buildReminderNotification(context: Context): Notification {
+        fun buildReminderNotification(context: Context, setSilent: Boolean = true): Notification {
             registerReminderChannel(context)
 
             val vpnControllerIntent = Intent(context, PrivacyReportActivity::class.java)
@@ -142,6 +142,7 @@ class VpnNotificationBuilder {
                 .setSmallIcon(R.drawable.ic_device_shield_notification_logo)
                 .setStyle(NotificationCompat.DecoratedCustomViewStyle())
                 .setContentIntent(vpnControllerPendingIntent)
+                .setSilent(setSilent)
                 .setCustomContentView(notificationLayout)
                 .setOngoing(true)
                 .setChannelId(VPN_ALERTS_CHANNEL_ID)

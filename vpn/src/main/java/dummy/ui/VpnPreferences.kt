@@ -54,5 +54,6 @@ class VpnPreferences(private val applicationContext: Context) {
         private const val PREFS_KEY_DEBUG_LOGGING = "PREFS_KEY_DEBUG_LOGGING"
         private const val PREFS_KEY_BLOCK_FACEBOOK_DOMAINS = "PREFS_KEY_BLOCK_FACEBOOK_DOMAINS"
         private const val PREFS_KEY_DNS_SERVER = "PREFS_KEY_DNS_SERVER"
+        const val PREFS_KEY_REMINDER_NOTIFICATION_SHOWN = "PREFS_KEY_REMINDER_NOTIFICATION_SHOWN"
     }
 }
