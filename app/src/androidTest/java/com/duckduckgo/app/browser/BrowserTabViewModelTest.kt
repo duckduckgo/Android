@@ -274,7 +274,7 @@ class BrowserTabViewModelTest {
         whenever(mockDismissedCtaDao.dismissedCtas()).thenReturn(dismissedCtaDaoChannel.consumeAsFlow())
         whenever(mockTabRepository.flowTabs).thenReturn(flowOf(emptyList()))
 
-        fireproofDialogsEventHandler = FireproofDialogsEventHandler(mockUserEventsStore, mockPixel, fireproofWebsiteRepository, mockSettingsStore, mockVariantManager)
+        fireproofDialogsEventHandler = FireproofDialogsEventHandler(mockUserEventsStore, mockPixel, fireproofWebsiteRepository, mockSettingsStore, mockVariantManager, coroutineRule.testDispatcherProvider)
 
         ctaViewModel = CtaViewModel(
             mockAppInstallStore,

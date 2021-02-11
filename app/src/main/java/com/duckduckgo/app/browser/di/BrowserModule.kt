@@ -285,8 +285,9 @@ class BrowserModule {
         pixel: Pixel,
         fireproofWebsiteRepository: FireproofWebsiteRepository,
         appSettingsPreferencesStore: SettingsDataStore,
-        variantManager: VariantManager
+        variantManager: VariantManager,
+        dispatchers: DispatcherProvider
     ): FireproofDialogsEventHandler {
-        return FireproofDialogsEventHandler(userEventsStore, pixel, fireproofWebsiteRepository, appSettingsPreferencesStore, variantManager)
+        return FireproofDialogsEventHandler(userEventsStore, pixel, fireproofWebsiteRepository, appSettingsPreferencesStore, variantManager, dispatchers)
     }
 }

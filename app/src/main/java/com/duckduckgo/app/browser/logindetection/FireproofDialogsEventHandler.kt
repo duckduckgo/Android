@@ -19,19 +19,22 @@ package com.duckduckgo.app.browser.logindetection
 import androidx.lifecycle.MutableLiveData
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepository
+import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.events.db.UserEventKey
 import com.duckduckgo.app.global.events.db.UserEventsStore
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.loginDetectionExperimentEnabled
 import com.duckduckgo.app.statistics.pixels.Pixel
+import kotlinx.coroutines.withContext
 
 class FireproofDialogsEventHandler constructor(
     private val userEventsStore: UserEventsStore,
     private val pixel: Pixel,
     private val fireproofWebsiteRepository: FireproofWebsiteRepository,
     private val appSettingsPreferencesStore: SettingsDataStore,
-    private val variantManager: VariantManager
+    private val variantManager: VariantManager,
+    private val dispatchers: DispatcherProvider
 ) {
 
     sealed class Event {
@@ -49,10 +52,12 @@ class FireproofDialogsEventHandler constructor(
     }
 
     suspend fun onUserConfirmedFireproofDialog(domain: String) {
-        userEventsStore.removeUserEvent(UserEventKey.FIREPROOF_LOGIN_DIALOG_DISMISSED)
-        fireproofWebsiteRepository.fireproofWebsite(domain)?.let {
-            pixel.fire(Pixel.PixelName.FIREPROOF_WEBSITE_LOGIN_ADDED, mapOf(Pixel.PixelParameter.FIRE_EXECUTED to userTriedFireButton().toString()))
-            event.value = Event.FireproofWebSiteSuccess(fireproofWebsiteEntity = it)
+        withContext(dispatchers.io()) {
+            userEventsStore.removeUserEvent(UserEventKey.FIREPROOF_LOGIN_DIALOG_DISMISSED)
+            fireproofWebsiteRepository.fireproofWebsite(domain)?.let {
+                pixel.fire(Pixel.PixelName.FIREPROOF_WEBSITE_LOGIN_ADDED, mapOf(Pixel.PixelParameter.FIRE_EXECUTED to userTriedFireButton().toString()))
+                emitEvent(Event.FireproofWebSiteSuccess(fireproofWebsiteEntity = it))
+            }
         }
     }
 
@@ -68,7 +73,7 @@ class FireproofDialogsEventHandler constructor(
     }
 
     suspend fun onDisableLoginDetectionDialogShown() {
-        pixel.enqueueFire(
+        pixel.fire(
             Pixel.PixelName.FIREPROOF_LOGIN_DISABLE_DIALOG_SHOWN,
             mapOf(Pixel.PixelParameter.FIRE_EXECUTED to userTriedFireButton().toString())
         )
@@ -76,7 +81,7 @@ class FireproofDialogsEventHandler constructor(
 
     suspend fun onUserConfirmedDisableLoginDetectionDialog() {
         appSettingsPreferencesStore.appLoginDetection = false
-        pixel.enqueueFire(
+        pixel.fire(
             Pixel.PixelName.FIREPROOF_LOGIN_DISABLE_DIALOG_DISABLE,
             mapOf(Pixel.PixelParameter.FIRE_EXECUTED to userTriedFireButton().toString())
         )
@@ -86,7 +91,7 @@ class FireproofDialogsEventHandler constructor(
         appSettingsPreferencesStore.appLoginDetection = true
         userEventsStore.removeUserEvent(UserEventKey.FIREPROOF_LOGIN_DIALOG_DISMISSED)
         userEventsStore.registerUserEvent(UserEventKey.FIREPROOF_DISABLE_DIALOG_DISMISSED)
-        pixel.enqueueFire(Pixel.PixelName.FIREPROOF_LOGIN_DISABLE_DIALOG_CANCEL, mapOf(Pixel.PixelParameter.FIRE_EXECUTED to userTriedFireButton().toString()))
+        pixel.fire(Pixel.PixelName.FIREPROOF_LOGIN_DISABLE_DIALOG_CANCEL, mapOf(Pixel.PixelParameter.FIRE_EXECUTED to userTriedFireButton().toString()))
     }
 
     private suspend fun userTriedFireButton() = userEventsStore.getUserEvent(UserEventKey.FIRE_BUTTON_EXECUTED) != null
@@ -106,5 +111,11 @@ class FireproofDialogsEventHandler constructor(
     private suspend fun shouldAskToDisableFireproofLogin(): Boolean {
         val userDismissedDialogBefore = userEventsStore.getUserEvent(UserEventKey.FIREPROOF_LOGIN_DIALOG_DISMISSED) != null
         return userDismissedDialogBefore
+    }
+
+    private suspend fun emitEvent(ev: Event) {
+        withContext(dispatchers.main()) {
+            event.value = ev
+        }
     }
 }
