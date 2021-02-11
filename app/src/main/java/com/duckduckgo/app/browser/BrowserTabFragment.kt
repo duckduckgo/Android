@@ -774,9 +774,10 @@ class BrowserTabFragment :
                 .setMessage(R.string.fireproofWebsiteLoginDialogDescription)
                 .setPositiveButton(R.string.fireproofWebsiteLoginDialogPositive) { _, _ ->
                     viewModel.onUserConfirmedFireproofDialog(fireproofWebsite.domain)
-                }
-                .setNegativeButton(R.string.fireproofWebsiteLoginDialogNegative) { dialog, _ ->
+                }.setNegativeButton(R.string.fireproofWebsiteLoginDialogNegative) { dialog, _ ->
                     dialog.dismiss()
+                    viewModel.onUserDismissedFireproofLoginDialog()
+                }.setOnCancelListener {
                     viewModel.onUserDismissedFireproofLoginDialog()
                 }.show()
         }
@@ -791,6 +792,8 @@ class BrowserTabFragment :
             }
             .setNegativeButton(R.string.disableLoginDetectionDialogNegative) { dialog, _ ->
                 dialog.dismiss()
+                viewModel.onUserDismissedDisableLoginDetectionDialog()
+            }.setOnCancelListener {
                 viewModel.onUserDismissedDisableLoginDetectionDialog()
             }.show()
     }
