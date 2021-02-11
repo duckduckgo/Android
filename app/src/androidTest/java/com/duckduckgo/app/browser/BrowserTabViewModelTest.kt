@@ -46,6 +46,7 @@ import com.duckduckgo.app.browser.LongPressHandler.RequiredAction.OpenInNewTab
 import com.duckduckgo.app.browser.addtohome.AddToHomeCapabilityDetector
 import com.duckduckgo.app.browser.downloader.FileDownloader
 import com.duckduckgo.app.browser.favicon.FaviconManager
+import com.duckduckgo.app.browser.logindetection.FireproofDialogsEventHandler
 import com.duckduckgo.app.browser.logindetection.LoginDetected
 import com.duckduckgo.app.browser.logindetection.NavigationAwareLoginDetector
 import com.duckduckgo.app.browser.logindetection.NavigationEvent
@@ -239,6 +240,8 @@ class BrowserTabViewModelTest {
 
     private lateinit var ctaViewModel: CtaViewModel
 
+    private lateinit var fireproofDialogsEventHandler: FireproofDialogsEventHandler
+
     @Captor
     private lateinit var commandCaptor: ArgumentCaptor<Command>
 
@@ -266,9 +269,12 @@ class BrowserTabViewModelTest {
         locationPermissionsDao = db.locationPermissionsDao()
 
         mockAutoCompleteApi = AutoCompleteApi(mockAutoCompleteService, mockBookmarksDao)
+        val fireproofWebsiteRepository = FireproofWebsiteRepository(fireproofWebsiteDao, coroutineRule.testDispatcherProvider, lazyFaviconManager)
 
         whenever(mockDismissedCtaDao.dismissedCtas()).thenReturn(dismissedCtaDaoChannel.consumeAsFlow())
         whenever(mockTabRepository.flowTabs).thenReturn(flowOf(emptyList()))
+
+        fireproofDialogsEventHandler = FireproofDialogsEventHandler(mockUserEventsStore, mockPixel, fireproofWebsiteRepository, mockSettingsStore, mockVariantManager)
 
         ctaViewModel = CtaViewModel(
             mockAppInstallStore,
@@ -318,7 +324,7 @@ class BrowserTabViewModelTest {
             searchCountDao = mockSearchCountDao,
             pixel = mockPixel,
             dispatchers = coroutineRule.testDispatcherProvider,
-            fireproofWebsiteRepository = FireproofWebsiteRepository(fireproofWebsiteDao, coroutineRule.testDispatcherProvider, lazyFaviconManager),
+            fireproofWebsiteRepository = fireproofWebsiteRepository,
             locationPermissionsRepository = LocationPermissionsRepository(
                 locationPermissionsDao,
                 lazyFaviconManager,
@@ -331,7 +337,8 @@ class BrowserTabViewModelTest {
             useOurAppDetector = UseOurAppDetector(mockUserEventsStore),
             variantManager = mockVariantManager,
             fileDownloader = mockFileDownloader,
-            globalPrivacyControl = GlobalPrivacyControlManager(mockSettingsStore)
+            globalPrivacyControl = GlobalPrivacyControlManager(mockSettingsStore),
+            fireproofDialogsEventHandler = fireproofDialogsEventHandler
         )
 
         testee.loadData("abc", null, false)
@@ -2088,18 +2095,6 @@ class BrowserTabViewModelTest {
         assertCommandIssued<Command.ShowFireproofWebSiteConfirmation> {
             assertEquals("login.example.com", this.fireproofWebsiteEntity.domain)
         }
-    }
-
-    @Test
-    fun whenUserFireproofsWebsiteFromLoginDialogThenPixelSent() {
-        testee.onUserConfirmedFireproofDialog("login.example.com")
-        verify(mockPixel).fire(Pixel.PixelName.FIREPROOF_WEBSITE_LOGIN_ADDED)
-    }
-
-    @Test
-    fun whenUserDismissesFireproofWebsiteLoginDialogThenPixelSent() {
-        testee.onUserDismissedFireproofLoginDialog()
-        verify(mockPixel).fire(Pixel.PixelName.FIREPROOF_WEBSITE_LOGIN_DISMISS)
     }
 
     @Test

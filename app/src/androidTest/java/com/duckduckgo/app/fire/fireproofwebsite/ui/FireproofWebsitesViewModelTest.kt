@@ -28,6 +28,7 @@ import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepository
 import com.duckduckgo.app.fire.fireproofwebsite.ui.FireproofWebsitesViewModel.Command.ConfirmDeleteFireproofWebsite
 import com.duckduckgo.app.global.db.AppDatabase
+import com.duckduckgo.app.global.events.db.UserEventsStore
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.FIREPROOF_LOGIN_TOGGLE_ENABLED
@@ -72,9 +73,11 @@ class FireproofWebsitesViewModelTest {
 
     private val mockPixel: Pixel = mock()
 
-    private val settingsDataStore: SettingsDataStore = mock()
+    private val mockSettingsDataStore: SettingsDataStore = mock()
 
     private val mockFaviconManager: FaviconManager = mock()
+
+    private val mockUserEventsStore: UserEventsStore = mock()
 
     private val lazyFaviconManager = Lazy { mockFaviconManager }
 
@@ -88,7 +91,8 @@ class FireproofWebsitesViewModelTest {
             FireproofWebsiteRepository(fireproofWebsiteDao, coroutineRule.testDispatcherProvider, lazyFaviconManager),
             coroutineRule.testDispatcherProvider,
             mockPixel,
-            settingsDataStore
+            mockSettingsDataStore,
+            mockUserEventsStore
         )
         viewModel.command.observeForever(mockCommandObserver)
         viewModel.viewState.observeForever(mockViewStateObserver)
@@ -164,7 +168,7 @@ class FireproofWebsitesViewModelTest {
     fun whenUserTogglesLoginDetectionThenUpdateSettingsDataStore() {
         viewModel.onUserToggleLoginDetection(true)
 
-        verify(settingsDataStore).appLoginDetection = true
+        verify(mockSettingsDataStore).appLoginDetection = true
     }
 
     private inline fun <reified T : FireproofWebsitesViewModel.Command> assertCommandIssued(instanceAssertions: T.() -> Unit = {}) {
