@@ -230,7 +230,9 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
             addAddress("10.0.0.2", 32)
             addRoute("0.0.0.0", 0)
             setBlocking(true)
-            setMtu(Short.MAX_VALUE.toInt())
+            // Cap the max MTU value to avoid backpressure issues in the socket
+            // This is effectively capping the max segment size too
+            setMtu(4000)
             configureMeteredConnection()
 
             if (vpnPreferences.isCustomDnsServerSet()) {

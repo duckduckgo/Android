@@ -20,6 +20,11 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
 
+import androidx.annotation.NonNull;
+import timber.log.Timber;
+
+import static xyz.hexene.localvpn.ByteBufferPool.BUFFER_SIZE;
+
 /** Representation of an IP Packet */
 // TODO: Reduce public mutability
 public class Packet {
@@ -27,6 +32,9 @@ public class Packet {
     public static final int IP4_HEADER_SIZE = 20;
     public static final int TCP_HEADER_SIZE = 20;
     public static final int UDP_HEADER_SIZE = 8;
+    public static final int TCP_OPTION_TYPE_MSS = 0x02;
+    public static final int TCP_OPTION_MSS_SIZE = 0x04;
+    public static final int TCP_MAX_SEGMENT_SIZE = BUFFER_SIZE - 40;
 
     public IP4Header ip4Header;
     public TCPHeader tcpHeader;
@@ -110,12 +118,23 @@ public class Packet {
 
         // Reset header size, since we don't need options
         byte dataOffset = (byte) (TCP_HEADER_SIZE << 2);
+        int headerLength = (dataOffset >> 4) * 4;
+        if (tcpHeader.isSYN()) {
+            dataOffset = (byte) (24 << 2);
+            headerLength = (dataOffset >> 4) * 4;
+            // at this point the buffer is at position 40. We use put(byte[]) so that the position
+            // advances. Else the only 40 bytes will later to written in the TUN
+            buffer.put((byte) TCP_OPTION_TYPE_MSS);
+            buffer.put((byte) TCP_OPTION_MSS_SIZE);
+            buffer.putShort((short) TCP_MAX_SEGMENT_SIZE);
+        }
+        tcpHeader.headerLength = headerLength;
         tcpHeader.dataOffsetAndReserved = dataOffset;
         backingBuffer.put(IP4_HEADER_SIZE + 12, dataOffset);
 
         updateTCPChecksum(payloadSize);
 
-        int ip4TotalLength = IP4_HEADER_SIZE + TCP_HEADER_SIZE + payloadSize;
+        int ip4TotalLength = IP4_HEADER_SIZE + headerLength + payloadSize;
         backingBuffer.putShort(2, (short) ip4TotalLength);
         ip4Header.totalLength = ip4TotalLength;
 
@@ -164,7 +183,8 @@ public class Packet {
 
     private void updateTCPChecksum(int payloadSize) {
         int sum = 0;
-        int tcpLength = TCP_HEADER_SIZE + payloadSize;
+        int optionsSize = tcpHeader.headerLength - TCP_HEADER_SIZE;
+        int tcpLength = TCP_HEADER_SIZE + optionsSize + payloadSize;
 
         // Calculate pseudo-header checksum
         ByteBuffer buffer = ByteBuffer.wrap(ip4Header.sourceAddress.getAddress());
