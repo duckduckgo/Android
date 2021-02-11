@@ -335,7 +335,7 @@ class BrowserTabViewModel(
     }
 
     private val fireproofDialogEventObserver = Observer<FireproofDialogsEventHandler.Event> { event ->
-        command.value =  when(event) {
+        command.value = when (event) {
             is FireproofDialogsEventHandler.Event.AskToDisableLoginDetection -> AskToDisableLoginDetection
             is FireproofDialogsEventHandler.Event.FireproofWebSiteSuccess -> ShowFireproofWebSiteConfirmation(event.fireproofWebsiteEntity)
         }
@@ -1322,9 +1322,9 @@ class BrowserTabViewModel(
     }
 
     fun onDisableLoginDetectionDialogShown() {
-       viewModelScope.launch(dispatchers.io()) {
-           fireproofDialogsEventHandler.onDisableLoginDetectionDialogShown()
-       }
+        viewModelScope.launch(dispatchers.io()) {
+            fireproofDialogsEventHandler.onDisableLoginDetectionDialogShown()
+        }
     }
 
     fun onUserConfirmedDisableLoginDetectionDialog() {
