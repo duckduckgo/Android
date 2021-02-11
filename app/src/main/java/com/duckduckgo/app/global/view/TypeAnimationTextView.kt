@@ -35,7 +35,7 @@ class TypeAnimationTextView @JvmOverloads constructor(
     private var typingAnimationJob: Job? = null
     private var delayAfterAnimationInMs: Long = 300
     var typingDelayInMs: Long = 20
-    lateinit var textInDialog: Spanned
+    var textInDialog: Spanned? = null
 
     fun startTypingAnimation(textDialog: String, isCancellable: Boolean = true, afterAnimation: () -> Unit = {}) {
         textInDialog = textDialog.html(context)
@@ -49,12 +49,14 @@ class TypeAnimationTextView @JvmOverloads constructor(
         }
 
         typingAnimationJob = launch {
-            textInDialog.mapIndexed { index, _ ->
-                text = textInDialog.subSequence(0, index + 1)
-                delay(typingDelayInMs)
+            textInDialog?.let {
+                it.mapIndexed { index, _ ->
+                    text = it.subSequence(0, index + 1)
+                    delay(typingDelayInMs)
+                }
+                delay(delayAfterAnimationInMs)
+                afterAnimation()
             }
-            delay(delayAfterAnimationInMs)
-            afterAnimation()
         }
     }
 
@@ -64,7 +66,7 @@ class TypeAnimationTextView @JvmOverloads constructor(
 
     fun finishAnimation() {
         cancelAnimation()
-        text = textInDialog
+        textInDialog?.let { text = it }
     }
 
     fun cancelAnimation() = typingAnimationJob?.cancel()

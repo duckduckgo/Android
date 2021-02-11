@@ -198,7 +198,7 @@ class TypewriterDaxDialog : DialogFragment(), DaxDialog {
             primaryButtonText: String,
             secondaryButtonText: String? = "",
             toolbarDimmed: Boolean = true,
-            dismissible: Boolean = true,
+            dismissible: Boolean = false,
             typingDelayInMs: Long = DEFAULT_TYPING_DELAY,
             showHideButton: Boolean = true
         ): TypewriterDaxDialog {

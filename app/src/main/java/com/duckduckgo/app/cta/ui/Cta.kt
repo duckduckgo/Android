@@ -132,7 +132,7 @@ sealed class DaxDialogCta(
 ) : Cta, DialogCta, DaxCta {
 
     override fun createCta(activity: FragmentActivity): DaxDialog =
-        TypewriterDaxDialog.newInstance(daxText = getDaxText(activity), primaryButtonText = activity.resources.getString(okButton), dismissible = false)
+        TypewriterDaxDialog.newInstance(daxText = getDaxText(activity), primaryButtonText = activity.resources.getString(okButton))
 
     override fun pixelCancelParameters(): Map<String, String> = mapOf(Pixel.PixelParameter.CTA_SHOWN to ctaPixelParam)
 
@@ -175,8 +175,7 @@ sealed class DaxDialogCta(
             TypewriterDaxDialog.newInstance(
                 daxText = getDaxText(activity),
                 primaryButtonText = activity.resources.getString(okButton),
-                toolbarDimmed = false,
-                dismissible = false
+                toolbarDimmed = false
             )
 
         override fun getDaxText(context: Context): String {
@@ -232,7 +231,7 @@ sealed class DaxDialogCta(
         }
 
         override fun createCta(activity: FragmentActivity): DaxDialog =
-            TypewriterDaxDialog.newInstance(daxText = getDaxText(activity), primaryButtonText = activity.resources.getString(okButton), dismissible = false)
+            TypewriterDaxDialog.newInstance(daxText = getDaxText(activity), primaryButtonText = activity.resources.getString(okButton))
 
         private fun isFromSameNetworkDomain(): Boolean = mainTrackerDomains.any { siteHost.contains(it) }
     }
@@ -249,7 +248,7 @@ sealed class DaxDialogCta(
         appInstallStore
     ) {
         override fun createCta(activity: FragmentActivity): DaxDialog =
-            TypewriterDaxDialog.newInstance(daxText = getDaxText(activity), primaryButtonText = activity.resources.getString(okButton), dismissible = false)
+            TypewriterDaxDialog.newInstance(daxText = getDaxText(activity), primaryButtonText = activity.resources.getString(okButton))
     }
 
     companion object {

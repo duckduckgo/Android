@@ -1794,7 +1794,7 @@ class BrowserTabFragment :
 
                 ddgLogo.show()
                 lastSeenCtaViewState = viewState
-                resetNewTabLayoutClickListener()
+                removeNewTabLayoutClickListener()
                 if (viewState.cta != null) {
                     showCta(viewState.cta)
                 } else {
@@ -1840,7 +1840,7 @@ class BrowserTabFragment :
             newTabLayout.setOnClickListener { daxCtaContainer.dialogTextCta.finishAnimation() }
         }
 
-        private fun resetNewTabLayoutClickListener() {
+        private fun removeNewTabLayoutClickListener() {
             newTabLayout.setOnClickListener(null)
         }
 
