@@ -86,10 +86,11 @@ class FireproofWebsitesViewModel(
     fun onUserToggleLoginDetection(enabled: Boolean) {
         viewModelScope.launch(dispatcherProvider.io()) {
             val pixelName = if (enabled) FIREPROOF_LOGIN_TOGGLE_ENABLED else FIREPROOF_LOGIN_TOGGLE_DISABLED
+            pixel.fire(pixelName)
+
             if (enabled) {
                 userEventsStore.registerUserEvent(UserEventKey.USER_ENABLED_FIREPROOF_LOGIN)
             }
-            pixel.fire(pixelName)
         }
         settingsDataStore.appLoginDetection = enabled
         _viewState.value = _viewState.value?.copy(loginDetectionEnabled = enabled)
