@@ -51,7 +51,7 @@ class TypewriterDaxDialog : DialogFragment(), DaxDialog {
     private var primaryButtonText: String = ""
     private var secondaryButtonText: String = ""
     private var toolbarDimmed: Boolean = true
-    private var dismissible: Boolean = true
+    private var dismissible: Boolean = false
     private var typingDelayInMs: Long = DEFAULT_TYPING_DELAY
     private var showHideButton: Boolean = true
 
