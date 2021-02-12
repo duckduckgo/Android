@@ -53,6 +53,7 @@ import com.duckduckgo.app.browser.downloader.DownloadFailReason
 import com.duckduckgo.app.browser.downloader.FileDownloader
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.logindetection.FireproofDialogsEventHandler
+import com.duckduckgo.app.browser.logindetection.FireproofDialogsEventHandler.Event
 import com.duckduckgo.app.browser.logindetection.LoginDetected
 import com.duckduckgo.app.browser.logindetection.NavigationAwareLoginDetector
 import com.duckduckgo.app.browser.logindetection.NavigationEvent
@@ -334,10 +335,10 @@ class BrowserTabViewModel(
         browserViewState.value = currentBrowserViewState().copy(isFireproofWebsite = isFireproofWebsite())
     }
 
-    private val fireproofDialogEventObserver = Observer<FireproofDialogsEventHandler.Event> { event ->
+    private val fireproofDialogEventObserver = Observer<Event> { event ->
         command.value = when (event) {
-            is FireproofDialogsEventHandler.Event.AskToDisableLoginDetection -> AskToDisableLoginDetection
-            is FireproofDialogsEventHandler.Event.FireproofWebSiteSuccess -> ShowFireproofWebSiteConfirmation(event.fireproofWebsiteEntity)
+            is Event.AskToDisableLoginDetection -> AskToDisableLoginDetection
+            is Event.FireproofWebSiteSuccess -> ShowFireproofWebSiteConfirmation(event.fireproofWebsiteEntity)
         }
     }
 

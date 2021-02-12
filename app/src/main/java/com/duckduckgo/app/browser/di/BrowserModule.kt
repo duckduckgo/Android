@@ -288,6 +288,6 @@ class BrowserModule {
         variantManager: VariantManager,
         dispatchers: DispatcherProvider
     ): FireproofDialogsEventHandler {
-        return FireproofDialogsEventHandler(userEventsStore, pixel, fireproofWebsiteRepository, appSettingsPreferencesStore, variantManager, dispatchers)
+        return BrowserTabFireproofDialogsEventHandler(userEventsStore, pixel, fireproofWebsiteRepository, appSettingsPreferencesStore, variantManager, dispatchers)
     }
 }

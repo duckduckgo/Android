@@ -234,13 +234,14 @@ class BrowserTabViewModelTest {
     @Mock
     private lateinit var geoLocationPermissions: GeoLocationPermissions
 
+    @Mock
+    private lateinit var fireproofDialogsEventHandler: FireproofDialogsEventHandler
+
     private val lazyFaviconManager = Lazy { mockFaviconManager }
 
     private lateinit var mockAutoCompleteApi: AutoCompleteApi
 
     private lateinit var ctaViewModel: CtaViewModel
-
-    private lateinit var fireproofDialogsEventHandler: FireproofDialogsEventHandler
 
     @Captor
     private lateinit var commandCaptor: ArgumentCaptor<Command>
@@ -256,6 +257,8 @@ class BrowserTabViewModelTest {
     private val selectedTabLiveData = MutableLiveData<TabEntity>()
 
     private val loginEventLiveData = MutableLiveData<LoginDetected>()
+
+    private val fireproofDialogsEventHandlerLiveData = MutableLiveData<FireproofDialogsEventHandler.Event>()
 
     private val dismissedCtaDaoChannel = Channel<List<DismissedCta>>()
 
@@ -273,8 +276,6 @@ class BrowserTabViewModelTest {
 
         whenever(mockDismissedCtaDao.dismissedCtas()).thenReturn(dismissedCtaDaoChannel.consumeAsFlow())
         whenever(mockTabRepository.flowTabs).thenReturn(flowOf(emptyList()))
-
-        fireproofDialogsEventHandler = FireproofDialogsEventHandler(mockUserEventsStore, mockPixel, fireproofWebsiteRepository, mockSettingsStore, mockVariantManager, coroutineRule.testDispatcherProvider)
 
         ctaViewModel = CtaViewModel(
             mockAppInstallStore,
@@ -303,6 +304,7 @@ class BrowserTabViewModelTest {
         whenever(mockPrivacyPractices.privacyPracticesFor(any())).thenReturn(PrivacyPractices.UNKNOWN)
         whenever(mockAppInstallStore.installTimestamp).thenReturn(System.currentTimeMillis() - TimeUnit.DAYS.toMillis(1))
         whenever(mockUserWhitelistDao.contains(anyString())).thenReturn(false)
+        whenever(fireproofDialogsEventHandler.event).thenReturn(fireproofDialogsEventHandlerLiveData)
 
         testee = BrowserTabViewModel(
             statisticsUpdater = mockStatisticsUpdater,
@@ -2089,12 +2091,28 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenUserFireproofsWebsiteFromLoginDialogThenShowConfirmationIsIssuedWithExpectedDomain() {
-        loadUrl("http://mobile.example.com/", isBrowserShowing = true)
+    fun whenUserFireproofsWebsiteFromLoginDialogThenShowConfirmationIsIssuedWithExpectedDomain() = coroutineRule.runBlocking {
+        whenever(fireproofDialogsEventHandler.onUserConfirmedFireproofDialog(anyString())).doAnswer {
+            val domain = it.arguments.first() as String
+            fireproofDialogsEventHandlerLiveData.postValue(FireproofDialogsEventHandler.Event.FireproofWebSiteSuccess(FireproofWebsiteEntity(domain)))
+        }
+
         testee.onUserConfirmedFireproofDialog("login.example.com")
+
         assertCommandIssued<Command.ShowFireproofWebSiteConfirmation> {
             assertEquals("login.example.com", this.fireproofWebsiteEntity.domain)
         }
+    }
+
+    @Test
+    fun whenAskToDisableLoginDetectionEventReceivedThenAskUserToDisableLoginDetection() = coroutineRule.runBlocking {
+        whenever(fireproofDialogsEventHandler.onUserDismissedFireproofLoginDialog()).doAnswer {
+            fireproofDialogsEventHandlerLiveData.postValue(FireproofDialogsEventHandler.Event.AskToDisableLoginDetection)
+        }
+
+        testee.onUserDismissedFireproofLoginDialog()
+
+        assertCommandIssued<Command.AskToDisableLoginDetection>()
     }
 
     @Test

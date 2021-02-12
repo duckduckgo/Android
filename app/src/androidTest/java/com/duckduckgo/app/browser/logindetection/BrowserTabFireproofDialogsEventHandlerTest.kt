@@ -46,7 +46,7 @@ import org.junit.Rule
 import org.junit.Test
 
 @ExperimentalCoroutinesApi
-class FireproofDialogsEventHandlerTest {
+class BrowserTabFireproofDialogsEventHandlerTest {
 
     @get:Rule
     var coroutineRule = CoroutineTestRule()
@@ -71,7 +71,7 @@ class FireproofDialogsEventHandlerTest {
             .build()
         fireproofWebsiteDao = db.fireproofWebsiteDao()
         val fireproofWebsiteRepository = FireproofWebsiteRepository(fireproofWebsiteDao, coroutineRule.testDispatcherProvider, mock())
-        testee = FireproofDialogsEventHandler(
+        testee = BrowserTabFireproofDialogsEventHandler(
             mockUserEventsStore,
             mockPixel,
             fireproofWebsiteRepository,
