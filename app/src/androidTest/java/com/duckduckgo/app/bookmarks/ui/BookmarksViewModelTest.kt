@@ -117,4 +117,10 @@ class BookmarksViewModelTest {
         testee.delete(bookmark)
         verify(faviconManager).deletePersistedFavicon(bookmark.url)
     }
+
+    @Test
+    fun whenBookmarkInsertedThenDaoUpdated() {
+        testee.insert(bookmark)
+        verify(bookmarksDao).insert(bookmark)
+    }
 }
