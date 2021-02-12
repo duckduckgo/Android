@@ -52,7 +52,7 @@ interface VariantManager {
             Variant(key = "zi", weight = 0.0, features = listOf(VariantFeature.SerpHeaderRemoval), filterBy = { noFilter() }),
 
             // Fireproof login Experiment
-            Variant(key = "zq", weight = 0.0, features = emptyList(), filterBy = { isEnglishLocale() }),
+            Variant(key = "zq", weight = 1.0, features = emptyList(), filterBy = { isEnglishLocale() }),
             Variant(key = "zw", weight = 1.0, features = listOf(VariantFeature.LoginDetectionEnabled), filterBy = { isEnglishLocale() }),
         )
 
