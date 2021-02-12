@@ -19,6 +19,7 @@ package com.duckduckgo.app.browser.omnibar
 import android.content.Context
 import android.graphics.Rect
 import android.text.Editable
+import android.text.Selection
 import android.util.AttributeSet
 import android.util.Patterns
 import android.view.KeyEvent
@@ -50,9 +51,13 @@ class KeyboardAwareEditText : AppCompatEditText {
                 text = text
                 // cursor at the end of the word
                 setSelection(text!!.length)
+            } else if (text?.isWebUrl() == true) {
+                // We always want URLs to be selected
+                // we need to post for the selectAll to take effect. The wonders of Android layout !
+                post { Selection.selectAll(text) }
             }
             showKeyboard()
-            didFocusAlready = true
+            didFocusAlready = text?.isWebUrl() == false
         }
     }
 
