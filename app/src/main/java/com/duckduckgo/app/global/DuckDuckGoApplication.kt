@@ -17,9 +17,11 @@
 package com.duckduckgo.app.global
 
 import android.annotation.SuppressLint
+import android.app.ActivityManager
 import android.app.Application
 import android.content.IntentFilter
 import android.os.Build
+import android.os.Process
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.OnLifecycleEvent
@@ -72,6 +74,7 @@ import kotlinx.coroutines.*
 import org.jetbrains.anko.doAsync
 import org.threeten.bp.zone.ZoneRulesProvider
 import timber.log.Timber
+import java.io.File
 import java.lang.reflect.Method
 import javax.inject.Inject
 import kotlin.concurrent.thread
@@ -245,20 +248,15 @@ open class DuckDuckGoApplication : HasAndroidInjector, Application(), LifecycleO
         return this.endsWith(":vpn")
     }
 
-    // vtodo Revisit this strategy of detecting if the current process is the VPN as it is hacky
+    // vtodo maybe remove at some point
     @SuppressLint("DiscouragedPrivateApi", "PrivateApi")
     private fun processName(): String {
         if (Build.VERSION.SDK_INT >= 28) {
             return getProcessName()
         }
 
-        return try {
-            val activityThread = Class.forName("android.app.ActivityThread")
-            val getProcessName: Method = activityThread.getDeclaredMethod("currentProcessName")
-            (getProcessName.invoke(null) as String)
-        } catch (e: Throwable) {
-            ""
-        }
+        val am = getSystemService(ACTIVITY_SERVICE) as ActivityManager
+        return am.runningAppProcesses.firstOrNull { it.pid == Process.myPid() }?.processName.orEmpty()
     }
 
     private fun configureUncaughtExceptionHandler() {
@@ -303,6 +301,45 @@ open class DuckDuckGoApplication : HasAndroidInjector, Application(), LifecycleO
             .applicationCoroutineScope(applicationCoroutineScope)
             .build()
         daggerAppComponent.inject(this)
+    }
+
+    // vtodo - Work around for https://crbug.com/558377
+    // AndroidInjection.inject(this) creates a new instance of the DuckDuckGoApplication (because we are in a new process)
+    // This has several disadvantages:
+    //   1. our app is of massive size, because we are duplicating our Dagger graph
+    //   2. we are hitting this bug in https://crbug.com/558377, because some of the injected dependencies may eventually
+    //      depend in something webview-related
+    //
+    // We need to override getDir and getCacheDir so that the webview does not share the same data dir across processes
+    // This is hacky hacky but should be OK for now as we don't use the webview in the VPN, it is just an issue with
+    // injecting/creating dependencies
+    //
+    // A proper fix should be to create a VpnServiceComponent that just provide the dependencies needed by the VPN, which would
+    // also help with memory
+    override fun getDir(name: String?, mode: Int): File {
+        val dir = super.getDir(name, mode)
+        if (name == "webview" && processName().isVpnProcess()) {
+            return File("${dir.absolutePath}/vpn").apply {
+                Timber.d(":vpn process getDir = $absolutePath")
+                if (!exists()) {
+                    mkdirs()
+                }
+            }
+        }
+        return dir
+    }
+
+    override fun getCacheDir(): File {
+        val dir = super.getCacheDir()
+        if (processName().isVpnProcess()) {
+            return File("${dir.absolutePath}/vpn").apply {
+                Timber.d(":vpn process getCacheDir = $absolutePath")
+                if (!exists()) {
+                    mkdirs()
+                }
+            }
+        }
+        return dir
     }
 
     private fun initializeHttpsUpgrader() {
