@@ -1259,6 +1259,17 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenUserSubmittedDifferentQueryAndOldQueryIsUrlThenDoNotSendQueryChangePixel() {
+        whenever(mockOmnibarConverter.convertQueryToUrl("another query", null)).thenReturn("another query")
+        loadUrl("www.foo.com")
+
+        testee.onUserSubmittedQuery("another query")
+
+        verify(mockPixel, never()).fire("rq_0")
+        verify(mockPixel, never()).fire("rq_1")
+    }
+
+    @Test
     fun whenUserBrowsingPressesBackAndBrowserCanGoBackThenNavigatesToPreviousPageAndHandledTrue() {
         setupNavigation(isBrowsing = true, canGoBack = true, stepsToPreviousPage = 2)
         assertTrue(testee.onUserPressedBack())

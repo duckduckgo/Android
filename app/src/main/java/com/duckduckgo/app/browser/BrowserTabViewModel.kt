@@ -545,6 +545,8 @@ class BrowserTabViewModel(
         val oldQuery = currentOmnibarViewState().omnibarText.toUri()
         val newQuery = omnibarText.toUri()
 
+        if (Patterns.WEB_URL.matcher(oldQuery.toString()).matches()) return
+
         if (oldQuery == newQuery) {
             pixel.fire(String.format(Locale.US, PixelName.SERP_REQUERY.pixelName, PixelParameter.SERP_QUERY_NOT_CHANGED))
         } else if (oldQuery.toString().isNotBlank()) { // blank means no previous search, don't send pixel
