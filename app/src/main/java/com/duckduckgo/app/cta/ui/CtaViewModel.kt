@@ -100,7 +100,6 @@ class CtaViewModel @Inject constructor(
         )
     }
 
-    @ExperimentalCoroutinesApi
     suspend fun dismissPulseAnimation() {
         withContext(dispatchers.io()) {
             dismissedCtaDao.insert(DismissedCta(CtaId.DAX_FIRE_BUTTON))
@@ -357,7 +356,6 @@ class CtaViewModel @Inject constructor(
         }
     }
 
-    @ExperimentalCoroutinesApi
     private fun forceStopFireButtonPulseAnimationFlow() = tabRepository.flowTabs.distinctUntilChanged()
         .map { tabs ->
             if (tabs.size >= MAX_TABS_OPEN_FIRE_EDUCATION) return@map true
@@ -378,7 +376,6 @@ class CtaViewModel @Inject constructor(
             }
         }.shouldShowPulseAnimation()
 
-    @ExperimentalCoroutinesApi
     private fun Flow<Pair<List<DismissedCta>, Boolean>>.shouldShowPulseAnimation(): Flow<Boolean> {
         return this.map { (dismissedCtaDao, forceStopAnimation) ->
             withContext(dispatchers.io()) {

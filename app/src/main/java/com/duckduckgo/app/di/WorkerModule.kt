@@ -17,22 +17,10 @@
 package com.duckduckgo.app.di
 
 import android.content.Context
-import androidx.core.app.NotificationManagerCompat
 import androidx.work.Configuration
 import androidx.work.WorkManager
 import androidx.work.WorkerFactory
-import com.duckduckgo.app.browser.BuildConfig
-import com.duckduckgo.app.global.view.ClearDataAction
-import com.duckduckgo.app.job.ConfigurationDownloader
-import com.duckduckgo.app.notification.NotificationFactory
-import com.duckduckgo.app.notification.db.NotificationDao
-import com.duckduckgo.app.notification.model.ClearDataNotification
-import com.duckduckgo.app.notification.model.PrivacyProtectionNotification
-import com.duckduckgo.app.settings.db.SettingsDataStore
-import com.duckduckgo.app.statistics.api.OfflinePixelSender
-import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
-import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
+import com.duckduckgo.app.global.plugins.worker.WorkerInjectorPluginPoint
 import dagger.Module
 import dagger.Provides
 import javax.inject.Singleton
@@ -45,7 +33,6 @@ class WorkerModule {
     fun workManager(context: Context, workerFactory: WorkerFactory): WorkManager {
         val config = Configuration.Builder()
             .setWorkerFactory(workerFactory)
-            .setDefaultProcessName(BuildConfig.APPLICATION_ID)
             .build()
         WorkManager.initialize(context, config)
         return WorkManager.getInstance(context)
@@ -54,32 +41,8 @@ class WorkerModule {
     @Provides
     @Singleton
     fun workerFactory(
-        offlinePixelSender: OfflinePixelSender,
-        settingsDataStore: SettingsDataStore,
-        clearDataAction: ClearDataAction,
-        notificationManager: NotificationManagerCompat,
-        notificationDao: NotificationDao,
-        notificationFactory: NotificationFactory,
-        clearDataNotification: ClearDataNotification,
-        privacyProtectionNotification: PrivacyProtectionNotification,
-        configurationDownloader: ConfigurationDownloader,
-        vpnDatabase: VpnDatabase,
-        vpnRepository: AppTrackerBlockingStatsRepository,
-        pixel: Pixel
+        workerInjectorPluginPoint: WorkerInjectorPluginPoint,
     ): WorkerFactory {
-        return DaggerWorkerFactory(
-            offlinePixelSender = offlinePixelSender,
-            settingsDataStore = settingsDataStore,
-            clearDataAction = clearDataAction,
-            notificationManager = notificationManager,
-            notificationDao = notificationDao,
-            notificationFactory = notificationFactory,
-            clearDataNotification = clearDataNotification,
-            privacyProtectionNotification = privacyProtectionNotification,
-            configurationDownloader = configurationDownloader,
-            vpnDatabase = vpnDatabase,
-            vpnRepository = vpnRepository,
-            pixel = pixel
-        )
+        return DaggerWorkerFactory(workerInjectorPluginPoint)
     }
 }

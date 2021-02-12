@@ -23,7 +23,7 @@ import io.reactivex.Single
 @Dao
 interface BookmarksDao {
 
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insert(bookmark: BookmarkEntity): Long
 
     @Query("select * from bookmarks")
@@ -38,8 +38,8 @@ interface BookmarksDao {
     @Update(onConflict = OnConflictStrategy.REPLACE)
     fun update(bookmarkEntity: BookmarkEntity)
 
-    @Query("select * from bookmarks WHERE title LIKE :query OR url LIKE :query")
-    fun bookmarksByQuery(query: String): Single<List<BookmarkEntity>>
+    @Query("select * from bookmarks")
+    fun bookmarksObservable(): Single<List<BookmarkEntity>>
 
     @Query("select CAST(COUNT(*) AS BIT) from bookmarks")
     suspend fun hasBookmarks(): Boolean

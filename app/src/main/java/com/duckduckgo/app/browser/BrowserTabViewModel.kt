@@ -20,6 +20,7 @@ import android.annotation.SuppressLint
 import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Message
+import android.util.Patterns
 import android.view.ContextMenu
 import android.view.MenuItem
 import android.view.View
@@ -60,6 +61,7 @@ import com.duckduckgo.app.browser.model.LongPressTarget
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.browser.ui.HttpAuthenticationDialogFragment.HttpAuthenticationListener
+import com.duckduckgo.app.browser.useragent.MobileUrlReWriter
 import com.duckduckgo.app.cta.ui.*
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepository
@@ -214,7 +216,7 @@ class BrowserTabViewModel(
         val shouldAnimate: Boolean = false,
         val showEmptyGrade: Boolean = true
     ) {
-        val isEnabled: Boolean = !showEmptyGrade && privacyGrade != PrivacyGrade.UNKNOWN
+        val isEnabled: Boolean = privacyGrade != PrivacyGrade.UNKNOWN
     }
 
     data class AutoCompleteViewState(
@@ -264,9 +266,11 @@ class BrowserTabViewModel(
         class CheckSystemLocationPermission(val domain: String, val deniedForever: Boolean) : Command()
         class AskDomainPermission(val domain: String) : Command()
         object RequestSystemLocationPermission : Command()
-        class RefreshUserAgent(val host: String?, val isDesktop: Boolean) : Command()
+        class RefreshUserAgent(val url: String?, val isDesktop: Boolean) : Command()
         class ShowErrorWithAction(val textResId: Int, val action: () -> Unit) : Command()
         class ShowDomainHasPermissionMessage(val domain: String) : Command()
+        class ConvertBlobToDataUri(val url: String, val mimeType: String) : Command()
+        class RequestFileDownload(val url: String, val contentDisposition: String?, val mimeType: String, val requestUserConfirmation: Boolean) : Command()
         sealed class DaxCommand : Command() {
             object FinishTrackerAnimation : DaxCommand()
             class HideDaxDialog(val cta: Cta) : DaxCommand()
@@ -327,7 +331,6 @@ class BrowserTabViewModel(
         browserViewState.value = currentBrowserViewState().copy(isFireproofWebsite = isFireproofWebsite())
     }
 
-    @ExperimentalCoroutinesApi
     private val fireButtonAnimation = Observer<Boolean> { shouldShowAnimation ->
         Timber.i("shouldShowAnimation $shouldShowAnimation")
         if (currentBrowserViewState().fireButton is FireButton.Visible) {
@@ -339,7 +342,6 @@ class BrowserTabViewModel(
         }
     }
 
-    @ExperimentalCoroutinesApi
     private fun registerAndScheduleDismissAction() {
         viewModelScope.launch(dispatchers.io()) {
             val fireButtonHighlightedEvent = userEventsStore.getUserEvent(UserEventKey.FIRE_BUTTON_HIGHLIGHTED)
@@ -426,9 +428,8 @@ class BrowserTabViewModel(
     }
 
     private fun onAutoCompleteResultReceived(result: AutoCompleteResult) {
-        val results = result.suggestions.take(6)
         val currentViewState = currentAutoCompleteViewState()
-        autoCompleteViewState.value = currentViewState.copy(searchResults = AutoCompleteResult(result.query, results))
+        autoCompleteViewState.value = currentViewState.copy(searchResults = AutoCompleteResult(result.query, result.suggestions))
     }
 
     @VisibleForTesting
@@ -544,9 +545,11 @@ class BrowserTabViewModel(
         val oldQuery = currentOmnibarViewState().omnibarText.toUri()
         val newQuery = omnibarText.toUri()
 
+        if (Patterns.WEB_URL.matcher(oldQuery.toString()).matches()) return
+
         if (oldQuery == newQuery) {
             pixel.fire(String.format(Locale.US, PixelName.SERP_REQUERY.pixelName, PixelParameter.SERP_QUERY_NOT_CHANGED))
-        } else {
+        } else if (oldQuery.toString().isNotBlank()) { // blank means no previous search, don't send pixel
             pixel.fire(String.format(Locale.US, PixelName.SERP_REQUERY.pixelName, PixelParameter.SERP_QUERY_CHANGED))
         }
     }
@@ -564,6 +567,7 @@ class BrowserTabViewModel(
     }
 
     override fun willOverrideUrl(newUrl: String) {
+        navigationAwareLoginDetector.onEvent(NavigationEvent.Redirect(newUrl))
         val previousSiteStillLoading = currentLoadingViewState().isLoading
         if (previousSiteStillLoading) {
             showBlankContentfNewContentDelayed()
@@ -590,6 +594,8 @@ class BrowserTabViewModel(
             }
         }
     }
+
+    override fun isDesktopSiteEnabled(): Boolean = currentBrowserViewState().isDesktopBrowsingMode
 
     override fun closeCurrentTab() {
         viewModelScope.launch { removeCurrentTabFromRepository() }
@@ -621,6 +627,10 @@ class BrowserTabViewModel(
     }
 
     fun onRefreshRequested() {
+        val omnibarContent = currentOmnibarViewState().omnibarText
+        if (!Patterns.WEB_URL.matcher(omnibarContent).matches()) {
+            fireQueryChangedPixel(currentOmnibarViewState().omnibarText)
+        }
         navigationAwareLoginDetector.onEvent(NavigationEvent.UserAction.Refresh)
         if (currentGlobalLayoutState() is Invalidated) {
             recoverTabWithQuery(url.orEmpty())
@@ -751,8 +761,6 @@ class BrowserTabViewModel(
             sendPixelIfUseOurAppSiteVisitedFirstTime(url)
         }
 
-        command.value = RefreshUserAgent(site?.uri?.host, currentBrowserViewState().isDesktopBrowsingMode)
-
         val currentOmnibarViewState = currentOmnibarViewState()
         omnibarViewState.value = currentOmnibarViewState.copy(omnibarText = omnibarTextForUrl(url), shouldMoveCaretToEnd = false)
         val currentBrowserViewState = currentBrowserViewState()
@@ -765,6 +773,7 @@ class BrowserTabViewModel(
             browserShowing = true,
             canAddBookmarks = true,
             addToHomeEnabled = true,
+            canChangeBrowsingMode = canChangeBrowsingMode(site?.domain),
             addToHomeVisible = addToHomeCapabilityDetector.isAddToHomeSupported(),
             canSharePage = true,
             showPrivacyGrade = true,
@@ -791,6 +800,10 @@ class BrowserTabViewModel(
         permissionOrigin?.let { viewModelScope.launch { notifyPermanentLocationPermission(permissionOrigin) } }
 
         registerSiteVisit()
+    }
+
+    private fun canChangeBrowsingMode(domain: String?): Boolean {
+        return !MobileUrlReWriter.strictlyMobileSiteHosts.any { domain?.contains(it.host) == true }
     }
 
     private fun sendPixelIfUseOurAppSiteVisitedFirstTime(url: String) {
@@ -914,6 +927,7 @@ class BrowserTabViewModel(
     override fun progressChanged(newProgress: Int) {
         Timber.v("Loading in progress $newProgress")
         if (!currentBrowserViewState().browserShowing) return
+
         val isLoading = newProgress < 100
         val progress = currentLoadingViewState()
         if (progress.progress == newProgress) return
@@ -927,7 +941,9 @@ class BrowserTabViewModel(
 
         val showLoadingGrade = progress.privacyOn || isLoading
         privacyGradeViewState.value = currentPrivacyGradeState().copy(shouldAnimate = isLoading, showEmptyGrade = showLoadingGrade)
+
         if (newProgress == 100) {
+            command.value = RefreshUserAgent(url, currentBrowserViewState().isDesktopBrowsingMode)
             navigationAwareLoginDetector.onEvent(NavigationEvent.PageFinished)
         }
     }
@@ -1427,7 +1443,7 @@ class BrowserTabViewModel(
     fun onDesktopSiteModeToggled(desktopSiteRequested: Boolean) {
         val currentBrowserViewState = currentBrowserViewState()
         browserViewState.value = currentBrowserViewState.copy(isDesktopBrowsingMode = desktopSiteRequested)
-        command.value = RefreshUserAgent(site?.uri?.host, desktopSiteRequested)
+        command.value = RefreshUserAgent(site?.uri?.toString(), desktopSiteRequested)
 
         val uri = site?.uri ?: return
 
@@ -1714,6 +1730,18 @@ class BrowserTabViewModel(
     override fun loginDetected() {
         val currentUrl = site?.url ?: return
         navigationAwareLoginDetector.onEvent(NavigationEvent.LoginAttempt(currentUrl))
+    }
+
+    fun requestFileDownload(url: String, contentDisposition: String?, mimeType: String, requestUserConfirmation: Boolean) {
+        if (url.startsWith("blob:")) {
+            command.value = ConvertBlobToDataUri(url, mimeType)
+        } else {
+            sendRequestFileDownloadCommand(url, contentDisposition, mimeType, requestUserConfirmation)
+        }
+    }
+
+    private fun sendRequestFileDownloadCommand(url: String, contentDisposition: String?, mimeType: String, requestUserConfirmation: Boolean) {
+        command.postValue(RequestFileDownload(url, contentDisposition, mimeType, requestUserConfirmation))
     }
 
     fun download(pendingFileDownload: FileDownloader.PendingFileDownload) {

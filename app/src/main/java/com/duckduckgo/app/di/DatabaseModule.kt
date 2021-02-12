@@ -17,8 +17,11 @@
 package com.duckduckgo.app.di
 
 import android.content.Context
+import android.webkit.WebViewDatabase
 import androidx.room.Room
 import com.duckduckgo.app.browser.addtohome.AddToHomeCapabilityDetector
+import com.duckduckgo.app.browser.httpauth.RealWebViewHttpAuthStore
+import com.duckduckgo.app.browser.httpauth.WebViewHttpAuthStore
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.global.db.MigrationsProvider
 import com.duckduckgo.app.settings.db.SettingsDataStore
@@ -31,9 +34,18 @@ class DatabaseModule {
 
     @Provides
     @Singleton
+    fun provideWebViewHttpAuthStore(
+        context: Context,
+    ): WebViewHttpAuthStore {
+        return RealWebViewHttpAuthStore(WebViewDatabase.getInstance(context))
+    }
+
+    @Provides
+    @Singleton
     fun provideAppDatabase(context: Context, migrationsProvider: MigrationsProvider): AppDatabase {
         return Room.databaseBuilder(context, AppDatabase::class.java, "app.db")
             .addMigrations(*migrationsProvider.ALL_MIGRATIONS.toTypedArray())
+            .addCallback(migrationsProvider.BOOKMARKS_DB_ON_CREATE)
             .build()
     }
 

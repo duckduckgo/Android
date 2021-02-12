@@ -225,7 +225,7 @@ class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope() {
                 launch { viewModel.onOpenShortcut(sharedText) }
             } else {
                 Timber.w("opening in new tab requested for $sharedText")
-                launch { viewModel.onOpenInNewTabRequested(query = sharedText, skipHome = true) }
+                launch { viewModel.onOpenInNewTabRequested(query = sharedText, sourceTabId = currentTab?.tabId, skipHome = true) }
                 return
             }
         }

@@ -18,6 +18,7 @@ package com.duckduckgo.app.job
 
 import android.content.Context
 import androidx.work.*
+import com.duckduckgo.app.global.plugins.worker.WorkerInjectorPlugin
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.VPN_TESTERS_DAILY_REPORT
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.VPN_DATA_RECEIVED
@@ -53,6 +54,23 @@ class VpnStatsReportingRequestBuilder @Inject constructor() {
         const val VPN_STATS_REPORTING_WORK_TAG = "VpnStatsReportingTag"
         private const val BACKOFF_INTERVAL = 10L
         private val BACKOFF_TIME_UNIT = TimeUnit.MINUTES
+    }
+}
+
+class VpnStatsReportingWorkerInjectorPlugin(
+    private val vpnDatabase: VpnDatabase,
+    private val appTrackerBlockingStatsRepository: AppTrackerBlockingStatsRepository,
+    private val pixel: Pixel
+) : WorkerInjectorPlugin {
+
+    override fun inject(worker: ListenableWorker): Boolean {
+        if (worker is VpnStatsReportingWorker) {
+            worker.vpnDatabase = vpnDatabase
+            worker.vpnRepository = appTrackerBlockingStatsRepository
+            worker.pixel = pixel
+            return true
+        }
+        return false
     }
 }
 

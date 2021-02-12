@@ -112,7 +112,7 @@ class FireAndForgetFeedbackSubmitter(
         pixel.fire(pixelName)
     }
 
-    private fun submitFeedback(
+    private suspend fun submitFeedback(
         openEnded: String,
         rating: String,
         category: String? = null,
@@ -132,7 +132,7 @@ class FireAndForgetFeedbackSubmitter(
             model = Build.MODEL,
             api = Build.VERSION.SDK_INT,
             atb = atbWithVariant()
-        ).execute()
+        )
     }
 
     private fun categoryFromMainReason(mainReason: MainReason): String {

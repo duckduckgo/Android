@@ -20,7 +20,7 @@ import android.content.Intent
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.CoroutineTestRule
-import com.duckduckgo.app.global.DefaultRoleBrowserDialogExperiment
+import com.duckduckgo.app.global.DefaultRoleBrowserDialog
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.runBlocking
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -58,7 +58,7 @@ class WelcomePageViewModelTest {
     private lateinit var appInstallStore: AppInstallStore
 
     @Mock
-    private lateinit var defaultRoleBrowserDialogExperiment: DefaultRoleBrowserDialogExperiment
+    private lateinit var defaultRoleBrowserDialog: DefaultRoleBrowserDialog
 
     private val events = ConflatedBroadcastChannel<WelcomePageView.Event>()
 
@@ -73,15 +73,15 @@ class WelcomePageViewModelTest {
             appInstallStore,
             InstrumentationRegistry.getInstrumentation().targetContext,
             pixel,
-            defaultRoleBrowserDialogExperiment
+            defaultRoleBrowserDialog
         )
 
         viewEvents = events.asFlow().flatMapLatest { viewModel.reduce(it) }
     }
 
     @Test
-    fun whenOnPrimaryCtaClickedAndShouldNotShowXpThenFinish() = coroutineRule.runBlocking {
-        whenever(defaultRoleBrowserDialogExperiment.shouldShowExperiment())
+    fun whenOnPrimaryCtaClickedAndShouldNotShowDialogThenFinish() = coroutineRule.runBlocking {
+        whenever(defaultRoleBrowserDialog.shouldShowDialog())
             .thenReturn(false)
 
         val launch = launch {
@@ -95,11 +95,11 @@ class WelcomePageViewModelTest {
     }
 
     @Test
-    fun whenOnPrimaryCtaClickedAndShouldShowXpAndShowThenEmitShowDialog() = coroutineRule.runBlocking {
-        whenever(defaultRoleBrowserDialogExperiment.shouldShowExperiment())
+    fun whenOnPrimaryCtaClickedAndShouldShowDialogAndShowThenEmitShowDialog() = coroutineRule.runBlocking {
+        whenever(defaultRoleBrowserDialog.shouldShowDialog())
             .thenReturn(true)
         val intent = Intent()
-        whenever(defaultRoleBrowserDialogExperiment.createIntent(any()))
+        whenever(defaultRoleBrowserDialog.createIntent(any()))
             .thenReturn(intent)
 
         val launch = launch {
@@ -113,10 +113,10 @@ class WelcomePageViewModelTest {
     }
 
     @Test
-    fun whenOnPrimaryCtaClickedAndShouldShowXpNullIntentThenFireAndFinish() = coroutineRule.runBlocking {
-        whenever(defaultRoleBrowserDialogExperiment.shouldShowExperiment())
+    fun whenOnPrimaryCtaClickedAndShouldShowDialogNullIntentThenFireAndFinish() = coroutineRule.runBlocking {
+        whenever(defaultRoleBrowserDialog.shouldShowDialog())
             .thenReturn(true)
-        whenever(defaultRoleBrowserDialogExperiment.createIntent(any()))
+        whenever(defaultRoleBrowserDialog.createIntent(any()))
             .thenReturn(null)
 
         val launch = launch {
@@ -132,7 +132,7 @@ class WelcomePageViewModelTest {
     }
 
     @Test
-    fun whenOnDefaultBrowserSetThenCallExperimentShownFireAndFinish() = coroutineRule.runBlocking {
+    fun whenOnDefaultBrowserSetThenCallDialogShownFireAndFinish() = coroutineRule.runBlocking {
         val launch = launch {
             viewEvents.collect { state ->
                 assertTrue(state == WelcomePageView.State.Finish)
@@ -140,7 +140,7 @@ class WelcomePageViewModelTest {
         }
         events.send(WelcomePageView.Event.OnDefaultBrowserSet)
 
-        verify(defaultRoleBrowserDialogExperiment).experimentShown()
+        verify(defaultRoleBrowserDialog).dialogShown()
         verify(pixel).fire(
             Pixel.PixelName.DEFAULT_BROWSER_SET,
             mapOf(Pixel.PixelParameter.DEFAULT_BROWSER_SET_FROM_ONBOARDING to true.toString())
@@ -150,7 +150,7 @@ class WelcomePageViewModelTest {
     }
 
     @Test
-    fun whenOnDefaultBrowserNotSetThenCallExperimentShownFireAndFinish() = coroutineRule.runBlocking {
+    fun whenOnDefaultBrowserNotSetThenCallDialogShownFireAndFinish() = coroutineRule.runBlocking {
         val launch = launch {
             viewEvents.collect { state ->
                 assertTrue(state == WelcomePageView.State.Finish)
@@ -158,7 +158,7 @@ class WelcomePageViewModelTest {
         }
         events.send(WelcomePageView.Event.OnDefaultBrowserNotSet)
 
-        verify(defaultRoleBrowserDialogExperiment).experimentShown()
+        verify(defaultRoleBrowserDialog).dialogShown()
         verify(pixel).fire(
             Pixel.PixelName.DEFAULT_BROWSER_NOT_SET,
             mapOf(Pixel.PixelParameter.DEFAULT_BROWSER_SET_FROM_ONBOARDING to true.toString())

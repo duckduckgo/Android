@@ -20,8 +20,11 @@ import android.content.Context
 import androidx.annotation.WorkerThread
 import androidx.core.app.NotificationManagerCompat
 import androidx.work.*
+import com.duckduckgo.app.global.plugins.worker.WorkerInjectorPlugin
 import com.duckduckgo.app.notification.db.NotificationDao
+import com.duckduckgo.app.notification.model.ClearDataNotification
 import com.duckduckgo.app.notification.model.Notification
+import com.duckduckgo.app.notification.model.PrivacyProtectionNotification
 import com.duckduckgo.app.notification.model.SchedulableNotification
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.NOTIFICATION_SHOWN
@@ -105,5 +108,47 @@ class NotificationScheduler(
 
     companion object {
         const val UNUSED_APP_WORK_REQUEST_TAG = "com.duckduckgo.notification.schedule"
+    }
+}
+
+class ClearDataNotificationWorkerInjectorPlugin(
+    private val notificationManagerCompat: NotificationManagerCompat,
+    private val notificationDao: NotificationDao,
+    private val notificationFactory: NotificationFactory,
+    private val pixel: Pixel,
+    private val clearDataNotification: ClearDataNotification
+) : WorkerInjectorPlugin {
+
+    override fun inject(worker: ListenableWorker): Boolean {
+        if (worker is NotificationScheduler.ClearDataNotificationWorker) {
+            worker.manager = notificationManagerCompat
+            worker.notificationDao = notificationDao
+            worker.factory = notificationFactory
+            worker.pixel = pixel
+            worker.notification = clearDataNotification
+            return true
+        }
+        return false
+    }
+}
+
+class PrivacyNotificationWorkerInjectorPlugin(
+    private val notificationManagerCompat: NotificationManagerCompat,
+    private val notificationDao: NotificationDao,
+    private val notificationFactory: NotificationFactory,
+    private val pixel: Pixel,
+    private val privacyProtectionNotification: PrivacyProtectionNotification
+) : WorkerInjectorPlugin {
+
+    override fun inject(worker: ListenableWorker): Boolean {
+        if (worker is NotificationScheduler.PrivacyNotificationWorker) {
+            worker.manager = notificationManagerCompat
+            worker.notificationDao = notificationDao
+            worker.factory = notificationFactory
+            worker.pixel = pixel
+            worker.notification = privacyProtectionNotification
+            return true
+        }
+        return false
     }
 }

@@ -17,6 +17,7 @@
 package com.duckduckgo.app.global.view
 
 import android.content.Context
+import android.text.Spanned
 import android.util.AttributeSet
 import androidx.appcompat.widget.AppCompatTextView
 import kotlinx.coroutines.*
@@ -34,27 +35,38 @@ class TypeAnimationTextView @JvmOverloads constructor(
     private var typingAnimationJob: Job? = null
     private var delayAfterAnimationInMs: Long = 300
     var typingDelayInMs: Long = 20
+    var textInDialog: Spanned? = null
 
     fun startTypingAnimation(textDialog: String, isCancellable: Boolean = true, afterAnimation: () -> Unit = {}) {
-        val inputText = textDialog.html(context)
+        textInDialog = textDialog.html(context)
         if (isCancellable) {
             setOnClickListener {
-                if (typingAnimationJob?.isActive == true) {
-                    cancelAnimation()
-                    text = inputText
+                if (hasAnimationStarted()) {
+                    finishAnimation()
                     afterAnimation()
                 }
             }
         }
 
         typingAnimationJob = launch {
-            inputText.mapIndexed { index, _ ->
-                text = inputText.subSequence(0, index + 1)
-                delay(typingDelayInMs)
+            textInDialog?.let {
+                it.mapIndexed { index, _ ->
+                    text = it.subSequence(0, index + 1)
+                    delay(typingDelayInMs)
+                }
+                delay(delayAfterAnimationInMs)
+                afterAnimation()
             }
-            delay(delayAfterAnimationInMs)
-            afterAnimation()
         }
+    }
+
+    fun hasAnimationStarted() = typingAnimationJob?.isActive == true
+
+    fun hasAnimationFinished() = typingAnimationJob?.isCompleted == true
+
+    fun finishAnimation() {
+        cancelAnimation()
+        textInDialog?.let { text = it }
     }
 
     fun cancelAnimation() = typingAnimationJob?.cancel()

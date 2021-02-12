@@ -16,55 +16,51 @@
 
 package com.duckduckgo.app.global.api
 
+import android.webkit.WebSettings
 import androidx.test.platform.app.InstrumentationRegistry
-import com.nhaarman.mockitokotlin2.any
-import com.nhaarman.mockitokotlin2.verify
-import com.nhaarman.mockitokotlin2.whenever
-import okhttp3.Interceptor
-import okhttp3.Protocol
-import okhttp3.Request
-import okhttp3.Response
+import com.duckduckgo.app.browser.useragent.UserAgentProvider
+import com.duckduckgo.app.global.device.ContextDeviceInfo
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
-import org.mockito.ArgumentCaptor
-import org.mockito.Mock
-import org.mockito.MockitoAnnotations
 
 class ApiRequestInterceptorTest {
 
     private lateinit var testee: ApiRequestInterceptor
 
-    @Mock
-    private lateinit var mockChain: Interceptor.Chain
+    private lateinit var userAgentProvider: UserAgentProvider
 
     @Before
     fun before() {
-        MockitoAnnotations.initMocks(this)
-        testee = ApiRequestInterceptor(InstrumentationRegistry.getInstrumentation().context)
+        userAgentProvider = UserAgentProvider(
+            WebSettings.getDefaultUserAgent(InstrumentationRegistry.getInstrumentation().context),
+            ContextDeviceInfo(InstrumentationRegistry.getInstrumentation().context)
+        )
+
+        testee = ApiRequestInterceptor(
+            InstrumentationRegistry.getInstrumentation().context,
+            userAgentProvider
+        )
     }
 
     @Test
     fun whenAPIRequestIsMadeThenUserAgentIsAdded() {
-        whenever(mockChain.request()).thenReturn(request())
-        whenever(mockChain.proceed(any())).thenReturn(response())
-
         val packageName = InstrumentationRegistry.getInstrumentation().context.applicationInfo.packageName
 
-        val captor = ArgumentCaptor.forClass(Request::class.java)
-        testee.intercept(mockChain)
-        verify(mockChain).proceed(captor.capture())
+        val response = testee.intercept(FakeChain("http://example.com"))
 
         val regex = "ddg_android/.*\\($packageName; Android API .*\\)".toRegex()
-        val result = captor.value.header(Header.USER_AGENT)!!
+        val result = response.request.header(Header.USER_AGENT)!!
         assertTrue(result.matches(regex))
     }
 
-    private fun request(): Request {
-        return Request.Builder().url("http://example.com").build()
-    }
+    @Test
+    fun whenAPIRequestIsRqPixelThenOverrideHeader() {
+        val fakeChain = FakeChain("https://improving.duckduckgo.com/t/rq_0")
 
-    private fun response(): Response {
-        return Response.Builder().request(request()).protocol(Protocol.HTTP_2).code(200).message("").build()
+        val response = testee.intercept(fakeChain)
+        val header = response.request.header(Header.USER_AGENT)!!
+        val regex = "Mozilla/.* \\(Linux; Android.*\\) AppleWebKit/.* \\(KHTML, like Gecko\\) Version/.* Chrome/.* Mobile DuckDuckGo/.* Safari/.*".toRegex()
+        assertTrue(header.matches(regex))
     }
 }

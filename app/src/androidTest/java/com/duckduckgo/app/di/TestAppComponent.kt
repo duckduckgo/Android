@@ -23,8 +23,10 @@ import com.duckduckgo.app.browser.di.BrowserModule
 import com.duckduckgo.app.browser.favicon.FaviconModule
 import com.duckduckgo.app.browser.rating.di.RatingModule
 import com.duckduckgo.app.global.exception.UncaughtExceptionModule
+import com.duckduckgo.app.global.plugins.worker.WorkerPluginsModule
 import com.duckduckgo.app.httpsupgrade.di.HttpsUpgraderModule
 import com.duckduckgo.app.onboarding.di.OnboardingModule
+import com.duckduckgo.app.onboarding.di.WelcomePageModule
 import com.duckduckgo.app.surrogates.di.ResourceSurrogateModule
 import com.duckduckgo.app.trackerdetection.di.TrackerDetectionModule
 import com.duckduckgo.app.usage.di.AppUsageModule
@@ -50,6 +52,7 @@ import javax.inject.Singleton
         StubStatisticsModule::class,
 
         /* real modules */
+        WorkerPluginsModule::class,
         ApplicationModule::class,
         WorkerModule::class,
         AndroidBindingModule::class,
@@ -76,6 +79,7 @@ import javax.inject.Singleton
         PlayStoreReferralModule::class,
         CoroutinesModule::class,
         CertificateTrustedStoreModule::class,
+        WelcomePageModule::class,
         FormatterModule::class
     ]
 )

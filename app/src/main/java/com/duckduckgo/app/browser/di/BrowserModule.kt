@@ -28,11 +28,14 @@ import com.duckduckgo.app.browser.defaultbrowsing.AndroidDefaultBrowserDetector
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserObserver
 import com.duckduckgo.app.browser.downloader.AndroidFileDownloader
+import com.duckduckgo.app.browser.downloader.BlobConverterInjector
+import com.duckduckgo.app.browser.downloader.BlobConverterInjectorJs
 import com.duckduckgo.app.browser.downloader.DataUriDownloader
 import com.duckduckgo.app.browser.downloader.FileDownloader
 import com.duckduckgo.app.browser.downloader.NetworkFileDownloader
 import com.duckduckgo.app.browser.favicon.FaviconPersister
 import com.duckduckgo.app.browser.favicon.FileBasedFaviconPersister
+import com.duckduckgo.app.browser.httpauth.WebViewHttpAuthStore
 import com.duckduckgo.app.browser.logindetection.DOMLoginDetector
 import com.duckduckgo.app.browser.logindetection.JsLoginDetector
 import com.duckduckgo.app.browser.logindetection.NavigationAwareLoginDetector
@@ -44,6 +47,7 @@ import com.duckduckgo.app.browser.tabpreview.FileBasedWebViewPreviewPersister
 import com.duckduckgo.app.browser.tabpreview.WebViewPreviewGenerator
 import com.duckduckgo.app.browser.tabpreview.WebViewPreviewPersister
 import com.duckduckgo.app.browser.useragent.UserAgentProvider
+import com.duckduckgo.app.browser.useragent.MobileUrlReWriter
 import com.duckduckgo.app.fire.*
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteDao
 import com.duckduckgo.app.global.AppUrl
@@ -86,6 +90,7 @@ class BrowserModule {
 
     @Provides
     fun browserWebViewClient(
+        webViewHttpAuthStore: WebViewHttpAuthStore,
         trustedCertificateStore: TrustedCertificateStore,
         requestRewriter: RequestRewriter,
         specialUrlDetector: SpecialUrlDetector,
@@ -99,6 +104,7 @@ class BrowserModule {
         pixel: Pixel
     ): BrowserWebViewClient {
         return BrowserWebViewClient(
+            webViewHttpAuthStore,
             trustedCertificateStore,
             requestRewriter,
             specialUrlDetector,
@@ -141,9 +147,10 @@ class BrowserModule {
         context: Context,
         webViewSessionStorage: WebViewSessionStorage,
         cookieManager: DuckDuckGoCookieManager,
-        fileDeleter: FileDeleter
+        fileDeleter: FileDeleter,
+        webViewHttpAuthStore: WebViewHttpAuthStore
     ): WebDataManager =
-        WebViewDataManager(context, webViewSessionStorage, cookieManager, fileDeleter)
+        WebViewDataManager(context, webViewSessionStorage, cookieManager, fileDeleter, webViewHttpAuthStore)
 
     @Provides
     fun clipboardManager(context: Context): ClipboardManager {
@@ -170,8 +177,10 @@ class BrowserModule {
         trackerDetector: TrackerDetector,
         httpsUpgrader: HttpsUpgrader,
         privacyProtectionCountDao: PrivacyProtectionCountDao,
-        globalPrivacyControl: GlobalPrivacyControl
-    ): RequestInterceptor = WebViewRequestInterceptor(resourceSurrogates, trackerDetector, httpsUpgrader, privacyProtectionCountDao, globalPrivacyControl)
+        globalPrivacyControl: GlobalPrivacyControl,
+        userAgentProvider: UserAgentProvider,
+        mobileUrlReWriter: MobileUrlReWriter
+    ): RequestInterceptor = WebViewRequestInterceptor(resourceSurrogates, trackerDetector, httpsUpgrader, privacyProtectionCountDao, globalPrivacyControl, userAgentProvider, mobileUrlReWriter)
 
     @Provides
     fun cookieManager(
@@ -249,8 +258,13 @@ class BrowserModule {
     }
 
     @Provides
-    fun navigationAwareLoginDetector(): NavigationAwareLoginDetector {
-        return NextPageLoginDetection()
+    fun blobConverterInjector(): BlobConverterInjector {
+        return BlobConverterInjectorJs()
+    }
+
+    @Provides
+    fun navigationAwareLoginDetector(settingsDataStore: SettingsDataStore): NavigationAwareLoginDetector {
+        return NextPageLoginDetection(settingsDataStore)
     }
 
     @Provides

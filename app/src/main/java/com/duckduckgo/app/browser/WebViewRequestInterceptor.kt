@@ -21,6 +21,8 @@ import android.webkit.WebResourceRequest
 import android.webkit.WebResourceResponse
 import android.webkit.WebView
 import androidx.annotation.WorkerThread
+import com.duckduckgo.app.browser.useragent.UserAgentProvider
+import com.duckduckgo.app.browser.useragent.MobileUrlReWriter
 import com.duckduckgo.app.global.isHttp
 import com.duckduckgo.app.globalprivacycontrol.GlobalPrivacyControl
 import com.duckduckgo.app.globalprivacycontrol.GlobalPrivacyControlManager
@@ -49,7 +51,9 @@ class WebViewRequestInterceptor(
     private val trackerDetector: TrackerDetector,
     private val httpsUpgrader: HttpsUpgrader,
     private val privacyProtectionCountDao: PrivacyProtectionCountDao,
-    private val globalPrivacyControl: GlobalPrivacyControl
+    private val globalPrivacyControl: GlobalPrivacyControl,
+    private val userAgentProvider: UserAgentProvider,
+    private val mobileUrlReWriter: MobileUrlReWriter
 ) : RequestInterceptor {
 
     /**
@@ -71,13 +75,26 @@ class WebViewRequestInterceptor(
 
         val url = request.url
 
+        shouldChangeToMobileUrl(request)?.let { newUrl ->
+            withContext(Dispatchers.Main) {
+                webView.loadUrl(newUrl, getHeaders(request))
+            }
+            return WebResourceResponse(null, null, null)
+        }
+
+        newUserAgent(request, webView, webViewClientListener)?.let {
+            withContext(Dispatchers.Main) {
+                webView.settings?.userAgentString = it
+                webView.loadUrl(url.toString(), getHeaders(request))
+            }
+            return WebResourceResponse(null, null, null)
+        }
+
         if (shouldUpgrade(request)) {
             val newUri = httpsUpgrader.upgrade(url)
 
             withContext(Dispatchers.Main) {
-                val headers = request.requestHeaders
-                headers.putAll(globalPrivacyControl.getHeaders())
-                webView.loadUrl(newUri.toString(), headers)
+                webView.loadUrl(newUri.toString(), getHeaders(request))
             }
 
             webViewClientListener?.upgradedToHttps()
@@ -86,11 +103,9 @@ class WebViewRequestInterceptor(
         }
 
         if (shouldAddGcpHeaders(request) && !requestWasInTheStack(url, webView)) {
-            val headers = request.requestHeaders
-            headers.putAll(globalPrivacyControl.getHeaders())
             withContext(Dispatchers.Main) {
                 webViewClientListener?.redirectTriggeredByGpc()
-                webView.loadUrl(url.toString(), headers)
+                webView.loadUrl(url.toString(), getHeaders(request))
             }
             return WebResourceResponse(null, null, null)
         }
@@ -121,6 +136,12 @@ class WebViewRequestInterceptor(
         return null
     }
 
+    private fun getHeaders(request: WebResourceRequest): Map<String, String> {
+        return request.requestHeaders.apply {
+            putAll(globalPrivacyControl.getHeaders())
+        }
+    }
+
     private fun shouldAddGcpHeaders(request: WebResourceRequest): Boolean {
         val headers = request.requestHeaders
         return (
@@ -139,6 +160,35 @@ class WebViewRequestInterceptor(
         }
     }
 
+    private suspend fun newUserAgent(
+        request: WebResourceRequest,
+        webView: WebView,
+        webViewClientListener: WebViewClientListener?
+    ): String? {
+        return if (request.isForMainFrame && request.method == "GET") {
+            val url = request.url ?: return null
+            if (requestWasInTheStack(url, webView)) return null
+            val desktopSiteEnabled = webViewClientListener?.isDesktopSiteEnabled() == true
+            val currentAgent = withContext(Dispatchers.Main) { webView.settings?.userAgentString }
+            val newAgent = userAgentProvider.userAgent(url.toString(), desktopSiteEnabled)
+            return if (currentAgent != newAgent) {
+                newAgent
+            } else {
+                null
+            }
+        } else {
+            null
+        }
+    }
+
+    private fun shouldChangeToMobileUrl(request: WebResourceRequest): String? {
+        return if (request.isForMainFrame && request.url != null && request.method == "GET") {
+            return mobileUrlReWriter.mobileSiteOnlyForUri(request.url)
+        } else {
+            null
+        }
+    }
+
     private fun shouldUpgrade(request: WebResourceRequest) =
         request.isForMainFrame && request.url != null && httpsUpgrader.shouldUpgrade(request.url)
 
@@ -153,5 +203,4 @@ class WebViewRequestInterceptor(
         webViewClientListener?.trackerDetected(trackingEvent)
         return trackingEvent.blocked
     }
-
 }
