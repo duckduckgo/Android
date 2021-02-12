@@ -40,8 +40,6 @@ import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.isFireproofExperimentEnabled
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.app.statistics.returningUsersContinueWithoutPrivacyTips
-import com.duckduckgo.app.statistics.returningUsersSkipTutorial
 import com.duckduckgo.app.survey.db.SurveyDao
 import com.duckduckgo.app.survey.model.Survey
 import com.duckduckgo.app.tabs.model.TabRepository
@@ -246,25 +244,10 @@ class CtaViewModel @Inject constructor(
                 DaxBubbleCta.DaxEndCta(onboardingStore, appInstallStore)
             }
             canShowWidgetCta() -> {
-                getWidgetCta()
+                if (widgetCapabilities.supportsAutomaticWidgetAdd) AddWidgetAuto else AddWidgetInstructions
             }
             else -> null
         }
-    }
-
-    private fun getWidget(): HomePanelCta = if (widgetCapabilities.supportsAutomaticWidgetAdd) AddWidgetAuto else AddWidgetInstructions
-
-    private fun getWidgetCta(): HomePanelCta? {
-        if ((variantManager.returningUsersContinueWithoutPrivacyTips() || variantManager.returningUsersSkipTutorial()) &&
-            onboardingStore.userMarkedAsReturningUser
-        ) {
-            onboardingStore.countNewTabForReturningUser++
-            if (onboardingStore.hasReachedThresholdToShowWidgetForReturningUser()) {
-                return getWidget()
-            }
-            return null
-        }
-        return getWidget()
     }
 
     private suspend fun getBrowserCta(site: Site?): Cta? {
@@ -437,7 +420,7 @@ class CtaViewModel @Inject constructor(
         }
     }
 
-    private fun hideTips() = settingsDataStore.hideTips || onboardingStore.userMarkedAsReturningUser
+    private fun hideTips() = settingsDataStore.hideTips
 
     companion object {
         private const val SURVEY_DEFAULT_MIN_DAYS_INSTALLED = 30
