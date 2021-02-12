@@ -132,7 +132,7 @@ sealed class DaxDialogCta(
 ) : Cta, DialogCta, DaxCta {
 
     override fun createCta(activity: FragmentActivity): DaxDialog =
-        TypewriterDaxDialog.newInstance(getDaxText(activity), activity.resources.getString(okButton))
+        TypewriterDaxDialog.newInstance(daxText = getDaxText(activity), primaryButtonText = activity.resources.getString(okButton))
 
     override fun pixelCancelParameters(): Map<String, String> = mapOf(Pixel.PixelParameter.CTA_SHOWN to ctaPixelParam)
 
@@ -255,7 +255,6 @@ sealed class DaxDialogCta(
         private const val MAX_TRACKERS_SHOWS = 2
         const val SERP = "duckduckgo"
         private val mainTrackerDomains = listOf("facebook", "google")
-        private val networkPropertyPercentages = mapOf(Pair("Google", "90%"), Pair("Facebook", "40%"))
         val mainTrackerNetworks = listOf("Facebook", "Google")
     }
 }

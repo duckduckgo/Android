@@ -51,7 +51,7 @@ class TypewriterDaxDialog : DialogFragment(), DaxDialog {
     private var primaryButtonText: String = ""
     private var secondaryButtonText: String = ""
     private var toolbarDimmed: Boolean = true
-    private var dismissible: Boolean = true
+    private var dismissible: Boolean = false
     private var typingDelayInMs: Long = DEFAULT_TYPING_DELAY
     private var showHideButton: Boolean = true
 
@@ -161,10 +161,14 @@ class TypewriterDaxDialog : DialogFragment(), DaxDialog {
             dismiss()
         }
 
-        if (dismissible) {
-            dialogContainer.setOnClickListener {
+        dialogContainer.setOnClickListener {
+            if (dismissible) {
                 dialogText.cancelAnimation()
                 dismiss()
+            } else {
+                if (!dialogText.hasAnimationFinished()) {
+                    dialogText.finishAnimation()
+                }
             }
         }
     }
@@ -194,7 +198,7 @@ class TypewriterDaxDialog : DialogFragment(), DaxDialog {
             primaryButtonText: String,
             secondaryButtonText: String? = "",
             toolbarDimmed: Boolean = true,
-            dismissible: Boolean = true,
+            dismissible: Boolean = false,
             typingDelayInMs: Long = DEFAULT_TYPING_DELAY,
             showHideButton: Boolean = true
         ): TypewriterDaxDialog {
