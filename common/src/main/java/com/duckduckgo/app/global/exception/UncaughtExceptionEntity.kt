@@ -18,7 +18,6 @@ package com.duckduckgo.app.global.exception
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.duckduckgo.app.browser.BuildConfig
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -27,8 +26,8 @@ data class UncaughtExceptionEntity(
     @PrimaryKey(autoGenerate = true) val id: Long = 0,
     val exceptionSource: UncaughtExceptionSource,
     val message: String,
-    val timestamp: Long = System.currentTimeMillis(),
-    val version: String = BuildConfig.VERSION_NAME
+    val version: String,
+    val timestamp: Long = System.currentTimeMillis()
 ) {
 
     fun formattedTimestamp(): String = formatter.format(Date(timestamp))
