@@ -8,3 +8,4 @@ buildscript {
 RefreshVersionsSetup.bootstrap(settings)
 
 include ':app'
+include ':statistics'
