@@ -16,8 +16,8 @@
 
 package com.duckduckgo.app.statistics.api
 
-import com.duckduckgo.app.browser.BuildConfig
 import com.duckduckgo.app.global.AppUrl
+import com.duckduckgo.app.global.BuildConfig
 import io.reactivex.Completable
 import retrofit2.http.GET
 import retrofit2.http.Path
