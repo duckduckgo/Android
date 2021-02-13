@@ -63,6 +63,8 @@ dependencies {
     implementation Square.retrofit2.adapter.rxJava2
     implementation Square.retrofit2.converter.scalars
 
+    implementation Google.dagger
+
     // Room
     implementation AndroidX.room.runtime
     implementation AndroidX.room.rxJava2
