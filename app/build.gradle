@@ -97,6 +97,7 @@ android {
 
 dependencies {
     implementation project(path: ':statistics')
+    implementation project(path: ':common')
 
     implementation AndroidX.legacy.supportV4
     debugImplementation Square.leakCanary.android

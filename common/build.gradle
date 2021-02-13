@@ -17,7 +17,6 @@
 plugins {
     id 'com.android.library'
     id 'kotlin-android'
-    id 'kotlin-kapt'
 }
 
 android {
@@ -50,40 +49,15 @@ android {
 }
 
 dependencies {
-    implementation project(path: ':common')
-
     implementation Kotlin.stdlib.jdk7
     implementation KotlinX.coroutines.core
     implementation KotlinX.coroutines.android
 
-    implementation "io.reactivex.rxjava2:rxjava:_"
-    implementation "io.reactivex.rxjava2:rxandroid:_"
-
-    implementation Square.retrofit2.retrofit
-    implementation Square.retrofit2.converter.moshi
-    implementation Square.retrofit2.adapter.rxJava2
-    implementation Square.retrofit2.converter.scalars
+    implementation AndroidX.work.runtimeKtx
 
     implementation Google.dagger
 
-    // Room
-    implementation AndroidX.room.runtime
-    implementation AndroidX.room.rxJava2
-    kapt AndroidX.room.compiler
-    testImplementation AndroidX.room.testing
-    androidTestImplementation AndroidX.room.testing
-
-    // WorkManager
-    implementation AndroidX.work.runtimeKtx
-    androidTestImplementation AndroidX.work.testing
-    implementation AndroidX.work.rxJava2
-
     implementation JakeWharton.timber
-    
-    implementation AndroidX.core.ktx
-
-    // Play Store referrer library
-    implementation("com.android.installreferrer:installreferrer:_")
 
     testImplementation 'junit:junit:4.+'
 }
