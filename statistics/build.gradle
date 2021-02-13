@@ -82,6 +82,9 @@ dependencies {
     
     implementation AndroidX.core.ktx
 
+    // Apache commons
+    implementation "org.apache.commons:commons-math3:_"
+
     // Play Store referrer library
     implementation("com.android.installreferrer:installreferrer:_")
 

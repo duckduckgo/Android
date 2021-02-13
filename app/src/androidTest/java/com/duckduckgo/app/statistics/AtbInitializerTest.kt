@@ -42,7 +42,7 @@ class AtbInitializerTest {
         appReferrerStateListener = StubAppReferrerFoundStateListener(referrer = "xx")
         testee = AtbInitializer(statisticsDataStore, statisticsUpdater, appReferrerStateListener)
 
-        testee.initializeAfterReferrerAvailable()
+        testee.initialize()
 
         verify(statisticsUpdater).initializeAtb()
     }
@@ -53,7 +53,7 @@ class AtbInitializerTest {
         appReferrerStateListener = StubAppReferrerFoundStateListener(referrer = "xx", mockDelayMs = 1000L)
         testee = AtbInitializer(statisticsDataStore, statisticsUpdater, appReferrerStateListener)
 
-        testee.initializeAfterReferrerAvailable()
+        testee.initialize()
 
         verify(statisticsUpdater).initializeAtb()
     }
@@ -64,7 +64,7 @@ class AtbInitializerTest {
         appReferrerStateListener = StubAppReferrerFoundStateListener(referrer = "xx", mockDelayMs = Long.MAX_VALUE)
         testee = AtbInitializer(statisticsDataStore, statisticsUpdater, appReferrerStateListener)
 
-        testee.initializeAfterReferrerAvailable()
+        testee.initialize()
 
         verify(statisticsUpdater).initializeAtb()
     }
@@ -74,7 +74,7 @@ class AtbInitializerTest {
         configureAlreadyInitialized()
         testee = AtbInitializer(statisticsDataStore, statisticsUpdater, appReferrerStateListener)
 
-        testee.initializeAfterReferrerAvailable()
+        testee.initialize()
         verify(statisticsUpdater).refreshAppRetentionAtb()
     }
 

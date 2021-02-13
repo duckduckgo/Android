@@ -16,27 +16,41 @@
 
 package com.duckduckgo.app.statistics
 
-import com.duckduckgo.app.referral.AppInstallationReferrerStateListener
-import com.duckduckgo.app.referral.AppInstallationReferrerStateListener.Companion.MAX_REFERRER_WAIT_TIME_MS
 import com.duckduckgo.app.statistics.api.StatisticsUpdater
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import kotlinx.coroutines.withTimeoutOrNull
 
+interface AtbInitializerListener {
+
+    /**
+     * This method will be called before initializing the ATB
+     */
+    suspend fun beforeAtbInit()
+
+    /**
+     * @return the timeout in milliseconds after which [beforeAtbInit]
+     * will be stopped
+     */
+    fun beforeAtbInitTimeoutMillis(): Long
+}
+
 class AtbInitializer(
     private val statisticsDataStore: StatisticsDataStore,
     private val statisticsUpdater: StatisticsUpdater,
-    private val appReferrerStateListener: AppInstallationReferrerStateListener
+    private val listeners: Set<AtbInitializerListener>
 ) {
 
-    suspend fun initializeAfterReferrerAvailable() {
-        withTimeoutOrNull(MAX_REFERRER_WAIT_TIME_MS) {
-            appReferrerStateListener.waitForReferrerCode()
+    suspend fun initialize() {
+        listeners.forEach {
+            withTimeoutOrNull(it.beforeAtbInitTimeoutMillis()) {
+                it.beforeAtbInit()
+            }
         }
 
-        initialize()
+        initializeAtb()
     }
 
-    private fun initialize() {
+    private fun initializeAtb() {
         if (statisticsDataStore.hasInstallationStatistics) {
             statisticsUpdater.refreshAppRetentionAtb()
         } else {

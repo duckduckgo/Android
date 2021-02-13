@@ -21,8 +21,8 @@ import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.global.device.ContextDeviceInfo
 import com.duckduckgo.app.global.device.DeviceInfo
 import com.duckduckgo.app.global.exception.UncaughtExceptionRepository
-import com.duckduckgo.app.referral.AppInstallationReferrerStateListener
 import com.duckduckgo.app.statistics.AtbInitializer
+import com.duckduckgo.app.statistics.AtbInitializerListener
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.api.*
 import com.duckduckgo.app.statistics.pixels.RxBasedPixel
@@ -86,9 +86,9 @@ class StatisticsModule {
     fun atbInitializer(
         statisticsDataStore: StatisticsDataStore,
         statisticsUpdater: StatisticsUpdater,
-        appReferrerStateListener: AppInstallationReferrerStateListener
+        listeners: Set<@JvmSuppressWildcards AtbInitializerListener>
     ): AtbInitializer {
-        return AtbInitializer(statisticsDataStore, statisticsUpdater, appReferrerStateListener)
+        return AtbInitializer(statisticsDataStore, statisticsUpdater, listeners)
     }
 
     @Singleton

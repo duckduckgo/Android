@@ -25,12 +25,15 @@ import com.android.installreferrer.api.InstallReferrerClient.InstallReferrerResp
 import com.android.installreferrer.api.InstallReferrerStateListener
 import com.duckduckgo.app.playstore.PlayStoreAndroidUtils.Companion.PLAY_STORE_PACKAGE
 import com.duckduckgo.app.playstore.PlayStoreAndroidUtils.Companion.PLAY_STORE_REFERRAL_SERVICE
+import com.duckduckgo.app.referral.AppInstallationReferrerStateListener.Companion.MAX_REFERRER_WAIT_TIME_MS
 import com.duckduckgo.app.referral.ParseFailureReason.*
 import com.duckduckgo.app.referral.ParsedReferrerResult.*
+import com.duckduckgo.app.statistics.AtbInitializerListener
 import com.duckduckgo.app.statistics.VariantManager
 import kotlinx.coroutines.delay
 import timber.log.Timber
 import javax.inject.Inject
+import javax.inject.Singleton
 
 interface AppInstallationReferrerStateListener {
 
@@ -43,13 +46,14 @@ interface AppInstallationReferrerStateListener {
 
 }
 
+@Singleton
 class PlayStoreAppReferrerStateListener @Inject constructor(
     val context: Context,
     private val packageManager: PackageManager,
     private val appInstallationReferrerParser: AppInstallationReferrerParser,
     private val appReferrerDataStore: AppReferrerDataStore,
     private val variantManager: VariantManager
-) : InstallReferrerStateListener, AppInstallationReferrerStateListener {
+) : InstallReferrerStateListener, AppInstallationReferrerStateListener, AtbInitializerListener {
 
     private val referralClient = InstallReferrerClient.newBuilder(context).build()
     private var initialisationStartTime: Long = 0
@@ -182,4 +186,10 @@ class PlayStoreAppReferrerStateListener @Inject constructor(
     override fun onInstallReferrerServiceDisconnected() {
         Timber.i("Referrer: ServiceDisconnected")
     }
+
+    override suspend fun beforeAtbInit() {
+        waitForReferrerCode()
+    }
+
+    override fun beforeAtbInitTimeoutMillis(): Long = MAX_REFERRER_WAIT_TIME_MS
 }
