@@ -196,7 +196,7 @@
     <string name="brokenSiteReportBrokenSiteMenuItem">Informar de sitio web dañado</string>
     <string name="brokenSiteHeading">Informar de sitio web dañado</string>
     <string name="brokenSiteSubmitted">Gracias, se han enviado tus opiniones.</string>
-    <string name="brokenSitesCategoriesTitle">Describe qué ha pasado</string>
+    <string name="brokenSitesCategoriesTitle">Describe qué ha ocurrido</string>
     <string name="brokenSitesCategoriesHint">Describe qué ocurrió</string>
     <string name="brokenSiteSubmitButton">Enviar informe</string>
     <string name="brokenSiteDescription">Enviar un informe anónimo del sitio dañado nos ayuda a depurar estos problemas y mejorar la aplicación.</string>
