@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!--
+<?xml version="1.0" encoding="UTF-8"?><!--
   ~ Copyright (c) 2020 DuckDuckGo
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
@@ -198,7 +197,7 @@
     <string name="brokenSiteHeading">Informar de sitio web dañado</string>
     <string name="brokenSiteSubmitted">Gracias, se han enviado tus opiniones.</string>
     <string name="brokenSitesCategoriesTitle">Describe qué ha pasado</string>
-    <string name="brokenSitesCategoriesHint">Describe qué pasó</string>
+    <string name="brokenSitesCategoriesHint">Describe qué ocurrió</string>
     <string name="brokenSiteSubmitButton">Enviar informe</string>
     <string name="brokenSiteDescription">Enviar un informe anónimo del sitio dañado nos ayuda a depurar estos problemas y mejorar la aplicación.</string>
 
@@ -370,7 +369,7 @@
     <string name="sharePositiveFeedbackWithTheTeam">¿Hay algún detalle que quieras compartir con el equipo?</string>
     <string name="whatHaveYouBeenEnjoying">¿Qué te ha gustado?</string>
     <string name="awesomeToHear">¡Es fantástico oír eso!</string>
-    <string name="shareTheLoveWithARating">Comparte tu entusiasmo calificando la aplicación en la Play Store.</string>
+    <string name="shareTheLoveWithARating">Comparte tu entusiasmo calificando la aplicación en Play Store.</string>
     <string name="rateTheApp">CALIFICAR LA APLICACIÓN</string>
     <string name="declineFurtherFeedback">NO GRACIAS, HE TERMINADO</string>
     <string name="whichBrokenSites">¿Dónde surgen estos problemas?</string>
@@ -512,7 +511,7 @@
     <string name="preciseLocationSiteDialogSubtitle">Puedes gestionar los permisos de acceso a la ubicación que has concedido a sitios específicos en Ajustes.</string>
     <string name="preciseLocationSiteDialogAllowAlways">Siempre</string>
     <string name="preciseLocationSiteDialogAllowOnce">Solo para esta sesión</string>
-    <string name="preciseLocationSiteDialogDenyAlways">Rechazar siempre</string>
+    <string name="preciseLocationSiteDialogDenyAlways">Rechazar para siempre</string>
     <string name="preciseLocationSiteDialogDenyOnce">Rechazar para esta sesión</string>
     <string name="settingsPreciseLocation">Ubicación</string>
     <string name="preciseLocationFeatureDescription">Puede que los sitios que visites pidan acceder a la ubicación de tu dispositivo. No podrán acceder a ella hasta que les concedas permiso específicamente. DuckDuckGo solo utiliza tu ubicación de forma anónima para mostrar resultados de búsqueda locales.</string>
