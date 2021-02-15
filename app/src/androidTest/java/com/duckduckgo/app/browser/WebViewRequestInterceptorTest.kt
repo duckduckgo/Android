@@ -24,7 +24,6 @@ import androidx.test.annotation.UiThreadTest
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.globalprivacycontrol.GlobalPrivacyControl
 import com.duckduckgo.app.globalprivacycontrol.GlobalPrivacyControlManager
-import com.duckduckgo.app.browser.useragent.MobileUrlReWriter
 import com.duckduckgo.app.browser.useragent.UserAgentProvider
 import com.duckduckgo.app.httpsupgrade.HttpsUpgrader
 import com.duckduckgo.app.privacy.db.PrivacyProtectionCountDao
@@ -58,7 +57,6 @@ class WebViewRequestInterceptorTest {
     private val mockGlobalPrivacyControl: GlobalPrivacyControl = mock()
     private val mockWebBackForwardList: WebBackForwardList = mock()
     private val userAgentProvider: UserAgentProvider = UserAgentProvider(DEFAULT, mock())
-    private val mobileUrlReWriter = MobileUrlReWriter()
 
     private var webView: WebView = mock()
 
@@ -75,8 +73,7 @@ class WebViewRequestInterceptorTest {
             resourceSurrogates = mockResourceSurrogates,
             privacyProtectionCountDao = mockPrivacyProtectionCountDao,
             globalPrivacyControl = mockGlobalPrivacyControl,
-            userAgentProvider = userAgentProvider,
-            mobileUrlReWriter = mobileUrlReWriter
+            userAgentProvider = userAgentProvider
         )
     }
 
@@ -442,21 +439,6 @@ class WebViewRequestInterceptorTest {
         )
 
         verify(webView, never()).loadUrl(any(), any())
-    }
-
-    @Test
-    fun whenUrlShouldChangeToMobileUrlThenLoadUrlWithMobileSubDomain() = runBlocking<Unit> {
-        configureShouldChangeToMobileUrl()
-
-        val mockWebViewClientListener: WebViewClientListener = mock()
-        testee.shouldIntercept(
-            request = mockRequest,
-            documentUrl = null,
-            webView = webView,
-            webViewClientListener = mockWebViewClientListener
-        )
-
-        verify(webView).loadUrl("https://m.facebook.com", emptyMap())
     }
 
     @Test

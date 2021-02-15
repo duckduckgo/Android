@@ -3095,33 +3095,6 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenPageChangesAndNewPageCanChangeBrowsingModeThenCanChangeBrowsingModeIsTrue() {
-        givenCurrentSite("https://www.example.com/")
-
-        loadUrl("https://www.example2.com", isBrowserShowing = true)
-
-        assertTrue(browserViewState().canChangeBrowsingMode)
-    }
-
-    @Test
-    fun whenPageChangesAndNewPageCannotChangeBrowsingModeThenCanChangeBrowsingModeIsFalse() {
-        givenCurrentSite("https://www.example.com/")
-
-        loadUrl("https://www.facebook.com", isBrowserShowing = true)
-
-        assertFalse(browserViewState().canChangeBrowsingMode)
-    }
-
-    @Test
-    fun whenPageChangesAndNewPageCanChangeBrowsingModeButContainsExcludedPathThenCanChangeBrowsingModeIsFalse() {
-        givenCurrentSite("https://www.example.com/")
-
-        loadUrl("https://www.facebook.com/dialog", isBrowserShowing = true)
-
-        assertFalse(browserViewState().canChangeBrowsingMode)
-    }
-
-    @Test
     fun whenRequestFileDownloadAndUrlIsBlobThenConvertBlobToDataUriCommandSent() {
         val blobUrl = "blob:https://example.com/283nasdho23jkasdAjd"
         val mime = "application/plain"
