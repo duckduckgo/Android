@@ -36,17 +36,14 @@ class KeyboardAwareEditText : AppCompatEditText {
     constructor(context: Context, attrs: AttributeSet?) : this(context, attrs, 0)
     constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr)
 
-    private var didFocusAlready = false
-
     private fun Editable.isWebUrl(): Boolean {
         return Patterns.WEB_URL.matcher(this.toString()).matches()
     }
 
     override fun onFocusChanged(focused: Boolean, direction: Int, previouslyFocusedRect: Rect?) {
         super.onFocusChanged(focused, direction, previouslyFocusedRect)
-        setSelectAllOnFocus(!didFocusAlready)
         if (focused) {
-            if (didFocusAlready && text != null && text?.isWebUrl() == false) {
+            if (text != null && text?.isWebUrl() == false) {
                 // trigger the text change listener so that we can show autocomplete
                 text = text
                 // cursor at the end of the word
@@ -57,7 +54,6 @@ class KeyboardAwareEditText : AppCompatEditText {
                 post { Selection.selectAll(text) }
             }
             showKeyboard()
-            didFocusAlready = text?.isWebUrl() == false
         }
     }
 
