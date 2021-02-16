@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 DuckDuckGo
+ * Copyright (c) 2021 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,19 +14,17 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.browser.autocomplete
+package com.duckduckgo.app.referral
 
-import android.content.Context
-import com.duckduckgo.app.settings.db.SettingsDataStore
-import com.duckduckgo.app.settings.db.SettingsSharedPreferences
-import com.duckduckgo.app.statistics.VariantManager
-import dagger.Module
-import dagger.Provides
+import kotlinx.coroutines.delay
 
-@Module
-class BrowserAutoCompleteModule {
+class StubAppReferrerFoundStateListener(private val referrer: String, private val mockDelayMs: Long = 0) : AppInstallationReferrerStateListener {
+    override suspend fun waitForReferrerCode(): ParsedReferrerResult {
+        if (mockDelayMs > 0) delay(mockDelayMs)
 
-    @Provides
-    fun settingsDataStore(context: Context, variantManager: VariantManager): SettingsDataStore = SettingsSharedPreferences(context, variantManager)
+        return ParsedReferrerResult.CampaignReferrerFound(referrer)
+    }
 
+    override fun initialiseReferralRetrieval() {
+    }
 }

@@ -51,6 +51,7 @@ class WelcomePage : OnboardingPageFragment() {
     private var ctaText: String = ""
     private var welcomeAnimation: ViewPropertyAnimatorCompat? = null
     private var typingAnimation: ViewPropertyAnimatorCompat? = null
+    private var welcomeAnimationFinished = false
 
     // we use a BroadcastChannel because we don't want to emit the last value upon subscription
     private val events = BroadcastChannel<WelcomePageView.Event>(1)
@@ -65,7 +66,8 @@ class WelcomePage : OnboardingPageFragment() {
         super.onActivityCreated(savedInstanceState)
 
         configureDaxCta()
-        beginWelcomeAnimation(ctaText)
+        scheduleWelcomeAnimation()
+        setSkipAnimationListener()
     }
 
     override fun onAttach(context: Context) {
@@ -145,26 +147,46 @@ class WelcomePage : OnboardingPageFragment() {
         context?.let {
             ctaText = it.getString(R.string.onboardingDaxText)
             hiddenTextCta.text = ctaText.html(it)
+            dialogTextCta.textInDialog = ctaText.html(it)
             dialogTextCta.setTextColor(ContextCompat.getColor(it, R.color.grayishBrown))
             cardView.backgroundTintList = ContextCompat.getColorStateList(it, R.color.white)
         }
         triangle.setImageResource(R.drawable.ic_triangle_bubble_white)
     }
 
-    private fun beginWelcomeAnimation(ctaText: String) {
+    private fun setSkipAnimationListener() {
+        longDescriptionContainer.setOnClickListener {
+            if (dialogTextCta.hasAnimationStarted()) {
+                finishTypingAnimation()
+            } else if (!welcomeAnimationFinished) {
+                welcomeAnimation?.cancel()
+                scheduleWelcomeAnimation(0L)
+            }
+            welcomeAnimationFinished = true
+        }
+    }
+
+    private fun scheduleWelcomeAnimation(startDelay: Long = ANIMATION_DELAY) {
         welcomeAnimation = ViewCompat.animate(welcomeContent as View)
             .alpha(MIN_ALPHA)
             .setDuration(ANIMATION_DURATION)
-            .setStartDelay(ANIMATION_DELAY)
+            .setStartDelay(startDelay)
             .withEndAction {
                 typingAnimation = ViewCompat.animate(daxCtaContainer)
                     .alpha(MAX_ALPHA)
                     .setDuration(ANIMATION_DURATION)
                     .withEndAction {
+                        welcomeAnimationFinished = true
                         dialogTextCta.startTypingAnimation(ctaText)
                         setPrimaryCtaListenerAfterWelcomeAlphaAnimation()
                     }
             }
+    }
+
+    private fun finishTypingAnimation() {
+        welcomeAnimation?.cancel()
+        dialogTextCta.finishAnimation()
+        setPrimaryCtaListenerAfterWelcomeAlphaAnimation()
     }
 
     private fun setPrimaryCtaListenerAfterWelcomeAlphaAnimation() {

@@ -77,6 +77,22 @@ class VariantManagerTest {
         }
     }
 
+    // Fireproof Login experiment
+    @Test
+    fun fireproofLoginDetectionControlVariantHasExpectedWeightAndFeatures() {
+        val variant = variants.first { it.key == "zq" }
+        assertEqualsDouble(1.0, variant.weight)
+        assertEquals(0, variant.features.size)
+    }
+
+    @Test
+    fun fireproofLoginDetectionExperimentVariantHasExpectedWeightAndFeatures() {
+        val variant = variants.first { it.key == "zw" }
+        assertEqualsDouble(1.0, variant.weight)
+        assertEquals(1, variant.features.size)
+        assertEquals(LoginDetectionEnabled, variant.features[0])
+    }
+
     @Suppress("SameParameterValue")
     private fun assertEqualsDouble(expected: Double, actual: Double) {
         val comparison = expected.compareTo(actual)

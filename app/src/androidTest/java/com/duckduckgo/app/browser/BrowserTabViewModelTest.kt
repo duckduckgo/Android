@@ -46,6 +46,7 @@ import com.duckduckgo.app.browser.LongPressHandler.RequiredAction.OpenInNewTab
 import com.duckduckgo.app.browser.addtohome.AddToHomeCapabilityDetector
 import com.duckduckgo.app.browser.downloader.FileDownloader
 import com.duckduckgo.app.browser.favicon.FaviconManager
+import com.duckduckgo.app.browser.logindetection.FireproofDialogsEventHandler
 import com.duckduckgo.app.browser.logindetection.LoginDetected
 import com.duckduckgo.app.browser.logindetection.NavigationAwareLoginDetector
 import com.duckduckgo.app.browser.logindetection.NavigationEvent
@@ -233,6 +234,9 @@ class BrowserTabViewModelTest {
     @Mock
     private lateinit var geoLocationPermissions: GeoLocationPermissions
 
+    @Mock
+    private lateinit var fireproofDialogsEventHandler: FireproofDialogsEventHandler
+
     private val lazyFaviconManager = Lazy { mockFaviconManager }
 
     private lateinit var mockAutoCompleteApi: AutoCompleteApi
@@ -254,6 +258,8 @@ class BrowserTabViewModelTest {
 
     private val loginEventLiveData = MutableLiveData<LoginDetected>()
 
+    private val fireproofDialogsEventHandlerLiveData = MutableLiveData<FireproofDialogsEventHandler.Event>()
+
     private val dismissedCtaDaoChannel = Channel<List<DismissedCta>>()
 
     @Before
@@ -266,6 +272,7 @@ class BrowserTabViewModelTest {
         locationPermissionsDao = db.locationPermissionsDao()
 
         mockAutoCompleteApi = AutoCompleteApi(mockAutoCompleteService, mockBookmarksDao)
+        val fireproofWebsiteRepository = FireproofWebsiteRepository(fireproofWebsiteDao, coroutineRule.testDispatcherProvider, lazyFaviconManager)
 
         whenever(mockDismissedCtaDao.dismissedCtas()).thenReturn(dismissedCtaDaoChannel.consumeAsFlow())
         whenever(mockTabRepository.flowTabs).thenReturn(flowOf(emptyList()))
@@ -297,6 +304,7 @@ class BrowserTabViewModelTest {
         whenever(mockPrivacyPractices.privacyPracticesFor(any())).thenReturn(PrivacyPractices.UNKNOWN)
         whenever(mockAppInstallStore.installTimestamp).thenReturn(System.currentTimeMillis() - TimeUnit.DAYS.toMillis(1))
         whenever(mockUserWhitelistDao.contains(anyString())).thenReturn(false)
+        whenever(fireproofDialogsEventHandler.event).thenReturn(fireproofDialogsEventHandlerLiveData)
 
         testee = BrowserTabViewModel(
             statisticsUpdater = mockStatisticsUpdater,
@@ -318,7 +326,7 @@ class BrowserTabViewModelTest {
             searchCountDao = mockSearchCountDao,
             pixel = mockPixel,
             dispatchers = coroutineRule.testDispatcherProvider,
-            fireproofWebsiteRepository = FireproofWebsiteRepository(fireproofWebsiteDao, coroutineRule.testDispatcherProvider, lazyFaviconManager),
+            fireproofWebsiteRepository = fireproofWebsiteRepository,
             locationPermissionsRepository = LocationPermissionsRepository(
                 locationPermissionsDao,
                 lazyFaviconManager,
@@ -331,7 +339,8 @@ class BrowserTabViewModelTest {
             useOurAppDetector = UseOurAppDetector(mockUserEventsStore),
             variantManager = mockVariantManager,
             fileDownloader = mockFileDownloader,
-            globalPrivacyControl = GlobalPrivacyControlManager(mockSettingsStore)
+            globalPrivacyControl = GlobalPrivacyControlManager(mockSettingsStore),
+            fireproofDialogsEventHandler = fireproofDialogsEventHandler
         )
 
         testee.loadData("abc", null, false)
@@ -823,9 +832,9 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenShowEmptyGradeIsTrueThenIsEnableIsFalse() {
+    fun whenShowEmptyGradeIsTrueThenIsEnableIsTrue() {
         val testee = BrowserTabViewModel.PrivacyGradeViewState(PrivacyGrade.A, shouldAnimate = false, showEmptyGrade = true)
-        assertFalse(testee.isEnabled)
+        assertTrue(testee.isEnabled)
     }
 
     @Test
@@ -1256,6 +1265,17 @@ class BrowserTabViewModelTest {
 
         verify(mockPixel, never()).fire("rq_0")
         verify(mockPixel).fire("rq_1")
+    }
+
+    @Test
+    fun whenUserSubmittedDifferentQueryAndOldQueryIsUrlThenDoNotSendQueryChangePixel() {
+        whenever(mockOmnibarConverter.convertQueryToUrl("another query", null)).thenReturn("another query")
+        loadUrl("www.foo.com")
+
+        testee.onUserSubmittedQuery("another query")
+
+        verify(mockPixel, never()).fire("rq_0")
+        verify(mockPixel, never()).fire("rq_1")
     }
 
     @Test
@@ -2082,24 +2102,28 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenUserFireproofsWebsiteFromLoginDialogThenShowConfirmationIsIssuedWithExpectedDomain() {
-        loadUrl("http://mobile.example.com/", isBrowserShowing = true)
+    fun whenUserFireproofsWebsiteFromLoginDialogThenShowConfirmationIsIssuedWithExpectedDomain() = coroutineRule.runBlocking {
+        whenever(fireproofDialogsEventHandler.onUserConfirmedFireproofDialog(anyString())).doAnswer {
+            val domain = it.arguments.first() as String
+            fireproofDialogsEventHandlerLiveData.postValue(FireproofDialogsEventHandler.Event.FireproofWebSiteSuccess(FireproofWebsiteEntity(domain)))
+        }
+
         testee.onUserConfirmedFireproofDialog("login.example.com")
+
         assertCommandIssued<Command.ShowFireproofWebSiteConfirmation> {
             assertEquals("login.example.com", this.fireproofWebsiteEntity.domain)
         }
     }
 
     @Test
-    fun whenUserFireproofsWebsiteFromLoginDialogThenPixelSent() {
-        testee.onUserConfirmedFireproofDialog("login.example.com")
-        verify(mockPixel).fire(Pixel.PixelName.FIREPROOF_WEBSITE_LOGIN_ADDED)
-    }
+    fun whenAskToDisableLoginDetectionEventReceivedThenAskUserToDisableLoginDetection() = coroutineRule.runBlocking {
+        whenever(fireproofDialogsEventHandler.onUserDismissedFireproofLoginDialog()).doAnswer {
+            fireproofDialogsEventHandlerLiveData.postValue(FireproofDialogsEventHandler.Event.AskToDisableLoginDetection)
+        }
 
-    @Test
-    fun whenUserDismissesFireproofWebsiteLoginDialogThenPixelSent() {
         testee.onUserDismissedFireproofLoginDialog()
-        verify(mockPixel).fire(Pixel.PixelName.FIREPROOF_WEBSITE_LOGIN_DISMISS)
+
+        assertCommandIssued<Command.AskToDisableLoginDetection>()
     }
 
     @Test
@@ -3081,33 +3105,6 @@ class BrowserTabViewModelTest {
         testee.progressChanged(100)
 
         assertCommandIssued<Command.RefreshUserAgent>()
-    }
-
-    @Test
-    fun whenPageChangesAndNewPageCanChangeBrowsingModeThenCanChangeBrowsingModeIsTrue() {
-        givenCurrentSite("https://www.example.com/")
-
-        loadUrl("https://www.example2.com", isBrowserShowing = true)
-
-        assertTrue(browserViewState().canChangeBrowsingMode)
-    }
-
-    @Test
-    fun whenPageChangesAndNewPageCannotChangeBrowsingModeThenCanChangeBrowsingModeIsFalse() {
-        givenCurrentSite("https://www.example.com/")
-
-        loadUrl("https://www.facebook.com", isBrowserShowing = true)
-
-        assertFalse(browserViewState().canChangeBrowsingMode)
-    }
-
-    @Test
-    fun whenPageChangesAndNewPageCanChangeBrowsingModeButContainsExcludedPathThenCanChangeBrowsingModeIsFalse() {
-        givenCurrentSite("https://www.example.com/")
-
-        loadUrl("https://www.facebook.com/dialog", isBrowserShowing = true)
-
-        assertFalse(browserViewState().canChangeBrowsingMode)
     }
 
     @Test

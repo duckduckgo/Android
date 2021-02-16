@@ -39,6 +39,7 @@ import com.duckduckgo.app.fire.DataClearer
 import com.duckduckgo.app.fire.DataClearerForegroundAppRestartPixel
 import com.duckduckgo.app.global.ApplicationClearDataState
 import com.duckduckgo.app.global.DuckDuckGoActivity
+import com.duckduckgo.app.global.events.db.UserEventsStore
 import com.duckduckgo.app.global.intentText
 import com.duckduckgo.app.global.view.*
 import com.duckduckgo.app.location.ui.LocationPermissionsActivity
@@ -79,6 +80,9 @@ class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope() {
 
     @Inject
     lateinit var variantManager: VariantManager
+
+    @Inject
+    lateinit var userEventsStore: UserEventsStore
 
     private var currentTab: BrowserTabFragment? = null
 
@@ -225,7 +229,7 @@ class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope() {
                 launch { viewModel.onOpenShortcut(sharedText) }
             } else {
                 Timber.w("opening in new tab requested for $sharedText")
-                launch { viewModel.onOpenInNewTabRequested(query = sharedText, skipHome = true) }
+                launch { viewModel.onOpenInNewTabRequested(query = sharedText, sourceTabId = currentTab?.tabId, skipHome = true) }
                 return
             }
         }
@@ -304,7 +308,8 @@ class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope() {
             clearPersonalDataAction = clearPersonalDataAction,
             ctaViewModel = ctaViewModel,
             pixel = pixel,
-            settingsDataStore = settingsDataStore
+            settingsDataStore = settingsDataStore,
+            userEventsStore = userEventsStore
         )
         dialog.clearStarted = {
             removeObservers()

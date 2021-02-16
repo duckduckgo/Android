@@ -14,19 +14,14 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.browser.autocomplete
+package com.duckduckgo.app.global.plugins
 
-import android.content.Context
-import com.duckduckgo.app.settings.db.SettingsDataStore
-import com.duckduckgo.app.settings.db.SettingsSharedPreferences
-import com.duckduckgo.app.statistics.VariantManager
-import dagger.Module
-import dagger.Provides
-
-@Module
-class BrowserAutoCompleteModule {
-
-    @Provides
-    fun settingsDataStore(context: Context, variantManager: VariantManager): SettingsDataStore = SettingsSharedPreferences(context, variantManager)
-
+/**
+ * A PluginPoint provides a list of plugins of a particular type T
+ */
+interface PluginPoint<T> {
+    /**
+     * @return the list of plugins of type <T>
+     */
+    fun getPlugins(): List<T>
 }

@@ -114,6 +114,7 @@ import kotlinx.android.synthetic.main.fragment_browser_tab.*
 import kotlinx.android.synthetic.main.include_add_widget_instruction_buttons.view.*
 import kotlinx.android.synthetic.main.include_cta_buttons.view.*
 import kotlinx.android.synthetic.main.include_dax_dialog_cta.*
+import kotlinx.android.synthetic.main.include_dax_dialog_cta.view.*
 import kotlinx.android.synthetic.main.include_find_in_page.*
 import kotlinx.android.synthetic.main.include_new_browser_tab.*
 import kotlinx.android.synthetic.main.include_omnibar_toolbar.*
@@ -615,6 +616,7 @@ class BrowserTabFragment :
             is Command.AskDomainPermission -> askSiteLocationPermission(it.domain)
             is Command.RefreshUserAgent -> refreshUserAgent(it.url, it.isDesktop)
             is Command.AskToFireproofWebsite -> askToFireproofWebsite(requireContext(), it.fireproofWebsite)
+            is Command.AskToDisableLoginDetection -> askToDisableLoginDetection(requireContext())
             is Command.ShowDomainHasPermissionMessage -> showDomainHasLocationPermission(it.domain)
             is DownloadCommand -> processDownloadCommand(it)
             is Command.ConvertBlobToDataUri -> convertBlobToDataUri(it)
@@ -773,12 +775,32 @@ class BrowserTabFragment :
                 .setMessage(R.string.fireproofWebsiteLoginDialogDescription)
                 .setPositiveButton(R.string.fireproofWebsiteLoginDialogPositive) { _, _ ->
                     viewModel.onUserConfirmedFireproofDialog(fireproofWebsite.domain)
-                }
-                .setNegativeButton(R.string.fireproofWebsiteLoginDialogNegative) { dialog, _ ->
+                }.setNegativeButton(R.string.fireproofWebsiteLoginDialogNegative) { dialog, _ ->
                     dialog.dismiss()
                     viewModel.onUserDismissedFireproofLoginDialog()
+                }.setOnCancelListener {
+                    viewModel.onUserDismissedFireproofLoginDialog()
                 }.show()
+
+            viewModel.onFireproofLoginDialogShown()
         }
+    }
+
+    private fun askToDisableLoginDetection(context: Context) {
+        AlertDialog.Builder(context)
+            .setTitle(getString(R.string.disableLoginDetectionDialogTitle))
+            .setMessage(R.string.disableLoginDetectionDialogDescription)
+            .setPositiveButton(R.string.disableLoginDetectionDialogPositive) { _, _ ->
+                viewModel.onUserConfirmedDisableLoginDetectionDialog()
+            }
+            .setNegativeButton(R.string.disableLoginDetectionDialogNegative) { dialog, _ ->
+                dialog.dismiss()
+                viewModel.onUserDismissedDisableLoginDetectionDialog()
+            }.setOnCancelListener {
+                viewModel.onUserDismissedDisableLoginDetectionDialog()
+            }.show()
+
+        viewModel.onDisableLoginDetectionDialogShown()
     }
 
     private fun launchExternalAppDialog(context: Context, onClick: () -> Unit) {
@@ -1793,6 +1815,7 @@ class BrowserTabFragment :
 
                 ddgLogo.show()
                 lastSeenCtaViewState = viewState
+                removeNewTabLayoutClickListener()
                 if (viewState.cta != null) {
                     showCta(viewState.cta)
                 } else {
@@ -1835,6 +1858,11 @@ class BrowserTabFragment :
             hideHomeCta()
             hideHomeTopCta()
             configuration.showCta(daxCtaContainer)
+            newTabLayout.setOnClickListener { daxCtaContainer.dialogTextCta.finishAnimation() }
+        }
+
+        private fun removeNewTabLayoutClickListener() {
+            newTabLayout.setOnClickListener(null)
         }
 
         private fun showHomeTopCta(configuration: HomeTopPanelCta) {

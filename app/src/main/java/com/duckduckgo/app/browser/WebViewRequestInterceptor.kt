@@ -22,7 +22,6 @@ import android.webkit.WebResourceResponse
 import android.webkit.WebView
 import androidx.annotation.WorkerThread
 import com.duckduckgo.app.browser.useragent.UserAgentProvider
-import com.duckduckgo.app.browser.useragent.MobileUrlReWriter
 import com.duckduckgo.app.global.isHttp
 import com.duckduckgo.app.globalprivacycontrol.GlobalPrivacyControl
 import com.duckduckgo.app.globalprivacycontrol.GlobalPrivacyControlManager
@@ -52,8 +51,7 @@ class WebViewRequestInterceptor(
     private val httpsUpgrader: HttpsUpgrader,
     private val privacyProtectionCountDao: PrivacyProtectionCountDao,
     private val globalPrivacyControl: GlobalPrivacyControl,
-    private val userAgentProvider: UserAgentProvider,
-    private val mobileUrlReWriter: MobileUrlReWriter
+    private val userAgentProvider: UserAgentProvider
 ) : RequestInterceptor {
 
     /**
@@ -74,13 +72,6 @@ class WebViewRequestInterceptor(
     ): WebResourceResponse? {
 
         val url = request.url
-
-        shouldChangeToMobileUrl(request)?.let { newUrl ->
-            withContext(Dispatchers.Main) {
-                webView.loadUrl(newUrl, getHeaders(request))
-            }
-            return WebResourceResponse(null, null, null)
-        }
 
         newUserAgent(request, webView, webViewClientListener)?.let {
             withContext(Dispatchers.Main) {
@@ -176,14 +167,6 @@ class WebViewRequestInterceptor(
             } else {
                 null
             }
-        } else {
-            null
-        }
-    }
-
-    private fun shouldChangeToMobileUrl(request: WebResourceRequest): String? {
-        return if (request.isForMainFrame && request.url != null && request.method == "GET") {
-            return mobileUrlReWriter.mobileSiteOnlyForUri(request.url)
         } else {
             null
         }

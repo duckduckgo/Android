@@ -28,6 +28,7 @@ import com.duckduckgo.app.browser.addtohome.AddToHomeCapabilityDetector
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.browser.downloader.FileDownloader
 import com.duckduckgo.app.browser.favicon.FaviconManager
+import com.duckduckgo.app.browser.logindetection.FireproofDialogsEventHandler
 import com.duckduckgo.app.browser.logindetection.NavigationAwareLoginDetector
 import com.duckduckgo.app.browser.omnibar.QueryUrlConverter
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
@@ -130,7 +131,8 @@ class ViewModelFactory @Inject constructor(
     private val fileDownloader: FileDownloader,
     private val dispatcherProvider: DispatcherProvider,
     private val fireAnimationLoader: FireAnimationLoader,
-    private val globalPrivacyControl: GlobalPrivacyControl
+    private val globalPrivacyControl: GlobalPrivacyControl,
+    private val fireproofDialogsEventHandler: FireproofDialogsEventHandler
 ) : ViewModelProvider.NewInstanceFactory() {
 
     override fun <T : ViewModel> create(modelClass: Class<T>) =
@@ -229,7 +231,8 @@ class ViewModelFactory @Inject constructor(
         useOurAppDetector = userOurAppDetector,
         variantManager = variantManager,
         fileDownloader = fileDownloader,
-        globalPrivacyControl = globalPrivacyControl
+        globalPrivacyControl = globalPrivacyControl,
+        fireproofDialogsEventHandler = fireproofDialogsEventHandler
     )
 
     private fun changeAppIconViewModel() =
@@ -240,7 +243,8 @@ class ViewModelFactory @Inject constructor(
             fireproofWebsiteRepository = fireproofWebsiteRepository,
             dispatcherProvider = dispatcherProvider,
             pixel = pixel,
-            settingsDataStore = appSettingsPreferencesStore
+            settingsDataStore = appSettingsPreferencesStore,
+            userEventsStore = userEventsStore
         )
 
     private fun locationPermissionsViewModel() =

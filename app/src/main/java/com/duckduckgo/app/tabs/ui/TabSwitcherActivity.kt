@@ -32,6 +32,7 @@ import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.tabpreview.WebViewPreviewPersister
 import com.duckduckgo.app.cta.ui.CtaViewModel
 import com.duckduckgo.app.global.DuckDuckGoActivity
+import com.duckduckgo.app.global.events.db.UserEventsStore
 import com.duckduckgo.app.global.view.ClearPersonalDataAction
 import com.duckduckgo.app.global.view.FireDialog
 import com.duckduckgo.app.settings.SettingsActivity
@@ -73,6 +74,9 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
 
     @Inject
     lateinit var faviconManager: FaviconManager
+
+    @Inject
+    lateinit var userEventsStore: UserEventsStore
 
     private val viewModel: TabSwitcherViewModel by bindViewModel()
 
@@ -195,7 +199,8 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
             clearPersonalDataAction = clearPersonalDataAction,
             ctaViewModel = ctaViewModel,
             pixel = pixel,
-            settingsDataStore = settingsDataStore
+            settingsDataStore = settingsDataStore,
+            userEventsStore = userEventsStore
         )
         dialog.clearComplete = { viewModel.onClearComplete() }
         dialog.show()
