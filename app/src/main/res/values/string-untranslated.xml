@@ -30,4 +30,10 @@
 
     <!-- Bookmark Websites snackbar -->
     <string name="bookmarkDeleteConfirmationMessage">Deleted &lt;b>%s&lt;/b></string>
+
+    <!-- Login detection enabled experiment -->
+    <string name="disableLoginDetectionDialogTitle">Disable Fireproof reminder when signing in to sites?</string>
+    <string name="disableLoginDetectionDialogDescription">You can change this preference anytime in Settings.</string>
+    <string name="disableLoginDetectionDialogPositive">DISABLE</string>
+    <string name="disableLoginDetectionDialogNegative">CANCEL</string>
 </resources>

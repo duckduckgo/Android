@@ -28,6 +28,9 @@ import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepository
 import com.duckduckgo.app.fire.fireproofwebsite.ui.FireproofWebsitesViewModel.Command.ConfirmDeleteFireproofWebsite
 import com.duckduckgo.app.global.db.AppDatabase
+import com.duckduckgo.app.global.events.db.UserEventKey
+import com.duckduckgo.app.global.events.db.UserEventsStore
+import com.duckduckgo.app.runBlocking
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.FIREPROOF_LOGIN_TOGGLE_ENABLED
@@ -72,9 +75,11 @@ class FireproofWebsitesViewModelTest {
 
     private val mockPixel: Pixel = mock()
 
-    private val settingsDataStore: SettingsDataStore = mock()
+    private val mockSettingsDataStore: SettingsDataStore = mock()
 
     private val mockFaviconManager: FaviconManager = mock()
+
+    private val mockUserEventsStore: UserEventsStore = mock()
 
     private val lazyFaviconManager = Lazy { mockFaviconManager }
 
@@ -88,7 +93,8 @@ class FireproofWebsitesViewModelTest {
             FireproofWebsiteRepository(fireproofWebsiteDao, coroutineRule.testDispatcherProvider, lazyFaviconManager),
             coroutineRule.testDispatcherProvider,
             mockPixel,
-            settingsDataStore
+            mockSettingsDataStore,
+            mockUserEventsStore
         )
         viewModel.command.observeForever(mockCommandObserver)
         viewModel.viewState.observeForever(mockViewStateObserver)
@@ -161,10 +167,17 @@ class FireproofWebsitesViewModelTest {
     }
 
     @Test
+    fun whenUserEnablesLoginDetectionThenRegisterEvent() = coroutineRule.runBlocking {
+        viewModel.onUserToggleLoginDetection(true)
+
+        verify(mockUserEventsStore).registerUserEvent(UserEventKey.USER_ENABLED_FIREPROOF_LOGIN)
+    }
+
+    @Test
     fun whenUserTogglesLoginDetectionThenUpdateSettingsDataStore() {
         viewModel.onUserToggleLoginDetection(true)
 
-        verify(settingsDataStore).appLoginDetection = true
+        verify(mockSettingsDataStore).appLoginDetection = true
     }
 
     @Test

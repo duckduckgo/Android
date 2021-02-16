@@ -204,6 +204,9 @@ interface Pixel {
         FIREPROOF_LOGIN_TOGGLE_ENABLED("m_fw_d_e"),
         FIREPROOF_LOGIN_TOGGLE_DISABLED("m_fw_d_d"),
         FIREPROOF_WEBSITE_UNDO("m_fw_u"),
+        FIREPROOF_LOGIN_DISABLE_DIALOG_SHOWN("m_fw_dd_s"),
+        FIREPROOF_LOGIN_DISABLE_DIALOG_DISABLE("m_fw_dd_d"),
+        FIREPROOF_LOGIN_DISABLE_DIALOG_CANCEL("m_fw_dd_c"),
 
         USE_OUR_APP_NOTIFICATION_SUFFIX("uoa"),
         USE_OUR_APP_DIALOG_SHOWN("m_uoa_d"),
@@ -256,6 +259,7 @@ interface Pixel {
         const val SERP_QUERY_NOT_CHANGED = "0"
         const val FIRE_BUTTON_STATE = "fb"
         const val FIRE_ANIMATION = "fa"
+        const val FIRE_EXECUTED = "fe"
     }
 
     object PixelValues {

@@ -52,6 +52,8 @@ import com.duckduckgo.app.browser.addtohome.AddToHomeCapabilityDetector
 import com.duckduckgo.app.browser.downloader.DownloadFailReason
 import com.duckduckgo.app.browser.downloader.FileDownloader
 import com.duckduckgo.app.browser.favicon.FaviconManager
+import com.duckduckgo.app.browser.logindetection.FireproofDialogsEventHandler
+import com.duckduckgo.app.browser.logindetection.FireproofDialogsEventHandler.Event
 import com.duckduckgo.app.browser.logindetection.LoginDetected
 import com.duckduckgo.app.browser.logindetection.NavigationAwareLoginDetector
 import com.duckduckgo.app.browser.logindetection.NavigationEvent
@@ -137,7 +139,8 @@ class BrowserTabViewModel(
     private val useOurAppDetector: UseOurAppDetector,
     private val variantManager: VariantManager,
     private val fileDownloader: FileDownloader,
-    private val globalPrivacyControl: GlobalPrivacyControl
+    private val globalPrivacyControl: GlobalPrivacyControl,
+    private val fireproofDialogsEventHandler: FireproofDialogsEventHandler
 ) : WebViewClientListener, EditBookmarkListener, HttpAuthenticationListener, SiteLocationPermissionDialog.SiteLocationPermissionDialogListener,
     SystemLocationPermissionDialog.SystemLocationPermissionDialogListener, ViewModel() {
 
@@ -244,6 +247,7 @@ class BrowserTabViewModel(
         class DownloadImage(val url: String, val requestUserConfirmation: Boolean) : Command()
         class ShowBookmarkAddedConfirmation(val bookmarkId: Long, val title: String?, val url: String?) : Command()
         class ShowFireproofWebSiteConfirmation(val fireproofWebsiteEntity: FireproofWebsiteEntity) : Command()
+        object AskToDisableLoginDetection : Command()
         class AskToFireproofWebsite(val fireproofWebsite: FireproofWebsiteEntity) : Command()
         class ShareLink(val url: String) : Command()
         class CopyLink(val url: String) : Command()
@@ -330,6 +334,13 @@ class BrowserTabViewModel(
         browserViewState.value = currentBrowserViewState().copy(isFireproofWebsite = isFireproofWebsite())
     }
 
+    private val fireproofDialogEventObserver = Observer<Event> { event ->
+        command.value = when (event) {
+            is Event.AskToDisableLoginDetection -> AskToDisableLoginDetection
+            is Event.FireproofWebSiteSuccess -> ShowFireproofWebSiteConfirmation(event.fireproofWebsiteEntity)
+        }
+    }
+
     private val fireButtonAnimation = Observer<Boolean> { shouldShowAnimation ->
         Timber.i("shouldShowAnimation $shouldShowAnimation")
         if (currentBrowserViewState().fireButton is FireButton.Visible) {
@@ -356,11 +367,14 @@ class BrowserTabViewModel(
 
     private val loginDetectionObserver = Observer<LoginDetected> { loginEvent ->
         Timber.i("LoginDetection for $loginEvent")
-        viewModelScope.launch { useOurAppDetector.registerIfFireproofSeenForTheFirstTime(loginEvent.forwardedToDomain) }
+        viewModelScope.launch(dispatchers.io()) {
+            useOurAppDetector.registerIfFireproofSeenForTheFirstTime(loginEvent.forwardedToDomain)
 
-        if (!isFireproofWebsite(loginEvent.forwardedToDomain)) {
-            pixel.fire(PixelName.FIREPROOF_LOGIN_DIALOG_SHOWN)
-            command.value = AskToFireproofWebsite(FireproofWebsiteEntity(loginEvent.forwardedToDomain))
+            if (!isFireproofWebsite(loginEvent.forwardedToDomain)) {
+                withContext(dispatchers.main()) {
+                    command.value = AskToFireproofWebsite(FireproofWebsiteEntity(loginEvent.forwardedToDomain))
+                }
+            }
         }
     }
 
@@ -368,6 +382,7 @@ class BrowserTabViewModel(
         initializeViewStates()
         configureAutoComplete()
         fireproofWebsiteState.observeForever(fireproofWebsitesObserver)
+        fireproofDialogsEventHandler.event.observeForever(fireproofDialogEventObserver)
         navigationAwareLoginDetector.loginEventLiveData.observeForever(loginDetectionObserver)
         showPulseAnimation.observeForever(fireButtonAnimation)
     }
@@ -438,6 +453,7 @@ class BrowserTabViewModel(
         autoCompleteDisposable = null
         fireproofWebsiteState.removeObserver(fireproofWebsitesObserver)
         navigationAwareLoginDetector.loginEventLiveData.removeObserver(loginDetectionObserver)
+        fireproofDialogsEventHandler.event.removeObserver(fireproofDialogEventObserver)
         showPulseAnimation.removeObserver(fireButtonAnimation)
         super.onCleared()
     }
@@ -1284,17 +1300,40 @@ class BrowserTabViewModel(
         }
     }
 
+    fun onFireproofLoginDialogShown() {
+        viewModelScope.launch {
+            fireproofDialogsEventHandler.onFireproofLoginDialogShown()
+        }
+    }
+
     fun onUserConfirmedFireproofDialog(domain: String) {
         viewModelScope.launch {
-            fireproofWebsiteRepository.fireproofWebsite(domain)?.let {
-                pixel.fire(PixelName.FIREPROOF_WEBSITE_LOGIN_ADDED)
-                command.value = ShowFireproofWebSiteConfirmation(fireproofWebsiteEntity = it)
-            }
+            fireproofDialogsEventHandler.onUserConfirmedFireproofDialog(domain)
         }
     }
 
     fun onUserDismissedFireproofLoginDialog() {
-        pixel.fire(PixelName.FIREPROOF_WEBSITE_LOGIN_DISMISS)
+        viewModelScope.launch {
+            fireproofDialogsEventHandler.onUserDismissedFireproofLoginDialog()
+        }
+    }
+
+    fun onDisableLoginDetectionDialogShown() {
+        viewModelScope.launch(dispatchers.io()) {
+            fireproofDialogsEventHandler.onDisableLoginDetectionDialogShown()
+        }
+    }
+
+    fun onUserConfirmedDisableLoginDetectionDialog() {
+        viewModelScope.launch(dispatchers.io()) {
+            fireproofDialogsEventHandler.onUserConfirmedDisableLoginDetectionDialog()
+        }
+    }
+
+    fun onUserDismissedDisableLoginDetectionDialog() {
+        viewModelScope.launch(dispatchers.io()) {
+            fireproofDialogsEventHandler.onUserDismissedDisableLoginDetectionDialog()
+        }
     }
 
     fun onFireproofWebsiteSnackbarUndoClicked(fireproofWebsiteEntity: FireproofWebsiteEntity) {
