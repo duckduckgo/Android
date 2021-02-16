@@ -1268,6 +1268,17 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenUserSubmittedDifferentQueryAndOldQueryIsUrlThenDoNotSendQueryChangePixel() {
+        whenever(mockOmnibarConverter.convertQueryToUrl("another query", null)).thenReturn("another query")
+        loadUrl("www.foo.com")
+
+        testee.onUserSubmittedQuery("another query")
+
+        verify(mockPixel, never()).fire("rq_0")
+        verify(mockPixel, never()).fire("rq_1")
+    }
+
+    @Test
     fun whenUserBrowsingPressesBackAndBrowserCanGoBackThenNavigatesToPreviousPageAndHandledTrue() {
         setupNavigation(isBrowsing = true, canGoBack = true, stepsToPreviousPage = 2)
         assertTrue(testee.onUserPressedBack())
@@ -3094,33 +3105,6 @@ class BrowserTabViewModelTest {
         testee.progressChanged(100)
 
         assertCommandIssued<Command.RefreshUserAgent>()
-    }
-
-    @Test
-    fun whenPageChangesAndNewPageCanChangeBrowsingModeThenCanChangeBrowsingModeIsTrue() {
-        givenCurrentSite("https://www.example.com/")
-
-        loadUrl("https://www.example2.com", isBrowserShowing = true)
-
-        assertTrue(browserViewState().canChangeBrowsingMode)
-    }
-
-    @Test
-    fun whenPageChangesAndNewPageCannotChangeBrowsingModeThenCanChangeBrowsingModeIsFalse() {
-        givenCurrentSite("https://www.example.com/")
-
-        loadUrl("https://www.facebook.com", isBrowserShowing = true)
-
-        assertFalse(browserViewState().canChangeBrowsingMode)
-    }
-
-    @Test
-    fun whenPageChangesAndNewPageCanChangeBrowsingModeButContainsExcludedPathThenCanChangeBrowsingModeIsFalse() {
-        givenCurrentSite("https://www.example.com/")
-
-        loadUrl("https://www.facebook.com/dialog", isBrowserShowing = true)
-
-        assertFalse(browserViewState().canChangeBrowsingMode)
     }
 
     @Test

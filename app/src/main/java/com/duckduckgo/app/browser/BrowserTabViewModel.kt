@@ -63,7 +63,6 @@ import com.duckduckgo.app.browser.model.LongPressTarget
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.browser.ui.HttpAuthenticationDialogFragment.HttpAuthenticationListener
-import com.duckduckgo.app.browser.useragent.MobileUrlReWriter
 import com.duckduckgo.app.cta.ui.*
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepository
@@ -561,6 +560,8 @@ class BrowserTabViewModel(
         val oldQuery = currentOmnibarViewState().omnibarText.toUri()
         val newQuery = omnibarText.toUri()
 
+        if (Patterns.WEB_URL.matcher(oldQuery.toString()).matches()) return
+
         if (oldQuery == newQuery) {
             pixel.fire(String.format(Locale.US, PixelName.SERP_REQUERY.pixelName, PixelParameter.SERP_QUERY_NOT_CHANGED))
         } else if (oldQuery.toString().isNotBlank()) { // blank means no previous search, don't send pixel
@@ -787,7 +788,6 @@ class BrowserTabViewModel(
             browserShowing = true,
             canAddBookmarks = true,
             addToHomeEnabled = true,
-            canChangeBrowsingMode = canChangeBrowsingMode(site?.domain),
             addToHomeVisible = addToHomeCapabilityDetector.isAddToHomeSupported(),
             canSharePage = true,
             showPrivacyGrade = true,
@@ -814,10 +814,6 @@ class BrowserTabViewModel(
         permissionOrigin?.let { viewModelScope.launch { notifyPermanentLocationPermission(permissionOrigin) } }
 
         registerSiteVisit()
-    }
-
-    private fun canChangeBrowsingMode(domain: String?): Boolean {
-        return !MobileUrlReWriter.strictlyMobileSiteHosts.any { domain?.contains(it.host) == true }
     }
 
     private fun sendPixelIfUseOurAppSiteVisitedFirstTime(url: String) {

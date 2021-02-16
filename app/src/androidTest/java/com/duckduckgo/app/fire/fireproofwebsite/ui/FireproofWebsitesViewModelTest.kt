@@ -180,6 +180,17 @@ class FireproofWebsitesViewModelTest {
         verify(mockSettingsDataStore).appLoginDetection = true
     }
 
+    @Test
+    fun whenUserUndosDeleteFireproofThenSiteIsAddedBack() {
+
+        val entity = FireproofWebsiteEntity("domain.com")
+
+        viewModel.onSnackBarUndoFireproof(entity)
+
+        verify(mockViewStateObserver, atLeastOnce()).onChanged(viewStateCaptor.capture())
+        assertTrue(viewStateCaptor.value.fireproofWebsitesEntities.isNotEmpty())
+    }
+
     private inline fun <reified T : FireproofWebsitesViewModel.Command> assertCommandIssued(instanceAssertions: T.() -> Unit = {}) {
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
         val issuedCommand = commandCaptor.allValues.find { it is T }

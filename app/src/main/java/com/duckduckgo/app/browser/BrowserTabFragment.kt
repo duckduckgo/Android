@@ -114,6 +114,7 @@ import kotlinx.android.synthetic.main.fragment_browser_tab.*
 import kotlinx.android.synthetic.main.include_add_widget_instruction_buttons.view.*
 import kotlinx.android.synthetic.main.include_cta_buttons.view.*
 import kotlinx.android.synthetic.main.include_dax_dialog_cta.*
+import kotlinx.android.synthetic.main.include_dax_dialog_cta.view.*
 import kotlinx.android.synthetic.main.include_find_in_page.*
 import kotlinx.android.synthetic.main.include_new_browser_tab.*
 import kotlinx.android.synthetic.main.include_omnibar_toolbar.*
@@ -1814,6 +1815,7 @@ class BrowserTabFragment :
 
                 ddgLogo.show()
                 lastSeenCtaViewState = viewState
+                removeNewTabLayoutClickListener()
                 if (viewState.cta != null) {
                     showCta(viewState.cta)
                 } else {
@@ -1856,6 +1858,11 @@ class BrowserTabFragment :
             hideHomeCta()
             hideHomeTopCta()
             configuration.showCta(daxCtaContainer)
+            newTabLayout.setOnClickListener { daxCtaContainer.dialogTextCta.finishAnimation() }
+        }
+
+        private fun removeNewTabLayoutClickListener() {
+            newTabLayout.setOnClickListener(null)
         }
 
         private fun showHomeTopCta(configuration: HomeTopPanelCta) {
