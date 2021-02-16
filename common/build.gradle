@@ -68,4 +68,6 @@ dependencies {
     androidTestImplementation AndroidX.room.testing
 
     testImplementation 'junit:junit:4.+'
+    androidTestImplementation AndroidX.test.runner
+    androidTestImplementation AndroidX.test.rules
 }

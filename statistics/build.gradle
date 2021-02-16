@@ -89,4 +89,6 @@ dependencies {
     implementation("com.android.installreferrer:installreferrer:_")
 
     testImplementation 'junit:junit:4.+'
+    androidTestImplementation AndroidX.test.runner
+    androidTestImplementation AndroidX.test.rules
 }
