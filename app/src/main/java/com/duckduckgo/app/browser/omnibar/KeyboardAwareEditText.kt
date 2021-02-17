@@ -81,13 +81,14 @@ class KeyboardAwareEditText : AppCompatEditText {
      * Overrides to paste clip data without rich text formatting.
      */
     override fun onTextContextMenuItem(id: Int): Boolean = when (id) {
-        android.R.id.paste -> if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            super.onTextContextMenuItem(android.R.id.pasteAsPlainText)
-        } else {
-            val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-            clipboard.convertClipToPlainText()
-            super.onTextContextMenuItem(id)
-        }
+        android.R.id.paste ->
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                super.onTextContextMenuItem(android.R.id.pasteAsPlainText)
+            } else {
+                val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+                clipboard.convertClipToPlainText()
+                super.onTextContextMenuItem(id)
+            }
         else -> super.onTextContextMenuItem(id)
     }
 
