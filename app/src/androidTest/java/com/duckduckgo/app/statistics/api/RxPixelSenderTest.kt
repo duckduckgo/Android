@@ -17,18 +17,15 @@
 package com.duckduckgo.app.statistics.api
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import androidx.room.Database
 import androidx.room.Room
-import androidx.room.RoomDatabase
-import androidx.room.TypeConverters
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.InstantSchedulersRule
+import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.global.device.DeviceInfo
 import com.duckduckgo.app.statistics.Variant
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.model.Atb
 import com.duckduckgo.app.statistics.model.PixelEntity
-import com.duckduckgo.app.statistics.model.QueryParamsTypeConverter
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.PRIVACY_DASHBOARD_OPENED
 import com.duckduckgo.app.statistics.store.PendingPixelDao
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
@@ -42,17 +39,6 @@ import org.junit.Rule
 import org.junit.Test
 import org.mockito.Mock
 import java.util.concurrent.TimeoutException
-
-@Database(
-    entities = [PixelEntity::class],
-    version = 1
-)
-@TypeConverters(
-    QueryParamsTypeConverter::class
-)
-abstract class TestDatabase : RoomDatabase() {
-    abstract fun pixelDao(): PendingPixelDao
-}
 
 class RxPixelSenderTest {
 
@@ -76,13 +62,13 @@ class RxPixelSenderTest {
     @Mock
     val mockDeviceInfo: DeviceInfo = mock()
 
-    private lateinit var db: TestDatabase
+    private lateinit var db: AppDatabase
     private lateinit var pendingPixelDao: PendingPixelDao
     private lateinit var testee: RxPixelSender
 
     @Before
     fun before() {
-        db = Room.inMemoryDatabaseBuilder(InstrumentationRegistry.getInstrumentation().targetContext, TestDatabase::class.java)
+        db = Room.inMemoryDatabaseBuilder(InstrumentationRegistry.getInstrumentation().targetContext, AppDatabase::class.java)
             .allowMainThreadQueries()
             .build()
         pendingPixelDao = db.pixelDao()
