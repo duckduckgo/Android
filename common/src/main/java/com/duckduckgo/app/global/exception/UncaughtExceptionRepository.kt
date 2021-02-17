@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.global.exception
 
+import com.duckduckgo.app.global.device.DeviceInfo
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import timber.log.Timber
@@ -28,7 +29,8 @@ interface UncaughtExceptionRepository {
 
 class UncaughtExceptionRepositoryDb(
     private val uncaughtExceptionDao: UncaughtExceptionDao,
-    private val rootExceptionFinder: RootExceptionFinder
+    private val rootExceptionFinder: RootExceptionFinder,
+    private val deviceInfo: DeviceInfo
 ) : UncaughtExceptionRepository {
 
     private var lastSeenException: Throwable? = null
@@ -42,7 +44,10 @@ class UncaughtExceptionRepositoryDb(
             Timber.e(e, "Uncaught exception - $exceptionSource")
 
             val rootCause = rootExceptionFinder.findRootException(e)
-            val exceptionEntity = UncaughtExceptionEntity(message = rootCause.extractExceptionCause(), exceptionSource = exceptionSource)
+            val exceptionEntity = UncaughtExceptionEntity(
+                message = rootCause.extractExceptionCause(),
+                exceptionSource = exceptionSource,
+                version = deviceInfo.appVersion)
             uncaughtExceptionDao.add(exceptionEntity)
 
             lastSeenException = e

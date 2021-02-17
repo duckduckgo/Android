@@ -11,12 +11,12 @@ ext {
 }
 
 android {
-    compileSdkVersion 29
+    compileSdkVersion compile_sdk
     ndkVersion '21.0.6113669'
     defaultConfig {
         applicationId "com.duckduckgo.mobile.android"
-        minSdkVersion 21
-        targetSdkVersion 29
+        minSdkVersion min_sdk
+        targetSdkVersion target_sdk
         versionCode buildVersionCode()
         versionName buildVersionName()
         testInstrumentationRunner "com.duckduckgo.app.TestRunner"
@@ -96,6 +96,9 @@ android {
 }
 
 dependencies {
+    implementation project(path: ':statistics')
+    implementation project(path: ':common')
+
     implementation AndroidX.legacy.supportV4
     debugImplementation Square.leakCanary.android
 
@@ -173,9 +176,6 @@ dependencies {
 
     // Lottie
     implementation "com.airbnb.android:lottie:_"
-
-    // Apache commons
-    implementation "org.apache.commons:commons-math3:_"
 
     // Play Store referrer library
     implementation("com.android.installreferrer:installreferrer:_")
