@@ -88,7 +88,7 @@ dependencies {
     // Play Store referrer library
     implementation("com.android.installreferrer:installreferrer:_")
 
-    testImplementation 'junit:junit:4.+'
+    testImplementation Testing.junit4
     androidTestImplementation AndroidX.test.runner
     androidTestImplementation AndroidX.test.rules
 }
