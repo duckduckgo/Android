@@ -16,9 +16,15 @@
 
 package com.duckduckgo.app.global
 
+import android.app.Activity
 import android.app.Application
 import android.content.IntentFilter
 import android.os.Build
+import android.os.Bundle
+import android.os.Handler
+import android.os.SystemClock
+import android.view.Choreographer
+import android.view.View
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.OnLifecycleEvent
@@ -31,7 +37,9 @@ import com.duckduckgo.app.browser.shortcut.ShortcutReceiver
 import com.duckduckgo.app.di.AppComponent
 import com.duckduckgo.app.di.DaggerAppComponent
 import com.duckduckgo.app.fire.*
+import com.duckduckgo.app.global.NextDrawListener.Companion.onNextDraw
 import com.duckduckgo.app.global.Theming.initializeTheme
+import com.duckduckgo.app.global.WindowDelegateCallback.Companion.onDecorViewReady
 import com.duckduckgo.app.global.initialization.AppDataLoader
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.rating.AppEnjoymentLifecycleObserver
@@ -179,8 +187,61 @@ open class DuckDuckGoApplication : HasAndroidInjector, Application(), LifecycleO
 
     open lateinit var daggerAppComponent: AppComponent
 
+    var applicationOnCreateMs: Long = 0
+    var firstFrameDoneMs: Long = 0
+    var firstDrawMs: Long = 0
+
     override fun onCreate() {
         super.onCreate()
+        var firstDraw = false
+        val handler = Handler()
+
+        applicationOnCreateMs = SystemClock.uptimeMillis()
+
+        registerActivityLifecycleCallbacks(
+            object : ActivityLifecycleCallbacks {
+                override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle?) {
+                    if (firstDraw) return
+                    val window = activity.window
+                    window.onDecorViewReady {
+                        window.decorView.onNextDraw {
+                            if (firstDraw) return@onNextDraw
+                            firstDraw = true
+                            handler.postAtFrontOfQueue {
+                                firstDrawMs = SystemClock.uptimeMillis()
+                            }
+                        }
+                    }
+                }
+
+                override fun onActivityStarted(activity: Activity) {
+
+                }
+
+                override fun onActivityResumed(activity: Activity) {
+                }
+
+                override fun onActivityPaused(activity: Activity) {
+
+                }
+
+                override fun onActivityStopped(activity: Activity) {
+
+                }
+
+                override fun onActivitySaveInstanceState(activity: Activity, outState: Bundle) {
+
+                }
+
+                override fun onActivityDestroyed(activity: Activity) {
+
+                }
+            }
+        )
+
+        Choreographer.getInstance().postFrameCallback {
+            firstFrameDoneMs = SystemClock.uptimeMillis()
+        }
 
         configureLogging()
         configureDependencyInjection()
