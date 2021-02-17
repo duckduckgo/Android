@@ -16,8 +16,8 @@
 
 package com.duckduckgo.app.statistics.api
 
-import com.duckduckgo.app.browser.BuildConfig
 import com.duckduckgo.app.global.AppUrl.ParamKey
+import com.duckduckgo.app.statistics.BuildConfig
 import com.duckduckgo.app.statistics.model.Atb
 import io.reactivex.Observable
 import okhttp3.ResponseBody

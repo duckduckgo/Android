@@ -43,6 +43,8 @@ import com.duckduckgo.app.global.baseHost
 import com.duckduckgo.app.global.view.gone
 import com.duckduckgo.app.global.view.html
 import com.duckduckgo.app.global.view.show
+import com.google.android.material.snackbar.Snackbar
+import kotlinx.android.synthetic.main.activity_bookmarks.*
 import kotlinx.android.synthetic.main.content_bookmarks.emptyBookmarks
 import kotlinx.android.synthetic.main.content_bookmarks.recycler
 import kotlinx.android.synthetic.main.include_toolbar.toolbar
@@ -138,18 +140,16 @@ class BookmarksActivity : DuckDuckGoActivity() {
     }
 
     private fun confirmDeleteBookmark(bookmark: BookmarkEntity) {
-        val message = getString(R.string.bookmarkDeleteConfirmMessage, bookmark.title).html(this)
-        val title = getString(R.string.dialogConfirmTitle)
-        deleteDialog = AlertDialog.Builder(this)
-            .setTitle(title)
-            .setMessage(message)
-            .setPositiveButton(android.R.string.yes) { _, _ ->
-                delete(bookmark)
-            }
-            .setNegativeButton(android.R.string.no) { dialog, _ ->
-                dialog.dismiss()
-            }
-            .show()
+        val message = getString(R.string.bookmarkDeleteConfirmationMessage, bookmark.title).html(this)
+        viewModel.delete(bookmark)
+        Snackbar.make(
+            bookmarkRootView,
+            message,
+            Snackbar.LENGTH_LONG
+        ).setAction(R.string.fireproofWebsiteSnackbarAction) {
+            viewModel.insert(bookmark)
+        }.show()
+
     }
 
     private fun delete(bookmark: BookmarkEntity) {

@@ -30,6 +30,7 @@ interface VariantManager {
     sealed class VariantFeature {
         object SerpHeaderQueryReplacement : VariantFeature()
         object SerpHeaderRemoval : VariantFeature()
+        object LoginDetectionEnabled : VariantFeature()
     }
 
     companion object {
@@ -50,7 +51,9 @@ interface VariantManager {
             Variant(key = "zh", weight = 0.0, features = listOf(VariantFeature.SerpHeaderQueryReplacement), filterBy = { noFilter() }),
             Variant(key = "zi", weight = 0.0, features = listOf(VariantFeature.SerpHeaderRemoval), filterBy = { noFilter() }),
 
-            // All groups in an experiment (control and variants) MUST use the same filters
+            // Fireproof login Experiment
+            Variant(key = "zq", weight = 1.0, features = emptyList(), filterBy = { isEnglishLocale() }),
+            Variant(key = "zw", weight = 1.0, features = listOf(VariantFeature.LoginDetectionEnabled), filterBy = { isEnglishLocale() }),
         )
 
         val REFERRER_VARIANTS = listOf(
@@ -95,6 +98,8 @@ interface VariantManager {
 
     fun updateAppReferrerVariant(variant: String)
 }
+
+fun VariantManager.loginDetectionExperimentEnabled() = this.getVariant().hasFeature(VariantManager.VariantFeature.LoginDetectionEnabled)
 
 class ExperimentationVariantManager(
     private val store: StatisticsDataStore,

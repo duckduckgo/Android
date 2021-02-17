@@ -12,6 +12,8 @@ include ':vpn-main'
 include ':di'
 include ':vpn'
 include ':app'
+include ':statistics'
+include ':common'
 
 rootProject.children.each { subproject ->
 

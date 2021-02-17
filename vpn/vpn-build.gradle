@@ -23,12 +23,12 @@ plugins {
 apply from: "$rootDir/spotless.gradle"
 
 android {
-    compileSdkVersion 30
-    buildToolsVersion "30.0.0"
+    compileSdkVersion compile_sdk
+    buildToolsVersion tools_build_version
 
     defaultConfig {
-        minSdkVersion 21
-        targetSdkVersion 30
+        minSdkVersion min_sdk
+        targetSdkVersion target_sdk
         versionCode 1
         versionName "1.0"
 

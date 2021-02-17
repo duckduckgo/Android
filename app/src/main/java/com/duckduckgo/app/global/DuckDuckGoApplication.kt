@@ -414,7 +414,7 @@ open class DuckDuckGoApplication : HasAndroidInjector, Application(), LifecycleO
         notificationRegistrar.updateStatus()
         GlobalScope.launch {
             workScheduler.scheduleWork()
-            atbInitializer.initializeAfterReferrerAvailable()
+            atbInitializer.initialize()
         }
     }
 
