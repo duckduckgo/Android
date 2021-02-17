@@ -62,6 +62,22 @@ android {
             ]
         }
     }
+    flavorDimensions "store"
+    productFlavors {
+        fdroid{
+            dimension "store"
+        }
+        play{
+            dimension "store"
+        }
+    }
+    variantFilter { variant ->
+        def names = variant.flavors*.name
+        if (names.contains("fdroid") && variant.buildType.name == "debug") {
+            // We only need the F-Droid release version
+            setIgnore(true)
+        }
+    }
     externalNativeBuild {
 
         cmake {
@@ -178,7 +194,7 @@ dependencies {
     implementation "com.airbnb.android:lottie:_"
 
     // Play Store referrer library
-    implementation("com.android.installreferrer:installreferrer:_")
+    playImplementation("com.android.installreferrer:installreferrer:_")
 
     // Testing dependencies
     androidTestImplementation AndroidX.test.runner
