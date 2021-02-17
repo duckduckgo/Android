@@ -19,13 +19,14 @@ package com.duckduckgo.app.di
 import android.content.Context
 import com.duckduckgo.app.referral.*
 import com.duckduckgo.app.statistics.AtbInitializerListener
+import com.duckduckgo.referral.FDroidReferrerStateListener
 import dagger.Module
 import dagger.Provides
 import dagger.multibindings.IntoSet
 import javax.inject.Singleton
 
 @Module
-class PlayStoreReferralModule {
+class StoreReferralModule {
 
     @Provides
     fun appInstallationReferrerParser(): AppInstallationReferrerParser {
@@ -35,13 +36,13 @@ class PlayStoreReferralModule {
     @Provides
     @Singleton
     fun appInstallationReferrerStateListener(
-        playStoreAppReferrerStateListener: PlayStoreAppReferrerStateListener
+        playStoreAppReferrerStateListener: FDroidReferrerStateListener
     ): AppInstallationReferrerStateListener = playStoreAppReferrerStateListener
 
     @Provides
     @IntoSet
     fun providedReferrerAtbInitializerListener(
-        playStoreAppReferrerStateListener: PlayStoreAppReferrerStateListener
+        playStoreAppReferrerStateListener: FDroidReferrerStateListener
     ): AtbInitializerListener = playStoreAppReferrerStateListener
 
     @Provides
