@@ -36,14 +36,14 @@ class StoreReferralModule {
     @Provides
     @Singleton
     fun appInstallationReferrerStateListener(
-        playStoreAppReferrerStateListener: FDroidReferrerStateListener
-    ): AppInstallationReferrerStateListener = playStoreAppReferrerStateListener
+        referrerStateListener: FDroidReferrerStateListener
+    ): AppInstallationReferrerStateListener = referrerStateListener
 
     @Provides
     @IntoSet
     fun providedReferrerAtbInitializerListener(
-        playStoreAppReferrerStateListener: FDroidReferrerStateListener
-    ): AtbInitializerListener = playStoreAppReferrerStateListener
+        referrerStateListener: FDroidReferrerStateListener
+    ): AtbInitializerListener = referrerStateListener
 
     @Provides
     @Singleton
