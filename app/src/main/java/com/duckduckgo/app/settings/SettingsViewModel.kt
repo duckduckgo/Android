@@ -153,7 +153,7 @@ class SettingsViewModel @Inject constructor(
             0 -> "None"
             1 -> apps.first().name
             2 -> "${apps.first().name} and ${apps.take(2)[1].name}"
-            else -> "${apps.first().name}, ${apps.take(2)[1].name} and More"
+            else -> "${apps.first().name}, ${apps.take(2)[1].name} and more"
         }
     }
 

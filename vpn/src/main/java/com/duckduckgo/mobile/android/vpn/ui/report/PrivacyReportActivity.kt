@@ -17,24 +17,29 @@
 package com.duckduckgo.mobile.android.vpn.ui.report
 
 import android.app.Activity
+import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import android.net.VpnService
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import android.widget.*
+import android.widget.Button
+import android.widget.ImageView
+import android.widget.LinearLayout
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.cardview.widget.CardView
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.isVisible
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import com.duckduckgo.mobile.android.vpn.BuildConfig
 import com.duckduckgo.mobile.android.vpn.R
 import com.duckduckgo.mobile.android.vpn.model.TimePassed
-import com.duckduckgo.mobile.android.vpn.model.VpnTrackerAndCompany
 import com.duckduckgo.mobile.android.vpn.onboarding.DeviceShieldOnboarding
 import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
 import com.duckduckgo.mobile.android.vpn.trackers.TrackerListProvider
@@ -65,12 +70,10 @@ class PrivacyReportActivity : AppCompatActivity(R.layout.activity_vpn_privacy_re
 
     private lateinit var reportSummaryTextView: TextView
     private lateinit var reportSummaryEnabledTooltip: TextView
-    private lateinit var reportSummaryDisabledTooltip: TextView
-    private lateinit var reportSummaryMoreToggle: TextView
+    private lateinit var reportSummaryLink: TextView
 
     private lateinit var reportCardView: CardView
-    private lateinit var collapsedTrackersLayout: LinearLayout
-    private lateinit var expandedTrackersLayout: LinearLayout
+    private lateinit var trackersLayout: LinearLayout
 
     private lateinit var deviceShieldDisabledCard: CardView
     private lateinit var vpnRunningToggleButton: Button
@@ -170,7 +173,7 @@ class PrivacyReportActivity : AppCompatActivity(R.layout.activity_vpn_privacy_re
 
     private fun observeViewModel() {
         viewModel.getReport().observe(this) {
-            renderTrackersBlocked(it.totalCompanies, it.trackerList)
+            renderTrackersBlocked(it.totalCompanies, it.totalTrackers, it.companiesBlocked)
         }
         viewModel.vpnRunning.observe(this) {
             renderVpnEnabledState(it)
@@ -204,16 +207,24 @@ class PrivacyReportActivity : AppCompatActivity(R.layout.activity_vpn_privacy_re
 
     private fun bindViewReferences() {
         reportCardView = findViewById(R.id.deviceShieldReportEntries)
-        reportSummaryTextView = findViewById(R.id.privacyReportTrackersBlocked)
+        reportSummaryTextView = findViewById(R.id.privacyReportSummary)
         reportSummaryEnabledTooltip = findViewById(R.id.privacyReportEnabledTooltip)
-        reportSummaryDisabledTooltip = findViewById(R.id.privacyReportDisabledTooltip)
-        reportSummaryMoreToggle = findViewById(R.id.privacyReportToggle)
+        reportSummaryLink = findViewById(R.id.privacyReportHyperlink)
         deviceShieldDisabledCard = findViewById(R.id.deviceShieldDisabledCardView)
         vpnRunningToggleButton = findViewById(R.id.privacyReportToggleButton)
-        collapsedTrackersLayout = findViewById(R.id.deviceShieldCollapsedTrackers)
-        expandedTrackersLayout = findViewById(R.id.deviceShieldExpandedTrackers)
+        trackersLayout = findViewById(R.id.deviceShieldTrackers)
         viewKonfetti = findViewById(R.id.deviceShieldKonfetti)
 
+        reportSummaryLink.setOnClickListener {
+
+            Intent().apply {
+                val url = "https://spreadprivacy.com/followed-by-ads/"
+                component = ComponentName(applicationContext.packageName, "com.duckduckgo.app.browser.BrowserActivity")
+                putExtra(Intent.EXTRA_TEXT, url)
+            }.also { startActivity(it) }
+
+            finish()
+        }
         vpnRunningToggleButton.setOnClickListener {
             enableDeviceShield()
         }
@@ -278,87 +289,71 @@ class PrivacyReportActivity : AppCompatActivity(R.layout.activity_vpn_privacy_re
         }
     }
 
-    private fun renderTrackersBlocked(totalCompanies: Int, trackers: List<VpnTrackerAndCompany>) {
-        if (trackers.isEmpty()) {
-            reportSummaryTextView.text = getString(R.string.deviceShieldEnabledTooltip)
-            reportSummaryMoreToggle.isVisible = false
-        } else {
-            reportSummaryDisabledTooltip.isVisible = false
+    private fun renderTrackersBlocked(
+        totalCompanies: Int,
+        trackersSize: Int,
+        companiesBlocked: List<PrivacyReportViewModel.PrivacyReportView.CompanyTrackers>
+    ) {
+        if (companiesBlocked.isNotEmpty()) {
             val totalCompanies = resources.getQuantityString(R.plurals.privacyReportCompaniesBlocked, totalCompanies, totalCompanies)
-            reportSummaryTextView.text = resources.getQuantityString(R.plurals.privacyReportTrackersBlocked, trackers.size, trackers.size, totalCompanies)
-
-            renderTrackerCompanies(trackers)
+            reportSummaryTextView.text = resources.getQuantityString(R.plurals.privacyReportTrackersBlocked, trackersSize, trackersSize, totalCompanies)
+            renderTrackerCompanies(companiesBlocked)
         }
     }
 
-    private fun renderTrackerCompanies(trackers: List<VpnTrackerAndCompany>) {
-
-        collapsedTrackersLayout.removeAllViews()
-        expandedTrackersLayout.removeAllViews()
-
-        val trackersToRender = trackers.take(MAX_TRACKERS)
-
-        if (trackersToRender.size > TRACKERS_COLLAPSED) {
-            reportSummaryMoreToggle.isVisible = true
-            val firstFive = trackersToRender.subList(0, TRACKERS_COLLAPSED)
-            val rest = trackersToRender.subList(TRACKERS_COLLAPSED, trackersToRender.size)
-            firstFive.forEach {
-                val trackerView = buildTrackerView(it)
-                collapsedTrackersLayout.addView(trackerView)
-            }
-            rest.forEach {
-                val trackerView = buildTrackerView(it)
-                expandedTrackersLayout.addView(trackerView)
-            }
-            var expanded = false
-            reportSummaryMoreToggle.setOnClickListener {
-                expanded = !expanded
-                if (expanded) {
-                    expandedTrackersLayout.visibility = View.VISIBLE
-                    reportSummaryMoreToggle.text = getString(R.string.privacyReportToggleLess)
-                } else {
-                    expandedTrackersLayout.visibility = View.GONE
-                    reportSummaryMoreToggle.text = getString(R.string.privacyReportToggleMore)
-                }
-            }
-
-        } else {
-            reportSummaryMoreToggle.isVisible = false
-            trackersToRender.forEach {
-                val trackerView = buildTrackerView(it)
-                collapsedTrackersLayout.addView(trackerView)
-            }
+    private fun renderTrackerCompanies(trackers: List<PrivacyReportViewModel.PrivacyReportView.CompanyTrackers>) {
+        trackersLayout.removeAllViews()
+        trackers.forEach {
+            val trackerView = buildTrackerView(it)
+            trackersLayout.addView(trackerView)
         }
+        trackersLayout.isVisible = true
     }
 
-    private fun buildTrackerView(trackerAndCompany: VpnTrackerAndCompany): View {
+    private fun buildTrackerView(trackerAndCompany: PrivacyReportViewModel.PrivacyReportView.CompanyTrackers): View {
         val inflater = LayoutInflater.from(this)
         val inflatedView = inflater.inflate(R.layout.view_privacy_report_tracker_entry, null)
 
         val companyTextView = inflatedView.findViewById<TextView>(R.id.privacyReportTrackerEntry)
+        val companyTimesBlockedTextView = inflatedView.findViewById<TextView>(R.id.privacyReportTrackerCompanyBlockedTimesLabel)
         val timeTextView = inflatedView.findViewById<TextView>(R.id.privacyReportTrackerTimeAgo)
         val companyImageView = inflatedView.findViewById<ImageView>(R.id.privacyReportTrackerCompany)
 
-        val companyImage = when (trackerAndCompany.trackerCompany.company) {
+        val companyImage = when (trackerAndCompany.companyName) {
             "Google" -> R.drawable.network_logo_google_llc
             "Amazon" -> R.drawable.network_logo_amazon_technologies_inc
             else -> R.drawable.network_logo_facebook_inc
         }
         companyImageView.setImageResource(companyImage)
 
-        val timestamp = LocalDateTime.parse(trackerAndCompany.tracker.timestamp)
+        companyTextView.text = trackerAndCompany.companyName
+        companyTimesBlockedTextView.text = resources.getQuantityString(
+            R.plurals.privacyReportCompanyTimesBlocked,
+            trackerAndCompany.totalTrackers,
+            trackerAndCompany.totalTrackers
+        )
+
+        val timestamp = LocalDateTime.parse(trackerAndCompany.lastTracker.tracker.timestamp)
         val timeDifference = timestamp.until(OffsetDateTime.now(), ChronoUnit.MILLIS)
         val timeRunning = TimePassed.fromMilliseconds(timeDifference)
         timeTextView.text = getString(R.string.privacyReportAppTrackerTime, timeRunning.shortFormat())
-        companyTextView.text = trackerAndCompany.trackerCompany.company
 
         return inflatedView
     }
 
     private fun renderVpnEnabledState(running: Boolean) {
         reportSummaryEnabledTooltip.isVisible = running
-        reportSummaryDisabledTooltip.isVisible = !running
+        reportSummaryLink.isVisible = running
         deviceShieldDisabledCard.isVisible = !running
+
+        if (!trackersLayout.isVisible) {
+            if (running) {
+                reportSummaryTextView.text = getString(R.string.deviceShieldEnabledTooltip)
+            } else {
+                reportSummaryTextView.text = getString(R.string.deviceShieldDisabledTooltip)
+            }
+        }
+
     }
 
     private sealed class VpnPermissionStatus {
@@ -371,8 +366,6 @@ class PrivacyReportActivity : AppCompatActivity(R.layout.activity_vpn_privacy_re
         private const val RC_REQUEST_VPN_PERMISSION = 100
         private const val REQUEST_DEVICE_SHIELD_ONBOARDING = 101
 
-        private const val TRACKERS_COLLAPSED = 5
-        private const val MAX_TRACKERS = 15
         private const val CELEBRATION_EXTRA = "CELEBRATION_EXTRA"
 
         fun intent(context: Context, celebrate: Boolean = false): Intent {

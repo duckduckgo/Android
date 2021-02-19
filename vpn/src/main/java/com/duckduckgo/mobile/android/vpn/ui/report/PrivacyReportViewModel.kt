@@ -59,8 +59,13 @@ class PrivacyReportViewModel(
 
     fun getReport(): LiveData<PrivacyReportView.State.TrackersBlocked> {
         return repository.getVpnTrackers({ dateOfLastWeek() }).map { trackers ->
-            val totalCompanies = trackers.groupBy { it.trackerCompany.trackerCompanyId }.size
-            PrivacyReportView.State.TrackersBlocked(totalCompanies, trackers)
+            val trackerCompanies: MutableList<PrivacyReportView.CompanyTrackers> = mutableListOf()
+            val perCompany = trackers.groupBy { it.trackerCompany.trackerCompanyId }
+            val totalCompanies = perCompany.size
+            perCompany.values.forEach {
+                trackerCompanies.add(PrivacyReportView.CompanyTrackers.group(it))
+            }
+            PrivacyReportView.State.TrackersBlocked(totalCompanies, trackers.size, trackerCompanies)
         }.asLiveData()
     }
 
@@ -73,7 +78,15 @@ class PrivacyReportViewModel(
 
     object PrivacyReportView {
         sealed class State {
-            data class TrackersBlocked(val totalCompanies: Int, val trackerList: List<VpnTrackerAndCompany>) : State()
+            data class TrackersBlocked(val totalCompanies: Int, val totalTrackers: Int, val companiesBlocked: List<CompanyTrackers>) : State()
+        }
+        data class CompanyTrackers(val companyName: String, val totalTrackers: Int, val lastTracker: VpnTrackerAndCompany) {
+            companion object {
+                fun group(trackers: List<VpnTrackerAndCompany>): CompanyTrackers {
+                    val lastTracker = trackers.first()
+                    return CompanyTrackers(lastTracker.trackerCompany.company, trackers.size, lastTracker)
+                }
+            }
         }
     }
 }

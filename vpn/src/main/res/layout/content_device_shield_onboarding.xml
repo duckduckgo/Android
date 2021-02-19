@@ -50,24 +50,13 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
-            android:fontFamily="sans-serif"
-            android:lineSpacingExtra="6sp"
-            android:text="@string/deviceShieldOnboardingTitle"
-            android:textAlignment="center"
-            android:textColor="#222222"
-            android:textSize="20sp"
-            android:textStyle="bold" />
-
-        <!-- TODO aitor - Color #222222 to ?attr/normalTextColor -->
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
             android:fontFamily="sans-serif-black"
             android:lineSpacingExtra="6sp"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
             android:text="@string/deviceShieldOnboardingSubtitle"
             android:textAlignment="center"
-            android:textColor="#222222"
+            android:textColor="@color/almostBlackDark"
             android:textSize="16sp"
             android:textStyle="normal"
             />
@@ -81,7 +70,7 @@
             android:lineSpacingExtra="6sp"
             android:text="@string/deviceShieldOnboardingDescription"
             android:textAlignment="center"
-            android:textColor="#222222"
+            android:textColor="@color/almostBlackDark"
             android:textSize="16sp"
             android:textStyle="normal"
             />

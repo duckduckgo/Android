@@ -43,7 +43,7 @@
         android:layout_marginTop="8dp"
         app:layout_constraintStart_toEndOf="@+id/privacyReportTrackerCompany"
         app:layout_constraintTop_toTopOf="parent"
-        tools:text="Amazon blocked" />
+        tools:text="Amazon" />
 
     <TextView
         android:id="@+id/privacyReportTrackerTimeAgo"
@@ -59,13 +59,24 @@
     <TextView
         android:id="@+id/privacyReportTrackerCompanyBlockedLabel"
         style="@style/DeviceShield.PrivacyReport.TrackerEntry"
-        android:layout_width="0dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="4dp"
         android:layout_marginTop="8dp"
         android:text="@string/privacyReportCompanyBlocked"
-        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/privacyReportTrackerEntry"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/privacyReportTrackerCompanyBlockedTimesLabel"
+        style="@style/DeviceShield.PrivacyReport.TrackerEntry.Company"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="4dp"
+        android:layout_marginTop="8dp"
+        android:text="TextView"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/privacyReportTrackerCompanyBlockedLabel"
         app:layout_constraintTop_toTopOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

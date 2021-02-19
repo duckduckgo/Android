@@ -53,13 +53,13 @@
                         android:layout_width="28dp"
                         android:layout_height="28dp"
                         android:layout_marginStart="16dp"
-                        android:layout_marginTop="22dp"
+                        android:layout_marginTop="24dp"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent"
                         app:srcCompat="@drawable/ic_device_shield_on" />
 
                     <TextView
-                        android:id="@+id/privacyReportTrackersBlocked"
+                        android:id="@+id/privacyReportSummary"
                         style="@style/DeviceShield.PrivacyReport.Title"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
@@ -70,21 +70,6 @@
                         app:layout_constraintStart_toEndOf="@+id/deviceShieldState"
                         app:layout_constraintTop_toTopOf="parent"
                         tools:text="In the past week, we blocked 28 companies from tracking you" />
-
-                    <TextView
-                        android:id="@+id/privacyReportDisabledTooltip"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="16dp"
-                        android:layout_marginTop="16dp"
-                        android:layout_marginEnd="16dp"
-                        android:layout_marginBottom="16dp"
-                        android:text="@string/privacyReportDisabledTooltip"
-                        android:visibility="gone"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@+id/privacyReportTrackersBlocked" />
 
                     <TextView
                         android:id="@+id/privacyReportEnabledTooltip"
@@ -99,47 +84,35 @@
                         android:visibility="gone"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@+id/privacyReportTrackersBlocked" />
+                        app:layout_constraintTop_toBottomOf="@+id/privacyReportSummary" />
 
                     <LinearLayout
-                        android:id="@+id/deviceShieldCollapsedTrackers"
+                        android:id="@+id/deviceShieldTrackers"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="16dp"
                         android:layout_marginTop="8dp"
                         android:orientation="vertical"
                         android:background="@color/white"
+                        android:visibility="invisible"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toBottomOf="@+id/privacyReportEnabledTooltip" />
 
-                    <LinearLayout
-                        android:id="@+id/deviceShieldExpandedTrackers"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="16dp"
-                        android:orientation="vertical"
-                        android:visibility="gone"
-                        android:background="@color/white"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@+id/deviceShieldCollapsedTrackers" />
-
                     <TextView
-                        android:id="@+id/privacyReportToggle"
+                        android:id="@+id/privacyReportHyperlink"
                         style="@style/DeviceShield.PrivacyReport.Toggle"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="8dp"
                         android:layout_marginTop="8dp"
-                        android:layout_marginBottom="8dp"
                         android:background="?selectableItemBackground"
                         android:padding="8dp"
-                        android:visibility="invisible"
-                        android:text="@string/privacyReportToggleMore"
+                        android:visibility="gone"
+                        android:text="@string/privacyReportPrivacylink"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@+id/deviceShieldExpandedTrackers" />
+                        app:layout_constraintTop_toBottomOf="@+id/deviceShieldTrackers" />
 
                 </androidx.constraintlayout.widget.ConstraintLayout>
 

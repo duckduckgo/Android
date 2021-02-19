@@ -75,7 +75,6 @@ import org.jetbrains.anko.doAsync
 import org.threeten.bp.zone.ZoneRulesProvider
 import timber.log.Timber
 import java.io.File
-import java.lang.reflect.Method
 import javax.inject.Inject
 import kotlin.concurrent.thread
 

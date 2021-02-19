@@ -94,7 +94,7 @@
             android:layout_marginStart="16dp"
             android:layout_marginTop="16dp"
             android:layout_marginEnd="16dp"
-            android:text="@string/deviceShieldDisabledSwitchHeader"
+            android:text="@string/deviceShield"
             app:layout_constraintEnd_toStartOf="@+id/newTabDeviceShieldSwitch"
             app:layout_constraintStart_toEndOf="@+id/newTabDeviceShieldSwitchImage"
             app:layout_constraintTop_toTopOf="@+id/newTabDeviceShieldTrackersSplitter" />

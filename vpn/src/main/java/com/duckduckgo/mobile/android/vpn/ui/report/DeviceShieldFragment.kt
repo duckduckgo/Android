@@ -28,14 +28,12 @@ import android.widget.CompoundButton
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.widget.SwitchCompat
-import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.duckduckgo.mobile.android.vpn.R
 import com.duckduckgo.mobile.android.vpn.model.TimePassed
-import com.duckduckgo.mobile.android.vpn.model.VpnTrackerAndCompany
 import com.duckduckgo.mobile.android.vpn.onboarding.DeviceShieldOnboarding
 import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
 import com.google.android.material.snackbar.Snackbar
@@ -139,7 +137,7 @@ class DeviceShieldFragment : Fragment() {
             renderVpnEnabledState(it)
         }
         viewModel.getReport().observe(this) {
-            renderTrackersBlocked(it.trackerList)
+            renderTrackersBlocked(it.totalTrackers, it.companiesBlocked)
         }
         lifecycle.addObserver(viewModel)
     }
@@ -203,14 +201,14 @@ class DeviceShieldFragment : Fragment() {
         requireActivity().startService(TrackerBlockingVpnService.stopIntent(requireActivity()))
     }
 
-    private fun renderTrackersBlocked(trackers: List<VpnTrackerAndCompany>) {
-        if (trackers.isEmpty()) {
+    private fun renderTrackersBlocked(totalTrackers: Int, companiesBlocked: List<PrivacyReportViewModel.PrivacyReportView.CompanyTrackers>) {
+        if (companiesBlocked.isEmpty()) {
             deviceShieldCtaHeaderTextView.text = getString(R.string.deviceShieldDisabledHeader)
             deviceShieldCtaSubHeaderTextView.isVisible = deviceShieldSwitch.isChecked
             deviceShieldCtaSubHeaderTextView.text = getString(R.string.deviceShieldDisabledSubheader)
         } else {
-            deviceShieldCtaHeaderTextView.text = resources.getQuantityString(R.plurals.deviceShieldCtaTrackersBlocked, trackers.size, trackers.size)
-            val lastTracker = trackers.first()
+            deviceShieldCtaHeaderTextView.text = resources.getQuantityString(R.plurals.deviceShieldCtaTrackersBlocked, totalTrackers, totalTrackers)
+            val lastTracker = companiesBlocked.first().lastTracker
             val timestamp = LocalDateTime.parse(lastTracker.tracker.timestamp)
             val timeDifference = timestamp.until(OffsetDateTime.now(), ChronoUnit.MILLIS)
             val timeRunning = TimePassed.fromMilliseconds(timeDifference)

@@ -151,13 +151,6 @@
     <string name="settingsVersion">Version</string>
     <string name="leaveFeedback">Share Feedback</string>
 
-    <!--  Settings - Device Shield  -->
-    <string name="deviceShield">Device Shield</string>
-    <string name="deviceShieldBlockTrackers">Block Trackers in Other Apps</string>
-    <string name="deviceShieldExcludedApps">Excluded Apps</string>
-    <string name="deviceShieldExclusionListActivityTitle">Excluded Apps</string>
-    <string name="deviceShieldExcludedAppsFeature">Device Shield doesn’t block trackers when apps require them to work properly. Consider limiting use of the following apps or viewing their content in the DuckDuckGo Privacy Browser instead.</string>
-
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Save</string>
 

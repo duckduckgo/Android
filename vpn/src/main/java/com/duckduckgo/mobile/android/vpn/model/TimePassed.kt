@@ -45,14 +45,9 @@ data class TimePassed(val hours: Long, val minutes: Long, val seconds: Long) {
             return sb.toString()
         }
 
-        if (minutes > 0) {
+        if (minutes > 2) {
             sb.append(minutes)
             sb.append("m ago")
-            return sb.toString()
-        }
-
-        if (seconds > 30) {
-            sb.append("a minute ago")
             return sb.toString()
         }
 

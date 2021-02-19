@@ -34,7 +34,7 @@
         <activity
             android:name=".onboarding.DeviceShieldOnboardingActivity"
             android:theme="@style/Theme.AndroidVpn"
-            android:label=""
+            android:label="@string/privacyReportDeviceShieldEnableLabel"
             />
 
         <service

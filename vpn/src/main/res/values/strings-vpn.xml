@@ -49,7 +49,7 @@
         <item quantity="other">%d companies</item>
     </plurals>
 
-    <string name="vpnNotificationTrackersFoundUpdate">"Today, so far we blocked %s from tracking you; the last one was %s. %s in total."</string>
+    <!-- Debug Screens -->
     <string name="vpnReportFeedback">Send feedback</string>
     <string name="diagnosticsMenuLabel">Diagnostics</string>
     <string name="dataMenuLabel">Data Stats</string>
@@ -60,9 +60,9 @@
     <string name="appExitsReasonsTitle">App exit reasons</string>
 
     <!-- Device Shield Privacy Report -->
-    <string name="deviceShieldEnabledTooltip">We block companies from tracking you as you browse</string>
-    <string name="privacyReportToggleMore">Show More</string>
-    <string name="privacyReportToggleLess">Show Less</string>
+    <string name="deviceShieldDisabledTooltip">We\'ll block companies from tracking you in other apps</string>
+    <string name="deviceShieldEnabledTooltip">We\'re blocking companies from tracking you in other apps</string>
+    <string name="privacyReportPrivacylink">How do trackers profile you?</string>
     <string name="privacyReportToolbarTitle">Privacy Report</string>
     <string name="privacyReportEnabledTooltip">Device Shield is enabled and blocking trackers across your whole device</string>
     <string name="privacyReportDisabledTooltip">Enable Device Shield for a summary</string>
@@ -77,6 +77,11 @@
     <plurals name="privacyReportCompaniesBlocked">
         <item quantity="one">%d company</item>
         <item quantity="other">%d companies</item>
+    </plurals>
+
+    <plurals name="privacyReportCompanyTimesBlocked">
+        <item quantity="one">%d time</item>
+        <item quantity="other">%d times</item>
     </plurals>
 
     <plurals name="privacyReportTrackersBlocked">
@@ -95,8 +100,6 @@
     <string name="deviceShieldMenuItemTitle">Device Shield</string>
     <string name="deviceShieldDisabledHeader">Web trackers blocked</string>
     <string name="deviceShieldDisabledSubheader">Enable Device Shield for a summary</string>
-    <string name="deviceShieldEnabledSwitchHeader">Device Shield</string>
-    <string name="deviceShieldDisabledSwitchHeader">Device Shield</string>
     <string name="deviceShieldDisabledSwitchSubheader">Block trackers in other apps</string>
     <string name="deviceShieldEnabledSnackbar">Success! 🎉 You\’ve enabled Device Shield. Manage this feature in Settings.</string>
     <string name="deviceShieldLastTrackerBlocked">%s blocked %s</string>
@@ -105,4 +108,12 @@
         <item quantity="one">%d tracker blocked this week</item>
         <item quantity="other">%d trackers blocked this week</item>
     </plurals>
+
+    <!--  Settings - Device Shield  -->
+    <string name="deviceShield">Device Shield</string>
+    <string name="deviceShieldBlockTrackers">Block trackers in other apps</string>
+    <string name="deviceShieldExcludedApps">Excluded Apps</string>
+    <string name="deviceShieldExclusionListActivityTitle">Excluded Apps</string>
+    <string name="deviceShieldExcludedAppsFeature">Device Shield doesn’t block trackers when apps require them to work properly. Consider limiting use of the following apps or viewing their content in the DuckDuckGo Privacy Browser instead.</string>
+
 </resources>
