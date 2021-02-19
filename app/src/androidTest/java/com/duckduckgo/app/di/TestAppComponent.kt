@@ -76,7 +76,7 @@ import javax.inject.Singleton
         AppUsageModule::class,
         FileModule::class,
         UncaughtExceptionModule::class,
-        PlayStoreReferralModule::class,
+        StoreReferralModule::class,
         CoroutinesModule::class,
         CertificateTrustedStoreModule::class,
         WelcomePageModule::class,
