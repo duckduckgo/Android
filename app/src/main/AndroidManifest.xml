@@ -43,6 +43,11 @@
                 android:resource="@xml/provider_paths"/>
         </provider>
 
+        <provider
+            android:name="com.duckduckgo.app.global.AppStartListener"
+            android:authorities="${applicationId}.appstartlistener"
+            android:exported="false" />
+
         <!--
             To protect user privacy, disable SafeBrowsing which could send URLs to Google servers
             https://developer.android.com/reference/android/webkit/WebView

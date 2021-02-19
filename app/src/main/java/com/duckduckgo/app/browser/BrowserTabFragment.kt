@@ -381,6 +381,8 @@ class BrowserTabFragment :
         addTextChangedListeners()
 
         activityOnResumeMs = SystemClock.uptimeMillis()
+
+        Debug.stopMethodTracing()
     }
 
     override fun onPause() {
