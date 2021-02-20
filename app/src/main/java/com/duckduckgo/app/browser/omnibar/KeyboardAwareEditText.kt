@@ -85,12 +85,14 @@ class KeyboardAwareEditText : AppCompatEditText {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 super.onTextContextMenuItem(android.R.id.pasteAsPlainText)
             } else {
-                val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-                clipboard.convertClipToPlainText()
+                context.getClipboardManager().convertClipToPlainText()
                 super.onTextContextMenuItem(id)
             }
         else -> super.onTextContextMenuItem(id)
     }
+
+    private fun Context.getClipboardManager(): ClipboardManager =
+        getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
 
     private fun ClipboardManager.convertClipToPlainText() {
         val clip = primaryClip ?: return
