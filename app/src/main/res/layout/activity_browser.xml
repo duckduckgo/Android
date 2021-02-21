@@ -22,6 +22,8 @@
     android:layout_height="match_parent"
     tools:context="com.duckduckgo.app.browser.BrowserActivity">
 
+    <include layout="@layout/include_omnibar_toolbar_mockup" />
+
     <FrameLayout
         android:id="@+id/fragmentContainer"
         android:layout_width="match_parent"
