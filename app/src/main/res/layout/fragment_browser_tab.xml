@@ -23,16 +23,6 @@
 
     <include layout="@layout/include_omnibar_toolbar" />
 
-    <include
-        android:id="@+id/defaultCard"
-        layout="@layout/content_onboarding_default_browser_card"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:visibility="invisible"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
     <FrameLayout
         android:id="@+id/webViewFullScreenContainer"
         android:layout_width="match_parent"
