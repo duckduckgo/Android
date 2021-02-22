@@ -1447,7 +1447,7 @@ class BrowserTabFragment :
 
         fun decorateWithFeatures() {
             decorateToolbarWithButtons()
-            createPopupMenu()
+            setListenerPopupMenu()
             configureShowTabSwitcherListener()
             configureLongClickOpensNewTabListener()
         }
@@ -1492,6 +1492,8 @@ class BrowserTabFragment :
         }
 
         private fun createPopupMenu() {
+            if(this@BrowserTabFragment::popupMenu.isInitialized) return
+
             popupMenu = BrowserPopupMenu(layoutInflater, variantManager.getVariant())
             val view = popupMenu.contentView
             popupMenu.apply {
@@ -1547,7 +1549,11 @@ class BrowserTabFragment :
                     viewModel.onPinPageToHomeSelected()
                 }
             }
+        }
+
+        private fun setListenerPopupMenu() {
             browserMenu.setOnClickListener {
+                createPopupMenu()
                 hideKeyboardImmediately()
                 launchTopAnchoredPopupMenu()
             }
@@ -1769,6 +1775,8 @@ class BrowserTabFragment :
         }
 
         private fun renderPopupMenus(browserShowing: Boolean, viewState: BrowserViewState) {
+            if(!this@BrowserTabFragment::popupMenu.isInitialized) return
+
             popupMenu.contentView.apply {
                 backPopupMenuItem.isEnabled = viewState.canGoBack
                 forwardPopupMenuItem.isEnabled = viewState.canGoForward
@@ -1821,7 +1829,7 @@ class BrowserTabFragment :
                 hideFindInPage()
             }
 
-            popupMenu.contentView.findInPageMenuItem?.isEnabled = viewState.canFindInPage
+            //popupMenu.contentView.findInPageMenuItem?.isEnabled = viewState.canFindInPage
         }
 
         fun renderCtaViewState(viewState: CtaViewState) {
