@@ -39,6 +39,8 @@ import dagger.Component
 import dagger.android.AndroidInjector
 import dagger.android.support.AndroidSupportInjectionModule
 import kotlinx.coroutines.CoroutineScope
+import retrofit2.Retrofit
+import javax.inject.Named
 import javax.inject.Singleton
 
 @Singleton
@@ -94,4 +96,8 @@ interface AppComponent : AndroidInjector<DuckDuckGoApplication> {
     }
 
     fun inject(searchWidget: SearchWidget)
+
+    // accessor to Retrofit instance for test only only for test
+    @Named("api")
+    fun retrofit(): Retrofit
 }

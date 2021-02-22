@@ -25,11 +25,17 @@ import com.duckduckgo.app.job.AndroidWorkScheduler
 import com.duckduckgo.app.job.JobCleaner
 import com.duckduckgo.app.job.WorkScheduler
 import com.duckduckgo.app.notification.AndroidNotificationScheduler
+import com.duckduckgo.di.scopes.AppObjectGraph
+import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
 import javax.inject.Singleton
 
 @Module
+@ContributesTo(
+    scope = AppObjectGraph::class,
+    replaces = [JobsModule::class]
+)
 class StubJobSchedulerModule {
 
     @Singleton

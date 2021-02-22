@@ -20,7 +20,7 @@ android {
         targetSdkVersion target_sdk
         versionCode buildVersionCode()
         versionName buildVersionName()
-        testInstrumentationRunner "com.duckduckgo.app.TestRunner"
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         archivesBaseName = "duckduckgo-$versionName"
         vectorDrawables.useSupportLibrary = true
 
