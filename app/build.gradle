@@ -63,7 +63,7 @@ android {
             signingConfig signingConfigs.release
             manifestPlaceholders = [
                     appIcon: "@mipmap/ic_launcher_black",
-                    appIconRound: "@mipmap/ic_launcher_silhouette_black"
+                    appIconRound: "@mipmap/ic_launcher_black_round"
             ]
         }
     }

@@ -98,17 +98,17 @@ class PrivacyReportViewModelTest {
     @Test
     fun whenTrackersBlockedThenReportHasTrackers() = runBlocking {
 
-        val expectedDomain = "dax.com"
         trackerFoundYesterday("dax.com")
         trackerFoundYesterday("dax.com")
         trackerFoundYesterday("dax.com")
 
         testee.getReport().observeForever {
-            val trackersBlockedObserved = it.trackerList
-            val companiesBlockedObserved = it.totalCompanies
-            assertEquals(3, trackersBlockedObserved.size)
-            assertEquals(expectedDomain, trackersBlockedObserved[0].tracker.domain)
-            assertEquals(1, companiesBlockedObserved)
+            val trackersBlockedObserved = it.totalTrackers
+            val totalCompaniesObserved = it.totalCompanies
+            val companiesBlockedObserved = it.companiesBlocked
+            assertEquals(3, trackersBlockedObserved)
+            assertEquals(1, totalCompaniesObserved)
+            assertEquals(TrackerListProvider.UNDEFINED_TRACKER_COMPANY.company, companiesBlockedObserved[0].companyName)
         }
 
     }
@@ -117,10 +117,12 @@ class PrivacyReportViewModelTest {
     fun whenNoTrackersBlockedThenReportIsEmpty() = runBlocking {
 
         testee.getReport().observeForever {
-            val trackersBlockedObserved = it.trackerList
-            val companiesBlockedObserved = it.totalCompanies
-            assertEquals(true, trackersBlockedObserved.isEmpty())
-            assertEquals(0, companiesBlockedObserved)
+            val trackersBlockedObserved = it.totalTrackers
+            val totalCompaniesObserved = it.totalCompanies
+            val companiesBlockedObserved = it.companiesBlocked
+            assertEquals(0, trackersBlockedObserved)
+            assertEquals(0, totalCompaniesObserved)
+            assertEquals(true, companiesBlockedObserved.isEmpty())
         }
 
     }
