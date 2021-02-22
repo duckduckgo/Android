@@ -246,7 +246,7 @@ class BrowserTabFragment :
 
     private var webView: DuckDuckGoWebView? = null
 
-    private val errorSnackbar: Snackbar by lazy {
+    private val errorSnackbar = lazy {
         Snackbar.make(browserLayout, R.string.crashedWebViewErrorMessage, Snackbar.LENGTH_INDEFINITE)
             .setBehavior(NonDismissibleBehavior())
     }
@@ -495,7 +495,9 @@ class BrowserTabFragment :
     }
 
     private fun showHome() {
-        errorSnackbar.dismiss()
+        if (errorSnackbar.isInitialized()) {
+            errorSnackbar.value.dismiss()
+        }
         newTabLayout.show()
         appBarLayout.setExpanded(true)
         webView?.onPause()
@@ -703,9 +705,11 @@ class BrowserTabFragment :
 
     private fun showErrorSnackbar(command: Command.ShowErrorWithAction) {
         // Snackbar is global and it should appear only the foreground fragment
-        if (!errorSnackbar.view.isAttachedToWindow && isVisible) {
-            errorSnackbar.setText(command.textResId)
-            errorSnackbar.setAction(R.string.crashedWebViewErrorAction) { command.action() }.show()
+        with(errorSnackbar.value) {
+            if (!view.isAttachedToWindow && isVisible) {
+                setText(command.textResId)
+                setAction(R.string.crashedWebViewErrorAction) { command.action() }.show()
+            }
         }
     }
 
