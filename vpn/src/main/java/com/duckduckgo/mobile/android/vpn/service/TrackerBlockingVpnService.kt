@@ -27,8 +27,8 @@ import android.content.pm.PackageManager
 import android.net.VpnService
 import android.os.*
 import androidx.core.app.NotificationManagerCompat
-import com.duckduckgo.mobile.android.vpn.di.VpnCoroutineScope
 import com.duckduckgo.mobile.android.vpn.exclusions.DeviceShieldExcludedApps
+import com.duckduckgo.mobile.android.vpn.heartbeat.VpnServiceHeartbeat
 import com.duckduckgo.mobile.android.vpn.model.VpnTrackerAndCompany
 import com.duckduckgo.mobile.android.vpn.model.dateOfLastHour
 import com.duckduckgo.mobile.android.vpn.processor.TunPacketReader
@@ -84,8 +84,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
     lateinit var deviceShieldExcludedApps: DeviceShieldExcludedApps
 
     @Inject
-    @VpnCoroutineScope
-    lateinit var vpnCoroutineScope: CoroutineScope
+    lateinit var vpnServiceHeartbeat: VpnServiceHeartbeat
 
     private val queues = VpnQueues()
 
@@ -125,7 +124,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
         AndroidInjection.inject(this)
 
         udpPacketProcessor = UdpPacketProcessor(queues, this, packetPersister)
-        tcpPacketProcessor = TcpPacketProcessor(queues, this, trackerDetector, packetPersister, localAddressDetector, originatingAppResolver, vpnCoroutineScope)
+        tcpPacketProcessor = TcpPacketProcessor(queues, this, trackerDetector, packetPersister, localAddressDetector, originatingAppResolver, this)
 
         Timber.e("VPN log onCreate")
     }
@@ -188,6 +187,10 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
                 processors.forEach { executorService.submit(it) }
             }
         }
+
+        launch {
+            vpnServiceHeartbeat.startHeartbeat()
+        }
     }
 
     private fun updateNotificationForNewTrackerFound(trackersBlocked: List<VpnTrackerAndCompany>) {
@@ -248,12 +251,15 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
                 safelyAddDisallowedApps(deviceShieldExcludedApps.getExclusionList())
             }
 
+            // Apparently we always need to call prepare, even tho not clear in docs
+            // without this prepare, establish() returns null after device reboot
+            prepare(this@TrackerBlockingVpnService.applicationContext)
             establish()
         }
 
         if (tunInterface == null) {
             Timber.e("VPN log: Failed to establish VPN tunnel")
-            stopVpn()
+            stopVpn(isError = true)
         }
     }
 
@@ -278,7 +284,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
         }
     }
 
-    private fun stopVpn() {
+    private fun stopVpn(isError: Boolean = false) {
         Timber.i("VPN log: Stopping VPN")
         notifyVpnStopped()
         schedulerReminderAlarm()
@@ -290,6 +296,10 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
         tcpPacketProcessor.stop()
         tunInterface?.close()
         tunInterface = null
+
+        if (!isError) {
+            vpnServiceHeartbeat.stopHeartbeat()
+        }
 
         stopForeground(true)
         stopSelf()

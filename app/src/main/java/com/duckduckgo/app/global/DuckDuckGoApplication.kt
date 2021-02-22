@@ -36,6 +36,7 @@ import com.duckduckgo.app.fire.*
 import com.duckduckgo.app.global.Theming.initializeTheme
 import com.duckduckgo.app.global.initialization.AppDataLoader
 import com.duckduckgo.app.global.install.AppInstallStore
+import com.duckduckgo.app.global.plugins.app.AppLifecycleObserverPlugin
 import com.duckduckgo.app.global.rating.AppEnjoymentLifecycleObserver
 import com.duckduckgo.app.global.shortcut.AppShortcutCreator
 import com.duckduckgo.app.httpsupgrade.HttpsUpgrader
@@ -179,6 +180,9 @@ open class DuckDuckGoApplication : HasAndroidInjector, Application(), LifecycleO
     @Inject
     lateinit var vpnStatsReporting: VpnStatsReportingScheduler
 
+    @Inject
+    lateinit var appLifecycleObserverPlugins: Set<@JvmSuppressWildcards AppLifecycleObserverPlugin>
+
     private var launchedByFireAction: Boolean = false
 
     private val applicationCoroutineScope = CoroutineScope(SupervisorJob())
@@ -218,6 +222,9 @@ open class DuckDuckGoApplication : HasAndroidInjector, Application(), LifecycleO
             it.addObserver(pixelSender)
             it.addObserver(fireFireAnimationLoader)
             it.addObserver(tabsDbSanitizer)
+            appLifecycleObserverPlugins.forEach { plugin ->
+                it.addObserver(plugin)
+            }
         }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1) {

@@ -16,6 +16,8 @@
 
 package com.duckduckgo.mobile.android.vpn.stats
 
+import androidx.annotation.WorkerThread
+import com.duckduckgo.mobile.android.vpn.dao.VpnPhoenixEntity
 import com.duckduckgo.mobile.android.vpn.model.VpnDataStats
 import com.duckduckgo.mobile.android.vpn.model.VpnState
 import com.duckduckgo.mobile.android.vpn.model.VpnTrackerAndCompany
@@ -24,6 +26,7 @@ import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import org.threeten.bp.LocalDateTime
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 class AppTrackerBlockingStatsRepository @Inject constructor(vpnDatabase: VpnDatabase) {
@@ -32,6 +35,7 @@ class AppTrackerBlockingStatsRepository @Inject constructor(vpnDatabase: VpnData
     private val statsDao = vpnDatabase.vpnDataStatsDao()
     private val stateDao = vpnDatabase.vpnStateDao()
     private val runningTimeDao = vpnDatabase.vpnRunningStatsDao()
+    private val phoenixDao = vpnDatabase.vpnPhoenixDao()
 
     fun getVpnState(): Flow<VpnState> {
         return stateDao.get().distinctUntilChanged()
@@ -60,6 +64,17 @@ class AppTrackerBlockingStatsRepository @Inject constructor(vpnDatabase: VpnData
             .transform {
                 emit(calculateDataTotals(it))
             }.flowOn(Dispatchers.Default)
+    }
+
+    @WorkerThread
+    fun getVpnRestartHistory(): List<VpnPhoenixEntity> {
+        return phoenixDao.restarts()
+            .filter { it.timestamp >= System.currentTimeMillis() - TimeUnit.DAYS.toMillis(1) }
+    }
+
+    @WorkerThread
+    fun deleteVpnRestartHistory() {
+        phoenixDao.delete()
     }
 
     private fun calculateDataTotals(dataStats: List<VpnDataStats>): DataStats {

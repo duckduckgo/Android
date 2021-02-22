@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 DuckDuckGo
+ * Copyright (c) 2021 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,18 +16,26 @@
 
 package com.duckduckgo.mobile.android.vpn.dao
 
-import androidx.room.Dao
-import androidx.room.Insert
-import androidx.room.OnConflictStrategy
-import androidx.room.Query
-import com.duckduckgo.mobile.android.vpn.model.VpnPreferences
+import androidx.room.*
+import com.duckduckgo.mobile.android.vpn.store.DatabaseDateFormatter
+
+
+@Entity(tableName = "vpn_phoenix")
+data class VpnPhoenixEntity(
+    @PrimaryKey(autoGenerate = true) var id: Long = 0,
+    val reason: String = "Reason not available",
+    val timestamp: Long = System.currentTimeMillis(),
+    val formattedTimestamp: String = DatabaseDateFormatter.timestamp()
+)
 
 @Dao
-interface VpnPreferencesDao {
-
+interface VpnPhoenixDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insert(state: VpnPreferences)
+    fun insert(vpnPhoenixEntity: VpnPhoenixEntity)
 
-    @Query("select * from vpn_preferences where preference = :preference")
-    fun get(preference: String): VpnPreferences?
+    @Query("select * from vpn_phoenix")
+    fun restarts(): List<VpnPhoenixEntity>
+
+    @Query("delete from vpn_phoenix")
+    fun delete()
 }

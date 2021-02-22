@@ -19,9 +19,7 @@ package com.duckduckgo.mobile.android.vpn.stats
 import androidx.room.Room
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.mobile.android.vpn.VpnCoroutineTestRule
-import com.duckduckgo.mobile.android.vpn.dao.VpnRunningStatsDao
-import com.duckduckgo.mobile.android.vpn.dao.VpnTrackerCompanyDao
-import com.duckduckgo.mobile.android.vpn.dao.VpnTrackerDao
+import com.duckduckgo.mobile.android.vpn.dao.*
 import com.duckduckgo.mobile.android.vpn.model.VpnTracker
 import com.duckduckgo.mobile.android.vpn.model.VpnTrackerAndCompany
 import com.duckduckgo.mobile.android.vpn.model.VpnTrackerCompany
@@ -51,6 +49,7 @@ class AppTrackerBlockingStatsRepositoryTest {
     private lateinit var vpnRunningStatsDao: VpnRunningStatsDao
     private lateinit var vpnTrackerDao: VpnTrackerDao
     private lateinit var vpnTrackerCompanyDao: VpnTrackerCompanyDao
+    private lateinit var vpnPhoenixDao: VpnPhoenixDao
     private lateinit var repository: AppTrackerBlockingStatsRepository
 
     @Before
@@ -62,6 +61,7 @@ class AppTrackerBlockingStatsRepositoryTest {
         vpnRunningStatsDao = db.vpnRunningStatsDao()
         vpnTrackerDao = db.vpnTrackerDao()
         vpnTrackerCompanyDao = db.vpnTrackerCompanyDao()
+        vpnPhoenixDao = db.vpnPhoenixDao()
         repository = AppTrackerBlockingStatsRepository(db)
 
         vpnTrackerCompanyDao.insert(VpnTrackerCompany(UNDEFINED_TRACKER_COMPANY.trackerCompanyId, UNDEFINED_TRACKER_COMPANY.company))
@@ -122,6 +122,29 @@ class AppTrackerBlockingStatsRepositoryTest {
         vpnRunningStatsDao.upsert(timeRunningMillis = 30, bucketByHour(midnight.plusMinutes(10)))
         vpnRunningStatsDao.upsert(timeRunningMillis = 30, bucketByHour(midnight.minusMinutes(5)))
         assertEquals(60L, repository.getRunningTimeMillis({ bucketByHour(midnight) }).first())
+    }
+
+    @Test
+    fun whenGetVpnRestartHistoryThenReturnHistory() {
+        val entity = VpnPhoenixEntity(id = 1, reason = "foo")
+        vpnPhoenixDao.insert(entity)
+
+        assertEquals(listOf(entity), repository.getVpnRestartHistory())
+    }
+
+    @Test
+    fun whenGetVpnRestartHistoryAndTableEmptyThenReturnEmptyList() {
+        assertEquals(0, repository.getVpnRestartHistory().size)
+    }
+
+    @Test
+    fun whenDeleteVpnRestartHistoryThenDeleteTableContents() {
+        val entity = VpnPhoenixEntity(reason = "foo")
+        vpnPhoenixDao.insert(entity)
+
+        repository.deleteVpnRestartHistory()
+
+        assertEquals(0, repository.getVpnRestartHistory().size)
     }
 
     private fun dateOfPreviousMidnight(): LocalDateTime {

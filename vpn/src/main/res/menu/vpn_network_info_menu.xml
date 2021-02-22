@@ -29,4 +29,10 @@
         android:title="@string/appExitsReasonsTitle"
         app:showAsAction="never" />
 
+    <item
+        android:id="@+id/vpnRestarts"
+        android:icon="@drawable/ic_baseline_history_24"
+        android:title="@string/appRestartsTitle"
+        app:showAsAction="never" />
+
 </menu>

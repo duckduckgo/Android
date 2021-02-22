@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 DuckDuckGo
+ * Copyright (c) 2021 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,20 +14,15 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.mobile.android.vpn.dao
+package com.duckduckgo.mobile.android.vpn.heartbeat
 
-import androidx.room.Dao
-import androidx.room.Insert
-import androidx.room.OnConflictStrategy
-import androidx.room.Query
-import com.duckduckgo.mobile.android.vpn.model.VpnPreferences
+import com.duckduckgo.mobile.android.vpn.dao.HeartBeatEntity
+import com.duckduckgo.mobile.android.vpn.heartbeat.VpnServiceHeartbeatReceiver.Companion.EXTRA_HEART_BEAT_TYPE_ALIVE
+import com.duckduckgo.mobile.android.vpn.heartbeat.VpnServiceHeartbeatReceiver.Companion.EXTRA_HEART_BEAT_TYPE_STOPPED
 
-@Dao
-interface VpnPreferencesDao {
-
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insert(state: VpnPreferences)
-
-    @Query("select * from vpn_preferences where preference = :preference")
-    fun get(preference: String): VpnPreferences?
+fun HeartBeatEntity.isAlive(): Boolean {
+    return EXTRA_HEART_BEAT_TYPE_ALIVE == type
+}
+fun HeartBeatEntity.isStopped(): Boolean {
+    return EXTRA_HEART_BEAT_TYPE_STOPPED == type
 }

@@ -58,6 +58,7 @@
     <string name="networkAvailable">"Connected to internet: %s"</string>
     <string name="dnsServers">"DNS servers: %s"</string>
     <string name="appExitsReasonsTitle">App exit reasons</string>
+    <string name="appRestartsTitle">App restarts</string>
 
     <!-- Device Shield Privacy Report -->
     <string name="deviceShieldDisabledTooltip">We\'ll block companies from tracking you in other apps</string>

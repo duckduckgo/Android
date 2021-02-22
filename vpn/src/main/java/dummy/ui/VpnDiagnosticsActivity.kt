@@ -16,7 +16,6 @@
 
 package dummy.ui
 
-import android.app.ActivityManager
 import android.content.Context
 import android.content.Intent
 import android.net.ConnectivityManager
@@ -30,6 +29,7 @@ import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
+import com.duckduckgo.app.global.extensions.historicalExitReasonsByProcessName
 import com.duckduckgo.mobile.android.vpn.R
 import com.duckduckgo.mobile.android.vpn.model.TimePassed
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
@@ -40,7 +40,6 @@ import java.net.Inet4Address
 import java.net.Inet6Address
 import java.net.InetAddress
 import java.net.NetworkInterface
-import java.util.*
 import javax.inject.Inject
 
 class VpnDiagnosticsActivity : AppCompatActivity(R.layout.activity_vpn_diagnostics), CoroutineScope by MainScope() {
@@ -99,14 +98,24 @@ class VpnDiagnosticsActivity : AppCompatActivity(R.layout.activity_vpn_diagnosti
             return AppExitHistory()
         }
 
-        val activityManager = getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
-
-        val exitReasons = activityManager.getHistoricalProcessExitReasons(null, 0, 0)
-            .filter { it.processName == "com.duckduckgo.mobile.android.vpn:vpn" }
-            .take(10)
-            .map { "[${Date(it.timestamp)}\nReason: ${it.reason}: ${it.description}" }
-
+        val exitReasons = applicationContext.historicalExitReasonsByProcessName("com.duckduckgo.mobile.android.vpn:vpn", 10)
         return AppExitHistory(exitReasons)
+    }
+
+    private fun retrieveRestartsHistoryInfo(): AppExitHistory {
+        return runBlocking {
+            val restarts = withContext(Dispatchers.IO) {
+                repository.getVpnRestartHistory()
+                    .sortedByDescending { it.timestamp }
+                    .map { """
+                        Restarted on ${it.formattedTimestamp}
+                        App exit reason - ${it.reason}
+                    """.trimIndent()
+                    }
+            }
+
+            AppExitHistory(restarts)
+        }
     }
 
     private suspend fun retrieveRunningTimeInfo() =
@@ -273,6 +282,29 @@ class VpnDiagnosticsActivity : AppCompatActivity(R.layout.activity_vpn_diagnosti
                         val intent = Intent(Intent.ACTION_SEND).also {
                             it.type = "text/plain"
                             it.putExtra(Intent.EXTRA_TEXT, history.toString())
+                            it.putExtra(Intent.EXTRA_SUBJECT, "Share VPN exit reasons")
+                        }
+                        startActivity(Intent.createChooser(intent, "Share"))
+                    }
+                    .show()
+                true
+            }
+            R.id.vpnRestarts -> {
+                val restarts = retrieveRestartsHistoryInfo()
+
+                AlertDialog.Builder(this)
+                    .setTitle(R.string.appRestartsTitle)
+                    .setMessage(restarts.toString())
+                    .setPositiveButton("OK") { _, _ -> }
+                    .setNegativeButton("Clean") { _, _ ->
+                        runBlocking(Dispatchers.IO) {
+                            repository.deleteVpnRestartHistory()
+                        }
+                    }
+                    .setNeutralButton("Share") { _, _ ->
+                        val intent = Intent(Intent.ACTION_SEND).also {
+                            it.type = "text/plain"
+                            it.putExtra(Intent.EXTRA_TEXT, restarts.toString())
                             it.putExtra(Intent.EXTRA_SUBJECT, "Share VPN exit reasons")
                         }
                         startActivity(Intent.createChooser(intent, "Share"))

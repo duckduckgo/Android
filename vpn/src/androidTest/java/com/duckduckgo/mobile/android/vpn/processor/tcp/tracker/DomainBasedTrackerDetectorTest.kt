@@ -18,6 +18,7 @@ package com.duckduckgo.mobile.android.vpn.processor.tcp.tracker
 
 import androidx.room.Room
 import androidx.test.platform.app.InstrumentationRegistry
+import com.duckduckgo.mobile.android.vpn.dao.VpnPreferencesDao
 import com.duckduckgo.mobile.android.vpn.dao.VpnTrackerDao
 import com.duckduckgo.mobile.android.vpn.processor.tcp.hostname.HostnameExtractor
 import com.duckduckgo.mobile.android.vpn.processor.tcp.tracker.RequestTrackerType.*
@@ -44,6 +45,7 @@ class DomainBasedTrackerDetectorTest {
     private lateinit var testee: DomainBasedTrackerDetector
 
     private val hostnameExtractor: HostnameExtractor = mock()
+    private lateinit var preferencesDao: VpnPreferencesDao
     private lateinit var vpnDatabase: VpnDatabase
     private lateinit var trackerDao: VpnTrackerDao
     private val tcb: TCB = mock()
@@ -61,8 +63,9 @@ class DomainBasedTrackerDetectorTest {
             .allowMainThreadQueries()
             .build()
         trackerDao = vpnDatabase.vpnTrackerDao()
+        preferencesDao = vpnDatabase.vpnPreferencesDao()
 
-        testee = DomainBasedTrackerDetector(hostnameExtractor, TrackerListProvider(), vpnDatabase)
+        testee = DomainBasedTrackerDetector(hostnameExtractor, TrackerListProvider(preferencesDao), vpnDatabase)
     }
 
     @Test

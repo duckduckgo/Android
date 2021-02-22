@@ -18,6 +18,7 @@ package com.duckduckgo.mobile.android.vpn.di
 
 import com.duckduckgo.di.scopes.AppObjectGraph
 import com.duckduckgo.di.scopes.VpnObjectGraph
+import com.duckduckgo.mobile.android.vpn.heartbeat.VpnServiceHeartbeatReceiver
 import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
 import com.duckduckgo.mobile.android.vpn.ui.report.DeviceShieldFragment
 import com.duckduckgo.mobile.android.vpn.ui.report.PrivacyReportActivity
@@ -143,6 +144,15 @@ interface TrackerBlockingVpnServiceComponent : AndroidInjector<TrackerBlockingVp
     interface Factory : AndroidInjector.Factory<TrackerBlockingVpnService>
 }
 
+@VpnScope
+@MergeSubcomponent(
+    scope = VpnObjectGraph::class
+)
+interface VpnServiceHeartbeatReceiverComponent : AndroidInjector<VpnServiceHeartbeatReceiver> {
+    @Subcomponent.Factory
+    interface Factory : AndroidInjector.Factory<VpnServiceHeartbeatReceiver>
+}
+
 /* ============================================================================
  Step 2. Making the App dagger component a factory of our sub-components
  ============================================================================ */
@@ -153,6 +163,7 @@ interface VpnComponentProvider {
     fun deviceShieldFragmentComponentFactory(): DeviceShieldFragmentComponent.Factory
     fun trackerBlockingVpnServiceComponentFactory(): TrackerBlockingVpnServiceComponent.Factory
     fun vpnDiagnosticsActivityComponentFactory(): VpnDiagnosticsActivityComponent.Factory
+    fun provideVpnServiceHeartbeatReceiver(): VpnServiceHeartbeatReceiverComponent.Factory
 }
 
 /* ============================================================================
@@ -185,4 +196,9 @@ abstract class VpnBindingModule {
     @IntoMap
     @ClassKey(TrackerBlockingVpnService::class)
     abstract fun bindTrackerBlockingVpnServiceFactory(factory: TrackerBlockingVpnServiceComponent.Factory): AndroidInjector.Factory<*>
+
+    @Binds
+    @IntoMap
+    @ClassKey(VpnServiceHeartbeatReceiver::class)
+    abstract fun bindVpnServiceHeartbeatReceiverFactory(factory: VpnServiceHeartbeatReceiverComponent.Factory): AndroidInjector.Factory<*>
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 DuckDuckGo
+ * Copyright (c) 2021 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,18 +16,29 @@
 
 package com.duckduckgo.mobile.android.vpn.dao
 
-import androidx.room.Dao
-import androidx.room.Insert
-import androidx.room.OnConflictStrategy
-import androidx.room.Query
-import com.duckduckgo.mobile.android.vpn.model.VpnPreferences
+import androidx.room.*
+
+@Entity(tableName = "vpn_heartbeat")
+data class HeartBeatEntity(
+    @PrimaryKey val type: String,
+    val timestamp: Long = System.currentTimeMillis()
+)
 
 @Dao
-interface VpnPreferencesDao {
-
+interface VpnHeartBeatDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insert(state: VpnPreferences)
+    fun insert(heartBeatEntity: HeartBeatEntity)
 
-    @Query("select * from vpn_preferences where preference = :preference")
-    fun get(preference: String): VpnPreferences?
+    @Transaction
+    fun insertType(type: String): HeartBeatEntity {
+        return HeartBeatEntity(type).also {
+            insert(it)
+        }
+    }
+
+    @Query("select * from vpn_heartbeat where type = :type limit 1")
+    fun getHearBeat(type: String): HeartBeatEntity?
+
+    @Query("select * from vpn_heartbeat")
+    fun hearBeats(): List<HeartBeatEntity>
 }

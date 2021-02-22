@@ -67,6 +67,15 @@
             </intent-filter>
         </receiver>
 
+        <receiver
+            android:name=".heartbeat.VpnServiceHeartbeatReceiver"
+            >
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="com.duckduckgo.mobile.android.vpn.heartbeat" />
+            </intent-filter>
+        </receiver>
+
     </application>
 
 </manifest>

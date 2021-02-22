@@ -41,7 +41,7 @@ class TrackerListProvider(
     }
 
     private fun getIncludeFacebookDomains(): Boolean = runBlocking(Dispatchers.IO) {
-        return@runBlocking vpnPreferencesDao.get(VPN_PREFERENCE_INCLUDE_FB_DOMAINS).value
+        return@runBlocking vpnPreferencesDao.get(VPN_PREFERENCE_INCLUDE_FB_DOMAINS)?.value ?: false
     }
 
     companion object {
