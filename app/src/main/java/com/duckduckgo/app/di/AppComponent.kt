@@ -31,7 +31,9 @@ import com.duckduckgo.app.onboarding.di.WelcomePageModule
 import com.duckduckgo.app.surrogates.di.ResourceSurrogateModule
 import com.duckduckgo.app.trackerdetection.di.TrackerDetectionModule
 import com.duckduckgo.app.usage.di.AppUsageModule
+import com.duckduckgo.di.scopes.AppObjectGraph
 import com.duckduckgo.widget.SearchWidget
+import com.squareup.anvil.annotations.MergeComponent
 import dagger.BindsInstance
 import dagger.Component
 import dagger.android.AndroidInjector
@@ -40,13 +42,13 @@ import kotlinx.coroutines.CoroutineScope
 import javax.inject.Singleton
 
 @Singleton
-@Component(
+@MergeComponent(
+    scope = AppObjectGraph::class,
     modules = [
         WorkerPluginsModule::class,
         ApplicationModule::class,
         JobsModule::class,
         WorkerModule::class,
-        AndroidBindingModule::class,
         AndroidSupportInjectionModule::class,
         NetworkModule::class,
         AppConfigurationDownloaderModule::class,

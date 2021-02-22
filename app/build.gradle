@@ -3,6 +3,7 @@ apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
+apply plugin: 'com.squareup.anvil'
 apply from: '../versioning.gradle'
 apply from: "$rootDir/spotless.gradle"
 
@@ -114,6 +115,7 @@ android {
 dependencies {
     implementation project(path: ':statistics')
     implementation project(path: ':common')
+    implementation project(path: ':di')
 
     implementation AndroidX.legacy.supportV4
     debugImplementation Square.leakCanary.android
@@ -180,10 +182,7 @@ dependencies {
     implementation AndroidX.work.rxJava2
 
     // Dagger
-    kapt Google.dagger.android.processor
     kapt Google.dagger.compiler
-    kaptAndroidTest "com.google.dagger:dagger-android-processor:_"
-    kaptAndroidTest "com.google.dagger:dagger-compiler:_"
 
     // Glide
     implementation "com.github.bumptech.glide:glide:_"
