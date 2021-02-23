@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 DuckDuckGo
+ * Copyright (C) 2020. Aitor Viana
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,16 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.duckduckgo.di.scopes
 
-package com.duckduckgo.app
-
-import android.app.Application
-import android.content.Context
-import androidx.test.runner.AndroidJUnitRunner
-
-@Suppress("unused")
-class TestRunner : AndroidJUnitRunner() {
-    override fun newApplication(cl: ClassLoader, className: String, context: Context): Application {
-        return super.newApplication(cl, TestApplication::class.java.name, context)
-    }
-}
+abstract class ActivityObjectGraph private constructor()

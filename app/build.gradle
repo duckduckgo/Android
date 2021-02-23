@@ -25,7 +25,7 @@ android {
         targetSdkVersion target_sdk
         versionCode buildVersionCode()
         versionName buildVersionName()
-        testInstrumentationRunner "com.duckduckgo.app.TestRunner"
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         archivesBaseName = "duckduckgo-$versionName"
         vectorDrawables.useSupportLibrary = true
 
@@ -133,6 +133,7 @@ ext {
 dependencies {
     implementation project(path: ':statistics')
     implementation project(path: ':common')
+    implementation project(path: ':di')
 
     implementation project(path: ':di')
     implementation project(path: ':vpn-main')
@@ -208,10 +209,7 @@ dependencies {
     implementation AndroidX.work.rxJava2
 
     // Dagger
-    kapt Google.dagger.android.processor
     kapt Google.dagger.compiler
-    kaptAndroidTest "com.google.dagger:dagger-android-processor:_"
-    kaptAndroidTest "com.google.dagger:dagger-compiler:_"
 
     // Glide
     implementation "com.github.bumptech.glide:glide:_"
