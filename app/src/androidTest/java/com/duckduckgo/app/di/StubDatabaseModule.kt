@@ -22,11 +22,17 @@ import androidx.room.Room
 import com.duckduckgo.app.browser.httpauth.RealWebViewHttpAuthStore
 import com.duckduckgo.app.browser.httpauth.WebViewHttpAuthStore
 import com.duckduckgo.app.global.db.AppDatabase
+import com.duckduckgo.di.scopes.AppObjectGraph
+import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
 import javax.inject.Singleton
 
 @Module(includes = [DaoModule::class])
+@ContributesTo(
+    scope = AppObjectGraph::class,
+    replaces = [DatabaseModule::class]
+)
 class StubDatabaseModule {
 
     @Provides

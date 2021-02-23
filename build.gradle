@@ -3,6 +3,7 @@
 buildscript {
     ext.kotlin_version = '1.4.10'
     ext.spotless = "5.7.0"
+    ext.anvil_version = "2.0.1"
 
     ext.min_sdk = 21
     ext.target_sdk = 29
@@ -14,9 +15,10 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:4.1.0'
+        classpath 'com.android.tools.build:gradle:4.1.1'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
         classpath "com.diffplug.spotless:spotless-plugin-gradle:$spotless"
+        classpath "com.squareup.anvil:gradle-plugin:$anvil_version"
 
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files

@@ -31,22 +31,26 @@ import com.duckduckgo.app.onboarding.di.WelcomePageModule
 import com.duckduckgo.app.surrogates.di.ResourceSurrogateModule
 import com.duckduckgo.app.trackerdetection.di.TrackerDetectionModule
 import com.duckduckgo.app.usage.di.AppUsageModule
+import com.duckduckgo.di.scopes.AppObjectGraph
 import com.duckduckgo.widget.SearchWidget
+import com.squareup.anvil.annotations.MergeComponent
 import dagger.BindsInstance
 import dagger.Component
 import dagger.android.AndroidInjector
 import dagger.android.support.AndroidSupportInjectionModule
 import kotlinx.coroutines.CoroutineScope
+import retrofit2.Retrofit
+import javax.inject.Named
 import javax.inject.Singleton
 
 @Singleton
-@Component(
+@MergeComponent(
+    scope = AppObjectGraph::class,
     modules = [
         WorkerPluginsModule::class,
         ApplicationModule::class,
         JobsModule::class,
         WorkerModule::class,
-        AndroidBindingModule::class,
         AndroidSupportInjectionModule::class,
         NetworkModule::class,
         AppConfigurationDownloaderModule::class,
@@ -92,4 +96,8 @@ interface AppComponent : AndroidInjector<DuckDuckGoApplication> {
     }
 
     fun inject(searchWidget: SearchWidget)
+
+    // accessor to Retrofit instance for test only only for test
+    @Named("api")
+    fun retrofit(): Retrofit
 }
