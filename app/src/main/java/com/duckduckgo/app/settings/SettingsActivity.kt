@@ -48,7 +48,6 @@ import com.duckduckgo.app.settings.clear.ClearWhenOption
 import com.duckduckgo.app.settings.clear.FireAnimation
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelName
-import com.duckduckgo.mobile.android.vpn.exclusions.DeviceShieldExcludedApps
 import com.duckduckgo.mobile.android.vpn.onboarding.DeviceShieldOnboarding
 import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
 import com.duckduckgo.mobile.android.vpn.ui.report.PrivacyReportActivity
@@ -68,9 +67,6 @@ class SettingsActivity :
 
     @Inject
     lateinit var pixel: Pixel
-
-    @Inject
-    lateinit var deviceShieldExcludedApps: DeviceShieldExcludedApps
 
     @Inject
     lateinit var deviceShieldOnboarding: DeviceShieldOnboarding
