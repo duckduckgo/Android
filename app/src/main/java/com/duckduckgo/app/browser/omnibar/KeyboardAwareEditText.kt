@@ -16,8 +16,11 @@
 
 package com.duckduckgo.app.browser.omnibar
 
+import android.content.ClipData
+import android.content.ClipboardManager
 import android.content.Context
 import android.graphics.Rect
+import android.os.Build
 import android.text.Editable
 import android.text.Selection
 import android.util.AttributeSet
@@ -72,6 +75,31 @@ class KeyboardAwareEditText : AppCompatEditText {
         super.onLayout(changed, left, top, right, bottom)
         if (isFocused) {
             showKeyboard()
+        }
+    }
+
+    /**
+     * Overrides to paste clip data without rich text formatting.
+     */
+    override fun onTextContextMenuItem(id: Int): Boolean = when (id) {
+        android.R.id.paste ->
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                super.onTextContextMenuItem(android.R.id.pasteAsPlainText)
+            } else {
+                context.getClipboardManager().convertClipToPlainText()
+                super.onTextContextMenuItem(id)
+            }
+        else -> super.onTextContextMenuItem(id)
+    }
+
+    private fun Context.getClipboardManager(): ClipboardManager =
+        getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+
+    private fun ClipboardManager.convertClipToPlainText() {
+        val clip = primaryClip ?: return
+        for (i in 0 until clip.itemCount) {
+            val text = clip.getItemAt(i).coerceToText(context)
+            setPrimaryClip(ClipData.newPlainText(null, text))
         }
     }
 
