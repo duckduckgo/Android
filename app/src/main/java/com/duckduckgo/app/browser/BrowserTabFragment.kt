@@ -1964,6 +1964,7 @@ class BrowserTabFragment :
             webViewFullScreenContainer.removeAllViews()
             webViewFullScreenContainer.gone()
             activity?.toggleFullScreen()
+            focusDummy.requestFocus()
         }
 
         private fun shouldUpdateOmnibarTextInput(viewState: OmnibarViewState, omnibarInput: String?) =
