@@ -34,7 +34,7 @@ class VpnPreferences(private val applicationContext: Context) {
         prefs().edit { putBoolean(PREFS_KEY_DNS_SERVER, dnsServer) }
     }
 
-    fun getBlockFacebookDomainsPreference(): Boolean = prefs().getBoolean(PREFS_KEY_BLOCK_FACEBOOK_DOMAINS, false)
+    fun getBlockFacebookDomainsPreference(): Boolean = prefs().getBoolean(PREFS_KEY_BLOCK_FACEBOOK_DOMAINS, true)
 
     fun blockFacebookDomains(enabled: Boolean) {
         prefs().edit { putBoolean(PREFS_KEY_BLOCK_FACEBOOK_DOMAINS, enabled) }
