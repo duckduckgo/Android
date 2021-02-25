@@ -37,7 +37,6 @@ import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.app.global.shortcut.AppShortcutCreator
 import com.duckduckgo.app.httpsupgrade.HttpsUpgrader
-import com.duckduckgo.app.job.AppConfigurationSyncer
 import com.duckduckgo.app.job.WorkScheduler
 import com.duckduckgo.app.notification.NotificationRegistrar
 import com.duckduckgo.app.pixels.AppPixelName
@@ -54,7 +53,6 @@ import dagger.android.DispatchingAndroidInjector
 import dagger.android.HasAndroidInjector
 import io.reactivex.exceptions.UndeliverableException
 import io.reactivex.plugins.RxJavaPlugins
-import io.reactivex.schedulers.Schedulers
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.SupervisorJob
@@ -74,9 +72,6 @@ open class DuckDuckGoApplication : HasAndroidInjector, Application(), LifecycleO
 
     @Inject
     lateinit var resourceSurrogateLoader: ResourceSurrogateLoader
-
-    @Inject
-    lateinit var appConfigurationSyncer: AppConfigurationSyncer
 
     @Inject
     lateinit var appInstallStore: AppInstallStore
@@ -159,7 +154,6 @@ open class DuckDuckGoApplication : HasAndroidInjector, Application(), LifecycleO
         recordInstallationTimestamp()
         initializeTheme(settingsDataStore)
         loadTrackerData()
-        configureDataDownloader()
         scheduleOfflinePixels()
 
         notificationRegistrar.registerApp()
@@ -236,21 +230,6 @@ open class DuckDuckGoApplication : HasAndroidInjector, Application(), LifecycleO
             }
             unsentForgetAllPixelStore.resetCount()
         }
-    }
-
-    /**
-     * Immediately syncs data. Upon completion (successful or error),
-     * it will schedule a recurring job to keep the data in sync.
-     *
-     * We only process data if it has changed so these calls are inexpensive.
-     */
-    private fun configureDataDownloader() {
-        appConfigurationSyncer.scheduleImmediateSync()
-            .subscribeOn(Schedulers.io())
-            .doAfterTerminate {
-                appConfigurationSyncer.scheduleRegularSync()
-            }
-            .subscribe({}, { Timber.w("Failed to download initial app configuration ${it.localizedMessage}") })
     }
 
     private fun scheduleOfflinePixels() {
