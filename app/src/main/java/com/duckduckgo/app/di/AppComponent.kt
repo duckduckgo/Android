@@ -25,7 +25,6 @@ import com.duckduckgo.app.browser.rating.di.RatingModule
 import com.duckduckgo.app.email.di.EmailModule
 import com.duckduckgo.app.global.DuckDuckGoApplication
 import com.duckduckgo.app.global.exception.UncaughtExceptionModule
-import com.duckduckgo.app.global.plugin.LifecycleObserverPluginProviderModule
 import com.duckduckgo.app.httpsupgrade.di.HttpsUpgraderModule
 import com.duckduckgo.app.onboarding.di.OnboardingModule
 import com.duckduckgo.app.onboarding.di.WelcomePageModule
@@ -80,8 +79,7 @@ import javax.inject.Singleton
         CertificateTrustedStoreModule::class,
         WelcomePageModule::class,
         HttpsPersisterModule::class,
-        EmailModule::class,
-        LifecycleObserverPluginProviderModule::class,
+        EmailModule::class
     ]
 )
 interface AppComponent : AndroidInjector<DuckDuckGoApplication> {

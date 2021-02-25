@@ -18,6 +18,8 @@ package com.duckduckgo.app.global.plugin
 
 import androidx.lifecycle.LifecycleObserver
 import com.duckduckgo.app.global.plugins.PluginPoint
+import com.duckduckgo.di.scopes.AppObjectGraph
+import com.squareup.anvil.annotations.ContributesTo
 import dagger.Binds
 import dagger.Module
 import dagger.multibindings.Multibinds
@@ -25,6 +27,7 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Module
+@ContributesTo(AppObjectGraph::class)
 abstract class LifecycleObserverPluginProviderModule {
     // we use multibinds as the list of plugins can be empty
     @Multibinds

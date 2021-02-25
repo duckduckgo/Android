@@ -86,7 +86,7 @@ class AppIconModifier @Inject constructor(
         enable(context, newIcon)
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1) {
-            appShortcutCreator.configureAppShortcuts(context)
+            appShortcutCreator.configureAppShortcuts()
         }
     }
 

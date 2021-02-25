@@ -18,7 +18,6 @@ package com.duckduckgo.app.global
 
 import android.app.Application
 import android.content.IntentFilter
-import android.os.Build
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.OnLifecycleEvent
@@ -34,7 +33,6 @@ import com.duckduckgo.app.fire.UnsentForgetAllPixelStore
 import com.duckduckgo.app.global.Theming.initializeTheme
 import com.duckduckgo.app.global.initialization.AppDataLoader
 import com.duckduckgo.app.global.plugins.PluginPoint
-import com.duckduckgo.app.global.shortcut.AppShortcutCreator
 import com.duckduckgo.app.httpsupgrade.HttpsUpgrader
 import com.duckduckgo.app.job.WorkScheduler
 import com.duckduckgo.app.notification.NotificationRegistrar
@@ -80,9 +78,6 @@ open class DuckDuckGoApplication : HasAndroidInjector, Application(), LifecycleO
 
     @Inject
     lateinit var pixel: Pixel
-
-    @Inject
-    lateinit var appShortcutCreator: AppShortcutCreator
 
     @Inject
     lateinit var httpsUpgrader: HttpsUpgrader
@@ -141,10 +136,6 @@ open class DuckDuckGoApplication : HasAndroidInjector, Application(), LifecycleO
                 Need to add this here
                 it.addObserver(webViewHttpAuthStore)
             }
-        }
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1) {
-            appShortcutCreator.configureAppShortcuts(this)
         }
 
         initializeTheme(settingsDataStore)
