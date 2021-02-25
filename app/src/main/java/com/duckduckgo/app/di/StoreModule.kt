@@ -59,6 +59,10 @@ abstract class StoreModule {
     abstract fun bindAppInstallStore(store: AppInstallSharedPreferences): AppInstallStore
 
     @Binds
+    @IntoSet
+    abstract fun bindAppInstallStoreObserver(appInstallStore: AppInstallStore): LifecycleObserver
+
+    @Binds
     abstract fun bindDataClearingStore(store: UnsentForgetAllPixelStoreSharedPreferences): UnsentForgetAllPixelStore
 
     @Binds

@@ -33,7 +33,6 @@ import com.duckduckgo.app.fire.FireActivity
 import com.duckduckgo.app.fire.UnsentForgetAllPixelStore
 import com.duckduckgo.app.global.Theming.initializeTheme
 import com.duckduckgo.app.global.initialization.AppDataLoader
-import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.app.global.shortcut.AppShortcutCreator
 import com.duckduckgo.app.httpsupgrade.HttpsUpgrader
@@ -72,9 +71,6 @@ open class DuckDuckGoApplication : HasAndroidInjector, Application(), LifecycleO
 
     @Inject
     lateinit var resourceSurrogateLoader: ResourceSurrogateLoader
-
-    @Inject
-    lateinit var appInstallStore: AppInstallStore
 
     @Inject
     lateinit var settingsDataStore: SettingsDataStore
@@ -151,7 +147,6 @@ open class DuckDuckGoApplication : HasAndroidInjector, Application(), LifecycleO
             appShortcutCreator.configureAppShortcuts(this)
         }
 
-        recordInstallationTimestamp()
         initializeTheme(settingsDataStore)
         loadTrackerData()
         scheduleOfflinePixels()
@@ -176,12 +171,6 @@ open class DuckDuckGoApplication : HasAndroidInjector, Application(), LifecycleO
             } else {
                 alertingUncaughtExceptionHandler.uncaughtException(Thread.currentThread(), throwable)
             }
-        }
-    }
-
-    private fun recordInstallationTimestamp() {
-        if (!appInstallStore.hasInstallTimestampRecorded()) {
-            appInstallStore.installTimestamp = System.currentTimeMillis()
         }
     }
 
