@@ -8,7 +8,6 @@ buildscript {
     // vtodo VPN
     ext.google_services = "4.3.4"
     ext.gradle_plugin = "4.1.0"
-    ext.google_perf_plugin = "1.3.3"
     ext.google_crashlytics_plugin = "2.2.1"
 
     ext.min_sdk = 21
@@ -25,7 +24,6 @@ buildscript {
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
         classpath "com.diffplug.spotless:spotless-plugin-gradle:$spotless"
         classpath "com.google.gms:google-services:$google_services"
-        classpath "com.google.firebase:perf-plugin:$google_perf_plugin"
         classpath "com.google.firebase:firebase-crashlytics-gradle:$google_crashlytics_plugin"
         classpath "com.squareup.anvil:gradle-plugin:$anvil_version"
 

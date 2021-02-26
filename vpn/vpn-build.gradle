@@ -101,7 +101,6 @@ dependencies {
     implementation "androidx.constraintlayout:constraintlayout:$constraintLayout"
 
     implementation platform("com.google.firebase:firebase-bom:$firebase")
-    implementation "com.google.firebase:firebase-perf"
     implementation "com.google.firebase:firebase-crashlytics-ktx"
 
     implementation "androidx.lifecycle:lifecycle-extensions:$lifecycle"

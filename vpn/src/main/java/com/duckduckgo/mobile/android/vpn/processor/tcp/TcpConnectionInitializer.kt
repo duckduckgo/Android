@@ -19,7 +19,6 @@ package com.duckduckgo.mobile.android.vpn.processor.tcp
 import com.duckduckgo.mobile.android.vpn.processor.tcp.ConnectionInitializer.TcpConnectionParams
 import com.duckduckgo.mobile.android.vpn.service.NetworkChannelCreator
 import com.duckduckgo.mobile.android.vpn.service.VpnQueues
-import com.google.firebase.perf.FirebasePerformance
 import timber.log.Timber
 import xyz.hexene.localvpn.Packet
 import xyz.hexene.localvpn.Packet.TCPHeader
@@ -50,8 +49,6 @@ interface ConnectionInitializer {
 class TcpConnectionInitializer(private val queues: VpnQueues, private val networkChannelCreator: NetworkChannelCreator) : ConnectionInitializer {
 
     override fun initializeConnection(params: TcpConnectionParams): Pair<TCB, SocketChannel>? {
-        val trace = FirebasePerformance.startTrace("initialize_tcp_connection")
-
         val key = params.key()
 
         val header = params.packet.tcpHeader
@@ -82,8 +79,6 @@ class TcpConnectionInitializer(private val queues: VpnQueues, private val networ
             queues.networkToDevice.offer(params.responseBuffer)
             null
         }
-
-        trace.stop()
 
         return pair
     }

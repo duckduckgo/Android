@@ -16,7 +16,6 @@
 
 package com.duckduckgo.mobile.android.vpn.processor.tcp
 
-import com.google.firebase.perf.FirebasePerformance
 import timber.log.Timber
 import xyz.hexene.localvpn.Packet
 import java.nio.channels.SelectionKey
@@ -30,8 +29,6 @@ class TcpSocketWriter(private val selector: Selector) : SocketWriter {
 
     @Synchronized
     override fun writeToSocket(writeData: TcpPacketProcessor.PendingWriteData): Boolean {
-        val trace = FirebasePerformance.startTrace("socket_writer_write_to_socket")
-
         Timber.v("Writing data to socket ${writeData.tcb.ipAndPort}: ${writeData.payloadSize} bytes")
         val payloadBuffer = writeData.payloadBuffer
         val payloadSize = writeData.payloadSize
@@ -71,8 +68,6 @@ class TcpSocketWriter(private val selector: Selector) : SocketWriter {
             )
             true
         }
-
-        trace.stop()
 
         return write
     }

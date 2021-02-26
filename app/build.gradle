@@ -10,7 +10,6 @@ apply from: "$rootDir/spotless.gradle"
 // vtodo VPN - temporarily included for VPN
 apply plugin: 'com.google.gms.google-services'
 apply plugin: 'com.google.firebase.crashlytics'
-apply plugin: 'com.google.firebase.firebase-perf'
 
 ext {
     USE_ORCHESTRATOR = project.hasProperty('orchestrator') ? project.property('orchestrator') : false
@@ -234,6 +233,5 @@ dependencies {
     androidTestImplementation "org.jetbrains.kotlin:kotlin-reflect:_"
 
     implementation platform("com.google.firebase:firebase-bom:$firebase")
-    implementation "com.google.firebase:firebase-perf"
     implementation "com.google.firebase:firebase-crashlytics-ktx"
 }
