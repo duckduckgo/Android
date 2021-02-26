@@ -41,7 +41,6 @@ import com.duckduckgo.app.global.rating.AppEnjoymentLifecycleObserver
 import com.duckduckgo.app.global.shortcut.AppShortcutCreator
 import com.duckduckgo.app.httpsupgrade.HttpsUpgrader
 import com.duckduckgo.app.job.AppConfigurationSyncer
-import com.duckduckgo.app.job.VpnStatsReportingScheduler
 import com.duckduckgo.app.job.WorkScheduler
 import com.duckduckgo.app.notification.NotificationRegistrar
 import com.duckduckgo.app.onboarding.store.UserStageStore
@@ -158,9 +157,6 @@ open class DuckDuckGoApplication : HasAndroidInjector, Application(), LifecycleO
     lateinit var tabsDbSanitizer: TabsDbSanitizer
 
     @Inject
-    lateinit var vpnStatsReporting: VpnStatsReportingScheduler
-
-    @Inject
     lateinit var appLifecycleObserverPlugins: Set<@JvmSuppressWildcards AppLifecycleObserverPlugin>
 
     private var launchedByFireAction: Boolean = false
@@ -216,7 +212,6 @@ open class DuckDuckGoApplication : HasAndroidInjector, Application(), LifecycleO
         loadTrackerData()
         configureDataDownloader()
         scheduleOfflinePixels()
-        scheduleVpnStatsReporting()
 
         notificationRegistrar.registerApp()
         registerReceiver(shortcutReceiver, IntentFilter(ShortcutBuilder.USE_OUR_APP_SHORTCUT_ADDED_ACTION))
@@ -367,10 +362,6 @@ open class DuckDuckGoApplication : HasAndroidInjector, Application(), LifecycleO
 
     private fun scheduleOfflinePixels() {
         offlinePixelScheduler.scheduleOfflinePixels()
-    }
-
-    private fun scheduleVpnStatsReporting() {
-        vpnStatsReporting.schedule()
     }
 
     private fun initializeDateLibrary() {

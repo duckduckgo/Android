@@ -29,7 +29,6 @@ import dagger.android.AndroidInjector
 import dagger.multibindings.ClassKey
 import dagger.multibindings.IntoMap
 
-
 @ActivityScoped
 @MergeSubcomponent(
     scope = ActivityObjectGraph::class

@@ -262,13 +262,6 @@ interface Pixel {
         const val FIRE_BUTTON_STATE = "fb"
         const val FIRE_ANIMATION = "fa"
         const val FIRE_EXECUTED = "fe"
-
-        const val VPN_TIME_RUNNING = "tr"
-        const val VPN_DATA_RECEIVED = "dr"
-        const val VPN_DATA_SENT = "ds"
-        const val VPN_UUID = "id"
-        const val VPN_TRACKERS_BLOCKED = "tb"
-        const val VPN_TRACKER_COMPANIES_BLOCKED = "tc"
     }
 
     object PixelValues {

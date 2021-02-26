@@ -21,7 +21,6 @@ import com.duckduckgo.app.fire.DataClearingWorkerInjectorPlugin
 import com.duckduckgo.app.global.job.AppConfigurationWorkerInjectorPlugin
 import com.duckduckgo.app.global.view.ClearDataAction
 import com.duckduckgo.app.job.ConfigurationDownloader
-import com.duckduckgo.app.job.VpnStatsReportingWorkerInjectorPlugin
 import com.duckduckgo.app.notification.ClearDataNotificationWorkerInjectorPlugin
 import com.duckduckgo.app.notification.NotificationFactory
 import com.duckduckgo.app.notification.PrivacyNotificationWorkerInjectorPlugin
@@ -32,8 +31,6 @@ import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.api.OfflinePixelSender
 import com.duckduckgo.app.statistics.api.OfflinePixelWorkerInjectorPlugin
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
-import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
 import dagger.Module
 import dagger.Provides
 import dagger.multibindings.IntoSet
@@ -92,11 +89,4 @@ class WorkerPluginsModule {
         offlinePixelSender: OfflinePixelSender
     ): WorkerInjectorPlugin = OfflinePixelWorkerInjectorPlugin(offlinePixelSender)
 
-    @Provides
-    @IntoSet
-    fun provideVpnStatsReportingWorkerInjectorPlugin(
-        vpnDatabase: VpnDatabase,
-        appTrackerBlockingStatsRepository: AppTrackerBlockingStatsRepository,
-        pixel: Pixel
-    ): WorkerInjectorPlugin = VpnStatsReportingWorkerInjectorPlugin(vpnDatabase, appTrackerBlockingStatsRepository, pixel)
 }
