@@ -46,6 +46,7 @@ class HomeBackgroundLogo(private var ddgLogoView: View) {
 
     private fun fadeLogoIn() {
         Timber.v("showLogo")
+        //To avoid glitches when calling show/hide logo within a small amount of time we keep this 50ms animation
         ddgLogoView.animate().apply {
             duration = FADE_IN_DURATION
             interpolator = AccelerateInterpolator()
