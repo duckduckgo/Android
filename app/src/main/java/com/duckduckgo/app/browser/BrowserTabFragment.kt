@@ -381,7 +381,7 @@ class BrowserTabFragment :
 
         activityOnResumeMs = SystemClock.uptimeMillis()
 
-        Debug.stopMethodTracing()
+        //Debug.stopMethodTracing()
     }
 
     override fun onPause() {
