@@ -263,7 +263,7 @@ class BrowserTabFragment :
         }
     }
 
-    private val logoHidingListener by lazy { LogoHidingLayoutChangeLifecycleListener(ddgLogo) }
+    private val homeBackgroundLogo by lazy { HomeBackgroundLogo(ddgLogo) }
 
     private val ctaViewStateObserver = Observer<CtaViewState> {
         it?.let { renderer.renderCtaViewState(it) }
@@ -371,7 +371,6 @@ class BrowserTabFragment :
 
         appBarLayout.setExpanded(true)
         viewModel.onViewResumed()
-        logoHidingListener.onResume()
 
         // onResume can be called for a hidden/backgrounded fragment, ensure this tab is visible.
         if (fragmentIsVisible()) {
@@ -386,7 +385,6 @@ class BrowserTabFragment :
     }
 
     override fun onPause() {
-        logoHidingListener.onPause()
         dismissDownloadFragment()
         dismissAuthenticationDialog()
         super.onPause()
@@ -503,7 +501,7 @@ class BrowserTabFragment :
         webView?.onPause()
         webView?.hide()
         omnibarScrolling.disableOmnibarScrolling(toolbarContainer)
-        logoHidingListener.onReadyToShowLogo()
+        homeBackgroundLogo.showLogo()
     }
 
     private fun showBrowser() {
@@ -511,6 +509,7 @@ class BrowserTabFragment :
         webView?.show()
         webView?.onResume()
         omnibarScrolling.enableOmnibarScrolling(toolbarContainer)
+        homeBackgroundLogo.hideLogo()
     }
 
     fun submitQuery(query: String) {
@@ -954,7 +953,6 @@ class BrowserTabFragment :
             disableTransitionType(DISAPPEARING)
             setDuration(LAYOUT_TRANSITION_MS)
         }
-        rootView.addOnLayoutChangeListener(logoHidingListener)
     }
 
     private fun userSelectedAutocomplete(suggestion: AutoCompleteSuggestion) {
@@ -1838,8 +1836,6 @@ class BrowserTabFragment :
             }
 
             renderIfChanged(viewState, lastSeenCtaViewState) {
-
-                ddgLogo.show()
                 lastSeenCtaViewState = viewState
                 removeNewTabLayoutClickListener()
                 if (viewState.cta != null) {
@@ -1880,7 +1876,7 @@ class BrowserTabFragment :
         }
 
         private fun showDaxCta(configuration: DaxBubbleCta) {
-            ddgLogo.hide()
+            homeBackgroundLogo.hideLogo()
             hideHomeCta()
             hideHomeTopCta()
             configuration.showCta(daxCtaContainer)
@@ -1895,7 +1891,7 @@ class BrowserTabFragment :
             hideDaxCta()
             hideHomeCta()
 
-            logoHidingListener.callToActionView = ctaTopContainer
+            /*logoHidingListener.callToActionView = ctaTopContainer
 
             configuration.showCta(ctaTopContainer)
             ctaTopContainer.setOnClickListener {
@@ -1903,7 +1899,7 @@ class BrowserTabFragment :
             }
             ctaTopContainer.closeButton.setOnClickListener {
                 viewModel.onUserDismissedCta()
-            }
+            }*/
         }
 
         private fun showHomeCta(configuration: HomePanelCta) {
@@ -1914,6 +1910,7 @@ class BrowserTabFragment :
             } else {
                 configuration.showCta(ctaContainer)
             }
+            homeBackgroundLogo.showLogo()
         }
 
         private fun hideDaxCta() {
@@ -1937,13 +1934,11 @@ class BrowserTabFragment :
             ctaContainer.removeAllViews()
 
             inflate(context, R.layout.include_cta, ctaContainer)
-            logoHidingListener.callToActionView = ctaContainer
 
             configuration.showCta(ctaContainer)
             ctaContainer.ctaOkButton.setOnClickListener {
                 viewModel.onUserClickCtaOkButton()
             }
-
             ctaContainer.ctaDismissButton.setOnClickListener {
                 viewModel.onUserDismissedCta()
             }
