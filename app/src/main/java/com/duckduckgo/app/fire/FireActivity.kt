@@ -21,11 +21,13 @@ import android.app.ActivityManager
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.os.Handler
 import android.os.Process
-import com.duckduckgo.app.browser.BrowserActivity
+import androidx.appcompat.app.AppCompatActivity
 import com.duckduckgo.app.browser.R
-import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.view.fadeTransitionConfig
+import com.duckduckgo.app.launch.LaunchBridgeActivity2
+import timber.log.Timber
 
 /**
  * Activity which is responsible for killing the main process and restarting it. This Activity will automatically finish itself after a brief time.
@@ -36,14 +38,22 @@ import com.duckduckgo.app.global.view.fadeTransitionConfig
  *
  * This Activity was largely inspired by https://github.com/JakeWharton/ProcessPhoenix
  */
-class FireActivity : DuckDuckGoActivity() {
+class FireActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val intent = intent.getParcelableExtra<Intent>(KEY_RESTART_INTENTS)
-        startActivity(intent, fadeTransitionConfig())
-        finish()
-        killProcess()
+        Timber.i("FireActivity")
+        setContentView(R.layout.activity_fire_activity)
+        Handler().postDelayed({
+            finish()
+            killProcess()
+        }, 3000L)
+    }
+
+    override fun onPostCreate(savedInstanceState: Bundle?) {
+        super.onPostCreate(savedInstanceState)
+        intent = intent.getParcelableExtra<Intent>(KEY_RESTART_INTENTS)
+        startActivity(intent)
     }
 
     override fun onBackPressed() {
@@ -70,8 +80,7 @@ class FireActivity : DuckDuckGoActivity() {
         }
 
         private fun getRestartIntent(context: Context): Intent {
-            val intent = BrowserActivity.intent(context, launchedFromFireAction = true)
-            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+            val intent = Intent(context, LaunchBridgeActivity2::class.java)
             return intent
         }
 
