@@ -39,6 +39,8 @@ class KeyboardAwareEditText : AppCompatEditText {
     constructor(context: Context, attrs: AttributeSet?) : this(context, attrs, 0)
     constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr)
 
+    private var didSelectQueryFirstTime = false
+
     private fun Editable.isWebUrl(): Boolean {
         return Patterns.WEB_URL.matcher(this.toString()).matches()
     }
@@ -47,10 +49,15 @@ class KeyboardAwareEditText : AppCompatEditText {
         super.onFocusChanged(focused, direction, previouslyFocusedRect)
         if (focused) {
             if (text != null && text?.isWebUrl() == false) {
-                // trigger the text change listener so that we can show autocomplete
-                text = text
-                // cursor at the end of the word
-                setSelection(text!!.length)
+                if (didSelectQueryFirstTime) {
+                    // trigger the text change listener so that we can show autocomplete
+                    text = text
+                    // cursor at the end of the word
+                    setSelection(text!!.length)
+                } else {
+                    didSelectQueryFirstTime = true
+                    post { Selection.selectAll(text) }
+                }
             } else if (text?.isWebUrl() == true) {
                 // We always want URLs to be selected
                 // we need to post for the selectAll to take effect. The wonders of Android layout !
