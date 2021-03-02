@@ -147,8 +147,8 @@ class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope() {
         val fragment = BrowserTabFragment.newInstance(tabId, url, skipHome)
         val transaction = supportFragmentManager.beginTransaction()
         val tab = currentTab
+        //transaction.setCustomAnimations(R.anim.slide_from_bottom, R.anim.fragment_fade_exit)
         if (tab == null) {
-            transaction.setCustomAnimations(R.anim.slide_from_bottom, 0)
             transaction.replace(R.id.fragmentContainer, fragment, tabId)
         } else {
             transaction.hide(tab)

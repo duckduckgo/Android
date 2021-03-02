@@ -25,6 +25,7 @@ import com.duckduckgo.app.onboarding.ui.OnboardingActivity
 import com.duckduckgo.app.statistics.VariantManager
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import javax.inject.Inject
 
 class LaunchBridgeActivity : DuckDuckGoActivity() {
@@ -36,6 +37,7 @@ class LaunchBridgeActivity : DuckDuckGoActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        Timber.i("LaunchBridgeActivity")
         setContentView(R.layout.activity_launch)
 
         configureObservers()
@@ -70,6 +72,7 @@ class LaunchBridgeActivity : DuckDuckGoActivity() {
 
     private fun showHome() {
         startActivity(BrowserActivity.intent(this))
+        overridePendingTransition(0, 0)
         finish()
     }
 }
