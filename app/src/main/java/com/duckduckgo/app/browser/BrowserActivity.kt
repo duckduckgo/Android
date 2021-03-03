@@ -39,8 +39,10 @@ import com.duckduckgo.app.fire.DataClearer
 import com.duckduckgo.app.fire.DataClearerForegroundAppRestartPixel
 import com.duckduckgo.app.global.ApplicationClearDataState
 import com.duckduckgo.app.global.DuckDuckGoActivity
+import com.duckduckgo.app.global.events.db.UserEventKey
 import com.duckduckgo.app.global.events.db.UserEventsStore
 import com.duckduckgo.app.global.intentText
+import com.duckduckgo.app.global.sendThemeChangedBroadcast
 import com.duckduckgo.app.global.view.*
 import com.duckduckgo.app.location.ui.LocationPermissionsActivity
 import com.duckduckgo.app.onboarding.ui.page.DefaultBrowserPage
@@ -214,7 +216,6 @@ class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope() {
 
         if (intent.getBooleanExtra(LAUNCHED_FROM_FIRE_EXTRA, false)) {
             Timber.i("Launched from fire")
-            Toast.makeText(applicationContext, R.string.fireDataCleared, Toast.LENGTH_LONG).show()
         }
 
         if (launchNewSearch(intent)) {
