@@ -78,7 +78,8 @@ import javax.inject.Singleton
         StoreReferralModule::class,
         CoroutinesModule::class,
         CertificateTrustedStoreModule::class,
-        WelcomePageModule::class
+        WelcomePageModule::class,
+        HttpsPersisterModule::class
     ]
 )
 interface AppComponent : AndroidInjector<DuckDuckGoApplication> {

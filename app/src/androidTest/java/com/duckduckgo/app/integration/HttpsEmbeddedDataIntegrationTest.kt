@@ -25,7 +25,7 @@ import com.duckduckgo.app.httpsupgrade.HttpsBloomFilterFactoryImpl
 import com.duckduckgo.app.httpsupgrade.HttpsUpgrader
 import com.duckduckgo.app.httpsupgrade.HttpsUpgraderImpl
 import com.duckduckgo.app.httpsupgrade.api.HttpsFalsePositivesJsonAdapter
-import com.duckduckgo.app.httpsupgrade.store.HttpsDataPersister
+import com.duckduckgo.httpsupgrade.store.PlayHttpsDataPersister
 import com.duckduckgo.app.privacy.db.UserWhitelistDao
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.nhaarman.mockitokotlin2.mock
@@ -55,7 +55,7 @@ class HttpsEmbeddedDataIntegrationTest {
         var httpsFalsePositivesDao = db.httpsFalsePositivesDao()
         var binaryDataStore: BinaryDataStore = BinaryDataStore(context)
 
-        val persister = HttpsDataPersister(
+        val persister = PlayHttpsDataPersister(
             binaryDataStore,
             httpsBloomSpecDao,
             httpsFalsePositivesDao,
