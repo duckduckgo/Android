@@ -19,15 +19,11 @@ package com.duckduckgo.app.fire
 import android.content.Context
 import java.io.File
 
-interface DatabaseLocator {
-    fun getDatabasePath(): String
-}
+abstract class DatabaseLocator(private val context: Context) {
 
-class WebViewDatabaseLocator(private val context: Context) : DatabaseLocator {
+    abstract val knownLocations: List<String>
 
-    private val knownLocations = listOf("/app_webview/Default/Cookies", "/app_webview/Cookies")
-
-    override fun getDatabasePath(): String {
+    open fun getDatabasePath(): String {
         val dataDir = context.applicationInfo.dataDir
         val detectedPath = knownLocations.find { knownPath ->
             val file = File(dataDir, knownPath)
@@ -40,4 +36,12 @@ class WebViewDatabaseLocator(private val context: Context) : DatabaseLocator {
                 "$dataDir$nonEmptyPath"
             }.orEmpty()
     }
+}
+
+class WebViewDatabaseLocator(context: Context) : DatabaseLocator(context) {
+    override val knownLocations = listOf("/app_webview/Default/Cookies", "/app_webview/Cookies")
+}
+
+class MainDatabaseLocator(context: Context) : DatabaseLocator(context) {
+    override val knownLocations = listOf("/databases/app.db")
 }

@@ -26,6 +26,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.store.OfflinePixelCountDataStore
 import kotlinx.coroutines.withContext
 import timber.log.Timber
+import javax.inject.Named
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
@@ -46,7 +47,7 @@ class CookieManagerRemover(private val cookieManager: CookieManager) : CookieRem
 }
 
 class SQLCookieRemover(
-    private val webViewDatabaseLocator: DatabaseLocator,
+    @Named("webViewDbLocator") private val webViewDatabaseLocator: DatabaseLocator,
     private val getCookieHostsToPreserve: GetCookieHostsToPreserve,
     private val offlinePixelCountDataStore: OfflinePixelCountDataStore,
     private val exceptionPixel: ExceptionPixel,

@@ -63,7 +63,8 @@ class PrivacyModule {
         settingsDataStore: SettingsDataStore,
         cookieManager: DuckDuckGoCookieManager,
         appCacheClearer: AppCacheClearer,
-        geoLocationPermissions: GeoLocationPermissions
+        geoLocationPermissions: GeoLocationPermissions,
+        mainDatabaseCleaner: MainDatabaseCleaner
     ): ClearDataAction {
         return ClearPersonalDataAction(
             context,
@@ -73,7 +74,8 @@ class PrivacyModule {
             settingsDataStore,
             cookieManager,
             appCacheClearer,
-            geoLocationPermissions
+            geoLocationPermissions,
+            mainDatabaseCleaner
         )
     }
 

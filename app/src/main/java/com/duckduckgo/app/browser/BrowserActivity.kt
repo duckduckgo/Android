@@ -61,7 +61,7 @@ import javax.inject.Inject
 class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope() {
 
     @Inject
-    lateinit var clearPersonalDataAction: ClearPersonalDataAction
+    lateinit var clearPersonalDataAction: ClearDataAction
 
     @Inject
     lateinit var dataClearer: DataClearer

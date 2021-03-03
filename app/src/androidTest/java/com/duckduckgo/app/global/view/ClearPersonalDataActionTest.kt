@@ -19,6 +19,7 @@ package com.duckduckgo.app.global.view
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.browser.WebDataManager
 import com.duckduckgo.app.fire.AppCacheClearer
+import com.duckduckgo.app.fire.DatabaseCleaner
 import com.duckduckgo.app.fire.DuckDuckGoCookieManager
 import com.duckduckgo.app.fire.UnsentForgetAllPixelStore
 import com.duckduckgo.app.location.GeoLocationPermissions
@@ -44,6 +45,7 @@ class ClearPersonalDataActionTest {
     private val mockCookieManager: DuckDuckGoCookieManager = mock()
     private val mockAppCacheClearer: AppCacheClearer = mock()
     private val mockGeoLocationPermissions: GeoLocationPermissions = mock()
+    private val mockDatabaseCleaner: DatabaseCleaner = mock()
 
     @Before
     fun setup() {
@@ -55,7 +57,8 @@ class ClearPersonalDataActionTest {
             mockSettingsDataStore,
             mockCookieManager,
             mockAppCacheClearer,
-            mockGeoLocationPermissions
+            mockGeoLocationPermissions,
+            mockDatabaseCleaner
         )
     }
 
@@ -99,5 +102,11 @@ class ClearPersonalDataActionTest {
     fun whenClearCalledThenGeoLocationPermissionsAreCleared() = runBlocking<Unit> {
         testee.clearTabsAndAllDataAsync(appInForeground = false, shouldFireDataClearPixel = false)
         verify(mockGeoLocationPermissions).clearAllButFireproofed()
+    }
+
+    @Test
+    fun whenClearCalledThenThenCleanDatabaseCalled() = runBlocking<Unit> {
+        testee.clearTabsAndAllDataAsync(appInForeground = false, shouldFireDataClearPixel = false)
+        verify(mockDatabaseCleaner).cleanDatabase()
     }
 }

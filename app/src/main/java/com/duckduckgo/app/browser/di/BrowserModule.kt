@@ -44,6 +44,7 @@ import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteDao
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepository
 import com.duckduckgo.app.global.AppUrl
 import com.duckduckgo.app.global.DispatcherProvider
+import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.global.device.DeviceInfo
 import com.duckduckgo.app.global.events.db.UserEventsStore
 import com.duckduckgo.app.global.exception.UncaughtExceptionRepository
@@ -66,6 +67,7 @@ import com.duckduckgo.app.tabs.ui.GridViewColumnCalculator
 import com.duckduckgo.app.trackerdetection.TrackerDetector
 import dagger.Module
 import dagger.Provides
+import javax.inject.Named
 import javax.inject.Singleton
 
 @Module
@@ -192,7 +194,7 @@ class BrowserModule {
 
     @Provides
     fun sqlCookieRemover(
-        webViewDatabaseLocator: WebViewDatabaseLocator,
+        @Named("webViewDbLocator") webViewDatabaseLocator: DatabaseLocator,
         getCookieHostsToPreserve: GetCookieHostsToPreserve,
         offlinePixelCountDataStore: OfflinePixelCountDataStore,
         exceptionPixel: ExceptionPixel,
@@ -202,7 +204,15 @@ class BrowserModule {
     }
 
     @Provides
-    fun webViewDatabaseLocator(context: Context): WebViewDatabaseLocator = WebViewDatabaseLocator(context)
+    @Named("webViewDbLocator")
+    fun webViewDatabaseLocator(context: Context): DatabaseLocator = WebViewDatabaseLocator(context)
+
+    @Provides
+    @Named("mainDbLocator")
+    fun mainDatabaseLocator(context: Context): DatabaseLocator = MainDatabaseLocator(context)
+
+    @Provides
+    fun mainDatabaseCleaner(appDatabase: AppDatabase, @Named("mainDbLocator") mainDatabaseLocator: DatabaseLocator): MainDatabaseCleaner = MainDatabaseCleaner(appDatabase, mainDatabaseLocator)
 
     @Provides
     fun getCookieHostsToPreserve(fireproofWebsiteDao: FireproofWebsiteDao): GetCookieHostsToPreserve = GetCookieHostsToPreserve(fireproofWebsiteDao)
