@@ -24,9 +24,12 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Process
 import androidx.appcompat.app.AppCompatActivity
+import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.view.fadeTransitionConfig
 import com.duckduckgo.app.launch.LaunchBridgeActivity2
+import org.jetbrains.anko.longToast
+import org.jetbrains.anko.toast
 import timber.log.Timber
 
 /**
@@ -43,17 +46,14 @@ class FireActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         Timber.i("FireActivity")
-        setContentView(R.layout.activity_fire_activity)
-        Handler().postDelayed({
-            finish()
-            killProcess()
-        }, 3000L)
     }
 
     override fun onPostCreate(savedInstanceState: Bundle?) {
         super.onPostCreate(savedInstanceState)
-        intent = intent.getParcelableExtra<Intent>(KEY_RESTART_INTENTS)
+        intent = intent.getParcelableExtra(KEY_RESTART_INTENTS)
         startActivity(intent)
+        finish()
+        killProcess()
     }
 
     override fun onBackPressed() {
@@ -80,7 +80,7 @@ class FireActivity : AppCompatActivity() {
         }
 
         private fun getRestartIntent(context: Context): Intent {
-            val intent = Intent(context, LaunchBridgeActivity2::class.java)
+            val intent = BrowserActivity.intent(context, launchedFromFireAction = true)
             return intent
         }
 
