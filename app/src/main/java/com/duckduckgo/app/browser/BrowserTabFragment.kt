@@ -109,7 +109,6 @@ import com.duckduckgo.widget.SearchWidgetLight
 import com.google.android.material.snackbar.Snackbar
 import dagger.android.support.AndroidSupportInjection
 import kotlinx.android.synthetic.main.fragment_browser_tab.*
-import kotlinx.android.synthetic.main.include_add_widget_instruction_buttons.view.*
 import kotlinx.android.synthetic.main.include_cta_buttons.view.*
 import kotlinx.android.synthetic.main.include_dax_dialog_cta.*
 import kotlinx.android.synthetic.main.include_dax_dialog_cta.view.*
@@ -368,7 +367,7 @@ class BrowserTabFragment :
 
     override fun onResume() {
         super.onResume()
-
+        Timber.i("BrowserTabFragment onResume")
         appBarLayout.setExpanded(true)
         viewModel.onViewResumed()
 
@@ -1226,7 +1225,7 @@ class BrowserTabFragment :
         pulseAnimation.stop()
         animatorHelper.removeListener()
         supervisorJob.cancel()
-        popupMenu.dismiss()
+        //popupMenu.dismiss()
         loginDetectionDialog?.dismiss()
         destroyWebView()
         super.onDestroy()
@@ -1923,7 +1922,7 @@ class BrowserTabFragment :
         }
 
         private fun hideHomeTopCta() {
-            ctaTopContainer.gone()
+            //ctaTopContainer.gone()
         }
 
         fun renderHomeCta() {
