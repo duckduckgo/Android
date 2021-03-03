@@ -81,7 +81,7 @@ class PlayHttpsDataPersister @Inject constructor(
         return specification == httpsBloomSpecDao.get() && binaryDataStore.verifyCheckSum(HttpsBloomFilterSpec.HTTPS_BINARY_FILE, specification.sha256)
     }
 
-    fun isPersisted(): Boolean {
+    override fun isPersisted(): Boolean {
         val specification = httpsBloomSpecDao.get() ?: return false
         return binaryDataStore.verifyCheckSum(HttpsBloomFilterSpec.HTTPS_BINARY_FILE, specification.sha256)
     }

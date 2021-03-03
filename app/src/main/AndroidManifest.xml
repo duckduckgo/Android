@@ -186,7 +186,6 @@
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:label="@string/appDescription"
             android:launchMode="singleTask"
-            android:supportsPictureInPicture="true"
             android:windowSoftInputMode="adjustResize|stateHidden">
 
             <!-- Allows app to become default browser -->
