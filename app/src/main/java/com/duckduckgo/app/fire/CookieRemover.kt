@@ -19,6 +19,7 @@ package com.duckduckgo.app.fire
 import android.database.DatabaseErrorHandler
 import android.database.DefaultDatabaseErrorHandler
 import android.database.sqlite.SQLiteDatabase
+import android.os.Build
 import android.webkit.CookieManager
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.statistics.pixels.ExceptionPixel
@@ -84,6 +85,9 @@ class SQLCookieRemover(
             try {
                 val whereClause = buildSQLWhereClause(excludedSites)
                 val number = delete(COOKIES_TABLE_NAME, whereClause, excludedSites.toTypedArray())
+                if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.M) {
+                    execSQL("VACUUM")
+                }
                 deleteExecuted = true
                 Timber.v("$number cookies removed")
             } catch (exception: Exception) {
