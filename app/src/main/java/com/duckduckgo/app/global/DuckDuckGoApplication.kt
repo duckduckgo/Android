@@ -25,12 +25,14 @@ import android.os.Handler
 import android.os.SystemClock
 import android.view.Choreographer
 import android.view.View
+import android.widget.Toast
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.OnLifecycleEvent
 import androidx.lifecycle.ProcessLifecycleOwner
 import androidx.work.WorkerFactory
 import com.duckduckgo.app.browser.BuildConfig
+import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserObserver
 import com.duckduckgo.app.browser.shortcut.ShortcutBuilder
 import com.duckduckgo.app.browser.shortcut.ShortcutReceiver
@@ -244,12 +246,16 @@ open class DuckDuckGoApplication : HasAndroidInjector, Application(), LifecycleO
         }
 
         configureLogging()
+        Timber.i("Application Started")
+        if (appIsRestarting()){
+
+            return
+        }
+
+        Timber.i("Creating DuckDuckGoApplication")
         configureDependencyInjection()
         configureUncaughtExceptionHandler()
 
-        Timber.i("Creating DuckDuckGoApplication")
-
-        if (appIsRestarting()) return
 
         ProcessLifecycleOwner.get().lifecycle.also {
             it.addObserver(this)
