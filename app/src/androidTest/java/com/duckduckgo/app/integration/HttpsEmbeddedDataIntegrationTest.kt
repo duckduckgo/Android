@@ -25,8 +25,11 @@ import com.duckduckgo.app.httpsupgrade.HttpsBloomFilterFactoryImpl
 import com.duckduckgo.app.httpsupgrade.HttpsUpgrader
 import com.duckduckgo.app.httpsupgrade.HttpsUpgraderImpl
 import com.duckduckgo.app.httpsupgrade.api.HttpsFalsePositivesJsonAdapter
+import com.duckduckgo.app.httpsupgrade.store.HttpsDataPersister
+import com.duckduckgo.app.httpsupgrade.store.HttpsEmbeddedDataPersister
 import com.duckduckgo.app.privacy.db.UserWhitelistDao
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.httpsupgrade.store.PlayHttpsEmbeddedDataPersister
 import com.nhaarman.mockitokotlin2.mock
 import com.squareup.moshi.Moshi
 import org.junit.After
@@ -50,20 +53,21 @@ class HttpsEmbeddedDataIntegrationTest {
         db = Room.inMemoryDatabaseBuilder(context, AppDatabase::class.java)
             .allowMainThreadQueries()
             .build()
+
         var httpsBloomSpecDao = db.httpsBloomFilterSpecDao()
         var httpsFalsePositivesDao = db.httpsFalsePositivesDao()
-        var binaryDataStore: BinaryDataStore = BinaryDataStore(context)
+        var binaryDataStore = BinaryDataStore(context)
 
-        val persister = PlayHttpsDataPersister(
+        val persister = HttpsDataPersister(
             binaryDataStore,
             httpsBloomSpecDao,
             httpsFalsePositivesDao,
-            db,
-            context,
-            moshi
+            db
         )
 
-        val factory = HttpsBloomFilterFactoryImpl(httpsBloomSpecDao, binaryDataStore, persister)
+        var embeddedDataPersister = PlayHttpsEmbeddedDataPersister(persister, binaryDataStore, httpsBloomSpecDao, context, moshi)
+
+        val factory = HttpsBloomFilterFactoryImpl(httpsBloomSpecDao, binaryDataStore, embeddedDataPersister, persister)
         httpsUpgrader = HttpsUpgraderImpl(factory, httpsFalsePositivesDao, mockUserAllowlistDao, mockPixel)
         httpsUpgrader.reloadData()
     }
