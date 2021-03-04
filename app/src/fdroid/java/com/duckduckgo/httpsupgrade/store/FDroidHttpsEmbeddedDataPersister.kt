@@ -14,19 +14,19 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.di
+package com.duckduckgo.httpsupgrade.store
 
 import com.duckduckgo.app.httpsupgrade.store.HttpsEmbeddedDataPersister
-import com.duckduckgo.httpsupgrade.store.FDroidHttpsEmbeddedDataPersister
-import dagger.Module
-import dagger.Provides
+import timber.log.Timber
 
-@Module
-class HttpsPersisterModule {
+class FDroidHttpsEmbeddedDataPersister : HttpsEmbeddedDataPersister {
 
-    @Provides
-    fun providesHttpsDataManager(): HttpsEmbeddedDataPersister {
-        return FDroidHttpsEmbeddedDataPersister()
+    override fun shouldPersistEmbeddedData(): Boolean {
+        Timber.d("Https update data not found, but F-Droid does not use the binary to load embedded data")
+        return false
     }
 
+    override fun persistEmbeddedData() {
+        Timber.d("Https update data not found, but F-Droid does not use the binary to load embedded data")
+    }
 }

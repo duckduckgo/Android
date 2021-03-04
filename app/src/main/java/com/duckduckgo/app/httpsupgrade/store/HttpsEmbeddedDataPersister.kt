@@ -14,19 +14,12 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.di
+package com.duckduckgo.app.httpsupgrade.store
 
-import com.duckduckgo.app.httpsupgrade.store.HttpsEmbeddedDataPersister
-import com.duckduckgo.httpsupgrade.store.FDroidHttpsEmbeddedDataPersister
-import dagger.Module
-import dagger.Provides
+interface HttpsEmbeddedDataPersister {
 
-@Module
-class HttpsPersisterModule {
+    fun shouldPersistEmbeddedData(): Boolean
 
-    @Provides
-    fun providesHttpsDataManager(): HttpsEmbeddedDataPersister {
-        return FDroidHttpsEmbeddedDataPersister()
-    }
+    fun persistEmbeddedData()
 
 }

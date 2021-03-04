@@ -17,12 +17,11 @@
 package com.duckduckgo.app.di
 
 import android.content.Context
-import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.global.store.BinaryDataStore
 import com.duckduckgo.app.httpsupgrade.store.HttpsBloomFilterSpecDao
 import com.duckduckgo.app.httpsupgrade.store.HttpsDataPersister
-import com.duckduckgo.app.httpsupgrade.store.HttpsFalsePositivesDao
-import com.duckduckgo.httpsupgrade.store.PlayHttpsDataPersister
+import com.duckduckgo.app.httpsupgrade.store.HttpsEmbeddedDataPersister
+import com.duckduckgo.httpsupgrade.store.PlayHttpsEmbeddedDataPersister
 import com.squareup.moshi.Moshi
 import dagger.Module
 import dagger.Provides
@@ -31,15 +30,14 @@ import dagger.Provides
 class HttpsPersisterModule {
 
     @Provides
-    fun providesHttpsDataPersister(
+    fun providesPlayHttpsEmbeddedDataPersister(
+        httpsDataPersister: HttpsDataPersister,
         binaryDataStore: BinaryDataStore,
         httpsBloomSpecDao: HttpsBloomFilterSpecDao,
-        httpsFalsePositivesDao: HttpsFalsePositivesDao,
-        appDatabase: AppDatabase,
         context: Context,
         moshi: Moshi
-    ): HttpsDataPersister {
-        return PlayHttpsDataPersister(binaryDataStore, httpsBloomSpecDao, httpsFalsePositivesDao, appDatabase, context, moshi)
+    ): HttpsEmbeddedDataPersister {
+        return PlayHttpsEmbeddedDataPersister(httpsDataPersister, binaryDataStore, httpsBloomSpecDao, context, moshi)
     }
 
 }

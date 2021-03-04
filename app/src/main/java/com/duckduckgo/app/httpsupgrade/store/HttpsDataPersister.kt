@@ -16,19 +16,45 @@
 
 package com.duckduckgo.app.httpsupgrade.store
 
+import com.duckduckgo.app.global.db.AppDatabase
+import com.duckduckgo.app.global.store.BinaryDataStore
 import com.duckduckgo.app.httpsupgrade.model.HttpsBloomFilterSpec
 import com.duckduckgo.app.httpsupgrade.model.HttpsFalsePositiveDomain
+import timber.log.Timber
+import java.io.IOException
+import javax.inject.Inject
 
-interface HttpsDataPersister {
+class HttpsDataPersister @Inject constructor(
+    private val binaryDataStore: BinaryDataStore,
+    private val httpsBloomSpecDao: HttpsBloomFilterSpecDao,
+    private val httpsFalsePositivesDao: HttpsFalsePositivesDao,
+    private val appDatabase: AppDatabase
+) {
 
-    fun persistBloomFilter(specification: HttpsBloomFilterSpec, bytes: ByteArray)
+    fun persistBloomFilter(specification: HttpsBloomFilterSpec, bytes: ByteArray, falsePositives: List<HttpsFalsePositiveDomain>) {
+        appDatabase.runInTransaction {
+            persistBloomFilter(specification, bytes)
+            persistFalsePositives(falsePositives)
+        }
+    }
 
-    fun persistFalsePositives(falsePositives: List<HttpsFalsePositiveDomain>)
+    fun persistBloomFilter(specification: HttpsBloomFilterSpec, bytes: ByteArray) {
+        if (!binaryDataStore.verifyCheckSum(bytes, specification.sha256)) {
+            throw IOException("Https binary has incorrect sha, throwing away file")
+        }
 
-    fun persistEmbeddedData()
+        Timber.d("Updating https bloom data store with new data")
+        appDatabase.runInTransaction {
+            httpsBloomSpecDao.insert(specification)
+            binaryDataStore.saveData(HttpsBloomFilterSpec.HTTPS_BINARY_FILE, bytes)
+        }
+    }
 
-    fun isPersisted(specification: HttpsBloomFilterSpec): Boolean
+    fun persistFalsePositives(falsePositives: List<HttpsFalsePositiveDomain>) {
+        httpsFalsePositivesDao.updateAll(falsePositives)
+    }
 
-    fun isPersisted(): Boolean
-
+    fun isPersisted(specification: HttpsBloomFilterSpec): Boolean {
+        return specification == httpsBloomSpecDao.get() && binaryDataStore.verifyCheckSum(HttpsBloomFilterSpec.HTTPS_BINARY_FILE, specification.sha256)
+    }
 }
