@@ -21,20 +21,19 @@ import com.duckduckgo.app.global.db.AppDatabase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import timber.log.Timber
-import javax.inject.Named
 
 interface DatabaseCleaner {
     suspend fun cleanDatabase(): Boolean
 }
 
-class MainDatabaseCleaner(private val appDatabase: AppDatabase, @Named("mainDbLocator") private val mainDatabaseLocator: DatabaseLocator) : DatabaseCleaner {
+class AppDatabaseCleaner(private val appDatabase: AppDatabase, private val databaseLocator: DatabaseLocator) : DatabaseCleaner {
 
     override suspend fun cleanDatabase(): Boolean {
         return withContext(Dispatchers.IO) {
             if (appDatabase.isOpen) {
                 appDatabase.close()
             }
-            val databasePath: String = mainDatabaseLocator.getDatabasePath()
+            val databasePath: String = databaseLocator.getDatabasePath()
             if (databasePath.isNotEmpty()) {
                 return@withContext cleanUpMainDatabase(databasePath)
             }
@@ -46,6 +45,7 @@ class MainDatabaseCleaner(private val appDatabase: AppDatabase, @Named("mainDbLo
         var cleanUpExecuted = false
         openReadableDatabase(databasePath)?.apply {
             try {
+                execSQL("VACUUM")
                 cleanUpExecuted = true
             } catch (exception: Exception) {
                 Timber.e(exception)
@@ -56,12 +56,11 @@ class MainDatabaseCleaner(private val appDatabase: AppDatabase, @Named("mainDbLo
         return cleanUpExecuted
     }
 
-}
-
-private fun openReadableDatabase(databasePath: String): SQLiteDatabase? {
-    return try {
-        SQLiteDatabase.openDatabase(databasePath, null, SQLiteDatabase.OPEN_READWRITE, null)
-    } catch (exception: Exception) {
-        null
+    private fun openReadableDatabase(databasePath: String): SQLiteDatabase? {
+        return try {
+            SQLiteDatabase.openDatabase(databasePath, null, SQLiteDatabase.OPEN_READWRITE, null)
+        } catch (exception: Exception) {
+            null
+        }
     }
 }

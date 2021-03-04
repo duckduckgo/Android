@@ -85,6 +85,7 @@ class SQLCookieRemover(
             try {
                 val whereClause = buildSQLWhereClause(excludedSites)
                 val number = delete(COOKIES_TABLE_NAME, whereClause, excludedSites.toTypedArray())
+                execSQL("VACUUM")
                 deleteExecuted = true
                 Timber.v("$number cookies removed")
             } catch (exception: Exception) {

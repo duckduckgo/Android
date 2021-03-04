@@ -19,6 +19,8 @@ package com.duckduckgo.app.browser.httpauth
 import android.webkit.WebView
 import android.webkit.WebViewDatabase
 import androidx.annotation.UiThread
+import androidx.annotation.WorkerThread
+import com.duckduckgo.app.fire.DatabaseCleaner
 
 data class WebViewHttpAuthCredentials(val username: String, val password: String)
 
@@ -31,10 +33,13 @@ interface WebViewHttpAuthStore {
     fun getHttpAuthUsernamePassword(webView: WebView, host: String, realm: String): WebViewHttpAuthCredentials?
     @UiThread
     fun clearHttpAuthUsernamePassword(webView: WebView)
+    @WorkerThread
+    suspend fun cleanHttpAuthDatabase()
 }
 
 class RealWebViewHttpAuthStore(
-    private val webViewDatabase: WebViewDatabase
+    private val webViewDatabase: WebViewDatabase,
+    private val appDatabaseCleaner: DatabaseCleaner
 ) : WebViewHttpAuthStore {
     override fun setHttpAuthUsernamePassword(webView: WebView, host: String, realm: String, username: String, password: String) {
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
@@ -57,5 +62,9 @@ class RealWebViewHttpAuthStore(
 
     override fun clearHttpAuthUsernamePassword(webView: WebView) {
         webViewDatabase.clearHttpAuthUsernamePassword()
+    }
+
+    override suspend fun cleanHttpAuthDatabase() {
+        appDatabaseCleaner.cleanDatabase()
     }
 }

@@ -45,3 +45,7 @@ class WebViewDatabaseLocator(context: Context) : DatabaseLocator(context) {
 class MainDatabaseLocator(context: Context) : DatabaseLocator(context) {
     override val knownLocations = listOf("/databases/app.db")
 }
+
+class AuthDatabaseLocator(context: Context) : DatabaseLocator(context) {
+    override val knownLocations = listOf("/databases/http_auth.db")
+}

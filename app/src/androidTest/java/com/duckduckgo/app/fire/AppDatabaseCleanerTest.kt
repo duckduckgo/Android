@@ -25,17 +25,17 @@ import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
 
-class MainDatabaseCleanerTest {
+class AppDatabaseCleanerTest {
 
     private val context = InstrumentationRegistry.getInstrumentation().targetContext
     private val db = Room.inMemoryDatabaseBuilder(context, AppDatabase::class.java).build()
     private val mainDatabaseLocator = MainDatabaseLocator(context)
 
-    private lateinit var testee: MainDatabaseCleaner
+    private lateinit var testee: AppDatabaseCleaner
 
     @Before
     fun before() {
-        testee = MainDatabaseCleaner(db, mainDatabaseLocator)
+        testee = AppDatabaseCleaner(db, mainDatabaseLocator)
     }
 
     @After

@@ -80,8 +80,9 @@ class WebViewDataManager @Inject constructor(
         fileDeleter.deleteContents(File(dataDir, WEBVIEW_DEFAULT_DIRECTORY_NAME), exclusions)
     }
 
-    private fun clearAuthentication(webView: WebView) {
+    private suspend fun clearAuthentication(webView: WebView) {
         webViewHttpAuthStore.clearHttpAuthUsernamePassword(webView)
+        webViewHttpAuthStore.cleanHttpAuthDatabase()
     }
 
     private suspend fun clearExternalCookies() {

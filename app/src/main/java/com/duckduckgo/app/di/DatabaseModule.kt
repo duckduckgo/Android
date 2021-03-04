@@ -22,11 +22,13 @@ import androidx.room.Room
 import com.duckduckgo.app.browser.addtohome.AddToHomeCapabilityDetector
 import com.duckduckgo.app.browser.httpauth.RealWebViewHttpAuthStore
 import com.duckduckgo.app.browser.httpauth.WebViewHttpAuthStore
+import com.duckduckgo.app.fire.DatabaseCleaner
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.global.db.MigrationsProvider
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import dagger.Module
 import dagger.Provides
+import javax.inject.Named
 import javax.inject.Singleton
 
 @Module(includes = [DaoModule::class])
@@ -36,8 +38,9 @@ class DatabaseModule {
     @Singleton
     fun provideWebViewHttpAuthStore(
         context: Context,
+        @Named("authDbCleaner") databaseCleaner: DatabaseCleaner
     ): WebViewHttpAuthStore {
-        return RealWebViewHttpAuthStore(WebViewDatabase.getInstance(context))
+        return RealWebViewHttpAuthStore(WebViewDatabase.getInstance(context), databaseCleaner)
     }
 
     @Provides

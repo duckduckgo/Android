@@ -20,10 +20,12 @@ import android.webkit.WebView
 import android.webkit.WebViewDatabase
 import androidx.test.filters.SdkSuppress
 import com.duckduckgo.app.CoroutineTestRule
+import com.duckduckgo.app.fire.DatabaseCleaner
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.whenever
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.runBlockingTest
 import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
@@ -36,9 +38,10 @@ class WebViewHttpAuthStoreTest {
     val coroutineRule = CoroutineTestRule()
 
     private val webViewDatabase: WebViewDatabase = mock()
+    private val mockDatabaseCleaner: DatabaseCleaner = mock()
     private val webView: WebView = mock()
 
-    private val webViewHttpAuthStore = RealWebViewHttpAuthStore(webViewDatabase)
+    private val webViewHttpAuthStore = RealWebViewHttpAuthStore(webViewDatabase, mockDatabaseCleaner)
 
     @Test
     @SdkSuppress(minSdkVersion = android.os.Build.VERSION_CODES.O)
@@ -88,5 +91,11 @@ class WebViewHttpAuthStoreTest {
         val credentials = webViewHttpAuthStore.getHttpAuthUsernamePassword(webView, "host", "realm")
 
         assertEquals(WebViewHttpAuthCredentials("name", "pass"), credentials)
+    }
+
+    @Test
+    fun whenCleanHttpAuthDatabaseThenCleanDatabaseCalled() = runBlockingTest {
+        webViewHttpAuthStore.cleanHttpAuthDatabase()
+        verify(mockDatabaseCleaner).cleanDatabase()
     }
 }

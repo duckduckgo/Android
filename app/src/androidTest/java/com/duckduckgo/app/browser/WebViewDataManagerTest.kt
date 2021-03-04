@@ -19,7 +19,6 @@ package com.duckduckgo.app.browser
 import android.content.Context
 import android.webkit.WebStorage
 import android.webkit.WebView
-import android.webkit.WebViewDatabase
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.browser.httpauth.WebViewHttpAuthStore
 import com.duckduckgo.app.browser.session.WebViewSessionInMemoryStorage
@@ -40,7 +39,6 @@ class WebViewDataManagerTest {
     private val mockStorage: WebStorage = mock()
     private val context = InstrumentationRegistry.getInstrumentation().targetContext
     private val mockFileDeleter: FileDeleter = mock()
-    private val mockWebViewDatabase: WebViewDatabase = mock()
     private val mockWebViewHttpAuthStore: WebViewHttpAuthStore = mock()
     private val testee = WebViewDataManager(context, WebViewSessionInMemoryStorage(), mockCookieManager, mockFileDeleter, mockWebViewHttpAuthStore)
 
@@ -86,6 +84,15 @@ class WebViewDataManagerTest {
             val webView = TestWebView(context)
             testee.clearData(webView, mockStorage)
             verify(mockWebViewHttpAuthStore).clearHttpAuthUsernamePassword(webView)
+        }
+    }
+
+    @Test
+    fun whenDataClearedThenHttpAuthDatabaseCleaned() = runBlocking<Unit> {
+        withContext(Dispatchers.Main) {
+            val webView = TestWebView(context)
+            testee.clearData(webView, mockStorage)
+            verify(mockWebViewHttpAuthStore).cleanHttpAuthDatabase()
         }
     }
 
