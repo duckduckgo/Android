@@ -39,7 +39,7 @@ interface WebViewHttpAuthStore {
 
 class RealWebViewHttpAuthStore(
     private val webViewDatabase: WebViewDatabase,
-    private val appDatabaseCleaner: DatabaseCleaner
+    private val databaseCleaner: DatabaseCleaner
 ) : WebViewHttpAuthStore {
     override fun setHttpAuthUsernamePassword(webView: WebView, host: String, realm: String, username: String, password: String) {
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
@@ -65,6 +65,6 @@ class RealWebViewHttpAuthStore(
     }
 
     override suspend fun cleanHttpAuthDatabase() {
-        appDatabaseCleaner.cleanDatabase()
+        databaseCleaner.cleanDatabase()
     }
 }
