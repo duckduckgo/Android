@@ -26,7 +26,6 @@ import com.duckduckgo.app.httpsupgrade.HttpsUpgrader
 import com.duckduckgo.app.httpsupgrade.HttpsUpgraderImpl
 import com.duckduckgo.app.httpsupgrade.api.HttpsFalsePositivesJsonAdapter
 import com.duckduckgo.app.httpsupgrade.store.HttpsDataPersister
-import com.duckduckgo.app.httpsupgrade.store.HttpsEmbeddedDataPersister
 import com.duckduckgo.app.privacy.db.UserWhitelistDao
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.httpsupgrade.store.PlayHttpsEmbeddedDataPersister
