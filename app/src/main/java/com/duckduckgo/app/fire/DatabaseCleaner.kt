@@ -35,13 +35,13 @@ class AppDatabaseCleaner(private val appDatabase: AppDatabase, private val datab
             }
             val databasePath: String = databaseLocator.getDatabasePath()
             if (databasePath.isNotEmpty()) {
-                return@withContext cleanUpMainDatabase(databasePath)
+                return@withContext cleanUpDatabase(databasePath)
             }
             return@withContext false
         }
     }
 
-    private fun cleanUpMainDatabase(databasePath: String): Boolean {
+    private fun cleanUpDatabase(databasePath: String): Boolean {
         var cleanUpExecuted = false
         openReadableDatabase(databasePath)?.apply {
             try {
