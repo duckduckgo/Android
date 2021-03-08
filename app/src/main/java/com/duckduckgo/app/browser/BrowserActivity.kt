@@ -22,6 +22,7 @@ import android.content.Intent
 import android.content.Intent.EXTRA_TEXT
 import android.os.Bundle
 import android.os.Message
+import android.view.View
 import android.widget.Toast
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.Observer
@@ -53,6 +54,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.FIRE_DIALOG_CANCEL
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.FIRE_DIALOG_PROMOTED_CANCEL
 import com.duckduckgo.app.tabs.model.TabEntity
 import kotlinx.android.synthetic.main.activity_browser.*
+import kotlinx.android.synthetic.main.include_omnibar_toolbar_mockup.*
 import kotlinx.coroutines.*
 import org.jetbrains.anko.longToast
 import timber.log.Timber
@@ -109,6 +111,7 @@ class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope() {
 
         super.onCreate(savedInstanceState = newInstanceState, daggerInject = false)
         setContentView(R.layout.activity_browser)
+        configureEmptyClickListeners()
         viewModel.viewState.observe(
             this,
             Observer {
@@ -142,6 +145,13 @@ class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope() {
         }
     }
 
+    private fun configureEmptyClickListeners() {
+        tabsMenuMockup.setOnClickListener {}
+        tabsMenuMockup.setOnLongClickListener {
+            return@setOnLongClickListener true
+        }
+    }
+
     private fun openNewTab(tabId: String, url: String? = null, skipHome: Boolean): BrowserTabFragment {
         Timber.i("Opening new tab, url: $url, tabId: $tabId")
         val fragment = BrowserTabFragment.newInstance(tabId, url, skipHome)
@@ -155,6 +165,7 @@ class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope() {
         }
         transaction.commit()
         currentTab = fragment
+        hideMockupOmnibar()
         return fragment
     }
 
@@ -365,6 +376,10 @@ class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope() {
         if (currentTab?.onBackPressed() != true) {
             super.onBackPressed()
         }
+    }
+
+    fun hideMockupOmnibar() {
+        appBarLayoutMockup.visibility = View.GONE
     }
 
     companion object {
