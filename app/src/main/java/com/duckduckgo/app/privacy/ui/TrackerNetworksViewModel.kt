@@ -22,10 +22,39 @@ import androidx.lifecycle.ViewModel
 import com.duckduckgo.app.global.baseHost
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.global.model.domain
+import com.duckduckgo.app.global.plugins.view_model.ViewModelFactoryPlugin
 import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.app.trackerdetection.model.TdsEntity
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
+import com.duckduckgo.di.scopes.AppObjectGraph
+import com.squareup.anvil.annotations.ContributesTo
+import dagger.Module
+import dagger.Provides
+import dagger.multibindings.IntoSet
 import java.util.*
+import javax.inject.Singleton
+
+@Module
+@ContributesTo(AppObjectGraph::class)
+class TrackerNetworksViewModelFactoryModule {
+    @Provides
+    @Singleton
+    @IntoSet
+    fun provideTrackerNetworksViewModelFactory(): ViewModelFactoryPlugin {
+        return TrackerNetworksViewModelFactory()
+    }
+}
+
+private class TrackerNetworksViewModelFactory() : ViewModelFactoryPlugin {
+    override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
+        with(modelClass) {
+            return when {
+                isAssignableFrom(TrackerNetworksViewModel::class.java) -> (TrackerNetworksViewModel() as T)
+                else -> null
+            }
+        }
+    }
+}
 
 class TrackerNetworksViewModel : ViewModel() {
 

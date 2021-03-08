@@ -25,10 +25,51 @@ import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.SingleLiveEvent
 import com.duckduckgo.app.global.events.db.UserEventKey
 import com.duckduckgo.app.global.events.db.UserEventsStore
+import com.duckduckgo.app.global.plugins.view_model.ViewModelFactoryPlugin
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.*
+import com.duckduckgo.di.scopes.AppObjectGraph
+import com.squareup.anvil.annotations.ContributesTo
+import dagger.Module
+import dagger.Provides
+import dagger.multibindings.IntoSet
 import kotlinx.coroutines.launch
+import javax.inject.Singleton
+
+@Module
+@ContributesTo(AppObjectGraph::class)
+class FireproofWebsitesViewModelFactoryModule {
+    @Provides
+    @Singleton
+    @IntoSet
+    fun provideFireproofWebsitesViewModelFactory(
+        fireproofWebsiteRepository: FireproofWebsiteRepository,
+        dispatcherProvider: DispatcherProvider,
+        pixel: Pixel,
+        settingsDataStore: SettingsDataStore,
+        userEventsStore: UserEventsStore
+    ): ViewModelFactoryPlugin {
+        return FireproofWebsitesViewModelFactory(fireproofWebsiteRepository, dispatcherProvider, pixel, settingsDataStore, userEventsStore)
+    }
+}
+
+private class FireproofWebsitesViewModelFactory(
+    private val fireproofWebsiteRepository: FireproofWebsiteRepository,
+    private val dispatcherProvider: DispatcherProvider,
+    private val pixel: Pixel,
+    private val settingsDataStore: SettingsDataStore,
+    private val userEventsStore: UserEventsStore
+) : ViewModelFactoryPlugin {
+    override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
+        with(modelClass) {
+            return when {
+                isAssignableFrom(FireproofWebsitesViewModel::class.java) -> (FireproofWebsitesViewModel(fireproofWebsiteRepository, dispatcherProvider, pixel, settingsDataStore, userEventsStore) as T)
+                else -> null
+            }
+        }
+    }
+}
 
 class FireproofWebsitesViewModel(
     private val fireproofWebsiteRepository: FireproofWebsiteRepository,

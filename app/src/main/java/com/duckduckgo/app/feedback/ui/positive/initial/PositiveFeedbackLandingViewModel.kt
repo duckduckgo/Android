@@ -18,6 +18,35 @@ package com.duckduckgo.app.feedback.ui.positive.initial
 
 import androidx.lifecycle.ViewModel
 import com.duckduckgo.app.global.SingleLiveEvent
+import com.duckduckgo.app.global.plugins.view_model.ViewModelFactoryPlugin
+import com.duckduckgo.di.scopes.AppObjectGraph
+import com.squareup.anvil.annotations.ContributesTo
+import dagger.Module
+import dagger.Provides
+import dagger.multibindings.IntoSet
+import javax.inject.Singleton
+
+@Module
+@ContributesTo(AppObjectGraph::class)
+class PositiveFeedbackLandingViewModelFactoryModule {
+    @Provides
+    @Singleton
+    @IntoSet
+    fun providePositiveFeedbackLandingViewModelFactory(): ViewModelFactoryPlugin {
+        return PositiveFeedbackLandingViewModelFactory()
+    }
+}
+
+private class PositiveFeedbackLandingViewModelFactory() : ViewModelFactoryPlugin {
+    override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
+        with(modelClass) {
+            return when {
+                isAssignableFrom(PositiveFeedbackLandingViewModel::class.java) -> (PositiveFeedbackLandingViewModel() as T)
+                else -> null
+            }
+        }
+    }
+}
 
 class PositiveFeedbackLandingViewModel : ViewModel() {
 

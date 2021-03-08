@@ -18,8 +18,37 @@ package com.duckduckgo.app.widget.ui
 
 import androidx.lifecycle.ViewModel
 import com.duckduckgo.app.global.SingleLiveEvent
+import com.duckduckgo.app.global.plugins.view_model.ViewModelFactoryPlugin
 import com.duckduckgo.app.widget.ui.AddWidgetInstructionsViewModel.Command.Close
 import com.duckduckgo.app.widget.ui.AddWidgetInstructionsViewModel.Command.ShowHome
+import com.duckduckgo.di.scopes.AppObjectGraph
+import com.squareup.anvil.annotations.ContributesTo
+import dagger.Module
+import dagger.Provides
+import dagger.multibindings.IntoSet
+import javax.inject.Singleton
+
+@Module
+@ContributesTo(AppObjectGraph::class)
+class AddWidgetInstructionsViewModelFactoryModule {
+    @Provides
+    @Singleton
+    @IntoSet
+    fun provideAddWidgetInstructionsViewModelFactory(): ViewModelFactoryPlugin {
+        return AddWidgetInstructionsViewModelFactory()
+    }
+}
+
+private class AddWidgetInstructionsViewModelFactory() : ViewModelFactoryPlugin {
+    override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
+        with(modelClass) {
+            return when {
+                isAssignableFrom(AddWidgetInstructionsViewModel::class.java) -> (AddWidgetInstructionsViewModel() as T)
+                else -> null
+            }
+        }
+    }
+}
 
 class AddWidgetInstructionsViewModel : ViewModel() {
 

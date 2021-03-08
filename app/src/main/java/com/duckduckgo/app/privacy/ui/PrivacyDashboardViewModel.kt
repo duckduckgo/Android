@@ -24,6 +24,7 @@ import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.SingleLiveEvent
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.global.model.domain
+import com.duckduckgo.app.global.plugins.view_model.ViewModelFactoryPlugin
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardEntry
 import com.duckduckgo.app.privacy.db.UserWhitelistDao
@@ -35,9 +36,45 @@ import com.duckduckgo.app.privacy.ui.PrivacyDashboardViewModel.Command.LaunchMan
 import com.duckduckgo.app.privacy.ui.PrivacyDashboardViewModel.Command.LaunchReportBrokenSite
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.*
+import com.duckduckgo.di.scopes.AppObjectGraph
+import com.squareup.anvil.annotations.ContributesTo
+import dagger.Module
+import dagger.Provides
+import dagger.multibindings.IntoSet
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import javax.inject.Singleton
+
+@Module
+@ContributesTo(AppObjectGraph::class)
+class PrivacyDashboardViewModelFactoryModule {
+    @Provides
+    @Singleton
+    @IntoSet
+    fun providePrivacyDashboardViewModelFactory(
+        userWhitelistDao: UserWhitelistDao,
+        networkLeaderboardDao: NetworkLeaderboardDao,
+        pixel: Pixel
+    ): ViewModelFactoryPlugin {
+        return PrivacyDashboardViewModelFactory(userWhitelistDao, networkLeaderboardDao, pixel)
+    }
+}
+
+private class PrivacyDashboardViewModelFactory(
+    private val userWhitelistDao: UserWhitelistDao,
+    private val networkLeaderboardDao: NetworkLeaderboardDao,
+    private val pixel: Pixel
+) : ViewModelFactoryPlugin {
+    override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
+        with(modelClass) {
+            return when {
+                isAssignableFrom(PrivacyDashboardViewModel::class.java) -> PrivacyDashboardViewModel(userWhitelistDao, networkLeaderboardDao, pixel) as T
+                else -> null
+            }
+        }
+    }
+}
 
 class PrivacyDashboardViewModel(
     private val userWhitelistDao: UserWhitelistDao,

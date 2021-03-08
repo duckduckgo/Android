@@ -18,9 +18,44 @@ package com.duckduckgo.app.globalprivacycontrol.ui
 
 import androidx.lifecycle.*
 import com.duckduckgo.app.global.SingleLiveEvent
+import com.duckduckgo.app.global.plugins.view_model.ViewModelFactoryPlugin
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.*
+import com.duckduckgo.di.scopes.AppObjectGraph
+import com.squareup.anvil.annotations.ContributesTo
+import dagger.Module
+import dagger.Provides
+import dagger.multibindings.IntoSet
+import javax.inject.Singleton
+
+@Module
+@ContributesTo(AppObjectGraph::class)
+class GlobalPrivacyControlViewModelFactoryModule {
+    @Provides
+    @Singleton
+    @IntoSet
+    fun provideGlobalPrivacyControlViewModelFactory(
+        pixel: Pixel,
+        settingsDataStore: SettingsDataStore
+    ): ViewModelFactoryPlugin {
+        return GlobalPrivacyControlViewModelFactory(pixel, settingsDataStore)
+    }
+}
+
+private class GlobalPrivacyControlViewModelFactory(
+    private val pixel: Pixel,
+    private val settingsDataStore: SettingsDataStore
+) : ViewModelFactoryPlugin {
+    override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
+        with(modelClass) {
+            return when {
+                isAssignableFrom(GlobalPrivacyControlViewModel::class.java) -> (GlobalPrivacyControlViewModel(pixel, settingsDataStore) as T)
+                else -> null
+            }
+        }
+    }
+}
 
 class GlobalPrivacyControlViewModel(
     private val pixel: Pixel,

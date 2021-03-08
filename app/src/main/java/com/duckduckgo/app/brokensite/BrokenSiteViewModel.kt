@@ -27,7 +27,42 @@ import com.duckduckgo.app.brokensite.model.BrokenSiteCategory.*
 import com.duckduckgo.app.global.SingleLiveEvent
 import com.duckduckgo.app.global.absoluteString
 import com.duckduckgo.app.global.isMobileSite
+import com.duckduckgo.app.global.plugins.view_model.ViewModelFactoryPlugin
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.di.scopes.AppObjectGraph
+import com.squareup.anvil.annotations.ContributesTo
+import dagger.Module
+import dagger.Provides
+import dagger.multibindings.IntoSet
+import javax.inject.Singleton
+
+@Module
+@ContributesTo(AppObjectGraph::class)
+class BrokenSiteViewModelFactoryModule {
+    @Provides
+    @Singleton
+    @IntoSet
+    fun provideBrokenSiteViewModelFactory(
+        pixel: Pixel,
+        brokenSiteSender: BrokenSiteSender
+    ): ViewModelFactoryPlugin {
+        return BrokenSiteViewModelFactory(pixel, brokenSiteSender)
+    }
+}
+
+private class BrokenSiteViewModelFactory(
+    private val pixel: Pixel,
+    private val brokenSiteSender: BrokenSiteSender
+) : ViewModelFactoryPlugin {
+    override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
+        with(modelClass) {
+            return when {
+                isAssignableFrom(BrokenSiteViewModel::class.java) -> (BrokenSiteViewModel(pixel, brokenSiteSender) as T)
+                else -> null
+            }
+        }
+    }
+}
 
 class BrokenSiteViewModel(private val pixel: Pixel, private val brokenSiteSender: BrokenSiteSender) : ViewModel() {
 

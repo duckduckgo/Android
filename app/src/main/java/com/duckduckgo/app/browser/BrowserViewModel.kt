@@ -24,6 +24,7 @@ import androidx.lifecycle.ViewModel
 import com.duckduckgo.app.browser.BrowserViewModel.Command.DisplayMessage
 import com.duckduckgo.app.browser.BrowserViewModel.Command.Refresh
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
+import com.duckduckgo.app.browser.omnibar.QueryUrlConverter
 import com.duckduckgo.app.browser.rating.ui.AppEnjoymentDialogFragment
 import com.duckduckgo.app.browser.rating.ui.GiveFeedbackDialogFragment
 import com.duckduckgo.app.browser.rating.ui.RateAppDialogFragment
@@ -32,6 +33,7 @@ import com.duckduckgo.app.global.ApplicationClearDataState
 import com.duckduckgo.app.global.DefaultDispatcherProvider
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.SingleLiveEvent
+import com.duckduckgo.app.global.plugins.view_model.ViewModelFactoryPlugin
 import com.duckduckgo.app.global.rating.AppEnjoymentPromptEmitter
 import com.duckduckgo.app.global.rating.AppEnjoymentPromptOptions
 import com.duckduckgo.app.global.rating.AppEnjoymentUserEventRecorder
@@ -41,11 +43,57 @@ import com.duckduckgo.app.privacy.ui.PrivacyDashboardActivity.Companion.RELOAD_R
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
+import com.duckduckgo.di.scopes.AppObjectGraph
+import com.squareup.anvil.annotations.ContributesTo
+import dagger.Module
+import dagger.Provides
+import dagger.multibindings.IntoSet
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import javax.inject.Singleton
 import kotlin.coroutines.CoroutineContext
+
+@Module
+@ContributesTo(AppObjectGraph::class)
+class BrowserViewModelFactoryModule {
+    @Provides
+    @Singleton
+    @IntoSet
+    fun provideBrowserViewModelFactory(
+        tabRepository: TabRepository,
+        queryUrlConverter: QueryUrlConverter,
+        dataClearer: DataClearer,
+        appEnjoymentPromptEmitter: AppEnjoymentPromptEmitter,
+        appEnjoymentUserEventRecorder: AppEnjoymentUserEventRecorder,
+        dispatchers: DispatcherProvider = DefaultDispatcherProvider(),
+        pixel: Pixel,
+        useOurAppDetector: UseOurAppDetector
+    ): ViewModelFactoryPlugin {
+        return BrowserViewModelFactory(tabRepository, queryUrlConverter, dataClearer, appEnjoymentPromptEmitter, appEnjoymentUserEventRecorder, dispatchers, pixel, useOurAppDetector)
+    }
+}
+
+private class BrowserViewModelFactory(
+    val tabRepository: TabRepository,
+    val queryUrlConverter: OmnibarEntryConverter,
+    val dataClearer: DataClearer,
+    val appEnjoymentPromptEmitter: AppEnjoymentPromptEmitter,
+    val appEnjoymentUserEventRecorder: AppEnjoymentUserEventRecorder,
+    val dispatchers: DispatcherProvider = DefaultDispatcherProvider(),
+    val pixel: Pixel,
+    val useOurAppDetector: UseOurAppDetector
+) : ViewModelFactoryPlugin {
+    override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
+        with(modelClass) {
+            return when {
+                isAssignableFrom(BrowserViewModel::class.java) -> BrowserViewModel(tabRepository, queryUrlConverter, dataClearer, appEnjoymentPromptEmitter, appEnjoymentUserEventRecorder, dispatchers, pixel, useOurAppDetector) as T
+                else -> null
+            }
+        }
+    }
+}
 
 class BrowserViewModel(
     private val tabRepository: TabRepository,

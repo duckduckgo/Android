@@ -19,10 +19,48 @@ package com.duckduckgo.app.onboarding.ui
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.app.global.DispatcherProvider
+import com.duckduckgo.app.global.plugins.view_model.ViewModelFactoryPlugin
 import com.duckduckgo.app.onboarding.store.AppStage
 import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.onboarding.ui.page.OnboardingPageFragment
+import com.duckduckgo.di.scopes.AppObjectGraph
+import com.squareup.anvil.annotations.ContributesTo
+import dagger.Module
+import dagger.Provides
+import dagger.multibindings.IntoSet
 import kotlinx.coroutines.launch
+import javax.inject.Singleton
+
+@Module
+@ContributesTo(AppObjectGraph::class)
+class OnboardingViewModelFactoryModule {
+    @Provides
+    @Singleton
+    @IntoSet
+    fun provideOnboardingViewModelFactory(
+        userStageStore: UserStageStore,
+        pageLayoutManager: OnboardingPageManager,
+        dispatchers: DispatcherProvider
+    ): ViewModelFactoryPlugin {
+        return OnboardingViewModelFactory(userStageStore, pageLayoutManager, dispatchers)
+    }
+}
+
+private class OnboardingViewModelFactory(
+    private val userStageStore: UserStageStore,
+    private val pageLayoutManager: OnboardingPageManager,
+    private val dispatchers: DispatcherProvider
+) : ViewModelFactoryPlugin {
+    override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
+        with(modelClass) {
+            return when {
+                isAssignableFrom(OnboardingViewModel::class.java) -> (OnboardingViewModel(userStageStore, pageLayoutManager, dispatchers) as T)
+                else -> null
+            }
+        }
+    }
+
+}
 
 class OnboardingViewModel(
     private val userStageStore: UserStageStore,

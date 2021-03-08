@@ -25,12 +25,47 @@ import com.duckduckgo.app.feedback.ui.negative.FeedbackType
 import com.duckduckgo.app.feedback.ui.negative.FeedbackType.MainReason
 import com.duckduckgo.app.feedback.ui.negative.FeedbackType.SubReason
 import com.duckduckgo.app.global.SingleLiveEvent
+import com.duckduckgo.app.global.plugins.view_model.ViewModelFactoryPlugin
 import com.duckduckgo.app.playstore.PlayStoreUtils
+import com.duckduckgo.di.scopes.AppObjectGraph
+import com.squareup.anvil.annotations.ContributesTo
+import dagger.Module
+import dagger.Provides
+import dagger.multibindings.IntoSet
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
+import javax.inject.Singleton
+
+@Module
+@ContributesTo(AppObjectGraph::class)
+class FeedbackViewModelFactoryModule {
+    @Provides
+    @Singleton
+    @IntoSet
+    fun provideFeedbackViewModelFactory(
+        playStoreUtils: PlayStoreUtils,
+        feedbackSubmitter: FeedbackSubmitter
+    ): ViewModelFactoryPlugin {
+        return FeedbackViewModelFactory(playStoreUtils, feedbackSubmitter)
+    }
+}
+
+private class FeedbackViewModelFactory(
+    private val playStoreUtils: PlayStoreUtils,
+    private val feedbackSubmitter: FeedbackSubmitter
+) : ViewModelFactoryPlugin {
+    override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
+        with(modelClass) {
+            return when {
+                isAssignableFrom(FeedbackViewModel::class.java) -> (FeedbackViewModel(playStoreUtils, feedbackSubmitter) as T)
+                else -> null
+            }
+        }
+    }
+}
 
 class FeedbackViewModel(private val playStoreUtils: PlayStoreUtils, private val feedbackSubmitter: FeedbackSubmitter) : ViewModel() {
 
