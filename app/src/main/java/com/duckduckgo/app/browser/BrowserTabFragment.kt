@@ -244,7 +244,7 @@ class BrowserTabFragment :
 
     private var webView: DuckDuckGoWebView? = null
 
-    private val errorSnackbar = lazy {
+    private val errorSnackbar: Snackbar by lazy {
         Snackbar.make(browserLayout, R.string.crashedWebViewErrorMessage, Snackbar.LENGTH_INDEFINITE)
             .setBehavior(NonDismissibleBehavior())
     }
@@ -480,9 +480,7 @@ class BrowserTabFragment :
     }
 
     private fun showHome() {
-        if (errorSnackbar.isInitialized()) {
-            errorSnackbar.value.dismiss()
-        }
+        errorSnackbar.dismiss()
         newTabLayout.show()
         appBarLayout.setExpanded(true)
         webView?.onPause()
@@ -691,11 +689,9 @@ class BrowserTabFragment :
 
     private fun showErrorSnackbar(command: Command.ShowErrorWithAction) {
         // Snackbar is global and it should appear only the foreground fragment
-        with(errorSnackbar.value) {
-            if (!view.isAttachedToWindow && isVisible) {
-                setText(command.textResId)
-                setAction(R.string.crashedWebViewErrorAction) { command.action() }.show()
-            }
+        if (!errorSnackbar.view.isAttachedToWindow && isVisible) {
+            errorSnackbar.setText(command.textResId)
+            errorSnackbar.setAction(R.string.crashedWebViewErrorAction) { command.action() }.show()
         }
     }
 
@@ -1216,7 +1212,7 @@ class BrowserTabFragment :
         pulseAnimation.stop()
         animatorHelper.removeListener()
         supervisorJob.cancel()
-        // popupMenu.dismiss()
+        popupMenu.dismiss()
         loginDetectionDialog?.dismiss()
         destroyWebView()
         super.onDestroy()
@@ -1437,7 +1433,7 @@ class BrowserTabFragment :
 
         fun decorateWithFeatures() {
             decorateToolbarWithButtons()
-            setListenerPopupMenu()
+            createPopupMenu()
             configureShowTabSwitcherListener()
             configureLongClickOpensNewTabListener()
         }
@@ -1477,8 +1473,6 @@ class BrowserTabFragment :
         }
 
         private fun createPopupMenu() {
-            if (this@BrowserTabFragment::popupMenu.isInitialized) return
-
             popupMenu = BrowserPopupMenu(layoutInflater, variantManager.getVariant())
             val view = popupMenu.contentView
             popupMenu.apply {
@@ -1534,11 +1528,7 @@ class BrowserTabFragment :
                     viewModel.onPinPageToHomeSelected()
                 }
             }
-        }
-
-        private fun setListenerPopupMenu() {
             browserMenu.setOnClickListener {
-                createPopupMenu()
                 hideKeyboardImmediately()
                 launchTopAnchoredPopupMenu()
             }
@@ -1760,8 +1750,6 @@ class BrowserTabFragment :
         }
 
         private fun renderPopupMenus(browserShowing: Boolean, viewState: BrowserViewState) {
-            if (!this@BrowserTabFragment::popupMenu.isInitialized) return
-
             popupMenu.contentView.apply {
                 backPopupMenuItem.isEnabled = viewState.canGoBack
                 forwardPopupMenuItem.isEnabled = viewState.canGoForward
@@ -1814,7 +1802,7 @@ class BrowserTabFragment :
                 hideFindInPage()
             }
 
-            // popupMenu.contentView.findInPageMenuItem?.isEnabled = viewState.canFindInPage
+            popupMenu.contentView.findInPageMenuItem?.isEnabled = viewState.canFindInPage
         }
 
         fun renderCtaViewState(viewState: CtaViewState) {
