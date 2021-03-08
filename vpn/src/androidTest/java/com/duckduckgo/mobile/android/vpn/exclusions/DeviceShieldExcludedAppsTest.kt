@@ -65,7 +65,7 @@ class DeviceShieldExcludedAppsTest {
 
     @Test
     fun whenGetExclusionListThenReturnAllExcludedPackages() {
-        assertEquals(60, deviceShieldExcludedApps.getExclusionList().size)
+        assertEquals(68, deviceShieldExcludedApps.getExclusionList().size)
     }
 
     @Test

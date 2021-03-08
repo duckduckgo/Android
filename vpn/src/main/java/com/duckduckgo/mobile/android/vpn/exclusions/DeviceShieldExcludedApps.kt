@@ -172,6 +172,15 @@ private class DeviceShieldExcludedAppsImpl(private val context: Context, private
             "com.facebook.adsmanager",
             "com.facebook.analytics",
             "com.facebook.Origami",
+            // deferred breakages
+            "com.shopify.arrive",
+            "com.discord",
+            "com.lasoo.android.target",
+            "com.myklarnamobile",
+            "com.reddit.frontpage",
+            "com.mbam.poshtips",
+            "com.nasscript.fetch",
+            "com.gotv.nflgamecenter.us.lite"
         )
 
         private val FIRST_PARTY_TRACKERS_ONLY_APPS = listOf(
