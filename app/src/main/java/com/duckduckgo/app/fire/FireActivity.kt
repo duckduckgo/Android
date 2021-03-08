@@ -41,7 +41,7 @@ class FireActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val intent = intent.getParcelableExtra<Intent>(KEY_RESTART_INTENTS)
-        startActivity(intent)
+        startActivity(intent, fadeTransitionConfig())
         finish()
         killProcess()
     }
