@@ -176,7 +176,7 @@ class FireDialog(
                 fireAnimationView.addAnimatorUpdateListener(accelerateAnimatorUpdateListener)
             }
         } else {
-            clearPersonalDataAction.killAndRestartProcess()
+            clearPersonalDataAction.killAndRestartProcess(notifyDataCleared = false)
         }
     }
 

@@ -42,7 +42,7 @@ interface ClearDataAction {
     suspend fun clearTabsAndAllDataAsync(appInForeground: Boolean, shouldFireDataClearPixel: Boolean): Unit?
     fun setAppUsedSinceLastClearFlag(appUsedSinceLastClear: Boolean)
     fun killProcess()
-    fun killAndRestartProcess()
+    fun killAndRestartProcess(notifyDataCleared: Boolean)
 }
 
 class ClearPersonalDataAction @Inject constructor(
@@ -56,9 +56,9 @@ class ClearPersonalDataAction @Inject constructor(
     private val geoLocationPermissions: GeoLocationPermissions
 ) : ClearDataAction {
 
-    override fun killAndRestartProcess() {
+    override fun killAndRestartProcess(notifyDataCleared: Boolean) {
         Timber.i("Restarting process")
-        FireActivity.triggerRestart(context)
+        FireActivity.triggerRestart(context, notifyDataCleared)
     }
 
     override fun killProcess() {
