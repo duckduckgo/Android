@@ -72,7 +72,7 @@ class TimePassedTest {
     @Test
     fun whenOnlySecondsPassedThenShortFormatsProperTime() {
         val timePassed = TimePassed(0, 0, 45)
-        assertEquals("a minute ago", timePassed.shortFormat())
+        assertEquals("just now", timePassed.shortFormat())
     }
 
     @Test
