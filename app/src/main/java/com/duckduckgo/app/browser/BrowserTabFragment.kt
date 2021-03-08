@@ -1022,6 +1022,9 @@ class BrowserTabFragment :
     }
 
     private fun configureSwipeRefresh() {
+        val metrics = resources.displayMetrics
+        val distanceToTrigger = (DEFAULT_CIRCLE_TARGET_TIMES_1_5 * metrics.density).toInt()
+        swipeRefreshContainer.setDistanceToTriggerSync(distanceToTrigger)
         swipeRefreshContainer.setColorSchemeColors(ContextCompat.getColor(requireContext(), R.color.cornflowerBlue))
 
         swipeRefreshContainer.setOnRefreshListener {
@@ -1426,6 +1429,8 @@ class BrowserTabFragment :
         private const val MAX_PROGRESS = 100
         private const val TRACKERS_INI_DELAY = 500L
         private const val TRACKERS_SECONDARY_DELAY = 200L
+
+        private const val DEFAULT_CIRCLE_TARGET_TIMES_1_5 = 96
 
         fun newInstance(tabId: String, query: String? = null, skipHome: Boolean): BrowserTabFragment {
             val fragment = BrowserTabFragment()
@@ -1979,6 +1984,7 @@ class BrowserTabFragment :
             webViewFullScreenContainer.removeAllViews()
             webViewFullScreenContainer.gone()
             activity?.toggleFullScreen()
+            focusDummy.requestFocus()
         }
 
         private fun shouldUpdateOmnibarTextInput(viewState: OmnibarViewState, omnibarInput: String?) =

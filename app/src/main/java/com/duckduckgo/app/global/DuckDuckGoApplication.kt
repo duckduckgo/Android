@@ -30,7 +30,6 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.OnLifecycleEvent
 import androidx.lifecycle.ProcessLifecycleOwner
-import androidx.work.WorkerFactory
 import com.duckduckgo.app.browser.BuildConfig
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserObserver
@@ -54,15 +53,10 @@ import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.referral.AppInstallationReferrerStateListener
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.AtbInitializer
-import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.api.OfflinePixelScheduler
-import com.duckduckgo.app.statistics.api.OfflinePixelSender
 import com.duckduckgo.app.statistics.api.PixelSender
-import com.duckduckgo.app.statistics.api.StatisticsUpdater
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.APP_LAUNCH
-import com.duckduckgo.app.statistics.store.OfflinePixelCountDataStore
-import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.app.surrogates.ResourceSurrogateLoader
 import com.duckduckgo.app.tabs.db.TabsDbSanitizer
 import com.duckduckgo.app.trackerdetection.TrackerDataLoader
@@ -100,12 +94,6 @@ open class DuckDuckGoApplication : HasAndroidInjector, Application(), LifecycleO
     lateinit var defaultBrowserObserver: DefaultBrowserObserver
 
     @Inject
-    lateinit var statisticsUpdater: StatisticsUpdater
-
-    @Inject
-    lateinit var statisticsDataStore: StatisticsDataStore
-
-    @Inject
     lateinit var appInstallStore: AppInstallStore
 
     @Inject
@@ -133,16 +121,10 @@ open class DuckDuckGoApplication : HasAndroidInjector, Application(), LifecycleO
     lateinit var offlinePixelScheduler: OfflinePixelScheduler
 
     @Inject
-    lateinit var offlinePixelCountDataStore: OfflinePixelCountDataStore
-
-    @Inject
     lateinit var dataClearer: DataClearer
 
     @Inject
     lateinit var workScheduler: WorkScheduler
-
-    @Inject
-    lateinit var workerFactory: WorkerFactory
 
     @Inject
     lateinit var appEnjoymentLifecycleObserver: AppEnjoymentLifecycleObserver
@@ -152,9 +134,6 @@ open class DuckDuckGoApplication : HasAndroidInjector, Application(), LifecycleO
 
     @Inject
     lateinit var appDataLoader: AppDataLoader
-
-    @Inject
-    lateinit var offlinePixelSender: OfflinePixelSender
 
     @Inject
     lateinit var pixelSender: PixelSender
@@ -170,9 +149,6 @@ open class DuckDuckGoApplication : HasAndroidInjector, Application(), LifecycleO
 
     @Inject
     lateinit var shortcutReceiver: ShortcutReceiver
-
-    @Inject
-    lateinit var variantManager: VariantManager
 
     @Inject
     lateinit var userStageStore: UserStageStore
@@ -396,7 +372,7 @@ open class DuckDuckGoApplication : HasAndroidInjector, Application(), LifecycleO
         notificationRegistrar.updateStatus()
         GlobalScope.launch {
             workScheduler.scheduleWork()
-            atbInitializer.initializeAfterReferrerAvailable()
+            atbInitializer.initialize()
         }
     }
 

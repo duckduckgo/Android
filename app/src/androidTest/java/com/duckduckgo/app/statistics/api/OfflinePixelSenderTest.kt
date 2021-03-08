@@ -52,7 +52,7 @@ class OfflinePixelSenderTest {
 
     @Before
     fun before() {
-        val exceptionEntity = UncaughtExceptionEntity(1, UncaughtExceptionSource.GLOBAL, "test", 1588167165000, "version")
+        val exceptionEntity = UncaughtExceptionEntity(1, UncaughtExceptionSource.GLOBAL, "test", "version", 1588167165000)
 
         runBlocking<Unit> {
             whenever(mockPixel.sendPixel(any(), any(), any())).thenReturn(Completable.complete())
