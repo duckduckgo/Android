@@ -89,7 +89,6 @@ import com.duckduckgo.app.browser.useragent.UserAgentProvider
 import com.duckduckgo.app.cta.ui.*
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
 import com.duckduckgo.app.fire.fireproofwebsite.data.website
-import com.duckduckgo.app.global.DuckDuckGoApplication
 import com.duckduckgo.app.global.ViewModelFactory
 import com.duckduckgo.app.global.model.orderedTrackingEntities
 import com.duckduckgo.app.global.view.*
@@ -274,10 +273,6 @@ class BrowserTabFragment :
 
     private val pulseAnimation: PulseAnimation = PulseAnimation(this)
 
-    var activityOnCreateMs: Long = 0
-    var activityOnCreatedMs: Long = 0
-    var activityOnResumeMs: Long = 0
-
     override fun onAttach(context: Context) {
         AndroidSupportInjection.inject(this)
         super.onAttach(context)
@@ -285,8 +280,6 @@ class BrowserTabFragment :
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        activityOnCreateMs = SystemClock.uptimeMillis()
-
         removeDaxDialogFromActivity()
         renderer = BrowserTabFragmentRenderer()
         decorator = BrowserTabFragmentDecorator()
@@ -328,7 +321,6 @@ class BrowserTabFragment :
                 }
             }
         })
-        activityOnCreatedMs = SystemClock.uptimeMillis()
     }
 
     private fun getDaxDialogFromActivity(): Fragment? = activity?.supportFragmentManager?.findFragmentByTag(DAX_DIALOG_DIALOG_TAG)
@@ -367,7 +359,7 @@ class BrowserTabFragment :
 
     override fun onResume() {
         super.onResume()
-        Timber.i("BrowserTabFragment onResume")
+
         appBarLayout.setExpanded(true)
         viewModel.onViewResumed()
 
@@ -377,10 +369,6 @@ class BrowserTabFragment :
         }
 
         addTextChangedListeners()
-
-        activityOnResumeMs = SystemClock.uptimeMillis()
-
-        //Debug.stopMethodTracing()
     }
 
     override fun onPause() {
@@ -1228,7 +1216,7 @@ class BrowserTabFragment :
         pulseAnimation.stop()
         animatorHelper.removeListener()
         supervisorJob.cancel()
-        //popupMenu.dismiss()
+        // popupMenu.dismiss()
         loginDetectionDialog?.dismiss()
         destroyWebView()
         super.onDestroy()
@@ -1478,11 +1466,6 @@ class BrowserTabFragment :
         private fun decorateToolbarWithButtons() {
             fireMenuButton?.show()
             fireMenuButton?.setOnClickListener {
-                val appMS = (activity!!.application as DuckDuckGoApplication).applicationOnCreateMs
-                val frameMS = (activity!!.application as DuckDuckGoApplication).firstFrameDoneMs
-                val drawMS = (activity!!.application as DuckDuckGoApplication).firstDrawMs
-                Timber.i("PROFILING: $appMS / $frameMS / $drawMS")
-                Timber.i("PROFILING: $activityOnCreateMs / $activityOnCreatedMs / $activityOnResumeMs")
                 browserActivity?.launchFire()
                 pixel.fire(
                     Pixel.PixelName.MENU_ACTION_FIRE_PRESSED.pixelName,
@@ -1494,7 +1477,7 @@ class BrowserTabFragment :
         }
 
         private fun createPopupMenu() {
-            if(this@BrowserTabFragment::popupMenu.isInitialized) return
+            if (this@BrowserTabFragment::popupMenu.isInitialized) return
 
             popupMenu = BrowserPopupMenu(layoutInflater, variantManager.getVariant())
             val view = popupMenu.contentView
@@ -1777,7 +1760,7 @@ class BrowserTabFragment :
         }
 
         private fun renderPopupMenus(browserShowing: Boolean, viewState: BrowserViewState) {
-            if(!this@BrowserTabFragment::popupMenu.isInitialized) return
+            if (!this@BrowserTabFragment::popupMenu.isInitialized) return
 
             popupMenu.contentView.apply {
                 backPopupMenuItem.isEnabled = viewState.canGoBack
@@ -1831,7 +1814,7 @@ class BrowserTabFragment :
                 hideFindInPage()
             }
 
-            //popupMenu.contentView.findInPageMenuItem?.isEnabled = viewState.canFindInPage
+            // popupMenu.contentView.findInPageMenuItem?.isEnabled = viewState.canFindInPage
         }
 
         fun renderCtaViewState(viewState: CtaViewState) {
@@ -1927,7 +1910,7 @@ class BrowserTabFragment :
         }
 
         private fun hideHomeTopCta() {
-            //ctaTopContainer.gone()
+            // ctaTopContainer.gone()
         }
 
         fun renderHomeCta() {
@@ -1943,6 +1926,7 @@ class BrowserTabFragment :
             ctaContainer.ctaOkButton.setOnClickListener {
                 viewModel.onUserClickCtaOkButton()
             }
+
             ctaContainer.ctaDismissButton.setOnClickListener {
                 viewModel.onUserDismissedCta()
             }

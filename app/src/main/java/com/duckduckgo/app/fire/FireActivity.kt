@@ -21,16 +21,11 @@ import android.app.ActivityManager
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.os.Handler
 import android.os.Process
 import androidx.appcompat.app.AppCompatActivity
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.view.fadeTransitionConfig
-import com.duckduckgo.app.launch.LaunchBridgeActivity2
-import org.jetbrains.anko.longToast
-import org.jetbrains.anko.toast
-import timber.log.Timber
 
 /**
  * Activity which is responsible for killing the main process and restarting it. This Activity will automatically finish itself after a brief time.
@@ -45,12 +40,7 @@ class FireActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        Timber.i("FireActivity")
-    }
-
-    override fun onPostCreate(savedInstanceState: Bundle?) {
-        super.onPostCreate(savedInstanceState)
-        intent = intent.getParcelableExtra(KEY_RESTART_INTENTS)
+        val intent = intent.getParcelableExtra<Intent>(KEY_RESTART_INTENTS)
         startActivity(intent)
         finish()
         killProcess()
@@ -81,6 +71,7 @@ class FireActivity : AppCompatActivity() {
 
         private fun getRestartIntent(context: Context): Intent {
             val intent = BrowserActivity.intent(context, launchedFromFireAction = true)
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
             return intent
         }
 

@@ -51,17 +51,6 @@
             android:name="android.webkit.WebView.EnableSafeBrowsing"
             android:value="false" />
 
-        <activity
-            android:name="com.duckduckgo.app.launch.LaunchBridgeActivity2"
-            android:icon="${appIcon}"
-            android:roundIcon="${appIconRound}"
-            android:label="@string/appName"
-            android:theme="@style/AppTheme.Transparent">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-            </intent-filter>
-        </activity>
-
         <!-- Renamed to allow for the introduction of custom icons without breaking existing shortcuts -->
         <activity
             android:name="com.duckduckgo.app.launch.LaunchBridgeActivity"
