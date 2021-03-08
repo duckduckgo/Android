@@ -226,12 +226,15 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
             FIVE_HOURS,
             alarmIntent
         )
+
     }
 
     private fun establishVpnInterface() {
         tunInterface = Builder().run {
             addAddress("10.0.0.2", 32)
-            addRoute("0.0.0.0", 0)
+
+            VpnRoutes.includedRoutes.forEach { addRoute(it.address, it.maskWidth) }
+
             setBlocking(true)
             // Cap the max MTU value to avoid backpressure issues in the socket
             // This is effectively capping the max segment size too
