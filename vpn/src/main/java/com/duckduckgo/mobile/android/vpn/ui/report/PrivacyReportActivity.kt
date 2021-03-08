@@ -271,7 +271,7 @@ class PrivacyReportActivity : AppCompatActivity(R.layout.activity_vpn_privacy_re
             .setTimeToLive(2000L)
             .addShapes(Shape.Rectangle(1f))
             .addSizes(Size(8))
-            .setPosition(-50f, viewKonfetti.width + 50f, -50f, -50f)
+            .setPosition(viewKonfetti.width / 2f, viewKonfetti.width / 2f, -50f, -50f)
             .streamFor(50, 4000L)
     }
 

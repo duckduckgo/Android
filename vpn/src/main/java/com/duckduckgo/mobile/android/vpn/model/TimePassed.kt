@@ -24,6 +24,11 @@ fun dateOfPreviousMidnight(): String {
     return DatabaseDateFormatter.timestamp(midnight)
 }
 
+fun dateOfLastDay(): String {
+    val day = LocalDateTime.now().minusHours(24)
+    return DatabaseDateFormatter.timestamp(day)
+}
+
 fun dateOfLastHour(): String {
     val midnight = LocalDateTime.now().minusHours(1)
     return DatabaseDateFormatter.timestamp(midnight)

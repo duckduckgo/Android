@@ -16,15 +16,15 @@
 
 package com.duckduckgo.mobile.android.vpn.service
 
-import android.app.PendingIntent
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
+import android.os.Build
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.edit
-import com.duckduckgo.mobile.android.vpn.BuildConfig
-import com.duckduckgo.mobile.android.vpn.ui.notification.VpnNotificationBuilder
+import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService.Companion.ACTION_VPN_REMINDER_RESTART
+import com.duckduckgo.mobile.android.vpn.ui.notification.DeviceShieldAlertNotificationBuilder
 import dummy.ui.VpnPreferences
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.GlobalScope
@@ -47,13 +47,26 @@ class VpnReminderReceiver : BroadcastReceiver() {
                 } else {
                     Timber.v("Vpn is not running, showing reminder notification")
                     val notification = if (wasReminderNotificationShown(context)){
-                        VpnNotificationBuilder.buildReminderNotification(context)
+                        DeviceShieldAlertNotificationBuilder.buildReminderNotification(context, true)
                     } else {
                         notificationWasShown(context)
-                        VpnNotificationBuilder.buildReminderNotification(context, false)
+                        DeviceShieldAlertNotificationBuilder.buildReminderNotification(context, false)
                     }
 
                     manager.notify(TrackerBlockingVpnService.VPN_REMINDER_NOTIFICATION_ID, notification)
+                }
+            }
+        }
+
+        if (intent.action == ACTION_VPN_REMINDER_RESTART){
+            Timber.v("Vpn will restart because the user asked it")
+            goAsync {
+                TrackerBlockingVpnService.startIntent(context).also {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                        context.startForegroundService(it)
+                    } else {
+                        context.startService(it)
+                    }
                 }
             }
         }

@@ -41,7 +41,7 @@ import com.duckduckgo.mobile.android.vpn.processor.udp.UdpPacketProcessor
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
 import com.duckduckgo.mobile.android.vpn.store.PacketPersister
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
-import com.duckduckgo.mobile.android.vpn.ui.notification.VpnNotificationBuilder.Companion.buildDeviceShieldEnabled
+import com.duckduckgo.mobile.android.vpn.ui.notification.DeviceShieldEnabledNotificationBuilder
 import dagger.android.AndroidInjection
 import dummy.ui.VpnPreferences
 import kotlinx.coroutines.*
@@ -194,10 +194,12 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
     }
 
     private fun updateNotificationForNewTrackerFound(trackersBlocked: List<VpnTrackerAndCompany>) {
-        val trackerCompaniesTotal = trackersBlocked.groupBy { it.trackerCompany.trackerCompanyId }.size
-        val trackerCompanies = trackersBlocked.distinctBy { it.trackerCompany.trackerCompanyId }
-        val notification = buildDeviceShieldEnabled(this, trackersBlocked, trackerCompaniesTotal, trackerCompanies)
-        notificationManager.notify(VPN_FOREGROUND_SERVICE_ID, notification)
+        if (trackersBlocked.isNotEmpty()){
+            val trackerCompaniesTotal = trackersBlocked.groupBy { it.trackerCompany.trackerCompanyId }.size
+            val trackerCompanies = trackersBlocked.distinctBy { it.trackerCompany.trackerCompanyId }
+            val notification = DeviceShieldEnabledNotificationBuilder.buildTrackersBlockedNotification(this, trackersBlocked, trackerCompaniesTotal, trackerCompanies)
+            notificationManager.notify(VPN_FOREGROUND_SERVICE_ID, notification)
+        }
     }
 
     private fun hideReminderNotification() {
@@ -341,7 +343,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
             }
         }
 
-        startForeground(VPN_FOREGROUND_SERVICE_ID, buildDeviceShieldEnabled(applicationContext, emptyList(), 0, emptyList()))
+        startForeground(VPN_FOREGROUND_SERVICE_ID, DeviceShieldEnabledNotificationBuilder.buildDeviceShieldEnabledNotification(applicationContext))
 
         newTrackerObserverJob = launch {
             repository.getVpnTrackers({ dateOfLastHour() }).collectLatest {
@@ -372,6 +374,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
     companion object {
 
         const val ACTION_VPN_REMINDER = "com.duckduckgo.vpn.internaltesters.reminder"
+        const val ACTION_VPN_REMINDER_RESTART = "com.duckduckgo.vpn.internaltesters.reminder.restart"
 
         const val VPN_REMINDER_NOTIFICATION_ID = 999
         const val VPN_FOREGROUND_SERVICE_ID = 200

@@ -23,26 +23,60 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.os.Build
+import android.view.View
 import android.widget.RemoteViews
 import androidx.core.app.NotificationCompat
 import androidx.core.app.TaskStackBuilder
+import androidx.core.content.ContextCompat
 import com.duckduckgo.mobile.android.vpn.R
 import com.duckduckgo.mobile.android.vpn.model.VpnTrackerAndCompany
 import com.duckduckgo.mobile.android.vpn.ui.report.PrivacyReportActivity
 
-class VpnNotificationBuilder {
+class DeviceShieldEnabledNotificationBuilder {
 
     companion object {
 
         private const val VPN_FOREGROUND_SERVICE_NOTIFICATION_CHANNEL_ID = "TrackerProtectionVPN"
-        private const val VPN_ALERTS_CHANNEL_ID = "DeviceShieldAlertChannel"
 
-        fun buildDeviceShieldEnabled(
+        private fun registerOngoingNotificationChannel(context: Context) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                val channel =
+                    NotificationChannel(VPN_FOREGROUND_SERVICE_NOTIFICATION_CHANNEL_ID, "Tracker Protection Running", NotificationManager.IMPORTANCE_MIN)
+                val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+                notificationManager.createNotificationChannel(channel)
+            }
+        }
+
+        fun buildDeviceShieldEnabledNotification(context: Context): Notification {
+
+            registerOngoingNotificationChannel(context)
+
+            val privacyReportIntent = Intent(context, PrivacyReportActivity::class.java)
+            val vpnShowDashboardPendingIntent: PendingIntent? = TaskStackBuilder.create(context).run {
+                addNextIntentWithParentStack(privacyReportIntent)
+                getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT)
+            }
+
+            val notificationLayout = RemoteViews(context.packageName, R.layout.notification_device_shield_enabled)
+            notificationLayout.setTextViewText(R.id.deviceShieldNotificationHeader, context.getString(R.string.deviceShieldOnInitialNotification))
+
+            return NotificationCompat.Builder(context, VPN_FOREGROUND_SERVICE_NOTIFICATION_CHANNEL_ID)
+                .setSmallIcon(R.drawable.ic_device_shield_notification_logo)
+                .setStyle(NotificationCompat.DecoratedCustomViewStyle())
+                .setContentIntent(vpnShowDashboardPendingIntent)
+                .setCustomContentView(notificationLayout)
+                .setOngoing(true)
+                .setChannelId(VPN_FOREGROUND_SERVICE_NOTIFICATION_CHANNEL_ID)
+                .build()
+        }
+
+        fun buildTrackersBlockedNotification(
             context: Context,
             trackersBlocked: List<VpnTrackerAndCompany>,
             trackerCompaniesTotal: Int,
             trackerCompanies: List<VpnTrackerAndCompany>
         ): Notification {
+
             registerOngoingNotificationChannel(context)
 
             val privacyReportIntent = Intent(context, PrivacyReportActivity::class.java)
@@ -54,7 +88,7 @@ class VpnNotificationBuilder {
             val notificationHeader = generateNotificationHeader(trackersBlocked, context)
             val notificationMessage = generateNotificationMessage(trackersBlocked, trackerCompaniesTotal, trackerCompanies, context)
 
-            val notificationLayout = RemoteViews(context.packageName, R.layout.notification_device_shield_enabled)
+            val notificationLayout = RemoteViews(context.packageName, R.layout.notification_device_shield_trackers)
             notificationLayout.setTextViewText(R.id.deviceShieldNotificationHeader, notificationHeader)
             notificationLayout.setTextViewText(R.id.deviceShieldNotificationMessage, notificationMessage)
 
@@ -72,10 +106,9 @@ class VpnNotificationBuilder {
             trackersBlocked: List<VpnTrackerAndCompany>,
             context: Context
         ): String {
-            return if (trackersBlocked.isEmpty()) {
-                context.getString(R.string.deviceShieldNotificationInitialStateHeader)
-            } else {
-                context.resources.getQuantityString(R.plurals.deviceShieldNotificationTrackers, trackersBlocked.size, trackersBlocked.size)
+            return when {
+                trackersBlocked.isEmpty() -> context.getString(R.string.deviceShieldOnNoTrackersNotificationHeader)
+                else -> context.resources.getQuantityString(R.plurals.deviceShieldOnNotificationTrackers, trackersBlocked.size, trackersBlocked.size)
             }
         }
 
@@ -86,7 +119,7 @@ class VpnNotificationBuilder {
             context: Context
         ): String {
             return if (trackersBlocked.isEmpty()) {
-                context.getString(R.string.deviceShieldNotificationInitialStateMessage)
+                context.getString(R.string.deviceShieldOnNoTrackersNotificationMessage)
             } else {
                 when (trackerCompaniesTotal) {
                     1 -> context.getString(R.string.deviceShieldNotificationOneCompanyBlocked, trackerCompanies.first().trackerCompany.company)
@@ -110,45 +143,5 @@ class VpnNotificationBuilder {
                 }
             }
         }
-
-        private fun registerOngoingNotificationChannel(context: Context) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                val channel = NotificationChannel(VPN_FOREGROUND_SERVICE_NOTIFICATION_CHANNEL_ID, "Tracker Protection Running", NotificationManager.IMPORTANCE_MIN)
-                val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-                notificationManager.createNotificationChannel(channel)
-            }
-        }
-
-        private fun registerReminderChannel(context: Context) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                val channel = NotificationChannel(VPN_ALERTS_CHANNEL_ID, "Device Shield Alerts", NotificationManager.IMPORTANCE_DEFAULT)
-                val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-                notificationManager.createNotificationChannel(channel)
-            }
-        }
-
-        fun buildReminderNotification(context: Context, setSilent: Boolean = true): Notification {
-            registerReminderChannel(context)
-
-            val vpnControllerIntent = Intent(context, PrivacyReportActivity::class.java)
-            val vpnControllerPendingIntent: PendingIntent? = TaskStackBuilder.create(context).run {
-                addNextIntentWithParentStack(vpnControllerIntent)
-                getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT)
-            }
-
-            val notificationLayout = RemoteViews(context.packageName, R.layout.notification_device_shield_disabled)
-
-            return NotificationCompat.Builder(context, VPN_ALERTS_CHANNEL_ID)
-                .setSmallIcon(R.drawable.ic_device_shield_notification_logo)
-                .setStyle(NotificationCompat.DecoratedCustomViewStyle())
-                .setContentIntent(vpnControllerPendingIntent)
-                .setSilent(setSilent)
-                .setCustomContentView(notificationLayout)
-                .setOngoing(true)
-                .setChannelId(VPN_ALERTS_CHANNEL_ID)
-                .build()
-        }
-
     }
-
 }

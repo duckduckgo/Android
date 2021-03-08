@@ -47,6 +47,11 @@ class AppTrackerBlockingStatsRepository @Inject constructor(vpnDatabase: VpnData
             .map { it.filter { tracker -> tracker.tracker.timestamp >= startTime() } }
     }
 
+    @WorkerThread
+    fun getVpnTrackersSync(startTime: () -> String, endTime: String = noEndDate()): List<VpnTrackerAndCompany> {
+        return trackerDao.getTrackersBetweenSync(startTime(), endTime).filter { tracker -> tracker.tracker.timestamp >= startTime() }
+    }
+
     fun getRunningTimeMillis(startTime: () -> String, endTime: String = noEndDate()): Flow<Long> {
         return runningTimeDao.getRunningStatsBetween(startTime(), endTime)
             .distinctUntilChanged()

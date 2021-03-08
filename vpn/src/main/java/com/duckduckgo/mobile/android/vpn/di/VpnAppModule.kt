@@ -17,6 +17,7 @@
 package com.duckduckgo.mobile.android.vpn.di
 
 import android.content.Context
+import android.content.res.Resources
 import android.net.ConnectivityManager
 import com.duckduckgo.di.scopes.AppObjectGraph
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
@@ -51,4 +52,10 @@ class VpnAppModule {
     fun provideTrackerListProvider(
         vpnDatabase: VpnDatabase
     ): TrackerListProvider = TrackerListProvider(vpnDatabase.vpnPreferencesDao())
+
+    @Provides
+    @Singleton
+    fun providesResources(context: Context): Resources {
+        return context.resources
+    }
 }
