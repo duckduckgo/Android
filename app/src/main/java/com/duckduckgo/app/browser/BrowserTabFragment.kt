@@ -300,7 +300,6 @@ class BrowserTabFragment :
         configureOmnibarTextInput()
         configureFindInPage()
         configureAutoComplete()
-        configureKeyboardAwareLogoAnimation()
 
         decorator.decorateWithFeatures()
 
@@ -927,15 +926,6 @@ class BrowserTabFragment :
         )
 
         clearTextButton.setOnClickListener { omnibarTextInput.setText("") }
-    }
-
-    private fun configureKeyboardAwareLogoAnimation() {
-        newTabLayout.layoutTransition?.apply {
-            // we want layout transitions for when the size changes; we don't want them when items disappear (can cause glitch on call to action button)
-            enableTransitionType(CHANGING)
-            disableTransitionType(DISAPPEARING)
-            setDuration(LAYOUT_TRANSITION_MS)
-        }
     }
 
     private fun userSelectedAutocomplete(suggestion: AutoCompleteSuggestion) {
