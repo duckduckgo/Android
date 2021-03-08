@@ -47,7 +47,7 @@ class HttpsBloomFilterFactoryImpl @Inject constructor(
         val specification = dao.get()
         val dataPath = binaryDataStore.dataFilePath(HTTPS_BINARY_FILE)
         if (dataPath == null || specification == null || !httpsDataPersister.isPersisted(specification)) {
-            Timber.d("Embedded https update data failed to load")
+            Timber.d("Https update data not available")
             return null
         }
 

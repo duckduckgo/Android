@@ -22,11 +22,11 @@ import timber.log.Timber
 class FDroidHttpsEmbeddedDataPersister : HttpsEmbeddedDataPersister {
 
     override fun shouldPersistEmbeddedData(): Boolean {
-        Timber.d("Https update data not found, but F-Droid does not use the binary to load embedded data")
+        Timber.d("Ignoring, FDroid does not use embedded data due to binary data restrictions")
         return false
     }
 
     override fun persistEmbeddedData() {
-        Timber.d("Https update data not found, but F-Droid does not use the binary to load embedded data")
+        Timber.d("Ignoring, FDroid does not use embedded data due to binary data restrictions")
     }
 }
