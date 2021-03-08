@@ -28,14 +28,14 @@
     <ImageView
         android:id="@+id/ddgLogo"
         android:layout_width="0dp"
+        android:alpha="0"
         android:layout_height="wrap_content"
         android:contentDescription="@string/duckDuckGoLogoDescription"
         android:src="@drawable/logo_full"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHeight_max="180dp"
         app:layout_constraintStart_toStartOf="parent"
-        android:layout_marginTop="100dp"
-        android:alpha="0"
+        android:layout_marginTop="@dimen/homeTabDdgLogoTopMargin"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintWidth_max="180dp"
         android:visibility="gone"/>

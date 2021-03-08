@@ -17,4 +17,5 @@
 
 <resources>
     <dimen name="feedbackTitleMarginTop">20dp</dimen>
+    <dimen name="homeTabDdgLogoTopMargin">80dp</dimen>
 </resources>
