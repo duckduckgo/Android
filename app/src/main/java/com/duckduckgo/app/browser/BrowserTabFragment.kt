@@ -1808,7 +1808,6 @@ class BrowserTabFragment :
                 } else {
                     hideHomeCta()
                     hideDaxCta()
-                    hideHomeTopCta()
                 }
             }
         }
@@ -1818,7 +1817,6 @@ class BrowserTabFragment :
                 is HomePanelCta -> showHomeCta(configuration)
                 is DaxBubbleCta -> showDaxCta(configuration)
                 is DialogCta -> showDaxDialogCta(configuration)
-                is HomeTopPanelCta -> showHomeTopCta(configuration)
             }
 
             viewModel.onCtaShown()
@@ -1843,7 +1841,6 @@ class BrowserTabFragment :
         private fun showDaxCta(configuration: DaxBubbleCta) {
             homeBackgroundLogo.hideLogo()
             hideHomeCta()
-            hideHomeTopCta()
             configuration.showCta(daxCtaContainer)
             newTabLayout.setOnClickListener { daxCtaContainer.dialogTextCta.finishAnimation() }
         }
@@ -1852,24 +1849,8 @@ class BrowserTabFragment :
             newTabLayout.setOnClickListener(null)
         }
 
-        private fun showHomeTopCta(configuration: HomeTopPanelCta) {
-            hideDaxCta()
-            hideHomeCta()
-
-            /*logoHidingListener.callToActionView = ctaTopContainer
-
-            configuration.showCta(ctaTopContainer)
-            ctaTopContainer.setOnClickListener {
-                viewModel.onUserClickTopCta(configuration)
-            }
-            ctaTopContainer.closeButton.setOnClickListener {
-                viewModel.onUserDismissedCta()
-            }*/
-        }
-
         private fun showHomeCta(configuration: HomePanelCta) {
             hideDaxCta()
-            hideHomeTopCta()
             if (ctaContainer.isEmpty()) {
                 renderHomeCta()
             } else {
@@ -1885,10 +1866,6 @@ class BrowserTabFragment :
 
         private fun hideHomeCta() {
             ctaContainer.gone()
-        }
-
-        private fun hideHomeTopCta() {
-            // ctaTopContainer.gone()
         }
 
         fun renderHomeCta() {
