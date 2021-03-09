@@ -146,6 +146,7 @@ class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope() {
     }
 
     private fun configureEmptyClickListeners() {
+        // TabSwitcherButton needs to have a click listener or it will crash when user clicks on it.
         tabsMenuMockup.setOnClickListener {}
         tabsMenuMockup.setOnLongClickListener {
             return@setOnLongClickListener true
