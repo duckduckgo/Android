@@ -23,7 +23,6 @@ import androidx.annotation.UiThread
 import androidx.annotation.WorkerThread
 import com.duckduckgo.app.browser.WebDataManager
 import com.duckduckgo.app.fire.AppCacheClearer
-import com.duckduckgo.app.fire.DatabaseCleaner
 import com.duckduckgo.app.fire.DuckDuckGoCookieManager
 import com.duckduckgo.app.fire.FireActivity
 import com.duckduckgo.app.fire.UnsentForgetAllPixelStore
@@ -53,8 +52,7 @@ class ClearPersonalDataAction(
     private val settingsDataStore: SettingsDataStore,
     private val cookieManager: DuckDuckGoCookieManager,
     private val appCacheClearer: AppCacheClearer,
-    private val geoLocationPermissions: GeoLocationPermissions,
-    private val mainDatabaseCleaner: DatabaseCleaner
+    private val geoLocationPermissions: GeoLocationPermissions
 ) : ClearDataAction {
 
     override fun killAndRestartProcess() {
@@ -76,10 +74,6 @@ class ClearPersonalDataAction(
 
         withContext(Dispatchers.Main) {
             clearDataAsync(shouldFireDataClearPixel)
-        }
-
-        withContext(Dispatchers.IO) {
-            mainDatabaseCleaner.cleanDatabase()
         }
 
         Timber.i("Finished clearing everything")

@@ -17,7 +17,6 @@
 package com.duckduckgo.app.fire
 
 import android.database.sqlite.SQLiteDatabase
-import com.duckduckgo.app.global.db.AppDatabase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import timber.log.Timber
@@ -26,13 +25,10 @@ interface DatabaseCleaner {
     suspend fun cleanDatabase(): Boolean
 }
 
-class AppDatabaseCleaner(private val appDatabase: AppDatabase, private val databaseLocator: DatabaseLocator) : DatabaseCleaner {
+class AuthDatabaseCleaner(private val databaseLocator: DatabaseLocator) : DatabaseCleaner {
 
     override suspend fun cleanDatabase(): Boolean {
         return withContext(Dispatchers.IO) {
-            if (appDatabase.isOpen) {
-                appDatabase.close()
-            }
             val databasePath: String = databaseLocator.getDatabasePath()
             if (databasePath.isNotEmpty()) {
                 return@withContext cleanUpDatabase(databasePath)

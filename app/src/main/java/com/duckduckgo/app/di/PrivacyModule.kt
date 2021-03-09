@@ -39,7 +39,6 @@ import com.duckduckgo.app.trackerdetection.db.TdsDomainEntityDao
 import com.duckduckgo.app.trackerdetection.db.TdsEntityDao
 import dagger.Module
 import dagger.Provides
-import javax.inject.Named
 import javax.inject.Singleton
 
 @Module
@@ -64,8 +63,7 @@ class PrivacyModule {
         settingsDataStore: SettingsDataStore,
         cookieManager: DuckDuckGoCookieManager,
         appCacheClearer: AppCacheClearer,
-        geoLocationPermissions: GeoLocationPermissions,
-        @Named("mainDbCleaner") databaseCleaner: DatabaseCleaner
+        geoLocationPermissions: GeoLocationPermissions
     ): ClearDataAction {
         return ClearPersonalDataAction(
             context,
@@ -75,8 +73,7 @@ class PrivacyModule {
             settingsDataStore,
             cookieManager,
             appCacheClearer,
-            geoLocationPermissions,
-            databaseCleaner
+            geoLocationPermissions
         )
     }
 

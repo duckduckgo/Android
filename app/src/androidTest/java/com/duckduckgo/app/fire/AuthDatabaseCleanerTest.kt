@@ -17,20 +17,25 @@
 package com.duckduckgo.app.fire
 
 import androidx.test.platform.app.InstrumentationRegistry
+import kotlinx.coroutines.runBlocking
 import org.junit.Assert.*
+import org.junit.Before
 import org.junit.Test
 
-class MainDatabaseLocatorTest {
+class AuthDatabaseCleanerTest {
+
+    private val context = InstrumentationRegistry.getInstrumentation().targetContext
+    private val authDatabaseLocator = AuthDatabaseLocator(context)
+
+    private lateinit var testee: AuthDatabaseCleaner
+
+    @Before
+    fun before() {
+        testee = AuthDatabaseCleaner(authDatabaseLocator)
+    }
 
     @Test
-    fun whenGetDatabasePathOnDeviceThenPathNotEmpty() {
-        val context = InstrumentationRegistry.getInstrumentation().targetContext
-        val mainDatabaseLocator = MainDatabaseLocator(context)
-
-        val databasePath = mainDatabaseLocator.getDatabasePath()
-
-        // If this test fails, it means the Main Database path has changed its location
-        // If so, add a new database location to knownLocations list
-        assertTrue(databasePath.isNotEmpty())
+    fun whenCleanDatabaseAndDatabaseExistsThenReturnTrue() = runBlocking {
+        assertTrue(testee.cleanDatabase())
     }
 }

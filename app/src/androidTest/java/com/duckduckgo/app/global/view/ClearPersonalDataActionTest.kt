@@ -57,8 +57,7 @@ class ClearPersonalDataActionTest {
             mockSettingsDataStore,
             mockCookieManager,
             mockAppCacheClearer,
-            mockGeoLocationPermissions,
-            mockDatabaseCleaner
+            mockGeoLocationPermissions
         )
     }
 
@@ -102,11 +101,5 @@ class ClearPersonalDataActionTest {
     fun whenClearCalledThenGeoLocationPermissionsAreCleared() = runBlocking<Unit> {
         testee.clearTabsAndAllDataAsync(appInForeground = false, shouldFireDataClearPixel = false)
         verify(mockGeoLocationPermissions).clearAllButFireproofed()
-    }
-
-    @Test
-    fun whenClearCalledThenThenCleanDatabaseCalled() = runBlocking<Unit> {
-        testee.clearTabsAndAllDataAsync(appInForeground = false, shouldFireDataClearPixel = false)
-        verify(mockDatabaseCleaner).cleanDatabase()
     }
 }

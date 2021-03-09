@@ -21,7 +21,7 @@ import android.webkit.WebViewDatabase
 import androidx.room.Room
 import com.duckduckgo.app.browser.httpauth.RealWebViewHttpAuthStore
 import com.duckduckgo.app.browser.httpauth.WebViewHttpAuthStore
-import com.duckduckgo.app.fire.AppDatabaseCleaner
+import com.duckduckgo.app.fire.AuthDatabaseCleaner
 import com.duckduckgo.app.fire.AuthDatabaseLocator
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.di.scopes.AppObjectGraph
@@ -48,9 +48,8 @@ class StubDatabaseModule {
     @Provides
     @Singleton
     fun provideWebViewHttpAuthStore(
-        context: Context,
-        appDatabase: AppDatabase
+        context: Context
     ): WebViewHttpAuthStore {
-        return RealWebViewHttpAuthStore(WebViewDatabase.getInstance(context), AppDatabaseCleaner(appDatabase, AuthDatabaseLocator(context)))
+        return RealWebViewHttpAuthStore(WebViewDatabase.getInstance(context), AuthDatabaseCleaner(AuthDatabaseLocator(context)))
     }
 }

@@ -44,7 +44,6 @@ import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteDao
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepository
 import com.duckduckgo.app.global.AppUrl
 import com.duckduckgo.app.global.DispatcherProvider
-import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.global.device.DeviceInfo
 import com.duckduckgo.app.global.events.db.UserEventsStore
 import com.duckduckgo.app.global.exception.UncaughtExceptionRepository
@@ -208,20 +207,12 @@ class BrowserModule {
     fun webViewDatabaseLocator(context: Context): DatabaseLocator = WebViewDatabaseLocator(context)
 
     @Provides
-    @Named("mainDbLocator")
-    fun mainDatabaseLocator(context: Context): DatabaseLocator = MainDatabaseLocator(context)
-
-    @Provides
     @Named("authDbLocator")
     fun authDatabaseLocator(context: Context): DatabaseLocator = AuthDatabaseLocator(context)
 
     @Provides
-    @Named("mainDbCleaner")
-    fun mainDatabaseCleaner(appDatabase: AppDatabase, @Named("mainDbLocator") mainDatabaseLocator: DatabaseLocator): DatabaseCleaner = AppDatabaseCleaner(appDatabase, mainDatabaseLocator)
-
-    @Provides
     @Named("authDbCleaner")
-    fun authDatabaseCleaner(appDatabase: AppDatabase, @Named("authDbLocator") authDatabaseLocator: DatabaseLocator): DatabaseCleaner = AppDatabaseCleaner(appDatabase, authDatabaseLocator)
+    fun authDatabaseCleaner(@Named("authDbLocator") authDatabaseLocator: DatabaseLocator): DatabaseCleaner = AuthDatabaseCleaner(authDatabaseLocator)
 
     @Provides
     fun getCookieHostsToPreserve(fireproofWebsiteDao: FireproofWebsiteDao): GetCookieHostsToPreserve = GetCookieHostsToPreserve(fireproofWebsiteDao)
