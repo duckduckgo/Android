@@ -17,8 +17,6 @@
 package com.duckduckgo.app.browser
 
 import android.Manifest
-import android.animation.LayoutTransition.CHANGING
-import android.animation.LayoutTransition.DISAPPEARING
 import android.annotation.SuppressLint
 import android.app.Activity.RESULT_OK
 import android.app.ActivityOptions
