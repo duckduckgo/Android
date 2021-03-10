@@ -23,13 +23,10 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.os.Build
-import android.view.View
 import android.widget.RemoteViews
 import androidx.core.app.NotificationCompat
 import androidx.core.app.TaskStackBuilder
-import androidx.core.content.ContextCompat
 import com.duckduckgo.mobile.android.vpn.R
-import com.duckduckgo.mobile.android.vpn.model.VpnTrackerAndCompany
 import com.duckduckgo.mobile.android.vpn.ui.report.PrivacyReportActivity
 
 class DeviceShieldEnabledNotificationBuilder {
@@ -47,7 +44,7 @@ class DeviceShieldEnabledNotificationBuilder {
             }
         }
 
-        fun buildDeviceShieldEnabledNotification(context: Context): Notification {
+        fun buildDeviceShieldEnabledNotification(context: Context, deviceShieldNotification: DeviceShieldNotificationFactory.DeviceShieldNotification): Notification {
 
             registerOngoingNotificationChannel(context)
 
@@ -58,7 +55,7 @@ class DeviceShieldEnabledNotificationBuilder {
             }
 
             val notificationLayout = RemoteViews(context.packageName, R.layout.notification_device_shield_enabled)
-            notificationLayout.setTextViewText(R.id.deviceShieldNotificationHeader, context.getString(R.string.deviceShieldOnInitialNotification))
+            notificationLayout.setTextViewText(R.id.deviceShieldNotificationHeader, deviceShieldNotification.title)
 
             return NotificationCompat.Builder(context, VPN_FOREGROUND_SERVICE_NOTIFICATION_CHANNEL_ID)
                 .setSmallIcon(R.drawable.ic_device_shield_notification_logo)
@@ -72,9 +69,7 @@ class DeviceShieldEnabledNotificationBuilder {
 
         fun buildTrackersBlockedNotification(
             context: Context,
-            trackersBlocked: List<VpnTrackerAndCompany>,
-            trackerCompaniesTotal: Int,
-            trackerCompanies: List<VpnTrackerAndCompany>
+            deviceShieldNotification: DeviceShieldNotificationFactory.DeviceShieldNotification
         ): Notification {
 
             registerOngoingNotificationChannel(context)
@@ -85,12 +80,9 @@ class DeviceShieldEnabledNotificationBuilder {
                 getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT)
             }
 
-            val notificationHeader = generateNotificationHeader(trackersBlocked, context)
-            val notificationMessage = generateNotificationMessage(trackersBlocked, trackerCompaniesTotal, trackerCompanies, context)
-
             val notificationLayout = RemoteViews(context.packageName, R.layout.notification_device_shield_trackers)
-            notificationLayout.setTextViewText(R.id.deviceShieldNotificationHeader, notificationHeader)
-            notificationLayout.setTextViewText(R.id.deviceShieldNotificationMessage, notificationMessage)
+            notificationLayout.setTextViewText(R.id.deviceShieldNotificationHeader, deviceShieldNotification.title)
+            notificationLayout.setTextViewText(R.id.deviceShieldNotificationMessage, deviceShieldNotification.message)
 
             return NotificationCompat.Builder(context, VPN_FOREGROUND_SERVICE_NOTIFICATION_CHANNEL_ID)
                 .setSmallIcon(R.drawable.ic_device_shield_notification_logo)
@@ -102,46 +94,5 @@ class DeviceShieldEnabledNotificationBuilder {
                 .build()
         }
 
-        private fun generateNotificationHeader(
-            trackersBlocked: List<VpnTrackerAndCompany>,
-            context: Context
-        ): String {
-            return when {
-                trackersBlocked.isEmpty() -> context.getString(R.string.deviceShieldOnNoTrackersNotificationHeader)
-                else -> context.resources.getQuantityString(R.plurals.deviceShieldOnNotificationTrackers, trackersBlocked.size, trackersBlocked.size)
-            }
-        }
-
-        private fun generateNotificationMessage(
-            trackersBlocked: List<VpnTrackerAndCompany>,
-            trackerCompaniesTotal: Int,
-            trackerCompanies: List<VpnTrackerAndCompany>,
-            context: Context
-        ): String {
-            return if (trackersBlocked.isEmpty()) {
-                context.getString(R.string.deviceShieldOnNoTrackersNotificationMessage)
-            } else {
-                when (trackerCompaniesTotal) {
-                    1 -> context.getString(R.string.deviceShieldNotificationOneCompanyBlocked, trackerCompanies.first().trackerCompany.company)
-                    2 -> context.getString(
-                        R.string.deviceShieldNotificationTwoCompaniesBlocked,
-                        trackerCompanies.first().trackerCompany.company,
-                        trackerCompanies[1].trackerCompany.company
-                    )
-                    3 -> context.getString(
-                        R.string.deviceShieldNotificationThreeCompaniesBlocked,
-                        trackerCompanies.first().trackerCompany.company,
-                        trackerCompanies[1].trackerCompany.company,
-                        trackerCompanies[2].trackerCompany.company
-                    )
-                    else -> context.getString(
-                        R.string.deviceShieldNotificationFourCompaniesBlocked,
-                        trackerCompanies.first().trackerCompany.company,
-                        trackerCompanies[1].trackerCompany.company,
-                        trackerCompaniesTotal - 2
-                    )
-                }
-            }
-        }
     }
 }

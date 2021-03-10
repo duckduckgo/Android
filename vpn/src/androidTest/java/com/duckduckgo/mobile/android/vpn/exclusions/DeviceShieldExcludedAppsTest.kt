@@ -46,7 +46,8 @@ class DeviceShieldExcludedAppsTest {
         whenever(packageManager.getApplicationLabel(applicationInfo)).thenReturn("foo app")
 
         deviceShieldExcludedApps = DeviceShieldExcludedAppsModule().provideDeviceShieldExcludedApps(
-            InstrumentationRegistry.getInstrumentation().targetContext, packageManager)
+            InstrumentationRegistry.getInstrumentation().targetContext, packageManager
+        )
     }
 
     @Test

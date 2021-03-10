@@ -33,12 +33,13 @@
     <!-- Device Shield Ongoing Notification -->
     <string name="deviceShieldOnInitialNotification">"Device Shield is enabled and blocking trackers across your whole device"</string>
     <string name="deviceShieldOnNoTrackersNotificationHeader">"Scanning for trackers… beep… boop"</string>
-    <string name="deviceShieldOnNoTrackersNotificationMessage">"No trackers blocked (past hour)"</string>
+    <string name="deviceShieldOnNoTrackersNotificationMessage">"No trackers blocked"</string>
     <plurals name="deviceShieldOnNotificationTrackers">
-        <item quantity="one">%d tracker blocked (last hour)</item>
-        <item quantity="other">%d trackers blocked (last hour)</item>
+        <item quantity="one">%d tracker blocked</item>
+        <item quantity="other">%d trackers blocked</item>
     </plurals>
-    <string name="deviceShieldNotificationFourCompaniesBlocked">"%s, %s and d% more companies"</string>
+    <string name="deviceShieldOnNoTrackersNotificationMessageTimeSuffix">" (past hour)"</string>
+    <string name="deviceShieldNotificationFourCompaniesBlocked">"%s, %s and %d more companies"</string>
     <string name="deviceShieldNotificationThreeCompaniesBlocked">"%s, %s and %s"</string>
     <string name="deviceShieldNotificationTwoCompaniesBlocked">"%s and %s"</string>
     <string name="deviceShieldNotificationOneCompanyBlocked">"from %s"</string>
@@ -46,7 +47,7 @@
     <string name="deviceShieldDisabledNotificationAction">"Enable Device Shield"</string>
 
     <!-- Device Shield Daily Notification -->
-    <string name="deviceShieldDailyTrackersNotification">"Device Shield has blocked %s so far. Tap to view your full Privacy Report"</string>
+    <string name="deviceShieldDailyTrackersNotification">"Device Shield has blocked %s so far. Tap to view your full Privacy Report."</string>
     <plurals name="deviceShieldTrackers">
         <item quantity="one">%d tracker</item>
         <item quantity="other">%d trackers</item>
@@ -81,7 +82,7 @@
 
     <!-- Device Shield Privacy Report -->
     <string name="deviceShieldDisabledTooltip">We\'ll block companies from tracking you in other apps</string>
-    <string name="deviceShieldEnabledTooltip">We\'re blocking companies from tracking you in other apps</string>
+    <string name="deviceShieldEnabledTooltip">We\'ll block companies from tracking you as you browse</string>
     <string name="privacyReportPrivacylink">How do trackers profile you?</string>
     <string name="privacyReportToolbarTitle">Privacy Report</string>
     <string name="privacyReportEnabledTooltip">Device Shield is enabled and blocking trackers across your whole device</string>

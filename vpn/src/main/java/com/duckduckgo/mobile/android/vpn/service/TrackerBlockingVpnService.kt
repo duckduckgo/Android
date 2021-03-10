@@ -42,6 +42,7 @@ import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
 import com.duckduckgo.mobile.android.vpn.store.PacketPersister
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
 import com.duckduckgo.mobile.android.vpn.ui.notification.DeviceShieldEnabledNotificationBuilder
+import com.duckduckgo.mobile.android.vpn.ui.notification.DeviceShieldNotificationFactory
 import dagger.android.AndroidInjection
 import dummy.ui.VpnPreferences
 import kotlinx.coroutines.*
@@ -85,6 +86,9 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
 
     @Inject
     lateinit var vpnServiceHeartbeat: VpnServiceHeartbeat
+
+    @Inject
+    lateinit var deviceShieldNotificationFactory: DeviceShieldNotificationFactory
 
     private val queues = VpnQueues()
 
@@ -194,10 +198,9 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
     }
 
     private fun updateNotificationForNewTrackerFound(trackersBlocked: List<VpnTrackerAndCompany>) {
-        if (trackersBlocked.isNotEmpty()){
-            val trackerCompaniesTotal = trackersBlocked.groupBy { it.trackerCompany.trackerCompanyId }.size
-            val trackerCompanies = trackersBlocked.distinctBy { it.trackerCompany.trackerCompanyId }
-            val notification = DeviceShieldEnabledNotificationBuilder.buildTrackersBlockedNotification(this, trackersBlocked, trackerCompaniesTotal, trackerCompanies)
+        if (trackersBlocked.isNotEmpty()) {
+            val deviceShieldNotification = deviceShieldNotificationFactory.createTrackersCountDeviceShieldNotification(trackersBlocked)
+            val notification = DeviceShieldEnabledNotificationBuilder.buildTrackersBlockedNotification(this, deviceShieldNotification)
             notificationManager.notify(VPN_FOREGROUND_SERVICE_ID, notification)
         }
     }
@@ -343,7 +346,8 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
             }
         }
 
-        startForeground(VPN_FOREGROUND_SERVICE_ID, DeviceShieldEnabledNotificationBuilder.buildDeviceShieldEnabledNotification(applicationContext))
+        val deviceShieldNotification = deviceShieldNotificationFactory.createEnabledDeviceShieldNotification()
+        startForeground(VPN_FOREGROUND_SERVICE_ID, DeviceShieldEnabledNotificationBuilder.buildDeviceShieldEnabledNotification(applicationContext, deviceShieldNotification))
 
         newTrackerObserverJob = launch {
             repository.getVpnTrackers({ dateOfLastHour() }).collectLatest {

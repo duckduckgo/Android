@@ -23,13 +23,9 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.os.Build
-import android.text.Html
-import android.view.View
 import android.widget.RemoteViews
 import androidx.core.app.NotificationCompat
 import androidx.core.app.TaskStackBuilder
-import androidx.core.content.ContextCompat
-import androidx.core.text.HtmlCompat
 import com.duckduckgo.mobile.android.vpn.R
 import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
 import com.duckduckgo.mobile.android.vpn.service.VpnReminderReceiver
@@ -87,11 +83,11 @@ class DeviceShieldAlertNotificationBuilder {
 
         fun buildDeviceShieldNotification(
             context: Context,
-            deviceShieldNotification: DeviceShieldNotificationRepository.DeviceShieldNotification
+            deviceShieldNotification: DeviceShieldNotificationFactory.DeviceShieldNotification
         ): Notification {
 
             val notificationLayout = RemoteViews(context.packageName, R.layout.notification_device_shield_report)
-            notificationLayout.setTextViewText(R.id.deviceShieldNotificationText, deviceShieldNotification.text)
+            notificationLayout.setTextViewText(R.id.deviceShieldNotificationText, deviceShieldNotification.title)
 
             return buildNotification(context, notificationLayout, false)
         }

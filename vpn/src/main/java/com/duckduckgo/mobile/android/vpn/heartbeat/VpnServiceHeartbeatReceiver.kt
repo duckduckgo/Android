@@ -29,7 +29,7 @@ import java.util.*
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
-class VpnServiceHeartbeatReceiver: BroadcastReceiver(), VpnServiceHeartbeatProcessor.Listener {
+class VpnServiceHeartbeatReceiver : BroadcastReceiver(), VpnServiceHeartbeatProcessor.Listener {
 
     @Inject lateinit var heartbeatProcessor: VpnServiceHeartbeatProcessor
 
@@ -85,13 +85,13 @@ class VpnServiceHeartbeatReceiver: BroadcastReceiver(), VpnServiceHeartbeatProce
         const val EXTRA_HEART_BEAT_TYPE_ALIVE = "ALIVE"
         const val EXTRA_HEART_BEAT_TYPE_STOPPED = "STOPPED"
 
-        private fun broadcastIntent(context: Context) : Intent {
+        private fun broadcastIntent(context: Context): Intent {
             return Intent(context, VpnServiceHeartbeatReceiver::class.java).apply {
                 action = ACTION_VPN_HEART_BEAT
             }
         }
 
-        fun aliveBroadcastIntent(context: Context, validityWindow: Long, unit: TimeUnit) : Intent {
+        fun aliveBroadcastIntent(context: Context, validityWindow: Long, unit: TimeUnit): Intent {
             require(validityWindow > 0) { "validityWindow < 0: $validityWindow" }
 
             return broadcastIntent(context).apply {
@@ -100,7 +100,7 @@ class VpnServiceHeartbeatReceiver: BroadcastReceiver(), VpnServiceHeartbeatProce
             }
         }
 
-        fun stoppedBroadcastIntent(context: Context) : Intent {
+        fun stoppedBroadcastIntent(context: Context): Intent {
             return broadcastIntent(context).apply {
                 putExtra(EXTRA_HEART_BEAT_TYPE, EXTRA_HEART_BEAT_TYPE_STOPPED)
             }

@@ -107,10 +107,11 @@ class VpnDiagnosticsActivity : AppCompatActivity(R.layout.activity_vpn_diagnosti
             val restarts = withContext(Dispatchers.IO) {
                 repository.getVpnRestartHistory()
                     .sortedByDescending { it.timestamp }
-                    .map { """
+                    .map {
+                        """
                         Restarted on ${it.formattedTimestamp}
                         App exit reason - ${it.reason}
-                    """.trimIndent()
+                        """.trimIndent()
                     }
             }
 

@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
   ~ Copyright (c) 2021 DuckDuckGo
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,45 +14,39 @@
   ~ limitations under the License.
   -->
 
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context="com.duckduckgo.app.device_shield.DeviceShieldExclusionListActivity"
-    >
+    tools:context="com.duckduckgo.app.device_shield.DeviceShieldExclusionListActivity">
 
     <include layout="@layout/include_toolbar" />
 
     <com.google.android.material.textview.MaterialTextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:fontFamily="sans-serif"
-        android:justificationMode="inter_word"
-        android:lineSpacingExtra="4sp"
         android:layout_marginTop="16dp"
+        android:fontFamily="sans-serif"
+        android:lineSpacingExtra="4sp"
         android:padding="16dp"
         android:text="@string/deviceShieldExcludedAppsFeature"
         android:textColor="?attr/settingsMinorTextColor"
         android:textSize="14sp"
-        android:textStyle="normal"
-        />
+        android:textStyle="normal" />
 
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1"
         android:layout_marginTop="8dp"
         android:layout_marginBottom="8dp"
-        >
+        android:layout_weight="1">
 
         <LinearLayout
             android:id="@+id/deviceShieldExclusionAppListContainer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            />
+            android:orientation="vertical" />
     </ScrollView>
 
 </LinearLayout>

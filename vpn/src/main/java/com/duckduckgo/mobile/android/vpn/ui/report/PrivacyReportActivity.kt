@@ -20,7 +20,6 @@ import android.app.Activity
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
-import android.net.Uri
 import android.net.VpnService
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -37,7 +36,6 @@ import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.isVisible
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import com.duckduckgo.mobile.android.vpn.BuildConfig
 import com.duckduckgo.mobile.android.vpn.R
 import com.duckduckgo.mobile.android.vpn.model.TimePassed
 import com.duckduckgo.mobile.android.vpn.onboarding.DeviceShieldOnboarding
@@ -91,9 +89,6 @@ class PrivacyReportActivity : AppCompatActivity(R.layout.activity_vpn_privacy_re
 
         bindViewReferences()
         observeViewModel()
-
-        val celebrate = intent.getBooleanExtra(CELEBRATION_EXTRA, false)
-        if (celebrate) launchKonfetti()
     }
 
     @Suppress("DEPRECATION")
@@ -103,6 +98,14 @@ class PrivacyReportActivity : AppCompatActivity(R.layout.activity_vpn_privacy_re
             REQUEST_DEVICE_SHIELD_ONBOARDING -> handleDeviceShieldOnboarding(resultCode)
             else -> super.onActivityResult(requestCode, resultCode, data)
         }
+    }
+
+    override fun onPostCreate(savedInstanceState: Bundle?) {
+        super.onPostCreate(savedInstanceState)
+
+        val celebrate = intent.getBooleanExtra(CELEBRATION_EXTRA, false)
+
+        if (celebrate) celebrate()
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -251,6 +254,10 @@ class PrivacyReportActivity : AppCompatActivity(R.layout.activity_vpn_privacy_re
         startService(TrackerBlockingVpnService.startIntent(this))
 
         renderVpnEnabledState(true)
+        celebrate()
+    }
+
+    private fun celebrate() {
         Snackbar.make(vpnRunningToggleButton, R.string.deviceShieldEnabledSnackbar, Snackbar.LENGTH_LONG).show()
         launchKonfetti()
     }
@@ -263,6 +270,8 @@ class PrivacyReportActivity : AppCompatActivity(R.layout.activity_vpn_privacy_re
         val green = ResourcesCompat.getColor(getResources(), R.color.green, null)
         val yellow = ResourcesCompat.getColor(getResources(), R.color.yellow, null)
 
+        val displayWidth = resources.displayMetrics.widthPixels
+
         viewKonfetti.build()
             .addColors(magenta, blue, purple, green, yellow)
             .setDirection(0.0, 359.0)
@@ -271,7 +280,7 @@ class PrivacyReportActivity : AppCompatActivity(R.layout.activity_vpn_privacy_re
             .setTimeToLive(2000L)
             .addShapes(Shape.Rectangle(1f))
             .addSizes(Size(8))
-            .setPosition(viewKonfetti.width / 2f, viewKonfetti.width / 2f, -50f, -50f)
+            .setPosition(displayWidth / 2f, displayWidth / 2f, -50f, -50f)
             .streamFor(50, 4000L)
     }
 
@@ -343,7 +352,6 @@ class PrivacyReportActivity : AppCompatActivity(R.layout.activity_vpn_privacy_re
 
     private fun renderVpnEnabledState(running: Boolean) {
         reportSummaryEnabledTooltip.isVisible = running
-        reportSummaryLink.isVisible = running
         deviceShieldDisabledCard.isVisible = !running
 
         if (!trackersLayout.isVisible) {

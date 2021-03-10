@@ -63,7 +63,7 @@
         android:id="@+id/fragment_device_shield_container"
         android:visibility="gone"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:name="com.duckduckgo.mobile.android.vpn.ui.report.DeviceShieldFragment"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

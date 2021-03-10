@@ -433,4 +433,36 @@
         <item name="android:selectable">false</item>
     </style>
 
+    <style name="DeviceShield"/>
+    <style name="DeviceShield.PrivacyReport"/>
+    <style name="DeviceShield.PrivacyReport.Title">
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:textColor">@color/almostBlackDark</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+    <style name="DeviceShield.PrivacyReport.Label">
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:textColor">@color/almostBlackDark</item>
+        <item name="android:textSize">14sp</item>
+    </style>
+    <style name="DeviceShield.PrivacyReport.Label.Tooltip">
+        <item name="android:background">@drawable/background_green_tooltip</item>
+    </style>
+    <style name="DeviceShield.PrivacyReport.Toggle">
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:textColor">@color/blue</item>
+        <item name="android:textSize">12sp</item>
+    </style>
+    <style name="DeviceShield.PrivacyReport.TrackerEntry">
+        <item name="android:textColor">@color/almostBlackDark</item>
+        <item name="android:textSize">14sp</item>
+    </style>
+    <style name="DeviceShield.PrivacyReport.TrackerEntry.Company">
+        <item name="android:textStyle">bold</item>
+    </style>
+    <style name="DeviceShield.PrivacyReport.TrackerEntry.Time">
+        <item name="android:textColor">@color/paleBrownishGray</item>
+    </style>
+
 </resources>

@@ -31,7 +31,6 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
-
 class VpnReminderReceiver : BroadcastReceiver() {
 
     override fun onReceive(context: Context, intent: Intent) {
@@ -46,7 +45,7 @@ class VpnReminderReceiver : BroadcastReceiver() {
                     Timber.v("Vpn is already running, nothing to show")
                 } else {
                     Timber.v("Vpn is not running, showing reminder notification")
-                    val notification = if (wasReminderNotificationShown(context)){
+                    val notification = if (wasReminderNotificationShown(context)) {
                         DeviceShieldAlertNotificationBuilder.buildReminderNotification(context, true)
                     } else {
                         notificationWasShown(context)
@@ -58,7 +57,7 @@ class VpnReminderReceiver : BroadcastReceiver() {
             }
         }
 
-        if (intent.action == ACTION_VPN_REMINDER_RESTART){
+        if (intent.action == ACTION_VPN_REMINDER_RESTART) {
             Timber.v("Vpn will restart because the user asked it")
             goAsync {
                 TrackerBlockingVpnService.startIntent(context).also {

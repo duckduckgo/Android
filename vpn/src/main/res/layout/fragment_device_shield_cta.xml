@@ -16,152 +16,167 @@
   ~ limitations under the License.
   -->
 
-<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:card_view="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:layout_gravity="top|center"
-    android:layout_margin="16dp"
-    android:background="@drawable/background_white_card"
-    card_view:cardElevation="4dp">
+    android:layout_height="match_parent">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <androidx.cardview.widget.CardView
+        android:background="@drawable/background_white_card"
+        android:layout_gravity="top|center"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        card_view:cardElevation="4dp">
 
         <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/deviceShieldCtaLayout"
-            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:background="?selectableItemBackground"
-            android:paddingBottom="16dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
+            android:layout_width="match_parent">
 
-            <ImageView
-                android:id="@+id/deviceShieldCtaImage"
-                android:layout_width="28dp"
-                android:layout_height="28dp"
-                android:layout_marginStart="16dp"
-                android:layout_marginTop="22dp"
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:background="?selectableItemBackground"
+                android:id="@+id/deviceShieldCtaLayout"
+                android:layout_height="wrap_content"
+                android:layout_width="0dp"
+                android:paddingBottom="16dp"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:srcCompat="@drawable/ic_device_shield_on" />
+                app:layout_constraintTop_toTopOf="parent">
 
-            <TextView
-                android:id="@+id/deviceShieldCtaHeader"
-                style="@style/DeviceShield.PrivacyReport.Title"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:layout_marginTop="16dp"
+                <ImageView
+                    android:id="@+id/deviceShieldCtaImage"
+                    android:layout_height="28dp"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginTop="22dp"
+                    android:layout_width="28dp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:srcCompat="@drawable/ic_device_shield_on" />
+
+                <TextView
+                    style="@style/DeviceShield.PrivacyReport.Title"
+                    android:id="@+id/deviceShieldCtaHeader"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="16dp"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginTop="16dp"
+                    android:layout_width="0dp"
+                    android:text="@string/deviceShieldDisabledHeader"
+                    app:layout_constraintBottom_toTopOf="@+id/deviceShieldCtaSubheader"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/deviceShieldCtaImage"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:id="@+id/deviceShieldCtaSubheader"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="16dp"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginTop="4dp"
+                    android:layout_width="0dp"
+                    android:text="@string/deviceShieldDisabledSubheader"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/deviceShieldCtaImage"
+                    app:layout_constraintTop_toBottomOf="@+id/deviceShieldCtaHeader" />
+
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <View
+                android:background="@color/splitterGray"
+                android:id="@+id/deviceShieldCtaSplitter"
+                android:layout_height="1dp"
                 android:layout_marginEnd="16dp"
-                android:text="@string/deviceShieldDisabledHeader"
-                app:layout_constraintBottom_toTopOf="@+id/deviceShieldCtaSubheader"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="@+id/deviceShieldCtaImage"
-                app:layout_constraintTop_toTopOf="parent" />
-
-            <TextView
-                android:id="@+id/deviceShieldCtaSubheader"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
-                android:layout_marginTop="4dp"
-                android:layout_marginEnd="16dp"
-                android:text="@string/deviceShieldDisabledSubheader"
-                app:layout_constraintBottom_toBottomOf="parent"
+                android:layout_width="0dp"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="@+id/deviceShieldCtaImage"
-                app:layout_constraintTop_toBottomOf="@+id/deviceShieldCtaHeader" />
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/deviceShieldCtaLayout" />
 
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/deviceShieldSwitchLayout"
+                android:layout_height="wrap_content"
+                android:layout_width="0dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/deviceShieldCtaSplitter">
+
+                <ImageView
+                    android:id="@+id/deviceShieldSwitchImage"
+                    android:layout_height="28dp"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginTop="22dp"
+                    android:layout_width="28dp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:srcCompat="@drawable/ic_device_shield_off"
+                    tools:visibility="gone" />
+
+                <TextView
+                    style="@style/DeviceShield.PrivacyReport.Title"
+                    android:id="@+id/deviceShieldSwitchHeader"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="16dp"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginTop="16dp"
+                    android:layout_width="0dp"
+                    android:text="@string/deviceShield"
+                    app:layout_constraintEnd_toStartOf="@+id/deviceShieldCtaSwitch"
+                    app:layout_constraintStart_toEndOf="@+id/deviceShieldSwitchImage"
+                    app:layout_constraintTop_toTopOf="parent"
+                    tools:visibility="gone" />
+
+                <TextView
+                    android:id="@+id/deviceShieldSwitchSubheader"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="16dp"
+                    android:layout_marginEnd="16dp"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginTop="4dp"
+                    android:layout_width="0dp"
+                    android:text="@string/deviceShieldDisabledSwitchSubheader"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="@+id/deviceShieldSwitchHeader"
+                    app:layout_constraintStart_toEndOf="@+id/deviceShieldSwitchImage"
+                    app:layout_constraintTop_toBottomOf="@+id/deviceShieldSwitchHeader"
+                    tools:visibility="gone" />
+
+                <androidx.appcompat.widget.SwitchCompat
+                    android:id="@+id/deviceShieldCtaSwitch"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="16dp"
+                    android:layout_width="wrap_content"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    style="@style/DeviceShield.PrivacyReport.Label"
+                    android:id="@+id/deviceShieldCtaSwitchLabel"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="16dp"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginTop="16dp"
+                    android:layout_width="0dp"
+                    android:text="@string/deviceShieldMenuItemTitle"
+                    android:visibility="visible"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toStartOf="@+id/deviceShieldCtaSwitch"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.cardview.widget.CardView>
 
-        <View
-            android:id="@+id/deviceShieldCtaSplitter"
-            android:layout_width="0dp"
-            android:layout_height="1dp"
-            android:layout_marginStart="16dp"
-            android:layout_marginEnd="16dp"
-            android:background="@color/splitterGray"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/deviceShieldCtaLayout" />
+    <nl.dionsegijn.konfetti.KonfettiView
+        android:id="@+id/deviceShieldKonfetti"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:elevation="6dp"/>
 
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/deviceShieldSwitchLayout"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/deviceShieldCtaSplitter">
-
-            <ImageView
-                android:id="@+id/deviceShieldSwitchImage"
-                android:layout_width="28dp"
-                android:layout_height="28dp"
-                android:layout_marginStart="16dp"
-                android:layout_marginTop="22dp"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:srcCompat="@drawable/ic_device_shield_off" />
-
-            <TextView
-                android:id="@+id/deviceShieldSwitchHeader"
-                style="@style/DeviceShield.PrivacyReport.Title"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:layout_marginTop="16dp"
-                android:layout_marginEnd="16dp"
-                android:text="@string/deviceShield"
-                app:layout_constraintEnd_toStartOf="@+id/deviceShieldCtaSwitch"
-                app:layout_constraintStart_toEndOf="@+id/deviceShieldSwitchImage"
-                app:layout_constraintTop_toTopOf="parent" />
-
-            <TextView
-                android:id="@+id/deviceShieldSwitchSubheader"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:layout_marginTop="4dp"
-                android:layout_marginEnd="16dp"
-                android:layout_marginBottom="16dp"
-                android:text="@string/deviceShieldDisabledSwitchSubheader"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="@+id/deviceShieldSwitchHeader"
-                app:layout_constraintStart_toEndOf="@+id/deviceShieldSwitchImage"
-                app:layout_constraintTop_toBottomOf="@+id/deviceShieldSwitchHeader" />
-
-            <androidx.appcompat.widget.SwitchCompat
-                android:id="@+id/deviceShieldCtaSwitch"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="16dp"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-
-            <TextView
-                android:id="@+id/deviceShieldCtaSwitchLabel"
-                style="@style/DeviceShield.PrivacyReport.Label"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:layout_marginTop="8dp"
-                android:layout_marginBottom="8dp"
-                android:text="@string/deviceShieldMenuItemTitle"
-                android:visibility="gone"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@+id/deviceShieldCtaSwitch"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-
-        </androidx.constraintlayout.widget.ConstraintLayout>
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
-</androidx.cardview.widget.CardView>
+</FrameLayout>

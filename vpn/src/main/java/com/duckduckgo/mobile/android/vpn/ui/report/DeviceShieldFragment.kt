@@ -28,6 +28,7 @@ import android.widget.CompoundButton
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.widget.SwitchCompat
+import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModel
@@ -40,6 +41,9 @@ import com.google.android.material.snackbar.Snackbar
 import dagger.android.support.AndroidSupportInjection
 import dummy.VpnViewModelFactory
 import dummy.quietlySetIsChecked
+import nl.dionsegijn.konfetti.KonfettiView
+import nl.dionsegijn.konfetti.models.Shape
+import nl.dionsegijn.konfetti.models.Size
 import org.threeten.bp.LocalDateTime
 import org.threeten.bp.OffsetDateTime
 import org.threeten.bp.temporal.ChronoUnit
@@ -66,12 +70,20 @@ class DeviceShieldFragment : Fragment() {
     private lateinit var deviceShieldInfoLayout: View
     private lateinit var deviceShieldSwitchLayout: View
 
+    private lateinit var viewKonfetti: KonfettiView
+
     private inline fun <reified V : ViewModel> bindViewModel() = lazy { ViewModelProvider(this, viewModelFactory).get(V::class.java) }
 
     private val viewModel: PrivacyReportViewModel by bindViewModel()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.fragment_device_shield_cta, container, false)
+        configureViewReferences(view)
+        bindListeners(view)
+        return view
+    }
+
+    private fun configureViewReferences(view: View) {
         deviceShieldCtaHeaderTextView = view.findViewById(R.id.deviceShieldCtaHeader)
         deviceShieldCtaSubHeaderTextView = view.findViewById(R.id.deviceShieldCtaSubheader)
         deviceShieldSwitch = view.findViewById(R.id.deviceShieldCtaSwitch)
@@ -84,9 +96,7 @@ class DeviceShieldFragment : Fragment() {
         deviceShieldInfoLayout = view.findViewById(R.id.deviceShieldCtaLayout)
         deviceShieldSwitchLayout = view.findViewById(R.id.deviceShieldSwitchLayout)
 
-        bindListeners(view)
-
-        return view
+        viewKonfetti = view.findViewById(R.id.deviceShieldKonfetti)
     }
 
     override fun onAttach(context: Context) {
@@ -194,11 +204,34 @@ class DeviceShieldFragment : Fragment() {
         deviceShieldSwitchImage.setImageResource(R.drawable.ic_device_shield_on)
         Snackbar.make(deviceShieldSwitchImage, R.string.deviceShieldEnabledSnackbar, Snackbar.LENGTH_SHORT).show()
         requireActivity().startService(TrackerBlockingVpnService.startIntent(requireActivity()))
+        launchKonfetti()
     }
 
     private fun stopVpn() {
         deviceShieldSwitchImage.setImageResource(R.drawable.ic_device_shield_off)
         requireActivity().startService(TrackerBlockingVpnService.stopIntent(requireActivity()))
+    }
+
+    private fun launchKonfetti() {
+
+        val magenta = ResourcesCompat.getColor(getResources(), R.color.magenta, null)
+        val blue = ResourcesCompat.getColor(getResources(), R.color.accentBlue, null)
+        val purple = ResourcesCompat.getColor(getResources(), R.color.purple, null)
+        val green = ResourcesCompat.getColor(getResources(), R.color.green, null)
+        val yellow = ResourcesCompat.getColor(getResources(), R.color.yellow, null)
+
+        val displayWidth = resources.displayMetrics.widthPixels
+
+        viewKonfetti.build()
+            .addColors(magenta, blue, purple, green, yellow)
+            .setDirection(0.0, 359.0)
+            .setSpeed(1f, 5f)
+            .setFadeOutEnabled(true)
+            .setTimeToLive(2000L)
+            .addShapes(Shape.Rectangle(1f))
+            .addSizes(Size(8))
+            .setPosition(displayWidth / 2f, displayWidth / 2f, -50f, -50f)
+            .streamFor(50, 4000L)
     }
 
     private fun renderTrackersBlocked(totalTrackers: Int, companiesBlocked: List<PrivacyReportViewModel.PrivacyReportView.CompanyTrackers>) {

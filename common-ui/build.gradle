@@ -14,15 +14,17 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.mobile.android.vpn.heartbeat
-
-import com.duckduckgo.mobile.android.vpn.dao.HeartBeatEntity
-import com.duckduckgo.mobile.android.vpn.heartbeat.VpnServiceHeartbeatReceiver.Companion.EXTRA_HEART_BEAT_TYPE_ALIVE
-import com.duckduckgo.mobile.android.vpn.heartbeat.VpnServiceHeartbeatReceiver.Companion.EXTRA_HEART_BEAT_TYPE_STOPPED
-
-fun HeartBeatEntity.isAlive(): Boolean {
-    return EXTRA_HEART_BEAT_TYPE_ALIVE == type
+plugins {
+    id 'com.android.library'
+    id 'kotlin-android'
 }
-fun HeartBeatEntity.isStopped(): Boolean {
-    return EXTRA_HEART_BEAT_TYPE_STOPPED == type
+
+apply from: "$rootProject.projectDir/gradle/android-library.gradle"
+
+dependencies {
+
+    implementation AndroidX.appCompat
+    implementation Google.android.material
+    implementation AndroidX.constraintLayout
+
 }

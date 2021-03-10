@@ -28,7 +28,7 @@ import kotlinx.coroutines.*
 import timber.log.Timber
 
 @RequiresApi(Build.VERSION_CODES.N)
-class DeviceShieldTileService: TileService() {
+class DeviceShieldTileService : TileService() {
 
     private var deviceShieldStatePollingJob: Job? = null
     private val serviceScope = CoroutineScope(Dispatchers.IO)
@@ -74,7 +74,6 @@ class DeviceShieldTileService: TileService() {
         deviceShieldStatePollingJob?.cancel()
     }
 
-
     private fun hasVpnPermission(): Boolean {
         return VpnService.prepare(this) == null
     }
@@ -88,7 +87,7 @@ class DeviceShieldTileService: TileService() {
     }
 }
 
-class VpnPermissionRequesterActivity: AppCompatActivity() {
+class VpnPermissionRequesterActivity : AppCompatActivity() {
 
     override fun onStart() {
         super.onStart()

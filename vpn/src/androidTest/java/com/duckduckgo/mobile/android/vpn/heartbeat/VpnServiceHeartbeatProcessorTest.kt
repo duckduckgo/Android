@@ -16,7 +16,6 @@
 
 package com.duckduckgo.mobile.android.vpn.heartbeat
 
-import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.mobile.android.vpn.dao.HeartBeatEntity
@@ -27,7 +26,6 @@ import com.jakewharton.threetenabp.AndroidThreeTen
 import com.nhaarman.mockitokotlin2.*
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.TestCoroutineDispatcher
 import kotlinx.coroutines.test.runBlockingTest
 import org.junit.Before

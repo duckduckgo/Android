@@ -16,14 +16,7 @@
   ~ limitations under the License.
   -->
 
-<resources>
-
-    <style name="AppTheme.Dark" parent="AppTheme.BaseDark">
-        <item name="android:windowLightStatusBar">false</item>
-    </style>
-
-    <style name="AppTheme.Light" parent="AppTheme.BaseLight">
-        <item name="android:windowLightStatusBar">true</item>
-    </style>
-
-</resources>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:color="@color/subtleGrayTwo" android:state_enabled="false" />
+    <item android:color="@color/cornflowerBlue" />
+</selector>

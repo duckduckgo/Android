@@ -17,7 +17,6 @@
 package com.duckduckgo.mobile.android.vpn.heartbeat
 
 import android.content.Context
-import android.os.Process
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.OnLifecycleEvent
 import androidx.work.*
@@ -33,7 +32,6 @@ import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
 import dagger.multibindings.IntoSet
-import kotlinx.coroutines.delay
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
 
@@ -42,7 +40,7 @@ import java.util.concurrent.TimeUnit
 class VpnServiceHeartbeatMonitorModule {
     @Provides
     @IntoSet
-    fun provideVpnServiceHeartbeatMonitor(workManager: WorkManager) : AppLifecycleObserverPlugin {
+    fun provideVpnServiceHeartbeatMonitor(workManager: WorkManager): AppLifecycleObserverPlugin {
         return VpnServiceHeartbeatMonitor(workManager)
     }
 
@@ -57,7 +55,7 @@ class VpnServiceHeartbeatMonitorModule {
 
 class VpnServiceHeartbeatMonitor(
     private val workManager: WorkManager
-): AppLifecycleObserverPlugin {
+) : AppLifecycleObserverPlugin {
 
     @OnLifecycleEvent(Lifecycle.Event.ON_CREATE)
     fun startHearbeatMonitor() {
@@ -117,4 +115,3 @@ class VpnServiceHeartbeatMonitorWorkerInjectorPlugin(
         return false
     }
 }
-

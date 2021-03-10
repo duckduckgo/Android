@@ -14,15 +14,18 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.mobile.android.vpn.heartbeat
+package com.duckduckgo.mobile.android.vpn.ui.notification
 
-import com.duckduckgo.mobile.android.vpn.dao.HeartBeatEntity
-import com.duckduckgo.mobile.android.vpn.heartbeat.VpnServiceHeartbeatReceiver.Companion.EXTRA_HEART_BEAT_TYPE_ALIVE
-import com.duckduckgo.mobile.android.vpn.heartbeat.VpnServiceHeartbeatReceiver.Companion.EXTRA_HEART_BEAT_TYPE_STOPPED
+import android.graphics.Typeface
+import android.text.Spannable
+import android.text.SpannableStringBuilder
+import android.text.style.StyleSpan
 
-fun HeartBeatEntity.isAlive(): Boolean {
-    return EXTRA_HEART_BEAT_TYPE_ALIVE == type
-}
-fun HeartBeatEntity.isStopped(): Boolean {
-    return EXTRA_HEART_BEAT_TYPE_STOPPED == type
+fun String.applyBoldSpanTo(textToStyle: List<String>): SpannableStringBuilder {
+    val spannable = SpannableStringBuilder(this)
+    textToStyle.forEach {
+        val index = this.indexOf(it)
+        spannable.setSpan(StyleSpan(Typeface.BOLD), index, index + it.length, Spannable.SPAN_EXCLUSIVE_INCLUSIVE)
+    }
+    return spannable
 }

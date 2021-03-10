@@ -16,14 +16,11 @@
 
 package xyz.hexene.localvpn;
 
+import static xyz.hexene.localvpn.ByteBufferPool.BUFFER_SIZE;
+
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
-
-import androidx.annotation.NonNull;
-import timber.log.Timber;
-
-import static xyz.hexene.localvpn.ByteBufferPool.BUFFER_SIZE;
 
 /** Representation of an IP Packet */
 // TODO: Reduce public mutability

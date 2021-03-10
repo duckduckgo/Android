@@ -48,7 +48,7 @@ class DeviceShieldNotificationSchedulerModule {
     fun provideDeviceShieldNotificationWorkerInjectorPlugin(
         repository: AppTrackerBlockingStatsRepository,
         notificationManagerCompat: NotificationManagerCompat,
-        deviceShieldNotificationFactory: DeviceShieldNotificationRepository
+        deviceShieldNotificationFactory: DeviceShieldNotificationFactory
     ): WorkerInjectorPlugin {
         return DeviceShieldNotificationWorkerInjectorPlugin(repository, notificationManagerCompat, deviceShieldNotificationFactory)
     }
@@ -94,12 +94,12 @@ class DeviceShieldNotificationScheduler(private val workManager: WorkManager) : 
     class DeviceShieldDailyNotificationWorker(val context: Context, val params: WorkerParameters) : CoroutineWorker(context, params) {
         lateinit var repository: AppTrackerBlockingStatsRepository
         lateinit var notificationManager: NotificationManagerCompat
-        lateinit var deviceShieldNotificationFactory: DeviceShieldNotificationRepository
+        lateinit var deviceShieldNotificationFactory: DeviceShieldNotificationFactory
 
         override suspend fun doWork(): Result {
             Timber.v("Vpn Daily notification worker is now awake")
 
-            val deviceShieldNotification = deviceShieldNotificationFactory.createDaily()
+            val deviceShieldNotification = deviceShieldNotificationFactory.createDailyDeviceShieldNotification()
             if (!deviceShieldNotification.hidden) {
                 Timber.v("Vpn Daily notification won't be shown because there is no data to show")
                 val notification = DeviceShieldAlertNotificationBuilder.buildDeviceShieldNotification(context, deviceShieldNotification)
@@ -112,12 +112,12 @@ class DeviceShieldNotificationScheduler(private val workManager: WorkManager) : 
 
     class DeviceShieldWeeklyNotificationWorker(val context: Context, params: WorkerParameters) : CoroutineWorker(context, params) {
         lateinit var notificationManager: NotificationManagerCompat
-        lateinit var deviceShieldNotificationFactory: DeviceShieldNotificationRepository
+        lateinit var deviceShieldNotificationFactory: DeviceShieldNotificationFactory
 
         override suspend fun doWork(): Result {
             Timber.v("Vpn Weekly notification worker is now awake")
 
-            val deviceShieldNotification = deviceShieldNotificationFactory.createWeekly()
+            val deviceShieldNotification = deviceShieldNotificationFactory.createWeeklyDeviceShieldNotification()
             if (!deviceShieldNotification.hidden) {
                 Timber.v("Vpn Daily notification won't be shown because there is no data to show")
                 val notification = DeviceShieldAlertNotificationBuilder.buildDeviceShieldNotification(context, deviceShieldNotification)
@@ -145,7 +145,7 @@ class DeviceShieldNotificationScheduler(private val workManager: WorkManager) : 
 class DeviceShieldNotificationWorkerInjectorPlugin(
     private val repository: AppTrackerBlockingStatsRepository,
     private val notificationManagerCompat: NotificationManagerCompat,
-    private val deviceShieldNotificationFactory: DeviceShieldNotificationRepository
+    private val deviceShieldNotificationFactory: DeviceShieldNotificationFactory
 ) : WorkerInjectorPlugin {
 
     override fun inject(worker: ListenableWorker): Boolean {
@@ -164,4 +164,3 @@ class DeviceShieldNotificationWorkerInjectorPlugin(
         return false
     }
 }
-

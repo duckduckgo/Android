@@ -63,7 +63,7 @@ class DeviceShieldOnboardingStoreModule {
 
 private class DeviceShieldOnboardingImpl(
     private val preferences: SharedPreferences
-): DeviceShieldOnboarding, DeviceShieldOnboardingStore {
+) : DeviceShieldOnboarding, DeviceShieldOnboardingStore {
 
     override fun prepare(context: Context): Intent? {
         val didShowOnboarding = preferences.getBoolean(KEY_DEVICE_SHIELD_ONBOARDING_LAUNCHED, false)

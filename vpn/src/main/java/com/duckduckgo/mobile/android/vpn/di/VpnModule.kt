@@ -18,7 +18,6 @@ package com.duckduckgo.mobile.android.vpn.di
 
 import android.content.Context
 import android.content.pm.PackageManager
-import android.content.res.Resources
 import android.net.ConnectivityManager
 import com.duckduckgo.di.scopes.VpnObjectGraph
 import com.duckduckgo.mobile.android.vpn.processor.tcp.hostname.*

@@ -14,6 +14,7 @@ include ':vpn'
 include ':app'
 include ':statistics'
 include ':common'
+include ':common-ui'
 
 rootProject.children.each { subproject ->
 

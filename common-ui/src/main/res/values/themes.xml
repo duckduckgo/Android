@@ -1,0 +1,259 @@
+<!--
+  ~ Copyright (c) 2018 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<resources>
+
+    <style name="BaseAppTheme" parent="Theme.MaterialComponents.Light.Bridge" />
+
+    <style name="AppTheme.Base" parent="BaseAppTheme">
+
+        <!-- These neutral colors cover cases before dynamic theme can be applied
+             such as the app launch color -->
+        <item name="colorPrimary">@color/almostBlackDark</item>
+        <item name="colorPrimaryDark">@color/black</item>
+        <item name="colorAccent">@color/cornflowerBlue</item>
+        <item name="android:windowBackground">?attr/colorPrimaryDark</item>
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+        <item name="bottomSheetDialogTheme">@style/BottomSheetDialog</item>
+        <item name="android:windowActivityTransitions">true</item>
+        <item name="autoCompleteTextViewStyle">@style/AutoCompleteTextViewStyle</item>
+        <item name="android:statusBarColor">?toolbarBgColor</item>
+        <item name="snackbarButtonStyle">@style/snackbarButtonStyle</item>
+        <item name="android:colorEdgeEffect">@color/newBlack</item>
+    </style>
+
+    <style name="AppTheme.Base.BaseDark">
+        <item name="colorPrimary">@color/darkThemePrimary</item>
+        <item name="colorPrimaryDark">@color/darkThemePrimaryDark</item>
+        <item name="daxLogoTextColor">@color/white</item>
+        <item name="normalTextColor">@color/white</item>
+        <item name="toolbarIconColor">@color/white</item>
+        <item name="toolbarTextColor">@color/white</item>
+        <item name="toolbarBgColor">@color/newBlack</item>
+        <item name="toolbarBgBorderColor">@color/toolbarBorderColorDark</item>
+        <item name="dialogBgColor">@color/almostBlackDark</item>
+        <item name="browserIconColorSelector">@color/browser_icon_color_selector_dark</item>
+        <item name="browserMenuTextColor">@color/white</item>
+        <item name="browserMenuTextColorDisabled">@color/warGreyTwo</item>
+        <item name="omnibarRoundedFieldBackgroundColor">@color/almostBlack</item>
+        <item name="omnibarTextColor">@color/white</item>
+        <item name="omnibarHintColor">@color/paleBrownishGray</item>
+        <item name="omnibarLogoLetterTextColor">@color/midGray</item>
+        <item name="autoCompleteTextColor">@color/white</item>
+        <item name="autoCompleteSubtitleTextColor">@color/grayish</item>
+        <item name="tabTitleTextColor">@color/white</item>
+        <item name="tabTitleTextColorLegacy">@color/midnight</item>
+        <item name="tabSubtitleTextColor">@color/coolGray</item>
+        <item name="tabSelectedBorderColor">@color/skyBlue</item>
+        <item name="tabsFireTextColor">@color/white</item>
+        <item name="tabCardBackgroundColor">@color/almostBlack</item>
+        <item name="whitelistTextColor">@color/white</item>
+        <item name="bookmarkIconColor">@color/white</item>
+        <item name="websiteListFaviconBackground">@color/almostBlack</item>
+        <item name="bookmarkTitleTextColor">@color/white</item>
+        <item name="fireproofWebsiteTitleTextColor">@color/white</item>
+        <item name="deviceShieldExcludedAppNameTextColor">@color/white</item>
+        <item name="bookmarkSubtitleTextColor">@color/grayishTwo</item>
+        <item name="settingsItemTextColor">@color/white</item>
+        <item name="settingsItemTextColorDisabled">@color/warGreyTwo</item>
+        <item name="settingsMinorTextColor">@color/grayishTwo</item>
+        <item name="settingsSwitchBackgroundColor">@color/subtleGrayTwo</item>
+        <item name="settingsDividerColor">@color/almostBlack</item>
+        <item name="buttonOutlinedTextColor">@color/pinkishGrayThree</item>
+        <item name="buttonOutlinedBorderColor">@color/brownishGrayTwo</item>
+        <item name="callToActionTitleColor">@color/white</item>
+        <item name="callToActionSubtitleColor">@color/grayishThree</item>
+        <item name="daxDialogBackgroundColor">@color/charcoalGrey</item>
+        <item name="daxDialogSecondaryButtonTextColor">@color/white</item>
+        <item name="daxDialogSecondaryButtonRippleColor">@color/white</item>
+
+        <item name="brokenSiteSelectionTextColor">@color/white</item>
+        <item name="brokenSiteOutlinedColor">@color/grayish</item>
+        <item name="brokenSitesButtonDisabledBackgroundColor">@color/greyishBrownTwo</item>
+        <item name="brokenSitesButtonDisabledTextColor">@color/warGreyTwo</item>
+        <item name="brokenSitesButtonRippleColor">@color/white</item>
+        <item name="topCallToActionDescriptionColor">@color/grayish</item>
+        <item name="topCallToActionBackgroundColor">@color/greyishBrownTwo</item>
+
+        <item name="feedbackAnonymousFeedbackLabelColor">@color/grayish</item>
+        <item name="feedbackListItemBackgroundColor">@color/almostBlack</item>
+        <item name="feedbackListItemSeparatorColor">@color/charcoalGrey</item>
+        <item name="feedbackEditTextBackgroundColor">@color/almostBlack</item>
+        <item name="feedbackEditTextHintColor">@color/grayish</item>
+
+        <item name="privacyDashboardLogoLetterTextColor">@color/subtleGray</item>
+    </style>
+
+    <style name="AppTheme.Dark" parent="AppTheme.Base.BaseDark" />
+
+    <style name="AppTheme.Dark.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+
+    <style name="AppTheme.Dark.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+
+    <style name="AppTheme.Dark.Transparent">
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
+    </style>
+
+    <!-- To create a new color theme, copy this light one and update the suffix as appropriate.
+         Include:
+          * AppTheme.BaseLight
+          * AppTheme.Light
+          * AppTheme.Light in values-v23/themes.xml
+          * SplashTheme.Light
+    -->
+    <style name="AppTheme.Base.BaseLight">
+        <item name="colorPrimary">@color/lightThemePrimary</item>
+        <item name="colorPrimaryDark">@color/lightThemePrimaryDark</item>
+        <item name="daxLogoTextColor">@color/almostBlackDark</item>
+        <item name="normalTextColor">@color/almostBlackDark</item>
+        <item name="toolbarIconColor">@color/almostBlackDark</item>
+        <item name="toolbarTextColor">@color/almostBlackDark</item>
+        <item name="toolbarBgColor">@color/white</item>
+        <item name="toolbarBgBorderColor">@color/toolbarBorderColorLight</item>
+        <item name="dialogBgColor">@color/white</item>
+        <item name="browserIconColorSelector">@color/browser_icon_color_selector_light</item>
+        <item name="browserMenuTextColor">@color/almostBlackDark</item>
+        <item name="browserMenuTextColorDisabled">@color/pinkish_grey_two</item>
+        <item name="omnibarRoundedFieldBackgroundColor">@color/whiteFour</item>
+        <item name="omnibarTextColor">@color/almostBlackDark</item>
+        <item name="omnibarHintColor">@color/brownishGrayTwo</item>
+        <item name="omnibarLogoLetterTextColor">@color/whiteFour</item>
+        <item name="autoCompleteTextColor">@color/almostBlackDark</item>
+        <item name="autoCompleteSubtitleTextColor">@color/warmerGray</item>
+        <item name="tabTitleTextColor">@color/almostBlackDark</item>
+        <item name="tabTitleTextColorLegacy">@color/almostBlackDark</item>
+        <item name="tabSubtitleTextColor">@color/warmerGray</item>
+        <item name="tabSelectedBorderColor">@color/cornflowerBlue</item>
+        <item name="tabsFireTextColor">@color/warmerGray</item>
+        <item name="tabCardBackgroundColor">@color/white</item>
+        <item name="bookmarkIconColor">@color/almostBlackDark</item>
+        <item name="bookmarkTitleTextColor">@color/almostBlackDark</item>
+        <item name="whitelistTextColor">@color/almostBlack</item>
+        <item name="websiteListFaviconBackground">@color/whiteSix</item>
+        <item name="fireproofWebsiteTitleTextColor">@color/almostBlack</item>
+        <item name="deviceShieldExcludedAppNameTextColor">@color/almostBlack</item>
+        <item name="bookmarkSubtitleTextColor">@color/warmerGray</item>
+        <item name="settingsItemTextColor">@color/almostBlackDark</item>
+        <item name="settingsItemTextColorDisabled">@color/pinkish_grey_two</item>
+        <item name="settingsMinorTextColor">@color/warmerGray</item>
+        <item name="settingsSwitchBackgroundColor">@color/brownishGrayTwo</item>
+        <item name="settingsDividerColor">@color/whiteSix</item>
+        <item name="buttonOutlinedTextColor">@color/cornflowerBlue</item>
+        <item name="buttonOutlinedBorderColor">@color/grayishThree</item>
+        <item name="callToActionTitleColor">@color/almostBlackDark</item>
+        <item name="callToActionSubtitleColor">@color/brownishGrayTwo</item>
+        <item name="daxDialogBackgroundColor">@color/white</item>
+        <item name="daxDialogSecondaryButtonTextColor">@color/almostBlackDark</item>
+        <item name="daxDialogSecondaryButtonRippleColor">@color/subtleGrayTwo</item>
+
+        <item name="brokenSiteSelectionTextColor">@color/almostBlackDark</item>
+        <item name="brokenSiteOutlinedColor">@color/grayishTwo</item>
+        <item name="brokenSitesButtonDisabledBackgroundColor">@color/subtleGrayTwo</item>
+        <item name="brokenSitesButtonDisabledTextColor">@color/white</item>
+        <item name="brokenSitesButtonRippleColor">@color/subtleGrayTwo</item>
+        <item name="topCallToActionDescriptionColor">@color/almostBlackDark</item>
+        <item name="topCallToActionBackgroundColor">@color/white</item>
+
+        <item name="feedbackAnonymousFeedbackLabelColor">@color/warmerGray</item>
+        <item name="feedbackListItemBackgroundColor">@color/whiteFive</item>
+        <item name="feedbackListItemSeparatorColor">@color/whiteSix</item>
+        <item name="feedbackEditTextBackgroundColor">@color/whiteFive</item>
+        <item name="feedbackEditTextHintColor">@color/warmerGray</item>
+
+        <item name="privacyDashboardLogoLetterTextColor">@color/whiteFour</item>
+    </style>
+
+    <style name="AppTheme.Light" parent="AppTheme.Base.BaseLight">
+        <!-- The status bar must always be dark prior to API 23 as the light text cannot be changed -->
+        <item name="android:statusBarColor">@color/almostBlack</item>
+    </style>
+
+    <style name="ModalCardTheme" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="colorPrimary">@color/darkThemePrimary</item>
+        <item name="colorPrimaryDark">@color/darkThemePrimaryDark</item>
+        <item name="colorAccent">@color/cornflowerBlue</item>
+        <item name="android:windowBackground">@color/translucentDark</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:colorBackgroundCacheHint">@null</item>
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowAnimationStyle">@android:style/Animation</item>
+        <item name="toolbarIconColor">@color/white</item>
+    </style>
+
+    <style name="ToolbarTheme" parent="ThemeOverlay.AppCompat.Dark.ActionBar">
+        <item name="colorControlNormal">?attr/toolbarIconColor</item>
+        <item name="android:textColorPrimary">?attr/toolbarTextColor</item>
+        <item name="colorControlHighlight">@color/subtleGrayTwo</item>
+    </style>
+
+    <style name="OmnibarToolbarTheme">
+        <item name="colorControlHighlight">@color/subtleGrayTwo</item>
+    </style>
+
+    <style name="SwitchTheme" parent="Widget.AppCompat.CompoundButton.Switch">
+        <item name="colorControlActivated">@android:color/white</item>
+    </style>
+
+    <style name="SettingsSwitchTheme">
+        <item name="colorControlActivated">@color/cornflowerBlue</item>
+        <item name="colorSwitchThumbNormal">@color/white</item>
+        <item name="android:colorForeground">?attr/settingsSwitchBackgroundColor</item>
+    </style>
+
+    <style name="TextInputLayoutTheme" parent="Widget.Design.TextInputLayout">
+        <item name="colorControlActivated">?colorAccent</item>
+        <item name="colorControlNormal">?colorAccent</item>
+        <item name="colorControlHighlight">?colorAccent</item>
+        <item name="android:textColor">?normalTextColor</item>
+        <item name="android:textColorSecondary">?normalTextColor</item>
+        <item name="android:textColorHint">?normalTextColor</item>
+    </style>
+
+    <style name="AutoCompleteTextViewStyle" parent="Widget.AppCompat.AutoCompleteTextView">
+        <item name="android:textCursorDrawable">@drawable/text_cursor</item>
+        <item name="android:textColorHint">?attr/omnibarHintColor</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+    </style>
+
+    <style name="DaxDialogFragment" parent="android:Theme.DeviceDefault.Light.NoActionBar">
+        <item name="android:windowTranslucentStatus">true</item>
+    </style>
+
+    <style name="PopUpMenuSwitchTheme">
+        <item name="colorAccent">@color/cornflowerBlue</item>
+        <item name="android:textColorSecondary">?attr/toolbarIconColor</item>
+    </style>
+
+    <style name="Theme.AndroidVpn" parent="Theme.Design.Light">
+        <item name="colorPrimary">@color/whiteFive</item>
+        <item name="colorPrimaryDark">@color/whiteFive</item>
+        <item name="colorAccent">@color/warmBlue</item>
+        <item name="android:windowBackground">?attr/colorPrimaryDark</item>
+        <item name="android:windowLightStatusBar">true</item>
+    </style>
+
+    <style name="Theme.AndroidVpn.NoActionBar" parent="Theme.Design.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
+    <style name="Theme.AndroidVpn.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+
+    <style name="Theme.AndroidVpn.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+
+</resources>

@@ -27,8 +27,7 @@ import dagger.android.AndroidInjection
 import timber.log.Timber
 import javax.inject.Inject
 
-
-class DeviceShieldOnboardingActivity: AppCompatActivity(R.layout.activity_device_shield_onboarding) {
+class DeviceShieldOnboardingActivity : AppCompatActivity(R.layout.activity_device_shield_onboarding) {
 
     @Inject
     lateinit var deviceShieldOnboardingStore: DeviceShieldOnboardingStore
@@ -41,7 +40,7 @@ class DeviceShieldOnboardingActivity: AppCompatActivity(R.layout.activity_device
 
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         findViewById<Button>(R.id.askVpnPermissionButton).setOnClickListener {
-            when(val intent = VpnService.prepare(this)) {
+            when (val intent = VpnService.prepare(this)) {
                 null -> startVpn()
                 else -> startActivityForResult(intent, REQUEST_ASK_VPN_PERMISSION)
             }
@@ -66,7 +65,7 @@ class DeviceShieldOnboardingActivity: AppCompatActivity(R.layout.activity_device
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (requestCode == REQUEST_ASK_VPN_PERMISSION) {
-            when(resultCode) {
+            when (resultCode) {
                 RESULT_OK -> {
                     startVpn()
                     return

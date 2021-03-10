@@ -90,6 +90,7 @@ dependencies {
     implementation project(path: ':vpn-store')
     implementation project(path: ':di')
     implementation project(path: ':common')
+    implementation project(path: ':common-ui')
 
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
 

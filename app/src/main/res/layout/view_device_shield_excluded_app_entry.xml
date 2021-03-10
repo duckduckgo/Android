@@ -70,7 +70,7 @@
             android:id="@+id/deviceShieldAppEntryType"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:fontFamily="sans-serif-medium"
+            android:fontFamily="sans-serif"
             android:textColor="?attr/autoCompleteSubtitleTextColor"
             android:textSize="14sp"
             android:textStyle="normal"
