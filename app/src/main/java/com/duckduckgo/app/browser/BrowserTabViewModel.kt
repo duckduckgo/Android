@@ -1630,9 +1630,6 @@ class BrowserTabViewModel(
         }
     }
 
-    fun onUserClickTopCta(cta: HomeTopPanelCta) {
-    }
-
     fun onUserClickCtaOkButton() {
         val cta = currentCtaViewState().cta ?: return
         ctaViewModel.onUserClickCtaOkButton(cta)
@@ -1678,9 +1675,6 @@ class BrowserTabViewModel(
         viewModelScope.launch {
             ctaViewModel.onUserDismissedCta(cta)
             when (cta) {
-                is HomeTopPanelCta -> {
-                    ctaViewState.value = currentCtaViewState().copy(cta = null)
-                }
                 is HomePanelCta -> refreshCta()
                 else -> ctaViewState.value = currentCtaViewState().copy(cta = null)
             }

@@ -37,8 +37,6 @@ import com.duckduckgo.app.trackerdetection.model.Entity
 import kotlinx.android.synthetic.main.include_cta_buttons.view.*
 import kotlinx.android.synthetic.main.include_cta_content.view.*
 import kotlinx.android.synthetic.main.include_dax_dialog_cta.view.*
-import kotlinx.android.synthetic.main.include_top_cta.view.*
-import java.util.*
 
 interface DialogCta {
     fun createCta(activity: FragmentActivity): DaxDialog
@@ -408,26 +406,6 @@ sealed class HomePanelCta(
         Pixel.PixelName.WIDGET_LEGACY_CTA_LAUNCHED,
         Pixel.PixelName.WIDGET_LEGACY_CTA_DISMISSED
     )
-}
-
-sealed class HomeTopPanelCta(
-    override val ctaId: CtaId,
-    override val shownPixel: Pixel.PixelName?,
-    override val okPixel: Pixel.PixelName?,
-    override val cancelPixel: Pixel.PixelName?,
-    @StringRes open val description: Int
-) : Cta, ViewCta {
-
-    override fun pixelCancelParameters(): Map<String, String> = emptyMap()
-
-    override fun pixelOkParameters(): Map<String, String> = emptyMap()
-
-    override fun pixelShownParameters(): Map<String, String> = emptyMap()
-
-    override fun showCta(view: View) {
-        view.upperCtaTitle.text = view.context.getString(description)
-        view.show()
-    }
 }
 
 fun DaxCta.addCtaToHistory(newCta: String): String {
