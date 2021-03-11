@@ -58,7 +58,6 @@ class HomeBackgroundLogo(private var ddgLogoView: View) {
     private fun fadeLogoOut() {
         Timber.v("hideLogo")
         ddgLogoView.hide()
-
     }
 
     companion object {
