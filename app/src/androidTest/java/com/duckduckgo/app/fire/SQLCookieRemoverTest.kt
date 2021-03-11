@@ -106,7 +106,7 @@ class SQLCookieRemoverTest {
         sqlCookieRemover.removeCookies()
 
         verify(mockOfflinePixelCountDataStore).cookieDatabaseOpenErrorCount = 1
-        verify(mockPixel).fire(eq(Pixel.PixelName.COOKIE_DATABASE_EXCEPTION_OPEN_ERROR), any(), any())
+        verify(mockPixel).fire(eq(Pixel.AppPixelName.COOKIE_DATABASE_EXCEPTION_OPEN_ERROR), any(), any())
     }
 
     private fun givenFireproofWebsitesStored() {

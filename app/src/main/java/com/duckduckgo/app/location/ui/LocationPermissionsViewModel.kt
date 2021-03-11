@@ -114,7 +114,7 @@ class LocationPermissionsViewModel(
     override fun onSiteLocationPermissionSelected(domain: String, permission: LocationPermissionType) {
         when (permission) {
             LocationPermissionType.ALLOW_ALWAYS -> {
-                pixel.fire(Pixel.PixelName.PRECISE_LOCATION_SITE_DIALOG_ALLOW_ALWAYS)
+                pixel.fire(Pixel.AppPixelName.PRECISE_LOCATION_SITE_DIALOG_ALLOW_ALWAYS)
                 geoLocationPermissions.allow(domain)
                 viewModelScope.launch {
                     locationPermissionsRepository.savePermission(domain, permission)
@@ -122,7 +122,7 @@ class LocationPermissionsViewModel(
             }
             LocationPermissionType.DENY_ALWAYS -> {
                 geoLocationPermissions.clear(domain)
-                pixel.fire(Pixel.PixelName.PRECISE_LOCATION_SITE_DIALOG_DENY_ALWAYS)
+                pixel.fire(Pixel.AppPixelName.PRECISE_LOCATION_SITE_DIALOG_DENY_ALWAYS)
                 viewModelScope.launch {
                     locationPermissionsRepository.savePermission(domain, permission)
                 }

@@ -40,7 +40,7 @@ class DataClearerForegroundAppRestartPixelTest {
 
         testee.firePendingPixels()
 
-        verify(pixel).fire(Pixel.PixelName.FORGET_ALL_AUTO_RESTART_WITH_INTENT)
+        verify(pixel).fire(Pixel.AppPixelName.FORGET_ALL_AUTO_RESTART_WITH_INTENT)
     }
 
     @Test
@@ -51,7 +51,7 @@ class DataClearerForegroundAppRestartPixelTest {
 
         testee.firePendingPixels()
 
-        verify(pixel).fire(Pixel.PixelName.FORGET_ALL_AUTO_RESTART_WITH_INTENT)
+        verify(pixel).fire(Pixel.AppPixelName.FORGET_ALL_AUTO_RESTART_WITH_INTENT)
     }
 
     @Test
@@ -62,7 +62,7 @@ class DataClearerForegroundAppRestartPixelTest {
 
         testee.firePendingPixels()
 
-        verify(pixel).fire(Pixel.PixelName.FORGET_ALL_AUTO_RESTART)
+        verify(pixel).fire(Pixel.AppPixelName.FORGET_ALL_AUTO_RESTART)
     }
 
     @Test
@@ -74,7 +74,7 @@ class DataClearerForegroundAppRestartPixelTest {
         testee.firePendingPixels()
         testee.firePendingPixels()
 
-        verify(pixel).fire(Pixel.PixelName.FORGET_ALL_AUTO_RESTART)
+        verify(pixel).fire(Pixel.AppPixelName.FORGET_ALL_AUTO_RESTART)
     }
 
     @Test
@@ -86,7 +86,7 @@ class DataClearerForegroundAppRestartPixelTest {
 
         testee.firePendingPixels()
 
-        verify(pixel).fire(Pixel.PixelName.FORGET_ALL_AUTO_RESTART)
+        verify(pixel).fire(Pixel.AppPixelName.FORGET_ALL_AUTO_RESTART)
     }
 
     private fun givenEmptyIntent(): Intent = Intent(context, BrowserActivity::class.java)

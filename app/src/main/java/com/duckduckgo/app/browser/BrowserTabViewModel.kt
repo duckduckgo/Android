@@ -95,7 +95,7 @@ import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.api.StatisticsUpdater
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelName
+import com.duckduckgo.app.statistics.pixels.Pixel.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter
 import com.duckduckgo.app.surrogates.SurrogateResponse
 import com.duckduckgo.app.survey.model.Survey
@@ -505,8 +505,8 @@ class BrowserTabViewModel(
             PixelParameter.BOOKMARK_CAPABLE to hasBookmarks.toString()
         )
         val pixelName = when (suggestion) {
-            is AutoCompleteBookmarkSuggestion -> PixelName.AUTOCOMPLETE_BOOKMARK_SELECTION
-            is AutoCompleteSearchSuggestion -> PixelName.AUTOCOMPLETE_SEARCH_SELECTION
+            is AutoCompleteBookmarkSuggestion -> AppPixelName.AUTOCOMPLETE_BOOKMARK_SELECTION
+            is AutoCompleteSearchSuggestion -> AppPixelName.AUTOCOMPLETE_SEARCH_SELECTION
         }
 
         pixel.fire(pixelName, params)
@@ -572,9 +572,9 @@ class BrowserTabViewModel(
         if (Patterns.WEB_URL.matcher(oldQuery.toString()).matches()) return
 
         if (oldQuery == newQuery) {
-            pixel.fire(String.format(Locale.US, PixelName.SERP_REQUERY.pixelName, PixelParameter.SERP_QUERY_NOT_CHANGED))
+            pixel.fire(String.format(Locale.US, AppPixelName.SERP_REQUERY.pixelName, PixelParameter.SERP_QUERY_NOT_CHANGED))
         } else if (oldQuery.toString().isNotBlank()) { // blank means no previous search, don't send pixel
-            pixel.fire(String.format(Locale.US, PixelName.SERP_REQUERY.pixelName, PixelParameter.SERP_QUERY_CHANGED))
+            pixel.fire(String.format(Locale.US, AppPixelName.SERP_REQUERY.pixelName, PixelParameter.SERP_QUERY_CHANGED))
         }
     }
 
@@ -838,10 +838,10 @@ class BrowserTabViewModel(
             val deleteCtaShown = ctaViewModel.useOurAppDeletionDialogShown()
 
             when {
-                deleteCtaShown -> pixel.fire(PixelName.UOA_VISITED_AFTER_DELETE_CTA)
-                isShortcutAdded != null -> pixel.fire(PixelName.UOA_VISITED_AFTER_SHORTCUT)
-                isUseOurAppNotificationSeen -> pixel.fire(PixelName.UOA_VISITED_AFTER_NOTIFICATION)
-                else -> pixel.fire(PixelName.UOA_VISITED)
+                deleteCtaShown -> pixel.fire(AppPixelName.UOA_VISITED_AFTER_DELETE_CTA)
+                isShortcutAdded != null -> pixel.fire(AppPixelName.UOA_VISITED_AFTER_SHORTCUT)
+                isUseOurAppNotificationSeen -> pixel.fire(AppPixelName.UOA_VISITED_AFTER_NOTIFICATION)
+                else -> pixel.fire(AppPixelName.UOA_VISITED)
             }
         }
     }
@@ -1013,19 +1013,19 @@ class BrowserTabViewModel(
                 LocationPermissionType.ALLOW_ALWAYS -> {
                     onSiteLocationPermissionAlwaysAllowed()
                     setDomainHasLocationPermissionShown(domain)
-                    pixel.fire(PixelName.PRECISE_LOCATION_SITE_DIALOG_ALLOW_ALWAYS)
+                    pixel.fire(AppPixelName.PRECISE_LOCATION_SITE_DIALOG_ALLOW_ALWAYS)
                     viewModelScope.launch {
                         locationPermissionsRepository.savePermission(domain, permission)
                         faviconManager.persistFavicon(tabId, domain)
                     }
                 }
                 LocationPermissionType.ALLOW_ONCE -> {
-                    pixel.fire(PixelName.PRECISE_LOCATION_SITE_DIALOG_ALLOW_ONCE)
+                    pixel.fire(AppPixelName.PRECISE_LOCATION_SITE_DIALOG_ALLOW_ONCE)
                     locationPermissionSession[domain] = permission
                     locationPermission.callback.invoke(locationPermission.origin, true, false)
                 }
                 LocationPermissionType.DENY_ALWAYS -> {
-                    pixel.fire(PixelName.PRECISE_LOCATION_SITE_DIALOG_DENY_ALWAYS)
+                    pixel.fire(AppPixelName.PRECISE_LOCATION_SITE_DIALOG_DENY_ALWAYS)
                     onSiteLocationPermissionAlwaysDenied()
                     viewModelScope.launch {
                         locationPermissionsRepository.savePermission(domain, permission)
@@ -1033,7 +1033,7 @@ class BrowserTabViewModel(
                     }
                 }
                 LocationPermissionType.DENY_ONCE -> {
-                    pixel.fire(PixelName.PRECISE_LOCATION_SITE_DIALOG_DENY_ONCE)
+                    pixel.fire(AppPixelName.PRECISE_LOCATION_SITE_DIALOG_DENY_ONCE)
                     locationPermissionSession[domain] = permission
                     locationPermission.callback.invoke(locationPermission.origin, false, false)
                 }
@@ -1091,19 +1091,19 @@ class BrowserTabViewModel(
     }
 
     override fun onSystemLocationPermissionAllowed() {
-        pixel.fire(PixelName.PRECISE_LOCATION_SYSTEM_DIALOG_ENABLE)
+        pixel.fire(AppPixelName.PRECISE_LOCATION_SYSTEM_DIALOG_ENABLE)
         command.postValue(RequestSystemLocationPermission)
     }
 
     override fun onSystemLocationPermissionNotAllowed() {
-        pixel.fire(PixelName.PRECISE_LOCATION_SYSTEM_DIALOG_LATER)
+        pixel.fire(AppPixelName.PRECISE_LOCATION_SYSTEM_DIALOG_LATER)
         onSiteLocationPermissionAlwaysDenied()
     }
 
     override fun onSystemLocationPermissionNeverAllowed() {
         locationPermission?.let { locationPermission ->
             onSiteLocationPermissionSelected(locationPermission.origin, LocationPermissionType.DENY_ALWAYS)
-            pixel.fire(PixelName.PRECISE_LOCATION_SYSTEM_DIALOG_NEVER)
+            pixel.fire(AppPixelName.PRECISE_LOCATION_SYSTEM_DIALOG_NEVER)
         }
     }
 
@@ -1111,7 +1111,7 @@ class BrowserTabViewModel(
         locationPermission?.let { locationPermission ->
             appSettingsPreferencesStore.appLocationPermissionDeniedForever = false
             appSettingsPreferencesStore.appLocationPermission = true
-            pixel.fire(PixelName.PRECISE_LOCATION_SETTINGS_LOCATION_PERMISSION_ENABLE)
+            pixel.fire(AppPixelName.PRECISE_LOCATION_SETTINGS_LOCATION_PERMISSION_ENABLE)
             viewModelScope.launch {
                 val permissionEntity = locationPermissionsRepository.getDomainPermission(locationPermission.origin)
                 if (permissionEntity == null) {
@@ -1124,7 +1124,7 @@ class BrowserTabViewModel(
     }
 
     fun onSystemLocationPermissionDeniedOneTime() {
-        pixel.fire(PixelName.PRECISE_LOCATION_SETTINGS_LOCATION_PERMISSION_DISABLE)
+        pixel.fire(AppPixelName.PRECISE_LOCATION_SETTINGS_LOCATION_PERMISSION_DISABLE)
         onSiteLocationPermissionAlwaysDenied()
     }
 
@@ -1298,10 +1298,10 @@ class BrowserTabViewModel(
         viewModelScope.launch {
             if (currentBrowserViewState().isFireproofWebsite) {
                 fireproofWebsiteRepository.removeFireproofWebsite(FireproofWebsiteEntity(domain))
-                pixel.fire(PixelName.FIREPROOF_WEBSITE_REMOVE)
+                pixel.fire(AppPixelName.FIREPROOF_WEBSITE_REMOVE)
             } else {
                 fireproofWebsiteRepository.fireproofWebsite(domain)?.let {
-                    pixel.fire(PixelName.FIREPROOF_WEBSITE_ADDED)
+                    pixel.fire(AppPixelName.FIREPROOF_WEBSITE_ADDED)
                     command.value = ShowFireproofWebSiteConfirmation(fireproofWebsiteEntity = it)
                     faviconManager.persistFavicon(tabId, url = domain)
                 }
@@ -1348,7 +1348,7 @@ class BrowserTabViewModel(
     fun onFireproofWebsiteSnackbarUndoClicked(fireproofWebsiteEntity: FireproofWebsiteEntity) {
         viewModelScope.launch(dispatchers.io()) {
             fireproofWebsiteRepository.removeFireproofWebsite(fireproofWebsiteEntity)
-            pixel.fire(PixelName.FIREPROOF_WEBSITE_UNDO)
+            pixel.fire(AppPixelName.FIREPROOF_WEBSITE_UNDO)
         }
     }
 
@@ -1381,7 +1381,7 @@ class BrowserTabViewModel(
     }
 
     private suspend fun addToWhitelist(domain: String) {
-        pixel.fire(PixelName.BROWSER_MENU_WHITELIST_ADD)
+        pixel.fire(AppPixelName.BROWSER_MENU_WHITELIST_ADD)
         withContext(dispatchers.io()) {
             userWhitelistDao.insert(domain)
         }
@@ -1391,7 +1391,7 @@ class BrowserTabViewModel(
     }
 
     private suspend fun removeFromWhitelist(domain: String) {
-        pixel.fire(PixelName.BROWSER_MENU_WHITELIST_REMOVE)
+        pixel.fire(AppPixelName.BROWSER_MENU_WHITELIST_REMOVE)
         withContext(dispatchers.io()) {
             userWhitelistDao.delete(domain)
         }
@@ -1490,8 +1490,8 @@ class BrowserTabViewModel(
         val uri = site?.uri ?: return
 
         pixel.fire(
-            if (desktopSiteRequested) PixelName.MENU_ACTION_DESKTOP_SITE_ENABLE_PRESSED
-            else PixelName.MENU_ACTION_DESKTOP_SITE_DISABLE_PRESSED
+            if (desktopSiteRequested) AppPixelName.MENU_ACTION_DESKTOP_SITE_ENABLE_PRESSED
+            else AppPixelName.MENU_ACTION_DESKTOP_SITE_DISABLE_PRESSED
         )
 
         if (desktopSiteRequested && uri.isMobileSite) {

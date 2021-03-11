@@ -53,7 +53,7 @@ class DefaultBrowserObserverTest {
 
         testee.onApplicationResumed()
 
-        verify(mockPixel).fire(Pixel.PixelName.DEFAULT_BROWSER_SET, params)
+        verify(mockPixel).fire(Pixel.AppPixelName.DEFAULT_BROWSER_SET, params)
     }
 
     @Test
@@ -63,7 +63,7 @@ class DefaultBrowserObserverTest {
 
         testee.onApplicationResumed()
 
-        verify(mockPixel, never()).fire(eq(Pixel.PixelName.DEFAULT_BROWSER_SET), any(), any())
+        verify(mockPixel, never()).fire(eq(Pixel.AppPixelName.DEFAULT_BROWSER_SET), any(), any())
     }
 
     @Test
@@ -73,7 +73,7 @@ class DefaultBrowserObserverTest {
 
         testee.onApplicationResumed()
 
-        verify(mockPixel, never()).fire(eq(Pixel.PixelName.DEFAULT_BROWSER_SET), any(), any())
+        verify(mockPixel, never()).fire(eq(Pixel.AppPixelName.DEFAULT_BROWSER_SET), any(), any())
     }
 
     @Test
@@ -83,6 +83,6 @@ class DefaultBrowserObserverTest {
 
         testee.onApplicationResumed()
 
-        verify(mockPixel).fire(Pixel.PixelName.DEFAULT_BROWSER_UNSET)
+        verify(mockPixel).fire(Pixel.AppPixelName.DEFAULT_BROWSER_UNSET)
     }
 }

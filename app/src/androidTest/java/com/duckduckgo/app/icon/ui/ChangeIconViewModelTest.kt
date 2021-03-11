@@ -65,7 +65,7 @@ class ChangeIconViewModelTest {
 
         testee.start()
 
-        Mockito.verify(mockPixel).fire(Pixel.PixelName.CHANGE_APP_ICON_OPENED)
+        Mockito.verify(mockPixel).fire(Pixel.AppPixelName.CHANGE_APP_ICON_OPENED)
 
         val viewState = testee.viewState.value!!
         assertTrue(viewState.appIcons.isNotEmpty())

@@ -215,7 +215,7 @@ class BrowserViewModelTest {
         val url = "http://m.$USE_OUR_APP_DOMAIN"
         whenever(mockOmnibarEntryConverter.convertQueryToUrl(url)).thenReturn(url)
         testee.onOpenShortcut(url)
-        verify(mockPixel).fire(Pixel.PixelName.USE_OUR_APP_SHORTCUT_OPENED)
+        verify(mockPixel).fire(Pixel.AppPixelName.USE_OUR_APP_SHORTCUT_OPENED)
     }
 
     @Test
@@ -223,7 +223,7 @@ class BrowserViewModelTest {
         val url = "example.com"
         whenever(mockOmnibarEntryConverter.convertQueryToUrl(url)).thenReturn(url)
         testee.onOpenShortcut(url)
-        verify(mockPixel).fire(Pixel.PixelName.SHORTCUT_OPENED)
+        verify(mockPixel).fire(Pixel.AppPixelName.SHORTCUT_OPENED)
     }
 
     companion object {

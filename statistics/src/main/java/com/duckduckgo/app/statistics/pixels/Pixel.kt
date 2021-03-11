@@ -18,15 +18,18 @@ package com.duckduckgo.app.statistics.pixels
 
 import android.annotation.SuppressLint
 import com.duckduckgo.app.statistics.api.PixelSender
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelName
+import com.duckduckgo.app.statistics.pixels.Pixel.AppPixelName
 import io.reactivex.schedulers.Schedulers
 import timber.log.Timber
 import javax.inject.Inject
 
 interface Pixel {
 
-    enum class PixelName(val pixelName: String) {
+    interface PixelName {
+        val pixelName: String
+    }
 
+    enum class AppPixelName(override val pixelName: String) : PixelName {
         APP_LAUNCH("ml"),
 
         FORGET_ALL_PRESSED_BROWSING("mf_bp"),
@@ -293,7 +296,7 @@ class RxBasedPixel @Inject constructor(
     private val pixelSender: PixelSender
 ) : Pixel {
 
-    override fun fire(pixel: PixelName, parameters: Map<String, String>, encodedParameters: Map<String, String>) {
+    override fun fire(pixel: Pixel.PixelName, parameters: Map<String, String>, encodedParameters: Map<String, String>) {
         fire(pixel.pixelName, parameters, encodedParameters)
     }
 
@@ -316,7 +319,7 @@ class RxBasedPixel @Inject constructor(
      * As this method stores the pixel to disk until successful delivery, check with privacy triage if the pixel has additional parameters
      * that they would want to validate.
      */
-    override fun enqueueFire(pixel: PixelName, parameters: Map<String, String>, encodedParameters: Map<String, String>) {
+    override fun enqueueFire(pixel: Pixel.PixelName, parameters: Map<String, String>, encodedParameters: Map<String, String>) {
         enqueueFire(pixel.pixelName, parameters, encodedParameters)
     }
 

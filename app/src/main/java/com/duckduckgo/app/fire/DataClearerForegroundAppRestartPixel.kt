@@ -73,8 +73,8 @@ class DataClearerForegroundAppRestartPixel @Inject constructor(
     }
 
     fun firePendingPixels() {
-        firePendingPixels(pendingAppForegroundRestart, Pixel.PixelName.FORGET_ALL_AUTO_RESTART)
-        firePendingPixels(pendingAppForegroundRestartWithIntent, Pixel.PixelName.FORGET_ALL_AUTO_RESTART_WITH_INTENT)
+        firePendingPixels(pendingAppForegroundRestart, Pixel.AppPixelName.FORGET_ALL_AUTO_RESTART)
+        firePendingPixels(pendingAppForegroundRestartWithIntent, Pixel.AppPixelName.FORGET_ALL_AUTO_RESTART_WITH_INTENT)
         resetCount()
     }
 

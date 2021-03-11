@@ -46,7 +46,7 @@ class WelcomePageViewModel(
             if (intent != null) {
                 emit(WelcomePageView.State.ShowDefaultBrowserDialog(intent))
             } else {
-                pixel.fire(Pixel.PixelName.DEFAULT_BROWSER_DIALOG_NOT_SHOWN)
+                pixel.fire(Pixel.AppPixelName.DEFAULT_BROWSER_DIALOG_NOT_SHOWN)
                 emit(WelcomePageView.State.Finish)
             }
         } else {
@@ -60,7 +60,7 @@ class WelcomePageViewModel(
         appInstallStore.defaultBrowser = true
 
         pixel.fire(
-            Pixel.PixelName.DEFAULT_BROWSER_SET,
+            Pixel.AppPixelName.DEFAULT_BROWSER_SET,
             mapOf(Pixel.PixelParameter.DEFAULT_BROWSER_SET_FROM_ONBOARDING to true.toString())
         )
 
@@ -73,7 +73,7 @@ class WelcomePageViewModel(
         appInstallStore.defaultBrowser = false
 
         pixel.fire(
-            Pixel.PixelName.DEFAULT_BROWSER_NOT_SET,
+            Pixel.AppPixelName.DEFAULT_BROWSER_NOT_SET,
             mapOf(Pixel.PixelParameter.DEFAULT_BROWSER_SET_FROM_ONBOARDING to true.toString())
         )
 

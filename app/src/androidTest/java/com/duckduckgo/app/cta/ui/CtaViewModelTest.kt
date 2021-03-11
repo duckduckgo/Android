@@ -47,7 +47,7 @@ import com.duckduckgo.app.runBlocking
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.*
+import com.duckduckgo.app.statistics.pixels.Pixel.AppPixelName.*
 import com.duckduckgo.app.survey.db.SurveyDao
 import com.duckduckgo.app.survey.model.Survey
 import com.duckduckgo.app.survey.model.Survey.Status.SCHEDULED

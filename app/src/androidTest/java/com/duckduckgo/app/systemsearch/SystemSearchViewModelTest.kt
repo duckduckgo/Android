@@ -27,7 +27,7 @@ import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.A
 import com.duckduckgo.app.onboarding.store.*
 import com.duckduckgo.app.runBlocking
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.*
+import com.duckduckgo.app.statistics.pixels.Pixel.AppPixelName.*
 import com.duckduckgo.app.systemsearch.SystemSearchViewModel.Command
 import com.duckduckgo.app.systemsearch.SystemSearchViewModel.Command.LaunchDuckDuckGo
 import com.nhaarman.mockitokotlin2.*

@@ -45,9 +45,9 @@ class ShortcutReceiver @Inject constructor(
         }
 
         if (useOurAppDetector.isUseOurAppUrl(originUrl)) {
-            pixel.fire(Pixel.PixelName.USE_OUR_APP_SHORTCUT_ADDED)
+            pixel.fire(Pixel.AppPixelName.USE_OUR_APP_SHORTCUT_ADDED)
         } else {
-            pixel.fire(Pixel.PixelName.SHORTCUT_ADDED)
+            pixel.fire(Pixel.AppPixelName.SHORTCUT_ADDED)
         }
     }
 

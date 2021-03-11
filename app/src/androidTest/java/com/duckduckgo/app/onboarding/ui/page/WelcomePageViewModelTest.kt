@@ -126,7 +126,7 @@ class WelcomePageViewModelTest {
         }
         events.send(WelcomePageView.Event.OnPrimaryCtaClicked)
 
-        verify(pixel).fire(Pixel.PixelName.DEFAULT_BROWSER_DIALOG_NOT_SHOWN)
+        verify(pixel).fire(Pixel.AppPixelName.DEFAULT_BROWSER_DIALOG_NOT_SHOWN)
 
         launch.cancel()
     }
@@ -142,7 +142,7 @@ class WelcomePageViewModelTest {
 
         verify(defaultRoleBrowserDialog).dialogShown()
         verify(pixel).fire(
-            Pixel.PixelName.DEFAULT_BROWSER_SET,
+            Pixel.AppPixelName.DEFAULT_BROWSER_SET,
             mapOf(Pixel.PixelParameter.DEFAULT_BROWSER_SET_FROM_ONBOARDING to true.toString())
         )
 
@@ -160,7 +160,7 @@ class WelcomePageViewModelTest {
 
         verify(defaultRoleBrowserDialog).dialogShown()
         verify(pixel).fire(
-            Pixel.PixelName.DEFAULT_BROWSER_NOT_SET,
+            Pixel.AppPixelName.DEFAULT_BROWSER_NOT_SET,
             mapOf(Pixel.PixelParameter.DEFAULT_BROWSER_SET_FROM_ONBOARDING to true.toString())
         )
 

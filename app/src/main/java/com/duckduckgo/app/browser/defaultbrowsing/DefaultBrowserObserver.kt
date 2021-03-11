@@ -21,7 +21,7 @@ import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.OnLifecycleEvent
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelName
+import com.duckduckgo.app.statistics.pixels.Pixel.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter
 
 class DefaultBrowserObserver(
@@ -40,9 +40,9 @@ class DefaultBrowserObserver(
                     val params = mapOf(
                         PixelParameter.DEFAULT_BROWSER_SET_FROM_ONBOARDING to false.toString()
                     )
-                    pixel.fire(PixelName.DEFAULT_BROWSER_SET, params)
+                    pixel.fire(AppPixelName.DEFAULT_BROWSER_SET, params)
                 }
-                else -> pixel.fire(PixelName.DEFAULT_BROWSER_UNSET)
+                else -> pixel.fire(AppPixelName.DEFAULT_BROWSER_UNSET)
             }
         }
 

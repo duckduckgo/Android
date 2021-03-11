@@ -30,7 +30,7 @@ import com.duckduckgo.app.onboarding.store.AppStage
 import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.onboarding.store.isNewUser
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.*
+import com.duckduckgo.app.statistics.pixels.Pixel.AppPixelName.*
 import com.duckduckgo.di.scopes.AppObjectGraph
 import com.jakewharton.rxrelay2.PublishRelay
 import com.squareup.anvil.annotations.ContributesTo

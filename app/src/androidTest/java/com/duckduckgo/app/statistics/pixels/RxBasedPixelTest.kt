@@ -18,7 +18,7 @@ package com.duckduckgo.app.statistics.pixels
 
 import com.duckduckgo.app.InstantSchedulersRule
 import com.duckduckgo.app.statistics.api.PixelSender
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.PRIVACY_DASHBOARD_OPENED
+import com.duckduckgo.app.statistics.pixels.Pixel.AppPixelName.PRIVACY_DASHBOARD_OPENED
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.verify

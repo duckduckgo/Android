@@ -76,14 +76,14 @@ class DefaultBrowserPageViewModelTest {
     @Test
     fun whenPageBecomesVisibleThenPixelSent() {
         testee.pageBecameVisible()
-        verify(mockPixel, times(1)).fire(Pixel.PixelName.ONBOARDING_DEFAULT_BROWSER_VISUALIZED)
+        verify(mockPixel, times(1)).fire(Pixel.AppPixelName.ONBOARDING_DEFAULT_BROWSER_VISUALIZED)
     }
 
     @Test
     fun whenPageBecomesVisibleSubsequentTimeThenAdditionalPixelNotSent() {
         testee.pageBecameVisible()
         testee.pageBecameVisible()
-        verify(mockPixel, times(1)).fire(Pixel.PixelName.ONBOARDING_DEFAULT_BROWSER_VISUALIZED)
+        verify(mockPixel, times(1)).fire(Pixel.AppPixelName.ONBOARDING_DEFAULT_BROWSER_VISUALIZED)
     }
 
     @Test
@@ -141,7 +141,7 @@ class DefaultBrowserPageViewModelTest {
 
         testee.onContinueToBrowser(false)
 
-        verify(mockPixel).fire(Pixel.PixelName.ONBOARDING_DEFAULT_BROWSER_SKIPPED)
+        verify(mockPixel).fire(Pixel.AppPixelName.ONBOARDING_DEFAULT_BROWSER_SKIPPED)
         assertTrue(captureCommands().lastValue is Command.ContinueToBrowser)
     }
 
@@ -152,7 +152,7 @@ class DefaultBrowserPageViewModelTest {
 
         testee.onContinueToBrowser(false)
 
-        verify(mockPixel, never()).fire(Pixel.PixelName.ONBOARDING_DEFAULT_BROWSER_SKIPPED)
+        verify(mockPixel, never()).fire(Pixel.AppPixelName.ONBOARDING_DEFAULT_BROWSER_SKIPPED)
         assertTrue(captureCommands().lastValue is Command.ContinueToBrowser)
     }
 
@@ -163,7 +163,7 @@ class DefaultBrowserPageViewModelTest {
 
         testee.onContinueToBrowser(true)
 
-        verify(mockPixel, never()).fire(Pixel.PixelName.ONBOARDING_DEFAULT_BROWSER_SKIPPED)
+        verify(mockPixel, never()).fire(Pixel.AppPixelName.ONBOARDING_DEFAULT_BROWSER_SKIPPED)
         assertTrue(captureCommands().lastValue is Command.ContinueToBrowser)
     }
 
@@ -174,7 +174,7 @@ class DefaultBrowserPageViewModelTest {
 
         testee.onContinueToBrowser(true)
 
-        verify(mockPixel, never()).fire(Pixel.PixelName.ONBOARDING_DEFAULT_BROWSER_SKIPPED)
+        verify(mockPixel, never()).fire(Pixel.AppPixelName.ONBOARDING_DEFAULT_BROWSER_SKIPPED)
         assertTrue(captureCommands().lastValue is Command.ContinueToBrowser)
     }
 
@@ -189,7 +189,7 @@ class DefaultBrowserPageViewModelTest {
         testee.onDefaultBrowserClicked()
 
         assertTrue(captureCommands().lastValue is Command.OpenSettings)
-        verify(mockPixel).fire(Pixel.PixelName.ONBOARDING_DEFAULT_BROWSER_LAUNCHED, params)
+        verify(mockPixel).fire(Pixel.AppPixelName.ONBOARDING_DEFAULT_BROWSER_LAUNCHED, params)
     }
 
     @Test
@@ -213,7 +213,7 @@ class DefaultBrowserPageViewModelTest {
 
         testee.onDefaultBrowserClicked()
 
-        verify(mockPixel).fire(Pixel.PixelName.ONBOARDING_DEFAULT_BROWSER_LAUNCHED, params)
+        verify(mockPixel).fire(Pixel.AppPixelName.ONBOARDING_DEFAULT_BROWSER_LAUNCHED, params)
     }
 
     @Test
@@ -229,7 +229,7 @@ class DefaultBrowserPageViewModelTest {
         testee.handleResult(Origin.InternalBrowser)
 
         assertTrue(captureCommands().lastValue is Command.ContinueToBrowser)
-        verify(mockPixel).fire(Pixel.PixelName.DEFAULT_BROWSER_SET, params)
+        verify(mockPixel).fire(Pixel.AppPixelName.DEFAULT_BROWSER_SET, params)
     }
 
     @Test
@@ -243,7 +243,7 @@ class DefaultBrowserPageViewModelTest {
         assertEquals(viewState(), DefaultBrowserDialogUI(showInstructionsCard = true))
         assertTrue(captureCommands().lastValue is Command.OpenDialog)
         assertEquals(2, testee.timesPressedJustOnce)
-        verify(mockPixel).fire(Pixel.PixelName.ONBOARDING_DEFAULT_BROWSER_SELECTED_JUST_ONCE)
+        verify(mockPixel).fire(Pixel.AppPixelName.ONBOARDING_DEFAULT_BROWSER_SELECTED_JUST_ONCE)
     }
 
     @Test
@@ -259,7 +259,7 @@ class DefaultBrowserPageViewModelTest {
         testee.handleResult(Origin.InternalBrowser)
 
         assertTrue(captureCommands().lastValue is Command.ContinueToBrowser)
-        verify(mockPixel).fire(Pixel.PixelName.DEFAULT_BROWSER_NOT_SET, params)
+        verify(mockPixel).fire(Pixel.AppPixelName.DEFAULT_BROWSER_NOT_SET, params)
     }
 
     @Test
@@ -275,7 +275,7 @@ class DefaultBrowserPageViewModelTest {
         testee.handleResult(Origin.DialogDismissed)
 
         assertEquals(viewState(), DefaultBrowserDialogUI(showInstructionsCard = false))
-        verify(mockPixel).fire(Pixel.PixelName.DEFAULT_BROWSER_NOT_SET, params)
+        verify(mockPixel).fire(Pixel.AppPixelName.DEFAULT_BROWSER_NOT_SET, params)
     }
 
     @Test
@@ -291,7 +291,7 @@ class DefaultBrowserPageViewModelTest {
         testee.handleResult(Origin.ExternalBrowser)
 
         assertTrue(viewState() is DefaultBrowserSettingsUI)
-        verify(mockPixel).fire(Pixel.PixelName.DEFAULT_BROWSER_NOT_SET, params)
+        verify(mockPixel).fire(Pixel.AppPixelName.DEFAULT_BROWSER_NOT_SET, params)
     }
 
     @Test
@@ -308,7 +308,7 @@ class DefaultBrowserPageViewModelTest {
         testee.handleResult(Origin.ExternalBrowser)
 
         assertTrue(captureCommands().lastValue is Command.ContinueToBrowser)
-        verify(mockPixel).fire(Pixel.PixelName.DEFAULT_BROWSER_SET, params)
+        verify(mockPixel).fire(Pixel.AppPixelName.DEFAULT_BROWSER_SET, params)
     }
 
     @Test
@@ -349,7 +349,7 @@ class DefaultBrowserPageViewModelTest {
 
         testee.handleResult(Origin.Settings)
 
-        verify(mockPixel).fire(Pixel.PixelName.DEFAULT_BROWSER_SET, params)
+        verify(mockPixel).fire(Pixel.AppPixelName.DEFAULT_BROWSER_SET, params)
     }
 
     @Test
@@ -364,7 +364,7 @@ class DefaultBrowserPageViewModelTest {
 
         testee.handleResult(Origin.Settings)
 
-        verify(mockPixel).fire(Pixel.PixelName.DEFAULT_BROWSER_NOT_SET, params)
+        verify(mockPixel).fire(Pixel.AppPixelName.DEFAULT_BROWSER_NOT_SET, params)
     }
 
     @Test

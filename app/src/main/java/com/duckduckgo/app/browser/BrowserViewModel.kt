@@ -232,9 +232,9 @@ class BrowserViewModel(
         launch(dispatchers.io()) {
             tabRepository.selectByUrlOrNewTab(queryUrlConverter.convertQueryToUrl(url))
             if (useOurAppDetector.isUseOurAppUrl(url)) {
-                pixel.fire(Pixel.PixelName.USE_OUR_APP_SHORTCUT_OPENED)
+                pixel.fire(Pixel.AppPixelName.USE_OUR_APP_SHORTCUT_OPENED)
             } else {
-                pixel.fire(Pixel.PixelName.SHORTCUT_OPENED)
+                pixel.fire(Pixel.AppPixelName.SHORTCUT_OPENED)
             }
         }
     }

@@ -66,7 +66,7 @@ class UseOurAppSpecification(context: Context) : NotificationSpec {
     override val description: String = context.getString(R.string.useOurAppNotificationDescription)
     override val launchButton: String? = null
     override val closeButton: String? = null
-    override val pixelSuffix = Pixel.PixelName.USE_OUR_APP_NOTIFICATION_SUFFIX.pixelName
+    override val pixelSuffix = Pixel.AppPixelName.USE_OUR_APP_NOTIFICATION_SUFFIX.pixelName
     override val autoCancel = true
     override val bundle: Bundle = Bundle()
     override val color: Int = R.color.ic_launcher_red_background

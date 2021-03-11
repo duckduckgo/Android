@@ -46,7 +46,7 @@ import com.duckduckgo.app.statistics.AtbInitializer
 import com.duckduckgo.app.statistics.api.OfflinePixelScheduler
 import com.duckduckgo.app.statistics.api.PixelSender
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.APP_LAUNCH
+import com.duckduckgo.app.statistics.pixels.Pixel.AppPixelName.APP_LAUNCH
 import com.duckduckgo.app.surrogates.ResourceSurrogateLoader
 import com.duckduckgo.app.tabs.db.TabsDbSanitizer
 import com.duckduckgo.app.trackerdetection.TrackerDataLoader
@@ -259,7 +259,7 @@ open class DuckDuckGoApplication : HasAndroidInjector, Application(), LifecycleO
                 launchedByFireAction = true
             }
             for (i in 1..count) {
-                pixel.fire(Pixel.PixelName.FORGET_ALL_EXECUTED)
+                pixel.fire(Pixel.AppPixelName.FORGET_ALL_EXECUTED)
             }
             unsentForgetAllPixelStore.resetCount()
         }

@@ -115,7 +115,7 @@ class BrokenSiteViewModelTest {
             siteType = BrokenSiteViewModel.DESKTOP_SITE
         )
 
-        verify(mockPixel).fire(Pixel.PixelName.BROKEN_SITE_REPORTED, mapOf("url" to url))
+        verify(mockPixel).fire(Pixel.AppPixelName.BROKEN_SITE_REPORTED, mapOf("url" to url))
         verify(mockBrokenSiteSender).submitBrokenSiteFeedback(brokenSiteExpected)
         verify(mockCommandObserver).onChanged(Command.ConfirmAndFinish)
     }

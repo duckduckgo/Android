@@ -159,7 +159,7 @@ class UriUtilsFilenameExtractorTest {
         val mimeType: String? = null
         val contentDisposition: String? = null
         val extracted = testee.extract(buildPendingDownload(url, contentDisposition, mimeType))
-        verify(mockedPixel).fire(Pixel.PixelName.DOWNLOAD_FILE_DEFAULT_GUESSED_NAME)
+        verify(mockedPixel).fire(Pixel.AppPixelName.DOWNLOAD_FILE_DEFAULT_GUESSED_NAME)
     }
 
     private fun buildPendingDownload(url: String, contentDisposition: String?, mimeType: String?): FileDownloader.PendingFileDownload {

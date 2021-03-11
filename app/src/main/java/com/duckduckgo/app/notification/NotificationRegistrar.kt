@@ -105,7 +105,7 @@ class NotificationRegistrar @Inject constructor(
 
     fun updateStatus(enabled: Boolean) {
         if (settingsDataStore.appNotificationsEnabled != enabled) {
-            pixel.fire(if (enabled) Pixel.PixelName.NOTIFICATIONS_ENABLED else Pixel.PixelName.NOTIFICATIONS_DISABLED)
+            pixel.fire(if (enabled) Pixel.AppPixelName.NOTIFICATIONS_ENABLED else Pixel.AppPixelName.NOTIFICATIONS_DISABLED)
             settingsDataStore.appNotificationsEnabled = enabled
         }
     }

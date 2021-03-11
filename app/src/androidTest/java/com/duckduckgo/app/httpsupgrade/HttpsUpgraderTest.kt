@@ -51,28 +51,28 @@ class HttpsUpgraderTest {
     fun whenHttpUriIsInBloomThenShouldUpgrade() {
         bloomFilter.add("www.local.url")
         assertTrue(testee.shouldUpgrade(Uri.parse("http://www.local.url")))
-        mockPixel.fire(Pixel.PixelName.HTTPS_LOCAL_UPGRADE)
+        mockPixel.fire(Pixel.AppPixelName.HTTPS_LOCAL_UPGRADE)
     }
 
     @Test
     fun whenHttpUriIsNotInBloomThenShouldNotUpgrade() {
         bloomFilter.add("www.local.url")
         assertFalse(testee.shouldUpgrade(Uri.parse("http://www.differentlocal.url")))
-        mockPixel.fire(Pixel.PixelName.HTTPS_NO_UPGRADE)
+        mockPixel.fire(Pixel.AppPixelName.HTTPS_NO_UPGRADE)
     }
 
     @Test
     fun whenHttpsUriThenShouldNotUpgrade() {
         bloomFilter.add("www.local.url")
         assertFalse(testee.shouldUpgrade(Uri.parse("https://www.local.url")))
-        mockPixel.fire(Pixel.PixelName.HTTPS_NO_UPGRADE)
+        mockPixel.fire(Pixel.AppPixelName.HTTPS_NO_UPGRADE)
     }
 
     @Test
     fun whenHttpUriHasOnlyPartDomainInLocalListThenShouldNotUpgrade() {
         bloomFilter.add("local.url")
         assertFalse(testee.shouldUpgrade(Uri.parse("http://www.local.url")))
-        mockPixel.fire(Pixel.PixelName.HTTPS_NO_LOOKUP)
+        mockPixel.fire(Pixel.AppPixelName.HTTPS_NO_LOOKUP)
     }
 
     @Test
@@ -80,6 +80,6 @@ class HttpsUpgraderTest {
         bloomFilter.add("www.local.url")
         whenever(mockUserAllowlistDao.contains("www.local.url")).thenReturn(true)
         assertFalse(testee.shouldUpgrade(Uri.parse("http://www.local.url")))
-        mockPixel.fire(Pixel.PixelName.HTTPS_NO_LOOKUP)
+        mockPixel.fire(Pixel.AppPixelName.HTTPS_NO_LOOKUP)
     }
 }

@@ -193,7 +193,7 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
     }
 
     private fun onFire() {
-        pixel.fire(Pixel.PixelName.FORGET_ALL_PRESSED_TABSWITCHING)
+        pixel.fire(Pixel.AppPixelName.FORGET_ALL_PRESSED_TABSWITCHING)
         val dialog = FireDialog(
             context = this,
             clearPersonalDataAction = clearPersonalDataAction,

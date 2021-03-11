@@ -72,8 +72,8 @@ class UseOurAppCta(
     @StringRes val okButton: Int = R.string.useOurAppDialogButtonText,
     @StringRes val cancelButton: Int = R.string.useOurAppDialogCancelButtonText,
     override val ctaId: CtaId = CtaId.USE_OUR_APP,
-    override val shownPixel: Pixel.PixelName? = Pixel.PixelName.USE_OUR_APP_DIALOG_SHOWN,
-    override val okPixel: Pixel.PixelName? = Pixel.PixelName.USE_OUR_APP_DIALOG_OK,
+    override val shownPixel: Pixel.PixelName? = Pixel.AppPixelName.USE_OUR_APP_DIALOG_SHOWN,
+    override val okPixel: Pixel.PixelName? = Pixel.AppPixelName.USE_OUR_APP_DIALOG_OK,
     override val cancelPixel: Pixel.PixelName? = null
 ) : Cta, DialogCta {
 
@@ -97,7 +97,7 @@ class UseOurAppDeletionCta(
     @StringRes val text: Int = R.string.useOurAppDeletionDialogText,
     @StringRes val okButton: Int = R.string.daxDialogGotIt,
     override val ctaId: CtaId = CtaId.USE_OUR_APP_DELETION,
-    override val shownPixel: Pixel.PixelName? = Pixel.PixelName.USE_OUR_APP_DIALOG_DELETE_SHOWN,
+    override val shownPixel: Pixel.PixelName? = Pixel.AppPixelName.USE_OUR_APP_DIALOG_DELETE_SHOWN,
     override val okPixel: Pixel.PixelName? = null,
     override val cancelPixel: Pixel.PixelName? = null
 ) : Cta, DialogCta {
@@ -144,8 +144,8 @@ sealed class DaxDialogCta(
         CtaId.DAX_DIALOG_SERP,
         R.string.daxSerpCtaText,
         R.string.daxDialogPhew,
-        Pixel.PixelName.ONBOARDING_DAX_CTA_SHOWN,
-        Pixel.PixelName.ONBOARDING_DAX_CTA_OK_BUTTON,
+        Pixel.AppPixelName.ONBOARDING_DAX_CTA_SHOWN,
+        Pixel.AppPixelName.ONBOARDING_DAX_CTA_OK_BUTTON,
         null,
         Pixel.PixelValues.DAX_SERP_CTA,
         onboardingStore,
@@ -161,8 +161,8 @@ sealed class DaxDialogCta(
         CtaId.DAX_DIALOG_TRACKERS_FOUND,
         R.plurals.daxTrackersBlockedCtaText,
         R.string.daxDialogHighFive,
-        Pixel.PixelName.ONBOARDING_DAX_CTA_SHOWN,
-        Pixel.PixelName.ONBOARDING_DAX_CTA_OK_BUTTON,
+        Pixel.AppPixelName.ONBOARDING_DAX_CTA_SHOWN,
+        Pixel.AppPixelName.ONBOARDING_DAX_CTA_OK_BUTTON,
         null,
         Pixel.PixelValues.DAX_TRACKERS_BLOCKED_CTA,
         onboardingStore,
@@ -203,8 +203,8 @@ sealed class DaxDialogCta(
         CtaId.DAX_DIALOG_NETWORK,
         R.string.daxMainNetworkCtaText,
         R.string.daxDialogGotIt,
-        Pixel.PixelName.ONBOARDING_DAX_CTA_SHOWN,
-        Pixel.PixelName.ONBOARDING_DAX_CTA_OK_BUTTON,
+        Pixel.AppPixelName.ONBOARDING_DAX_CTA_SHOWN,
+        Pixel.AppPixelName.ONBOARDING_DAX_CTA_OK_BUTTON,
         null,
         Pixel.PixelValues.DAX_NETWORK_CTA_1,
         onboardingStore,
@@ -238,8 +238,8 @@ sealed class DaxDialogCta(
         CtaId.DAX_DIALOG_OTHER,
         R.string.daxNonSerpCtaText,
         R.string.daxDialogGotIt,
-        Pixel.PixelName.ONBOARDING_DAX_CTA_SHOWN,
-        Pixel.PixelName.ONBOARDING_DAX_CTA_OK_BUTTON,
+        Pixel.AppPixelName.ONBOARDING_DAX_CTA_SHOWN,
+        Pixel.AppPixelName.ONBOARDING_DAX_CTA_OK_BUTTON,
         null,
         Pixel.PixelValues.DAX_NO_TRACKERS_CTA,
         onboardingStore,
@@ -286,8 +286,8 @@ sealed class DaxBubbleCta(
     class DaxIntroCta(override val onboardingStore: OnboardingStore, override val appInstallStore: AppInstallStore) : DaxBubbleCta(
         CtaId.DAX_INTRO,
         R.string.daxIntroCtaText,
-        Pixel.PixelName.ONBOARDING_DAX_CTA_SHOWN,
-        Pixel.PixelName.ONBOARDING_DAX_CTA_OK_BUTTON,
+        Pixel.AppPixelName.ONBOARDING_DAX_CTA_SHOWN,
+        Pixel.AppPixelName.ONBOARDING_DAX_CTA_OK_BUTTON,
         null,
         Pixel.PixelValues.DAX_INITIAL_CTA,
         onboardingStore,
@@ -297,8 +297,8 @@ sealed class DaxBubbleCta(
     class DaxEndCta(override val onboardingStore: OnboardingStore, override val appInstallStore: AppInstallStore) : DaxBubbleCta(
         CtaId.DAX_END,
         R.string.daxEndCtaText,
-        Pixel.PixelName.ONBOARDING_DAX_CTA_SHOWN,
-        Pixel.PixelName.ONBOARDING_DAX_CTA_OK_BUTTON,
+        Pixel.AppPixelName.ONBOARDING_DAX_CTA_SHOWN,
+        Pixel.AppPixelName.ONBOARDING_DAX_CTA_OK_BUTTON,
         null,
         Pixel.PixelValues.DAX_END_CTA,
         onboardingStore,
@@ -335,7 +335,7 @@ sealed class DaxFireDialogCta(
     class TryClearDataCta(override val onboardingStore: OnboardingStore, override val appInstallStore: AppInstallStore) : DaxFireDialogCta(
         ctaId = CtaId.DAX_FIRE_BUTTON,
         description = R.string.daxClearDataCtaText,
-        shownPixel = Pixel.PixelName.ONBOARDING_DAX_CTA_SHOWN,
+        shownPixel = Pixel.AppPixelName.ONBOARDING_DAX_CTA_SHOWN,
         okPixel = null,
         cancelPixel = null,
         ctaPixelParam = DAX_FIRE_DIALOG_CTA,
@@ -378,9 +378,9 @@ sealed class HomePanelCta(
         R.string.surveyCtaDescription,
         R.string.surveyCtaLaunchButton,
         R.string.surveyCtaDismissButton,
-        Pixel.PixelName.SURVEY_CTA_SHOWN,
-        Pixel.PixelName.SURVEY_CTA_LAUNCHED,
-        Pixel.PixelName.SURVEY_CTA_DISMISSED
+        Pixel.AppPixelName.SURVEY_CTA_SHOWN,
+        Pixel.AppPixelName.SURVEY_CTA_LAUNCHED,
+        Pixel.AppPixelName.SURVEY_CTA_DISMISSED
     )
 
     object AddWidgetAuto : HomePanelCta(
@@ -390,9 +390,9 @@ sealed class HomePanelCta(
         R.string.addWidgetCtaDescription,
         R.string.addWidgetCtaAutoLaunchButton,
         R.string.addWidgetCtaDismissButton,
-        Pixel.PixelName.WIDGET_CTA_SHOWN,
-        Pixel.PixelName.WIDGET_CTA_LAUNCHED,
-        Pixel.PixelName.WIDGET_CTA_DISMISSED
+        Pixel.AppPixelName.WIDGET_CTA_SHOWN,
+        Pixel.AppPixelName.WIDGET_CTA_LAUNCHED,
+        Pixel.AppPixelName.WIDGET_CTA_DISMISSED
     )
 
     object AddWidgetInstructions : HomePanelCta(
@@ -402,9 +402,9 @@ sealed class HomePanelCta(
         R.string.addWidgetCtaDescription,
         R.string.addWidgetCtaInstructionsLaunchButton,
         R.string.addWidgetCtaDismissButton,
-        Pixel.PixelName.WIDGET_LEGACY_CTA_SHOWN,
-        Pixel.PixelName.WIDGET_LEGACY_CTA_LAUNCHED,
-        Pixel.PixelName.WIDGET_LEGACY_CTA_DISMISSED
+        Pixel.AppPixelName.WIDGET_LEGACY_CTA_SHOWN,
+        Pixel.AppPixelName.WIDGET_LEGACY_CTA_LAUNCHED,
+        Pixel.AppPixelName.WIDGET_LEGACY_CTA_DISMISSED
     )
 }
 

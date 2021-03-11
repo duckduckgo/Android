@@ -115,7 +115,7 @@ class CtaViewModel @Inject constructor(
 
     suspend fun hideTipsForever(cta: Cta) {
         settingsDataStore.hideTips = true
-        pixel.fire(Pixel.PixelName.ONBOARDING_DAX_ALL_CTA_HIDDEN, cta.pixelCancelParameters())
+        pixel.fire(Pixel.AppPixelName.ONBOARDING_DAX_ALL_CTA_HIDDEN, cta.pixelCancelParameters())
         userStageStore.stageCompleted(AppStage.DAX_ONBOARDING)
     }
 

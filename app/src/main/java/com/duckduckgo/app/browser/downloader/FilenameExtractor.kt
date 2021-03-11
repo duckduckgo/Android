@@ -76,7 +76,7 @@ class FilenameExtractor @Inject constructor(
     private fun bestGuess(guesses: Guesses): String {
         val guess = guesses.bestGuess ?: guesses.latestGuess
         if (!guess.contains(".")) {
-            pixel.fire(Pixel.PixelName.DOWNLOAD_FILE_DEFAULT_GUESSED_NAME)
+            pixel.fire(Pixel.AppPixelName.DOWNLOAD_FILE_DEFAULT_GUESSED_NAME)
             return guess + DEFAULT_FILE_TYPE
         }
         return guess

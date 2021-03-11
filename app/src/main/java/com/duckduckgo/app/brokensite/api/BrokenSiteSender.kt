@@ -62,7 +62,7 @@ class BrokenSiteSubmitter(
                 SURROGATES_KEY to brokenSite.surrogates
             )
             runCatching {
-                pixel.fire(Pixel.PixelName.BROKEN_SITE_REPORT.pixelName, params, encodedParams)
+                pixel.fire(Pixel.AppPixelName.BROKEN_SITE_REPORT.pixelName, params, encodedParams)
             }
                 .onSuccess { Timber.v("Feedback submission succeeded") }
                 .onFailure { Timber.w(it, "Feedback submission failed") }

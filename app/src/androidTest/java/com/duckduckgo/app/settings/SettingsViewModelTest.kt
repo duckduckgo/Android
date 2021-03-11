@@ -93,7 +93,7 @@ class SettingsViewModelTest {
     @Test
     fun whenViewModelInitialisedThenPixelIsFired() {
         testee // init
-        verify(mockPixel).fire(Pixel.PixelName.SETTINGS_OPENED)
+        verify(mockPixel).fire(Pixel.AppPixelName.SETTINGS_OPENED)
     }
 
     @Test
@@ -136,7 +136,7 @@ class SettingsViewModelTest {
     @Test
     fun whenLightThemeToggledOnThenLighThemePixelIsSent() {
         testee.onLightThemeToggled(true)
-        verify(mockPixel).fire(Pixel.PixelName.SETTINGS_THEME_TOGGLED_LIGHT)
+        verify(mockPixel).fire(Pixel.AppPixelName.SETTINGS_THEME_TOGGLED_LIGHT)
     }
 
     @Test
@@ -152,7 +152,7 @@ class SettingsViewModelTest {
     @Test
     fun whenLightThemeToggledOffThenDarkThemePixelIsSent() {
         testee.onLightThemeToggled(false)
-        verify(mockPixel).fire(Pixel.PixelName.SETTINGS_THEME_TOGGLED_DARK)
+        verify(mockPixel).fire(Pixel.AppPixelName.SETTINGS_THEME_TOGGLED_DARK)
     }
 
     @Test
@@ -208,7 +208,7 @@ class SettingsViewModelTest {
     @Test
     fun whenWhitelistSelectedThenPixelIsSentAndWhitelistLaunched() {
         testee.onManageWhitelistSelected()
-        verify(mockPixel).fire(Pixel.PixelName.SETTINGS_MANAGE_WHITELIST)
+        verify(mockPixel).fire(Pixel.AppPixelName.SETTINGS_MANAGE_WHITELIST)
         verify(commandObserver).onChanged(Command.LaunchWhitelist)
     }
 
@@ -247,7 +247,7 @@ class SettingsViewModelTest {
     fun whenFireAnimationSettingClickedThenPixelSent() {
         testee.userRequestedToChangeFireAnimation()
 
-        verify(mockPixel).fire(Pixel.PixelName.FIRE_ANIMATION_SETTINGS_OPENED)
+        verify(mockPixel).fire(Pixel.AppPixelName.FIRE_ANIMATION_SETTINGS_OPENED)
     }
 
     @Test
@@ -276,7 +276,7 @@ class SettingsViewModelTest {
         testee.onFireAnimationSelected(FireAnimation.HeroWater)
 
         verify(mockPixel).fire(
-            Pixel.PixelName.FIRE_ANIMATION_NEW_SELECTED,
+            Pixel.AppPixelName.FIRE_ANIMATION_NEW_SELECTED,
             mapOf(Pixel.PixelParameter.FIRE_ANIMATION to Pixel.PixelValues.FIRE_ANIMATION_WHIRLPOOL)
         )
     }
@@ -288,7 +288,7 @@ class SettingsViewModelTest {
         testee.onFireAnimationSelected(FireAnimation.HeroFire)
 
         verify(mockPixel, times(0)).fire(
-            Pixel.PixelName.FIRE_ANIMATION_NEW_SELECTED,
+            Pixel.AppPixelName.FIRE_ANIMATION_NEW_SELECTED,
             mapOf(Pixel.PixelParameter.FIRE_ANIMATION to Pixel.PixelValues.FIRE_ANIMATION_INFERNO)
         )
     }

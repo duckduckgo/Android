@@ -62,19 +62,19 @@ class WebViewLongPressHandlerTest {
     @Test
     fun whenUserLongPressesWithImageTypeThenPixelFired() {
         testee.handleLongPress(HitTestResult.IMAGE_TYPE, HTTPS_IMAGE_URL, mockMenu)
-        verify(mockPixel).fire(Pixel.PixelName.LONG_PRESS)
+        verify(mockPixel).fire(Pixel.AppPixelName.LONG_PRESS)
     }
 
     @Test
     fun whenUserLongPressesWithAnchorImageTypeThenPixelFired() {
         testee.handleLongPress(HitTestResult.SRC_IMAGE_ANCHOR_TYPE, HTTPS_IMAGE_URL, mockMenu)
-        verify(mockPixel).fire(Pixel.PixelName.LONG_PRESS)
+        verify(mockPixel).fire(Pixel.AppPixelName.LONG_PRESS)
     }
 
     @Test
     fun whenUserLongPressesWithUnknownTypeThenPixelNotFired() {
         testee.handleLongPress(HitTestResult.UNKNOWN_TYPE, HTTPS_IMAGE_URL, mockMenu)
-        verify(mockPixel, never()).fire(Pixel.PixelName.LONG_PRESS)
+        verify(mockPixel, never()).fire(Pixel.AppPixelName.LONG_PRESS)
     }
 
     @Test

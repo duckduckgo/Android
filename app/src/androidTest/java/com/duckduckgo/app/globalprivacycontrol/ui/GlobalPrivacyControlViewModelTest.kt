@@ -71,7 +71,7 @@ class GlobalPrivacyControlViewModelTest {
 
     @Test
     fun whenViewModelCreateThenPixelSent() {
-        verify(mockPixel).fire(Pixel.PixelName.SETTINGS_DO_NOT_SELL_SHOWN)
+        verify(mockPixel).fire(Pixel.AppPixelName.SETTINGS_DO_NOT_SELL_SHOWN)
     }
 
     @Test
@@ -88,14 +88,14 @@ class GlobalPrivacyControlViewModelTest {
     fun whenOnUserToggleGlobalPrivacyControlThenDoNotSellOnPixelSent() {
         testee.onUserToggleGlobalPrivacyControl(true)
 
-        verify(mockPixel).fire(Pixel.PixelName.SETTINGS_DO_NOT_SELL_ON)
+        verify(mockPixel).fire(Pixel.AppPixelName.SETTINGS_DO_NOT_SELL_ON)
     }
 
     @Test
     fun whenOnUserToggleGlobalPrivacyControlThenDoNotSellOffPixelSent() {
         testee.onUserToggleGlobalPrivacyControl(false)
 
-        verify(mockPixel).fire(Pixel.PixelName.SETTINGS_DO_NOT_SELL_OFF)
+        verify(mockPixel).fire(Pixel.AppPixelName.SETTINGS_DO_NOT_SELL_OFF)
     }
 
     @Test

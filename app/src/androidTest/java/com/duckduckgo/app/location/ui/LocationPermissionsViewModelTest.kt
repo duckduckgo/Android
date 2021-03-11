@@ -223,7 +223,7 @@ class LocationPermissionsViewModelTest {
 
         viewModel.onSiteLocationPermissionSelected("domain.com", LocationPermissionType.DENY_ALWAYS)
 
-        verify(mockPixel).fire(Pixel.PixelName.PRECISE_LOCATION_SITE_DIALOG_DENY_ALWAYS)
+        verify(mockPixel).fire(Pixel.AppPixelName.PRECISE_LOCATION_SITE_DIALOG_DENY_ALWAYS)
         Mockito.verify(mockViewStateObserver, atLeastOnce()).onChanged(viewStateCaptor.capture())
         assertTrue(viewStateCaptor.lastValue.locationPermissionEntities.size == 1)
 
@@ -237,7 +237,7 @@ class LocationPermissionsViewModelTest {
 
         viewModel.onSiteLocationPermissionSelected(domain, LocationPermissionType.ALLOW_ALWAYS)
 
-        verify(mockPixel).fire(Pixel.PixelName.PRECISE_LOCATION_SITE_DIALOG_ALLOW_ALWAYS)
+        verify(mockPixel).fire(Pixel.AppPixelName.PRECISE_LOCATION_SITE_DIALOG_ALLOW_ALWAYS)
         verify(mockGeoLocationPermissions).allow(domain)
         assertEquals(locationPermissionsDao.getPermission(domain)!!.permission, LocationPermissionType.ALLOW_ALWAYS)
     }

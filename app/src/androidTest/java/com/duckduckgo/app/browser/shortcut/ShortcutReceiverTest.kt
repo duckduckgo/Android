@@ -43,7 +43,7 @@ class ShortcutReceiverTest {
         intent.putExtra(ShortcutBuilder.SHORTCUT_TITLE_ARG, "Title")
         testee.onReceive(null, intent)
 
-        verify(mockPixel).fire(Pixel.PixelName.USE_OUR_APP_SHORTCUT_ADDED)
+        verify(mockPixel).fire(Pixel.AppPixelName.USE_OUR_APP_SHORTCUT_ADDED)
     }
 
     @Test
@@ -53,7 +53,7 @@ class ShortcutReceiverTest {
         intent.putExtra(ShortcutBuilder.SHORTCUT_TITLE_ARG, "Title")
         testee.onReceive(null, intent)
 
-        verify(mockPixel).fire(Pixel.PixelName.SHORTCUT_ADDED)
+        verify(mockPixel).fire(Pixel.AppPixelName.SHORTCUT_ADDED)
     }
 
 }
