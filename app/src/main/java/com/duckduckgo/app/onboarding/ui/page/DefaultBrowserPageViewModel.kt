@@ -30,36 +30,6 @@ import dagger.Provides
 import dagger.multibindings.IntoSet
 import javax.inject.Singleton
 
-@Module
-@ContributesTo(AppObjectGraph::class)
-class DefaultBrowserPageViewModelFactoryModule {
-    @Provides
-    @Singleton
-    @IntoSet
-    fun provideDefaultBrowserPageViewModelFactory(
-        defaultBrowserDetector: DefaultBrowserDetector,
-        pixel: Pixel,
-        installStore: AppInstallStore
-    ): ViewModelFactoryPlugin {
-        return DefaultBrowserPageViewModelFactory(defaultBrowserDetector, pixel, installStore)
-    }
-}
-
-private class DefaultBrowserPageViewModelFactory(
-    private val defaultBrowserDetector: DefaultBrowserDetector,
-    private val pixel: Pixel,
-    private val installStore: AppInstallStore
-) : ViewModelFactoryPlugin {
-    override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
-        with(modelClass) {
-            return when {
-                isAssignableFrom(DefaultBrowserPageViewModel::class.java) -> (DefaultBrowserPageViewModel(defaultBrowserDetector, pixel, installStore) as T)
-                else -> null
-            }
-        }
-    }
-}
-
 class DefaultBrowserPageViewModel(
     private val defaultBrowserDetector: DefaultBrowserDetector,
     private val pixel: Pixel,
@@ -228,5 +198,35 @@ class DefaultBrowserPageViewModel(
     companion object {
         const val MAX_DIALOG_ATTEMPTS = 2
         const val DEFAULT_URL = "https://duckduckgo.com"
+    }
+}
+
+@Module
+@ContributesTo(AppObjectGraph::class)
+class DefaultBrowserPageViewModelFactoryModule {
+    @Provides
+    @Singleton
+    @IntoSet
+    fun provideDefaultBrowserPageViewModelFactory(
+        defaultBrowserDetector: DefaultBrowserDetector,
+        pixel: Pixel,
+        installStore: AppInstallStore
+    ): ViewModelFactoryPlugin {
+        return DefaultBrowserPageViewModelFactory(defaultBrowserDetector, pixel, installStore)
+    }
+}
+
+private class DefaultBrowserPageViewModelFactory(
+    private val defaultBrowserDetector: DefaultBrowserDetector,
+    private val pixel: Pixel,
+    private val installStore: AppInstallStore
+) : ViewModelFactoryPlugin {
+    override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
+        with(modelClass) {
+            return when {
+                isAssignableFrom(DefaultBrowserPageViewModel::class.java) -> (DefaultBrowserPageViewModel(defaultBrowserDetector, pixel, installStore) as T)
+                else -> null
+            }
+        }
     }
 }

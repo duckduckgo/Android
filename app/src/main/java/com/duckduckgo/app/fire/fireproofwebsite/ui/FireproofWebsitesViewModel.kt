@@ -37,40 +37,6 @@ import dagger.multibindings.IntoSet
 import kotlinx.coroutines.launch
 import javax.inject.Singleton
 
-@Module
-@ContributesTo(AppObjectGraph::class)
-class FireproofWebsitesViewModelFactoryModule {
-    @Provides
-    @Singleton
-    @IntoSet
-    fun provideFireproofWebsitesViewModelFactory(
-        fireproofWebsiteRepository: FireproofWebsiteRepository,
-        dispatcherProvider: DispatcherProvider,
-        pixel: Pixel,
-        settingsDataStore: SettingsDataStore,
-        userEventsStore: UserEventsStore
-    ): ViewModelFactoryPlugin {
-        return FireproofWebsitesViewModelFactory(fireproofWebsiteRepository, dispatcherProvider, pixel, settingsDataStore, userEventsStore)
-    }
-}
-
-private class FireproofWebsitesViewModelFactory(
-    private val fireproofWebsiteRepository: FireproofWebsiteRepository,
-    private val dispatcherProvider: DispatcherProvider,
-    private val pixel: Pixel,
-    private val settingsDataStore: SettingsDataStore,
-    private val userEventsStore: UserEventsStore
-) : ViewModelFactoryPlugin {
-    override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
-        with(modelClass) {
-            return when {
-                isAssignableFrom(FireproofWebsitesViewModel::class.java) -> (FireproofWebsitesViewModel(fireproofWebsiteRepository, dispatcherProvider, pixel, settingsDataStore, userEventsStore) as T)
-                else -> null
-            }
-        }
-    }
-}
-
 class FireproofWebsitesViewModel(
     private val fireproofWebsiteRepository: FireproofWebsiteRepository,
     private val dispatcherProvider: DispatcherProvider,
@@ -142,5 +108,39 @@ class FireproofWebsitesViewModel(
         }
         settingsDataStore.appLoginDetection = enabled
         _viewState.value = _viewState.value?.copy(loginDetectionEnabled = enabled)
+    }
+}
+
+@Module
+@ContributesTo(AppObjectGraph::class)
+class FireproofWebsitesViewModelFactoryModule {
+    @Provides
+    @Singleton
+    @IntoSet
+    fun provideFireproofWebsitesViewModelFactory(
+        fireproofWebsiteRepository: FireproofWebsiteRepository,
+        dispatcherProvider: DispatcherProvider,
+        pixel: Pixel,
+        settingsDataStore: SettingsDataStore,
+        userEventsStore: UserEventsStore
+    ): ViewModelFactoryPlugin {
+        return FireproofWebsitesViewModelFactory(fireproofWebsiteRepository, dispatcherProvider, pixel, settingsDataStore, userEventsStore)
+    }
+}
+
+private class FireproofWebsitesViewModelFactory(
+    private val fireproofWebsiteRepository: FireproofWebsiteRepository,
+    private val dispatcherProvider: DispatcherProvider,
+    private val pixel: Pixel,
+    private val settingsDataStore: SettingsDataStore,
+    private val userEventsStore: UserEventsStore
+) : ViewModelFactoryPlugin {
+    override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
+        with(modelClass) {
+            return when {
+                isAssignableFrom(FireproofWebsitesViewModel::class.java) -> (FireproofWebsitesViewModel(fireproofWebsiteRepository, dispatcherProvider, pixel, settingsDataStore, userEventsStore) as T)
+                else -> null
+            }
+        }
     }
 }

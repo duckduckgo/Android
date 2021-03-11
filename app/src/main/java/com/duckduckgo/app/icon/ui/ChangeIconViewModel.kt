@@ -32,36 +32,6 @@ import dagger.multibindings.IntoSet
 import javax.inject.Inject
 import javax.inject.Singleton
 
-@Module
-@ContributesTo(AppObjectGraph::class)
-class ChangeIconViewModelFactoryModule {
-    @Provides
-    @Singleton
-    @IntoSet
-    fun provideChangeIconViewModelFactory(
-        settingsDataStore: SettingsDataStore,
-        appIconModifier: IconModifier,
-        pixel: Pixel
-    ): ViewModelFactoryPlugin {
-        return ChangeIconViewModelFactory(settingsDataStore, appIconModifier, pixel)
-    }
-}
-
-private class ChangeIconViewModelFactory(
-    private val settingsDataStore: SettingsDataStore,
-    private val appIconModifier: IconModifier,
-    private val pixel: Pixel
-) : ViewModelFactoryPlugin {
-    override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
-        with(modelClass) {
-            return when {
-                isAssignableFrom(ChangeIconViewModel::class.java) -> (ChangeIconViewModel(settingsDataStore, appIconModifier, pixel) as T)
-                else -> null
-            }
-        }
-    }
-}
-
 class ChangeIconViewModel @Inject constructor(
     private val settingsDataStore: SettingsDataStore,
     private val appIconModifier: IconModifier,
@@ -109,5 +79,34 @@ class ChangeIconViewModel @Inject constructor(
         appIconModifier.changeIcon(previousIcon, viewData.appIcon)
         command.value = Command.IconChanged
     }
+}
 
+@Module
+@ContributesTo(AppObjectGraph::class)
+class ChangeIconViewModelFactoryModule {
+    @Provides
+    @Singleton
+    @IntoSet
+    fun provideChangeIconViewModelFactory(
+        settingsDataStore: SettingsDataStore,
+        appIconModifier: IconModifier,
+        pixel: Pixel
+    ): ViewModelFactoryPlugin {
+        return ChangeIconViewModelFactory(settingsDataStore, appIconModifier, pixel)
+    }
+}
+
+private class ChangeIconViewModelFactory(
+    private val settingsDataStore: SettingsDataStore,
+    private val appIconModifier: IconModifier,
+    private val pixel: Pixel
+) : ViewModelFactoryPlugin {
+    override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
+        with(modelClass) {
+            return when {
+                isAssignableFrom(ChangeIconViewModel::class.java) -> (ChangeIconViewModel(settingsDataStore, appIconModifier, pixel) as T)
+                else -> null
+            }
+        }
+    }
 }

@@ -38,32 +38,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Singleton
 
-@Module
-@ContributesTo(AppObjectGraph::class)
-class WhitelistViewModelFactoryModule {
-    @Provides
-    @Singleton
-    @IntoSet
-    fun provideWhitelistViewModelFactory(
-        dao: UserWhitelistDao
-    ): ViewModelFactoryPlugin {
-        return WhitelistViewModelFactory(dao)
-    }
-}
-
-private class WhitelistViewModelFactory(
-    private val dao: UserWhitelistDao
-) : ViewModelFactoryPlugin {
-    override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
-        with(modelClass) {
-            return when {
-                isAssignableFrom(WhitelistViewModel::class.java) -> (WhitelistViewModel(dao) as T)
-                else -> null
-            }
-        }
-    }
-}
-
 class WhitelistViewModel(
     private val dao: UserWhitelistDao,
     private val dispatchers: DispatcherProvider = DefaultDispatcherProvider()
@@ -149,5 +123,31 @@ class WhitelistViewModel(
 
     private suspend fun deleteEntryFromDatabase(entry: UserWhitelistedDomain) {
         withContext(dispatchers.io()) { dao.delete(entry) }
+    }
+}
+
+@Module
+@ContributesTo(AppObjectGraph::class)
+class WhitelistViewModelFactoryModule {
+    @Provides
+    @Singleton
+    @IntoSet
+    fun provideWhitelistViewModelFactory(
+        dao: UserWhitelistDao
+    ): ViewModelFactoryPlugin {
+        return WhitelistViewModelFactory(dao)
+    }
+}
+
+private class WhitelistViewModelFactory(
+    private val dao: UserWhitelistDao
+) : ViewModelFactoryPlugin {
+    override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
+        with(modelClass) {
+            return when {
+                isAssignableFrom(WhitelistViewModel::class.java) -> (WhitelistViewModel(dao) as T)
+                else -> null
+            }
+        }
     }
 }

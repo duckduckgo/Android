@@ -26,6 +26,20 @@ import dagger.Provides
 import dagger.multibindings.IntoSet
 import javax.inject.Singleton
 
+class BrokenSiteNegativeFeedbackViewModel : ViewModel() {
+
+    val command: SingleLiveEvent<Command> = SingleLiveEvent()
+
+    fun userSubmittingFeedback(feedback: String, brokenSite: String?) {
+        command.value = Command.ExitAndSubmitFeedback(feedback, brokenSite)
+    }
+
+    sealed class Command {
+        data class ExitAndSubmitFeedback(val feedback: String, val brokenSite: String?) : Command()
+        object Exit : Command()
+    }
+}
+
 @Module
 @ContributesTo(AppObjectGraph::class)
 class BrokenSiteNegativeFeedbackViewModelFactoryModule {
@@ -45,19 +59,5 @@ private class BrokenSiteNegativeFeedbackViewModelFactory() : ViewModelFactoryPlu
                 else -> null
             }
         }
-    }
-}
-
-class BrokenSiteNegativeFeedbackViewModel : ViewModel() {
-
-    val command: SingleLiveEvent<Command> = SingleLiveEvent()
-
-    fun userSubmittingFeedback(feedback: String, brokenSite: String?) {
-        command.value = Command.ExitAndSubmitFeedback(feedback, brokenSite)
-    }
-
-    sealed class Command {
-        data class ExitAndSubmitFeedback(val feedback: String, val brokenSite: String?) : Command()
-        object Exit : Command()
     }
 }

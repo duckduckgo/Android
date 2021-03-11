@@ -27,6 +27,26 @@ import dagger.Provides
 import dagger.multibindings.IntoSet
 import javax.inject.Singleton
 
+class InitialFeedbackFragmentViewModel : ViewModel() {
+
+    val viewState: MutableLiveData<ViewState> = MutableLiveData()
+    val command: MutableLiveData<Command> = MutableLiveData()
+
+    fun onPositiveFeedback() {
+        command.value = Command.PositiveFeedbackSelected
+    }
+
+    fun onNegativeFeedback() {
+        command.value = Command.NegativeFeedbackSelected
+    }
+
+    sealed class Command {
+        object PositiveFeedbackSelected : Command()
+        object NegativeFeedbackSelected : Command()
+        object UserCancelled : Command()
+    }
+}
+
 @Module
 @ContributesTo(AppObjectGraph::class)
 class InitialFeedbackFragmentViewModelFactoryModule {
@@ -46,25 +66,5 @@ private class InitialFeedbackFragmentViewModelFactory() : ViewModelFactoryPlugin
                 else -> null
             }
         }
-    }
-}
-
-class InitialFeedbackFragmentViewModel : ViewModel() {
-
-    val viewState: MutableLiveData<ViewState> = MutableLiveData()
-    val command: MutableLiveData<Command> = MutableLiveData()
-
-    fun onPositiveFeedback() {
-        command.value = Command.PositiveFeedbackSelected
-    }
-
-    fun onNegativeFeedback() {
-        command.value = Command.NegativeFeedbackSelected
-    }
-
-    sealed class Command {
-        object PositiveFeedbackSelected : Command()
-        object NegativeFeedbackSelected : Command()
-        object UserCancelled : Command()
     }
 }

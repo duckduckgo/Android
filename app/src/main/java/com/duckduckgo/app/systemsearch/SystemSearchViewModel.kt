@@ -48,38 +48,6 @@ import timber.log.Timber
 import java.util.concurrent.TimeUnit
 import javax.inject.Singleton
 
-@Module
-@ContributesTo(AppObjectGraph::class)
-class SystemSearchViewModelFactoryModule {
-    @Provides
-    @Singleton
-    @IntoSet
-    fun provideSystemSearchViewModelFactory(
-        userStageStore: UserStageStore,
-        autoCompleteApi: AutoCompleteApi,
-        deviceAppLookup: DeviceAppLookup,
-        pixel: Pixel,
-    ): ViewModelFactoryPlugin {
-        return SystemSearchViewModelFactory(userStageStore, autoCompleteApi, deviceAppLookup, pixel)
-    }
-}
-
-private class SystemSearchViewModelFactory(
-    private val userStageStore: UserStageStore,
-    private val autoComplete: AutoComplete,
-    private val deviceAppLookup: DeviceAppLookup,
-    private val pixel: Pixel
-) : ViewModelFactoryPlugin {
-    override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
-        with(modelClass) {
-            return when {
-                isAssignableFrom(SystemSearchViewModel::class.java) -> (SystemSearchViewModel(userStageStore, autoComplete, deviceAppLookup, pixel) as T)
-                else -> null
-            }
-        }
-    }
-}
-
 data class SystemSearchResult(val autocomplete: AutoCompleteResult, val deviceApps: List<DeviceApp>)
 
 class SystemSearchViewModel(
@@ -288,5 +256,37 @@ class SystemSearchViewModel(
     companion object {
         private const val DEBOUNCE_TIME_MS = 200L
         private const val RESULTS_MAX_RESULTS_PER_GROUP = 4
+    }
+}
+
+@Module
+@ContributesTo(AppObjectGraph::class)
+class SystemSearchViewModelFactoryModule {
+    @Provides
+    @Singleton
+    @IntoSet
+    fun provideSystemSearchViewModelFactory(
+        userStageStore: UserStageStore,
+        autoCompleteApi: AutoCompleteApi,
+        deviceAppLookup: DeviceAppLookup,
+        pixel: Pixel,
+    ): ViewModelFactoryPlugin {
+        return SystemSearchViewModelFactory(userStageStore, autoCompleteApi, deviceAppLookup, pixel)
+    }
+}
+
+private class SystemSearchViewModelFactory(
+    private val userStageStore: UserStageStore,
+    private val autoComplete: AutoComplete,
+    private val deviceAppLookup: DeviceAppLookup,
+    private val pixel: Pixel
+) : ViewModelFactoryPlugin {
+    override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
+        with(modelClass) {
+            return when {
+                isAssignableFrom(SystemSearchViewModel::class.java) -> (SystemSearchViewModel(userStageStore, autoComplete, deviceAppLookup, pixel) as T)
+                else -> null
+            }
+        }
     }
 }

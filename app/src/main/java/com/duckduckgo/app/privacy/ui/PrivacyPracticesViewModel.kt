@@ -30,28 +30,6 @@ import dagger.Provides
 import dagger.multibindings.IntoSet
 import javax.inject.Singleton
 
-@Module
-@ContributesTo(AppObjectGraph::class)
-class PrivacyPracticesViewModelFactoryModule {
-    @Provides
-    @Singleton
-    @IntoSet
-    fun providePrivacyPracticesViewModelFactory(): ViewModelFactoryPlugin {
-        return PrivacyPracticesViewModelFactory()
-    }
-}
-
-private class PrivacyPracticesViewModelFactory() : ViewModelFactoryPlugin {
-    override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
-        with(modelClass) {
-            return when {
-                isAssignableFrom(PrivacyPracticesViewModel::class.java) -> (PrivacyPracticesViewModel() as T)
-                else -> null
-            }
-        }
-    }
-}
-
 class PrivacyPracticesViewModel : ViewModel() {
 
     data class ViewState(
@@ -87,5 +65,27 @@ class PrivacyPracticesViewModel : ViewModel() {
             goodTerms = site.privacyPractices.goodReasons,
             badTerms = site.privacyPractices.badReasons
         )
+    }
+}
+
+@Module
+@ContributesTo(AppObjectGraph::class)
+class PrivacyPracticesViewModelFactoryModule {
+    @Provides
+    @Singleton
+    @IntoSet
+    fun providePrivacyPracticesViewModelFactory(): ViewModelFactoryPlugin {
+        return PrivacyPracticesViewModelFactory()
+    }
+}
+
+private class PrivacyPracticesViewModelFactory() : ViewModelFactoryPlugin {
+    override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
+        with(modelClass) {
+            return when {
+                isAssignableFrom(PrivacyPracticesViewModel::class.java) -> (PrivacyPracticesViewModel() as T)
+                else -> null
+            }
+        }
     }
 }

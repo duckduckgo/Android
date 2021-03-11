@@ -29,34 +29,6 @@ import dagger.Provides
 import dagger.multibindings.IntoSet
 import javax.inject.Singleton
 
-@Module
-@ContributesTo(AppObjectGraph::class)
-class GlobalPrivacyControlViewModelFactoryModule {
-    @Provides
-    @Singleton
-    @IntoSet
-    fun provideGlobalPrivacyControlViewModelFactory(
-        pixel: Pixel,
-        settingsDataStore: SettingsDataStore
-    ): ViewModelFactoryPlugin {
-        return GlobalPrivacyControlViewModelFactory(pixel, settingsDataStore)
-    }
-}
-
-private class GlobalPrivacyControlViewModelFactory(
-    private val pixel: Pixel,
-    private val settingsDataStore: SettingsDataStore
-) : ViewModelFactoryPlugin {
-    override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
-        with(modelClass) {
-            return when {
-                isAssignableFrom(GlobalPrivacyControlViewModel::class.java) -> (GlobalPrivacyControlViewModel(pixel, settingsDataStore) as T)
-                else -> null
-            }
-        }
-    }
-}
-
 class GlobalPrivacyControlViewModel(
     private val pixel: Pixel,
     private val settingsDataStore: SettingsDataStore
@@ -94,5 +66,33 @@ class GlobalPrivacyControlViewModel(
 
     companion object {
         const val LEARN_MORE_URL = "https://duckduckgo.com/global-privacy-control-learn-more"
+    }
+}
+
+@Module
+@ContributesTo(AppObjectGraph::class)
+class GlobalPrivacyControlViewModelFactoryModule {
+    @Provides
+    @Singleton
+    @IntoSet
+    fun provideGlobalPrivacyControlViewModelFactory(
+        pixel: Pixel,
+        settingsDataStore: SettingsDataStore
+    ): ViewModelFactoryPlugin {
+        return GlobalPrivacyControlViewModelFactory(pixel, settingsDataStore)
+    }
+}
+
+private class GlobalPrivacyControlViewModelFactory(
+    private val pixel: Pixel,
+    private val settingsDataStore: SettingsDataStore
+) : ViewModelFactoryPlugin {
+    override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
+        with(modelClass) {
+            return when {
+                isAssignableFrom(GlobalPrivacyControlViewModel::class.java) -> (GlobalPrivacyControlViewModel(pixel, settingsDataStore) as T)
+                else -> null
+            }
+        }
     }
 }

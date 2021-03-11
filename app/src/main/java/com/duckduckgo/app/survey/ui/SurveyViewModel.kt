@@ -40,36 +40,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Singleton
 
-@Module
-@ContributesTo(AppObjectGraph::class)
-class SurveyViewModelFactoryModule {
-    @Provides
-    @Singleton
-    @IntoSet
-    fun provideSurveyViewModelFactory(
-        surveyDao: SurveyDao,
-        statisticsStore: StatisticsDataStore,
-        appInstallStore: AppInstallStore,
-    ): ViewModelFactoryPlugin {
-        return SurveyViewModelFactory(surveyDao, statisticsStore, appInstallStore)
-    }
-}
-
-private class SurveyViewModelFactory(
-    private val surveyDao: SurveyDao,
-    private val statisticsStore: StatisticsDataStore,
-    private val appInstallStore: AppInstallStore
-) : ViewModelFactoryPlugin {
-    override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
-        with(modelClass) {
-            return when {
-                isAssignableFrom(SurveyViewModel::class.java) -> (SurveyViewModel(surveyDao, statisticsStore, appInstallStore) as T)
-                else -> null
-            }
-        }
-    }
-}
-
 class SurveyViewModel(
     private val surveyDao: SurveyDao,
     private val statisticsStore: StatisticsDataStore,
@@ -143,5 +113,35 @@ class SurveyViewModel(
         const val APP_VERSION = "ddgv"
         const val MANUFACTURER = "man"
         const val MODEL = "mo"
+    }
+}
+
+@Module
+@ContributesTo(AppObjectGraph::class)
+class SurveyViewModelFactoryModule {
+    @Provides
+    @Singleton
+    @IntoSet
+    fun provideSurveyViewModelFactory(
+        surveyDao: SurveyDao,
+        statisticsStore: StatisticsDataStore,
+        appInstallStore: AppInstallStore,
+    ): ViewModelFactoryPlugin {
+        return SurveyViewModelFactory(surveyDao, statisticsStore, appInstallStore)
+    }
+}
+
+private class SurveyViewModelFactory(
+    private val surveyDao: SurveyDao,
+    private val statisticsStore: StatisticsDataStore,
+    private val appInstallStore: AppInstallStore
+) : ViewModelFactoryPlugin {
+    override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
+        with(modelClass) {
+            return when {
+                isAssignableFrom(SurveyViewModel::class.java) -> (SurveyViewModel(surveyDao, statisticsStore, appInstallStore) as T)
+                else -> null
+            }
+        }
     }
 }

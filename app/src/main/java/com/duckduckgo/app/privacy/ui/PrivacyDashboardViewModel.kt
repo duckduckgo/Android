@@ -46,36 +46,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Singleton
 
-@Module
-@ContributesTo(AppObjectGraph::class)
-class PrivacyDashboardViewModelFactoryModule {
-    @Provides
-    @Singleton
-    @IntoSet
-    fun providePrivacyDashboardViewModelFactory(
-        userWhitelistDao: UserWhitelistDao,
-        networkLeaderboardDao: NetworkLeaderboardDao,
-        pixel: Pixel
-    ): ViewModelFactoryPlugin {
-        return PrivacyDashboardViewModelFactory(userWhitelistDao, networkLeaderboardDao, pixel)
-    }
-}
-
-private class PrivacyDashboardViewModelFactory(
-    private val userWhitelistDao: UserWhitelistDao,
-    private val networkLeaderboardDao: NetworkLeaderboardDao,
-    private val pixel: Pixel
-) : ViewModelFactoryPlugin {
-    override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
-        with(modelClass) {
-            return when {
-                isAssignableFrom(PrivacyDashboardViewModel::class.java) -> PrivacyDashboardViewModel(userWhitelistDao, networkLeaderboardDao, pixel) as T
-                else -> null
-            }
-        }
-    }
-}
-
 class PrivacyDashboardViewModel(
     private val userWhitelistDao: UserWhitelistDao,
     networkLeaderboardDao: NetworkLeaderboardDao,
@@ -232,5 +202,35 @@ class PrivacyDashboardViewModel(
     private companion object {
         private const val LEADERBOARD_MIN_NETWORKS = 3
         private const val LEADERBOARD_MIN_DOMAINS_EXCLUSIVE = 30
+    }
+}
+
+@Module
+@ContributesTo(AppObjectGraph::class)
+class PrivacyDashboardViewModelFactoryModule {
+    @Provides
+    @Singleton
+    @IntoSet
+    fun providePrivacyDashboardViewModelFactory(
+        userWhitelistDao: UserWhitelistDao,
+        networkLeaderboardDao: NetworkLeaderboardDao,
+        pixel: Pixel
+    ): ViewModelFactoryPlugin {
+        return PrivacyDashboardViewModelFactory(userWhitelistDao, networkLeaderboardDao, pixel)
+    }
+}
+
+private class PrivacyDashboardViewModelFactory(
+    private val userWhitelistDao: UserWhitelistDao,
+    private val networkLeaderboardDao: NetworkLeaderboardDao,
+    private val pixel: Pixel
+) : ViewModelFactoryPlugin {
+    override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
+        with(modelClass) {
+            return when {
+                isAssignableFrom(PrivacyDashboardViewModel::class.java) -> PrivacyDashboardViewModel(userWhitelistDao, networkLeaderboardDao, pixel) as T
+                else -> null
+            }
+        }
     }
 }

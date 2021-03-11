@@ -28,6 +28,24 @@ import dagger.Provides
 import dagger.multibindings.IntoSet
 import javax.inject.Singleton
 
+class AddWidgetInstructionsViewModel : ViewModel() {
+
+    sealed class Command {
+        object ShowHome : Command()
+        object Close : Command()
+    }
+
+    val command: SingleLiveEvent<Command> = SingleLiveEvent()
+
+    fun onShowHomePressed() {
+        command.value = ShowHome
+    }
+
+    fun onClosePressed() {
+        command.value = Close
+    }
+}
+
 @Module
 @ContributesTo(AppObjectGraph::class)
 class AddWidgetInstructionsViewModelFactoryModule {
@@ -47,23 +65,5 @@ private class AddWidgetInstructionsViewModelFactory() : ViewModelFactoryPlugin {
                 else -> null
             }
         }
-    }
-}
-
-class AddWidgetInstructionsViewModel : ViewModel() {
-
-    sealed class Command {
-        object ShowHome : Command()
-        object Close : Command()
-    }
-
-    val command: SingleLiveEvent<Command> = SingleLiveEvent()
-
-    fun onShowHomePressed() {
-        command.value = ShowHome
-    }
-
-    fun onClosePressed() {
-        command.value = Close
     }
 }

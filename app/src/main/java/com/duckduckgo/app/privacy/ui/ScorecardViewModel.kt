@@ -38,30 +38,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Singleton
 
-@Module
-@ContributesTo(AppObjectGraph::class)
-class ScorecardViewModelFactoryModule {
-    @Provides
-    @Singleton
-    @IntoSet
-    fun provideScorecardViewModelFactory(userWhitelistDao: UserWhitelistDao): ViewModelFactoryPlugin {
-        return ScorecardViewModelFactory(userWhitelistDao)
-    }
-}
-
-private class ScorecardViewModelFactory(
-    private val userWhitelistDao: UserWhitelistDao,
-) : ViewModelFactoryPlugin {
-    override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
-        with(modelClass) {
-            return when {
-                isAssignableFrom(ScorecardViewModel::class.java) -> ScorecardViewModel(userWhitelistDao) as T
-                else -> null
-            }
-        }
-    }
-}
-
 class ScorecardViewModel(
     private val userWhitelistDao: UserWhitelistDao,
     private val dispatchers: DispatcherProvider = DefaultDispatcherProvider()
@@ -135,6 +111,30 @@ class ScorecardViewModel(
                 showIsMemberOfMajorNetwork = site.entity?.isMajor ?: false,
                 showEnhancedGrade = grade != improvedGrade
             )
+        }
+    }
+}
+
+@Module
+@ContributesTo(AppObjectGraph::class)
+class ScorecardViewModelFactoryModule {
+    @Provides
+    @Singleton
+    @IntoSet
+    fun provideScorecardViewModelFactory(userWhitelistDao: UserWhitelistDao): ViewModelFactoryPlugin {
+        return ScorecardViewModelFactory(userWhitelistDao)
+    }
+}
+
+private class ScorecardViewModelFactory(
+    private val userWhitelistDao: UserWhitelistDao,
+) : ViewModelFactoryPlugin {
+    override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
+        with(modelClass) {
+            return when {
+                isAssignableFrom(ScorecardViewModel::class.java) -> ScorecardViewModel(userWhitelistDao) as T
+                else -> null
+            }
         }
     }
 }

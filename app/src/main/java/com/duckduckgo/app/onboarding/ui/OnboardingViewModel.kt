@@ -31,6 +31,32 @@ import dagger.multibindings.IntoSet
 import kotlinx.coroutines.launch
 import javax.inject.Singleton
 
+class OnboardingViewModel(
+    private val userStageStore: UserStageStore,
+    private val pageLayoutManager: OnboardingPageManager,
+    private val dispatchers: DispatcherProvider
+) : ViewModel() {
+
+    fun initializePages() {
+        pageLayoutManager.buildPageBlueprints()
+    }
+
+    fun pageCount(): Int {
+        return pageLayoutManager.pageCount()
+    }
+
+    fun getItem(position: Int): OnboardingPageFragment? {
+        return pageLayoutManager.buildPage(position)
+    }
+
+    fun onOnboardingDone() {
+        // Executing this on IO to avoid any delay changing threads between Main-IO.
+        viewModelScope.launch(dispatchers.io()) {
+            userStageStore.stageCompleted(AppStage.NEW)
+        }
+    }
+}
+
 @Module
 @ContributesTo(AppObjectGraph::class)
 class OnboardingViewModelFactoryModule {
@@ -57,33 +83,6 @@ private class OnboardingViewModelFactory(
                 isAssignableFrom(OnboardingViewModel::class.java) -> (OnboardingViewModel(userStageStore, pageLayoutManager, dispatchers) as T)
                 else -> null
             }
-        }
-    }
-
-}
-
-class OnboardingViewModel(
-    private val userStageStore: UserStageStore,
-    private val pageLayoutManager: OnboardingPageManager,
-    private val dispatchers: DispatcherProvider
-) : ViewModel() {
-
-    fun initializePages() {
-        pageLayoutManager.buildPageBlueprints()
-    }
-
-    fun pageCount(): Int {
-        return pageLayoutManager.pageCount()
-    }
-
-    fun getItem(position: Int): OnboardingPageFragment? {
-        return pageLayoutManager.buildPage(position)
-    }
-
-    fun onOnboardingDone() {
-        // Executing this on IO to avoid any delay changing threads between Main-IO.
-        viewModelScope.launch(dispatchers.io()) {
-            userStageStore.stageCompleted(AppStage.NEW)
         }
     }
 }

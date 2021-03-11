@@ -39,34 +39,6 @@ import kotlinx.coroutines.withContext
 import timber.log.Timber
 import javax.inject.Singleton
 
-@Module
-@ContributesTo(AppObjectGraph::class)
-class FeedbackViewModelFactoryModule {
-    @Provides
-    @Singleton
-    @IntoSet
-    fun provideFeedbackViewModelFactory(
-        playStoreUtils: PlayStoreUtils,
-        feedbackSubmitter: FeedbackSubmitter
-    ): ViewModelFactoryPlugin {
-        return FeedbackViewModelFactory(playStoreUtils, feedbackSubmitter)
-    }
-}
-
-private class FeedbackViewModelFactory(
-    private val playStoreUtils: PlayStoreUtils,
-    private val feedbackSubmitter: FeedbackSubmitter
-) : ViewModelFactoryPlugin {
-    override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
-        with(modelClass) {
-            return when {
-                isAssignableFrom(FeedbackViewModel::class.java) -> (FeedbackViewModel(playStoreUtils, feedbackSubmitter) as T)
-                else -> null
-            }
-        }
-    }
-}
-
 class FeedbackViewModel(private val playStoreUtils: PlayStoreUtils, private val feedbackSubmitter: FeedbackSubmitter) : ViewModel() {
 
     val command: SingleLiveEvent<Command> = SingleLiveEvent()
@@ -317,3 +289,31 @@ data class UpdateViewCommand(
     val mainReason: MainReason? = null,
     val subReason: SubReason? = null
 )
+
+@Module
+@ContributesTo(AppObjectGraph::class)
+class FeedbackViewModelFactoryModule {
+    @Provides
+    @Singleton
+    @IntoSet
+    fun provideFeedbackViewModelFactory(
+        playStoreUtils: PlayStoreUtils,
+        feedbackSubmitter: FeedbackSubmitter
+    ): ViewModelFactoryPlugin {
+        return FeedbackViewModelFactory(playStoreUtils, feedbackSubmitter)
+    }
+}
+
+private class FeedbackViewModelFactory(
+    private val playStoreUtils: PlayStoreUtils,
+    private val feedbackSubmitter: FeedbackSubmitter
+) : ViewModelFactoryPlugin {
+    override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
+        with(modelClass) {
+            return when {
+                isAssignableFrom(FeedbackViewModel::class.java) -> (FeedbackViewModel(playStoreUtils, feedbackSubmitter) as T)
+                else -> null
+            }
+        }
+    }
+}

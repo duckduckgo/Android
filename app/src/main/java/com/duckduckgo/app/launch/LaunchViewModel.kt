@@ -32,34 +32,6 @@ import kotlinx.coroutines.withTimeoutOrNull
 import timber.log.Timber
 import javax.inject.Singleton
 
-@Module
-@ContributesTo(AppObjectGraph::class)
-class LaunchViewModelFactoryModule {
-    @Provides
-    @Singleton
-    @IntoSet
-    fun provideLaunchViewModelFactory(
-        userStageStore: UserStageStore,
-        appInstallationReferrerStateListener: AppInstallationReferrerStateListener
-    ): ViewModelFactoryPlugin {
-        return LaunchViewModelFactory(userStageStore, appInstallationReferrerStateListener)
-    }
-}
-
-private class LaunchViewModelFactory(
-    private val userStageStore: UserStageStore,
-    private val appInstallationReferrerStateListener: AppInstallationReferrerStateListener
-) : ViewModelFactoryPlugin {
-    override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
-        with(modelClass) {
-            return when {
-                isAssignableFrom(LaunchViewModel::class.java) -> (LaunchViewModel(userStageStore, appInstallationReferrerStateListener) as T)
-                else -> null
-            }
-        }
-    }
-}
-
 class LaunchViewModel(
     private val userStageStore: UserStageStore,
     private val appReferrerStateListener: AppInstallationReferrerStateListener
@@ -92,5 +64,33 @@ class LaunchViewModel(
         }
 
         Timber.d("Waited ${System.currentTimeMillis() - startTime}ms for referrer")
+    }
+}
+
+@Module
+@ContributesTo(AppObjectGraph::class)
+class LaunchViewModelFactoryModule {
+    @Provides
+    @Singleton
+    @IntoSet
+    fun provideLaunchViewModelFactory(
+        userStageStore: UserStageStore,
+        appInstallationReferrerStateListener: AppInstallationReferrerStateListener
+    ): ViewModelFactoryPlugin {
+        return LaunchViewModelFactory(userStageStore, appInstallationReferrerStateListener)
+    }
+}
+
+private class LaunchViewModelFactory(
+    private val userStageStore: UserStageStore,
+    private val appInstallationReferrerStateListener: AppInstallationReferrerStateListener
+) : ViewModelFactoryPlugin {
+    override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
+        with(modelClass) {
+            return when {
+                isAssignableFrom(LaunchViewModel::class.java) -> (LaunchViewModel(userStageStore, appInstallationReferrerStateListener) as T)
+                else -> null
+            }
+        }
     }
 }

@@ -44,40 +44,6 @@ import timber.log.Timber
 import javax.inject.Inject
 import javax.inject.Singleton
 
-@Module
-@ContributesTo(AppObjectGraph::class)
-class SettingsViewModelFactoryModule {
-    @Provides
-    @Singleton
-    @IntoSet
-    fun provideSettingsViewModelFactory(
-        settingsDataStore: SettingsDataStore,
-        defaultWebBrowserCapability: DefaultBrowserDetector,
-        variantManager: VariantManager,
-        fireAnimationLoader: FireAnimationLoader,
-        pixel: Pixel
-    ): ViewModelFactoryPlugin {
-        return SettingsViewModelFactory(settingsDataStore, defaultWebBrowserCapability, variantManager, fireAnimationLoader, pixel)
-    }
-}
-
-private class SettingsViewModelFactory(
-    private val settingsDataStore: SettingsDataStore,
-    private val defaultWebBrowserCapability: DefaultBrowserDetector,
-    private val variantManager: VariantManager,
-    private val fireAnimationLoader: FireAnimationLoader,
-    private val pixel: Pixel
-) : ViewModelFactoryPlugin {
-    override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
-        with(modelClass) {
-            return when {
-                isAssignableFrom(SettingsViewModel::class.java) -> (SettingsViewModel(settingsDataStore, defaultWebBrowserCapability, variantManager, fireAnimationLoader, pixel) as T)
-                else -> null
-            }
-        }
-    }
-}
-
 class SettingsViewModel @Inject constructor(
     private val settingsDataStore: SettingsDataStore,
     private val defaultWebBrowserCapability: DefaultBrowserDetector,
@@ -274,6 +240,40 @@ class SettingsViewModel @Inject constructor(
             ClearWhenOption.APP_EXIT_OR_30_MINS -> AUTOMATIC_CLEAR_DATA_WHEN_OPTION_APP_EXIT_OR_30_MINS
             ClearWhenOption.APP_EXIT_OR_60_MINS -> AUTOMATIC_CLEAR_DATA_WHEN_OPTION_APP_EXIT_OR_60_MINS
             else -> null
+        }
+    }
+}
+
+@Module
+@ContributesTo(AppObjectGraph::class)
+class SettingsViewModelFactoryModule {
+    @Provides
+    @Singleton
+    @IntoSet
+    fun provideSettingsViewModelFactory(
+        settingsDataStore: SettingsDataStore,
+        defaultWebBrowserCapability: DefaultBrowserDetector,
+        variantManager: VariantManager,
+        fireAnimationLoader: FireAnimationLoader,
+        pixel: Pixel
+    ): ViewModelFactoryPlugin {
+        return SettingsViewModelFactory(settingsDataStore, defaultWebBrowserCapability, variantManager, fireAnimationLoader, pixel)
+    }
+}
+
+private class SettingsViewModelFactory(
+    private val settingsDataStore: SettingsDataStore,
+    private val defaultWebBrowserCapability: DefaultBrowserDetector,
+    private val variantManager: VariantManager,
+    private val fireAnimationLoader: FireAnimationLoader,
+    private val pixel: Pixel
+) : ViewModelFactoryPlugin {
+    override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
+        with(modelClass) {
+            return when {
+                isAssignableFrom(SettingsViewModel::class.java) -> (SettingsViewModel(settingsDataStore, defaultWebBrowserCapability, variantManager, fireAnimationLoader, pixel) as T)
+                else -> null
+            }
         }
     }
 }

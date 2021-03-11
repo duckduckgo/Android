@@ -39,36 +39,6 @@ import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.launch
 import javax.inject.Singleton
 
-@Module
-@ContributesTo(AppObjectGraph::class)
-class BookmarksViewModelFactoryModule {
-    @Provides
-    @Singleton
-    @IntoSet
-    fun provideBookmarksViewModelFactory(
-        dao: BookmarksDao,
-        faviconManager: FaviconManager,
-        dispatcherProvider: DispatcherProvider
-    ): ViewModelFactoryPlugin {
-        return BookmarksViewModelFactory(dao, faviconManager, dispatcherProvider)
-    }
-}
-
-private class BookmarksViewModelFactory(
-    private val dao: BookmarksDao,
-    private val faviconManager: FaviconManager,
-    private val dispatcherProvider: DispatcherProvider
-) : ViewModelFactoryPlugin {
-    override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
-        with(modelClass) {
-            return when {
-                isAssignableFrom(BookmarksViewModel::class.java) -> (BookmarksViewModel(dao, faviconManager, dispatcherProvider) as T)
-                else -> null
-            }
-        }
-    }
-}
-
 class BookmarksViewModel(
     val dao: BookmarksDao,
     private val faviconManager: FaviconManager,
@@ -148,4 +118,34 @@ class BookmarksViewModel(
         }
     }
 
+}
+
+@Module
+@ContributesTo(AppObjectGraph::class)
+class BookmarksViewModelFactoryModule {
+    @Provides
+    @Singleton
+    @IntoSet
+    fun provideBookmarksViewModelFactory(
+        dao: BookmarksDao,
+        faviconManager: FaviconManager,
+        dispatcherProvider: DispatcherProvider
+    ): ViewModelFactoryPlugin {
+        return BookmarksViewModelFactory(dao, faviconManager, dispatcherProvider)
+    }
+}
+
+private class BookmarksViewModelFactory(
+    private val dao: BookmarksDao,
+    private val faviconManager: FaviconManager,
+    private val dispatcherProvider: DispatcherProvider
+) : ViewModelFactoryPlugin {
+    override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
+        with(modelClass) {
+            return when {
+                isAssignableFrom(BookmarksViewModel::class.java) -> (BookmarksViewModel(dao, faviconManager, dispatcherProvider) as T)
+                else -> null
+            }
+        }
+    }
 }

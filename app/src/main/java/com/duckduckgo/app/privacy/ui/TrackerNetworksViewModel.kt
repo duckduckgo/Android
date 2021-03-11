@@ -34,28 +34,6 @@ import dagger.multibindings.IntoSet
 import java.util.*
 import javax.inject.Singleton
 
-@Module
-@ContributesTo(AppObjectGraph::class)
-class TrackerNetworksViewModelFactoryModule {
-    @Provides
-    @Singleton
-    @IntoSet
-    fun provideTrackerNetworksViewModelFactory(): ViewModelFactoryPlugin {
-        return TrackerNetworksViewModelFactory()
-    }
-}
-
-private class TrackerNetworksViewModelFactory() : ViewModelFactoryPlugin {
-    override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
-        with(modelClass) {
-            return when {
-                isAssignableFrom(TrackerNetworksViewModel::class.java) -> (TrackerNetworksViewModel() as T)
-                else -> null
-            }
-        }
-    }
-}
-
 class TrackerNetworksViewModel : ViewModel() {
 
     data class ViewState(
@@ -112,5 +90,27 @@ class TrackerNetworksViewModel : ViewModel() {
     private fun emptySortedTrackingEventMap(): SortedMap<Entity, List<TrackingEvent>> {
         val comparator = compareBy<Entity> { !it.isMajor }.thenBy { it.displayName }
         return emptyMap<Entity, List<TrackingEvent>>().toSortedMap(comparator)
+    }
+}
+
+@Module
+@ContributesTo(AppObjectGraph::class)
+class TrackerNetworksViewModelFactoryModule {
+    @Provides
+    @Singleton
+    @IntoSet
+    fun provideTrackerNetworksViewModelFactory(): ViewModelFactoryPlugin {
+        return TrackerNetworksViewModelFactory()
+    }
+}
+
+private class TrackerNetworksViewModelFactory() : ViewModelFactoryPlugin {
+    override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
+        with(modelClass) {
+            return when {
+                isAssignableFrom(TrackerNetworksViewModel::class.java) -> (TrackerNetworksViewModel() as T)
+                else -> null
+            }
+        }
     }
 }

@@ -119,121 +119,6 @@ import java.util.*
 import java.util.concurrent.TimeUnit
 import javax.inject.Singleton
 
-@Module
-@ContributesTo(AppObjectGraph::class)
-class BrowserTabViewModelFactoryModule {
-    @Provides
-    @Singleton
-    @IntoSet
-    fun proideBrowserTabViewModelFactory(
-        statisticsUpdater: StatisticsUpdater,
-        queryUrlConverter: QueryUrlConverter,
-        duckDuckGoUrlDetector: DuckDuckGoUrlDetector,
-        siteFactory: SiteFactory,
-        tabRepository: TabRepository,
-        userWhitelistDao: UserWhitelistDao,
-        networkLeaderboardDao: NetworkLeaderboardDao,
-        bookmarksDao: BookmarksDao,
-        fireproofWebsiteRepository: FireproofWebsiteRepository,
-        locationPermissionsRepository: LocationPermissionsRepository,
-        geoLocationPermissions: GeoLocationPermissions,
-        navigationAwareLoginDetector: NavigationAwareLoginDetector,
-        autoCompleteApi: AutoCompleteApi,
-        appSettingsPreferencesStore: SettingsDataStore,
-        longPressHandler: LongPressHandler,
-        webViewSessionStorage: WebViewSessionStorage,
-        specialUrlDetector: SpecialUrlDetector,
-        faviconManager: FaviconManager,
-        addToHomeCapabilityDetector: AddToHomeCapabilityDetector,
-        ctaViewModel: CtaViewModel,
-        searchCountDao: SearchCountDao,
-        pixel: Pixel,
-        dispatchers: DispatcherProvider = DefaultDispatcherProvider(),
-        userEventsStore: UserEventsStore,
-        notificationDao: NotificationDao,
-        useOurAppDetector: UseOurAppDetector,
-        variantManager: VariantManager,
-        fileDownloader: FileDownloader,
-        globalPrivacyControl: GlobalPrivacyControl,
-        fireproofDialogsEventHandler: FireproofDialogsEventHandler
-    ): ViewModelFactoryPlugin {
-        return BrowserTabViewModelFactory(
-            statisticsUpdater,
-            queryUrlConverter,
-            duckDuckGoUrlDetector,
-            siteFactory,
-            tabRepository,
-            userWhitelistDao,
-            networkLeaderboardDao,
-            bookmarksDao,
-            fireproofWebsiteRepository,
-            locationPermissionsRepository,
-            geoLocationPermissions,
-            navigationAwareLoginDetector,
-            autoCompleteApi,
-            appSettingsPreferencesStore,
-            longPressHandler,
-            webViewSessionStorage,
-            specialUrlDetector,
-            faviconManager,
-            addToHomeCapabilityDetector,
-            ctaViewModel,
-            searchCountDao,
-            pixel,
-            dispatchers,
-            userEventsStore,
-            notificationDao,
-            useOurAppDetector,
-            variantManager,
-            fileDownloader,
-            globalPrivacyControl,
-            fireproofDialogsEventHandler
-        )
-    }
-}
-
-private class BrowserTabViewModelFactory(
-    private val statisticsUpdater: StatisticsUpdater,
-    private val queryUrlConverter: OmnibarEntryConverter,
-    private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector,
-    private val siteFactory: SiteFactory,
-    private val tabRepository: TabRepository,
-    private val userWhitelistDao: UserWhitelistDao,
-    private val networkLeaderboardDao: NetworkLeaderboardDao,
-    private val bookmarksDao: BookmarksDao,
-    private val fireproofWebsiteRepository: FireproofWebsiteRepository,
-    private val locationPermissionsRepository: LocationPermissionsRepository,
-    private val geoLocationPermissions: GeoLocationPermissions,
-    private val navigationAwareLoginDetector: NavigationAwareLoginDetector,
-    private val autoComplete: AutoComplete,
-    private val appSettingsPreferencesStore: SettingsDataStore,
-    private val longPressHandler: LongPressHandler,
-    private val webViewSessionStorage: WebViewSessionStorage,
-    private val specialUrlDetector: SpecialUrlDetector,
-    private val faviconManager: FaviconManager,
-    private val addToHomeCapabilityDetector: AddToHomeCapabilityDetector,
-    private val ctaViewModel: CtaViewModel,
-    private val searchCountDao: SearchCountDao,
-    private val pixel: Pixel,
-    private val dispatchers: DispatcherProvider = DefaultDispatcherProvider(),
-    private val userEventsStore: UserEventsStore,
-    private val notificationDao: NotificationDao,
-    private val useOurAppDetector: UseOurAppDetector,
-    private val variantManager: VariantManager,
-    private val fileDownloader: FileDownloader,
-    private val globalPrivacyControl: GlobalPrivacyControl,
-    private val fireproofDialogsEventHandler: FireproofDialogsEventHandler
-) : ViewModelFactoryPlugin {
-    override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
-        with(modelClass) {
-            return when {
-                isAssignableFrom(BrowserTabViewModel::class.java) -> BrowserTabViewModel(statisticsUpdater, queryUrlConverter, duckDuckGoUrlDetector, siteFactory, tabRepository, userWhitelistDao, networkLeaderboardDao, bookmarksDao, fireproofWebsiteRepository, locationPermissionsRepository, geoLocationPermissions, navigationAwareLoginDetector, autoComplete, appSettingsPreferencesStore, longPressHandler, webViewSessionStorage, specialUrlDetector, faviconManager, addToHomeCapabilityDetector, ctaViewModel, searchCountDao, pixel, dispatchers, userEventsStore, notificationDao, useOurAppDetector, variantManager, fileDownloader, globalPrivacyControl, fireproofDialogsEventHandler) as T
-                else -> null
-            }
-        }
-    }
-}
-
 class BrowserTabViewModel(
     private val statisticsUpdater: StatisticsUpdater,
     private val queryUrlConverter: OmnibarEntryConverter,
@@ -1954,5 +1839,120 @@ class BrowserTabViewModel(
         private const val SHOW_CONTENT_MIN_PROGRESS = 50
         private const val NEW_CONTENT_MAX_DELAY_MS = 1000L
         private const val ONE_HOUR_IN_MS = 3_600_000
+    }
+}
+
+@Module
+@ContributesTo(AppObjectGraph::class)
+class BrowserTabViewModelFactoryModule {
+    @Provides
+    @Singleton
+    @IntoSet
+    fun provideBrowserTabViewModelFactory(
+        statisticsUpdater: StatisticsUpdater,
+        queryUrlConverter: QueryUrlConverter,
+        duckDuckGoUrlDetector: DuckDuckGoUrlDetector,
+        siteFactory: SiteFactory,
+        tabRepository: TabRepository,
+        userWhitelistDao: UserWhitelistDao,
+        networkLeaderboardDao: NetworkLeaderboardDao,
+        bookmarksDao: BookmarksDao,
+        fireproofWebsiteRepository: FireproofWebsiteRepository,
+        locationPermissionsRepository: LocationPermissionsRepository,
+        geoLocationPermissions: GeoLocationPermissions,
+        navigationAwareLoginDetector: NavigationAwareLoginDetector,
+        autoCompleteApi: AutoCompleteApi,
+        appSettingsPreferencesStore: SettingsDataStore,
+        longPressHandler: LongPressHandler,
+        webViewSessionStorage: WebViewSessionStorage,
+        specialUrlDetector: SpecialUrlDetector,
+        faviconManager: FaviconManager,
+        addToHomeCapabilityDetector: AddToHomeCapabilityDetector,
+        ctaViewModel: CtaViewModel,
+        searchCountDao: SearchCountDao,
+        pixel: Pixel,
+        dispatchers: DispatcherProvider = DefaultDispatcherProvider(),
+        userEventsStore: UserEventsStore,
+        notificationDao: NotificationDao,
+        useOurAppDetector: UseOurAppDetector,
+        variantManager: VariantManager,
+        fileDownloader: FileDownloader,
+        globalPrivacyControl: GlobalPrivacyControl,
+        fireproofDialogsEventHandler: FireproofDialogsEventHandler
+    ): ViewModelFactoryPlugin {
+        return BrowserTabViewModelFactory(
+            statisticsUpdater,
+            queryUrlConverter,
+            duckDuckGoUrlDetector,
+            siteFactory,
+            tabRepository,
+            userWhitelistDao,
+            networkLeaderboardDao,
+            bookmarksDao,
+            fireproofWebsiteRepository,
+            locationPermissionsRepository,
+            geoLocationPermissions,
+            navigationAwareLoginDetector,
+            autoCompleteApi,
+            appSettingsPreferencesStore,
+            longPressHandler,
+            webViewSessionStorage,
+            specialUrlDetector,
+            faviconManager,
+            addToHomeCapabilityDetector,
+            ctaViewModel,
+            searchCountDao,
+            pixel,
+            dispatchers,
+            userEventsStore,
+            notificationDao,
+            useOurAppDetector,
+            variantManager,
+            fileDownloader,
+            globalPrivacyControl,
+            fireproofDialogsEventHandler
+        )
+    }
+}
+
+private class BrowserTabViewModelFactory(
+    private val statisticsUpdater: StatisticsUpdater,
+    private val queryUrlConverter: OmnibarEntryConverter,
+    private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector,
+    private val siteFactory: SiteFactory,
+    private val tabRepository: TabRepository,
+    private val userWhitelistDao: UserWhitelistDao,
+    private val networkLeaderboardDao: NetworkLeaderboardDao,
+    private val bookmarksDao: BookmarksDao,
+    private val fireproofWebsiteRepository: FireproofWebsiteRepository,
+    private val locationPermissionsRepository: LocationPermissionsRepository,
+    private val geoLocationPermissions: GeoLocationPermissions,
+    private val navigationAwareLoginDetector: NavigationAwareLoginDetector,
+    private val autoComplete: AutoComplete,
+    private val appSettingsPreferencesStore: SettingsDataStore,
+    private val longPressHandler: LongPressHandler,
+    private val webViewSessionStorage: WebViewSessionStorage,
+    private val specialUrlDetector: SpecialUrlDetector,
+    private val faviconManager: FaviconManager,
+    private val addToHomeCapabilityDetector: AddToHomeCapabilityDetector,
+    private val ctaViewModel: CtaViewModel,
+    private val searchCountDao: SearchCountDao,
+    private val pixel: Pixel,
+    private val dispatchers: DispatcherProvider = DefaultDispatcherProvider(),
+    private val userEventsStore: UserEventsStore,
+    private val notificationDao: NotificationDao,
+    private val useOurAppDetector: UseOurAppDetector,
+    private val variantManager: VariantManager,
+    private val fileDownloader: FileDownloader,
+    private val globalPrivacyControl: GlobalPrivacyControl,
+    private val fireproofDialogsEventHandler: FireproofDialogsEventHandler
+) : ViewModelFactoryPlugin {
+    override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
+        with(modelClass) {
+            return when {
+                isAssignableFrom(BrowserTabViewModel::class.java) -> BrowserTabViewModel(statisticsUpdater, queryUrlConverter, duckDuckGoUrlDetector, siteFactory, tabRepository, userWhitelistDao, networkLeaderboardDao, bookmarksDao, fireproofWebsiteRepository, locationPermissionsRepository, geoLocationPermissions, navigationAwareLoginDetector, autoComplete, appSettingsPreferencesStore, longPressHandler, webViewSessionStorage, specialUrlDetector, faviconManager, addToHomeCapabilityDetector, ctaViewModel, searchCountDao, pixel, dispatchers, userEventsStore, notificationDao, useOurAppDetector, variantManager, fileDownloader, globalPrivacyControl, fireproofDialogsEventHandler) as T
+                else -> null
+            }
+        }
     }
 }

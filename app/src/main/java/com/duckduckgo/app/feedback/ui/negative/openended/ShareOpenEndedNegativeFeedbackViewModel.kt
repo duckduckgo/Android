@@ -28,6 +28,25 @@ import dagger.Provides
 import dagger.multibindings.IntoSet
 import javax.inject.Singleton
 
+class ShareOpenEndedNegativeFeedbackViewModel : ViewModel() {
+
+    val command: SingleLiveEvent<Command> = SingleLiveEvent()
+
+    fun userSubmittingPositiveFeedback(feedback: String) {
+        command.value = Command.ExitAndSubmitPositiveFeedback(feedback)
+    }
+
+    fun userSubmittingNegativeFeedback(mainReason: MainReason, subReason: SubReason?, openEndedComment: String) {
+        command.value = Command.ExitAndSubmitNegativeFeedback(mainReason, subReason, openEndedComment)
+    }
+
+    sealed class Command {
+        data class ExitAndSubmitNegativeFeedback(val mainReason: MainReason, val subReason: SubReason?, val feedback: String) : Command()
+        data class ExitAndSubmitPositiveFeedback(val feedback: String) : Command()
+        object Exit : Command()
+    }
+}
+
 @Module
 @ContributesTo(AppObjectGraph::class)
 class ShareOpenEndedNegativeFeedbackViewModelFactoryModule {
@@ -47,24 +66,5 @@ private class ShareOpenEndedNegativeFeedbackViewModelFactory() : ViewModelFactor
                 else -> null
             }
         }
-    }
-}
-
-class ShareOpenEndedNegativeFeedbackViewModel : ViewModel() {
-
-    val command: SingleLiveEvent<Command> = SingleLiveEvent()
-
-    fun userSubmittingPositiveFeedback(feedback: String) {
-        command.value = Command.ExitAndSubmitPositiveFeedback(feedback)
-    }
-
-    fun userSubmittingNegativeFeedback(mainReason: MainReason, subReason: SubReason?, openEndedComment: String) {
-        command.value = Command.ExitAndSubmitNegativeFeedback(mainReason, subReason, openEndedComment)
-    }
-
-    sealed class Command {
-        data class ExitAndSubmitNegativeFeedback(val mainReason: MainReason, val subReason: SubReason?, val feedback: String) : Command()
-        data class ExitAndSubmitPositiveFeedback(val feedback: String) : Command()
-        object Exit : Command()
     }
 }

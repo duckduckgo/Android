@@ -36,34 +36,6 @@ import dagger.Provides
 import dagger.multibindings.IntoSet
 import javax.inject.Singleton
 
-@Module
-@ContributesTo(AppObjectGraph::class)
-class BrokenSiteViewModelFactoryModule {
-    @Provides
-    @Singleton
-    @IntoSet
-    fun provideBrokenSiteViewModelFactory(
-        pixel: Pixel,
-        brokenSiteSender: BrokenSiteSender
-    ): ViewModelFactoryPlugin {
-        return BrokenSiteViewModelFactory(pixel, brokenSiteSender)
-    }
-}
-
-private class BrokenSiteViewModelFactory(
-    private val pixel: Pixel,
-    private val brokenSiteSender: BrokenSiteSender
-) : ViewModelFactoryPlugin {
-    override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
-        with(modelClass) {
-            return when {
-                isAssignableFrom(BrokenSiteViewModel::class.java) -> (BrokenSiteViewModel(pixel, brokenSiteSender) as T)
-                else -> null
-            }
-        }
-    }
-}
-
 class BrokenSiteViewModel(private val pixel: Pixel, private val brokenSiteSender: BrokenSiteSender) : ViewModel() {
 
     data class ViewState(
@@ -151,5 +123,33 @@ class BrokenSiteViewModel(private val pixel: Pixel, private val brokenSiteSender
         const val WEBVIEW_UNKNOWN_VERSION = "unknown"
         const val MOBILE_SITE = "mobile"
         const val DESKTOP_SITE = "desktop"
+    }
+}
+
+@Module
+@ContributesTo(AppObjectGraph::class)
+class BrokenSiteViewModelFactoryModule {
+    @Provides
+    @Singleton
+    @IntoSet
+    fun provideBrokenSiteViewModelFactory(
+        pixel: Pixel,
+        brokenSiteSender: BrokenSiteSender
+    ): ViewModelFactoryPlugin {
+        return BrokenSiteViewModelFactory(pixel, brokenSiteSender)
+    }
+}
+
+private class BrokenSiteViewModelFactory(
+    private val pixel: Pixel,
+    private val brokenSiteSender: BrokenSiteSender
+) : ViewModelFactoryPlugin {
+    override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
+        with(modelClass) {
+            return when {
+                isAssignableFrom(BrokenSiteViewModel::class.java) -> (BrokenSiteViewModel(pixel, brokenSiteSender) as T)
+                else -> null
+            }
+        }
     }
 }

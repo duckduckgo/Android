@@ -34,35 +34,6 @@ import dagger.Provides
 import dagger.multibindings.IntoSet
 import javax.inject.Singleton
 
-@Module
-@ContributesTo(AppObjectGraph::class)
-class TabSwitcherViewModelFactoryModule {
-    @Provides
-    @Singleton
-    @IntoSet
-    fun provideTabSwitcherViewModelFactory(
-        tabRepository: TabRepository,
-        webViewSessionStorage: WebViewSessionStorage
-    ): ViewModelFactoryPlugin {
-        return TabSwitcherViewModelFactory(tabRepository, webViewSessionStorage)
-    }
-}
-
-private class TabSwitcherViewModelFactory(
-    private val tabRepository: TabRepository,
-    private val webViewSessionStorage: WebViewSessionStorage
-) : ViewModelFactoryPlugin {
-    override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
-        with(modelClass) {
-            return when {
-                isAssignableFrom(TabSwitcherViewModel::class.java) -> TabSwitcherViewModel(tabRepository, webViewSessionStorage) as T
-                else -> null
-            }
-        }
-    }
-
-}
-
 class TabSwitcherViewModel(private val tabRepository: TabRepository, private val webViewSessionStorage: WebViewSessionStorage) : ViewModel() {
 
     var tabs: LiveData<List<TabEntity>> = tabRepository.liveTabs
@@ -106,5 +77,33 @@ class TabSwitcherViewModel(private val tabRepository: TabRepository, private val
     fun onClearComplete() {
         command.value = Command.DisplayMessage(R.string.fireDataCleared)
         command.value = Command.Close
+    }
+}
+
+@Module
+@ContributesTo(AppObjectGraph::class)
+class TabSwitcherViewModelFactoryModule {
+    @Provides
+    @Singleton
+    @IntoSet
+    fun provideTabSwitcherViewModelFactory(
+        tabRepository: TabRepository,
+        webViewSessionStorage: WebViewSessionStorage
+    ): ViewModelFactoryPlugin {
+        return TabSwitcherViewModelFactory(tabRepository, webViewSessionStorage)
+    }
+}
+
+private class TabSwitcherViewModelFactory(
+    private val tabRepository: TabRepository,
+    private val webViewSessionStorage: WebViewSessionStorage
+) : ViewModelFactoryPlugin {
+    override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
+        with(modelClass) {
+            return when {
+                isAssignableFrom(TabSwitcherViewModel::class.java) -> TabSwitcherViewModel(tabRepository, webViewSessionStorage) as T
+                else -> null
+            }
+        }
     }
 }

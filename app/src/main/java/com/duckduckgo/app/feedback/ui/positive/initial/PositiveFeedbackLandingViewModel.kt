@@ -26,28 +26,6 @@ import dagger.Provides
 import dagger.multibindings.IntoSet
 import javax.inject.Singleton
 
-@Module
-@ContributesTo(AppObjectGraph::class)
-class PositiveFeedbackLandingViewModelFactoryModule {
-    @Provides
-    @Singleton
-    @IntoSet
-    fun providePositiveFeedbackLandingViewModelFactory(): ViewModelFactoryPlugin {
-        return PositiveFeedbackLandingViewModelFactory()
-    }
-}
-
-private class PositiveFeedbackLandingViewModelFactory() : ViewModelFactoryPlugin {
-    override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
-        with(modelClass) {
-            return when {
-                isAssignableFrom(PositiveFeedbackLandingViewModel::class.java) -> (PositiveFeedbackLandingViewModel() as T)
-                else -> null
-            }
-        }
-    }
-}
-
 class PositiveFeedbackLandingViewModel : ViewModel() {
 
     val command: SingleLiveEvent<Command> = SingleLiveEvent()
@@ -71,4 +49,26 @@ sealed class Command {
     object LaunchPlayStore : Command()
     object Exit : Command()
     object LaunchShareFeedbackPage : Command()
+}
+
+@Module
+@ContributesTo(AppObjectGraph::class)
+class PositiveFeedbackLandingViewModelFactoryModule {
+    @Provides
+    @Singleton
+    @IntoSet
+    fun providePositiveFeedbackLandingViewModelFactory(): ViewModelFactoryPlugin {
+        return PositiveFeedbackLandingViewModelFactory()
+    }
+}
+
+private class PositiveFeedbackLandingViewModelFactory() : ViewModelFactoryPlugin {
+    override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
+        with(modelClass) {
+            return when {
+                isAssignableFrom(PositiveFeedbackLandingViewModel::class.java) -> (PositiveFeedbackLandingViewModel() as T)
+                else -> null
+            }
+        }
+    }
 }
