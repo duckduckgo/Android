@@ -111,7 +111,6 @@ class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope() {
 
         super.onCreate(savedInstanceState = newInstanceState, daggerInject = false)
         setContentView(R.layout.activity_browser)
-        configureEmptyClickListeners()
         viewModel.viewState.observe(
             this,
             Observer {
@@ -142,14 +141,6 @@ class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope() {
         } else {
             Timber.i("Automatic data clearer not yet finished, so deferring processing of intent")
             lastIntent = intent
-        }
-    }
-
-    private fun configureEmptyClickListeners() {
-        // TabSwitcherButton needs to have a click listener or it will crash when user clicks on it.
-        tabsMenuMockup.setOnClickListener {}
-        tabsMenuMockup.setOnLongClickListener {
-            return@setOnLongClickListener true
         }
     }
 
