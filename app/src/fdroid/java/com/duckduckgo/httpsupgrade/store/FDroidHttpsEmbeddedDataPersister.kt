@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 DuckDuckGo
+ * Copyright (c) 2021 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,17 +14,19 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.trackerdetection.api
+package com.duckduckgo.httpsupgrade.store
 
-import retrofit2.Call
-import retrofit2.http.GET
+import com.duckduckgo.app.httpsupgrade.store.HttpsEmbeddedDataPersister
+import timber.log.Timber
 
-interface TrackerListService {
+class FDroidHttpsEmbeddedDataPersister : HttpsEmbeddedDataPersister {
 
-    @GET("https://staticcdn.duckduckgo.com/trackerblocking/v2.1/tds.json")
-    fun tds(): Call<TdsJson>
+    override fun shouldPersistEmbeddedData(): Boolean {
+        Timber.d("Ignoring, FDroid does not use embedded data due to binary data restrictions")
+        return false
+    }
 
-    @GET("/contentblocking/trackers-unprotected-temporary.txt")
-    fun temporaryWhitelist(): Call<String>
-
+    override fun persistEmbeddedData() {
+        Timber.d("Ignoring, FDroid does not use embedded data due to binary data restrictions")
+    }
 }

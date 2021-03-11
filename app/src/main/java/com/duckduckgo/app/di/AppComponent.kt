@@ -79,7 +79,8 @@ import javax.inject.Singleton
         CoroutinesModule::class,
         CertificateTrustedStoreModule::class,
         WelcomePageModule::class,
-        FormatterModule::class
+        FormatterModule::class,
+        HttpsPersisterModule::class
     ]
 )
 interface AppComponent : AndroidInjector<DuckDuckGoApplication> {

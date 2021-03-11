@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 DuckDuckGo
+ * Copyright (c) 2021 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,17 +14,12 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.trackerdetection.api
+package com.duckduckgo.app.httpsupgrade.store
 
-import retrofit2.Call
-import retrofit2.http.GET
+interface HttpsEmbeddedDataPersister {
 
-interface TrackerListService {
+    fun shouldPersistEmbeddedData(): Boolean
 
-    @GET("https://staticcdn.duckduckgo.com/trackerblocking/v2.1/tds.json")
-    fun tds(): Call<TdsJson>
-
-    @GET("/contentblocking/trackers-unprotected-temporary.txt")
-    fun temporaryWhitelist(): Call<String>
+    fun persistEmbeddedData()
 
 }
