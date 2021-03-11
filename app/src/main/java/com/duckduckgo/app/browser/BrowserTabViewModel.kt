@@ -38,6 +38,7 @@ import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteResult
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteBookmarkSuggestion
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteSearchSuggestion
+import com.duckduckgo.app.autocomplete.api.AutoCompleteApi
 import com.duckduckgo.app.bookmarks.db.BookmarkEntity
 import com.duckduckgo.app.bookmarks.db.BookmarksDao
 import com.duckduckgo.app.bookmarks.ui.EditBookmarkDialogFragment.EditBookmarkListener
@@ -61,6 +62,7 @@ import com.duckduckgo.app.browser.model.BasicAuthenticationCredentials
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.browser.model.LongPressTarget
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
+import com.duckduckgo.app.browser.omnibar.QueryUrlConverter
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.browser.ui.HttpAuthenticationDialogFragment.HttpAuthenticationListener
 import com.duckduckgo.app.cta.ui.*
@@ -73,6 +75,7 @@ import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.global.model.SiteFactory
 import com.duckduckgo.app.global.model.domain
 import com.duckduckgo.app.global.model.domainMatchesUrl
+import com.duckduckgo.app.global.plugins.view_model.ViewModelFactoryPlugin
 import com.duckduckgo.app.global.useourapp.UseOurAppDetector
 import com.duckduckgo.app.global.useourapp.UseOurAppDetector.Companion.USE_OUR_APP_SHORTCUT_TITLE
 import com.duckduckgo.app.global.useourapp.UseOurAppDetector.Companion.USE_OUR_APP_SHORTCUT_URL
@@ -100,7 +103,12 @@ import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import com.duckduckgo.app.usage.search.SearchCountDao
+import com.duckduckgo.di.scopes.AppObjectGraph
 import com.jakewharton.rxrelay2.PublishRelay
+import com.squareup.anvil.annotations.ContributesTo
+import dagger.Module
+import dagger.Provides
+import dagger.multibindings.IntoSet
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
@@ -109,6 +117,7 @@ import timber.log.Timber
 import java.io.File
 import java.util.*
 import java.util.concurrent.TimeUnit
+import javax.inject.Singleton
 
 class BrowserTabViewModel(
     private val statisticsUpdater: StatisticsUpdater,
@@ -1830,5 +1839,120 @@ class BrowserTabViewModel(
         private const val SHOW_CONTENT_MIN_PROGRESS = 50
         private const val NEW_CONTENT_MAX_DELAY_MS = 1000L
         private const val ONE_HOUR_IN_MS = 3_600_000
+    }
+}
+
+@Module
+@ContributesTo(AppObjectGraph::class)
+class BrowserTabViewModelFactoryModule {
+    @Provides
+    @Singleton
+    @IntoSet
+    fun provideBrowserTabViewModelFactory(
+        statisticsUpdater: StatisticsUpdater,
+        queryUrlConverter: QueryUrlConverter,
+        duckDuckGoUrlDetector: DuckDuckGoUrlDetector,
+        siteFactory: SiteFactory,
+        tabRepository: TabRepository,
+        userWhitelistDao: UserWhitelistDao,
+        networkLeaderboardDao: NetworkLeaderboardDao,
+        bookmarksDao: BookmarksDao,
+        fireproofWebsiteRepository: FireproofWebsiteRepository,
+        locationPermissionsRepository: LocationPermissionsRepository,
+        geoLocationPermissions: GeoLocationPermissions,
+        navigationAwareLoginDetector: NavigationAwareLoginDetector,
+        autoCompleteApi: AutoCompleteApi,
+        appSettingsPreferencesStore: SettingsDataStore,
+        longPressHandler: LongPressHandler,
+        webViewSessionStorage: WebViewSessionStorage,
+        specialUrlDetector: SpecialUrlDetector,
+        faviconManager: FaviconManager,
+        addToHomeCapabilityDetector: AddToHomeCapabilityDetector,
+        ctaViewModel: CtaViewModel,
+        searchCountDao: SearchCountDao,
+        pixel: Pixel,
+        dispatchers: DispatcherProvider = DefaultDispatcherProvider(),
+        userEventsStore: UserEventsStore,
+        notificationDao: NotificationDao,
+        useOurAppDetector: UseOurAppDetector,
+        variantManager: VariantManager,
+        fileDownloader: FileDownloader,
+        globalPrivacyControl: GlobalPrivacyControl,
+        fireproofDialogsEventHandler: FireproofDialogsEventHandler
+    ): ViewModelFactoryPlugin {
+        return BrowserTabViewModelFactory(
+            statisticsUpdater,
+            queryUrlConverter,
+            duckDuckGoUrlDetector,
+            siteFactory,
+            tabRepository,
+            userWhitelistDao,
+            networkLeaderboardDao,
+            bookmarksDao,
+            fireproofWebsiteRepository,
+            locationPermissionsRepository,
+            geoLocationPermissions,
+            navigationAwareLoginDetector,
+            autoCompleteApi,
+            appSettingsPreferencesStore,
+            longPressHandler,
+            webViewSessionStorage,
+            specialUrlDetector,
+            faviconManager,
+            addToHomeCapabilityDetector,
+            ctaViewModel,
+            searchCountDao,
+            pixel,
+            dispatchers,
+            userEventsStore,
+            notificationDao,
+            useOurAppDetector,
+            variantManager,
+            fileDownloader,
+            globalPrivacyControl,
+            fireproofDialogsEventHandler
+        )
+    }
+}
+
+private class BrowserTabViewModelFactory(
+    private val statisticsUpdater: StatisticsUpdater,
+    private val queryUrlConverter: OmnibarEntryConverter,
+    private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector,
+    private val siteFactory: SiteFactory,
+    private val tabRepository: TabRepository,
+    private val userWhitelistDao: UserWhitelistDao,
+    private val networkLeaderboardDao: NetworkLeaderboardDao,
+    private val bookmarksDao: BookmarksDao,
+    private val fireproofWebsiteRepository: FireproofWebsiteRepository,
+    private val locationPermissionsRepository: LocationPermissionsRepository,
+    private val geoLocationPermissions: GeoLocationPermissions,
+    private val navigationAwareLoginDetector: NavigationAwareLoginDetector,
+    private val autoComplete: AutoComplete,
+    private val appSettingsPreferencesStore: SettingsDataStore,
+    private val longPressHandler: LongPressHandler,
+    private val webViewSessionStorage: WebViewSessionStorage,
+    private val specialUrlDetector: SpecialUrlDetector,
+    private val faviconManager: FaviconManager,
+    private val addToHomeCapabilityDetector: AddToHomeCapabilityDetector,
+    private val ctaViewModel: CtaViewModel,
+    private val searchCountDao: SearchCountDao,
+    private val pixel: Pixel,
+    private val dispatchers: DispatcherProvider = DefaultDispatcherProvider(),
+    private val userEventsStore: UserEventsStore,
+    private val notificationDao: NotificationDao,
+    private val useOurAppDetector: UseOurAppDetector,
+    private val variantManager: VariantManager,
+    private val fileDownloader: FileDownloader,
+    private val globalPrivacyControl: GlobalPrivacyControl,
+    private val fireproofDialogsEventHandler: FireproofDialogsEventHandler
+) : ViewModelFactoryPlugin {
+    override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
+        with(modelClass) {
+            return when {
+                isAssignableFrom(BrowserTabViewModel::class.java) -> BrowserTabViewModel(statisticsUpdater, queryUrlConverter, duckDuckGoUrlDetector, siteFactory, tabRepository, userWhitelistDao, networkLeaderboardDao, bookmarksDao, fireproofWebsiteRepository, locationPermissionsRepository, geoLocationPermissions, navigationAwareLoginDetector, autoComplete, appSettingsPreferencesStore, longPressHandler, webViewSessionStorage, specialUrlDetector, faviconManager, addToHomeCapabilityDetector, ctaViewModel, searchCountDao, pixel, dispatchers, userEventsStore, notificationDao, useOurAppDetector, variantManager, fileDownloader, globalPrivacyControl, fireproofDialogsEventHandler) as T
+                else -> null
+            }
+        }
     }
 }

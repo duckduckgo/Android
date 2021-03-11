@@ -23,13 +23,20 @@ import com.duckduckgo.app.global.DefaultDispatcherProvider
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.global.model.domain
+import com.duckduckgo.app.global.plugins.view_model.ViewModelFactoryPlugin
 import com.duckduckgo.app.privacy.db.UserWhitelistDao
 import com.duckduckgo.app.privacy.model.HttpsStatus
 import com.duckduckgo.app.privacy.model.PrivacyGrade
 import com.duckduckgo.app.privacy.model.PrivacyPractices
 import com.duckduckgo.app.privacy.model.PrivacyPractices.Summary.UNKNOWN
+import com.duckduckgo.di.scopes.AppObjectGraph
+import com.squareup.anvil.annotations.ContributesTo
+import dagger.Module
+import dagger.Provides
+import dagger.multibindings.IntoSet
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import javax.inject.Singleton
 
 class ScorecardViewModel(
     private val userWhitelistDao: UserWhitelistDao,
@@ -104,6 +111,30 @@ class ScorecardViewModel(
                 showIsMemberOfMajorNetwork = site.entity?.isMajor ?: false,
                 showEnhancedGrade = grade != improvedGrade
             )
+        }
+    }
+}
+
+@Module
+@ContributesTo(AppObjectGraph::class)
+class ScorecardViewModelFactoryModule {
+    @Provides
+    @Singleton
+    @IntoSet
+    fun provideScorecardViewModelFactory(userWhitelistDao: UserWhitelistDao): ViewModelFactoryPlugin {
+        return ScorecardViewModelFactory(userWhitelistDao)
+    }
+}
+
+private class ScorecardViewModelFactory(
+    private val userWhitelistDao: UserWhitelistDao,
+) : ViewModelFactoryPlugin {
+    override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
+        with(modelClass) {
+            return when {
+                isAssignableFrom(ScorecardViewModel::class.java) -> ScorecardViewModel(userWhitelistDao) as T
+                else -> null
+            }
         }
     }
 }

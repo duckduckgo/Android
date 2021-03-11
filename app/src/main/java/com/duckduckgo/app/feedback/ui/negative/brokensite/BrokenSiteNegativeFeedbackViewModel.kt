@@ -18,6 +18,13 @@ package com.duckduckgo.app.feedback.ui.negative.brokensite
 
 import androidx.lifecycle.ViewModel
 import com.duckduckgo.app.global.SingleLiveEvent
+import com.duckduckgo.app.global.plugins.view_model.ViewModelFactoryPlugin
+import com.duckduckgo.di.scopes.AppObjectGraph
+import com.squareup.anvil.annotations.ContributesTo
+import dagger.Module
+import dagger.Provides
+import dagger.multibindings.IntoSet
+import javax.inject.Singleton
 
 class BrokenSiteNegativeFeedbackViewModel : ViewModel() {
 
@@ -30,5 +37,27 @@ class BrokenSiteNegativeFeedbackViewModel : ViewModel() {
     sealed class Command {
         data class ExitAndSubmitFeedback(val feedback: String, val brokenSite: String?) : Command()
         object Exit : Command()
+    }
+}
+
+@Module
+@ContributesTo(AppObjectGraph::class)
+class BrokenSiteNegativeFeedbackViewModelFactoryModule {
+    @Provides
+    @Singleton
+    @IntoSet
+    fun provideBrokenSiteNegativeFeedbackViewModelFactory(): ViewModelFactoryPlugin {
+        return BrokenSiteNegativeFeedbackViewModelFactory()
+    }
+}
+
+private class BrokenSiteNegativeFeedbackViewModelFactory() : ViewModelFactoryPlugin {
+    override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
+        with(modelClass) {
+            return when {
+                isAssignableFrom(BrokenSiteNegativeFeedbackViewModel::class.java) -> (BrokenSiteNegativeFeedbackViewModel() as T)
+                else -> null
+            }
+        }
     }
 }

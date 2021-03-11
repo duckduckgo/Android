@@ -20,8 +20,15 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.global.model.domain
+import com.duckduckgo.app.global.plugins.view_model.ViewModelFactoryPlugin
 import com.duckduckgo.app.privacy.model.PrivacyPractices
 import com.duckduckgo.app.privacy.model.PrivacyPractices.Summary.UNKNOWN
+import com.duckduckgo.di.scopes.AppObjectGraph
+import com.squareup.anvil.annotations.ContributesTo
+import dagger.Module
+import dagger.Provides
+import dagger.multibindings.IntoSet
+import javax.inject.Singleton
 
 class PrivacyPracticesViewModel : ViewModel() {
 
@@ -58,5 +65,27 @@ class PrivacyPracticesViewModel : ViewModel() {
             goodTerms = site.privacyPractices.goodReasons,
             badTerms = site.privacyPractices.badReasons
         )
+    }
+}
+
+@Module
+@ContributesTo(AppObjectGraph::class)
+class PrivacyPracticesViewModelFactoryModule {
+    @Provides
+    @Singleton
+    @IntoSet
+    fun providePrivacyPracticesViewModelFactory(): ViewModelFactoryPlugin {
+        return PrivacyPracticesViewModelFactory()
+    }
+}
+
+private class PrivacyPracticesViewModelFactory() : ViewModelFactoryPlugin {
+    override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
+        with(modelClass) {
+            return when {
+                isAssignableFrom(PrivacyPracticesViewModel::class.java) -> (PrivacyPracticesViewModel() as T)
+                else -> null
+            }
+        }
     }
 }

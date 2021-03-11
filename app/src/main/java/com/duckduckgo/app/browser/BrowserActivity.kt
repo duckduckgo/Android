@@ -94,8 +94,6 @@ class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope() {
 
     private var lastIntent: Intent? = null
 
-    private var currentAppEnjoymentFragment: DialogFragment? = null
-
     private lateinit var renderer: BrowserStateRenderer
 
     private var openMessageInNewTabJob: Job? = null
@@ -444,9 +442,8 @@ class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope() {
         get() = (flags and Intent.FLAG_ACTIVITY_LAUNCHED_FROM_HISTORY) == Intent.FLAG_ACTIVITY_LAUNCHED_FROM_HISTORY
 
     private fun showAppEnjoymentPrompt(prompt: DialogFragment) {
-        currentAppEnjoymentFragment?.dismiss()
+        (supportFragmentManager.findFragmentByTag(APP_ENJOYMENT_DIALOG_TAG) as? DialogFragment)?.dismiss()
         prompt.show(supportFragmentManager, APP_ENJOYMENT_DIALOG_TAG)
-        currentAppEnjoymentFragment = prompt
     }
 
     private fun hideWebContent() {
