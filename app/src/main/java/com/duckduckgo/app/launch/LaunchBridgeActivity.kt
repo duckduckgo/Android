@@ -70,6 +70,7 @@ class LaunchBridgeActivity : DuckDuckGoActivity() {
 
     private fun showHome() {
         startActivity(BrowserActivity.intent(this))
+        overridePendingTransition(0, 0)
         finish()
     }
 }

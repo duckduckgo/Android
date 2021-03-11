@@ -23,16 +23,6 @@
 
     <include layout="@layout/include_omnibar_toolbar" />
 
-    <include
-        android:id="@+id/defaultCard"
-        layout="@layout/content_onboarding_default_browser_card"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:visibility="invisible"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
     <FrameLayout
         android:id="@+id/webViewFullScreenContainer"
         android:layout_width="match_parent"
@@ -54,16 +44,14 @@
         android:clipToPadding="false"
         android:elevation="4dp"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
         tools:itemCount="3"
         tools:listitem="@layout/item_autocomplete_search_suggestion"
         tools:visibility="visible" />
 
-    <include layout="@layout/include_new_browser_tab" />
+    <include layout="@layout/include_new_browser_tab"
+        android:visibility="gone"/>
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <FrameLayout
         android:id="@+id/browserLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -76,16 +64,12 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
-                <FrameLayout
-                    android:id="@+id/webViewContainer"
-                    android:layout_width="0dp"
-                    android:layout_height="0dp"
-                    app:layout_behavior="@string/appbar_scrolling_view_behavior"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    tools:background="#4F00" />
+            <FrameLayout
+                android:id="@+id/webViewContainer"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                app:layout_behavior="@string/appbar_scrolling_view_behavior"
+                tools:background="#4F00" />
 
         </com.duckduckgo.app.browser.ui.ScrollAwareRefreshLayout>
 
@@ -95,6 +79,5 @@
             android:layout_height="match_parent"
             android:focusableInTouchMode="true" />
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
-
+    </FrameLayout>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

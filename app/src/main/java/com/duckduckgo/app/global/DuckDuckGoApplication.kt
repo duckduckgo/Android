@@ -159,12 +159,12 @@ open class DuckDuckGoApplication : HasAndroidInjector, Application(), LifecycleO
         super.onCreate()
 
         configureLogging()
-        configureDependencyInjection()
-        configureUncaughtExceptionHandler()
+        Timber.i("Application Started")
+        if (appIsRestarting()) return
 
         Timber.i("Creating DuckDuckGoApplication")
-
-        if (appIsRestarting()) return
+        configureDependencyInjection()
+        configureUncaughtExceptionHandler()
 
         ProcessLifecycleOwner.get().lifecycle.also {
             it.addObserver(this)

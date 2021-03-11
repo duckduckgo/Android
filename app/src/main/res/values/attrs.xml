@@ -65,8 +65,6 @@
     <attr name="brokenSitesButtonDisabledBackgroundColor" format="color" />
     <attr name="brokenSitesButtonDisabledTextColor" format="color" />
     <attr name="brokenSitesButtonRippleColor" format="color" />
-    <attr name="topCallToActionDescriptionColor" format="color" />
-    <attr name="topCallToActionBackgroundColor" format="color" />
     <attr name="privacyDashboardLogoLetterTextColor" format="color" />
     <attr name="fireproofWebsiteTitleTextColor" format="color" />
 

@@ -22,9 +22,9 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.os.Process
+import androidx.appcompat.app.AppCompatActivity
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
-import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.view.fadeTransitionConfig
 
 /**
@@ -36,7 +36,7 @@ import com.duckduckgo.app.global.view.fadeTransitionConfig
  *
  * This Activity was largely inspired by https://github.com/JakeWharton/ProcessPhoenix
  */
-class FireActivity : DuckDuckGoActivity() {
+class FireActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -53,8 +53,8 @@ class FireActivity : DuckDuckGoActivity() {
     companion object {
         private const val KEY_RESTART_INTENTS = "KEY_RESTART_INTENTS"
 
-        fun triggerRestart(context: Context) {
-            triggerRestart(context, getRestartIntent(context))
+        fun triggerRestart(context: Context, notifyDataCleared: Boolean) {
+            triggerRestart(context, getRestartIntent(context, notifyDataCleared))
         }
 
         private fun triggerRestart(context: Context, nextIntent: Intent) {
@@ -69,8 +69,8 @@ class FireActivity : DuckDuckGoActivity() {
             killProcess()
         }
 
-        private fun getRestartIntent(context: Context): Intent {
-            val intent = BrowserActivity.intent(context, launchedFromFireAction = true)
+        private fun getRestartIntent(context: Context, notifyDataCleared: Boolean = false): Intent {
+            val intent = BrowserActivity.intent(context, notifyDataCleared = notifyDataCleared)
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
             return intent
         }

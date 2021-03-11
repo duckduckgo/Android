@@ -14,7 +14,7 @@
   ~ limitations under the License.
   -->
 
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/findInPageContainer"
@@ -22,6 +22,7 @@
     android:layout_height="match_parent"
     android:background="?attr/colorPrimary"
     android:clickable="true"
+    android:orientation="horizontal"
     tools:ignore="KeyboardInaccessibleWidget"
     tools:layout_height="?attr/actionBarSize">
 
@@ -29,6 +30,7 @@
         android:id="@+id/findInPageInput"
         android:layout_width="0dp"
         android:layout_height="match_parent"
+        android:layout_weight="1"
         android:layout_marginStart="12dp"
         android:layout_marginEnd="12dp"
         android:background="?attr/colorPrimary"
@@ -53,64 +55,30 @@
         android:layout_height="wrap_content"
         android:layout_marginEnd="10dp"
         android:textColor="?attr/omnibarTextColor"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@id/findInPageControlButtons"
-        app:layout_constraintStart_toEndOf="@id/findInPageInput"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.5"
         tools:text="1/10" />
 
-
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/findInPageControlButtons"
-        android:layout_width="wrap_content"
+    <ImageView
+        android:id="@+id/previousSearchTermButton"
+        android:layout_width="36dp"
         android:layout_height="match_parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@id/findInPageMatches"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.5">
+        android:layout_marginStart="6dp"
+        android:contentDescription="@string/previousSearchTermDescription"
+        android:src="@drawable/ic_keyboard_arrow_up_24dp"/>
 
-        <ImageView
-            android:id="@+id/previousSearchTermButton"
-            android:layout_width="36dp"
-            android:layout_height="match_parent"
-            android:layout_marginStart="6dp"
-            android:layout_marginEnd="6dp"
-            android:contentDescription="@string/previousSearchTermDescription"
-            android:src="@drawable/ic_keyboard_arrow_up_24dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/nextSearchTermButton"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.5" />
+    <ImageView
+        android:id="@+id/nextSearchTermButton"
+        android:layout_width="36dp"
+        android:layout_marginStart="6dp"
+        android:layout_height="match_parent"
+        android:contentDescription="@string/nextSearchTermDescription"
+        android:src="@drawable/ic_keyboard_arrow_down_24dp"/>
 
-        <ImageView
-            android:id="@+id/nextSearchTermButton"
-            android:layout_width="36dp"
-            android:layout_height="match_parent"
-            android:layout_marginStart="6dp"
-            android:contentDescription="@string/nextSearchTermDescription"
-            android:src="@drawable/ic_keyboard_arrow_down_24dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toEndOf="@id/previousSearchTermButton"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.5" />
+    <ImageView
+        android:id="@+id/closeFindInPagePanel"
+        android:layout_width="36dp"
+        android:layout_height="match_parent"
+        android:contentDescription="@string/closeFindInPageButtonDescription"
+        android:padding="6dp"
+        android:src="@drawable/ic_close_24dp"/>
 
-        <ImageView
-            android:id="@+id/closeFindInPagePanel"
-            android:layout_width="36dp"
-            android:layout_height="match_parent"
-            android:contentDescription="@string/closeFindInPageButtonDescription"
-            android:padding="6dp"
-            android:src="@drawable/ic_close_24dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@id/nextSearchTermButton"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.5" />
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
-
-
-</androidx.constraintlayout.widget.ConstraintLayout>
+</LinearLayout>

@@ -45,14 +45,6 @@ class TabSwitcherButton @JvmOverloads constructor(
     override fun onFinishInflate() {
         super.onFinishInflate()
         View.inflate(context, R.layout.view_tab_switcher_button, this)
-
-        setOnClickListener {
-            super.callOnClick()
-        }
-
-        setOnLongClickListener {
-            super.performLongClick()
-        }
     }
 
     fun increment(callback: () -> Unit) {
