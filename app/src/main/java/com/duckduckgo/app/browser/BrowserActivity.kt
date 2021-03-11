@@ -157,7 +157,6 @@ class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope() {
         }
         transaction.commit()
         currentTab = fragment
-        hideMockupOmnibar()
         return fragment
     }
 
@@ -370,7 +369,12 @@ class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope() {
         }
     }
 
-    fun hideMockupOmnibar() {
+    override fun onAttachFragment(fragment: androidx.fragment.app.Fragment) {
+        super.onAttachFragment(fragment)
+        hideMockupOmnibar()
+    }
+
+    private fun hideMockupOmnibar() {
         appBarLayoutMockup.visibility = View.GONE
     }
 
