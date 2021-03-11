@@ -23,6 +23,7 @@ import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.fire.FireAnimationLoader
 import com.duckduckgo.app.global.DuckDuckGoTheme
 import com.duckduckgo.app.global.SingleLiveEvent
+import com.duckduckgo.app.global.plugins.view_model.ViewModelFactoryPlugin
 import com.duckduckgo.app.icon.api.AppIcon
 import com.duckduckgo.app.settings.clear.ClearWhatOption
 import com.duckduckgo.app.settings.clear.ClearWhenOption
@@ -34,6 +35,11 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelName
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelName.*
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.FIRE_ANIMATION
+import com.duckduckgo.di.scopes.AppObjectGraph
+import com.squareup.anvil.annotations.ContributesTo
+import dagger.Module
+import dagger.Provides
+import dagger.multibindings.IntoSet
 import com.duckduckgo.mobile.android.vpn.exclusions.DeviceShieldExcludedApps
 import com.duckduckgo.mobile.android.vpn.onboarding.DeviceShieldOnboarding
 import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
@@ -42,9 +48,9 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import javax.inject.Inject
+import javax.inject.Singleton
 
-class SettingsViewModel @Inject constructor(
+class SettingsViewModel(
     private val appContext: Context,
     private val settingsDataStore: SettingsDataStore,
     private val defaultWebBrowserCapability: DefaultBrowserDetector,
@@ -297,6 +303,46 @@ class SettingsViewModel @Inject constructor(
             ClearWhenOption.APP_EXIT_OR_30_MINS -> AUTOMATIC_CLEAR_DATA_WHEN_OPTION_APP_EXIT_OR_30_MINS
             ClearWhenOption.APP_EXIT_OR_60_MINS -> AUTOMATIC_CLEAR_DATA_WHEN_OPTION_APP_EXIT_OR_60_MINS
             else -> null
+        }
+    }
+}
+
+@Module
+@ContributesTo(AppObjectGraph::class)
+class SettingsViewModelFactoryModule {
+    @Provides
+    @Singleton
+    @IntoSet
+    fun provideSettingsViewModelFactory(
+        appContext: Context,
+        settingsDataStore: SettingsDataStore,
+        defaultWebBrowserCapability: DefaultBrowserDetector,
+        variantManager: VariantManager,
+        fireAnimationLoader: FireAnimationLoader,
+        pixel: Pixel,
+        deviceShieldExcludedApps: DeviceShieldExcludedApps,
+        deviceShieldOnboarding: DeviceShieldOnboarding
+    ): ViewModelFactoryPlugin {
+        return SettingsViewModelFactory(appContext, settingsDataStore, defaultWebBrowserCapability, variantManager, fireAnimationLoader, pixel, deviceShieldExcludedApps, deviceShieldOnboarding)
+    }
+}
+
+private class SettingsViewModelFactory(
+    private val appContext: Context,
+    private val settingsDataStore: SettingsDataStore,
+    private val defaultWebBrowserCapability: DefaultBrowserDetector,
+    private val variantManager: VariantManager,
+    private val fireAnimationLoader: FireAnimationLoader,
+    private val pixel: Pixel,
+    private val deviceShieldExcludedApps: DeviceShieldExcludedApps,
+    private val deviceShieldOnboarding: DeviceShieldOnboarding
+) : ViewModelFactoryPlugin {
+    override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
+        with(modelClass) {
+            return when {
+                isAssignableFrom(SettingsViewModel::class.java) -> (SettingsViewModel(appContext, settingsDataStore, defaultWebBrowserCapability, variantManager, fireAnimationLoader, pixel, deviceShieldExcludedApps, deviceShieldOnboarding) as T)
+                else -> null
+            }
         }
     }
 }
