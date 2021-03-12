@@ -119,6 +119,7 @@ class SettingsActivity :
 
         deviceShieldToggle.setOnCheckedChangeListener(deviceShieldToggleListener)
         deviceShieldExcludedAppsText.setOnClickListener { viewModel.onExcludedAppsClicked() }
+        deviceShieldPrivacyReportText.setOnClickListener { viewModel.onDeviceShieldPrivacyReportClicked() }
     }
 
     private fun observeViewModel() {
@@ -196,6 +197,7 @@ class SettingsActivity :
             is Command.LaunchAppIcon -> launchAppIconChange()
             is Command.LaunchGlobalPrivacyControl -> launchGlobalPrivacyControl()
             is Command.LaunchExcludedAppList -> launchExcludedAppList()
+            is Command.LaunchDeviceShieldPrivacyReport -> launchDeviceShieldPrivacyReport()
             is Command.UpdateTheme -> sendThemeChangedBroadcast()
             is Command.LaunchFireAnimationSettings -> launchFireAnimationSelector()
             is Command.LaunchDeviceShieldOnboarding -> launchDeviceShieldOnboarding()
@@ -293,6 +295,11 @@ class SettingsActivity :
     private fun launchExcludedAppList() {
         val options = ActivityOptions.makeSceneTransitionAnimation(this).toBundle()
         startActivity(DeviceShieldExclusionListActivity.intent(this), options)
+    }
+
+    private fun launchDeviceShieldPrivacyReport() {
+        val options = ActivityOptions.makeSceneTransitionAnimation(this).toBundle()
+        startActivity(PrivacyReportActivity.intent(this), options)
     }
 
     override fun onAutomaticallyClearWhatOptionSelected(clearWhatSetting: ClearWhatOption) {

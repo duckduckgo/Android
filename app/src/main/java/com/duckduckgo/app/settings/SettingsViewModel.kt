@@ -93,6 +93,7 @@ class SettingsViewModel(
         object LaunchFireAnimationSettings : Command()
         object LaunchGlobalPrivacyControl : Command()
         object LaunchExcludedAppList : Command()
+        object LaunchDeviceShieldPrivacyReport : Command()
         object UpdateTheme : Command()
         object LaunchDeviceShieldOnboarding : Command()
         object StartDeviceShield : Command()
@@ -182,6 +183,10 @@ class SettingsViewModel(
 
     fun onExcludedAppsClicked() {
         command.value = Command.LaunchExcludedAppList
+    }
+
+    fun onDeviceShieldPrivacyReportClicked() {
+        command.value = Command.LaunchDeviceShieldPrivacyReport
     }
 
     fun onLocationClicked() {

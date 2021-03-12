@@ -40,12 +40,22 @@
         app:layout_constraintTop_toBottomOf="@id/deviceShieldTitle" />
 
     <com.duckduckgo.app.settings.SettingsOptionWithSubtitle
-        android:id="@+id/deviceShieldExcludedAppsText"
+        android:id="@+id/deviceShieldPrivacyReportText"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/deviceShieldToggle"
+        app:subtitle="@string/deviceShieldPrivacyReportSubtitle"
+        app:title="@string/deviceShieldPrivacyReport" />
+
+    <com.duckduckgo.app.settings.SettingsOptionWithSubtitle
+        android:id="@+id/deviceShieldExcludedAppsText"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/deviceShieldPrivacyReportText"
         app:subtitle="TODO"
         app:title="@string/deviceShieldExcludedApps" />
 

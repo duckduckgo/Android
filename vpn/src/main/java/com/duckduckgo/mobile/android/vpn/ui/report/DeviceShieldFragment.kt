@@ -24,6 +24,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.CompoundButton
 import android.widget.ImageView
 import android.widget.TextView
@@ -60,15 +61,10 @@ class DeviceShieldFragment : Fragment() {
 
     private lateinit var deviceShieldCtaHeaderTextView: TextView
     private lateinit var deviceShieldCtaSubHeaderTextView: TextView
-    private lateinit var deviceShieldSwitch: SwitchCompat
-
-    private lateinit var deviceShieldSwitchImage: ImageView
-    private lateinit var deviceShieldSwitchHeaderTextView: TextView
-    private lateinit var deviceShieldSwitchSubHeaderTextView: TextView
-    private lateinit var deviceShieldSwitchLabelTextView: TextView
-
     private lateinit var deviceShieldInfoLayout: View
-    private lateinit var deviceShieldSwitchLayout: View
+
+    private lateinit var deviceShieldDisabledLayout: View
+    private lateinit var deviceShieldEnableCTA: Button
 
     private lateinit var viewKonfetti: KonfettiView
 
@@ -86,15 +82,9 @@ class DeviceShieldFragment : Fragment() {
     private fun configureViewReferences(view: View) {
         deviceShieldCtaHeaderTextView = view.findViewById(R.id.deviceShieldCtaHeader)
         deviceShieldCtaSubHeaderTextView = view.findViewById(R.id.deviceShieldCtaSubheader)
-        deviceShieldSwitch = view.findViewById(R.id.deviceShieldCtaSwitch)
-
-        deviceShieldSwitchImage = view.findViewById(R.id.deviceShieldSwitchImage)
-        deviceShieldSwitchHeaderTextView = view.findViewById(R.id.deviceShieldSwitchHeader)
-        deviceShieldSwitchSubHeaderTextView = view.findViewById(R.id.deviceShieldSwitchSubheader)
-        deviceShieldSwitchLabelTextView = view.findViewById(R.id.deviceShieldCtaSwitchLabel)
-
-        deviceShieldInfoLayout = view.findViewById(R.id.deviceShieldCtaLayout)
-        deviceShieldSwitchLayout = view.findViewById(R.id.deviceShieldSwitchLayout)
+        deviceShieldInfoLayout = view.findViewById(R.id.deviceShieldInfoLayout)
+        deviceShieldEnableCTA = view.findViewById(R.id.privacyReportToggleButton)
+        deviceShieldDisabledLayout = view.findViewById(R.id.deviceShieldDisabledCardView)
 
         viewKonfetti = view.findViewById(R.id.deviceShieldKonfetti)
     }
@@ -152,20 +142,12 @@ class DeviceShieldFragment : Fragment() {
         lifecycle.addObserver(viewModel)
     }
 
-    private val deviceShieldSwitchListener = CompoundButton.OnCheckedChangeListener { _, checked ->
-        Timber.i("Toggle changed. enabled=$checked")
-        if (checked) {
-            enableDeviceShield()
-        } else {
-            stopVpn()
-        }
-
-        renderDeviceShieldSwitchState(checked)
-    }
-
     private fun bindListeners(view: View) {
         deviceShieldInfoLayout.setOnClickListener {
             startActivity(PrivacyReportActivity.intent(requireActivity()))
+        }
+        deviceShieldEnableCTA.setOnClickListener {
+            enableDeviceShield()
         }
     }
 
@@ -201,15 +183,9 @@ class DeviceShieldFragment : Fragment() {
     }
 
     private fun startVpn() {
-        deviceShieldSwitchImage.setImageResource(R.drawable.ic_device_shield_on)
-        Snackbar.make(deviceShieldSwitchImage, R.string.deviceShieldEnabledSnackbar, Snackbar.LENGTH_SHORT).show()
+        Snackbar.make(deviceShieldInfoLayout, R.string.deviceShieldEnabledSnackbar, Snackbar.LENGTH_SHORT).show()
         requireActivity().startService(TrackerBlockingVpnService.startIntent(requireActivity()))
         launchKonfetti()
-    }
-
-    private fun stopVpn() {
-        deviceShieldSwitchImage.setImageResource(R.drawable.ic_device_shield_off)
-        requireActivity().startService(TrackerBlockingVpnService.stopIntent(requireActivity()))
     }
 
     private fun launchKonfetti() {
@@ -236,9 +212,8 @@ class DeviceShieldFragment : Fragment() {
 
     private fun renderTrackersBlocked(totalTrackers: Int, companiesBlocked: List<PrivacyReportViewModel.PrivacyReportView.CompanyTrackers>) {
         if (companiesBlocked.isEmpty()) {
-            deviceShieldCtaHeaderTextView.text = getString(R.string.deviceShieldDisabledHeader)
-            deviceShieldCtaSubHeaderTextView.isVisible = deviceShieldSwitch.isChecked
-            deviceShieldCtaSubHeaderTextView.text = getString(R.string.deviceShieldDisabledSubheader)
+            deviceShieldCtaHeaderTextView.text = getString(R.string.deviceShieldEnabledTooltip)
+            deviceShieldCtaSubHeaderTextView.isVisible = false
         } else {
             deviceShieldCtaHeaderTextView.text = resources.getQuantityString(R.plurals.deviceShieldCtaTrackersBlocked, totalTrackers, totalTrackers)
             val lastTracker = companiesBlocked.first().lastTracker
@@ -252,15 +227,16 @@ class DeviceShieldFragment : Fragment() {
     }
 
     private fun renderVpnEnabledState(running: Boolean) {
-        renderDeviceShieldSwitchState(running)
-        deviceShieldSwitch.quietlySetIsChecked(running, deviceShieldSwitchListener)
-    }
+        deviceShieldDisabledLayout.isVisible = !running
 
-    private fun renderDeviceShieldSwitchState(running: Boolean) {
-        deviceShieldSwitchImage.isVisible = !running
-        deviceShieldSwitchHeaderTextView.isVisible = !running
-        deviceShieldSwitchSubHeaderTextView.isVisible = !running
-        deviceShieldSwitchLabelTextView.isVisible = running
+        if (!deviceShieldCtaSubHeaderTextView.isVisible){
+            if (running){
+                deviceShieldCtaHeaderTextView.text = getString(R.string.deviceShieldEnabledTooltip)
+            } else {
+                deviceShieldCtaHeaderTextView.text = getString(R.string.deviceShieldDisabledHeader)
+            }
+        }
+
     }
 
     private sealed class VpnPermissionStatus {

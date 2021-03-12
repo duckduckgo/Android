@@ -304,6 +304,7 @@ class PrivacyReportActivity : AppCompatActivity(R.layout.activity_vpn_privacy_re
         companiesBlocked: List<PrivacyReportViewModel.PrivacyReportView.CompanyTrackers>
     ) {
         if (companiesBlocked.isNotEmpty()) {
+            reportSummaryLink.isVisible = true
             val totalCompanies = resources.getQuantityString(R.plurals.privacyReportCompaniesBlocked, totalCompanies, totalCompanies)
             reportSummaryTextView.text = resources.getQuantityString(R.plurals.privacyReportTrackersBlocked, trackersSize, trackersSize, totalCompanies)
             renderTrackerCompanies(companiesBlocked)
@@ -345,7 +346,7 @@ class PrivacyReportActivity : AppCompatActivity(R.layout.activity_vpn_privacy_re
         val timestamp = LocalDateTime.parse(trackerAndCompany.lastTracker.tracker.timestamp)
         val timeDifference = timestamp.until(OffsetDateTime.now(), ChronoUnit.MILLIS)
         val timeRunning = TimePassed.fromMilliseconds(timeDifference)
-        timeTextView.text = getString(R.string.privacyReportAppTrackerTime, timeRunning.shortFormat())
+        timeTextView.text = getString(R.string.privacyReportAppTrackerTime, timeRunning.shortFormat()).capitalize()
 
         return inflatedView
     }
@@ -353,11 +354,12 @@ class PrivacyReportActivity : AppCompatActivity(R.layout.activity_vpn_privacy_re
     private fun renderVpnEnabledState(running: Boolean) {
         reportSummaryEnabledTooltip.isVisible = running
         deviceShieldDisabledCard.isVisible = !running
-
         if (!trackersLayout.isVisible) {
             if (running) {
                 reportSummaryTextView.text = getString(R.string.deviceShieldEnabledTooltip)
+                reportSummaryLink.isVisible = true
             } else {
+                reportSummaryLink.isVisible = false
                 reportSummaryTextView.text = getString(R.string.deviceShieldDisabledTooltip)
             }
         }
