@@ -30,6 +30,10 @@ class PixelNameTest {
                 fail("Duplicate pixel name found: ${it.pixelName}")
             }
         }
+        Pixel.StatisticsPixelName.values().forEach {
+            if (!existingNames.add(it.pixelName)) {
+                fail("Duplicate pixel name found: ${it.pixelName}")
+            }
+        }
     }
-
 }
