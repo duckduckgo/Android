@@ -48,7 +48,6 @@ class WebViewDataManager @Inject constructor(
         clearAuthentication(webView)
         clearExternalCookies()
         clearWebViewDirectories(exclusions = WEBVIEW_FILES_EXCLUDED_FROM_DELETION)
-        clearAuthDbJournalFiles(files = HTTP_AUTH_FILES_TO_DELETE)
     }
 
     private fun clearWebViewCache(webView: WebView) {
@@ -81,11 +80,6 @@ class WebViewDataManager @Inject constructor(
         fileDeleter.deleteContents(File(dataDir, WEBVIEW_DEFAULT_DIRECTORY_NAME), exclusions)
     }
 
-    private suspend fun clearAuthDbJournalFiles(files: List<String>) {
-        val dataDir = context.applicationInfo.dataDir
-        fileDeleter.deleteFilesFromDirectory(File(dataDir, DATABASES_DIRECTORY_NAME), files)
-    }
-
     private suspend fun clearAuthentication(webView: WebView) {
         webViewHttpAuthStore.clearHttpAuthUsernamePassword(webView)
         webViewHttpAuthStore.cleanHttpAuthDatabase()
@@ -107,10 +101,6 @@ class WebViewDataManager @Inject constructor(
         private val WEBVIEW_FILES_EXCLUDED_FROM_DELETION = listOf(
             "Default",
             "Cookies"
-        )
-
-        private val HTTP_AUTH_FILES_TO_DELETE = listOf(
-            "http_auth.db-journal"
         )
     }
 }

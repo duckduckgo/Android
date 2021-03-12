@@ -19,13 +19,16 @@ package com.duckduckgo.app.browser.httpauth
 import android.webkit.WebView
 import android.webkit.WebViewDatabase
 import androidx.test.filters.SdkSuppress
+import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.CoroutineTestRule
+import com.duckduckgo.app.fire.AuthDatabaseLocator
 import com.duckduckgo.app.fire.DatabaseCleaner
+import com.duckduckgo.app.runBlocking
 import com.nhaarman.mockitokotlin2.mock
+import com.nhaarman.mockitokotlin2.never
 import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.whenever
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.runBlockingTest
 import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
@@ -34,14 +37,15 @@ import org.junit.Test
 class WebViewHttpAuthStoreTest {
 
     @get:Rule
-    @Suppress("unused")
     val coroutineRule = CoroutineTestRule()
 
+    private val context = InstrumentationRegistry.getInstrumentation().targetContext
     private val webViewDatabase: WebViewDatabase = mock()
     private val mockDatabaseCleaner: DatabaseCleaner = mock()
     private val webView: WebView = mock()
+    private val databaseLocator = AuthDatabaseLocator(context)
 
-    private val webViewHttpAuthStore = RealWebViewHttpAuthStore(webViewDatabase, mockDatabaseCleaner)
+    private val webViewHttpAuthStore = RealWebViewHttpAuthStore(webViewDatabase, mockDatabaseCleaner, databaseLocator, coroutineRule.testDispatcherProvider)
 
     @Test
     @SdkSuppress(minSdkVersion = android.os.Build.VERSION_CODES.O)
@@ -94,8 +98,29 @@ class WebViewHttpAuthStoreTest {
     }
 
     @Test
-    fun whenCleanHttpAuthDatabaseThenCleanDatabaseCalled() = runBlockingTest {
+    fun whenCleanHttpAuthDatabaseThenCleanDatabaseCalled() = coroutineRule.runBlocking {
         webViewHttpAuthStore.cleanHttpAuthDatabase()
-        verify(mockDatabaseCleaner).cleanDatabase()
+        verify(mockDatabaseCleaner).cleanDatabase(databaseLocator.getDatabasePath())
+    }
+
+    @Test
+    @SdkSuppress(minSdkVersion = android.os.Build.VERSION_CODES.LOLLIPOP, maxSdkVersion = android.os.Build.VERSION_CODES.O_MR1)
+    fun whenAppCreatedAndApiBetween21And27ThenJournalModeChangedToDelete() = coroutineRule.runBlocking {
+        webViewHttpAuthStore.onAppCreated()
+        verify(mockDatabaseCleaner).changeJournalModeToDelete(databaseLocator.getDatabasePath())
+    }
+
+    @Test
+    @SdkSuppress(minSdkVersion = android.os.Build.VERSION_CODES.Q)
+    fun whenAppCreatedAndApiGreaterThan28ThenJournalModeChangedToDelete() = coroutineRule.runBlocking {
+        webViewHttpAuthStore.onAppCreated()
+        verify(mockDatabaseCleaner).changeJournalModeToDelete(databaseLocator.getDatabasePath())
+    }
+
+    @Test
+    @SdkSuppress(minSdkVersion = android.os.Build.VERSION_CODES.P, maxSdkVersion = android.os.Build.VERSION_CODES.P)
+    fun whenAppCreatedAndApiIs28ThenJournalModeChangedToDeleteNotCalled() = coroutineRule.runBlocking {
+        webViewHttpAuthStore.onAppCreated()
+        verify(mockDatabaseCleaner, never()).changeJournalModeToDelete(databaseLocator.getDatabasePath())
     }
 }

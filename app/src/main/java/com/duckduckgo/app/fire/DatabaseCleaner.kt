@@ -22,31 +22,39 @@ import kotlinx.coroutines.withContext
 import timber.log.Timber
 
 interface DatabaseCleaner {
-    suspend fun cleanDatabase(): Boolean
+    suspend fun cleanDatabase(databasePath: String): Boolean
+    suspend fun changeJournalModeToDelete(databasePath: String): Boolean
 }
 
-class AuthDatabaseCleaner(private val databasePath: String) : DatabaseCleaner {
+class DatabaseCleanerHelper : DatabaseCleaner {
 
-    override suspend fun cleanDatabase(): Boolean {
+    override suspend fun cleanDatabase(databasePath: String): Boolean {
+        return executeCommand("VACUUM", databasePath)
+    }
+
+    override suspend fun changeJournalModeToDelete(databasePath: String): Boolean {
+        return executeCommand("PRAGMA journal_mode=DELETE", databasePath)
+    }
+
+    private suspend fun executeCommand(command: String, databasePath: String): Boolean {
         return withContext(Dispatchers.IO) {
             if (databasePath.isNotEmpty()) {
-                return@withContext cleanUpDatabase()
+                var commandExecuted = false
+                openReadableDatabase(databasePath)?.use {
+                    try {
+                        it.rawQuery(command, null).apply {
+                            moveToFirst()
+                            close()
+                        }
+                        commandExecuted = true
+                    } catch (exception: Exception) {
+                        Timber.e(exception)
+                    }
+                }
+                return@withContext commandExecuted
             }
             return@withContext false
         }
-    }
-
-    private fun cleanUpDatabase(): Boolean {
-        var cleanUpExecuted = false
-        openReadableDatabase(databasePath)?.use {
-            try {
-                it.execSQL("VACUUM")
-                cleanUpExecuted = true
-            } catch (exception: Exception) {
-                Timber.e(exception)
-            }
-        }
-        return cleanUpExecuted
     }
 
     private fun openReadableDatabase(databasePath: String): SQLiteDatabase? {

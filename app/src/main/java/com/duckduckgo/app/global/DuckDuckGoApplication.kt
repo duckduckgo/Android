@@ -25,6 +25,7 @@ import androidx.lifecycle.OnLifecycleEvent
 import androidx.lifecycle.ProcessLifecycleOwner
 import com.duckduckgo.app.browser.BuildConfig
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserObserver
+import com.duckduckgo.app.browser.httpauth.WebViewHttpAuthStore
 import com.duckduckgo.app.browser.shortcut.ShortcutBuilder
 import com.duckduckgo.app.browser.shortcut.ShortcutReceiver
 import com.duckduckgo.app.di.AppComponent
@@ -149,6 +150,9 @@ open class DuckDuckGoApplication : HasAndroidInjector, Application(), LifecycleO
     @Inject
     lateinit var tabsDbSanitizer: TabsDbSanitizer
 
+    @Inject
+    lateinit var webViewHttpAuthStore: WebViewHttpAuthStore
+
     private var launchedByFireAction: Boolean = false
 
     private val applicationCoroutineScope = CoroutineScope(SupervisorJob())
@@ -177,6 +181,7 @@ open class DuckDuckGoApplication : HasAndroidInjector, Application(), LifecycleO
             it.addObserver(pixelSender)
             it.addObserver(fireFireAnimationLoader)
             it.addObserver(tabsDbSanitizer)
+            it.addObserver(webViewHttpAuthStore)
         }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1) {

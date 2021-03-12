@@ -22,20 +22,25 @@ import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
 
-class AuthDatabaseCleanerTest {
+class DatabaseCleanerHelperTest {
 
     private val context = InstrumentationRegistry.getInstrumentation().targetContext
-    private val authDatabaseLocator = AuthDatabaseLocator(context)
 
-    private lateinit var testee: AuthDatabaseCleaner
+    private lateinit var testee: DatabaseCleanerHelper
+    private val databaseLocator = AuthDatabaseLocator(context)
 
     @Before
     fun before() {
-        testee = AuthDatabaseCleaner(authDatabaseLocator.getDatabasePath())
+        testee = DatabaseCleanerHelper()
     }
 
     @Test
-    fun whenCleanDatabaseAndDatabaseExistsThenReturnTrue() = runBlocking {
-        assertTrue(testee.cleanDatabase())
+    fun whenCleanDatabaseThenReturnTrue() = runBlocking {
+        assertTrue(testee.cleanDatabase(databaseLocator.getDatabasePath()))
+    }
+
+    @Test
+    fun whenChangeJournalModeToDeleteThenReturnTrue() = runBlocking {
+        assertTrue(testee.changeJournalModeToDelete(databaseLocator.getDatabasePath()))
     }
 }
